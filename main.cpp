@@ -1,46 +1,72 @@
-#include <Interface/SimulationGUI.h>
+//#include <Interface/SimulationGUI.h>
 #include <Interface/SimTestGUI.h>
+//#include <Interface/QSimTestGUI.h>
+//#include <KlamptQt/qtsimtestgui.h>
+//#include "pickandplace.h"
+#include <KrisLibrary/GLdraw/GL.h>
+#include <KrisLibrary/GLdraw/drawextra.h>
+
 #include <stdio.h>
 
+// TODO: draw arrows here not in SimTestGUI.cpp!
+//class SimGUI2 : public SimTestBackend
+//{
+//        virtual bool OnCommand(const string& cmd,const string& args){
+//                if(cmd=="advance") {
+//                        glBegin(GL_LINES);
+//                        //glDisable(GL_LIGHTING);
+//                        //glColor3f(1,0,0);
+//                        //glLineWidth(5.0);
+//                        glVertex3f(0.0f, 0.0f, 0.0f);
+//                        glVertex3f(50.0f, 50.0f, 50.0f);
+//                        glEnd();
+//                        SimStep(sim.simStep);
+//                }
+//        }
+//
+//}
 
 int main(int argc,const char** argv) {
-        //create a world
         RobotWorld world;
         SimTestBackend backend(&world);
         WorldSimulation& sim=backend.sim;
 
-        //world.LoadElement("/home/aorthey/git/Klampt/data/robots/athlete.rob");
-        //world.LoadElement("/home/aorthey/git/Klampt/data/terrains/fractal_terrain_2.tri");
+        backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_fractal_3.xml");
 
-        //backend.InitSim();
-        backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/athlete_fractal_1.xml");
-        //if(!backend.LoadAndInitSim(argc,argv)) {
-                //cerr<<"Error loading simulation from command line"<<endl;
-                //return 1;
-        //}
+        int ids = world.NumIDs();
 
-        //Uncomment+edit the following line to change the controller
-        //time step for robot 0 (100Hz is the default)
-        //sim.controlSimulators[0].controlTimeStep = 0.01;
+        std::cout << std::string(80, '-') << std::endl;
 
-        //Uncomment+edit the following line to change the underlying
-        //simulation time step (1kHz is the default)
-        //sim.simStep = 0.001;
+        std::cout << "RobotWorld Info" << std::endl;
 
-        double dt = 0.1;
+        std::cout << std::string(80, '-') << std::endl;
+        for(int itr = 0; itr <= ids; itr++){
+                std::cout << "[" << itr << "] " << world.GetName(itr) << std::endl;
+        }
+        std::cout << std::string(80, '-') << std::endl;
 
-        //backend.Start();
-        //backend.RenderWorld();
-        //backend.RenderScreen();
+        std::vector<SmartPointer<Robot> > robots = world.robots;
+        std::vector<SmartPointer<Terrain> > terrains = world.terrains;
+        for (std::vector<SmartPointer<Robot> >::iterator it = robots.begin() ; it != robots.end(); ++it){
+                std::cout << "Robot " << (*it)->name << std::endl;
+        }
+
         GLUISimTestGUI gui(&backend,&world);
-        gui.SetWindowTitle("SimTest");
+        gui.SetWindowTitle("SimTest2");
+        glBegin(GL_LINES);
+        //glDisable(GL_LIGHTING);
+        //glColor3f(1,0,0);
+        //glLineWidth(5.0);
+        glVertex3f(0.0f, 0.0f, 0.0f);
+        glVertex3f(50.0f, 50.0f, 50.0f);
+        glEnd();
         gui.Run();
 
-        while(1) {
-                sim.Advance(dt);
-                sim.UpdateModel();
-                cout<<sim.time<<'\t'<<world.robots[0]->q<<endl;
-        }
+        // while(1) {
+        //         //sim.Advance(dt);
+        //         //sim.UpdateModel();
+        //         cout<<sim.time<<'\t'<<world.robots[0]->q<<endl;
+        // }
         ////run the simulation
         //while(sim.time < 5) {
         //        backend.RenderWorld();
