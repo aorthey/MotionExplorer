@@ -1,5 +1,7 @@
 #pragma once
 #include <Interface/SimTestGUI.h>
+#include <ode/ode.h>
+
 
 class ForceFieldGUI : public SimTestBackend
 {
@@ -14,15 +16,15 @@ class ForceFieldGUI : public SimTestBackend
   virtual void RenderWorld()
   {
     BaseT::RenderWorld();
-  
-    for(int x = -3; x < 3; x++){
-      for(int y = -3; y < 3; y++){
-        for(double z = 0.2; z <= 2.5; z+=0.5){
+    double step = 0.5;
+    Real length = step/6;
+    Real linewidth=0.01;
+    Vector3 dir(1,1,0);
+    GLColor cForce(1,1,1,0.6);
+    for(double x = -3; x < 3; x+=step){
+      for(double y = -3; y < 3; y+=step){
+        for(double z = 0.2; z <= 2; z+=step){
           Vector3 pos(x,y,z);
-          Vector3 dir(1,1,0);
-          Real length = 0.2;
-          Real linewidth=0.01;
-          GLColor cForce(1,1,1,0.6);
   
           glDisable(GL_LIGHTING);
   
@@ -49,12 +51,19 @@ class ForceFieldGUI : public SimTestBackend
         }
       }
     }
-        
   }
-  virtual bool OnCommand(const string& cmd,const string& args){
 
+  virtual bool OnCommand(const string& cmd,const string& args){
     if(cmd=="advance") {
       ODERobot *robot = sim.odesim.robot(0);
+      std::cout << "Force" << std::endl;
+      std::cout << robot->robot.name << std::endl;
+      double px,py,pz;
+      double fx,fy,fz;
+      fx = 2.0;
+      fy = 0.0;
+      fz = 0.0;
+      //dBodyAddForceAtPos(robot->body(0),fx,fy,fz,px,py,pz);
     }
     return BaseT::OnCommand(cmd,args);
   }
