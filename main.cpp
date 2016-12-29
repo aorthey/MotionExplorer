@@ -5,61 +5,26 @@
 //#include "pickandplace.h"
 #include <KrisLibrary/GLdraw/GL.h>
 #include <KrisLibrary/GLdraw/drawextra.h>
-
 #include <stdio.h>
+#include "src/gui.h"
+#include "src/info.h"
 
-// TODO: draw arrows here not in SimTestGUI.cpp!
-//class SimGUI2 : public SimTestBackend
-//{
-//        virtual bool OnCommand(const string& cmd,const string& args){
-//                if(cmd=="advance") {
-//                        glBegin(GL_LINES);
-//                        //glDisable(GL_LIGHTING);
-//                        //glColor3f(1,0,0);
-//                        //glLineWidth(5.0);
-//                        glVertex3f(0.0f, 0.0f, 0.0f);
-//                        glVertex3f(50.0f, 50.0f, 50.0f);
-//                        glEnd();
-//                        SimStep(sim.simStep);
-//                }
-//        }
-//
-//}
 
 int main(int argc,const char** argv) {
         RobotWorld world;
-        SimTestBackend backend(&world);
+        ForceFieldGUI backend(&world);
         WorldSimulation& sim=backend.sim;
 
-        backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_fractal_3.xml");
+        //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_fractal_3.xml");
+        backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/athlete_fractal_1.xml");
 
-        int ids = world.NumIDs();
+        Info info(&world);
 
-        std::cout << std::string(80, '-') << std::endl;
-
-        std::cout << "RobotWorld Info" << std::endl;
-
-        std::cout << std::string(80, '-') << std::endl;
-        for(int itr = 0; itr <= ids; itr++){
-                std::cout << "[" << itr << "] " << world.GetName(itr) << std::endl;
-        }
-        std::cout << std::string(80, '-') << std::endl;
-
-        std::vector<SmartPointer<Robot> > robots = world.robots;
-        std::vector<SmartPointer<Terrain> > terrains = world.terrains;
-        for (std::vector<SmartPointer<Robot> >::iterator it = robots.begin() ; it != robots.end(); ++it){
-                std::cout << "Robot " << (*it)->name << std::endl;
-        }
+        info.print();
 
         GLUISimTestGUI gui(&backend,&world);
+        //ForceFieldGUI gui(&backend,&world);
         gui.SetWindowTitle("SimTest2");
-        glBegin(GL_LINES);
-        //glDisable(GL_LIGHTING);
-        //glColor3f(1,0,0);
-        //glLineWidth(5.0);
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(50.0f, 50.0f, 50.0f);
-        glEnd();
         gui.Run();
 
         // while(1) {
