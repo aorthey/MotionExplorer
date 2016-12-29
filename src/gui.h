@@ -54,6 +54,7 @@ class ForceFieldGUI : public SimTestBackend
   virtual bool OnCommand(const string& cmd,const string& args){
 
     if(cmd=="advance") {
+      ODERobot *robot = sim.odesim.robot(0);
     }
     return BaseT::OnCommand(cmd,args);
   }
