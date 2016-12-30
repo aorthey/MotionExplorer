@@ -18,6 +18,7 @@ Robot (Robot.h)
     SelfCollision()
     DrawGL()
     DrawLinkGL(int i)
+    int LinkIndex(char *) GetBody|GetLink function
 
   <- <- RobotDynamics3D 
 

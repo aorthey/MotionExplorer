@@ -4,11 +4,15 @@
 //#include <KlamptQt/qtsimtestgui.h>
 //#include "pickandplace.h"
 #include <KrisLibrary/GLdraw/GL.h>
+#include <KrisLibrary/robotics/IK.h>
+#include <KrisLibrary/robotics/IKFunctions.h>
 #include <KrisLibrary/GLdraw/drawextra.h>
 #include <stdio.h>
 #include "src/gui.h"
 #include "src/info.h"
 #include "src/object.h"
+#include "src/iksolver.h"
+#include "src/iksolver_hubo.h"
 
 
 int main(int argc,const char** argv) {
@@ -25,6 +29,14 @@ int main(int argc,const char** argv) {
 
   Info info(&world);
   info.print();
+
+  Robot *huborizer = world.GetRobot("hubo");
+  IKSolverHubo ikhubo(&world);
+  ikhubo.solve();
+
+  //huborizer->GetWorldPosition(localPos,EElink,wp);
+  //double err = RobotIKError(*huborizer,goal);
+  //std::cout << "IK error" << err << std::endl;
 
 
   //always load objects over backend, not in world! (backend takes care of
