@@ -30,22 +30,13 @@ int main(int argc,const char** argv) {
   Info info(&world);
   info.print();
 
-  Robot *huborizer = world.GetRobot("hubo");
   IKSolverHubo ikhubo(&world);
   ikhubo.solve();
 
-  //huborizer->GetWorldPosition(localPos,EElink,wp);
-  //double err = RobotIKError(*huborizer,goal);
-  //std::cout << "IK error" << err << std::endl;
-
+  //Robot *huborizer = world.GetRobot("hubo");
 
   //always load objects over backend, not in world! (backend takes care of
   //associating it with frontend gui)
-
-  //string objFile = "/home/aorthey/git/Klampt/data/robots/door.rob";
-  //backend.LoadFile(objFile.c_str());
-  //string cubeFile = "/home/aorthey/git/Klampt/data/robots/free_cube.rob";
-  //backend.LoadFile(cubeFile.c_str());
 
   //Robot *cube = world.GetRobot("free_cube");
   //Config q = cube->q;

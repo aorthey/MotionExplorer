@@ -100,12 +100,16 @@ class IKSolverHubo: public IKSolver
   IKGoal LinkToGoal( const char *linkName, double x, double y, double z)
   {
     int linkid = _robot->LinkIndex(linkName);
-    Vector3 position(x,y,z);
     Vector3 localPosition(0,0,0);
+    Vector3 position(x,y,z);
+    Matrix3 rotation;
+    rotation.setIdentity();
+
     IKGoal goal;
     goal.link = linkid;
     goal.localPosition = localPosition;
     goal.SetFixedPosition(position);
+    goal.SetFixedRotation(rotation);
     return goal;
   }
     
