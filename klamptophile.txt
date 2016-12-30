@@ -83,7 +83,6 @@ BACKEND
   <- <- <- <- SimGUIBackend (add functions to display dynamics,i.e. wrenches, torques, contacts etc)
   <- <- <- <- <- SimTestBackend (more functions to interact with robot, add forces, etc)
 
-
 -------------------------------------------------
 VIEW
 -------------------------------------------------
@@ -111,5 +110,13 @@ WorldSimulation
   ODESimulator odesim; //your gateway to ODE geometrix
   RobotWorld *world;
 
-  
+-------------------------------------------------
+CONTACTS
+-------------------------------------------------
+  Hold (a single robot link-env contact with 1 or more contact points)
+  Stance (a set of holds)
+  Grasp (a set of holds with some dofs fixed)
+-------------------------------------------------
 
+
+where to set configurations? ODERobot?
