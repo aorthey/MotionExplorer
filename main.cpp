@@ -12,11 +12,13 @@
 
 int main(int argc,const char** argv) {
         RobotWorld world;
-        ForceFieldGUI backend(&world);
+
+        ForceFieldBackend backend(&world);
+        //SimTestBackend backend(&world);
         WorldSimulation& sim=backend.sim;
 
-        backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_fractal_3.xml");
-        //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/athlete_fractal_1.xml");
+        //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_fractal_3.xml");
+        backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/athlete_fractal_1.xml");
 
         Info info(&world);
 

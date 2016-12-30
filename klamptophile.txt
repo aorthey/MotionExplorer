@@ -1,0 +1,115 @@
+-------------------------------------------------
+MODELING
+-------------------------------------------------
+  A container for all the entities which we use
+  Robot, Terrain, RigidObject, MultiPath
+  EntryFile: World.h
+-------------------------------------------------
+
+RobotWorld (World.h) contains 
+  Robot, Terrain, RigidObject, MultiPath!
+  Names, Ids
+  Load/Save XML
+
+Robot (Robot.h)
+
+  <- RobotWithGeometry
+
+    SelfCollision()
+    DrawGL()
+    DrawLinkGL(int i)
+
+  <- <- RobotDynamics3D 
+
+    Vector dq;   ///< current velocity
+    Vector velMin,velMax; ///< velocity limits
+    Vector torqueMax;     ///< torque limits
+    Vector powerMax;      ///< Power=|torque||velocity| limits
+
+    //B*ddq + C*dq = fext
+    //ddq from fext
+    void CalcAcceleration(Vector& ddq, const Vector& fext);
+    //fext from ddq
+    void CalcTorques(const Vector& ddq, Vector& fext);
+
+
+  <- <- <- RobotKinematics3D 
+
+    GetCOM()
+    GetTotalMass()
+    std::vector<RobotLink3D> links;
+    Config q;           ///< current configuration
+    Vector qMin,qMax;   ///< joint limits
+
+    /// sets the current config q and updates frames
+    void UpdateConfig(const Config& q);
+
+    /// based on the values in q, update the frames T
+    void UpdateFrames();
+
+    bool InJointLimits(const Config& q) const;
+
+    //Force Field acts on rigid link i and induces a wrench on its COM
+    // wrench on COM of link i induces a wrench on CS of robot. 
+    // F = J^t w | w=(torque,force)
+    void GetWrenchTorques(const Vector3& torque, const Vector3& force, int i, Vector& F) const;
+
+
+  <- <- <- <- Chain
+    //on-chain/off-chain idea goes here:
+    void GetChildList(std::vector<std::vector<int> >& children) const;
+
+
+RobotLink3D (KrisLibrary/robotics/RobotLink3d.h
+  Type type; {revolute,prismatic}
+  Vector3 w;
+  Real mass;
+  Vector3 com;
+  Matrix3 inertia;
+
+-------------------------------------------------
+INTERFACE
+-------------------------------------------------
+  Controls the communication between frontend and backend
+  Frontend  (The GUI, viewer, interactions, dynamic simulation, drawGL)
+    GenericGUIBase (GenericGUI.h)
+  Backend (The world and its entities)
+    GenericBackendBase (GenericGUI.h)
+-------------------------------------------------
+
+BACKEND
+  GenericBackendBase
+  <- <- <- WorldGUIBackend (loader for RobotWorld)
+  <- <- <- <- SimGUIBackend (add functions to display dynamics,i.e. wrenches, torques, contacts etc)
+  <- <- <- <- <- SimTestBackend (more functions to interact with robot, add forces, etc)
+
+
+-------------------------------------------------
+VIEW
+-------------------------------------------------
+  drawing routines for all entities defined in RobotWorld
+-------------------------------------------------
+Actual drawing happens in KrisLibrary/GLdraw/GeometryAppearance.cpp
+KrisLibrary/GLdraw/drawextra.h
+
+-------------------------------------------------
+SIMULATION
+-------------------------------------------------
+  ode simulation files 
+  everything related to the actual dynamical simulation
+  EntryFile : WorldSimulation.h
+-------------------------------------------------
+
+WorldSimulation
+  double time
+
+  /// anything contact forces/torques, where are the contacts etc goes here
+  ODEContactList* GetContactList(int aid,int bid);
+  Vector3 ContactForce(int aid,int bid=-1);
+
+  // major players
+  ODESimulator odesim; //your gateway to ODE geometrix
+  RobotWorld *world;
+
+  
+
