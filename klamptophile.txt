@@ -1,10 +1,17 @@
--------------------------------------------------
+-------------------------------------------------------------------------------
 MODELING
--------------------------------------------------
+-------------------------------------------------------------------------------
   A container for all the entities which we use
   Robot, Terrain, RigidObject, MultiPath
   EntryFile: World.h
--------------------------------------------------
+  
+  Note: Robot corresponds to the "desired" yellowish robot in simulation; to put
+the real robot exactly at a position can be done over ODERobot
+WorldSimulation->GetRobot(). This is only for starting purposes of course.
+Control acts on ODEWorldSimulationRobot, while all the kinematic
+solutions/setconfig act on Yellow Robot. 
+-------------------------------------------------------------------------------
+
 
 RobotWorld (World.h) contains 
   Robot, Terrain, RigidObject, MultiPath!
@@ -68,15 +75,15 @@ RobotLink3D (KrisLibrary/robotics/RobotLink3d.h
   Vector3 com;
   Matrix3 inertia;
 
--------------------------------------------------
+-------------------------------------------------------------------------------
 INTERFACE
--------------------------------------------------
+-------------------------------------------------------------------------------
   Controls the communication between frontend and backend
   Frontend  (The GUI, viewer, interactions, dynamic simulation, drawGL)
     GenericGUIBase (GenericGUI.h)
   Backend (The world and its entities)
     GenericBackendBase (GenericGUI.h)
--------------------------------------------------
+-------------------------------------------------------------------------------
 
 BACKEND
   GenericBackendBase
@@ -84,21 +91,21 @@ BACKEND
   <- <- <- <- SimGUIBackend (add functions to display dynamics,i.e. wrenches, torques, contacts etc)
   <- <- <- <- <- SimTestBackend (more functions to interact with robot, add forces, etc)
 
--------------------------------------------------
+-------------------------------------------------------------------------------
 VIEW
--------------------------------------------------
+-------------------------------------------------------------------------------
   drawing routines for all entities defined in RobotWorld
--------------------------------------------------
+-------------------------------------------------------------------------------
 Actual drawing happens in KrisLibrary/GLdraw/GeometryAppearance.cpp
 KrisLibrary/GLdraw/drawextra.h
 
--------------------------------------------------
+-------------------------------------------------------------------------------
 SIMULATION
--------------------------------------------------
+-------------------------------------------------------------------------------
   ode simulation files 
   everything related to the actual dynamical simulation
   EntryFile : WorldSimulation.h
--------------------------------------------------
+-------------------------------------------------------------------------------
 
 WorldSimulation
   double time
@@ -111,12 +118,66 @@ WorldSimulation
   ODESimulator odesim; //your gateway to ODE geometrix
   RobotWorld *world;
 
--------------------------------------------------
+  ODERobot GetRobot(int id); //get the real robot (you cannot and should not
+control that, but can be used for initial placement procedures)
+
+-------------------------------------------------------------------------------
 CONTACTS
--------------------------------------------------
+-------------------------------------------------------------------------------
   Hold (a single robot link-env contact with 1 or more contact points)
   Stance (a set of holds)
   Grasp (a set of holds with some dofs fixed)
--------------------------------------------------
+-------------------------------------------------------------------------------
 
-where to set configurations? ODERobot? 
+-------------------------------------------------------------------------------
+MATH
+-------------------------------------------------------------------------------
+ Krislibrary/math3d/primitives.h
+  class Vector2;
+  class Vector3;
+  class Vector4;
+  class Matrix2;
+  class Matrix3;
+  class Matrix4;
+  class RigidTransform2D;
+  class RigidTransform;
+  +IO functionality!
+
+  - class Matrix3
+    inline void setRotateX(Real rads);  ///<sets the matrix that rotates ccw by rads around the x axis
+    inline void setRotateY(Real rads);  ///<sets the matrix that rotates ccw by rads around the x axis
+    inline void setRotateZ(Real rads);  ///<sets the matrix that rotates ccw by rads around the x axis
+
+
+
+ Krislibrary/math/Vectortemplate.h
+  typedef class VectorTemplate<float> fVector;
+  typedef class VectorTemplate<double> dVector;
+  typedef class VectorTemplate<Complex> cVector;
+  typedef VectorTemplate<Real> Vector;
+    T dot(const MyT&) const;
+    T dotSelf() const;
+    T norm() const;
+    T normSquared() const;
+    T distance(const MyT&) const;
+    T distanceSquared(const MyT&) const;
+    T minElement(int* index=NULL) const;
+    T maxElement(int* index=NULL) const;
+    T minAbsElement(int* index=NULL) const;
+    T maxAbsElement(int* index=NULL) const;
+
+-------------------------------------------------------------------------------
+TODO
+-------------------------------------------------------------------------------
+ [x] solve IK for frame-env contact points
+ [ ] solve IK for arbitrary rob-env contact points
+ [ ] add limits/selfcollision/collision checks to IK
+ [x] place robot directly(!) at IK computed solution and THEN start sim 
+ [x] place robot feet on floor
+
+ [ ] make/break contact events => compute transition paths
+ [ ] retime transition paths (TOPP vs build-in!?)
+ [ ] execute transition paths
+ [ ] Compute Force Closure Grasp from points
+ [ ] Move hand such that a set of fingertip points is fulfilled
+ [ ] Compute SE constraints, what is GIWC equivalent?

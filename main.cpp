@@ -24,14 +24,25 @@ int main(int argc,const char** argv) {
 
   //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_fractal_3.xml");
   //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/athlete_fractal_1.xml");
-  //backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/hubo_object.xml");
-  backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_pushdoor.xml");
+  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/hubo_object.xml");
+  //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_pushdoor.xml");
 
   Info info(&world);
   info.print();
 
   IKSolverHubo ikhubo(&world);
   ikhubo.solve();
+  ikhubo.SetConfigSimulatedRobot(sim);
+
+  TakeObjectWithLeftHand();
+
+
+ // robot->UpdateConfig(q);
+ // robot->UpdateFrames();
+ // ViewRobot *vrobot = world.GetRobotView("hubo");
+ // vrobot->robot->UpdateConfig(q);
+ // vrobot->robot->UpdateFrames();
+
 
   //Robot *huborizer = world.GetRobot("hubo");
 

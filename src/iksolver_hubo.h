@@ -86,30 +86,43 @@ class IKSolverHubo: public IKSolver
   string GetRobotName(){
     return "hubo";
   }
+
   vector<IKGoal> GetProblem(){
     vector<IKGoal> problem;
+    Matrix3 I;
+    I.setRotateZ(Pi/2);
 
-    problem.push_back( LinkToGoal("Body_LAP",0.5,-1,0.1) );
-    problem.push_back( LinkToGoal("Body_RAP",1.0,-1,0.1) );
-    problem.push_back( LinkToGoal("leftIndexDistal",0.5,-1,1.2) );
-    problem.push_back( LinkToGoal("rightIndexDistal",1.0,-1,1.2) );
+    problem.push_back( LinkToGoalRot("Body_LAR",0.4,-0.5,0.1,I) );
+    problem.push_back( LinkToGoalRot("Body_RAR",0.6,-0.5,0.1,I) );
+    problem.push_back( LinkToGoal("leftIndexDistal",0.4,-0.2,1.2) );
+    problem.push_back( LinkToGoal("rightIndexDistal",0.6,-0.2,1.2) );
 
     return problem;
   }
   //#########################################################################
-  IKGoal LinkToGoal( const char *linkName, double x, double y, double z)
+  IKGoal LinkToGoalRot( const char *linkName, double x, double y, double z, Matrix3 &rotation)
   {
     int linkid = _robot->LinkIndex(linkName);
     Vector3 localPosition(0,0,0);
     Vector3 position(x,y,z);
-    Matrix3 rotation;
-    rotation.setIdentity();
 
     IKGoal goal;
     goal.link = linkid;
     goal.localPosition = localPosition;
     goal.SetFixedPosition(position);
     goal.SetFixedRotation(rotation);
+    return goal;
+  }
+  IKGoal LinkToGoal( const char *linkName, double x, double y, double z)
+  {
+    int linkid = _robot->LinkIndex(linkName);
+    Vector3 localPosition(0,0,0);
+    Vector3 position(x,y,z);
+
+    IKGoal goal;
+    goal.link = linkid;
+    goal.localPosition = localPosition;
+    goal.SetFixedPosition(position);
     return goal;
   }
     
