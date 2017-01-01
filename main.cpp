@@ -14,6 +14,10 @@
 #include "src/iksolver.h"
 #include "src/iksolver_hubo.h"
 
+#include "Contact/Grasp.h" //class Grasp
+//#include "Modeling/MultiPath.h"
+//#include "Modeling/Paths.h"
+
 
 int main(int argc,const char** argv) {
   RobotWorld world;
@@ -34,18 +38,16 @@ int main(int argc,const char** argv) {
   ikhubo.solve();
   ikhubo.SetConfigSimulatedRobot(sim);
 
-  TakeObjectWithLeftHand();
+  Grasp worldGrasp;
+  //TakeObjectWithLeftHand();
 
-
- // robot->UpdateConfig(q);
- // robot->UpdateFrames();
- // ViewRobot *vrobot = world.GetRobotView("hubo");
- // vrobot->robot->UpdateConfig(q);
- // vrobot->robot->UpdateFrames();
-
+  //robot->UpdateConfig(q);
+  //robot->UpdateFrames();
+  //ViewRobot *vrobot = world.GetRobotView("hubo");
+  //vrobot->robot->UpdateConfig(q);
+  //vrobot->robot->UpdateFrames();
 
   //Robot *huborizer = world.GetRobot("hubo");
-
   //always load objects over backend, not in world! (backend takes care of
   //associating it with frontend gui)
 
