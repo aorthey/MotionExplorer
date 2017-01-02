@@ -5,13 +5,13 @@ MODELING
   Robot, Terrain, RigidObject, MultiPath
   EntryFile: World.h
   
-  Note: Robot corresponds to the "desired" yellowish robot in simulation; to put
-the real robot exactly at a position can be done over ODERobot
-WorldSimulation->GetRobot(). This is only for starting purposes of course.
-Control acts on ODEWorldSimulationRobot, while all the kinematic
-solutions/setconfig act on Yellow Robot. 
+  Note: 
+    Robot corresponds to the "desired" yellowish robot in simulation; to put
+    the real robot exactly at a position can be done over ODERobot
+    WorldSimulation->GetRobot(). This is only for starting purposes of course.
+    Control acts on ODEWorldSimulationRobot, while all the kinematic
+    solutions/setconfig act on Yellow Robot. 
 -------------------------------------------------------------------------------
-
 
 RobotWorld (World.h) contains 
   Robot, Terrain, RigidObject, MultiPath!
@@ -78,11 +78,13 @@ RobotLink3D (KrisLibrary/robotics/RobotLink3d.h
 -------------------------------------------------------------------------------
 INTERFACE
 -------------------------------------------------------------------------------
+
   Controls the communication between frontend and backend
   Frontend  (The GUI, viewer, interactions, dynamic simulation, drawGL)
     GenericGUIBase (GenericGUI.h)
   Backend (The world and its entities)
     GenericBackendBase (GenericGUI.h)
+
 -------------------------------------------------------------------------------
 
 BACKEND
@@ -96,6 +98,7 @@ VIEW
 -------------------------------------------------------------------------------
   drawing routines for all entities defined in RobotWorld
 -------------------------------------------------------------------------------
+
 Actual drawing happens in KrisLibrary/GLdraw/GeometryAppearance.cpp
 KrisLibrary/GLdraw/drawextra.h
 
@@ -124,14 +127,52 @@ control that, but can be used for initial placement procedures)
 -------------------------------------------------------------------------------
 CONTACTS
 -------------------------------------------------------------------------------
+
   Hold (a single robot link-env contact with 1 or more contact points)
   Stance (a set of holds)
   Grasp (a set of holds with some dofs fixed)
+
 -------------------------------------------------------------------------------
+CSPACE
+-------------------------------------------------------------------------------
+
+  ContactCSpace (Planning/ContactCSpace.h)
+    //Single Robot in contact with environment
+    vector<IKGoal> contactIK;
+    void AddContact(const IKGoal& goal);
+    void RemoveContact(int link);
+    bool SolveContact(int numIters=0,Real tol=0);
+
+  <- SingleRobotCSpace2
+    //Single robot + fixed dofs available
+
+  <- <- SingleRobotCSpace 
+    //Single Robot 
+
+  <- <- <- ExplicitCSpace
+    //N-obstacles CSpace
+    bool IsFeasible(const Config&,int obstacle);
+    EdgePlanner* LocalPlanner(const Config& a,const Config& b,int obstacle);
+    int NumObstacles();
+
+  <- <- <- <- CSpace (Krislibrary/planning/cspace.h)
+    //Generic CSpace
+    void Sample(Config& x);
+    bool IsFeasible(const Config&);
+
+-------------------------------------------------------------------------------
+LOAD/SAVE RESOURCE (KrisLibrary/utils/ResourceLibrary.h)
+-------------------------------------------------------------------------------
+
+  Modeling/Resources.h
+
+    BasicResources (vector,transform,config)
+    GraspResources
 
 -------------------------------------------------------------------------------
 MATH
 -------------------------------------------------------------------------------
+
  Krislibrary/math3d/primitives.h
   class Vector2;
   class Vector3;
@@ -169,6 +210,7 @@ MATH
 -------------------------------------------------------------------------------
 TODO
 -------------------------------------------------------------------------------
+
  [x] solve IK for frame-env contact points
  [ ] solve IK for arbitrary rob-env contact points
  [ ] add limits/selfcollision/collision checks to IK

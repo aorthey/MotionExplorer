@@ -1,0 +1,6 @@
+namespace orthoklampt{
+  class PickupObject{
+
+  }
+};
+

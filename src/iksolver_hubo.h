@@ -100,31 +100,6 @@ class IKSolverHubo: public IKSolver
     return problem;
   }
   //#########################################################################
-  IKGoal LinkToGoalRot( const char *linkName, double x, double y, double z, Matrix3 &rotation)
-  {
-    int linkid = _robot->LinkIndex(linkName);
-    Vector3 localPosition(0,0,0);
-    Vector3 position(x,y,z);
-
-    IKGoal goal;
-    goal.link = linkid;
-    goal.localPosition = localPosition;
-    goal.SetFixedPosition(position);
-    goal.SetFixedRotation(rotation);
-    return goal;
-  }
-  IKGoal LinkToGoal( const char *linkName, double x, double y, double z)
-  {
-    int linkid = _robot->LinkIndex(linkName);
-    Vector3 localPosition(0,0,0);
-    Vector3 position(x,y,z);
-
-    IKGoal goal;
-    goal.link = linkid;
-    goal.localPosition = localPosition;
-    goal.SetFixedPosition(position);
-    return goal;
-  }
     
 };
 
