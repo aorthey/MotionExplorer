@@ -92,10 +92,10 @@ class IKSolverHubo: public IKSolver
     Matrix3 I;
     I.setRotateZ(Pi/2);
 
-    problem.push_back( LinkToGoalRot("Body_LAR",0.4,-0.5,0.1,I) );
-    problem.push_back( LinkToGoalRot("Body_RAR",0.6,-0.5,0.1,I) );
-    problem.push_back( LinkToGoal("leftIndexDistal",0.4,-0.2,1.2) );
-    problem.push_back( LinkToGoal("rightIndexDistal",0.6,-0.2,1.2) );
+    problem.push_back( LinkToGoalTransRot("Body_LAR",0.4,-0.5,0.1,I) );
+    problem.push_back( LinkToGoalTransRot("Body_RAR",0.6,-0.5,0.1,I) );
+    problem.push_back( LinkToGoalTrans("leftIndexDistal",0.4,-0.2,1.2) );
+    problem.push_back( LinkToGoalTrans("rightIndexDistal",0.6,-0.2,1.2) );
 
     return problem;
   }

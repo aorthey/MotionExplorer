@@ -221,5 +221,6 @@ TODO
  [ ] retime transition paths (TOPP vs build-in!?)
  [ ] execute transition paths
  [ ] Compute Force Closure Grasp from points
- [ ] Move hand such that a set of fingertip points is fulfilled
+ [x] Move hand such that a set of fingertip points is fulfilled
  [ ] Compute SE constraints, what is GIWC equivalent?
+ [ ] set color to link in contact

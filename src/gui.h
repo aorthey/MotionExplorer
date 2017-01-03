@@ -3,6 +3,9 @@
 #include <ode/ode.h>
 
 
+const GLColor bodyColor(0.9,0.9,0.9);
+const GLColor selectedLinkColor(0.9,0.2,0.2);
+
 class ForceFieldBackend : public SimTestBackend
 {
   private:
@@ -29,7 +32,12 @@ class ForceFieldBackend : public SimTestBackend
       viewRobot->DrawCenterOfMass(COMradius);
       viewRobot->DrawLinkFrames(frameLength);
       viewRobot->DrawLinkSkeleton();
-      //viewRobot->SetColor(int i,const GLDraw::GLColor& c);
+      viewRobot->SetColors(bodyColor);
+      //std::cout << cur_driver << std::endl;
+      //std::cout << cur_link << std::endl;
+      //if(cur_driver>-1){
+        //viewRobot->SetColor(cur_driver, selectedLinkColor);
+      //}
     }
 
     if(drawForceField){
@@ -74,6 +82,7 @@ class ForceFieldBackend : public SimTestBackend
   }//RenderWorld
 
   virtual bool OnCommand(const string& cmd,const string& args){
+    BaseT::OnCommand(cmd,args);
     if(cmd=="advance") {
       ODERobot *robot = sim.odesim.robot(0);
       std::cout << "Force" << std::endl;
@@ -91,8 +100,8 @@ class ForceFieldBackend : public SimTestBackend
       pz = 0.0;
       dBodyAddForceAtPos(robot->body(7),fx,fy,fz,px,py,pz);
     }
-    return BaseT::OnCommand(cmd,args);
   }
+
 
 };
 

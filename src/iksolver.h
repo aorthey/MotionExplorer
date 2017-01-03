@@ -18,15 +18,23 @@ class IKSolver{
     bool _isSolved;
     Robot *_robot;
     RobotWorld *_world;
+
+  private:
+    void preSolve();
+    void postSolve();
   public:
     IKSolver(RobotWorld *world);
     virtual string GetRobotName() = 0;
     virtual vector<IKGoal> GetProblem() = 0;
-    virtual bool solve();
+    virtual bool solveIKconstraints();
+    virtual bool solve_default();
+
+    bool solve();
     void visualize();
     ///Set IK solution to real robot
     void SetConfigSimulatedRobot(WorldSimulation &sim);
-    IKGoal LinkToGoalRot( const char *linkName, double x, double y, double z, Matrix3 &rotation);
-    IKGoal LinkToGoal( const char *linkName, double x, double y, double z);
+    IKGoal LinkToGoalTransRot( const char *linkName, double x, double y, double z, Matrix3 &rotation);
+    IKGoal LinkToGoalTrans( const char *linkName, double x, double y, double z);
+    IKGoal LinkToGoalRot( const char *linkName, Matrix3 &rotation);
 };
 
