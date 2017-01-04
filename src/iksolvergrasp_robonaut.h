@@ -110,18 +110,31 @@ class IKSolverGraspRobonaut: public IKSolverGrasp
     }
 
     void ComputeFixedDofs(){
-      //fix everything except joints 8-28 (left arm and left hand)
       fixedDofs.clear();
       fixedDofValues.clear();
 
       Config q = this->_robot->q;
       for(int i =0; i<10;i++){
-        std::cout << "fixed dof" << i << std::endl;
+        fixedDofs.push_back(i);
+        fixedDofValues.push_back(q[i]);
+      }
+//Link[22] left_little_proximal mass 0.001
+//Link[23] left_little_medial mass 0.001
+//Link[24] left_little_distal mass 0.001
+//Link[25] left_little_tip mass 0.001
+//Link[31] left_ring_proximal mass 0.001
+//Link[32] left_ring_medial mass 0.001
+//Link[33] left_ring_distal mass 0.001
+//Link[34] left_ring_tip mass 0.001
+      for(int i =22; i<26;i++){
+        fixedDofs.push_back(i);
+        fixedDofValues.push_back(q[i]);
+      }
+      for(int i =31; i<35;i++){
         fixedDofs.push_back(i);
         fixedDofValues.push_back(q[i]);
       }
       for(int i =41; i<this->_robot->q.size();i++){
-        std::cout << "fixed dof" << i << std::endl;
         fixedDofs.push_back(i);
         fixedDofValues.push_back(q[i]);
       }
@@ -133,8 +146,8 @@ class IKSolverGraspRobonaut: public IKSolverGrasp
     vector<int> GetFixedDofs(){
       return fixedDofs;
     }
-    vector<IKGoal> GetProblem(){
-      vector<IKGoal> problem;
+    vector<IKGoal> GetConstraints(){
+      vector<IKGoal> constraints;
 
       //L.setIdentity();
 //Link[10] left_shoulder_pitch mass 4.42706
@@ -177,19 +190,23 @@ class IKSolverGraspRobonaut: public IKSolverGrasp
       L.setRotateZ(Pi/2);
       Matrix3 LX;
       LX.setRotateY(Pi);
-      //Matrix3 LY;
-      //LY.setRotateY(Pi/2);
       L = LX*L;
 
       Matrix3 Lt;
       Lt.setRotateZ(Pi/2);
+      Matrix3 LY;
+      LY.setRotateY(Pi);
+      Matrix3 LZ;
+      //LZ.setRotateY(-Pi);
+      LZ.setRotateY(-Pi-Pi/4-Pi/8);
+      Lt = LZ*LY*Lt;
 
-      problem.push_back( LinkToGoalTransRot("left_index_tip",0.2,-0.0,1.0,L) );
-      //problem.push_back( LinkToGoalTransRot("left_thumb_tip",0.25,-0.05,1.0,Lt) );
-      problem.push_back( LinkToGoalTrans("left_thumb_tip",0.25,-0.05,1.0) );
-      //problem.push_back( LinkToGoalTransRot("left_middle_tip",0.2,-0.0,0.9,L) );
-      //problem.push_back( LinkToGoalTransRot("left_middle_distal",0.2,-0.0,0.953,R) );
+      constraints.push_back( LinkToGoalTransRot("left_thumb_distal",0.27,-0.05,1.0,Lt) );
+      constraints.push_back( LinkToGoalTransRot("left_index_distal",0.2,-0.0,1.0,L) );
+      //constraints.push_back( LinkToGoalTrans("left_thumb_distal",0.25,-0.05,1.0) );
+      constraints.push_back( LinkToGoalTransRot("left_middle_distal",0.2,-0.0,0.97,L) );
+      //constraints.push_back( LinkToGoalTransRot("left_middle_distal",0.2,-0.0,0.953,R) );
 
-      return problem;
+      return constraints;
     }
 };

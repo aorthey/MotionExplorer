@@ -87,17 +87,17 @@ class IKSolverHubo: public IKSolver
     return "hubo";
   }
 
-  vector<IKGoal> GetProblem(){
-    vector<IKGoal> problem;
+  vector<IKGoal> GetConstraints(){
+    vector<IKGoal> constraints;
     Matrix3 I;
     I.setRotateZ(Pi/2);
 
-    problem.push_back( LinkToGoalTransRot("Body_LAR",0.4,-0.5,0.1,I) );
-    problem.push_back( LinkToGoalTransRot("Body_RAR",0.6,-0.5,0.1,I) );
-    problem.push_back( LinkToGoalTrans("leftIndexDistal",0.4,-0.2,1.2) );
-    problem.push_back( LinkToGoalTrans("rightIndexDistal",0.6,-0.2,1.2) );
+    constraints.push_back( LinkToGoalTransRot("Body_LAR",0.4,-0.5,0.1,I) );
+    constraints.push_back( LinkToGoalTransRot("Body_RAR",0.6,-0.5,0.1,I) );
+    constraints.push_back( LinkToGoalTrans("leftIndexDistal",0.4,-0.2,1.2) );
+    constraints.push_back( LinkToGoalTrans("rightIndexDistal",0.6,-0.2,1.2) );
 
-    return problem;
+    return constraints;
   }
   //#########################################################################
     

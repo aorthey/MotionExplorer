@@ -38,10 +38,13 @@ int main(int argc,const char** argv) {
 
   IKSolverGraspRobonaut ikrobot(&world,0);
   //IKSolverGraspHuboLeftHandCylinder ikhubo(&world,0);
-  ikrobot.solve_default();
+  ikrobot.solve();
   ikrobot.SetConfigSimulatedRobot(sim);
+
+  backend.SetIKConstraints( ikrobot.GetIKGoalConstraints(), ikrobot.GetIKRobotName() );
+  //ikrobot.solve_default();
   //ikhubo.ComputeFixedDofs();
-  ikrobot.visualize();
+  //ikrobot.visualize();
   //ikhubo.solve();
   //ikhubo.SetConfigSimulatedRobot(sim);
 

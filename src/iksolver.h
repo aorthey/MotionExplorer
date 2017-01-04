@@ -11,7 +11,7 @@ class IKSolver{
     Real _tolerance;
     int _iters;
     int _verbose;
-    vector<IKGoal> _problem;
+    vector<IKGoal> _constraints;
     Config q_solution;
     Config q_initial;
 
@@ -19,16 +19,21 @@ class IKSolver{
     Robot *_robot;
     RobotWorld *_world;
 
+    bool _isInitialized;
+
+    virtual string GetRobotName() = 0;
+    virtual bool solveIKconstraints();
+    virtual vector<IKGoal> GetConstraints() = 0;
   private:
     void preSolve();
     void postSolve();
+    void init();
   public:
     IKSolver(RobotWorld *world);
-    virtual string GetRobotName() = 0;
-    virtual vector<IKGoal> GetProblem() = 0;
-    virtual bool solveIKconstraints();
-    virtual bool solve_default();
 
+    string GetIKRobotName();
+    vector<IKGoal> GetIKGoalConstraints();
+    virtual bool solve_default();
     bool solve();
     void visualize();
     ///Set IK solution to real robot

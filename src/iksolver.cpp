@@ -5,17 +5,29 @@ IKSolver::IKSolver(RobotWorld *world):
 {
   this->_tolerance = 1e-2;
   this->_isSolved = false;
+  this->_isInitialized = false;
   this->_iters = 100;
   this->_verbose = 1;
 }
 
+void IKSolver::init(){
+  if(!this->_isInitialized){
+    this->_robot = _world->GetRobot(this->GetRobotName());
+    this->_isInitialized = true;
+  }
+}
+string IKSolver::GetIKRobotName()
+{
+  this->init();
+  return this->GetRobotName();
+}
 void IKSolver::preSolve()
 {
-  this->_robot = _world->GetRobot(this->GetRobotName());
-  this->_problem = this->GetProblem();
+  this->_constraints = this->GetConstraints();
   this->q_initial = this->_robot->q;
   std::cout << "presolve" << std::endl;
 }
+
 void IKSolver::postSolve()
 {
   this->q_solution = this->_robot->q;
@@ -31,17 +43,20 @@ void IKSolver::postSolve()
 
 bool IKSolver::solveIKconstraints()
 {
-  _isSolved = SolveIK(*_robot,_problem,_tolerance,_iters,_verbose);
+  this->init();
+  _isSolved = SolveIK(*_robot,_constraints,_tolerance,_iters,_verbose);
   return _isSolved;
 }
 bool IKSolver::solve_default(){
+  this->init();
   this->preSolve();
-  _isSolved = SolveIK(*_robot,_problem,_tolerance,_iters,_verbose);
+  _isSolved = SolveIK(*_robot,_constraints,_tolerance,_iters,_verbose);
   this->postSolve();
   return _isSolved;
 }
 
 bool IKSolver::solve(){
+  this->init();
   this->preSolve();
   _isSolved = this->solveIKconstraints();
   this->postSolve();
@@ -51,6 +66,7 @@ bool IKSolver::solve(){
 ///Set IK solution to real robot
 void IKSolver::SetConfigSimulatedRobot(WorldSimulation &sim)
 {
+  this->init();
   if(!_isSolved){
     std::cout << "[ERROR] Robot cannot set to infeasible IK solution" << std::endl;
     return;
@@ -60,12 +76,17 @@ void IKSolver::SetConfigSimulatedRobot(WorldSimulation &sim)
   std::cout << "[WARNING] Setting Simulated Robot to Config. This should be done exactly once!" << std::endl;
 }
 
+vector<IKGoal> IKSolver::GetIKGoalConstraints(){
+  this->init();
+  return this->GetConstraints();
+}
 void IKSolver::visualize()
 {
   //this->_world
-  this->_problem = this->GetProblem();
-  for(size_t i=0;i<this->_problem.size();i++) {
-    IKGoal ikgoal = this->_problem[i];
+  this->init();
+  this->_constraints = this->GetConstraints();
+  for(size_t i=0;i<this->_constraints.size();i++) {
+    IKGoal ikgoal = this->_constraints[i];
 
     vector<ViewRobot> viewRobots = _world->robotViews;
     ViewRobot *viewRobot = &viewRobots[0];

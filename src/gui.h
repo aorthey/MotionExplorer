@@ -1,16 +1,22 @@
 #pragma once
 #include <Interface/SimTestGUI.h>
+#include <KrisLibrary/robotics/IK.h>
+#include <KrisLibrary/robotics/IKFunctions.h>
+#include <View/ViewIK.h>
 #include <ode/ode.h>
 
 
 const GLColor bodyColor(0.9,0.9,0.9);
-const GLColor selectedLinkColor(0.9,0.2,0.2);
+const GLColor selectedLinkColor(0.8,0.1,0.1);
 
 class ForceFieldBackend : public SimTestBackend
 {
   private:
     bool drawForceField;
     bool drawExtras; 
+    bool drawIKextras;
+    vector<IKGoal> _constraints;
+    string _robotname;
 
   public:
   typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
@@ -20,8 +26,14 @@ class ForceFieldBackend : public SimTestBackend
   {
     drawForceField = false;
     drawExtras = true;
+    drawIKextras = false;
   }
 
+  void SetIKConstraints( vector<IKGoal> constraints, string robotname){
+    _constraints = constraints;
+    _robotname = robotname;
+    drawIKextras = true;
+  }
   virtual void RenderWorld()
   {
     if(drawExtras){
@@ -30,7 +42,7 @@ class ForceFieldBackend : public SimTestBackend
       double COMradius = 0.05;
       double frameLength = 0.2;
       viewRobot->DrawCenterOfMass(COMradius);
-      viewRobot->DrawLinkFrames(frameLength);
+      //viewRobot->DrawLinkFrames(frameLength);
       viewRobot->DrawLinkSkeleton();
       viewRobot->SetColors(bodyColor);
       //std::cout << cur_driver << std::endl;
@@ -38,6 +50,32 @@ class ForceFieldBackend : public SimTestBackend
       //if(cur_driver>-1){
         //viewRobot->SetColor(cur_driver, selectedLinkColor);
       //}
+    }
+    if(drawIKextras){
+
+      vector<ViewRobot> viewRobots = world->robotViews;
+      ViewRobot *viewRobot = &viewRobots[0];
+      for(int i = 0; i < _constraints.size(); i++){
+        const IKGoal goal = _constraints[i];
+        //std::cout << "[" << goal->link << "/" << _constraints.size() << "] " << std::endl;
+        //viewRobot->SetColor(goal.link, selectedLinkColor);
+
+        ViewIKGoal viewik = ViewIKGoal();
+        //GLDraw::GLColor lineColor;
+        //GLDraw::GLColor linkColor;
+
+        Robot *robot = world->GetRobot(this->_robotname);
+        GLColor contactColor(0.9,0.5,0.9,0.1);
+        viewik.linkColor.set(0.0,0.8,0.8);
+        viewik.lineColor.set(0.9,0.0,0.0);
+        //viewik.linkColor.setRandom();
+        //viewik.lineColor.set(1,0,0);
+
+        //viewRobot->SetColor(goal.link,selectedLinkColor);
+        viewik.Draw(goal, *robot);
+        viewik.DrawLink(goal, *viewRobot);
+      }
+
     }
 
     if(drawForceField){

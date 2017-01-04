@@ -223,4 +223,4 @@ TODO
  [ ] Compute Force Closure Grasp from points
  [x] Move hand such that a set of fingertip points is fulfilled
  [ ] Compute SE constraints, what is GIWC equivalent?
- [ ] set color to link in contact
+ [x] set color to link in contact

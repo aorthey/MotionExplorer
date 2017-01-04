@@ -49,8 +49,8 @@ class IKSolverGraspHuboLeftHandCylinder: public IKSolverGrasp
     vector<int> GetFixedDofs(){
       return fixedDofs;
     }
-    vector<IKGoal> GetProblem(){
-      vector<IKGoal> problem;
+    vector<IKGoal> GetConstraints(){
+      vector<IKGoal> constraints;
       Matrix3 I;
       I.setRotateZ(Pi/2);
 
@@ -76,21 +76,21 @@ class IKSolverGraspHuboLeftHandCylinder: public IKSolverGrasp
       //0.27m dist (1inch)
       //1.2 1.173
       this->_tolerance = 1e0;
-      problem.push_back( LinkToGoalTransRot("leftIndexDistal",0.2,-0.0,0.98,R) );
-      problem.push_back( LinkToGoalTransRot("leftMiddleDistal",0.2,-0.0,0.953,R) );
-      problem.push_back( LinkToGoalTransRot("leftRingDistal",0.2,-0.0,0.94,R) );
-      problem.push_back( LinkToGoalTransRot("leftPinkyDistal",0.2,-0.02,0.927,R) );
-      //problem.push_back( LinkToGoalRot("leftThumbDistal",0.22,-0.0,0.98,R) );
-      //problem.push_back( LinkToGoal("leftThumbDistal",0.26,-0.03,0.975) );
-      //problem.push_back( LinkToGoalRot("leftThumbDistal",0.26,-0.03,0.975,L) );
+      constraints.push_back( LinkToGoalTransRot("leftIndexDistal",0.2,-0.0,0.98,R) );
+      constraints.push_back( LinkToGoalTransRot("leftMiddleDistal",0.2,-0.0,0.953,R) );
+      constraints.push_back( LinkToGoalTransRot("leftRingDistal",0.2,-0.0,0.94,R) );
+      constraints.push_back( LinkToGoalTransRot("leftPinkyDistal",0.2,-0.02,0.927,R) );
+      //constraints.push_back( LinkToGoalRot("leftThumbDistal",0.22,-0.0,0.98,R) );
+      //constraints.push_back( LinkToGoal("leftThumbDistal",0.26,-0.03,0.975) );
+      //constraints.push_back( LinkToGoalRot("leftThumbDistal",0.26,-0.03,0.975,L) );
       Matrix3 L;
       L.setRotateZ(-Pi/4);
-      problem.push_back( LinkToGoalRot("leftThumbDistal",L) );
+      constraints.push_back( LinkToGoalRot("leftThumbDistal",L) );
 
       //Set both feet on the floor
-      problem.push_back( LinkToGoalTransRot("Body_LAR",0.4,-0.5,0.1,I) );
-      problem.push_back( LinkToGoalTransRot("Body_RAR",0.6,-0.5,0.1,I) );
+      constraints.push_back( LinkToGoalTransRot("Body_LAR",0.4,-0.5,0.1,I) );
+      constraints.push_back( LinkToGoalTransRot("Body_RAR",0.6,-0.5,0.1,I) );
 
-      return problem;
+      return constraints;
     }
 };
