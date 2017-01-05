@@ -27,6 +27,9 @@ class IKSolverGrasp: public IKSolver
 
     ///*
     virtual bool solveIKconstraints(){
+
+
+
       this->ComputeFixedDofs();
       //###########################################################################
       //Grasping OBJECT
@@ -46,10 +49,11 @@ class IKSolverGrasp: public IKSolver
       //###########################################################################
 
       Grasp worldGrasp();
-      int irobot = 0;
       WorldPlannerSettings settings;
       settings.InitializeDefault(*_world);
-      SingleRobotCSpace freeSpace = SingleRobotCSpace(*_world,irobot,&settings);
+      settings.robotSettings[0].contactEpsilon = 1e-2;
+      settings.robotSettings[0].contactIKMaxIters = 100;
+      SingleRobotCSpace freeSpace = SingleRobotCSpace(*_world,_irobot,&settings);
 
       // The contact cspace needs to be initiziliazed with a free CSpace, and also
       // with the constraints of contacts + which dofs we like to fix. This defines
@@ -90,15 +94,17 @@ class IKSolverGrasp: public IKSolver
       //and between contact links and object
       //#######################################################################
       int objectid = _world->RigidObjectID(0);
+      string oname = _world->rigidObjects[0]->name;
+      std::cout << "object" << objectid << " " << oname << std::endl;
       for(size_t i=0;i<_constraints.size();i++) 
       {
         int k=_constraints[i].link;
-        cspace.ignoreCollisions.push_back(pair<int,int>(objectid,_world->RobotLinkID(irobot,k)));
+        cspace.ignoreCollisions.push_back(pair<int,int>(objectid,_world->RobotLinkID(_irobot,k)));
       }
       for(size_t i=0;i<cspace.fixedDofs.size();i++) 
       {
         int k=cspace.fixedDofs[i];
-        cspace.ignoreCollisions.push_back(pair<int,int>(objectid,_world->RobotLinkID(irobot,k)));
+        cspace.ignoreCollisions.push_back(pair<int,int>(objectid,_world->RobotLinkID(_irobot,k)));
       }
       for(size_t i=0;i<cspace.fixedDofs.size();i++) 
       {
@@ -106,17 +112,17 @@ class IKSolverGrasp: public IKSolver
         {
           int ilhs=cspace.fixedDofs[i];
           int irhs=cspace.fixedDofs[j];
-          cspace.ignoreCollisions.push_back(pair<int,int>(_world->RobotLinkID(irobot,ilhs),_world->RobotLinkID(irobot,irhs)));
+          cspace.ignoreCollisions.push_back(pair<int,int>(_world->RobotLinkID(_irobot,ilhs),_world->RobotLinkID(_irobot,irhs)));
         }
       }
 
       //#######################################################################
       //(4) draw #iters samples from the contact submanifold using IK solver
       //#######################################################################
-      Config out = this->_robot->q;
+      Config out;
       _isSolved=false;
       std::cout << cspace.fixedDofs << std::endl;
-      int iters = 2000;
+      int iters = 200;
 
       //cspace.SolveContact();
       //Config out = this->_robot->q;
@@ -128,34 +134,47 @@ class IKSolverGrasp: public IKSolver
       //  cspace.PrintInfeasibleNames(out);
       //  getchar();
       //} 
-      this->_robot->q = out;
       vector<Real> cdist;
       Config bestConfig = this->_robot->q;
       double bestDist = 1000;
+
       while(iters-- > 0 ){
         cspace.Sample(out);
-        //std::cout << "DIST TO CMANIF" << cspace.ContactDistance() << std::endl;
+
+        std::cout << "DIST TO CMANIF" << cspace.ContactDistance() << std::endl;
         double d = cspace.ContactDistance();
-        if(d<bestDist)
-        {
+
+        if(cspace.IsFeasible(out)){
+          std::cout << std::string(80, '-') << std::endl;
+          std::cout << "found feasible grasp" << std::endl;
+          std::cout << std::string(80, '-') << std::endl;
+          _isSolved=true;
           bestDist = d;
           bestConfig = out;
-        }
-        if(cspace.IsFeasible(out)){
-          std::cout << "found feasible grasp" << std::endl;
-          _isSolved=true;
           break;
         }else{
+          if(d<bestDist)
+          {
+            bestDist = d;
+            bestConfig = out;
+          }
           cspace.PrintInfeasibleNames(out);
+          //getchar();
         }
       }
-      this->_robot->q = bestConfig;
-      cspace.SolveContact();
-      cspace.IsFeasible(bestConfig);
 
-      std::cout << "Sampling Contact Submanifold took " << iters << " iterations" << std::endl;
+      std::cout << std::string(80, '-') << std::endl;
+
+      if(!cspace.IsFeasible(bestConfig)){
+        cspace.PrintInfeasibleNames(out);
+      }
+      this->_robot->q = bestConfig;
+      std::cout << this->_robot->q << std::endl;
+      std::cout << std::string(80, '-') << std::endl;
+
       Vector distV(cdist);
       std::cout << "min dist:" << bestDist << std::endl;
+      std::cout << std::string(80, '-') << std::endl;
       return _isSolved;
 
     }

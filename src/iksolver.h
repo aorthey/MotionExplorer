@@ -20,6 +20,7 @@ class IKSolver{
     RobotWorld *_world;
 
     bool _isInitialized;
+    int _irobot;
 
     virtual string GetRobotName() = 0;
     virtual bool solveIKconstraints();
@@ -33,7 +34,6 @@ class IKSolver{
 
     string GetIKRobotName();
     vector<IKGoal> GetIKGoalConstraints();
-    virtual bool solve_default();
     bool solve();
     void visualize();
     ///Set IK solution to real robot

@@ -184,7 +184,7 @@ class IKSolverGraspRobonaut: public IKSolverGrasp
 
       //0.27m dist (1inch)
       //1.2 1.173
-      this->_tolerance = 1e-1;
+      //this->_tolerance = 1e-1;
 
       Matrix3 L;
       L.setRotateZ(Pi/2);
@@ -201,11 +201,9 @@ class IKSolverGraspRobonaut: public IKSolverGrasp
       LZ.setRotateY(-Pi-Pi/4-Pi/8);
       Lt = LZ*LY*Lt;
 
-      constraints.push_back( LinkToGoalTransRot("left_thumb_distal",0.27,-0.05,1.0,Lt) );
-      constraints.push_back( LinkToGoalTransRot("left_index_distal",0.2,-0.0,1.0,L) );
-      //constraints.push_back( LinkToGoalTrans("left_thumb_distal",0.25,-0.05,1.0) );
-      constraints.push_back( LinkToGoalTransRot("left_middle_distal",0.2,-0.0,0.97,L) );
-      //constraints.push_back( LinkToGoalTransRot("left_middle_distal",0.2,-0.0,0.953,R) );
+      constraints.push_back( LinkToGoalTransRot("left_thumb_distal",0.37,-0.05,1.0,Lt) );
+      constraints.push_back( LinkToGoalTransRot("left_index_distal",0.3,-0.0,1.01,L) );
+      constraints.push_back( LinkToGoalTransRot("left_middle_distal",0.3,-0.0,0.97,L) );
 
       return constraints;
     }

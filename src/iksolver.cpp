@@ -14,6 +14,14 @@ void IKSolver::init(){
   if(!this->_isInitialized){
     this->_robot = _world->GetRobot(this->GetRobotName());
     this->_isInitialized = true;
+    this->_irobot = 0;
+    Robot *irob = _world->robots[this->_irobot];
+    if(irob->name.compare(_robot->name)){
+        std::cout << "ERROR: index number does not match robot" << std::endl;
+        std::cout << "Robot name      :  " << _robot->name << std::endl;
+        std::cout << "Index robot name:  " << irob->name << std::endl;
+        throw;
+    }
   }
 }
 string IKSolver::GetIKRobotName()
@@ -45,13 +53,6 @@ bool IKSolver::solveIKconstraints()
 {
   this->init();
   _isSolved = SolveIK(*_robot,_constraints,_tolerance,_iters,_verbose);
-  return _isSolved;
-}
-bool IKSolver::solve_default(){
-  this->init();
-  this->preSolve();
-  _isSolved = SolveIK(*_robot,_constraints,_tolerance,_iters,_verbose);
-  this->postSolve();
   return _isSolved;
 }
 
@@ -130,7 +131,7 @@ IKGoal IKSolver::LinkToGoalTransRot( const char *linkName, double x, double y, d
 
   IKGoal goal;
   goal.link = linkid;
-  goal.localPosition = localPosition;
+  //goal.localPosition = localPosition;
   goal.SetFixedPosition(position);
   goal.SetFixedRotation(rotation);
   return goal;

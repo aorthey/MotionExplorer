@@ -30,7 +30,8 @@ int main(int argc,const char** argv) {
   //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_fractal_3.xml");
   //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/athlete_fractal_1.xml");
   //backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/hubo_object.xml");
-  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/atlas_object.xml");
+  //backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/atlas_object.xml");
+  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/robonaut_object.xml");
   //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_pushdoor.xml");
 
   Info info(&world);
@@ -52,6 +53,7 @@ int main(int argc,const char** argv) {
   ///ikhubo.solve();
   ///ikhubo.SetConfigSimulatedRobot(sim);
 
+  std::cout << world.robots[0]->q << std::endl;
   GLUISimTestGUI gui(&backend,&world);
   gui.SetWindowTitle("SimTest2");
   gui.Run();
