@@ -14,6 +14,7 @@
 //Link[7] chest_center mass 0
 //Link[8] chest_base mass 0
 //Link[9] left_shoulder_roll mass 6.16886
+//
 //Link[10] left_shoulder_pitch mass 4.42706
 //Link[11] left_upper_arm mass 4.85344
 //Link[12] left_elbow mass 2.97103
@@ -26,6 +27,7 @@
 //Link[19] left_index_medial mass 0.001
 //Link[20] left_index_distal mass 0.001
 //Link[21] left_index_tip mass 0.001
+//
 //Link[22] left_little_proximal mass 0.001
 //Link[23] left_little_medial mass 0.001
 //Link[24] left_little_distal mass 0.001

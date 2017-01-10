@@ -90,22 +90,32 @@ class IKSolverGrasp: public IKSolver
       cspace.fixedValues = this->GetFixedDofValues();
 
       //#######################################################################
-      //(3) ignore collisions between fixed dofs and object
-      //and between contact links and object
+      //(3a) if there is a rigid object, then ignore collisions 
+      //  - between fixed dofs and object
+      //  - between contact links and object
       //#######################################################################
-      int objectid = _world->RigidObjectID(0);
-      string oname = _world->rigidObjects[0]->name;
-      std::cout << "object" << objectid << " " << oname << std::endl;
-      for(size_t i=0;i<_constraints.size();i++) 
-      {
-        int k=_constraints[i].link;
-        cspace.ignoreCollisions.push_back(pair<int,int>(objectid,_world->RobotLinkID(_irobot,k)));
+      uint constraintsCtr = 0;
+      if(!_world->rigidObjects.empty()){
+        int objectid = _world->RigidObjectID(0);
+        string oname = _world->rigidObjects[0]->name;
+        std::cout << "object" << objectid << " " << oname << std::endl;
+        for(size_t i=0;i<_constraints.size();i++) 
+        {
+          int k=_constraints[i].link;
+          cspace.ignoreCollisions.push_back(pair<int,int>(objectid,_world->RobotLinkID(_irobot,k)));
+        }
+        constraintsCtr+=_constraints.size();
+        for(size_t i=0;i<cspace.fixedDofs.size();i++) 
+        {
+          int k=cspace.fixedDofs[i];
+          cspace.ignoreCollisions.push_back(pair<int,int>(objectid,_world->RobotLinkID(_irobot,k)));
+        }
+        constraintsCtr+=cspace.fixedDofs.size();
       }
-      for(size_t i=0;i<cspace.fixedDofs.size();i++) 
-      {
-        int k=cspace.fixedDofs[i];
-        cspace.ignoreCollisions.push_back(pair<int,int>(objectid,_world->RobotLinkID(_irobot,k)));
-      }
+
+      //#######################################################################
+      //(3b) ignore collisions between fixed links itself
+      //#######################################################################
       for(size_t i=0;i<cspace.fixedDofs.size();i++) 
       {
         for(size_t j=0;j<cspace.fixedDofs.size();j++) 
@@ -114,8 +124,20 @@ class IKSolverGrasp: public IKSolver
           int irhs=cspace.fixedDofs[j];
           cspace.ignoreCollisions.push_back(pair<int,int>(_world->RobotLinkID(_irobot,ilhs),_world->RobotLinkID(_irobot,irhs)));
         }
+        constraintsCtr+=cspace.fixedDofs.size();
       }
-
+      //#######################################################################
+      //(3c) ignore collisions between fixed links and terrain
+      //#######################################################################
+      if(!_world->terrains.empty()){
+        int terrainid = _world->TerrainID(0);
+        for(size_t i=0;i<cspace.fixedDofs.size();i++) 
+        {
+          int k=cspace.fixedDofs[i];
+          cspace.ignoreCollisions.push_back(pair<int,int>(terrainid,_world->RobotLinkID(_irobot,k)));
+        }
+        constraintsCtr+=cspace.fixedDofs.size();
+      }
       //#######################################################################
       //(4) draw #iters samples from the contact submanifold using IK solver
       //#######################################################################
@@ -124,16 +146,6 @@ class IKSolverGrasp: public IKSolver
       std::cout << cspace.fixedDofs << std::endl;
       int iters = 200;
 
-      //cspace.SolveContact();
-      //Config out = this->_robot->q;
-      //if(cspace.IsFeasible(out)){
-      //  return true;
-      //}
-      //else {
-      //  printf("Infeasible:\n");
-      //  cspace.PrintInfeasibleNames(out);
-      //  getchar();
-      //} 
       vector<Real> cdist;
       Config bestConfig = this->_robot->q;
       double bestDist = 1000;
@@ -159,14 +171,79 @@ class IKSolverGrasp: public IKSolver
             bestConfig = out;
           }
           cspace.PrintInfeasibleNames(out);
+
           //getchar();
         }
       }
 
       std::cout << std::string(80, '-') << std::endl;
+      std::cout << "IK Solver finished." << std::endl;
+      std::cout << std::string(80, '-') << std::endl;
 
       if(!cspace.IsFeasible(bestConfig)){
-        cspace.PrintInfeasibleNames(out);
+        cspace.PrintInfeasibleNames(bestConfig);
+        int Nobstacles = cspace.NumObstacles();
+        std::cout << "NumObstacles " << Nobstacles << std::endl;
+
+        std::vector<bool> infeasible;
+        cspace.CheckObstacles(bestConfig,infeasible);
+
+        vector<pair<int,int> > collisionPairs = cspace.collisionPairs;
+        std::cout << "COLLISION PAIRS:" << collisionPairs.size() << std::endl;
+        std::cout << "CollFree    " << cspace.CheckCollisionFree() << std::endl;
+        std::cout << "JointLimits " << cspace.CheckJointLimits(bestConfig) << std::endl; 
+
+        WorldPlannerSettings* settings = cspace.settings;
+        RobotWorld& world = cspace.world;
+
+        int id = world.RobotID(cspace.index);
+        vector<int> idrobot(1,id);
+        vector<int> idothers;
+        for(size_t i=0;i<world.terrains.size();i++)
+          idothers.push_back(world.TerrainID(i));
+        for(size_t i=0;i<world.rigidObjects.size();i++)
+          idothers.push_back(world.RigidObjectID(i));
+        for(size_t i=0;i<world.robots.size();i++) {
+          if((int)i != cspace.index)
+            idothers.push_back(world.RobotID(i));
+        }
+        //environment collision check
+        pair<int,int> res = settings->CheckCollision(world,idrobot,idothers);
+        if(res.first >= 0)
+        {
+          std::cout << "COLLISION AT" << res.first << std::endl;
+        }
+        //self collision check
+        res = settings->CheckCollision(world,idrobot);
+
+        if(res.first >= 0)
+        {
+          std::cout << "SELF COLLISION AT" << res.first << "|" << res.second << std::endl;
+          std::cout <<  idrobot << std::endl;
+        }
+
+
+
+
+        // for(int i = 0; i < collisionPairs.size(); i++){
+        //   std::cout << collisionPairs[i].first << std::endl;
+        // }
+
+        //
+        //vector<ContactPair> cp = cspace.contactPairs;
+        //std::vector<std::string>& infeasibleNames;
+        //cspace.GetInfeasibleNames(bestConfig, infeasibleNames);
+
+        double dist = cspace.ContactDistance();
+        for(int i = 0; i < Nobstacles; i++){
+          if(infeasible[i]){
+            std::string oname = cspace.ObstacleName(i);
+            std::cout << "[" << i << "/" << Nobstacles << "] " << oname << std::endl;
+            std::cout << "!Not feasible!" << std::endl;
+          }
+        }
+        std::cout << "Distance to Contact Manifold:"<<dist << std::endl;
+
       }
       this->_robot->q = bestConfig;
       std::cout << this->_robot->q << std::endl;

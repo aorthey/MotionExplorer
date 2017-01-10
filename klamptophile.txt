@@ -136,24 +136,29 @@ CONTACTS
 CSPACE
 -------------------------------------------------------------------------------
 
-  ContactCSpace (Planning/ContactCSpace.h)
+  ContactCSpace (Klampt/Planning/ContactCSpace.h)
     //Single Robot in contact with environment
     vector<IKGoal> contactIK;
     void AddContact(const IKGoal& goal);
     void RemoveContact(int link);
     bool SolveContact(int numIters=0,Real tol=0);
 
-  <- SingleRobotCSpace2
+  <- SingleRobotCSpace2 (Klampt/Planning/RobotCSpace.h)
     //Single robot + fixed dofs available
 
-  <- <- SingleRobotCSpace 
+  <- <- SingleRobotCSpace  (Klampt/Planning/RobotCSpace.h)
     //Single Robot 
+    vector<pair<int,int> > collisionPairs;
+    bool CheckCollisionFree();
 
-  <- <- <- ExplicitCSpace
+
+
+  <- <- <- ExplicitCSpace (KrisLibrary/planning/ExplicitCspace.h)
     //N-obstacles CSpace
     bool IsFeasible(const Config&,int obstacle);
     EdgePlanner* LocalPlanner(const Config& a,const Config& b,int obstacle);
     int NumObstacles();
+    void GetInfeasibleNames(const Config& q,std::vector<std::string>& names);
 
   <- <- <- <- CSpace (Krislibrary/planning/cspace.h)
     //Generic CSpace

@@ -7,7 +7,7 @@
 
 
 const GLColor bodyColor(0.9,0.9,0.9);
-const GLColor selectedLinkColor(0.8,0.1,0.1);
+const GLColor selectedLinkColor(1.0,1.0,0.5);
 
 class ForceFieldBackend : public SimTestBackend
 {
@@ -16,6 +16,7 @@ class ForceFieldBackend : public SimTestBackend
     bool drawExtras; 
     bool drawIKextras;
     vector<IKGoal> _constraints;
+    vector<int> _linksInCollision;
     string _robotname;
 
   public:
@@ -34,6 +35,11 @@ class ForceFieldBackend : public SimTestBackend
     _robotname = robotname;
     drawIKextras = true;
   }
+  void SetIKCollisions( vector<int> linksInCollision )
+  {
+    _linksInCollision = linksInCollision;
+    drawIKextras = true;
+  }
   virtual void RenderWorld()
   {
     if(drawExtras){
@@ -45,35 +51,40 @@ class ForceFieldBackend : public SimTestBackend
       //viewRobot->DrawLinkFrames(frameLength);
       viewRobot->DrawLinkSkeleton();
       viewRobot->SetColors(bodyColor);
-      //std::cout << cur_driver << std::endl;
-      //std::cout << cur_link << std::endl;
-      //if(cur_driver>-1){
-        //viewRobot->SetColor(cur_driver, selectedLinkColor);
-      //}
     }
     if(drawIKextras){
 
       vector<ViewRobot> viewRobots = world->robotViews;
       ViewRobot *viewRobot = &viewRobots[0];
       for(int i = 0; i < _constraints.size(); i++){
+
         const IKGoal goal = _constraints[i];
-        //std::cout << "[" << goal->link << "/" << _constraints.size() << "] " << std::endl;
-        //viewRobot->SetColor(goal.link, selectedLinkColor);
 
+        viewRobot->SetColor(goal.link, selectedLinkColor);
         ViewIKGoal viewik = ViewIKGoal();
-        //GLDraw::GLColor lineColor;
-        //GLDraw::GLColor linkColor;
-
         Robot *robot = world->GetRobot(this->_robotname);
-        GLColor contactColor(0.9,0.5,0.9,0.1);
-        viewik.linkColor.set(0.0,0.8,0.8);
-        viewik.lineColor.set(0.9,0.0,0.0);
-        //viewik.linkColor.setRandom();
-        //viewik.lineColor.set(1,0,0);
-
-        //viewRobot->SetColor(goal.link,selectedLinkColor);
         viewik.Draw(goal, *robot);
         viewik.DrawLink(goal, *viewRobot);
+
+        //glDisable(GL_LIGHTING);
+        //glEnable(GL_BLEND);
+        //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+        //glPushMatrix();
+        //glMultMatrix(Matrix4(T));
+        //robotviewer.DrawLink_Local(goal.link);
+        //glPopMatrix();
+        //glDisable(GL_BLEND);
+
+      }
+      for(int i = 0; i < _linksInCollision.size(); i++){
+        glDisable(GL_LIGHTING);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+        glPushMatrix();
+        //glMultMatrix(Matrix4(T));
+        viewRobot->DrawLink_Local(_linksInCollision[i]);
+        glPopMatrix();
+        glDisable(GL_BLEND);
       }
 
     }

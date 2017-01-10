@@ -24,6 +24,11 @@ void IKSolver::init(){
     }
   }
 }
+vector<int> IKSolver::GetIKCollisions()
+{
+  return _linksInCollision;
+
+}
 string IKSolver::GetIKRobotName()
 {
   this->init();
@@ -80,34 +85,6 @@ void IKSolver::SetConfigSimulatedRobot(WorldSimulation &sim)
 vector<IKGoal> IKSolver::GetIKGoalConstraints(){
   this->init();
   return this->GetConstraints();
-}
-void IKSolver::visualize()
-{
-  //this->_world
-  this->init();
-  this->_constraints = this->GetConstraints();
-  for(size_t i=0;i<this->_constraints.size();i++) {
-    IKGoal ikgoal = this->_constraints[i];
-
-    vector<ViewRobot> viewRobots = _world->robotViews;
-    ViewRobot *viewRobot = &viewRobots[0];
-
-    ViewIKGoal viewik = ViewIKGoal();
-
-    //viewik.linkColor.set(1.0,0,0,0.8);
-    //viewik.linkColor.setRandom();
-    //viewik.lineColor.set(1,0,0);
-    //GLDraw::GLColor lineColor;
-    //GLDraw::GLColor linkColor;
-
-    GLColor contactColor(0.5,0.8,0.5);
-
-    //doesn't work because renderworld overwrites it!?
-    viewRobot->SetColor(ikgoal.link,contactColor);
-
-    viewik.DrawLink(ikgoal, *viewRobot);
-    //viewik.Draw(ikgoal, *this->_robot);  
-  }
 }
 IKGoal IKSolver::LinkToGoalTrans( const char *linkName, double x, double y, double z)
 {

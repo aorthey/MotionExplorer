@@ -12,6 +12,7 @@ class IKSolver{
     int _iters;
     int _verbose;
     vector<IKGoal> _constraints;
+    vector<int> _linksInCollision;
     Config q_solution;
     Config q_initial;
 
@@ -34,8 +35,8 @@ class IKSolver{
 
     string GetIKRobotName();
     vector<IKGoal> GetIKGoalConstraints();
+    vector<int> GetIKCollisions();
     bool solve();
-    void visualize();
     ///Set IK solution to real robot
     void SetConfigSimulatedRobot(WorldSimulation &sim);
     IKGoal LinkToGoalTransRot( const char *linkName, double x, double y, double z, Matrix3 &rotation);

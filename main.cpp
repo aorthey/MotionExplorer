@@ -43,9 +43,10 @@ int main(int argc,const char** argv) {
   ikrobot.SetConfigSimulatedRobot(sim);
 
   backend.SetIKConstraints( ikrobot.GetIKGoalConstraints(), ikrobot.GetIKRobotName() );
+
+  backend.SetIKCollisions( ikrobot.GetIKCollisions() );
   //ikrobot.solve_default();
   //ikhubo.ComputeFixedDofs();
-  //ikrobot.visualize();
   //ikhubo.solve();
   //ikhubo.SetConfigSimulatedRobot(sim);
 
