@@ -61,7 +61,8 @@ bool IKSolver::solveIKconstraints()
   return _isSolved;
 }
 
-bool IKSolver::solve(){
+bool IKSolver::solve()
+{
   this->init();
   this->preSolve();
   _isSolved = this->solveIKconstraints();
@@ -69,6 +70,10 @@ bool IKSolver::solve(){
   return _isSolved;
 }
 
+Config IKSolver::GetSolutionConfig()
+{
+  return this->q_solution;
+}
 ///Set IK solution to real robot
 void IKSolver::SetConfigSimulatedRobot(WorldSimulation &sim)
 {

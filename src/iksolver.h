@@ -33,6 +33,7 @@ class IKSolver{
   public:
     IKSolver(RobotWorld *world);
 
+    Config GetSolutionConfig();
     string GetIKRobotName();
     vector<IKGoal> GetIKGoalConstraints();
     vector<int> GetIKCollisions();

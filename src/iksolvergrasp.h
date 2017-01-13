@@ -28,8 +28,6 @@ class IKSolverGrasp: public IKSolver
     ///*
     virtual bool solveIKconstraints(){
 
-
-
       this->ComputeFixedDofs();
       //###########################################################################
       //Grasping OBJECT
@@ -144,7 +142,8 @@ class IKSolverGrasp: public IKSolver
       Config out;
       _isSolved=false;
       std::cout << cspace.fixedDofs << std::endl;
-      int iters = 200;
+      const int IK_MAX_ITERATIONS = 500;
+      int iters = IK_MAX_ITERATIONS;
 
       vector<Real> cdist;
       Config bestConfig = this->_robot->q;
@@ -153,12 +152,12 @@ class IKSolverGrasp: public IKSolver
       while(iters-- > 0 ){
         cspace.Sample(out);
 
-        std::cout << "DIST TO CMANIF" << cspace.ContactDistance() << std::endl;
         double d = cspace.ContactDistance();
 
         if(cspace.IsFeasible(out)){
           std::cout << std::string(80, '-') << std::endl;
           std::cout << "found feasible grasp" << std::endl;
+          std::cout << "DIST TO CMANIF" << cspace.ContactDistance() << std::endl;
           std::cout << std::string(80, '-') << std::endl;
           _isSolved=true;
           bestDist = d;
@@ -170,14 +169,15 @@ class IKSolverGrasp: public IKSolver
             bestDist = d;
             bestConfig = out;
           }
-          cspace.PrintInfeasibleNames(out);
+          //cspace.PrintInfeasibleNames(out);
 
           //getchar();
         }
       }
 
       std::cout << std::string(80, '-') << std::endl;
-      std::cout << "IK Solver finished." << std::endl;
+      std::cout << "IK Solver finished. (after " << IK_MAX_ITERATIONS-iters << "/" 
+       <<IK_MAX_ITERATIONS << " iterations)" << std::endl;
       std::cout << std::string(80, '-') << std::endl;
 
       if(!cspace.IsFeasible(bestConfig)){
@@ -222,18 +222,6 @@ class IKSolverGrasp: public IKSolver
           std::cout <<  idrobot << std::endl;
         }
 
-
-
-
-        // for(int i = 0; i < collisionPairs.size(); i++){
-        //   std::cout << collisionPairs[i].first << std::endl;
-        // }
-
-        //
-        //vector<ContactPair> cp = cspace.contactPairs;
-        //std::vector<std::string>& infeasibleNames;
-        //cspace.GetInfeasibleNames(bestConfig, infeasibleNames);
-
         double dist = cspace.ContactDistance();
         for(int i = 0; i < Nobstacles; i++){
           if(infeasible[i]){
@@ -246,7 +234,6 @@ class IKSolverGrasp: public IKSolver
 
       }
       this->_robot->q = bestConfig;
-      std::cout << this->_robot->q << std::endl;
       std::cout << std::string(80, '-') << std::endl;
 
       Vector distV(cdist);

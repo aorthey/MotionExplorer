@@ -205,7 +205,7 @@ class IKSolverGraspRobonaut: public IKSolverGrasp
 
       constraints.push_back( LinkToGoalTransRot("left_thumb_distal",0.37,-0.05,1.0,Lt) );
       constraints.push_back( LinkToGoalTransRot("left_index_distal",0.3,-0.0,1.01,L) );
-      constraints.push_back( LinkToGoalTransRot("left_middle_distal",0.3,-0.0,0.97,L) );
+      constraints.push_back( LinkToGoalTransRot("left_middle_distal",0.3,-0.0,0.98,L) );
 
       return constraints;
     }

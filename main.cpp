@@ -14,10 +14,12 @@
 #include "src/iksolvergrasp_hubolefthandcylinder.h"
 #include "src/iksolvergrasp_robonaut.h"
 
-#include "Contact/Grasp.h" //class Grasp
-#include "Planning/ContactCSpace.h"
-//#include "Modeling/MultiPath.h"
-//#include "Modeling/Paths.h"
+#include <Contact/Grasp.h> //class Grasp
+#include <Planning/ContactCSpace.h>
+#include <Modeling/MultiPath.h>
+#include <Planning/PlannerSettings.h>
+#include <KrisLibrary/planning/AnyMotionPlanner.h>
+#include "Modeling/Paths.h"
 
 
 int main(int argc,const char** argv) {
@@ -38,23 +40,40 @@ int main(int argc,const char** argv) {
   info.print();
 
   IKSolverGraspRobonaut ikrobot(&world,0);
-  //IKSolverGraspHuboLeftHandCylinder ikhubo(&world,0);
   ikrobot.solve();
   ikrobot.SetConfigSimulatedRobot(sim);
-
   backend.SetIKConstraints( ikrobot.GetIKGoalConstraints(), ikrobot.GetIKRobotName() );
-
   backend.SetIKCollisions( ikrobot.GetIKCollisions() );
-  //ikrobot.solve_default();
-  //ikhubo.ComputeFixedDofs();
-  //ikhubo.solve();
-  //ikhubo.SetConfigSimulatedRobot(sim);
 
-  ///IKSolverHubo ikhubo(&world);
-  ///ikhubo.solve();
-  ///ikhubo.SetConfigSimulatedRobot(sim);
 
-  std::cout << world.robots[0]->q << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  //int maxIters = 100;
+  //int numRemainingIters = maxIters;
+  //MultiPath result;
+  //Timer timer;
+  //bool Plan(CSpace* space,const Config& a, const Config& b,
+    //int& maxIters,MilestonePath& path)
+
+  /*
+  Config b = ikrobot.GetSolutionConfig();
+  Config a = ikrobot.GetSolutionConfig();
+  std::cout << a << std::endl;
+
+  MotionPlannerFactory factory;
+  factory.perturbationRadius = 0.5;
+  space = SingleRobotCSpace(*world,irobot,&settings);
+  ContactCSpace cspace(*env.freeSpace);
+
+  SmartPointer<MotionPlannerInterface> planner = factory.Create(space,a,b);
+  while(maxIters > 0) {
+    planner->PlanMore();
+    maxIters--;
+    if(planner->IsSolved()) {
+      planner->GetSolution(path);
+    }
+  }
+  //*/
+
   GLUISimTestGUI gui(&backend,&world);
   gui.SetWindowTitle("SimTest2");
   gui.Run();
@@ -69,30 +88,6 @@ int main(int argc,const char** argv) {
   //ObjectPlacementManager objectified(&world);
   //objectified.spawn();
 
-
-  // while(1) {
-  //         //sim.Advance(dt);
-  //         //sim.UpdateModel();
-  //         cout<<sim.time<<'\t'<<world.robots[0]->q<<endl;
-  // }
-  ////run the simulation
-  //while(sim.time < 5) {
-  //        backend.RenderWorld();
-  //        if(sim.time >= 2.0 && sim.time-dt < 2.0) {
-  //                Config q;
-  //                sim.robotControllers[0]->GetCommandedConfig(q);
-  //                q[7] -= 1.0;
-  //                //LexicalCast is needed to convert config to string
-  //                sim.robotControllers[0]->SendCommand("set_q",LexicalCast(q));
-  //                //then move link 7 (hip pitch) 1.5 radians down
-  //                q[7] += 1.5;
-  //                sim.robotControllers[0]->SendCommand("append_q",LexicalCast(q));
-  //        }
-  //        sim.Advance(dt);
-  //        sim.UpdateModel();
-  //        cout<<sim.time<<'\t'<<world.robots[0]->q<<endl;
-  //        backend.DoStateLogging_LinearPath(0,"test_state.path");
-  //}
   return 0;
 }
 
