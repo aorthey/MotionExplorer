@@ -213,6 +213,18 @@ MATH
     T maxAbsElement(int* index=NULL) const;
 
 -------------------------------------------------------------------------------
+PATH
+-------------------------------------------------------------------------------
+
+MilestonePath (KrisLibrary/planning/path.h)
+  const Config& Start()
+  const Config& End()
+  bool IsFeasible();
+  int Eval(Real t, Config& c) const;
+
+
+
+-------------------------------------------------------------------------------
 TODO
 -------------------------------------------------------------------------------
 
@@ -222,6 +234,10 @@ TODO
  [x] place robot directly(!) at IK computed solution and THEN start sim 
  [x] place robot feet on floor
 
+ [ ] plan path between A and B
+ [ ] extract milestones between A and B from path
+ [ ] retime path
+ [ ] execute trajectory in GUI
  [ ] make/break contact events => compute transition paths
  [ ] retime transition paths (TOPP vs build-in!?)
  [ ] execute transition paths

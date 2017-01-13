@@ -19,6 +19,7 @@
 #include <Modeling/MultiPath.h>
 #include <Planning/PlannerSettings.h>
 #include <KrisLibrary/planning/AnyMotionPlanner.h>
+#include "Modeling/DynamicPath.h"
 #include "Modeling/Paths.h"
 
 
@@ -45,33 +46,46 @@ int main(int argc,const char** argv) {
   backend.SetIKConstraints( ikrobot.GetIKGoalConstraints(), ikrobot.GetIKRobotName() );
   backend.SetIKCollisions( ikrobot.GetIKCollisions() );
 
-
   std::cout << std::string(80, '-') << std::endl;
   //int maxIters = 100;
   //int numRemainingIters = maxIters;
-  //MultiPath result;
-  //Timer timer;
   //bool Plan(CSpace* space,const Config& a, const Config& b,
     //int& maxIters,MilestonePath& path)
 
-  /*
-  Config b = ikrobot.GetSolutionConfig();
+  ///*
+  MilestonePath path;
+  Timer timer;
   Config a = ikrobot.GetSolutionConfig();
+  Config b = ikrobot.GetSolutionConfig();
+
+  a.setZero();
   std::cout << a << std::endl;
+
+
+  WorldPlannerSettings settings;
+  settings.InitializeDefault(world);
+  settings.robotSettings[0].contactEpsilon = 1e-2;
+  settings.robotSettings[0].contactIKMaxIters = 100;
+
+  int irobot = 0;
+  SingleRobotCSpace freeSpace = SingleRobotCSpace(world,irobot,&settings);
+  //ContactCSpace cspace(freeSpace);
 
   MotionPlannerFactory factory;
   factory.perturbationRadius = 0.5;
-  space = SingleRobotCSpace(*world,irobot,&settings);
-  ContactCSpace cspace(*env.freeSpace);
-
-  SmartPointer<MotionPlannerInterface> planner = factory.Create(space,a,b);
+  int maxIters = 10;
+  SmartPointer<MotionPlannerInterface> planner = factory.Create(&freeSpace,a,b);
   while(maxIters > 0) {
     planner->PlanMore();
     maxIters--;
     if(planner->IsSolved()) {
       planner->GetSolution(path);
+      break;
     }
   }
+  std::cout << path.Start() << std::endl;
+  std::cout << path.End() << std::endl;
+  std::cout << "Planner converged after" << maxIters << std::endl;
   //*/
 
   GLUISimTestGUI gui(&backend,&world);
