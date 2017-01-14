@@ -1,11 +1,18 @@
+#include <stdio.h>
 //#include <Interface/SimulationGUI.h>
 #include <Interface/SimTestGUI.h>
-//#include <Interface/QSimTestGUI.h>
-//#include <KlamptQt/qtsimtestgui.h>
-//#include "pickandplace.h"
 #include <KrisLibrary/GLdraw/GL.h>
 #include <KrisLibrary/GLdraw/drawextra.h>
-#include <stdio.h>
+
+#include <Contact/Grasp.h> //class Grasp
+#include <Planning/ContactCSpace.h>
+#include <Modeling/MultiPath.h>
+#include <Planning/PlannerSettings.h>
+#include <KrisLibrary/planning/AnyMotionPlanner.h>
+#include <Modeling/DynamicPath.h>
+#include <Modeling/Paths.h>
+#include <Control/PathController.h>
+
 #include "src/gui.h"
 #include "src/info.h"
 #include "src/object.h"
@@ -13,15 +20,7 @@
 #include "src/iksolver_hubo.h"
 #include "src/iksolvergrasp_hubolefthandcylinder.h"
 #include "src/iksolvergrasp_robonaut.h"
-
-#include <Contact/Grasp.h> //class Grasp
-#include <Planning/ContactCSpace.h>
-#include <Modeling/MultiPath.h>
-#include <Planning/PlannerSettings.h>
-#include <KrisLibrary/planning/AnyMotionPlanner.h>
-#include "Modeling/DynamicPath.h"
-#include "Modeling/Paths.h"
-
+#include "src/controller.h"
 
 int main(int argc,const char** argv) {
   RobotWorld world;
@@ -37,14 +36,18 @@ int main(int argc,const char** argv) {
   backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/robonaut_object.xml");
   //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_pushdoor.xml");
 
-  Info info(&world);
-  info.print();
 
-  IKSolverGraspRobonaut ikrobot(&world,0);
-  ikrobot.solve();
-  ikrobot.SetConfigSimulatedRobot(sim);
-  backend.SetIKConstraints( ikrobot.GetIKGoalConstraints(), ikrobot.GetIKRobotName() );
-  backend.SetIKCollisions( ikrobot.GetIKCollisions() );
+  //Info info(&world);
+  //info.print();
+
+  //Config a(ikrobot.GetSolutionConfig());
+  //Config b(ikrobot.GetSolutionConfig());
+
+//  IKSolverGraspRobonaut ikrobot(&world,0);
+//  ikrobot.solve();
+//  //ikrobot.SetConfigSimulatedRobot(sim);
+//  backend.SetIKConstraints( ikrobot.GetIKGoalConstraints(), ikrobot.GetIKRobotName() );
+//  backend.SetIKCollisions( ikrobot.GetIKCollisions() );
 
   std::cout << std::string(80, '-') << std::endl;
   //int maxIters = 100;
@@ -52,16 +55,12 @@ int main(int argc,const char** argv) {
   //bool Plan(CSpace* space,const Config& a, const Config& b,
     //int& maxIters,MilestonePath& path)
 
-  ///*
+  /*
   MilestonePath path;
   Timer timer;
-  Config a = ikrobot.GetSolutionConfig();
-  Config b = ikrobot.GetSolutionConfig();
-
-  a.setZero();
-  std::cout << a << std::endl;
 
 
+  //plan simple path between A and B
   WorldPlannerSettings settings;
   settings.InitializeDefault(world);
   settings.robotSettings[0].contactEpsilon = 1e-2;
@@ -73,20 +72,53 @@ int main(int argc,const char** argv) {
 
   MotionPlannerFactory factory;
   factory.perturbationRadius = 0.5;
-  int maxIters = 10;
+  const int PLANNER_MAX_ITERS = 10;
+  int iters = PLANNER_MAX_ITERS;
   SmartPointer<MotionPlannerInterface> planner = factory.Create(&freeSpace,a,b);
-  while(maxIters > 0) {
+  while(iters > 0) {
     planner->PlanMore();
-    maxIters--;
+    iters--;
     if(planner->IsSolved()) {
       planner->GetSolution(path);
       break;
     }
   }
+  std::cout << std::string(80, '-') << std::endl;
   std::cout << path.Start() << std::endl;
   std::cout << path.End() << std::endl;
-  std::cout << "Planner converged after" << maxIters << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << a << std::endl;
+  std::cout << b << std::endl;
+  std::cout << "Planner converged after " << PLANNER_MAX_ITERS-iters << "/" << PLANNER_MAX_ITERS << " iterations." << std::endl;
+
+ // double dstep = 0.01;
+ // Config cur;
+ // for(double d = 0; d < 1; d+=dstep){
+ //   path.Eval(d,cur);
+ //   std::cout << d << " : " << cur << std::endl;
+ // }
+  //execute it by 
   //*/
+
+  //RobotControllerFactory::Register(new RobotControllerInterface(*(world.robots[0])));
+
+
+  
+  Robot *robot = world.robots[0];
+  Config a(robot->q);
+
+  ODERobot *simrobot = sim.odesim.robot(0);
+  //simrobot->GetConfig(a);
+  //a.setZero();
+  //std::cout << robot->q << std::endl;
+  a[4] = 0.0;
+  //a *= -1;
+  simrobot->robot.q = a;
+  std::cout << robot->q << std::endl;
+  simrobot->SetConfig(robot->q);
+
+
+
 
   GLUISimTestGUI gui(&backend,&world);
   gui.SetWindowTitle("SimTest2");

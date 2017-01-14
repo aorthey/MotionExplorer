@@ -228,6 +228,8 @@ MilestonePath (KrisLibrary/planning/path.h)
 TODO
 -------------------------------------------------------------------------------
 
+ [ ] Can't change SIMROBOT anymore, what happened!?
+
  [x] solve IK for frame-env contact points
  [ ] solve IK for arbitrary rob-env contact points
  [ ] add limits/selfcollision/collision checks to IK

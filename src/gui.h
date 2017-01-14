@@ -133,21 +133,21 @@ class ForceFieldBackend : public SimTestBackend
   virtual bool OnCommand(const string& cmd,const string& args){
     BaseT::OnCommand(cmd,args);
     if(cmd=="advance") {
-      ODERobot *robot = sim.odesim.robot(0);
-      std::cout << "Force" << std::endl;
-      std::cout << robot->robot.name << std::endl;
+      //ODERobot *robot = sim.odesim.robot(0);
+      //std::cout << "Force" << std::endl;
+      //std::cout << robot->robot.name << std::endl;
 
-      Config q;
-      robot->GetConfig(q);
-      double px,py,pz;
-      double fx,fy,fz;
-      fx = 10.0;
-      fy = 0.0;
-      fz = 10.0;
-      px = 0.0;
-      py = 0.0;
-      pz = 0.0;
-      dBodyAddForceAtPos(robot->body(7),fx,fy,fz,px,py,pz);
+      //Config q;
+      //robot->GetConfig(q);
+      //double px,py,pz;
+      //double fx,fy,fz;
+      //fx = 10.0;
+      //fy = 0.0;
+      //fz = 10.0;
+      //px = 0.0;
+      //py = 0.0;
+      //pz = 0.0;
+      //dBodyAddForceAtPos(robot->body(7),fx,fy,fz,px,py,pz);
     }
   }
 
