@@ -46,7 +46,7 @@ Robot (Robot.h)
     GetCOM()
     GetTotalMass()
     std::vector<RobotLink3D> links;
-    Config q;           ///< current configuration
+    Config q;  //! DO NOT set directly, use UpdateConfig!
     Vector qMin,qMax;   ///< joint limits
 
     /// sets the current config q and updates frames

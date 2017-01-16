@@ -82,6 +82,8 @@ void IKSolver::SetConfigSimulatedRobot(WorldSimulation &sim)
     std::cout << "[ERROR] Robot cannot set to infeasible IK solution" << std::endl;
     return;
   }
+  _robot->q = q_solution;
+  _robot->UpdateFrames();
   ODERobot *simrobot = sim.odesim.robot(0);
   simrobot->SetConfig(q_solution);
   std::cout << "[WARNING] Setting Simulated Robot to Config. This should be done exactly once!" << std::endl;
