@@ -23,8 +23,8 @@ int main(int argc,const char** argv) {
 
   backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/hubo_object.xml");
 
-  Info info(&world);
-  info.print();
+  Info info;
+  print(&world);
 
   IKSolverHubo ikhubo(&world);
   ikhubo.solve();

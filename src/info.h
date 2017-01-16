@@ -5,13 +5,15 @@
 class Info
 {
   public:
-    void operator()(MilestonePath &path)
-    {
-      std::cout <<  path.Length() << std::endl;
-    }
+    
     Info()
     {
       std::cout << "Information Module initialized" << std::endl;
+    }
+
+    void operator()(MilestonePath &path)
+    {
+      std::cout <<  path.Length() << std::endl;
     }
 
     void operator()(RobotWorld *world){

@@ -236,8 +236,9 @@ TODO
  [x] place robot directly(!) at IK computed solution and THEN start sim 
  [x] place robot feet on floor
 
- [ ] plan path between A and B
- [ ] extract milestones between A and B from path
+ [x] plan path between A and B
+ [x] extract milestones between A and B from path
+ [x] execute path in GUI
  [ ] retime path
  [ ] execute trajectory in GUI
  [ ] make/break contact events => compute transition paths
