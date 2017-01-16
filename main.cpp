@@ -25,7 +25,7 @@
 
 int main(int argc,const char** argv) {
   RobotWorld world;
-
+  Info info;
   ForceFieldBackend backend(&world);
   //SimTestBackend backend(&world);
   WorldSimulation& sim=backend.sim;
@@ -38,8 +38,7 @@ int main(int argc,const char** argv) {
   //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_pushdoor.xml");
 
 
-  Info info(&world);
-  info.print();
+  info(&world);
 
 
   IKSolverGraspRobonaut ikrobot(&world,0);
@@ -92,21 +91,40 @@ int main(int argc,const char** argv) {
   std::cout << a << std::endl;
   std::cout << b << std::endl;
   std::cout << "Planner converged after " << PLANNER_MAX_ITERS-iters << "/" << PLANNER_MAX_ITERS << " iterations." << std::endl;
+  info(path);
 
- // double dstep = 0.01;
- // Config cur;
- // for(double d = 0; d < 1; d+=dstep){
- //   path.Eval(d,cur);
- //   std::cout << d << " : " << cur << std::endl;
- // }
   //execute it by 
-  //*/
-
   RobotControllerFactory::Register(new RobotControllerInterface(*(world.robots[0])));
+
+
+  double dstep = 0.1;
+  Config cur;
+  std::cout << sim.robotControllers.size() << std::endl;
+  static bool firstTime = true;
+  for(double d = 0; d < 1; d+=dstep){
+    path.Eval(d,cur);
+    stringstream ss;
+    ss<<cur;
+    if(firstTime){
+      if(!sim.robotControllers[0]->SendCommand("set_q",ss.str())) {
+        fprintf(stderr,"set_q command does not work with the robot's controller\n");
+        std::cout << "FAILURE" << std::endl;
+        return false;
+      } 
+    }else {
+      if(!sim.robotControllers[0]->SendCommand("append_q",ss.str())) {
+        fprintf(stderr,"append_q command does not work with the robot's controller\n");
+        std::cout << "FAILURE" << std::endl;
+        return false;
+      }
+    }
+  }
+
 
   Robot *robot = world.robots[0];
   util::SetSimulatedRobot(robot,sim,b);
   util::SetSimulatedRobot(robot,sim,a);
+
 
   GLUISimTestGUI gui(&backend,&world);
   gui.SetWindowTitle("SimTest2");

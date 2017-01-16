@@ -1,17 +1,21 @@
 #pragma once
 #include <stdio.h>
+#include <Modeling/Paths.h>
 
 class Info
 {
   public:
-    Info(RobotWorld *world):
-      _world(world)
+    void operator()(MilestonePath &path)
+    {
+      std::cout <<  path.Length() << std::endl;
+    }
+    Info()
     {
       std::cout << "Information Module initialized" << std::endl;
     }
 
-    void print(){
-      int ids = _world->NumIDs();
+    void operator()(RobotWorld *world){
+      int ids = world->NumIDs();
 
       std::cout << std::string(80, '-') << std::endl;
 
@@ -19,12 +23,12 @@ class Info
 
       std::cout << std::string(80, '-') << std::endl;
       for(int itr = 0; itr <= ids; itr++){
-        std::cout << "[" << itr << "] " << _world->GetName(itr) << std::endl;
+        std::cout << "[" << itr << "] " << world->GetName(itr) << std::endl;
       }
       std::cout << std::string(80, '-') << std::endl;
 
-      std::vector<SmartPointer<Robot> > robots = _world->robots;
-      std::vector<SmartPointer<Terrain> > terrains = _world->terrains;
+      std::vector<SmartPointer<Robot> > robots = world->robots;
+      std::vector<SmartPointer<Terrain> > terrains = world->terrains;
       for (std::vector<SmartPointer<Robot> >::iterator it = robots.begin() ; it != robots.end(); ++it){
         std::cout << "Robot " << (*it)->name << std::endl;
 
@@ -57,7 +61,5 @@ class Info
       }//for all robots
 
     }
-  private:
-    RobotWorld *_world;
 };
 
