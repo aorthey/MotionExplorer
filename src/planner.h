@@ -1,9 +1,10 @@
 #pragma once
-#include <Modeling/MultiPath.h>
 #include <Planning/PlannerSettings.h>
 #include <KrisLibrary/planning/AnyMotionPlanner.h>
 #include <Modeling/DynamicPath.h>
 #include <Modeling/Paths.h>
+#include <Modeling/MultiPath.h>
+#include <Planning/RobotTimeScaling.h>
 
 class MotionPlanner{
   private:
@@ -97,9 +98,17 @@ class MotionPlanner{
       return true;
     }
 
-    //void TrajectoryToController(){
+    void TrajectoryToController(){
+      //Path discretization resolution -- it controls
+      ////how many points N are used in the optimization.
+      ////Running time is empirically quadratic in N
+      double xtol=0.01;
+      ////Output path discretization resolution
+      double ttol=0.01;
+      Robot *robot = _world->robots[_irobot];
+      bool res=GenerateAndTimeOptimizeMultiPath(robot,_path,xtol,ttol);
 
-    ///*
+    }
     bool PathToController(){
       double dstep = 0.1;
       

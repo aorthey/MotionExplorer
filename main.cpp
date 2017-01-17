@@ -65,6 +65,7 @@ int main(int argc,const char** argv) {
   MotionPlanner planner(&world, &sim);
   planner.solve(p_start, p_goal);
   planner.PathToController();
+  planner.TrajectoryToController();
 
   //############################################################################
   //guification
