@@ -1,6 +1,8 @@
 #pragma once
+
 #include <stdio.h>
 #include <Modeling/Paths.h>
+#include <Modeling/MultiPath.h>
 
 class Info
 {
@@ -14,6 +16,19 @@ class Info
     void operator()(MilestonePath &path)
     {
       std::cout <<  path.Length() << std::endl;
+    }
+    void operator()(const MultiPath &path)
+    {
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << "----- MultiPath Start ------ " << std::endl;
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << "Time start    : " << path.StartTime() << std::endl;
+      std::cout << "Time end      : " << path.EndTime() << std::endl;
+      std::cout << "Path duration : "<< path.Duration() << std::endl;
+      std::cout << "Path valid    : "<< ((path.IsValid())?("True"):("False"))<< std::endl;
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << "----- MultiPath End ------ " << std::endl;
+      std::cout << std::string(80, '-') << std::endl;
     }
 
     void operator()(RobotWorld *world){

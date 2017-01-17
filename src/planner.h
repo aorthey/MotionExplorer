@@ -16,6 +16,10 @@ class MotionPlanner{
     MultiPath _path;
 
   public:
+    const MultiPath& GetPath()
+    {
+      return _path;
+    }
     MotionPlanner(RobotWorld *world, WorldSimulation *sim):
       _world(world),_sim(sim)
     {
@@ -93,12 +97,6 @@ class MotionPlanner{
       //util::SetSimulatedRobot(robot,*_sim,p_init);
       //robot->UpdateConfig(p_goal);
 
-      //std::cout << "Done Path to Controller" << std::endl;
-
-      return true;
-    }
-
-    void TrajectoryToController(){
       //Path discretization resolution -- it controls
       ////how many points N are used in the optimization.
       ////Running time is empirically quadratic in N
@@ -106,35 +104,47 @@ class MotionPlanner{
       ////Output path discretization resolution
       double ttol=0.01;
       Robot *robot = _world->robots[_irobot];
-      bool res=GenerateAndTimeOptimizeMultiPath(robot,_path,xtol,ttol);
+      bool res=GenerateAndTimeOptimizeMultiPath(*robot,_path,xtol,ttol);
+      //new path
 
+      return true;
     }
-    bool PathToController(){
+
+    void SendCommandStringController(string cmd, string arg)
+    {
+      if(!_sim->robotControllers[0]->SendCommand(cmd,arg)) {
+        std::cout << std::string(80, '-') << std::endl;
+        std::cout << "ERROR in controller commander" << std::endl;
+        std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
+        std::cout << std::string(80, '-') << std::endl;
+        throw "Controller command not supported!";
+      }
+    }
+    bool SendToController(){
       double dstep = 0.1;
       
-      static bool firstTime = true;
 
-      Config cur;
-      double d=0.8;
+      Config q;
+      Config dq;
+
       for(double d = 0; d <= 1; d+=dstep)
       {
-        _path.Evaluate(d, cur);
+        static bool firstTime = true;
+        _path.Evaluate(d, q, dq);
 
-        stringstream ss;
-        ss<<cur;
+        stringstream qstr;
+        //stringstream dqstr;
+        qstr<<q<<dq;
+        //dqstr<<dq;
+        //std::cout << q << std::endl;
+        //std::cout << dq << std::endl;
+
         if(firstTime){
-          if(!_sim->robotControllers[0]->SendCommand("set_q",ss.str())) {
-            fprintf(stderr,"set_q command does not work with the robot's controller\n");
-            std::cout << "FAILURE" << std::endl;
-            return false;
-          } 
+          //SendCommandStringController("set_q",qstr.str());
+          SendCommandStringController("set_qv",qstr.str());
           firstTime=false;
         }else {
-          if(!_sim->robotControllers[0]->SendCommand("append_q",ss.str())) {
-            fprintf(stderr,"append_q command does not work with the robot's controller\n");
-            std::cout << "FAILURE" << std::endl;
-            return false;
-          }
+          SendCommandStringController("append_qv",qstr.str());
         }
       }
 

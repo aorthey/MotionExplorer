@@ -42,18 +42,21 @@ int main(int argc,const char** argv) {
   //############################################################################
   //IK solve for some grasp points
   //############################################################################
+
   IKSolverGraspRobonaut ikrobot(&world,0);
   ikrobot.solve();
 
   //############################################################################
   //transfer information from IKsolver to backend for vis purposes
   //############################################################################
+
   backend.SetIKConstraints( ikrobot.GetIKGoalConstraints(), ikrobot.GetIKRobotName() );
   backend.SetIKCollisions( ikrobot.GetIKCollisions() );
 
   //############################################################################
   //obtain start and goal config
   //############################################################################
+
   std::cout << std::string(80, '-') << std::endl;
   Config p_start(ikrobot.GetSolutionConfig());
   p_start.setZero();
@@ -62,10 +65,12 @@ int main(int argc,const char** argv) {
   //############################################################################
   //free space planner
   //############################################################################
+
   MotionPlanner planner(&world, &sim);
   planner.solve(p_start, p_goal);
-  planner.PathToController();
-  planner.TrajectoryToController();
+  info(planner.GetPath());
+  planner.SendToController();
+
 
   //############################################################################
   //guification

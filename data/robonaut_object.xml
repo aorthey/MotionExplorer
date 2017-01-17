@@ -41,13 +41,14 @@
     </robot>
   </simulation>
 
-
+  <!--
   <simulation>
     <robot index="0"> 
       <controller type="RobotControllerInterface" />.
     </robot>  
   </simulation>
 
+-->
 
 
 </world>

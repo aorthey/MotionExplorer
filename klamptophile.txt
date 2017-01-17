@@ -222,25 +222,36 @@ MilestonePath (KrisLibrary/planning/path.h)
   bool IsFeasible();
   int Eval(Real t, Config& c) const;
 
+MultiPath (Modelling/MultiPath.h)
+  Load(string);
+  Save(string);
+  bool IsValid();
+  Real StartTime() const;
+  ///Returns the end time of the path.  If untimed, the end time is 1.
+  Real EndTime() const;
+  Real Duration() const;
+  int Evaluate(Real time,Vector& q,Vector& v)
+
+
+
 
 
 -------------------------------------------------------------------------------
 TODO
 -------------------------------------------------------------------------------
 
- [ ] Can't change SIMROBOT anymore, what happened!?
-
  [x] solve IK for frame-env contact points
+ [x] Can't change SIMROBOT anymore, what happened!?
  [ ] solve IK for arbitrary rob-env contact points
  [ ] add limits/selfcollision/collision checks to IK
  [x] place robot directly(!) at IK computed solution and THEN start sim 
  [x] place robot feet on floor
-
  [x] plan path between A and B
  [x] extract milestones between A and B from path
  [x] execute path in GUI
- [ ] retime path
- [ ] execute trajectory in GUI
+ [x] retime path
+ [x] execute trajectory in GUI
+ [ ] visualize path in GUI
  [ ] make/break contact events => compute transition paths
  [ ] retime transition paths (TOPP vs build-in!?)
  [ ] execute transition paths
