@@ -15,7 +15,6 @@
 
 #include "src/gui.h"
 #include "src/info.h"
-#include "src/util.h"
 #include "src/planner.h"
 #include "src/object.h"
 #include "src/iksolver.h"
