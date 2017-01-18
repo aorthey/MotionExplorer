@@ -70,7 +70,7 @@ int main(int argc,const char** argv) {
   info(planner.GetPath());
   planner.SendToController();
 
-
+  backend.VisualizePathSweptVolume(planner.GetPath());
   //############################################################################
   //guification
   //############################################################################

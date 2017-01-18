@@ -11,6 +11,7 @@ MODELING
     WorldSimulation->GetRobot(). This is only for starting purposes of course.
     Control acts on ODEWorldSimulationRobot, while all the kinematic
     solutions/setconfig act on Yellow Robot. 
+    Be sure to update the frames or use UpdateConfig to set the robot
 -------------------------------------------------------------------------------
 
 RobotWorld (World.h) contains 
@@ -233,9 +234,6 @@ MultiPath (Modelling/MultiPath.h)
   int Evaluate(Real time,Vector& q,Vector& v)
 
 
-
-
-
 -------------------------------------------------------------------------------
 TODO
 -------------------------------------------------------------------------------
@@ -251,9 +249,11 @@ TODO
  [x] execute path in GUI
  [x] retime path
  [x] execute trajectory in GUI
- [ ] visualize path in GUI
+ [ ] grasp an actual object (grasp)
+ [ ] sample grasps for object and compute IK (findGrasp method)
+ [ ] visualize path in GUI (i.e. visualize the individual link paths)
+ [ ] swept volume? (for irr paper)
  [ ] make/break contact events => compute transition paths
- [ ] retime transition paths (TOPP vs build-in!?)
  [ ] execute transition paths
  [ ] Compute Force Closure Grasp from points
  [x] Move hand such that a set of fingertip points is fulfilled

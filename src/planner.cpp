@@ -19,6 +19,11 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal)
   _p_goal = p_goal;
   const int PLANNER_MAX_ITERS = 10;
 
+  Robot *robot = _world->robots[_irobot];
+  robot->UpdateConfig(_p_init);
+  util::SetSimulatedRobot(robot,*_sim,_p_init);
+  robot->UpdateConfig(_p_goal);
+
   WorldPlannerSettings settings;
   settings.InitializeDefault(*_world);
   settings.robotSettings[0].contactEpsilon = 1e-2;
@@ -31,31 +36,35 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal)
   factory.perturbationRadius = 0.5;
   int iters = PLANNER_MAX_ITERS;
   SmartPointer<MotionPlannerInterface> planner = factory.Create(&freeSpace,p_init,p_goal);
+  _isSolved = false;
   while(iters > 0) {
     planner->PlanMore();
     iters--;
     if(planner->IsSolved()) {
       planner->GetSolution(milestone_path);
+      _isSolved = true;
       break;
     }
   }
   std::cout << "Planner converged after " << PLANNER_MAX_ITERS-iters << "/" << PLANNER_MAX_ITERS << " iterations." << std::endl;
 
-  double dstep = 0.1;
-  Config cur;
-  vector<Config> keyframes;
-  for(double d = 0; d <= 1; d+=dstep)
-  {
-    milestone_path.Eval(d,cur);
-    keyframes.push_back(cur);
+  if(_isSolved){
+    double dstep = 0.1;
+    Config cur;
+    vector<Config> keyframes;
+    for(double d = 0; d <= 1; d+=dstep)
+    {
+      milestone_path.Eval(d,cur);
+      keyframes.push_back(cur);
+    }
+    _path.SetMilestones(keyframes);
+    double xtol=0.01;
+    double ttol=0.01;
+    Robot *robot = _world->robots[_irobot];
+    bool res=GenerateAndTimeOptimizeMultiPath(*robot,_path,xtol,ttol);
+    return true;
   }
-  _path.SetMilestones(keyframes);
-  double xtol=0.01;
-  double ttol=0.01;
-  Robot *robot = _world->robots[_irobot];
-  bool res=GenerateAndTimeOptimizeMultiPath(*robot,_path,xtol,ttol);
-
-  return true;
+  return false;
 }
 
 void MotionPlanner::SendCommandStringController(string cmd, string arg)
@@ -70,6 +79,8 @@ void MotionPlanner::SendCommandStringController(string cmd, string arg)
 }
 bool MotionPlanner::SendToController()
 {
+  if(!_isSolved){ return false; }
+
   double dstep = 0.1;
   Config q;
   Config dq;

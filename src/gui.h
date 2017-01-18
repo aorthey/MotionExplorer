@@ -8,6 +8,8 @@
 
 const GLColor bodyColor(0.9,0.9,0.9);
 const GLColor selectedLinkColor(1.0,1.0,0.5);
+const double sweptvolumeScale = 0.9;
+GLColor sweptvolumeColor(1.0,0.0,0.0,1.0);
 
 class ForceFieldBackend : public SimTestBackend
 {
@@ -15,9 +17,15 @@ class ForceFieldBackend : public SimTestBackend
     bool drawForceField;
     bool drawExtras; 
     bool drawIKextras;
+    bool drawPath;
     vector<IKGoal> _constraints;
     vector<int> _linksInCollision;
     string _robotname;
+    
+    //swept volume
+    std::vector<std::vector<Matrix4> > _mats;
+    vector<GLDraw::GeometryAppearance> _appearanceStack;
+
 
   public:
   typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
@@ -28,6 +36,7 @@ class ForceFieldBackend : public SimTestBackend
     drawForceField = false;
     drawExtras = true;
     drawIKextras = false;
+    drawPath = false;
   }
 
   void SetIKConstraints( vector<IKGoal> constraints, string robotname){
@@ -40,8 +49,79 @@ class ForceFieldBackend : public SimTestBackend
     _linksInCollision = linksInCollision;
     drawIKextras = true;
   }
+
+  void VisualizePathSweptVolume(const MultiPath &path)
+  {
+    _mats.clear();
+    Robot *robot = world->robots[0];
+
+    double dstep = 0.1;
+    Config q;
+    Config dq;
+
+    //orthezticate the matrices
+    for(double d = 0; d <= path.Duration(); d+=dstep)
+    {
+      path.Evaluate(d, q);
+      robot->UpdateConfig(q);
+      std::vector<Matrix4> mats_config;
+
+      for(size_t i=0;i<robot->links.size();i++) {
+        Matrix4 mat = robot->links[i].T_World;
+        mats_config.push_back(mat);
+      }
+      _mats.push_back(mats_config);
+    }
+    std::cout << "VIS SWEPT VOLUME" << _mats.size() << std::endl;
+    _appearanceStack.clear();
+    for(size_t i=0;i<robot->links.size();i++) {
+      if(robot->geomManagers[i].IsAppearanceShared())
+      {
+        robot->geomManagers[i].SetUniqueAppearance();
+      }
+      GLDraw::GeometryAppearance a = *robot->geomManagers[i].Appearance();
+      _appearanceStack.push_back(a);
+
+    }
+    drawPath = true;
+
+  }
+
+
+
   virtual void RenderWorld()
   {
+
+    if(drawPath){
+      Robot *robot = world->robots[0];
+      //loopin' through the waypoints
+      glColor4fv(sweptvolumeColor);
+      for(int i = 0; i < _mats.size(); i++){
+        for(int j=0;j<robot->links.size();j++) {
+          Matrix4 matij = _mats.at(i).at(j);
+          glPushMatrix();
+          glMultMatrix(matij);
+          glScalef(sweptvolumeScale, sweptvolumeScale, sweptvolumeScale);
+          glColor4fv(sweptvolumeColor);
+          GLDraw::GeometryAppearance& a = _appearanceStack.at(j);
+          a.SetColor(sweptvolumeColor);
+          //a.lightFaces = false;
+          //a.drawEdges = false;
+          //a.drawVertices = false;
+          //a.tex1D=NULL;
+          //a.tex2D=NULL;
+          //a.textureObject.cleanup();
+          //a.texgen.clear();
+            //const Geometry::AnyGeometry3D* geom;
+          //const Geometry::AnyGeometry3D* geom = a.geom;
+          //draw(*geom);
+
+          //draw(a);
+          a.DrawGL();
+          glPopMatrix();
+        }
+      }
+    }
     if(drawExtras){
       vector<ViewRobot> viewRobots = world->robotViews;
       ViewRobot *viewRobot = &viewRobots[0];

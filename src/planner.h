@@ -17,6 +17,7 @@ class MotionPlanner{
     Config _p_init;
     Config _p_goal;
     MultiPath _path;
+    bool _isSolved;
 
   public:
     const MultiPath& GetPath();

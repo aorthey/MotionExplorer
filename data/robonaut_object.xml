@@ -29,9 +29,8 @@
   </terrain>
 
   <!--
+  <rigidObject name="bar" file="/home/aorthey/git/Klampt/data/objects/cylinder.obj" position="0.60 0.0 0.032" />
   <rigidObject name="bar" file="/home/aorthey/git/Klampt/data/objects/cylinder.obj" position="0.35 0.0 0.932" />
-  <rigidObject name="bar" file="/home/aorthey/git/Klampt/data/objects/cylinder.obj" position="0.60 0.0 0.032" />
-  <rigidObject name="bar" file="/home/aorthey/git/Klampt/data/objects/cylinder.obj" position="0.60 0.0 0.032" />
 -->
 
   <simulation>
