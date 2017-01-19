@@ -41,7 +41,6 @@ int main(int argc,const char** argv) {
   //############################################################################
   //IK solve for some grasp points
   //############################################################################
-
   IKSolverGraspRobonaut ikrobot(&world,0);
   ikrobot.solve();
 

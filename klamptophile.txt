@@ -90,6 +90,8 @@ INTERFACE
 
 BACKEND
   GenericBackendBase
+  <- MouseDragBackend
+  <- <- GLNavigationBackend
   <- <- <- WorldGUIBackend (loader for RobotWorld)
   <- <- <- <- SimGUIBackend (add functions to display dynamics,i.e. wrenches, torques, contacts etc)
   <- <- <- <- <- SimTestBackend (more functions to interact with robot, add forces, etc)
@@ -123,7 +125,7 @@ WorldSimulation
   RobotWorld *world;
 
   ODERobot GetRobot(int id); //get the real robot (you cannot and should not
-control that, but can be used for initial placement procedures)
+    control that, but can be used for initial placement procedures)
 
 -------------------------------------------------------------------------------
 CONTACTS
@@ -151,8 +153,6 @@ CSPACE
     //Single Robot 
     vector<pair<int,int> > collisionPairs;
     bool CheckCollisionFree();
-
-
 
   <- <- <- ExplicitCSpace (KrisLibrary/planning/ExplicitCspace.h)
     //N-obstacles CSpace
@@ -249,12 +249,14 @@ TODO
  [x] execute path in GUI
  [x] retime path
  [x] execute trajectory in GUI
- [ ] grasp an actual object (grasp)
+ [ ] grasp an actual object
  [ ] sample grasps for object and compute IK (findGrasp method)
  [ ] visualize path in GUI (i.e. visualize the individual link paths)
- [ ] swept volume? (for irr paper)
+ [x] swept volume? (for irr paper)
+ [ ] swept volume transparent without the blueish background
  [ ] make/break contact events => compute transition paths
- [ ] execute transition paths
+ [ ] execute transition paths 
+ [ ] change viewpoint
  [ ] Compute Force Closure Grasp from points
  [x] Move hand such that a set of fingertip points is fulfilled
  [ ] Compute SE constraints, what is GIWC equivalent?
