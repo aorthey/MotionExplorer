@@ -11,7 +11,8 @@ int main(int argc,const char** argv) {
         //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hrp2.xml");
         //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_fractal_2.xml");
         //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_fractal_3.xml");
-        backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/hubo_object.xml");
+        //backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/hubo_object.xml");
+        backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel.xml");
 
         GLUISimTestGUI gui(&backend,&world);
         gui.SetWindowTitle("SimTest");

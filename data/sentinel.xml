@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<world>
+  <robot name="sentinel" file="/home/aorthey/git/orthoklampt/data/sentinel2.urdf" translation="0 -4 0.5" rotateRPY="0 0 3.14"/>
+
+  <terrain file="/home/aorthey/git/Klampt/data/terrains/plane.tri" translation="0 0 0"/>
+
+</world>

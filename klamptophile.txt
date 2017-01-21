@@ -241,6 +241,7 @@ TODO
  [x] solve IK for frame-env contact points
  [x] Can't change SIMROBOT anymore, what happened!?
  [ ] solve IK for arbitrary rob-env contact points
+ [ ] setup kinodynamic planning problem
  [ ] add limits/selfcollision/collision checks to IK
  [x] place robot directly(!) at IK computed solution and THEN start sim 
  [x] place robot feet on floor
