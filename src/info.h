@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <Modeling/Paths.h>
 #include <Modeling/MultiPath.h>
+#include <KrisLibrary/planning/Path.h>
 
 class Info
 {

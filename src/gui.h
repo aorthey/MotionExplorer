@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Interface/SimTestGUI.h>
+#include <Modeling/MultiPath.h>
 #include <KrisLibrary/robotics/IK.h>
 #include <KrisLibrary/robotics/IKFunctions.h>
 #include <KrisLibrary/geometry/CollisionMesh.h>

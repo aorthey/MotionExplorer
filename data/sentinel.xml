@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <world>
-  <robot name="sentinel" file="/home/aorthey/git/orthoklampt/data/sentinel2.urdf" translation="0 -4 0.5" rotateRPY="0 0 3.14"/>
+  <robot name="sentinel" file="/home/aorthey/git/orthoklampt/data/sentinel2.urdf" translation="0 0 0.5" rotateRPY="0 0 3.14" config="39  0 0 0 0 0 0 0  0 0  0.523598775598  0.523598775598  0  1.0471975512  1.0471975512  0  0 0  0.523598775598  0.523598775598  0  1.0471975512  1.0471975512  0  0 0  0.523598775598  0.523598775598  0  1.0471975512  1.0471975512  0  0 0  0.523598775598  0.523598775598  0  1.0471975512  1.0471975512  0 "
+    />
+  <!--<robot name="sentinel" file="/home/aorthey/git/orthoklampt/data/sentinel2.urdf" translation="0 0 0.5" rotateRPY="0 0 3.14" config="39 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0" />
+       -->
 
   <terrain file="/home/aorthey/git/Klampt/data/terrains/plane.tri" translation="0 0 0"/>
 

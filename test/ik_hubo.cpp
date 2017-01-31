@@ -8,11 +8,11 @@
 #include <KrisLibrary/robotics/IKFunctions.h>
 #include <KrisLibrary/GLdraw/drawextra.h>
 #include <stdio.h>
-#include "src/gui.h"
-#include "src/info.h"
-#include "src/object.h"
-#include "src/iksolver.h"
-#include "src/iksolver_hubo.h"
+#include "gui.h"
+#include "info.h"
+#include "object.h"
+#include "iksolver.h"
+#include "iksolver_hubo.h"
 
 
 int main(int argc,const char** argv) {
@@ -24,7 +24,7 @@ int main(int argc,const char** argv) {
   backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/hubo_object.xml");
 
   Info info;
-  print(&world);
+  info(&world);
 
   IKSolverHubo ikhubo(&world);
   ikhubo.solve();
