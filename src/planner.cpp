@@ -17,7 +17,12 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal)
   MilestonePath milestone_path;
   _p_init = p_init;
   _p_goal = p_goal;
-  const int PLANNER_MAX_ITERS = 10;
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "Motion Planner:" << std::endl;
+  std::cout << "p_init =" << p_init << std::endl;
+  std::cout << "p_goal =" << p_goal << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  const int PLANNER_MAX_ITERS = 10000;
 
   Robot *robot = _world->robots[_irobot];
   robot->UpdateConfig(_p_init);
@@ -34,6 +39,7 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal)
 
   MotionPlannerFactory factory;
   factory.perturbationRadius = 0.5;
+  factory.type = "ompl:birrt";
   int iters = PLANNER_MAX_ITERS;
   SmartPointer<MotionPlannerInterface> planner = factory.Create(&freeSpace,p_init,p_goal);
   _isSolved = false;
@@ -46,9 +52,9 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal)
       break;
     }
   }
-  std::cout << "Planner converged after " << PLANNER_MAX_ITERS-iters << "/" << PLANNER_MAX_ITERS << " iterations." << std::endl;
 
   if(_isSolved){
+    std::cout << "Planner converged after " << PLANNER_MAX_ITERS-iters << "/" << PLANNER_MAX_ITERS << " iterations." << std::endl;
     double dstep = 0.1;
     Config cur;
     vector<Config> keyframes;
@@ -63,8 +69,10 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal)
     Robot *robot = _world->robots[_irobot];
     bool res=GenerateAndTimeOptimizeMultiPath(*robot,_path,xtol,ttol);
     return true;
+  }else{
+    std::cout << "Planner did not find a solution" << std::endl;
+    return false;
   }
-  return false;
 }
 
 void MotionPlanner::SendCommandStringController(string cmd, string arg)

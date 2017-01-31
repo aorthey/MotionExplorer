@@ -103,9 +103,12 @@ class ForceFieldBackend : public SimTestBackend
     Config dq;
 
     //orthezticate the matrices
+    std::cout << path.Duration() << std::endl;
     for(double d = 0; d <= path.Duration(); d+=dstep)
     {
+      std::cout << d << std::endl;
       path.Evaluate(d, q);
+      std::cout << q << std::endl;
       robot->UpdateConfig(q);
       std::vector<Matrix4> mats_config;
 

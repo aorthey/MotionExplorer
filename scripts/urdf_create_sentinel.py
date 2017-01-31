@@ -7,24 +7,21 @@ length = 0.15
 radius = 0.01
 sphere_scale = 2
 headradius = 0.1
-Nsegments = 5
-Nbranches = 5
+Nsegments = 2
+Nbranches = 1
 
 config = ''
-
 fname = 'sentinel2.urdf'
 xmlname = 'sentinel2.xml'
 pathname = os.path.dirname(os.path.realpath(__file__))+'/../data/'
 pathname = os.path.abspath(pathname)+'/'
 fname = pathname + fname
 xmlname = pathname + xmlname
-print "\nCreated new file >>",
-print fname
 
 f = open(fname,'w')
 
-f.write('<?xml version="1.0"?>')
-f.write('<robot name="sentinel">')
+f.write('<?xml version="1.0"?>\n')
+f.write('<robot name="sentinel">\n')
 
 def createHead(headname):
   hstrs = createSphere("eye",0,0,0,headradius)
@@ -116,15 +113,18 @@ headname = "head"
 f.write(createHead(headname))
 f.write(createBranchBundle(headname))
 
-f.write('  <klampt package_root="../.." use_vis_geom="1" />')
+f.write('  <klampt package_root="../.." use_vis_geom="1" />\n')
 f.write('</robot>')
 f.close()
+
+print "\nCreated new file >>",
+print fname
 
 f = open(xmlname,'w')
 f.write('<?xml version="1.0"?>\n\n')
 f.write('<world>\n')
 terrainstr = '  <terrain file=\"/home/aorthey/git/Klampt/data/terrains/plane.tri\"'
-terrainstr += '  translation=\"0 0 0\"/>\n'
+terrainstr += '  translation=\"0 0 0\"/>\n\n'
 f.write(terrainstr)
 
 robotstr  = '  <robot name=\"sentinel\"'
@@ -134,5 +134,15 @@ robotstr += ' rotateRPY="0 0 3.14"'
 robotstr += ' '+config+'/>\n\n'
 f.write(robotstr)
 
+ctrlstr  = '  <simulation>\n'
+ctrlstr += '    <globals maxContacts="20" />\n'
+ctrlstr += '    <robot index="0">\n'
+ctrlstr += '      <controller type="PolynomialPathController" />\n'
+ctrlstr += '    </robot>\n'
+ctrlstr += '  </simulation>\n\n'
+f.write(ctrlstr)
 f.write('</world>')
 f.close()
+
+print "\nCreated new file >>",
+print xmlname
