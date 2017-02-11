@@ -93,39 +93,37 @@ class ForceFieldBackend : public SimTestBackend
 
   //############################################################################
   //############################################################################
+  void VisualizePathSweptVolumeAtPosition(const MultiPath &path, double d)
+  {
+    Robot *robot = world->robots[0];
+    Config q;
+    path.Evaluate(d, q);
+    robot->UpdateConfig(q);
+    std::vector<Matrix4> mats_config;
+
+    for(size_t i=0;i<robot->links.size();i++) {
+      Matrix4 mat = robot->links[i].T_World;
+      mats_config.push_back(mat);
+    }
+    _mats.push_back(mats_config);
+  }
   void VisualizePathSweptVolume(const MultiPath &path)
   {
     _mats.clear();
     Robot *robot = world->robots[0];
 
     double dstep = 0.1;
-    Config q;
-    Config dq;
 
-    //orthezticate the matrices
-    std::cout << path.Duration() << std::endl;
     for(double d = 0; d <= path.Duration(); d+=dstep)
     {
-      std::cout << d << std::endl;
-      path.Evaluate(d, q);
-      std::cout << q << std::endl;
-      robot->UpdateConfig(q);
-      std::vector<Matrix4> mats_config;
-
-      for(size_t i=0;i<robot->links.size();i++) {
-        Matrix4 mat = robot->links[i].T_World;
-        mats_config.push_back(mat);
-      }
-      _mats.push_back(mats_config);
+      VisualizePathSweptVolumeAtPosition(path, d);
     }
+
     std::cout << "[SweptVolume] #waypoints " << _mats.size() << std::endl;
     _appearanceStack.clear();
     _appearanceStack.resize(robot->links.size());
+
     for(size_t i=0;i<robot->links.size();i++) {
-      //if(robot->geomManagers[i].IsAppearanceShared())
-      //{
-      //  robot->geomManagers[i].SetUniqueAppearance();
-      //}
       GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
       //a.SetColor(sweptvolumeColor);
       _appearanceStack[i]=a;

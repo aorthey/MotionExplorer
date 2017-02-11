@@ -262,6 +262,7 @@ TODO
  [x] Move hand such that a set of fingertip points is fulfilled
  [ ] Compute SE constraints, what is GIWC equivalent?
  [x] set color to link in contact
- [ ] importing/exporting blender models? how to best design your own environments? [needs
+ [x] importing/exporting blender models? how to best design your own environments? [needs
 .tri to blender importer. there is none (only for some other tri files). maybe
+ [ ] smoothing of path
 better to convert to dae (collada) ?]

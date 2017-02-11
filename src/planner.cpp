@@ -21,7 +21,6 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal)
   std::cout << "Motion Planner:" << std::endl;
   std::cout << "p_init =" << p_init << std::endl;
   std::cout << "p_goal =" << p_goal << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
   const int PLANNER_MAX_ITERS = 10000;
 
   Robot *robot = _world->robots[_irobot];
@@ -31,17 +30,21 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal)
 
   WorldPlannerSettings settings;
   settings.InitializeDefault(*_world);
-  settings.robotSettings[0].contactEpsilon = 1e-2;
-  settings.robotSettings[0].contactIKMaxIters = 100;
+  //settings.robotSettings[0].contactEpsilon = 1e-2;
+  //settings.robotSettings[0].contactIKMaxIters = 100;
 
   SingleRobotCSpace freeSpace = SingleRobotCSpace(*_world,_irobot,&settings);
   //ContactCSpace cspace(freeSpace);
 
   MotionPlannerFactory factory;
-  factory.perturbationRadius = 0.5;
-  factory.type = "ompl:birrt";
+  factory.perturbationRadius = 0.1;
+  //factory.type = "rrt";
+  factory.type = "prm";
+  factory.shortcut = true;
+
   int iters = PLANNER_MAX_ITERS;
   SmartPointer<MotionPlannerInterface> planner = factory.Create(&freeSpace,p_init,p_goal);
+
   _isSolved = false;
   while(iters > 0) {
     planner->PlanMore();
@@ -52,6 +55,7 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal)
       break;
     }
   }
+  std::cout << std::string(80, '-') << std::endl;
 
   if(_isSolved){
     std::cout << "Planner converged after " << PLANNER_MAX_ITERS-iters << "/" << PLANNER_MAX_ITERS << " iterations." << std::endl;
