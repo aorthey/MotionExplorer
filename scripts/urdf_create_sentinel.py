@@ -7,14 +7,16 @@ length = 0.15
 radius = 0.01
 sphere_scale = 2
 headradius = 0.1
-Nsegments = 3
-Nbranches = 3
+Nsegments = 4
+Nbranches = 4
 aperture = 0.4 ## aperture of bouquet of branches
 
 sRadius = sphere_scale*radius
 config = ''
-fname = 'sentinel2.urdf'
-xmlname = 'sentinel2.xml'
+#folder='sentinel/'
+folder=''
+fname = folder+'sentinel.urdf'
+xmlname = folder+'sentinel.xml'
 pathname = os.path.dirname(os.path.realpath(__file__))+'/../data/'
 pathname = os.path.abspath(pathname)+'/'
 fname = pathname + fname
@@ -118,7 +120,7 @@ headname = "head"
 f.write(createHead(headname))
 f.write(createBranchBundle(headname))
 #f.write('  <klampt package_root="../.." flip_yz="1" use_vis_geom="1">\n')
-f.write('  <klampt package_root="../.." default_acc_max="4" >\n')
+f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
 #f.write('    <noselfcollision pairs="head eye"/>\n')
 #branch_00_spherical_joint_link
 #f.write('    <link name="branch_00_spherical_joint_link" physical="0" />\n')
@@ -139,8 +141,8 @@ terrainstr += '  translation=\"0 0 0\"/>\n\n'
 f.write(terrainstr)
 
 robotstr  = '  <robot name=\"sentinel\"'
-robotstr += ' file=\"/home/aorthey/git/orthoklampt/data/sentinel2.urdf\"'
-robotstr += ' translation=\"0 0 0\"'
+robotstr += ' file="'+str(fname)+'"'
+robotstr += ' translation="0 0 0"'
 robotstr += ' rotateRPY="0 0 3.14"'
 robotstr += ' '+config+'/>\n\n'
 f.write(robotstr)
