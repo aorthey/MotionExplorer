@@ -89,12 +89,31 @@ INTERFACE
 -------------------------------------------------------------------------------
 
 BACKEND
-  GenericBackendBase
-  <- MouseDragBackend
-  <- <- GLNavigationBackend
-  <- <- <- WorldGUIBackend (loader for RobotWorld)
-  <- <- <- <- SimGUIBackend (add functions to display dynamics,i.e. wrenches, torques, contacts etc)
-  <- <- <- <- <- SimTestBackend (more functions to interact with robot, add forces, etc)
+  GenericBackendBase [GenericGUI.h] 
+    bool GenericGUIBase::SendGLViewport(int x,int y,int w,int h)
+
+  <- MouseDragBackend [NavigationGUI.h] 
+  <- <- GLNavigationBackend [NavigationGUI.h] 
+          Camera::Viewport viewport; viewport.x .y .w .h 
+          OnGLRender()
+            RenderWorld()
+
+  <- <- <- WorldGUIBackend [WorldGUI.h] (loader for RobotWorld)
+  <- <- <- <- SimGUIBackend [SimulationGUI.h] (add functions to display dynamics,i.e. wrenches, torques, contacts etc)
+                RenderWorld()
+                  world->terrains[i]->DrawGL();
+                  world->rigidObjects[i]->DrawGL();
+                  world->robotViews[i].DrawLink_World(j);
+
+  <- <- <- <- <- SimTestBackend [SimTestGUI.h] (more functions to interact with robot, add forces, etc)
+                  RenderWorld()
+                    world->robotViews[r].SetColors(desiredColor);
+                    world->robotViews[r].Draw();
+                    world->robotViews[r].SetAppearance(oldAppearance);
+
+
+
+
 
 -------------------------------------------------------------------------------
 VIEW
@@ -139,32 +158,49 @@ CONTACTS
 CSPACE
 -------------------------------------------------------------------------------
 
-  ContactCSpace (Klampt/Planning/ContactCSpace.h)
-    //Single Robot in contact with environment
-    vector<IKGoal> contactIK;
-    void AddContact(const IKGoal& goal);
-    void RemoveContact(int link);
-    bool SolveContact(int numIters=0,Real tol=0);
+  CSpace (Krislibrary/planning/cspace.h)
+    //Generic CSpace
+    void Sample(Config& x);
+    bool IsFeasible(const Config&);
 
-  <- SingleRobotCSpace2 (Klampt/Planning/RobotCSpace.h)
-    //Single robot + fixed dofs available
-
-  <- <- SingleRobotCSpace  (Klampt/Planning/RobotCSpace.h)
-    //Single Robot 
-    vector<pair<int,int> > collisionPairs;
-    bool CheckCollisionFree();
-
-  <- <- <- ExplicitCSpace (KrisLibrary/planning/ExplicitCspace.h)
+  <- ExplicitCSpace (KrisLibrary/planning/ExplicitCspace.h)
     //N-obstacles CSpace
     bool IsFeasible(const Config&,int obstacle);
     EdgePlanner* LocalPlanner(const Config& a,const Config& b,int obstacle);
     int NumObstacles();
     void GetInfeasibleNames(const Config& q,std::vector<std::string>& names);
 
-  <- <- <- <- CSpace (Krislibrary/planning/cspace.h)
-    //Generic CSpace
-    void Sample(Config& x);
-    bool IsFeasible(const Config&);
+  <- <- SingleRobotCSpace  (Klampt/Planning/RobotCSpace.h)
+    //Single Robot 
+    vector<pair<int,int> > collisionPairs;
+    bool CheckCollisionFree();
+
+  <- <- <- <- SingleRobotCSpace2 (Klampt/Planning/RobotCSpace.h)
+    //Single robot + fixed dofs available
+    IgnoreCollisions(int,int)
+    FixDof(int,double)
+
+  <- <- <- <- <- ContactCSpace (Klampt/Planning/ContactCSpace.h)
+    //Single Robot in contact with environment
+    vector<IKGoal> contactIK;
+    void AddContact(const IKGoal& goal);
+    void RemoveContact(int link);
+    bool SolveContact(int numIters=0,Real tol=0);
+
+-------------------------------------------------------------------------------
+MOTION PLANNER
+-------------------------------------------------------------------------------
+
+(KrisLibrary/planning/MotionPlanner.h)
+
+RoadmapPlanner 
+TreeRoadmapPlanner
+  <- RRTPlanner
+  <- <- BidirectionalRRTPlanner
+
+(KrisLibrary/planning/AnyMotionPlanner.h)
+MotionPlannerFactory
+MotionPlannerInterface
 
 -------------------------------------------------------------------------------
 LOAD/SAVE RESOURCE (KrisLibrary/utils/ResourceLibrary.h)
@@ -223,7 +259,7 @@ MilestonePath (KrisLibrary/planning/path.h)
   bool IsFeasible();
   int Eval(Real t, Config& c) const;
 
-MultiPath (Modelling/MultiPath.h)
+MultiPath (Modeling/MultiPath.h)
   Load(string);
   Save(string);
   bool IsValid();
@@ -254,7 +290,7 @@ TODO
  [ ] sample grasps for object and compute IK (findGrasp method)
  [ ] visualize path in GUI (i.e. visualize the individual link paths)
  [x] swept volume? (for irr paper)
- [ ] swept volume transparent without the blueish background
+ [x] swept volume transparent without the blueish background
  [ ] make/break contact events => compute transition paths
  [ ] execute transition paths 
  [ ] change viewpoint
@@ -262,7 +298,7 @@ TODO
  [x] Move hand such that a set of fingertip points is fulfilled
  [ ] Compute SE constraints, what is GIWC equivalent?
  [x] set color to link in contact
- [x] importing/exporting blender models? how to best design your own environments? [needs
-.tri to blender importer. there is none (only for some other tri files). maybe
- [ ] smoothing of path
-better to convert to dae (collada) ?]
+ [x] importing/exporting blender models? how to best design your own environments? [needs .tri to blender importer. there is none (only for some other tri files). maybe better to convert to dae (collada) ?]
+ [ ] smoothing after path planning
+ [ ] why does planning fail with 1 additional joint see sentinel
+ 

@@ -6,11 +6,12 @@
 #include <KrisLibrary/robotics/IKFunctions.h>
 #include <KrisLibrary/geometry/CollisionMesh.h>
 #include <KrisLibrary/GLdraw/drawMesh.h>
+#include <KrisLibrary/GLdraw/GLError.h>
 
 #include <View/ViewIK.h>
 #include <ode/ode.h>
 
-const GLColor bodyColor(0.9,0.9,0.9);
+const GLColor bodyColor(0.1,0.1,0.1);
 const GLColor selectedLinkColor(1.0,1.0,0.5);
 const double sweptvolumeScale = 0.90;
 GLColor sweptvolumeColor(0.7,0.0,0.9,0.5);
@@ -28,9 +29,9 @@ class ForceFieldBackend : public SimTestBackend
     //swept volume
     std::vector<std::vector<Matrix4> > _mats;
     vector<GLDraw::GeometryAppearance> _appearanceStack;
+    typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
 
   public:
-    typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
 
   ForceFieldBackend(RobotWorld *world)
       : SimTestBackend(world)
@@ -114,7 +115,7 @@ class ForceFieldBackend : public SimTestBackend
 
     double dstep = 0.1;
 
-    for(double d = 0; d <= path.Duration(); d+=dstep)
+    for(double d = 0; d <= path.Duration()+dstep; d+=dstep)
     {
       VisualizePathSweptVolumeAtPosition(path, d);
     }
@@ -135,6 +136,15 @@ class ForceFieldBackend : public SimTestBackend
 
   virtual void RenderWorld()
   {
+    DEBUG_GL_ERRORS()
+    this->drawDesired=false;
+
+    BaseT::RenderWorld();
+
+    glEnable(GL_BLEND);
+    allWidgets.Enable(&allRobotWidgets,drawPoser==1);
+    allWidgets.DrawGL(viewport);
+
 
     if(drawExtras){
       vector<ViewRobot> viewRobots = world->robotViews;
@@ -146,6 +156,7 @@ class ForceFieldBackend : public SimTestBackend
       viewRobot->DrawLinkSkeleton();
       viewRobot->SetColors(bodyColor);
     }
+
     //############################################################################
     // IK extras: contact links, contact directions
     //############################################################################
@@ -258,7 +269,6 @@ class ForceFieldBackend : public SimTestBackend
         }
       }
     }
-    BaseT::RenderWorld();
   }//RenderWorld
 
 
