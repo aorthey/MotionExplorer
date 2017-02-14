@@ -34,7 +34,7 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal)
   //settings.robotSettings[0].contactEpsilon = 1e-2;
   //settings.robotSettings[0].contactIKMaxIters = 100;
 
-  SingleRobotCSpace2 cspace = SingleRobotCSpace(*_world,_irobot,&settings);
+  SingleRobotCSpace cspace = SingleRobotCSpace(*_world,_irobot,&settings);
   //std::cout << "CSPACE COLLISION PAIRS: " << cspace.collisionPairs.size() << std::endl;
   //cspace.FixDof(6,0);
   //cspace.FixDof(7,0);
@@ -110,14 +110,14 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal)
   //factory.type = "lazyrrg*";
   //factory.type = "fmm"; //warning: slows down system 
 
-  factory.type = "prm";
+  factory.type = "sbl";
   factory.shortcut = true;
 
   int iters = PLANNER_MAX_ITERS;
   SmartPointer<MotionPlannerInterface> planner = factory.Create(&cspace,p_init,p_goal);
 
   HaltingCondition cond;
-  cond.foundSolution=false;
+  cond.foundSolution=true;
   cond.timeLimit = 10;
 
   std::cout << "Start Planning" << std::endl;

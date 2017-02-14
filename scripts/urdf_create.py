@@ -4,6 +4,7 @@ from math import cos,sin,pi
 mass = 0.05
 damping = 0.5
 effort = 0.01
+velocity=100
 def createCylinder(lname,x,y,z,radius,length,COLLISION_ENABLED=True):
   s= ' <link name="'+lname+'">\n'
   s+= '  <inertial>\n'
@@ -16,13 +17,13 @@ def createCylinder(lname,x,y,z,radius,length,COLLISION_ENABLED=True):
   s+= '      <cylinder length="'+str(length)+'" radius="'+str(radius)+'"/>\n'
   s+= '    </geometry>\n'
   s+= '  </visual>\n'
-  if COLLISION_ENABLED:
-    s+= '  <collision>\n'
-    s+= '    <origin rpy="0 1.54 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
-    s+= '    <geometry>\n'
-    s+= '      <cylinder length="'+str(length)+'" radius="'+str(radius)+'"/>\n'
-    s+= '    </geometry>\n'
-    s+= '  </collision>\n'
+  #if COLLISION_ENABLED:
+  s+= '  <collision>\n'
+  s+= '    <origin rpy="0 1.57 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
+  s+= '    <geometry>\n'
+  s+= '      <cylinder length="'+str(length)+'" radius="'+str(radius)+'"/>\n'
+  s+= '    </geometry>\n'
+  s+= '  </collision>\n'
   s+= ' </link>\n\n'
   return s
 
@@ -75,7 +76,7 @@ def createRevoluteJoint(jname, parentname, childname, x=0, y=0, z=0):
   s+='  <child link="'+childname+'"/>\n'
   s+='  <axis xyz="0 1 0"/>\n'
   s+='  <dynamics damping="'+str(damping)+'" friction="0"/>\n'
-  s+='  <limit lower="-1.57" upper="1.57" effort="'+str(effort)+'" velocity="1000"/>\n'
+  s+='  <limit lower="-1.57" upper="1.57" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'
   return s
 
@@ -88,15 +89,15 @@ def createSphericalJoint(jname, parentname, childname, x=0, y=0, z=0):
   s+='  <child link="'+tmpname+'"/>\n'
   s+='  <axis xyz="0 1 0"/>\n'
   s+='  <dynamics damping="'+str(damping)+'" friction="0"/>\n'
-  s+='  <limit lower="-1.57" upper="1.57" effort="'+str(effort)+'" velocity="1000"/>\n'
+  s+='  <limit lower="-1.57" upper="1.57" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'
-  s+= createSphere(tmpname,0,0,0,0.01,PHYSICAL=False)
+  s+= createSphere(tmpname,0,0,0,0.001,PHYSICAL=False)
   s+='<joint name="'+jname+'_X" type="revolute">\n'
   s+='  <origin rpy="0 0 0" xyz="0 0 0"/>\n'
   s+='  <parent link="'+tmpname+'"/>\n'
   s+='  <child link="'+childname+'"/>\n'
   s+='  <axis xyz="0 0 1"/>\n'
   s+='  <dynamics damping="'+str(damping)+'" friction="0"/>\n'
-  s+='  <limit lower="-1.57" upper="1.57" effort="'+str(effort)+'" velocity="1000"/>\n'
+  s+='  <limit lower="-1.57" upper="1.57" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'
   return s

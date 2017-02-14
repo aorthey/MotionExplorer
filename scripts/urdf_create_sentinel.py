@@ -7,9 +7,11 @@ length = 0.15
 radius = 0.01
 sphere_scale = 2
 headradius = 0.1
-Nsegments = 5
+Nsegments = 3
 Nbranches = 3
+aperture = 0.4 ## aperture of bouquet of branches
 
+sRadius = sphere_scale*radius
 config = ''
 fname = 'sentinel2.urdf'
 xmlname = 'sentinel2.xml'
@@ -32,9 +34,9 @@ def createHead(headname):
 def attachBranchSegment(parentlinkname, linkname, x, y, z):
   linkname1 = linkname+'_cylinder'
   linkname2 = linkname
-  sbl1 = createCylinder(linkname1,-length/2,0,0,radius,length) 
+  sbl1 = createCylinder(linkname1,-length/2-sRadius,0,0,radius,length) 
   sbj1 = createSphericalJoint(parentlinkname+'_'+linkname+'_joint_revolute', parentlinkname,linkname1, x, y, z) 
-  sbl2 = createSphere(linkname2,-length,0,0,sphere_scale*radius) 
+  sbl2 = createSphere(linkname2,-length-2*sRadius,0,0,0.95*sRadius)
   sbj2 = createRigidJoint(linkname+'_fixed', linkname1, linkname2,0,0,0)
   return sbl1+sbj1+sbl2+sbj2
 
@@ -44,14 +46,17 @@ def createBranchSegment(parentlinkname, linkname, x, y, z):
   linkname2 = linkname
   sbl1 = createCylinder(linkname1,-length/2,0,0,radius,length) 
   sbj1 = createRigidJoint(parentlinkname+'_'+linkname+'_joint', parentlinkname,linkname1, x, y, z) 
-  sbl2 = createSphere(linkname2,-length,0,0,sphere_scale*radius) 
+  sbl2 = createSphere(linkname2,-length-sRadius,0,0,0.95*sRadius)
   sbj2 = createRigidJoint(linkname+'_fixed', linkname1, linkname2, 0, 0, 0)
   return sbc+sbl1+sbj1+sbl2+sbj2
 
 def createBranch(headname, branchname,x,y,z):
   s = createBranchSegment(headname,branchname+str(0),x,y,z)
   for i in range(1,Nsegments):
-    s+= attachBranchSegment(branchname+str(i-1),branchname+str(i),-length,0,0)
+    if i==1:
+      s+= attachBranchSegment(branchname+str(i-1),branchname+str(i),-length-sRadius,0,0)
+    else:
+      s+= attachBranchSegment(branchname+str(i-1),branchname+str(i),-length-2*sRadius,0,0)
   return s
 
 def createBranchBundle(headname):
@@ -89,7 +94,6 @@ def createBranchBundle(headname):
   config += str(" 0"*1) ## head-eye
 
   ## create a nice bouquet of branches
-  aperture = 0.4
   for i in range(0,Nbranches):
     config += str(" 0"*2) ## first segment is fixed
     y = cos(i*2*pi/Nbranches)
@@ -113,9 +117,13 @@ def createBranchBundle(headname):
 headname = "head"
 f.write(createHead(headname))
 f.write(createBranchBundle(headname))
-f.write('  <klampt package_root="../.." flip_yz="1">\n')
+#f.write('  <klampt package_root="../.." flip_yz="1" use_vis_geom="1">\n')
+f.write('  <klampt package_root="../.." default_acc_max="4" >\n')
 #f.write('    <noselfcollision pairs="head eye"/>\n')
+#branch_00_spherical_joint_link
+#f.write('    <link name="branch_00_spherical_joint_link" physical="0" />\n')
 #f.write('    <noselfcollision pairs="eye branch_00"/>\n')
+#f.write('    <noselfcollision pairs="eye branch_00_cylinder"/>\n')
 f.write('  </klampt>\n')
 f.write('</robot>')
 f.close()
