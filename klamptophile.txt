@@ -294,6 +294,7 @@ TODO
  [x] set color to link in contact
  [x] importing/exporting blender models? how to best design your own environments? [needs .tri to blender importer. there is none (only for some other tri files). maybe better to convert to dae (collada) ?]
  [x] why does planning fail with 1 additional joint see sentinel
+ [x] disable backface culling to display backoriented triangles (just use rigidobject, they are non-culled)
  [ ] solve IK for arbitrary rob-env contact points
  [ ] setup kinodynamic planning problem
  [ ] grasp an actual object
@@ -304,4 +305,5 @@ TODO
  [ ] Compute Force Closure Grasp from points
  [ ] Compute SE constraints, what is GIWC equivalent?
  [ ] smoothing after path planning
- [ ] disable backface culling to display backoriented triangles
+ [ ] better swept volume visualization
+ [ ] make a Klampt Interface where to set all properties like background color etc

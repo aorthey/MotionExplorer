@@ -67,6 +67,7 @@ int main(int argc,const char** argv) {
   //############################################################################
 
   MotionPlanner planner(&world, &sim);
+
   if(planner.solve(p_init, p_goal,100,false)){
     info(planner.GetPath());
     std::cout << "send to controller" << std::endl;

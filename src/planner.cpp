@@ -106,6 +106,9 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
     double ttol=0.01;
     Robot *robot = _world->robots[_irobot];
     bool res=GenerateAndTimeOptimizeMultiPath(*robot,_path,xtol,ttol);
+    string out = "last_path.xml";
+    _path.Save(out);
+    std::cout << "saved path to "<<out << std::endl;
     return true;
   }else{
     std::cout << "Planner did not find a solution" << std::endl;
