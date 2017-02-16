@@ -22,9 +22,10 @@ class MotionPlanner{
   public:
     const MultiPath& GetPath();
     MotionPlanner(RobotWorld *world, WorldSimulation *sim);
-    bool solve(Config &p_init, Config &p_goal);
+    bool solve(Config &p_init, Config &p_goal, double timelimit=100.0, bool shortcutting=true);
     void SendCommandStringController(string cmd, string arg);
     bool SendToController();
+    void CheckFeasibility(Robot *robot, SingleRobotCSpace &cspace, Config &q);
 };
 
 // * The type field can be left as "any", in which a default planning algorithm will be

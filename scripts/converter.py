@@ -45,6 +45,7 @@ class ConverterInterface:
 
     if self.input_file_name == '':
       self.printUsage()
+
     ## obtain input file extension
     self.input_file_name = os.path.abspath(self.input_file_name)
     basename = os.path.basename(self.input_file_name)
@@ -53,7 +54,7 @@ class ConverterInterface:
     basename = basename[0]
 
     ## convert to output file 
-    pathname = os.path.dirname(os.path.realpath(__file__))+'/../data/'
+    pathname= os.path.abspath(os.path.join(self.input_file_name, os.pardir))
     self.output_file_name = os.path.abspath(pathname)+'/'+basename+"."+self.output_file_extension
 
     print self.charLineBreak*80
