@@ -1,5 +1,6 @@
 #include "planner.h"
 #include "util.h"
+#include "cspace_sentinel.h"
 
 MotionPlanner::MotionPlanner(RobotWorld *world, WorldSimulation *sim):
   _world(world),_sim(sim)
@@ -55,6 +56,7 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //settings.robotSettings[0].contactIKMaxIters = 100;
 
   SingleRobotCSpace cspace = SingleRobotCSpace(*_world,_irobot,&settings);
+  KinodynamicCSpaceSentinel cspace_kinodynamic;
 
   CheckFeasibility( robot, cspace, p_init);
   CheckFeasibility( robot, cspace, p_goal);

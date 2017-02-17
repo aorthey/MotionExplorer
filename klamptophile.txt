@@ -189,6 +189,18 @@ CSPACE
     void AddContact(const IKGoal& goal);
     void RemoveContact(int link);
     bool SolveContact(int numIters=0,Real tol=0);
+-------------------------------------------------------------------------------
+KINODYNAMIC CSPACE
+-------------------------------------------------------------------------------
+
+  CSpace (Krislibrary/planning/cspace.h)
+    void Sample(Config& x);
+    bool IsFeasible(const Config&);
+
+  <- KinodynamicCSpace (KrisLibrary/planning/KinodynamicCSpace.h)
+
+  <- <- IntegratedKinodynamicCSpace : public KinodynamicCSpace
+
 
 -------------------------------------------------------------------------------
 MOTION PLANNER
@@ -216,6 +228,9 @@ LOAD/SAVE RESOURCE (KrisLibrary/utils/ResourceLibrary.h)
 
 -------------------------------------------------------------------------------
 MATH
+ * The elements can be accessed as (i,j) for i,j in [0,3].
+
+  WARNING: [i][j] = (j,i) !! DO NOT USE [i][j]
 -------------------------------------------------------------------------------
 
  Krislibrary/math3d/primitives.h
@@ -234,6 +249,8 @@ MATH
     inline void setRotateY(Real rads);  ///<sets the matrix that rotates ccw by rads around the x axis
     inline void setRotateZ(Real rads);  ///<sets the matrix that rotates ccw by rads around the x axis
 
+  setIdentity()
+  setZero()
 
 
  Krislibrary/math/Vectortemplate.h
@@ -307,3 +324,5 @@ TODO
  [ ] smoothing after path planning
  [ ] better swept volume visualization
  [ ] make a Klampt Interface where to set all properties like background color etc
+ [ ] kinodynamic planning 
+ [ ] make ompl planners available
