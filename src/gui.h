@@ -113,13 +113,14 @@ class ForceFieldBackend : public SimTestBackend
     _mats.clear();
     Robot *robot = world->robots[0];
 
-    //double dstep = 0.01;
 
     //put swept volumes 
     Config qt;
     path.Evaluate(0, qt);
 
     double q_spacing = 0.3;
+
+    double dstep = 0.01;
     double d = 0;
 
     while(d <= 1)
