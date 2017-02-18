@@ -118,12 +118,40 @@ class KinodynamicCSpaceSentinel: public IntegratedKinodynamicCSpace
       X5(1,3) = 1;
       //##########################
       X6(2,3) = 1;
-
-      //dx = mul(X1,u(0)) + mul(X2,u(1)) + mul(X3,u(2)) + X4;
       
-      Matrix4 tmp = u(0)*X1;
+      //represent lie group element as matrix4
+      RigidTransform T_x_se3;
+      Matrix3 R,Rx,Ry,Rz;
+      Rx.setRotateX(x(3));
+      Ry.setRotateX(x(4));
+      Rz.setRotateX(x(5));
+      R = Rz*Ry*Rx;
+      T_x_se3.setTranslate(Vector3(x(0),x(1),x(2)));
+      T_x_se3.setRotate(R);
 
-      //dx = x*(u(0)*X1)
+      Matrix4 x_se3;
+      T_x_se3.get(x_se3);
+
+      //#########################################################################
+      //Matrix4 dx_se3 = x_se3*(X1*u(0) + X2*u(1) + X3*u(2) + X4);
+      Matrix4 dx_se3 = x_se3*(X3*u(2) + X4);
+      //#########################################################################
+
+      //dx_se3 is a lie algebra element represented as matrix4
+      // need to convert back to Vector6 element
+      Matrix3 dR_m;
+      EulerAngleRotation dR;
+      Vector3 dt;
+      dx_se3.get(dR_m,dt);
+      dR.setMatrixXYZ(dR_m);
+
+      dx(0)=dt[0];
+      dx(1)=dt[1];
+      dx(2)=dt[2];
+      dx(3)=dR[0];
+      dx(4)=dR[1];
+      dx(5)=dR[2];
+
     }
     virtual void Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps){
       dt = 0.001;
