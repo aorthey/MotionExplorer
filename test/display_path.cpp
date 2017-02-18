@@ -30,16 +30,13 @@ int main(int argc,const char** argv) {
   //SimTestBackend backend(&world);
   WorldSimulation& sim=backend.sim;
 
-  glDisable(GL_CULL_FACE);
   backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel.xml");
 
   MultiPath path;
-  path.Load("last_path.xml");
+  path.Load("../data/paths/path_2017_02_18.xml");
   backend.VisualizePathSweptVolume(path);
 
   world.rigidObjects.clear();
-
-
 
   //############################################################################
   //guification

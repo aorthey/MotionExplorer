@@ -113,12 +113,31 @@ class ForceFieldBackend : public SimTestBackend
     _mats.clear();
     Robot *robot = world->robots[0];
 
-    double dstep = 0.1;
+    //double dstep = 0.01;
 
-    for(double d = 0; d <= path.Duration()+dstep; d+=dstep)
+    //put swept volumes 
+    Config qt;
+    path.Evaluate(0, qt);
+
+    double q_spacing = 0.3;
+    double d = 0;
+
+    while(d <= 1)
     {
-      VisualizePathSweptVolumeAtPosition(path, d);
+      d+=dstep;
+      Config qtn;
+      path.Evaluate(d, qtn);
+      if((qt-qtn).norm() >= q_spacing)
+      {
+        VisualizePathSweptVolumeAtPosition(path, d);
+        qt = qtn;
+      }
     }
+    //for(double d = 0; d <= path.Duration()+dstep; d+=dstep)
+    //{
+    //  while 
+    //  VisualizePathSweptVolumeAtPosition(path, d);
+    //}
 
     std::cout << "[SweptVolume] #waypoints " << _mats.size() << std::endl;
     _appearanceStack.clear();
