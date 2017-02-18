@@ -1,6 +1,4 @@
 #include "planner.h"
-#include "util.h"
-#include "cspace_sentinel.h"
 
 MotionPlanner::MotionPlanner(RobotWorld *world, WorldSimulation *sim):
   _world(world),_sim(sim)
@@ -11,6 +9,9 @@ MotionPlanner::MotionPlanner(RobotWorld *world, WorldSimulation *sim):
 const MultiPath& MotionPlanner::GetPath()
 {
   return _path;
+}
+std::string MotionPlanner::getName(){
+  return "Motion Planner";
 }
 
 void MotionPlanner::CheckFeasibility( Robot *robot, SingleRobotCSpace &cspace, Config &q){
@@ -33,22 +34,33 @@ void MotionPlanner::CheckFeasibility( Robot *robot, SingleRobotCSpace &cspace, C
   }
 }
 
+bool MotionPlanner::PlanPath(){
+
+}
 bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool shortcutting)
 {
-  MilestonePath milestone_path;
-  _p_init = p_init;
-  _p_goal = p_goal;
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Motion Planner:" << std::endl;
-  std::cout << "p_init =" << p_init << std::endl;
-  std::cout << "p_goal =" << p_goal << std::endl;
 
+  this->_p_init = p_init;
+  this->_p_goal = p_goal;
+  this->_timelimit = timelimit;
+  this->_shortcutting = shortcutting;
   Robot *robot = _world->robots[_irobot];
   robot->UpdateConfig(_p_init);
   util::SetSimulatedRobot(robot,*_sim,_p_init);
-  //robot->UpdateConfig(_p_goal);
+  this->_world->InitCollisions();
 
-  _world->InitCollisions();
+  std::cout << std::string(80, '-') << std::endl;
+
+  std::cout << "Motion Planner:" << this->getName() << std::endl;
+  std::cout << "p_init =" << p_init << std::endl;
+  std::cout << "p_goal =" << p_goal << std::endl;
+
+  std::cout << std::string(80, '-') << std::endl;
+
+
+  //###########################################################################
+  // Plan Path
+  //###########################################################################
 
   WorldPlannerSettings settings;
   settings.InitializeDefault(*_world);
@@ -56,10 +68,10 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //settings.robotSettings[0].contactIKMaxIters = 100;
 
   SingleRobotCSpace cspace = SingleRobotCSpace(*_world,_irobot,&settings);
-  KinodynamicCSpaceSentinel cspace_kinodynamic;
+  KinodynamicCSpaceSentinel kcspace;
+  CheckFeasibility( robot, cspace, _p_init);
+  CheckFeasibility( robot, cspace, _p_goal);
 
-  CheckFeasibility( robot, cspace, p_init);
-  CheckFeasibility( robot, cspace, p_goal);
 
   MotionPlannerFactory factory;
   //factory.perturbationRadius = 0.1;
@@ -73,48 +85,51 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
 
   //factory.type = "sbl";
   factory.type = "rrt";
-  factory.shortcut = shortcutting;
+  factory.shortcut = this->_shortcutting;
 
-  SmartPointer<MotionPlannerInterface> planner = factory.Create(&cspace,p_init,p_goal);
+  SmartPointer<MotionPlannerInterface> planner = factory.Create(&cspace,_p_init,_p_goal);
 
   HaltingCondition cond;
   cond.foundSolution=true;
-  cond.timeLimit = timelimit;
+  cond.timeLimit = this->_timelimit;
 
   std::cout << "Start Planning" << std::endl;
-  string res = planner->Plan(milestone_path,cond);
-  if(milestone_path.edges.empty())
+  string res = planner->Plan(_milestone_path,cond);
+  if(_milestone_path.edges.empty())
   {
    printf("Planning failed\n");
-   _isSolved = false;
+   this->_isSolved = false;
   }else{
-   printf("Planning succeeded, path has length %g\n",milestone_path.Length());
-   _isSolved = true;
+   printf("Planning succeeded, path has length %g\n",_milestone_path.Length());
+   this->_isSolved = true;
   }
 
-  std::cout << std::string(80, '-') << std::endl;
-
-  if(_isSolved){
+  //###########################################################################
+  // Time Optimize Path, Convert to MultiPath and Save Path
+  //###########################################################################
+  if(this->_isSolved){
     double dstep = 0.1;
     Config cur;
     vector<Config> keyframes;
     for(double d = 0; d <= 1; d+=dstep)
     {
-      milestone_path.Eval(d,cur);
+      std::cout << d << std::endl;
+      _milestone_path.Eval(d,cur);
       keyframes.push_back(cur);
     }
     _path.SetMilestones(keyframes);
     double xtol=0.01;
     double ttol=0.01;
-    Robot *robot = _world->robots[_irobot];
+    std::cout << "time optimizing" << std::endl;
     bool res=GenerateAndTimeOptimizeMultiPath(*robot,_path,xtol,ttol);
-    string out = "last_path.xml";
+
+
+    std::string date = util::GetCurrentTimeString();
+    string out = "../data/paths/path_"+date+".xml";
     _path.Save(out);
     std::cout << "saved path to "<<out << std::endl;
-    return true;
   }else{
     std::cout << "Planner did not find a solution" << std::endl;
-    return false;
   }
 }
 

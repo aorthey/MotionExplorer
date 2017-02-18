@@ -13,14 +13,11 @@
 #include <Modeling/Paths.h>
 #include <Control/PathController.h>
 
+#include "util.h"
 #include "gui.h"
 #include "info.h"
 #include "planner.h"
 #include "object.h"
-#include "iksolver.h"
-#include "iksolver_hubo.h"
-#include "iksolvergrasp_hubolefthandcylinder.h"
-#include "iksolvergrasp_robonaut.h"
 #include "controller.h"
 
 int main(int argc,const char** argv) {
@@ -30,7 +27,7 @@ int main(int argc,const char** argv) {
   //SimTestBackend backend(&world);
   WorldSimulation& sim=backend.sim;
 
-  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel.xml");
+  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel_plane.xml");
   info(&world);
 
   //############################################################################
@@ -57,27 +54,25 @@ int main(int argc,const char** argv) {
   p_goal[2]=4;
   p_goal[3]=0;
   p_goal[4]=0;
-  //world.terrains[0]->geometry.Appearance()->SetColor(1,1,1,0.5);
-  //world.terrains[0]->geometry.Appearance()->Refresh();
+
   world.background = GLColor(1,1,1);
 
   //############################################################################
   //free space planner
   //############################################################################
-
   MotionPlanner planner(&world, &sim);
 
   if(planner.solve(p_init, p_goal,100,false)){
     info(planner.GetPath());
     std::cout << "send to controller" << std::endl;
-    planner.SendToController();
+    //planner.SendToController();
     std::cout << "VisualizePathSweptVolume" << std::endl;
     backend.VisualizePathSweptVolume(planner.GetPath());
   }
 
-  //############################################################################
-  //guification
-  //############################################################################
+  ////############################################################################
+  ////guification
+  ////############################################################################
 
   std::cout << "start GUI" << std::endl;
   GLUISimTestGUI gui(&backend,&world);
@@ -86,5 +81,6 @@ int main(int argc,const char** argv) {
 
   return 0;
 }
+
 
 
