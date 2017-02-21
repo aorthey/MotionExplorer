@@ -57,7 +57,6 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
 
   std::cout << std::string(80, '-') << std::endl;
 
-
   //###########################################################################
   // Plan Path
   //###########################################################################
@@ -68,41 +67,49 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //settings.robotSettings[0].contactIKMaxIters = 100;
 
   SingleRobotCSpace cspace = SingleRobotCSpace(*_world,_irobot,&settings);
-  KinodynamicCSpaceSentinel kcspace;
+
+  //Check Kinematic Feasibility at init/goal positions
   CheckFeasibility( robot, cspace, _p_init);
   CheckFeasibility( robot, cspace, _p_goal);
 
+  KinodynamicCSpaceSentinelAdaptor kcspace(&cspace);
 
-  MotionPlannerFactory factory;
-  //factory.perturbationRadius = 0.1;
-  //factory.type = "rrt";
-  //factory.type = "prm";
-  //factory.type = "sbl";
-  //factory.type = "sblprt";
-  //factory.type = "rrt*";
-  //factory.type = "lazyrrg*";
-  //factory.type = "fmm"; //warning: slows down system 
+  //BidirectionalRRTKP
+  //RRTKinodynamicPlanner krrt(&kcspace);
+  BidirectionalRRTKP krrt(&kcspace);
+  krrt.Init(_p_init,_p_goal);
+  krrt.Plan(100);
 
-  //factory.type = "sbl";
-  factory.type = "rrt";
-  factory.shortcut = this->_shortcutting;
+  // Standard Planning
+  ////MotionPlannerFactory factory;
+  //////factory.perturbationRadius = 0.1;
+  //////factory.type = "rrt";
+  //////factory.type = "prm";
+  //////factory.type = "sbl";
+  //////factory.type = "sblprt";
+  //////factory.type = "rrt*";
+  //////factory.type = "lazyrrg*";
+  //////factory.type = "fmm"; //warning: slows down system 
+  //////factory.type = "sbl";
+  ////factory.type = "rrt";
+  ////factory.shortcut = this->_shortcutting;
 
-  SmartPointer<MotionPlannerInterface> planner = factory.Create(&cspace,_p_init,_p_goal);
+  ////SmartPointer<MotionPlannerInterface> planner = factory.Create(&kcspace,_p_init,_p_goal);
 
-  HaltingCondition cond;
-  cond.foundSolution=true;
-  cond.timeLimit = this->_timelimit;
+  ////HaltingCondition cond;
+  ////cond.foundSolution=true;
+  ////cond.timeLimit = this->_timelimit;
 
-  std::cout << "Start Planning" << std::endl;
-  string res = planner->Plan(_milestone_path,cond);
-  if(_milestone_path.edges.empty())
-  {
-   printf("Planning failed\n");
-   this->_isSolved = false;
-  }else{
-   printf("Planning succeeded, path has length %g\n",_milestone_path.Length());
-   this->_isSolved = true;
-  }
+  ////std::cout << "Start Planning" << std::endl;
+  ////string res = planner->Plan(_milestone_path,cond);
+  ////if(_milestone_path.edges.empty())
+  ////{
+  //// printf("Planning failed\n");
+  //// this->_isSolved = false;
+  ////}else{
+  //// printf("Planning succeeded, path has length %g\n",_milestone_path.Length());
+  //// this->_isSolved = true;
+  ////}
 
   //###########################################################################
   // Time Optimize Path, Convert to MultiPath and Save Path
@@ -113,7 +120,6 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
     vector<Config> keyframes;
     for(double d = 0; d <= 1; d+=dstep)
     {
-      std::cout << d << std::endl;
       _milestone_path.Eval(d,cur);
       keyframes.push_back(cur);
     }

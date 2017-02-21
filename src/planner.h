@@ -8,6 +8,7 @@
 #include <Modeling/Paths.h>
 #include <Modeling/MultiPath.h>
 
+#include <vector>
 #include "util.h"
 #include "cspace_sentinel.h"
 

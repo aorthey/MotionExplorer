@@ -13,7 +13,7 @@
 
 const GLColor bodyColor(0.1,0.1,0.1);
 const GLColor selectedLinkColor(1.0,1.0,0.5);
-const double sweptvolumeScale = 0.90;
+const double sweptvolumeScale = 0.98;
 GLColor sweptvolumeColor(0.7,0.0,0.9,0.5);
 
 class ForceFieldBackend : public SimTestBackend
@@ -113,13 +113,10 @@ class ForceFieldBackend : public SimTestBackend
     _mats.clear();
     Robot *robot = world->robots[0];
 
-
-    //put swept volumes 
     Config qt;
     path.Evaluate(0, qt);
 
-    double q_spacing = 0.3;
-
+    double q_spacing = 0.1;
     double dstep = 0.01;
     double d = 0;
 

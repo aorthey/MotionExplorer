@@ -214,8 +214,12 @@ TreeRoadmapPlanner
   <- <- BidirectionalRRTPlanner
 
 (KrisLibrary/planning/AnyMotionPlanner.h)
-MotionPlannerFactory
-MotionPlannerInterface
+  MotionPlannerFactory factory;
+  factory.type="rrt"
+  MotionPlannerInterface = factory.create(CSpace)
+
+
+
 
 -------------------------------------------------------------------------------
 LOAD/SAVE RESOURCE (KrisLibrary/utils/ResourceLibrary.h)

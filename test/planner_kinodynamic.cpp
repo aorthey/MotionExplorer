@@ -38,20 +38,17 @@ int main(int argc,const char** argv) {
   Config p_init = robot->q;
   p_init[0]=0;
   p_init[1]=0;
-  p_init[2]=2;
+  p_init[2]=3;
   std::cout << p_init << std::endl;
 
   sim.odesim.SetGravity(Vector3(0,0,0));
   Config p_goal(p_init);
   //p_goal.resize(p_init.size());
   p_goal.setZero();
-  p_goal[0]=5;
-  p_goal[1]=-2.5;
-  p_goal[2]=4;
 
-  p_goal[0]=6;
-  p_goal[1]=-2.5;
-  p_goal[2]=4;
+  p_goal[0]=2;
+  p_goal[1]=0;
+  p_goal[2]=3;
   p_goal[3]=0;
   p_goal[4]=0;
 
