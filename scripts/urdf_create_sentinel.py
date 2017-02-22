@@ -7,8 +7,8 @@ length = 0.15
 radius = 0.01
 sphere_scale = 2
 headradius = 0.1
-Nsegments = 4
-Nbranches = 4
+Nsegments = 0
+Nbranches = 0
 aperture = 0.4 ## aperture of bouquet of branches
 
 sRadius = sphere_scale*radius

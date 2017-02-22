@@ -67,6 +67,8 @@ class KinodynamicCSpaceSentinelAdaptor: public KinematicCSpaceAdaptor
     // Reimplementation because of too simple implementation in Kinematiccspaceadaptor
     virtual void Simulate(const State& x0, const ControlInput& u,std::vector<State>& p);
     virtual void SimulateEndpoint(const State& x0, const ControlInput& u,State& x1);
+    virtual void BiasedSampleControl(const State& x,const State& xGoal,ControlInput& u);
+    virtual void BiasedSampleReverseControl(const State& x1,const State& xDest,ControlInput& u);
 
     //required implementation
     virtual EdgePlanner* TrajectoryChecker(const std::vector<State>& p);
@@ -74,12 +76,13 @@ class KinodynamicCSpaceSentinelAdaptor: public KinematicCSpaceAdaptor
     virtual void SampleControl(const State& x,ControlInput& u);
 
     //new functions to be used with struct IntegratorFunction 
-    virtual void XDerivative(const State& x, const ControlInput& u, State& dx);
+    virtual Matrix4 SE3Derivative(const Matrix4& x_SE3, const ControlInput& u);
     virtual void Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps);
+    //virtual State SE3ToState(const Matrix4& x_SE3);
+    Matrix4 StateToSE3(const State& x);
+    void SE3ToState(State& x, const Matrix4& x_SE3);
+    Matrix4& MatrixExponential(const Matrix4& x);
 
-
-    //might need reimplementation
-    virtual void BiasedSampleControl(const State& x,const State& xGoal,ControlInput& u);
 
 
 };

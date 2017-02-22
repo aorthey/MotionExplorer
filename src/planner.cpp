@@ -76,9 +76,21 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
 
   //BidirectionalRRTKP
   //RRTKinodynamicPlanner krrt(&kcspace);
-  BidirectionalRRTKP krrt(&kcspace);
+  //BidirectionalRRTKP krrt(&kcspace);
+  UnidirectionalRRTKP krrt(&kcspace);
   krrt.Init(_p_init,_p_goal);
-  krrt.Plan(100);
+  bool res = krrt.Plan(10000);
+
+  //if(_milestone_path.edges.empty())
+  std::cout << res << std::endl;
+  if(!res)
+  {
+   printf("Planning failed\n");
+   this->_isSolved = false;
+  }else{
+   printf("Planning succeeded, path has length %g\n",_milestone_path.Length());
+   this->_isSolved = true;
+  }
 
   // Standard Planning
   ////MotionPlannerFactory factory;

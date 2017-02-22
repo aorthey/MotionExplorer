@@ -27,7 +27,7 @@ int main(int argc,const char** argv) {
   //SimTestBackend backend(&world);
   WorldSimulation& sim=backend.sim;
 
-  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel_plane.xml");
+  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel.xml");
   info(&world);
 
   //############################################################################
@@ -36,6 +36,7 @@ int main(int argc,const char** argv) {
 
   Robot *robot = world.robots[0];
   Config p_init = robot->q;
+  p_init.setZero();
   p_init[0]=0;
   p_init[1]=0;
   p_init[2]=3;
@@ -46,11 +47,9 @@ int main(int argc,const char** argv) {
   //p_goal.resize(p_init.size());
   p_goal.setZero();
 
-  p_goal[0]=2;
+  p_goal[0]=0.5;
   p_goal[1]=0;
   p_goal[2]=3;
-  p_goal[3]=0;
-  p_goal[4]=0;
 
   world.background = GLColor(1,1,1);
 
