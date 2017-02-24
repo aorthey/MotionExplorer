@@ -72,27 +72,82 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   CheckFeasibility( robot, cspace, _p_init);
   CheckFeasibility( robot, cspace, _p_goal);
 
+  //###########################################################################
+  // Dynamic Planning
+  //###########################################################################
+
   KinodynamicCSpaceSentinelAdaptor kcspace(&cspace);
 
   //BidirectionalRRTKP
-  //RRTKinodynamicPlanner krrt(&kcspace);
+  RRTKinodynamicPlanner2 krrt(&kcspace);
   //BidirectionalRRTKP krrt(&kcspace);
-  UnidirectionalRRTKP krrt(&kcspace);
+  //UnidirectionalRRTKP krrt(&kcspace);
   krrt.Init(_p_init,_p_goal);
-  bool res = krrt.Plan(10000);
 
-  //if(_milestone_path.edges.empty())
-  std::cout << res << std::endl;
-  if(!res)
-  {
-   printf("Planning failed\n");
-   this->_isSolved = false;
-  }else{
-   printf("Planning succeeded, path has length %g\n",_milestone_path.Length());
-   this->_isSolved = true;
+
+  KinodynamicMilestonePath path;
+  path.milestones.push_back(p_init);
+
+  ControlInput u;
+
+  for(int i = 0; i < 500; i++){
+    double ak = -1.2;
+    u.resize(p_init.size());
+    u.setZero();
+    u(0) = 0;
+    u(1) = 0;//Rand(-ak,ak);
+    u(2) = ak;
+    u(3) = 1;
+    u(4) = 0;
+    u(5) = 0;
+    path.Append(u, &kcspace);
   }
 
-  // Standard Planning
+
+  
+
+
+  bool res=true;
+  //bool res = krrt.Plan(10000);
+
+  if(res)
+  {
+    //KinodynamicMilestonePath path;
+    //krrt.CreatePath(path);
+
+    double dstep = 0.01;
+    Config cur;
+    vector<Config> keyframes;
+    for(double d = 0; d <= 1; d+=dstep)
+    {
+      path.Eval(d,cur);
+      for(int i = 3; i < 6; i++){
+        //if(cur(i)>M_PI){
+        //  cur(i)-=2*M_PI;
+        //}
+      }
+      std::cout << d << cur << std::endl;
+      keyframes.push_back(cur);
+    }
+    _path.SetMilestones(keyframes);
+    double xtol=0.01;
+    double ttol=0.01;
+    //std::cout << "time optimizing" << std::endl;
+    //bool res=GenerateAndTimeOptimizeMultiPath(*robot,_path,xtol,ttol);
+
+
+    std::string date = util::GetCurrentTimeString();
+    string out = "../data/paths/path_"+date+".xml";
+    _path.Save(out);
+    std::cout << "saved path to "<<out << std::endl;
+
+  }
+  return res;
+
+
+  //###########################################################################
+  // Kinematic Planning
+  //###########################################################################
   ////MotionPlannerFactory factory;
   //////factory.perturbationRadius = 0.1;
   //////factory.type = "rrt";
@@ -123,32 +178,32 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //// this->_isSolved = true;
   ////}
 
-  //###########################################################################
-  // Time Optimize Path, Convert to MultiPath and Save Path
-  //###########################################################################
-  if(this->_isSolved){
-    double dstep = 0.1;
-    Config cur;
-    vector<Config> keyframes;
-    for(double d = 0; d <= 1; d+=dstep)
-    {
-      _milestone_path.Eval(d,cur);
-      keyframes.push_back(cur);
-    }
-    _path.SetMilestones(keyframes);
-    double xtol=0.01;
-    double ttol=0.01;
-    std::cout << "time optimizing" << std::endl;
-    bool res=GenerateAndTimeOptimizeMultiPath(*robot,_path,xtol,ttol);
+  ////###########################################################################
+  //// Time Optimize Path, Convert to MultiPath and Save Path
+  ////###########################################################################
+  //if(this->_isSolved){
+  //  double dstep = 0.1;
+  //  Config cur;
+  //  vector<Config> keyframes;
+  //  for(double d = 0; d <= 1; d+=dstep)
+  //  {
+  //    _milestone_path.Eval(d,cur);
+  //    keyframes.push_back(cur);
+  //  }
+  //  _path.SetMilestones(keyframes);
+  //  double xtol=0.01;
+  //  double ttol=0.01;
+  //  std::cout << "time optimizing" << std::endl;
+  //  bool res=GenerateAndTimeOptimizeMultiPath(*robot,_path,xtol,ttol);
 
 
-    std::string date = util::GetCurrentTimeString();
-    string out = "../data/paths/path_"+date+".xml";
-    _path.Save(out);
-    std::cout << "saved path to "<<out << std::endl;
-  }else{
-    std::cout << "Planner did not find a solution" << std::endl;
-  }
+  //  std::string date = util::GetCurrentTimeString();
+  //  string out = "../data/paths/path_"+date+".xml";
+  //  _path.Save(out);
+  //  std::cout << "saved path to "<<out << std::endl;
+  //}else{
+  //  std::cout << "Planner did not find a solution" << std::endl;
+  //}
 }
 
 void MotionPlanner::SendCommandStringController(string cmd, string arg)

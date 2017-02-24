@@ -36,20 +36,22 @@ int main(int argc,const char** argv) {
 
   Robot *robot = world.robots[0];
   Config p_init = robot->q;
-  p_init.setZero();
+  //p_init.setZero();
   p_init[0]=0;
   p_init[1]=0;
-  p_init[2]=3;
+  p_init[2]=1;
   std::cout << p_init << std::endl;
 
   sim.odesim.SetGravity(Vector3(0,0,0));
   Config p_goal(p_init);
   //p_goal.resize(p_init.size());
-  p_goal.setZero();
+  //p_goal.setZero();
 
-  p_goal[0]=0.5;
+  p_goal[0]=3;
   p_goal[1]=0;
-  p_goal[2]=3;
+  p_goal[2]=1;
+  p_goal[3]=0;
+  //p_goal[3]=0;
 
   world.background = GLColor(1,1,1);
 
@@ -65,6 +67,10 @@ int main(int argc,const char** argv) {
     std::cout << "VisualizePathSweptVolume" << std::endl;
     backend.VisualizePathSweptVolume(planner.GetPath());
   }
+
+  DebugKinodynamicPlanner dkp;
+
+
 
   ////############################################################################
   ////guification

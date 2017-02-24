@@ -33,7 +33,7 @@ int main(int argc,const char** argv) {
   backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel.xml");
 
   MultiPath path;
-  path.Load("../data/paths/path_2017_02_18.xml");
+  path.Load("../data/paths/path_2017_02_24.xml");
   backend.VisualizePathSweptVolume(path);
 
   world.rigidObjects.clear();

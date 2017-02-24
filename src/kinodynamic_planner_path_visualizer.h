@@ -43,7 +43,6 @@ class KinodynamicPlannerPathVisualizer{
           u.resize(p_init.size());
           u.setZero();
           //Rotation Control
-          u(0) = 0;
           //u(1) = control[i];//Rand(-ak,ak);
           u(0) = control[i];
 
@@ -62,9 +61,9 @@ class KinodynamicPlannerPathVisualizer{
         {
           kd_path.Eval(d,cur);
           for(int i = 3; i < 6; i++){
-            //if(cur(i)>M_PI){
-            //  cur(i)-=2*M_PI;
-            //}
+            if(cur(i)>M_PI){
+              cur(i)-=2*M_PI;
+            }
           }
           std::cout << d << cur << std::endl;
           keyframes.push_back(cur);

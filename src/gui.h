@@ -14,6 +14,7 @@
 const GLColor bodyColor(0.1,0.1,0.1);
 const GLColor selectedLinkColor(1.0,1.0,0.5);
 const double sweptvolumeScale = 0.98;
+const double sweptVolume_q_spacing = 0.01;
 GLColor sweptvolumeColor(0.7,0.0,0.9,0.5);
 
 class ForceFieldBackend : public SimTestBackend
@@ -40,7 +41,7 @@ class ForceFieldBackend : public SimTestBackend
     drawExtras = false;
     drawIKextras = false;
     drawPath = false;
-
+    _mats.clear();
   }
   virtual void Start()
   {
@@ -110,13 +111,11 @@ class ForceFieldBackend : public SimTestBackend
   }
   void VisualizePathSweptVolume(const MultiPath &path)
   {
-    _mats.clear();
     Robot *robot = world->robots[0];
 
     Config qt;
     path.Evaluate(0, qt);
 
-    double q_spacing = 0.1;
     double dstep = 0.01;
     double d = 0;
 
@@ -125,7 +124,7 @@ class ForceFieldBackend : public SimTestBackend
       d+=dstep;
       Config qtn;
       path.Evaluate(d, qtn);
-      if((qt-qtn).norm() >= q_spacing)
+      if((qt-qtn).norm() >= sweptVolume_q_spacing)
       {
         VisualizePathSweptVolumeAtPosition(path, d);
         qt = qtn;

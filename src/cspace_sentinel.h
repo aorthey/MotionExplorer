@@ -21,10 +21,10 @@ using namespace Math3D;
 //  virtual Real Distance(const Config& x, const Config& y) { return base->Distance(x,y); }
 //  virtual void Interpolate(const Config& x,const Config& y,Real u,Config& out) { base->Interpolate(x,y,u,out); }
 //  virtual void Midpoint(const Config& x,const Config& y,Config& out) { base->Midpoint(x,y,out); }
+//  virtual EdgePlanner* TrajectoryChecker(const std::vector<State>& p);
 //
 //  NEEDS TO BE IMPLEMENTED:
 //  virtual void Simulate(const State& x0, const ControlInput& u,std::vector<State>& p);
-//  virtual EdgePlanner* TrajectoryChecker(const std::vector<State>& p);
 //  virtual bool IsValidControl(const State& x,const ControlInput& u);
 //  virtual void SampleControl(const State& x,ControlInput& u);
 //
@@ -56,6 +56,12 @@ class KinodynamicCSpaceSentinelAdaptor: public KinematicCSpaceAdaptor
     KinodynamicCSpaceSentinelAdaptor(CSpace *base);
 
     ////pass-throughs to base space
+    virtual void Sample(Config& x) { 
+      base->Sample(x);  
+      x(2)=3.0;
+      x(3)=0.0;
+      x(4)=0.0;
+    }
     //virtual void Sample(Config& x) { base->Sample(x); }
     //virtual void SampleNeighborhood(const Config& c,Real r,Config& x) { base->SampleNeighborhood(c,r,x); }
     //virtual EdgePlanner* LocalPlanner(const Config& a,const Config& b) { return base->LocalPlanner(a,b); }
@@ -68,7 +74,6 @@ class KinodynamicCSpaceSentinelAdaptor: public KinematicCSpaceAdaptor
     virtual void Simulate(const State& x0, const ControlInput& u,std::vector<State>& p);
     virtual void SimulateEndpoint(const State& x0, const ControlInput& u,State& x1);
     virtual void BiasedSampleControl(const State& x,const State& xGoal,ControlInput& u);
-    virtual void BiasedSampleReverseControl(const State& x1,const State& xDest,ControlInput& u);
 
     //required implementation
     virtual EdgePlanner* TrajectoryChecker(const std::vector<State>& p);
@@ -83,7 +88,15 @@ class KinodynamicCSpaceSentinelAdaptor: public KinematicCSpaceAdaptor
     void SE3ToState(State& x, const Matrix4& x_SE3);
     Matrix4& MatrixExponential(const Matrix4& x);
 
+    virtual bool ReverseSimulate(const State& x1, const ControlInput& u,std::vector<State>& p);
 
+    virtual bool ConnectionControl(const State& x,const State& xGoal,ControlInput& u) { return false; }
+    virtual bool ReverseControl(const State& x0,const State& x1,ControlInput& u) { return false; }
+    virtual void BiasedSampleReverseControl(const State& x1,const State& xDest,ControlInput& u);
+    //virtual bool ReverseSimulate(const State& x1, const ControlInput& u,std::vector<State>& p) { return false; }
+
+//  virtual void SampleReverseControl(const State& x,ControlInput& u);
+//  virtual void BiasedSampleReverseControl(const State& x1,const State& xDest,ControlInput& u);
 
 };
 

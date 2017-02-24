@@ -28,24 +28,49 @@ void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlIn
   p.push_back(x0);
 
   std::cout << std::setprecision(2) << std::fixed;
-  std::cout << "START STATE:"<<x0 << std::endl;
+  //std::cout << "START STATE:"<<x0 << std::endl;
+
   for(int i=0;i<numSteps;i++) {
 
     State w0 = p.back(); //\in SE(3) current element along path segment
 
     Matrix4 w0_SE3 = StateToSE3(w0);
     Matrix4 dw_se3 = this->SE3Derivative(w0_SE3,u);
-    //Matrix4 w1_SE3 = w0_SE3 + MatrixExponential(dw_se3*h);
-    Matrix4 w1_SE3 = MatrixExponential(dw_se3*h*i)*w0_SE3;
+    Matrix4 w1_SE3 = MatrixExponential(dw_se3*h)*w0_SE3;
     State w1 = w0;
     SE3ToState(w1, w1_SE3);
-    std::cout << "STATE:" << w1 << std::endl;
-    //Matrix4 w1_SE3 = 
-    //State w1=w0; //\in SE(3) next element
-    //w1.madd(dw,h); //w1 += dw*h
     p.push_back(w1);
+    //std::cout << "STATE:" << w1 << std::endl;
   }
   //exit(0);
+
+}
+bool KinodynamicCSpaceSentinelAdaptor::ReverseSimulate(const State& x1, const ControlInput& u,std::vector<State>& p)
+{
+  Real dt;
+  int numSteps;
+  Parameters(x1,u,dt,numSteps);
+
+  Real h = -dt/numSteps;
+
+  p.push_back(x1);
+  for(int i=0;i<numSteps;i++) {
+
+    State w1 = p.back(); //\in SE(3) current element along path segment
+
+    Matrix4 w1_SE3 = StateToSE3(w1);
+    Matrix4 dw_se3 = this->SE3Derivative(w1_SE3,u);
+    Matrix4 w0_SE3 = MatrixExponential(dw_se3*h)*w1_SE3;
+    State w0 = w1;
+    SE3ToState(w0, w0_SE3);
+    p.push_back(w0);
+    //std::cout << "STATE:" << w1 << std::endl;
+  }
+  //reverse the vector?
+  //std::reverse(p.begin(),p.end());
+
+  //exit(0);
+  return true;
 
 }
 Matrix4& KinodynamicCSpaceSentinelAdaptor::MatrixExponential(const Matrix4& x)
@@ -59,7 +84,7 @@ Matrix4& KinodynamicCSpaceSentinelAdaptor::MatrixExponential(const Matrix4& x)
 
   Eigen::MatrixXd Aexp = A.exp();
   Matrix4 result;
-  //std::cout << "The matrix exponential of A is:\n" << A.exp() << "\n\n";
+  //std::cout << "The matrix exponential of A is:\n" << Aexp << "\n\n";
   for(int i = 0; i < 4; i++){
     for(int j = 0; j < 4; j++){
       result(i,j) = Aexp(i,j);
@@ -80,9 +105,11 @@ void KinodynamicCSpaceSentinelAdaptor::SimulateEndpoint(const State& x0, const C
 EdgePlanner* KinodynamicCSpaceSentinelAdaptor::TrajectoryChecker(const std::vector<State>& p){
   double tolerance = 1e-3;
   return new GivenPathEdgePlanner(this,p,tolerance);
+  //return new TrueEdgePlanner(this,p.front(),p.back());
 }
 
 bool KinodynamicCSpaceSentinelAdaptor::IsValidControl(const State& x,const ControlInput& u){
+  return true;
   const int N=6;
 
   double u_low_limit_ptr[N]= {0,-1,-1,1,0,0};
@@ -102,22 +129,46 @@ bool KinodynamicCSpaceSentinelAdaptor::IsValidControl(const State& x,const Contr
 
 ///Randomly pick a control input
 void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput& u){
-  double ak = 0.1;
+  double ak = 0.5;
   u.resize(x.size());
   u.setZero();
   u(0) = 0;
   u(1) = 0;//Rand(-ak,ak);
-  u(2) = Rand(-ak,ak);
+  u(2) = Rand(-ak,+ak);
   u(3) = 1;
   u(4) = 0;
   u(5) = 0;
 }
+//bool KinodynamicCSpaceSentinelAdaptor::ConnectionControl(const State& x,const State& xGoal,ControlInput& u)
+//{
+//  std::cout << "ERROR NYI" << std::endl;
+//  exit(0);
+//}
+
 
 void KinodynamicCSpaceSentinelAdaptor::BiasedSampleControl(const State& x,const State& xGoal,ControlInput& u){
-  SampleControl(x,u);
+  //SampleControl(x,u);
+  //std::cout << xGoal << std::endl;
+
+  //Node* goal = base->goal.root;
+  int numSamples = 10;
+  State x2;
+  Real closest=Inf;
+  ControlInput temp;
+
+  for(int i=0;i<numSamples;i++) {
+    SampleControl(x,temp);
+    SimulateEndpoint(x,temp,x2);
+    Real dist = Distance(xGoal,x2);
+    if(dist < closest) {
+      closest = dist;
+      u = temp;
+    }
+  }
 }
 void KinodynamicCSpaceSentinelAdaptor::BiasedSampleReverseControl(const State& x1,const State& xDest,ControlInput& u){
   BiasedSampleControl(x1,xDest,u);
+  //BiasedSampleControl(xDest,x1,u);
 }
 
 //void KinodynamicCSpaceSentinelAdaptor::XDerivative(const State& x, const ControlInput& u, State& dx){
@@ -149,80 +200,30 @@ Matrix4 KinodynamicCSpaceSentinelAdaptor::SE3Derivative(const Matrix4& x_SE3, co
   //##########################
   X6(2,3) = 1;
   
-
-  bool DEBUG=false;
-
   //#########################################################################
-  //Matrix4 dx_se3 = x_SE3*(X1*u(0) + X2*u(1) + X3*u(2) + X4);
   //Matrix4 dx_se3 = x_SE3*(X3*u(2) + X4);
   //Matrix4 dx_se3 = x_SE3*(X4);
-  Matrix4 dx_se3 = (X1*u(0) + X2*u(1) + X3*u(2) + X4);
+  Matrix4 dx_se3 = (X1*u(0) + X2*u(1) + X3*u(2) + X4*u(3));
   //#########################################################################
 
   return dx_se3;
-  ////dx_se3 is a lie algebra element represented as matrix4
-  //// need to convert back to Vector6 element
-  //Matrix3 dR_m;
-  //EulerAngleRotation dR;
-  //Vector3 dT;
-  //dx_se3.get(dR_m,dT);
-
-  //dR.setMatrixXYZ(dR_m);
-
-  //dx.resize(x.size());
-  //dx.setZero();
-
-  //dx(0)=dT[0];
-  //dx(1)=dT[1];
-  //dx(2)=dT[2];
-  //dx(3)=dR[0];
-  //dx(4)=dR[1];
-  //dx(5)=dR[2];
-
-  //if(DEBUG){
-  ////if(x(3)>0.5){
-  //  std::cout << "X1:" << std::endl <<  X1*u(0) << std::endl;
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  std::cout << "X2:" << std::endl <<  X2*u(1) << std::endl;
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  std::cout << "X3:" << std::endl <<  X3*u(2) << std::endl;
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  std::cout << "X4:" << std::endl <<  X4*u(3) << std::endl;
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  std::cout << "X5:" << std::endl <<  X5 << std::endl;
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  std::cout << "X6:" << std::endl <<  X6 << std::endl;
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  std::cout << std::setprecision(2) << std::fixed;
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  std::cout << "X input:" << std::endl << x << std::endl;
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  std::cout << "X SE(3) input:" << std::endl << x_se3 << std::endl;
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  std::cout << "U input:" << std::endl << u << std::endl;
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  //Matrix4 u_se3 = X1*u(0) + X2*u(1) + X3*u(2) + X4;
-  //  //std::cout << "U SE(3) input:" << std::endl << u_se3 << std::endl;
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  std::cout << "DX se(3) output:" << std::endl << dx_se3 << std::endl;
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  std::cout << "DX output:" << dx << std::endl;
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  std::cout << "X1 output:" << x+0.01*dx << std::endl;
-  ////std::cout << std::string(80, '-') << std::endl;
-  //  //
-  //  exit(0);
-  //}
-
 }
+
+//SE(3) element: X Y Z rotZ rotY rotX
+//SE(3) element: X Y Z yaw pitch roll
 Matrix4 KinodynamicCSpaceSentinelAdaptor::StateToSE3(const State& x){
   //represent lie group element as matrix4
   RigidTransform T_x_se3;
-  Matrix3 R,Rx,Ry,Rz;
-  Rx.setRotateX(x(3));
-  Ry.setRotateY(x(4));
-  Rz.setRotateZ(x(5));
-  R = Rz*Ry*Rx;
+  EulerAngleRotation Reuler(x(3),x(4),x(5));
+
+  //Matrix3 R,Rx,Ry,Rz;
+  //Rz.setRotateZ(x(3));
+  //Ry.setRotateY(x(4));
+  //Rx.setRotateX(x(5));
+
+  Matrix3 R;
+  Reuler.getMatrixZYX(R);
+  //R = Rz*Ry*Rx;
   T_x_se3.setRotation(R);
   T_x_se3.setTranslation(Vector3(x(0),x(1),x(2)));
 
@@ -236,19 +237,24 @@ void KinodynamicCSpaceSentinelAdaptor::SE3ToState(State& x, const Matrix4& x_SE3
   x_SE3.get(R_m,T);
 
   EulerAngleRotation R;
-  R.setMatrixXYZ(R_m);
+  R.setMatrixZYX(R_m);
 
   x.resize(x.size());
   x.setZero();
   x(0)=T[0];
   x(1)=T[1];
   x(2)=T[2];
+
   x(3)=R[0];
   x(4)=R[1];
   x(5)=R[2];
-
+  for(int i = 3; i < 6; i++){
+    //if(x(i)>M_PI){
+    //  x(i)-=2*M_PI;
+    //}
+  }
 }
 void KinodynamicCSpaceSentinelAdaptor::Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps){
-  dt = 0.001;
+  dt = 0.01;
   numSteps = 10;
 }

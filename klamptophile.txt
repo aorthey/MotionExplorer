@@ -326,7 +326,7 @@ TODO
  [ ] Compute Force Closure Grasp from points
  [ ] Compute SE constraints, what is GIWC equivalent?
  [ ] smoothing after path planning
- [ ] better swept volume visualization
  [ ] make a Klampt Interface where to set all properties like background color etc
  [ ] kinodynamic planning 
  [ ] make ompl planners available
+ [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)

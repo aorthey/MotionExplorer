@@ -3,7 +3,7 @@
 <world>
   <terrain file="/home/aorthey/git/Klampt/data/terrains/plane.tri"  translation="0 0 0"/>
 
-  <robot name="sentinel" file="/home/aorthey/git/orthoklampt/data/sentinel.urdf" translation="0 0 0" rotateRPY="0 0 3.14" config="7 0 0 1 0 0 0 0"/>
+  <robot name="sentinel" file="/home/aorthey/git/orthoklampt/data/sentinel.urdf" translation="0 0 0" rotateRPY="0 0 0" config="7 0 0 1 0 0 0 0"/>
 
   <simulation>
     <globals maxContacts="20" />
