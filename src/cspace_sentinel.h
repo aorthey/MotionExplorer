@@ -86,7 +86,7 @@ class KinodynamicCSpaceSentinelAdaptor: public KinematicCSpaceAdaptor
     //virtual State SE3ToState(const Matrix4& x_SE3);
     Matrix4 StateToSE3(const State& x);
     void SE3ToState(State& x, const Matrix4& x_SE3);
-    Matrix4& MatrixExponential(const Matrix4& x);
+    Matrix4 MatrixExponential(const Matrix4& x);
 
     virtual bool ReverseSimulate(const State& x1, const ControlInput& u,std::vector<State>& p);
 

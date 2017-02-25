@@ -19,6 +19,7 @@
 #include "planner.h"
 #include "object.h"
 #include "controller.h"
+#include "kinodynamic_planner_path_visualizer.h"
 
 int main(int argc,const char** argv) {
   RobotWorld world;
@@ -37,36 +38,23 @@ int main(int argc,const char** argv) {
   Robot *robot = world.robots[0];
   Config p_init = robot->q;
   //p_init.setZero();
-  p_init[0]=0;
-  p_init[1]=0;
-  p_init[2]=1;
-  std::cout << p_init << std::endl;
-
+  p_init[0]=-0.5;
+  p_init[1]=-1;
+  p_init[2]=-1;
   sim.odesim.SetGravity(Vector3(0,0,0));
-  Config p_goal(p_init);
-  //p_goal.resize(p_init.size());
-  //p_goal.setZero();
-
-  p_goal[0]=2;
-  p_goal[1]=-0.5;
-  p_goal[2]=1;
-  //p_goal[3]=0;
-  //p_goal[3]=0;
 
   world.background = GLColor(1,1,1);
 
   //############################################################################
   //free space planner
   //############################################################################
-  MotionPlanner planner(&world, &sim);
+  KinodynamicPlannerPathVisualizer debugger(&world, &sim);
 
-  if(planner.solve(p_init, p_goal,100,false)){
-    info(planner.GetPath());
-    std::cout << "send to controller" << std::endl;
-    //planner.SendToController();
-    std::cout << "VisualizePathSweptVolume" << std::endl;
-    backend.VisualizePathSweptVolume(planner.GetPath());
+  std::vector<MultiPath> paths = debugger.GetPaths(p_init);
+  for(int i = 0; i < paths.size(); i++){
+    backend.VisualizePathSweptVolume(paths[i]);
   }
+
 
 
   ////############################################################################
@@ -80,6 +68,7 @@ int main(int argc,const char** argv) {
 
   return 0;
 }
+
 
 
 

@@ -30,18 +30,28 @@ void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlIn
   std::cout << std::setprecision(2) << std::fixed;
   //std::cout << "START STATE:"<<x0 << std::endl;
 
+  bool DEBUG=false;
   for(int i=0;i<numSteps;i++) {
 
     State w0 = p.back(); //\in SE(3) current element along path segment
-
     Matrix4 w0_SE3 = StateToSE3(w0);
+
+    if(DEBUG) std::cout << std::string(80, '-') << std::endl;
+    if(DEBUG) std::cout << w0 << std::endl;
+    if(DEBUG) std::cout << w0_SE3 << std::endl;
+
     Matrix4 dw_se3 = this->SE3Derivative(w0_SE3,u);
-    Matrix4 w1_SE3 = MatrixExponential(dw_se3*h)*w0_SE3;
+    Matrix4 tmp = MatrixExponential(dw_se3*h);
+    Matrix4 w1_SE3 = w0_SE3*tmp;
     State w1 = w0;
     SE3ToState(w1, w1_SE3);
     p.push_back(w1);
-    //std::cout << "STATE:" << w1 << std::endl;
+
+    if(DEBUG) std::cout << std::string(10, '-') << std::endl;
+    if(DEBUG) std::cout << w1 << std::endl;
+    if(DEBUG) std::cout << w1_SE3 << std::endl;
   }
+
   //exit(0);
 
 }
@@ -69,11 +79,10 @@ bool KinodynamicCSpaceSentinelAdaptor::ReverseSimulate(const State& x1, const Co
   //reverse the vector?
   //std::reverse(p.begin(),p.end());
 
-  //exit(0);
   return true;
 
 }
-Matrix4& KinodynamicCSpaceSentinelAdaptor::MatrixExponential(const Matrix4& x)
+Matrix4 KinodynamicCSpaceSentinelAdaptor::MatrixExponential(const Matrix4& x)
 {
   Eigen::MatrixXd A(4,4);
   for(int i = 0; i < 4; i++){
@@ -129,7 +138,7 @@ bool KinodynamicCSpaceSentinelAdaptor::IsValidControl(const State& x,const Contr
 
 ///Randomly pick a control input
 void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput& u){
-  double ak = 0.5;
+  double ak = 1;
   u.resize(x.size());
   u.setZero();
   u(0) = 0;
@@ -256,5 +265,5 @@ void KinodynamicCSpaceSentinelAdaptor::SE3ToState(State& x, const Matrix4& x_SE3
 }
 void KinodynamicCSpaceSentinelAdaptor::Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps){
   dt = 0.01;
-  numSteps = 10;
+  numSteps = 5;
 }

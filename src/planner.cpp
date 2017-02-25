@@ -84,36 +84,12 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //UnidirectionalRRTKP krrt(&kcspace);
   krrt.Init(_p_init,_p_goal);
 
-
-  KinodynamicMilestonePath path;
-  path.milestones.push_back(p_init);
-
-  ControlInput u;
-
-  for(int i = 0; i < 500; i++){
-    double ak = -1.2;
-    u.resize(p_init.size());
-    u.setZero();
-    u(0) = 0;
-    u(1) = 0;//Rand(-ak,ak);
-    u(2) = ak;
-    u(3) = 1;
-    u(4) = 0;
-    u(5) = 0;
-    path.Append(u, &kcspace);
-  }
-
-
-  
-
-
-  bool res=true;
-  //bool res = krrt.Plan(10000);
+  bool res = krrt.Plan(10000);
 
   if(res)
   {
-    //KinodynamicMilestonePath path;
-    //krrt.CreatePath(path);
+    KinodynamicMilestonePath path;
+    krrt.CreatePath(path);
 
     double dstep = 0.01;
     Config cur;

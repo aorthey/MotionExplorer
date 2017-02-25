@@ -30,46 +30,50 @@ class KinodynamicPlannerPathVisualizer{
       control.push_back(0.5);
       control.push_back(1);
 
-      int steps=200;
+      int steps=500;
 
       int Npaths = control.size();
-      for(int i = 0; i < Npaths; i++)
+      for(int yaw = 0; yaw < Npaths; yaw++)
       {
-        KinodynamicMilestonePath kd_path;
-        kd_path.milestones.push_back(p_init);
-        ControlInput u;
-
-        for(int j = 0; j < steps; j++){
-          u.resize(p_init.size());
-          u.setZero();
-          //Rotation Control
-          //u(1) = control[i];//Rand(-ak,ak);
-          u(0) = control[i];
-
-          //Translation Control
-          u(3) = 1;
-          u(4) = 0;
-          u(5) = 0;
-          kd_path.Append(u, &kcspace);
-        }
-
-        MultiPath path;
-        double dstep = 0.01;
-        Config cur;
-        vector<Config> keyframes;
-        for(double d = 0; d <= 1; d+=dstep)
+        for(int pitch = 0; pitch < Npaths; pitch++)
         {
-          kd_path.Eval(d,cur);
-          for(int i = 3; i < 6; i++){
-            if(cur(i)>M_PI){
-              cur(i)-=2*M_PI;
-            }
+          KinodynamicMilestonePath kd_path;
+          kd_path.milestones.push_back(p_init);
+          ControlInput u;
+
+          for(int j = 0; j < steps; j++){
+            u.resize(p_init.size());
+            u.setZero();
+            //Rotation Control
+            //u(1) = control[i];//Rand(-ak,ak);
+            u(1) = control[pitch];
+            u(2) = control[yaw];
+
+            //Translation Control
+            u(3) = 1;
+            u(4) = 0;
+            u(5) = 0;
+            kd_path.Append(u, &kcspace);
           }
-          std::cout << d << cur << std::endl;
-          keyframes.push_back(cur);
+
+          MultiPath path;
+          double dstep = 0.1;
+          Config cur;
+          vector<Config> keyframes;
+          for(double d = 0; d <= 1; d+=dstep)
+          {
+            kd_path.Eval(d,cur);
+            for(int i = 3; i < 6; i++){
+              if(cur(i)>M_PI){
+                cur(i)-=2*M_PI;
+              }
+            }
+            std::cout << d << cur << std::endl;
+            keyframes.push_back(cur);
+          }
+          path.SetMilestones(keyframes);
+          pathvec.push_back(path);
         }
-        path.SetMilestones(keyframes);
-        pathvec.push_back(path);
       }
       return pathvec;
 
