@@ -28,7 +28,6 @@ void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlIn
   p.push_back(x0);
 
   std::cout << std::setprecision(2) << std::fixed;
-  //std::cout << "START STATE:"<<x0 << std::endl;
 
   bool DEBUG=false;
   for(int i=0;i<numSteps;i++) {
@@ -211,8 +210,6 @@ Matrix4 KinodynamicCSpaceSentinelAdaptor::SE3Derivative(const Matrix4& x_SE3, co
   X6(2,3) = 1;
   
   //#########################################################################
-  //Matrix4 dx_se3 = x_SE3*(X3*u(2) + X4);
-  //Matrix4 dx_se3 = x_SE3*(X4);
   Matrix4 dx_se3 = (X1*u(0) + X2*u(1) + X3*u(2) + X4*u(3) + X5*u(4) + X6*u(5));
   //#########################################################################
 

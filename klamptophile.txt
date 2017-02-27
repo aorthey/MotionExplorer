@@ -335,3 +335,4 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] make ompl planners available
  [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
  [ ] screenshots x_X?
+ [ ] control in kinodynamic planning converges to wrong direction
