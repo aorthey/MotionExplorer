@@ -161,7 +161,7 @@ void KinodynamicCSpaceSentinelAdaptor::BiasedSampleControl(const State& x,const 
   //std::cout << xGoal << std::endl;
 
   //Node* goal = base->goal.root;
-  int numSamples = 100;
+  int numSamples = 10;
   Real closest=Inf;
 
   for(int i=0;i<numSamples;i++) {
@@ -213,7 +213,7 @@ Matrix4 KinodynamicCSpaceSentinelAdaptor::SE3Derivative(const Matrix4& x_SE3, co
   //#########################################################################
   //Matrix4 dx_se3 = x_SE3*(X3*u(2) + X4);
   //Matrix4 dx_se3 = x_SE3*(X4);
-  Matrix4 dx_se3 = (X1*u(0) + X2*u(1) + X3*u(2) + X4*u(3));
+  Matrix4 dx_se3 = (X1*u(0) + X2*u(1) + X3*u(2) + X4*u(3) + X5*u(4) + X6*u(5));
   //#########################################################################
 
   return dx_se3;
@@ -260,6 +260,6 @@ void KinodynamicCSpaceSentinelAdaptor::SE3ToState(State& x, const Matrix4& x_SE3
   x(5)=R[2];
 }
 void KinodynamicCSpaceSentinelAdaptor::Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps){
-  dt = 0.1;
+  dt = 0.01;
   numSteps = 10;
 }

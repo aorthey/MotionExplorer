@@ -78,10 +78,10 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
 
   KinodynamicCSpaceSentinelAdaptor kcspace(&cspace);
 
-  CSpaceGoalSetEpsilonNeighborhood goalSet(_p_goal,0.1);
-
+  CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, 0.1);
 
   RRTKinodynamicPlanner krrt(&kcspace);
+  //LazyRRTKinodynamicPlanner krrt(&kcspace);
   krrt.goalSet = &goalSet;
   krrt.Init(_p_init);
 
@@ -94,7 +94,7 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //UnidirectionalRRTKP krrt(&kcspace);
 
 
-  bool res = krrt.Plan(10000);
+  bool res = krrt.Plan(1000);
 
   if(res)
   {
@@ -111,8 +111,8 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
       keyframes.push_back(cur);
     }
     _path.SetMilestones(keyframes);
-    double xtol=0.01;
-    double ttol=0.01;
+    //double xtol=0.01;
+    //double ttol=0.01;
     //std::cout << "time optimizing" << std::endl;
     //bool res=GenerateAndTimeOptimizeMultiPath(*robot,_path,xtol,ttol);
 
