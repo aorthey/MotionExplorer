@@ -11,6 +11,8 @@
 #include <View/ViewIK.h>
 #include <ode/ode.h>
 
+#define DEBUG 0
+
 const GLColor bodyColor(0.1,0.1,0.1);
 const GLColor selectedLinkColor(1.0,1.0,0.5);
 const double sweptvolumeScale = 0.98;
@@ -79,6 +81,7 @@ class ForceFieldBackend : public SimTestBackend
       //pz = 0.0;
       //dBodyAddForceAtPos(robot->body(7),fx,fy,fz,px,py,pz);
     }
+    return true;
   }
   //############################################################################
   //############################################################################
@@ -95,11 +98,9 @@ class ForceFieldBackend : public SimTestBackend
 
   //############################################################################
   //############################################################################
-  void VisualizePathSweptVolumeAtPosition(const MultiPath &path, double d)
+  void VisualizePathSweptVolumeAtPosition(const Config &q)
   {
     Robot *robot = world->robots[0];
-    Config q;
-    path.Evaluate(d, q);
     robot->UpdateConfig(q);
     std::vector<Matrix4> mats_config;
 
@@ -109,6 +110,7 @@ class ForceFieldBackend : public SimTestBackend
     }
     _mats.push_back(mats_config);
   }
+
   void VisualizePathSweptVolume(const MultiPath &path)
   {
     Robot *robot = world->robots[0];
@@ -126,7 +128,7 @@ class ForceFieldBackend : public SimTestBackend
       path.Evaluate(d, qtn);
       if((qt-qtn).norm() >= sweptVolume_q_spacing)
       {
-        VisualizePathSweptVolumeAtPosition(path, d);
+        VisualizePathSweptVolumeAtPosition(qtn);
         qt = qtn;
       }
     }
@@ -136,7 +138,7 @@ class ForceFieldBackend : public SimTestBackend
     //  VisualizePathSweptVolumeAtPosition(path, d);
     //}
 
-    std::cout << "[SweptVolume] #waypoints " << _mats.size() << std::endl;
+    if(DEBUG) std::cout << "[SweptVolume] #waypoints " << _mats.size() << std::endl;
     _appearanceStack.clear();
     _appearanceStack.resize(robot->links.size());
 
@@ -145,9 +147,39 @@ class ForceFieldBackend : public SimTestBackend
       //a.SetColor(sweptvolumeColor);
       _appearanceStack[i]=a;
     }
-    std::cout << "[SweptVolume] #geometries " << _appearanceStack.size() << std::endl;
+    if(DEBUG) std::cout << "[SweptVolume] #geometries " << _appearanceStack.size() << std::endl;
     drawPath = true;
 
+  }
+  void VisualizePathSweptVolume(const KinodynamicMilestonePath &path)
+  {
+    Robot *robot = world->robots[0];
+
+    Config qt;
+    path.Eval(0, qt);
+
+    double dstep = 0.01;
+    double d = 0;
+
+    while(d <= 1)
+    {
+      d+=dstep;
+      Config qtn;
+      path.Eval(d, qtn);
+      if((qt-qtn).norm() >= sweptVolume_q_spacing)
+      {
+        VisualizePathSweptVolumeAtPosition(qtn);
+        qt = qtn;
+      }
+    }
+    _appearanceStack.clear();
+    _appearanceStack.resize(robot->links.size());
+
+    for(size_t i=0;i<robot->links.size();i++) {
+      GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
+      _appearanceStack[i]=a;
+    }
+    drawPath = true;
   }
 
   virtual void RenderWorld()
@@ -166,8 +198,8 @@ class ForceFieldBackend : public SimTestBackend
       vector<ViewRobot> viewRobots = world->robotViews;
       ViewRobot *viewRobot = &viewRobots[0];
       double COMradius = 0.05;
-      double frameLength = 0.2;
       viewRobot->DrawCenterOfMass(COMradius);
+      //double frameLength = 0.2;
       //viewRobot->DrawLinkFrames(frameLength);
       viewRobot->DrawLinkSkeleton();
       viewRobot->SetColors(bodyColor);
@@ -180,7 +212,7 @@ class ForceFieldBackend : public SimTestBackend
 
       vector<ViewRobot> viewRobots = world->robotViews;
       ViewRobot *viewRobot = &viewRobots[0];
-      for(int i = 0; i < _constraints.size(); i++){
+      for(uint i = 0; i < _constraints.size(); i++){
 
         const IKGoal goal = _constraints[i];
 
@@ -200,7 +232,7 @@ class ForceFieldBackend : public SimTestBackend
         //glDisable(GL_BLEND);
 
       }
-      for(int i = 0; i < _linksInCollision.size(); i++){
+      for(uint i = 0; i < _linksInCollision.size(); i++){
         glDisable(GL_LIGHTING);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
@@ -261,8 +293,8 @@ class ForceFieldBackend : public SimTestBackend
     if(drawPath){
       Robot *robot = world->robots[0];
       //loopin' through the waypoints
-      for(int i = 0; i < _mats.size(); i++){
-        for(int j=0;j<robot->links.size();j++) {
+      for(uint i = 0; i < _mats.size(); i++){
+        for(uint j=0;j<robot->links.size();j++) {
           if(robot->IsGeometryEmpty(j)) continue;
           Matrix4 matij = _mats.at(i).at(j);
 

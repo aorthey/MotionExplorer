@@ -54,7 +54,7 @@ class Info
         vector<string> linkNames = (*it)->linkNames;
         vector<RobotLink3D> links = (*it)->links;
         assert( links.size() == linkNames.size() );
-        for(int i = 0; i< links.size(); i++){
+        for(uint i = 0; i < links.size(); i++){
           std::cout<< "Link[" << i << "] " << linkNames[i] << " mass " << links[i].mass << std::endl;
         }
 
@@ -67,7 +67,7 @@ class Info
         std::cout << std::string(80, '-') << std::endl;
         vector<RobotJointDriver> drivers = (*it)->drivers;
         vector<string> dnames = (*it)->driverNames;
-        for(int i = 0; i< drivers.size(); i++){
+        for(uint i = 0; i < drivers.size(); i++){
           std::cout<< "Joint[" << i << "] " << dnames[i] << " qmin " << drivers[i].qmin << " qmax " << drivers[i].qmax << std::endl;
         }
 

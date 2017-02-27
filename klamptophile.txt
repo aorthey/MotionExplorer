@@ -316,6 +316,10 @@ TODO
  [x] importing/exporting blender models? how to best design your own environments? [needs .tri to blender importer. there is none (only for some other tri files). maybe better to convert to dae (collada) ?]
  [x] why does planning fail with 1 additional joint see sentinel
  [x] disable backface culling to display backoriented triangles (just use rigidobject, they are non-culled)
+ [x] MultiPath is using linear interpolation between keyframes. However on SO(3)
+we need a different interpolation due to the gluing of the charts. Check if
+something like that is already implemented, see GeodesicManifold/DynamicPath.
+Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] solve IK for arbitrary rob-env contact points
  [ ] setup kinodynamic planning problem
  [ ] grasp an actual object
@@ -330,3 +334,4 @@ TODO
  [ ] kinodynamic planning 
  [ ] make ompl planners available
  [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
+ [ ] screenshots x_X?

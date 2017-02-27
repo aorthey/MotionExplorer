@@ -78,6 +78,7 @@ bool KinodynamicCSpaceSentinelAdaptor::ReverseSimulate(const State& x1, const Co
   }
   //reverse the vector?
   //std::reverse(p.begin(),p.end());
+  throw("NYI");
 
   return true;
 
@@ -160,15 +161,15 @@ void KinodynamicCSpaceSentinelAdaptor::BiasedSampleControl(const State& x,const 
   //std::cout << xGoal << std::endl;
 
   //Node* goal = base->goal.root;
-  int numSamples = 10;
-  State x2;
+  int numSamples = 100;
   Real closest=Inf;
-  ControlInput temp;
 
   for(int i=0;i<numSamples;i++) {
+    State x2;
+    ControlInput temp;
     SampleControl(x,temp);
     SimulateEndpoint(x,temp,x2);
-    Real dist = Distance(xGoal,x2);
+    Real dist = Distance(x2,xGoal);
     if(dist < closest) {
       closest = dist;
       u = temp;
@@ -257,13 +258,8 @@ void KinodynamicCSpaceSentinelAdaptor::SE3ToState(State& x, const Matrix4& x_SE3
   x(3)=R[0];
   x(4)=R[1];
   x(5)=R[2];
-  for(int i = 3; i < 6; i++){
-    //if(x(i)>M_PI){
-    //  x(i)-=2*M_PI;
-    //}
-  }
 }
 void KinodynamicCSpaceSentinelAdaptor::Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps){
-  dt = 0.01;
-  numSteps = 5;
+  dt = 0.1;
+  numSteps = 10;
 }

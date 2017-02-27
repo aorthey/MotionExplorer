@@ -47,8 +47,8 @@ int main(int argc,const char** argv) {
   //p_goal.resize(p_init.size());
   //p_goal.setZero();
 
-  p_goal[0]=2;
-  p_goal[1]=-0.5;
+  p_goal[0]=1;
+  p_goal[1]=0;
   p_goal[2]=1;
   //p_goal[3]=0;
   //p_goal[3]=0;

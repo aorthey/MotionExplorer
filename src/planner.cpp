@@ -78,11 +78,21 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
 
   KinodynamicCSpaceSentinelAdaptor kcspace(&cspace);
 
+  CSpaceGoalSetEpsilonNeighborhood goalSet(_p_goal,0.1);
+
+
+  RRTKinodynamicPlanner krrt(&kcspace);
+  krrt.goalSet = &goalSet;
+  krrt.Init(_p_init);
+
+
+  //RRTKinodynamicPlanner2 krrt(&kcspace);
+  //krrt.Init(_p_init,_p_goal);
+
   //BidirectionalRRTKP
-  RRTKinodynamicPlanner2 krrt(&kcspace);
   //BidirectionalRRTKP krrt(&kcspace);
   //UnidirectionalRRTKP krrt(&kcspace);
-  krrt.Init(_p_init,_p_goal);
+
 
   bool res = krrt.Plan(10000);
 
@@ -97,11 +107,6 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
     for(double d = 0; d <= 1; d+=dstep)
     {
       path.Eval(d,cur);
-      for(int i = 3; i < 6; i++){
-        //if(cur(i)>M_PI){
-        //  cur(i)-=2*M_PI;
-        //}
-      }
       std::cout << d << cur << std::endl;
       keyframes.push_back(cur);
     }

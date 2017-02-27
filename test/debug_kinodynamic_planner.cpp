@@ -41,6 +41,9 @@ int main(int argc,const char** argv) {
   p_init[0]=-0.5;
   p_init[1]=-1;
   p_init[2]=-1;
+  p_init[3]=2*M_PI-M_PI/8;
+  p_init[4]=-M_PI/16;
+  p_init[5]=M_PI/16;
   sim.odesim.SetGravity(Vector3(0,0,0));
 
   world.background = GLColor(1,1,1);
@@ -50,12 +53,10 @@ int main(int argc,const char** argv) {
   //############################################################################
   KinodynamicPlannerPathVisualizer debugger(&world, &sim);
 
-  std::vector<MultiPath> paths = debugger.GetPaths(p_init);
+  std::vector<KinodynamicMilestonePath> paths = debugger.GetPaths(p_init);
   for(int i = 0; i < paths.size(); i++){
     backend.VisualizePathSweptVolume(paths[i]);
   }
-
-
 
   ////############################################################################
   ////guification

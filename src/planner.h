@@ -11,6 +11,7 @@
 #include <vector>
 #include "util.h"
 #include "cspace_sentinel.h"
+#include "cspace_epsilon_neighborhood.h"
 
 class MotionPlanner{
   private:
