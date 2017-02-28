@@ -28,7 +28,6 @@ int main(int argc,const char** argv) {
   Info info;
   ForceFieldBackend backend(&world);
   //SimTestBackend backend(&world);
-  WorldSimulation& sim=backend.sim;
 
   backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel.xml");
 

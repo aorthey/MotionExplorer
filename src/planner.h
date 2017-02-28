@@ -4,16 +4,18 @@
 #include <Planning/RobotTimeScaling.h>
 #include <Simulation/WorldSimulation.h>
 #include <KrisLibrary/planning/AnyMotionPlanner.h>
+#include <KrisLibrary/planning/KinodynamicMotionPlanner.h>
 #include <Modeling/DynamicPath.h>
 #include <Modeling/Paths.h>
 #include <Modeling/MultiPath.h>
 
 #include <vector>
-#include "util.h"
-#include "cspace_sentinel.h"
-#include "cspace_epsilon_neighborhood.h"
+
+typedef std::pair<Vector, std::vector<Vector> > SerializedTreeNode;
+typedef std::vector< SerializedTreeNode > SerializedTree;
 
 class MotionPlanner{
+
   private:
     RobotWorld *_world;
     int _irobot;
@@ -26,9 +28,17 @@ class MotionPlanner{
     bool _shortcutting;
     double _timelimit;
     MilestonePath _milestone_path;
+    //KinodynamicTree _tree;
+    SerializedTree _stree;
+
   public:
+
     explicit MotionPlanner(RobotWorld *world, WorldSimulation *sim);
     const MultiPath& GetPath();
+    const SerializedTree& GetTree();
+    void SerializeTree( const KinodynamicTree& tree, SerializedTree& stree);
+    void SerializeTree( const KinodynamicTree::Node* node, SerializedTree &stree);
+
     bool solve(Config &p_init, Config &p_goal, double timelimit=100.0, bool shortcutting=true);
     void SendCommandStringController(string cmd, string arg);
     bool SendToController();

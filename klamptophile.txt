@@ -336,3 +336,4 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
  [ ] screenshots x_X?
  [ ] control in kinodynamic planning converges to wrong direction
+ [ ] refactor kinodynamic planner to make it independent from path planner

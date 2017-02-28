@@ -9,7 +9,7 @@ KinodynamicCSpaceSentinelAdaptor::KinodynamicCSpaceSentinelAdaptor(CSpace *_base
 
 void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlInput& u,std::vector<State>& p)
 {
-  //State x0 lies on local chart and is represented by R^6. We will convert x0
+  //State x0 lies on local chart represented by R^6. We will convert x0
   //to a R^4x4 matrix representing the same SE(3) element. Using the matrix
   //representation allows easier computation of the forward dynamics. Once we
   //are done, we reconvert the matrix representation to an element in vector
@@ -132,6 +132,11 @@ bool KinodynamicCSpaceSentinelAdaptor::IsValidControl(const State& x,const Contr
   for(int i = 0; i < u_low_limit.size(); i++){
     valid &= (u_low_limit[i] <= u[i] && u[i] <= u_up_limit[i]);
   }
+  if(!valid){
+    std::cout << "Non valid control!" << std::endl;
+    std::cout << u << std::endl;
+    exit(0);
+  }
   return valid;
 
 }
@@ -163,17 +168,21 @@ void KinodynamicCSpaceSentinelAdaptor::BiasedSampleControl(const State& x,const 
   int numSamples = 10;
   Real closest=Inf;
 
+  //std::cout << "Going from "<< x << std::endl;
+  //std::cout << "to "<< xGoal << std::endl;
   for(int i=0;i<numSamples;i++) {
     State x2;
     ControlInput temp;
     SampleControl(x,temp);
     SimulateEndpoint(x,temp,x2);
-    Real dist = Distance(x2,xGoal);
+    Real dist = base->Distance(x2,xGoal);
     if(dist < closest) {
       closest = dist;
       u = temp;
     }
   }
+  //std::cout << "best control "<< u << std::endl;
+  //exit(0);
 }
 void KinodynamicCSpaceSentinelAdaptor::BiasedSampleReverseControl(const State& x1,const State& xDest,ControlInput& u){
   BiasedSampleControl(x1,xDest,u);

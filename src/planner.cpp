@@ -1,4 +1,7 @@
 #include "planner.h"
+#include "util.h"
+#include "cspace_sentinel.h"
+#include "cspace_epsilon_neighborhood.h"
 
 MotionPlanner::MotionPlanner(RobotWorld *world, WorldSimulation *sim):
   _world(world),_sim(sim)
@@ -9,6 +12,49 @@ MotionPlanner::MotionPlanner(RobotWorld *world, WorldSimulation *sim):
 const MultiPath& MotionPlanner::GetPath()
 {
   return _path;
+}
+const SerializedTree& MotionPlanner::GetTree()
+{
+  return _stree;
+}
+void MotionPlanner::SerializeTree( const KinodynamicTree::Node* node, SerializedTree &stree){
+  SerializedTreeNode snode;
+
+  State s = *node;
+  Vector position;
+  position.resize(6);
+  for(int i = 0; i < 6; i++){
+    position(i) = s(i);
+  }
+  snode.first = position;
+
+  std::vector<Vector> directions;
+
+  std::vector<KinodynamicTree::Node* > children;
+  node->enumChildren(children);
+  for(uint i = 0; i < children.size(); i++){
+    Vector childdir;
+    childdir.resize(3);
+    State c = *children.at(i);
+    for(int j = 0; j < 3; j++){
+      childdir(j) = c(j)-position(j);
+    }
+    directions.push_back(childdir);
+    SerializeTree(children.at(i),stree);
+  }
+  snode.second = directions;
+
+  //DEBUG
+  //std::cout << snode.first << std::endl;
+  //std::cout << "Childrens: " << children.size() << std::endl;
+  //for(int i = 0; i < directions.size(); i++){
+  //  std::cout << snode.second.at(i) << std::endl;
+  //}
+  stree.push_back(snode);
+
+}
+void MotionPlanner::SerializeTree( const KinodynamicTree& tree, SerializedTree& stree){
+  SerializeTree(tree.root, stree);
 }
 std::string MotionPlanner::getName(){
   return "Motion Planner";
@@ -80,7 +126,9 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
 
   CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, 0.1);
 
+
   RRTKinodynamicPlanner krrt(&kcspace);
+  krrt.goalSeekProbability=0.1;
   //LazyRRTKinodynamicPlanner krrt(&kcspace);
   krrt.goalSet = &goalSet;
   krrt.Init(_p_init);
@@ -93,8 +141,11 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //BidirectionalRRTKP krrt(&kcspace);
   //UnidirectionalRRTKP krrt(&kcspace);
 
-
   bool res = krrt.Plan(10000);
+
+  _stree.clear();
+  SerializeTree(krrt.tree, _stree);
+
 
   if(res)
   {

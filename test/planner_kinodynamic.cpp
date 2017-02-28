@@ -14,11 +14,11 @@
 #include <Control/PathController.h>
 
 #include "util.h"
-#include "gui.h"
 #include "info.h"
 #include "planner.h"
 #include "object.h"
 #include "controller.h"
+#include "gui.h"
 
 int main(int argc,const char** argv) {
   RobotWorld world;
@@ -67,6 +67,7 @@ int main(int argc,const char** argv) {
     std::cout << "VisualizePathSweptVolume" << std::endl;
     backend.VisualizePathSweptVolume(planner.GetPath());
   }
+  backend.VisualizePlannerTree(planner.GetTree());
 
 
   ////############################################################################
