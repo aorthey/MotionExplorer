@@ -141,7 +141,7 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //BidirectionalRRTKP krrt(&kcspace);
   //UnidirectionalRRTKP krrt(&kcspace);
 
-  bool res = krrt.Plan(10000);
+  bool res = krrt.Plan(1000);
 
   _stree.clear();
   SerializeTree(krrt.tree, _stree);
