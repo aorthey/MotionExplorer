@@ -92,7 +92,7 @@ INTERFACE
 
 -------------------------------------------------------------------------------
 
-BACKEND
+BACKEND [Interface/*GUI.h]
   GenericBackendBase [GenericGUI.h] 
     bool GenericGUIBase::SendGLViewport(int x,int y,int w,int h)
 
@@ -103,6 +103,10 @@ BACKEND
             RenderWorld()
 
   <- <- <- WorldGUIBackend [WorldGUI.h] (loader for RobotWorld)
+              RenderWorld()
+                drawCoords(0.1);
+
+
   <- <- <- <- SimGUIBackend [SimulationGUI.h] (add functions to display dynamics,i.e. wrenches, torques, contacts etc)
                 RenderWorld()
                   world->terrains[i]->DrawGL();

@@ -76,7 +76,7 @@ class KinodynamicCSpaceSentinelAdaptor: public KinematicCSpaceAdaptor
     virtual void SampleControl(const State& x,ControlInput& u);
 
     //new functions to be used with struct IntegratorFunction 
-    virtual Matrix4 SE3Derivative(const Matrix4& x_SE3, const ControlInput& u);
+    virtual Matrix4 SE3Derivative(const ControlInput& u);
     virtual void Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps);
     //virtual State SE3ToState(const Matrix4& x_SE3);
     Matrix4 StateToSE3(const State& x);

@@ -39,7 +39,7 @@ void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlIn
     if(DEBUG) std::cout << w0 << std::endl;
     if(DEBUG) std::cout << w0_SE3 << std::endl;
 
-    Matrix4 dw_se3 = this->SE3Derivative(w0_SE3,u);
+    Matrix4 dw_se3 = this->SE3Derivative(u);
     Matrix4 tmp = MatrixExponential(dw_se3*h);
     Matrix4 w1_SE3 = w0_SE3*tmp;
     State w1 = w0;
@@ -68,7 +68,7 @@ bool KinodynamicCSpaceSentinelAdaptor::ReverseSimulate(const State& x1, const Co
     State w1 = p.back(); //\in SE(3) current element along path segment
 
     Matrix4 w1_SE3 = StateToSE3(w1);
-    Matrix4 dw_se3 = this->SE3Derivative(w1_SE3,u);
+    Matrix4 dw_se3 = this->SE3Derivative(u);
     Matrix4 w0_SE3 = MatrixExponential(dw_se3*h)*w1_SE3;
     State w0 = w1;
     SE3ToState(w0, w0_SE3);
@@ -190,7 +190,7 @@ void KinodynamicCSpaceSentinelAdaptor::BiasedSampleReverseControl(const State& x
 }
 
 //void KinodynamicCSpaceSentinelAdaptor::XDerivative(const State& x, const ControlInput& u, State& dx){
-Matrix4 KinodynamicCSpaceSentinelAdaptor::SE3Derivative(const Matrix4& x_SE3, const ControlInput& u)
+Matrix4 KinodynamicCSpaceSentinelAdaptor::SE3Derivative(const ControlInput& u)
 {
 
   // Lie Algebra Generators
@@ -237,8 +237,8 @@ Matrix4 KinodynamicCSpaceSentinelAdaptor::StateToSE3(const State& x){
   EulerAngleRotation Reuler(x(5),x(4),x(3));
   Reuler.getMatrixXYZ(R);
   //R = Rz*Ry*Rx;
-  T_x_se3.setRotation(R);
   T_x_se3.setTranslation(Vector3(x(0),x(1),x(2)));
+  T_x_se3.setRotation(R);
 
   Matrix4 x_se3;
   T_x_se3.get(x_se3);

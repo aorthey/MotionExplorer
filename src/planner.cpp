@@ -18,6 +18,31 @@ const SerializedTree& MotionPlanner::GetTree()
   return _stree;
 }
 
+void MotionPlanner::SerializeTreeNeighborhoodPrune(SerializedTree &_stree, double epsilon)
+{
+  //for(int i = 0; i < _stree.size(); i++){
+  //  for(int j = i+1; j < _stree.size(); j++){
+
+  //  }
+  //}
+//v.erase(std::remove_if(
+//          v.begin(), v.end(),
+//              [](const int& x) { return x > 10; }), 
+//    v.end());
+}
+
+
+void MotionPlanner::SerializeTreeAddCostToGoal(SerializedTree &stree, CSpace *base, Config &goal)
+{
+  for(uint i = 0; i < stree.size(); i++){
+    Config worldgoal;
+    worldgoal.resize(6);
+    for(int j = 0; j < 6; j++){
+      worldgoal(j) = goal(j);
+    }
+    stree.at(i).cost_to_goal = base->Distance(stree.at(i).position, goal);
+  }
+}
 void MotionPlanner::SerializeTree( const KinodynamicTree::Node* node, SerializedTree &stree){
   SerializedTreeNode snode;
 
@@ -27,23 +52,22 @@ void MotionPlanner::SerializeTree( const KinodynamicTree::Node* node, Serialized
   for(int i = 0; i < 6; i++){
     position(i) = s(i);
   }
-  snode.first = position;
+  snode.position = position;
 
-  std::vector<Vector> directions;
+  std::vector<Vector3> directions;
 
   std::vector<KinodynamicTree::Node* > children;
   node->enumChildren(children);
   for(uint i = 0; i < children.size(); i++){
-    Vector childdir;
-    childdir.resize(3);
+    Vector3 childdir;
     State c = *children.at(i);
     for(int j = 0; j < 3; j++){
-      childdir(j) = c(j)-position(j);
+      childdir[j] = c(j)-position(j);
     }
     directions.push_back(childdir);
     SerializeTree(children.at(i),stree);
   }
-  snode.second = directions;
+  snode.directions = directions;
 
   //DEBUG
   //std::cout << snode.first << std::endl;
@@ -127,7 +151,7 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   CSpaceGoalSetEpsilonNeighborhood goalSet(&cspace, _p_goal, 0.1);
 
   RRTKinodynamicPlanner krrt(&kcspace);
-  krrt.goalSeekProbability=0.9;
+  krrt.goalSeekProbability=0.2;
   //LazyRRTKinodynamicPlanner krrt(&kcspace);
   krrt.goalSet = &goalSet;
   krrt.Init(_p_init);
@@ -139,10 +163,13 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //BidirectionalRRTKP krrt(&kcspace);
   //UnidirectionalRRTKP krrt(&kcspace);
 
-  bool res = krrt.Plan(500);
+  bool res = krrt.Plan(1000);
 
   _stree.clear();
   SerializeTree(krrt.tree, _stree);
+  SerializeTreeNeighborhoodPrune(_stree, 0.1);
+  SerializeTreeAddCostToGoal(_stree, &cspace, _p_goal);
+
   //SerializeTreeCost(krrt.tree, _stree, &goalSet);
 
   if(res)
@@ -160,9 +187,9 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
       keyframes.push_back(cur);
     }
     _path.SetMilestones(keyframes);
+    //std::cout << "time optimizing" << std::endl;
     //double xtol=0.01;
     //double ttol=0.01;
-    //std::cout << "time optimizing" << std::endl;
     //bool res=GenerateAndTimeOptimizeMultiPath(*robot,_path,xtol,ttol);
 
 

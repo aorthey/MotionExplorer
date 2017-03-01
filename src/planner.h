@@ -13,13 +13,13 @@
 
 //typedef std::vector< SerializedTreeNode > SerializedTree;
 
-//struct SerializedTreeNode{
-//  Vector position;
-//  std::vector<Vector3> directions;
-//  double cost_to_goal;
-//}
+struct SerializedTreeNode{
+  Vector position; //\in R^6 local chart on SE(3)
+  std::vector<Vector3> directions;
+  double cost_to_goal;
+};
 
-typedef std::pair<Vector, std::vector<Vector> > SerializedTreeNode;
+//typedef std::pair<Vector, std::vector<Vector> > SerializedTreeNode;
 typedef std::vector< SerializedTreeNode > SerializedTree;
 
 class MotionPlanner{
@@ -46,6 +46,9 @@ class MotionPlanner{
     const SerializedTree& GetTree();
     void SerializeTree( const KinodynamicTree& tree, SerializedTree& stree);
     void SerializeTree( const KinodynamicTree::Node* node, SerializedTree &stree);
+    void SerializeTreeAddCostToGoal(SerializedTree &stree, CSpace *base, Config &goal);
+    //Delete all nodes from the tree with distance < epsilon to another node
+    void SerializeTreeNeighborhoodPrune(SerializedTree &_stree, double epsilon);
 
     bool solve(Config &p_init, Config &p_goal, double timelimit=100.0, bool shortcutting=true);
     void SendCommandStringController(string cmd, string arg);

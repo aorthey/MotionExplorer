@@ -24,6 +24,7 @@ class ForceFieldBackend : public SimTestBackend
     bool drawIKextras;
     bool drawPath;
     bool drawPlannerTree;
+    bool drawAxesLabels;
     vector<IKGoal> _constraints;
     vector<int> _linksInCollision;
     string _robotname;
