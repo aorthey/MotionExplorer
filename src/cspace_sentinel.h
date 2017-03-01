@@ -57,7 +57,12 @@ class KinodynamicCSpaceSentinelAdaptor: public KinematicCSpaceAdaptor
 
     ////pass-throughs to base space
     //virtual void Sample(Config& x) { base->Sample(x); }
-    virtual void Sample(Config& x) { base->Sample(x);x(2)=1;x(4)=0;x(5)=0; }
+    virtual void Sample(Config& x) 
+    { 
+      base->Sample(x);
+      x(2)=1;x(4)=0;x(5)=0;
+      std::cout << "RANDOM SAMPLE" << x << std::endl;
+    }
     //virtual void SampleNeighborhood(const Config& c,Real r,Config& x) { base->SampleNeighborhood(c,r,x); }
     //virtual EdgePlanner* LocalPlanner(const Config& a,const Config& b) { return base->LocalPlanner(a,b); }
     //virtual bool IsFeasible(const Config& x) { return base->IsFeasible(x); }

@@ -51,7 +51,7 @@ int main(int argc,const char** argv) {
   p_goal[0]=0;
   p_goal[1]=0.6;
   p_goal[2]=1;
-  p_init[3]=0;
+  p_goal[3]=M_PI/6;
   //p_goal[3]=0;
   //p_goal[3]=0;
 

@@ -150,8 +150,8 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   KinodynamicCSpaceSentinelAdaptor kcspace(&cspace);
   CSpaceGoalSetEpsilonNeighborhood goalSet(&cspace, _p_goal, 0.1);
 
-  RRTKinodynamicPlanner krrt(&kcspace);
-  krrt.goalSeekProbability=0.2;
+  LazyRRTKinodynamicPlanner krrt(&kcspace);
+  krrt.goalSeekProbability=0.9;
   //LazyRRTKinodynamicPlanner krrt(&kcspace);
   krrt.goalSet = &goalSet;
   krrt.Init(_p_init);
