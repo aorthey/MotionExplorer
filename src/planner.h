@@ -11,6 +11,14 @@
 
 #include <vector>
 
+//typedef std::vector< SerializedTreeNode > SerializedTree;
+
+//struct SerializedTreeNode{
+//  Vector position;
+//  std::vector<Vector3> directions;
+//  double cost_to_goal;
+//}
+
 typedef std::pair<Vector, std::vector<Vector> > SerializedTreeNode;
 typedef std::vector< SerializedTreeNode > SerializedTree;
 

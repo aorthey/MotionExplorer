@@ -230,15 +230,12 @@ Matrix4 KinodynamicCSpaceSentinelAdaptor::SE3Derivative(const Matrix4& x_SE3, co
 Matrix4 KinodynamicCSpaceSentinelAdaptor::StateToSE3(const State& x){
   //represent lie group element as matrix4
   RigidTransform T_x_se3;
-  EulerAngleRotation Reuler(x(3),x(4),x(5));
-
-  //Matrix3 R,Rx,Ry,Rz;
-  //Rz.setRotateZ(x(3));
-  //Ry.setRotateY(x(4));
-  //Rx.setRotateX(x(5));
-
   Matrix3 R;
-  Reuler.getMatrixZYX(R);
+
+  // EulerAngleRotation Reuler(x(3),x(4),x(5));
+  // Reuler.getMatrixZYX(R);
+  EulerAngleRotation Reuler(x(5),x(4),x(3));
+  Reuler.getMatrixXYZ(R);
   //R = Rz*Ry*Rx;
   T_x_se3.setRotation(R);
   T_x_se3.setTranslation(Vector3(x(0),x(1),x(2)));
@@ -253,7 +250,7 @@ void KinodynamicCSpaceSentinelAdaptor::SE3ToState(State& x, const Matrix4& x_SE3
   x_SE3.get(R_m,T);
 
   EulerAngleRotation R;
-  R.setMatrixZYX(R_m);
+  R.setMatrixXYZ(R_m);
 
   x.resize(x.size());
   x.setZero();
@@ -261,9 +258,9 @@ void KinodynamicCSpaceSentinelAdaptor::SE3ToState(State& x, const Matrix4& x_SE3
   x(1)=T[1];
   x(2)=T[2];
 
-  x(3)=R[0];
+  x(3)=R[2];
   x(4)=R[1];
-  x(5)=R[2];
+  x(5)=R[0];
 }
 void KinodynamicCSpaceSentinelAdaptor::Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps){
   dt = 0.01;

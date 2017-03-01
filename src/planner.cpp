@@ -17,6 +17,7 @@ const SerializedTree& MotionPlanner::GetTree()
 {
   return _stree;
 }
+
 void MotionPlanner::SerializeTree( const KinodynamicTree::Node* node, SerializedTree &stree){
   SerializedTreeNode snode;
 
@@ -123,16 +124,13 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //###########################################################################
 
   KinodynamicCSpaceSentinelAdaptor kcspace(&cspace);
-
-  CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, 0.1);
-
+  CSpaceGoalSetEpsilonNeighborhood goalSet(&cspace, _p_goal, 0.1);
 
   RRTKinodynamicPlanner krrt(&kcspace);
-  krrt.goalSeekProbability=0.1;
+  krrt.goalSeekProbability=0.9;
   //LazyRRTKinodynamicPlanner krrt(&kcspace);
   krrt.goalSet = &goalSet;
   krrt.Init(_p_init);
-
 
   //RRTKinodynamicPlanner2 krrt(&kcspace);
   //krrt.Init(_p_init,_p_goal);
@@ -141,11 +139,11 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //BidirectionalRRTKP krrt(&kcspace);
   //UnidirectionalRRTKP krrt(&kcspace);
 
-  bool res = krrt.Plan(1000);
+  bool res = krrt.Plan(500);
 
   _stree.clear();
   SerializeTree(krrt.tree, _stree);
-
+  //SerializeTreeCost(krrt.tree, _stree, &goalSet);
 
   if(res)
   {
