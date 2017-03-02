@@ -196,7 +196,7 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   kcspace.Properties(pmap);
   std::cout << pmap << std::endl;
 
-  bool res = krrt.Plan(1e3);
+  bool res = krrt.Plan(1e8);
 
   _stree.clear();
   SerializeTree(krrt.tree, _stree);
