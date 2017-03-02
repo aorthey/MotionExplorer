@@ -20,16 +20,18 @@ class ForceFieldBackend : public SimTestBackend
 {
   private:
     bool drawForceField;
-    bool drawExtras; 
+    bool drawRobotExtras; 
     bool drawIKextras;
     bool drawPath;
     bool drawPlannerTree;
+    bool drawPlannerStartGoal;
     bool drawAxesLabels;
     vector<IKGoal> _constraints;
     vector<int> _linksInCollision;
     string _robotname;
     SerializedTree _stree;
     //swept volume
+    Config planner_p_init, planner_p_goal;
     std::vector<std::vector<Matrix4> > _mats;
     vector<GLDraw::GeometryAppearance> _appearanceStack;
     typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
@@ -45,6 +47,7 @@ class ForceFieldBackend : public SimTestBackend
   void VisualizePathSweptVolume(const MultiPath &path);
   void VisualizePathSweptVolume(const KinodynamicMilestonePath &path);
   void VisualizePlannerTree(const SerializedTree &tree);
+  void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
   virtual void RenderWorld();
 
 

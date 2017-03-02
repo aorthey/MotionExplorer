@@ -60,13 +60,20 @@ class KinodynamicCSpaceSentinelAdaptor: public KinematicCSpaceAdaptor
     virtual void Sample(Config& x) 
     { 
       base->Sample(x);
-      x(2)=1;x(4)=0;x(5)=0;
-      std::cout << "RANDOM SAMPLE" << x << std::endl;
+      //x(2)=1;x(4)=0;x(5)=0;
+      //std::cout << "RANDOM SAMPLE" << x << std::endl;
     }
+
+    virtual Real Distance(const Config& x, const Config& y) { 
+      Config xpos;xpos.resize(3);xpos(0)=x(0);xpos(1)=x(1);xpos(2)=x(2);
+      Config ypos;ypos.resize(3);ypos(0)=y(0);ypos(1)=y(1);ypos(2)=y(2);
+      return base->Distance(xpos,ypos); 
+      //return base->Distance(x,y); 
+    }
+
     //virtual void SampleNeighborhood(const Config& c,Real r,Config& x) { base->SampleNeighborhood(c,r,x); }
     //virtual EdgePlanner* LocalPlanner(const Config& a,const Config& b) { return base->LocalPlanner(a,b); }
     //virtual bool IsFeasible(const Config& x) { return base->IsFeasible(x); }
-    //virtual Real Distance(const Config& x, const Config& y) { return base->Distance(x,y); }
     //virtual void Interpolate(const Config& x,const Config& y,Real u,Config& out) { base->Interpolate(x,y,u,out); }
     //virtual void Midpoint(const Config& x,const Config& y,Config& out) { base->Midpoint(x,y,out); }
 

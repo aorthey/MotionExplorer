@@ -240,6 +240,9 @@ MATH
 
   WARNING: [i][j] = (j,i) !! DO NOT USE [i][j]
 -------------------------------------------------------------------------------
+ Infinity
+  double dInf
+  Real Inf
 
  Krislibrary/math3d/primitives.h
   class Vector2;
@@ -341,3 +344,4 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] screenshots x_X?
  [ ] control in kinodynamic planning converges to wrong direction
  [ ] refactor kinodynamic planner to make it independent from path planner
+ [ ] refactor draw methods in gui.cpp

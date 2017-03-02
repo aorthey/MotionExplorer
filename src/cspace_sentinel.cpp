@@ -7,6 +7,170 @@ KinodynamicCSpaceSentinelAdaptor::KinodynamicCSpaceSentinelAdaptor(CSpace *_base
 {
 }
 
+//////hooks for the math library integrators
+////class MatrixDiffEqFunction
+////{
+////  public:
+////      virtual ~MatrixDiffEqFunction() {}
+////      virtual int NumDimensions() const { FatalError("NumDimensions not defined in subclass of DiffEqFunction"); return -1; }
+////      virtual void operator ()(Real t,const Matrix4& y,Matrix4& fy) { PreEval(t,y); Eval(t,y,fy); }
+////      virtual void PreEval(Real t,const Matrix4& y) {}
+////      virtual void Eval(Real t,const Matrix4& y,Matrix4& fy) =0;
+////};
+////Matrix4 MatrixExponential(const Matrix4& x)
+////{
+////  Eigen::MatrixXd A(4,4);
+////  for(int i = 0; i < 4; i++){
+////    for(int j = 0; j < 4; j++){
+////      A(i,j) = x(i,j);
+////    }
+////  }
+////
+////  Eigen::MatrixXd Aexp = A.exp();
+////  Matrix4 result;
+////  //std::cout << "The matrix exponential of A is:\n" << Aexp << "\n\n";
+////  for(int i = 0; i < 4; i++){
+////    for(int j = 0; j < 4; j++){
+////      result(i,j) = Aexp(i,j);
+////    }
+////  }
+////  return result;
+////}
+////
+////
+//////steps forward the initial value problem
+//////y' = f(t,y)
+//////y(t0) = w0
+//////by the time step h, placing the result in w1
+////void Euler_step(MatrixDiffEqFunction* f, Real t0, Real h, const Matrix4& w0, Matrix4& w1)
+////{
+////  Matrix4 k;
+////  (*f)(t0,w0,k);
+////  //w1=w0;
+////  //w1.madd(k,h);
+////  Matrix4 tmp = MatrixExponential(k*h);
+////  w1 = w0*tmp;
+////    //Matrix4 tmp = MatrixExponential(dw_se3*h);
+////    //Matrix4 w1_SE3 = w0_SE3*tmp;
+////    //State w1 = w0;
+////    //SE3ToState(w1, w1_SE3);
+////}
+////
+//////void RungeKutta4_step(MatrixDiffEqFunction* f, Real t0, Real h, const Matrix4& w0, Matrix4& w1)
+//////{
+//////  Assert(&w0 != &w1);
+//////  Matrix4 k1,k2,k3,k4, tmp;
+//////
+//////  (*f)(t0,w0,k1);
+//////
+//////  //k1 *= h;
+//////  //tmp = w0;
+//////  //tmp.madd(k1,Half);
+//////
+//////  k1 *= h;
+//////  //tmp = w0;
+//////  mexp = MatrixExponential(k1*Half);
+//////  tmp = w0*mexp;
+//////
+//////  (*f)(t0+h*Half, tmp, k2);
+//////  k2 *= h;
+//////  tmp = w0;
+//////  tmp.madd(k2,Half);
+//////
+//////  k2 *= h;
+//////  tmp = w0;
+//////  tmp = MatrixExponential(k1*Half);
+//////  tmp = w0*tmp;
+//////
+//////
+//////
+//////  (*f)(t0+h*Half, tmp, k3);
+//////  k3 *= h;
+//////
+//////  tmp.add(w0,k3);
+//////  (*f)(t0+h, tmp, k4);
+//////  k4 *= h;
+//////
+//////  tmp.add(k2,k3);
+//////  tmp.add(tmp,tmp);
+//////  w1.add(k1,tmp);
+//////  w1 += k4;
+//////  w1.inplaceMul(1.0/6.0);
+//////  w1 += w0;
+//////}
+////
+////
+////
+////struct IntegrationFunction : public MatrixDiffEqFunction
+////{
+////  IntegrationFunction(KinodynamicCSpaceSentinelAdaptor* _space,const ControlInput& _u)
+////    :space(_space),u(_u)
+////  {}
+////
+////  virtual void Eval(Real t,const Matrix4& y,Matrix4& dy) {
+////    dy = space->SE3Derivative(u);
+////    //space->XDerivative(y,u,dy);
+////  }
+////
+////  KinodynamicCSpaceSentinelAdaptor* space;
+////  const ControlInput& u;
+////};
+////void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlInput& u,std::vector<State>& p)
+////{
+////  //State x0 lies on local chart represented by R^6. We will convert x0
+////  //to a R^4x4 matrix representing the same SE(3) element. Using the matrix
+////  //representation allows easier computation of the forward dynamics. Once we
+////  //are done, we reconvert the matrix representation to an element in vector
+////  //representation in R^6 on the local chart.
+////  //
+////  // p is the path segment containing (numsteps) states along the forward simulation
+////  // dt is the total timestep size
+////  // numsteps is the number intermediate steps
+////  // h = dt/numsteps is the intermediate timestep size
+////
+////  IntegrationFunction func(this,u);
+////  std::cout << std::setprecision(2) << std::fixed;
+////
+////  Real dt;
+////  int numSteps;
+////  Parameters(x0,u,dt,numSteps);
+////  Real h = dt/numSteps;
+////
+////  Matrix4 x0_SE3 = StateToSE3(x0);
+////  std::vector<Matrix4> p_SE3;
+////  p_SE3.push_back(x0_SE3);
+////
+////  for(int i=0;i<numSteps;i++) {
+////    Matrix4 pnext;  
+////    Matrix4 p0 = p_SE3.back();
+////    Euler_step(&func,0,h,p0,pnext);
+////    //RungeKutta4_step(&func,0,h,p0,pnext);
+////
+////    p_SE3.push_back(pnext);
+////
+////    //State w0 = p.back(); //\in SE(3) current element along path segment
+////    //Matrix4 w0_SE3 = StateToSE3(w0);
+////
+////    //Matrix4 dw_se3 = this->SE3Derivative(u);
+////    //Matrix4 tmp = MatrixExponential(dw_se3*h);
+////    //Matrix4 w1_SE3 = w0_SE3*tmp;
+////    //State w1 = w0;
+////    //SE3ToState(w1, w1_SE3);
+////    //p.push_back(w1);
+////
+////  }
+////  for(int i = 0; i < p_SE3.size(); i++){
+////    State pi;
+////    SE3ToState(pi, p_SE3.at(i));
+////    p.push_back(pi);
+////  }
+////
+////  //exit(0);
+////
+////}
+
+
+
 void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlInput& u,std::vector<State>& p)
 {
   //State x0 lies on local chart represented by R^6. We will convert x0
@@ -113,8 +277,8 @@ void KinodynamicCSpaceSentinelAdaptor::SimulateEndpoint(const State& x0, const C
 ///Typically, just return new GivenPathEdgePlanner(this,p,tolerance)
 EdgePlanner* KinodynamicCSpaceSentinelAdaptor::TrajectoryChecker(const std::vector<State>& p){
   double tolerance = 1e-3;
-  return new GivenPathEdgePlanner(this,p,tolerance);
-  //return new TrueEdgePlanner(this,p.front(),p.back());
+  //return new GivenPathEdgePlanner(this,p,tolerance);
+  return new TrueEdgePlanner(this,p.front(),p.back());
 }
 
 bool KinodynamicCSpaceSentinelAdaptor::IsValidControl(const State& x,const ControlInput& u){
@@ -147,7 +311,7 @@ void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput
   u.resize(x.size());
   u.setZero();
   u(0) = 0;
-  u(1) = 0;//Rand(-ak,ak);
+  u(1) = Rand(-ak,+ak);
   u(2) = Rand(-ak,+ak);
   u(3) = 1;
   u(4) = 0;
@@ -263,6 +427,6 @@ void KinodynamicCSpaceSentinelAdaptor::SE3ToState(State& x, const Matrix4& x_SE3
   x(5)=R[0];
 }
 void KinodynamicCSpaceSentinelAdaptor::Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps){
-  dt = 0.01;
-  numSteps = 10;
+  dt = 0.1;
+  numSteps = 1;
 }

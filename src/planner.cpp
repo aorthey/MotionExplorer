@@ -129,11 +129,32 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   std::cout << std::string(80, '-') << std::endl;
 
   //###########################################################################
-  // Plan Path
+  // Planner Settings
   //###########################################################################
 
+//** Real   collisionEpsilon threshold for edge feasibility checks
+//** Vector  distanceWeights for non-euclidean distance metric
+//** AABB3D  worldBounds base position sampling range for free-floating robots
+//** Real  contactEpsilon convergence threshold for contact solving
+//** int   contactIKMaxIters max iters for contact solving
+//** PropertyMap   properties other properties 
   WorldPlannerSettings settings;
   settings.InitializeDefault(*_world);
+  Vector3 bmin(-3,-3,1);
+  Vector3 bmax(+3,+3,1);
+  //AABB3D worldBounds(bmin,bmax);
+  settings.robotSettings[0].worldBounds = AABB3D(bmin,bmax);
+  Vector weights;weights.resize(7);
+  weights.setZero();
+  weights(0) = 1;
+  weights(1) = 1;
+  weights(2) = 1;
+  weights(3) = 0.2;
+  weights(4) = 0.2;
+  weights(5) = 0.2;
+  //std::cout << weights << std::endl;
+  //settings.robotSettings[0].distanceWeights = weights;
+  //exit(0);
   //settings.robotSettings[0].contactEpsilon = 1e-2;
   //settings.robotSettings[0].contactIKMaxIters = 100;
 
@@ -147,12 +168,20 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   // Dynamic Planning
   //###########################################################################
 
+  //for(int i = 0; i < 10; i++){
+  //  std::cout << "[" << i << "/" << 10 << "] " << std::endl;
+  //  Config x;
+  //  cspace.Sample(x);
+  //  std::cout << x << std::endl;
+  //}
+  //exit(0);
   KinodynamicCSpaceSentinelAdaptor kcspace(&cspace);
-  CSpaceGoalSetEpsilonNeighborhood goalSet(&cspace, _p_goal, 0.1);
+
+  CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, 0.1);
 
   LazyRRTKinodynamicPlanner krrt(&kcspace);
-  krrt.goalSeekProbability=0.9;
-  //LazyRRTKinodynamicPlanner krrt(&kcspace);
+  //RRTKinodynamicPlanner krrt(&kcspace);
+  krrt.goalSeekProbability=0.2;
   krrt.goalSet = &goalSet;
   krrt.Init(_p_init);
 
@@ -162,13 +191,17 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //BidirectionalRRTKP
   //BidirectionalRRTKP krrt(&kcspace);
   //UnidirectionalRRTKP krrt(&kcspace);
+  //
+  PropertyMap pmap;
+  kcspace.Properties(pmap);
+  std::cout << pmap << std::endl;
 
-  bool res = krrt.Plan(1000);
+  bool res = krrt.Plan(1e3);
 
   _stree.clear();
   SerializeTree(krrt.tree, _stree);
   SerializeTreeNeighborhoodPrune(_stree, 0.1);
-  SerializeTreeAddCostToGoal(_stree, &cspace, _p_goal);
+  SerializeTreeAddCostToGoal(_stree, &kcspace, _p_goal);
 
   //SerializeTreeCost(krrt.tree, _stree, &goalSet);
 
