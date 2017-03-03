@@ -163,6 +163,8 @@ void ForceFieldBackend::RenderWorld()
       //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cForce);
 
       if(i==nearestNode){
+        GLColor cNearest(1,1,0);
+        cNearest.setCurrentGL();
         glPointSize(15.0);                                     
         //std::cout << "Nearest Node " << node.position << " d=" <<bestD << std::endl;
       }else{
@@ -337,12 +339,31 @@ void ForceFieldBackend::VisualizePathSweptVolume(const KinodynamicMilestonePath 
     d+=dstep;
     Config qtn;
     path.Eval(d, qtn);
+    std::cout << d << qtn << std::endl;
     if((qt-qtn).norm() >= sweptVolume_q_spacing)
     {
       VisualizePathSweptVolumeAtPosition(qtn);
       qt = qtn;
     }
   }
+  _appearanceStack.clear();
+  _appearanceStack.resize(robot->links.size());
+
+  for(size_t i=0;i<robot->links.size();i++) {
+    GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
+    _appearanceStack[i]=a;
+  }
+  drawPath = true;
+}
+void ForceFieldBackend::VisualizePathSweptVolume(const std::vector<Config> &keyframes)
+{
+  Robot *robot = world->robots[0];
+
+  for(int i = 0; i < keyframes.size(); i++)
+  {
+    VisualizePathSweptVolumeAtPosition(keyframes.at(i));
+  }
+
   _appearanceStack.clear();
   _appearanceStack.resize(robot->links.size());
 

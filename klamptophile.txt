@@ -345,3 +345,5 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] control in kinodynamic planning converges to wrong direction
  [ ] refactor kinodynamic planner to make it independent from path planner
  [ ] refactor draw methods in gui.cpp
+ [ ] refactor planner settings
+ [ ] save kinodynamicmilestonepath to file

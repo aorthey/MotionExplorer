@@ -7,16 +7,16 @@ length = 0.15
 radius = 0.01
 sphere_scale = 2
 headradius = 0.1
-Nsegments = 0
-Nbranches = 0
+Nsegments = 5
+Nbranches = 4
 aperture = 0.4 ## aperture of bouquet of branches
+name = 'sentinel_complete'
 
 sRadius = sphere_scale*radius
 config = ''
-#folder='sentinel/'
 folder=''
-fname = folder+'sentinel.urdf'
-xmlname = folder+'sentinel.xml'
+fname = folder+name+'.urdf'
+xmlname = folder+name+'.xml'
 pathname = os.path.dirname(os.path.realpath(__file__))+'/../data/'
 pathname = os.path.abspath(pathname)+'/'
 fname = pathname + fname
@@ -25,7 +25,7 @@ xmlname = pathname + xmlname
 f = open(fname,'w')
 
 f.write('<?xml version="1.0"?>\n')
-f.write('<robot name="sentinel">\n')
+f.write('<robot name="'+name+'">\n')
 
 def createHead(headname):
   hstrs = createSphere("eye",0,0,0,headradius)
@@ -140,7 +140,7 @@ terrainstr = '  <terrain file=\"/home/aorthey/git/Klampt/data/terrains/plane.tri
 terrainstr += '  translation=\"0 0 0\"/>\n\n'
 f.write(terrainstr)
 
-robotstr  = '  <robot name=\"sentinel\"'
+robotstr  = '  <robot name=\"'+name+'\"'
 robotstr += ' file="'+str(fname)+'"'
 robotstr += ' translation="0 0 0"'
 robotstr += ' rotateRPY="0 0 3.14"'

@@ -329,7 +329,7 @@ void KinodynamicCSpaceSentinelAdaptor::BiasedSampleControl(const State& x,const 
   //std::cout << xGoal << std::endl;
 
   //Node* goal = base->goal.root;
-  int numSamples = 20;
+  int numSamples = 500;
   Real closest=Inf;
 
   //std::cout << "Going from "<< x << std::endl;

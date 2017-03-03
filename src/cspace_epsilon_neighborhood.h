@@ -24,6 +24,23 @@ class CSpaceGoalSetEpsilonNeighborhood: public CSpace
         std::cout << "BEST Distance: " << d << ":" << q << std::endl; 
         std::cout << "               " << _goal << std::endl; 
         bestDist = d;
+
+
+        //RigidTransform Ta,Tb;
+        //ConfigToTransform(q,Ta);
+        //ConfigToTransform(_goal,Tb);
+        //Real d = Ta.t.distance(Tb.t);
+        //Matrix3 Rrel;
+        //Rrel.mulTransposeB(Ta.R,Tb.R);
+        //AngleAxisRotation aa;
+        //aa.setMatrix(Rrel);
+        //double wt = 1;
+        //double wr = 1;
+        //d = Sqrt(d*d*wt + aa.angle*aa.angle*wr);
+        //std::cout << " estimated : " << d << std::endl;
+
+
+
       }
       return (d < epsilon);
     }

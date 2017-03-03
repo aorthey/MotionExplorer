@@ -31,28 +31,29 @@ class MotionPlanner{
     WorldSimulation *_sim;
     Config _p_init;
     Config _p_goal;
-    MultiPath _path;
     bool _isSolved;
     bool _shortcutting;
     double _timelimit;
-    MilestonePath _milestone_path;
-    //KinodynamicTree _tree;
+    KinodynamicMilestonePath _path;
+    std::vector<Config> _keyframes;
     SerializedTree _stree;
 
   public:
 
     explicit MotionPlanner(RobotWorld *world, WorldSimulation *sim);
-    const MultiPath& GetPath();
+    const KinodynamicMilestonePath& GetPath();
+    const std::vector<Config>& GetKeyframes();
     const SerializedTree& GetTree();
     void SerializeTree( const KinodynamicTree& tree, SerializedTree& stree);
     void SerializeTree( const KinodynamicTree::Node* node, SerializedTree &stree);
     void SerializeTreeAddCostToGoal(SerializedTree &stree, CSpace *base, Config &goal);
     //Delete all nodes from the tree with distance < epsilon to another node
-    void SerializeTreeNeighborhoodPrune(SerializedTree &_stree, double epsilon);
+    void SerializeTreeCullClosePoints(SerializedTree &_stree, CSpace *base, double epsilon=0.1);
+    void SerializeTreeRandomlyCullPoints(SerializedTree &_stree, uint N=1000);
 
     bool solve(Config &p_init, Config &p_goal, double timelimit=100.0, bool shortcutting=true);
     void SendCommandStringController(string cmd, string arg);
-    bool SendToController();
+    //bool SendToController();
     void CheckFeasibility(Robot *robot, SingleRobotCSpace &cspace, Config &q);
 
     virtual bool PlanPath();

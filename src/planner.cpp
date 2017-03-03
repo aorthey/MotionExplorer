@@ -9,26 +9,61 @@ MotionPlanner::MotionPlanner(RobotWorld *world, WorldSimulation *sim):
   _irobot = 0;
   _icontroller = 0;
 }
-const MultiPath& MotionPlanner::GetPath()
+const KinodynamicMilestonePath& MotionPlanner::GetPath()
 {
   return _path;
+}
+const std::vector<Config>& MotionPlanner::GetKeyframes()
+{
+  return _keyframes;
 }
 const SerializedTree& MotionPlanner::GetTree()
 {
   return _stree;
 }
 
-void MotionPlanner::SerializeTreeNeighborhoodPrune(SerializedTree &_stree, double epsilon)
+void MotionPlanner::SerializeTreeCullClosePoints(SerializedTree &_stree, CSpace *base, double epsilon)
 {
-  //for(int i = 0; i < _stree.size(); i++){
-  //  for(int j = i+1; j < _stree.size(); j++){
+  uint N_nodes_erased = 0;
+  uint N_nodes_start = _stree.size();
 
-  //  }
-  //}
-//v.erase(std::remove_if(
-//          v.begin(), v.end(),
-//              [](const int& x) { return x > 10; }), 
-//    v.end());
+  uint curiter = 0;
+  uint nextiter = curiter+1;
+  std::cout << "culling points" << std::endl;
+  while(curiter < _stree.size()){
+    std::cout << curiter << "/" << _stree.size() << std::endl;
+    SerializedTreeNode cur = _stree.at(curiter);
+    nextiter = curiter + 1;
+
+    while(nextiter < _stree.size()){
+
+      SerializedTreeNode next = _stree.at(nextiter);
+      double d = base->Distance(cur.position, next.position);
+      if(d<epsilon){
+        //std::vector<Vector3> dirs = next.directions;
+        //cur.directions.insert( cur.directions.end(), dirs.begin(), dirs.end() );
+        _stree.erase(_stree.begin()+nextiter);
+        //std::cout << "erasing node" << nextiter  << " (too close to node "<<curiter <<")"<< std::endl;
+        nextiter --; N_nodes_erased++;
+      }
+      nextiter++;
+    }
+    curiter++;
+  }
+  std::cout << "Erased " << N_nodes_erased << "/" << N_nodes_start << std::endl;
+}
+//delete all node except N randomly choosen ones
+void MotionPlanner::SerializeTreeRandomlyCullPoints(SerializedTree &_stree, uint N)
+{
+  uint Nall = _stree.size();
+  SerializedTree snew;
+  for(int i = 0; i < N; i++){
+    uint Ni = RandInt(Nall);
+    SerializedTreeNode si = _stree.at(Ni);
+    snew.push_back(si);
+  }
+  _stree.clear();
+  _stree=snew;
 }
 
 
@@ -40,7 +75,7 @@ void MotionPlanner::SerializeTreeAddCostToGoal(SerializedTree &stree, CSpace *ba
     for(int j = 0; j < 6; j++){
       worldgoal(j) = goal(j);
     }
-    stree.at(i).cost_to_goal = base->Distance(stree.at(i).position, goal);
+    stree.at(i).cost_to_goal = base->Distance(stree.at(i).position, worldgoal);
   }
 }
 void MotionPlanner::SerializeTree( const KinodynamicTree::Node* node, SerializedTree &stree){
@@ -140,8 +175,11 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
 //** PropertyMap   properties other properties 
   WorldPlannerSettings settings;
   settings.InitializeDefault(*_world);
-  Vector3 bmin(-3,-3,1);
-  Vector3 bmax(+3,+3,1);
+  //sentinel
+  //Vector3 bmin(-4,-4,-0);
+  //Vector3 bmax(+4,+4,+4);
+  Vector3 bmin(-4,-4,1);
+  Vector3 bmax(+4,+4,3);
   //AABB3D worldBounds(bmin,bmax);
   settings.robotSettings[0].worldBounds = AABB3D(bmin,bmax);
   Vector weights;weights.resize(7);
@@ -177,11 +215,11 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //exit(0);
   KinodynamicCSpaceSentinelAdaptor kcspace(&cspace);
 
-  CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, 0.1);
+  CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, 0.5);
 
-  LazyRRTKinodynamicPlanner krrt(&kcspace);
+  RRTKinodynamicPlanner krrt(&kcspace);
   //RRTKinodynamicPlanner krrt(&kcspace);
-  krrt.goalSeekProbability=0.2;
+  krrt.goalSeekProbability=0.1;
   krrt.goalSet = &goalSet;
   krrt.Init(_p_init);
 
@@ -196,12 +234,13 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   kcspace.Properties(pmap);
   std::cout << pmap << std::endl;
 
-  bool res = krrt.Plan(1e8);
+  bool res = krrt.Plan(1e4);
 
   _stree.clear();
   SerializeTree(krrt.tree, _stree);
-  SerializeTreeNeighborhoodPrune(_stree, 0.1);
   SerializeTreeAddCostToGoal(_stree, &kcspace, _p_goal);
+  //SerializeTreeCullClosePoints(_stree, &kcspace,0.3);
+  SerializeTreeRandomlyCullPoints(_stree, 2000);
 
   //SerializeTreeCost(krrt.tree, _stree, &goalSet);
 
@@ -210,26 +249,29 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
     KinodynamicMilestonePath path;
     krrt.CreatePath(path);
 
-    double dstep = 0.01;
+
     Config cur;
+    double dstep = 0.01;
     vector<Config> keyframes;
     for(double d = 0; d <= 1; d+=dstep)
     {
       path.Eval(d,cur);
       std::cout << d << cur << std::endl;
-      keyframes.push_back(cur);
+      _keyframes.push_back(cur);
     }
-    _path.SetMilestones(keyframes);
+    std::cout << std::string(80, '-') << std::endl;
+    //std::cout << std::string(80, '-') << std::endl;
+    //_path.SetMilestones(keyframes);
     //std::cout << "time optimizing" << std::endl;
     //double xtol=0.01;
     //double ttol=0.01;
     //bool res=GenerateAndTimeOptimizeMultiPath(*robot,_path,xtol,ttol);
 
 
-    std::string date = util::GetCurrentTimeString();
-    string out = "../data/paths/path_"+date+".xml";
-    _path.Save(out);
-    std::cout << "saved path to "<<out << std::endl;
+    //std::string date = util::GetCurrentTimeString();
+    //string out = "../data/paths/path_"+date+".xml";
+    //path.Save(out);
+    //std::cout << "saved path to "<<out << std::endl;
 
   }
   return res;
@@ -306,28 +348,28 @@ void MotionPlanner::SendCommandStringController(string cmd, string arg)
     throw "Controller command not supported!";
   }
 }
-bool MotionPlanner::SendToController()
-{
-  if(!_isSolved){ return false; }
+// bool MotionPlanner::SendToController()
+// {
+//   if(!_isSolved){ return false; }
 
-  double dstep = 0.1;
-  Config q;
-  Config dq;
+//   double dstep = 0.1;
+//   Config q;
+//   Config dq;
 
-  for(double d = 0; d <= 1; d+=dstep)
-  {
-    _path.Evaluate(d, q, dq);
-    stringstream qstr;
-    qstr<<q<<dq;
-    string cmd( (d<=0)?("set_qv"):("append_qv") );
-    SendCommandStringController(cmd,qstr.str());
-  }
+//   for(double d = 0; d <= 1; d+=dstep)
+//   {
+//     _path.Evaluate(d, q, dq);
+//     stringstream qstr;
+//     qstr<<q<<dq;
+//     string cmd( (d<=0)?("set_qv"):("append_qv") );
+//     SendCommandStringController(cmd,qstr.str());
+//   }
 
-  std::cout << "Sending Path to Controller" << std::endl;
-  Robot *robot = _world->robots[_irobot];
-  util::SetSimulatedRobot(robot,*_sim,_p_init);
-  robot->UpdateConfig(_p_goal);
-  std::cout << "Done Path to Controller" << std::endl;
-  return true;
-}
+//   std::cout << "Sending Path to Controller" << std::endl;
+//   Robot *robot = _world->robots[_irobot];
+//   util::SetSimulatedRobot(robot,*_sim,_p_init);
+//   robot->UpdateConfig(_p_goal);
+//   std::cout << "Done Path to Controller" << std::endl;
+//   return true;
+// }
 

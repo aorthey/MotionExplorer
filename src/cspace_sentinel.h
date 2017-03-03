@@ -3,6 +3,7 @@
 #include <KrisLibrary/math3d/primitives.h>
 #include <KrisLibrary/math3d/rotation.h>
 #include <KrisLibrary/math/diffeq.h>
+#include <Planning/RobotCSpace.h>
 #include <vector>
 
 using namespace Math3D;
@@ -65,10 +66,23 @@ class KinodynamicCSpaceSentinelAdaptor: public KinematicCSpaceAdaptor
     }
 
     virtual Real Distance(const Config& x, const Config& y) { 
-      Config xpos;xpos.resize(3);xpos(0)=x(0);xpos(1)=x(1);xpos(2)=x(2);
-      Config ypos;ypos.resize(3);ypos(0)=y(0);ypos(1)=y(1);ypos(2)=y(2);
-      return base->Distance(xpos,ypos); 
       //return base->Distance(x,y); 
+      //Config xpos;xpos.resize(3);xpos(0)=x(0);xpos(1)=x(1);xpos(2)=x(2);
+      //Config ypos;ypos.resize(3);ypos(0)=y(0);ypos(1)=y(1);ypos(2)=y(2);
+      //return base->Distance(xpos,ypos); 
+      RigidTransform Ta,Tb;
+      ConfigToTransform(x,Ta);
+      ConfigToTransform(y,Tb);
+      Real d = Ta.t.distance(Tb.t);
+      Matrix3 Rrel;
+      Rrel.mulTransposeB(Ta.R,Tb.R);
+      AngleAxisRotation aa;
+      aa.setMatrix(Rrel);
+      double wt = 1;
+      double wr = 0.25;
+      d = Sqrt(d*d*wt + aa.angle*aa.angle*wr);
+      //std::cout << " estimated : " << d << std::endl;
+      return d;
     }
 
     //virtual void SampleNeighborhood(const Config& c,Real r,Config& x) { base->SampleNeighborhood(c,r,x); }

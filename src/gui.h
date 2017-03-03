@@ -46,6 +46,7 @@ class ForceFieldBackend : public SimTestBackend
   void VisualizePathSweptVolumeAtPosition(const Config &q);
   void VisualizePathSweptVolume(const MultiPath &path);
   void VisualizePathSweptVolume(const KinodynamicMilestonePath &path);
+  void VisualizePathSweptVolume(const std::vector<Config> &keyframes);
   void VisualizePlannerTree(const SerializedTree &tree);
   void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
   virtual void RenderWorld();
