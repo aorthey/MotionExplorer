@@ -169,6 +169,44 @@ KinodynamicCSpaceSentinelAdaptor::KinodynamicCSpaceSentinelAdaptor(CSpace *_base
 ////
 ////}
 
+void KinodynamicCSpaceSentinelAdaptor::Euler_step(std::vector<Matrix4>& p, const Matrix4& dp0, double h)
+{  
+  Matrix4 p0 = p.back();
+  Matrix4 pnext = ForwardSimulate(p0,dp0,h);
+  p.push_back(pnext);
+}
+Matrix4 KinodynamicCSpaceSentinelAdaptor::ForwardSimulate(const Matrix4& p0, const Matrix4& dp0, double h)
+{
+  Matrix4 tmp = MatrixExponential(dp0*h);
+  Matrix4 pnext = p0*tmp;
+  return pnext;
+}
+void KinodynamicCSpaceSentinelAdaptor::RungeKutta4_step(std::vector<Matrix4>& p, const Matrix4& dp0, double h)
+{  
+  throw("NYI");
+  Matrix4 p0 = p.back();
+  //Matrix4 pnext = ForwardSimulate(p0,dp0,h);
+  //p.push_back(pnext);
+  Matrix4 k1,k2,k3,k4;
+  k1 = ForwardSimulate(p0, dp0,           0);
+  k2 = ForwardSimulate(p0, dp0+k1*h/2.0,  h/2.0);
+  k3 = ForwardSimulate(p0, dp0+k2*h/2.0,  h/2.0);
+  k4 = ForwardSimulate(p0, dp0+k3*h,      h);
+
+  Matrix4 m = (k1+k2*2+k3*2+k4)/6.0;
+
+  Matrix4 pnext = ForwardSimulate(p0, m, h);
+  p.push_back(pnext);
+}
+//Real RungeKutta4_step(RealFunction2* f, Real t0, Real h, Real w)
+//{
+//  Real k1,k2,k3,k4;
+//  k1 = h*(*f)(t0,w);
+//  k2 = h*(*f)(t0+h*Half, w+k1*Half);
+//  k3 = h*(*f)(t0+h*Half, w+k2*Half);
+//  k4 = h*(*f)(t0+h, w+k3);
+//  return w + (k1 + Two*k2 + Two*k3 + k4)/6.0;
+//}
 
 
 void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlInput& u,std::vector<State>& p)
@@ -184,9 +222,52 @@ void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlIn
   // numsteps is the number intermediate steps
   // h = dt/numsteps is the intermediate timestep size
 
-  Real dt;
-  int numSteps;
-  Parameters(x0,u,dt,numSteps);
+  std::cout << std::setprecision(2) << std::fixed;
+  Real dt = u(6);
+  int numSteps = 10;
+  Real h = dt/numSteps;
+
+  Matrix4 x0_SE3 = StateToSE3(x0);
+  Matrix4 dp0 = this->SE3Derivative(u);
+
+  std::vector<Matrix4> p_SE3;
+  p_SE3.push_back(x0_SE3);
+
+  for(int i=0;i<numSteps;i++) {
+    Euler_step(p_SE3, dp0, h);
+    //RungeKutta4_step(p_SE3, dp0, h);
+  }
+
+
+  for(int i = 0; i < p_SE3.size(); i++){
+    State pi = x0;
+    SE3ToState(pi, p_SE3.at(i));
+    p.push_back(pi);
+  }
+
+  //exit(0);
+
+}
+
+
+
+/*
+void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlInput& u,std::vector<State>& p)
+{
+  //State x0 lies on local chart represented by R^6. We will convert x0
+  //to a R^4x4 matrix representing the same SE(3) element. Using the matrix
+  //representation allows easier computation of the forward dynamics. Once we
+  //are done, we reconvert the matrix representation to an element in vector
+  //representation in R^6 on the local chart.
+  //
+  // p is the path segment containing (numsteps) states along the forward simulation
+  // dt is the total timestep size
+  // numsteps is the number intermediate steps
+  // h = dt/numsteps is the intermediate timestep size
+
+  Real dt = u(6);
+  int numSteps = 1;
+  //Parameters(x0,u,dt,numSteps);
 
   Real h = dt/numSteps;
   p.push_back(x0);
@@ -218,31 +299,36 @@ void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlIn
   //exit(0);
 
 }
+//*/
+
+
+
 bool KinodynamicCSpaceSentinelAdaptor::ReverseSimulate(const State& x1, const ControlInput& u,std::vector<State>& p)
 {
-  Real dt;
-  int numSteps;
-  Parameters(x1,u,dt,numSteps);
-
-  Real h = -dt/numSteps;
-
-  p.push_back(x1);
-  for(int i=0;i<numSteps;i++) {
-
-    State w1 = p.back(); //\in SE(3) current element along path segment
-
-    Matrix4 w1_SE3 = StateToSE3(w1);
-    Matrix4 dw_se3 = this->SE3Derivative(u);
-    Matrix4 w0_SE3 = MatrixExponential(dw_se3*h)*w1_SE3;
-    State w0 = w1;
-    SE3ToState(w0, w0_SE3);
-    p.push_back(w0);
-    //std::cout << "STATE:" << w1 << std::endl;
-  }
-  //reverse the vector?
-  //std::reverse(p.begin(),p.end());
   throw("NYI");
-
+//  Real dt;
+//  int numSteps;
+//  Parameters(x1,u,dt,numSteps);
+//
+//  Real h = -dt/numSteps;
+//
+//  p.push_back(x1);
+//  for(int i=0;i<numSteps;i++) {
+//
+//    State w1 = p.back(); //\in SE(3) current element along path segment
+//
+//    Matrix4 w1_SE3 = StateToSE3(w1);
+//    Matrix4 dw_se3 = this->SE3Derivative(u);
+//    Matrix4 w0_SE3 = MatrixExponential(dw_se3*h)*w1_SE3;
+//    State w0 = w1;
+//    SE3ToState(w0, w0_SE3);
+//    p.push_back(w0);
+//    //std::cout << "STATE:" << w1 << std::endl;
+//  }
+//  //reverse the vector?
+//  //std::reverse(p.begin(),p.end());
+//  throw("NYI");
+//
   return true;
 
 }
@@ -305,18 +391,6 @@ bool KinodynamicCSpaceSentinelAdaptor::IsValidControl(const State& x,const Contr
 
 }
 
-///Randomly pick a control input
-void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput& u){
-  double ak = 1;
-  u.resize(x.size());
-  u.setZero();
-  u(0) = 0;
-  u(1) = Rand(-ak,+ak);
-  u(2) = Rand(-ak,+ak);
-  u(3) = 1;
-  u(4) = 0;
-  u(5) = 0;
-}
 //bool KinodynamicCSpaceSentinelAdaptor::ConnectionControl(const State& x,const State& xGoal,ControlInput& u)
 //{
 //  std::cout << "ERROR NYI" << std::endl;
@@ -329,7 +403,7 @@ void KinodynamicCSpaceSentinelAdaptor::BiasedSampleControl(const State& x,const 
   //std::cout << xGoal << std::endl;
 
   //Node* goal = base->goal.root;
-  int numSamples = 500;
+  int numSamples = 100;
   Real closest=Inf;
 
   //std::cout << "Going from "<< x << std::endl;
@@ -426,7 +500,43 @@ void KinodynamicCSpaceSentinelAdaptor::SE3ToState(State& x, const Matrix4& x_SE3
   x(4)=R[1];
   x(5)=R[0];
 }
+Real KinodynamicCSpaceSentinelAdaptor::Distance(const Config& x, const Config& y) { 
+  //return base->Distance(x,y); 
+ // Config xpos;xpos.resize(3);xpos(0)=x(0);xpos(1)=x(1);xpos(2)=x(2);
+ // Config ypos;ypos.resize(3);ypos(0)=y(0);ypos(1)=y(1);ypos(2)=y(2);
+ // return base->Distance(xpos,ypos); 
+
+
+  RigidTransform Ta,Tb;
+  ConfigToTransform(x,Ta);
+  ConfigToTransform(y,Tb);
+  Real d = Ta.t.distance(Tb.t);
+  Matrix3 Rrel;
+  Rrel.mulTransposeB(Ta.R,Tb.R);
+  AngleAxisRotation aa;
+  aa.setMatrix(Rrel);
+  double wt = 1;
+  double wr = 0.01;
+  d = Sqrt(d*d*wt + aa.angle*aa.angle*wr);
+  //std::cout << " estimated : " << d << std::endl;
+  return d;
+}
+///Randomly pick a control input
+void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput& u){
+  double ak = 1;
+  u.resize(x.size()+1);
+  u.setZero();
+  u(0) = 0;
+  u(1) = Rand(-ak,+ak);
+  u(2) = Rand(-ak,+ak);
+  u(3) = 1;
+  u(4) = 0;
+  u(5) = 0;
+  //T
+  u(6) = Rand(0.01,0.5);
+}
 void KinodynamicCSpaceSentinelAdaptor::Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps){
+  //dt = Rand(0.01,0.1);
   dt = 0.1;
   numSteps = 1;
 }

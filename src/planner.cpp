@@ -70,12 +70,13 @@ void MotionPlanner::SerializeTreeRandomlyCullPoints(SerializedTree &_stree, uint
 void MotionPlanner::SerializeTreeAddCostToGoal(SerializedTree &stree, CSpace *base, Config &goal)
 {
   for(uint i = 0; i < stree.size(); i++){
-    Config worldgoal;
-    worldgoal.resize(6);
-    for(int j = 0; j < 6; j++){
-      worldgoal(j) = goal(j);
-    }
-    stree.at(i).cost_to_goal = base->Distance(stree.at(i).position, worldgoal);
+    //Config worldgoal;
+    //worldgoal.resize(6);
+    //for(int j = 0; j < 6; j++){
+    //  worldgoal(j) = goal(j);
+    //}
+    //stree.at(i).cost_to_goal = base->Distance(stree.at(i).position, worldgoal);
+    stree.at(i).cost_to_goal = base->Distance(stree.at(i).config, goal);
   }
 }
 void MotionPlanner::SerializeTree( const KinodynamicTree::Node* node, SerializedTree &stree){
@@ -88,6 +89,7 @@ void MotionPlanner::SerializeTree( const KinodynamicTree::Node* node, Serialized
     position(i) = s(i);
   }
   snode.position = position;
+  snode.config = s;
 
   std::vector<Vector3> directions;
 
@@ -173,15 +175,15 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
 //** Real  contactEpsilon convergence threshold for contact solving
 //** int   contactIKMaxIters max iters for contact solving
 //** PropertyMap   properties other properties 
-  WorldPlannerSettings settings;
-  settings.InitializeDefault(*_world);
+  WorldPlannerSettings worldsettings;
+  worldsettings.InitializeDefault(*_world);
   //sentinel
   //Vector3 bmin(-4,-4,-0);
   //Vector3 bmax(+4,+4,+4);
-  Vector3 bmin(-4,-4,1);
-  Vector3 bmax(+4,+4,3);
+  //Vector3 bmin(-4,-4,1);
+  //Vector3 bmax(+4,+4,3);
   //AABB3D worldBounds(bmin,bmax);
-  settings.robotSettings[0].worldBounds = AABB3D(bmin,bmax);
+  //worldsettings.robotSettings[0].worldBounds = AABB3D(plannersettings.worldboundsMin,plannersettings.worldboundsMax);
   Vector weights;weights.resize(7);
   weights.setZero();
   weights(0) = 1;
@@ -196,7 +198,7 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //settings.robotSettings[0].contactEpsilon = 1e-2;
   //settings.robotSettings[0].contactIKMaxIters = 100;
 
-  SingleRobotCSpace cspace = SingleRobotCSpace(*_world,_irobot,&settings);
+  SingleRobotCSpace cspace = SingleRobotCSpace(*_world,_irobot,&worldsettings);
 
   //Check Kinematic Feasibility at init/goal positions
   CheckFeasibility( robot, cspace, _p_init);
@@ -206,20 +208,13 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   // Dynamic Planning
   //###########################################################################
 
-  //for(int i = 0; i < 10; i++){
-  //  std::cout << "[" << i << "/" << 10 << "] " << std::endl;
-  //  Config x;
-  //  cspace.Sample(x);
-  //  std::cout << x << std::endl;
-  //}
-  //exit(0);
   KinodynamicCSpaceSentinelAdaptor kcspace(&cspace);
 
-  CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, 0.5);
+  CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, plannersettings.goalRegionConvergence);
 
   RRTKinodynamicPlanner krrt(&kcspace);
   //RRTKinodynamicPlanner krrt(&kcspace);
-  krrt.goalSeekProbability=0.1;
+  krrt.goalSeekProbability= plannersettings.goalSeekProbability;
   krrt.goalSet = &goalSet;
   krrt.Init(_p_init);
 
@@ -234,24 +229,26 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   kcspace.Properties(pmap);
   std::cout << pmap << std::endl;
 
-  bool res = krrt.Plan(1e4);
+  //bool res = krrt.Plan(1e4);
+  bool res = krrt.Plan(plannersettings.iterations);
 
   _stree.clear();
   SerializeTree(krrt.tree, _stree);
   SerializeTreeAddCostToGoal(_stree, &kcspace, _p_goal);
   //SerializeTreeCullClosePoints(_stree, &kcspace,0.3);
-  SerializeTreeRandomlyCullPoints(_stree, 2000);
+  SerializeTreeRandomlyCullPoints(_stree, plannersettings.maxDisplayedPointsInTree);
 
   //SerializeTreeCost(krrt.tree, _stree, &goalSet);
 
   if(res)
   {
+    std::cout << "Found solution path" << std::endl;
     KinodynamicMilestonePath path;
     krrt.CreatePath(path);
 
 
     Config cur;
-    double dstep = 0.01;
+    double dstep = plannersettings.discretizationOutputPath;
     vector<Config> keyframes;
     for(double d = 0; d <= 1; d+=dstep)
     {
@@ -273,6 +270,8 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
     //path.Save(out);
     //std::cout << "saved path to "<<out << std::endl;
 
+  }else{
+    std::cout << "[Motion Planner] No path found." << std::endl;
   }
   return res;
 

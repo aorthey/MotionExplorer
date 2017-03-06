@@ -55,7 +55,6 @@ int main(int argc,const char** argv) {
   //p_goal[1]=-2.5;
   //p_goal[2]=3.5;
 
-
   p_init[0]=-2;
   p_init[1]=0;
   p_init[2]=1;
@@ -93,6 +92,8 @@ int main(int argc,const char** argv) {
   ////############################################################################
 
   std::cout << "Planning Time T=" << duration << std::endl;
+
+
   std::cout << "start GUI" << std::endl;
   GLUISimTestGUI gui(&backend,&world);
   gui.SetWindowTitle("SweptVolumePath");

@@ -65,25 +65,7 @@ class KinodynamicCSpaceSentinelAdaptor: public KinematicCSpaceAdaptor
       //std::cout << "RANDOM SAMPLE" << x << std::endl;
     }
 
-    virtual Real Distance(const Config& x, const Config& y) { 
-      //return base->Distance(x,y); 
-      //Config xpos;xpos.resize(3);xpos(0)=x(0);xpos(1)=x(1);xpos(2)=x(2);
-      //Config ypos;ypos.resize(3);ypos(0)=y(0);ypos(1)=y(1);ypos(2)=y(2);
-      //return base->Distance(xpos,ypos); 
-      RigidTransform Ta,Tb;
-      ConfigToTransform(x,Ta);
-      ConfigToTransform(y,Tb);
-      Real d = Ta.t.distance(Tb.t);
-      Matrix3 Rrel;
-      Rrel.mulTransposeB(Ta.R,Tb.R);
-      AngleAxisRotation aa;
-      aa.setMatrix(Rrel);
-      double wt = 1;
-      double wr = 0.25;
-      d = Sqrt(d*d*wt + aa.angle*aa.angle*wr);
-      //std::cout << " estimated : " << d << std::endl;
-      return d;
-    }
+    virtual Real Distance(const Config& x, const Config& y);
 
     //virtual void SampleNeighborhood(const Config& c,Real r,Config& x) { base->SampleNeighborhood(c,r,x); }
     //virtual EdgePlanner* LocalPlanner(const Config& a,const Config& b) { return base->LocalPlanner(a,b); }
@@ -108,6 +90,10 @@ class KinodynamicCSpaceSentinelAdaptor: public KinematicCSpaceAdaptor
     Matrix4 StateToSE3(const State& x);
     void SE3ToState(State& x, const Matrix4& x_SE3);
     Matrix4 MatrixExponential(const Matrix4& x);
+    Matrix4 ForwardSimulate(const Matrix4& p0, const Matrix4& dp0, double h);
+    void Euler_step(std::vector<Matrix4>& p, const Matrix4& dp0, double h);
+    void RungeKutta4_step(std::vector<Matrix4>& p, const Matrix4& dp0, double h);
+
 
     virtual bool ReverseSimulate(const State& x1, const ControlInput& u,std::vector<State>& p);
 

@@ -11,20 +11,29 @@
 
 #include <vector>
 
-//typedef std::vector< SerializedTreeNode > SerializedTree;
-
 struct SerializedTreeNode{
   Vector position; //\in R^6 local chart on SE(3)
+  Vector config;
   std::vector<Vector3> directions;
   double cost_to_goal;
 };
 
-//typedef std::pair<Vector, std::vector<Vector> > SerializedTreeNode;
 typedef std::vector< SerializedTreeNode > SerializedTree;
+
+struct PlannerSettings{
+  const uint iterations = 1e2;
+  const double goalSeekProbability = 0.1;
+  const double goalRegionConvergence = 0.1;
+  const uint maxDisplayedPointsInTree = 2000;
+  const double discretizationOutputPath = 0.01;
+  const Vector3 worldboundsMin = Vector3(-4,-4,1);
+  const Vector3 worldboundsMax = Vector3(+4,+4,3);
+};
 
 class MotionPlanner{
 
   private:
+    PlannerSettings plannersettings;
     RobotWorld *_world;
     int _irobot;
     int _icontroller;
