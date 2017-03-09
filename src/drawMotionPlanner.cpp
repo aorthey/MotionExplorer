@@ -93,5 +93,44 @@ namespace GLDraw{
       }
     }
   }
+  void drawPlannerStartGoal(Robot *robot, const Config &p_init, const Config &p_goal)
+  {
+    if(!p_init.empty() && !p_goal.empty()){
+      GLColor colorOriginal;
+      GLColor colorInit(0,1,0);
+      GLColor colorGoal(1,0,0);
+      double scale = 1.01;
+
+      //GLDraw::GeometryAppearance& a = *robot->geomManagers[0].Appearance();
+      //a.GetColor(colorOriginal);
+
+      robot->UpdateConfig(p_init);
+      for(uint j=0;j<robot->links.size();j++) {
+        if(robot->IsGeometryEmpty(j)) continue;
+        Matrix4 mat = robot->links[j].T_World;
+        glPushMatrix();
+        glMultMatrix(mat);
+        glScalef(scale, scale, scale);
+        GLDraw::GeometryAppearance& a = *robot->geomManagers[j].Appearance();
+        a.SetColor(colorInit);
+        a.DrawGL();
+        glPopMatrix();
+      }
+      
+      robot->UpdateConfig(p_goal);
+      for(uint j=0;j<robot->links.size();j++) {
+        if(robot->IsGeometryEmpty(j)) continue;
+        Matrix4 mat = robot->links[j].T_World;
+        glPushMatrix();
+        glMultMatrix(mat);
+        glScalef(scale, scale, scale);
+        GLDraw::GeometryAppearance& a = *robot->geomManagers[j].Appearance();
+        a.SetColor(colorGoal);
+        a.DrawGL();
+        a.SetColor(colorOriginal);
+        glPopMatrix();
+      }
+    }
+  }
 };
 
