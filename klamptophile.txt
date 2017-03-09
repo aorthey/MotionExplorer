@@ -377,4 +377,4 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] enable the ompl kinodynamic planners
  [ ] make the controller work without gravity on SE(3)
  [ ] save motion planner class plus tree and path
- [ ] krrt: no forward simulation towards goal
+ [x] krrt: no forward simulation towards goal (was wrong init rot)

@@ -147,6 +147,9 @@ std::string MotionPlanner::getName(){
 
 void MotionPlanner::CheckFeasibility( Robot *robot, SingleRobotCSpace &cspace, Config &q){
   if(!cspace.IsFeasible(q)) {
+    std::cout << std::string(80, '*') << std::endl;
+    std::cout << "ERROR!" << std::endl;
+    std::cout << std::string(80, '*') << std::endl;
     cout<<"configuration is infeasible, violated constraints:"<<endl;
     std::cout << q << std::endl;
     vector<bool> infeasible;
@@ -161,7 +164,21 @@ void MotionPlanner::CheckFeasibility( Robot *robot, SingleRobotCSpace &cspace, C
       }
     }
     std::cout << cspace.collisionQueries.size() << std::endl;
+    std::cout << std::string(80, '*') << std::endl;
     exit(0);
+  }
+  //check that rotations are in [0,2pi]
+  for(int i = 3; i < 6; i++){
+    if(q(i)<0 || q(i)>2*M_PI){
+      std::cout << std::string(80, '*') << std::endl;
+      std::cout << "ERROR!" << std::endl;
+      std::cout << std::string(80, '*') << std::endl;
+      std::cout << "Rotation invalid for configuration" << std::endl;
+      std::cout << q << std::endl;
+      std::cout << "entry "<<i<< " " << q(i) << " outside of [0,2*pi]" << std::endl;
+      std::cout << std::string(80, '*') << std::endl;
+      exit(0);
+    }
   }
 }
 
@@ -270,7 +287,6 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
     KinodynamicMilestonePath path;
     krrt.CreatePath(path);
 
-
     Config cur;
     double dstep = plannersettings.discretizationOutputPath;
     vector<Config> keyframes;
@@ -281,6 +297,7 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
       _keyframes.push_back(cur);
     }
     std::cout << std::string(80, '-') << std::endl;
+
     //std::cout << std::string(80, '-') << std::endl;
     //_path.SetMilestones(keyframes);
     //std::cout << "time optimizing" << std::endl;

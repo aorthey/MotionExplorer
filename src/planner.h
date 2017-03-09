@@ -31,7 +31,7 @@ struct SerializedTreeNode{
 typedef std::vector< SerializedTreeNode > SerializedTree;
 
 struct PlannerSettings{
-  const uint iterations = 1e2;
+  const uint iterations = 1e1;
   const double goalSeekProbability = 1;
   const double goalRegionConvergence = 0.1;
   const uint maxDisplayedPointsInTree = 2000;

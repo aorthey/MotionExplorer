@@ -14,9 +14,9 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawForceField = 0;
   drawRobotExtras = 1;
   drawIKextras = 0;
-  drawPath = 0;
+  drawPath = 1;
   drawPlannerTree = 1;
-  drawPlannerStartGoal = 0;
+  drawPlannerStartGoal = 1;
 
   drawAxes = 1;
   drawAxesLabels = 0;
@@ -120,17 +120,10 @@ void ForceFieldBackend::RenderWorld()
 
   if(drawAxes) drawCoordWidget(1);
 
-  //glRasterPos2i(100, 120);
-  //glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
-  //glPushMatrix();
-  //glTranslatef(1,0,0);
-  ////glutStrokeString(GLUT_STROKE_ROMAN, (unsigned char*)"some text");
-  //glutStrokeString(GLUT_STROKE_ROMAN, (unsigned char*) "Xl");
-  //glPopMatrix();
-
   if(drawAxesLabels)
   {
-    //TODO: does not support scale
+    //TODO: (1) does not support scale, (2) does not exactly cooincide with
+    //coordwidget, wtf?
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho((double)viewport.x, (double)viewport.y,
@@ -352,6 +345,7 @@ bool GLUIForceFieldGUI::Initialize()
 
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Swept Volume");
   AddControl(checkbox,"draw_path");
+  checkbox->set_int_val(1);
 
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Start Goal Config");
   AddControl(checkbox,"draw_path_start_goal");

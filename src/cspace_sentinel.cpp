@@ -411,30 +411,6 @@ bool KinodynamicCSpaceSentinelAdaptor::IsValidControl(const State& x,const Contr
 //}
 
 
-void KinodynamicCSpaceSentinelAdaptor::BiasedSampleControl(const State& x,const State& xGoal,ControlInput& u){
-  //SampleControl(x,u);
-  //std::cout << xGoal << std::endl;
-
-  //Node* goal = base->goal.root;
-  int numSamples = 100;
-  Real closest=Inf;
-
-  //std::cout << "Going from "<< x << std::endl;
-  //std::cout << "to "<< xGoal << std::endl;
-  for(int i=0;i<numSamples;i++) {
-    State x2;
-    ControlInput temp;
-    SampleControl(x,temp);
-    SimulateEndpoint(x,temp,x2);
-    Real dist = base->Distance(x2,xGoal);
-    if(dist < closest) {
-      closest = dist;
-      u = temp;
-    }
-  }
-  //std::cout << "best control "<< u << std::endl;
-  //exit(0);
-}
 void KinodynamicCSpaceSentinelAdaptor::BiasedSampleReverseControl(const State& x1,const State& xDest,ControlInput& u){
   BiasedSampleControl(x1,xDest,u);
   //BiasedSampleControl(xDest,x1,u);
@@ -534,6 +510,11 @@ Real KinodynamicCSpaceSentinelAdaptor::Distance(const Config& x, const Config& y
   //std::cout << " estimated : " << d << std::endl;
   return d;
 }
+void KinodynamicCSpaceSentinelAdaptor::Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps){
+  //dt = Rand(0.01,0.1);
+  dt = 0.1;
+  numSteps = 1;
+}
 ///Randomly pick a control input
 void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput& u){
   double ak = 1;
@@ -547,10 +528,29 @@ void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput
   u(5) = 0;
   //T
   //u(6) = Rand(0.01,0.2);
-  u(6) = Rand(0.2,0.8);
+  u(6) = Rand(0.01,0.2);
 }
-void KinodynamicCSpaceSentinelAdaptor::Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps){
-  //dt = Rand(0.01,0.1);
-  dt = 0.1;
-  numSteps = 1;
+void KinodynamicCSpaceSentinelAdaptor::BiasedSampleControl(const State& x,const State& xGoal,ControlInput& u){
+  //SampleControl(x,u);
+  //std::cout << xGoal << std::endl;
+
+  //Node* goal = base->goal.root;
+  int numSamples = 1e3;
+  Real closest=Inf;
+
+  //std::cout << "Going from "<< x << std::endl;
+  //std::cout << "to "<< xGoal << std::endl;
+  for(int i=0;i<numSamples;i++) {
+    State x2;
+    ControlInput temp;
+    SampleControl(x,temp);
+    SimulateEndpoint(x,temp,x2);
+    Real dist = base->Distance(x2,xGoal);
+    if(dist < closest) {
+      closest = dist;
+      u = temp;
+    }
+  }
+  //std::cout << "best control "<< u << std::endl;
+  //exit(0);
 }
