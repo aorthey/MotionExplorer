@@ -3,6 +3,8 @@
 #include <ctime>
 #include <iostream>
 #include <iomanip>
+#include <Simulation/ODERobot.h>
+#include <Simulation/WorldSimulation.h>
 
 namespace util {
   inline void SetSimulatedRobot( Robot *robot, WorldSimulation &sim, Config &q)

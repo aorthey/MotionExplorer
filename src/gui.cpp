@@ -11,18 +11,27 @@ GLColor sweptvolumeColor(0.7,0.0,0.9,0.5);
 ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
     : SimTestBackend(world)
 {
-  drawForceField = false;
-  drawRobotExtras = true;
-  drawIKextras = false;
-  drawAxesLabels = false;
-  drawPath = false;
-  drawPlannerTree = false;
-  drawPlannerStartGoal = false;
+  drawForceField = 0;
+  drawRobotExtras = 1;
+  drawIKextras = 0;
+  drawAxesLabels = 0;
+  drawPath = 0;
+  drawPlannerTree = 1;
+  drawPlannerStartGoal = 0;
+
+  MapButtonToggle("draw_planner_tree",&drawPlannerTree);
+  MapButtonToggle("draw_path",&drawPath);
+  MapButtonToggle("draw_path_start_goal",&drawPlannerStartGoal);
+
+
   _mats.clear();
 }
+
+
 void ForceFieldBackend::Start()
 {
   BaseT::Start();
+
 
   //disable higher drawing functions
   //drawBBs,drawPoser,drawDesired,drawEstimated,drawContacts,drawWrenches,drawExpanded,drawTime,doLogging
@@ -50,14 +59,13 @@ void ForceFieldBackend::Start()
 void ForceFieldBackend::RenderWorld()
 {
   DEBUG_GL_ERRORS()
-  this->drawDesired=false;
+  drawDesired=0;
 
   BaseT::RenderWorld();
 
   glEnable(GL_BLEND);
   allWidgets.Enable(&allRobotWidgets,drawPoser==1);
   allWidgets.DrawGL(viewport);
-
   vector<ViewRobot> viewRobots = world->robotViews;
 
   Robot *robot = world->robots[0];
@@ -95,38 +103,7 @@ void ForceFieldBackend::RenderWorld()
   }
 
   if(drawPlannerStartGoal){
-
-    GLColor colorInit(0,1,0);
-    GLColor colorGoal(1,0,0);
-    double scale = 1.01;
-
-    Robot *robot = world->robots[0];
-    
-    robot->UpdateConfig(planner_p_goal);
-    for(uint j=0;j<robot->links.size();j++) {
-      if(robot->IsGeometryEmpty(j)) continue;
-      Matrix4 mat = robot->links[j].T_World;
-      glPushMatrix();
-      glMultMatrix(mat);
-      glScalef(scale, scale, scale);
-      GLDraw::GeometryAppearance& a = *robot->geomManagers[j].Appearance();
-      a.SetColor(colorGoal);
-      a.DrawGL();
-      glPopMatrix();
-    }
-
-    robot->UpdateConfig(planner_p_init);
-    for(uint j=0;j<robot->links.size();j++) {
-      if(robot->IsGeometryEmpty(j)) continue;
-      Matrix4 mat = robot->links[j].T_World;
-      glPushMatrix();
-      glMultMatrix(mat);
-      glScalef(scale, scale, scale);
-      GLDraw::GeometryAppearance& a = *robot->geomManagers[j].Appearance();
-      a.SetColor(colorInit);
-      a.DrawGL();
-      glPopMatrix();
-    }
+    GLDraw::drawPlannerStartGoal(robot, planner_p_init, planner_p_goal);
   }
   if(drawPlannerTree){
     uint nearestNode = 0;
@@ -262,12 +239,12 @@ void ForceFieldBackend::VisualizePlannerTree(const SerializedTree &tree)
 //typedef std::vector< SerializedTreeNode > SerializedTree;
 
   _stree = tree;
-  drawPlannerTree=true;
+  drawPlannerTree=1;
 
 }
 void ForceFieldBackend::VisualizeStartGoal(const Config &p_init, const Config &p_goal)
 {
-  drawPlannerStartGoal = true;
+  drawPlannerStartGoal = 1;
   planner_p_init = p_init;
   planner_p_goal = p_goal;
 }
@@ -321,7 +298,7 @@ void ForceFieldBackend::VisualizePathSweptVolume(const MultiPath &path)
     _appearanceStack[i]=a;
   }
   if(DEBUG) std::cout << "[SweptVolume] #geometries " << _appearanceStack.size() << std::endl;
-  drawPath = true;
+  drawPath = 1;
 
 }
 void ForceFieldBackend::VisualizePathSweptVolume(const KinodynamicMilestonePath &path)
@@ -353,7 +330,7 @@ void ForceFieldBackend::VisualizePathSweptVolume(const KinodynamicMilestonePath 
     GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
     _appearanceStack[i]=a;
   }
-  drawPath = true;
+  drawPath = 1;
 }
 void ForceFieldBackend::VisualizePathSweptVolume(const std::vector<Config> &keyframes)
 {
@@ -371,17 +348,17 @@ void ForceFieldBackend::VisualizePathSweptVolume(const std::vector<Config> &keyf
     GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
     _appearanceStack[i]=a;
   }
-  drawPath = true;
+  drawPath = 1;
 }
 void ForceFieldBackend::SetIKConstraints( vector<IKGoal> constraints, string robotname){
   _constraints = constraints;
   _robotname = robotname;
-  drawIKextras = true;
+  drawIKextras = 1;
 }
 void ForceFieldBackend::SetIKCollisions( vector<int> linksInCollision )
 {
   _linksInCollision = linksInCollision;
-  drawIKextras = true;
+  drawIKextras = 1;
 }
 bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   BaseT::OnCommand(cmd,args);
@@ -403,4 +380,34 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }
   return true;
 }
+
+GLUIForceFieldGUI::GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _world)
+    :BaseT(_backend,_world)
+{
+}
+bool GLUIForceFieldGUI::Initialize()
+{
+  if(!BaseT::Initialize()) return false;
+  
+  GLUI_Panel* panel;
+  GLUI_Checkbox* checkbox;
+
+  panel = glui->add_rollout("Motion Planning");
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Planning Tree");
+  AddControl(checkbox,"draw_planner_tree");
+  checkbox->set_int_val(1);
+
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Swept Volume");
+  AddControl(checkbox,"draw_path");
+
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Start Goal Config");
+  AddControl(checkbox,"draw_path_start_goal");
+  checkbox->set_int_val(1);
+
+  UpdateGUI();
+  return true;
+
+}
+
+
 

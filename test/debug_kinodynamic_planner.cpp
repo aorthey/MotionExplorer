@@ -1,5 +1,5 @@
 #include <stdio.h>
-//#include <Interface/SimulationGUI.h>
+#include <Interface/SimulationGUI.h>
 #include <Interface/SimTestGUI.h>
 #include <KrisLibrary/GLdraw/GL.h>
 #include <KrisLibrary/GLdraw/drawextra.h>
@@ -62,7 +62,7 @@ int main(int argc,const char** argv) {
   ////############################################################################
 
   std::cout << "start GUI" << std::endl;
-  GLUISimTestGUI gui(&backend,&world);
+  GLUIForceFieldGUI gui(&backend,&world);
   gui.SetWindowTitle("SweptVolumePath");
   gui.Run();
 

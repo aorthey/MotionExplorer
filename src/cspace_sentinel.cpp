@@ -533,7 +533,7 @@ void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput
   u(4) = 0;
   u(5) = 0;
   //T
-  u(6) = Rand(0.01,0.5);
+  u(6) = Rand(0.01,0.2);
 }
 void KinodynamicCSpaceSentinelAdaptor::Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps){
   //dt = Rand(0.01,0.1);

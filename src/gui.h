@@ -19,13 +19,14 @@
 class ForceFieldBackend : public SimTestBackend
 {
   private:
-    bool drawForceField;
-    bool drawRobotExtras; 
-    bool drawIKextras;
-    bool drawPath;
-    bool drawPlannerTree;
-    bool drawPlannerStartGoal;
-    bool drawAxesLabels;
+    int drawForceField;
+    int drawRobotExtras; 
+    int drawIKextras;
+    int drawPath;
+    int drawPlannerTree;
+    int drawPlannerStartGoal;
+    int drawAxesLabels;
+
     vector<IKGoal> _constraints;
     vector<int> _linksInCollision;
     string _robotname;
@@ -41,6 +42,8 @@ class ForceFieldBackend : public SimTestBackend
   ForceFieldBackend(RobotWorld *world);
   virtual void Start();
   virtual bool OnCommand(const string& cmd,const string& args);
+  virtual void RenderWorld();
+
   void SetIKConstraints( vector<IKGoal> constraints, string robotname);
   void SetIKCollisions( vector<int> linksInCollision );
   void VisualizePathSweptVolumeAtPosition(const Config &q);
@@ -49,8 +52,15 @@ class ForceFieldBackend : public SimTestBackend
   void VisualizePathSweptVolume(const std::vector<Config> &keyframes);
   void VisualizePlannerTree(const SerializedTree &tree);
   void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
-  virtual void RenderWorld();
+
+};
 
 
+class GLUIForceFieldGUI: public GLUISimTestGUI
+{
+  public:
+    typedef GLUISimTestGUI BaseT;
+    GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _world);
+    virtual bool Initialize();
 };
 

@@ -91,8 +91,8 @@ INTERFACE
     GenericBackendBase (GenericGUI.h)
 
 -------------------------------------------------------------------------------
-
 BACKEND [Interface/*GUI.h]
+-------------------------------------------------------------------------------
   GenericBackendBase [GenericGUI.h] 
     bool GenericGUIBase::SendGLViewport(int x,int y,int w,int h)
 
@@ -106,7 +106,6 @@ BACKEND [Interface/*GUI.h]
               RenderWorld()
                 drawCoords(0.1);
 
-
   <- <- <- <- SimGUIBackend [SimulationGUI.h] (add functions to display dynamics,i.e. wrenches, torques, contacts etc)
                 RenderWorld()
                   world->terrains[i]->DrawGL();
@@ -118,6 +117,31 @@ BACKEND [Interface/*GUI.h]
                     world->robotViews[r].SetColors(desiredColor);
                     world->robotViews[r].Draw();
                     world->robotViews[r].SetAppearance(oldAppearance);
+
+-------------------------------------------------------------------------------
+GUI
+-------------------------------------------------------------------------------
+  GLUIProgramBase [KrisLibrary/GLdraw/GLUIProgram.h]
+  Run()
+  int Run(const char *window_title="OpenGL Viewer",unsigned int displayMode=0);
+
+  <- GLUIGUI : GenericGUIBase, GLUIProgramBase [Interface/GLUIGUI.h]
+
+  <- <- GLScreenshotProgram<BaseGUI> : public BaseGUI
+
+  <- <- <- GLUISimTestGUI : GLScreenshotProgram<GLUIGUI>
+          Initialize()
+
+
+
+
+
+
+
+
+adding new widgets: 
+Creating button: 
+Connecting button: button has to be connected with render drawing method => MapButtonToggle("draw_bbs",&drawBBs);
 
 
 
@@ -327,6 +351,7 @@ TODO
 we need a different interpolation due to the gluing of the charts. Check if
 something like that is already implemented, see GeodesicManifold/DynamicPath.
 Just use KinodynamicMilestonePath instead of MultiPath!
+ [x] add widgets for planning to gui
  [ ] solve IK for arbitrary rob-env contact points
  [ ] setup kinodynamic planning problem
  [ ] grasp an actual object
@@ -346,4 +371,4 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] refactor kinodynamic planner to make it independent from path planner
  [ ] refactor draw methods in gui.cpp
  [ ] refactor planner settings
- [ ] save kinodynamicmilestonepath to file
+ [ ] save kinodynamicmilestonepath to file 
