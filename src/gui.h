@@ -25,6 +25,7 @@ class ForceFieldBackend : public SimTestBackend
     int drawPath;
     int drawPlannerTree;
     int drawPlannerStartGoal;
+    int drawAxes;
     int drawAxesLabels;
 
     vector<IKGoal> _constraints;

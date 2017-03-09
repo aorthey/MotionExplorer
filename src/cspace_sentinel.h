@@ -93,6 +93,7 @@ class KinodynamicCSpaceSentinelAdaptor: public KinematicCSpaceAdaptor
     Matrix4 ForwardSimulate(const Matrix4& p0, const Matrix4& dp0, double h);
     void Euler_step(std::vector<Matrix4>& p, const Matrix4& dp0, double h);
     void RungeKutta4_step(std::vector<Matrix4>& p, const Matrix4& dp0, double h);
+    void RK4_step(std::vector<Matrix4>& p, const Matrix4& dp0, double h);
 
 
     virtual bool ReverseSimulate(const State& x1, const ControlInput& u,std::vector<State>& p);

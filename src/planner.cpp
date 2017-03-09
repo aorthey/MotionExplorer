@@ -55,27 +55,46 @@ void MotionPlanner::SerializeTreeCullClosePoints(SerializedTree &_stree, CSpace 
 //delete all node except N randomly choosen ones
 void MotionPlanner::SerializeTreeRandomlyCullPoints(SerializedTree &_stree, uint N)
 {
+
   uint Nall = _stree.size();
+
+  if(N>=Nall) return;
+  
   SerializedTree snew;
-  for(int i = 0; i < N; i++){
-    uint Ni = RandInt(Nall);
-    SerializedTreeNode si = _stree.at(Ni);
+  SerializedTreeNode si;
+  si = _stree.at(0);
+  si.directions.clear();
+  snew.push_back(si);
+  for(int i = 1; i < N; i++){
+    si = _stree.at(RandInt(Nall));
+    si.directions.clear();
     snew.push_back(si);
   }
   _stree.clear();
   _stree=snew;
-}
 
+  ////set new directions
+  //for(uint i = 0; i < snew.size(); i++){
+  //  SerializedTreeNode parent = snew.at(i);
+  //  uint parentid = parent.id;
+
+  //  for(uint j = 0; j < snew.size(); j++){
+
+  //    SerializedTreeNode child = snew.at(j);
+  //    if(child.parentid==parentid)
+  //    {
+  //      Vector3 v = child.GetXYZ()-parent.GetXYZ();
+  //      parent.directions.add(v);
+
+  //    si.directions.clear();
+  //    snew.push_back(si);
+  //  }
+  //}
+}
 
 void MotionPlanner::SerializeTreeAddCostToGoal(SerializedTree &stree, CSpace *base, Config &goal)
 {
   for(uint i = 0; i < stree.size(); i++){
-    //Config worldgoal;
-    //worldgoal.resize(6);
-    //for(int j = 0; j < 6; j++){
-    //  worldgoal(j) = goal(j);
-    //}
-    //stree.at(i).cost_to_goal = base->Distance(stree.at(i).position, worldgoal);
     stree.at(i).cost_to_goal = base->Distance(stree.at(i).config, goal);
   }
 }
@@ -115,6 +134,10 @@ void MotionPlanner::SerializeTree( const KinodynamicTree::Node* node, Serialized
   stree.push_back(snode);
 
 }
+
+
+
+
 void MotionPlanner::SerializeTree( const KinodynamicTree& tree, SerializedTree& stree){
   SerializeTree(tree.root, stree);
 }
@@ -183,15 +206,16 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //Vector3 bmin(-4,-4,1);
   //Vector3 bmax(+4,+4,3);
   //AABB3D worldBounds(bmin,bmax);
-  //worldsettings.robotSettings[0].worldBounds = AABB3D(plannersettings.worldboundsMin,plannersettings.worldboundsMax);
-  Vector weights;weights.resize(7);
-  weights.setZero();
-  weights(0) = 1;
-  weights(1) = 1;
-  weights(2) = 1;
-  weights(3) = 0.2;
-  weights(4) = 0.2;
-  weights(5) = 0.2;
+  worldsettings.robotSettings[0].worldBounds = AABB3D(plannersettings.worldboundsMin,plannersettings.worldboundsMax);
+
+  //Vector weights;weights.resize(7);
+  //weights.setZero();
+  //weights(0) = 1;
+  //weights(1) = 1;
+  //weights(2) = 1;
+  //weights(3) = 0.2;
+  //weights(4) = 0.2;
+  //weights(5) = 0.2;
   //std::cout << weights << std::endl;
   //settings.robotSettings[0].distanceWeights = weights;
   //exit(0);
@@ -272,6 +296,10 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
 
   }else{
     std::cout << "[Motion Planner] No path found." << std::endl;
+    std::cout << "Tree size " << _stree.size() << std::endl;
+    for(int i = 0; i < _stree.size(); i++){
+      std::cout << _stree.at(i).position << std::endl;
+    }
   }
   return res;
 
@@ -347,28 +375,38 @@ void MotionPlanner::SendCommandStringController(string cmd, string arg)
     throw "Controller command not supported!";
   }
 }
-// bool MotionPlanner::SendToController()
-// {
-//   if(!_isSolved){ return false; }
+bool MotionPlanner::SendToController()
+{
+  if(!_isSolved){ return false; }
 
-//   double dstep = 0.1;
-//   Config q;
-//   Config dq;
+  double dstep = 0.1;
+  Config q;
+  Config dq;
 
-//   for(double d = 0; d <= 1; d+=dstep)
-//   {
-//     _path.Evaluate(d, q, dq);
-//     stringstream qstr;
-//     qstr<<q<<dq;
-//     string cmd( (d<=0)?("set_qv"):("append_qv") );
-//     SendCommandStringController(cmd,qstr.str());
-//   }
+  for(int i = 0; i < _keyframes.size()-1; i++){
+    //_path.Evaluate(d, q, dq);
+    q = _keyframes.at(i);
+    Config q2 = _keyframes.at(i+1);
+    double dt = 1.0/_keyframes.size();
+    dq = (q-q2)/dt;
+    stringstream qstr;
+    qstr<<q<<dq;
+    string cmd( (i<=0)?("set_qv"):("append_qv") );
+    SendCommandStringController(cmd,qstr.str());
+  }
+  //{
+  //  _path.Evaluate(d, q, dq);
+  //  stringstream qstr;
+  //  qstr<<q<<dq;
+  //  string cmd( (d<=0)?("set_qv"):("append_qv") );
+  //  SendCommandStringController(cmd,qstr.str());
+  //}
 
-//   std::cout << "Sending Path to Controller" << std::endl;
-//   Robot *robot = _world->robots[_irobot];
-//   util::SetSimulatedRobot(robot,*_sim,_p_init);
-//   robot->UpdateConfig(_p_goal);
-//   std::cout << "Done Path to Controller" << std::endl;
-//   return true;
-// }
+  std::cout << "Sending Path to Controller" << std::endl;
+  Robot *robot = _world->robots[_irobot];
+  util::SetSimulatedRobot(robot,*_sim,_p_init);
+  robot->UpdateConfig(_p_goal);
+  std::cout << "Done Path to Controller" << std::endl;
+  return true;
+}
 

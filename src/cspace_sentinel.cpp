@@ -175,6 +175,18 @@ void KinodynamicCSpaceSentinelAdaptor::Euler_step(std::vector<Matrix4>& p, const
   Matrix4 pnext = ForwardSimulate(p0,dp0,h);
   p.push_back(pnext);
 }
+void KinodynamicCSpaceSentinelAdaptor::RK4_step(std::vector<Matrix4>& p, const Matrix4& dp0, double h)
+{  
+  Matrix4 p0 = p.back();
+
+  Matrix4 k1 = dp0;
+  Matrix4 k2 = ForwardSimulate(p0+k1*h/2,dp0,0);
+  Matrix4 k3 = ForwardSimulate(p0+k2*h/2,dp0,0);
+  Matrix4 k4 = ForwardSimulate(p0+k3*h/2,dp0,0);
+  Matrix4 pnext = p0 + (k1+k2*2+k3*2+k4)*h/6.0;
+  p.push_back(pnext);
+}
+
 Matrix4 KinodynamicCSpaceSentinelAdaptor::ForwardSimulate(const Matrix4& p0, const Matrix4& dp0, double h)
 {
   Matrix4 tmp = MatrixExponential(dp0*h);
@@ -224,7 +236,7 @@ void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlIn
 
   std::cout << std::setprecision(2) << std::fixed;
   Real dt = u(6);
-  int numSteps = 10;
+  int numSteps = 1;
   Real h = dt/numSteps;
 
   Matrix4 x0_SE3 = StateToSE3(x0);
@@ -235,6 +247,7 @@ void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlIn
 
   for(int i=0;i<numSteps;i++) {
     Euler_step(p_SE3, dp0, h);
+    //RK4_step(p_SE3, dp0, h);
     //RungeKutta4_step(p_SE3, dp0, h);
   }
 
@@ -533,7 +546,8 @@ void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput
   u(4) = 0;
   u(5) = 0;
   //T
-  u(6) = Rand(0.01,0.2);
+  //u(6) = Rand(0.01,0.2);
+  u(6) = Rand(0.2,0.8);
 }
 void KinodynamicCSpaceSentinelAdaptor::Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps){
   //dt = Rand(0.01,0.1);

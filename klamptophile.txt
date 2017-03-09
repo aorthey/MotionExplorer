@@ -363,12 +363,18 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] Compute SE constraints, what is GIWC equivalent?
  [ ] smoothing after path planning
  [ ] make a Klampt Interface where to set all properties like background color etc
- [ ] kinodynamic planning 
  [ ] make ompl planners available
  [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
  [ ] screenshots x_X?
- [ ] control in kinodynamic planning converges to wrong direction
  [ ] refactor kinodynamic planner to make it independent from path planner
  [ ] refactor draw methods in gui.cpp
  [ ] refactor planner settings
  [ ] save kinodynamicmilestonepath to file 
+ [ ] kinodynamic planning 
+ [ ] control in kinodynamic planning converges to wrong direction
+ [ ] outsource serialized tree to seperate file
+ [ ] add directions again in draw serialized tree after culling nodes
+ [ ] enable the ompl kinodynamic planners
+ [ ] make the controller work without gravity on SE(3)
+ [ ] save motion planner class plus tree and path
+ [ ] krrt: no forward simulation towards goal

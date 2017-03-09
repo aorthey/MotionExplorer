@@ -16,13 +16,23 @@ struct SerializedTreeNode{
   Vector config;
   std::vector<Vector3> directions;
   double cost_to_goal;
+  //uint id;
+  //uint parentid;
+  //std::vector<int> parentids;
+  Vector3 GetXYZ(){
+    Vector3 pos;
+    pos[0] = position[0];
+    pos[1] = position[1];
+    pos[2] = position[2];
+    return pos;
+  }
 };
 
 typedef std::vector< SerializedTreeNode > SerializedTree;
 
 struct PlannerSettings{
   const uint iterations = 1e2;
-  const double goalSeekProbability = 0.1;
+  const double goalSeekProbability = 1;
   const double goalRegionConvergence = 0.1;
   const uint maxDisplayedPointsInTree = 2000;
   const double discretizationOutputPath = 0.01;
@@ -62,11 +72,15 @@ class MotionPlanner{
 
     bool solve(Config &p_init, Config &p_goal, double timelimit=100.0, bool shortcutting=true);
     void SendCommandStringController(string cmd, string arg);
-    //bool SendToController();
+    bool SendToController();
     void CheckFeasibility(Robot *robot, SingleRobotCSpace &cspace, Config &q);
 
     virtual bool PlanPath();
     void PostProcess();
+
+    //void Save();
+    //void SavePath();
+    //void SaveTree();
 
     virtual std::string getName();
 };

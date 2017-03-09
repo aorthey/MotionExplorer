@@ -132,5 +132,65 @@ namespace GLDraw{
       }
     }
   }
+
+  void drawPlannerTree(const SerializedTree &_stree)
+  {
+    double linewidth = 0.01;
+
+    uint nearestNode = 0;
+    double bestD = dInf;
+    for(uint i = 0; i < _stree.size(); i++){
+      SerializedTreeNode node = _stree.at(i);
+      double d = node.cost_to_goal;
+      if(d<bestD){
+        bestD = d;
+        nearestNode = i;
+      }
+    }
+    for(uint i = 0; i < _stree.size(); i++){
+      //std::cout << "Tree GUI:" << tree.at(0).first << std::endl;
+      SerializedTreeNode node = _stree.at(i);
+      Vector3 pos(node.position(0),node.position(1),node.position(2));
+      Vector3 rot(node.position(3),node.position(4),node.position(5));
+
+      std::vector<Vector3> dirs = node.directions;
+
+      glDisable(GL_LIGHTING);
+      glEnable(GL_BLEND); 
+      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      
+      //compute color from cost_to_goal
+      double d = node.cost_to_goal;
+      double shade = exp(-d*d/0.5); //\in [0,1]
+      GLColor color(shade,0,1.0-shade);
+
+      color.setCurrentGL();
+
+      glPushMatrix();
+      glTranslate(pos);
+      //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cForce);
+
+      if(i==nearestNode){
+        GLColor cNearest(1,1,0);
+        cNearest.setCurrentGL();
+        glPointSize(15.0);                                     
+        //std::cout << "Nearest Node " << node.position << " d=" <<bestD << std::endl;
+      }else{
+        glPointSize(5.0);                                     
+      }
+      drawPoint(Vector3(0,0,0));
+      for(uint j = 0; j < dirs.size(); j++){
+        Vector3 dir(dirs.at(j)[0], dirs.at(j)[1], dirs.at(j)[2]);
+        drawCylinder(dir,linewidth);
+      }
+
+      glPushMatrix();
+
+      glPopMatrix();
+      glPopMatrix();
+      glEnable(GL_LIGHTING);
+    }
+  }
+
 };
 

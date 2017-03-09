@@ -14,14 +14,19 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawForceField = 0;
   drawRobotExtras = 1;
   drawIKextras = 0;
-  drawAxesLabels = 0;
   drawPath = 0;
   drawPlannerTree = 1;
   drawPlannerStartGoal = 0;
 
+  drawAxes = 1;
+  drawAxesLabels = 0;
+
   MapButtonToggle("draw_planner_tree",&drawPlannerTree);
   MapButtonToggle("draw_path",&drawPath);
   MapButtonToggle("draw_path_start_goal",&drawPlannerStartGoal);
+  MapButtonToggle("draw_fancy_coordinate_axes",&drawAxes);
+  MapButtonToggle("draw_fancy_coordinate_axes_labels",&drawAxesLabels);
+
 
 
   _mats.clear();
@@ -98,6 +103,7 @@ void ForceFieldBackend::RenderWorld()
   //############################################################################
   // Visualize swept volume along path
   //############################################################################
+
   if(drawPath){
     GLDraw::drawPathSweptVolume(robot, _mats, _appearanceStack);
   }
@@ -105,66 +111,14 @@ void ForceFieldBackend::RenderWorld()
   if(drawPlannerStartGoal){
     GLDraw::drawPlannerStartGoal(robot, planner_p_init, planner_p_goal);
   }
+
   if(drawPlannerTree){
-    uint nearestNode = 0;
-    double bestD = dInf;
-    for(uint i = 0; i < _stree.size(); i++){
-      SerializedTreeNode node = _stree.at(i);
-      double d = node.cost_to_goal;
-      if(d<bestD){
-        bestD = d;
-        nearestNode = i;
-      }
-    }
-    for(uint i = 0; i < _stree.size(); i++){
-      //std::cout << "Tree GUI:" << tree.at(0).first << std::endl;
-      SerializedTreeNode node = _stree.at(i);
-      Vector3 pos(node.position(0),node.position(1),node.position(2));
-      Vector3 rot(node.position(3),node.position(4),node.position(5));
-
-      std::vector<Vector3> dirs = node.directions;
-
-      glDisable(GL_LIGHTING);
-      glEnable(GL_BLEND); 
-      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      
-      //compute color from cost_to_goal
-      double d = node.cost_to_goal;
-      double shade = exp(-d*d/0.5); //\in [0,1]
-      GLColor color(shade,0,1.0-shade);
-
-      color.setCurrentGL();
-
-      glPushMatrix();
-      glTranslate(pos);
-      //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cForce);
-
-      if(i==nearestNode){
-        GLColor cNearest(1,1,0);
-        cNearest.setCurrentGL();
-        glPointSize(15.0);                                     
-        //std::cout << "Nearest Node " << node.position << " d=" <<bestD << std::endl;
-      }else{
-        glPointSize(5.0);                                     
-      }
-      drawPoint(Vector3(0,0,0));
-      //double linewidth = 0.01;
-      //for(uint j = 0; j < dirs.size(); j++){
-      //  Vector3 dir(dirs.at(j)[0], dirs.at(j)[1], dirs.at(j)[2]);
-      //  drawCylinder(dir,linewidth);
-      //}
-
-      glPushMatrix();
-
-      glPopMatrix();
-      glPopMatrix();
-      glEnable(GL_LIGHTING);
-    }
-
+    GLDraw::drawPlannerTree(_stree);
   }
   //Draw fancy coordinate axes
   //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
-  drawCoordWidget(1);
+
+  if(drawAxes) drawCoordWidget(1);
 
   //glRasterPos2i(100, 120);
   //glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
@@ -229,7 +183,6 @@ void ForceFieldBackend::RenderWorld()
 
 //############################################################################
 //############################################################################
-
 
 #include <KrisLibrary/graph/Tree.h>
 
@@ -403,6 +356,16 @@ bool GLUIForceFieldGUI::Initialize()
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Start Goal Config");
   AddControl(checkbox,"draw_path_start_goal");
   checkbox->set_int_val(1);
+
+
+  panel = glui->add_rollout("Fancy Decorations");
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Coordinate Axes");
+  AddControl(checkbox,"draw_fancy_coordinate_axes");
+  checkbox->set_int_val(1);
+
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Coordinate Axes Labels[TODO]");
+  AddControl(checkbox,"draw_fancy_coordinate_axes_labels");
+  checkbox->set_int_val(0);
 
   UpdateGUI();
   return true;

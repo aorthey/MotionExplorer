@@ -56,12 +56,12 @@ int main(int argc,const char** argv) {
   //p_goal[2]=3.5;
 
   p_init[0]=-2;
-  p_init[1]=0;
+  p_init[1]=0.5;
   p_init[2]=1;
   p_init[3]=-M_PI/4;
 
-  p_goal[0]=0;
-  p_goal[1]=-0.5;
+  p_goal[0]=-0.5;
+  p_goal[1]=-0.2;
   p_goal[2]=1.5;
 
   world.background = GLColor(1,1,1);
@@ -74,11 +74,9 @@ int main(int argc,const char** argv) {
   MotionPlanner planner(&world, &sim);
 
   if(planner.solve(p_init, p_goal,100,false)){
-    //info(planner.GetPath());
-    //std::cout << "send to controller" << std::endl;
-    //planner.SendToController();
     std::cout << "VisualizePathSweptVolume" << std::endl;
     //backend.VisualizePathSweptVolume(planner.GetPath());
+    planner.SendToController();
     backend.VisualizePathSweptVolume(planner.GetKeyframes());
   }
   std::clock_t end = std::clock();
