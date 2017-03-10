@@ -32,9 +32,9 @@ typedef std::vector< SerializedTreeNode > SerializedTree;
 
 struct PlannerSettings{
   const uint iterations = 1e2;
-  const double goalSeekProbability = 1;
+  const double goalSeekProbability = 0.1;
   const double goalRegionConvergence = 0.1;
-  const uint maxDisplayedPointsInTree = 2000;
+  const uint maxDisplayedPointsInTree = 1e4;
   const double discretizationOutputPath = 0.01;
   const Vector3 worldboundsMin = Vector3(-4,-4,1);
   const Vector3 worldboundsMax = Vector3(+4,+4,3);

@@ -352,8 +352,10 @@ we need a different interpolation due to the gluing of the charts. Check if
 something like that is already implemented, see GeodesicManifold/DynamicPath.
 Just use KinodynamicMilestonePath instead of MultiPath!
  [x] add widgets for planning to gui
+ [x] setup kinodynamic planning problem
+ [x] control in kinodynamic planning converges to wrong direction
+ [x] refactor draw methods in gui.cpp
  [ ] solve IK for arbitrary rob-env contact points
- [ ] setup kinodynamic planning problem
  [ ] grasp an actual object
  [ ] sample grasps for object and compute IK (findGrasp method)
  [ ] make/break contact events => compute transition paths
@@ -367,14 +369,13 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
  [ ] screenshots x_X?
  [ ] refactor kinodynamic planner to make it independent from path planner
- [ ] refactor draw methods in gui.cpp
  [ ] refactor planner settings
  [ ] save kinodynamicmilestonepath to file 
- [ ] kinodynamic planning 
- [ ] control in kinodynamic planning converges to wrong direction
  [ ] outsource serialized tree to seperate file
  [ ] add directions again in draw serialized tree after culling nodes
  [ ] enable the ompl kinodynamic planners
  [ ] make the controller work without gravity on SE(3)
  [ ] save motion planner class plus tree and path
  [x] krrt: no forward simulation towards goal (was wrong init rot)
+ [ ] execute kinodynamic path
+ [ ] remove this orange line from origin to p_init

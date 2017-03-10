@@ -420,6 +420,25 @@ Real KinodynamicCSpaceSentinelAdaptor::Distance(const Config& x, const Config& y
   RigidTransform Ta,Tb;
   ConfigToTransform(x,Ta);
   ConfigToTransform(y,Tb);
+
+
+  ////####
+  //AngleAxisRotation aax;
+  //aax.setMatrix(Ta.R);
+  //Vector3 xdir = aax.axis;
+  //Vector3 xpos = Ta.t;
+
+  //AngleAxisRotation aay;
+  //aay.setMatrix(Tb.R);
+  //Vector3 ydir = aay.axis;
+  //Vector3 ypos = Tb.t;
+  //float theta = M_PI/6;
+  //if (acos(dot(X-M, N)/(norm(X-M)*norm(N)) <= theta) doSomething();
+  //double d = ydir.dot(xdir);
+  ////####
+
+
+
   Real d = Ta.t.distance(Tb.t);
   Matrix3 Rrel;
   Rrel.mulTransposeB(Ta.R,Tb.R);
@@ -428,6 +447,7 @@ Real KinodynamicCSpaceSentinelAdaptor::Distance(const Config& x, const Config& y
   double wt = 1;
   double wr = 0.01;
   d = Sqrt(d*d*wt + aa.angle*aa.angle*wr);
+
   return d;
 }
 void KinodynamicCSpaceSentinelAdaptor::Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps){
@@ -438,7 +458,7 @@ void KinodynamicCSpaceSentinelAdaptor::Parameters(const State& x,const ControlIn
 ///Randomly pick a control input
 void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput& u){
   double ak = 1;
-  u.resize(x.size()+1);
+  u.resize(x.size());
   u.setZero();
   u(0) = 0;
   u(1) = Rand(-ak,+ak);
@@ -448,37 +468,21 @@ void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput
   u(5) = 0;
   //T
   //u(6) = Rand(0.01,0.2);
-  u(6) = Rand(0.01,0.1);
+  u(6) = Rand(0.01,0.2);
 }
 void KinodynamicCSpaceSentinelAdaptor::BiasedSampleControl(const State& x,const State& xGoal,ControlInput& u){
-  //std::cout << "Going from "<< x << std::endl;
-  //std::cout << "to "<< xGoal << std::endl;
-  //std::cout << "best u" << u << std::endl;
-
-  //SampleControl(x,u);
-
-  //Node* goal = base->goal.root;
-  ///*
   int numSamples = 1e2;
   Real closest=Inf;
 
-  //std::cout << "Going from "<< x << std::endl;
-  //std::cout << "to "<< xGoal << std::endl;
   for(int i=0;i<numSamples;i++) {
     State x2,xtemp;
     ControlInput temp;
     SampleControl(x,temp);
     SimulateEndpoint(x,temp,x2);
     Real dist = Distance(x2,xGoal);
-    //Real dist = base->Distance(x,x2);
-    //base->Interpolate(x,xGoal,Min(dist,1.0),xtemp);
-    //dist = base->Distance(x2,xtemp);
     if(dist < closest) {
-      //std::cout << dist << std::endl;
       closest = dist;
       u = temp;
     }
   }
-  //exit(0);
-  //*/
 }

@@ -192,5 +192,56 @@ namespace GLDraw{
     }
   }
 
+#include <GL/freeglut.h>
+  void drawAxesLabels(Camera::Viewport& viewport)
+  {
+    //TODO: (1) does not support scale, (2) does not exactly cooincide with
+    //coordwidget, wtf?
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho((double)viewport.x, (double)viewport.y,
+        (double)viewport.w, (double)viewport.h,
+        -1000., 1000.);
+    glTranslated(0., 0., 0.);
+    glMatrixMode(GL_MODELVIEW);
+
+    double l = 0.5;
+    double o = 0 ;
+
+    double cx = 0;
+    double cy = 0;
+    double xx, xy, yx, yy , zx, zy;
+
+    float fvViewMatrix[ 16 ];
+    glGetFloatv( GL_MODELVIEW_MATRIX, fvViewMatrix );
+    glLoadIdentity();
+
+    xx = l * fvViewMatrix[0];
+    xy = l * fvViewMatrix[1];
+    yx = l * fvViewMatrix[4];
+    yy = l * fvViewMatrix[5];
+    zx = l * fvViewMatrix[8];
+    zy = l * fvViewMatrix[9];
+
+    double lineWidth = 0.1;
+    //double lineWidth = 0.1;
+    glLineWidth(lineWidth);
+    //glColor4ubv(color);
+
+    glBegin(GL_LINES);
+    glVertex2d(cx, cy);
+    glVertex2d(cx + xx, cy + xy);
+    glVertex2d(cx, cy);
+    glVertex2d(cx + yx, cy + yy);
+    glVertex2d(cx, cy);
+    glVertex2d(cx + zx, cy + zy);
+    glEnd();
+    glRasterPos2d(cx + xx + o, cy + xy + o);
+    glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char*) "X");
+    glRasterPos2d(cx + yx + o, cy + yy + o);
+    glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char*) "Y");
+    glRasterPos2d(cx + zx + o, cy + zy + o);
+    glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char*) "Z");
+  }
 };
 

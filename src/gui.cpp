@@ -1,5 +1,4 @@
 #include "gui.h"
-#include <GL/freeglut.h>
 #include "drawMotionPlanner.h"
 
 const GLColor bodyColor(0.1,0.1,0.1);
@@ -77,100 +76,26 @@ void ForceFieldBackend::RenderWorld()
   ViewRobot *viewRobot = &viewRobots[0];
 
   //############################################################################
-  // Robot extras: COM, skeleton
+  // Visualize
+  //
+  // drawrobotextras      : COM, skeleton
+  // drawikextras         : contact links, contact directions
+  // drawforcefield       : a flow/force field on R^3
+  // drawpath             : swept volume along path
+  // drawplannerstartgoal : start/goal configuration of motion planner
+  // drawplannertree      : Cspace tree visualized as COM tree in W
+  // drawaxes             : fancy coordinate axes
+  // drawaxeslabels       : labelling of the coordinate axes [needs fixing]
   //############################################################################
 
-  if(drawRobotExtras){
-    GLDraw::drawRobotExtras(viewRobot);
-  }
-
-  //############################################################################
-  // IK extras: contact links, contact directions
-  //############################################################################
-
-  if(drawIKextras){
-    GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);
-  }
-
-  //############################################################################
-  // visualize a flow/force field on R^3
-  //############################################################################
-
-  if(drawForceField){
-    GLDraw::drawUniformForceField();
-  }
-
-  //############################################################################
-  // Visualize swept volume along path
-  //############################################################################
-
-  if(drawPath){
-    GLDraw::drawPathSweptVolume(robot, _mats, _appearanceStack);
-  }
-
-  if(drawPlannerStartGoal){
-    GLDraw::drawPlannerStartGoal(robot, planner_p_init, planner_p_goal);
-  }
-
-  if(drawPlannerTree){
-    GLDraw::drawPlannerTree(_stree);
-  }
-  //Draw fancy coordinate axes
-  //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
-
-  if(drawAxes) drawCoordWidget(1);
-
-  if(drawAxesLabels)
-  {
-    //TODO: (1) does not support scale, (2) does not exactly cooincide with
-    //coordwidget, wtf?
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho((double)viewport.x, (double)viewport.y,
-        (double)viewport.w, (double)viewport.h,
-        -1000., 1000.);
-    glTranslated(0., 0., 0.);
-    glMatrixMode(GL_MODELVIEW);
-
-    double l = 0.5;
-    double o = 0 ;
-
-    double cx = 0;
-    double cy = 0;
-    double xx, xy, yx, yy , zx, zy;
-
-    float fvViewMatrix[ 16 ];
-    glGetFloatv( GL_MODELVIEW_MATRIX, fvViewMatrix );
-    glLoadIdentity();
-
-    xx = l * fvViewMatrix[0];
-    xy = l * fvViewMatrix[1];
-    yx = l * fvViewMatrix[4];
-    yy = l * fvViewMatrix[5];
-    zx = l * fvViewMatrix[8];
-    zy = l * fvViewMatrix[9];
-
-    double lineWidth = 0.1;
-    //double lineWidth = 0.1;
-    glLineWidth(lineWidth);
-    //glColor4ubv(color);
-
-    glBegin(GL_LINES);
-    glVertex2d(cx, cy);
-    glVertex2d(cx + xx, cy + xy);
-    glVertex2d(cx, cy);
-    glVertex2d(cx + yx, cy + yy);
-    glVertex2d(cx, cy);
-    glVertex2d(cx + zx, cy + zy);
-    glEnd();
-    glRasterPos2d(cx + xx + o, cy + xy + o);
-    glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char*) "X");
-    glRasterPos2d(cx + yx + o, cy + yy + o);
-    glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char*) "Y");
-    glRasterPos2d(cx + zx + o, cy + zy + o);
-    glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char*) "Z");
-  }
-
+  if(drawRobotExtras) GLDraw::drawRobotExtras(viewRobot);
+  if(drawIKextras) GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);
+  if(drawForceField) GLDraw::drawUniformForceField();
+  if(drawPath) GLDraw::drawPathSweptVolume(robot, _mats, _appearanceStack);
+  if(drawPlannerStartGoal) GLDraw::drawPlannerStartGoal(robot, planner_p_init, planner_p_goal);
+  if(drawPlannerTree) GLDraw::drawPlannerTree(_stree);
+  if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
+  if(drawAxesLabels) GLDraw::drawAxesLabels(viewport);
 
 }//RenderWorld
 
