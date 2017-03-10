@@ -66,7 +66,7 @@ int main(int argc,const char** argv) {
 
   p_goal[0]=-0.5;
   p_goal[1]=0.3;
-  p_goal[2]=1.1;
+  p_goal[2]=1.0;
 
   world.background = GLColor(1,1,1);
 

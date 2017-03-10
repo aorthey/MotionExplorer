@@ -21,8 +21,8 @@ class CSpaceGoalSetEpsilonNeighborhood: public CSpace
     virtual bool IsFeasible(const Config& q){
       double d = base->Distance(q,_goal);
       if(d<bestDist){
-        std::cout << "BEST Distance: " << d << ":" << q << std::endl; 
-        std::cout << "               " << _goal << std::endl; 
+        //std::cout << "BEST Distance: " << d << ":" << q << std::endl; 
+        //std::cout << "               " << _goal << std::endl; 
         bestDist = d;
 
 

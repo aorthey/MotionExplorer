@@ -258,15 +258,6 @@ void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlIn
     p.push_back(pi);
   }
 
-  if(x0!=p.front()){
-    double d = (x0-p.front()).norm();
-    std::cout << std::setprecision(16) << std::scientific;
-    std::cout << x0 << std::endl;
-    std::cout << d << std::endl;
-    std::cout << p.front() << std::endl;
-  }
-
-  assert(x0==p.front());
 }
 
 
@@ -437,7 +428,6 @@ Real KinodynamicCSpaceSentinelAdaptor::Distance(const Config& x, const Config& y
   double wt = 1;
   double wr = 0.01;
   d = Sqrt(d*d*wt + aa.angle*aa.angle*wr);
-  //std::cout << " estimated : " << d << std::endl;
   return d;
 }
 void KinodynamicCSpaceSentinelAdaptor::Parameters(const State& x,const ControlInput& u,Real& dt,int& numSteps){
@@ -458,29 +448,38 @@ void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput
   u(5) = 0;
   //T
   //u(6) = Rand(0.01,0.2);
-  u(6) = Rand(0.2,0.2);
+  u(6) = Rand(0.05,0.2);
 }
 void KinodynamicCSpaceSentinelAdaptor::BiasedSampleControl(const State& x,const State& xGoal,ControlInput& u){
+  //std::cout << "Going from "<< x << std::endl;
+  //std::cout << "to "<< xGoal << std::endl;
+  //std::cout << "best u" << u << std::endl;
+
   //SampleControl(x,u);
-  //std::cout << xGoal << std::endl;
 
   //Node* goal = base->goal.root;
-  int numSamples = 1e3;
+  ///*
+  int numSamples = 1e2;
   Real closest=Inf;
 
   //std::cout << "Going from "<< x << std::endl;
   //std::cout << "to "<< xGoal << std::endl;
   for(int i=0;i<numSamples;i++) {
-    State x2;
+    State x2,xtemp;
     ControlInput temp;
     SampleControl(x,temp);
     SimulateEndpoint(x,temp,x2);
-    Real dist = base->Distance(x2,xGoal);
+    Real dist = Distance(x2,xGoal);
+    //Real dist = base->Distance(x,x2);
+    //base->Interpolate(x,xGoal,Min(dist,1.0),xtemp);
+    //dist = base->Distance(x2,xtemp);
     if(dist < closest) {
+      //std::cout << dist << std::endl;
       closest = dist;
       u = temp;
     }
   }
-  //std::cout << "best control "<< u << std::endl;
+  std::cout << "best control "<< u << std::endl;
   //exit(0);
+  //*/
 }
