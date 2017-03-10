@@ -448,7 +448,7 @@ void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput
   u(5) = 0;
   //T
   //u(6) = Rand(0.01,0.2);
-  u(6) = Rand(0.05,0.2);
+  u(6) = Rand(0.01,0.1);
 }
 void KinodynamicCSpaceSentinelAdaptor::BiasedSampleControl(const State& x,const State& xGoal,ControlInput& u){
   //std::cout << "Going from "<< x << std::endl;
@@ -479,7 +479,6 @@ void KinodynamicCSpaceSentinelAdaptor::BiasedSampleControl(const State& x,const 
       u = temp;
     }
   }
-  std::cout << "best control "<< u << std::endl;
   //exit(0);
   //*/
 }

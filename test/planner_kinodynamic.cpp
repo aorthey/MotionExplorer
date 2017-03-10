@@ -58,15 +58,15 @@ int main(int argc,const char** argv) {
   p_init[0]=-2;
   p_init[1]=0.5;
   p_init[2]=1;
-  //p_init[3]=2*M_PI-M_PI/4;
+  p_init[3]=2*M_PI-M_PI/4;
 
   //p_goal[0]=-0.5;
   //p_goal[1]=-0.2;
   //p_goal[2]=1.5;
 
-  p_goal[0]=-0.5;
-  p_goal[1]=0.3;
-  p_goal[2]=1.0;
+  p_goal[0]=1.5;
+  p_goal[1]=-0.3;
+  p_goal[2]=1.5;
 
   world.background = GLColor(1,1,1);
 
