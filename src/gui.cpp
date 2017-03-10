@@ -254,6 +254,7 @@ void ForceFieldBackend::VisualizePathSweptVolume(const KinodynamicMilestonePath 
   Config qt;
   path.Eval(0, qt);
 
+  std::cout << 0 << qt << std::endl;
   double dstep = 0.01;
   double d = 0;
 

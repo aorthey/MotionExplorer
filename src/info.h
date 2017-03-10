@@ -14,9 +14,32 @@ class Info
       std::cout << "Information Module initialized" << std::endl;
     }
 
-    void operator()(MilestonePath &path)
+    void operator()(const MilestonePath &path)
     {
       std::cout <<  path.Length() << std::endl;
+    }
+    void operator()(const KinodynamicMilestonePath &path)
+    {
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << "----- KinodynamicMilestonePath Start ------ " << std::endl;
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << "Milestones  : " << path.milestones.size() << std::endl;
+      std::cout << "Controls    : " << path.controls.size() << std::endl;
+      std::cout << "Paths       : " << path.paths.size() << std::endl;
+      //std::cout << "Edges       : " << path.edges.size() << std::endl;
+      //std::cout << path.edges.at(0) << std::endl;
+      //std::cout << path.edges.at(0)->Space() << std::endl;
+      //std::cout <<  path.PathLength() << std::endl;
+        // std::vector<State> milestones;
+        //   std::vector<ControlInput> controls;
+        //     std::vector<std::vector<State> > paths;
+        //       std::vector<SmartPointer<EdgePlanner> > edges;
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << "----- KinodynamicMilestonePath End ------ " << std::endl;
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << std::endl;
+
+
     }
     void operator()(const MultiPath &path)
     {

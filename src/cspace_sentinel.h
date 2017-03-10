@@ -96,7 +96,7 @@ class KinodynamicCSpaceSentinelAdaptor: public KinematicCSpaceAdaptor
     void RK4_step(std::vector<Matrix4>& p, const Matrix4& dp0, double h);
 
 
-    virtual bool ReverseSimulate(const State& x1, const ControlInput& u,std::vector<State>& p);
+    //virtual bool ReverseSimulate(const State& x1, const ControlInput& u,std::vector<State>& p);
 
     virtual bool ConnectionControl(const State& x,const State& xGoal,ControlInput& u) { return false; }
     virtual bool ReverseControl(const State& x0,const State& x1,ControlInput& u) { return false; }

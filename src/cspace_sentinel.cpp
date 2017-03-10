@@ -251,100 +251,25 @@ void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlIn
     //RungeKutta4_step(p_SE3, dp0, h);
   }
 
-
-  for(int i = 0; i < p_SE3.size(); i++){
-    State pi = x0;
+  p.push_back(x0);
+  for(int i = 1; i < p_SE3.size(); i++){
+    State pi(x0);
     SE3ToState(pi, p_SE3.at(i));
     p.push_back(pi);
   }
 
-  //exit(0);
-
-}
-
-
-
-/*
-void KinodynamicCSpaceSentinelAdaptor::Simulate(const State& x0, const ControlInput& u,std::vector<State>& p)
-{
-  //State x0 lies on local chart represented by R^6. We will convert x0
-  //to a R^4x4 matrix representing the same SE(3) element. Using the matrix
-  //representation allows easier computation of the forward dynamics. Once we
-  //are done, we reconvert the matrix representation to an element in vector
-  //representation in R^6 on the local chart.
-  //
-  // p is the path segment containing (numsteps) states along the forward simulation
-  // dt is the total timestep size
-  // numsteps is the number intermediate steps
-  // h = dt/numsteps is the intermediate timestep size
-
-  Real dt = u(6);
-  int numSteps = 1;
-  //Parameters(x0,u,dt,numSteps);
-
-  Real h = dt/numSteps;
-  p.push_back(x0);
-
-  std::cout << std::setprecision(2) << std::fixed;
-
-  bool DEBUG=false;
-  for(int i=0;i<numSteps;i++) {
-
-    State w0 = p.back(); //\in SE(3) current element along path segment
-    Matrix4 w0_SE3 = StateToSE3(w0);
-
-    if(DEBUG) std::cout << std::string(80, '-') << std::endl;
-    if(DEBUG) std::cout << w0 << std::endl;
-    if(DEBUG) std::cout << w0_SE3 << std::endl;
-
-    Matrix4 dw_se3 = this->SE3Derivative(u);
-    Matrix4 tmp = MatrixExponential(dw_se3*h);
-    Matrix4 w1_SE3 = w0_SE3*tmp;
-    State w1 = w0;
-    SE3ToState(w1, w1_SE3);
-    p.push_back(w1);
-
-    if(DEBUG) std::cout << std::string(10, '-') << std::endl;
-    if(DEBUG) std::cout << w1 << std::endl;
-    if(DEBUG) std::cout << w1_SE3 << std::endl;
+  if(x0!=p.front()){
+    double d = (x0-p.front()).norm();
+    std::cout << std::setprecision(16) << std::scientific;
+    std::cout << x0 << std::endl;
+    std::cout << d << std::endl;
+    std::cout << p.front() << std::endl;
   }
 
-  //exit(0);
-
+  assert(x0==p.front());
 }
-//*/
 
 
-
-bool KinodynamicCSpaceSentinelAdaptor::ReverseSimulate(const State& x1, const ControlInput& u,std::vector<State>& p)
-{
-  throw("NYI");
-//  Real dt;
-//  int numSteps;
-//  Parameters(x1,u,dt,numSteps);
-//
-//  Real h = -dt/numSteps;
-//
-//  p.push_back(x1);
-//  for(int i=0;i<numSteps;i++) {
-//
-//    State w1 = p.back(); //\in SE(3) current element along path segment
-//
-//    Matrix4 w1_SE3 = StateToSE3(w1);
-//    Matrix4 dw_se3 = this->SE3Derivative(u);
-//    Matrix4 w0_SE3 = MatrixExponential(dw_se3*h)*w1_SE3;
-//    State w0 = w1;
-//    SE3ToState(w0, w0_SE3);
-//    p.push_back(w0);
-//    //std::cout << "STATE:" << w1 << std::endl;
-//  }
-//  //reverse the vector?
-//  //std::reverse(p.begin(),p.end());
-//  throw("NYI");
-//
-  return true;
-
-}
 Matrix4 KinodynamicCSpaceSentinelAdaptor::MatrixExponential(const Matrix4& x)
 {
   Eigen::MatrixXd A(4,4);
@@ -382,25 +307,25 @@ EdgePlanner* KinodynamicCSpaceSentinelAdaptor::TrajectoryChecker(const std::vect
 
 bool KinodynamicCSpaceSentinelAdaptor::IsValidControl(const State& x,const ControlInput& u){
   return true;
-  const int N=6;
+  //const int N=6;
 
-  double u_low_limit_ptr[N]= {0,-1,-1,1,0,0};
-  double u_up_limit_ptr[N]= {0,1,1,1,0,0};
-  Vector u_low_limit;
-  Vector u_up_limit;
-  u_low_limit.setRef(u_low_limit_ptr, N);
-  u_up_limit.setRef(u_up_limit_ptr, N);
+  //double u_low_limit_ptr[N]= {0,-1,-1,1,0,0};
+  //double u_up_limit_ptr[N]= {0,1,1,1,0,0};
+  //Vector u_low_limit;
+  //Vector u_up_limit;
+  //u_low_limit.setRef(u_low_limit_ptr, N);
+  //u_up_limit.setRef(u_up_limit_ptr, N);
 
-  bool valid = true;
-  for(int i = 0; i < u_low_limit.size(); i++){
-    valid &= (u_low_limit[i] <= u[i] && u[i] <= u_up_limit[i]);
-  }
-  if(!valid){
-    std::cout << "Non valid control!" << std::endl;
-    std::cout << u << std::endl;
-    exit(0);
-  }
-  return valid;
+  //bool valid = true;
+  //for(int i = 0; i < u_low_limit.size(); i++){
+  //  valid &= (u_low_limit[i] <= u[i] && u[i] <= u_up_limit[i]);
+  //}
+  //if(!valid){
+  //  std::cout << "Non valid control!" << std::endl;
+  //  std::cout << u << std::endl;
+  //  exit(0);
+  //}
+  //return valid;
 
 }
 
@@ -488,6 +413,11 @@ void KinodynamicCSpaceSentinelAdaptor::SE3ToState(State& x, const Matrix4& x_SE3
   x(3)=R[2];
   x(4)=R[1];
   x(5)=R[0];
+
+  for(int i = 3; i < 6; i++){
+    if(x(i)<0) x(i)+=2*M_PI;
+    if(x(i)>2*M_PI) x(i)-=2*M_PI;
+  }
 }
 Real KinodynamicCSpaceSentinelAdaptor::Distance(const Config& x, const Config& y) { 
   //return base->Distance(x,y); 
@@ -528,7 +458,7 @@ void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput
   u(5) = 0;
   //T
   //u(6) = Rand(0.01,0.2);
-  u(6) = Rand(0.01,0.2);
+  u(6) = Rand(0.2,0.2);
 }
 void KinodynamicCSpaceSentinelAdaptor::BiasedSampleControl(const State& x,const State& xGoal,ControlInput& u){
   //SampleControl(x,u);
