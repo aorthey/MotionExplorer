@@ -65,7 +65,7 @@ int main(int argc,const char** argv) {
   //p_goal[2]=1.5;
 
   p_goal[0]=1.5;
-  p_goal[1]=-0.3;
+  p_goal[1]=-0.8;
   p_goal[2]=1.5;
 
   world.background = GLColor(1,1,1);
@@ -88,6 +88,8 @@ int main(int argc,const char** argv) {
 
   backend.VisualizeStartGoal(p_init, p_goal);
   backend.VisualizePlannerTree(planner.GetTree());
+  backend.Save();
+
 
   ////############################################################################
   ////guification

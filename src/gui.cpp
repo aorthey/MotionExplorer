@@ -1,5 +1,8 @@
 #include "gui.h"
 #include "drawMotionPlanner.h"
+#include "util.h"
+#include <tinyxml.h>
+
 
 const GLColor bodyColor(0.1,0.1,0.1);
 const GLColor selectedLinkColor(1.0,1.0,0.5);
@@ -99,6 +102,52 @@ void ForceFieldBackend::RenderWorld()
 
 }//RenderWorld
 
+void ForceFieldBackend::Load()
+{
+}
+bool ForceFieldBackend::Save()
+{
+
+   // string _robotname;
+   // SerializedTree _stree;
+   // //swept volume
+   // Config planner_p_init, planner_p_goal;
+   // std::vector<std::vector<Matrix4> > _mats;
+   // vector<GLDraw::GeometryAppearance> _appearanceStack;
+  std::string date = util::GetCurrentTimeString();
+  string out = "../data/gui/state_"+date+".xml";
+  std::cout << "saving data to "<<out << std::endl;
+
+  TiXmlElement node("GUI");
+  {
+    TiXmlElement c("robot");
+
+    //###################################################################
+    {
+      TiXmlElement cc("name");
+      stringstream ss;
+      ss<<_robotname;
+      TiXmlText text(ss.str().c_str());
+      cc.InsertEndChild(text);
+      c.InsertEndChild(cc);
+    }
+    {
+      TiXmlElement cc("config");
+      stringstream ss;
+      ss<<planner_p_init;
+      ss<<planner_p_goal;
+
+      TiXmlText text(ss.str().c_str());
+      cc.InsertEndChild(text);
+      c.InsertEndChild(cc);
+    }
+    //###################################################################
+    node.InsertEndChild(c);
+  }
+  return true;
+
+}
+
 //############################################################################
 //############################################################################
 
@@ -172,6 +221,13 @@ void ForceFieldBackend::VisualizePathSweptVolume(const MultiPath &path)
   drawPath = 1;
 
 }
+
+
+
+
+
+
+
 void ForceFieldBackend::VisualizePathSweptVolume(const KinodynamicMilestonePath &path)
 {
   Robot *robot = world->robots[0];
@@ -275,6 +331,9 @@ bool GLUIForceFieldGUI::Initialize()
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Start Goal Config");
   AddControl(checkbox,"draw_path_start_goal");
   checkbox->set_int_val(1);
+
+    //AddControl(glui->add_button_to_panel(panel,"Save state"),"save_state");
+
 
 
   panel = glui->add_rollout("Fancy Decorations");

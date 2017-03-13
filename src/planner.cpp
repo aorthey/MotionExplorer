@@ -98,6 +98,7 @@ void MotionPlanner::SerializeTreeAddCostToGoal(SerializedTree &stree, CSpace *ba
     stree.at(i).cost_to_goal = base->Distance(stree.at(i).config, goal);
   }
 }
+
 void MotionPlanner::SerializeTree( const KinodynamicTree::Node* node, SerializedTree &stree){
   SerializedTreeNode snode;
 
@@ -254,7 +255,9 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, plannersettings.goalRegionConvergence);
 
   RRTKinodynamicPlanner krrt(&kcspace);
-  //RRTKinodynamicPlanner krrt(&kcspace);
+  //LazyRRTKinodynamicPlanner krrt(&kcspace);
+  //RGRRT krrt(&kcspace, plannersettings.Nreachableset);
+
   krrt.goalSeekProbability= plannersettings.goalSeekProbability;
   krrt.goalSet = &goalSet;
   krrt.Init(_p_init);

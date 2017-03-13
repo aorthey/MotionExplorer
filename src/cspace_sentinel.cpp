@@ -292,8 +292,8 @@ void KinodynamicCSpaceSentinelAdaptor::SimulateEndpoint(const State& x0, const C
 ///Typically, just return new GivenPathEdgePlanner(this,p,tolerance)
 EdgePlanner* KinodynamicCSpaceSentinelAdaptor::TrajectoryChecker(const std::vector<State>& p){
   double tolerance = 1e-3;
-  //return new GivenPathEdgePlanner(this,p,tolerance);
-  return new TrueEdgePlanner(this,p.front(),p.back());
+  return new GivenPathEdgePlanner(this,p,tolerance);
+  //return new TrueEdgePlanner(this,p.front(),p.back());
 }
 
 bool KinodynamicCSpaceSentinelAdaptor::IsValidControl(const State& x,const ControlInput& u){
@@ -423,21 +423,25 @@ Real KinodynamicCSpaceSentinelAdaptor::Distance(const Config& x, const Config& y
 
 
   ////####
-  //AngleAxisRotation aax;
-  //aax.setMatrix(Ta.R);
-  //Vector3 xdir = aax.axis;
-  //Vector3 xpos = Ta.t;
 
-  //AngleAxisRotation aay;
-  //aay.setMatrix(Tb.R);
-  //Vector3 ydir = aay.axis;
-  //Vector3 ypos = Tb.t;
+  Vector3 e1(1,0,0);
+  Vector3 ydir = Tb.R*e1;
+  Vector3 ypos = Tb.t;
+  Vector3 xpos = Ta.t;
+  //Vector3 fpos = ypos - ydir*0.3;
+
+  Vector3 xydir = xpos - ypos;
+  double r=dot(xydir,ydir);
+
+  Vector3 xline = xydir - r*ydir;
+
+  double df = xline.norm();
+  //exit(0);
+  //std::cout << r << " " << df << std::endl;
   //float theta = M_PI/6;
   //if (acos(dot(X-M, N)/(norm(X-M)*norm(N)) <= theta) doSomething();
   //double d = ydir.dot(xdir);
   ////####
-
-
 
   Real d = Ta.t.distance(Tb.t);
   Matrix3 Rrel;
@@ -445,8 +449,9 @@ Real KinodynamicCSpaceSentinelAdaptor::Distance(const Config& x, const Config& y
   AngleAxisRotation aa;
   aa.setMatrix(Rrel);
   double wt = 1;
-  double wr = 0.01;
-  d = Sqrt(d*d*wt + aa.angle*aa.angle*wr);
+  double wf = 0.0;
+  double wr = 0.0;
+  d = Sqrt(d*d*wt + df*df*wf + aa.angle*aa.angle*wr);
 
   return d;
 }
@@ -468,7 +473,7 @@ void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput
   u(5) = 0;
   //T
   //u(6) = Rand(0.01,0.2);
-  u(6) = Rand(0.01,0.2);
+  u(6) = Rand(0.01,0.1);
 }
 void KinodynamicCSpaceSentinelAdaptor::BiasedSampleControl(const State& x,const State& xGoal,ControlInput& u){
   int numSamples = 1e2;

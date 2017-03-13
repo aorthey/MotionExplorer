@@ -45,6 +45,9 @@ class ForceFieldBackend : public SimTestBackend
   virtual bool OnCommand(const string& cmd,const string& args);
   virtual void RenderWorld();
 
+  virtual bool Save();
+  virtual void Load();
+
   void SetIKConstraints( vector<IKGoal> constraints, string robotname);
   void SetIKCollisions( vector<int> linksInCollision );
   void VisualizePathSweptVolumeAtPosition(const Config &q);
