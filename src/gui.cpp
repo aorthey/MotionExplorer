@@ -1,7 +1,9 @@
+#include <tinyxml.h>
+#include <iostream>
+#include <fstream>
 #include "gui.h"
 #include "drawMotionPlanner.h"
 #include "util.h"
-#include <tinyxml.h>
 
 
 const GLColor bodyColor(0.1,0.1,0.1);
@@ -102,27 +104,128 @@ void ForceFieldBackend::RenderWorld()
 
 }//RenderWorld
 
-void ForceFieldBackend::Load()
+bool ForceFieldBackend::Load(TiXmlElement *node)
 {
+
+  _stree.clear();
+  _keyframes.clear();
+  _mats.clear();
+  _appearanceStack.clear();
+  planner_p_goal.setZero();
+  planner_p_init.setZero();
+
+  if(0!=strcmp(node->Value(),"GUI")) {
+    std::cout << "Not a GUI file" << std::endl;
+    return false;
+  }
+  TiXmlElement* e=node->FirstChildElement();
+  while(e != NULL) 
+  {
+    if(0==strcmp(e->Value(),"robot")) {
+      TiXmlElement* c=e->FirstChildElement();
+      while(c!=NULL)
+      {
+        if(0==strcmp(c->Value(),"name")) {
+          if(e->GetText()){
+            stringstream ss(e->GetText());
+            ss >> _robotname;
+          }
+        }
+        if(0==strcmp(c->Value(),"configinit")) {
+          stringstream ss(c->GetText());
+          ss >> planner_p_init;
+        }
+        if(0==strcmp(c->Value(),"configgoal")) {
+          stringstream ss(c->GetText());
+          ss >> planner_p_goal;
+        }
+        c = c->NextSiblingElement();
+      }
+    }
+    if(0==strcmp(e->Value(),"tree")) {
+      TiXmlElement* c=e->FirstChildElement();
+      while(c!=NULL)
+      {
+        if(0==strcmp(c->Value(),"node")) {
+          SerializedTreeNode sn;
+          sn.Load(c);
+          _stree.push_back(sn);
+        }
+        c = c->NextSiblingElement();
+      }
+    }
+    if(0==strcmp(e->Value(),"sweptvolume")) {
+
+      TiXmlElement* c=e->FirstChildElement();
+      std::vector<Config> keyframes;
+      while(c!=NULL)
+      {
+        if(0==strcmp(c->Value(),"qitem")) {
+          Config q;
+          stringstream ss(c->GetText());
+          ss >> q;
+          keyframes.push_back(q);
+        }
+        c = c->NextSiblingElement();
+      }
+      VisualizePathSweptVolume(keyframes);
+    }
+    e = e->NextSiblingElement();
+  }
+
+  return true;
+}
+bool ForceFieldBackend::Load(const char* file)
+{
+  std::string pdata = util::GetDataFolder();
+  std::string in = pdata+"/gui/"+file;
+  //std::string in = "../gui/state_2017_03_14.xml";
+
+  std::cout << "loading data from "<<in << std::endl;
+
+  TiXmlDocument doc(in.c_str());
+  if(doc.LoadFile()){
+    TiXmlElement *root = doc.RootElement();
+    if(root){
+      Load(root);
+    }
+  }else{
+    std::cout << doc.ErrorDesc() << std::endl;
+    std::cout << "ERROR" << std::endl;
+  }
+  //exit(0);
+  return true;
+
 }
 bool ForceFieldBackend::Save()
 {
 
-   // string _robotname;
-   // SerializedTree _stree;
-   // //swept volume
-   // Config planner_p_init, planner_p_goal;
-   // std::vector<std::vector<Matrix4> > _mats;
-   // vector<GLDraw::GeometryAppearance> _appearanceStack;
   std::string date = util::GetCurrentTimeString();
-  string out = "../data/gui/state_"+date+".xml";
+  std::string pdata = util::GetDataFolder();
+  std::string out = pdata+"/gui/state_"+date+".xml";
+
   std::cout << "saving data to "<<out << std::endl;
 
-  TiXmlElement node("GUI");
+  TiXmlDocument doc;
+  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+  doc.LinkEndChild(decl);
+  TiXmlElement *node = new TiXmlElement("GUI");
+  Save(node);
+
+  doc.LinkEndChild(node);
+  doc.SaveFile(out.c_str());
+
+  return true;
+
+}
+bool ForceFieldBackend::Save(TiXmlElement *node)
+{
+  node->SetValue("GUI");
+
+  //###################################################################
   {
     TiXmlElement c("robot");
 
-    //###################################################################
     {
       TiXmlElement cc("name");
       stringstream ss;
@@ -132,19 +235,51 @@ bool ForceFieldBackend::Save()
       c.InsertEndChild(cc);
     }
     {
-      TiXmlElement cc("config");
+      TiXmlElement cc("configinit");
       stringstream ss;
-      ss<<planner_p_init;
-      ss<<planner_p_goal;
-
+      ss<<planner_p_init<<endl;
       TiXmlText text(ss.str().c_str());
       cc.InsertEndChild(text);
       c.InsertEndChild(cc);
     }
-    //###################################################################
-    node.InsertEndChild(c);
+    {
+      TiXmlElement cc("configgoal");
+      stringstream ss;
+      ss<<planner_p_goal;
+      TiXmlText text(ss.str().c_str());
+      cc.InsertEndChild(text);
+      c.InsertEndChild(cc);
+    }
+    node->InsertEndChild(c);
   }
+  //###################################################################
+  {
+    TiXmlElement c("tree");
+    for(int i = 0; i < _stree.size(); i++){
+      TiXmlElement cc("node");
+      _stree.at(i).Save(&cc);
+      c.InsertEndChild(cc);
+    }
+
+    node->InsertEndChild(c);
+  }
+  //###################################################################
+  {
+    TiXmlElement c("sweptvolume");
+    for(int i = 0; i < _keyframes.size(); i++){
+      TiXmlElement cc("qitem");
+      stringstream ss;
+      ss<<_keyframes.at(i);
+      TiXmlText text(ss.str().c_str());
+      cc.InsertEndChild(text);
+      c.InsertEndChild(cc);
+    }
+    node->InsertEndChild(c);
+  }
+
   return true;
+   // std::vector<std::vector<Matrix4> > _mats;
+   // vector<GLDraw::GeometryAppearance> _appearanceStack;
 
 }
 
@@ -179,6 +314,7 @@ void ForceFieldBackend::VisualizePathSweptVolumeAtPosition(const Config &q)
     mats_config.push_back(mat);
   }
   _mats.push_back(mats_config);
+  _keyframes.push_back(q);
 }
 
 void ForceFieldBackend::VisualizePathSweptVolume(const MultiPath &path)
@@ -312,12 +448,19 @@ GLUIForceFieldGUI::GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _w
     :BaseT(_backend,_world)
 {
 }
+void GLUIForceFieldGUI::browser_control(int control) {
+  glutPostRedisplay();
+  if(control==1){
+    //browser
+    std::string file_name = browser->get_file();
+    //file = fopen(file_name.c_str(),"r"); 
+    std::cout << "opening file " << file_name << std::endl;
+  }
+}
 bool GLUIForceFieldGUI::Initialize()
 {
   if(!BaseT::Initialize()) return false;
   
-  GLUI_Panel* panel;
-  GLUI_Checkbox* checkbox;
 
   panel = glui->add_rollout("Motion Planning");
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Planning Tree");
@@ -333,8 +476,18 @@ bool GLUIForceFieldGUI::Initialize()
   checkbox->set_int_val(1);
 
     //AddControl(glui->add_button_to_panel(panel,"Save state"),"save_state");
+  GLUI_Button* button;
+  button = glui->add_button_to_panel(panel,">> Save state");
+  AddControl(button, "save_motion_planner");
+  button = glui->add_button_to_panel(panel,">> Load state");
+  AddControl(button, "load_motion_planner");
 
-
+  //browser = new GLUI_FileBrowser(panel, "Loading New State", false, 1, 
+      //static_cast<void(GLUIForceFieldGUI::*)(int)>(&GLUIForceFieldGUI::browser_control));
+  //browser->set_h(100);
+  //browser->set_w(100);
+  //browser->set_allow_change_dir(0);
+  //browser->fbreaddir("../data/gui");
 
   panel = glui->add_rollout("Fancy Decorations");
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Coordinate Axes");

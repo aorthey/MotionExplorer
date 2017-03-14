@@ -36,6 +36,7 @@ class ForceFieldBackend : public SimTestBackend
     Config planner_p_init, planner_p_goal;
     std::vector<std::vector<Matrix4> > _mats;
     vector<GLDraw::GeometryAppearance> _appearanceStack;
+    vector<Config> _keyframes;
     typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
 
   public:
@@ -46,7 +47,9 @@ class ForceFieldBackend : public SimTestBackend
   virtual void RenderWorld();
 
   virtual bool Save();
-  virtual void Load();
+  virtual bool Save(TiXmlElement *node);
+  virtual bool Load(const char* file);
+  virtual bool Load(TiXmlElement *node);
 
   void SetIKConstraints( vector<IKGoal> constraints, string robotname);
   void SetIKCollisions( vector<int> linksInCollision );
@@ -66,5 +69,10 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
     typedef GLUISimTestGUI BaseT;
     GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _world);
     virtual bool Initialize();
+    void browser_control(int control);
+  private:
+    GLUI_Panel* panel;
+    GLUI_Checkbox* checkbox;
+    GLUI_FileBrowser *browser;
 };
 

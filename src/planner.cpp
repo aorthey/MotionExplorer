@@ -308,7 +308,6 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
     //double ttol=0.01;
     //bool res=GenerateAndTimeOptimizeMultiPath(*robot,_path,xtol,ttol);
 
-
     //std::string date = util::GetCurrentTimeString();
     //string out = "../data/paths/path_"+date+".xml";
     //path.Save(out);

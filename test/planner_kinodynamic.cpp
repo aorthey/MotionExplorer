@@ -85,17 +85,18 @@ int main(int argc,const char** argv) {
   }
   std::clock_t end = std::clock();
   double duration = ( end - start ) / (double) CLOCKS_PER_SEC;
+  std::cout << "Planning Time T=" << duration << std::endl;
 
   backend.VisualizeStartGoal(p_init, p_goal);
   backend.VisualizePlannerTree(planner.GetTree());
   backend.Save();
+  backend.Load("state_2017_03_14.xml");
 
 
   ////############################################################################
   ////guification
   ////############################################################################
 
-  std::cout << "Planning Time T=" << duration << std::endl;
 
   std::cout << "start GUI" << std::endl;
   GLUIForceFieldGUI gui(&backend,&world);

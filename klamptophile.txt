@@ -379,3 +379,4 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [x] krrt: no forward simulation towards goal (was wrong init rot)
  [ ] execute kinodynamic path
  [ ] remove this orange line from origin to p_init
+ [ ] Button to save/load GUI state including Motion Planning Equipment

@@ -28,5 +28,11 @@ namespace util {
     os << yyyy << "_" << setfill('0') << setw(2) << mm << "_" << setfill('0') << setw(2) << dd;
     return os.str();
   }
-} // namespace util
+  inline std::string GetDataFolder()
+  {
+    std::string name = getenv("USER");
+
+    return "/home/"+name+"/git/orthoklampt/data";
+  }
+}// namespace util
 
