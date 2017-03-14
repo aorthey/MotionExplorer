@@ -59,7 +59,6 @@ class ForceFieldBackend : public SimTestBackend
   void VisualizePathSweptVolume(const std::vector<Config> &keyframes);
   void VisualizePlannerTree(const SerializedTree &tree);
   void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
-
 };
 
 
@@ -69,6 +68,9 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
     typedef GLUISimTestGUI BaseT;
     GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _world);
     virtual bool Initialize();
+    virtual bool OnCommand(const string& cmd,const string& args);
+    virtual void Handle_Keypress(unsigned char c,int x,int y);
+
     void browser_control(int control);
   private:
     GLUI_Panel* panel;

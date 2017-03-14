@@ -359,11 +359,6 @@ void ForceFieldBackend::VisualizePathSweptVolume(const MultiPath &path)
 }
 
 
-
-
-
-
-
 void ForceFieldBackend::VisualizePathSweptVolume(const KinodynamicMilestonePath &path)
 {
   Robot *robot = world->robots[0];
@@ -424,7 +419,9 @@ void ForceFieldBackend::SetIKCollisions( vector<int> linksInCollision )
   drawIKextras = 1;
 }
 bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
-  BaseT::OnCommand(cmd,args);
+  stringstream ss(args);
+  std::cout << "OnCommand " << cmd << std::endl;
+
   if(cmd=="advance") {
     //ODERobot *robot = sim.odesim.robot(0);
     //std::cout << "Force" << std::endl;
@@ -440,7 +437,14 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     //py = 0.0;
     //pz = 0.0;
     //dBodyAddForceAtPos(robot->body(7),fx,fy,fz,px,py,pz);
+  }else if(cmd=="load_motion_planner") {
+    std::cout << "loading file " << args.c_str() << std::endl;
+  }else if(cmd=="save_motion_planner") {
+    std::cout << "saving file " << args.c_str() << std::endl;
+  }else{
+    return BaseT::OnCommand(cmd,args);
   }
+  SendRefresh();
   return true;
 }
 
@@ -482,6 +486,7 @@ bool GLUIForceFieldGUI::Initialize()
   button = glui->add_button_to_panel(panel,">> Load state");
   AddControl(button, "load_motion_planner");
 
+  glui->add_button_to_panel(panel,"Quit",0,(GLUI_Update_CB)exit);
   //browser = new GLUI_FileBrowser(panel, "Loading New State", false, 1, 
       //static_cast<void(GLUIForceFieldGUI::*)(int)>(&GLUIForceFieldGUI::browser_control));
   //browser->set_h(100);
@@ -502,6 +507,26 @@ bool GLUIForceFieldGUI::Initialize()
   return true;
 
 }
+
+bool GLUIForceFieldGUI::OnCommand(const string& cmd,const string& args)
+{
+  std::cout << "ONCOMMAND" << std::endl;
+  std::cout << cmd << std::endl;
+
+  return BaseT::OnCommand(cmd,args);
+}
+
+void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
+{
+    switch(c) {
+      case 'h':
+        printf("S: save motion planner \n");
+        break;
+      default:
+        BaseT::Handle_Keypress(c,x,y);
+    }
+}
+
 
 
 

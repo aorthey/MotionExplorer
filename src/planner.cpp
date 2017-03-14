@@ -281,7 +281,6 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   SerializeTreeAddCostToGoal(_stree, &kcspace, _p_goal);
   //SerializeTreeCullClosePoints(_stree, &kcspace,0.3);
   //SerializeTreeRandomlyCullPoints(_stree, plannersettings.maxDisplayedPointsInTree);
-
   //SerializeTreeCost(krrt.tree, _stree, &goalSet);
 
   if(res)
