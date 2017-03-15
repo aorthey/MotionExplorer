@@ -81,7 +81,7 @@ namespace GLDraw{
         glPushMatrix();
         glMultMatrix(matij);
 
-        sweptvolumeColor.setCurrentGL();
+        //sweptvolumeColor.setCurrentGL();
         glScalef(sweptvolumeScale, sweptvolumeScale, sweptvolumeScale);
 
         GLDraw::GeometryAppearance& a = appearanceStack.at(j);

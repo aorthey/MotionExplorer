@@ -146,7 +146,7 @@ std::string MotionPlanner::getName(){
   return "Motion Planner";
 }
 
-void MotionPlanner::CheckFeasibility( Robot *robot, SingleRobotCSpace &cspace, Config &q){
+bool MotionPlanner::CheckFeasibility( Robot *robot, SingleRobotCSpace &cspace, Config &q){
   if(!cspace.IsFeasible(q)) {
     std::cout << std::string(80, '*') << std::endl;
     std::cout << "ERROR!" << std::endl;
@@ -166,7 +166,7 @@ void MotionPlanner::CheckFeasibility( Robot *robot, SingleRobotCSpace &cspace, C
     }
     std::cout << cspace.collisionQueries.size() << std::endl;
     std::cout << std::string(80, '*') << std::endl;
-    exit(0);
+    return false;
   }
   //check that rotations are in [0,2pi]
   for(int i = 3; i < 6; i++){
@@ -178,9 +178,10 @@ void MotionPlanner::CheckFeasibility( Robot *robot, SingleRobotCSpace &cspace, C
       std::cout << q << std::endl;
       std::cout << "entry "<<i<< " " << q(i) << " outside of [0,2*pi]" << std::endl;
       std::cout << std::string(80, '*') << std::endl;
-      exit(0);
+      return false;
     }
   }
+  return true;
 }
 
 bool MotionPlanner::PlanPath(){
@@ -243,8 +244,8 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   SingleRobotCSpace cspace = SingleRobotCSpace(*_world,_irobot,&worldsettings);
 
   //Check Kinematic Feasibility at init/goal positions
-  CheckFeasibility( robot, cspace, _p_init);
-  CheckFeasibility( robot, cspace, _p_goal);
+  if(!CheckFeasibility( robot, cspace, _p_init)) return false;
+  if(!CheckFeasibility( robot, cspace, _p_goal)) return false;
 
   //###########################################################################
   // Dynamic Planning
@@ -274,7 +275,7 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   std::cout << pmap << std::endl;
 
   //bool res = krrt.Plan(1e4);
-  bool res = krrt.Plan(plannersettings.iterations);
+  _isSolved = krrt.Plan(plannersettings.iterations);
 
   _stree.clear();
   SerializeTree(krrt.tree, _stree);
@@ -283,7 +284,7 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //SerializeTreeRandomlyCullPoints(_stree, plannersettings.maxDisplayedPointsInTree);
   //SerializeTreeCost(krrt.tree, _stree, &goalSet);
 
-  if(res)
+  if(_isSolved)
   {
     std::cout << "Found solution path" << std::endl;
     KinodynamicMilestonePath path;
@@ -319,7 +320,7 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
       std::cout << _stree.at(i).position << std::endl;
     }
   }
-  return res;
+  return _isSolved;
 
 
   //###########################################################################
@@ -421,9 +422,9 @@ bool MotionPlanner::SendToController()
   //}
 
   std::cout << "Sending Path to Controller" << std::endl;
-  Robot *robot = _world->robots[_irobot];
-  util::SetSimulatedRobot(robot,*_sim,_p_init);
-  robot->UpdateConfig(_p_goal);
+  //Robot *robot = _world->robots[_irobot];
+  //util::SetSimulatedRobot(robot,*_sim,_p_init);
+  //robot->UpdateConfig(_p_goal);
   std::cout << "Done Path to Controller" << std::endl;
   return true;
 }

@@ -12,7 +12,7 @@
 
 #include <View/ViewIK.h>
 #include <ode/ode.h>
-#include "planner.h"
+#include "serialized_tree.h"
 
 #define DEBUG 0
 
@@ -27,6 +27,7 @@ class ForceFieldBackend : public SimTestBackend
     int drawPlannerStartGoal;
     int drawAxes;
     int drawAxesLabels;
+    int drawRigidObjects;
 
     vector<IKGoal> _constraints;
     vector<int> _linksInCollision;

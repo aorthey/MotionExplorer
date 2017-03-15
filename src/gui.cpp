@@ -10,7 +10,6 @@ const GLColor bodyColor(0.1,0.1,0.1);
 const GLColor selectedLinkColor(1.0,1.0,0.5);
 const double sweptvolumeScale = 0.98;
 const double sweptVolume_q_spacing = 0.01;
-GLColor sweptvolumeColor(0.7,0.0,0.9,0.5);
 
 ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
     : SimTestBackend(world)
@@ -21,6 +20,7 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawPath = 1;
   drawPlannerTree = 1;
   drawPlannerStartGoal = 1;
+  drawRigidObjects = 1;
 
   drawAxes = 1;
   drawAxesLabels = 0;
@@ -28,9 +28,9 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   MapButtonToggle("draw_planner_tree",&drawPlannerTree);
   MapButtonToggle("draw_path",&drawPath);
   MapButtonToggle("draw_path_start_goal",&drawPlannerStartGoal);
+  MapButtonToggle("draw_rigid_objects",&drawRigidObjects);
   MapButtonToggle("draw_fancy_coordinate_axes",&drawAxes);
   MapButtonToggle("draw_fancy_coordinate_axes_labels",&drawAxesLabels);
-
 
 
   _mats.clear();
@@ -70,6 +70,38 @@ void ForceFieldBackend::RenderWorld()
   DEBUG_GL_ERRORS()
   drawDesired=0;
 
+  for(size_t i=0;i<world->terrains.size();i++)
+    world->terrains[i]->DrawGL();
+
+  if(drawRigidObjects){
+    for(size_t i=0;i<world->rigidObjects.size();i++){
+      //
+      //visualization of vertices/faces is implemented in 
+      //Krislibrary/GLDraw/GeometryAppearances.h
+      //but edges are not yet!
+      //
+
+      RigidObject *obj = world->rigidObjects[i];
+      GLDraw::GeometryAppearance* a = obj->geometry.Appearance();
+      a->SetColor(GLColor(0.8,0.8,0.8));
+      a->drawFaces = true;
+      //a->drawEdges = true;
+      //a->drawVertices = true;
+      //a->vertexSize = 10;
+      //a->edgeSize = 500;
+      obj->DrawGL();
+    }
+  }
+  //WorldGUIBackend::RenderWorld();
+
+  for(size_t i=0;i<world->robots.size();i++) {
+    for(size_t j=0;j<world->robots[i]->links.size();j++) {
+      sim.odesim.robot(i)->GetLinkTransform(j,world->robots[i]->links[j].T_World);
+      world->robotViews[i].DrawLink_World(j);
+    }
+  }
+
+
   BaseT::RenderWorld();
 
   glEnable(GL_BLEND);
@@ -101,6 +133,8 @@ void ForceFieldBackend::RenderWorld()
   if(drawPlannerTree) GLDraw::drawPlannerTree(_stree);
   if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
   if(drawAxesLabels) GLDraw::drawAxesLabels(viewport);
+
+  
 
 }//RenderWorld
 
@@ -350,7 +384,6 @@ void ForceFieldBackend::VisualizePathSweptVolume(const MultiPath &path)
 
   for(size_t i=0;i<robot->links.size();i++) {
     GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
-    //a.SetColor(sweptvolumeColor);
     _appearanceStack[i]=a;
   }
   if(DEBUG) std::cout << "[SweptVolume] #geometries " << _appearanceStack.size() << std::endl;
@@ -420,23 +453,35 @@ void ForceFieldBackend::SetIKCollisions( vector<int> linksInCollision )
 }
 bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
-  std::cout << "OnCommand " << cmd << std::endl;
+  std::cout << "OnCommand: " << cmd << std::endl;
 
   if(cmd=="advance") {
-    //ODERobot *robot = sim.odesim.robot(0);
-    //std::cout << "Force" << std::endl;
-    //std::cout << robot->robot.name << std::endl;
-    //Config q;
-    //robot->GetConfig(q);
-    //double px,py,pz;
-    //double fx,fy,fz;
-    //fx = 10.0;
-    //fy = 0.0;
-    //fz = 10.0;
-    //px = 0.0;
-    //py = 0.0;
-    //pz = 0.0;
-    //dBodyAddForceAtPos(robot->body(7),fx,fy,fz,px,py,pz);
+    //static uint i = 0;
+
+    //if(i>_keyframes.size()-1){
+    //  return BaseT::OnCommand(cmd,args);
+    //}
+
+    //Config q = _keyframes.at(i);
+    //Config q2 = _keyframes.at(i+1);
+    //double dt = 1.0/_keyframes.size();
+    //Config dq = (q-q2)/dt;
+    ////if(i==0) dq.setZero();
+    //stringstream qstr;
+    //qstr<<q;
+
+    ////string cmd( (i<=0)?("set_qv"):("append_qv") );
+    //string cmd( (i<=0)?("set_q"):("append_q") );
+    //sim.robotControllers[0]->SendCommand(cmd,qstr.str());
+    //i++;
+
+    std::cout << sim.time << std::endl;
+    std::vector<Real> times;
+    for(int i = 0; i < _keyframes.size(); i++){
+      times.push_back(i);
+    }
+    SendLinearPath(times,_keyframes);
+
   }else if(cmd=="load_motion_planner") {
     std::cout << "loading file " << args.c_str() << std::endl;
   }else if(cmd=="save_motion_planner") {
@@ -444,8 +489,7 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else{
     return BaseT::OnCommand(cmd,args);
   }
-  SendRefresh();
-  return true;
+  return BaseT::OnCommand(cmd,args);
 }
 
 GLUIForceFieldGUI::GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _world)
@@ -473,6 +517,10 @@ bool GLUIForceFieldGUI::Initialize()
 
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Swept Volume");
   AddControl(checkbox,"draw_path");
+  checkbox->set_int_val(1);
+
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Obstacles");
+  AddControl(checkbox,"draw_rigid_objects");
   checkbox->set_int_val(1);
 
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Start Goal Config");
@@ -510,9 +558,6 @@ bool GLUIForceFieldGUI::Initialize()
 
 bool GLUIForceFieldGUI::OnCommand(const string& cmd,const string& args)
 {
-  std::cout << "ONCOMMAND" << std::endl;
-  std::cout << cmd << std::endl;
-
   return BaseT::OnCommand(cmd,args);
 }
 

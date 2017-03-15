@@ -376,8 +376,10 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] enable the ompl kinodynamic planners
  [ ] make the controller work without gravity on SE(3)
  [ ] save motion planner class plus tree and path
- [x] krrt: no forward simulation towards goal (was wrong init rot)
  [ ] execute kinodynamic path
  [ ] remove this orange line from origin to p_init
+ [x] krrt: no forward simulation towards goal (was wrong init rot)
  [x] save/load GUI state including Motion Planning Equipment
+ [x] Display/Undisplay Rigid Bodies (to visualize tree)
  [ ] Button to save/load GUI state including Motion Planning Equipment
+ [ ] implement edge visualization in KrisLibrary/GLDraw/GeometryAppearance.cpp

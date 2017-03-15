@@ -46,27 +46,15 @@ int main(int argc,const char** argv) {
   p_goal.setZero();
 
   //sentinel
-  //p_init[0]=-1;
-  //p_init[1]=0;
-  //p_init[2]=3;
-  //p_init[3]=-M_PI/4;
 
-  //p_goal[0]=3;
-  //p_goal[1]=-2.5;
-  //p_goal[2]=3.5;
+  p_init[0]=-1.8;
+  p_init[1]=-0.8;
+  p_init[2]=2.7;
+  p_init[3]=M_PI/4;
 
-  p_init[0]=-2;
-  p_init[1]=0.5;
-  p_init[2]=1;
-  p_init[3]=2*M_PI-M_PI/4;
-
-  //p_goal[0]=-0.5;
-  //p_goal[1]=-0.2;
-  //p_goal[2]=1.5;
-
-  p_goal[0]=1.5;
-  p_goal[1]=-0.8;
-  p_goal[2]=1.5;
+  p_goal[0]=2.0;
+  p_goal[1]=0.3;
+  p_goal[2]=1.3;
 
   world.background = GLColor(1,1,1);
 
@@ -78,11 +66,10 @@ int main(int argc,const char** argv) {
   MotionPlanner planner(&world, &sim);
 
   if(planner.solve(p_init, p_goal,100,false)){
-    std::cout << "VisualizePathSweptVolume" << std::endl;
-    //backend.VisualizePathSweptVolume(planner.GetPath());
-    planner.SendToController();
+    //planner.SendToController();
     backend.VisualizePathSweptVolume(planner.GetKeyframes());
   }
+
   std::clock_t end = std::clock();
   double duration = ( end - start ) / (double) CLOCKS_PER_SEC;
   std::cout << "Planning Time T=" << duration << std::endl;
@@ -90,13 +77,37 @@ int main(int argc,const char** argv) {
   backend.VisualizeStartGoal(p_init, p_goal);
   backend.VisualizePlannerTree(planner.GetTree());
   backend.Save();
-  backend.Load("state_2017_03_14.xml");
+  //backend.Load("state_2017_03_14.xml");
 
+  //############################################################################
+  //controller
+  //############################################################################
+  ////Robot *robot = _world->robots[_irobot];
+  //util::SetSimulatedRobot(robot,sim,p_init);
+  //robot->UpdateConfig(p_init);
+  //
+  //double dt = 0.1;
+  //std::vector<Config> keyframes = planner.GetKeyframes();
+  //uint itr = 0;
+  //Config q = keyframes.at(itr);
+  //cout<<sim.time<<'\t'<<world.robots[0]->q<<endl;
+
+  //sim.robotControllers[0]->SendCommand("set_q",LexicalCast(q));
+
+  //while(sim.time < 5) {
+  //  if(sim.time>itr){
+  //    Config q = keyframes.at(++itr);
+  //    sim.robotControllers[0]->SendCommand("append_q",LexicalCast(q));
+  //  }
+
+  //  sim.Advance(dt);
+  //  sim.UpdateModel();
+  //  cout<<sim.time<<'\t'<<world.robots[0]->q<<endl;
+  //}
 
   ////############################################################################
   ////guification
   ////############################################################################
-
 
   std::cout << "start GUI" << std::endl;
   GLUIForceFieldGUI gui(&backend,&world);
