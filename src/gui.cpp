@@ -84,11 +84,11 @@ void ForceFieldBackend::RenderWorld()
       RigidObject *obj = world->rigidObjects[i];
       GLDraw::GeometryAppearance* a = obj->geometry.Appearance();
       a->SetColor(GLColor(0.8,0.8,0.8));
-      a->drawFaces = true;
-      //a->drawEdges = true;
-      //a->drawVertices = true;
+      a->drawFaces = false;
+      a->drawEdges = true;
+      a->drawVertices = false;
       //a->vertexSize = 10;
-      //a->edgeSize = 500;
+      a->edgeSize = 10;
       obj->DrawGL();
     }
   }

@@ -15,7 +15,7 @@
 #include "serialized_tree.h"
 
 struct PlannerSettings{
-  const uint iterations = 1e6;
+  const uint iterations = 1e5;
   const double goalSeekProbability = 0.1;
   const double goalRegionConvergence = 0.1;
   const uint maxDisplayedPointsInTree = 1e4;

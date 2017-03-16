@@ -47,8 +47,8 @@ int main(int argc,const char** argv) {
 
   //sentinel
 
-  p_init[0]=-1.8;
-  p_init[1]=-0.8;
+  p_init[0]=-1.3;
+  p_init[1]=-0.4;
   p_init[2]=2.7;
   p_init[3]=M_PI/4;
 
@@ -77,7 +77,7 @@ int main(int argc,const char** argv) {
   backend.VisualizeStartGoal(p_init, p_goal);
   backend.VisualizePlannerTree(planner.GetTree());
   backend.Save();
-  //backend.Load("state_2017_03_14.xml");
+  //backend.Load("state_2017_03_15.xml");
 
   //############################################################################
   //controller
