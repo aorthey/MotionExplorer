@@ -365,7 +365,6 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] Compute SE constraints, what is GIWC equivalent?
  [ ] smoothing after path planning
  [ ] make a Klampt Interface where to set all properties like background color etc
- [ ] make ompl planners available
  [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
  [ ] screenshots x_X?
  [ ] refactor kinodynamic planner to make it independent from path planner
@@ -373,7 +372,6 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] save kinodynamicmilestonepath to file 
  [ ] outsource serialized tree to seperate file
  [ ] add directions again in draw serialized tree after culling nodes
- [ ] enable the ompl kinodynamic planners
  [ ] make the controller work without gravity on SE(3)
  [ ] save motion planner class plus tree and path
  [ ] execute kinodynamic path
@@ -382,4 +380,8 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [x] save/load GUI state including Motion Planning Equipment
  [x] Display/Undisplay Rigid Bodies (to visualize tree)
  [ ] Button to save/load GUI state including Motion Planning Equipment
- [ ] implement edge visualization in KrisLibrary/GLDraw/GeometryAppearance.cpp
+ [x] implement edge visualization in KrisLibrary/GLDraw/GeometryAppearance.cpp
+ [x] install krislib with ompl support (didn't link ompl in klampt lib and this lib)
+ [x] ompl does not read the joint limits
+ [x] make ompl planners available 
+ [ ] enable ompl kinodynamic planners

@@ -88,7 +88,7 @@ void ForceFieldBackend::RenderWorld()
       a->drawEdges = true;
       a->drawVertices = false;
       //a->vertexSize = 10;
-      a->edgeSize = 10;
+      a->edgeSize = 20;
       obj->DrawGL();
     }
   }

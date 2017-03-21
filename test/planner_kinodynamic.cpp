@@ -29,6 +29,18 @@ int main(int argc,const char** argv) {
   WorldSimulation& sim=backend.sim;
 
   backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel.xml");
+  world.robots[0]->qMin[0]=-4;
+  world.robots[0]->qMin[1]=-4;
+  world.robots[0]->qMin[2]=-4;
+  world.robots[0]->qMin[3]=0;
+  world.robots[0]->qMin[4]=0;
+  world.robots[0]->qMin[5]=0;
+  world.robots[0]->qMax[0]=4;
+  world.robots[0]->qMax[1]=4;
+  world.robots[0]->qMax[2]=4;
+  world.robots[0]->qMax[3]=2*M_PI;
+  world.robots[0]->qMax[4]=2*M_PI;
+  world.robots[0]->qMax[5]=2*M_PI;
   info(&world);
 
   //############################################################################

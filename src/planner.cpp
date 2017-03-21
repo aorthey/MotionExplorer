@@ -99,16 +99,52 @@ void MotionPlanner::SerializeTreeAddCostToGoal(SerializedTree &stree, CSpace *ba
   }
 }
 
-void MotionPlanner::SerializeTree( const KinodynamicTree::Node* node, SerializedTree &stree){
+#include <KrisLibrary/graph/Graph.h>
+void MotionPlanner::SerializeTree( const RoadmapPlanner& graph, SerializedTree& stree)
+{
+  std::cout << "serializing tree with " << graph.roadmap.nodes.size() << " nodes" << std::endl;
+  for(uint i = 0; i < graph.roadmap.nodes.size(); i++)
+  {
+    SerializedTreeNode snode;
+    snode.config = graph.roadmap.nodes.at(i);
+    snode.position.resize(6);
+    for(int i = 0; i < 6; i++){
+      snode.position(i) = snode.config(i);
+    }
+
+    Vector3 vnode(snode.position(0),snode.position(1),snode.position(2));
+      //typedef std::map<int,EdgeDataPtr> EdgeList;
+
+    //TODO: do in O(n)
+    uint Nedges = graph.roadmap.edges.at(i).size();
+
+    if(Nedges>0)
+    {
+      for(uint j = 0; j < graph.roadmap.nodes.size(); j++)
+      {
+        if(graph.roadmap.HasEdge(i,j))
+        {
+          Config goal = graph.roadmap.nodes.at(j);
+          Vector3 vgoal(goal(0),goal(1),goal(2));
+          Vector3 v;
+          v = vgoal - vnode;
+          snode.directions.push_back(v);
+        }
+      }
+      _stree.push_back(snode);
+    }
+  }
+
+}
+void MotionPlanner::SerializeTree( const KinodynamicTree::Node* node, SerializedTree &stree)
+{
   SerializedTreeNode snode;
 
   State s = *node;
-  Vector position;
-  position.resize(6);
+  snode.position.resize(6);
   for(int i = 0; i < 6; i++){
-    position(i) = s(i);
+    snode.position(i) = s(i);
   }
-  snode.position = position;
   snode.config = s;
 
   std::vector<Vector3> directions;
@@ -119,7 +155,7 @@ void MotionPlanner::SerializeTree( const KinodynamicTree::Node* node, Serialized
     Vector3 childdir;
     State c = *children.at(i);
     for(int j = 0; j < 3; j++){
-      childdir[j] = c(j)-position(j);
+      childdir[j] = c(j)-snode.position(j);
     }
     directions.push_back(childdir);
     SerializeTree(children.at(i),stree);
@@ -136,9 +172,6 @@ void MotionPlanner::SerializeTree( const KinodynamicTree::Node* node, Serialized
 
 }
 
-
-
-
 void MotionPlanner::SerializeTree( const KinodynamicTree& tree, SerializedTree& stree){
   SerializeTree(tree.root, stree);
 }
@@ -146,7 +179,7 @@ std::string MotionPlanner::getName(){
   return "Motion Planner";
 }
 
-bool MotionPlanner::CheckFeasibility( Robot *robot, SingleRobotCSpace &cspace, Config &q){
+bool MotionPlanner::IsFeasible( Robot *robot, SingleRobotCSpace &cspace, Config &q){
   if(!cspace.IsFeasible(q)) {
     std::cout << std::string(80, '*') << std::endl;
     std::cout << "ERROR!" << std::endl;
@@ -217,101 +250,168 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
 //** Real  contactEpsilon convergence threshold for contact solving
 //** int   contactIKMaxIters max iters for contact solving
 //** PropertyMap   properties other properties 
+
   WorldPlannerSettings worldsettings;
   worldsettings.InitializeDefault(*_world);
-  //sentinel
-  //Vector3 bmin(-4,-4,-0);
-  //Vector3 bmax(+4,+4,+4);
-  //Vector3 bmin(-4,-4,1);
-  //Vector3 bmax(+4,+4,3);
-  //AABB3D worldBounds(bmin,bmax);
-  worldsettings.robotSettings[0].worldBounds = AABB3D(plannersettings.worldboundsMin,plannersettings.worldboundsMax);
-
-  //Vector weights;weights.resize(7);
-  //weights.setZero();
-  //weights(0) = 1;
-  //weights(1) = 1;
-  //weights(2) = 1;
-  //weights(3) = 0.2;
-  //weights(4) = 0.2;
-  //weights(5) = 0.2;
-  //std::cout << weights << std::endl;
-  //settings.robotSettings[0].distanceWeights = weights;
-  //exit(0);
-  //settings.robotSettings[0].contactEpsilon = 1e-2;
-  //settings.robotSettings[0].contactIKMaxIters = 100;
+  //worldsettings.robotSettings[0].worldBounds = AABB3D(plannersettings.worldboundsMin,plannersettings.worldboundsMax);
+  //worldsettings.robotSettings[0].contactEpsilon = 1e-2;
+  //worldsettings.robotSettings[0].contactIKMaxIters = 100;
 
   SingleRobotCSpace cspace = SingleRobotCSpace(*_world,_irobot,&worldsettings);
+  //std::cout << cspace.settings->robotSettings[0].worldBounds << std::endl;
 
   //Check Kinematic Feasibility at init/goal positions
-  if(!CheckFeasibility( robot, cspace, _p_init)) return false;
-  if(!CheckFeasibility( robot, cspace, _p_goal)) return false;
+  if(!IsFeasible( robot, cspace, _p_init)) return false;
+  if(!IsFeasible( robot, cspace, _p_goal)) return false;
+
+  KinodynamicCSpaceSentinelAdaptor kcspace(&cspace);
+  PropertyMap pmap;
+  cspace.Properties(pmap);
+  std::cout << pmap << std::endl;
+
+  CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, plannersettings.goalRegionConvergence);
 
   //###########################################################################
   // Dynamic Planning
   //###########################################################################
 
-  KinodynamicCSpaceSentinelAdaptor kcspace(&cspace);
 
-  CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, plannersettings.goalRegionConvergence);
+  /////RRTKinodynamicPlanner krrt(&kcspace);
+  ///////LazyRRTKinodynamicPlanner krrt(&kcspace);
+  ///////RGRRT krrt(&kcspace, plannersettings.Nreachableset);
 
-  RRTKinodynamicPlanner krrt(&kcspace);
-  //LazyRRTKinodynamicPlanner krrt(&kcspace);
-  //RGRRT krrt(&kcspace, plannersettings.Nreachableset);
+  /////krrt.goalSeekProbability= plannersettings.goalSeekProbability;
+  /////krrt.goalSet = &goalSet;
+  /////krrt.Init(_p_init);
 
-  krrt.goalSeekProbability= plannersettings.goalSeekProbability;
-  krrt.goalSet = &goalSet;
-  krrt.Init(_p_init);
 
-  //RRTKinodynamicPlanner2 krrt(&kcspace);
-  //krrt.Init(_p_init,_p_goal);
+  ///////RRTKinodynamicPlanner2 krrt(&kcspace);
+  ///////krrt.Init(_p_init,_p_goal);
 
-  //BidirectionalRRTKP
-  //BidirectionalRRTKP krrt(&kcspace);
-  //UnidirectionalRRTKP krrt(&kcspace);
-  //
-  PropertyMap pmap;
-  kcspace.Properties(pmap);
-  std::cout << pmap << std::endl;
+  ///////BidirectionalRRTKP
+  ///////BidirectionalRRTKP krrt(&kcspace);
+  ///////UnidirectionalRRTKP krrt(&kcspace);
+  ///////
 
-  //bool res = krrt.Plan(1e4);
-  _isSolved = krrt.Plan(plannersettings.iterations);
+  /////_isSolved = krrt.Plan(plannersettings.iterations);
 
+  /////_stree.clear();
+  /////SerializeTree(krrt.tree, _stree);
+  /////SerializeTreeAddCostToGoal(_stree, &kcspace, _p_goal);
+  ///////SerializeTreeCullClosePoints(_stree, &kcspace,0.3);
+  ///////SerializeTreeRandomlyCullPoints(_stree, plannersettings.maxDisplayedPointsInTree);
+  ///////SerializeTreeCost(krrt.tree, _stree, &goalSet);
+
+  /////if(_isSolved)
+  /////{
+  /////  std::cout << "Found solution path" << std::endl;
+  /////  KinodynamicMilestonePath path;
+  /////  krrt.CreatePath(path);
+
+  /////  Config cur;
+  /////  double dstep = plannersettings.discretizationOutputPath;
+  /////  vector<Config> keyframes;
+  /////  for(double d = 0; d <= 1; d+=dstep)
+  /////  {
+  /////    path.Eval(d,cur);
+  /////    std::cout << d << cur << std::endl;
+  /////    _keyframes.push_back(cur);
+  /////  }
+  /////  std::cout << std::string(80, '-') << std::endl;
+
+  /////  //std::cout << std::string(80, '-') << std::endl;
+  /////  //_path.SetMilestones(keyframes);
+  /////  //std::cout << "time optimizing" << std::endl;
+  /////  //double xtol=0.01;
+  /////  //double ttol=0.01;
+  /////  //bool res=GenerateAndTimeOptimizeMultiPath(*robot,_path,xtol,ttol);
+
+  /////  //std::string date = util::GetCurrentTimeString();
+  /////  //string out = "../data/paths/path_"+date+".xml";
+  /////  //path.Save(out);
+  /////  //std::cout << "saved path to "<<out << std::endl;
+
+  /////}else{
+  /////  std::cout << "[Motion Planner] No path found." << std::endl;
+  /////  std::cout << "Tree size " << _stree.size() << std::endl;
+  /////  for(int i = 0; i < _stree.size(); i++){
+  /////    std::cout << _stree.at(i).position << std::endl;
+  /////  }
+  /////}
+  /////return _isSolved;
+
+
+  //###########################################################################
+  // Kinematic Planning
+  //###########################################################################
+  MotionPlannerFactory factory;
+  //factory.perturbationRadius = 0.1;
+  //factory.type = "rrt";
+  //factory.type = "prm";
+  //factory.type = "sbl";
+  //factory.type = "sblprt";
+  //factory.type = "rrt*";
+  //factory.type = "lazyrrg*";
+  //factory.type = "fmm"; //warning: slows down system 
+  //factory.type = "sbl";
+  //factory.type = "ompl:rrt";
+  //factory.type = "ompl:est";
+  factory.type = "ompl:rrtconnect";
+  //factory.type = "ompl:rrt*";
+  //factory.type = "ompl:fmt";
+  factory.shortcut = true;
+
+  SmartPointer<MotionPlannerInterface> planner = factory.Create(&kcspace,_p_init,_p_goal);
+
+  HaltingCondition cond;
+  cond.foundSolution=false;
+  cond.timeLimit = 5;
+
+  std::cout << "Start Planning" << std::endl;
+  MilestonePath mpath;
+  string res = planner->Plan(mpath,cond);
+  if(mpath.edges.empty())
+  {
+   printf("Planning failed\n");
+   this->_isSolved = false;
+  }else{
+   printf("Planning succeeded, path has length %g\n",mpath.Length());
+   this->_isSolved = true;
+  }
+
+  ////###########################################################################
+  //// Extract roadmap from planner
+  ////###########################################################################
+  RoadmapPlanner roadmap(&kcspace);
+  planner->GetRoadmap(roadmap);
+
+  //typedef Graph::UndirectedGraph<Config,SmartPointer<EdgePlanner> > Roadmap;
+
+  std::cout << roadmap.roadmap.NumNodes() << " Nodes" << std::endl;
   _stree.clear();
-  SerializeTree(krrt.tree, _stree);
+  SerializeTree(roadmap, _stree);
   SerializeTreeAddCostToGoal(_stree, &kcspace, _p_goal);
-  //SerializeTreeCullClosePoints(_stree, &kcspace,0.3);
-  //SerializeTreeRandomlyCullPoints(_stree, plannersettings.maxDisplayedPointsInTree);
-  //SerializeTreeCost(krrt.tree, _stree, &goalSet);
 
+
+  ////###########################################################################
+  //// Time Optimize Path, Convert to MultiPath and Save Path
+  ////###########################################################################
   if(_isSolved)
   {
     std::cout << "Found solution path" << std::endl;
-    KinodynamicMilestonePath path;
-    krrt.CreatePath(path);
+    //KinodynamicMilestonePath path;
+    //planner.CreatePath(path);
 
     Config cur;
     double dstep = plannersettings.discretizationOutputPath;
     vector<Config> keyframes;
     for(double d = 0; d <= 1; d+=dstep)
     {
-      path.Eval(d,cur);
-      std::cout << d << cur << std::endl;
+      mpath.Eval(d,cur);
+      //std::cout << d << cur << std::endl;
       _keyframes.push_back(cur);
     }
     std::cout << std::string(80, '-') << std::endl;
-
-    //std::cout << std::string(80, '-') << std::endl;
-    //_path.SetMilestones(keyframes);
-    //std::cout << "time optimizing" << std::endl;
-    //double xtol=0.01;
-    //double ttol=0.01;
-    //bool res=GenerateAndTimeOptimizeMultiPath(*robot,_path,xtol,ttol);
-
-    //std::string date = util::GetCurrentTimeString();
-    //string out = "../data/paths/path_"+date+".xml";
-    //path.Save(out);
-    //std::cout << "saved path to "<<out << std::endl;
 
   }else{
     std::cout << "[Motion Planner] No path found." << std::endl;
@@ -321,44 +421,6 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
     }
   }
   return _isSolved;
-
-
-  //###########################################################################
-  // Kinematic Planning
-  //###########################################################################
-  ////MotionPlannerFactory factory;
-  //////factory.perturbationRadius = 0.1;
-  //////factory.type = "rrt";
-  //////factory.type = "prm";
-  //////factory.type = "sbl";
-  //////factory.type = "sblprt";
-  //////factory.type = "rrt*";
-  //////factory.type = "lazyrrg*";
-  //////factory.type = "fmm"; //warning: slows down system 
-  //////factory.type = "sbl";
-  ////factory.type = "rrt";
-  ////factory.shortcut = this->_shortcutting;
-
-  ////SmartPointer<MotionPlannerInterface> planner = factory.Create(&kcspace,_p_init,_p_goal);
-
-  ////HaltingCondition cond;
-  ////cond.foundSolution=true;
-  ////cond.timeLimit = this->_timelimit;
-
-  ////std::cout << "Start Planning" << std::endl;
-  ////string res = planner->Plan(_milestone_path,cond);
-  ////if(_milestone_path.edges.empty())
-  ////{
-  //// printf("Planning failed\n");
-  //// this->_isSolved = false;
-  ////}else{
-  //// printf("Planning succeeded, path has length %g\n",_milestone_path.Length());
-  //// this->_isSolved = true;
-  ////}
-
-  ////###########################################################################
-  //// Time Optimize Path, Convert to MultiPath and Save Path
-  ////###########################################################################
   //if(this->_isSolved){
   //  double dstep = 0.1;
   //  Config cur;

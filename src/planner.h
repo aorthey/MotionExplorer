@@ -15,7 +15,7 @@
 #include "serialized_tree.h"
 
 struct PlannerSettings{
-  const uint iterations = 1e5;
+  const uint iterations = 1e6;
   const double goalSeekProbability = 0.1;
   const double goalRegionConvergence = 0.1;
   const uint maxDisplayedPointsInTree = 1e4;
@@ -48,6 +48,7 @@ class MotionPlanner{
     const KinodynamicMilestonePath& GetPath();
     const std::vector<Config>& GetKeyframes();
     const SerializedTree& GetTree();
+    void SerializeTree( const RoadmapPlanner& graph, SerializedTree& stree);
     void SerializeTree( const KinodynamicTree& tree, SerializedTree& stree);
     void SerializeTree( const KinodynamicTree::Node* node, SerializedTree &stree);
     void SerializeTreeAddCostToGoal(SerializedTree &stree, CSpace *base, Config &goal);
@@ -58,7 +59,7 @@ class MotionPlanner{
     bool solve(Config &p_init, Config &p_goal, double timelimit=100.0, bool shortcutting=true);
     void SendCommandStringController(string cmd, string arg);
     bool SendToController();
-    bool CheckFeasibility(Robot *robot, SingleRobotCSpace &cspace, Config &q);
+    bool IsFeasible(Robot *robot, SingleRobotCSpace &cspace, Config &q);
 
     virtual bool PlanPath();
     void PostProcess();
