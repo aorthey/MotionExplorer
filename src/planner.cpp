@@ -117,22 +117,60 @@ void MotionPlanner::SerializeTree( const RoadmapPlanner& graph, SerializedTree& 
 
     //TODO: do in O(n)
     uint Nedges = graph.roadmap.edges.at(i).size();
+    uint Ncoedges = graph.roadmap.co_edges.at(i).size();
+    //typedef typename std::list<EdgeData>::iterator EdgeDataPtr;
+    //typedef std::map<int,EdgeDataPtr> EdgeList;
 
-    if(Nedges>0)
+    RoadmapPlanner::Roadmap::EdgeList edges = graph.roadmap.edges.at(i);
+    RoadmapPlanner::Roadmap::CoEdgeList co_edges = graph.roadmap.co_edges.at(i);
+    typedef RoadmapPlanner::Roadmap::EdgeList::iterator EdgeIterator;
+    typedef RoadmapPlanner::Roadmap::CoEdgeList::iterator CoEdgeIterator;
+
+    for(EdgeIterator it = edges.begin(); it!=edges.end(); ++it)
     {
-      for(uint j = 0; j < graph.roadmap.nodes.size(); j++)
-      {
-        if(graph.roadmap.HasEdge(i,j))
-        {
-          Config goal = graph.roadmap.nodes.at(j);
-          Vector3 vgoal(goal(0),goal(1),goal(2));
-          Vector3 v;
-          v = vgoal - vnode;
-          snode.directions.push_back(v);
-        }
-      }
-      _stree.push_back(snode);
+      //std::cout << it->first << std::endl;
+      uint j = it->first;
+      Config goal = graph.roadmap.nodes.at(j);
+      Vector3 vgoal(goal(0),goal(1),goal(2));
+      Vector3 v;
+      v = vgoal - vnode;
+      snode.directions.push_back(v);
     }
+    for(CoEdgeIterator it = co_edges.begin(); it!=co_edges.end(); ++it)
+    {
+      uint j = it->first;
+      Config goal = graph.roadmap.nodes.at(j);
+      Vector3 vgoal(goal(0),goal(1),goal(2));
+      Vector3 v;
+      v = vnode - vgoal;
+      snode.directions.push_back(v);
+    }
+    _stree.push_back(snode);
+    //
+    //      Config goal = graph.roadmap.nodes.at(j);
+    //      Vector3 vgoal(goal(0),goal(1),goal(2));
+    //      Vector3 v;
+    //      v = vgoal - vnode;
+    //      snode.directions.push_back(v);
+    //    }
+    //  }
+    //  _stree.push_back(snode);
+
+    //if(Nedges>0)
+    //{
+    //  for(uint j = 0; j < graph.roadmap.nodes.size(); j++)
+    //  {
+    //    if(graph.roadmap.HasEdge(i,j))
+    //    {
+    //      Config goal = graph.roadmap.nodes.at(j);
+    //      Vector3 vgoal(goal(0),goal(1),goal(2));
+    //      Vector3 v;
+    //      v = vgoal - vnode;
+    //      snode.directions.push_back(v);
+    //    }
+    //  }
+    //  _stree.push_back(snode);
+    //}
   }
 
 }
