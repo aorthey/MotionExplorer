@@ -81,11 +81,11 @@ class Info
           std::cout<< "Link[" << i << "] " << linkNames[i] << " mass " << links[i].mass << std::endl;
         }
 
-        //std::cout << std::string(80, '-') << std::endl;
-        //vector<RobotJoint> joints = (*it)->joints;
-        //for(int i = 0; i< joints.size(); i++){
-        //  std::cout<< "Joint[" << i << "] linkidx " << joints[i].linkIndex << " baseidx " << joints[i].baseIndex << " type " << joints[i].type << std::endl;
-        //}
+        std::cout << std::string(80, '-') << std::endl;
+        vector<RobotJoint> joints = (*it)->joints;
+        for(int i = 0; i< joints.size(); i++){
+          std::cout<< "Joint[" << i << "] linkidx " << joints[i].linkIndex << " baseidx " << joints[i].baseIndex << " type " << joints[i].type << std::endl;
+        }
 
         std::cout << std::string(80, '-') << std::endl;
         vector<RobotJointDriver> drivers = (*it)->drivers;

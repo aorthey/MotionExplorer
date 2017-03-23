@@ -15,11 +15,11 @@
 #include "serialized_tree.h"
 
 struct PlannerSettings{
-  const uint iterations = 1e6;
+  const uint iterations = 1e3;
   const double goalSeekProbability = 0.1;
   const double goalRegionConvergence = 0.1;
   const uint maxDisplayedPointsInTree = 1e4;
-  const uint Nreachableset = 1e2; //for RGRRT
+  const uint Nreachableset = 10; //for RGRRT
   const double discretizationOutputPath = 0.01;
   const Vector3 worldboundsMin = Vector3(-3,-3,1);
   const Vector3 worldboundsMax = Vector3(+3,+3,3);
@@ -27,7 +27,7 @@ struct PlannerSettings{
 
 class MotionPlanner{
 
-  private:
+  protected:
     PlannerSettings plannersettings;
     RobotWorld *_world;
     int _irobot;
@@ -56,15 +56,34 @@ class MotionPlanner{
     void SerializeTreeCullClosePoints(SerializedTree &_stree, CSpace *base, double epsilon=0.1);
     void SerializeTreeRandomlyCullPoints(SerializedTree &_stree, uint N=1000);
 
-    bool solve(Config &p_init, Config &p_goal, double timelimit=100.0, bool shortcutting=true);
+    virtual bool solve(Config &p_init, Config &p_goal, double timelimit=100.0, bool shortcutting=true);
     void SendCommandStringController(string cmd, string arg);
     bool SendToController();
     bool IsFeasible(Robot *robot, SingleRobotCSpace &cspace, Config &q);
 
-    virtual bool PlanPath();
-    void PostProcess();
-
     virtual std::string getName();
+};
+
+#include <ompl/base/spaces/DubinsStateSpace.h>
+#include <ompl/base/spaces/ReedsSheppStateSpace.h>
+#include <ompl/base/spaces/SE3StateSpace.h>
+#include <ompl/base/ScopedState.h>
+#include <ompl/geometric/SimpleSetup.h>
+#include <boost/program_options.hpp>
+
+namespace ob = ompl::base;
+namespace og = ompl::geometric;
+namespace po = boost::program_options;
+
+
+class MotionPlannerOMPL: public MotionPlanner
+{
+  public:
+    MotionPlannerOMPL(RobotWorld *world, WorldSimulation *sim):
+      MotionPlanner(world,sim)
+    {};
+    ob::ScopedState<> ConfigToOMPLState(Config &q, ob::StateSpacePtr &s);
+    virtual bool solve(Config &p_init, Config &p_goal);
 };
 
 // * The type field can be left as "any", in which a default planning algorithm will be

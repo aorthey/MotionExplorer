@@ -17,7 +17,6 @@
 #include "util.h"
 #include "info.h"
 #include "planner.h"
-#include "object.h"
 #include "controller.h"
 #include "gui.h"
 
@@ -75,10 +74,10 @@ int main(int argc,const char** argv) {
   //############################################################################
 
   std::clock_t start = std::clock();
-  MotionPlanner planner(&world, &sim);
 
-  if(planner.solve(p_init, p_goal,100,false)){
-    //planner.SendToController();
+  MotionPlannerOMPL planner(&world, &sim);
+
+  if(planner.solve(p_init, p_goal)){
     backend.VisualizePathSweptVolume(planner.GetKeyframes());
   }
 
@@ -90,32 +89,6 @@ int main(int argc,const char** argv) {
   backend.VisualizePlannerTree(planner.GetTree());
   backend.Save();
   //backend.Load("state_2017_03_15.xml");
-
-  //############################################################################
-  //controller
-  //############################################################################
-  ////Robot *robot = _world->robots[_irobot];
-  //util::SetSimulatedRobot(robot,sim,p_init);
-  //robot->UpdateConfig(p_init);
-  //
-  //double dt = 0.1;
-  //std::vector<Config> keyframes = planner.GetKeyframes();
-  //uint itr = 0;
-  //Config q = keyframes.at(itr);
-  //cout<<sim.time<<'\t'<<world.robots[0]->q<<endl;
-
-  //sim.robotControllers[0]->SendCommand("set_q",LexicalCast(q));
-
-  //while(sim.time < 5) {
-  //  if(sim.time>itr){
-  //    Config q = keyframes.at(++itr);
-  //    sim.robotControllers[0]->SendCommand("append_q",LexicalCast(q));
-  //  }
-
-  //  sim.Advance(dt);
-  //  sim.UpdateModel();
-  //  cout<<sim.time<<'\t'<<world.robots[0]->q<<endl;
-  //}
 
   ////############################################################################
   ////guification

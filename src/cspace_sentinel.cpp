@@ -416,11 +416,9 @@ Real KinodynamicCSpaceSentinelAdaptor::Distance(const Config& x, const Config& y
  // Config ypos;ypos.resize(3);ypos(0)=y(0);ypos(1)=y(1);ypos(2)=y(2);
  // return base->Distance(xpos,ypos); 
 
-
   RigidTransform Ta,Tb;
   ConfigToTransform(x,Ta);
   ConfigToTransform(y,Tb);
-
 
   ////####
 
@@ -450,7 +448,7 @@ Real KinodynamicCSpaceSentinelAdaptor::Distance(const Config& x, const Config& y
   aa.setMatrix(Rrel);
   double wt = 1;
   double wf = 0.0;
-  double wr = 0.0;
+  double wr = 0.1;
   d = Sqrt(d*d*wt + df*df*wf + aa.angle*aa.angle*wr);
 
   return d;

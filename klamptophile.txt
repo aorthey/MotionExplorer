@@ -23,7 +23,16 @@ World -> Terrain -> ManagedGeometry -> DrawGL()
 -> GLDraw::GeometryAppearance -> DrawGL() ->
   
 
-Robot (Robot.h)
+Robot (Modeling/Robot.h)
+  Robot : public RobotWithGeometry
+    string name;
+    vector<string> geomFiles;   ///< geometry file names (used in saving)
+    vector<ManagedGeometry> geomManagers; ///< geometry loaders (speeds up loading)
+    Vector accMax;   ///< conservative acceleration limits, used by DynamicPath
+    vector<RobotJoint> joints;
+    vector<RobotJointDriver> drivers;
+    vector<string> linkNames;
+    vector<string> driverNames;
 
   <- RobotWithGeometry
 
@@ -40,10 +49,10 @@ Robot (Robot.h)
     Vector powerMax;      ///< Power=|torque||velocity| limits
 
     //B*ddq + C*dq = fext
-    //ddq from fext
-    void CalcAcceleration(Vector& ddq, const Vector& fext);
-    //fext from ddq
-    void CalcTorques(const Vector& ddq, Vector& fext);
+      //ddq from fext
+      void CalcAcceleration(Vector& ddq, const Vector& fext);
+      //fext from ddq
+      void CalcTorques(const Vector& ddq, Vector& fext);
 
 
   <- <- <- RobotKinematics3D 
@@ -56,10 +65,8 @@ Robot (Robot.h)
 
     /// sets the current config q and updates frames
     void UpdateConfig(const Config& q);
-
     /// based on the values in q, update the frames T
     void UpdateFrames();
-
     bool InJointLimits(const Config& q) const;
 
     //Force Field acts on rigid link i and induces a wrench on its COM
@@ -205,6 +212,11 @@ CSPACE
     //Single Robot 
     vector<pair<int,int> > collisionPairs;
     bool CheckCollisionFree();
+    WorldPlannerSettings* settings;
+    RobotWorld& world;
+    int index; ##robot number
+    Robot* GetRobot&();
+
 
   <- <- <- <- SingleRobotCSpace2 (Klampt/Planning/RobotCSpace.h)
     //Single robot + fixed dofs available
@@ -369,19 +381,23 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] screenshots x_X?
  [ ] refactor kinodynamic planner to make it independent from path planner
  [ ] refactor planner settings
- [ ] save kinodynamicmilestonepath to file 
- [ ] outsource serialized tree to seperate file
- [ ] add directions again in draw serialized tree after culling nodes
- [ ] make the controller work without gravity on SE(3)
- [ ] save motion planner class plus tree and path
- [ ] execute kinodynamic path
- [ ] remove this orange line from origin to p_init
+ [x] save kinodynamicmilestonepath to file 
+ [x] outsource serialized tree to seperate file
+ [x] save motion planner class plus tree and path
  [x] krrt: no forward simulation towards goal (was wrong init rot)
  [x] save/load GUI state including Motion Planning Equipment
  [x] Display/Undisplay Rigid Bodies (to visualize tree)
- [ ] Button to save/load GUI state including Motion Planning Equipment
  [x] implement edge visualization in KrisLibrary/GLDraw/GeometryAppearance.cpp
  [x] install krislib with ompl support (didn't link ompl in klampt lib and this lib)
  [x] ompl does not read the joint limits
  [x] make ompl planners available 
+ [ ] add directions again in draw serialized tree after culling nodes
+ [ ] make the controller work without gravity on SE(3)
+ [ ] execute kinodynamic path
+ [ ] remove this orange line from origin to p_init
+ [ ] Button to save/load GUI state including Motion Planning Equipment
  [ ] enable ompl kinodynamic planners
+ [ ] ompl converts cspace to realvectorspace R, but we need a compound space SE(3)xQ
+ [ ] make own ompl interface
+ [ ] refactor planner 
+
