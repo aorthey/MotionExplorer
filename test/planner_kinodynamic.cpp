@@ -16,9 +16,9 @@
 
 #include "util.h"
 #include "info.h"
-#include "planner.h"
 #include "controller.h"
 #include "gui.h"
+#include "planner/planner_ompl.h"
 
 int main(int argc,const char** argv) {
   RobotWorld world;

@@ -396,8 +396,10 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] execute kinodynamic path
  [ ] remove this orange line from origin to p_init
  [ ] Button to save/load GUI state including Motion Planning Equipment
+ [x] ompl converts cspace to realvectorspace R, but we need a compound space SE(3)xQ => make own ompl interface
+ [x] enable ompl geometric planners
  [ ] enable ompl kinodynamic planners
- [ ] ompl converts cspace to realvectorspace R, but we need a compound space SE(3)xQ
- [ ] make own ompl interface
+ [ ] create planner_klampt outsourcing klampt planning structure
+ [x] move planner components to planner/
  [ ] refactor planner 
 

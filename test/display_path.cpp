@@ -16,7 +16,6 @@
 #include "gui.h"
 #include "info.h"
 #include "planner.h"
-#include "object.h"
 #include "iksolver.h"
 #include "iksolver_hubo.h"
 #include "iksolvergrasp_hubolefthandcylinder.h"

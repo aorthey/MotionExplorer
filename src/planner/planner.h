@@ -12,7 +12,7 @@
 #include <tinyxml.h>
 #include <vector>
 
-#include "serialized_tree.h"
+#include "planner/serialized_tree.h"
 
 struct PlannerSettings{
   const uint iterations = 1e3;
@@ -64,27 +64,6 @@ class MotionPlanner{
     virtual std::string getName();
 };
 
-#include <ompl/base/spaces/DubinsStateSpace.h>
-#include <ompl/base/spaces/ReedsSheppStateSpace.h>
-#include <ompl/base/spaces/SE3StateSpace.h>
-#include <ompl/base/ScopedState.h>
-#include <ompl/geometric/SimpleSetup.h>
-#include <boost/program_options.hpp>
-
-namespace ob = ompl::base;
-namespace og = ompl::geometric;
-namespace po = boost::program_options;
-
-
-class MotionPlannerOMPL: public MotionPlanner
-{
-  public:
-    MotionPlannerOMPL(RobotWorld *world, WorldSimulation *sim):
-      MotionPlanner(world,sim)
-    {};
-    ob::ScopedState<> ConfigToOMPLState(Config &q, ob::StateSpacePtr &s);
-    virtual bool solve(Config &p_init, Config &p_goal);
-};
 
 // * The type field can be left as "any", in which a default planning algorithm will be
 // * used. Otherwise, a given planner algorithm can be designated as follows:

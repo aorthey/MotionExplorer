@@ -12,7 +12,7 @@
 
 #include <View/ViewIK.h>
 #include <ode/ode.h>
-#include "serialized_tree.h"
+#include "planner/serialized_tree.h"
 
 #define DEBUG 0
 

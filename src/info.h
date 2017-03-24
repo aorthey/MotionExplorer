@@ -4,6 +4,7 @@
 #include <Modeling/Paths.h>
 #include <Modeling/MultiPath.h>
 #include <KrisLibrary/planning/Path.h>
+#include <KrisLibrary/planning/KinodynamicPath.h>
 
 class Info
 {

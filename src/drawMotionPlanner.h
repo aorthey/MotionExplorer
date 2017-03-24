@@ -7,7 +7,7 @@
 #include <View/ViewRobot.h>
 #include <View/ViewIK.h>
 
-#include "planner.h"
+#include "planner/planner.h"
 
 namespace GLDraw {
   void drawRobotExtras(ViewRobot *robot, GLColor bodyColor=GLColor(0.5,0.5,0.5), double COMradius=0.05);
