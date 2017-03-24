@@ -6,14 +6,15 @@
 #include <ompl/control/SimpleSetup.h>
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/PathGeometric.h>
-#include <boost/program_options.hpp>
+//#include <boost/program_options.hpp>
+//#include <omplapp/config.h>
 #include "planner.h"
 #include "util.h"
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;
 namespace og = ompl::geometric;
-namespace po = boost::program_options;
+//namespace po = boost::program_options;
 
 class MotionPlannerOMPL: public MotionPlanner
 {

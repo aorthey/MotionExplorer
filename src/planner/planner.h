@@ -62,6 +62,9 @@ class MotionPlanner{
     bool IsFeasible(Robot *robot, SingleRobotCSpace &cspace, Config &q);
 
     virtual std::string getName();
+    //virtual Roadmap GetRoadmap() = 0;
+    //virtual Path GetPath() = 0;
+    //virtual Roadmap GetPath() = 0;
 };
 
 
