@@ -29,7 +29,9 @@
 //#include <boost/program_options.hpp>
 #include <omplapp/config.h>
 #include <omplapp/apps/SE3RigidBodyPlanning.h>
-#include "planner.h"
+#include <ompl/base/PlannerDataGraph.h>
+#include "planner/planner.h"
+#include "cspace_sentinel.h"
 #include "util.h"
 
 namespace ob = ompl::base;
@@ -39,6 +41,7 @@ namespace oa = ompl::app;
 //namespace po = boost::program_options;
 
 ob::ScopedState<> ConfigToOMPLState(const Config &q, const ob::StateSpacePtr &s);
+ob::State* ConfigToOMPLStatePtr(const Config &q, const ob::StateSpacePtr &s);
 Config OMPLStateToConfig(const ob::ScopedState<> &qompl, const ob::StateSpacePtr &s);
 Config OMPLStateToConfig(const ob::State *qompl, const ob::StateSpacePtr &s);
 Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState, const ob::StateSpacePtr &s);
@@ -66,8 +69,22 @@ class MotionPlannerOMPL: public MotionPlanner
 {
   public:
     MotionPlannerOMPL(RobotWorld *world, WorldSimulation *sim);
+    void SerializeTree(ob::PlannerData &pd, SerializedTree &stree);
     void test();
     void test_conversion(Config &q, ob::StateSpacePtr &stateSpace);
     virtual bool solve(Config &p_init, Config &p_goal);
 };
 
+class SentinelPropagator : public oc::StatePropagator
+{
+public:
+
+    SentinelPropagator(oc::SpaceInformationPtr si, KinodynamicCSpaceSentinelAdaptor *cspace) : 
+        oc::StatePropagator(si.get()), cspace_(cspace)
+    {
+    }
+    virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
+
+    KinodynamicCSpaceSentinelAdaptor *cspace_;
+
+};

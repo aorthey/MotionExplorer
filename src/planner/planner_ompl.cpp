@@ -73,6 +73,25 @@ GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot)
   cspaceRn->setBounds(boundsRn);
 
 }
+ob::State* ConfigToOMPLStatePtr(const Config &q, const ob::StateSpacePtr &s){
+  ob::ScopedState<> qompl = ConfigToOMPLState(q, s);
+
+  ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
+  ob::RealVectorStateSpace::StateType *qomplRn = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+  //double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
+
+  ob::State* out = s->allocState();
+  ob::SE3StateSpace::StateType *outSE3 = out->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  ob::SO3StateSpace::StateType *outSO3 = &outSE3->rotation();
+  ob::RealVectorStateSpace::StateType *outRn = out->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+
+  outSE3 = qomplSE3;
+  outSO3 = qomplSO3;
+  outRn = qomplRn;
+
+  return out;
+}
 ob::ScopedState<> ConfigToOMPLState(const Config &q, const ob::StateSpacePtr &s){
   ob::ScopedState<> qompl(s);
 
@@ -234,19 +253,74 @@ void MotionPlannerOMPL::test_conversion(Config &q, ob::StateSpacePtr &stateSpace
 
 }
 
-void propagate(const ob::State *start, const oc::Control *control, const double duration, ob::State *result)
+void SentinelPropagator::propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
 {
-  const ob::SE2StateSpace::StateType *se2state = start->as<ob::SE2StateSpace::StateType>();
-  const double* pos = se2state->as<ob::RealVectorStateSpace::StateType>(0)->values;
-  const double rot = se2state->as<ob::SO2StateSpace::StateType>(1)->value;
-  const double* ctrl = control->as<oc::RealVectorControlSpace::ControlType>()->values;
 
-  result->as<ob::SE2StateSpace::StateType>()->setXY(
-      pos[0] + ctrl[0] * duration * cos(rot),
-      pos[1] + ctrl[0] * duration * sin(rot));
-  result->as<ob::SE2StateSpace::StateType>()->setYaw(
-      rot    + ctrl[1] * duration);
+  //const ob::SE3StateSpace::StateType *startSE3 = start->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  //const ob::SO3StateSpace::StateType *startSO3 = &qomplSE3->rotation();
+  //const ob::RealVectorStateSpace::StateType *startRn = start->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+
+  //double xs = startSE3->getX();
+  //double ys = startSE3->getY();
+  //double zs = startSE3->getZ();
+
+  //double rxs = startSO3->x;
+  //double rys = startSO3->y;
+  //double rzs = startSO3->z;
+  //double rws = startSO3->w;
+
+  const ob::StateSpacePtr s = si_->getStateSpace();
+  Config x0 = OMPLStateToConfig(state, s);
+
+  const double *ucontrol = control->as<oc::RealVectorControlSpace::ControlType>()->values;
+
+  Config u;
+  u.resize(7);
+  u.setZero();
+  u(1) = ucontrol[0];
+  u(2) = ucontrol[1];
+  u(3) = 1.0;
+  u(6) = duration;
+
+  std::vector<Config> path;
+  cspace_->Simulate(x0, u, path);
+  Config qend = path.back();
+
+  ob::ScopedState<> ssr = ConfigToOMPLState(qend, s);
+
+  //ob::State* sr = ConfigToOMPLStatePtr(qend, s);
+
+  //std::cout << "propagate:" << x0 << ", control:" << u << std::endl;
+  //std::cout << "          " << qend << std::endl;
+
+  //std::cout << ssr << std::endl;
+
+  ob::SE3StateSpace::StateType *ssrSE3 = ssr->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  ob::SO3StateSpace::StateType *ssrSO3 = &ssrSE3->rotation();
+  ob::RealVectorStateSpace::StateType *ssrRn = ssr->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+
+  ob::SE3StateSpace::StateType *resultSE3 = result->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  ob::SO3StateSpace::StateType *resultSO3 = &resultSE3->rotation();
+  ob::RealVectorStateSpace::StateType *resultRn = result->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+
+  resultSE3->setXYZ(ssrSE3->getX(),ssrSE3->getY(),ssrSE3->getZ());
+  resultSO3->x = ssrSO3->x;
+  resultSO3->y = ssrSO3->y;
+  resultSO3->z = ssrSO3->z;
+  resultSO3->w = ssrSO3->w;
+
+  uint N = s->getDimension() - 6;
+  for(int i = 0; i < N; i++){
+    resultRn->values[i] = ssrRn->values[i];
+  }
+
+  //std::cout << resultSE3->getX() << " " << resultSE3->getY() << " " << resultSE3->getZ() << std::endl;
+  //std::cout << resultSO3->x << " " << resultSO3->y << " " << resultSO3->z << " " << resultSO3->w << " " << std::endl;
+
 }
+
+
+
 bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
 {
   this->_p_init = p_init;
@@ -268,10 +342,6 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
 
   WorldPlannerSettings worldsettings;
   worldsettings.InitializeDefault(*_world);
-  //worldsettings.robotSettings[0].worldBounds = AABB3D(plannersettings.worldboundsMin,plannersettings.worldboundsMax);
-  //worldsettings.robotSettings[0].contactEpsilon = 1e-2;
-  //worldsettings.robotSettings[0].contactIKMaxIters = 100;
-
   SingleRobotCSpace geometric_cspace = SingleRobotCSpace(*_world,_irobot,&worldsettings);
   if(!IsFeasible( robot, geometric_cspace, _p_init)) return false;
   if(!IsFeasible( robot, geometric_cspace, _p_goal)) return false;
@@ -280,8 +350,6 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   PropertyMap pmap;
   kcspace.Properties(pmap);
   std::cout << pmap << std::endl;
-
-  //CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, plannersettings.goalRegionConvergence);
 
   //###########################################################################
   // Config init,goal to OMPL start/goal
@@ -342,20 +410,18 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   // Kinodynamic planner
   //###########################################################################
   //KINODYNAMIC PLANNERS
-  auto control_cspace(std::make_shared<oc::RealVectorControlSpace>(cspace.getPtr(), 6));
-  //oc::ControlSpace
-
-  ob::RealVectorBounds cbounds(6);
-  cbounds.setLow(-0.3);
-  cbounds.setHigh(0.3);
+  auto control_cspace(std::make_shared<oc::RealVectorControlSpace>(cspace.getPtr(), 2));
+  ob::RealVectorBounds cbounds(2);
+  cbounds.setLow(-1);
+  cbounds.setHigh(1);
   control_cspace->setBounds(cbounds);
 
   oc::SimpleSetup ss(control_cspace);
-  const oc::SpaceInformationPtr si = ss.getSpaceInformation();
+  oc::SpaceInformationPtr si = ss.getSpaceInformation();
 
-  ss.setStatePropagator(propagate);
+  auto cpropagate(std::make_shared<SentinelPropagator>(si, &kcspace));
 
-  //ss->setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
+
   //oc::SimpleSetup ss(cspace);
   //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
   ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
@@ -368,14 +434,31 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::EST>(si);
 
+
+  ss.setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
+  ss.setStatePropagator(cpropagate);
+  ss.setStartAndGoalStates(start, goal);
+  ss.setPlanner(ompl_planner);
+
   ss.setup();
-  ob::PlannerStatus solved = ss.solve(10.0);
+  ob::PlannerStatus status = ss.solve(2.0);
+  std::cout << "Status:" << status << std::endl;
+  bool solved = ss.haveSolutionPath();
+
+  //Extract roadmap
+  oc::PlannerData pd(si);
+  ss.getPlannerData(pd);
+  std::cout << "Edges   : " << pd.numEdges() << std::endl;
+  std::cout << "Vertices: " << pd.numVertices() << std::endl;
+
+  _stree.clear();
+  SerializeTree(pd, _stree);
+
   if (solved)
   {
     std::cout << "Found solution:" << std::endl;
     oc::PathControl path_control = ss.getSolutionPath();
     og::PathGeometric path = path_control.asGeometric();
-    path.interpolate();
     std::cout << path.length() << std::endl;
     std::cout << path.getStateCount() << std::endl;
 
@@ -386,6 +469,13 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
       Config cur = OMPLStateToConfig(state, cspace.getPtr());
       _keyframes.push_back(cur);
     }
+    uint istep = int(path.getStateCount()/10.0);
+    for(int i = 0; i < path.getStateCount(); i+=istep)
+    {
+      ob::State *state = path.getState(i);
+      Config cur = OMPLStateToConfig(state, cspace.getPtr());
+      std::cout << cur << std::endl;
+    }
     std::cout << std::string(80, '-') << std::endl;
   }else{
     std::cout << "No solution found" << std::endl;
@@ -394,3 +484,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   return solved;
 }
 
+void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd, SerializedTree &stree)
+{
+  std::cout << "serializing tree with " << pd.numEdges() << " nodes" << std::endl;
+}

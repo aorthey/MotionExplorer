@@ -1,3 +1,4 @@
+#pragma once
 #include <KrisLibrary/planning/KinodynamicCSpace.h>
 #include <KrisLibrary/math/random.h>
 #include <KrisLibrary/math3d/primitives.h>
