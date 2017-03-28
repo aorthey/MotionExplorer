@@ -1,6 +1,78 @@
 #include "planner_ompl.h"
 #include "cspace_sentinel.h"
 
+GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot)
+{
+  //###########################################################################
+  // Create OMPL state space
+  //   Create an SE(3) x R^n state space
+  //###########################################################################
+  if(!(robot->joints[0].type==RobotJoint::Floating))
+  {
+    std::cout << "[MotionPlanner] only supports robots with a configuration space equal to SE(3) x R^n" << std::endl;
+    exit(0);
+  }
+
+  double N = robot->q.size()-6;
+  std::cout << "[MotionPlanner] Robot CSpace: SE(3) x R^"<<N<<std::endl;
+
+  ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());
+  ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(N));
+
+  space_ = SE3 + Rn;
+  ob::SE3StateSpace *cspaceSE3 = space_->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
+  ob::RealVectorStateSpace *cspaceRn = space_->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+
+  //std::cout << startRn->getDimension() << std::endl;
+
+  //###########################################################################
+  // Set bounds
+  //###########################################################################
+  std::vector<double> minimum, maximum;
+  //PropertyMap props;
+  //space->Properties(props);
+  //props.getArray("minimum",minimum);
+  //props.getArray("maximum",maximum);
+  minimum = robot->qMin;
+  maximum = robot->qMax;
+
+  assert(minimum.size() == 6+N);
+  assert(maximum.size() == 6+N);
+
+  vector<double> lowSE3;
+  lowSE3.push_back(minimum.at(0));
+  lowSE3.push_back(minimum.at(1));
+  lowSE3.push_back(minimum.at(2));
+  vector<double> highSE3;
+  highSE3.push_back(maximum.at(0));
+  highSE3.push_back(maximum.at(1));
+  highSE3.push_back(maximum.at(2));
+
+  ob::RealVectorBounds boundsSE3(3);
+  boundsSE3.low = lowSE3;
+  boundsSE3.high = highSE3;
+  cspaceSE3->setBounds(boundsSE3);
+
+  vector<double> lowRn, highRn;
+  for(int i = 0; i < N; i++){
+    lowRn.push_back(minimum.at(i+6));
+    highRn.push_back(maximum.at(i+6));
+  }
+  ob::RealVectorBounds boundsRn(N);
+
+  //ompl does only accept dimensions with strictly positive measure, adding some epsilon space
+  double epsilonSpacing=1e-8;
+  for(int i = 0; i < N; i++){
+    if(abs(lowRn.at(i)-highRn.at(i))<epsilonSpacing){
+      highRn.at(i)+=epsilonSpacing;
+    }
+  }
+
+  boundsRn.low = lowRn;
+  boundsRn.high = highRn;
+  cspaceRn->setBounds(boundsRn);
+
+}
 ob::ScopedState<> ConfigToOMPLState(const Config &q, const ob::StateSpacePtr &s){
   ob::ScopedState<> qompl(s);
 
@@ -85,6 +157,7 @@ Config OMPLStateToConfig(const ob::State *qompl, const ob::StateSpacePtr &s){
   return OMPLStateToConfig(qomplSE3, qomplRnState, s);
 
 }
+
 Config OMPLStateToConfig(const ob::ScopedState<> &qompl, const ob::StateSpacePtr &s){
 
   const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
@@ -102,11 +175,9 @@ bool MotionPlannerOMPLValidityChecker::isValid(const ob::State* state) const
   const ob::StateSpacePtr ssp = si_->getStateSpace();
   Config q = OMPLStateToConfig(state, ssp);
   bool isFeasible = _space->IsFeasible(q);
-  //std::cout << "Config: " << q;
-  //if(isFeasible) std::cout << " feasible" << std::endl;
-  //else std::cout << "" << std::endl;
   return isFeasible;
 }
+
 
 MotionPlannerOMPL::MotionPlannerOMPL(RobotWorld *world, WorldSimulation *sim):
   MotionPlanner(world,sim)
@@ -163,6 +234,19 @@ void MotionPlannerOMPL::test_conversion(Config &q, ob::StateSpacePtr &stateSpace
 
 }
 
+void propagate(const ob::State *start, const oc::Control *control, const double duration, ob::State *result)
+{
+  const ob::SE2StateSpace::StateType *se2state = start->as<ob::SE2StateSpace::StateType>();
+  const double* pos = se2state->as<ob::RealVectorStateSpace::StateType>(0)->values;
+  const double rot = se2state->as<ob::SO2StateSpace::StateType>(1)->value;
+  const double* ctrl = control->as<oc::RealVectorControlSpace::ControlType>()->values;
+
+  result->as<ob::SE2StateSpace::StateType>()->setXY(
+      pos[0] + ctrl[0] * duration * cos(rot),
+      pos[1] + ctrl[0] * duration * sin(rot));
+  result->as<ob::SE2StateSpace::StateType>()->setYaw(
+      rot    + ctrl[1] * duration);
+}
 bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
 {
   this->_p_init = p_init;
@@ -200,112 +284,97 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, plannersettings.goalRegionConvergence);
 
   //###########################################################################
-  // Create OMPL state space
-  //   Create an SE(3) x R^n state space
-  //###########################################################################
-  if(!(robot->joints[0].type==RobotJoint::Floating))
-  {
-    std::cout << "[MotionPlanner] only supports robots with a configuration space equal to SE(3) x R^n" << std::endl;
-    exit(0);
-  }
-
-  double N = robot->q.size()-6;
-  std::cout << "[MotionPlanner] Robot CSpace: SE(3) x R^"<<N<<std::endl;
-
-  ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());
-  ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(N));
-
-  ob::StateSpacePtr cspace = SE3 + Rn;
-  ob::SE3StateSpace *cspaceSE3 = cspace->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
-  ob::RealVectorStateSpace *cspaceRn = cspace->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
-
-  //std::cout << startRn->getDimension() << std::endl;
-  //###########################################################################
   // Config init,goal to OMPL start/goal
   //###########################################################################
 
-  ob::ScopedState<> start = ConfigToOMPLState(p_init, cspace);
-  ob::ScopedState<> goal  = ConfigToOMPLState(p_goal, cspace);
+  GeometricCSpaceOMPL cspace(robot);
+
+  ob::ScopedState<> start = ConfigToOMPLState(p_init, cspace.getPtr());
+  ob::ScopedState<> goal  = ConfigToOMPLState(p_goal, cspace.getPtr());
   std::cout << start << std::endl;
   std::cout << goal << std::endl;
 
 
-  //###########################################################################
-  // Set bounds
-  //###########################################################################
-  std::vector<double> minimum, maximum;
-  //PropertyMap props;
-  //space->Properties(props);
-  //props.getArray("minimum",minimum);
-  //props.getArray("maximum",maximum);
-  minimum = _world->robots[_irobot]->qMin;
-  maximum = _world->robots[_irobot]->qMax;
+  ////###########################################################################
+  //// Geometric planning (tested, works)
+  ////###########################################################################
 
-  assert(minimum.size() == 6+N);
-  assert(maximum.size() == 6+N);
+  //og::SimpleSetup ss(cspace.getPtr());
+  //const ob::SpaceInformationPtr si = ss.getSpaceInformation();
 
-  vector<double> lowSE3;
-  lowSE3.push_back(minimum.at(0));
-  lowSE3.push_back(minimum.at(1));
-  lowSE3.push_back(minimum.at(2));
-  vector<double> highSE3;
-  highSE3.push_back(maximum.at(0));
-  highSE3.push_back(maximum.at(1));
-  highSE3.push_back(maximum.at(2));
-
-  ob::RealVectorBounds boundsSE3(3);
-  boundsSE3.low = lowSE3;
-  boundsSE3.high = highSE3;
-  cspaceSE3->setBounds(boundsSE3);
-
-  vector<double> lowRn, highRn;
-  for(int i = 0; i < N; i++){
-    lowRn.push_back(minimum.at(i+6));
-    highRn.push_back(maximum.at(i+6));
-  }
-  ob::RealVectorBounds boundsRn(N);
-
-  //ompl does only accept dimensions with strictly positive measure, adding some epsilon space
-  double epsilonSpacing=1e-8;
-  for(int i = 0; i < N; i++){
-    if(abs(lowRn.at(i)-highRn.at(i))<epsilonSpacing){
-      highRn.at(i)+=epsilonSpacing;
-    }
-  }
-
-  boundsRn.low = lowRn;
-  boundsRn.high = highRn;
-  cspaceRn->setBounds(boundsRn);
-
-  //###########################################################################
-  // Setup planning
-  //###########################################################################
-
-  og::SimpleSetup ss(cspace);
-  const ob::SpaceInformationPtr si = ss.getSpaceInformation();
-
+  ////GEOMETRIC PLANNERS
   //ob::PlannerPtr ompl_planner = std::make_shared<og::RRTConnect>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<og::RRT>(si);
-  ob::PlannerPtr ompl_planner = std::make_shared<og::RRTstar>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<og::RRTsharp>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<og::LazyRRT>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<og::InformedRRTstar>(si);
-  ss.setPlanner(ompl_planner);
-  //ss.setPlanner(std::make_shared<og::RRTConnect>(si));
+  ////ob::PlannerPtr ompl_planner = std::make_shared<og::RRT>(si);
+  ////ob::PlannerPtr ompl_planner = std::make_shared<og::RRTstar>(si);
+  ////ob::PlannerPtr ompl_planner = std::make_shared<og::RRTsharp>(si);
+  ////ob::PlannerPtr ompl_planner = std::make_shared<og::LazyRRT>(si);
 
-  si->setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
+  //ss.setPlanner(ompl_planner);
+  ////ss.setPlanner(std::make_shared<og::RRTConnect>(si));
 
-  ss.setStartAndGoalStates(start, goal);
+  //si->setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
+
+  //ss.setStartAndGoalStates(start, goal);
+  //ss.setup();
+  //ob::PlannerStatus solved = ss.solve(10.0);
+  //if (solved)
+  //{
+  //  std::cout << "Found solution:" << std::endl;
+  //  ss.simplifySolution();
+  //  og::PathGeometric path = ss.getSolutionPath();
+  //  path.interpolate();
+  //  std::cout << path.length() << std::endl;
+  //  std::cout << path.getStateCount() << std::endl;
+
+  //  vector<Config> keyframes;
+  //  for(int i = 0; i < path.getStateCount(); i++)
+  //  {
+  //    ob::State *state = path.getState(i);
+  //    Config cur = OMPLStateToConfig(state, cspace.getPtr());
+  //    _keyframes.push_back(cur);
+  //  }
+  //  std::cout << std::string(80, '-') << std::endl;
+  //}else{
+  //  std::cout << "No solution found" << std::endl;
+  //}
+
+  //###########################################################################
+  // Kinodynamic planner
+  //###########################################################################
+  //KINODYNAMIC PLANNERS
+  auto control_cspace(std::make_shared<oc::RealVectorControlSpace>(cspace.getPtr(), 6));
+  //oc::ControlSpace
+
+  ob::RealVectorBounds cbounds(6);
+  cbounds.setLow(-0.3);
+  cbounds.setHigh(0.3);
+  control_cspace->setBounds(cbounds);
+
+  oc::SimpleSetup ss(control_cspace);
+  const oc::SpaceInformationPtr si = ss.getSpaceInformation();
+
+  ss.setStatePropagator(propagate);
+
+  //ss->setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
+  //oc::SimpleSetup ss(cspace);
+  //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
+  ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::Syclop>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopRRT>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopEST>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::LTLPlanner>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::EST>(si);
+
   ss.setup();
   ob::PlannerStatus solved = ss.solve(10.0);
-  //###########################################################################
-  // Extract path
-  //###########################################################################
   if (solved)
   {
     std::cout << "Found solution:" << std::endl;
-    ss.simplifySolution();
-    og::PathGeometric path = ss.getSolutionPath();
+    oc::PathControl path_control = ss.getSolutionPath();
+    og::PathGeometric path = path_control.asGeometric();
     path.interpolate();
     std::cout << path.length() << std::endl;
     std::cout << path.getStateCount() << std::endl;
@@ -314,7 +383,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
     for(int i = 0; i < path.getStateCount(); i++)
     {
       ob::State *state = path.getState(i);
-      Config cur = OMPLStateToConfig(state, cspace);
+      Config cur = OMPLStateToConfig(state, cspace.getPtr());
       _keyframes.push_back(cur);
     }
     std::cout << std::string(80, '-') << std::endl;
