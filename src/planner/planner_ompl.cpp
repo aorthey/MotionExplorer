@@ -280,15 +280,19 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   // Setup planning
   //###########################################################################
-  //oa::SE3RigidBodyPlanning SE3setup;
-  //std::string robot_fname = "/home/aorthey/git/orthoklampt/data/sentinel.urdf";
-  //SE3setup.setRobotMesh(robot_fname.c_str());
-  //std::string env_fname = std::string(OMPLAPP_RESOURCE_DIR) + "/3D/cubicles_env.dae";
-  //setup.setEnvironmentMesh(env_fname.c_str());
 
   og::SimpleSetup ss(cspace);
-
   const ob::SpaceInformationPtr si = ss.getSpaceInformation();
+
+  //ob::PlannerPtr ompl_planner = std::make_shared<og::RRTConnect>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<og::RRT>(si);
+  ob::PlannerPtr ompl_planner = std::make_shared<og::RRTstar>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<og::RRTsharp>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<og::LazyRRT>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<og::InformedRRTstar>(si);
+  ss.setPlanner(ompl_planner);
+  //ss.setPlanner(std::make_shared<og::RRTConnect>(si));
+
   si->setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
 
   ss.setStartAndGoalStates(start, goal);

@@ -6,6 +6,12 @@
 #include <ompl/control/SimpleSetup.h>
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/PathGeometric.h>
+#include <ompl/geometric/planners/rrt/RRTConnect.h>
+#include <ompl/geometric/planners/rrt/RRT.h>
+#include <ompl/geometric/planners/rrt/RRTstar.h>
+#include <ompl/geometric/planners/rrt/RRTsharp.h>
+#include <ompl/geometric/planners/rrt/LazyRRT.h>
+#include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 //#include <boost/program_options.hpp>
 #include <omplapp/config.h>
 #include <omplapp/apps/SE3RigidBodyPlanning.h>
