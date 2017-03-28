@@ -9,6 +9,13 @@ Vector3 SerializedTreeNode::GetXYZ(){
   pos[2] = position[2];
   return pos;
 }
+void SerializedTreeNode::SetXYZ(double x, double y, double z){
+  position.resize(6);
+  position.setZero();
+  position[0] = x;
+  position[1] = y;
+  position[2] = z;
+}
 bool SerializedTreeNode::Save(TiXmlElement *node)
 {
   node->SetValue("node");

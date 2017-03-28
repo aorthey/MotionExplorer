@@ -12,6 +12,7 @@ struct SerializedTreeNode{
   std::vector<Vector3> directions;
   double cost_to_goal;
   Vector3 GetXYZ();
+  void SetXYZ(double x, double y, double z);
   bool Save(TiXmlElement *node);
   bool Load(TiXmlElement *node);
 };

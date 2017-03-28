@@ -451,8 +451,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   std::cout << "Edges   : " << pd.numEdges() << std::endl;
   std::cout << "Vertices: " << pd.numVertices() << std::endl;
 
-  _stree.clear();
-  SerializeTree(pd, _stree);
+  SerializeTree(pd);
 
   if (solved)
   {
@@ -484,7 +483,25 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   return solved;
 }
 
-void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd, SerializedTree &stree)
+void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
 {
-  std::cout << "serializing tree with " << pd.numEdges() << " nodes" << std::endl;
+  std::cout << "serializing tree with " << pd.numVertices() << " nodes" << std::endl;
+  _stree.clear();
+  for(uint i = 0; i < pd.numVertices(); i++){
+    ob::PlannerDataVertex v = pd.getVertex(i);
+    const ob::State* s = v.getState();
+
+    const ob::SE3StateSpace::StateType *sSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+    double x = sSE3->getX();
+    double y = sSE3->getY();
+    double z = sSE3->getZ();
+    SerializedTreeNode snode;
+    Config q;q.resize(6);q.setZero();
+    q(0)=x;
+    q(1)=y;
+    q(2)=z;
+    snode.position = q;
+    _stree.push_back(snode);
+    
+  }
 }

@@ -3,6 +3,8 @@
 #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/base/ScopedState.h>
 #include <ompl/base/StateSpace.h>
+#include <ompl/base/PlannerData.h>
+#include <ompl/base/PlannerDataGraph.h>
 
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/PathGeometric.h>
@@ -29,7 +31,6 @@
 //#include <boost/program_options.hpp>
 #include <omplapp/config.h>
 #include <omplapp/apps/SE3RigidBodyPlanning.h>
-#include <ompl/base/PlannerDataGraph.h>
 #include "planner/planner.h"
 #include "cspace_sentinel.h"
 #include "util.h"
@@ -69,7 +70,7 @@ class MotionPlannerOMPL: public MotionPlanner
 {
   public:
     MotionPlannerOMPL(RobotWorld *world, WorldSimulation *sim);
-    void SerializeTree(ob::PlannerData &pd, SerializedTree &stree);
+    void SerializeTree(ob::PlannerData &pd);
     void test();
     void test_conversion(Config &q, ob::StateSpacePtr &stateSpace);
     virtual bool solve(Config &p_init, Config &p_goal);
