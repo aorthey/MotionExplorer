@@ -76,17 +76,11 @@ int main(int argc,const char** argv) {
   //free space planner
   //############################################################################
 
-  std::clock_t start = std::clock();
-
   MotionPlannerOMPL planner(&world, &sim);
 
   if(planner.solve(p_init, p_goal)){
     backend.VisualizePathSweptVolume(planner.GetKeyframes());
   }
-
-  std::clock_t end = std::clock();
-  double duration = ( end - start ) / (double) CLOCKS_PER_SEC;
-  std::cout << "Planning Time T=" << duration << std::endl;
 
   backend.VisualizeStartGoal(p_init, p_goal);
   backend.VisualizePlannerTree(planner.GetTree());

@@ -424,11 +424,11 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
 
   //oc::SimpleSetup ss(cspace);
   //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
-  ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::Syclop>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopRRT>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopEST>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
+  ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::LTLPlanner>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
@@ -441,7 +441,9 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   ss.setPlanner(ompl_planner);
 
   ss.setup();
-  ob::PlannerStatus status = ss.solve(2.0);
+
+  //ob::PlannerStatus status = ss.solve(100.0);
+  ob::PlannerStatus status = ss.solve(200.0);
   std::cout << "Status:" << status << std::endl;
   bool solved = ss.haveSolutionPath();
 
@@ -452,6 +454,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   std::cout << "Vertices: " << pd.numVertices() << std::endl;
 
   SerializeTree(pd);
+  SerializeTreeRandomlyCullPoints(_stree, 2000);
 
   if (solved)
   {
@@ -490,7 +493,6 @@ void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
   for(uint i = 0; i < pd.numVertices(); i++){
     ob::PlannerDataVertex v = pd.getVertex(i);
     const ob::State* s = v.getState();
-
     const ob::SE3StateSpace::StateType *sSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
     double x = sSE3->getX();
     double y = sSE3->getY();
@@ -501,6 +503,25 @@ void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
     q(1)=y;
     q(2)=z;
     snode.position = q;
+
+    //std::vector<uint> edgeList;
+    //uint Nedges = pd.getIncomingEdges (i, edgeList);
+
+    //std::cout << "Node " << i << " has " << Nedges << " edges" << std::endl;
+    //for(int j = 0; j < edgeList.size(); j++){
+    //  ob::PlannerDataVertex w = pd.getVertex(j);
+    //  const ob::State* sw = w.getState();
+    //  const ob::SE3StateSpace::StateType *swSE3 = sw->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+    //  double xw = swSE3->getX();
+    //  double yw = swSE3->getY();
+    //  double zw = swSE3->getZ();
+
+    //  Vector3 dvw( xw-x, yw-y, zw-z);
+    //  snode.directions.push_back(dvw);
+    //}
+
+
+
     _stree.push_back(snode);
     
   }

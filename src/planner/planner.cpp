@@ -257,6 +257,8 @@ bool MotionPlanner::IsFeasible( Robot *robot, SingleRobotCSpace &cspace, Config 
 
 bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool shortcutting)
 {
+  std::clock_t start = std::clock();
+
 
   this->_p_init = p_init;
   this->_p_goal = p_goal;
@@ -441,6 +443,9 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
         std::cout << _stree.at(i).position << std::endl;
       }
     }
+    std::clock_t end = std::clock();
+    double duration = ( end - start ) / (double) CLOCKS_PER_SEC;
+    std::cout << "Planning Time T=" << duration << std::endl;
     return _isSolved;
   }
 }
