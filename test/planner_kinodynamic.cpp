@@ -40,6 +40,9 @@ int main(int argc,const char** argv) {
   world.robots[0]->qMax[3]=2*M_PI;
   world.robots[0]->qMax[4]=2*M_PI;
   world.robots[0]->qMax[5]=2*M_PI;
+
+  world.robots[0]->qMin[6]=0;
+  world.robots[0]->qMax[6]=1e-8;
   info(&world);
 
   //############################################################################

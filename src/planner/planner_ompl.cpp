@@ -1,10 +1,7 @@
 #include "planner_ompl.h"
+#include "cspace_sentinel.h"
 
-MotionPlannerOMPL::MotionPlannerOMPL(RobotWorld *world, WorldSimulation *sim):
-  MotionPlanner(world,sim)
-{
-}
-ob::ScopedState<> MotionPlannerOMPL::ConfigToOMPLState(Config &q, ob::StateSpacePtr &s){
+ob::ScopedState<> ConfigToOMPLState(const Config &q, const ob::StateSpacePtr &s){
   ob::ScopedState<> qompl(s);
 
   ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
@@ -43,8 +40,8 @@ ob::ScopedState<> MotionPlannerOMPL::ConfigToOMPLState(Config &q, ob::StateSpace
   }
   return qompl;
 }
-Config MotionPlannerOMPL::OMPLStateToConfig(ob::SE3StateSpace::StateType *qomplSE3, ob::RealVectorStateSpace::StateType *qomplRnState, ob::StateSpacePtr &s){
-  ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
+Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState, const ob::StateSpacePtr &s){
+  const ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
 
   //std::vector<double> reals;
   //s->copyToReals(reals, qomplRnState);
@@ -82,19 +79,38 @@ Config MotionPlannerOMPL::OMPLStateToConfig(ob::SE3StateSpace::StateType *qomplS
 
   return q;
 }
-Config MotionPlannerOMPL::OMPLStateToConfig(ob::State *qompl, ob::StateSpacePtr &s){
-  ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+Config OMPLStateToConfig(const ob::State *qompl, const ob::StateSpacePtr &s){
+  const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
   return OMPLStateToConfig(qomplSE3, qomplRnState, s);
 
 }
-Config MotionPlannerOMPL::OMPLStateToConfig(ob::ScopedState<> &qompl, ob::StateSpacePtr &s){
+Config OMPLStateToConfig(const ob::ScopedState<> &qompl, const ob::StateSpacePtr &s){
 
-  ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-
+  const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
   return OMPLStateToConfig(qomplSE3, qomplRnState, s);
 
+}
+
+MotionPlannerOMPLValidityChecker::MotionPlannerOMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpace* space):
+  ob::StateValidityChecker(si),_space(space)
+{
+}
+bool MotionPlannerOMPLValidityChecker::isValid(const ob::State* state) const
+{
+  const ob::StateSpacePtr ssp = si_->getStateSpace();
+  Config q = OMPLStateToConfig(state, ssp);
+  bool isFeasible = _space->IsFeasible(q);
+  //std::cout << "Config: " << q;
+  //if(isFeasible) std::cout << " feasible" << std::endl;
+  //else std::cout << "" << std::endl;
+  return isFeasible;
+}
+
+MotionPlannerOMPL::MotionPlannerOMPL(RobotWorld *world, WorldSimulation *sim):
+  MotionPlanner(world,sim)
+{
 }
 void MotionPlannerOMPL::test()
 {
@@ -162,6 +178,26 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   std::cout << "p_init =" << p_init << std::endl;
   std::cout << "p_goal =" << p_goal << std::endl;
   std::cout << std::string(80, '-') << std::endl;
+  //###########################################################################
+  // Setup Klampt CSpace
+  //###########################################################################
+
+  WorldPlannerSettings worldsettings;
+  worldsettings.InitializeDefault(*_world);
+  //worldsettings.robotSettings[0].worldBounds = AABB3D(plannersettings.worldboundsMin,plannersettings.worldboundsMax);
+  //worldsettings.robotSettings[0].contactEpsilon = 1e-2;
+  //worldsettings.robotSettings[0].contactIKMaxIters = 100;
+
+  SingleRobotCSpace geometric_cspace = SingleRobotCSpace(*_world,_irobot,&worldsettings);
+  if(!IsFeasible( robot, geometric_cspace, _p_init)) return false;
+  if(!IsFeasible( robot, geometric_cspace, _p_goal)) return false;
+
+  KinodynamicCSpaceSentinelAdaptor kcspace(&geometric_cspace);
+  PropertyMap pmap;
+  kcspace.Properties(pmap);
+  std::cout << pmap << std::endl;
+
+  //CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, plannersettings.goalRegionConvergence);
 
   //###########################################################################
   // Create OMPL state space
@@ -244,12 +280,20 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   // Setup planning
   //###########################################################################
+  //oa::SE3RigidBodyPlanning SE3setup;
+  //std::string robot_fname = "/home/aorthey/git/orthoklampt/data/sentinel.urdf";
+  //SE3setup.setRobotMesh(robot_fname.c_str());
+  //std::string env_fname = std::string(OMPLAPP_RESOURCE_DIR) + "/3D/cubicles_env.dae";
+  //setup.setEnvironmentMesh(env_fname.c_str());
+
   og::SimpleSetup ss(cspace);
+
+  const ob::SpaceInformationPtr si = ss.getSpaceInformation();
+  si->setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
+
   ss.setStartAndGoalStates(start, goal);
   ss.setup();
-
   ob::PlannerStatus solved = ss.solve(10.0);
-
   //###########################################################################
   // Extract path
   //###########################################################################

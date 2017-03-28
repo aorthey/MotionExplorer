@@ -306,14 +306,12 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
 
   CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, plannersettings.goalRegionConvergence);
 
-  bool geometric =false;
-
+  bool geometric = false;
 
   if(!geometric){
     //###########################################################################
     // Dynamic Planning
     //###########################################################################
-
 
     //RRTKinodynamicPlanner krrt(&kcspace);
     ///////LazyRRTKinodynamicPlanner krrt(&kcspace);
