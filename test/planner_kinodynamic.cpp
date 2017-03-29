@@ -66,9 +66,13 @@ int main(int argc,const char** argv) {
   p_init[2]=2.7;
   p_init[3]=M_PI/4;
 
-  p_goal[0]=2.0;
+  //p_goal[0]=2.0;
+  //p_goal[1]=0.3;
+  //p_goal[2]=1.3;
+  p_goal[0]=-2.0;
   p_goal[1]=0.3;
   p_goal[2]=1.3;
+  p_goal[3]=M_PI;
 
   world.background = GLColor(1,1,1);
 
@@ -85,7 +89,7 @@ int main(int argc,const char** argv) {
   backend.VisualizeStartGoal(p_init, p_goal);
   backend.VisualizePlannerTree(planner.GetTree());
   backend.Save();
-  //backend.Load("state_2017_03_15.xml");
+  //backend.Load("kinodynamic_solution_tunnel_environment.xml");
 
   ////############################################################################
   ////guification

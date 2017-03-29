@@ -277,8 +277,9 @@ void SentinelPropagator::propagate(const ob::State *state, const oc::Control* co
   Config u;
   u.resize(7);
   u.setZero();
-  u(1) = ucontrol[0];
-  u(2) = ucontrol[1];
+  u(0) = ucontrol[0];
+  u(1) = ucontrol[1];
+  u(2) = ucontrol[2];
   u(3) = 1.0;
   u(6) = duration;
 
@@ -366,124 +367,140 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   ////###########################################################################
   //// Geometric planning (tested, works)
   ////###########################################################################
+  bool geometric = false;
+  if(geometric){
 
-  //og::SimpleSetup ss(cspace.getPtr());
-  //const ob::SpaceInformationPtr si = ss.getSpaceInformation();
+    og::SimpleSetup ss(cspace.getPtr());
+    const ob::SpaceInformationPtr si = ss.getSpaceInformation();
 
-  ////GEOMETRIC PLANNERS
-  //ob::PlannerPtr ompl_planner = std::make_shared<og::RRTConnect>(si);
-  ////ob::PlannerPtr ompl_planner = std::make_shared<og::RRT>(si);
-  ////ob::PlannerPtr ompl_planner = std::make_shared<og::RRTstar>(si);
-  ////ob::PlannerPtr ompl_planner = std::make_shared<og::RRTsharp>(si);
-  ////ob::PlannerPtr ompl_planner = std::make_shared<og::LazyRRT>(si);
+    //GEOMETRIC PLANNERS
+    //ob::PlannerPtr ompl_planner = std::make_shared<og::RRTConnect>(si);
+    ob::PlannerPtr ompl_planner = std::make_shared<og::RRT>(si);
+    //ob::PlannerPtr ompl_planner = std::make_shared<og::RRTstar>(si);
+    //ob::PlannerPtr ompl_planner = std::make_shared<og::RRTsharp>(si);
+    //ob::PlannerPtr ompl_planner = std::make_shared<og::LazyRRT>(si);
 
-  //ss.setPlanner(ompl_planner);
-  ////ss.setPlanner(std::make_shared<og::RRTConnect>(si));
+    ss.setPlanner(ompl_planner);
+    //ss.setPlanner(std::make_shared<og::RRTConnect>(si));
 
-  //si->setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
+    si->setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
 
-  //ss.setStartAndGoalStates(start, goal);
-  //ss.setup();
-  //ob::PlannerStatus solved = ss.solve(10.0);
-  //if (solved)
-  //{
-  //  std::cout << "Found solution:" << std::endl;
-  //  ss.simplifySolution();
-  //  og::PathGeometric path = ss.getSolutionPath();
-  //  path.interpolate();
-  //  std::cout << path.length() << std::endl;
-  //  std::cout << path.getStateCount() << std::endl;
-
-  //  vector<Config> keyframes;
-  //  for(int i = 0; i < path.getStateCount(); i++)
-  //  {
-  //    ob::State *state = path.getState(i);
-  //    Config cur = OMPLStateToConfig(state, cspace.getPtr());
-  //    _keyframes.push_back(cur);
-  //  }
-  //  std::cout << std::string(80, '-') << std::endl;
-  //}else{
-  //  std::cout << "No solution found" << std::endl;
-  //}
-
-  //###########################################################################
-  // Kinodynamic planner
-  //###########################################################################
-  //KINODYNAMIC PLANNERS
-  auto control_cspace(std::make_shared<oc::RealVectorControlSpace>(cspace.getPtr(), 2));
-  ob::RealVectorBounds cbounds(2);
-  cbounds.setLow(-1);
-  cbounds.setHigh(1);
-  control_cspace->setBounds(cbounds);
-
-  oc::SimpleSetup ss(control_cspace);
-  oc::SpaceInformationPtr si = ss.getSpaceInformation();
-
-  auto cpropagate(std::make_shared<SentinelPropagator>(si, &kcspace));
-
-
-  //oc::SimpleSetup ss(cspace);
-  //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::Syclop>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopRRT>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopEST>(si);
-  ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::LTLPlanner>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::EST>(si);
-
-
-  ss.setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
-  ss.setStatePropagator(cpropagate);
-  ss.setStartAndGoalStates(start, goal);
-  ss.setPlanner(ompl_planner);
-
-  ss.setup();
-
-  //ob::PlannerStatus status = ss.solve(100.0);
-  ob::PlannerStatus status = ss.solve(200.0);
-  std::cout << "Status:" << status << std::endl;
-  bool solved = ss.haveSolutionPath();
-
-  //Extract roadmap
-  oc::PlannerData pd(si);
-  ss.getPlannerData(pd);
-  std::cout << "Edges   : " << pd.numEdges() << std::endl;
-  std::cout << "Vertices: " << pd.numVertices() << std::endl;
-
-  SerializeTree(pd);
-  SerializeTreeRandomlyCullPoints(_stree, 2000);
-
-  if (solved)
-  {
-    std::cout << "Found solution:" << std::endl;
-    oc::PathControl path_control = ss.getSolutionPath();
-    og::PathGeometric path = path_control.asGeometric();
-    std::cout << path.length() << std::endl;
-    std::cout << path.getStateCount() << std::endl;
-
-    vector<Config> keyframes;
-    for(int i = 0; i < path.getStateCount(); i++)
+    ss.setStartAndGoalStates(start, goal);
+    ss.setup();
+    ob::PlannerStatus solved = ss.solve(10.0);
+    if (solved)
     {
-      ob::State *state = path.getState(i);
-      Config cur = OMPLStateToConfig(state, cspace.getPtr());
-      _keyframes.push_back(cur);
+      std::cout << "Found solution:" << std::endl;
+      ss.simplifySolution();
+      og::PathGeometric path = ss.getSolutionPath();
+      path.interpolate();
+      std::cout << path.length() << std::endl;
+      std::cout << path.getStateCount() << std::endl;
+
+      vector<Config> keyframes;
+      for(int i = 0; i < path.getStateCount(); i++)
+      {
+        ob::State *state = path.getState(i);
+        Config cur = OMPLStateToConfig(state, cspace.getPtr());
+        _keyframes.push_back(cur);
+      }
+      std::cout << std::string(80, '-') << std::endl;
+    }else{
+      std::cout << "No solution found" << std::endl;
     }
-    uint istep = int(path.getStateCount()/10.0);
-    for(int i = 0; i < path.getStateCount(); i+=istep)
-    {
-      ob::State *state = path.getState(i);
-      Config cur = OMPLStateToConfig(state, cspace.getPtr());
-      std::cout << cur << std::endl;
-    }
-    std::cout << std::string(80, '-') << std::endl;
   }else{
-    std::cout << "No solution found" << std::endl;
-  }
+    //###########################################################################
+    // Kinodynamic planner
+    //###########################################################################
+    //KINODYNAMIC PLANNERS
+    uint NdimControl = 3;
+    auto control_cspace(std::make_shared<oc::RealVectorControlSpace>(cspace.getPtr(), NdimControl));
+    ob::RealVectorBounds cbounds(NdimControl);
+    cbounds.setLow(-1);
+    cbounds.setHigh(1);
+    control_cspace->setBounds(cbounds);
 
-  return solved;
+    oc::SimpleSetup ss(control_cspace);
+    oc::SpaceInformationPtr si = ss.getSpaceInformation();
+
+    auto cpropagate(std::make_shared<SentinelPropagator>(si, &kcspace));
+
+
+    //oc::SimpleSetup ss(cspace);
+    //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
+    //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
+    //ob::PlannerPtr ompl_planner = std::make_shared<oc::Syclop>(si);
+    //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopRRT>(si);
+    //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopEST>(si);
+    //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
+    //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
+    //ob::PlannerPtr ompl_planner = std::make_shared<oc::LTLPlanner>(si);
+    //ob::PlannerPtr ompl_planner = std::make_shared<oc::EST>(si);
+    ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
+
+    ss.setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
+    ss.setStatePropagator(cpropagate);
+    ss.setStartAndGoalStates(start, goal);
+    ss.setup();
+    ss.setPlanner(ompl_planner);
+
+    //set default projection
+    ss.getStateSpace()->registerDefaultProjection(base::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
+
+    //std::vector<double> cs(3); cs[0] = cs[1] = cs[2]= 0.1;
+    //ss.getStateSpace()->getDefaultProjection()->setCellSizes(cs);
+    //std::static_pointer_cast<oc::KPIECE1>(ompl_planner)->setProjectionEvaluator(ss.getStateSpace()->getDefaultProjection());
+
+    //ob::ProjectionEvaluatorPtr projector = ss.getStateSpace()->getDefaultProjection();
+
+    if(!ss.getStateSpace()->hasDefaultProjection()){
+      std::cout << "No default projection available" << std::endl;
+    }
+
+
+    //ob::PlannerStatus status = ss.solve(100.0);
+    ob::PlannerStatus status = ss.solve(3600.0);
+    std::cout << "Status:" << status << std::endl;
+    bool solved = ss.haveSolutionPath();
+
+    //Extract roadmap
+    oc::PlannerData pd(si);
+    ss.getPlannerData(pd);
+    std::cout << "Edges   : " << pd.numEdges() << std::endl;
+    std::cout << "Vertices: " << pd.numVertices() << std::endl;
+
+    SerializeTree(pd);
+    SerializeTreeRandomlyCullPoints(_stree, 2000);
+
+    if (solved)
+    {
+      std::cout << "Found solution:" << std::endl;
+      oc::PathControl path_control = ss.getSolutionPath();
+      og::PathGeometric path = path_control.asGeometric();
+      std::cout << path.length() << std::endl;
+      std::cout << path.getStateCount() << std::endl;
+
+      vector<Config> keyframes;
+      for(int i = 0; i < path.getStateCount(); i++)
+      {
+        ob::State *state = path.getState(i);
+        Config cur = OMPLStateToConfig(state, cspace.getPtr());
+        _keyframes.push_back(cur);
+      }
+      uint istep = max(int(path.getStateCount()/10.0),1);
+      for(int i = 0; i < path.getStateCount(); i+=istep)
+      {
+        ob::State *state = path.getState(i);
+        Config cur = OMPLStateToConfig(state, cspace.getPtr());
+        std::cout << i << "/" << path.getStateCount() <<  cur << std::endl;
+      }
+      std::cout << std::string(80, '-') << std::endl;
+    }else{
+      std::cout << "No solution found" << std::endl;
+    }
+
+    return solved;
+  }
 }
 
 void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)

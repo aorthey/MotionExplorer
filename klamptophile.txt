@@ -403,6 +403,11 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [x] enable ompl kinodynamic planners
  [ ] create planner_klampt outsourcing klampt planning structure
  [x] move planner components to planner/
+ [x] make button to disable/enable mesh and disable/enable faces of mesh
  [ ] refactor planner 
  [ ] boost graph instead of serialized tree
-
+ [ ] find distance to goal for planner output OMPL (how approximate is the solution)
+ [ ] run ompl PDST/KPIECE /w def proj
+ [ ] compute irreducible projection from SE(3) path
+ [ ] extend environment by a new pipe upward curved plus box connector
+ [ ] GUI: save current robot state too, not only init/goal of planner
