@@ -28,6 +28,8 @@ class ForceFieldBackend : public SimTestBackend
     int drawAxes;
     int drawAxesLabels;
     int drawRigidObjects;
+    int drawRigidObjectsEdges;
+    int drawRigidObjectsFaces;
 
     vector<IKGoal> _constraints;
     vector<int> _linksInCollision;

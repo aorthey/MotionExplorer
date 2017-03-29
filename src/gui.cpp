@@ -21,6 +21,8 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawPlannerTree = 1;
   drawPlannerStartGoal = 1;
   drawRigidObjects = 1;
+  drawRigidObjectsEdges = 1;
+  drawRigidObjectsFaces = 0;
 
   drawAxes = 1;
   drawAxesLabels = 0;
@@ -28,7 +30,8 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   MapButtonToggle("draw_planner_tree",&drawPlannerTree);
   MapButtonToggle("draw_path",&drawPath);
   MapButtonToggle("draw_path_start_goal",&drawPlannerStartGoal);
-  MapButtonToggle("draw_rigid_objects",&drawRigidObjects);
+  MapButtonToggle("draw_rigid_objects_faces",&drawRigidObjectsFaces);
+  MapButtonToggle("draw_rigid_objects_edges",&drawRigidObjectsEdges);
   MapButtonToggle("draw_fancy_coordinate_axes",&drawAxes);
   MapButtonToggle("draw_fancy_coordinate_axes_labels",&drawAxesLabels);
 
@@ -85,8 +88,10 @@ void ForceFieldBackend::RenderWorld()
       GLDraw::GeometryAppearance* a = obj->geometry.Appearance();
       a->SetColor(GLColor(0.8,0.8,0.8));
       a->drawFaces = false;
-      a->drawEdges = true;
+      a->drawEdges = false;
       a->drawVertices = false;
+      if(drawRigidObjectsFaces) a->drawFaces = true;
+      if(drawRigidObjectsEdges) a->drawEdges = true;
       //a->vertexSize = 10;
       a->edgeSize = 20;
       obj->DrawGL();
@@ -519,9 +524,12 @@ bool GLUIForceFieldGUI::Initialize()
   AddControl(checkbox,"draw_path");
   checkbox->set_int_val(1);
 
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Obstacles");
-  AddControl(checkbox,"draw_rigid_objects");
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Object Edges");
+  AddControl(checkbox,"draw_rigid_objects_edges");
   checkbox->set_int_val(1);
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Object Faces");
+  AddControl(checkbox,"draw_rigid_objects_faces");
+  checkbox->set_int_val(0);
 
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Start Goal Config");
   AddControl(checkbox,"draw_path_start_goal");
