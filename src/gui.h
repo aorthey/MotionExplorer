@@ -42,6 +42,8 @@ class ForceFieldBackend : public SimTestBackend
     vector<Config> _keyframes;
     typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
 
+    vector< vector<Vector3> > _frames;
+
   public:
 
   ForceFieldBackend(RobotWorld *world);
@@ -49,17 +51,21 @@ class ForceFieldBackend : public SimTestBackend
   virtual bool OnCommand(const string& cmd,const string& args);
   virtual void RenderWorld();
 
+
   virtual bool Save();
   virtual bool Save(TiXmlElement *node);
   virtual bool Load(const char* file);
   virtual bool Load(TiXmlElement *node);
 
+
+  void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3);
   void SetIKConstraints( vector<IKGoal> constraints, string robotname);
   void SetIKCollisions( vector<int> linksInCollision );
   void VisualizePathSweptVolumeAtPosition(const Config &q);
   void VisualizePathSweptVolume(const MultiPath &path);
   void VisualizePathSweptVolume(const KinodynamicMilestonePath &path);
   void VisualizePathSweptVolume(const std::vector<Config> &keyframes);
+  std::vector<Config> getKeyFrames();
   void VisualizePlannerTree(const SerializedTree &tree);
   void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
 };

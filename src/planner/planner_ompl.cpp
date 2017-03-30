@@ -182,13 +182,54 @@ Config OMPLStateToConfig(const ob::ScopedState<> &qompl, const ob::StateSpacePtr
   const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
   const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
   return OMPLStateToConfig(qomplSE3, qomplRnState, s);
+}
 
+void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
+{
+  std::cout << "serializing tree with " << pd.numVertices() << " nodes" << std::endl;
+  _stree.clear();
+  for(uint i = 0; i < pd.numVertices(); i++){
+    ob::PlannerDataVertex v = pd.getVertex(i);
+    const ob::State* s = v.getState();
+    const ob::SE3StateSpace::StateType *sSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+    double x = sSE3->getX();
+    double y = sSE3->getY();
+    double z = sSE3->getZ();
+    SerializedTreeNode snode;
+    Config q;q.resize(6);q.setZero();
+    q(0)=x;
+    q(1)=y;
+    q(2)=z;
+    snode.position = q;
+
+    //std::vector<uint> edgeList;
+    //uint Nedges = pd.getIncomingEdges (i, edgeList);
+
+    //std::cout << "Node " << i << " has " << Nedges << " edges" << std::endl;
+    //for(int j = 0; j < edgeList.size(); j++){
+    //  ob::PlannerDataVertex w = pd.getVertex(j);
+    //  const ob::State* sw = w.getState();
+    //  const ob::SE3StateSpace::StateType *swSE3 = sw->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+    //  double xw = swSE3->getX();
+    //  double yw = swSE3->getY();
+    //  double zw = swSE3->getZ();
+
+    //  Vector3 dvw( xw-x, yw-y, zw-z);
+    //  snode.directions.push_back(dvw);
+    //}
+
+
+
+    _stree.push_back(snode);
+    
+  }
 }
 
 MotionPlannerOMPLValidityChecker::MotionPlannerOMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpace* space):
   ob::StateValidityChecker(si),_space(space)
 {
 }
+
 bool MotionPlannerOMPLValidityChecker::isValid(const ob::State* state) const
 {
   const ob::StateSpacePtr ssp = si_->getStateSpace();
@@ -196,7 +237,6 @@ bool MotionPlannerOMPLValidityChecker::isValid(const ob::State* state) const
   bool isFeasible = _space->IsFeasible(q);
   return isFeasible;
 }
-
 
 MotionPlannerOMPL::MotionPlannerOMPL(RobotWorld *world, WorldSimulation *sim):
   MotionPlanner(world,sim)
@@ -277,7 +317,7 @@ void SentinelPropagator::propagate(const ob::State *state, const oc::Control* co
   Config u;
   u.resize(7);
   u.setZero();
-  u(0) = ucontrol[0];
+  u(0) = 0.0;//ucontrol[0];
   u(1) = ucontrol[1];
   u(2) = ucontrol[2];
   u(3) = 1.0;
@@ -319,7 +359,6 @@ void SentinelPropagator::propagate(const ob::State *state, const oc::Control* co
   //std::cout << resultSO3->x << " " << resultSO3->y << " " << resultSO3->z << " " << resultSO3->w << " " << std::endl;
 
 }
-
 
 
 bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
@@ -432,11 +471,11 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
     //ob::PlannerPtr ompl_planner = std::make_shared<oc::Syclop>(si);
     //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopRRT>(si);
     //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopEST>(si);
-    //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
+    ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
     //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
     //ob::PlannerPtr ompl_planner = std::make_shared<oc::LTLPlanner>(si);
     //ob::PlannerPtr ompl_planner = std::make_shared<oc::EST>(si);
-    ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
+    //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
 
     ss.setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
     ss.setStatePropagator(cpropagate);
@@ -445,7 +484,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
     ss.setPlanner(ompl_planner);
 
     //set default projection
-    ss.getStateSpace()->registerDefaultProjection(base::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
+    ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
 
     //std::vector<double> cs(3); cs[0] = cs[1] = cs[2]= 0.1;
     //ss.getStateSpace()->getDefaultProjection()->setCellSizes(cs);
@@ -457,9 +496,8 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
       std::cout << "No default projection available" << std::endl;
     }
 
-
     //ob::PlannerStatus status = ss.solve(100.0);
-    ob::PlannerStatus status = ss.solve(3600.0);
+    ob::PlannerStatus status = ss.solve(10.0);
     std::cout << "Status:" << status << std::endl;
     bool solved = ss.haveSolutionPath();
 
@@ -503,43 +541,3 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   }
 }
 
-void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
-{
-  std::cout << "serializing tree with " << pd.numVertices() << " nodes" << std::endl;
-  _stree.clear();
-  for(uint i = 0; i < pd.numVertices(); i++){
-    ob::PlannerDataVertex v = pd.getVertex(i);
-    const ob::State* s = v.getState();
-    const ob::SE3StateSpace::StateType *sSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-    double x = sSE3->getX();
-    double y = sSE3->getY();
-    double z = sSE3->getZ();
-    SerializedTreeNode snode;
-    Config q;q.resize(6);q.setZero();
-    q(0)=x;
-    q(1)=y;
-    q(2)=z;
-    snode.position = q;
-
-    //std::vector<uint> edgeList;
-    //uint Nedges = pd.getIncomingEdges (i, edgeList);
-
-    //std::cout << "Node " << i << " has " << Nedges << " edges" << std::endl;
-    //for(int j = 0; j < edgeList.size(); j++){
-    //  ob::PlannerDataVertex w = pd.getVertex(j);
-    //  const ob::State* sw = w.getState();
-    //  const ob::SE3StateSpace::StateType *swSE3 = sw->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-    //  double xw = swSE3->getX();
-    //  double yw = swSE3->getY();
-    //  double zw = swSE3->getZ();
-
-    //  Vector3 dvw( xw-x, yw-y, zw-z);
-    //  snode.directions.push_back(dvw);
-    //}
-
-
-
-    _stree.push_back(snode);
-    
-  }
-}

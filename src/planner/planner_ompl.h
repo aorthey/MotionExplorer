@@ -91,10 +91,10 @@ public:
 };
 
 
-class SE3Project0r : public base::ProjectionEvaluator
+class SE3Project0r : public ob::ProjectionEvaluator
 {
   public:
-    SE3Project0r(const base::StateSpacePtr &space) : base::ProjectionEvaluator(space)
+    SE3Project0r(const ob::StateSpacePtr &space) : ob::ProjectionEvaluator(space)
     {
     }
     virtual unsigned int getDimension(void) const
@@ -104,15 +104,15 @@ class SE3Project0r : public base::ProjectionEvaluator
     virtual void defaultCellSizes(void)
     {
       cellSizes_.resize(3);
-      cellSizes_[0] = 1;
-      cellSizes_[1] = 1;
-      cellSizes_[2] = 1;
+      cellSizes_[0] = 0.1;
+      cellSizes_[1] = 0.1;
+      cellSizes_[2] = 0.1;
     }
-    virtual void project(const base::State *state, base::EuclideanProjection &projection) const
+    virtual void project(const ob::State *state, ob::EuclideanProjection &projection) const
     {
-      const double *values = state->as<base::RealVectorStateSpace::StateType>()->values;
-      projection(0) = (values[0] + values[1]) / 2.0;
-      projection(1) = (values[2] + values[3]) / 2.0;
-      projection(2) = (values[2] + values[3]) / 2.0;
+      const ob::SE3StateSpace::StateType *stateSE3 = state->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+      projection(0) = stateSE3->getX();
+      projection(1) = stateSE3->getY();
+      projection(2) = stateSE3->getZ();
     }
 };

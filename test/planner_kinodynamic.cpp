@@ -80,16 +80,16 @@ int main(int argc,const char** argv) {
   //free space planner
   //############################################################################
 
-  MotionPlannerOMPL planner(&world, &sim);
+  //MotionPlannerOMPL planner(&world, &sim);
 
-  if(planner.solve(p_init, p_goal)){
-    backend.VisualizePathSweptVolume(planner.GetKeyframes());
-  }
+  //if(planner.solve(p_init, p_goal)){
+  //  backend.VisualizePathSweptVolume(planner.GetKeyframes());
+  //}
 
-  backend.VisualizeStartGoal(p_init, p_goal);
-  backend.VisualizePlannerTree(planner.GetTree());
-  backend.Save();
-  //backend.Load("kinodynamic_solution_tunnel_environment.xml");
+  //backend.VisualizeStartGoal(p_init, p_goal);
+  //backend.VisualizePlannerTree(planner.GetTree());
+  //backend.Save();
+  backend.Load("kinodynamic_solution_tunnel_environment.xml");
 
   ////############################################################################
   ////guification

@@ -17,4 +17,5 @@ namespace GLDraw {
   void drawPlannerStartGoal(Robot *robot, const Config &p_init, const Config &p_goal);
   void drawPlannerTree(const SerializedTree &_stree);
   void drawAxesLabels(Camera::Viewport& viewport);
+  void drawFrames(std::vector< std::vector<Vector3> > &frames);
 };

@@ -7,8 +7,8 @@ length = 0.15
 radius = 0.01
 sphere_scale = 2
 headradius = 0.1
-Nsegments = 5
-Nbranches = 4
+Nsegments = 4
+Nbranches = 1
 aperture = 0.4 ## aperture of bouquet of branches
 name = 'sentinel_complete'
 
@@ -89,7 +89,7 @@ def createBranchBundle(headname):
 
   x=0
   y=0
-  z=1
+  z=0
   config += str(Njoints) + " "
   config += str(x) + " " + str(y) + " " + str(z)
   config += str(" 0"*3) ## SE(3)
@@ -143,7 +143,7 @@ f.write(terrainstr)
 robotstr  = '  <robot name=\"'+name+'\"'
 robotstr += ' file="'+str(fname)+'"'
 robotstr += ' translation="0 0 0"'
-robotstr += ' rotateRPY="0 0 3.14"'
+robotstr += ' rotateRPY="0 0 0"'
 robotstr += ' '+config+'/>\n\n'
 f.write(robotstr)
 

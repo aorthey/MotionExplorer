@@ -407,7 +407,10 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] refactor planner 
  [ ] boost graph instead of serialized tree
  [ ] find distance to goal for planner output OMPL (how approximate is the solution)
- [ ] run ompl PDST/KPIECE /w def proj
+ [x] run ompl PDST/KPIECE /w def proj
  [ ] compute irreducible projection from SE(3) path
+
  [ ] extend environment by a new pipe upward curved plus box connector
  [ ] GUI: save current robot state too, not only init/goal of planner
+ [ ] remove torsion while computing irreducible projection
+ [ ] reimplement irreducible projection in cpp, make it cleaner

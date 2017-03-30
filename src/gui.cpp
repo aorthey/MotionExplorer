@@ -14,6 +14,8 @@ const double sweptVolume_q_spacing = 0.01;
 ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
     : SimTestBackend(world)
 {
+  world->background = GLColor(1,1,1);
+
   drawForceField = 0;
   drawRobotExtras = 1;
   drawIKextras = 0;
@@ -37,6 +39,7 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
 
 
   _mats.clear();
+  _frames.clear();
 }
 
 
@@ -138,6 +141,7 @@ void ForceFieldBackend::RenderWorld()
   if(drawPlannerTree) GLDraw::drawPlannerTree(_stree);
   if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
   if(drawAxesLabels) GLDraw::drawAxesLabels(viewport);
+  if(drawFrames) GLDraw::drawFrames(_frames);
 
   
 
@@ -342,6 +346,19 @@ void ForceFieldBackend::VisualizeStartGoal(const Config &p_init, const Config &p
   planner_p_init = p_init;
   planner_p_goal = p_goal;
 }
+std::vector<Config> ForceFieldBackend::getKeyFrames()
+{
+  return _keyframes;
+}
+void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3)
+{
+  vector<Vector3> frame;
+  frame.push_back(p);
+  frame.push_back(e1);
+  frame.push_back(e2);
+  frame.push_back(e3);
+  _frames.push_back(frame);
+}
 void ForceFieldBackend::VisualizePathSweptVolumeAtPosition(const Config &q)
 {
   Robot *robot = world->robots[0];
@@ -431,6 +448,9 @@ void ForceFieldBackend::VisualizePathSweptVolume(const KinodynamicMilestonePath 
 void ForceFieldBackend::VisualizePathSweptVolume(const std::vector<Config> &keyframes)
 {
   Robot *robot = world->robots[0];
+  _keyframes.clear();
+  _mats.clear();
+  _appearanceStack.clear();
 
   for(int i = 0; i < keyframes.size(); i++)
   {
