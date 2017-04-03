@@ -43,6 +43,7 @@ class ForceFieldBackend : public SimTestBackend
     typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
 
     vector< vector<Vector3> > _frames;
+    double _frameLength;
 
   public:
 
@@ -51,14 +52,19 @@ class ForceFieldBackend : public SimTestBackend
   virtual bool OnCommand(const string& cmd,const string& args);
   virtual void RenderWorld();
 
-
   virtual bool Save();
   virtual bool Save(TiXmlElement *node);
   virtual bool Load(const char* file);
   virtual bool Load(TiXmlElement *node);
 
+  void ShowPath(){ drawPath=true; }
+  void HidePath(){ drawPath=false; }
+  void ShowPlannerTree(){ drawPlannerTree=true; }
+  void HidePlannerTree(){ drawPlannerTree=false; }
+  void ShowPlannerStartGoal(){ drawPlannerStartGoal=true; }
+  void HidePlannerStartGoal(){ drawPlannerStartGoal=false; }
 
-  void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3);
+  void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);
   void SetIKConstraints( vector<IKGoal> constraints, string robotname);
   void SetIKCollisions( vector<int> linksInCollision );
   void VisualizePathSweptVolumeAtPosition(const Config &q);

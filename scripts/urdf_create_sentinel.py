@@ -53,7 +53,7 @@ def createBranchSegment(parentlinkname, linkname, x, y, z):
   return sbc+sbl1+sbj1+sbl2+sbj2
 
 def createBranch(headname, branchname,x,y,z):
-  s = createBranchSegment(headname,branchname+str(0),x,y,z)
+  s = createBranchSegment(headname,branchname+str(0),x+length-length/8,y,z)
   for i in range(1,Nsegments):
     if i==1:
       s+= attachBranchSegment(branchname+str(i-1),branchname+str(i),-length-sRadius,0,0)
@@ -100,12 +100,14 @@ def createBranchBundle(headname):
     config += str(" 0"*2) ## first segment is fixed
     y = cos(i*2*pi/Nbranches)
     z = sin(i*2*pi/Nbranches)
-    thetaY = atan2(abs(y),abs(z))
-    thetaZ = pi/2-atan2(abs(y),abs(z))
+
+    thetaZ = atan2(abs(y),abs(z))
+    thetaY = pi/2-atan2(abs(y),abs(z))
+
     if y>0:
-      thetaY *= -1
-    if z<0:
       thetaZ *= -1
+    if z<0:
+      thetaY *= -1
 
     for j in range(1,Nsegments):
       config += " "+str(aperture*thetaZ)+" "+str(aperture*thetaY)

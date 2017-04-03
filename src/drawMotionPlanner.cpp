@@ -243,8 +243,7 @@ namespace GLDraw{
     glRasterPos2d(cx + zx + o, cy + zy + o);
     glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char*) "Z");
   }
-  void drawFrames(std::vector< std::vector<Vector3> > &frames){
-    Real length = 1.0;
+  void drawFrames(std::vector< std::vector<Vector3> > &frames, double frameLength){
     Real linewidth=0.01;
     for(int i = 0; i < frames.size(); i++){
       Vector3 p = frames.at(i).at(0);
@@ -264,19 +263,19 @@ namespace GLDraw{
       glPushMatrix();
       c1.setCurrentGL();
       glTranslate(p);
-      drawCylinder(e1*length,linewidth);
+      drawCylinder(e1*frameLength,linewidth);
       glPopMatrix();
 
       glPushMatrix();
       c2.setCurrentGL();
       glTranslate(p);
-      drawCylinder(e2*length,linewidth);
+      drawCylinder(e2*frameLength,linewidth);
       glPopMatrix();
 
       glPushMatrix();
       c3.setCurrentGL();
       glTranslate(p);
-      drawCylinder(e3*length,linewidth);
+      drawCylinder(e3*frameLength,linewidth);
       glPopMatrix();
       glEnable(GL_LIGHTING);
     }

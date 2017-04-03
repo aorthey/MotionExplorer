@@ -18,12 +18,8 @@ class PathPiecewiseLinearEuclidean
 
   public:
     static PathPiecewiseLinearEuclidean from_keyframes(const std::vector<Config> &keyframes);
+    static PathPiecewiseLinearEuclidean from_keyframes(const std::vector<Vector3> &keyframes);
 
-    Config EvalMilestone(const int k){
-      if(k<0) return keyframes.front();
-      if(k>Nkeyframes) return keyframes.back();
-      return keyframes.at(k);
-    }
 
     // make it [0,1] -> R^n
     void Normalize(){
@@ -36,20 +32,33 @@ class PathPiecewiseLinearEuclidean
       assert( fabs(newLength-1.0) < 1e-10);
       length = newLength;
     }
-    std::vector<double> GetLengthVector(){
+    std::vector<double> GetLengthVector() const{
       return interLength;
     }
 
-    double GetLength(){
+    double GetLength() const{
       return length;
     }
 
-    Vector3 EvalVec3(const double t){
+    Vector3 EvalVec3(const double t) const{
       Config q = Eval(t);
       Vector3 v; v[0] = q(0); v[1] = q(1); v[2] = q(2);
       return v;
     }
-    Config Eval(const double t){
+    Vector3 EvalVec3Milestone(const int k) const{
+      Config q;
+      if(k<0) q= keyframes.front();
+      else if(k>Nkeyframes) q= keyframes.back();
+      else q = keyframes.at(k);
+      Vector3 v; v[0] = q(0); v[1] = q(1); v[2] = q(2);
+      return v;
+    }
+    Config EvalMilestone(const int k) const{
+      if(k<0) return keyframes.front();
+      if(k>Nkeyframes) return keyframes.back();
+      return keyframes.at(k);
+    }
+    Config Eval(const double t) const{
       if(t<=0) return keyframes.front();
       if(t>=length) return keyframes.back();
       uint ictr = 0;
@@ -113,6 +122,19 @@ inline PathPiecewiseLinearEuclidean PathPiecewiseLinearEuclidean::from_keyframes
   PathPiecewiseLinearEuclidean path = PathPiecewiseLinearEuclidean();
   path.keyframes=keyframes;
   path.Ndim = keyframes.at(0).size();
+  path.Nkeyframes = keyframes.size();
+  path.interpolate();
+  return path;
+}
+inline PathPiecewiseLinearEuclidean PathPiecewiseLinearEuclidean::from_keyframes(const std::vector<Vector3> &keyframes){
+  PathPiecewiseLinearEuclidean path = PathPiecewiseLinearEuclidean();
+  for(int i = 0; i < keyframes.size(); i++){
+    //Vector3 x = keyframes.at(i);
+    Config q;q.resize(3);q(0)=keyframes.at(i)[0];q(1)=keyframes.at(i)[1];q(2)=keyframes.at(i)[2];
+    path.keyframes.push_back(q);
+  }
+  //path.keyframes=keyframes;
+  path.Ndim = 3;
   path.Nkeyframes = keyframes.size();
   path.interpolate();
   return path;

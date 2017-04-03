@@ -141,7 +141,7 @@ void ForceFieldBackend::RenderWorld()
   if(drawPlannerTree) GLDraw::drawPlannerTree(_stree);
   if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
   if(drawAxesLabels) GLDraw::drawAxesLabels(viewport);
-  if(drawFrames) GLDraw::drawFrames(_frames);
+  if(drawFrames) GLDraw::drawFrames(_frames, _frameLength);
 
   
 
@@ -350,8 +350,9 @@ std::vector<Config> ForceFieldBackend::getKeyFrames()
 {
   return _keyframes;
 }
-void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3)
+void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength)
 {
+  _frameLength = frameLength;
   vector<Vector3> frame;
   frame.push_back(p);
   frame.push_back(e1);

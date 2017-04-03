@@ -13,7 +13,7 @@ int main(int argc,const char** argv) {
   //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_fractal_3.xml");
   //backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/hubo_object.xml");
   //backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel/sentinel.xml");
-  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel.xml");
+  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel_complete.xml");
   Info info;
   info(&world);
 

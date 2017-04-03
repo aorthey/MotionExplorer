@@ -70,11 +70,11 @@ def commentNewBranch(bname):
 
 def createRevoluteJoint(jname, parentname, childname, x=0, y=0, z=0):
   s= ''
-  s+='<joint name="'+jname+'" type="revolute">\n'
+  s+='<joint name="'+jname+'_Z" type="revolute">\n'
   s+='  <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
   s+='  <parent link="'+parentname+'"/>\n'
   s+='  <child link="'+childname+'"/>\n'
-  s+='  <axis xyz="0 1 0"/>\n'
+  s+='  <axis xyz="0 0 1"/>\n'
   s+='  <dynamics damping="'+str(damping)+'" friction="0"/>\n'
   s+='  <limit lower="-1.57" upper="1.57" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'
@@ -83,20 +83,20 @@ def createRevoluteJoint(jname, parentname, childname, x=0, y=0, z=0):
 def createSphericalJoint(jname, parentname, childname, x=0, y=0, z=0):
   tmpname = parentname+"_spherical_joint_link"
   s= ''
-  s+='<joint name="'+jname+'_Y" type="revolute">\n'
+  s+='<joint name="'+jname+'_Z" type="revolute">\n'
   s+='  <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
   s+='  <parent link="'+parentname+'"/>\n'
   s+='  <child link="'+tmpname+'"/>\n'
-  s+='  <axis xyz="0 1 0"/>\n'
+  s+='  <axis xyz="0 0 1"/>\n'
   s+='  <dynamics damping="'+str(damping)+'" friction="0"/>\n'
   s+='  <limit lower="-1.57" upper="1.57" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'
   s+= createSphere(tmpname,0,0,0,0.001,PHYSICAL=False)
-  s+='<joint name="'+jname+'_X" type="revolute">\n'
+  s+='<joint name="'+jname+'_Y" type="revolute">\n'
   s+='  <origin rpy="0 0 0" xyz="0 0 0"/>\n'
   s+='  <parent link="'+tmpname+'"/>\n'
   s+='  <child link="'+childname+'"/>\n'
-  s+='  <axis xyz="0 0 1"/>\n'
+  s+='  <axis xyz="0 1 0"/>\n'
   s+='  <dynamics damping="'+str(damping)+'" friction="0"/>\n'
   s+='  <limit lower="-1.57" upper="1.57" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'

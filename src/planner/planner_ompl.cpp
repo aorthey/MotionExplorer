@@ -464,7 +464,6 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
 
     auto cpropagate(std::make_shared<SentinelPropagator>(si, &kcspace));
 
-
     //oc::SimpleSetup ss(cspace);
     //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
     //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
