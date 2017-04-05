@@ -23,6 +23,7 @@ class ForceFieldBackend : public SimTestBackend
     int drawRobotExtras; 
     int drawIKextras;
     int drawPath;
+    int drawPathMilestones;
     int drawPlannerTree;
     int drawPlannerStartGoal;
     int drawAxes;
@@ -40,6 +41,7 @@ class ForceFieldBackend : public SimTestBackend
     std::vector<std::vector<Matrix4> > _mats;
     vector<GLDraw::GeometryAppearance> _appearanceStack;
     vector<Config> _keyframes;
+    vector<uint> _milestonekeyframe_indices;
     typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
 
     vector< vector<Vector3> > _frames;
@@ -74,6 +76,7 @@ class ForceFieldBackend : public SimTestBackend
   std::vector<Config> getKeyFrames();
   void VisualizePlannerTree(const SerializedTree &tree);
   void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
+  void VisualizePathMilestones(const std::vector<Config> &keyframes, uint Nmilestones);
 };
 
 

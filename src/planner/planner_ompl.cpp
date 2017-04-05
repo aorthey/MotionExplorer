@@ -1,6 +1,16 @@
 #include "planner_ompl.h"
 #include "cspace_sentinel.h"
 
+ob::PlannerTerminationCondition epsilonSolnPlannerTerminationCondition(ob::ProblemDefinitionPtr pdef, double epsilon)
+{
+    return ob::PlannerTerminationCondition([pdef, epsilon]
+                                       {
+                                          double d = pdef->getSolutionDifference();
+                                          if(d<0) return false;
+                                          return (d < epsilon);
+                                       });
+}
+
 GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot)
 {
   //###########################################################################
@@ -464,18 +474,23 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
 
     auto cpropagate(std::make_shared<SentinelPropagator>(si, &kcspace));
 
-    //oc::SimpleSetup ss(cspace);
+    //###########################################################################
+    // choose planner
+    //###########################################################################
     //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
-    //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
+    ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
+    //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
+    //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
+    //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
     //ob::PlannerPtr ompl_planner = std::make_shared<oc::Syclop>(si);
     //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopRRT>(si);
     //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopEST>(si);
-    ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
-    //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
     //ob::PlannerPtr ompl_planner = std::make_shared<oc::LTLPlanner>(si);
     //ob::PlannerPtr ompl_planner = std::make_shared<oc::EST>(si);
-    //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
 
+    //###########################################################################
+    // setup and projection
+    //###########################################################################
     ss.setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
     ss.setStatePropagator(cpropagate);
     ss.setStartAndGoalStates(start, goal);
@@ -494,20 +509,42 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
     if(!ss.getStateSpace()->hasDefaultProjection()){
       std::cout << "No default projection available" << std::endl;
     }
+    //###########################################################################
+    // solve
+    //
+    // termination condition: 
+    //    reached duration or found solution in epsilon-neighborhood
+    //###########################################################################
 
-    //ob::PlannerStatus status = ss.solve(100.0);
-    ob::PlannerStatus status = ss.solve(10.0);
+    double duration = 2.0;
+    double epsilon = 0.1;
+
+    ob::PlannerTerminationCondition ptc_time = ob::timedPlannerTerminationCondition(duration);
+    //ob::PlannerTerminationCondition ptc_solution = ob::exactSolnPlannerTerminationCondition(ss.getProblemDefinition());
+    ob::PlannerTerminationCondition ptc_solution = epsilonSolnPlannerTerminationCondition(ss.getProblemDefinition(), epsilon);
+    ob::PlannerTerminationCondition ptc = ob::plannerOrTerminationCondition(ptc_time, ptc_solution);
+
+    std::cout << "Starting Motion Planner" << std::endl;
+    std::cout << "termination condition: reaching "<<duration << " seconds or being in epsilon="<< epsilon<<" neighborhood of solution" << std::endl;
+    std::cout << std::string(80, '-') << std::endl;
+    ob::PlannerStatus status = ss.solve(ptc);
     std::cout << "Status:" << status << std::endl;
     bool solved = ss.haveSolutionPath();
 
-    //Extract roadmap
+    //###########################################################################
+    // extract roadmap
+    //###########################################################################
     oc::PlannerData pd(si);
     ss.getPlannerData(pd);
-    std::cout << "Edges   : " << pd.numEdges() << std::endl;
-    std::cout << "Vertices: " << pd.numVertices() << std::endl;
+    //std::cout << "Edges   : " << pd.numEdges() << std::endl;
+    //std::cout << "Vertices: " << pd.numVertices() << std::endl;
 
     SerializeTree(pd);
     SerializeTreeRandomlyCullPoints(_stree, 2000);
+
+    //###########################################################################
+    // solve
+    //###########################################################################
 
     if (solved)
     {
@@ -524,6 +561,12 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
         Config cur = OMPLStateToConfig(state, cspace.getPtr());
         _keyframes.push_back(cur);
       }
+      ob::State *obgoal = path.getState(path.getStateCount()-1);
+      Config plannergoal = OMPLStateToConfig(obgoal, cspace.getPtr());
+
+      double dgoal = kcspace.Distance(plannergoal, p_goal);
+      std::cout << "Distance to goal: " << dgoal << std::endl;
+
       uint istep = max(int(path.getStateCount()/10.0),1);
       for(int i = 0; i < path.getStateCount(); i+=istep)
       {

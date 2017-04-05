@@ -1,3 +1,5 @@
+#pragma once
+
 #include <ompl/base/spaces/DubinsStateSpace.h>
 #include <ompl/base/spaces/ReedsSheppStateSpace.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
@@ -116,3 +118,5 @@ class SE3Project0r : public ob::ProjectionEvaluator
       projection(2) = stateSE3->getZ();
     }
 };
+
+ob::PlannerTerminationCondition epsilonSolnPlannerTerminationCondition(ob::ProblemDefinitionPtr pdef, double epsilon);

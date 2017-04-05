@@ -404,16 +404,18 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] create planner_klampt outsourcing klampt planning structure
  [x] move planner components to planner/
  [x] make button to disable/enable mesh and disable/enable faces of mesh
- [ ] refactor planner 
- [ ] boost graph instead of serialized tree
- [ ] find distance to goal for planner output OMPL (how approximate is the solution)
  [x] run ompl PDST/KPIECE /w def proj
  [x] compute irreducible projection from SE(3) path
 
- [ ] extend environment by a new pipe upward curved plus box connector
  [ ] GUI: save current robot state too, not only init/goal of planner
  [x] remove torsion while computing irreducible projection
  [x] reimplement irreducible projection in cpp, make it cleaner
- [ ] refactor path_pwl_euclid
- [ ] compute projection irreducible for N branches
+ [x] refactor path_pwl_euclid
+ [x] compute projection irreducible for N branches
+ [x] extend environment by a new pipe upward curved plus box connector
+ [ ] boost graph instead of serialized tree
+ [ ] refactor planner 
+ [ ] find distance to goal for planner output OMPL (how approximate is the solution)
  [ ] do ompl planning for N branches
+ [ ] make the environment easier to compute for rigid body planning (widen the inner hole maybe!?)
+ [ ] ompl benchmark (100 runs à 3600 seconds x environments x 2 x PDST/KPIECE/RRT/SST?)

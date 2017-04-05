@@ -70,6 +70,7 @@ namespace GLDraw{
       }//fory
     }//forx
   }
+
   void drawPathSweptVolume(Robot *robot, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, double sweptvolumeScale, GLColor sweptvolumeColor)
   {
     //loopin' through the waypoints
@@ -93,45 +94,58 @@ namespace GLDraw{
       }
     }
   }
-  void drawPlannerStartGoal(Robot *robot, const Config &p_init, const Config &p_goal)
+  void drawPathKeyframes(Robot *robot, std::vector<uint> keyframe_indices, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, double scale, GLColor color)
   {
-    if(!p_init.empty() && !p_goal.empty()){
-      GLColor colorOriginal;
-      GLColor colorInit(0,1,0);
-      GLColor colorGoal(1,0,0);
-      double scale = 1.01;
+    for(uint k = 0; k < keyframe_indices.size(); k++){
+      uint i = keyframe_indices.at(k);
 
-      //GLDraw::GeometryAppearance& a = *robot->geomManagers[0].Appearance();
-      //a.GetColor(colorOriginal);
-
-      robot->UpdateConfig(p_init);
       for(uint j=0;j<robot->links.size();j++) {
         if(robot->IsGeometryEmpty(j)) continue;
-        Matrix4 mat = robot->links[j].T_World;
+        Matrix4 matij = mats.at(i).at(j);
+
         glPushMatrix();
-        glMultMatrix(mat);
+        glMultMatrix(matij);
+
         glScalef(scale, scale, scale);
-        GLDraw::GeometryAppearance& a = *robot->geomManagers[j].Appearance();
-        a.SetColor(colorInit);
+
+        GLDraw::GeometryAppearance& a = appearanceStack.at(j);
+        a.SetColor(color);
+
         a.DrawGL();
         glPopMatrix();
-      }
-      
-      robot->UpdateConfig(p_goal);
-      for(uint j=0;j<robot->links.size();j++) {
-        if(robot->IsGeometryEmpty(j)) continue;
-        Matrix4 mat = robot->links[j].T_World;
-        glPushMatrix();
-        glMultMatrix(mat);
-        glScalef(scale, scale, scale);
-        GLDraw::GeometryAppearance& a = *robot->geomManagers[j].Appearance();
-        a.SetColor(colorGoal);
-        a.DrawGL();
-        a.SetColor(colorOriginal);
-        glPopMatrix();
+
       }
     }
+
   }
+
+  void drawPlannerStartGoal(Robot *robot, const Config &p_init, const Config &p_goal)
+  {
+    GLColor colorInit(0,1,0);
+    GLColor colorGoal(1,0,0);
+    double scale = 1.01;
+    if(!p_init.empty()) drawRobotAtConfig(robot, p_init, colorInit, scale);
+    if(!p_goal.empty()) drawRobotAtConfig(robot, p_goal, colorGoal, scale);
+  }
+
+  void drawRobotAtConfig(Robot *robot, const Config &q, GLColor color, double scale){
+    robot->UpdateConfig(q);
+    for(uint j=0;j<robot->links.size();j++) {
+      if(robot->IsGeometryEmpty(j)) continue;
+      Matrix4 mat = robot->links[j].T_World;
+      glPushMatrix();
+      glMultMatrix(mat);
+      glScalef(scale, scale, scale);
+      GLDraw::GeometryAppearance& a = *robot->geomManagers[j].Appearance();
+      //GLColor colorOriginal;
+      //a.GetColor(colorOriginal);
+      a.SetColor(color);
+      a.DrawGL();
+      //a.SetColor(colorOriginal);
+      glPopMatrix();
+    }
+  }
+
 
   void drawPlannerTree(const SerializedTree &_stree)
   {

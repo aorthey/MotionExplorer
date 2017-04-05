@@ -19,9 +19,10 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawForceField = 0;
   drawRobotExtras = 1;
   drawIKextras = 0;
-  drawPath = 1;
-  drawPlannerTree = 1;
-  drawPlannerStartGoal = 1;
+  drawPath = 0;
+  drawPathMilestones = 0;
+  drawPlannerTree = 0;
+  drawPlannerStartGoal = 0;
   drawRigidObjects = 1;
   drawRigidObjectsEdges = 1;
   drawRigidObjectsFaces = 0;
@@ -31,6 +32,7 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
 
   MapButtonToggle("draw_planner_tree",&drawPlannerTree);
   MapButtonToggle("draw_path",&drawPath);
+  MapButtonToggle("draw_path_milestones",&drawPathMilestones);
   MapButtonToggle("draw_path_start_goal",&drawPlannerStartGoal);
   MapButtonToggle("draw_rigid_objects_faces",&drawRigidObjectsFaces);
   MapButtonToggle("draw_rigid_objects_edges",&drawRigidObjectsEdges);
@@ -137,6 +139,8 @@ void ForceFieldBackend::RenderWorld()
   if(drawIKextras) GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);
   if(drawForceField) GLDraw::drawUniformForceField();
   if(drawPath) GLDraw::drawPathSweptVolume(robot, _mats, _appearanceStack);
+  if(drawPathMilestones) GLDraw::drawPathKeyframes(robot, _milestonekeyframe_indices, _mats, _appearanceStack);
+
   if(drawPlannerStartGoal) GLDraw::drawPlannerStartGoal(robot, planner_p_init, planner_p_goal);
   if(drawPlannerTree) GLDraw::drawPlannerTree(_stree);
   if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
@@ -346,6 +350,31 @@ void ForceFieldBackend::VisualizeStartGoal(const Config &p_init, const Config &p
   planner_p_init = p_init;
   planner_p_goal = p_goal;
 }
+
+void ForceFieldBackend::VisualizePathMilestones(const std::vector<Config> &keyframes, uint Nmilestones){
+  VisualizePathSweptVolume(keyframes);
+  drawPathMilestones=1;
+
+  if(Nmilestones > keyframes.size()){
+    Nmilestones = keyframes.size();
+  }
+  if(Nmilestones < 1){
+    Nmilestones=0;
+  }
+  _milestonekeyframe_indices.clear();
+
+  uint N = keyframes.size();
+  uint Nstep = (int)(N/Nmilestones);
+
+  if(Nstep<1) Nstep=1;
+  uint Ncur = 0;
+  while(Ncur < N){
+    _milestonekeyframe_indices.push_back(Ncur);
+    Ncur += Nstep;
+  }
+  std::cout << "Milestone visualization indicies: " << _milestonekeyframe_indices << std::endl;
+}
+
 std::vector<Config> ForceFieldBackend::getKeyFrames()
 {
   return _keyframes;
@@ -551,6 +580,10 @@ bool GLUIForceFieldGUI::Initialize()
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Object Faces");
   AddControl(checkbox,"draw_rigid_objects_faces");
   checkbox->set_int_val(0);
+
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Path Milestones");
+  AddControl(checkbox,"draw_path_milestones");
+  checkbox->set_int_val(1);
 
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Start Goal Config");
   AddControl(checkbox,"draw_path_start_goal");

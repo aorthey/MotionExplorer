@@ -5,10 +5,11 @@ from urdf_create import *
 
 length = 0.15
 radius = 0.01
+radius_cylinder = 0.02
 sphere_scale = 2
 headradius = 0.1
-Nsegments = 4
-Nbranches = 1
+Nsegments = 6
+Nbranches = 8
 aperture = 0.4 ## aperture of bouquet of branches
 name = 'sentinel_complete'
 
@@ -36,7 +37,7 @@ def createHead(headname):
 def attachBranchSegment(parentlinkname, linkname, x, y, z):
   linkname1 = linkname+'_cylinder'
   linkname2 = linkname
-  sbl1 = createCylinder(linkname1,-length/2-sRadius,0,0,radius,length) 
+  sbl1 = createCylinder(linkname1,-length/2-sRadius,0,0,radius_cylinder,length) 
   sbj1 = createSphericalJoint(parentlinkname+'_'+linkname+'_joint_revolute', parentlinkname,linkname1, x, y, z) 
   sbl2 = createSphere(linkname2,-length-2*sRadius,0,0,0.95*sRadius)
   sbj2 = createRigidJoint(linkname+'_fixed', linkname1, linkname2,0,0,0)
@@ -46,7 +47,7 @@ def createBranchSegment(parentlinkname, linkname, x, y, z):
   sbc = commentNewBranch(linkname) 
   linkname1 = linkname+'_cylinder'
   linkname2 = linkname
-  sbl1 = createCylinder(linkname1,-length/2,0,0,radius,length) 
+  sbl1 = createCylinder(linkname1,-length/2,0,0,radius_cylinder,length) 
   sbj1 = createRigidJoint(parentlinkname+'_'+linkname+'_joint', parentlinkname,linkname1, x, y, z) 
   sbl2 = createSphere(linkname2,-length-sRadius,0,0,0.95*sRadius)
   sbj2 = createRigidJoint(linkname+'_fixed', linkname1, linkname2, 0, 0, 0)
@@ -67,7 +68,7 @@ def createBranchBundle(headname):
   if tt < 2.0:
     print "[warning] head radius too small, branches too big"
 
-  scale = 0.5
+  scale = 0.7
 
   for i in range(0,Nbranches):
     y = scale*headradius*cos(i*2*pi/Nbranches)
@@ -138,7 +139,9 @@ print fname
 f = open(xmlname,'w')
 f.write('<?xml version="1.0"?>\n\n')
 f.write('<world>\n')
-terrainstr = '  <terrain file=\"/home/aorthey/git/Klampt/data/terrains/plane.tri\"'
+terrainstr  = '  <rigidObject '
+terrainstr += '  name=\"tunnel\"'
+terrainstr += '  file=\"/home/aorthey/git/orthoklampt/data/terrains/tunnel/tunnel_branch.tri\"'
 terrainstr += '  translation=\"0 0 0\"/>\n\n'
 f.write(terrainstr)
 

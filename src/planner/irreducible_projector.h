@@ -27,18 +27,13 @@ class IrreducibleProjector
     pairDoubleVecVec ComputeThetaGammaFromRootPath( const std::vector<Vector3> &rootPos, const std::vector<Matrix3> &rootRot, const std::vector<double> &lengths);
     pairDoubleVec ComputeThetaGammaFromRootPathPosition(const PathPiecewiseLinearEuclidean &path, double t0, const Matrix3 &R0, const std::vector<double> &lengths);
 
-  protected:
-    //virtual std::vector<Vector3> ComputePositionAlongRootPath();
-    //virtual std::vector<Matrix3> ComputeRotationAlongRootPath();
-
   public:
 
     IrreducibleProjector(Robot *robot);
 
-    std::vector<Config> getSubLinkKeyframes(std::vector<double> &lengths);
+    std::vector<Config> getSubLinkKeyframes(std::vector<double> &lengths, uint Nbranches);
 
     void setRootPath( std::vector<Config> &keyframes);
-
 
 
     //ComputeExtensionAlongRootPath(std::vector<double> lengths);

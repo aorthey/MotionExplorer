@@ -97,11 +97,20 @@ class Info
           std::cout<< "Joint[" << i << "] " << dnames[i] << " qmin " << drivers[i].qmin << " qmax " << drivers[i].qmax << std::endl;
         }
 
+        uint Neffective = 0;
+        for(int i = 0; i < (*it)->qMin.size(); i++){
+          double qL = (*it)->qMin[i];
+          double qU = (*it)->qMax[i];
+          if(fabs(qU-qL) > 1e-8) Neffective++;
+        }
         std::cout << std::string(80, '-') << std::endl;
         std::cout << "#config q=" << (*it)->q << std::endl;
         std::cout << "#qmin " << (*it)->qMin << std::endl;
         std::cout << "#qmax " << (*it)->qMax << std::endl;
+        std::cout << "Dimensionality          : " << (*it)->qMin.size() << std::endl;
+        std::cout << "Effective dimensionality: " << Neffective << " (removing zero measure dimensions)" << std::endl;
         std::cout << std::string(80, '-') << std::endl;
+
       }//for all robots
 
     }
