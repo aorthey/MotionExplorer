@@ -141,7 +141,7 @@ f.write('<?xml version="1.0"?>\n\n')
 f.write('<world>\n')
 terrainstr  = '  <rigidObject '
 terrainstr += '  name=\"tunnel\"'
-terrainstr += '  file=\"/home/aorthey/git/orthoklampt/data/terrains/tunnel/tunnel_branch.tri\"'
+terrainstr += ' file=\"/home/aorthey/git/orthoklampt/data/terrains/tunnel/tunnel_branch2.tri\"'
 terrainstr += '  translation=\"0 0 0\"/>\n\n'
 f.write(terrainstr)
 

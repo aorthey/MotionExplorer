@@ -392,8 +392,6 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [x] ompl does not read the joint limits
  [x] make ompl planners available 
  [ ] add directions again in draw serialized tree after culling nodes
- [ ] make the controller work without gravity on SE(3)
- [ ] execute kinodynamic path
  [ ] remove this orange line from origin to p_init
  [ ] Button to save/load GUI state including Motion Planning Equipment
  [x] ompl converts cspace to realvectorspace R, but we need a compound space SE(3)xQ => make own ompl interface
@@ -413,9 +411,32 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [x] refactor path_pwl_euclid
  [x] compute projection irreducible for N branches
  [x] extend environment by a new pipe upward curved plus box connector
+ [x] make the environment easier to compute for rigid body planning (widen the inner hole maybe!?)
  [ ] boost graph instead of serialized tree
  [ ] refactor planner 
  [ ] find distance to goal for planner output OMPL (how approximate is the solution)
- [ ] do ompl planning for N branches
- [ ] make the environment easier to compute for rigid body planning (widen the inner hole maybe!?)
+ [ ] toggle mesh/faces of objects with keyboard
+
+-- abstraction
+
+
+-- wrench fields
+ [ ] make the controller work without gravity on SE(3)
+ [ ] execute kinodynamic path
+ [ ] visualize path speed profile
+
+-- irreducible paths
+ [ ] do ompl planning for N branches (use ttrivial control)
+ [ ] design 3 easy environments with fast SE(3) computation with any MP (so that
+experiments are faster and it becomes easier to see different to irr
+experiments) => best case: make them also compatible with wrench planning?
+ [ ] add one hard experiment where the method will break down, should be short
+so that any RRT can find a solution under 3600 seconds. replace the 'proof of
+completeness' section with that experiment
  [ ] ompl benchmark (100 runs à 3600 seconds x environments x 2 x PDST/KPIECE/RRT/SST?)
+ [ ] bug: robot makes backward movements through pipe segment? (check propagate
+function)
+ [x] repair rotation conversion klampt->klampt
+ [ ] make manual propagate function to test SE3 implementation, seems not quite
+right
+

@@ -2,10 +2,11 @@
 
 <world>
 
+
   <robot name="sentinel" file="/home/aorthey/git/orthoklampt/data/sentinel.urdf" translation="0 0 0" rotateRPY="0 0 0" config="7 0 0 0 0 0 0 0"/>
   <!--
   -->
-  <rigidObject name="tunnel" file="/home/aorthey/git/orthoklampt/data/terrains/tunnel/tunnel_branch3.tri" translation="0 0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="tunnel" file="/home/aorthey/git/orthoklampt/data/terrains/tunnel/tunnel_branch2.tri" translation="0 0 0" rotateRPY="0 0 0"/>
 
   <simulation>
     <globals maxContacts="20" />

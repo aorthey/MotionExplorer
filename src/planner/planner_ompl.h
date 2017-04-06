@@ -74,6 +74,7 @@ class MotionPlannerOMPL: public MotionPlanner
     MotionPlannerOMPL(RobotWorld *world, WorldSimulation *sim);
     void SerializeTree(ob::PlannerData &pd);
     void test();
+    void testSE3(KinodynamicCSpaceSentinelAdaptor &cspace);
     void test_conversion(Config &q, ob::StateSpacePtr &stateSpace);
     virtual bool solve(Config &p_init, Config &p_goal);
 };

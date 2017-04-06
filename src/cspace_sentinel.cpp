@@ -236,10 +236,12 @@ void KinodynamicCSpaceSentinelAdaptor::SE3ToState(State& x, const Matrix4& x_SE3
   x(4)=R[1];
   x(5)=R[0];
 
-  for(int i = 3; i < 6; i++){
-    if(x(i)<0) x(i)+=2*M_PI;
-    if(x(i)>2*M_PI) x(i)-=2*M_PI;
-  }
+  if(x(3)<-M_PI) x(3)+=2*M_PI;
+  if(x(3)>M_PI) x(3)-=2*M_PI;
+  if(x(5)<-M_PI) x(5)+=2*M_PI;
+  if(x(5)>M_PI) x(5)-=2*M_PI;
+  if(x(4)<-M_PI/2) x(5)+=M_PI;
+  if(x(4)>M_PI/2) x(5)-=M_PI;
 }
 Real KinodynamicCSpaceSentinelAdaptor::Distance(const Config& x, const Config& y) { 
   //return base->Distance(x,y); 

@@ -239,9 +239,10 @@ bool MotionPlanner::IsFeasible( Robot *robot, SingleRobotCSpace &cspace, Config 
     std::cout << std::string(80, '*') << std::endl;
     return false;
   }
-  //check that rotations are in [0,2pi]
-  for(int i = 3; i < 6; i++){
-    if(q(i)<0 || q(i)>2*M_PI){
+  //check joint limits
+  robot->qMin;
+  for(int i = 0; i < robot->q.size(); i++){
+    if(q(i) < robot->qMin(i) || q(i) > robot->qMax(i)){
       std::cout << std::string(80, '*') << std::endl;
       std::cout << "ERROR!" << std::endl;
       std::cout << std::string(80, '*') << std::endl;
