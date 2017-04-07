@@ -250,14 +250,19 @@ bool ForceFieldBackend::Load(const char* file)
   return true;
 
 }
-bool ForceFieldBackend::Save()
+bool ForceFieldBackend::Save(const char* file)
 {
-
-  std::string date = util::GetCurrentTimeString();
+  std::string out;
   std::string pdata = util::GetDataFolder();
-  std::string out = pdata+"/gui/state_"+date+".xml";
 
-  std::cout << "saving data to "<<out << std::endl;
+  if(!file){
+    std::string date = util::GetCurrentTimeString();
+    out = pdata+"/gui/state_"+date+".xml";
+  }else{
+    out = pdata+"/gui/"+file;
+  }
+
+  std::cout << "saving data to "<< out << std::endl;
 
   TiXmlDocument doc;
   TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );

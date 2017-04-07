@@ -240,7 +240,6 @@ bool MotionPlanner::IsFeasible( Robot *robot, SingleRobotCSpace &cspace, Config 
     return false;
   }
   //check joint limits
-  robot->qMin;
   for(int i = 0; i < robot->q.size(); i++){
     if(q(i) < robot->qMin(i) || q(i) > robot->qMax(i)){
       std::cout << std::string(80, '*') << std::endl;
@@ -248,7 +247,7 @@ bool MotionPlanner::IsFeasible( Robot *robot, SingleRobotCSpace &cspace, Config 
       std::cout << std::string(80, '*') << std::endl;
       std::cout << "Rotation invalid for configuration" << std::endl;
       std::cout << q << std::endl;
-      std::cout << "entry "<<i<< " " << q(i) << " outside of [0,2*pi]" << std::endl;
+      std::cout << "entry "<<i<< " violation: " << robot->qMin(i) << " < " << q(i) << " < " << robot->qMax(i) << std::endl;
       std::cout << std::string(80, '*') << std::endl;
       return false;
     }

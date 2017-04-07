@@ -206,9 +206,6 @@ Matrix4 KinodynamicCSpaceSentinelAdaptor::StateToSE3(const State& x){
   RigidTransform T_x_se3;
   Matrix3 R;
 
-  // EulerAngleRotation Reuler(x(3),x(4),x(5));
-  // Reuler.getMatrixZYX(R);
-  //EulerAngleRotation Reuler(x(5),x(4),x(3));
   EulerAngleRotation Reuler(x(3),x(4),x(5));
   Reuler.getMatrixZYX(R);
 

@@ -54,7 +54,7 @@ class ForceFieldBackend : public SimTestBackend
   virtual bool OnCommand(const string& cmd,const string& args);
   virtual void RenderWorld();
 
-  virtual bool Save();
+  virtual bool Save(const char* file=NULL);
   virtual bool Save(TiXmlElement *node);
   virtual bool Load(const char* file);
   virtual bool Load(TiXmlElement *node);

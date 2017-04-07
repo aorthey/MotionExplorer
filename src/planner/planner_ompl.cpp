@@ -656,7 +656,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   testSE3(kcspace);
   //KinodynamicCSpaceSentinelAdaptor kcspace(&geometric_cspace);
   //exit(0);
-  double duration = 2.0;
+  double duration = 10.0;
   double epsilon = 0.1;
 
   ob::PlannerTerminationCondition ptc_time = ob::timedPlannerTerminationCondition(duration);
