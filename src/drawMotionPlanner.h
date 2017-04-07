@@ -23,5 +23,5 @@ namespace GLDraw {
 
   void drawPlannerTree(const SerializedTree &_stree);
   void drawAxesLabels(Camera::Viewport& viewport);
-  void drawFrames(std::vector< std::vector<Vector3> > &frames, double frameLength);
+  void drawFrames(std::vector< std::vector<Vector3> > &frames, std::vector<double> frameLength);
 };

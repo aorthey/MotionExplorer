@@ -208,9 +208,10 @@ Matrix4 KinodynamicCSpaceSentinelAdaptor::StateToSE3(const State& x){
 
   // EulerAngleRotation Reuler(x(3),x(4),x(5));
   // Reuler.getMatrixZYX(R);
-  EulerAngleRotation Reuler(x(5),x(4),x(3));
-  Reuler.getMatrixXYZ(R);
-  //R = Rz*Ry*Rx;
+  //EulerAngleRotation Reuler(x(5),x(4),x(3));
+  EulerAngleRotation Reuler(x(3),x(4),x(5));
+  Reuler.getMatrixZYX(R);
+
   T_x_se3.setTranslation(Vector3(x(0),x(1),x(2)));
   T_x_se3.setRotation(R);
 
@@ -224,7 +225,7 @@ void KinodynamicCSpaceSentinelAdaptor::SE3ToState(State& x, const Matrix4& x_SE3
   x_SE3.get(R_m,T);
 
   EulerAngleRotation R;
-  R.setMatrixXYZ(R_m);
+  R.setMatrixZYX(R_m);
 
   x.resize(x.size());
   x.setZero();
@@ -232,16 +233,19 @@ void KinodynamicCSpaceSentinelAdaptor::SE3ToState(State& x, const Matrix4& x_SE3
   x(1)=T[1];
   x(2)=T[2];
 
-  x(3)=R[2];
+  x(3)=R[0];
   x(4)=R[1];
-  x(5)=R[0];
+  x(5)=R[2];
 
   if(x(3)<-M_PI) x(3)+=2*M_PI;
   if(x(3)>M_PI) x(3)-=2*M_PI;
+
+  if(x(4)<-M_PI/2) x(4)+=M_PI;
+  if(x(4)>M_PI/2) x(4)-=M_PI;
+
   if(x(5)<-M_PI) x(5)+=2*M_PI;
   if(x(5)>M_PI) x(5)-=2*M_PI;
-  if(x(4)<-M_PI/2) x(5)+=M_PI;
-  if(x(4)>M_PI/2) x(5)-=M_PI;
+
 }
 Real KinodynamicCSpaceSentinelAdaptor::Distance(const Config& x, const Config& y) { 
   //return base->Distance(x,y); 

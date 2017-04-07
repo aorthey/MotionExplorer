@@ -440,3 +440,5 @@ function)
  [ ] make manual propagate function to test SE3 implementation, seems not quite
 right
 
+ [ ] seems rot of path is right, visualization seems wrong, especially it
+diverges near the end of the path

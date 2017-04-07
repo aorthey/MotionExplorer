@@ -16,6 +16,12 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
 {
   world->background = GLColor(1,1,1);
 
+  if(world->robots.size()>1){
+    std::cout << "[ERROR]" << std::endl;
+    std::cout << "there are " << world->robots.size() << " robots in this world. We only support 1." << std::endl;
+    exit(0);
+  }
+
   drawForceField = 0;
   drawRobotExtras = 1;
   drawIKextras = 0;
@@ -325,7 +331,6 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
   }
 
   return true;
-   // std::vector<std::vector<Matrix4> > _mats;
    // vector<GLDraw::GeometryAppearance> _appearanceStack;
 
 }
@@ -381,17 +386,25 @@ std::vector<Config> ForceFieldBackend::getKeyFrames()
 }
 void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength)
 {
-  _frameLength = frameLength;
   vector<Vector3> frame;
   frame.push_back(p);
   frame.push_back(e1);
   frame.push_back(e2);
   frame.push_back(e3);
+
   _frames.push_back(frame);
+  _frameLength.push_back(frameLength);
 }
 void ForceFieldBackend::VisualizePathSweptVolumeAtPosition(const Config &q)
 {
   Robot *robot = world->robots[0];
+  if(!robot->InJointLimits(q)){
+    std::cout << "trying to set an outer limit config" << std::endl;
+    std::cout << "minimum       :" << robot->qMin << std::endl;
+    std::cout << "configuration :" << q << std::endl;
+    std::cout << "maximum       :" << robot->qMin << std::endl;
+    exit(0);
+  }
   robot->UpdateConfig(q);
   std::vector<Matrix4> mats_config;
 

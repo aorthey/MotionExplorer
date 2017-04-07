@@ -175,10 +175,12 @@ Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob:
 
   if(q(3)<-M_PI) q(3)+=2*M_PI;
   if(q(3)>M_PI) q(3)-=2*M_PI;
+
+  if(q(4)<-M_PI/2) q(4)+=M_PI;
+  if(q(4)>M_PI/2) q(4)-=M_PI;
+
   if(q(5)<-M_PI) q(5)+=2*M_PI;
   if(q(5)>M_PI) q(5)-=2*M_PI;
-  if(q(4)<-M_PI/2) q(5)+=M_PI;
-  if(q(4)>M_PI/2) q(5)-=M_PI;
 
   return q;
 }
@@ -453,20 +455,28 @@ void SentinelPropagator::propagate(const ob::State *state, const oc::Control* co
   //###########################################################################
   // Forward Simulate
   //###########################################################################
+  double roll = u(0);
+  double pitch = u(1);
+  double yaw = u(2);
+  Math3D::EulerAngleRotation Reuler(roll, pitch, yaw);
+  Math3D::Matrix3 R;
+  Reuler.getMatrixXYZ(R);
+
   //Matrix4 tmp = MatrixExponential(dp0*h);
   //Matrix4 pnext = p0*tmp;
 
   std::vector<Config> path;
   cspace_->Simulate(x0, u, path);
 
+  Config qend = path.back();
+
   //###########################################################################
   // Config to OMPL
   //###########################################################################
 
-  Config qend = path.back();
-  std::cout << "Propagate: " << std::endl;
-  std::cout << x0 << std::endl;
-  std::cout << qend << std::endl;
+  //std::cout << "Propagate: " << std::endl;
+  //std::cout << x0 << std::endl;
+  //std::cout << qend << std::endl;
 
   ob::ScopedState<> ssr = ConfigToOMPLState(qend, s);
 
@@ -491,9 +501,6 @@ void SentinelPropagator::propagate(const ob::State *state, const oc::Control* co
   for(int i = 0; i < N; i++){
     resultRn->values[i] = ssrRn->values[i];
   }
-
-  //std::cout << resultSE3->getX() << " " << resultSE3->getY() << " " << resultSE3->getZ() << std::endl;
-  //std::cout << resultSO3->x << " " << resultSO3->y << " " << resultSO3->z << " " << resultSO3->w << " " << std::endl;
 
 }
 

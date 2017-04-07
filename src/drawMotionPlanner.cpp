@@ -109,6 +109,8 @@ namespace GLDraw{
         glScalef(scale, scale, scale);
 
         GLDraw::GeometryAppearance& a = appearanceStack.at(j);
+        if(a.geom != robot->geometry[j]) a.Set(*robot->geometry[j]);
+
         a.SetColor(color);
 
         a.DrawGL();
@@ -257,8 +259,8 @@ namespace GLDraw{
     glRasterPos2d(cx + zx + o, cy + zy + o);
     glutBitmapString(GLUT_BITMAP_HELVETICA_18, (unsigned char*) "Z");
   }
-  void drawFrames(std::vector< std::vector<Vector3> > &frames, double frameLength){
-    Real linewidth=0.01;
+  void drawFrames(std::vector< std::vector<Vector3> > &frames, std::vector<double> frameLength){
+    Real linewidth=0.005;
     for(int i = 0; i < frames.size(); i++){
       Vector3 p = frames.at(i).at(0);
       Vector3 e1 = frames.at(i).at(1);
@@ -277,19 +279,19 @@ namespace GLDraw{
       glPushMatrix();
       c1.setCurrentGL();
       glTranslate(p);
-      drawCylinder(e1*frameLength,linewidth);
+      drawCylinder(e1*frameLength.at(i),linewidth);
       glPopMatrix();
 
       glPushMatrix();
       c2.setCurrentGL();
       glTranslate(p);
-      drawCylinder(e2*frameLength,linewidth);
+      drawCylinder(e2*frameLength.at(i),linewidth);
       glPopMatrix();
 
       glPushMatrix();
       c3.setCurrentGL();
       glTranslate(p);
-      drawCylinder(e3*frameLength,linewidth);
+      drawCylinder(e3*frameLength.at(i),linewidth);
       glPopMatrix();
       glEnable(GL_LIGHTING);
     }

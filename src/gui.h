@@ -45,7 +45,7 @@ class ForceFieldBackend : public SimTestBackend
     typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
 
     vector< vector<Vector3> > _frames;
-    double _frameLength;
+    vector< double > _frameLength;
 
   public:
 
