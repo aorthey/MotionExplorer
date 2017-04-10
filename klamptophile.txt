@@ -426,6 +426,11 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] visualize path speed profile
 
 -- irreducible paths
+ [x] bug: robot makes backward movements through pipe segment? (check propagate
+function)
+ [x] repair rotation conversion klampt->klampt
+ [x] seems rot of path is right, visualization seems wrong, especially it
+diverges near the end of the path
  [ ] do ompl planning for N branches (use ttrivial control)
  [ ] design 3 easy environments with fast SE(3) computation with any MP (so that
 experiments are faster and it becomes easier to see different to irr
@@ -434,11 +439,6 @@ experiments) => best case: make them also compatible with wrench planning?
 so that any RRT can find a solution under 3600 seconds. replace the 'proof of
 completeness' section with that experiment
  [ ] ompl benchmark (100 runs à 3600 seconds x environments x 2 x PDST/KPIECE/RRT/SST?)
- [ ] bug: robot makes backward movements through pipe segment? (check propagate
-function)
- [x] repair rotation conversion klampt->klampt
- [ ] make manual propagate function to test SE3 implementation, seems not quite
-right
-
- [ ] seems rot of path is right, visualization seems wrong, especially it
-diverges near the end of the path
+ [ ] Stop if reached goal region
+ [ ] Check why approximateSolution is false in between planning
+ [ ] ProblemDefPtr is not updated from ompl site!? (only after last plan?)

@@ -7,6 +7,8 @@
 #include <ompl/base/StateSpace.h>
 #include <ompl/base/PlannerData.h>
 #include <ompl/base/PlannerDataGraph.h>
+#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
+#include <ompl/tools/benchmark/Benchmark.h>
 
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/PathGeometric.h>
@@ -17,6 +19,7 @@
 #include <ompl/geometric/planners/rrt/LazyRRT.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
+
 
 #include <ompl/control/SimpleSetup.h>
 #include <ompl/control/SpaceInformation.h>
@@ -41,6 +44,7 @@ namespace ob = ompl::base;
 namespace oc = ompl::control;
 namespace og = ompl::geometric;
 namespace oa = ompl::app;
+namespace ot = ompl::tools;
 //namespace po = boost::program_options;
 
 ob::ScopedState<> ConfigToOMPLState(const Config &q, const ob::StateSpacePtr &s);
@@ -120,4 +124,4 @@ class SE3Project0r : public ob::ProjectionEvaluator
     }
 };
 
-ob::PlannerTerminationCondition epsilonSolnPlannerTerminationCondition(ob::ProblemDefinitionPtr pdef, double epsilon);
+//ob::PlannerTerminationCondition epsilonSolnPlannerTerminationCondition(ob::ProblemDefinitionPtr pdef);

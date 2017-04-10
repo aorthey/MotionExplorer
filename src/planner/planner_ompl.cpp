@@ -1,14 +1,28 @@
 #include "planner_ompl.h"
+
 #include "cspace_sentinel.h"
 
-ob::PlannerTerminationCondition epsilonSolnPlannerTerminationCondition(ob::ProblemDefinitionPtr pdef, double epsilon)
+ob::PlannerTerminationCondition epsilonSolnPlannerTerminationCondition(ob::ProblemDefinitionPtr pdef)
 {
-    return ob::PlannerTerminationCondition([pdef, epsilon]
-                                       {
-                                          double d = pdef->getSolutionDifference();
-                                          if(d<0) return false;
-                                          return (d < epsilon);
-                                       });
+    return ob::PlannerTerminationCondition(
+      [pdef]
+      {
+        //std::cout << planner->getName() << std::endl;
+        //ob::StateSpacePtr ss = si.getStateSpace();
+        //si.distance(s1,s2);
+         //double d = pdef->getSolutionDifference();
+         //std::cout << "Planner distance: " << d << std::endl;
+         //if(d<0) return false;
+         //double epsilon = 0.1;
+         //if(d<epsilon) return true;
+        return false;
+      });
+}
+ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)
+{
+  ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
+  obj->setCostThreshold(ob::Cost(dInf));
+  return obj;
 }
 
 GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot)
@@ -601,8 +615,11 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   ob::RealVectorBounds cbounds(NdimControl+1);
   cbounds.setLow(-1);
   cbounds.setHigh(1);
-  cbounds.setLow(3,0.02);
+
+  cbounds.setLow(3,0.02);//propagation step size
   cbounds.setHigh(3,0.15);
+
+
   control_cspace->setBounds(cbounds);
 
   oc::SimpleSetup ss(control_cspace);
@@ -614,10 +631,11 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   // choose planner
   //###########################################################################
   //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
-  ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
+  ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
+  //
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::Syclop>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopRRT>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopEST>(si);
@@ -627,49 +645,109 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   // setup and projection
   //###########################################################################
+
   ss.setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
   ss.setStatePropagator(cpropagate);
-  ss.setStartAndGoalStates(start, goal);
+
+  double epsilon = 0.5;
+
+  ss.setStartAndGoalStates(start, goal, epsilon);
   ss.setup();
   ss.setPlanner(ompl_planner);
 
-  //set default projection
-  //ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
+  ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
 
-  //std::vector<double> cs(3); cs[0] = cs[1] = cs[2]= 0.1;
-  //ss.getStateSpace()->getDefaultProjection()->setCellSizes(cs);
-  //std::static_pointer_cast<oc::KPIECE1>(ompl_planner)->setProjectionEvaluator(ss.getStateSpace()->getDefaultProjection());
+  //set objective to infinite path to just return first solution
+  ob::ProblemDefinitionPtr pdef = ss.getProblemDefinition();
+  pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
-  //ob::ProjectionEvaluatorPtr projector = ss.getStateSpace()->getDefaultProjection();
+  //###########################################################################
+  // debug
+  //###########################################################################
 
-  //if(!ss.getStateSpace()->hasDefaultProjection()){
-  //  std::cout << "No default projection available" << std::endl;
-  //}
+  //testRotationConversion();
+  //test();
+  //testSE3(kcspace);
+
   //###########################################################################
   // solve
   //
   // termination condition: 
   //    reached duration or found solution in epsilon-neighborhood
   //###########################################################################
-  testRotationConversion();
-  test();
-  testSE3(kcspace);
-  //KinodynamicCSpaceSentinelAdaptor kcspace(&geometric_cspace);
-  //exit(0);
-  double duration = 10.0;
-  double epsilon = 0.1;
+  bool solved = false;
+  double solution_time = dInf;
+  double duration = 3600.0;
+  ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
 
-  ob::PlannerTerminationCondition ptc_time = ob::timedPlannerTerminationCondition(duration);
-  //ob::PlannerTerminationCondition ptc_solution = ob::exactSolnPlannerTerminationCondition(ss.getProblemDefinition());
-  ob::PlannerTerminationCondition ptc_solution = epsilonSolnPlannerTerminationCondition(ss.getProblemDefinition(), epsilon);
-  ob::PlannerTerminationCondition ptc = ob::plannerOrTerminationCondition(ptc_time, ptc_solution);
 
-  std::cout << "Starting Motion Planner" << std::endl;
-  std::cout << "termination condition: reaching "<<duration << " seconds or being in epsilon="<< epsilon<<" neighborhood of solution" << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
+  //###########################################################################
+  // benchmark instead
+  //###########################################################################
+  ot::Benchmark benchmark(ss, "IrreducibleBenchmarkPipes");
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
+
+  ot::Benchmark::Request req;
+  req.maxTime = duration;
+  req.maxMem = 10000.0;
+  req.runCount = 100;
+  req.displayProgress = true;
+  benchmark.benchmark(req);
+  // This will generate a file of the form ompl_host_time.log
+  benchmark.saveResultsToFile();
+
+
+
+  //###########################################################################
+  // solve
+  //###########################################################################
   ob::PlannerStatus status = ss.solve(ptc);
-  std::cout << "Status:" << status << std::endl;
-  bool solved = ss.haveSolutionPath();
+
+  solved = ss.haveExactSolutionPath();
+
+  //double dstep = 0.1;
+  //uint Niterations = duration/dstep;
+
+  //std::cout << "Starting Motion Planner" << std::endl;
+  //std::cout << "termination condition: reaching "<<duration << " seconds or being in epsilon="<< epsilon<<" neighborhood of solution" << std::endl;
+  //std::cout << std::string(80, '-') << std::endl;
+
+  //bool solved = false;
+  //double solution_time = dInf;
+
+  //for(int i = 0; i < Niterations; i++){
+  //  ob::PlannerTerminationCondition ptc_time( ob::timedPlannerTerminationCondition(dstep) );
+  //  ob::PlannerTerminationCondition ptc_exact( ob::exactSolnPlannerTerminationCondition(pdef) );
+  //  ob::PlannerTerminationCondition ptc_epsilon( epsilonSolnPlannerTerminationCondition(pdef) );
+  //  ob::PlannerTerminationCondition ptc = ob::plannerOrTerminationCondition(ptc_time, ptc_epsilon);
+  //  ob::PlannerStatus status = ss.solve(ptc);
+
+  //  solved = ss.haveExactSolutionPath();
+
+  //  std::cout << "Approximate solution: ";
+  //  std::cout << (pdef->hasApproximateSolution() ? "Yes":"No") << std::endl;
+
+  //  std::cout << "Solution            : ";
+  //  std::cout << (pdef->hasSolution() ? "Yes":"No") << std::endl;
+
+  //  std::cout << "Solution Distance   : ";
+  //  std::cout << pdef->getSolutionDifference() << std::endl;
+
+  //  std::cout << "Exact Solution      : ";
+  //  std::cout << (pdef->hasExactSolution() ? "Yes":"No") << std::endl;
+
+  //  std::cout << "Time                : ";
+  //  std::cout << i*dstep << "/" << duration << std::endl;
+
+  //  if(solved){
+  //    solution_time = i*dstep;
+  //    break;
+  //  }
+  //}
+
 
   //###########################################################################
   // extract roadmap
@@ -683,16 +761,17 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   SerializeTreeRandomlyCullPoints(_stree, 2000);
 
   //###########################################################################
-  // solve
+  // extract solution path if solved
   //###########################################################################
 
   if (solved)
   {
+    std::cout << std::string(80, '-') << std::endl;
     std::cout << "Found solution:" << std::endl;
     oc::PathControl path_control = ss.getSolutionPath();
     og::PathGeometric path = path_control.asGeometric();
-    std::cout << path.length() << std::endl;
-    std::cout << path.getStateCount() << std::endl;
+    std::cout << "Path Length     : " << path.length() << std::endl;
+    std::cout << "Path Milestones : " << path.getStateCount() << std::endl;
 
     vector<Config> keyframes;
     for(int i = 0; i < path.getStateCount(); i++)
@@ -704,8 +783,8 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
     ob::State *obgoal = path.getState(path.getStateCount()-1);
     Config plannergoal = OMPLStateToConfig(obgoal, cspace.getPtr());
 
-    double dgoal = kcspace.Distance(plannergoal, p_goal);
-    std::cout << "Distance to goal: " << dgoal << std::endl;
+    //double dgoal = kcspace.Distance(plannergoal, p_goal);
+    //std::cout << "Distance to goal: " << dgoal << std::endl;
 
     uint istep = max(int(path.getStateCount()/10.0),1);
     for(int i = 0; i < path.getStateCount(); i+=istep)

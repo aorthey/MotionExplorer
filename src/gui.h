@@ -19,18 +19,6 @@
 class ForceFieldBackend : public SimTestBackend
 {
   private:
-    int drawForceField;
-    int drawRobotExtras; 
-    int drawIKextras;
-    int drawPath;
-    int drawPathMilestones;
-    int drawPlannerTree;
-    int drawPlannerStartGoal;
-    int drawAxes;
-    int drawAxesLabels;
-    int drawRigidObjects;
-    int drawRigidObjectsEdges;
-    int drawRigidObjectsFaces;
 
     vector<IKGoal> _constraints;
     vector<int> _linksInCollision;
@@ -77,6 +65,20 @@ class ForceFieldBackend : public SimTestBackend
   void VisualizePlannerTree(const SerializedTree &tree);
   void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
   void VisualizePathMilestones(const std::vector<Config> &keyframes, uint Nmilestones);
+
+  int drawForceField;
+  int drawRobotExtras; 
+  int drawIKextras;
+  int drawRobot;
+  int drawPath;
+  int drawPathMilestones;
+  int drawPlannerTree;
+  int drawPlannerStartGoal;
+  int drawAxes;
+  int drawAxesLabels;
+  int drawRigidObjects;
+  int drawRigidObjectsEdges;
+  int drawRigidObjectsFaces;
 };
 
 

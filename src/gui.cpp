@@ -23,7 +23,6 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   }
 
   drawForceField = 0;
-  drawRobotExtras = 1;
   drawIKextras = 0;
   drawPath = 0;
   drawPathMilestones = 0;
@@ -33,8 +32,10 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawRigidObjectsEdges = 1;
   drawRigidObjectsFaces = 0;
 
-  drawAxes = 1;
+  drawAxes = 0;
   drawAxesLabels = 0;
+  drawRobot = 0;
+  drawRobotExtras = 0;
 
   MapButtonToggle("draw_planner_tree",&drawPlannerTree);
   MapButtonToggle("draw_path",&drawPath);
@@ -42,6 +43,9 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   MapButtonToggle("draw_path_start_goal",&drawPlannerStartGoal);
   MapButtonToggle("draw_rigid_objects_faces",&drawRigidObjectsFaces);
   MapButtonToggle("draw_rigid_objects_edges",&drawRigidObjectsEdges);
+
+  MapButtonToggle("draw_robot_extras",&drawRobotExtras);
+  MapButtonToggle("draw_robot",&drawRobot);
   MapButtonToggle("draw_fancy_coordinate_axes",&drawAxes);
   MapButtonToggle("draw_fancy_coordinate_axes_labels",&drawAxesLabels);
 
@@ -110,10 +114,12 @@ void ForceFieldBackend::RenderWorld()
   }
   //WorldGUIBackend::RenderWorld();
 
-  for(size_t i=0;i<world->robots.size();i++) {
-    for(size_t j=0;j<world->robots[i]->links.size();j++) {
-      sim.odesim.robot(i)->GetLinkTransform(j,world->robots[i]->links[j].T_World);
-      world->robotViews[i].DrawLink_World(j);
+  if(drawRobot){
+    for(size_t i=0;i<world->robots.size();i++) {
+      for(size_t j=0;j<world->robots[i]->links.size();j++) {
+        sim.odesim.robot(i)->GetLinkTransform(j,world->robots[i]->links[j].T_World);
+        world->robotViews[i].DrawLink_World(j);
+      }
     }
   }
 
@@ -583,29 +589,31 @@ bool GLUIForceFieldGUI::Initialize()
   if(!BaseT::Initialize()) return false;
   
 
+  ForceFieldBackend* _backend = static_cast<ForceFieldBackend*>(backend);
+
   panel = glui->add_rollout("Motion Planning");
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Planning Tree");
   AddControl(checkbox,"draw_planner_tree");
-  checkbox->set_int_val(1);
+  checkbox->set_int_val(_backend->drawPlannerTree);
 
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Swept Volume");
   AddControl(checkbox,"draw_path");
-  checkbox->set_int_val(1);
+  checkbox->set_int_val(_backend->drawPath);
 
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Object Edges");
   AddControl(checkbox,"draw_rigid_objects_edges");
-  checkbox->set_int_val(1);
+  checkbox->set_int_val(_backend->drawRigidObjectsEdges);
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Object Faces");
   AddControl(checkbox,"draw_rigid_objects_faces");
-  checkbox->set_int_val(0);
+  checkbox->set_int_val(_backend->drawRigidObjectsFaces);
 
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Path Milestones");
   AddControl(checkbox,"draw_path_milestones");
-  checkbox->set_int_val(1);
+  checkbox->set_int_val(_backend->drawPathMilestones);
 
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Start Goal Config");
   AddControl(checkbox,"draw_path_start_goal");
-  checkbox->set_int_val(1);
+  checkbox->set_int_val(_backend->drawPlannerStartGoal);
 
     //AddControl(glui->add_button_to_panel(panel,"Save state"),"save_state");
   GLUI_Button* button;
@@ -625,11 +633,19 @@ bool GLUIForceFieldGUI::Initialize()
   panel = glui->add_rollout("Fancy Decorations");
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Coordinate Axes");
   AddControl(checkbox,"draw_fancy_coordinate_axes");
-  checkbox->set_int_val(1);
+  checkbox->set_int_val(_backend->drawAxes);
 
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Coordinate Axes Labels[TODO]");
   AddControl(checkbox,"draw_fancy_coordinate_axes_labels");
-  checkbox->set_int_val(0);
+  checkbox->set_int_val(_backend->drawAxesLabels);
+
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Robot");
+  AddControl(checkbox,"draw_robot");
+  checkbox->set_int_val(_backend->drawRobot);
+
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Robot COM+Skeleton");
+  AddControl(checkbox,"draw_robot_extras");
+  checkbox->set_int_val(_backend->drawRobotExtras);
 
   UpdateGUI();
   return true;
