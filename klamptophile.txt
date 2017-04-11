@@ -438,7 +438,8 @@ experiments) => best case: make them also compatible with wrench planning?
  [ ] add one hard experiment where the method will break down, should be short
 so that any RRT can find a solution under 3600 seconds. replace the 'proof of
 completeness' section with that experiment
- [ ] ompl benchmark (100 runs à 3600 seconds x environments x 2 x PDST/KPIECE/RRT/SST?)
- [ ] Stop if reached goal region
- [ ] Check why approximateSolution is false in between planning
- [ ] ProblemDefPtr is not updated from ompl site!? (only after last plan?)
+ [x] ompl benchmark (100 runs à 3600 seconds x environments x 2 x PDST/KPIECE/RRT/SST?)
+ [x] Stop if reached goal region
+ [x] Check why approximateSolution is false in between planning
+ [x] ProblemDefPtr is not updated from ompl site!? (only after last plan?)
+ [ ] Save every path for every ompl benchmark run, so that we can compare them!? Implement PostSolve 

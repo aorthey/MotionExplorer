@@ -684,69 +684,27 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   // benchmark instead
   //###########################################################################
-  ot::Benchmark benchmark(ss, "IrreducibleBenchmarkPipes");
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
+  //ot::Benchmark benchmark(ss, "IrreducibleBenchmarkPipes");
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 
-  ot::Benchmark::Request req;
-  req.maxTime = duration;
-  req.maxMem = 10000.0;
-  req.runCount = 100;
-  req.displayProgress = true;
-  benchmark.benchmark(req);
-  // This will generate a file of the form ompl_host_time.log
-  benchmark.saveResultsToFile();
-
+  //ot::Benchmark::Request req;
+  //req.maxTime = duration;
+  //req.maxMem = 10000.0;
+  //req.runCount = 100;
+  //req.displayProgress = true;
+  //benchmark.benchmark(req);
+  //// This will generate a file of the form ompl_host_time.log
+  //benchmark.saveResultsToFile();
 
 
   //###########################################################################
   // solve
   //###########################################################################
   ob::PlannerStatus status = ss.solve(ptc);
-
   solved = ss.haveExactSolutionPath();
-
-  //double dstep = 0.1;
-  //uint Niterations = duration/dstep;
-
-  //std::cout << "Starting Motion Planner" << std::endl;
-  //std::cout << "termination condition: reaching "<<duration << " seconds or being in epsilon="<< epsilon<<" neighborhood of solution" << std::endl;
-  //std::cout << std::string(80, '-') << std::endl;
-
-  //bool solved = false;
-  //double solution_time = dInf;
-
-  //for(int i = 0; i < Niterations; i++){
-  //  ob::PlannerTerminationCondition ptc_time( ob::timedPlannerTerminationCondition(dstep) );
-  //  ob::PlannerTerminationCondition ptc_exact( ob::exactSolnPlannerTerminationCondition(pdef) );
-  //  ob::PlannerTerminationCondition ptc_epsilon( epsilonSolnPlannerTerminationCondition(pdef) );
-  //  ob::PlannerTerminationCondition ptc = ob::plannerOrTerminationCondition(ptc_time, ptc_epsilon);
-  //  ob::PlannerStatus status = ss.solve(ptc);
-
-  //  solved = ss.haveExactSolutionPath();
-
-  //  std::cout << "Approximate solution: ";
-  //  std::cout << (pdef->hasApproximateSolution() ? "Yes":"No") << std::endl;
-
-  //  std::cout << "Solution            : ";
-  //  std::cout << (pdef->hasSolution() ? "Yes":"No") << std::endl;
-
-  //  std::cout << "Solution Distance   : ";
-  //  std::cout << pdef->getSolutionDifference() << std::endl;
-
-  //  std::cout << "Exact Solution      : ";
-  //  std::cout << (pdef->hasExactSolution() ? "Yes":"No") << std::endl;
-
-  //  std::cout << "Time                : ";
-  //  std::cout << i*dstep << "/" << duration << std::endl;
-
-  //  if(solved){
-  //    solution_time = i*dstep;
-  //    break;
-  //  }
-  //}
 
 
   //###########################################################################
