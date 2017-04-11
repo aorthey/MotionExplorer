@@ -610,6 +610,8 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   // Kinodynamic planner
   //###########################################################################
   //KINODYNAMIC PLANNERS
+  std::cout << robot->q.size() << std::endl;
+  exit(0);
   uint NdimControl = 3;
   auto control_cspace(std::make_shared<oc::RealVectorControlSpace>(cspace.getPtr(), NdimControl+1));
   ob::RealVectorBounds cbounds(NdimControl+1);
