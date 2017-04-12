@@ -53,7 +53,6 @@ int main(int argc,const char** argv) {
 
   sim.odesim.SetGravity(Vector3(0,0,0));
 
-
   p_init.setZero();
   p_init[0]=-2.5;
   p_init[1]=-1.5;
@@ -82,7 +81,6 @@ int main(int argc,const char** argv) {
   p_goal[5]=0;
 
   world.background = GLColor(1,1,1);
-
   //############################################################################
   //free space planner
   //############################################################################

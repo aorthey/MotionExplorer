@@ -53,6 +53,7 @@ Config OMPLStateToConfig(const ob::ScopedState<> &qompl, const ob::StateSpacePtr
 Config OMPLStateToConfig(const ob::State *qompl, const ob::StateSpacePtr &s);
 Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState, const ob::StateSpacePtr &s);
 
+
 class GeometricCSpaceOMPL
 {
   public:

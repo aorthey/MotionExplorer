@@ -21,6 +21,233 @@ const SerializedTree& MotionPlanner::GetTree()
 {
   return _stree;
 }
+//###################################################################
+bool Save(const std::vector<Config> &keyframes, const char* file=NULL)
+{
+  std::string out;
+  std::string pdata = util::GetDataFolder();
+
+  if(!file){
+    std::string date = util::GetCurrentTimeString();
+    out = pdata+"/keyframes/state_"+date+".xml";
+  }else{
+    out = pdata+"/keyframes/"+file;
+  }
+
+  std::cout << "saving data to "<< out << std::endl;
+
+  TiXmlDocument doc;
+  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+  doc.LinkEndChild(decl);
+  TiXmlElement *node = new TiXmlElement("Keyframes");
+  Save(keyframes, node);
+
+  doc.LinkEndChild(node);
+  doc.SaveFile(out.c_str());
+
+  return true;
+
+}
+//###################################################################
+
+bool Load(std::vector<Config> &keyframes, const char* file)
+{
+  std::string pdata = util::GetDataFolder();
+  std::string in = pdata+"/keyframes/"+file;
+
+  std::cout << "loading data from "<<in << std::endl;
+
+  TiXmlDocument doc(in.c_str());
+  if(doc.LoadFile()){
+    TiXmlElement *root = doc.RootElement();
+    if(root){
+      Load(keyframes, root);
+    }
+  }else{
+    std::cout << doc.ErrorDesc() << std::endl;
+    std::cout << "ERROR" << std::endl;
+  }
+  return true;
+
+}
+//###################################################################
+bool Load(std::vector<Config> &keyframes, TiXmlElement *node)
+{
+
+  keyframes.clear();
+  if(0!=strcmp(node->Value(),"Keyframes")) {
+    std::cout << "Not a Keyframes file" << std::endl;
+    return false;
+  }
+  TiXmlElement* e=node->FirstChildElement();
+  while(e != NULL) 
+  {
+    if(0==strcmp(e->Value(),"keyframes")) {
+
+      TiXmlElement* c=e->FirstChildElement();
+      while(c!=NULL)
+      {
+        if(0==strcmp(c->Value(),"qitem")) {
+          Config q;
+          stringstream ss(c->GetText());
+          ss >> q;
+          keyframes.push_back(q);
+        }
+        c = c->NextSiblingElement();
+      }
+    }
+    e = e->NextSiblingElement();
+  }
+  return true;
+}
+//###################################################################
+bool Save(const std::vector<Config> &keyframes, TiXmlElement *node)
+{
+  node->SetValue("Keyframes");
+
+  {
+    TiXmlElement c("keyframes");
+    for(int i = 0; i < keyframes.size(); i++){
+      TiXmlElement cc("qitem");
+      stringstream ss;
+      ss<<keyframes.at(i);
+      TiXmlText text(ss.str().c_str());
+      cc.InsertEndChild(text);
+      c.InsertEndChild(cc);
+    }
+    node->InsertEndChild(c);
+  }
+  return true;
+}
+
+//###################################################################
+bool MotionPlanner::Load(const char* file)
+{
+  std::string pdata = util::GetDataFolder();
+  std::string in = pdata+"/planner/"+file;
+
+  std::cout << "loading data from "<<in << std::endl;
+
+  TiXmlDocument doc(in.c_str());
+  if(doc.LoadFile()){
+    TiXmlElement *root = doc.RootElement();
+    if(root){
+      Load(root);
+    }
+  }else{
+    std::cout << doc.ErrorDesc() << std::endl;
+    std::cout << "ERROR" << std::endl;
+  }
+  return true;
+
+}
+//###################################################################
+bool MotionPlanner::Save(const char* file)
+{
+  std::string out;
+  std::string pdata = util::GetDataFolder();
+
+  if(!file){
+    std::string date = util::GetCurrentTimeString();
+    out = pdata+"/planner/state_"+date+".xml";
+  }else{
+    out = pdata+"/planner/"+file;
+  }
+
+  std::cout << "saving data to "<< out << std::endl;
+
+  TiXmlDocument doc;
+  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+  doc.LinkEndChild(decl);
+  TiXmlElement *node = new TiXmlElement("Planner");
+  Save(node);
+
+  doc.LinkEndChild(node);
+  doc.SaveFile(out.c_str());
+
+  return true;
+
+}
+//###################################################################
+bool MotionPlanner::Load(TiXmlElement *node)
+{
+
+  _stree.clear();
+  _keyframes.clear();
+
+  if(0!=strcmp(node->Value(),"Planner")) {
+    std::cout << "Not a Planner file" << std::endl;
+    return false;
+  }
+  TiXmlElement* e=node->FirstChildElement();
+  while(e != NULL) 
+  {
+    if(0==strcmp(e->Value(),"tree")) {
+      TiXmlElement* c=e->FirstChildElement();
+      while(c!=NULL)
+      {
+        if(0==strcmp(c->Value(),"node")) {
+          SerializedTreeNode sn;
+          sn.Load(c);
+          _stree.push_back(sn);
+        }
+        c = c->NextSiblingElement();
+      }
+    }
+    if(0==strcmp(e->Value(),"sweptvolume")) {
+
+      TiXmlElement* c=e->FirstChildElement();
+      while(c!=NULL)
+      {
+        if(0==strcmp(c->Value(),"qitem")) {
+          Config q;
+          stringstream ss(c->GetText());
+          ss >> q;
+          _keyframes.push_back(q);
+        }
+        c = c->NextSiblingElement();
+      }
+    }
+    e = e->NextSiblingElement();
+  }
+
+  return true;
+}
+//###################################################################
+bool MotionPlanner::Save(TiXmlElement *node)
+{
+  node->SetValue("Planner");
+
+  //###################################################################
+  {
+    TiXmlElement c("tree");
+    for(int i = 0; i < _stree.size(); i++){
+      TiXmlElement cc("node");
+      _stree.at(i).Save(&cc);
+      c.InsertEndChild(cc);
+    }
+
+    node->InsertEndChild(c);
+  }
+  //###################################################################
+  {
+    TiXmlElement c("sweptvolume");
+    for(int i = 0; i < _keyframes.size(); i++){
+      TiXmlElement cc("qitem");
+      stringstream ss;
+      ss<<_keyframes.at(i);
+      TiXmlText text(ss.str().c_str());
+      cc.InsertEndChild(text);
+      c.InsertEndChild(cc);
+    }
+    node->InsertEndChild(c);
+  }
+
+  return true;
+
+}
+//###################################################################
+//###################################################################
 
 void MotionPlanner::SerializeTreeCullClosePoints(SerializedTree &_stree, CSpace *base, double epsilon)
 {
@@ -227,7 +454,7 @@ bool MotionPlanner::IsFeasible( Robot *robot, SingleRobotCSpace &cspace, Config 
     vector<bool> infeasible;
     cspace.CheckObstacles(q,infeasible);
     for(size_t i=0;i<infeasible.size();i++){
-      //if(!infeasible[i]) cout<<"  OK"<<cspace.ObstacleName(i)<<endl;
+      if(!infeasible[i]) cout<<"  ok "<<cspace.ObstacleName(i)<<endl;
       if(infeasible[i]){
         int icq = i - (int)robot->joints.size();
         cout<<"-->"<<cspace.ObstacleName(i) << " | pen-depth: ";
@@ -245,7 +472,7 @@ bool MotionPlanner::IsFeasible( Robot *robot, SingleRobotCSpace &cspace, Config 
       std::cout << std::string(80, '*') << std::endl;
       std::cout << "ERROR!" << std::endl;
       std::cout << std::string(80, '*') << std::endl;
-      std::cout << "Rotation invalid for configuration" << std::endl;
+      std::cout << "Joint limits invalid for configuration" << std::endl;
       std::cout << q << std::endl;
       std::cout << "entry "<<i<< " violation: " << robot->qMin(i) << " < " << q(i) << " < " << robot->qMax(i) << std::endl;
       std::cout << std::string(80, '*') << std::endl;

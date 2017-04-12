@@ -79,6 +79,8 @@ namespace GLDraw{
         if(robot->IsGeometryEmpty(j)) continue;
         Matrix4 matij = mats.at(i).at(j);
 
+        //glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
+
         glPushMatrix();
         glMultMatrix(matij);
 

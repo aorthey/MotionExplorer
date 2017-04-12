@@ -16,11 +16,6 @@
 #include "gui.h"
 #include "info.h"
 #include "planner.h"
-#include "iksolver.h"
-#include "iksolver_hubo.h"
-#include "iksolvergrasp_hubolefthandcylinder.h"
-#include "iksolvergrasp_robonaut.h"
-#include "controller.h"
 
 int main(int argc,const char** argv) {
   RobotWorld world;

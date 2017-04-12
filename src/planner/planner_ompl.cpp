@@ -2,28 +2,13 @@
 
 #include "cspace_sentinel.h"
 
-ob::PlannerTerminationCondition epsilonSolnPlannerTerminationCondition(ob::ProblemDefinitionPtr pdef)
-{
-    return ob::PlannerTerminationCondition(
-      [pdef]
-      {
-        //std::cout << planner->getName() << std::endl;
-        //ob::StateSpacePtr ss = si.getStateSpace();
-        //si.distance(s1,s2);
-         //double d = pdef->getSolutionDifference();
-         //std::cout << "Planner distance: " << d << std::endl;
-         //if(d<0) return false;
-         //double epsilon = 0.1;
-         //if(d<epsilon) return true;
-        return false;
-      });
-}
 ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)
 {
   ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
   obj->setCostThreshold(ob::Cost(dInf));
   return obj;
 }
+
 
 GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot)
 {
@@ -456,41 +441,44 @@ void SentinelPropagator::propagate(const ob::State *state, const oc::Control* co
 
   const double *ucontrol = control->as<oc::RealVectorControlSpace::ControlType>()->values;
 
-  Config u;
-  u.resize(7);
-  u.setZero();
-  u(0) = 0.0;//ucontrol[0]; //include torsion?
-  u(1) = ucontrol[0];
-  u(2) = ucontrol[1];
-  u(3) = 1.0;
-  u(6) = ucontrol[3];//time
+  Config uSE3;
+  uSE3.resize(6);
+  uSE3.setZero();
+  uSE3(0) = ucontrol[0]; //include torsion?
+  uSE3(1) = ucontrol[1];
+  uSE3(2) = ucontrol[2];
+  uSE3(3) = ucontrol[3];
+  uSE3(4) = ucontrol[4];
+  uSE3(5) = ucontrol[5];
 
+  uint N = s->getDimension() - 6;
 
   //###########################################################################
   // Forward Simulate
   //###########################################################################
-  double roll = u(0);
-  double pitch = u(1);
-  double yaw = u(2);
-  Math3D::EulerAngleRotation Reuler(roll, pitch, yaw);
-  Math3D::Matrix3 R;
-  Reuler.getMatrixXYZ(R);
 
-  //Matrix4 tmp = MatrixExponential(dp0*h);
-  //Matrix4 pnext = p0*tmp;
+  uint Nduration = N+6+1;
+  Real dt = ucontrol[Nduration];
+  //Real dt = 0.1;
+  //std::vector<Config> path;
+  //cspace_->Simulate(x0, u, path);
 
-  std::vector<Config> path;
-  cspace_->Simulate(x0, u, path);
+  Matrix4 x0_SE3 = cspace_->StateToSE3(x0);
+  Matrix4 dp0 = cspace_->SE3Derivative(uSE3);
+  Matrix4 x1_SE3 = cspace_->ForwardSimulate(x0_SE3,dp0,dt);
 
-  Config qend = path.back();
+  State x1(x0);
+  cspace_->SE3ToState(x1, x1_SE3);
+
+  Config qend = x1;
+
+  for(int i = 0; i < N; i++){
+    qend[i+6] = x0[i+6] + dt*ucontrol[i+6];
+  }
 
   //###########################################################################
   // Config to OMPL
   //###########################################################################
-
-  //std::cout << "Propagate: " << std::endl;
-  //std::cout << x0 << std::endl;
-  //std::cout << qend << std::endl;
 
   ob::ScopedState<> ssr = ConfigToOMPLState(qend, s);
 
@@ -511,13 +499,48 @@ void SentinelPropagator::propagate(const ob::State *state, const oc::Control* co
   //###########################################################################
   // R^N Control
   //###########################################################################
-  uint N = s->getDimension() - 6;
   for(int i = 0; i < N; i++){
     resultRn->values[i] = ssrRn->values[i];
   }
 
 }
 
+void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &run, GeometricCSpaceOMPL *cspace)
+{
+  static uint pid = 0;
+
+  //run["some extra property name INTEGER"] = "some value";
+  // The format of added data is string key, string value pairs,
+  // with the convention that the last word in string key is one of
+  // REAL, INTEGER, BOOLEAN, STRING. (this will be the type of the field
+  // when the log file is processed and saved as a database).
+  // The values are always converted to string.
+  ob::SpaceInformationPtr si = planner->getSpaceInformation();
+  ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
+  bool solved = pdef->hasExactSolution();
+
+  if(solved){
+    const ob::PathPtr &pp = pdef->getSolutionPath();
+    oc::PathControl path_control = static_cast<oc::PathControl&>(*pp);
+    og::PathGeometric path = path_control.asGeometric();
+
+    vector<Config> keyframes;
+    for(int i = 0; i < path.getStateCount(); i++)
+    {
+      ob::State *state = path.getState(i);
+      Config cur = OMPLStateToConfig(state, cspace->getPtr());
+      keyframes.push_back(cur);
+    }
+    std::cout << "Found Solution at run " << pid << std::endl;
+    std::string sfile = "ompl"+std::to_string(pid)+".xml";
+    Save(keyframes, sfile.c_str());
+  }else{
+    std::cout << "Run " << pid << " no solution" << std::endl;
+
+  }
+  pid++;
+
+}
 
 bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
 {
@@ -541,8 +564,8 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   WorldPlannerSettings worldsettings;
   worldsettings.InitializeDefault(*_world);
   SingleRobotCSpace geometric_cspace = SingleRobotCSpace(*_world,_irobot,&worldsettings);
-  if(!IsFeasible( robot, geometric_cspace, _p_init)) return false;
   if(!IsFeasible( robot, geometric_cspace, _p_goal)) return false;
+  if(!IsFeasible( robot, geometric_cspace, _p_init)) return false;
 
   KinodynamicCSpaceSentinelAdaptor kcspace(&geometric_cspace);
   PropertyMap pmap;
@@ -560,67 +583,33 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   std::cout << start << std::endl;
   std::cout << goal << std::endl;
 
-
-  ////###########################################################################
-  //// Geometric planning (tested, works)
-  ////###########################################################################
-  //bool geometric = false;
-  //if(geometric){
-
-  //  og::SimpleSetup ss(cspace.getPtr());
-  //  const ob::SpaceInformationPtr si = ss.getSpaceInformation();
-
-  //  //GEOMETRIC PLANNERS
-  //  //ob::PlannerPtr ompl_planner = std::make_shared<og::RRTConnect>(si);
-  //  ob::PlannerPtr ompl_planner = std::make_shared<og::RRT>(si);
-  //  //ob::PlannerPtr ompl_planner = std::make_shared<og::RRTstar>(si);
-  //  //ob::PlannerPtr ompl_planner = std::make_shared<og::RRTsharp>(si);
-  //  //ob::PlannerPtr ompl_planner = std::make_shared<og::LazyRRT>(si);
-
-  //  ss.setPlanner(ompl_planner);
-  //  //ss.setPlanner(std::make_shared<og::RRTConnect>(si));
-
-  //  si->setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
-
-  //  ss.setStartAndGoalStates(start, goal);
-  //  ss.setup();
-  //  ob::PlannerStatus solved = ss.solve(10.0);
-  //  if (solved)
-  //  {
-  //    std::cout << "Found solution:" << std::endl;
-  //    ss.simplifySolution();
-  //    og::PathGeometric path = ss.getSolutionPath();
-  //    path.interpolate();
-  //    std::cout << path.length() << std::endl;
-  //    std::cout << path.getStateCount() << std::endl;
-
-  //    vector<Config> keyframes;
-  //    for(int i = 0; i < path.getStateCount(); i++)
-  //    {
-  //      ob::State *state = path.getState(i);
-  //      Config cur = OMPLStateToConfig(state, cspace.getPtr());
-  //      _keyframes.push_back(cur);
-  //    }
-  //    std::cout << std::string(80, '-') << std::endl;
-  //  }else{
-  //    std::cout << "No solution found" << std::endl;
-  //  }
-  //}else{
   //###########################################################################
   // Kinodynamic planner
   //###########################################################################
   //KINODYNAMIC PLANNERS
   std::cout << robot->q.size() << std::endl;
-  exit(0);
-  uint NdimControl = 3;
+  uint NdimControl = robot->q.size();
+
   auto control_cspace(std::make_shared<oc::RealVectorControlSpace>(cspace.getPtr(), NdimControl+1));
   ob::RealVectorBounds cbounds(NdimControl+1);
   cbounds.setLow(-1);
   cbounds.setHigh(1);
+  uint effectiveControlDim = 0;
+  for(int i = 0; i < NdimControl; i++){
+    double qmin = robot->qMin(i);
+    double qmax = robot->qMax(i);
+    double d = sqrtf((qmin-qmax)*(qmin-qmax));
+    if(d<1e-8){
+      //remove zero-measure dimensions for control
+      cbounds.setLow(i,0);
+      cbounds.setHigh(i,0);
+    }else{
+      effectiveControlDim++;
+    }
+  }
 
-  cbounds.setLow(3,0.02);//propagation step size
-  cbounds.setHigh(3,0.15);
-
+  cbounds.setLow(NdimControl+1,0.01);//propagation step size
+  cbounds.setHigh(NdimControl+1,0.1);
 
   control_cspace->setBounds(cbounds);
 
@@ -634,15 +623,9 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
-  ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
+  ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
-  //
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::Syclop>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopRRT>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopEST>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::LTLPlanner>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::EST>(si);
 
   //###########################################################################
   // setup and projection
@@ -679,28 +662,28 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   bool solved = false;
   double solution_time = dInf;
-  double duration = 3600.0;
+  double duration = 1200.0;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
-
 
   //###########################################################################
   // benchmark instead
   //###########################################################################
-  //ot::Benchmark benchmark(ss, "IrreducibleBenchmarkPipes");
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
+  ot::Benchmark benchmark(ss, "IrreducibleBenchmarkPipes");
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 
-  //ot::Benchmark::Request req;
-  //req.maxTime = duration;
-  //req.maxMem = 10000.0;
-  //req.runCount = 100;
-  //req.displayProgress = true;
-  //benchmark.benchmark(req);
-  //// This will generate a file of the form ompl_host_time.log
-  //benchmark.saveResultsToFile();
+  ot::Benchmark::Request req;
+  req.maxTime = duration;
+  req.maxMem = 10000.0;
+  req.runCount = 10;
+  req.displayProgress = true;
 
+  benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2, &cspace));
+  
+  benchmark.benchmark(req);
+  benchmark.saveResultsToFile();
 
   //###########################################################################
   // solve

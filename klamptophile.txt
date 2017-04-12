@@ -151,6 +151,22 @@ Creating button:
 Connecting button: button has to be connected with render drawing method => MapButtonToggle("draw_bbs",&drawBBs);
 
 
+%%inline void DrawGLTris(const
+%%                                                                                                              
+%%{
+%%  glBegin(GL_TRIANGLES);
+%%  for(size_t i=0;i<mesh.tris.size();i++) {
+%%  | Math3D::Vector3 normal =
+%%  | glNormal3v(normal);
+%%  | glVertex3v(mesh.verts[mesh.tris[i].a]);
+%%  | glVertex3v(mesh.verts[mesh.tris[i].b]);
+%%  | glVertex3v(mesh.verts[mesh.tris[i].c]);
+%%  }
+%%  glEnd();
+%%}
+
+
+
 
 
 -------------------------------------------------------------------------------
@@ -416,9 +432,9 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] refactor planner 
  [ ] find distance to goal for planner output OMPL (how approximate is the solution)
  [ ] toggle mesh/faces of objects with keyboard
+ [ ] add edges to planner tree visualization
 
 -- abstraction
-
 
 -- wrench fields
  [ ] make the controller work without gravity on SE(3)
@@ -431,7 +447,7 @@ function)
  [x] repair rotation conversion klampt->klampt
  [x] seems rot of path is right, visualization seems wrong, especially it
 diverges near the end of the path
- [ ] do ompl planning for N branches (use ttrivial control)
+ [x] do ompl planning for N branches (use trivial control)
  [ ] design 3 easy environments with fast SE(3) computation with any MP (so that
 experiments are faster and it becomes easier to see different to irr
 experiments) => best case: make them also compatible with wrench planning?
@@ -442,4 +458,12 @@ completeness' section with that experiment
  [x] Stop if reached goal region
  [x] Check why approximateSolution is false in between planning
  [x] ProblemDefPtr is not updated from ompl site!? (only after last plan?)
- [ ] Save every path for every ompl benchmark run, so that we can compare them!? Implement PostSolve 
+ [x] Save every path for every ompl benchmark run, so that we can compare them!? Implement PostSolve 
+ [x] Resolve collision of start/goal states of complete model (likely wrong
+model?) -> one of the cylinders pierced the head sphere creating a spurious
+collision
+ [x] function createBranchSegment creates collision
+ [ ] repeat experiments with 20 min time frame?
+
+
+

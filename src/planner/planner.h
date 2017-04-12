@@ -65,7 +65,15 @@ class MotionPlanner{
     //virtual Roadmap GetRoadmap() = 0;
     //virtual Path GetPath() = 0;
     //virtual Roadmap GetPath() = 0;
+    virtual bool Save(const char* file=NULL);
+    virtual bool Save(TiXmlElement *node);
+    virtual bool Load(const char* file);
+    virtual bool Load(TiXmlElement *node);
 };
+bool Save(const std::vector<Config> &keyframes, const char* file);
+bool Save(const std::vector<Config> &keyframes, TiXmlElement *node);
+bool Load(std::vector<Config> &keyframes, const char* file);
+bool Load(std::vector<Config> &keyframes, TiXmlElement *node);
 
 
 // * The type field can be left as "any", in which a default planning algorithm will be

@@ -25,7 +25,7 @@ int main(int argc,const char** argv) {
   //SimTestBackend backend(&world);
   WorldSimulation& sim=backend.sim;
 
-  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel_pipedreamin_complete.xml");
+  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel_complete.xml");
   world.robots[0]->qMin[0]=-6;
   world.robots[0]->qMin[1]=-6;
   world.robots[0]->qMin[2]=-1;
@@ -60,9 +60,6 @@ int main(int argc,const char** argv) {
   p_init[2]=4.2;
   p_init[3]=-M_PI/4;
 
-  //p_goal[0]=2.0;
-  //p_goal[1]=0.3;
-  //p_goal[2]=1.3;
   Config p_goal;
   p_goal.resize(p_init.size());
   p_goal.setZero();
@@ -73,13 +70,13 @@ int main(int argc,const char** argv) {
   p_goal[2]=0.0;
   p_goal[3]=M_PI/2;
 
-  //////goal in upper pipe
-  p_goal[0]=-5.1;
-  p_goal[1]=-0.1;
-  p_goal[2]=15;
-  p_goal[3]=0;
-  p_goal[4]=-M_PI/2;
-  p_goal[5]=0;
+  ////////goal in upper pipe
+  //p_goal[0]=-5.1;
+  //p_goal[1]=-0.1;
+  //p_goal[2]=15;
+  //p_goal[3]=0;
+  //p_goal[4]=-M_PI/2;
+  //p_goal[5]=0;
 
   world.background = GLColor(1,1,1);
 

@@ -4,6 +4,7 @@ from math import cos,sin,pi,atan2
 from urdf_create import *
 
 length = 0.15
+stublength = length/8
 radius = 0.01
 radius_cylinder = 0.02
 sphere_scale = 2
@@ -12,6 +13,9 @@ Nsegments = 6
 Nbranches = 8
 aperture = 0.4 ## aperture of bouquet of branches
 name = 'sentinel_complete'
+#env_name = 'tunnel/tunnel_branch2.tri'
+env_name = 'pipes/pipedreamin.tri'
+
 
 sRadius = sphere_scale*radius
 config = ''
@@ -47,17 +51,21 @@ def createBranchSegment(parentlinkname, linkname, x, y, z):
   sbc = commentNewBranch(linkname) 
   linkname1 = linkname+'_cylinder'
   linkname2 = linkname
-  sbl1 = createCylinder(linkname1,-length/2,0,0,radius_cylinder,length) 
+  # sbl1 = createCylinder(linkname1,-length/2,0,0,radius_cylinder,length) 
+  # sbj1 = createRigidJoint(parentlinkname+'_'+linkname+'_joint', parentlinkname,linkname1, x, y, z) 
+  # sbl2 = createSphere(linkname2,-length-sRadius,0,0,0.95*sRadius)
+  # sbj2 = createRigidJoint(linkname+'_fixed', linkname1, linkname2, 0, 0, 0)
+  sbl1 = createCylinder(linkname1,-stublength/2,0,0,radius_cylinder,stublength) 
   sbj1 = createRigidJoint(parentlinkname+'_'+linkname+'_joint', parentlinkname,linkname1, x, y, z) 
-  sbl2 = createSphere(linkname2,-length-sRadius,0,0,0.95*sRadius)
+  sbl2 = createSphere(linkname2,-stublength-sRadius,0,0,0.95*sRadius)
   sbj2 = createRigidJoint(linkname+'_fixed', linkname1, linkname2, 0, 0, 0)
   return sbc+sbl1+sbj1+sbl2+sbj2
 
 def createBranch(headname, branchname,x,y,z):
-  s = createBranchSegment(headname,branchname+str(0),x+length-length/8,y,z)
+  s = createBranchSegment(headname,branchname+str(0),x,y,z)
   for i in range(1,Nsegments):
     if i==1:
-      s+= attachBranchSegment(branchname+str(i-1),branchname+str(i),-length-sRadius,0,0)
+      s+= attachBranchSegment(branchname+str(i-1),branchname+str(i),-stublength-sRadius,0,0)
     else:
       s+= attachBranchSegment(branchname+str(i-1),branchname+str(i),-length-2*sRadius,0,0)
   return s
@@ -77,12 +85,14 @@ def createBranchBundle(headname):
 
   ## CSpace structure:
   ## SE(3) ~ R^6 (local chart) 
+  ## + 1 rigid fixed joint eye-head
   ## + Nbranches*(Nsegments-1) spherical joints /w ## limits ~ (R^2)
   ## + Nbranches*(1+Nsegments) rigid fixed links
 
   Njoints = 6 + 1 + Nbranches * 2*(Nsegments-1) + Nbranches*(1+Nsegments)
   print "[default position config]"
   print "config=\""+str(Njoints)+" "+" 0"*Njoints+"\""
+
   print "[arms open config]"
 
   global config
@@ -94,27 +104,28 @@ def createBranchBundle(headname):
   config += str(Njoints) + " "
   config += str(x) + " " + str(y) + " " + str(z)
   config += str(" 0"*3) ## SE(3)
-  config += str(" 0"*1) ## head-eye
+  if Nsegments>0:
+    config += str(" 0"*1) ## head-eye
 
-  ## create a nice bouquet of branches
-  for i in range(0,Nbranches):
-    config += str(" 0"*2) ## first segment is fixed
-    y = cos(i*2*pi/Nbranches)
-    z = sin(i*2*pi/Nbranches)
+    ## create a nice bouquet of branches
+    for i in range(0,Nbranches):
+      config += str(" 0"*2) ## first segment is fixed
+      y = cos(i*2*pi/Nbranches)
+      z = sin(i*2*pi/Nbranches)
 
-    thetaZ = atan2(abs(y),abs(z))
-    thetaY = pi/2-atan2(abs(y),abs(z))
+      thetaZ = atan2(abs(y),abs(z))
+      thetaY = pi/2-atan2(abs(y),abs(z))
 
-    if y>0:
-      thetaZ *= -1
-    if z<0:
-      thetaY *= -1
+      if y>0:
+        thetaZ *= -1
+      if z<0:
+        thetaY *= -1
 
-    for j in range(1,Nsegments):
-      config += " "+str(aperture*thetaZ)+" "+str(aperture*thetaY)
-      config+= " 0"
+      for j in range(1,Nsegments):
+        config += " "+str(aperture*thetaZ)+" "+str(aperture*thetaY)
+        config+= " 0"
 
-    #config+= " 0"*Nsegments ## shoulder of branch
+      #config+= " 0"*Nsegments ## shoulder of branch
   config+= "\""
   print config
   return s
@@ -139,11 +150,6 @@ print fname
 f = open(xmlname,'w')
 f.write('<?xml version="1.0"?>\n\n')
 f.write('<world>\n')
-terrainstr  = '  <rigidObject '
-terrainstr += '  name=\"tunnel\"'
-terrainstr += ' file=\"/home/aorthey/git/orthoklampt/data/terrains/tunnel/tunnel_branch2.tri\"'
-terrainstr += '  translation=\"0 0 0\"/>\n\n'
-f.write(terrainstr)
 
 robotstr  = '  <robot name=\"'+name+'\"'
 robotstr += ' file="'+str(fname)+'"'
@@ -151,6 +157,12 @@ robotstr += ' translation="0 0 0"'
 robotstr += ' rotateRPY="0 0 0"'
 robotstr += ' '+config+'/>\n\n'
 f.write(robotstr)
+
+terrainstr  = '  <rigidObject '
+terrainstr += ' name=\"'+str(env_name)+'\"'
+terrainstr += ' file=\"/home/aorthey/git/orthoklampt/data/terrains/'+str(env_name)+'\"'
+terrainstr += ' translation="0 0 0"/>\n\n'
+f.write(terrainstr)
 
 ctrlstr  = '  <simulation>\n'
 ctrlstr += '    <globals maxContacts="20" />\n'

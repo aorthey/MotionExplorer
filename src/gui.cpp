@@ -413,7 +413,7 @@ void ForceFieldBackend::VisualizePathSweptVolumeAtPosition(const Config &q)
     std::cout << "trying to set an outer limit config" << std::endl;
     std::cout << "minimum       :" << robot->qMin << std::endl;
     std::cout << "configuration :" << q << std::endl;
-    std::cout << "maximum       :" << robot->qMin << std::endl;
+    std::cout << "maximum       :" << robot->qMax << std::endl;
     exit(0);
   }
   robot->UpdateConfig(q);

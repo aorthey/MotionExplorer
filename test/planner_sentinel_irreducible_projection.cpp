@@ -35,8 +35,8 @@ int main(int argc,const char** argv) {
   //backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel_complete.xml");
   //backend.Load("kinodynamic_solution_tunnel_environment.xml");
 
-  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel_pipedreamin_complete.xml");
-  backend.Load("sentinel_pipe.xml");
+  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel_complete.xml");
+  backend.Load("sentinel_pipe_homotopy_class2.xml");
 
   //backend.Load("kinodynamic_solution_tunnel_environment_without_torsion.xml");
 
