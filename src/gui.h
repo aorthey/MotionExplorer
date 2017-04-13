@@ -74,8 +74,11 @@ class SweptVolume
     GLColor GetColor(){
       return color;
     }
+    void SetColorMilestones(const GLColor c){
+      color_milestones= c;
+    }
     GLColor GetColorMilestones(){
-      return color;
+      return color_milestones;
     }
     const Config& GetStart(){
       return init;
@@ -108,6 +111,7 @@ class SweptVolume
     }
 
     GLColor color;
+    GLColor color_milestones;
     Robot *_robot;
     std::vector<std::vector<Matrix4> > _mats;
     vector<Config> _keyframes;

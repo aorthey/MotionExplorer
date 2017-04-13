@@ -99,13 +99,7 @@ int main(int argc,const char** argv) {
   ////############################################################################
   ////guification
   ////############################################################################
-  backend.VisualizePathSweptVolume(wholeBodyPath);
-  backend.VisualizeStartGoal(wholeBodyPath.front(),wholeBodyPath.back());
-  backend.VisualizePathMilestones(wholeBodyPath, 20);
-
-  //backend.HidePath();
-  //backend.HidePlannerTree();
-  //backend.HidePlannerStartGoal();
+  backend.AddPath(wholeBodyPath,GLColor(0.7,0.1,0.9,0.5));
 
   util::SetSimulatedRobot( robot, sim, wholeBodyPath.front());
   std::cout << "start GUI" << std::endl;

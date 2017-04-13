@@ -9,10 +9,6 @@ class ConverterInterface:
 
   charLineBreak = '-'
 
-  def NotYetImplemented(self):
-    print "ERROR: No known convert from "+self.input_file_extension+" to "+self.output_file_extension
-    sys.exit(1)
-
   def printUsage(self):
     print
     print "Usage: converter.py -i <input_filename> -e <output_file_extension>"
@@ -21,6 +17,14 @@ class ConverterInterface:
     print " -e --extension  : output file extension"
     print
     sys.exit(0)
+
+  def NotYetImplemented(self):
+    print self.charLineBreak*80
+    print
+    print "[ERROR]: No converter available from "+self.input_file_extension+" to "+self.output_file_extension
+    print
+    print self.charLineBreak*80
+    sys.exit(1)
 
   def __init__(self, args):
     self.input_file_name = ''
@@ -70,13 +74,15 @@ class ConverterInterface:
       if self.output_file_extension == 'stl':
         ConverterTriToStl(self.input_file_name, self.output_file_name)
       else:
-        NotYetImplemented()
+        self.NotYetImplemented()
 
-    if self.input_file_extension == 'stl':
+    elif self.input_file_extension == 'stl':
       if self.output_file_extension == 'tri':
         ConverterStlToTri(self.input_file_name, self.output_file_name)
       else:
-        NotYetImplemented()
+        self.NotYetImplemented()
+    else:
+        self.NotYetImplemented()
     print self.charLineBreak*80
     print "[SUCCESS]"
     print "Output written to "+self.output_file_name
