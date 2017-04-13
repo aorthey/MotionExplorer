@@ -442,6 +442,7 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] visualize path speed profile
 
 -- irreducible paths
+
  [x] bug: robot makes backward movements through pipe segment? (check propagate
 function)
  [x] repair rotation conversion klampt->klampt
@@ -463,7 +464,14 @@ completeness' section with that experiment
 model?) -> one of the cylinders pierced the head sphere creating a spurious
 collision
  [x] function createBranchSegment creates collision
+
  [ ] repeat experiments with 20 min time frame?
+ [ ] repeat experiments with 20 min time frame and propagation step size in [0.01,0.1]
+
+ [ ] rewrite introduction and experimental part
+ [ ] display two paths in different colors, one irreducible (magenta or green?), one reducible (red?)
+
+ [x] probably bug in postprocess event of benchmark
 
 
 

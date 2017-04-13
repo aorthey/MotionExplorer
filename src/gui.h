@@ -16,21 +16,124 @@
 
 #define DEBUG 0
 
+class SweptVolume
+{
+  public:
+    SweptVolume(Robot *robot){
+      _keyframes.clear();
+      _mats.clear();
+      _robot = robot;
+      color = GLColor(0.8,0.8,0.8);
+    }
+
+    SweptVolume(Robot *robot, const std::vector<Config> &keyframes, uint Nkeyframes)
+    {
+      _keyframes.clear();
+      _mats.clear();
+      _robot = robot;
+      color = GLColor(0.8,0.8,0.8);
+
+      for(int i = 0; i < keyframes.size(); i++)
+      {
+        Config q = keyframes.at(i);
+        AddKeyframe(q);
+      }
+      init = _keyframes.front();
+      goal = _keyframes.back();
+      //compute keyframe indices 
+      if(Nkeyframes > keyframes.size()){
+        Nkeyframes = keyframes.size();
+      }
+      if(Nkeyframes < 1){
+        Nkeyframes=0;
+      }
+      _keyframe_indices.clear();
+
+      uint N = keyframes.size();
+      uint Nstep = (int)(N/Nkeyframes);
+
+      if(Nstep<1) Nstep=1;
+      uint Ncur = 0;
+      while(Ncur < N){
+        _keyframe_indices.push_back(Ncur);
+        Ncur += Nstep;
+      }
+      std::cout << "Milestone visualization indicies: " << _keyframe_indices << std::endl;
+
+    }
+
+    const std::vector<std::vector<Matrix4> >& GetMatrices(){
+      return _mats;
+    }
+    const std::vector<Config >& GetKeyframes(){
+      return _keyframes;
+    }
+    void SetColor(const GLColor c){
+      color = c;
+    }
+    GLColor GetColor(){
+      return color;
+    }
+    GLColor GetColorMilestones(){
+      return color;
+    }
+    const Config& GetStart(){
+      return init;
+    }
+    const Config& GetGoal(){
+      return goal;
+    }
+    const vector<uint>& GetKeyframeIndices(){
+      return _keyframe_indices;
+    }
+  private:
+    void AddKeyframe(const Config &q ){
+
+      if(!_robot->InJointLimits(q)){
+        std::cout << "trying to set an outer limit config" << std::endl;
+        std::cout << "minimum       :" << _robot->qMin << std::endl;
+        std::cout << "configuration :" << q << std::endl;
+        std::cout << "maximum       :" << _robot->qMax << std::endl;
+        exit(0);
+      }
+      _robot->UpdateConfig(q);
+
+      std::vector<Matrix4> mats_config;
+      for(size_t i=0;i<_robot->links.size();i++) {
+        Matrix4 mat = _robot->links[i].T_World;
+        mats_config.push_back(mat);
+      }
+      _mats.push_back(mats_config);
+      _keyframes.push_back(q);
+    }
+
+    GLColor color;
+    Robot *_robot;
+    std::vector<std::vector<Matrix4> > _mats;
+    vector<Config> _keyframes;
+    Config init, goal;
+    vector<uint> _keyframe_indices;
+
+};
+
 class ForceFieldBackend : public SimTestBackend
 {
   private:
+    typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
 
     vector<IKGoal> _constraints;
     vector<int> _linksInCollision;
     string _robotname;
     SerializedTree _stree;
+    vector<GLDraw::GeometryAppearance> _appearanceStack;
+
+    std::vector<SweptVolume> swept_volume_paths;
+
     //swept volume
     Config planner_p_init, planner_p_goal;
     std::vector<std::vector<Matrix4> > _mats;
-    vector<GLDraw::GeometryAppearance> _appearanceStack;
     vector<Config> _keyframes;
     vector<uint> _milestonekeyframe_indices;
-    typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
 
     vector< vector<Vector3> > _frames;
     vector< double > _frameLength;
@@ -47,33 +150,41 @@ class ForceFieldBackend : public SimTestBackend
   virtual bool Load(const char* file);
   virtual bool Load(TiXmlElement *node);
 
-  void ShowPath(){ drawPath=true; }
-  void HidePath(){ drawPath=false; }
-  void ShowPlannerTree(){ drawPlannerTree=true; }
-  void HidePlannerTree(){ drawPlannerTree=false; }
-  void ShowPlannerStartGoal(){ drawPlannerStartGoal=true; }
-  void HidePlannerStartGoal(){ drawPlannerStartGoal=false; }
+
+  //void ShowPath(){ drawPath=true; }
+  //void HidePath(){ drawPath=false; }
+  //void ShowPlannerTree(){ drawPlannerTree=true; }
+  //void HidePlannerTree(){ drawPlannerTree=false; }
+  //void ShowPlannerStartGoal(){ drawPlannerStartGoal=true; }
+  //void HidePlannerStartGoal(){ drawPlannerStartGoal=false; }
 
   void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);
   void SetIKConstraints( vector<IKGoal> constraints, string robotname);
   void SetIKCollisions( vector<int> linksInCollision );
-  void VisualizePathSweptVolumeAtPosition(const Config &q);
-  void VisualizePathSweptVolume(const MultiPath &path);
-  void VisualizePathSweptVolume(const KinodynamicMilestonePath &path);
-  void VisualizePathSweptVolume(const std::vector<Config> &keyframes);
-  std::vector<Config> getKeyFrames();
+
+
+  uint getNumberOfPaths(){return swept_volume_paths.size();}
+  void AddPath(const std::vector<Config> &keyframes, GLColor color = GLColor(0.8,0.8,0.8), uint Nkeyframes_alongpath=10);
+  //deprecated
+  //void VisualizePathSweptVolumeAtPosition(const Config &q);
+  //void VisualizePathSweptVolume(const std::vector<Config> &keyframes);
+  //void VisualizePathSweptVolume(const MultiPath &path);
+  //void VisualizePathSweptVolume(const KinodynamicMilestonePath &path);
+  //void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
+  //void VisualizePathMilestones(const std::vector<Config> &keyframes, uint Nmilestones);
+
   void VisualizePlannerTree(const SerializedTree &tree);
-  void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
-  void VisualizePathMilestones(const std::vector<Config> &keyframes, uint Nmilestones);
+  std::vector<Config> getKeyFrames();
+
+  std::vector<int> drawPathSweptVolume;
+  std::vector<int> drawPathMilestones;
+  std::vector<int> drawPathStartGoal;
 
   int drawForceField;
   int drawRobotExtras; 
   int drawIKextras;
   int drawRobot;
-  int drawPath;
-  int drawPathMilestones;
   int drawPlannerTree;
-  int drawPlannerStartGoal;
   int drawAxes;
   int drawAxesLabels;
   int drawRigidObjects;

@@ -520,6 +520,7 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   bool solved = pdef->hasExactSolution();
 
   if(solved){
+    std::cout << "Found Solution at run " << pid << std::endl;
     const ob::PathPtr &pp = pdef->getSolutionPath();
     oc::PathControl path_control = static_cast<oc::PathControl&>(*pp);
     og::PathGeometric path = path_control.asGeometric();
@@ -531,8 +532,8 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
       Config cur = OMPLStateToConfig(state, cspace->getPtr());
       keyframes.push_back(cur);
     }
-    std::cout << "Found Solution at run " << pid << std::endl;
     std::string sfile = "ompl"+std::to_string(pid)+".xml";
+    std::cout << "Saving keyframes"<< std::endl;
     Save(keyframes, sfile.c_str());
   }else{
     std::cout << "Run " << pid << " no solution" << std::endl;

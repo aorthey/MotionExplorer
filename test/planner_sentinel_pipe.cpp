@@ -64,19 +64,19 @@ int main(int argc,const char** argv) {
   p_goal.resize(p_init.size());
   p_goal.setZero();
 
-  //goal in lower pipe
-  p_goal[0]=-0.5;
-  p_goal[1]=1.0;
-  p_goal[2]=0.0;
-  p_goal[3]=M_PI/2;
+  ////goal in lower pipe
+  //p_goal[0]=-0.5;
+  //p_goal[1]=1.0;
+  //p_goal[2]=0.0;
+  //p_goal[3]=M_PI/2;
 
   ////////goal in upper pipe
-  //p_goal[0]=-5.1;
-  //p_goal[1]=-0.1;
-  //p_goal[2]=15;
-  //p_goal[3]=0;
-  //p_goal[4]=-M_PI/2;
-  //p_goal[5]=0;
+  p_goal[0]=-5.1;
+  p_goal[1]=-0.1;
+  p_goal[2]=15;
+  p_goal[3]=0;
+  p_goal[4]=-M_PI/2;
+  p_goal[5]=0;
 
   world.background = GLColor(1,1,1);
 

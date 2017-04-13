@@ -24,10 +24,8 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
 
   drawForceField = 0;
   drawIKextras = 0;
-  drawPath = 0;
-  drawPathMilestones = 0;
+
   drawPlannerTree = 0;
-  drawPlannerStartGoal = 0;
   drawRigidObjects = 1;
   drawRigidObjectsEdges = 1;
   drawRigidObjectsFaces = 0;
@@ -38,9 +36,6 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawRobotExtras = 0;
 
   MapButtonToggle("draw_planner_tree",&drawPlannerTree);
-  MapButtonToggle("draw_path",&drawPath);
-  MapButtonToggle("draw_path_milestones",&drawPathMilestones);
-  MapButtonToggle("draw_path_start_goal",&drawPlannerStartGoal);
   MapButtonToggle("draw_rigid_objects_faces",&drawRigidObjectsFaces);
   MapButtonToggle("draw_rigid_objects_edges",&drawRigidObjectsEdges);
 
@@ -49,9 +44,14 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   MapButtonToggle("draw_fancy_coordinate_axes",&drawAxes);
   MapButtonToggle("draw_fancy_coordinate_axes_labels",&drawAxesLabels);
 
+  drawPathSweptVolume.clear();
+  drawPathMilestones.clear();
+  drawPathStartGoal.clear();
+
 
   _mats.clear();
   _frames.clear();
+
 }
 
 
@@ -76,6 +76,34 @@ void ForceFieldBackend::Start()
   //Camera::CameraController_Orbit camera;
   //Camera::Viewport viewport;
   show_frames_per_second = true;
+
+  Robot *robot = world->robots[0];
+  _appearanceStack.clear();
+  _appearanceStack.resize(robot->links.size());
+
+  for(size_t i=0;i<robot->links.size();i++) {
+    GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
+    _appearanceStack[i]=a;
+  }
+
+  drawPathSweptVolume.clear();
+  drawPathMilestones.clear();
+  drawPathStartGoal.clear();
+
+  std::cout << "Setting swept volume paths" << std::endl;
+  for(int i = 0; i < getNumberOfPaths(); i++){
+    drawPathSweptVolume.push_back(0);
+    drawPathMilestones.push_back(1);
+    drawPathStartGoal.push_back(1);
+  }
+  for(int i = 0; i < getNumberOfPaths(); i++){
+    std::string dpsv = "draw_path_swept_volume_"+std::to_string(i);
+    MapButtonToggle(dpsv.c_str(),&drawPathSweptVolume.at(i));
+    std::string dpms = "draw_path_milestones"+std::to_string(i);
+    MapButtonToggle(dpms.c_str(),&drawPathMilestones.at(i));
+    std::string dpsg = "draw_path_start_goal"+std::to_string(i);
+    MapButtonToggle(dpsg.c_str(),&drawPathStartGoal.at(i));
+  }
 
 }
 
@@ -140,7 +168,7 @@ void ForceFieldBackend::RenderWorld()
   // drawrobotextras      : COM, skeleton
   // drawikextras         : contact links, contact directions
   // drawforcefield       : a flow/force field on R^3
-  // drawpath             : swept volume along path
+  // drawpathsweptvolume  : swept volume along path
   // drawplannerstartgoal : start/goal configuration of motion planner
   // drawplannertree      : Cspace tree visualized as COM tree in W
   // drawaxes             : fancy coordinate axes
@@ -150,10 +178,15 @@ void ForceFieldBackend::RenderWorld()
   if(drawRobotExtras) GLDraw::drawRobotExtras(viewRobot);
   if(drawIKextras) GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);
   if(drawForceField) GLDraw::drawUniformForceField();
-  if(drawPath) GLDraw::drawPathSweptVolume(robot, _mats, _appearanceStack);
-  if(drawPathMilestones) GLDraw::drawPathKeyframes(robot, _milestonekeyframe_indices, _mats, _appearanceStack);
 
-  if(drawPlannerStartGoal) GLDraw::drawPlannerStartGoal(robot, planner_p_init, planner_p_goal);
+  for(int i = 0; i < swept_volume_paths.size(); i++){
+    SweptVolume sv = swept_volume_paths.at(i);
+
+    if(drawPathSweptVolume.at(i)) GLDraw::drawGLPathSweptVolume(robot, sv.GetMatrices(), _appearanceStack,sv.GetColor());
+    if(drawPathMilestones.at(i)) GLDraw::drawGLPathKeyframes(robot, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack,sv.GetColorMilestones());
+    if(drawPathStartGoal.at(i)) GLDraw::drawGLPathStartGoal(robot, sv.GetStart(), sv.GetGoal());
+  }
+
   if(drawPlannerTree) GLDraw::drawPlannerTree(_stree);
   if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
   if(drawAxesLabels) GLDraw::drawAxesLabels(viewport);
@@ -169,7 +202,6 @@ bool ForceFieldBackend::Load(TiXmlElement *node)
   _stree.clear();
   _keyframes.clear();
   _mats.clear();
-  _appearanceStack.clear();
   planner_p_goal.setZero();
   planner_p_init.setZero();
 
@@ -223,11 +255,11 @@ bool ForceFieldBackend::Load(TiXmlElement *node)
           Config q;
           stringstream ss(c->GetText());
           ss >> q;
-          keyframes.push_back(q);
+          _keyframes.push_back(q);
         }
         c = c->NextSiblingElement();
       }
-      VisualizePathSweptVolume(keyframes);
+      //AddPath(_keyframes);
     }
     e = e->NextSiblingElement();
   }
@@ -342,7 +374,6 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
   }
 
   return true;
-   // vector<GLDraw::GeometryAppearance> _appearanceStack;
 
 }
 
@@ -360,36 +391,35 @@ void ForceFieldBackend::VisualizePlannerTree(const SerializedTree &tree)
   drawPlannerTree=1;
 
 }
-void ForceFieldBackend::VisualizeStartGoal(const Config &p_init, const Config &p_goal)
-{
-  drawPlannerStartGoal = 1;
-  planner_p_init = p_init;
-  planner_p_goal = p_goal;
-}
 
-void ForceFieldBackend::VisualizePathMilestones(const std::vector<Config> &keyframes, uint Nmilestones){
-  VisualizePathSweptVolume(keyframes);
-  drawPathMilestones=1;
+//void ForceFieldBackend::VisualizeStartGoal(const Config &p_init, const Config &p_goal)
+//{
+//  planner_p_init = p_init;
+//  planner_p_goal = p_goal;
+//}
 
-  if(Nmilestones > keyframes.size()){
-    Nmilestones = keyframes.size();
-  }
-  if(Nmilestones < 1){
-    Nmilestones=0;
-  }
-  _milestonekeyframe_indices.clear();
-
-  uint N = keyframes.size();
-  uint Nstep = (int)(N/Nmilestones);
-
-  if(Nstep<1) Nstep=1;
-  uint Ncur = 0;
-  while(Ncur < N){
-    _milestonekeyframe_indices.push_back(Ncur);
-    Ncur += Nstep;
-  }
-  std::cout << "Milestone visualization indicies: " << _milestonekeyframe_indices << std::endl;
-}
+//void ForceFieldBackend::VisualizePathMilestones(const std::vector<Config> &keyframes, uint Nmilestones){
+//  VisualizePathSweptVolume(keyframes);
+//
+//  if(Nmilestones > keyframes.size()){
+//    Nmilestones = keyframes.size();
+//  }
+//  if(Nmilestones < 1){
+//    Nmilestones=0;
+//  }
+//  _milestonekeyframe_indices.clear();
+//
+//  uint N = keyframes.size();
+//  uint Nstep = (int)(N/Nmilestones);
+//
+//  if(Nstep<1) Nstep=1;
+//  uint Ncur = 0;
+//  while(Ncur < N){
+//    _milestonekeyframe_indices.push_back(Ncur);
+//    Ncur += Nstep;
+//  }
+//  std::cout << "Milestone visualization indicies: " << _milestonekeyframe_indices << std::endl;
+//}
 
 std::vector<Config> ForceFieldBackend::getKeyFrames()
 {
@@ -406,120 +436,99 @@ void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, con
   _frames.push_back(frame);
   _frameLength.push_back(frameLength);
 }
-void ForceFieldBackend::VisualizePathSweptVolumeAtPosition(const Config &q)
+
+//void ForceFieldBackend::VisualizePathSweptVolumeAtPosition(const Config &q)
+//{
+//  Robot *robot = world->robots[0];
+//  if(!robot->InJointLimits(q)){
+//    std::cout << "trying to set an outer limit config" << std::endl;
+//    std::cout << "minimum       :" << robot->qMin << std::endl;
+//    std::cout << "configuration :" << q << std::endl;
+//    std::cout << "maximum       :" << robot->qMax << std::endl;
+//    exit(0);
+//  }
+//  robot->UpdateConfig(q);
+//  std::vector<Matrix4> mats_config;
+//
+//  for(size_t i=0;i<robot->links.size();i++) {
+//    Matrix4 mat = robot->links[i].T_World;
+//    mats_config.push_back(mat);
+//  }
+//  _mats.push_back(mats_config);
+//  _keyframes.push_back(q);
+//}
+//
+//void ForceFieldBackend::VisualizePathSweptVolume(const MultiPath &path)
+//{
+//  Robot *robot = world->robots[0];
+//
+//  Config qt;
+//  path.Evaluate(0, qt);
+//
+//  double dstep = 0.01;
+//  double d = 0;
+//
+//  while(d <= 1)
+//  {
+//    d+=dstep;
+//    Config qtn;
+//    path.Evaluate(d, qtn);
+//    if((qt-qtn).norm() >= sweptVolume_q_spacing)
+//    {
+//      VisualizePathSweptVolumeAtPosition(qtn);
+//      qt = qtn;
+//    }
+//  }
+//  if(DEBUG) std::cout << "[SweptVolume] #waypoints " << _mats.size() << std::endl;
+//}
+
+
+// void ForceFieldBackend::VisualizePathSweptVolume(const KinodynamicMilestonePath &path)
+// {
+//   Robot *robot = world->robots[0];
+
+//   Config qt;
+//   path.Eval(0, qt);
+
+//   double dstep = 0.01;
+//   double d = 0;
+
+//   while(d <= 1)
+//   {
+//     d+=dstep;
+//     Config qtn;
+//     path.Eval(d, qtn);
+//     //std::cout << d << qtn << std::endl;
+//     if((qt-qtn).norm() >= sweptVolume_q_spacing)
+//     {
+//       VisualizePathSweptVolumeAtPosition(qtn);
+//       qt = qtn;
+//     }
+//   }
+//   drawPath = 1;
+// }
+// void ForceFieldBackend::VisualizePathSweptVolume(const std::vector<Config> &keyframes)
+// {
+//   Robot *robot = world->robots[0];
+//   _keyframes.clear();
+//   _mats.clear();
+//   for(int i = 0; i < keyframes.size(); i++)
+//   {
+//     VisualizePathSweptVolumeAtPosition(keyframes.at(i));
+//   }
+//   drawPath = 1;
+// }
+void ForceFieldBackend::AddPath(const std::vector<Config> &keyframes, GLColor color, uint Nkeyframes_alongpath)
 {
   Robot *robot = world->robots[0];
-  if(!robot->InJointLimits(q)){
-    std::cout << "trying to set an outer limit config" << std::endl;
-    std::cout << "minimum       :" << robot->qMin << std::endl;
-    std::cout << "configuration :" << q << std::endl;
-    std::cout << "maximum       :" << robot->qMax << std::endl;
-    exit(0);
-  }
-  robot->UpdateConfig(q);
-  std::vector<Matrix4> mats_config;
-
-  for(size_t i=0;i<robot->links.size();i++) {
-    Matrix4 mat = robot->links[i].T_World;
-    mats_config.push_back(mat);
-  }
-  _mats.push_back(mats_config);
-  _keyframes.push_back(q);
+  SweptVolume sv(robot, keyframes, Nkeyframes_alongpath);
+  sv.SetColor(color);
+  swept_volume_paths.push_back(sv);
 }
 
-void ForceFieldBackend::VisualizePathSweptVolume(const MultiPath &path)
-{
-  Robot *robot = world->robots[0];
+//############################################################################
+//############################################################################
 
-  Config qt;
-  path.Evaluate(0, qt);
-
-  double dstep = 0.01;
-  double d = 0;
-
-  while(d <= 1)
-  {
-    d+=dstep;
-    Config qtn;
-    path.Evaluate(d, qtn);
-    if((qt-qtn).norm() >= sweptVolume_q_spacing)
-    {
-      VisualizePathSweptVolumeAtPosition(qtn);
-      qt = qtn;
-    }
-  }
-  //for(double d = 0; d <= path.Duration()+dstep; d+=dstep)
-  //{
-  //  while 
-  //  VisualizePathSweptVolumeAtPosition(path, d);
-  //}
-
-  if(DEBUG) std::cout << "[SweptVolume] #waypoints " << _mats.size() << std::endl;
-  _appearanceStack.clear();
-  _appearanceStack.resize(robot->links.size());
-
-  for(size_t i=0;i<robot->links.size();i++) {
-    GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
-    _appearanceStack[i]=a;
-  }
-  if(DEBUG) std::cout << "[SweptVolume] #geometries " << _appearanceStack.size() << std::endl;
-  drawPath = 1;
-
-}
-
-
-void ForceFieldBackend::VisualizePathSweptVolume(const KinodynamicMilestonePath &path)
-{
-  Robot *robot = world->robots[0];
-
-  Config qt;
-  path.Eval(0, qt);
-
-  double dstep = 0.01;
-  double d = 0;
-
-  while(d <= 1)
-  {
-    d+=dstep;
-    Config qtn;
-    path.Eval(d, qtn);
-    //std::cout << d << qtn << std::endl;
-    if((qt-qtn).norm() >= sweptVolume_q_spacing)
-    {
-      VisualizePathSweptVolumeAtPosition(qtn);
-      qt = qtn;
-    }
-  }
-  _appearanceStack.clear();
-  _appearanceStack.resize(robot->links.size());
-
-  for(size_t i=0;i<robot->links.size();i++) {
-    GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
-    _appearanceStack[i]=a;
-  }
-  drawPath = 1;
-}
-void ForceFieldBackend::VisualizePathSweptVolume(const std::vector<Config> &keyframes)
-{
-  Robot *robot = world->robots[0];
-  _keyframes.clear();
-  _mats.clear();
-  _appearanceStack.clear();
-
-  for(int i = 0; i < keyframes.size(); i++)
-  {
-    VisualizePathSweptVolumeAtPosition(keyframes.at(i));
-  }
-
-  _appearanceStack.clear();
-  _appearanceStack.resize(robot->links.size());
-
-  for(size_t i=0;i<robot->links.size();i++) {
-    GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
-    _appearanceStack[i]=a;
-  }
-  drawPath = 1;
-}
 void ForceFieldBackend::SetIKConstraints( vector<IKGoal> constraints, string robotname){
   _constraints = constraints;
   _robotname = robotname;
@@ -570,6 +579,8 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }
   return BaseT::OnCommand(cmd,args);
 }
+//############################################################################
+//############################################################################
 
 GLUIForceFieldGUI::GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _world)
     :BaseT(_backend,_world)
@@ -595,11 +606,6 @@ bool GLUIForceFieldGUI::Initialize()
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Planning Tree");
   AddControl(checkbox,"draw_planner_tree");
   checkbox->set_int_val(_backend->drawPlannerTree);
-
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Swept Volume");
-  AddControl(checkbox,"draw_path");
-  checkbox->set_int_val(_backend->drawPath);
-
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Object Edges");
   AddControl(checkbox,"draw_rigid_objects_edges");
   checkbox->set_int_val(_backend->drawRigidObjectsEdges);
@@ -607,13 +613,29 @@ bool GLUIForceFieldGUI::Initialize()
   AddControl(checkbox,"draw_rigid_objects_faces");
   checkbox->set_int_val(_backend->drawRigidObjectsFaces);
 
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Path Milestones");
-  AddControl(checkbox,"draw_path_milestones");
-  checkbox->set_int_val(_backend->drawPathMilestones);
+  uint N = _backend->getNumberOfPaths();
 
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Start Goal Config");
-  AddControl(checkbox,"draw_path_start_goal");
-  checkbox->set_int_val(_backend->drawPlannerStartGoal);
+  for(int i = 0; i < N; i++){
+    std::string prefix = "Path "+std::to_string(i)+" :";
+
+    std::string dpsv = "draw_path_swept_volume_"+std::to_string(i);
+    std::string descr = prefix + "Draw Swept Volume";
+    checkbox = glui->add_checkbox_to_panel(panel, descr.c_str());
+    AddControl(checkbox,dpsv.c_str());
+    checkbox->set_int_val(_backend->drawPathSweptVolume.at(i));
+
+    std::string dpms = "draw_path_milestones"+std::to_string(i);
+    std::string descr2 = prefix + "Draw Milestones";
+    checkbox = glui->add_checkbox_to_panel(panel, descr2.c_str());
+    AddControl(checkbox,dpms.c_str());
+    checkbox->set_int_val(_backend->drawPathMilestones.at(i));
+
+    std::string dpsg = "draw_path_start_goal"+std::to_string(i);
+    std::string descr3 = prefix + "Draw Start Goal";
+    checkbox = glui->add_checkbox_to_panel(panel, descr3.c_str());
+    AddControl(checkbox,dpsg.c_str());
+    checkbox->set_int_val(_backend->drawPathStartGoal.at(i));
+  }
 
     //AddControl(glui->add_button_to_panel(panel,"Save state"),"save_state");
   GLUI_Button* button;

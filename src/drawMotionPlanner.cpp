@@ -71,15 +71,16 @@ namespace GLDraw{
     }//forx
   }
 
-  void drawPathSweptVolume(Robot *robot, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, double sweptvolumeScale, GLColor sweptvolumeColor)
+  void drawGLPathSweptVolume(Robot *robot, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor sweptvolumeColor, double sweptvolumeScale)
   {
     //loopin' through the waypoints
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
     for(uint i = 0; i < mats.size(); i++){
       for(uint j=0;j<robot->links.size();j++) {
         if(robot->IsGeometryEmpty(j)) continue;
         Matrix4 matij = mats.at(i).at(j);
 
-        //glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
 
         glPushMatrix();
         glMultMatrix(matij);
@@ -90,13 +91,14 @@ namespace GLDraw{
         GLDraw::GeometryAppearance& a = appearanceStack.at(j);
         a.SetColor(sweptvolumeColor);
 
+        //glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
         a.DrawGL();
         glPopMatrix();
 
       }
     }
   }
-  void drawPathKeyframes(Robot *robot, std::vector<uint> keyframe_indices, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, double scale, GLColor color)
+  void drawGLPathKeyframes(Robot *robot, std::vector<uint> keyframe_indices, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack,GLColor color, double scale)
   {
     for(uint k = 0; k < keyframe_indices.size(); k++){
       uint i = keyframe_indices.at(k);
@@ -123,7 +125,7 @@ namespace GLDraw{
 
   }
 
-  void drawPlannerStartGoal(Robot *robot, const Config &p_init, const Config &p_goal)
+  void drawGLPathStartGoal(Robot *robot, const Config &p_init, const Config &p_goal)
   {
     GLColor colorInit(0,1,0);
     GLColor colorGoal(1,0,0);

@@ -16,7 +16,7 @@
 #include "info.h"
 #include "controller.h"
 #include "gui.h"
-#include "planner/planner_ompl.h"
+#include "planner/planner_ompl_irreducible.h"
 
 int main(int argc,const char** argv) {
   RobotWorld world;
@@ -40,8 +40,8 @@ int main(int argc,const char** argv) {
   world.robots[0]->qMax[4]=M_PI/2;
   world.robots[0]->qMax[5]=M_PI;
 
-  world.robots[0]->qMin[6]=0;
-  world.robots[0]->qMax[6]=1e-16;
+  //world.robots[0]->qMin[6]=0;
+  //world.robots[0]->qMax[6]=1e-16;
   info(&world);
 
   //############################################################################
@@ -66,11 +66,11 @@ int main(int argc,const char** argv) {
   p_goal.resize(p_init.size());
   p_goal.setZero();
 
-  //goal in lower pipe
-  p_goal[0]=-0.5;
-  p_goal[1]=1.0;
-  p_goal[2]=0.0;
-  p_goal[3]=M_PI/2;
+  ////goal in lower pipe
+  //p_goal[0]=-0.5;
+  //p_goal[1]=1.0;
+  //p_goal[2]=0.0;
+  //p_goal[3]=M_PI/2;
 
   //////goal in upper pipe
   p_goal[0]=-5.1;
@@ -85,7 +85,7 @@ int main(int argc,const char** argv) {
   //free space planner
   //############################################################################
 
-  MotionPlannerOMPL planner(&world, &sim);
+  MotionPlannerOMPLIrreducible planner(&world, &sim);
 
   if(planner.solve(p_init, p_goal)){
     std::vector<Config> keyframes = planner.GetKeyframes();

@@ -1,6 +1,10 @@
 #include "cspace_sentinel.h"
 #include "planner/planner_ompl_irreducible.h"
 
+MotionPlannerOMPLIrreducible::MotionPlannerOMPLIrreducible(RobotWorld *world, WorldSimulation *sim):
+  MotionPlannerOMPL(world,sim)
+{
+}
 ob::OptimizationObjectivePtr getThresholdPathLengthObj2(const ob::SpaceInformationPtr& si)
 {
   ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
@@ -77,6 +81,44 @@ void SentinelPropagatorIrreducible::propagate(const ob::State *state, const oc::
   for(int i = 0; i < N; i++){
     resultRn->values[i] = ssrRn->values[i];
   }
+
+}
+
+void PostRunEventIrreducible(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &run, GeometricCSpaceOMPL *cspace)
+{
+  static uint pid = 0;
+
+  //run["some extra property name INTEGER"] = "some value";
+  // The format of added data is string key, string value pairs,
+  // with the convention that the last word in string key is one of
+  // REAL, INTEGER, BOOLEAN, STRING. (this will be the type of the field
+  // when the log file is processed and saved as a database).
+  // The values are always converted to string.
+  ob::SpaceInformationPtr si = planner->getSpaceInformation();
+  ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
+  bool solved = pdef->hasExactSolution();
+
+  if(solved){
+    std::cout << "Found Solution at run " << pid << std::endl;
+    const ob::PathPtr &pp = pdef->getSolutionPath();
+    oc::PathControl path_control = static_cast<oc::PathControl&>(*pp);
+    og::PathGeometric path = path_control.asGeometric();
+
+    vector<Config> keyframes;
+    for(int i = 0; i < path.getStateCount(); i++)
+    {
+      ob::State *state = path.getState(i);
+      Config cur = OMPLStateToConfig(state, cspace->getPtr());
+      keyframes.push_back(cur);
+    }
+    std::string sfile = "ompl"+std::to_string(pid)+".xml";
+    std::cout << "Saving keyframes"<< std::endl;
+    Save(keyframes, sfile.c_str());
+  }else{
+    std::cout << "Run " << pid << " no solution" << std::endl;
+
+  }
+  pid++;
 
 }
 
@@ -178,8 +220,8 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   cbounds.setLow(-1);
   cbounds.setHigh(1);
 
-  cbounds.setLow(3,0.02);//propagation step size
-  cbounds.setHigh(3,0.15);
+  cbounds.setLow(3,0.01);//propagation step size
+  cbounds.setHigh(3,0.10);
 
 
   control_cspace->setBounds(cbounds);
@@ -187,7 +229,7 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   oc::SimpleSetup ss(control_cspace);
   oc::SpaceInformationPtr si = ss.getSpaceInformation();
 
-  auto cpropagate(std::make_shared<SentinelPropagator>(si, &kcspace));
+  auto cpropagate(std::make_shared<SentinelPropagatorIrreducible>(si, &kcspace));
 
   //###########################################################################
   // choose planner
@@ -239,27 +281,29 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   bool solved = false;
   double solution_time = dInf;
-  double duration = 3600.0;
+  double duration = 1200.0;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
 
 
   //###########################################################################
   // benchmark instead
   //###########################################################################
-  //ot::Benchmark benchmark(ss, "IrreducibleBenchmarkPipes");
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
+  ot::Benchmark benchmark(ss, "IrreducibleBenchmarkPipes");
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 
-  //ot::Benchmark::Request req;
-  //req.maxTime = duration;
-  //req.maxMem = 10000.0;
-  //req.runCount = 100;
-  //req.displayProgress = true;
-  //benchmark.benchmark(req);
-  //// This will generate a file of the form ompl_host_time.log
-  //benchmark.saveResultsToFile();
+  ot::Benchmark::Request req;
+  req.maxTime = duration;
+  req.maxMem = 10000.0;
+  req.runCount = 100;
+  req.displayProgress = true;
+
+  benchmark.setPostRunEvent(std::bind(&PostRunEventIrreducible, std::placeholders::_1, std::placeholders::_2, &cspace));
+
+  benchmark.benchmark(req);
+  benchmark.saveResultsToFile();
 
 
   //###########################################################################
