@@ -36,8 +36,6 @@ for table in tables:
 #    [ColumnNames] ['id', 'name', 'settings']
 #      [Entries:] 4
 
-print 80*"-"
-
 #    [ColumnNames] ['id', 'experimentid', 'plannerid', 'approximate_solution',
 #'correct_solution', 'graph_motions', 'graph_states', 'memory',
 #'solution_clearance', 'solution_difference', 'solution_length',
@@ -47,17 +45,30 @@ names = cursor.execute("""SELECT name FROM plannerConfigs;""").fetchall()
 
 plannerids = cursor.execute("""SELECT DISTINCT plannerid FROM runs;""").fetchall()
 
+timelimit = 600
+
+print 80*"-"
+print "Solution Planner Runs with timelimit=",timelimit,"seconds"
+print 80*"-"
 for i in range(0,len(names)):
   name = names[i][0]
   pid = plannerids[i][0]
   sql = """SELECT time FROM runs WHERE plannerid="""+str(pid)
   timessql = cursor.execute(sql).fetchall()
+
   times = np.array(timessql)  
   sql = """SELECT correct_solution FROM runs WHERE plannerid="""+str(pid)
   sol = np.array(cursor.execute(sql).fetchall())
   solved = sol.sum()
   runs = sol.shape[0]
-  print pid,": [",name,"]solved: ",solved,"/",runs," time:",times.mean(),"+/-",times.std()
+
+  Dtimes = times[times < timelimit]
+  Dsolved = len(Dtimes)
+  Dmean = Dtimes.mean() 
+  Dstd = Dtimes.std() 
+
+  #print pid,": [",name,"]solved: ",solved,"/",runs," time:",times.mean(),"+/-",times.std()
+  print pid,": [",name,"]solved: ",Dsolved,"/",runs," time:",Dtimes.mean(),"+/-",Dtimes.std()
   
 
 
