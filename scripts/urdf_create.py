@@ -68,7 +68,7 @@ def commentNewBranch(bname):
   s+='-->\n'
   return s
 
-def createRevoluteJoint(jname, parentname, childname, x=0, y=0, z=0):
+def createRevoluteJoint(jname, parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
   s= ''
   s+='<joint name="'+jname+'_Z" type="revolute">\n'
   s+='  <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
@@ -76,11 +76,11 @@ def createRevoluteJoint(jname, parentname, childname, x=0, y=0, z=0):
   s+='  <child link="'+childname+'"/>\n'
   s+='  <axis xyz="0 0 1"/>\n'
   s+='  <dynamics damping="'+str(damping)+'" friction="0"/>\n'
-  s+='  <limit lower="-1.57" upper="1.57" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
+  s+='  <limit lower="'+str(lowerLimit)+'" upper="'+str(upperLimit)+'" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'
   return s
 
-def createSphericalJoint(jname, parentname, childname, x=0, y=0, z=0):
+def createSphericalJoint(jname, parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57,upperLimit=1.57):
   tmpname = parentname+"_spherical_joint_link"
   s= ''
   s+='<joint name="'+jname+'_Z" type="revolute">\n'
@@ -89,7 +89,7 @@ def createSphericalJoint(jname, parentname, childname, x=0, y=0, z=0):
   s+='  <child link="'+tmpname+'"/>\n'
   s+='  <axis xyz="0 0 1"/>\n'
   s+='  <dynamics damping="'+str(damping)+'" friction="0"/>\n'
-  s+='  <limit lower="-1.57" upper="1.57" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
+  s+='  <limit lower="'+str(lowerLimit)+'" upper="'+str(upperLimit)+'" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'
   s+= createSphere(tmpname,0,0,0,0.001,PHYSICAL=False)
   s+='<joint name="'+jname+'_Y" type="revolute">\n'
@@ -98,6 +98,6 @@ def createSphericalJoint(jname, parentname, childname, x=0, y=0, z=0):
   s+='  <child link="'+childname+'"/>\n'
   s+='  <axis xyz="0 1 0"/>\n'
   s+='  <dynamics damping="'+str(damping)+'" friction="0"/>\n'
-  s+='  <limit lower="-1.57" upper="1.57" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
+  s+='  <limit lower="'+str(lowerLimit)+'" upper="'+str(upperLimit)+'" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'
   return s

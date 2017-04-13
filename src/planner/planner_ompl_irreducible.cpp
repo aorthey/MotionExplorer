@@ -214,11 +214,12 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   // Kinodynamic planner
   //###########################################################################
   //KINODYNAMIC PLANNERS
+  double kappa_curvature = 2.2;
   uint NdimControl = 3;
   auto control_cspace(std::make_shared<oc::RealVectorControlSpace>(cspace.getPtr(), NdimControl+1));
   ob::RealVectorBounds cbounds(NdimControl+1);
-  cbounds.setLow(-1);
-  cbounds.setHigh(1);
+  cbounds.setLow(-kappa_curvature);
+  cbounds.setHigh(kappa_curvature);
 
   cbounds.setLow(3,0.01);//propagation step size
   cbounds.setHigh(3,0.10);
@@ -288,22 +289,22 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   // benchmark instead
   //###########################################################################
-  ot::Benchmark benchmark(ss, "IrreducibleBenchmarkPipes");
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
+  //ot::Benchmark benchmark(ss, "IrreducibleBenchmarkPipes");
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 
-  ot::Benchmark::Request req;
-  req.maxTime = duration;
-  req.maxMem = 10000.0;
-  req.runCount = 100;
-  req.displayProgress = true;
+  //ot::Benchmark::Request req;
+  //req.maxTime = duration;
+  //req.maxMem = 10000.0;
+  //req.runCount = 100;
+  //req.displayProgress = true;
 
-  benchmark.setPostRunEvent(std::bind(&PostRunEventIrreducible, std::placeholders::_1, std::placeholders::_2, &cspace));
+  //benchmark.setPostRunEvent(std::bind(&PostRunEventIrreducible, std::placeholders::_1, std::placeholders::_2, &cspace));
 
-  benchmark.benchmark(req);
-  benchmark.saveResultsToFile();
+  //benchmark.benchmark(req);
+  //benchmark.saveResultsToFile();
 
 
   //###########################################################################

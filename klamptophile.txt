@@ -462,12 +462,17 @@ model?) -> one of the cylinders pierced the head sphere creating a spurious coll
  [x] display two paths in different colors, one irreducible (magenta or green?), one reducible (red?)
 
  [ ] repeat experiments with 20 min time frame?
- [ ] repeat experiments with 20 min time frame and propagation step size in [0.01,0.1]
+ [ ] repeat experiments with 20 min time frame, curvature = 2.2 (2/0.15*6) and propagation step size in [0.01,0.1]
 
  [ ] rewrite introduction and experimental part
  [ ] outsource swept volume to seperate elements file
 
  [ ] design one turbine scenario with a large room (which can be used for wrench planning)
+ [ ] design one centrifuge scenario (which can be used for wrench planning)
+
+ [ ] repeat 3d snake experiment, different scenario (some centrifuge like?)
  [ ] add one hard experiment where the method will break down, should be short so that any RRT can find a solution under 3600 seconds. 
+
+ [ ] turbine (for mechanical octopus), centrifuge plus holes (for mechanical snake), and horseshoe-like (to break it)
 
 

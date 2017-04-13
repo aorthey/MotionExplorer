@@ -40,8 +40,6 @@ int main(int argc,const char** argv) {
   world.robots[0]->qMax[4]=M_PI/2;
   world.robots[0]->qMax[5]=M_PI;
 
-  //world.robots[0]->qMin[6]=0;
-  //world.robots[0]->qMax[6]=1e-16;
   info(&world);
 
   //############################################################################
@@ -89,12 +87,12 @@ int main(int argc,const char** argv) {
 
   if(planner.solve(p_init, p_goal)){
     std::vector<Config> keyframes = planner.GetKeyframes();
-    backend.VisualizePathSweptVolume(keyframes);
-
+    //backend.VisualizePathSweptVolume(keyframes);
+    backend.AddPath(keyframes);
     //void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);
   }
 
-  backend.VisualizeStartGoal(p_init, p_goal);
+  //backend.VisualizeStartGoal(p_init, p_goal);
   backend.VisualizePlannerTree(planner.GetTree());
   backend.Save("sentinel_pipe.xml");
   //backend.Load("kinodynamic_solution_tunnel_environment.xml");

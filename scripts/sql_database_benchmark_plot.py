@@ -45,7 +45,7 @@ names = cursor.execute("""SELECT name FROM plannerConfigs;""").fetchall()
 
 plannerids = cursor.execute("""SELECT DISTINCT plannerid FROM runs;""").fetchall()
 
-timelimit = 600
+timelimit = 1200
 
 print 80*"-"
 print "Solution Planner Runs with timelimit=",timelimit,"seconds"
