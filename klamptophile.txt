@@ -435,6 +435,7 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [x] add edges to planner tree visualization
  [ ] create sweptvolumeGUI + forcefieldGUI 
  [ ] outsource swept volume to seperate elements file
+ [ ] save all swept volumes when saving GUI, rewrite all Load/Save functions
 
 -- abstractions (longterm goals)
 
@@ -451,6 +452,8 @@ output over time inside the simulator.
  [ ] be able to deform path inside simulator. Ability to load paths from file,
 then display them, then deform them, then to save those paths. 
  [ ] visualize planner tree with millions of nodes without lags
+ [ ] have vim-keybindings to quickly move around, save/load, screenshots,
+display tree/start/goal/swept volumes, do planning
 
 -- wrench fields
 
