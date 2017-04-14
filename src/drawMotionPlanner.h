@@ -21,7 +21,7 @@ namespace GLDraw {
   void drawGLPathStartGoal(Robot *robot, const Config &p_init, const Config &p_goal);
 
   void drawRobotAtConfig(Robot *robot, const Config &q, GLColor color=GLColor(1,0,0), double scale = 1.0);
-  void drawPlannerTree(const SerializedTree &_stree);
+  void drawPlannerTree(const SerializedTree &_stree, GLColor colorTree=GLColor(0.3,0.7,0.3));
   void drawAxesLabels(Camera::Viewport& viewport);
   void drawFrames(std::vector< std::vector<Vector3> > &frames, std::vector<double> frameLength);
 };

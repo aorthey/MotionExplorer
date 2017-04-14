@@ -12,6 +12,7 @@ headradius = 0.1
 Nsegments = 6
 Nbranches = 8
 aperture = 0.4 ## aperture of bouquet of branches
+limit = pi/2
 name = 'sentinel_complete'
 #env_name = 'tunnel/tunnel_branch2.tri'
 env_name = 'pipes/pipedreamin.tri'
@@ -42,7 +43,7 @@ def attachBranchSegment(parentlinkname, linkname, x, y, z):
   linkname1 = linkname+'_cylinder'
   linkname2 = linkname
   sbl1 = createCylinder(linkname1,-length/2-sRadius,0,0,radius_cylinder,length) 
-  sbj1 = createSphericalJoint(parentlinkname+'_'+linkname+'_joint_revolute', parentlinkname,linkname1, x, y, z) 
+  sbj1 = createSphericalJoint(parentlinkname+'_'+linkname+'_joint_revolute', parentlinkname,linkname1, x, y, z, -limit, limit) 
   sbl2 = createSphere(linkname2,-length-2*sRadius,0,0,0.95*sRadius)
   sbj2 = createRigidJoint(linkname+'_fixed', linkname1, linkname2,0,0,0)
   return sbl1+sbj1+sbl2+sbj2
@@ -157,6 +158,10 @@ robotstr += ' translation="0 0 0"'
 robotstr += ' rotateRPY="0 0 0"'
 robotstr += ' '+config+'/>\n\n'
 f.write(robotstr)
+
+kappa = (2*sin(limit))/(length*Nsegments)
+cmmntstr = '  <!-- Irreducible Curvature kappa ='+str(kappa)+' -->\n\n'
+f.write(cmmntstr)
 
 terrainstr  = '  <rigidObject '
 terrainstr += ' name=\"'+str(env_name)+'\"'

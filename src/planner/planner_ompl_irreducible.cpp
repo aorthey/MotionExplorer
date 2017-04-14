@@ -214,16 +214,18 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   // Kinodynamic planner
   //###########################################################################
   //KINODYNAMIC PLANNERS
-  double kappa_curvature = 2.2;
+  //double kappa_curvature = 2.2;
+  double kappa_curvature = 1.57;
   uint NdimControl = 3;
+
+  //TODO: this does not check if index is out of bounds -> 
   auto control_cspace(std::make_shared<oc::RealVectorControlSpace>(cspace.getPtr(), NdimControl+1));
   ob::RealVectorBounds cbounds(NdimControl+1);
   cbounds.setLow(-kappa_curvature);
   cbounds.setHigh(kappa_curvature);
 
-  cbounds.setLow(3,0.01);//propagation step size
-  cbounds.setHigh(3,0.10);
-
+  cbounds.setLow(NdimControl,0.01);//propagation step size
+  cbounds.setHigh(NdimControl,0.10);
 
   control_cspace->setBounds(cbounds);
 
@@ -331,8 +333,13 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
 
   if (solved)
   {
+
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Found solution:" << std::endl;
+    std::cout << " exact solution       : " << (pdef->hasExactSolution()? "Yes":"No")<< std::endl;
+    std::cout << " approximate solution : " << (pdef->hasApproximateSolution()? "Yes":"No")<< std::endl;
+
+
     oc::PathControl path_control = ss.getSolutionPath();
     og::PathGeometric path = path_control.asGeometric();
     std::cout << "Path Length     : " << path.length() << std::endl;

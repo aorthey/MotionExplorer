@@ -432,9 +432,25 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] refactor planner 
  [ ] find distance to goal for planner output OMPL (how approximate is the solution)
  [ ] toggle mesh/faces of objects with keyboard
- [ ] add edges to planner tree visualization
+ [x] add edges to planner tree visualization
+ [ ] create sweptvolumeGUI + forcefieldGUI 
+ [ ] outsource swept volume to seperate elements file
 
--- abstraction
+-- abstractions (longterm goals)
+
+ [x] be able to design landscapes/fancy environments and import them to simulator
+ [ ] be able to load different landscapes/robots from simulator, plus start/goal
+configs, and be able to run different algorithms to find a solution. Then be
+able to save/delete solution paths. So that we can display several output paths
+as swept volumes simultaneously
+ [ ] do benchmark planning from inside the simulator by clicking together
+algorithms and #runs and duration. Have a default benchmarking plus dump
+everything to nice pdf graph / latex table.
+ [ ] have ability to do retiming of a path inside simulator, then display the
+output over time inside the simulator. 
+ [ ] be able to deform path inside simulator. Ability to load paths from file,
+then display them, then deform them, then to save those paths. 
+ [ ] visualize planner tree with millions of nodes without lags
 
 -- wrench fields
 
@@ -461,18 +477,29 @@ model?) -> one of the cylinders pierced the head sphere creating a spurious coll
  [x] probably bug in postprocess event of benchmark
  [x] display two paths in different colors, one irreducible (magenta or green?), one reducible (red?)
 
+ [ ] repeat Nbranch experiments because wrong stepsize was used!
+ [ ] repeat irreducible experiments using updated curvature!
+
  [ ] repeat experiments with 20 min time frame?
- [ ] repeat experiments with 20 min time frame, curvature = 2.2 (2/0.15*6) and propagation step size in [0.01,0.1]
+ [ ] repeat experiments with 20 min time frame, curvature = 2.22 and propagation step size in [0.01,0.1]
+
+ [ ] experiment 3d snake underwater, 20min, curvature = 1.57, propagation step size [0.01,0.1]
+ [ ] experiment 3d snake underwater, 20min
 
  [ ] rewrite introduction and experimental part
- [ ] outsource swept volume to seperate elements file
+ [ ] Corner Experiment: too big
+ [ ] Underwater Experiment: strange texture, make that better, also it takes too
+long for Nbranch planner to converge or to converge at all. make that easier?
+otherwise not much difference to pipes
 
  [ ] design one turbine scenario with a large room (which can be used for wrench planning)
  [ ] design one centrifuge scenario (which can be used for wrench planning)
 
- [ ] repeat 3d snake experiment, different scenario (some centrifuge like?)
  [ ] add one hard experiment where the method will break down, should be short so that any RRT can find a solution under 3600 seconds. 
 
- [ ] turbine (for mechanical octopus), centrifuge plus holes (for mechanical snake), and horseshoe-like (to break it)
+ [ ] outsource planner setup to JSON file or xml (should be loadable in simulator)
 
+ [ ] turbine (for mechanical octopus), centrifuge plus holes (for mechanical snake), and horseshoe-like (to break snake?)
+ [ ] make sure that cbounds gives an exception if outer limit index
 
+ [ ] what about the humanoid experiments? could we repeat them easily?

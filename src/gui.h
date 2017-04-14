@@ -162,12 +162,18 @@ class ForceFieldBackend : public SimTestBackend
   //void ShowPlannerStartGoal(){ drawPlannerStartGoal=true; }
   //void HidePlannerStartGoal(){ drawPlannerStartGoal=false; }
 
+  void ShowCoordinateAxes(){ drawAxes = 1; }
+  void HideCoordinateAxes(){ drawAxes = 0; }
+  void ShowRobot(){ drawRobot = 1; }
+  void HideRobot(){ drawRobot = 0; }
+
   void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);
+  void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
   void SetIKConstraints( vector<IKGoal> constraints, string robotname);
   void SetIKCollisions( vector<int> linksInCollision );
 
+  uint getNumberOfPaths();
 
-  uint getNumberOfPaths(){return swept_volume_paths.size();}
   void AddPath(const std::vector<Config> &keyframes, GLColor color = GLColor(0.8,0.8,0.8), uint Nkeyframes_alongpath=10);
   //deprecated
   //void VisualizePathSweptVolumeAtPosition(const Config &q);
@@ -189,6 +195,7 @@ class ForceFieldBackend : public SimTestBackend
   int drawIKextras;
   int drawRobot;
   int drawPlannerTree;
+  int drawPlannerStartGoal;
   int drawAxes;
   int drawAxesLabels;
   int drawRigidObjects;

@@ -127,8 +127,8 @@ namespace GLDraw{
 
   void drawGLPathStartGoal(Robot *robot, const Config &p_init, const Config &p_goal)
   {
-    GLColor colorInit(0,1,0);
-    GLColor colorGoal(0.8,0.8,0.8);
+    GLColor colorInit(0.3,1,0.3);
+    GLColor colorGoal(1,0.3,0.3);
     double scale = 1.01;
     if(!p_init.empty()) drawRobotAtConfig(robot, p_init, colorInit, scale);
     if(!p_goal.empty()) drawRobotAtConfig(robot, p_goal, colorGoal, scale);
@@ -153,56 +153,54 @@ namespace GLDraw{
   }
 
 
-  void drawPlannerTree(const SerializedTree &_stree)
+  void drawPlannerTree(const SerializedTree &_stree, GLColor colorTree)
   {
-    double linewidth = 0.01;
+    double edgeWidth = 0.1;
+    double vertexSize = 0.1;
 
-    uint nearestNode = 0;
-    double bestD = dInf;
+    //too costly for each round
+    //uint nearestNode = 0;
+    //double bestD = dInf;
+    //for(uint i = 0; i < _stree.size(); i++){
+    //  SerializedTreeNode node = _stree.at(i);
+    //  double d = node.cost_to_goal;
+    //  if(d<bestD){
+    //    bestD = d;
+    //    nearestNode = i;
+    //  }
+    //}
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND); 
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      
     for(uint i = 0; i < _stree.size(); i++){
-      SerializedTreeNode node = _stree.at(i);
-      double d = node.cost_to_goal;
-      if(d<bestD){
-        bestD = d;
-        nearestNode = i;
-      }
-    }
-    for(uint i = 0; i < _stree.size(); i++){
-      //std::cout << "Tree GUI:" << tree.at(0).first << std::endl;
       SerializedTreeNode node = _stree.at(i);
       Vector3 pos(node.position(0),node.position(1),node.position(2));
       Vector3 rot(node.position(3),node.position(4),node.position(5));
 
       std::vector<Vector3> dirs = node.directions;
 
-      glDisable(GL_LIGHTING);
-      glEnable(GL_BLEND); 
-      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-      
-      //compute color from cost_to_goal
-      double d = node.cost_to_goal;
-      double shade = exp(-d*d/0.5); //\in [0,1]
-      GLColor color(shade,0,1.0-shade);
+      ////Fancy Color gradient, red near goal, blue far away, gaussian //distributed
+      //double d = node.cost_to_goal;
+      //double shade = exp(-d*d/0.5); //\in [0,1]
+      //GLColor color(shade,0,1.0-shade);
 
-      color.setCurrentGL();
+      colorTree.setCurrentGL();
 
       glPushMatrix();
       glTranslate(pos);
-      //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cForce);
-
-      if(i==nearestNode){
-        GLColor cNearest(1,1,0);
-        cNearest.setCurrentGL();
-        glPointSize(15.0);                                     
-        //std::cout << "Nearest Node " << node.position << " d=" <<bestD << std::endl;
-      }else{
-        glPointSize(5.0);                                     
-      }
+      glPointSize(vertexSize);
       drawPoint(Vector3(0,0,0));
+
       for(uint j = 0; j < dirs.size(); j++){
-        Vector3 dir(dirs.at(j)[0], dirs.at(j)[1], dirs.at(j)[2]);
-        drawCylinder(dir,linewidth);
+        colorTree.setCurrentGL();
+        glBegin(GL_LINES);
+        glLineWidth(edgeWidth);
+        glVertex3f(0.0, 0.0, 0.0);
+        glVertex3f(dirs.at(j)[0], dirs.at(j)[1], dirs.at(j)[2]);
+        glEnd();
       }
+
 
       glPushMatrix();
 
@@ -210,6 +208,7 @@ namespace GLDraw{
       glPopMatrix();
       glEnable(GL_LIGHTING);
     }
+    //std::cout << "Visualized Tree with " << _stree.size() << " vertices and " << Nedges << " edges." << std::endl;
   }
 
 #include <GL/freeglut.h>

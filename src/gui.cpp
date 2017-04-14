@@ -25,7 +25,8 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawForceField = 0;
   drawIKextras = 0;
 
-  drawPlannerTree = 0;
+  drawPlannerTree = 1;
+  drawPlannerStartGoal = 1;
   drawRigidObjects = 1;
   drawRigidObjectsEdges = 1;
   drawRigidObjectsFaces = 0;
@@ -36,6 +37,8 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawRobotExtras = 0;
 
   MapButtonToggle("draw_planner_tree",&drawPlannerTree);
+  MapButtonToggle("draw_planner_start_goal",&drawPlannerStartGoal);
+
   MapButtonToggle("draw_rigid_objects_faces",&drawRigidObjectsFaces);
   MapButtonToggle("draw_rigid_objects_edges",&drawRigidObjectsEdges);
 
@@ -51,7 +54,7 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
 
   _mats.clear();
   _frames.clear();
-
+  swept_volume_paths.clear();
 }
 
 
@@ -178,6 +181,7 @@ void ForceFieldBackend::RenderWorld()
   if(drawRobotExtras) GLDraw::drawRobotExtras(viewRobot);
   if(drawIKextras) GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);
   if(drawForceField) GLDraw::drawUniformForceField();
+  if(drawPlannerStartGoal) GLDraw::drawGLPathStartGoal(robot, planner_p_init, planner_p_goal);
 
   for(int i = 0; i < swept_volume_paths.size(); i++){
     SweptVolume sv = swept_volume_paths.at(i);
@@ -195,6 +199,13 @@ void ForceFieldBackend::RenderWorld()
   
 
 }//RenderWorld
+
+void ForceFieldBackend::VisualizeStartGoal(const Config &p_init, const Config &p_goal)
+{
+  drawPlannerStartGoal = 1;
+  planner_p_init = p_init;
+  planner_p_goal = p_goal;
+}
 
 bool ForceFieldBackend::Load(TiXmlElement *node)
 {
@@ -384,47 +395,18 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
 
 void ForceFieldBackend::VisualizePlannerTree(const SerializedTree &tree)
 {
-//typedef std::pair<Vector, std::vector<Vector> > SerializedTreeNode;
-//typedef std::vector< SerializedTreeNode > SerializedTree;
-
   _stree = tree;
   drawPlannerTree=1;
-
 }
-
-//void ForceFieldBackend::VisualizeStartGoal(const Config &p_init, const Config &p_goal)
-//{
-//  planner_p_init = p_init;
-//  planner_p_goal = p_goal;
-//}
-
-//void ForceFieldBackend::VisualizePathMilestones(const std::vector<Config> &keyframes, uint Nmilestones){
-//  VisualizePathSweptVolume(keyframes);
-//
-//  if(Nmilestones > keyframes.size()){
-//    Nmilestones = keyframes.size();
-//  }
-//  if(Nmilestones < 1){
-//    Nmilestones=0;
-//  }
-//  _milestonekeyframe_indices.clear();
-//
-//  uint N = keyframes.size();
-//  uint Nstep = (int)(N/Nmilestones);
-//
-//  if(Nstep<1) Nstep=1;
-//  uint Ncur = 0;
-//  while(Ncur < N){
-//    _milestonekeyframe_indices.push_back(Ncur);
-//    Ncur += Nstep;
-//  }
-//  std::cout << "Milestone visualization indicies: " << _milestonekeyframe_indices << std::endl;
-//}
 
 std::vector<Config> ForceFieldBackend::getKeyFrames()
 {
   return _keyframes;
 }
+uint ForceFieldBackend::getNumberOfPaths(){
+  return this->swept_volume_paths.size();
+}
+
 void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength)
 {
   vector<Vector3> frame;
@@ -603,24 +585,31 @@ bool GLUIForceFieldGUI::Initialize()
   ForceFieldBackend* _backend = static_cast<ForceFieldBackend*>(backend);
 
   panel = glui->add_rollout("Motion Planning");
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Planning Tree");
-  AddControl(checkbox,"draw_planner_tree");
-  checkbox->set_int_val(_backend->drawPlannerTree);
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Object Edges");
   AddControl(checkbox,"draw_rigid_objects_edges");
   checkbox->set_int_val(_backend->drawRigidObjectsEdges);
+
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Object Faces");
   AddControl(checkbox,"draw_rigid_objects_faces");
   checkbox->set_int_val(_backend->drawRigidObjectsFaces);
 
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Planner Start Goal");
+  AddControl(checkbox,"draw_planner_start_goal");
+  checkbox->set_int_val(_backend->drawPlannerStartGoal);
+
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Planning Tree");
+  AddControl(checkbox,"draw_planner_tree");
+  checkbox->set_int_val(_backend->drawPlannerTree);
+
   uint N = _backend->getNumberOfPaths();
 
+  std::cout << "N paths " << N << std::endl;
   for(int i = 0; i < N; i++){
     std::string prefix = "Path "+std::to_string(i)+" :";
 
     std::string dpsv = "draw_path_swept_volume_"+std::to_string(i);
-    std::string descr = prefix + "Draw Swept Volume";
-    checkbox = glui->add_checkbox_to_panel(panel, descr.c_str());
+    std::string descr1 = prefix + "Draw Swept Volume";
+    checkbox = glui->add_checkbox_to_panel(panel, descr1.c_str());
     AddControl(checkbox,dpsv.c_str());
     checkbox->set_int_val(_backend->drawPathSweptVolume.at(i));
 

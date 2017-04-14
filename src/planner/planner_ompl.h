@@ -53,6 +53,19 @@ Config OMPLStateToConfig(const ob::ScopedState<> &qompl, const ob::StateSpacePtr
 Config OMPLStateToConfig(const ob::State *qompl, const ob::StateSpacePtr &s);
 Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState, const ob::StateSpacePtr &s);
 
+class MotionPlannerOMPL: public MotionPlanner
+{
+  public:
+    MotionPlannerOMPL(RobotWorld *world, WorldSimulation *sim);
+    void SerializeTree(ob::PlannerData &pd);
+    virtual bool solve(Config &p_init, Config &p_goal);
+
+    //debug
+    void test();
+    void testSE3(KinodynamicCSpaceSentinelAdaptor &cspace);
+    void test_conversion(Config &q, ob::StateSpacePtr &stateSpace);
+};
+
 
 class GeometricCSpaceOMPL
 {
@@ -71,17 +84,6 @@ class MotionPlannerOMPLValidityChecker : public ob::StateValidityChecker
      MotionPlannerOMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpace* space);
      virtual bool isValid(const ob::State* state) const;
      CSpace* _space;
-};
-
-class MotionPlannerOMPL: public MotionPlanner
-{
-  public:
-    MotionPlannerOMPL(RobotWorld *world, WorldSimulation *sim);
-    void SerializeTree(ob::PlannerData &pd);
-    void test();
-    void testSE3(KinodynamicCSpaceSentinelAdaptor &cspace);
-    void test_conversion(Config &q, ob::StateSpacePtr &stateSpace);
-    virtual bool solve(Config &p_init, Config &p_goal);
 };
 
 class SentinelPropagator : public oc::StatePropagator

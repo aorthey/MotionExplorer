@@ -199,7 +199,35 @@ Config OMPLStateToConfig(const ob::ScopedState<> &qompl, const ob::StateSpacePtr
 
 void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
 {
-  std::cout << "serializing tree with " << pd.numVertices() << " nodes" << std::endl;
+  //pd.decoupleFromPlanner();
+  std::cout << "serializing tree with " << pd.numVertices() << " vertices" << std::endl;
+  std::cout << "                  and " << pd.numEdges() << " edges" << std::endl;
+  pd.toBoostGraph();
+
+  //ob::PlannerData::Graph::EIterator eiter;
+  //for(eiter = graph.begin(); eiter!=graph.end(); ++eiter){
+  //}
+
+  //graph_traits < adjacency_list <> >::vertex_iterator i, end;
+  //graph_traits < adjacency_list <> >::adjacency_iterator ai, a_end;
+  //property_map < adjacency_list <>, vertex_index_t >::type
+  //  index_map = get(vertex_index, g);
+
+  //for (tie(i, end) = vertices(g); i != end; ++i) {
+  //  std::cout << name[get(index_map, *i)];
+  //  tie(ai, a_end) = adjacent_vertices(*i, g);
+  //  if (ai == a_end)
+  //    std::cout << " has no children";
+  //  else
+  //    std::cout << " is the parent of ";
+  //  for (; ai != a_end; ++ai) {
+  //    std::cout << name[get(index_map, *ai)];
+  //    if (boost::next(ai) != a_end)
+  //      std::cout << ", ";
+  //  }
+  //  std::cout << std::endl;
+  //}
+
   _stree.clear();
   for(uint i = 0; i < pd.numVertices(); i++){
     ob::PlannerDataVertex v = pd.getVertex(i);
@@ -218,18 +246,22 @@ void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
     //std::vector<uint> edgeList;
     //uint Nedges = pd.getIncomingEdges (i, edgeList);
 
-    //std::cout << "Node " << i << " has " << Nedges << " edges" << std::endl;
-    //for(int j = 0; j < edgeList.size(); j++){
-    //  ob::PlannerDataVertex w = pd.getVertex(j);
-    //  const ob::State* sw = w.getState();
-    //  const ob::SE3StateSpace::StateType *swSE3 = sw->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-    //  double xw = swSE3->getX();
-    //  double yw = swSE3->getY();
-    //  double zw = swSE3->getZ();
 
-    //  Vector3 dvw( xw-x, yw-y, zw-z);
-    //  snode.directions.push_back(dvw);
-    //}
+     
+    std::vector<uint> edgeList;
+    pd.getEdges(i, edgeList);
+    //std::cout << "Node " << i << " has " << Nedges << " edges" << std::endl;
+    for(int j = 0; j < edgeList.size(); j++){
+      ob::PlannerDataVertex w = pd.getVertex(edgeList.at(j));
+      const ob::State* sw = w.getState();
+      const ob::SE3StateSpace::StateType *swSE3 = sw->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+      double xw = swSE3->getX();
+      double yw = swSE3->getY();
+      double zw = swSE3->getZ();
+
+      Vector3 dvw( xw-x, yw-y, zw-z);
+      snode.directions.push_back(dvw);
+    }
 
 
 
@@ -457,11 +489,15 @@ void SentinelPropagator::propagate(const ob::State *state, const oc::Control* co
   // Forward Simulate
   //###########################################################################
 
-  uint Nduration = N+6+1;
+  uint Nduration = N+6;
   Real dt = ucontrol[Nduration];
   //Real dt = 0.1;
   //std::vector<Config> path;
   //cspace_->Simulate(x0, u, path);
+  if(dt<0){
+    std::cout << "propagation step size is negative:"<<dt << std::endl;
+    exit(0);
+  }
 
   Matrix4 x0_SE3 = cspace_->StateToSE3(x0);
   Matrix4 dp0 = cspace_->SE3Derivative(uSE3);
@@ -609,8 +645,8 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
     }
   }
 
-  cbounds.setLow(NdimControl+1,0.01);//propagation step size
-  cbounds.setHigh(NdimControl+1,0.1);
+  cbounds.setLow(NdimControl,0.01);//propagation step size
+  cbounds.setHigh(NdimControl,0.10);
 
   control_cspace->setBounds(cbounds);
 
@@ -624,8 +660,8 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
-  ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
+  ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
 
   //###########################################################################
@@ -663,35 +699,34 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   bool solved = false;
   double solution_time = dInf;
-  double duration = 1200.0;
+  double duration = 2000.0;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
 
   //###########################################################################
   // benchmark instead
   //###########################################################################
-  ot::Benchmark benchmark(ss, "IrreducibleBenchmarkPipes");
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
+  // ot::Benchmark benchmark(ss, "IrreducibleBenchmarkPipes");
+  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
+  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
+  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 
-  ot::Benchmark::Request req;
-  req.maxTime = duration;
-  req.maxMem = 10000.0;
-  req.runCount = 10;
-  req.displayProgress = true;
+  // ot::Benchmark::Request req;
+  // req.maxTime = duration;
+  // req.maxMem = 10000.0;
+  // req.runCount = 100;
+  // req.displayProgress = true;
 
-  benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2, &cspace));
+  // benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2, &cspace));
   
-  benchmark.benchmark(req);
-  benchmark.saveResultsToFile();
+  // benchmark.benchmark(req);
+  // benchmark.saveResultsToFile();
 
   //###########################################################################
   // solve
   //###########################################################################
   ob::PlannerStatus status = ss.solve(ptc);
   solved = ss.haveExactSolutionPath();
-
 
   //###########################################################################
   // extract roadmap
@@ -702,12 +737,14 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //std::cout << "Vertices: " << pd.numVertices() << std::endl;
 
   SerializeTree(pd);
-  SerializeTreeRandomlyCullPoints(_stree, 2000);
+  //SerializeTreeRandomlyCullPoints(_stree, 2000);
 
   //###########################################################################
   // extract solution path if solved
   //###########################################################################
 
+  solved = ss.haveSolutionPath();
+  //return approximate solution
   if (solved)
   {
     std::cout << std::string(80, '-') << std::endl;
