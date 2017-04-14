@@ -16,8 +16,9 @@
 #include "info.h"
 #include "controller.h"
 #include "gui.h"
-#include "planner/planner_ompl_irreducible.h"
-#include "plannersetup/plannersetup_sentinel_pipe_irreducible.h"
+#include "planner/planner_ompl.h"
+
+#include "plannersetup/plannersetup_snake_underwater.h"
 
 int main(int argc,const char** argv) {
   RobotWorld world;
@@ -25,28 +26,29 @@ int main(int argc,const char** argv) {
   ForceFieldBackend backend(&world);
   //SimTestBackend backend(&world);
   WorldSimulation& sim=backend.sim;
+  sim.odesim.SetGravity(Vector3(0,0,0));
+  world.background = GLColor(1,1,1);
 
-  //############################################################################
-
-  PlannerSetupSentinelPipeIrreducible setup(&world);
+  PlannerSetupSnakeUnderwater setup(&world);
   setup.LoadAndInitSim(backend);
   Config p_init = setup.GetInitialConfig();
   Config p_goal = setup.GetGoalConfig();
 
   //############################################################################
-  //free space planner
-  //############################################################################
 
-  MotionPlannerOMPLIrreducible planner(&world, &sim);
+  MotionPlannerOMPL planner(&world, &sim);
 
   if(planner.solve(p_init, p_goal)){
     std::vector<Config> keyframes = planner.GetKeyframes();
     backend.AddPath(keyframes);
+    //void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);
   }
+  backend.ShowCoordinateAxes();
+  backend.ShowRobot();
 
-  //backend.VisualizeStartGoal(p_init, p_goal);
+  backend.VisualizeStartGoal(p_init, p_goal);
   backend.VisualizePlannerTree(planner.GetTree());
-  backend.Save("sentinel_pipe.xml");
+  backend.Save("snake_underwater.xml");
   //backend.Load("kinodynamic_solution_tunnel_environment.xml");
 
   ////############################################################################

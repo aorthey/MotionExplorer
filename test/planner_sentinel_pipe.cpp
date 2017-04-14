@@ -88,14 +88,14 @@ int main(int argc,const char** argv) {
 
   if(planner.solve(p_init, p_goal)){
     std::vector<Config> keyframes = planner.GetKeyframes();
-    backend.VisualizePathSweptVolume(keyframes);
+    backend.AddPath(keyframes);
 
     //void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);
   }
 
   backend.VisualizeStartGoal(p_init, p_goal);
   backend.VisualizePlannerTree(planner.GetTree());
-  backend.Save("sentinel_pipe.xml");
+  //backend.Save("sentinel_pipe.xml");
   //backend.Load("kinodynamic_solution_tunnel_environment.xml");
 
   ////############################################################################
