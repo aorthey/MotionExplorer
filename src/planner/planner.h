@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "planner/serialized_tree.h"
+#include "planner/planner_output.h"
 
 struct PlannerSettings{
   const uint iterations = 1e3;
@@ -28,11 +29,12 @@ struct PlannerSettings{
 class MotionPlanner{
 
   protected:
+
     PlannerSettings plannersettings;
     RobotWorld *_world;
+    Robot *robot;
     int _irobot;
     int _icontroller;
-    WorldSimulation *_sim;
     Config _p_init;
     Config _p_goal;
     bool _isSolved;
@@ -42,12 +44,16 @@ class MotionPlanner{
     std::vector<Config> _keyframes;
     SerializedTree _stree;
 
+    PlannerOutput pout;
+
   public:
 
-    explicit MotionPlanner(RobotWorld *world, WorldSimulation *sim);
+    explicit MotionPlanner(RobotWorld *world);
     const KinodynamicMilestonePath& GetPath();
     const std::vector<Config>& GetKeyframes();
     const SerializedTree& GetTree();
+
+
     void SerializeTree( const RoadmapPlanner& graph, SerializedTree& stree);
     void SerializeTree( const KinodynamicTree& tree, SerializedTree& stree);
     void SerializeTree( const KinodynamicTree::Node* node, SerializedTree &stree);
@@ -62,9 +68,6 @@ class MotionPlanner{
     bool IsFeasible(Robot *robot, SingleRobotCSpace &cspace, Config &q);
 
     virtual std::string getName();
-    //virtual Roadmap GetRoadmap() = 0;
-    //virtual Path GetPath() = 0;
-    //virtual Roadmap GetPath() = 0;
     virtual bool Save(const char* file=NULL);
     virtual bool Save(TiXmlElement *node);
     virtual bool Load(const char* file);

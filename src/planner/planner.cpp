@@ -3,9 +3,17 @@
 #include "cspace_sentinel.h"
 #include "cspace_epsilon_neighborhood.h"
 
-MotionPlanner::MotionPlanner(RobotWorld *world, WorldSimulation *sim):
-  _world(world),_sim(sim)
+MotionPlanner::MotionPlanner(RobotWorld *world):
+  _world(world)
 {
+
+  //make sure that there is only one robot in the world
+  uint Nrobots = world->robots.size();
+  if(Nrobots>1){
+    std::cout << "Current planner only supports 1 robot! selected " << Nrobots << " robots." << std::endl;
+    exit(0);
+  }
+
   _irobot = 0;
   _icontroller = 0;
 }
@@ -491,9 +499,7 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   this->_p_goal = p_goal;
   this->_timelimit = timelimit;
   this->_shortcutting = shortcutting;
-  Robot *robot = _world->robots[_irobot];
   robot->UpdateConfig(_p_init);
-  util::SetSimulatedRobot(robot,*_sim,_p_init);
   this->_world->InitCollisions();
 
   std::cout << std::string(80, '-') << std::endl;
@@ -679,13 +685,13 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
 
 void MotionPlanner::SendCommandStringController(string cmd, string arg)
 {
-  if(!_sim->robotControllers[_icontroller]->SendCommand(cmd,arg)) {
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "ERROR in controller commander" << std::endl;
-    std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
-    std::cout << std::string(80, '-') << std::endl;
-    throw "Controller command not supported!";
-  }
+  //if(!_sim->robotControllers[_icontroller]->SendCommand(cmd,arg)) {
+  //  std::cout << std::string(80, '-') << std::endl;
+  //  std::cout << "ERROR in controller commander" << std::endl;
+  //  std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
+  //  std::cout << std::string(80, '-') << std::endl;
+  //  throw "Controller command not supported!";
+  //}
 }
 bool MotionPlanner::SendToController()
 {
@@ -715,8 +721,6 @@ bool MotionPlanner::SendToController()
   //}
 
   std::cout << "Sending Path to Controller" << std::endl;
-  //Robot *robot = _world->robots[_irobot];
-  //util::SetSimulatedRobot(robot,*_sim,_p_init);
   //robot->UpdateConfig(_p_goal);
   std::cout << "Done Path to Controller" << std::endl;
   return true;

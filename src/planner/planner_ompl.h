@@ -56,7 +56,7 @@ Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob:
 class MotionPlannerOMPL: public MotionPlanner
 {
   public:
-    MotionPlannerOMPL(RobotWorld *world, WorldSimulation *sim);
+    MotionPlannerOMPL(RobotWorld *world);
     void SerializeTree(ob::PlannerData &pd);
     virtual bool solve(Config &p_init, Config &p_goal);
 

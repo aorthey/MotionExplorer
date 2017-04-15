@@ -44,7 +44,7 @@
 class MotionPlannerOMPLIrreducible: public MotionPlannerOMPL
 {
   public:
-    MotionPlannerOMPLIrreducible(RobotWorld *world, WorldSimulation *sim);
+    MotionPlannerOMPLIrreducible(RobotWorld *world);
     virtual bool solve(Config &p_init, Config &p_goal);
 };
 

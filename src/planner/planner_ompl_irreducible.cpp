@@ -1,10 +1,11 @@
 #include "cspace_sentinel.h"
 #include "planner/planner_ompl_irreducible.h"
 
-MotionPlannerOMPLIrreducible::MotionPlannerOMPLIrreducible(RobotWorld *world, WorldSimulation *sim):
-  MotionPlannerOMPL(world,sim)
+MotionPlannerOMPLIrreducible::MotionPlannerOMPLIrreducible(RobotWorld *world):
+  MotionPlannerOMPL(world)
 {
 }
+
 ob::OptimizationObjectivePtr getThresholdPathLengthObj2(const ob::SpaceInformationPtr& si)
 {
   ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
@@ -130,7 +131,6 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   Robot *robot = _world->robots[_irobot];
   robot->UpdateConfig(_p_init);
 
-  util::SetSimulatedRobot(robot,*_sim,_p_init);//TODO: outsource sim
   this->_world->InitCollisions();
 
   std::cout << std::string(80, '-') << std::endl;

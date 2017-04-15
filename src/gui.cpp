@@ -52,7 +52,6 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawPathStartGoal.clear();
 
 
-  _mats.clear();
   _frames.clear();
   swept_volume_paths.clear();
 }
@@ -212,7 +211,6 @@ bool ForceFieldBackend::Load(TiXmlElement *node)
 
   _stree.clear();
   _keyframes.clear();
-  _mats.clear();
   planner_p_goal.setZero();
   planner_p_init.setZero();
 

@@ -282,8 +282,8 @@ bool MotionPlannerOMPLValidityChecker::isValid(const ob::State* state) const
   return _space->IsFeasible(q);
 }
 
-MotionPlannerOMPL::MotionPlannerOMPL(RobotWorld *world, WorldSimulation *sim):
-  MotionPlanner(world,sim)
+MotionPlannerOMPL::MotionPlannerOMPL(RobotWorld *world):
+  MotionPlanner(world)
 {
 }
 void MotionPlannerOMPL::testSE3(KinodynamicCSpaceSentinelAdaptor &cspace)
@@ -586,7 +586,6 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   Robot *robot = _world->robots[_irobot];
   robot->UpdateConfig(_p_init);
 
-  util::SetSimulatedRobot(robot,*_sim,_p_init);//TODO: outsource sim
   this->_world->InitCollisions();
 
   std::cout << std::string(80, '-') << std::endl;

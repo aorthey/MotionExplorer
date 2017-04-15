@@ -26,17 +26,18 @@ class ForceFieldBackend : public SimTestBackend
     vector<IKGoal> _constraints;
     vector<int> _linksInCollision;
     string _robotname;
+    //##########################################################################
     SerializedTree _stree;
     vector<GLDraw::GeometryAppearance> _appearanceStack;
 
+    //##########################################################################
     std::vector<SweptVolume> swept_volume_paths;
 
     //swept volume
     Config planner_p_init, planner_p_goal;
-    std::vector<std::vector<Matrix4> > _mats;
     vector<Config> _keyframes;
-    vector<uint> _milestonekeyframe_indices;
 
+    //##########################################################################
     vector< vector<Vector3> > _frames;
     vector< double > _frameLength;
   public:

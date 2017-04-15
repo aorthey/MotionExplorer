@@ -20,6 +20,7 @@
 
 int main(int argc,const char** argv) {
   RobotWorld world;
+
   Info info;
   ForceFieldBackend backend(&world);
   //SimTestBackend backend(&world);

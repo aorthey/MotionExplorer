@@ -421,7 +421,7 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [x] run ompl PDST/KPIECE /w def proj
  [x] compute irreducible projection from SE(3) path
 
- [ ] GUI: save current robot state too, not only init/goal of planner
+ [x] GUI: save current robot state too, not only init/goal of planner
  [x] remove torsion while computing irreducible projection
  [x] reimplement irreducible projection in cpp, make it cleaner
  [x] refactor path_pwl_euclid
@@ -430,12 +430,13 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [x] make the environment easier to compute for rigid body planning (widen the inner hole maybe!?)
  [x] outsource swept volume to seperate elements file
  [ ] boost graph instead of serialized tree?
- [ ] refactor planner 
- [ ] find distance to goal for planner output OMPL (how approximate is the solution)
- [ ] toggle mesh/faces of objects with keyboard
+ [x] find distance to goal for planner output OMPL (how approximate is the solution)
+ [x] toggle mesh/faces of objects with keyboard
  [x] add edges to planner tree visualization
  [ ] create sweptvolumeGUI + forcefieldGUI 
  [ ] save all swept volumes when saving GUI, rewrite all Load/Save functions
+ [ ] refactor planner -> use PlannerOutput to store path/roadmap and use
+PlannerOutput as Input to GUI to shadow the internal things.
 
 -- abstractions (longterm goals)
 
