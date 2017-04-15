@@ -428,13 +428,13 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [x] compute projection irreducible for N branches
  [x] extend environment by a new pipe upward curved plus box connector
  [x] make the environment easier to compute for rigid body planning (widen the inner hole maybe!?)
- [ ] boost graph instead of serialized tree
+ [x] outsource swept volume to seperate elements file
+ [ ] boost graph instead of serialized tree?
  [ ] refactor planner 
  [ ] find distance to goal for planner output OMPL (how approximate is the solution)
  [ ] toggle mesh/faces of objects with keyboard
  [x] add edges to planner tree visualization
  [ ] create sweptvolumeGUI + forcefieldGUI 
- [ ] outsource swept volume to seperate elements file
  [ ] save all swept volumes when saving GUI, rewrite all Load/Save functions
 
 -- abstractions (longterm goals)
@@ -483,11 +483,11 @@ model?) -> one of the cylinders pierced the head sphere creating a spurious coll
  [ ] repeat Nbranch experiments because wrong stepsize was used!
  [ ] repeat irreducible experiments using updated curvature!
 
- [ ] repeat experiments with 20 min time frame?
- [ ] repeat experiments with 20 min time frame, curvature = 2.22 and propagation step size in [0.01,0.1]
+ [ ] repeat experiments with 20 min time frame? (todo)
+ [ ] repeat experiments with 20 min time frame, curvature = 2.22 and propagation step size in [0.01,0.1] (running)
 
- [ ] experiment 3d snake underwater, 20min, curvature = 1.57, propagation step size [0.01,0.1]
- [ ] experiment 3d snake underwater, 20min
+ [ ] experiment 3d snake underwater, 20min, curvature = 1.57, propagation step size [0.01,0.1] (todo)
+ [ ] experiment 3d snake underwater, 20min (todo)
 
  [ ] rewrite introduction and experimental part
  [ ] Corner Experiment: too big

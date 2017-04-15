@@ -419,87 +419,6 @@ void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, con
   _frameLength.push_back(frameLength);
 }
 
-//void ForceFieldBackend::VisualizePathSweptVolumeAtPosition(const Config &q)
-//{
-//  Robot *robot = world->robots[0];
-//  if(!robot->InJointLimits(q)){
-//    std::cout << "trying to set an outer limit config" << std::endl;
-//    std::cout << "minimum       :" << robot->qMin << std::endl;
-//    std::cout << "configuration :" << q << std::endl;
-//    std::cout << "maximum       :" << robot->qMax << std::endl;
-//    exit(0);
-//  }
-//  robot->UpdateConfig(q);
-//  std::vector<Matrix4> mats_config;
-//
-//  for(size_t i=0;i<robot->links.size();i++) {
-//    Matrix4 mat = robot->links[i].T_World;
-//    mats_config.push_back(mat);
-//  }
-//  _mats.push_back(mats_config);
-//  _keyframes.push_back(q);
-//}
-//
-//void ForceFieldBackend::VisualizePathSweptVolume(const MultiPath &path)
-//{
-//  Robot *robot = world->robots[0];
-//
-//  Config qt;
-//  path.Evaluate(0, qt);
-//
-//  double dstep = 0.01;
-//  double d = 0;
-//
-//  while(d <= 1)
-//  {
-//    d+=dstep;
-//    Config qtn;
-//    path.Evaluate(d, qtn);
-//    if((qt-qtn).norm() >= sweptVolume_q_spacing)
-//    {
-//      VisualizePathSweptVolumeAtPosition(qtn);
-//      qt = qtn;
-//    }
-//  }
-//  if(DEBUG) std::cout << "[SweptVolume] #waypoints " << _mats.size() << std::endl;
-//}
-
-
-// void ForceFieldBackend::VisualizePathSweptVolume(const KinodynamicMilestonePath &path)
-// {
-//   Robot *robot = world->robots[0];
-
-//   Config qt;
-//   path.Eval(0, qt);
-
-//   double dstep = 0.01;
-//   double d = 0;
-
-//   while(d <= 1)
-//   {
-//     d+=dstep;
-//     Config qtn;
-//     path.Eval(d, qtn);
-//     //std::cout << d << qtn << std::endl;
-//     if((qt-qtn).norm() >= sweptVolume_q_spacing)
-//     {
-//       VisualizePathSweptVolumeAtPosition(qtn);
-//       qt = qtn;
-//     }
-//   }
-//   drawPath = 1;
-// }
-// void ForceFieldBackend::VisualizePathSweptVolume(const std::vector<Config> &keyframes)
-// {
-//   Robot *robot = world->robots[0];
-//   _keyframes.clear();
-//   _mats.clear();
-//   for(int i = 0; i < keyframes.size(); i++)
-//   {
-//     VisualizePathSweptVolumeAtPosition(keyframes.at(i));
-//   }
-//   drawPath = 1;
-// }
 void ForceFieldBackend::AddPath(const std::vector<Config> &keyframes, GLColor color, uint Nkeyframes_alongpath)
 {
   Robot *robot = world->robots[0];
@@ -552,6 +471,10 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     }
     SendLinearPath(times,_keyframes);
 
+  }else if(cmd=="draw_rigid_objects_faces_toggle") {
+    toggle(drawRigidObjectsFaces);
+  }else if(cmd=="draw_rigid_objects_edges_toggle") {
+    toggle(drawRigidObjectsEdges);
   }else if(cmd=="load_motion_planner") {
     std::cout << "loading file " << args.c_str() << std::endl;
   }else if(cmd=="save_motion_planner") {
@@ -559,7 +482,8 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else{
     return BaseT::OnCommand(cmd,args);
   }
-  return BaseT::OnCommand(cmd,args);
+  SendRefresh();
+  return true;
 }
 //############################################################################
 //############################################################################
@@ -659,20 +583,48 @@ bool GLUIForceFieldGUI::Initialize()
   checkbox->set_int_val(_backend->drawRobotExtras);
 
   UpdateGUI();
+
+//################################################################################
+  //KEYMAPS
+  //add keymaps to GUI (TODO: vimerize and make it automatically appear in -h)
+  //Handle_Keypress: show keymap on -h
+  //Backend::OnCommand: handle the action
+//################################################################################
+
+  AddToKeymap("r","reset");
+  AddToKeymap("f","draw_rigid_objects_faces_toggle");
+  AddToKeymap("e","draw_rigid_objects_edges_toggle");
+  AddToKeymap("s","toggle_simulate");
+
   return true;
 
 }
+void GLUIForceFieldGUI::AddToKeymap(const char *key, const char *s){
+  AnyCollection c;
+  std::string type =  "{type:key_down,key:"+std::string(key)+"}";
+  bool res=c.read(type.c_str());
+  Assert(res == true);
+  AddCommandRule(c,s,"");
 
-bool GLUIForceFieldGUI::OnCommand(const string& cmd,const string& args)
-{
-  return BaseT::OnCommand(cmd,args);
+  std::string descr(s);
+  descr = std::regex_replace(descr, std::regex("_"), " ");
+
+  //_keymap[key] = descr.c_str();
+  _keymap[key] = descr;
 }
 
 void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
 {
     switch(c) {
       case 'h':
-        printf("S: save motion planner \n");
+        BaseT::Handle_Keypress(c,x,y);
+
+        std::cout << "--- swept volume" << std::endl;
+        for (Keymap::iterator it=_keymap.begin(); it!=_keymap.end(); ++it){
+          std::cout << it->first << ": " << it->second << '\n';
+        }
+
+        //printf("save motion planner \n");
         break;
       default:
         BaseT::Handle_Keypress(c,x,y);

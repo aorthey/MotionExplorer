@@ -1,5 +1,6 @@
 #pragma once
 
+#include <regex>
 #include <Interface/SimTestGUI.h>
 #include <Modeling/MultiPath.h>
 #include <KrisLibrary/robotics/IK.h>
@@ -38,7 +39,6 @@ class ForceFieldBackend : public SimTestBackend
 
     vector< vector<Vector3> > _frames;
     vector< double > _frameLength;
-
   public:
 
   ForceFieldBackend(RobotWorld *world);
@@ -98,6 +98,11 @@ class ForceFieldBackend : public SimTestBackend
   int drawRigidObjects;
   int drawRigidObjectsEdges;
   int drawRigidObjectsFaces;
+
+  void toggle(int &k){
+    if(k) k=0;
+    else k=1;
+  }
 };
 
 
@@ -107,11 +112,14 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
     typedef GLUISimTestGUI BaseT;
     GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _world);
     virtual bool Initialize();
-    virtual bool OnCommand(const string& cmd,const string& args);
+    //virtual bool OnCommand(const string& cmd,const string& args);
     virtual void Handle_Keypress(unsigned char c,int x,int y);
+    void AddToKeymap(const char *key, const char *s);
 
     void browser_control(int control);
   private:
+    typedef std::map<const char *, std::string> Keymap;
+    Keymap _keymap;
     GLUI_Panel* panel;
     GLUI_Checkbox* checkbox;
     GLUI_FileBrowser *browser;

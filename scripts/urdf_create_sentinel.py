@@ -13,7 +13,7 @@ Nsegments = 6
 Nbranches = 8
 aperture = 0.4 ## aperture of bouquet of branches
 limit = pi/2
-name = 'sentinel_complete'
+name = 'sentinel_pipedreamin_complete'
 #env_name = 'tunnel/tunnel_branch2.tri'
 env_name = 'pipes/pipedreamin.tri'
 
