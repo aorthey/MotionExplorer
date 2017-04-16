@@ -481,17 +481,16 @@ model?) -> one of the cylinders pierced the head sphere creating a spurious coll
  [x] probably bug in postprocess event of benchmark
  [x] display two paths in different colors, one irreducible (magenta or green?), one reducible (red?)
 
- [ ] repeat Nbranch experiments because wrong stepsize was used!
- [ ] repeat irreducible experiments using updated curvature!
+ [x] repeat Nbranch experiments because wrong stepsize was used!
+ [x] repeat irreducible experiments using updated curvature!
 
  [ ] repeat experiments with 20 min time frame? (todo)
- [ ] repeat experiments with 20 min time frame, curvature = 2.22 and propagation step size in [0.01,0.1] (running)
+ [x] repeat experiments with 20 min time frame, curvature = 2.22 and propagation step size in [0.01,0.1] (running)
 
  [ ] experiment 3d snake underwater, 20min, curvature = 1.57, propagation step size [0.01,0.1] (todo)
  [ ] experiment 3d snake underwater, 20min (todo)
 
  [ ] rewrite introduction and experimental part
- [ ] Corner Experiment: too big
  [ ] Underwater Experiment: strange texture, make that better, also it takes too
 long for Nbranch planner to converge or to converge at all. make that easier?
 otherwise not much difference to pipes
