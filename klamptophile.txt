@@ -450,7 +450,7 @@ configs, and be able to run different algorithms to find a solution. Then be
 able to save/delete solution paths. So that we can display several output paths
 as swept volumes simultaneously
       [ ] be able to load different landscapes + plannersettings from simulator 
-      [ ] screenshots
+      [x] screenshots
       [x] display plannersettings (text+start/goal configs)
 
  [ ] do benchmark planning from inside the simulator by clicking together
@@ -463,6 +463,7 @@ then display them, then deform them, then to save those paths.
  [ ] visualize planner tree with millions of nodes without lags
  [ ] have vim-keybindings to quickly move around, save/load, screenshots,
 display tree/start/goal/swept volumes, do planning
+ [ ] EnvironmentLoader should be merged with Backend, so that we can load/save inside
 
 -- wrench fields
 

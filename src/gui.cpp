@@ -499,6 +499,9 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     toggle(drawPlannerTree);
   }else if(cmd=="load_motion_planner") {
     std::cout << "loading file " << args.c_str() << std::endl;
+
+
+
   }else if(cmd=="save_motion_planner") {
     std::cout << "saving file " << args.c_str() << std::endl;
   }else if(cmd=="print_config") {
@@ -578,16 +581,19 @@ bool GLUIForceFieldGUI::Initialize()
   GLUI_Button* button;
   button = glui->add_button_to_panel(panel,">> Save state");
   AddControl(button, "save_motion_planner");
+
   button = glui->add_button_to_panel(panel,">> Load state");
   AddControl(button, "load_motion_planner");
 
   glui->add_button_to_panel(panel,"Quit",0,(GLUI_Update_CB)exit);
-  //browser = new GLUI_FileBrowser(panel, "Loading New State", false, 1, 
-      //static_cast<void(GLUIForceFieldGUI::*)(int)>(&GLUIForceFieldGUI::browser_control));
+
+  //browser = new GLUI_FileBrowser(panel, "Loading New State", false, 1, browser_control);
   //browser->set_h(100);
   //browser->set_w(100);
   //browser->set_allow_change_dir(0);
   //browser->fbreaddir("../data/gui");
+  //file_name = fb->get_file();
+
 
   panel = glui->add_rollout("Fancy Decorations");
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Coordinate Axes");
@@ -610,7 +616,7 @@ bool GLUIForceFieldGUI::Initialize()
 
 //################################################################################
   //KEYMAPS
-  //add keymaps to GUI (TODO: vimerize and make it automatically appear in -h)
+  //add keymaps to GUI
   //Handle_Keypress: show keymap on -h
   //Backend::OnCommand: handle the action
 //################################################################################
@@ -623,9 +629,38 @@ bool GLUIForceFieldGUI::Initialize()
   AddToKeymap("t","draw_planner_tree_toggle");
   AddToKeymap("S","make_screenshot");
 
+  AddButton("load_motion_planner");
+  AddButton("save_motion_planner");
+  AddButton("quit");
+//
+//              "{type:button_press,button:simulate}","toggle_simulate","",
+//            "{type:button_press,button:reset}","reset","",
+//            "{type:button_press,button:set_milestone}","command_pose","",
+//            "{type:button_toggle,button:pose_ik_mode,checked:1}","constrain_point_mode","",
+//            "{type:button_toggle,button:pose_ik,checked:0}","pose_mode","",
+//            "{type:button_toggle,button:force_application_mode,checked:1}","force_application_mode","",
+//            "{type:button_toggle,button:force_application_mode,checked:0}","pose_mode","",
+//            "{type:button_toggle,button:do_logging,checked:1}","log_sim","simtest_log.csv",
+//            "{type:button_toggle,button:do_logging,checked:0}","log_sim","",
+//            "{type:button_toggle,button:do_contact_state_logging,checked:1}","log_contact_state","simtest_contact_log.csv",
+//            "{type:button_toggle,button:do_contact_state_logging,checked:0}","log_contact_state","",
+//            "{type:button_toggle,button:do_contact_wrench_logging,checked:1}","log_contact_wrenches","simtest_wrench_log.csv",
+//            "{type:button_toggle,button:do_contact_wrench_logging,checked:0}","log_contact_wrenches","",
+
+
   return true;
 
 }
+
+void GLUIForceFieldGUI::AddButton(const char *key){
+  AnyCollection c;
+  std::string type =  "{type:button_press,button:"+std::string(key)+"}";
+  bool res=c.read(type.c_str());
+  Assert(res == true);
+  AddCommandRule(c,key,"");
+
+}
+
 void GLUIForceFieldGUI::AddToKeymap(const char *key, const char *s){
   AnyCollection c;
   std::string type =  "{type:key_down,key:"+std::string(key)+"}";

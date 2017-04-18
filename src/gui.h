@@ -124,6 +124,7 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
     //virtual bool OnCommand(const string& cmd,const string& args);
     virtual void Handle_Keypress(unsigned char c,int x,int y);
     void AddToKeymap(const char *key, const char *s);
+    void AddButton(const char *key);
 
     void browser_control(int control);
   private:
