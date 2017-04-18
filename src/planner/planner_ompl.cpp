@@ -9,7 +9,6 @@ ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformatio
   return obj;
 }
 
-
 GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot)
 {
   //###########################################################################
@@ -670,12 +669,12 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   ss.setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
   ss.setStatePropagator(cpropagate);
 
-  double epsilon = 0.5;
+  //double epsilon = 0.01*robot->q.size();
+  double epsilon = 2.0;
 
   ss.setStartAndGoalStates(start, goal, epsilon);
   ss.setup();
   ss.setPlanner(ompl_planner);
-
   ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
 
   //set objective to infinite path to just return first solution
@@ -704,22 +703,22 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   // benchmark instead
   //###########################################################################
-  ot::Benchmark benchmark(ss, "BenchmarkPipes");
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
+  //ot::Benchmark benchmark(ss, "BenchmarkPipes");
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 
-  ot::Benchmark::Request req;
-  req.maxTime = duration;
-  req.maxMem = 10000.0;
-  req.runCount = 100;
-  req.displayProgress = true;
+  //ot::Benchmark::Request req;
+  //req.maxTime = duration;
+  //req.maxMem = 10000.0;
+  //req.runCount = 100;
+  //req.displayProgress = true;
 
-  benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2, &cspace));
-  
-  benchmark.benchmark(req);
-  benchmark.saveResultsToFile();
+  //benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2, &cspace));
+  //
+  //benchmark.benchmark(req);
+  //benchmark.saveResultsToFile();
 
   //###########################################################################
   // solve
@@ -748,6 +747,8 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   {
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Found solution:" << std::endl;
+    std::cout << " exact solution       : " << (pdef->hasExactSolution()? "Yes":"No")<< std::endl;
+    std::cout << " approximate solution : " << (pdef->hasApproximateSolution()? "Yes":"No")<< std::endl;
     oc::PathControl path_control = ss.getSolutionPath();
     og::PathGeometric path = path_control.asGeometric();
     std::cout << "Path Length     : " << path.length() << std::endl;

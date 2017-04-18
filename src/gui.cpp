@@ -198,6 +198,16 @@ void ForceFieldBackend::RenderWorld()
   
 
 }//RenderWorld
+ 
+void ForceFieldBackend::RenderScreen(){
+  BaseT::RenderScreen();
+  std::string line;
+  line = "Robot       : "+_robotname;
+  DrawText(20,60,line);
+  line = "Environment : ";
+  DrawText(20,80,line);
+
+}
 
 void ForceFieldBackend::VisualizeStartGoal(const Config &p_init, const Config &p_goal)
 {
@@ -438,6 +448,18 @@ void ForceFieldBackend::SetIKCollisions( vector<int> linksInCollision )
   _linksInCollision = linksInCollision;
   drawIKextras = 1;
 }
+
+void ForceFieldBackend::DrawText(int x,int y, std::string s)
+{
+  void* font = GLUT_BITMAP_HELVETICA_18;
+  glColor3f(0,0,0);
+  glDisable(GL_LIGHTING);
+  glDisable(GL_DEPTH_TEST);
+  glRasterPos2i(x,y);
+  glutBitmapString(font,s.c_str());
+  glEnable(GL_DEPTH_TEST);
+}
+
 bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
   std::cout << "OnCommand: " << cmd << std::endl;
@@ -473,10 +495,14 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     toggle(drawRigidObjectsFaces);
   }else if(cmd=="draw_rigid_objects_edges_toggle") {
     toggle(drawRigidObjectsEdges);
+  }else if(cmd=="draw_planner_tree_toggle"){
+    toggle(drawPlannerTree);
   }else if(cmd=="load_motion_planner") {
     std::cout << "loading file " << args.c_str() << std::endl;
   }else if(cmd=="save_motion_planner") {
     std::cout << "saving file " << args.c_str() << std::endl;
+  }else if(cmd=="print_config") {
+    std::cout << world->robots[0]->q <<std::endl;
   }else{
     return BaseT::OnCommand(cmd,args);
   }
@@ -593,6 +619,9 @@ bool GLUIForceFieldGUI::Initialize()
   AddToKeymap("f","draw_rigid_objects_faces_toggle");
   AddToKeymap("e","draw_rigid_objects_edges_toggle");
   AddToKeymap("s","toggle_simulate");
+  AddToKeymap("p","print_config");
+  AddToKeymap("t","draw_planner_tree_toggle");
+  AddToKeymap("S","make_screenshot");
 
   return true;
 
@@ -624,11 +653,22 @@ void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
 
         //printf("save motion planner \n");
         break;
+
+      case 'S':
+        {
+          SaveScreenshot();
+          std::size_t pos = screenshotFile.find(".ppm");
+          std::string outpng = screenshotFile.substr(0,pos)+".png";
+          std::string cmd = "convert "+screenshotFile+" "+outpng;
+          system(cmd.c_str());
+          cmd = "rm -rf "+screenshotFile;
+          system(cmd.c_str());
+          IncrementStringDigits(screenshotFile);
+          break;
+        }
+
       default:
         BaseT::Handle_Keypress(c,x,y);
     }
 }
-
-
-
 

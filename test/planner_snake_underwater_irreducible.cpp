@@ -17,7 +17,6 @@
 #include "controller.h"
 #include "gui.h"
 #include "planner/planner_ompl_irreducible.h"
-
 #include "plannersetup/plannersetup_snake_underwater_irreducible.h"
 
 int main(int argc,const char** argv) {

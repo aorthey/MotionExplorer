@@ -393,7 +393,6 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] Compute SE constraints, what is GIWC equivalent?
  [ ] smoothing after path planning
  [ ] make a Klampt Interface where to set all properties like background color etc
- [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
  [ ] screenshots x_X?
  [ ] refactor kinodynamic planner to make it independent from path planner
  [ ] refactor planner settings
@@ -436,7 +435,12 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] create sweptvolumeGUI + forcefieldGUI 
  [ ] save all swept volumes when saving GUI, rewrite all Load/Save functions
  [ ] refactor planner -> use PlannerOutput to store path/roadmap and use
-PlannerOutput as Input to GUI to shadow the internal things.
+PlannerOutput as Input to GUI to shadow the internal things. Also put the
+plannersettings into the xml, so that we can load planner+start/goal config
+without recompiling. Delete the whole plannersetup folder!
+ [ ] enbable/disable swept volume of certain links.
+ [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
+      andreas dziegielewski http://acg.cs.tau.ac.il/projects/swept-volume/project-page seems promising
 
 -- abstractions (longterm goals)
 
@@ -445,6 +449,10 @@ PlannerOutput as Input to GUI to shadow the internal things.
 configs, and be able to run different algorithms to find a solution. Then be
 able to save/delete solution paths. So that we can display several output paths
 as swept volumes simultaneously
+      [ ] be able to load different landscapes + plannersettings from simulator 
+      [ ] screenshots
+      [x] display plannersettings (text+start/goal configs)
+
  [ ] do benchmark planning from inside the simulator by clicking together
 algorithms and #runs and duration. Have a default benchmarking plus dump
 everything to nice pdf graph / latex table.
@@ -499,7 +507,7 @@ otherwise not much difference to pipes
  [ ] design one turbine scenario with a large room (which can be used for wrench planning)
  [ ] design one centrifuge scenario (which can be used for wrench planning)
 
- [ ] add one hard experiment where the method will break down, should be short so that any RRT can find a solution under 3600 seconds. 
+ [x] add one hard experiment where the method will break down, should be short so that any RRT can find a solution under 3600 seconds. 
 
  [ ] outsource planner setup to JSON file or xml (should be loadable in simulator)
 

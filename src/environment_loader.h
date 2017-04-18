@@ -8,6 +8,12 @@
 class EnvironmentLoader{
   private:
     std::string file_name;
+
+    std::string name_environment;
+    std::string name_robot;
+    std::string name;
+
+
     RobotWorld world;
     ForceFieldBackendPtr _backend;
     Info info;
@@ -34,7 +40,16 @@ class EnvironmentLoader{
       std::cout << "[EnvironmentLoader] loading from file " << file_name << std::endl;
 
       _backend = new ForceFieldBackend(&world);
-      _backend->LoadAndInitSim(file_name.c_str());
+      if(!_backend->LoadAndInitSim(file_name.c_str())){
+        std::cout << std::string(80, '-') << std::endl;
+        std::cout << std::endl;
+        std::cout << "ERROR:" << std::endl;
+        std::cout << std::endl;
+        std::cout << "XML file does not exists or corrupted: "<<xml_file << std::endl;
+        std::cout << std::endl;
+        std::cout << std::string(80, '-') << std::endl;
+        exit(0);
+      }
 
       uint Nrobots = world.robots.size();
       if(Nrobots!=1){
@@ -45,6 +60,10 @@ class EnvironmentLoader{
         std::cout << "Has the xml files been loaded multiple times?" << std::endl;
         exit(0);
       }
+      name_robot = world.robots[0]->name;
+      name_environment = world.rigidObjects[0]->name;
+      name = name_robot + "_" + name_environment;
+      std::cout << name << std::endl;
 
       info(&world);
 
@@ -65,15 +84,23 @@ class EnvironmentLoader{
       CheckNodeName(node, "world");
 
       TiXmlElement* plannersettings = FindSubNode(node, "plannersettings");
+
+      if(!plannersettings){
+        std::cout << "world xml file has no plannersettings" << std::endl;
+        return false;
+      }
+
       TiXmlElement* qinit = FindSubNode(plannersettings, "qinit");
       TiXmlElement* qgoal = FindSubNode(plannersettings, "qgoal");
       TiXmlElement* se3min = FindSubNode(plannersettings, "se3min");
       TiXmlElement* se3max = FindSubNode(plannersettings, "se3max");
+      TiXmlElement* algorithm = FindSubNode(plannersettings, "algorithm");
 
-      stringstream(qinit->Attribute("config") ) >> pin.q_init;
-      stringstream(qgoal->Attribute("config") ) >> pin.q_goal;
-      stringstream(se3min->Attribute("config"))  >> pin.se3min;
-      stringstream(se3max->Attribute("config"))  >> pin.se3max;
+      GetStreamAttribute(qinit,"config") >> pin.q_init;
+      GetStreamAttribute(qgoal,"config") >> pin.q_goal;
+      GetStreamAttribute(se3min,"config")  >> pin.se3min;
+      GetStreamAttribute(se3max,"config")  >> pin.se3max;
+      GetStreamAttribute(algorithm, "name") >> pin.name_algorithm;
 
       return true;
     }

@@ -8,12 +8,7 @@ MotionPlanner::MotionPlanner(RobotWorld *world):
 {
 
   //make sure that there is only one robot in the world
-  uint Nrobots = world->robots.size();
-  if(Nrobots>1){
-    std::cout << "Current planner only supports 1 robot! selected " << Nrobots << " robots." << std::endl;
-    exit(0);
-  }
-
+  assert(world->robots.size() == 1);
   _irobot = 0;
   _icontroller = 0;
 }
@@ -457,20 +452,22 @@ bool MotionPlanner::IsFeasible( Robot *robot, SingleRobotCSpace &cspace, Config 
     std::cout << std::string(80, '*') << std::endl;
     std::cout << "ERROR!" << std::endl;
     std::cout << std::string(80, '*') << std::endl;
-    cout<<"configuration is infeasible, violated constraints:"<<endl;
-    std::cout << q << std::endl;
     vector<bool> infeasible;
     cspace.CheckObstacles(q,infeasible);
+    uint N = 0;
     for(size_t i=0;i<infeasible.size();i++){
       if(!infeasible[i]) cout<<"  ok "<<cspace.ObstacleName(i)<<endl;
       if(infeasible[i]){
+        N++;
         int icq = i - (int)robot->joints.size();
         cout<<"-->"<<cspace.ObstacleName(i) << " | pen-depth: ";
         cout << cspace.collisionQueries[icq].PenetrationDepth() << " | dist: ";
         cout << cspace.collisionQueries[icq].Distance(1e-3,1e-3) << std::endl;
       }
     }
-    std::cout << cspace.collisionQueries.size() << std::endl;
+    std::cout << N << "/" << cspace.collisionQueries.size() << " queries are in collision."<< std::endl;
+    cout<<"configuration is infeasible, violated "<<N<<" constraints:"<<endl;
+    std::cout << q << std::endl;
     std::cout << std::string(80, '*') << std::endl;
     return false;
   }

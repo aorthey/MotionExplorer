@@ -5,41 +5,41 @@ from math import cos,sin,pi,atan2
 from urdf_create import *
 
 
-names = ['snake_corner','snake_corner_irreducible','snake_underwater','snake_underwater_irreducible']
-env_names = ['corner/corner.tri','corner/corner.tri','underwater/underwater.tri','underwater/underwater.tri']
-Nsegments_vec = [9,1,9,1]
+robot_names = ['snake','snake_irreducible']
+env_names = ['twister/twister.tri','underwater/underwater.tri']
+Nsegments_vec = [9,1]
 
-for k in range(0,len(names)):
+length = 0.12
+limit = pi/4
+stublength = length/4
+radius = 0.01
+headradius = 0.1
+kappa = (2*sin(limit))/(length*Nsegments_vec[0])
 
-  length = 0.12
-  stublength = length/4
-  radius = 0.01
-  headradius = 0.1
-  Nsegments = 1
-  limit = pi/4
+for k in range(0,len(robot_names)):
+
+  robot_name = robot_names[k]
+
   lowerLimit=-limit
   upperLimit=limit
   radius_cylinder = headradius-headradius/4
-  name = names[k]
-  env_name = env_names[k]
+
   Nsegments = Nsegments_vec[k]
-  print name,env_name,Nsegments_vec[k]
+  print robot_name,Nsegments_vec[k]
   #sys.exit(0)
 
   sRadius = 2*radius
   config = ''
   folder=''
-  fname = folder+name+'.urdf'
-  xmlname = folder+name+'.xml'
+  fname = folder+robot_name+'.urdf'
   pathname = os.path.dirname(os.path.realpath(__file__))+'/../data/'
   pathname = os.path.abspath(pathname)+'/'
   fname = pathname + fname
-  xmlname = pathname + xmlname
 
   f = open(fname,'w')
 
   f.write('<?xml version="1.0"?>\n')
-  f.write('<robot name="'+name+'">\n')
+  f.write('<robot name="'+robot_name+'">\n')
 
   def createHead(headname):
     hstrs = createSphere("eye",0,0,0,headradius)
@@ -112,39 +112,54 @@ for k in range(0,len(names)):
   f.write('</robot>')
   f.close()
 
-  print "\nCreated new file >>",
+  print "\nCreated new robot >>",
   print fname
 
-  f = open(xmlname,'w')
-  f.write('<?xml version="1.0"?>\n\n')
-  f.write('<world>\n')
+  for env_name in env_names:
 
-  robotstr  = '  <robot name=\"'+name+'\"'
-  robotstr += ' file="'+str(fname)+'"'
-  robotstr += ' translation="0 0 0"'
-  robotstr += ' rotateRPY="0 0 0"'
-  robotstr += ' '+config+'/>\n\n'
-  f.write(robotstr)
+    base=os.path.basename(env_name)
+    env_singleword = os.path.splitext(base)[0]
+    xmlname = folder+robot_name+'_'+env_singleword+'.xml'
 
-  kappa = (2*sin(limit))/(length*Nsegments)
-  cmmntstr = '  <!-- Irreducible Curvature kappa ='+str(kappa)+' -->\n\n'
-  f.write(cmmntstr)
+    xmlname = pathname + xmlname
 
-  terrainstr  = '  <rigidObject '
-  terrainstr += ' name=\"'+str(env_name)+'\"'
-  terrainstr += ' file=\"/home/aorthey/git/orthoklampt/data/terrains/'+str(env_name)+'\"'
-  terrainstr += ' translation="0 0 0"/>\n\n'
-  f.write(terrainstr)
+    f = open(xmlname,'w')
+    f.write('<?xml version="1.0"?>\n\n')
+    f.write('<world>\n')
 
-  ctrlstr  = '  <simulation>\n'
-  ctrlstr += '    <globals maxContacts="20" />\n'
-  ctrlstr += '    <robot index="0">\n'
-  ctrlstr += '      <controller type="PolynomialPathController" />\n'
-  ctrlstr += '    </robot>\n'
-  ctrlstr += '  </simulation>\n\n'
-  f.write(ctrlstr)
-  f.write('</world>')
-  f.close()
+    robotstr  = '  <robot name=\"'+robot_name+'\"'
+    robotstr += ' file="'+str(fname)+'"'
+    robotstr += ' translation="0 0 0"'
+    robotstr += ' rotateRPY="0 0 0"'
+    robotstr += ' '+config+'/>\n\n'
+    f.write(robotstr)
 
-  print "\nCreated new file >>",
-  print xmlname
+    cmmntstr = '  <!-- Irreducible Curvature kappa ='+str(kappa)+' -->\n\n'
+    f.write(cmmntstr)
+
+    terrainstr  = '  <rigidObject '
+    terrainstr += ' name=\"'+str(env_name)+'\"'
+    terrainstr += ' file=\"/home/aorthey/git/orthoklampt/data/terrains/'+str(env_name)+'\"'
+    terrainstr += ' translation="0 0 0"/>\n\n'
+    f.write(terrainstr)
+
+    plannersettingsstr  = '  <plannersettings>\n\n'
+    plannersettingsstr += '    <qinit config="33  0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>\n'
+    plannersettingsstr += '    <qgoal config="33  2.3 0.7 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>\n'
+    plannersettingsstr += '    <se3min config="6  -6 -6 -1 -3.141592 -1.57 -3.14"/>\n'
+    plannersettingsstr += '    <se3max config="6  6 6 16 3.141592 1.57 3.14"/>\n\n'
+    plannersettingsstr += '  </plannersettings>\n\n'
+    f.write(plannersettingsstr)
+
+    ctrlstr  = '  <simulation>\n'
+    ctrlstr += '    <globals maxContacts="20" />\n'
+    ctrlstr += '    <robot index="0">\n'
+    ctrlstr += '      <controller type="PolynomialPathController" />\n'
+    ctrlstr += '    </robot>\n'
+    ctrlstr += '  </simulation>\n\n'
+    f.write(ctrlstr)
+    f.write('</world>')
+    f.close()
+
+    print "\nCreated new file >>",
+    print xmlname

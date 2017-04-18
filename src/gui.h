@@ -10,6 +10,8 @@
 #include <KrisLibrary/planning/KinodynamicMotionPlanner.h>
 #include <KrisLibrary/GLdraw/drawMesh.h>
 #include <KrisLibrary/GLdraw/GLError.h>
+#include <KrisLibrary/GLdraw/GLUTString.h>
+
 #include <View/ViewIK.h>
 #include <ode/ode.h>
 #include "planner/serialized_tree.h"
@@ -40,12 +42,14 @@ class ForceFieldBackend : public SimTestBackend
     //##########################################################################
     vector< vector<Vector3> > _frames;
     vector< double > _frameLength;
+
   public:
 
   ForceFieldBackend(RobotWorld *world);
   virtual void Start();
   virtual bool OnCommand(const string& cmd,const string& args);
   virtual void RenderWorld();
+  virtual void RenderScreen();
 
   virtual bool Save(const char* file=NULL);
   virtual bool Save(TiXmlElement *node);
@@ -64,6 +68,8 @@ class ForceFieldBackend : public SimTestBackend
   void HideCoordinateAxes(){ drawAxes = 0; }
   void ShowRobot(){ drawRobot = 1; }
   void HideRobot(){ drawRobot = 0; }
+  void ShowPlannerTree(){ drawPlannerTree = 1; }
+  void HidePlannerTree(){ drawPlannerTree = 0; }
 
   void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);
   void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
@@ -83,6 +89,8 @@ class ForceFieldBackend : public SimTestBackend
 
   void VisualizePlannerTree(const SerializedTree &tree);
   std::vector<Config> getKeyFrames();
+
+  void DrawText(int x,int y, std::string s);
 
   std::vector<int> drawPathSweptVolume;
   std::vector<int> drawPathMilestones;
@@ -125,4 +133,6 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
     GLUI_Checkbox* checkbox;
     GLUI_FileBrowser *browser;
 };
+
+typedef SmartPointer<ForceFieldBackend> ForceFieldBackendPtr;
 

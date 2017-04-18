@@ -1,26 +1,27 @@
 #include <Interface/SimTestGUI.h>
 #include <stdio.h>
+#include "gui.h"
+#include "info.h"
 
-
+#include "util.h"
+#include "environment_loader.h"
 int main(int argc,const char** argv) {
-  RobotWorld world;
-  SimTestBackend backend(&world);
-  WorldSimulation& sim=backend.sim;
 
-  //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/athlete_fractal_1.xml");
-  //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hrp2.xml");
-  //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_fractal_2.xml");
-  //backend.LoadAndInitSim("/home/aorthey/git/Klampt/data/hubo_fractal_3.xml");
-  //backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/hubo_object.xml");
-  //backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel/sentinel.xml");
-  //backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel.xml");
-  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/snake.xml");
-  Info info;
-  info(&world);
+  //file = "home/aorthey/git/orthoklampt/data/snake_turbine.xml";
 
-  GLUISimTestGUI gui(&backend,&world);
-  gui.SetWindowTitle("SimTest");
+  std::string file = "data/snake_turbine.xml";
+  EnvironmentLoader env = EnvironmentLoader(file.c_str());
+
+  std::cout << env.GetPlannerInput() << std::endl;
+
+  env.GetBackendPtr()->VisualizeStartGoal(env.GetPlannerInput().q_init, env.GetPlannerInput().q_goal);
+
+  GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
+  gui.SetWindowTitle("DisplayEnvironment");
   gui.Run();
+
   return 0;
 }
+
+
 

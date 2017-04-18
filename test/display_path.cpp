@@ -15,28 +15,15 @@
 
 #include "gui.h"
 #include "info.h"
-#include "planner.h"
+#include "environment_loader.h"
 
 int main(int argc,const char** argv) {
-  RobotWorld world;
-  Info info;
-  ForceFieldBackend backend(&world);
-  //SimTestBackend backend(&world);
+  //std::string file = "gui/snake_twister.xml";
 
-  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel.xml");
+  EnvironmentLoader env = EnvironmentLoader("data/snake_twister.xml");
+  env.GetBackendPtr()->Load("snake_twister.xml");
 
-  MultiPath path;
-  path.Load("../data/paths/path_2017_03_02.xml");
-  backend.VisualizePathSweptVolume(path);
-
-  world.rigidObjects.clear();
-
-  //############################################################################
-  //guification
-  //############################################################################
-
-  std::cout << "start GUI" << std::endl;
-  GLUISimTestGUI gui(&backend,&world);
+  GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.SetWindowTitle("SweptVolumePath");
   gui.Run();
 

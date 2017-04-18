@@ -6,6 +6,7 @@ bool CheckNodeName(TiXmlElement *node, const char* name)
     std::cout << "Not a " << name <<  " file" << std::endl;
     return false;
   }
+  return true;
 }
 TiXmlElement* GetRootNodeFromDocument(TiXmlDocument& doc)
 {
@@ -16,10 +17,12 @@ TiXmlElement* GetRootNodeFromDocument(TiXmlDocument& doc)
     }
   }else{
     std::cout << doc.ErrorDesc() << std::endl;
+    return NULL;
   }
 }
 
 TiXmlElement* FindSubNode(TiXmlElement* node, const char *name){
+  if(!node) return NULL;
   TiXmlElement* e=node->FirstChildElement();
   while(e != NULL) 
   {
@@ -27,4 +30,15 @@ TiXmlElement* FindSubNode(TiXmlElement* node, const char *name){
     e = e->NextSiblingElement();
   }
   return NULL;
+}
+
+stringstream GetStreamAttribute(TiXmlElement* node, const char *name){
+
+  if(!node) return stringstream ("NONE");
+  const char *na = node->Attribute(name);
+  if(na){
+    return stringstream (na);
+  }else{
+    return stringstream ("NONE");
+  }
 }
