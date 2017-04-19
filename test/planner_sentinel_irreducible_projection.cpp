@@ -24,21 +24,18 @@
 #include "planner/irreducible_projector.h"
 
 int main(int argc,const char** argv) {
-  RobotWorld world;
-  Info info;
-  ForceFieldBackend backend(&world);
-  //SimTestBackend backend(&world);
-  WorldSimulation& sim=backend.sim;
-
-  sim.odesim.SetGravity(Vector3(0,0,0));
+  //RobotWorld world;
+  //Info info;
+  //ForceFieldBackend backend(&world);
+  ////SimTestBackend backend(&world);
+  //WorldSimulation& sim=backend.sim;
+  std::string file = "data/sentinel_complete.xml";
+  EnvironmentLoader env = EnvironmentLoader(file.c_str());
 
   //backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel_complete.xml");
-  //backend.Load("kinodynamic_solution_tunnel_environment.xml");
+  env.LoadPath("sentinel_pipe_homotopy_class2.xml");
 
-  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel_complete.xml");
-  backend.Load("sentinel_pipe_homotopy_class2.xml");
-
-  //backend.Load("kinodynamic_solution_tunnel_environment_without_torsion.xml");
+  //backend.Load("sentinel_pipe_homotopy_class2.xml");
 
   //TODO: outsource this part, merge with planner!?
   std::vector<Config> headPath = backend.getKeyFrames();
@@ -63,7 +60,6 @@ int main(int argc,const char** argv) {
 
   IrreducibleProjector proj(robot);
   proj.setRootPath(headPath);
-
   std::vector<Config> wholeBodyPath = proj.getSubLinkKeyframes(lengths, Nbranches);
 
   //RANDOM VALUES FOR JOINTS
@@ -101,7 +97,6 @@ int main(int argc,const char** argv) {
   ////############################################################################
   backend.AddPath(wholeBodyPath,GLColor(0.7,0.1,0.9,0.5));
 
-  util::SetSimulatedRobot( robot, sim, wholeBodyPath.front());
   std::cout << "start GUI" << std::endl;
   GLUIForceFieldGUI gui(&backend,&world);
   gui.SetWindowTitle("SweptVolumePath");

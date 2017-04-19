@@ -51,7 +51,6 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawPathMilestones.clear();
   drawPathStartGoal.clear();
 
-
   _frames.clear();
   swept_volume_paths.clear();
 }
@@ -220,7 +219,6 @@ bool ForceFieldBackend::Load(TiXmlElement *node)
 {
 
   _stree.clear();
-  _keyframes.clear();
   planner_p_goal.setZero();
   planner_p_init.setZero();
 
@@ -274,11 +272,12 @@ bool ForceFieldBackend::Load(TiXmlElement *node)
           Config q;
           stringstream ss(c->GetText());
           ss >> q;
-          _keyframes.push_back(q);
+          keyframes.push_back(q);
         }
         c = c->NextSiblingElement();
       }
-      //AddPath(_keyframes);
+      std::cout << "loaded " << keyframes.size() << " keyframes." << std::endl;
+      AddPath(keyframes);
     }
     e = e->NextSiblingElement();
   }
@@ -368,23 +367,26 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
     node->InsertEndChild(c);
   }
   //###################################################################
-  {
-    TiXmlElement c("tree");
-    for(int i = 0; i < _stree.size(); i++){
-      TiXmlElement cc("node");
-      _stree.at(i).Save(&cc);
-      c.InsertEndChild(cc);
-    }
+  //{
+  //  TiXmlElement c("tree");
+  //  for(int i = 0; i < _stree.size(); i++){
+  //    TiXmlElement cc("node");
+  //    _stree.at(i).Save(&cc);
+  //    c.InsertEndChild(cc);
+  //  }
 
-    node->InsertEndChild(c);
-  }
+  //  node->InsertEndChild(c);
+  //}
   //###################################################################
-  {
+  for(int i = 0; i < swept_volume_paths.size(); i++){
+  //
     TiXmlElement c("sweptvolume");
-    for(int i = 0; i < _keyframes.size(); i++){
+
+    std::vector<Config> keyframes = swept_volume_paths.at(i).GetKeyframes();
+    for(int i = 0; i < keyframes.size(); i++){
       TiXmlElement cc("qitem");
       stringstream ss;
-      ss<<_keyframes.at(i);
+      ss<< keyframes.at(i);
       TiXmlText text(ss.str().c_str());
       cc.InsertEndChild(text);
       c.InsertEndChild(cc);
@@ -407,10 +409,6 @@ void ForceFieldBackend::VisualizePlannerTree(const SerializedTree &tree)
   drawPlannerTree=1;
 }
 
-std::vector<Config> ForceFieldBackend::getKeyFrames()
-{
-  return _keyframes;
-}
 uint ForceFieldBackend::getNumberOfPaths(){
   return this->swept_volume_paths.size();
 }
@@ -465,31 +463,6 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   std::cout << "OnCommand: " << cmd << std::endl;
 
   if(cmd=="advance") {
-    //static uint i = 0;
-
-    //if(i>_keyframes.size()-1){
-    //  return BaseT::OnCommand(cmd,args);
-    //}
-
-    //Config q = _keyframes.at(i);
-    //Config q2 = _keyframes.at(i+1);
-    //double dt = 1.0/_keyframes.size();
-    //Config dq = (q-q2)/dt;
-    ////if(i==0) dq.setZero();
-    //stringstream qstr;
-    //qstr<<q;
-
-    ////string cmd( (i<=0)?("set_qv"):("append_qv") );
-    //string cmd( (i<=0)?("set_q"):("append_q") );
-    //sim.robotControllers[0]->SendCommand(cmd,qstr.str());
-    //i++;
-
-    std::cout << sim.time << std::endl;
-    std::vector<Real> times;
-    for(int i = 0; i < _keyframes.size(); i++){
-      times.push_back(i);
-    }
-    SendLinearPath(times,_keyframes);
 
   }else if(cmd=="draw_rigid_objects_faces_toggle") {
     toggle(drawRigidObjectsFaces);
@@ -498,9 +471,9 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="draw_planner_tree_toggle"){
     toggle(drawPlannerTree);
   }else if(cmd=="load_motion_planner") {
-    std::cout << "loading file " << args.c_str() << std::endl;
-
-
+    //glutSelectFile ("","","");//char *filename, const char *filter, const char *title)
+    //std::string file_name = browser->get_file();
+    //std::cout << "loading file " << file_name << std::endl;
 
   }else if(cmd=="save_motion_planner") {
     std::cout << "saving file " << args.c_str() << std::endl;
@@ -513,21 +486,22 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   return true;
 }
 //############################################################################
+// GLUIForceFieldGUI
 //############################################################################
 
 GLUIForceFieldGUI::GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _world)
     :BaseT(_backend,_world)
 {
 }
-void GLUIForceFieldGUI::browser_control(int control) {
-  glutPostRedisplay();
-  if(control==1){
-    //browser
-    std::string file_name = browser->get_file();
-    //file = fopen(file_name.c_str(),"r"); 
-    std::cout << "opening file " << file_name << std::endl;
-  }
-}
+//void browser_control(int control) {
+//  glutPostRedisplay();
+//  if(control==1){
+//    //browser
+//    std::string file_name = browser->get_file();
+//    //file = fopen(file_name.c_str(),"r"); 
+//    std::cout << "opening file " << file_name << std::endl;
+//  }
+//}
 bool GLUIForceFieldGUI::Initialize()
 {
   if(!BaseT::Initialize()) return false;
@@ -577,22 +551,20 @@ bool GLUIForceFieldGUI::Initialize()
     checkbox->set_int_val(_backend->drawPathStartGoal.at(i));
   }
 
-    //AddControl(glui->add_button_to_panel(panel,"Save state"),"save_state");
-  GLUI_Button* button;
-  button = glui->add_button_to_panel(panel,">> Save state");
-  AddControl(button, "save_motion_planner");
-
-  button = glui->add_button_to_panel(panel,">> Load state");
-  AddControl(button, "load_motion_planner");
+  //AddControl(glui->add_button_to_panel(panel,"Save state"),"save_state");
+  //GLUI_Button* button;
+  //button = glui->add_button_to_panel(panel,">> Save state");
+  //AddControl(button, "save_motion_planner");
+  //button_file_load = glui->add_button_to_panel(panel,">> Load state");
+  //AddControl(button_file_load, "load_motion_planner");
 
   glui->add_button_to_panel(panel,"Quit",0,(GLUI_Update_CB)exit);
 
-  //browser = new GLUI_FileBrowser(panel, "Loading New State", false, 1, browser_control);
+  //browser = new GLUI_FileBrowser(panel, "Loading New State");
   //browser->set_h(100);
   //browser->set_w(100);
-  //browser->set_allow_change_dir(0);
+  //browser->set_allow_change_dir(1);
   //browser->fbreaddir("../data/gui");
-  //file_name = fb->get_file();
 
 
   panel = glui->add_rollout("Fancy Decorations");
@@ -705,5 +677,20 @@ void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
       default:
         BaseT::Handle_Keypress(c,x,y);
     }
+}
+bool GLUIForceFieldGUI::OnCommand(const string& cmd,const string& args)
+{
+  return BaseT::OnCommand(cmd,args);
+}
+
+
+void GLUIForceFieldGUI::Handle_Control(int id)
+{
+  if(controls[id]==button_file_load)
+  {
+    std::string file_name = browser->get_file();
+    std::cout << "loading file: " << file_name << std::endl;
+  }
+  BaseT::Handle_Control(id);
 }
 

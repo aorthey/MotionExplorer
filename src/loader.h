@@ -32,10 +32,35 @@ TiXmlElement* FindSubNode(TiXmlElement* node, const char *name){
   return NULL;
 }
 
+TiXmlElement* FindFirstSubNode(TiXmlElement* node, const char *name){
+  return FindSubNode(node, name);
+}
+
+TiXmlElement* FindNextSiblingNode(TiXmlElement* node, const char *name){
+  while(node != NULL) 
+  {
+    node = node->NextSiblingElement();
+    if(node!=NULL){
+      if(0==strcmp(node->Value(),name)) return node; 
+    }
+  }
+  return NULL;
+}
+
 stringstream GetStreamAttribute(TiXmlElement* node, const char *name){
 
   if(!node) return stringstream ("NONE");
   const char *na = node->Attribute(name);
+  if(na){
+    return stringstream (na);
+  }else{
+    return stringstream ("NONE");
+  }
+}
+stringstream GetStreamText(TiXmlElement* node){
+
+  if(!node) return stringstream ("NONE");
+  const char *na = node->GetText();
   if(na){
     return stringstream (na);
   }else{

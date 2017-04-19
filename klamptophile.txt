@@ -444,7 +444,9 @@ without recompiling. Delete the whole plannersetup folder!
 
 -- abstractions (longterm goals)
 
+ [ ] Needs switch to QT, the file loader from GLUI seems not to work properly.  Also the graphics are quite bad. 
  [x] be able to design landscapes/fancy environments and import them to simulator
+
  [ ] be able to load different landscapes/robots from simulator, plus start/goal
 configs, and be able to run different algorithms to find a solution. Then be
 able to save/delete solution paths. So that we can display several output paths
@@ -464,6 +466,10 @@ then display them, then deform them, then to save those paths.
  [ ] have vim-keybindings to quickly move around, save/load, screenshots,
 display tree/start/goal/swept volumes, do planning
  [ ] EnvironmentLoader should be merged with Backend, so that we can load/save inside
+
+-- important:
+ [x] check distance function in OMPL -- why is it different depending on number
+of DOFs?
 
 -- wrench fields
 
@@ -515,3 +521,5 @@ otherwise not much difference to pipes
  [ ] make sure that cbounds gives an exception if outer limit index
 
  [ ] what about the humanoid experiments? could we repeat them easily?
+
+

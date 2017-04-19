@@ -703,22 +703,22 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   // benchmark instead
   //###########################################################################
-  ot::Benchmark benchmark(ss, "BenchmarkPipes");
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
+  //ot::Benchmark benchmark(ss, "BenchmarkPipes");
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 
-  ot::Benchmark::Request req;
-  req.maxTime = duration;
-  req.maxMem = 10000.0;
-  req.runCount = 100;
-  req.displayProgress = true;
+  //ot::Benchmark::Request req;
+  //req.maxTime = duration;
+  //req.maxMem = 10000.0;
+  //req.runCount = 100;
+  //req.displayProgress = true;
 
-  benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2, &cspace));
-  
-  benchmark.benchmark(req);
-  benchmark.saveResultsToFile();
+  //benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2, &cspace));
+  //
+  //benchmark.benchmark(req);
+  //benchmark.saveResultsToFile();
 
   //###########################################################################
   // solve

@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include "gui.h"
 #include "info.h"
-
 #include "util.h"
 #include "environment_loader.h"
+
 int main(int argc,const char** argv) {
 
   //file = "home/aorthey/git/orthoklampt/data/snake_turbine.xml";

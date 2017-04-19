@@ -35,9 +35,7 @@ class ForceFieldBackend : public SimTestBackend
     //##########################################################################
     std::vector<SweptVolume> swept_volume_paths;
 
-    //swept volume
     Config planner_p_init, planner_p_goal;
-    vector<Config> _keyframes;
 
     //##########################################################################
     vector< vector<Vector3> > _frames;
@@ -55,7 +53,6 @@ class ForceFieldBackend : public SimTestBackend
   virtual bool Save(TiXmlElement *node);
   virtual bool Load(const char* file);
   virtual bool Load(TiXmlElement *node);
-
 
   //void ShowPath(){ drawPath=true; }
   //void HidePath(){ drawPath=false; }
@@ -122,18 +119,23 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
     GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _world);
     virtual bool Initialize();
     //virtual bool OnCommand(const string& cmd,const string& args);
-    virtual void Handle_Keypress(unsigned char c,int x,int y);
     void AddToKeymap(const char *key, const char *s);
     void AddButton(const char *key);
-
     void browser_control(int control);
+
+    virtual void Handle_Keypress(unsigned char c,int x,int y);
+    virtual bool OnCommand(const string& cmd,const string& args);
+    virtual void Handle_Control(int id);
+
   private:
     typedef std::map<const char *, std::string> Keymap;
     Keymap _keymap;
     GLUI_Panel* panel;
     GLUI_Checkbox* checkbox;
     GLUI_FileBrowser *browser;
+    GLUI_Button* button_file_load;
 };
+
 
 typedef SmartPointer<ForceFieldBackend> ForceFieldBackendPtr;
 

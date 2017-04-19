@@ -35,12 +35,4 @@ class IrreducibleProjector
 
     void setRootPath( std::vector<Config> &keyframes);
 
-
-    //ComputeExtensionAlongRootPath(std::vector<double> lengths);
-
-    //pairDoubleVecVec ComputeThetaGammaFromRootPath( std::vector<Vector3> rootPos, std::vector<Matrix3> rootRot);
-
-
-
-
 };

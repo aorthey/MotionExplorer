@@ -20,8 +20,12 @@
 int main(int argc,const char** argv) {
   //std::string file = "gui/snake_twister.xml";
 
-  EnvironmentLoader env = EnvironmentLoader("data/snake_twister.xml");
-  env.GetBackendPtr()->Load("snake_twister.xml");
+  EnvironmentLoader env = EnvironmentLoader("data/snake_turbine.xml");
+
+  //env.GetBackendPtr()->Load("snake_turbine_complete.xml");
+  env.GetBackendPtr()->Load("snake_turbine_complete.xml");
+  //env.LoadPath("paths/snake_turbine_complete.xml");
+  //env.LoadPath("data/paths/sentinel_pipe1.xml");
 
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.SetWindowTitle("SweptVolumePath");
