@@ -7,6 +7,9 @@ RobotWorld& EnvironmentLoader::GetWorld(){
 RobotWorld* EnvironmentLoader::GetWorldPtr(){
   return &world;
 }
+Robot* EnvironmentLoader::GetRobotPtr(){
+  return world.robots[0];
+}
 PlannerInput EnvironmentLoader::GetPlannerInput(){
   return pin;
 }
@@ -48,14 +51,15 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
   info(&world);
 
   Robot *robot = world.robots[0];
-  LoadPlannerSettings(file_name.c_str());
+  if(LoadPlannerSettings(file_name.c_str())){
 
-  for(int i = 0; i < 6; i++){
-    robot->qMin[i] = pin.se3min[i];
-    robot->qMax[i] = pin.se3max[i];
+    for(int i = 0; i < 6; i++){
+      robot->qMin[i] = pin.se3min[i];
+      robot->qMax[i] = pin.se3max[i];
+    }
+    pin.qMin = robot->qMin;
+    pin.qMax = robot->qMax;
   }
-  pin.qMin = robot->qMin;
-  pin.qMax = robot->qMax;
 
 }
 
@@ -89,8 +93,7 @@ bool EnvironmentLoader::LoadPlannerSettings(const char* file)
 {
   TiXmlDocument doc(file);
   TiXmlElement *root = GetRootNodeFromDocument(doc);
-  LoadPlannerSettings(root);
-  return true;
+  return LoadPlannerSettings(root);
 }
 
 bool EnvironmentLoader::LoadPath(const char* file)

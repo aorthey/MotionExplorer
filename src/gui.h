@@ -76,6 +76,11 @@ class ForceFieldBackend : public SimTestBackend
   uint getNumberOfPaths();
 
   void AddPath(const std::vector<Config> &keyframes, GLColor color = GLColor(0.8,0.8,0.8), uint Nkeyframes_alongpath=10);
+  //std::vector<Config> getPathKeyFrames(uint pathid);
+
+  const std::vector<Config>& getPathKeyFrames(uint pathid);
+  void ClearPaths();
+
   //deprecated
   //void VisualizePathSweptVolumeAtPosition(const Config &q);
   //void VisualizePathSweptVolume(const std::vector<Config> &keyframes);
@@ -83,9 +88,10 @@ class ForceFieldBackend : public SimTestBackend
   //void VisualizePathSweptVolume(const KinodynamicMilestonePath &path);
   //void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
   //void VisualizePathMilestones(const std::vector<Config> &keyframes, uint Nmilestones);
+  //std::vector<Config> getKeyFrames();
 
   void VisualizePlannerTree(const SerializedTree &tree);
-  std::vector<Config> getKeyFrames();
+
 
   void DrawText(int x,int y, std::string s);
 

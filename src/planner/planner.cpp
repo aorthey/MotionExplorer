@@ -32,9 +32,9 @@ bool Save(const std::vector<Config> &keyframes, const char* file=NULL)
 
   if(!file){
     std::string date = util::GetCurrentTimeString();
-    out = pdata+"/keyframes/state_"+date+".xml";
+    out = pdata+"/paths/state_"+date+".xml";
   }else{
-    out = pdata+"/keyframes/"+file;
+    out = pdata+"/paths/"+file;
   }
 
   std::cout << "saving data to "<< out << std::endl;
@@ -42,7 +42,7 @@ bool Save(const std::vector<Config> &keyframes, const char* file=NULL)
   TiXmlDocument doc;
   TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
   doc.LinkEndChild(decl);
-  TiXmlElement *node = new TiXmlElement("Keyframes");
+  TiXmlElement *node = new TiXmlElement("path");
   Save(keyframes, node);
 
   doc.LinkEndChild(node);
@@ -56,7 +56,7 @@ bool Save(const std::vector<Config> &keyframes, const char* file=NULL)
 bool Load(std::vector<Config> &keyframes, const char* file)
 {
   std::string pdata = util::GetDataFolder();
-  std::string in = pdata+"/keyframes/"+file;
+  std::string in = pdata+"/paths/"+file;
 
   std::cout << "loading data from "<<in << std::endl;
 
@@ -78,26 +78,18 @@ bool Load(std::vector<Config> &keyframes, TiXmlElement *node)
 {
 
   keyframes.clear();
-  if(0!=strcmp(node->Value(),"Keyframes")) {
+  if(0!=strcmp(node->Value(),"path")) {
     std::cout << "Not a Keyframes file" << std::endl;
     return false;
   }
   TiXmlElement* e=node->FirstChildElement();
   while(e != NULL) 
   {
-    if(0==strcmp(e->Value(),"keyframes")) {
-
-      TiXmlElement* c=e->FirstChildElement();
-      while(c!=NULL)
-      {
-        if(0==strcmp(c->Value(),"qitem")) {
-          Config q;
-          stringstream ss(c->GetText());
-          ss >> q;
-          keyframes.push_back(q);
-        }
-        c = c->NextSiblingElement();
-      }
+    if(0==strcmp(e->Value(),"q")) {
+      Config q;
+      stringstream ss(e->GetText());
+      ss >> q;
+      keyframes.push_back(q);
     }
     e = e->NextSiblingElement();
   }
@@ -106,18 +98,14 @@ bool Load(std::vector<Config> &keyframes, TiXmlElement *node)
 //###################################################################
 bool Save(const std::vector<Config> &keyframes, TiXmlElement *node)
 {
-  node->SetValue("Keyframes");
+  node->SetValue("path");
 
-  {
-    TiXmlElement c("keyframes");
-    for(int i = 0; i < keyframes.size(); i++){
-      TiXmlElement cc("qitem");
-      stringstream ss;
-      ss<<keyframes.at(i);
-      TiXmlText text(ss.str().c_str());
-      cc.InsertEndChild(text);
-      c.InsertEndChild(cc);
-    }
+  for(int i = 0; i < keyframes.size(); i++){
+    TiXmlElement c("q");
+    stringstream ss;
+    ss<<keyframes.at(i);
+    TiXmlText text(ss.str().c_str());
+    c.InsertEndChild(text);
     node->InsertEndChild(c);
   }
   return true;

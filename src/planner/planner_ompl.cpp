@@ -31,7 +31,10 @@ GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot)
   ob::SE3StateSpace *cspaceSE3 = space_->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
   ob::RealVectorStateSpace *cspaceRn = space_->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
 
-  //std::cout << startRn->getDimension() << std::endl;
+  ob::CompoundStateSpace *cspace = space_->as<ob::CompoundStateSpace>();
+
+  cspace->setSubspaceWeight(0,1);
+  cspace->setSubspaceWeight(1,0);
 
   //###########################################################################
   // Set bounds
@@ -659,8 +662,8 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
-  ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
+  ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
 
   //###########################################################################
   // setup and projection
@@ -669,8 +672,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   ss.setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
   ss.setStatePropagator(cpropagate);
 
-  //double epsilon = 0.01*robot->q.size();
-  double epsilon = 2.0;
+  double epsilon = 0.5;
 
   ss.setStartAndGoalStates(start, goal, epsilon);
   ss.setup();
@@ -703,39 +705,37 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   // benchmark instead
   //###########################################################################
-  //ot::Benchmark benchmark(ss, "BenchmarkPipes");
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
+  ot::Benchmark benchmark(ss, "BenchmarkSnake");
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 
-  //ot::Benchmark::Request req;
-  //req.maxTime = duration;
-  //req.maxMem = 10000.0;
-  //req.runCount = 100;
-  //req.displayProgress = true;
+  ot::Benchmark::Request req;
+  req.maxTime = duration;
+  req.maxMem = 10000.0;
+  req.runCount = 100;
+  req.displayProgress = true;
 
-  //benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2, &cspace));
-  //
-  //benchmark.benchmark(req);
-  //benchmark.saveResultsToFile();
+  benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2, &cspace));
+  
+  benchmark.benchmark(req);
+  benchmark.saveResultsToFile();
 
   //###########################################################################
   // solve
   //###########################################################################
+
   ob::PlannerStatus status = ss.solve(ptc);
   solved = ss.haveExactSolutionPath();
 
   //###########################################################################
   // extract roadmap
   //###########################################################################
+
   oc::PlannerData pd(si);
   ss.getPlannerData(pd);
-  //std::cout << "Edges   : " << pd.numEdges() << std::endl;
-  //std::cout << "Vertices: " << pd.numVertices() << std::endl;
-
   SerializeTree(pd);
-  //SerializeTreeRandomlyCullPoints(_stree, 2000);
 
   //###########################################################################
   // extract solution path if solved

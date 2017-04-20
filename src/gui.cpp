@@ -122,12 +122,6 @@ void ForceFieldBackend::RenderWorld()
 
   if(drawRigidObjects){
     for(size_t i=0;i<world->rigidObjects.size();i++){
-      //
-      //visualization of vertices/faces is implemented in 
-      //Krislibrary/GLDraw/GeometryAppearances.h
-      //but edges are not yet!
-      //
-
       RigidObject *obj = world->rigidObjects[i];
       GLDraw::GeometryAppearance* a = obj->geometry.Appearance();
       a->SetColor(GLColor(0.8,0.8,0.8));
@@ -145,9 +139,24 @@ void ForceFieldBackend::RenderWorld()
 
   if(drawRobot){
     for(size_t i=0;i<world->robots.size();i++) {
+      Robot *robot = world->robots[i];
       for(size_t j=0;j<world->robots[i]->links.size();j++) {
+        if(robot->IsGeometryEmpty(j)) continue;
+
         sim.odesim.robot(i)->GetLinkTransform(j,world->robots[i]->links[j].T_World);
-        world->robotViews[i].DrawLink_World(j);
+        Matrix4 mat = world->robots[i]->links[j].T_World;
+
+        //glColor3f(0.7,0.7,0.7);
+        //world->robotViews[i].DrawLink_World(j);
+
+        glPushMatrix();
+        glMultMatrix(mat);
+        GLDraw::GeometryAppearance& a = _appearanceStack.at(j);
+        if(a.geom != robot->geometry[j]) a.Set(*robot->geometry[j]);
+        a.SetColor(GLColor(0.7,0.7,0.7));
+        a.DrawGL();
+        glPopMatrix();
+
       }
     }
   }
@@ -409,6 +418,14 @@ void ForceFieldBackend::VisualizePlannerTree(const SerializedTree &tree)
   drawPlannerTree=1;
 }
 
+void ForceFieldBackend::ClearPaths(){
+  swept_volume_paths.clear();
+}
+const std::vector<Config>& ForceFieldBackend::getPathKeyFrames(uint pathid)
+{
+  assert(swept_volume_paths.size()>pathid);
+  return swept_volume_paths.at(pathid).GetKeyframes();
+}
 uint ForceFieldBackend::getNumberOfPaths(){
   return this->swept_volume_paths.size();
 }
@@ -667,8 +684,6 @@ void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
           std::size_t pos = screenshotFile.find(".ppm");
           std::string outpng = screenshotFile.substr(0,pos)+".png";
           std::string cmd = "convert "+screenshotFile+" "+outpng;
-          system(cmd.c_str());
-          cmd = "rm -rf "+screenshotFile;
           system(cmd.c_str());
           IncrementStringDigits(screenshotFile);
           break;

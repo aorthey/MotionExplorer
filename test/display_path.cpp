@@ -24,6 +24,7 @@ int main(int argc,const char** argv) {
 
   //env.GetBackendPtr()->Load("snake_turbine_complete.xml");
   env.GetBackendPtr()->Load("snake_turbine_complete.xml");
+  env.GetBackendPtr()->Load("snake_turbine_irreducible.xml");
   //env.LoadPath("paths/snake_turbine_complete.xml");
   //env.LoadPath("data/paths/sentinel_pipe1.xml");
 

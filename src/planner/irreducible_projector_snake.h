@@ -57,7 +57,6 @@ class IrreducibleProjectorSnake: public IrreducibleProjector
 
       for(int i = 0; i < _rootPath.size(); i++){
         Config qr = _rootPath.at(i);
-        std::cout << i << "::"<<qr << std::endl;
 
         Vector3 T0 = GetPositionAtLink(qr, rootLinkId);
         Matrix3 R0 = GetRotationAtLink(qr, rootLinkId);

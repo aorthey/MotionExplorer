@@ -20,49 +20,27 @@
 #include "info.h"
 #include "controller.h"
 #include "gui.h"
+#include "environment_loader.h"
 #include "planner/planner_ompl.h"
-#include "planner/irreducible_projector.h"
+//#include "planner/irreducible_projector.h"
+#include "planner/irreducible_projector_sentinel.h"
 
 int main(int argc,const char** argv) {
-  //RobotWorld world;
-  //Info info;
-  //ForceFieldBackend backend(&world);
-  ////SimTestBackend backend(&world);
-  //WorldSimulation& sim=backend.sim;
   std::string file = "data/sentinel_complete.xml";
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
 
-  //backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel_complete.xml");
-  env.LoadPath("sentinel_pipe_homotopy_class2.xml");
-
-  //backend.Load("sentinel_pipe_homotopy_class2.xml");
+  env.LoadPath("data/paths/sentinel_pipe1.xml");
 
   //TODO: outsource this part, merge with planner!?
-  std::vector<Config> headPath = backend.getKeyFrames();
+  std::vector<Config> headPath = env.GetBackendPtr()->getPathKeyFrames(0);
 
-  Robot *robot = world.robots[0];
-  uint N = robot->links.size();
-  uint Nsub = N - headPath.at(0).size();
-  uint Nhead = headPath.at(0).size();
-  uint Nbranches = 8;
-  uint Nsubdimension = Nsub/Nbranches;
-  uint Nsegments= (Nsubdimension - 2)/3+1;
+  Robot *robot = env.GetRobotPtr();
+  IrreducibleProjectorSentinel projector(robot);
+  projector.setRootPath(headPath);
 
-  assert(Nsub/Nbranches==(int)Nsub/Nbranches);
 
-  std::vector<double> lengths(Nsegments-1);
-  double length = 0.19;
-  for(int j = 0; j < Nsegments-1; j++){
-    lengths.at(j)=length;
-  }
+  std::vector<Config> wholeBodyPath = projector.getSubLinkKeyframes();
 
-  info(&world);
-
-  IrreducibleProjector proj(robot);
-  proj.setRootPath(headPath);
-  std::vector<Config> wholeBodyPath = proj.getSubLinkKeyframes(lengths, Nbranches);
-
-  //RANDOM VALUES FOR JOINTS
 
 //  std::vector<Config> wholeBodyPath;
 //  for(int i = 0; i < headPath.size(); i++){
@@ -95,10 +73,11 @@ int main(int argc,const char** argv) {
   ////############################################################################
   ////guification
   ////############################################################################
-  backend.AddPath(wholeBodyPath,GLColor(0.7,0.1,0.9,0.5));
+  env.GetBackendPtr()->ClearPaths();
+  env.GetBackendPtr()->AddPath(wholeBodyPath,GLColor(0.7,0.1,0.9,0.5));
 
   std::cout << "start GUI" << std::endl;
-  GLUIForceFieldGUI gui(&backend,&world);
+  GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.SetWindowTitle("SweptVolumePath");
   gui.Run();
 
