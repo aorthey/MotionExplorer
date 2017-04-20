@@ -10,7 +10,7 @@ typedef std::pair<doubleVecVec,doubleVecVec> pairDoubleVecVec;
 
 class IrreducibleProjector
 {
-  private:
+  protected:
     uint Ndim;
     uint _Nsublinks;
     uint _Nkeyframes;
@@ -24,15 +24,19 @@ class IrreducibleProjector
     Vector3 GetPositionAtLink(const Config &q, uint id);
     Matrix3 GetRotationAtLink(const Config &q, uint id);
 
-    pairDoubleVecVec ComputeThetaGammaFromRootPath( const std::vector<Vector3> &rootPos, const std::vector<Matrix3> &rootRot, const std::vector<double> &lengths);
-    pairDoubleVec ComputeThetaGammaFromRootPathPosition(const PathPiecewiseLinearEuclidean &path, double t0, const Matrix3 &R0, const std::vector<double> &lengths);
 
   public:
 
     IrreducibleProjector(Robot *robot);
 
-    std::vector<Config> getSubLinkKeyframes(std::vector<double> &lengths, uint Nbranches);
-
     void setRootPath( std::vector<Config> &keyframes);
+
+    pairDoubleVecVec ComputeThetaGammaFromRootPath( const std::vector<Vector3> &rootPos, const std::vector<Matrix3> &rootRot, const std::vector<double> &lengths);
+
+    pairDoubleVec ComputeThetaGammaFromRootPathPosition(const PathPiecewiseLinearEuclidean &path, double t0, const Matrix3 &R0, const std::vector<double> &lengths);
+
+    //std::vector<Config> getSubLinkKeyframes(std::vector<double> &lengths, uint Nbranches);
+
+    virtual std::vector<Config> getSubLinkKeyframes() = 0;
 
 };
