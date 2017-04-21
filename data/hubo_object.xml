@@ -6,13 +6,14 @@
 
   <robot name="hubo" file="/home/aorthey/git/Klampt/data/robots/huboplus/huboplus_col.rob" config="63  0.360239 -0.561188 -0.0329274 1.29229 -0.322774 6.18123 0 0 -1.36924 0.382023 -2.51209 -0.629389 2.33545 -0.373077 0 0 0 0 0 0 -0.203771 0.145427 0.059533 -0.22216 0.114577 0.0728987 -0.144406 0.20041 0.0638871 -1.37563 -0.331695 1.42685 -1.19807 -1.40899 -0.0395242 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.11612 0.407074 -0.00347999 0.57969 -0.0698132 -0.2238 0.150229 0.44978 -0.0440201 0.440722 -0.0386252 -0.109777 0.191986 "/>
 
+  <robot name="wall" file="/home/aorthey/git/orthoklampt/data/wall.urdf" />
+
   <terrain file="/home/aorthey/git/Klampt/data/terrains/plane.tri" translation="0 0 0"/>
 
-  <robot name="door" file="/home/aorthey/git/Klampt/data/robots/door.rob" translation="0 1 0"/>
 
     <!-- the table -->
-    <terrain file="/home/aorthey/git/Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.3 0.25 0.01">
-     <display color="0.4 0.3 0.2"/>
+  <terrain file="/home/aorthey/git/Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.3 0.25 0.01">
+   <display color="0.4 0.3 0.2"/>
   </terrain>
   <terrain file="/home/aorthey/git/Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.3 -0.25 0.01">
      <display color="0.4 0.3 0.2"/>

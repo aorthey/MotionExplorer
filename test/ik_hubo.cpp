@@ -13,24 +13,30 @@
 #include "iksolver.h"
 #include "iksolver_hubo.h"
 
+#include "environment_loader.h"
 
 int main(int argc,const char** argv) {
-  RobotWorld world;
+  //RobotWorld world;
 
-  ForceFieldBackend backend(&world);
-  WorldSimulation& sim=backend.sim;
+  //ForceFieldBackend backend(&world);
+  //WorldSimulation& sim=backend.sim;
 
-  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/hubo_object.xml");
+  //backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/hubo_object.xml");
+  std::string file = "data/hubo_object.xml";
+  EnvironmentLoader env = EnvironmentLoader(file.c_str());
 
-  Info info;
-  info(&world);
+  WorldSimulation sim = env.GetBackendPtr()->sim;
 
-  IKSolverHubo ikhubo(&world);
+  IKSolverHubo ikhubo(env.GetWorldPtr());
   ikhubo.solve();
   ikhubo.SetConfigSimulatedRobot(sim);
 
-  GLUISimTestGUI gui(&backend,&world);
-  gui.SetWindowTitle("SimTest2");
+  env.GetBackendPtr()->ShowSweptVolumes();
+  env.GetBackendPtr()->ShowRobot();
+  env.GetBackendPtr()->ShowCoordinateAxes();
+
+  GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
+  gui.SetWindowTitle("IK");
   gui.Run();
 
   return 0;

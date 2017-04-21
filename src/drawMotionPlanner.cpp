@@ -7,6 +7,7 @@ namespace GLDraw{
     robot->DrawLinkSkeleton();
     robot->SetColors(bodyColor);
   }
+
   void drawIKextras(ViewRobot *viewRobot, Robot *robot, std::vector<IKGoal> &constraints, std::vector<int> linksInCollision, GLColor selectedLinkColor)
   {
     for(uint i = 0; i < constraints.size(); i++){
@@ -134,6 +135,7 @@ namespace GLDraw{
     if(!p_goal.empty()) drawRobotAtConfig(robot, p_goal, colorGoal, scale);
   }
 
+
   void drawRobotAtConfig(Robot *robot, const Config &q, GLColor color, double scale){
     robot->UpdateConfig(q);
     for(uint j=0;j<robot->links.size();j++) {
@@ -143,11 +145,8 @@ namespace GLDraw{
       glMultMatrix(mat);
       glScalef(scale, scale, scale);
       GLDraw::GeometryAppearance& a = *robot->geomManagers[j].Appearance();
-      //GLColor colorOriginal;
-      //a.GetColor(colorOriginal);
       a.SetColor(color);
       a.DrawGL();
-      //a.SetColor(colorOriginal);
       glPopMatrix();
     }
   }

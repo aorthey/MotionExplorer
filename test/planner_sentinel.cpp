@@ -15,86 +15,34 @@
 #include "util.h"
 #include "info.h"
 #include "controller.h"
+#include "environment_loader.h"
 #include "gui.h"
 #include "planner/planner_ompl.h"
 
 int main(int argc,const char** argv) {
-  RobotWorld world;
-  Info info;
-  ForceFieldBackend backend(&world);
-  //SimTestBackend backend(&world);
-  WorldSimulation& sim=backend.sim;
 
-  backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/sentinel.xml");
-  world.robots[0]->qMin[0]=-4;
-  world.robots[0]->qMin[1]=-4;
-  world.robots[0]->qMin[2]=-4;
-  world.robots[0]->qMin[3]=0;
-  world.robots[0]->qMin[4]=0;
-  world.robots[0]->qMin[5]=0;
-  world.robots[0]->qMax[0]=4;
-  world.robots[0]->qMax[1]=4;
-  world.robots[0]->qMax[2]=4;
-  world.robots[0]->qMax[3]=2*M_PI;
-  world.robots[0]->qMax[4]=2*M_PI;
-  world.robots[0]->qMax[5]=2*M_PI;
+  std::string file = "data/sentinel_pipedreamin_complete.xml";
+  EnvironmentLoader env = EnvironmentLoader(file.c_str());
 
-  world.robots[0]->qMin[6]=0;
-  world.robots[0]->qMax[6]=1e-8;
-  info(&world);
+  MotionPlannerOMPL planner(env.GetWorldPtr());
 
-  //############################################################################
-  //obtain start and goal config
-  //############################################################################
-
-  Robot *robot = world.robots[0];
-  Config p_init = robot->q;
-  //p_init.setZero();
-
-  sim.odesim.SetGravity(Vector3(0,0,0));
-
-  Config p_goal;
-  p_goal.resize(p_init.size());
-  p_goal.setZero();
-
-  //sentinel
-
-  p_init[0]=-1.3;
-  p_init[1]=-0.4;
-  p_init[2]=2.7;
-  p_init[3]=M_PI/4;
-
-  //p_goal[0]=2.0;
-  //p_goal[1]=0.3;
-  //p_goal[2]=1.3;
-  p_goal[0]=-2.0;
-  p_goal[1]=0.3;
-  p_goal[2]=1.3;
-  p_goal[3]=M_PI;
-
-  world.background = GLColor(1,1,1);
-
-  //############################################################################
-  //free space planner
-  //############################################################################
-
-  MotionPlannerOMPL planner(&world, &sim);
+  PlannerInput pin = env.GetPlannerInput();
+  std::cout << pin << std::endl;
+  Config p_init = pin.q_init;
+  Config p_goal = pin.q_goal;
 
   if(planner.solve(p_init, p_goal)){
-    backend.VisualizePathSweptVolume(planner.GetKeyframes());
+    std::vector<Config> keyframes = planner.GetKeyframes();
+    env.GetBackendPtr()->AddPath(keyframes);
   }
 
-  backend.VisualizeStartGoal(p_init, p_goal);
-  backend.VisualizePlannerTree(planner.GetTree());
-  backend.Save();
-  //backend.Load("kinodynamic_solution_tunnel_environment.xml");
 
-  ////############################################################################
-  ////guification
-  ////############################################################################
+  env.GetBackendPtr()->VisualizeStartGoal(p_init, p_goal);
+  env.GetBackendPtr()->VisualizePlannerTree(planner.GetTree());
+  env.GetBackendPtr()->HidePlannerTree();
+  env.GetBackendPtr()->Save("snake_turbine_complete.xml");
 
-  std::cout << "start GUI" << std::endl;
-  GLUIForceFieldGUI gui(&backend,&world);
+  GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.SetWindowTitle("SweptVolumePath");
   gui.Run();
 

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <KrisLibrary/GLdraw/GL.h>
 #include <KrisLibrary/GLdraw/drawextra.h>
+#include <KrisLibrary/Timer.h>
 
 #include <Contact/Grasp.h> //class Grasp
 #include <Planning/ContactCSpace.h>
@@ -35,12 +36,18 @@ int main(int argc,const char** argv) {
   std::vector<Config> headPath = env.GetBackendPtr()->getPathKeyFrames(0);
 
   Robot *robot = env.GetRobotPtr();
+
+  Timer* timer = new Timer();
+
   IrreducibleProjectorSentinel projector(robot);
   projector.setRootPath(headPath);
 
 
   std::vector<Config> wholeBodyPath = projector.getSubLinkKeyframes();
 
+  double t = timer->ElapsedTime();
+  std::cout << "Time for irreducible projection: " << t << std::endl;
+  exit(0);
 
 //  std::vector<Config> wholeBodyPath;
 //  for(int i = 0; i < headPath.size(); i++){

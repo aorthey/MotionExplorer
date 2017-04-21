@@ -67,6 +67,8 @@ class ForceFieldBackend : public SimTestBackend
   void HideRobot(){ drawRobot = 0; }
   void ShowPlannerTree(){ drawPlannerTree = 1; }
   void HidePlannerTree(){ drawPlannerTree = 0; }
+  void ShowSweptVolumes(){ showSweptVolumes = 1; }
+  void HideSweptVolumes(){ showSweptVolumes = 0; }
 
   void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);
   void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
@@ -92,8 +94,9 @@ class ForceFieldBackend : public SimTestBackend
 
   void VisualizePlannerTree(const SerializedTree &tree);
 
-
   void DrawText(int x,int y, std::string s);
+
+  int showSweptVolumes;
 
   std::vector<int> drawPathSweptVolume;
   std::vector<int> drawPathMilestones;

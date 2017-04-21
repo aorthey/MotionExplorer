@@ -35,8 +35,6 @@ class IrreducibleProjector
 
     pairDoubleVec ComputeThetaGammaFromRootPathPosition(const PathPiecewiseLinearEuclidean &path, double t0, const Matrix3 &R0, const std::vector<double> &lengths);
 
-    //std::vector<Config> getSubLinkKeyframes(std::vector<double> &lengths, uint Nbranches);
-
     virtual std::vector<Config> getSubLinkKeyframes() = 0;
 
 };

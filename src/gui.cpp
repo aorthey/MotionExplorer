@@ -21,6 +21,7 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
     std::cout << "there are " << world->robots.size() << " robots in this world. We only support 1." << std::endl;
     exit(0);
   }
+  showSweptVolumes = 0;
 
   drawForceField = 0;
   drawIKextras = 0;
@@ -93,7 +94,7 @@ void ForceFieldBackend::Start()
 
   std::cout << "Setting swept volume paths" << std::endl;
   for(int i = 0; i < getNumberOfPaths(); i++){
-    drawPathSweptVolume.push_back(0);
+    drawPathSweptVolume.push_back(showSweptVolumes);
     drawPathMilestones.push_back(0);
     drawPathStartGoal.push_back(1);
   }
@@ -151,7 +152,8 @@ void ForceFieldBackend::RenderWorld()
 
         glPushMatrix();
         glMultMatrix(mat);
-        GLDraw::GeometryAppearance& a = _appearanceStack.at(j);
+        //GLDraw::GeometryAppearance& a = _appearanceStack.at(j);
+        GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
         if(a.geom != robot->geometry[j]) a.Set(*robot->geometry[j]);
         a.SetColor(GLColor(0.7,0.7,0.7));
         a.DrawGL();

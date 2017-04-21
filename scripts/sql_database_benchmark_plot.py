@@ -3,7 +3,8 @@ import numpy as np
 
 #fname = "../data/benchmarks/2017_04_11_irreduciblepipes.db"
 #fname = "../data/benchmarks/sentinel_pipes_irreducible_2017_04_15.db"
-fname = "../data/benchmarks/snake_turbine_2017_04_20.db"
+#fname = "../data/benchmarks/snake_turbine_2017_04_20.db"
+fname = "../data/benchmarks/sentinel_pipes_2017_04_21.db"
 
 connection = sqlite3.connect(fname)
 cursor = connection.cursor()

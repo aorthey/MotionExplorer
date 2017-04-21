@@ -35,22 +35,23 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
   }
 
   uint Nrobots = world.robots.size();
-  if(Nrobots!=1){
-    std::cout << "Current planner only supports 1 robot! selected " << Nrobots << " robots." << std::endl;
+  if(Nrobots<1){
+    std::cout << "Current planner only supports one robot! selected " << Nrobots << " robots." << std::endl;
     for(int i = 0; i < Nrobots; i++){
       std::cout << world.robots[i]->name << std::endl;
     }
-    std::cout << "Has the xml files been loaded multiple times?" << std::endl;
     exit(0);
   }
   name_robot = world.robots[0]->name;
-  name_environment = world.rigidObjects[0]->name;
-  name = name_robot + "_" + name_environment;
-  std::cout << name << std::endl;
+
+  //name_environment = world.rigidObjects[0]->name;
+  //name = name_robot + "_" + name_environment;
+  //std::cout << name << std::endl;
 
   info(&world);
 
   Robot *robot = world.robots[0];
+
   if(LoadPlannerSettings(file_name.c_str())){
 
     for(int i = 0; i < 6; i++){
