@@ -24,33 +24,46 @@ void SentinelPropagatorIrreducible::propagate(const ob::State *state, const oc::
 
   const double *ucontrol = control->as<oc::RealVectorControlSpace::ControlType>()->values;
 
-  Config u;
-  u.resize(7);
-  u.setZero();
-  u(0) = 0.0;//ucontrol[0]; //include torsion?
-  u(1) = ucontrol[0];
-  u(2) = ucontrol[1];
-  u(3) = 1.0;
-  u(6) = ucontrol[3];//time
+  Config uSE3;
+  uSE3.resize(6);
+  uSE3.setZero();
+  uSE3(0) = 0.0;//ucontrol[0]; //include torsion?
+  uSE3(1) = ucontrol[1];
+  uSE3(2) = ucontrol[2];
+  uSE3(3) = 1.0;
+  uSE3(4) = 0.0;
+  uSE3(5) = 0.0;
 
-
+  uint N = s->getDimension() - 6;
   //###########################################################################
   // Forward Simulate
   //###########################################################################
-  double roll = u(0);
-  double pitch = u(1);
-  double yaw = u(2);
-  Math3D::EulerAngleRotation Reuler(roll, pitch, yaw);
-  Math3D::Matrix3 R;
-  Reuler.getMatrixXYZ(R);
+  //double roll = u(0);
+  //double pitch = u(1);
+  //double yaw = u(2);
+  //Math3D::EulerAngleRotation Reuler(roll, pitch, yaw);
+  //Math3D::Matrix3 R;
+  //Reuler.getMatrixXYZ(R);
 
-  //Matrix4 tmp = MatrixExponential(dp0*h);
-  //Matrix4 pnext = p0*tmp;
+  //std::vector<Config> path;
+  //cspace_->Simulate(x0, u, path);
+  //Config qend = path.back();
 
-  std::vector<Config> path;
-  cspace_->Simulate(x0, u, path);
+  //new
+  double dt = ucontrol[3];
+  if(dt<0){
+    std::cout << "propagation step size is negative:"<<dt << std::endl;
+    exit(0);
+  }
 
-  Config qend = path.back();
+  Matrix4 x0_SE3 = cspace_->StateToSE3(x0);
+  Matrix4 dp0 = cspace_->SE3Derivative(uSE3);
+  Matrix4 x1_SE3 = cspace_->ForwardSimulate(x0_SE3,dp0,dt);
+
+  State x1(x0);
+  cspace_->SE3ToState(x1, x1_SE3);
+
+  Config qend = x1;
 
   //###########################################################################
   // Config to OMPL
@@ -78,7 +91,6 @@ void SentinelPropagatorIrreducible::propagate(const ob::State *state, const oc::
   //###########################################################################
   // R^N Control
   //###########################################################################
-  uint N = s->getDimension() - 6;
   for(int i = 0; i < N; i++){
     resultRn->values[i] = ssrRn->values[i];
   }
@@ -215,7 +227,7 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   //KINODYNAMIC PLANNERS
   //double kappa_curvature = 2.2;
-  double kappa_curvature = 1.3;
+  double kappa_curvature = 1.57;
   uint NdimControl = 3;
 
   //TODO: this does not check if index is out of bounds -> 
@@ -238,9 +250,9 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   // choose planner
   //###########################################################################
   //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
+  ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
-  ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
   //
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::Syclop>(si);
@@ -261,7 +273,6 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   ss.setStartAndGoalStates(start, goal, epsilon);
   ss.setup();
   ss.setPlanner(ompl_planner);
-
   ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
 
   //set objective to infinite path to just return first solution
@@ -287,27 +298,34 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   double duration = 1200.0;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
 
-
   //###########################################################################
   // benchmark instead
   //###########################################################################
-  //ot::Benchmark benchmark(ss, "IrreducibleBenchmarkPipes");
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
+  // ot::Benchmark benchmark(ss, "BenchmarkSnakeTurbineIrreducible");
+  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
+  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
+  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 
-  //ot::Benchmark::Request req;
-  //req.maxTime = duration;
-  //req.maxMem = 10000.0;
-  //req.runCount = 100;
-  //req.displayProgress = true;
+  // ot::Benchmark::Request req;
+  // req.maxTime = duration;
+  // req.maxMem = 10000.0;
+  // req.runCount = 100;
+  // req.displayProgress = true;
 
-  //benchmark.setPostRunEvent(std::bind(&PostRunEventIrreducible, std::placeholders::_1, std::placeholders::_2, &cspace));
+  // benchmark.setPostRunEvent(std::bind(&PostRunEventIrreducible, std::placeholders::_1, std::placeholders::_2, &cspace));
 
-  //benchmark.benchmark(req);
-  //benchmark.saveResultsToFile();
+  // benchmark.benchmark(req);
+  // benchmark.saveResultsToFile();
 
+  // std::string file = "ompl_irreducible_benchmark";
+  // std::string res = file+".log";
+  // benchmark.saveResultsToFile(res.c_str());
+
+  // std::string cmd = "ompl_benchmark_statistics.py "+file+".log -d "+file+".db";
+  // std::system(cmd.c_str());
+  // cmd = "cp "+file+".db"+" ../data/benchmarks/";
+  // std::system(cmd.c_str());
 
   //###########################################################################
   // solve
@@ -339,6 +357,8 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
     std::cout << "Found solution:" << std::endl;
     std::cout << " exact solution       : " << (pdef->hasExactSolution()? "Yes":"No")<< std::endl;
     std::cout << " approximate solution : " << (pdef->hasApproximateSolution()? "Yes":"No")<< std::endl;
+    double dg = pdef->getSolutionDifference();
+    std::cout << " solution difference  : " << dg << std::endl;
 
 
     oc::PathControl path_control = ss.getSolutionPath();
@@ -355,9 +375,6 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
     }
     ob::State *obgoal = path.getState(path.getStateCount()-1);
     Config plannergoal = OMPLStateToConfig(obgoal, cspace.getPtr());
-
-    //double dgoal = kcspace.Distance(plannergoal, p_goal);
-    //std::cout << "Distance to goal: " << dgoal << std::endl;
 
     uint istep = max(int(path.getStateCount()/10.0),1);
     for(int i = 0; i < path.getStateCount(); i+=istep)

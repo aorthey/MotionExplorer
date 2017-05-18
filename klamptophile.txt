@@ -442,10 +442,11 @@ without recompiling. Delete the whole plannersetup folder!
  [ ] enbable/disable swept volume of certain links.
  [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
       andreas dziegielewski http://acg.cs.tau.ac.il/projects/swept-volume/project-page seems promising
+ [ ] use TAB to access different modes: simulation <-> Desired Pose (change goal) blender-like controls?
 
 -- abstractions (longterm goals)
 
- [ ] Needs switch to QT, the file loader from GLUI seems not to work properly.  Also the graphics are quite bad. 
+ [ ] Needs switch to QT, the file loader from GLUI seems not to work properly. Also the graphics are quite bad. 
  [x] be able to design landscapes/fancy environments and import them to simulator
 
  [ ] be able to load different landscapes/robots from simulator, plus start/goal
@@ -459,11 +460,11 @@ as swept volumes simultaneously
  [ ] do benchmark planning from inside the simulator by clicking together
 algorithms and #runs and duration. Have a default benchmarking plus dump
 everything to nice pdf graph / latex table.
- [ ] have ability to do retiming of a path inside simulator, then display the
+ [ ] have ability to retime a path inside simulator, then display the
 output over time inside the simulator. 
  [ ] be able to deform path inside simulator. Ability to load paths from file,
 then display them, then deform them, then to save those paths. 
- [ ] visualize planner tree with millions of nodes without lags
+ [ ] visualize planner tree with millions of nodes without lags (cull points somehow)
  [ ] have vim-keybindings to quickly move around, save/load, screenshots,
 display tree/start/goal/swept volumes, do planning
  [ ] EnvironmentLoader should be merged with Backend, so that we can load/save inside
@@ -508,6 +509,5 @@ if specified irreducible planner, use that one)
  [ ] what about the humanoid experiments? could we repeat them easily?
  [ ] one humanoid experiment: flat floor, multiple doors at different angles, sideways motion.  Maybe like the kyoto tori 
 
-
 -- important
- [ ] loading urdf robots from terrain folder not working
+ [x] loading urdf robots from terrain folder not working

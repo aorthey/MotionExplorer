@@ -50,6 +50,7 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
 
   info(&world);
 
+
   Robot *robot = world.robots[0];
 
   if(LoadPlannerSettings(file_name.c_str())){
@@ -62,6 +63,13 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     pin.qMax = robot->qMax;
   }
 
+  robot->q = pin.q_init;
+  robot->UpdateFrames();
+  ODERobot *simrobot = _backend->sim.odesim.robot(0);
+  simrobot->SetConfig(pin.q_init);
+
+  robot->q = pin.q_goal;
+  robot->UpdateFrames();
 }
 
 bool EnvironmentLoader::LoadPlannerSettings(TiXmlElement *node)

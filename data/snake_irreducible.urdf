@@ -53,15 +53,15 @@ body0
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.54 0" xyz="-0.015 0 0"/>
+    <origin rpy="0 1.54 0" xyz="-0.0125 0 0"/>
     <geometry>
-      <cylinder length="0.03" radius="0.075"/>
+      <cylinder length="0.025" radius="0.075"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="-0.015 0 0"/>
+    <origin rpy="0 1.57 0" xyz="-0.0125 0 0"/>
     <geometry>
-      <cylinder length="0.03" radius="0.075"/>
+      <cylinder length="0.025" radius="0.075"/>
     </geometry>
   </collision>
  </link>
@@ -78,13 +78,13 @@ body0
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
-    <origin rpy="0 0 0" xyz="-0.05 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.045 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
   </collision>
   <visual>
-    <origin rpy="0 0 0" xyz="-0.05 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.045 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>

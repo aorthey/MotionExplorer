@@ -53,15 +53,15 @@ body0
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.54 0" xyz="-0.015 0 0"/>
+    <origin rpy="0 1.54 0" xyz="-0.0125 0 0"/>
     <geometry>
-      <cylinder length="0.03" radius="0.075"/>
+      <cylinder length="0.025" radius="0.075"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="-0.015 0 0"/>
+    <origin rpy="0 1.57 0" xyz="-0.0125 0 0"/>
     <geometry>
-      <cylinder length="0.03" radius="0.075"/>
+      <cylinder length="0.025" radius="0.075"/>
     </geometry>
   </collision>
  </link>
@@ -78,13 +78,13 @@ body0
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
-    <origin rpy="0 0 0" xyz="-0.05 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.045 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
   </collision>
   <visual>
-    <origin rpy="0 0 0" xyz="-0.05 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.045 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
@@ -103,21 +103,21 @@ body0
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.54 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.54 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.075"/>
+      <cylinder length="0.1" radius="0.075"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.57 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.075"/>
+      <cylinder length="0.1" radius="0.075"/>
     </geometry>
   </collision>
  </link>
 
 <joint name="body0_body1_joint_revolute_Z" type="revolute">
-  <origin rpy="0 0 0" xyz="-0.05 0 0"/>
+  <origin rpy="0 0 0" xyz="-0.045 0 0"/>
   <parent link="body0"/>
   <child link="body0_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
@@ -159,13 +159,13 @@ body0
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
   </collision>
   <visual>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
@@ -184,21 +184,21 @@ body0
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.54 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.54 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.0625"/>
+      <cylinder length="0.1" radius="0.0625"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.57 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.0625"/>
+      <cylinder length="0.1" radius="0.0625"/>
     </geometry>
   </collision>
  </link>
 
 <joint name="body1_body2_joint_revolute_Z" type="revolute">
-  <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+  <origin rpy="0 0 0" xyz="-0.14 0 0"/>
   <parent link="body1"/>
   <child link="body1_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
@@ -240,13 +240,13 @@ body0
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
   </collision>
   <visual>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
@@ -265,21 +265,21 @@ body0
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.54 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.54 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.0520833333333"/>
+      <cylinder length="0.1" radius="0.0520833333333"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.57 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.0520833333333"/>
+      <cylinder length="0.1" radius="0.0520833333333"/>
     </geometry>
   </collision>
  </link>
 
 <joint name="body2_body3_joint_revolute_Z" type="revolute">
-  <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+  <origin rpy="0 0 0" xyz="-0.14 0 0"/>
   <parent link="body2"/>
   <child link="body2_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
@@ -321,13 +321,13 @@ body0
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
   </collision>
   <visual>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
@@ -346,21 +346,21 @@ body0
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.54 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.54 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.0434027777778"/>
+      <cylinder length="0.1" radius="0.0434027777778"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.57 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.0434027777778"/>
+      <cylinder length="0.1" radius="0.0434027777778"/>
     </geometry>
   </collision>
  </link>
 
 <joint name="body3_body4_joint_revolute_Z" type="revolute">
-  <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+  <origin rpy="0 0 0" xyz="-0.14 0 0"/>
   <parent link="body3"/>
   <child link="body3_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
@@ -402,13 +402,13 @@ body0
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
   </collision>
   <visual>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
@@ -427,21 +427,21 @@ body0
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.54 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.54 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.0361689814815"/>
+      <cylinder length="0.1" radius="0.0361689814815"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.57 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.0361689814815"/>
+      <cylinder length="0.1" radius="0.0361689814815"/>
     </geometry>
   </collision>
  </link>
 
 <joint name="body4_body5_joint_revolute_Z" type="revolute">
-  <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+  <origin rpy="0 0 0" xyz="-0.14 0 0"/>
   <parent link="body4"/>
   <child link="body4_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
@@ -483,13 +483,13 @@ body0
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
   </collision>
   <visual>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
@@ -508,21 +508,21 @@ body0
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.54 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.54 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.0301408179012"/>
+      <cylinder length="0.1" radius="0.0301408179012"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.57 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.0301408179012"/>
+      <cylinder length="0.1" radius="0.0301408179012"/>
     </geometry>
   </collision>
  </link>
 
 <joint name="body5_body6_joint_revolute_Z" type="revolute">
-  <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+  <origin rpy="0 0 0" xyz="-0.14 0 0"/>
   <parent link="body5"/>
   <child link="body5_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
@@ -564,13 +564,13 @@ body0
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
   </collision>
   <visual>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
@@ -589,21 +589,21 @@ body0
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.54 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.54 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.025117348251"/>
+      <cylinder length="0.1" radius="0.025117348251"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.57 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.025117348251"/>
+      <cylinder length="0.1" radius="0.025117348251"/>
     </geometry>
   </collision>
  </link>
 
 <joint name="body6_body7_joint_revolute_Z" type="revolute">
-  <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+  <origin rpy="0 0 0" xyz="-0.14 0 0"/>
   <parent link="body6"/>
   <child link="body6_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
@@ -645,13 +645,13 @@ body0
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
   </collision>
   <visual>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
@@ -670,21 +670,21 @@ body0
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.54 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.54 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.0209311235425"/>
+      <cylinder length="0.1" radius="0.0209311235425"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="-0.08 0 0"/>
+    <origin rpy="0 1.57 0" xyz="-0.07 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.0209311235425"/>
+      <cylinder length="0.1" radius="0.0209311235425"/>
     </geometry>
   </collision>
  </link>
 
 <joint name="body7_body8_joint_revolute_Z" type="revolute">
-  <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+  <origin rpy="0 0 0" xyz="-0.14 0 0"/>
   <parent link="body7"/>
   <child link="body7_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
@@ -726,13 +726,13 @@ body0
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
   </collision>
   <visual>
-    <origin rpy="0 0 0" xyz="-0.16 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.14 0 0"/>
     <geometry>
       <sphere radius="0.019"/>
     </geometry>
@@ -745,6 +745,6 @@ body0
   <child link="body8"/>
 </joint>
 
-  <klampt package_root="../../.." default_acc_max="4" >
+  <klampt package_root="../" default_acc_max="4" >
   </klampt>
 </robot>

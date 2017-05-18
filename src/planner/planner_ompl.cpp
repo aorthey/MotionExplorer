@@ -33,8 +33,8 @@ GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot)
 
   ob::CompoundStateSpace *cspace = space_->as<ob::CompoundStateSpace>();
 
-  cspace->setSubspaceWeight(0,1);
-  cspace->setSubspaceWeight(1,0);
+  //cspace->setSubspaceWeight(0,1);
+  //cspace->setSubspaceWeight(1,0);
 
   //###########################################################################
   // Set bounds
@@ -493,9 +493,6 @@ void SentinelPropagator::propagate(const ob::State *state, const oc::Control* co
 
   uint Nduration = N+6;
   Real dt = ucontrol[Nduration];
-  //Real dt = 0.1;
-  //std::vector<Config> path;
-  //cspace_->Simulate(x0, u, path);
   if(dt<0){
     std::cout << "propagation step size is negative:"<<dt << std::endl;
     exit(0);
@@ -556,6 +553,9 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   ob::SpaceInformationPtr si = planner->getSpaceInformation();
   ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
   bool solved = pdef->hasExactSolution();
+
+  double dg = pdef->getSolutionDifference();
+  std::cout << dg << std::endl;
 
   if(solved){
     std::cout << "Found Solution at run " << pid << std::endl;
@@ -632,6 +632,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   ob::RealVectorBounds cbounds(NdimControl+1);
   cbounds.setLow(-1);
   cbounds.setHigh(1);
+
   uint effectiveControlDim = 0;
   for(int i = 0; i < NdimControl; i++){
     double qmin = robot->qMin(i);
@@ -661,9 +662,9 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
+  ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
-  ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
 
   //###########################################################################
   // setup and projection
@@ -672,7 +673,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   ss.setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
   ss.setStatePropagator(cpropagate);
 
-  double epsilon = 0.5;
+  double epsilon = 1.0;
 
   ss.setStartAndGoalStates(start, goal, epsilon);
   ss.setup();
@@ -699,28 +700,37 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   bool solved = false;
   double solution_time = dInf;
-  double duration = 1200.0;
+  double duration = 120.0;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
 
   //###########################################################################
   // benchmark instead
   //###########################################################################
-  //ot::Benchmark benchmark(ss, "BenchmarkSnake");
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
+  // ot::Benchmark benchmark(ss, "BenchmarkSnakeTurbine");
+  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
+  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
+  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 
-  //ot::Benchmark::Request req;
-  //req.maxTime = duration;
-  //req.maxMem = 10000.0;
-  //req.runCount = 100;
-  //req.displayProgress = true;
+  // ot::Benchmark::Request req;
+  // req.maxTime = duration;
+  // req.maxMem = 10000.0;
+  // req.runCount = 100;
+  // req.displayProgress = true;
 
-  //benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2, &cspace));
-  //
-  //benchmark.benchmark(req);
-  //benchmark.saveResultsToFile();
+  // benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2, &cspace));
+  
+  // benchmark.benchmark(req);
+  // benchmark.saveResultsToFile();
+
+  // std::string file = "ompl_benchmark";
+  // std::string res = file+".log";
+  // benchmark.saveResultsToFile(res.c_str());
+
+  // std::string cmd = "ompl_benchmark_statistics.py "+file+".log -d "+file+".db";
+  // std::system(cmd.c_str());
+  // cmd = "cp "+file+".db"+" ../data/benchmarks/";
+  // std::system(cmd.c_str());
 
   //###########################################################################
   // solve
@@ -749,6 +759,8 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
     std::cout << "Found solution:" << std::endl;
     std::cout << " exact solution       : " << (pdef->hasExactSolution()? "Yes":"No")<< std::endl;
     std::cout << " approximate solution : " << (pdef->hasApproximateSolution()? "Yes":"No")<< std::endl;
+    double dg = pdef->getSolutionDifference();
+    std::cout << " solution difference  : " << dg << std::endl;
     oc::PathControl path_control = ss.getSolutionPath();
     og::PathGeometric path = path_control.asGeometric();
     std::cout << "Path Length     : " << path.length() << std::endl;
@@ -763,9 +775,6 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
     }
     ob::State *obgoal = path.getState(path.getStateCount()-1);
     Config plannergoal = OMPLStateToConfig(obgoal, cspace.getPtr());
-
-    //double dgoal = kcspace.Distance(plannergoal, p_goal);
-    //std::cout << "Distance to goal: " << dgoal << std::endl;
 
     uint istep = max(int(path.getStateCount()/10.0),1);
     for(int i = 0; i < path.getStateCount(); i+=istep)

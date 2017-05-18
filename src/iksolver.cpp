@@ -12,16 +12,17 @@ IKSolver::IKSolver(RobotWorld *world):
 
 void IKSolver::init(){
   if(!this->_isInitialized){
-    this->_robot = _world->GetRobot(this->GetRobotName());
+    //this->_robot = _world->GetRobot(this->GetRobotName());
     this->_isInitialized = true;
     this->_irobot = 0;
-    Robot *irob = _world->robots[this->_irobot];
-    if(irob->name.compare(_robot->name)){
-        std::cout << "ERROR: index number does not match robot" << std::endl;
-        std::cout << "Robot name      :  " << _robot->name << std::endl;
-        std::cout << "Index robot name:  " << irob->name << std::endl;
-        throw;
-    }
+    this->_robot = _world->robots[this->_irobot];
+    // Robot *irob = _world->robots[this->_irobot];
+    // if(irob->name.compare(_robot->name)){
+    //     std::cout << "ERROR: index number does not match robot" << std::endl;
+    //     std::cout << "Robot name      :  " << _robot->name << std::endl;
+    //     std::cout << "Index robot name:  " << irob->name << std::endl;
+    //     throw;
+    // }
   }
 }
 vector<int> IKSolver::GetIKCollisions()

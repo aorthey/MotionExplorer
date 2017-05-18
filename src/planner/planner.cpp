@@ -8,7 +8,7 @@ MotionPlanner::MotionPlanner(RobotWorld *world):
 {
 
   //make sure that there is only one robot in the world
-  assert(world->robots.size() == 1);
+  //assert(world->robots.size() == 1);
   _irobot = 0;
   _icontroller = 0;
 }

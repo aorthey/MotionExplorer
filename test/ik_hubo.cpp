@@ -1,8 +1,4 @@
-//#include <Interface/SimulationGUI.h>
 #include <Interface/SimTestGUI.h>
-//#include <Interface/QSimTestGUI.h>
-//#include <KlamptQt/qtsimtestgui.h>
-//#include "pickandplace.h"
 #include <KrisLibrary/GLdraw/GL.h>
 #include <KrisLibrary/robotics/IK.h>
 #include <KrisLibrary/robotics/IKFunctions.h>
@@ -16,12 +12,6 @@
 #include "environment_loader.h"
 
 int main(int argc,const char** argv) {
-  //RobotWorld world;
-
-  //ForceFieldBackend backend(&world);
-  //WorldSimulation& sim=backend.sim;
-
-  //backend.LoadAndInitSim("/home/aorthey/git/orthoklampt/data/hubo_object.xml");
   std::string file = "data/hubo_object.xml";
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
 

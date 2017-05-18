@@ -6,10 +6,10 @@ from urdf_create import *
 
 
 robot_names = ['snake','snake_irreducible']
-env_names = ['twister/twister.tri','underwater/underwater.tri']
+env_names = ['turbine/turbine.tri','twister/twister.tri','underwater/underwater.tri']
 Nsegments_vec = [9,1]
 
-length = 0.12
+length = 0.1
 limit = pi/4
 stublength = length/4
 radius = 0.01
@@ -144,8 +144,8 @@ for k in range(0,len(robot_names)):
     f.write(terrainstr)
 
     plannersettingsstr  = '  <plannersettings>\n\n'
-    plannersettingsstr += '    <qinit config="33  0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>\n'
-    plannersettingsstr += '    <qgoal config="33  2.3 0.7 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>\n'
+    plannersettingsstr += '    <qinit config="33  -3.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>\n'
+    plannersettingsstr += '    <qgoal config="33  5.2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>\n'
     plannersettingsstr += '    <se3min config="6  -6 -6 -1 -3.141592 -1.57 -3.14"/>\n'
     plannersettingsstr += '    <se3max config="6  6 6 16 3.141592 1.57 3.14"/>\n\n'
     plannersettingsstr += '  </plannersettings>\n\n'
@@ -163,3 +163,5 @@ for k in range(0,len(robot_names)):
 
     print "\nCreated new file >>",
     print xmlname
+
+print "Curvature: ",kappa

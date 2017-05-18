@@ -126,5 +126,3 @@ class SE3Project0r : public ob::ProjectionEvaluator
       projection(2) = stateSE3->getZ();
     }
 };
-
-//ob::PlannerTerminationCondition epsilonSolnPlannerTerminationCondition(ob::ProblemDefinitionPtr pdef);

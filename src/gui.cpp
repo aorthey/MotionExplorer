@@ -45,6 +45,7 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
 
   MapButtonToggle("draw_robot_extras",&drawRobotExtras);
   MapButtonToggle("draw_robot",&drawRobot);
+  MapButtonToggle("draw_ik",&drawIKextras);
   MapButtonToggle("draw_fancy_coordinate_axes",&drawAxes);
   MapButtonToggle("draw_fancy_coordinate_axes_labels",&drawAxesLabels);
 
@@ -61,11 +62,9 @@ void ForceFieldBackend::Start()
 {
   BaseT::Start();
 
-
   //disable higher drawing functions
   //drawBBs,drawPoser,drawDesired,drawEstimated,drawContacts,drawWrenches,drawExpanded,drawTime,doLogging
-  drawPoser = 0;
-
+  //drawPoser = 0;
   //settings["desired"]["color"][0] = 1;
   //settings["desired"]["color"][1] = 0;
   //settings["desired"]["color"][2] = 0;
@@ -599,9 +598,14 @@ bool GLUIForceFieldGUI::Initialize()
   AddControl(checkbox,"draw_robot");
   checkbox->set_int_val(_backend->drawRobot);
 
+
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Robot COM+Skeleton");
   AddControl(checkbox,"draw_robot_extras");
   checkbox->set_int_val(_backend->drawRobotExtras);
+
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw IK Constraints");
+  AddControl(checkbox,"draw_ik");
+  checkbox->set_int_val(_backend->drawIKextras);
 
   UpdateGUI();
 

@@ -16,6 +16,9 @@ namespace GLDraw{
 
       viewRobot->SetColor(goal.link, selectedLinkColor);
       ViewIKGoal viewik = ViewIKGoal();
+      viewik.widgetSize = 0.1;
+      viewik.lineWidth = 10;
+      viewik.lineColor = GLColor(1.0,0.5,0);
       viewik.Draw(goal, *robot);
       viewik.DrawLink(goal, *viewRobot);
 
