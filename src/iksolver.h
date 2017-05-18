@@ -2,6 +2,7 @@
 #include <Interface/SimTestGUI.h>
 #include <KrisLibrary/robotics/IK.h>
 #include <KrisLibrary/robotics/IKFunctions.h>
+#include <KrisLibrary/robotics/Stability.h>
 #include <Modeling/World.h>
 #include <View/ViewIK.h>
 

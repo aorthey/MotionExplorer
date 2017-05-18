@@ -8,6 +8,10 @@ IKSolver::IKSolver(RobotWorld *world):
   this->_isInitialized = false;
   this->_iters = 100;
   this->_verbose = 1;
+
+  this->_isInitialized = true;
+  this->_irobot = 0;
+  this->_robot = _world->robots[this->_irobot];
 }
 
 void IKSolver::init(){
@@ -132,3 +136,4 @@ IKGoal IKSolver::LinkToGoalRot( const char *linkName, Matrix3 &rotation)
   goal.SetFixedRotation(rotation);
   return goal;
 }
+

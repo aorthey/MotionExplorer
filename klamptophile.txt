@@ -24,6 +24,10 @@ World -> Terrain -> ManagedGeometry -> DrawGL()
   
 
 Robot (Modeling/Robot.h)
+bool InJointLimits(const Config& q) const;
+virtual bool SelfCollision(Real distance=0);
+
+
   Robot : public RobotWithGeometry
     string name;
     vector<string> geomFiles;   ///< geometry file names (used in saving)
@@ -40,6 +44,8 @@ Robot (Modeling/Robot.h)
     DrawGL()
     DrawLinkGL(int i)
     int LinkIndex(char *) GetBody|GetLink function
+    virtual bool SelfCollision(Real distance=0);
+
 
   <- <- RobotDynamics3D 
 
@@ -508,6 +514,10 @@ if specified irreducible planner, use that one)
  [ ] make sure that cbounds gives an exception if outer limit index
  [ ] what about the humanoid experiments? could we repeat them easily?
  [ ] one humanoid experiment: flat floor, multiple doors at different angles, sideways motion.  Maybe like the kyoto tori 
+ [ ] be able to sample all possible IK configurations given contacts
+ [ ] CoM + IK computation?
 
 -- important
  [x] loading urdf robots from terrain folder not working
+ [ ] update to klampt-0.7
+ [ ] visualize wrench cone at contact
