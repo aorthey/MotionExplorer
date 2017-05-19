@@ -102,9 +102,13 @@ class Info
           double qL = (*it)->qMin[i];
           double qU = (*it)->qMax[i];
           if(fabs(qU-qL) > 1e-8) Neffective++;
+          std::cout << "#qlimit [" << i << "] " << (*it)->qMin[i] << " - " <<  (*it)->qMax[i] << std::endl;
         }
+        //SE(3) element: X Y Z yaw pitch roll
         std::cout << std::string(80, '-') << std::endl;
         std::cout << "#config q=" << (*it)->q << std::endl;
+        std::cout << "#X Y Z          : " << (*it)->q[0] << ","  << (*it)->q[1] << "," << (*it)->q[2]<< std::endl;
+        std::cout << "#Yaw Pitch Roll : " << (*it)->q[3] << ","  << (*it)->q[4] << "," << (*it)->q[5]<< std::endl;
         std::cout << "#qmin " << (*it)->qMin << std::endl;
         std::cout << "#qmax " << (*it)->qMax << std::endl;
         std::cout << "Dimensionality          : " << (*it)->qMin.size() << std::endl;

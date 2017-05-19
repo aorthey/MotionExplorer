@@ -35,12 +35,17 @@ class MotionPlannerContact: public MotionPlanner
       //#######################################################################
       //set some IK goal
       //#######################################################################
-      Matrix3 I;
-      I.setRotateZ(0);
+      Matrix3 R;
+      double theta = M_PI/4;
+      double xl = 0.0;
+      double yl = -2.0;
+      double zl = 0.0;
+
+      R.setRotateZ(theta);
       IKSolverHRP2 iks(_world);
-      //iks.init();
-      IKGoal contact1 = iks.LinkToGoalTransRot("l_sole",0,-2.0,0.0,I);
-      IKGoal contact2 = iks.LinkToGoalTransRot("r_sole",0,-2.15,0.0,I);
+      IKGoal contact1 = iks.LinkToGoalTransRot("l_sole",xl,yl,zl,R);
+      //IKGoal contact2 = iks.LinkToGoalTransRot("r_sole",0,-2.15,0.0,I);
+      //cspace.AddContact(contact2);
       //vector<IKGoal> ikcnstr = ik.GetConstraints();
 
       PropertyMap pmap;
@@ -48,12 +53,26 @@ class MotionPlannerContact: public MotionPlanner
       std::cout << pmap << std::endl;
 
       cspace.AddContact(contact1);
-      cspace.AddContact(contact2);
 
-      for(int i = 0; i < 10000; i++){
+      for(int i = 0; i < 1000; i++){
         Config x;
         cspace.Sample(x);
         if(cspace.IsFeasible(x)){
+          robot->UpdateConfig(x);
+          Vector3 lfoot(xl,yl,zl);
+          Vector3 c = robot->GetCOM() - lfoot;
+
+          Vector3 ex(1,0,0),ey(0,1,0),cx,cy;
+          R.mul(ex,cx);
+          R.mul(ey,cy);
+
+          double ctx = dot(c,cx);
+          double cty = dot(c,cy);
+
+          double dx = sqrt((xl-ctx)*(xl-ctx));
+          double dy = sqrt((yl-cty)*(yl-cty));
+
+          if(dx>0.05) continue;
           this->q = x;
           std::cout << "Found config at iter " << i << std::endl;
           return true;

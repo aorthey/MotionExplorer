@@ -310,6 +310,7 @@ bool ForceFieldBackend::Load(const char* file)
     }
   }else{
     std::cout << doc.ErrorDesc() << std::endl;
+    std::cout << in << std::endl;
     std::cout << "ERROR" << std::endl;
   }
   //exit(0);

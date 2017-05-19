@@ -63,7 +63,7 @@ virtual bool SelfCollision(Real distance=0);
 
   <- <- <- RobotKinematics3D 
 
-    GetCOM()
+    Vector3 GetCOM()
     GetTotalMass()
     std::vector<RobotLink3D> links;
     Config q;  //! DO NOT set directly, use UpdateConfig!

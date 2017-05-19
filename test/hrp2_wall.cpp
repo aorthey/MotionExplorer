@@ -18,9 +18,6 @@ int main(int argc,const char** argv) {
   MotionPlannerContact planner(env.GetWorldPtr());
 
   WorldSimulation sim = env.GetBackendPtr()->sim;
-  //IKSolverHubo ikhubo(env.GetWorldPtr());
-  //ikhubo.solve();
-  //ikhubo.SetConfigSimulatedRobot(sim);
 
   PlannerInput pin = env.GetPlannerInput();
   std::cout << pin << std::endl;
@@ -30,12 +27,14 @@ int main(int argc,const char** argv) {
   if(planner.solve(p_init, p_goal)){
     util::SetSimulatedRobot(env.GetRobotPtr(), sim, planner.q );
   }
+
+
   //   std::vector<Config> keyframes = planner.GetKeyframes();
   //   env.GetBackendPtr()->AddPath(keyframes);
   // }
 
   //env.GetBackendPtr()->SetIKConstraints(ik.GetIKGoalConstraints(), ik.GetIKRobotName());
-  env.GetBackendPtr()->VisualizeStartGoal(p_init, p_goal);
+  //env.GetBackendPtr()->VisualizeStartGoal(p_init, p_goal);
   env.GetBackendPtr()->ShowSweptVolumes();
   env.GetBackendPtr()->ShowRobot();
   env.GetBackendPtr()->HideCoordinateAxes();
