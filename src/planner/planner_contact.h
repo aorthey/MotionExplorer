@@ -31,7 +31,6 @@ class MotionPlannerContact: public MotionPlanner
 
       ContactCSpace cspace(*_world, _irobot, &worldsettings);
 
-
       //#######################################################################
       //set some IK goal
       //#######################################################################

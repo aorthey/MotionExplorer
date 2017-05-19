@@ -63,6 +63,14 @@ class MotionPlannerOMPL: public MotionPlanner
     void test();
     void testSE3(KinodynamicCSpaceSentinelAdaptor &cspace);
     void test_conversion(Config &q, ob::StateSpacePtr &stateSpace);
+
+    static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)
+    {
+      ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
+      obj->setCostThreshold(ob::Cost(dInf));
+      return obj;
+    }
+
 };
 
 

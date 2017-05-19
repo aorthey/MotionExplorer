@@ -2,13 +2,6 @@
 
 #include "cspace_sentinel.h"
 
-ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)
-{
-  ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
-  obj->setCostThreshold(ob::Cost(dInf));
-  return obj;
-}
-
 GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot)
 {
   //###########################################################################
@@ -281,7 +274,16 @@ bool MotionPlannerOMPLValidityChecker::isValid(const ob::State* state) const
 {
   const ob::StateSpacePtr ssp = si_->getStateSpace();
   Config q = OMPLStateToConfig(state, ssp);
-  return _space->IsFeasible(q);
+  //Robot *robot = _space->robot;
+  //if(!robot->InJointLimits(q)) {
+    //return false;
+  //}
+  //return _space->CheckCollisionFree();
+
+  //PropertyMap pmap;
+  //_space->Properties(pmap);
+
+  return _space->IsFeasible(q) && si_->satisfiesBounds(state);
 }
 
 MotionPlannerOMPL::MotionPlannerOMPL(RobotWorld *world):

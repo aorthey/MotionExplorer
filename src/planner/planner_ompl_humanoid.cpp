@@ -1,12 +1,12 @@
 #include "cspace_sentinel.h"
-#include "planner/planner_ompl_irreducible.h"
+#include "planner/planner_ompl_humanoid.h"
 
-MotionPlannerOMPLIrreducible::MotionPlannerOMPLIrreducible(RobotWorld *world):
+MotionPlannerOMPLHumanoid::MotionPlannerOMPLHumanoid(RobotWorld *world):
   MotionPlannerOMPL(world)
 {
 }
 
-void SentinelPropagatorIrreducible::propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
+void HumanoidPropagatorIrreducible::propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
 {
 
   //###########################################################################
@@ -20,12 +20,12 @@ void SentinelPropagatorIrreducible::propagate(const ob::State *state, const oc::
   Config uSE3;
   uSE3.resize(6);
   uSE3.setZero();
-  uSE3(0) = 0.0;//ucontrol[0]; //include torsion?
-  uSE3(1) = ucontrol[1];
+  uSE3(0) = 0;//ucontrol[0]; //include torsion?
+  uSE3(1) = 0;//ucontrol[1];
   uSE3(2) = ucontrol[2];
-  uSE3(3) = 1.0;
-  uSE3(4) = 0.0;
-  uSE3(5) = 0.0;
+  uSE3(3) = 0;
+  uSE3(4) = 1;
+  uSE3(5) = 0;
 
   uint N = s->getDimension() - 6;
   //###########################################################################
@@ -42,8 +42,8 @@ void SentinelPropagatorIrreducible::propagate(const ob::State *state, const oc::
   //cspace_->Simulate(x0, u, path);
   //Config qend = path.back();
 
-  //new
-  double dt = ucontrol[3];
+  uint Nduration = N+6;
+  double dt = ucontrol[Nduration];
   if(dt<0){
     std::cout << "propagation step size is negative:"<<dt << std::endl;
     exit(0);
@@ -58,6 +58,9 @@ void SentinelPropagatorIrreducible::propagate(const ob::State *state, const oc::
 
   Config qend = x1;
 
+  for(int i = 0; i < N; i++){
+    qend[i+6] = x0[i+6] + dt*ucontrol[i+6];
+  }
   //###########################################################################
   // Config to OMPL
   //###########################################################################
@@ -90,7 +93,7 @@ void SentinelPropagatorIrreducible::propagate(const ob::State *state, const oc::
 
 }
 
-void PostRunEventIrreducible(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &run, GeometricCSpaceOMPL *cspace)
+void PostRunEventHumanoid(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &run, GeometricCSpaceOMPL *cspace)
 {
   static uint pid = 0;
 
@@ -129,7 +132,7 @@ void PostRunEventIrreducible(const ob::PlannerPtr &planner, ot::Benchmark::RunPr
 }
 
 
-bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
+bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
 {
   this->_p_init = p_init;
   this->_p_goal = p_goal;
@@ -158,6 +161,8 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   kcspace.Properties(pmap);
   std::cout << "KCSPACE:" << std::endl <<  pmap << std::endl;
 
+  //std::cout << "Init: " << (kcspace.IsFeasible(p_init)?"yes":"no") << std::endl;
+  //std::cout << "Goal: " << (kcspace.IsFeasible(p_goal)?"yes":"no") << std::endl;
   //###########################################################################
   // Config init,goal to OMPL start/goal
   //###########################################################################
@@ -168,66 +173,41 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   ob::ScopedState<> goal  = ConfigToOMPLState(p_goal, cspace.getPtr());
   std::cout << start << std::endl;
   std::cout << goal << std::endl;
-
-
-  ////###########################################################################
-  //// Geometric planning (tested, works)
-  ////###########################################################################
-  //bool geometric = false;
-  //if(geometric){
-
-  //  og::SimpleSetup ss(cspace.getPtr());
-  //  const ob::SpaceInformationPtr si = ss.getSpaceInformation();
-
-  //  //GEOMETRIC PLANNERS
-  //  //ob::PlannerPtr ompl_planner = std::make_shared<og::RRTConnect>(si);
-  //  ob::PlannerPtr ompl_planner = std::make_shared<og::RRT>(si);
-  //  //ob::PlannerPtr ompl_planner = std::make_shared<og::RRTstar>(si);
-  //  //ob::PlannerPtr ompl_planner = std::make_shared<og::RRTsharp>(si);
-  //  //ob::PlannerPtr ompl_planner = std::make_shared<og::LazyRRT>(si);
-
-  //  ss.setPlanner(ompl_planner);
-  //  //ss.setPlanner(std::make_shared<og::RRTConnect>(si));
-
-  //  si->setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
-
-  //  ss.setStartAndGoalStates(start, goal);
-  //  ss.setup();
-  //  ob::PlannerStatus solved = ss.solve(10.0);
-  //  if (solved)
-  //  {
-  //    std::cout << "Found solution:" << std::endl;
-  //    ss.simplifySolution();
-  //    og::PathGeometric path = ss.getSolutionPath();
-  //    path.interpolate();
-  //    std::cout << path.length() << std::endl;
-  //    std::cout << path.getStateCount() << std::endl;
-
-  //    vector<Config> keyframes;
-  //    for(int i = 0; i < path.getStateCount(); i++)
-  //    {
-  //      ob::State *state = path.getState(i);
-  //      Config cur = OMPLStateToConfig(state, cspace.getPtr());
-  //      _keyframes.push_back(cur);
-  //    }
-  //    std::cout << std::string(80, '-') << std::endl;
-  //  }else{
-  //    std::cout << "No solution found" << std::endl;
-  //  }
-  //}else{
   //###########################################################################
   // Kinodynamic planner
   //###########################################################################
   //KINODYNAMIC PLANNERS
   //double kappa_curvature = 2.2;
-  double kappa_curvature = 1.57;
-  uint NdimControl = 3;
+  double kappa_curvature = 1.88;
 
-  //TODO: this does not check if index is out of bounds -> 
+  uint NdimControl = robot->q.size();
+
   auto control_cspace(std::make_shared<oc::RealVectorControlSpace>(cspace.getPtr(), NdimControl+1));
   ob::RealVectorBounds cbounds(NdimControl+1);
-  cbounds.setLow(-kappa_curvature);
-  cbounds.setHigh(kappa_curvature);
+  cbounds.setLow(-1);
+  cbounds.setHigh(1);
+
+
+  uint effectiveControlDim = 0;
+  for(int i = 0; i < NdimControl; i++){
+    double qmin = robot->qMin(i);
+    double qmax = robot->qMax(i);
+    double d = sqrtf((qmin-qmax)*(qmin-qmax));
+    if(d<1e-8){
+      //remove zero-measure dimensions for control
+      cbounds.setLow(i,0);
+      cbounds.setHigh(i,0);
+    }else{
+      effectiveControlDim++;
+    }
+  }
+  for(int i = 0; i < 6; i++){
+    cbounds.setLow(i,0);
+    cbounds.setHigh(i,0);
+  }
+  cbounds.setLow(2,-kappa_curvature);
+  cbounds.setHigh(2,kappa_curvature);
+
 
   cbounds.setLow(NdimControl,0.01);//propagation step size
   cbounds.setHigh(NdimControl,0.10);
@@ -237,7 +217,7 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   oc::SimpleSetup ss(control_cspace);
   oc::SpaceInformationPtr si = ss.getSpaceInformation();
 
-  auto cpropagate(std::make_shared<SentinelPropagatorIrreducible>(si, &kcspace));
+  auto cpropagate(std::make_shared<HumanoidPropagatorIrreducible>(si, &kcspace));
 
   //###########################################################################
   // choose planner
@@ -247,12 +227,6 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
-  //
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::Syclop>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopRRT>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::SyclopEST>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::LTLPlanner>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::EST>(si);
 
   //###########################################################################
   // setup and projection
@@ -273,14 +247,6 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
   //###########################################################################
-  // debug
-  //###########################################################################
-
-  //testRotationConversion();
-  //test();
-  //testSE3(kcspace);
-
-  //###########################################################################
   // solve
   //
   // termination condition: 
@@ -288,13 +254,13 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   bool solved = false;
   double solution_time = dInf;
-  double duration = 1200.0;
+  double duration = 3600;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
 
   //###########################################################################
   // benchmark instead
   //###########################################################################
-  // ot::Benchmark benchmark(ss, "BenchmarkSnakeTurbineIrreducible");
+  // ot::Benchmark benchmark(ss, "BenchmarkHumanoid");
   // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
   // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
   // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
@@ -306,7 +272,7 @@ bool MotionPlannerOMPLIrreducible::solve(Config &p_init, Config &p_goal)
   // req.runCount = 100;
   // req.displayProgress = true;
 
-  // benchmark.setPostRunEvent(std::bind(&PostRunEventIrreducible, std::placeholders::_1, std::placeholders::_2, &cspace));
+  // benchmark.setPostRunEvent(std::bind(&PostRunEventHumanoid, std::placeholders::_1, std::placeholders::_2, &cspace));
 
   // benchmark.benchmark(req);
   // benchmark.saveResultsToFile();
