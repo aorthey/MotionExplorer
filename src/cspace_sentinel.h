@@ -70,7 +70,7 @@ class KinodynamicCSpaceSentinelAdaptor: public KinematicCSpaceAdaptor
 
     //virtual void SampleNeighborhood(const Config& c,Real r,Config& x) { base->SampleNeighborhood(c,r,x); }
     //virtual EdgePlanner* LocalPlanner(const Config& a,const Config& b) { return base->LocalPlanner(a,b); }
-    //virtual bool IsFeasible(const Config& x) { return base->IsFeasible(x); }
+    virtual bool IsFeasible(const Config& x) { return base->IsFeasible(x); }
     //virtual void Interpolate(const Config& x,const Config& y,Real u,Config& out) { base->Interpolate(x,y,u,out); }
     //virtual void Midpoint(const Config& x,const Config& y,Config& out) { base->Midpoint(x,y,out); }
 

@@ -306,6 +306,7 @@ void KinodynamicCSpaceSentinelAdaptor::SampleControl(const State& x,ControlInput
   //T
   //u(6) = Rand(0.01,0.2);
   u(6) = Rand(0.01,0.1);
+  exit(0);
 }
 void KinodynamicCSpaceSentinelAdaptor::BiasedSampleControl(const State& x,const State& xGoal,ControlInput& u){
   int numSamples = 1e2;

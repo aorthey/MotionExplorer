@@ -9,13 +9,14 @@
 
 #include "environment_loader.h"
 #include "planner/planner_ompl.h"
+#include "planner/planner_ompl_humanoid.h"
 #include "planner/planner_contact.h"
 #include "iksolver_hrp2.h"
 
 int main(int argc,const char** argv) {
   std::string file = "data/hrp2_wall.xml";
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
-  MotionPlannerContact planner(env.GetWorldPtr());
+  MotionPlannerOMPLHumanoid planner(env.GetWorldPtr());
 
   WorldSimulation sim = env.GetBackendPtr()->sim;
 
@@ -25,9 +26,10 @@ int main(int argc,const char** argv) {
   Config p_goal = pin.q_goal;
 
   if(planner.solve(p_init, p_goal)){
-    util::SetSimulatedRobot(env.GetRobotPtr(), sim, planner.q );
+    //util::SetSimulatedRobot(env.GetRobotPtr(), sim, planner.q );
+    std::vector<Config> keyframes = planner.GetKeyframes();
+    env.GetBackendPtr()->AddPath(keyframes);
   }
-
 
   //   std::vector<Config> keyframes = planner.GetKeyframes();
   //   env.GetBackendPtr()->AddPath(keyframes);
@@ -35,6 +37,8 @@ int main(int argc,const char** argv) {
 
   //env.GetBackendPtr()->SetIKConstraints(ik.GetIKGoalConstraints(), ik.GetIKRobotName());
   //env.GetBackendPtr()->VisualizeStartGoal(p_init, p_goal);
+  env.GetBackendPtr()->VisualizePlannerTree(planner.GetTree());
+  env.GetBackendPtr()->HidePlannerTree();
   env.GetBackendPtr()->ShowSweptVolumes();
   env.GetBackendPtr()->ShowRobot();
   env.GetBackendPtr()->HideCoordinateAxes();
