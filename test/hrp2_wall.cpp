@@ -14,7 +14,7 @@
 #include "iksolver_hrp2.h"
 
 int main(int argc,const char** argv) {
-  std::string file = "data/hrp2_wall.xml";
+  std::string file = "data/hrp2_door.xml";
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
   MotionPlannerOMPLHumanoid planner(env.GetWorldPtr());
 
@@ -39,7 +39,7 @@ int main(int argc,const char** argv) {
   //env.GetBackendPtr()->VisualizeStartGoal(p_init, p_goal);
   env.GetBackendPtr()->VisualizePlannerTree(planner.GetTree());
   env.GetBackendPtr()->HidePlannerTree();
-  env.GetBackendPtr()->ShowSweptVolumes();
+  env.GetBackendPtr()->HideSweptVolumes();
   env.GetBackendPtr()->ShowRobot();
   env.GetBackendPtr()->HideCoordinateAxes();
 

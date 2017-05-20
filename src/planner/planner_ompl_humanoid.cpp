@@ -92,6 +92,46 @@ void HumanoidPropagatorIrreducible::propagate(const ob::State *state, const oc::
   }
 
 }
+MotionPlannerOMPLHumanoidValidityChecker::MotionPlannerOMPLHumanoidValidityChecker(const ob::SpaceInformationPtr &si, Robot *robot, CSpace* space):
+  MotionPlannerOMPLValidityChecker(si,space),robot(robot)
+{
+}
+
+bool MotionPlannerOMPLHumanoidValidityChecker::isValid(const ob::State* state) const
+{
+  const ob::StateSpacePtr ssp = si_->getStateSpace();
+
+  Config q = OMPLStateToConfig(state, ssp);
+
+  robot->UpdateConfig(q);
+
+  Vector3 lfoot(q[0],q[1],q[2]);
+  Matrix3 R;
+  R.setRotateZ(q[3]);
+  Vector3 c = robot->GetCOM() - lfoot;
+
+  Vector3 ex(1,0,0),ey(0,1,0),cx,cy;
+  R.mul(ex,cx);
+  R.mul(ey,cy);
+
+  double ctx = dot(c,cx);
+  double cty = dot(c,cy);
+
+  double dx = sqrt((ctx)*(ctx));
+  double dy = sqrt((cty)*(cty));
+
+  if(dx>0.08) return false;
+
+  //if(!robot->InJointLimits(q)) {
+    //return false;
+  //}
+  //return _space->CheckCollisionFree();
+
+  //PropertyMap pmap;
+  //_space->Properties(pmap);
+
+  return _space->IsFeasible(q) && si_->satisfiesBounds(state);
+}
 
 void PostRunEventHumanoid(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &run, GeometricCSpaceOMPL *cspace)
 {
@@ -210,7 +250,7 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
 
 
   cbounds.setLow(NdimControl,0.01);//propagation step size
-  cbounds.setHigh(NdimControl,0.10);
+  cbounds.setHigh(NdimControl,0.05);
 
   control_cspace->setBounds(cbounds);
 
@@ -232,7 +272,7 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
   // setup and projection
   //###########################################################################
 
-  ss.setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
+  ss.setStateValidityChecker(std::make_shared<MotionPlannerOMPLHumanoidValidityChecker>(si, robot, &kcspace));
   ss.setStatePropagator(cpropagate);
 
   double epsilon = 0.5;
@@ -254,7 +294,7 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   bool solved = false;
   double solution_time = dInf;
-  double duration = 3600;
+  double duration = 10;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
 
   //###########################################################################
@@ -321,7 +361,6 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
     std::cout << "Path Length     : " << path.length() << std::endl;
     std::cout << "Path Milestones : " << path.getStateCount() << std::endl;
 
-    vector<Config> keyframes;
     for(int i = 0; i < path.getStateCount(); i++)
     {
       ob::State *state = path.getState(i);
@@ -339,6 +378,11 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
       std::cout << i << "/" << path.getStateCount() <<  cur << std::endl;
     }
     std::cout << std::string(80, '-') << std::endl;
+
+    std::string sfile = util::GetCurrentTimeString()+".xml";
+
+    std::cout << "Saving keyframes"<< std::endl;
+    ::Save(_keyframes, sfile.c_str());
   }else{
     std::cout << "No solution found" << std::endl;
   }

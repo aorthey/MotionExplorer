@@ -20,7 +20,9 @@
 int main(int argc,const char** argv) {
 
   EnvironmentLoader env = EnvironmentLoader("data/snake_turbine.xml");
-  env.GetBackendPtr()->Load("snake_turbine_complete.xml");
+  //env.GetBackendPtr()->Load("snake_turbine_complete.xml");
+  env.LoadPath("data/paths/ompl280.xml");
+
 
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.SetWindowTitle("SweptVolumePath");

@@ -12,7 +12,7 @@ int main(int argc,const char** argv) {
   //std::string file = "data/wall.xml";
   //std::string file = "data/snake_turbine.xml";
   //std::string file = "data/human.xml";
-  std::string file = "data/hrp2_wall.xml";
+  std::string file = "data/hrp2_door_complete.xml";
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
 
   std::cout << env.GetPlannerInput() << std::endl;

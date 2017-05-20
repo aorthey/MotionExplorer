@@ -61,15 +61,14 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     }
     pin.qMin = robot->qMin;
     pin.qMax = robot->qMax;
+    robot->q = pin.q_init;
+    robot->UpdateFrames();
+    ODERobot *simrobot = _backend->sim.odesim.robot(0);
+    simrobot->SetConfig(pin.q_init);
+    robot->q = pin.q_goal;
+    robot->UpdateFrames();
   }
 
-  robot->q = pin.q_init;
-  robot->UpdateFrames();
-  ODERobot *simrobot = _backend->sim.odesim.robot(0);
-  simrobot->SetConfig(pin.q_init);
-
-  robot->q = pin.q_goal;
-  robot->UpdateFrames();
 }
 
 bool EnvironmentLoader::LoadPlannerSettings(TiXmlElement *node)
@@ -129,4 +128,23 @@ bool EnvironmentLoader::LoadPath(TiXmlElement *node)
   _backend->AddPath(keyframes);
 
   return true;
+}
+std::vector<Config> EnvironmentLoader::GetKeyframesFromFile(const char* file)
+{
+  std::string file_name = util::GetApplicationFolder()+file;
+  TiXmlDocument doc(file_name.c_str());
+  TiXmlElement *root = GetRootNodeFromDocument(doc);
+  CheckNodeName(root, "path");
+
+  TiXmlElement* q = FindFirstSubNode(root, "q");
+  std::vector<Config> keyframes;
+  while(q!=NULL){
+    //std::cout << q->GetText() << std::endl;
+    Config qconfig;
+    GetStreamText(q) >> qconfig;
+    keyframes.push_back(qconfig);
+    q = FindNextSiblingNode(q, "q");
+  }
+
+  return keyframes;
 }

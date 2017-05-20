@@ -33,5 +33,6 @@ class EnvironmentLoader{
 
     bool LoadPath(const char* file);
     bool LoadPath(TiXmlElement *node);
+    std::vector<Config> GetKeyframesFromFile(const char* file);
 
 };

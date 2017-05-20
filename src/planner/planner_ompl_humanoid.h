@@ -36,6 +36,7 @@
 //#include <boost/program_options.hpp>
 #include <omplapp/config.h>
 #include <omplapp/apps/SE3RigidBodyPlanning.h>
+#include "planner/planner.h"
 #include "planner/planner_ompl.h"
 #include "cspace_sentinel.h"
 #include "util.h"
@@ -51,7 +52,7 @@ class MotionPlannerOMPLHumanoid: public MotionPlannerOMPL
 
 class HumanoidPropagatorIrreducible : public SentinelPropagator
 {
-public:
+  public:
 
     HumanoidPropagatorIrreducible(oc::SpaceInformationPtr si, KinodynamicCSpaceSentinelAdaptor *cspace) : 
         SentinelPropagator(si,cspace)
@@ -61,3 +62,10 @@ public:
 
 };
 
+class MotionPlannerOMPLHumanoidValidityChecker : public MotionPlannerOMPLValidityChecker
+{
+   public:
+     MotionPlannerOMPLHumanoidValidityChecker(const ob::SpaceInformationPtr &si, Robot* robot, CSpace* space);
+     virtual bool isValid(const ob::State* state) const;
+     Robot *robot;
+};
