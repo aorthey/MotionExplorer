@@ -78,6 +78,13 @@ void SweptVolume::AddKeyframe(const Config &q ){
     std::cout << "minimum       :" << _robot->qMin << std::endl;
     std::cout << "configuration :" << q << std::endl;
     std::cout << "maximum       :" << _robot->qMax << std::endl;
+    //check joint limits
+    for(int i = 0; i < _robot->q.size(); i++){
+      if(q(i) < _robot->qMin(i) || q(i) > _robot->qMax(i)){
+        std::cout << "[ "<<i<< " ]: " << _robot->qMin(i) << " < " << q(i) << " < " << _robot->qMax(i) << std::endl;
+      }
+    }
+
     exit(0);
   }
   _robot->UpdateConfig(q);

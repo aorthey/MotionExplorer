@@ -201,7 +201,11 @@ class IrreducibleProjectorHRP2: public IrreducibleProjector
       for(int i = 0; i < _rootPath.size(); i++){
         Config qr = _rootPath.at(i);
 
-        Vector3 T0(qr[0],qr[1],0);
+        Vector3 T1 = GetPositionAtLink(qr, rootLinkId);
+        Vector3 T0(T1[0],T1[1],0);
+        //Vector3 T0(qr[0],qr[1],0);
+        //std::cout << T0 << "," << T1 << std::endl;
+
         Matrix3 R0;
         R0.setRotateZ(qr[3]+M_PI/2);
 
@@ -229,10 +233,10 @@ class IrreducibleProjectorHRP2: public IrreducibleProjector
         wholeBodyPath.at(i)(46) = t3;
         wholeBodyPath.at(i)(48) = t5;
 
+        //
         wholeBodyPath.at(i)(30) = -(t1-M_PI/2);
         wholeBodyPath.at(i)(32) = -t3;
         wholeBodyPath.at(i)(34) = -t5;
-        //double gij = gammas.at(i).at(j);
         
 //Link[44] RARM_LINK1 mass 1.03448
 //Link[45] RARM_LINK2 mass 1.59929
