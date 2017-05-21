@@ -14,13 +14,7 @@ const double sweptVolume_q_spacing = 0.01;
 ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
     : SimTestBackend(world)
 {
-  world->background = GLColor(1,1,1);
 
-  if(world->robots.size()>1){
-    std::cout << "[ERROR]" << std::endl;
-    std::cout << "there are " << world->robots.size() << " robots in this world. We only support 1." << std::endl;
-    exit(0);
-  }
   showSweptVolumes = 0;
 
   drawForceField = 0;
@@ -62,6 +56,19 @@ void ForceFieldBackend::Start()
 {
   BaseT::Start();
 
+  Robot *robot = world->robots[0];
+
+  uint Nlinks  = robot->links.size();
+  
+  std::cout << "links: " << Nlinks << std::endl;
+  showLinks.resize(Nlinks); //hide certain links 
+  for(int i = 0; i < showLinks.size(); i++){
+    showLinks[i] = 0;
+  }
+  showLinks[15] = 1;
+  for(int i = 43; i < 50; i++) showLinks[i] = 1;
+
+
   //disable higher drawing functions
   //drawBBs,drawPoser,drawDesired,drawEstimated,drawContacts,drawWrenches,drawExpanded,drawTime,doLogging
   //drawPoser = 0;
@@ -78,13 +85,13 @@ void ForceFieldBackend::Start()
   //Camera::Viewport viewport;
   show_frames_per_second = true;
 
-  Robot *robot = world->robots[0];
+  std::cout << robot->name << std::endl;
   _appearanceStack.clear();
   _appearanceStack.resize(robot->links.size());
 
   for(size_t i=0;i<robot->links.size();i++) {
     GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
-    _appearanceStack[i]=a;
+    if(showLinks[i]) _appearanceStack[i]=a;
   }
 
   drawPathSweptVolume.clear();
@@ -151,7 +158,6 @@ void ForceFieldBackend::RenderWorld()
 
         glPushMatrix();
         glMultMatrix(mat);
-        //GLDraw::GeometryAppearance& a = _appearanceStack.at(j);
         GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
         if(a.geom != robot->geometry[j]) a.Set(*robot->geometry[j]);
         a.SetColor(GLColor(0.7,0.7,0.7));
@@ -185,6 +191,7 @@ void ForceFieldBackend::RenderWorld()
   // drawaxes             : fancy coordinate axes
   // drawaxeslabels       : labelling of the coordinate axes [needs fixing]
   //############################################################################
+  //
 
   if(drawRobotExtras) GLDraw::drawRobotExtras(viewRobot);
   if(drawIKextras) GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);
@@ -194,8 +201,8 @@ void ForceFieldBackend::RenderWorld()
   for(int i = 0; i < swept_volume_paths.size(); i++){
     SweptVolume sv = swept_volume_paths.at(i);
 
-    if(drawPathSweptVolume.at(i)) GLDraw::drawGLPathSweptVolume(robot, sv.GetMatrices(), _appearanceStack,sv.GetColor());
-    if(drawPathMilestones.at(i)) GLDraw::drawGLPathKeyframes(robot, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack,sv.GetColorMilestones());
+    if(drawPathSweptVolume.at(i)) GLDraw::drawGLPathSweptVolume(robot, sv.GetMatrices(), _appearanceStack, sv.GetColor());
+    if(drawPathMilestones.at(i)) GLDraw::drawGLPathKeyframes(robot, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack, sv.GetColorMilestones());
     if(drawPathStartGoal.at(i)) GLDraw::drawGLPathStartGoal(robot, sv.GetStart(), sv.GetGoal());
   }
 
@@ -553,9 +560,30 @@ bool GLUIForceFieldGUI::Initialize()
 
     std::string dpsv = "draw_path_swept_volume_"+std::to_string(i);
     std::string descr1 = prefix + "Draw Swept Volume";
+
+    
     checkbox = glui->add_checkbox_to_panel(panel, descr1.c_str());
     AddControl(checkbox,dpsv.c_str());
     checkbox->set_int_val(_backend->drawPathSweptVolume.at(i));
+
+
+    linkBox = glui->add_listbox_to_panel(panel,"Show Link",NULL);
+    //toggleMeasurementDrawCheckbox = glui->add_checkbox_to_panel(panel,"Plot value");
+
+    Robot* robot = world->robots[0];
+    uint Nlinks = robot->links.size();
+    for(size_t i=0;i<robot->links.size();i++)
+    {
+      char buf[256];
+      strcpy(buf,robot->linkNames[i].c_str());
+      linkBox->add_item(i,buf);
+    }
+    AddControl(linkBox,"show_links");
+    //checkbox = glui->add_checkbox_to_panel(panel, descr1.c_str());
+    //AddControl(checkbox,dpsv.c_str());
+    //checkbox->set_int_val(_backend->drawPathSweptVolume.at(i));
+
+
 
     std::string dpms = "draw_path_milestones"+std::to_string(i);
     std::string descr2 = prefix + "Draw Milestones";

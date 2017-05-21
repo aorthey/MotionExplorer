@@ -218,7 +218,7 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   //KINODYNAMIC PLANNERS
   //double kappa_curvature = 2.2;
-  double kappa_curvature = 1.88;
+  double kappa_curvature = 2.66;
 
   uint NdimControl = robot->q.size();
 
@@ -275,7 +275,7 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
   ss.setStateValidityChecker(std::make_shared<MotionPlannerOMPLHumanoidValidityChecker>(si, robot, &kcspace));
   ss.setStatePropagator(cpropagate);
 
-  double epsilon = 0.5;
+  double epsilon = 1;
 
   ss.setStartAndGoalStates(start, goal, epsilon);
   ss.setup();
@@ -301,8 +301,8 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
   // benchmark instead
   //###########################################################################
   ot::Benchmark benchmark(ss, "BenchmarkHumanoid");
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
   benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
   benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 

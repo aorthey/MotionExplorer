@@ -189,19 +189,21 @@ class IrreducibleProjectorHRP2: public IrreducibleProjector
       //###########################################################################
       // compute 
       //###########################################################################
-      uint rootLinkId = 43;
+      uint rootLinkIdLeftArm = 29;
+      uint rootLinkIdRightArm = 43;
 
       vector<string> linkNames = _robot->linkNames;
 
-      std::cout << "Computing irreducible path from root link: " << linkNames[rootLinkId] << std::endl;
-      //std::cout << std::string(80, '-') << std::endl;
+      std::cout << "Computing irreducible path from root link: " << linkNames[rootLinkIdRightArm] << std::endl;
+      std::cout << "Computing irreducible path from root link: " << linkNames[rootLinkIdLeftArm] << std::endl;
+
       _positionAlongRootPath.clear();
       _rotationAlongRootPath.clear();
 
       for(int i = 0; i < _rootPath.size(); i++){
         Config qr = _rootPath.at(i);
 
-        Vector3 T1 = GetPositionAtLink(qr, rootLinkId);
+        Vector3 T1 = GetPositionAtLink(qr, rootLinkIdRightArm);
         Vector3 T0(T1[0],T1[1],0);
         //Vector3 T0(qr[0],qr[1],0);
         //std::cout << T0 << "," << T1 << std::endl;
@@ -234,9 +236,9 @@ class IrreducibleProjectorHRP2: public IrreducibleProjector
         wholeBodyPath.at(i)(48) = t5;
 
         //
-        wholeBodyPath.at(i)(30) = -(t1-M_PI/2);
-        wholeBodyPath.at(i)(32) = -t3;
-        wholeBodyPath.at(i)(34) = -t5;
+        //wholeBodyPath.at(i)(30) = -(t1-M_PI/2);
+        //wholeBodyPath.at(i)(32) = -t3;
+        //wholeBodyPath.at(i)(34) = -t5;
         
 //Link[44] RARM_LINK1 mass 1.03448
 //Link[45] RARM_LINK2 mass 1.59929
@@ -245,6 +247,49 @@ class IrreducibleProjectorHRP2: public IrreducibleProjector
 //Link[48] r_wrist mass 0.573818
         //std::cout << wholeBodyPath.at(i) << std::endl;
       }
+
+      _positionAlongRootPath.clear();
+      _rotationAlongRootPath.clear();
+
+      for(int i = _rootPath.size()-1; i >= 0; i--){
+        Config qr = _rootPath.at(i);
+
+        Vector3 T1 = GetPositionAtLink(qr, rootLinkIdLeftArm);
+
+        Vector3 T0(T1[0],T1[1],0);
+        //Vector3 T0(qr[0],qr[1],0);
+        //std::cout << T0 << "," << T1 << std::endl;
+
+        Matrix3 R0;
+        R0.setRotateZ(qr[3]-M_PI/2);
+
+        _positionAlongRootPath.push_back(T0);
+        _rotationAlongRootPath.push_back(R0);
+
+      }
+
+      thetagamma = ComputeThetaGammaFromRootPath( _positionAlongRootPath ,_rotationAlongRootPath, lengths);
+
+      thetas = thetagamma.first;
+      gammas = thetagamma.second;
+
+      for(int i = wholeBodyPath.size()-1; i>=0; i--){
+        Config q = wholeBodyPath.at(i);
+
+        //double offset = q(59)+ q(60)+ q(61) - q(15);
+        //wholeBodyPath.at(i)(43) = offset-M_PI/2;
+        //wholeBodyPath.at(i)(29) = offset-M_PI/2;
+
+        double t1 = thetas.at(wholeBodyPath.size()-1-i).at(0);
+        double t3 = thetas.at(wholeBodyPath.size()-1-i).at(1);
+        double t5 = thetas.at(wholeBodyPath.size()-1-i).at(2);
+
+        wholeBodyPath.at(i)(30) = (t1+M_PI/2);
+        wholeBodyPath.at(i)(32) = t3;
+        wholeBodyPath.at(i)(34) = t5;
+        
+      }
+
 
 
     return wholeBodyPath;

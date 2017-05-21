@@ -14,7 +14,7 @@
 #include "iksolver_hrp2.h"
 
 int main(int argc,const char** argv) {
-  std::string file = "data/hrp2_door.xml";
+  std::string file = "data/hrp2_wall.xml";
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
   MotionPlannerOMPLHumanoid planner(env.GetWorldPtr());
 

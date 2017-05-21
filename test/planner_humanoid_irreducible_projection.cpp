@@ -31,7 +31,7 @@ int main(int argc,const char** argv) {
   std::string file = "data/hrp2_door_complete.xml";
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
 
-  std::vector<Config> headPath = env.GetKeyframesFromFile("data/paths/hrp2_door.xml");
+  std::vector<Config> headPath = env.GetKeyframesFromFile("data/paths/hrp2_door2.xml");
 
   IrreducibleProjectorHRP2 projector(env.GetRobotPtr());
   projector.setRootPath(headPath);
@@ -70,6 +70,7 @@ int main(int argc,const char** argv) {
   ////############################################################################
   env.GetBackendPtr()->ClearPaths();
   env.GetBackendPtr()->AddPath(wholeBodyPath,GLColor(0.7,0.1,0.9,0.5),5);
+  env.GetBackendPtr()->VisualizeStartGoal(wholeBodyPath.front(), wholeBodyPath.at(wholeBodyPath.size()-2));
 
   std::cout << "start GUI" << std::endl;
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());

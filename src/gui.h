@@ -98,6 +98,8 @@ class ForceFieldBackend : public SimTestBackend
 
   int showSweptVolumes;
 
+  std::vector<int> showLinks; //hide certain links 
+
   std::vector<int> drawPathSweptVolume;
   std::vector<int> drawPathMilestones;
   std::vector<int> drawPathStartGoal;
@@ -143,6 +145,8 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
     GLUI_Checkbox* checkbox;
     GLUI_FileBrowser *browser;
     GLUI_Button* button_file_load;
+    GLUI_Listbox* linkBox;
+
 };
 
 

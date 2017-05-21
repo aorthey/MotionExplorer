@@ -516,6 +516,7 @@ if specified irreducible planner, use that one)
  [ ] one humanoid experiment: flat floor, multiple doors at different angles, sideways motion.  Maybe like the kyoto tori 
  [ ] be able to sample all possible IK configurations given contacts
  [ ] CoM + IK computation?
+ [ ] swept volume -> display certain links only (click them together)
 
 -- important
  [x] loading urdf robots from terrain folder not working

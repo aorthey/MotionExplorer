@@ -22,6 +22,8 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
 
   std::cout << "[EnvironmentLoader] loading from file " << file_name << std::endl;
 
+  world.background = GLColor(1,1,1);
+
   _backend = new ForceFieldBackend(&world);
   if(!_backend->LoadAndInitSim(file_name.c_str())){
     std::cout << std::string(80, '-') << std::endl;
