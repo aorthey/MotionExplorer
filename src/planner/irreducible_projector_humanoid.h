@@ -183,6 +183,7 @@ class IrreducibleProjectorHRP2: public IrreducibleProjector
 //Link[48] r_wrist mass 0.573818
 //Link[49] RARM_LINK6 mass 0.0804856
 //
+        std::cout << q << std::endl;
         wholeBodyPath.push_back(q);
       }
 

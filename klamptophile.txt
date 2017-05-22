@@ -398,7 +398,7 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] Compute Force Closure Grasp from points
  [ ] Compute SE constraints, what is GIWC equivalent?
  [ ] smoothing after path planning
- [ ] make a Klampt Interface where to set all properties like background color etc
+ [x] make a Klampt Interface where to set all properties like background color etc
  [x] screenshots x_X?
  [ ] refactor kinodynamic planner to make it independent from path planner
  [x] refactor planner settings
@@ -413,7 +413,7 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [x] ompl does not read the joint limits
  [x] make ompl planners available 
  [ ] add directions again in draw serialized tree after culling nodes
- [ ] remove this orange line from origin to p_init
+ [x] remove this orange line from origin to p_init
  [ ] Button to save/load GUI state including Motion Planning Equipment
  [x] ompl converts cspace to realvectorspace R, but we need a compound space SE(3)xQ => make own ompl interface
  [x] enable ompl geometric planners
@@ -445,10 +445,8 @@ Just use KinodynamicMilestonePath instead of MultiPath!
 PlannerOutput as Input to GUI to shadow the internal things. Also put the
 plannersettings into the xml, so that we can load planner+start/goal config
 without recompiling. Delete the whole plannersetup folder!
- [ ] enbable/disable swept volume of certain links.
- [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
-      andreas dziegielewski http://acg.cs.tau.ac.il/projects/swept-volume/project-page seems promising
- [ ] use TAB to access different modes: simulation <-> Desired Pose (change goal) blender-like controls?
+ [ ] update to klampt-0.7
+ [ ] visualize wrench cone at contact
 
 -- abstractions (longterm goals)
 
@@ -474,6 +472,9 @@ then display them, then deform them, then to save those paths.
  [ ] have vim-keybindings to quickly move around, save/load, screenshots,
 display tree/start/goal/swept volumes, do planning
  [ ] EnvironmentLoader should be merged with Backend, so that we can load/save inside
+ [ ] use TAB to access different modes: simulation <-> Desired Pose (change goal) blender-like controls?
+ [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
+      andreas dziegielewski http://acg.cs.tau.ac.il/projects/swept-volume/project-page seems promising
 
 -- wrench fields
 
@@ -513,12 +514,10 @@ if specified irreducible planner, use that one)
  [ ] rewrite introduction and experimental part
  [ ] make sure that cbounds gives an exception if outer limit index
  [ ] what about the humanoid experiments? could we repeat them easily?
- [ ] one humanoid experiment: flat floor, multiple doors at different angles, sideways motion.  Maybe like the kyoto tori 
+ [x] one humanoid experiment: flat floor, multiple doors at different angles, sideways motion.  Maybe like the kyoto tori 
  [ ] be able to sample all possible IK configurations given contacts
  [ ] CoM + IK computation?
- [ ] swept volume -> display certain links only (click them together)
-
--- important
- [x] loading urdf robots from terrain folder not working
- [ ] update to klampt-0.7
- [ ] visualize wrench cone at contact
+ [ ] experiment door 100x1200 irr
+ [ ] experiment door 100x1200 complete
+ [ ] experiment wall 10xXX ? 
+ [ ] enbable/disable swept volume of certain links.

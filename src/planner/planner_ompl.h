@@ -107,7 +107,6 @@ public:
 
 };
 
-
 class SE3Project0r : public ob::ProjectionEvaluator
 {
   public:
