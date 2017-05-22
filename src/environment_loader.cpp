@@ -50,7 +50,7 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
   //name = name_robot + "_" + name_environment;
   //std::cout << name << std::endl;
 
-  info(&world);
+  //info(&world);
 
 
   Robot *robot = world.robots[0];

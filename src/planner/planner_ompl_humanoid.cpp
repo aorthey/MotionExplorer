@@ -149,9 +149,13 @@ void PostRunEventHumanoid(const ob::PlannerPtr &planner, ot::Benchmark::RunPrope
 
   if(solved){
     std::cout << "Found Solution at run " << pid << std::endl;
+    util::PrintCurrentTime();
     const ob::PathPtr &pp = pdef->getSolutionPath();
     oc::PathControl path_control = static_cast<oc::PathControl&>(*pp);
     og::PathGeometric path = path_control.asGeometric();
+
+    og::PathSimplifier shortcutter(si);
+    shortcutter.shortcutPath(path);
 
     vector<Config> keyframes;
     for(int i = 0; i < path.getStateCount(); i++)
@@ -160,7 +164,7 @@ void PostRunEventHumanoid(const ob::PlannerPtr &planner, ot::Benchmark::RunPrope
       Config cur = OMPLStateToConfig(state, cspace->getPtr());
       keyframes.push_back(cur);
     }
-    std::string sfile = "ompl"+std::to_string(pid)+".xml";
+    std::string sfile = "humanoid_"+std::to_string(pid)+".xml";
     std::cout << "Saving keyframes"<< std::endl;
     Save(keyframes, sfile.c_str());
   }else{
@@ -262,10 +266,10 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
   // choose planner
   //###########################################################################
   //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
+  ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
-  ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
 
   //###########################################################################
   // setup and projection
@@ -293,37 +297,37 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   bool solved = false;
   double solution_time = dInf;
-  double duration = 120*5;
+  double duration = 3600*48;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
 
   //###########################################################################
   // benchmark instead
   //###########################################################################
-  // ot::Benchmark benchmark(ss, "BenchmarkHumanoid");
-  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
-  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
-  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
-  // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
+  //ot::Benchmark benchmark(ss, "BenchmarkHumanoid");
+  ////benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
+  ////benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  ////benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 
-  // ot::Benchmark::Request req;
-  // req.maxTime = duration;
-  // req.maxMem = 10000.0;
-  // req.runCount = 10;
-  // req.displayProgress = true;
+  //ot::Benchmark::Request req;
+  //req.maxTime = duration;
+  //req.maxMem = 10000.0;
+  //req.runCount = 10;
+  //req.displayProgress = true;
 
-  // benchmark.setPostRunEvent(std::bind(&PostRunEventHumanoid, std::placeholders::_1, std::placeholders::_2, &cspace));
+  //benchmark.setPostRunEvent(std::bind(&PostRunEventHumanoid, std::placeholders::_1, std::placeholders::_2, &cspace));
 
-  // benchmark.benchmark(req);
-  // benchmark.saveResultsToFile();
+  //benchmark.benchmark(req);
+  //benchmark.saveResultsToFile();
 
-  // std::string file = "ompl_humanoid_irreducible_benchmark";
-  // std::string res = file+".log";
-  // benchmark.saveResultsToFile(res.c_str());
+  //std::string file = "ompl_humanoid_irreducible_benchmark_wall";
+  //std::string res = file+".log";
+  //benchmark.saveResultsToFile(res.c_str());
 
-  // std::string cmd = "ompl_benchmark_statistics.py "+file+".log -d "+file+".db";
-  // std::system(cmd.c_str());
-  // cmd = "cp "+file+".db"+" ../data/benchmarks/";
-  // std::system(cmd.c_str());
+  //std::string cmd = "ompl_benchmark_statistics.py "+file+".log -d "+file+".db";
+  //std::system(cmd.c_str());
+  //cmd = "cp "+file+".db"+" ../data/benchmarks/";
+  //std::system(cmd.c_str());
 
   //###########################################################################
   // solve
@@ -359,6 +363,9 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
     og::PathGeometric path = path_control.asGeometric();
     std::cout << "Path Length     : " << path.length() << std::endl;
     std::cout << "Path Milestones : " << path.getStateCount() << std::endl;
+
+    og::PathSimplifier shortcutter(si);
+    shortcutter.shortcutPath(path);
 
     for(int i = 0; i < path.getStateCount(); i++)
     {

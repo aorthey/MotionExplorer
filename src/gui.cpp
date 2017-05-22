@@ -65,8 +65,8 @@ void ForceFieldBackend::Start()
   for(int i = 0; i < showLinks.size(); i++){
     showLinks[i] = 0;
   }
-  showLinks[15] = 1;
-  for(int i = 43; i < 50; i++) showLinks[i] = 1;
+  //showLinks[15] = 1;
+  //for(int i = 43; i < 50; i++) showLinks[i] = 1;
 
 
   //disable higher drawing functions
@@ -85,11 +85,10 @@ void ForceFieldBackend::Start()
   //Camera::Viewport viewport;
   show_frames_per_second = true;
 
-  std::cout << robot->name << std::endl;
   _appearanceStack.clear();
-  _appearanceStack.resize(robot->links.size());
+  _appearanceStack.resize(Nlinks);
 
-  for(size_t i=0;i<robot->links.size();i++) {
+  for(size_t i=0;i<Nlinks;i++) {
     GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
     if(showLinks[i]) _appearanceStack[i]=a;
   }
@@ -124,8 +123,10 @@ void ForceFieldBackend::RenderWorld()
   DEBUG_GL_ERRORS()
   drawDesired=0;
 
-  for(size_t i=0;i<world->terrains.size();i++)
+  for(size_t i=0;i<world->terrains.size();i++){
+    world->terrains[i]->geometry.Appearance()->SetColor(0.5,0.5,0.5,1.0);
     world->terrains[i]->DrawGL();
+  }
 
   if(drawRigidObjects){
     for(size_t i=0;i<world->rigidObjects.size();i++){

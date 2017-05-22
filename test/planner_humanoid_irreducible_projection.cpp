@@ -31,11 +31,25 @@ int main(int argc,const char** argv) {
   //std::string file = "data/hrp2_door_complete.xml";
   //std::string path = "data/paths/hrp2_door2.xml";
   std::string file = "data/hrp2_wall_complete.xml";
-  std::string path = "data/paths/humanoid_wall.xml";
+  std::string path = "data/paths/humanoid_wall_2.xml";
 
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
 
   std::vector<Config> headPath = env.GetKeyframesFromFile(path.c_str());
+
+  //og::PathSimplifier shortcutter(si);
+
+  //ob::State* ConfigToOMPLStatePtr(const Config &q, const ob::StateSpacePtr &s);
+
+  //shortcutter.shortcutPath(path);
+
+  //for(int i = 0; i < path.getStateCount(); i++)
+  //{
+  //  ob::State *state = path.getState(i);
+  //  Config cur = OMPLStateToConfig(state, cspace.getPtr());
+  //  _keyframes.push_back(cur);
+  //}
+
 
   IrreducibleProjectorHRP2 projector(env.GetRobotPtr());
   projector.setRootPath(headPath);
@@ -75,6 +89,7 @@ int main(int argc,const char** argv) {
   env.GetBackendPtr()->ClearPaths();
   env.GetBackendPtr()->AddPath(wholeBodyPath,GLColor(0.7,0.1,0.9,0.5),8);
   env.GetBackendPtr()->VisualizeStartGoal(wholeBodyPath.front(), wholeBodyPath.at(wholeBodyPath.size()-2));
+  env.GetBackendPtr()->ShowSweptVolumes();
 
   std::cout << "start GUI" << std::endl;
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
