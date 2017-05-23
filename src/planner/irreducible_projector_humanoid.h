@@ -232,6 +232,10 @@ class IrreducibleProjectorHRP2: public IrreducibleProjector
         double t3 = thetas.at(i).at(1);
         double t5 = thetas.at(i).at(2);
 
+        if(std::isnan(t1)) t1 = 0;
+        if(std::isnan(t3)) t3 = 0;
+        if(std::isnan(t5)) t5 = 0;
+
         wholeBodyPath.at(i)(44) = (t1-M_PI/2);
         wholeBodyPath.at(i)(46) = t3;
         wholeBodyPath.at(i)(48) = t5;
@@ -284,6 +288,15 @@ class IrreducibleProjectorHRP2: public IrreducibleProjector
         double t1 = thetas.at(wholeBodyPath.size()-1-i).at(0);
         double t3 = thetas.at(wholeBodyPath.size()-1-i).at(1);
         double t5 = thetas.at(wholeBodyPath.size()-1-i).at(2);
+
+        std::cout << std::string(80, '-') << std::endl;
+        std::cout << t1 << "," << t3 << "," << t5 << std::endl;
+
+        if(std::isnan(t1)) t1 = 0;
+        if(std::isnan(t3)) t3 = 0;
+        if(std::isnan(t5)) t5 = 0;
+
+        std::cout << t1 << "," << t3 << "," << t5 << std::endl;
 
         wholeBodyPath.at(i)(30) = (t1+M_PI/2);
         wholeBodyPath.at(i)(32) = t3;

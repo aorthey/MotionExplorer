@@ -521,3 +521,6 @@ if specified irreducible planner, use that one)
  [ ] experiment door 100x1200 complete
  [ ] experiment wall 10xXX ? 
  [ ] enbable/disable swept volume of certain links.
+
+-- important
+ [ ] self collisions occuring when simulating atlas in Klampt! 

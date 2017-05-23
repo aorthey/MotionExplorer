@@ -78,6 +78,7 @@ class ForceFieldBackend : public SimTestBackend
   uint getNumberOfPaths();
 
   void AddPath(const std::vector<Config> &keyframes, GLColor color = GLColor(0.8,0.8,0.8), uint Nkeyframes_alongpath=10);
+  void AddPathInterpolate(const std::vector<Config> &keyframes, GLColor color = GLColor(0.8,0.8,0.8), uint Nkeyframes_alongpath=10);
   //std::vector<Config> getPathKeyFrames(uint pathid);
 
   const std::vector<Config>& getPathKeyFrames(uint pathid);

@@ -31,25 +31,11 @@ int main(int argc,const char** argv) {
   //std::string file = "data/hrp2_door_complete.xml";
   //std::string path = "data/paths/hrp2_door2.xml";
   std::string file = "data/hrp2_wall_complete.xml";
-  std::string path = "data/paths/humanoid_wall_2.xml";
+  std::string path = "data/paths/humanoid_wall_fixed.xml";
 
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
 
   std::vector<Config> headPath = env.GetKeyframesFromFile(path.c_str());
-
-  //og::PathSimplifier shortcutter(si);
-
-  //ob::State* ConfigToOMPLStatePtr(const Config &q, const ob::StateSpacePtr &s);
-
-  //shortcutter.shortcutPath(path);
-
-  //for(int i = 0; i < path.getStateCount(); i++)
-  //{
-  //  ob::State *state = path.getState(i);
-  //  Config cur = OMPLStateToConfig(state, cspace.getPtr());
-  //  _keyframes.push_back(cur);
-  //}
-
 
   IrreducibleProjectorHRP2 projector(env.GetRobotPtr());
   projector.setRootPath(headPath);
@@ -83,14 +69,29 @@ int main(int argc,const char** argv) {
 //  }
 
 
+  //TODO
+  //for(int i = 0; i < wholeBodyPath.size(); i++){
+  //  Config q = wholeBodyPath.at(i);
+  //  for(int j = 0; j < q.size(); j++){
+  //    if(std::isnan(q(j))) q(j)=0;
+  //  }
+  //  wholeBodyPath.at(i) = q;
+  //}
+
   ////############################################################################
   ////guification
   ////############################################################################
   env.GetBackendPtr()->ClearPaths();
-  env.GetBackendPtr()->AddPath(wholeBodyPath,GLColor(0.7,0.1,0.9,0.5),8);
-  env.GetBackendPtr()->VisualizeStartGoal(wholeBodyPath.front(), wholeBodyPath.at(wholeBodyPath.size()-2));
+  //env.GetBackendPtr()->AddPath(wholeBodyPath,GLColor(0.7,0.1,0.9,0.5),2);
+  env.GetBackendPtr()->AddPathInterpolate(wholeBodyPath,GLColor(0.7,0.1,0.9,0.5),2);
+  env.GetBackendPtr()->VisualizeStartGoal(wholeBodyPath.at(1), wholeBodyPath.at(wholeBodyPath.size()-1));
   env.GetBackendPtr()->ShowSweptVolumes();
+  env.GetBackendPtr()->ShowRobot();
 
+  WorldSimulation sim = env.GetBackendPtr()->sim;
+  util::SetSimulatedRobot(env.GetRobotPtr(), sim, wholeBodyPath.at(1));
+
+  std::cout << wholeBodyPath.size() << std::endl;
   std::cout << "start GUI" << std::endl;
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.SetWindowTitle("SweptVolumePath");

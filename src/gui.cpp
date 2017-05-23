@@ -56,17 +56,22 @@ void ForceFieldBackend::Start()
 {
   BaseT::Start();
 
-  Robot *robot = world->robots[0];
+  settings["dragForceMultiplier"] = 500.0;
+  drawContacts = 0;
+  drawWrenches = 1;
+  click_mode = ModeForceApplication;
 
+  Robot *robot = world->robots[0];
   uint Nlinks  = robot->links.size();
-  
   std::cout << "links: " << Nlinks << std::endl;
   showLinks.resize(Nlinks); //hide certain links 
+
   for(int i = 0; i < showLinks.size(); i++){
     showLinks[i] = 0;
   }
-  //showLinks[15] = 1;
+  showLinks[15] = 1;
   //for(int i = 43; i < 50; i++) showLinks[i] = 1;
+  //for(int i = 29; i < 36; i++) showLinks[i] = 1;
 
 
   //disable higher drawing functions
@@ -218,10 +223,11 @@ void ForceFieldBackend::RenderWorld()
  
 void ForceFieldBackend::RenderScreen(){
   BaseT::RenderScreen();
+  Robot *robot = world->robots[0];
   std::string line;
-  line = "Robot       : "+_robotname;
+  line = "Robot       : "+robot->name;
   DrawText(20,60,line);
-  line = "Environment : ";
+  line = "Environment : "+world->terrains[0]->name;
   DrawText(20,80,line);
 
 }
@@ -452,6 +458,36 @@ void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, con
   _frameLength.push_back(frameLength);
 }
 
+void ForceFieldBackend::AddPathInterpolate(const std::vector<Config> &keyframes, GLColor color, uint Nkeyframes_alongpath)
+{
+  std::vector<Config> interp_keyframes;
+  double minimal_distance = 0.1;
+  for(int i = 0; i < keyframes.size()-1; i++){
+    Config q1= keyframes.at(i);
+    Config q2= keyframes.at(i+1);
+    interp_keyframes.push_back(q1);
+    double d = (q2-q1).norm();
+    std::cout << std::string(80, '-') << std::endl; 
+    std::cout << q1 << std::endl;
+    std::cout << q2 << std::endl;
+    std::cout << d << std::endl;
+
+    if(d > minimal_distance){
+      int Npts = floor(d/minimal_distance);
+      std::cout << Npts << std::endl;
+      //std::cout << q1 << std::endl;
+      for(int j = 0; j < Npts; j++){
+        Config qj = q1 + j*(minimal_distance/d)*(q2-q1);
+        //std::cout << qj << std::endl;
+        interp_keyframes.push_back(qj);
+      }
+      //exit(0);
+    }
+  }
+  interp_keyframes.push_back(keyframes.back());
+
+  AddPath(interp_keyframes, color, Nkeyframes_alongpath);
+}
 void ForceFieldBackend::AddPath(const std::vector<Config> &keyframes, GLColor color, uint Nkeyframes_alongpath)
 {
   Robot *robot = world->robots[0];
