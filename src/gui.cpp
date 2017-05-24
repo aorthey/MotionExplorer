@@ -224,19 +224,41 @@ void ForceFieldBackend::RenderWorld()
 void ForceFieldBackend::RenderScreen(){
   BaseT::RenderScreen();
   Robot *robot = world->robots[0];
+  int line_y_offset = 60;
+  int line_y_offset_stepsize = 20;
+
   std::string line;
-  line = "Robot       : "+robot->name;
-  DrawText(20,60,line);
-  std::string env;
-  if(world->terrains.size() > 0){
-    env = world->terrains[0]->geomFile;
-  }else{
-    if(world->rigidObjects.size()>0){
-      env = world->rigidObjects[0]->geomFile;
-    }
+
+  line = "Robot       : ";
+  DrawText(20,line_y_offset,line);
+  line_y_offset += line_y_offset_stepsize;
+  for(int i = 0; i < world->robots.size(); i++){
+    line = "\n\r              ";
+    line += world->robots[i]->name;
+    DrawText(20,line_y_offset,line);
+    line_y_offset += line_y_offset_stepsize;
   }
-  line = "Environment : "+std::string(basename(env.c_str()));
-  DrawText(20,80,line);
+
+  line = "Terrains    : ";
+  DrawText(20,line_y_offset,line);
+  line_y_offset += line_y_offset_stepsize;
+  for(int i = 0; i < world->terrains.size(); i++){
+    line = "\n\r              ";
+    std::string geom = world->terrains[i]->geomFile;
+    line += std::string(basename(geom.c_str()));
+    DrawText(20,line_y_offset,line);
+    line_y_offset += line_y_offset_stepsize;
+  }
+  line = "RigidObjects: ";
+  DrawText(20,line_y_offset,line);
+  line_y_offset += line_y_offset_stepsize;
+  for(int i = 0; i < world->rigidObjects.size(); i++){
+    line = "\n\r              ";
+    std::string geom = world->rigidObjects[i]->geomFile;
+    line += std::string(basename(geom.c_str()));
+    DrawText(20,line_y_offset,line);
+    line_y_offset += line_y_offset_stepsize;
+  }
 
 }
 
