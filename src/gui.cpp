@@ -229,35 +229,41 @@ void ForceFieldBackend::RenderScreen(){
 
   std::string line;
 
-  line = "Robot       : ";
-  DrawText(20,line_y_offset,line);
-  line_y_offset += line_y_offset_stepsize;
-  for(int i = 0; i < world->robots.size(); i++){
-    line = "\n\r              ";
-    line += world->robots[i]->name;
+  if(world->robots.size()>0){
+    line = "Robots      : ";
     DrawText(20,line_y_offset,line);
     line_y_offset += line_y_offset_stepsize;
+    for(int i = 0; i < world->robots.size(); i++){
+      line = "\n\r              ";
+      line += world->robots[i]->name;
+      DrawText(20,line_y_offset,line);
+      line_y_offset += line_y_offset_stepsize;
+    }
   }
 
-  line = "Terrains    : ";
-  DrawText(20,line_y_offset,line);
-  line_y_offset += line_y_offset_stepsize;
-  for(int i = 0; i < world->terrains.size(); i++){
-    line = "\n\r              ";
-    std::string geom = world->terrains[i]->geomFile;
-    line += std::string(basename(geom.c_str()));
+  if(world->terrains.size()>0){
+    line = "Terrains    : ";
     DrawText(20,line_y_offset,line);
     line_y_offset += line_y_offset_stepsize;
+    for(int i = 0; i < world->terrains.size(); i++){
+      line = "\n\r              ";
+      std::string geom = world->terrains[i]->geomFile;
+      line += std::string(basename(geom.c_str()));
+      DrawText(20,line_y_offset,line);
+      line_y_offset += line_y_offset_stepsize;
+    }
   }
-  line = "RigidObjects: ";
-  DrawText(20,line_y_offset,line);
-  line_y_offset += line_y_offset_stepsize;
-  for(int i = 0; i < world->rigidObjects.size(); i++){
-    line = "\n\r              ";
-    std::string geom = world->rigidObjects[i]->geomFile;
-    line += std::string(basename(geom.c_str()));
+  if(world->rigidObjects.size()>0){
+    line = "RigidObjects: ";
     DrawText(20,line_y_offset,line);
     line_y_offset += line_y_offset_stepsize;
+    for(int i = 0; i < world->rigidObjects.size(); i++){
+      line = "\n\r              ";
+      std::string geom = world->rigidObjects[i]->geomFile;
+      line += std::string(basename(geom.c_str()));
+      DrawText(20,line_y_offset,line);
+      line_y_offset += line_y_offset_stepsize;
+    }
   }
 
 }
