@@ -28,6 +28,7 @@ namespace util {
     os << yyyy << "_" << setfill('0') << setw(2) << mm << "_" << setfill('0') << setw(2) << dd;
     return os.str();
   }
+
   inline void PrintCurrentTime()
   {
     time_t t = time(0);   // get time now

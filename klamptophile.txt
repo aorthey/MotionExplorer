@@ -515,12 +515,12 @@ if specified irreducible planner, use that one)
  [ ] make sure that cbounds gives an exception if outer limit index
  [ ] what about the humanoid experiments? could we repeat them easily?
  [x] one humanoid experiment: flat floor, multiple doors at different angles, sideways motion.  Maybe like the kyoto tori 
- [ ] be able to sample all possible IK configurations given contacts
+ [x] be able to sample all possible IK configurations given contacts
  [ ] CoM + IK computation?
- [ ] experiment door 100x1200 irr
+ [ ] experiment door 100x1200 irr (running)
  [ ] experiment door 100x1200 complete
- [ ] experiment wall 10xXX ? 
- [ ] enbable/disable swept volume of certain links.
+ [x] experiment wall 10xXX ? 
+ [x] enable/disable swept volume of certain links.
 
 -- important
  [ ] self collisions occuring when simulating atlas in Klampt! 

@@ -28,10 +28,10 @@
 #include "planner/irreducible_projector_humanoid.h"
 
 int main(int argc,const char** argv) {
-  //std::string file = "data/hrp2_door_complete.xml";
-  //std::string path = "data/paths/hrp2_door2.xml";
-  std::string file = "data/hrp2_wall_complete.xml";
-  std::string path = "data/paths/humanoid_wall_fixed.xml";
+  std::string file = "data/hrp2_door_complete.xml";
+  std::string path = "data/paths/hrp2_door.xml";
+  //std::string file = "data/hrp2_wall_complete.xml";
+  //std::string path = "data/paths/humanoid_wall_fixed.xml";
 
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
 
@@ -81,9 +81,10 @@ int main(int argc,const char** argv) {
   ////############################################################################
   ////guification
   ////############################################################################
+
   env.GetBackendPtr()->ClearPaths();
-  //env.GetBackendPtr()->AddPath(wholeBodyPath,GLColor(0.7,0.1,0.9,0.5),2);
-  env.GetBackendPtr()->AddPathInterpolate(wholeBodyPath,GLColor(0.7,0.1,0.9,0.5),2);
+  env.GetBackendPtr()->AddPath(wholeBodyPath,GLColor(0.7,0.1,0.9,0.5),5);
+  //env.GetBackendPtr()->AddPathInterpolate(wholeBodyPath,GLColor(0.7,0.1,0.9,0.5),5);
   env.GetBackendPtr()->VisualizeStartGoal(wholeBodyPath.at(1), wholeBodyPath.at(wholeBodyPath.size()-1));
   env.GetBackendPtr()->ShowSweptVolumes();
   env.GetBackendPtr()->ShowRobot();

@@ -59,7 +59,7 @@ void ForceFieldBackend::Start()
   settings["dragForceMultiplier"] = 500.0;
   drawContacts = 0;
   drawWrenches = 1;
-  click_mode = ModeForceApplication;
+  //click_mode = ModeForceApplication;
 
   Robot *robot = world->robots[0];
   uint Nlinks  = robot->links.size();
@@ -227,7 +227,15 @@ void ForceFieldBackend::RenderScreen(){
   std::string line;
   line = "Robot       : "+robot->name;
   DrawText(20,60,line);
-  line = "Environment : "+world->terrains[0]->name;
+  std::string env;
+  if(world->terrains.size() > 0){
+    env = world->terrains[0]->geomFile;
+  }else{
+    if(world->rigidObjects.size()>0){
+      env = world->rigidObjects[0]->geomFile;
+    }
+  }
+  line = "Environment : "+std::string(basename(env.c_str()));
   DrawText(20,80,line);
 
 }
