@@ -62,12 +62,12 @@ void HumanoidPropagatorIrreducible::propagate(const ob::State *state, const oc::
     qend[i+6] = x0[i+6] + dt*ucontrol[i+6];
   }
 
-  qend[57] = qend[12];
-  qend[58] = qend[11];
-  qend[59] = qend[10];
-  qend[60] = qend[9];
-  qend[61] = qend[8];
-  qend[62] = qend[7];
+  qend[58] = qend[12];
+  qend[59] = qend[11];
+  qend[60] = qend[10];
+  qend[61] = qend[9];
+  qend[62] = qend[8];
+  qend[63] = qend[7];
   qend[64] = qend[6];
 
 
@@ -174,7 +174,7 @@ void PostRunEventHumanoid(const ob::PlannerPtr &planner, ot::Benchmark::RunPrope
       Config cur = OMPLStateToConfig(state, cspace->getPtr());
       keyframes.push_back(cur);
     }
-    std::string sfile = "humanoid_door_"+std::to_string(pid)+".xml";
+    std::string sfile = "humanoid_wall_full_"+std::to_string(pid)+".xml";
     std::cout << "Saving keyframes"<< std::endl;
     Save(keyframes, sfile.c_str());
   }else{
@@ -299,9 +299,9 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
   // choose planner
   //###########################################################################
   //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
-  ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
+  ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
 
   //###########################################################################
@@ -330,16 +330,16 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   bool solved = false;
   double solution_time = dInf;
-  double duration = 1200;
+  double duration = 3600*24;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
 
   //###########################################################################
   // benchmark instead
   //###########################################################################
   ot::Benchmark benchmark(ss, "BenchmarkHumanoid");
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
-  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
   benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 
   ot::Benchmark::Request req;
@@ -353,7 +353,7 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
   benchmark.benchmark(req);
   benchmark.saveResultsToFile();
 
-  std::string file = "ompl_humanoid_irreducible_benchmark_wall";
+  std::string file = "ompl_humanoid_benchmark_wall";
   std::string res = file+".log";
   benchmark.saveResultsToFile(res.c_str());
 
