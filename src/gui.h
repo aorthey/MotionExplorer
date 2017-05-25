@@ -6,6 +6,7 @@
 #include <KrisLibrary/robotics/IK.h>
 #include <KrisLibrary/robotics/IKFunctions.h>
 #include <KrisLibrary/geometry/CollisionMesh.h>
+#include <KrisLibrary/geometry/AnyGeometry.h>
 #include <KrisLibrary/planning/KinodynamicPath.h>
 #include <KrisLibrary/planning/KinodynamicMotionPlanner.h>
 #include <KrisLibrary/GLdraw/drawMesh.h>
@@ -49,6 +50,8 @@ class ForceFieldBackend : public SimTestBackend
   virtual void RenderWorld();
   virtual void RenderScreen();
 
+  virtual bool OnIdle();
+
   virtual bool Save(const char* file=NULL);
   virtual bool Save(TiXmlElement *node);
   virtual bool Load(const char* file);
@@ -83,15 +86,6 @@ class ForceFieldBackend : public SimTestBackend
 
   const std::vector<Config>& getPathKeyFrames(uint pathid);
   void ClearPaths();
-
-  //deprecated
-  //void VisualizePathSweptVolumeAtPosition(const Config &q);
-  //void VisualizePathSweptVolume(const std::vector<Config> &keyframes);
-  //void VisualizePathSweptVolume(const MultiPath &path);
-  //void VisualizePathSweptVolume(const KinodynamicMilestonePath &path);
-  //void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
-  //void VisualizePathMilestones(const std::vector<Config> &keyframes, uint Nmilestones);
-  //std::vector<Config> getKeyFrames();
 
   void VisualizePlannerTree(const SerializedTree &tree);
 

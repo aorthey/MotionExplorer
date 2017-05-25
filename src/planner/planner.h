@@ -53,7 +53,6 @@ class MotionPlanner{
     const std::vector<Config>& GetKeyframes();
     const SerializedTree& GetTree();
 
-
     void SerializeTree( const RoadmapPlanner& graph, SerializedTree& stree);
     void SerializeTree( const KinodynamicTree& tree, SerializedTree& stree);
     void SerializeTree( const KinodynamicTree::Node* node, SerializedTree &stree);

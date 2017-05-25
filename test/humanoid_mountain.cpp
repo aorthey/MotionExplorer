@@ -22,8 +22,6 @@ int main(int argc,const char** argv) {
   //Robot *robot = sim.odesim.robot(0).robot;
   simrobot->EnableSelfCollisions(true);
 
-  //    bool SelfCollisionsEnabled() const;
-  //
 
   //PlannerInput pin = env.GetPlannerInput();
   //std::cout << pin << std::endl;

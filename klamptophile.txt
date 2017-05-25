@@ -86,6 +86,7 @@ virtual bool SelfCollision(Real distance=0);
     void GetChildList(std::vector<std::vector<int> >& children) const;
 
 
+Anygeometry: AnyCollisionQuery
 RobotLink3D (KrisLibrary/robotics/RobotLink3d.h
   Type type; {revolute,prismatic}
   Vector3 w;
@@ -475,6 +476,9 @@ display tree/start/goal/swept volumes, do planning
  [ ] use TAB to access different modes: simulation <-> Desired Pose (change goal) blender-like controls?
  [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
       andreas dziegielewski http://acg.cs.tau.ac.il/projects/swept-volume/project-page seems promising
+ [ ] get distance between links and terrain
+ [ ] create arbitrary force fields in ODE simulator
+ [ ] making a safe static contact
 
 -- wrench fields
 

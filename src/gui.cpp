@@ -36,6 +36,7 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
 
   MapButtonToggle("draw_rigid_objects_faces",&drawRigidObjectsFaces);
   MapButtonToggle("draw_rigid_objects_edges",&drawRigidObjectsEdges);
+  MapButtonToggle("draw_forcefield",&drawForceField);
 
   MapButtonToggle("draw_robot_extras",&drawRobotExtras);
   MapButtonToggle("draw_robot",&drawRobot);
@@ -52,6 +53,32 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
 }
 
 
+bool ForceFieldBackend::OnIdle()
+{
+  bool res=BaseT::OnIdle();
+  if(simulate) {
+    SendRefresh();
+    Vector3 force(0,0,50);
+    Vector3 torque(0,0,0);
+    ODERobot *robot = sim.odesim.robot(0);
+    uint Nlinks = robot->robot.links.size();
+
+    sim.hooks.clear();
+    for(int i = 0; i < Nlinks; i++){
+      dBodyID bodyid = robot->body(i);
+      if(bodyid){
+        std::cout << "setting bodyid:" << i << ":" << bodyid << std::endl;
+        sim.hooks.push_back(new WrenchHook(bodyid,force, torque));
+      }
+    }
+
+
+    return true;
+  }
+  return res;
+
+
+}
 void ForceFieldBackend::Start()
 {
   BaseT::Start();
@@ -129,8 +156,19 @@ void ForceFieldBackend::RenderWorld()
   drawDesired=0;
 
   for(size_t i=0;i<world->terrains.size();i++){
-    world->terrains[i]->geometry.Appearance()->SetColor(0.5,0.5,0.5,1.0);
-    world->terrains[i]->DrawGL();
+    //world->terrains[i]->geometry.Appearance()->SetColor(0.5,0.5,0.5,1.0);
+    //world->terrains[i]->DrawGL();
+    Terrain *terra = world->terrains[i];
+    GLDraw::GeometryAppearance* a = terra->geometry.Appearance();
+    a->SetColor(GLColor(0.8,0.8,0.8,1.0));
+    a->drawFaces = false;
+    a->drawEdges = false;
+    a->drawVertices = false;
+    if(drawRigidObjectsFaces) a->drawFaces = true;
+    if(drawRigidObjectsEdges) a->drawEdges = true;
+    //a->vertexSize = 10;
+    a->edgeSize = 20;
+    terra->DrawGL();
   }
 
   if(drawRigidObjects){
@@ -148,17 +186,23 @@ void ForceFieldBackend::RenderWorld()
       obj->DrawGL();
     }
   }
-  //WorldGUIBackend::RenderWorld();
+  //ODERobot *simrobot = sim.odesim.robot(0);
+  //  typedef map<pair<ODEObjectID,ODEObjectID>,ContactFeedbackInfo> ContactFeedbackMap;
+  //
+  ////for (WorldSimulation::ContactFeedbackMap::iterator i = sim.contactFeedback.begin(); i != sim.contactFeedback.end(); i++) {
+  //  if(!i->second.inContact) continue;
+  //}
+
 
   if(drawRobot){
     for(size_t i=0;i<world->robots.size();i++) {
       Robot *robot = world->robots[i];
       //std::cout << robot->name << " selfcollisions:" << robot->SelfCollision() << std::endl;
-      for(size_t j=0;j<world->robots[i]->links.size();j++) {
+      for(size_t j=0;j<robot->links.size();j++) {
         if(robot->IsGeometryEmpty(j)) continue;
 
-        sim.odesim.robot(i)->GetLinkTransform(j,world->robots[i]->links[j].T_World);
-        Matrix4 mat = world->robots[i]->links[j].T_World;
+        sim.odesim.robot(i)->GetLinkTransform(j,robot->links[j].T_World);
+        Matrix4 mat = robot->links[j].T_World;
 
         //glColor3f(0.7,0.7,0.7);
         //world->robotViews[i].DrawLink_World(j);
@@ -170,6 +214,10 @@ void ForceFieldBackend::RenderWorld()
         a.SetColor(GLColor(0.7,0.7,0.7));
         a.DrawGL();
         glPopMatrix();
+
+
+
+
 
       }
     }
@@ -701,6 +749,9 @@ bool GLUIForceFieldGUI::Initialize()
   AddControl(checkbox,"draw_robot");
   checkbox->set_int_val(_backend->drawRobot);
 
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Force Field");
+  AddControl(checkbox,"draw_forcefield");
+  checkbox->set_int_val(_backend->drawForceField);
 
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Robot COM+Skeleton");
   AddControl(checkbox,"draw_robot_extras");
@@ -720,6 +771,7 @@ bool GLUIForceFieldGUI::Initialize()
 //################################################################################
 
   AddToKeymap("r","reset");
+  AddToKeymap("w","draw_forcefield");
   AddToKeymap("f","draw_rigid_objects_faces_toggle");
   AddToKeymap("e","draw_rigid_objects_edges_toggle");
   AddToKeymap("s","toggle_simulate");
