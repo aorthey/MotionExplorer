@@ -513,7 +513,7 @@ model?) -> one of the cylinders pierced the head sphere creating a spurious coll
 if specified irreducible planner, use that one)
  [ ] rewrite introduction and experimental part
  [ ] make sure that cbounds gives an exception if outer limit index
- [ ] what about the humanoid experiments? could we repeat them easily?
+ [x] what about the humanoid experiments? could we repeat them easily?
  [x] one humanoid experiment: flat floor, multiple doors at different angles, sideways motion.  Maybe like the kyoto tori 
  [x] be able to sample all possible IK configurations given contacts
  [ ] CoM + IK computation?
@@ -523,4 +523,6 @@ if specified irreducible planner, use that one)
  [x] enable/disable swept volume of certain links.
 
 -- important
- [ ] self collisions occuring when simulating atlas in Klampt! 
+ [ ] self collisions occuring when simulating atlas in Klampt. ODERobot
+correctly determines that collision occurs. But why is it not avoided? maybe
+force too strong? but then terrain would be permeated, too.

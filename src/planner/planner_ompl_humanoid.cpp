@@ -23,8 +23,8 @@ void HumanoidPropagatorIrreducible::propagate(const ob::State *state, const oc::
   uSE3(0) = 0;//ucontrol[0]; //include torsion?
   uSE3(1) = 0;//ucontrol[1];
   uSE3(2) = ucontrol[2];
-  uSE3(3) = 0;
-  uSE3(4) = 1;
+  uSE3(3) = ucontrol[3];
+  uSE3(4) = ucontrol[4];
   uSE3(5) = 0;
 
   uint N = s->getDimension() - 6;
@@ -61,6 +61,16 @@ void HumanoidPropagatorIrreducible::propagate(const ob::State *state, const oc::
   for(int i = 0; i < N; i++){
     qend[i+6] = x0[i+6] + dt*ucontrol[i+6];
   }
+
+  qend[57] = qend[12];
+  qend[58] = qend[11];
+  qend[59] = qend[10];
+  qend[60] = qend[9];
+  qend[61] = qend[8];
+  qend[62] = qend[7];
+  qend[64] = qend[6];
+
+
   //###########################################################################
   // Config to OMPL
   //###########################################################################
@@ -154,8 +164,8 @@ void PostRunEventHumanoid(const ob::PlannerPtr &planner, ot::Benchmark::RunPrope
     oc::PathControl path_control = static_cast<oc::PathControl&>(*pp);
     og::PathGeometric path = path_control.asGeometric();
 
-    og::PathSimplifier shortcutter(si);
-    shortcutter.shortcutPath(path);
+    //og::PathSimplifier shortcutter(si);
+    //shortcutter.shortcutPath(path);
 
     vector<Config> keyframes;
     for(int i = 0; i < path.getStateCount(); i++)
@@ -164,7 +174,7 @@ void PostRunEventHumanoid(const ob::PlannerPtr &planner, ot::Benchmark::RunPrope
       Config cur = OMPLStateToConfig(state, cspace->getPtr());
       keyframes.push_back(cur);
     }
-    std::string sfile = "humanoid_"+std::to_string(pid)+".xml";
+    std::string sfile = "humanoid_door_"+std::to_string(pid)+".xml";
     std::cout << "Saving keyframes"<< std::endl;
     Save(keyframes, sfile.c_str());
   }else{
@@ -230,7 +240,6 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
   cbounds.setLow(-1);
   cbounds.setHigh(1);
 
-
   uint effectiveControlDim = 0;
   for(int i = 0; i < NdimControl; i++){
     double qmin = robot->qMin(i);
@@ -244,12 +253,36 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
       effectiveControlDim++;
     }
   }
-  for(int i = 0; i < 6; i++){
-    cbounds.setLow(i,0);
-    cbounds.setHigh(i,0);
+  //for(int i = 0; i < 6; i++){
+    //cbounds.setLow(i,0);
+    //cbounds.setHigh(i,0);
+  //}
+  //cbounds.setLow(2,-kappa_curvature);
+  //cbounds.setHigh(2,kappa_curvature);
+
+
+  for(int i = 36; i < 42; i++){
+    cbounds.setLow(i,0);cbounds.setHigh(i,0);
   }
-  cbounds.setLow(2,-kappa_curvature);
-  cbounds.setHigh(2,kappa_curvature);
+  for(int i = 50; i < 56; i++){
+    cbounds.setLow(i,0);cbounds.setHigh(i,0);
+  }
+  // Link[36] LHAND_LINK0 mass 0.0632782
+  // Link[37] LHAND_LINK1 mass 0.0775929
+  // Link[38] LHAND_LINK2 mass 0.205701
+  // Link[39] LHAND_LINK3 mass 0.0745618
+  // Link[40] LHAND_LINK4 mass 0.0710285
+  // Link[41] LeftHandForceSensor mass 0.0001
+  // Link[42] l_gripper mass 0.0001
+  
+
+  //   Link[50] RHAND_LINK0 mass 0.0632782
+  //   Link[51] RHAND_LINK1 mass 0.0775929
+  //   Link[52] RHAND_LINK2 mass 0.205701
+  //   Link[53] RHAND_LINK3 mass 0.0745618
+  //   Link[54] RHAND_LINK4 mass 0.0710285
+  //   Link[55] RightHandForceSensor mass 0.0001
+  //   Link[56] r_gripper mass 0.0001
 
 
   cbounds.setLow(NdimControl,0.01);//propagation step size
@@ -297,37 +330,37 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   bool solved = false;
   double solution_time = dInf;
-  double duration = 3600*48;
+  double duration = 1200;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
 
   //###########################################################################
   // benchmark instead
   //###########################################################################
-  //ot::Benchmark benchmark(ss, "BenchmarkHumanoid");
-  ////benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
-  ////benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
-  ////benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
+  ot::Benchmark benchmark(ss, "BenchmarkHumanoid");
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 
-  //ot::Benchmark::Request req;
-  //req.maxTime = duration;
-  //req.maxMem = 10000.0;
-  //req.runCount = 10;
-  //req.displayProgress = true;
+  ot::Benchmark::Request req;
+  req.maxTime = duration;
+  req.maxMem = 10000.0;
+  req.runCount = 10;
+  req.displayProgress = true;
 
-  //benchmark.setPostRunEvent(std::bind(&PostRunEventHumanoid, std::placeholders::_1, std::placeholders::_2, &cspace));
+  benchmark.setPostRunEvent(std::bind(&PostRunEventHumanoid, std::placeholders::_1, std::placeholders::_2, &cspace));
 
-  //benchmark.benchmark(req);
-  //benchmark.saveResultsToFile();
+  benchmark.benchmark(req);
+  benchmark.saveResultsToFile();
 
-  //std::string file = "ompl_humanoid_irreducible_benchmark_wall";
-  //std::string res = file+".log";
-  //benchmark.saveResultsToFile(res.c_str());
+  std::string file = "ompl_humanoid_irreducible_benchmark_wall";
+  std::string res = file+".log";
+  benchmark.saveResultsToFile(res.c_str());
 
-  //std::string cmd = "ompl_benchmark_statistics.py "+file+".log -d "+file+".db";
-  //std::system(cmd.c_str());
-  //cmd = "cp "+file+".db"+" ../data/benchmarks/";
-  //std::system(cmd.c_str());
+  std::string cmd = "ompl_benchmark_statistics.py "+file+".log -d "+file+".db";
+  std::system(cmd.c_str());
+  cmd = "cp "+file+".db"+" ../data/benchmarks/";
+  std::system(cmd.c_str());
 
   //###########################################################################
   // solve

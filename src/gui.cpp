@@ -153,6 +153,7 @@ void ForceFieldBackend::RenderWorld()
   if(drawRobot){
     for(size_t i=0;i<world->robots.size();i++) {
       Robot *robot = world->robots[i];
+      //std::cout << robot->name << " selfcollisions:" << robot->SelfCollision() << std::endl;
       for(size_t j=0;j<world->robots[i]->links.size();j++) {
         if(robot->IsGeometryEmpty(j)) continue;
 

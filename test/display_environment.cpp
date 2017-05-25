@@ -12,12 +12,16 @@ int main(int argc,const char** argv) {
   //std::string file = "data/wall.xml";
   //std::string file = "data/snake_turbine.xml";
   //std::string file = "data/human.xml";
-  std::string file = "data/hrp2_door_complete.xml";
+  std::string file = "data/hrp2_door.xml";
+  //std::string file = "data/hrp2_door_irreducible.xml";
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
 
-  std::cout << env.GetPlannerInput() << std::endl;
-  env.GetBackendPtr()->VisualizeStartGoal(env.GetPlannerInput().q_init, env.GetPlannerInput().q_goal);
-  env.GetBackendPtr()->ShowRobot();
+  Info info;
+  info(env.GetWorldPtr());
+
+  //std::cout << env.GetPlannerInput() << std::endl;
+  //env.GetBackendPtr()->VisualizeStartGoal(env.GetPlannerInput().q_init, env.GetPlannerInput().q_goal);
+  //env.GetBackendPtr()->ShowRobot();
 
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.SetWindowTitle("DisplayEnvironment");
