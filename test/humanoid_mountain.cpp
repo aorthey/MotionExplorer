@@ -45,7 +45,8 @@ int main(int argc,const char** argv) {
   //env.GetBackendPtr()->HideSweptVolumes();
   env.GetBackendPtr()->ShowRobot();
   //env.GetBackendPtr()->HideCoordinateAxes();
-
+  env.GetBackendPtr()->drawRigidObjectsFaces = 1;
+  env.GetBackendPtr()->drawRigidObjectsEdges = 0;
   std::cout << "SelfCollisionsEnabled" << std::endl;
   std::cout << simrobot->SelfCollisionsEnabled() << std::endl;
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());

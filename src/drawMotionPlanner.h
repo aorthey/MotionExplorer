@@ -8,11 +8,14 @@
 #include <View/ViewIK.h>
 
 #include "planner/planner.h"
+#include "elements/wrench_field.h"
 
 namespace GLDraw {
   void drawRobotExtras(ViewRobot *robot, GLColor bodyColor=GLColor(0.5,0.5,0.5), double COMradius=0.05);
   void drawIKextras(ViewRobot *viewrobot, Robot *robot, std::vector<IKGoal> &constraints, std::vector<int> linksInCollision, GLColor selectedLinkColor);
   void drawUniformForceField();
+  void drawForceField(WrenchField &wrenchfield);
+  void drawWrenchField(WrenchField &wrenchfield);
 
   void drawGLPathKeyframes(Robot *robot, std::vector<uint> keyframe_indices, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor color = GLColor(0.8,0.8,0.8,1.0), double scale = 1.0);
 

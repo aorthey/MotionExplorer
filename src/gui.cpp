@@ -18,6 +18,7 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   showSweptVolumes = 0;
 
   drawForceField = 0;
+  drawWrenchField = 0;
   drawIKextras = 0;
 
   drawPlannerTree = 1;
@@ -37,6 +38,7 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   MapButtonToggle("draw_rigid_objects_faces",&drawRigidObjectsFaces);
   MapButtonToggle("draw_rigid_objects_edges",&drawRigidObjectsEdges);
   MapButtonToggle("draw_forcefield",&drawForceField);
+  MapButtonToggle("draw_wrenchfield",&drawWrenchField);
 
   MapButtonToggle("draw_robot_extras",&drawRobotExtras);
   MapButtonToggle("draw_robot",&drawRobot);
@@ -58,17 +60,33 @@ bool ForceFieldBackend::OnIdle()
   bool res=BaseT::OnIdle();
   if(simulate) {
     SendRefresh();
-    Vector3 force(0,0,50);
-    Vector3 torque(0,0,0);
+
+    //Simulate Force Field
+    // compute links COM, then get forces from field
+
+
     ODERobot *robot = sim.odesim.robot(0);
     uint Nlinks = robot->robot.links.size();
+
+    //we use own force field
+    sim.odesim.SetGravity(Vector3(0,0,0));
 
     sim.hooks.clear();
     for(int i = 0; i < Nlinks; i++){
       dBodyID bodyid = robot->body(i);
+
+
       if(bodyid){
-        std::cout << "setting bodyid:" << i << ":" << bodyid << std::endl;
-        sim.hooks.push_back(new WrenchHook(bodyid,force, torque));
+        Frame3D T = robot->robot.links[i].T_World;
+        Vector3 com = T*robot->robot.links[i].com;
+
+        wrenchfield.setPosition(i, com);
+        Vector3 force = wrenchfield.getForceFieldAtPosition(com);
+        Vector3 torque(0,0,0);
+        wrenchfield.setForce(i, force);
+
+        sim.hooks.push_back(new WrenchHook(bodyid, force, torque));
+
       }
     }
 
@@ -82,6 +100,7 @@ bool ForceFieldBackend::OnIdle()
 void ForceFieldBackend::Start()
 {
   BaseT::Start();
+
 
   settings["dragForceMultiplier"] = 500.0;
   drawContacts = 0;
@@ -97,6 +116,10 @@ void ForceFieldBackend::Start()
     showLinks[i] = 0;
   }
   showLinks[15] = 1;
+
+  //ForceField init
+
+  wrenchfield.init(Nlinks);
   //for(int i = 43; i < 50; i++) showLinks[i] = 1;
   //for(int i = 29; i < 36; i++) showLinks[i] = 1;
 
@@ -160,7 +183,7 @@ void ForceFieldBackend::RenderWorld()
     //world->terrains[i]->DrawGL();
     Terrain *terra = world->terrains[i];
     GLDraw::GeometryAppearance* a = terra->geometry.Appearance();
-    a->SetColor(GLColor(0.8,0.8,0.8,1.0));
+    a->SetColor(GLColor(0.9,0.5,0.1,1.0));
     a->drawFaces = false;
     a->drawEdges = false;
     a->drawVertices = false;
@@ -168,6 +191,7 @@ void ForceFieldBackend::RenderWorld()
     if(drawRigidObjectsEdges) a->drawEdges = true;
     //a->vertexSize = 10;
     a->edgeSize = 20;
+
     terra->DrawGL();
   }
 
@@ -250,7 +274,10 @@ void ForceFieldBackend::RenderWorld()
 
   if(drawRobotExtras) GLDraw::drawRobotExtras(viewRobot);
   if(drawIKextras) GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);
-  if(drawForceField) GLDraw::drawUniformForceField();
+
+  if(drawForceField) GLDraw::drawForceField(wrenchfield);
+  if(drawWrenchField) GLDraw::drawWrenchField(wrenchfield);
+
   if(drawPlannerStartGoal) GLDraw::drawGLPathStartGoal(robot, planner_p_init, planner_p_goal);
 
   for(int i = 0; i < swept_volume_paths.size(); i++){
@@ -618,6 +645,10 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     toggle(drawRigidObjectsEdges);
   }else if(cmd=="draw_planner_tree_toggle"){
     toggle(drawPlannerTree);
+  }else if(cmd=="draw_forcefield"){
+    toggle(drawForceField);
+  }else if(cmd=="draw_wrenchfield"){
+    toggle(drawWrenchField);
   }else if(cmd=="load_motion_planner") {
     //glutSelectFile ("","","");//char *filename, const char *filter, const char *title)
     //std::string file_name = browser->get_file();
@@ -625,6 +656,13 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
 
   }else if(cmd=="save_motion_planner") {
     std::cout << "saving file " << args.c_str() << std::endl;
+  }else if(cmd=="toggle_mode"){
+    if(click_mode == ModeNormal){
+      click_mode = ModeForceApplication;
+    }else{
+      click_mode = ModeNormal;
+    }
+    std::cout << "Changed Mode to: "<<click_mode << std::endl;
   }else if(cmd=="print_config") {
     std::cout << world->robots[0]->q <<std::endl;
   }else{
@@ -753,6 +791,10 @@ bool GLUIForceFieldGUI::Initialize()
   AddControl(checkbox,"draw_forcefield");
   checkbox->set_int_val(_backend->drawForceField);
 
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Wrench Field");
+  AddControl(checkbox,"draw_wrenchfield");
+  checkbox->set_int_val(_backend->drawWrenchField);
+
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Robot COM+Skeleton");
   AddControl(checkbox,"draw_robot_extras");
   checkbox->set_int_val(_backend->drawRobotExtras);
@@ -771,7 +813,9 @@ bool GLUIForceFieldGUI::Initialize()
 //################################################################################
 
   AddToKeymap("r","reset");
-  AddToKeymap("w","draw_forcefield");
+  AddToKeymap("q","draw_forcefield");
+  AddToKeymap("w","draw_wrenchfield");
+  AddToKeymap("T","toggle_mode");
   AddToKeymap("f","draw_rigid_objects_faces_toggle");
   AddToKeymap("e","draw_rigid_objects_edges_toggle");
   AddToKeymap("s","toggle_simulate");

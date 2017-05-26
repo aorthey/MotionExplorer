@@ -390,18 +390,8 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [x] setup kinodynamic planning problem
  [x] control in kinodynamic planning converges to wrong direction
  [x] refactor draw methods in gui.cpp
- [ ] solve IK for arbitrary rob-env contact points
- [ ] grasp an actual object
- [ ] sample grasps for object and compute IK (findGrasp method)
- [ ] make/break contact events => compute transition paths
- [ ] execute transition paths 
- [ ] change viewpoint internally
- [ ] Compute Force Closure Grasp from points
- [ ] Compute SE constraints, what is GIWC equivalent?
- [ ] smoothing after path planning
  [x] make a Klampt Interface where to set all properties like background color etc
  [x] screenshots x_X?
- [ ] refactor kinodynamic planner to make it independent from path planner
  [x] refactor planner settings
  [x] save kinodynamicmilestonepath to file 
  [x] outsource serialized tree to seperate file
@@ -413,20 +403,16 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [x] install krislib with ompl support (didn't link ompl in klampt lib and this lib)
  [x] ompl does not read the joint limits
  [x] make ompl planners available 
- [ ] add directions again in draw serialized tree after culling nodes
  [x] remove this orange line from origin to p_init
- [ ] Button to save/load GUI state including Motion Planning Equipment
  [x] ompl converts cspace to realvectorspace R, but we need a compound space SE(3)xQ => make own ompl interface
  [x] enable ompl geometric planners
  [x] add omplapp interface to load meshes + collision detection (check omplapp/SE3RigidBodyPlanning.cpp)
       (/git/ompl/omplapp-1.3.0-Source/demos/SE3RigidBodyPlanning)
  [x] enable ompl kinodynamic planners
- [ ] create planner_klampt outsourcing klampt planning structure
  [x] move planner components to planner/
  [x] make button to disable/enable mesh and disable/enable faces of mesh
  [x] run ompl PDST/KPIECE /w def proj
  [x] compute irreducible projection from SE(3) path
-
  [x] GUI: save current robot state too, not only init/goal of planner
  [x] remove torsion while computing irreducible projection
  [x] reimplement irreducible projection in cpp, make it cleaner
@@ -436,11 +422,24 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [x] make the environment easier to compute for rigid body planning (widen the inner hole maybe!?)
  [x] outsource swept volume to seperate elements file
  [x] check distance function in OMPL -- why is it different depending on number of DOFs?
- [ ] boost graph instead of serialized tree?
  [x] find distance to goal for planner output OMPL (how approximate is the solution)
  [x] toggle mesh/faces of objects with keyboard
  [x] add edges to planner tree visualization
- [ ] create sweptvolumeGUI + forcefieldGUI 
+ [ ] add directions again in draw serialized tree after culling nodes
+ [ ] boost graph instead of serialized tree?
+ [ ] Button to save/load GUI state including Motion Planning Equipment
+ [ ] create planner_klampt outsourcing klampt planning structure
+ [ ] solve IK for arbitrary rob-env contact points
+ [ ] grasp an actual object
+ [ ] sample grasps for object and compute IK (findGrasp method)
+ [ ] make/break contact events => compute transition paths
+ [ ] execute transition paths 
+ [ ] change viewpoint internally
+ [ ] Compute Force Closure Grasp from points
+ [ ] Compute SE constraints, what is GIWC equivalent?
+ [ ] smoothing after path planning
+ [ ] refactor kinodynamic planner to make it independent from path planner
+ [ ] decompose GUI into sweptvolumeGUI and forcefieldGUI 
  [ ] save all swept volumes when saving GUI, rewrite all Load/Save functions
  [ ] refactor planner -> use PlannerOutput to store path/roadmap and use
 PlannerOutput as Input to GUI to shadow the internal things. Also put the
@@ -476,13 +475,19 @@ display tree/start/goal/swept volumes, do planning
  [ ] use TAB to access different modes: simulation <-> Desired Pose (change goal) blender-like controls?
  [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
       andreas dziegielewski http://acg.cs.tau.ac.il/projects/swept-volume/project-page seems promising
- [ ] get distance between links and terrain
- [ ] create arbitrary force fields in ODE simulator
  [ ] making a safe static contact
+ [ ] compute and display distance between links and terrain
 
 -- wrench fields
 
- [ ] make the controller work without gravity on SE(3)
+ [x] create arbitrary force fields in ODE simulator
+ [ ] create force field visualization and visualize its effect on each link
+ [ ] let force be specificable in xml file, uniform, box, uniform inside rigid object, radial from source,
+maelstrom from source, and any combination of that. Test with moving robot
+around and visualize wrenches on each link plus wrench on COM
+ [ ] visualize COM separately in box to quickly see wrenches attacking robot.
+COM should retain orientation equal to origin so that we can see forces from
+different perspectives
  [ ] execute kinodynamic path
  [ ] visualize path speed profile
 
@@ -513,18 +518,19 @@ model?) -> one of the cylinders pierced the head sphere creating a spurious coll
  [x] design one turbine scenario with a large room (which can be used for wrench planning)
  [x] add one hard experiment where the method will break down, should be short so that any RRT can find a solution under 3600 seconds. 
  [x] outsource planner setup to JSON file or xml (should be loadable in simulator)
- [ ] make irreducible planner independent from xml file (use same xml file, but
-if specified irreducible planner, use that one)
- [ ] rewrite introduction and experimental part
- [ ] make sure that cbounds gives an exception if outer limit index
+ [x] make sure that cbounds gives an exception if outer limit index
  [x] what about the humanoid experiments? could we repeat them easily?
  [x] one humanoid experiment: flat floor, multiple doors at different angles, sideways motion.  Maybe like the kyoto tori 
  [x] be able to sample all possible IK configurations given contacts
- [ ] CoM + IK computation?
- [ ] experiment door 100x1200 irr (running)
- [ ] experiment door 100x1200 complete
- [x] experiment wall 10xXX ? 
+ [x] CoM + IK computation?
+ [x] experiment door 100x1200 irr (running)
  [x] enable/disable swept volume of certain links.
+ [x] experiment wall 10xXX ? 
+ [ ] make irreducible planner independent from xml file (use same xml file, but
+if specified irreducible planner, use that one)
+ [ ] experiment door 100x1200 complete
+ [ ] experiment wall 10x3600*24 complete
+ [ ] rewrite introduction and experimental part
 
 -- important
  [ ] self collisions occuring when simulating atlas in Klampt. ODERobot

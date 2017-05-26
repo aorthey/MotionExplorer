@@ -17,6 +17,7 @@
 #include <ode/ode.h>
 #include "planner/serialized_tree.h"
 #include "elements/swept_volume.h"
+#include "elements/wrench_field.h"
 
 #define DEBUG 0
 
@@ -41,6 +42,13 @@ class ForceFieldBackend : public SimTestBackend
     //##########################################################################
     vector< vector<Vector3> > _frames;
     vector< double > _frameLength;
+
+    //point and direction of wrench for each link's COM
+
+    //typedef Vector Wrench;
+    //typedef vector< std::pair<Vector3, Wrench> > WrenchField;
+
+    WrenchField wrenchfield;
 
   public:
 
@@ -100,6 +108,7 @@ class ForceFieldBackend : public SimTestBackend
   std::vector<int> drawPathStartGoal;
 
   int drawForceField;
+  int drawWrenchField;
   int drawRobotExtras; 
   int drawIKextras;
   int drawRobot;
