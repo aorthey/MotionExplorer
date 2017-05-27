@@ -39,15 +39,19 @@ namespace util {
   }
   inline std::string GetApplicationFolder()
   {
-    std::string name = getenv("USER");
+    //std::string name = getenv("USER");
+    std::string pwd = getenv("PWD");
 
-    return "/home/"+name+"/git/orthoklampt/";
+    //return "/home/"+name+"/git/orthoklampt/";
+    return pwd+"/../";
   }
   inline std::string GetDataFolder()
   {
-    std::string name = getenv("USER");
+    //std::string name = getenv("USER");
+    std::string pwd = getenv("PWD");
 
-    return "/home/"+name+"/git/orthoklampt/data";
+    return pwd+"/../data";
+    //return "/home/"+name+"/git/orthoklampt/data";
   }
 }// namespace util
 

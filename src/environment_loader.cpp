@@ -72,6 +72,7 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
   }
 
   _backend->wrenchfield.LoadFromWorldFile(file_name.c_str());
+  _backend->wrenchfield.print();
 
 }
 bool EnvironmentLoader::LoadPlannerSettings(TiXmlElement *node)
