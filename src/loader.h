@@ -1,6 +1,13 @@
 #pragma once
 
-bool CheckNodeName(TiXmlElement *node, const char* name)
+#include <tinyxml.h>
+#include <string>
+#include <iostream>
+#include <sstream>
+
+using namespace std;
+
+inline bool CheckNodeName(TiXmlElement *node, const char* name)
 {
   if(0!=strcmp(node->Value(),name)) {
     std::cout << "Not a " << name <<  " file" << std::endl;
@@ -8,7 +15,7 @@ bool CheckNodeName(TiXmlElement *node, const char* name)
   }
   return true;
 }
-TiXmlElement* GetRootNodeFromDocument(TiXmlDocument& doc)
+inline TiXmlElement* GetRootNodeFromDocument(TiXmlDocument& doc)
 {
   if(doc.LoadFile()){
     TiXmlElement *root = doc.RootElement();
@@ -21,7 +28,7 @@ TiXmlElement* GetRootNodeFromDocument(TiXmlDocument& doc)
   }
 }
 
-TiXmlElement* FindSubNode(TiXmlElement* node, const char *name){
+inline TiXmlElement* FindSubNode(TiXmlElement* node, const char *name){
   if(!node) return NULL;
   TiXmlElement* e=node->FirstChildElement();
   while(e != NULL) 
@@ -32,11 +39,11 @@ TiXmlElement* FindSubNode(TiXmlElement* node, const char *name){
   return NULL;
 }
 
-TiXmlElement* FindFirstSubNode(TiXmlElement* node, const char *name){
+inline TiXmlElement* FindFirstSubNode(TiXmlElement* node, const char *name){
   return FindSubNode(node, name);
 }
 
-TiXmlElement* FindNextSiblingNode(TiXmlElement* node, const char *name){
+inline TiXmlElement* FindNextSiblingNode(TiXmlElement* node, const char *name){
   while(node != NULL) 
   {
     node = node->NextSiblingElement();
@@ -47,7 +54,7 @@ TiXmlElement* FindNextSiblingNode(TiXmlElement* node, const char *name){
   return NULL;
 }
 
-stringstream GetStreamAttribute(TiXmlElement* node, const char *name){
+inline stringstream GetStreamAttribute(TiXmlElement* node, const char *name){
 
   if(!node) return stringstream ("NONE");
   const char *na = node->Attribute(name);
@@ -57,7 +64,7 @@ stringstream GetStreamAttribute(TiXmlElement* node, const char *name){
     return stringstream ("NONE");
   }
 }
-stringstream GetStreamText(TiXmlElement* node){
+inline stringstream GetStreamText(TiXmlElement* node){
 
   if(!node) return stringstream ("NONE");
   const char *na = node->GetText();

@@ -342,6 +342,10 @@ void ForceFieldBackend::RenderScreen(){
     }
   }
 
+  line = "Mode       : ";
+  line += (click_mode == ModeForceApplication?"ForceApplication":"PositionSetter");
+  DrawText(20,line_y_offset,line);
+  line_y_offset += line_y_offset_stepsize;
 }
 
 void ForceFieldBackend::VisualizeStartGoal(const Config &p_init, const Config &p_goal)

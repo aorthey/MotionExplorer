@@ -481,14 +481,15 @@ display tree/start/goal/swept volumes, do planning
 -- wrench fields
 
  [x] create arbitrary force fields in ODE simulator
- [ ] create force field visualization and visualize its effect on each link
+ [x] create force field visualization and visualize its effect on each link
+ [ ] visualize COM separately in box to quickly see wrenches attacking robot.
  [ ] let force be specificable in xml file, uniform, box, uniform inside rigid object, radial from source,
 maelstrom from source, and any combination of that. Test with moving robot
 around and visualize wrenches on each link plus wrench on COM
- [ ] visualize COM separately in box to quickly see wrenches attacking robot.
 COM should retain orientation equal to origin so that we can see forces from
 different perspectives
  [ ] execute kinodynamic path
+ [ ] visualize min dist between link and terrain
  [ ] visualize path speed profile
 
 -- irreducible paths

@@ -48,9 +48,10 @@ class ForceFieldBackend : public SimTestBackend
     //typedef Vector Wrench;
     //typedef vector< std::pair<Vector3, Wrench> > WrenchField;
 
-    WrenchField wrenchfield;
-
   public:
+
+  WrenchField wrenchfield;
+
 
   ForceFieldBackend(RobotWorld *world);
   virtual void Start();

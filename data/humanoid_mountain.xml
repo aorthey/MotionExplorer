@@ -31,11 +31,14 @@
 
     <uniform force="0 0 -3.7"/>
 
-    <radial source="0 0 0" power="1"/>
+    <!-- linear (default): power*(1/r) from source-->
+    <!-- quadratic       : power*(1/r^2) from source-->
+    <radial source="0 0 0" power="1" type="quadratic"/>
 
+    <!--
     <maelstrom source="0 0 0" power="1"/>
-
     <box pos="0 0 0" measure="1 1 1" force="0 0 1"/>
+    -->
 
   </forcefield>
 

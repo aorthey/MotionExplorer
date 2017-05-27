@@ -71,8 +71,9 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     robot->UpdateFrames();
   }
 
-}
+  _backend->wrenchfield.LoadFromWorldFile(file_name.c_str());
 
+}
 bool EnvironmentLoader::LoadPlannerSettings(TiXmlElement *node)
 {
   CheckNodeName(node, "world");
