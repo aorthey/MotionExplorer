@@ -48,18 +48,18 @@ bool WrenchField::Load(TiXmlElement *node)
   //############################################################################
   TiXmlElement* forceradial = FindSubNode(forcefieldsettings, "radial");
 
-  while(forceradial){
+  while(forceradial!=NULL){
     Vector3 source;
     double power, radius;
     GetStreamAttribute(forceradial,"source") >> source;
     GetStreamAttribute(forceradial,"power") >> power;
     GetStreamAttribute(forceradial,"radius") >> radius;
-    forceradial = FindNextSiblingNode(forcefieldsettings, "radial");
 
     SmartPointer<ForceField> fr(new RadialForceField(source, power, radius));
     forcefields.push_back(fr);
-  }
 
+    forceradial = FindNextSiblingNode(forceradial, "radial");
+  }
 
   return true;
 }
@@ -73,6 +73,9 @@ WrenchField::WrenchField(){
   forcefields.clear();
 }
 
+const std::vector<SmartPointer<ForceField> >& WrenchField::GetForceFields() const{
+  return forcefields;
+}
 
 Vector3 WrenchField::getForceFieldAtPosition(Vector3 &position){
 

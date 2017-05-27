@@ -537,3 +537,4 @@ if specified irreducible planner, use that one)
  [ ] self collisions occuring when simulating atlas in Klampt. ODERobot
 correctly determines that collision occurs. But why is it not avoided? maybe
 force too strong? but then terrain would be permeated, too.
+ [ ] reset not working anymore

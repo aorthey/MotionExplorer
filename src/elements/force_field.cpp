@@ -12,7 +12,7 @@ void UniformForceField::print(){
   std::cout << "UniformForceField : force " << force << std::endl;
 }
 ForceFieldTypes UniformForceField::type(){
-  return ForceFieldTypes.UNIFORM;
+  return UNIFORM;
 }
 RadialForceField::RadialForceField(Vector3 _source, double _power, double _radius):
   source(_source), power(_power), maximum_radius(_radius), minimum_radius(0.1)
@@ -37,5 +37,11 @@ void RadialForceField::print(){
 }
 
 ForceFieldTypes RadialForceField::type(){
-  return ForceFieldTypes.RADIAL;
+  return RADIAL;
+}
+Math3D::Vector3 RadialForceField::GetSource(){
+  return source;
+}
+double RadialForceField::GetRadius(){
+  return maximum_radius;
 }

@@ -18,13 +18,13 @@ struct Wrench{
 class WrenchField{
 
   private:
-
     std::vector<SmartPointer<ForceField> > forcefields;
 
     //wrench induced by force field on each link of the main robot
     std::vector<Wrench> wrench_per_link;
 
   public: 
+
     void init(uint Nlinks);
     WrenchField();
 
@@ -33,12 +33,13 @@ class WrenchField{
 
     Math3D::Vector3 getForceFieldAtPosition(Math3D::Vector3 &position);
 
-    uint size();
+    const std::vector<SmartPointer<ForceField> >& GetForceFields() const;
 
     void setForce( uint id, Math3D::Vector3 force);
     void setTorque( uint id, Math3D::Vector3 torque);
     void setPosition( uint id, Math3D::Vector3 position);
 
+    uint size();
     Math3D::Vector3 getForce( uint id );
     Math3D::Vector3 getTorque( uint id );
     Math3D::Vector3 getPosition( uint id );

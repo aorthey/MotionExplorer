@@ -73,52 +73,53 @@ namespace GLDraw{
 
   void drawForceField(WrenchField &W){
     Real linewidth=0.01;
-    for(int i = 0; i < W.forcefields.size(); i++){
-      SmartPointer<ForceField> f = W.forcefields.at(i);
-      if(f.type() == ForceFieldTypes.UNIFORM){
-      }else if(f.type() == ForceFieldTypes.RADIAL){
-        std::cout << "RADIAL FF" << std::endl;
+    std::vector<SmartPointer<ForceField> > forcefields = W.GetForceFields();
+    for(int i = 0; i < forcefields.size(); i++){
+      SmartPointer<ForceField> f = forcefields.at(i);
+      if(f->type() == UNIFORM){
+        //TODO: how to visualize a uniform field
+      }else if(f->type() == RADIAL){
+        SmartPointer<RadialForceField>& fr = *reinterpret_cast<SmartPointer<RadialForceField>*>(&forcefields.at(i));
+        //Vector3 source = dynamic_cast<RadialForceField*>(f)->GetSource()
+        Vector3 source = fr->GetSource();
+        double radius = fr->GetRadius();
+
+        glDisable(GL_LIGHTING);
+        glEnable(GL_BLEND); 
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+        GLColor cForce(0.2,0.7,0.2);
+        cForce.setCurrentGL();
+        
+        glPushMatrix();
+        glTranslate(source);
+
+        glPointSize(5);
+        drawPoint(Vector3(0,0,0));
+
+        glLineWidth(2);
+
+        double theta_step = M_PI/4;
+        double gamma_step = theta_step;
+        for(double theta = 0; theta < 2*M_PI; theta+=theta_step){
+          for(double gamma = 0; gamma < M_PI; gamma+=gamma_step){
+            double xs = radius*sin(theta)*cos(gamma);
+            double ys = radius*sin(theta)*sin(gamma);
+            double zs = radius*cos(theta);
+            glBegin(GL_LINES);
+            glVertex3f(0,0,0);
+            glVertex3f(xs,ys,zs);
+            glEnd();
+          }
+        }
+
+
+        glPopMatrix();
+        glEnable(GL_LIGHTING);
+
       }
     }
 
-//    Vector3 L = W.getLowerLimit();
-//    Vector3 U = W.getUpperLimit();
-//    Vector3 dstep = W.getStepSize();
-//    for(double x = L[0]; x <= U[0]; x+=dstep[0]){
-//      for(double y = L[1]; y <= U[1]; y+=dstep[1]){
-//        for(double z = L[2]; z <= U[2]; z+=dstep[2]){
-//          Vector3 xyz(x,y,z);
-//          Vector3 force = W.getForceFieldAtPosition(xyz);
-//          force = force/force.norm();
-//
-//          force[0] *= dstep[0]/2;
-//          force[1] *= dstep[1]/2;
-//          force[2] *= dstep[2]/2;
-//
-//          Vector3 pos(x,y,z);
-//  
-//          glDisable(GL_LIGHTING);
-//          glEnable(GL_BLEND); 
-//          glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-//
-//          GLColor cForce(0.8,0.2,0.2);
-//          cForce.setCurrentGL();
-//          
-//          glPushMatrix();
-//          glTranslate(pos);
-//
-//          glLineWidth(10);
-//
-//          glBegin(GL_LINES);
-//          glVertex3f(0.0, 0.0, 0.0);
-//          glVertex3f(force[0],force[1],force[2]);
-//          glEnd();
-//
-//          glPopMatrix();
-//          glEnable(GL_LIGHTING);
-//        }//forz
-//      }//fory
-//    }//forx
 
   }
   void drawUniformForceField()

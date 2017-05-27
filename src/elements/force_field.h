@@ -27,6 +27,8 @@ class RadialForceField: public ForceField{
     virtual Math3D::Vector3 getForceAtPosition(Math3D::Vector3 position);
     virtual void print();
     virtual ForceFieldTypes type();
+    Math3D::Vector3 GetSource();
+    double GetRadius();
   private:
     Math3D::Vector3 source;
     double power;
