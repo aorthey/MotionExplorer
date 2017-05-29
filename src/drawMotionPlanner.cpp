@@ -79,16 +79,18 @@ namespace GLDraw{
       if(f->type() == UNIFORM){
         //TODO: how to visualize a uniform field
       }else if(f->type() == RADIAL){
+
         SmartPointer<RadialForceField>& fr = *reinterpret_cast<SmartPointer<RadialForceField>*>(&forcefields.at(i));
         //Vector3 source = dynamic_cast<RadialForceField*>(f)->GetSource()
         Vector3 source = fr->GetSource();
         double radius = fr->GetRadius();
+        double power = fr->GetPower();
 
         glDisable(GL_LIGHTING);
         glEnable(GL_BLEND); 
         glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
-        GLColor cForce(0.2,0.7,0.2);
+        GLColor cForce = fr->GetColor();
         cForce.setCurrentGL();
         
         glPushMatrix();
@@ -106,10 +108,24 @@ namespace GLDraw{
             double xs = radius*sin(theta)*cos(gamma);
             double ys = radius*sin(theta)*sin(gamma);
             double zs = radius*cos(theta);
+
             glBegin(GL_LINES);
             glVertex3f(0,0,0);
             glVertex3f(xs,ys,zs);
             glEnd();
+
+
+            Vector3 middle(xs/2,ys/2,zs/2);
+            glPushMatrix();
+            glTranslate(middle);
+            //drawPoint(Vector3(0,0,0));
+
+            Vector3 direction = 0.1*middle; 
+            if(power > 0) {
+              direction *= -1;
+            }
+            GLDraw::drawCone(direction, 0.5*direction.norm());
+            glPopMatrix();
           }
         }
 

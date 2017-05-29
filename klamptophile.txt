@@ -488,6 +488,8 @@ maelstrom from source, and any combination of that. Test with moving robot
 around and visualize wrenches on each link plus wrench on COM
 COM should retain orientation equal to origin so that we can see forces from
 different perspectives
+ [ ] add constraint to a force field to be inside a given rigid object
+ [ ] add arrows to visualize flow of power
  [ ] execute kinodynamic path
  [ ] visualize min dist between link and terrain
  [ ] visualize path speed profile
@@ -524,17 +526,19 @@ model?) -> one of the cylinders pierced the head sphere creating a spurious coll
  [x] one humanoid experiment: flat floor, multiple doors at different angles, sideways motion.  Maybe like the kyoto tori 
  [x] be able to sample all possible IK configurations given contacts
  [x] CoM + IK computation?
- [x] experiment door 100x1200 irr (running)
+ [x] experiment door 100x1200 irr 
  [x] enable/disable swept volume of certain links.
  [x] experiment wall 10xXX ? 
+ [x] rewrite introduction and experimental part
  [ ] make irreducible planner independent from xml file (use same xml file, but
 if specified irreducible planner, use that one)
- [ ] experiment door 100x1200 complete
+ [ ] experiment door 100x1200 complete (running)
  [ ] experiment wall 10x3600*24 complete
- [ ] rewrite introduction and experimental part
 
 -- important
- [ ] self collisions occuring when simulating atlas in Klampt. ODERobot
+ [x] self collisions occuring when simulating atlas in Klampt. ODERobot
 correctly determines that collision occurs. But why is it not avoided? maybe
 force too strong? but then terrain would be permeated, too.
+    Simulation/settings.h: const static bool gRobotSelfCollisionsEnabled = true;
+ [ ] simulator crash if forces are too high and selfcollision is enabled
  [ ] reset not working anymore

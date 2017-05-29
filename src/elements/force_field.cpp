@@ -33,7 +33,7 @@ Vector3 RadialForceField::getForceAtPosition(Vector3 position){
 }
 
 void RadialForceField::print(){
-  std::cout << "RadialForceField  : source:" << source << " power: "<< power << " radius "<< maximum_radius << std::endl;
+  std::cout << "RadialForceField  : source:" << source << " power: "<< power << " radius "<< maximum_radius << " color " << color << std::endl;
 }
 
 ForceFieldTypes RadialForceField::type(){
@@ -44,4 +44,7 @@ Math3D::Vector3 RadialForceField::GetSource(){
 }
 double RadialForceField::GetRadius(){
   return maximum_radius;
+}
+double RadialForceField::GetPower(){
+  return power;
 }

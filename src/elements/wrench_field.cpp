@@ -1,3 +1,4 @@
+#include <KrisLibrary/GLdraw/GLColor.h>
 #include "loader.h"
 #include "wrench_field.h"
 
@@ -33,14 +34,26 @@ bool WrenchField::Load(TiXmlElement *node)
   TiXmlElement* forceuniform = FindSubNode(forcefieldsettings, "uniform");
   Vector3 Funiform;
   GetStreamAttribute(forceuniform,"force") >> Funiform;
+
+  using namespace GLDraw;
+  GLColor colorForce(0.8,0.8,0.8);
   while(forceuniform){
     forceuniform = FindNextSiblingNode(forcefieldsettings, "uniform");
     Vector3 FuniformNext;
     GetStreamAttribute(forceuniform,"force") >> FuniformNext;
+    stringstream ssc = GetStreamAttribute(forceuniform,"color");
+    Vector3 cc;
+    if(ssc.str()!="NONE"){
+      ssc >> cc;
+      colorForce[0]=cc[0]; colorForce[1]=cc[1]; colorForce[2]=cc[2];
+    }
     Funiform += FuniformNext;
   }
 
+
   SmartPointer<ForceField> fu(new UniformForceField(Funiform));
+  fu->SetColor(colorForce);
+
   forcefields.push_back(fu);
 
   //############################################################################
@@ -51,11 +64,19 @@ bool WrenchField::Load(TiXmlElement *node)
   while(forceradial!=NULL){
     Vector3 source;
     double power, radius;
+    GLColor colorForce(0.8,0.8,0.8);
     GetStreamAttribute(forceradial,"source") >> source;
     GetStreamAttribute(forceradial,"power") >> power;
     GetStreamAttribute(forceradial,"radius") >> radius;
+    stringstream ssc = GetStreamAttribute(forceradial,"color");
+    Vector3 cc;
+    if(ssc.str()!="NONE"){
+      ssc >> cc;
+      colorForce[0]=cc[0]; colorForce[1]=cc[1]; colorForce[2]=cc[2];
+    }
 
     SmartPointer<ForceField> fr(new RadialForceField(source, power, radius));
+    fr->SetColor(colorForce);
     forcefields.push_back(fr);
 
     forceradial = FindNextSiblingNode(forceradial, "radial");

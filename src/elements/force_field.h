@@ -1,5 +1,6 @@
 #pragma once
 #include <KrisLibrary/math3d/primitives.h>
+#include <KrisLibrary/GLdraw/GLColor.h>
 #include <iostream>
 
 enum ForceFieldTypes{ UNIFORM=0, RADIAL };
@@ -9,6 +10,14 @@ class ForceField{
     virtual Math3D::Vector3 getForceAtPosition(Math3D::Vector3 position) = 0;
     virtual void print() = 0;
     virtual ForceFieldTypes type() = 0;
+    GLDraw::GLColor GetColor(){
+      return color;
+    }
+    void SetColor(GLDraw::GLColor &_color){
+      color=_color;
+    }
+  protected:
+    GLDraw::GLColor color;
 };
 
 class UniformForceField: public ForceField{
@@ -29,6 +38,7 @@ class RadialForceField: public ForceField{
     virtual ForceFieldTypes type();
     Math3D::Vector3 GetSource();
     double GetRadius();
+    double GetPower();
   private:
     Math3D::Vector3 source;
     double power;
