@@ -133,6 +133,64 @@ namespace GLDraw{
         glPopMatrix();
         glEnable(GL_LIGHTING);
 
+      }else if(f->type() == OBB){
+        SmartPointer<OrientedBoundingBoxForceField>& fb = *reinterpret_cast<SmartPointer<OrientedBoundingBoxForceField>*>(&forcefields.at(i));
+        double power = fb->GetPower();
+        Vector3 center = fb->GetCenter();
+        Vector3 extension = fb->GetExtension();
+        Matrix3 R = fb->GetRotation();
+
+        glDisable(GL_LIGHTING);
+        glEnable(GL_BLEND); 
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+        GLColor cForce = fb->GetColor();
+        cForce.setCurrentGL();
+        
+        glPushMatrix();
+        glTranslate(center);
+        Matrix4 RH(R);
+        RH(3,3) = 1;
+        glMultMatrixd(RH);
+
+        glPointSize(5);
+        drawPoint(Vector3(0,0,0));
+
+        glLineWidth(2);
+
+        double ystep = 0.5;
+        double zstep = 0.5;
+        for(double y = -extension[1]/2; y < extension[1]/2; y+=ystep){
+          for(double z = -extension[2]/2; z < extension[2]/2; z+=zstep){
+
+            double x = extension[0]/2;
+
+            glBegin(GL_LINES);
+            glVertex3f(-x,y,z);
+            glVertex3f(x,y,z);
+            glEnd();
+
+            double length = 0.1;
+            Vector3 direction(length,0,0);
+            if(power < 0) {
+              direction *= -1;
+            }
+            glPushMatrix();
+            Vector3 middle(-x/2,y,z);
+            glTranslate(middle);
+            GLDraw::drawCone(direction, length/2);
+            glPopMatrix();
+            glPushMatrix();
+            middle = Vector3(x/2,y,z);
+            glTranslate(middle);
+            GLDraw::drawCone(direction, length/2);
+            glPopMatrix();
+          }
+        }
+
+
+        glPopMatrix();
+        glEnable(GL_LIGHTING);
       }
     }
 

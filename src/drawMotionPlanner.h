@@ -4,6 +4,7 @@
 #include <KrisLibrary/robotics/IK.h>
 #include <KrisLibrary/robotics/IKFunctions.h>
 #include <KrisLibrary/camera/viewport.h>
+#include <KrisLibrary/math3d/rotation.h>
 #include <View/ViewRobot.h>
 #include <View/ViewIK.h>
 

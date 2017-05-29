@@ -1,3 +1,5 @@
+#include <KrisLibrary/geometry/AnyGeometry.h>
+
 #include <tinyxml.h>
 #include <iostream>
 #include <fstream>
@@ -55,38 +57,63 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
 }
 
 
+///*
 bool ForceFieldBackend::OnIdle()
 {
+
   bool res=BaseT::OnIdle();
+
   if(simulate) {
-    SendRefresh();
 
     //Simulate Force Field
     // compute links COM, then get forces from field
-
-
     ODERobot *robot = sim.odesim.robot(0);
     uint Nlinks = robot->robot.links.size();
 
-    //we use own force field
+    //use own force field
     sim.odesim.SetGravity(Vector3(0,0,0));
-
     sim.hooks.clear();
+
+    //const Terrain* terrain = sim.odesim.terrain(0);
+    //const Geometry::AnyCollisionGeometry3D tgeom = (*terrain->geometry);
+    //Geometry::AnyCollisionGeometry3D tt(tgeom);
+    //robot->robot.InitMeshCollision(tt);
+
     for(int i = 0; i < Nlinks; i++){
       dBodyID bodyid = robot->body(i);
 
-
       if(bodyid){
-        Frame3D T = robot->robot.links[i].T_World;
-        Vector3 com = T*robot->robot.links[i].com;
+        if(!robot->robot.IsGeometryEmpty(i)){
 
-        wrenchfield.setPosition(i, com);
-        Vector3 force = wrenchfield.getForceFieldAtPosition(com);
-        Vector3 torque(0,0,0);
-        wrenchfield.setForce(i, force);
+          Geometry::AnyCollisionQuery *query = robot->robot.envCollisions[i];
+          if(query){
+            //std::cout << "Collision link " << i << ":" << (query->Collide()?"Yes":"No") << std::endl;
+          }
+          //const Terrain* terrain = sim.odesim.terrain(0);
+          //const Geometry::AnyCollisionGeometry3D tgeom = (*terrain->geometry);
 
-        sim.hooks.push_back(new WrenchHook(bodyid, force, torque));
+          //Geometry::AnyCollisionGeometry3D geom = *robot->robot.geometry[i];
+          //if(&geom){
+          //  Geometry::AnyCollisionGeometry3D tt(tgeom);
+          //  Geometry::AnyCollisionQuery collision(geom, tt);
+          //  double d= collision.Distance(0.0,0.1);
+          //  std::vector<Vector3> p1,p2;
+          //  collision.InteractingPoints(p1,p2);
+          //  std::cout << p1.size() << "," << p2.size() << std::endl;
 
+          //}
+          Vector3 com;
+          RobotLink3D *link = &robot->robot.links[i];
+          link->GetWorldCOM(com);
+          wrenchfield.setPosition(i, com);
+          Vector3 force = wrenchfield.getForceFieldAtPosition(com);
+          Vector3 torque(0,0,0);
+
+          wrenchfield.setForce(i, force);
+          wrenchfield.setTorque(i, torque);
+
+          sim.hooks.push_back(new WrenchHook(bodyid, force, torque));
+        }
       }
     }
 
@@ -94,9 +121,9 @@ bool ForceFieldBackend::OnIdle()
     return true;
   }
   return res;
-
-
 }
+//*/
+
 void ForceFieldBackend::Start()
 {
   BaseT::Start();
@@ -300,6 +327,7 @@ void ForceFieldBackend::RenderWorld()
 void ForceFieldBackend::RenderScreen(){
   BaseT::RenderScreen();
   Robot *robot = world->robots[0];
+
   int line_y_offset = 60;
   int line_y_offset_stepsize = 20;
 
@@ -628,6 +656,14 @@ void ForceFieldBackend::SetIKCollisions( vector<int> linksInCollision )
 
 void ForceFieldBackend::DrawText(int x,int y, std::string s)
 {
+  //GLUT_BITMAP_8_BY_13
+  //GLUT_BITMAP_9_BY_15
+  //GLUT_BITMAP_TIMES_ROMAN_10
+  //GLUT_BITMAP_TIMES_ROMAN_24
+  //GLUT_BITMAP_HELVETICA_10
+  //GLUT_BITMAP_HELVETICA_12
+  //GLUT_BITMAP_HELVETICA_18
+
   void* font = GLUT_BITMAP_HELVETICA_18;
   glColor3f(0,0,0);
   glDisable(GL_LIGHTING);
@@ -641,8 +677,9 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
   std::cout << "OnCommand: " << cmd << std::endl;
 
-  if(cmd=="advance") {
-
+  if(cmd=="reset") {
+    SendPauseIdle();
+    return BaseT::OnCommand(cmd,args);
   }else if(cmd=="draw_rigid_objects_faces_toggle") {
     toggle(drawRigidObjectsFaces);
   }else if(cmd=="draw_rigid_objects_edges_toggle") {
@@ -669,9 +706,8 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     std::cout << "Changed Mode to: "<<click_mode << std::endl;
   }else if(cmd=="print_config") {
     std::cout << world->robots[0]->q <<std::endl;
-  }else{
-    return BaseT::OnCommand(cmd,args);
-  }
+  }else return BaseT::OnCommand(cmd,args);
+
   SendRefresh();
   return true;
 }

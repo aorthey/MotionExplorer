@@ -81,6 +81,78 @@ bool WrenchField::Load(TiXmlElement *node)
 
     forceradial = FindNextSiblingNode(forceradial, "radial");
   }
+  //############################################################################
+  //Uniform Random Force Fields
+  //############################################################################
+  TiXmlElement* forcerandom = FindSubNode(forcefieldsettings, "uniformrandom");
+
+  while(forcerandom!=NULL){
+    Vector3 minforce, maxforce;
+    GLColor colorForce(0.8,0.8,0.8);
+    GetStreamAttribute(forcerandom,"minforce") >> minforce;
+    GetStreamAttribute(forcerandom,"maxforce") >> maxforce;
+    stringstream ssc = GetStreamAttribute(forcerandom,"color");
+    Vector3 cc;
+    if(ssc.str()!="NONE"){
+      ssc >> cc;
+      colorForce[0]=cc[0]; colorForce[1]=cc[1]; colorForce[2]=cc[2];
+    }
+
+    SmartPointer<ForceField> fr(new UniformRandomForceField(minforce, maxforce));
+    fr->SetColor(colorForce);
+    forcefields.push_back(fr);
+
+    forcerandom = FindNextSiblingNode(forcerandom, "uniformrandom");
+  }
+  //############################################################################
+  //Gaussian Random Force Fields
+  //############################################################################
+  forcerandom = FindSubNode(forcefieldsettings, "gaussianrandom");
+
+  while(forcerandom!=NULL){
+    Vector3 mean, stddev;
+    GLColor colorForce(0.8,0.8,0.8);
+    GetStreamAttribute(forcerandom,"mean") >> mean;
+    GetStreamAttribute(forcerandom,"stddeviation") >> stddev;
+    stringstream ssc = GetStreamAttribute(forcerandom,"color");
+    Vector3 cc;
+    if(ssc.str()!="NONE"){
+      ssc >> cc;
+      colorForce[0]=cc[0]; colorForce[1]=cc[1]; colorForce[2]=cc[2];
+    }
+
+    SmartPointer<ForceField> fg(new GaussianRandomForceField(mean, stddev));
+    fg->SetColor(colorForce);
+    forcefields.push_back(fg);
+
+    forcerandom = FindNextSiblingNode(forcerandom, "gaussianrandom");
+  }
+  //############################################################################
+  //Bounding Box Force Fields
+  //############################################################################
+  TiXmlElement* forcebox = FindSubNode(forcefieldsettings, "orientedbox");
+
+  while(forcebox!=NULL){
+    double power;
+    Vector3 center, direction, extension;
+    GLColor colorForce(0.8,0.8,0.8);
+    GetStreamAttribute(forcebox,"power") >> power;
+    GetStreamAttribute(forcebox,"center") >> center;
+    GetStreamAttribute(forcebox,"direction") >> direction;
+    GetStreamAttribute(forcebox,"extension") >> extension;
+    stringstream ssc = GetStreamAttribute(forcebox,"color");
+    Vector3 cc;
+    if(ssc.str()!="NONE"){
+      ssc >> cc;
+      colorForce[0]=cc[0]; colorForce[1]=cc[1]; colorForce[2]=cc[2];
+    }
+
+    SmartPointer<ForceField> fb(new OrientedBoundingBoxForceField(power, center, direction, extension));
+    fb->SetColor(colorForce);
+    forcefields.push_back(fb);
+
+    forcebox = FindNextSiblingNode(forcebox, "orientedbox");
+  }
 
   return true;
 }
@@ -106,6 +178,11 @@ Vector3 WrenchField::getForceFieldAtPosition(Vector3 &position){
   }
 
   return F;
+}
+Vector3 WrenchField::getTorqueFieldAtPosition(Vector3 &position, Vector3 &origin){
+
+  Vector3 T(0,0,0);
+  return T;
 }
 
 uint WrenchField::size(){ 

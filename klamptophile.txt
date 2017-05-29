@@ -476,23 +476,25 @@ display tree/start/goal/swept volumes, do planning
  [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
       andreas dziegielewski http://acg.cs.tau.ac.il/projects/swept-volume/project-page seems promising
  [ ] making a safe static contact
- [ ] compute and display distance between links and terrain
+ [ ] new mode where you can pick and place the robot !
 
 -- wrench fields
 
  [x] create arbitrary force fields in ODE simulator
  [x] create force field visualization and visualize its effect on each link
+ [x] add arrows to visualize flow of power
+ [ ] compute and display distance between links and terrain
+
  [ ] visualize COM separately in box to quickly see wrenches attacking robot.
  [ ] let force be specificable in xml file, uniform, box, uniform inside rigid object, radial from source,
 maelstrom from source, and any combination of that. Test with moving robot
 around and visualize wrenches on each link plus wrench on COM
 COM should retain orientation equal to origin so that we can see forces from
-different perspectives
  [ ] add constraint to a force field to be inside a given rigid object
- [ ] add arrows to visualize flow of power
  [ ] execute kinodynamic path
  [ ] visualize min dist between link and terrain
  [ ] visualize path speed profile
+ [ ] composite force fields: intersection and union
 
 -- irreducible paths
 
@@ -540,5 +542,8 @@ if specified irreducible planner, use that one)
 correctly determines that collision occurs. But why is it not avoided? maybe
 force too strong? but then terrain would be permeated, too.
     Simulation/settings.h: const static bool gRobotSelfCollisionsEnabled = true;
- [ ] simulator crash if forces are too high and selfcollision is enabled
+ [ ] simulator crash if forces are too high and selfcollision is enabled ---
+happens if we apply a force which overcomes the self-collision and creates
+overlapping meshes. solution: avoid forces higher than ?? or increase
+self-collision forces?
  [ ] reset not working anymore

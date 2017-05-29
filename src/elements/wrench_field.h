@@ -31,7 +31,10 @@ class WrenchField{
     bool LoadFromWorldFile( const char * file);
     bool Load( TiXmlElement *node );
 
+    //force at position
     Math3D::Vector3 getForceFieldAtPosition(Math3D::Vector3 &position);
+    //TODO: force at origin induced by force at position 
+    Math3D::Vector3 getTorqueFieldAtPosition(Math3D::Vector3 &position, Math3D::Vector3 &origin);
 
     const std::vector<SmartPointer<ForceField> >& GetForceFields() const;
 

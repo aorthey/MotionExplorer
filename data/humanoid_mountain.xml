@@ -31,11 +31,25 @@
 
     <uniform force="0 0 -3.7" color="1 0 0"/>
 
-    <radial source="0 0 1" power="3" radius="2" color="1 0.5 0"/>
+    <radial source="0 0 1" power="3" radius="2" color="0 0 1"/>
+
+    <radial source="1 1 2" power="5" radius="2" color="0 0 1"/>
+
+    <gaussianrandom mean="0 0 0" stddeviation="0.1 0.1 0.1"/>
+
+    <orientedbox power="5" center="0 0 0" direction="1 1 0" extension="8 8 3" color="1 1 1"/>
 
     <!--
-    <maelstrom source="0 0 1" power="3" radius="2" color="1 0 0"/>
+    <uniformrandom minforce="-1 -1 -1" maxforce="1 1 1"/>
+
+        WORKING:
+    <random minforce="-10 -10 -10" maxforce="10 10 10"/>
     <radial source="0 0 3" power="100" radius="20"/>
+    -->
+
+    <!--
+         TODO:
+    <maelstrom source="0 0 1" power="3" radius="2" color="1 0 0"/>
     <maelstrom source="0 0 0" power="1"/>
     <box pos="0 0 0" measure="1 1 1" force="0 0 1"/>
     -->
