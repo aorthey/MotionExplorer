@@ -20,16 +20,30 @@ public:
     GetCommandedVelocity(vcmd);  //convenience function in RobotController
     GetSensedConfig(qactual);  //convenience function in RobotController
     GetSensedVelocity(vactual);  //convenience function in RobotController
-    int link = 15;  //the movement link
-    if(time >= 1.0 && time < 2.0)
-    {
-      Real speed = -1.5;
-      vcmd[link] = speed;
-    }else
-    {
-      vcmd[link] = 0;
-    }
+
+
+    //int link = 15;  //the movement link
+    //vcmd.setZero();
+    //if(time >= 1.0 && time < 2.0)
+    //{
+    //  Real speed = 10;
+    //  vcmd[link] = speed;
+    //}else
+    //{
+    //  vcmd[link] = 0;
+    //}
     SetPIDCommand(qcmd,vcmd); //convenience function in RobotController
+    //Vector torques;
+    //torques.resize(qcmd.size());
+    //torques.setZero();
+
+    //std::cout << "drivers: " << robot.drivers.size() << std::endl;
+    //std::cout << "torques: " << torques.size() << std::endl;
+    //torques[15] = 1;
+    //torques[16] = 1;
+    //torques[17] = 1;
+
+    //SetTorqueCommand(torques);
 
     RobotController::Update(dt);
   }

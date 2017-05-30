@@ -124,8 +124,8 @@ namespace GLDraw{
 
     }
     Vector3 com(0,0,3);
-    Vector3 lmomentum = wrenchfield.getCOMAngularMomentum();
-    Vector3 amomentum = wrenchfield.getCOMLinearMomentum();
+    Vector3 lmomentum = wrenchfield.getCOMLinearMomentum();
+    Vector3 amomentum = wrenchfield.getCOMAngularMomentum();
 
     lmomentum = 0.5*lmomentum / (1+lmomentum.length());
     amomentum = 0.5*amomentum / (1+amomentum.length());

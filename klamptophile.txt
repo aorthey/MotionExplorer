@@ -536,8 +536,6 @@ model?) -> one of the cylinders pierced the head sphere creating a spurious coll
  [x] enable/disable swept volume of certain links.
  [x] experiment wall 10xXX ? 
  [x] rewrite introduction and experimental part
- [ ] make irreducible planner independent from xml file (use same xml file, but
-if specified irreducible planner, use that one)
  [ ] experiment door 100x1200 complete (running)
  [ ] experiment wall 10x3600*24 complete
 
@@ -551,3 +549,4 @@ happens if we apply a force which overcomes the self-collision and creates
 overlapping meshes. solution: avoid forces higher than ?? or increase
 self-collision forces?
  [ ] reset not working anymore
+ [ ] kernel panic after movie creation
