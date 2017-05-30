@@ -65,4 +65,12 @@
   -->
 
 
+
+  <simulation>
+    <robot index="0"> 
+      <controller type="ContactStabilityController" />.
+    </robot>  
+  </simulation>
+
+
 </world>

@@ -14,6 +14,14 @@ struct Wrench{
   Math3D::Vector3 force;
   Math3D::Vector3 position;
 };
+struct Momentum{
+  Math3D::Vector3 linear;
+  Math3D::Vector3 angular;
+};
+struct COM{
+  Wrench wrench;
+  Momentum momentum;
+};
 
 class WrenchField{
 
@@ -22,6 +30,10 @@ class WrenchField{
 
     //wrench induced by force field on each link of the main robot
     std::vector<Wrench> wrench_per_link;
+
+    //Wrench wrench_at_com;
+
+    COM com;
 
   public: 
 
@@ -38,14 +50,26 @@ class WrenchField{
 
     const std::vector<SmartPointer<ForceField> >& GetForceFields() const;
 
+    uint size();
+
     void setForce( uint id, Math3D::Vector3 force);
     void setTorque( uint id, Math3D::Vector3 torque);
     void setPosition( uint id, Math3D::Vector3 position);
-
-    uint size();
     Math3D::Vector3 getForce( uint id );
     Math3D::Vector3 getTorque( uint id );
     Math3D::Vector3 getPosition( uint id );
+
+    void setCOMLinearMomentum( Math3D::Vector3 linearmomentum);
+    void setCOMAngularMomentum( Math3D::Vector3 angularmomentum);
+    void setCOMForce( Math3D::Vector3 force);
+    void setCOMTorque( Math3D::Vector3 torque);
+    void setCOMPosition( Math3D::Vector3 position);
+
+    Math3D::Vector3 getCOMLinearMomentum();
+    Math3D::Vector3 getCOMAngularMomentum();
+    Math3D::Vector3 getCOMForce();
+    Math3D::Vector3 getCOMTorque();
+    Math3D::Vector3 getCOMPosition();
 
     void print();
 };

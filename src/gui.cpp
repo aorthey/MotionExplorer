@@ -118,6 +118,17 @@ bool ForceFieldBackend::OnIdle()
     }
 
 
+    Vector3 com = robot->robot.GetCOM();
+    Real mass = robot->robot.GetTotalMass();
+    Matrix3 intertia = robot->robot.GetTotalInertia();
+
+    Vector3 LM = robot->robot.GetLinearMomentum();
+    Vector3 AM = robot->robot.GetAngularMomentum();
+
+    wrenchfield.setCOMPosition(com);
+    wrenchfield.setCOMLinearMomentum(LM);
+    wrenchfield.setCOMAngularMomentum(AM);
+
     return true;
   }
   return res;

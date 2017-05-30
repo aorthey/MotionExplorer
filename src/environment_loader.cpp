@@ -1,5 +1,6 @@
-#include "environment_loader.h"
+#include "controller.h"
 #include "loader.h"
+#include "environment_loader.h"
 
 RobotWorld& EnvironmentLoader::GetWorld(){
   return world;
@@ -36,6 +37,7 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     exit(0);
   }
 
+
   uint Nrobots = world.robots.size();
   if(Nrobots<1){
     std::cout << "Current planner only supports one robot! selected " << Nrobots << " robots." << std::endl;
@@ -50,10 +52,19 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
   //name = name_robot + "_" + name_environment;
   //std::cout << name << std::endl;
 
-  //info(&world);
-
-
+  info(&world);
   Robot *robot = world.robots[0];
+
+  SmartPointer<RobotController> controller = new ContactStabilityController(*robot);
+  RobotControllerFactory::Register("ContactStabilityController", controller);
+  _backend->sim.SetController(0, controller);
+
+
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "LOADED CONTACTSTABILITYCONTROLLER" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+
+
 
   if(LoadPlannerSettings(file_name.c_str())){
 

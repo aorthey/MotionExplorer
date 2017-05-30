@@ -49,6 +49,7 @@ int main(int argc,const char** argv) {
   env.GetBackendPtr()->drawRigidObjectsEdges = 0;
   std::cout << "SelfCollisionsEnabled" << std::endl;
   std::cout << simrobot->SelfCollisionsEnabled() << std::endl;
+
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.SetWindowTitle("robonaut");
   gui.Run();

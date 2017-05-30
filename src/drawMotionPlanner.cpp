@@ -1,6 +1,71 @@
 #include "drawMotionPlanner.h"
 
 namespace GLDraw{
+
+  struct GLCheckeredSphere
+  {
+    GLCheckeredSphere();
+    void Draw();
+
+    Real radius;
+    Vector3 center;
+    GLColor c1,c2;
+    int numSlices,numStacks;
+  };
+
+  GLCheckeredSphere::GLCheckeredSphere()
+    :radius(1),center(Zero),numSlices(16),numStacks(8)
+  {
+    c1.set(0.7,0.7,0.7);
+    c2.set(0.3,0.3,0.3);
+  }
+
+  //theta is the vertical range, phi is the rotational range
+  void DrawSphereArc(Real r,Real theta0,Real theta1,Real phi0,Real phi1,int numSlices,int numStacks)
+  {
+    Real thetaInc = (theta1-theta0)/Real(numStacks);
+    Real phiInc = (phi1-phi0)/Real(numSlices);
+    Real phi=phi0;
+    Real theta;
+    for(int i=0;i<numSlices;i++,phi+=phiInc) {
+      Real x1=Cos(phi);
+      Real x2=Cos(phi+phiInc);
+      Real y1=Sin(phi);
+      Real y2=Sin(phi+phiInc);
+      theta=theta0;
+      glBegin(GL_TRIANGLE_STRIP);
+      for(int j=0;j<=numStacks;j++,theta+=thetaInc) {
+        Real cz=Cos(theta);
+        Real sz=Sin(theta);
+        glNormal3f(x2*sz,y2*sz,cz);
+        glVertex3f(r*x2*sz,r*y2*sz,r*cz);
+        glNormal3f(x1*sz,y1*sz,cz);
+        glVertex3f(r*x1*sz,r*y1*sz,r*cz);
+      }
+      glEnd();
+    }
+  }
+
+  void GLCheckeredSphere::Draw()
+  {
+    glEnable(GL_LIGHTING);
+    glPushMatrix();
+    {
+      glTranslate(center);
+      glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,c1.rgba); 
+      DrawSphereArc(radius, 0,Pi_2,  0,Pi_2,    numSlices/4,numStacks/2);
+      DrawSphereArc(radius, 0,Pi_2,  Pi,3*Pi_2, numSlices/4,numStacks/2);
+      DrawSphereArc(radius, Pi_2,Pi, Pi_2,Pi,   numSlices/4,numStacks/2);
+      DrawSphereArc(radius, Pi_2,Pi, 3*Pi_2,TwoPi,numSlices/4,numStacks/2);
+      glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,c2.rgba); 
+      DrawSphereArc(radius, 0,Pi_2,  Pi_2,Pi,   numSlices/4,numStacks/2);
+      DrawSphereArc(radius, 0,Pi_2,  3*Pi_2,TwoPi,numSlices/4,numStacks/2);
+      DrawSphereArc(radius, Pi_2,Pi, 0,Pi_2,    numSlices/4,numStacks/2);
+      DrawSphereArc(radius, Pi_2,Pi, Pi,3*Pi_2, numSlices/4,numStacks/2);
+    }
+    glPopMatrix();
+  }
+
   void drawRobotExtras(ViewRobot *robot, GLColor bodyColor, double COMradius)
   {
     robot->DrawCenterOfMass(COMradius);
@@ -39,64 +104,64 @@ namespace GLDraw{
     glEnable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
     GLColor cWrench(0,1,1);
-    cWrench.setCurrentGL();
+    //cWrench.setCurrentGL();
     for(int i = 0; i < wrenchfield.size(); i++){
       Vector3 pos = wrenchfield.getPosition(i);
       Vector3 force = wrenchfield.getForce(i);
+      Vector3 sforce = 0.5*force / (1+force.length());
+      Real r=0.01;
 
-      double scale = 0.5;
-      Vector3 sforce = scale*force/force.norm();
-
-      //glDisable(GL_LIGHTING);
-
-      //glEnable(GL_BLEND); 
-      //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-
-      ////cForce.setCurrentGL();
-      //GLColor cWrench(0,0,0.5);
-      //cWrench.setCurrentGL();
-      //
-      //glPushMatrix();
-      //glTranslate(pos);
-
-      ////glPointSize(10);
-      ////drawPoint(Vector3(0,0,0));
-
-      //glLineWidth(5);
-
-      //glBegin(GL_LINES);
-      //glVertex3f(0.0, 0.0, 0.0);
-      //glVertex3f(sforce[0],sforce[1],sforce[2]);
-      //glEnd();
-
-      //glPopMatrix();
-      //glEnable(GL_LIGHTING);
-
-
-      //glDisable(GL_LIGHTING);
-      //glEnable(GL_BLEND); 
-      //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-
-      //GLColor cWrench(0,1,1);
-
+      //force at link i
       glPushMatrix();
       glTranslate(pos);
       glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cWrench);
-        
-      Real r=0.01;
-
-      sforce = 0.5*force / (1+force.length());
-
       drawCylinder(sforce,r);
-
       glPushMatrix();
       glTranslate(sforce);
       drawCone(3*r*sforce/sforce.length(),2*r,8);
       glPopMatrix();
-        
       glPopMatrix();
 
     }
+    Vector3 com(0,0,3);
+    Vector3 lmomentum = wrenchfield.getCOMAngularMomentum();
+    Vector3 amomentum = wrenchfield.getCOMLinearMomentum();
+
+    lmomentum = 0.5*lmomentum / (1+lmomentum.length());
+    amomentum = 0.5*amomentum / (1+amomentum.length());
+
+    GLColor cLinMom(0,1,1);
+    GLColor cAngMom(1,0,1);
+
+    GLDraw::GLCheckeredSphere sph;
+    sph.center = com;
+    sph.radius = 0.1;
+    sph.Draw();
+
+    Real r=0.01;
+
+    //linear momentum at com
+    glPushMatrix();
+    glTranslate(com);
+    glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cLinMom);
+    drawCylinder(lmomentum,r);
+    glPushMatrix();
+    glTranslate(lmomentum);
+    drawCone(3*r*lmomentum/lmomentum.length(),2*r,8);
+    glPopMatrix();
+    glPopMatrix();
+
+    //angular momentum at com
+    glPushMatrix();
+    glTranslate(com);
+    glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cAngMom);
+    drawCylinder(amomentum,r);
+    glPushMatrix();
+    glTranslate(amomentum);
+    drawCone(3*r*amomentum/amomentum.length(),2*r,8);
+    glPopMatrix();
+    glPopMatrix();
+
     glEnable(GL_DEPTH_TEST);
 
 

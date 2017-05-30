@@ -189,18 +189,16 @@ uint WrenchField::size(){
   return wrench_per_link.size(); 
 }
 
+//############################################################################
 void WrenchField::setForce( uint id, Vector3 force){
   wrench_per_link.at(id).force = force;
 }
-
 void WrenchField::setTorque( uint id, Vector3 torque){
   wrench_per_link.at(id).torque = torque;
 }
-
 void WrenchField::setPosition( uint id, Vector3 position){
   wrench_per_link.at(id).position = position;
 }
-
 Vector3 WrenchField::getForce( uint id ){ 
   return wrench_per_link.at(id).force; 
 }
@@ -210,6 +208,44 @@ Vector3 WrenchField::getTorque( uint id ){
 Vector3 WrenchField::getPosition( uint id ){ 
   return wrench_per_link.at(id).position; 
 }
+
+//############################################################################
+
+void WrenchField::setCOMLinearMomentum( Math3D::Vector3 linearmomentum){
+  com.momentum.linear = linearmomentum;
+}
+void WrenchField::setCOMAngularMomentum( Math3D::Vector3 angularmomentum){
+  com.momentum.angular = angularmomentum;
+}
+void WrenchField::setCOMForce(Vector3 force){
+  com.wrench.force = force;
+}
+void WrenchField::setCOMTorque(Vector3 torque){
+  com.wrench.torque = torque;
+}
+void WrenchField::setCOMPosition(Vector3 position){
+  com.wrench.position = position;
+}
+
+//############################################################################
+Vector3 WrenchField::getCOMLinearMomentum(){ 
+  return com.momentum.linear; 
+}
+Vector3 WrenchField::getCOMAngularMomentum(){ 
+  return com.momentum.angular; 
+}
+Vector3 WrenchField::getCOMForce(){ 
+  return com.wrench.force; 
+}
+Vector3 WrenchField::getCOMTorque(){ 
+  return com.wrench.torque; 
+}
+Vector3 WrenchField::getCOMPosition(){ 
+  return com.wrench.position; 
+}
+
+//############################################################################
+
 void WrenchField::print(){
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "WrenchField" << std::endl;
