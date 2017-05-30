@@ -36,38 +36,69 @@ namespace GLDraw{
 
   }
   void drawWrenchField(WrenchField &wrenchfield){
+    glEnable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+    GLColor cWrench(0,1,1);
+    cWrench.setCurrentGL();
     for(int i = 0; i < wrenchfield.size(); i++){
       Vector3 pos = wrenchfield.getPosition(i);
       Vector3 force = wrenchfield.getForce(i);
 
       double scale = 0.5;
-      force = scale*force/force.norm();
+      Vector3 sforce = scale*force/force.norm();
 
-      glDisable(GL_LIGHTING);
+      //glDisable(GL_LIGHTING);
 
-      glEnable(GL_BLEND); 
-      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      //glEnable(GL_BLEND); 
+      //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
-      //cForce.setCurrentGL();
-      GLColor cWrench(0,0,0.5);
-      cWrench.setCurrentGL();
-      
+      ////cForce.setCurrentGL();
+      //GLColor cWrench(0,0,0.5);
+      //cWrench.setCurrentGL();
+      //
+      //glPushMatrix();
+      //glTranslate(pos);
+
+      ////glPointSize(10);
+      ////drawPoint(Vector3(0,0,0));
+
+      //glLineWidth(5);
+
+      //glBegin(GL_LINES);
+      //glVertex3f(0.0, 0.0, 0.0);
+      //glVertex3f(sforce[0],sforce[1],sforce[2]);
+      //glEnd();
+
+      //glPopMatrix();
+      //glEnable(GL_LIGHTING);
+
+
+      //glDisable(GL_LIGHTING);
+      //glEnable(GL_BLEND); 
+      //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+      //GLColor cWrench(0,1,1);
+
       glPushMatrix();
       glTranslate(pos);
+      glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cWrench);
+        
+      Real r=0.01;
 
-      //glPointSize(10);
-      //drawPoint(Vector3(0,0,0));
+      sforce = 0.5*force / (1+force.length());
 
-      glLineWidth(5);
+      drawCylinder(sforce,r);
 
-      glBegin(GL_LINES);
-      glVertex3f(0.0, 0.0, 0.0);
-      glVertex3f(force[0],force[1],force[2]);
-      glEnd();
-
+      glPushMatrix();
+      glTranslate(sforce);
+      drawCone(3*r*sforce/sforce.length(),2*r,8);
       glPopMatrix();
-      glEnable(GL_LIGHTING);
+        
+      glPopMatrix();
+
     }
+    glEnable(GL_DEPTH_TEST);
+
 
   }
 

@@ -483,6 +483,7 @@ display tree/start/goal/swept volumes, do planning
  [x] create arbitrary force fields in ODE simulator
  [x] create force field visualization and visualize its effect on each link
  [x] add arrows to visualize flow of power
+ [x] forces on link => make them better looking like contact wrenches
  [ ] compute and display distance between links and terrain
 
  [ ] visualize COM separately in box to quickly see wrenches attacking robot.
