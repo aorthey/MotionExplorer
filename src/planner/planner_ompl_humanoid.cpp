@@ -174,7 +174,7 @@ void PostRunEventHumanoid(const ob::PlannerPtr &planner, ot::Benchmark::RunPrope
       Config cur = OMPLStateToConfig(state, cspace->getPtr());
       keyframes.push_back(cur);
     }
-    std::string sfile = "humanoid_wall_full_"+std::to_string(pid)+".xml";
+    std::string sfile = "humanoid_door_full_"+std::to_string(pid)+".xml";
     std::cout << "Saving keyframes"<< std::endl;
     Save(keyframes, sfile.c_str());
   }else{
@@ -330,22 +330,22 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   bool solved = false;
   double solution_time = dInf;
-  double duration = 3600*24;
+  double duration = 1200;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
 
   //###########################################################################
   // benchmark instead
   //###########################################################################
-  ot::Benchmark benchmark(ss, "BenchmarkHumanoid");
+  ot::Benchmark benchmark(ss, "BenchmarkHumanoiddoor");
   //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
-  //benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
+  benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));
   benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 
   ot::Benchmark::Request req;
   req.maxTime = duration;
   req.maxMem = 10000.0;
-  req.runCount = 10;
+  req.runCount = 100;
   req.displayProgress = true;
 
   benchmark.setPostRunEvent(std::bind(&PostRunEventHumanoid, std::placeholders::_1, std::placeholders::_2, &cspace));
@@ -353,7 +353,7 @@ bool MotionPlannerOMPLHumanoid::solve(Config &p_init, Config &p_goal)
   benchmark.benchmark(req);
   benchmark.saveResultsToFile();
 
-  std::string file = "ompl_humanoid_benchmark_wall";
+  std::string file = "ompl_humanoid_benchmark_door";
   std::string res = file+".log";
   benchmark.saveResultsToFile(res.c_str());
 
