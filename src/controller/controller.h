@@ -36,10 +36,17 @@ struct ControllerState{
       //compute change in momentum to get force estimate
       Vector3 force;
       if(linmomentum_window.size()>1){
-        uint N = linmomentum_window.size()-1;
-        Vector3 l1 = linmomentum_window.at(N-1);
-        Vector3 l2 = linmomentum_window.at(N);
-        force = (l2 - l1)/0.1;
+        double dt = 0.01;
+        //uint N = linmomentum_window.size()-1;
+
+        //average over last elements with diminishing return
+        uint N= min(10, int(linmomentum_window.size()-1));
+        for(int i = 0; i < N; i++){
+          Vector3 l1 = linmomentum_window.at(i);
+          Vector3 l2 = linmomentum_window.at(i+1);
+          force += ((N-i)/N)*(l2 - l1)/dt;
+        }
+        force /= N;
       }else{
         force = Vector3(0,0,0);
       }
@@ -63,13 +70,7 @@ struct ControllerState{
 
       Vector3 dcom = LM/mass;
 
-      //std::cout << "force " << force << std::endl;
-
       predicted_com.clear();
-      //if(predicted_com.size() > 3*Nsteps){
-      //  predicted_com.erase (predicted_com.begin(),predicted_com.begin()+Nsteps);
-      //}
-
       for(int i = 0; i < Nsteps; i++){
         predicted_com.push_back(com);
         com = com + dt * dcom + dt2 * force/mass;
@@ -133,18 +134,7 @@ public:
 
     output.PredictCOM(0.001, 1000);
 
-    //int link = 15;  //the movement link
-    //vcmd.setZero();
-    //if(time >= 1.0 && time < 2.0)
-    //{
-    //  Real speed = 10;
-    //  vcmd[link] = speed;
-    //}else
-    //{
-    //  vcmd[link] = 0;
-    //}
-
-    SetPIDCommand(qcmd,vcmd); //convenience function in RobotController
+    SetPIDCommand(qcmd,vcmd);
     //Vector torques;
     //torques.resize(qcmd.size());
     //torques.setZero();
