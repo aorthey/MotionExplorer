@@ -29,7 +29,6 @@
 
   <forcefield>
 
-    <uniform force="0 0 -3.7" color="1 0 0"/>
 
     <radial source="0 0 1" power="3" radius="2" color="0 0 1"/>
 
@@ -37,10 +36,11 @@
 
     <gaussianrandom mean="0 0 0" stddeviation="0.1 0.1 0.1"/>
 
-    <orientedbox power="5" center="0 0 0" direction="1 1 0" extension="8 8 3" color="1 1 1"/>
+    <cylindrical source="3 3 0" direction="0.2 0.2 1.0" elongation="2" radius="2" power="-5" color="0.1 0.1 0.1"/>
 
+    <uniform force="0 0 0" color="1 0 0"/>
     <!--
-    <uniformrandom minforce="-1 -1 -1" maxforce="1 1 1"/>
+    <orientedbox power="5" center="0 0 0" direction="1 1 0" extension="8 8 3" color="1 1 1"/>
 
         WORKING:
     <random minforce="-10 -10 -10" maxforce="10 10 10"/>

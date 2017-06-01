@@ -22,7 +22,7 @@ ForceFieldTypes UniformForceField::type(){
 // Radialforcefield
 //##############################################################################
 RadialForceField::RadialForceField(Vector3 _source, double _power, double _radius):
-  source(_source), power(_power), maximum_radius(_radius), minimum_radius(0.1)
+  source(_source), power(_power), maximum_radius(_radius), minimum_radius(minimumRadiusSingularity)
 {
 }
 
@@ -53,6 +53,52 @@ double RadialForceField::GetRadius(){
   return maximum_radius;
 }
 double RadialForceField::GetPower(){
+  return power;
+}
+//##############################################################################
+// Cylindricalforcefield
+//##############################################################################
+CylindricalForceField::CylindricalForceField(Math3D::Vector3 _source, Math3D::Vector3 _direction, double _elongation, double _radius, double _power):
+  source(_source), direction(_direction), elongation(_elongation), maximum_radius(_radius), minimum_radius(minimumRadiusSingularity), power(_power)
+{
+  direction /= direction.length();
+}
+
+Math3D::Vector3 CylindricalForceField::getForceAtPosition(Math3D::Vector3 position){
+  Vector3 x = position - source;
+  Vector3 v = x - (dot(x,direction))*direction;
+  //TODO: make it depend on the velocity
+
+  Vector3 F(0,0,0);
+
+  double dist = v.normSquared();
+  if( minimum_radius <= dist && dist <= maximum_radius){
+    F = power*(1/(2*M_PI*v.norm()))*(cross(v,direction));
+  }
+  return F;
+}
+
+void CylindricalForceField::print(){
+  std::cout << "CylindricalForceField  : source:" << source << " direction: "<< direction;
+  std::cout << " elongation " << elongation << " radius " << maximum_radius;
+  std::cout << " power "<< power << " color " << color << std::endl;
+}
+ForceFieldTypes CylindricalForceField::type(){
+  return CYLINDRICAL;
+}
+Math3D::Vector3 CylindricalForceField::GetSource(){
+  return source;
+}
+Math3D::Vector3 CylindricalForceField::GetDirection(){
+  return direction;
+}
+double CylindricalForceField::GetElongation(){
+  return elongation;
+}
+double CylindricalForceField::GetRadius(){
+  return maximum_radius;
+}
+double CylindricalForceField::GetPower(){
   return power;
 }
 //##############################################################################

@@ -153,6 +153,36 @@ bool WrenchField::Load(TiXmlElement *node)
 
     forcebox = FindNextSiblingNode(forcebox, "orientedbox");
   }
+  //############################################################################
+  //Cylindrical Force Fields
+  //############################################################################
+  TiXmlElement* field = FindSubNode(forcefieldsettings, "cylindrical");
+
+    //<cylindrical source="3 3 0" direction="0.2 0.2 1.0" elongation="3" power="2" color="0.3 0.3 0.7"/>
+  while(field!=NULL){
+    double elongation, radius, power;
+    Vector3 source, direction;
+    GLColor colorForce(0.8,0.8,0.8);
+
+    GetStreamAttribute(field,"source") >> source;
+    GetStreamAttribute(field,"direction") >> direction;
+    GetStreamAttribute(field,"elongation") >> elongation;
+    GetStreamAttribute(field,"radius") >> radius;
+    GetStreamAttribute(field,"power") >> power;
+
+    stringstream ssc = GetStreamAttribute(field,"color");
+    Vector3 cc;
+    if(ssc.str()!="NONE"){
+      ssc >> cc;
+      colorForce[0]=cc[0]; colorForce[1]=cc[1]; colorForce[2]=cc[2];
+    }
+
+    SmartPointer<ForceField> fb(new CylindricalForceField(source, direction, elongation, radius, power));
+    fb->SetColor(colorForce);
+    forcefields.push_back(fb);
+
+    field = FindNextSiblingNode(field, "cylindrical");
+  }
 
   return true;
 }

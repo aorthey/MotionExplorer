@@ -5,7 +5,9 @@
 #include <KrisLibrary/math/random.h>
 #include <iostream>
 
-enum ForceFieldTypes{ UNIFORM=0, RADIAL, UNIFORM_RANDOM, GAUSSIAN_RANDOM, OBB};
+enum ForceFieldTypes{ UNIFORM=0, RADIAL, CYLINDRICAL, UNIFORM_RANDOM, GAUSSIAN_RANDOM, OBB};
+
+const double minimumRadiusSingularity = 0.1;
 
 class ForceField{
   public:
@@ -47,6 +49,26 @@ class RadialForceField: public ForceField{
     double power;
     double minimum_radius;
     double maximum_radius;
+};
+
+class CylindricalForceField: public ForceField{
+  public:
+    CylindricalForceField(Math3D::Vector3 _source, Math3D::Vector3 _direction, double _elongation, double _radius, double _power);
+
+    virtual Math3D::Vector3 getForceAtPosition(Math3D::Vector3 position);
+    virtual void print();
+    virtual ForceFieldTypes type();
+    Math3D::Vector3 GetSource();
+    Math3D::Vector3 GetDirection();
+    double GetElongation();
+    double GetRadius();
+    double GetPower();
+  private:
+    Math3D::Vector3 source, direction;
+    double elongation;
+    double minimum_radius;
+    double maximum_radius;
+    double power;
 };
 
 class UniformRandomForceField: public ForceField{

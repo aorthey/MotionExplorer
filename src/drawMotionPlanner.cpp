@@ -1,3 +1,4 @@
+#include "KrisLibrary/math3d/basis.h"
 #include "drawMotionPlanner.h"
 
 namespace GLDraw{
@@ -142,33 +143,10 @@ namespace GLDraw{
     drawCylinderArrowAtPosition(com, amomentum, cAngMom);
 
     sph.center = wrenchfield.getCOMPosition();
-    sph.radius = 0.1;
     sph.Draw();
-    //Real r=0.01;
     drawCylinderArrowAtPosition(sph.center, lmomentum, cLinMom);
     drawCylinderArrowAtPosition(sph.center, amomentum, cAngMom);
 
-    ////linear momentum at com 
-    //glPushMatrix();
-    //glTranslate(com);
-    //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cLinMom);
-    //drawCylinder(lmomentum,r);
-    //glPushMatrix();
-    //glTranslate(lmomentum);
-    //drawCone(3*r*lmomentum/lmomentum.length(),2*r,8);
-    //glPopMatrix();
-    //glPopMatrix();
-
-    ////angular momentum at com
-    //glPushMatrix();
-    //glTranslate(com);
-    //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cAngMom);
-    //drawCylinder(amomentum,r);
-    //glPushMatrix();
-    //glTranslate(amomentum);
-    //drawCone(3*r*amomentum/amomentum.length(),2*r,8);
-    //glPopMatrix();
-    //glPopMatrix();
 
     glEnable(GL_DEPTH_TEST);
 
@@ -302,6 +280,88 @@ namespace GLDraw{
             glTranslate(middle);
             GLDraw::drawCone(direction, length/2);
             glPopMatrix();
+          }
+        }
+
+
+        glPopMatrix();
+        glEnable(GL_LIGHTING);
+      }else if(f->type() == CYLINDRICAL){
+
+        SmartPointer<CylindricalForceField>& fr = *reinterpret_cast<SmartPointer<CylindricalForceField>*>(&forcefields.at(i));
+        //Vector3 source = dynamic_cast<RadialForceField*>(f)->GetSource()
+        Vector3 source = fr->GetSource();
+        Vector3 direction = fr->GetDirection();
+        direction /= direction.length();
+        double elongation = fr->GetElongation();
+        double radius = fr->GetRadius();
+        double power = fr->GetPower();
+        GLColor cForce = fr->GetColor();
+
+        glDisable(GL_LIGHTING);
+        glEnable(GL_BLEND); 
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+        cForce.setCurrentGL();
+        
+        glPushMatrix();
+        glTranslate(source);
+
+        //draw cable axis
+        glPointSize(5);
+        drawPoint(Vector3(0,0,0));
+        glLineWidth(4);
+        Vector3 vv = 0.5*elongation*direction;
+        glBegin(GL_LINES);
+        glVertex3f(-vv[0],-vv[1],-vv[2]);
+        glVertex3f(vv[0],vv[1],vv[2]);
+        glEnd();
+
+
+        double verticalDistanceConcentricCircles = min(1.0, elongation);
+        double horizontalDistanceConcentricCircles = min(0.5, radius);
+
+        uint numSteps = 16; 
+
+        for(double dv = -0.5*elongation; dv <= 0.5*elongation; dv+=verticalDistanceConcentricCircles){
+          for(double dr = horizontalDistanceConcentricCircles; dr <= radius; dr+=horizontalDistanceConcentricCircles){
+              glPushMatrix();
+              float inc = fTwoPi/numSteps;
+              Vector3 eu,ev;
+              GetCanonicalBasis(direction,eu,ev);
+              Complex x,dx;
+              dx.setPolar(One,inc);
+              
+              glBegin(GL_LINE_LOOP);
+              x.set(dr,0);
+              for(i=0; i<numSteps; i++) {
+                glVertex3v(direction*dv + x.x*eu+x.y*ev);
+                x=x*dx;
+              }
+              glEnd();
+
+              uint Narrows = 5;
+              inc = fTwoPi/Narrows;
+              dx.setPolar(One,inc);
+              x.set(dr,0);
+
+              for(int i = 0; i < Narrows; i++){
+                glPushMatrix();
+                Vector3 rr = x.x*eu + x.y*ev;
+                Vector3 arrowS(direction*dv + rr);
+                x=x*dx;
+
+                glTranslate(arrowS);
+                Vector3 coneori = cross(direction,rr);
+                coneori /= coneori.length();
+                double length = 0.1;
+                if(power < 0) {
+                  coneori *= -1;
+                }
+                GLDraw::drawCone(length*coneori, 0.5*length);
+                glPopMatrix();
+              }
+              glPopMatrix();
+
           }
         }
 

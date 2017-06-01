@@ -525,6 +525,7 @@ display tree/start/goal/swept volumes, do planning
  [x] add arrows to visualize flow of power
  [x] forces on link => make them better looking like contact wrenches
  [ ] compute and display distance between links and terrain
+ [ ] enable velocity induced FF, drag force, magnetic force, etc
 
  [x] visualize COM separately in box to quickly see wrenches attacking robot.
  [x] let force be specificable in xml file, uniform, box, uniform inside rigid object, radial from source,
