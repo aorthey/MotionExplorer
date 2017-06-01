@@ -448,6 +448,46 @@ without recompiling. Delete the whole plannersetup folder!
  [ ] update to klampt-0.7
  [ ] visualize wrench cone at contact
 
+-- irreducible paths
+
+ [x] bug: robot makes backward movements through pipe segment? (check propagate
+function)
+ [x] repair rotation conversion klampt->klampt
+ [x] seems rot of path is right, visualization seems wrong, especially it
+diverges near the end of the path
+ [x] do ompl planning for N branches (use trivial control)
+ [x] ompl benchmark (100 runs à 3600 seconds x environments x 2 x PDST/KPIECE/RRT/SST?)
+ [x] Stop if reached goal region
+ [x] Check why approximateSolution is false in between planning
+ [x] ProblemDefPtr is not updated from ompl site!? (only after last plan?)
+ [x] Save every path for every ompl benchmark run, so that we can compare them!? Implement PostSolve 
+ [x] Resolve collision of start/goal states of complete model (likely wrong
+model?) -> one of the cylinders pierced the head sphere creating a spurious collision
+ [x] function createBranchSegment creates collision
+ [x] probably bug in postprocess event of benchmark
+ [x] display two paths in different colors, one irreducible (magenta or green?), one reducible (red?)
+ [x] repeat Nbranch experiments because wrong stepsize was used!
+ [x] repeat irreducible experiments using updated curvature!
+ [x] repeat experiments with 20 min time frame? (todo)
+ [x] repeat experiments with 20 min time frame, curvature = 2.22 and propagation step size in [0.01,0.1] (running)
+ [x] experiment 3d snake underwater, 20min, curvature = 1.57, propagation step size [0.01,0.1] (todo)
+ [x] experiment 3d snake underwater, 20min (todo)
+ [x] design one turbine scenario with a large room (which can be used for wrench planning)
+ [x] add one hard experiment where the method will break down, should be short so that any RRT can find a solution under 3600 seconds. 
+ [x] outsource planner setup to JSON file or xml (should be loadable in simulator)
+ [x] make sure that cbounds gives an exception if outer limit index
+ [x] what about the humanoid experiments? could we repeat them easily?
+ [x] one humanoid experiment: flat floor, multiple doors at different angles, sideways motion.  Maybe like the kyoto tori 
+ [x] be able to sample all possible IK configurations given contacts
+ [x] CoM + IK computation?
+ [x] experiment door 100x1200 irr 
+ [x] enable/disable swept volume of certain links.
+ [x] experiment wall 10xXX ? 
+ [x] rewrite introduction and experimental part
+ [x] experiment door 100x1200 complete
+ [ ] experiment wall 10x3600*24 complete (running)
+ [ ] incorporate reviews/edits/comments from OOM
+
 -- abstractions (longterm goals)
 
  [ ] Needs switch to QT, the file loader from GLUI seems not to work properly. Also the graphics are quite bad. 
@@ -491,53 +531,14 @@ display tree/start/goal/swept volumes, do planning
 maelstrom from source, and any combination of that. Test with moving robot
 around and visualize wrenches on each link plus wrench on COM
 COM should retain orientation equal to origin so that we can see forces from
- [ ] devise better way to visualize angular momentum
- [ ] add constraint to a force field to be inside a given rigid object
- [ ] execute kinodynamic path
+ [ ] cylindrical FF
  [ ] visualize min dist between link and terrain
+ [ ] devise better way to visualize angular momentum
+ [ ] add constraint to a FF to be inside a given rigid object
+ [ ] execute kinodynamic path
  [ ] visualize path speed profile
  [ ] composite force fields: intersection and union
  [ ] add custom controller loop 
-
-
--- irreducible paths
-
- [x] bug: robot makes backward movements through pipe segment? (check propagate
-function)
- [x] repair rotation conversion klampt->klampt
- [x] seems rot of path is right, visualization seems wrong, especially it
-diverges near the end of the path
- [x] do ompl planning for N branches (use trivial control)
- [x] ompl benchmark (100 runs à 3600 seconds x environments x 2 x PDST/KPIECE/RRT/SST?)
- [x] Stop if reached goal region
- [x] Check why approximateSolution is false in between planning
- [x] ProblemDefPtr is not updated from ompl site!? (only after last plan?)
- [x] Save every path for every ompl benchmark run, so that we can compare them!? Implement PostSolve 
- [x] Resolve collision of start/goal states of complete model (likely wrong
-model?) -> one of the cylinders pierced the head sphere creating a spurious collision
- [x] function createBranchSegment creates collision
- [x] probably bug in postprocess event of benchmark
- [x] display two paths in different colors, one irreducible (magenta or green?), one reducible (red?)
- [x] repeat Nbranch experiments because wrong stepsize was used!
- [x] repeat irreducible experiments using updated curvature!
- [x] repeat experiments with 20 min time frame? (todo)
- [x] repeat experiments with 20 min time frame, curvature = 2.22 and propagation step size in [0.01,0.1] (running)
- [x] experiment 3d snake underwater, 20min, curvature = 1.57, propagation step size [0.01,0.1] (todo)
- [x] experiment 3d snake underwater, 20min (todo)
- [x] design one turbine scenario with a large room (which can be used for wrench planning)
- [x] add one hard experiment where the method will break down, should be short so that any RRT can find a solution under 3600 seconds. 
- [x] outsource planner setup to JSON file or xml (should be loadable in simulator)
- [x] make sure that cbounds gives an exception if outer limit index
- [x] what about the humanoid experiments? could we repeat them easily?
- [x] one humanoid experiment: flat floor, multiple doors at different angles, sideways motion.  Maybe like the kyoto tori 
- [x] be able to sample all possible IK configurations given contacts
- [x] CoM + IK computation?
- [x] experiment door 100x1200 irr 
- [x] enable/disable swept volume of certain links.
- [x] experiment wall 10xXX ? 
- [x] rewrite introduction and experimental part
- [ ] experiment door 100x1200 complete (running)
- [ ] experiment wall 10x3600*24 complete
 
 -- important
  [x] self collisions occuring when simulating atlas in Klampt. ODERobot

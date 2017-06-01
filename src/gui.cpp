@@ -257,6 +257,7 @@ void ForceFieldBackend::RenderWorld()
 
   int drawController = 1;
   if(drawController){
+    int linewidth = 4;
     //for(int i = 0; i < sim.robotControllers.size(); i++){
     //}
     //SmartPointer<RadialForceField>& fr = *reinterpret_cast<SmartPointer<RadialForceField>*>(&forcefields.at(i));
@@ -284,7 +285,7 @@ void ForceFieldBackend::RenderWorld()
       //glPointSize(5);
       //drawPoint(Vector3(0,0,0));
 
-      glLineWidth(2);
+      glLineWidth(linewidth);
       glBegin(GL_LINES);
       glVertex3f(0,0,0);
       glVertex3f(dc[0],dc[1],dc[2]);
@@ -303,7 +304,7 @@ void ForceFieldBackend::RenderWorld()
       glPushMatrix();
       glTranslate(com_cur);
 
-      glLineWidth(4);
+      glLineWidth(linewidth);
       glBegin(GL_LINES);
       glVertex3f(0,0,0);
       glVertex3f(dc[0],dc[1],dc[2]);

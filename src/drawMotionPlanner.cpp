@@ -137,33 +137,54 @@ namespace GLDraw{
     sph.center = com;
     sph.radius = 0.1;
     sph.Draw();
+    //Real r=0.01;
+    drawCylinderArrowAtPosition(com, lmomentum, cLinMom);
+    drawCylinderArrowAtPosition(com, amomentum, cAngMom);
 
-    Real r=0.01;
+    sph.center = wrenchfield.getCOMPosition();
+    sph.radius = 0.1;
+    sph.Draw();
+    //Real r=0.01;
+    drawCylinderArrowAtPosition(sph.center, lmomentum, cLinMom);
+    drawCylinderArrowAtPosition(sph.center, amomentum, cAngMom);
 
-    //linear momentum at com
-    glPushMatrix();
-    glTranslate(com);
-    glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cLinMom);
-    drawCylinder(lmomentum,r);
-    glPushMatrix();
-    glTranslate(lmomentum);
-    drawCone(3*r*lmomentum/lmomentum.length(),2*r,8);
-    glPopMatrix();
-    glPopMatrix();
+    ////linear momentum at com 
+    //glPushMatrix();
+    //glTranslate(com);
+    //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cLinMom);
+    //drawCylinder(lmomentum,r);
+    //glPushMatrix();
+    //glTranslate(lmomentum);
+    //drawCone(3*r*lmomentum/lmomentum.length(),2*r,8);
+    //glPopMatrix();
+    //glPopMatrix();
 
-    //angular momentum at com
-    glPushMatrix();
-    glTranslate(com);
-    glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cAngMom);
-    drawCylinder(amomentum,r);
-    glPushMatrix();
-    glTranslate(amomentum);
-    drawCone(3*r*amomentum/amomentum.length(),2*r,8);
-    glPopMatrix();
-    glPopMatrix();
+    ////angular momentum at com
+    //glPushMatrix();
+    //glTranslate(com);
+    //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cAngMom);
+    //drawCylinder(amomentum,r);
+    //glPushMatrix();
+    //glTranslate(amomentum);
+    //drawCone(3*r*amomentum/amomentum.length(),2*r,8);
+    //glPopMatrix();
+    //glPopMatrix();
 
     glEnable(GL_DEPTH_TEST);
 
+
+  }
+  void drawCylinderArrowAtPosition(Vector3 &pos, Vector3 &dir, GLColor &color){
+    double r = 0.01;
+    glPushMatrix();
+    glTranslate(pos);
+    glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,color);
+    drawCylinder(dir, r);
+    glPushMatrix();
+    glTranslate(dir);
+    drawCone(3*r*dir/dir.length(),2*r,8);
+    glPopMatrix();
+    glPopMatrix();
 
   }
 

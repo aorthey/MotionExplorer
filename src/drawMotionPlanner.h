@@ -17,6 +17,7 @@ namespace GLDraw {
   void drawUniformForceField();
   void drawForceField(WrenchField &wrenchfield);
   void drawWrenchField(WrenchField &wrenchfield);
+  void drawCylinderArrowAtPosition(Vector3 &pos, Vector3 &dir, GLColor &color);
 
   void drawGLPathKeyframes(Robot *robot, std::vector<uint> keyframe_indices, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor color = GLColor(0.8,0.8,0.8,1.0), double scale = 1.0);
 
