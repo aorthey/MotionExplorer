@@ -255,6 +255,63 @@ void ForceFieldBackend::RenderWorld()
   //  if(!i->second.inContact) continue;
   //}
 
+  int drawController = 1;
+  if(drawController){
+    //for(int i = 0; i < sim.robotControllers.size(); i++){
+    //}
+    //SmartPointer<RadialForceField>& fr = *reinterpret_cast<SmartPointer<RadialForceField>*>(&forcefields.at(i));
+    //ContactStabilityController *controller = sim.robotControllers[0];
+    SmartPointer<ContactStabilityController>& controller = *reinterpret_cast<SmartPointer<ContactStabilityController>*>(&sim.robotControllers[0]);
+    ControllerState output = controller->GetControllerState();
+
+    //output.predicted_com
+    //ODERobot *simrobot = sim.odesim.robot(0);
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND); 
+
+    GLColor color(1,0,0);
+    color.setCurrentGL();
+    //std::cout << "com size: " << int(output.predicted_com.size())-1 << std::endl;
+    for(int i = 0; i < int(output.predicted_com.size())-1; i++){
+      Vector3 com_cur = output.predicted_com.at(i);
+      Vector3 com_next = output.predicted_com.at(i+1);
+
+      Vector3 dc = com_next - com_cur;
+        
+      glPushMatrix();
+      glTranslate(com_cur);
+
+      //glPointSize(5);
+      //drawPoint(Vector3(0,0,0));
+
+      glLineWidth(2);
+      glBegin(GL_LINES);
+      glVertex3f(0,0,0);
+      glVertex3f(dc[0],dc[1],dc[2]);
+      glEnd();
+
+      glPopMatrix();
+    }
+    GLColor green(0,1,0);
+    green.setCurrentGL();
+    for(int i = 0; i < int(output.com_window.size())-1; i++){
+      Vector3 com_cur = output.com_window.at(i);
+      Vector3 com_next = output.com_window.at(i+1);
+
+      Vector3 dc = com_next - com_cur;
+        
+      glPushMatrix();
+      glTranslate(com_cur);
+
+      glLineWidth(4);
+      glBegin(GL_LINES);
+      glVertex3f(0,0,0);
+      glVertex3f(dc[0],dc[1],dc[2]);
+      glEnd();
+
+      glPopMatrix();
+    }
+  }
 
   if(drawRobot){
     for(size_t i=0;i<world->robots.size();i++) {
@@ -266,9 +323,6 @@ void ForceFieldBackend::RenderWorld()
         sim.odesim.robot(i)->GetLinkTransform(j,robot->links[j].T_World);
         Matrix4 mat = robot->links[j].T_World;
 
-        //glColor3f(0.7,0.7,0.7);
-        //world->robotViews[i].DrawLink_World(j);
-
         glPushMatrix();
         glMultMatrix(mat);
         GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
@@ -276,10 +330,6 @@ void ForceFieldBackend::RenderWorld()
         a.SetColor(GLColor(0.7,0.7,0.7));
         a.DrawGL();
         glPopMatrix();
-
-
-
-
 
       }
     }
