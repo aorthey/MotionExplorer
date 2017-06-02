@@ -58,6 +58,8 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
 
 
 ///*
+//############################################################################
+//############################################################################
 bool ForceFieldBackend::OnIdle()
 {
 
@@ -70,14 +72,23 @@ bool ForceFieldBackend::OnIdle()
     ODERobot *robot = sim.odesim.robot(0);
     uint Nlinks = robot->robot.links.size();
 
+    const Terrain* terrain = sim.odesim.terrain(0);
+
+    // static bool init = true;
+    // if(init){
+    //   const Geometry::AnyCollisionGeometry3D tgeom = (*terrain->geometry);
+    //   Geometry::AnyCollisionGeometry3D tt(tgeom);
+    //   robot->robot.InitMeshCollision(tt);
+    //   init=false;
+    // }
+    //const Geometry::AnyCollisionGeometry3D tgeom = (*terrain->geometry);
+    //Geometry::AnyCollisionGeometry3D tt(tgeom);
+    //robot->robot.CleanupCollisions();
+    //robot->robot.InitMeshCollision(tt);
+
     //use own force field
     sim.odesim.SetGravity(Vector3(0,0,0));
     sim.hooks.clear();
-
-    //const Terrain* terrain = sim.odesim.terrain(0);
-    //const Geometry::AnyCollisionGeometry3D tgeom = (*terrain->geometry);
-    //Geometry::AnyCollisionGeometry3D tt(tgeom);
-    //robot->robot.InitMeshCollision(tt);
 
     for(int i = 0; i < Nlinks; i++){
       dBodyID bodyid = robot->body(i);
@@ -85,23 +96,11 @@ bool ForceFieldBackend::OnIdle()
       if(bodyid){
         if(!robot->robot.IsGeometryEmpty(i)){
 
-          Geometry::AnyCollisionQuery *query = robot->robot.envCollisions[i];
-          if(query){
-            //std::cout << "Collision link " << i << ":" << (query->Collide()?"Yes":"No") << std::endl;
-          }
-          //const Terrain* terrain = sim.odesim.terrain(0);
-          //const Geometry::AnyCollisionGeometry3D tgeom = (*terrain->geometry);
+          //Geometry::AnyCollisionQuery *query = robot->robot.envCollisions[i];
+          //double d = query->Distance(0,0.1);
+          //std::vector<Vector3> p1,p2;
+          //query->InteractingPoints(p1,p2);
 
-          //Geometry::AnyCollisionGeometry3D geom = *robot->robot.geometry[i];
-          //if(&geom){
-          //  Geometry::AnyCollisionGeometry3D tt(tgeom);
-          //  Geometry::AnyCollisionQuery collision(geom, tt);
-          //  double d= collision.Distance(0.0,0.1);
-          //  std::vector<Vector3> p1,p2;
-          //  collision.InteractingPoints(p1,p2);
-          //  std::cout << p1.size() << "," << p2.size() << std::endl;
-
-          //}
           Vector3 com;
           RobotLink3D *link = &robot->robot.links[i];
           link->GetWorldCOM(com);
@@ -134,18 +133,20 @@ bool ForceFieldBackend::OnIdle()
   return res;
 }
 //*/
+//############################################################################
+//############################################################################
 
 void ForceFieldBackend::Start()
 {
   BaseT::Start();
-
+  Robot *robot = world->robots[0];
 
   settings["dragForceMultiplier"] = 500.0;
   drawContacts = 0;
   drawWrenches = 1;
   //click_mode = ModeForceApplication;
+  pose_objects = 1;
 
-  Robot *robot = world->robots[0];
   uint Nlinks  = robot->links.size();
   std::cout << "links: " << Nlinks << std::endl;
   showLinks.resize(Nlinks); //hide certain links 
@@ -256,6 +257,8 @@ void ForceFieldBackend::RenderWorld()
   //}
 
   int drawController = 1;
+  int drawContactDistances = 1;
+
   if(drawController){
     int linewidth = 4;
     //for(int i = 0; i < sim.robotControllers.size(); i++){
@@ -311,6 +314,64 @@ void ForceFieldBackend::RenderWorld()
       glEnd();
 
       glPopMatrix();
+    }
+  }
+  if(drawContactDistances){
+    ODERobot *robot = sim.odesim.robot(0);
+    uint Nlinks = robot->robot.links.size();
+    const Terrain* terrain = sim.odesim.terrain(0);
+    const Geometry::AnyCollisionGeometry3D tgeom = (*terrain->geometry);
+    Geometry::AnyCollisionGeometry3D tt(tgeom);
+    robot->robot.CleanupCollisions();
+    robot->robot.InitMeshCollision(tt);
+
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND); 
+    GLColor yellow(1,1,0);
+    GLColor white(1,1,1);
+    for(int i = 0; i < Nlinks; i++){
+      dBodyID bodyid = robot->body(i);
+      if(bodyid){
+        if(!robot->robot.IsGeometryEmpty(i)){
+          RobotLink3D *link = &robot->robot.links[i];
+
+
+          Geometry::AnyCollisionQuery *query = robot->robot.envCollisions[i];
+          double d = query->Distance(0,0.1);
+          std::vector<Vector3> vp1,vp2;
+          query->InteractingPoints(vp1,vp2);
+          if(vp1.size()!=1){
+            std::cout << "Warning: got " << vp1.size() << " contact points for single rigid body" << std::endl;
+          }
+          Matrix4 mat = link->T_World;
+          //glMultMatrix(mat);
+          Vector3 p1 = link->T_World*vp1.front();
+          Vector3 p2 = vp2.front();
+          //Vector3 dp = p1-p2;
+
+
+          glPushMatrix();
+
+          //glTranslate(p1);
+          glPointSize(5);
+          white.setCurrentGL();
+          drawPoint(p1);
+          drawPoint(p2);
+
+          yellow.setCurrentGL();
+          glLineWidth(3);
+          glBegin(GL_LINES);
+          glVertex3f(p1[0],p1[1],p1[2]);
+          glVertex3f(p2[0],p2[1],p2[2]);
+          //glVertex3f(dp[0],dp[1],dp[2]);
+          glEnd();
+
+          //white.setCurrentGL();
+          ////glPointSize(5);
+          //drawPoint(dp);
+          glPopMatrix();
+        }
+      }
     }
   }
 
@@ -397,39 +458,33 @@ void ForceFieldBackend::RenderScreen(){
 
   if(world->robots.size()>0){
     line = "Robots      : ";
+    for(int i = 0; i < world->robots.size(); i++){
+      line += ((i>0 && i==world->robots.size()-1)?" | ":"");
+      line += world->robots[i]->name;
+    }
     DrawText(20,line_y_offset,line);
     line_y_offset += line_y_offset_stepsize;
-    for(int i = 0; i < world->robots.size(); i++){
-      line = "\n\r              ";
-      line += world->robots[i]->name;
-      DrawText(20,line_y_offset,line);
-      line_y_offset += line_y_offset_stepsize;
-    }
   }
 
   if(world->terrains.size()>0){
     line = "Terrains    : ";
+    for(int i = 0; i < world->terrains.size(); i++){
+      std::string geom = world->terrains[i]->geomFile;
+      line += ((i>0 && i==world->terrains.size()-1)?" | ":"");
+      line += std::string(basename(geom.c_str()));
+    }
     DrawText(20,line_y_offset,line);
     line_y_offset += line_y_offset_stepsize;
-    for(int i = 0; i < world->terrains.size(); i++){
-      line = "\n\r              ";
-      std::string geom = world->terrains[i]->geomFile;
-      line += std::string(basename(geom.c_str()));
-      DrawText(20,line_y_offset,line);
-      line_y_offset += line_y_offset_stepsize;
-    }
   }
   if(world->rigidObjects.size()>0){
     line = "RigidObjects: ";
+    for(int i = 0; i < world->rigidObjects.size(); i++){
+      std::string geom = world->rigidObjects[i]->geomFile;
+      line += ((i>0 && i==world->rigidObjects.size()-1)?" | ":"");
+      line += std::string(basename(geom.c_str()));
+    }
     DrawText(20,line_y_offset,line);
     line_y_offset += line_y_offset_stepsize;
-    for(int i = 0; i < world->rigidObjects.size(); i++){
-      line = "\n\r              ";
-      std::string geom = world->rigidObjects[i]->geomFile;
-      line += std::string(basename(geom.c_str()));
-      DrawText(20,line_y_offset,line);
-      line_y_offset += line_y_offset_stepsize;
-    }
   }
 
   line = "Mode       : ";
@@ -518,7 +573,6 @@ bool ForceFieldBackend::Load(const char* file)
 {
   std::string pdata = util::GetDataFolder();
   std::string in = pdata+"/gui/"+file;
-  //std::string in = "../gui/state_2017_03_14.xml";
 
   std::cout << "loading data from "<<in << std::endl;
 

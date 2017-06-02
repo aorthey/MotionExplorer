@@ -119,9 +119,35 @@ public:
     GetSensedConfig(qactual);  //convenience function in RobotController
     GetSensedVelocity(vactual);  //convenience function in RobotController
 
-    //uint Nsensors =  sensors->sensors.size();
+    //uint Nsensors = sensors->sensors.size();
     //for(int i = 0; i < Nsensors; i++){
     //  std::cout << sensors->sensors.at(i)->name << std::endl;
+    //}
+
+    //uint Nlinks = robot.links.size();
+    ////const Terrain* terrain = sim.odesim.terrain(0);
+    //const Geometry::AnyCollisionGeometry3D tgeom = (*terrain->geometry);
+    //Geometry::AnyCollisionGeometry3D tt(tgeom);
+    //robot->robot.CleanupCollisions();
+    //robot->robot.InitMeshCollision(tt);
+
+    //for(int i = 0; i < Nlinks; i++){
+    //  dBodyID bodyid = robot->body(i);
+    //  if(bodyid){
+    //    if(!robot->robot.IsGeometryEmpty(i)){
+    //      RobotLink3D *link = &robot->robot.links[i];
+    //      Geometry::AnyCollisionQuery *query = robot->robot.envCollisions[i];
+    //      double d = query->Distance(0,0.1);
+    //      std::vector<Vector3> vp1,vp2;
+    //      query->InteractingPoints(vp1,vp2);
+    //      if(vp1.size()!=1){
+    //        std::cout << "Warning: got " << vp1.size() << " contact points for single rigid body" << std::endl;
+    //      }
+    //      Matrix4 mat = link->T_World;
+    //      Vector3 p1 = link->T_World*vp1.front();
+    //      Vector3 p2 = vp2.front();
+    //    }
+    //  }
     //}
 
     Vector3 com = robot.GetCOM();
@@ -129,9 +155,7 @@ public:
     Vector3 AM = robot.GetAngularMomentum();
 
     output.SetMass( robot.GetTotalMass() );
-
     output.AddCOM(com, LM, AM);
-
     output.PredictCOM(0.001, 1000);
 
     SetPIDCommand(qcmd,vcmd);
