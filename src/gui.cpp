@@ -1,4 +1,7 @@
 #include <KrisLibrary/geometry/AnyGeometry.h>
+#include <KrisLibrary/math/LAPACKInterface.h>
+#include <Eigen/Core>
+#include <Eigen/SVD>
 
 #include <tinyxml.h>
 #include <iostream>
@@ -95,11 +98,6 @@ bool ForceFieldBackend::OnIdle()
 
       if(bodyid){
         if(!robot->robot.IsGeometryEmpty(i)){
-
-          //Geometry::AnyCollisionQuery *query = robot->robot.envCollisions[i];
-          //double d = query->Distance(0,0.1);
-          //std::vector<Vector3> p1,p2;
-          //query->InteractingPoints(p1,p2);
 
           Vector3 com;
           RobotLink3D *link = &robot->robot.links[i];
@@ -334,7 +332,55 @@ void ForceFieldBackend::RenderWorld()
       if(bodyid){
         if(!robot->robot.IsGeometryEmpty(i)){
           RobotLink3D *link = &robot->robot.links[i];
+          ///Jacobian (orientation,position) of a point (in frame 0) with respect to qi
+          // void GetJacobian(Real qi,const Vector3& p,Vector3& Jo,Vector3& Jp) const;
 
+          Vector3 com = link->com;
+          Matrix J;
+          //GetFullJacobian(const Vector3 p, const int i, Matrix M) point p in
+          //workspace, i-th link, returns matrix M R^{6xN}
+          robot->robot.GetFullJacobian(com, i, J);
+          uint N=J.numCols();
+          Matrix Jo(3,N);
+          Matrix Jp(3,N);
+          J.getSubMatrixCopy(0,0,Jo);
+          J.getSubMatrixCopy(3,0,Jp);
+
+          J = Jp;
+          Math::RobustSVD<Real> rsvd(J);
+          Math::SVDecomposition<Real> svd = rsvd.svd;
+          //svd.sortSVs();
+          Matrix U = svd.U;
+          Math::SVDecomposition<Real>::DiagonalMatrixT Sigma = svd.W;
+
+          if(i==14 || i==32 || i==39 || i==45){
+            //std::cout << robot->robot.LinkName(i) << std::endl;
+            for(int k = 0; k < 4; k++){
+              Vector u = U.col(k);
+              Vector3 center = link->T_World*com;
+              Vector3 dp;
+              dp[0] = Sigma(k)*u(0);
+              dp[1] = Sigma(k)*u(1);
+              dp[2] = Sigma(k)*u(2);
+              //remove zero singular values
+              if((dp).length()<1e-8){
+                continue;
+              }
+              //dp /= dp.norm();
+              dp *= 0.5;
+              Vector3 p1 = center - dp;
+              Vector3 p2 = center + dp;
+
+              glPushMatrix();
+              yellow.setCurrentGL();
+              glLineWidth(3);
+              glBegin(GL_LINES);
+              glVertex3f(p1[0],p1[1],p1[2]);
+              glVertex3f(p2[0],p2[1],p2[2]);
+              glEnd();
+              glPopMatrix();
+            }
+          }
 
           Geometry::AnyCollisionQuery *query = robot->robot.envCollisions[i];
           double d = query->Distance(0,0.1);
@@ -350,26 +396,18 @@ void ForceFieldBackend::RenderWorld()
           //Vector3 dp = p1-p2;
 
 
-          glPushMatrix();
-
-          //glTranslate(p1);
-          glPointSize(5);
-          white.setCurrentGL();
-          drawPoint(p1);
-          drawPoint(p2);
-
-          yellow.setCurrentGL();
-          glLineWidth(3);
-          glBegin(GL_LINES);
-          glVertex3f(p1[0],p1[1],p1[2]);
-          glVertex3f(p2[0],p2[1],p2[2]);
-          //glVertex3f(dp[0],dp[1],dp[2]);
-          glEnd();
-
-          //white.setCurrentGL();
-          ////glPointSize(5);
-          //drawPoint(dp);
-          glPopMatrix();
+          // glPushMatrix();
+          // glPointSize(5);
+          // white.setCurrentGL();
+          // drawPoint(p1);
+          // drawPoint(p2);
+          // yellow.setCurrentGL();
+          // glLineWidth(3);
+          // glBegin(GL_LINES);
+          // glVertex3f(p1[0],p1[1],p1[2]);
+          // glVertex3f(p2[0],p2[1],p2[2]);
+          // glEnd();
+          // glPopMatrix();
         }
       }
     }

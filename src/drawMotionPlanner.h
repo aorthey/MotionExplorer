@@ -29,4 +29,7 @@ namespace GLDraw {
   void drawPlannerTree(const SerializedTree &_stree, GLColor colorTree=GLColor(0.3,0.7,0.3));
   void drawAxesLabels(Camera::Viewport& viewport);
   void drawFrames(std::vector< std::vector<Vector3> > &frames, std::vector<double> frameLength);
+
+
+  void drawEllipsoid(Vector3 &u, Vector3 &v, Vector3 &w, int numSteps);
 };

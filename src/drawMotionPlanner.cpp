@@ -639,5 +639,31 @@ namespace GLDraw{
       glEnable(GL_LIGHTING);
     }
   }
+
+      
+  void drawEllipsoid(Vector3 &u, Vector3 &v, Vector3 &w, int numSteps)
+  {
+    //x = a*cos(t) cos(s)
+    //y = b*cos(t) sin(s)
+    //z = c*sin(t)
+    //
+    // -pi/2 <= t <= pi/2 
+    // -pi <= s <= pi
+
+    //float tStep = M_PI/numSteps;
+    //float sStep = 2*M_PI/numSteps;
+
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //for(float t = -Pi/2; t <= (Pi/2)+.0001; t += tStep)
+    //{
+    //  glBegin(GL_TRIANGLE_STRIP);
+    //  for(float s = -Pi; s <= Pi+.0001; s += sStep)
+    //  {
+    //    glVertex3f(fA * cos(t) * cos(s), fB * cos(t) * sin(s), fC * sin(t));
+    //    glVertex3f(fA * cos(t+tStep) * cos(s), fB * cos(t+tStep) * sin(s), fC * sin(t+tStep));
+    //  }
+    //  glEnd();
+    //}
+  }
 };
 

@@ -173,5 +173,29 @@ public:
 
     RobotController::Update(dt);
   }
+  virtual bool SendCommand(const string& name,const string& str){
+
+    stringstream ss(str);
+    Real t;
+    Config q,v;
+    if(name == "set_q") {
+      fprintf(stderr,"not done yet\n");
+      return false;
+    }else if(name == "brake") {
+      fprintf(stderr,"Brake is not done yet\n");
+      return false;
+    }
+    return false;
+  }
+
+  virtual vector<string> Commands() const
+  {
+    vector<string> res;
+    res.push_back("set_q");
+    res.push_back("brake");
+    return res;
+  }
+
+
 };
 
