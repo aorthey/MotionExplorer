@@ -1,5 +1,6 @@
 #include "KrisLibrary/math3d/basis.h"
 #include "drawMotionPlanner.h"
+#include "controller/controller.h"
 
 namespace GLDraw{
 
@@ -638,6 +639,226 @@ namespace GLDraw{
       glPopMatrix();
       glEnable(GL_LIGHTING);
     }
+  }
+  void drawCenterOfMassPathFromController(WorldSimulation &sim){
+    int linewidth = 4;
+    SmartPointer<ContactStabilityController>& controller = *reinterpret_cast<SmartPointer<ContactStabilityController>*>(&sim.robotControllers[0]);
+    ControllerState output = controller->GetControllerState();
+
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND); 
+
+    GLColor color(1,0,0);
+    color.setCurrentGL();
+    for(int i = 0; i < int(output.predicted_com.size())-1; i++){
+      Vector3 com_cur = output.predicted_com.at(i);
+      Vector3 com_next = output.predicted_com.at(i+1);
+
+      Vector3 dc = com_next - com_cur;
+        
+      glPushMatrix();
+      glTranslate(com_cur);
+
+      //glPointSize(5);
+      //drawPoint(Vector3(0,0,0));
+
+      glLineWidth(linewidth);
+      glBegin(GL_LINES);
+      glVertex3f(0,0,0);
+      glVertex3f(dc[0],dc[1],dc[2]);
+      glEnd();
+
+      glPopMatrix();
+    }
+    GLColor green(0,1,0);
+    green.setCurrentGL();
+    for(int i = 0; i < int(output.com_window.size())-1; i++){
+      Vector3 com_cur = output.com_window.at(i);
+      Vector3 com_next = output.com_window.at(i+1);
+
+      Vector3 dc = com_next - com_cur;
+        
+      glPushMatrix();
+      glTranslate(com_cur);
+
+      glLineWidth(linewidth);
+      glBegin(GL_LINES);
+      glVertex3f(0,0,0);
+      glVertex3f(dc[0],dc[1],dc[2]);
+      glEnd();
+
+      glPopMatrix();
+    }
+  }
+  void drawDistanceRobotTerrain(const ODERobot *robot, const Terrain* terrain){
+    //ODERobot *robot = sim.odesim.robot(0);
+    uint Nlinks = robot->robot.links.size();
+    //const Terrain* terrain = sim.odesim.terrain(0);
+    const Geometry::AnyCollisionGeometry3D tgeom = (*terrain->geometry);
+    Geometry::AnyCollisionGeometry3D tt(tgeom);
+    robot->robot.CleanupCollisions();
+    robot->robot.InitMeshCollision(tt);
+
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND); 
+    GLColor yellow(1,1,0);
+    GLColor white(1,1,1);
+    for(int i = 0; i < Nlinks; i++){
+      dBodyID bodyid = robot->body(i);
+      if(bodyid){
+        if(!robot->robot.IsGeometryEmpty(i)){
+          RobotLink3D *link = &robot->robot.links[i];
+
+          Geometry::AnyCollisionQuery *query = robot->robot.envCollisions[i];
+          double d = query->Distance(0,0.1);
+          std::vector<Vector3> vp1,vp2;
+          query->InteractingPoints(vp1,vp2);
+          if(vp1.size()!=1){
+            std::cout << "Warning: got " << vp1.size() << " contact points for single rigid body" << std::endl;
+          }
+          Matrix4 mat = link->T_World;
+          //glMultMatrix(mat);
+          Vector3 p1 = link->T_World*vp1.front();
+          Vector3 p2 = vp2.front();
+          //Vector3 dp = p1-p2;
+
+
+          glPushMatrix();
+          glPointSize(5);
+          white.setCurrentGL();
+          drawPoint(p1);
+          drawPoint(p2);
+          yellow.setCurrentGL();
+          glLineWidth(3);
+          glBegin(GL_LINES);
+          glVertex3f(p1[0],p1[1],p1[2]);
+          glVertex3f(p2[0],p2[1],p2[2]);
+          glEnd();
+          glPopMatrix();
+        }
+      }
+    }
+  }
+
+  void drawForceEllipsoid( const ODERobot *robot ){
+    uint Nlinks = robot->robot.links.size();
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND); 
+    for(int i = 0; i < Nlinks; i++){
+      dBodyID bodyid = robot->body(i);
+      if(bodyid){
+        if(!robot->robot.IsGeometryEmpty(i)){
+          RobotLink3D *link = &robot->robot.links[i];
+          Vector3 com = link->com;
+          Matrix J;
+          robot->robot.GetFullJacobian(com, i, J);
+          uint N=J.numCols();
+          Matrix Jp(3,N);
+          J.getSubMatrixCopy(3,0,Jp);
+
+          J = Jp;
+          Math::SVDecomposition<Real> svd(J);
+          Matrix U = svd.U;
+          Math::SVDecomposition<Real>::DiagonalMatrixT Sigma = svd.W;
+
+          if(1){//i==14 || i==32 || i==39 || i==45){
+            std::vector<Vector3> axes;
+            Vector3 center = link->T_World*com;
+            for(int k = 0; k < 4; k++){
+              //remove zero singular values
+              if(Sigma(k)<1e-10){
+                continue;
+              }
+              Vector uk = U.col(k);
+              Vector3 u(uk[0],uk[1],uk[2]);
+              u /= u.norm();
+              Vector3 dp = 1.0/(Sigma(k)*Sigma(k))*u;
+              dp *= 0.5;
+              Vector3 p1 = center - dp;
+              Vector3 p2 = center + dp;
+              axes.push_back(dp);
+            }
+            GLColor magenta(0.5,0,1,0.5);
+            magenta.setCurrentGL();
+            drawWireEllipsoid(center, axes.at(0),axes.at(1),axes.at(2),8);
+          }
+        }
+      }
+    }
+    glEnable(GL_LIGHTING);
+  }
+
+      
+  void drawWireEllipsoid(Vector3 &c, Vector3 &u, Vector3 &v, Vector3 &w, int numSteps)
+  {
+    //x = a*cos(t) cos(s)
+    //y = b*cos(t) sin(s)
+    //z = c*sin(t)
+    //
+    // -pi/2 <= t <= pi/2 
+    // -pi <= s <= pi
+
+    float tStep = M_PI/(float)numSteps;
+    float sStep = 2*M_PI/(float)16;
+
+    glLineWidth(2);
+    for(float t = -M_PI/2; t <= M_PI/2; t += tStep)
+    {
+      glBegin(GL_LINE_LOOP);
+      for(float s = -M_PI; s <= M_PI; s += sStep)
+      {
+        Vector3 point = cos(t)*cos(s)*u + cos(t)*sin(s)*v + sin(t)*w + c;
+        glVertex3f(point[0],point[1],point[2]);
+      }
+      glEnd();
+    }
+    for(float t = -M_PI/2; t <= M_PI/2; t += tStep)
+    {
+      glBegin(GL_LINE_LOOP);
+      for(float s = -M_PI; s <= M_PI; s += sStep)
+      {
+        Vector3 point = cos(t)*cos(s)*v + cos(t)*sin(s)*w + sin(t)*u + c;
+        glVertex3f(point[0],point[1],point[2]);
+      }
+      glEnd();
+    }
+  }
+  void drawEllipsoid(Vector3 &c, Vector3 &u, Vector3 &v, Vector3 &w, int numSteps)
+  {
+    //x = a*cos(t) cos(s)
+    //y = b*cos(t) sin(s)
+    //z = c*sin(t)
+    //
+    // -pi/2 <= t <= pi/2 
+    // -pi <= s <= pi
+
+    float tStep = M_PI/(float)numSteps;
+    float sStep = 2*M_PI/(float)numSteps;
+
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    for(float t = -M_PI/2; t <= M_PI/2; t += tStep)
+    {
+      glBegin(GL_TRIANGLE_STRIP);
+      for(float s = -M_PI; s <= M_PI; s += sStep)
+      {
+        Vector3 p1 = cos(t)*cos(s)*u + cos(t)*sin(s)*v + sin(t)*w + c;
+        Vector3 p2 = cos(t+tStep)*cos(s)*u + cos(t+tStep)*sin(s)*v + sin(t+tStep)*w + c;
+        glVertex3f(p1[0],p1[1],p1[2]);
+        glVertex3f(p2[0],p2[1],p2[2]);
+      }
+      glEnd();
+    }
+    //for(float s = -M_PI; s <= M_PI; s += sStep)
+    //{
+    //  glBegin(GL_LINE_LOOP);
+    //  glVertex3f(c[0],c[1],c[2]);
+    //  for(float t = -M_PI/2; t <= M_PI/2; t += tStep)
+    //  {
+    //    Vector3 point = cos(t)*cos(s)*v + cos(t)*sin(s)*w + sin(t)*u + c;
+    //    glVertex3f(point[0],point[1],point[2]);
+    //  }
+    //  glEnd();
+    //}
   }
 };
 

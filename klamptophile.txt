@@ -517,33 +517,30 @@ display tree/start/goal/swept volumes, do planning
       andreas dziegielewski http://acg.cs.tau.ac.il/projects/swept-volume/project-page seems promising
  [ ] making a safe static contact
 
- [ ] new mode where you can pick and place the robot !
-
 -- wrench fields
 
  [x] create arbitrary force fields in ODE simulator
  [x] create force field visualization and visualize its effect on each link
  [x] add arrows to visualize flow of power
  [x] forces on link => make them better looking like contact wrenches
- [ ] apply force to rigidObjects and other robots in the scene
-
- [ ] compute and display distance between links and terrain
-
- [ ] enable velocity induced FF, drag force, magnetic force, etc
- [ ] use baseball bat to apply forces
+ [x] compute and display distance between links and terrain
  [x] visualize COM separately in box to quickly see wrenches attacking robot.
  [x] let force be specificable in xml file, uniform, box, uniform inside rigid object, radial from source,
 maelstrom from source, and any combination of that. Test with moving robot
 around and visualize wrenches on each link plus wrench on COM
 COM should retain orientation equal to origin so that we can see forces from
  [x] cylindrical FF
- [ ] visualize min dist between link and terrain
+ [x] visualize min dist between link and terrain
+ [x] add custom controller loop 
+ [x] * visualize force ellipsoid at each point
+ [ ] * enable velocity induced FF, drag force, magnetic force, etc
+ [ ] apply force to rigidObjects and other robots in the scene
+ [ ] use baseball bat to apply forces
  [ ] devise better way to visualize angular momentum
  [ ] add constraint to a FF to be inside a given rigid object
  [ ] execute kinodynamic path
  [ ] visualize path speed profile
  [ ] composite force fields: intersection and union
- [ ] add custom controller loop 
 
 -- important
  [x] self collisions occuring when simulating atlas in Klampt. ODERobot
