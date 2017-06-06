@@ -25,6 +25,11 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawForceField = 0;
   drawWrenchField = 0;
   drawIKextras = 0;
+  drawController = 1;
+  drawContactDistances = 1;
+  drawForceEllipsoid = 1;
+  drawDistanceRobotTerrain = 1;
+  drawCenterOfMassPath = 1;
 
   drawPlannerTree = 1;
   drawPlannerStartGoal = 1;
@@ -43,6 +48,9 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   MapButtonToggle("draw_rigid_objects_faces",&drawRigidObjectsFaces);
   MapButtonToggle("draw_rigid_objects_edges",&drawRigidObjectsEdges);
   MapButtonToggle("draw_forcefield",&drawForceField);
+  MapButtonToggle("draw_forceellipsoid",&drawForceEllipsoid);
+  MapButtonToggle("draw_distance_robot_terrain",&drawDistanceRobotTerrain);
+  MapButtonToggle("draw_com_path", &drawCenterOfMassPath);
   MapButtonToggle("draw_wrenchfield",&drawWrenchField);
 
   MapButtonToggle("draw_robot_extras",&drawRobotExtras);
@@ -76,18 +84,6 @@ bool ForceFieldBackend::OnIdle()
     uint Nlinks = robot->robot.links.size();
 
     const Terrain* terrain = sim.odesim.terrain(0);
-
-    // static bool init = true;
-    // if(init){
-    //   const Geometry::AnyCollisionGeometry3D tgeom = (*terrain->geometry);
-    //   Geometry::AnyCollisionGeometry3D tt(tgeom);
-    //   robot->robot.InitMeshCollision(tt);
-    //   init=false;
-    // }
-    //const Geometry::AnyCollisionGeometry3D tgeom = (*terrain->geometry);
-    //Geometry::AnyCollisionGeometry3D tt(tgeom);
-    //robot->robot.CleanupCollisions();
-    //robot->robot.InitMeshCollision(tt);
 
     //use own force field
     sim.odesim.SetGravity(Vector3(0,0,0));
@@ -159,7 +155,6 @@ void ForceFieldBackend::Start()
   wrenchfield.init(Nlinks);
   //for(int i = 43; i < 50; i++) showLinks[i] = 1;
   //for(int i = 29; i < 36; i++) showLinks[i] = 1;
-
 
   //disable higher drawing functions
   //drawBBs,drawPoser,drawDesired,drawEstimated,drawContacts,drawWrenches,drawExpanded,drawTime,doLogging
@@ -247,171 +242,6 @@ void ForceFieldBackend::RenderWorld()
       obj->DrawGL();
     }
   }
-  //ODERobot *simrobot = sim.odesim.robot(0);
-  //  typedef map<pair<ODEObjectID,ODEObjectID>,ContactFeedbackInfo> ContactFeedbackMap;
-  //
-  ////for (WorldSimulation::ContactFeedbackMap::iterator i = sim.contactFeedback.begin(); i != sim.contactFeedback.end(); i++) {
-  //  if(!i->second.inContact) continue;
-  //}
-
-  int drawController = 1;
-  int drawContactDistances = 1;
-
-  if(drawController){
-    int linewidth = 4;
-    //for(int i = 0; i < sim.robotControllers.size(); i++){
-    //}
-    //SmartPointer<RadialForceField>& fr = *reinterpret_cast<SmartPointer<RadialForceField>*>(&forcefields.at(i));
-    //ContactStabilityController *controller = sim.robotControllers[0];
-    SmartPointer<ContactStabilityController>& controller = *reinterpret_cast<SmartPointer<ContactStabilityController>*>(&sim.robotControllers[0]);
-    ControllerState output = controller->GetControllerState();
-
-    //output.predicted_com
-    //ODERobot *simrobot = sim.odesim.robot(0);
-    glDisable(GL_LIGHTING);
-    glEnable(GL_BLEND); 
-
-    GLColor color(1,0,0);
-    color.setCurrentGL();
-    //std::cout << "com size: " << int(output.predicted_com.size())-1 << std::endl;
-    for(int i = 0; i < int(output.predicted_com.size())-1; i++){
-      Vector3 com_cur = output.predicted_com.at(i);
-      Vector3 com_next = output.predicted_com.at(i+1);
-
-      Vector3 dc = com_next - com_cur;
-        
-      glPushMatrix();
-      glTranslate(com_cur);
-
-      //glPointSize(5);
-      //drawPoint(Vector3(0,0,0));
-
-      glLineWidth(linewidth);
-      glBegin(GL_LINES);
-      glVertex3f(0,0,0);
-      glVertex3f(dc[0],dc[1],dc[2]);
-      glEnd();
-
-      glPopMatrix();
-    }
-    GLColor green(0,1,0);
-    green.setCurrentGL();
-    for(int i = 0; i < int(output.com_window.size())-1; i++){
-      Vector3 com_cur = output.com_window.at(i);
-      Vector3 com_next = output.com_window.at(i+1);
-
-      Vector3 dc = com_next - com_cur;
-        
-      glPushMatrix();
-      glTranslate(com_cur);
-
-      glLineWidth(linewidth);
-      glBegin(GL_LINES);
-      glVertex3f(0,0,0);
-      glVertex3f(dc[0],dc[1],dc[2]);
-      glEnd();
-
-      glPopMatrix();
-    }
-  }
-  if(drawContactDistances){
-    ODERobot *robot = sim.odesim.robot(0);
-    uint Nlinks = robot->robot.links.size();
-    const Terrain* terrain = sim.odesim.terrain(0);
-    const Geometry::AnyCollisionGeometry3D tgeom = (*terrain->geometry);
-    Geometry::AnyCollisionGeometry3D tt(tgeom);
-    robot->robot.CleanupCollisions();
-    robot->robot.InitMeshCollision(tt);
-
-    glDisable(GL_LIGHTING);
-    glEnable(GL_BLEND); 
-    GLColor yellow(1,1,0);
-    GLColor white(1,1,1);
-    for(int i = 0; i < Nlinks; i++){
-      dBodyID bodyid = robot->body(i);
-      if(bodyid){
-        if(!robot->robot.IsGeometryEmpty(i)){
-          RobotLink3D *link = &robot->robot.links[i];
-          ///Jacobian (orientation,position) of a point (in frame 0) with respect to qi
-          // void GetJacobian(Real qi,const Vector3& p,Vector3& Jo,Vector3& Jp) const;
-
-          Vector3 com = link->com;
-          Matrix J;
-          //GetFullJacobian(const Vector3 p, const int i, Matrix M) point p in
-          //workspace, i-th link, returns matrix M R^{6xN}
-          robot->robot.GetFullJacobian(com, i, J);
-          uint N=J.numCols();
-          Matrix Jo(3,N);
-          Matrix Jp(3,N);
-          J.getSubMatrixCopy(0,0,Jo);
-          J.getSubMatrixCopy(3,0,Jp);
-
-          J = Jp;
-          Math::RobustSVD<Real> rsvd(J);
-          Math::SVDecomposition<Real> svd = rsvd.svd;
-          //svd.sortSVs();
-          Matrix U = svd.U;
-          Math::SVDecomposition<Real>::DiagonalMatrixT Sigma = svd.W;
-
-          if(i==14 || i==32 || i==39 || i==45){
-            //std::cout << robot->robot.LinkName(i) << std::endl;
-            for(int k = 0; k < 4; k++){
-              Vector u = U.col(k);
-              Vector3 center = link->T_World*com;
-              Vector3 dp;
-              dp[0] = Sigma(k)*u(0);
-              dp[1] = Sigma(k)*u(1);
-              dp[2] = Sigma(k)*u(2);
-              //remove zero singular values
-              if((dp).length()<1e-8){
-                continue;
-              }
-              //dp /= dp.norm();
-              dp *= 0.5;
-              Vector3 p1 = center - dp;
-              Vector3 p2 = center + dp;
-
-              glPushMatrix();
-              yellow.setCurrentGL();
-              glLineWidth(3);
-              glBegin(GL_LINES);
-              glVertex3f(p1[0],p1[1],p1[2]);
-              glVertex3f(p2[0],p2[1],p2[2]);
-              glEnd();
-              glPopMatrix();
-            }
-          }
-
-          Geometry::AnyCollisionQuery *query = robot->robot.envCollisions[i];
-          double d = query->Distance(0,0.1);
-          std::vector<Vector3> vp1,vp2;
-          query->InteractingPoints(vp1,vp2);
-          if(vp1.size()!=1){
-            std::cout << "Warning: got " << vp1.size() << " contact points for single rigid body" << std::endl;
-          }
-          Matrix4 mat = link->T_World;
-          //glMultMatrix(mat);
-          Vector3 p1 = link->T_World*vp1.front();
-          Vector3 p2 = vp2.front();
-          //Vector3 dp = p1-p2;
-
-
-          // glPushMatrix();
-          // glPointSize(5);
-          // white.setCurrentGL();
-          // drawPoint(p1);
-          // drawPoint(p2);
-          // yellow.setCurrentGL();
-          // glLineWidth(3);
-          // glBegin(GL_LINES);
-          // glVertex3f(p1[0],p1[1],p1[2]);
-          // glVertex3f(p2[0],p2[1],p2[2]);
-          // glEnd();
-          // glPopMatrix();
-        }
-      }
-    }
-  }
 
   if(drawRobot){
     for(size_t i=0;i<world->robots.size();i++) {
@@ -444,7 +274,9 @@ void ForceFieldBackend::RenderWorld()
   vector<ViewRobot> viewRobots = world->robotViews;
 
   Robot *robot = world->robots[0];
+  const ODERobot *oderobot = sim.odesim.robot(0);
   ViewRobot *viewRobot = &viewRobots[0];
+  const Terrain *terrain = sim.odesim.terrain(0);
 
   //############################################################################
   // Visualize
@@ -458,14 +290,15 @@ void ForceFieldBackend::RenderWorld()
   // drawaxes             : fancy coordinate axes
   // drawaxeslabels       : labelling of the coordinate axes [needs fixing]
   //############################################################################
-  //
+
+  if(drawCenterOfMassPath) GLDraw::drawCenterOfMassPathFromController(sim);
+  if(drawForceEllipsoid) GLDraw::drawForceEllipsoid(oderobot);
+  if(drawDistanceRobotTerrain) GLDraw::drawDistanceRobotTerrain(oderobot, terrain);
 
   if(drawRobotExtras) GLDraw::drawRobotExtras(viewRobot);
   if(drawIKextras) GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);
-
   if(drawForceField) GLDraw::drawForceField(wrenchfield);
   if(drawWrenchField) GLDraw::drawWrenchField(wrenchfield);
-
   if(drawPlannerStartGoal) GLDraw::drawGLPathStartGoal(robot, planner_p_init, planner_p_goal);
 
   for(int i = 0; i < swept_volume_paths.size(); i++){
@@ -480,7 +313,6 @@ void ForceFieldBackend::RenderWorld()
   if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
   if(drawAxesLabels) GLDraw::drawAxesLabels(viewport);
   if(drawFrames) GLDraw::drawFrames(_frames, _frameLength);
-
   
 
 }//RenderWorld
@@ -842,6 +674,12 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     toggle(drawPlannerTree);
   }else if(cmd=="draw_forcefield"){
     toggle(drawForceField);
+  }else if(cmd=="draw_forceellipsoid"){
+    toggle(drawForceEllipsoid);
+  }else if(cmd=="draw_distance_robot_terrain"){
+    toggle(drawDistanceRobotTerrain);
+  }else if(cmd=="draw_com_path"){
+    toggle(drawCenterOfMassPath);
   }else if(cmd=="draw_wrenchfield"){
     toggle(drawWrenchField);
   }else if(cmd=="load_motion_planner") {
@@ -937,8 +775,6 @@ bool GLUIForceFieldGUI::Initialize()
     //AddControl(checkbox,dpsv.c_str());
     //checkbox->set_int_val(_backend->drawPathSweptVolume.at(i));
 
-
-
     std::string dpms = "draw_path_milestones"+std::to_string(i);
     std::string descr2 = prefix + "Draw Milestones";
     checkbox = glui->add_checkbox_to_panel(panel, descr2.c_str());
@@ -967,7 +803,6 @@ bool GLUIForceFieldGUI::Initialize()
   //browser->set_allow_change_dir(1);
   //browser->fbreaddir("../data/gui");
 
-
   panel = glui->add_rollout("Fancy Decorations");
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Coordinate Axes");
   AddControl(checkbox,"draw_fancy_coordinate_axes");
@@ -989,6 +824,18 @@ bool GLUIForceFieldGUI::Initialize()
   AddControl(checkbox,"draw_wrenchfield");
   checkbox->set_int_val(_backend->drawWrenchField);
 
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Force Ellipsoid");
+  AddControl(checkbox,"draw_forceellipsoid");
+  checkbox->set_int_val(_backend->drawForceEllipsoid);
+
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw Distance Robot Terrain");
+  AddControl(checkbox,"draw_distance_robot_terrain");
+  checkbox->set_int_val(_backend->drawDistanceRobotTerrain);
+
+  checkbox = glui->add_checkbox_to_panel(panel, "Draw COM Path");
+  AddControl(checkbox,"draw_com_path");
+  checkbox->set_int_val(_backend->drawCenterOfMassPath);
+
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Robot COM+Skeleton");
   AddControl(checkbox,"draw_robot_extras");
   checkbox->set_int_val(_backend->drawRobotExtras);
@@ -1007,8 +854,13 @@ bool GLUIForceFieldGUI::Initialize()
 //################################################################################
 
   AddToKeymap("r","reset");
-  AddToKeymap("q","draw_forcefield");
-  AddToKeymap("w","draw_wrenchfield");
+
+  AddToKeymap("1","draw_forcefield");
+  AddToKeymap("2","draw_wrenchfield");
+  AddToKeymap("3","draw_forceellipsoid");
+  AddToKeymap("4","draw_distance_robot_terrain");
+  AddToKeymap("5","draw_com_path");
+
   AddToKeymap("T","toggle_mode");
   AddToKeymap("f","draw_rigid_objects_faces_toggle");
   AddToKeymap("e","draw_rigid_objects_edges_toggle");
@@ -1059,7 +911,6 @@ void GLUIForceFieldGUI::AddToKeymap(const char *key, const char *s){
   std::string descr(s);
   descr = std::regex_replace(descr, std::regex("_"), " ");
 
-  //_keymap[key] = descr.c_str();
   _keymap[key] = descr;
 }
 
@@ -1074,7 +925,6 @@ void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
           std::cout << it->first << ": " << it->second << '\n';
         }
 
-        //printf("save motion planner \n");
         break;
 
       case 'S':

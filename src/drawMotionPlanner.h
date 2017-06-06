@@ -30,6 +30,10 @@ namespace GLDraw {
   void drawAxesLabels(Camera::Viewport& viewport);
   void drawFrames(std::vector< std::vector<Vector3> > &frames, std::vector<double> frameLength);
 
+  void drawCenterOfMassPathFromController(WorldSimulation &sim);
+  void drawForceEllipsoid( const ODERobot *robot );
+  void drawDistanceRobotTerrain(const ODERobot *robot, const Terrain* terrain);
 
-  void drawEllipsoid(Vector3 &u, Vector3 &v, Vector3 &w, int numSteps);
+  void drawWireEllipsoid(Vector3 &c, Vector3 &u, Vector3 &v, Vector3 &w, int numSteps=16);
+  void drawEllipsoid(Vector3 &c, Vector3 &u, Vector3 &v, Vector3 &w, int numSteps=16);
 };

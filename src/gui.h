@@ -22,6 +22,34 @@
 
 #define DEBUG 0
 
+class GUIVariable
+{
+  private:
+    bool active;
+    char hotkey;
+    std::string name;
+    std::string descr;
+  public:
+
+    GUIVariable(std::string name);
+    GUIVariable(std::string name, std::string descr);
+    GUIVariable(std::string name, bool active);
+    GUIVariable(std::string name, char hotkey);
+    GUIVariable(std::string name, std::string descr, char hotkey);
+    GUIVariable(std::string name, std::string descr, char hotkey, bool active);
+
+    void toggle(){
+      if(active) active=false;
+      else active=true;
+    }
+
+    operator bool() const{
+      return active;
+    }
+    bool operator!() const{
+      return !active;
+    }
+}
 
 class ForceFieldBackend : public SimTestBackend
 {
@@ -67,13 +95,6 @@ class ForceFieldBackend : public SimTestBackend
   virtual bool Load(const char* file);
   virtual bool Load(TiXmlElement *node);
 
-  //void ShowPath(){ drawPath=true; }
-  //void HidePath(){ drawPath=false; }
-  //void ShowPlannerTree(){ drawPlannerTree=true; }
-  //void HidePlannerTree(){ drawPlannerTree=false; }
-  //void ShowPlannerStartGoal(){ drawPlannerStartGoal=true; }
-  //void HidePlannerStartGoal(){ drawPlannerStartGoal=false; }
-
   void ShowCoordinateAxes(){ drawAxes = 1; }
   void HideCoordinateAxes(){ drawAxes = 0; }
   void ShowRobot(){ drawRobot = 1; }
@@ -92,22 +113,26 @@ class ForceFieldBackend : public SimTestBackend
 
   void AddPath(const std::vector<Config> &keyframes, GLColor color = GLColor(0.8,0.8,0.8), uint Nkeyframes_alongpath=10);
   void AddPathInterpolate(const std::vector<Config> &keyframes, GLColor color = GLColor(0.8,0.8,0.8), uint Nkeyframes_alongpath=10);
-  //std::vector<Config> getPathKeyFrames(uint pathid);
 
   const std::vector<Config>& getPathKeyFrames(uint pathid);
   void ClearPaths();
-
   void VisualizePlannerTree(const SerializedTree &tree);
 
   void DrawText(int x,int y, std::string s);
 
-  int showSweptVolumes;
-
   std::vector<int> showLinks; //hide certain links 
-
   std::vector<int> drawPathSweptVolume;
   std::vector<int> drawPathMilestones;
   std::vector<int> drawPathStartGoal;
+
+  int showSweptVolumes;
+
+  int drawController;
+  int drawContactDistances;
+
+  int drawForceEllipsoid;
+  int drawDistanceRobotTerrain;
+  int drawCenterOfMassPath;
 
   int drawForceField;
   int drawWrenchField;

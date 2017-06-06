@@ -532,9 +532,9 @@ COM should retain orientation equal to origin so that we can see forces from
  [x] cylindrical FF
  [x] visualize min dist between link and terrain
  [x] add custom controller loop 
- [ ] * visualize force ellipsoid at each point
- [ ] apply force to rigidObjects and other robots in the scene
+ [x] * visualize force ellipsoid at each point
  [ ] * enable velocity induced FF, drag force, magnetic force, etc
+ [ ] apply force to rigidObjects and other robots in the scene
  [ ] use baseball bat to apply forces
  [ ] devise better way to visualize angular momentum
  [ ] add constraint to a FF to be inside a given rigid object
