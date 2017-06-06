@@ -49,7 +49,7 @@ class GUIVariable
     bool operator!() const{
       return !active;
     }
-}
+};
 
 class ForceFieldBackend : public SimTestBackend
 {
