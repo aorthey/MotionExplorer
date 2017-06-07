@@ -780,7 +780,15 @@ namespace GLDraw{
             }
             GLColor magenta(0.5,0,1,0.5);
             magenta.setCurrentGL();
-            drawWireEllipsoid(center, axes.at(0),axes.at(1),axes.at(2),8);
+            if(axes.size()>3){
+              std::cout << "more than three axes for Ellipsoid. Something is wrong" << std::endl;
+              exit(0);
+            }
+            if(axes.size()<3){
+              std::cout << "Warning: ellipsoid is singular" << std::endl;
+            }else{
+              drawWireEllipsoid(center, axes.at(0),axes.at(1),axes.at(2),8);
+            }
           }
         }
       }

@@ -447,6 +447,7 @@ plannersettings into the xml, so that we can load planner+start/goal config
 without recompiling. Delete the whole plannersetup folder!
  [ ] update to klampt-0.7
  [ ] visualize wrench cone at contact
+ [ ] restructure GUI to use GUIVariables
 
 -- irreducible paths
 
@@ -486,6 +487,7 @@ model?) -> one of the cylinders pierced the head sphere creating a spurious coll
  [x] rewrite introduction and experimental part
  [x] experiment door 100x1200 complete
  [ ] experiment wall 10x3600*24 complete (running)
+ [ ] change title to dimred for mp using ip
  [ ] incorporate reviews/edits/comments from OOM
 
 -- abstractions (longterm goals)
@@ -533,14 +535,15 @@ COM should retain orientation equal to origin so that we can see forces from
  [x] visualize min dist between link and terrain
  [x] add custom controller loop 
  [x] * visualize force ellipsoid at each point
- [ ] * enable velocity induced FF, drag force, magnetic force, etc
+ [ ] enable velocity induced FF, drag force, magnetic force, etc
  [ ] apply force to rigidObjects and other robots in the scene
- [ ] use baseball bat to apply forces
- [ ] devise better way to visualize angular momentum
- [ ] add constraint to a FF to be inside a given rigid object
- [ ] execute kinodynamic path
- [ ] visualize path speed profile
  [ ] composite force fields: intersection and union
+
+ [ ] * add constraint to a FF to be inside a given rigid object
+ [ ] * execute kinodynamic path
+ [ ] * flow following by forward simulating a PID controlled device
+ [ ] * visualize path speed profile *reuse python display and display in topp
+ [ ] * replace propagation by undulatory motions along each axis, but how would that work?
 
 -- important
  [x] self collisions occuring when simulating atlas in Klampt. ODERobot

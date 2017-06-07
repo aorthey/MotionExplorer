@@ -149,12 +149,10 @@ void ForceFieldBackend::Start()
     showLinks[i] = 0;
   }
   showLinks[15] = 1;
-
-  //ForceField init
-
-  wrenchfield.init(Nlinks);
   //for(int i = 43; i < 50; i++) showLinks[i] = 1;
   //for(int i = 29; i < 36; i++) showLinks[i] = 1;
+
+  wrenchfield.init(Nlinks);
 
   //disable higher drawing functions
   //drawBBs,drawPoser,drawDesired,drawEstimated,drawContacts,drawWrenches,drawExpanded,drawTime,doLogging
@@ -211,8 +209,6 @@ void ForceFieldBackend::RenderWorld()
   drawDesired=0;
 
   for(size_t i=0;i<world->terrains.size();i++){
-    //world->terrains[i]->geometry.Appearance()->SetColor(0.5,0.5,0.5,1.0);
-    //world->terrains[i]->DrawGL();
     Terrain *terra = world->terrains[i];
     GLDraw::GeometryAppearance* a = terra->geometry.Appearance();
     a->SetColor(GLColor(0.9,0.5,0.1,1.0));
@@ -221,9 +217,7 @@ void ForceFieldBackend::RenderWorld()
     a->drawVertices = false;
     if(drawRigidObjectsFaces) a->drawFaces = true;
     if(drawRigidObjectsEdges) a->drawEdges = true;
-    //a->vertexSize = 10;
-    a->edgeSize = 20;
-
+    a->edgeSize = 10;
     terra->DrawGL();
   }
 

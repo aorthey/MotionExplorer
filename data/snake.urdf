@@ -2,7 +2,7 @@
 <robot name="snake">
 <link name="eye">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -21,7 +21,7 @@
 
  <link name="head">
   <inertial>
-    <mass value="0.05"/>
+    <mass value="1"/>
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
@@ -49,7 +49,7 @@ body0
 ##############################################################################-->
  <link name="body0_cylinder">
   <inertial>
-    <mass value="0.05"/>
+    <mass value="1"/>
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
@@ -74,7 +74,7 @@ body0
 
 <link name="body0">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -99,7 +99,7 @@ body0
 
  <link name="body1_cylinder">
   <inertial>
-    <mass value="0.05"/>
+    <mass value="1"/>
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
@@ -121,13 +121,13 @@ body0
   <parent link="body0"/>
   <child link="body0_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body0_spherical_joint_link" physical="0">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -149,13 +149,13 @@ body0
   <parent link="body0_spherical_joint_link"/>
   <child link="body1_cylinder"/>
   <axis xyz="0 1 0"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body1">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -180,7 +180,7 @@ body0
 
  <link name="body2_cylinder">
   <inertial>
-    <mass value="0.05"/>
+    <mass value="1"/>
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
@@ -202,13 +202,13 @@ body0
   <parent link="body1"/>
   <child link="body1_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body1_spherical_joint_link" physical="0">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -230,13 +230,13 @@ body0
   <parent link="body1_spherical_joint_link"/>
   <child link="body2_cylinder"/>
   <axis xyz="0 1 0"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body2">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -261,7 +261,7 @@ body0
 
  <link name="body3_cylinder">
   <inertial>
-    <mass value="0.05"/>
+    <mass value="1"/>
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
@@ -283,13 +283,13 @@ body0
   <parent link="body2"/>
   <child link="body2_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body2_spherical_joint_link" physical="0">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -311,13 +311,13 @@ body0
   <parent link="body2_spherical_joint_link"/>
   <child link="body3_cylinder"/>
   <axis xyz="0 1 0"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body3">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -342,7 +342,7 @@ body0
 
  <link name="body4_cylinder">
   <inertial>
-    <mass value="0.05"/>
+    <mass value="1"/>
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
@@ -364,13 +364,13 @@ body0
   <parent link="body3"/>
   <child link="body3_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body3_spherical_joint_link" physical="0">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -392,13 +392,13 @@ body0
   <parent link="body3_spherical_joint_link"/>
   <child link="body4_cylinder"/>
   <axis xyz="0 1 0"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body4">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -423,7 +423,7 @@ body0
 
  <link name="body5_cylinder">
   <inertial>
-    <mass value="0.05"/>
+    <mass value="1"/>
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
@@ -445,13 +445,13 @@ body0
   <parent link="body4"/>
   <child link="body4_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body4_spherical_joint_link" physical="0">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -473,13 +473,13 @@ body0
   <parent link="body4_spherical_joint_link"/>
   <child link="body5_cylinder"/>
   <axis xyz="0 1 0"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body5">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -504,7 +504,7 @@ body0
 
  <link name="body6_cylinder">
   <inertial>
-    <mass value="0.05"/>
+    <mass value="1"/>
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
@@ -526,13 +526,13 @@ body0
   <parent link="body5"/>
   <child link="body5_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body5_spherical_joint_link" physical="0">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -554,13 +554,13 @@ body0
   <parent link="body5_spherical_joint_link"/>
   <child link="body6_cylinder"/>
   <axis xyz="0 1 0"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body6">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -585,7 +585,7 @@ body0
 
  <link name="body7_cylinder">
   <inertial>
-    <mass value="0.05"/>
+    <mass value="1"/>
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
@@ -607,13 +607,13 @@ body0
   <parent link="body6"/>
   <child link="body6_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body6_spherical_joint_link" physical="0">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -635,13 +635,13 @@ body0
   <parent link="body6_spherical_joint_link"/>
   <child link="body7_cylinder"/>
   <axis xyz="0 1 0"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body7">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -666,7 +666,7 @@ body0
 
  <link name="body8_cylinder">
   <inertial>
-    <mass value="0.05"/>
+    <mass value="1"/>
     <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <visual>
@@ -688,13 +688,13 @@ body0
   <parent link="body7"/>
   <child link="body7_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body7_spherical_joint_link" physical="0">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
@@ -716,13 +716,13 @@ body0
   <parent link="body7_spherical_joint_link"/>
   <child link="body8_cylinder"/>
   <axis xyz="0 1 0"/>
-  <dynamics damping="0.5" friction="0"/>
+  <dynamics damping="0.1" friction="0"/>
   <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body8">
   <inertial>
-  <mass value="0.05"/>
+  <mass value="1"/>
   <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
   </inertial>
   <collision>
