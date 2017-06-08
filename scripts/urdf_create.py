@@ -1,15 +1,19 @@
 import numpy as np
 from math import cos,sin,pi
 
-mass = 0.05
-damping = 0.5
+mass = 1
+damping = 0.1
 effort = 0.01
 velocity=100
+
+
 def createCylinder(lname,x,y,z,radius,length,COLLISION_ENABLED=True):
+  Ixx = Iyy = (1.0/12.0)*mass*length*length + (1.0/4.0)*mass*radius*radius
+  Izz = (1.0/4.0)*mass*radius*radius
   s= ' <link name="'+lname+'">\n'
   s+= '  <inertial>\n'
   s+= '    <mass value="'+str(mass)+'"/>\n'
-  s+= '    <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>\n'
+  s+= '    <inertia ixx="'+str(Ixx)+'" ixy="0" ixz="0" iyy="'+str(Iyy)+'" iyz="0" izz="'+str(Izz)+'"/>\n'
   s+= '  </inertial>\n'
   s+= '  <visual>\n'
   s+= '    <origin rpy="0 1.54 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
@@ -17,25 +21,26 @@ def createCylinder(lname,x,y,z,radius,length,COLLISION_ENABLED=True):
   s+= '      <cylinder length="'+str(length)+'" radius="'+str(radius)+'"/>\n'
   s+= '    </geometry>\n'
   s+= '  </visual>\n'
-  #if COLLISION_ENABLED:
-  s+= '  <collision>\n'
-  s+= '    <origin rpy="0 1.57 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
-  s+= '    <geometry>\n'
-  s+= '      <cylinder length="'+str(length)+'" radius="'+str(radius)+'"/>\n'
-  s+= '    </geometry>\n'
-  s+= '  </collision>\n'
-  s+= ' </link>\n\n'
+  if COLLISION_ENABLED:
+    s+= '  <collision>\n'
+    s+= '    <origin rpy="0 1.57 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
+    s+= '    <geometry>\n'
+    s+= '      <cylinder length="'+str(length)+'" radius="'+str(radius)+'"/>\n'
+    s+= '    </geometry>\n'
+    s+= '  </collision>\n'
+    s+= ' </link>\n\n'
   return s
 
 def createSphere(lname,x,y,z,radius,PHYSICAL=True):
+  Ixx = Iyy = Izz = (2.0/5.0)*mass*radius*radius
   s=''
   if PHYSICAL:
     s+='<link name="'+lname+'">\n'
   else:
     s+='<link name="'+lname+'" physical="0">\n'
   s+='  <inertial>\n'
-  s+='  <mass value="'+str(mass)+'"/>\n'
-  s+='  <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>\n'
+  s+='   <mass value="'+str(mass)+'"/>\n'
+  s+='   <inertia ixx="'+str(Ixx)+'" ixy="0" ixz="0" iyy="'+str(Iyy)+'" iyz="0" izz="'+str(Izz)+'"/>\n'
   s+='  </inertial>\n'
   s+='  <collision>\n'
   s+='    <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'

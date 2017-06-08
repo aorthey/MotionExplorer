@@ -52,6 +52,7 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
   //name = name_robot + "_" + name_environment;
   //std::cout << name << std::endl;
 
+
   info(&world);
   Robot *robot = world.robots[0];
 
@@ -81,6 +82,10 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     robot->q = pin.q_goal;
     robot->UpdateFrames();
   }
+  //WorldSimulation sim = _backend->sim;
+  ODERobot *simrobot = _backend->sim.odesim.robot(0);
+  simrobot->EnableSelfCollisions(true);
+  std::cout << "SelfCollisionsEnabled" << std::endl;
 
   _backend->wrenchfield.LoadFromWorldFile(file_name.c_str());
   _backend->wrenchfield.print();

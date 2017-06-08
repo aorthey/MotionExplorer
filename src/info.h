@@ -84,11 +84,11 @@ class Info
           std::cout<< "Link[" << i << "] " << linkNames[i] << " mass " << links[i].mass << std::endl;
         }
 
-        std::cout << std::string(80, '-') << std::endl;
-        vector<RobotJoint> joints = (*it)->joints;
-        for(int i = 0; i< joints.size(); i++){
-          std::cout<< "Joint[" << i << "] linkidx " << joints[i].linkIndex << " baseidx " << joints[i].baseIndex << " type " << joints[i].type << std::endl;
-        }
+        //std::cout << std::string(80, '-') << std::endl;
+        //vector<RobotJoint> joints = (*it)->joints;
+        //for(int i = 0; i< joints.size(); i++){
+        //  std::cout<< "Joint[" << i << "] linkidx " << joints[i].linkIndex << " baseidx " << joints[i].baseIndex << " type " << joints[i].type << std::endl;
+        //}
 
         std::cout << std::string(80, '-') << std::endl;
         vector<RobotJointDriver> drivers = (*it)->drivers;
@@ -102,7 +102,7 @@ class Info
           double qL = (*it)->qMin[i];
           double qU = (*it)->qMax[i];
           if(fabs(qU-qL) > 1e-8) Neffective++;
-          std::cout << "#qlimit [" << i << "] " << (*it)->qMin[i] << " - " <<  (*it)->qMax[i] << std::endl;
+          //std::cout << "#qlimit [" << i << "] " << (*it)->qMin[i] << " - " <<  (*it)->qMax[i] << std::endl;
         }
         //SE(3) element: X Y Z yaw pitch roll
         std::cout << std::string(80, '-') << std::endl;
@@ -114,6 +114,19 @@ class Info
         std::cout << "Dimensionality          : " << (*it)->qMin.size() << std::endl;
         std::cout << "Effective dimensionality: " << Neffective << " (removing zero measure dimensions)" << std::endl;
         std::cout << std::string(80, '-') << std::endl;
+
+        for(int i = 0; i < (*it)->qMin.size(); i++){
+          double qL = (*it)->qMin[i];
+          double qU = (*it)->qMax[i];
+          double vL = (*it)->velMin[i];
+          double vU = (*it)->velMax[i];
+          double aL = -(*it)->accMax[i];
+          double aU = (*it)->accMax[i];
+          if(fabs(qU-qL) > 1e-8) 
+          std::cout << "#q= [" << i << "] " << qL << "<=   q <=" << qU << " | "
+                                            << vL << "<=  dq <=" << vU << " | "
+                                            << aL << "<= ddq <=" << aU << std::endl;
+        }
 
       }//for all robots
 

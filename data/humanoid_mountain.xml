@@ -8,19 +8,20 @@
     
   <robot name="HRP2" file="data/robots/hrp2.rob" config="36 1.53399 0 1.51278 6.28319 -0 6.28319 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 -0 "/>
   <robot name="atlas" file="data/robots/atlas.rob" config="46 2.97692 2.53272 0.733276 4.97226 -1.211 0.568614 -0.00251273 -0.0179597 -0.587503 0.00632426 0.0206146 -0.00196797 0.0282358 0.00198077 0.037607 -0.00352839 0 0 0 0.000168385 0 0 0 0 0 0 0 0.0270821 -0.124572 -0.00111701 -0.0872056 -0.00442587 -0.0355846 0 0.000550363 0.0380947 0.00434231 -0.00045954 -0.000423695 0.0111652 -0.000759861 -0.0191312 0.0103818 0.00398571 0.00258749 0.00287771 "/>
+  <robot name="atlas" file="data/robots/atlas.rob" config="46 2.97692 2.53272 0.733276 4.97226 -1.211 0.568614 -0.00251273 -0.0179597 -0.587503 0.00632426 0.0206146 -0.00196797 0.0282358 0.00198077 0.037607 -0.00352839 0 0 0 0.000168385 0 0 0 0 0 0 0 0.0270821 -0.124572 -0.00111701 -0.0872056 -0.00442587 -0.0355846 0 0.000550363 0.0380947 0.00434231 -0.00045954 -0.000423695 0.0111652 -0.000759861 -0.0191312 0.0103818 0.00398571 0.00258749 0.00287771 "/>
   -->
 
-  <robot name="snake" file="/home/aorthey/git/orthoklampt/data/snake.urdf" translation="0 0 0" rotateRPY="0 0 0" config="33  0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
-    
+  <robot name="snake" file="/home/aorthey/git/orthoklampt/data/snake.urdf" translation="0 0 0" rotateRPY="0 0 0" config="21  0 0 2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
+
   <terrain file="/home/aorthey/git/orthoklampt/data/terrains/mountain/ridge.tri" translation="0 0 -2">
-    <display color="0.0 0.8 0.8"/>
+    <display color="0.9 0.5 0.1"/>
   </terrain>
 
   <forcefield>
 
-    <radial source="0 0 1" power="3" radius="2" color="0 0 1"/>
+    <radial source="1.5 1 2" power="-3" radius="2" color="0 0 1"/>
 
-    <radial source="1 1 2" power="5" radius="2" color="0 0 1"/>
+    <radial source="1 1 2" power="3" radius="2" color="0 0 1"/>
 
     <cylindrical source="3 3 0" direction="0.2 0.2 1.0" elongation="2" radius="2" power="-5" color="0.1 0.1 0.1"/>
 

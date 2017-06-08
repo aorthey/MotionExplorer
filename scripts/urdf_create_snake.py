@@ -6,13 +6,13 @@ from urdf_create import *
 
 
 robot_names = ['snake','snake_irreducible']
-env_names = ['turbine/turbine.tri','twister/twister.tri','underwater/underwater.tri']
-Nsegments_vec = [9,1]
+env_names = ['twister/twister.tri','underwater/underwater.tri']
+Nsegments_vec = [5,1]
 
 length = 0.1
 limit = pi/4
 stublength = length/4
-radius = 0.01
+radius = 0.05
 headradius = 0.1
 kappa = (2*sin(limit))/(length*Nsegments_vec[0])
 
@@ -143,9 +143,10 @@ for k in range(0,len(robot_names)):
     terrainstr += ' translation="0 0 0"/>\n\n'
     f.write(terrainstr)
 
+    Njoints = 6 + 1 + 2*(Nsegments-1) + (1+Nsegments)
     plannersettingsstr  = '  <plannersettings>\n\n'
-    plannersettingsstr += '    <qinit config="33  -3.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>\n'
-    plannersettingsstr += '    <qgoal config="33  5.2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>\n'
+    plannersettingsstr += '    <qinit config="'+str(Njoints)+'  -3.3 0 0'+(Njoints-3)*" 0"+'"/>\n'
+    plannersettingsstr += '    <qgoal config="'+str(Njoints)+'  5.2 0 0'+(Njoints-3)*" 0"+'"/>\n'
     plannersettingsstr += '    <se3min config="6  -6 -6 -1 -3.141592 -1.57 -3.14"/>\n'
     plannersettingsstr += '    <se3max config="6  6 6 16 3.141592 1.57 3.14"/>\n\n'
     plannersettingsstr += '  </plannersettings>\n\n'

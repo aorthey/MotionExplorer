@@ -83,8 +83,6 @@ bool ForceFieldBackend::OnIdle()
     ODERobot *robot = sim.odesim.robot(0);
     uint Nlinks = robot->robot.links.size();
 
-    const Terrain* terrain = sim.odesim.terrain(0);
-
     //use own force field
     sim.odesim.SetGravity(Vector3(0,0,0));
     sim.hooks.clear();
@@ -211,12 +209,13 @@ void ForceFieldBackend::RenderWorld()
   for(size_t i=0;i<world->terrains.size();i++){
     Terrain *terra = world->terrains[i];
     GLDraw::GeometryAppearance* a = terra->geometry.Appearance();
-    a->SetColor(GLColor(0.9,0.5,0.1,1.0));
+    //a->SetColor(GLColor(0.9,0.5,0.1,0.2));
     a->drawFaces = false;
     a->drawEdges = false;
     a->drawVertices = false;
     if(drawRigidObjectsFaces) a->drawFaces = true;
     if(drawRigidObjectsEdges) a->drawEdges = true;
+    a->vertexSize = 1;
     a->edgeSize = 10;
     terra->DrawGL();
   }
@@ -259,7 +258,6 @@ void ForceFieldBackend::RenderWorld()
     }
   }
 
-
   BaseT::RenderWorld();
 
   glEnable(GL_BLEND);
@@ -270,7 +268,6 @@ void ForceFieldBackend::RenderWorld()
   Robot *robot = world->robots[0];
   const ODERobot *oderobot = sim.odesim.robot(0);
   ViewRobot *viewRobot = &viewRobots[0];
-  const Terrain *terrain = sim.odesim.terrain(0);
 
   //############################################################################
   // Visualize
@@ -287,7 +284,11 @@ void ForceFieldBackend::RenderWorld()
 
   if(drawCenterOfMassPath) GLDraw::drawCenterOfMassPathFromController(sim);
   if(drawForceEllipsoid) GLDraw::drawForceEllipsoid(oderobot);
-  if(drawDistanceRobotTerrain) GLDraw::drawDistanceRobotTerrain(oderobot, terrain);
+
+  if(!world->terrains.empty() && drawDistanceRobotTerrain){
+    const Terrain *terrain = world->terrains[0];
+    GLDraw::drawDistanceRobotTerrain(oderobot, terrain);
+  }
 
   if(drawRobotExtras) GLDraw::drawRobotExtras(viewRobot);
   if(drawIKextras) GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);

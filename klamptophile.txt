@@ -540,9 +540,10 @@ COM should retain orientation equal to origin so that we can see forces from
  [ ] composite force fields: intersection and union
 
  [ ] * add constraint to a FF to be inside a given rigid object
- [ ] * execute kinodynamic path
- [ ] * flow following by forward simulating a PID controlled device
- [ ] * visualize path speed profile *reuse python display and display in topp
+ [ ] *** simulate snake, make sure there are no glitches
+ [ ] ** execute kinodynamic path
+ [ ] ** flow following by forward simulating a PID controlled device
+ [ ] ** visualize path speed profile (reuse python display and display in topp)
  [ ] * replace propagation by undulatory motions along each axis, but how would that work?
 
 -- important
