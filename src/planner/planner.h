@@ -74,7 +74,7 @@ class MotionPlanner{
     virtual bool Load(TiXmlElement *node);
 
   protected:
-    virtual bool solve_internal(Config &p_init, Config &p_goal);
+    //virtual bool solve_internal(Config &p_init, Config &p_goal);
 };
 bool Save(const std::vector<Config> &keyframes, const char* file);
 bool Save(const std::vector<Config> &keyframes, TiXmlElement *node);
