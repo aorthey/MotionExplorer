@@ -14,7 +14,7 @@
 
 #include "util.h"
 #include "info.h"
-#include "controller.h"
+//#include "controller.h"
 #include "gui.h"
 #include "environment_loader.h"
 #include "planner/planner_ompl.h"

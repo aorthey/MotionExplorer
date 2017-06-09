@@ -174,7 +174,7 @@ void PostRunEventHumanoid(const ob::PlannerPtr &planner, ot::Benchmark::RunPrope
       Config cur = OMPLStateToConfig(state, cspace->getPtr());
       keyframes.push_back(cur);
     }
-    std::string sfile = "humanoid_wall_full_"+std::to_string(pid)+".xml";
+    std::string sfile = "random_"+std::to_string(pid)+".xml";
     std::cout << "Saving keyframes"<< std::endl;
     Save(keyframes, sfile.c_str());
   }else{

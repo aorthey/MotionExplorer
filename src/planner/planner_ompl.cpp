@@ -480,7 +480,7 @@ void SentinelPropagator::propagate(const ob::State *state, const oc::Control* co
   Config uSE3;
   uSE3.resize(6);
   uSE3.setZero();
-  uSE3(0) = ucontrol[0]; //include torsion?
+  uSE3(0) = ucontrol[0];
   uSE3(1) = ucontrol[1];
   uSE3(2) = ucontrol[2];
   uSE3(3) = ucontrol[3];
@@ -572,7 +572,7 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
       Config cur = OMPLStateToConfig(state, cspace->getPtr());
       keyframes.push_back(cur);
     }
-    std::string sfile = "ompl"+std::to_string(pid)+".xml";
+    std::string sfile = "ompl_"+std::to_string(pid)+".xml";
     std::cout << "Saving keyframes"<< std::endl;
     Save(keyframes, sfile.c_str());
   }else{
@@ -587,9 +587,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
 {
   this->_p_init = p_init;
   this->_p_goal = p_goal;
-  Robot *robot = _world->robots[_irobot];
   robot->UpdateConfig(_p_init);
-
   this->_world->InitCollisions();
 
   std::cout << std::string(80, '-') << std::endl;
@@ -664,9 +662,9 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   //const oc::SpaceInformationPtr si = ss.getSpaceInformation();
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
-  ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
+  ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
 
   //###########################################################################
   // setup and projection

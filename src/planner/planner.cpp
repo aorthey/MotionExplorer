@@ -11,6 +11,8 @@ MotionPlanner::MotionPlanner(RobotWorld *world):
   //assert(world->robots.size() == 1);
   _irobot = 0;
   _icontroller = 0;
+  robot = world->robots[_irobot];
+
 }
 const KinodynamicMilestonePath& MotionPlanner::GetPath()
 {
@@ -479,7 +481,6 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
 {
   std::clock_t start = std::clock();
 
-
   this->_p_init = p_init;
   this->_p_goal = p_goal;
   this->_timelimit = timelimit;
@@ -488,11 +489,9 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   this->_world->InitCollisions();
 
   std::cout << std::string(80, '-') << std::endl;
-
   std::cout << "Motion Planner:" << this->getName() << std::endl;
   std::cout << "p_init =" << p_init << std::endl;
   std::cout << "p_goal =" << p_goal << std::endl;
-
   std::cout << std::string(80, '-') << std::endl;
 
   //###########################################################################
@@ -526,146 +525,6 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
 
   CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, plannersettings.goalRegionConvergence);
 
-  bool geometric = false;
-
-  if(!geometric){
-    //###########################################################################
-    // Dynamic Planning
-    //###########################################################################
-
-    //RRTKinodynamicPlanner krrt(&kcspace);
-    ///////LazyRRTKinodynamicPlanner krrt(&kcspace);
-    RGRRT krrt(&kcspace, plannersettings.Nreachableset);
-
-    krrt.goalSeekProbability= plannersettings.goalSeekProbability;
-    krrt.goalSet = &goalSet;
-    krrt.Init(_p_init);
-
-    ///////RRTKinodynamicPlanner2 krrt(&kcspace);
-    ///////krrt.Init(_p_init,_p_goal);
-    ///////BidirectionalRRTKP
-    ///////BidirectionalRRTKP krrt(&kcspace);
-    ///////UnidirectionalRRTKP krrt(&kcspace);
-    ///////
-
-    _isSolved = krrt.Plan(plannersettings.iterations);
-
-    _stree.clear();
-    SerializeTree(krrt.tree, _stree);
-    SerializeTreeAddCostToGoal(_stree, &kcspace, _p_goal);
-    ///////SerializeTreeCullClosePoints(_stree, &kcspace,0.3);
-    ///////SerializeTreeRandomlyCullPoints(_stree, plannersettings.maxDisplayedPointsInTree);
-    ///////SerializeTreeCost(krrt.tree, _stree, &goalSet);
-
-    if(_isSolved)
-    {
-      std::cout << "Found solution path" << std::endl;
-      KinodynamicMilestonePath path;
-      krrt.CreatePath(path);
-
-      Config cur;
-      double dstep = plannersettings.discretizationOutputPath;
-      vector<Config> keyframes;
-      for(double d = 0; d <= 1; d+=dstep)
-      {
-        path.Eval(d,cur);
-        std::cout << d << cur << std::endl;
-        _keyframes.push_back(cur);
-      }
-      std::cout << std::string(80, '-') << std::endl;
-
-    }else{
-      std::cout << "[Motion Planner] No path found." << std::endl;
-      std::cout << "Tree size " << _stree.size() << std::endl;
-      for(int i = 0; i < _stree.size(); i++){
-        std::cout << _stree.at(i).position << std::endl;
-      }
-    }
-    return _isSolved;
-  }else{
-    //###########################################################################
-    // Kinematic Planning
-    //###########################################################################
-    MotionPlannerFactory factory;
-    //factory.perturbationRadius = 0.1;
-    //factory.type = "rrt";
-    //factory.type = "prm";
-    //factory.type = "sbl";
-    //factory.type = "sblprt";
-    //factory.type = "rrt*";
-    //factory.type = "lazyrrg*";
-    //factory.type = "fmm"; //warning: slows down system 
-    //factory.type = "sbl";
-    //factory.type = "ompl:rrt";
-    //factory.type = "ompl:est";
-    //factory.type = "ompl:rrt*";
-    //factory.type = "ompl:fmt";
-    //factory.type = "ompl:sbl";
-    factory.type = "ompl:rrtconnect";
-    factory.shortcut = true;
-
-    SmartPointer<MotionPlannerInterface> planner = factory.Create(&kcspace,_p_init,_p_goal);
-
-    HaltingCondition cond;
-    cond.foundSolution=false;
-    cond.timeLimit = 5;
-
-    std::cout << "Start Planning" << std::endl;
-    MilestonePath mpath;
-    string res = planner->Plan(mpath,cond);
-    if(mpath.edges.empty())
-    {
-     printf("Planning failed\n");
-     this->_isSolved = false;
-    }else{
-     printf("Planning succeeded, path has length %g\n",mpath.Length());
-     this->_isSolved = true;
-    }
-
-    ////###########################################################################
-    //// Extract roadmap from planner
-    ////###########################################################################
-    RoadmapPlanner roadmap(&kcspace);
-    planner->GetRoadmap(roadmap);
-
-    std::cout << roadmap.roadmap.NumNodes() << " Nodes" << std::endl;
-    _stree.clear();
-    SerializeTree(roadmap, _stree);
-    SerializeTreeAddCostToGoal(_stree, &kcspace, _p_goal);
-
-
-    ////###########################################################################
-    //// Time Optimize Path, Convert to MultiPath and Save Path
-    ////###########################################################################
-    if(_isSolved)
-    {
-      std::cout << "Found solution path" << std::endl;
-      //KinodynamicMilestonePath path;
-      //planner.CreatePath(path);
-
-      Config cur;
-      double dstep = plannersettings.discretizationOutputPath;
-      vector<Config> keyframes;
-      for(double d = 0; d <= 1; d+=dstep)
-      {
-        mpath.Eval(d,cur);
-        //std::cout << d << cur << std::endl;
-        _keyframes.push_back(cur);
-      }
-      std::cout << std::string(80, '-') << std::endl;
-
-    }else{
-      std::cout << "[Motion Planner] No path found." << std::endl;
-      std::cout << "Tree size " << _stree.size() << std::endl;
-      for(int i = 0; i < _stree.size(); i++){
-        std::cout << _stree.at(i).position << std::endl;
-      }
-    }
-    std::clock_t end = std::clock();
-    double duration = ( end - start ) / (double) CLOCKS_PER_SEC;
-    std::cout << "Planning Time T=" << duration << std::endl;
-    return _isSolved;
-  }
 }
 
 void MotionPlanner::SendCommandStringController(string cmd, string arg)

@@ -534,14 +534,16 @@ COM should retain orientation equal to origin so that we can see forces from
  [x] cylindrical FF
  [x] visualize min dist between link and terrain
  [x] add custom controller loop 
- [x] * visualize force ellipsoid at each point
+ [x] visualize force ellipsoid at each point
  [ ] enable velocity induced FF, drag force, magnetic force, etc
  [ ] apply force to rigidObjects and other robots in the scene
  [ ] composite force fields: intersection and union
 
+ [x] simulate snake, make sure there are no glitches
  [ ] * add constraint to a FF to be inside a given rigid object
- [ ] *** simulate snake, make sure there are no glitches
- [ ] ** execute kinodynamic path
+ [ ] *** do kinodynamic planning /w FF
+ [ ] *** do topp with non-uniform FF
+ [ ] *** execute/simulate kinodynamic path (use jet propulsion)
  [ ] ** flow following by forward simulating a PID controlled device
  [ ] ** visualize path speed profile (reuse python display and display in topp)
  [ ] * replace propagation by undulatory motions along each axis, but how would that work?

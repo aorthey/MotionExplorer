@@ -54,6 +54,8 @@ Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob:
 
 class MotionPlannerOMPL: public MotionPlanner
 {
+  private:
+    Robot *robot;
   public:
     MotionPlannerOMPL(RobotWorld *world);
     void SerializeTree(ob::PlannerData &pd);
@@ -72,7 +74,6 @@ class MotionPlannerOMPL: public MotionPlanner
     }
 
 };
-
 
 class GeometricCSpaceOMPL
 {
@@ -104,6 +105,7 @@ public:
     virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
 
     KinodynamicCSpaceSentinelAdaptor *cspace_;
+    //PrincipalFibreBundle *cspace_;
 
 };
 
