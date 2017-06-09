@@ -50,15 +50,30 @@ class MotionPlannerOMPLHumanoid: public MotionPlannerOMPL
 };
 
 
-class HumanoidPropagatorIrreducible : public SentinelPropagator
+//class SentinelPropagator : public oc::StatePropagator
+//{
+//public:
+//
+//    SentinelPropagator(oc::SpaceInformationPtr si, KinodynamicCSpaceSentinelAdaptor *cspace) : 
+//        oc::StatePropagator(si.get()), cspace_(cspace)
+//    {
+//    }
+//    virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
+//
+//    KinodynamicCSpaceSentinelAdaptor *cspace_;
+//    //PrincipalFibreBundle *cspace_;
+//
+//};
+class HumanoidPropagatorIrreducible : public oc::StatePropagator
 {
   public:
 
     HumanoidPropagatorIrreducible(oc::SpaceInformationPtr si, KinodynamicCSpaceSentinelAdaptor *cspace) : 
-        SentinelPropagator(si,cspace)
+        oc::StatePropagator(si.get()), cspace_(cspace)
     {
     }
     virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
+    KinodynamicCSpaceSentinelAdaptor *cspace_;
 
 };
 

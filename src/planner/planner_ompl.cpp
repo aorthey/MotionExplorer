@@ -1,6 +1,7 @@
 #include "planner_ompl.h"
 
 #include "cspace_sentinel.h"
+#include "liegroupintegrator.h"
 
 GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot)
 {
@@ -500,12 +501,14 @@ void SentinelPropagator::propagate(const ob::State *state, const oc::Control* co
     exit(0);
   }
 
-  Matrix4 x0_SE3 = cspace_->StateToSE3(x0);
-  Matrix4 dp0 = cspace_->SE3Derivative(uSE3);
-  Matrix4 x1_SE3 = cspace_->ForwardSimulate(x0_SE3,dp0,dt);
+  LieGroupIntegrator integrator;
+
+  Matrix4 x0_SE3 = integrator.StateToSE3(x0);
+  Matrix4 dp0 = integrator.SE3Derivative(uSE3);
+  Matrix4 x1_SE3 = integrator.Integrate(x0_SE3,dp0,dt);
 
   State x1(x0);
-  cspace_->SE3ToState(x1, x1_SE3);
+  integrator.SE3ToState(x1, x1_SE3);
 
   Config qend = x1;
 
@@ -587,7 +590,6 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
 {
   this->_p_init = p_init;
   this->_p_goal = p_goal;
-  Robot *robot = _world->robots[_irobot];
   robot->UpdateConfig(_p_init);
 
   this->_world->InitCollisions();
@@ -657,8 +659,6 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   oc::SimpleSetup ss(control_cspace);
   oc::SpaceInformationPtr si = ss.getSpaceInformation();
 
-  auto cpropagate(std::make_shared<SentinelPropagator>(si, &kcspace));
-
   //###########################################################################
   // choose planner
   //###########################################################################
@@ -673,6 +673,8 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
 
   ss.setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
+
+  auto cpropagate(std::make_shared<SentinelPropagator>(si, &kcspace));
   ss.setStatePropagator(cpropagate);
 
   double epsilon = 1.0;

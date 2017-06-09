@@ -6,13 +6,9 @@
 MotionPlanner::MotionPlanner(RobotWorld *world):
   _world(world)
 {
-
-  //make sure that there is only one robot in the world
-  //assert(world->robots.size() == 1);
   _irobot = 0;
   _icontroller = 0;
   robot = world->robots[_irobot];
-
 }
 const KinodynamicMilestonePath& MotionPlanner::GetPath()
 {
@@ -514,17 +510,17 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   SingleRobotCSpace geometric_cspace = SingleRobotCSpace(*_world,_irobot,&worldsettings);
   //std::cout << cspace.settings->robotSettings[0].worldBounds << std::endl;
 
-  //Check Kinematic Feasibility at init/goal positions
   if(!IsFeasible( robot, geometric_cspace, _p_init)) return false;
   if(!IsFeasible( robot, geometric_cspace, _p_goal)) return false;
 
-  KinodynamicCSpaceSentinelAdaptor kcspace(&geometric_cspace);
-  PropertyMap pmap;
-  kcspace.Properties(pmap);
-  std::cout << pmap << std::endl;
+  //PrincipalFibreBundleAdaptor space(&geometric_cspace);
+  //PropertyMap pmap;
+  //space.Properties(pmap);
+  //std::cout << pmap << std::endl;
 
-  CSpaceGoalSetEpsilonNeighborhood goalSet(&kcspace, _p_goal, plannersettings.goalRegionConvergence);
+  //CSpaceGoalSetEpsilonNeighborhood goalSet(&space, _p_goal, plannersettings.goalRegionConvergence);
 
+  std::clock_t end = std::clock();
 }
 
 void MotionPlanner::SendCommandStringController(string cmd, string arg)

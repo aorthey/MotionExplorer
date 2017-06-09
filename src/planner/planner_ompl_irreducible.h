@@ -49,15 +49,15 @@ class MotionPlannerOMPLIrreducible: public MotionPlannerOMPL
 };
 
 
-class SentinelPropagatorIrreducible : public SentinelPropagator
+class SentinelPropagatorIrreducible : public oc::StatePropagator
 {
-public:
+  public:
 
     SentinelPropagatorIrreducible(oc::SpaceInformationPtr si, KinodynamicCSpaceSentinelAdaptor *cspace) : 
-        SentinelPropagator(si,cspace)
+        oc::StatePropagator(si.get()), cspace_(cspace)
     {
     }
     virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
+    KinodynamicCSpaceSentinelAdaptor *cspace_;
 
 };
-
