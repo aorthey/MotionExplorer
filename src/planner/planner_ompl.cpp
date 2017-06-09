@@ -587,7 +587,9 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
 {
   this->_p_init = p_init;
   this->_p_goal = p_goal;
+  Robot *robot = _world->robots[_irobot];
   robot->UpdateConfig(_p_init);
+
   this->_world->InitCollisions();
 
   std::cout << std::string(80, '-') << std::endl;
