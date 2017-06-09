@@ -38,6 +38,7 @@
 #include "planner/planner.h"
 #include "cspace_sentinel.h"
 #include "util.h"
+#include "principalfibrebundle.h"
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;
@@ -96,13 +97,13 @@ class SentinelPropagator : public oc::StatePropagator
 {
 public:
 
-    SentinelPropagator(oc::SpaceInformationPtr si, KinodynamicCSpaceSentinelAdaptor *cspace) : 
+    SentinelPropagator(oc::SpaceInformationPtr si, PrincipalFibreBundleAdaptor *cspace) : 
         oc::StatePropagator(si.get()), cspace_(cspace)
     {
     }
     virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
 
-    KinodynamicCSpaceSentinelAdaptor *cspace_;
+    PrincipalFibreBundleAdaptor *cspace_;
     //PrincipalFibreBundle *cspace_;
 
 };

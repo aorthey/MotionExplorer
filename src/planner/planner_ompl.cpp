@@ -291,76 +291,76 @@ MotionPlannerOMPL::MotionPlannerOMPL(RobotWorld *world):
   MotionPlanner(world)
 {
 }
-void MotionPlannerOMPL::testSE3(KinodynamicCSpaceSentinelAdaptor &cspace)
-{
-  std::cout << "Testing Klampt->SE3->Klampt conversion" << std::endl;
+// void MotionPlannerOMPL::testSE3(KinodynamicCSpaceSentinelAdaptor &cspace)
+// {
+//   std::cout << "Testing Klampt->SE3->Klampt conversion" << std::endl;
 
-  Srand(0);
-  for(int i = 0; i < 100; i++){
-    uint N = Rand(0,0);
-    ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());
-    ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(N));
-    ob::StateSpacePtr stateSpace = SE3 + Rn;
+//   Srand(0);
+//   for(int i = 0; i < 100; i++){
+//     uint N = Rand(0,0);
+//     ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());
+//     ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(N));
+//     ob::StateSpacePtr stateSpace = SE3 + Rn;
 
-    Config q;
-    q.resize(6+N);
-    q.setZero();
-    q[0]=Rand(-3,3);
-    q[1]=Rand(-3,3);
-    q[2]=Rand(-3,3);
-    q[3] = Rand(-M_PI,M_PI);
-    q[4] = Rand(-M_PI/2,M_PI/2);
-    q[5] = Rand(-M_PI,M_PI);
-    for(int j = 0; j < N; j++){
-      q[j+6] = Rand(0,3);
-    }
-    Matrix4 x = cspace.StateToSE3(q);
-    Config qq(q);
-    qq.setZero();
-    cspace.SE3ToState(qq,x);
+//     Config q;
+//     q.resize(6+N);
+//     q.setZero();
+//     q[0]=Rand(-3,3);
+//     q[1]=Rand(-3,3);
+//     q[2]=Rand(-3,3);
+//     q[3] = Rand(-M_PI,M_PI);
+//     q[4] = Rand(-M_PI/2,M_PI/2);
+//     q[5] = Rand(-M_PI,M_PI);
+//     for(int j = 0; j < N; j++){
+//       q[j+6] = Rand(0,3);
+//     }
+//     Matrix4 x = cspace.StateToSE3(q);
+//     Config qq(q);
+//     qq.setZero();
+//     cspace.SE3ToState(qq,x);
 
-    double epsilon = 1e-10;
-    if((q-qq).norm()>epsilon){
-      std::cout << "Klampt->SE3->Klampt Test "<<i<<" failed" << std::endl;
-      std::cout << std::string(80, '-') << std::endl;
-      std::cout << "Klampt Input  state: " << q << std::endl;
-      std::cout << "Klampt Output state: " << qq << std::endl;
-      std::cout << std::string(80, '-') << std::endl;
-      exit(0);
-    }
-  }
+//     double epsilon = 1e-10;
+//     if((q-qq).norm()>epsilon){
+//       std::cout << "Klampt->SE3->Klampt Test "<<i<<" failed" << std::endl;
+//       std::cout << std::string(80, '-') << std::endl;
+//       std::cout << "Klampt Input  state: " << q << std::endl;
+//       std::cout << "Klampt Output state: " << qq << std::endl;
+//       std::cout << std::string(80, '-') << std::endl;
+//       exit(0);
+//     }
+//   }
 
-}
+// }
 
-void MotionPlannerOMPL::test()
-{
-  std::cout << "Testing Klampt->OMPL->Klampt conversion" << std::endl;
+// void MotionPlannerOMPL::test()
+// {
+//   std::cout << "Testing Klampt->OMPL->Klampt conversion" << std::endl;
 
-  Srand(0);
-  for(int i = 0; i < 100; i++){
-    uint N = Rand(0,0);
-    ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());
-    ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(N));
-    ob::StateSpacePtr stateSpace = SE3 + Rn;
+//   Srand(0);
+//   for(int i = 0; i < 100; i++){
+//     uint N = Rand(0,0);
+//     ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());
+//     ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(N));
+//     ob::StateSpacePtr stateSpace = SE3 + Rn;
 
-    Config q;
-    q.resize(6+N);
-    q.setZero();
-    q[0]=Rand(-3,3);
-    q[1]=Rand(-3,3);
-    q[2]=Rand(-3,3);
-    q[3] = Rand(-M_PI,M_PI);
-    q[4] = Rand(-M_PI/2,M_PI/2);
-    q[5] = Rand(-M_PI,M_PI);
-    for(int j = 0; j < N; j++){
-      q[j+6] = Rand(0,3);
-    }
-    //std::cout << "testing " << i << " : " << std::endl;
-    test_conversion(q, stateSpace);
-  }
+//     Config q;
+//     q.resize(6+N);
+//     q.setZero();
+//     q[0]=Rand(-3,3);
+//     q[1]=Rand(-3,3);
+//     q[2]=Rand(-3,3);
+//     q[3] = Rand(-M_PI,M_PI);
+//     q[4] = Rand(-M_PI/2,M_PI/2);
+//     q[5] = Rand(-M_PI,M_PI);
+//     for(int j = 0; j < N; j++){
+//       q[j+6] = Rand(0,3);
+//     }
+//     //std::cout << "testing " << i << " : " << std::endl;
+//     test_conversion(q, stateSpace);
+//   }
 
 
-}
+// }
 void checkYawPitchRoll(double y, double p, double r, double y2, double p2, double r2)
 {
   double epsilon = 1e-10;
@@ -609,7 +609,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   if(!IsFeasible( robot, geometric_cspace, _p_goal)) return false;
   if(!IsFeasible( robot, geometric_cspace, _p_init)) return false;
 
-  KinodynamicCSpaceSentinelAdaptor kcspace(&geometric_cspace);
+  PrincipalFibreBundleAdaptor kcspace(&geometric_cspace);
   PropertyMap pmap;
   kcspace.Properties(pmap);
   std::cout << pmap << std::endl;
