@@ -9,7 +9,6 @@ PrincipalFibreBundleAdaptor::PrincipalFibreBundleAdaptor(CSpace *_base):
 {
 }
 
-
 void PrincipalFibreBundleAdaptor::SimulateEndpoint(const State& x0, const ControlInput& u,State& x1)
 {
   std::vector<State> p;
@@ -130,3 +129,84 @@ void PrincipalFibreBundleAdaptor::BiasedSampleControl(const State& x,const State
     }
   }
 }
+
+void PrincipalFibreBundleIntegrator::propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
+{
+
+  //###########################################################################
+  // OMPL to Config control
+  //###########################################################################
+  const ob::StateSpacePtr s = si_->getStateSpace();
+  Config x0 = OMPLStateToConfig(state, s);
+
+  const double *ucontrol = control->as<oc::RealVectorControlSpace::ControlType>()->values;
+
+  Config uSE3;
+  uSE3.resize(6);
+  uSE3.setZero();
+  uSE3(0) = ucontrol[0];
+  uSE3(1) = ucontrol[1];
+  uSE3(2) = ucontrol[2];
+  uSE3(3) = ucontrol[3];
+  uSE3(4) = ucontrol[4];
+  uSE3(5) = ucontrol[5];
+
+  uint N = s->getDimension() - 6;
+
+  //###########################################################################
+  // Forward Simulate
+  //###########################################################################
+
+  uint Nduration = N+6;
+  Real dt = ucontrol[Nduration];
+  if(dt<0){
+    std::cout << "propagation step size is negative:"<<dt << std::endl;
+    exit(0);
+  }
+
+  LieGroupIntegrator integrator;
+
+  Matrix4 x0_SE3 = integrator.StateToSE3(x0);
+  Matrix4 dp0 = integrator.SE3Derivative(uSE3);
+  Matrix4 x1_SE3 = integrator.Integrate(x0_SE3,dp0,dt);
+
+  State x1(x0);
+  integrator.SE3ToState(x1, x1_SE3);
+
+  Config qend = x1;
+
+  for(int i = 0; i < N; i++){
+    qend[i+6] = x0[i+6] + dt*ucontrol[i+6];
+  }
+
+  //###########################################################################
+  // Config to OMPL
+  //###########################################################################
+
+  ob::ScopedState<> ssr = ConfigToOMPLState(qend, s);
+
+  ob::SE3StateSpace::StateType *ssrSE3 = ssr->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  ob::SO3StateSpace::StateType *ssrSO3 = &ssrSE3->rotation();
+  ob::RealVectorStateSpace::StateType *ssrRn = ssr->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+
+  ob::SE3StateSpace::StateType *resultSE3 = result->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  ob::SO3StateSpace::StateType *resultSO3 = &resultSE3->rotation();
+  ob::RealVectorStateSpace::StateType *resultRn = result->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+
+  resultSE3->setXYZ(ssrSE3->getX(),ssrSE3->getY(),ssrSE3->getZ());
+  resultSO3->x = ssrSO3->x;
+  resultSO3->y = ssrSO3->y;
+  resultSO3->z = ssrSO3->z;
+  resultSO3->w = ssrSO3->w;
+
+  //###########################################################################
+  // R^N Control
+  //###########################################################################
+  for(int i = 0; i < N; i++){
+    resultRn->values[i] = ssrRn->values[i];
+  }
+
+}
+
+
+

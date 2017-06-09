@@ -7,7 +7,6 @@
 #include <Planning/RobotCSpace.h>
 #include <vector>
 
-//#include <ompl/control/SpaceInformation.h>
 //SE(3) element: X Y Z rotZ rotY rotX
 //SE(3) element: X Y Z yaw pitch roll
 //SE(3) element: homogenous 4x4 matrix, rotation 3x3, translation 3x1

@@ -39,6 +39,7 @@
 #include "cspace_sentinel.h"
 #include "util.h"
 #include "principalfibrebundle.h"
+#include "omplklamptconverter.h"
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;
@@ -47,11 +48,11 @@ namespace oa = ompl::app;
 namespace ot = ompl::tools;
 //namespace po = boost::program_options;
 
-ob::ScopedState<> ConfigToOMPLState(const Config &q, const ob::StateSpacePtr &s);
-ob::State* ConfigToOMPLStatePtr(const Config &q, const ob::StateSpacePtr &s);
-Config OMPLStateToConfig(const ob::ScopedState<> &qompl, const ob::StateSpacePtr &s);
-Config OMPLStateToConfig(const ob::State *qompl, const ob::StateSpacePtr &s);
-Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState, const ob::StateSpacePtr &s);
+// ob::ScopedState<> ConfigToOMPLState(const Config &q, const ob::StateSpacePtr &s);
+// ob::State* ConfigToOMPLStatePtr(const Config &q, const ob::StateSpacePtr &s);
+// Config OMPLStateToConfig(const ob::ScopedState<> &qompl, const ob::StateSpacePtr &s);
+// Config OMPLStateToConfig(const ob::State *qompl, const ob::StateSpacePtr &s);
+// Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState, const ob::StateSpacePtr &s);
 
 class MotionPlannerOMPL: public MotionPlanner
 {
@@ -104,7 +105,6 @@ public:
     virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
 
     PrincipalFibreBundleAdaptor *cspace_;
-    //PrincipalFibreBundle *cspace_;
 
 };
 
