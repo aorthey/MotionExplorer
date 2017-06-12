@@ -11,12 +11,29 @@
 
 
 using namespace Math3D;
+
+// Convention:
+//  The principal fibre bundle is represented as
+//
+//  M = SE(3) x R^N 
+//
+//  its tangent space is 
+//
+//  TM = R^{6+N}
+//
+//  and the control space is the tangent space of the tangent space plus one
+//  time step dimension (the last dimension)
+//
+//  TTM \union R = U = R^{6+N+1} 
+//
+//   the time step-dimension is used as an adaptive time step for integration.
+//   We use usual values between 0.01 and 0.1 for the time step.
+
 class PrincipalFibreBundleAdaptor: public KinematicCSpaceAdaptor
 {
 
-  protected:
-    LieGroupIntegrator integrator;
-
+  //TODO: only IsFeasible is used in validitychecker right now, maybe we can
+  //ompl-merize everything using PQP
   public:
 
     PrincipalFibreBundleAdaptor(CSpace *base);
@@ -41,10 +58,6 @@ class PrincipalFibreBundleAdaptor: public KinematicCSpaceAdaptor
     virtual bool ReverseControl(const State& x0,const State& x1,ControlInput& u) { return false; }
     virtual void BiasedSampleReverseControl(const State& x1,const State& xDest,ControlInput& u);
     virtual void BiasedSampleControl(const State& x,const State& xGoal,ControlInput& u);
-    //virtual bool ReverseSimulate(const State& x1, const ControlInput& u,std::vector<State>& p) { return false; }
-
-//  virtual void SampleReverseControl(const State& x,ControlInput& u);
-//  virtual void BiasedSampleReverseControl(const State& x1,const State& xDest,ControlInput& u);
 
 };
 
@@ -59,25 +72,17 @@ class PrincipalFibreBundleIntegrator : public oc::StatePropagator
 {
 public:
 
-    PrincipalFibreBundleIntegrator(oc::SpaceInformationPtr si, PrincipalFibreBundleAdaptor *cspace) : 
-        oc::StatePropagator(si.get()), cspace_(cspace)
+    PrincipalFibreBundleIntegrator(oc::SpaceInformationPtr si) : 
+        oc::StatePropagator(si.get())
     {
     }
     virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
-
-    PrincipalFibreBundleAdaptor *cspace_;
 };
 
-class PrincipalFibreBundleValidityChecker : public oc::StatePropagator
+class PrincipalFibreBundleOMPLValidityChecker : public ob::StateValidityChecker
 {
-public:
-
-    PrincipalFibreBundleValidityChecker(oc::SpaceInformationPtr si, PrincipalFibreBundleAdaptor *cspace) : 
-        oc::StatePropagator(si.get()), cspace_(cspace)
-    {
-    }
-    virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
-
-    PrincipalFibreBundleAdaptor *cspace_;
-
+  public:
+    PrincipalFibreBundleOMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpace *space);
+    virtual bool isValid(const ob::State* state) const;
+    CSpace *cspace_;
 };

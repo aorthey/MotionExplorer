@@ -25,7 +25,8 @@ INCLUDE_DIRECTORIES(${KLAMPT_INCLUDE_DIRS})
 INCLUDE_DIRECTORIES(src)
 INCLUDE_DIRECTORIES(src/planner)
 
-FILE(GLOB ORTHOKLAMPT_SRC src/*.cpp src/planner/*.cpp src/elements/*.cpp)
+FILE(GLOB ORTHOKLAMPT_SRC src/*.cpp src/planner/*.cpp src/elements/*.cpp src/controller/*.cpp)
+
 SET(ORTHOKLAMPT_LIB ${KLAMPT_LIBRARIES} ${OMPL_LIBRARIES} ompl_app_base)
 
 MESSAGE("-------------------------------------")

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ompl/base/spaces/DubinsStateSpace.h>
-#include <ompl/base/spaces/ReedsSheppStateSpace.h>
+//#include <ompl/base/spaces/DubinsStateSpace.h>
+//#include <ompl/base/spaces/ReedsSheppStateSpace.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/base/ScopedState.h>
 #include <ompl/base/StateSpace.h>
@@ -36,23 +36,16 @@
 #include <omplapp/config.h>
 #include <omplapp/apps/SE3RigidBodyPlanning.h>
 #include "planner/planner.h"
-#include "cspace_sentinel.h"
 #include "util.h"
 #include "principalfibrebundle.h"
 #include "omplklamptconverter.h"
+#include "ompl_space.h"
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;
 namespace og = ompl::geometric;
 namespace oa = ompl::app;
 namespace ot = ompl::tools;
-//namespace po = boost::program_options;
-
-// ob::ScopedState<> ConfigToOMPLState(const Config &q, const ob::StateSpacePtr &s);
-// ob::State* ConfigToOMPLStatePtr(const Config &q, const ob::StateSpacePtr &s);
-// Config OMPLStateToConfig(const ob::ScopedState<> &qompl, const ob::StateSpacePtr &s);
-// Config OMPLStateToConfig(const ob::State *qompl, const ob::StateSpacePtr &s);
-// Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState, const ob::StateSpacePtr &s);
 
 class MotionPlannerOMPL: public MotionPlanner
 {
@@ -61,50 +54,12 @@ class MotionPlannerOMPL: public MotionPlanner
     void SerializeTree(ob::PlannerData &pd);
     virtual bool solve(Config &p_init, Config &p_goal);
 
-    //debug
-    void test();
-    void testSE3(KinodynamicCSpaceSentinelAdaptor &cspace);
-    void test_conversion(Config &q, ob::StateSpacePtr &stateSpace);
-
     static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)
     {
       ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
       obj->setCostThreshold(ob::Cost(dInf));
       return obj;
     }
-
-};
-
-class GeometricCSpaceOMPL
-{
-  public:
-    GeometricCSpaceOMPL(Robot *robot);
-    const ob::StateSpacePtr getPtr(){
-      return space_;
-    }
-  protected:
-    ob::StateSpacePtr space_;
-};
-
-class MotionPlannerOMPLValidityChecker : public ob::StateValidityChecker
-{
-   public:
-     MotionPlannerOMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpace* space);
-     virtual bool isValid(const ob::State* state) const;
-     CSpace* _space;
-};
-
-class SentinelPropagator : public oc::StatePropagator
-{
-public:
-
-    SentinelPropagator(oc::SpaceInformationPtr si, PrincipalFibreBundleAdaptor *cspace) : 
-        oc::StatePropagator(si.get()), cspace_(cspace)
-    {
-    }
-    virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
-
-    PrincipalFibreBundleAdaptor *cspace_;
 
 };
 

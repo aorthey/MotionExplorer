@@ -11,6 +11,7 @@ PrincipalFibreBundleAdaptor::PrincipalFibreBundleAdaptor(CSpace *_base):
 
 void PrincipalFibreBundleAdaptor::SimulateEndpoint(const State& x0, const ControlInput& u,State& x1)
 {
+  exit(0);
   std::vector<State> p;
   Simulate(x0,u,p);
   x1 = p.back();
@@ -19,12 +20,14 @@ void PrincipalFibreBundleAdaptor::SimulateEndpoint(const State& x0, const Contro
 ///Return an edge planner that checks the simulation trace p for feasibility
 ///Typically, just return new GivenPathEdgePlanner(this,p,tolerance)
 EdgePlanner* PrincipalFibreBundleAdaptor::TrajectoryChecker(const std::vector<State>& p){
+  exit(0);
   double tolerance = 1e-3;
   return new GivenPathEdgePlanner(this,p,tolerance);
   //return new TrueEdgePlanner(this,p.front(),p.back());
 }
 
 bool PrincipalFibreBundleAdaptor::IsValidControl(const State& x,const ControlInput& u){
+  exit(0);
   return true;
   //const int N=6;
 
@@ -59,6 +62,7 @@ Real PrincipalFibreBundleAdaptor::Distance(const Config& x, const Config& y) {
  // Config ypos;ypos.resize(3);ypos(0)=y(0);ypos(1)=y(1);ypos(2)=y(2);
  // return base->Distance(xpos,ypos); 
 
+  exit(0);
   RigidTransform Ta,Tb;
   ConfigToTransform(x,Ta);
   ConfigToTransform(y,Tb);
@@ -128,6 +132,7 @@ void PrincipalFibreBundleAdaptor::BiasedSampleControl(const State& x,const State
       u = temp;
     }
   }
+  exit(0);
 }
 
 void PrincipalFibreBundleIntegrator::propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
@@ -154,7 +159,7 @@ void PrincipalFibreBundleIntegrator::propagate(const ob::State *state, const oc:
   uint N = s->getDimension() - 6;
 
   //###########################################################################
-  // Forward Simulate
+  // Forward Simulate SE(3) component
   //###########################################################################
 
   uint Nduration = N+6;
@@ -175,6 +180,9 @@ void PrincipalFibreBundleIntegrator::propagate(const ob::State *state, const oc:
 
   Config qend = x1;
 
+  //###########################################################################
+  // Forward Simulate R^N component
+  //###########################################################################
   for(int i = 0; i < N; i++){
     qend[i+6] = x0[i+6] + dt*ucontrol[i+6];
   }
@@ -206,6 +214,27 @@ void PrincipalFibreBundleIntegrator::propagate(const ob::State *state, const oc:
     resultRn->values[i] = ssrRn->values[i];
   }
 
+}
+
+PrincipalFibreBundleOMPLValidityChecker::PrincipalFibreBundleOMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpace* space):
+  ob::StateValidityChecker(si),cspace_(space)
+{
+}
+
+bool PrincipalFibreBundleOMPLValidityChecker::isValid(const ob::State* state) const
+{
+  const ob::StateSpacePtr ssp = si_->getStateSpace();
+  Config q = OMPLStateToConfig(state, ssp);
+  //Robot *robot = _space->robot;
+  //if(!robot->InJointLimits(q)) {
+    //return false;
+  //}
+  //return _space->CheckCollisionFree();
+
+  //PropertyMap pmap;
+  //_space->Properties(pmap);
+
+  return cspace_->IsFeasible(q) && si_->satisfiesBounds(state);
 }
 
 

@@ -508,7 +508,6 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //worldsettings.robotSettings[0].contactIKMaxIters = 100;
 
   SingleRobotCSpace geometric_cspace = SingleRobotCSpace(*_world,_irobot,&worldsettings);
-  //std::cout << cspace.settings->robotSettings[0].worldBounds << std::endl;
 
   if(!IsFeasible( robot, geometric_cspace, _p_init)) return false;
   if(!IsFeasible( robot, geometric_cspace, _p_goal)) return false;
