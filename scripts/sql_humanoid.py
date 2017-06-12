@@ -1,6 +1,10 @@
 from sql_query import *
 
-files = ['../data/benchmarks/2017_05_25_humanoid_door_irreducible.db','../data/benchmarks/2017_05_25_humanoid_door_complete.db']
+files = \
+['../data/benchmarks/2017_05_25_humanoid_door_irreducible.db', \
+  '../data/benchmarks/2017_05_25_humanoid_door_complete.db', \
+  '../data/benchmarks/2017_05_23_humanoid_wall_irreducible.db', \
+  '../data/benchmarks/2017_05_23_humanoid_wall_complete.db']
 for fname in files:
   extractInfoFromSqlDatabase(fname,verbose=False)
 
