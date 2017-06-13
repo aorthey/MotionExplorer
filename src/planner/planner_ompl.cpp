@@ -83,7 +83,7 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
     for(int i = 0; i < path.getStateCount(); i++)
     {
       ob::State *state = path.getState(i);
-      Config cur = OMPLStateToConfig(state, cspace->SpacePtr());
+      Config cur = cspace->OMPLStateToConfig(state);
       keyframes.push_back(cur);
     }
     std::string sfile = "ompl_"+std::to_string(pid)+".xml";
@@ -148,7 +148,6 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
   std::cout << start << std::endl;
   std::cout << goal << std::endl;
-  //exit(0);
 
   oc::SimpleSetup ss(cspace->ControlSpacePtr());//const ControlSpacePtr
   oc::SpaceInformationPtr si = ss.getSpaceInformation();
@@ -256,21 +255,25 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
     //og::PathSimplifier shortcutter(si);
     //shortcutter.shortcutPath(path);
 
-    vector<Config> keyframes;
     for(int i = 0; i < path.getStateCount(); i++)
     {
       ob::State *state = path.getState(i);
-      Config cur = OMPLStateToConfig(state, cspace->SpacePtr());
+      Config cc = cspace->OMPLStateToConfig(state);
+      //Config cc;cc.resize(cur.size());
+      std::vector<Real> curd = std::vector<Real>(cc);
+      std::vector<Real> curhalf(curd.begin(),curd.begin()+int(0.5*curd.size()));
+      Config cur(curhalf);
+
+      //vector<T> newVec(first, last);
       _keyframes.push_back(cur);
     }
     ob::State *obgoal = path.getState(path.getStateCount()-1);
-    Config plannergoal = OMPLStateToConfig(obgoal, cspace->SpacePtr());
+    Config plannergoal = cspace->OMPLStateToConfig(obgoal);
 
     uint istep = max(int(path.getStateCount()/10.0),1);
-    for(int i = 0; i < path.getStateCount(); i+=istep)
+    for(int i = 0; i < _keyframes.size(); i+=istep)
     {
-      ob::State *state = path.getState(i);
-      Config cur = OMPLStateToConfig(state, cspace->SpacePtr());
+      Config cur(_keyframes.at(i));
       std::cout << i << "/" << path.getStateCount() <<  cur << std::endl;
     }
     std::cout << std::string(80, '-') << std::endl;

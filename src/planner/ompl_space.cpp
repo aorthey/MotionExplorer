@@ -392,6 +392,20 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
   cbounds.setLow(NdimControl,0.01);//propagation step size
   cbounds.setHigh(NdimControl,0.10);
 
+  //TODO: remove hardcoded se(3) vector fields
+  for(int i = 0; i < 6; i++){
+    cbounds.setLow(i,0);
+    cbounds.setHigh(i,0);
+  }
+  cbounds.setLow(3,1);
+  cbounds.setHigh(3,1);
+  cbounds.setLow(0,-1);
+  cbounds.setHigh(0,1);
+  cbounds.setLow(1,-1);
+  cbounds.setHigh(1,1);
+  cbounds.setLow(2,-1);
+  cbounds.setHigh(2,1);
+
   cbounds.check();
   control_space->setBounds(cbounds);
 
@@ -399,7 +413,6 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
   for(int i = 0; i < NdimControl+1; i++){
     std::cout << i << " <" << cbounds.low.at(i) << ","<< cbounds.high.at(i) << ">" << std::endl;
   }
-  //exit(0);
 }
 
 ob::State* KinodynamicCSpaceOMPL::ConfigToOMPLStatePtr(const Config &q){
