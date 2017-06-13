@@ -142,7 +142,7 @@ void PrincipalFibreBundleIntegrator::propagate(const ob::State *state, const oc:
   // OMPL to Config control
   //###########################################################################
   const ob::StateSpacePtr s = si_->getStateSpace();
-  Config x0 = OMPLStateToConfig(state, s);
+  Config x0 = ompl_space->OMPLStateToConfig(state);
 
   const double *ucontrol = control->as<oc::RealVectorControlSpace::ControlType>()->values;
 
@@ -191,7 +191,7 @@ void PrincipalFibreBundleIntegrator::propagate(const ob::State *state, const oc:
   // Config to OMPL
   //###########################################################################
 
-  ob::ScopedState<> ssr = ConfigToOMPLState(qend, s);
+  ob::ScopedState<> ssr = ompl_space->ConfigToOMPLState(qend);
 
   ob::SE3StateSpace::StateType *ssrSE3 = ssr->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
   ob::SO3StateSpace::StateType *ssrSO3 = &ssrSE3->rotation();
@@ -216,15 +216,15 @@ void PrincipalFibreBundleIntegrator::propagate(const ob::State *state, const oc:
 
 }
 
-PrincipalFibreBundleOMPLValidityChecker::PrincipalFibreBundleOMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpace* space):
-  ob::StateValidityChecker(si),cspace_(space)
+PrincipalFibreBundleOMPLValidityChecker::PrincipalFibreBundleOMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpace* space, CSpaceOMPL *ompl_space_):
+  ob::StateValidityChecker(si),cspace_(space),ompl_space(ompl_space_)
 {
 }
 
 bool PrincipalFibreBundleOMPLValidityChecker::isValid(const ob::State* state) const
 {
   const ob::StateSpacePtr ssp = si_->getStateSpace();
-  Config q = OMPLStateToConfig(state, ssp);
+  Config q = ompl_space->OMPLStateToConfig(state);
   //Robot *robot = _space->robot;
   //if(!robot->InJointLimits(q)) {
     //return false;

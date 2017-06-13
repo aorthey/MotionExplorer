@@ -8,10 +8,10 @@
 #include <vector>
 #include "liegroupintegrator.h"
 #include "principalfibrebundle.h"
-#include "omplklamptconverter.h"
-
+#include "ompl_space.h"
 
 using namespace Math3D;
+class CSpaceOMPL;
 
 // Convention:
 //  The tangent bundle is represented as
@@ -28,11 +28,11 @@ using namespace Math3D;
 //   the time step-dimension is used as an adaptive time step for integration.
 //   We use usual values between 0.01 and 0.1 for the time step.
 
-
 #include <ompl/base/StateSpace.h>
 #include <ompl/control/SimpleSetup.h>
 #include <ompl/control/SpaceInformation.h>
 #include <ompl/control/spaces/RealVectorControlSpace.h>
+
 namespace oc = ompl::control;
 namespace ob = ompl::base;
 
@@ -40,18 +40,21 @@ class TangentBundleIntegrator : public oc::StatePropagator
 {
 public:
 
-    TangentBundleIntegrator(oc::SpaceInformationPtr si) : 
-        oc::StatePropagator(si.get())
+    TangentBundleIntegrator(oc::SpaceInformationPtr si, CSpaceOMPL *ompl_space_) : 
+        oc::StatePropagator(si.get()), ompl_space(ompl_space_)
     {
     }
     virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
+
+    CSpaceOMPL *ompl_space;
 };
 
 class TangentBundleOMPLValidityChecker : public ob::StateValidityChecker
 {
   public:
-    TangentBundleOMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpace *space);
+    TangentBundleOMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpace *space, CSpaceOMPL *ompl_space_);
     virtual bool isValid(const ob::State* state) const;
     CSpace *cspace_;
+    CSpaceOMPL *ompl_space;
 };
 

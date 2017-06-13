@@ -7,11 +7,12 @@
 #include <Planning/RobotCSpace.h>
 #include <vector>
 #include "liegroupintegrator.h"
-#include "omplklamptconverter.h"
+#include "ompl_space.h"
 
 
 using namespace Math3D;
 
+class CSpaceOMPL;
 // Convention:
 //  The principal fibre bundle is represented as
 //
@@ -72,17 +73,19 @@ class PrincipalFibreBundleIntegrator : public oc::StatePropagator
 {
 public:
 
-    PrincipalFibreBundleIntegrator(oc::SpaceInformationPtr si) : 
-        oc::StatePropagator(si.get())
+    PrincipalFibreBundleIntegrator(oc::SpaceInformationPtr si, CSpaceOMPL *ompl_space_) : 
+        oc::StatePropagator(si.get()), ompl_space(ompl_space_)
     {
     }
     virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
+    CSpaceOMPL *ompl_space;
 };
 
 class PrincipalFibreBundleOMPLValidityChecker : public ob::StateValidityChecker
 {
   public:
-    PrincipalFibreBundleOMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpace *space);
+    PrincipalFibreBundleOMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpace *space, CSpaceOMPL *ompl_space_);
     virtual bool isValid(const ob::State* state) const;
     CSpace *cspace_;
+    CSpaceOMPL *ompl_space;
 };

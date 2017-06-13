@@ -133,23 +133,28 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //on the se(3) component
   //
 
-  GeometricCSpaceOMPL cspace(robot, &kcspace);
+  CSpaceFactory factory;
+  //GeometricCSpaceOMPL cspace(robot, &kcspace);
   //KinodynamicCSpaceOMPL cspace(robot, &kcspace);
+
+  //GeometricCSpaceOMPL* cspace = factory.MakeGeometricCSpace(robot, &kcspace);
+  KinodynamicCSpaceOMPL* cspace = factory.MakeKinodynamicCSpace(robot, &kcspace);
 
   //###########################################################################
   // Config init,goal to OMPL start/goal
   //###########################################################################
 
-  ob::ScopedState<> start = ConfigToOMPLState(p_init, cspace.SpacePtr());
-  ob::ScopedState<> goal  = ConfigToOMPLState(p_goal, cspace.SpacePtr());
+  ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
+  ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
   std::cout << start << std::endl;
   std::cout << goal << std::endl;
+  //exit(0);
 
-  oc::SimpleSetup ss(cspace.ControlSpacePtr());//const ControlSpacePtr
+  oc::SimpleSetup ss(cspace->ControlSpacePtr());//const ControlSpacePtr
   oc::SpaceInformationPtr si = ss.getSpaceInformation();
 
-  ss.setStateValidityChecker(cspace.StateValidityCheckerPtr(si));
-  ss.setStatePropagator(cspace.StatePropagatorPtr(si));
+  ss.setStateValidityChecker(cspace->StateValidityCheckerPtr(si));
+  ss.setStatePropagator(cspace->StatePropagatorPtr(si));
 
   //###########################################################################
   // choose planner
@@ -162,7 +167,6 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   // setup and projection
   //###########################################################################
-
   double epsilon = 1.0;
 
   ss.setStartAndGoalStates(start, goal, epsilon);
@@ -256,17 +260,17 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
     for(int i = 0; i < path.getStateCount(); i++)
     {
       ob::State *state = path.getState(i);
-      Config cur = OMPLStateToConfig(state, cspace.SpacePtr());
+      Config cur = OMPLStateToConfig(state, cspace->SpacePtr());
       _keyframes.push_back(cur);
     }
     ob::State *obgoal = path.getState(path.getStateCount()-1);
-    Config plannergoal = OMPLStateToConfig(obgoal, cspace.SpacePtr());
+    Config plannergoal = OMPLStateToConfig(obgoal, cspace->SpacePtr());
 
     uint istep = max(int(path.getStateCount()/10.0),1);
     for(int i = 0; i < path.getStateCount(); i+=istep)
     {
       ob::State *state = path.getState(i);
-      Config cur = OMPLStateToConfig(state, cspace.SpacePtr());
+      Config cur = OMPLStateToConfig(state, cspace->SpacePtr());
       std::cout << i << "/" << path.getStateCount() <<  cur << std::endl;
     }
     std::cout << std::string(80, '-') << std::endl;
