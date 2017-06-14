@@ -134,8 +134,6 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //
 
   CSpaceFactory factory;
-  //GeometricCSpaceOMPL cspace(robot, &kcspace);
-  //KinodynamicCSpaceOMPL cspace(robot, &kcspace);
 
   //GeometricCSpaceOMPL* cspace = factory.MakeGeometricCSpace(robot, &kcspace);
   KinodynamicCSpaceOMPL* cspace = factory.MakeKinodynamicCSpace(robot, &kcspace);
@@ -158,10 +156,10 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   // choose planner
   //###########################################################################
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
+  ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
-  ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
 
   //###########################################################################
   // setup and projection
@@ -185,7 +183,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   bool solved = false;
   double solution_time = dInf;
-  double duration = 120.0;
+  double duration = 10.0;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
 
   //###########################################################################

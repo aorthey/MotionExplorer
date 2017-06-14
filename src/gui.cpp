@@ -183,7 +183,7 @@ void ForceFieldBackend::Start()
   std::cout << "Setting swept volume paths" << std::endl;
   for(int i = 0; i < getNumberOfPaths(); i++){
     drawPathSweptVolume.push_back(showSweptVolumes);
-    drawPathMilestones.push_back(0);
+    drawPathMilestones.push_back(1);
     drawPathStartGoal.push_back(1);
   }
   for(int i = 0; i < getNumberOfPaths(); i++){

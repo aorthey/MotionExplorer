@@ -4,29 +4,46 @@
 void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
 {
 
+  //
+  // Configuration space is Q = G x M whereby G is the position space and M the
+  // shape space. We write \hat{q} = (x,r) \in Q for an element in Q.
+  //
+  // State Space is TQ with an element represented as q = (\hat{q},\dot{\hat{q}}) or
+  // ((x,r),(\dot{x},\dot{r}))
+  //
+  // The local chart on which q resides has dimensionality 6 + N + 6 + N = 12+2N
+  // with G=SE(3), M=R^N, TG \times TM = R^{6+N}
+  //
+  // Control is applied on the tangent space TTQ of the tangent bundle TQ.
+  // The control dimensionality is R^{6+N} \times R whereby the last dimension
+  // is the step size parameter (some algorithms are sensitive to the stepsize,
+  // so it is advantageous to change it, adapt it on the fly or even include it
+  // into some optimization routine)
+  //
+
   //###########################################################################
   // OMPL to Config control
   //###########################################################################
   const ob::StateSpacePtr s = si_->getStateSpace();
-  Config x0 = ompl_space->OMPLStateToConfig(state);
+  Config q0 = ompl_space->OMPLStateToConfig(state);
 
   const double *ucontrol = control->as<oc::RealVectorControlSpace::ControlType>()->values;
 
-  Config use3;
-  use3.resize(6);
-  use3.setZero();
-  use3(0) = ucontrol[0];
-  use3(1) = ucontrol[1];
-  use3(2) = ucontrol[2];
-  use3(3) = ucontrol[3];
-  use3(4) = ucontrol[4];
-  use3(5) = ucontrol[5];
+  Config R6control;
+  R6control.resize(6);
+  R6control.setZero();
+  R6control(0) = ucontrol[0];
+  R6control(1) = ucontrol[1];
+  R6control(2) = ucontrol[2];
+  R6control(3) = ucontrol[3];
+  R6control(4) = ucontrol[4];
+  R6control(5) = ucontrol[5];
 
   uint N = 0.5*s->getDimension() - 6;
   assert( 2*N + 12 == s->getDimension());
 
   //###########################################################################
-  // Forward Simulate SE(3) component
+  // extract step size parameter
   //###########################################################################
 
   uint Nduration = N+6;
@@ -37,35 +54,56 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   }
   Real dt2 = 0.5*dt*dt;
 
+  //###########################################################################
+  // Forward Simulate SE(3) component
+  //###########################################################################
   LieGroupIntegrator integrator;
+
+  Config x0; x0.resize(6);
+  Config dx0; dx0.resize(6);
+  for(int i = 0; i < 6; i++){
+    x0(i) = q0(i);
+    dx0(i) = q0(i+6+N);
+  }
 
   Matrix4 x0_SE3 = integrator.StateToSE3(x0);
 
-  //Config dx; dx.resize(6);
+  Matrix4 dx0_SE3 = integrator.SE3Derivative(dx0);
 
-  //Matrix4 dx0_SE3 = 
+  Matrix4 ddp = integrator.SE3Derivative(R6control);
 
-  Matrix4 dp0 = integrator.SE3Derivative(use3);
-  Matrix4 x1_SE3 = integrator.Integrate(x0_SE3,dp0,dt);
+  Matrix4 dp = ddp*dt*0.5 + dx0_SE3;
 
-  State x1(x0);
+  Matrix4 x1_SE3 = integrator.Integrate(x0_SE3,dp,dt);
+
+  State x1;x1.resize(6);
   integrator.SE3ToState(x1, x1_SE3);
 
-  Config qend = x1;
+  State dx1 = R6control*dt + dx0;
+  //integrator.SE3ToState(dx1, dx1_SE3);
+
+  //State x1(x0); integrator.SE3ToState(x1, x1_SE3);
+  //Config qend = x1;
+
+  Config q1; q1.resize(12+2*N); q1.setZero();
+  for(int i = 0; i < 6; i++){
+    q1(i) = x1(i);
+    q1(i+6+N) = dx1(i);
+  }
 
   //###########################################################################
   // Forward Simulate R^N component
   //###########################################################################
   for(int i = 0; i < N; i++){
-    qend[i+6] = x0[i+6] + dt*x0[i+N+6+6] + dt2*ucontrol[i+6];
-    qend[i+N+6+6] = x0[i+N+6+6] + dt*ucontrol[i+6];
+    q1[i+6] = q0[i+6] + dt*q0[i+N+6+6] + dt2*ucontrol[i+6];
+    q1[i+N+6+6] = q0[i+N+6+6] + dt*ucontrol[i+6];
   }
 
   //###########################################################################
   // Config to OMPL
   //###########################################################################
 
-  ob::ScopedState<> ssr = ompl_space->ConfigToOMPLState(qend);
+  ob::ScopedState<> ssr = ompl_space->ConfigToOMPLState(q1);
 
   ob::SE3StateSpace::StateType *ssrSE3 = ssr->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
   ob::SO3StateSpace::StateType *ssrSO3 = &ssrSE3->rotation();

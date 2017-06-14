@@ -548,8 +548,9 @@ COM should retain orientation equal to origin so that we can see forces from
  [ ] [URGENT] Plan one path /w speed profile using OMPL, send to controller, execute in the simulator, observe deviation from swept volume
    [x] return only pointers in ompl_space, make a factory
    [x] finalize kinodynamic space
-   [ ] simulate jet propulsion
-   [ ] implement tangentbundle integrator
+   [x] simulate jet propulsion
+   [x] implement tangentbundle integrator
+   [ ] OMPL_SPACE remove hardcoded se3 vector fields
    [ ] include FF in tangentbundle integrator
    [ ] add start velocity plannersettings
    [ ] outsource duration time, algorithm name and epsilon goal (xml plannersettings)
