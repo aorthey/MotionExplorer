@@ -21,16 +21,18 @@
   </plannersettings>
 
   <forcefield>
+    <!--
     <radial source="-1.4 0 0" power="3" radius="1.5" color="1 0 1"/>
     <radial source="1.8 0 0" power="-3" radius="1.5" color="1 0 1"/>
+    -->
     <uniform force="0 0 0" color="1 0 0"/> <!-- simulate buoycancy as antigravity -->
   </forcefield>
 
   <simulation>
     <globals maxContacts="20" />
-    <robot index="0">
-      <controller type="PolynomialPathController" />
-    </robot>
+    <robot index="0"> 
+      <controller type="ContactStabilityController" />.
+    </robot>  
   </simulation>
 
 

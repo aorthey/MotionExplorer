@@ -42,11 +42,13 @@ class MotionPlanner{
     double _timelimit;
     KinodynamicMilestonePath _path;
     std::vector<Config> _keyframes;
+
     SerializedTree _stree;
 
-    PlannerOutput pout;
-
   public:
+
+    PlannerOutput output;
+
 
     explicit MotionPlanner(RobotWorld *world);
     const KinodynamicMilestonePath& GetPath();

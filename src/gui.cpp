@@ -195,6 +195,7 @@ void ForceFieldBackend::Start()
     MapButtonToggle(dpsg.c_str(),&drawPathStartGoal.at(i));
   }
 
+  std::cout << "Finished Initializing Backend" << std::endl;
 }
 
 //############################################################################
@@ -552,6 +553,32 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
 //############################################################################
 
 #include <KrisLibrary/graph/Tree.h>
+void ForceFieldBackend::AddPlannerOutput( PlannerOutput& pout )
+{
+  std::cout << "Adding PlannerOutput" << std::endl;
+  planneroutput = pout;
+}
+
+void ForceFieldBackend::SendPlannerOutputToController()
+{
+  std::vector<Vector> torques = planneroutput.GetTorques();
+  for(int i = 0; i < torques.size(); i++){
+    stringstream qstr;
+    qstr<<torques.at(i);
+    string cmd( (i<=0)?("set_torque_control"):("append_torque_control") );
+    SendCommandStringController(cmd,qstr.str());
+  }
+}
+void ForceFieldBackend::SendCommandStringController(string cmd, string arg)
+{
+  if(!sim.robotControllers[0]->SendCommand(cmd,arg)) {
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "ERROR in controller commander" << std::endl;
+    std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
+    std::cout << std::string(80, '-') << std::endl;
+    throw "Controller command not supported!";
+  }
+}
 
 void ForceFieldBackend::VisualizePlannerTree(const SerializedTree &tree)
 {
@@ -717,10 +744,15 @@ GLUIForceFieldGUI::GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _w
 //}
 bool GLUIForceFieldGUI::Initialize()
 {
+  std::cout << "Initializing GUI" << std::endl;
   if(!BaseT::Initialize()) return false;
-  
+
 
   ForceFieldBackend* _backend = static_cast<ForceFieldBackend*>(backend);
+
+  std::cout << "Open Loop Controller Setup" << std::endl;
+  _backend->SendPlannerOutputToController();
+
 
   panel = glui->add_rollout("Motion Planning");
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Object Edges");

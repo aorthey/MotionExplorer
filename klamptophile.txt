@@ -550,16 +550,22 @@ COM should retain orientation equal to origin so that we can see forces from
    [x] finalize kinodynamic space
    [x] simulate jet propulsion
    [x] implement tangentbundle integrator
+   [ ] *** do kinodynamic planning /w torque constraints on fibre bundle
+   [ ] *** execute/simulate kinodynamic path (use jet propulsion)
+      [x] torque values are SO(3) x R3 in controller, but should be R3xSO(3).  Why?
+      [x] error: driver 0 is not in PID mode. Why?
+      [ ] jet propulsion not implemented yet (see RobotJointDriver)
+      [ ] torques not being set properly
+      [ ] why does robot move when disabling force fields?
+
+   [ ] ** flow following by forward simulating a PID controlled device
    [ ] OMPL_SPACE remove hardcoded se3 vector fields
    [ ] include FF in tangentbundle integrator
    [ ] add start velocity plannersettings
    [ ] outsource duration time, algorithm name and epsilon goal (xml plannersettings)
-   [ ] *** do kinodynamic planning /w torque constraints on fibre bundle
    [ ] *** do kinodynamic planning /w FF
    [ ] put geometricOMPLcspace together with principal fibre bundle, do the same
 for kinodynamic
-   [ ] *** execute/simulate kinodynamic path (use jet propulsion)
-   [ ] ** flow following by forward simulating a PID controlled device
    [ ] ** visualize path speed profile (reuse python display and display in topp)
  [ ] * replace propagation by undulatory motions along each axis, but how would that work?
 

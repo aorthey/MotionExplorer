@@ -156,10 +156,10 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   // choose planner
   //###########################################################################
-  ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
+  //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
   //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
+  ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
 
   //###########################################################################
   // setup and projection
@@ -183,7 +183,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   bool solved = false;
   double solution_time = dInf;
-  double duration = 10.0;
+  double duration = 2.0;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
 
   //###########################################################################
@@ -250,6 +250,36 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
     std::cout << "Path Length     : " << path.length() << std::endl;
     std::cout << "Path Milestones : " << path.getStateCount() << std::endl;
 
+    std::vector<oc::Control*> controls = path_control.getControls();
+
+    uint N = cspace->GetControlDimensionality();
+    std::vector<Vector> torques;
+    std::cout << "Controls:" << std::endl;
+    std::cout << N << "x" << controls.size() << std::endl;
+    for(int i = 0; i < controls.size(); i++){
+      oc::RealVectorControlSpace::ControlType* ccv = static_cast<oc::RealVectorControlSpace::ControlType *>(controls.at(i));
+
+      double time = ccv->values[N-1];
+      Vector qt;qt.resize(N);
+      //invert SO3xR3 -> R3xSO3
+      for(int k = 0; k < 3; k++){
+        qt(k) = ccv->values[k+3];
+      }
+      for(int k = 3; k < 6; k++){
+        qt(k) = ccv->values[k-3];
+      }
+      for(int k = 6; k < N; k++){
+        qt(k) = ccv->values[k];
+      }
+      torques.push_back(qt);
+      //stringstream qstr;
+      //qstr<<qt;
+      //string cmd( (i<=0)?("set_torque_control"):("append_torque_control") );
+      //SendCommandStringController(cmd,qstr.str());
+    }
+
+    output.SetTorques(torques);
+
     //og::PathSimplifier shortcutter(si);
     //shortcutter.shortcutPath(path);
 
@@ -259,10 +289,10 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
       Config cc = cspace->OMPLStateToConfig(state);
       //Config cc;cc.resize(cur.size());
       std::vector<Real> curd = std::vector<Real>(cc);
+      //extract only position
       std::vector<Real> curhalf(curd.begin(),curd.begin()+int(0.5*curd.size()));
       Config cur(curhalf);
 
-      //vector<T> newVec(first, last);
       _keyframes.push_back(cur);
     }
     ob::State *obgoal = path.getState(path.getStateCount()-1);

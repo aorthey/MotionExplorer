@@ -56,6 +56,13 @@ class CSpaceOMPL
     virtual void initSpace() = 0;
     virtual void initControlSpace() = 0;
 
+    uint GetDimensionality(){
+      return space->getDimension();
+    }
+    uint GetControlDimensionality(){
+      return control_space->getDimension();
+    }
+
   protected:
 
     ob::StateSpacePtr space;

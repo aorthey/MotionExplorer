@@ -18,12 +18,15 @@
 #include "gui.h"
 #include "environment_loader.h"
 #include "planner/planner_ompl.h"
+#include "controller/controller.h"
 
 int main(int argc,const char** argv) {
 
   std::string file = "data/snake_turbine.xml";
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
   MotionPlannerOMPL planner(env.GetWorldPtr());
+
+  //RobotControllerFactory::Register( new ContactStabilityController(*env.GetRobotPtr()));
 
   PlannerInput pin = env.GetPlannerInput();
   std::cout << pin << std::endl;
@@ -35,6 +38,8 @@ int main(int argc,const char** argv) {
     env.GetBackendPtr()->AddPath(keyframes);
   }
 
+  env.GetBackendPtr()->AddPlannerOutput( planner.output );
+
   env.GetBackendPtr()->VisualizeStartGoal(p_init, p_goal);
   env.GetBackendPtr()->VisualizePlannerTree(planner.GetTree());
   env.GetBackendPtr()->HidePlannerTree();
@@ -42,6 +47,10 @@ int main(int argc,const char** argv) {
 
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.SetWindowTitle("SweptVolumePath");
+
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "GUI Start" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
   gui.Run();
 
   return 0;

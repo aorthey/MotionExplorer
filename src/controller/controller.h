@@ -1,5 +1,6 @@
 #pragma once
 #include <Control/Controller.h>
+#include <KrisLibrary/math/random.h>
 
 struct ControllerState{
   public:
@@ -98,6 +99,7 @@ public:
   virtual const char* Type() const { return "ContactStabilityController"; }
   virtual void Reset() { 
     //put any initialization code here
+    std::cout << "["<<Type() << "] Reset" << std::endl;
     RobotController::Reset(); 
   } 
 
@@ -114,10 +116,14 @@ public:
 
     Vector qcmd,vcmd;
     Vector qactual,vactual;
-    GetCommandedConfig(qcmd);  //convenience function in RobotController
-    GetCommandedVelocity(vcmd);  //convenience function in RobotController
-    GetSensedConfig(qactual);  //convenience function in RobotController
-    GetSensedVelocity(vactual);  //convenience function in RobotController
+
+    //GetCommandedConfig(qcmd);  //convenience function in RobotController
+    //GetCommandedVelocity(vcmd);  //convenience function in RobotController
+    //GetSensedConfig(qactual);  //convenience function in RobotController
+    //GetSensedVelocity(vactual);  //convenience function in RobotController
+
+    //std::cout << "config: " << qcmd << std::endl;
+    //std::cout << "velocity: " << vcmd << std::endl;
 
     //uint Nsensors = sensors->sensors.size();
     //for(int i = 0; i < Nsensors; i++){
@@ -158,29 +164,64 @@ public:
     output.AddCOM(com, LM, AM);
     output.PredictCOM(0.001, 1000);
 
-    SetPIDCommand(qcmd,vcmd);
+    if(torques.size()>0){
+      uint N = torques.at(0).size();
+
+      uint ictr = 0;
+      double t = 0;
+      while(t < time && ictr<times.size()){
+        t+= times.at(ictr++);
+        //std::cout << t << "/" << time << "(" << ictr << "/" << torques.size() << ")" << std::endl;
+      }
+      if(t>time){
+        Vector torque = torques.at(ictr-1);
+        for(int k = 0; k < torque.size(); k++){
+          torque(k) += Rand(-1,1);
+        }
+        SetTorqueCommand(torque);
+        std::cout << "Setting torque: " << torque << std::endl;
+      }else{
+        SetTorqueCommand(ZeroTorque);
+      }
+    }
+
+    //SetPIDCommand(qcmd,vcmd);
+    //SetTorqueCommand(const Vector& torques);
+
     //Vector torques;
     //torques.resize(qcmd.size());
     //torques.setZero();
 
     //std::cout << "drivers: " << robot.drivers.size() << std::endl;
-    //std::cout << "torques: " << torques.size() << std::endl;
-    //torques[15] = 1;
-    //torques[16] = 1;
-    //torques[17] = 1;
-
-    //SetTorqueCommand(torques);
+    //for(int i = 0; i < robot.drivers.size(); i++){
+    //  RobotJointDriver driver = robot.drivers.at(i);
+    //  if(driver.type == RobotJointDriver::Normal) {
+    //    std::cout << "[" << i << "/" << robot.drivers.size() << "] : normal" << std::endl;
+    //  }
+    //}
+    //exit(0);
 
     RobotController::Update(dt);
   }
   virtual bool SendCommand(const string& name,const string& str){
 
     stringstream ss(str);
-    Real t;
-    Config q,v;
+    Vector torque_and_time;
     if(name == "set_q") {
       fprintf(stderr,"not done yet\n");
       return false;
+    }else if(name == "set_torque_control") {
+      ss >> torque_and_time;
+      torques.clear();
+      AppendTorqueAndTime(torque_and_time);
+      ZeroTorque = torques.at(0);
+      ZeroTorque.setZero();
+      return true;
+    }else if(name == "append_torque_control") {
+      ss >> torque_and_time;
+      std::cout << "Controller: append_torque_control : #torques " << torques.size() << " last item " << torques.back() << std::endl;
+      AppendTorqueAndTime(torque_and_time);
+      return true;
     }else if(name == "brake") {
       fprintf(stderr,"Brake is not done yet\n");
       return false;
@@ -188,11 +229,35 @@ public:
     return false;
   }
 
+  void AppendTorqueAndTime( Vector &torque_and_time )
+  {
+    std::vector<Real> torque_tmp(torque_and_time.begin(),torque_and_time.end()-1);
+    Vector torque(torque_tmp);
+    torques.push_back(torque);
+    times.push_back(torque_and_time(torque_and_time.size()-1));
+    // std::cout << torque_and_time << std::endl;
+    // std::cout << torque << std::endl;
+    // std::cout << "time:" << times.back() << std::endl;
+    // exit(0);
+  }
+
+  std::vector<Vector> torques;
+  std::vector<double> times;
+  Vector ZeroTorque;
+
   virtual vector<string> Commands() const
   {
     vector<string> res;
     res.push_back("set_q");
+    res.push_back("set_torque_control");
+    res.push_back("append_torque_control");
     res.push_back("brake");
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "Controller Commands:" << std::endl;
+    for(int i = 0; i < res.size(); i++){
+      std::cout << res.at(i) << std::endl;
+    }
+    std::cout << std::string(80, '-') << std::endl;
     return res;
   }
 

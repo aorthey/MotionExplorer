@@ -16,6 +16,7 @@
 #include <View/ViewIK.h>
 #include <ode/ode.h>
 #include "planner/serialized_tree.h"
+#include "planner/planner_output.h"
 #include "elements/swept_volume.h"
 #include "elements/wrench_field.h"
 #include "controller/controller.h"
@@ -72,15 +73,11 @@ class ForceFieldBackend : public SimTestBackend
     vector< vector<Vector3> > _frames;
     vector< double > _frameLength;
 
-    //point and direction of wrench for each link's COM
-
-    //typedef Vector Wrench;
-    //typedef vector< std::pair<Vector3, Wrench> > WrenchField;
+    PlannerOutput planneroutput; //TODO: put everything in here, make it vector 
 
   public:
 
   WrenchField wrenchfield;
-
 
   ForceFieldBackend(RobotWorld *world);
   virtual void Start();
@@ -89,6 +86,8 @@ class ForceFieldBackend : public SimTestBackend
   virtual void RenderScreen();
 
   virtual bool OnIdle();
+  void SendPlannerOutputToController();
+  void SendCommandStringController(string cmd, string arg);
 
   virtual bool Save(const char* file=NULL);
   virtual bool Save(TiXmlElement *node);
@@ -103,6 +102,8 @@ class ForceFieldBackend : public SimTestBackend
   void HidePlannerTree(){ drawPlannerTree = 0; }
   void ShowSweptVolumes(){ showSweptVolumes = 1; }
   void HideSweptVolumes(){ showSweptVolumes = 0; }
+
+  void AddPlannerOutput( PlannerOutput& pout );
 
   void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);
   void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
@@ -182,4 +183,3 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
 
 
 typedef SmartPointer<ForceFieldBackend> ForceFieldBackendPtr;
-
