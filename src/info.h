@@ -80,21 +80,46 @@ class Info
         vector<string> linkNames = (*it)->linkNames;
         vector<RobotLink3D> links = (*it)->links;
         assert( links.size() == linkNames.size() );
+        std::cout << "#Links: " << links.size() << std::endl;
         for(uint i = 0; i < links.size(); i++){
           std::cout<< "Link[" << i << "] " << linkNames[i] << " mass " << links[i].mass << std::endl;
         }
 
-        //std::cout << std::string(80, '-') << std::endl;
-        //vector<RobotJoint> joints = (*it)->joints;
-        //for(int i = 0; i< joints.size(); i++){
-        //  std::cout<< "Joint[" << i << "] linkidx " << joints[i].linkIndex << " baseidx " << joints[i].baseIndex << " type " << joints[i].type << std::endl;
-        //}
+        std::cout << std::string(80, '-') << std::endl;
+        vector<RobotJoint> joints = (*it)->joints;
+        std::cout << "#Joints: " << joints.size() << std::endl;
+        for(int i = 0; i< joints.size(); i++){
+          std::cout<< "Joint[" << i << "] linkidx " << joints[i].linkIndex << " baseidx " << joints[i].baseIndex << " type ";
+            switch(joints[i].type){
+              case RobotJoint::Floating: std::cout << "floating"; break;
+              case RobotJoint::Weld: std::cout << "--"; break;
+              case RobotJoint::Normal: std::cout << "actuated"; break;
+              case RobotJoint::Spin: std::cout << "infinite rotating"; break;
+              default: std::cout << "UNKNOWN"; break;
+            }
+          std::cout << std::endl;
+        }
 
         std::cout << std::string(80, '-') << std::endl;
         vector<RobotJointDriver> drivers = (*it)->drivers;
         vector<string> dnames = (*it)->driverNames;
+        std::cout << "#Drivers: " << drivers.size() << std::endl;
         for(uint i = 0; i < drivers.size(); i++){
-          std::cout<< "Joint[" << i << "] " << dnames[i] << " qmin " << drivers[i].qmin << " qmax " << drivers[i].qmax << std::endl;
+          double ql = drivers[i].qmin;
+          double qu = drivers[i].qmax;
+          double vl = drivers[i].vmin;
+          double vu = drivers[i].vmax;
+          double al = drivers[i].amin;
+          double au = drivers[i].amax;
+          double tl = drivers[i].tmin;
+          double tu = drivers[i].tmax;
+          std::cout << "Driver[" << drivers[i].linkIndices.at(0) << "] ";
+
+          std::cout << ql << "<=   q <=" << qu << " | "
+                    << vl << "<=  dq <=" << vu << " | "
+                    << al << "<=  ddq <=" << au << " | "
+                    << tl << "<=  trq <=" << tu << "   ";
+          std::cout << "("<< dnames[i] <<")"<<std::endl;
         }
 
         uint Neffective = 0;

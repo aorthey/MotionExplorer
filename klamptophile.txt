@@ -359,6 +359,11 @@ MultiPath (Modeling/MultiPath.h)
   Real Duration() const;
   int Evaluate(Real time,Vector& q,Vector& v)
 
+-------------------------------------------------------------------------------
+Controller
+-------------------------------------------------------------------------------
+
+Control/Controller.h
 
 -------------------------------------------------------------------------------
 TODO
@@ -486,8 +491,8 @@ model?) -> one of the cylinders pierced the head sphere creating a spurious coll
  [x] experiment wall 10xXX ? 
  [x] rewrite introduction and experimental part
  [x] experiment door 100x1200 complete
- [ ] experiment wall 10x3600*24 complete (running)
- [ ] change title to dimred for mp using ip
+ [x] experiment wall 10x3600*24 complete (running)
+ [x] change title to dimred for mp using ip
  [ ] incorporate reviews/edits/comments from OOM
 
 -- unnamed abstractions paper
@@ -551,13 +556,19 @@ COM should retain orientation equal to origin so that we can see forces from
    [x] simulate jet propulsion
    [x] implement tangentbundle integrator
    [ ] *** do kinodynamic planning /w torque constraints on fibre bundle
+      [ ] check forward integration
    [ ] *** execute/simulate kinodynamic path (use jet propulsion)
       [x] torque values are SO(3) x R3 in controller, but should be R3xSO(3).  Why?
       [x] error: driver 0 is not in PID mode. Why?
-      [ ] jet propulsion not implemented yet (see RobotJointDriver)
-      [ ] torques not being set properly (robot should move with random torques)
-      [ ] why does robot move when disabling force fields?
+      [x] jet propulsion not implemented yet (see RobotJointDriver)
+      [ ] jet propulsion acts on global coordinate frame, not locally on robot link
+      [x] torques not being set properly (robot should move with random torques)
+      [ ] why does robot move when disabling force fields? (does not happen after reset!)
+      [ ] display the jet propulsion wrenches to verify
+      [ ] segfault /w single rigid body
+          [ ] drivers and actuators do not match up
 
+   [x] reset: delete com window
    [ ] ** flow following by forward simulating a PID controlled device
    [ ] OMPL_SPACE remove hardcoded se3 vector fields
    [ ] include FF in tangentbundle integrator

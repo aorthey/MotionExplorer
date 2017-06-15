@@ -74,7 +74,7 @@ class ForceFieldBackend : public SimTestBackend
     vector< vector<Vector3> > _frames;
     vector< double > _frameLength;
 
-    PlannerOutput planneroutput; //TODO: put everything in here, make it vector 
+    vector<PlannerOutput> planneroutput;
 
   public:
 
@@ -104,7 +104,7 @@ class ForceFieldBackend : public SimTestBackend
     void ShowSweptVolumes(){ showSweptVolumes = 1; }
     void HideSweptVolumes(){ showSweptVolumes = 0; }
 
-    void AddPlannerOutput( PlannerOutput& pout );
+    void AddPlannerOutput( PlannerOutput pout );
 
     void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);
     void VisualizeStartGoal(const Config &p_init, const Config &p_goal);

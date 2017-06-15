@@ -40,15 +40,12 @@ class MotionPlanner{
     bool _isSolved;
     bool _shortcutting;
     double _timelimit;
-    KinodynamicMilestonePath _path;
-    std::vector<Config> _keyframes;
-
+    //KinodynamicMilestonePath _path;
     SerializedTree _stree;
-
+    PlannerOutput output;
   public:
 
-    PlannerOutput output;
-
+    PlannerOutput GetOutput();
 
     explicit MotionPlanner(RobotWorld *world);
     const KinodynamicMilestonePath& GetPath();
@@ -65,23 +62,23 @@ class MotionPlanner{
 
     virtual bool solve(Config &p_init, Config &p_goal, double timelimit=100.0, bool shortcutting=true);
 
-    void SendCommandStringController(string cmd, string arg);
-    bool SendToController();
+    //void SendCommandStringController(string cmd, string arg);
+    //bool SendToController();
     bool IsFeasible(Robot *robot, SingleRobotCSpace &cspace, Config &q);
 
     virtual std::string getName();
-    virtual bool Save(const char* file=NULL);
-    virtual bool Save(TiXmlElement *node);
-    virtual bool Load(const char* file);
-    virtual bool Load(TiXmlElement *node);
+    //virtual bool Save(const char* file=NULL);
+    //virtual bool Save(TiXmlElement *node);
+    //virtual bool Load(const char* file);
+    //virtual bool Load(TiXmlElement *node);
 
   protected:
     //virtual bool solve_internal(Config &p_init, Config &p_goal);
 };
-bool Save(const std::vector<Config> &keyframes, const char* file);
-bool Save(const std::vector<Config> &keyframes, TiXmlElement *node);
-bool Load(std::vector<Config> &keyframes, const char* file);
-bool Load(std::vector<Config> &keyframes, TiXmlElement *node);
+//bool Save(const std::vector<Config> &keyframes, const char* file);
+//bool Save(const std::vector<Config> &keyframes, TiXmlElement *node);
+//bool Load(std::vector<Config> &keyframes, const char* file);
+//bool Load(std::vector<Config> &keyframes, TiXmlElement *node);
 
 
 // * The type field can be left as "any", in which a default planning algorithm will be

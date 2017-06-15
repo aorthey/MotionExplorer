@@ -47,13 +47,70 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     exit(0);
   }
   name_robot = world.robots[0]->name;
+//################################################################################
+//################################################################################
+  std::cout << "Adding free float driver to robot " << name_robot << std::endl;
 
-  //name_environment = world.rigidObjects[0]->name;
-  //name = name_robot + "_" + name_environment;
-  //std::cout << name << std::endl;
+  if(!(world.robots[0]->joints[0].type == RobotJoint::Floating)){
+    std::cout << "First joint of robot should be a free floating joint" << std::endl;
+    std::cout << "But actual type is: " << world.robots[0]->joints[0].type << std::endl;
+    exit(0);
+  }
+  vector<string>* driverNames = &world.robots[0]->driverNames;
+  vector<RobotJointDriver>* drivers = &world.robots[0]->drivers;
 
+  RobotJointDriver translation[3], rotation[3];
 
+  //TODO read any jet propulsion mechanisms directly from XML (i.e. add jet
+  //propulsion while specifying robot urdf)
+  // Rotation is eulerangles ZYX
+  for(int i = 2; i >= 0; i--){
+    rotation[i].type = RobotJointDriver::Rotation;
+    rotation[i].linkIndices.push_back(i+3);
+    rotation[i].linkIndices.push_back(5);
+    rotation[i].qmin = -dInf;
+    rotation[i].qmax = dInf;
+    rotation[i].vmin = -dInf;
+    rotation[i].vmax = dInf;
+    rotation[i].tmin = -dInf;
+    rotation[i].tmax = dInf;
+    rotation[i].amin = -dInf;
+    rotation[i].amax = dInf;
+    rotation[i].servoP = 0;
+    rotation[i].servoI = 0;
+    rotation[i].servoD = 0;
+    rotation[i].dryFriction = 0;
+    rotation[i].viscousFriction = 0;
+    drivers->insert(drivers->begin(), rotation[i]);
+    std::string dName = "rotation e"+to_string(i);
+    driverNames->insert(driverNames->begin(), dName.c_str());
+  }
+
+  for(int i = 2; i >= 0; i--){
+    translation[i].type = RobotJointDriver::Translation;
+    translation[i].linkIndices.push_back(i);
+    translation[i].linkIndices.push_back(5);
+    translation[i].qmin = -dInf;
+    translation[i].qmax = dInf;
+    translation[i].vmin = -dInf;
+    translation[i].vmax = dInf;
+    translation[i].tmin = -dInf;
+    translation[i].tmax = dInf;
+    translation[i].amin = -dInf;
+    translation[i].amax = dInf;
+    translation[i].servoP = 0;
+    translation[i].servoI = 0;
+    translation[i].servoD = 0;
+    translation[i].dryFriction = 0;
+    translation[i].viscousFriction = 0;
+    drivers->insert(drivers->begin(), translation[i]);
+    std::string dName = "translation e"+to_string(i);
+    driverNames->insert(driverNames->begin(), dName.c_str());
+  }
+
+  //  nd = (int) drivers.size();
   info(&world);
+
   Robot *robot = world.robots[0];
 
   SmartPointer<RobotController> controller = new ContactStabilityController(*robot);

@@ -17,6 +17,8 @@ struct ControllerState{
     void SetMass( double _mass );
     void PredictCOM( double tstep, uint Nsteps);
 
+    void Reset();
+
   private:
     double getLength(std::vector<Vector3> &path);
 };

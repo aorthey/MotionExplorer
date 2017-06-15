@@ -144,9 +144,9 @@ void ForceFieldBackend::Start()
   showLinks.resize(Nlinks); //hide certain links 
 
   for(int i = 0; i < showLinks.size(); i++){
-    showLinks[i] = 0;
+    showLinks[i] = 1;
   }
-  showLinks[15] = 1;
+  //showLinks[15] = 1;
   //for(int i = 43; i < 50; i++) showLinks[i] = 1;
   //for(int i = 29; i < 36; i++) showLinks[i] = 1;
 
@@ -553,15 +553,17 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
 //############################################################################
 
 #include <KrisLibrary/graph/Tree.h>
-void ForceFieldBackend::AddPlannerOutput( PlannerOutput& pout )
+void ForceFieldBackend::AddPlannerOutput( PlannerOutput pout )
 {
   std::cout << "Adding PlannerOutput" << std::endl;
-  planneroutput = pout;
+  planneroutput.push_back(pout);
+  AddPath(pout.GetKeyframes());
+  VisualizePlannerTree(pout.GetTree());
 }
 
 void ForceFieldBackend::SendPlannerOutputToController()
 {
-  std::vector<Vector> torques = planneroutput.GetTorques();
+  std::vector<Vector> torques = planneroutput.at(0).GetTorques();
   for(int i = 0; i < torques.size(); i++){
     stringstream qstr;
     qstr<<torques.at(i);
@@ -686,6 +688,9 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   std::cout << "OnCommand: " << cmd << std::endl;
 
   if(cmd=="reset") {
+    for(int k = 0; k < sim.robotControllers.size(); k++){
+      sim.robotControllers.at(k)->Reset();
+    }
     sim.hooks.clear();
     return BaseT::OnCommand(cmd,args);
   }else if(cmd=="draw_rigid_objects_faces_toggle") {

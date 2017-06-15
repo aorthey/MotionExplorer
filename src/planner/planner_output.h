@@ -5,15 +5,18 @@ class PlannerOutput{
   private:
     double time;
     uint nodes;
-    std::vector<Config> p;
-    std::vector<Config> dp;
+
+    //tree swath
+    SerializedTree _stree;
+
+    //path
+    std::vector<Config> q;
+    std::vector<Config> dq;
+    std::vector<Config> ddq;
     std::vector<Vector> torques;
 
   public:
     PlannerOutput(){};
-
-    //std::vector<Config> GetRoadmapVertices();
-    //std::vector<std::pair<Config,Config> > GetRoadmapEdges();
 
     void SetTorques(std::vector<Vector> &torques_){
       torques = torques_;
@@ -21,9 +24,22 @@ class PlannerOutput{
     const std::vector<Vector>& GetTorques(){
       return torques;
     }
-    //std::vector<Config> GetPath();
-    //Config GetInitialConfig();
-    //Config GetGoalConfig();
+
+    const SerializedTree& GetTree()
+    {
+      return _stree;
+    }
+    void SetTree(SerializedTree &stree)
+    {
+      _stree = stree;
+    }
+
+    const std::vector<Config> GetKeyframes(){
+      return q;
+    }
+    void SetKeyframes(std::vector<Config> &keyframes){
+      q = keyframes;
+    }
 
 };
 

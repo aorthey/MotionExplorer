@@ -7,7 +7,7 @@ from urdf_create import *
 
 robot_names = ['snake','snake_irreducible']
 env_names = ['twister/twister.tri','underwater/underwater.tri']
-Nsegments_vec = [5,1]
+Nsegments_vec = [1,1]
 
 length = 0.1
 limit = pi/4

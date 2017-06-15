@@ -88,7 +88,7 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
     }
     std::string sfile = "ompl_"+std::to_string(pid)+".xml";
     std::cout << "Saving keyframes"<< std::endl;
-    Save(keyframes, sfile.c_str());
+    //Save(keyframes, sfile.c_str());
   }else{
     std::cout << "Run " << pid << " no solution" << std::endl;
 
@@ -183,7 +183,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   bool solved = false;
   double solution_time = dInf;
-  double duration = 2.0;
+  double duration = 1.0;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
 
   //###########################################################################
@@ -278,11 +278,10 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
       //SendCommandStringController(cmd,qstr.str());
     }
 
-    output.SetTorques(torques);
-
     //og::PathSimplifier shortcutter(si);
     //shortcutter.shortcutPath(path);
 
+    std::vector<Config> keyframes;
     for(int i = 0; i < path.getStateCount(); i++)
     {
       ob::State *state = path.getState(i);
@@ -293,17 +292,21 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
       std::vector<Real> curhalf(curd.begin(),curd.begin()+int(0.5*curd.size()));
       Config cur(curhalf);
 
-      _keyframes.push_back(cur);
+      keyframes.push_back(cur);
     }
     ob::State *obgoal = path.getState(path.getStateCount()-1);
     Config plannergoal = cspace->OMPLStateToConfig(obgoal);
 
     uint istep = max(int(path.getStateCount()/10.0),1);
-    for(int i = 0; i < _keyframes.size(); i+=istep)
+    for(int i = 0; i < keyframes.size(); i+=istep)
     {
-      Config cur(_keyframes.at(i));
+      Config cur(keyframes.at(i));
       std::cout << i << "/" << path.getStateCount() <<  cur << std::endl;
     }
+
+    output.SetTorques(torques);
+    output.SetKeyframes(keyframes);
+    output.SetTree(_stree);
     std::cout << std::string(80, '-') << std::endl;
   }else{
     std::cout << "No solution found" << std::endl;

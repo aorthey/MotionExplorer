@@ -2,8 +2,8 @@ import numpy as np
 from math import cos,sin,pi
 
 mass = 1
-damping = 0.1
-effort = 0.01
+damping = 0.5
+effort = 1
 velocity=100
 
 

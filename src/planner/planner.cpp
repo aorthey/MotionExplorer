@@ -10,233 +10,237 @@ MotionPlanner::MotionPlanner(RobotWorld *world):
   _icontroller = 0;
   robot = world->robots[_irobot];
 }
-const KinodynamicMilestonePath& MotionPlanner::GetPath()
-{
-  return _path;
-}
-const std::vector<Config>& MotionPlanner::GetKeyframes()
-{
-  return _keyframes;
-}
-const SerializedTree& MotionPlanner::GetTree()
-{
-  return _stree;
-}
-//###################################################################
-bool Save(const std::vector<Config> &keyframes, const char* file=NULL)
-{
-  std::string out;
-  std::string pdata = util::GetDataFolder();
-
-  if(!file){
-    std::string date = util::GetCurrentTimeString();
-    out = pdata+"/paths/state_"+date+".xml";
-  }else{
-    out = pdata+"/paths/"+file;
-  }
-
-  std::cout << "saving data to "<< out << std::endl;
-
-  TiXmlDocument doc;
-  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
-  doc.LinkEndChild(decl);
-  TiXmlElement *node = new TiXmlElement("path");
-  Save(keyframes, node);
-
-  doc.LinkEndChild(node);
-  doc.SaveFile(out.c_str());
-
-  return true;
-
-}
-//###################################################################
-
-bool Load(std::vector<Config> &keyframes, const char* file)
-{
-  std::string pdata = util::GetDataFolder();
-  std::string in = pdata+"/paths/"+file;
-
-  std::cout << "loading data from "<<in << std::endl;
-
-  TiXmlDocument doc(in.c_str());
-  if(doc.LoadFile()){
-    TiXmlElement *root = doc.RootElement();
-    if(root){
-      Load(keyframes, root);
-    }
-  }else{
-    std::cout << doc.ErrorDesc() << std::endl;
-    std::cout << "ERROR" << std::endl;
-  }
-  return true;
-
-}
-//###################################################################
-bool Load(std::vector<Config> &keyframes, TiXmlElement *node)
-{
-
-  keyframes.clear();
-  if(0!=strcmp(node->Value(),"path")) {
-    std::cout << "Not a Keyframes file" << std::endl;
-    return false;
-  }
-  TiXmlElement* e=node->FirstChildElement();
-  while(e != NULL) 
-  {
-    if(0==strcmp(e->Value(),"q")) {
-      Config q;
-      stringstream ss(e->GetText());
-      ss >> q;
-      keyframes.push_back(q);
-    }
-    e = e->NextSiblingElement();
-  }
-  return true;
-}
-//###################################################################
-bool Save(const std::vector<Config> &keyframes, TiXmlElement *node)
-{
-  node->SetValue("path");
-
-  for(int i = 0; i < keyframes.size(); i++){
-    TiXmlElement c("q");
-    stringstream ss;
-    ss<<keyframes.at(i);
-    TiXmlText text(ss.str().c_str());
-    c.InsertEndChild(text);
-    node->InsertEndChild(c);
-  }
-  return true;
+//const KinodynamicMilestonePath& MotionPlanner::GetPath()
+//{
+//  return _path;
+//}
+//const std::vector<Config>& MotionPlanner::GetKeyframes()
+//{
+//  return _keyframes;
+//}
+//const SerializedTree& MotionPlanner::GetTree()
+//{
+//  return _stree;
+//}
+PlannerOutput MotionPlanner::GetOutput(){
+  return output;
 }
 
-//###################################################################
-bool MotionPlanner::Load(const char* file)
-{
-  std::string pdata = util::GetDataFolder();
-  std::string in = pdata+"/planner/"+file;
+////###################################################################
+//bool Save(const std::vector<Config> &keyframes, const char* file=NULL)
+//{
+//  std::string out;
+//  std::string pdata = util::GetDataFolder();
 
-  std::cout << "loading data from "<<in << std::endl;
+//  if(!file){
+//    std::string date = util::GetCurrentTimeString();
+//    out = pdata+"/paths/state_"+date+".xml";
+//  }else{
+//    out = pdata+"/paths/"+file;
+//  }
 
-  TiXmlDocument doc(in.c_str());
-  if(doc.LoadFile()){
-    TiXmlElement *root = doc.RootElement();
-    if(root){
-      Load(root);
-    }
-  }else{
-    std::cout << doc.ErrorDesc() << std::endl;
-    std::cout << "ERROR" << std::endl;
-  }
-  return true;
+//  std::cout << "saving data to "<< out << std::endl;
 
-}
-//###################################################################
-bool MotionPlanner::Save(const char* file)
-{
-  std::string out;
-  std::string pdata = util::GetDataFolder();
+//  TiXmlDocument doc;
+//  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+//  doc.LinkEndChild(decl);
+//  TiXmlElement *node = new TiXmlElement("path");
+//  Save(keyframes, node);
 
-  if(!file){
-    std::string date = util::GetCurrentTimeString();
-    out = pdata+"/planner/state_"+date+".xml";
-  }else{
-    out = pdata+"/planner/"+file;
-  }
+//  doc.LinkEndChild(node);
+//  doc.SaveFile(out.c_str());
 
-  std::cout << "saving data to "<< out << std::endl;
+//  return true;
 
-  TiXmlDocument doc;
-  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
-  doc.LinkEndChild(decl);
-  TiXmlElement *node = new TiXmlElement("Planner");
-  Save(node);
+//}
+////###################################################################
 
-  doc.LinkEndChild(node);
-  doc.SaveFile(out.c_str());
+//bool Load(std::vector<Config> &keyframes, const char* file)
+//{
+//  std::string pdata = util::GetDataFolder();
+//  std::string in = pdata+"/paths/"+file;
 
-  return true;
+//  std::cout << "loading data from "<<in << std::endl;
 
-}
-//###################################################################
-bool MotionPlanner::Load(TiXmlElement *node)
-{
+//  TiXmlDocument doc(in.c_str());
+//  if(doc.LoadFile()){
+//    TiXmlElement *root = doc.RootElement();
+//    if(root){
+//      Load(keyframes, root);
+//    }
+//  }else{
+//    std::cout << doc.ErrorDesc() << std::endl;
+//    std::cout << "ERROR" << std::endl;
+//  }
+//  return true;
 
-  _stree.clear();
-  _keyframes.clear();
+//}
+////###################################################################
+//bool Load(std::vector<Config> &keyframes, TiXmlElement *node)
+//{
 
-  if(0!=strcmp(node->Value(),"Planner")) {
-    std::cout << "Not a Planner file" << std::endl;
-    return false;
-  }
-  TiXmlElement* e=node->FirstChildElement();
-  while(e != NULL) 
-  {
-    if(0==strcmp(e->Value(),"tree")) {
-      TiXmlElement* c=e->FirstChildElement();
-      while(c!=NULL)
-      {
-        if(0==strcmp(c->Value(),"node")) {
-          SerializedTreeNode sn;
-          sn.Load(c);
-          _stree.push_back(sn);
-        }
-        c = c->NextSiblingElement();
-      }
-    }
-    if(0==strcmp(e->Value(),"sweptvolume")) {
+//  keyframes.clear();
+//  if(0!=strcmp(node->Value(),"path")) {
+//    std::cout << "Not a Keyframes file" << std::endl;
+//    return false;
+//  }
+//  TiXmlElement* e=node->FirstChildElement();
+//  while(e != NULL) 
+//  {
+//    if(0==strcmp(e->Value(),"q")) {
+//      Config q;
+//      stringstream ss(e->GetText());
+//      ss >> q;
+//      keyframes.push_back(q);
+//    }
+//    e = e->NextSiblingElement();
+//  }
+//  return true;
+//}
+////###################################################################
+//bool Save(const std::vector<Config> &keyframes, TiXmlElement *node)
+//{
+//  node->SetValue("path");
 
-      TiXmlElement* c=e->FirstChildElement();
-      while(c!=NULL)
-      {
-        if(0==strcmp(c->Value(),"qitem")) {
-          Config q;
-          stringstream ss(c->GetText());
-          ss >> q;
-          _keyframes.push_back(q);
-        }
-        c = c->NextSiblingElement();
-      }
-    }
-    e = e->NextSiblingElement();
-  }
+//  for(int i = 0; i < keyframes.size(); i++){
+//    TiXmlElement c("q");
+//    stringstream ss;
+//    ss<<keyframes.at(i);
+//    TiXmlText text(ss.str().c_str());
+//    c.InsertEndChild(text);
+//    node->InsertEndChild(c);
+//  }
+//  return true;
+//}
 
-  return true;
-}
-//###################################################################
-bool MotionPlanner::Save(TiXmlElement *node)
-{
-  node->SetValue("Planner");
+////###################################################################
+//bool MotionPlanner::Load(const char* file)
+//{
+//  std::string pdata = util::GetDataFolder();
+//  std::string in = pdata+"/planner/"+file;
 
-  //###################################################################
-  {
-    TiXmlElement c("tree");
-    for(int i = 0; i < _stree.size(); i++){
-      TiXmlElement cc("node");
-      _stree.at(i).Save(&cc);
-      c.InsertEndChild(cc);
-    }
+//  std::cout << "loading data from "<<in << std::endl;
 
-    node->InsertEndChild(c);
-  }
-  //###################################################################
-  {
-    TiXmlElement c("sweptvolume");
-    for(int i = 0; i < _keyframes.size(); i++){
-      TiXmlElement cc("qitem");
-      stringstream ss;
-      ss<<_keyframes.at(i);
-      TiXmlText text(ss.str().c_str());
-      cc.InsertEndChild(text);
-      c.InsertEndChild(cc);
-    }
-    node->InsertEndChild(c);
-  }
+//  TiXmlDocument doc(in.c_str());
+//  if(doc.LoadFile()){
+//    TiXmlElement *root = doc.RootElement();
+//    if(root){
+//      Load(root);
+//    }
+//  }else{
+//    std::cout << doc.ErrorDesc() << std::endl;
+//    std::cout << "ERROR" << std::endl;
+//  }
+//  return true;
 
-  return true;
+//}
+////###################################################################
+//bool MotionPlanner::Save(const char* file)
+//{
+//  std::string out;
+//  std::string pdata = util::GetDataFolder();
 
-}
-//###################################################################
-//###################################################################
+//  if(!file){
+//    std::string date = util::GetCurrentTimeString();
+//    out = pdata+"/planner/state_"+date+".xml";
+//  }else{
+//    out = pdata+"/planner/"+file;
+//  }
+
+//  std::cout << "saving data to "<< out << std::endl;
+
+//  TiXmlDocument doc;
+//  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
+//  doc.LinkEndChild(decl);
+//  TiXmlElement *node = new TiXmlElement("Planner");
+//  Save(node);
+
+//  doc.LinkEndChild(node);
+//  doc.SaveFile(out.c_str());
+
+//  return true;
+
+//}
+////###################################################################
+//bool MotionPlanner::Load(TiXmlElement *node)
+//{
+
+//  _stree.clear();
+//  _keyframes.clear();
+
+//  if(0!=strcmp(node->Value(),"Planner")) {
+//    std::cout << "Not a Planner file" << std::endl;
+//    return false;
+//  }
+//  TiXmlElement* e=node->FirstChildElement();
+//  while(e != NULL) 
+//  {
+//    if(0==strcmp(e->Value(),"tree")) {
+//      TiXmlElement* c=e->FirstChildElement();
+//      while(c!=NULL)
+//      {
+//        if(0==strcmp(c->Value(),"node")) {
+//          SerializedTreeNode sn;
+//          sn.Load(c);
+//          _stree.push_back(sn);
+//        }
+//        c = c->NextSiblingElement();
+//      }
+//    }
+//    if(0==strcmp(e->Value(),"sweptvolume")) {
+
+//      TiXmlElement* c=e->FirstChildElement();
+//      while(c!=NULL)
+//      {
+//        if(0==strcmp(c->Value(),"qitem")) {
+//          Config q;
+//          stringstream ss(c->GetText());
+//          ss >> q;
+//          _keyframes.push_back(q);
+//        }
+//        c = c->NextSiblingElement();
+//      }
+//    }
+//    e = e->NextSiblingElement();
+//  }
+
+//  return true;
+//}
+////###################################################################
+//bool MotionPlanner::Save(TiXmlElement *node)
+//{
+//  node->SetValue("Planner");
+
+//  //###################################################################
+//  {
+//    TiXmlElement c("tree");
+//    for(int i = 0; i < _stree.size(); i++){
+//      TiXmlElement cc("node");
+//      _stree.at(i).Save(&cc);
+//      c.InsertEndChild(cc);
+//    }
+
+//    node->InsertEndChild(c);
+//  }
+//  //###################################################################
+//  {
+//    TiXmlElement c("sweptvolume");
+//    for(int i = 0; i < _keyframes.size(); i++){
+//      TiXmlElement cc("qitem");
+//      stringstream ss;
+//      ss<<_keyframes.at(i);
+//      TiXmlText text(ss.str().c_str());
+//      cc.InsertEndChild(text);
+//      c.InsertEndChild(cc);
+//    }
+//    node->InsertEndChild(c);
+//  }
+
+//  return true;
+
+//}
+////###################################################################
+////###################################################################
 
 void MotionPlanner::SerializeTreeCullClosePoints(SerializedTree &_stree, CSpace *base, double epsilon)
 {
@@ -520,48 +524,5 @@ bool MotionPlanner::solve(Config &p_init, Config &p_goal, double timelimit, bool
   //CSpaceGoalSetEpsilonNeighborhood goalSet(&space, _p_goal, plannersettings.goalRegionConvergence);
 
   std::clock_t end = std::clock();
-}
-
-void MotionPlanner::SendCommandStringController(string cmd, string arg)
-{
-  //if(!_sim->robotControllers[_icontroller]->SendCommand(cmd,arg)) {
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  std::cout << "ERROR in controller commander" << std::endl;
-  //  std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  throw "Controller command not supported!";
-  //}
-}
-bool MotionPlanner::SendToController()
-{
-  if(!_isSolved){ return false; }
-
-  double dstep = 0.1;
-  Config q;
-  Config dq;
-
-  for(int i = 0; i < _keyframes.size()-1; i++){
-    //_path.Evaluate(d, q, dq);
-    q = _keyframes.at(i);
-    Config q2 = _keyframes.at(i+1);
-    double dt = 1.0/_keyframes.size();
-    dq = (q-q2)/dt;
-    stringstream qstr;
-    qstr<<q<<dq;
-    string cmd( (i<=0)?("set_qv"):("append_qv") );
-    SendCommandStringController(cmd,qstr.str());
-  }
-  //{
-  //  _path.Evaluate(d, q, dq);
-  //  stringstream qstr;
-  //  qstr<<q<<dq;
-  //  string cmd( (d<=0)?("set_qv"):("append_qv") );
-  //  SendCommandStringController(cmd,qstr.str());
-  //}
-
-  std::cout << "Sending Path to Controller" << std::endl;
-  //robot->UpdateConfig(_p_goal);
-  std::cout << "Done Path to Controller" << std::endl;
-  return true;
 }
 
