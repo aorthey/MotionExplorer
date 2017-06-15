@@ -555,7 +555,7 @@ COM should retain orientation equal to origin so that we can see forces from
       [x] torque values are SO(3) x R3 in controller, but should be R3xSO(3).  Why?
       [x] error: driver 0 is not in PID mode. Why?
       [ ] jet propulsion not implemented yet (see RobotJointDriver)
-      [ ] torques not being set properly
+      [ ] torques not being set properly (robot should move with random torques)
       [ ] why does robot move when disabling force fields?
 
    [ ] ** flow following by forward simulating a PID controlled device
@@ -578,7 +578,8 @@ force too strong? but then terrain would be permeated, too.
 happens if we apply a force which overcomes the self-collision and creates
 overlapping meshes. solution: avoid forces higher than ?? or increase
 self-collision forces?
- [ ] reset not working anymore
+ [x] reset not working anymore
+ [ ] reset goes back to wrong position
  [ ] kernel panic after movie creation
 
 -- pipeline

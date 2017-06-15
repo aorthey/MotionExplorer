@@ -40,10 +40,11 @@ int main(int argc,const char** argv) {
 
   env.GetBackendPtr()->AddPlannerOutput( planner.output );
 
-  env.GetBackendPtr()->VisualizeStartGoal(p_init, p_goal);
+  //env.GetBackendPtr()->VisualizeStartGoal(p_init, p_goal);
   env.GetBackendPtr()->VisualizePlannerTree(planner.GetTree());
   env.GetBackendPtr()->HidePlannerTree();
-  env.GetBackendPtr()->Save("snake_turbine_complete.xml");
+  env.GetBackendPtr()->ShowRobot();
+  //env.GetBackendPtr()->Save("snake_turbine_complete.xml");
 
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.SetWindowTitle("SweptVolumePath");

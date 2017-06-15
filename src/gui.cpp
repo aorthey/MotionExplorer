@@ -686,7 +686,7 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   std::cout << "OnCommand: " << cmd << std::endl;
 
   if(cmd=="reset") {
-    SendPauseIdle();
+    sim.hooks.clear();
     return BaseT::OnCommand(cmd,args);
   }else if(cmd=="draw_rigid_objects_faces_toggle") {
     toggle(drawRigidObjectsFaces);

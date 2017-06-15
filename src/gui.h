@@ -54,7 +54,8 @@ class GUIVariable
 
 class ForceFieldBackend : public SimTestBackend
 {
-  private:
+  protected:
+
     typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
 
     vector<IKGoal> _constraints;
@@ -77,81 +78,81 @@ class ForceFieldBackend : public SimTestBackend
 
   public:
 
-  WrenchField wrenchfield;
+    WrenchField wrenchfield;
 
-  ForceFieldBackend(RobotWorld *world);
-  virtual void Start();
-  virtual bool OnCommand(const string& cmd,const string& args);
-  virtual void RenderWorld();
-  virtual void RenderScreen();
+    ForceFieldBackend(RobotWorld *world);
+    virtual void Start();
+    virtual bool OnCommand(const string& cmd,const string& args);
+    virtual void RenderWorld();
+    virtual void RenderScreen();
 
-  virtual bool OnIdle();
-  void SendPlannerOutputToController();
-  void SendCommandStringController(string cmd, string arg);
+    virtual bool OnIdle();
+    void SendPlannerOutputToController();
+    void SendCommandStringController(string cmd, string arg);
 
-  virtual bool Save(const char* file=NULL);
-  virtual bool Save(TiXmlElement *node);
-  virtual bool Load(const char* file);
-  virtual bool Load(TiXmlElement *node);
+    virtual bool Save(const char* file=NULL);
+    virtual bool Save(TiXmlElement *node);
+    virtual bool Load(const char* file);
+    virtual bool Load(TiXmlElement *node);
 
-  void ShowCoordinateAxes(){ drawAxes = 1; }
-  void HideCoordinateAxes(){ drawAxes = 0; }
-  void ShowRobot(){ drawRobot = 1; }
-  void HideRobot(){ drawRobot = 0; }
-  void ShowPlannerTree(){ drawPlannerTree = 1; }
-  void HidePlannerTree(){ drawPlannerTree = 0; }
-  void ShowSweptVolumes(){ showSweptVolumes = 1; }
-  void HideSweptVolumes(){ showSweptVolumes = 0; }
+    void ShowCoordinateAxes(){ drawAxes = 1; }
+    void HideCoordinateAxes(){ drawAxes = 0; }
+    void ShowRobot(){ drawRobot = 1; }
+    void HideRobot(){ drawRobot = 0; }
+    void ShowPlannerTree(){ drawPlannerTree = 1; }
+    void HidePlannerTree(){ drawPlannerTree = 0; }
+    void ShowSweptVolumes(){ showSweptVolumes = 1; }
+    void HideSweptVolumes(){ showSweptVolumes = 0; }
 
-  void AddPlannerOutput( PlannerOutput& pout );
+    void AddPlannerOutput( PlannerOutput& pout );
 
-  void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);
-  void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
-  void SetIKConstraints( vector<IKGoal> constraints, string robotname);
-  void SetIKCollisions( vector<int> linksInCollision );
+    void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);
+    void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
+    void SetIKConstraints( vector<IKGoal> constraints, string robotname);
+    void SetIKCollisions( vector<int> linksInCollision );
 
-  uint getNumberOfPaths();
+    uint getNumberOfPaths();
 
-  void AddPath(const std::vector<Config> &keyframes, GLColor color = GLColor(0.8,0.8,0.8), uint Nkeyframes_alongpath=10);
-  void AddPathInterpolate(const std::vector<Config> &keyframes, GLColor color = GLColor(0.8,0.8,0.8), uint Nkeyframes_alongpath=10);
+    void AddPath(const std::vector<Config> &keyframes, GLColor color = GLColor(0.8,0.8,0.8), uint Nkeyframes_alongpath=10);
+    void AddPathInterpolate(const std::vector<Config> &keyframes, GLColor color = GLColor(0.8,0.8,0.8), uint Nkeyframes_alongpath=10);
 
-  const std::vector<Config>& getPathKeyFrames(uint pathid);
-  void ClearPaths();
-  void VisualizePlannerTree(const SerializedTree &tree);
+    const std::vector<Config>& getPathKeyFrames(uint pathid);
+    void ClearPaths();
+    void VisualizePlannerTree(const SerializedTree &tree);
 
-  void DrawText(int x,int y, std::string s);
+    void DrawText(int x,int y, std::string s);
 
-  std::vector<int> showLinks; //hide certain links 
-  std::vector<int> drawPathSweptVolume;
-  std::vector<int> drawPathMilestones;
-  std::vector<int> drawPathStartGoal;
+    std::vector<int> showLinks; //hide certain links 
+    std::vector<int> drawPathSweptVolume;
+    std::vector<int> drawPathMilestones;
+    std::vector<int> drawPathStartGoal;
 
-  int showSweptVolumes;
+    int showSweptVolumes;
 
-  int drawController;
-  int drawContactDistances;
+    int drawController;
+    int drawContactDistances;
 
-  int drawForceEllipsoid;
-  int drawDistanceRobotTerrain;
-  int drawCenterOfMassPath;
+    int drawForceEllipsoid;
+    int drawDistanceRobotTerrain;
+    int drawCenterOfMassPath;
 
-  int drawForceField;
-  int drawWrenchField;
-  int drawRobotExtras; 
-  int drawIKextras;
-  int drawRobot;
-  int drawPlannerTree;
-  int drawPlannerStartGoal;
-  int drawAxes;
-  int drawAxesLabels;
-  int drawRigidObjects;
-  int drawRigidObjectsEdges;
-  int drawRigidObjectsFaces;
+    int drawForceField;
+    int drawWrenchField;
+    int drawRobotExtras; 
+    int drawIKextras;
+    int drawRobot;
+    int drawPlannerTree;
+    int drawPlannerStartGoal;
+    int drawAxes;
+    int drawAxesLabels;
+    int drawRigidObjects;
+    int drawRigidObjectsEdges;
+    int drawRigidObjectsFaces;
 
-  void toggle(int &k){
-    if(k) k=0;
-    else k=1;
-  }
+    void toggle(int &k){
+      if(k) k=0;
+      else k=1;
+    }
 };
 
 
