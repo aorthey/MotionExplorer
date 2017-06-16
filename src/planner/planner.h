@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "planner/serialized_tree.h"
+#include "planner/planner_input.h"
 #include "planner/planner_output.h"
 
 struct PlannerSettings{
@@ -60,7 +61,11 @@ class MotionPlanner{
     void SerializeTreeCullClosePoints(SerializedTree &_stree, CSpace *base, double epsilon=0.1);
     void SerializeTreeRandomlyCullPoints(SerializedTree &_stree, uint N=1000);
 
-    virtual bool solve(Config &p_init, Config &p_goal, double timelimit=100.0, bool shortcutting=true);
+    virtual bool solve(Config &p_init, Config &p_goal, double timelimit=100.0, bool shortcutting=true){
+      std::cout << "Error: deprecated function" << std::endl;
+      exit(0);
+    }
+    virtual bool solve(PlannerInput& input) = 0;
 
     //void SendCommandStringController(string cmd, string arg);
     //bool SendToController();

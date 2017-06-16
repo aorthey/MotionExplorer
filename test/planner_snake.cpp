@@ -38,22 +38,13 @@ int main(int argc,const char** argv) {
   MotionPlannerOMPL planner(env.GetWorldPtr());
 
   PlannerInput pin = env.GetPlannerInput();
-  std::cout << pin << std::endl;
-  Config p_init = pin.q_init;
-  Config p_goal = pin.q_goal;
 
-  if(planner.solve(p_init, p_goal)){
-    //std::vector<Config> keyframes = planner.GetKeyframes();
-    //env.GetBackendPtr()->AddPath(keyframes);
+  if(planner.solve(pin)){
     env.GetBackendPtr()->AddPlannerOutput( planner.GetOutput() );
   }
 
-  //env.GetBackendPtr()->VisualizeStartGoal(p_init, p_goal);
-  //env.GetBackendPtr()->VisualizePlannerTree(planner.GetTree());
   env.GetBackendPtr()->HidePlannerTree();
   env.GetBackendPtr()->ShowRobot();
-
-  //env.GetBackendPtr()->Save("snake_turbine_complete.xml");
 
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.SetWindowTitle("SweptVolumePath");

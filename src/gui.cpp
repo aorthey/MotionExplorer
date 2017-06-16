@@ -270,6 +270,47 @@ void ForceFieldBackend::RenderWorld()
   const ODERobot *oderobot = sim.odesim.robot(0);
   ViewRobot *viewRobot = &viewRobots[0];
 
+
+  //############################################################################
+  // visualize applied torque
+  //############################################################################
+  //SmartPointer<ContactStabilityController>& controller = *reinterpret_cast<SmartPointer<ContactStabilityController>*>(&sim.robotControllers[0]);
+  //ControllerState output = controller->GetControllerState();
+  //Vector torque = output.current_torque;
+
+  Vector T;
+  sim.controlSimulators[0].GetActuatorTorques(T);
+
+  for(int i = 0; i < robot->drivers.size(); i++){
+    RobotJointDriver driver = robot->drivers[i];
+    if(driver.type == RobotJointDriver::Normal){
+      //std::cout << "driver" << i << " value " << T(i) << std::endl;
+    }
+    if(driver.type == RobotJointDriver::Translation){
+      uint didx = driver.linkIndices[0];
+      uint lidx = driver.linkIndices[1];
+      //std::cout << "driver" << i << " value " << T(i) << std::endl;
+      Frame3D Tw = robot->links[lidx].T_World;
+      Vector3 pos = Tw*robot->links[lidx].com;
+
+      Frame3D dTw = robot->links[didx].T_World;
+      Vector3 dir = Tw*robot->links[didx].w - pos;
+      dir = T(i)*dir/dir.norm();
+
+      double r = 0.05;
+      glEnable(GL_LIGHTING);
+      glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(1,0.5,0,0.7));
+      glPushMatrix();
+      glTranslate(pos);
+      //drawCylinder(dir,r);
+      //glPushMatrix();
+      //glTranslate(dir);
+      drawCone(-dir,2*r,8);
+      glPopMatrix();
+
+    }
+  }
+
   //############################################################################
   // Visualize
   //
@@ -563,12 +604,14 @@ void ForceFieldBackend::AddPlannerOutput( PlannerOutput pout )
 
 void ForceFieldBackend::SendPlannerOutputToController()
 {
-  std::vector<Vector> torques = planneroutput.at(0).GetTorques();
-  for(int i = 0; i < torques.size(); i++){
-    stringstream qstr;
-    qstr<<torques.at(i);
-    string cmd( (i<=0)?("set_torque_control"):("append_torque_control") );
-    SendCommandStringController(cmd,qstr.str());
+  if(planneroutput.size()>0){
+    std::vector<Vector> torques = planneroutput.at(0).GetTorques();
+    for(int i = 0; i < torques.size(); i++){
+      stringstream qstr;
+      qstr<<torques.at(i);
+      string cmd( (i<=0)?("set_torque_control"):("append_torque_control") );
+      SendCommandStringController(cmd,qstr.str());
+    }
   }
 }
 void ForceFieldBackend::SendCommandStringController(string cmd, string arg)
@@ -688,11 +731,43 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   std::cout << "OnCommand: " << cmd << std::endl;
 
   if(cmd=="reset") {
+    sim.hooks.clear();
+
     for(int k = 0; k < sim.robotControllers.size(); k++){
       sim.robotControllers.at(k)->Reset();
     }
-    sim.hooks.clear();
-    return BaseT::OnCommand(cmd,args);
+
+    BaseT::OnCommand(cmd,args);
+
+    Robot* robot = world->robots[0];
+
+    Config q;
+    if(planneroutput.size()>0){
+      Config q = planneroutput.at(0).GetInitConfiguration();
+    }else{
+      q = robot->q;
+    }
+    robot->UpdateConfig(q);
+    robot->UpdateGeometry();
+
+    std::cout << "reseting planner to" << robot->q << std::endl;
+
+    for(size_t i=0;i<world->robots.size();i++) {
+      Robot* robot = world->robots[i];
+      sim.odesim.robot(i)->SetConfig(robot->q);
+      Vector dq;
+      sim.odesim.robot(i)->GetVelocities(dq);
+      dq.setZero();
+      sim.odesim.robot(i)->SetVelocities(dq);
+      robotWidgets[i].SetPose(robot->q);
+      robotWidgets[i].ikPoser.poseGoals.clear();
+      robotWidgets[i].ikPoser.RefreshWidgets();
+    }
+    sim.controlSimulators[0].Init(world->robots[0], sim.odesim.robot(0), sim.robotControllers[0]);
+
+    //ODERobot *simrobot = sim.odesim.robot(0);
+    //simrobot->SetConfig(planner_p_init);
+
   }else if(cmd=="draw_rigid_objects_faces_toggle") {
     toggle(drawRigidObjectsFaces);
   }else if(cmd=="draw_rigid_objects_edges_toggle") {

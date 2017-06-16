@@ -348,22 +348,21 @@ void KinodynamicCSpaceOMPL::initSpace()
   boundsTM.setHigh(100);
   cspaceTM->setBounds(boundsTM);
 
-  std::cout << "velocity bounds" << std::endl;
-  for(int i = 0; i < N+6; i++){
-    std::cout << i << " <" << boundsTM.low.at(i) << ","<< boundsTM.high.at(i) << ">" << std::endl;
-  }
+  //std::cout << "velocity bounds" << std::endl;
+  //for(int i = 0; i < N+6; i++){
+  //  std::cout << i << " <" << boundsTM.low.at(i) << ","<< boundsTM.high.at(i) << ">" << std::endl;
+  //}
 
 }
 void KinodynamicCSpaceOMPL::initControlSpace(){
   uint NdimControl = robot->q.size();
   this->control_space = std::make_shared<oc::RealVectorControlSpace>(space, NdimControl+1);
-  std::cout << "INIT CONTROL SPACE" << std::endl;
 
-  std::cout << "TORQUES robot:" << std::endl;
   Vector torques = robot->torqueMax;
-  std::cout << robot->q.size() << std::endl;
-  std::cout << torques.size() << std::endl;
-  std::cout << torques << std::endl;
+  //std::cout << "TORQUES robot:" << std::endl;
+  //std::cout << robot->q.size() << std::endl;
+  //std::cout << torques.size() << std::endl;
+  //std::cout << torques << std::endl;
 
   ob::RealVectorBounds cbounds(NdimControl+1);
   cbounds.setLow(-1);
@@ -408,11 +407,10 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
 
   cbounds.check();
   control_space->setBounds(cbounds);
-
-  std::cout << "torque bounds" << std::endl;
-  for(int i = 0; i < NdimControl+1; i++){
-    std::cout << i << " <" << cbounds.low.at(i) << ","<< cbounds.high.at(i) << ">" << std::endl;
-  }
+  //std::cout << "torque bounds" << std::endl;
+  //for(int i = 0; i < NdimControl+1; i++){
+  //  std::cout << i << " <" << cbounds.low.at(i) << ","<< cbounds.high.at(i) << ">" << std::endl;
+  //}
 }
 
 ob::State* KinodynamicCSpaceOMPL::ConfigToOMPLStatePtr(const Config &q){
@@ -571,7 +569,7 @@ Config KinodynamicCSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
 
 const oc::StatePropagatorPtr KinodynamicCSpaceOMPL::StatePropagatorPtr(oc::SpaceInformationPtr si)
 {
-  return std::make_shared<TangentBundleIntegrator>(si, this);
+  return std::make_shared<TangentBundleIntegrator>(si, robot, this);
 }
 const ob::StateValidityCheckerPtr KinodynamicCSpaceOMPL::StateValidityCheckerPtr(oc::SpaceInformationPtr si)
 {

@@ -56,8 +56,9 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     std::cout << "But actual type is: " << world.robots[0]->joints[0].type << std::endl;
     exit(0);
   }
-  vector<string>* driverNames = &world.robots[0]->driverNames;
-  vector<RobotJointDriver>* drivers = &world.robots[0]->drivers;
+  Robot *robot = world.robots[0];
+  vector<string>* driverNames = &robot->driverNames;
+  vector<RobotJointDriver>* drivers = &robot->drivers;
 
   RobotJointDriver translation[3], rotation[3];
 
@@ -111,18 +112,17 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
   //  nd = (int) drivers.size();
   info(&world);
 
-  Robot *robot = world.robots[0];
 
   SmartPointer<RobotController> controller = new ContactStabilityController(*robot);
   RobotControllerFactory::Register("ContactStabilityController", controller);
   _backend->sim.SetController(0, controller);
 
+  //reinit robot such that drivers are copied to actuators (so we can use them in Command)
+  _backend->sim.controlSimulators[0].Init(robot, _backend->sim.odesim.robot(0), _backend->sim.robotControllers[0]);
 
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "LOADED CONTACTSTABILITYCONTROLLER" << std::endl;
   std::cout << std::string(80, '-') << std::endl;
-
-
 
   if(LoadPlannerSettings(file_name.c_str())){
 
@@ -134,8 +134,15 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     pin.qMax = robot->qMax;
     robot->q = pin.q_init;
     robot->UpdateFrames();
+
+    //set oderobot to planner start pos
     ODERobot *simrobot = _backend->sim.odesim.robot(0);
     simrobot->SetConfig(pin.q_init);
+    Vector dq;
+    _backend->sim.odesim.robot(0)->GetVelocities(dq);
+    dq.setZero();
+    _backend->sim.odesim.robot(0)->SetVelocities(dq);
+
     robot->q = pin.q_goal;
     robot->UpdateFrames();
   }
@@ -165,11 +172,22 @@ bool EnvironmentLoader::LoadPlannerSettings(TiXmlElement *node)
   TiXmlElement* se3max = FindSubNode(plannersettings, "se3max");
   TiXmlElement* algorithm = FindSubNode(plannersettings, "algorithm");
 
+  TiXmlElement* dqinit = FindSubNode(plannersettings, "dqinit");
+  TiXmlElement* dqgoal = FindSubNode(plannersettings, "dqgoal");
+  TiXmlElement* max_planning_time = FindSubNode(plannersettings, "maxplanningtime");
+  TiXmlElement* epsilon_goalregion = FindSubNode(plannersettings, "epsilongoalregion");
+
   GetStreamAttribute(qinit,"config") >> pin.q_init;
   GetStreamAttribute(qgoal,"config") >> pin.q_goal;
+  GetStreamAttribute(dqinit,"config") >> pin.dq_init;
+  GetStreamAttribute(dqgoal,"config") >> pin.dq_goal;
+
+  GetStreamText(max_planning_time) >> pin.max_planning_time;
+  GetStreamText(epsilon_goalregion) >> pin.epsilon_goalregion;
+
   GetStreamAttribute(se3min,"config")  >> pin.se3min;
   GetStreamAttribute(se3max,"config")  >> pin.se3max;
-  GetStreamAttribute(algorithm, "name") >> pin.name_algorithm;
+  GetStreamText(algorithm) >> pin.name_algorithm;
 
   return true;
 }

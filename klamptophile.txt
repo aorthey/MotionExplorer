@@ -364,6 +364,24 @@ Controller
 -------------------------------------------------------------------------------
 
 Control/Controller.h
+-------------------------------------------------------------------------------
+World Simulation
+-------------------------------------------------------------------------------
+
+ Every robot has an associated ControlledRobotSimulator class
+(Simulation/ControllerSimulator.h)
+
+It contains Robot, ODERobot, and RobotController. Also we can get a Sensor class
+and set a Command Class:
+
+  Robot* robot;
+  ODERobot* oderobot;
+  RobotController* controller;
+  RobotMotorCommand command;
+  RobotSensors sensors;
+
+We need to reinit this one after changing the driver!
+
 
 -------------------------------------------------------------------------------
 TODO
@@ -555,30 +573,39 @@ COM should retain orientation equal to origin so that we can see forces from
    [x] finalize kinodynamic space
    [x] simulate jet propulsion
    [x] implement tangentbundle integrator
-   [ ] *** do kinodynamic planning /w torque constraints on fibre bundle
-      [ ] check forward integration
-   [ ] *** execute/simulate kinodynamic path (use jet propulsion)
+   [x] *** execute/simulate kinodynamic path (use jet propulsion)
       [x] torque values are SO(3) x R3 in controller, but should be R3xSO(3).  Why?
       [x] error: driver 0 is not in PID mode. Why?
       [x] jet propulsion not implemented yet (see RobotJointDriver)
-      [ ] jet propulsion acts on global coordinate frame, not locally on robot link
+      [x] jet propulsion acts on global coordinate frame, not locally on robot link
       [x] torques not being set properly (robot should move with random torques)
-      [ ] why does robot move when disabling force fields? (does not happen after reset!)
-      [ ] display the jet propulsion wrenches to verify
-      [ ] segfault /w single rigid body
-          [ ] drivers and actuators do not match up
+      [x] segfault /w single rigid body
+      [x] drivers and actuators do not match up. zero joints = zero actuators, therefore segfault. where are the actuators created?
+      [x] display the jet propulsion wrenches to verify
+   [ ] why does robot move when disabling force fields? (does not happen after reset!)
+   [ ] display all torques applied
+   [ ] *** do kinodynamic planning /w torque constraints on fibre bundle
+      [ ] fix propagation function
+        [ ] propagation function does not accurately reflect reality, i.e. there is some discrepancy
+        [ ] rework forward simulation on tangent bundle
+        [ ] calcacceleration returns values on fixed joint
+    
 
    [x] reset: delete com window
+   [x] reset: go back to init pos not xml config
    [ ] ** flow following by forward simulating a PID controlled device
-   [ ] OMPL_SPACE remove hardcoded se3 vector fields
+   [ ] OMPL_SPACE remove hardcoded se3 vector fields (and put them into xml, urdf or so)
    [ ] include FF in tangentbundle integrator
-   [ ] add start velocity plannersettings
-   [ ] outsource duration time, algorithm name and epsilon goal (xml plannersettings)
+   [x] add start velocity plannersettings
+   [x] outsource duration time, algorithm name and epsilon goal (xml plannersettings)
    [ ] *** do kinodynamic planning /w FF
-   [ ] put geometricOMPLcspace together with principal fibre bundle, do the same
+   [x] put geometricOMPLcspace together with principal fibre bundle, do the same
+
 for kinodynamic
    [ ] ** visualize path speed profile (reuse python display and display in topp)
  [ ] * replace propagation by undulatory motions along each axis, but how would that work?
+
+ [ ] put all the loader stuff into separate folder each with one file
 
 -- important
  [x] self collisions occuring when simulating atlas in Klampt. ODERobot
@@ -590,7 +617,8 @@ happens if we apply a force which overcomes the self-collision and creates
 overlapping meshes. solution: avoid forces higher than ?? or increase
 self-collision forces?
  [x] reset not working anymore
- [ ] reset goes back to wrong position
+ [x] reset goes back to wrong position
+ [ ] reset: momentum is not set back to zero 
  [ ] kernel panic after movie creation
 
 -- pipeline

@@ -17,6 +17,8 @@ struct ControllerState{
     void SetMass( double _mass );
     void PredictCOM( double tstep, uint Nsteps);
 
+    Vector current_torque;
+
     void Reset();
 
   private:

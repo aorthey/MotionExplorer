@@ -97,19 +97,13 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
 
 }
 
-bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
+bool MotionPlannerOMPL::solve(PlannerInput &input)
 {
-  this->_p_init = p_init;
-  this->_p_goal = p_goal;
+  this->_p_init = input.q_init;
+  this->_p_goal = input.q_goal;
   robot->UpdateConfig(_p_init);
-
   this->_world->InitCollisions();
-
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Motion Planner:" << this->getName() << std::endl;
-  std::cout << "p_init =" << p_init << std::endl;
-  std::cout << "p_goal =" << p_goal << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
+  std::cout << input << std::endl;
 
   //###########################################################################
   // Setup Klampt CSpace
@@ -142,8 +136,8 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   // Config init,goal to OMPL start/goal
   //###########################################################################
 
-  ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
-  ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
+  ob::ScopedState<> start = cspace->ConfigToOMPLState(_p_init);
+  ob::ScopedState<> goal  = cspace->ConfigToOMPLState(_p_goal);
   std::cout << start << std::endl;
   std::cout << goal << std::endl;
 
@@ -164,9 +158,9 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   // setup and projection
   //###########################################################################
-  double epsilon = 1.0;
+  double epsilon_goalregion = input.epsilon_goalregion;
 
-  ss.setStartAndGoalStates(start, goal, epsilon);
+  ss.setStartAndGoalStates(start, goal, epsilon_goalregion);
   ss.setup();
   ss.setPlanner(ompl_planner);
   ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
@@ -183,8 +177,8 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   //###########################################################################
   bool solved = false;
   double solution_time = dInf;
-  double duration = 1.0;
-  ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(duration) );
+  double max_planning_time= input.max_planning_time;
+  ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
   //###########################################################################
   // benchmark instead
@@ -196,7 +190,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
   // benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::RRT>(si)));
 
   // ot::Benchmark::Request req;
-  // req.maxTime = duration;
+  // req.maxTime = max_planning_time;
   // req.maxMem = 10000.0;
   // req.runCount = 100;
   // req.displayProgress = true;
@@ -260,7 +254,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
       oc::RealVectorControlSpace::ControlType* ccv = static_cast<oc::RealVectorControlSpace::ControlType *>(controls.at(i));
 
       double time = ccv->values[N-1];
-      Vector qt;qt.resize(N);
+      Vector qt;qt.resize(N+6);
       //invert SO3xR3 -> R3xSO3
       for(int k = 0; k < 3; k++){
         qt(k) = ccv->values[k+3];
@@ -268,7 +262,7 @@ bool MotionPlannerOMPL::solve(Config &p_init, Config &p_goal)
       for(int k = 3; k < 6; k++){
         qt(k) = ccv->values[k-3];
       }
-      for(int k = 6; k < N; k++){
+      for(int k = 6; k < N+6; k++){
         qt(k) = ccv->values[k];
       }
       torques.push_back(qt);

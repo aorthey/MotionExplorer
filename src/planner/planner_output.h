@@ -25,6 +25,14 @@ class PlannerOutput{
       return torques;
     }
 
+    Config GetInitConfiguration(){
+      if(q.empty()){
+        std::cout << "[PlannerOutput] No path in output, cannot get initial configuration" << std::endl;
+        exit(0);
+      }
+      return q.at(0);
+    }
+
     const SerializedTree& GetTree()
     {
       return _stree;

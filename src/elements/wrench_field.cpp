@@ -33,21 +33,26 @@ bool WrenchField::Load(TiXmlElement *node)
   //############################################################################
   TiXmlElement* forceuniform = FindSubNode(forcefieldsettings, "uniform");
   Vector3 Funiform;
-  GetStreamAttribute(forceuniform,"force") >> Funiform;
-
   using namespace GLDraw;
   GLColor colorForce(0.8,0.8,0.8);
-  while(forceuniform){
-    forceuniform = FindNextSiblingNode(forcefieldsettings, "uniform");
-    Vector3 FuniformNext;
-    GetStreamAttribute(forceuniform,"force") >> FuniformNext;
-    stringstream ssc = GetStreamAttribute(forceuniform,"color");
-    Vector3 cc;
-    if(ssc.str()!="NONE"){
-      ssc >> cc;
-      colorForce[0]=cc[0]; colorForce[1]=cc[1]; colorForce[2]=cc[2];
+
+  if(ExistStreamAttribute(forceuniform, "force")){
+    GetStreamAttribute(forceuniform,"force") >> Funiform;
+    while(forceuniform){
+      forceuniform = FindNextSiblingNode(forcefieldsettings, "uniform");
+      Vector3 FuniformNext;
+      GetStreamAttribute(forceuniform,"force") >> FuniformNext;
+      stringstream ssc = GetStreamAttribute(forceuniform,"color");
+      Vector3 cc;
+      if(ssc.str()!="NONE"){
+        ssc >> cc;
+        colorForce[0]=cc[0]; colorForce[1]=cc[1]; colorForce[2]=cc[2];
+      }
+      Funiform += FuniformNext;
     }
-    Funiform += FuniformNext;
+
+  }else{
+    Funiform.setZero();
   }
 
 

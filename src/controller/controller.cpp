@@ -153,24 +153,27 @@ void ContactStabilityController::Update(Real dt) {
   output.AddCOM(com, LM, AM);
   output.PredictCOM(0.001, 1000);
 
-  //if(torques.size()>0){
-  //  uint N = torques.at(0).size();
+  if(torques.size()>0){
+    output.current_torque = ZeroTorque;
+    uint N = torques.at(0).size();
 
-  //  uint ictr = 0;
-  //  double t = 0;
-  //  while(t < time && ictr<times.size()){
-  //    t+= times.at(ictr++);
-  //    //std::cout << t << "/" << time << "(" << ictr << "/" << torques.size() << ")" << std::endl;
-  //  }
-  //  if(t>time){
-  //    Vector torque = torques.at(ictr-1);
-  //    SetTorqueCommand(torque);
-  //    std::cout << "Setting torque: " << torque << std::endl;
-  //  }else{
-  //    //shutdown. TODO: enable some force compensation controller here
-  //    SetTorqueCommand(ZeroTorque);
-  //  }
-  //}
+    uint ictr = 0;
+    double t = 0;
+    while(t < time && ictr<times.size()){
+      t+= times.at(ictr++);
+    }
+    if(t>time){
+      Vector torque = torques.at(ictr-1);
+      output.current_torque = torque;
+    }else{
+      output.current_torque = ZeroTorque;
+    }
+    //output.current_torque.setZero();
+    //output.current_torque(0) = 1;
+    //output.current_torque(1) = 1;
+    std::cout << "Setting torque: " << output.current_torque << std::endl;
+    SetTorqueCommand(output.current_torque);
+  }
 
   //SetPIDCommand(qcmd,vcmd);
   //SetTorqueCommand(const Vector& torques);
@@ -180,10 +183,11 @@ void ContactStabilityController::Update(Real dt) {
   //torques.setZero();
 
 //
+  //Vector torque = torques.at(0);
+  //std::cout << "Setting torque: " << torque << std::endl;
   std::cout << "drivers: " << robot.drivers.size() << std::endl;
-  Vector torque = torques.at(0);
-  std::cout << "Setting torque: " << torque << std::endl;
   std::cout << "actuators: " << command->actuators.size() << std::endl;
+
   //for(int i = 0; i < robot.drivers.size(); i++){
   //  RobotJointDriver driver = robot.drivers.at(i);
   //  if(driver.type == RobotJointDriver::Translation) {
@@ -202,14 +206,14 @@ void ContactStabilityController::Update(Real dt) {
   //std::cout << "end" << std::endl;
   //exit(0);
 
-  if(!torques.empty()){
-    Vector trq = torques.at(0);
-    trq.setZero();
-    //trq(0)=5;
-    trq(0)=2;
-    std::cout << trq << std::endl;
-    SetTorqueCommand(trq);
-  }
+  //if(!torques.empty()){
+  //  Vector trq = torques.at(0);
+  //  trq.setZero();
+  //  //trq(0)=5;
+  //  trq(0)=2;
+  //  std::cout << trq << std::endl;
+  //  SetTorqueCommand(trq);
+  //}
   RobotController::Update(dt);
 }
 bool ContactStabilityController::SendCommand(const string& name,const string& str){

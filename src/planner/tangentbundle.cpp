@@ -21,13 +21,110 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   // into some optimization routine)
   //
 
-  //###########################################################################
-  // OMPL to Config control
-  //###########################################################################
   const ob::StateSpacePtr s = si_->getStateSpace();
   Config q0 = ompl_space->OMPLStateToConfig(state);
-
   const double *ucontrol = control->as<oc::RealVectorControlSpace::ControlType>()->values;
+
+  //###########################################################################
+  // extract step size parameter
+  //###########################################################################
+
+  uint N = 0.5*s->getDimension() - 6;
+  assert( 2*N + 12 == s->getDimension());
+
+  uint Nduration = N+6;
+  Real dt = ucontrol[Nduration];
+  if(dt<0){
+    std::cout << "propagation step size is negative:"<<dt << std::endl;
+    exit(0);
+  }
+  Real dt2 = 0.5*dt*dt;
+
+
+  //###########################################################################
+  // update based on real dynamics
+  //###########################################################################
+  Vector fext; fext.resize(6+N);
+  for(int k = 0; k < 3; k++){
+    fext(k) = ucontrol[k+3];
+  }
+  for(int k = 3; k < 6; k++){
+    fext(k) = ucontrol[k-3];
+  }
+  for(int k = 6; k < N+6; k++){
+    fext(k) = ucontrol[k];
+  }
+
+  robot->UpdateDynamics();
+  Vector ddq0;
+  robot->CalcAcceleration(ddq0, fext);
+
+  //Force Field acts on rigid link i and induces a wrench on its COM
+  // wrench on COM of link i induces a wrench on CS of robot. 
+  // F = J^t w | w=(torque,force)
+  //void GetWrenchTorques(const Vector3& torque, const Vector3& force, int i, Vector& F) const;
+
+  //Config q = ddq0*dt2 + dq0*dt + q0;
+  //Config dq = ddq0*dt + dq0;
+
+  //Config q1; q1.resize(2*N+12);
+  //for(int i = 0; i < 6+N; i++){
+  //  q1(i) = q(i);
+  //  q1(i+6+N) = dq(i);
+  //}
+
+  //std::cout << fext << std::endl;
+  //std::cout << ddq0 << std::endl;
+  //exit(0);
+  LieGroupIntegrator integrator;
+
+  Config x0; x0.resize(6);
+  Config dx0; dx0.resize(6);
+  Config ddx0; ddx0.resize(6);
+  for(int i = 0; i < 6; i++){
+    x0(i) = q0(i);
+    dx0(i) = q0(i+6+N);
+    ddx0(i) = ddq0(i);
+  }
+
+  Matrix4 x0_SE3 = integrator.StateToSE3(x0);
+
+  Matrix4 dx0_SE3 = integrator.SE3Derivative(dx0);
+
+  Matrix4 ddp = integrator.SE3Derivative(ddx0);
+
+  Matrix4 dp = ddp*dt*0.5 + dx0_SE3;
+
+  Matrix4 x1_SE3 = integrator.Integrate(x0_SE3,dp,dt);
+
+  State x1;x1.resize(6);
+  integrator.SE3ToState(x1, x1_SE3);
+
+  State dx1 = ddq0*dt + dx0;
+  //integrator.SE3ToState(dx1, dx1_SE3);
+
+  //State x1(x0); integrator.SE3ToState(x1, x1_SE3);
+  //Config qend = x1;
+
+  Config q1; q1.resize(12+2*N); q1.setZero();
+  for(int i = 0; i < 6; i++){
+    q1(i) = x1(i);
+    q1(i+6+N) = dx1(i);
+  }
+
+  //###########################################################################
+  // Forward Simulate R^N component
+  //###########################################################################
+  for(int i = 0; i < N; i++){
+    q1[i+6] = q0[i+6] + dt*q0[i+N+6+6] + dt2*ddq0[i+6];
+    q1[i+N+6+6] = q0[i+N+6+6] + dt*ddq0[i+6];
+  }
+
+  /*
+
+  //###########################################################################
+  // Forward Simulate SE(3) component
+  //###########################################################################
 
   Config R6control;
   R6control.resize(6);
@@ -39,24 +136,6 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   R6control(4) = ucontrol[4];
   R6control(5) = ucontrol[5];
 
-  uint N = 0.5*s->getDimension() - 6;
-  assert( 2*N + 12 == s->getDimension());
-
-  //###########################################################################
-  // extract step size parameter
-  //###########################################################################
-
-  uint Nduration = N+6;
-  Real dt = ucontrol[Nduration];
-  if(dt<0){
-    std::cout << "propagation step size is negative:"<<dt << std::endl;
-    exit(0);
-  }
-  Real dt2 = 0.5*dt*dt;
-
-  //###########################################################################
-  // Forward Simulate SE(3) component
-  //###########################################################################
   LieGroupIntegrator integrator;
 
   Config x0; x0.resize(6);
@@ -98,6 +177,7 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
     q1[i+6] = q0[i+6] + dt*q0[i+N+6+6] + dt2*ucontrol[i+6];
     q1[i+N+6+6] = q0[i+N+6+6] + dt*ucontrol[i+6];
   }
+  //*/
 
   //###########################################################################
   // Config to OMPL

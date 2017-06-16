@@ -53,6 +53,16 @@ inline TiXmlElement* FindNextSiblingNode(TiXmlElement* node, const char *name){
   }
   return NULL;
 }
+inline bool ExistStreamAttribute(TiXmlElement* node, const char *name){
+
+  if(!node) return false;
+  const char *na = node->Attribute(name);
+  if(na){
+    return true;
+  }else{
+    return false;
+  }
+}
 
 inline stringstream GetStreamAttribute(TiXmlElement* node, const char *name){
 

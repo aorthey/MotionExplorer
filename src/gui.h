@@ -131,7 +131,6 @@ class ForceFieldBackend : public SimTestBackend
 
     int drawController;
     int drawContactDistances;
-
     int drawForceEllipsoid;
     int drawDistanceRobotTerrain;
     int drawCenterOfMassPath;

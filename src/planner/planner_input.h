@@ -5,10 +5,18 @@
 struct PlannerInput{
   std::string name_robot;
   std::string name_algorithm;
+
   Config q_init;
   Config q_goal;
+  Config dq_init;
+  Config dq_goal;
+
   Config qMin;
   Config qMax;
+
+  double epsilon_goalregion;
+  double max_planning_time;
+
   Config se3min;
   Config se3max;
 
@@ -17,11 +25,15 @@ struct PlannerInput{
     out << std::string(80, '-') << std::endl;
     out << "[PlannerInput]" << std::endl;
     out << std::string(80, '-') << std::endl;
-    out << "q_init     : " << pin.q_init << std::endl;
-    out << "q_goal     : " << pin.q_goal << std::endl;
-    out << "q_min      : " << pin.qMin << std::endl;
-    out << "q_max      : " << pin.qMax << std::endl;
-    out << "algorithm  : " << pin.name_algorithm << std::endl;
+    out << "q_init            : " << pin.q_init << std::endl;
+    out << "  dq_init         : " << pin.dq_init << std::endl;
+    out << "q_goal            : " << pin.q_goal << std::endl;
+    out << "  dq_goal         : " << pin.dq_goal << std::endl;
+    out << "SE3_min           : " << pin.se3min << std::endl;
+    out << "SE3_max           : " << pin.se3max << std::endl;
+    out << "algorithm         : " << pin.name_algorithm << std::endl;
+    out << "max planning time : " << pin.max_planning_time << " (seconds)" << std::endl;
+    out << "epsilon_goalregion: " << pin.epsilon_goalregion<< std::endl;
     out << std::string(80, '-') << std::endl;
     return out;
   }

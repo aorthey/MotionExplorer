@@ -40,12 +40,13 @@ class TangentBundleIntegrator : public oc::StatePropagator
 {
 public:
 
-    TangentBundleIntegrator(oc::SpaceInformationPtr si, CSpaceOMPL *ompl_space_) : 
-        oc::StatePropagator(si.get()), ompl_space(ompl_space_)
+    TangentBundleIntegrator(oc::SpaceInformationPtr si, Robot *robot_, CSpaceOMPL *ompl_space_) : 
+        oc::StatePropagator(si.get()), robot(robot_), ompl_space(ompl_space_)
     {
     }
     virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
 
+    Robot *robot;
     CSpaceOMPL *ompl_space;
 };
 
