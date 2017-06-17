@@ -52,7 +52,7 @@ class MotionPlannerOMPL: public MotionPlanner
   public:
     MotionPlannerOMPL(RobotWorld *world);
     void SerializeTree(ob::PlannerData &pd);
-    virtual bool solve(PlannerInput& input);
+    virtual bool solve(PlannerInput& input_);
 
     static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)
     {

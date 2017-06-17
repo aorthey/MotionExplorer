@@ -596,16 +596,27 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
 #include <KrisLibrary/graph/Tree.h>
 void ForceFieldBackend::AddPlannerOutput( PlannerOutput pout )
 {
-  std::cout << "Adding PlannerOutput" << std::endl;
-  planneroutput.push_back(pout);
-  AddPath(pout.GetKeyframes());
+  plannerOutput.push_back(pout);
+  std::vector<Config> keyframes = pout.GetKeyframes();
+  if(keyframes.size()>0){
+    AddPath(keyframes);
+  }
   VisualizePlannerTree(pout.GetTree());
+}
+void ForceFieldBackend::AddPlannerInput( PlannerInput pin )
+{
+  plannerInput.push_back(pin);
+}
+void ForceFieldBackend::AddPlannerIO( PlannerInput pin, PlannerOutput pout )
+{
+  AddPlannerInput(pin);
+  AddPlannerOutput(pout);
 }
 
 void ForceFieldBackend::SendPlannerOutputToController()
 {
-  if(planneroutput.size()>0){
-    std::vector<Vector> torques = planneroutput.at(0).GetTorques();
+  if(plannerOutput.size()>0){
+    std::vector<Vector> torques = plannerOutput.at(0).GetTorques();
     for(int i = 0; i < torques.size(); i++){
       stringstream qstr;
       qstr<<torques.at(i);
@@ -742,15 +753,16 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     Robot* robot = world->robots[0];
 
     Config q;
-    if(planneroutput.size()>0){
-      Config q = planneroutput.at(0).GetInitConfiguration();
+    if(plannerInput.size()>0){
+      q = plannerInput.at(0).q_init;
     }else{
       q = robot->q;
     }
+    std::cout << "reseting planner to" << q << std::endl;
     robot->UpdateConfig(q);
     robot->UpdateGeometry();
-
     std::cout << "reseting planner to" << robot->q << std::endl;
+
 
     for(size_t i=0;i<world->robots.size();i++) {
       Robot* robot = world->robots[i];

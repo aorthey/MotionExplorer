@@ -16,6 +16,7 @@
 #include <View/ViewIK.h>
 #include <ode/ode.h>
 #include "planner/serialized_tree.h"
+#include "planner/planner_input.h"
 #include "planner/planner_output.h"
 #include "elements/swept_volume.h"
 #include "elements/wrench_field.h"
@@ -74,7 +75,8 @@ class ForceFieldBackend : public SimTestBackend
     vector< vector<Vector3> > _frames;
     vector< double > _frameLength;
 
-    vector<PlannerOutput> planneroutput;
+    vector<PlannerInput> plannerInput;
+    vector<PlannerOutput> plannerOutput;
 
   public:
 
@@ -104,6 +106,8 @@ class ForceFieldBackend : public SimTestBackend
     void ShowSweptVolumes(){ showSweptVolumes = 1; }
     void HideSweptVolumes(){ showSweptVolumes = 0; }
 
+    void AddPlannerIO( PlannerInput pin, PlannerOutput pout );
+    void AddPlannerInput( PlannerInput pin );
     void AddPlannerOutput( PlannerOutput pout );
 
     void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);

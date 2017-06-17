@@ -13,6 +13,9 @@ MotionPlanner::MotionPlanner(RobotWorld *world):
 PlannerOutput MotionPlanner::GetOutput(){
   return output;
 }
+PlannerInput MotionPlanner::GetInput(){
+  return input;
+}
 
 void MotionPlanner::SerializeTreeCullClosePoints(SerializedTree &_stree, CSpace *base, double epsilon)
 {

@@ -40,8 +40,8 @@ int main(int argc,const char** argv) {
   PlannerInput pin = env.GetPlannerInput();
 
   if(planner.solve(pin)){
-    env.GetBackendPtr()->AddPlannerOutput( planner.GetOutput() );
   }
+  env.GetBackendPtr()->AddPlannerIO( planner.GetInput(), planner.GetOutput() );
 
   env.GetBackendPtr()->HidePlannerTree();
   env.GetBackendPtr()->ShowRobot();

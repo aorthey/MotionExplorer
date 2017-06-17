@@ -43,9 +43,12 @@ class MotionPlanner{
     double _timelimit;
     //KinodynamicMilestonePath _path;
     SerializedTree _stree;
+
+    PlannerInput input;
     PlannerOutput output;
   public:
 
+    PlannerInput GetInput();
     PlannerOutput GetOutput();
 
     explicit MotionPlanner(RobotWorld *world);
@@ -65,7 +68,7 @@ class MotionPlanner{
       std::cout << "Error: deprecated function" << std::endl;
       exit(0);
     }
-    virtual bool solve(PlannerInput& input) = 0;
+    virtual bool solve(PlannerInput& input_) = 0;
 
     //void SendCommandStringController(string cmd, string arg);
     //bool SendToController();

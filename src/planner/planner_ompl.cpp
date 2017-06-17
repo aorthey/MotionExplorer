@@ -97,8 +97,10 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
 
 }
 
-bool MotionPlannerOMPL::solve(PlannerInput &input)
+bool MotionPlannerOMPL::solve(PlannerInput &input_)
 {
+  input = input_;
+
   this->_p_init = input.q_init;
   this->_p_goal = input.q_goal;
   robot->UpdateConfig(_p_init);
