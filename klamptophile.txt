@@ -591,8 +591,7 @@ COM should retain orientation equal to origin so that we can see forces from
    [ ] display all torques applied
    [ ] *** do kinodynamic planning /w torque constraints on fibre bundle
 =>>     [ ] fix propagation function
-        [ ] propagation function does not accurately reflect reality, i.e. there is some discrepancy
-        [ ] rework forward simulation on tangent bundle
+        [ ] forward simulation is wrong on tangent bundle
         [ ] calcacceleration returns values on fixed joint
    [ ] gl error when drawing planning tree
     
@@ -624,7 +623,8 @@ overlapping meshes. solution: avoid forces higher than ?? or increase
 self-collision forces?
  [x] reset not working anymore
  [x] reset goes back to wrong position
- [ ] reset: momentum is not set back to zero 
+ [x] reset: momentum is not set back to zero 
+ [ ] reset: crash when plotting joint values
  [ ] kernel panic after movie creation
 
 -- pipeline

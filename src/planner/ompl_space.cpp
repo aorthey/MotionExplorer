@@ -398,10 +398,10 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
   }
   cbounds.setLow(0,1);
   cbounds.setHigh(0,1);
-  cbounds.setLow(3,-0.01);
-  cbounds.setHigh(3,0.01);
-  cbounds.setLow(4,-0.01);
-  cbounds.setHigh(4,0.01);
+  cbounds.setLow(3,-0.002);
+  cbounds.setHigh(3,0.002);
+  cbounds.setLow(4,-0.002);
+  cbounds.setHigh(4,0.002);
   //cbounds.setLow(5,-1);
   //cbounds.setHigh(5,1);
 

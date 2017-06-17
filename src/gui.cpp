@@ -1,4 +1,5 @@
 #include <KrisLibrary/geometry/AnyGeometry.h>
+#include <KrisLibrary/math3d/basis.h>
 #include <KrisLibrary/math/LAPACKInterface.h>
 #include <Eigen/Core>
 #include <Eigen/SVD>
@@ -285,18 +286,87 @@ void ForceFieldBackend::RenderWorld()
 
   for(int i = 0; i < robot->drivers.size(); i++){
     RobotJointDriver driver = robot->drivers[i];
-    if(driver.type == RobotJointDriver::Normal){
-      //std::cout << "driver" << i << " value " << T(i) << std::endl;
+    //############################################################################
+    if(driver.type == RobotJointDriver::Rotation){
+      /*
+      uint didx = driver.linkIndices[0];
+      uint lidx = driver.linkIndices[1];
+
+      Frame3D Tw = robot->links[lidx].T_World;
+      Vector3 pos = Tw*robot->links[lidx].com;
+      Vector3 dir = Tw*robot->links[didx].w - pos;
+
+      dir = 100*T(i)*dir/dir.norm();
+
+      double r = 0.01;
+      glEnable(GL_LIGHTING);
+      glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(0,0.5,1,0.7));
+
+      glPushMatrix();
+      glTranslate(pos);
+      drawCylinder(dir,r);
+
+      double theta_step = M_PI/4;
+      double dr = 0.1;
+      uint numSteps = 32;
+
+      float inc = fTwoPi/numSteps;
+      Vector3 eu,ev;
+      GetCanonicalBasis(dir,eu,ev);
+      Complex x,dx;
+      dx.setPolar(One,inc);
+      
+      x.set(dr,0);
+
+      for(i=0; i<2*numSteps/3; i++) {
+        Vector3 p0 = dir + x.x*eu + x.y*ev;
+        //glVertex3v(dir + x.x*eu+x.y*ev);
+        x=x*dx;
+        Vector3 p1 = dir + x.x*eu + x.y*ev;
+
+        glPushMatrix();
+        glTranslate(p0);
+        drawCylinder(p1-p0,dr/8);
+        glPopMatrix();
+      }
+
+      //glLineWidth(5);
+      //glBegin(GL_LINE_STRIP);
+      //for(i=0; i<2*numSteps/3; i++) {
+      //  glVertex3v(dir + x.x*eu+x.y*ev);
+      //  x=x*dx;
+      //}
+      //glEnd();
+
+      if(T(i) < 0) {
+        x.set(dr,0);
+      }
+      glPushMatrix();
+      Vector3 rr = x.x*eu + x.y*ev;
+      Vector3 arrowS(dir + rr);
+
+      glTranslate(arrowS);
+      Vector3 coneori = cross(dir,rr);
+      coneori /= coneori.length();
+      if(T(i) < 0) {
+        coneori *= -1;
+      }
+      double length = dr/2;
+      GLDraw::drawCone(length*coneori, 0.5*length);
+      glPopMatrix();
+
+      //glPopMatrix();
+      glPopMatrix();
+      //*/
     }
+  //############################################################################
     if(driver.type == RobotJointDriver::Translation){
       uint didx = driver.linkIndices[0];
       uint lidx = driver.linkIndices[1];
-      //std::cout << "driver" << i << " value " << T(i) << std::endl;
       Frame3D Tw = robot->links[lidx].T_World;
       Vector3 pos = Tw*robot->links[lidx].com;
-
-      Frame3D dTw = robot->links[didx].T_World;
       Vector3 dir = Tw*robot->links[didx].w - pos;
+
       dir = T(i)*dir/dir.norm();
 
       double r = 0.05;
