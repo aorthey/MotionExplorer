@@ -511,7 +511,7 @@ namespace GLDraw{
     //  }
     //}
     glDisable(GL_LIGHTING);
-    glEnable(GL_BLEND); 
+    //glEnable(GL_BLEND); 
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       
     for(uint i = 0; i < _stree.size(); i++){
@@ -530,25 +530,24 @@ namespace GLDraw{
 
       glPushMatrix();
       glTranslate(pos);
+
       glPointSize(vertexSize);
       drawPoint(Vector3(0,0,0));
 
       for(uint j = 0; j < dirs.size(); j++){
+        glPushMatrix();
         colorTree.setCurrentGL();
         glBegin(GL_LINES);
         glLineWidth(edgeWidth);
         glVertex3f(0.0, 0.0, 0.0);
         glVertex3f(dirs.at(j)[0], dirs.at(j)[1], dirs.at(j)[2]);
         glEnd();
+        glPopMatrix();
       }
 
-
-      glPushMatrix();
-
       glPopMatrix();
-      glPopMatrix();
-      glEnable(GL_LIGHTING);
     }
+    glEnable(GL_LIGHTING);
     //std::cout << "Visualized Tree with " << _stree.size() << " vertices and " << Nedges << " edges." << std::endl;
   }
 

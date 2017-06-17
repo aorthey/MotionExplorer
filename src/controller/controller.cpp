@@ -101,7 +101,7 @@ const ControllerState& ContactStabilityController::GetControllerState() const {
 void ContactStabilityController::Update(Real dt) {
   //We'll put our code here: read from this->sensors, and write to this->command.
   //See Sensor.h and Command.h for details on these structures
-  std::cout << "controller time " << time << std::endl;
+  //std::cout << "controller time " << time << std::endl;
 
   Vector qcmd,vcmd;
   Vector qactual,vactual;
@@ -171,7 +171,7 @@ void ContactStabilityController::Update(Real dt) {
     //output.current_torque.setZero();
     //output.current_torque(0) = 1;
     //output.current_torque(1) = 1;
-    std::cout << "Setting torque: " << output.current_torque << std::endl;
+    //std::cout << "Setting torque: " << output.current_torque << std::endl;
     SetTorqueCommand(output.current_torque);
   }
 
@@ -185,8 +185,8 @@ void ContactStabilityController::Update(Real dt) {
 //
   //Vector torque = torques.at(0);
   //std::cout << "Setting torque: " << torque << std::endl;
-  std::cout << "drivers: " << robot.drivers.size() << std::endl;
-  std::cout << "actuators: " << command->actuators.size() << std::endl;
+  //std::cout << "drivers: " << robot.drivers.size() << std::endl;
+  //std::cout << "actuators: " << command->actuators.size() << std::endl;
 
   //for(int i = 0; i < robot.drivers.size(); i++){
   //  RobotJointDriver driver = robot.drivers.at(i);
@@ -227,13 +227,16 @@ bool ContactStabilityController::SendCommand(const string& name,const string& st
     ss >> torque_and_time;
     torques.clear();
     AppendTorqueAndTime(torque_and_time);
-    ZeroTorque = torques.at(0);
+    ZeroTorque = torques.back();
     ZeroTorque.setZero();
+    overall_time = times.back();
     return true;
   }else if(name == "append_torque_control") {
     ss >> torque_and_time;
-    std::cout << "Controller: append_torque_control : #torques " << torques.size() << " last item " << torques.back() << std::endl;
     AppendTorqueAndTime(torque_and_time);
+    std::cout << "Controller: append_torque_control " << torques.size() << " last item " << torques.back();
+    overall_time += times.back();
+    std::cout << " t " << times.back() << " overall time " << overall_time << std::endl;
     return true;
   }else if(name == "brake") {
     fprintf(stderr,"Brake is not done yet\n");

@@ -35,12 +35,11 @@ int main(int argc,const char** argv) {
 
 
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
-  MotionPlannerOMPL planner(env.GetWorldPtr());
-
   PlannerInput pin = env.GetPlannerInput();
 
-  if(planner.solve(pin)){
-  }
+  MotionPlannerOMPL planner(env.GetWorldPtr());
+  planner.solve(pin);
+
   env.GetBackendPtr()->AddPlannerIO( planner.GetInput(), planner.GetOutput() );
 
   env.GetBackendPtr()->HidePlannerTree();

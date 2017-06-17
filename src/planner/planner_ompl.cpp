@@ -248,26 +248,30 @@ bool MotionPlannerOMPL::solve(PlannerInput &input_)
 
     std::vector<oc::Control*> controls = path_control.getControls();
 
-    uint N = cspace->GetControlDimensionality();
-    std::vector<Vector> torques;
+    //ControlDimension K = N+6
+    uint K = cspace->GetControlDimensionality();
+
+    std::vector<Vector> torques_and_time;
     std::cout << "Controls:" << std::endl;
-    std::cout << N << "x" << controls.size() << std::endl;
+    std::cout <<K << "x" << controls.size() << std::endl;
     for(int i = 0; i < controls.size(); i++){
       oc::RealVectorControlSpace::ControlType* ccv = static_cast<oc::RealVectorControlSpace::ControlType *>(controls.at(i));
 
-      double time = ccv->values[N-1];
-      Vector qt;qt.resize(N+6);
+      double time = ccv->values[K-1];
+      Vector qt;qt.resize(K);
+
+      qt(K-1) = time;
       //invert SO3xR3 -> R3xSO3
-      for(int k = 0; k < 3; k++){
-        qt(k) = ccv->values[k+3];
-      }
-      for(int k = 3; k < 6; k++){
-        qt(k) = ccv->values[k-3];
-      }
-      for(int k = 6; k < N+6; k++){
+    //  for(int k = 0; k < 3; k++){
+    //    qt(k) = ccv->values[k+3];
+    //  }
+    //  for(int k = 3; k < 6; k++){
+    //    qt(k) = ccv->values[k-3];
+    //  }
+      for(int k = 0; k < K; k++){
         qt(k) = ccv->values[k];
       }
-      torques.push_back(qt);
+      torques_and_time.push_back(qt);
       //stringstream qstr;
       //qstr<<qt;
       //string cmd( (i<=0)?("set_torque_control"):("append_torque_control") );
@@ -300,7 +304,7 @@ bool MotionPlannerOMPL::solve(PlannerInput &input_)
       std::cout << i << "/" << path.getStateCount() <<  cur << std::endl;
     }
 
-    output.SetTorques(torques);
+    output.SetTorques(torques_and_time);
     output.SetKeyframes(keyframes);
     output.SetTree(_stree);
     std::cout << std::string(80, '-') << std::endl;

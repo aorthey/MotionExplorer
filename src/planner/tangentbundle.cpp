@@ -22,7 +22,7 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   //
 
   const ob::StateSpacePtr s = si_->getStateSpace();
-  Config q0 = ompl_space->OMPLStateToConfig(state);
+  Config qstate = ompl_space->OMPLStateToConfig(state);
   const double *ucontrol = control->as<oc::RealVectorControlSpace::ControlType>()->values;
 
   //###########################################################################
@@ -45,18 +45,27 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   // update based on real dynamics
   //###########################################################################
   Vector fext; fext.resize(6+N);
-  for(int k = 0; k < 3; k++){
-    fext(k) = ucontrol[k+3];
-  }
-  for(int k = 3; k < 6; k++){
-    fext(k) = ucontrol[k-3];
-  }
-  for(int k = 6; k < N+6; k++){
+  //for(int k = 0; k < 3; k++){
+  //  fext(k) = ucontrol[k+3];
+  //}
+  //for(int k = 3; k < 6; k++){
+  //  fext(k) = ucontrol[k-3];
+  //}
+  for(int k = 0; k < N+6; k++){
     fext(k) = ucontrol[k];
   }
 
-  robot->UpdateDynamics();
+  Vector q0,dq0;q0.resize(6+N);dq0.resize(6+N);
+  for(int i = 0; i < 6+N; i++){
+    q0(i) = qstate(i);
+    dq0(i) = qstate(i+6+N);
+  }
+
   Vector ddq0;
+  //only works for internal shape space?
+  robot->UpdateConfig(q0);
+  robot->dq = dq0;
+  robot->UpdateDynamics();
   robot->CalcAcceleration(ddq0, fext);
 
   //Force Field acts on rigid link i and induces a wrench on its COM
@@ -73,9 +82,7 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   //  q1(i+6+N) = dq(i);
   //}
 
-  //std::cout << fext << std::endl;
-  //std::cout << ddq0 << std::endl;
-  //exit(0);
+
   LieGroupIntegrator integrator;
 
   Config x0; x0.resize(6);
@@ -83,9 +90,10 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   Config ddx0; ddx0.resize(6);
   for(int i = 0; i < 6; i++){
     x0(i) = q0(i);
-    dx0(i) = q0(i+6+N);
+    dx0(i) = dq0(i);
     ddx0(i) = ddq0(i);
   }
+
 
   Matrix4 x0_SE3 = integrator.StateToSE3(x0);
 
@@ -100,7 +108,7 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   State x1;x1.resize(6);
   integrator.SE3ToState(x1, x1_SE3);
 
-  State dx1 = ddq0*dt + dx0;
+  State dx1 = ddx0*dt + dx0;
   //integrator.SE3ToState(dx1, dx1_SE3);
 
   //State x1(x0); integrator.SE3ToState(x1, x1_SE3);
@@ -115,11 +123,31 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   //###########################################################################
   // Forward Simulate R^N component
   //###########################################################################
-  for(int i = 0; i < N; i++){
-    q1[i+6] = q0[i+6] + dt*q0[i+N+6+6] + dt2*ddq0[i+6];
-    q1[i+N+6+6] = q0[i+N+6+6] + dt*ddq0[i+6];
-  }
+  ///*
+  //for(int i = 0; i < N; i++){
+  //  q1[i+6] = q0[i+6] + dt*dq0[i+6] + dt2*ddq0[i+6];
+  //  q1[i+N+6+6] = dq0[i+6] + dt*ddq0[i+6];
+  //}
 
+
+  /*
+  static uint stop = 0;
+  if(stop>1) exit(0);
+  else stop++;
+
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "dt   :" << dt << std::endl;
+  std::cout << "Fext :" << fext << std::endl;
+  std::cout << "x0   :" << x0 << std::endl;
+  std::cout << "dx0  :" << dx0 << std::endl;
+  std::cout << "ddx0 :" << ddx0 << std::endl;
+  std::cout << "x1   :" << x1 << std::endl;
+  std::cout << "dx1  :" << dx1 << std::endl;
+  std::cout << "ddq0 :" << ddq0 << std::endl;
+  std::cout << "q0   :" << q0 << std::endl;
+  std::cout << "q1   :" << q1 << std::endl;
+  //exit(0);
+  //*/
   /*
 
   //###########################################################################

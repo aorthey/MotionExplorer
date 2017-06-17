@@ -89,7 +89,7 @@ class Info
         vector<RobotJoint> joints = (*it)->joints;
         std::cout << "#Joints: " << joints.size() << std::endl;
         for(int i = 0; i< joints.size(); i++){
-          std::cout<< "Joint[" << i << "] linkidx " << joints[i].linkIndex << " baseidx " << joints[i].baseIndex << " type ";
+          std::cout<< "Joint[" << i << "] linkidx " << joints[i].linkIndex << " type ";
             switch(joints[i].type){
               case RobotJoint::Floating: std::cout << "floating"; break;
               case RobotJoint::Weld: std::cout << "--"; break;

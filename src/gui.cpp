@@ -154,7 +154,9 @@ void ForceFieldBackend::Start()
 
   //disable higher drawing functions
   //drawBBs,drawPoser,drawDesired,drawEstimated,drawContacts,drawWrenches,drawExpanded,drawTime,doLogging
-  //drawPoser = 0;
+
+  drawPoser = 0;
+
   //settings["desired"]["color"][0] = 1;
   //settings["desired"]["color"][1] = 0;
   //settings["desired"]["color"][2] = 0;
@@ -396,6 +398,16 @@ void ForceFieldBackend::RenderScreen(){
 
   line = "Mode       : ";
   line += (click_mode == ModeForceApplication?"ForceApplication":"PositionSetter");
+  DrawText(20,line_y_offset,line);
+  line_y_offset += line_y_offset_stepsize;
+
+  Vector T;
+  sim.controlSimulators[0].GetActuatorTorques(T);
+
+  line = "Cmd Torque : ";
+  stringstream ss;
+  ss << T;
+  line += ss.str();
   DrawText(20,line_y_offset,line);
   line_y_offset += line_y_offset_stepsize;
 }
@@ -758,11 +770,9 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     }else{
       q = robot->q;
     }
-    std::cout << "reseting planner to" << q << std::endl;
     robot->UpdateConfig(q);
     robot->UpdateGeometry();
-    std::cout << "reseting planner to" << robot->q << std::endl;
-
+    std::cout << "reseting robot to" << robot->q << std::endl;
 
     for(size_t i=0;i<world->robots.size();i++) {
       Robot* robot = world->robots[i];

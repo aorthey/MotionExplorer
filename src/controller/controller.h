@@ -32,6 +32,7 @@ class ContactStabilityController: public RobotController
     ControllerState output;
     std::vector<Vector> torques;
     std::vector<double> times;
+    double overall_time;
     Vector ZeroTorque;
 
   public:

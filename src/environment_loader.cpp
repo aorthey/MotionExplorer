@@ -158,7 +158,6 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
 bool EnvironmentLoader::LoadPlannerSettings(TiXmlElement *node)
 {
   CheckNodeName(node, "world");
-
   TiXmlElement* plannersettings = FindSubNode(node, "plannersettings");
 
   if(!plannersettings){
