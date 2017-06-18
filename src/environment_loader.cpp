@@ -147,9 +147,11 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     robot->UpdateFrames();
   }
   //WorldSimulation sim = _backend->sim;
-  ODERobot *simrobot = _backend->sim.odesim.robot(0);
-  simrobot->EnableSelfCollisions(true);
-  std::cout << "SelfCollisionsEnabled" << std::endl;
+  for(int i = 0; i < _backend->sim.odesim.numRobots(); i++){
+    ODERobot *simrobot = _backend->sim.odesim.robot(i);
+    simrobot->EnableSelfCollisions(true);
+    std::cout << "SelfCollisionsEnabled" << std::endl;
+  }
 
   _backend->wrenchfield.LoadFromWorldFile(file_name.c_str());
   _backend->wrenchfield.print();

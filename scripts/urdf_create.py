@@ -2,8 +2,8 @@ import numpy as np
 from math import cos,sin,pi
 
 mass = 1
-damping = 0.5
-effort = 1
+damping = 1
+effort = 0.5
 velocity=100
 
 
@@ -16,7 +16,7 @@ def createCylinder(lname,x,y,z,radius,length,COLLISION_ENABLED=True):
   s+= '    <inertia ixx="'+str(Ixx)+'" ixy="0" ixz="0" iyy="'+str(Iyy)+'" iyz="0" izz="'+str(Izz)+'"/>\n'
   s+= '  </inertial>\n'
   s+= '  <visual>\n'
-  s+= '    <origin rpy="0 1.54 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
+  s+= '    <origin rpy="0 1.57 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
   s+= '    <geometry>\n'
   s+= '      <cylinder length="'+str(length)+'" radius="'+str(radius)+'"/>\n'
   s+= '    </geometry>\n'
@@ -24,6 +24,29 @@ def createCylinder(lname,x,y,z,radius,length,COLLISION_ENABLED=True):
   if COLLISION_ENABLED:
     s+= '  <collision>\n'
     s+= '    <origin rpy="0 1.57 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
+    s+= '    <geometry>\n'
+    s+= '      <cylinder length="'+str(length)+'" radius="'+str(radius)+'"/>\n'
+    s+= '    </geometry>\n'
+    s+= '  </collision>\n'
+    s+= ' </link>\n\n'
+  return s
+def createRotatedCylinder(lname,x,y,z,r,p,yaw,radius,length,COLLISION_ENABLED=True):
+  Ixx = Iyy = (1.0/12.0)*mass*length*length + (1.0/4.0)*mass*radius*radius
+  Izz = (1.0/4.0)*mass*radius*radius
+  s= ' <link name="'+lname+'">\n'
+  s+= '  <inertial>\n'
+  s+= '    <mass value="'+str(mass)+'"/>\n'
+  s+= '    <inertia ixx="'+str(Ixx)+'" ixy="0" ixz="0" iyy="'+str(Iyy)+'" iyz="0" izz="'+str(Izz)+'"/>\n'
+  s+= '  </inertial>\n'
+  s+= '  <visual>\n'
+  s+= '    <origin rpy="'+str(r)+' '+str(p)+' '+str(yaw)+'" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
+  s+= '    <geometry>\n'
+  s+= '      <cylinder length="'+str(length)+'" radius="'+str(radius)+'"/>\n'
+  s+= '    </geometry>\n'
+  s+= '  </visual>\n'
+  if COLLISION_ENABLED:
+    s+= '  <collision>\n'
+    s+= '    <origin rpy="'+str(r)+' '+str(p)+' '+str(yaw)+'" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
     s+= '    <geometry>\n'
     s+= '      <cylinder length="'+str(length)+'" radius="'+str(radius)+'"/>\n'
     s+= '    </geometry>\n'
@@ -74,12 +97,33 @@ def commentNewBranch(bname):
   return s
 
 def createRevoluteJoint(jname, parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
+  return createRevoluteJointXYZ(jname, parentname, childname, 0, 0, 1, x, y, z, lowerLimit, upperLimit)
+
+def createRevoluteJointZ(jname, parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
+  return createRevoluteJointXYZ(jname, parentname, childname, 0, 0, 1, x, y, z, lowerLimit, upperLimit)
+def createRevoluteJointY(jname, parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
+  return createRevoluteJointXYZ(jname, parentname, childname, 0, 1, 0, x, y, z, lowerLimit, upperLimit)
+def createRevoluteJointX(jname, parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
+  return createRevoluteJointXYZ(jname, parentname, childname, 1, 0, 0, x, y, z, lowerLimit, upperLimit)
+
+def createRevoluteJointRPY_XYZ(jname, parentname, childname, r, p, yaw, ex, ey, ez, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
+  s= ''
+  s+='<joint name="'+jname+'_Z" type="revolute">\n'
+  s+='  <origin rpy="'+str(r)+' '+str(p)+' '+str(yaw)+'" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
+  s+='  <parent link="'+parentname+'"/>\n'
+  s+='  <child link="'+childname+'"/>\n'
+  s+='  <axis xyz="'+str(ex)+' '+str(ey)+' '+str(ez)+'"/>\n'
+  s+='  <dynamics damping="'+str(damping)+'" friction="0"/>\n'
+  s+='  <limit lower="'+str(lowerLimit)+'" upper="'+str(upperLimit)+'" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
+  s+='</joint>\n\n'
+  return s
+def createRevoluteJointXYZ(jname, parentname, childname, ex, ey, ez, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
   s= ''
   s+='<joint name="'+jname+'_Z" type="revolute">\n'
   s+='  <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
   s+='  <parent link="'+parentname+'"/>\n'
   s+='  <child link="'+childname+'"/>\n'
-  s+='  <axis xyz="0 0 1"/>\n'
+  s+='  <axis xyz="'+str(ex)+' '+str(ey)+' '+str(ez)+'"/>\n'
   s+='  <dynamics damping="'+str(damping)+'" friction="0"/>\n'
   s+='  <limit lower="'+str(lowerLimit)+'" upper="'+str(upperLimit)+'" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'

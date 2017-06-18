@@ -33,6 +33,7 @@ bool WrenchField::Load(TiXmlElement *node)
   //############################################################################
   TiXmlElement* forceuniform = FindSubNode(forcefieldsettings, "uniform");
   Vector3 Funiform;
+  Funiform.setZero();
   using namespace GLDraw;
   GLColor colorForce(0.8,0.8,0.8);
 
@@ -50,9 +51,6 @@ bool WrenchField::Load(TiXmlElement *node)
       }
       Funiform += FuniformNext;
     }
-
-  }else{
-    Funiform.setZero();
   }
 
 

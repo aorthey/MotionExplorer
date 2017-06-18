@@ -518,10 +518,6 @@ model?) -> one of the cylinders pierced the head sphere creating a spurious coll
    [ ] make completeness property clearer (->os)
    [ ] rewrite quotient space section (->mt)
 
--- unnamed abstractions paper
-
- [ ] make small 3-leg spider robot, only contacts
-
 
 -- abstractions (longterm goals)
 
@@ -595,18 +591,15 @@ COM should retain orientation equal to origin so that we can see forces from
         [ ] calcacceleration returns values on fixed joint
    [ ] gl error when drawing planning tree
     
-
    [x] reset: delete com window
    [x] reset: go back to init pos not xml config
+   [x] add start velocity plannersettings
+   [x] outsource duration time, algorithm name and epsilon goal (xml plannersettings)
+   [x] put geometricOMPLcspace together with principal fibre bundle, do the same for kinodynamic
    [ ] ** flow following by forward simulating a PID controlled device
    [ ] OMPL_SPACE remove hardcoded se3 vector fields (and put them into xml, urdf or so)
    [ ] include FF in tangentbundle integrator
-   [x] add start velocity plannersettings
-   [x] outsource duration time, algorithm name and epsilon goal (xml plannersettings)
    [ ] *** do kinodynamic planning /w FF
-   [x] put geometricOMPLcspace together with principal fibre bundle, do the same
-
-for kinodynamic
    [ ] ** visualize path speed profile (reuse python display and display in topp)
  [ ] * replace propagation by undulatory motions along each axis, but how would that work?
 
@@ -626,7 +619,10 @@ self-collision forces?
  [x] reset: momentum is not set back to zero 
  [ ] reset: crash when plotting joint values
  [ ] kernel panic after movie creation
+   [ ] got another kernel panic after displaying torque based jet propulsion
 
--- pipeline
- [ ] new mode where you can pick and place the robot !
+-- unnamed abstractions paper
+
  [x] compute and display distance between links and terrain
+ [x] make small 3-leg spider robot, only contacts
+ [ ] use some balance controller

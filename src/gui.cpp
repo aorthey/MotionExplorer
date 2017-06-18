@@ -155,8 +155,7 @@ void ForceFieldBackend::Start()
 
   //disable higher drawing functions
   //drawBBs,drawPoser,drawDesired,drawEstimated,drawContacts,drawWrenches,drawExpanded,drawTime,doLogging
-
-  drawPoser = 0;
+  //drawPoser = 0;
 
   //settings["desired"]["color"][0] = 1;
   //settings["desired"]["color"][1] = 0;
