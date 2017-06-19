@@ -95,14 +95,13 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   torque[1]=ucontrol[4];
   torque[2]=ucontrol[3];
 
-  Vector fse3;
-  robot->GetWrenchTorques(torque, force, 6, fse3);
+  Vector fse3; 
+  robot->GetWrenchTorques(torque, force, 5, fse3);
   fext += fse3;
 
   Vector ddq0;
   robot->UpdateDynamics();
   robot->CalcAcceleration(ddq0, fext);
-
 
   // std::cout << std::string(80, '-') << std::endl;
   // std::cout << force << torque << std::endl;
