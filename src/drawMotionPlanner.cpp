@@ -655,12 +655,12 @@ namespace GLDraw{
       Vector3 dc = com_next - com_cur;
         
       glPushMatrix();
+      glLineWidth(linewidth);
       glTranslate(com_cur);
 
       //glPointSize(5);
       //drawPoint(Vector3(0,0,0));
 
-      glLineWidth(linewidth);
       glBegin(GL_LINES);
       glVertex3f(0,0,0);
       glVertex3f(dc[0],dc[1],dc[2]);
@@ -722,12 +722,12 @@ namespace GLDraw{
 
 
           glPushMatrix();
+          glLineWidth(3);
           glPointSize(5);
           white.setCurrentGL();
           drawPoint(p1);
           drawPoint(p2);
           yellow.setCurrentGL();
-          glLineWidth(3);
           glBegin(GL_LINES);
           glVertex3f(p1[0],p1[1],p1[2]);
           glVertex3f(p2[0],p2[1],p2[2]);
@@ -807,6 +807,7 @@ namespace GLDraw{
     float tStep = M_PI/(float)numSteps;
     float sStep = 2*M_PI/(float)16;
 
+    glPushMatrix();
     glLineWidth(2);
     for(float t = -M_PI/2; t <= M_PI/2; t += tStep)
     {
@@ -828,6 +829,7 @@ namespace GLDraw{
       }
       glEnd();
     }
+    glPopMatrix();
   }
   void drawEllipsoid(Vector3 &c, Vector3 &u, Vector3 &v, Vector3 &w, int numSteps)
   {
