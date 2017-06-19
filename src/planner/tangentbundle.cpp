@@ -100,9 +100,9 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   robot->UpdateDynamics();
   robot->CalcAcceleration(ddq0, fext);
 
-  std::cout << fext << std::endl;
-  std::cout << ddq0 << std::endl;
-  exit(0);
+  // std::cout << fext << std::endl;
+  // std::cout << ddq0 << std::endl;
+  // exit(0);
   //Force Field acts on rigid link i and induces a wrench on its COM
   // wrench on COM of link i induces a wrench on CS of robot. 
   // F = J^t w | w=(torque,force)

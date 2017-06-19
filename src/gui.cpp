@@ -887,8 +887,17 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     toggle(drawRigidObjectsEdges);
   }else if(cmd=="draw_planner_tree_toggle"){
     toggle(drawPlannerTree);
+  }else if(cmd=="draw_minimal"){
+    drawForceField=0;
+    drawWrenchField=0;
+    drawForceEllipsoid=0;
+    drawDistanceRobotTerrain=0;
+    drawCenterOfMassPath=0;
+    drawPoser = 0;
   }else if(cmd=="draw_forcefield"){
     toggle(drawForceField);
+  }else if(cmd=="draw_wrenchfield"){
+    toggle(drawWrenchField);
   }else if(cmd=="draw_forceellipsoid"){
     toggle(drawForceEllipsoid);
   }else if(cmd=="draw_distance_robot_terrain"){
@@ -898,8 +907,6 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="draw_swept_volume"){
     toggle(drawPathSweptVolume.at(0));
     toggle(drawPathStartGoal.at(0));
-  }else if(cmd=="draw_wrenchfield"){
-    toggle(drawWrenchField);
   }else if(cmd=="load_motion_planner") {
     //glutSelectFile ("","","");//char *filename, const char *filter, const char *title)
     //std::string file_name = browser->get_file();
@@ -1083,6 +1090,8 @@ bool GLUIForceFieldGUI::Initialize()
   AddToKeymap("3","draw_forceellipsoid");
   AddToKeymap("4","draw_distance_robot_terrain");
   AddToKeymap("5","draw_com_path");
+  AddToKeymap("q","draw_minimal");
+
   AddToKeymap("g","draw_swept_volume");
 
   AddToKeymap("T","toggle_mode");
