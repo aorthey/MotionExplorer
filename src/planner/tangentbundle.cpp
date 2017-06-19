@@ -40,10 +40,20 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   }
   Real dt2 = 0.5*dt*dt;
 
+  Vector q0,dq0;q0.resize(6+N);dq0.resize(6+N);
+  for(int i = 0; i < 6+N; i++){
+    q0(i) = qstate(i);
+    dq0(i) = qstate(i+6+N);
+  }
+
+  robot->UpdateConfig(q0);
+  robot->dq = dq0;
 
   //###########################################################################
   // update based on real dynamics
   //###########################################################################
+  Vector fse3; fse3.resize(6);
+
   Vector fext; fext.resize(6+N);
   //for(int k = 0; k < 3; k++){
   //  fext(k) = ucontrol[k+3];
@@ -51,38 +61,65 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   //for(int k = 3; k < 6; k++){
   //  fext(k) = ucontrol[k-3];
   //}
+  //for(int k = 0; k < 6; k++){
+  //  fse3(k) = ucontrol[k];
+  //}
+  fext.setZero();
+
+  //fext = S^T * torque, whereby S is the selection matrix
   for(int k = 0; k < N+6; k++){
     fext(k) = ucontrol[k];
   }
 
-  Vector q0,dq0;q0.resize(6+N);dq0.resize(6+N);
-  for(int i = 0; i < 6+N; i++){
-    q0(i) = qstate(i);
-    dq0(i) = qstate(i+6+N);
+  //access SE(3) driver
+  for(int k = 0; k < 6; k++){
+    fse3.setZero();
+    fse3(k) = ucontrol[k];
+    RobotJointDriver *driver = &robot->drivers.at(k);
+    uint lidx = driver->linkIndices[1];
+    RobotLink3D *link  = &robot->links.at(lidx);
+    Vector3 com = link->com;
+    Matrix J;
+    robot->GetFullJacobian(com,lidx,J);
+    //Jt.setRefTranspose(J);
+
+    Vector fout;
+    J.mulTranspose(fse3, fout);
+    //std::cout << "J: " << J.numRows() << "x" << J.numCols() << std::endl;
+    //std::cout << fse3 << std::endl;
+    //std::cout << fout << std::endl;
+    //std::cout << std::string(80, '-') << std::endl;
+    //fext += fout;
+    //Jk.mul(Jk,fse3);
+    //exit(0);
+
   }
+  //exit(0);
 
   Vector ddq0;
-  //only works for internal shape space?
-  robot->UpdateConfig(q0);
-  robot->dq = dq0;
   robot->UpdateDynamics();
   robot->CalcAcceleration(ddq0, fext);
 
+  //std::cout << fext << std::endl;
+  //std::cout << ddq0 << std::endl;
   //Force Field acts on rigid link i and induces a wrench on its COM
   // wrench on COM of link i induces a wrench on CS of robot. 
   // F = J^t w | w=(torque,force)
   //void GetWrenchTorques(const Vector3& torque, const Vector3& force, int i, Vector& F) const;
 
-  //Config q = ddq0*dt2 + dq0*dt + q0;
-  //Config dq = ddq0*dt + dq0;
+  /*
+  Config q = ddq0*dt2 + dq0*dt + q0;
+  Config dq = ddq0*dt + dq0;
 
-  //Config q1; q1.resize(2*N+12);
-  //for(int i = 0; i < 6+N; i++){
-  //  q1(i) = q(i);
-  //  q1(i+6+N) = dq(i);
-  //}
+  Config q1; q1.resize(2*N+12);
+  for(int i = 0; i < 6+N; i++){
+    q1(i) = q(i);
+    q1(i+6+N) = dq(i);
+  }
+  //*/
 
 
+  ///*
   LieGroupIntegrator integrator;
 
   Config x0; x0.resize(6);
@@ -119,15 +156,17 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
     q1(i) = x1(i);
     q1(i+6+N) = dx1(i);
   }
+  //*/
 
   //###########################################################################
   // Forward Simulate R^N component
   //###########################################################################
-  ///*
+  //*
   //for(int i = 0; i < N; i++){
   //  q1[i+6] = q0[i+6] + dt*dq0[i+6] + dt2*ddq0[i+6];
   //  q1[i+N+6+6] = dq0[i+6] + dt*ddq0[i+6];
   //}
+  //*/
 
 
   /*

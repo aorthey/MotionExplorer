@@ -152,10 +152,17 @@ bool MotionPlannerOMPL::solve(PlannerInput &input_)
   //###########################################################################
   // choose planner
   //###########################################################################
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::RRT>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::SST>(si);
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::PDST>(si);
-  ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
+  std::string algorithm = input.name_algorithm;
+  ob::PlannerPtr ompl_planner;
+
+  if(algorithm=="ompl:rrt") ompl_planner = std::make_shared<oc::RRT>(si);
+  else if(algorithm=="ompl:sst") ompl_planner = std::make_shared<oc::SST>(si);
+  else if(algorithm=="ompl:pdst") ompl_planner = std::make_shared<oc::PDST>(si);
+  else if(algorithm=="ompl:kpiece") ompl_planner = std::make_shared<oc::KPIECE1>(si);
+  else{
+    std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
+    exit(0);
+  }
 
   //###########################################################################
   // setup and projection

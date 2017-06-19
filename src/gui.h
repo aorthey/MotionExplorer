@@ -103,8 +103,11 @@ class ForceFieldBackend : public SimTestBackend
     void HideRobot(){ drawRobot = 0; }
     void ShowPlannerTree(){ drawPlannerTree = 1; }
     void HidePlannerTree(){ drawPlannerTree = 0; }
-    void ShowSweptVolumes(){ showSweptVolumes = 1; }
-    void HideSweptVolumes(){ showSweptVolumes = 0; }
+
+    void ShowSweptVolumes();
+    void HideSweptVolumes();
+    void ShowMilestones();
+    void HideMilestones();
 
     void AddPlannerIO( PlannerInput pin, PlannerOutput pout );
     void AddPlannerInput( PlannerInput pin );

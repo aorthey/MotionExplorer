@@ -22,6 +22,72 @@ RobotWorld (World.h) contains
 World -> Terrain -> ManagedGeometry -> DrawGL()
 -> GLDraw::GeometryAppearance -> DrawGL() ->
   
+Jacobian:
+  void GetCOMJacobian(Matrix& Jc) const;
+  void GetCOMHessian(Matrix& Hx,Matrix& Hy,Matrix& Hz) const;
+
+  void GetDriverJacobian(int driver,Vector& J);
+
+  /// Computes the time derivative of dpi/dqj.
+  /// That is, the jacobian of pi on link i with respect to qj.
+  bool GetJacobianDt(const Vector3& pi, int i, int j, Vector3&dtheta_dt,Vector3& dp_dt) const;
+  ///gets the jacobian of pi w.r.t qj
+  bool GetJacobian(const Vector3& pi, int i, int j, Vector3& dw, Vector3& dv) const;
+  bool GetOrientationJacobian(int i, int j, Vector3& dw) const;
+  bool GetPositionJacobian(const Vector3& pi, int i, int j, Vector3& dv) const;
+  ///gets the jacobian matrix of pi w.r.t q
+  ///row 0-2 are angular, 3-5 are translational
+  void GetFullJacobian(const Vector3& pi, int i, Matrix& J) const;
+  ///rows 3-5 of the above
+  void GetPositionJacobian(const Vector3& pi, int i, Matrix& J) const;
+
+
+struct RobotJointDriver
+  enum Type { Normal, Affine, Translation, Rotation, Custom };
+  int NumControls() const;  //number of input controls
+  int NumLinks() const;
+  Type type;
+  vector<int> linkIndices;
+  Real qmin,qmax;           //min/max values
+  Real vmin,vmax;           //min/max velocities
+  Real amin,amax;           //min/max accelerations
+  Real tmin,tmax;           //min/max torques
+  Real servoP,servoI,servoD;  //servo parameters
+  Real dryFriction;           //constant friction coefficient
+  Real viscousFriction;       //velocity-dependent friction coefficient
+
+class RobotLink3D
+  ///links's transformation is a function of control qi
+  ///say we're link i
+  ///T(i->i)(qi) = R(w*qi)oT(v*qi) where R rotates about an axis, T translates
+  ///T(i->pi)(qi) = T0(i->pi)*T(i->i)(qi)
+  void GetLocalTransform(Real qi,Frame3D& T) const;
+
+  ///velocity of a point (in frame 0) with respect to qi,dqi
+  void GetVelocity(Real qi,Real dqi,const Vector3& p,Vector3& vel) const;
+  void GetAngularVelocity(Real dqi,Vector3& omega) const;
+
+  ///Jacobian (orientation,position) of a point (in frame 0) with respect to qi
+  void GetJacobian(Real qi,const Vector3& p,Vector3& Jo,Vector3& Jp) const;
+  void GetOrientationJacobian(Vector3& Jo) const;
+  void GetPositionJacobian(Real qi,const Vector3& p,Vector3& Jp) const;
+
+  //Position jacobian of points in frame 0 w.r.t. i 
+  void GetJacobian(Real qi,Frame3D& J) const; 
+  //Position jacobian of points in frame j w.r.t. i
+  void GetJacobian(Real qi,const Frame3D& Tj_World,Frame3D& J) const; 
+  void GetWorldInertia(Matrix3& inertiaWorld) const;
+  void GetWorldCOM(Vector3& comWorld) const { T_World.mulPoint(com,comWorld); }
+
+  Type type; /// Indicates the type of joint- revolute, prismatic
+  Vector3 w; /// The axis of rotation/translation (in local frame)
+  Real mass;
+  Vector3 com; /// The center of mass (in local frame)
+  Matrix3 inertia; /// The inertia matrix (in local frame)
+  /// Temporary - holds the current state of local to world transformation
+  Frame3D T_World;
+`
+
 
 Robot (Modeling/Robot.h)
 bool InJointLimits(const Config& q) const;
@@ -511,12 +577,12 @@ model?) -> one of the cylinders pierced the head sphere creating a spurious coll
  [x] experiment door 100x1200 complete
  [x] experiment wall 10x3600*24 complete (running)
  [x] change title to dimred for mp using ip
- [ ] incorporate reviews/edits/comments from OOM
-   [ ] check why section numbers are not displayed
-   [ ] rewrite related work
-   [ ] rewrite discussion
-   [ ] make completeness property clearer (->os)
-   [ ] rewrite quotient space section (->mt)
+ [x] incorporate reviews/edits/comments from OOM
+   [x] rewrite related work
+   [x] rewrite discussion
+   [x] make completeness property clearer (->os)
+   [x] rewrite quotient space section (->mt)
+ [ ] check why section numbers are not displayed
 
 
 -- abstractions (longterm goals)
@@ -586,9 +652,9 @@ COM should retain orientation equal to origin so that we can see forces from
    [ ] why does robot move when disabling force fields? (does not happen after reset!)
    [ ] display all torques applied
    [ ] *** do kinodynamic planning /w torque constraints on fibre bundle
-=>>     [ ] fix propagation function
-        [ ] forward simulation is wrong on tangent bundle
-        [ ] calcacceleration returns values on fixed joint
+=>>   [ ] fix propagation function
+      [ ] forward simulation is wrong on tangent bundle
+      [ ] calcacceleration returns values on fixed joint
    [ ] gl error when drawing planning tree
     
    [x] reset: delete com window

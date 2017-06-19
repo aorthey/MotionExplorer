@@ -67,6 +67,28 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   _frames.clear();
   swept_volume_paths.clear();
 }
+void ForceFieldBackend::ShowSweptVolumes(){ 
+  showSweptVolumes = 1;
+  for(int i = 0; i < drawPathSweptVolume.size(); i++){
+    drawPathSweptVolume.at(i) = 1;
+  }
+}
+void ForceFieldBackend::HideSweptVolumes(){ 
+  showSweptVolumes = 0;
+  for(int i = 0; i < drawPathSweptVolume.size(); i++){
+    drawPathSweptVolume.at(i) = 0;
+  }
+}
+void ForceFieldBackend::ShowMilestones(){ 
+  for(int i = 0; i < drawPathMilestones.size(); i++){
+    drawPathMilestones.at(i) = 1;
+  }
+}
+void ForceFieldBackend::HideMilestones(){ 
+  for(int i = 0; i < drawPathMilestones.size(); i++){
+    drawPathMilestones.at(i) = 0;
+  }
+}
 
 
 ///*
@@ -185,15 +207,15 @@ void ForceFieldBackend::Start()
   std::cout << "Setting swept volume paths" << std::endl;
   for(int i = 0; i < getNumberOfPaths(); i++){
     drawPathSweptVolume.push_back(showSweptVolumes);
-    drawPathMilestones.push_back(1);
+    drawPathMilestones.push_back(0);
     drawPathStartGoal.push_back(1);
   }
   for(int i = 0; i < getNumberOfPaths(); i++){
     std::string dpsv = "draw_path_swept_volume_"+std::to_string(i);
     MapButtonToggle(dpsv.c_str(),&drawPathSweptVolume.at(i));
-    std::string dpms = "draw_path_milestones"+std::to_string(i);
+    std::string dpms = "draw_path_milestones_"+std::to_string(i);
     MapButtonToggle(dpms.c_str(),&drawPathMilestones.at(i));
-    std::string dpsg = "draw_path_start_goal"+std::to_string(i);
+    std::string dpsg = "draw_path_start_goal_"+std::to_string(i);
     MapButtonToggle(dpsg.c_str(),&drawPathStartGoal.at(i));
   }
 
@@ -873,6 +895,9 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     toggle(drawDistanceRobotTerrain);
   }else if(cmd=="draw_com_path"){
     toggle(drawCenterOfMassPath);
+  }else if(cmd=="draw_swept_volume"){
+    toggle(drawPathSweptVolume.at(0));
+    toggle(drawPathStartGoal.at(0));
   }else if(cmd=="draw_wrenchfield"){
     toggle(drawWrenchField);
   }else if(cmd=="load_motion_planner") {
@@ -973,13 +998,13 @@ bool GLUIForceFieldGUI::Initialize()
     //AddControl(checkbox,dpsv.c_str());
     //checkbox->set_int_val(_backend->drawPathSweptVolume.at(i));
 
-    std::string dpms = "draw_path_milestones"+std::to_string(i);
+    std::string dpms = "draw_path_milestones_"+std::to_string(i);
     std::string descr2 = prefix + "Draw Milestones";
     checkbox = glui->add_checkbox_to_panel(panel, descr2.c_str());
     AddControl(checkbox,dpms.c_str());
     checkbox->set_int_val(_backend->drawPathMilestones.at(i));
 
-    std::string dpsg = "draw_path_start_goal"+std::to_string(i);
+    std::string dpsg = "draw_path_start_goal_"+std::to_string(i);
     std::string descr3 = prefix + "Draw Start Goal";
     checkbox = glui->add_checkbox_to_panel(panel, descr3.c_str());
     AddControl(checkbox,dpsg.c_str());
@@ -1058,6 +1083,7 @@ bool GLUIForceFieldGUI::Initialize()
   AddToKeymap("3","draw_forceellipsoid");
   AddToKeymap("4","draw_distance_robot_terrain");
   AddToKeymap("5","draw_com_path");
+  AddToKeymap("g","draw_swept_volume");
 
   AddToKeymap("T","toggle_mode");
   AddToKeymap("f","draw_rigid_objects_faces_toggle");

@@ -747,7 +747,7 @@ namespace GLDraw{
       dBodyID bodyid = robot->body(i);
       if(bodyid){
         if(!robot->robot.IsGeometryEmpty(i)){
-          RobotLink3D *link = &robot->robot.links[i];
+          RobotLink3D *link = &robot->robot.links.at(i);
           Vector3 com = link->com;
           Matrix J;
           robot->robot.GetFullJacobian(com, i, J);

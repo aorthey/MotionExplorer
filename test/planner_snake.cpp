@@ -42,7 +42,9 @@ int main(int argc,const char** argv) {
 
   env.GetBackendPtr()->AddPlannerIO( planner.GetInput(), planner.GetOutput() );
 
-  env.GetBackendPtr()->HidePlannerTree();
+  env.GetBackendPtr()->ShowPlannerTree();
+  env.GetBackendPtr()->ShowSweptVolumes();
+  env.GetBackendPtr()->HideMilestones();
   env.GetBackendPtr()->ShowRobot();
 
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
