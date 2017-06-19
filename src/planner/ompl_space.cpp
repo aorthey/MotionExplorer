@@ -388,15 +388,15 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
     }
   }
 
-  cbounds.setLow(NdimControl,0.01);//propagation step size
-  cbounds.setHigh(NdimControl,0.10);
+  cbounds.setLow(NdimControl,input.timestep_min);//propagation step size
+  cbounds.setHigh(NdimControl,input.timestep_max);
 
   //TODO: remove hardcoded se(3) vector fields
   for(int i = 0; i < 6; i++){
     cbounds.setLow(i,0);
     cbounds.setHigh(i,0);
   }
-  cbounds.setLow(0,0);
+  cbounds.setLow(0,1);
   cbounds.setHigh(0,1);
   cbounds.setLow(3,-0.01);
   cbounds.setHigh(3,0.01);

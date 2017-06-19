@@ -129,7 +129,7 @@ bool MotionPlannerOMPL::solve(PlannerInput &input_)
   //on the se(3) component
   //
 
-  CSpaceFactory factory;
+  CSpaceFactory factory(input);
 
   //GeometricCSpaceOMPL* cspace = factory.MakeGeometricCSpace(robot, &kcspace);
   KinodynamicCSpaceOMPL* cspace = factory.MakeKinodynamicCSpace(robot, &kcspace);

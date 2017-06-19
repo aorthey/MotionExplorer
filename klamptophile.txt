@@ -655,7 +655,8 @@ COM should retain orientation equal to origin so that we can see forces from
 =>>   [ ] fix propagation function
       [ ] forward simulation is wrong on tangent bundle
       [ ] calcacceleration returns values on fixed joint
-   [ ] gl error when drawing planning tree
+      [ ] feels like momentum is ignored by propagation function. 
+   [x] gl error when drawing planning tree
     
    [x] reset: delete com window
    [x] reset: go back to init pos not xml config
@@ -668,6 +669,7 @@ COM should retain orientation equal to origin so that we can see forces from
    [ ] *** do kinodynamic planning /w FF
    [ ] ** visualize path speed profile (reuse python display and display in topp)
  [ ] * replace propagation by undulatory motions along each axis, but how would that work?
+ 
 
  [ ] put all the loader stuff into separate folder each with one file
 

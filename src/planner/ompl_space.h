@@ -16,6 +16,7 @@
 
 #include "principalfibrebundle.h"
 #include "tangentbundle.h"
+#include "planner_input.h"
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;
@@ -62,8 +63,12 @@ class CSpaceOMPL
     uint GetControlDimensionality(){
       return control_space->getDimension();
     }
+    void SetPlannerInput(PlannerInput &input_){
+      input = input_;
+    }
 
   protected:
+    PlannerInput input;
 
     ob::StateSpacePtr space;
     oc::RealVectorControlSpacePtr control_space;
@@ -114,16 +119,20 @@ class KinodynamicCSpaceOMPL: public CSpaceOMPL
 
 
 class CSpaceFactory{
+  private:
+    PlannerInput input;
   public:
-    CSpaceFactory(){};
+    CSpaceFactory(PlannerInput &input_): input(input_){};
     virtual GeometricCSpaceOMPL* MakeGeometricCSpace( Robot *robot, CSpace *kspace){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPL(robot, kspace);
+      cspace->SetPlannerInput(input);
       cspace->initSpace();
       cspace->initControlSpace();
       return cspace;
     }
     virtual KinodynamicCSpaceOMPL* MakeKinodynamicCSpace( Robot *robot, CSpace *kspace){
       KinodynamicCSpaceOMPL *cspace = new KinodynamicCSpaceOMPL(robot, kspace);
+      cspace->SetPlannerInput(input);
       cspace->initSpace();
       cspace->initControlSpace();
       return cspace;

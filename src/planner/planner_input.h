@@ -16,6 +16,7 @@ struct PlannerInput{
 
   double epsilon_goalregion;
   double max_planning_time;
+  double timestep_min, timestep_max;
 
   Config se3min;
   Config se3max;
@@ -32,6 +33,7 @@ struct PlannerInput{
     out << "SE3_min           : " << pin.se3min << std::endl;
     out << "SE3_max           : " << pin.se3max << std::endl;
     out << "algorithm         : " << pin.name_algorithm << std::endl;
+    out << "discr timestep    : [" << pin.timestep_min << "," << pin.timestep_max << "]" << std::endl;
     out << "max planning time : " << pin.max_planning_time << " (seconds)" << std::endl;
     out << "epsilon_goalregion: " << pin.epsilon_goalregion<< std::endl;
     out << std::string(80, '-') << std::endl;

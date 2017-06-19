@@ -46,67 +46,69 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
     dq0(i) = qstate(i+6+N);
   }
 
-  robot->UpdateConfig(q0);
   robot->dq = dq0;
+  robot->UpdateConfig(q0);
 
   //###########################################################################
   // update based on real dynamics
   //###########################################################################
-  Vector fse3; fse3.resize(6);
-
   Vector fext; fext.resize(6+N);
-  //for(int k = 0; k < 3; k++){
-  //  fext(k) = ucontrol[k+3];
-  //}
-  //for(int k = 3; k < 6; k++){
-  //  fext(k) = ucontrol[k-3];
-  //}
-  //for(int k = 0; k < 6; k++){
-  //  fse3(k) = ucontrol[k];
-  //}
   fext.setZero();
 
   //fext = S^T * torque, whereby S is the selection matrix
-  for(int k = 0; k < N+6; k++){
+  for(int k = 6; k < N+6; k++){
     fext(k) = ucontrol[k];
   }
 
-  //access SE(3) driver
-  for(int k = 0; k < 6; k++){
-    fse3.setZero();
-    fse3(k) = ucontrol[k];
-    RobotJointDriver *driver = &robot->drivers.at(k);
-    uint lidx = driver->linkIndices[1];
-    RobotLink3D *link  = &robot->links.at(lidx);
-    Vector3 com = link->com;
-    Matrix J;
-    robot->GetFullJacobian(com,lidx,J);
-    //Jt.setRefTranspose(J);
+  ////access SE(3) driver
+  //for(int k = 0; k < 6; k++){
+  //  Vector fse3; fse3.resize(6);
 
-    Vector fout;
-    J.mulTranspose(fse3, fout);
-    //std::cout << "J: " << J.numRows() << "x" << J.numCols() << std::endl;
-    //std::cout << fse3 << std::endl;
-    //std::cout << fout << std::endl;
-    //std::cout << std::string(80, '-') << std::endl;
-    //fext += fout;
-    //Jk.mul(Jk,fse3);
-    //exit(0);
+  //  fse3.setZero();
+  //  fse3(k) = ucontrol[k];
+  //  RobotJointDriver *driver = &robot->drivers.at(k);
+  //  uint lidx = driver->linkIndices[1];
+  //  RobotLink3D *link  = &robot->links.at(lidx);
+  //  Vector3 com = link->com;
+  //  Matrix J;
+  //  robot->GetFullJacobian(com,lidx,J);
+  //  //Jt.setRefTranspose(J);
 
-  }
+  //  Vector fout;
+  //  J.mulTranspose(fse3, fout);
+  //  //std::cout << "J: " << J.numRows() << "x" << J.numCols() << std::endl;
+  //  //std::cout << fse3 << std::endl;
+  //  //std::cout << fout << std::endl;
+  //  //std::cout << std::string(80, '-') << std::endl;
+  //  //fext += fout;
+  //  //Jk.mul(Jk,fse3);
+  //  //exit(0);
+
+  //}
   //exit(0);
+
+  Vector3 torque,force;
+  force[0]=ucontrol[0];
+  force[1]=ucontrol[1];
+  force[2]=ucontrol[2];
+  torque[0]=ucontrol[5];
+  torque[1]=ucontrol[4];
+  torque[2]=ucontrol[3];
+
+  Vector fse3;
+  robot->GetWrenchTorques(torque, force, 6, fse3);
+  fext += fse3;
 
   Vector ddq0;
   robot->UpdateDynamics();
   robot->CalcAcceleration(ddq0, fext);
 
+
+  // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << force << torque << std::endl;
   // std::cout << fext << std::endl;
   // std::cout << ddq0 << std::endl;
   // exit(0);
-  //Force Field acts on rigid link i and induces a wrench on its COM
-  // wrench on COM of link i induces a wrench on CS of robot. 
-  // F = J^t w | w=(torque,force)
-  //void GetWrenchTorques(const Vector3& torque, const Vector3& force, int i, Vector& F) const;
 
   /*
   Config q = ddq0*dt2 + dq0*dt + q0;
@@ -120,7 +122,7 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   //*/
 
 
-  ///*
+  //*
   LieGroupIntegrator integrator;
 
   Config x0; x0.resize(6);
@@ -131,7 +133,6 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
     dx0(i) = dq0(i);
     ddx0(i) = ddq0(i);
   }
-
 
   Matrix4 x0_SE3 = integrator.StateToSE3(x0);
 
@@ -153,9 +154,11 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   //Config qend = x1;
 
   Config q1; q1.resize(12+2*N); q1.setZero();
+  Vector dq1;dq1.resize(6+N); dq1.setZero();
   for(int i = 0; i < 6; i++){
     q1(i) = x1(i);
     q1(i+6+N) = dx1(i);
+    //dq1(i) = dx1(i);
   }
   //*/
 

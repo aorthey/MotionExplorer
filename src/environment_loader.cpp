@@ -175,13 +175,23 @@ bool EnvironmentLoader::LoadPlannerSettings(TiXmlElement *node)
 
   TiXmlElement* dqinit = FindSubNode(plannersettings, "dqinit");
   TiXmlElement* dqgoal = FindSubNode(plannersettings, "dqgoal");
+  TiXmlElement* timestep = FindSubNode(plannersettings, "timestep");
   TiXmlElement* max_planning_time = FindSubNode(plannersettings, "maxplanningtime");
   TiXmlElement* epsilon_goalregion = FindSubNode(plannersettings, "epsilongoalregion");
+
 
   GetStreamAttribute(qinit,"config") >> pin.q_init;
   GetStreamAttribute(qgoal,"config") >> pin.q_goal;
   GetStreamAttribute(dqinit,"config") >> pin.dq_init;
   GetStreamAttribute(dqgoal,"config") >> pin.dq_goal;
+
+  if(timestep){
+    GetStreamAttribute(timestep,"min") >> pin.timestep_min;
+    GetStreamAttribute(timestep,"max") >> pin.timestep_max;
+  }else{
+    pin.timestep_min= 0.01;
+    pin.timestep_max= 0.1;
+  }
 
   GetStreamText(max_planning_time) >> pin.max_planning_time;
   GetStreamText(epsilon_goalregion) >> pin.epsilon_goalregion;
