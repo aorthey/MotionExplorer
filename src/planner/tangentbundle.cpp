@@ -49,6 +49,11 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   robot->dq = dq0;
   robot->UpdateConfig(q0);
 
+  uint lidx = 5;
+  RobotLink3D *link  = &robot->links.at(lidx);
+  Vector3 com = link->com;
+  //Vector3 com = link->T_World.t;
+  Matrix3 R = link->T_World.R;
   //###########################################################################
   // update based on real dynamics
   //###########################################################################
@@ -60,33 +65,6 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
     fext(k) = ucontrol[k];
   }
 
-  ////access SE(3) driver
-  //for(int k = 0; k < 6; k++){
-  //  Vector fse3; fse3.resize(6);
-
-  //  fse3.setZero();
-  //  fse3(k) = ucontrol[k];
-  //  RobotJointDriver *driver = &robot->drivers.at(k);
-  //  uint lidx = driver->linkIndices[1];
-  //  RobotLink3D *link  = &robot->links.at(lidx);
-  //  Vector3 com = link->com;
-  //  Matrix J;
-  //  robot->GetFullJacobian(com,lidx,J);
-  //  //Jt.setRefTranspose(J);
-
-  //  Vector fout;
-  //  J.mulTranspose(fse3, fout);
-  //  //std::cout << "J: " << J.numRows() << "x" << J.numCols() << std::endl;
-  //  //std::cout << fse3 << std::endl;
-  //  //std::cout << fout << std::endl;
-  //  //std::cout << std::string(80, '-') << std::endl;
-  //  //fext += fout;
-  //  //Jk.mul(Jk,fse3);
-  //  //exit(0);
-
-  //}
-  //exit(0);
-
   Vector3 torque,force;
   force[0]=ucontrol[0];
   force[1]=ucontrol[1];
@@ -95,31 +73,33 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   torque[1]=ucontrol[4];
   torque[2]=ucontrol[3];
 
-  Vector fse3; 
-  robot->GetWrenchTorques(torque, force, 5, fse3);
-  fext += fse3;
+  R.mulTranspose(force, force);
+  R.mulTranspose(torque, torque);
+
+  Vector wrench;wrench.resize(6);
+  //for(int i = 0; i < 3; i++) wrench(i)=torque[i];
+  //for(int i = 3; i < 6; i++) wrench(i)=force[i-3];
+
+  //row 0-2 of jacobian is angular, 3-5 translational
+  for(int i = 0; i < 3; i++) wrench(i)=torque[i];
+  for(int i = 3; i < 6; i++) wrench(i)=force[i-3];
+
+  Matrix J,Jt;
+  robot->GetFullJacobian(com,lidx,J);
+  Vector Fq;
+  Jt.setRefTranspose(J);
+  J.mulTranspose(wrench, Fq);
+  //robot->GetWrenchTorques(torque, force, lidx, Fq);
+  fext += Fq;
+  // std::cout << Jt << std::endl;
+  // std::cout << Fq << std::endl;
+  // std::cout << wrench << std::endl;
+  // exit(0);
+
 
   Vector ddq0;
   robot->UpdateDynamics();
   robot->CalcAcceleration(ddq0, fext);
-
-  // std::cout << std::string(80, '-') << std::endl;
-  // std::cout << force << torque << std::endl;
-  // std::cout << fext << std::endl;
-  // std::cout << ddq0 << std::endl;
-  // exit(0);
-
-  /*
-  Config q = ddq0*dt2 + dq0*dt + q0;
-  Config dq = ddq0*dt + dq0;
-
-  Config q1; q1.resize(2*N+12);
-  for(int i = 0; i < 6+N; i++){
-    q1(i) = q(i);
-    q1(i+6+N) = dq(i);
-  }
-  //*/
-
 
   //*
   LieGroupIntegrator integrator;
@@ -147,105 +127,31 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   integrator.SE3ToState(x1, x1_SE3);
 
   State dx1 = ddx0*dt + dx0;
-  //integrator.SE3ToState(dx1, dx1_SE3);
-
-  //State x1(x0); integrator.SE3ToState(x1, x1_SE3);
-  //Config qend = x1;
 
   Config q1; q1.resize(12+2*N); q1.setZero();
   Vector dq1;dq1.resize(6+N); dq1.setZero();
   for(int i = 0; i < 6; i++){
     q1(i) = x1(i);
     q1(i+6+N) = dx1(i);
-    //dq1(i) = dx1(i);
+    dq1(i) = dx1(i);
   }
+
+  std::cout << std::string(80, '-') << std::endl; 
+  std::cout << "dq :" << dq1 << std::endl;
+  // std::cout << ddq0 << std::endl;
+  // std::cout << fext << std::endl;
+  // std::cout << std::string(80, '-') << std::endl;
+  // exit(0);
+
   //*/
 
   //###########################################################################
   // Forward Simulate R^N component
   //###########################################################################
-  //*
-  //for(int i = 0; i < N; i++){
-  //  q1[i+6] = q0[i+6] + dt*dq0[i+6] + dt2*ddq0[i+6];
-  //  q1[i+N+6+6] = dq0[i+6] + dt*ddq0[i+6];
-  //}
-  //*/
-
-
   /*
-  static uint stop = 0;
-  if(stop>1) exit(0);
-  else stop++;
-
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "dt   :" << dt << std::endl;
-  std::cout << "Fext :" << fext << std::endl;
-  std::cout << "x0   :" << x0 << std::endl;
-  std::cout << "dx0  :" << dx0 << std::endl;
-  std::cout << "ddx0 :" << ddx0 << std::endl;
-  std::cout << "x1   :" << x1 << std::endl;
-  std::cout << "dx1  :" << dx1 << std::endl;
-  std::cout << "ddq0 :" << ddq0 << std::endl;
-  std::cout << "q0   :" << q0 << std::endl;
-  std::cout << "q1   :" << q1 << std::endl;
-  //exit(0);
-  //*/
-  /*
-
-  //###########################################################################
-  // Forward Simulate SE(3) component
-  //###########################################################################
-
-  Config R6control;
-  R6control.resize(6);
-  R6control.setZero();
-  R6control(0) = ucontrol[0];
-  R6control(1) = ucontrol[1];
-  R6control(2) = ucontrol[2];
-  R6control(3) = ucontrol[3];
-  R6control(4) = ucontrol[4];
-  R6control(5) = ucontrol[5];
-
-  LieGroupIntegrator integrator;
-
-  Config x0; x0.resize(6);
-  Config dx0; dx0.resize(6);
-  for(int i = 0; i < 6; i++){
-    x0(i) = q0(i);
-    dx0(i) = q0(i+6+N);
-  }
-
-  Matrix4 x0_SE3 = integrator.StateToSE3(x0);
-
-  Matrix4 dx0_SE3 = integrator.SE3Derivative(dx0);
-
-  Matrix4 ddp = integrator.SE3Derivative(R6control);
-
-  Matrix4 dp = ddp*dt*0.5 + dx0_SE3;
-
-  Matrix4 x1_SE3 = integrator.Integrate(x0_SE3,dp,dt);
-
-  State x1;x1.resize(6);
-  integrator.SE3ToState(x1, x1_SE3);
-
-  State dx1 = R6control*dt + dx0;
-  //integrator.SE3ToState(dx1, dx1_SE3);
-
-  //State x1(x0); integrator.SE3ToState(x1, x1_SE3);
-  //Config qend = x1;
-
-  Config q1; q1.resize(12+2*N); q1.setZero();
-  for(int i = 0; i < 6; i++){
-    q1(i) = x1(i);
-    q1(i+6+N) = dx1(i);
-  }
-
-  //###########################################################################
-  // Forward Simulate R^N component
-  //###########################################################################
   for(int i = 0; i < N; i++){
-    q1[i+6] = q0[i+6] + dt*q0[i+N+6+6] + dt2*ucontrol[i+6];
-    q1[i+N+6+6] = q0[i+N+6+6] + dt*ucontrol[i+6];
+    q1[i+6] = q0[i+6] + dt*dq0[i+6] + dt2*ddq0[i+6];
+    q1[i+N+6+6] = dq0[i+6] + dt*ddq0[i+6];
   }
   //*/
 

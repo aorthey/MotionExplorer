@@ -630,10 +630,10 @@ COM should retain orientation equal to origin so that we can see forces from
  [x] visualize min dist between link and terrain
  [x] add custom controller loop 
  [x] visualize force ellipsoid at each point
+ [x] simulate snake, make sure there are no glitches
  [ ] enable velocity induced FF, drag force, magnetic force, etc
  [ ] apply force to rigidObjects and other robots in the scene
  [ ] composite force fields: intersection and union
- [x] simulate snake, make sure there are no glitches
  [ ] add constraint to a FF to be inside a given rigid object
  [ ] [URGENT] Plan one path /w speed profile using OMPL, send to controller, execute in the simulator, have perfect path following behavior
    [x] return only pointers in ompl_space, make a factory
@@ -641,15 +641,15 @@ COM should retain orientation equal to origin so that we can see forces from
    [x] simulate jet propulsion
    [x] implement tangentbundle integrator
    [x] *** execute/simulate kinodynamic path (use jet propulsion)
-      [x] torque values are SO(3) x R3 in controller, but should be R3xSO(3).  Why?
-      [x] error: driver 0 is not in PID mode. Why?
-      [x] jet propulsion not implemented yet (see RobotJointDriver)
-      [x] jet propulsion acts on global coordinate frame, not locally on robot link
-      [x] torques not being set properly (robot should move with random torques)
-      [x] segfault /w single rigid body
-      [x] drivers and actuators do not match up. zero joints = zero actuators, therefore segfault. where are the actuators created?
-      [x] display the jet propulsion wrenches to verify
-   [ ] why does robot move when disabling force fields? (does not happen after reset!)
+   [x] torque values are SO(3) x R3 in controller, but should be R3xSO(3).  Why?
+   [x] error: driver 0 is not in PID mode. Why?
+   [x] jet propulsion not implemented yet (see RobotJointDriver)
+   [x] jet propulsion acts on global coordinate frame, not locally on robot link
+   [x] torques not being set properly (robot should move with random torques)
+   [x] segfault /w single rigid body
+   [x] drivers and actuators do not match up. zero joints = zero actuators, therefore segfault. where are the actuators created?
+   [x] display the jet propulsion wrenches to verify
+   [x] why does robot move when disabling force fields? (does not happen after reset!)
    [ ] display all torques applied
    [ ] *** do kinodynamic planning /w torque constraints on fibre bundle
 =>>   [ ] fix propagation function

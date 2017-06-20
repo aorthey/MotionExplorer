@@ -106,8 +106,6 @@ bool ForceFieldBackend::OnIdle()
     ODERobot *robot = sim.odesim.robot(0);
     uint Nlinks = robot->robot.links.size();
 
-    //use own force field
-    sim.odesim.SetGravity(Vector3(0,0,0));
     sim.hooks.clear();
 
     for(int i = 0; i < Nlinks; i++){
@@ -173,6 +171,8 @@ void ForceFieldBackend::Start()
   //for(int i = 43; i < 50; i++) showLinks[i] = 1;
   //for(int i = 29; i < 36; i++) showLinks[i] = 1;
 
+  //use custom force fields
+  sim.odesim.SetGravity(Vector3(0,0,0));
   wrenchfield.init(Nlinks);
 
   //disable higher drawing functions

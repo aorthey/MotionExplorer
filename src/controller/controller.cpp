@@ -161,6 +161,27 @@ void ContactStabilityController::Update(Real dt) {
   else
     output.current_torque = ZeroTorque;
 
+  // Vector3 torque,force;
+  // force[0]=output.current_torque[0];
+  // force[1]=output.current_torque[1];
+  // force[2]=output.current_torque[2];
+  // torque[0]=output.current_torque[5];
+  // torque[1]=output.current_torque[4];
+  // torque[2]=output.current_torque[3];
+
+  // RobotLink3D *link  = &(robot.links.at(5));
+  // Matrix3 R = link->T_World.R;
+
+  // R.mul(force, force);
+  // R.mul(torque, torque);
+
+  // output.current_torque[0]=force[0];
+  // output.current_torque[1]=force[1];
+  // output.current_torque[2]=force[2];
+  // output.current_torque[5]=torque[0];
+  // output.current_torque[4]=torque[1];
+  // output.current_torque[3]=torque[2];
+
   SetTorqueCommand(output.current_torque);
   // if(torques.size()>0){
   //   output.current_torque = ZeroTorque;

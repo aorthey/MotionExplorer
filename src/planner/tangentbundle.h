@@ -27,6 +27,10 @@ class CSpaceOMPL;
 //
 //   the time step-dimension is used as an adaptive time step for integration.
 //   We use usual values between 0.01 and 0.1 for the time step.
+//
+//   each configuration is with respect to an interial frame centered at (0,0,0)
+//   each velocity is spatial, i.e. w.r.t. (0,0,0)
+//
 
 #include <ompl/base/StateSpace.h>
 #include <ompl/control/SimpleSetup.h>
