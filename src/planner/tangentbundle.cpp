@@ -77,9 +77,6 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   R.mul(torque, torque);
 
   Vector wrench;wrench.resize(6);
-  //for(int i = 0; i < 3; i++) wrench(i)=torque[i];
-  //for(int i = 3; i < 6; i++) wrench(i)=force[i-3];
-
   //row 0-2 of jacobian is angular, 3-5 translational
   for(int i = 0; i < 3; i++) wrench(i)=torque[i];
   for(int i = 3; i < 6; i++) wrench(i)=force[i-3];
@@ -88,8 +85,8 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   robot->GetFullJacobian(com,lidx,J);
   Vector Fq;
   //Jt.setRefTranspose(J);
-  J.mulTranspose(wrench, Fq);
-  //robot->GetWrenchTorques(torque, force, lidx, Fq);
+  //J.mulTranspose(wrench, Fq);
+  robot->GetWrenchTorques(torque, force, lidx, Fq);
   fext += Fq;
   // std::cout << "rot force: " << wrench << std::endl;
   // std::cout << "torque: " << fext << std::endl;
@@ -103,47 +100,59 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   Config q1; q1.resize(12+2*N); q1.setZero();
   Config dq1;dq1.resize(6+N); dq1.setZero();
 
-  //*
-  // LieGroupIntegrator integrator;
+  /*
+   LieGroupIntegrator integrator;
 
-  // Config x0; x0.resize(6);
-  // Config dx0; dx0.resize(6);
-  // Config ddx0; ddx0.resize(6);
-  // for(int i = 0; i < 6; i++){
-  //   x0(i) = q0(i);
-  //   dx0(i) = dq0(i);
-  //   ddx0(i) = ddq0(i);
-  // }
+   Config x0; x0.resize(6);
+   Config dx0; dx0.resize(6);
+   Config ddx0; ddx0.resize(6);
+   for(int i = 0; i < 6; i++){
+     x0(i) = q0(i);
+     dx0(i) = dq0(i);
+     ddx0(i) = ddq0(i);
+   }
 
-  // Matrix4 x0_SE3 = integrator.StateToSE3(x0);
+   Matrix4 x0_SE3 = integrator.StateToSE3(x0);
 
-  // Matrix4 dx0_SE3 = integrator.SE3Derivative(dx0);
+   Matrix4 dx0_SE3 = integrator.SE3Derivative(dx0);
 
-  // Matrix4 ddp = integrator.SE3Derivative(ddx0);
+   Matrix4 ddp = integrator.SE3Derivative(ddx0);
 
-  // Matrix4 dp = ddp*dt*0.5 + dx0_SE3;
+   Matrix4 dp = ddp*dt*0.5 + dx0_SE3;
 
-  // Matrix4 x1_SE3 = integrator.Integrate(x0_SE3,dp,dt);
+   Matrix4 x1_SE3 = integrator.Integrate(x0_SE3,dp,dt);
 
-  // State x1;x1.resize(6);
-  // integrator.SE3ToState(x1, x1_SE3);
+   State x1;x1.resize(6);
+   integrator.SE3ToState(x1, x1_SE3);
 
-  // State dx1 = ddx0*dt + dx0;
+   State dx1 = ddx0*dt + dx0;
 
-  // for(int i = 0; i < 6; i++){
-  //   q1(i) = x1(i);
-  //   q1(i+6+N) = dx1(i);
-  //   dq1(i) = dx1(i);
-  // }
+   for(int i = 0; i < 6; i++){
+     q1(i) = x1(i);
+     q1(i+6+N) = dx1(i);
+     dq1(i) = dx1(i);
+   }
 
   // std::cout << std::string(80, '-') << std::endl; 
+  //*/
+  //*
   for(int i = 0; i < (N+6); i++){
     q1(i) = q0(i) + dt*dq0(i) + dt2*ddq0(i);
     q1(i+N+6) = dq0(i) + dt*ddq0(i);
     dq1(i) = q1(i+N+6);
   }
+  std::cout << q1 << std::endl;
   q1(6) = 0;
   q1(6+N+6) = 0;
+
+  if(q1(3)<-M_PI) q1(3)+=2*M_PI;
+  if(q1(3)>M_PI) q1(3)-=2*M_PI;
+
+  if(q1(4)<-M_PI/2) q1(4)+=M_PI;
+  if(q1(4)>M_PI/2) q1(4)-=M_PI;
+
+  if(q1(5)<-M_PI) q1(5)+=2*M_PI;
+  if(q1(5)>M_PI) q1(5)-=2*M_PI;
 
   // std::cout << std::string(80, '-') << std::endl;
   // std::cout << "ddq0 :" << ddq0 << std::endl;
