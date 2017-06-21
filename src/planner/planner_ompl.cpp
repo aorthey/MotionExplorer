@@ -249,9 +249,11 @@ bool MotionPlannerOMPL::solve(PlannerInput &input_)
     double dg = pdef->getSolutionDifference();
     std::cout << " solution difference  : " << dg << std::endl;
     oc::PathControl path_control = ss.getSolutionPath();
-    og::PathGeometric path = path_control.asGeometric();
-    std::cout << "Path Length     : " << path.length() << std::endl;
-    std::cout << "Path Milestones : " << path.getStateCount() << std::endl;
+    path_control.interpolate();
+
+    //og::PathGeometric path = path_control.asGeometric();
+    std::cout << "Path Length     : " << path_control.length() << std::endl;
+    //std::cout << "Path Milestones : " << path.getStateCount() << std::endl;
 
     std::vector<oc::Control*> controls = path_control.getControls();
 
@@ -268,32 +270,21 @@ bool MotionPlannerOMPL::solve(PlannerInput &input_)
       Vector qt;qt.resize(K);
 
       qt(K-1) = time;
-      //invert SO3xR3 -> R3xSO3
-    //  for(int k = 0; k < 3; k++){
-    //    qt(k) = ccv->values[k+3];
-    //  }
-    //  for(int k = 3; k < 6; k++){
-    //    qt(k) = ccv->values[k-3];
-    //  }
       for(int k = 0; k < K; k++){
         qt(k) = ccv->values[k];
       }
       torques_and_time.push_back(qt);
-      //stringstream qstr;
-      //qstr<<qt;
-      //string cmd( (i<=0)?("set_torque_control"):("append_torque_control") );
-      //SendCommandStringController(cmd,qstr.str());
     }
 
     //og::PathSimplifier shortcutter(si);
     //shortcutter.shortcutPath(path);
 
+    std::vector<ob::State *> states = path_control.getStates();
     std::vector<Config> keyframes;
-    for(int i = 0; i < path.getStateCount(); i++)
+    for(int i = 0; i < states.size(); i++)
     {
-      ob::State *state = path.getState(i);
+      ob::State *state = states.at(i);//path.getState(i);
       Config cc = cspace->OMPLStateToConfig(state);
-      //Config cc;cc.resize(cur.size());
       std::vector<Real> curd = std::vector<Real>(cc);
       //extract only position
       std::vector<Real> curhalf(curd.begin(),curd.begin()+int(0.5*curd.size()));
@@ -301,15 +292,13 @@ bool MotionPlannerOMPL::solve(PlannerInput &input_)
 
       keyframes.push_back(cur);
     }
-    ob::State *obgoal = path.getState(path.getStateCount()-1);
-    Config plannergoal = cspace->OMPLStateToConfig(obgoal);
 
-    uint istep = max(int(path.getStateCount()/10.0),1);
+    uint istep = max(int(keyframes.size()/10.0),1);
     for(int i = 0; i < keyframes.size(); i+=istep)
     {
-      Config cur(keyframes.at(i));
-      std::cout << i << "/" << path.getStateCount() <<  cur << std::endl;
+      std::cout << i << "/" << keyframes.size() << " : "  <<  keyframes.at(i) << std::endl;
     }
+    std::cout << keyframes.size() << "/" << keyframes.size() << " : "  <<  keyframes.back() << std::endl;
 
     output.SetTorques(torques_and_time);
     output.SetKeyframes(keyframes);

@@ -73,8 +73,8 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   torque[1]=ucontrol[4];
   torque[2]=ucontrol[3];
 
-  R.mulTranspose(force, force);
-  R.mulTranspose(torque, torque);
+  R.mul(force, force);
+  R.mul(torque, torque);
 
   Vector wrench;wrench.resize(6);
   //for(int i = 0; i < 3; i++) wrench(i)=torque[i];
@@ -87,13 +87,12 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   Matrix J,Jt;
   robot->GetFullJacobian(com,lidx,J);
   Vector Fq;
-  Jt.setRefTranspose(J);
+  //Jt.setRefTranspose(J);
   J.mulTranspose(wrench, Fq);
   //robot->GetWrenchTorques(torque, force, lidx, Fq);
   fext += Fq;
-  // std::cout << Jt << std::endl;
-  // std::cout << Fq << std::endl;
-  // std::cout << wrench << std::endl;
+  // std::cout << "rot force: " << wrench << std::endl;
+  // std::cout << "torque: " << fext << std::endl;
   // exit(0);
 
 
@@ -101,49 +100,62 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   robot->UpdateDynamics();
   robot->CalcAcceleration(ddq0, fext);
 
-  //*
-  LieGroupIntegrator integrator;
-
-  Config x0; x0.resize(6);
-  Config dx0; dx0.resize(6);
-  Config ddx0; ddx0.resize(6);
-  for(int i = 0; i < 6; i++){
-    x0(i) = q0(i);
-    dx0(i) = dq0(i);
-    ddx0(i) = ddq0(i);
-  }
-
-  Matrix4 x0_SE3 = integrator.StateToSE3(x0);
-
-  Matrix4 dx0_SE3 = integrator.SE3Derivative(dx0);
-
-  Matrix4 ddp = integrator.SE3Derivative(ddx0);
-
-  Matrix4 dp = ddp*dt*0.5 + dx0_SE3;
-
-  Matrix4 x1_SE3 = integrator.Integrate(x0_SE3,dp,dt);
-
-  State x1;x1.resize(6);
-  integrator.SE3ToState(x1, x1_SE3);
-
-  State dx1 = ddx0*dt + dx0;
-
   Config q1; q1.resize(12+2*N); q1.setZero();
-  Vector dq1;dq1.resize(6+N); dq1.setZero();
-  for(int i = 0; i < 6; i++){
-    q1(i) = x1(i);
-    q1(i+6+N) = dx1(i);
-    dq1(i) = dx1(i);
+  Config dq1;dq1.resize(6+N); dq1.setZero();
+
+  //*
+  // LieGroupIntegrator integrator;
+
+  // Config x0; x0.resize(6);
+  // Config dx0; dx0.resize(6);
+  // Config ddx0; ddx0.resize(6);
+  // for(int i = 0; i < 6; i++){
+  //   x0(i) = q0(i);
+  //   dx0(i) = dq0(i);
+  //   ddx0(i) = ddq0(i);
+  // }
+
+  // Matrix4 x0_SE3 = integrator.StateToSE3(x0);
+
+  // Matrix4 dx0_SE3 = integrator.SE3Derivative(dx0);
+
+  // Matrix4 ddp = integrator.SE3Derivative(ddx0);
+
+  // Matrix4 dp = ddp*dt*0.5 + dx0_SE3;
+
+  // Matrix4 x1_SE3 = integrator.Integrate(x0_SE3,dp,dt);
+
+  // State x1;x1.resize(6);
+  // integrator.SE3ToState(x1, x1_SE3);
+
+  // State dx1 = ddx0*dt + dx0;
+
+  // for(int i = 0; i < 6; i++){
+  //   q1(i) = x1(i);
+  //   q1(i+6+N) = dx1(i);
+  //   dq1(i) = dx1(i);
+  // }
+
+  // std::cout << std::string(80, '-') << std::endl; 
+  for(int i = 0; i < (N+6); i++){
+    q1(i) = q0(i) + dt*dq0(i) + dt2*ddq0(i);
+    q1(i+N+6) = dq0(i) + dt*ddq0(i);
+    dq1(i) = q1(i+N+6);
   }
+  q1(6) = 0;
+  q1(6+N+6) = 0;
 
-  std::cout << std::string(80, '-') << std::endl; 
-  std::cout << "dq :" << dq1 << std::endl;
-  // std::cout << ddq0 << std::endl;
-  // std::cout << fext << std::endl;
   // std::cout << std::string(80, '-') << std::endl;
-  // exit(0);
-
+  // std::cout << "ddq0 :" << ddq0 << std::endl;
+  // std::cout << "dq0 :" << dq0 << std::endl;
+  // std::cout << "q0 :" << q0 << std::endl;
+  // std::cout << "dt :" << dt << std::endl;
+  // std::cout << "dq1 :" << dq1 << std::endl;
+  // std::cout << "q1 :" << q1 << std::endl;
+  // static uint xk = 0;
+  // if(xk++ > 10) exit(0);
   //*/
+
 
   //###########################################################################
   // Forward Simulate R^N component

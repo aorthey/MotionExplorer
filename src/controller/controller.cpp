@@ -108,8 +108,8 @@ void ContactStabilityController::Update(Real dt) {
 
   //GetCommandedConfig(qcmd);  //convenience function in RobotController
   //GetCommandedVelocity(vcmd);  //convenience function in RobotController
-  //GetSensedConfig(qactual);  //convenience function in RobotController
-  //GetSensedVelocity(vactual);  //convenience function in RobotController
+  GetSensedConfig(qactual);  //convenience function in RobotController
+  GetSensedVelocity(vactual);  //convenience function in RobotController
 
   //std::cout << "config: " << qcmd << std::endl;
   //std::cout << "velocity: " << vcmd << std::endl;
@@ -155,11 +155,18 @@ void ContactStabilityController::Update(Real dt) {
 
   //0.01
   uint ictr = int(time*10);
-  std::cout << "time " << time << " ctr " << ictr << std::endl;
+  //std::cout << "time " << time << " ctr " << ictr << std::endl;
   if(ictr < torques.size())
     output.current_torque = torques.at(ictr);
   else
     output.current_torque = ZeroTorque;
+
+
+  // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << "q     : " << qactual << std::endl;
+  // std::cout << "dq    : " << vactual << std::endl;
+  // std::cout << "torque: " << output.current_torque << std::endl;
+  // std::cout << "time  : " << time << std::endl;
 
   // Vector3 torque,force;
   // force[0]=output.current_torque[0];

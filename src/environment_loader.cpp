@@ -130,6 +130,7 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
       robot->qMin[i] = pin.se3min[i];
       robot->qMax[i] = pin.se3max[i];
     }
+
     pin.qMin = robot->qMin;
     pin.qMax = robot->qMax;
     robot->q = pin.q_init;

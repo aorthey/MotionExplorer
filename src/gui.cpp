@@ -395,9 +395,6 @@ void ForceFieldBackend::RenderWorld()
       glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(1,0.5,0,0.7));
       glPushMatrix();
       glTranslate(pos);
-      //drawCylinder(dir,r);
-      //glPushMatrix();
-      //glTranslate(dir);
       drawCone(-dir,2*r,8);
       glPopMatrix();
 
@@ -726,6 +723,28 @@ void ForceFieldBackend::SendPlannerOutputToController()
       string cmd( (i<=0)?("set_torque_control"):("append_torque_control") );
       SendCommandStringController(cmd,qstr.str());
     }
+
+
+    // ControlledRobotSimulator *rsim = &sim.controlSimulators[0];
+    // rsim->UpdateRobot();
+
+    // std::vector<Config> keyframes;
+
+    // rsim->curTime = 0.0;
+    // for(int i = 0; i < torques.size(); i++){
+    //   Config q;
+    //   rsim->GetSensedConfig(q);
+    //   keyframes.push_back(q);
+    
+    //   uint Ntime = torques.at(i).size()-1;
+    //   double dt = torques.at(i)(Ntime);
+    //   std::cout << dt << std::endl;
+    //   rsim->Update(dt);
+    // }
+    // rsim->curTime = 0.0;
+
+    // if(keyframes.size()>0) AddPath(keyframes);
+
   }
 }
 void ForceFieldBackend::SendCommandStringController(string cmd, string arg)
