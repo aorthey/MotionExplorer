@@ -1,6 +1,28 @@
 #include "tangentbundle.h"
 #include "ompl_space.h"
 
+Matrix3 GetTotalInertiaAtPoint(const Robot *robot, const Vector3 &p)
+{
+  Matrix3 I,temp,ccross;
+  I.setZero();
+  Vector3 ci;
+  for(size_t i=0;i<robot->links.size();i++) {
+    robot->links[i].GetWorldInertia(temp);
+    I += temp;
+    //get the inertia matrix associated with the center of mass
+    robot->links[i].T_World.mul(robot->links[i].com,ci);
+    ci -= p;
+    Real x,y,z;
+    ci.get(x,y,z);
+    ccross(0,0)=y*y+z*z; ccross(0,1)=-x*y; ccross(0,2)=-x*z;
+    ccross(1,0)=-x*y; ccross(1,1)=x*x+z*z; ccross(1,2)=-y*z;
+    ccross(2,0)=-x*z; ccross(2,1)=-y*z; ccross(2,2)=x*x+y*y;
+    ccross.inplaceMul(robot->links[i].mass);
+    I += ccross;
+  }
+  return I;
+}
+
 void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
 {
 
@@ -69,28 +91,25 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   force[0]=ucontrol[0];
   force[1]=ucontrol[1];
   force[2]=ucontrol[2];
-  torque[0]=ucontrol[5];
+  torque[0]=ucontrol[3];
   torque[1]=ucontrol[4];
-  torque[2]=ucontrol[3];
+  torque[2]=ucontrol[5];
 
   R.mul(force, force);
-  R.mul(torque, torque);
+  //R.mul(torque, torque);
 
   Vector wrench;wrench.resize(6);
   //row 0-2 of jacobian is angular, 3-5 translational
   for(int i = 0; i < 3; i++) wrench(i)=torque[i];
   for(int i = 3; i < 6; i++) wrench(i)=force[i-3];
 
-  Matrix J,Jt;
-  robot->GetFullJacobian(com,lidx,J);
-  Vector Fq;
-  //Jt.setRefTranspose(J);
-  //J.mulTranspose(wrench, Fq);
-  robot->GetWrenchTorques(torque, force, lidx, Fq);
-  fext += Fq;
-  // std::cout << "rot force: " << wrench << std::endl;
-  // std::cout << "torque: " << fext << std::endl;
-  // exit(0);
+  //Matrix J,Jt;
+  //robot->GetFullJacobian(com,lidx,J);
+  //Vector Fq;
+  ////Jt.setRefTranspose(J);
+  ////J.mulTranspose(wrench, Fq);
+  ////robot->GetWrenchTorques(torque, force, lidx, Fq);
+  ////fext += Fq;
 
 
   Vector ddq0;
@@ -100,6 +119,27 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   Config q1; q1.resize(12+2*N); q1.setZero();
   Config dq1;dq1.resize(6+N); dq1.setZero();
 
+
+
+  std::cout << robot->GetTotalInertia()  << std::endl;
+  std::cout << link->inertia << std::endl;
+  Matrix3 inertia = GetTotalInertiaAtPoint(robot, link->com);
+  Matrix3 inertia_inv;
+  inertia.getInverse(inertia_inv);
+  std::cout << inertia_inv << std::endl;
+
+  Vector3 ddqForce = force/robot->GetTotalMass();
+  Vector3 ddqTorque;
+  inertia_inv.mul(torque, ddqTorque);
+
+  for(int i = 0; i < 3; i++) ddq0(i)+=ddqForce[i];
+  for(int i = 0; i < 3; i++) ddq0(i+3)+=ddqTorque[i];
+
+  std::cout << "rot force: " << torque << std::endl;
+  std::cout << "wrench: " << fext << std::endl;
+  std::cout << "ddq0: " << ddq0 << std::endl;
+
+  exit(0);
   /*
    LieGroupIntegrator integrator;
 
@@ -141,7 +181,6 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
     q1(i+N+6) = dq0(i) + dt*ddq0(i);
     dq1(i) = q1(i+N+6);
   }
-  std::cout << q1 << std::endl;
   q1(6) = 0;
   q1(6+N+6) = 0;
 
