@@ -448,6 +448,8 @@ void ForceFieldBackend::RenderScreen(){
   BaseT::RenderScreen();
   Robot *robot = world->robots[0];
 
+  int line_x_pos = 20;
+
   int line_y_offset = 60;
   int line_y_offset_stepsize = 20;
 
@@ -459,7 +461,7 @@ void ForceFieldBackend::RenderScreen(){
       line += ((i>0 && i==world->robots.size()-1)?" | ":"");
       line += world->robots[i]->name;
     }
-    DrawText(20,line_y_offset,line);
+    DrawText(line_x_pos,line_y_offset,line);
     line_y_offset += line_y_offset_stepsize;
   }
 
@@ -470,7 +472,7 @@ void ForceFieldBackend::RenderScreen(){
       line += ((i>0 && i==world->terrains.size()-1)?" | ":"");
       line += std::string(basename(geom.c_str()));
     }
-    DrawText(20,line_y_offset,line);
+    DrawText(line_x_pos,line_y_offset,line);
     line_y_offset += line_y_offset_stepsize;
   }
   if(world->rigidObjects.size()>0){
@@ -480,25 +482,36 @@ void ForceFieldBackend::RenderScreen(){
       line += ((i>0 && i==world->rigidObjects.size()-1)?" | ":"");
       line += std::string(basename(geom.c_str()));
     }
-    DrawText(20,line_y_offset,line);
+    DrawText(line_x_pos,line_y_offset,line);
     line_y_offset += line_y_offset_stepsize;
   }
 
   line = "Mode       : ";
   line += (click_mode == ModeForceApplication?"ForceApplication":"PositionSetter");
-  DrawText(20,line_y_offset,line);
+  DrawText(line_x_pos,line_y_offset,line);
   line_y_offset += line_y_offset_stepsize;
 
-  Vector T;
+  Vector q,dq,T;
+  sim.controlSimulators[0].GetSensedConfig(q);
+  sim.controlSimulators[0].GetSensedVelocity(dq);
   sim.controlSimulators[0].GetActuatorTorques(T);
 
-  line = "Cmd Torque : ";
-  stringstream ss;
-  ss << T;
-  line += ss.str();
-  DrawText(20,line_y_offset,line);
+  DrawTextVector(line_x_pos, line_y_offset, "Position   :", q);
+  line_y_offset += line_y_offset_stepsize;
+  DrawTextVector(line_x_pos, line_y_offset, "Velocity   :", dq);
+  line_y_offset += line_y_offset_stepsize;
+  DrawTextVector(line_x_pos, line_y_offset, "Cmd Torque :", T);
   line_y_offset += line_y_offset_stepsize;
 }
+
+void ForceFieldBackend::DrawTextVector(double xpos, double ypos, const char* prefix, Vector &v){
+  stringstream ss;
+  std::string line(prefix);
+  ss << v;
+  line += ss.str();
+  DrawText(xpos, ypos,line);
+}
+
 
 void ForceFieldBackend::VisualizeStartGoal(const Config &p_init, const Config &p_goal)
 {

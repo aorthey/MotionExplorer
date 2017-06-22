@@ -70,12 +70,18 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
 
   robot->dq = dq0;
   robot->UpdateConfig(q0);
+  robot->UpdateDynamics();
 
   uint lidx = 5;
   RobotLink3D *link  = &robot->links.at(lidx);
   Vector3 com = link->com;
-  //Vector3 com = link->T_World.t;
   Matrix3 R = link->T_World.R;
+
+  //R.mul(com,com);
+
+  Config q1; q1.resize(12+2*N); q1.setZero();
+  Config dq1;dq1.resize(6+N); dq1.setZero();
+  Config ddq0; ddq0.resize(6+N); ddq0.setZero();
   //###########################################################################
   // update based on real dynamics
   //###########################################################################
@@ -87,59 +93,71 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
     fext(k) = ucontrol[k];
   }
 
-  Vector3 torque,force;
+  Vector3 torque,tmp,force;
   force[0]=ucontrol[0];
   force[1]=ucontrol[1];
   force[2]=ucontrol[2];
-  torque[0]=ucontrol[3];
-  torque[1]=ucontrol[4];
-  torque[2]=ucontrol[5];
+
+  tmp[0]=ucontrol[5];
+  tmp[1]=ucontrol[4];
+  tmp[2]=ucontrol[3];
 
   R.mul(force, force);
-  //R.mul(torque, torque);
+  R.mul(tmp, tmp);
+  torque[0] = tmp[2];
+  torque[1] = tmp[1];
+  torque[2] = tmp[0];
 
-  Vector wrench;wrench.resize(6);
-  //row 0-2 of jacobian is angular, 3-5 translational
-  for(int i = 0; i < 3; i++) wrench(i)=torque[i];
-  for(int i = 3; i < 6; i++) wrench(i)=force[i-3];
-
-  //Matrix J,Jt;
-  //robot->GetFullJacobian(com,lidx,J);
-  //Vector Fq;
-  ////Jt.setRefTranspose(J);
-  ////J.mulTranspose(wrench, Fq);
-  ////robot->GetWrenchTorques(torque, force, lidx, Fq);
-  ////fext += Fq;
-
-
-  Vector ddq0;
-  robot->UpdateDynamics();
-  robot->CalcAcceleration(ddq0, fext);
-
-  Config q1; q1.resize(12+2*N); q1.setZero();
-  Config dq1;dq1.resize(6+N); dq1.setZero();
+  Vector Fq;
+  robot->GetWrenchTorques(tmp, force, 5, Fq);
+  fext += Fq;
 
 
 
-  std::cout << robot->GetTotalInertia()  << std::endl;
-  std::cout << link->inertia << std::endl;
-  Matrix3 inertia = GetTotalInertiaAtPoint(robot, link->com);
+  // //Matrix3 inertia = GetTotalInertiaAtPoint(robot, link->T_World*com);
+  Matrix3 inertia = robot->GetTotalInertia();
   Matrix3 inertia_inv;
   inertia.getInverse(inertia_inv);
-  std::cout << inertia_inv << std::endl;
 
-  Vector3 ddqForce = force/robot->GetTotalMass();
   Vector3 ddqTorque;
   inertia_inv.mul(torque, ddqTorque);
 
-  for(int i = 0; i < 3; i++) ddq0(i)+=ddqForce[i];
-  for(int i = 0; i < 3; i++) ddq0(i+3)+=ddqTorque[i];
+  fext[3]=ddqTorque[0];
+  fext[4]=ddqTorque[1];
+  fext[5]=ddqTorque[2];
 
-  std::cout << "rot force: " << torque << std::endl;
-  std::cout << "wrench: " << fext << std::endl;
-  std::cout << "ddq0: " << ddq0 << std::endl;
+  robot->CalcAcceleration(ddq0, fext);
+  //ddq0(0)=0;
+  //ddq0(1)=0;
+  //ddq0(6)=0;
 
-  exit(0);
+  ddq0(6)=0;
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << fext << std::endl;
+  std::cout << ddq0 << std::endl;
+
+  ////
+
+  //Vector wrench;wrench.resize(6);
+  ////row 0-2 of jacobian is angular, 3-5 translational
+  ////for(int i = 0; i < 3; i++) wrench(i)=ddqTorque[i];
+  //wrench(0) = ddqTorque[2];
+  //wrench(1) = ddqTorque[1];
+  //wrench(2) = ddqTorque[0];
+
+  //for(int i = 3; i < 6; i++) wrench(i)=ddqForce[i-3];
+  //fext[0]+=ddqTorque[0];
+  //fext[1]+=ddqTorque[1];
+  //fext[2]+=ddqTorque[2];
+  //fext[3]+=ddqForce[0];
+  //fext[4]+=ddqForce[1];
+  //fext[5]+=ddqForce[2];
+
+  //Vector Fq;
+  //J.mulTranspose(wrench, Fq);
+  //fext += Fq;
+
+  // exit(0);
   /*
    LieGroupIntegrator integrator;
 
@@ -194,6 +212,7 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   if(q1(5)>M_PI) q1(5)-=2*M_PI;
 
   // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << "torque:" << torque << std::endl;
   // std::cout << "ddq0 :" << ddq0 << std::endl;
   // std::cout << "dq0 :" << dq0 << std::endl;
   // std::cout << "q0 :" << q0 << std::endl;

@@ -128,6 +128,7 @@ class ForceFieldBackend : public SimTestBackend
     void VisualizePlannerTree(const SerializedTree &tree);
 
     void DrawText(int x,int y, std::string s);
+    void DrawTextVector(double xpos, double ypos, const char* prefix, Vector &v);
 
     std::vector<int> showLinks; //hide certain links 
     std::vector<int> drawPathSweptVolume;

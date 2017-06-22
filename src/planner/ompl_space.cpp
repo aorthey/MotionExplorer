@@ -270,13 +270,28 @@ void KinodynamicCSpaceOMPL::initSpace()
   std::cout << "[MotionPlanner] Tangent Bundle: TM = M x R^{6+" << N << "}" << std::endl;
 
   ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());
-  ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(N));
+
+
   ob::StateSpacePtr TM(std::make_shared<ob::RealVectorStateSpace>(6+N));
 
-  space = SE3 + Rn + TM;
+  if(N>0){
+    ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(N));
+    space = SE3 + Rn + TM;
+  }else{
+    space = SE3 + TM;
+  }
+
   ob::SE3StateSpace *cspaceSE3 = space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
-  ob::RealVectorStateSpace *cspaceRn = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
-  ob::RealVectorStateSpace *cspaceTM = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(2);
+
+  ob::RealVectorStateSpace *cspaceRn;
+  ob::RealVectorStateSpace *cspaceTM;
+
+  if(N>0){
+    cspaceRn = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+    cspaceTM = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(2);
+  }else{
+    cspaceTM = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+  }
 
   ob::CompoundStateSpace *cspace = space->as<ob::CompoundStateSpace>();
 
@@ -305,24 +320,26 @@ void KinodynamicCSpaceOMPL::initSpace()
   boundsSE3.check();
   cspaceSE3->setBounds(boundsSE3);
 
-  vector<double> lowRn, highRn;
-  for(int i = 0; i < N; i++){
-    lowRn.push_back(minimum.at(i+6));
-    highRn.push_back(maximum.at(i+6));
-  }
-  ob::RealVectorBounds boundsRn(N);
-
-  //ompl does only accept dimensions with strictly positive measure, adding some epsilon space
-  double epsilonSpacing=1e-8;
-  for(int i = 0; i < N; i++){
-    if(abs(lowRn.at(i)-highRn.at(i))<epsilonSpacing){
-      highRn.at(i)+=epsilonSpacing;
+  if(N>0){
+    vector<double> lowRn, highRn;
+    for(int i = 0; i < N; i++){
+      lowRn.push_back(minimum.at(i+6));
+      highRn.push_back(maximum.at(i+6));
     }
+    ob::RealVectorBounds boundsRn(N);
+
+    //ompl does only accept dimensions with strictly positive measure, adding some epsilon space
+    double epsilonSpacing=1e-8;
+    for(int i = 0; i < N; i++){
+      if(abs(lowRn.at(i)-highRn.at(i))<epsilonSpacing){
+        highRn.at(i)+=epsilonSpacing;
+      }
+    }
+    boundsRn.low = lowRn;
+    boundsRn.high = highRn;
+    boundsRn.check();
+    cspaceRn->setBounds(boundsRn);
   }
-  boundsRn.low = lowRn;
-  boundsRn.high = highRn;
-  boundsRn.check();
-  cspaceRn->setBounds(boundsRn);
   //###########################################################################
   // Set velocity bounds
   //###########################################################################
@@ -347,11 +364,6 @@ void KinodynamicCSpaceOMPL::initSpace()
   boundsTM.setLow(-100);
   boundsTM.setHigh(100);
   cspaceTM->setBounds(boundsTM);
-
-  //std::cout << "velocity bounds" << std::endl;
-  //for(int i = 0; i < N+6; i++){
-  //  std::cout << i << " <" << boundsTM.low.at(i) << ","<< boundsTM.high.at(i) << ">" << std::endl;
-  //}
 
 }
 void KinodynamicCSpaceOMPL::initControlSpace(){
@@ -396,16 +408,16 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
     cbounds.setLow(i,0);
     cbounds.setHigh(i,0);
   }
-  //cbounds.setLow(0,-1);
-  //cbounds.setHigh(0,1);
+  cbounds.setLow(0,0);
+  cbounds.setHigh(0,1);
   //cbounds.setLow(1,-1);
   //cbounds.setHigh(1,1);
 
-  cbounds.setLow(3,0.1);
-  cbounds.setHigh(3,0.1);
+  cbounds.setLow(3,-1);
+  cbounds.setHigh(3,1);
   //cbounds.setLow(4,-0.01);
   //cbounds.setHigh(4,0.01);
-  //cbounds.setLow(5,-1);
+  //cbounds.setLow(5,1);
   //cbounds.setHigh(5,1);
 
   cbounds.check();
