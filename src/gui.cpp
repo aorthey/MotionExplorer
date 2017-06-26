@@ -302,102 +302,126 @@ void ForceFieldBackend::RenderWorld()
   //ControllerState output = controller->GetControllerState();
   //Vector torque = output.current_torque;
 
-  Vector T;
-  sim.controlSimulators[0].GetActuatorTorques(T);
+  int drawWorkspaceApproximation = 1;
+  int drawRobotDriver = 0;
 
-  for(int i = 0; i < robot->drivers.size(); i++){
-    RobotJointDriver driver = robot->drivers[i];
-    //############################################################################
-    if(driver.type == RobotJointDriver::Rotation){
-      /*
-      uint didx = driver.linkIndices[0];
-      uint lidx = driver.linkIndices[1];
+  if(drawRobotDriver){
+    Vector T;
+    sim.controlSimulators[0].GetActuatorTorques(T);
 
-      Frame3D Tw = robot->links[lidx].T_World;
-      Vector3 pos = Tw*robot->links[lidx].com;
-      Vector3 dir = Tw*robot->links[didx].w - pos;
+    for(int i = 0; i < robot->drivers.size(); i++){
+      RobotJointDriver driver = robot->drivers[i];
+      //############################################################################
+      if(driver.type == RobotJointDriver::Rotation){
+        /*
+        uint didx = driver.linkIndices[0];
+        uint lidx = driver.linkIndices[1];
 
-      dir = 100*T(i)*dir/dir.norm();
+        Frame3D Tw = robot->links[lidx].T_World;
+        Vector3 pos = Tw*robot->links[lidx].com;
+        Vector3 dir = Tw*robot->links[didx].w - pos;
 
-      double r = 0.01;
-      glEnable(GL_LIGHTING);
-      glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(0,0.5,1,0.7));
+        dir = 100*T(i)*dir/dir.norm();
 
-      glPushMatrix();
-      glTranslate(pos);
-      drawCylinder(dir,r);
-
-      double theta_step = M_PI/4;
-      double dr = 0.1;
-      uint numSteps = 32;
-
-      float inc = fTwoPi/numSteps;
-      Vector3 eu,ev;
-      GetCanonicalBasis(dir,eu,ev);
-      Complex x,dx;
-      dx.setPolar(One,inc);
-      
-      x.set(dr,0);
-
-      for(i=0; i<2*numSteps/3; i++) {
-        Vector3 p0 = dir + x.x*eu + x.y*ev;
-        //glVertex3v(dir + x.x*eu+x.y*ev);
-        x=x*dx;
-        Vector3 p1 = dir + x.x*eu + x.y*ev;
+        double r = 0.01;
+        glEnable(GL_LIGHTING);
+        glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(0,0.5,1,0.7));
 
         glPushMatrix();
-        glTranslate(p0);
-        drawCylinder(p1-p0,dr/8);
+        glTranslate(pos);
+        drawCylinder(dir,r);
+
+        double theta_step = M_PI/4;
+        double dr = 0.1;
+        uint numSteps = 32;
+
+        float inc = fTwoPi/numSteps;
+        Vector3 eu,ev;
+        GetCanonicalBasis(dir,eu,ev);
+        Complex x,dx;
+        dx.setPolar(One,inc);
+        
+        x.set(dr,0);
+
+        for(i=0; i<2*numSteps/3; i++) {
+          Vector3 p0 = dir + x.x*eu + x.y*ev;
+          //glVertex3v(dir + x.x*eu+x.y*ev);
+          x=x*dx;
+          Vector3 p1 = dir + x.x*eu + x.y*ev;
+
+          glPushMatrix();
+          glTranslate(p0);
+          drawCylinder(p1-p0,dr/8);
+          glPopMatrix();
+        }
+
+        //glLineWidth(5);
+        //glBegin(GL_LINE_STRIP);
+        //for(i=0; i<2*numSteps/3; i++) {
+        //  glVertex3v(dir + x.x*eu+x.y*ev);
+        //  x=x*dx;
+        //}
+        //glEnd();
+
+        if(T(i) < 0) {
+          x.set(dr,0);
+        }
+        glPushMatrix();
+        Vector3 rr = x.x*eu + x.y*ev;
+        Vector3 arrowS(dir + rr);
+
+        glTranslate(arrowS);
+        Vector3 coneori = cross(dir,rr);
+        coneori /= coneori.length();
+        if(T(i) < 0) {
+          coneori *= -1;
+        }
+        double length = dr/2;
+        GLDraw::drawCone(length*coneori, 0.5*length);
+        glPopMatrix();
+
+        //glPopMatrix();
+        glPopMatrix();
+        //*/
+      }
+    //############################################################################
+      if(driver.type == RobotJointDriver::Translation){
+        uint didx = driver.linkIndices[0];
+        uint lidx = driver.linkIndices[1];
+        Frame3D Tw = robot->links[lidx].T_World;
+        Vector3 pos = Tw*robot->links[lidx].com;
+        Vector3 dir = Tw*robot->links[didx].w - pos;
+
+        dir = T(i)*dir/dir.norm();
+
+        double r = 0.05;
+        glEnable(GL_LIGHTING);
+        glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(1,0.5,0,0.7));
+        glPushMatrix();
+        glTranslate(pos);
+        drawCone(-dir,2*r,8);
+        glPopMatrix();
+
+      }
+    }
+  }
+
+
+  if(drawWorkspaceApproximation){
+    if(plannerOutput.size()>0){
+      WorkspaceApproximation w = plannerOutput.at(0).workspace;
+      GLColor glWc(0,1,0,1);
+      for(uint i = 0; i < w.elements.size(); i++){
+        WorkspaceApproximationElement wi = w.elements.at(i);
+        // w.pos = Vector3(s[0],s[1],s[2]);
+        // w.inner_radius = 0.3;
+        // w.outer_radius = 1.5;
+        glWc.setCurrentGL();
+        glPushMatrix();
+        glTranslate(wi.pos);
+        GLDraw::drawSphere(wi.inner_radius,16,8);
         glPopMatrix();
       }
-
-      //glLineWidth(5);
-      //glBegin(GL_LINE_STRIP);
-      //for(i=0; i<2*numSteps/3; i++) {
-      //  glVertex3v(dir + x.x*eu+x.y*ev);
-      //  x=x*dx;
-      //}
-      //glEnd();
-
-      if(T(i) < 0) {
-        x.set(dr,0);
-      }
-      glPushMatrix();
-      Vector3 rr = x.x*eu + x.y*ev;
-      Vector3 arrowS(dir + rr);
-
-      glTranslate(arrowS);
-      Vector3 coneori = cross(dir,rr);
-      coneori /= coneori.length();
-      if(T(i) < 0) {
-        coneori *= -1;
-      }
-      double length = dr/2;
-      GLDraw::drawCone(length*coneori, 0.5*length);
-      glPopMatrix();
-
-      //glPopMatrix();
-      glPopMatrix();
-      //*/
-    }
-  //############################################################################
-    if(driver.type == RobotJointDriver::Translation){
-      uint didx = driver.linkIndices[0];
-      uint lidx = driver.linkIndices[1];
-      Frame3D Tw = robot->links[lidx].T_World;
-      Vector3 pos = Tw*robot->links[lidx].com;
-      Vector3 dir = Tw*robot->links[didx].w - pos;
-
-      dir = T(i)*dir/dir.norm();
-
-      double r = 0.05;
-      glEnable(GL_LIGHTING);
-      glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(1,0.5,0,0.7));
-      glPushMatrix();
-      glTranslate(pos);
-      drawCone(-dir,2*r,8);
-      glPopMatrix();
-
     }
   }
 
@@ -458,7 +482,7 @@ void ForceFieldBackend::RenderScreen(){
   if(world->robots.size()>0){
     line = "Robots      : ";
     for(int i = 0; i < world->robots.size(); i++){
-      line += ((i>0 && i==world->robots.size()-1)?" | ":"");
+      line += ((i>0)?" | ":"");
       line += world->robots[i]->name;
     }
     DrawText(line_x_pos,line_y_offset,line);
@@ -469,7 +493,7 @@ void ForceFieldBackend::RenderScreen(){
     line = "Terrains    : ";
     for(int i = 0; i < world->terrains.size(); i++){
       std::string geom = world->terrains[i]->geomFile;
-      line += ((i>0 && i==world->terrains.size()-1)?" | ":"");
+      line += ((i>0)?" | ":"");
       line += std::string(basename(geom.c_str()));
     }
     DrawText(line_x_pos,line_y_offset,line);
@@ -479,7 +503,7 @@ void ForceFieldBackend::RenderScreen(){
     line = "RigidObjects: ";
     for(int i = 0; i < world->rigidObjects.size(); i++){
       std::string geom = world->rigidObjects[i]->geomFile;
-      line += ((i>0 && i==world->rigidObjects.size()-1)?" | ":"");
+      line += ((i>0)?" | ":"");
       line += std::string(basename(geom.c_str()));
     }
     DrawText(line_x_pos,line_y_offset,line);
@@ -937,8 +961,10 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="draw_com_path"){
     toggle(drawCenterOfMassPath);
   }else if(cmd=="draw_swept_volume"){
-    toggle(drawPathSweptVolume.at(0));
-    toggle(drawPathStartGoal.at(0));
+    if(drawPathSweptVolume.size()>0){
+      toggle(drawPathSweptVolume.at(0));
+      toggle(drawPathStartGoal.at(0));
+    }
   }else if(cmd=="load_motion_planner") {
     //glutSelectFile ("","","");//char *filename, const char *filter, const char *title)
     //std::string file_name = browser->get_file();
