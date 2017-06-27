@@ -47,7 +47,7 @@ void PlannerWorkspaceApproximation::solve(){
   WSphere B0;
   B0.pos = init;
   B0.radius = inner_radius;
-  B0.distance_goal = (init-goal).norm();
+  B0.distance_goal = (init-goal).norm() - inner_radius;
   spheres.push(B0);
 
   for(int i = 0; i < M; i++){
@@ -58,6 +58,7 @@ void PlannerWorkspaceApproximation::solve(){
     std::cout << "feasible sphere: " << q0 << std::endl;
     tree.push_back(q0);
     spheres.pop();
+    if(B.distance_goal < 0.1) break;
     for(int i = 0; i < N; i++){
       double u = Rand(0.0,1.0);
       double v = Rand(0.0,1.0);
@@ -88,12 +89,7 @@ bool PlannerWorkspaceApproximation::IsFeasible(Vector3 &qq){
   Config q;q.resize(3);
   for(int k = 0; k < 3; q(k)=qq[k],k++);
 
-  // std::cout << "state" << qq << std::endl;
-  // std::cout << "inner sphere feasible " << (inner->IsFeasible(q)?"yes":"no") << std::endl;
-  // std::cout << "outer sphere feasible " << (outer->IsFeasible(q)?"yes":"no") << std::endl;
-
-  //return isCollisionFree(inner,q) && !isCollisionFree(outer,q);
-  return !isCollisionFree(outer,q) && isCollisionFree(inner,q);
+  return (!isCollisionFree(outer,q)) && isCollisionFree(inner,q);
 }
 
 bool PlannerWorkspaceApproximation::isCollisionFree(SingleRobotCSpace *space, Config q){

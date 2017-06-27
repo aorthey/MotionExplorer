@@ -45,7 +45,7 @@ int main(int argc,const char** argv) {
   env.GetBackendPtr()->ShowPlannerTree();
   env.GetBackendPtr()->ShowSweptVolumes();
   env.GetBackendPtr()->HideMilestones();
-  //env.GetBackendPtr()->ShowRobot();
+  env.GetBackendPtr()->ShowRobot();
 
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.SetWindowTitle("SweptVolumePath");

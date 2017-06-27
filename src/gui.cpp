@@ -303,7 +303,7 @@ void ForceFieldBackend::RenderWorld()
   //Vector torque = output.current_torque;
 
   int drawWorkspaceApproximation = 1;
-  int drawRobotDriver = 0;
+  int drawRobotDriver = 1;
 
   if(drawRobotDriver){
     Vector T;
@@ -406,10 +406,6 @@ void ForceFieldBackend::RenderWorld()
     }
   }
 
-
-  if(drawWorkspaceApproximation) GLDraw::drawWorkspaceApproximationSpheres(plannerOutput);
-
-
   //############################################################################
   // Visualize
   //
@@ -423,6 +419,7 @@ void ForceFieldBackend::RenderWorld()
   // drawaxeslabels       : labelling of the coordinate axes [needs fixing]
   //############################################################################
 
+  if(drawWorkspaceApproximation) GLDraw::drawWorkspaceApproximationSpheres(plannerOutput);
   if(drawCenterOfMassPath) GLDraw::drawCenterOfMassPathFromController(sim);
   if(drawForceEllipsoid) GLDraw::drawForceEllipsoid(oderobot);
 

@@ -298,6 +298,8 @@ bool MotionPlannerOMPL::solve(PlannerInput &input_)
   this->_world->InitCollisions();
   std::cout << input << std::endl;
 
+  std::string algorithm = input.name_algorithm;
+
   //###########################################################################
   // Setup Klampt CSpace
   //###########################################################################
@@ -309,7 +311,10 @@ bool MotionPlannerOMPL::solve(PlannerInput &input_)
   if(!IsFeasible( robot, kcspace, _p_goal)) return false;
   if(!IsFeasible( robot, kcspace, _p_init)) return false;
 
-  WorkspaceApproximationPlanner(input);
+  if(algorithm=="workspace"){
+    WorkspaceApproximationPlanner(input);
+    return true;
+  }
 
 
   //
@@ -346,7 +351,6 @@ bool MotionPlannerOMPL::solve(PlannerInput &input_)
   //###########################################################################
   // choose planner
   //###########################################################################
-  std::string algorithm = input.name_algorithm;
   ob::PlannerPtr ompl_planner;
 
   if(algorithm=="ompl:rrt") ompl_planner = std::make_shared<oc::RRT>(si);

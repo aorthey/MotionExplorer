@@ -695,3 +695,4 @@ self-collision forces?
  [x] compute and display distance between links and terrain
  [x] make small 3-leg spider robot, only contacts
  [ ] use some balance controller
+ [ ] design cave environment

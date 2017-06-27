@@ -24,8 +24,8 @@
     <se3max config="6  6 6 16 3.141592 1.57 3.14"/>
     <timestep min="0.1" max="0.1"/>
     <epsilongoalregion>0.1</epsilongoalregion>
-    <maxplanningtime>1</maxplanningtime>
-    <algorithm>ompl:kpiece</algorithm>
+    <maxplanningtime>0.1</maxplanningtime>
+    <algorithm>workspace</algorithm>
 
   </plannersettings>
 

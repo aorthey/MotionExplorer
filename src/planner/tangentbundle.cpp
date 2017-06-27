@@ -115,10 +115,10 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   Vector Cdq;
   robot->GetCoriolisForces(Cdq);
 
-  for(int i = 0; i < 3; i++){
-    force[i]=force[i]-Cdq(i);
-    torque[i]=torque[i]-Cdq(i+3);
-  }
+  // for(int i = 0; i < 3; i++){
+  //   force[i]=force[i]-Cdq(i);
+  //   torque[i]=torque[i]-Cdq(i+3);
+  // }
 
   Vector3 ddqTorque,ddqForce;
   inertia_inv.mul(torque, ddqTorque);
