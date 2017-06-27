@@ -89,6 +89,7 @@ Matrix4 LieGroupIntegrator::SE3Derivative(const ControlInput& u)
   X5.setZero();
   X6.setZero();
 
+  //XYZ Rz Ry Rx
   //##########################
   X1(0,3) = 1;
   //##########################

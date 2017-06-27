@@ -12,6 +12,8 @@
     <!--
     <qinit config="7  -3.3 0 0 0.2 0 0 0 0 "/>
     <qgoal config="7  5 -2 0 1.2 0 0 0 0 "/>
+    <se3min config="6  -6 -6 -1 -3.141592 -1.57 -3.14"/>
+    <se3max config="6  6 6 16 3.141592 1.57 3.14"/>
     -->
     <qinit config="7  -3.3 0 0 0.2 0 0 0 0 "/>
     <qgoal config="7  5.2 0 0 0 0 0 0 0 "/>
@@ -19,10 +21,10 @@
     <dqgoal config="7  0 0 0 0 0 0 0 0 "/>
     <se3min config="6  -6 -6 -1 -3.141592 -1.57 -3.14"/>
     <se3max config="6  6 6 16 3.141592 1.57 3.14"/>
-    <timestep min="0.1" max="0.1"/>
+    <timestep min="0.001" max="0.1"/>
     <epsilongoalregion>0.1</epsilongoalregion>
-    <maxplanningtime>0.5</maxplanningtime>
-    <algorithm>ompl:kpiece</algorithm>
+    <maxplanningtime>1</maxplanningtime>
+    <algorithm>ompl:rrt</algorithm>
 
   </plannersettings>
 
@@ -32,6 +34,7 @@
     <radial source="1.8 0 0" power="-3" radius="1.5" color="1 0 1"/>
     <uniform force="0 0 0" color="1 0 0"/> <!-- simulate buoycancy as antigravity -->
     -->
+    <uniform force="0 0 0" color="1 0 0"/>
   </forcefield>
 
   <simulation>

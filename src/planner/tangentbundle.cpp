@@ -76,8 +76,8 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   RobotLink3D *link  = &robot->links.at(lidx);
   Vector3 com = link->com;
   Matrix3 R = link->T_World.R;
+  Frame3D Tw = link->T_World;
 
-  //R.mul(com,com);
 
   Config q1; q1.resize(12+2*N); q1.setZero();
   Config dq1;dq1.resize(6+N); dq1.setZero();
@@ -93,72 +93,63 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
     fext(k) = ucontrol[k];
   }
 
-  Vector3 torque,tmp,force;
-  force[0]=ucontrol[0];
-  force[1]=ucontrol[1];
-  force[2]=ucontrol[2];
+  Vector3 torque,force;
+  Vector3 force_tmp(ucontrol[0],ucontrol[1],ucontrol[2]);
+  Vector3 torque_tmp(ucontrol[5],ucontrol[4],ucontrol[3]);
 
-  tmp[0]=ucontrol[5];
-  tmp[1]=ucontrol[4];
-  tmp[2]=ucontrol[3];
+  R.mul(force_tmp, force);
+  R.mul(torque_tmp, torque);
 
-  R.mul(force, force);
-  R.mul(tmp, tmp);
-  torque[0] = tmp[2];
-  torque[1] = tmp[1];
-  torque[2] = tmp[0];
+  // Vector Fq;
+  // robot->GetWrenchTorques(tmp, force, 5, Fq);
+  // fext += Fq;
 
-  Vector Fq;
-  robot->GetWrenchTorques(tmp, force, 5, Fq);
-  fext += Fq;
+  Matrix3 inertia = GetTotalInertiaAtPoint(robot, link->T_World*com);
+  //Matrix3 inertia = robot->GetTotalInertia();
 
-
-
-  // //Matrix3 inertia = GetTotalInertiaAtPoint(robot, link->T_World*com);
-  Matrix3 inertia = robot->GetTotalInertia();
   Matrix3 inertia_inv;
   inertia.getInverse(inertia_inv);
 
-  Vector3 ddqTorque;
+  robot->CalcAcceleration(ddq0, fext);
+
+  Vector Cdq;
+  robot->GetCoriolisForces(Cdq);
+
+  for(int i = 0; i < 3; i++){
+    force[i]=force[i]-Cdq(i);
+    torque[i]=torque[i]-Cdq(i+3);
+  }
+
+  Vector3 ddqTorque,ddqForce;
   inertia_inv.mul(torque, ddqTorque);
 
-  fext[3]=ddqTorque[0];
-  fext[4]=ddqTorque[1];
-  fext[5]=ddqTorque[2];
+  ddqForce = force/robot->GetTotalMass();
+  //std::cout << inertia_inv << std::endl;
+  //inertia_inv.mul(force, ddqForce);
 
-  robot->CalcAcceleration(ddq0, fext);
-  //ddq0(0)=0;
-  //ddq0(1)=0;
-  //ddq0(6)=0;
 
-  ddq0(6)=0;
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << fext << std::endl;
-  std::cout << ddq0 << std::endl;
+  for(int i = 0; i < 3; i++){
+    Vector3 w = robot->links[i].w;
+    Vector3 wf = w*ddqForce[i];
+    ddq0(0) += wf[0];
+    ddq0(1) += wf[1];
+    ddq0(2) += wf[2];
+  }
+  for(int i = 3; i < 6; i++){
+    Vector3 w = robot->links[i].w;
+    Vector3 wt = w*ddqTorque[i-3];
+    ddq0(3) += wt[0];
+    ddq0(4) += wt[1];
+    ddq0(5) += wt[2];
+  }
 
-  ////
-
-  //Vector wrench;wrench.resize(6);
-  ////row 0-2 of jacobian is angular, 3-5 translational
-  ////for(int i = 0; i < 3; i++) wrench(i)=ddqTorque[i];
-  //wrench(0) = ddqTorque[2];
-  //wrench(1) = ddqTorque[1];
-  //wrench(2) = ddqTorque[0];
-
-  //for(int i = 3; i < 6; i++) wrench(i)=ddqForce[i-3];
-  //fext[0]+=ddqTorque[0];
-  //fext[1]+=ddqTorque[1];
-  //fext[2]+=ddqTorque[2];
-  //fext[3]+=ddqForce[0];
-  //fext[4]+=ddqForce[1];
-  //fext[5]+=ddqForce[2];
-
-  //Vector Fq;
-  //J.mulTranspose(wrench, Fq);
-  //fext += Fq;
-
-  // exit(0);
-  /*
+//################################################################################/
+// ddq0 seems to be correct if we integrate the usual way. However, once we go
+// over the rotation limits, it becomes wrong. Should use liegroupintegrator,
+// but there seems to be some bug
+//################################################################################/
+  //
+  //*
    LieGroupIntegrator integrator;
 
    Config x0; x0.resize(6);
@@ -169,6 +160,38 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
      dx0(i) = dq0(i);
      ddx0(i) = ddq0(i);
    }
+
+   Vector3 dxf,dxt,ddxf,ddxt;
+   Vector3 dxf_tmp,dxt_tmp,ddxf_tmp,ddxt_tmp;
+   for(int i = 0; i < 3; i++) ddxf_tmp[i]=ddx0(i);
+   ddxt_tmp[0]=ddx0(5);
+   ddxt_tmp[1]=ddx0(4);
+   ddxt_tmp[2]=ddx0(3);
+
+   R.mulTranspose(ddxf_tmp, ddxf);
+   R.mulTranspose(ddxt_tmp, ddxt);
+
+   for(int i = 0; i < 3; i++){
+     ddx0(i)=ddxf[i];
+   }
+   ddx0(3)=ddxt[2];
+   ddx0(4)=ddxt[1];
+   ddx0(5)=ddxt[0];
+
+   for(int i = 0; i < 3; i++) dxf_tmp[i]=dx0(i);
+   dxt_tmp[0]=dx0(5);
+   dxt_tmp[1]=dx0(4);
+   dxt_tmp[2]=dx0(3);
+
+   R.mulTranspose(dxf_tmp, dxf);
+   R.mulTranspose(dxt_tmp, dxt);
+
+   for(int i = 0; i < 3; i++){
+     dx0(i)=dxf[i];
+   }
+   dx0(3)=dxt[2];
+   dx0(4)=dxt[1];
+   dx0(5)=dxt[0];
 
    Matrix4 x0_SE3 = integrator.StateToSE3(x0);
 
@@ -185,22 +208,43 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
 
    State dx1 = ddx0*dt + dx0;
 
+   for(int i = 0; i < 3; i++) dxf_tmp[i]=dx1(i);
+   dxt_tmp[0]=dx1(5);
+   dxt_tmp[1]=dx1(4);
+   dxt_tmp[2]=dx1(3);
+
+   R.mul(dxf_tmp, dxf);
+   R.mul(dxt_tmp, dxt);
+
+   for(int i = 0; i < 3; i++){
+     dx1(i)=dxf[i];
+   }
+   dx1(3)=dxt[2];
+   dx1(4)=dxt[1];
+   dx1(5)=dxt[0];
+   // std::cout << x0 << std::endl;
+   // std::cout << dx0 << std::endl;
+   // std::cout << ddx0 << std::endl;
+   // std::cout << std::string(80, '-') << std::endl;
+   // std::cout << dx1 << std::endl;
+   // exit(0);
+
    for(int i = 0; i < 6; i++){
      q1(i) = x1(i);
      q1(i+6+N) = dx1(i);
      dq1(i) = dx1(i);
    }
 
+
   // std::cout << std::string(80, '-') << std::endl; 
   //*/
-  //*
+
+  /*
   for(int i = 0; i < (N+6); i++){
     q1(i) = q0(i) + dt*dq0(i) + dt2*ddq0(i);
     q1(i+N+6) = dq0(i) + dt*ddq0(i);
     dq1(i) = q1(i+N+6);
   }
-  q1(6) = 0;
-  q1(6+N+6) = 0;
 
   if(q1(3)<-M_PI) q1(3)+=2*M_PI;
   if(q1(3)>M_PI) q1(3)-=2*M_PI;

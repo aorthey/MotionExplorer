@@ -7,9 +7,9 @@ from urdf_create import *
 robot_name = 'spider'
 env_name = 'mountain/ridge.tri'
 
-limit = pi/4
+limit = pi/16
 
-headradius = 0.5
+headradius = 0.3
 leglength1 = 0.3
 leglength2 = 0.75
 legradius = 0.08
@@ -142,7 +142,7 @@ terrainstr += '  </terrain> \n\n'
 f.write(terrainstr)
 
 forcestr  = '  <forcefield>\n'
-forcestr += '    <uniform force="0 0 0" color="1 0 0"/>\n'
+forcestr += '    <uniform force="0 0 -3.71" color="1 0 0"/>\n'
 forcestr += '  </forcefield>\n\n'
 f.write(forcestr)
 

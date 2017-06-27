@@ -407,23 +407,8 @@ void ForceFieldBackend::RenderWorld()
   }
 
 
-  if(drawWorkspaceApproximation){
-    if(plannerOutput.size()>0){
-      WorkspaceApproximation w = plannerOutput.at(0).workspace;
-      GLColor glWc(0,1,0,1);
-      for(uint i = 0; i < w.elements.size(); i++){
-        WorkspaceApproximationElement wi = w.elements.at(i);
-        // w.pos = Vector3(s[0],s[1],s[2]);
-        // w.inner_radius = 0.3;
-        // w.outer_radius = 1.5;
-        glWc.setCurrentGL();
-        glPushMatrix();
-        glTranslate(wi.pos);
-        GLDraw::drawSphere(wi.inner_radius,16,8);
-        glPopMatrix();
-      }
-    }
-  }
+  if(drawWorkspaceApproximation) GLDraw::drawWorkspaceApproximationSpheres(plannerOutput);
+
 
   //############################################################################
   // Visualize

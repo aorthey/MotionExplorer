@@ -154,12 +154,12 @@ void ContactStabilityController::Update(Real dt) {
   output.PredictCOM(0.001, 1000);
 
   //0.01
-  uint ictr = int(time*10);
-  //std::cout << "time " << time << " ctr " << ictr << std::endl;
-  if(ictr < torques.size())
-    output.current_torque = torques.at(ictr);
-  else
-    output.current_torque = ZeroTorque;
+  //uint ictr = int(time*10);
+  ////std::cout << "time " << time << " ctr " << ictr << std::endl;
+  //if(ictr < torques.size())
+  //  output.current_torque = torques.at(ictr);
+  //else
+  //  output.current_torque = ZeroTorque;
 
 
   // std::cout << std::string(80, '-') << std::endl;
@@ -179,9 +179,6 @@ void ContactStabilityController::Update(Real dt) {
   // RobotLink3D *link  = &(robot.links.at(5));
   // Matrix3 R = link->T_World.R;
 
-  // R.mul(force, force);
-  // R.mul(torque, torque);
-
   // output.current_torque[0]=force[0];
   // output.current_torque[1]=force[1];
   // output.current_torque[2]=force[2];
@@ -189,28 +186,28 @@ void ContactStabilityController::Update(Real dt) {
   // output.current_torque[4]=torque[1];
   // output.current_torque[3]=torque[2];
 
-  SetTorqueCommand(output.current_torque);
-  // if(torques.size()>0){
-  //   output.current_torque = ZeroTorque;
-  //   uint N = torques.at(0).size();
+  //SetTorqueCommand(output.current_torque);
+  if(torques.size()>0){
+    output.current_torque = ZeroTorque;
+    uint N = torques.at(0).size();
 
-  //   uint ictr = 0;
-  //   double t = 0;
-  //   while(t < time && ictr<times.size()){
-  //     t+= times.at(ictr++);
-  //   }
-  //   if(t>time){
-  //     Vector torque = torques.at(ictr-1);
-  //     output.current_torque = torque;
-  //   }else{
-  //     output.current_torque = ZeroTorque;
-  //   }
-  //   //output.current_torque.setZero();
-  //   //output.current_torque(0) = 1;
-  //   //output.current_torque(1) = 1;
-  //   //std::cout << "Setting torque: " << output.current_torque << std::endl;
-  //   SetTorqueCommand(output.current_torque);
-  // }
+    uint ictr = 0;
+    double t = 0;
+    while(t < time && ictr<times.size()){
+      t+= times.at(ictr++);
+    }
+    if(t>time){
+      Vector torque = torques.at(ictr-1);
+      output.current_torque = torque;
+    }else{
+      output.current_torque = ZeroTorque;
+    }
+    //output.current_torque.setZero();
+    //output.current_torque(0) = 1;
+    //output.current_torque(1) = 1;
+    //std::cout << "Setting torque: " << output.current_torque << std::endl;
+    SetTorqueCommand(output.current_torque);
+  }
 
   //SetPIDCommand(qcmd,vcmd);
   //SetTorqueCommand(const Vector& torques);

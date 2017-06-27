@@ -65,6 +65,7 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
   //TODO read any jet propulsion mechanisms directly from XML (i.e. add jet
   //propulsion while specifying robot urdf)
   // Rotation is eulerangles ZYX
+
   for(int i = 2; i >= 0; i--){
     rotation[i].type = RobotJointDriver::Rotation;
     rotation[i].linkIndices.push_back(i+3);
@@ -86,7 +87,6 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     std::string dName = "rotation e"+to_string(i);
     driverNames->insert(driverNames->begin(), dName.c_str());
   }
-
   for(int i = 2; i >= 0; i--){
     translation[i].type = RobotJointDriver::Translation;
     translation[i].linkIndices.push_back(i);

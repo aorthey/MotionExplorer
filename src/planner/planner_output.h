@@ -1,5 +1,15 @@
 #pragma once
 
+struct WorkspaceApproximationElement{
+  Vector3 pos;
+  Vector3 ori;
+  double inner_radius;
+  double outer_radius;
+};
+struct WorkspaceApproximation{
+  std::vector<WorkspaceApproximationElement> elements;
+};
+
 class PlannerOutput{
 
   private:
@@ -15,7 +25,10 @@ class PlannerOutput{
     std::vector<Config> ddq;
     std::vector<Vector> torques;
 
+
+
   public:
+    WorkspaceApproximation workspace;
     PlannerOutput(){};
 
     void SetTorques(std::vector<Vector> &torques_){

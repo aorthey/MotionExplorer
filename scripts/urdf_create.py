@@ -3,7 +3,8 @@ from math import cos,sin,pi
 
 mass = 1
 damping = 1
-effort = 0.5
+friction = 10
+effort = 1
 velocity=100
 
 
@@ -113,7 +114,7 @@ def createRevoluteJointRPY_XYZ(jname, parentname, childname, r, p, yaw, ex, ey, 
   s+='  <parent link="'+parentname+'"/>\n'
   s+='  <child link="'+childname+'"/>\n'
   s+='  <axis xyz="'+str(ex)+' '+str(ey)+' '+str(ez)+'"/>\n'
-  s+='  <dynamics damping="'+str(damping)+'" friction="0"/>\n'
+  s+='  <dynamics damping="'+str(damping)+'" friction="'+str(friction)+'"/>\n'
   s+='  <limit lower="'+str(lowerLimit)+'" upper="'+str(upperLimit)+'" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'
   return s
@@ -124,7 +125,7 @@ def createRevoluteJointXYZ(jname, parentname, childname, ex, ey, ez, x=0, y=0, z
   s+='  <parent link="'+parentname+'"/>\n'
   s+='  <child link="'+childname+'"/>\n'
   s+='  <axis xyz="'+str(ex)+' '+str(ey)+' '+str(ez)+'"/>\n'
-  s+='  <dynamics damping="'+str(damping)+'" friction="0"/>\n'
+  s+='  <dynamics damping="'+str(damping)+'" friction="'+str(friction)+'"/>\n'
   s+='  <limit lower="'+str(lowerLimit)+'" upper="'+str(upperLimit)+'" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'
   return s
@@ -137,7 +138,7 @@ def createSphericalJoint(jname, parentname, childname, x=0, y=0, z=0, lowerLimit
   s+='  <parent link="'+parentname+'"/>\n'
   s+='  <child link="'+tmpname+'"/>\n'
   s+='  <axis xyz="0 0 1"/>\n'
-  s+='  <dynamics damping="'+str(damping)+'" friction="0"/>\n'
+  s+='  <dynamics damping="'+str(damping)+'" friction="'+str(friction)+'"/>\n'
   s+='  <limit lower="'+str(lowerLimit)+'" upper="'+str(upperLimit)+'" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'
   s+= createSphere(tmpname,0,0,0,0.001,PHYSICAL=False)
@@ -146,7 +147,7 @@ def createSphericalJoint(jname, parentname, childname, x=0, y=0, z=0, lowerLimit
   s+='  <parent link="'+tmpname+'"/>\n'
   s+='  <child link="'+childname+'"/>\n'
   s+='  <axis xyz="0 1 0"/>\n'
-  s+='  <dynamics damping="'+str(damping)+'" friction="0"/>\n'
+  s+='  <dynamics damping="'+str(damping)+'" friction="'+str(friction)+'"/>\n'
   s+='  <limit lower="'+str(lowerLimit)+'" upper="'+str(upperLimit)+'" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'
   return s
