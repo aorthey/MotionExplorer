@@ -156,6 +156,9 @@ class ForceFieldBackend : public SimTestBackend
     int drawRigidObjectsEdges;
     int drawRigidObjectsFaces;
 
+    int drawWorkspaceApproximation;
+
+
     void toggle(int &k){
       if(k) k=0;
       else k=1;

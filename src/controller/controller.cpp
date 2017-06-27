@@ -84,7 +84,9 @@ void ControllerState::Reset(){
 //################################################################################
 //################################################################################
 
-ContactStabilityController::ContactStabilityController(Robot& robot) : RobotController(robot) {}
+ContactStabilityController::ContactStabilityController(Robot& robot) : RobotController(robot) {
+  //nominalTimeStep = 0.001;
+}
 ContactStabilityController::~ContactStabilityController() {}
 const char* ContactStabilityController::Type() const { return "ContactStabilityController"; }
 
@@ -101,7 +103,7 @@ const ControllerState& ContactStabilityController::GetControllerState() const {
 void ContactStabilityController::Update(Real dt) {
   //We'll put our code here: read from this->sensors, and write to this->command.
   //See Sensor.h and Command.h for details on these structures
-  //std::cout << "controller time " << time << std::endl;
+  //std::cout << "controller time " << time << " dt=" << dt << std::endl;
 
   Vector qcmd,vcmd;
   Vector qactual,vactual;
@@ -119,32 +121,6 @@ void ContactStabilityController::Update(Real dt) {
   //  std::cout << sensors->sensors.at(i)->name << std::endl;
   //}
 
-  //uint Nlinks = robot.links.size();
-  ////const Terrain* terrain = sim.odesim.terrain(0);
-  //const Geometry::AnyCollisionGeometry3D tgeom = (*terrain->geometry);
-  //Geometry::AnyCollisionGeometry3D tt(tgeom);
-  //robot->robot.CleanupCollisions();
-  //robot->robot.InitMeshCollision(tt);
-
-  //for(int i = 0; i < Nlinks; i++){
-  //  dBodyID bodyid = robot->body(i);
-  //  if(bodyid){
-  //    if(!robot->robot.IsGeometryEmpty(i)){
-  //      RobotLink3D *link = &robot->robot.links[i];
-  //      Geometry::AnyCollisionQuery *query = robot->robot.envCollisions[i];
-  //      double d = query->Distance(0,0.1);
-  //      std::vector<Vector3> vp1,vp2;
-  //      query->InteractingPoints(vp1,vp2);
-  //      if(vp1.size()!=1){
-  //        std::cout << "Warning: got " << vp1.size() << " contact points for single rigid body" << std::endl;
-  //      }
-  //      Matrix4 mat = link->T_World;
-  //      Vector3 p1 = link->T_World*vp1.front();
-  //      Vector3 p2 = vp2.front();
-  //    }
-  //  }
-  //}
-
   Vector3 com = robot.GetCOM();
   Vector3 LM = robot.GetLinearMomentum();
   Vector3 AM = robot.GetAngularMomentum();
@@ -153,58 +129,22 @@ void ContactStabilityController::Update(Real dt) {
   output.AddCOM(com, LM, AM);
   output.PredictCOM(0.001, 1000);
 
-  //0.01
-  //uint ictr = int(time*10);
-  ////std::cout << "time " << time << " ctr " << ictr << std::endl;
-  //if(ictr < torques.size())
-  //  output.current_torque = torques.at(ictr);
-  //else
-  //  output.current_torque = ZeroTorque;
-
-
-  // std::cout << std::string(80, '-') << std::endl;
-  // std::cout << "q     : " << qactual << std::endl;
-  // std::cout << "dq    : " << vactual << std::endl;
-  // std::cout << "torque: " << output.current_torque << std::endl;
-  // std::cout << "time  : " << time << std::endl;
-
-  // Vector3 torque,force;
-  // force[0]=output.current_torque[0];
-  // force[1]=output.current_torque[1];
-  // force[2]=output.current_torque[2];
-  // torque[0]=output.current_torque[5];
-  // torque[1]=output.current_torque[4];
-  // torque[2]=output.current_torque[3];
-
-  // RobotLink3D *link  = &(robot.links.at(5));
-  // Matrix3 R = link->T_World.R;
-
-  // output.current_torque[0]=force[0];
-  // output.current_torque[1]=force[1];
-  // output.current_torque[2]=force[2];
-  // output.current_torque[5]=torque[0];
-  // output.current_torque[4]=torque[1];
-  // output.current_torque[3]=torque[2];
-
-  //SetTorqueCommand(output.current_torque);
   if(torques.size()>0){
     output.current_torque = ZeroTorque;
     uint N = torques.at(0).size();
 
     uint ictr = 0;
     double t = 0;
-    while(t < time && ictr<times.size()){
+    while(t <= time && ictr<times.size()){
       t+= times.at(ictr++);
     }
+    //std::cout << time << "::" << t << "::" << ictr << std::endl;
     if(t>time){
       Vector torque = torques.at(ictr-1);
       output.current_torque = torque;
     }else{
       output.current_torque = ZeroTorque;
     }
-    //output.current_torque.setZero();
-    //output.current_torque(0) = 1;
-    //output.current_torque(1) = 1;
     //std::cout << "Setting torque: " << output.current_torque << std::endl;
     SetTorqueCommand(output.current_torque);
   }
@@ -212,42 +152,6 @@ void ContactStabilityController::Update(Real dt) {
   //SetPIDCommand(qcmd,vcmd);
   //SetTorqueCommand(const Vector& torques);
 
-  //Vector torques;
-  //torques.resize(qcmd.size());
-  //torques.setZero();
-
-//
-  //Vector torque = torques.at(0);
-  //std::cout << "Setting torque: " << torque << std::endl;
-  //std::cout << "drivers: " << robot.drivers.size() << std::endl;
-  //std::cout << "actuators: " << command->actuators.size() << std::endl;
-
-  //for(int i = 0; i < robot.drivers.size(); i++){
-  //  RobotJointDriver driver = robot.drivers.at(i);
-  //  if(driver.type == RobotJointDriver::Translation) {
-  //    std::cout << "[" << driver.linkIndices[0] << "]" << std::endl;
-  //    command->actuators[i].SetTorque(0);
-  //  }
-  //  if(driver.type == RobotJointDriver::Normal) {
-  //    std::cout << "[" << driver.linkIndices[0] << "]" << std::endl;
-  //    //double ti = torque(driver.linkIndices[0]);
-  //    //std::cout << "[" << i << "/" << robot.drivers.size() << "] : normal" << std::endl;
-  //    //std::cout << "[" << driver.linkIndices[0] << "]" << "="  << ti << ",";
-  //    //command->actuators[i].SetTorque(ti);
-  //  }
-  //}
-  //std::cout << std::endl;
-  //std::cout << "end" << std::endl;
-  //exit(0);
-
-  //if(!torques.empty()){
-  //  Vector trq = torques.at(0);
-  //  trq.setZero();
-  //  //trq(0)=5;
-  //  trq(0)=2;
-  //  std::cout << trq << std::endl;
-  //  SetTorqueCommand(trq);
-  //}
   RobotController::Update(dt);
 }
 bool ContactStabilityController::SendCommand(const string& name,const string& str){

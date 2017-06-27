@@ -671,7 +671,6 @@ COM should retain orientation equal to origin so that we can see forces from
  [ ] * replace propagation by undulatory motions along each axis, but how would that work?
  [ ] make cspace ompl work with zero-dimensional shape space
  
-
  [ ] put all the loader stuff into separate folder each with one file
 
 -- important
@@ -689,6 +688,7 @@ self-collision forces?
  [ ] reset: crash when plotting joint values
  [ ] kernel panic after movie creation
    [ ] got another kernel panic after displaying torque based jet propulsion
+ [ ] retreat simulation
 
 -- unnamed abstractions paper
 

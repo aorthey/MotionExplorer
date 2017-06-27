@@ -147,6 +147,7 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     robot->q = pin.q_goal;
     robot->UpdateFrames();
   }
+  //_backend->sim.simStep = 0.001;
   //WorldSimulation sim = _backend->sim;
   for(int i = 0; i < _backend->sim.odesim.numRobots(); i++){
     ODERobot *simrobot = _backend->sim.odesim.robot(i);

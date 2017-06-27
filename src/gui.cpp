@@ -23,6 +23,8 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
 
   showSweptVolumes = 0;
 
+  drawWorkspaceApproximation = 1;
+
   drawForceField = 0;
   drawWrenchField = 0;
   drawIKextras = 0;
@@ -302,13 +304,16 @@ void ForceFieldBackend::RenderWorld()
   //ControllerState output = controller->GetControllerState();
   //Vector torque = output.current_torque;
 
-  int drawWorkspaceApproximation = 1;
+
+  //Untested/Experimental Stuff
+
   int drawRobotDriver = 1;
 
   if(drawRobotDriver){
     Vector T;
     sim.controlSimulators[0].GetActuatorTorques(T);
 
+    Robot *robot = &oderobot->robot;
     for(int i = 0; i < robot->drivers.size(); i++){
       RobotJointDriver driver = robot->drivers[i];
       //############################################################################
@@ -446,6 +451,7 @@ void ForceFieldBackend::RenderWorld()
   if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
   if(drawAxesLabels) GLDraw::drawAxesLabels(viewport);
   if(drawFrames) GLDraw::drawFrames(_frames, _frameLength);
+
   
 
 }//RenderWorld
@@ -881,8 +887,11 @@ void ForceFieldBackend::DrawText(int x,int y, std::string s)
 bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
   std::cout << "OnCommand: " << cmd << std::endl;
-
-  if(cmd=="reset") {
+  if(cmd=="advance") {
+    SimStep(sim.simStep);
+  //}else if(cmd=="retreat") {
+    //SimStep(-sim.simStep);
+  }else if(cmd=="reset") {
     sim.hooks.clear();
 
     for(int k = 0; k < sim.robotControllers.size(); k++){
@@ -1124,6 +1133,8 @@ bool GLUIForceFieldGUI::Initialize()
 //################################################################################
 
   AddToKeymap("r","reset");
+  //AddToKeymap("a","advance");
+  //AddToKeymap("m","retreat");
 
   AddToKeymap("1","draw_forcefield");
   AddToKeymap("2","draw_wrenchfield");
@@ -1189,31 +1200,30 @@ void GLUIForceFieldGUI::AddToKeymap(const char *key, const char *s){
 
 void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
 {
-    switch(c) {
-      case 'h':
-        BaseT::Handle_Keypress(c,x,y);
+  switch(c) {
+    case 'h':
+    {
+      BaseT::Handle_Keypress(c,x,y);
 
-        std::cout << "--- swept volume" << std::endl;
-        for (Keymap::iterator it=_keymap.begin(); it!=_keymap.end(); ++it){
-          std::cout << it->first << ": " << it->second << '\n';
-        }
-
-        break;
-
-      case 'S':
-        {
-          SaveScreenshot();
-          std::size_t pos = screenshotFile.find(".ppm");
-          std::string outpng = screenshotFile.substr(0,pos)+".png";
-          std::string cmd = "convert "+screenshotFile+" "+outpng;
-          system(cmd.c_str());
-          IncrementStringDigits(screenshotFile);
-          break;
-        }
-
-      default:
-        BaseT::Handle_Keypress(c,x,y);
+      std::cout << "--- swept volume" << std::endl;
+      for (Keymap::iterator it=_keymap.begin(); it!=_keymap.end(); ++it){
+        std::cout << it->first << ": " << it->second << '\n';
+      }
+      break;
     }
+    case 'S':
+    {
+      SaveScreenshot();
+      std::size_t pos = screenshotFile.find(".ppm");
+      std::string outpng = screenshotFile.substr(0,pos)+".png";
+      std::string cmd = "convert "+screenshotFile+" "+outpng;
+      system(cmd.c_str());
+      IncrementStringDigits(screenshotFile);
+      break;
+    }
+    default:
+      BaseT::Handle_Keypress(c,x,y);
+  }
 }
 bool GLUIForceFieldGUI::OnCommand(const string& cmd,const string& args)
 {

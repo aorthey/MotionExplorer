@@ -93,12 +93,12 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
     fext(k) = ucontrol[k];
   }
 
-  Vector3 torque,force;
-  Vector3 force_tmp(ucontrol[0],ucontrol[1],ucontrol[2]);
-  Vector3 torque_tmp(ucontrol[5],ucontrol[4],ucontrol[3]);
+  Vector3 force,force_tmp(ucontrol[0],ucontrol[1],ucontrol[2]);
+  //Vector3 torque_tmp(ucontrol[5],ucontrol[4],ucontrol[3]);
+  Vector3 torque(ucontrol[5],ucontrol[4],ucontrol[3]);
 
   R.mul(force_tmp, force);
-  R.mul(torque_tmp, torque);
+  //R.mul(torque_tmp, torque);
 
   // Vector Fq;
   // robot->GetWrenchTorques(tmp, force, 5, Fq);
@@ -115,10 +115,10 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   Vector Cdq;
   robot->GetCoriolisForces(Cdq);
 
-  // for(int i = 0; i < 3; i++){
-  //   force[i]=force[i]-Cdq(i);
-  //   torque[i]=torque[i]-Cdq(i+3);
-  // }
+  for(int i = 0; i < 3; i++){
+    force[i]=force[i]-Cdq(i);
+    torque[i]=torque[i]-Cdq(i+3);
+  }
 
   Vector3 ddqTorque,ddqForce;
   inertia_inv.mul(torque, ddqTorque);
@@ -163,35 +163,14 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
 
    Vector3 dxf,dxt,ddxf,ddxt;
    Vector3 dxf_tmp,dxt_tmp,ddxf_tmp,ddxt_tmp;
+
    for(int i = 0; i < 3; i++) ddxf_tmp[i]=ddx0(i);
-   ddxt_tmp[0]=ddx0(5);
-   ddxt_tmp[1]=ddx0(4);
-   ddxt_tmp[2]=ddx0(3);
-
    R.mulTranspose(ddxf_tmp, ddxf);
-   R.mulTranspose(ddxt_tmp, ddxt);
-
-   for(int i = 0; i < 3; i++){
-     ddx0(i)=ddxf[i];
-   }
-   ddx0(3)=ddxt[2];
-   ddx0(4)=ddxt[1];
-   ddx0(5)=ddxt[0];
+   for(int i = 0; i < 3; i++) ddx0(i)=ddxf[i];
 
    for(int i = 0; i < 3; i++) dxf_tmp[i]=dx0(i);
-   dxt_tmp[0]=dx0(5);
-   dxt_tmp[1]=dx0(4);
-   dxt_tmp[2]=dx0(3);
-
    R.mulTranspose(dxf_tmp, dxf);
-   R.mulTranspose(dxt_tmp, dxt);
-
-   for(int i = 0; i < 3; i++){
-     dx0(i)=dxf[i];
-   }
-   dx0(3)=dxt[2];
-   dx0(4)=dxt[1];
-   dx0(5)=dxt[0];
+   for(int i = 0; i < 3; i++) dx0(i)=dxf[i];
 
    Matrix4 x0_SE3 = integrator.StateToSE3(x0);
 
@@ -209,25 +188,8 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
    State dx1 = ddx0*dt + dx0;
 
    for(int i = 0; i < 3; i++) dxf_tmp[i]=dx1(i);
-   dxt_tmp[0]=dx1(5);
-   dxt_tmp[1]=dx1(4);
-   dxt_tmp[2]=dx1(3);
-
    R.mul(dxf_tmp, dxf);
-   R.mul(dxt_tmp, dxt);
-
-   for(int i = 0; i < 3; i++){
-     dx1(i)=dxf[i];
-   }
-   dx1(3)=dxt[2];
-   dx1(4)=dxt[1];
-   dx1(5)=dxt[0];
-   // std::cout << x0 << std::endl;
-   // std::cout << dx0 << std::endl;
-   // std::cout << ddx0 << std::endl;
-   // std::cout << std::string(80, '-') << std::endl;
-   // std::cout << dx1 << std::endl;
-   // exit(0);
+   for(int i = 0; i < 3; i++) dx1(i)=dxf[i];
 
    for(int i = 0; i < 6; i++){
      q1(i) = x1(i);
@@ -235,8 +197,19 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
      dq1(i) = dx1(i);
    }
 
+//   static uint xx = 0;
+//   if(xx++ < 5){
+//     std::cout << q0 << std::endl;
+//     std::cout << dq0 << std::endl;
+//     std::cout << R << std::endl;
+//     std::cout << ddqForce << std::endl;
+//     std::cout << ddqTorque << std::endl;
+//     std::cout << "dx1  :" << dx1 << std::endl;
 
-  // std::cout << std::string(80, '-') << std::endl; 
+//     std::cout << std::string(80, '-') << std::endl;
+//   }
+//   else exit(0);
+
   //*/
 
   /*
