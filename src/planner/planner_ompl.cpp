@@ -208,7 +208,6 @@ void MotionPlannerOMPL::WorkspaceApproximationPlanner(PlannerInput &input){
     output.workspace.elements.push_back(w);
   }
 
-
   //oc::RealVectorControlSpacePtr control_space = std::make_shared<oc::RealVectorControlSpace>(space, 2);
   //ob::RealVectorBounds boundsC(2);
 
@@ -292,13 +291,14 @@ bool MotionPlannerOMPL::solve(PlannerInput &input_)
 {
   input = input_;
 
-  this->_p_init = input.q_init;
-  this->_p_goal = input.q_goal;
-  robot->UpdateConfig(_p_init);
+  Config p_init = input.q_init;
+  Config p_goal = input.q_goal;
+  std::string algorithm = input.name_algorithm;
+
+  robot->UpdateConfig(p_init);
   this->_world->InitCollisions();
   std::cout << input << std::endl;
 
-  std::string algorithm = input.name_algorithm;
 
   //###########################################################################
   // Setup Klampt CSpace
@@ -308,14 +308,13 @@ bool MotionPlannerOMPL::solve(PlannerInput &input_)
   worldsettings.InitializeDefault(*_world);
 
   SingleRobotCSpace kcspace = SingleRobotCSpace(*_world,_irobot,&worldsettings);
-  if(!IsFeasible( robot, kcspace, _p_goal)) return false;
-  if(!IsFeasible( robot, kcspace, _p_init)) return false;
+  if(!IsFeasible( robot, kcspace, p_goal)) return false;
+  if(!IsFeasible( robot, kcspace, p_init)) return false;
 
   if(algorithm=="workspace"){
     WorkspaceApproximationPlanner(input);
     return true;
   }
-
 
   //
   //GeometricCSpaceOMPL: Space = Configuration manifold; control space = tangent
@@ -337,8 +336,8 @@ bool MotionPlannerOMPL::solve(PlannerInput &input_)
   // Config init,goal to OMPL start/goal
   //###########################################################################
 
-  ob::ScopedState<> start = cspace->ConfigToOMPLState(_p_init);
-  ob::ScopedState<> goal  = cspace->ConfigToOMPLState(_p_goal);
+  ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
+  ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
   std::cout << start << std::endl;
   std::cout << goal << std::endl;
 

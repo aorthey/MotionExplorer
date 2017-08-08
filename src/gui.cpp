@@ -35,7 +35,6 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawCenterOfMassPath = 1;
 
   drawPlannerTree = 1;
-  drawPlannerStartGoal = 1;
   drawRigidObjects = 1;
   drawRigidObjectsEdges = 1;
   drawRigidObjectsFaces = 0;
@@ -46,7 +45,6 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawRobotExtras = 0;
 
   MapButtonToggle("draw_planner_tree",&drawPlannerTree);
-  MapButtonToggle("draw_planner_start_goal",&drawPlannerStartGoal);
 
   MapButtonToggle("draw_rigid_objects_faces",&drawRigidObjectsFaces);
   MapButtonToggle("draw_rigid_objects_edges",&drawRigidObjectsEdges);
@@ -105,6 +103,8 @@ bool ForceFieldBackend::OnIdle()
 
     //Simulate Force Field
     // compute links COM, then get forces from field
+
+    sim.odesim.SetGravity(Vector3(0,0,0));
     ODERobot *robot = sim.odesim.robot(0);
     uint Nlinks = robot->robot.links.size();
 
@@ -207,12 +207,12 @@ void ForceFieldBackend::Start()
   drawPathStartGoal.clear();
 
   std::cout << "Setting swept volume paths" << std::endl;
-  for(int i = 0; i < getNumberOfPaths(); i++){
+  for(int i = 0; i < plannerInput.size(); i++){
     drawPathSweptVolume.push_back(showSweptVolumes);
     drawPathMilestones.push_back(0);
     drawPathStartGoal.push_back(1);
   }
-  for(int i = 0; i < getNumberOfPaths(); i++){
+  for(int i = 0; i < plannerInput.size(); i++){
     std::string dpsv = "draw_path_swept_volume_"+std::to_string(i);
     MapButtonToggle(dpsv.c_str(),&drawPathSweptVolume.at(i));
     std::string dpms = "draw_path_milestones_"+std::to_string(i);
@@ -418,14 +418,13 @@ void ForceFieldBackend::RenderWorld()
   // drawikextras         : contact links, contact directions
   // drawforcefield       : a flow/force field on R^3
   // drawpathsweptvolume  : swept volume along path
-  // drawplannerstartgoal : start/goal configuration of motion planner
   // drawplannertree      : Cspace tree visualized as COM tree in W
   // drawaxes             : fancy coordinate axes
   // drawaxeslabels       : labelling of the coordinate axes [needs fixing]
   //############################################################################
 
   if(drawWorkspaceApproximation) GLDraw::drawWorkspaceApproximationSpheres(plannerOutput);
-  if(drawCenterOfMassPath) GLDraw::drawCenterOfMassPathFromController(sim);
+  //if(drawCenterOfMassPath) GLDraw::drawCenterOfMassPathFromController(sim);
   if(drawForceEllipsoid) GLDraw::drawForceEllipsoid(oderobot);
 
   if(!world->terrains.empty() && drawDistanceRobotTerrain){
@@ -437,7 +436,14 @@ void ForceFieldBackend::RenderWorld()
   if(drawIKextras) GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);
   if(drawForceField) GLDraw::drawForceField(wrenchfield);
   if(drawWrenchField) GLDraw::drawWrenchField(wrenchfield);
-  if(drawPlannerStartGoal) GLDraw::drawGLPathStartGoal(robot, planner_p_init, planner_p_goal);
+
+  for(int i = 0; i < plannerInput.size(); i++){
+    if(drawPathStartGoal.at(i)){
+      Config qi = plannerInput.at(i).q_init;
+      Config qg = plannerInput.at(i).q_goal;
+      GLDraw::drawGLPathStartGoal(robot, qi, qg);
+    }
+  }
 
   for(int i = 0; i < swept_volume_paths.size(); i++){
     SweptVolume sv = swept_volume_paths.at(i);
@@ -527,7 +533,6 @@ void ForceFieldBackend::DrawTextVector(double xpos, double ypos, const char* pre
 
 void ForceFieldBackend::VisualizeStartGoal(const Config &p_init, const Config &p_goal)
 {
-  drawPlannerStartGoal = 1;
   planner_p_init = p_init;
   planner_p_goal = p_goal;
 }
@@ -798,7 +803,7 @@ const std::vector<Config>& ForceFieldBackend::getPathKeyFrames(uint pathid)
   return swept_volume_paths.at(pathid).GetKeyframes();
 }
 uint ForceFieldBackend::getNumberOfPaths(){
-  return this->swept_volume_paths.size();
+  return this->plannerInput.size();
 }
 
 void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength)
@@ -1014,10 +1019,6 @@ bool GLUIForceFieldGUI::Initialize()
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Object Faces");
   AddControl(checkbox,"draw_rigid_objects_faces");
   checkbox->set_int_val(_backend->drawRigidObjectsFaces);
-
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Planner Start Goal");
-  AddControl(checkbox,"draw_planner_start_goal");
-  checkbox->set_int_val(_backend->drawPlannerStartGoal);
 
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Planning Tree");
   AddControl(checkbox,"draw_planner_tree");

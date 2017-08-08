@@ -9,7 +9,6 @@
 
 #include "environment_loader.h"
 #include "planner/planner_ompl.h"
-#include "planner/planner_ompl_humanoid.h"
 #include "planner/planner_contact.h"
 #include "iksolver_hrp2.h"
 

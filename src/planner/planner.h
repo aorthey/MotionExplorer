@@ -16,22 +16,12 @@
 #include "planner/planner_input.h"
 #include "planner/planner_output.h"
 
-struct PlannerSettings{
-  const uint iterations = 1e3;
-  const double goalSeekProbability = 0.1;
-  const double goalRegionConvergence = 0.1;
-  const uint maxDisplayedPointsInTree = 1e4;
-  const uint Nreachableset = 10; //for RGRRT
-  const double discretizationOutputPath = 0.01;
-  const Vector3 worldboundsMin = Vector3(-3,-3,1);
-  const Vector3 worldboundsMax = Vector3(+3,+3,3);
-};
-
 class MotionPlanner{
 
   protected:
+    PlannerInput input;
+    PlannerOutput output;
 
-    PlannerSettings plannersettings;
     RobotWorld *_world;
     Robot *robot;
     int _irobot;
@@ -39,13 +29,9 @@ class MotionPlanner{
     Config _p_init;
     Config _p_goal;
     bool _isSolved;
-    bool _shortcutting;
-    double _timelimit;
-    //KinodynamicMilestonePath _path;
+
     SerializedTree _stree;
 
-    PlannerInput input;
-    PlannerOutput output;
   public:
 
     PlannerInput GetInput();
@@ -75,18 +61,7 @@ class MotionPlanner{
     bool IsFeasible(Robot *robot, SingleRobotCSpace &cspace, Config &q);
 
     virtual std::string getName();
-    //virtual bool Save(const char* file=NULL);
-    //virtual bool Save(TiXmlElement *node);
-    //virtual bool Load(const char* file);
-    //virtual bool Load(TiXmlElement *node);
-
-  protected:
-    //virtual bool solve_internal(Config &p_init, Config &p_goal);
 };
-//bool Save(const std::vector<Config> &keyframes, const char* file);
-//bool Save(const std::vector<Config> &keyframes, TiXmlElement *node);
-//bool Load(std::vector<Config> &keyframes, const char* file);
-//bool Load(std::vector<Config> &keyframes, TiXmlElement *node);
 
 
 // * The type field can be left as "any", in which a default planning algorithm will be

@@ -215,10 +215,10 @@ bool MotionPlanner::IsFeasible( Robot *robot, SingleRobotCSpace &cspace, Config 
     cspace.CheckObstacles(q,infeasible);
     uint N = 0;
     for(size_t i=0;i<infeasible.size();i++){
-      if(!infeasible[i]) cout<<"  ok "<<cspace.ObstacleName(i)<<endl;
+      //if(!infeasible[i]) cout<<"  ok "<<cspace.ObstacleName(i)<<endl;
       if(infeasible[i]){
         N++;
-        int icq = i - (int)robot->joints.size();
+        int icq = i - q.size();
         cout<<"-->"<<cspace.ObstacleName(i) << " | pen-depth: ";
         cout << cspace.collisionQueries[icq].PenetrationDepth() << " | dist: ";
         cout << cspace.collisionQueries[icq].Distance(1e-3,1e-3) << std::endl;

@@ -23,7 +23,7 @@ double PlannerWorkspaceApproximation::GetRadiusFromRobot( Robot *r ){
 
 void PlannerWorkspaceApproximation::solve(){
   uint N = 20;
-  uint M = 100;
+  uint M = 200;
 
   struct WSphere{
     Vector3 pos;
@@ -47,6 +47,7 @@ void PlannerWorkspaceApproximation::solve(){
   WSphere B0;
   B0.pos = init;
   B0.radius = inner_radius;
+  //B0.distance_goal = dInf;
   B0.distance_goal = (init-goal).norm() - inner_radius;
   spheres.push(B0);
 
@@ -55,7 +56,7 @@ void PlannerWorkspaceApproximation::solve(){
 
     WSphere B = spheres.top();
     Vector3 q0 = B.pos;
-    std::cout << "feasible sphere: " << q0 << std::endl;
+    //std::cout << "feasible sphere: " << q0 << std::endl;
     tree.push_back(q0);
     spheres.pop();
     if(B.distance_goal < 0.1) break;
@@ -72,6 +73,7 @@ void PlannerWorkspaceApproximation::solve(){
         WSphere B1;
         B1.pos = q1;
         B1.radius = inner_radius;
+        //B1.distance_goal = 1.0/(q1-init).norm();
         B1.distance_goal = (q1-goal).norm()-inner_radius;
         spheres.push(B1);
       }

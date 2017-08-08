@@ -149,7 +149,6 @@ class ForceFieldBackend : public SimTestBackend
     int drawIKextras;
     int drawRobot;
     int drawPlannerTree;
-    int drawPlannerStartGoal;
     int drawAxes;
     int drawAxesLabels;
     int drawRigidObjects;

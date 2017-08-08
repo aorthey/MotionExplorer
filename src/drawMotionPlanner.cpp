@@ -640,7 +640,11 @@ namespace GLDraw{
   }
   void drawCenterOfMassPathFromController(WorldSimulation &sim){
     int linewidth = 4;
+
+    if(!sim.robotControllers.size()>0) return;
+
     SmartPointer<ContactStabilityController>& controller = *reinterpret_cast<SmartPointer<ContactStabilityController>*>(&sim.robotControllers[0]);
+
     ControllerState output = controller->GetControllerState();
 
     glDisable(GL_LIGHTING);
@@ -719,7 +723,6 @@ namespace GLDraw{
           Vector3 p1 = link->T_World*vp1.front();
           Vector3 p2 = vp2.front();
           //Vector3 dp = p1-p2;
-
 
           glPushMatrix();
           glLineWidth(3);
@@ -878,9 +881,6 @@ namespace GLDraw{
       glEnable(GL_LIGHTING);
       for(uint i = 0; i < w.elements.size(); i++){
         WorkspaceApproximationElement wi = w.elements.at(i);
-        // w.pos = Vector3(s[0],s[1],s[2]);
-        // w.inner_radius = 0.3;
-        // w.outer_radius = 1.5;
         glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,colorInner);
         glPushMatrix();
         glTranslate(wi.pos);
