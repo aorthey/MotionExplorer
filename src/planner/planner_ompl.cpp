@@ -1,6 +1,4 @@
 #include "planner_ompl.h"
-
-#include "cspace_sentinel.h"
 #include "liegroupintegrator.h"
 #include "planner/planner_workspace_approximation.h"
 
@@ -13,13 +11,23 @@ void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
   pd.toBoostGraph();
 
   _stree.clear();
+  uint N = robot->q.size()-6;
   for(uint i = 0; i < pd.numVertices(); i++){
     ob::PlannerDataVertex v = pd.getVertex(i);
     const ob::State* s = v.getState();
-    const ob::SE3StateSpace::StateType *sSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-    double x = sSE3->getX();
-    double y = sSE3->getY();
-    double z = sSE3->getZ();
+    double x,y,z;
+
+    if(N>0){
+      const ob::SE3StateSpace::StateType *sSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+      x = sSE3->getX();
+      y = sSE3->getY();
+      z = sSE3->getZ();
+    }else{
+      const ob::SE3StateSpace::StateType *sSE3 = s->as<ob::SE3StateSpace::StateType>();
+      x = sSE3->getX();
+      y = sSE3->getY();
+      z = sSE3->getZ();
+    }
     SerializedTreeNode snode;
     Config q;q.resize(6);q.setZero();
     q(0)=x;
@@ -36,10 +44,18 @@ void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
     for(int j = 0; j < edgeList.size(); j++){
       ob::PlannerDataVertex w = pd.getVertex(edgeList.at(j));
       const ob::State* sw = w.getState();
-      const ob::SE3StateSpace::StateType *swSE3 = sw->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-      double xw = swSE3->getX();
-      double yw = swSE3->getY();
-      double zw = swSE3->getZ();
+      double xw,yw,zw;
+      if(N>0){
+        const ob::SE3StateSpace::StateType *swSE3 = sw->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+        xw = swSE3->getX();
+        yw = swSE3->getY();
+        zw = swSE3->getZ();
+      }else{
+        const ob::SE3StateSpace::StateType *swSE3 = sw->as<ob::SE3StateSpace::StateType>();
+        xw = swSE3->getX();
+        yw = swSE3->getY();
+        zw = swSE3->getZ();
+      }
 
       Vector3 dvw( xw-x, yw-y, zw-z);
       snode.directions.push_back(dvw);
@@ -52,8 +68,8 @@ void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
   }
 }
 
-MotionPlannerOMPL::MotionPlannerOMPL(RobotWorld *world):
-  MotionPlanner(world)
+MotionPlannerOMPL::MotionPlannerOMPL(RobotWorld *world_, PlannerInput& input_):
+  MotionPlanner(world_, input_)
 {
 }
 
@@ -98,94 +114,14 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
 
 }
 
-// class WorkspaceApproximationPlannerValidityChecker : public ob::StateValidityChecker
-// {
-//   public:
-//     WorkspaceApproximationPlannerValidityChecker(const ob::SpaceInformationPtr &si, CSpace *inner_, CSpace *outer_):
-//       ob::StateValidityChecker(si),inner(inner_),outer(outer_) {};
-
-//     virtual bool isValid(const ob::State* state) const{
-//       //const ob::StateSpacePtr space = si_->getStateSpace();
-//       const ob::RealVectorStateSpace::StateType *RnSpace = state->as<ob::RealVectorStateSpace::StateType>();
-
-//       double* qs = RnSpace->values;
-
-//       Config q;q.resize(3);
-//       for(int i = 0; i < 3; i++) q[i]=qs[i];
-//       // std::cout << "state" << q << std::endl;
-//       // std::cout << "inner sphere feasible " << (inner->IsFeasible(q)?"yes":"no") << std::endl;
-//       // std::cout << "outer sphere feasible " << (outer->IsFeasible(q)?"yes":"no") << std::endl;
-//       // static int kk = 0;
-//       // if(kk++>5) exit(0);
-
-//       bool feasible = inner->IsFeasible(q) && !outer->IsFeasible(q);
-//       return feasible;
-
-//     }
-//     // bool intersectsSpheres(Config &q) const{
-//     //   double radius = 0.1;
-//     //   for(int i = 0; i < spheres.size(); i++){
-//     //     Config s = spheres.at(i);
-//     //     if((s-q).norm() < radius){
-//     //       return true;
-//     //     }
-//     //   }
-//     //   return false;
-//     // }
-
-//     CSpace *inner;
-//     CSpace *outer;
-// };
-// class WorkspaceApproximationPlannerPropagator : public oc::StatePropagator
-// {
-// public:
-
-//     WorkspaceApproximationPlannerPropagator(oc::SpaceInformationPtr si, Robot *robot_) : 
-//         oc::StatePropagator(si.get()), robot(robot_)
-//     {
-//     }
-//     virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override{
-//       const ob::RealVectorStateSpace::StateType *RnSpace = state->as<ob::RealVectorStateSpace::StateType>();
-//       const double *ucontrol = control->as<oc::RealVectorControlSpace::ControlType>()->values;
-//       double* qs = RnSpace->values;
-//       Config q;q.resize(3);
-//       for(int i = 0; i < 3; i++) q[i]=qs[i];
-
-//       double radius = 0.1;
-
-//       const ob::RealVectorStateSpace::StateType *resultRn = result->as<ob::RealVectorStateSpace::StateType>();
-//       double* qr = resultRn->values;
-//       qr[0] = q[0]+radius*sin(ucontrol[0])*cos(ucontrol[1]);
-//       qr[1] = q[1]+radius*sin(ucontrol[0])*sin(ucontrol[1]);
-//       qr[2] = q[2]+radius*cos(ucontrol[0]);
-
-//     }
-
-//     Robot *robot;
-//     CSpaceOMPL *ompl_space;
-// };
 
 void MotionPlannerOMPL::WorkspaceApproximationPlanner(PlannerInput &input){
 
-  //ob::StateSpacePtr space(std::make_shared<ob::RealVectorStateSpace>(3));
-
-  //ob::RealVectorBounds boundsRn(3);
-  //boundsRn.setLow(-100);
-  //boundsRn.setHigh(100);
-  //space->as<ob::RealVectorStateSpace>()->setBounds(boundsRn);
-
-  //ob::ScopedState<> start(space);
-  //ob::ScopedState<> goal(space);
-  //for(int i = 0; i < 3; i++){
-  //  start[i] = input.q_init[i];
-  //  goal[i] = input.q_goal[i];
-  //}
-
   WorldPlannerSettings worldsettings;
-  worldsettings.InitializeDefault(*_world);
+  worldsettings.InitializeDefault(*world);
 
-  SingleRobotCSpace sphere_inner = SingleRobotCSpace(*_world,1,&worldsettings);
-  SingleRobotCSpace sphere_outer = SingleRobotCSpace(*_world,2,&worldsettings);
+  SingleRobotCSpace sphere_inner = SingleRobotCSpace(*world,1,&worldsettings);
+  SingleRobotCSpace sphere_outer = SingleRobotCSpace(*world,2,&worldsettings);
 
   Vector3 init,goal;
   for(int i = 0; i < 3; i++){
@@ -208,134 +144,82 @@ void MotionPlannerOMPL::WorkspaceApproximationPlanner(PlannerInput &input){
     output.workspace.elements.push_back(w);
   }
 
-  //oc::RealVectorControlSpacePtr control_space = std::make_shared<oc::RealVectorControlSpace>(space, 2);
-  //ob::RealVectorBounds boundsC(2);
-
-  //boundsC.setLow(0);
-  //boundsC.setHigh(M_PI);
-
-  //boundsC.setLow(0,0);
-  //boundsC.setHigh(0,2*M_PI);
-  //boundsC.setLow(1,0);
-  //boundsC.setHigh(1,M_PI);
-
-  //boundsC.check();
-  //control_space->setBounds(boundsC);
-
-  //oc::SimpleSetup ss(control_space);
-  //oc::SpaceInformationPtr si = ss.getSpaceInformation();
-
-  //ss.setStateValidityChecker(std::make_shared<WorkspaceApproximationPlannerValidityChecker>(si,&sphere_inner,&sphere_outer));
-  //ss.setStatePropagator(std::make_shared<WorkspaceApproximationPlannerPropagator>(si,sphere_inner.GetRobot()));
-  //si->setStateValidityCheckingResolution(0.1);
-
-  ////###########################################################################
-  //// choose planner
-  ////###########################################################################
-  //ob::PlannerPtr ompl_planner = std::make_shared<oc::KPIECE1>(si);
-
-  //double epsilon_goalregion = input.epsilon_goalregion;
-
-  //ss.setStartAndGoalStates(start, goal, epsilon_goalregion);
-  //ss.setup();
-  //ss.setPlanner(ompl_planner);
-  //ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new WorkspaceProject0r(ss.getStateSpace())));
-
-  ////set objective to infinite path to just return first solution
-  //ob::ProblemDefinitionPtr pdef = ss.getProblemDefinition();
-  //pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
-
-  //double solution_time = dInf;
-  //double max_planning_time= input.max_planning_time;
-  //ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
-
-  //ob::PlannerStatus status = ss.solve(ptc);
-
-  ////###########################################################################
-  //// extract roadmap
-  ////###########################################################################
-
-  //oc::PlannerData pd(si);
-  //ss.getPlannerData(pd);
-
-  ////create workspaceapproximationelements
-
-  //std::cout << "serializing tree with " << pd.numVertices() << " vertices" << std::endl;
-  //std::cout << "                  and " << pd.numEdges() << " edges" << std::endl;
-  ////pd.toBoostGraph();
-
-  //for(uint i = 0; i < pd.numVertices(); i++){
-  //  ob::PlannerDataVertex v = pd.getVertex(i);
-  //  const ob::State* state = v.getState();
-
-  //  //std::vector<uint> edgeList;
-  //  //pd.getEdges(i, edgeList);
-
-  //  const ob::RealVectorStateSpace::StateType *st = state->as<ob::RealVectorStateSpace::StateType>();
-  //  double* s = st->values;
-
-  //  WorkspaceApproximationElement w;
-  //  w.pos = Vector3(s[0],s[1],s[2]);
-  //  w.inner_radius = 0.3;
-  //  w.outer_radius = 1.5;
-
-  //  output.workspace.elements.push_back(w);
-  //  
-  //}
-
-
 }
 
 
-bool MotionPlannerOMPL::solve(PlannerInput &input_)
+bool MotionPlannerOMPL::solve()
 {
-  input = input_;
+  //input = input_;
 
   Config p_init = input.q_init;
   Config p_goal = input.q_goal;
   std::string algorithm = input.name_algorithm;
 
   robot->UpdateConfig(p_init);
-  this->_world->InitCollisions();
+  this->world->InitCollisions();
   std::cout << input << std::endl;
-
 
   //###########################################################################
   // Setup Klampt CSpace
   //###########################################################################
 
   WorldPlannerSettings worldsettings;
-  worldsettings.InitializeDefault(*_world);
-
-  SingleRobotCSpace kcspace = SingleRobotCSpace(*_world,_irobot,&worldsettings);
-  if(!IsFeasible( robot, kcspace, p_goal)) return false;
-  if(!IsFeasible( robot, kcspace, p_init)) return false;
-
-  if(algorithm=="workspace"){
-    WorkspaceApproximationPlanner(input);
-    return true;
-  }
-
-  //
-  //GeometricCSpaceOMPL: Space = Configuration manifold; control space = tangent
-  //space of configuration manifold, i.e. control happens in velocity space
-  //
-  //KinodynamicCSpaceOMPL: Space = tangent bundle of configuration manifold;
-  //control space = tangent space of tangent bundle, i.e. control happens in
-  //acceleration space, i.e. we can control torques of revolute joints, forces
-  //of prismatic joints, and any additional booster/thruster which act directly
-  //on the se(3) component
-  //
+  worldsettings.InitializeDefault(*world);
 
   CSpaceFactory factory(input);
+  //KinodynamicCSpaceOMPL* cspace;
+  GeometricCSpaceOMPL* cspace;
 
-  //GeometricCSpaceOMPL* cspace = factory.MakeGeometricCSpace(robot, &kcspace);
-  KinodynamicCSpaceOMPL* cspace = factory.MakeKinodynamicCSpace(robot, &kcspace);
+  SingleRobotCSpace* kcspace;
+  SingleRobotCSpace* cspace_inner;
+  SingleRobotCSpace* cspace_outer;
+
+  if(algorithm=="workspace"){
+    int idx_is = input.robot_idx;
+    robot = world->robots[idx_is];
+    robot->UpdateConfig(p_init);
+    int idx_os = input.robot_idx_outer_shell;
+
+    if(idx_os < 0){
+      std::cout << "algorithm workspace requires outer shell specification" << std::endl;
+      exit(0);
+    }
+
+    cspace_inner = new SingleRobotCSpace(*world,idx_is,&worldsettings);
+    cspace_outer = new SingleRobotCSpace(*world,idx_os,&worldsettings);
+
+    Robot *ri = cspace_inner->GetRobot();
+    Robot *ro = cspace_outer->GetRobot();
+    std::cout << ri->name << std::endl;
+    std::cout << ro->name << std::endl;
+
+    //goal/init needs to be >infeasible< for outer shell (robot in contact /w at
+    //least one link)
+    //if(IsFeasible( robot_outer_shell, cspace_outer_shell, p_init)) return false;
+    //if(IsFeasible( robot_outer_shell, cspace_outer_shell, p_goal)) return false;
+
+    //WorkspaceApproximationPlanner(input);
+
+    cspace = factory.MakeGeometricCSpaceInnerOuter(robot, cspace_inner, cspace_outer);
+    algorithm = "ompl:rrt";
+
+    cspace->print();
+  }else{
+
+    //GeometricCSpaceOMPL* cspace = factory.MakeGeometricCSpace(robot, &kcspace);
+    kcspace = new SingleRobotCSpace(*world,_irobot,&worldsettings);
+
+    if(!IsFeasible( robot, *kcspace, p_goal)) return false;
+    if(!IsFeasible( robot, *kcspace, p_init)) return false;
+
+    cspace = factory.MakeGeometricCSpace(robot, kcspace);
+  }
 
   //###########################################################################
   // Config init,goal to OMPL start/goal
   //###########################################################################
 
+  std::cout << p_init << std::endl;
   ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
   std::cout << start << std::endl;

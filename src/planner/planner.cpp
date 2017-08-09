@@ -3,14 +3,15 @@
 #include "cspace_sentinel.h"
 #include "cspace_epsilon_neighborhood.h"
 
-MotionPlanner::MotionPlanner(RobotWorld *world):
-  _world(world)
+MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
+  world(world_), input(input_)
 {
-  _irobot = 0;
-  _icontroller = 0;
+  _irobot = input.robot_idx;
   robot = world->robots[_irobot];
+  _icontroller = 0;
 }
 PlannerOutput MotionPlanner::GetOutput(){
+  output.robot_idx = _irobot;
   return output;
 }
 PlannerInput MotionPlanner::GetInput(){
@@ -209,7 +210,7 @@ std::string MotionPlanner::getName(){
 bool MotionPlanner::IsFeasible( Robot *robot, SingleRobotCSpace &cspace, Config &q){
   if(!cspace.IsFeasible(q)) {
     std::cout << std::string(80, '*') << std::endl;
-    std::cout << "ERROR!" << std::endl;
+    std::cout << "Robot " << robot->name << std::endl;
     std::cout << std::string(80, '*') << std::endl;
     vector<bool> infeasible;
     cspace.CheckObstacles(q,infeasible);

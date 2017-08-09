@@ -37,8 +37,8 @@ int main(int argc,const char** argv) {
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
   PlannerInput pin = env.GetPlannerInput();
 
-  MotionPlannerOMPL planner(env.GetWorldPtr());
-  planner.solve(pin);
+  MotionPlannerOMPL planner(env.GetWorldPtr(), pin);
+  planner.solve();
 
   env.GetBackendPtr()->AddPlannerIO( planner.GetInput(), planner.GetOutput() );
 

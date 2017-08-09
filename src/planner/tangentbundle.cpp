@@ -279,8 +279,10 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   for(int i = 0; i < N; i++){
     resultRn->values[i] = ssrRn->values[i];
   }
-  for(int i = 0; i < N+6; i++){
-    resultTM->values[i] = ssrTM->values[i];
+  if(N>0){
+    for(int i = 0; i < N+6; i++){
+      resultTM->values[i] = ssrTM->values[i];
+    }
   }
 
 }

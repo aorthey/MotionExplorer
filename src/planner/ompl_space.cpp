@@ -10,6 +10,43 @@ GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
 {
 }
 
+void GeometricCSpaceOMPL::print()
+{
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "OMPL CSPACE" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "Dimensionality Space      :" << GetDimensionality() << std::endl;
+
+  ob::SE3StateSpace *cspaceSE3;
+  ob::RealVectorStateSpace *cspaceRn;
+
+  uint N =  robot->q.size() - 6;
+  if(N>0){
+    cspaceSE3 = space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
+    cspaceRn = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+  }else{
+    cspaceSE3 = space->as<ob::SE3StateSpace>();
+  }
+
+//################################################################################
+  const ob::RealVectorBounds bounds = cspaceSE3->getBounds();
+  std::vector<double> se3min = bounds.low;
+  std::vector<double> se3max = bounds.high;
+  std::cout << "SE(3) bounds min     : ";
+  for(int i = 0; i < se3min.size(); i++){
+    std::cout << " " << se3min.at(i);
+  }
+  std::cout << std::endl;
+
+  std::cout << "SE(3) bounds max     : ";
+  for(int i = 0; i < se3max.size(); i++){
+    std::cout << " " << se3max.at(i);
+  }
+  std::cout << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+
+}
+
 void GeometricCSpaceOMPL::initSpace()
 {
   //###########################################################################
@@ -26,11 +63,21 @@ void GeometricCSpaceOMPL::initSpace()
   std::cout << "[MotionPlanner] Robot CSpace: SE(3) x R^"<<N<<std::endl;
 
   ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());
-  ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(N));
 
-  this->space = SE3 + Rn;
-  ob::SE3StateSpace *cspaceSE3 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
-  ob::RealVectorStateSpace *cspaceRn = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+  ob::SE3StateSpace *cspaceSE3;
+  ob::RealVectorStateSpace *cspaceRn;
+
+  if(N>0){
+    ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(N));
+    this->space = SE3 + Rn;
+    cspaceSE3 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
+    cspaceRn = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+  }else{
+    this->space = SE3;
+    cspaceSE3 = this->space->as<ob::SE3StateSpace>();
+  }
+
+
 
   //ob::CompoundStateSpace *cspace = this->space->as<ob::CompoundStateSpace>();
   //cspace->setSubspaceWeight(0,1);
@@ -61,25 +108,27 @@ void GeometricCSpaceOMPL::initSpace()
   cspaceSE3->setBounds(boundsSE3);
   boundsSE3.check();
 
-  vector<double> lowRn, highRn;
-  for(int i = 0; i < N; i++){
-    lowRn.push_back(minimum.at(i+6));
-    highRn.push_back(maximum.at(i+6));
-  }
-  ob::RealVectorBounds boundsRn(N);
-
-  //ompl does only accept dimensions with strictly positive measure, adding some epsilon space
-  double epsilonSpacing=1e-8;
-  for(int i = 0; i < N; i++){
-    if(abs(lowRn.at(i)-highRn.at(i))<epsilonSpacing){
-      highRn.at(i)+=epsilonSpacing;
+  if(N>0){
+    vector<double> lowRn, highRn;
+    for(int i = 0; i < N; i++){
+      lowRn.push_back(minimum.at(i+6));
+      highRn.push_back(maximum.at(i+6));
     }
-  }
+    ob::RealVectorBounds boundsRn(N);
 
-  boundsRn.low = lowRn;
-  boundsRn.high = highRn;
-  boundsRn.check();
-  cspaceRn->setBounds(boundsRn);
+    //ompl does only accept dimensions with strictly positive measure, adding some epsilon space
+    double epsilonSpacing=1e-8;
+    for(int i = 0; i < N; i++){
+      if(abs(lowRn.at(i)-highRn.at(i))<epsilonSpacing){
+        highRn.at(i)+=epsilonSpacing;
+      }
+    }
+
+    boundsRn.low = lowRn;
+    boundsRn.high = highRn;
+    boundsRn.check();
+    cspaceRn->setBounds(boundsRn);
+  }
 
 }
 void GeometricCSpaceOMPL::initControlSpace()
@@ -138,12 +187,22 @@ ob::State* GeometricCSpaceOMPL::ConfigToOMPLStatePtr(const Config &q){
   return out;
 }
 ob::ScopedState<> GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q){
+  uint N =  space->getDimension() - 6;
   ob::ScopedState<> qompl(space);
 
-  ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
-  ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-  double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
+  ob::SE3StateSpace::StateType *qomplSE3;
+  ob::SO3StateSpace::StateType *qomplSO3;
+  ob::RealVectorStateSpace::StateType *qomplRnSpace;
+
+  if(N>0){
+    qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+    qomplSO3 = &qomplSE3->rotation();
+    qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+  }else{
+    qomplSE3 = qompl->as<ob::SE3StateSpace::StateType>();
+    qomplSO3 = &qomplSE3->rotation();
+  }
+
 
   qomplSE3->setXYZ(q[0],q[1],q[2]);
   qomplSO3->setIdentity();
@@ -171,8 +230,11 @@ ob::ScopedState<> GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q){
   //Math3D::Matrix3 qrM;
   //qr.getMatrix(qrM);
 
-  for(int i = 0; i < q.size()-6; i++){
-    qomplRn[i]=q(6+i);
+  if(N>0){
+    double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
+    for(int i = 0; i < q.size()-6; i++){
+      qomplRn[i]=q(6+i);
+    }
   }
   return qompl;
 }
@@ -221,18 +283,29 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType
   return q;
 }
 Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
-  const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+  uint N = space->getDimension() - 6;
+  if(N>0){
+    const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+    const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+    return OMPLStateToConfig(qomplSE3, qomplRnState);
+  }else{
+    const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::SE3StateSpace::StateType>();
+    return OMPLStateToConfig(qomplSE3, NULL);
 
-  return OMPLStateToConfig(qomplSE3, qomplRnState);
+  }
 
 }
 
 Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
-
-  const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-  return OMPLStateToConfig(qomplSE3, qomplRnState);
+  uint N = space->getDimension() - 6;
+  if(N>0){
+    const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+    const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+    return OMPLStateToConfig(qomplSE3, qomplRnState);
+  }else{
+    const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::SE3StateSpace::StateType>();
+    return OMPLStateToConfig(qomplSE3, NULL);
+  }
 }
 
 const oc::StatePropagatorPtr GeometricCSpaceOMPL::StatePropagatorPtr(oc::SpaceInformationPtr si)
@@ -250,6 +323,64 @@ const ob::StateValidityCheckerPtr GeometricCSpaceOMPL::StateValidityCheckerPtr(o
 KinodynamicCSpaceOMPL::KinodynamicCSpaceOMPL(Robot *robot_, CSpace *kspace_):
   CSpaceOMPL(robot_, kspace_)
 {
+
+
+}
+
+void KinodynamicCSpaceOMPL::print()
+{
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "OMPL CSPACE" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "Dimensionality Space      :" << GetDimensionality() << std::endl;
+  std::cout << "Dimensionality Ctrl Space :" << GetControlDimensionality() << std::endl;
+  ob::CompoundStateSpace *cspace = space->as<ob::CompoundStateSpace>();
+  ob::SE3StateSpace *cspaceSE3 = cspace->as<ob::SE3StateSpace>(0);
+
+  ob::RealVectorStateSpace *cspaceRn;
+  ob::RealVectorStateSpace *cspaceTM;
+
+  uint N =  robot->q.size() - 6;
+  if(N>0){
+    cspaceRn = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+    cspaceTM = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(2);
+  }else{
+    cspaceTM = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+  }
+
+//################################################################################
+  const ob::RealVectorBounds bounds = cspaceSE3->getBounds();
+  std::vector<double> se3min = bounds.low;
+  std::vector<double> se3max = bounds.high;
+  std::cout << "SE(3) bounds min     : ";
+  for(int i = 0; i < se3min.size(); i++){
+    std::cout << " " << se3min.at(i);
+  }
+  std::cout << std::endl;
+
+  std::cout << "SE(3) bounds max     : ";
+  for(int i = 0; i < se3max.size(); i++){
+    std::cout << " " << se3max.at(i);
+  }
+  std::cout << std::endl;
+
+//################################################################################
+  const ob::RealVectorBounds boundstm = cspaceTM->getBounds();
+  std::vector<double> min = boundstm.low;
+  std::vector<double> max = boundstm.high;
+  std::cout << "Vel bounds min       : ";
+  for(int i = 0; i < min.size(); i++){
+    std::cout << " " << min.at(i);
+  }
+  std::cout << std::endl;
+  std::cout << "Vel bounds max       : ";
+  for(int i = 0; i < max.size(); i++){
+    std::cout << " " << max.at(i);
+  }
+  std::cout << std::endl;
+
+
+  std::cout << std::string(80, '-') << std::endl;
 
 }
 
@@ -454,12 +585,23 @@ ob::State* KinodynamicCSpaceOMPL::ConfigToOMPLStatePtr(const Config &q){
   return out;
 }
 ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q){
+  uint N=0;
+  if(!(q.size() == space->getDimension())){
+    if(q.size() == int(0.5*space->getDimension())){
+      N = q.size()-6;
+    }else{
+      exit(0);
+    }
+  }else{
+    N = int(0.5*q.size())-6;
+    assert(12+2*N == space->getDimension());
+  }
+
+
   ob::ScopedState<> qompl(space);
 
   ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
   ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
-  ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-  ob::RealVectorStateSpace::StateType *qomplTMSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
 
   qomplSE3->setXYZ(q[0],q[1],q[2]);
   qomplSO3->setIdentity();
@@ -484,16 +626,19 @@ ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q){
   qomplSO3->z = qz;
   qomplSO3->w = qw;
 
-  //Math3D::Matrix3 qrM;
-  //qr.getMatrix(qrM);
-
+  ob::RealVectorStateSpace::StateType *qomplRnSpace;
+  ob::RealVectorStateSpace::StateType *qomplTMSpace;
+  if(N>0){
+    qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+    qomplTMSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
+  }else{
+    qomplTMSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+  }
   double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
   //q.size = 6 + N + (N+6)
 
-
   if(!(q.size() == space->getDimension())){
     if(q.size() == int(0.5*space->getDimension())){
-      uint N = q.size()-6;
       assert(12+2*N == space->getDimension());
       for(int i = 0; i < N; i++){
         qomplRn[i]=q(6+i);
@@ -562,8 +707,10 @@ Config KinodynamicCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateTy
   for(int i = 0; i < N; i++){
     q(i+6) = qomplRnState->values[i];
   }
-  for(int i = 0; i < (6+N); i++){
-    q(i+6+N) = qomplTMState->values[i];
+  if(N>0){
+    for(int i = 0; i < (6+N); i++){
+      q(i+6+N) = qomplTMState->values[i];
+    }
   }
 
   return q;
@@ -594,4 +741,72 @@ const ob::StateValidityCheckerPtr KinodynamicCSpaceOMPL::StateValidityCheckerPtr
 {
   return std::make_shared<TangentBundleOMPLValidityChecker>(si, kspace, this);
 }
+//#############################################################################
+//#############################################################################
+//#############################################################################
 
+class OMPLValidityCheckerInnerOuter: public ob::StateValidityChecker
+{
+  public:
+    OMPLValidityCheckerInnerOuter(const ob::SpaceInformationPtr &si, CSpaceOMPL *ompl_space_, CSpace *inner_, CSpace *outer_);
+    virtual bool isValid(const ob::State* state) const;
+    bool isCollisionFree(SingleRobotCSpace *space, Config q) const;
+
+    CSpace *inner;
+    CSpace *outer;
+    CSpaceOMPL *ompl_space;
+};
+
+OMPLValidityCheckerInnerOuter::OMPLValidityCheckerInnerOuter(const ob::SpaceInformationPtr &si, CSpaceOMPL *ompl_space_, CSpace *inner_, CSpace *outer_):
+  ob::StateValidityChecker(si), ompl_space(ompl_space_), inner(inner_), outer(outer_)
+{
+}
+bool OMPLValidityCheckerInnerOuter::isValid(const ob::State* state) const
+{
+  const ob::StateSpacePtr ssp = si_->getStateSpace();
+  Config q = ompl_space->OMPLStateToConfig(state);
+  SingleRobotCSpace* csi = static_cast<SingleRobotCSpace*>(inner);
+  SingleRobotCSpace* cso = static_cast<SingleRobotCSpace*>(outer);
+  return isCollisionFree(csi, q) && (!isCollisionFree(cso,q));
+}
+
+bool OMPLValidityCheckerInnerOuter::isCollisionFree(SingleRobotCSpace *space, Config q) const{
+  Robot* robot = space->GetRobot();
+  robot->UpdateConfig(q);
+  robot->UpdateGeometry();
+
+  //same as Singlerobotcspace but ignore other robots
+  int id = space->world.RobotID(space->index);
+  vector<int> idrobot(1,id);
+  vector<int> idothers;
+  for(size_t i=0;i<space->world.terrains.size();i++)
+    idothers.push_back(space->world.TerrainID(i));
+  for(size_t i=0;i<space->world.rigidObjects.size();i++)
+    idothers.push_back(space->world.RigidObjectID(i));
+
+  pair<int,int> res = space->settings->CheckCollision(space->world,idrobot,idothers);
+  if(res.first >= 0) return false;
+  res = space->settings->CheckCollision(space->world,idrobot);
+  if(res.first >= 0) return false;
+  return true;
+}
+//#############################################################################
+//#############################################################################
+//#############################################################################
+
+KinodynamicCSpaceOMPLInnerOuter::KinodynamicCSpaceOMPLInnerOuter(Robot *robot_inner_, CSpace *inner_, CSpace *outer_):
+  KinodynamicCSpaceOMPL(robot_inner_, inner_), inner(inner_), outer(outer_){
+
+}
+
+const ob::StateValidityCheckerPtr KinodynamicCSpaceOMPLInnerOuter::StateValidityCheckerPtr(oc::SpaceInformationPtr si){
+  return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, inner, outer);
+}
+GeometricCSpaceOMPLInnerOuter::GeometricCSpaceOMPLInnerOuter(Robot *robot_inner_, CSpace *inner_, CSpace *outer_):
+  GeometricCSpaceOMPL(robot_inner_, inner_), inner(inner_), outer(outer_){
+
+}
+
+const ob::StateValidityCheckerPtr GeometricCSpaceOMPLInnerOuter::StateValidityCheckerPtr(oc::SpaceInformationPtr si){
+  return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, inner, outer);
+}

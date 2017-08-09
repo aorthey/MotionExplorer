@@ -50,9 +50,9 @@ namespace ot = ompl::tools;
 class MotionPlannerOMPL: public MotionPlanner
 {
   public:
-    MotionPlannerOMPL(RobotWorld *world);
+    MotionPlannerOMPL(RobotWorld *world_, PlannerInput& input_);
     void SerializeTree(ob::PlannerData &pd);
-    virtual bool solve(PlannerInput& input_);
+    virtual bool solve();
     void WorkspaceApproximationPlanner(PlannerInput &input);
 
     static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)

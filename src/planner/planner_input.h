@@ -14,6 +14,9 @@ struct PlannerInput{
   Config qMin;
   Config qMax;
 
+  int robot_idx;
+  int robot_idx_outer_shell;
+
   double epsilon_goalregion;
   double max_planning_time;
   double timestep_min, timestep_max;
@@ -36,6 +39,8 @@ struct PlannerInput{
     out << "discr timestep    : [" << pin.timestep_min << "," << pin.timestep_max << "]" << std::endl;
     out << "max planning time : " << pin.max_planning_time << " (seconds)" << std::endl;
     out << "epsilon_goalregion: " << pin.epsilon_goalregion<< std::endl;
+    out << "robot index       : " << pin.robot_idx << std::endl;
+    out << "robot index       : " << pin.robot_idx_outer_shell << std::endl;
     out << std::string(80, '-') << std::endl;
     return out;
   }

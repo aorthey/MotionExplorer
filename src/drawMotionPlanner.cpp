@@ -531,7 +531,8 @@ namespace GLDraw{
       glPushMatrix();
       glTranslate(pos);
 
-      glPointSize(vertexSize);
+      //glPointSize(vertexSize);
+      glPointSize(10);
       drawPoint(Vector3(0,0,0));
 
       glPushMatrix();

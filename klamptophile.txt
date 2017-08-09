@@ -628,6 +628,7 @@ COM should retain orientation equal to origin so that we can see forces from
  [ ] put all the loader stuff into separate folder each with one file
 
 -- important
+
  [x] self collisions occuring when simulating atlas in Klampt. ODERobot
 correctly determines that collision occurs. But why is it not avoided? maybe
 force too strong? but then terrain would be permeated, too.
@@ -652,7 +653,12 @@ self-collision forces?
  [x] design cave environment
  [x] force is applied even with 000 force field (didn't remove se3drivers)
  [ ] ompl:rrt applied to workspace planner, rework the planning interface
+    [ ] do planning with timelimit and no success return
+    [ ] extract tree, display all 
+    [ ] compute homotopy classes
 
+ [ ] planning with two robot entities inner/outer SV
+    [ ] make cspace with two robots, inherit from kinodynamiccspace, make robot + outer shell 
 
 -- redesign UI
  [ ] create three hotkey groups: Env Manipulation, Path Manipulation, Robot Manipulation and Simulation

@@ -56,6 +56,7 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     std::cout << "But actual type is: " << world.robots[0]->joints[0].type << std::endl;
     exit(0);
   }
+
   Robot *robot = world.robots[0];
 
 
@@ -129,6 +130,8 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
 
   if(LoadPlannerSettings(file_name.c_str())){
 
+    Robot *robot = world.robots[pin.robot_idx];
+
     for(int i = 0; i < 6; i++){
       robot->qMin[i] = pin.se3min[i];
       robot->qMax[i] = pin.se3max[i];
@@ -140,7 +143,7 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     robot->UpdateFrames();
 
     //set oderobot to planner start pos
-    ODERobot *simrobot = _backend->sim.odesim.robot(0);
+    ODERobot *simrobot = _backend->sim.odesim.robot(pin.robot_idx);
     simrobot->SetConfig(pin.q_init);
     Vector dq;
     _backend->sim.odesim.robot(0)->GetVelocities(dq);
@@ -204,6 +207,20 @@ bool EnvironmentLoader::LoadPlannerSettings(TiXmlElement *node)
   GetStreamAttribute(se3min,"config")  >> pin.se3min;
   GetStreamAttribute(se3max,"config")  >> pin.se3max;
   GetStreamText(algorithm) >> pin.name_algorithm;
+
+  TiXmlElement* robot = FindSubNode(plannersettings, "robot");
+  if(robot){
+    TiXmlElement* rindex = FindSubNode(robot, "index");
+    if(rindex) GetStreamText(rindex) >> pin.robot_idx;
+    else pin.robot_idx = 0;
+
+    TiXmlElement* rindexos = FindSubNode(robot, "indexoutershell");
+    if(rindexos) GetStreamText(rindexos) >> pin.robot_idx_outer_shell;
+    else pin.robot_idx_outer_shell = -1;
+  }else{
+    pin.robot_idx = 0;
+    pin.robot_idx_outer_shell = -1;
+  }
 
   return true;
 }

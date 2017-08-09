@@ -25,9 +25,10 @@ class PlannerOutput{
     std::vector<Config> ddq;
     std::vector<Vector> torques;
 
-
-
   public:
+
+    uint robot_idx;
+
     WorkspaceApproximation workspace;
     PlannerOutput(){};
 

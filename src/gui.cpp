@@ -423,9 +423,9 @@ void ForceFieldBackend::RenderWorld()
   // drawaxeslabels       : labelling of the coordinate axes [needs fixing]
   //############################################################################
 
-  if(drawWorkspaceApproximation) GLDraw::drawWorkspaceApproximationSpheres(plannerOutput);
+  //if(drawWorkspaceApproximation) GLDraw::drawWorkspaceApproximationSpheres(plannerOutput);
   //if(drawCenterOfMassPath) GLDraw::drawCenterOfMassPathFromController(sim);
-  if(drawForceEllipsoid) GLDraw::drawForceEllipsoid(oderobot);
+  //if(drawForceEllipsoid) GLDraw::drawForceEllipsoid(oderobot);
 
   if(!world->terrains.empty() && drawDistanceRobotTerrain){
     const Terrain *terrain = world->terrains[0];
@@ -438,19 +438,26 @@ void ForceFieldBackend::RenderWorld()
   if(drawWrenchField) GLDraw::drawWrenchField(wrenchfield);
 
   for(int i = 0; i < plannerInput.size(); i++){
+    uint ridx = plannerInput.at(i).robot_idx;
+    Robot *robot_i = world->robots[ridx];
+    //const ODERobot *oderobot = sim.odesim.robot(0);
+    //ViewRobot *viewRobot = &viewRobots[0];
     if(drawPathStartGoal.at(i)){
       Config qi = plannerInput.at(i).q_init;
       Config qg = plannerInput.at(i).q_goal;
-      GLDraw::drawGLPathStartGoal(robot, qi, qg);
+      GLDraw::drawGLPathStartGoal(robot_i, qi, qg);
     }
   }
 
   for(int i = 0; i < swept_volume_paths.size(); i++){
+    uint ridx = plannerInput.at(i).robot_idx;
+    Robot *robot_i = world->robots[ridx];
+
     SweptVolume sv = swept_volume_paths.at(i);
 
-    if(drawPathSweptVolume.at(i)) GLDraw::drawGLPathSweptVolume(robot, sv.GetMatrices(), _appearanceStack, sv.GetColor());
-    if(drawPathMilestones.at(i)) GLDraw::drawGLPathKeyframes(robot, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack, sv.GetColorMilestones());
-    if(drawPathStartGoal.at(i)) GLDraw::drawGLPathStartGoal(robot, sv.GetStart(), sv.GetGoal());
+    if(drawPathSweptVolume.at(i)) GLDraw::drawGLPathSweptVolume(robot_i, sv.GetMatrices(), _appearanceStack, sv.GetColor());
+    if(drawPathMilestones.at(i)) GLDraw::drawGLPathKeyframes(robot_i, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack, sv.GetColorMilestones());
+    if(drawPathStartGoal.at(i)) GLDraw::drawGLPathStartGoal(robot_i, sv.GetStart(), sv.GetGoal());
   }
 
   if(drawPlannerTree) GLDraw::drawPlannerTree(_stree);
@@ -729,7 +736,7 @@ void ForceFieldBackend::AddPlannerOutput( PlannerOutput pout )
   plannerOutput.push_back(pout);
   std::vector<Config> keyframes = pout.GetKeyframes();
   if(keyframes.size()>0){
-    AddPath(keyframes);
+    AddPath(keyframes, GLColor(0.8,0.8,0.8), 10, pout.robot_idx);
   }
   VisualizePlannerTree(pout.GetTree());
 }
@@ -754,26 +761,6 @@ void ForceFieldBackend::SendPlannerOutputToController()
       SendCommandStringController(cmd,qstr.str());
     }
 
-
-    // ControlledRobotSimulator *rsim = &sim.controlSimulators[0];
-    // rsim->UpdateRobot();
-
-    // std::vector<Config> keyframes;
-
-    // rsim->curTime = 0.0;
-    // for(int i = 0; i < torques.size(); i++){
-    //   Config q;
-    //   rsim->GetSensedConfig(q);
-    //   keyframes.push_back(q);
-    
-    //   uint Ntime = torques.at(i).size()-1;
-    //   double dt = torques.at(i)(Ntime);
-    //   std::cout << dt << std::endl;
-    //   rsim->Update(dt);
-    // }
-    // rsim->curTime = 0.0;
-
-    // if(keyframes.size()>0) AddPath(keyframes);
 
   }
 }
@@ -848,9 +835,9 @@ void ForceFieldBackend::AddPathInterpolate(const std::vector<Config> &keyframes,
 
   AddPath(interp_keyframes, color, Nkeyframes_alongpath);
 }
-void ForceFieldBackend::AddPath(const std::vector<Config> &keyframes, GLColor color, uint Nkeyframes_alongpath)
+void ForceFieldBackend::AddPath(const std::vector<Config> &keyframes, GLColor color, uint Nkeyframes_alongpath, uint robot_idx)
 {
-  Robot *robot = world->robots[0];
+  Robot *robot = world->robots[robot_idx];
   SweptVolume sv(robot, keyframes, Nkeyframes_alongpath);
   sv.SetColor(color);
   swept_volume_paths.push_back(sv);
@@ -1007,8 +994,8 @@ bool GLUIForceFieldGUI::Initialize()
 
   ForceFieldBackend* _backend = static_cast<ForceFieldBackend*>(backend);
 
-  std::cout << "Open Loop Controller Setup" << std::endl;
-  _backend->SendPlannerOutputToController();
+  //std::cout << "Open Loop Controller Setup" << std::endl;
+  //_backend->SendPlannerOutputToController();
 
 
   panel = glui->add_rollout("Motion Planning");
@@ -1042,8 +1029,9 @@ bool GLUIForceFieldGUI::Initialize()
     linkBox = glui->add_listbox_to_panel(panel,"Show Link",NULL);
     //toggleMeasurementDrawCheckbox = glui->add_checkbox_to_panel(panel,"Plot value");
 
-    Robot* robot = world->robots[0];
+    Robot* robot = world->robots[_backend->plannerOutput.at(i).robot_idx];
     uint Nlinks = robot->links.size();
+    std::cout << "path " << i << "with links " << robot->links.size() << std::endl;
     for(size_t i=0;i<robot->links.size();i++)
     {
       char buf[256];

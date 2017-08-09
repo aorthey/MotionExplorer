@@ -67,6 +67,8 @@ class CSpaceOMPL
       input = input_;
     }
 
+    virtual void print() = 0;
+
   protected:
     PlannerInput input;
 
@@ -76,6 +78,9 @@ class CSpaceOMPL
     CSpace *kspace;
     Robot *robot;
 };
+//GeometricCSpaceOMPL: Space = Configuration manifold; control space = tangent
+//space of configuration manifold, i.e. control happens in velocity space
+//
 class GeometricCSpaceOMPL: public CSpaceOMPL
 {
   public:
@@ -94,8 +99,15 @@ class GeometricCSpaceOMPL: public CSpaceOMPL
     virtual Config OMPLStateToConfig(const ob::State *qompl);
 
     Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState);
+
+    virtual void print();
 };
 
+//KinodynamicCSpaceOMPL: Space = tangent bundle of configuration manifold;
+//control space = tangent space of tangent bundle, i.e. control happens in
+//acceleration space, i.e. we can control torques of revolute joints, forces
+//of prismatic joints, and any additional booster/thruster which act directly
+//on the se(3) component
 
 class KinodynamicCSpaceOMPL: public CSpaceOMPL
 {
@@ -115,8 +127,37 @@ class KinodynamicCSpaceOMPL: public CSpaceOMPL
     virtual Config OMPLStateToConfig(const ob::State *qompl);
 
     Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState, const ob::RealVectorStateSpace::StateType *qomplTMState);
+
+    virtual void print();
 };
 
+//KinodynamicCSpaceOMPLInnerOuter: same as KinodynamicCSpaceOMPL but there is
+//one more robot added. This robot is called outer shell robot. A configuration
+//is valid iff the original robot is feasible AND the outer shell robot is
+//infeasible. In this case the original robot can be in contact with the
+//environment. 
+//
+
+class KinodynamicCSpaceOMPLInnerOuter: public KinodynamicCSpaceOMPL
+{
+  public:
+    KinodynamicCSpaceOMPLInnerOuter(Robot *robot_inner, CSpace *inner, CSpace *outer);
+
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si);
+
+    CSpace *inner;
+    CSpace *outer;
+};
+class GeometricCSpaceOMPLInnerOuter: public GeometricCSpaceOMPL
+{
+  public:
+    GeometricCSpaceOMPLInnerOuter(Robot *robot_inner, CSpace *inner, CSpace *outer);
+
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si);
+
+    CSpace *inner;
+    CSpace *outer;
+};
 
 class CSpaceFactory{
   private:
@@ -132,6 +173,20 @@ class CSpaceFactory{
     }
     virtual KinodynamicCSpaceOMPL* MakeKinodynamicCSpace( Robot *robot, CSpace *kspace){
       KinodynamicCSpaceOMPL *cspace = new KinodynamicCSpaceOMPL(robot, kspace);
+      cspace->SetPlannerInput(input);
+      cspace->initSpace();
+      cspace->initControlSpace();
+      return cspace;
+    }
+    virtual KinodynamicCSpaceOMPL* MakeKinodynamicCSpaceInnerOuter( Robot *robot, CSpace *inner, CSpace *outer ){
+      KinodynamicCSpaceOMPL *cspace = new KinodynamicCSpaceOMPLInnerOuter(robot, inner, outer);
+      cspace->SetPlannerInput(input);
+      cspace->initSpace();
+      cspace->initControlSpace();
+      return cspace;
+    }
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceInnerOuter( Robot *robot, CSpace *inner, CSpace *outer ){
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLInnerOuter(robot, inner, outer);
       cspace->SetPlannerInput(input);
       cspace->initSpace();
       cspace->initControlSpace();

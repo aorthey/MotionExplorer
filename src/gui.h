@@ -55,6 +55,8 @@ class GUIVariable
 
 class ForceFieldBackend : public SimTestBackend
 {
+    friend class GLUIForceFieldGUI;
+
   protected:
 
     typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
@@ -120,7 +122,7 @@ class ForceFieldBackend : public SimTestBackend
 
     uint getNumberOfPaths();
 
-    void AddPath(const std::vector<Config> &keyframes, GLColor color = GLColor(0.8,0.8,0.8), uint Nkeyframes_alongpath=10);
+    void AddPath(const std::vector<Config> &keyframes, GLColor color = GLColor(0.8,0.8,0.8), uint Nkeyframes_alongpath=10, uint robot_idx=0);
     void AddPathInterpolate(const std::vector<Config> &keyframes, GLColor color = GLColor(0.8,0.8,0.8), uint Nkeyframes_alongpath=10);
 
     const std::vector<Config>& getPathKeyFrames(uint pathid);

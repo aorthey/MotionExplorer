@@ -21,9 +21,9 @@ class MotionPlanner{
   protected:
     PlannerInput input;
     PlannerOutput output;
-
-    RobotWorld *_world;
+    RobotWorld *world;
     Robot *robot;
+
     int _irobot;
     int _icontroller;
     Config _p_init;
@@ -34,10 +34,13 @@ class MotionPlanner{
 
   public:
 
+    explicit MotionPlanner(RobotWorld *world_, PlannerInput& input_);
+
+    virtual bool solve() = 0;
+
     PlannerInput GetInput();
     PlannerOutput GetOutput();
 
-    explicit MotionPlanner(RobotWorld *world);
     const KinodynamicMilestonePath& GetPath();
     const std::vector<Config>& GetKeyframes();
     const SerializedTree& GetTree();
@@ -49,12 +52,6 @@ class MotionPlanner{
     //Delete all nodes from the tree with distance < epsilon to another node
     void SerializeTreeCullClosePoints(SerializedTree &_stree, CSpace *base, double epsilon=0.1);
     void SerializeTreeRandomlyCullPoints(SerializedTree &_stree, uint N=1000);
-
-    virtual bool solve(Config &p_init, Config &p_goal, double timelimit=100.0, bool shortcutting=true){
-      std::cout << "Error: deprecated function" << std::endl;
-      exit(0);
-    }
-    virtual bool solve(PlannerInput& input_) = 0;
 
     //void SendCommandStringController(string cmd, string arg);
     //bool SendToController();

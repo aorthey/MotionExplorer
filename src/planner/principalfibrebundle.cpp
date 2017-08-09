@@ -193,14 +193,19 @@ void PrincipalFibreBundleIntegrator::propagate(const ob::State *state, const oc:
 
   ob::ScopedState<> ssr = ompl_space->ConfigToOMPLState(qend);
 
-  ob::SE3StateSpace::StateType *ssrSE3 = ssr->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  ob::SE3StateSpace::StateType *ssrSE3;
+  ob::SE3StateSpace::StateType *resultSE3;
+
+  if(N>0){
+    ssrSE3 = ssr->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+    resultSE3 = result->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  }else{
+    ssrSE3 = ssr->as<ob::SE3StateSpace::StateType>();
+    resultSE3 = result->as<ob::SE3StateSpace::StateType>();
+  }
+
   ob::SO3StateSpace::StateType *ssrSO3 = &ssrSE3->rotation();
-  ob::RealVectorStateSpace::StateType *ssrRn = ssr->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-
-  ob::SE3StateSpace::StateType *resultSE3 = result->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
   ob::SO3StateSpace::StateType *resultSO3 = &resultSE3->rotation();
-  ob::RealVectorStateSpace::StateType *resultRn = result->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-
   resultSE3->setXYZ(ssrSE3->getX(),ssrSE3->getY(),ssrSE3->getZ());
   resultSO3->x = ssrSO3->x;
   resultSO3->y = ssrSO3->y;
@@ -210,8 +215,12 @@ void PrincipalFibreBundleIntegrator::propagate(const ob::State *state, const oc:
   //###########################################################################
   // R^N Control
   //###########################################################################
-  for(int i = 0; i < N; i++){
-    resultRn->values[i] = ssrRn->values[i];
+  if(N>0){
+    ob::RealVectorStateSpace::StateType *ssrRn = ssr->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+    ob::RealVectorStateSpace::StateType *resultRn = result->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+    for(int i = 0; i < N; i++){
+      resultRn->values[i] = ssrRn->values[i];
+    }
   }
 
 }
