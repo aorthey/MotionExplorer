@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot name="sphere_outer">
+<link name="sphere_outer">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.036" ixy="0" ixz="0" iyy="0.036" iyz="0" izz="0.036"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="1.5"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="1.5"/>
+    </geometry>
+  </visual>
+</link>
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>
+
