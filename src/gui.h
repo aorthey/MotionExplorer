@@ -52,6 +52,21 @@ class GUIVariable
     }
 };
 
+//visualize a single planner outcome
+class PlannerOutputVisualizer
+{
+  vector<IKGoal> constraints;
+  vector<int> linksInCollision;
+  string robotname;
+  uint robot_idx;
+
+  vector<GLDraw::GeometryAppearance> _appearanceStack;
+  SweptVolume swept_volume_path;
+
+  vector< vector<Vector3> > _frames;
+  vector< double > _frameLength;
+
+};
 class ForceFieldBackend : public SimTestBackend
 {
     friend class GLUIForceFieldGUI;

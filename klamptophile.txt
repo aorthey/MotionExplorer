@@ -667,5 +667,8 @@ self-collision forces?
    [ ] visualize level path
    [ ] visualize level all paths
 
-
 [ ] planner should retain option to do standard kino/geo planning with ompl
+[ ] planner needs refactoring: new folders validator/integrator. new class setup
+which takes settings and produces a cspace and an algorithm taking
+validator/integrator into account. This setup file should then be replaced by
+Hplanner, so we need to give it more meaningful name 
