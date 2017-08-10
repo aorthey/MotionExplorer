@@ -21,14 +21,13 @@ SweptVolume::SweptVolume(Robot *robot, const std::vector<Config> &keyframes, uin
     Config q = keyframes.at(i);
     AddKeyframe(q);
   }
-  init = _keyframes.front();
-  goal = _keyframes.back();
+  if(keyframes.size()>0){
+    init = _keyframes.front();
+    goal = _keyframes.back();
+  }
   //compute keyframe indices 
   if(Nkeyframes > keyframes.size()){
     Nkeyframes = keyframes.size();
-  }
-  if(Nkeyframes < 1){
-    Nkeyframes=0;
   }
   _keyframe_indices.clear();
 
@@ -41,7 +40,6 @@ SweptVolume::SweptVolume(Robot *robot, const std::vector<Config> &keyframes, uin
     _keyframe_indices.push_back(Ncur);
     Ncur += Nstep;
   }
-  //std::cout << "Milestone visualization indicies: " << _keyframe_indices << std::endl;
 }
 
 const std::vector<std::vector<Matrix4> >& SweptVolume::GetMatrices(){

@@ -187,6 +187,14 @@ bool EnvironmentLoader::LoadPlannerSettings(TiXmlElement *node)
   TiXmlElement* max_planning_time = FindSubNode(plannersettings, "maxplanningtime");
   TiXmlElement* epsilon_goalregion = FindSubNode(plannersettings, "epsilongoalregion");
 
+  TiXmlElement* drawTree = FindSubNode(plannersettings, "drawTree");
+  TiXmlElement* drawSweptVolume = FindSubNode(plannersettings, "drawSweptVolume");
+  TiXmlElement* drawMilestones = FindSubNode(plannersettings, "drawMilestones");
+  TiXmlElement* drawStartGoal = FindSubNode(plannersettings, "drawStartGoal");
+  GetStreamText(drawTree) >> pin.drawTree;
+  GetStreamText(drawSweptVolume) >> pin.drawSweptVolume;
+  GetStreamText(drawMilestones) >> pin.drawMilestones;
+  GetStreamText(drawStartGoal) >> pin.drawStartGoal;
 
   GetStreamAttribute(qinit,"config") >> pin.q_init;
   GetStreamAttribute(qgoal,"config") >> pin.q_goal;

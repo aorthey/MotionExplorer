@@ -24,6 +24,11 @@ struct PlannerInput{
   Config se3min;
   Config se3max;
 
+  int drawTree;
+  int drawSweptVolume;
+  int drawMilestones;
+  int drawStartGoal;
+
   friend std::ostream& operator<< (std::ostream& out, const PlannerInput& pin) 
   {
     out << std::string(80, '-') << std::endl;

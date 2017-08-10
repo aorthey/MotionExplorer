@@ -115,44 +115,44 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
 }
 
 
-void MotionPlannerOMPL::WorkspaceApproximationPlanner(PlannerInput &input){
+// void MotionPlannerOMPL::WorkspaceApproximationPlanner(PlannerInput &input){
 
-  WorldPlannerSettings worldsettings;
-  worldsettings.InitializeDefault(*world);
+//   WorldPlannerSettings worldsettings;
+//   worldsettings.InitializeDefault(*world);
 
-  SingleRobotCSpace sphere_inner = SingleRobotCSpace(*world,1,&worldsettings);
-  SingleRobotCSpace sphere_outer = SingleRobotCSpace(*world,2,&worldsettings);
+//   SingleRobotCSpace sphere_inner = SingleRobotCSpace(*world,1,&worldsettings);
+//   SingleRobotCSpace sphere_outer = SingleRobotCSpace(*world,2,&worldsettings);
 
-  Vector3 init,goal;
-  for(int i = 0; i < 3; i++){
-    init[i] = input.q_init[i];
-    goal[i] = input.q_goal[i];
-  }
-  PlannerWorkspaceApproximation planner_workspace(init,goal,&sphere_inner,&sphere_outer);
-  planner_workspace.solve();
-  std::vector<Vector3> tree = planner_workspace.tree;
-  std::cout << " tree contains  " << tree.size() << " vertices" << std::endl;
+//   Vector3 init,goal;
+//   for(int i = 0; i < 3; i++){
+//     init[i] = input.q_init[i];
+//     goal[i] = input.q_goal[i];
+//   }
+//   PlannerWorkspaceApproximation planner_workspace(init,goal,&sphere_inner,&sphere_outer);
+//   planner_workspace.solve();
+//   std::vector<Vector3> tree = planner_workspace.tree;
+//   std::cout << " tree contains  " << tree.size() << " vertices" << std::endl;
 
-  for(uint i = 0; i < tree.size(); i++){
-    Vector3 s = tree.at(i);
+//   for(uint i = 0; i < tree.size(); i++){
+//     Vector3 s = tree.at(i);
 
-    WorkspaceApproximationElement w;
-    w.pos = Vector3(s[0],s[1],s[2]);
-    w.inner_radius = planner_workspace.inner_radius;
-    w.outer_radius = planner_workspace.outer_radius;
+//     WorkspaceApproximationElement w;
+//     w.pos = Vector3(s[0],s[1],s[2]);
+//     w.inner_radius = planner_workspace.inner_radius;
+//     w.outer_radius = planner_workspace.outer_radius;
 
-    output.workspace.elements.push_back(w);
-  }
+//     output.workspace.elements.push_back(w);
+//   }
 
-}
+// }
 
 
 bool MotionPlannerOMPL::solve()
 {
-  //input = input_;
 
   Config p_init = input.q_init;
   Config p_goal = input.q_goal;
+
   std::string algorithm = input.name_algorithm;
 
   robot->UpdateConfig(p_init);

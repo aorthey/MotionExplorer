@@ -10,7 +10,28 @@ struct WorkspaceApproximation{
   std::vector<WorkspaceApproximationElement> elements;
 };
 
+struct HierarchicalLevel{
+  uint idx;
+  std::string name;
+  std::vector<Config> V;
+  //geometry
+};
+
 class PlannerOutput{
+  public:
+    uint robot_idx;
+    std::string name_robot;
+    std::string name_algorithm;
+
+    Config q_init;
+    Config q_goal;
+    Config dq_init;
+    Config dq_goal;
+
+    int drawTree;
+    int drawSweptVolume;
+    int drawMilestones;
+    int drawStartGoal;
 
   private:
     double time;
@@ -25,12 +46,18 @@ class PlannerOutput{
     std::vector<Config> ddq;
     std::vector<Vector> torques;
 
+    std::vector<HierarchicalLevel> hierarchy;
   public:
-
-    uint robot_idx;
 
     WorkspaceApproximation workspace;
     PlannerOutput(){};
+
+    void SetHierarchy(std::vector<HierarchicalLevel> &hierarchy_){
+      hierarchy = hierarchy_;
+    }
+    const std::vector<HierarchicalLevel>& GetHierarchy(){
+      return hierarchy;
+    }
 
     void SetTorques(std::vector<Vector> &torques_){
       torques = torques_;

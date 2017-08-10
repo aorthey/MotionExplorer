@@ -21,9 +21,6 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
     : SimTestBackend(world)
 {
 
-  showSweptVolumes = 0;
-
-  drawWorkspaceApproximation = 1;
 
   drawForceField = 0;
   drawWrenchField = 0;
@@ -34,7 +31,6 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawDistanceRobotTerrain = 1;
   drawCenterOfMassPath = 1;
 
-  drawPlannerTree = 1;
   drawRigidObjects = 1;
   drawRigidObjectsEdges = 1;
   drawRigidObjectsFaces = 0;
@@ -43,8 +39,6 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawAxesLabels = 0;
   drawRobot = 0;
   drawRobotExtras = 0;
-
-  MapButtonToggle("draw_planner_tree",&drawPlannerTree);
 
   MapButtonToggle("draw_rigid_objects_faces",&drawRigidObjectsFaces);
   MapButtonToggle("draw_rigid_objects_edges",&drawRigidObjectsEdges);
@@ -63,18 +57,17 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawPathSweptVolume.clear();
   drawPathMilestones.clear();
   drawPathStartGoal.clear();
+  drawPlannerTree.clear();
 
   _frames.clear();
   swept_volume_paths.clear();
 }
 void ForceFieldBackend::ShowSweptVolumes(){ 
-  showSweptVolumes = 1;
   for(int i = 0; i < drawPathSweptVolume.size(); i++){
     drawPathSweptVolume.at(i) = 1;
   }
 }
 void ForceFieldBackend::HideSweptVolumes(){ 
-  showSweptVolumes = 0;
   for(int i = 0; i < drawPathSweptVolume.size(); i++){
     drawPathSweptVolume.at(i) = 0;
   }
@@ -87,6 +80,16 @@ void ForceFieldBackend::ShowMilestones(){
 void ForceFieldBackend::HideMilestones(){ 
   for(int i = 0; i < drawPathMilestones.size(); i++){
     drawPathMilestones.at(i) = 0;
+  }
+}
+void ForceFieldBackend::ShowPlannerTree(){ 
+  for(int i = 0; i < drawPlannerTree.size(); i++){
+    drawPlannerTree.at(i) = 1;
+  }
+}
+void ForceFieldBackend::HidePlannerTree(){ 
+  for(int i = 0; i < drawPlannerTree.size(); i++){
+    drawPlannerTree.at(i) = 0;
   }
 }
 
@@ -205,20 +208,26 @@ void ForceFieldBackend::Start()
   drawPathSweptVolume.clear();
   drawPathMilestones.clear();
   drawPathStartGoal.clear();
+  drawPlannerTree.clear();
 
   std::cout << "Setting swept volume paths" << std::endl;
-  for(int i = 0; i < plannerInput.size(); i++){
-    drawPathSweptVolume.push_back(showSweptVolumes);
-    drawPathMilestones.push_back(0);
-    drawPathStartGoal.push_back(1);
+  for(int i = 0; i < plannerOutput.size(); i++){
+    drawPathSweptVolume.push_back(plannerOutput.at(i).drawSweptVolume);
+    drawPathStartGoal.push_back(plannerOutput.at(i).drawStartGoal);
+    drawPlannerTree.push_back(plannerOutput.at(i).drawTree);
+
+    if(plannerOutput.at(i).drawMilestones) drawPathMilestones.push_back(1);
+    else drawPathMilestones.push_back(0);
   }
-  for(int i = 0; i < plannerInput.size(); i++){
+  for(int i = 0; i < plannerOutput.size(); i++){
     std::string dpsv = "draw_path_swept_volume_"+std::to_string(i);
     MapButtonToggle(dpsv.c_str(),&drawPathSweptVolume.at(i));
     std::string dpms = "draw_path_milestones_"+std::to_string(i);
     MapButtonToggle(dpms.c_str(),&drawPathMilestones.at(i));
     std::string dpsg = "draw_path_start_goal_"+std::to_string(i);
     MapButtonToggle(dpsg.c_str(),&drawPathStartGoal.at(i));
+    std::string dpt = "draw_planner_tree_"+std::to_string(i);
+    MapButtonToggle(dpt.c_str(),&drawPlannerTree.at(i));
   }
 
   std::cout << "Finished Initializing Backend" << std::endl;
@@ -437,30 +446,30 @@ void ForceFieldBackend::RenderWorld()
   if(drawForceField) GLDraw::drawForceField(wrenchfield);
   if(drawWrenchField) GLDraw::drawWrenchField(wrenchfield);
 
-  for(int i = 0; i < plannerInput.size(); i++){
-    uint ridx = plannerInput.at(i).robot_idx;
+  for(int i = 0; i < plannerOutput.size(); i++){
+    uint ridx = plannerOutput.at(i).robot_idx;
     Robot *robot_i = world->robots[ridx];
-    //const ODERobot *oderobot = sim.odesim.robot(0);
-    //ViewRobot *viewRobot = &viewRobots[0];
+    SweptVolume sv = swept_volume_paths.at(i);
+
     if(drawPathStartGoal.at(i)){
-      Config qi = plannerInput.at(i).q_init;
-      Config qg = plannerInput.at(i).q_goal;
+      Config qi = plannerOutput.at(i).q_init;
+      Config qg = plannerOutput.at(i).q_goal;
       GLDraw::drawGLPathStartGoal(robot_i, qi, qg);
     }
-  }
-
-  for(int i = 0; i < swept_volume_paths.size(); i++){
-    uint ridx = plannerInput.at(i).robot_idx;
-    Robot *robot_i = world->robots[ridx];
-
-    SweptVolume sv = swept_volume_paths.at(i);
 
     if(drawPathSweptVolume.at(i)) GLDraw::drawGLPathSweptVolume(robot_i, sv.GetMatrices(), _appearanceStack, sv.GetColor());
     if(drawPathMilestones.at(i)) GLDraw::drawGLPathKeyframes(robot_i, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack, sv.GetColorMilestones());
-    if(drawPathStartGoal.at(i)) GLDraw::drawGLPathStartGoal(robot_i, sv.GetStart(), sv.GetGoal());
+    if(drawPlannerTree.at(i)) GLDraw::drawPlannerTree(plannerOutput.at(i).GetTree());
+
+    std::vector<HierarchicalLevel> hierarchy = plannerOutput.at(i).GetHierarchy();
+    for(int j = 0; j < hierarchy.size(); j++){
+      std::cout << "Hierarchy Level " << j << std::endl;
+      std::cout << "                name " << hierarchy.at(j).name << std::endl;
+    }
+
   }
 
-  if(drawPlannerTree) GLDraw::drawPlannerTree(_stree);
+  
   if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
   if(drawAxesLabels) GLDraw::drawAxesLabels(viewport);
   if(drawFrames) GLDraw::drawFrames(_frames, _frameLength);
@@ -547,7 +556,6 @@ void ForceFieldBackend::VisualizeStartGoal(const Config &p_init, const Config &p
 bool ForceFieldBackend::Load(TiXmlElement *node)
 {
 
-  _stree.clear();
   planner_p_goal.setZero();
   planner_p_init.setZero();
 
@@ -575,18 +583,6 @@ bool ForceFieldBackend::Load(TiXmlElement *node)
         if(0==strcmp(c->Value(),"configgoal")) {
           stringstream ss(c->GetText());
           ss >> planner_p_goal;
-        }
-        c = c->NextSiblingElement();
-      }
-    }
-    if(0==strcmp(e->Value(),"tree")) {
-      TiXmlElement* c=e->FirstChildElement();
-      while(c!=NULL)
-      {
-        if(0==strcmp(c->Value(),"node")) {
-          SerializedTreeNode sn;
-          sn.Load(c);
-          _stree.push_back(sn);
         }
         c = c->NextSiblingElement();
       }
@@ -695,18 +691,6 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
     }
     node->InsertEndChild(c);
   }
-  //###################################################################
-  //{
-  //  TiXmlElement c("tree");
-  //  for(int i = 0; i < _stree.size(); i++){
-  //    TiXmlElement cc("node");
-  //    _stree.at(i).Save(&cc);
-  //    c.InsertEndChild(cc);
-  //  }
-
-  //  node->InsertEndChild(c);
-  //}
-  //###################################################################
   for(int i = 0; i < swept_volume_paths.size(); i++){
   //
     TiXmlElement c("sweptvolume");
@@ -735,19 +719,7 @@ void ForceFieldBackend::AddPlannerOutput( PlannerOutput pout )
 {
   plannerOutput.push_back(pout);
   std::vector<Config> keyframes = pout.GetKeyframes();
-  if(keyframes.size()>0){
-    AddPath(keyframes, GLColor(0.8,0.8,0.8), 10, pout.robot_idx);
-  }
-  VisualizePlannerTree(pout.GetTree());
-}
-void ForceFieldBackend::AddPlannerInput( PlannerInput pin )
-{
-  plannerInput.push_back(pin);
-}
-void ForceFieldBackend::AddPlannerIO( PlannerInput pin, PlannerOutput pout )
-{
-  AddPlannerInput(pin);
-  AddPlannerOutput(pout);
+  AddPath(keyframes, GLColor(0.8,0.8,0.8), pout.drawMilestones, pout.robot_idx);
 }
 
 void ForceFieldBackend::SendPlannerOutputToController()
@@ -775,12 +747,6 @@ void ForceFieldBackend::SendCommandStringController(string cmd, string arg)
   }
 }
 
-void ForceFieldBackend::VisualizePlannerTree(const SerializedTree &tree)
-{
-  _stree = tree;
-  drawPlannerTree=1;
-}
-
 void ForceFieldBackend::ClearPaths(){
   swept_volume_paths.clear();
 }
@@ -790,7 +756,7 @@ const std::vector<Config>& ForceFieldBackend::getPathKeyFrames(uint pathid)
   return swept_volume_paths.at(pathid).GetKeyframes();
 }
 uint ForceFieldBackend::getNumberOfPaths(){
-  return this->plannerInput.size();
+  return this->plannerOutput.size();
 }
 
 void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength)
@@ -895,8 +861,8 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     Robot* robot = world->robots[0];
 
     Config q;
-    if(plannerInput.size()>0){
-      q = plannerInput.at(0).q_init;
+    if(plannerOutput.size()>0){
+      q = plannerOutput.at(0).q_init;
     }else{
       q = robot->q;
     }
@@ -925,7 +891,7 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="draw_rigid_objects_edges_toggle") {
     toggle(drawRigidObjectsEdges);
   }else if(cmd=="draw_planner_tree_toggle"){
-    toggle(drawPlannerTree);
+    toggle(drawPlannerTree.at(0));
   }else if(cmd=="draw_minimal"){
     drawForceField=0;
     drawWrenchField=0;
@@ -1007,10 +973,6 @@ bool GLUIForceFieldGUI::Initialize()
   AddControl(checkbox,"draw_rigid_objects_faces");
   checkbox->set_int_val(_backend->drawRigidObjectsFaces);
 
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Planning Tree");
-  AddControl(checkbox,"draw_planner_tree");
-  checkbox->set_int_val(_backend->drawPlannerTree);
-
   uint N = _backend->getNumberOfPaths();
 
   std::cout << "N paths " << N << std::endl;
@@ -1054,6 +1016,12 @@ bool GLUIForceFieldGUI::Initialize()
     checkbox = glui->add_checkbox_to_panel(panel, descr3.c_str());
     AddControl(checkbox,dpsg.c_str());
     checkbox->set_int_val(_backend->drawPathStartGoal.at(i));
+
+    std::string dpt = "draw_planner_tree_"+std::to_string(i);
+    std::string descr4 = prefix + "Draw Planner Tree";
+    checkbox = glui->add_checkbox_to_panel(panel, descr4.c_str());
+    AddControl(checkbox,dpt.c_str());
+    checkbox->set_int_val(_backend->drawPlannerTree.at(i));
   }
 
   //AddControl(glui->add_button_to_panel(panel,"Save state"),"save_state");

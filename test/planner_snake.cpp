@@ -40,7 +40,7 @@ int main(int argc,const char** argv) {
   MotionPlannerOMPL planner(env.GetWorldPtr(), pin);
   planner.solve();
 
-  env.GetBackendPtr()->AddPlannerIO( planner.GetInput(), planner.GetOutput() );
+  env.GetBackendPtr()->AddPlannerOutput( planner.GetOutput() );
 
   env.GetBackendPtr()->ShowPlannerTree();
   env.GetBackendPtr()->ShowSweptVolumes();
@@ -49,6 +49,10 @@ int main(int argc,const char** argv) {
 
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.SetWindowTitle("SweptVolumePath");
+
+  //env.GetWorldPtr()->DeleteRobot("sphere_inner");
+  //env.GetWorldPtr()->DeleteRobot("sphere_outer");
+
 
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "GUI Start" << std::endl;

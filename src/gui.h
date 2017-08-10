@@ -16,7 +16,6 @@
 #include <View/ViewIK.h>
 #include <ode/ode.h>
 #include "planner/serialized_tree.h"
-#include "planner/planner_input.h"
 #include "planner/planner_output.h"
 #include "elements/swept_volume.h"
 #include "elements/wrench_field.h"
@@ -65,7 +64,6 @@ class ForceFieldBackend : public SimTestBackend
     vector<int> _linksInCollision;
     string _robotname;
     //##########################################################################
-    SerializedTree _stree;
     vector<GLDraw::GeometryAppearance> _appearanceStack;
 
     //##########################################################################
@@ -77,7 +75,6 @@ class ForceFieldBackend : public SimTestBackend
     vector< vector<Vector3> > _frames;
     vector< double > _frameLength;
 
-    vector<PlannerInput> plannerInput;
     vector<PlannerOutput> plannerOutput;
 
   public:
@@ -103,16 +100,14 @@ class ForceFieldBackend : public SimTestBackend
     void HideCoordinateAxes(){ drawAxes = 0; }
     void ShowRobot(){ drawRobot = 1; }
     void HideRobot(){ drawRobot = 0; }
-    void ShowPlannerTree(){ drawPlannerTree = 1; }
-    void HidePlannerTree(){ drawPlannerTree = 0; }
 
     void ShowSweptVolumes();
     void HideSweptVolumes();
     void ShowMilestones();
     void HideMilestones();
+    void ShowPlannerTree();
+    void HidePlannerTree();
 
-    void AddPlannerIO( PlannerInput pin, PlannerOutput pout );
-    void AddPlannerInput( PlannerInput pin );
     void AddPlannerOutput( PlannerOutput pout );
 
     void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);
@@ -133,12 +128,13 @@ class ForceFieldBackend : public SimTestBackend
     void DrawTextVector(double xpos, double ypos, const char* prefix, Vector &v);
 
     std::vector<int> showLinks; //hide certain links 
+
     std::vector<int> drawPathSweptVolume;
     std::vector<int> drawPathMilestones;
     std::vector<int> drawPathStartGoal;
+    std::vector<int> drawPlannerTree;
 
     int showSweptVolumes;
-
     int drawController;
     int drawContactDistances;
     int drawForceEllipsoid;
@@ -150,15 +146,11 @@ class ForceFieldBackend : public SimTestBackend
     int drawRobotExtras; 
     int drawIKextras;
     int drawRobot;
-    int drawPlannerTree;
     int drawAxes;
     int drawAxesLabels;
     int drawRigidObjects;
     int drawRigidObjectsEdges;
     int drawRigidObjectsFaces;
-
-    int drawWorkspaceApproximation;
-
 
     void toggle(int &k){
       if(k) k=0;
