@@ -24,12 +24,9 @@ class EnvironmentLoader{
     RobotWorld* GetWorldPtr();
     Robot* GetRobotPtr();
     ForceFieldBackendPtr GetBackendPtr();
-
     PlannerInput GetPlannerInput();
-    EnvironmentLoader(const char *xml_file);
 
-    bool LoadPlannerSettings(TiXmlElement *node);
-    bool LoadPlannerSettings(const char* file);
+    EnvironmentLoader(const char *xml_file);
 
     bool LoadPath(const char* file);
     bool LoadPath(TiXmlElement *node);

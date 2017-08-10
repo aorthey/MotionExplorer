@@ -128,7 +128,7 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     std::cout << std::string(80, '-') << std::endl;
   }
 
-  if(LoadPlannerSettings(file_name.c_str())){
+  if(pin.load(file_name.c_str())){
 
     Robot *robot = world.robots[pin.robot_idx];
 
@@ -165,81 +165,6 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
   _backend->wrenchfield.print();
 
 }
-bool EnvironmentLoader::LoadPlannerSettings(TiXmlElement *node)
-{
-  CheckNodeName(node, "world");
-  TiXmlElement* plannersettings = FindSubNode(node, "plannersettings");
-
-  if(!plannersettings){
-    std::cout << "world xml file has no plannersettings" << std::endl;
-    return false;
-  }
-
-  TiXmlElement* qinit = FindSubNode(plannersettings, "qinit");
-  TiXmlElement* qgoal = FindSubNode(plannersettings, "qgoal");
-  TiXmlElement* se3min = FindSubNode(plannersettings, "se3min");
-  TiXmlElement* se3max = FindSubNode(plannersettings, "se3max");
-  TiXmlElement* algorithm = FindSubNode(plannersettings, "algorithm");
-
-  TiXmlElement* dqinit = FindSubNode(plannersettings, "dqinit");
-  TiXmlElement* dqgoal = FindSubNode(plannersettings, "dqgoal");
-  TiXmlElement* timestep = FindSubNode(plannersettings, "timestep");
-  TiXmlElement* max_planning_time = FindSubNode(plannersettings, "maxplanningtime");
-  TiXmlElement* epsilon_goalregion = FindSubNode(plannersettings, "epsilongoalregion");
-
-  TiXmlElement* drawTree = FindSubNode(plannersettings, "drawTree");
-  TiXmlElement* drawSweptVolume = FindSubNode(plannersettings, "drawSweptVolume");
-  TiXmlElement* drawMilestones = FindSubNode(plannersettings, "drawMilestones");
-  TiXmlElement* drawStartGoal = FindSubNode(plannersettings, "drawStartGoal");
-  GetStreamText(drawTree) >> pin.drawTree;
-  GetStreamText(drawSweptVolume) >> pin.drawSweptVolume;
-  GetStreamText(drawMilestones) >> pin.drawMilestones;
-  GetStreamText(drawStartGoal) >> pin.drawStartGoal;
-
-  GetStreamAttribute(qinit,"config") >> pin.q_init;
-  GetStreamAttribute(qgoal,"config") >> pin.q_goal;
-  GetStreamAttribute(dqinit,"config") >> pin.dq_init;
-  GetStreamAttribute(dqgoal,"config") >> pin.dq_goal;
-
-  if(timestep){
-    GetStreamAttribute(timestep,"min") >> pin.timestep_min;
-    GetStreamAttribute(timestep,"max") >> pin.timestep_max;
-  }else{
-    pin.timestep_min= 0.01;
-    pin.timestep_max= 0.1;
-  }
-
-  GetStreamText(max_planning_time) >> pin.max_planning_time;
-  GetStreamText(epsilon_goalregion) >> pin.epsilon_goalregion;
-
-  GetStreamAttribute(se3min,"config")  >> pin.se3min;
-  GetStreamAttribute(se3max,"config")  >> pin.se3max;
-  GetStreamText(algorithm) >> pin.name_algorithm;
-
-  TiXmlElement* robot = FindSubNode(plannersettings, "robot");
-  if(robot){
-    TiXmlElement* rindex = FindSubNode(robot, "index");
-    if(rindex) GetStreamText(rindex) >> pin.robot_idx;
-    else pin.robot_idx = 0;
-
-    TiXmlElement* rindexos = FindSubNode(robot, "indexoutershell");
-    if(rindexos) GetStreamText(rindexos) >> pin.robot_idx_outer_shell;
-    else pin.robot_idx_outer_shell = -1;
-  }else{
-    pin.robot_idx = 0;
-    pin.robot_idx_outer_shell = -1;
-  }
-
-  return true;
-}
-
-bool EnvironmentLoader::LoadPlannerSettings(const char* file)
-{
-  TiXmlDocument doc(file);
-  TiXmlElement *root = GetRootNodeFromDocument(doc);
-  return LoadPlannerSettings(root);
-}
-
 bool EnvironmentLoader::LoadPath(const char* file)
 {
   std::string file_name = util::GetApplicationFolder()+file;

@@ -666,3 +666,6 @@ self-collision forces?
    [ ] visualize level tree
    [ ] visualize level path
    [ ] visualize level all paths
+
+
+[ ] planner should retain option to do standard kino/geo planning with ompl

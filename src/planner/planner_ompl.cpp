@@ -114,45 +114,11 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
 
 }
 
-
-// void MotionPlannerOMPL::WorkspaceApproximationPlanner(PlannerInput &input){
-
-//   WorldPlannerSettings worldsettings;
-//   worldsettings.InitializeDefault(*world);
-
-//   SingleRobotCSpace sphere_inner = SingleRobotCSpace(*world,1,&worldsettings);
-//   SingleRobotCSpace sphere_outer = SingleRobotCSpace(*world,2,&worldsettings);
-
-//   Vector3 init,goal;
-//   for(int i = 0; i < 3; i++){
-//     init[i] = input.q_init[i];
-//     goal[i] = input.q_goal[i];
-//   }
-//   PlannerWorkspaceApproximation planner_workspace(init,goal,&sphere_inner,&sphere_outer);
-//   planner_workspace.solve();
-//   std::vector<Vector3> tree = planner_workspace.tree;
-//   std::cout << " tree contains  " << tree.size() << " vertices" << std::endl;
-
-//   for(uint i = 0; i < tree.size(); i++){
-//     Vector3 s = tree.at(i);
-
-//     WorkspaceApproximationElement w;
-//     w.pos = Vector3(s[0],s[1],s[2]);
-//     w.inner_radius = planner_workspace.inner_radius;
-//     w.outer_radius = planner_workspace.outer_radius;
-
-//     output.workspace.elements.push_back(w);
-//   }
-
-// }
-
-
 bool MotionPlannerOMPL::solve()
 {
 
   Config p_init = input.q_init;
   Config p_goal = input.q_goal;
-
   std::string algorithm = input.name_algorithm;
 
   robot->UpdateConfig(p_init);
@@ -198,12 +164,10 @@ bool MotionPlannerOMPL::solve()
     //if(IsFeasible( robot_outer_shell, cspace_outer_shell, p_init)) return false;
     //if(IsFeasible( robot_outer_shell, cspace_outer_shell, p_goal)) return false;
 
-    //WorkspaceApproximationPlanner(input);
-
     cspace = factory.MakeGeometricCSpaceInnerOuter(robot, cspace_inner, cspace_outer);
     algorithm = "ompl:rrt";
-
     cspace->print();
+
   }else{
 
     //GeometricCSpaceOMPL* cspace = factory.MakeGeometricCSpace(robot, &kcspace);
@@ -219,7 +183,6 @@ bool MotionPlannerOMPL::solve()
   // Config init,goal to OMPL start/goal
   //###########################################################################
 
-  std::cout << p_init << std::endl;
   ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
   std::cout << start << std::endl;
@@ -242,6 +205,7 @@ bool MotionPlannerOMPL::solve()
   else if(algorithm=="ompl:kpiece") ompl_planner = std::make_shared<oc::KPIECE1>(si);
   else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
+    exit(0);
     return false;
   }
 
@@ -334,7 +298,6 @@ bool MotionPlannerOMPL::solve()
 
     //og::PathGeometric path = path_control.asGeometric();
     std::cout << "Path Length     : " << path_control.length() << std::endl;
-    //std::cout << "Path Milestones : " << path.getStateCount() << std::endl;
 
     std::vector<oc::Control*> controls = path_control.getControls();
 

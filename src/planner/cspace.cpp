@@ -1,4 +1,4 @@
-#include "ompl_space.h"
+#include "cspace.h"
 
 CSpaceOMPL::CSpaceOMPL(Robot *robot_, CSpace *kspace_):
   robot(robot_), kspace(kspace_)

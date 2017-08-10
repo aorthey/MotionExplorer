@@ -8,7 +8,7 @@
 #include <vector>
 #include "liegroupintegrator.h"
 #include "principalfibrebundle.h"
-#include "ompl_space.h"
+#include "cspace.h"
 
 using namespace Math3D;
 class CSpaceOMPL;

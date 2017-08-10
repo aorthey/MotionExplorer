@@ -39,7 +39,7 @@
 #include "util.h"
 #include "principalfibrebundle.h"
 #include "omplklamptconverter.h"
-#include "ompl_space.h"
+#include "cspace.h"
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;
@@ -53,7 +53,6 @@ class MotionPlannerOMPL: public MotionPlanner
     MotionPlannerOMPL(RobotWorld *world_, PlannerInput& input_);
     void SerializeTree(ob::PlannerData &pd);
     virtual bool solve();
-    void WorkspaceApproximationPlanner(PlannerInput &input);
 
     static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)
     {

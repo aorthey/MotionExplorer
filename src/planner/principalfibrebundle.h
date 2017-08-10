@@ -7,7 +7,7 @@
 #include <Planning/RobotCSpace.h>
 #include <vector>
 #include "liegroupintegrator.h"
-#include "ompl_space.h"
+#include "cspace.h"
 
 
 using namespace Math3D;

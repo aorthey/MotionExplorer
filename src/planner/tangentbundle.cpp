@@ -1,5 +1,5 @@
 #include "tangentbundle.h"
-#include "ompl_space.h"
+#include "cspace.h"
 
 Matrix3 GetTotalInertiaAtPoint(const Robot *robot, const Vector3 &p)
 {

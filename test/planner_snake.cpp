@@ -33,7 +33,6 @@ int main(int argc,const char** argv) {
   }
   std::cout << "Loading file: " << file << std::endl;
 
-
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
   PlannerInput pin = env.GetPlannerInput();
 
@@ -41,10 +40,6 @@ int main(int argc,const char** argv) {
   planner.solve();
 
   env.GetBackendPtr()->AddPlannerOutput( planner.GetOutput() );
-
-  env.GetBackendPtr()->ShowPlannerTree();
-  env.GetBackendPtr()->ShowSweptVolumes();
-  env.GetBackendPtr()->HideMilestones();
   env.GetBackendPtr()->ShowRobot();
 
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());

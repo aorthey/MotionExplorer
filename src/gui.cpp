@@ -715,6 +715,7 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
 //############################################################################
 
 #include <KrisLibrary/graph/Tree.h>
+
 void ForceFieldBackend::AddPlannerOutput( PlannerOutput pout )
 {
   plannerOutput.push_back(pout);
@@ -732,10 +733,9 @@ void ForceFieldBackend::SendPlannerOutputToController()
       string cmd( (i<=0)?("set_torque_control"):("append_torque_control") );
       SendCommandStringController(cmd,qstr.str());
     }
-
-
   }
 }
+
 void ForceFieldBackend::SendCommandStringController(string cmd, string arg)
 {
   if(!sim.robotControllers[0]->SendCommand(cmd,arg)) {
@@ -750,11 +750,13 @@ void ForceFieldBackend::SendCommandStringController(string cmd, string arg)
 void ForceFieldBackend::ClearPaths(){
   swept_volume_paths.clear();
 }
+
 const std::vector<Config>& ForceFieldBackend::getPathKeyFrames(uint pathid)
 {
   assert(swept_volume_paths.size()>pathid);
   return swept_volume_paths.at(pathid).GetKeyframes();
 }
+
 uint ForceFieldBackend::getNumberOfPaths(){
   return this->plannerOutput.size();
 }

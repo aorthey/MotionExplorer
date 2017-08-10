@@ -1,7 +1,7 @@
 #include "planner/planner.h"
 #include "util.h"
-#include "cspace_sentinel.h"
-#include "cspace_epsilon_neighborhood.h"
+//#include "cspace_sentinel.h"
+//#include "cspace_epsilon_neighborhood.h"
 
 MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   world(world_), input(input_)
