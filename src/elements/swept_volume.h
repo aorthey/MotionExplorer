@@ -14,6 +14,7 @@ class SweptVolume
 
     const std::vector<std::vector<Matrix4> >& GetMatrices();
     const std::vector<Config >& GetKeyframes();
+    const vector<GLDraw::GeometryAppearance>& GetAppearanceStack();
 
     void SetColor(const GLColor c);
     GLColor GetColor();
@@ -23,12 +24,14 @@ class SweptVolume
     const Config& GetGoal();
     const vector<uint>& GetKeyframeIndices();
 
+    Robot* GetRobot();
+
     bool Save(const char* file=NULL);
     bool Save(TiXmlElement *node);
     bool Load(const char* file);
     bool Load(TiXmlElement *node);
 
-  private:
+  protected:
     void AddKeyframe(const Config &q );
 
     GLColor color;
@@ -37,6 +40,8 @@ class SweptVolume
     Robot *_robot;
     std::vector<std::vector<Matrix4> > _mats;
     vector<Config> _keyframes;
+    vector<GLDraw::GeometryAppearance> _appearanceStack;
+
     Config init, goal;
     vector<uint> _keyframe_indices;
 

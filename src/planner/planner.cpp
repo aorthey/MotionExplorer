@@ -13,6 +13,7 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   output.q_init = input.q_init;
   output.q_goal= input.q_goal;
   output.robot_idx = input.robot_idx;
+  output.robot = robot;
   output.name_algorithm = input.name_algorithm;
   output.drawTree = input.drawTree;
   output.drawSweptVolume = input.drawSweptVolume;

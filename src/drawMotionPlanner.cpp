@@ -414,6 +414,13 @@ namespace GLDraw{
     }//forx
   }
 
+  void drawSwathVolume(Robot *robot, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor swathVolumeColor)
+  {
+    drawGLPathSweptVolume(robot, mats, appearanceStack, swathVolumeColor, 1.0);
+  }
+
+
+
   void drawGLPathSweptVolume(Robot *robot, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor sweptvolumeColor, double sweptvolumeScale)
   {
     //loopin' through the waypoints
@@ -872,32 +879,32 @@ namespace GLDraw{
     //  glEnd();
     //}
   }
-  void drawWorkspaceApproximationSpheres(std::vector<PlannerOutput> &pout){
-    for(int i = 0; i < pout.size(); i++){
+  // void drawWorkspaceApproximationSpheres(std::vector<PlannerOutput> &pout){
+  //   for(int i = 0; i < pout.size(); i++){
 
-      WorkspaceApproximation w = pout.at(i).workspace;
-      GLColor colorOuter(1,0,1,0.3);
-      GLColor colorInner(0,1,0,0.5);
+  //     WorkspaceApproximation w = pout.at(i).workspace;
+  //     GLColor colorOuter(1,0,1,0.3);
+  //     GLColor colorInner(0,1,0,0.5);
 
-      glEnable(GL_LIGHTING);
-      for(uint i = 0; i < w.elements.size(); i++){
-        WorkspaceApproximationElement wi = w.elements.at(i);
-        glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,colorInner);
-        glPushMatrix();
-        glTranslate(wi.pos);
-        GLDraw::drawSphere(wi.inner_radius,16,8);
-        glPopMatrix();
-      }
-      if(w.elements.size()>0){
-        WorkspaceApproximationElement wi = w.elements.front();
-        glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,colorOuter);
-        glPushMatrix();
-        glTranslate(wi.pos);
-        GLDraw::drawSphere(wi.outer_radius,16,8);
-        glPopMatrix();
-      }
-      glDisable(GL_LIGHTING);
-    }
-  }
+  //     glEnable(GL_LIGHTING);
+  //     for(uint i = 0; i < w.elements.size(); i++){
+  //       WorkspaceApproximationElement wi = w.elements.at(i);
+  //       glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,colorInner);
+  //       glPushMatrix();
+  //       glTranslate(wi.pos);
+  //       GLDraw::drawSphere(wi.inner_radius,16,8);
+  //       glPopMatrix();
+  //     }
+  //     if(w.elements.size()>0){
+  //       WorkspaceApproximationElement wi = w.elements.front();
+  //       glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,colorOuter);
+  //       glPushMatrix();
+  //       glTranslate(wi.pos);
+  //       GLDraw::drawSphere(wi.outer_radius,16,8);
+  //       glPopMatrix();
+  //     }
+  //     glDisable(GL_LIGHTING);
+  //   }
+  // }
 };
 

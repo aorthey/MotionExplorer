@@ -58,6 +58,7 @@ class MotionPlannerOMPL: public MotionPlanner
     {
       ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
       obj->setCostThreshold(ob::Cost(dInf));
+      //obj->setCostThreshold(ob::Cost(0));
       return obj;
     }
 

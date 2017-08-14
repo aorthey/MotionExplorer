@@ -7,6 +7,15 @@ SweptVolume::SweptVolume(Robot *robot){
   _mats.clear();
   _robot = robot;
   color = GLColor(0.8,0.8,0.8);
+  uint Nlinks = _robot->links.size();
+
+  _appearanceStack.clear();
+  _appearanceStack.resize(Nlinks);
+
+  for(size_t i=0;i<Nlinks;i++) {
+    GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
+    _appearanceStack[i]=a;
+  }
 }
 
 SweptVolume::SweptVolume(Robot *robot, const std::vector<Config> &keyframes, uint Nkeyframes)
@@ -15,6 +24,15 @@ SweptVolume::SweptVolume(Robot *robot, const std::vector<Config> &keyframes, uin
   _mats.clear();
   _robot = robot;
   color = GLColor(0.8,0.8,0.8);
+  uint Nlinks = _robot->links.size();
+
+  _appearanceStack.clear();
+  _appearanceStack.resize(Nlinks);
+
+  for(size_t i=0;i<Nlinks;i++) {
+    GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
+    _appearanceStack[i]=a;
+  }
 
   for(int i = 0; i < keyframes.size(); i++)
   {
@@ -26,19 +44,21 @@ SweptVolume::SweptVolume(Robot *robot, const std::vector<Config> &keyframes, uin
     goal = _keyframes.back();
   }
   //compute keyframe indices 
-  if(Nkeyframes > keyframes.size()){
-    Nkeyframes = keyframes.size();
-  }
-  _keyframe_indices.clear();
+  if(Nkeyframes > 0){
+    if(Nkeyframes> keyframes.size()){
+      Nkeyframes = keyframes.size();
+    }
+    _keyframe_indices.clear();
 
-  uint N = keyframes.size();
-  uint Nstep = (int)(N/Nkeyframes);
+    uint N = keyframes.size();
+    uint Nstep = (int)(N/Nkeyframes);
 
-  if(Nstep<1) Nstep=1;
-  uint Ncur = 0;
-  while(Ncur < N){
-    _keyframe_indices.push_back(Ncur);
-    Ncur += Nstep;
+    if(Nstep<1) Nstep=1;
+    uint Ncur = 0;
+    while(Ncur < N){
+      _keyframe_indices.push_back(Ncur);
+      Ncur += Nstep;
+    }
   }
 }
 
@@ -48,6 +68,10 @@ const std::vector<std::vector<Matrix4> >& SweptVolume::GetMatrices(){
 const std::vector<Config >& SweptVolume::GetKeyframes(){
   return _keyframes;
 }
+const vector<GLDraw::GeometryAppearance>& SweptVolume::GetAppearanceStack(){
+  return _appearanceStack;
+}
+
 void SweptVolume::SetColor(const GLColor c){
   color = c;
 }
@@ -88,12 +112,16 @@ void SweptVolume::AddKeyframe(const Config &q ){
   _robot->UpdateConfig(q);
 
   std::vector<Matrix4> mats_config;
-  for(size_t i=0;i<_robot->links.size();i++) {
+  uint Nlinks = _robot->links.size();
+
+  for(size_t i=0;i<Nlinks;i++) {
     Matrix4 mat = _robot->links[i].T_World;
     mats_config.push_back(mat);
   }
   _mats.push_back(mats_config);
   _keyframes.push_back(q);
+
+
 }
 
 

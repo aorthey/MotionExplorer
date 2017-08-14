@@ -3,8 +3,10 @@
 #include <KrisLibrary/GLdraw/GLError.h>
 #include <KrisLibrary/GLdraw/GLColor.h>
 #include <Modeling/Robot.h>
+#include "elements/swept_volume.h"
 
 using namespace GLDraw;
+
 
 
 // 
@@ -12,31 +14,21 @@ using namespace GLDraw;
 //Swath Volume: Volume of Robot along a graph in CSpace
 //
 
-class SwathVolume
+class SwathVolume: public SweptVolume
 {
   public:
     SwathVolume(Robot *robot);
     SwathVolume(Robot *robot, const std::vector<Config> &vertices);
 
-    const std::vector<std::vector<Matrix4> >& GetMatrices();
-
-    void SetColor(const GLColor c);
-    GLColor GetColor();
+    const std::vector<Config >& GetVertices();
 
     // bool Save(const char* file=NULL);
     // bool Save(TiXmlElement *node);
     // bool Load(const char* file);
     // bool Load(TiXmlElement *node);
 
-  private:
-    void AddVertex(const Config &q );
+    //void AddVertex(const Config &q );
 
-    GLColor color;
-    GLColor color_milestones;
-
-    Robot *_robot;
-    std::vector<std::vector<Matrix4> > _mats;
-    vector<Config> _vertices;
 
 };
 

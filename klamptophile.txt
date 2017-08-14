@@ -672,3 +672,9 @@ self-collision forces?
 which takes settings and produces a cspace and an algorithm taking
 validator/integrator into account. This setup file should then be replaced by
 Hplanner, so we need to give it more meaningful name 
+
+[ ] adjust algo such that spheres do not intersect (too many clustered on one
+point)
+
+
+[ ] make sure it works with -wall, -mars, and -cave.

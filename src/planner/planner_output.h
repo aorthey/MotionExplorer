@@ -1,20 +1,25 @@
 #pragma once
+#include "elements/swept_volume.h"
+#include "elements/swath_volume.h"
+#include "planner/serialized_tree.h"
 
-struct WorkspaceApproximationElement{
-  Vector3 pos;
-  Vector3 ori;
-  double inner_radius;
-  double outer_radius;
-};
-struct WorkspaceApproximation{
-  std::vector<WorkspaceApproximationElement> elements;
-};
+// struct WorkspaceApproximationElement{
+//   Vector3 pos;
+//   Vector3 ori;
+//   double inner_radius;
+//   double outer_radius;
+// };
+// struct WorkspaceApproximation{
+//   std::vector<WorkspaceApproximationElement> elements;
+// };
 
 struct HierarchicalLevel{
   uint idx;
   std::string name;
   std::vector<Config> V;
   //geometry
+  //vector<GLDraw::GeometryAppearance> geometry;
+  SwathVolume swv;
 };
 
 class PlannerOutput{
@@ -35,6 +40,10 @@ class PlannerOutput{
     int drawMilestones;
     int drawStartGoal;
 
+    SweptVolume *sv;
+    SwathVolume *swv;
+
+    Robot *robot;
   private:
     double time;
     uint nodes;
@@ -49,48 +58,24 @@ class PlannerOutput{
     std::vector<Vector> torques;
 
     std::vector<HierarchicalLevel> hierarchy;
+
+
   public:
 
-    WorkspaceApproximation workspace;
-    PlannerOutput(){};
+    PlannerOutput();
 
-    void SetHierarchy(std::vector<HierarchicalLevel> &hierarchy_){
-      hierarchy = hierarchy_;
-    }
-    const std::vector<HierarchicalLevel>& GetHierarchy(){
-      return hierarchy;
-    }
+    SweptVolume& GetSweptVolume();
+    SwathVolume& GetSwathVolume();
 
-    void SetTorques(std::vector<Vector> &torques_){
-      torques = torques_;
-    }
-    const std::vector<Vector>& GetTorques(){
-      return torques;
-    }
-
-    Config GetInitConfiguration(){
-      if(q.empty()){
-        std::cout << "[PlannerOutput] No path in output, cannot get initial configuration" << std::endl;
-        exit(0);
-      }
-      return q.at(0);
-    }
-
-    const SerializedTree& GetTree()
-    {
-      return _stree;
-    }
-    void SetTree(SerializedTree &stree)
-    {
-      _stree = stree;
-    }
-
-    const std::vector<Config> GetKeyframes(){
-      return q;
-    }
-    void SetKeyframes(std::vector<Config> &keyframes){
-      q = keyframes;
-    }
+    void SetHierarchy(std::vector<HierarchicalLevel> &hierarchy_);
+    const std::vector<HierarchicalLevel>& GetHierarchy();
+    void SetTorques(std::vector<Vector> &torques_);
+    const std::vector<Vector>& GetTorques();
+    Config GetInitConfiguration();
+    const SerializedTree& GetTree();
+    void SetTree(SerializedTree &stree);
+    const std::vector<Config> GetKeyframes();
+    void SetKeyframes(std::vector<Config> &keyframes);
 
 };
 

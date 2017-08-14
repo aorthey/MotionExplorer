@@ -197,6 +197,8 @@ bool MotionPlannerOMPL::solve()
   //###########################################################################
   // choose planner
   //###########################################################################
+
+
   ob::PlannerPtr ompl_planner;
 
   if(algorithm=="ompl:rrt") ompl_planner = std::make_shared<oc::RRT>(si);
@@ -215,12 +217,13 @@ bool MotionPlannerOMPL::solve()
   double epsilon_goalregion = input.epsilon_goalregion;
 
   ss.setStartAndGoalStates(start, goal, epsilon_goalregion);
-  ss.setup();
   ss.setPlanner(ompl_planner);
+  ss.setup();
   ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
 
   //set objective to infinite path to just return first solution
   ob::ProblemDefinitionPtr pdef = ss.getProblemDefinition();
+
   pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
   //###########################################################################

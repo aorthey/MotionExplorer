@@ -432,7 +432,6 @@ void ForceFieldBackend::RenderWorld()
   // drawaxeslabels       : labelling of the coordinate axes [needs fixing]
   //############################################################################
 
-  //if(drawWorkspaceApproximation) GLDraw::drawWorkspaceApproximationSpheres(plannerOutput);
   //if(drawCenterOfMassPath) GLDraw::drawCenterOfMassPathFromController(sim);
   //if(drawForceEllipsoid) GLDraw::drawForceEllipsoid(oderobot);
 
@@ -449,7 +448,6 @@ void ForceFieldBackend::RenderWorld()
   for(int i = 0; i < plannerOutput.size(); i++){
     uint ridx = plannerOutput.at(i).robot_idx;
     Robot *robot_i = world->robots[ridx];
-    SweptVolume sv = swept_volume_paths.at(i);
 
     if(drawPathStartGoal.at(i)){
       Config qi = plannerOutput.at(i).q_init;
@@ -457,9 +455,19 @@ void ForceFieldBackend::RenderWorld()
       GLDraw::drawGLPathStartGoal(robot_i, qi, qg);
     }
 
-    if(drawPathSweptVolume.at(i)) GLDraw::drawGLPathSweptVolume(robot_i, sv.GetMatrices(), _appearanceStack, sv.GetColor());
-    if(drawPathMilestones.at(i)) GLDraw::drawGLPathKeyframes(robot_i, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack, sv.GetColorMilestones());
-    if(drawPlannerTree.at(i)) GLDraw::drawPlannerTree(plannerOutput.at(i).GetTree());
+    if(drawPathSweptVolume.at(i)){
+      SweptVolume sv = plannerOutput.at(i).GetSweptVolume();
+      GLDraw::drawGLPathSweptVolume(robot_i, sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
+    }
+
+    //if(drawPathMilestones.at(i)) GLDraw::drawGLPathKeyframes(robot_i, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack, sv.GetColorMilestones());
+    //if(drawPlannerTree.at(i)) GLDraw::drawPlannerTree(plannerOutput.at(i).GetTree());
+
+
+    if(drawPlannerTree.at(i)){
+      SwathVolume swv = plannerOutput.at(i).GetSwathVolume();
+      GLDraw::drawSwathVolume(robot_i, swv.GetMatrices(), swv.GetAppearanceStack(), swv.GetColor());
+    }
 
     std::vector<HierarchicalLevel> hierarchy = plannerOutput.at(i).GetHierarchy();
     for(int j = 0; j < hierarchy.size(); j++){
@@ -719,8 +727,6 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
 void ForceFieldBackend::AddPlannerOutput( PlannerOutput pout )
 {
   plannerOutput.push_back(pout);
-  std::vector<Config> keyframes = pout.GetKeyframes();
-  AddPath(keyframes, GLColor(0.8,0.8,0.8), pout.drawMilestones, pout.robot_idx);
 }
 
 void ForceFieldBackend::SendPlannerOutputToController()

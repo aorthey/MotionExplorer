@@ -31,15 +31,17 @@
     <qgoal config="6  -10 1 2 0 0 0 "/>
     <se3min config="6  -15 -6 -1 0 0 0 "/>
     <se3max config="6  10 6 16 0 0 0 "/>
-    <timestep min="0.01" max="0.2"/>
-    <epsilongoalregion>0.1</epsilongoalregion>
-    <maxplanningtime>2</maxplanningtime>
+    <timestep min="0.1" max="0.2"/>
+    <epsilongoalregion>0</epsilongoalregion>
+    <maxplanningtime>1</maxplanningtime>
     <algorithm>workspace</algorithm>
 
-    <drawTree>1</drawTree>
     <drawSweptVolume>0</drawSweptVolume>
     <drawMilestones>10</drawMilestones>
     <drawStartGoal>1</drawStartGoal>
+
+    <drawTree>1</drawTree>
+    <drawSwath>1</drawSwath>
 
     <robot>
       <index>1</index>
