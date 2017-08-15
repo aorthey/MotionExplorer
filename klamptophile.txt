@@ -666,6 +666,8 @@ self-collision forces?
    [ ] visualize level tree
    [ ] visualize level path
    [ ] visualize level all paths
+ [ ] have different numbers to highlight/show different planner outputs. This
+way we could build a hierarchical visualization
 
 [ ] planner should retain option to do standard kino/geo planning with ompl
 [ ] planner needs refactoring: new folders validator/integrator. new class setup
@@ -675,6 +677,6 @@ Hplanner, so we need to give it more meaningful name
 
 [ ] adjust algo such that spheres do not intersect (too many clustered on one
 point)
-
-
 [ ] make sure it works with -wall, -mars, and -cave.
+[ ] new idea for going down on level
+

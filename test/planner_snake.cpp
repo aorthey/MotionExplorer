@@ -40,6 +40,8 @@ int main(int argc,const char** argv) {
   planner.solve();
 
   env.GetBackendPtr()->AddPlannerOutput( planner.GetOutput() );
+  env.GetBackendPtr()->AddPlannerOutput( planner.GetOutput() );
+
   env.GetBackendPtr()->ShowRobot();
 
   GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
@@ -47,7 +49,6 @@ int main(int argc,const char** argv) {
 
   //env.GetWorldPtr()->DeleteRobot("sphere_inner");
   //env.GetWorldPtr()->DeleteRobot("sphere_outer");
-
 
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "GUI Start" << std::endl;

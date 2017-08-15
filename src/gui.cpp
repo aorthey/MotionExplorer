@@ -446,6 +446,7 @@ void ForceFieldBackend::RenderWorld()
   if(drawWrenchField) GLDraw::drawWrenchField(wrenchfield);
 
   for(int i = 0; i < plannerOutput.size(); i++){
+
     uint ridx = plannerOutput.at(i).robot_idx;
     Robot *robot_i = world->robots[ridx];
 
@@ -898,8 +899,6 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     toggle(drawRigidObjectsFaces);
   }else if(cmd=="draw_rigid_objects_edges_toggle") {
     toggle(drawRigidObjectsEdges);
-  }else if(cmd=="draw_planner_tree_toggle"){
-    toggle(drawPlannerTree.at(0));
   }else if(cmd=="draw_minimal"){
     drawForceField=0;
     drawWrenchField=0;
@@ -917,10 +916,13 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     toggle(drawDistanceRobotTerrain);
   }else if(cmd=="draw_com_path"){
     toggle(drawCenterOfMassPath);
+  }else if(cmd=="draw_planner_tree_toggle"){
+    for(int i = 0; i < drawPlannerTree.size(); i++){
+      toggle(drawPlannerTree.at(i));
+    }
   }else if(cmd=="draw_swept_volume"){
-    if(drawPathSweptVolume.size()>0){
-      toggle(drawPathSweptVolume.at(0));
-      toggle(drawPathStartGoal.at(0));
+    for(int i = 0; i < drawPathSweptVolume.size(); i++){
+      toggle(drawPathSweptVolume.at(i));
     }
   }else if(cmd=="load_motion_planner") {
     //glutSelectFile ("","","");//char *filename, const char *filter, const char *title)
