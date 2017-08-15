@@ -9,10 +9,10 @@ env_name = 'mountain/ridge.tri'
 
 limit = pi/16
 
-headradius = 0.3
-leglength1 = 0.3
-leglength2 = 0.75
-legradius = 0.08
+headradius = 0.2
+leglength1 = 0.2
+leglength2 = 0.55
+legradius = 0.04
 jointradius = 0.1
 
 numberLegs = 3
@@ -29,9 +29,17 @@ fname = pathname + fname
 
 
 def createHead(headname):
+    upperhead = "eye_"+headname
+    tophead = "container_"+headname
+    topradius = 0.6*headradius
+    length = 1*headradius
+
     hstrs = createSphere(headname,0,0,0,headradius)
-    #hstrc = createCylinder(headname,-headradius/2,0,0,headradius,headradius)
-    #hstrj = createRigidJoint("joint_eye_"+headname,"eye",headname)
+    hstrs += createRotatedCylinder(upperhead,0,0,headradius+length/2,0,0,1.57,0.3*length,length+0.1)
+    hstrs += createRigidJoint("joint_"+headname+"_"+upperhead, upperhead, headname)
+
+    hstrs += createSphere(tophead,0,0,headradius+length+topradius,topradius)
+    hstrs += createRigidJoint("joint_"+upperhead+"_"+tophead, tophead, upperhead)
     return hstrs
 
 def createBody(headname):
@@ -98,7 +106,7 @@ Njoints = 6+numberLegs*7
 config = "config=\""+str(Njoints)+" "+" 0"*Njoints+"\""
 print config
 
-headname = "eye"
+headname = "brain"
 f.write(createHead(headname))
 f.write(createBody(headname))
 #f.write('  <klampt package_root="../.." flip_yz="1" use_vis_geom="1">\n')

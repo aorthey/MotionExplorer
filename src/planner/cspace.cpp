@@ -312,9 +312,14 @@ const oc::StatePropagatorPtr GeometricCSpaceOMPL::StatePropagatorPtr(oc::SpaceIn
 {
   return std::make_shared<PrincipalFibreBundleIntegrator>(si, this);
 }
-const ob::StateValidityCheckerPtr GeometricCSpaceOMPL::StateValidityCheckerPtr(oc::SpaceInformationPtr si)
+const ob::StateValidityCheckerPtr GeometricCSpaceOMPL::StateValidityCheckerPtr(ob::SpaceInformationPtr si)
 {
   return std::make_shared<PrincipalFibreBundleOMPLValidityChecker>(si, kspace, this);
+}
+const ob::StateValidityCheckerPtr GeometricCSpaceOMPL::StateValidityCheckerPtr(oc::SpaceInformationPtr si)
+{
+  std::cout << "KinodynamicCSpaceOMPL only supports OMPL geometric (ob::). You called OMPL control (oc::)" << std::endl;
+  exit(0);
 }
 
 //#############################################################################
@@ -741,6 +746,11 @@ const ob::StateValidityCheckerPtr KinodynamicCSpaceOMPL::StateValidityCheckerPtr
 {
   return std::make_shared<TangentBundleOMPLValidityChecker>(si, kspace, this);
 }
+const ob::StateValidityCheckerPtr KinodynamicCSpaceOMPL::StateValidityCheckerPtr(ob::SpaceInformationPtr si)
+{
+  std::cout << "KinodynamicCSpaceOMPL only supports OMPL control (oc::). You called OMPL geometric (ob::)" << std::endl;
+  exit(0);
+}
 //#############################################################################
 //#############################################################################
 //#############################################################################
@@ -807,6 +817,6 @@ GeometricCSpaceOMPLInnerOuter::GeometricCSpaceOMPLInnerOuter(Robot *robot_inner_
 
 }
 
-const ob::StateValidityCheckerPtr GeometricCSpaceOMPLInnerOuter::StateValidityCheckerPtr(oc::SpaceInformationPtr si){
+const ob::StateValidityCheckerPtr GeometricCSpaceOMPLInnerOuter::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
   return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, inner, outer);
 }

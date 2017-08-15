@@ -46,7 +46,9 @@ class CSpaceOMPL
     }
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) = 0;
+
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si) = 0;
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) = 0;
 
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q) = 0;
     virtual ob::State* ConfigToOMPLStatePtr(const Config &q) = 0;
@@ -88,6 +90,7 @@ class GeometricCSpaceOMPL: public CSpaceOMPL
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si);
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si);
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
 
     virtual void initSpace();
     virtual void initControlSpace();
@@ -116,6 +119,7 @@ class KinodynamicCSpaceOMPL: public CSpaceOMPL
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si);
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si);
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
 
     virtual void initSpace();
     virtual void initControlSpace();
@@ -153,7 +157,7 @@ class GeometricCSpaceOMPLInnerOuter: public GeometricCSpaceOMPL
   public:
     GeometricCSpaceOMPLInnerOuter(Robot *robot_inner, CSpace *inner, CSpace *outer);
 
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si);
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
 
     CSpace *inner;
     CSpace *outer;

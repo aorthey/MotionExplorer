@@ -675,8 +675,38 @@ which takes settings and produces a cspace and an algorithm taking
 validator/integrator into account. This setup file should then be replaced by
 Hplanner, so we need to give it more meaningful name 
 
-[ ] adjust algo such that spheres do not intersect (too many clustered on one
-point)
+[ ] adjust algo such that spheres do not intersect (too many clustered on one point) -> cvx decomp?
 [ ] make sure it works with -wall, -mars, and -cave.
-[ ] new idea for going down on level
+[ ] fix spider urdf
 
+[ ] new idea for going down one level !!
+ [ ] cylinder -> hole example (can easily be compared to ompl, has many
+variations already included in ompl and would nicely act as a ground truth
+example)
+ [ ] cylinder -> free space as comparison (do not check if start and goal can be
+connected, or use that as a ground truth benchmark)
+ [ ] corner element -> hole
+
+
+ [ ] change to boost tree to use more convenient algorithms
+
+
+-- Decompose robot into CVX regions. If not, add cvx regions and rigid joints.
+
+-- Choose one link, the one with min cum reach. 
+-- Compute max internal sphere. do planning level 1. This is for connectivity.
+
+-- Compute max internal capsule. do planning level 2? This is for orientation
+connectivity.
+
+We might lose orientation connectivity because a passage is too curved.
+
+
+[ ] !! FIX LEVEL0: spheres are too near which cost too much computation. Also spheres
+are still computed kinodynamically. this is the foundation, there cannot be any
+overload crap. Don't sacrifice completeness, however.
+  [ ] make computation geometric
+  [ ] enforce space constraint
+  [ ] compute principal LEVEL0 path 
+    [ ] fix one graph representation (e.g. boostgraph) which has lots of
+algorithms associated (at least dykstra)

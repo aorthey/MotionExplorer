@@ -3,16 +3,6 @@
 #include "elements/swath_volume.h"
 #include "planner/serialized_tree.h"
 
-// struct WorkspaceApproximationElement{
-//   Vector3 pos;
-//   Vector3 ori;
-//   double inner_radius;
-//   double outer_radius;
-// };
-// struct WorkspaceApproximation{
-//   std::vector<WorkspaceApproximationElement> elements;
-// };
-
 struct HierarchicalLevel{
   uint idx;
   std::string name;
@@ -58,7 +48,6 @@ class PlannerOutput{
     std::vector<Vector> torques;
 
     std::vector<HierarchicalLevel> hierarchy;
-
 
   public:
 

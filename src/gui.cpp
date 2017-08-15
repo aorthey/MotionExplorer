@@ -458,7 +458,7 @@ void ForceFieldBackend::RenderWorld()
 
     if(drawPathSweptVolume.at(i)){
       SweptVolume sv = plannerOutput.at(i).GetSweptVolume();
-      GLDraw::drawGLPathSweptVolume(robot_i, sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
+      GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
     }
 
     //if(drawPathMilestones.at(i)) GLDraw::drawGLPathKeyframes(robot_i, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack, sv.GetColorMilestones());
@@ -467,7 +467,7 @@ void ForceFieldBackend::RenderWorld()
 
     if(drawPlannerTree.at(i)){
       SwathVolume swv = plannerOutput.at(i).GetSwathVolume();
-      GLDraw::drawSwathVolume(robot_i, swv.GetMatrices(), swv.GetAppearanceStack(), swv.GetColor());
+      GLDraw::drawSwathVolume(swv.GetRobot(), swv.GetMatrices(), swv.GetAppearanceStack(), swv.GetColor());
     }
 
     std::vector<HierarchicalLevel> hierarchy = plannerOutput.at(i).GetHierarchy();
@@ -953,26 +953,15 @@ GLUIForceFieldGUI::GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _w
     :BaseT(_backend,_world)
 {
 }
-//void browser_control(int control) {
-//  glutPostRedisplay();
-//  if(control==1){
-//    //browser
-//    std::string file_name = browser->get_file();
-//    //file = fopen(file_name.c_str(),"r"); 
-//    std::cout << "opening file " << file_name << std::endl;
-//  }
-//}
 bool GLUIForceFieldGUI::Initialize()
 {
   std::cout << "Initializing GUI" << std::endl;
   if(!BaseT::Initialize()) return false;
 
-
   ForceFieldBackend* _backend = static_cast<ForceFieldBackend*>(backend);
 
   //std::cout << "Open Loop Controller Setup" << std::endl;
   //_backend->SendPlannerOutputToController();
-
 
   panel = glui->add_rollout("Motion Planning");
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Object Edges");
@@ -991,12 +980,10 @@ bool GLUIForceFieldGUI::Initialize()
 
     std::string dpsv = "draw_path_swept_volume_"+std::to_string(i);
     std::string descr1 = prefix + "Draw Swept Volume";
-
     
     checkbox = glui->add_checkbox_to_panel(panel, descr1.c_str());
     AddControl(checkbox,dpsv.c_str());
     checkbox->set_int_val(_backend->drawPathSweptVolume.at(i));
-
 
     linkBox = glui->add_listbox_to_panel(panel,"Show Link",NULL);
     //toggleMeasurementDrawCheckbox = glui->add_checkbox_to_panel(panel,"Plot value");
@@ -1109,7 +1096,6 @@ bool GLUIForceFieldGUI::Initialize()
   AddToKeymap("4","draw_distance_robot_terrain");
   AddToKeymap("5","draw_com_path");
   AddToKeymap("q","draw_minimal");
-
   AddToKeymap("g","draw_swept_volume");
 
   AddToKeymap("T","toggle_mode");

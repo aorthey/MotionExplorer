@@ -62,6 +62,9 @@ SweptVolume::SweptVolume(Robot *robot, const std::vector<Config> &keyframes, uin
   }
 }
 
+Robot* SweptVolume::GetRobot(){
+  return _robot;
+}
 const std::vector<std::vector<Matrix4> >& SweptVolume::GetMatrices(){
   return _mats;
 }
@@ -120,8 +123,6 @@ void SweptVolume::AddKeyframe(const Config &q ){
   }
   _mats.push_back(mats_config);
   _keyframes.push_back(q);
-
-
 }
 
 

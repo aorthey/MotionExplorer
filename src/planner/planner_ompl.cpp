@@ -1,3 +1,4 @@
+#include <ompl/base/GenericParam.h>
 #include "planner_ompl.h"
 #include "liegroupintegrator.h"
 #include "planner/planner_workspace_approximation.h"
@@ -165,7 +166,7 @@ bool MotionPlannerOMPL::solve()
     //if(IsFeasible( robot_outer_shell, cspace_outer_shell, p_goal)) return false;
 
     cspace = factory.MakeGeometricCSpaceInnerOuter(robot, cspace_inner, cspace_outer);
-    algorithm = "ompl:rrt";
+    input.name_algorithm = "ompl:rrt";
     cspace->print();
 
   }else{
@@ -179,6 +180,175 @@ bool MotionPlannerOMPL::solve()
     cspace = factory.MakeGeometricCSpace(robot, kcspace);
   }
 
+  return solve_geometrically(cspace);
+
+}
+bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
+  Config p_init = input.q_init;
+  Config p_goal = input.q_goal;
+  std::string algorithm = input.name_algorithm;
+  //###########################################################################
+  // Config init,goal to OMPL start/goal
+  //###########################################################################
+
+  ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
+  ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
+
+  og::SimpleSetup ss(cspace->SpacePtr());//const ControlSpacePtr
+  const ob::SpaceInformationPtr si = ss.getSpaceInformation();
+
+  ss.setStateValidityChecker(cspace->StateValidityCheckerPtr(si));
+
+  //###########################################################################
+  // choose planner
+  //###########################################################################
+
+  ob::PlannerPtr ompl_planner;
+
+  if(algorithm=="ompl:rrt") ompl_planner = std::make_shared<og::RRT>(si);
+  else if(algorithm=="ompl:rrtstar") ompl_planner = std::make_shared<og::RRTstar>(si);
+  else if(algorithm=="ompl:rrtconnect") ompl_planner = std::make_shared<og::RRTConnect>(si);
+  else if(algorithm=="ompl:rrtlazy") ompl_planner = std::make_shared<og::LazyRRT>(si);
+  else if(algorithm=="ompl:rrtsharp") ompl_planner = std::make_shared<og::RRTsharp>(si);
+  else{
+    std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
+    exit(0);
+    return false;
+  }
+
+  //###########################################################################
+  // setup and projection
+  //###########################################################################
+  double epsilon_goalregion = input.epsilon_goalregion;
+
+  ss.setStartAndGoalStates(start, goal, epsilon_goalregion);
+  ss.setPlanner(ompl_planner);
+  ss.setup();
+  ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
+
+  //set objective to infinite path to just return first solution
+  ob::ProblemDefinitionPtr pdef = ss.getProblemDefinition();
+
+  pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
+
+  //###########################################################################
+  // solve
+  //
+  // termination condition: 
+  //    reached duration or found solution in epsilon-neighborhood
+  //###########################################################################
+  bool solved = false;
+  double solution_time = dInf;
+  double max_planning_time= input.max_planning_time;
+  ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
+
+  //###########################################################################
+  // solve
+  //###########################################################################
+
+  ob::PlannerStatus status = ss.solve(ptc);
+  solved = ss.haveExactSolutionPath();
+
+  //###########################################################################
+  // extract roadmap
+  //###########################################################################
+
+  ob::PlannerData pd(si);
+  ss.getPlannerData(pd);
+  SerializeTree(pd);
+
+  //###########################################################################
+  // extract solution path if solved
+  //###########################################################################
+
+  solved = ss.haveSolutionPath();
+  //return approximate solution
+  if (solved)
+  {
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "Found solution:" << std::endl;
+    std::cout << " exact solution       : " << (pdef->hasExactSolution()? "Yes":"No")<< std::endl;
+    std::cout << " approximate solution : " << (pdef->hasApproximateSolution()? "Yes":"No")<< std::endl;
+
+    double dg = pdef->getSolutionDifference();
+    std::cout << " solution difference  : " << dg << std::endl;
+
+    ss.simplifySolution();
+    og::PathGeometric path = ss.getSolutionPath();
+    path.interpolate();
+
+    std::cout << "Path Length     : " << path.length() << std::endl;
+
+    //og::PathSimplifier shortcutter(si);
+    //shortcutter.shortcutPath(path);
+
+    std::vector<ob::State *> states = path.getStates();
+    std::vector<Config> keyframes;
+    for(int i = 0; i < states.size(); i++)
+    {
+      ob::State *state = states.at(i);//path.getState(i);
+      Config cc = cspace->OMPLStateToConfig(state);
+      std::vector<Real> curd = std::vector<Real>(cc);
+      //extract only position
+      std::vector<Real> curhalf(curd.begin(),curd.begin()+int(0.5*curd.size()));
+      Config cur(curhalf);
+
+      keyframes.push_back(cur);
+    }
+
+    uint istep = max(int(keyframes.size()/10.0),1);
+    for(int i = 0; i < keyframes.size(); i+=istep)
+    {
+      std::cout << i << "/" << keyframes.size() << " : "  <<  keyframes.at(i) << std::endl;
+    }
+    std::cout << keyframes.size() << "/" << keyframes.size() << " : "  <<  keyframes.back() << std::endl;
+
+    output.SetKeyframes(keyframes);
+    output.SetTree(_stree);
+    std::cout << std::string(80, '-') << std::endl;
+  }else{
+    std::cout << "No solution found" << std::endl;
+  }
+
+  return solved;
+
+  //og::SimpleSetup ss(cspace.getPtr());
+  //const ob::SpaceInformationPtr si = ss.getSpaceInformation();
+  //ss.setPlanner(ompl_planner);
+
+  //si->setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
+
+  //ss.setStartAndGoalStates(start, goal);
+  //ss.setup();
+  //ob::PlannerStatus solved = ss.solve(10.0);
+  //if (solved)
+  //{
+  //  std::cout << "Found solution:" << std::endl;
+  //  ss.simplifySolution();
+  //  og::PathGeometric path = ss.getSolutionPath();
+  //  path.interpolate();
+  //  std::cout << path.length() << std::endl;
+  //  std::cout << path.getStateCount() << std::endl;
+
+  //  vector<Config> keyframes;
+  //  for(int i = 0; i < path.getStateCount(); i++)
+  //  {
+  //    ob::State *state = path.getState(i);
+  //    Config cur = OMPLStateToConfig(state, cspace.getPtr());
+  //    _keyframes.push_back(cur);
+  //  }
+  //  std::cout << std::string(80, '-') << std::endl;
+  //}else{
+  //  std::cout << "No solution found" << std::endl;
+  //}
+
+
+}
+
+bool MotionPlannerOMPL::solve_kinodynamically(CSpaceOMPL *cspace){
+  Config p_init = input.q_init;
+  Config p_goal = input.q_goal;
+  std::string algorithm = input.name_algorithm;
   //###########################################################################
   // Config init,goal to OMPL start/goal
   //###########################################################################
@@ -198,7 +368,6 @@ bool MotionPlannerOMPL::solve()
   // choose planner
   //###########################################################################
 
-
   ob::PlannerPtr ompl_planner;
 
   if(algorithm=="ompl:rrt") ompl_planner = std::make_shared<oc::RRT>(si);
@@ -210,6 +379,9 @@ bool MotionPlannerOMPL::solve()
     exit(0);
     return false;
   }
+
+  ob::ParamSet psi = si->params();
+  psi.print(std::cout);
 
   //###########################################################################
   // setup and projection
@@ -357,4 +529,3 @@ bool MotionPlannerOMPL::solve()
 
   return solved;
 }
-
