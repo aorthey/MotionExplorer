@@ -1,3 +1,7 @@
+#include "gui.h"
+#include "util.h"
+#include "drawMotionPlanner.h"
+
 #include <KrisLibrary/geometry/AnyGeometry.h>
 #include <KrisLibrary/math3d/basis.h>
 #include <KrisLibrary/math/LAPACKInterface.h>
@@ -7,9 +11,6 @@
 #include <tinyxml.h>
 #include <iostream>
 #include <fstream>
-#include "gui.h"
-#include "drawMotionPlanner.h"
-#include "util.h"
 
 
 const GLColor bodyColor(0.1,0.1,0.1);

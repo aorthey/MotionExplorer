@@ -1,10 +1,11 @@
 #pragma once
 
-#include <tinyxml.h>
 #include "util.h"
 #include "gui.h"
 #include "info.h"
 #include "planner/planner_input.h"
+
+#include <tinyxml.h>
 
 class EnvironmentLoader{
   private:

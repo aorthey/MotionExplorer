@@ -1,5 +1,11 @@
 #pragma once
 
+#include "planner/planner.h"
+#include "planner/principalfibrebundle.h"
+#include "planner/omplklamptconverter.h"
+#include "planner/cspace.h"
+#include "util.h"
+
 //#include <ompl/base/spaces/DubinsStateSpace.h>
 //#include <ompl/base/spaces/ReedsSheppStateSpace.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
@@ -35,11 +41,6 @@
 //#include <boost/program_options.hpp>
 #include <omplapp/config.h>
 #include <omplapp/apps/SE3RigidBodyPlanning.h>
-#include "planner/planner.h"
-#include "util.h"
-#include "principalfibrebundle.h"
-#include "omplklamptconverter.h"
-#include "cspace.h"
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;

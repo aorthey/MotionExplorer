@@ -1,3 +1,10 @@
+#include "util.h"
+#include "info.h"
+#include "gui.h"
+#include "environment_loader.h"
+#include "planner/planner_ompl.h"
+#include "controller/controller.h"
+
 #include <stdio.h>
 #include <ctime>
 #include <KrisLibrary/GLdraw/GL.h>
@@ -11,13 +18,6 @@
 #include <Modeling/DynamicPath.h>
 #include <Modeling/Paths.h>
 #include <Control/PathController.h>
-
-#include "util.h"
-#include "info.h"
-#include "gui.h"
-#include "environment_loader.h"
-#include "planner/planner_ompl.h"
-#include "controller/controller.h"
 
 int main(int argc,const char** argv) {
 

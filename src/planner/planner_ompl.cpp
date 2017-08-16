@@ -1,15 +1,39 @@
-#include <ompl/base/GenericParam.h>
+//#include <topology/cohomology-persistence.h>
 #include "planner_ompl.h"
+#include "chomp.h"
 #include "liegroupintegrator.h"
 #include "planner/planner_workspace_approximation.h"
 
+#include <boost/regex.hpp>
+#include <ompl/base/GenericParam.h>
+#include <ompl/base/PlannerDataGraph.h>
+
+using namespace chomp;
 
 void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
 {
   //pd.decoupleFromPlanner();
   std::cout << "serializing tree with " << pd.numVertices() << " vertices" << std::endl;
   std::cout << "                  and " << pd.numEdges() << " edges" << std::endl;
-  pd.toBoostGraph();
+  ob::PlannerData::Graph graph = pd.toBoostGraph();
+
+  //HomologyCore hc;
+
+  //namespace chomp{
+//#include <chomp/Generators.h>
+//#include <chomp/MorseComplex.h>
+  //};
+
+  // dijkstra_shortest_paths(g, s, predecessor_map(&p[0]).distance_map(&d[0]));
+  // std::cout << "distances and parents:" << std::endl;
+  // graph_traits < graph_t >::vertex_iterator vi, vend;
+  // for (boost::tie(vi, vend) = vertices(g); vi != vend; ++vi) {
+  //   std::cout << "distance(" << name[*vi] << ") = " << d[*vi] << ", ";
+  //   std::cout << "parent(" << name[*vi] << ") = " << name[p[*vi]] << std::
+  //     endl;
+  // }
+  // std::cout << std::endl;
+
 
   _stree.clear();
   uint N = robot->q.size()-6;

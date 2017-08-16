@@ -1,4 +1,9 @@
 #pragma once
+#include "planner/serialized_tree.h"
+#include "planner/planner_output.h"
+#include "elements/swept_volume.h"
+#include "elements/wrench_field.h"
+#include "controller/controller.h"
 
 #include <regex>
 #include <Interface/SimTestGUI.h>
@@ -15,11 +20,6 @@
 
 #include <View/ViewIK.h>
 #include <ode/ode.h>
-#include "planner/serialized_tree.h"
-#include "planner/planner_output.h"
-#include "elements/swept_volume.h"
-#include "elements/wrench_field.h"
-#include "controller/controller.h"
 
 #define DEBUG 0
 

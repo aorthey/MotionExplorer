@@ -705,7 +705,7 @@ We might lose orientation connectivity because a passage is too curved.
 [ ] !! FIX LEVEL0: spheres are too near which cost too much computation. Also spheres
 are still computed kinodynamically. this is the foundation, there cannot be any
 overload crap. Don't sacrifice completeness, however.
-  [ ] make computation geometric
+  [x] make computation geometric
   [ ] enforce space constraint
   [ ] compute principal LEVEL0 path 
     [ ] fix one graph representation (e.g. boostgraph) which has lots of
