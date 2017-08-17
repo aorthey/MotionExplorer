@@ -748,6 +748,11 @@ namespace GLDraw{
       }
     }
   }
+  void drawSimplicialComplex( SimplicialComplex& cmplx ){
+    for(int i = 0; i < cmplx.V.size(); i++){
+      drawPoint(cmplx.V.at(i));
+    }
+  }
 
   void drawForceEllipsoid( const ODERobot *robot ){
     uint Nlinks = robot->robot.links.size();

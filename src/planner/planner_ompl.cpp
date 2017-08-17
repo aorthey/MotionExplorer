@@ -13,14 +13,7 @@ void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
   //pd.decoupleFromPlanner();
   std::cout << "serializing tree with " << pd.numVertices() << " vertices" << std::endl;
   std::cout << "                  and " << pd.numEdges() << " edges" << std::endl;
-  ob::PlannerData::Graph graph = pd.toBoostGraph();
-
-  Topology::TopologicalGraph top(graph);
-
-  //namespace chomp{
-//#include <chomp/Generators.h>
-//#include <chomp/MorseComplex.h>
-  //};
+  //ob::PlannerData::Graph graph = pd.toBoostGraph();
 
   // dijkstra_shortest_paths(g, s, predecessor_map(&p[0]).distance_map(&d[0]));
   // std::cout << "distances and parents:" << std::endl;
@@ -277,7 +270,11 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
 
   ob::PlannerData pd(si);
   ss.getPlannerData(pd);
+  std::cout << "TopologicalGraph" << std::endl;
+  Topology::TopologicalGraph top(pd);
+
   SerializeTree(pd);
+  output.cmplx = top.GetSimplicialComplex();
 
   //###########################################################################
   // extract solution path if solved
@@ -473,7 +470,9 @@ bool MotionPlannerOMPL::solve_kinodynamically(CSpaceOMPL *cspace){
 
   oc::PlannerData pd(si);
   ss.getPlannerData(pd);
+
   SerializeTree(pd);
+
 
   //###########################################################################
   // extract solution path if solved

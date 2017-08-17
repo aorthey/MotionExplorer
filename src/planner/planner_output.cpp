@@ -36,6 +36,9 @@ void PlannerOutput::SetTree(SerializedTree &stree)
   _stree = stree;
 }
 
+const SimplicialComplex& PlannerOutput::GetSimplicialComplex(){
+  return cmplx;
+}
 const std::vector<Config> PlannerOutput::GetKeyframes(){
   return q;
 }

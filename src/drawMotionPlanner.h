@@ -10,6 +10,7 @@
 
 #include "planner/planner.h"
 #include "elements/wrench_field.h"
+#include "elements/simplicial_complex.h"
 
 namespace GLDraw {
   void drawRobotExtras(ViewRobot *robot, GLColor bodyColor=GLColor(0.5,0.5,0.5), double COMradius=0.05);
@@ -21,6 +22,7 @@ namespace GLDraw {
 
   void drawGLPathKeyframes(Robot *robot, std::vector<uint> keyframe_indices, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor color = GLColor(0.8,0.8,0.8,1.0), double scale = 1.0);
 
+  void drawSimplicialComplex( SimplicialComplex& cmplx );
   void drawSwathVolume(Robot *robot, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor swathVolumeColor=GLColor(0.5,0.8,0.5,0.5));
 
   void drawGLPathSweptVolume(Robot *robot, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor sweptvolumeColor = GLColor(0.7,0.0,0.9,0.2), double sweptvolumeScale = 0.98);

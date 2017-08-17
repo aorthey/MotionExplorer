@@ -465,10 +465,12 @@ void ForceFieldBackend::RenderWorld()
     //if(drawPathMilestones.at(i)) GLDraw::drawGLPathKeyframes(robot_i, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack, sv.GetColorMilestones());
     //if(drawPlannerTree.at(i)) GLDraw::drawPlannerTree(plannerOutput.at(i).GetTree());
 
-
     if(drawPlannerTree.at(i)){
       SwathVolume swv = plannerOutput.at(i).GetSwathVolume();
-      GLDraw::drawSwathVolume(swv.GetRobot(), swv.GetMatrices(), swv.GetAppearanceStack(), swv.GetColor());
+      //GLDraw::drawSwathVolume(swv.GetRobot(), swv.GetMatrices(), swv.GetAppearanceStack(), swv.GetColor());
+
+      SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
+      GLDraw::drawSimplicialComplex(cmplx);
     }
 
     std::vector<HierarchicalLevel> hierarchy = plannerOutput.at(i).GetHierarchy();

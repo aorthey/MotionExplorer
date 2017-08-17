@@ -1,6 +1,7 @@
 #pragma once
 #include "elements/swept_volume.h"
 #include "elements/swath_volume.h"
+#include "elements/simplicial_complex.h"
 #include "planner/serialized_tree.h"
 
 struct HierarchicalLevel{
@@ -32,6 +33,7 @@ class PlannerOutput{
 
     SweptVolume *sv;
     SwathVolume *swv;
+    SimplicialComplex cmplx;
 
     Robot *robot;
   private:
@@ -65,6 +67,7 @@ class PlannerOutput{
     void SetTree(SerializedTree &stree);
     const std::vector<Config> GetKeyframes();
     void SetKeyframes(std::vector<Config> &keyframes);
+    const SimplicialComplex& GetSimplicialComplex();
 
 };
 

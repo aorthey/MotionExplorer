@@ -33,13 +33,18 @@
     <se3max config="6  10 6 16 0 0 0 "/>
     <timestep min="0.1" max="0.1"/>
     <epsilongoalregion>0</epsilongoalregion>
-    <maxplanningtime>0.5</maxplanningtime>
+    <maxplanningtime>0.2</maxplanningtime>
     <algorithm>workspace</algorithm>
 
     <drawMilestones>0</drawMilestones>
     <drawSweptVolume>0</drawSweptVolume>
     <drawTree>0</drawTree>
     <drawStartGoal>1</drawStartGoal>
+
+    <drawSimplicialComplexVertices>1</drawSimplicialComplexVertices>
+    <drawSimplicialComplexEdges>0</drawSimplicialComplexEdges>
+    <drawSimplicialComplexSurfaces>0</drawSimplicialComplexSurfaces>
+    <drawSimplicialComplexTetrahedra>0</drawSimplicialComplexTetrahedra>
 
     <robot>
       <index>1</index>
