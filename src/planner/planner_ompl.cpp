@@ -1,14 +1,12 @@
 //#include <topology/cohomology-persistence.h>
 #include "planner_ompl.h"
-#include "chomp.h"
-#include "liegroupintegrator.h"
-#include "planner/planner_workspace_approximation.h"
+//#include "liegroupintegrator.h"
+//#include "planner/planner_workspace_approximation.h"
 
-#include <boost/regex.hpp>
+//#include <boost/regex.hpp>
 #include <ompl/base/GenericParam.h>
 #include <ompl/base/PlannerDataGraph.h>
 
-using namespace chomp;
 
 void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
 {
@@ -17,7 +15,7 @@ void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
   std::cout << "                  and " << pd.numEdges() << " edges" << std::endl;
   ob::PlannerData::Graph graph = pd.toBoostGraph();
 
-  //HomologyCore hc;
+  Topology::TopologicalGraph top(graph);
 
   //namespace chomp{
 //#include <chomp/Generators.h>

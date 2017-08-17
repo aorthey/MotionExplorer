@@ -5,6 +5,7 @@
 #include "planner/omplklamptconverter.h"
 #include "planner/cspace.h"
 #include "util.h"
+#include "elements/topological_graph.h"
 
 //#include <ompl/base/spaces/DubinsStateSpace.h>
 //#include <ompl/base/spaces/ReedsSheppStateSpace.h>
