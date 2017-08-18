@@ -631,5 +631,7 @@
 </joint>
 
   <klampt package_root="../../.." default_acc_max="4" >
+    <noselfcollision pairs="brain eye_brain"/>
+    <noselfcollision pairs="eye_brain container_brain"/>
   </klampt>
 </robot>

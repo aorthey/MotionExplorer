@@ -890,7 +890,11 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
 
     Config q;
     if(plannerOutput.size()>0){
-      q = plannerOutput.at(0).q_init;
+      if(plannerOutput.at(0).robot_idx == 0){
+        q = plannerOutput.at(0).q_init;
+      }else{
+        q = robot->q;
+      }
     }else{
       q = robot->q;
     }
@@ -1011,16 +1015,17 @@ bool GLUIForceFieldGUI::Initialize()
     linkBox = glui->add_listbox_to_panel(panel,"Show Link",NULL);
     //toggleMeasurementDrawCheckbox = glui->add_checkbox_to_panel(panel,"Plot value");
 
-    Robot* robot = world->robots[_backend->plannerOutput.at(i).robot_idx];
-    uint Nlinks = robot->links.size();
-    std::cout << "path " << i << "with links " << robot->links.size() << std::endl;
-    for(size_t i=0;i<robot->links.size();i++)
-    {
-      char buf[256];
-      strcpy(buf,robot->linkNames[i].c_str());
-      linkBox->add_item(i,buf);
-    }
-    AddControl(linkBox,"show_links");
+    //Robot* robot = world->robots[_backend->plannerOutput.at(i).robot_idx];
+    //uint Nlinks = robot->links.size();
+    //std::cout << "path " << i << "with links " << robot->links.size() << std::endl;
+
+    //for(size_t i=0;i<robot->links.size();i++)
+    //{
+    //  char buf[256];
+    //  strcpy(buf,robot->linkNames[i].c_str());
+    //  linkBox->add_item(i,buf);
+    //}
+    //AddControl(linkBox,"show_links");
     //checkbox = glui->add_checkbox_to_panel(panel, descr1.c_str());
     //AddControl(checkbox,dpsv.c_str());
     //checkbox->set_int_val(_backend->drawPathSweptVolume.at(i));

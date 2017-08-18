@@ -44,12 +44,25 @@ int main(int argc,const char** argv) {
 
   env.GetBackendPtr()->ShowRobot();
 
-  GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
-  gui.SetWindowTitle("SweptVolumePath");
+  //Robot *inner = env.GetWorldPtr()->robots[1];
+  //Robot *outer = env.GetWorldPtr()->robots[2];
+  //Config q;
+  //q = inner->q;
+  //q[0]=-Inf;
+  //inner->UpdateConfig(q);
+  //q = outer->q;
+  //q[0]=-Inf;
+  //outer->UpdateConfig(q);
 
+  env.GetBackendPtr()->sim.odesim.DeleteRobot("sphere_inner");
+  env.GetBackendPtr()->sim.odesim.DeleteRobot("sphere_outer");
   //env.GetWorldPtr()->DeleteRobot("sphere_inner");
   //env.GetWorldPtr()->DeleteRobot("sphere_outer");
 
+  GLUIForceFieldGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
+  gui.SetWindowTitle("SweptVolumePath");
+
+  //exit(0);
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "GUI Start" << std::endl;
   std::cout << std::string(80, '-') << std::endl;

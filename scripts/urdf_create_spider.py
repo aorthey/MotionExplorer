@@ -29,18 +29,18 @@ fname = pathname + fname
 
 
 def createHead(headname):
-    upperhead = "eye_"+headname
-    tophead = "container_"+headname
-    topradius = 0.6*headradius
-    length = 1*headradius
+  upperhead = "eye_"+headname
+  tophead = "container_"+headname
+  topradius = 0.6*headradius
+  length = 1*headradius
 
-    hstrs = createSphere(headname,0,0,0,headradius)
-    hstrs += createRotatedCylinder(upperhead,0,0,headradius+length/2,0,0,1.57,0.3*length,length+0.1)
-    hstrs += createRigidJoint("joint_"+headname+"_"+upperhead, upperhead, headname)
+  hstrs = createSphere(headname,0,0,0,headradius)
+  hstrs += createRotatedCylinder(upperhead,0,0,headradius+length/2,0,0,1.57,0.3*length,length+0.1)
+  hstrs += createRigidJoint("joint_"+headname+"_"+upperhead, upperhead, headname)
 
-    hstrs += createSphere(tophead,0,0,headradius+length+topradius,topradius)
-    hstrs += createRigidJoint("joint_"+upperhead+"_"+tophead, tophead, upperhead)
-    return hstrs
+  hstrs += createSphere(tophead,0,0,headradius+length+topradius,topradius)
+  hstrs += createRigidJoint("joint_"+upperhead+"_"+tophead, tophead, upperhead)
+  return hstrs
 
 def createBody(headname):
   turnangle = 2*pi/numberLegs
@@ -62,13 +62,11 @@ def createBody(headname):
 
     body+= createSphere(shouldername,x,y,z,jointradius)
     body+= createRigidJoint(shouldername+'_fixed', headname, shouldername)
-    #body+= createRevoluteJointXYZ(shouldername+'_revolute', headname, shouldername, ex[0],ex[1],ex[2], x,y,z,lowerLimit, upperLimit)
 
     leg1 = 'leg_'+str(k)+'_link0'
 
     x = (headradius+jointradius)*cos(angle)
     y = (headradius+jointradius)*sin(angle)
-    #body+= createRevoluteJoint(leg1+'_revolute', shouldername, leg1,x,y,z,lowerLimit, upperLimit)
     body+= createSphericalJoint(leg1+'_spherical', shouldername, leg1,x,y,z,lowerLimit, upperLimit)
 
     x = (leglength1/2+jointradius)*cos(angle)
@@ -82,7 +80,6 @@ def createBody(headname):
 
     leg2 = 'leg_'+str(k)+'_link1'
 
-    #body+= createRevoluteJointXYZ(leg2+'_revolute', leg1+'_sphere', leg2, ex[0],ex[1],ex[2], x,y,z,lowerLimit, upperLimit)
     body+= createSphericalJoint(leg2+'_spherical', leg1+'_sphere', leg2, x,y,z,lowerLimit, upperLimit)
 
     body+= createRotatedCylinder(leg2,0,0,z-leglength2/2-jointradius,0,0,angle,legradius,leglength2-0.01) 
@@ -111,8 +108,8 @@ f.write(createHead(headname))
 f.write(createBody(headname))
 #f.write('  <klampt package_root="../.." flip_yz="1" use_vis_geom="1">\n')
 f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
-#f.write('    <noselfcollision pairs="head eye"/>\n')
-#branch_00_spherical_joint_link
+f.write('    <noselfcollision pairs="brain eye_brain"/>\n')
+f.write('    <noselfcollision pairs="eye_brain container_brain"/>\n')
 #f.write('    <link name="branch_00_spherical_joint_link" physical="0" />\n')
 #f.write('    <noselfcollision pairs="eye branch_00"/>\n')
 #f.write('    <noselfcollision pairs="eye branch_00_cylinder"/>\n')

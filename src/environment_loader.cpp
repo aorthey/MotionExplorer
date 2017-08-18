@@ -117,6 +117,7 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     //  nd = (int) drivers.size();
     info(&world);
     SmartPointer<RobotController> controller = new ContactStabilityController(*robot);
+
     RobotControllerFactory::Register("ContactStabilityController", controller);
     _backend->sim.SetController(0, controller);
 

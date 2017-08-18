@@ -679,17 +679,13 @@ Hplanner, so we need to give it more meaningful name
 [ ] make sure it works with -wall, -mars, and -cave.
 [ ] fix spider urdf
 
-[ ] new idea for going down one level !!
+[ ] get new idea for going down one level
  [ ] cylinder -> hole example (can easily be compared to ompl, has many
 variations already included in ompl and would nicely act as a ground truth
 example)
  [ ] cylinder -> free space as comparison (do not check if start and goal can be
 connected, or use that as a ground truth benchmark)
  [ ] corner element -> hole
-
-
- [ ] change to boost tree to use more convenient algorithms
-
 
 -- Decompose robot into CVX regions. If not, add cvx regions and rigid joints.
 
@@ -708,5 +704,5 @@ overload crap. Don't sacrifice completeness, however.
   [x] make computation geometric
   [ ] enforce space constraint
   [ ] compute principal LEVEL0 path 
-    [ ] fix one graph representation (e.g. boostgraph) which has lots of
+    [x] fix one graph representation (e.g. boostgraph) which has lots of
 algorithms associated (at least dykstra)

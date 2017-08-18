@@ -1,10 +1,15 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot index="0" name="spider" file="/home/aorthey/git/orthoklampt/data/spider.urdf" translation="0 0 0" rotateRPY="0 0 0" config="29  -1.41933 -0.615327 1.67908 0.0169847 0.0155761 -0.303214 0 0 0 0.00453186 -0.0249605 0 -0.00141095 0.0759681 0 0 0.000134763 0.0527292 0 7.64411e-09 0.00723569 0 0 -0.00110411 0.158241 0 8.11395e-05 -0.174171 0 "/>
+  <robot index="0" name="spider" file="/home/aorthey/git/orthoklampt/data/spider.urdf" translation="0 0 0" rotateRPY="0 0 0" config="29 -1.49055 -0.343221 1.44064 6.23411 -0.00884473 6.1431 0.000134763 1.20206e-320 6.95335e-310 0.00736376 -0.0590389 0 0.128255 0.135814 0.158241 0 0.00368315 -0.125626 0 -9.46818e-08 -0.00153995 6.95335e-310 0 -0.289195 0.1614 -0.303214 0.000705835 0.0344819 0 "/>
 
-  <robot name="sphere_inner" file="/home/aorthey/git/orthoklampt/data/sphere_inner.urdf" config="6 0 0 -5 0 0 0"/>
-  <robot name="sphere_outer" file="/home/aorthey/git/orthoklampt/data/sphere_outer.urdf" config="6 0 0 -5 0 0 0"/>
+  <!--
+  29  -1.41933 -0.615327 1.67908 0.0169847 0.0155761 -0.303214 0 0 0 0.00453186 -0.0249605 0 -0.00141095 0.0759681 0 0 0.000134763 0.0527292 0 7.64411e-09 0.00723569 0 0 -0.00110411 0.158241 0 8.11395e-05 -0.174171 0 "/>
+-->
+
+
+  <robot name="sphere_inner" file="/home/aorthey/git/orthoklampt/data/sphere_inner.urdf" config="6 0 0 -10 0 0 0"/>
+  <robot name="sphere_outer" file="/home/aorthey/git/orthoklampt/data/sphere_outer.urdf" config="6 0 0 -10 0 0 0"/>
 
   <terrain  name="mountain/ridge.tri" file="/home/aorthey/git/orthoklampt/data/terrains/cave/cave.tri" translation="0 0 0">
    <display color="0.9 0.5 0.1"/>
@@ -27,25 +32,21 @@
 
   <plannersettings>
 
-    <qinit config="6  -1.41933 -0.615327 1.77908 0 0 0 "/>
+    <qinit config="6  -1.49055 -0.343221 1.44064 6.23411 -0.00884473 6.1431 "/>
     <qgoal config="6  -10 1 2 0 0 0 "/>
     <se3min config="6  -15 -6 -1 0 0 0 "/>
     <se3max config="6  10 6 16 0 0 0 "/>
     <timestep min="0.1" max="0.1"/>
     <epsilongoalregion>0</epsilongoalregion>
-    <maxplanningtime>5</maxplanningtime>
+    <maxplanningtime>0.1</maxplanningtime>
     <algorithm>workspace</algorithm>
 
     <drawMilestones>0</drawMilestones>
     <drawSweptVolume>0</drawSweptVolume>
-    <drawStartGoal>1</drawStartGoal>
+    <drawStartGoal>0</drawStartGoal>
 
     <drawTree>0</drawTree>
-    <drawSimplicialComplex>1</drawSimplicialComplex>
-    <drawSimplicialComplexVertices>1</drawSimplicialComplexVertices>
-    <drawSimplicialComplexEdges>1</drawSimplicialComplexEdges>
-    <drawSimplicialComplexSurfaces>0</drawSimplicialComplexSurfaces>
-    <drawSimplicialComplexTetrahedra>0</drawSimplicialComplexTetrahedra>
+    <drawSimplicialComplex>0</drawSimplicialComplex>
 
     <robot>
       <index>1</index>
