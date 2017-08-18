@@ -122,6 +122,8 @@ class ForceFieldBackend : public SimTestBackend
     void HideMilestones();
     void ShowPlannerTree();
     void HidePlannerTree();
+    void ShowPlannerSimplicialComplex();
+    void HidePlannerSimplicialComplex();
 
     void AddPlannerOutput( PlannerOutput pout );
 
@@ -148,6 +150,7 @@ class ForceFieldBackend : public SimTestBackend
     std::vector<int> drawPathMilestones;
     std::vector<int> drawPathStartGoal;
     std::vector<int> drawPlannerTree;
+    std::vector<int> drawPlannerSimplicialComplex;
 
     int showSweptVolumes;
     int drawController;

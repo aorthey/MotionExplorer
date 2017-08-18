@@ -749,8 +749,32 @@ namespace GLDraw{
     }
   }
   void drawSimplicialComplex( SimplicialComplex& cmplx ){
+    std::cout << "drawSimplicialComplex: " 
+      << cmplx.V.size() << " vertices " 
+      << cmplx.E.size() << " edges " 
+      << cmplx.F.size() << " faces " 
+      << cmplx.T.size() << " tetrahedras " 
+      << std::endl;
+
+    glPointSize(10);
     for(int i = 0; i < cmplx.V.size(); i++){
       drawPoint(cmplx.V.at(i));
+    }
+    glLineWidth(5);
+    for(int i = 0; i < cmplx.E.size(); i++){
+      drawLineSegment(cmplx.E.at(i).first, 
+                      cmplx.E.at(i).second);
+    }
+    for(int i = 0; i < cmplx.F.size(); i++){
+      drawTriangle(cmplx.F.at(i).at(0),
+                   cmplx.F.at(i).at(1),
+                   cmplx.F.at(i).at(2) );
+    }
+    for(int i = 0; i < cmplx.T.size(); i++){
+      drawQuad(cmplx.T.at(i).at(0),
+                   cmplx.T.at(i).at(1),
+                   cmplx.T.at(i).at(2),
+                   cmplx.T.at(i).at(3) );
     }
   }
 

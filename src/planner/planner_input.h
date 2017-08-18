@@ -26,10 +26,11 @@ class PlannerInput{
     Config se3min;
     Config se3max;
 
-    int drawTree;
     int drawSweptVolume;
     int drawMilestones;
     int drawStartGoal;
+    int drawTree;
+    int drawSimplicialComplex;
 
     bool load(const char* file);
     bool load(TiXmlElement *node);

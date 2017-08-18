@@ -10,8 +10,8 @@
 //
 struct SimplicialComplex{
   std::vector<Math3D::Vector3> V;
-  std::vector<std::pair<uint,uint>> E;
-  std::vector<std::vector<uint> > F;
-  std::vector<std::vector<uint> > T;
+  std::vector<std::pair<Math3D::Vector3,Math3D::Vector3>> E;
+  std::vector<std::vector<Math3D::Vector3> > F;
+  std::vector<std::vector<Math3D::Vector3> > T;
 };
 

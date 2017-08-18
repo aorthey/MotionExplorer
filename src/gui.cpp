@@ -59,6 +59,7 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawPathMilestones.clear();
   drawPathStartGoal.clear();
   drawPlannerTree.clear();
+  drawPlannerSimplicialComplex.clear();
 
   _frames.clear();
   swept_volume_paths.clear();
@@ -91,6 +92,16 @@ void ForceFieldBackend::ShowPlannerTree(){
 void ForceFieldBackend::HidePlannerTree(){ 
   for(int i = 0; i < drawPlannerTree.size(); i++){
     drawPlannerTree.at(i) = 0;
+  }
+}
+void ForceFieldBackend::ShowPlannerSimplicialComplex(){ 
+  for(int i = 0; i < drawPlannerSimplicialComplex.size(); i++){
+    drawPlannerSimplicialComplex.at(i) = 1;
+  }
+}
+void ForceFieldBackend::HidePlannerSimplicialComplex(){ 
+  for(int i = 0; i < drawPlannerSimplicialComplex.size(); i++){
+    drawPlannerSimplicialComplex.at(i) = 0;
   }
 }
 
@@ -210,12 +221,14 @@ void ForceFieldBackend::Start()
   drawPathMilestones.clear();
   drawPathStartGoal.clear();
   drawPlannerTree.clear();
+  drawPlannerSimplicialComplex.clear();
 
   std::cout << "Setting swept volume paths" << std::endl;
   for(int i = 0; i < plannerOutput.size(); i++){
     drawPathSweptVolume.push_back(plannerOutput.at(i).drawSweptVolume);
     drawPathStartGoal.push_back(plannerOutput.at(i).drawStartGoal);
     drawPlannerTree.push_back(plannerOutput.at(i).drawTree);
+    drawPlannerSimplicialComplex.push_back(plannerOutput.at(i).drawSimplicialComplex);
 
     if(plannerOutput.at(i).drawMilestones) drawPathMilestones.push_back(1);
     else drawPathMilestones.push_back(0);
@@ -229,6 +242,8 @@ void ForceFieldBackend::Start()
     MapButtonToggle(dpsg.c_str(),&drawPathStartGoal.at(i));
     std::string dpt = "draw_planner_tree_"+std::to_string(i);
     MapButtonToggle(dpt.c_str(),&drawPlannerTree.at(i));
+    std::string dpsc = "draw_planner_simplicial_complex_"+std::to_string(i);
+    MapButtonToggle(dpsc.c_str(),&drawPlannerSimplicialComplex.at(i));
   }
 
   std::cout << "Finished Initializing Backend" << std::endl;
@@ -463,21 +478,22 @@ void ForceFieldBackend::RenderWorld()
     }
 
     //if(drawPathMilestones.at(i)) GLDraw::drawGLPathKeyframes(robot_i, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack, sv.GetColorMilestones());
-    //if(drawPlannerTree.at(i)) GLDraw::drawPlannerTree(plannerOutput.at(i).GetTree());
 
     if(drawPlannerTree.at(i)){
       SwathVolume swv = plannerOutput.at(i).GetSwathVolume();
-      //GLDraw::drawSwathVolume(swv.GetRobot(), swv.GetMatrices(), swv.GetAppearanceStack(), swv.GetColor());
+      GLDraw::drawSwathVolume(swv.GetRobot(), swv.GetMatrices(), swv.GetAppearanceStack(), swv.GetColor());
 
+    }
+    if(drawPlannerSimplicialComplex.at(i)){
       SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
       GLDraw::drawSimplicialComplex(cmplx);
     }
 
-    std::vector<HierarchicalLevel> hierarchy = plannerOutput.at(i).GetHierarchy();
-    for(int j = 0; j < hierarchy.size(); j++){
-      std::cout << "Hierarchy Level " << j << std::endl;
-      std::cout << "                name " << hierarchy.at(j).name << std::endl;
-    }
+    //std::vector<HierarchicalLevel> hierarchy = plannerOutput.at(i).GetHierarchy();
+    //for(int j = 0; j < hierarchy.size(); j++){
+    //  std::cout << "Hierarchy Level " << j << std::endl;
+    //  std::cout << "                name " << hierarchy.at(j).name << std::endl;
+    //}
 
   }
 
@@ -923,6 +939,10 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     for(int i = 0; i < drawPlannerTree.size(); i++){
       toggle(drawPlannerTree.at(i));
     }
+  }else if(cmd=="draw_planner_simplicial_complex"){
+    for(int i = 0; i < drawPlannerSimplicialComplex.size(); i++){
+      toggle(drawPlannerSimplicialComplex.at(i));
+    }
   }else if(cmd=="draw_swept_volume"){
     for(int i = 0; i < drawPathSweptVolume.size(); i++){
       toggle(drawPathSweptVolume.at(i));
@@ -1022,6 +1042,12 @@ bool GLUIForceFieldGUI::Initialize()
     checkbox = glui->add_checkbox_to_panel(panel, descr4.c_str());
     AddControl(checkbox,dpt.c_str());
     checkbox->set_int_val(_backend->drawPlannerTree.at(i));
+
+    std::string dpsc = "draw_planner_simplicial_complex_"+std::to_string(i);
+    std::string descr5 = prefix + "Draw Planner SimplicialComplex";
+    checkbox = glui->add_checkbox_to_panel(panel, descr5.c_str());
+    AddControl(checkbox,dpsc.c_str());
+    checkbox->set_int_val(_backend->drawPlannerSimplicialComplex.at(i));
   }
 
   //AddControl(glui->add_button_to_panel(panel,"Save state"),"save_state");
@@ -1099,14 +1125,15 @@ bool GLUIForceFieldGUI::Initialize()
   AddToKeymap("4","draw_distance_robot_terrain");
   AddToKeymap("5","draw_com_path");
   AddToKeymap("q","draw_minimal");
-  AddToKeymap("g","draw_swept_volume");
 
   AddToKeymap("T","toggle_mode");
   AddToKeymap("f","draw_rigid_objects_faces_toggle");
   AddToKeymap("e","draw_rigid_objects_edges_toggle");
   AddToKeymap("s","toggle_simulate");
   AddToKeymap("p","print_config");
+  AddToKeymap("g","draw_swept_volume");
   AddToKeymap("t","draw_planner_tree_toggle");
+  AddToKeymap("G","draw_planner_simplicial_complex");
   AddToKeymap("S","make_screenshot");
 
   AddButton("load_motion_planner");

@@ -16,6 +16,7 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   output.robot = robot;
   output.name_algorithm = input.name_algorithm;
   output.drawTree = input.drawTree;
+  output.drawSimplicialComplex = input.drawSimplicialComplex;
   output.drawSweptVolume = input.drawSweptVolume;
   output.drawMilestones = input.drawMilestones;
   output.drawStartGoal = input.drawStartGoal;

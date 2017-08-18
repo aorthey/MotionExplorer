@@ -26,10 +26,11 @@ class PlannerOutput{
     Config dq_init;
     Config dq_goal;
 
-    int drawTree;
     int drawSweptVolume;
     int drawMilestones;
     int drawStartGoal;
+    int drawTree;
+    int drawSimplicialComplex;
 
     SweptVolume *sv;
     SwathVolume *swv;
