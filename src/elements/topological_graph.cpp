@@ -1,11 +1,19 @@
 #include "elements/topological_graph.h"
 
+#include <SBL/GT/Betti_numbers_2.hpp>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Regular_triangulation_3.h>
 #include <CGAL/Fixed_alpha_shape_3.h>
 #include <CGAL/Fixed_alpha_shape_vertex_base_3.h>
 #include <CGAL/Fixed_alpha_shape_cell_base_3.h>
 #include <CGAL/Alpha_shape_3.h>
+
+
+//shortest path functions:
+#include <boost/graph/graph_traits.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/dijkstra_shortest_paths.hpp>
+#include <boost/property_map/property_map.hpp>
 
 #include <Library/KrisLibrary/math/vector.h>
 #include <Library/KrisLibrary/math3d/primitives.h>
@@ -32,6 +40,7 @@ typedef Fixed_alpha_shape_3::Edge                           Edge;
 typedef K::Weighted_point_3                                 Weighted_point;
 typedef K::Point_3                                          Bare_point;
 
+
 TopologicalGraph::TopologicalGraph(ob::PlannerData& pd){
   std::cout << "TopologicalGraph" << std::endl;
   std::list<Weighted_point> lwp;
@@ -47,9 +56,7 @@ TopologicalGraph::TopologicalGraph(ob::PlannerData& pd){
     lwp.push_back(Weighted_point(Bare_point( x,y,z), 0.3));
   }
 
-  //build one alpha_shape  with alpha=0
   Fixed_alpha_shape_3  as(lwp.begin(), lwp.end(), 0);
-  //explore the 0-shape - It is dual to the boundary of the union.
   std::list<Cell_handle> cells;
   std::list<Facet>       facets;
   std::list<Edge>        edges;
@@ -131,37 +138,72 @@ TopologicalGraph::TopologicalGraph(ob::PlannerData& pd){
     }
     cmplx.T.push_back(V);
   }
+  typedef SBL::GT::T_Betti_numbers_2<Fixed_alpha_shape_3>                        Betti_numbers_2;
+  Betti_numbers_2 betti;
+  Betti_numbers_2::result_type res = betti(as);
+  std::cout << "Number of input spheres: " << as.number_of_vertices() << std::endl;
+  std::cout << "Betti numbers: " << res.get<0>() << " " << res.get<1>() << " " << res.get<2>() << std::endl;
+  exit(0);
 
 
-  //cell handle
-  //http://doc.cgal.org/latest/TDS_3/classTriangulationDataStructure__3_1_1Cell.html
-  //The concept TriangulationDataStructure_3::Cell stores four Vertex_handles to its four vertices and four Cell_handles to its four neighbors. The vertices are indexed 0, 1, 2, and 3 in consistent order. The neighbor indexed i lies opposite to vertex i. 
-  // Vertex_handle  vertex (int i) const
-  //  Returns the vertex i of c. More...
-  // 
-  //int   index (Vertex_handle v) const
-  //  Returns the index of vertex v in c. More...
-  // 
-  //bool  has_vertex (Vertex_handle v) const
-  //  Returns true if v is a vertex of c.
-  // 
-  //bool  has_vertex (Vertex_handle v, int &i) const
-  //  Returns true if v is a vertex of c, and computes its index i in c.
-  // 
-  //Cell_handle   neighbor (int i) const
-  //  Returns the neighbor i of c. More...
-  // 
-  //int   index (Cell_handle n) const
-  //  Returns the index corresponding to neighboring cell n. More...
-  // 
-  //bool  has_neighbor (Cell_handle n) const
-  //  Returns true if n is a neighbor of c.
-  // 
-  //bool  has_neighbor (Cell_handle n, int &i) const
-  //  Returns true if n is a neighbor of c, and computes its index i in c. 
+  ////dijkstra_shortest_paths(g, s,
+  ////                        predecessor_map(boost::make_iterator_property_map(p.begin(), get(boost::vertex_index, g))).
+  ////                        distance_map(boost::make_iterator_property_map(d.begin(), get(boost::vertex_index, g))));
+  //dijkstra_shortest_paths(g, s, predecessor_map(&p[0]).distance_map(&d[0]));
 
-  //K::Plane_3 pp = f->plane()
+  //std::cout << "distances and parents:" << std::endl;
+  //Vertex vi, vend;
+  //for (boost::tie(vi, vend) = vertices(g); vi != vend; ++vi) {
+  //  std::cout << "distance(" << name[*vi] << ") = " << d[*vi] << ", ";
+  //  std::cout << "parent(" << name[*vi] << ") = " << name[p[*vi]] << std::
+  //    endl;
+  //}
+
+  //ComputeShortestPaths(pd);
+  //exit(0);
+
 }
 SimplicialComplex& TopologicalGraph::GetSimplicialComplex(){
   return cmplx;
+}
+
+//http://sbl.inria.fr/doc/Betti_numbers-user-manual.html
+//OR: from lwp 
+//#include <SBL/GT/Betti_numbers_2.hpp>
+//  typedef SBL::GT::T_Betti_numbers_2<Fixed_alpha_shape_3>                        Betti_numbers_2;
+//  Betti_numbers_2 betti;
+//  Betti_numbers_2::result_type res = betti(as);
+//  std::cout << "Number of input spheres: " << as.number_of_vertices() << std::endl;
+//  std::cout << "Betti numbers: " << res.get<0>() << " " << res.get<1>() << " " << res.get<2>() << std::endl;
+//  exit(0);
+
+void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd){
+
+  using namespace boost;
+  ob::PlannerData::Graph g = pd.toBoostGraph();
+
+  using Vertex = ob::PlannerData::Graph::Vertex;
+  using VIterator = ob::PlannerData::Graph::VIterator;
+
+  std::vector<Vertex> p(num_vertices(g));
+  std::vector<int> d(num_vertices(g));
+
+  VIterator vi, vi_end;
+  std::cout << num_vertices(g) << std::endl;
+
+  property_map < PlannerDataGraph, vertex_index_t >::type
+        index_map = get(vertex_index, g);
+
+  ob::PlannerDataVertex vs = pd.getStartVertex(0);
+  ob::PlannerDataVertex vg = pd.getGoalVertex(0);
+  const ob::State* ss = vs.getState();
+  const ob::State* sg = vg.getState();
+
+  std::cout << "Start Vertex: " << vs.getTag() << std::endl;
+  std::cout << "Goal Vertex: " << vg.getTag() << std::endl;
+
+  for (tie(vi, vi_end) = boost::vertices(g); vi != vi_end; ++vi){
+    uint idx = get(index_map,*vi);
+  }
+
 }

@@ -15,6 +15,8 @@ namespace Topology{
 
       SimplicialComplex& GetSimplicialComplex();
 
+      void ComputeShortestPaths(const ob::PlannerData& pd);
+
     private:
       SimplicialComplex cmplx;
   };

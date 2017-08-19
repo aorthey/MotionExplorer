@@ -756,6 +756,8 @@ namespace GLDraw{
       << cmplx.T.size() << " tetrahedras " 
       << std::endl;
 
+    GLColor red(0.8,0.3,0.3,1);
+    red.setCurrentGL();
     glPointSize(10);
     for(int i = 0; i < cmplx.V.size(); i++){
       drawPoint(cmplx.V.at(i));

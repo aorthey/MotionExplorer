@@ -706,3 +706,13 @@ overload crap. Don't sacrifice completeness, however.
   [ ] compute principal LEVEL0 path 
     [x] fix one graph representation (e.g. boostgraph) which has lots of
 algorithms associated (at least dykstra)
+
+
+[ ] changing between visuals changes colors/linewidth of other visuals, but shouldn't.
+
+[ ] take simplicial complex (SC), compute retraction.
+[ ] visualize different retraction levels of SC
+
+[ ] install SBL lib
+[ ] compute homology groups (HG) of SC
+[ ] compute representative paths of some cycles
