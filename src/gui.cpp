@@ -488,6 +488,8 @@ void ForceFieldBackend::RenderWorld()
       SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
       GLDraw::drawSimplicialComplex(cmplx);
     }
+    SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
+    GLDraw::drawShortestPath(cmplx);
 
     //std::vector<HierarchicalLevel> hierarchy = plannerOutput.at(i).GetHierarchy();
     //for(int j = 0; j < hierarchy.size(); j++){

@@ -33,8 +33,6 @@ if ( SBL_FOUND )
   INCLUDE(${SBL_USE_FILE}) 
 endif()
 
-
-
 INCLUDE_DIRECTORIES("/usr/local/sbl/Core/Betti_numbers/include/")
 ADD_DEFINITIONS(${KLAMPT_DEFINITIONS})
 

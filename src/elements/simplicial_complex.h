@@ -8,10 +8,14 @@
 //  F faces
 //  T tetrahedras
 //
+// path shortest path between nodes
+//
+
 struct SimplicialComplex{
   std::vector<Math3D::Vector3> V;
   std::vector<std::pair<Math3D::Vector3,Math3D::Vector3>> E;
   std::vector<std::vector<Math3D::Vector3> > F;
   std::vector<std::vector<Math3D::Vector3> > T;
+  std::vector<Math3D::Vector3> path;
 };
 

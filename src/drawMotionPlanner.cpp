@@ -748,13 +748,25 @@ namespace GLDraw{
       }
     }
   }
+  void drawShortestPath( SimplicialComplex& cmplx ){
+
+    GLColor red(0.8,0.3,0.3,1);
+    red.setCurrentGL();
+    glPointSize(10);
+    glLineWidth(5);
+    for(int i = 0; i < cmplx.path.size()-1; i++){
+      drawPoint(cmplx.path.at(i));
+      drawLineSegment(cmplx.path.at(i),
+                      cmplx.path.at(i+1));
+    }
+  }
   void drawSimplicialComplex( SimplicialComplex& cmplx ){
-    std::cout << "drawSimplicialComplex: " 
-      << cmplx.V.size() << " vertices " 
-      << cmplx.E.size() << " edges " 
-      << cmplx.F.size() << " faces " 
-      << cmplx.T.size() << " tetrahedras " 
-      << std::endl;
+    //std::cout << "drawSimplicialComplex: " 
+    //  << cmplx.V.size() << " vertices " 
+    //  << cmplx.E.size() << " edges " 
+    //  << cmplx.F.size() << " faces " 
+    //  << cmplx.T.size() << " tetrahedras " 
+    //  << std::endl;
 
     GLColor red(0.8,0.3,0.3,1);
     red.setCurrentGL();

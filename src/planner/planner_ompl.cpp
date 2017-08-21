@@ -65,8 +65,6 @@ void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
       snode.directions.push_back(dvw);
     }
 
-
-
     _stree.push_back(snode);
     
   }
@@ -258,11 +256,14 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
 
   ob::PlannerData pd(si);
   ss.getPlannerData(pd);
-  std::cout << "TopologicalGraph" << std::endl;
-  Topology::TopologicalGraph top(pd);
+
+  const ob::OptimizationObjectivePtr obj = pdef->getOptimizationObjective();
+
+  Topology::TopologicalGraph top(pd, *obj);
+  output.cmplx = top.GetSimplicialComplex();
 
   SerializeTree(pd);
-  output.cmplx = top.GetSimplicialComplex();
+  output.SetTree(_stree);
 
   //###########################################################################
   // extract solution path if solved
@@ -311,7 +312,6 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
     std::cout << keyframes.size() << "/" << keyframes.size() << " : "  <<  keyframes.back() << std::endl;
 
     output.SetKeyframes(keyframes);
-    output.SetTree(_stree);
     std::cout << std::string(80, '-') << std::endl;
   }else{
     std::cout << "No solution found" << std::endl;
@@ -402,7 +402,6 @@ bool MotionPlannerOMPL::solve_kinodynamically(CSpaceOMPL *cspace){
 
   //set objective to infinite path to just return first solution
   ob::ProblemDefinitionPtr pdef = ss.getProblemDefinition();
-
   pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
   //###########################################################################
@@ -460,7 +459,7 @@ bool MotionPlannerOMPL::solve_kinodynamically(CSpaceOMPL *cspace){
   ss.getPlannerData(pd);
 
   SerializeTree(pd);
-
+  output.SetTree(_stree);
 
   //###########################################################################
   // extract solution path if solved
@@ -530,7 +529,6 @@ bool MotionPlannerOMPL::solve_kinodynamically(CSpaceOMPL *cspace){
 
     output.SetTorques(torques_and_time);
     output.SetKeyframes(keyframes);
-    output.SetTree(_stree);
     std::cout << std::string(80, '-') << std::endl;
   }else{
     std::cout << "No solution found" << std::endl;

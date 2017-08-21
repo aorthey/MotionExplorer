@@ -8,13 +8,13 @@
   <collision>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-      <sphere radius="1.5"/>
+      <sphere radius="1"/>
     </geometry>
   </collision>
   <visual>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-      <sphere radius="1.5"/>
+      <sphere radius="1"/>
     </geometry>
   </visual>
 </link>

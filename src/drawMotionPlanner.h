@@ -22,6 +22,7 @@ namespace GLDraw {
 
   void drawGLPathKeyframes(Robot *robot, std::vector<uint> keyframe_indices, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor color = GLColor(0.8,0.8,0.8,1.0), double scale = 1.0);
 
+  void drawShortestPath( SimplicialComplex& cmplx );
   void drawSimplicialComplex( SimplicialComplex& cmplx );
   void drawSwathVolume(Robot *robot, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor swathVolumeColor=GLColor(0.5,0.8,0.5,0.5));
 

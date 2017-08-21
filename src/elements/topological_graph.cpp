@@ -18,6 +18,9 @@
 #include <Library/KrisLibrary/math/vector.h>
 #include <Library/KrisLibrary/math3d/primitives.h>
 
+#include <ompl/base/Cost.h>
+
+
 #include <list>
 #include <utility>
 
@@ -40,8 +43,9 @@ typedef Fixed_alpha_shape_3::Edge                           Edge;
 typedef K::Weighted_point_3                                 Weighted_point;
 typedef K::Point_3                                          Bare_point;
 
+#include <SBL/CADS/Dijkstra_shortest_paths_with_landmarks.hpp>
 
-TopologicalGraph::TopologicalGraph(ob::PlannerData& pd){
+TopologicalGraph::TopologicalGraph(const ob::PlannerData& pd, const ob::OptimizationObjective& obj){
   std::cout << "TopologicalGraph" << std::endl;
   std::list<Weighted_point> lwp;
 
@@ -143,8 +147,6 @@ TopologicalGraph::TopologicalGraph(ob::PlannerData& pd){
   Betti_numbers_2::result_type res = betti(as);
   std::cout << "Number of input spheres: " << as.number_of_vertices() << std::endl;
   std::cout << "Betti numbers: " << res.get<0>() << " " << res.get<1>() << " " << res.get<2>() << std::endl;
-  exit(0);
-
 
   ////dijkstra_shortest_paths(g, s,
   ////                        predecessor_map(boost::make_iterator_property_map(p.begin(), get(boost::vertex_index, g))).
@@ -159,8 +161,11 @@ TopologicalGraph::TopologicalGraph(ob::PlannerData& pd){
   //    endl;
   //}
 
-  //ComputeShortestPaths(pd);
+  ComputeShortestPaths(pd, obj);
   //exit(0);
+
+
+
 
 }
 SimplicialComplex& TopologicalGraph::GetSimplicialComplex(){
@@ -177,33 +182,140 @@ SimplicialComplex& TopologicalGraph::GetSimplicialComplex(){
 //  std::cout << "Betti numbers: " << res.get<0>() << " " << res.get<1>() << " " << res.get<2>() << std::endl;
 //  exit(0);
 
-void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd){
+using Vertex = ob::PlannerData::Graph::Vertex;
+using VIterator = ob::PlannerData::Graph::VIterator;
+using EIterator = ob::PlannerData::Graph::EIterator;
+using Graph = ob::PlannerData::Graph;
 
-  using namespace boost;
-  ob::PlannerData::Graph g = pd.toBoostGraph();
+using namespace boost;
+typedef boost::property_map<Graph, vertex_index_t>::type IndexMap;
+//typedef boost::property_map<Graph, boost::vertex_name_t>::type NameMap;
 
-  using Vertex = ob::PlannerData::Graph::Vertex;
-  using VIterator = ob::PlannerData::Graph::VIterator;
+//typedef boost::property<vertex_type_t, ompl::base::PlannerDataVertex *,
+//                boost::property<boost::vertex_index_t, unsigned int>> VertexProperty;
+//typedef boost::property<edge_type_t, ompl::base::PlannerDataEdge *,
+//                boost::property<boost::edge_weight_t, ompl::base::Cost>>> EdgeProperty;
+//
 
-  std::vector<Vertex> p(num_vertices(g));
-  std::vector<int> d(num_vertices(g));
+typedef boost::iterator_property_map<Vertex*, IndexMap, Vertex, Vertex&> PredecessorMap;
+typedef boost::iterator_property_map<int*, IndexMap, int, int&> DistanceMap;
 
+//using PlannerDataGraph =
+//    boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, VertexProperty, EdgeProperty> 
+
+
+class Landmark_functor {
+public:
+  bool operator()(Vertex v, Graph& G)const {
+    return false;
+  }
+};
+typedef SBL::CADS::T_Dijkstra_shortest_paths_with_landmarks<Graph, Landmark_functor>  Dijkstra;
+
+void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob::OptimizationObjective& opt){
+
+  Graph g = pd.toBoostGraph();
+
+
+  //std::vector<Vertex> predecessors(num_vertices(g));
+  std::vector<double> distances(num_vertices(g));
+
+  IndexMap index_map = get(vertex_index, g);
+  //PredecessorMap predecessorMap(&predecessors[0], index_map);
+  //DistanceMap distanceMap(&distances[0], index_map);
+
+  //typedef SBL::CADS::T_Dijkstra_shortest_paths_with_landmarks<ob::PlannerData::Graph, Landmark_functor>  Dijkstra;
+  //Dijkstra dijkstra;
+
+
+  EIterator ei, ei_end;
   VIterator vi, vi_end;
-  std::cout << num_vertices(g) << std::endl;
-
-  property_map < PlannerDataGraph, vertex_index_t >::type
-        index_map = get(vertex_index, g);
-
   ob::PlannerDataVertex vs = pd.getStartVertex(0);
   ob::PlannerDataVertex vg = pd.getGoalVertex(0);
   const ob::State* ss = vs.getState();
   const ob::State* sg = vg.getState();
 
-  std::cout << "Start Vertex: " << vs.getTag() << std::endl;
-  std::cout << "Goal Vertex: " << vg.getTag() << std::endl;
+  std::cout << "SimplicialComplex: vertices: " << num_vertices(g) << std::endl;
+  std::cout << "                      edges: " << num_edges(g) << std::endl;
 
   for (tie(vi, vi_end) = boost::vertices(g); vi != vi_end; ++vi){
-    uint idx = get(index_map,*vi);
+    //uint idx = get(index,*vi);
   }
+  for(tie(ei, ei_end) = boost::edges(g); ei != ei_end;++ei){
+    //std::cout << "(" << index[source(*ei,g)] << "->" << index[target(*ei,g)] << ")" << std::endl;
+  }
+
+  //Vertex start = *(vertices(g).first);
+  //Vertex goal = *(vertices(g).second);
+
+  Vertex start= pd.getStartIndex(0);
+  Vertex goal = pd.getGoalIndex(0);
+  std::vector<ompl::base::PlannerData::Graph::Vertex> predecessors(num_vertices(g));
+
+  typedef ob::Cost Cost;
+  boost::dijkstra_shortest_paths(g, start, 
+                                        boost::predecessor_map(&predecessors[0])
+                                        //boost::distance_map(&distances[0])
+
+                                               .distance_compare([&opt](Cost c1, Cost c2)
+                                                                 {
+                                                                     return opt.isCostBetterThan(c1, c2);
+                                                                 })
+                                               .distance_combine([](Cost, Cost c)
+                                                                 {
+                                                                     return c;
+                                                                 })
+                                               .distance_inf(opt.infiniteCost())
+                                               .distance_zero(opt.identityCost()));
+
+  std::cout << "all: " <<num_vertices(g) << " vertices. shortest path: " << distances.size() << " vertices." << std::endl;
+  std::cout << "all: " <<num_vertices(g) << " vertices. shortest path: " << predecessors.size() << " vertices." << std::endl;
+
+  std::vector<Vertex> path;
+  Vertex current=goal;
+
+  while(current!=start) {
+    path.push_back(current);
+    current=predecessors[current];
+  }
+  path.push_back(start);
+
+  //This prints the path reversed use reverse_iterator and rbegin/rend
+  cmplx.path.clear();
+  std::vector<Vertex>::iterator it;
+  for (it=path.begin(); it != path.end(); ++it) 
+  {
+      ob::PlannerDataVertex vi = pd.getVertex(*it);
+      const ob::State* si = vi.getState();
+      const ob::SE3StateSpace::StateType *sSE3 = si->as<ob::SE3StateSpace::StateType>();
+      double x,y,z;
+      x = sSE3->getX();
+      y = sSE3->getY();
+      z = sSE3->getZ();
+      std::cout << *it << " : (" << x << "," << y << "," << z << ")" << std::endl;
+      Vector3 v3(x,y,z);
+      cmplx.path.push_back(v3);
+  }
+  std::cout << std::endl;
+
+  //VIterator vd;
+
+  //how to access a vertex
+  //for(int i = 0; i < predecessors.size(); i++){
+    //std::cout << "distance: " << predecessors.at(i) << std::endl;
+  //}
+//      boost::vector_property_map<Vertex> prev(boost::num_vertices(g_));
+//    boost::dijkstra_shortest_paths(g_, root_, boost::predecessor_map(prev));
+//    if (prev[goal_] != goal_)
+//    {
+//        auto h(std::make_shared<PathGeometric>(si_));
+//        for (Vertex pos = prev[goal_]; prev[pos] != pos; pos = prev[pos])
+//            h->append(stateProperty_[pos]);
+//        h->reverse();
+//        hpath_ = h;
+//    }
+
+
+
 
 }

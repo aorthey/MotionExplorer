@@ -688,12 +688,12 @@ connected, or use that as a ground truth benchmark)
  [ ] corner element -> hole
 
 -- Decompose robot into CVX regions. If not, add cvx regions and rigid joints.
-
 -- Choose one link, the one with min cum reach. 
 -- Compute max internal sphere. do planning level 1. This is for connectivity.
-
 -- Compute max internal capsule. do planning level 2? This is for orientation
 connectivity.
+-- compute 1-level layer limbs. I.e. take the root link, add those limbs. At
+least one reachable set has to be in contact.
 
 We might lose orientation connectivity because a passage is too curved.
 
@@ -709,10 +709,14 @@ algorithms associated (at least dykstra)
 
 
 [ ] changing between visuals changes colors/linewidth of other visuals, but shouldn't.
-
+[x] install SBL lib
+[x] compute homology groups (HG) of SC
 [ ] take simplicial complex (SC), compute retraction.
 [ ] visualize different retraction levels of SC
-
-[ ] install SBL lib
-[ ] compute homology groups (HG) of SC
 [ ] compute representative paths of some cycles
+
+[ ] visualize internal holes
+
+[ ] compute shortest paths in each homotopy class
+[ ] tab through all layers of a simplicial complex with [tab] or other key
+[ ] compute retraction (GUDHI or CGAL)
