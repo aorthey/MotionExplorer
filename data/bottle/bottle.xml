@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
 
 <world>
-  <!--
-  <robot name="bullet" file="/home/aorthey/git/orthoklampt/data/bullet.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
--->
    <robot name="bottle" file="/home/aorthey/git/orthoklampt/data/bottle/bottle.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
   <rigidObject  name="twohole.tri" file="/home/aorthey/git/orthoklampt/data/bottle/twohole.tri" translation="0 1.5 -1"/>
@@ -16,8 +13,8 @@
     <se3max config="6  5 5 5 3.141593 1.57 3.141593"/>
     <timestep min="0.01" max="0.01"/>
     <epsilongoalregion>0.1</epsilongoalregion>
-    <maxplanningtime>1</maxplanningtime>
-    <algorithm>ompl:rrt</algorithm>
+    <maxplanningtime>2</maxplanningtime>
+    <algorithm>ompl:rrtconnect</algorithm>
 
     <drawMilestones>0</drawMilestones>
     <drawSweptVolume>1</drawSweptVolume>

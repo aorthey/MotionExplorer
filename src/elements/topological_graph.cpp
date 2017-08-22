@@ -49,6 +49,8 @@ TopologicalGraph::TopologicalGraph(const ob::PlannerData& pd, const ob::Optimiza
   std::cout << "TopologicalGraph" << std::endl;
   std::list<Weighted_point> lwp;
 
+  if(pd.numVertices()<=1) return;
+
   for(uint i = 0; i < pd.numVertices(); i++){
     ob::PlannerDataVertex v = pd.getVertex(i);
     const ob::State* s = v.getState();
@@ -215,7 +217,6 @@ typedef SBL::CADS::T_Dijkstra_shortest_paths_with_landmarks<Graph, Landmark_func
 void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob::OptimizationObjective& opt){
 
   Graph g = pd.toBoostGraph();
-
 
   //std::vector<Vertex> predecessors(num_vertices(g));
   std::vector<double> distances(num_vertices(g));

@@ -40,7 +40,6 @@ int main(int argc,const char** argv) {
   planner.solve();
 
   env.GetBackendPtr()->AddPlannerOutput( planner.GetOutput() );
-  env.GetBackendPtr()->AddPlannerOutput( planner.GetOutput() );
 
   env.GetBackendPtr()->ShowRobot();
 
@@ -54,8 +53,9 @@ int main(int argc,const char** argv) {
   //q[0]=-Inf;
   //outer->UpdateConfig(q);
 
-  env.GetBackendPtr()->sim.odesim.DeleteRobot("sphere_inner");
-  env.GetBackendPtr()->sim.odesim.DeleteRobot("sphere_outer");
+  //env.GetBackendPtr()->sim.odesim.DeleteRobot("sphere_inner");
+  //env.GetBackendPtr()->sim.odesim.DeleteRobot("sphere_outer");
+  //
   //env.GetWorldPtr()->DeleteRobot("sphere_inner");
   //env.GetWorldPtr()->DeleteRobot("sphere_outer");
 

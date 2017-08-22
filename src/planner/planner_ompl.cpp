@@ -171,15 +171,18 @@ bool MotionPlannerOMPL::solve()
     cspace->print();
 
   }else{
+    int idx_is = input.robot_idx;
+    robot = world->robots[idx_is];
 
     //GeometricCSpaceOMPL* cspace = factory.MakeGeometricCSpace(robot, &kcspace);
     kcspace = new SingleRobotCSpace(*world,_irobot,&worldsettings);
 
-    if(!IsFeasible( robot, *kcspace, p_goal)) return false;
     if(!IsFeasible( robot, *kcspace, p_init)) return false;
+    if(!IsFeasible( robot, *kcspace, p_goal)) return false;
 
     cspace = factory.MakeGeometricCSpace(robot, kcspace);
   }
+  std::cout << "Planning for robot " << robot->name << std::endl;
 
   return solve_geometrically(cspace);
 
@@ -259,8 +262,8 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
 
   const ob::OptimizationObjectivePtr obj = pdef->getOptimizationObjective();
 
-  Topology::TopologicalGraph top(pd, *obj);
-  output.cmplx = top.GetSimplicialComplex();
+  //Topology::TopologicalGraph top(pd, *obj);
+  //output.cmplx = top.GetSimplicialComplex();
 
   SerializeTree(pd);
   output.SetTree(_stree);

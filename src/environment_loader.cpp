@@ -49,7 +49,6 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
   name_robot = world.robots[0]->name;
 //################################################################################
 //################################################################################
-  std::cout << "Adding free float driver to robot " << name_robot << std::endl;
 
   if(!(world.robots[0]->joints[0].type == RobotJoint::Floating)){
     std::cout << "First joint of robot should be a free floating joint" << std::endl;
@@ -62,6 +61,7 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
 
   bool addSE3drivers = false;
   if(addSE3drivers){
+    std::cout << "Adding free float driver to robot " << name_robot << std::endl;
     vector<string>* driverNames = &robot->driverNames;
     vector<RobotJointDriver>* drivers = &robot->drivers;
 

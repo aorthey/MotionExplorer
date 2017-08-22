@@ -7,15 +7,18 @@
 
 int main(int argc,const char** argv) {
 
-  //file = "home/aorthey/git/orthoklampt/data/snake_turbine.xml";
-  //std::string file = "data/hubo_object.xml";
-  //std::string file = "data/wall.xml";
-  //std::string file = "data/snake_turbine.xml";
-  //std::string file = "data/human.xml";
-  //std::string file = "data/hrp2_door.xml";
-  //std::string file = "data/hrp2_door_irreducible.xml";
-  //std::string file = "data/spider_ridge.xml";
-  std::string file = "data/humanoid_mountain.xml";
+  std::string exec = argv[0];
+  std::string file;
+  std::vector<std::string> all_args;
+
+  if (argc > 1) {
+    file = argv[1];
+    all_args.assign(argv + 1, argv + argc);
+  }else{
+    std::cout << "Usage: <xml world file>" << std::endl;
+    exit(0);
+  }
+  std::cout << "Loading file: " << file << std::endl;
   EnvironmentLoader env = EnvironmentLoader(file.c_str());
 
   Info info;

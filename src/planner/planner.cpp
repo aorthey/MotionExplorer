@@ -227,7 +227,8 @@ bool MotionPlanner::IsFeasible( Robot *robot, SingleRobotCSpace &cspace, Config 
     cspace.CheckObstacles(q,infeasible);
     uint N = 0;
     for(size_t i=0;i<infeasible.size();i++){
-      //if(!infeasible[i]) cout<<"  ok "<<cspace.ObstacleName(i)<<endl;
+      if(!infeasible[i]) cout<<"  ok "<<cspace.ObstacleName(i)<<endl;
+
       if(infeasible[i]){
         N++;
         int icq = i - q.size();
