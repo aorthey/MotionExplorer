@@ -232,18 +232,9 @@ PrincipalFibreBundleOMPLValidityChecker::PrincipalFibreBundleOMPLValidityChecker
 
 bool PrincipalFibreBundleOMPLValidityChecker::isValid(const ob::State* state) const
 {
-  const ob::StateSpacePtr ssp = si_->getStateSpace();
   Config q = ompl_space->OMPLStateToConfig(state);
-  //Robot *robot = _space->robot;
-  //if(!robot->InJointLimits(q)) {
-    //return false;
-  //}
-  //return _space->CheckCollisionFree();
-
-  //PropertyMap pmap;
-  //_space->Properties(pmap);
-
-  return cspace_->IsFeasible(q) && si_->satisfiesBounds(state);
+  bool feas = cspace_->IsFeasible(q) && si_->satisfiesBounds(state);
+  return feas;
 }
 
 

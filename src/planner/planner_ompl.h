@@ -53,7 +53,7 @@ class MotionPlannerOMPL: public MotionPlanner
 {
   public:
     MotionPlannerOMPL(RobotWorld *world_, PlannerInput& input_);
-    void SerializeTree(ob::PlannerData &pd);
+    void SerializeTree(ob::PlannerData &pd, CSpaceOMPL *cspace);
 
     virtual bool solve();
 

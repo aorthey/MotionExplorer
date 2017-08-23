@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
-#include "loader.h"
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
+#include "loader.h"
 
 class PlannerInput{
   public:
@@ -18,6 +18,7 @@ class PlannerInput{
 
     int robot_idx;
     int robot_idx_outer_shell;
+    std::vector<int> robot_idxs;
 
     double epsilon_goalregion;
     double max_planning_time;

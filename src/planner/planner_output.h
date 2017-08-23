@@ -37,7 +37,9 @@ class PlannerOutput{
     SimplicialComplex cmplx;
 
     Robot *robot;
+
   private:
+
     double time;
     uint nodes;
 

@@ -71,6 +71,9 @@ class CSpaceOMPL
 
     virtual void print() = 0;
 
+    Robot* GetRobotPtr(){
+      return robot;
+    }
   protected:
     PlannerInput input;
 
@@ -104,6 +107,9 @@ class GeometricCSpaceOMPL: public CSpaceOMPL
     Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState);
 
     virtual void print();
+
+  private:
+    bool hasRealVectorSpace;
 };
 
 //KinodynamicCSpaceOMPL: Space = tangent bundle of configuration manifold;

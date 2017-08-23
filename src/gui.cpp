@@ -130,7 +130,6 @@ bool ForceFieldBackend::OnIdle()
 
       if(bodyid){
         if(!robot->robot.IsGeometryEmpty(i)){
-
           Vector3 com;
           RobotLink3D *link = &robot->robot.links[i];
           link->GetWorldCOM(com);
@@ -482,6 +481,7 @@ void ForceFieldBackend::RenderWorld()
     if(drawPlannerTree.at(i)){
       SwathVolume swv = plannerOutput.at(i).GetSwathVolume();
       GLDraw::drawSwathVolume(swv.GetRobot(), swv.GetMatrices(), swv.GetAppearanceStack(), swv.GetColor());
+      GLDraw::drawPlannerTree(plannerOutput.at(i).GetTree());
 
     }
     if(drawPlannerSimplicialComplex.at(i)){

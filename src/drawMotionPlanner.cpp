@@ -505,7 +505,6 @@ namespace GLDraw{
   {
     double edgeWidth = 0.1;
     double vertexSize = 0.1;
-
     //too costly for each round
     //uint nearestNode = 0;
     //double bestD = dInf;
@@ -526,7 +525,7 @@ namespace GLDraw{
       Vector3 pos(node.position(0),node.position(1),node.position(2));
       Vector3 rot(node.position(3),node.position(4),node.position(5));
 
-      std::vector<Vector3> dirs = node.directions;
+      std::vector<Vector> dirs = node.directions;
 
       ////Fancy Color gradient, red near goal, blue far away, gaussian //distributed
       //double d = node.cost_to_goal;

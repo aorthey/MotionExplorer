@@ -119,8 +119,8 @@ void MotionPlanner::SerializeTree( const RoadmapPlanner& graph, SerializedTree& 
       snode.position(i) = snode.config(i);
     }
 
-    Vector3 vnode(snode.position(0),snode.position(1),snode.position(2));
-      //typedef std::map<int,EdgeDataPtr> EdgeList;
+    Vector vnode;vnode.resize(3);
+    for(uint k = 0; k < 3; k++) vnode(k) = snode.position(k);
 
     //TODO: do in O(n)
     uint Nedges = graph.roadmap.edges.at(i).size();
@@ -138,18 +138,18 @@ void MotionPlanner::SerializeTree( const RoadmapPlanner& graph, SerializedTree& 
       //std::cout << it->first << std::endl;
       uint j = it->first;
       Config goal = graph.roadmap.nodes.at(j);
-      Vector3 vgoal(goal(0),goal(1),goal(2));
-      Vector3 v;
-      v = vgoal - vnode;
+      Vector vgoal;vgoal.resize(3);
+      for(uint k = 0; k < 3; k++) vgoal(k) = goal(k);
+      Vector v = vgoal - vnode;
       snode.directions.push_back(v);
     }
     for(CoEdgeIterator it = co_edges.begin(); it!=co_edges.end(); ++it)
     {
       uint j = it->first;
       Config goal = graph.roadmap.nodes.at(j);
-      Vector3 vgoal(goal(0),goal(1),goal(2));
-      Vector3 v;
-      v = vnode - vgoal;
+      Vector vgoal;vgoal.resize(3);
+      for(uint k = 0; k < 3; k++) vgoal(k) = goal(k);
+      Vector v = vnode - vgoal;
       snode.directions.push_back(v);
     }
     _stree.push_back(snode);
@@ -192,12 +192,12 @@ void MotionPlanner::SerializeTree( const KinodynamicTree::Node* node, Serialized
   }
   snode.config = s;
 
-  std::vector<Vector3> directions;
+  std::vector<Vector> directions;
 
   std::vector<KinodynamicTree::Node* > children;
   node->enumChildren(children);
   for(uint i = 0; i < children.size(); i++){
-    Vector3 childdir;
+    Vector childdir;childdir.resize(3);
     State c = *children.at(i);
     for(int j = 0; j < 3; j++){
       childdir[j] = c(j)-snode.position(j);

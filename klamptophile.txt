@@ -708,9 +708,10 @@ overload crap. Don't sacrifice completeness, however.
 algorithms associated (at least dykstra)
 
 
-[ ] changing between visuals changes colors/linewidth of other visuals, but shouldn't.
 [x] install SBL lib
 [x] compute homology groups (HG) of SC
+[x] make bottle planning possible
+[ ] changing between visuals changes colors/linewidth of other visuals, but shouldn't.
 [ ] take simplicial complex (SC), compute retraction.
 [ ] visualize different retraction levels of SC
 [ ] compute representative paths of some cycles

@@ -7,7 +7,7 @@
 #include <ompl/base/PlannerDataGraph.h>
 
 
-void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
+void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd, CSpaceOMPL *cspace)
 {
   //pd.decoupleFromPlanner();
   std::cout << "serializing tree with " << pd.numVertices() << " vertices" << std::endl;
@@ -18,26 +18,30 @@ void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
   uint N = robot->q.size()-6;
   for(uint i = 0; i < pd.numVertices(); i++){
     ob::PlannerDataVertex v = pd.getVertex(i);
-    const ob::State* s = v.getState();
-    double x,y,z;
+    const ob::State* state = v.getState();
+    Config cc = cspace->OMPLStateToConfig(state);
 
-    if(N>0){
-      const ob::SE3StateSpace::StateType *sSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-      x = sSE3->getX();
-      y = sSE3->getY();
-      z = sSE3->getZ();
-    }else{
-      const ob::SE3StateSpace::StateType *sSE3 = s->as<ob::SE3StateSpace::StateType>();
-      x = sSE3->getX();
-      y = sSE3->getY();
-      z = sSE3->getZ();
-    }
+
+    //if(N>0){
+    //  const ob::SE3StateSpace::StateType *sSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+    //  x = sSE3->getX();
+    //  y = sSE3->getY();
+    //  z = sSE3->getZ();
+    //}else{
+    //  const ob::SE3StateSpace::StateType *sSE3 = s->as<ob::SE3StateSpace::StateType>();
+    //  const ob::SO3StateSpace::StateType *sSO3 = sSE3->rotation();
+    //  x = sSE3->getX();
+    //  y = sSE3->getY();
+    //  z = sSE3->getZ();
+
+    //}
     SerializedTreeNode snode;
     Config q;q.resize(6);q.setZero();
-    q(0)=x;
-    q(1)=y;
-    q(2)=z;
-    snode.position = q;
+    for(uint k = 0; k < 6; k++){
+      q(k) = cc(k);
+    }
+    snode.position = cc;
+    //double x(q(0)),y(q(1)),z(q(2));
 
     //std::vector<uint> edgeList;
     //uint Nedges = pd.getIncomingEdges (i, edgeList);
@@ -48,21 +52,9 @@ void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd)
     for(int j = 0; j < edgeList.size(); j++){
       ob::PlannerDataVertex w = pd.getVertex(edgeList.at(j));
       const ob::State* sw = w.getState();
-      double xw,yw,zw;
-      if(N>0){
-        const ob::SE3StateSpace::StateType *swSE3 = sw->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-        xw = swSE3->getX();
-        yw = swSE3->getY();
-        zw = swSE3->getZ();
-      }else{
-        const ob::SE3StateSpace::StateType *swSE3 = sw->as<ob::SE3StateSpace::StateType>();
-        xw = swSE3->getX();
-        yw = swSE3->getY();
-        zw = swSE3->getZ();
-      }
+      Config dqj = snode.position - cspace->OMPLStateToConfig(sw);
 
-      Vector3 dvw( xw-x, yw-y, zw-z);
-      snode.directions.push_back(dvw);
+      snode.directions.push_back(dqj);
     }
 
     _stree.push_back(snode);
@@ -168,14 +160,13 @@ bool MotionPlannerOMPL::solve()
 
     cspace = factory.MakeGeometricCSpaceInnerOuter(robot, cspace_inner, cspace_outer);
     input.name_algorithm = "ompl:rrt";
-    cspace->print();
 
   }else{
-    int idx_is = input.robot_idx;
-    robot = world->robots[idx_is];
+    int robot_idx = input.robot_idx;
+    robot = world->robots[robot_idx];
 
     //GeometricCSpaceOMPL* cspace = factory.MakeGeometricCSpace(robot, &kcspace);
-    kcspace = new SingleRobotCSpace(*world,_irobot,&worldsettings);
+    kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
 
     if(!IsFeasible( robot, *kcspace, p_init)) return false;
     if(!IsFeasible( robot, *kcspace, p_goal)) return false;
@@ -183,9 +174,8 @@ bool MotionPlannerOMPL::solve()
     cspace = factory.MakeGeometricCSpace(robot, kcspace);
   }
   std::cout << "Planning for robot " << robot->name << std::endl;
-
+  cspace->print();
   return solve_geometrically(cspace);
-
 }
 bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
   Config p_init = input.q_init;
@@ -228,7 +218,7 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
   ss.setStartAndGoalStates(start, goal, epsilon_goalregion);
   ss.setPlanner(ompl_planner);
   ss.setup();
-  ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
+  //ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
 
   //set objective to infinite path to just return first solution
   ob::ProblemDefinitionPtr pdef = ss.getProblemDefinition();
@@ -265,7 +255,7 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
   //Topology::TopologicalGraph top(pd, *obj);
   //output.cmplx = top.GetSimplicialComplex();
 
-  SerializeTree(pd);
+  SerializeTree(pd, cspace);
   output.SetTree(_stree);
 
   //###########################################################################
@@ -298,13 +288,16 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
     for(int i = 0; i < states.size(); i++)
     {
       ob::State *state = states.at(i);//path.getState(i);
-      Config cc = cspace->OMPLStateToConfig(state);
-      std::vector<Real> curd = std::vector<Real>(cc);
-      //extract only position
-      std::vector<Real> curhalf(curd.begin(),curd.begin()+int(0.5*curd.size()));
-      Config cur(curhalf);
-
-      keyframes.push_back(cur);
+      uint N = robot->q.size();
+      Config cur = cspace->OMPLStateToConfig(state);
+      if(N>cur.size()){
+        Config qq;qq.resize(N);
+        qq.setZero();
+        for(uint k = 0; k < cur.size(); k++){
+          qq(k) = cur(k);
+        }
+        keyframes.push_back(qq);
+      }else keyframes.push_back(cur);
     }
 
     uint istep = max(int(keyframes.size()/10.0),1);
@@ -461,7 +454,7 @@ bool MotionPlannerOMPL::solve_kinodynamically(CSpaceOMPL *cspace){
   oc::PlannerData pd(si);
   ss.getPlannerData(pd);
 
-  SerializeTree(pd);
+  SerializeTree(pd, cspace);
   output.SetTree(_stree);
 
   //###########################################################################

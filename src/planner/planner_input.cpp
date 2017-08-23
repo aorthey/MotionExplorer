@@ -1,3 +1,5 @@
+#include <KrisLibrary/math/VectorTemplate.h>
+
 #include "planner_input.h"
 
 bool PlannerInput::load(TiXmlElement *node)
@@ -54,13 +56,31 @@ bool PlannerInput::load(TiXmlElement *node)
   GetStreamAttribute(node_se3max,"config")  >> se3max;
   GetStreamText(node_algorithm) >> name_algorithm;
 
-  TiXmlElement* robot = FindSubNode(plannersettings, "robot");
-  if(robot){
-    TiXmlElement* rindex = FindSubNode(robot, "index");
-    if(rindex) GetStreamText(rindex) >> robot_idx;
-    else robot_idx = 0;
+  TiXmlElement* node_robot = FindSubNode(plannersettings, "robot");
+  if(node_robot){
+    TiXmlElement* rindex = FindFirstSubNode(node_robot, "index");
+    while(rindex!=NULL){
+      int tmp;
+      GetStreamText(rindex) >> tmp;
+      if(tmp<0){
+        std::cout << "Robot Index " << tmp << " is negative. Not valid." << std::endl;
+        exit(0);
+      }
+      robot_idxs.push_back(tmp);
+      rindex = FindNextSiblingNode(rindex, "index");
+    }
+    std::cout << "Loading Robots: ";
+    for(uint k = 0; k < robot_idxs.size(); k++){
+      std::cout << " " << robot_idxs.at(k);
+    }
+    std::cout << std::endl;
+    if(robot_idxs.size()>0){
+      robot_idx = robot_idxs.at(0);
+    }else{
+      robot_idx = 0;
+    }
 
-    TiXmlElement* rindexos = FindSubNode(robot, "indexoutershell");
+    TiXmlElement* rindexos = FindSubNode(node_robot, "indexoutershell");
     if(rindexos) GetStreamText(rindexos) >> robot_idx_outer_shell;
     else robot_idx_outer_shell = -1;
   }else{

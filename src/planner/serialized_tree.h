@@ -9,7 +9,7 @@ using namespace Math3D;
 struct SerializedTreeNode{
   Vector position; //\in R^6 local chart on SE(3)
   Vector config;
-  std::vector<Vector3> directions;
+  std::vector<Vector> directions;
   double cost_to_goal;
   Vector3 GetXYZ();
   void SetXYZ(double x, double y, double z);

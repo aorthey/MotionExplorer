@@ -86,7 +86,7 @@ bool SerializedTreeNode::Load(TiXmlElement *node)
       {
         if(d->GetText()!=NULL) {
           stringstream ss(d->GetText());
-          Vector3 dir;
+          Vector dir;
           ss >> dir;
           directions.push_back(dir);
           d = d->NextSiblingElement();
