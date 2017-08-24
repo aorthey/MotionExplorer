@@ -721,3 +721,6 @@ algorithms associated (at least dykstra)
 [ ] compute shortest paths in each homotopy class
 [ ] tab through all layers of a simplicial complex with [tab] or other key
 [ ] compute retraction (GUDHI or CGAL)
+
+[ ] orientation limits are not respected OMPL
+[x] ompl cannot deal with zero dimensions

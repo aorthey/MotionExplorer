@@ -1,6 +1,7 @@
 #include "environment_loader.h"
 #include "controller/controller.h"
 #include "loader.h"
+#include <boost/filesystem.hpp>
 
 RobotWorld& EnvironmentLoader::GetWorld(){
   return world;
@@ -18,10 +19,28 @@ ForceFieldBackendPtr EnvironmentLoader::GetBackendPtr(){
   return _backend;
 }
 
-EnvironmentLoader::EnvironmentLoader(const char *xml_file){
-  file_name = util::GetApplicationFolder()+xml_file;
+EnvironmentLoader EnvironmentLoader::from_args(int argc,const char** argv){
+  std::string exec = argv[0];
+  std::string file;
+  std::vector<std::string> all_args;
+
+  if (argc > 1) {
+    file = argv[1];
+    all_args.assign(argv + 1, argv + argc);
+  }else{
+    std::cout << "Usage: <xml world file>" << std::endl;
+    exit(0);
+  }
+  using namespace boost::filesystem;
+  path cur = current_path();
+  file = cur.string()+"/"+file;
+  return EnvironmentLoader(file.c_str());
+}
+EnvironmentLoader::EnvironmentLoader(const char *file_name_){
+  file_name = file_name_;
 
   std::cout << "[EnvironmentLoader] loading from file " << file_name << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
 
   world.background = GLColor(1,1,1);
 
@@ -31,7 +50,7 @@ EnvironmentLoader::EnvironmentLoader(const char *xml_file){
     std::cout << std::endl;
     std::cout << "ERROR:" << std::endl;
     std::cout << std::endl;
-    std::cout << "XML file does not exists or corrupted: "<<xml_file << std::endl;
+    std::cout << "XML file does not exists or corrupted: "<< file_name << std::endl;
     std::cout << std::endl;
     std::cout << std::string(80, '-') << std::endl;
     exit(0);

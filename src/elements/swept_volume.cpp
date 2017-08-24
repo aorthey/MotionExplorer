@@ -96,21 +96,30 @@ const Config& SweptVolume::GetGoal(){
 const vector<uint>& SweptVolume::GetKeyframeIndices(){
   return _keyframe_indices;
 }
-void SweptVolume::AddKeyframe(const Config &q ){
+void SweptVolume::AddKeyframe(Config &q ){
 
   if(!_robot->InJointLimits(q)){
-    std::cout << "trying to set an outer limit config" << std::endl;
-    std::cout << "minimum       :" << _robot->qMin << std::endl;
-    std::cout << "configuration :" << q << std::endl;
-    std::cout << "maximum       :" << _robot->qMax << std::endl;
+    bool projectJointLimits = true;
+    if(!projectJointLimits){
+      std::cout << "[WARNING] trying to set an outer limit config" << std::endl;
+      std::cout << "minimum       :" << _robot->qMin << std::endl;
+      std::cout << "configuration :" << q << std::endl;
+      std::cout << "maximum       :" << _robot->qMax << std::endl;
+    }
     //check joint limits
+
     for(int i = 0; i < _robot->q.size(); i++){
-      if(q(i) < _robot->qMin(i) || q(i) > _robot->qMax(i)){
-        std::cout << "[ "<<i<< " ]: " << _robot->qMin(i) << " < " << q(i) << " < " << _robot->qMax(i) << std::endl;
+      if(projectJointLimits){
+        if(q(i) < _robot->qMin(i)) q(i) = _robot->qMin(i);
+        if(q(i) > _robot->qMax(i)) q(i) = _robot->qMax(i);
+      }else{
+        if(q(i) < _robot->qMin(i) || q(i) > _robot->qMax(i)){
+          std::cout << "[ "<<i<< " ]: " << _robot->qMin(i) << " < " << q(i) << " < " << _robot->qMax(i) << std::endl;
+        }
       }
     }
 
-    exit(0);
+    if(!projectJointLimits) exit(0);
   }
   _robot->UpdateConfig(q);
 

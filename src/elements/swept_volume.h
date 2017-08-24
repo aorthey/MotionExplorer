@@ -32,7 +32,7 @@ class SweptVolume
     bool Load(TiXmlElement *node);
 
   protected:
-    void AddKeyframe(const Config &q );
+    void AddKeyframe(Config &q );
 
     GLColor color;
     GLColor color_milestones;

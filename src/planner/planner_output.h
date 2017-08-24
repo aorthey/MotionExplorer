@@ -61,6 +61,8 @@ class PlannerOutput{
     SweptVolume& GetSweptVolume();
     SwathVolume& GetSwathVolume();
 
+    void VerticesToFile();
+
     void SetHierarchy(std::vector<HierarchicalLevel> &hierarchy_);
     const std::vector<HierarchicalLevel>& GetHierarchy();
     void SetTorques(std::vector<Vector> &torques_);

@@ -308,6 +308,7 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
     std::cout << keyframes.size() << "/" << keyframes.size() << " : "  <<  keyframes.back() << std::endl;
 
     output.SetKeyframes(keyframes);
+    output.VerticesToFile();
     std::cout << std::string(80, '-') << std::endl;
   }else{
     std::cout << "No solution found" << std::endl;

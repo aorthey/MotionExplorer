@@ -7,19 +7,7 @@
 
 int main(int argc,const char** argv) {
 
-  std::string exec = argv[0];
-  std::string file;
-  std::vector<std::string> all_args;
-
-  if (argc > 1) {
-    file = argv[1];
-    all_args.assign(argv + 1, argv + argc);
-  }else{
-    std::cout << "Usage: <xml world file>" << std::endl;
-    exit(0);
-  }
-  std::cout << "Loading file: " << file << std::endl;
-  EnvironmentLoader env = EnvironmentLoader(file.c_str());
+  EnvironmentLoader env = EnvironmentLoader::from_args(argc, argv);
 
   Info info;
   info(env.GetWorldPtr());

@@ -21,19 +21,8 @@
 
 int main(int argc,const char** argv) {
 
-  std::string exec = argv[0];
-  std::string file;
-  std::vector<std::string> all_args;
+  EnvironmentLoader env = EnvironmentLoader::from_args(argc, argv);
 
-  if (argc > 1) {
-    file = argv[1];
-    all_args.assign(argv + 1, argv + argc);
-  }else{
-    file = "data/snake_turbine.xml";
-  }
-  std::cout << "Loading file: " << file << std::endl;
-
-  EnvironmentLoader env = EnvironmentLoader(file.c_str());
   PlannerInput pin = env.GetPlannerInput();
 
   MotionPlannerOMPL planner(env.GetWorldPtr(), pin);

@@ -27,6 +27,7 @@ class EnvironmentLoader{
     ForceFieldBackendPtr GetBackendPtr();
     PlannerInput GetPlannerInput();
 
+    static EnvironmentLoader from_args(int argc,const char** argv);
     EnvironmentLoader(const char *xml_file);
 
     bool LoadPath(const char* file);

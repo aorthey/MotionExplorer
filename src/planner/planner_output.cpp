@@ -1,9 +1,23 @@
 #include "planner/planner_output.h"
+#include <boost/filesystem.hpp>
+#include <fstream>
 
 PlannerOutput::PlannerOutput(){
   sv = NULL;
   swv = NULL;
 };
+
+void PlannerOutput::VerticesToFile(){
+
+  ofstream fh;
+  fh.open ("vertices.txt");
+  if(!swv) GetSwathVolume();
+  std::vector<Config> tree= swv->GetKeyframes();
+  for(uint k = 0; k < tree.size(); k++){
+    fh << tree.at(k) << std::endl;
+  }
+  fh.close();
+}
 
 void PlannerOutput::SetHierarchy(std::vector<HierarchicalLevel> &hierarchy_){
   hierarchy = hierarchy_;
