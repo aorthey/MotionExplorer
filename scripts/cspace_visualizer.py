@@ -3,6 +3,12 @@ import pickle as pk
 import sys
 import numpy as np
 import matplotlib.cm as cm
+from matplotlib import rc
+rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+## for Palatino and other serif fonts use:
+#rc('font',**{'family':'serif','serif':['Palatino']})
+rc('text', usetex=True)
+rc('font', family='serif', size=40)
 
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d.axes3d as p3
@@ -71,9 +77,11 @@ ct = np.sum(PT[triangles],axis=1)/3.0
 
 colors = np.array([ (x-1)**2 for x,y in np.vstack((cx,ct)).T])
 
+fig = plt.figure(0)
 plt.tripcolor(PX,PT,triangles, cmap=plt.cm.Spectral_r, facecolors=colors, edgecolors='none')
 plt.xlabel('X')
-plt.ylabel('$\Theta$')
+fig.autofmt_xdate()
+plt.ylabel(r'\theta',rotation=0)
 #plt.show()
 #sys.exit(0)
 
@@ -114,9 +122,12 @@ tris.set_mask(mask)
 #plt.triplot(tris, 'bo-', lw=1)
 #plt.show()
 
-fig = plt.figure()
+fig = plt.figure(1)
 ax  = fig.add_subplot(111, projection='3d')
 ax.plot_trisurf(X,Y,Z, \
     triangles=tris.get_masked_triangles(),cmap=plt.cm.Spectral, \
      linewidth=0, antialiased=False)
+ax.set_xlabel(r'r')
+ax.set_ylabel(r'\phi')
+ax.set_zlabel(r'z')
 plt.show()

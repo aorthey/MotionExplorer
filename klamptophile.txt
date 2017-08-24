@@ -718,9 +718,18 @@ algorithms associated (at least dykstra)
 
 [ ] visualize internal holes
 
+[x] ompl cannot deal with zero dimensions
 [ ] compute shortest paths in each homotopy class
 [ ] tab through all layers of a simplicial complex with [tab] or other key
 [ ] compute retraction (GUDHI or CGAL)
-
 [ ] orientation limits are not respected OMPL
-[x] ompl cannot deal with zero dimensions
+
+
+What objects to increase complexity?
+
+nunchaku (1dof revolute SE(3) x S1)
+irregular shaped links (non-convex) (SE(3))
+
+
+Visualize the CSpace along a path for the nunchaku robot
+
