@@ -77,6 +77,24 @@ class CSpaceOMPL
   protected:
     PlannerInput input;
 
+    uint Nklampt;
+    uint Nompl;
+
+    //klampt:
+    //
+    // SE(3) x R^Nklampt
+    //
+    //ompl:
+    //
+    // SE(3) x R^Nompl
+    //
+    // ompl_to_klampt: maps a dimension in R^Nompl to SE(3)xR^Nklampt
+    // klampt_to_ompl: maps a dimension in SE(3)xR^Nklampt to R^Nompl
+    std::vector<int> ompl_to_klampt;
+    std::vector<int> klampt_to_ompl;
+
+    std::vector< std::pair<int, int> > DimensionalityKlamptToOMPLMap; //maps klampt dimensions to ompl dimensions
+
     ob::StateSpacePtr space;
     oc::RealVectorControlSpacePtr control_space;
 

@@ -8,11 +8,12 @@ CSpaceOMPL::CSpaceOMPL(Robot *robot_, CSpace *kspace_):
 GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
   CSpaceOMPL(robot_, kspace_)
 {
-  uint N =  robot->q.size() - 6;
+  Nklampt =  robot->q.size() - 6;
 
   //check if the robot is SE(3) or if we need to add real vector space for joints
-  if(N<=0){
+  if(Nklampt<=0){
     hasRealVectorSpace = false;
+    Nompl = 0;
   }else{
     //sometimes the joint space are only fixed joints. In that case OMPL
     //complains that the real vector space is empty. We check here for that case
@@ -20,27 +21,33 @@ GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
     std::vector<double> minimum, maximum;
     minimum = robot->qMin;
     maximum = robot->qMax;
-    assert(minimum.size() == 6+N);
-    assert(maximum.size() == 6+N);
+    assert(minimum.size() == 6+Nklampt);
+    assert(maximum.size() == 6+Nklampt);
 
-    vector<double> lowRn, highRn;
-    for(int i = 0; i < N; i++){
-      lowRn.push_back(minimum.at(i+6));
-      highRn.push_back(maximum.at(i+6));
-    }
-    ob::RealVectorBounds boundsRn(N);
+    //vector<double> lowRn, highRn;
+    //for(int i = 0; i < Nklampt; i++){
+    //  lowRn.push_back(minimum.at(i+6));
+    //  highRn.push_back(maximum.at(i+6));
+    //}
+    //ob::RealVectorBounds boundsRn(Nklampt);
 
     //ompl does only accept dimensions with strictly positive measure, adding some epsilon space
     double epsilonSpacing=1e-10;
     hasRealVectorSpace = false;
-    for(int i = 6; i < 6+N; i++){
+    Nompl = 0;
+    for(int i = 6; i < 6+Nklampt; i++){
+
       if(abs(minimum.at(i)-maximum.at(i))>epsilonSpacing){
         hasRealVectorSpace = true;
-        break;
+        klampt_to_ompl.push_back(Nompl);
+        ompl_to_klampt.push_back(i);
+        Nompl++;
+      }else{
+        klampt_to_ompl.push_back(-1);
       }
     }
   }
-  std::cout << "Robot \"" << robot->name << "\" Configuration Space: SE(3)" << (hasRealVectorSpace?"xR^N":"") << std::endl;
+  std::cout << "Robot \"" << robot->name << "\" Configuration Space: SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(Nompl):"") << std::endl;
 }
 
 void GeometricCSpaceOMPL::print()
@@ -53,8 +60,8 @@ void GeometricCSpaceOMPL::print()
   ob::SE3StateSpace *cspaceSE3;
   ob::RealVectorStateSpace *cspaceRn;
 
-  uint N =  robot->q.size() - 6;
-  if(hasRealVectorSpace){
+  //uint N =  robot->q.size() - 6;
+  if(Nompl>0){
     cspaceSE3 = space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
     cspaceRn = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
   }else{
@@ -109,16 +116,14 @@ void GeometricCSpaceOMPL::initSpace()
     exit(0);
   }
 
-  uint N = robot->q.size()-6;
-  std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(N):"")<< std::endl;
+  std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(Nompl):"")<< std::endl;
 
   ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());
-
   ob::SE3StateSpace *cspaceSE3;
   ob::RealVectorStateSpace *cspaceRn;
 
-  if(hasRealVectorSpace){
-    ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(N));
+  if(Nompl>0){
+    ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(Nompl));
     this->space = SE3 + Rn;
     cspaceSE3 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
     cspaceRn = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
@@ -139,8 +144,8 @@ void GeometricCSpaceOMPL::initSpace()
   minimum = robot->qMin;
   maximum = robot->qMax;
 
-  assert(minimum.size() == 6+N);
-  assert(maximum.size() == 6+N);
+  assert(minimum.size() == 6+Nklampt);
+  assert(maximum.size() == 6+Nklampt);
 
   vector<double> lowSE3;
   lowSE3.push_back(minimum.at(0));
@@ -157,13 +162,17 @@ void GeometricCSpaceOMPL::initSpace()
   cspaceSE3->setBounds(boundsSE3);
   boundsSE3.check();
 
-  if(hasRealVectorSpace){
+  if(Nompl>0){
     vector<double> lowRn, highRn;
-    for(int i = 0; i < N; i++){
-      lowRn.push_back(minimum.at(i+6));
-      highRn.push_back(maximum.at(i+6));
+
+    for(int i = 0; i < Nompl;i++){
+      uint idx = ompl_to_klampt.at(i);
+      double min = minimum.at(idx);
+      double max = maximum.at(idx);
+      lowRn.push_back(min);
+      highRn.push_back(max);
     }
-    ob::RealVectorBounds boundsRn(N);
+    ob::RealVectorBounds boundsRn(Nompl);
 
     ////ompl does only accept dimensions with strictly positive measure, adding some epsilon space
     //double epsilonSpacing=1e-10;
@@ -236,14 +245,13 @@ ob::State* GeometricCSpaceOMPL::ConfigToOMPLStatePtr(const Config &q){
   return out;
 }
 ob::ScopedState<> GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q){
-  uint N =  space->getDimension() - 6;
   ob::ScopedState<> qompl(space);
 
   ob::SE3StateSpace::StateType *qomplSE3;
   ob::SO3StateSpace::StateType *qomplSO3;
   ob::RealVectorStateSpace::StateType *qomplRnSpace;
 
-  if(hasRealVectorSpace){
+  if(Nompl>0){
     qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
     qomplSO3 = &qomplSE3->rotation();
     qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
@@ -279,10 +287,12 @@ ob::ScopedState<> GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q){
   //Math3D::Matrix3 qrM;
   //qr.getMatrix(qrM);
 
-  if(hasRealVectorSpace){
+  if(Nompl>0){
     double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
-    for(int i = 0; i < q.size()-6; i++){
-      qomplRn[i]=q(6+i);
+    for(int i = 0; i < Nklampt; i++){
+      int idx = klampt_to_ompl.at(i);
+      if(idx<0) continue;
+      else qomplRn[idx]=q(6+i);
     }
   }
   return qompl;
@@ -293,10 +303,9 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType
   //std::vector<double> reals;
   //s->copyToReals(reals, qomplRnState);
   //uint N =  space->getDimension() - 6;
-  uint N = robot->q.size() - 6;
 
   Config q;
-  q.resize(6+N);
+  q.resize(6+Nklampt);
 
   q(0) = qomplSE3->getX();
   q(1) = qomplSE3->getY();
@@ -326,22 +335,24 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType
   if(q(5)<-M_PI) q(5)+=2*M_PI;
   if(q(5)>M_PI) q(5)-=2*M_PI;
 
-  if(hasRealVectorSpace){
-    for(int i = 0; i < N; i++){
-      q(i+6) = qomplRnState->values[i];
-    }
+
+
+  for(int i = 0; i < Nklampt; i++){
+    q(i+6) = 0;
   }
-  else{
-    for(int i = 0; i < N; i++){
-      q(i+6) = 0;
+
+  if(Nompl>0){
+    //set non-zero dimensions to ompl value
+    for(int i = 0; i < Nompl; i++){
+      uint idx = ompl_to_klampt.at(i);
+      q(idx) = qomplRnState->values[i];
     }
   }
 
   return q;
 }
 Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
-  uint N = space->getDimension() - 6;
-  if(hasRealVectorSpace){
+  if(Nompl>0){
     const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
     const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
     return OMPLStateToConfig(qomplSE3, qomplRnState);
@@ -354,8 +365,7 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
 }
 
 Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
-  uint N = space->getDimension() - 6;
-  if(hasRealVectorSpace){
+  if(Nompl>0){
     const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
     const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
     return OMPLStateToConfig(qomplSE3, qomplRnState);
