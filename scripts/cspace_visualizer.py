@@ -8,7 +8,7 @@ rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 ## for Palatino and other serif fonts use:
 #rc('font',**{'family':'serif','serif':['Palatino']})
 rc('text', usetex=True)
-rc('font', family='serif', size=40)
+rc('font', family='serif', size=30)
 
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d.axes3d as p3
@@ -78,12 +78,18 @@ ct = np.sum(PT[triangles],axis=1)/3.0
 colors = np.array([ (x-1)**2 for x,y in np.vstack((cx,ct)).T])
 
 fig = plt.figure(0)
+ax = fig.add_subplot(111)
 plt.tripcolor(PX,PT,triangles, cmap=plt.cm.Spectral_r, facecolors=colors, edgecolors='none')
 plt.xlabel('X')
 fig.autofmt_xdate()
 plt.ylabel(r'\theta',rotation=0)
-#plt.show()
-#sys.exit(0)
+dxax=0.45
+dyax=0.05
+fig.patch.set_facecolor('white')
+plt.text(dxax, 0-dyax,r'$\gg$',transform=ax.transAxes, fontsize=50)
+plt.text(dxax, 1-dyax,r'$\gg$',transform=ax.transAxes, fontsize=50)
+ax.tick_params(axis='both', which='major', pad=15)
+plt.savefig("cspace.png", bbox_inches='tight')
 
 
 def long_edges(x, y, triangles, radio=22):
@@ -123,6 +129,7 @@ tris.set_mask(mask)
 #plt.show()
 
 fig = plt.figure(1)
+fig.patch.set_facecolor('white')
 ax  = fig.add_subplot(111, projection='3d')
 ax.plot_trisurf(X,Y,Z, \
     triangles=tris.get_masked_triangles(),cmap=plt.cm.Spectral, \
@@ -130,4 +137,6 @@ ax.plot_trisurf(X,Y,Z, \
 ax.set_xlabel(r'r')
 ax.set_ylabel(r'\phi')
 ax.set_zlabel(r'z')
+ax.tick_params(axis='both', which='major', pad=15)
+plt.savefig("cspace3d.png", bbox_inches='tight')
 plt.show()

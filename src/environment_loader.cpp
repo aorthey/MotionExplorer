@@ -134,7 +134,6 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
     }
 
     //  nd = (int) drivers.size();
-    info(&world);
     SmartPointer<RobotController> controller = new ContactStabilityController(*robot);
 
     RobotControllerFactory::Register("ContactStabilityController", controller);
@@ -147,6 +146,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
     std::cout << "LOADED CONTACTSTABILITYCONTROLLER" << std::endl;
     std::cout << std::string(80, '-') << std::endl;
   }
+  info(&world);
 
   if(pin.load(file_name.c_str())){
 

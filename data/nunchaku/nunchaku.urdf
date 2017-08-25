@@ -6,13 +6,13 @@
     <inertia ixx="0.00355833333333" ixy="0" ixz="0" iyy="0.00355833333333" iyz="0" izz="0.000225"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.57 0" xyz="-0.3 0 0"/>
+    <origin rpy="0 1.57 0" xyz="-0.31 0 0"/>
     <geometry>
       <cylinder length="0.2" radius="0.03"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="-0.3 0 0"/>
+    <origin rpy="0 1.57 0" xyz="-0.31 0 0"/>
     <geometry>
       <cylinder length="0.2" radius="0.03"/>
     </geometry>
@@ -75,7 +75,7 @@
   <child link="connector2"/>
   <axis xyz="0 1 0"/>
   <dynamics damping="1" friction="10"/>
-  <limit lower="-3.0" upper="3.0" effort="1" velocity="100"/>
+  <limit lower="-2.99" upper="2.99" effort="1" velocity="100"/>
 </joint>
 
  <link name="connector2">
@@ -109,13 +109,13 @@
     <inertia ixx="0.00355833333333" ixy="0" ixz="0" iyy="0.00355833333333" iyz="0" izz="0.000225"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.57 0" xyz="0.515 0 0"/>
+    <origin rpy="0 1.57 0" xyz="0.54 0 0"/>
     <geometry>
       <cylinder length="0.2" radius="0.03"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="0.515 0 0"/>
+    <origin rpy="0 1.57 0" xyz="0.54 0 0"/>
     <geometry>
       <cylinder length="0.2" radius="0.03"/>
     </geometry>
@@ -123,5 +123,13 @@
  </link>
 
   <klampt package_root="../../.." default_acc_max="4" >
+    <noselfcollision pairs="hinge link2"/>
+    <noselfcollision pairs="hinge link1"/>
+    <noselfcollision pairs="connector link1"/>
+    <noselfcollision pairs="connector link2"/>
+    <noselfcollision pairs="connector hinge"/>
+    <noselfcollision pairs="connector2 link1"/>
+    <noselfcollision pairs="connector2 link2"/>
+    <noselfcollision pairs="connector2 hinge"/>
   </klampt>
 </robot>

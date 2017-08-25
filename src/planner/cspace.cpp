@@ -109,7 +109,7 @@ void GeometricCSpaceOMPL::initSpace()
     exit(0);
   }
 
-  double N = robot->q.size()-6;
+  uint N = robot->q.size()-6;
   std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(N):"")<< std::endl;
 
   ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());

@@ -1,5 +1,6 @@
 #include "planner/planner.h"
 #include "util.h"
+#include "info.h"
 //#include "cspace_sentinel.h"
 //#include "cspace_epsilon_neighborhood.h"
 
