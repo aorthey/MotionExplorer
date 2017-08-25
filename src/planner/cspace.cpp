@@ -47,7 +47,11 @@ GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
       }
     }
   }
-  std::cout << "Robot \"" << robot->name << "\" Configuration Space: SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(Nompl):"") << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "Robot \"" << robot->name << "\":" << std::endl;
+  std::cout << "------ Configuration Space (original) : SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(Nklampt):"") << "  [Klampt]"<< std::endl;
+  std::cout << "------ Configuration Space (effective): SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(Nompl):"") << "  [OMPL]" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
 }
 
 void GeometricCSpaceOMPL::print()

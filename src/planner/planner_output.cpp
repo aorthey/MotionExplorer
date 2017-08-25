@@ -17,6 +17,14 @@ void PlannerOutput::VerticesToFile(){
     fh << tree.at(k) << std::endl;
   }
   fh.close();
+
+  fh.open ("vertices_path.txt");
+  if(!sv) GetSweptVolume();
+  std::vector<Config> path = sv->GetKeyframes();
+  for(uint k = 0; k < path.size(); k++){
+    fh << path.at(k) << std::endl;
+  }
+  fh.close();
 }
 
 void PlannerOutput::SetHierarchy(std::vector<HierarchicalLevel> &hierarchy_){

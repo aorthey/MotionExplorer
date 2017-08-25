@@ -3,7 +3,7 @@
 <world>
    <robot name="bottle" file="/home/aorthey/git/orthoklampt/data/bottle/bottle.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-   <rigidObject  name="onehole.tri" file="/home/aorthey/git/orthoklampt/data/bottle_orientation/onehole.tri" translation="0.47 1.5 -1.26"/>
+   <rigidObject  name="onehole.tri" file="/home/aorthey/git/orthoklampt/data/terrains/onehole.tri" translation="0.47 1.5 -1.26"/>
    <!--
 -->
 
@@ -15,7 +15,7 @@
     <se3max config="6   1e-10  1 0 3.141593 0 0"/>
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0</epsilongoalregion>
-    <maxplanningtime>0.1</maxplanningtime>
+    <maxplanningtime>2</maxplanningtime>
     <algorithm>ompl:rrt</algorithm>
     <drawMilestones>0</drawMilestones>
     <drawSweptVolume>1</drawSweptVolume>

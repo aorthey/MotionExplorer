@@ -3,24 +3,21 @@
 <world>
   <robot name="nunchaku" file="/home/aorthey/git/orthoklampt/data/nunchaku/nunchaku.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-   <!--
-  <rigidObject  name="onehole.tri" file="/home/aorthey/git/orthoklampt/data/nunchaku/onehole.tri" translation="0.47 1.5 -1.26"/>
--->
+  <rigidObject  name="onehole.tri" file="/home/aorthey/git/orthoklampt/data/terrains/oneholethick.tri" translation="0.47 1.5 -1.26"/>
 
   <plannersettings>
 
-    <qinit config="10   0 -1 0 1.57 0 0 0 0 0 0"/>
-    <qgoal config="10   0  1 0 1.57 0 0 0 0 0 0"/>
-
+    <qinit config="10   0 -1 0 1.57 0 0 0 0 2.9 0"/>
+    <qgoal config="10   0 1 0 1.57 0 0 0 0 -2.9 0"/>
     <se3min config="6   -1e-10 -1 0 1.56 0 0"/>
     <se3max config="6   1e-10  1 0 1.58 0 0"/>
 
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0</epsilongoalregion>
-    <maxplanningtime>0.1</maxplanningtime>
+    <maxplanningtime>2</maxplanningtime>
     <algorithm>ompl:rrt</algorithm>
-    <drawMilestones>0</drawMilestones>
-    <drawSweptVolume>1</drawSweptVolume>
+    <drawMilestones>10</drawMilestones>
+    <drawSweptVolume>0</drawSweptVolume>
     <drawStartGoal>1</drawStartGoal>
     <drawTree>0</drawTree>
     <robot>

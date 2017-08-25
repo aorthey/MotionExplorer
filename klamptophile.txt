@@ -734,5 +734,7 @@ irregular shaped links (non-convex) (SE(3))
 Visualize the CSpace along a path for the nunchaku robot
 
 
-[ ] remove zero measure dimensions from OMPL (i.e. map them to lower space
+[x] remove zero measure dimensions from OMPL (i.e. map them to lower space
 before starting OMPL, there are always problems with that)
+
+[ ] there is no way to enforce bounds on SO(3), maybe we need to decompose it somehow

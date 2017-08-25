@@ -233,9 +233,28 @@ PrincipalFibreBundleOMPLValidityChecker::PrincipalFibreBundleOMPLValidityChecker
 bool PrincipalFibreBundleOMPLValidityChecker::isValid(const ob::State* state) const
 {
   Config q = ompl_space->OMPLStateToConfig(state);
+  //q(3)=1.57;
+  q(4)=0;
+  q(5)=0;
   bool feas = cspace_->IsFeasible(q) && si_->satisfiesBounds(state);
   return feas;
+  // CSpace *space = cspace_;
+
+  // Robot* robot = space->GetRobot();
+  // robot->UpdateConfig(q);
+  // robot->UpdateGeometry();
+
+  // //same as Singlerobotcspace but ignore other robots
+  // int id = space->world.RobotID(space->index);
+  // vector<int> idrobot(1,id);
+  // vector<int> idothers;
+  // for(size_t i=0;i<space->world.terrains.size();i++)
+  //   idothers.push_back(space->world.TerrainID(i));
+  // for(size_t i=0;i<space->world.rigidObjects.size();i++)
+  //   idothers.push_back(space->world.RigidObjectID(i));
+
+  // pair<int,int> res = space->settings->CheckCollision(space->world,idrobot,idothers);
+  // if(res.first >= 0) return false;
+  // res = space->settings->CheckCollision(space->world,idrobot);
+  // if(res.first >= 0) return false;
 }
-
-
-

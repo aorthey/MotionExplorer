@@ -276,7 +276,7 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
 
     ss.simplifySolution();
     og::PathGeometric path = ss.getSolutionPath();
-    path.interpolate();
+    //path.interpolate();
 
     std::cout << "Path Length     : " << path.length() << std::endl;
 
