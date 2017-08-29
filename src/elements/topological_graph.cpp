@@ -1,6 +1,5 @@
 #include "elements/topological_graph.h"
 
-#include <SBL/GT/Betti_numbers_2.hpp>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Regular_triangulation_3.h>
 #include <CGAL/Fixed_alpha_shape_3.h>
@@ -17,6 +16,11 @@
 
 #include <Library/KrisLibrary/math/vector.h>
 #include <Library/KrisLibrary/math3d/primitives.h>
+
+//#include <SBL/GT/Betti_numbers_2.hpp>
+//#include <SBL/CADS/Dijkstra_shortest_paths_with_landmarks.hpp>
+//typedef SBL::GT::T_Betti_numbers_2<Fixed_alpha_shape_3>                        Betti_numbers_2;
+//typedef SBL::CADS::T_Dijkstra_shortest_paths_with_landmarks<Graph, Landmark_functor>  Dijkstra;
 
 #include <ompl/base/Cost.h>
 
@@ -43,7 +47,6 @@ typedef Fixed_alpha_shape_3::Edge                           Edge;
 typedef K::Weighted_point_3                                 Weighted_point;
 typedef K::Point_3                                          Bare_point;
 
-#include <SBL/CADS/Dijkstra_shortest_paths_with_landmarks.hpp>
 
 TopologicalGraph::TopologicalGraph(const ob::PlannerData& pd, const ob::OptimizationObjective& obj){
   std::cout << "TopologicalGraph" << std::endl;
@@ -144,11 +147,10 @@ TopologicalGraph::TopologicalGraph(const ob::PlannerData& pd, const ob::Optimiza
     }
     cmplx.T.push_back(V);
   }
-  typedef SBL::GT::T_Betti_numbers_2<Fixed_alpha_shape_3>                        Betti_numbers_2;
-  Betti_numbers_2 betti;
-  Betti_numbers_2::result_type res = betti(as);
-  std::cout << "Number of input spheres: " << as.number_of_vertices() << std::endl;
-  std::cout << "Betti numbers: " << res.get<0>() << " " << res.get<1>() << " " << res.get<2>() << std::endl;
+  //Betti_numbers_2 betti;
+  //Betti_numbers_2::result_type res = betti(as);
+  //std::cout << "Number of input spheres: " << as.number_of_vertices() << std::endl;
+  //std::cout << "Betti numbers: " << res.get<0>() << " " << res.get<1>() << " " << res.get<2>() << std::endl;
 
   ////dijkstra_shortest_paths(g, s,
   ////                        predecessor_map(boost::make_iterator_property_map(p.begin(), get(boost::vertex_index, g))).
@@ -212,7 +214,6 @@ public:
     return false;
   }
 };
-typedef SBL::CADS::T_Dijkstra_shortest_paths_with_landmarks<Graph, Landmark_functor>  Dijkstra;
 
 void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob::OptimizationObjective& opt){
 
@@ -224,9 +225,6 @@ void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob:
   IndexMap index_map = get(vertex_index, g);
   //PredecessorMap predecessorMap(&predecessors[0], index_map);
   //DistanceMap distanceMap(&distances[0], index_map);
-
-  //typedef SBL::CADS::T_Dijkstra_shortest_paths_with_landmarks<ob::PlannerData::Graph, Landmark_functor>  Dijkstra;
-  //Dijkstra dijkstra;
 
 
   EIterator ei, ei_end;

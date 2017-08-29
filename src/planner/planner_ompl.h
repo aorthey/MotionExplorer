@@ -40,8 +40,8 @@
 #include <ompl/control/planners/kpiece/KPIECE1.h>
 #include <ompl/control/planners/est/EST.h>
 //#include <boost/program_options.hpp>
-#include <omplapp/config.h>
 #include <omplapp/apps/SE3RigidBodyPlanning.h>
+#include <omplapp/config.h>
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;
