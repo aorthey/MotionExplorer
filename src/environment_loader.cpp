@@ -60,7 +60,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
   uint Nrobots = world.robots.size();
   if(Nrobots<1){
     std::cout << "Current planner only supports one robot! selected " << Nrobots << " robots." << std::endl;
-    for(int i = 0; i < Nrobots; i++){
+    for(uint i = 0; i < Nrobots; i++){
       std::cout << world.robots[i]->name << std::endl;
     }
     exit(0);
@@ -175,7 +175,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
   }
   //_backend->sim.simStep = 0.001;
   //WorldSimulation sim = _backend->sim;
-  for(int i = 0; i < _backend->sim.odesim.numRobots(); i++){
+  for(uint i = 0; i < _backend->sim.odesim.numRobots(); i++){
     ODERobot *simrobot = _backend->sim.odesim.robot(i);
     simrobot->EnableSelfCollisions(true);
     std::cout << "SelfCollisionsEnabled" << std::endl;

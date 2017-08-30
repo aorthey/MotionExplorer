@@ -25,7 +25,7 @@ GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
     assert(maximum.size() == 6+Nklampt);
 
     //vector<double> lowRn, highRn;
-    //for(int i = 0; i < Nklampt; i++){
+    ////for(uint i = 0; i < Nklampt; i++){
     //  lowRn.push_back(minimum.at(i+6));
     //  highRn.push_back(maximum.at(i+6));
     //}
@@ -35,7 +35,7 @@ GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
     double epsilonSpacing=1e-10;
     hasRealVectorSpace = false;
     Nompl = 0;
-    for(int i = 6; i < 6+Nklampt; i++){
+    for(uint i = 6; i < 6+Nklampt; i++){
 
       if(abs(minimum.at(i)-maximum.at(i))>epsilonSpacing){
         hasRealVectorSpace = true;
@@ -77,13 +77,13 @@ void GeometricCSpaceOMPL::print()
   std::vector<double> se3min = bounds.low;
   std::vector<double> se3max = bounds.high;
   std::cout << "SE(3) bounds min     : ";
-  for(int i = 0; i < se3min.size(); i++){
+  for(uint i = 0; i < se3min.size(); i++){
     std::cout << " " << se3min.at(i);
   }
   std::cout << std::endl;
 
   std::cout << "SE(3) bounds max     : ";
-  for(int i = 0; i < se3max.size(); i++){
+  for(uint i = 0; i < se3max.size(); i++){
     std::cout << " " << se3max.at(i);
   }
   std::cout << std::endl;
@@ -169,7 +169,7 @@ void GeometricCSpaceOMPL::initSpace()
   if(Nompl>0){
     vector<double> lowRn, highRn;
 
-    for(int i = 0; i < Nompl;i++){
+    for(uint i = 0; i < Nompl;i++){
       uint idx = ompl_to_klampt.at(i);
       double min = minimum.at(idx);
       double max = maximum.at(idx);
@@ -180,7 +180,7 @@ void GeometricCSpaceOMPL::initSpace()
 
     ////ompl does only accept dimensions with strictly positive measure, adding some epsilon space
     //double epsilonSpacing=1e-10;
-    //for(int i = 0; i < N; i++){
+    //for(uint i = 0; i < N; i++){
     //  if(abs(lowRn.at(i)-highRn.at(i))<epsilonSpacing){
     //    highRn.at(i)=0;
     //  }
@@ -203,7 +203,7 @@ void GeometricCSpaceOMPL::initControlSpace()
   cbounds.setHigh(1);
 
   uint effectiveControlDim = 0;
-  for(int i = 0; i < NdimControl; i++){
+  for(uint i = 0; i < NdimControl; i++){
     double qmin = robot->qMin(i);
     double qmax = robot->qMax(i);
     double d = sqrtf((qmin-qmax)*(qmin-qmax));
@@ -293,7 +293,7 @@ ob::ScopedState<> GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q){
 
   if(Nompl>0){
     double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
-    for(int i = 0; i < Nklampt; i++){
+    for(uint i = 0; i < Nklampt; i++){
       int idx = klampt_to_ompl.at(i);
       if(idx<0) continue;
       else qomplRn[idx]=q(6+i);
@@ -341,13 +341,13 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType
 
 
 
-  for(int i = 0; i < Nklampt; i++){
+  for(uint i = 0; i < Nklampt; i++){
     q(i+6) = 0;
   }
 
   if(Nompl>0){
     //set non-zero dimensions to ompl value
-    for(int i = 0; i < Nompl; i++){
+    for(uint i = 0; i < Nompl; i++){
       uint idx = ompl_to_klampt.at(i);
       q(idx) = qomplRnState->values[i];
     }
@@ -429,13 +429,13 @@ void KinodynamicCSpaceOMPL::print()
   std::vector<double> se3min = bounds.low;
   std::vector<double> se3max = bounds.high;
   std::cout << "SE(3) bounds min     : ";
-  for(int i = 0; i < se3min.size(); i++){
+  for(uint i = 0; i < se3min.size(); i++){
     std::cout << " " << se3min.at(i);
   }
   std::cout << std::endl;
 
   std::cout << "SE(3) bounds max     : ";
-  for(int i = 0; i < se3max.size(); i++){
+  for(uint i = 0; i < se3max.size(); i++){
     std::cout << " " << se3max.at(i);
   }
   std::cout << std::endl;
@@ -445,12 +445,12 @@ void KinodynamicCSpaceOMPL::print()
   std::vector<double> min = boundstm.low;
   std::vector<double> max = boundstm.high;
   std::cout << "Vel bounds min       : ";
-  for(int i = 0; i < min.size(); i++){
+  for(uint i = 0; i < min.size(); i++){
     std::cout << " " << min.at(i);
   }
   std::cout << std::endl;
   std::cout << "Vel bounds max       : ";
-  for(int i = 0; i < max.size(); i++){
+  for(uint i = 0; i < max.size(); i++){
     std::cout << " " << max.at(i);
   }
   std::cout << std::endl;
@@ -529,7 +529,7 @@ void KinodynamicCSpaceOMPL::initSpace()
 
   if(N>0){
     vector<double> lowRn, highRn;
-    for(int i = 0; i < N; i++){
+    for(uint i = 0; i < N; i++){
       lowRn.push_back(minimum.at(i+6));
       highRn.push_back(maximum.at(i+6));
     }
@@ -537,7 +537,7 @@ void KinodynamicCSpaceOMPL::initSpace()
 
     //ompl does only accept dimensions with strictly positive measure, adding some epsilon space
     double epsilonSpacing=1e-8;
-    for(int i = 0; i < N; i++){
+    for(uint i = 0; i < N; i++){
       if(abs(lowRn.at(i)-highRn.at(i))<epsilonSpacing){
         highRn.at(i)+=epsilonSpacing;
       }
@@ -559,7 +559,7 @@ void KinodynamicCSpaceOMPL::initSpace()
 
 
   vector<double> lowTM, highTM;
-  for(int i = 0; i < 6+N; i++){
+  for(uint i = 0; i < 6+N; i++){
     lowTM.push_back(vMin.at(i));
     highTM.push_back(vMax.at(i));
   }
@@ -589,7 +589,7 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
   cbounds.setHigh(1);
 
   uint effectiveControlDim = 0;
-  for(int i = 0; i < NdimControl; i++){
+  for(uint i = 0; i < NdimControl; i++){
     double qmin = robot->qMin(i);
     double qmax = robot->qMax(i);
     double d = sqrtf((qmin-qmax)*(qmin-qmax));
@@ -612,7 +612,7 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
   cbounds.setHigh(NdimControl,input.timestep_max);
 
   //TODO: remove hardcoded se(3) vector fields
-  for(int i = 0; i < 6; i++){
+  for(uint i = 0; i < 6; i++){
     cbounds.setLow(i,0);
     cbounds.setHigh(i,0);
   }
@@ -634,7 +634,7 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
   cbounds.check();
   control_space->setBounds(cbounds);
   //std::cout << "torque bounds" << std::endl;
-  //for(int i = 0; i < NdimControl+1; i++){
+  //for(uint i = 0; i < NdimControl+1; i++){
   //  std::cout << i << " <" << cbounds.low.at(i) << ","<< cbounds.high.at(i) << ">" << std::endl;
   //}
 }
@@ -716,11 +716,11 @@ ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q){
   if(!(q.size() == space->getDimension())){
     if(q.size() == int(0.5*space->getDimension())){
       assert(12+2*N == space->getDimension());
-      for(int i = 0; i < N; i++){
+      for(uint i = 0; i < N; i++){
         qomplRn[i]=q(6+i);
       }
       double* qomplTM = static_cast<ob::RealVectorStateSpace::StateType*>(qomplTMSpace)->values;
-      for(int i = 0; i < (N+6); i++){
+      for(uint i = 0; i < (N+6); i++){
         qomplTM[i]=0.0;
       }
     }else{
@@ -729,11 +729,11 @@ ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q){
   }else{
     uint N = int(0.5*q.size())-6;
     assert(12+2*N == space->getDimension());
-    for(int i = 0; i < N; i++){
+    for(uint i = 0; i < N; i++){
       qomplRn[i]=q(6+i);
     }
     double* qomplTM = static_cast<ob::RealVectorStateSpace::StateType*>(qomplTMSpace)->values;
-    for(int i = 0; i < (N+6); i++){
+    for(uint i = 0; i < (N+6); i++){
       qomplTM[i]=q(N+6+i);
     }
   }
@@ -780,11 +780,11 @@ Config KinodynamicCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateTy
   if(q(5)<-M_PI) q(5)+=2*M_PI;
   if(q(5)>M_PI) q(5)-=2*M_PI;
 
-  for(int i = 0; i < N; i++){
+  for(uint i = 0; i < N; i++){
     q(i+6) = qomplRnState->values[i];
   }
   if(N>0){
-    for(int i = 0; i < (6+N); i++){
+    for(uint i = 0; i < (6+N); i++){
       q(i+6+N) = qomplTMState->values[i];
     }
   }

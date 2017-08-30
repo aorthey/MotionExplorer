@@ -88,7 +88,7 @@ class Info
         std::cout << std::string(80, '-') << std::endl;
         vector<RobotJoint> joints = (*it)->joints;
         std::cout << "#Joints: " << joints.size() << std::endl;
-        for(int i = 0; i< joints.size(); i++){
+        for(uint i = 0; i< joints.size(); i++){
           std::cout<< "Joint[" << i << "] linkidx " << joints[i].linkIndex << " type ";
             switch(joints[i].type){
               case RobotJoint::Floating: std::cout << "floating"; break;

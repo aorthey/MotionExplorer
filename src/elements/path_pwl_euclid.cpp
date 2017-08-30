@@ -11,7 +11,7 @@ PathPiecewiseLinearEuclidean::PathPiecewiseLinearEuclidean()
 
 void PathPiecewiseLinearEuclidean::Normalize(){
   double newLength =0.0;
-  for(int i = 0; i < interLength.size(); i++){
+  for(uint i = 0; i < interLength.size(); i++){
     interLength.at(i) /= length;
     newLength+=interLength.at(i);
 
@@ -48,10 +48,9 @@ Config PathPiecewiseLinearEuclidean::EvalMilestone(const int k) const{
 Config PathPiecewiseLinearEuclidean::Eval(const double t) const{
   if(t<=0) return keyframes.front();
   if(t>=length) return keyframes.back();
-  uint ictr = 0;
   double Tcum = 0;
   assert(interLength.size()==keyframes.size()-1);
-  for(int i = 0; i < interLength.size(); i++){
+  for(uint i = 0; i < interLength.size(); i++){
     double Tnext = interLength.at(i);
     if((Tcum+Tnext)>=t){
       //t \in [Lcum, Lcum+Lnext]
@@ -81,7 +80,7 @@ Config PathPiecewiseLinearEuclidean::Eval(const double t) const{
 void PathPiecewiseLinearEuclidean::interpolate(){
   length = 0;
   interLength.clear();
-  for(int i = 0; i < Nkeyframes-1; i++){
+  for(uint i = 0; i < Nkeyframes-1; i++){
     Config q1 = keyframes.at(i);
     Config q2 = keyframes.at(i+1);
     double d = (q1-q2).norm();
@@ -113,7 +112,7 @@ PathPiecewiseLinearEuclidean PathPiecewiseLinearEuclidean::from_keyframes(const 
 }
 PathPiecewiseLinearEuclidean PathPiecewiseLinearEuclidean::from_keyframes(const std::vector<Vector3> &keyframes){
   PathPiecewiseLinearEuclidean path = PathPiecewiseLinearEuclidean();
-  for(int i = 0; i < keyframes.size(); i++){
+  for(uint i = 0; i < keyframes.size(); i++){
     //Vector3 x = keyframes.at(i);
     Config q;q.resize(3);q(0)=keyframes.at(i)[0];q(1)=keyframes.at(i)[1];q(2)=keyframes.at(i)[2];
     path.keyframes.push_back(q);

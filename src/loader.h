@@ -24,8 +24,8 @@ inline TiXmlElement* GetRootNodeFromDocument(TiXmlDocument& doc)
     }
   }else{
     std::cout << doc.ErrorDesc() << std::endl;
-    return NULL;
   }
+  return NULL;
 }
 
 inline TiXmlElement* FindSubNode(TiXmlElement* node, const char *name){

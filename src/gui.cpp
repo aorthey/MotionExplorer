@@ -5,8 +5,8 @@
 #include <KrisLibrary/geometry/AnyGeometry.h>
 #include <KrisLibrary/math3d/basis.h>
 #include <KrisLibrary/math/LAPACKInterface.h>
-#include <Eigen/Core>
-#include <Eigen/SVD>
+//#include <Eigen/Core>
+//#include <Eigen/SVD>
 
 #include <tinyxml.h>
 #include <iostream>
@@ -65,42 +65,42 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   swept_volume_paths.clear();
 }
 void ForceFieldBackend::ShowSweptVolumes(){ 
-  for(int i = 0; i < drawPathSweptVolume.size(); i++){
+  for(uint i = 0; i < drawPathSweptVolume.size(); i++){
     drawPathSweptVolume.at(i) = 1;
   }
 }
 void ForceFieldBackend::HideSweptVolumes(){ 
-  for(int i = 0; i < drawPathSweptVolume.size(); i++){
+  for(uint i = 0; i < drawPathSweptVolume.size(); i++){
     drawPathSweptVolume.at(i) = 0;
   }
 }
 void ForceFieldBackend::ShowMilestones(){ 
-  for(int i = 0; i < drawPathMilestones.size(); i++){
+  for(uint i = 0; i < drawPathMilestones.size(); i++){
     drawPathMilestones.at(i) = 1;
   }
 }
 void ForceFieldBackend::HideMilestones(){ 
-  for(int i = 0; i < drawPathMilestones.size(); i++){
+  for(uint i = 0; i < drawPathMilestones.size(); i++){
     drawPathMilestones.at(i) = 0;
   }
 }
 void ForceFieldBackend::ShowPlannerTree(){ 
-  for(int i = 0; i < drawPlannerTree.size(); i++){
+  for(uint i = 0; i < drawPlannerTree.size(); i++){
     drawPlannerTree.at(i) = 1;
   }
 }
 void ForceFieldBackend::HidePlannerTree(){ 
-  for(int i = 0; i < drawPlannerTree.size(); i++){
+  for(uint i = 0; i < drawPlannerTree.size(); i++){
     drawPlannerTree.at(i) = 0;
   }
 }
 void ForceFieldBackend::ShowPlannerSimplicialComplex(){ 
-  for(int i = 0; i < drawPlannerSimplicialComplex.size(); i++){
+  for(uint i = 0; i < drawPlannerSimplicialComplex.size(); i++){
     drawPlannerSimplicialComplex.at(i) = 1;
   }
 }
 void ForceFieldBackend::HidePlannerSimplicialComplex(){ 
-  for(int i = 0; i < drawPlannerSimplicialComplex.size(); i++){
+  for(uint i = 0; i < drawPlannerSimplicialComplex.size(); i++){
     drawPlannerSimplicialComplex.at(i) = 0;
   }
 }
@@ -125,7 +125,7 @@ bool ForceFieldBackend::OnIdle()
 
     sim.hooks.clear();
 
-    for(int i = 0; i < Nlinks; i++){
+    for(uint i = 0; i < Nlinks; i++){
       dBodyID bodyid = robot->body(i);
 
       if(bodyid){
@@ -147,8 +147,8 @@ bool ForceFieldBackend::OnIdle()
 
 
     Vector3 com = robot->robot.GetCOM();
-    Real mass = robot->robot.GetTotalMass();
-    Matrix3 intertia = robot->robot.GetTotalInertia();
+    //Real mass = robot->robot.GetTotalMass();
+    //Matrix3 intertia = robot->robot.GetTotalInertia();
 
     Vector3 LM = robot->robot.GetLinearMomentum();
     Vector3 AM = robot->robot.GetAngularMomentum();
@@ -180,12 +180,12 @@ void ForceFieldBackend::Start()
   std::cout << "links: " << Nlinks << std::endl;
   showLinks.resize(Nlinks); //hide certain links 
 
-  for(int i = 0; i < showLinks.size(); i++){
+  for(uint i = 0; i < showLinks.size(); i++){
     showLinks[i] = 1;
   }
   //showLinks[15] = 1;
-  //for(int i = 43; i < 50; i++) showLinks[i] = 1;
-  //for(int i = 29; i < 36; i++) showLinks[i] = 1;
+  //for(uint i = 43; i < 50; i++) showLinks[i] = 1;
+  //for(uint i = 29; i < 36; i++) showLinks[i] = 1;
 
   //use custom force fields
   sim.odesim.SetGravity(Vector3(0,0,0));
@@ -223,7 +223,7 @@ void ForceFieldBackend::Start()
   drawPlannerSimplicialComplex.clear();
 
   std::cout << "Setting swept volume paths" << std::endl;
-  for(int i = 0; i < plannerOutput.size(); i++){
+  for(uint i = 0; i < plannerOutput.size(); i++){
     drawPathSweptVolume.push_back(plannerOutput.at(i).drawSweptVolume);
     drawPathStartGoal.push_back(plannerOutput.at(i).drawStartGoal);
     drawPlannerTree.push_back(plannerOutput.at(i).drawTree);
@@ -232,7 +232,7 @@ void ForceFieldBackend::Start()
     if(plannerOutput.at(i).drawMilestones) drawPathMilestones.push_back(1);
     else drawPathMilestones.push_back(0);
   }
-  for(int i = 0; i < plannerOutput.size(); i++){
+  for(uint i = 0; i < plannerOutput.size(); i++){
     std::string dpsv = "draw_path_swept_volume_"+std::to_string(i);
     MapButtonToggle(dpsv.c_str(),&drawPathSweptVolume.at(i));
     std::string dpms = "draw_path_milestones_"+std::to_string(i);
@@ -338,7 +338,7 @@ void ForceFieldBackend::RenderWorld()
     sim.controlSimulators[0].GetActuatorTorques(T);
 
     Robot *robot = &oderobot->robot;
-    for(int i = 0; i < robot->drivers.size(); i++){
+    for(uint i = 0; i < robot->drivers.size(); i++){
       RobotJointDriver driver = robot->drivers[i];
       //############################################################################
       if(driver.type == RobotJointDriver::Rotation){
@@ -460,7 +460,7 @@ void ForceFieldBackend::RenderWorld()
   if(drawForceField) GLDraw::drawForceField(wrenchfield);
   if(drawWrenchField) GLDraw::drawWrenchField(wrenchfield);
 
-  for(int i = 0; i < plannerOutput.size(); i++){
+  for(uint i = 0; i < plannerOutput.size(); i++){
 
     uint ridx = plannerOutput.at(i).robot_idx;
     Robot *robot_i = world->robots[ridx];
@@ -493,10 +493,10 @@ void ForceFieldBackend::RenderWorld()
 
   }
 
-  
   if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
   if(drawAxesLabels) GLDraw::drawAxesLabels(viewport);
-  if(drawFrames) GLDraw::drawFrames(_frames, _frameLength);
+
+  GLDraw::drawFrames(_frames, _frameLength);
 
   
 
@@ -504,7 +504,7 @@ void ForceFieldBackend::RenderWorld()
  
 void ForceFieldBackend::RenderScreen(){
   BaseT::RenderScreen();
-  Robot *robot = world->robots[0];
+  //Robot *robot = world->robots[0];
 
   int line_x_pos = 20;
 
@@ -515,7 +515,7 @@ void ForceFieldBackend::RenderScreen(){
 
   if(world->robots.size()>0){
     line = "Robots      : ";
-    for(int i = 0; i < world->robots.size(); i++){
+    for(uint i = 0; i < world->robots.size(); i++){
       line += ((i>0)?" | ":"");
       line += world->robots[i]->name;
     }
@@ -525,7 +525,7 @@ void ForceFieldBackend::RenderScreen(){
 
   if(world->terrains.size()>0){
     line = "Terrains    : ";
-    for(int i = 0; i < world->terrains.size(); i++){
+    for(uint i = 0; i < world->terrains.size(); i++){
       std::string geom = world->terrains[i]->geomFile;
       line += ((i>0)?" | ":"");
       line += std::string(basename(geom.c_str()));
@@ -535,7 +535,7 @@ void ForceFieldBackend::RenderScreen(){
   }
   if(world->rigidObjects.size()>0){
     line = "RigidObjects: ";
-    for(int i = 0; i < world->rigidObjects.size(); i++){
+    for(uint i = 0; i < world->rigidObjects.size(); i++){
       std::string geom = world->rigidObjects[i]->geomFile;
       line += ((i>0)?" | ":"");
       line += std::string(basename(geom.c_str()));
@@ -715,12 +715,12 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
     }
     node->InsertEndChild(c);
   }
-  for(int i = 0; i < swept_volume_paths.size(); i++){
+  for(uint i = 0; i < swept_volume_paths.size(); i++){
   //
     TiXmlElement c("sweptvolume");
 
     std::vector<Config> keyframes = swept_volume_paths.at(i).GetKeyframes();
-    for(int i = 0; i < keyframes.size(); i++){
+    for(uint i = 0; i < keyframes.size(); i++){
       TiXmlElement cc("qitem");
       stringstream ss;
       ss<< keyframes.at(i);
@@ -749,7 +749,7 @@ void ForceFieldBackend::SendPlannerOutputToController()
 {
   if(plannerOutput.size()>0){
     std::vector<Vector> torques = plannerOutput.at(0).GetTorques();
-    for(int i = 0; i < torques.size(); i++){
+    for(uint i = 0; i < torques.size(); i++){
       stringstream qstr;
       qstr<<torques.at(i);
       string cmd( (i<=0)?("set_torque_control"):("append_torque_control") );
@@ -799,7 +799,7 @@ void ForceFieldBackend::AddPathInterpolate(const std::vector<Config> &keyframes,
 {
   std::vector<Config> interp_keyframes;
   double minimal_distance = 0.1;
-  for(int i = 0; i < keyframes.size()-1; i++){
+  for(uint i = 0; i < keyframes.size()-1; i++){
     Config q1= keyframes.at(i);
     Config q2= keyframes.at(i+1);
     interp_keyframes.push_back(q1);
@@ -810,10 +810,10 @@ void ForceFieldBackend::AddPathInterpolate(const std::vector<Config> &keyframes,
     std::cout << d << std::endl;
 
     if(d > minimal_distance){
-      int Npts = floor(d/minimal_distance);
+      uint Npts = floor(d/minimal_distance);
       std::cout << Npts << std::endl;
       //std::cout << q1 << std::endl;
-      for(int j = 0; j < Npts; j++){
+      for(uint j = 0; j < Npts; j++){
         Config qj = q1 + j*(minimal_distance/d)*(q2-q1);
         //std::cout << qj << std::endl;
         interp_keyframes.push_back(qj);
@@ -876,7 +876,7 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="reset") {
     sim.hooks.clear();
 
-    for(int k = 0; k < sim.robotControllers.size(); k++){
+    for(uint k = 0; k < sim.robotControllers.size(); k++){
       sim.robotControllers.at(k)->Reset();
     }
 
@@ -936,15 +936,15 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="draw_com_path"){
     toggle(drawCenterOfMassPath);
   }else if(cmd=="draw_planner_tree_toggle"){
-    for(int i = 0; i < drawPlannerTree.size(); i++){
+    for(uint i = 0; i < drawPlannerTree.size(); i++){
       toggle(drawPlannerTree.at(i));
     }
   }else if(cmd=="draw_planner_simplicial_complex"){
-    for(int i = 0; i < drawPlannerSimplicialComplex.size(); i++){
+    for(uint i = 0; i < drawPlannerSimplicialComplex.size(); i++){
       toggle(drawPlannerSimplicialComplex.at(i));
     }
   }else if(cmd=="draw_swept_volume"){
-    for(int i = 0; i < drawPathSweptVolume.size(); i++){
+    for(uint i = 0; i < drawPathSweptVolume.size(); i++){
       toggle(drawPathSweptVolume.at(i));
     }
   }else if(cmd=="load_motion_planner") {
@@ -998,7 +998,7 @@ bool GLUIForceFieldGUI::Initialize()
   uint N = _backend->getNumberOfPaths();
 
   std::cout << "N paths " << N << std::endl;
-  for(int i = 0; i < N; i++){
+  for(uint i = 0; i < N; i++){
     std::string prefix = "Path "+std::to_string(i)+" :";
 
     std::string dpsv = "draw_path_swept_volume_"+std::to_string(i);
@@ -1163,9 +1163,11 @@ bool GLUIForceFieldGUI::Initialize()
 void GLUIForceFieldGUI::AddButton(const char *key){
   AnyCollection c;
   std::string type =  "{type:button_press,button:"+std::string(key)+"}";
+  //Assert(res == true);
   bool res=c.read(type.c_str());
-  Assert(res == true);
-  AddCommandRule(c,key,"");
+  if(res){
+    AddCommandRule(c,key,"");
+  }
 
 }
 
@@ -1173,8 +1175,9 @@ void GLUIForceFieldGUI::AddToKeymap(const char *key, const char *s){
   AnyCollection c;
   std::string type =  "{type:key_down,key:"+std::string(key)+"}";
   bool res=c.read(type.c_str());
-  Assert(res == true);
-  AddCommandRule(c,s,"");
+  if(res){
+    AddCommandRule(c,s,"");
+  }
 
   std::string descr(s);
   descr = std::regex_replace(descr, std::regex("_"), " ");
@@ -1201,7 +1204,8 @@ void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
       std::size_t pos = screenshotFile.find(".ppm");
       std::string outpng = screenshotFile.substr(0,pos)+".png";
       std::string cmd = "convert "+screenshotFile+" "+outpng;
-      system(cmd.c_str());
+      int sres = system(cmd.c_str());
+      if(sres) std::cout << "successful stored screenshot" << std::endl;
       IncrementStringDigits(screenshotFile);
       break;
     }

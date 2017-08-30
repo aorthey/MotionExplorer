@@ -107,7 +107,7 @@ namespace GLDraw{
     glDisable(GL_DEPTH_TEST);
     GLColor cWrench(0,1,1);
     //cWrench.setCurrentGL();
-    for(int i = 0; i < wrenchfield.size(); i++){
+    for(uint i = 0; i < wrenchfield.size(); i++){
       Vector3 pos = wrenchfield.getPosition(i);
       Vector3 force = wrenchfield.getForce(i);
       Vector3 sforce = 0.5*force / (1+force.length());
@@ -168,9 +168,9 @@ namespace GLDraw{
   }
 
   void drawForceField(WrenchField &W){
-    Real linewidth=0.01;
+    //Real linewidth=0.01;
     std::vector<SmartPointer<ForceField> > forcefields = W.GetForceFields();
-    for(int i = 0; i < forcefields.size(); i++){
+    for(uint i = 0; i < forcefields.size(); i++){
       SmartPointer<ForceField> f = forcefields.at(i);
       if(f->type() == UNIFORM){
         //TODO: how to visualize a uniform field
@@ -334,7 +334,7 @@ namespace GLDraw{
               
               glBegin(GL_LINE_LOOP);
               x.set(dr,0);
-              for(i=0; i<numSteps; i++) {
+              for(uint j=0; j<numSteps; j++) {
                 glVertex3v(direction*dv + x.x*eu+x.y*ev);
                 x=x*dx;
               }
@@ -345,7 +345,7 @@ namespace GLDraw{
               dx.setPolar(One,inc);
               x.set(dr,0);
 
-              for(int i = 0; i < Narrows; i++){
+              for(uint j = 0; j < Narrows; j++){
                 glPushMatrix();
                 Vector3 rr = x.x*eu + x.y*ev;
                 Vector3 arrowS(direction*dv + rr);
@@ -504,7 +504,7 @@ namespace GLDraw{
   void drawPlannerTree(const SerializedTree &_stree, GLColor colorTree)
   {
     double edgeWidth = 0.1;
-    double vertexSize = 0.1;
+    //double vertexSize = 0.1;
     //too costly for each round
     //uint nearestNode = 0;
     //double bestD = dInf;
@@ -610,7 +610,7 @@ namespace GLDraw{
   }
   void drawFrames(std::vector< std::vector<Vector3> > &frames, std::vector<double> frameLength){
     Real linewidth=0.005;
-    for(int i = 0; i < frames.size(); i++){
+    for(uint i = 0; i < frames.size(); i++){
       Vector3 p = frames.at(i).at(0);
       Vector3 e1 = frames.at(i).at(1);
       Vector3 e2 = frames.at(i).at(2);
@@ -648,7 +648,7 @@ namespace GLDraw{
   void drawCenterOfMassPathFromController(WorldSimulation &sim){
     int linewidth = 4;
 
-    if(!sim.robotControllers.size()>0) return;
+    if(!(sim.robotControllers.size()>0)) return;
 
     SmartPointer<ContactStabilityController>& controller = *reinterpret_cast<SmartPointer<ContactStabilityController>*>(&sim.robotControllers[0]);
 
@@ -712,20 +712,20 @@ namespace GLDraw{
     glEnable(GL_BLEND); 
     GLColor yellow(1,1,0);
     GLColor white(1,1,1);
-    for(int i = 0; i < Nlinks; i++){
+    for(uint i = 0; i < Nlinks; i++){
       dBodyID bodyid = robot->body(i);
       if(bodyid){
         if(!robot->robot.IsGeometryEmpty(i)){
           RobotLink3D *link = &robot->robot.links[i];
 
           Geometry::AnyCollisionQuery *query = robot->robot.envCollisions[i];
-          double d = query->Distance(0,0.1);
+          //double d = query->Distance(0,0.1);
           std::vector<Vector3> vp1,vp2;
           query->InteractingPoints(vp1,vp2);
           if(vp1.size()!=1){
             std::cout << "Warning: got " << vp1.size() << " contact points for single rigid body" << std::endl;
           }
-          Matrix4 mat = link->T_World;
+          //Matrix4 mat = link->T_World;
           //glMultMatrix(mat);
           Vector3 p1 = link->T_World*vp1.front();
           Vector3 p2 = vp2.front();
@@ -753,7 +753,7 @@ namespace GLDraw{
     red.setCurrentGL();
     glPointSize(10);
     glLineWidth(5);
-    for(int i = 0; i < cmplx.path.size()-1; i++){
+    for(uint i = 0; i < cmplx.path.size()-1; i++){
       drawPoint(cmplx.path.at(i));
       drawLineSegment(cmplx.path.at(i),
                       cmplx.path.at(i+1));
@@ -770,20 +770,20 @@ namespace GLDraw{
     GLColor red(0.8,0.3,0.3,1);
     red.setCurrentGL();
     glPointSize(10);
-    for(int i = 0; i < cmplx.V.size(); i++){
+    for(uint i = 0; i < cmplx.V.size(); i++){
       drawPoint(cmplx.V.at(i));
     }
     glLineWidth(5);
-    for(int i = 0; i < cmplx.E.size(); i++){
+    for(uint i = 0; i < cmplx.E.size(); i++){
       drawLineSegment(cmplx.E.at(i).first, 
                       cmplx.E.at(i).second);
     }
-    for(int i = 0; i < cmplx.F.size(); i++){
+    for(uint i = 0; i < cmplx.F.size(); i++){
       drawTriangle(cmplx.F.at(i).at(0),
                    cmplx.F.at(i).at(1),
                    cmplx.F.at(i).at(2) );
     }
-    for(int i = 0; i < cmplx.T.size(); i++){
+    for(uint i = 0; i < cmplx.T.size(); i++){
       drawQuad(cmplx.T.at(i).at(0),
                    cmplx.T.at(i).at(1),
                    cmplx.T.at(i).at(2),
@@ -795,7 +795,7 @@ namespace GLDraw{
     uint Nlinks = robot->robot.links.size();
     glDisable(GL_LIGHTING);
     glEnable(GL_BLEND); 
-    for(int i = 0; i < Nlinks; i++){
+    for(uint i = 0; i < Nlinks; i++){
       dBodyID bodyid = robot->body(i);
       if(bodyid){
         if(!robot->robot.IsGeometryEmpty(i)){
@@ -825,8 +825,8 @@ namespace GLDraw{
               u /= u.norm();
               Vector3 dp = 1.0/(Sigma(k)*Sigma(k))*u;
               dp *= 0.5;
-              Vector3 p1 = center - dp;
-              Vector3 p2 = center + dp;
+              //Vector3 p1 = center - dp;
+              //Vector3 p2 = center + dp;
               axes.push_back(dp);
             }
             GLColor magenta(0.5,0,1,0.5);

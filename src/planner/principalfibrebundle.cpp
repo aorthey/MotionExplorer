@@ -1,4 +1,4 @@
-#include <eigen3/unsupported/Eigen/MatrixFunctions>
+//#include <eigen3/unsupported/Eigen/MatrixFunctions>
 #include <iomanip>
 #include "principalfibrebundle.h"
 
