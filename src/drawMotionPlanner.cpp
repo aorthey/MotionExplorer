@@ -724,25 +724,27 @@ namespace GLDraw{
           query->InteractingPoints(vp1,vp2);
           if(vp1.size()!=1){
             std::cout << "Warning: got " << vp1.size() << " contact points for single rigid body" << std::endl;
-          }
-          //Matrix4 mat = link->T_World;
-          //glMultMatrix(mat);
-          Vector3 p1 = link->T_World*vp1.front();
-          Vector3 p2 = vp2.front();
-          //Vector3 dp = p1-p2;
+            std::cout << "Ignoring Link " << i << "/" << Nlinks << std::endl;
+          }else{
+            //Matrix4 mat = link->T_World;
+            //glMultMatrix(mat);
+            Vector3 p1 = link->T_World*vp1.front();
+            Vector3 p2 = vp2.front();
+            //Vector3 dp = p1-p2;
 
-          glPushMatrix();
-          glLineWidth(3);
-          glPointSize(5);
-          white.setCurrentGL();
-          drawPoint(p1);
-          drawPoint(p2);
-          yellow.setCurrentGL();
-          glBegin(GL_LINES);
-          glVertex3f(p1[0],p1[1],p1[2]);
-          glVertex3f(p2[0],p2[1],p2[2]);
-          glEnd();
-          glPopMatrix();
+            glPushMatrix();
+            glLineWidth(3);
+            glPointSize(5);
+            white.setCurrentGL();
+            drawPoint(p1);
+            drawPoint(p2);
+            yellow.setCurrentGL();
+            glBegin(GL_LINES);
+            glVertex3f(p1[0],p1[1],p1[2]);
+            glVertex3f(p2[0],p2[1],p2[2]);
+            glEnd();
+            glPopMatrix();
+          }
         }
       }
     }

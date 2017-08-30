@@ -118,6 +118,8 @@ bool MotionPlannerOMPL::solve()
   Config p_init = input.q_init;
   Config p_goal = input.q_goal;
 
+  assert(p_init.size() == p_goal.size());
+
   robot->UpdateConfig(p_init);
   this->world->InitCollisions();
   std::cout << input << std::endl;
