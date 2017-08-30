@@ -10,4 +10,5 @@
 *.rar
 *.tar
 *.zip
+build/
 

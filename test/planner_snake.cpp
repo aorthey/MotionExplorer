@@ -27,9 +27,7 @@ int main(int argc,const char** argv) {
 
   MotionPlannerOMPL planner(env.GetWorldPtr(), pin);
   planner.solve();
-
   env.GetBackendPtr()->AddPlannerOutput( planner.GetOutput() );
-
   env.GetBackendPtr()->ShowRobot();
 
   //Robot *inner = env.GetWorldPtr()->robots[1];

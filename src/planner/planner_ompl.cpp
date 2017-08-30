@@ -15,7 +15,6 @@ void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd, CSpaceOMPL *cspace)
   //ob::PlannerData::Graph graph = pd.toBoostGraph();
 
   _stree.clear();
-  uint N = robot->q.size()-6;
   for(uint i = 0; i < pd.numVertices(); i++){
     ob::PlannerDataVertex v = pd.getVertex(i);
     const ob::State* state = v.getState();
@@ -49,7 +48,7 @@ void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd, CSpaceOMPL *cspace)
     std::vector<uint> edgeList;
     pd.getEdges(i, edgeList);
     //std::cout << "Node " << i << " has " << Nedges << " edges" << std::endl;
-    for(int j = 0; j < edgeList.size(); j++){
+    for(uint j = 0; j < edgeList.size(); j++){
       ob::PlannerDataVertex w = pd.getVertex(edgeList.at(j));
       const ob::State* sw = w.getState();
       Config dqj = snode.position - cspace->OMPLStateToConfig(sw);
@@ -91,7 +90,7 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
     og::PathGeometric path = path_control.asGeometric();
 
     vector<Config> keyframes;
-    for(int i = 0; i < path.getStateCount(); i++)
+    for(uint i = 0; i < path.getStateCount(); i++)
     {
       ob::State *state = path.getState(i);
       Config cur = cspace->OMPLStateToConfig(state);
@@ -110,10 +109,14 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
 
 bool MotionPlannerOMPL::solve()
 {
+  std::string algorithm = input.name_algorithm;
+  if(algorithm=="" || algorithm=="NONE"){
+    std::cout << "No Planner Algorithm detected" << std::endl;
+    return false;
+  }
 
   Config p_init = input.q_init;
   Config p_goal = input.q_goal;
-  std::string algorithm = input.name_algorithm;
 
   robot->UpdateConfig(p_init);
   this->world->InitCollisions();
@@ -232,7 +235,6 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
   //    reached duration or found solution in epsilon-neighborhood
   //###########################################################################
   bool solved = false;
-  double solution_time = dInf;
   double max_planning_time= input.max_planning_time;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
@@ -240,7 +242,8 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
   // solve
   //###########################################################################
 
-  ob::PlannerStatus status = ss.solve(ptc);
+  //ob::PlannerStatus status = ss.solve(ptc);
+
   solved = ss.haveExactSolutionPath();
 
   //###########################################################################
@@ -285,15 +288,15 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
 
     std::vector<ob::State *> states = path.getStates();
     std::vector<Config> keyframes;
-    for(int i = 0; i < states.size(); i++)
+    for(uint i = 0; i < states.size(); i++)
     {
       ob::State *state = states.at(i);//path.getState(i);
-      uint N = robot->q.size();
+      int N = robot->q.size();
       Config cur = cspace->OMPLStateToConfig(state);
       if(N>cur.size()){
         Config qq;qq.resize(N);
         qq.setZero();
-        for(uint k = 0; k < cur.size(); k++){
+        for(int k = 0; k < cur.size(); k++){
           qq(k) = cur(k);
         }
         keyframes.push_back(qq);
@@ -301,7 +304,7 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
     }
 
     uint istep = max(int(keyframes.size()/10.0),1);
-    for(int i = 0; i < keyframes.size(); i+=istep)
+    for(uint i = 0; i < keyframes.size(); i+=istep)
     {
       std::cout << i << "/" << keyframes.size() << " : "  <<  keyframes.at(i) << std::endl;
     }
@@ -335,7 +338,7 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
   //  std::cout << path.getStateCount() << std::endl;
 
   //  vector<Config> keyframes;
-  //  for(int i = 0; i < path.getStateCount(); i++)
+  //  for(uint i = 0; i < path.getStateCount(); i++)
   //  {
   //    ob::State *state = path.getState(i);
   //    Config cur = OMPLStateToConfig(state, cspace.getPtr());
@@ -408,7 +411,6 @@ bool MotionPlannerOMPL::solve_kinodynamically(CSpaceOMPL *cspace){
   //    reached duration or found solution in epsilon-neighborhood
   //###########################################################################
   bool solved = false;
-  double solution_time = dInf;
   double max_planning_time= input.max_planning_time;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
@@ -445,7 +447,7 @@ bool MotionPlannerOMPL::solve_kinodynamically(CSpaceOMPL *cspace){
   // solve
   //###########################################################################
 
-  ob::PlannerStatus status = ss.solve(ptc);
+  //ob::PlannerStatus status = ss.solve(ptc);
   solved = ss.haveExactSolutionPath();
 
   //###########################################################################
@@ -487,14 +489,14 @@ bool MotionPlannerOMPL::solve_kinodynamically(CSpaceOMPL *cspace){
     std::vector<Vector> torques_and_time;
     std::cout << "Controls:" << std::endl;
     std::cout <<K << "x" << controls.size() << std::endl;
-    for(int i = 0; i < controls.size(); i++){
+    for(uint i = 0; i < controls.size(); i++){
       oc::RealVectorControlSpace::ControlType* ccv = static_cast<oc::RealVectorControlSpace::ControlType *>(controls.at(i));
 
       double time = ccv->values[K-1];
       Vector qt;qt.resize(K);
 
       qt(K-1) = time;
-      for(int k = 0; k < K; k++){
+      for(uint k = 0; k < K; k++){
         qt(k) = ccv->values[k];
       }
       torques_and_time.push_back(qt);
@@ -505,7 +507,7 @@ bool MotionPlannerOMPL::solve_kinodynamically(CSpaceOMPL *cspace){
 
     std::vector<ob::State *> states = path_control.getStates();
     std::vector<Config> keyframes;
-    for(int i = 0; i < states.size(); i++)
+    for(uint i = 0; i < states.size(); i++)
     {
       ob::State *state = states.at(i);//path.getState(i);
       Config cc = cspace->OMPLStateToConfig(state);
@@ -518,7 +520,7 @@ bool MotionPlannerOMPL::solve_kinodynamically(CSpaceOMPL *cspace){
     }
 
     uint istep = max(int(keyframes.size()/10.0),1);
-    for(int i = 0; i < keyframes.size(); i+=istep)
+    for(uint i = 0; i < keyframes.size(); i+=istep)
     {
       std::cout << i << "/" << keyframes.size() << " : "  <<  keyframes.at(i) << std::endl;
     }

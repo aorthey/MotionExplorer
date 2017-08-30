@@ -3,7 +3,7 @@
 <world>
   <robot name="nunchaku" file="/home/aorthey/git/orthoklampt/data/nunchaku/nunchaku.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <rigidObject  name="onehole.tri" file="/home/aorthey/git/orthoklampt/data/terrains/oneholethick.tri" translation="0.47 1.5 -1.26"/>
+  <terrain  name="onehole.tri" file="/home/aorthey/git/orthoklampt/data/terrains/twohole.tri" translation="0.47 1.5 -1.26"/>
 
   <plannersettings>
 

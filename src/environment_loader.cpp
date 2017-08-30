@@ -172,6 +172,8 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 
     robot->q = pin.q_goal;
     robot->UpdateFrames();
+  }else{
+    std::cout << "No Planner Settings. No Planning" << std::endl;
   }
   //_backend->sim.simStep = 0.001;
   //WorldSimulation sim = _backend->sim;
