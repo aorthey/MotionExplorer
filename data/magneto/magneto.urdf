@@ -3,18 +3,18 @@
  <link name="foot">
   <inertial>
     <mass value="1"/>
-    <inertia ixx="0.00333333333333" ixy="0" ixz="0" iyy="0.00333333333333" iyz="0" izz="0.0025"/>
+    <inertia ixx="0.00115833333333" ixy="0" ixz="0" iyy="0.00115833333333" iyz="0" izz="0.000625"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
     <geometry>
-      <cylinder length="0.1" radius="0.1"/>
+      <cylinder length="0.08" radius="0.05"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
     <geometry>
-      <cylinder length="0.1" radius="0.1"/>
+      <cylinder length="0.08" radius="0.05"/>
     </geometry>
   </collision>
  </link>
@@ -47,18 +47,18 @@
  <link name="joint1">
   <inertial>
     <mass value="1"/>
-    <inertia ixx="0.00213333333333" ixy="0" ixz="0" iyy="0.00213333333333" iyz="0" izz="0.0016"/>
+    <inertia ixx="0.000933333333333" ixy="0" ixz="0" iyy="0.000933333333333" iyz="0" izz="0.0004"/>
   </inertial>
   <visual>
-    <origin rpy="1.57 0 0" xyz="0.53 0 0"/>
+    <origin rpy="1.57 0 0" xyz="0.49 0 0"/>
     <geometry>
-      <cylinder length="0.08" radius="0.08"/>
+      <cylinder length="0.08" radius="0.04"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="1.57 0 0" xyz="0.53 0 0"/>
+    <origin rpy="1.57 0 0" xyz="0.49 0 0"/>
     <geometry>
-      <cylinder length="0.08" radius="0.08"/>
+      <cylinder length="0.08" radius="0.04"/>
     </geometry>
   </collision>
  </link>
@@ -75,13 +75,13 @@
     <inertia ixx="0.0212333333333" ixy="0" ixz="0" iyy="0.0212333333333" iyz="0" izz="0.0004"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.57 0" xyz="0.33 0 0"/>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
     <geometry>
       <cylinder length="0.5" radius="0.04"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="0.33 0 0"/>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
     <geometry>
       <cylinder length="0.5" radius="0.04"/>
     </geometry>
@@ -89,29 +89,29 @@
  </link>
 
 <joint name="joint_leg2_joint1_Z" type="revolute">
-  <origin rpy="0 0 0" xyz="0.53 0 0"/>
+  <origin rpy="0 0 0" xyz="0.49 0 0"/>
   <parent link="joint1"/>
   <child link="leg2"/>
   <axis xyz="0 1 0"/>
-  <dynamics damping="1" friction="10"/>
-  <limit lower="-1.57" upper="1.57" effort="1" velocity="100"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
 </joint>
 
  <link name="joint2">
   <inertial>
     <mass value="1"/>
-    <inertia ixx="0.00213333333333" ixy="0" ixz="0" iyy="0.00213333333333" iyz="0" izz="0.0016"/>
+    <inertia ixx="0.000933333333333" ixy="0" ixz="0" iyy="0.000933333333333" iyz="0" izz="0.0004"/>
   </inertial>
   <visual>
-    <origin rpy="1.57 0 0" xyz="0.66 0 0"/>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
     <geometry>
-      <cylinder length="0.08" radius="0.08"/>
+      <cylinder length="0.08" radius="0.04"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="1.57 0 0" xyz="0.66 0 0"/>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
     <geometry>
-      <cylinder length="0.08" radius="0.08"/>
+      <cylinder length="0.08" radius="0.04"/>
     </geometry>
   </collision>
  </link>
@@ -128,13 +128,13 @@
     <inertia ixx="0.0137333333333" ixy="0" ixz="0" iyy="0.0137333333333" iyz="0" izz="0.0004"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.57 0" xyz="0.28 0 0"/>
+    <origin rpy="0 1.57 0" xyz="0.24 0 0"/>
     <geometry>
       <cylinder length="0.4" radius="0.04"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="0.28 0 0"/>
+    <origin rpy="0 1.57 0" xyz="0.24 0 0"/>
     <geometry>
       <cylinder length="0.4" radius="0.04"/>
     </geometry>
@@ -142,29 +142,29 @@
  </link>
 
 <joint name="joint_leg3_joint2_Z" type="revolute">
-  <origin rpy="0 0 0" xyz="0.66 0 0"/>
+  <origin rpy="0 0 0" xyz="0.58 0 0"/>
   <parent link="joint2"/>
   <child link="leg3"/>
   <axis xyz="0 1 0"/>
-  <dynamics damping="1" friction="10"/>
-  <limit lower="-1.57" upper="1.57" effort="1" velocity="100"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
 </joint>
 
  <link name="foot2">
   <inertial>
     <mass value="1"/>
-    <inertia ixx="0.00333333333333" ixy="0" ixz="0" iyy="0.00333333333333" iyz="0" izz="0.0025"/>
+    <inertia ixx="0.00115833333333" ixy="0" ixz="0" iyy="0.00115833333333" iyz="0" izz="0.000625"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.57 0" xyz="0.53 0 0"/>
+    <origin rpy="1.57 0 0" xyz="0.49 0 0"/>
     <geometry>
-      <cylinder length="0.1" radius="0.1"/>
+      <cylinder length="0.08" radius="0.05"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="0.53 0 0"/>
+    <origin rpy="1.57 0 0" xyz="0.49 0 0"/>
     <geometry>
-      <cylinder length="0.1" radius="0.1"/>
+      <cylinder length="0.08" radius="0.05"/>
     </geometry>
   </collision>
  </link>

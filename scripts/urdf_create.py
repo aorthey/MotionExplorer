@@ -2,9 +2,9 @@ import numpy as np
 from math import cos,sin,pi
 
 mass = 1
-damping = 1
-friction = 10
-effort = 1
+damping = 0.01
+friction = 0.5
+effort = 0.01
 velocity=100
 
 

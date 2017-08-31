@@ -723,20 +723,20 @@ algorithms associated (at least dykstra)
 [ ] compute retraction (GUDHI or CGAL)
 [ ] orientation limits are not respected OMPL
 
-
-What objects to increase complexity?
-
-nunchaku (1dof revolute SE(3) x S1)
-irregular shaped links (non-convex) (SE(3))
-
 [x] remove zero measure dimensions from OMPL (i.e. map them to lower space
 before starting OMPL, there are always problems with that)
 [ ] there is no way to enforce bounds on SO(3), maybe we need to decompose it somehow
 [ ] have one complete system for rigid link: add arbitrary nested robots.
 compute shortest paths. Iterate through all solutions.
 
+[ ] add 1-dof
+[ ] add non-convexity
+[ ] add magnets
+
+
 [x] magneto: 2-dof, 2 magnet robot
-[ ] simulate a magnetic-contact
+[ ] simulate a magnetic-contact. read klampt tutorial about humanoid robot with
+infinite force contact. how to selectively activate/deactivate?
 
 good idea to add it. several new problems:
 [ ] how to define contact points and add arbitrary force when in contact?
@@ -753,6 +753,10 @@ joint?
  how about a spring which is automatically moving along? this would be SE(2)?
 bwd/fwd motions, but no internal shape shifts.
 
- the two joints could be made such that leg1/leg3 are zero. Then there would be
-no shape changes. then for the free foot we would have rotational symmetry.
-cspace would collapse to line segment.
+the two joints could be made such that leg1/leg3 are zero. assume feet are
+spheres. Then there would be no shape changes. for the free foot we would have
+rotational symmetry.  cspace would collapse to line segment. 
+
+basically M0 has two cspaces which are glued together cyclically ad infinitum.
+Those cspaces are not the same. also the gluing operation has to be well defined
+by make/break a magnet.
