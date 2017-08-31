@@ -744,19 +744,6 @@ good idea to add it. several new problems:
 [ ] how to adapt sphere/capsule to new structure. it is completely different,
 how can that work?
 
-
-brainstorming:
-  we give up arbitrary positioning. further restriction. now we need zero
-distance to environment.
- is there maybe an even easier shape? maybe without any joints, or just one
-joint?
- how about a spring which is automatically moving along? this would be SE(2)?
-bwd/fwd motions, but no internal shape shifts.
-
-the two joints could be made such that leg1/leg3 are zero. assume feet are
-spheres. Then there would be no shape changes. for the free foot we would have
-rotational symmetry.  cspace would collapse to line segment. 
-
 basically M0 has two cspaces which are glued together cyclically ad infinitum.
 Those cspaces are not the same. also the gluing operation has to be well defined
 by make/break a magnet.

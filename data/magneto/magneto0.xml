@@ -6,7 +6,7 @@
 
   <plannersettings>
 
-    <qinit config="8 -4 0 0.055 3.14159 -1.57 3.14159 1.57 0 "/>
+    <qinit config="8 -4 0 0.051 3.14159 -1.57 3.14159 1.57 0 "/>
     <qgoal config="8  4 0 0.08 3.14159 -1.57 3.14159 0 0 "/>
 
     <se3min config="6  -5 -4 -3 -3.141593 -1.57 -3.141593"/>
@@ -35,10 +35,10 @@
        <controller type="PolynomialPathController" />
     </robot>
     <robot index="0" body="5"> 
-       <geometry kFriction="1.0" kRestitution="1.0" padding="0" stiffness="80000" damping="20000" />
+       <geometry kFriction="20.0" kRestitution="2.0" padding="0" stiffness="80000" damping="50000" />
     </robot>
     <robot index="0" body="7"> 
-       <geometry kFriction="1.0" kRestitution="1.0" padding="0" stiffness="80000" damping="20000" />
+       <geometry kFriction="20.0" kRestitution="2.0" padding="0" stiffness="80000" damping="50000" />
     </robot>
   </simulation>
 </world>
