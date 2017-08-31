@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="magneto0" file="/home/aorthey/git/orthoklampt/data/magneto/magneto0.urdf" translation="0 0 0" rotateRPY="0 0 0" config="8 0 0 0.0 3.14159 -1.57 3.14159 0 0 "/>
+  <terrain  name="plank.tri" file="/home/aorthey/git/orthoklampt/data/terrains/plank_ceiling.tri" translation="0 0 0"/>
+
+  <plannersettings>
+
+    <qinit config="8 -4 0 0.055 3.14159 -1.57 3.14159 1.57 0 "/>
+    <qgoal config="8  4 0 0.08 3.14159 -1.57 3.14159 0 0 "/>
+
+    <se3min config="6  -5 -4 -3 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6   5  4  3 3.141593 1.57 3.141593"/>
+    <timestep min="0.01" max="0.1"/>
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>1</maxplanningtime>
+    <algorithm>ompl:rrt</algorithm>
+    <drawMilestones>0</drawMilestones>
+    <drawSweptVolume>1</drawSweptVolume>
+    <drawStartGoal>0</drawStartGoal>
+    <drawTree>0</drawTree>
+    <robot>
+      <index>0</index>
+    </robot>
+
+  </plannersettings>
+
+  <forcefield>
+    <uniform force="0 0 -1.71" color="1 0 0"/>
+  </forcefield>
+
+  <simulation>
+    <globals maxContacts="20" />
+    <robot index="0">
+       <controller type="PolynomialPathController" />
+    </robot>
+    <robot index="0" body="5"> 
+       <geometry kFriction="1.0" kRestitution="1.0" padding="0" stiffness="80000" damping="20000" />
+    </robot>
+    <robot index="0" body="7"> 
+       <geometry kFriction="1.0" kRestitution="1.0" padding="0" stiffness="80000" damping="20000" />
+    </robot>
+  </simulation>
+</world>
+
+
+

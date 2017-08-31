@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<robot name="magneto0">
+ <link name="foot">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.00115833333333" ixy="0" ixz="0" iyy="0.00115833333333" iyz="0" izz="0.000625"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.05"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.05"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="leg">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.000408333333333" ixy="0" ixz="0" iyy="0.000408333333333" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.055 0 0"/>
+    <geometry>
+      <cylinder length="0.01" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.055 0 0"/>
+    <geometry>
+      <cylinder length="0.01" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="foot2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.00115833333333" ixy="0" ixz="0" iyy="0.00115833333333" iyz="0" izz="0.000625"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.05"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.05"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_foot_leg_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="foot"/>
+  <child link="leg"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+<joint name="joint_leg_foot2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.11 0 0"/>
+  <parent link="leg"/>
+  <child link="foot2"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>
