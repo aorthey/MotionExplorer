@@ -2,12 +2,12 @@
 
 <world>
   <robot name="magneto0" file="/home/aorthey/git/orthoklampt/data/magneto/magneto0.urdf" translation="0 0 0" rotateRPY="0 0 0" config="8 0 0 0.0 3.14159 -1.57 3.14159 0 0 "/>
-  <terrain  name="plank.tri" file="/home/aorthey/git/orthoklampt/data/terrains/plank_ceiling.tri" translation="0 0 0"/>
+  <terrain  name="sphere.tri" file="/home/aorthey/git/orthoklampt/data/terrains/sphereworld.tri" translation="0 0 0"/>
 
   <plannersettings>
 
-    <qinit config="8 -4 0 0.051 3.14159 -1.57 3.14159 1.57 0 "/>
-    <qgoal config="8  4 0 0.08 3.14159 -1.57 3.14159 0 0 "/>
+    <qinit config="8 0 0 1.05 3.14159 -1.57 3.14159 1.57 0 "/>
+    <qgoal config="8 0 0 -1.05 3.14159 -1.57 3.14159 1.57 0 "/>
 
     <se3min config="6  -5 -4 -3 -3.141593 -1.57 -3.141593"/>
     <se3max config="6   5  4  3 3.141593 1.57 3.141593"/>
@@ -26,7 +26,7 @@
   </plannersettings>
 
   <forcefield>
-    <radial source="0 0 0" power="-1.71" radius="3" color="1 0 1"/>
+    <radial source="0 0 0" power="-1.71" radius="2.5" color="0.3 0.3 0.8"/>
   </forcefield>
 
   <simulation>

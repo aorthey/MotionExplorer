@@ -747,3 +747,9 @@ how can that work?
 basically M0 has two cspaces which are glued together cyclically ad infinitum.
 Those cspaces are not the same. also the gluing operation has to be well defined
 by make/break a magnet.
+
+M2 has the same principal, but now the cspaces are plane segments, and gluing
+might be along line segments embedded in the plane segments.
+
+[ ] can we design a controller which moves M0 around a great arc of an arbitrary sphere?
+[ ] do the same, but for M2

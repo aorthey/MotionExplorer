@@ -86,7 +86,7 @@ leg_radius = 0.04
 #robot_name = 'magneto'
 #createMagneto(robot_name, foot_radius, leg1_length, leg2_length, leg3_length, leg_radius)
 
-leg_length=0.01
+leg_length=0.05
 robot_name = 'magneto0'
 createSymmetricMagneto(robot_name, foot_radius, leg_length, leg_radius)
 

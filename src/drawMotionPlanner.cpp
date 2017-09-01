@@ -170,13 +170,14 @@ namespace GLDraw{
   void drawForceField(WrenchField &W){
     //Real linewidth=0.01;
     std::vector<SmartPointer<ForceField> > forcefields = W.GetForceFields();
-    for(uint i = 0; i < forcefields.size(); i++){
-      SmartPointer<ForceField> f = forcefields.at(i);
+
+    for(uint fctr = 0; fctr < forcefields.size(); fctr++){
+      SmartPointer<ForceField> f = forcefields.at(fctr);
       if(f->type() == UNIFORM){
         //TODO: how to visualize a uniform field
       }else if(f->type() == RADIAL){
 
-        SmartPointer<RadialForceField>& fr = *reinterpret_cast<SmartPointer<RadialForceField>*>(&forcefields.at(i));
+        SmartPointer<RadialForceField>& fr = *reinterpret_cast<SmartPointer<RadialForceField>*>(&forcefields.at(fctr));
         //Vector3 source = dynamic_cast<RadialForceField*>(f)->GetSource()
         Vector3 source = fr->GetSource();
         double radius = fr->GetRadius();
@@ -217,7 +218,7 @@ namespace GLDraw{
             //drawPoint(Vector3(0,0,0));
 
             Vector3 direction = 0.1*middle; 
-            if(power > 0) {
+            if(power < 0) {
               direction *= -1;
             }
             GLDraw::drawCone(direction, 0.5*direction.norm());
@@ -230,7 +231,7 @@ namespace GLDraw{
         glEnable(GL_LIGHTING);
 
       }else if(f->type() == OBB){
-        SmartPointer<OrientedBoundingBoxForceField>& fb = *reinterpret_cast<SmartPointer<OrientedBoundingBoxForceField>*>(&forcefields.at(i));
+        SmartPointer<OrientedBoundingBoxForceField>& fb = *reinterpret_cast<SmartPointer<OrientedBoundingBoxForceField>*>(&forcefields.at(fctr));
         double power = fb->GetPower();
         Vector3 center = fb->GetCenter();
         Vector3 extension = fb->GetExtension();
@@ -289,7 +290,7 @@ namespace GLDraw{
         glEnable(GL_LIGHTING);
       }else if(f->type() == CYLINDRICAL){
 
-        SmartPointer<CylindricalForceField>& fr = *reinterpret_cast<SmartPointer<CylindricalForceField>*>(&forcefields.at(i));
+        SmartPointer<CylindricalForceField>& fr = *reinterpret_cast<SmartPointer<CylindricalForceField>*>(&forcefields.at(fctr));
         //Vector3 source = dynamic_cast<RadialForceField*>(f)->GetSource()
         Vector3 source = fr->GetSource();
         Vector3 direction = fr->GetDirection();

@@ -33,7 +33,7 @@ Vector3 RadialForceField::getForceAtPosition(Vector3 position){
 
   double dist = relative_position.normSquared();
   if( minimum_radius <= dist && dist <= maximum_radius){
-    F = (power/(dist*dist))*(-relative_position);
+    F = (power/(dist*dist))*(relative_position);
   }
 
   return F;
