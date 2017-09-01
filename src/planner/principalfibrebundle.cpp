@@ -183,7 +183,7 @@ void PrincipalFibreBundleIntegrator::propagate(const ob::State *state, const oc:
   //###########################################################################
   // Forward Simulate R^N component
   //###########################################################################
-  for(int i = 0; i < N; i++){
+  for(uint i = 0; i < N; i++){
     qend[i+6] = x0[i+6] + dt*ucontrol[i+6];
   }
 
@@ -218,7 +218,7 @@ void PrincipalFibreBundleIntegrator::propagate(const ob::State *state, const oc:
   if(N>0){
     ob::RealVectorStateSpace::StateType *ssrRn = ssr->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
     ob::RealVectorStateSpace::StateType *resultRn = result->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-    for(int i = 0; i < N; i++){
+    for(uint i = 0; i < N; i++){
       resultRn->values[i] = ssrRn->values[i];
     }
   }

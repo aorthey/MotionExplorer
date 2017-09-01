@@ -54,59 +54,6 @@ GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
   std::cout << std::string(80, '-') << std::endl;
 }
 
-void GeometricCSpaceOMPL::print()
-{
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "OMPL CSPACE" << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Dimensionality Space      :" << GetDimensionality() << std::endl;
-
-  ob::SE3StateSpace *cspaceSE3;
-  ob::RealVectorStateSpace *cspaceRn;
-
-  //uint N =  robot->q.size() - 6;
-  if(Nompl>0){
-    cspaceSE3 = space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
-    cspaceRn = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
-  }else{
-    cspaceSE3 = space->as<ob::SE3StateSpace>();
-  }
-
-//################################################################################
-  const ob::RealVectorBounds bounds = cspaceSE3->getBounds();
-  std::vector<double> se3min = bounds.low;
-  std::vector<double> se3max = bounds.high;
-  std::cout << "SE(3) bounds min     : ";
-  for(uint i = 0; i < se3min.size(); i++){
-    std::cout << " " << se3min.at(i);
-  }
-  std::cout << std::endl;
-
-  std::cout << "SE(3) bounds max     : ";
-  for(uint i = 0; i < se3max.size(); i++){
-    std::cout << " " << se3max.at(i);
-  }
-  std::cout << std::endl;
-
-  ob::RealVectorBounds cbounds = control_space->getBounds();
-  std::vector<double> cbounds_low = cbounds.low;
-  std::vector<double> cbounds_high = cbounds.high;
-
-  std::cout << "Control bounds min   : ";
-  for(uint i = 0; i < cbounds_low.size()-1; i++){
-    std::cout << " " << cbounds_low.at(i);
-  }
-  std::cout << std::endl;
-  std::cout << "Control bounds max   : ";
-  for(uint i = 0; i < cbounds_high.size()-1; i++){
-    std::cout << " " << cbounds_high.at(i);
-  }
-  std::cout << std::endl;
-  std::cout << "Time step            : [" << cbounds_low.back()
-    << "," << cbounds_high.back() << "]" << std::endl;
-
-  std::cout << std::string(80, '-') << std::endl;
-}
 
 void GeometricCSpaceOMPL::initSpace()
 {
@@ -227,6 +174,60 @@ void GeometricCSpaceOMPL::initControlSpace()
 
   cbounds.check();
   control_space->setBounds(cbounds);
+}
+
+void GeometricCSpaceOMPL::print()
+{
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "OMPL CSPACE" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "Dimensionality Space      :" << GetDimensionality() << std::endl;
+
+  ob::SE3StateSpace *cspaceSE3;
+  ob::RealVectorStateSpace *cspaceRn;
+
+  //uint N =  robot->q.size() - 6;
+  if(Nompl>0){
+    cspaceSE3 = space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
+    cspaceRn = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+  }else{
+    cspaceSE3 = space->as<ob::SE3StateSpace>();
+  }
+
+//################################################################################
+  const ob::RealVectorBounds bounds = cspaceSE3->getBounds();
+  std::vector<double> se3min = bounds.low;
+  std::vector<double> se3max = bounds.high;
+  std::cout << "SE(3) bounds min     : ";
+  for(uint i = 0; i < se3min.size(); i++){
+    std::cout << " " << se3min.at(i);
+  }
+  std::cout << std::endl;
+
+  std::cout << "SE(3) bounds max     : ";
+  for(uint i = 0; i < se3max.size(); i++){
+    std::cout << " " << se3max.at(i);
+  }
+  std::cout << std::endl;
+
+  ob::RealVectorBounds cbounds = control_space->getBounds();
+  std::vector<double> cbounds_low = cbounds.low;
+  std::vector<double> cbounds_high = cbounds.high;
+
+  std::cout << "Control bounds min   : ";
+  for(uint i = 0; i < cbounds_low.size()-1; i++){
+    std::cout << " " << cbounds_low.at(i);
+  }
+  std::cout << std::endl;
+  std::cout << "Control bounds max   : ";
+  for(uint i = 0; i < cbounds_high.size()-1; i++){
+    std::cout << " " << cbounds_high.at(i);
+  }
+  std::cout << std::endl;
+  std::cout << "Time step            : [" << cbounds_low.back()
+    << "," << cbounds_high.back() << "]" << std::endl;
+
+  std::cout << std::string(80, '-') << std::endl;
 }
 
 ob::State* GeometricCSpaceOMPL::ConfigToOMPLStatePtr(const Config &q){
@@ -898,4 +899,130 @@ GeometricCSpaceOMPLInnerOuter::GeometricCSpaceOMPLInnerOuter(Robot *robot_inner_
 
 const ob::StateValidityCheckerPtr GeometricCSpaceOMPLInnerOuter::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
   return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, inner, outer);
+}
+
+GeometricCSpaceOMPLInnerOuterRotationalInvariance::GeometricCSpaceOMPLInnerOuterRotationalInvariance(Robot *robot_inner_, CSpace *inner_, CSpace *outer_):
+  GeometricCSpaceOMPLInnerOuter(robot_inner_, inner_, outer_){
+
+}
+void GeometricCSpaceOMPLInnerOuterRotationalInvariance::initSpace()
+{
+  //###########################################################################
+  // Create OMPL state space
+  //   Create an R^3 state
+  //###########################################################################
+  if(!(robot->joints[0].type==RobotJoint::Floating))
+  {
+    std::cout << "[MotionPlanner] only supports robots with a configuration space equal to SE(3) x R^n" << std::endl;
+    exit(0);
+  }
+
+  if(hasRealVectorSpace){
+    std::cout << "Robot has real vector space, but should be a rotational invariant rigid body?" << std::endl;
+    exit(0);
+  }
+  std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: R^3" << std::endl;
+
+  ob::StateSpacePtr R3(std::make_shared<ob::RealVectorStateSpace>(3));
+  this->space = R3;
+  ob::RealVectorStateSpace *cspaceR3 = this->space->as<ob::RealVectorStateSpace>();
+  //ob::RealVectorStateSpace *cspaceRn;
+
+  //if(Nompl>0){
+  //  ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(Nompl));
+  //  this->space = SE3 + Rn;
+  //  cspaceSE3 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
+  //  cspaceRn = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+  //}else{
+  //  this->space = SE3;
+  //  cspaceSE3 = this->space->as<ob::SE3StateSpace>();
+  //}
+
+  //###########################################################################
+  // Set bounds
+  //###########################################################################
+  std::vector<double> minimum, maximum;
+  minimum = robot->qMin;
+  maximum = robot->qMax;
+
+  vector<double> lowR3;
+  lowR3.push_back(minimum.at(0));
+  lowR3.push_back(minimum.at(1));
+  lowR3.push_back(minimum.at(2));
+  vector<double> highR3;
+  highR3.push_back(maximum.at(0));
+  highR3.push_back(maximum.at(1));
+  highR3.push_back(maximum.at(2));
+
+  ob::RealVectorBounds boundsR3(3);
+  boundsR3.low = lowR3;
+  boundsR3.high = highR3;
+  cspaceR3->setBounds(boundsR3);
+  boundsR3.check();
+
+}
+void GeometricCSpaceOMPLInnerOuterRotationalInvariance::print()
+{
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "OMPL CSPACE" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "Dimensionality Space      :" << GetDimensionality() << std::endl;
+
+  ob::RealVectorStateSpace *cspaceRn = space->as<ob::RealVectorStateSpace>();
+
+//################################################################################
+  const ob::RealVectorBounds bounds = cspaceRn->getBounds();
+  std::vector<double> se3min = bounds.low;
+  std::vector<double> se3max = bounds.high;
+  std::cout << "SE(3) bounds min     : ";
+  for(uint i = 0; i < se3min.size(); i++){
+    std::cout << " " << se3min.at(i);
+  }
+  std::cout << std::endl;
+
+  std::cout << "SE(3) bounds max     : ";
+  for(uint i = 0; i < se3max.size(); i++){
+    std::cout << " " << se3max.at(i);
+  }
+  std::cout << std::endl;
+
+  std::cout << std::string(80, '-') << std::endl;
+}
+
+ob::State* GeometricCSpaceOMPLInnerOuterRotationalInvariance::ConfigToOMPLStatePtr(const Config &q){
+  ob::ScopedState<> qompl = this->ConfigToOMPLState(q);
+  ob::State* out = space->allocState();
+  ob::RealVectorStateSpace::StateType *outRn = qompl->as<ob::RealVectorStateSpace::StateType>();
+  return out;
+}
+ob::ScopedState<> GeometricCSpaceOMPLInnerOuterRotationalInvariance::ConfigToOMPLState(const Config &q){
+  ob::ScopedState<> qompl(space);
+
+  ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::RealVectorStateSpace::StateType>();
+  double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
+  for(uint i = 0; i < 3; i++){
+    qomplRn[i]=q(i);
+  }
+  return qompl;
+}
+
+Config GeometricCSpaceOMPLInnerOuterRotationalInvariance::OMPLStateToConfig(const ob::State *qompl){
+  const ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::RealVectorStateSpace::StateType>();
+  //double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
+  Config q;q.resize(6);q.setZero();
+  q(0)=qomplRnSpace->values[0];
+  q(1)=qomplRnSpace->values[1];
+  q(2)=qomplRnSpace->values[2];
+  return q;
+
+}
+
+Config GeometricCSpaceOMPLInnerOuterRotationalInvariance::OMPLStateToConfig(const ob::ScopedState<> &qompl){
+  const ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::RealVectorStateSpace::StateType>();
+  //double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
+  Config q;q.resize(6);q.setZero();
+  q(0)=qomplRnSpace->values[0];
+  q(1)=qomplRnSpace->values[1];
+  q(2)=qomplRnSpace->values[2];
+  return q;
 }

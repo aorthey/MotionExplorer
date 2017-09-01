@@ -60,10 +60,10 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
     std::cout << "propagation step size is negative:"<<dt << std::endl;
     exit(0);
   }
-  Real dt2 = 0.5*dt*dt;
+  //Real dt2 = 0.5*dt*dt;
 
   Vector q0,dq0;q0.resize(6+N);dq0.resize(6+N);
-  for(int i = 0; i < 6+N; i++){
+  for(uint i = 0; i < 6+N; i++){
     q0(i) = qstate(i);
     dq0(i) = qstate(i+6+N);
   }
@@ -76,7 +76,7 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   RobotLink3D *link  = &robot->links.at(lidx);
   Vector3 com = link->com;
   Matrix3 R = link->T_World.R;
-  Frame3D Tw = link->T_World;
+  //Frame3D Tw = link->T_World;
 
 
   Config q1; q1.resize(12+2*N); q1.setZero();
@@ -89,7 +89,7 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   fext.setZero();
 
   //fext = S^T * torque, whereby S is the selection matrix
-  for(int k = 6; k < N+6; k++){
+  for(uint k = 6; k < N+6; k++){
     fext(k) = ucontrol[k];
   }
 
@@ -276,11 +276,11 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   //###########################################################################
   // R^N Control
   //###########################################################################
-  for(int i = 0; i < N; i++){
+  for(uint i = 0; i < N; i++){
     resultRn->values[i] = ssrRn->values[i];
   }
   if(N>0){
-    for(int i = 0; i < N+6; i++){
+    for(uint i = 0; i < N+6; i++){
       resultTM->values[i] = ssrTM->values[i];
     }
   }

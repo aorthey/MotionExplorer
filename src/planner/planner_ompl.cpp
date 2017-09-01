@@ -1,8 +1,4 @@
 #include "planner_ompl.h"
-//#include "liegroupintegrator.h"
-//#include "planner/planner_workspace_approximation.h"
-
-//#include <boost/regex.hpp>
 #include <ompl/base/GenericParam.h>
 #include <ompl/base/PlannerDataGraph.h>
 
@@ -171,7 +167,7 @@ bool MotionPlannerOMPL::solve()
     //if(IsFeasible( ro, *cspace_outer, p_init)) return false;
     //if(IsFeasible( ro, *cspace_outer, p_goal)) return false;
 
-    cspace = factory.MakeGeometricCSpaceInnerOuter(ri, cspace_inner, cspace_outer);
+    cspace = factory.MakeGeometricCSpaceInnerOuterRotationalInvariance(ri, cspace_inner, cspace_outer);
     input.name_algorithm = "ompl:rrt";
 
   }else{
@@ -268,8 +264,8 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
 
   const ob::OptimizationObjectivePtr obj = pdef->getOptimizationObjective();
 
-  //Topology::TopologicalGraph top(pd, *obj);
-  //output.cmplx = top.GetSimplicialComplex();
+  Topology::TopologicalGraph top(pd, *obj);
+  output.cmplx = top.GetSimplicialComplex();
 
   SerializeTree(pd, cspace);
   output.SetTree(_stree);

@@ -487,6 +487,7 @@ void ForceFieldBackend::RenderWorld()
     if(drawPlannerSimplicialComplex.at(i)){
       SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
       GLDraw::drawSimplicialComplex(cmplx);
+      //GLDraw::drawShortestPath(cmplx);
     }
     //SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
     //GLDraw::drawShortestPath(cmplx);

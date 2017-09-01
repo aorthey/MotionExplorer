@@ -58,10 +58,14 @@ TopologicalGraph::TopologicalGraph(const ob::PlannerData& pd, const ob::Optimiza
     ob::PlannerDataVertex v = pd.getVertex(i);
     const ob::State* s = v.getState();
     double x,y,z;
-    const ob::SE3StateSpace::StateType *sSE3 = s->as<ob::SE3StateSpace::StateType>();
-    x = sSE3->getX();
-    y = sSE3->getY();
-    z = sSE3->getZ();
+    //const ob::SE3StateSpace::StateType *sSE3 = s->as<ob::SE3StateSpace::StateType>();
+    //x = sSE3->getX();
+    //y = sSE3->getY();
+    //z = sSE3->getZ();
+    const ob::RealVectorStateSpace::StateType *qomplRnSpace = s->as<ob::RealVectorStateSpace::StateType>();
+    x=qomplRnSpace->values[0];
+    y=qomplRnSpace->values[1];
+    z=qomplRnSpace->values[2];
     lwp.push_back(Weighted_point(Bare_point( x,y,z), 0.3));
   }
 
@@ -231,8 +235,8 @@ void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob:
   VIterator vi, vi_end;
   ob::PlannerDataVertex vs = pd.getStartVertex(0);
   ob::PlannerDataVertex vg = pd.getGoalVertex(0);
-  const ob::State* ss = vs.getState();
-  const ob::State* sg = vg.getState();
+  //const ob::State* ss = vs.getState();
+  //const ob::State* sg = vg.getState();
 
   std::cout << "SimplicialComplex: vertices: " << num_vertices(g) << std::endl;
   std::cout << "                      edges: " << num_edges(g) << std::endl;
@@ -286,11 +290,15 @@ void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob:
   {
       ob::PlannerDataVertex vi = pd.getVertex(*it);
       const ob::State* si = vi.getState();
-      const ob::SE3StateSpace::StateType *sSE3 = si->as<ob::SE3StateSpace::StateType>();
       double x,y,z;
-      x = sSE3->getX();
-      y = sSE3->getY();
-      z = sSE3->getZ();
+      //const ob::SE3StateSpace::StateType *sSE3 = si->as<ob::SE3StateSpace::StateType>();
+      //x = sSE3->getX();
+      //y = sSE3->getY();
+      //z = sSE3->getZ();
+      const ob::RealVectorStateSpace::StateType *qomplRnSpace = si->as<ob::RealVectorStateSpace::StateType>();
+      x = qomplRnSpace->values[0];
+      y = qomplRnSpace->values[1];
+      z = qomplRnSpace->values[2];
       std::cout << *it << " : (" << x << "," << y << "," << z << ")" << std::endl;
       Vector3 v3(x,y,z);
       cmplx.path.push_back(v3);
