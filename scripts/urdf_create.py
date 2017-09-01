@@ -1,4 +1,5 @@
 import numpy as np
+import os 
 from math import cos,sin,pi
 
 mass = 1
@@ -151,3 +152,9 @@ def createSphericalJoint(jname, parentname, childname, x=0, y=0, z=0, lowerLimit
   s+='  <limit lower="'+str(lowerLimit)+'" upper="'+str(upperLimit)+'" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'
   return s
+
+def getPathname(folder_name, robot_name):
+  fname = robot_name+'.urdf'
+  pathname = os.path.dirname(os.path.realpath(__file__))+'/../data/'
+  pathname = os.path.abspath(pathname)+'/'
+  return pathname + folder_name + robot_name + '.urdf'

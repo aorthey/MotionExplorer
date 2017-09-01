@@ -2,11 +2,15 @@
 
 <world>
   <robot name="magneto0" file="/home/aorthey/git/orthoklampt/data/magneto/magneto0.urdf" translation="0 0 0" rotateRPY="0 0 0" config="8 0 0 0.0 3.14159 -1.57 3.14159 0 0 "/>
-  <terrain  name="sphere.tri" file="/home/aorthey/git/orthoklampt/data/terrains/sphereworld.tri" translation="0 0 0"/>
+
+  <robot name="level0_inner" file="/home/aorthey/git/orthoklampt/data/magneto/magneto0_sphere_inner.urdf"/>
+  <robot name="level0_outer" file="/home/aorthey/git/orthoklampt/data/magneto/magneto0_sphere_outer.urdf"/>
+
+  <terrain  name="sphere.tri" file="/home/aorthey/git/orthoklampt/data/terrains/sphereworld.tri" translation="0 0 0" kFriction="0.0"/>
 
   <plannersettings>
 
-    <qinit config="8 0 0 1.05 3.14159 -1.57 3.14159 1.57 0 "/>
+    <qinit config="8 0 0 1.07 3.14159 -1.57 3.14159 1.57 0 "/>
     <qgoal config="8 0 0 -1.05 3.14159 -1.57 3.14159 1.57 0 "/>
 
     <se3min config="6  -5 -4 -3 -3.141593 -1.57 -3.141593"/>
@@ -14,13 +18,15 @@
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.1</epsilongoalregion>
     <maxplanningtime>1</maxplanningtime>
-    <algorithm>ompl:rrt</algorithm>
+    <algorithm>workspace</algorithm>
     <drawMilestones>0</drawMilestones>
     <drawSweptVolume>1</drawSweptVolume>
     <drawStartGoal>0</drawStartGoal>
-    <drawTree>0</drawTree>
+    <drawTree>1</drawTree>
     <robot>
       <index>0</index>
+      <index>1</index>
+      <index>2</index>
     </robot>
 
   </plannersettings>
@@ -34,11 +40,19 @@
     <robot index="0">
        <controller type="PolynomialPathController" />
     </robot>
+    <!--
     <robot index="0" body="5"> 
-       <geometry kFriction="20.0" kRestitution="2.0" padding="0" stiffness="80000" damping="50000" />
+       <geometry kFriction="0.0" kRestitution="2.0" padding="0" stiffness="80000" damping="50000" />
     </robot>
     <robot index="0" body="7"> 
-       <geometry kFriction="20.0" kRestitution="2.0" padding="0" stiffness="80000" damping="50000" />
+       <geometry kFriction="0.0" kRestitution="2.0" padding="0" stiffness="80000" damping="50000" />
+    </robot>
+    -->
+    <robot index="0" body="5"> 
+       <geometry kFriction="0.0" kRestitution="0.0" padding="0" stiffness="0" damping="0" />
+    </robot>
+    <robot index="0" body="7"> 
+       <geometry kFriction="0.0" kRestitution="0.0" padding="0" stiffness="0" damping="0" />
     </robot>
   </simulation>
 </world>

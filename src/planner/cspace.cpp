@@ -232,19 +232,23 @@ void GeometricCSpaceOMPL::initControlSpace()
 ob::State* GeometricCSpaceOMPL::ConfigToOMPLStatePtr(const Config &q){
   ob::ScopedState<> qompl = this->ConfigToOMPLState(q);
 
-  ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
-  ob::RealVectorStateSpace::StateType *qomplRn = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-  //double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
+  //ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  //ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
+  //ob::RealVectorStateSpace::StateType *qomplRn = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+  ////double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
 
+  //ob::State* out = space->allocState();
+  //ob::SE3StateSpace::StateType *outSE3 = out->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  //ob::SO3StateSpace::StateType *outSO3 = &outSE3->rotation();
+  //ob::RealVectorStateSpace::StateType *outRn = out->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+
+  //outSE3 = qomplSE3;
+  //outSO3 = qomplSO3;
+  //outRn = qomplRn;
   ob::State* out = space->allocState();
-  ob::SE3StateSpace::StateType *outSE3 = out->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  ob::SE3StateSpace::StateType *outSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
   ob::SO3StateSpace::StateType *outSO3 = &outSE3->rotation();
-  ob::RealVectorStateSpace::StateType *outRn = out->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-
-  outSE3 = qomplSE3;
-  outSO3 = qomplSO3;
-  outRn = qomplRn;
+  ob::RealVectorStateSpace::StateType *outRn = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
 
   return out;
 }
@@ -500,8 +504,6 @@ void KinodynamicCSpaceOMPL::initSpace()
     cspaceTM = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
   }
 
-  ob::CompoundStateSpace *cspace = space->as<ob::CompoundStateSpace>();
-
   //###########################################################################
   // Set position bounds
   //###########################################################################
@@ -642,27 +644,33 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
 ob::State* KinodynamicCSpaceOMPL::ConfigToOMPLStatePtr(const Config &q){
   ob::ScopedState<> qompl = this->ConfigToOMPLState(q);
 
-  ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
-  ob::RealVectorStateSpace::StateType *qomplRn = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-  ob::RealVectorStateSpace::StateType *qomplTM = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
+  //ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  //ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
+  //ob::RealVectorStateSpace::StateType *qomplRn = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+  //ob::RealVectorStateSpace::StateType *qomplTM = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
+
+  //ob::State* out = space->allocState();
+  //ob::SE3StateSpace::StateType *outSE3 = out->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  //ob::SO3StateSpace::StateType *outSO3 = &outSE3->rotation();
+  //ob::RealVectorStateSpace::StateType *outRn = out->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+  //ob::RealVectorStateSpace::StateType *outTM = out->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
+
+  //outSE3 = qomplSE3;
+  //outSO3 = qomplSO3;
+  //outRn = qomplRn;
+  //outTM = qomplTM;
 
   ob::State* out = space->allocState();
-  ob::SE3StateSpace::StateType *outSE3 = out->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  ob::SE3StateSpace::StateType *outSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
   ob::SO3StateSpace::StateType *outSO3 = &outSE3->rotation();
-  ob::RealVectorStateSpace::StateType *outRn = out->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-  ob::RealVectorStateSpace::StateType *outTM = out->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
-
-  outSE3 = qomplSE3;
-  outSO3 = qomplSO3;
-  outRn = qomplRn;
-  outTM = qomplTM;
+  ob::RealVectorStateSpace::StateType *outRn = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+  ob::RealVectorStateSpace::StateType *outTM = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
 
   return out;
 }
 ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q){
   uint N=0;
-  if(!(q.size() == space->getDimension())){
+  if(!(q.size() == int(space->getDimension()))){
     if(q.size() == int(0.5*space->getDimension())){
       N = q.size()-6;
     }else{
@@ -713,7 +721,7 @@ ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q){
   double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
   //q.size = 6 + N + (N+6)
 
-  if(!(q.size() == space->getDimension())){
+  if(!(q.size() == int(space->getDimension()))){
     if(q.size() == int(0.5*space->getDimension())){
       assert(12+2*N == space->getDimension());
       for(uint i = 0; i < N; i++){

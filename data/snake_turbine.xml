@@ -24,7 +24,6 @@
     <!--
     <radial source="-1.4 0 0" power="3" radius="1.5" color="1 0 1"/>
     <radial source="1.8 0 0" power="-3" radius="1.5" color="1 0 1"/>
-    <uniform force="0 0 0" color="1 0 0"/> <!-- simulate buoycancy as antigravity -->
     -->
   </forcefield>
 

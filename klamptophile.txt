@@ -753,3 +753,4 @@ might be along line segments embedded in the plane segments.
 
 [ ] can we design a controller which moves M0 around a great arc of an arbitrary sphere?
 [ ] do the same, but for M2
+[ ] add drawFace/drawEdge to terrain XML file

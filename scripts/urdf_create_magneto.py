@@ -2,6 +2,7 @@ import os
 import numpy as np
 from math import cos,sin,pi,atan2
 from urdf_create import *
+from urdf_create_primitives import *
 
 def createSymmetricMagneto(robot_name, foot_radius, leg_length, leg_radius):
   foot_length = 2*leg_radius
@@ -86,9 +87,16 @@ leg_radius = 0.04
 #robot_name = 'magneto'
 #createMagneto(robot_name, foot_radius, leg1_length, leg2_length, leg3_length, leg_radius)
 
-leg_length=0.05
+leg_length=0.07
 robot_name = 'magneto0'
 createSymmetricMagneto(robot_name, foot_radius, leg_length, leg_radius)
+
+folder_name = 'magneto/'
+
+robot_name = 'magneto0_sphere_inner'
+createSphereRobot(folder_name, robot_name, max(leg_radius, leg_length/2))
+robot_name = 'magneto0_sphere_outer'
+createSphereRobot(folder_name, robot_name, (leg_length+4*foot_radius)/2)
 
 leg_length=0.5
 robot_name = 'magneto1'

@@ -102,18 +102,22 @@ std::ostream& operator<< (std::ostream& out, const PlannerInput& pin)
   out << std::string(80, '-') << std::endl;
   out << "[PlannerInput]" << std::endl;
   out << std::string(80, '-') << std::endl;
-  out << "q_init            : " << pin.q_init << std::endl;
-  out << "  dq_init         : " << pin.dq_init << std::endl;
-  out << "q_goal            : " << pin.q_goal << std::endl;
-  out << "  dq_goal         : " << pin.dq_goal << std::endl;
-  out << "SE3_min           : " << pin.se3min << std::endl;
-  out << "SE3_max           : " << pin.se3max << std::endl;
-  out << "algorithm         : " << pin.name_algorithm << std::endl;
-  out << "discr timestep    : [" << pin.timestep_min << "," << pin.timestep_max << "]" << std::endl;
-  out << "max planning time : " << pin.max_planning_time << " (seconds)" << std::endl;
-  out << "epsilon_goalregion: " << pin.epsilon_goalregion<< std::endl;
-  out << "robot index       : " << pin.robot_idx << std::endl;
-  out << "robot index       : " << pin.robot_idx_outer_shell << std::endl;
+  out << "q_init             : " << pin.q_init << std::endl;
+  out << "  dq_init          : " << pin.dq_init << std::endl;
+  out << "q_goal             : " << pin.q_goal << std::endl;
+  out << "  dq_goal          : " << pin.dq_goal << std::endl;
+  out << "SE3_min            : " << pin.se3min << std::endl;
+  out << "SE3_max            : " << pin.se3max << std::endl;
+  out << "algorithm          : " << pin.name_algorithm << std::endl;
+  out << "discr timestep     : [" << pin.timestep_min << "," << pin.timestep_max << "]" << std::endl;
+  out << "max planning time  : " << pin.max_planning_time << " (seconds)" << std::endl;
+  out << "epsilon_goalregion : " << pin.epsilon_goalregion<< std::endl;
+  out << "robot indices      : ";
+  for(uint k = 0; k < pin.robot_idxs.size(); k++){
+    out << " " << pin.robot_idxs.at(k);
+  }
+  out << std::endl;
+    
   out << std::string(80, '-') << std::endl;
   return out;
 }

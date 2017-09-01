@@ -140,30 +140,38 @@ bool MotionPlannerOMPL::solve()
   SingleRobotCSpace* cspace_outer;
 
   if(algorithm=="workspace"){
-    int idx_is = input.robot_idx;
-    robot = world->robots[idx_is];
+    std::vector<int> idxs = input.robot_idxs;
+    robot = world->robots[idxs.at(0)];
     robot->UpdateConfig(p_init);
-    int idx_os = input.robot_idx_outer_shell;
 
-    if(idx_os < 0){
-      std::cout << "algorithm workspace requires outer shell specification" << std::endl;
+    if(idxs.size() < 3){
+      std::cout << "algorithm workspace requires at least ORIGINAL robot, INNER SHELL, OUTER SHELL robot" << std::endl;
       exit(0);
     }
 
-    cspace_inner = new SingleRobotCSpace(*world,idx_is,&worldsettings);
-    cspace_outer = new SingleRobotCSpace(*world,idx_os,&worldsettings);
+    std::cout << "Workspace Planner: " << std::endl;
+    std::cout << " Robots  " << std::endl;
+    std::cout << " Original       : idx " << idxs.at(0) << " name " << robot->name << std::endl;
+    std::cout << " Level0[inner]  : idx " << idxs.at(1) << " name " << world->robots[idxs.at(1)]->name << std::endl;
+    std::cout << " Level0[outer]  : idx " << idxs.at(2) << " name " << world->robots[idxs.at(2)]->name << std::endl;
+
+    cspace_inner = new SingleRobotCSpace(*world,idxs.at(1),&worldsettings);
+    cspace_outer = new SingleRobotCSpace(*world,idxs.at(2),&worldsettings);
 
     Robot *ri = cspace_inner->GetRobot();
     Robot *ro = cspace_outer->GetRobot();
     std::cout << ri->name << std::endl;
     std::cout << ro->name << std::endl;
 
+    output.robot_idx =  idxs.at(1);
+    output.robot = ri;
+
     //goal/init needs to be >infeasible< for outer shell (robot in contact /w at
     //least one link)
-    //if(IsFeasible( robot_outer_shell, cspace_outer_shell, p_init)) return false;
-    //if(IsFeasible( robot_outer_shell, cspace_outer_shell, p_goal)) return false;
+    //if(IsFeasible( ro, *cspace_outer, p_init)) return false;
+    //if(IsFeasible( ro, *cspace_outer, p_goal)) return false;
 
-    cspace = factory.MakeGeometricCSpaceInnerOuter(robot, cspace_inner, cspace_outer);
+    cspace = factory.MakeGeometricCSpaceInnerOuter(ri, cspace_inner, cspace_outer);
     input.name_algorithm = "ompl:rrt";
 
   }else{
@@ -178,6 +186,7 @@ bool MotionPlannerOMPL::solve()
 
     cspace = factory.MakeGeometricCSpace(robot, kcspace);
   }
+  std::cout << std::string(80, '-') << std::endl;
   std::cout << "Planning for robot " << robot->name << std::endl;
   cspace->print();
   return solve_geometrically(cspace);
@@ -192,6 +201,8 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
 
   ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
+  std::cout << start << std::endl;
+  std::cout << goal << std::endl;
 
   og::SimpleSetup ss(cspace->SpacePtr());//const ControlSpacePtr
   const ob::SpaceInformationPtr si = ss.getSpaceInformation();
@@ -244,7 +255,7 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
   // solve
   //###########################################################################
 
-  //ob::PlannerStatus status = ss.solve(ptc);
+  ob::PlannerStatus status = ss.solve(ptc);
 
   solved = ss.haveExactSolutionPath();
 
@@ -320,37 +331,6 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
   }
 
   return solved;
-
-  //og::SimpleSetup ss(cspace.getPtr());
-  //const ob::SpaceInformationPtr si = ss.getSpaceInformation();
-  //ss.setPlanner(ompl_planner);
-
-  //si->setStateValidityChecker(std::make_shared<MotionPlannerOMPLValidityChecker>(si, &kcspace));
-
-  //ss.setStartAndGoalStates(start, goal);
-  //ss.setup();
-  //ob::PlannerStatus solved = ss.solve(10.0);
-  //if (solved)
-  //{
-  //  std::cout << "Found solution:" << std::endl;
-  //  ss.simplifySolution();
-  //  og::PathGeometric path = ss.getSolutionPath();
-  //  path.interpolate();
-  //  std::cout << path.length() << std::endl;
-  //  std::cout << path.getStateCount() << std::endl;
-
-  //  vector<Config> keyframes;
-  //  for(uint i = 0; i < path.getStateCount(); i++)
-  //  {
-  //    ob::State *state = path.getState(i);
-  //    Config cur = OMPLStateToConfig(state, cspace.getPtr());
-  //    _keyframes.push_back(cur);
-  //  }
-  //  std::cout << std::string(80, '-') << std::endl;
-  //}else{
-  //  std::cout << "No solution found" << std::endl;
-  //}
-
 
 }
 
@@ -449,7 +429,7 @@ bool MotionPlannerOMPL::solve_kinodynamically(CSpaceOMPL *cspace){
   // solve
   //###########################################################################
 
-  //ob::PlannerStatus status = ss.solve(ptc);
+  ob::PlannerStatus status = ss.solve(ptc);
   solved = ss.haveExactSolutionPath();
 
   //###########################################################################

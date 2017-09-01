@@ -22,18 +22,18 @@
  <link name="leg">
   <inertial>
     <mass value="1"/>
-    <inertia ixx="0.000608333333333" ixy="0" ixz="0" iyy="0.000608333333333" iyz="0" izz="0.0004"/>
+    <inertia ixx="0.000808333333333" ixy="0" ixz="0" iyy="0.000808333333333" iyz="0" izz="0.0004"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.57 0" xyz="0.075 0 0"/>
+    <origin rpy="0 1.57 0" xyz="0.085 0 0"/>
     <geometry>
-      <cylinder length="0.05" radius="0.04"/>
+      <cylinder length="0.07" radius="0.04"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="0.075 0 0"/>
+    <origin rpy="0 1.57 0" xyz="0.085 0 0"/>
     <geometry>
-      <cylinder length="0.05" radius="0.04"/>
+      <cylinder length="0.07" radius="0.04"/>
     </geometry>
   </collision>
  </link>
@@ -67,7 +67,7 @@
 </joint>
 
 <joint name="joint_leg_foot2_Z" type="revolute">
-  <origin rpy="0 0 0" xyz="0.15 0 0"/>
+  <origin rpy="0 0 0" xyz="0.17 0 0"/>
   <parent link="leg"/>
   <child link="foot2"/>
   <axis xyz="0 1 0"/>

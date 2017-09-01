@@ -11,6 +11,7 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   robot = world->robots[_irobot];
   _icontroller = 0;
 
+  output.robot_idx = _irobot;
   output.q_init = input.q_init;
   output.q_goal= input.q_goal;
   output.robot_idx = input.robot_idx;
@@ -23,7 +24,6 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   output.drawStartGoal = input.drawStartGoal;
 }
 PlannerOutput MotionPlanner::GetOutput(){
-  output.robot_idx = _irobot;
   return output;
 }
 PlannerInput MotionPlanner::GetInput(){
@@ -223,6 +223,7 @@ bool MotionPlanner::IsFeasible( Robot *robot, SingleRobotCSpace &cspace, Config 
   if(!cspace.IsFeasible(q)) {
     std::cout << std::string(80, '*') << std::endl;
     std::cout << "Robot " << robot->name << std::endl;
+    std::cout << "Config " << q << std::endl;
     std::cout << std::string(80, '*') << std::endl;
     vector<bool> infeasible;
     cspace.CheckObstacles(q,infeasible);
