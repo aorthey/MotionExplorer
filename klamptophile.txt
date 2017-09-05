@@ -755,3 +755,5 @@ might be along line segments embedded in the plane segments.
 [ ] do the same, but for M2
 [ ] add drawFace/drawEdge to terrain XML file
 [ ] remove orientation sampling for rotational invariant shapes
+
+[ ] shortest path not really shortest path, what is wrong there?

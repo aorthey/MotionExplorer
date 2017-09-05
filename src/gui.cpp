@@ -484,10 +484,8 @@ void ForceFieldBackend::RenderWorld()
     if(drawPlannerSimplicialComplex.at(i)){
       SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
       GLDraw::drawSimplicialComplex(cmplx);
-      //GLDraw::drawShortestPath(cmplx);
+      GLDraw::drawShortestPath(cmplx);
     }
-    //SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
-    //GLDraw::drawShortestPath(cmplx);
   }
 
   if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
