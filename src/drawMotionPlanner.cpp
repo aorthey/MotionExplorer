@@ -748,6 +748,8 @@ namespace GLDraw{
   }
   void drawShortestPath( SimplicialComplex& cmplx ){
 
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND);
     glPushMatrix();
     GLColor red(0.8,0.2,0.2,1);
     setColor(red);
@@ -759,6 +761,8 @@ namespace GLDraw{
                       cmplx.path.at(i+1));
     }
     glPopMatrix();
+    glEnable(GL_LIGHTING);
+    glDisable(GL_BLEND);
   }
   void drawSimplicialComplex( SimplicialComplex& cmplx ){
 
