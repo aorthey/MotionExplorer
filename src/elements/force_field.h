@@ -11,6 +11,7 @@ const double minimumRadiusSingularity = 0.1;
 
 class ForceField{
   public:
+    virtual ~ForceField(){};
     virtual Math3D::Vector3 getForceAtPosition(Math3D::Vector3 position) = 0;
     virtual void print() = 0;
     virtual ForceFieldTypes type() = 0;

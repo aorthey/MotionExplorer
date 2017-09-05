@@ -20,10 +20,10 @@
     <maxplanningtime>1</maxplanningtime>
     <algorithm>workspace</algorithm>
     <drawMilestones>0</drawMilestones>
-    <drawSweptVolume>1</drawSweptVolume>
+    <drawSweptVolume>0</drawSweptVolume>
     <drawStartGoal>0</drawStartGoal>
     <drawSimplicialComplex>1</drawSimplicialComplex>
-    <drawTree>1</drawTree>
+    <drawTree>0</drawTree>
     <robot>
       <index>0</index>
       <index>1</index>

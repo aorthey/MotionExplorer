@@ -15,11 +15,11 @@ pairDoubleVecVec IrreducibleProjector::ComputeThetaGammaFromRootPath( const std:
   //Insert extended path to make starting positions irreducible
   uint Nextended = 4;
   double length_extended = 0.0;
-  for(int i = 0; i < lengths.size(); i++){
+  for(uint i = 0; i < lengths.size(); i++){
     length_extended += lengths.at(i);
   }
   length_extended *= 2;
-  for(int j = 0; j < Nextended; j++){
+  for(uint j = 0; j < Nextended; j++){
     _rotationAlongRootPath.insert(_rotationAlongRootPath.begin(),R0);
 
     Vector3 ex = R0*Vector3(1,0,0);
@@ -40,11 +40,11 @@ pairDoubleVecVec IrreducibleProjector::ComputeThetaGammaFromRootPath( const std:
   std::vector<double> lvec = rpath.GetLengthVector();
 
   double lall=0.0;
-  for(int i = 0; i < Nextended-1; i++){
+  for(uint i = 0; i < Nextended-1; i++){
     lall+=lvec.at(i);
   }
   double t0 = lall;
-  for(int i = Nextended-1; i < lvec.size(); i++)
+  for(uint i = Nextended-1; i < lvec.size(); i++)
   {
     //start at t0, move backwards to get previous link positions
     t0 += lvec.at(i);
@@ -72,7 +72,7 @@ pairDoubleVec IrreducibleProjector::ComputeThetaGammaFromRootPathPosition(const 
   doubleVec gammasAtT;
 
   Matrix3 R = R0;
-  for(int k = 0; k < lengths.size(); k++){
+  for(uint k = 0; k < lengths.size(); k++){
 
     Vector3 ex(1,0,0), ey(0,1,0), ez(0,0,1), ex0, ey0, ez0;
     R.mul(ex, ex0);

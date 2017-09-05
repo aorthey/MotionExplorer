@@ -97,6 +97,7 @@ class ForceFieldBackend : public SimTestBackend
     WrenchField wrenchfield;
 
     ForceFieldBackend(RobotWorld *world);
+    //virtual ~ForceFieldBackend(){};
     virtual void Start();
     virtual bool OnCommand(const string& cmd,const string& args);
     virtual void RenderWorld();

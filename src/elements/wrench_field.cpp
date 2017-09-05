@@ -206,7 +206,7 @@ const std::vector<SmartPointer<ForceField> >& WrenchField::GetForceFields() cons
 Vector3 WrenchField::getForceFieldAtPosition(Vector3 &position){
 
   Vector3 F(0,0,0);
-  for(int i = 0; i < forcefields.size(); i++){
+  for(uint i = 0; i < forcefields.size(); i++){
     F += forcefields.at(i)->getForceAtPosition(position);
   }
 
@@ -284,7 +284,7 @@ void WrenchField::print(){
   std::cout << "WrenchField" << std::endl;
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "Force Fields" << std::endl;
-  for(int i = 0; i < forcefields.size(); i++){
+  for(uint i = 0; i < forcefields.size(); i++){
     forcefields.at(i)->print();
   }
   std::cout << std::string(80, '-') << std::endl;

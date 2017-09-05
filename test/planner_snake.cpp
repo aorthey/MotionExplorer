@@ -30,8 +30,8 @@ int main(int argc,const char** argv) {
   env.GetBackendPtr()->AddPlannerOutput( planner.GetOutput() );
   env.GetBackendPtr()->ShowRobot();
 
-  //env.GetBackendPtr()->sim.odesim.DeleteRobot("sphere_inner");
-  //env.GetBackendPtr()->sim.odesim.DeleteRobot("sphere_outer");
+  env.GetBackendPtr()->sim.odesim.DeleteRobot("level0_inner");
+  env.GetBackendPtr()->sim.odesim.DeleteRobot("level0_outer");
   //
   //env.GetWorldPtr()->DeleteRobot("level0_inner");
   //env.GetWorldPtr()->DeleteRobot("level0_outer");

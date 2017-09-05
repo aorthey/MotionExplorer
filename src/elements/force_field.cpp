@@ -22,7 +22,7 @@ ForceFieldTypes UniformForceField::type(){
 // Radialforcefield
 //##############################################################################
 RadialForceField::RadialForceField(Vector3 _source, double _power, double _radius):
-  source(_source), power(_power), maximum_radius(_radius), minimum_radius(minimumRadiusSingularity)
+  source(_source), power(_power), minimum_radius(minimumRadiusSingularity), maximum_radius(_radius)
 {
 }
 
@@ -59,7 +59,7 @@ double RadialForceField::GetPower(){
 // Cylindricalforcefield
 //##############################################################################
 CylindricalForceField::CylindricalForceField(Math3D::Vector3 _source, Math3D::Vector3 _direction, double _elongation, double _radius, double _power):
-  source(_source), direction(_direction), elongation(_elongation), maximum_radius(_radius), minimum_radius(minimumRadiusSingularity), power(_power)
+  source(_source), direction(_direction), elongation(_elongation), minimum_radius(minimumRadiusSingularity), maximum_radius(_radius), power(_power)
 {
   direction /= direction.length();
 }
@@ -153,7 +153,7 @@ ForceFieldTypes OrientedBoundingBoxForceField::type(){
   return OBB;
 }
 OrientedBoundingBoxForceField::OrientedBoundingBoxForceField(double _power, Vector3 _center, Vector3 _direction, Vector3 _extension):
-  power(_power), center(_center), extension(_extension)
+  center(_center), extension(_extension), power(_power)
 {
   Vector3 ex(1,0,0);
 
