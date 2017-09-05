@@ -169,7 +169,9 @@ namespace GLDraw{
 
   }
   void setColor(GLColor &c){
-    glColor4f(c[0],c[1],c[2],c[3]);
+    //glColor4f(c[0],c[1],c[2],c[3]);
+    //glColor3f(c[0],c[1],c[2]);
+    c.setCurrentGL();
   }
 
   void drawForceField(WrenchField &W){
@@ -647,8 +649,8 @@ namespace GLDraw{
 
     ControllerState output = controller->GetControllerState();
 
-    //glDisable(GL_LIGHTING);
-    //glEnable(GL_BLEND); 
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND); 
 
     GLColor color(1,0,0);
     for(int i = 0; i < int(output.predicted_com.size())-1; i++){
@@ -691,6 +693,8 @@ namespace GLDraw{
 
       glPopMatrix();
     }
+    glEnable(GL_LIGHTING);
+    glDisable(GL_BLEND); 
   }
   void drawDistanceRobotTerrain(const ODERobot *robot, const Terrain* terrain){
     //ODERobot *robot = sim.odesim.robot(0);
@@ -758,11 +762,14 @@ namespace GLDraw{
   }
   void drawSimplicialComplex( SimplicialComplex& cmplx ){
 
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND);
+    GLColor magenta(0.8,0,0.8,0.5);
+    GLColor black(0.1,0.1,0.1,1);
+    //GLColor grey(0.7,0.7,0.7,1);
     glPushMatrix();
-    GLColor magenta(0.5,0,1,0.5);
-    GLColor grey(0.7,0.7,0.7,1);
     glPointSize(10);
-    setColor(magenta);
+    setColor(black);
     for(uint i = 0; i < cmplx.V.size(); i++){
       drawPoint(cmplx.V.at(i));
     }
@@ -771,6 +778,7 @@ namespace GLDraw{
       drawLineSegment(cmplx.E.at(i).first, 
                       cmplx.E.at(i).second);
     }
+    setColor(magenta);
     for(uint i = 0; i < cmplx.F.size(); i++){
       drawTriangle(cmplx.F.at(i).at(0),
                    cmplx.F.at(i).at(1),
@@ -782,14 +790,15 @@ namespace GLDraw{
                    cmplx.T.at(i).at(2),
                    cmplx.T.at(i).at(3) );
     }
-    setColor(grey);
     glPopMatrix();
+    glDisable(GL_BLEND);
+    glEnable(GL_LIGHTING);
   }
 
   void drawForceEllipsoid( const ODERobot *robot ){
     uint Nlinks = robot->robot.links.size();
-    //glDisable(GL_LIGHTING);
-    //glEnable(GL_BLEND); 
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND); 
     for(uint i = 0; i < Nlinks; i++){
       dBodyID bodyid = robot->body(i);
       if(bodyid){
@@ -841,7 +850,8 @@ namespace GLDraw{
         }
       }
     }
-    //glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHTING);
+    glDisable(GL_BLEND); 
   }
 
       

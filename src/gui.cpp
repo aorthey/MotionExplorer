@@ -313,7 +313,6 @@ void ForceFieldBackend::RenderWorld()
 
   BaseT::RenderWorld();
 
-  //glEnable(GL_BLEND);
   allWidgets.Enable(&allRobotWidgets,drawPoser==1);
   allWidgets.DrawGL(viewport);
   vector<ViewRobot> viewRobots = world->robotViews;
@@ -390,7 +389,6 @@ void ForceFieldBackend::RenderWorld()
         //  glVertex3v(dir + x.x*eu+x.y*ev);
         //  x=x*dx;
         //}
-        //glEnd();
 
         if(T(i) < 0) {
           x.set(dr,0);
@@ -424,7 +422,6 @@ void ForceFieldBackend::RenderWorld()
         dir = T(i)*dir/dir.norm();
 
         double r = 0.05;
-        //glEnable(GL_LIGHTING);
         glPushMatrix();
         //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(1,0.5,0,0.7));
         glTranslate(pos);
@@ -481,13 +478,13 @@ void ForceFieldBackend::RenderWorld()
     if(drawPlannerTree.at(i)){
       SwathVolume swv = plannerOutput.at(i).GetSwathVolume();
       GLDraw::drawSwathVolume(swv.GetRobot(), swv.GetMatrices(), swv.GetAppearanceStack(), swv.GetColor());
-      GLDraw::drawPlannerTree(plannerOutput.at(i).GetTree());
+      //GLDraw::drawPlannerTree(plannerOutput.at(i).GetTree());
     }
 
     if(drawPlannerSimplicialComplex.at(i)){
       SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
       GLDraw::drawSimplicialComplex(cmplx);
-      GLDraw::drawShortestPath(cmplx);
+      //GLDraw::drawShortestPath(cmplx);
     }
     //SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
     //GLDraw::drawShortestPath(cmplx);
@@ -868,10 +865,10 @@ void ForceFieldBackend::DrawText(int x,int y, std::string s)
   glPushMatrix();
   glColor3f(0,0,0);
   //glDisable(GL_LIGHTING);
-  //glDisable(GL_DEPTH_TEST);
+  glDisable(GL_DEPTH_TEST);
   glRasterPos2i(x,y);
   glutBitmapString(font,s.c_str());
-  //glEnable(GL_DEPTH_TEST);
+  glEnable(GL_DEPTH_TEST);
   glPopMatrix();
 }
 
