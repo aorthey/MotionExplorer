@@ -132,7 +132,7 @@ TopologicalGraph::TopologicalGraph(const ob::PlannerData& pd, const ob::Optimiza
     Cell_handle cf = f.first;
     uint idx_vf = f.second; //idx of vertex opposite of facet in cell
     std::vector<Vector3> V;
-    for(int k = 0; k < 4; k++){
+    for(uint k = 0; k < 4; k++){
       if(k==idx_vf) continue;
       K::Point_3 pk = cf->vertex(k)->point();
       Vector3 vk(pk[0],pk[1],pk[2]);
