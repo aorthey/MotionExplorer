@@ -883,23 +883,25 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
 
     BaseT::OnCommand(cmd,args);
 
-    for(uint k = 0; k < world->robots.size(); k++){
-      Robot* robot = world->robots[k];
-      Config q;
-      //if(plannerOutput.size()>0){
-      //  if(plannerOutput.at(0).robot_idx == 0){
-      //    q = plannerOutput.at(0).q_init;
-      //  }else{
-      //    q = robot->q;
-      //  }
-      //}else{
-      //  q = robot->q;
-      //}
-      //q=robot->q;
-      q = plannerOutput.at(0).q_init;
-      robot->UpdateConfig(q);
-      robot->UpdateGeometry();
-      std::cout << "reseting robot to" << robot->q << std::endl;
+    if(plannerOutput.size()>0){
+      std::cout << "Reseting all robots to first planner output" << std::endl;
+      for(uint k = 0; k < world->robots.size(); k++){
+        Robot* robot = world->robots[k];
+        if(plannerOutput.at(0).robot_idx == k){
+          Config q = plannerOutput.at(0).q_init;
+          robot->UpdateConfig(q);
+          robot->UpdateGeometry();
+          std::cout << "reseting robot " << robot->name << " to " << robot->q << std::endl;
+        }
+      }
+    }else{
+      for(uint k = 0; k < world->robots.size(); k++){
+        Robot* robot = world->robots[k];
+        Config q = robot->q;
+        robot->UpdateConfig(q);
+        robot->UpdateGeometry();
+        std::cout << "reseting robot " << robot->name << " to " << robot->q << std::endl;
+      }
     }
 
 

@@ -735,10 +735,12 @@ compute shortest paths. Iterate through all solutions.
 
 
 [x] magneto: 2-dof, 2 magnet robot
+[x] reset does not work on all robots
 [ ] simulate a magnetic-contact. read klampt tutorial about humanoid robot with
 infinite force contact. how to selectively activate/deactivate?
 
 good idea to add it. several new problems:
+
 [ ] how to define contact points and add arbitrary force when in contact?
 [ ] how to make and break contacts
 [ ] how to adapt sphere/capsule to new structure. it is completely different,
@@ -755,5 +757,3 @@ might be along line segments embedded in the plane segments.
 [ ] do the same, but for M2
 [ ] add drawFace/drawEdge to terrain XML file
 [ ] remove orientation sampling for rotational invariant shapes
-
-[ ] reset does not work on all robots

@@ -19,10 +19,10 @@
 class MotionPlanner{
 
   protected:
-    PlannerInput input;
-    PlannerOutput output;
     RobotWorld *world;
     Robot *robot;
+    PlannerInput input;
+    PlannerOutput output;
 
     int _irobot;
     int _icontroller;

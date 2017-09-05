@@ -159,7 +159,7 @@ bool MotionPlannerOMPL::solve()
     std::cout << ri->name << std::endl;
     std::cout << ro->name << std::endl;
 
-    output.robot_idx =  idxs.at(1);
+    output.robot_idx = idxs.at(0);
     output.robot = ri;
 
     //goal/init needs to be >infeasible< for outer shell (robot in contact /w at
@@ -251,7 +251,8 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
   // solve
   //###########################################################################
 
-  ob::PlannerStatus status = ss.solve(ptc);
+  //ob::PlannerStatus status = 
+  ss.solve(ptc);
 
   solved = ss.haveExactSolutionPath();
 
@@ -288,12 +289,12 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
 
     ss.simplifySolution();
     og::PathGeometric path = ss.getSolutionPath();
-    //path.interpolate();
+    path.interpolate();
 
     std::cout << "Path Length     : " << path.length() << std::endl;
 
-    //og::PathSimplifier shortcutter(si);
-    //shortcutter.shortcutPath(path);
+    og::PathSimplifier shortcutter(si);
+    shortcutter.shortcutPath(path);
 
     std::vector<ob::State *> states = path.getStates();
     std::vector<Config> keyframes;
@@ -425,7 +426,8 @@ bool MotionPlannerOMPL::solve_kinodynamically(CSpaceOMPL *cspace){
   // solve
   //###########################################################################
 
-  ob::PlannerStatus status = ss.solve(ptc);
+  //ob::PlannerStatus status = 
+  ss.solve(ptc);
   solved = ss.haveExactSolutionPath();
 
   //###########################################################################

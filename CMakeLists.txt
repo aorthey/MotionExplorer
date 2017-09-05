@@ -92,4 +92,5 @@ FOREACH(FILENAME ${EXECUTABLES})
 ENDFOREACH(FILENAME)
 MESSAGE("-------------------------------------")
 
+#SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall -Werror" )
 SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall" )

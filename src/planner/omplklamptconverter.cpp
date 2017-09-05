@@ -7,7 +7,6 @@ ob::State* ConfigToOMPLStatePtr(const Config &q, const ob::StateSpacePtr &s){
   ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
   ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
   ob::RealVectorStateSpace::StateType *qomplRn = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-  //double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
 
   ob::State* out = s->allocState();
   ob::SE3StateSpace::StateType *outSE3 = out->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
@@ -68,7 +67,7 @@ Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob:
   Config q;
   q.resize(6+N);
 
-  for(int i = 0; i < N; i++){
+  for(uint i = 0; i < N; i++){
     q(i+6) = qomplRnState->values[i];
   }
 
@@ -137,7 +136,7 @@ void test()
    q[3] = Rand(-M_PI,M_PI);
    q[4] = Rand(-M_PI/2,M_PI/2);
    q[5] = Rand(-M_PI,M_PI);
-   for(int j = 0; j < N; j++){
+   for(uint j = 0; j < N; j++){
      q[j+6] = Rand(0,3);
    }
    //std::cout << "testing " << i << " : " << std::endl;

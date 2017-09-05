@@ -73,7 +73,7 @@ void MotionPlanner::SerializeTreeRandomlyCullPoints(SerializedTree &_stree, uint
   si = _stree.at(0);
   si.directions.clear();
   snew.push_back(si);
-  for(int i = 1; i < N; i++){
+  for(uint i = 1; i < N; i++){
     si = _stree.at(RandInt(Nall));
     si.directions.clear();
     snew.push_back(si);

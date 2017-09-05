@@ -44,7 +44,7 @@ void LieGroupIntegrator::Simulate(const State& x0, const ControlInput& u,std::ve
   }
 
   p.push_back(x0);
-  for(int i = 1; i < p_SE3.size(); i++){
+  for(uint i = 1; i < p_SE3.size(); i++){
     State pi(x0);
     SE3ToState(pi, p_SE3.at(i));
     p.push_back(pi);
