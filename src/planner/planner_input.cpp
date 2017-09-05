@@ -4,6 +4,7 @@
 
 bool PlannerInput::load(TiXmlElement *node)
 {
+  exists = false;
   CheckNodeName(node, "world");
   TiXmlElement* plannersettings = FindSubNode(node, "plannersettings");
 
@@ -80,14 +81,11 @@ bool PlannerInput::load(TiXmlElement *node)
       robot_idx = 0;
     }
 
-    TiXmlElement* rindexos = FindSubNode(node_robot, "indexoutershell");
-    if(rindexos) GetStreamText(rindexos) >> robot_idx_outer_shell;
-    else robot_idx_outer_shell = -1;
   }else{
     robot_idx = 0;
-    robot_idx_outer_shell = -1;
   }
 
+  exists = true;
   return true;
 }
 

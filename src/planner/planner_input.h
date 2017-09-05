@@ -5,6 +5,8 @@
 
 class PlannerInput{
   public:
+    bool exists;
+
     std::string name_robot;
     std::string name_algorithm;
 
@@ -17,7 +19,6 @@ class PlannerInput{
     Config qMax;
 
     int robot_idx;
-    int robot_idx_outer_shell;
     std::vector<int> robot_idxs;
 
     double epsilon_goalregion;

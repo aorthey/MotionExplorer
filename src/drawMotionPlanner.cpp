@@ -50,16 +50,16 @@ namespace GLDraw{
 
   void GLCheckeredSphere::Draw()
   {
-    glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHTING);
     glPushMatrix();
     {
       glTranslate(center);
-      glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,c1.rgba); 
+      //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,c1.rgba); 
       DrawSphereArc(radius, 0,Pi_2,  0,Pi_2,    numSlices/4,numStacks/2);
       DrawSphereArc(radius, 0,Pi_2,  Pi,3*Pi_2, numSlices/4,numStacks/2);
       DrawSphereArc(radius, Pi_2,Pi, Pi_2,Pi,   numSlices/4,numStacks/2);
       DrawSphereArc(radius, Pi_2,Pi, 3*Pi_2,TwoPi,numSlices/4,numStacks/2);
-      glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,c2.rgba); 
+      //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,c2.rgba); 
       DrawSphereArc(radius, 0,Pi_2,  Pi_2,Pi,   numSlices/4,numStacks/2);
       DrawSphereArc(radius, 0,Pi_2,  3*Pi_2,TwoPi,numSlices/4,numStacks/2);
       DrawSphereArc(radius, Pi_2,Pi, 0,Pi_2,    numSlices/4,numStacks/2);
@@ -91,22 +91,22 @@ namespace GLDraw{
 
     }
     for(uint i = 0; i < linksInCollision.size(); i++){
-      glDisable(GL_LIGHTING);
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      //glDisable(GL_LIGHTING);
+      //glEnable(GL_BLEND);
+      //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       glPushMatrix();
       //glMultMatrix(Matrix4(T));
       viewRobot->DrawLink_Local(linksInCollision[i]);
       glPopMatrix();
-      glDisable(GL_BLEND);
+      //glDisable(GL_BLEND);
     }
 
   }
   void drawWrenchField(WrenchField &wrenchfield){
-    glEnable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
+    ////glEnable(GL_LIGHTING);
+    //glDisable(GL_DEPTH_TEST);
     GLColor cWrench(0,1,1);
-    //cWrench.setCurrentGL();
+
     for(uint i = 0; i < wrenchfield.size(); i++){
       Vector3 pos = wrenchfield.getPosition(i);
       Vector3 force = wrenchfield.getForce(i);
@@ -115,8 +115,9 @@ namespace GLDraw{
 
       //force at link i
       glPushMatrix();
+      setColor(cWrench);
       glTranslate(pos);
-      glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cWrench);
+      //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cWrench);
       drawCylinder(sforce,r);
       glPushMatrix();
       glTranslate(sforce);
@@ -149,7 +150,8 @@ namespace GLDraw{
     drawCylinderArrowAtPosition(sph.center, amomentum, cAngMom);
 
 
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
+    //glDisable(GL_LIGHTING);
 
 
   }
@@ -157,7 +159,7 @@ namespace GLDraw{
     double r = 0.01;
     glPushMatrix();
     glTranslate(pos);
-    glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,color);
+    //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,color);
     drawCylinder(dir, r);
     glPushMatrix();
     glTranslate(dir);
@@ -166,10 +168,17 @@ namespace GLDraw{
     glPopMatrix();
 
   }
+  void setColor(GLColor &c){
+    glColor4f(c[0],c[1],c[2],c[3]);
+  }
 
   void drawForceField(WrenchField &W){
     //Real linewidth=0.01;
     std::vector<SmartPointer<ForceField> > forcefields = W.GetForceFields();
+
+    //glDisable(GL_LIGHTING);
+    //glEnable(GL_BLEND); 
+    //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
     for(uint fctr = 0; fctr < forcefields.size(); fctr++){
       SmartPointer<ForceField> f = forcefields.at(fctr);
@@ -183,14 +192,9 @@ namespace GLDraw{
         double radius = fr->GetRadius();
         double power = fr->GetPower();
 
-        glDisable(GL_LIGHTING);
-        glEnable(GL_BLEND); 
-        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-
-        GLColor cForce = fr->GetColor();
-        cForce.setCurrentGL();
-        
         glPushMatrix();
+        GLColor cForce = fr->GetColor();
+        setColor(cForce);
         glTranslate(source);
 
         glPointSize(5);
@@ -228,7 +232,6 @@ namespace GLDraw{
 
 
         glPopMatrix();
-        glEnable(GL_LIGHTING);
 
       }else if(f->type() == OBB){
         SmartPointer<OrientedBoundingBoxForceField>& fb = *reinterpret_cast<SmartPointer<OrientedBoundingBoxForceField>*>(&forcefields.at(fctr));
@@ -236,15 +239,10 @@ namespace GLDraw{
         Vector3 center = fb->GetCenter();
         Vector3 extension = fb->GetExtension();
         Matrix3 R = fb->GetRotation();
-
-        glDisable(GL_LIGHTING);
-        glEnable(GL_BLEND); 
-        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-
-        GLColor cForce = fb->GetColor();
-        cForce.setCurrentGL();
         
         glPushMatrix();
+        GLColor cForce = fb->GetColor();
+        setColor(cForce);
         glTranslate(center);
         Matrix4 RH(R);
         RH(3,3) = 1;
@@ -287,7 +285,6 @@ namespace GLDraw{
 
 
         glPopMatrix();
-        glEnable(GL_LIGHTING);
       }else if(f->type() == CYLINDRICAL){
 
         SmartPointer<CylindricalForceField>& fr = *reinterpret_cast<SmartPointer<CylindricalForceField>*>(&forcefields.at(fctr));
@@ -300,12 +297,8 @@ namespace GLDraw{
         double power = fr->GetPower();
         GLColor cForce = fr->GetColor();
 
-        glDisable(GL_LIGHTING);
-        glEnable(GL_BLEND); 
-        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-        cForce.setCurrentGL();
-        
         glPushMatrix();
+        setColor(cForce);
         glTranslate(source);
 
         //draw cable axis
@@ -369,9 +362,10 @@ namespace GLDraw{
 
 
         glPopMatrix();
-        glEnable(GL_LIGHTING);
       }
     }
+    //glDisable(GL_BLEND); 
+    //glEnable(GL_LIGHTING);
 
 
   }
@@ -387,13 +381,12 @@ namespace GLDraw{
         for(double z = 0.2; z <= 2; z+=step){
           Vector3 pos(x,y,z);
   
-          glDisable(GL_LIGHTING);
-  
-          glEnable(GL_BLEND); 
-          glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-          cForce.setCurrentGL();
+          //glDisable(GL_LIGHTING);
+          //glEnable(GL_BLEND); 
+          //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
   
           glPushMatrix();
+          setColor(cForce);
   
           glTranslate(pos);
           //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cForce);
@@ -409,7 +402,7 @@ namespace GLDraw{
   
           glPopMatrix();
           glPopMatrix();
-          glEnable(GL_LIGHTING);
+          //glEnable(GL_LIGHTING);
         }//forz
       }//fory
     }//forx
@@ -436,7 +429,6 @@ namespace GLDraw{
         glPushMatrix();
         glMultMatrix(matij);
 
-        //sweptvolumeColor.setCurrentGL();
         glScalef(sweptvolumeScale, sweptvolumeScale, sweptvolumeScale);
 
         GLDraw::GeometryAppearance& a = appearanceStack.at(j);
@@ -517,9 +509,9 @@ namespace GLDraw{
     //    nearestNode = i;
     //  }
     //}
-    glDisable(GL_LIGHTING);
-    glEnable(GL_BLEND); 
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    //glDisable(GL_LIGHTING);
+    //glEnable(GL_BLEND); 
+    //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
       
     for(uint i = 0; i < _stree.size(); i++){
       SerializedTreeNode node = _stree.at(i);
@@ -533,9 +525,9 @@ namespace GLDraw{
       //double shade = exp(-d*d/0.5); //\in [0,1]
       //GLColor color(shade,0,1.0-shade);
 
-      colorTree.setCurrentGL();
 
       glPushMatrix();
+      setColor(colorTree);
       glTranslate(pos);
 
       //glPointSize(vertexSize);
@@ -554,7 +546,7 @@ namespace GLDraw{
 
       glPopMatrix();
     }
-    glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHTING);
     //std::cout << "Visualized Tree with " << _stree.size() << " vertices and " << Nedges << " edges." << std::endl;
   }
 
@@ -621,29 +613,29 @@ namespace GLDraw{
       GLColor c2(0,1,0);
       GLColor c3(0,0,1);
 
-      glDisable(GL_LIGHTING);
+      //glDisable(GL_LIGHTING);
 
-      glEnable(GL_BLEND); 
-      glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+      //glEnable(GL_BLEND); 
+      //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
       glPushMatrix();
-      c1.setCurrentGL();
+      setColor(c1);
       glTranslate(p);
       drawCylinder(e1*frameLength.at(i),linewidth);
       glPopMatrix();
 
       glPushMatrix();
-      c2.setCurrentGL();
+      setColor(c2);
       glTranslate(p);
       drawCylinder(e2*frameLength.at(i),linewidth);
       glPopMatrix();
 
       glPushMatrix();
-      c3.setCurrentGL();
+      setColor(c3);
       glTranslate(p);
       drawCylinder(e3*frameLength.at(i),linewidth);
       glPopMatrix();
-      glEnable(GL_LIGHTING);
+      //glEnable(GL_LIGHTING);
     }
   }
   void drawCenterOfMassPathFromController(WorldSimulation &sim){
@@ -655,11 +647,10 @@ namespace GLDraw{
 
     ControllerState output = controller->GetControllerState();
 
-    glDisable(GL_LIGHTING);
-    glEnable(GL_BLEND); 
+    //glDisable(GL_LIGHTING);
+    //glEnable(GL_BLEND); 
 
     GLColor color(1,0,0);
-    color.setCurrentGL();
     for(int i = 0; i < int(output.predicted_com.size())-1; i++){
       Vector3 com_cur = output.predicted_com.at(i);
       Vector3 com_next = output.predicted_com.at(i+1);
@@ -667,6 +658,7 @@ namespace GLDraw{
       Vector3 dc = com_next - com_cur;
         
       glPushMatrix();
+      setColor(color);
       glLineWidth(linewidth);
       glTranslate(com_cur);
 
@@ -681,7 +673,6 @@ namespace GLDraw{
       glPopMatrix();
     }
     GLColor green(0,1,0);
-    green.setCurrentGL();
     for(int i = 0; i < int(output.com_window.size())-1; i++){
       Vector3 com_cur = output.com_window.at(i);
       Vector3 com_next = output.com_window.at(i+1);
@@ -689,6 +680,7 @@ namespace GLDraw{
       Vector3 dc = com_next - com_cur;
         
       glPushMatrix();
+      setColor(green);
       glTranslate(com_cur);
 
       glLineWidth(linewidth);
@@ -709,8 +701,8 @@ namespace GLDraw{
     robot->robot.CleanupCollisions();
     robot->robot.InitMeshCollision(tt);
 
-    glDisable(GL_LIGHTING);
-    glEnable(GL_BLEND); 
+    //glDisable(GL_LIGHTING);
+    //glEnable(GL_BLEND); 
     GLColor yellow(1,1,0);
     GLColor white(1,1,1);
     for(uint i = 0; i < Nlinks; i++){
@@ -736,11 +728,11 @@ namespace GLDraw{
             glPushMatrix();
             glLineWidth(3);
             glPointSize(5);
-            white.setCurrentGL();
+            setColor(white);
             drawPoint(p1);
             drawPoint(p2);
-            yellow.setCurrentGL();
             glBegin(GL_LINES);
+            setColor(yellow);
             glVertex3f(p1[0],p1[1],p1[2]);
             glVertex3f(p2[0],p2[1],p2[2]);
             glEnd();
@@ -752,27 +744,25 @@ namespace GLDraw{
   }
   void drawShortestPath( SimplicialComplex& cmplx ){
 
-    GLColor red(0.8,0.3,0.3,1);
-    red.setCurrentGL();
-    glPointSize(10);
-    glLineWidth(5);
+    glPushMatrix();
+    GLColor red(0.8,0.2,0.2,1);
+    setColor(red);
+    glPointSize(30);
+    glLineWidth(15);
     for(uint i = 0; i < cmplx.path.size()-1; i++){
       drawPoint(cmplx.path.at(i));
       drawLineSegment(cmplx.path.at(i),
                       cmplx.path.at(i+1));
     }
+    glPopMatrix();
   }
   void drawSimplicialComplex( SimplicialComplex& cmplx ){
-    //std::cout << "drawSimplicialComplex: " 
-    //  << cmplx.V.size() << " vertices " 
-    //  << cmplx.E.size() << " edges " 
-    //  << cmplx.F.size() << " faces " 
-    //  << cmplx.T.size() << " tetrahedras " 
-    //  << std::endl;
 
-    GLColor red(0.8,0.3,0.3,1);
-    red.setCurrentGL();
+    glPushMatrix();
+    GLColor magenta(0.5,0,1,0.5);
+    GLColor grey(0.7,0.7,0.7,1);
     glPointSize(10);
+    setColor(magenta);
     for(uint i = 0; i < cmplx.V.size(); i++){
       drawPoint(cmplx.V.at(i));
     }
@@ -792,12 +782,14 @@ namespace GLDraw{
                    cmplx.T.at(i).at(2),
                    cmplx.T.at(i).at(3) );
     }
+    setColor(grey);
+    glPopMatrix();
   }
 
   void drawForceEllipsoid( const ODERobot *robot ){
     uint Nlinks = robot->robot.links.size();
-    glDisable(GL_LIGHTING);
-    glEnable(GL_BLEND); 
+    //glDisable(GL_LIGHTING);
+    //glEnable(GL_BLEND); 
     for(uint i = 0; i < Nlinks; i++){
       dBodyID bodyid = robot->body(i);
       if(bodyid){
@@ -832,8 +824,6 @@ namespace GLDraw{
               //Vector3 p2 = center + dp;
               axes.push_back(dp);
             }
-            GLColor magenta(0.5,0,1,0.5);
-            magenta.setCurrentGL();
             if(axes.size()>3){
               std::cout << "more than three axes for Ellipsoid. Something is wrong" << std::endl;
               exit(0);
@@ -841,13 +831,17 @@ namespace GLDraw{
             if(axes.size()<3){
               std::cout << "Warning: ellipsoid is singular" << std::endl;
             }else{
+              glPushMatrix();
+              GLColor magenta(0.5,0,1,0.5);
+              setColor(magenta);
               drawWireEllipsoid(center, axes.at(0),axes.at(1),axes.at(2),8);
+              glPopMatrix();
             }
           }
         }
       }
     }
-    glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHTING);
   }
 
       

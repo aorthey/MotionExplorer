@@ -255,12 +255,14 @@ void ForceFieldBackend::Start()
 void ForceFieldBackend::RenderWorld()
 {
   DEBUG_GL_ERRORS()
+  glDisable(GL_LIGHTING);
+  glDisable(GL_BLEND);
+
   drawDesired=0;
 
   for(size_t i=0;i<world->terrains.size();i++){
     Terrain *terra = world->terrains[i];
     GLDraw::GeometryAppearance* a = terra->geometry.Appearance();
-    //a->SetColor(GLColor(0.9,0.5,0.1,0.2));
     a->drawFaces = false;
     a->drawEdges = false;
     a->drawVertices = false;
@@ -311,7 +313,7 @@ void ForceFieldBackend::RenderWorld()
 
   BaseT::RenderWorld();
 
-  glEnable(GL_BLEND);
+  //glEnable(GL_BLEND);
   allWidgets.Enable(&allRobotWidgets,drawPoser==1);
   allWidgets.DrawGL(viewport);
   vector<ViewRobot> viewRobots = world->robotViews;
@@ -353,8 +355,6 @@ void ForceFieldBackend::RenderWorld()
         dir = 100*T(i)*dir/dir.norm();
 
         double r = 0.01;
-        glEnable(GL_LIGHTING);
-        glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(0,0.5,1,0.7));
 
         glPushMatrix();
         glTranslate(pos);
@@ -424,9 +424,9 @@ void ForceFieldBackend::RenderWorld()
         dir = T(i)*dir/dir.norm();
 
         double r = 0.05;
-        glEnable(GL_LIGHTING);
-        glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(1,0.5,0,0.7));
+        //glEnable(GL_LIGHTING);
         glPushMatrix();
+        //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(1,0.5,0,0.7));
         glTranslate(pos);
         drawCone(-dir,2*r,8);
         glPopMatrix();
@@ -482,16 +482,15 @@ void ForceFieldBackend::RenderWorld()
       SwathVolume swv = plannerOutput.at(i).GetSwathVolume();
       GLDraw::drawSwathVolume(swv.GetRobot(), swv.GetMatrices(), swv.GetAppearanceStack(), swv.GetColor());
       GLDraw::drawPlannerTree(plannerOutput.at(i).GetTree());
-
     }
+
     if(drawPlannerSimplicialComplex.at(i)){
       SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
       GLDraw::drawSimplicialComplex(cmplx);
-      //GLDraw::drawShortestPath(cmplx);
+      GLDraw::drawShortestPath(cmplx);
     }
     //SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
     //GLDraw::drawShortestPath(cmplx);
-
   }
 
   if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
@@ -744,6 +743,13 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
 void ForceFieldBackend::AddPlannerOutput( PlannerOutput pout )
 {
   plannerOutput.push_back(pout);
+
+  for(uint k = 0; k < pout.removable_robot_idxs.size(); k++){
+    uint idx = pout.removable_robot_idxs.at(k);
+    Robot *rk = world->robots[idx];
+    sim.odesim.DeleteRobot( rk->name.c_str() );
+  }
+  //
 }
 
 void ForceFieldBackend::SendPlannerOutputToController()
@@ -859,12 +865,14 @@ void ForceFieldBackend::DrawText(int x,int y, std::string s)
   //GLUT_BITMAP_HELVETICA_18
 
   void* font = GLUT_BITMAP_HELVETICA_18;
+  glPushMatrix();
   glColor3f(0,0,0);
-  glDisable(GL_LIGHTING);
-  glDisable(GL_DEPTH_TEST);
+  //glDisable(GL_LIGHTING);
+  //glDisable(GL_DEPTH_TEST);
   glRasterPos2i(x,y);
   glutBitmapString(font,s.c_str());
-  glEnable(GL_DEPTH_TEST);
+  //glEnable(GL_DEPTH_TEST);
+  glPopMatrix();
 }
 
 bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
@@ -1133,8 +1141,8 @@ bool GLUIForceFieldGUI::Initialize()
   AddToKeymap("3","draw_forceellipsoid");
   AddToKeymap("4","draw_distance_robot_terrain");
   AddToKeymap("5","draw_com_path");
-  AddToKeymap("q","draw_minimal");
 
+  AddToKeymap("q","draw_minimal");
   AddToKeymap("T","toggle_mode");
   AddToKeymap("f","draw_rigid_objects_faces_toggle");
   AddToKeymap("e","draw_rigid_objects_edges_toggle");

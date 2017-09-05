@@ -4,8 +4,7 @@
    <robot name="bottle" file="/home/aorthey/git/orthoklampt/data/bottle/bottle.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
    <terrain  name="onehole.tri" file="/home/aorthey/git/orthoklampt/data/terrains/oneholethick.tri" translation="0.47 1.5 -1.26"/>
-   <!--
--->
+
 
   <plannersettings>
 

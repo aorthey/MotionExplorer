@@ -28,7 +28,7 @@ void ControllerState::PredictCOM( double tstep, uint Nsteps){
 
     //average over last elements with diminishing return
     uint N= min(10, int(linmomentum_window.size()-1));
-    for(int i = 0; i < N; i++){
+    for(uint i = 0; i < N; i++){
       Vector3 l1 = linmomentum_window.at(i);
       Vector3 l2 = linmomentum_window.at(i+1);
       force += ((N-i)/N)*(l2 - l1)/dt;
@@ -58,7 +58,7 @@ void ControllerState::PredictCOM( double tstep, uint Nsteps){
   Vector3 dcom = LM/mass;
 
   predicted_com.clear();
-  for(int i = 0; i < Nsteps; i++){
+  for(uint i = 0; i < Nsteps; i++){
     predicted_com.push_back(com);
     com = com + dt * dcom + dt2 * force/mass;
     dcom = dcom + dt * force/mass;
@@ -68,7 +68,7 @@ void ControllerState::PredictCOM( double tstep, uint Nsteps){
 
 double ControllerState::getLength(std::vector<Vector3> &path){
   double length = 0.0;
-  for(int i = 0; i < path.size()-1; i++){
+  for(uint i = 0; i < path.size()-1; i++){
     length += (path.at(i) - path.at(i+1)).norm();
   }
   return length;
@@ -131,7 +131,7 @@ void ContactStabilityController::Update(Real dt) {
 
   if(torques.size()>0){
     output.current_torque = ZeroTorque;
-    uint N = torques.at(0).size();
+    //uint N = torques.at(0).size();
 
     uint ictr = 0;
     double t = 0;
@@ -202,11 +202,11 @@ vector<string> ContactStabilityController::Commands() const
   res.push_back("set_torque_control");
   res.push_back("append_torque_control");
   res.push_back("brake");
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Controller Commands:" << std::endl;
-  for(int i = 0; i < res.size(); i++){
-    std::cout << res.at(i) << std::endl;
-  }
-  std::cout << std::string(80, '-') << std::endl;
+  // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << "Controller Commands:" << std::endl;
+  // for(uint i = 0; i < res.size(); i++){
+  //   std::cout << res.at(i) << std::endl;
+  // }
+  // std::cout << std::string(80, '-') << std::endl;
   return res;
 }

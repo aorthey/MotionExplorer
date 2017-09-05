@@ -18,6 +18,8 @@ class PlannerOutput{
   public:
 
     uint robot_idx;
+    std::vector<int> removable_robot_idxs;
+
     std::string name_robot;
     std::string name_algorithm;
 

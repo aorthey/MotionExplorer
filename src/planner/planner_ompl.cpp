@@ -105,6 +105,10 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
 
 bool MotionPlannerOMPL::solve()
 {
+  if(!input.exists){
+    std::cout << "No Planner Settings founds." << std::endl;
+    return false;
+  }
   std::string algorithm = input.name_algorithm;
   if(algorithm=="" || algorithm=="NONE"){
     std::cout << "No Planner Algorithm detected" << std::endl;
@@ -139,6 +143,11 @@ bool MotionPlannerOMPL::solve()
     std::vector<int> idxs = input.robot_idxs;
     robot = world->robots[idxs.at(0)];
     robot->UpdateConfig(p_init);
+
+    //remove all nested robots except the original one
+    for(uint k = 1; k < idxs.size(); k++){
+      output.removable_robot_idxs.push_back(idxs.at(k));
+    }
 
     if(idxs.size() < 3){
       std::cout << "algorithm workspace requires at least ORIGINAL robot, INNER SHELL, OUTER SHELL robot" << std::endl;

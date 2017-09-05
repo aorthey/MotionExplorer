@@ -7,21 +7,35 @@
 MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   world(world_), input(input_)
 {
-  _irobot = input.robot_idx;
-  robot = world->robots[_irobot];
-  _icontroller = 0;
+  if(input.exists){
+    _irobot = input.robot_idx;
+    robot = world->robots[_irobot];
+    _icontroller = 0;
+    output.robot_idx = _irobot;
+    output.q_init = input.q_init;
+    output.q_goal= input.q_goal;
+    output.robot_idx = input.robot_idx;
+    output.robot = robot;
+    output.name_algorithm = input.name_algorithm;
+    output.drawTree = input.drawTree;
+    output.drawSimplicialComplex = input.drawSimplicialComplex;
+    output.drawSweptVolume = input.drawSweptVolume;
+    output.drawMilestones = input.drawMilestones;
+    output.drawStartGoal = input.drawStartGoal;
+  }else{
+    _irobot = 0;
+    robot = world->robots[_irobot];
+    _icontroller = 0;
 
-  output.robot_idx = _irobot;
-  output.q_init = input.q_init;
-  output.q_goal= input.q_goal;
-  output.robot_idx = input.robot_idx;
-  output.robot = robot;
-  output.name_algorithm = input.name_algorithm;
-  output.drawTree = input.drawTree;
-  output.drawSimplicialComplex = input.drawSimplicialComplex;
-  output.drawSweptVolume = input.drawSweptVolume;
-  output.drawMilestones = input.drawMilestones;
-  output.drawStartGoal = input.drawStartGoal;
+    //output.robot_idx = _irobot;
+    //output.robot = robot;
+    output.drawTree = 0;
+    output.drawSimplicialComplex = 0;
+    output.drawSweptVolume = 0;
+    output.drawMilestones = 0;
+    output.drawStartGoal = 0;
+  }
+
 }
 PlannerOutput MotionPlanner::GetOutput(){
   return output;
@@ -124,8 +138,8 @@ void MotionPlanner::SerializeTree( const RoadmapPlanner& graph, SerializedTree& 
     for(uint k = 0; k < 3; k++) vnode(k) = snode.position(k);
 
     //TODO: do in O(n)
-    uint Nedges = graph.roadmap.edges.at(i).size();
-    uint Ncoedges = graph.roadmap.co_edges.at(i).size();
+    //uint Nedges = graph.roadmap.edges.at(i).size();
+    //uint Ncoedges = graph.roadmap.co_edges.at(i).size();
     //typedef typename std::list<EdgeData>::iterator EdgeDataPtr;
     //typedef std::map<int,EdgeDataPtr> EdgeList;
 

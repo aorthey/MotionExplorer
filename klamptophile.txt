@@ -706,7 +706,6 @@ overload crap. Don't sacrifice completeness, however.
     [x] fix one graph representation (e.g. boostgraph) which has lots of
 algorithms associated (at least dykstra)
 
-
 [x] install SBL lib
 [x] compute homology groups (HG) of SC
 [x] make bottle planning possible
@@ -743,8 +742,7 @@ good idea to add it. several new problems:
 
 [ ] how to define contact points and add arbitrary force when in contact?
 [ ] how to make and break contacts
-[ ] how to adapt sphere/capsule to new structure. it is completely different,
-how can that work?
+[ ] how to adapt sphere/capsule to new structure. it is completely different, how can that work?
 
 basically M0 has two cspaces which are glued together cyclically ad infinitum.
 Those cspaces are not the same. also the gluing operation has to be well defined

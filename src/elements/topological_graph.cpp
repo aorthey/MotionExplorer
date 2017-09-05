@@ -66,7 +66,7 @@ TopologicalGraph::TopologicalGraph(const ob::PlannerData& pd, const ob::Optimiza
     x=qomplRnSpace->values[0];
     y=qomplRnSpace->values[1];
     z=qomplRnSpace->values[2];
-    lwp.push_back(Weighted_point(Bare_point( x,y,z), 0.3));
+    lwp.push_back(Weighted_point(Bare_point( x,y,z), 0.1));
   }
 
   Fixed_alpha_shape_3  as(lwp.begin(), lwp.end(), 0);
