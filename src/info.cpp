@@ -55,17 +55,18 @@ void Info::operator()(RobotWorld *world){
 
   int ids = world->NumIDs();
 
+  std::cout << std::string(80, '-') << std::endl;
   for(int itr = 0; itr <= ids; itr++){
     std::cout << "[" << itr << "] " << world->GetName(itr) << std::endl;
   }
-  std::cout << std::string(80, '-') << std::endl;
 
   std::vector<SmartPointer<Robot> > robots = world->robots;
   std::vector<SmartPointer<Terrain> > terrains = world->terrains;
   for (std::vector<SmartPointer<Robot> >::iterator it = robots.begin() ; it != robots.end(); ++it){
-    std::cout << "Robot " << (*it)->name << std::endl;
+    std::cout << "*** " << std::string(80, '-') << std::endl;
+    std::cout << "*** " << " Robot " << (*it)->name << std::endl;
+    std::cout << "*** " << std::string(80, '-') << std::endl;
 
-    std::cout << std::string(80, '-') << std::endl;
     vector<string> linkNames = (*it)->linkNames;
     vector<RobotLink3D> links = (*it)->links;
     assert( links.size() == linkNames.size() );

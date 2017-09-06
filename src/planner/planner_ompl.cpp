@@ -17,30 +17,12 @@ void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd, CSpaceOMPL *cspace)
     const ob::State* state = v.getState();
     Config cc = cspace->OMPLStateToConfig(state);
 
-
-    //if(N>0){
-    //  const ob::SE3StateSpace::StateType *sSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-    //  x = sSE3->getX();
-    //  y = sSE3->getY();
-    //  z = sSE3->getZ();
-    //}else{
-    //  const ob::SE3StateSpace::StateType *sSE3 = s->as<ob::SE3StateSpace::StateType>();
-    //  const ob::SO3StateSpace::StateType *sSO3 = sSE3->rotation();
-    //  x = sSE3->getX();
-    //  y = sSE3->getY();
-    //  z = sSE3->getZ();
-
-    //}
     SerializedTreeNode snode;
     Config q;q.resize(6);q.setZero();
     for(uint k = 0; k < 6; k++){
       q(k) = cc(k);
     }
     snode.position = cc;
-    //double x(q(0)),y(q(1)),z(q(2));
-
-    //std::vector<uint> edgeList;
-    //uint Nedges = pd.getIncomingEdges (i, edgeList);
      
     std::vector<uint> edgeList;
     pd.getEdges(i, edgeList);
@@ -143,8 +125,8 @@ bool MotionPlannerOMPL::solve()
   SingleRobotCSpace* cspace_outer;
 
   //################################################################################
+  std::vector<int> idxs = input.robot_idxs;
   if(algorithm=="hierarchical"){
-    std::vector<int> idxs = input.robot_idxs;
     robot = world->robots[idxs.at(0)];
     robot->UpdateConfig(p_init);
 
@@ -153,7 +135,6 @@ bool MotionPlannerOMPL::solve()
       output.removable_robot_idxs.push_back(idxs.at(k));
     }
 
-    output.robot_idx = idxs.at(0);
 
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Hierarchical Planner: " << std::endl;
@@ -162,6 +143,23 @@ bool MotionPlannerOMPL::solve()
     std::cout << " Original       : idx " << output.robot_idx << " name " << robot->name << std::endl;
 
     //################################################################################
+    uint ridx = idxs.at(1);
+    robot = world->robots[ridx];
+    Robot *ri = robot;
+
+    output.robot_idx = ridx;
+    output.robot = ri;
+
+    Config qi = input.q_init;
+    Config qg = input.q_goal;
+    qi.resize(ri->q.size());
+    qg.resize(ri->q.size());
+
+    output.q_init = qi;
+    output.q_goal = qg;
+
+    robot->UpdateConfig(qi);
+
     if(input.freeFloating){
       std::cout <<  "FreeFloating" << std::endl;
       for(uint k = 1; k < idxs.size(); k++){
@@ -169,11 +167,9 @@ bool MotionPlannerOMPL::solve()
       }
       cspace_nested = new SingleRobotCSpace(*world,idxs.at(1),&worldsettings);
 
-      Robot *ri = cspace_nested->GetRobot();
-
-      output.robot = ri;
 
       cspace = factory.MakeGeometricCSpaceRotationalInvariance(ri, cspace_nested);
+
     //################################################################################
     }else{
       if(idxs.size() < 3){
@@ -189,11 +185,11 @@ bool MotionPlannerOMPL::solve()
 
       Robot *ri = cspace_inner->GetRobot();
       //Robot *ro = cspace_outer->GetRobot();
+      output.robot = ri;
 
       cspace = factory.MakeGeometricCSpaceRotationalInvariance(ri, cspace_inner);
 
       cspace = factory.MakeCSpaceDecoratorInnerOuter(cspace, cspace_outer);
-
 
     }
     //################################################################################
@@ -201,7 +197,11 @@ bool MotionPlannerOMPL::solve()
 
 //################################################################################
   }else{
-    int robot_idx = input.robot_idx;
+    if(idxs.size() < 1){
+      std::cout << "Planner requires at least one robot to plan with" << std::endl;
+      exit(0);
+    }
+    int robot_idx = input.robot_idxs.at(0);
     robot = world->robots[robot_idx];
 
     kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
@@ -329,7 +329,8 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
     for(uint i = 0; i < states.size(); i++)
     {
       ob::State *state = states.at(i);//path.getState(i);
-      int N = robot->q.size();
+
+      int N = cspace->GetDimensionality();
       Config cur = cspace->OMPLStateToConfig(state);
       if(N>cur.size()){
         Config qq;qq.resize(N);

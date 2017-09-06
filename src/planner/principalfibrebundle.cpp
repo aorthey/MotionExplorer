@@ -233,9 +233,6 @@ PrincipalFibreBundleOMPLValidityChecker::PrincipalFibreBundleOMPLValidityChecker
 bool PrincipalFibreBundleOMPLValidityChecker::isValid(const ob::State* state) const
 {
   Config q = ompl_space->OMPLStateToConfig(state);
-  //q(3)=1.57;
-  q(4)=0;
-  q(5)=0;
   bool feas = cspace_->IsFeasible(q) && si_->satisfiesBounds(state);
   return feas;
   // CSpace *space = cspace_;

@@ -343,73 +343,6 @@ void ForceFieldBackend::RenderWorld()
       RobotJointDriver driver = robot->drivers[i];
       //############################################################################
       if(driver.type == RobotJointDriver::Rotation){
-        /*
-        uint didx = driver.linkIndices[0];
-        uint lidx = driver.linkIndices[1];
-
-        Frame3D Tw = robot->links[lidx].T_World;
-        Vector3 pos = Tw*robot->links[lidx].com;
-        Vector3 dir = Tw*robot->links[didx].w - pos;
-
-        dir = 100*T(i)*dir/dir.norm();
-
-        double r = 0.01;
-
-        glPushMatrix();
-        glTranslate(pos);
-        drawCylinder(dir,r);
-
-        double theta_step = M_PI/4;
-        double dr = 0.1;
-        uint numSteps = 32;
-
-        float inc = fTwoPi/numSteps;
-        Vector3 eu,ev;
-        GetCanonicalBasis(dir,eu,ev);
-        Complex x,dx;
-        dx.setPolar(One,inc);
-        
-        x.set(dr,0);
-
-        for(i=0; i<2*numSteps/3; i++) {
-          Vector3 p0 = dir + x.x*eu + x.y*ev;
-          //glVertex3v(dir + x.x*eu+x.y*ev);
-          x=x*dx;
-          Vector3 p1 = dir + x.x*eu + x.y*ev;
-
-          glPushMatrix();
-          glTranslate(p0);
-          drawCylinder(p1-p0,dr/8);
-          glPopMatrix();
-        }
-
-        //glLineWidth(5);
-        //glBegin(GL_LINE_STRIP);
-        //for(i=0; i<2*numSteps/3; i++) {
-        //  glVertex3v(dir + x.x*eu+x.y*ev);
-        //  x=x*dx;
-        //}
-
-        if(T(i) < 0) {
-          x.set(dr,0);
-        }
-        glPushMatrix();
-        Vector3 rr = x.x*eu + x.y*ev;
-        Vector3 arrowS(dir + rr);
-
-        glTranslate(arrowS);
-        Vector3 coneori = cross(dir,rr);
-        coneori /= coneori.length();
-        if(T(i) < 0) {
-          coneori *= -1;
-        }
-        double length = dr/2;
-        GLDraw::drawCone(length*coneori, 0.5*length);
-        glPopMatrix();
-
-        //glPopMatrix();
-        glPopMatrix();
-        //*/
       }
     //############################################################################
       if(driver.type == RobotJointDriver::Translation){
@@ -465,6 +398,8 @@ void ForceFieldBackend::RenderWorld()
     if(drawPathStartGoal.at(i)){
       Config qi = plannerOutput.at(i).q_init;
       Config qg = plannerOutput.at(i).q_goal;
+      //std::cout << robot_i->name << std::endl;
+      //std::cout << qg << std::endl;
       GLDraw::drawGLPathStartGoal(robot_i, qi, qg);
     }
 

@@ -188,7 +188,7 @@ bool SweptVolume::Save(TiXmlElement *node)
   //###################################################################
   {
     TiXmlElement c("keyframes");
-    for(int i = 0; i < _keyframes.size(); i++){
+    for(uint i = 0; i < _keyframes.size(); i++){
       TiXmlElement cc("qitem");
       stringstream ss;
       ss<<_keyframes.at(i);
@@ -201,9 +201,9 @@ bool SweptVolume::Save(TiXmlElement *node)
   //###################################################################
   {
     TiXmlElement c("matrices");
-    for(int i = 0; i < _mats.size(); i++){
+    for(uint i = 0; i < _mats.size(); i++){
       TiXmlElement cc("matrixvector");
-      for(int j = 0; j < _mats.at(i).size(); j++){
+      for(uint j = 0; j < _mats.at(i).size(); j++){
         TiXmlElement ccc("matrix");
         stringstream ss;
         ss<<_mats.at(i).at(j);
@@ -218,7 +218,7 @@ bool SweptVolume::Save(TiXmlElement *node)
   //###################################################################
   {
     TiXmlElement c("keyframe_indices");
-    for(int i = 0; i < _keyframe_indices.size(); i++){
+    for(uint i = 0; i < _keyframe_indices.size(); i++){
       TiXmlElement cc("index");
       stringstream ss;
       ss<<_keyframe_indices.at(i);

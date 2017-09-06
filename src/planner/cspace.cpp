@@ -1,4 +1,5 @@
 #include "cspace.h"
+#include "validity_checker_ompl.h"
 
 CSpaceOMPL::CSpaceOMPL(Robot *robot_, CSpace *kspace_):
   robot(robot_), kspace(kspace_)
@@ -385,7 +386,8 @@ const oc::StatePropagatorPtr GeometricCSpaceOMPL::StatePropagatorPtr(oc::SpaceIn
 }
 const ob::StateValidityCheckerPtr GeometricCSpaceOMPL::StateValidityCheckerPtr(ob::SpaceInformationPtr si)
 {
-  return std::make_shared<PrincipalFibreBundleOMPLValidityChecker>(si, kspace, this);
+  //return std::make_shared<PrincipalFibreBundleOMPLValidityChecker>(si, kspace, this);
+  return std::make_shared<OMPLValidityChecker>(si, this, kspace);
 }
 const ob::StateValidityCheckerPtr GeometricCSpaceOMPL::StateValidityCheckerPtr(oc::SpaceInformationPtr si)
 {
@@ -826,34 +828,6 @@ const ob::StateValidityCheckerPtr KinodynamicCSpaceOMPL::StateValidityCheckerPtr
   std::cout << "KinodynamicCSpaceOMPL only supports OMPL control (oc::). You called OMPL geometric (ob::)" << std::endl;
   exit(0);
 }
-//#############################################################################
-//#############################################################################
-//#############################################################################
-
-//KinodynamicCSpaceOMPLInnerOuter::KinodynamicCSpaceOMPLInnerOuter(Robot *robot_inner_, CSpace *inner_, CSpace *outer_):
-//  KinodynamicCSpaceOMPL(robot_inner_, inner_), inner(inner_), outer(outer_){
-//
-//}
-//
-//const ob::StateValidityCheckerPtr KinodynamicCSpaceOMPLInnerOuter::StateValidityCheckerPtr(oc::SpaceInformationPtr si){
-//  return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, inner, outer);
-//}
-//
-//GeometricCSpaceOMPLInnerOuter::GeometricCSpaceOMPLInnerOuter(Robot *robot_inner_, CSpace *inner_, CSpace *outer_):
-//  GeometricCSpaceOMPL(robot_inner_, inner_), inner(inner_), outer(outer_){
-//}
-//const ob::StateValidityCheckerPtr GeometricCSpaceOMPLInnerOuter::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
-//  return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, inner, outer);
-//}
-//
-//GeometricCSpaceOMPLDecoratorInnerOuter::GeometricCSpaceOMPLDecoratorInnerOuter(GeometricCSpaceOMPL *geometric_cspace_, CSpace *outer_):
-//  geometric_cspace(geometric_cspace_), outer(outer_)
-//{
-//}
-//const ob::StateValidityCheckerPtr GeometricCSpaceOMPLDecoratorInnerOuter::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
-//  return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, geometric_cspace->kspace, outer);
-//}
-
 //#############################################################################
 //#############################################################################
 GeometricCSpaceOMPLRotationalInvariance::GeometricCSpaceOMPLRotationalInvariance(Robot *robot_, CSpace *space_):

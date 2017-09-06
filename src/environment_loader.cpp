@@ -177,8 +177,13 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       //set other nested robots
       for(uint k = 0; k < pin.robot_idxs.size(); k++){
         uint ik = pin.robot_idxs.at(k);
-        Robot *rk= world.robots[ik];
-
+        if(ik>=world.robots.size()){
+          std::cout << std::string(80, '>') << std::endl;
+          std::cout << ">>> [ERROR] Robot with idx " << ik << " does not exists." << std::endl;
+          std::cout << std::string(80, '>') << std::endl;
+          exit(1);
+        }
+        Robot *rk= world.robots.at(ik);
         for(int i = 0; i < 6; i++){
           rk->qMin[i] = pin.se3min[i];
           rk->qMax[i] = pin.se3max[i];
