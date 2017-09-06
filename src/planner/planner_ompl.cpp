@@ -140,12 +140,10 @@ bool MotionPlannerOMPL::solve()
     std::cout << "Hierarchical Planner: " << std::endl;
     std::cout << std::string(80, '-') << std::endl;
     std::cout << " Robots  " << std::endl;
-    std::cout << " Original       : idx " << output.robot_idx << " name " << robot->name << std::endl;
 
     //################################################################################
     uint ridx = idxs.at(1);
-    robot = world->robots[ridx];
-    Robot *ri = robot;
+    Robot *ri = world->robots[ridx];
 
     output.robot_idx = ridx;
     output.robot = ri;
@@ -158,16 +156,11 @@ bool MotionPlannerOMPL::solve()
     output.q_init = qi;
     output.q_goal = qg;
 
-    robot->UpdateConfig(qi);
-
+    for(uint k = 0; k < idxs.size(); k++){
+      std::cout << " Level" << k << "         : idx " << idxs.at(k) << " name " << world->robots[idxs.at(k)]->name << std::endl;
+    }
     if(input.freeFloating){
-      std::cout <<  "FreeFloating" << std::endl;
-      for(uint k = 1; k < idxs.size(); k++){
-        std::cout << " Level" << k << "         : idx " << idxs.at(k) << " name " << world->robots[idxs.at(k)]->name << std::endl;
-      }
       cspace_nested = new SingleRobotCSpace(*world,idxs.at(1),&worldsettings);
-
-
       cspace = factory.MakeGeometricCSpaceRotationalInvariance(ri, cspace_nested);
 
     //################################################################################
@@ -176,9 +169,6 @@ bool MotionPlannerOMPL::solve()
         std::cout << "algorithm workspace requires at least ORIGINAL robot, INNER SHELL, OUTER SHELL robot" << std::endl;
         exit(0);
       }
-
-      std::cout << " Level0[inner]  : idx " << idxs.at(1) << " name " << world->robots[idxs.at(1)]->name << std::endl;
-      std::cout << " Level0[outer]  : idx " << idxs.at(2) << " name " << world->robots[idxs.at(2)]->name << std::endl;
 
       cspace_inner = new SingleRobotCSpace(*world,idxs.at(1),&worldsettings);
       cspace_outer = new SingleRobotCSpace(*world,idxs.at(2),&worldsettings);
