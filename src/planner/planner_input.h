@@ -24,6 +24,7 @@ class PlannerInput{
     double epsilon_goalregion;
     double max_planning_time;
     double timestep_min, timestep_max;
+    int freeFloating;
 
     Config se3min;
     Config se3max;

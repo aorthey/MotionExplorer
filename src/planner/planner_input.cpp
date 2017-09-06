@@ -24,6 +24,7 @@ bool PlannerInput::load(TiXmlElement *node)
   TiXmlElement* node_timestep = FindSubNode(plannersettings, "timestep");
   TiXmlElement* node_max_planning_time = FindSubNode(plannersettings, "maxplanningtime");
   TiXmlElement* node_epsilon_goalregion = FindSubNode(plannersettings, "epsilongoalregion");
+  TiXmlElement* node_freeFloating = FindSubNode(plannersettings, "freeFloating");
 
   TiXmlElement* node_drawTree = FindSubNode(plannersettings, "drawTree");
   TiXmlElement* node_drawSimplicialComplex = FindSubNode(plannersettings, "drawSimplicialComplex");
@@ -49,6 +50,7 @@ bool PlannerInput::load(TiXmlElement *node)
     timestep_min= 0.01;
     timestep_max= 0.1;
   }
+  GetStreamText(node_freeFloating) >> freeFloating;
 
   GetStreamText(node_max_planning_time) >> max_planning_time;
   GetStreamText(node_epsilon_goalregion) >> epsilon_goalregion;

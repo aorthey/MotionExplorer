@@ -233,23 +233,18 @@ void GeometricCSpaceOMPL::print()
 ob::State* GeometricCSpaceOMPL::ConfigToOMPLStatePtr(const Config &q){
   ob::ScopedState<> qompl = this->ConfigToOMPLState(q);
 
-  //ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  //ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
-  //ob::RealVectorStateSpace::StateType *qomplRn = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-  ////double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
+  ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
+  ob::RealVectorStateSpace::StateType *qomplRn = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
 
-  //ob::State* out = space->allocState();
-  //ob::SE3StateSpace::StateType *outSE3 = out->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  //ob::SO3StateSpace::StateType *outSO3 = &outSE3->rotation();
-  //ob::RealVectorStateSpace::StateType *outRn = out->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-
-  //outSE3 = qomplSE3;
-  //outSO3 = qomplSO3;
-  //outRn = qomplRn;
   ob::State* out = space->allocState();
-  ob::SE3StateSpace::StateType *outSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  ob::SE3StateSpace::StateType *outSE3 = out->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
   ob::SO3StateSpace::StateType *outSO3 = &outSE3->rotation();
-  ob::RealVectorStateSpace::StateType *outRn = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+  ob::RealVectorStateSpace::StateType *outRn = out->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+
+  outSE3 = qomplSE3;
+  outSO3 = qomplSO3;
+  outRn = qomplRn;
 
   return out;
 }
@@ -835,77 +830,42 @@ const ob::StateValidityCheckerPtr KinodynamicCSpaceOMPL::StateValidityCheckerPtr
 //#############################################################################
 //#############################################################################
 
-class OMPLValidityCheckerInnerOuter: public ob::StateValidityChecker
-{
-  public:
-    OMPLValidityCheckerInnerOuter(const ob::SpaceInformationPtr &si, CSpaceOMPL *ompl_space_, CSpace *inner_, CSpace *outer_);
-    virtual bool isValid(const ob::State* state) const;
-    bool isCollisionFree(SingleRobotCSpace *space, Config q) const;
-
-    CSpace *inner;
-    CSpace *outer;
-    CSpaceOMPL *ompl_space;
-};
-
-OMPLValidityCheckerInnerOuter::OMPLValidityCheckerInnerOuter(const ob::SpaceInformationPtr &si, CSpaceOMPL *ompl_space_, CSpace *inner_, CSpace *outer_):
-  ob::StateValidityChecker(si), ompl_space(ompl_space_), inner(inner_), outer(outer_)
-{
-}
-bool OMPLValidityCheckerInnerOuter::isValid(const ob::State* state) const
-{
-  const ob::StateSpacePtr ssp = si_->getStateSpace();
-  Config q = ompl_space->OMPLStateToConfig(state);
-  SingleRobotCSpace* csi = static_cast<SingleRobotCSpace*>(inner);
-  SingleRobotCSpace* cso = static_cast<SingleRobotCSpace*>(outer);
-  return isCollisionFree(csi, q) && (!isCollisionFree(cso,q));
-}
-
-bool OMPLValidityCheckerInnerOuter::isCollisionFree(SingleRobotCSpace *space, Config q) const{
-  Robot* robot = space->GetRobot();
-  robot->UpdateConfig(q);
-  robot->UpdateGeometry();
-
-  //same as Singlerobotcspace but ignore other robots
-  int id = space->world.RobotID(space->index);
-  vector<int> idrobot(1,id);
-  vector<int> idothers;
-  for(size_t i=0;i<space->world.terrains.size();i++)
-    idothers.push_back(space->world.TerrainID(i));
-  for(size_t i=0;i<space->world.rigidObjects.size();i++)
-    idothers.push_back(space->world.RigidObjectID(i));
-
-  pair<int,int> res = space->settings->CheckCollision(space->world,idrobot,idothers);
-  if(res.first >= 0) return false;
-  res = space->settings->CheckCollision(space->world,idrobot);
-  if(res.first >= 0) return false;
-  return true;
-}
 //#############################################################################
 //#############################################################################
 //#############################################################################
 
-KinodynamicCSpaceOMPLInnerOuter::KinodynamicCSpaceOMPLInnerOuter(Robot *robot_inner_, CSpace *inner_, CSpace *outer_):
-  KinodynamicCSpaceOMPL(robot_inner_, inner_), inner(inner_), outer(outer_){
+//KinodynamicCSpaceOMPLInnerOuter::KinodynamicCSpaceOMPLInnerOuter(Robot *robot_inner_, CSpace *inner_, CSpace *outer_):
+//  KinodynamicCSpaceOMPL(robot_inner_, inner_), inner(inner_), outer(outer_){
+//
+//}
+//
+//const ob::StateValidityCheckerPtr KinodynamicCSpaceOMPLInnerOuter::StateValidityCheckerPtr(oc::SpaceInformationPtr si){
+//  return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, inner, outer);
+//}
+//
+//GeometricCSpaceOMPLInnerOuter::GeometricCSpaceOMPLInnerOuter(Robot *robot_inner_, CSpace *inner_, CSpace *outer_):
+//  GeometricCSpaceOMPL(robot_inner_, inner_), inner(inner_), outer(outer_){
+//}
+//const ob::StateValidityCheckerPtr GeometricCSpaceOMPLInnerOuter::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
+//  return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, inner, outer);
+//}
+//
+//GeometricCSpaceOMPLDecoratorInnerOuter::GeometricCSpaceOMPLDecoratorInnerOuter(GeometricCSpaceOMPL *geometric_cspace_, CSpace *outer_):
+//  geometric_cspace(geometric_cspace_), outer(outer_)
+//{
+//}
+//const ob::StateValidityCheckerPtr GeometricCSpaceOMPLDecoratorInnerOuter::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
+//  return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, geometric_cspace->kspace, outer);
+//}
 
+//#############################################################################
+//#############################################################################
+GeometricCSpaceOMPLRotationalInvariance::GeometricCSpaceOMPLRotationalInvariance(Robot *robot_, CSpace *space_):
+  GeometricCSpaceOMPL(robot_, space_)
+{
 }
 
-const ob::StateValidityCheckerPtr KinodynamicCSpaceOMPLInnerOuter::StateValidityCheckerPtr(oc::SpaceInformationPtr si){
-  return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, inner, outer);
-}
-GeometricCSpaceOMPLInnerOuter::GeometricCSpaceOMPLInnerOuter(Robot *robot_inner_, CSpace *inner_, CSpace *outer_):
-  GeometricCSpaceOMPL(robot_inner_, inner_), inner(inner_), outer(outer_){
-
-}
-
-const ob::StateValidityCheckerPtr GeometricCSpaceOMPLInnerOuter::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
-  return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, inner, outer);
-}
-
-GeometricCSpaceOMPLInnerOuterRotationalInvariance::GeometricCSpaceOMPLInnerOuterRotationalInvariance(Robot *robot_inner_, CSpace *inner_, CSpace *outer_):
-  GeometricCSpaceOMPLInnerOuter(robot_inner_, inner_, outer_){
-
-}
-void GeometricCSpaceOMPLInnerOuterRotationalInvariance::initSpace()
+void GeometricCSpaceOMPLRotationalInvariance::initSpace()
 {
   //###########################################################################
   // Create OMPL state space
@@ -961,7 +921,7 @@ void GeometricCSpaceOMPLInnerOuterRotationalInvariance::initSpace()
   boundsR3.check();
 
 }
-void GeometricCSpaceOMPLInnerOuterRotationalInvariance::print()
+void GeometricCSpaceOMPLRotationalInvariance::print()
 {
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "OMPL CSPACE" << std::endl;
@@ -989,13 +949,13 @@ void GeometricCSpaceOMPLInnerOuterRotationalInvariance::print()
   std::cout << std::string(80, '-') << std::endl;
 }
 
-ob::State* GeometricCSpaceOMPLInnerOuterRotationalInvariance::ConfigToOMPLStatePtr(const Config &q){
+ob::State* GeometricCSpaceOMPLRotationalInvariance::ConfigToOMPLStatePtr(const Config &q){
   ob::ScopedState<> qompl = this->ConfigToOMPLState(q);
   ob::State* out = space->allocState();
   ob::RealVectorStateSpace::StateType *outRn = qompl->as<ob::RealVectorStateSpace::StateType>();
   return out;
 }
-ob::ScopedState<> GeometricCSpaceOMPLInnerOuterRotationalInvariance::ConfigToOMPLState(const Config &q){
+ob::ScopedState<> GeometricCSpaceOMPLRotationalInvariance::ConfigToOMPLState(const Config &q){
   ob::ScopedState<> qompl(space);
 
   ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::RealVectorStateSpace::StateType>();
@@ -1006,7 +966,7 @@ ob::ScopedState<> GeometricCSpaceOMPLInnerOuterRotationalInvariance::ConfigToOMP
   return qompl;
 }
 
-Config GeometricCSpaceOMPLInnerOuterRotationalInvariance::OMPLStateToConfig(const ob::State *qompl){
+Config GeometricCSpaceOMPLRotationalInvariance::OMPLStateToConfig(const ob::State *qompl){
   const ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::RealVectorStateSpace::StateType>();
   //double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
   Config q;q.resize(6);q.setZero();
@@ -1017,7 +977,7 @@ Config GeometricCSpaceOMPLInnerOuterRotationalInvariance::OMPLStateToConfig(cons
 
 }
 
-Config GeometricCSpaceOMPLInnerOuterRotationalInvariance::OMPLStateToConfig(const ob::ScopedState<> &qompl){
+Config GeometricCSpaceOMPLRotationalInvariance::OMPLStateToConfig(const ob::ScopedState<> &qompl){
   const ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::RealVectorStateSpace::StateType>();
   //double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
   Config q;q.resize(6);q.setZero();

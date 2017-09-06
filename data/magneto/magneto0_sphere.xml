@@ -8,6 +8,13 @@
 
   <terrain  name="sphere.tri" file="/home/aorthey/git/orthoklampt/data/terrains/sphereworld.tri" translation="0 0 0" kFriction="0.0"/>
 
+  <!--
+  <gui>
+    <drawTerrainFaces>1</drawTerrainFaces>
+    <drawTerrainEdges>0</drawTerrainEdges>
+  </gui>
+  -->
+
   <plannersettings>
 
     <qinit config="8 0 0 1.07 3.14159 -1.57 3.14159 1.57 0 "/>

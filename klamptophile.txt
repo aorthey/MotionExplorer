@@ -732,7 +732,6 @@ compute shortest paths. Iterate through all solutions.
 [ ] add non-convexity
 [ ] add magnets
 
-
 [x] magneto: 2-dof, 2 magnet robot
 [x] reset does not work on all robots
 [ ] simulate a magnetic-contact. read klampt tutorial about humanoid robot with
@@ -744,16 +743,16 @@ good idea to add it. several new problems:
 [ ] how to make and break contacts
 [ ] how to adapt sphere/capsule to new structure. it is completely different, how can that work?
 
-basically M0 has two cspaces which are glued together cyclically ad infinitum.
-Those cspaces are not the same. also the gluing operation has to be well defined
-by make/break a magnet.
-
-M2 has the same principal, but now the cspaces are plane segments, and gluing
-might be along line segments embedded in the plane segments.
-
 [ ] can we design a controller which moves M0 around a great arc of an arbitrary sphere?
 [ ] do the same, but for M2
 [ ] add drawFace/drawEdge to terrain XML file
-[ ] remove orientation sampling for rotational invariant shapes
+[x] remove orientation sampling for rotational invariant shapes
 
 [ ] shortest path not really shortest path, what is wrong there?
+[ ] some parts of simplicial complex penetrate the surface. does it have to do
+with collision checker used?
+[ ] have <gui></gui> environment to set variables
+
+
+[ ] bottle requires different planner because physics is different: innerouter
+vs. normal

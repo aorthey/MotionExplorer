@@ -33,8 +33,8 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawCenterOfMassPath = 1;
 
   drawRigidObjects = 1;
-  drawRigidObjectsEdges = 1;
-  drawRigidObjectsFaces = 0;
+  drawRigidObjectsEdges = 0;
+  drawRigidObjectsFaces = 1;
 
   drawAxes = 0;
   drawAxesLabels = 0;

@@ -4,6 +4,7 @@
    <robot name="bottle" file="/home/aorthey/git/orthoklampt/data/bottle/bottle.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
    <robot name="bottle_sphere" file="/home/aorthey/git/orthoklampt/data/bottle/bottle_sphere.urdf" translation="0 0 -200" rotateRPY="0 0 0"/>
+
    <robot name="bottle_capsule" file="/home/aorthey/git/orthoklampt/data/bottle/bottle_capsule.urdf" translation="0 0 -200" rotateRPY="0 0 0"/>
 
   <rigidObject  name="twohole.tri" file="/home/aorthey/git/orthoklampt/data/bottle/twohole.tri" translation="0 1.5 -1"/>
@@ -19,13 +20,16 @@
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.1</epsilongoalregion>
     <maxplanningtime>1</maxplanningtime>
-    <algorithm>ompl:rrt</algorithm>
+    <algorithm>hierarchical</algorithm>
     <drawMilestones>0</drawMilestones>
     <drawSweptVolume>1</drawSweptVolume>
     <drawStartGoal>1</drawStartGoal>
     <drawTree>0</drawTree>
+    <freeFloating>1</freeFloating>
     <robot>
       <index>0</index>
+      <index>1</index>
+      <index>2</index>
     </robot>
 
   </plannersettings>

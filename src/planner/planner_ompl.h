@@ -1,9 +1,9 @@
 #pragma once
-
 #include "planner/planner.h"
 #include "planner/principalfibrebundle.h"
 #include "planner/omplklamptconverter.h"
 #include "planner/cspace.h"
+#include "planner/cspace_decorator.h"
 #include "util.h"
 #include "elements/topological_graph.h"
 

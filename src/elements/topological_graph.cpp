@@ -79,6 +79,8 @@ TopologicalGraph::TopologicalGraph(const ob::PlannerData& pd, const ob::Optimiza
                Fixed_alpha_shape_3::INTERIOR);
   as.get_alpha_shape_cells(std::back_inserter(cells),
                Fixed_alpha_shape_3::REGULAR);
+  as.get_alpha_shape_cells(std::back_inserter(cells),
+               Fixed_alpha_shape_3::SINGULAR);
 
   as.get_alpha_shape_facets(std::back_inserter(facets),
                 Fixed_alpha_shape_3::REGULAR);

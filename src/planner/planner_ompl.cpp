@@ -136,10 +136,11 @@ bool MotionPlannerOMPL::solve()
   GeometricCSpaceOMPL* cspace;
 
   SingleRobotCSpace* kcspace;
+  SingleRobotCSpace* cspace_nested;
   SingleRobotCSpace* cspace_inner;
   SingleRobotCSpace* cspace_outer;
-
-  if(algorithm=="workspace"){
+  //################################################################################
+  if(algorithm=="hierarchical"){
     std::vector<int> idxs = input.robot_idxs;
     robot = world->robots[idxs.at(0)];
     robot->UpdateConfig(p_init);
@@ -149,41 +150,58 @@ bool MotionPlannerOMPL::solve()
       output.removable_robot_idxs.push_back(idxs.at(k));
     }
 
-    if(idxs.size() < 3){
-      std::cout << "algorithm workspace requires at least ORIGINAL robot, INNER SHELL, OUTER SHELL robot" << std::endl;
-      exit(0);
-    }
-
-    std::cout << "Workspace Planner: " << std::endl;
-    std::cout << " Robots  " << std::endl;
-    std::cout << " Original       : idx " << idxs.at(0) << " name " << robot->name << std::endl;
-    std::cout << " Level0[inner]  : idx " << idxs.at(1) << " name " << world->robots[idxs.at(1)]->name << std::endl;
-    std::cout << " Level0[outer]  : idx " << idxs.at(2) << " name " << world->robots[idxs.at(2)]->name << std::endl;
-
-    cspace_inner = new SingleRobotCSpace(*world,idxs.at(1),&worldsettings);
-    cspace_outer = new SingleRobotCSpace(*world,idxs.at(2),&worldsettings);
-
-    Robot *ri = cspace_inner->GetRobot();
-    Robot *ro = cspace_outer->GetRobot();
-    std::cout << ri->name << std::endl;
-    std::cout << ro->name << std::endl;
-
     output.robot_idx = idxs.at(0);
-    output.robot = ri;
 
-    //goal/init needs to be >infeasible< for outer shell (robot in contact /w at
-    //least one link)
-    //if(IsFeasible( ro, *cspace_outer, p_init)) return false;
-    //if(IsFeasible( ro, *cspace_outer, p_goal)) return false;
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "Hierarchical Planner: " << std::endl;
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << " Robots  " << std::endl;
+    std::cout << " Original       : idx " << output.robot_idx << " name " << robot->name << std::endl;
 
-    cspace = factory.MakeGeometricCSpaceInnerOuterRotationalInvariance(ri, cspace_inner, cspace_outer);
+    //################################################################################
+    if(input.freeFloating){
+      std::cout <<  "FreeFloating" << std::endl;
+      for(uint k = 1; k < idxs.size(); k++){
+        std::cout << " Level" << k << "         : idx " << idxs.at(k) << " name " << world->robots[idxs.at(k)]->name << std::endl;
+      }
+      cspace_nested = new SingleRobotCSpace(*world,idxs.at(1),&worldsettings);
+
+      Robot *ri = cspace_nested->GetRobot();
+
+      output.robot = ri;
+
+      cspace = factory.MakeGeometricCSpaceRotationalInvariance(ri, cspace_nested);
+    //################################################################################
+    }else{
+      if(idxs.size() < 3){
+        std::cout << "algorithm workspace requires at least ORIGINAL robot, INNER SHELL, OUTER SHELL robot" << std::endl;
+        exit(0);
+      }
+
+      std::cout << " Level0[inner]  : idx " << idxs.at(1) << " name " << world->robots[idxs.at(1)]->name << std::endl;
+      std::cout << " Level0[outer]  : idx " << idxs.at(2) << " name " << world->robots[idxs.at(2)]->name << std::endl;
+
+      cspace_inner = new SingleRobotCSpace(*world,idxs.at(1),&worldsettings);
+      cspace_outer = new SingleRobotCSpace(*world,idxs.at(2),&worldsettings);
+
+      Robot *ri = cspace_inner->GetRobot();
+      //Robot *ro = cspace_outer->GetRobot();
+
+      output.robot = ri;
+
+      cspace = factory.MakeGeometricCSpaceRotationalInvariance(ri, cspace_inner);
+
+      //cspace must be near environment
+      cspace = new GeometricCSpaceOMPLDecoratorInnerOuter(cspace, cspace_outer);
+    }
+    //################################################################################
     input.name_algorithm = "ompl:rrt";
 
+//################################################################################
   }else{
     int robot_idx = input.robot_idx;
     robot = world->robots[robot_idx];
 
-    //GeometricCSpaceOMPL* cspace = factory.MakeGeometricCSpace(robot, &kcspace);
     kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
 
     if(!IsFeasible( robot, *kcspace, p_init)) return false;
@@ -191,6 +209,9 @@ bool MotionPlannerOMPL::solve()
 
     cspace = factory.MakeGeometricCSpace(robot, kcspace);
   }
+//################################################################################
+
+
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "Planning for robot " << robot->name << std::endl;
   cspace->print();
