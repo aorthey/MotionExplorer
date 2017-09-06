@@ -24,7 +24,7 @@
     <drawMilestones>0</drawMilestones>
     <drawSweptVolume>1</drawSweptVolume>
     <drawStartGoal>1</drawStartGoal>
-    <drawTree>0</drawTree>
+    <drawTree>1</drawTree>
     <freeFloating>1</freeFloating>
     <robot>
       <index>0</index>

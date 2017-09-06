@@ -25,7 +25,8 @@
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.0</epsilongoalregion>
     <maxplanningtime>0.5</maxplanningtime>
-    <algorithm>workspace</algorithm>
+    <algorithm>hierarchical</algorithm>
+    <freeFloating>0</freeFloating>
 
     <drawMilestones>0</drawMilestones>
     <drawSweptVolume>0</drawSweptVolume>

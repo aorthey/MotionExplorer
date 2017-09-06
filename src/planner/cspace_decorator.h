@@ -1,34 +1,39 @@
+#pragma once
 #include "cspace.h"
 
-class GeometricCSpaceOMPLDecorator: public GeometricCSpaceOMPL
+class CSpaceOMPLDecorator: public CSpaceOMPL
 {
   public:
-    GeometricCSpaceOMPLDecorator(GeometricCSpaceOMPL*);
+    CSpaceOMPLDecorator(CSpaceOMPL*);
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si);
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si);
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
 
     virtual void initSpace();
     virtual void initControlSpace();
+    virtual void print();
 
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
     virtual ob::State* ConfigToOMPLStatePtr(const Config &q);
 
     virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
     virtual Config OMPLStateToConfig(const ob::State *qompl);
-
-    Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState);
-
-    virtual void print();
-
+    virtual const ob::StateSpacePtr SpacePtr();
+    virtual const oc::RealVectorControlSpacePtr ControlSpacePtr();
+    virtual uint GetDimensionality();
+    virtual uint GetControlDimensionality();
+    virtual void SetPlannerInput(PlannerInput &input_);
+    virtual Robot* GetRobotPtr();
+    virtual CSpace* GetCSpacePtr();
   protected:
-    GeometricCSpaceOMPL *geometric_cspace;
+    CSpaceOMPL *cspace_ompl;
 };
 
-class GeometricCSpaceOMPLDecoratorInnerOuter: public GeometricCSpaceOMPLDecorator
+class CSpaceOMPLDecoratorInnerOuter: public CSpaceOMPLDecorator
 {
   public:
-    GeometricCSpaceOMPLDecoratorInnerOuter(GeometricCSpaceOMPL *geometric_cspace_, CSpace *outer_);
+    CSpaceOMPLDecoratorInnerOuter(CSpaceOMPL *_cspace_, CSpace *outer_);
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
   private:
     CSpace *outer;

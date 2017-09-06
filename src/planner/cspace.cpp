@@ -830,10 +830,6 @@ const ob::StateValidityCheckerPtr KinodynamicCSpaceOMPL::StateValidityCheckerPtr
 //#############################################################################
 //#############################################################################
 
-//#############################################################################
-//#############################################################################
-//#############################################################################
-
 //KinodynamicCSpaceOMPLInnerOuter::KinodynamicCSpaceOMPLInnerOuter(Robot *robot_inner_, CSpace *inner_, CSpace *outer_):
 //  KinodynamicCSpaceOMPL(robot_inner_, inner_), inner(inner_), outer(outer_){
 //

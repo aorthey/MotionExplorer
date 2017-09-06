@@ -1,4 +1,5 @@
 #include "planner_ompl.h"
+#include "planner/cspace_factory.h"
 #include <ompl/base/GenericParam.h>
 #include <ompl/base/PlannerDataGraph.h>
 
@@ -133,12 +134,14 @@ bool MotionPlannerOMPL::solve()
 
   CSpaceFactory factory(input);
   //KinodynamicCSpaceOMPL* cspace;
-  GeometricCSpaceOMPL* cspace;
+  CSpaceOMPL* cspace;
+  //GeometricCSpaceOMPL* cspace_invariant;
 
   SingleRobotCSpace* kcspace;
   SingleRobotCSpace* cspace_nested;
   SingleRobotCSpace* cspace_inner;
   SingleRobotCSpace* cspace_outer;
+
   //################################################################################
   if(algorithm=="hierarchical"){
     std::vector<int> idxs = input.robot_idxs;
@@ -187,12 +190,11 @@ bool MotionPlannerOMPL::solve()
       Robot *ri = cspace_inner->GetRobot();
       //Robot *ro = cspace_outer->GetRobot();
 
-      output.robot = ri;
-
       cspace = factory.MakeGeometricCSpaceRotationalInvariance(ri, cspace_inner);
 
-      //cspace must be near environment
-      cspace = new GeometricCSpaceOMPLDecoratorInnerOuter(cspace, cspace_outer);
+      cspace = factory.MakeCSpaceDecoratorInnerOuter(cspace, cspace_outer);
+
+
     }
     //################################################################################
     input.name_algorithm = "ompl:rrt";
@@ -210,10 +212,6 @@ bool MotionPlannerOMPL::solve()
     cspace = factory.MakeGeometricCSpace(robot, kcspace);
   }
 //################################################################################
-
-
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Planning for robot " << robot->name << std::endl;
   cspace->print();
   return solve_geometrically(cspace);
 }

@@ -1,44 +1,70 @@
 #include "planner/cspace_decorator.h"
 #include "planner/validity_checker_ompl.h"
 
-GeometricCSpaceOMPLDecorator::GeometricCSpaceOMPLDecorator(GeometricCSpaceOMPL* geometric_cspace_)
+CSpaceOMPLDecorator::CSpaceOMPLDecorator(CSpaceOMPL* cspace_ompl_):
+  CSpaceOMPL(cspace_ompl_->GetRobotPtr(), cspace_ompl_->GetCSpacePtr())
 {
-  geometric_cspace = geometric_cspace_;
+  cspace_ompl = cspace_ompl_;
+
 }
-const oc::StatePropagatorPtr GeometricCSpaceOMPLDecorator::StatePropagatorPtr(oc::SpaceInformationPtr si){
-  return geometric_cspace->StatePropagatorPtr(si);
+const oc::StatePropagatorPtr CSpaceOMPLDecorator::StatePropagatorPtr(oc::SpaceInformationPtr si){
+  return cspace_ompl->StatePropagatorPtr(si);
 }
-const ob::StateValidityCheckerPtr GeometricCSpaceOMPLDecorator::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
-  return geometric_cspace->StateValidityCheckerPtr(si);
+const ob::StateValidityCheckerPtr CSpaceOMPLDecorator::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
+  return cspace_ompl->StateValidityCheckerPtr(si);
 }
-void GeometricCSpaceOMPLDecorator::initSpace(){
-  geometric_cspace->initSpace();
+const ob::StateValidityCheckerPtr CSpaceOMPLDecorator::StateValidityCheckerPtr(oc::SpaceInformationPtr si){
+  return cspace_ompl->StateValidityCheckerPtr(si);
 }
-void GeometricCSpaceOMPLDecorator::initControlSpace(){
-  geometric_cspace->initControlSpace();
+ob::ScopedState<> CSpaceOMPLDecorator::ConfigToOMPLState(const Config &q){
+  return cspace_ompl->ConfigToOMPLState(q);
 }
-ob::ScopedState<> GeometricCSpaceOMPLDecorator::ConfigToOMPLState(const Config &q){
-  return geometric_cspace->ConfigToOMPLState(q);
+ob::State* CSpaceOMPLDecorator::ConfigToOMPLStatePtr(const Config &q){
+  return cspace_ompl->ConfigToOMPLStatePtr(q);
 }
-ob::State* GeometricCSpaceOMPLDecorator::ConfigToOMPLStatePtr(const Config &q){
-  return geometric_cspace->ConfigToOMPLStatePtr(q);
+Config CSpaceOMPLDecorator::OMPLStateToConfig(const ob::ScopedState<> &qompl){
+  return cspace_ompl->OMPLStateToConfig(qompl);
 }
-Config GeometricCSpaceOMPLDecorator::OMPLStateToConfig(const ob::ScopedState<> &qompl){
-  return geometric_cspace->OMPLStateToConfig(qompl);
+Config CSpaceOMPLDecorator::OMPLStateToConfig(const ob::State *qompl){
+  return cspace_ompl->OMPLStateToConfig(qompl);
 }
-Config GeometricCSpaceOMPLDecorator::OMPLStateToConfig(const ob::State *qompl){
-  return geometric_cspace->OMPLStateToConfig(qompl);
+void CSpaceOMPLDecorator::initSpace(){
+  cspace_ompl->initSpace();
 }
-Config GeometricCSpaceOMPLDecorator::OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState){
-  return geometric_cspace->OMPLStateToConfig(qomplSE3, qomplRnState);
+void CSpaceOMPLDecorator::initControlSpace(){
+  cspace_ompl->initControlSpace();
 }
-void GeometricCSpaceOMPLDecorator::print(){
-  geometric_cspace->print();
+void CSpaceOMPLDecorator::print(){
+  cspace_ompl->print();
 }
-GeometricCSpaceOMPLDecoratorInnerOuter::GeometricCSpaceOMPLDecoratorInnerOuter(GeometricCSpaceOMPL *geometric_cspace_, CSpace *outer_):
-  GeometricCSpaceOMPLDecorator(geometric_cspace_), outer(outer_)
+const ob::StateSpacePtr CSpaceOMPLDecorator::SpacePtr(){
+  return cspace_ompl->SpacePtr();
+}
+const oc::RealVectorControlSpacePtr CSpaceOMPLDecorator::ControlSpacePtr(){
+  return cspace_ompl->ControlSpacePtr();
+}
+uint CSpaceOMPLDecorator::GetDimensionality(){
+  return cspace_ompl->GetDimensionality();
+}
+uint CSpaceOMPLDecorator::GetControlDimensionality(){
+  return cspace_ompl->GetControlDimensionality();
+}
+void CSpaceOMPLDecorator::SetPlannerInput(PlannerInput &input_){
+  cspace_ompl->SetPlannerInput(input_);
+}
+Robot* CSpaceOMPLDecorator::GetRobotPtr(){
+  return cspace_ompl->GetRobotPtr();
+}
+CSpace* CSpaceOMPLDecorator::GetCSpacePtr(){
+  return cspace_ompl->GetCSpacePtr();
+}
+
+//#############################################################################
+
+CSpaceOMPLDecoratorInnerOuter::CSpaceOMPLDecoratorInnerOuter(CSpaceOMPL *cspace_ompl_, CSpace *outer_):
+  CSpaceOMPLDecorator(cspace_ompl_), outer(outer_)
 {
 }
-const ob::StateValidityCheckerPtr GeometricCSpaceOMPLDecoratorInnerOuter::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
-  return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, geometric_cspace->GetCSpacePtr(), outer);
+const ob::StateValidityCheckerPtr CSpaceOMPLDecoratorInnerOuter::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
+  return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, cspace_ompl->GetCSpacePtr(), outer);
 }
