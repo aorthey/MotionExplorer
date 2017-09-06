@@ -155,33 +155,6 @@ class KinodynamicCSpaceOMPL: public CSpaceOMPL
     virtual void print();
 };
 
-//KinodynamicCSpaceOMPLInnerOuter: same as KinodynamicCSpaceOMPL but there is
-//one more robot added. This robot is called outer shell robot. A configuration
-//is valid iff the original robot is feasible AND the outer shell robot is
-//infeasible. In this case the original robot can be in contact with the
-//environment. 
-//
-
-//class KinodynamicCSpaceOMPLInnerOuter: public KinodynamicCSpaceOMPL
-//{
-//  public:
-//    KinodynamicCSpaceOMPLInnerOuter(Robot *robot_inner, CSpace *inner, CSpace *outer);
-//
-//    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si);
-//
-//    CSpace *inner;
-//    CSpace *outer;
-//};
-//class GeometricCSpaceOMPLInnerOuter: public GeometricCSpaceOMPL
-//{
-//  public:
-//    GeometricCSpaceOMPLInnerOuter(Robot *robot_inner, CSpace *inner, CSpace *outer);
-//    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
-//
-//    CSpace *inner;
-//    CSpace *outer;
-//};
-//
 class GeometricCSpaceOMPLRotationalInvariance: public GeometricCSpaceOMPL
 {
   public:
@@ -193,34 +166,3 @@ class GeometricCSpaceOMPLRotationalInvariance: public GeometricCSpaceOMPL
     virtual Config OMPLStateToConfig(const ob::State *qompl);
     virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
 };
-
-
-//class GeometricCSpaceOMPLDecoratorInnerOuter: public GeometricCSpaceOMPL
-//{
-//  public:
-//    GeometricCSpaceOMPLInnerOuter(GeometricCSpaceOMPL *geometric_cspace, CSpace *outer);
-//    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
-//    GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_);
-//
-//    virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si);
-//    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
-//
-//    virtual void initSpace();
-//    virtual void initControlSpace();
-//
-//    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
-//    virtual ob::State* ConfigToOMPLStatePtr(const Config &q);
-//
-//    virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
-//    virtual Config OMPLStateToConfig(const ob::State *qompl);
-//
-//    Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState);
-//
-//    virtual void print();
-//
-//  protected:
-//    bool hasRealVectorSpace;
-//
-//    GeometricCSpaceOMPL *cspace_ompl;
-//    CSpace *outer;
-//};
