@@ -255,9 +255,9 @@ void ForceFieldBackend::Start()
 void ForceFieldBackend::RenderWorld()
 {
   DEBUG_GL_ERRORS()
-  glDisable(GL_LIGHTING);
-  glDisable(GL_BLEND);
 
+  glDisable(GL_LIGHTING);
+  glEnable(GL_BLEND); 
   drawDesired=0;
 
   for(size_t i=0;i<world->terrains.size();i++){
@@ -310,6 +310,8 @@ void ForceFieldBackend::RenderWorld()
       }
     }
   }
+  glEnable(GL_LIGHTING);
+  glDisable(GL_BLEND); 
 
   BaseT::RenderWorld();
 
@@ -679,7 +681,6 @@ void ForceFieldBackend::AddPlannerOutput( PlannerOutput pout )
     Robot *rk = world->robots[idx];
     sim.odesim.DeleteRobot( rk->name.c_str() );
   }
-  //
 }
 
 void ForceFieldBackend::SendPlannerOutputToController()

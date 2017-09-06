@@ -20,8 +20,9 @@
     <maxplanningtime>1</maxplanningtime>
     <algorithm>hierarchical</algorithm>
     <drawMilestones>0</drawMilestones>
-    <drawSweptVolume>0</drawSweptVolume>
+    <drawSweptVolume>1</drawSweptVolume>
     <drawStartGoal>1</drawStartGoal>
+    <drawSimplicialComplex>1</drawSimplicialComplex>
     <drawTree>0</drawTree>
     <freeFloating>1</freeFloating>
     <robot>
