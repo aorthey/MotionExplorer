@@ -103,7 +103,7 @@ bool MotionPlannerOMPL::solve()
 
   assert(p_init.size() == p_goal.size());
 
-  robot->UpdateConfig(p_init);
+  //robot->UpdateConfig(p_init);
   this->world->InitCollisions();
   std::cout << input << std::endl;
 
@@ -124,29 +124,39 @@ bool MotionPlannerOMPL::solve()
   SingleRobotCSpace* cspace_inner;
   SingleRobotCSpace* cspace_outer;
 
-  //################################################################################
   std::vector<int> idxs = input.robot_idxs;
+
+  //################################################################################
   if(algorithm=="hierarchical"){
     robot = world->robots[idxs.at(0)];
     robot->UpdateConfig(p_init);
+
+    for(uint k = 0; k < idxs.size(); k++){
+      uint ridx = idxs.at(k);
+      output.nested_idx.push_back(ridx);
+      Robot *rk = world->robots[ridx];
+
+      Config qi = p_init; qi.resize(rk->q.size());
+      Config qg = p_goal; qg.resize(rk->q.size());
+
+      output.nested_q_init.push_back(qi);
+      output.nested_q_goal.push_back(qg);
+    }
 
     //remove all nested robots except the original one
     for(uint k = 1; k < idxs.size(); k++){
       output.removable_robot_idxs.push_back(idxs.at(k));
     }
 
-
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Hierarchical Planner: " << std::endl;
     std::cout << std::string(80, '-') << std::endl;
     std::cout << " Robots  " << std::endl;
 
-    //################################################################################
     uint ridx = idxs.at(1);
     Robot *ri = world->robots[ridx];
 
     output.robot_idx = ridx;
-    output.robot = ri;
 
     Config qi = input.q_init;
     Config qg = input.q_goal;
@@ -159,6 +169,9 @@ bool MotionPlannerOMPL::solve()
     for(uint k = 0; k < idxs.size(); k++){
       std::cout << " Level" << k << "         : idx " << idxs.at(k) << " name " << world->robots[idxs.at(k)]->name << std::endl;
     }
+
+    output.robot = ri;
+
     if(input.freeFloating){
       cspace_nested = new SingleRobotCSpace(*world,idxs.at(1),&worldsettings);
       cspace = factory.MakeGeometricCSpaceRotationalInvariance(ri, cspace_nested);
@@ -173,14 +186,9 @@ bool MotionPlannerOMPL::solve()
       cspace_inner = new SingleRobotCSpace(*world,idxs.at(1),&worldsettings);
       cspace_outer = new SingleRobotCSpace(*world,idxs.at(2),&worldsettings);
 
-      Robot *ri = cspace_inner->GetRobot();
-      //Robot *ro = cspace_outer->GetRobot();
-      output.robot = ri;
 
       cspace = factory.MakeGeometricCSpaceRotationalInvariance(ri, cspace_inner);
-
       cspace = factory.MakeCSpaceDecoratorInnerOuter(cspace, cspace_outer);
-
     }
     //################################################################################
     input.name_algorithm = "ompl:rrt";
@@ -307,12 +315,12 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
 
     ss.simplifySolution();
     og::PathGeometric path = ss.getSolutionPath();
+    //og::PathSimplifier shortcutter(si);
+    //shortcutter.shortcutPath(path);
+
     path.interpolate();
 
     std::cout << "Path Length     : " << path.length() << std::endl;
-
-    og::PathSimplifier shortcutter(si);
-    shortcutter.shortcutPath(path);
 
     std::vector<ob::State *> states = path.getStates();
     std::vector<Config> keyframes;

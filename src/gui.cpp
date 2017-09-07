@@ -436,10 +436,8 @@ void ForceFieldBackend::RenderWorld()
  
 void ForceFieldBackend::RenderScreen(){
   BaseT::RenderScreen();
-  //Robot *robot = world->robots[0];
 
   int line_x_pos = 20;
-
   int line_y_offset = 60;
   int line_y_offset_stepsize = 20;
 
@@ -492,6 +490,19 @@ void ForceFieldBackend::RenderScreen(){
   line_y_offset += line_y_offset_stepsize;
   DrawTextVector(line_x_pos, line_y_offset, "Cmd Torque :", T);
   line_y_offset += line_y_offset_stepsize;
+
+  DrawText(line_x_pos, line_y_offset, "[MotionPlanner]");
+  line_y_offset += line_y_offset_stepsize;
+
+  std::vector<int> bn = plannerOutput.at(0).cmplx.betti_numbers;
+  line = "Betti      ";
+  line+=(" b0: ["+std::to_string(bn[0])+"]");
+  line+=(" b1: ["+std::to_string(bn[1])+"]");
+  line+=(" b2: ["+std::to_string(bn[2])+"]");
+
+  DrawText(line_x_pos, line_y_offset, line);
+  line_y_offset += line_y_offset_stepsize;
+
 }
 
 void ForceFieldBackend::DrawTextVector(double xpos, double ypos, const char* prefix, Vector &v){
@@ -501,6 +512,28 @@ void ForceFieldBackend::DrawTextVector(double xpos, double ypos, const char* pre
   line += ss.str();
   DrawText(xpos, ypos,line);
 }
+
+void ForceFieldBackend::DrawText(int x,int y, std::string s)
+{
+  //GLUT_BITMAP_8_BY_13
+  //GLUT_BITMAP_9_BY_15
+  //GLUT_BITMAP_TIMES_ROMAN_10
+  //GLUT_BITMAP_TIMES_ROMAN_24
+  //GLUT_BITMAP_HELVETICA_10
+  //GLUT_BITMAP_HELVETICA_12
+  //GLUT_BITMAP_HELVETICA_18
+
+  void* font = GLUT_BITMAP_HELVETICA_18;
+  glPushMatrix();
+  glColor3f(0,0,0);
+  //glDisable(GL_LIGHTING);
+  glDisable(GL_DEPTH_TEST);
+  glRasterPos2i(x,y);
+  glutBitmapString(font,s.c_str());
+  glEnable(GL_DEPTH_TEST);
+  glPopMatrix();
+}
+
 
 
 void ForceFieldBackend::VisualizeStartGoal(const Config &p_init, const Config &p_goal)
@@ -733,36 +766,36 @@ void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, con
   _frameLength.push_back(frameLength);
 }
 
-void ForceFieldBackend::AddPathInterpolate(const std::vector<Config> &keyframes, GLColor color, uint Nkeyframes_alongpath)
-{
-  std::vector<Config> interp_keyframes;
-  double minimal_distance = 0.1;
-  for(uint i = 0; i < keyframes.size()-1; i++){
-    Config q1= keyframes.at(i);
-    Config q2= keyframes.at(i+1);
-    interp_keyframes.push_back(q1);
-    double d = (q2-q1).norm();
-    std::cout << std::string(80, '-') << std::endl; 
-    std::cout << q1 << std::endl;
-    std::cout << q2 << std::endl;
-    std::cout << d << std::endl;
-
-    if(d > minimal_distance){
-      uint Npts = floor(d/minimal_distance);
-      std::cout << Npts << std::endl;
-      //std::cout << q1 << std::endl;
-      for(uint j = 0; j < Npts; j++){
-        Config qj = q1 + j*(minimal_distance/d)*(q2-q1);
-        //std::cout << qj << std::endl;
-        interp_keyframes.push_back(qj);
-      }
-      //exit(0);
-    }
-  }
-  interp_keyframes.push_back(keyframes.back());
-
-  AddPath(interp_keyframes, color, Nkeyframes_alongpath);
-}
+//void ForceFieldBackend::AddPathInterpolate(const std::vector<Config> &keyframes, GLColor color, uint Nkeyframes_alongpath)
+//{
+//  std::vector<Config> interp_keyframes;
+//  double minimal_distance = 0.1;
+//  for(uint i = 0; i < keyframes.size()-1; i++){
+//    Config q1= keyframes.at(i);
+//    Config q2= keyframes.at(i+1);
+//    interp_keyframes.push_back(q1);
+//    double d = (q2-q1).norm();
+//    std::cout << std::string(80, '-') << std::endl; 
+//    std::cout << q1 << std::endl;
+//    std::cout << q2 << std::endl;
+//    std::cout << d << std::endl;
+//
+//    if(d > minimal_distance){
+//      uint Npts = floor(d/minimal_distance);
+//      std::cout << Npts << std::endl;
+//      //std::cout << q1 << std::endl;
+//      for(uint j = 0; j < Npts; j++){
+//        Config qj = q1 + j*(minimal_distance/d)*(q2-q1);
+//        //std::cout << qj << std::endl;
+//        interp_keyframes.push_back(qj);
+//      }
+//      //exit(0);
+//    }
+//  }
+//  interp_keyframes.push_back(keyframes.back());
+//
+//  AddPath(interp_keyframes, color, Nkeyframes_alongpath);
+//}
 void ForceFieldBackend::AddPath(const std::vector<Config> &keyframes, GLColor color, uint Nkeyframes_alongpath, uint robot_idx)
 {
   Robot *robot = world->robots[robot_idx];
@@ -785,27 +818,6 @@ void ForceFieldBackend::SetIKCollisions( vector<int> linksInCollision )
   drawIKextras = 1;
 }
 
-void ForceFieldBackend::DrawText(int x,int y, std::string s)
-{
-  //GLUT_BITMAP_8_BY_13
-  //GLUT_BITMAP_9_BY_15
-  //GLUT_BITMAP_TIMES_ROMAN_10
-  //GLUT_BITMAP_TIMES_ROMAN_24
-  //GLUT_BITMAP_HELVETICA_10
-  //GLUT_BITMAP_HELVETICA_12
-  //GLUT_BITMAP_HELVETICA_18
-
-  void* font = GLUT_BITMAP_HELVETICA_18;
-  glPushMatrix();
-  glColor3f(0,0,0);
-  //glDisable(GL_LIGHTING);
-  glDisable(GL_DEPTH_TEST);
-  glRasterPos2i(x,y);
-  glutBitmapString(font,s.c_str());
-  glEnable(GL_DEPTH_TEST);
-  glPopMatrix();
-}
-
 bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
   std::cout << "OnCommand: " << cmd << std::endl;
@@ -825,13 +837,25 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     if(plannerOutput.size()>0){
       std::cout << "Reseting all robots to first planner output" << std::endl;
       for(uint k = 0; k < world->robots.size(); k++){
-        Robot* robot = world->robots[k];
-        if(plannerOutput.at(0).robot_idx == k){
-          Config q = plannerOutput.at(0).q_init;
+
+        Robot* robot = world->robots.at(k);
+        uint ridx = plannerOutput.at(0).nested_idx.at(0);
+        if(ridx == k){
+          Config q = plannerOutput.at(0).nested_q_init.at(0);
           robot->UpdateConfig(q);
           robot->UpdateGeometry();
           std::cout << "reseting robot " << robot->name << " to " << robot->q << std::endl;
         }
+
+        //for(uint j = 0; j < plannerOutput.at(0).nested_idx.size(); j++){
+        //  uint ridx = plannerOutput.at(0).nested_idx.at(j);
+        //  if(ridx == k){
+        //    Config q = plannerOutput.at(0).nested_q_init.at(j);
+        //    robot->UpdateConfig(q);
+        //    robot->UpdateGeometry();
+        //    std::cout << "reseting robot " << robot->name << " to " << robot->q << std::endl;
+        //  }
+        //}
       }
     }else{
       for(uint k = 0; k < world->robots.size(); k++){
@@ -1102,9 +1126,7 @@ bool GLUIForceFieldGUI::Initialize()
 //            "{type:button_toggle,button:do_contact_wrench_logging,checked:1}","log_contact_wrenches","simtest_wrench_log.csv",
 //            "{type:button_toggle,button:do_contact_wrench_logging,checked:0}","log_contact_wrenches","",
 
-
   return true;
-
 }
 
 void GLUIForceFieldGUI::AddButton(const char *key){

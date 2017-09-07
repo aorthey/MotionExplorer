@@ -753,6 +753,9 @@ good idea to add it. several new problems:
 with collision checker used?
 [ ] have <gui></gui> environment to set variables
 
-
 [ ] bottle requires different planner because physics is different: innerouter
 vs. normal
+
+Technical Problems
+[ ] computing betti numbers works, but how do we get the associated edges?
+[ ] how to compute shortest path of several H classes

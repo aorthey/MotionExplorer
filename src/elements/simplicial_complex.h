@@ -17,5 +17,6 @@ struct SimplicialComplex{
   std::vector<std::vector<Math3D::Vector3> > F;
   std::vector<std::vector<Math3D::Vector3> > T;
   std::vector<Math3D::Vector3> path;
+  std::vector<int> betti_numbers;
 };
 

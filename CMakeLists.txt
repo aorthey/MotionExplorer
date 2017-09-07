@@ -6,31 +6,17 @@ set(ORTHOKLAMPT_MAJOR_VERSION 0)
 set(ORTHOKLAMPT_MINOR_VERSION 1)
 set(ORTHOKLAMPT_PATCH_VERSION 0)
 set(ORTHOKLAMPT_VERSION ${ORTHOKLAMPT_MAJOR_VERSION}.${ORTHOKLAMPT_MINOR_VERSION}.${ORTHOKLAMPT_PATCH_VERSION})
-MESSAGE("${CMAKE_MODULE_PATH}")
+
+SET(KLAMPT_ROOT /home/aorthey/git/Klampt/)
+LIST(APPEND CMAKE_MODULE_PATH "${KLAMPT_ROOT}/CMakeModules")
 LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules")
 INCLUDE(CMakeColors)
-set(CMAKE_CXX_COMPILER "g++-5")
-#set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-
-
-###############################################################################
-SET(KLAMPT_ROOT /home/aorthey/git/Klampt/)
-###############################################################################
-
-SET (CMAKE_MODULE_PATH "${KLAMPT_ROOT}/CMakeModules")
-
-#FIND_PACKAGE(CGAL REQUIRED)
-#INCLUDE( ${CGAL_USE_FILE} )
-
-cmake_policy(SET CMP0015 NEW)
-#FIND_PACKAGE(SBL REQUIRED)
-#if ( SBL_FOUND )
-#  INCLUDE(${SBL_USE_FILE}) 
-#endif()
-#INCLUDE_DIRECTORIES("/usr/local/sbl/Core/Betti_numbers/include/")
-#INCLUDE_DIRECTORIES(${SBL_DIR})
-
 MESSAGE(COLOR_WHITE ${DEPENDENCIES})
+set(CMAKE_CXX_COMPILER "g++-5")
+
+###############################################################################
+MESSAGE("${CMAKE_MODULE_PATH}")
+###############################################################################
 
 SET(DEPENDENCIES ${DEPENDENCIES} OMPL)
 FOREACH(DEPENDENCY ${DEPENDENCIES})
@@ -49,6 +35,32 @@ SET(DEPENDENCIES ${DEPENDENCIES} KLAMPT)
 
 FIND_PACKAGE(Boost 1.55.0 REQUIRED COMPONENTS filesystem thread serialization system)
 SET(DEPENDENCIES ${DEPENDENCIES} Boost)
+
+#cmake_policy(SET CMP0015 NEW)
+#SET(SBL_USE_LIBS ESBTL CGAL MPFR GMP Boost)
+#if ( SBL_FOUND )
+#  INCLUDE(${SBL_USE_FILE}) 
+#endif()
+INCLUDE_DIRECTORIES("/usr/local/sbl/Core/Betti_numbers/include/")
+#INCLUDE_DIRECTORIES(${SBL_DIR})
+#set(SBL_INTERNAL_ARCHITECTURE OFF)
+#set(SBL_FOUND TRUE)
+#if(EXISTS ${SBL_DIR}/UseSBL.cmake)
+# set(SBL_CMAKE_DIR "${SBL_DIR}")
+#  MESSAGE("1")
+# set(SBL_USE_FILE "${SBL_CMAKE_DIR}/UseSBL.cmake")
+#else()
+#  if(EXISTS ${SBL_DIR}/cmake/Modules/UseSBL.cmake)
+#   set(SBL_CMAKE_DIR "${SBL_DIR}/cmake/Modules")
+#   set(SBL_USE_FILE "${SBL_CMAKE_DIR}/UseSBL.cmake")
+#  else()
+#    if(EXISTS ${SBL_DIR}/share/cmake/Modules/UseSBL.cmake)
+#     set(SBL_CMAKE_DIR "${SBL_DIR}/share/cmake/Modules")
+#     set(SBL_USE_FILE "${SBL_CMAKE_DIR}/UseSBL.cmake")
+#    endif()
+#  endif()
+#endif()
+#FIND_PACKAGE(SBL REQUIRED)
 
 MESSAGE(COLOR_WHITE "-------------------------------------")
 MESSAGE(COLOR_WHITE "-- INCLUDING DEPENDENCIES")

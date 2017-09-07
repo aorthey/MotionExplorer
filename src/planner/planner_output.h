@@ -18,7 +18,16 @@ class PlannerOutput{
   public:
 
     uint robot_idx;
+
+    std::vector<int> nested_idx;
+    std::vector<Config> nested_q_init;
+    std::vector<Config> nested_q_goal;
+
+    //all nested robots should not be simulated, they will later be discarded
+    //from ODE simulator
     std::vector<int> removable_robot_idxs;
+
+    std::vector<int> betti_numbers_lvl0;
 
     std::string name_robot;
     std::string name_algorithm;

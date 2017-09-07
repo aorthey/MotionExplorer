@@ -17,10 +17,7 @@
 #include <Library/KrisLibrary/math/vector.h>
 #include <Library/KrisLibrary/math3d/primitives.h>
 
-//#include <SBL/GT/Betti_numbers_2.hpp>
-//#include <SBL/CADS/Dijkstra_shortest_paths_with_landmarks.hpp>
-//typedef SBL::GT::T_Betti_numbers_2<Fixed_alpha_shape_3>                        Betti_numbers_2;
-//typedef SBL::CADS::T_Dijkstra_shortest_paths_with_landmarks<Graph, Landmark_functor>  Dijkstra;
+#include <SBL/GT/Betti_numbers_2.hpp>
 
 #include <ompl/base/Cost.h>
 
@@ -46,6 +43,8 @@ typedef Fixed_alpha_shape_3::Facet                          Facet;
 typedef Fixed_alpha_shape_3::Edge                           Edge;
 typedef K::Weighted_point_3                                 Weighted_point;
 typedef K::Point_3                                          Bare_point;
+
+typedef SBL::GT::T_Betti_numbers_2<Fixed_alpha_shape_3>                        Betti_numbers_2;
 
 
 TopologicalGraph::TopologicalGraph(const ob::PlannerData& pd, const ob::OptimizationObjective& obj){
@@ -153,44 +152,22 @@ TopologicalGraph::TopologicalGraph(const ob::PlannerData& pd, const ob::Optimiza
     }
     cmplx.T.push_back(V);
   }
-  //Betti_numbers_2 betti;
-  //Betti_numbers_2::result_type res = betti(as);
+//http://sbl.inria.fr/doc/Betti_numbers-user-manual.html
+  Betti_numbers_2 betti;
+  Betti_numbers_2::result_type res = betti(as);
   //std::cout << "Number of input spheres: " << as.number_of_vertices() << std::endl;
   //std::cout << "Betti numbers: " << res.get<0>() << " " << res.get<1>() << " " << res.get<2>() << std::endl;
 
-  ////dijkstra_shortest_paths(g, s,
-  ////                        predecessor_map(boost::make_iterator_property_map(p.begin(), get(boost::vertex_index, g))).
-  ////                        distance_map(boost::make_iterator_property_map(d.begin(), get(boost::vertex_index, g))));
-  //dijkstra_shortest_paths(g, s, predecessor_map(&p[0]).distance_map(&d[0]));
-
-  //std::cout << "distances and parents:" << std::endl;
-  //Vertex vi, vend;
-  //for (boost::tie(vi, vend) = vertices(g); vi != vend; ++vi) {
-  //  std::cout << "distance(" << name[*vi] << ") = " << d[*vi] << ", ";
-  //  std::cout << "parent(" << name[*vi] << ") = " << name[p[*vi]] << std::
-  //    endl;
-  //}
+  cmplx.betti_numbers.push_back(res.get<0>());
+  cmplx.betti_numbers.push_back(res.get<1>());
+  cmplx.betti_numbers.push_back(res.get<2>());
 
   ComputeShortestPaths(pd, obj);
-  //exit(0);
-
-
-
 
 }
 SimplicialComplex& TopologicalGraph::GetSimplicialComplex(){
   return cmplx;
 }
-
-//http://sbl.inria.fr/doc/Betti_numbers-user-manual.html
-//OR: from lwp 
-//#include <SBL/GT/Betti_numbers_2.hpp>
-//  typedef SBL::GT::T_Betti_numbers_2<Fixed_alpha_shape_3>                        Betti_numbers_2;
-//  Betti_numbers_2 betti;
-//  Betti_numbers_2::result_type res = betti(as);
-//  std::cout << "Number of input spheres: " << as.number_of_vertices() << std::endl;
-//  std::cout << "Betti numbers: " << res.get<0>() << " " << res.get<1>() << " " << res.get<2>() << std::endl;
-//  exit(0);
 
 using Vertex = ob::PlannerData::Graph::Vertex;
 using VIterator = ob::PlannerData::Graph::VIterator;
@@ -199,46 +176,19 @@ using Graph = ob::PlannerData::Graph;
 
 using namespace boost;
 typedef boost::property_map<Graph, vertex_index_t>::type IndexMap;
-//typedef boost::property_map<Graph, boost::vertex_name_t>::type NameMap;
-
-//typedef boost::property<vertex_type_t, ompl::base::PlannerDataVertex *,
-//                boost::property<boost::vertex_index_t, unsigned int>> VertexProperty;
-//typedef boost::property<edge_type_t, ompl::base::PlannerDataEdge *,
-//                boost::property<boost::edge_weight_t, ompl::base::Cost>>> EdgeProperty;
-//
-
 typedef boost::iterator_property_map<Vertex*, IndexMap, Vertex, Vertex&> PredecessorMap;
 typedef boost::iterator_property_map<int*, IndexMap, int, int&> DistanceMap;
-
-//using PlannerDataGraph =
-//    boost::adjacency_list<boost::vecS, boost::vecS, boost::bidirectionalS, VertexProperty, EdgeProperty> 
-
-
-class Landmark_functor {
-public:
-  bool operator()(Vertex v, Graph& G)const {
-    return false;
-  }
-};
 
 void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob::OptimizationObjective& opt){
 
   Graph g = pd.toBoostGraph();
 
-  //std::vector<Vertex> predecessors(num_vertices(g));
   std::vector<double> distances(num_vertices(g));
-
-  IndexMap index_map = get(vertex_index, g);
-  //PredecessorMap predecessorMap(&predecessors[0], index_map);
-  //DistanceMap distanceMap(&distances[0], index_map);
-
 
   EIterator ei, ei_end;
   VIterator vi, vi_end;
   ob::PlannerDataVertex vs = pd.getStartVertex(0);
   ob::PlannerDataVertex vg = pd.getGoalVertex(0);
-  //const ob::State* ss = vs.getState();
-  //const ob::State* sg = vg.getState();
 
   std::cout << "SimplicialComplex: vertices: " << num_vertices(g) << std::endl;
   std::cout << "                      edges: " << num_edges(g) << std::endl;
@@ -293,10 +243,6 @@ void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob:
       ob::PlannerDataVertex vi = pd.getVertex(*it);
       const ob::State* si = vi.getState();
       double x,y,z;
-      //const ob::SE3StateSpace::StateType *sSE3 = si->as<ob::SE3StateSpace::StateType>();
-      //x = sSE3->getX();
-      //y = sSE3->getY();
-      //z = sSE3->getZ();
       const ob::RealVectorStateSpace::StateType *qomplRnSpace = si->as<ob::RealVectorStateSpace::StateType>();
       x = qomplRnSpace->values[0];
       y = qomplRnSpace->values[1];
@@ -306,25 +252,6 @@ void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob:
       cmplx.path.push_back(v3);
   }
   std::cout << std::endl;
-
-  //VIterator vd;
-
-  //how to access a vertex
-  //for(int i = 0; i < predecessors.size(); i++){
-    //std::cout << "distance: " << predecessors.at(i) << std::endl;
-  //}
-//      boost::vector_property_map<Vertex> prev(boost::num_vertices(g_));
-//    boost::dijkstra_shortest_paths(g_, root_, boost::predecessor_map(prev));
-//    if (prev[goal_] != goal_)
-//    {
-//        auto h(std::make_shared<PathGeometric>(si_));
-//        for (Vertex pos = prev[goal_]; prev[pos] != pos; pos = prev[pos])
-//            h->append(stateProperty_[pos]);
-//        h->reverse();
-//        hpath_ = h;
-//    }
-
-
 
 
 }
