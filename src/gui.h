@@ -170,6 +170,9 @@ class ForceFieldBackend : public SimTestBackend
     int drawRigidObjectsEdges;
     int drawRigidObjectsFaces;
 
+    int planner_layer;
+    int planner_layer_robot_idx;
+
     void toggle(int &k){
       if(k) k=0;
       else k=1;

@@ -34,10 +34,15 @@ SweptVolume::SweptVolume(Robot *robot, const std::vector<Config> &keyframes, uin
     _appearanceStack[i]=a;
   }
 
-  for(int i = 0; i < keyframes.size(); i++)
+  for(uint i = 0; i < keyframes.size(); i++)
   {
     Config q = keyframes.at(i);
-    AddKeyframe(q);
+
+    Config qq; qq.resize(robot->q.size()); qq.setZero();
+    for(uint k = 0; k < q.size(); k++){
+      qq(k) = q(k);
+    }
+    AddKeyframe(qq);
   }
   if(keyframes.size()>0){
     init = _keyframes.front();

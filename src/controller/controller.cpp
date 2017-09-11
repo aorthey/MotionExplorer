@@ -50,7 +50,7 @@ void ControllerState::PredictCOM( double tstep, uint Nsteps){
   //predict COM forward assuming that we are in uniform force field
   Vector3 com = com_window.back();
   Vector3 LM = linmomentum_window.back();
-  Vector3 AM = angmomentum_window.back();
+  //Vector3 AM = angmomentum_window.back();
 
   double dt = tstep;
   double dt2 = tstep*tstep*0.5;
@@ -85,15 +85,23 @@ void ControllerState::Reset(){
 //################################################################################
 
 ContactStabilityController::ContactStabilityController(Robot& robot) : RobotController(robot) {
-  //nominalTimeStep = 0.001;
 }
 ContactStabilityController::~ContactStabilityController() {}
 const char* ContactStabilityController::Type() const { return "ContactStabilityController"; }
 
 void ContactStabilityController::Reset() { 
-  std::cout << "["<<Type() << "] Reset" << std::endl;
   output.Reset();
   RobotController::Reset(); 
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "["<<Type() << "] Reset" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+
+  uint Nsensors = sensors->sensors.size();
+  std::cout << "Sensors : " << std::endl;
+  for(uint i = 0; i < Nsensors; i++){
+    std::cout << "         " << sensors->sensors.at(i)->name << std::endl;
+  }
+  std::cout << std::string(80, '-') << std::endl;
 } 
 
 const ControllerState& ContactStabilityController::GetControllerState() const {
@@ -108,18 +116,10 @@ void ContactStabilityController::Update(Real dt) {
   Vector qcmd,vcmd;
   Vector qactual,vactual;
 
-  //GetCommandedConfig(qcmd);  //convenience function in RobotController
-  //GetCommandedVelocity(vcmd);  //convenience function in RobotController
+  GetCommandedConfig(qcmd);  //convenience function in RobotController
+  GetCommandedVelocity(vcmd);  //convenience function in RobotController
   GetSensedConfig(qactual);  //convenience function in RobotController
   GetSensedVelocity(vactual);  //convenience function in RobotController
-
-  //std::cout << "config: " << qcmd << std::endl;
-  //std::cout << "velocity: " << vcmd << std::endl;
-
-  //uint Nsensors = sensors->sensors.size();
-  //for(int i = 0; i < Nsensors; i++){
-  //  std::cout << sensors->sensors.at(i)->name << std::endl;
-  //}
 
   Vector3 com = robot.GetCOM();
   Vector3 LM = robot.GetLinearMomentum();
@@ -131,7 +131,6 @@ void ContactStabilityController::Update(Real dt) {
 
   if(torques.size()>0){
     output.current_torque = ZeroTorque;
-    //uint N = torques.at(0).size();
 
     uint ictr = 0;
     double t = 0;

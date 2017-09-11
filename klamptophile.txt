@@ -709,12 +709,12 @@ algorithms associated (at least dykstra)
 [x] install SBL lib
 [x] compute homology groups (HG) of SC
 [x] make bottle planning possible
-[ ] changing between visuals changes colors/linewidth of other visuals, but shouldn't.
+[x] visualize internal holes
+[x] changing between visuals changes colors/linewidth of other visuals, but shouldn't.
+
 [ ] take simplicial complex (SC), compute retraction.
 [ ] visualize different retraction levels of SC
 [ ] compute representative paths of some cycles
-
-[ ] visualize internal holes
 
 [x] ompl cannot deal with zero dimensions
 [ ] compute shortest paths in each homotopy class
@@ -728,34 +728,38 @@ before starting OMPL, there are always problems with that)
 [ ] have one complete system for rigid link: add arbitrary nested robots.
 compute shortest paths. Iterate through all solutions.
 
-[ ] add 1-dof
-[ ] add non-convexity
-[ ] add magnets
-
 [x] magneto: 2-dof, 2 magnet robot
 [x] reset does not work on all robots
+[x] remove orientation sampling for rotational invariant shapes
+[x] bottle requires different planner because physics is different: innerouter vs. normal
+
+Contacts 
+[ ] How to make the contact decisions inside the controller?
+[ ] most important point is how the hierarchy would work with a contact point
 [ ] simulate a magnetic-contact. read klampt tutorial about humanoid robot with
 infinite force contact. how to selectively activate/deactivate?
-
-good idea to add it. several new problems:
-
 [ ] how to define contact points and add arbitrary force when in contact?
 [ ] how to make and break contacts
 [ ] how to adapt sphere/capsule to new structure. it is completely different, how can that work?
-
 [ ] can we design a controller which moves M0 around a great arc of an arbitrary sphere?
 [ ] do the same, but for M2
-[ ] add drawFace/drawEdge to terrain XML file
-[x] remove orientation sampling for rotational invariant shapes
 
-[ ] shortest path not really shortest path, what is wrong there?
-[ ] some parts of simplicial complex penetrate the surface. does it have to do
-with collision checker used?
+General
+[ ] add drawFace/drawEdge to terrain XML file
 [ ] have <gui></gui> environment to set variables
 
-[ ] bottle requires different planner because physics is different: innerouter
-vs. normal
+Rigid Body
+[ ] have one working algorithm for rigid body case
+  [ ] computing betti numbers works, but how do we get the associated edges?
+  [ ] some parts of simplicial complex penetrate the surface. does it have to do with collision checker used?
+  [ ] how to compute shortest path of several H classes
+[ ] compute Hclasses for just the sphere
+[ ] compute Hclasses for just the capsule
+[ ] going up and down the hierarchy
 
-Technical Problems
-[ ] computing betti numbers works, but how do we get the associated edges?
-[ ] how to compute shortest path of several H classes
+[ ] how to compute all shortest paths? What if there is a sphere in the
+environment, would we classify into up/down paths? Like going over sphere/ under
+sphere?
+What if there are two exactly similar shortest path around a sphere. I.e. there
+are >TWO< unique shortest paths (in the same homotopy class)
+

@@ -24,7 +24,7 @@
     <se3max config="6   5  4  3 3.141593 1.57 3.141593"/>
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.0</epsilongoalregion>
-    <maxplanningtime>5</maxplanningtime>
+    <maxplanningtime>0.5</maxplanningtime>
     <algorithm>hierarchical</algorithm>
     <freeFloating>0</freeFloating>
 

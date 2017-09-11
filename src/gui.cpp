@@ -170,6 +170,9 @@ void ForceFieldBackend::Start()
   BaseT::Start();
   Robot *robot = world->robots[0];
 
+  planner_layer_robot_idx = plannerOutput.at(0).nested_idx.at(0);
+  planner_layer = 0;
+
   settings["dragForceMultiplier"] = 500.0;
   drawContacts = 0;
   drawWrenches = 1;
@@ -394,19 +397,19 @@ void ForceFieldBackend::RenderWorld()
 
   for(uint i = 0; i < plannerOutput.size(); i++){
 
-    uint ridx = plannerOutput.at(i).robot_idx;
-    Robot *robot_i = world->robots[ridx];
+    //uint ridx = plannerOutput.at(i).robot_idx;
+
+    Robot *robot_i = world->robots[planner_layer_robot_idx];
+    std::cout << "drawing robot " << robot_i->name << std::endl;
 
     if(drawPathStartGoal.at(i)){
       Config qi = plannerOutput.at(i).q_init;
       Config qg = plannerOutput.at(i).q_goal;
-      //std::cout << robot_i->name << std::endl;
-      //std::cout << qg << std::endl;
       GLDraw::drawGLPathStartGoal(robot_i, qi, qg);
     }
 
     if(drawPathSweptVolume.at(i)){
-      SweptVolume sv = plannerOutput.at(i).GetSweptVolume();
+      SweptVolume sv = plannerOutput.at(i).GetSweptVolume(robot_i);
       GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
     }
 
@@ -508,7 +511,7 @@ void ForceFieldBackend::RenderScreen(){
 void ForceFieldBackend::DrawTextVector(double xpos, double ypos, const char* prefix, Vector &v){
   stringstream ss;
   std::string line(prefix);
-  ss << v;
+  ss << fixed << left << showpos << setprecision(6) << v;
   line += ss.str();
   DrawText(xpos, ypos,line);
 }
@@ -934,6 +937,16 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     std::cout << "Changed Mode to: "<<click_mode << std::endl;
   }else if(cmd=="print_config") {
     std::cout << world->robots[0]->q <<std::endl;
+  }else if(cmd=="toggle_layer") {
+    int Nlayer = plannerOutput.at(0).nested_idx.size();
+    if(planner_layer < Nlayer-1){
+      planner_layer++;
+    }else{
+      planner_layer = 0;
+    }
+    planner_layer_robot_idx = plannerOutput.at(0).nested_idx.at(planner_layer);
+    std::cout << "Switched to hierarchy level " << planner_layer << " (Robot: ";
+    std::cout << planner_layer_robot_idx << " name " << world->robots[planner_layer_robot_idx]->name  << ")" << std::endl;  
   }else return BaseT::OnCommand(cmd,args);
 
   SendRefresh();
@@ -1096,6 +1109,8 @@ bool GLUIForceFieldGUI::Initialize()
   AddToKeymap("3","draw_forceellipsoid");
   AddToKeymap("4","draw_distance_robot_terrain");
   AddToKeymap("5","draw_com_path");
+
+  AddToKeymap("l","toggle_layer");
 
   AddToKeymap("q","draw_minimal");
   AddToKeymap("T","toggle_mode");

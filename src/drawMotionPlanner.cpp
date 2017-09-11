@@ -481,7 +481,9 @@ namespace GLDraw{
 
 
   void drawRobotAtConfig(Robot *robot, const Config &q, GLColor color, double scale){
-    robot->UpdateConfig(q);
+    Config qq; qq.resize(robot->q.size());qq.setZero();
+    for(int k = 0; k < q.size(); k++) qq(k)=q(k);
+    robot->UpdateConfig(qq);
     for(uint j=0;j<robot->links.size();j++) {
       if(robot->IsGeometryEmpty(j)) continue;
       Matrix4 mat = robot->links[j].T_World;

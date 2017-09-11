@@ -71,6 +71,8 @@ class PlannerOutput{
 
     SweptVolume& GetSweptVolume();
     SwathVolume& GetSwathVolume();
+    SweptVolume& GetSweptVolume(Robot *robot_);
+    SweptVolume& GetSwathVolume(Robot *robot_);
 
     void VerticesToFile();
 

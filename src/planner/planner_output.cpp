@@ -74,6 +74,19 @@ SweptVolume& PlannerOutput::GetSweptVolume(){
   }
   return *sv;
 }
+SweptVolume& PlannerOutput::GetSweptVolume(Robot *robot_){
+  sv = new SweptVolume(robot_, q, drawMilestones);
+  return *sv;
+}
+SweptVolume& PlannerOutput::GetSwathVolume(Robot *robot_){
+  vector<Config> qs;
+  for(uint i = 0; i < _stree.size(); i++){
+    SerializedTreeNode node = _stree.at(i);
+    qs.push_back(node.position);
+  }
+  swv = new SwathVolume(robot_, qs);
+  return *sv;
+}
 SwathVolume& PlannerOutput::GetSwathVolume(){
   if(!swv){
     vector<Config> qs;
