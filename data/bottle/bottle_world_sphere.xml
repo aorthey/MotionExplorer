@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+
+<world>
+   <robot name="bottle" file="/home/aorthey/git/orthoklampt/data/bottle/bottle.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+   <robot name="bottle_sphere" file="/home/aorthey/git/orthoklampt/data/bottle/bottle_sphere.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+   <rigidObject name="sphere.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/sphere.tri" translation="0 0 0"/>
+   <!--
+-->
+
+  <plannersettings>
+
+    <qinit config="9  0 -2 0 -2.0 +0.6 0.3 0 0 0"/>
+    <qgoal config="9  0 +2 0 -0.8 -0.6 0.0 0 0 0"/>
+    <se3min config="6  -2 -4 -1 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  2 4 1 3.141593 1.57 3.141593"/>
+    <timestep min="0.01" max="0.1"/>
+    <epsilongoalregion>0.0</epsilongoalregion>
+    <maxplanningtime>0.05</maxplanningtime>
+    <algorithm>hierarchical</algorithm>
+    <drawMilestones>0</drawMilestones>
+    <drawSweptVolume>1</drawSweptVolume>
+    <drawStartGoal>1</drawStartGoal>
+    <drawSimplicialComplex>1</drawSimplicialComplex>
+    <drawTree>0</drawTree>
+    <freeFloating>1</freeFloating>
+    <robot>
+      <index>0</index>
+      <index>1</index>
+    </robot>
+
+  </plannersettings>
+
+  <forcefield>
+    <!--
+    <radial source="-1.4 0 0" power="3" radius="1.5" color="1 0 1"/>
+    <radial source="1.8 0 0" power="-3" radius="1.5" color="1 0 1"/>
+    <uniform force="0 0 0" color="1 0 0"/> 
+    <robot name="bullet" file="/home/aorthey/git/orthoklampt/data/bullet.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+    -->
+    <uniform force="0 0 -1.71" color="1 0 0"/>
+  </forcefield>
+
+</world>
