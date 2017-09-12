@@ -750,6 +750,7 @@ namespace GLDraw{
   }
   void drawShortestPath( SimplicialComplex& cmplx ){
 
+    if(cmplx.path.size()<=1) return;
     glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);
     glPushMatrix();
@@ -757,7 +758,9 @@ namespace GLDraw{
     setColor(red);
     glPointSize(30);
     glLineWidth(15);
+    //std::cout << std::string(80, '-') << std::endl;
     for(uint i = 0; i < cmplx.path.size()-1; i++){
+      //std::cout << cmplx.path.at(i) << std::endl;
       drawPoint(cmplx.path.at(i));
       drawLineSegment(cmplx.path.at(i),
                       cmplx.path.at(i+1));
@@ -772,11 +775,16 @@ namespace GLDraw{
     glEnable(GL_BLEND);
     GLColor magenta(0.8,0,0.8,0.5);
     GLColor black(0.1,0.1,0.1,1);
-    //GLColor grey(0.7,0.7,0.7,1);
+    GLColor blue(0.1,0.1,0.9,1);
+    GLColor white(1,1,1,1);
+    GLColor grey(0.7,0.7,0.7,1);
     glPushMatrix();
     glPointSize(10);
-    setColor(black);
+    double dm = cmplx.max_distance_shortest_path;
+
     for(uint i = 0; i < cmplx.V.size(); i++){
+      double di = cmplx.distance_shortest_path.at(i)/dm;
+      GLColor ci; ci.blend(black, white, di); setColor(ci);
       drawPoint(cmplx.V.at(i));
     }
     glLineWidth(5);

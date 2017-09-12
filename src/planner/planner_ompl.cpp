@@ -289,6 +289,7 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
   ob::PlannerData pd(si);
   ss.getPlannerData(pd);
 
+  pd.computeEdgeWeights();
   const ob::OptimizationObjectivePtr obj = pdef->getOptimizationObjective();
 
   Topology::TopologicalGraph top(pd, *obj);

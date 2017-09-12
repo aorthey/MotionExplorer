@@ -170,8 +170,8 @@ void ForceFieldBackend::Start()
   BaseT::Start();
   Robot *robot = world->robots[0];
 
-  planner_layer_robot_idx = plannerOutput.at(0).nested_idx.at(0);
-  planner_layer = 0;
+  planner_layer_robot_idx = plannerOutput.at(0).nested_idx.back();
+  planner_layer = plannerOutput.at(0).nested_idx.size()-1;
 
   settings["dragForceMultiplier"] = 500.0;
   drawContacts = 0;
@@ -397,10 +397,7 @@ void ForceFieldBackend::RenderWorld()
 
   for(uint i = 0; i < plannerOutput.size(); i++){
 
-    //uint ridx = plannerOutput.at(i).robot_idx;
-
     Robot *robot_i = world->robots[planner_layer_robot_idx];
-    std::cout << "drawing robot " << robot_i->name << std::endl;
 
     if(drawPathStartGoal.at(i)){
       Config qi = plannerOutput.at(i).q_init;
@@ -408,12 +405,15 @@ void ForceFieldBackend::RenderWorld()
       GLDraw::drawGLPathStartGoal(robot_i, qi, qg);
     }
 
+    SweptVolume sv = plannerOutput.at(i).GetSweptVolume(robot_i);
+
     if(drawPathSweptVolume.at(i)){
-      SweptVolume sv = plannerOutput.at(i).GetSweptVolume(robot_i);
       GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
     }
 
-    //if(drawPathMilestones.at(i)) GLDraw::drawGLPathKeyframes(robot_i, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack, sv.GetColorMilestones());
+    if(drawPathMilestones.at(i)){
+      GLDraw::drawGLPathKeyframes(robot_i, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack, sv.GetColorMilestones());
+    }
 
     if(drawPlannerTree.at(i)){
       SwathVolume swv = plannerOutput.at(i).GetSwathVolume();
@@ -421,11 +421,12 @@ void ForceFieldBackend::RenderWorld()
       //GLDraw::drawPlannerTree(plannerOutput.at(i).GetTree());
     }
 
+    SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
+
     if(drawPlannerSimplicialComplex.at(i)){
-      SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
       GLDraw::drawSimplicialComplex(cmplx);
-      GLDraw::drawShortestPath(cmplx);
     }
+    GLDraw::drawShortestPath(cmplx);
   }
 
   if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
@@ -498,13 +499,14 @@ void ForceFieldBackend::RenderScreen(){
   line_y_offset += line_y_offset_stepsize;
 
   std::vector<int> bn = plannerOutput.at(0).cmplx.betti_numbers;
-  line = "Betti      ";
-  line+=(" b0: ["+std::to_string(bn[0])+"]");
-  line+=(" b1: ["+std::to_string(bn[1])+"]");
-  line+=(" b2: ["+std::to_string(bn[2])+"]");
-
-  DrawText(line_x_pos, line_y_offset, line);
-  line_y_offset += line_y_offset_stepsize;
+  if(bn.size()>2){
+    line = "Betti      ";
+    line+=(" b0: ["+std::to_string(bn[0])+"]");
+    line+=(" b1: ["+std::to_string(bn[1])+"]");
+    line+=(" b2: ["+std::to_string(bn[2])+"]");
+    DrawText(line_x_pos, line_y_offset, line);
+    line_y_offset += line_y_offset_stepsize;
+  }
 
 }
 
