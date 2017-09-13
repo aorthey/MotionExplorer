@@ -1,4 +1,5 @@
 #pragma once
+#include "elements/simplicial_complex.h"
 
 #include <ompl/base/PlannerData.h>
 #include <ompl/base/PlannerDataGraph.h>
@@ -6,7 +7,9 @@
 #include <ompl/base/ScopedState.h>
 #include <ompl/base/StateSpace.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
-#include "elements/simplicial_complex.h"
+
+#include <Library/KrisLibrary/math/vector.h>
+#include <Library/KrisLibrary/math3d/primitives.h>
 
 namespace ob = ompl::base;
 using PlannerDataGraphUndirected =
@@ -24,6 +27,9 @@ namespace Topology{
       SimplicialComplex& GetSimplicialComplex();
 
       void ComputeShortestPaths(ob::PlannerData& pd, const ob::OptimizationObjective& opt);
+
+      std::vector<Math3D::Vector3> vertexIndicesToVector(const ob::PlannerData& pd, std::vector<ob::PlannerData::Graph::Vertex> &v);
+      Math3D::Vector3 vertexIndexToVector(const ob::PlannerData& pd, ob::PlannerData::Graph::Vertex v);
 
     private:
       SimplicialComplex cmplx;

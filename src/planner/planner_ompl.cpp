@@ -320,7 +320,7 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
     double dg = pdef->getSolutionDifference();
     std::cout << " solution difference  : " << dg << std::endl;
 
-    ss.simplifySolution();
+    //ss.simplifySolution();
     og::PathGeometric path = ss.getSolutionPath();
     //og::PathSimplifier shortcutter(si);
     //shortcutter.shortcutPath(path);

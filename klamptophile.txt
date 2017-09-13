@@ -746,6 +746,10 @@ infinite force contact. how to selectively activate/deactivate?
 
 General
 [ ] add drawFace/drawEdge to terrain XML file
+[ ] draw functions should be stored in map (string/string) structure to be
+easier accessible in GUI. If we like to add one variable, we should only change
+maybe keybindings and oncommand in GUI. everything else is ideally done
+automatically.
 [ ] have <gui></gui> environment to set variables
 
 Rigid Body
@@ -763,3 +767,13 @@ sphere?
 What if there are two exactly similar shortest path around a sphere. I.e. there
 are >TWO< unique shortest paths (in the same homotopy class)
 
+Boost::graph
+[ ] first vertex sometimes removed (maybe not enough padding in cost?)
+[ ] why does shortest path contain so few vertices?
+
+[ ] test on 5 environments: 
+   [ ] sphere
+   [ ] cuboid
+   [ ] double cuboid
+   [ ] triple T grill (see jaillet 2008)
+   [ ] think about how to trick the algorithm 

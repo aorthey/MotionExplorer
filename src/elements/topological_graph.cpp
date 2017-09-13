@@ -8,11 +8,7 @@
 #include <boost/property_map/property_map.hpp>
 #include <boost/graph/copy.hpp>
 
-#include <Library/KrisLibrary/math/vector.h>
-#include <Library/KrisLibrary/math3d/primitives.h>
-
 #include <ompl/base/Cost.h>
-
 #include <list>
 #include <utility>
 
@@ -23,6 +19,11 @@ using namespace Math3D;
 
 //#define CGAL_COMPUTATION
 #undef CGAL_COMPUTATION
+//#undef BETTI_NUMBERS
+#define BETTI_NUMBERS
+
+
+
 #ifdef CGAL_COMPUTATION
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Regular_triangulation_3.h>
@@ -45,14 +46,48 @@ typedef Fixed_alpha_shape_3::Facet                          Facet;
 typedef Fixed_alpha_shape_3::Edge                           Edge;
 typedef K::Weighted_point_3                                 Weighted_point;
 typedef K::Point_3                                          Bare_point;
-#endif
-
-#undef BETTI_NUMBERS
 #ifdef BETTI_NUMBERS
 #include <SBL/GT/Betti_numbers_2.hpp>
   typedef SBL::GT::T_Betti_numbers_2<Fixed_alpha_shape_3>                        Betti_numbers_2;
 #endif
+#endif
 
+using Vertex = ob::PlannerData::Graph::Vertex;
+using VIterator = ob::PlannerData::Graph::VIterator;
+using EIterator = ob::PlannerData::Graph::EIterator;
+using Graph = ob::PlannerData::Graph;
+
+using namespace boost;
+typedef boost::property_map<Graph, vertex_index_t>::type IndexMap;
+typedef boost::iterator_property_map<Vertex*, IndexMap, Vertex, Vertex&> PredecessorMap;
+typedef boost::iterator_property_map<int*, IndexMap, int, int&> DistanceMap;
+typedef ob::Cost Cost;
+
+
+
+Vector3 TopologicalGraph::vertexIndexToVector(const ob::PlannerData& pd, Vertex v){
+  ob::PlannerDataVertex vd = pd.getVertex(v);
+  const ob::State* si = vd.getState();
+  double x,y,z;
+  const ob::RealVectorStateSpace::StateType *qomplRnSpace = si->as<ob::RealVectorStateSpace::StateType>();
+  x = qomplRnSpace->values[0];
+  y = qomplRnSpace->values[1];
+  z = qomplRnSpace->values[2];
+  Vector3 v3(x,y,z);
+  return v3;
+}
+std::vector<Vector3> TopologicalGraph::vertexIndicesToVector(const ob::PlannerData& pd, std::vector<Vertex> &v){
+
+  std::vector<Vertex>::iterator it;
+  std::vector<Vector3> output;
+  for (it=v.begin(); it != v.end(); ++it) 
+  {
+    Vector3 v3 = vertexIndexToVector(pd, *it);
+    output.push_back(v3);
+    
+  }
+  return output;
+}
 
 TopologicalGraph::TopologicalGraph(ob::PlannerData& pd, const ob::OptimizationObjective& obj){
 #ifdef CGAL_COMPUTATION
@@ -156,7 +191,6 @@ TopologicalGraph::TopologicalGraph(ob::PlannerData& pd, const ob::OptimizationOb
     cmplx.T.push_back(V);
   }
 //http://sbl.inria.fr/doc/Betti_numbers-user-manual.html
-#endif
 #ifdef BETTI_NUMBERS
   Betti_numbers_2 betti;
   Betti_numbers_2::result_type res = betti(as);
@@ -167,6 +201,7 @@ TopologicalGraph::TopologicalGraph(ob::PlannerData& pd, const ob::OptimizationOb
   cmplx.betti_numbers.push_back(res.get<1>());
   cmplx.betti_numbers.push_back(res.get<2>());
 #endif
+#endif
 
   ComputeShortestPaths(pd, obj);
 
@@ -174,17 +209,6 @@ TopologicalGraph::TopologicalGraph(ob::PlannerData& pd, const ob::OptimizationOb
 SimplicialComplex& TopologicalGraph::GetSimplicialComplex(){
   return cmplx;
 }
-
-using Vertex = ob::PlannerData::Graph::Vertex;
-using VIterator = ob::PlannerData::Graph::VIterator;
-using EIterator = ob::PlannerData::Graph::EIterator;
-using Graph = ob::PlannerData::Graph;
-
-using namespace boost;
-typedef boost::property_map<Graph, vertex_index_t>::type IndexMap;
-typedef boost::iterator_property_map<Vertex*, IndexMap, Vertex, Vertex&> PredecessorMap;
-typedef boost::iterator_property_map<int*, IndexMap, int, int&> DistanceMap;
-typedef ob::Cost Cost;
 
 void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd, const ob::OptimizationObjective& opt){
 
@@ -254,22 +278,7 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd, const ob::Optim
   path.push_back(start);
 
   cmplx.path.clear();
-  std::vector<Vertex>::iterator it;
-  for (it=path.begin(); it != path.end(); ++it) 
-  {
-    ob::PlannerDataVertex vi = pd.getVertex(*it);
-    const ob::State* si = vi.getState();
-    double x,y,z;
-    const ob::RealVectorStateSpace::StateType *qomplRnSpace = si->as<ob::RealVectorStateSpace::StateType>();
-    x = qomplRnSpace->values[0];
-    y = qomplRnSpace->values[1];
-    z = qomplRnSpace->values[2];
-    std::cout << *it << " : (" << x << "," << y << "," << z << ")" << std::endl;
-    Vector3 v3(x,y,z);
-    cmplx.path.push_back(v3);
-    
-  }
-  std::cout << std::endl;
+  cmplx.path = vertexIndicesToVector(pd, path);
 
 //################################################################################
   //extract cumulative distance for each vertex (distance to start + distance to
@@ -309,14 +318,7 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd, const ob::Optim
       }
       current=predecessors_to_goal[current];
     }
-    const ob::State* si = vi.getState();
-    double x,y,z;
-    const ob::RealVectorStateSpace::StateType *qomplRnSpace = si->as<ob::RealVectorStateSpace::StateType>();
-    x = qomplRnSpace->values[0];
-    y = qomplRnSpace->values[1];
-    z = qomplRnSpace->values[2];
-    Vector3 v3(x,y,z);
-
+    Vector3 v3 = vertexIndexToVector(pd, k);
     cmplx.V.push_back(v3);
     cmplx.distance_shortest_path.push_back(dk);
 
@@ -332,7 +334,6 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd, const ob::Optim
   typedef boost::property_map<Graph, boost::vertex_index_t>::type IndexMap;
   IndexMap index = get(boost::vertex_index, g);
   typedef boost::graph_traits < PlannerDataGraphUndirected >::adjacency_iterator adjacency_iterator;
-
 
   for(uint i = 0; i < pd.numVertices(); i++){
    
@@ -351,9 +352,34 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd, const ob::Optim
         std::cout << idx << "(" << ln << ") ";
         if( ln < lk ){
           //found better neighbor
-          //cmplx.V.erase(cmplx.V.begin() + i);
           std::cout << "(del) " << i;
           neighborIsBetter = true;
+
+          //extract shortest paths and compare their visibility:
+          Vertex v_current = i;
+          Vertex v_neighbor = idx;
+
+          //extract shortest path 1: start -> v_current -> goal
+
+          //Vertex current = 
+
+          //while(current!=start) {
+          //  dk += dist_to_start[current].value();
+          //  if(predecessors_to_start[current]==current){
+          //    std::cout << "TopologicalGraph: no path from vertex " << current << " to start vertex " << start << std::endl;
+          //    exit(0);
+          //  }
+          //  current=predecessors_to_start[current];
+          //}
+          //current=k;
+          //while(current!=goal) {
+          //  dk += dist_to_goal[current].value();
+          //  if(predecessors_to_goal[current]==current){
+          //    std::cout << "TopologicalGraph: no path from vertex " << current << " to goal vertex " << goal << std::endl;
+          //    exit(0);
+          //  }
+          //  current=predecessors_to_goal[current];
+          //}
           break;
         }
       }
