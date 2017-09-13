@@ -20,6 +20,7 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
     output.drawSweptVolume = input.drawSweptVolume;
     output.drawMilestones = input.drawMilestones;
     output.drawStartGoal = input.drawStartGoal;
+    output.drawShortestPath = input.drawShortestPath;
   }else{
     _irobot = 0;
     robot = world->robots[_irobot];

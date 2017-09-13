@@ -29,6 +29,7 @@ class PlannerInput{
     Config se3min;
     Config se3max;
 
+    int drawShortestPath;
     int drawSweptVolume;
     int drawMilestones;
     int drawStartGoal;

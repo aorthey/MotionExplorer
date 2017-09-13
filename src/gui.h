@@ -146,6 +146,7 @@ class ForceFieldBackend : public SimTestBackend
 
     std::vector<int> showLinks; //hide certain links 
 
+    std::vector<int> drawPathShortestPath;
     std::vector<int> drawPathSweptVolume;
     std::vector<int> drawPathMilestones;
     std::vector<int> drawPathStartGoal;

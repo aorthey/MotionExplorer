@@ -500,7 +500,7 @@ namespace GLDraw{
 
   void drawPlannerTree(const SerializedTree &_stree, GLColor colorTree)
   {
-    double edgeWidth = 0.1;
+    double edgeWidth = 3;
     //double vertexSize = 0.1;
     //too costly for each round
     //uint nearestNode = 0;
@@ -513,9 +513,8 @@ namespace GLDraw{
     //    nearestNode = i;
     //  }
     //}
-    //glDisable(GL_LIGHTING);
-    //glEnable(GL_BLEND); 
-    //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND); 
       
     for(uint i = 0; i < _stree.size(); i++){
       SerializedTreeNode node = _stree.at(i);
@@ -528,7 +527,6 @@ namespace GLDraw{
       //double d = node.cost_to_goal;
       //double shade = exp(-d*d/0.5); //\in [0,1]
       //GLColor color(shade,0,1.0-shade);
-
 
       glPushMatrix();
       setColor(colorTree);
@@ -550,6 +548,8 @@ namespace GLDraw{
 
       glPopMatrix();
     }
+    glDisable(GL_BLEND); 
+    glEnable(GL_LIGHTING);
     //glEnable(GL_LIGHTING);
     //std::cout << "Visualized Tree with " << _stree.size() << " vertices and " << Nedges << " edges." << std::endl;
   }
@@ -775,16 +775,18 @@ namespace GLDraw{
     glEnable(GL_BLEND);
     GLColor magenta(0.8,0,0.8,0.5);
     GLColor black(0.1,0.1,0.1,1);
+    GLColor red(0.9,0.1,0.1,1);
     GLColor blue(0.1,0.1,0.9,1);
     GLColor white(1,1,1,1);
     GLColor grey(0.7,0.7,0.7,1);
     glPushMatrix();
     glPointSize(10);
-    double dm = cmplx.max_distance_shortest_path;
+    double dmax = cmplx.max_distance_shortest_path;
+    double dmin = cmplx.min_distance_shortest_path;
 
     for(uint i = 0; i < cmplx.V.size(); i++){
-      double di = cmplx.distance_shortest_path.at(i)/dm;
-      GLColor ci; ci.blend(black, white, di); setColor(ci);
+      double di = (cmplx.distance_shortest_path.at(i)-dmin)/(dmax-dmin);
+      GLColor ci; ci.blend(red, blue, di); setColor(ci);
       drawPoint(cmplx.V.at(i));
     }
     glLineWidth(5);

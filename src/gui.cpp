@@ -55,6 +55,7 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   MapButtonToggle("draw_fancy_coordinate_axes",&drawAxes);
   MapButtonToggle("draw_fancy_coordinate_axes_labels",&drawAxesLabels);
 
+  drawPathShortestPath.clear();
   drawPathSweptVolume.clear();
   drawPathMilestones.clear();
   drawPathStartGoal.clear();
@@ -219,6 +220,7 @@ void ForceFieldBackend::Start()
     if(showLinks[i]) _appearanceStack[i]=a;
   }
 
+  drawPathShortestPath.clear();
   drawPathSweptVolume.clear();
   drawPathMilestones.clear();
   drawPathStartGoal.clear();
@@ -227,6 +229,7 @@ void ForceFieldBackend::Start()
 
   std::cout << "Setting swept volume paths" << std::endl;
   for(uint i = 0; i < plannerOutput.size(); i++){
+    drawPathShortestPath.push_back(plannerOutput.at(i).drawShortestPath);
     drawPathSweptVolume.push_back(plannerOutput.at(i).drawSweptVolume);
     drawPathStartGoal.push_back(plannerOutput.at(i).drawStartGoal);
     drawPlannerTree.push_back(plannerOutput.at(i).drawTree);
@@ -238,6 +241,8 @@ void ForceFieldBackend::Start()
   for(uint i = 0; i < plannerOutput.size(); i++){
     std::string dpsv = "draw_path_swept_volume_"+std::to_string(i);
     MapButtonToggle(dpsv.c_str(),&drawPathSweptVolume.at(i));
+    std::string dpsp = "draw_shortest_path_"+std::to_string(i);
+    MapButtonToggle(dpsp.c_str(),&drawPathShortestPath.at(i));
     std::string dpms = "draw_path_milestones_"+std::to_string(i);
     MapButtonToggle(dpms.c_str(),&drawPathMilestones.at(i));
     std::string dpsg = "draw_path_start_goal_"+std::to_string(i);
@@ -414,19 +419,20 @@ void ForceFieldBackend::RenderWorld()
     if(drawPathMilestones.at(i)){
       GLDraw::drawGLPathKeyframes(robot_i, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack, sv.GetColorMilestones());
     }
+    SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
 
     if(drawPlannerTree.at(i)){
       SwathVolume swv = plannerOutput.at(i).GetSwathVolume();
       GLDraw::drawSwathVolume(swv.GetRobot(), swv.GetMatrices(), swv.GetAppearanceStack(), swv.GetColor());
-      //GLDraw::drawPlannerTree(plannerOutput.at(i).GetTree());
+      GLDraw::drawPlannerTree(plannerOutput.at(i).GetTree());
     }
-
-    SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
 
     if(drawPlannerSimplicialComplex.at(i)){
       GLDraw::drawSimplicialComplex(cmplx);
     }
-    GLDraw::drawShortestPath(cmplx);
+    if(drawPathShortestPath.at(i)){
+      GLDraw::drawShortestPath(cmplx);
+    }
   }
 
   if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
@@ -923,6 +929,10 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     for(uint i = 0; i < drawPathSweptVolume.size(); i++){
       toggle(drawPathSweptVolume.at(i));
     }
+  }else if(cmd=="draw_shortest_path"){
+    for(uint i = 0; i < drawPathShortestPath.size(); i++){
+      toggle(drawPathShortestPath.at(i));
+    }
   }else if(cmd=="load_motion_planner") {
     //glutSelectFile ("","","");//char *filename, const char *filter, const char *title)
     //std::string file_name = browser->get_file();
@@ -1121,6 +1131,7 @@ bool GLUIForceFieldGUI::Initialize()
   AddToKeymap("s","toggle_simulate");
   AddToKeymap("p","print_config");
   AddToKeymap("g","draw_swept_volume");
+  AddToKeymap("n","draw_shortest_path");
   AddToKeymap("t","draw_planner_tree_toggle");
   AddToKeymap("G","draw_planner_simplicial_complex");
   AddToKeymap("S","make_screenshot");

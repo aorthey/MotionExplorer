@@ -6,6 +6,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/property_map/property_map.hpp>
+#include <boost/graph/copy.hpp>
 
 #include <Library/KrisLibrary/math/vector.h>
 #include <Library/KrisLibrary/math3d/primitives.h>
@@ -20,6 +21,7 @@ using namespace Topology;
 using namespace Math3D;
 
 
+//#define CGAL_COMPUTATION
 #undef CGAL_COMPUTATION
 #ifdef CGAL_COMPUTATION
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
@@ -52,7 +54,7 @@ typedef K::Point_3                                          Bare_point;
 #endif
 
 
-TopologicalGraph::TopologicalGraph(const ob::PlannerData& pd, const ob::OptimizationObjective& obj){
+TopologicalGraph::TopologicalGraph(ob::PlannerData& pd, const ob::OptimizationObjective& obj){
 #ifdef CGAL_COMPUTATION
   std::cout << "TopologicalGraph" << std::endl;
   std::list<Weighted_point> lwp;
@@ -113,10 +115,6 @@ TopologicalGraph::TopologicalGraph(const ob::PlannerData& pd, const ob::Optimiza
   for( Vertex_handle v: vertices){
     //Documentation: http://doc.cgal.org/latest/Kernel_23/classCGAL_1_1Point__3.html
     K::Point_3 p = v->point();
-    //std::cout << p.x() << std::endl;
-    //std::cout << p.y() << std::endl;
-    //std::cout << p.z() << std::endl;
-    //std::cout << p.dimension() << std::endl;
     Vector3 vv(p[0],p[1],p[2]);
     cmplx.V.push_back(vv);
   }
@@ -188,9 +186,12 @@ typedef boost::iterator_property_map<Vertex*, IndexMap, Vertex, Vertex&> Predece
 typedef boost::iterator_property_map<int*, IndexMap, int, int&> DistanceMap;
 typedef ob::Cost Cost;
 
-void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob::OptimizationObjective& opt){
+void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd, const ob::OptimizationObjective& opt){
 
   Graph g = pd.toBoostGraph();
+  PlannerDataGraph gb(g);
+  PlannerDataGraphUndirected gu;
+  boost::copy_graph(gb, gu);//NOT_OPTIMAL: avoid copying the whole graph
 
   EIterator ei, ei_end;
   VIterator vi, vi_end;
@@ -206,9 +207,6 @@ void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob:
   for(tie(ei, ei_end) = boost::edges(g); ei != ei_end;++ei){
     //std::cout << "(" << index[source(*ei,g)] << "->" << index[target(*ei,g)] << ")" << std::endl;
   }
-  //Vertex start = *(vertices(g).first);
-  //Vertex goal = *(vertices(g).second);
-
   Vertex start= pd.getStartIndex(0);
   Vertex goal = pd.getGoalIndex(0);
 
@@ -216,8 +214,9 @@ void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob:
   std::vector<ob::Cost> dist_to_goal(num_vertices(g));
   std::vector<ompl::base::PlannerData::Graph::Vertex> predecessors_to_start(num_vertices(g));
   std::vector<ompl::base::PlannerData::Graph::Vertex> predecessors_to_goal(num_vertices(g));
+
 //################################################################################
-  boost::dijkstra_shortest_paths(g, start, 
+  boost::dijkstra_shortest_paths(gu, start,
     boost::predecessor_map(&predecessors_to_start[0]).distance_map(&dist_to_start[0])
     .distance_compare([&opt](Cost c1, Cost c2)
     {
@@ -230,7 +229,7 @@ void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob:
     .distance_inf(opt.infiniteCost())
     .distance_zero(opt.identityCost()));
 //################################################################################
-  boost::dijkstra_shortest_paths(g, goal, 
+  boost::dijkstra_shortest_paths(gu, goal, 
     boost::predecessor_map(&predecessors_to_goal[0]).distance_map(&dist_to_goal[0])
     .distance_compare([&opt](Cost c1, Cost c2)
     {
@@ -243,7 +242,7 @@ void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob:
     .distance_inf(opt.infiniteCost())
     .distance_zero(opt.identityCost()));
 //################################################################################
-
+  //shortest path from goal to start
   std::vector<Vertex> path;
   Vertex current=goal;
 
@@ -253,15 +252,6 @@ void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob:
     current=predecessors_to_start[current];
   }
   path.push_back(start);
-
-  //Vertex current=start;
-
-  //while(current!=goal) {
-  //  path.push_back(current);
-  //  std::cout << current << ":" << dist_to_goal[current] << std::endl;  
-  //  current=predecessors_to_goal[current];
-  //}
-  //path.push_back(goal);
 
   cmplx.path.clear();
   std::vector<Vertex>::iterator it;
@@ -282,56 +272,96 @@ void TopologicalGraph::ComputeShortestPaths(const ob::PlannerData& pd, const ob:
   std::cout << std::endl;
 
 //################################################################################
+  //extract cumulative distance for each vertex (distance to start + distance to
+  //goal)
 
   cmplx.V.clear();
-  cmplx.E.clear();
-  cmplx.F.clear();
-  cmplx.T.clear();
+  //cmplx.E.clear();
+  //cmplx.F.clear();
+  //cmplx.T.clear();
   cmplx.distance_shortest_path.clear();
-  cmplx.max_distance_shortest_path = 10000;
+  cmplx.min_distance_shortest_path = dInf;
+  cmplx.max_distance_shortest_path = 0;
+  uint ctrToStart = 0;
+  uint ctrToGoal = 0;
 
-  std::cout << "distances and parents:" << std::endl;
-  //graph_traits < graph_t >::vertex_iterator vi, vend;
-  for(uint k = 0; k < predecessors_to_start.size(); k++){
-    //std::cout << "distance(" << *vi << ") = " << dist_to_start[*vi] << ", ";
+  for(uint k = 0; k < pd.numVertices(); k++){
+  //for(uint k = 12; k < 47; k++){
 
     ob::PlannerDataVertex vi = pd.getVertex(k);
+    Vertex current = pd.vertexIndex(vi);
 
-    Vertex current=k;
     double dk = 0.0;
     while(current!=start) {
       dk += dist_to_start[current].value();
+      if(predecessors_to_start[current]==current){
+        std::cout << "TopologicalGraph: no path from vertex " << current << " to start vertex " << start << std::endl;
+        exit(0);
+      }
       current=predecessors_to_start[current];
     }
     current=k;
-    //while(current!=goal) {
-    //  dk += dist_to_goal[current].value();
-    //  if(predecessors_to_goal[current]==current){
-    //    dk=dInf;
-    //    break;
-    //  }
-    //  current=predecessors_to_goal[current];
-    //}
+    while(current!=goal) {
+      dk += dist_to_goal[current].value();
+      if(predecessors_to_goal[current]==current){
+        std::cout << "TopologicalGraph: no path from vertex " << current << " to goal vertex " << goal << std::endl;
+        exit(0);
+      }
+      current=predecessors_to_goal[current];
+    }
+    const ob::State* si = vi.getState();
+    double x,y,z;
+    const ob::RealVectorStateSpace::StateType *qomplRnSpace = si->as<ob::RealVectorStateSpace::StateType>();
+    x = qomplRnSpace->values[0];
+    y = qomplRnSpace->values[1];
+    z = qomplRnSpace->values[2];
+    Vector3 v3(x,y,z);
 
-    if(dk<=cmplx.max_distance_shortest_path){
-      std::cout << dk << ", ";
-      const ob::State* si = vi.getState();
-      double x,y,z;
-      const ob::RealVectorStateSpace::StateType *qomplRnSpace = si->as<ob::RealVectorStateSpace::StateType>();
-      x = qomplRnSpace->values[0];
-      y = qomplRnSpace->values[1];
-      z = qomplRnSpace->values[2];
-      Vector3 v3(x,y,z);
-      cmplx.V.push_back(v3);
-      cmplx.distance_shortest_path.push_back(dk);
-      //if(dk > cmplx.max_distance_shortest_path){
-      //  cmplx.max_distance_shortest_path = dk;
-      //}
+    cmplx.V.push_back(v3);
+    cmplx.distance_shortest_path.push_back(dk);
+
+    if(dk > cmplx.max_distance_shortest_path)
+      cmplx.max_distance_shortest_path = dk;
+    if(dk < cmplx.min_distance_shortest_path)
+      cmplx.min_distance_shortest_path = dk;
+  }
+  std::cout << "Found " << cmplx.V.size() << " eligible vertices." << std::endl;
+//################################################################################
+  //simplify simplicial complex by removing vertices which belong to long paths
+
+  typedef boost::property_map<Graph, boost::vertex_index_t>::type IndexMap;
+  IndexMap index = get(boost::vertex_index, g);
+  typedef boost::graph_traits < PlannerDataGraphUndirected >::adjacency_iterator adjacency_iterator;
+
+
+  for(uint i = 0; i < pd.numVertices(); i++){
+   
+    double lk = cmplx.distance_shortest_path.at(i);
+
+    Vertex current=i;
+    std::pair<adjacency_iterator, adjacency_iterator> neighbors =
+      boost::adjacent_vertices(vertex(current,gu), gu);
+   
+    std::cout << current << "(" << lk << ") -> ";
+    bool neighborIsBetter = false;
+    for(; neighbors.first != neighbors.second; ++neighbors.first)
+      {
+        uint idx = *neighbors.first;//index[*neighbors.first];
+        double ln = cmplx.distance_shortest_path.at(idx);
+        std::cout << idx << "(" << ln << ") ";
+        if( ln < lk ){
+          //found better neighbor
+          //cmplx.V.erase(cmplx.V.begin() + i);
+          std::cout << "(del) " << i;
+          neighborIsBetter = true;
+          break;
+        }
+      }
+    std::cout << std::endl;
+
+    if(neighborIsBetter){
+      cmplx.V.at(i) = Vector3(0,0,0);
     }
   }
   std::cout << "Found " << cmplx.V.size() << " eligible vertices." << std::endl;
-  std::cout << "Start Vertices: " << pd.numStartVertices() << std::endl;
-  std::cout << "Goal Vertices: " << pd.numGoalVertices() << std::endl;
-  std::cout << predecessors_to_start.size()  << std::endl;
-  std::cout << predecessors_to_goal.size()  << std::endl;
 }

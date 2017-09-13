@@ -31,12 +31,14 @@ bool PlannerInput::load(TiXmlElement *node)
   TiXmlElement* node_drawSweptVolume = FindSubNode(plannersettings, "drawSweptVolume");
   TiXmlElement* node_drawMilestones = FindSubNode(plannersettings, "drawMilestones");
   TiXmlElement* node_drawStartGoal = FindSubNode(plannersettings, "drawStartGoal");
+  TiXmlElement* node_drawShortestPath = FindSubNode(plannersettings, "drawShortestPath");
 
   GetStreamText(node_drawTree) >> drawTree;
   GetStreamText(node_drawSimplicialComplex) >> drawSimplicialComplex;
   GetStreamText(node_drawSweptVolume) >> drawSweptVolume;
   GetStreamText(node_drawMilestones) >> drawMilestones;
   GetStreamText(node_drawStartGoal) >> drawStartGoal;
+  GetStreamText(node_drawShortestPath) >> drawShortestPath;
 
   GetStreamAttribute(node_qinit,"config") >> q_init;
   GetStreamAttribute(node_qgoal,"config") >> q_goal;

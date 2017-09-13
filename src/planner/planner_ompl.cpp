@@ -26,11 +26,17 @@ void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd, CSpaceOMPL *cspace)
      
     std::vector<uint> edgeList;
     pd.getEdges(i, edgeList);
+
+    std::vector<uint> edgeListIn;
+    pd.getIncomingEdges(i, edgeListIn);
+
+    edgeList.insert( edgeList.end(), edgeListIn.begin(), edgeListIn.end() );
+
     //std::cout << "Node " << i << " has " << Nedges << " edges" << std::endl;
     for(uint j = 0; j < edgeList.size(); j++){
       ob::PlannerDataVertex w = pd.getVertex(edgeList.at(j));
       const ob::State* sw = w.getState();
-      Config dqj = snode.position - cspace->OMPLStateToConfig(sw);
+      Config dqj = cspace->OMPLStateToConfig(sw)-cc;
 
       snode.directions.push_back(dqj);
     }

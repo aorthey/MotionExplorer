@@ -37,6 +37,7 @@ class PlannerOutput{
     Config dq_init;
     Config dq_goal;
 
+    int drawShortestPath;
     int drawSweptVolume;
     int drawMilestones;
     int drawStartGoal;
