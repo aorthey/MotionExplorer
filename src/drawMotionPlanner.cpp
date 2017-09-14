@@ -789,7 +789,8 @@ namespace GLDraw{
       GLColor ci; ci.blend(red, blue, di); setColor(ci);
       drawPoint(cmplx.V.at(i));
     }
-    glLineWidth(5);
+    glLineWidth(10);
+    setColor(red);
     for(uint i = 0; i < cmplx.E.size(); i++){
       drawLineSegment(cmplx.E.at(i).first, 
                       cmplx.E.at(i).second);

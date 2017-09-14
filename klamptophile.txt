@@ -772,8 +772,9 @@ Boost::graph
 [ ] why does shortest path contain so few vertices?
 
 [ ] test on 5 environments: 
-   [ ] sphere
-   [ ] cuboid
-   [ ] double cuboid
-   [ ] triple T grill (see jaillet 2008)
-   [ ] think about how to trick the algorithm 
+  [ ] sphere
+  [ ] cuboid
+  [ ] double cuboid
+  [ ] triple T grill (see jaillet 2008)
+  [ ] forest of cylinders on a flat surface
+  [ ] 3D lattice cuboid

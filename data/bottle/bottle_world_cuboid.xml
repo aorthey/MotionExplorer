@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 
 <world>
-   <robot name="bottle" file="/home/aorthey/git/orthoklampt/data/bottle/bottle.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="bottle" file="/home/aorthey/git/orthoklampt/data/bottle/bottle.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-   <robot name="bottle_sphere" file="/home/aorthey/git/orthoklampt/data/bottle/bottle_sphere.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="bottle_sphere" file="/home/aorthey/git/orthoklampt/data/bottle/bottle_sphere.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-   <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
+  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
 
   <plannersettings>
 
@@ -21,7 +21,7 @@
     <drawSweptVolume>0</drawSweptVolume>
     <drawStartGoal>1</drawStartGoal>
     <drawSimplicialComplex>1</drawSimplicialComplex>
-    <drawShortestPath>1</drawShortestPath>
+    <drawShortestPath>0</drawShortestPath>
     <drawTree>0</drawTree>
     <freeFloating>1</freeFloating>
     <robot>

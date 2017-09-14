@@ -28,8 +28,13 @@ namespace Topology{
 
       void ComputeShortestPaths(ob::PlannerData& pd, const ob::OptimizationObjective& opt);
 
-      std::vector<Math3D::Vector3> vertexIndicesToVector(const ob::PlannerData& pd, std::vector<ob::PlannerData::Graph::Vertex> &v);
-      Math3D::Vector3 vertexIndexToVector(const ob::PlannerData& pd, ob::PlannerData::Graph::Vertex v);
+      std::vector<Math3D::Vector3> vertexIndicesToVector(const ob::PlannerData& pd, const std::vector<ob::PlannerData::Graph::Vertex> &v);
+      Math3D::Vector3 vertexIndexToVector(const ob::PlannerData& pd, const ob::PlannerData::Graph::Vertex &v);
+
+      std::vector<ob::PlannerData::Graph::Vertex> shortestPath(const ob::PlannerData::Graph::Vertex, const ob::PlannerData::Graph::Vertex, const ob::PlannerData::Graph::Vertex, const std::vector<ob::PlannerData::Graph::Vertex>&, const std::vector<ob::PlannerData::Graph::Vertex> &);
+
+      template<typename T>
+      std::vector<std::vector<T> > extractFacetsBetweenPaths( const std::vector<T> &p1, const std::vector<T> &p2);
 
     private:
       SimplicialComplex cmplx;
