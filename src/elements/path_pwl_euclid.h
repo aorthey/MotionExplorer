@@ -20,10 +20,12 @@ class PathPiecewiseLinearEuclidean
     PathPiecewiseLinearEuclidean();
 
   public:
-    static PathPiecewiseLinearEuclidean from_keyframes(const std::vector<Config> &keyframes);
-    static PathPiecewiseLinearEuclidean from_keyframes(const std::vector<Vector3> &keyframes);
+    //static PathPiecewiseLinearEuclidean from_keyframes(const std::vector<Config> &keyframes);
+    //static PathPiecewiseLinearEuclidean from_keyframes(const std::vector<Vector3> &keyframes);
+    static PathPiecewiseLinearEuclidean* from_keyframes(const std::vector<Config> &keyframes);
+    static PathPiecewiseLinearEuclidean* from_keyframes(const std::vector<Vector3> &keyframes);
 
-    // make it [0,1] -> R^n
+    // convert path length [0,L] -> [0,1]
     void Normalize();
     std::vector<double> GetLengthVector() const;
     double GetLength() const;

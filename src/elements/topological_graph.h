@@ -33,6 +33,8 @@ namespace Topology{
 
       std::vector<ob::PlannerData::Graph::Vertex> shortestPath(const ob::PlannerData::Graph::Vertex, const ob::PlannerData::Graph::Vertex, const ob::PlannerData::Graph::Vertex, const std::vector<ob::PlannerData::Graph::Vertex>&, const std::vector<ob::PlannerData::Graph::Vertex> &);
 
+      bool testVisibilityRRT(const ob::PlannerData& pd, const ob::SpaceInformationPtr &si_path_space, const std::vector<ob::PlannerData::Graph::Vertex> &p1, const std::vector<ob::PlannerData::Graph::Vertex> &p2);
+
       template<typename T>
       std::vector<std::vector<T> > extractFacetsBetweenPaths( const std::vector<T> &p1, const std::vector<T> &p2);
 

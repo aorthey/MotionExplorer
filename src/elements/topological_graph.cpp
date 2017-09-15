@@ -1,4 +1,5 @@
 #include "elements/topological_graph.h"
+#include "elements/path_pwl_euclid.h"
 
 
 //shortest path functions:
@@ -21,7 +22,6 @@ using namespace Math3D;
 #undef CGAL_COMPUTATION
 //#undef BETTI_NUMBERS
 #define BETTI_NUMBERS
-
 
 
 #ifdef CGAL_COMPUTATION
@@ -63,6 +63,138 @@ typedef boost::iterator_property_map<Vertex*, IndexMap, Vertex, Vertex&> Predece
 typedef boost::iterator_property_map<int*, IndexMap, int, int&> DistanceMap;
 typedef ob::Cost Cost;
 
+#include <ompl/geometric/SimpleSetup.h>
+#include <ompl/geometric/planners/rrt/RRT.h>
+#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
+namespace ob = ompl::base;
+namespace og = ompl::geometric;
+
+static ob::OptimizationObjectivePtr getThresholdPathLength(const ob::SpaceInformationPtr& si)
+{
+  ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
+  obj->setCostThreshold(ob::Cost(dInf));
+  return obj;
+}
+namespace ompl{
+  namespace base{
+    typedef std::shared_ptr<StateValidityChecker> StateValidityCheckerPtr;
+  }
+}
+class LinearSegmentValidityChecker : public ob::StateValidityChecker
+{
+  public:
+    LinearSegmentValidityChecker(const ob::SpaceInformationPtr &si, const ob::SpaceInformationPtr &si_path_, TopologicalGraph* tg, const ob::PlannerData& pd, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2):
+      ob::StateValidityChecker(si), si_path(si_path_)
+    {
+      std::vector<Vector3> s1;
+      std::vector<Vector3> s2;
+
+      for(uint k = 0; k < p1.size(); k++){
+        Vector3 v = tg->vertexIndexToVector(pd, p1.at(k));
+        s1.push_back(v);
+      }
+      for(uint k = 0; k < p2.size(); k++){
+        Vector3 v = tg->vertexIndexToVector(pd, p2.at(k));
+        s2.push_back(v);
+      }
+      /////DEBUG
+
+      //s1.clear();s2.clear();
+      //s1.push_back(Vector3(0,-2,0));
+      //s1.push_back(Vector3(-2,-2,0));
+      //s1.push_back(Vector3(0,+2,0));
+
+      //s2.push_back(Vector3(0,-2,0));
+      //s2.push_back(Vector3(-2,0,0));
+      //s2.push_back(Vector3(0,+2,0));
+
+
+      path1 = PathPiecewiseLinearEuclidean::from_keyframes(s1);
+      path1->Normalize();
+      path2 = PathPiecewiseLinearEuclidean::from_keyframes(s2);
+      path2->Normalize();
+    }
+
+    virtual bool isValid(const ob::State* state) const{
+
+      const ob::RealVectorStateSpace::StateType *RnSpace = state->as<ob::RealVectorStateSpace::StateType>();
+      double t1 = RnSpace->values[0];
+      double t2 = RnSpace->values[1];
+
+      Vector3 vv = path1->EvalVec3(t1);
+      Vector3 ww = path2->EvalVec3(t2);
+
+      const ob::StateSpacePtr space_path = si_path->getStateSpace();
+
+      ob::State *q1 = space_path->allocState();
+      ob::State *q2 = space_path->allocState();
+
+      for(uint k = 0; k < 3; k++){
+        q1->as<ob::RealVectorStateSpace::StateType>()->values[k] = vv[k];
+        q2->as<ob::RealVectorStateSpace::StateType>()->values[k] = ww[k];
+      }
+    
+      bool isfeasible = si_path->checkMotion(q1,q2);
+      //std::cout << "[" << t1 << "] " << vv << " -> "  << "[" << t2 << "] " << ww << "(" << (isfeasible?"feasible":"invalid") << ")" << std::endl;
+
+      space_path->freeState(q1);
+      space_path->freeState(q2);
+      return isfeasible;
+
+    }
+
+  private:
+
+    ob::SpaceInformationPtr si_path;
+    PathPiecewiseLinearEuclidean *path1;
+    PathPiecewiseLinearEuclidean *path2;
+
+};
+
+bool TopologicalGraph::testVisibilityRRT(const ob::PlannerData& pd, const ob::SpaceInformationPtr &si_path_space, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2)
+{
+  //[0,1] x [0,1]
+  ob::RealVectorBounds bounds(2);
+  bounds.setLow(0);
+  bounds.setHigh(1);
+
+  ob::StateSpacePtr space = (std::make_shared<ob::RealVectorStateSpace>(2));
+  ob::RealVectorStateSpace *R2 = space->as<ob::RealVectorStateSpace>();
+
+  R2->setBounds(bounds);
+
+  ob::ScopedState<> start(space);
+  ob::ScopedState<> goal(space);
+  start[0]=start[1]=0.0;
+  goal[0]=goal[1]=1.0;
+
+  og::SimpleSetup ss(space);
+  const ob::SpaceInformationPtr si_local = ss.getSpaceInformation();
+
+  ss.setStateValidityChecker(std::make_shared<LinearSegmentValidityChecker>(si_local, si_path_space,this,pd,p1,p2));
+
+  ob::PlannerPtr ompl_planner = std::make_shared<og::RRT>(si_local);
+  double epsilon_goalregion = 0.01;
+
+  ss.setStartAndGoalStates(start, goal, epsilon_goalregion);
+  ss.setPlanner(ompl_planner);
+  ss.setup();
+
+  ////set objective to infinite path to just return first solution
+  ob::ProblemDefinitionPtr pdef = ss.getProblemDefinition();
+  pdef->setOptimizationObjective( getThresholdPathLength(si_local) );
+
+  double max_planning_time=0.03;
+  ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
+
+  ss.solve(ptc);
+  bool solved = ss.haveExactSolutionPath();
+  //if(!solved){
+  //  std::cout << "NOT SOLVED" << std::endl;
+  //}
+  //exit(0);
+  return solved;
+}
 
 
 Vector3 TopologicalGraph::vertexIndexToVector(const ob::PlannerData& pd, const Vertex &v){
@@ -291,34 +423,60 @@ SimplicialComplex& TopologicalGraph::GetSimplicialComplex(){
   return cmplx;
 }
 
-void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd, const ob::OptimizationObjective& opt){
+void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt){
 
-  Graph g = pd.toBoostGraph();
+  Graph g = pd_in.toBoostGraph();
   PlannerDataGraph gb(g);
   PlannerDataGraphUndirected gu;
+
   boost::copy_graph(gb, gu);//NOT_OPTIMAL: avoid copying the whole graph
 
   EIterator ei, ei_end;
   VIterator vi, vi_end;
-  ob::PlannerDataVertex vs = pd.getStartVertex(0);
-  ob::PlannerDataVertex vg = pd.getGoalVertex(0);
+  ob::PlannerDataVertex vs = pd_in.getStartVertex(0);
+  ob::PlannerDataVertex vg = pd_in.getGoalVertex(0);
+  Vertex start= pd_in.getStartIndex(0);
+  Vertex goal = pd_in.getGoalIndex(0);
 
-  std::cout << "SimplicialComplex: vertices: " << num_vertices(g) << std::endl;
+  std::cout << "PlannerDataGraph:  vertices: " << num_vertices(g) << std::endl;
   std::cout << "                      edges: " << num_edges(g) << std::endl;
+  std::cout << "PlannerDataGraphU: vertices: " << num_vertices(gu) << std::endl;
+  std::cout << "                      edges: " << num_edges(gu) << std::endl;
 
-  for (tie(vi, vi_end) = boost::vertices(g); vi != vi_end; ++vi){
+  using UVertex = boost::graph_traits<PlannerDataGraphUndirected>::vertex_descriptor;
+  using UEdge = boost::graph_traits<PlannerDataGraphUndirected>::edge_descriptor;
+
+  for (tie(vi, vi_end) = boost::vertices(gu); vi != vi_end; ++vi){
     //uint idx = get(index,*vi);
+
+    boost::graph_traits<PlannerDataGraphUndirected>::out_edge_iterator e, e_end;
+    for(tie(e, e_end) = boost::out_edges(*vi, gu); e != e_end;++e){
+
+
+      UVertex e1 = source(*e,gu);
+      UVertex e2 = target(*e,gu);
+      property_map<PlannerDataGraphUndirected, edge_weight_t>::type weight = get(edge_weight, gu);
+
+      Vector3 v1 = vertexIndexToVector(pd_in, e1);
+      Vector3 v2 = vertexIndexToVector(pd_in, e2);
+
+      double d = (v1-v2).norm();
+
+      std::cout << "(" << source(*e, gu) << "," << target(*e, gu) << ") -> " << get(weight,*e) << " = " << d<< std::endl;
+
+      //cmplx.E.push_back(std::make_pair(v1,v2));
+    }
+
   }
-  for(tie(ei, ei_end) = boost::edges(g); ei != ei_end;++ei){
-    //std::cout << "(" << index[source(*ei,g)] << "->" << index[target(*ei,g)] << ")" << std::endl;
-  }
-  Vertex start= pd.getStartIndex(0);
-  Vertex goal = pd.getGoalIndex(0);
 
   std::vector<ob::Cost> dist_to_start(num_vertices(g));
   std::vector<ob::Cost> dist_to_goal(num_vertices(g));
-  std::vector<ompl::base::PlannerData::Graph::Vertex> predecessors_to_start(num_vertices(g));
-  std::vector<ompl::base::PlannerData::Graph::Vertex> predecessors_to_goal(num_vertices(g));
+
+  std::vector<UVertex> predecessors_to_start(num_vertices(gu));
+  std::vector<UVertex> predecessors_to_goal(num_vertices(gu));
+
+  UVertex ustart = start;
+  UVertex ugoal = goal;
 
 //################################################################################
   boost::dijkstra_shortest_paths(gu, start,
@@ -332,35 +490,33 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd, const ob::Optim
      return c;
     })
     .distance_inf(opt.infiniteCost())
-    .distance_zero(opt.identityCost()));
+    .distance_zero(opt.identityCost())
+    );
 //################################################################################
-  boost::dijkstra_shortest_paths(gu, goal, 
-    boost::predecessor_map(&predecessors_to_goal[0]).distance_map(&dist_to_goal[0])
-    .distance_compare([&opt](Cost c1, Cost c2)
-    {
-     return opt.isCostBetterThan(c1, c2);
-    })
-    .distance_combine([](Cost, Cost c)
-    {
-     return c;
-    })
-    .distance_inf(opt.infiniteCost())
-    .distance_zero(opt.identityCost()));
-//################################################################################
-  //shortest path from goal to start
-  std::vector<Vertex> path;
-  Vertex current=goal;
 
-  while(current!=start) {
-    path.push_back(current);
-    std::cout << current << ":" << dist_to_start[current] << std::endl;  
-    current=predecessors_to_start[current];
+  std::cout << "predecessors_to_start " << predecessors_to_start.size()   << std::endl;
+  for(uint k = 0; k < predecessors_to_start.size()  ; k++){
+    Vector3 v3 = vertexIndexToVector(pd_in, k);
+    cmplx.V.push_back(v3);
+    cmplx.distance_shortest_path.push_back(dist_to_start[k].value());
+    std::cout << "vertex " << k << " dist start " << dist_to_start[k] << std::endl;
   }
-  path.push_back(start);
 
-  cmplx.path.clear();
-  cmplx.path = vertexIndicesToVector(pd, path);
+  for(uint k = 0; k < predecessors_to_start.size(); k++){
 
+    if( predecessors_to_start[k] != k ){
+      Vector3 v1 = vertexIndexToVector(pd_in, k);
+      Vector3 v2 = vertexIndexToVector(pd_in, predecessors_to_start[k]);
+
+      cmplx.E.push_back(std::make_pair(v1,v2));
+    }
+
+  }
+  uint idx_min = std::distance(std::begin(cmplx.distance_shortest_path), std::min_element(std::begin(cmplx.distance_shortest_path), std::end(cmplx.distance_shortest_path)));
+  uint idx_max = std::distance(std::begin(cmplx.distance_shortest_path), std::max_element(std::begin(cmplx.distance_shortest_path), std::end(cmplx.distance_shortest_path)));
+  cmplx.min_distance_shortest_path = cmplx.distance_shortest_path[idx_min];
+  cmplx.max_distance_shortest_path = cmplx.distance_shortest_path[idx_max];
+  return;
 //################################################################################
   //extract cumulative distance for each vertex (distance to start + distance to
   //goal)
@@ -373,17 +529,20 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd, const ob::Optim
   cmplx.min_distance_shortest_path = dInf;
   cmplx.max_distance_shortest_path = 0;
 
-  for(uint k = 0; k < pd.numVertices(); k++){
+  for(uint k = 0; k < pd_in.numVertices(); k++){
 
-    ob::PlannerDataVertex vi = pd.getVertex(k);
-    Vertex current = pd.vertexIndex(vi);
+    ob::PlannerDataVertex vi = pd_in.getVertex(k);
+    Vertex current = pd_in.vertexIndex(vi);
 
     double dk = 0.0;
+    bool unreachable_vertex = false;
     while(current!=start) {
       dk += dist_to_start[current].value();
       if(predecessors_to_start[current]==current){
-        std::cout << "TopologicalGraph: no path from vertex " << current << " to start vertex " << start << std::endl;
+        std::cout << "iter" << k << ": TopologicalGraph: no path from vertex " << current << " to start vertex " << start << std::endl;
         exit(0);
+        unreachable_vertex = true;
+        break;
       }
       current=predecessors_to_start[current];
     }
@@ -393,10 +552,13 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd, const ob::Optim
       if(predecessors_to_goal[current]==current){
         std::cout << "TopologicalGraph: no path from vertex " << current << " to goal vertex " << goal << std::endl;
         exit(0);
+        unreachable_vertex = true;
+        break;
       }
       current=predecessors_to_goal[current];
     }
-    Vector3 v3 = vertexIndexToVector(pd, k);
+    if(unreachable_vertex) continue;
+    Vector3 v3 = vertexIndexToVector(pd_in, k);
     cmplx.V.push_back(v3);
     cmplx.distance_shortest_path.push_back(dk);
 
@@ -407,6 +569,11 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd, const ob::Optim
   }
   std::cout << "Found " << cmplx.V.size() << " eligible vertices." << std::endl;
 //################################################################################
+
+  std::vector<Vertex> path_idxs = shortestPath(start, start, goal, predecessors_to_start, predecessors_to_goal);
+  cmplx.path = vertexIndicesToVector(pd_in, path_idxs);
+
+//################################################################################
   //simplify simplicial complex by removing vertices which belong to long paths
 
   typedef boost::property_map<Graph, boost::vertex_index_t>::type IndexMap;
@@ -414,7 +581,7 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd, const ob::Optim
   typedef boost::graph_traits < PlannerDataGraphUndirected >::adjacency_iterator adjacency_iterator;
 
   //cmplx.V.clear();
-  for(uint i = 0; i < pd.numVertices(); i++){
+  for(uint i = 0; i < pd_in.numVertices(); i++){
    
     double lk = cmplx.distance_shortest_path.at(i);
 
@@ -430,8 +597,8 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd, const ob::Optim
         double ln = cmplx.distance_shortest_path.at(idx);
         std::cout << idx << "(" << ln << ") ";
         if( ln < (lk - 1e-3)){
+          neighborIsBetter = true;
           //found better neighbor
-          std::cout << "(del) " << i;
 
           //extract shortest paths and compare their visibility:
           Vertex v_current = i;
@@ -439,62 +606,33 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd, const ob::Optim
 
           //extract shortest path 1: start -> v_current -> goal
           std::vector<Vertex> pcur_idxs = shortestPath(start, v_current, goal, predecessors_to_start, predecessors_to_goal);
-          std::vector<Vector3> pcur = vertexIndicesToVector(pd, pcur_idxs);
+          std::vector<Vector3> pcur = vertexIndicesToVector(pd_in, pcur_idxs);
 
           std::vector<Vertex> pneighbor_idxs = shortestPath(start, v_neighbor, goal, predecessors_to_start, predecessors_to_goal);
-          std::vector<Vector3> pneighbor = vertexIndicesToVector(pd, pneighbor_idxs);
+          std::vector<Vector3> pneighbor = vertexIndicesToVector(pd_in, pneighbor_idxs);
 
-          //extract facets between paths.
+          // test with RRT
+          const ob::SpaceInformationPtr si = pd_in.getSpaceInformation();
+          neighborIsBetter = testVisibilityRRT( pd_in, si, pcur_idxs, pneighbor_idxs);
 
-          std::vector<std::vector<Math3D::Vector3> > tris = extractFacetsBetweenPaths<Math3D::Vector3>( pcur, pneighbor);
-          std::vector<std::vector<Vertex> > tris_idxs = extractFacetsBetweenPaths<Vertex>( pcur_idxs, pneighbor_idxs);
-          std::cout << std::endl << tris.size() << std::endl;
+          //if(!neighborIsBetter){
+          //  std::cout << std::string(80, '-') << std::endl;
+          //  std::cout << std::string(80, '-') << std::endl;
+          //  std::cout << "Neighborpath is better? " << (neighborIsBetter?"Yes":"No") << std::endl;
+          //  std::cout << std::string(80, '-') << std::endl;
+          //  std::cout << std::string(80, '-') << std::endl;
 
-          const ob::StateValidityCheckerPtr checker = pd.getSpaceInformation()->getStateValidityChecker();
-          const ob::SpaceInformationPtr si = pd.getSpaceInformation();
+          //  for(uint j = 0; j < pcur.size()-1; j++){
+          //    cmplx.E.push_back(std::make_pair(pcur.at(j),pcur.at(j+1)));
+          //  }
+          //  for(uint j = 0; j < pneighbor.size()-1; j++){
+          //    cmplx.E.push_back(std::make_pair(pneighbor.at(j),pneighbor.at(j+1)));
+          //  }
 
-          neighborIsBetter = true;
-
-          for(uint k = 0; k < tris.size(); k++){
-            ob::PlannerDataVertex v1 = pd.getVertex(tris_idxs.at(k).at(0));
-            ob::PlannerDataVertex v2 = pd.getVertex(tris_idxs.at(k).at(1));
-            ob::PlannerDataVertex v3 = pd.getVertex(tris_idxs.at(k).at(2));
-            const ob::State* s1 = v1.getState();
-            const ob::State* s2 = v2.getState();
-            const ob::State* s3 = v3.getState();
-            std::pair< ob::State*, double > lastValid;
-            if(!si->checkMotion(s1,s2,lastValid) || !si->checkMotion(s1,s3,lastValid) 
-                || !si->checkMotion(s1,s3,lastValid)  ){
-              neighborIsBetter = false;
-              double x,y,z;
-              if(lastValid.first){
-                const ob::RealVectorStateSpace::StateType *qomplRnSpace = lastValid.first->as<ob::RealVectorStateSpace::StateType>();
-                x = qomplRnSpace->values[0];
-                y = qomplRnSpace->values[1];
-                z = qomplRnSpace->values[2];
-                Vector3 v3(x,y,z);
-                cmplx.V.push_back( v3);
-              }
-              break;
-            }
-          }
-          if(!neighborIsBetter){
-            std::cout << std::string(80, '-') << std::endl;
-            std::cout << std::string(80, '-') << std::endl;
-            std::cout << "Neighborpath is better? " << (neighborIsBetter?"Yes":"No") << std::endl;
-            std::cout << std::string(80, '-') << std::endl;
-            std::cout << std::string(80, '-') << std::endl;
-            cmplx.F = tris;
-
-            for(uint j = 0; j < pcur.size()-1; j++){
-              cmplx.E.push_back(std::make_pair(pcur.at(j),pcur.at(j+1)));
-            }
-            for(uint j = 0; j < pneighbor.size()-1; j++){
-              cmplx.E.push_back(std::make_pair(pneighbor.at(j),pneighbor.at(j+1)));
-            }
-
-            return;
-          }
+          //  return;
+          //}else{
+          //  std::cout << "(del) " << i;
+          //}
 
 
           break;
@@ -505,18 +643,33 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd, const ob::Optim
     if(!neighborIsBetter){
       //found local shortest path -> add to complex
       //double ln = cmplx.distance_shortest_path.at(idx);
-      //std::vector<Vertex> path;
-      //Vertex current=i;
+    //Vertex current=i;
+    std::vector<Vertex> pcur_idxs = shortestPath(start, current, goal, predecessors_to_start, predecessors_to_goal);
+    std::vector<Vector3> pcur = vertexIndicesToVector(pd_in, pcur_idxs);
 
-      //while(current!=start) {
-      //  Vector3 v1 = vertexIndexToVector(pd, current);
-      //  current=predecessors_to_start[current];
-      //  Vector3 v2 = vertexIndexToVector(pd, current);
-      //  cmplx.E.push_back(std::make_pair(v1,v2));
-      //}
-    }else{
-      cmplx.V.at(i) = Vector3(0,0,0);
+    static double dstep = 0.5;
+
+    static double dd = 0;
+    for(uint k = 0; k < pcur.size()-1; k++){
+      Vector3 v1 = pcur.at(k);
+      Vector3 v2 = pcur.at(k+1);
+      v1[2]=dd;
+      v2[2]=dd;
+      cmplx.E.push_back(std::make_pair(v1,v2));
     }
+
+    cmplx.V.at(i)[2]=dd;
+    cmplx.V.at(i)[0]+=0.05;
+
+    dd+=dstep;
+
+
+
+    }else{
+      //cmplx.V.at(i)[2]=dstep;
+      //= Vector3(0,0,0);
+    }
+
   }
   std::cout << "Found " << cmplx.V.size() << " eligible vertices." << std::endl;
 }

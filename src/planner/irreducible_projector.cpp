@@ -31,13 +31,13 @@ pairDoubleVecVec IrreducibleProjector::ComputeThetaGammaFromRootPath( const std:
   //###########################################################################
   //piecewise linear interp between rootPos
   //###########################################################################
-  PathPiecewiseLinearEuclidean rpath = PathPiecewiseLinearEuclidean::from_keyframes(rootPos);
+  PathPiecewiseLinearEuclidean* rpath = PathPiecewiseLinearEuclidean::from_keyframes(rootPos);
 
   doubleVecVec thetas;
   doubleVecVec gammas;
 
   //compute the projected theta/gamma values for specific point t0
-  std::vector<double> lvec = rpath.GetLengthVector();
+  std::vector<double> lvec = rpath->GetLengthVector();
 
   double lall=0.0;
   for(uint i = 0; i < Nextended-1; i++){
@@ -51,7 +51,7 @@ pairDoubleVecVec IrreducibleProjector::ComputeThetaGammaFromRootPath( const std:
     Matrix3 R = rootRot.at(i+1);
 
     pairDoubleVec thetagamma;
-    thetagamma = ComputeThetaGammaFromRootPathPosition(rpath, t0, R, lengths);
+    thetagamma = ComputeThetaGammaFromRootPathPosition(*rpath, t0, R, lengths);
 
     thetas.push_back(thetagamma.first);
     gammas.push_back(thetagamma.second);

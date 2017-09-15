@@ -2,6 +2,7 @@
 #include "planner/cspace_factory.h"
 #include <ompl/base/GenericParam.h>
 #include <ompl/base/PlannerDataGraph.h>
+#include <KrisLibrary/utils/stringutils.h>
 
 
 void MotionPlannerOMPL::SerializeTree(ob::PlannerData &pd, CSpaceOMPL *cspace)
@@ -133,7 +134,14 @@ bool MotionPlannerOMPL::solve()
   std::vector<int> idxs = input.robot_idxs;
 
   //################################################################################
-  if(algorithm=="hierarchical"){
+  if(StartsWith(algorithm.c_str(),"hierarchical")) {
+    if(algorithm.size()<14){
+      std::cout << "Error Hierarchical Algorithm: \n             Usage hierarchical:<algorithm>  \n            Example: hierarchical:ompl:rrt" << std::endl;
+      std::cout << "your input: " << algorithm.c_str() << std::endl;
+      exit(0);
+    }
+    input.name_algorithm = algorithm.substr(13,algorithm.size()-13);
+
     robot = world->robots[idxs.at(0)];
     robot->UpdateConfig(p_init);
 
@@ -197,7 +205,6 @@ bool MotionPlannerOMPL::solve()
       cspace = factory.MakeCSpaceDecoratorInnerOuter(cspace, cspace_outer);
     }
     //################################################################################
-    input.name_algorithm = "ompl:rrt";
 
 //################################################################################
   }else{
@@ -248,6 +255,14 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
   else if(algorithm=="ompl:rrtconnect") ompl_planner = std::make_shared<og::RRTConnect>(si);
   else if(algorithm=="ompl:rrtlazy") ompl_planner = std::make_shared<og::LazyRRT>(si);
   else if(algorithm=="ompl:rrtsharp") ompl_planner = std::make_shared<og::RRTsharp>(si);
+  else if(algorithm=="ompl:prm") ompl_planner = std::make_shared<og::PRM>(si);
+  else if(algorithm=="ompl:prmstar") ompl_planner = std::make_shared<og::PRMstar>(si);
+  else if(algorithm=="ompl:lazyprm") ompl_planner = std::make_shared<og::LazyPRM>(si);
+  else if(algorithm=="ompl:lazyprmstar") ompl_planner = std::make_shared<og::LazyPRMstar>(si);
+  else if(algorithm=="ompl:sst") ompl_planner = std::make_shared<og::SST>(si);
+  else if(algorithm=="ompl:pdst") ompl_planner = std::make_shared<og::PDST>(si);
+  else if(algorithm=="ompl:kpiece") ompl_planner = std::make_shared<og::KPIECE1>(si);
+  else if(algorithm=="ompl:est") ompl_planner = std::make_shared<og::EST>(si);
   else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);
@@ -268,6 +283,7 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
   ob::ProblemDefinitionPtr pdef = ss.getProblemDefinition();
 
   pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
+  //pdef->setOptimizationObjective(ob::OptimizationObjectivePtr(new ob::PathLengthOptimizationObjective(si)));
 
   //###########################################################################
   // solve
@@ -275,6 +291,7 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
   // termination condition: 
   //    reached duration or found solution in epsilon-neighborhood
   //###########################################################################
+
   bool solved = false;
   double max_planning_time= input.max_planning_time;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );

@@ -785,12 +785,14 @@ namespace GLDraw{
     double dmin = cmplx.min_distance_shortest_path;
 
     for(uint i = 0; i < cmplx.V.size(); i++){
-      double di = (cmplx.distance_shortest_path.at(i)-dmin)/(dmax-dmin);
-      GLColor ci; ci.blend(red, blue, di); setColor(ci);
+      if(!cmplx.distance_shortest_path.empty()){
+        double di = (cmplx.distance_shortest_path.at(i)-dmin)/(dmax-dmin);
+        GLColor ci; ci.blend(red, blue, di); setColor(ci);
+      }
       drawPoint(cmplx.V.at(i));
     }
     glLineWidth(10);
-    setColor(red);
+    setColor(magenta);
     for(uint i = 0; i < cmplx.E.size(); i++){
       drawLineSegment(cmplx.E.at(i).first, 
                       cmplx.E.at(i).second);
