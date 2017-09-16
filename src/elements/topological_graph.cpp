@@ -538,27 +538,45 @@ void TopologicalGraph::ComputeShortestPathsLemon(ob::PlannerData& pd_in, const o
 // Dijkstra on graph
 //#############################################################################
 
-  auto d = Dijkstra<ListGraph, CostMap>(lg, length);
-  d.run(goal);
+  auto dstart = Dijkstra<ListGraph, CostMap>(lg, length);
+  dstart.run(start);
 
-  std::cout << "start: " << lg.id(start) << std::endl;
-  std::cout << "goal : " << lg.id(goal) << std::endl;
+  auto dgoal = Dijkstra<ListGraph, CostMap>(lg, length);
+  dgoal.run(goal);
 
   for (ListGraph::NodeIt node(lg); node != INVALID; ++node)
   {
-    Path<ListGraph> path = d.path(node);
-    for (Path<ListGraph>::ArcIt it(path); it != INVALID; ++it) {
+    Path<ListGraph> path_start = dstart.path(node);
+    std::vector<ListGraph::Node> path;
+
+    for (Path<ListGraph>::ArcIt it(path_start); it != INVALID; ++it) {
       ListGraph::Node v = lg.source(it);
       ListGraph::Node w = lg.target(it);
+      path.push_back(v);
+      path.push_back(w);
+    }
+    Path<ListGraph> path_goal = dgoal.path(node);
+    std::vector<ListGraph::Node> path_reversed;
+    for (Path<ListGraph>::ArcIt it(path_goal); it != INVALID; ++it) {
+      ListGraph::Node v = lg.source(it);
+      ListGraph::Node w = lg.target(it);
+      path_reversed.push_back(v);
+      path_reversed.push_back(w);
+    }
+    path.insert( path.end(), path_reversed.rbegin(), path_reversed.rend() );
+
+    for(uint k = 0; k < path.size()-1; k++){
+      ListGraph::Node v = path.at(k);
+      ListGraph::Node w = path.at(k+1);
       uint v1i = lg.id(v);
       uint v2i = lg.id(w);
       Vector3 v1 = vertexIndexToVector(pd_in, v1i);
       Vector3 v2 = vertexIndexToVector(pd_in, v2i);
       cmplx.E.push_back(std::make_pair(v1,v2));
     }
-  }
 
-  //exit(0);
+
+  }
 }
 
 
