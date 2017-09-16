@@ -783,3 +783,6 @@ Boost::graph
 
 
 [ ] does pd return a tree or a graph structure?
+
+-> graph looks OK before starting dijkstra. Why do we get back the wrong
+predeccessor map?

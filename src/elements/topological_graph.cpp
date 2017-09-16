@@ -6,12 +6,18 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
+#include <boost/graph/visitors.hpp>
+#include <boost/graph/breadth_first_search.hpp>
+#include <boost/graph/depth_first_search.hpp>
+#include <boost/graph/undirected_dfs.hpp>
+#include <boost/graph/dijkstra_shortest_paths_no_color_map.hpp>
 #include <boost/property_map/property_map.hpp>
 #include <boost/graph/copy.hpp>
 
 #include <ompl/base/Cost.h>
 #include <list>
 #include <utility>
+#include <map>
 
 typedef Math::Vector Config;
 using namespace Topology;
@@ -52,10 +58,19 @@ typedef K::Point_3                                          Bare_point;
 #endif
 #endif
 
-using Vertex = ob::PlannerData::Graph::Vertex;
-using VIterator = ob::PlannerData::Graph::VIterator;
-using EIterator = ob::PlannerData::Graph::EIterator;
 using Graph = ob::PlannerData::Graph;
+
+using Vertex = Graph::Vertex;
+using Edge = Graph::Edge;
+using VIterator = Graph::VIterator;
+using EIterator = Graph::EIterator;
+
+
+using UVertex = boost::graph_traits<PlannerDataGraphUndirected>::vertex_descriptor;
+using UEdge = boost::graph_traits<PlannerDataGraphUndirected>::edge_descriptor;
+using UVIterator = boost::graph_traits<PlannerDataGraphUndirected>::vertex_iterator;
+using UEIterator = boost::graph_traits<PlannerDataGraphUndirected>::edge_iterator;
+
 
 using namespace boost;
 typedef boost::property_map<Graph, vertex_index_t>::type IndexMap;
@@ -416,71 +431,211 @@ TopologicalGraph::TopologicalGraph(ob::PlannerData& pd, const ob::OptimizationOb
 #endif
 #endif
 
-  ComputeShortestPaths(pd, obj);
+  ComputeShortestPathsLemon(pd, obj);
 
 }
 SimplicialComplex& TopologicalGraph::GetSimplicialComplex(){
   return cmplx;
 }
 
+template <class Edge, class Graph>
+class BfsVisitor : public boost::default_bfs_visitor
+{
+public:
+
+    BfsVisitor(std::vector<Vertex>& edges_src, std::vector<Vertex>& edges_tar)
+    : m_edges_source(edges_src), m_edges_target(edges_tar)
+    {
+    }
+
+    void tree_edge(Edge e, const Graph& g) const
+    {
+      UVertex u = source(e, g);
+      UVertex v = target(e, g);
+      m_edges_source.push_back(u);
+      m_edges_target.push_back(v);
+    }
+private:
+    std::vector<Vertex>& m_edges_source;
+    std::vector<Vertex>& m_edges_target;
+};
+
+template <class Edge, class Graph>
+class DfsVisitor : public boost::default_dfs_visitor
+{
+public:
+
+    DfsVisitor(std::vector<Vertex>& edges_src, std::vector<Vertex>& edges_tar)
+    : m_edges_source(edges_src), m_edges_target(edges_tar)
+    {
+    }
+
+    void tree_edge(Edge e, const Graph& g) const
+    {
+      UVertex u = source(e, g);
+      UVertex v = target(e, g);
+      m_edges_source.push_back(u);
+      m_edges_target.push_back(v);
+    }
+private:
+    std::vector<Vertex>& m_edges_source;
+    std::vector<Vertex>& m_edges_target;
+};
+
+
+#include <lemon/list_graph.h>
+#include <lemon/dijkstra.h>
+
+void TopologicalGraph::ComputeShortestPathsLemon(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt){
+
+  using namespace lemon;
+
+  const ob::SpaceInformationPtr si = pd_in.getSpaceInformation();
+  Graph g = pd_in.toBoostGraph();
+
+  //Vertex start= pd_in.getStartIndex(0);
+  //Vertex goal = pd_in.getGoalIndex(0);
+
+//#############################################################################
+// Nodes boost to lemon
+//#############################################################################
+  ListGraph lg;
+  std::vector<ListGraph::Node> gn;
+  ListGraph::Node start, goal;
+
+  for(uint k = 0; k < pd_in.numVertices(); k++){
+    ListGraph::Node x = lg.addNode();
+    gn.push_back(x);
+    if(pd_in.isStartVertex(k)) start = x;
+    if(pd_in.isGoalVertex(k)) goal = x;
+  }
+
+//#############################################################################
+// Extract edges and weight
+//#############################################################################
+  typedef ListGraph::EdgeMap<double> CostMap;
+  CostMap length(lg);
+
+  for(uint v1 = 0; v1 < pd_in.numVertices(); v1++){
+    ob::PlannerDataVertex v1d = pd_in.getVertex(v1);
+
+    std::map<unsigned int, const ob::PlannerDataEdge *> edgeMap;
+    pd_in.getEdges(v1, edgeMap);
+
+
+    for (const auto &e1 : edgeMap) {
+      uint v2 = e1.first;
+
+      ob::Cost c;
+      pd_in.getEdgeWeight(v1,v2,&c);
+
+      ListGraph::Edge e = lg.addEdge( gn.at(v1), gn.at(v2) );
+      length[e] = c.value();
+    }
+  }
+
+//#############################################################################
+// Dijkstra on graph
+//#############################################################################
+
+  auto d = Dijkstra<ListGraph, CostMap>(lg, length);
+  d.init();
+  d.addSource(goal);
+  d.start();
+
+  std::cout << "start: " << lg.id(start) << std::endl;
+  std::cout << "goal : " << lg.id(goal) << std::endl;
+
+  for (ListGraph::NodeIt node(lg); node != INVALID; ++node)
+  {
+    Path<ListGraph> path = d.path(node);
+    for (Path<ListGraph>::ArcIt it(path); it != INVALID; ++it) {
+      ListGraph::Node v = lg.source(it);
+      ListGraph::Node w = lg.target(it);
+      uint v1i = lg.id(v);
+      uint v2i = lg.id(w);
+      Vector3 v1 = vertexIndexToVector(pd_in, v1i);
+      Vector3 v2 = vertexIndexToVector(pd_in, v2i);
+      cmplx.E.push_back(std::make_pair(v1,v2));
+    }
+  }
+
+  //exit(0);
+}
+
+
 void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt){
 
-  Graph g = pd_in.toBoostGraph();
-  PlannerDataGraph gb(g);
-  PlannerDataGraphUndirected gu;
-
-  boost::copy_graph(gb, gu);//NOT_OPTIMAL: avoid copying the whole graph
-
+  const ob::SpaceInformationPtr si = pd_in.getSpaceInformation();
   EIterator ei, ei_end;
   VIterator vi, vi_end;
-  ob::PlannerDataVertex vs = pd_in.getStartVertex(0);
-  ob::PlannerDataVertex vg = pd_in.getGoalVertex(0);
+
+  Graph g = pd_in.toBoostGraph();
+
   Vertex start= pd_in.getStartIndex(0);
   Vertex goal = pd_in.getGoalIndex(0);
 
   std::cout << "PlannerDataGraph:  vertices: " << num_vertices(g) << std::endl;
   std::cout << "                      edges: " << num_edges(g) << std::endl;
-  std::cout << "PlannerDataGraphU: vertices: " << num_vertices(gu) << std::endl;
-  std::cout << "                      edges: " << num_edges(gu) << std::endl;
-
-  using UVertex = boost::graph_traits<PlannerDataGraphUndirected>::vertex_descriptor;
-  using UEdge = boost::graph_traits<PlannerDataGraphUndirected>::edge_descriptor;
-
-  for (tie(vi, vi_end) = boost::vertices(gu); vi != vi_end; ++vi){
-    //uint idx = get(index,*vi);
-
-    boost::graph_traits<PlannerDataGraphUndirected>::out_edge_iterator e, e_end;
-    for(tie(e, e_end) = boost::out_edges(*vi, gu); e != e_end;++e){
-
-
-      UVertex e1 = source(*e,gu);
-      UVertex e2 = target(*e,gu);
-      property_map<PlannerDataGraphUndirected, edge_weight_t>::type weight = get(edge_weight, gu);
-
-      Vector3 v1 = vertexIndexToVector(pd_in, e1);
-      Vector3 v2 = vertexIndexToVector(pd_in, e2);
-
-      double d = (v1-v2).norm();
-
-      std::cout << "(" << source(*e, gu) << "," << target(*e, gu) << ") -> " << get(weight,*e) << " = " << d<< std::endl;
-
-      //cmplx.E.push_back(std::make_pair(v1,v2));
-    }
-
-  }
 
   std::vector<ob::Cost> dist_to_start(num_vertices(g));
   std::vector<ob::Cost> dist_to_goal(num_vertices(g));
 
-  std::vector<UVertex> predecessors_to_start(num_vertices(gu));
-  std::vector<UVertex> predecessors_to_goal(num_vertices(gu));
+  std::vector<UVertex> predecessors_to_start(num_vertices(g));
+  std::vector<UVertex> predecessors_to_goal(num_vertices(g));
 
-  UVertex ustart = start;
-  UVertex ugoal = goal;
+  std::vector<UVertex> vertex1;
+  std::vector<UVertex> vertex2;
+
+  BfsVisitor<ob::PlannerData::Graph::Edge, PlannerDataGraph> bfsVisitor(vertex1,vertex2);
+  //DfsVisitor<ob::PlannerData::Graph::Edge, PlannerDataGraph> dfsVisitor(vertex1,vertex2);
+  //get(edge_weight,g);
+  property_map<PlannerDataGraph, edge_weight_t>::type
+          weights = get(edge_weight, g);
+
+  property_map<Graph, boost::vertex_index_t>::type
+      indices = get(boost::vertex_index, g);
+
+  boost::breadth_first_search(g, start, 
+      boost::visitor(bfsVisitor)
+      .weight_map(weights)
+      .distance_map(boost::make_iterator_property_map(dist_to_start.begin(), get(boost::vertex_index, g)))
+      .distance_compare([&opt](Cost c1, Cost c2)
+      {
+       return opt.isCostBetterThan(c1, c2);
+      })
+      .distance_combine([](Cost, Cost c)
+      {
+       return c;
+      })
+      .distance_inf(opt.infiniteCost())
+      .distance_zero(opt.identityCost())
+  ); 
+
+  for(uint k = 0; k < vertex1.size(); k++){
+    uint v1i = vertex1.at(k);
+    uint v2i = vertex2.at(k);
+    Vector3 v1 = vertexIndexToVector(pd_in, v1i);
+    Vector3 v2 = vertexIndexToVector(pd_in, v2i);
+    //cmplx.E.push_back(std::make_pair(v1,v2));
+
+    bool found;
+    Edge ek;
+    boost::tie(ek, found) = edge(v1i, v2i, g);
+    if(found){
+      std::cout << "weight[(" << v1i << "," << v2i << ")] = " << get(weights, ek) <<std::endl;
+    }
+  }
+
 
 //################################################################################
-  boost::dijkstra_shortest_paths(gu, start,
-    boost::predecessor_map(&predecessors_to_start[0]).distance_map(&dist_to_start[0])
+  predecessors_to_start[start] = start;
+
+  boost::dijkstra_shortest_paths_no_color_map(g, start,
+  //boost::dijkstra_shortest_paths(g, start,
+    boost::predecessor_map(boost::make_iterator_property_map(predecessors_to_start.begin(), get(boost::vertex_index, g)))
+    .weight_map(weights)
+    .distance_map(boost::make_iterator_property_map(dist_to_start.begin(), get(boost::vertex_index, g)))
     .distance_compare([&opt](Cost c1, Cost c2)
     {
      return opt.isCostBetterThan(c1, c2);
@@ -491,23 +646,21 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd_in, const ob::Op
     })
     .distance_inf(opt.infiniteCost())
     .distance_zero(opt.identityCost())
-    );
-//################################################################################
+  );
 
   std::cout << "predecessors_to_start " << predecessors_to_start.size()   << std::endl;
   for(uint k = 0; k < predecessors_to_start.size()  ; k++){
     Vector3 v3 = vertexIndexToVector(pd_in, k);
     cmplx.V.push_back(v3);
     cmplx.distance_shortest_path.push_back(dist_to_start[k].value());
-    std::cout << "vertex " << k << " dist start " << dist_to_start[k] << std::endl;
+    std::cout << "vertex " << k << " dist start " << dist_to_start[k] 
+      << " pred " << predecessors_to_start[k] << std::endl;
   }
 
   for(uint k = 0; k < predecessors_to_start.size(); k++){
-
     if( predecessors_to_start[k] != k ){
       Vector3 v1 = vertexIndexToVector(pd_in, k);
       Vector3 v2 = vertexIndexToVector(pd_in, predecessors_to_start[k]);
-
       cmplx.E.push_back(std::make_pair(v1,v2));
     }
 
@@ -517,6 +670,26 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd_in, const ob::Op
   cmplx.min_distance_shortest_path = cmplx.distance_shortest_path[idx_min];
   cmplx.max_distance_shortest_path = cmplx.distance_shortest_path[idx_max];
   return;
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
+//################################################################################
 //################################################################################
   //extract cumulative distance for each vertex (distance to start + distance to
   //goal)
@@ -578,7 +751,7 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd_in, const ob::Op
 
   typedef boost::property_map<Graph, boost::vertex_index_t>::type IndexMap;
   IndexMap index = get(boost::vertex_index, g);
-  typedef boost::graph_traits < PlannerDataGraphUndirected >::adjacency_iterator adjacency_iterator;
+  typedef boost::graph_traits < PlannerDataGraph >::adjacency_iterator adjacency_iterator;
 
   //cmplx.V.clear();
   for(uint i = 0; i < pd_in.numVertices(); i++){
@@ -587,7 +760,7 @@ void TopologicalGraph::ComputeShortestPaths(ob::PlannerData& pd_in, const ob::Op
 
     Vertex current=i;
     std::pair<adjacency_iterator, adjacency_iterator> neighbors =
-      boost::adjacent_vertices(vertex(current,gu), gu);
+      boost::adjacent_vertices(vertex(current,g), g);
    
     std::cout << current << "(" << lk << ") -> ";
     bool neighborIsBetter = false;
