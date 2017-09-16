@@ -565,17 +565,35 @@ void TopologicalGraph::ComputeShortestPathsLemon(ob::PlannerData& pd_in, const o
     }
     path.insert( path.end(), path_reversed.rbegin(), path_reversed.rend() );
 
-    for(uint k = 0; k < path.size()-1; k++){
-      ListGraph::Node v = path.at(k);
-      ListGraph::Node w = path.at(k+1);
-      uint v1i = lg.id(v);
-      uint v2i = lg.id(w);
-      Vector3 v1 = vertexIndexToVector(pd_in, v1i);
-      Vector3 v2 = vertexIndexToVector(pd_in, v2i);
-      cmplx.E.push_back(std::make_pair(v1,v2));
+    if(path.size()>0){
+      double L = 0.0;
+      for(uint k = 0; k < path.size()-1; k++){
+        //std::cout << k << "/" << path.size() << std::endl;
+        ListGraph::Node v = path.at(k);
+        ListGraph::Node w = path.at(k+1);
+        uint v1i = lg.id(v);
+        uint v2i = lg.id(w);
+        Vector3 v1 = vertexIndexToVector(pd_in, v1i);
+        Vector3 v2 = vertexIndexToVector(pd_in, v2i);
+        L += (v1-v2).norm();
+        cmplx.E.push_back(std::make_pair(v1,v2));
+      }
+      uint node_idx = lg.id(node);
+      Vector3 node_v3 = vertexIndexToVector(pd_in, node_idx);
+      cmplx.V.push_back(node_v3);
+      cmplx.distance_shortest_path.push_back(L);
+      std::cout << "vertex " << lg.id(node) << " length " << L << std::endl;
     }
 
 
+  }
+  if(cmplx.distance_shortest_path.size()>0){
+    uint idx_min = std::distance(std::begin(cmplx.distance_shortest_path), std::min_element(std::begin(cmplx.distance_shortest_path), std::end(cmplx.distance_shortest_path)));
+    uint idx_max = std::distance(std::begin(cmplx.distance_shortest_path), std::max_element(std::begin(cmplx.distance_shortest_path), std::end(cmplx.distance_shortest_path)));
+    cmplx.min_distance_shortest_path = cmplx.distance_shortest_path[idx_min];
+    cmplx.max_distance_shortest_path = cmplx.distance_shortest_path[idx_max];
+    std::cout << "min shortest path: " << cmplx.min_distance_shortest_path << std::endl;
+    std::cout << "max shortest path: " << cmplx.max_distance_shortest_path << std::endl;
   }
 }
 

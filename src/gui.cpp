@@ -171,8 +171,10 @@ void ForceFieldBackend::Start()
   BaseT::Start();
   Robot *robot = world->robots[0];
 
-  planner_layer_robot_idx = plannerOutput.at(0).nested_idx.back();
-  planner_layer = plannerOutput.at(0).nested_idx.size()-1;
+  if(plannerOutput.size()>0){
+    planner_layer_robot_idx = plannerOutput.at(0).nested_idx.back();
+    planner_layer = plannerOutput.at(0).nested_idx.size()-1;
+  }
 
   settings["dragForceMultiplier"] = 500.0;
   drawContacts = 0;
@@ -504,14 +506,16 @@ void ForceFieldBackend::RenderScreen(){
   DrawText(line_x_pos, line_y_offset, "[MotionPlanner]");
   line_y_offset += line_y_offset_stepsize;
 
-  std::vector<int> bn = plannerOutput.at(0).cmplx.betti_numbers;
-  if(bn.size()>2){
-    line = "Betti      ";
-    line+=(" b0: ["+std::to_string(bn[0])+"]");
-    line+=(" b1: ["+std::to_string(bn[1])+"]");
-    line+=(" b2: ["+std::to_string(bn[2])+"]");
-    DrawText(line_x_pos, line_y_offset, line);
-    line_y_offset += line_y_offset_stepsize;
+  if(plannerOutput.size()>0){
+    std::vector<int> bn = plannerOutput.at(0).cmplx.betti_numbers;
+    if(bn.size()>2){
+      line = "Betti      ";
+      line+=(" b0: ["+std::to_string(bn[0])+"]");
+      line+=(" b1: ["+std::to_string(bn[1])+"]");
+      line+=(" b2: ["+std::to_string(bn[2])+"]");
+      DrawText(line_x_pos, line_y_offset, line);
+      line_y_offset += line_y_offset_stepsize;
+    }
   }
 
 }
