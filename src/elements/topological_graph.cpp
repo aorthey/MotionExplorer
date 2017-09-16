@@ -539,9 +539,7 @@ void TopologicalGraph::ComputeShortestPathsLemon(ob::PlannerData& pd_in, const o
 //#############################################################################
 
   auto d = Dijkstra<ListGraph, CostMap>(lg, length);
-  d.init();
-  d.addSource(goal);
-  d.start();
+  d.run(goal);
 
   std::cout << "start: " << lg.id(start) << std::endl;
   std::cout << "goal : " << lg.id(goal) << std::endl;
