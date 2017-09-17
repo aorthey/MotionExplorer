@@ -26,7 +26,7 @@ namespace Topology{
 
       SimplicialComplex& GetSimplicialComplex();
 
-      void ComputeShortestPaths(ob::PlannerData& pd, const ob::OptimizationObjective& opt);
+      //void ComputeShortestPaths(ob::PlannerData& pd, const ob::OptimizationObjective& opt);
       void ComputeShortestPathsLemon(ob::PlannerData& pd, const ob::OptimizationObjective& opt);
 
       std::vector<Math3D::Vector3> vertexIndicesToVector(const ob::PlannerData& pd, const std::vector<ob::PlannerData::Graph::Vertex> &v);
