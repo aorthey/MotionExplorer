@@ -1,4 +1,5 @@
 #include "planner_ompl.h"
+#include "elements/pathspace_hierarchy.h"
 #include "planner/cspace_factory.h"
 #include <ompl/base/GenericParam.h>
 #include <ompl/base/PlannerDataGraph.h>
@@ -156,7 +157,7 @@ bool MotionPlannerOMPL::solve()
       output.nested_q_init.push_back(qi);
       output.nested_q_goal.push_back(qg);
 
-      output.hierarchy.addLevel( ridx, qi, qg);
+      output.hierarchy.AddLevel( ridx, qi, qg);
     }
 
     //remove all nested robots except the original one
@@ -319,6 +320,10 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
 
   Topology::TopologicalGraph top(pd, *obj);
   output.cmplx = top.GetSimplicialComplex();
+
+  //PathspaceHierarchy hierarchy;
+  output.hierarchy.CreateHierarchyFromPlannerData(pd, *obj);
+  output.hierarchy.Print();
 
   SerializeTree(pd, cspace);
   output.SetTree(_stree);

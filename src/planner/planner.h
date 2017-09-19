@@ -1,4 +1,9 @@
 #pragma once
+
+#include "planner/serialized_tree.h"
+#include "planner/planner_input.h"
+#include "planner/planner_output.h"
+
 #include <Planning/PlannerSettings.h>
 #include <Planning/ContactCSpace.h>
 #include <Planning/RobotTimeScaling.h>
@@ -11,10 +16,6 @@
 
 #include <tinyxml.h>
 #include <vector>
-
-#include "planner/serialized_tree.h"
-#include "planner/planner_input.h"
-#include "planner/planner_output.h"
 
 class MotionPlanner{
 

@@ -153,6 +153,7 @@ class ForceFieldBackend : public SimTestBackend
     std::vector<int> drawPlannerTree;
     std::vector<int> drawPlannerSimplicialComplex;
 
+
     int showSweptVolumes;
     int drawController;
     int drawContactDistances;
@@ -170,6 +171,9 @@ class ForceFieldBackend : public SimTestBackend
     int drawRigidObjects;
     int drawRigidObjectsEdges;
     int drawRigidObjectsFaces;
+
+    int hierarchical_level;
+    std::vector<int> hierarchical_level_nodes;
 
     int planner_layer;
     int planner_layer_robot_idx;

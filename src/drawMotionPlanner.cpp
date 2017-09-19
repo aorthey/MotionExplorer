@@ -769,6 +769,26 @@ namespace GLDraw{
     glEnable(GL_LIGHTING);
     glDisable(GL_BLEND);
   }
+  void drawPath( const std::vector<Config> &path, GLColor &c, double linewidth){
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND);
+    glPushMatrix();
+
+    glPointSize(10);
+    glLineWidth(linewidth);
+    setColor(c);
+    for(uint i = 0; i < path.size()-1; i++){
+      Config c1 = path.at(i);
+      Config c2 = path.at(i+1);
+      Vector3 q1(c1[0],c1[1],c1[2]);
+      Vector3 q2(c2[0],c2[1],c2[2]);
+      drawPoint(q1);
+      drawLineSegment(q1, q2);
+    }
+    glPopMatrix();
+    glDisable(GL_BLEND);
+    glEnable(GL_LIGHTING);
+  }
   void drawSimplicialComplex( SimplicialComplex& cmplx ){
 
     glDisable(GL_LIGHTING);

@@ -27,12 +27,6 @@ void PlannerOutput::VerticesToFile(){
   fh.close();
 }
 
-void PlannerOutput::SetHierarchy(std::vector<HierarchicalLevel> &hierarchy_){
-  hierarchy = hierarchy_;
-}
-const std::vector<HierarchicalLevel>& PlannerOutput::GetHierarchy(){
-  return hierarchy;
-}
 
 void PlannerOutput::SetTorques(std::vector<Vector> &torques_){
   torques = torques_;

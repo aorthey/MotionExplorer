@@ -172,6 +172,9 @@ void ForceFieldBackend::Start()
   Robot *robot = world->robots[0];
 
   if(plannerOutput.size()>0){
+    hierarchical_level = 0;
+    hierarchical_level_nodes.push_back(0);
+
     planner_layer_robot_idx = plannerOutput.at(0).nested_idx.back();
     planner_layer = plannerOutput.at(0).nested_idx.size()-1;
   }
@@ -402,38 +405,71 @@ void ForceFieldBackend::RenderWorld()
   if(drawForceField) GLDraw::drawForceField(wrenchfield);
   if(drawWrenchField) GLDraw::drawWrenchField(wrenchfield);
 
+//  for(uint i = 0; i < plannerOutput.size(); i++){
+//
+//    Robot *robot_i = world->robots[planner_layer_robot_idx];
+//
+//    if(drawPathStartGoal.at(i)){
+//      Config qi = plannerOutput.at(i).q_init;
+//      Config qg = plannerOutput.at(i).q_goal;
+//      GLDraw::drawGLPathStartGoal(robot_i, qi, qg);
+//    }
+//
+//    SweptVolume sv = plannerOutput.at(i).GetSweptVolume(robot_i);
+//
+//    if(drawPathSweptVolume.at(i)){
+//      GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
+//    }
+//
+//    if(drawPathMilestones.at(i)){
+//      GLDraw::drawGLPathKeyframes(robot_i, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack, sv.GetColorMilestones());
+//    }
+//    SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
+//
+//    if(drawPlannerTree.at(i)){
+//      SwathVolume swv = plannerOutput.at(i).GetSwathVolume();
+//      GLDraw::drawSwathVolume(swv.GetRobot(), swv.GetMatrices(), swv.GetAppearanceStack(), swv.GetColor());
+//      GLDraw::drawPlannerTree(plannerOutput.at(i).GetTree());
+//    }
+//
+//    if(drawPlannerSimplicialComplex.at(i)){
+//      GLDraw::drawSimplicialComplex(cmplx);
+//    }
+//    if(drawPathShortestPath.at(i)){
+//      GLDraw::drawShortestPath(cmplx);
+//    }
+//  }
+  //hierarchies
   for(uint i = 0; i < plannerOutput.size(); i++){
 
-    Robot *robot_i = world->robots[planner_layer_robot_idx];
+    PathspaceHierarchy *h = &plannerOutput.at(i).hierarchy;
+    Robot *robot_h = world->robots[h->GetRobotIdx(hierarchical_level)];
+    //SweptVolume sv = plannerOutput.at(i).GetSweptVolume(robot_i);
 
     if(drawPathStartGoal.at(i)){
-      Config qi = plannerOutput.at(i).q_init;
-      Config qg = plannerOutput.at(i).q_goal;
-      GLDraw::drawGLPathStartGoal(robot_i, qi, qg);
+      Config qi = h->GetInitConfig(hierarchical_level);
+      Config qg = h->GetGoalConfig(hierarchical_level);
+      GLDraw::drawGLPathStartGoal(robot_h, qi, qg);
     }
+    GLColor magenta(0.8,0,0.8,0.5);
+    GLColor green(0.1,0.9,0.1,1);
 
-    SweptVolume sv = plannerOutput.at(i).GetSweptVolume(robot_i);
 
-    if(drawPathSweptVolume.at(i)){
-      GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
+    std::vector<int> nodes;
+    if(hierarchical_level>0){
+      for(uint k = 0; k < hierarchical_level-1; k++){
+        nodes.push_back(hierarchical_level_nodes.at(k));
+      }
     }
+    for(uint k = 0; k < h->NumberNodesOnLevel(hierarchical_level); k++){
+      nodes.push_back(k);
+      const std::vector<Config> &path = h->GetPathFromNodes(nodes);
+      if(k == hierarchical_level_nodes.at(hierarchical_level))
+        GLDraw::drawPath(path, green, 30);
+      else
+        GLDraw::drawPath(path, magenta);
 
-    if(drawPathMilestones.at(i)){
-      GLDraw::drawGLPathKeyframes(robot_i, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack, sv.GetColorMilestones());
-    }
-    SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
-
-    if(drawPlannerTree.at(i)){
-      SwathVolume swv = plannerOutput.at(i).GetSwathVolume();
-      GLDraw::drawSwathVolume(swv.GetRobot(), swv.GetMatrices(), swv.GetAppearanceStack(), swv.GetColor());
-      GLDraw::drawPlannerTree(plannerOutput.at(i).GetTree());
-    }
-
-    if(drawPlannerSimplicialComplex.at(i)){
-      GLDraw::drawSimplicialComplex(cmplx);
-    }
-    if(drawPathShortestPath.at(i)){
-      GLDraw::drawShortestPath(cmplx);
+      nodes.erase(nodes.end() - 1);
     }
   }
 
@@ -517,6 +553,13 @@ void ForceFieldBackend::RenderScreen(){
       line_y_offset += line_y_offset_stepsize;
     }
   }
+  line = "Hierarchy    : ";
+  line+=(" level ["+std::to_string(hierarchical_level)+"]");
+  for(uint k = 0; k < hierarchical_level_nodes.size(); k++){
+    line+=(" node ["+std::to_string(hierarchical_level_nodes.at(k))+"]");
+  }
+  DrawText(line_x_pos,line_y_offset,line);
+  line_y_offset += line_y_offset_stepsize;
 
 }
 
@@ -963,6 +1006,39 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     planner_layer_robot_idx = plannerOutput.at(0).nested_idx.at(planner_layer);
     std::cout << "Switched to hierarchy level " << planner_layer << " (Robot: ";
     std::cout << planner_layer_robot_idx << " name " << world->robots[planner_layer_robot_idx]->name  << ")" << std::endl;  
+
+  }else if(cmd=="hierarchy_next"){
+    int N = plannerOutput.at(0).hierarchy.NumberNodesOnLevel(hierarchical_level);
+    if(N>0){
+      uint node = hierarchical_level_nodes.at(hierarchical_level);
+      if(node < N-1) node++;
+      else node=0;
+      hierarchical_level_nodes.at(hierarchical_level) = node;
+    }
+
+  }else if(cmd=="hierarchy_previous"){
+    int N = plannerOutput.at(0).hierarchy.NumberNodesOnLevel(hierarchical_level);
+    if(N>0){
+      uint node = hierarchical_level_nodes.at(hierarchical_level);
+      if(node > 0 ) node--;
+      else node=N-1;
+      hierarchical_level_nodes.at(hierarchical_level) = node;
+    }
+
+  }else if(cmd=="hierarchy_down"){
+    int N = plannerOutput.at(0).hierarchy.NumberLevels();
+    if(hierarchical_level < N-1 ){
+      hierarchical_level++;
+    }else{
+      hierarchical_level=0;
+    }
+  }else if(cmd=="hierarchy_up"){
+    int N = plannerOutput.at(0).hierarchy.NumberLevels();
+    if(hierarchical_level > 0 ){
+      hierarchical_level--;
+    }else{
+      hierarchical_level=N-1;
+    }
   }else return BaseT::OnCommand(cmd,args);
 
   SendRefresh();

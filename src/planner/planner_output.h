@@ -2,17 +2,8 @@
 #include "elements/swept_volume.h"
 #include "elements/swath_volume.h"
 #include "elements/simplicial_complex.h"
-#include "elements/path_hierarchy.h"
+#include "elements/pathspace_hierarchy.h"
 #include "planner/serialized_tree.h"
-
-struct HierarchicalLevel{
-  uint idx;
-  std::string name;
-  std::vector<Config> V;
-  //geometry
-  //vector<GLDraw::GeometryAppearance> geometry;
-  SwathVolume swv;
-};
 
 class PlannerOutput{
 
@@ -49,7 +40,7 @@ class PlannerOutput{
     SwathVolume *swv;
     SimplicialComplex cmplx;
     
-    PathHierarchy hierarchy;
+    PathspaceHierarchy hierarchy;
 
     Robot *robot;
 
@@ -67,8 +58,6 @@ class PlannerOutput{
     std::vector<Config> ddq;
     std::vector<Vector> torques;
 
-    std::vector<HierarchicalLevel> hierarchy;
-
   public:
 
     PlannerOutput();
@@ -80,8 +69,6 @@ class PlannerOutput{
 
     void VerticesToFile();
 
-    void SetHierarchy(std::vector<HierarchicalLevel> &hierarchy_);
-    const std::vector<HierarchicalLevel>& GetHierarchy();
     void SetTorques(std::vector<Vector> &torques_);
     const std::vector<Vector>& GetTorques();
     Config GetInitConfiguration();

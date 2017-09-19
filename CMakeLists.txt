@@ -83,7 +83,7 @@ SET(ORTHOKLAMPT_LIBRARIES ${ORTHOKLAMPT_LIBRARIES} ${OMPLAPP_LIBRARIES} ompl_app
 INCLUDE_DIRECTORIES(src)
 INCLUDE_DIRECTORIES(src/planner)
 
-FILE(GLOB ORTHOKLAMPT_SRC src/*.cpp src/planner/*.cpp src/elements/*.cpp src/controller/*.cpp)
+FILE(GLOB ORTHOKLAMPT_SRC src/*.cpp src/planner/*.cpp src/elements/*.cpp src/controller/*.cpp src/algorithms/*.cpp)
 
 MESSAGE(COLOR_WHITE "-------------------------------------")
 MESSAGE(COLOR_WHITE "-- BUILDING EXECUTABLES")
