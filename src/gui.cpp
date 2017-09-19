@@ -464,11 +464,16 @@ void ForceFieldBackend::RenderWorld()
     for(uint k = 0; k < h->NumberNodesOnLevel(hierarchical_level); k++){
       nodes.push_back(k);
       const std::vector<Config> &path = h->GetPathFromNodes(nodes);
-      if(k == hierarchical_level_nodes.at(hierarchical_level))
+      if(k == hierarchical_level_nodes.at(hierarchical_level)){
+        PathNode* node = h->GetPathNodeFromNodes(nodes);
+        SweptVolume sv = node->GetSweptVolume(robot_h);
         GLDraw::drawPath(path, green, 30);
-      else
+        if(drawPathSweptVolume.at(i)){
+          GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
+        }
+      }else{
         GLDraw::drawPath(path, magenta);
-
+      }
       nodes.erase(nodes.end() - 1);
     }
   }
@@ -1029,15 +1034,11 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     int N = plannerOutput.at(0).hierarchy.NumberLevels();
     if(hierarchical_level < N-1 ){
       hierarchical_level++;
-    }else{
-      hierarchical_level=0;
     }
   }else if(cmd=="hierarchy_up"){
     int N = plannerOutput.at(0).hierarchy.NumberLevels();
     if(hierarchical_level > 0 ){
       hierarchical_level--;
-    }else{
-      hierarchical_level=N-1;
     }
   }else return BaseT::OnCommand(cmd,args);
 

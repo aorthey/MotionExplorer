@@ -10,6 +10,9 @@ GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
   CSpaceOMPL(robot_, kspace_)
 {
   Nklampt =  robot->q.size() - 6;
+  // std::cout << Nklampt << std::endl;
+  // std::cout << robot->name << std::endl;
+  // std::cout << robot->q.size() << std::endl;
 
   //check if the robot is SE(3) or if we need to add real vector space for joints
   if(Nklampt<=0){

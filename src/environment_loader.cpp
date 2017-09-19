@@ -160,8 +160,11 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 
       pin.qMin = robot->qMin;
       pin.qMax = robot->qMax;
+      uint N = robot->q.size();
       robot->q = pin.q_init;
+      robot->q.resize(N);
       robot->UpdateFrames();
+
 
       //set oderobot to planner start pos
       ODERobot *simrobot = _backend->sim.odesim.robot(ridx);
@@ -172,6 +175,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       _backend->sim.odesim.robot(0)->SetVelocities(dq);
 
       robot->q = pin.q_goal;
+      robot->q.resize(N);
       robot->UpdateFrames();
 
       //set other nested robots
@@ -196,6 +200,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       std::cout << "No Planner Settings. No Planning" << std::endl;
       std::cout << std::string(80, '-') << std::endl;
     }
+
     //_backend->sim.simStep = 0.001;
     //WorldSimulation sim = _backend->sim;
     for(uint i = 0; i < _backend->sim.odesim.numRobots(); i++){

@@ -43,8 +43,6 @@ namespace GLDraw {
   void drawEllipsoid(Vector3 &c, Vector3 &u, Vector3 &v, Vector3 &w, int numSteps=16);
 
   void drawWorkspaceApproximationSpheres(std::vector<PlannerOutput> &pout);
-
   void drawPath( const std::vector<Config> &path, GLColor &c, double linewidth = 10);
-
   void setColor(GLColor &c);
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "elements/swept_volume.h"
 #include <Library/KrisLibrary/math/vector.h>
 #include <Library/KrisLibrary/math3d/primitives.h>
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
@@ -9,8 +10,18 @@
 namespace ob = ompl::base;
 
 struct PathNode{
+  PathNode(){
+    sv = NULL;
+  }
   std::vector<Config> path;
   std::vector<PathNode*> children;
+  SweptVolume& GetSweptVolume(Robot *robot){
+    if(!sv){
+      sv = new SweptVolume(robot, path, 0);
+    }
+    return *sv;
+  }
+  SweptVolume *sv;
 };
 
 

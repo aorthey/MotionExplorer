@@ -105,6 +105,8 @@ bool MotionPlannerOMPL::solve()
     std::cout << "No Planner Algorithm detected" << std::endl;
     return false;
   }
+  std::vector<int> idxs = input.robot_idxs;
+
 
   Config p_init = input.q_init;
   Config p_goal = input.q_goal;
@@ -132,7 +134,6 @@ bool MotionPlannerOMPL::solve()
   SingleRobotCSpace* cspace_inner;
   SingleRobotCSpace* cspace_outer;
 
-  std::vector<int> idxs = input.robot_idxs;
 
   //################################################################################
   if(StartsWith(algorithm.c_str(),"hierarchical")) {
@@ -143,14 +144,15 @@ bool MotionPlannerOMPL::solve()
     }
     input.name_algorithm = algorithm.substr(13,algorithm.size()-13);
 
-    robot = world->robots[idxs.at(0)];
-    robot->UpdateConfig(p_init);
+    //robot = world->robots[idxs.back()];
+    //robot->UpdateConfig(p_init);
 
     for(uint k = 0; k < idxs.size(); k++){
       uint ridx = idxs.at(k);
       output.nested_idx.push_back(ridx);
       Robot *rk = world->robots[ridx];
 
+      std::cout << "robot " << rk->name <<  " size " << rk->q.size() << std::endl;
       Config qi = p_init; qi.resize(rk->q.size());
       Config qg = p_goal; qg.resize(rk->q.size());
 
@@ -161,7 +163,7 @@ bool MotionPlannerOMPL::solve()
     }
 
     //remove all nested robots except the original one
-    for(uint k = 1; k < idxs.size(); k++){
+    for(uint k = 0; k < idxs.size()-1; k++){
       output.removable_robot_idxs.push_back(idxs.at(k));
     }
 
@@ -170,9 +172,9 @@ bool MotionPlannerOMPL::solve()
     std::cout << std::string(80, '-') << std::endl;
     std::cout << " Robots  " << std::endl;
 
-    uint ridx = idxs.at(1);
-    Robot *ri = world->robots[ridx];
+    uint ridx = idxs.at(0);
 
+    Robot *ri = world->robots[ridx];
     output.robot_idx = ridx;
 
     Config qi = input.q_init;
@@ -190,7 +192,7 @@ bool MotionPlannerOMPL::solve()
     output.robot = ri;
 
     if(input.freeFloating){
-      cspace_nested = new SingleRobotCSpace(*world,idxs.at(1),&worldsettings);
+      cspace_nested = new SingleRobotCSpace(*world,ridx,&worldsettings);
       cspace = factory.MakeGeometricCSpaceRotationalInvariance(ri, cspace_nested);
 
     //################################################################################
