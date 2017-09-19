@@ -2,6 +2,7 @@
 #include "elements/swept_volume.h"
 #include "elements/swath_volume.h"
 #include "elements/simplicial_complex.h"
+#include "elements/path_hierarchy.h"
 #include "planner/serialized_tree.h"
 
 struct HierarchicalLevel{
@@ -47,6 +48,8 @@ class PlannerOutput{
     SweptVolume *sv;
     SwathVolume *swv;
     SimplicialComplex cmplx;
+    
+    PathHierarchy hierarchy;
 
     Robot *robot;
 

@@ -155,6 +155,8 @@ bool MotionPlannerOMPL::solve()
 
       output.nested_q_init.push_back(qi);
       output.nested_q_goal.push_back(qg);
+
+      output.hierarchy.addLevel( ridx, qi, qg);
     }
 
     //remove all nested robots except the original one

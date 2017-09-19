@@ -1140,6 +1140,11 @@ bool GLUIForceFieldGUI::Initialize()
   AddToKeymap("G","draw_planner_simplicial_complex");
   AddToKeymap("S","make_screenshot");
 
+  AddToKeymap("left","hierarchy_previous");
+  AddToKeymap("right","hierarchy_next");
+  AddToKeymap("up","hierarchy_down");
+  AddToKeymap("down","hierarchy_up");
+
   AddButton("load_motion_planner");
   AddButton("save_motion_planner");
   AddButton("quit");
