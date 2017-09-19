@@ -173,7 +173,12 @@ void ForceFieldBackend::Start()
 
   if(plannerOutput.size()>0){
     hierarchical_level = 0;
-    hierarchical_level_nodes.push_back(0);
+
+    uint N = plannerOutput.at(0).hierarchy.NumberLevels();
+    for(uint k = 0; k < N; k++){
+      //uint M = plannerOutput.at(0).hierarchy.NumberNodesOnLevel(k);
+      hierarchical_level_nodes.push_back(0);
+    }
 
     planner_layer_robot_idx = plannerOutput.at(0).nested_idx.back();
     planner_layer = plannerOutput.at(0).nested_idx.size()-1;
@@ -454,27 +459,37 @@ void ForceFieldBackend::RenderWorld()
     GLColor magenta(0.8,0,0.8,0.5);
     GLColor green(0.1,0.9,0.1,1);
 
-
     std::vector<int> nodes;
+
     if(hierarchical_level>0){
       for(uint k = 0; k < hierarchical_level-1; k++){
         nodes.push_back(hierarchical_level_nodes.at(k));
       }
-    }
-    for(uint k = 0; k < h->NumberNodesOnLevel(hierarchical_level); k++){
-      nodes.push_back(k);
-      const std::vector<Config> &path = h->GetPathFromNodes(nodes);
-      if(k == hierarchical_level_nodes.at(hierarchical_level)){
-        PathNode* node = h->GetPathNodeFromNodes(nodes);
-        SweptVolume sv = node->GetSweptVolume(robot_h);
-        GLDraw::drawPath(path, green, 30);
-        if(drawPathSweptVolume.at(i)){
-          GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
+      for(uint k = 0; k < h->NumberNodesOnLevel(hierarchical_level); k++){
+        nodes.push_back(k);
+
+        const std::vector<Config> &path = h->GetPathFromNodes(nodes);
+        if(k == hierarchical_level_nodes.at(hierarchical_level)){
+          PathNode* node = h->GetPathNodeFromNodes(nodes);
+          SweptVolume sv = node->GetSweptVolume(robot_h);
+          GLDraw::drawPath(path, green, 30);
+          if(drawPathSweptVolume.at(i)){
+            GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
+          }
+        }else{
+          GLDraw::drawPath(path, magenta);
         }
-      }else{
-        GLDraw::drawPath(path, magenta);
+
+        nodes.erase(nodes.end() - 1);
       }
-      nodes.erase(nodes.end() - 1);
+    }else{
+      const std::vector<Config> &path = h->GetPathFromNodes(nodes);
+      PathNode* node = h->GetPathNodeFromNodes(nodes);
+      SweptVolume sv = node->GetSweptVolume(robot_h);
+      GLDraw::drawPath(path, green, 20);
+      if(drawPathSweptVolume.at(i)){
+        GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
+      }
     }
   }
 
@@ -1020,7 +1035,6 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
       else node=0;
       hierarchical_level_nodes.at(hierarchical_level) = node;
     }
-
   }else if(cmd=="hierarchy_previous"){
     int N = plannerOutput.at(0).hierarchy.NumberNodesOnLevel(hierarchical_level);
     if(N>0){
@@ -1029,7 +1043,6 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
       else node=N-1;
       hierarchical_level_nodes.at(hierarchical_level) = node;
     }
-
   }else if(cmd=="hierarchy_down"){
     int N = plannerOutput.at(0).hierarchy.NumberLevels();
     if(hierarchical_level < N-1 ){
@@ -1219,8 +1232,8 @@ bool GLUIForceFieldGUI::Initialize()
 
   AddToKeymap("left","hierarchy_previous");
   AddToKeymap("right","hierarchy_next");
-  AddToKeymap("up","hierarchy_down");
-  AddToKeymap("down","hierarchy_up");
+  AddToKeymap("down","hierarchy_down");
+  AddToKeymap("up","hierarchy_up");
 
   AddButton("load_motion_planner");
   AddButton("save_motion_planner");

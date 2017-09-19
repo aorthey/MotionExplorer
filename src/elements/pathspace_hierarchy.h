@@ -13,7 +13,10 @@ struct PathNode{
   PathNode(){
     sv = NULL;
   }
+
   std::vector<Config> path;
+  std::vector<ob::State*> state_path;
+
   std::vector<PathNode*> children;
   SweptVolume& GetSweptVolume(Robot *robot){
     if(!sv){
@@ -47,7 +50,12 @@ class PathspaceHierarchy{
     void AddPath( std::vector<Config> &path_ );
     void AddPath( std::vector<Config> &path_, std::vector<int> nodes);
 
+    void SmoothPath( std::vector<int> nodes );
+    void SmoothPath( int node );
+
   protected:
+    ob::SpaceInformationPtr si;
+
     std::vector<int> level_robot_idx;
     std::vector<Config> level_q_init;
     std::vector<Config> level_q_goal;

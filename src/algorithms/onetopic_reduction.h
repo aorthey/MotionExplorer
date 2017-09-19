@@ -41,6 +41,11 @@ static ob::OptimizationObjectivePtr getThresholdPathLength(const ob::SpaceInform
 Vector3 vertexIndexToVector(const ob::PlannerData& pd, const Vertex &v);
 std::vector<Vector3> vertexIndicesToVector(const ob::PlannerData& pd, const std::vector<Vertex> &v);
 
+//Let p,q be two paths [0,1]->M
+//Linearsegmentvaliditychecker: 
+//  for given s,t \in [0,1] checks if the linear segments between p(s) and q(t)
+//  is valid. This is done by calling ompl's checkmotion
+
 class LinearSegmentValidityChecker : public ob::StateValidityChecker
 {
   public:
@@ -101,5 +106,23 @@ class LinearSegmentValidityChecker : public ob::StateValidityChecker
 
 };
 
-bool testVisibilityRRT(const ob::PlannerData& pd, const ob::SpaceInformationPtr &si_path_space, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2);
-std::vector< std::vector< Vector3 >> ComputeShortestPathsLemon(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt);
+//bool testVisibilityRRT(const ob::PlannerData& pd, const ob::SpaceInformationPtr &si_path_space, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2);
+//std::vector< std::vector< Vector3 >> ComputeShortestPathsLemon(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt);
+
+class OnetopicPathSpaceModifier{
+  public:
+    explicit OnetopicPathSpaceModifier( ob::PlannerData& pd_in, const ob::OptimizationObjective& opt );
+
+    std::vector< std::vector< Vector3 >> GetVectorPaths();
+    std::vector< std::vector< Config >> GetConfigPaths();
+
+
+  private:
+    bool testVisibilityRRT(const ob::PlannerData& pd, const ob::SpaceInformationPtr &si_path_space, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2);
+    std::vector< std::vector< Vector3 >> ComputeShortestPathsLemon(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt);
+
+    std::vector< std::vector< Vector3 >> vector_paths;
+    std::vector< std::vector< Config >> config_paths;
+
+
+};

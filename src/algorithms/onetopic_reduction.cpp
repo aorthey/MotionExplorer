@@ -1,6 +1,28 @@
 #include "algorithms/onetopic_reduction.h"
 
-bool testVisibilityRRT(const ob::PlannerData& pd, const ob::SpaceInformationPtr &si_path_space, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2)
+
+Vector3 vertexIndexToVector(const ob::PlannerData& pd, const Vertex &v){
+  ob::PlannerDataVertex vd = pd.getVertex(v);
+  const ob::State* si = vd.getState();
+  double x,y,z;
+  const ob::RealVectorStateSpace::StateType *qomplRnSpace = si->as<ob::RealVectorStateSpace::StateType>();
+  x = qomplRnSpace->values[0];
+  y = qomplRnSpace->values[1];
+  z = qomplRnSpace->values[2];
+  Vector3 v3(x,y,z);
+  return v3;
+}
+std::vector<Vector3> vertexIndicesToVector(const ob::PlannerData& pd, const std::vector<Vertex> &v){
+
+  std::vector<Vector3> output;
+  for(uint i = 0; i < v.size(); i++){
+    Vector3 v3 = vertexIndexToVector(pd, v.at(i));
+    output.push_back(v3);
+  }
+  return output;
+}
+
+bool OnetopicPathSpaceModifier::testVisibilityRRT(const ob::PlannerData& pd, const ob::SpaceInformationPtr &si_path_space, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2)
 {
   //[0,1] x [0,1]
   ob::RealVectorBounds bounds(2);
@@ -41,29 +63,7 @@ bool testVisibilityRRT(const ob::PlannerData& pd, const ob::SpaceInformationPtr 
   return solved;
 }
 
-
-Vector3 vertexIndexToVector(const ob::PlannerData& pd, const Vertex &v){
-  ob::PlannerDataVertex vd = pd.getVertex(v);
-  const ob::State* si = vd.getState();
-  double x,y,z;
-  const ob::RealVectorStateSpace::StateType *qomplRnSpace = si->as<ob::RealVectorStateSpace::StateType>();
-  x = qomplRnSpace->values[0];
-  y = qomplRnSpace->values[1];
-  z = qomplRnSpace->values[2];
-  Vector3 v3(x,y,z);
-  return v3;
-}
-std::vector<Vector3> vertexIndicesToVector(const ob::PlannerData& pd, const std::vector<Vertex> &v){
-
-  std::vector<Vector3> output;
-  for(uint i = 0; i < v.size(); i++){
-    Vector3 v3 = vertexIndexToVector(pd, v.at(i));
-    output.push_back(v3);
-  }
-  return output;
-}
-
-std::vector< std::vector< Vector3 >> ComputeShortestPathsLemon(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt){
+std::vector< std::vector< Vector3 >> OnetopicPathSpaceModifier::ComputeShortestPathsLemon(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt){
 
 //#############################################################################
 // output
@@ -191,7 +191,6 @@ std::vector< std::vector< Vector3 >> ComputeShortestPathsLemon(ob::PlannerData& 
       std::cout << "Found a non-connected vertex in graph -> vertex " << lg.id(node) << std::endl;
       V.at(node_idx) = Vector3(0,0,0);
       distance_shortest_path.at(node_idx) = dInf;
-      //exit(0);
     }
 
 
@@ -264,7 +263,28 @@ std::vector< std::vector< Vector3 >> ComputeShortestPathsLemon(ob::PlannerData& 
     }
   }
   return output;
+}
+OnetopicPathSpaceModifier::OnetopicPathSpaceModifier( ob::PlannerData& pd_in, const ob::OptimizationObjective& opt ){
 
+  vector_paths = ComputeShortestPathsLemon(pd_in, opt);
+  for(uint i = 0; i < vector_paths.size(); i++){
+    std::vector<Vector3> path3 = vector_paths.at(i);
+    std::vector<Config> path;
+    for(uint j = 0; j < path3.size(); j++){
+      Config q;q.resize(3);
+      for(uint k = 0; k < 3; k++){
+        q(k) = path3.at(j)[k];
+      }
+      path.push_back(q);
+    }
+    config_paths.push_back(path);
+  }
 }
 
 
+std::vector< std::vector< Vector3 >> OnetopicPathSpaceModifier::GetVectorPaths(){
+  return vector_paths;
+}
+std::vector< std::vector< Config >> OnetopicPathSpaceModifier::GetConfigPaths(){
+  return config_paths;
+}

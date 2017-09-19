@@ -767,22 +767,15 @@ sphere?
 What if there are two exactly similar shortest path around a sphere. I.e. there
 are >TWO< unique shortest paths (in the same homotopy class)
 
-Boost::graph
-[ ] first vertex sometimes removed (maybe not enough padding in cost?)
-[ ] why does shortest path contain so few vertices?
+[x] test RRT for visibility check between two paths
+[x] test on 6 environments: 
+  [x] sphere
+  [x] cuboid
+  [x] double cuboid
+  [x] triple T grill (see jaillet 2008)
+  [x] forest of cylinders on a flat surface
+  [x] 3D lattice cuboid
 
-[ ] test RRT for visibility check between two paths
-
-[ ] test on 5 environments: 
-  [ ] sphere
-  [ ] cuboid
-  [ ] double cuboid
-  [ ] triple T grill (see jaillet 2008)
-  [ ] forest of cylinders on a flat surface
-  [ ] 3D lattice cuboid
-
-
-[ ] does pd return a tree or a graph structure?
-
--> graph looks OK before starting dijkstra. Why do we get back the wrong
-predeccessor map?
+[ ] visualize tree by text output (and indicate which nodes are where)
+[ ] smooth path
+[ ] interpolate path

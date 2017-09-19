@@ -323,7 +323,6 @@ bool MotionPlannerOMPL::solve_geometrically(CSpaceOMPL *cspace){
   Topology::TopologicalGraph top(pd, *obj);
   output.cmplx = top.GetSimplicialComplex();
 
-  //PathspaceHierarchy hierarchy;
   output.hierarchy.CreateHierarchyFromPlannerData(pd, *obj);
   output.hierarchy.Print();
 
