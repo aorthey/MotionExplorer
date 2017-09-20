@@ -137,6 +137,7 @@ void PlannerStrategyGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspa
   double max_planning_time= input.max_planning_time;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
+
   //###########################################################################
   // solve
   //###########################################################################

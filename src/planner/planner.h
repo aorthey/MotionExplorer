@@ -27,5 +27,7 @@ class MotionPlanner{
 
     bool IsFeasible(Robot *robot, SingleRobotCSpace &cspace, Config &q);
 
+  private:
+
 };
 

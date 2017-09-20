@@ -752,15 +752,6 @@ maybe keybindings and oncommand in GUI. everything else is ideally done
 automatically.
 [ ] have <gui></gui> environment to set variables
 
-Rigid Body
-[ ] have one working algorithm for rigid body case
-  [ ] computing betti numbers works, but how do we get the associated edges?
-  [ ] some parts of simplicial complex penetrate the surface. does it have to do with collision checker used?
-  [ ] how to compute shortest path of several H classes
-[ ] compute Hclasses for just the sphere
-[ ] compute Hclasses for just the capsule
-[ ] going up and down the hierarchy
-
 [ ] how to compute all shortest paths? What if there is a sphere in the
 environment, would we classify into up/down paths? Like going over sphere/ under
 sphere?
@@ -776,5 +767,7 @@ are >TWO< unique shortest paths (in the same homotopy class)
   [x] forest of cylinders on a flat surface
   [x] 3D lattice cuboid
 [x] visualize tree by text output (and indicate which nodes are where)
-[ ] smooth path
-[ ] interpolate path
+[x] smooth path
+[x] interpolate path
+[ ] sometimes two nearby paths are not reduced, investigate that
+[ ] extend ompl to plan with an input path constraint (sublevel planning)

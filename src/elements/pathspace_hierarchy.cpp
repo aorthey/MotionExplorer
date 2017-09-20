@@ -105,23 +105,5 @@ void PathspaceHierarchy::CreateHierarchyFromPlannerData( ob::PlannerData& pd, co
 
   for(uint i = 0; i < onetopic_paths.size(); i++){
     AddPath( onetopic_paths.at(i) );
-    SmoothPath(i);
   }
-}
-void PathspaceHierarchy::SmoothPath( int node ){
-  std::vector<int> nodes; nodes.push_back(node);
-  SmoothPath(nodes);
-}
-void PathspaceHierarchy::SmoothPath( std::vector<int> nodes ){
-  og::PathGeometric path(si);
-  //PathGeometric (const base::SpaceInformationPtr &si, const base::State *state1, const base::State *state2)
-  og::PathSimplifier shortcutter(si);
-  shortcutter.shortcutPath(path);
-
-    // 
-    //PathGeometric (const base::SpaceInformationPtr &si, const base::State *state1, const base::State *state2)
-    //    Construct a path instance from two states (thus making a segment) 
-
-  path.interpolate();
-
 }

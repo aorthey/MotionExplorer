@@ -30,6 +30,11 @@ struct PathNode{
 
 // hierarchical tree can be accessed by Tree( L, N),
 // whereby L is the level and N is the node on the level
+//
+// Note: might be more efficient to implement as a caterpillar tree
+// https://en.wikipedia.org/wiki/Caterpillar_tree
+//
+
 class PathspaceHierarchy{
   public:
     PathspaceHierarchy();
@@ -49,9 +54,6 @@ class PathspaceHierarchy{
     void Print();
     void AddPath( std::vector<Config> &path_ );
     void AddPath( std::vector<Config> &path_, std::vector<int> nodes);
-
-    void SmoothPath( std::vector<int> nodes );
-    void SmoothPath( int node );
 
   protected:
     ob::SpaceInformationPtr si;

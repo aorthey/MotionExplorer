@@ -69,7 +69,6 @@ bool MotionPlanner::solve()
   }
   std::vector<int> idxs = input.robot_idxs;
 
-
   Config p_init = input.q_init;
   Config p_goal = input.q_goal;
 
@@ -86,15 +85,12 @@ bool MotionPlanner::solve()
   worldsettings.InitializeDefault(*world);
 
   CSpaceFactory factory(input);
-  //KinodynamicCSpaceOMPL* cspace;
   CSpaceOMPL* cspace;
-  //GeometricCSpaceOMPL* cspace_invariant;
 
   SingleRobotCSpace* kcspace;
   SingleRobotCSpace* cspace_nested;
   SingleRobotCSpace* cspace_inner;
   SingleRobotCSpace* cspace_outer;
-
 
   //################################################################################
   if(StartsWith(algorithm.c_str(),"hierarchical")) {
@@ -111,13 +107,11 @@ bool MotionPlanner::solve()
       output.nested_idx.push_back(ridx);
       Robot *rk = world->robots[ridx];
 
-      std::cout << "robot " << rk->name <<  " size " << rk->q.size() << std::endl;
       Config qi = p_init; qi.resize(rk->q.size());
       Config qg = p_goal; qg.resize(rk->q.size());
 
       output.nested_q_init.push_back(qi);
       output.nested_q_goal.push_back(qg);
-
       output.hierarchy.AddLevel( ridx, qi, qg);
     }
 
@@ -186,6 +180,9 @@ bool MotionPlanner::solve()
 
     cspace = factory.MakeGeometricCSpace(robot, kcspace);
   }
+
+
+
   cspace->print();
 
   PlannerStrategyGeometric strategy;

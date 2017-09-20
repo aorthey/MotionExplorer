@@ -1030,7 +1030,7 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="hierarchy_next"){
     int N = plannerOutput.at(0).hierarchy.NumberNodesOnLevel(hierarchical_level);
     if(N>0){
-      uint node = hierarchical_level_nodes.at(hierarchical_level);
+      int node = hierarchical_level_nodes.at(hierarchical_level);
       if(node < N-1) node++;
       else node=0;
       hierarchical_level_nodes.at(hierarchical_level) = node;

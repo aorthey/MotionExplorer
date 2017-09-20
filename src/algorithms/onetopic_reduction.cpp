@@ -39,9 +39,11 @@ std::vector<Vector3> vertexIndicesToVector(const ob::PlannerData& pd, const std:
   }
   return output;
 }
+#include <ompl/util/Console.h>
 
 bool OnetopicPathSpaceModifier::testVisibilityRRT(const ob::PlannerData& pd, const ob::SpaceInformationPtr &si_path_space, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2)
 {
+  ompl::msg::setLogLevel(ompl::msg::LOG_WARN);
   //[0,1] x [0,1]
   ob::RealVectorBounds bounds(2);
   bounds.setLow(0);
@@ -186,7 +188,7 @@ std::vector< std::vector< Vector3 >> OnetopicPathSpaceModifier::ComputeShortestP
         uint v1i = lg.id(v);
         uint v2i = lg.id(w);
         if(v1i!=v2i){
-          std::cout << v1i << "->";
+          //std::cout << v1i << "->";
           Vector3 v1 = vertexIndexToVector(pd_in, v1i);
           Vector3 v2 = vertexIndexToVector(pd_in, v2i);
           L += (v1-v2).norm();
@@ -197,16 +199,16 @@ std::vector< std::vector< Vector3 >> OnetopicPathSpaceModifier::ComputeShortestP
           shortest_path_idxs.push_back(v2i);
         }
       }
-      std::cout << std::endl;
+      //std::cout << std::endl;
       Vector3 node_v3 = vertexIndexToVector(pd_in, node_idx);
 
       V_shortest_path.at(node_idx) = shortest_path_idxs;
       V.at(node_idx) = node_v3;
       distance_shortest_path.at(node_idx) = L;
 
-      std::cout << "vertex " << lg.id(node) << " length " << L << std::endl;
+      //std::cout << "vertex " << lg.id(node) << " length " << L << std::endl;
     }else{
-      std::cout << "Found a non-connected vertex in graph -> vertex " << lg.id(node) << std::endl;
+      //std::cout << "Found a non-connected vertex in graph -> vertex " << lg.id(node) << std::endl;
       V.at(node_idx) = Vector3(0,0,0);
       distance_shortest_path.at(node_idx) = dInf;
     }
@@ -218,8 +220,8 @@ std::vector< std::vector< Vector3 >> OnetopicPathSpaceModifier::ComputeShortestP
     uint idx_max = std::distance(std::begin(distance_shortest_path), std::max_element(std::begin(distance_shortest_path), std::end(distance_shortest_path)));
     min_distance_shortest_path = distance_shortest_path[idx_min];
     max_distance_shortest_path = distance_shortest_path[idx_max];
-    std::cout << "min shortest path: " << min_distance_shortest_path << std::endl;
-    std::cout << "max shortest path: " << max_distance_shortest_path << std::endl;
+    //std::cout << "min shortest path: " << min_distance_shortest_path << std::endl;
+    //std::cout << "max shortest path: " << max_distance_shortest_path << std::endl;
   }
 //################################################################################
   //simplify simplicial complex by removing vertices which belong to long paths
@@ -260,7 +262,7 @@ std::vector< std::vector< Vector3 >> OnetopicPathSpaceModifier::ComputeShortestP
         }
       }
     if(neighborIsBetter){
-      V.at(i) = Vector3(0,0,0);
+      //V.at(i) = Vector3(0,0,0);
     }else{
       std::vector<Vertex> Vidxs = V_shortest_path.at(i);
       if(Vidxs.size()>0){
