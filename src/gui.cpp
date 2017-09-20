@@ -578,38 +578,38 @@ void ForceFieldBackend::RenderScreen(){
   //line+=(" ["+std::to_string(hierarchical_level)+"]");
   uint Nlevels = plannerOutput.at(0).hierarchy.NumberLevels();
 
-  uint Nnodes = plannerOutput.at(0).hierarchy.NumberNodesOnLevel(1);
-  uint selectedNode = hierarchical_level_nodes.at(hierarchical_level);
+  const uint Nnodes = plannerOutput.at(0).hierarchy.NumberNodesOnLevel(1);
+  //const uint selectedNode = hierarchical_level_nodes.at(hierarchical_level);
 
   //root node
   line = "";
-  for(uint k = 0; k < 2*Nnodes; k++) line+=" ";
+  for(uint k = 0; k < 2*Nnodes; k++) line+="  ";
   line+=("<0>");
-  for(uint k = 0; k < 2*Nnodes; k++) line+=" ";
   DrawText(line_x_pos,line_y_offset,line);
   line_y_offset += line_y_offset_stepsize;
 
-  for(uint i = 0; i < 1; i++){
+  for(uint i = 1; i < 2; i++){
+    const uint selectedNode = hierarchical_level_nodes.at(i);
 
-    line = "";
+    line = "  ";
     for(uint k = 0; k < 2*Nnodes; k++) line+=("_");
     line+=("|");
     for(uint k = 0; k < 2*Nnodes; k++) line+=("_");
     DrawText(line_x_pos,line_y_offset,line);
     line_y_offset += line_y_offset_stepsize;
 
-    line = "";
-    for(uint k = 0; k < 4*Nnodes-1; k+=Nnodes) 
-      line+=("|    ");
+    line = " ";
+    for(uint k = 0; k < Nnodes; k++) 
+      line+=("    |    ");
     DrawText(line_x_pos,line_y_offset,line);
     line_y_offset += line_y_offset_stepsize;
 
     line = "";
     for(uint k = 0; k < Nnodes; k++){
-      if(k==selectedNode)
-        line+=("<"+std::to_string(k)+"> ");
+      if(k==selectedNode && i<=hierarchical_level)
+        line+=("<"+std::to_string(k)+">");
       else
-        line+=(" "+std::to_string(k)+"  ");
+        line+=("  "+std::to_string(k)+" ");
     }
 
     DrawText(line_x_pos,line_y_offset,line);
