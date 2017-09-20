@@ -25,8 +25,8 @@
     <drawTree>0</drawTree>
     <freeFloating>1</freeFloating>
     <robot>
-      <index>0</index>
       <index>1</index>
+      <index>0</index>
     </robot>
 
   </plannersettings>

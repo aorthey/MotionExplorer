@@ -40,6 +40,9 @@ static ob::OptimizationObjectivePtr getThresholdPathLength(const ob::SpaceInform
 }
 Vector3 vertexIndexToVector(const ob::PlannerData& pd, const Vertex &v);
 std::vector<Vector3> vertexIndicesToVector(const ob::PlannerData& pd, const std::vector<Vertex> &v);
+const ob::State* vertexIndexToOMPLState(const ob::PlannerData& pd, const Vertex &v);
+Config OMPLStateToConfig(const ob::State* si);
+Vector3 OMPLStateToVector3(const ob::State* si);
 
 //Let p,q be two paths [0,1]->M
 //Linearsegmentvaliditychecker: 
@@ -115,14 +118,17 @@ class OnetopicPathSpaceModifier{
 
     std::vector< std::vector< Vector3 >> GetVectorPaths();
     std::vector< std::vector< Config >> GetConfigPaths();
+    std::vector< std::vector< const ob::State* >> GetOMPLStatePaths();
 
 
   private:
     bool testVisibilityRRT(const ob::PlannerData& pd, const ob::SpaceInformationPtr &si_path_space, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2);
     std::vector< std::vector< Vector3 >> ComputeShortestPathsLemon(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt);
+    void ComputeConfigPaths( ob::PlannerData& pd );
 
     std::vector< std::vector< Vector3 >> vector_paths;
     std::vector< std::vector< Config >> config_paths;
+    std::vector< std::vector< const ob::State* >> omplstate_paths;
 
 
 };

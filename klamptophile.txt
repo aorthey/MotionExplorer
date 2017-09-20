@@ -775,7 +775,6 @@ are >TWO< unique shortest paths (in the same homotopy class)
   [x] triple T grill (see jaillet 2008)
   [x] forest of cylinders on a flat surface
   [x] 3D lattice cuboid
-
-[ ] visualize tree by text output (and indicate which nodes are where)
+[x] visualize tree by text output (and indicate which nodes are where)
 [ ] smooth path
 [ ] interpolate path

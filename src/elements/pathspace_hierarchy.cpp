@@ -102,6 +102,7 @@ void PathspaceHierarchy::CreateHierarchyFromPlannerData( ob::PlannerData& pd, co
   si = pd.getSpaceInformation();
   OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(pd,obj);
   std::vector< std::vector< Config >> onetopic_paths = onetopic_pathspace.GetConfigPaths();
+
   for(uint i = 0; i < onetopic_paths.size(); i++){
     AddPath( onetopic_paths.at(i) );
     SmoothPath(i);

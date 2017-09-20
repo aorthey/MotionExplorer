@@ -1,9 +1,12 @@
 #include "algorithms/onetopic_reduction.h"
 
 
-Vector3 vertexIndexToVector(const ob::PlannerData& pd, const Vertex &v){
+const ob::State* vertexIndexToOMPLState(const ob::PlannerData& pd, const Vertex &v){
   ob::PlannerDataVertex vd = pd.getVertex(v);
   const ob::State* si = vd.getState();
+  return si;
+}
+Vector3 OMPLStateToVector3(const ob::State* si){
   double x,y,z;
   const ob::RealVectorStateSpace::StateType *qomplRnSpace = si->as<ob::RealVectorStateSpace::StateType>();
   x = qomplRnSpace->values[0];
@@ -11,6 +14,21 @@ Vector3 vertexIndexToVector(const ob::PlannerData& pd, const Vertex &v){
   z = qomplRnSpace->values[2];
   Vector3 v3(x,y,z);
   return v3;
+}
+Config OMPLStateToConfig(const ob::State* si){
+  double x,y,z;
+  const ob::RealVectorStateSpace::StateType *qomplRnSpace = si->as<ob::RealVectorStateSpace::StateType>();
+  x = qomplRnSpace->values[0];
+  y = qomplRnSpace->values[1];
+  z = qomplRnSpace->values[2];
+  Config q;q.resize(3);
+  q[0]=x; q[1]=y; q[2]=z;
+  return q;
+}
+Vector3 vertexIndexToVector(const ob::PlannerData& pd, const Vertex &v){
+  ob::PlannerDataVertex vd = pd.getVertex(v);
+  const ob::State* si = vd.getState();
+  return OMPLStateToVector3(si);
 }
 std::vector<Vector3> vertexIndicesToVector(const ob::PlannerData& pd, const std::vector<Vertex> &v){
 
@@ -247,18 +265,26 @@ std::vector< std::vector< Vector3 >> OnetopicPathSpaceModifier::ComputeShortestP
       std::vector<Vertex> Vidxs = V_shortest_path.at(i);
       if(Vidxs.size()>0){
         std::vector<Vector3> path;
+        std::vector<const ob::State*> omplstate_path;
         Vector3 vI = vertexIndexToVector(pd_in, Vidxs.at(0));
+        const ob::State* s0 = vertexIndexToOMPLState(pd_in, Vidxs.at(0));
+
         path.push_back(vI);
+        omplstate_path.push_back(s0);
 
         for(uint k = 0; k < Vidxs.size()-1; k++){
           Vector3 v1 = vertexIndexToVector(pd_in, Vidxs.at(k));
           Vector3 v2 = vertexIndexToVector(pd_in, Vidxs.at(k+1));
+          const ob::State* sk = vertexIndexToOMPLState(pd_in, Vidxs.at(k+1));
           path.push_back(v2);
+          omplstate_path.push_back(sk);
+
           //###################################################################
           //cmplx.E.push_back(std::make_pair(v1,v2));
           //###################################################################
         }
         output.push_back(path);
+        omplstate_paths.push_back(omplstate_path);
       }
     }
   }
@@ -267,24 +293,60 @@ std::vector< std::vector< Vector3 >> OnetopicPathSpaceModifier::ComputeShortestP
 OnetopicPathSpaceModifier::OnetopicPathSpaceModifier( ob::PlannerData& pd_in, const ob::OptimizationObjective& opt ){
 
   vector_paths = ComputeShortestPathsLemon(pd_in, opt);
-  for(uint i = 0; i < vector_paths.size(); i++){
-    std::vector<Vector3> path3 = vector_paths.at(i);
-    std::vector<Config> path;
-    for(uint j = 0; j < path3.size(); j++){
-      Config q;q.resize(3);
-      for(uint k = 0; k < 3; k++){
-        q(k) = path3.at(j)[k];
-      }
-      path.push_back(q);
-    }
-    config_paths.push_back(path);
-  }
+  ComputeConfigPaths(pd_in);
+
 }
 
+void OnetopicPathSpaceModifier::ComputeConfigPaths( ob::PlannerData& pd ){
+  const ob::SpaceInformationPtr si = pd.getSpaceInformation();
+
+
+  for(uint i = 0; i < omplstate_paths.size(); i++){
+    std::vector<const ob::State*> states = omplstate_paths.at(i);
+    og::PathGeometric path(si);
+    for(uint k = 0; k < states.size(); k++){
+      path.append(states.at(k));
+      //og::PathGeometric segment(si, states.at(k), states.at(k+1));
+    }
+
+    og::PathSimplifier shortcutter(si);
+    shortcutter.shortcutPath(path);
+
+    path.interpolate();
+
+    std::vector<ob::State *> interpolated_states = path.getStates();
+    std::vector<Config> keyframes;
+    for(uint k = 0; k < interpolated_states.size(); k++)
+    {
+      ob::State *state = interpolated_states.at(k);
+      Config q = OMPLStateToConfig(state);
+      keyframes.push_back(q);
+    }
+    config_paths.push_back(keyframes);
+  }
+
+  //for(uint i = 0; i < vector_paths.size(); i++){
+  //  std::vector<Vector3> path3 = vector_paths.at(i);
+  //  std::vector<Config> path;
+  //  for(uint j = 0; j < path3.size(); j++){
+  //    Config q;q.resize(3);
+  //    for(uint k = 0; k < 3; k++){
+  //      q(k) = path3.at(j)[k];
+  //    }
+  //    path.push_back(q);
+  //  }
+  //  config_paths.push_back(path);
+  //}
+
+
+}
 
 std::vector< std::vector< Vector3 >> OnetopicPathSpaceModifier::GetVectorPaths(){
   return vector_paths;
 }
 std::vector< std::vector< Config >> OnetopicPathSpaceModifier::GetConfigPaths(){
   return config_paths;
+}
+std::vector< std::vector< const ob::State* >> OnetopicPathSpaceModifier::GetOMPLStatePaths(){
+  return omplstate_paths;
 }
