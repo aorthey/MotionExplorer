@@ -156,8 +156,8 @@ void PlannerStrategyGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspa
   pd.computeEdgeWeights();
   const ob::OptimizationObjectivePtr obj = pdef->getOptimizationObjective();
 
-  Topology::TopologicalGraph top(pd, *obj);
-  output.cmplx = top.GetSimplicialComplex();
+  //Topology::TopologicalGraph top(pd, *obj);
+  //output.cmplx = top.GetSimplicialComplex();
 
   output.hierarchy.CreateHierarchyFromPlannerData(pd, *obj);
   output.hierarchy.Print();
