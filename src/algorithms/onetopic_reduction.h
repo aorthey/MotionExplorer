@@ -48,6 +48,9 @@ Vector3 OMPLStateToVector3(const ob::State* si);
 //Linearsegmentvaliditychecker: 
 //  for given s,t \in [0,1] checks if the linear segments between p(s) and q(t)
 //  is valid. This is done by calling ompl's checkmotion
+//
+//  it is used to determine inside a RRT planner to verify if two paths p,q are
+//  onetopic, i.e. homotopic by using a linear homotopy deformation.
 
 class LinearSegmentValidityChecker : public ob::StateValidityChecker
 {
@@ -108,9 +111,6 @@ class LinearSegmentValidityChecker : public ob::StateValidityChecker
     PathPiecewiseLinearEuclidean *path2;
 
 };
-
-//bool testVisibilityRRT(const ob::PlannerData& pd, const ob::SpaceInformationPtr &si_path_space, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2);
-//std::vector< std::vector< Vector3 >> ComputeShortestPathsLemon(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt);
 
 class OnetopicPathSpaceModifier{
   public:

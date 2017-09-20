@@ -324,21 +324,6 @@ void OnetopicPathSpaceModifier::ComputeConfigPaths( ob::PlannerData& pd ){
     }
     config_paths.push_back(keyframes);
   }
-
-  //for(uint i = 0; i < vector_paths.size(); i++){
-  //  std::vector<Vector3> path3 = vector_paths.at(i);
-  //  std::vector<Config> path;
-  //  for(uint j = 0; j < path3.size(); j++){
-  //    Config q;q.resize(3);
-  //    for(uint k = 0; k < 3; k++){
-  //      q(k) = path3.at(j)[k];
-  //    }
-  //    path.push_back(q);
-  //  }
-  //  config_paths.push_back(path);
-  //}
-
-
 }
 
 std::vector< std::vector< Vector3 >> OnetopicPathSpaceModifier::GetVectorPaths(){

@@ -1,6 +1,6 @@
 #include "gui.h"
 #include "environment_loader.h"
-#include "planner/planner_ompl.h"
+#include "planner/planner.h"
 
 int main(int argc,const char** argv) {
 
@@ -8,7 +8,7 @@ int main(int argc,const char** argv) {
 
   PlannerInput pin = env.GetPlannerInput();
 
-  MotionPlannerOMPL planner(env.GetWorldPtr(), pin);
+  MotionPlanner planner(env.GetWorldPtr(), pin);
   if(planner.solve()){
     env.GetBackendPtr()->AddPlannerOutput( planner.GetOutput() );
   }

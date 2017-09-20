@@ -1,7 +1,7 @@
 #pragma once
+#include "loader.h"
 #include <string>
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
-#include "loader.h"
 
 class PlannerInput{
   public:
@@ -18,7 +18,6 @@ class PlannerInput{
     Config qMin;
     Config qMax;
 
-    int robot_idx;
     std::vector<int> robot_idxs;
 
     double epsilon_goalregion;
@@ -29,6 +28,7 @@ class PlannerInput{
     Config se3min;
     Config se3max;
 
+    //to <gui>
     int drawShortestPath;
     int drawSweptVolume;
     int drawMilestones;

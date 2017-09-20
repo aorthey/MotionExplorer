@@ -79,14 +79,8 @@ bool PlannerInput::load(TiXmlElement *node)
       std::cout << " " << robot_idxs.at(k);
     }
     std::cout << std::endl;
-    if(robot_idxs.size()>0){
-      robot_idx = robot_idxs.at(0);
-    }else{
-      robot_idx = 0;
-    }
 
   }else{
-    robot_idx = 0;
   }
 
   exists = true;

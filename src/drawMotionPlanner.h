@@ -1,4 +1,7 @@
 #pragma once
+#include "planner/planner.h"
+#include "elements/wrench_field.h"
+#include "elements/simplicial_complex.h"
 
 #include <KrisLibrary/GLdraw/drawMesh.h>
 #include <KrisLibrary/robotics/IK.h>
@@ -7,10 +10,8 @@
 #include <KrisLibrary/math3d/rotation.h>
 #include <View/ViewRobot.h>
 #include <View/ViewIK.h>
+#include <Simulation/WorldSimulation.h>
 
-#include "planner/planner.h"
-#include "elements/wrench_field.h"
-#include "elements/simplicial_complex.h"
 
 namespace GLDraw {
   void drawRobotExtras(ViewRobot *robot, GLColor bodyColor=GLColor(0.5,0.5,0.5), double COMradius=0.05);
