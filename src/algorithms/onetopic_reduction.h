@@ -120,7 +120,6 @@ class OnetopicPathSpaceModifier{
     std::vector< std::vector< Config >> GetConfigPaths();
     std::vector< std::vector< const ob::State* >> GetOMPLStatePaths();
 
-
   private:
     bool testVisibilityRRT(const ob::PlannerData& pd, const ob::SpaceInformationPtr &si_path_space, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2);
     std::vector< std::vector< Vector3 >> ComputeShortestPathsLemon(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt);
@@ -129,6 +128,5 @@ class OnetopicPathSpaceModifier{
     std::vector< std::vector< Vector3 >> vector_paths;
     std::vector< std::vector< Config >> config_paths;
     std::vector< std::vector< const ob::State* >> omplstate_paths;
-
 
 };

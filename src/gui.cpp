@@ -573,13 +573,57 @@ void ForceFieldBackend::RenderScreen(){
       line_y_offset += line_y_offset_stepsize;
     }
   }
-  line = "Hierarchy    : ";
-  line+=(" level ["+std::to_string(hierarchical_level)+"]");
-  for(uint k = 0; k < hierarchical_level_nodes.size(); k++){
-    line+=(" node ["+std::to_string(hierarchical_level_nodes.at(k))+"]");
-  }
+  line = "Hierarchy    :\n";
+
+  //line+=(" ["+std::to_string(hierarchical_level)+"]");
+  uint Nlevels = plannerOutput.at(0).hierarchy.NumberLevels();
+
+  uint Nnodes = plannerOutput.at(0).hierarchy.NumberNodesOnLevel(1);
+  uint selectedNode = hierarchical_level_nodes.at(hierarchical_level);
+
+  //root node
+  line = "";
+  for(uint k = 0; k < 2*Nnodes; k++) line+=" ";
+  line+=("<0>");
+  for(uint k = 0; k < 2*Nnodes; k++) line+=" ";
   DrawText(line_x_pos,line_y_offset,line);
   line_y_offset += line_y_offset_stepsize;
+
+  for(uint i = 0; i < 1; i++){
+
+    line = "";
+    for(uint k = 0; k < 2*Nnodes; k++) line+=("_");
+    line+=("|");
+    for(uint k = 0; k < 2*Nnodes; k++) line+=("_");
+    DrawText(line_x_pos,line_y_offset,line);
+    line_y_offset += line_y_offset_stepsize;
+
+    line = "";
+    for(uint k = 0; k < 4*Nnodes-1; k+=Nnodes) 
+      line+=("|    ");
+    DrawText(line_x_pos,line_y_offset,line);
+    line_y_offset += line_y_offset_stepsize;
+
+    line = "";
+    for(uint k = 0; k < Nnodes; k++){
+      if(k==selectedNode)
+        line+=("<"+std::to_string(k)+"> ");
+      else
+        line+=(" "+std::to_string(k)+"  ");
+    }
+
+    DrawText(line_x_pos,line_y_offset,line);
+    line_y_offset += line_y_offset_stepsize;
+  }
+
+  // for(uint k = 0; k < ; k++){
+  // }
+
+  //for(uint k = 0; k < hierarchical_level_nodes.size(); k++){
+  //  line+=(" ["+std::to_string(hierarchical_level_nodes.at(k))+"]");
+  //}
+  //DrawText(line_x_pos,line_y_offset,line);
+  //line_y_offset += line_y_offset_stepsize;
 
 }
 
@@ -898,7 +942,7 @@ void ForceFieldBackend::SetIKCollisions( vector<int> linksInCollision )
 
 bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
-  std::cout << "OnCommand: " << cmd << std::endl;
+  //std::cout << "OnCommand: " << cmd << std::endl;
   if(cmd=="advance") {
     SimStep(sim.simStep);
   //}else if(cmd=="retreat") {
@@ -1026,7 +1070,6 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     planner_layer_robot_idx = plannerOutput.at(0).nested_idx.at(planner_layer);
     std::cout << "Switched to hierarchy level " << planner_layer << " (Robot: ";
     std::cout << planner_layer_robot_idx << " name " << world->robots[planner_layer_robot_idx]->name  << ")" << std::endl;  
-
   }else if(cmd=="hierarchy_next"){
     int N = plannerOutput.at(0).hierarchy.NumberNodesOnLevel(hierarchical_level);
     if(N>0){
@@ -1044,6 +1087,12 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
       hierarchical_level_nodes.at(hierarchical_level) = node;
     }
   }else if(cmd=="hierarchy_down"){
+
+    std::cout << "Going deeper" << std::endl;
+    std::cout << "Planning Level " << hierarchical_level << std::endl;
+    std::cout << "Node           " << hierarchical_level_nodes.at(hierarchical_level) << std::endl;
+    //invoke planning inception
+
     int N = plannerOutput.at(0).hierarchy.NumberLevels();
     if(hierarchical_level < N-1 ){
       hierarchical_level++;
@@ -1222,8 +1271,8 @@ bool GLUIForceFieldGUI::Initialize()
   AddToKeymap("T","toggle_mode");
   AddToKeymap("f","draw_rigid_objects_faces_toggle");
   AddToKeymap("e","draw_rigid_objects_edges_toggle");
-  AddToKeymap("s","toggle_simulate");
-  AddToKeymap("p","print_config");
+  AddToKeymap("s","toggle_simulate",true);
+  AddToKeymap("p","print_config",true);
   AddToKeymap("g","draw_swept_volume");
   AddToKeymap("n","draw_shortest_path");
   AddToKeymap("t","draw_planner_tree_toggle");
@@ -1264,10 +1313,9 @@ void GLUIForceFieldGUI::AddButton(const char *key){
   if(res){
     AddCommandRule(c,key,"");
   }
-
 }
 
-void GLUIForceFieldGUI::AddToKeymap(const char *key, const char *s){
+void GLUIForceFieldGUI::AddToKeymap(const char *key, const char *s, bool baseClass){
   AnyCollection c;
   std::string type =  "{type:key_down,key:"+std::string(key)+"}";
   bool res=c.read(type.c_str());
@@ -1279,6 +1327,11 @@ void GLUIForceFieldGUI::AddToKeymap(const char *key, const char *s){
   descr = std::regex_replace(descr, std::regex("_"), " ");
 
   _keymap[key] = descr;
+
+  if(baseClass){
+    _baseclass_keys[key] = descr;
+  }
+
 }
 
 void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
@@ -1306,7 +1359,13 @@ void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
       break;
     }
     default:
-      BaseT::Handle_Keypress(c,x,y);
+      for (Keymap::iterator it=_baseclass_keys.begin(); it!=_baseclass_keys.end(); ++it){
+        if(c==*it->first){
+          BaseT::Handle_Keypress(c,x,y);
+          break;
+        }
+      }
+      break;
   }
 }
 bool GLUIForceFieldGUI::OnCommand(const string& cmd,const string& args)

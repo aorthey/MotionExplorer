@@ -192,7 +192,7 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
     GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _world);
     virtual bool Initialize();
     //virtual bool OnCommand(const string& cmd,const string& args);
-    void AddToKeymap(const char *key, const char *s);
+    void AddToKeymap(const char *key, const char *s, bool baseClass = false);
     void AddButton(const char *key);
     void browser_control(int control);
 
@@ -203,6 +203,7 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
   private:
     typedef std::map<const char *, std::string> Keymap;
     Keymap _keymap;
+    Keymap _baseclass_keys;
     GLUI_Panel* panel;
     GLUI_Checkbox* checkbox;
     GLUI_FileBrowser *browser;

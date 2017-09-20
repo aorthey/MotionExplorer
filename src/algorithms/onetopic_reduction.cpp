@@ -84,6 +84,11 @@ bool OnetopicPathSpaceModifier::testVisibilityRRT(const ob::PlannerData& pd, con
 }
 
 std::vector< std::vector< Vector3 >> OnetopicPathSpaceModifier::ComputeShortestPathsLemon(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt){
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "Onetopic Reduction" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "input paths    : " << pd_in.numVertices() << std::endl;
+  std::cout << "output paths   : " << std::flush;
 
 //#############################################################################
 // output
@@ -290,6 +295,8 @@ std::vector< std::vector< Vector3 >> OnetopicPathSpaceModifier::ComputeShortestP
       }
     }
   }
+  std::cout << output.size() << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
   return output;
 }
 OnetopicPathSpaceModifier::OnetopicPathSpaceModifier( ob::PlannerData& pd_in, const ob::OptimizationObjective& opt ){
