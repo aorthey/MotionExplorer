@@ -23,50 +23,35 @@
 
 #define DEBUG 0
 
-class GUIVariable
-{
-  private:
-    bool active;
-    char hotkey;
-    std::string name;
-    std::string descr;
-  public:
+//class GUIVariable
+//{
+//  private:
+//    bool active;
+//    char hotkey;
+//    std::string name;
+//    std::string descr;
+//  public:
+//
+//    GUIVariable(std::string name);
+//    GUIVariable(std::string name, std::string descr);
+//    GUIVariable(std::string name, bool active);
+//    GUIVariable(std::string name, char hotkey);
+//    GUIVariable(std::string name, std::string descr, char hotkey);
+//    GUIVariable(std::string name, std::string descr, char hotkey, bool active);
+//
+//    void toggle(){
+//      if(active) active=false;
+//      else active=true;
+//    }
+//
+//    operator bool() const{
+//      return active;
+//    }
+//    bool operator!() const{
+//      return !active;
+//    }
+//};
 
-    GUIVariable(std::string name);
-    GUIVariable(std::string name, std::string descr);
-    GUIVariable(std::string name, bool active);
-    GUIVariable(std::string name, char hotkey);
-    GUIVariable(std::string name, std::string descr, char hotkey);
-    GUIVariable(std::string name, std::string descr, char hotkey, bool active);
-
-    void toggle(){
-      if(active) active=false;
-      else active=true;
-    }
-
-    operator bool() const{
-      return active;
-    }
-    bool operator!() const{
-      return !active;
-    }
-};
-
-//visualize a single planner outcome
-class PlannerOutputVisualizer
-{
-  vector<IKGoal> constraints;
-  vector<int> linksInCollision;
-  string robotname;
-  uint robot_idx;
-
-  vector<GLDraw::GeometryAppearance> _appearanceStack;
-  SweptVolume swept_volume_path;
-
-  vector< vector<Vector3> > _frames;
-  vector< double > _frameLength;
-
-};
 class ForceFieldBackend : public SimTestBackend
 {
     friend class GLUIForceFieldGUI;
@@ -80,12 +65,6 @@ class ForceFieldBackend : public SimTestBackend
     string _robotname;
     //##########################################################################
     vector<GLDraw::GeometryAppearance> _appearanceStack;
-
-    //##########################################################################
-    std::vector<SweptVolume> swept_volume_paths;
-
-    Config planner_p_init, planner_p_goal;
-
     //##########################################################################
     vector< vector<Vector3> > _frames;
     vector< double > _frameLength;
@@ -112,20 +91,6 @@ class ForceFieldBackend : public SimTestBackend
     virtual bool Load(const char* file);
     virtual bool Load(TiXmlElement *node);
 
-    void ShowCoordinateAxes(){ drawAxes = 1; }
-    void HideCoordinateAxes(){ drawAxes = 0; }
-    void ShowRobot(){ drawRobot = 1; }
-    void HideRobot(){ drawRobot = 0; }
-
-    void ShowSweptVolumes();
-    void HideSweptVolumes();
-    void ShowMilestones();
-    void HideMilestones();
-    void ShowPlannerTree();
-    void HidePlannerTree();
-    void ShowPlannerSimplicialComplex();
-    void HidePlannerSimplicialComplex();
-
     void AddPlannerOutput( PlannerOutput pout );
 
     void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);
@@ -135,10 +100,6 @@ class ForceFieldBackend : public SimTestBackend
 
     uint getNumberOfPaths();
 
-    void AddPath(const std::vector<Config> &keyframes, GLColor color = GLColor(0.8,0.8,0.8), uint Nkeyframes_alongpath=10, uint robot_idx=0);
-
-    const std::vector<Config>& getPathKeyFrames(uint pathid);
-    void ClearPaths();
     void VisualizePlannerTree(const SerializedTree &tree);
 
     void DrawText(int x,int y, std::string s);
@@ -152,7 +113,6 @@ class ForceFieldBackend : public SimTestBackend
     std::vector<int> drawPathStartGoal;
     std::vector<int> drawPlannerTree;
     std::vector<int> drawPlannerSimplicialComplex;
-
 
     int showSweptVolumes;
     int drawController;
@@ -172,16 +132,14 @@ class ForceFieldBackend : public SimTestBackend
     int drawRigidObjectsEdges;
     int drawRigidObjectsFaces;
 
-    int hierarchical_level;
-    std::vector<int> hierarchical_level_nodes;
-
-    int planner_layer;
-    int planner_layer_robot_idx;
-
     void toggle(int &k){
       if(k) k=0;
       else k=1;
     }
+
+    int line_x_pos;
+    int line_y_offset;
+    int line_y_offset_stepsize;
 };
 
 

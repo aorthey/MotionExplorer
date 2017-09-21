@@ -63,47 +63,6 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawPlannerSimplicialComplex.clear();
 
   _frames.clear();
-  swept_volume_paths.clear();
-}
-void ForceFieldBackend::ShowSweptVolumes(){ 
-  for(uint i = 0; i < drawPathSweptVolume.size(); i++){
-    drawPathSweptVolume.at(i) = 1;
-  }
-}
-void ForceFieldBackend::HideSweptVolumes(){ 
-  for(uint i = 0; i < drawPathSweptVolume.size(); i++){
-    drawPathSweptVolume.at(i) = 0;
-  }
-}
-void ForceFieldBackend::ShowMilestones(){ 
-  for(uint i = 0; i < drawPathMilestones.size(); i++){
-    drawPathMilestones.at(i) = 1;
-  }
-}
-void ForceFieldBackend::HideMilestones(){ 
-  for(uint i = 0; i < drawPathMilestones.size(); i++){
-    drawPathMilestones.at(i) = 0;
-  }
-}
-void ForceFieldBackend::ShowPlannerTree(){ 
-  for(uint i = 0; i < drawPlannerTree.size(); i++){
-    drawPlannerTree.at(i) = 1;
-  }
-}
-void ForceFieldBackend::HidePlannerTree(){ 
-  for(uint i = 0; i < drawPlannerTree.size(); i++){
-    drawPlannerTree.at(i) = 0;
-  }
-}
-void ForceFieldBackend::ShowPlannerSimplicialComplex(){ 
-  for(uint i = 0; i < drawPlannerSimplicialComplex.size(); i++){
-    drawPlannerSimplicialComplex.at(i) = 1;
-  }
-}
-void ForceFieldBackend::HidePlannerSimplicialComplex(){ 
-  for(uint i = 0; i < drawPlannerSimplicialComplex.size(); i++){
-    drawPlannerSimplicialComplex.at(i) = 0;
-  }
 }
 
 
@@ -170,18 +129,6 @@ void ForceFieldBackend::Start()
 {
   BaseT::Start();
   Robot *robot = world->robots[0];
-
-  if(plannerOutput.size()>0){
-    hierarchical_level = 0;
-
-    uint N = plannerOutput.at(0).hierarchy.NumberLevels();
-    for(uint k = 0; k < N; k++){
-      hierarchical_level_nodes.push_back(0);
-    }
-
-    planner_layer_robot_idx = plannerOutput.at(0).nested_idx.back();
-    planner_layer = plannerOutput.at(0).nested_idx.size()-1;
-  }
 
   settings["dragForceMultiplier"] = 500.0;
   drawContacts = 0;
@@ -443,54 +390,6 @@ void ForceFieldBackend::RenderWorld()
 //      GLDraw::drawShortestPath(cmplx);
 //    }
 //  }
-  //hierarchies
-  for(uint i = 0; i < plannerOutput.size(); i++){
-
-    PathspaceHierarchy *h = &plannerOutput.at(i).hierarchy;
-    Robot *robot_h = world->robots[h->GetRobotIdx(hierarchical_level)];
-    //SweptVolume sv = plannerOutput.at(i).GetSweptVolume(robot_i);
-
-    if(drawPathStartGoal.at(i)){
-      Config qi = h->GetInitConfig(hierarchical_level);
-      Config qg = h->GetGoalConfig(hierarchical_level);
-      GLDraw::drawGLPathStartGoal(robot_h, qi, qg);
-    }
-    GLColor magenta(0.8,0,0.8,0.5);
-    GLColor green(0.1,0.9,0.1,1);
-
-    std::vector<int> nodes;
-
-    if(hierarchical_level>0){
-      for(uint k = 0; k < hierarchical_level-1; k++){
-        nodes.push_back(hierarchical_level_nodes.at(k));
-      }
-      for(uint k = 0; k < h->NumberNodesOnLevel(hierarchical_level); k++){
-        nodes.push_back(k);
-
-        const std::vector<Config> &path = h->GetPathFromNodes(nodes);
-        if(k == hierarchical_level_nodes.at(hierarchical_level)){
-          PathNode* node = h->GetPathNodeFromNodes(nodes);
-          SweptVolume sv = node->GetSweptVolume(robot_h);
-          GLDraw::drawPath(path, green, 30);
-          if(drawPathSweptVolume.at(i)){
-            GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
-          }
-        }else{
-          GLDraw::drawPath(path, magenta);
-        }
-
-        nodes.erase(nodes.end() - 1);
-      }
-    }else{
-      const std::vector<Config> &path = h->GetPathFromNodes(nodes);
-      PathNode* node = h->GetPathNodeFromNodes(nodes);
-      SweptVolume sv = node->GetSweptVolume(robot_h);
-      GLDraw::drawPath(path, green, 20);
-      if(drawPathSweptVolume.at(i)){
-        GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
-      }
-    }
-  }
 
   if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
   if(drawAxesLabels) GLDraw::drawAxesLabels(viewport);
@@ -504,9 +403,9 @@ void ForceFieldBackend::RenderWorld()
 void ForceFieldBackend::RenderScreen(){
   BaseT::RenderScreen();
 
-  int line_x_pos = 20;
-  int line_y_offset = 60;
-  int line_y_offset_stepsize = 20;
+  line_x_pos = 20;
+  line_y_offset = 60;
+  line_y_offset_stepsize = 20;
 
   std::string line;
 
@@ -572,57 +471,7 @@ void ForceFieldBackend::RenderScreen(){
       line_y_offset += line_y_offset_stepsize;
     }
   }
-  line = "Hierarchy    :\n";
 
-  //line+=(" ["+std::to_string(hierarchical_level)+"]");
-  uint Nlevels = plannerOutput.at(0).hierarchy.NumberLevels();
-
-  const uint Nnodes = plannerOutput.at(0).hierarchy.NumberNodesOnLevel(1);
-  //const uint selectedNode = hierarchical_level_nodes.at(hierarchical_level);
-
-  //root node
-  line = "";
-  for(uint k = 0; k < 2*Nnodes; k++) line+="  ";
-  line+=("<0>");
-  DrawText(line_x_pos,line_y_offset,line);
-  line_y_offset += line_y_offset_stepsize;
-
-  for(uint i = 1; i < 2; i++){
-    const uint selectedNode = hierarchical_level_nodes.at(i);
-
-    line = "  ";
-    for(uint k = 0; k < 2*Nnodes; k++) line+=("_");
-    line+=("|");
-    for(uint k = 0; k < 2*Nnodes; k++) line+=("_");
-    DrawText(line_x_pos,line_y_offset,line);
-    line_y_offset += line_y_offset_stepsize;
-
-    line = " ";
-    for(uint k = 0; k < Nnodes; k++) 
-      line+=("    |    ");
-    DrawText(line_x_pos,line_y_offset,line);
-    line_y_offset += line_y_offset_stepsize;
-
-    line = "";
-    for(uint k = 0; k < Nnodes; k++){
-      if(k==selectedNode && i<=hierarchical_level)
-        line+=("<"+std::to_string(k)+">");
-      else
-        line+=("  "+std::to_string(k)+" ");
-    }
-
-    DrawText(line_x_pos,line_y_offset,line);
-    line_y_offset += line_y_offset_stepsize;
-  }
-
-  // for(uint k = 0; k < ; k++){
-  // }
-
-  //for(uint k = 0; k < hierarchical_level_nodes.size(); k++){
-  //  line+=(" ["+std::to_string(hierarchical_level_nodes.at(k))+"]");
-  //}
-  //DrawText(line_x_pos,line_y_offset,line);
-  //line_y_offset += line_y_offset_stepsize;
 
 }
 
@@ -656,169 +505,23 @@ void ForceFieldBackend::DrawText(int x,int y, std::string s)
 }
 
 
-
-void ForceFieldBackend::VisualizeStartGoal(const Config &p_init, const Config &p_goal)
-{
-  planner_p_init = p_init;
-  planner_p_goal = p_goal;
-}
-
 bool ForceFieldBackend::Load(TiXmlElement *node)
 {
-
-  planner_p_goal.setZero();
-  planner_p_init.setZero();
-
-  if(0!=strcmp(node->Value(),"GUI")) {
-    std::cout << "Not a GUI file" << std::endl;
-    return false;
-  }
-  TiXmlElement* e=node->FirstChildElement();
-  while(e != NULL) 
-  {
-    if(0==strcmp(e->Value(),"robot")) {
-      TiXmlElement* c=e->FirstChildElement();
-      while(c!=NULL)
-      {
-        if(0==strcmp(c->Value(),"name")) {
-          if(e->GetText()){
-            stringstream ss(e->GetText());
-            ss >> _robotname;
-          }
-        }
-        if(0==strcmp(c->Value(),"configinit")) {
-          stringstream ss(c->GetText());
-          ss >> planner_p_init;
-        }
-        if(0==strcmp(c->Value(),"configgoal")) {
-          stringstream ss(c->GetText());
-          ss >> planner_p_goal;
-        }
-        c = c->NextSiblingElement();
-      }
-    }
-    if(0==strcmp(e->Value(),"sweptvolume")) {
-
-      TiXmlElement* c=e->FirstChildElement();
-      std::vector<Config> keyframes;
-      while(c!=NULL)
-      {
-        if(0==strcmp(c->Value(),"qitem")) {
-          Config q;
-          stringstream ss(c->GetText());
-          ss >> q;
-          keyframes.push_back(q);
-        }
-        c = c->NextSiblingElement();
-      }
-      std::cout << "loaded " << keyframes.size() << " keyframes." << std::endl;
-      AddPath(keyframes);
-    }
-    e = e->NextSiblingElement();
-  }
-
-  return true;
+  return false;
 }
 bool ForceFieldBackend::Load(const char* file)
 {
-  std::string pdata = util::GetDataFolder();
-  std::string in = pdata+"/gui/"+file;
-
-  std::cout << "loading data from "<<in << std::endl;
-
-  TiXmlDocument doc(in.c_str());
-  if(doc.LoadFile()){
-    TiXmlElement *root = doc.RootElement();
-    if(root){
-      Load(root);
-    }
-  }else{
-    std::cout << doc.ErrorDesc() << std::endl;
-    std::cout << in << std::endl;
-    std::cout << "ERROR" << std::endl;
-  }
-  //exit(0);
-  return true;
+  return false;
 
 }
 bool ForceFieldBackend::Save(const char* file)
 {
-  std::string out;
-  std::string pdata = util::GetDataFolder();
-
-  if(!file){
-    std::string date = util::GetCurrentTimeString();
-    out = pdata+"/gui/state_"+date+".xml";
-  }else{
-    out = pdata+"/gui/"+file;
-  }
-
-  std::cout << "saving data to "<< out << std::endl;
-
-  TiXmlDocument doc;
-  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
-  doc.LinkEndChild(decl);
-  TiXmlElement *node = new TiXmlElement("GUI");
-  Save(node);
-
-  doc.LinkEndChild(node);
-  doc.SaveFile(out.c_str());
-
-  return true;
+  return false;
 
 }
 bool ForceFieldBackend::Save(TiXmlElement *node)
 {
-  node->SetValue("GUI");
-
-  //###################################################################
-  {
-    TiXmlElement c("robot");
-
-    {
-      TiXmlElement cc("name");
-      stringstream ss;
-      ss<<_robotname;
-      TiXmlText text(ss.str().c_str());
-      cc.InsertEndChild(text);
-      c.InsertEndChild(cc);
-    }
-    {
-      TiXmlElement cc("configinit");
-      stringstream ss;
-      ss<<planner_p_init<<endl;
-      TiXmlText text(ss.str().c_str());
-      cc.InsertEndChild(text);
-      c.InsertEndChild(cc);
-    }
-    {
-      TiXmlElement cc("configgoal");
-      stringstream ss;
-      ss<<planner_p_goal;
-      TiXmlText text(ss.str().c_str());
-      cc.InsertEndChild(text);
-      c.InsertEndChild(cc);
-    }
-    node->InsertEndChild(c);
-  }
-  for(uint i = 0; i < swept_volume_paths.size(); i++){
-  //
-    TiXmlElement c("sweptvolume");
-
-    std::vector<Config> keyframes = swept_volume_paths.at(i).GetKeyframes();
-    for(uint i = 0; i < keyframes.size(); i++){
-      TiXmlElement cc("qitem");
-      stringstream ss;
-      ss<< keyframes.at(i);
-      TiXmlText text(ss.str().c_str());
-      cc.InsertEndChild(text);
-      c.InsertEndChild(cc);
-    }
-    node->InsertEndChild(c);
-  }
-
-  return true;
-
+  return false;
 }
 
 //############################################################################
@@ -861,16 +564,6 @@ void ForceFieldBackend::SendCommandStringController(string cmd, string arg)
   }
 }
 
-void ForceFieldBackend::ClearPaths(){
-  swept_volume_paths.clear();
-}
-
-const std::vector<Config>& ForceFieldBackend::getPathKeyFrames(uint pathid)
-{
-  assert(swept_volume_paths.size()>pathid);
-  return swept_volume_paths.at(pathid).GetKeyframes();
-}
-
 uint ForceFieldBackend::getNumberOfPaths(){
   return this->plannerOutput.size();
 }
@@ -887,43 +580,6 @@ void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, con
   _frameLength.push_back(frameLength);
 }
 
-//void ForceFieldBackend::AddPathInterpolate(const std::vector<Config> &keyframes, GLColor color, uint Nkeyframes_alongpath)
-//{
-//  std::vector<Config> interp_keyframes;
-//  double minimal_distance = 0.1;
-//  for(uint i = 0; i < keyframes.size()-1; i++){
-//    Config q1= keyframes.at(i);
-//    Config q2= keyframes.at(i+1);
-//    interp_keyframes.push_back(q1);
-//    double d = (q2-q1).norm();
-//    std::cout << std::string(80, '-') << std::endl; 
-//    std::cout << q1 << std::endl;
-//    std::cout << q2 << std::endl;
-//    std::cout << d << std::endl;
-//
-//    if(d > minimal_distance){
-//      uint Npts = floor(d/minimal_distance);
-//      std::cout << Npts << std::endl;
-//      //std::cout << q1 << std::endl;
-//      for(uint j = 0; j < Npts; j++){
-//        Config qj = q1 + j*(minimal_distance/d)*(q2-q1);
-//        //std::cout << qj << std::endl;
-//        interp_keyframes.push_back(qj);
-//      }
-//      //exit(0);
-//    }
-//  }
-//  interp_keyframes.push_back(keyframes.back());
-//
-//  AddPath(interp_keyframes, color, Nkeyframes_alongpath);
-//}
-void ForceFieldBackend::AddPath(const std::vector<Config> &keyframes, GLColor color, uint Nkeyframes_alongpath, uint robot_idx)
-{
-  Robot *robot = world->robots[robot_idx];
-  SweptVolume sv(robot, keyframes, Nkeyframes_alongpath);
-  sv.SetColor(color);
-  swept_volume_paths.push_back(sv);
-}
 
 //############################################################################
 //############################################################################
@@ -1059,51 +715,6 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     std::cout << "Changed Mode to: "<<click_mode << std::endl;
   }else if(cmd=="print_config") {
     std::cout << world->robots[0]->q <<std::endl;
-  }else if(cmd=="toggle_layer") {
-    int Nlayer = plannerOutput.at(0).nested_idx.size();
-    if(planner_layer < Nlayer-1){
-      planner_layer++;
-    }else{
-      planner_layer = 0;
-    }
-    planner_layer_robot_idx = plannerOutput.at(0).nested_idx.at(planner_layer);
-    std::cout << "Switched to hierarchy level " << planner_layer << " (Robot: ";
-    std::cout << planner_layer_robot_idx << " name " << world->robots[planner_layer_robot_idx]->name  << ")" << std::endl;  
-  }else if(cmd=="hierarchy_next"){
-    int N = plannerOutput.at(0).hierarchy.NumberNodesOnLevel(hierarchical_level);
-    if(N>0){
-      int node = hierarchical_level_nodes.at(hierarchical_level);
-      if(node < N-1) node++;
-      else node=0;
-      hierarchical_level_nodes.at(hierarchical_level) = node;
-    }
-  }else if(cmd=="hierarchy_previous"){
-    int N = plannerOutput.at(0).hierarchy.NumberNodesOnLevel(hierarchical_level);
-    if(N>0){
-      uint node = hierarchical_level_nodes.at(hierarchical_level);
-      if(node > 0 ) node--;
-      else node=N-1;
-      hierarchical_level_nodes.at(hierarchical_level) = node;
-    }
-  }else if(cmd=="hierarchy_down"){
-
-    std::cout << "Planning Level " << hierarchical_level << std::endl;
-    std::cout << "Node           ";
-    for(uint k = 0; k <= hierarchical_level; k++){
-      std::cout << " -> " << hierarchical_level_nodes.at(k);
-    }
-    std::cout << std::endl;
-    //invoke planning inception
-
-    int N = plannerOutput.at(0).hierarchy.NumberLevels();
-    if(hierarchical_level < N-1 ){
-      hierarchical_level++;
-    }
-  }else if(cmd=="hierarchy_up"){
-    int N = plannerOutput.at(0).hierarchy.NumberLevels();
-    if(hierarchical_level > 0 ){
-      hierarchical_level--;
-    }
   }else return BaseT::OnCommand(cmd,args);
 
   SendRefresh();
@@ -1280,11 +891,6 @@ bool GLUIForceFieldGUI::Initialize()
   AddToKeymap("t","draw_planner_tree_toggle");
   AddToKeymap("G","draw_planner_simplicial_complex");
   AddToKeymap("S","make_screenshot");
-
-  AddToKeymap("left","hierarchy_previous");
-  AddToKeymap("right","hierarchy_next");
-  AddToKeymap("down","hierarchy_down");
-  AddToKeymap("up","hierarchy_up");
 
   AddButton("load_motion_planner");
   AddButton("save_motion_planner");

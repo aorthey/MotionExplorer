@@ -12,19 +12,19 @@ class SweptVolume
     SweptVolume(Robot *robot);
     SweptVolume(Robot *robot, const std::vector<Config> &keyframes, uint Nkeyframes);
 
-    const std::vector<std::vector<Matrix4> >& GetMatrices();
-    const std::vector<Config >& GetKeyframes();
-    const vector<GLDraw::GeometryAppearance>& GetAppearanceStack();
+    const std::vector<std::vector<Matrix4> >& GetMatrices() const;
+    const std::vector<Config >& GetKeyframes() const;
+    const vector<GLDraw::GeometryAppearance>& GetAppearanceStack() const;
 
     void SetColor(const GLColor c);
-    GLColor GetColor();
+    GLColor GetColor() const;
     void SetColorMilestones(const GLColor c);
-    GLColor GetColorMilestones();
-    const Config& GetStart();
-    const Config& GetGoal();
-    const vector<uint>& GetKeyframeIndices();
+    GLColor GetColorMilestones() const;
+    const Config& GetStart() const;
+    const Config& GetGoal() const;
+    const vector<uint>& GetKeyframeIndices() const;
 
-    Robot* GetRobot();
+    Robot* GetRobot() const;
 
     bool Save(const char* file=NULL);
     bool Save(TiXmlElement *node);

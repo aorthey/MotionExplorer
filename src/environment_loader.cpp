@@ -15,7 +15,7 @@ Robot* EnvironmentLoader::GetRobotPtr(){
 PlannerInput EnvironmentLoader::GetPlannerInput(){
   return pin;
 }
-ForceFieldBackendPtr EnvironmentLoader::GetBackendPtr(){
+PlannerBackendPtr EnvironmentLoader::GetBackendPtr(){
   return _backend;
 }
 
@@ -44,7 +44,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 
   world.background = GLColor(1,1,1);
 
-  _backend = new ForceFieldBackend(&world);
+  _backend = new PlannerBackend(&world);
   if(!_backend->LoadAndInitSim(file_name.c_str())){
     std::cout << std::string(80, '-') << std::endl;
     std::cout << std::endl;
@@ -216,28 +216,11 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 }
 bool EnvironmentLoader::LoadPath(const char* file)
 {
-  std::string file_name = util::GetApplicationFolder()+file;
-  TiXmlDocument doc(file_name.c_str());
-  TiXmlElement *root = GetRootNodeFromDocument(doc);
-  LoadPath(root);
-  return true;
+  return false;
 }
 bool EnvironmentLoader::LoadPath(TiXmlElement *node)
 {
-  CheckNodeName(node, "path");
-
-  TiXmlElement* q = FindFirstSubNode(node, "q");
-  std::vector<Config> keyframes;
-  while(q!=NULL){
-    //std::cout << q->GetText() << std::endl;
-    Config qconfig;
-    GetStreamText(q) >> qconfig;
-    keyframes.push_back(qconfig);
-    q = FindNextSiblingNode(q, "q");
-  }
-  _backend->AddPath(keyframes);
-
-  return true;
+  return false;
 }
 std::vector<Config> EnvironmentLoader::GetKeyframesFromFile(const char* file)
 {

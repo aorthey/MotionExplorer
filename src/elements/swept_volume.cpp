@@ -67,38 +67,38 @@ SweptVolume::SweptVolume(Robot *robot, const std::vector<Config> &keyframes, uin
   }
 }
 
-Robot* SweptVolume::GetRobot(){
+Robot* SweptVolume::GetRobot() const{
   return _robot;
 }
-const std::vector<std::vector<Matrix4> >& SweptVolume::GetMatrices(){
+const std::vector<std::vector<Matrix4> >& SweptVolume::GetMatrices() const{
   return _mats;
 }
-const std::vector<Config >& SweptVolume::GetKeyframes(){
+const std::vector<Config >& SweptVolume::GetKeyframes() const{
   return _keyframes;
 }
-const vector<GLDraw::GeometryAppearance>& SweptVolume::GetAppearanceStack(){
+const vector<GLDraw::GeometryAppearance>& SweptVolume::GetAppearanceStack() const{
   return _appearanceStack;
 }
 
 void SweptVolume::SetColor(const GLColor c){
   color = c;
 }
-GLColor SweptVolume::GetColor(){
+GLColor SweptVolume::GetColor() const{
   return color;
 }
 void SweptVolume::SetColorMilestones(const GLColor c){
   color_milestones= c;
 }
-GLColor SweptVolume::GetColorMilestones(){
+GLColor SweptVolume::GetColorMilestones() const{
   return color_milestones;
 }
-const Config& SweptVolume::GetStart(){
+const Config& SweptVolume::GetStart() const{
   return init;
 }
-const Config& SweptVolume::GetGoal(){
+const Config& SweptVolume::GetGoal() const{
   return goal;
 }
-const vector<uint>& SweptVolume::GetKeyframeIndices(){
+const vector<uint>& SweptVolume::GetKeyframeIndices() const{
   return _keyframe_indices;
 }
 void SweptVolume::AddKeyframe(Config &q ){

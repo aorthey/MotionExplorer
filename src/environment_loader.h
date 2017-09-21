@@ -1,7 +1,7 @@
 #pragma once
 
 #include "util.h"
-#include "gui.h"
+#include "gui_planner.h"
 #include "info.h"
 #include "planner/planner_input.h"
 
@@ -16,7 +16,7 @@ class EnvironmentLoader{
     std::string name;
 
     RobotWorld world;
-    ForceFieldBackendPtr _backend;
+    PlannerBackendPtr _backend;
     Info info;
     PlannerInput pin;
 
@@ -24,7 +24,7 @@ class EnvironmentLoader{
     RobotWorld& GetWorld();
     RobotWorld* GetWorldPtr();
     Robot* GetRobotPtr();
-    ForceFieldBackendPtr GetBackendPtr();
+    PlannerBackendPtr GetBackendPtr();
     PlannerInput GetPlannerInput();
 
     static EnvironmentLoader from_args(int argc,const char** argv);
