@@ -77,13 +77,19 @@ void PathspaceHierarchy::Print( ){
 
 }
 
+void PathspaceHierarchy::CollapsePath( std::vector<int> nodes ){
+  PathNode* collapsed_node = GetPathNodeFromNodes( nodes );
+  collapsed_node->children.clear();
+  level_number_nodes.at(collapsed_node->level+1)=0;
+}
+
 void PathspaceHierarchy::AddPath( std::vector<Config> &path_ ){
   PathNode* newpath = new PathNode();
   newpath->level = 1;
   newpath->node = root->children.size();
   newpath->path = path_;
   root->children.push_back(newpath); 
-  level_number_nodes.at(1)++;
+  level_number_nodes.at(newpath->level)++;
 }
 
 void PathspaceHierarchy::AddPath( std::vector<Config> &path_, std::vector<int> nodes){

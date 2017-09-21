@@ -12,7 +12,7 @@ class HierarchicalMotionPlanner: public MotionPlanner{
   public:
     HierarchicalMotionPlanner(RobotWorld *world_, PlannerInput& input_);
 
-    bool solve(std::vector<int> nodes);
+    bool solve(std::vector<int> path_idxs);
 
     //folder-like operations on hierarchical path space
     void ExpandPath();

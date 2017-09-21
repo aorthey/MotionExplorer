@@ -73,33 +73,46 @@ HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, Planner
   }
 }
 
-bool HierarchicalMotionPlanner::solve(std::vector<int> path){
+//################################################################################
+bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
+
+  uint Nlevel = output.hierarchy.NumberLevels();
+  PathNode* node = output.hierarchy.GetPathNodeFromNodes( path_idxs );
+
+  std::vector<Config> path_constraint = node->path;
+  uint level = node->level;
+
+  if(level >= Nlevel){
+    std::cout << "reached bottom level -> nothing more to solve" << std::endl;
+    return true;
+  }
+
   std::vector<int> idxs = input.robot_idxs;
 
   WorldPlannerSettings worldsettings;
   worldsettings.InitializeDefault(*world);
-
   CSpaceFactory factory(input);
-  CSpaceOMPL* cspace;
 
-  SingleRobotCSpace* kcspace;
-  SingleRobotCSpace* cspace_nested;
-  SingleRobotCSpace* cspace_inner;
-  SingleRobotCSpace* cspace_outer;
+  //for(uint i = 0; i < idxs.size(); i++){
 
-  //################################################################################
-  for(uint i = 0; i < idxs.size(); i++){
-    uint ridx = idxs.at(i);
-    Robot *ri = world->robots[ridx];
-    SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,ridx,&worldsettings);
-    CSpaceOMPL* cspace_i;
+
+  uint ridx = idxs.at(level);
+  Robot *ri = world->robots[ridx];
+  SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,ridx,&worldsettings);
+  CSpaceOMPL* cspace_i;
+
+  if(level==0){
     cspace_i = factory.MakeGeometricCSpaceRotationalInvariance(ri, cspace_klampt_i);
-    cspace_i->print();
-    PlannerStrategyGeometric strategy;
-    output.robot_idx = ridx;
-    strategy.plan(input, cspace_i, output);
+  }else{
+    std::cout << "level " << level << " nyi" << std::endl;
     return true;
   }
+  cspace_i->print();
+  PlannerStrategyGeometric strategy;
+  output.robot_idx = ridx;
+  strategy.plan(input, cspace_i, output);
+  return true;
+  //}
 
 }
 
@@ -181,8 +194,9 @@ void HierarchicalMotionPlanner::ExpandPath(){
 }
 void HierarchicalMotionPlanner::CollapsePath(){
   if(current_level>0){
-    current_level--;
     current_path.erase(current_path.end() - 1);
+    output.hierarchy.CollapsePath( current_path );
+    current_level--;
   }
 }
 

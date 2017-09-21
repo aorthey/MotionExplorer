@@ -13,6 +13,12 @@ struct PathNode{
   PathNode(){
     sv = NULL;
   }
+  ~PathNode(){
+    delete sv;
+    for(uint k = 0; k < children.size(); k++){
+      delete children.at(k);
+    }
+  }
 
   std::vector<Config> path;
   std::vector<ob::State*> state_path;
@@ -52,6 +58,7 @@ class PathspaceHierarchy{
     PathNode* GetPathNodeFromNodes( std::vector<int> nodes );
 
     const std::vector<Config>& GetPathFromNodes( std::vector<int> nodes );
+    void CollapsePath( std::vector<int> nodes );
 
     uint AddLevel( uint ridx, Config &qi, Config &qg );
     void Print();
