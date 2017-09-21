@@ -67,7 +67,7 @@ class PlannerOutput{
     SweptVolume& GetSweptVolume(Robot *robot_);
     SweptVolume& GetSwathVolume(Robot *robot_);
 
-    void VerticesToFile();
+    //void VerticesToFile();
 
     void SetTorques(std::vector<Vector> &torques_);
     const std::vector<Vector>& GetTorques();

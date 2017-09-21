@@ -124,48 +124,58 @@ bool MotionPlanner::solve()
     std::cout << "Hierarchical Planner: " << std::endl;
     std::cout << std::string(80, '-') << std::endl;
     std::cout << " Robots  " << std::endl;
-
-    uint ridx = idxs.at(0);
-
-    Robot *ri = world->robots[ridx];
-    output.robot_idx = ridx;
-
-    Config qi = input.q_init;
-    Config qg = input.q_goal;
-    qi.resize(ri->q.size());
-    qg.resize(ri->q.size());
-
-    output.q_init = qi;
-    output.q_goal = qg;
-
-    for(uint k = 0; k < idxs.size(); k++){
-      std::cout << " Level" << k << "         : idx " << idxs.at(k) << " name " << world->robots[idxs.at(k)]->name << std::endl;
+    for(uint k = 0; k < output.nested_idx.size(); k++){
+      uint ridx = output.nested_idx.at(k);
+      Robot *rk = world->robots[ridx];
+      std::cout << " Level" << k << "         : idx " << ridx << " name " << rk->name << std::endl;
+      Config qi = output.nested_q_init.at(k);
+      Config qg = output.nested_q_goal.at(k);
+      std::cout << "   qinit        : " << qi << std::endl;
+      std::cout << "   qgoal        : " << qi << std::endl;
     }
 
-    output.robot = ri;
-
     if(input.freeFloating){
-      cspace_nested = new SingleRobotCSpace(*world,ridx,&worldsettings);
-      cspace = factory.MakeGeometricCSpaceRotationalInvariance(ri, cspace_nested);
+      //################################################################################
+      //hierarchical: free floating
+      //################################################################################
+      for(uint i = 0; i < idxs.size(); i++){
+        uint ridx = idxs.at(i);
+        Robot *ri = world->robots[ridx];
+        SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,ridx,&worldsettings);
+        CSpaceOMPL* cspace_i;
+        cspace_i = factory.MakeGeometricCSpaceRotationalInvariance(ri, cspace_klampt_i);
+        cspace_i->print();
+        PlannerStrategyGeometric strategy;
+        output.robot_idx = ridx;
+        strategy.plan(input, cspace_i, output);
+        return true;
+      }
 
-    //################################################################################
+
     }else{
+      //################################################################################
+      //hierarchical: contacts
+      //################################################################################
       if(idxs.size() < 3){
         std::cout << "algorithm workspace requires at least ORIGINAL robot, INNER SHELL, OUTER SHELL robot" << std::endl;
         exit(0);
       }
 
+      uint ridx = idxs.at(0);
+      Robot *ri = world->robots[ridx];
+      output.robot_idx = ridx;
+
       cspace_inner = new SingleRobotCSpace(*world,idxs.at(1),&worldsettings);
       cspace_outer = new SingleRobotCSpace(*world,idxs.at(2),&worldsettings);
-
 
       cspace = factory.MakeGeometricCSpaceRotationalInvariance(ri, cspace_inner);
       cspace = factory.MakeCSpaceDecoratorInnerOuter(cspace, cspace_outer);
     }
     //################################################################################
-
-//################################################################################
   }else{
+//################################################################################
+//Single Robot OMPL Cspace
+//################################################################################
     if(idxs.size() < 1){
       std::cout << "Planner requires at least one robot to plan with" << std::endl;
       exit(0);
@@ -181,10 +191,7 @@ bool MotionPlanner::solve()
     cspace = factory.MakeGeometricCSpace(robot, kcspace);
   }
 
-
-
   cspace->print();
-
   PlannerStrategyGeometric strategy;
   strategy.plan(input, cspace, output);
   return true;

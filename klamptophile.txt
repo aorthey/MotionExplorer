@@ -770,4 +770,5 @@ are >TWO< unique shortest paths (in the same homotopy class)
 [x] smooth path
 [x] interpolate path
 [ ] sometimes two nearby paths are not reduced, investigate that
+[ ] visualize tree with this velocity window thing
 [ ] extend ompl to plan with an input path constraint (sublevel planning)

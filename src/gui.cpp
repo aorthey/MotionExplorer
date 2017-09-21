@@ -176,7 +176,6 @@ void ForceFieldBackend::Start()
 
     uint N = plannerOutput.at(0).hierarchy.NumberLevels();
     for(uint k = 0; k < N; k++){
-      //uint M = plannerOutput.at(0).hierarchy.NumberNodesOnLevel(k);
       hierarchical_level_nodes.push_back(0);
     }
 
@@ -1088,9 +1087,12 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     }
   }else if(cmd=="hierarchy_down"){
 
-    std::cout << "Going deeper" << std::endl;
     std::cout << "Planning Level " << hierarchical_level << std::endl;
-    std::cout << "Node           " << hierarchical_level_nodes.at(hierarchical_level) << std::endl;
+    std::cout << "Node           ";
+    for(uint k = 0; k <= hierarchical_level; k++){
+      std::cout << " -> " << hierarchical_level_nodes.at(k);
+    }
+    std::cout << std::endl;
     //invoke planning inception
 
     int N = plannerOutput.at(0).hierarchy.NumberLevels();
@@ -1359,12 +1361,13 @@ void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
       break;
     }
     default:
-      for (Keymap::iterator it=_baseclass_keys.begin(); it!=_baseclass_keys.end(); ++it){
-        if(c==*it->first){
-          BaseT::Handle_Keypress(c,x,y);
-          break;
-        }
-      }
+      //for (Keymap::iterator it=_baseclass_keys.begin(); it!=_baseclass_keys.end(); ++it){
+      //  if(c==*it->first){
+      //    BaseT::Handle_Keypress(c,x,y);
+      //    break;
+      //  }
+      //}
+      BaseT::Handle_Keypress(c,x,y);
       break;
   }
 }

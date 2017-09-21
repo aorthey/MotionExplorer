@@ -7,25 +7,25 @@ PlannerOutput::PlannerOutput(){
   swv = NULL;
 };
 
-void PlannerOutput::VerticesToFile(){
-
-  ofstream fh;
-  fh.open ("vertices.txt");
-  if(!swv) GetSwathVolume();
-  std::vector<Config> tree= swv->GetKeyframes();
-  for(uint k = 0; k < tree.size(); k++){
-    fh << tree.at(k) << std::endl;
-  }
-  fh.close();
-
-  fh.open ("vertices_path.txt");
-  if(!sv) GetSweptVolume();
-  std::vector<Config> path = sv->GetKeyframes();
-  for(uint k = 0; k < path.size(); k++){
-    fh << path.at(k) << std::endl;
-  }
-  fh.close();
-}
+//void PlannerOutput::VerticesToFile(){
+//
+//  ofstream fh;
+//  fh.open ("vertices.txt");
+//  if(!swv) GetSwathVolume();
+//  std::vector<Config> tree= swv->GetKeyframes();
+//  for(uint k = 0; k < tree.size(); k++){
+//    fh << tree.at(k) << std::endl;
+//  }
+//  fh.close();
+//
+//  fh.open ("vertices_path.txt");
+//  if(!sv) GetSweptVolume();
+//  std::vector<Config> path = sv->GetKeyframes();
+//  for(uint k = 0; k < path.size(); k++){
+//    fh << path.at(k) << std::endl;
+//  }
+//  fh.close();
+//}
 
 
 void PlannerOutput::SetTorques(std::vector<Vector> &torques_){
