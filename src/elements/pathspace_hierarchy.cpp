@@ -23,7 +23,7 @@ Config PathspaceHierarchy::GetGoalConfig( uint level ){
   return level_q_goal.at(level);
 }
 
-PathNode* PathspaceHierarchy::GetPathNodeFromNodes( std::vector<int> &nodes ){
+PathNode* PathspaceHierarchy::GetPathNodeFromNodes( std::vector<int> nodes ){
   if(nodes.empty()) return root;
 
   PathNode *current = root;
@@ -31,22 +31,17 @@ PathNode* PathspaceHierarchy::GetPathNodeFromNodes( std::vector<int> &nodes ){
   for(uint k = 0; k < nodes.size(); k++){
     if(nodes.at(k) >= current->children.size()){
       std::cout << "node " << nodes.at(k) << " does not exists on level " << k << " in hierarchical path tree" << std::endl;
-      exit(0);
+      return current;
+      //exit(0);
     }
     current = current->children.at( nodes.at(k) );
   }
   return current;
 }
 
-const std::vector<Config>& PathspaceHierarchy::GetPathFromNodes( std::vector<int> &nodes ){
+const std::vector<Config>& PathspaceHierarchy::GetPathFromNodes( std::vector<int> nodes ){
   PathNode* node = GetPathNodeFromNodes( nodes );
   return node->path;
-}
-
-
-std::vector<Config> PathspaceHierarchy::GetPath( std::vector<int> nodes ){
-  PathNode *current = GetPathNodeFromNodes(nodes);
-  return current->path;
 }
 
 uint PathspaceHierarchy::AddLevel( uint ridx, Config &qi, Config &qg ){
@@ -57,6 +52,8 @@ uint PathspaceHierarchy::AddLevel( uint ridx, Config &qi, Config &qg ){
     level_q_goal.push_back(qg);
     level_number_nodes.push_back(1);
     root = new PathNode();
+    root->level = 0;
+    root->node = 0;
     root->path.clear();
     root->path.push_back(qi);
     root->path.push_back(qg);
@@ -82,6 +79,8 @@ void PathspaceHierarchy::Print( ){
 
 void PathspaceHierarchy::AddPath( std::vector<Config> &path_ ){
   PathNode* newpath = new PathNode();
+  newpath->level = 1;
+  newpath->node = root->children.size();
   newpath->path = path_;
   root->children.push_back(newpath); 
   level_number_nodes.at(1)++;
@@ -94,6 +93,9 @@ void PathspaceHierarchy::AddPath( std::vector<Config> &path_, std::vector<int> n
   PathNode *current = GetPathNodeFromNodes(nodes);
   PathNode *newpath = new PathNode();
   newpath->path = path_;
+  newpath->level = current->level+1;
+  newpath->node = current->children.size();
+
   current->children.push_back(newpath);
   level_number_nodes.at(nodes.size())++;
 }

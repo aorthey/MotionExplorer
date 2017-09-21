@@ -9,7 +9,7 @@ PlannerBackend::PlannerBackend(RobotWorld *world) :
 void PlannerBackend::AddPlannerInput(PlannerInput& _in){
   planner = new HierarchicalMotionPlanner(world, _in);
   in = _in;
-  planner->solve();
+  //planner->solve();
 }
 
 void PlannerBackend::Start(){
@@ -43,12 +43,17 @@ void PlannerBackend::RenderWorld(){
   GLColor magenta(0.8,0,0.8,0.5);
   GLColor green(0.1,0.9,0.1,1);
 
-  GLDraw::drawPath(selected_path, green, 30);
-
   GLDraw::drawGLPathStartGoal(robot, qi, qg);
 
-  //const SweptVolume& sv = planner->GetSelectedPathSweptVolume();
-  //GLDraw::drawGLPathSweptVolume(robot, sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
+  GLDraw::drawPath(selected_path, green, 20);
+
+  std::vector< std::vector<Config> > sibling_paths = planner->GetSiblingPaths();
+  for(uint k = 0; k < sibling_paths.size(); k++){
+    GLDraw::drawPath(sibling_paths.at(k), magenta, 10);
+  }
+
+  const SweptVolume& sv = planner->GetSelectedPathSweptVolume();
+  GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
 
 }
 void PlannerBackend::RenderScreen(){
@@ -56,10 +61,18 @@ void PlannerBackend::RenderScreen(){
 
   std::string line;
   line = "Hierarchy    :\n";
-  line+=(" ["+std::to_string(planner->GetCurrentLevel())+"]");
+  uint cur_level = planner->GetSelectedLevel();
+  uint cur_node = planner->GetSelectedNode();
+  uint Nlevels = planner->GetNumberOfLevels();
+  uint Nnodes = planner->GetNumberNodesOnSelectedLevel();
+  line+=(" ["+std::to_string(cur_level)+"/"+std::to_string(Nlevels)+"]");
+  line+=(" ["+std::to_string(cur_node)+"/"+std::to_string(Nnodes)+"]");
+    uint NumberNodesOnLevel(uint level);
 
   DrawText(line_x_pos,line_y_offset,line);
   line_y_offset += line_y_offset_stepsize;
+
+
   //  uint Nlevels = plannerOutput.at(0).hierarchy.NumberLevels();
   //
   //  const uint Nnodes = plannerOutput.at(0).hierarchy.NumberNodesOnLevel(1);
