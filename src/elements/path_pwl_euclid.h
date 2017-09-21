@@ -33,6 +33,7 @@ class PathPiecewiseLinearEuclidean
     Vector3 EvalVec3Milestone(const int k) const;
     Config EvalMilestone(const int k) const;
     Config Eval(const double t) const;
+    double PosFromConfig(const Config) const;
     virtual void interpolate();
     virtual void info();
 

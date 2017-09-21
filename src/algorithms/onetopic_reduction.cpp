@@ -80,6 +80,7 @@ bool OnetopicPathSpaceModifier::testVisibilityRRT(const ob::PlannerData& pd, con
 
   ss.solve(ptc);
   bool solved = ss.haveExactSolutionPath();
+  ompl::msg::setLogLevel(ompl::msg::LOG_INFO);
   return solved;
 }
 

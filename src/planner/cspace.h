@@ -2,6 +2,7 @@
 #include "principalfibrebundle.h"
 #include "tangentbundle.h"
 #include "planner_input.h"
+#include "elements/path_pwl_euclid.h"
 
 #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/base/ScopedState.h>
@@ -165,4 +166,20 @@ class GeometricCSpaceOMPLRotationalInvariance: public GeometricCSpaceOMPL
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
     virtual Config OMPLStateToConfig(const ob::State *qompl);
     virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
+};
+
+class GeometricCSpaceOMPLPathConstraintRollInvariance: public GeometricCSpaceOMPL
+{
+  public:
+    GeometricCSpaceOMPLPathConstraintRollInvariance(Robot *robot_, CSpace *space_, std::vector<Config> path_);
+    virtual void initSpace();
+    virtual void print();
+    virtual ob::State* ConfigToOMPLStatePtr(const Config &q);
+    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
+    virtual Config OMPLStateToConfig(const ob::State *qompl);
+    virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
+  private:
+    PathPiecewiseLinearEuclidean* path_constraint;
+    double t;
+
 };

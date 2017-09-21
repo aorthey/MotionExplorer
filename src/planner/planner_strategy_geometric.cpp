@@ -1,5 +1,6 @@
 #include "planner/planner_strategy_geometric.h"
 #include "elements/topological_graph.h"
+#include "algorithms/onetopic_reduction.h"
 
 //#include <ompl/control/SimpleSetup.h>
 //#include <ompl/control/SpaceInformation.h>
@@ -67,6 +68,8 @@ void PlannerStrategyGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspa
 
   ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
+  std::cout << start << std::endl;
+  std::cout << goal << std::endl;
 
   og::SimpleSetup ss(cspace->SpacePtr());//const ControlSpacePtr
   const ob::SpaceInformationPtr si = ss.getSpaceInformation();
@@ -159,8 +162,11 @@ void PlannerStrategyGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspa
   //Topology::TopologicalGraph top(pd, *obj);
   //output.cmplx = top.GetSimplicialComplex();
 
-  output.hierarchy.CreateHierarchyFromPlannerData(pd, *obj);
-  output.hierarchy.Print();
+  //output.hierarchy.CreateHierarchyFromPlannerData(pd, *obj);
+  //output.hierarchy.Print();
+
+  OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(pd,*obj);
+  output.paths = onetopic_pathspace.GetConfigPaths();
 
   //SerializeTree(pd, cspace);
   //output.SetTree(_stree);

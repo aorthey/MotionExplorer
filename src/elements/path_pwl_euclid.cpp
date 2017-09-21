@@ -140,3 +140,25 @@ PathPiecewiseLinearEuclidean* PathPiecewiseLinearEuclidean::from_keyframes(const
   path->interpolate();
   return path;
 }
+double PathPiecewiseLinearEuclidean::PosFromConfig(const Config q) const{
+  double pos = 0;
+  for(uint k = 0; k < keyframes.size()-1; k++){
+    Config q1 = keyframes.at(k);
+    Config q2 = keyframes.at(k+1);
+    double d1 = (q-q1).norm();
+    double d2 = (q-q2).norm();
+    double d = (q1-q2).norm();
+    double epsilon = 1e-10;
+    if(d1+d2 <= d+epsilon){
+      //q lies on line (q1,q2)
+      //
+      pos += d1/d*interLength.at(k);
+      Config qout = Eval(pos);
+      assert((qout-q).norm() < epsilon);
+      return pos;
+    }
+    pos += interLength.at(k);
+
+  }
+
+}

@@ -36,6 +36,8 @@ class HierarchicalMotionPlanner: public MotionPlanner{
     const std::vector<int>& GetSelectedPathIndices();
     int GetCurrentLevel();
 
+    void Print();
+
     //for each level: first: number of all nodes, second: node selected on that
     //level. produces a tree of nodes with distance 1 to central path
     //const std::vector<std::pair<int,int> >& GetCaterpillarTreeIndices();
@@ -45,6 +47,7 @@ class HierarchicalMotionPlanner: public MotionPlanner{
     int current_level_node;
     std::vector<int> current_path;
 
+    PathspaceHierarchy hierarchy;
 
 };
 

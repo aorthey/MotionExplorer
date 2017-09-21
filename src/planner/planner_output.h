@@ -44,6 +44,7 @@ class PlannerOutput{
 
     Robot *robot;
 
+    std::vector< std::vector< Config >>  paths;
   private:
 
     double time;

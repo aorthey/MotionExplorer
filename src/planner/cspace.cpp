@@ -1,5 +1,6 @@
 #include "cspace.h"
 #include "validity_checker_ompl.h"
+#include <ompl/base/spaces/SO2StateSpace.h>
 
 CSpaceOMPL::CSpaceOMPL(Robot *robot_, CSpace *kspace_):
   robot(robot_), kspace(kspace_)
@@ -859,17 +860,6 @@ void GeometricCSpaceOMPLRotationalInvariance::initSpace()
   ob::StateSpacePtr R3(std::make_shared<ob::RealVectorStateSpace>(3));
   this->space = R3;
   ob::RealVectorStateSpace *cspaceR3 = this->space->as<ob::RealVectorStateSpace>();
-  //ob::RealVectorStateSpace *cspaceRn;
-
-  //if(Nompl>0){
-  //  ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(Nompl));
-  //  this->space = SE3 + Rn;
-  //  cspaceSE3 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
-  //  cspaceRn = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
-  //}else{
-  //  this->space = SE3;
-  //  cspaceSE3 = this->space->as<ob::SE3StateSpace>();
-  //}
 
   //###########################################################################
   // Set bounds
@@ -958,4 +948,89 @@ Config GeometricCSpaceOMPLRotationalInvariance::OMPLStateToConfig(const ob::Scop
   q(1)=qomplRnSpace->values[1];
   q(2)=qomplRnSpace->values[2];
   return q;
+}
+//#############################################################################
+//#############################################################################
+GeometricCSpaceOMPLPathConstraintRollInvariance::GeometricCSpaceOMPLPathConstraintRollInvariance(Robot *robot_, CSpace *space_, std::vector<Config> path_):
+  GeometricCSpaceOMPL(robot_, space_)
+{
+  path_constraint = PathPiecewiseLinearEuclidean::from_keyframes(path_);
+  path_constraint->Normalize();
+}
+
+void GeometricCSpaceOMPLPathConstraintRollInvariance::initSpace()
+{
+  //###########################################################################
+  //   R^1 times S times S
+  //###########################################################################
+  std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: [0,1] x S^1 x S^1" << std::endl;
+
+  ob::StateSpacePtr R = (std::make_shared<ob::RealVectorStateSpace>(1));
+  ob::StateSpacePtr S1a = (std::make_shared<ob::SO2StateSpace>());
+  ob::StateSpacePtr S1b = (std::make_shared<ob::SO2StateSpace>());
+  this->space = R + S1a + S1b;
+  ob::RealVectorStateSpace *cspaceR = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(0);
+  ob::SO2StateSpace *cspaceS1a = this->space->as<ob::CompoundStateSpace>()->as<ob::SO2StateSpace>(1);
+  ob::SO2StateSpace *cspaceS1b = this->space->as<ob::CompoundStateSpace>()->as<ob::SO2StateSpace>(2);
+
+  ob::RealVectorBounds cbounds(1);
+  cbounds.setLow(0);
+  cbounds.setHigh(1+1e-10);
+  cspaceR->setBounds(cbounds);
+}
+void GeometricCSpaceOMPLPathConstraintRollInvariance::print()
+{
+}
+
+
+Config GeometricCSpaceOMPLPathConstraintRollInvariance::OMPLStateToConfig(const ob::State *qompl){
+
+  const ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+  const ob::SO2StateSpace::StateType *qomplSO2SpaceA = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+  const ob::SO2StateSpace::StateType *qomplSO2SpaceB = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(2);
+  t = qomplRnSpace->values[0];
+  double q1 = qomplSO2SpaceA->value;
+  double q2 = qomplSO2SpaceB->value;
+
+  Config qconstraint = path_constraint->Eval(t);
+
+  Config q;q.resize(6);q.setZero();
+  q(0)=qconstraint(0);
+  q(1)=qconstraint(1);
+  q(2)=qconstraint(2);
+  q(3)=q1;
+  q(4)=q2;
+  q(5)=0.0;
+
+  return q;
+}
+
+Config GeometricCSpaceOMPLPathConstraintRollInvariance::OMPLStateToConfig(const ob::ScopedState<> &qompl){
+  const ob::State* s = qompl.get();
+  return OMPLStateToConfig(s);
+}
+
+
+ob::State* GeometricCSpaceOMPLPathConstraintRollInvariance::ConfigToOMPLStatePtr(const Config &q){
+  return ConfigToOMPLState(q).get();
+}
+ob::ScopedState<> GeometricCSpaceOMPLPathConstraintRollInvariance::ConfigToOMPLState(const Config &q){
+
+  ob::ScopedState<> qompl(space);
+  ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+  ob::SO2StateSpace::StateType *qomplSO2SpaceA = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+  ob::SO2StateSpace::StateType *qomplSO2SpaceB = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(2);
+
+  double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
+  //double* qomplSa = static_cast<ob::SO2StateSpace::StateType*>(qomplSO2SpaceA)->value;
+  //double* qomplSb = static_cast<ob::SO2StateSpace::StateType*>(qomplSO2SpaceB)->value;
+  //qomplSa[0] = q[3];
+  //qomplSb[0] = q[4];
+  static_cast<ob::SO2StateSpace::StateType*>(qomplSO2SpaceA)->value = q[3];
+  static_cast<ob::SO2StateSpace::StateType*>(qomplSO2SpaceB)->value = q[4];
+  Config qc;qc.resize(3);qc.setZero();
+  qc(0)=q(0); qc(1)=q(1); qc(2)=q(2);
+
+  qomplRn[0] = path_constraint->PosFromConfig(qc);
+  return qompl;
 }

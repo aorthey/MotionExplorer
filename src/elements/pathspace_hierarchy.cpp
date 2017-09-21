@@ -29,10 +29,16 @@ PathNode* PathspaceHierarchy::GetPathNodeFromNodes( std::vector<int> nodes ){
   PathNode *current = root;
 
   for(uint k = 0; k < nodes.size(); k++){
+    //std::cout << "children: " << current->children.size() << std::endl;
     if(nodes.at(k) >= current->children.size()){
-      std::cout << "node " << nodes.at(k) << " does not exists on level " << k << " in hierarchical path tree" << std::endl;
-      return current;
-      //exit(0);
+      std::cout << "node " << nodes.at(k) << " does not exists on level " << k+1 << " in hierarchical path tree" << std::endl;
+      std::cout << "input : ";
+      for(uint j = 0; j < nodes.size(); j++){
+        std::cout << nodes.at(j) << " ";
+      }
+      std::cout << std::endl;
+      //return current;
+      exit(0);
     }
     current = current->children.at( nodes.at(k) );
   }
@@ -73,7 +79,13 @@ void PathspaceHierarchy::Print( ){
   for(uint k = 0; k < NumberLevels(); k++){
     std::cout << " level "<< k <<" nodes: " << NumberNodesOnLevel(k) << std::endl;
   }
+  std::cout << "Robots ";
+  for(uint k = 0; k < level_robot_idx.size(); k++){
+    std::cout << level_robot_idx.at(k) << " ";
+  }
+  std::cout << std::endl;
   std::cout << std::string(80, '-') << std::endl;
+
 
 }
 
@@ -94,16 +106,15 @@ void PathspaceHierarchy::AddPath( std::vector<Config> &path_ ){
 
 void PathspaceHierarchy::AddPath( std::vector<Config> &path_, std::vector<int> nodes){
 
-  nodes.insert(nodes.begin(), 0);
-
   PathNode *current = GetPathNodeFromNodes(nodes);
+  
   PathNode *newpath = new PathNode();
-  newpath->path = path_;
   newpath->level = current->level+1;
   newpath->node = current->children.size();
+  newpath->path = path_;
 
   current->children.push_back(newpath);
-  level_number_nodes.at(nodes.size())++;
+  level_number_nodes.at(newpath->level)++;
 }
 
 void PathspaceHierarchy::CreateHierarchyFromPlannerData( ob::PlannerData& pd, const ob::OptimizationObjective& obj){
