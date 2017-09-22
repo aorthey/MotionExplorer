@@ -226,8 +226,8 @@ std::vector< std::vector< Vector3 >> OnetopicPathSpaceModifier::ComputeShortestP
     uint idx_max = std::distance(std::begin(distance_shortest_path), std::max_element(std::begin(distance_shortest_path), std::end(distance_shortest_path)));
     min_distance_shortest_path = distance_shortest_path[idx_min];
     max_distance_shortest_path = distance_shortest_path[idx_max];
-    //std::cout << "min shortest path: " << min_distance_shortest_path << std::endl;
-    //std::cout << "max shortest path: " << max_distance_shortest_path << std::endl;
+    std::cout << "min shortest path: " << min_distance_shortest_path << std::endl;
+    std::cout << "max shortest path: " << max_distance_shortest_path << std::endl;
   }
 //################################################################################
   //simplify simplicial complex by removing vertices which belong to long paths
@@ -239,6 +239,7 @@ std::vector< std::vector< Vector3 >> OnetopicPathSpaceModifier::ComputeShortestP
   for(uint i = 0; i < Vidx.size(); i++){
    
     double lk = distance_shortest_path.at(i);
+    if(lk>=dInf) continue;
     Vertex current = i;
 
     std::pair<adjacency_iterator, adjacency_iterator> neighbors =
