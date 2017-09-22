@@ -788,6 +788,7 @@ namespace GLDraw{
     glPopMatrix();
     glDisable(GL_BLEND);
     glEnable(GL_LIGHTING);
+    glLineWidth(1);
   }
   void drawSimplicialComplex( SimplicialComplex& cmplx ){
 

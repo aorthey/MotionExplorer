@@ -1,6 +1,7 @@
 #pragma once
 
 #include "planner/planner.h"
+#include "ViewTree.h"
 #include "elements/swept_volume.h"
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 #include "planner/cspace_factory.h"
@@ -19,6 +20,7 @@ class HierarchicalMotionPlanner: public MotionPlanner{
     void CollapsePath();
     void NextPath();
     void PreviousPath();
+    void UpdateHierarchy();
 
     int GetNumberNodesOnSelectedLevel();
     int GetNumberOfLevels();
@@ -37,6 +39,7 @@ class HierarchicalMotionPlanner: public MotionPlanner{
     int GetCurrentLevel();
 
     void Print();
+    void DrawGL(double x_ =0.0, double y_=0.0);
 
     //for each level: first: number of all nodes, second: node selected on that
     //level. produces a tree of nodes with distance 1 to central path
@@ -48,6 +51,8 @@ class HierarchicalMotionPlanner: public MotionPlanner{
     std::vector<int> current_path;
 
     PathspaceHierarchy hierarchy;
+
+    ViewTree viewTree;
 
 };
 

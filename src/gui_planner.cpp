@@ -59,59 +59,21 @@ void PlannerBackend::RenderWorld(){
 void PlannerBackend::RenderScreen(){
   BaseT::RenderScreen();
 
-  std::string line;
-  line = "Hierarchy    :\n";
-  uint cur_level = planner->GetSelectedLevel();
-  uint cur_node = planner->GetSelectedNode();
-  uint Nlevels = planner->GetNumberOfLevels();
-  uint Nnodes = planner->GetNumberNodesOnSelectedLevel();
-  line+=(" ["+std::to_string(cur_level)+"/"+std::to_string(Nlevels)+"]");
-  line+=(" ["+std::to_string(cur_node)+"/"+std::to_string(Nnodes)+"]");
-    uint NumberNodesOnLevel(uint level);
+  //std::string line;
+  //line = "Hierarchy    :\n";
+  //uint cur_level = planner->GetSelectedLevel();
+  //uint cur_node = planner->GetSelectedNode();
+  //uint Nlevels = planner->GetNumberOfLevels();
+  //uint Nnodes = planner->GetNumberNodesOnSelectedLevel();
+  //line+=(" ["+std::to_string(cur_level)+"/"+std::to_string(Nlevels)+"]");
+  //line+=(" ["+std::to_string(cur_node)+"/"+std::to_string(Nnodes)+"]");
+  //  uint NumberNodesOnLevel(uint level);
 
-  DrawText(line_x_pos,line_y_offset,line);
-  line_y_offset += line_y_offset_stepsize;
+  //DrawText(line_x_pos,line_y_offset,line);
+  //line_y_offset += line_y_offset_stepsize;
 
+  planner->DrawGL(line_x_pos, line_y_offset);
 
-  //  uint Nlevels = plannerOutput.at(0).hierarchy.NumberLevels();
-  //
-  //  const uint Nnodes = plannerOutput.at(0).hierarchy.NumberNodesOnLevel(1);
-  //  //const uint selectedNode = hierarchical_level_nodes.at(hierarchical_level);
-  //
-  //  //root node
-  //  line = "";
-  //  for(uint k = 0; k < 2*Nnodes; k++) line+="  ";
-  //  line+=("<0>");
-  //  DrawText(line_x_pos,line_y_offset,line);
-  //  line_y_offset += line_y_offset_stepsize;
-  //
-  //  for(uint i = 1; i < 2; i++){
-  //    const uint selectedNode = hierarchical_level_nodes.at(i);
-  //
-  //    line = "  ";
-  //    for(uint k = 0; k < 2*Nnodes; k++) line+=("_");
-  //    line+=("|");
-  //    for(uint k = 0; k < 2*Nnodes; k++) line+=("_");
-  //    DrawText(line_x_pos,line_y_offset,line);
-  //    line_y_offset += line_y_offset_stepsize;
-  //
-  //    line = " ";
-  //    for(uint k = 0; k < Nnodes; k++) 
-  //      line+=("    |    ");
-  //    DrawText(line_x_pos,line_y_offset,line);
-  //    line_y_offset += line_y_offset_stepsize;
-  //
-  //    line = "";
-  //    for(uint k = 0; k < Nnodes; k++){
-  //      if(k==selectedNode && i<=hierarchical_level)
-  //        line+=("<"+std::to_string(k)+">");
-  //      else
-  //        line+=("  "+std::to_string(k)+" ");
-  //    }
-  //
-  //    DrawText(line_x_pos,line_y_offset,line);
-  //    line_y_offset += line_y_offset_stepsize;
-  //  }
 }
 bool PlannerBackend::OnIdle(){
   return BaseT::OnIdle();

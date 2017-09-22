@@ -51,6 +51,9 @@ HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, Planner
     output.nested_q_goal.push_back(qg);
     hierarchy.AddLevel( ridx, qi, qg);
   }
+  uint ridx = idxs.at(0);
+  Robot *r0 = world->robots[ridx];
+  //viewTree.PushLevel(1, r0);
 
   //remove all nested robots except the original one
   for(uint k = 0; k < idxs.size()-1; k++){
@@ -171,11 +174,6 @@ std::vector< std::vector<Config> > HierarchicalMotionPlanner::GetSiblingPaths(){
 const SweptVolume& HierarchicalMotionPlanner::GetSelectedPathSweptVolume(){
   PathNode* node = hierarchy.GetPathNodeFromNodes( current_path );
   uint idx = hierarchy.GetRobotIdx( node->level );
-  //std::cout << "Swept volume robot: " << idx << std::endl;
-  //std::cout << "path:" <<std::endl;
-  //for(uint k = 0; k < node->path.size(); k++){
-  //  std::cout << node->path.at(k) << std::endl;
-  //}
   Robot *robot = world->robots[idx];
   return node->GetSweptVolume(robot);
 }
@@ -203,11 +201,13 @@ int HierarchicalMotionPlanner::GetCurrentLevel(){
 void HierarchicalMotionPlanner::Print(){
   hierarchy.Print();
   std::cout << "current level " << current_level << std::endl;
+  std::cout << "viewTree level " << viewTree.GetLevel() << std::endl;
   std::cout << "current node  " << current_level_node << std::endl;
   std::cout << "current path: ";
   for(uint k = 0; k < current_path.size(); k++){
     std::cout << "->" << current_path.at(k);
   }
+
   std::cout << std::endl;
   std::cout << std::string(80, '-') << std::endl;
 }
@@ -218,21 +218,23 @@ void HierarchicalMotionPlanner::ExpandPath(){
     //current_level_node
     if(solve(current_path)){
       //start from node 0 if existing
-      current_path.push_back(0);
       current_level++;
+      current_level_node=0;
+      current_path.push_back(current_level_node);
     }else{
       std::cout << "Error: Path could not be expanded" << std::endl;
     }
   }
-  Print();
+  UpdateHierarchy();
 }
 void HierarchicalMotionPlanner::CollapsePath(){
   if(current_level>0){
     current_path.erase(current_path.end() - 1);
     hierarchy.CollapsePath( current_path );
     current_level--;
+    current_level_node = current_path.back();
   }
-  Print();
+  UpdateHierarchy();
 }
 
 void HierarchicalMotionPlanner::NextPath(){
@@ -242,7 +244,7 @@ void HierarchicalMotionPlanner::NextPath(){
   if(current_level > 0){
     current_path.at(current_level-1) = current_level_node;
   }
-  Print();
+  UpdateHierarchy();
 }
 void HierarchicalMotionPlanner::PreviousPath(){
   int Nmax=hierarchy.NumberNodesOnLevel(current_level);
@@ -257,5 +259,26 @@ void HierarchicalMotionPlanner::PreviousPath(){
   if(current_level > 0){
     current_path.at(current_level-1) = current_level_node;
   }
+  UpdateHierarchy();
+}
+void HierarchicalMotionPlanner::UpdateHierarchy(){
+  uint L = viewTree.GetLevel();
+  if(current_level == L ){
+  }else{
+    if(current_level < L){
+      viewTree.PopLevel();
+    }else{
+      uint idx = hierarchy.GetRobotIdx( current_level );
+      Robot *robot = world->robots[idx];
+      uint N = GetNumberNodesOnSelectedLevel();
+      viewTree.PushLevel(N, robot->name);
+    }
+  }
+  viewTree.UpdateSelectionPath( current_path );
   Print();
+}
+void HierarchicalMotionPlanner::DrawGL(double x_, double y_){
+  viewTree.x = x_;
+  viewTree.y = y_;
+  viewTree.DrawGL();
 }

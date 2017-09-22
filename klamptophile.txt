@@ -159,6 +159,14 @@ RobotLink3D (KrisLibrary/robotics/RobotLink3d.h
   Vector3 com;
   Matrix3 inertia;
 
+
+
+-------------------------------------------------------------------------------
+COMMON ERRORS:
+-------------------------------------------------------------------------------
+glError GL_INVALID_OPERATION found at /home/aorthey/git/Klampt/Interface/NavigationGUI.cpp:203
+(means we have setlinewidth inside an opengl operation)
+
 -------------------------------------------------------------------------------
 INTERFACE
 -------------------------------------------------------------------------------
@@ -769,6 +777,9 @@ are >TWO< unique shortest paths (in the same homotopy class)
 [x] visualize tree by text output (and indicate which nodes are where)
 [x] smooth path
 [x] interpolate path
+[x] extend ompl to plan with an input path constraint (sublevel planning)
 [ ] sometimes two nearby paths are not reduced, investigate that
 [ ] visualize tree with this velocity window thing
-[ ] extend ompl to plan with an input path constraint (sublevel planning)
+[ ] make onetopic modifier general applicable to any config/space
+
+
