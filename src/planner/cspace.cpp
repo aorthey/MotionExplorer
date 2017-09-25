@@ -236,22 +236,7 @@ void GeometricCSpaceOMPL::print()
 }
 
 ob::State* GeometricCSpaceOMPL::ConfigToOMPLStatePtr(const Config &q){
-  ob::ScopedState<> qompl = this->ConfigToOMPLState(q);
-
-  ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
-  ob::RealVectorStateSpace::StateType *qomplRn = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-
-  ob::State* out = space->allocState();
-  ob::SE3StateSpace::StateType *outSE3 = out->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  ob::SO3StateSpace::StateType *outSO3 = &outSE3->rotation();
-  ob::RealVectorStateSpace::StateType *outRn = out->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-
-  outSE3 = qomplSE3;
-  outSO3 = qomplSO3;
-  outRn = qomplRn;
-
-  return out;
+  return this->ConfigToOMPLState(q).get();
 }
 ob::ScopedState<> GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q){
   ob::ScopedState<> qompl(space);
@@ -644,31 +629,7 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
 }
 
 ob::State* KinodynamicCSpaceOMPL::ConfigToOMPLStatePtr(const Config &q){
-  ob::ScopedState<> qompl = this->ConfigToOMPLState(q);
-
-  //ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  //ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
-  //ob::RealVectorStateSpace::StateType *qomplRn = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-  //ob::RealVectorStateSpace::StateType *qomplTM = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
-
-  //ob::State* out = space->allocState();
-  //ob::SE3StateSpace::StateType *outSE3 = out->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  //ob::SO3StateSpace::StateType *outSO3 = &outSE3->rotation();
-  //ob::RealVectorStateSpace::StateType *outRn = out->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-  //ob::RealVectorStateSpace::StateType *outTM = out->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
-
-  //outSE3 = qomplSE3;
-  //outSO3 = qomplSO3;
-  //outRn = qomplRn;
-  //outTM = qomplTM;
-
-  ob::State* out = space->allocState();
-  ob::SE3StateSpace::StateType *outSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  ob::SO3StateSpace::StateType *outSO3 = &outSE3->rotation();
-  ob::RealVectorStateSpace::StateType *outRn = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-  ob::RealVectorStateSpace::StateType *outTM = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
-
-  return out;
+  return this->ConfigToOMPLState(q).get();
 }
 ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q){
   uint N=0;
@@ -913,18 +874,16 @@ void GeometricCSpaceOMPLRotationalInvariance::print()
 }
 
 ob::State* GeometricCSpaceOMPLRotationalInvariance::ConfigToOMPLStatePtr(const Config &q){
-  ob::ScopedState<> qompl = this->ConfigToOMPLState(q);
-  ob::State* out = space->allocState();
-  ob::RealVectorStateSpace::StateType *outRn = qompl->as<ob::RealVectorStateSpace::StateType>();
-  return out;
+  return this->ConfigToOMPLState(q).get();
 }
 ob::ScopedState<> GeometricCSpaceOMPLRotationalInvariance::ConfigToOMPLState(const Config &q){
   ob::ScopedState<> qompl(space);
 
-  ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::RealVectorStateSpace::StateType>();
-  double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
+  //ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::RealVectorStateSpace::StateType>();
+  //double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
+
   for(uint i = 0; i < 3; i++){
-    qomplRn[i]=q(i);
+    qompl->as<ob::RealVectorStateSpace::StateType>()->values[i] = q(i);
   }
   return qompl;
 }
@@ -1012,7 +971,7 @@ Config GeometricCSpaceOMPLPathConstraintRollInvariance::OMPLStateToConfig(const 
 
 
 ob::State* GeometricCSpaceOMPLPathConstraintRollInvariance::ConfigToOMPLStatePtr(const Config &q){
-  return ConfigToOMPLState(q).get();
+  return this->ConfigToOMPLState(q).get();
 }
 ob::ScopedState<> GeometricCSpaceOMPLPathConstraintRollInvariance::ConfigToOMPLState(const Config &q){
 

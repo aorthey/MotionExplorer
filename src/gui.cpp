@@ -457,9 +457,6 @@ void ForceFieldBackend::RenderScreen(){
   DrawTextVector(line_x_pos, line_y_offset, "Cmd Torque :", T);
   line_y_offset += line_y_offset_stepsize;
 
-  DrawText(line_x_pos, line_y_offset, "[MotionPlanner]");
-  line_y_offset += line_y_offset_stepsize;
-
   if(plannerOutput.size()>0){
     std::vector<int> bn = plannerOutput.at(0).cmplx.betti_numbers;
     if(bn.size()>2){

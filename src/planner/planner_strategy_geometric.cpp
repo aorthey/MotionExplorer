@@ -2,19 +2,6 @@
 #include "elements/topological_graph.h"
 #include "algorithms/onetopic_reduction.h"
 
-//#include <ompl/control/SimpleSetup.h>
-//#include <ompl/control/SpaceInformation.h>
-//#include <ompl/control/spaces/RealVectorControlSpace.h>
-//#include <ompl/control/planners/rrt/RRT.h>
-//#include <ompl/control/planners/syclop/Syclop.h>
-//#include <ompl/control/planners/syclop/SyclopRRT.h>
-//#include <ompl/control/planners/syclop/SyclopEST.h>
-//#include <ompl/control/planners/sst/SST.h>
-//#include <ompl/control/planners/pdst/PDST.h>
-//#include <ompl/control/planners/ltl/LTLPlanner.h>
-//#include <ompl/control/planners/kpiece/KPIECE1.h>
-//#include <ompl/control/planners/est/EST.h>
-
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
@@ -148,7 +135,7 @@ void PlannerStrategyGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspa
   //ob::PlannerStatus status = 
   ss.solve(ptc);
 
-  solved = ss.haveExactSolutionPath();
+  //solved = ss.haveExactSolutionPath();
 
   //###########################################################################
   // extract roadmap
@@ -162,10 +149,7 @@ void PlannerStrategyGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspa
   //Topology::TopologicalGraph top(pd, *obj);
   //output.cmplx = top.GetSimplicialComplex();
 
-  //output.hierarchy.CreateHierarchyFromPlannerData(pd, *obj);
-  //output.hierarchy.Print();
-
-  OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(pd,*obj);
+  OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(pd, *obj, cspace);
   output.paths = onetopic_pathspace.GetConfigPaths();
 
   //SerializeTree(pd, cspace);

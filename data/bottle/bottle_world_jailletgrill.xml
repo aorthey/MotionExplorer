@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <world>
+
   <robot name="bottle" file="/home/aorthey/git/orthoklampt/data/bottle/bottle.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
   <robot name="bottle_capsule" file="/home/aorthey/git/orthoklampt/data/bottle/bottle_capsule.urdf" translation="0 0 0" rotateRPY="0 0 0"/>

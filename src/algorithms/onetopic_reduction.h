@@ -1,5 +1,6 @@
 #pragma once
 
+#include "planner/cspace.h"
 #include "elements/path_pwl_euclid.h"
 
 #include <ompl/base/Cost.h>
@@ -8,6 +9,7 @@
 #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/base/ScopedState.h>
 #include <ompl/base/StateSpace.h>
+
 #include <list>
 #include <utility>
 #include <map>
@@ -32,101 +34,27 @@ using Edge = Graph::Edge;
 using VIterator = Graph::VIterator;
 using EIterator = Graph::EIterator;
 
-static ob::OptimizationObjectivePtr getThresholdPathLength(const ob::SpaceInformationPtr& si)
-{
-  ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
-  obj->setCostThreshold(ob::Cost(dInf));
-  return obj;
-}
-Vector3 vertexIndexToVector(const ob::PlannerData& pd, const Vertex &v);
-std::vector<Vector3> vertexIndicesToVector(const ob::PlannerData& pd, const std::vector<Vertex> &v);
-const ob::State* vertexIndexToOMPLState(const ob::PlannerData& pd, const Vertex &v);
-Config OMPLStateToConfig(const ob::State* si);
-Vector3 OMPLStateToVector3(const ob::State* si);
-
-//Let p,q be two paths [0,1]->M
-//Linearsegmentvaliditychecker: 
-//  for given s,t \in [0,1] checks if the linear segments between p(s) and q(t)
-//  is valid. This is done by calling ompl's checkmotion
-//
-//  it is used to determine inside a RRT planner to verify if two paths p,q are
-//  onetopic, i.e. homotopic by using a linear homotopy deformation.
-
-class LinearSegmentValidityChecker : public ob::StateValidityChecker
-{
-  public:
-    LinearSegmentValidityChecker(const ob::SpaceInformationPtr &si, const ob::SpaceInformationPtr &si_path_, const ob::PlannerData& pd, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2):
-      ob::StateValidityChecker(si), si_path(si_path_)
-    {
-      std::vector<Vector3> s1;
-      std::vector<Vector3> s2;
-
-      for(uint k = 0; k < p1.size(); k++){
-        Vector3 v = vertexIndexToVector(pd, p1.at(k));
-        s1.push_back(v);
-      }
-      for(uint k = 0; k < p2.size(); k++){
-        Vector3 v = vertexIndexToVector(pd, p2.at(k));
-        s2.push_back(v);
-      }
-      /////DEBUG
-
-      path1 = PathPiecewiseLinearEuclidean::from_keyframes(s1);
-      path1->Normalize();
-      path2 = PathPiecewiseLinearEuclidean::from_keyframes(s2);
-      path2->Normalize();
-    }
-
-    virtual bool isValid(const ob::State* state) const{
-
-      const ob::RealVectorStateSpace::StateType *RnSpace = state->as<ob::RealVectorStateSpace::StateType>();
-      double t1 = RnSpace->values[0];
-      double t2 = RnSpace->values[1];
-
-      Vector3 vv = path1->EvalVec3(t1);
-      Vector3 ww = path2->EvalVec3(t2);
-
-      const ob::StateSpacePtr space_path = si_path->getStateSpace();
-
-      ob::State *q1 = space_path->allocState();
-      ob::State *q2 = space_path->allocState();
-
-      for(uint k = 0; k < 3; k++){
-        q1->as<ob::RealVectorStateSpace::StateType>()->values[k] = vv[k];
-        q2->as<ob::RealVectorStateSpace::StateType>()->values[k] = ww[k];
-      }
-    
-      bool isfeasible = si_path->checkMotion(q1,q2);
-
-      space_path->freeState(q1);
-      space_path->freeState(q2);
-      return isfeasible;
-
-    }
-
-  private:
-
-    ob::SpaceInformationPtr si_path;
-    PathPiecewiseLinearEuclidean *path1;
-    PathPiecewiseLinearEuclidean *path2;
-
-};
+//Vector3 vertexIndexToVector(const ob::PlannerData& pd, const Vertex &v);
+//std::vector<Vector3> vertexIndicesToVector(const ob::PlannerData& pd, const std::vector<Vertex> &v);
+//const ob::State* vertexIndexToOMPLState(const ob::PlannerData& pd, const Vertex &v);
+//Config OMPLStateToConfig(const ob::State* si);
+//Vector3 OMPLStateToVector3(const ob::State* si);
 
 class OnetopicPathSpaceModifier{
   public:
-    explicit OnetopicPathSpaceModifier( ob::PlannerData& pd_in, const ob::OptimizationObjective& opt );
+    explicit OnetopicPathSpaceModifier( ob::PlannerData& pd_in, const ob::OptimizationObjective& opt, CSpaceOMPL *cspace);
 
-    std::vector< std::vector< Vector3 >> GetVectorPaths();
     std::vector< std::vector< Config >> GetConfigPaths();
     std::vector< std::vector< const ob::State* >> GetOMPLStatePaths();
 
   private:
-    bool testVisibilityRRT(const ob::PlannerData& pd, const ob::SpaceInformationPtr &si_path_space, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2);
-    std::vector< std::vector< Vector3 >> ComputeShortestPathsLemon(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt);
-    void ComputeConfigPaths( ob::PlannerData& pd );
+    //bool testVisibilityRRT(const ob::PlannerData& pd, const ob::SpaceInformationPtr &si_path_space, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2);
+    void ComputeShortestPathsLemon(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt);
+    void InterpolatePaths( ob::PlannerData& pd );
 
-    std::vector< std::vector< Vector3 >> vector_paths;
     std::vector< std::vector< Config >> config_paths;
     std::vector< std::vector< const ob::State* >> omplstate_paths;
+
+    CSpaceOMPL *cspace;
 
 };

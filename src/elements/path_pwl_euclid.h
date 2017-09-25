@@ -25,8 +25,6 @@ class PathPiecewiseLinearEuclidean
     static PathPiecewiseLinearEuclidean* from_keyframes(const std::vector<Config> &keyframes);
     static PathPiecewiseLinearEuclidean* from_keyframes(const std::vector<Vector3> &keyframes);
 
-    // convert path length [0,L] -> [0,1]
-    void Normalize();
     std::vector<double> GetLengthVector() const;
     double GetLength() const;
     Vector3 EvalVec3(const double t) const;
@@ -34,8 +32,11 @@ class PathPiecewiseLinearEuclidean
     Config EvalMilestone(const int k) const;
     Config Eval(const double t) const;
     double PosFromConfig(const Config) const;
+    virtual void info() const;
+
+    // convert path length [0,L] -> [0,1]
+    void Normalize();
     virtual void interpolate();
-    virtual void info();
 
 };
 

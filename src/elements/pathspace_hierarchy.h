@@ -9,31 +9,34 @@
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 namespace ob = ompl::base;
 
-struct PathNode{
-  PathNode(){
-    sv = NULL;
-  }
-  ~PathNode(){
-    delete sv;
-    for(uint k = 0; k < children.size(); k++){
-      delete children.at(k);
+class PathNode{
+  public:
+    PathNode(){
+      sv = NULL;
     }
-  }
-
-  std::vector<Config> path;
-  std::vector<ob::State*> state_path;
-
-  int level;
-  int node;
-
-  std::vector<PathNode*> children;
-  SweptVolume& GetSweptVolume(Robot *robot){
-    if(!sv){
-      sv = new SweptVolume(robot, path, 0);
+    ~PathNode(){
+      delete sv;
+      for(uint k = 0; k < children.size(); k++){
+        delete children.at(k);
+      }
     }
-    return *sv;
-  }
-  SweptVolume *sv;
+
+    std::vector<Config> path;
+    std::vector<ob::State*> state_path;
+
+    int level;
+    int id;
+
+    std::vector<PathNode*> children;
+    SweptVolume& GetSweptVolume(Robot *robot){
+      if(!sv){
+        sv = new SweptVolume(robot, path, 0);
+      }
+      return *sv;
+    }
+    SweptVolume *sv;
+
+  private:
 };
 
 
@@ -48,7 +51,7 @@ class PathspaceHierarchy{
   public:
     PathspaceHierarchy();
 
-    void CreateHierarchyFromPlannerData( ob::PlannerData& pd, const ob::OptimizationObjective& obj);
+    //void CreateHierarchyFromPlannerData( ob::PlannerData& pd, const ob::OptimizationObjective& obj);
 
     uint NumberLevels();
     uint NumberNodesOnLevel(uint level);

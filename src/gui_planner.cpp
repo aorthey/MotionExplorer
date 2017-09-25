@@ -9,7 +9,6 @@ PlannerBackend::PlannerBackend(RobotWorld *world) :
 void PlannerBackend::AddPlannerInput(PlannerInput& _in){
   planner = new HierarchicalMotionPlanner(world, _in);
   in = _in;
-  //planner->solve();
 }
 
 void PlannerBackend::Start(){
@@ -58,22 +57,7 @@ void PlannerBackend::RenderWorld(){
 }
 void PlannerBackend::RenderScreen(){
   BaseT::RenderScreen();
-
-  //std::string line;
-  //line = "Hierarchy    :\n";
-  //uint cur_level = planner->GetSelectedLevel();
-  //uint cur_node = planner->GetSelectedNode();
-  //uint Nlevels = planner->GetNumberOfLevels();
-  //uint Nnodes = planner->GetNumberNodesOnSelectedLevel();
-  //line+=(" ["+std::to_string(cur_level)+"/"+std::to_string(Nlevels)+"]");
-  //line+=(" ["+std::to_string(cur_node)+"/"+std::to_string(Nnodes)+"]");
-  //  uint NumberNodesOnLevel(uint level);
-
-  //DrawText(line_x_pos,line_y_offset,line);
-  //line_y_offset += line_y_offset_stepsize;
-
   planner->DrawGL(line_x_pos, line_y_offset);
-
 }
 bool PlannerBackend::OnIdle(){
   return BaseT::OnIdle();

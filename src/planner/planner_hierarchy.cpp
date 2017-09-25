@@ -53,7 +53,6 @@ HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, Planner
   }
   uint ridx = idxs.at(0);
   Robot *r0 = world->robots[ridx];
-  //viewTree.PushLevel(1, r0);
 
   //remove all nested robots except the original one
   for(uint k = 0; k < idxs.size()-1; k++){
@@ -120,19 +119,15 @@ bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
   }else if(level==1){
     std::cout << "adding paths" << std::endl;
     std::vector<int> nodes;
-    nodes.push_back(node->node);
-    //for(uint k = 0; k < output.paths.size(); k++){
-    //  hierarchy.AddPath( output.paths.at(k), nodes );
-    //}
-    std::vector<Config> keyframes = output.GetKeyframes();
+    nodes.push_back(node->id);
 
-    hierarchy.AddPath( keyframes, nodes );
+    for(uint k = 0; k < output.paths.size(); k++){
+      hierarchy.AddPath( output.paths.at(k), nodes );
+    }
   }
   hierarchy.Print();
 
   return true;
-  //}
-
 }
 
 
@@ -213,7 +208,8 @@ void HierarchicalMotionPlanner::Print(){
 }
 //folder-like operations on hierarchical path space
 void HierarchicalMotionPlanner::ExpandPath(){
-  int Nmax=hierarchy.NumberLevels();
+  //int Nmax=hierarchy.NumberLevels();
+  int Nmax=3;
   if(current_level<Nmax-1){
     //current_level_node
     if(solve(current_path)){

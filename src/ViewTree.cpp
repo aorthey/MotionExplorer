@@ -20,7 +20,19 @@ void ViewTree::UpdateSelectionPath( std::vector<int> path ){
   if(path.size() == selected_path.size()){
     selected_path = path;
   }else{
-    std::cout << "Updating selection with invalid path" << std::endl;
+    std::cout << "[ViewTree.h] Updating selection with invalid path" << std::endl;
+    std::cout << "input path: " << std::endl;
+    for(uint k = 0; k < path.size(); k++){
+      std::cout << "  node " << path.at(k) << std::endl;
+    }
+    std::cout << "levels: " << std::endl;
+    for(uint k = 0; k < level_nodes.size(); k++){
+      std::cout << "  level " << k << " nodes " << level_nodes.at(k) << std::endl;
+    }
+    std::cout << "old selected path:" << std::endl;
+    for(uint k = 0; k < selected_path.size(); k++){
+      std::cout << "  node " << selected_path.at(k) << std::endl;
+    }
     exit(1);
   }
 }

@@ -59,7 +59,7 @@ uint PathspaceHierarchy::AddLevel( uint ridx, Config &qi, Config &qg ){
     level_number_nodes.push_back(1);
     root = new PathNode();
     root->level = 0;
-    root->node = 0;
+    root->id = 0;
     root->path.clear();
     root->path.push_back(qi);
     root->path.push_back(qg);
@@ -98,7 +98,7 @@ void PathspaceHierarchy::CollapsePath( std::vector<int> nodes ){
 void PathspaceHierarchy::AddPath( std::vector<Config> &path_ ){
   PathNode* newpath = new PathNode();
   newpath->level = 1;
-  newpath->node = root->children.size();
+  newpath->id = root->children.size();
   newpath->path = path_;
   root->children.push_back(newpath); 
   level_number_nodes.at(newpath->level)++;
@@ -110,19 +110,10 @@ void PathspaceHierarchy::AddPath( std::vector<Config> &path_, std::vector<int> n
   
   PathNode *newpath = new PathNode();
   newpath->level = current->level+1;
-  newpath->node = current->children.size();
+  newpath->id = current->children.size();
   newpath->path = path_;
 
   current->children.push_back(newpath);
   level_number_nodes.at(newpath->level)++;
 }
 
-void PathspaceHierarchy::CreateHierarchyFromPlannerData( ob::PlannerData& pd, const ob::OptimizationObjective& obj){
-  si = pd.getSpaceInformation();
-  OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(pd,obj);
-  std::vector< std::vector< Config >> onetopic_paths = onetopic_pathspace.GetConfigPaths();
-
-  for(uint i = 0; i < onetopic_paths.size(); i++){
-    AddPath( onetopic_paths.at(i) );
-  }
-}

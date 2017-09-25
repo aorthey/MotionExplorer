@@ -89,7 +89,7 @@ void PathPiecewiseLinearEuclidean::interpolate(){
   }
 }
   
-void PathPiecewiseLinearEuclidean::info(){
+void PathPiecewiseLinearEuclidean::info() const{
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "Path Length   : " << length << std::endl;
   std::cout << "Path Keyframes: " << Nkeyframes << std::endl;
@@ -110,25 +110,6 @@ PathPiecewiseLinearEuclidean* PathPiecewiseLinearEuclidean::from_keyframes(const
   return path;
 }
 
-//PathPiecewiseLinearEuclidean PathPiecewiseLinearEuclidean::from_keyframes(const std::vector<Config> &keyframes){
-//  PathPiecewiseLinearEuclidean path = PathPiecewiseLinearEuclidean();
-//  path.keyframes=keyframes;
-//  path.Ndim = keyframes.at(0).size();
-//  path.Nkeyframes = keyframes.size();
-//  path.interpolate();
-//  return path;
-//}
-//PathPiecewiseLinearEuclidean PathPiecewiseLinearEuclidean::from_keyframes(const std::vector<Vector3> &keyframes){
-//  PathPiecewiseLinearEuclidean path = PathPiecewiseLinearEuclidean();
-//  for(uint i = 0; i < keyframes.size(); i++){
-//    Config q;q.resize(3);q(0)=keyframes.at(i)[0];q(1)=keyframes.at(i)[1];q(2)=keyframes.at(i)[2];
-//    path.keyframes.push_back(q);
-//  }
-//  path.Ndim = 3;
-//  path.Nkeyframes = keyframes.size();
-//  path.interpolate();
-//  return path;
-//}
 PathPiecewiseLinearEuclidean* PathPiecewiseLinearEuclidean::from_keyframes(const std::vector<Vector3> &keyframes){
   PathPiecewiseLinearEuclidean* path = new PathPiecewiseLinearEuclidean();
   for(uint i = 0; i < keyframes.size(); i++){
