@@ -46,18 +46,12 @@ class LinearSegmentValidityChecker : public ob::StateValidityChecker
       ob::State *s1 = cspace->ConfigToOMPLStatePtr(q1);
       ob::State *s2 = cspace->ConfigToOMPLStatePtr(q2);
 
-      //for(uint k = 0; k < 3; k++){
-      //  std::cout << s1->as<ob::RealVectorStateSpace::StateType>()->values[k]<< " <-> " << q1[k] << std::endl;
-      //  std::cout << s2->as<ob::RealVectorStateSpace::StateType>()->values[k]<< " <-> " << q2[k] << std::endl;
-      //}
-
-
       bool isfeasible = si_path->checkMotion(s1,s2);
-      //ob::ScopedState<> ss1 = cspace->ConfigToOMPLState(q1);
+      ob::ScopedState<> ss1 = cspace->ConfigToOMPLState(q1);
       //ob::ScopedState<> ss2 = cspace->ConfigToOMPLState(q2);
-      //std::cout << std::string(80, '-') << std::endl;
-      //std::cout << ss1 << std::endl;
-      //std::cout << q1 << std::endl;
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << ss1 << std::endl;
+      std::cout << q1 << std::endl;
       //std::cout << "s1 is " << (si_path->isValid(s1)?"valid":"not valid") << std::endl;
       //std::cout << ss2 << std::endl;
       //std::cout << q2 << std::endl;

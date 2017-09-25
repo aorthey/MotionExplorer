@@ -947,6 +947,9 @@ Config GeometricCSpaceOMPLPathConstraintRollInvariance::OMPLStateToConfig(const 
   const ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
   const ob::SO2StateSpace::StateType *qomplSO2SpaceA = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
   const ob::SO2StateSpace::StateType *qomplSO2SpaceB = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(2);
+
+  std::cout << qomplRnSpace->values[0] << std::endl;
+
   t = qomplRnSpace->values[0];
   double q1 = qomplSO2SpaceA->value;
   double q2 = qomplSO2SpaceB->value;
@@ -974,22 +977,27 @@ ob::State* GeometricCSpaceOMPLPathConstraintRollInvariance::ConfigToOMPLStatePtr
   return this->ConfigToOMPLState(q).get();
 }
 ob::ScopedState<> GeometricCSpaceOMPLPathConstraintRollInvariance::ConfigToOMPLState(const Config &q){
+  //for(uint i = 0; i < 3; i++){
+  //  qompl->as<ob::RealVectorStateSpace::StateType>()->values[i] = q(i);
+  //}
 
   ob::ScopedState<> qompl(space);
-  ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+  //ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
   ob::SO2StateSpace::StateType *qomplSO2SpaceA = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
   ob::SO2StateSpace::StateType *qomplSO2SpaceB = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(2);
 
-  double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
+  //double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
   //double* qomplSa = static_cast<ob::SO2StateSpace::StateType*>(qomplSO2SpaceA)->value;
   //double* qomplSb = static_cast<ob::SO2StateSpace::StateType*>(qomplSO2SpaceB)->value;
   //qomplSa[0] = q[3];
   //qomplSb[0] = q[4];
   static_cast<ob::SO2StateSpace::StateType*>(qomplSO2SpaceA)->value = q[3];
   static_cast<ob::SO2StateSpace::StateType*>(qomplSO2SpaceB)->value = q[4];
+
   Config qc;qc.resize(3);qc.setZero();
   qc(0)=q(0); qc(1)=q(1); qc(2)=q(2);
 
-  qomplRn[0] = path_constraint->PosFromConfig(qc);
+  //qomplRn[0] = path_constraint->PosFromConfig(qc);
+  qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0)->values[0] = path_constraint->PosFromConfig(qc);
   return qompl;
 }

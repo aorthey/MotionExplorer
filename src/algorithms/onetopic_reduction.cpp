@@ -193,6 +193,7 @@ void OnetopicPathSpaceModifier::ComputeShortestPathsLemon(ob::PlannerData& pd_in
   typedef boost::graph_traits < PlannerDataGraph >::adjacency_iterator adjacency_iterator;
   
 
+  PathVisibilityChecker path_checker(si, cspace);
   for(uint i = 0; i < Vidx.size(); i++){
    
     double lk = distance_shortest_path.at(i);
@@ -219,7 +220,6 @@ void OnetopicPathSpaceModifier::ComputeShortestPathsLemon(ob::PlannerData& pd_in
           const std::vector<Vertex> pcur_idxs = V_shortest_path.at(v_current);
           const std::vector<Vertex> pneighbor_idxs = V_shortest_path.at(v_neighbor);
 
-          PathVisibilityChecker path_checker(si, cspace);
           neighborIsBetter = path_checker.isVisible(pd_in, pcur_idxs, pneighbor_idxs);
 
           if(neighborIsBetter) break; //don't check the other neighbors, we found at least one
