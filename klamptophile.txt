@@ -760,12 +760,6 @@ maybe keybindings and oncommand in GUI. everything else is ideally done
 automatically.
 [ ] have <gui></gui> environment to set variables
 
-[ ] how to compute all shortest paths? What if there is a sphere in the
-environment, would we classify into up/down paths? Like going over sphere/ under
-sphere?
-What if there are two exactly similar shortest path around a sphere. I.e. there
-are >TWO< unique shortest paths (in the same homotopy class)
-
 [x] test RRT for visibility check between two paths
 [x] test on 6 environments: 
   [x] sphere
@@ -779,11 +773,14 @@ are >TWO< unique shortest paths (in the same homotopy class)
 [x] interpolate path
 [x] extend ompl to plan with an input path constraint (sublevel planning)
 [x] visualize tree with this velocity window thing
-[ ] sometimes two nearby paths are not reduced, investigate that (update
-definition of equivalence first)
-[ ] make onetopic modifier general applicable to any config/space
+[x] make onetopic modifier general applicable to any config/space
 
+[ ] sometimes two nearby paths are not reduced, investigate that (update definition of equivalence first)
+[ ] more sophisticated graph visualization; using viewpoint to get fixed 3d position
+[ ] incorporate sufficient conditions, visualize that nodes are feasible, use
+some interpolation to get shortest path in pocket
 
-[ ] pd_in does not match the same pd
+[ ] more challenging environments
+   [ ] forest with steep ruggy terrain
 
 

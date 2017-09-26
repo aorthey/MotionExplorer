@@ -56,10 +56,77 @@ void PlannerBackend::RenderWorld(){
   //const SweptVolume& sv = planner->GetSelectedPathSweptVolume();
   //GLDraw::drawGLPathKeyframes(sv.GetRobot(), sv.GetKeyframeIndices(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColorMilestones());
 
+    //Camera::Viewport viewport;
+      //Camera::CameraController_Orbit camera;
+
+  //experiments on drawing 3d structures on fixed screen position
+  double scale = viewport.scale;
+  double w = viewport.w;
+  double h = viewport.h;
+  double x = viewport.x;
+  double y = viewport.y;
+  double n = viewport.n;
+  double f = viewport.f;
+  Vector3 campos = viewport.position();
+  Vector3 camdir;
+  viewport.getViewVector(camdir);
+  //camdir = camdir / camdir.norm();
+
+  Vector3 xdir;
+  xdir.set(viewport.xDir());
+  xdir.inplaceNegative();
+  //xdir /= xdir.norm();
+  Vector3 zdir;
+  zdir.set(viewport.zDir());
+  zdir.inplaceNegative();
+  Vector3 ydir;
+  ydir.set(viewport.yDir());
+  ydir.inplaceNegative();
+  //ydir /= ydir.norm();
+
+  xdir *= scale;
+  ydir *= scale;
+  zdir *= scale;
+
+
+
+
+  //Vector3 left= campos + xdir + zdir;
+  //Vector3 right= campos - xdir + camdir;
+
+  //Vector3 up= campos - ydir + camdir;
+  //Vector3 down= campos + ydir + camdir;
+
+  Vector3 up,down,left,right,updir;
+  //viewport.getClickSource(w/4,h/4,up);
+  viewport.getClickVector(w,0,up);
+
+  std::cout << up << "<>" << campos << std::endl;
+  //up = up+updir;
+  //down = down+campos;
+  //right = right+campos;
+
+  glLineWidth(10);
+  glPointSize(20);
+  GLColor black(1,0,0);
+  black.setCurrentGL();
+  //GLDraw::drawPoint(campos + camdir);
+  GLDraw::drawPoint(campos + camdir);
+  GLDraw::drawPoint(campos + up + camdir);
+  //GLDraw::drawPoint(down);
+  //GLDraw::drawPoint(right);
+  GLDraw::drawLineSegment(up+camdir, campos+camdir);
+  //GLDraw::drawLineSegment(up, right);
+  //GLDraw::drawLineSegment(down, right);
+
 }
 void PlannerBackend::RenderScreen(){
   BaseT::RenderScreen();
   planner->DrawGL(line_x_pos, line_y_offset);
+
+
+
+
 }
 bool PlannerBackend::OnIdle(){
   return BaseT::OnIdle();

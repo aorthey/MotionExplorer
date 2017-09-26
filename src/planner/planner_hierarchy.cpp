@@ -187,23 +187,9 @@ int HierarchicalMotionPlanner::GetCurrentLevel(){
   return current_level;
 }
 
-void HierarchicalMotionPlanner::Print(){
-  hierarchy.Print();
-  std::cout << "current level " << current_level << std::endl;
-  std::cout << "viewTree level " << viewTree.GetLevel() << std::endl;
-  std::cout << "current node  " << current_level_node << std::endl;
-  std::cout << "current path: ";
-  for(uint k = 0; k < current_path.size(); k++){
-    std::cout << "->" << current_path.at(k);
-  }
-
-  std::cout << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
-}
 //folder-like operations on hierarchical path space
 void HierarchicalMotionPlanner::ExpandPath(){
-  //int Nmax=hierarchy.NumberLevels();
-  int Nmax=3;
+  int Nmax=hierarchy.NumberLevels();
   if(current_level<Nmax-1){
     //current_level_node
     if(solve(current_path)){
@@ -265,7 +251,20 @@ void HierarchicalMotionPlanner::UpdateHierarchy(){
     }
   }
   viewTree.UpdateSelectionPath( current_path );
-  //Print();
+  Print();
+}
+void HierarchicalMotionPlanner::Print(){
+  hierarchy.Print();
+  std::cout << "current level " << current_level << "/" << hierarchy.NumberLevels()-1 << std::endl;
+  std::cout << "viewTree level " << viewTree.GetLevel() << std::endl;
+  std::cout << "current node  " << current_level_node << std::endl;
+  std::cout << "current path: ";
+  for(uint k = 0; k < current_path.size(); k++){
+    std::cout << "->" << current_path.at(k);
+  }
+
+  std::cout << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
 }
 void HierarchicalMotionPlanner::DrawGL(double x_, double y_){
   viewTree.x = x_;
