@@ -213,10 +213,6 @@ void OnetopicPathSpaceModifier::ComputeShortestPathsLemon(ob::PlannerData& pd_in
           //found better neighbor
 
           //extract shortest paths and compare their visibility:
-          //Vertex v_current = i;
-          //Vertex v_neighbor = idx;
-
-          //const ob::SpaceInformationPtr si = pd_in.getSpaceInformation();
           const std::vector<Vertex> pcur_idxs = V_shortest_path.at(v_current);
           const std::vector<Vertex> pneighbor_idxs = V_shortest_path.at(v_neighbor);
 

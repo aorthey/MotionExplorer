@@ -15,7 +15,6 @@ class CSpaceOMPLDecorator: public CSpaceOMPL
     virtual void print();
 
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
-    virtual ob::State* ConfigToOMPLStatePtr(const Config &q);
 
     virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
     virtual Config OMPLStateToConfig(const ob::State *qompl);

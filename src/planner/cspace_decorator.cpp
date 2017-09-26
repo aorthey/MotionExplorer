@@ -19,9 +19,6 @@ const ob::StateValidityCheckerPtr CSpaceOMPLDecorator::StateValidityCheckerPtr(o
 ob::ScopedState<> CSpaceOMPLDecorator::ConfigToOMPLState(const Config &q){
   return cspace_ompl->ConfigToOMPLState(q);
 }
-ob::State* CSpaceOMPLDecorator::ConfigToOMPLStatePtr(const Config &q){
-  return cspace_ompl->ConfigToOMPLStatePtr(q);
-}
 Config CSpaceOMPLDecorator::OMPLStateToConfig(const ob::ScopedState<> &qompl){
   return cspace_ompl->OMPLStateToConfig(qompl);
 }

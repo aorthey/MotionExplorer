@@ -235,9 +235,6 @@ void GeometricCSpaceOMPL::print()
   std::cout << std::string(80, '-') << std::endl;
 }
 
-ob::State* GeometricCSpaceOMPL::ConfigToOMPLStatePtr(const Config &q){
-  return this->ConfigToOMPLState(q).get();
-}
 ob::ScopedState<> GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q){
   ob::ScopedState<> qompl(space);
 
@@ -628,9 +625,6 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
   //}
 }
 
-ob::State* KinodynamicCSpaceOMPL::ConfigToOMPLStatePtr(const Config &q){
-  return this->ConfigToOMPLState(q).get();
-}
 ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q){
   uint N=0;
   if(!(q.size() == int(space->getDimension()))){
@@ -873,9 +867,6 @@ void GeometricCSpaceOMPLRotationalInvariance::print()
   std::cout << std::string(80, '-') << std::endl;
 }
 
-ob::State* GeometricCSpaceOMPLRotationalInvariance::ConfigToOMPLStatePtr(const Config &q){
-  return this->ConfigToOMPLState(q).get();
-}
 ob::ScopedState<> GeometricCSpaceOMPLRotationalInvariance::ConfigToOMPLState(const Config &q){
   ob::ScopedState<> qompl(space);
 
@@ -948,8 +939,6 @@ Config GeometricCSpaceOMPLPathConstraintRollInvariance::OMPLStateToConfig(const 
   const ob::SO2StateSpace::StateType *qomplSO2SpaceA = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
   const ob::SO2StateSpace::StateType *qomplSO2SpaceB = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(2);
 
-  std::cout << qomplRnSpace->values[0] << std::endl;
-
   t = qomplRnSpace->values[0];
   double q1 = qomplSO2SpaceA->value;
   double q2 = qomplSO2SpaceB->value;
@@ -973,14 +962,7 @@ Config GeometricCSpaceOMPLPathConstraintRollInvariance::OMPLStateToConfig(const 
 }
 
 
-ob::State* GeometricCSpaceOMPLPathConstraintRollInvariance::ConfigToOMPLStatePtr(const Config &q){
-  return this->ConfigToOMPLState(q).get();
-}
 ob::ScopedState<> GeometricCSpaceOMPLPathConstraintRollInvariance::ConfigToOMPLState(const Config &q){
-  //for(uint i = 0; i < 3; i++){
-  //  qompl->as<ob::RealVectorStateSpace::StateType>()->values[i] = q(i);
-  //}
-
   ob::ScopedState<> qompl(space);
   //ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
   ob::SO2StateSpace::StateType *qomplSO2SpaceA = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);

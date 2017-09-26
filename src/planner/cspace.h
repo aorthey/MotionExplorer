@@ -44,7 +44,6 @@ class CSpaceOMPL
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) = 0;
 
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q) = 0;
-    virtual ob::State* ConfigToOMPLStatePtr(const Config &q) = 0;
     virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl) = 0;
     virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
 
@@ -116,7 +115,6 @@ class GeometricCSpaceOMPL: public CSpaceOMPL
     virtual void initSpace();
     virtual void initControlSpace();
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
-    virtual ob::State* ConfigToOMPLStatePtr(const Config &q);
 
     virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
     virtual Config OMPLStateToConfig(const ob::State *qompl);
@@ -146,7 +144,6 @@ class KinodynamicCSpaceOMPL: public CSpaceOMPL
     virtual void initControlSpace();
 
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
-    virtual ob::State* ConfigToOMPLStatePtr(const Config &q);
 
     virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
     virtual Config OMPLStateToConfig(const ob::State *qompl);
@@ -162,7 +159,6 @@ class GeometricCSpaceOMPLRotationalInvariance: public GeometricCSpaceOMPL
     GeometricCSpaceOMPLRotationalInvariance(Robot *robot_, CSpace *space_);
     virtual void initSpace();
     virtual void print();
-    virtual ob::State* ConfigToOMPLStatePtr(const Config &q);
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
     virtual Config OMPLStateToConfig(const ob::State *qompl);
     virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
@@ -174,7 +170,6 @@ class GeometricCSpaceOMPLPathConstraintRollInvariance: public GeometricCSpaceOMP
     GeometricCSpaceOMPLPathConstraintRollInvariance(Robot *robot_, CSpace *space_, std::vector<Config> path_);
     virtual void initSpace();
     virtual void print();
-    virtual ob::State* ConfigToOMPLStatePtr(const Config &q);
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
     virtual Config OMPLStateToConfig(const ob::State *qompl);
     virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);

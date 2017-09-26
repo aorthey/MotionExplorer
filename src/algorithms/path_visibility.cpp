@@ -43,20 +43,10 @@ class LinearSegmentValidityChecker : public ob::StateValidityChecker
       Config q1 = path1->Eval(t1);
       Config q2 = path2->Eval(t2);
 
-      ob::State *s1 = cspace->ConfigToOMPLStatePtr(q1);
-      ob::State *s2 = cspace->ConfigToOMPLStatePtr(q2);
+      ob::ScopedState<> s1 = cspace->ConfigToOMPLState(q1);
+      ob::ScopedState<> s2 = cspace->ConfigToOMPLState(q2);
 
-      bool isfeasible = si_path->checkMotion(s1,s2);
-      ob::ScopedState<> ss1 = cspace->ConfigToOMPLState(q1);
-      //ob::ScopedState<> ss2 = cspace->ConfigToOMPLState(q2);
-      std::cout << std::string(80, '-') << std::endl;
-      std::cout << ss1 << std::endl;
-      std::cout << q1 << std::endl;
-      //std::cout << "s1 is " << (si_path->isValid(s1)?"valid":"not valid") << std::endl;
-      //std::cout << ss2 << std::endl;
-      //std::cout << q2 << std::endl;
-      //std::cout << "s2 is " << (si_path->isValid(s2)?"valid":"not valid") << std::endl;
-      //std::cout << "is feasible: " << (isfeasible?"Yes":"No") << std::endl;  
+      bool isfeasible = si_path->checkMotion(s1.get(),s2.get());
 
       //cspace->SpacePtr()->freeState(s1);
       //cspace->SpacePtr()->freeState(s2);
