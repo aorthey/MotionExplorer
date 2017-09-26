@@ -884,6 +884,7 @@ bool GLUIForceFieldGUI::Initialize()
   AddToKeymap("s","toggle_simulate",true);
   AddToKeymap("p","print_config",true);
   AddToKeymap("g","draw_swept_volume");
+  AddToKeymap("m","draw_milestones");
   AddToKeymap("n","draw_shortest_path");
   AddToKeymap("t","draw_planner_tree_toggle");
   AddToKeymap("G","draw_planner_simplicial_complex");

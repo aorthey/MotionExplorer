@@ -53,6 +53,8 @@ void PlannerBackend::RenderWorld(){
 
   const SweptVolume& sv = planner->GetSelectedPathSweptVolume();
   GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
+  //const SweptVolume& sv = planner->GetSelectedPathSweptVolume();
+  //GLDraw::drawGLPathKeyframes(sv.GetRobot(), sv.GetKeyframeIndices(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColorMilestones());
 
 }
 void PlannerBackend::RenderScreen(){

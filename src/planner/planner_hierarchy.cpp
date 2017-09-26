@@ -85,7 +85,7 @@ bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
   std::cout << "Planner level " << level << std::endl;
   if(level >= Nlevel-1){
     std::cout << "reached bottom level -> nothing more to solve" << std::endl;
-    return true;
+    return false;
   }
 
   std::vector<int> idxs = input.robot_idxs;
@@ -99,10 +99,10 @@ bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
   SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,ridx,&worldsettings);
   CSpaceOMPL* cspace_i;
 
+  std::vector<Config> path_constraint = node->path;
   if(level==0){
     cspace_i = factory.MakeGeometricCSpaceRotationalInvariance(ri, cspace_klampt_i);
   }else if(level==1){
-    std::vector<Config> path_constraint = node->path;
     cspace_i = factory.MakeGeometricCSpacePathConstraintRollInvariance(ri, cspace_klampt_i, path_constraint);
   }else{
     return true;
@@ -112,20 +112,14 @@ bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
   output.robot_idx = ridx;
   strategy.plan(input, cspace_i, output);
 
-  if(level==0){
-    for(uint k = 0; k < output.paths.size(); k++){
-      hierarchy.AddPath( output.paths.at(k) );
-    }
-  }else if(level==1){
-    std::cout << "adding paths" << std::endl;
-    std::vector<int> nodes;
-    nodes.push_back(node->id);
+  if(!output.success) return false;
 
-    for(uint k = 0; k < output.paths.size(); k++){
-      hierarchy.AddPath( output.paths.at(k), nodes );
-    }
+  std::vector<int> nodes;
+  if(level>0) nodes.push_back(node->id);
+
+  for(uint k = 0; k < output.paths.size(); k++){
+    hierarchy.AddPath( output.paths.at(k), nodes );
   }
-  hierarchy.Print();
 
   return true;
 }
@@ -271,7 +265,7 @@ void HierarchicalMotionPlanner::UpdateHierarchy(){
     }
   }
   viewTree.UpdateSelectionPath( current_path );
-  Print();
+  //Print();
 }
 void HierarchicalMotionPlanner::DrawGL(double x_, double y_){
   viewTree.x = x_;

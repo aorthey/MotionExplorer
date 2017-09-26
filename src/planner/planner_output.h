@@ -36,6 +36,8 @@ class PlannerOutput{
     int drawTree;
     int drawSimplicialComplex;
 
+    bool success;
+
     SweptVolume *sv;
     SwathVolume *swv;
     SimplicialComplex cmplx;

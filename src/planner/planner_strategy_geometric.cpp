@@ -149,9 +149,6 @@ void PlannerStrategyGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspa
   //Topology::TopologicalGraph top(pd, *obj);
   //output.cmplx = top.GetSimplicialComplex();
 
-  OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(pd, *obj, cspace);
-  output.paths = onetopic_pathspace.GetConfigPaths();
-
   //SerializeTree(pd, cspace);
   //output.SetTree(_stree);
 
@@ -161,8 +158,14 @@ void PlannerStrategyGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspa
 
   solved = ss.haveSolutionPath();
   //return approximate solution
+  output.success = false;
   if (solved)
   {
+    output.success = true;
+
+    OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(pd, *obj, cspace);
+    output.paths = onetopic_pathspace.GetConfigPaths();
+
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Found solution:" << std::endl;
     std::cout << " exact solution       : " << (pdef->hasExactSolution()? "Yes":"No")<< std::endl;
