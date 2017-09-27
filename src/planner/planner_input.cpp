@@ -81,6 +81,8 @@ bool PlannerInput::load(TiXmlElement *node)
     std::cout << std::endl;
 
   }else{
+    exists = false;
+    return false;
   }
 
   exists = true;

@@ -201,12 +201,9 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       std::cout << std::string(80, '-') << std::endl;
     }
 
-    //_backend->sim.simStep = 0.001;
-    //WorldSimulation sim = _backend->sim;
     for(uint i = 0; i < _backend->sim.odesim.numRobots(); i++){
       ODERobot *simrobot = _backend->sim.odesim.robot(i);
       simrobot->EnableSelfCollisions(true);
-      //std::cout << "SelfCollisionsEnabled" << std::endl;
     }
   }
 

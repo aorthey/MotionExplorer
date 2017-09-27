@@ -33,6 +33,7 @@ class HierarchicalMotionPlanner: public MotionPlanner{
 
     const SweptVolume& GetSelectedPathSweptVolume();
     Robot* GetSelectedPathRobot();
+
     const Config GetSelectedPathInitConfig();
     const Config GetSelectedPathGoalConfig();
     const std::vector<int>& GetSelectedPathIndices();
@@ -40,11 +41,15 @@ class HierarchicalMotionPlanner: public MotionPlanner{
 
     void Print();
     void DrawGL(double x_ =0.0, double y_=0.0);
+    bool isActive();
 
     //for each level: first: number of all nodes, second: node selected on that
     //level. produces a tree of nodes with distance 1 to central path
     //const std::vector<std::pair<int,int> >& GetCaterpillarTreeIndices();
     
+    Robot* GetOriginalRobot();
+    const Config GetOriginalInitConfig();
+    const Config GetOriginalGoalConfig();
   private:
     int current_level;
     int current_level_node;
@@ -53,6 +58,8 @@ class HierarchicalMotionPlanner: public MotionPlanner{
     PathspaceHierarchy hierarchy;
 
     ViewTree viewTree;
+
+    bool active;
 
 };
 

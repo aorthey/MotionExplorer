@@ -3,18 +3,23 @@
 HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, PlannerInput& input_):
   MotionPlanner(world_, input_)
 {
+  active = true;
   current_level = 0;
   current_level_node = 0;
   std::cout << input << std::endl;
 
   if(!input.exists){
     std::cout << "No Planner Settings founds." << std::endl;
-    exit(1);
+    active = false;
+    return;
+    //exit(1);
   }
   std::string algorithm = input.name_algorithm;
   if(algorithm=="" || algorithm=="NONE"){
     std::cout << "No Planner Algorithm detected" << std::endl;
-    exit(1);
+    active = false;
+    return;
+    //exit(1);
   }
 
   std::vector<int> idxs = input.robot_idxs;
@@ -74,8 +79,22 @@ HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, Planner
   }
 }
 
+Robot* HierarchicalMotionPlanner::GetOriginalRobot(){
+  uint N = hierarchy.NumberLevels()-1;
+  uint ridx = hierarchy.GetRobotIdx(N);
+  return world->robots[ridx];
+}
+const Config HierarchicalMotionPlanner::GetOriginalInitConfig(){
+  uint N = hierarchy.NumberLevels()-1;
+  return hierarchy.GetInitConfig(N);
+}
+const Config HierarchicalMotionPlanner::GetOriginalGoalConfig(){
+  uint N = hierarchy.NumberLevels()-1;
+  return hierarchy.GetGoalConfig(N);
+}
 //################################################################################
 bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
+  if(!active) return false;
 
   uint Nlevel = hierarchy.NumberLevels();
   PathNode* node = hierarchy.GetPathNodeFromNodes( path_idxs );
@@ -189,6 +208,7 @@ int HierarchicalMotionPlanner::GetCurrentLevel(){
 
 //folder-like operations on hierarchical path space
 void HierarchicalMotionPlanner::ExpandPath(){
+  if(!active) return;
   int Nmax=hierarchy.NumberLevels();
   if(current_level<Nmax-1){
     //current_level_node
@@ -204,6 +224,7 @@ void HierarchicalMotionPlanner::ExpandPath(){
   UpdateHierarchy();
 }
 void HierarchicalMotionPlanner::CollapsePath(){
+  if(!active) return;
   if(current_level>0){
     current_path.erase(current_path.end() - 1);
     hierarchy.CollapsePath( current_path );
@@ -214,6 +235,7 @@ void HierarchicalMotionPlanner::CollapsePath(){
 }
 
 void HierarchicalMotionPlanner::NextPath(){
+  if(!active) return;
   int Nmax=hierarchy.NumberNodesOnLevel(current_level);
   if(current_level_node<Nmax-1) current_level_node++;
   else current_level_node = 0;
@@ -223,6 +245,7 @@ void HierarchicalMotionPlanner::NextPath(){
   UpdateHierarchy();
 }
 void HierarchicalMotionPlanner::PreviousPath(){
+  if(!active) return;
   int Nmax=hierarchy.NumberNodesOnLevel(current_level);
   if(current_level_node>0) current_level_node--;
   else{
@@ -254,6 +277,7 @@ void HierarchicalMotionPlanner::UpdateHierarchy(){
   Print();
 }
 void HierarchicalMotionPlanner::Print(){
+  if(!active) return;
   hierarchy.Print();
   std::cout << "current level " << current_level << "/" << hierarchy.NumberLevels()-1 << std::endl;
   std::cout << "viewTree level " << viewTree.GetLevel() << std::endl;
@@ -267,7 +291,11 @@ void HierarchicalMotionPlanner::Print(){
   std::cout << std::string(80, '-') << std::endl;
 }
 void HierarchicalMotionPlanner::DrawGL(double x_, double y_){
+  if(!active) return;
   viewTree.x = x_;
   viewTree.y = y_;
   viewTree.DrawGL();
+}
+bool HierarchicalMotionPlanner::isActive(){
+  return active;
 }

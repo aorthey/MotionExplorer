@@ -32,101 +32,103 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
 }
 
 void PlannerBackend::RenderWorld(){
+
   BaseT::RenderWorld();
 
-  Robot* robot = planner->GetSelectedPathRobot();
-  const std::vector<Config>& selected_path = planner->GetSelectedPath();
-  const Config qi = planner->GetSelectedPathInitConfig();
-  const Config qg = planner->GetSelectedPathGoalConfig();
+  DEBUG_GL_ERRORS()
 
-  GLColor magenta(0.8,0,0.8,0.5);
-  GLColor green(0.1,0.9,0.1,1);
+  if(planner->isActive()){
+    Robot* r_in = planner->GetOriginalRobot();
+    const Config qi_in = planner->GetOriginalInitConfig();
+    const Config qg_in = planner->GetOriginalGoalConfig();
 
-  GLDraw::drawGLPathStartGoal(robot, qi, qg);
+    GLColor lightGrey(0.4,0.4,0.4,0.2);
+    GLColor lightGreen(0.2,0.9,0.2,0.2);
+    GLColor lightRed(0.9,0.2,0.2,0.2);
+    drawRobotAtConfig(r_in, qi_in, lightGreen);
+    drawRobotAtConfig(r_in, qg_in, lightRed);
 
-  GLDraw::drawPath(selected_path, green, 20);
+    Robot* robot = planner->GetSelectedPathRobot();
+    const std::vector<Config>& selected_path = planner->GetSelectedPath();
+    const Config qi = planner->GetSelectedPathInitConfig();
+    const Config qg = planner->GetSelectedPathGoalConfig();
 
-  std::vector< std::vector<Config> > sibling_paths = planner->GetSiblingPaths();
-  for(uint k = 0; k < sibling_paths.size(); k++){
-    GLDraw::drawPath(sibling_paths.at(k), magenta, 10);
+    GLColor magenta(0.8,0,0.8,0.5);
+    GLColor green(0.1,0.9,0.1,1);
+
+    GLDraw::drawGLPathStartGoal(robot, qi, qg);
+
+    GLDraw::drawPath(selected_path, green, 20);
+
+    std::vector< std::vector<Config> > sibling_paths = planner->GetSiblingPaths();
+    for(uint k = 0; k < sibling_paths.size(); k++){
+      GLDraw::drawPath(sibling_paths.at(k), magenta, 10);
+    }
+
+    const SweptVolume& sv = planner->GetSelectedPathSweptVolume();
+    GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
   }
-
-  const SweptVolume& sv = planner->GetSelectedPathSweptVolume();
-  GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
-  //const SweptVolume& sv = planner->GetSelectedPathSweptVolume();
-  //GLDraw::drawGLPathKeyframes(sv.GetRobot(), sv.GetKeyframeIndices(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColorMilestones());
-
-    //Camera::Viewport viewport;
-      //Camera::CameraController_Orbit camera;
+  glDisable(GL_LIGHTING);
 
   //experiments on drawing 3d structures on fixed screen position
-  double scale = viewport.scale;
   double w = viewport.w;
   double h = viewport.h;
-  double x = viewport.x;
-  double y = viewport.y;
-  double n = viewport.n;
-  double f = viewport.f;
+
   Vector3 campos = viewport.position();
   Vector3 camdir;
   viewport.getViewVector(camdir);
-  //camdir = camdir / camdir.norm();
 
-  Vector3 xdir;
-  xdir.set(viewport.xDir());
-  xdir.inplaceNegative();
-  //xdir /= xdir.norm();
-  Vector3 zdir;
-  zdir.set(viewport.zDir());
-  zdir.inplaceNegative();
-  Vector3 ydir;
-  ydir.set(viewport.yDir());
-  ydir.inplaceNegative();
-  //ydir /= ydir.norm();
+  Vector3 up,down,left,right;
 
-  xdir *= scale;
-  ydir *= scale;
-  zdir *= scale;
+  viewport.getClickVector(0,h/2,left);
+  viewport.getClickVector(w,h/2,right);
+  viewport.getClickVector(w/2,0,down);
+  viewport.getClickVector(w/2,h,up);
 
-
-
-
-  //Vector3 left= campos + xdir + zdir;
-  //Vector3 right= campos - xdir + camdir;
-
-  //Vector3 up= campos - ydir + camdir;
-  //Vector3 down= campos + ydir + camdir;
-
-  Vector3 up,down,left,right,updir;
-  //viewport.getClickSource(w/4,h/4,up);
-  viewport.getClickVector(w,0,up);
-
-  std::cout << up << "<>" << campos << std::endl;
-  //up = up+updir;
-  //down = down+campos;
-  //right = right+campos;
+  up = up+campos;
+  down = down+campos;
+  left = left+campos;
+  right = right+campos;
 
   glLineWidth(10);
   glPointSize(20);
   GLColor black(1,0,0);
   black.setCurrentGL();
-  //GLDraw::drawPoint(campos + camdir);
-  GLDraw::drawPoint(campos + camdir);
-  GLDraw::drawPoint(campos + up + camdir);
-  //GLDraw::drawPoint(down);
-  //GLDraw::drawPoint(right);
-  GLDraw::drawLineSegment(up+camdir, campos+camdir);
-  //GLDraw::drawLineSegment(up, right);
-  //GLDraw::drawLineSegment(down, right);
+  GLDraw::drawPoint(campos);
+  GLDraw::drawPoint(up );
+  GLDraw::drawPoint(down);
+  GLDraw::drawPoint(right);
+  GLDraw::drawPoint(left);
+
+  GLDraw::drawLineSegment(up, left);
+  GLDraw::drawLineSegment(up, right);
+  GLDraw::drawLineSegment(down, right);
+  GLDraw::drawLineSegment(down, left);
+
+
+  GLColor grey(0.6,0.6,0.6);
+  grey.setCurrentGL();
+  glTranslate(left+0.5*(up-left));
+  GLDraw::drawSphere(0.05,16,16);
+
+  Vector3 tt;
+  viewport.getClickVector(w/8,h/2,tt);
+
+  glTranslate(tt + 0.1*camdir);
+  GLDraw::drawSphere(0.05,16,16);
+  glTranslate(tt + 0.3*camdir);
+  GLDraw::drawSphere(0.05,16,16);
+  glTranslate(tt + 0.4*camdir);
+  GLDraw::drawSphere(0.05,16,16);
+
+  glEnable(GL_LIGHTING);
+  DEBUG_GL_ERRORS()
+
 
 }
 void PlannerBackend::RenderScreen(){
   BaseT::RenderScreen();
   planner->DrawGL(line_x_pos, line_y_offset);
-
-
-
-
 }
 bool PlannerBackend::OnIdle(){
   return BaseT::OnIdle();

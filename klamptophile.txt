@@ -704,29 +704,13 @@ least one reachable set has to be in contact.
 
 We might lose orientation connectivity because a passage is too curved.
 
-
-[ ] !! FIX LEVEL0: spheres are too near which cost too much computation. Also spheres
-are still computed kinodynamically. this is the foundation, there cannot be any
-overload crap. Don't sacrifice completeness, however.
-  [x] make computation geometric
-  [ ] enforce space constraint
-  [ ] compute principal LEVEL0 path 
-    [x] fix one graph representation (e.g. boostgraph) which has lots of
-algorithms associated (at least dykstra)
-
 [x] install SBL lib
 [x] compute homology groups (HG) of SC
 [x] make bottle planning possible
 [x] visualize internal holes
 [x] changing between visuals changes colors/linewidth of other visuals, but shouldn't.
 
-[ ] take simplicial complex (SC), compute retraction.
-[ ] visualize different retraction levels of SC
-[ ] compute representative paths of some cycles
-
 [x] ompl cannot deal with zero dimensions
-[ ] compute shortest paths in each homotopy class
-[ ] tab through all layers of a simplicial complex with [tab] or other key
 [ ] compute retraction (GUDHI or CGAL)
 [ ] orientation limits are not respected OMPL
 
@@ -775,12 +759,18 @@ automatically.
 [x] visualize tree with this velocity window thing
 [x] make onetopic modifier general applicable to any config/space
 
-[ ] sometimes two nearby paths are not reduced, investigate that (update definition of equivalence first)
-[ ] more sophisticated graph visualization; using viewpoint to get fixed 3d position
-[ ] incorporate sufficient conditions, visualize that nodes are feasible, use
+[ ] more sophisticated [graph visualization]; using viewpoint to get fixed 3d position
+[ ] sometimes [two nearby paths are not reduced], investigate that (update definition of equivalence first)
+[ ] incorporate [sufficient conditions], visualize that nodes are feasible, use
 some interpolation to get shortest path in pocket
+[ ] create [L-shape] in elongated environment to show failure case of Zhang approach
+
+
+[ ] plan for multi-dof chains -> find good examples and good environments
+
+find path -> increase clearance until sufficient condition
+  -> if sufficient condition clerance hit -> done. return path by interpolation. 
+  -> else  -> go down one level, find path
 
 [ ] more challenging environments
-   [ ] forest with steep ruggy terrain
-
-
+  [ ] forest with steep ruggy terrain
