@@ -13,31 +13,32 @@ class HierarchicalMotionPlanner: public MotionPlanner{
   public:
     HierarchicalMotionPlanner(RobotWorld *world_, PlannerInput& input_);
 
-    bool solve(std::vector<int> path_idxs);
-
     //folder-like operations on hierarchical path space
-    void ExpandPath();
-    void CollapsePath();
-    void NextPath();
-    void PreviousPath();
+    virtual void ExpandPath();
+    virtual void CollapsePath();
+    virtual void NextPath();
+    virtual void PreviousPath();
+
     void UpdateHierarchy();
 
-    int GetNumberNodesOnSelectedLevel();
-    int GetNumberOfLevels();
-    int GetSelectedLevel();
-    int GetSelectedNode();
+    virtual int GetNumberNodesOnSelectedLevel();
+    virtual int GetNumberOfLevels();
+    virtual int GetSelectedLevel();
+    virtual int GetSelectedNode();
+    
+    virtual Robot* GetOriginalRobot();
+    virtual const Config GetOriginalInitConfig();
+    virtual const Config GetOriginalGoalConfig();
 
-    const std::vector<Config>& GetSelectedPath();
+    virtual const std::vector<Config>& GetSelectedPath();
+    virtual std::vector< std::vector<Config> > GetSiblingPaths();
+    virtual const SweptVolume& GetSelectedPathSweptVolume();
+    virtual Robot* GetSelectedPathRobot();
 
-    std::vector< std::vector<Config> > GetSiblingPaths();
-
-    const SweptVolume& GetSelectedPathSweptVolume();
-    Robot* GetSelectedPathRobot();
-
-    const Config GetSelectedPathInitConfig();
-    const Config GetSelectedPathGoalConfig();
-    const std::vector<int>& GetSelectedPathIndices();
-    int GetCurrentLevel();
+    virtual const Config GetSelectedPathInitConfig();
+    virtual const Config GetSelectedPathGoalConfig();
+    virtual const std::vector<int>& GetSelectedPathIndices();
+    virtual int GetCurrentLevel();
 
     void Print();
     void DrawGL(double x_ =0.0, double y_=0.0);
@@ -46,11 +47,10 @@ class HierarchicalMotionPlanner: public MotionPlanner{
     //for each level: first: number of all nodes, second: node selected on that
     //level. produces a tree of nodes with distance 1 to central path
     //const std::vector<std::pair<int,int> >& GetCaterpillarTreeIndices();
-    
-    Robot* GetOriginalRobot();
-    const Config GetOriginalInitConfig();
-    const Config GetOriginalGoalConfig();
-  private:
+
+  protected:
+    bool solve(std::vector<int> path_idxs);
+
     int current_level;
     int current_level_node;
     std::vector<int> current_path;

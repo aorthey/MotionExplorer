@@ -22,8 +22,8 @@ class MotionPlanner{
 
     virtual bool solve();
 
-    PlannerInput GetInput();
-    PlannerOutput GetOutput();
+    const PlannerInput& GetInput();
+    const PlannerOutput& GetOutput();
 
     bool IsFeasible(Robot *robot, SingleRobotCSpace &cspace, Config &q);
 

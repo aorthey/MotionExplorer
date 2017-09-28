@@ -17,7 +17,6 @@ bool PlannerInput::load(TiXmlElement *node)
   TiXmlElement* node_qgoal = FindSubNode(plannersettings, "qgoal");
   TiXmlElement* node_se3min = FindSubNode(plannersettings, "se3min");
   TiXmlElement* node_se3max = FindSubNode(plannersettings, "se3max");
-  TiXmlElement* node_algorithm = FindSubNode(plannersettings, "algorithm");
 
   TiXmlElement* node_dqinit = FindSubNode(plannersettings, "dqinit");
   TiXmlElement* node_dqgoal = FindSubNode(plannersettings, "dqgoal");
@@ -59,20 +58,42 @@ bool PlannerInput::load(TiXmlElement *node)
 
   GetStreamAttribute(node_se3min,"config")  >> se3min;
   GetStreamAttribute(node_se3max,"config")  >> se3max;
-  GetStreamText(node_algorithm) >> name_algorithm;
+
+  TiXmlElement* node_algorithm = FindFirstSubNode(plannersettings, "algorithm");
+
+  while(node_algorithm!=NULL){
+    GetStreamText(node_algorithm) >> name_algorithm;
+    algorithms.push_back(name_algorithm);
+    node_algorithm = FindNextSiblingNode(node_algorithm, "algorithm");
+  }
 
   TiXmlElement* node_robot = FindSubNode(plannersettings, "robot");
   if(node_robot){
-    TiXmlElement* rindex = FindFirstSubNode(node_robot, "index");
-    while(rindex!=NULL){
-      int tmp;
-      GetStreamText(rindex) >> tmp;
-      if(tmp<0){
-        std::cout << "Robot Index " << tmp << " is negative. Not valid." << std::endl;
-        exit(0);
+    GetStreamText(node_robot) >> robot_idx;
+  }else{
+    robot_idx = 0;
+  }
+
+  TiXmlElement* node_hierarchy = FindSubNode(plannersettings, "hierarchy");
+  uint level = 0;
+  if(node_hierarchy){
+    TiXmlElement* lindex = FindFirstSubNode(node_hierarchy, "level");
+    while(lindex!=NULL){
+
+      Layer layer;
+      layer.level = level++;
+      GetStreamAttribute(lindex, "inner_index") >> layer.inner_index;
+      if(ExistStreamAttribute(lindex, "outer_index")){
+        GetStreamAttribute(lindex, "outer_index") >> layer.outer_index;
+        layer.isInnerOuter =true;
+      }else{
+        layer.outer_index = -1;
+        layer.isInnerOuter =false;
       }
-      robot_idxs.push_back(tmp);
-      rindex = FindNextSiblingNode(rindex, "index");
+      robot_idxs.push_back(layer.inner_index);
+      layers.push_back(layer);
+
+      lindex = FindNextSiblingNode(lindex, "level");
     }
     std::cout << "Loading Robots: ";
     for(uint k = 0; k < robot_idxs.size(); k++){
@@ -106,10 +127,15 @@ std::ostream& operator<< (std::ostream& out, const PlannerInput& pin)
   out << "  dq_goal          : " << pin.dq_goal << std::endl;
   out << "SE3_min            : " << pin.se3min << std::endl;
   out << "SE3_max            : " << pin.se3max << std::endl;
+  //out << "algorithm          : " << pin.name_algorithm << std::endl;
+  //for(uint k = 0; k < pin.algorithms.size(); k++){
+  //  out << "algorithm          : " << pin.algorithms.at(k) << std::endl;
+  //}
   out << "algorithm          : " << pin.name_algorithm << std::endl;
   out << "discr timestep     : [" << pin.timestep_min << "," << pin.timestep_max << "]" << std::endl;
   out << "max planning time  : " << pin.max_planning_time << " (seconds)" << std::endl;
-  out << "epsilon_goalregion : " << pin.epsilon_goalregion<< std::endl;
+  out << "epsilon_goalregion : " << pin.epsilon_goalregion << std::endl;
+  out << "robot              : " << pin.robot_idx << std::endl;
   out << "robot indices      : ";
   for(uint k = 0; k < pin.robot_idxs.size(); k++){
     out << " " << pin.robot_idxs.at(k);

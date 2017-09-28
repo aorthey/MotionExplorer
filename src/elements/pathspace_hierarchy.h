@@ -27,6 +27,8 @@ class PathNode{
     int level;
     int id;
 
+    bool isSufficient;
+
     std::vector<PathNode*> children;
     SweptVolume& GetSweptVolume(Robot *robot){
       if(!sv){
@@ -51,11 +53,11 @@ class PathspaceHierarchy{
   public:
     PathspaceHierarchy();
 
-    //void CreateHierarchyFromPlannerData( ob::PlannerData& pd, const ob::OptimizationObjective& obj);
-
     uint NumberLevels();
     uint NumberNodesOnLevel(uint level);
     uint GetRobotIdx( uint level );
+    uint GetInnerRobotIdx( uint level );
+    uint GetOuterRobotIdx( uint level );
     Config GetInitConfig( uint level );
     Config GetGoalConfig( uint level );
     PathNode* GetPathNodeFromNodes( std::vector<int> nodes );
@@ -63,20 +65,24 @@ class PathspaceHierarchy{
     const std::vector<Config>& GetPathFromNodes( std::vector<int> nodes );
     void CollapsePath( std::vector<int> nodes );
 
-    uint AddLevel( uint ridx, Config &qi, Config &qg );
+    void AddLevel( uint idx, Config qi, Config qg );
+    void AddLevel( uint inner_idx, uint outer_idx, Config qi, Config qg );
+
     void Print();
     void AddPath( std::vector<Config> &path_ );
     void AddPath( std::vector<Config> &path_, std::vector<int> nodes);
 
   protected:
-    ob::SpaceInformationPtr si;
-
-    std::vector<int> level_robot_idx;
-    std::vector<Config> level_q_init;
-    std::vector<Config> level_q_goal;
-
-    std::vector<int> level_number_nodes;
+    //tree root
     PathNode *root;
 
+    //meta information about tree
+    ob::SpaceInformationPtr si;
+    std::vector<int> level_robot_inner_idx;
+    std::vector<int> level_robot_outer_idx;
+    std::vector<Config> level_q_init;
+    std::vector<Config> level_q_goal;
+    std::vector<int> level_number_nodes;
+    void CheckLevel( uint level );
 };
 

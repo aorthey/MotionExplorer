@@ -30,6 +30,7 @@ HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, Planner
   this->world->InitCollisions();
 
   //################################################################################
+  std::cout << algorithm << std::endl;
   if(StartsWith(algorithm.c_str(),"hierarchical")) {
     if(algorithm.size()<14){
       std::cout << "Error Hierarchical Algorithm: \n             Usage hierarchical:<algorithm>  \n            Example: hierarchical:ompl:rrt" << std::endl;
@@ -40,24 +41,27 @@ HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, Planner
       std::cout << "Hierarchical planner works only with freefloating robots right now x__X;;" << std::endl;
       exit(1);
     }
+  }else{
+    return;
   }
 
   input.name_algorithm = algorithm.substr(13,algorithm.size()-13);
+  //################################################################################
 
-  for(uint k = 0; k < idxs.size(); k++){
-    uint ridx = idxs.at(k);
-    output.nested_idx.push_back(ridx);
-    Robot *rk = world->robots[ridx];
+  for(uint k = 0; k < input.layers.size(); k++){
+    int level = input.layers.at(k).level;
+    int ii = input.layers.at(k).inner_index;
+    int io = input.layers.at(k).outer_index;
+    Robot *ri = world->robots[ii];
+    Robot *ro = world->robots[io];
 
-    Config qi = p_init; qi.resize(rk->q.size());
-    Config qg = p_goal; qg.resize(rk->q.size());
+    Config qi = p_init; qi.resize(ri->q.size());
+    Config qg = p_goal; qg.resize(ri->q.size());
 
-    output.nested_q_init.push_back(qi);
-    output.nested_q_goal.push_back(qg);
-    hierarchy.AddLevel( ridx, qi, qg);
+    hierarchy.AddLevel( ii, io, qi, qg);
   }
-  uint ridx = idxs.at(0);
-  Robot *r0 = world->robots[ridx];
+  //uint ridx = idxs.at(0);
+  //Robot *r0 = world->robots[ridx];
 
   //remove all nested robots except the original one
   for(uint k = 0; k < idxs.size()-1; k++){
@@ -68,14 +72,18 @@ HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, Planner
   std::cout << "Hierarchical Planner: " << std::endl;
   std::cout << std::string(80, '-') << std::endl;
   std::cout << " Robots  " << std::endl;
-  for(uint k = 0; k < output.nested_idx.size(); k++){
-    uint ridx = output.nested_idx.at(k);
-    Robot *rk = world->robots[ridx];
-    std::cout << " Level" << k << "         : idx " << ridx << " name " << rk->name << std::endl;
-    Config qi = output.nested_q_init.at(k);
-    Config qg = output.nested_q_goal.at(k);
-    std::cout << "   qinit        : " << qi << std::endl;
-    std::cout << "   qgoal        : " << qi << std::endl;
+  for(uint k = 0; k < input.layers.size(); k++){
+    uint ii = hierarchy.GetInnerRobotIdx(k);
+    uint io = hierarchy.GetOuterRobotIdx(k);
+    Robot *ri = world->robots[ii];
+    Robot *ro = world->robots[io];
+    std::cout << " Level" << k << std::endl;
+    std::cout << "   Robot (inner) : idx " << ii << " name " << ri->name << std::endl;
+    std::cout << "   Robot (outer) : idx " << io << " name " << ro->name << std::endl;
+    Config qi = hierarchy.GetInitConfig(k);
+    Config qg = hierarchy.GetGoalConfig(k);
+    std::cout << "      qinit      : " << qi << std::endl;
+    std::cout << "      qgoal      : " << qg << std::endl;
   }
 }
 
@@ -107,28 +115,28 @@ bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
     return false;
   }
 
-  std::vector<int> idxs = input.robot_idxs;
-
   WorldPlannerSettings worldsettings;
   worldsettings.InitializeDefault(*world);
   CSpaceFactory factory(input);
 
-  uint ridx = idxs.at(level);
-  Robot *ri = world->robots[ridx];
-  SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,ridx,&worldsettings);
+  uint inner_index = hierarchy.GetInnerRobotIdx(level);
+  uint outer_index = hierarchy.GetOuterRobotIdx(level);
+  Robot *robot_inner = world->robots[inner_index];
+
+  SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,inner_index,&worldsettings);
   CSpaceOMPL* cspace_i;
 
   std::vector<Config> path_constraint = node->path;
   if(level==0){
-    cspace_i = factory.MakeGeometricCSpaceRotationalInvariance(ri, cspace_klampt_i);
+    cspace_i = factory.MakeGeometricCSpaceRotationalInvariance(robot_inner, cspace_klampt_i);
   }else if(level==1){
-    cspace_i = factory.MakeGeometricCSpacePathConstraintRollInvariance(ri, cspace_klampt_i, path_constraint);
+    cspace_i = factory.MakeGeometricCSpacePathConstraintRollInvariance(robot_inner, cspace_klampt_i, path_constraint);
   }else{
     return true;
   }
   cspace_i->print();
   PlannerStrategyGeometric strategy;
-  output.robot_idx = ridx;
+  output.robot_idx = inner_index;
   strategy.plan(input, cspace_i, output);
 
   if(!output.success) return false;

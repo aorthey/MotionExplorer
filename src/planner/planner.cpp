@@ -8,10 +8,10 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   world(world_), input(input_)
 {
 }
-PlannerOutput MotionPlanner::GetOutput(){
+const PlannerOutput& MotionPlanner::GetOutput(){
   return output;
 }
-PlannerInput MotionPlanner::GetInput(){
+const PlannerInput& MotionPlanner::GetInput(){
   return input;
 }
 

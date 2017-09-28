@@ -1,3 +1,4 @@
+#pragma once
 #include "cspace.h"
 #include "cspace_decorator.h"
 

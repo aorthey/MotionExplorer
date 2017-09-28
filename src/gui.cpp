@@ -480,7 +480,7 @@ void ForceFieldBackend::DrawTextVector(double xpos, double ypos, const char* pre
   DrawText(xpos, ypos,line);
 }
 
-void ForceFieldBackend::DrawText(int x,int y, std::string s)
+void ForceFieldBackend::DrawText(int x,int y, std::string s, void* font)
 {
   //GLUT_BITMAP_8_BY_13
   //GLUT_BITMAP_9_BY_15
@@ -490,7 +490,7 @@ void ForceFieldBackend::DrawText(int x,int y, std::string s)
   //GLUT_BITMAP_HELVETICA_12
   //GLUT_BITMAP_HELVETICA_18
 
-  void* font = GLUT_BITMAP_HELVETICA_18;
+  //void* font = GLUT_BITMAP_HELVETICA_18;
   glPushMatrix();
   glColor3f(0,0,0);
   //glDisable(GL_LIGHTING);
@@ -886,7 +886,7 @@ bool GLUIForceFieldGUI::Initialize()
   AddToKeymap("g","draw_swept_volume");
   AddToKeymap("m","draw_milestones");
   AddToKeymap("n","draw_shortest_path");
-  AddToKeymap("t","draw_planner_tree_toggle");
+  //AddToKeymap("t","draw_planner_tree_toggle");
   AddToKeymap("G","draw_planner_simplicial_complex");
   AddToKeymap("S","make_screenshot");
 

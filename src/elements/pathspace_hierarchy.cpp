@@ -3,23 +3,40 @@
 
 PathspaceHierarchy::PathspaceHierarchy(){root=NULL;};
 
-uint PathspaceHierarchy::NumberLevels(){
-  return level_robot_idx.size();
-}
-uint PathspaceHierarchy::NumberNodesOnLevel(uint level){
-  return level_number_nodes.at(level);
-}
-uint PathspaceHierarchy::GetRobotIdx( uint level ){
-  if(level>=level_robot_idx.size()){
+void PathspaceHierarchy::CheckLevel( uint level ){
+  if(level>=level_robot_inner_idx.size()){
     std::cout << "level " << level << " does not exists" << std::endl;
     exit(1);
   }
-  return level_robot_idx.at(level);
 }
+uint PathspaceHierarchy::NumberLevels(){
+  return level_robot_inner_idx.size();
+}
+uint PathspaceHierarchy::NumberNodesOnLevel(uint level){
+  CheckLevel(level);
+  return level_number_nodes.at(level);
+}
+
+uint PathspaceHierarchy::GetRobotIdx( uint level ){
+  CheckLevel(level);
+  return level_robot_inner_idx.at(level);
+}
+
+uint PathspaceHierarchy::GetInnerRobotIdx( uint level ){
+  CheckLevel(level);
+  return GetRobotIdx(level);
+}
+uint PathspaceHierarchy::GetOuterRobotIdx( uint level ){
+  CheckLevel(level);
+  return level_robot_outer_idx.at(level);
+}
+
 Config PathspaceHierarchy::GetInitConfig( uint level ){
+  CheckLevel(level);
   return level_q_init.at(level);
 }
 Config PathspaceHierarchy::GetGoalConfig( uint level ){
+  CheckLevel(level);
   return level_q_goal.at(level);
 }
 
@@ -50,10 +67,14 @@ const std::vector<Config>& PathspaceHierarchy::GetPathFromNodes( std::vector<int
   return node->path;
 }
 
-uint PathspaceHierarchy::AddLevel( uint ridx, Config &qi, Config &qg ){
+void PathspaceHierarchy::AddLevel( uint idx, Config qi, Config qg ){
+  AddLevel(idx, idx, qi, qg);
+}
+void PathspaceHierarchy::AddLevel( uint inner_idx, uint outer_idx, Config qi, Config qg ){
   if(!root){
     //level0
-    level_robot_idx.push_back(ridx);
+    level_robot_inner_idx.push_back(inner_idx);
+    level_robot_outer_idx.push_back(outer_idx);
     level_q_init.push_back(qi);
     level_q_goal.push_back(qg);
     level_number_nodes.push_back(1);
@@ -64,7 +85,8 @@ uint PathspaceHierarchy::AddLevel( uint ridx, Config &qi, Config &qg ){
     root->path.push_back(qi);
     root->path.push_back(qg);
   }
-  level_robot_idx.push_back(ridx);
+  level_robot_inner_idx.push_back(inner_idx);
+  level_robot_outer_idx.push_back(outer_idx);
   level_q_init.push_back(qi);
   level_q_goal.push_back(qg);
   level_number_nodes.push_back(0);
@@ -80,13 +102,11 @@ void PathspaceHierarchy::Print( ){
     std::cout << " level "<< k <<" nodes: " << NumberNodesOnLevel(k) << std::endl;
   }
   std::cout << "Robots ";
-  for(uint k = 0; k < level_robot_idx.size(); k++){
-    std::cout << level_robot_idx.at(k) << " ";
+  for(uint k = 0; k < level_robot_inner_idx.size(); k++){
+    std::cout << level_robot_inner_idx.at(k) << " ";
   }
   std::cout << std::endl;
   std::cout << std::string(80, '-') << std::endl;
-
-
 }
 
 void PathspaceHierarchy::CollapsePath( std::vector<int> nodes ){

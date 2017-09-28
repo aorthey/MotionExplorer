@@ -1,6 +1,8 @@
 #pragma once
 #include "gui.h"
+#include "planner/planner.h"
 #include "planner/planner_hierarchy.h"
+#include "planner/planner_hierarchy_shallow.h"
 
 class PlannerBackend : public ForceFieldBackend
 {
@@ -10,9 +12,11 @@ class PlannerBackend : public ForceFieldBackend
 
     typedef ForceFieldBackend BaseT; 
 
-    PlannerInput in;
-
     HierarchicalMotionPlanner *planner;
+
+    std::vector<HierarchicalMotionPlanner*> planners;
+
+    int active_planner;
 
   public:
 
@@ -31,11 +35,10 @@ class GLUIPlannerGUI: public GLUIForceFieldGUI
 {
   public:
     typedef GLUIForceFieldGUI BaseT;
-    GLUIPlannerGUI(GenericBackendBase* _backend,RobotWorld* _world, PlannerInput _in);
+    GLUIPlannerGUI(GenericBackendBase* _backend,RobotWorld* _world);
+    void AddPlannerInput(PlannerInput& _in);
     virtual bool Initialize();
 
-  private:
-    PlannerInput in;
 };
 
 

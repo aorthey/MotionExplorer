@@ -7,7 +7,9 @@ int main(int argc,const char** argv) {
   EnvironmentLoader env = EnvironmentLoader::from_args(argc, argv);
 
   PlannerInput in = env.GetPlannerInput();
-  GLUIPlannerGUI gui(env.GetBackendPtr(),env.GetWorldPtr(),in);
+
+  GLUIPlannerGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
+  gui.AddPlannerInput(in);
   gui.SetWindowTitle("HierarchicalMotionPlanner");
 
   std::cout << std::string(80, '-') << std::endl;

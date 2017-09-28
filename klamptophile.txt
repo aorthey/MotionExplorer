@@ -763,7 +763,10 @@ automatically.
 [ ] sometimes [two nearby paths are not reduced], investigate that (update definition of equivalence first)
 [ ] incorporate [sufficient conditions], visualize that nodes are feasible, use
 some interpolation to get shortest path in pocket
-[ ] create [L-shape] in elongated environment to show failure case of Zhang approach
+[x] create [L-shape] in elongated environment to show failure case of Zhang approach
+[ ] define what we mean when we apply a path constraint, and what we mean by
+sufficient condition on that path constraint
+[ ] layer 2 sometimes returns infeasible paths for capsule. 
 
 
 [ ] plan for multi-dof chains -> find good examples and good environments
