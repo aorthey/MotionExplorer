@@ -89,3 +89,6 @@ const std::vector<int>& ShallowHierarchicalMotionPlanner::GetSelectedPathIndices
   const std::vector<int> emptyset;
   return emptyset;
 }
+void ShallowHierarchicalMotionPlanner::DrawGL(double x_, double y_){
+  if(!active) return;
+}

@@ -12,7 +12,7 @@ class PlannerBackend : public ForceFieldBackend
 
     typedef ForceFieldBackend BaseT; 
 
-    HierarchicalMotionPlanner *planner;
+    //HierarchicalMotionPlanner *planner;
 
     std::vector<HierarchicalMotionPlanner*> planners;
 

@@ -17,8 +17,6 @@ void PlannerBackend::AddPlannerInput(PlannerInput& _in){
     _in.timestep_min = algorithms.at(k).timestep_min;
     _in.timestep_max = algorithms.at(k).timestep_max;
 
-    std::cout << _in << std::endl;
-
     if(StartsWith(algorithms.at(k).name.c_str(),"hierarchical")) {
       planners.push_back( new HierarchicalMotionPlanner(world, _in) );
     } else if(StartsWith(algorithms.at(k).name.c_str(),"ompl")) {
@@ -47,11 +45,13 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="next_planner"){
     if(active_planner<planners.size()-1) active_planner++;
     else active_planner = 0;
-    std::cout << "active planner: " << active_planner << std::endl;
+    //std::cout << "active planner: " << active_planner << std::endl;
+    std::cout << planners.at(active_planner)->GetInput() << std::endl;
   }else if(cmd=="previous_planner"){
     if(active_planner>0) active_planner--;
     else active_planner = planners.size()-1;
-    std::cout << "active planner: " << active_planner << std::endl;
+    //std::cout << "active planner: " << active_planner << std::endl;
+    std::cout << planners.at(active_planner)->GetInput() << std::endl;
   }else return BaseT::OnCommand(cmd,args);
 
   SendRefresh();

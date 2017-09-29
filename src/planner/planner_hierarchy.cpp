@@ -6,7 +6,7 @@ HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, Planner
   active = true;
   current_level = 0;
   current_level_node = 0;
-  std::cout << input << std::endl;
+  //std::cout << input << std::endl;
 
   if(!input.exists){
     std::cout << "No Planner Settings founds." << std::endl;

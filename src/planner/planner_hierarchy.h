@@ -41,7 +41,7 @@ class HierarchicalMotionPlanner: public MotionPlanner{
     virtual int GetCurrentLevel();
 
     void Print();
-    void DrawGL(double x_ =0.0, double y_=0.0);
+    virtual void DrawGL(double x_ =0.0, double y_=0.0);
     bool isActive();
 
     //for each level: first: number of all nodes, second: node selected on that

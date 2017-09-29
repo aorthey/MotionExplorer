@@ -13,35 +13,37 @@
 
   <plannersettings>
 
+    <!-- general settings for all algorithms (fixed) -->
     <qinit config="7  3 0 0 -2.0 0.6 0.3 0"/>
     <qgoal config="7  -3 -1 0.45 -0.8 -0.6 0 0"/>
     <se3min config="6  -4 -4 -1 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  4 4 1 3.141593 1.57 3.141593"/>
-    <timestep min="0.01" max="0.1"/>
     <robot>0</robot>
+    <freeFloating>1</freeFloating>
 
+    <!-- default settings for all algorithms (overwriteable) -->
+    <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.01</epsilongoalregion>
     <maxplanningtime>1800.0</maxplanningtime>
 
     <algorithm>ompl:pdst</algorithm>
-    <algorithm>ompl:rrt</algorithm>
+    <algorithm maxplanningtime="1.0">ompl:rrt</algorithm>
     <algorithm>ompl:rrtconnect</algorithm>
     <algorithm>ompl:prm</algorithm>
     <algorithm maxplanningtime="0.1">hierarchical:ompl:prmstar</algorithm>
-
-    <drawMilestones>0</drawMilestones>
-    <drawSweptVolume>1</drawSweptVolume>
-    <drawStartGoal>1</drawStartGoal>
-    <drawSimplicialComplex>1</drawSimplicialComplex>
-    <drawTree>0</drawTree>
-
-    <freeFloating>1</freeFloating>
 
     <hierarchy>
       <level inner_index="3" outer_index="4"/>
       <level inner_index="1" outer_index="0"/>
       <level inner_index="0"/>
     </hierarchy>
+
+    <!-- outsource to <gui></gui> -->
+    <drawMilestones>0</drawMilestones>
+    <drawSweptVolume>1</drawSweptVolume>
+    <drawStartGoal>1</drawStartGoal>
+    <drawSimplicialComplex>1</drawSimplicialComplex>
+    <drawTree>0</drawTree>
 
   </plannersettings>
 

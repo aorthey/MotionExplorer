@@ -126,7 +126,7 @@ bool PlannerInput::load(const char* file)
 std::ostream& operator<< (std::ostream& out, const PlannerInput& pin) 
 {
   out << std::string(80, '-') << std::endl;
-  out << "[PlannerInput]" << std::endl;
+  out << "[PlannerInput] " << pin.name_algorithm << std::endl;
   out << std::string(80, '-') << std::endl;
   out << "q_init             : " << pin.q_init << std::endl;
   out << "  dq_init          : " << pin.dq_init << std::endl;

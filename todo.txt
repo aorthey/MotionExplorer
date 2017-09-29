@@ -288,7 +288,6 @@ some interpolation to get shortest path in pocket
 [x] create [L-shape] in elongated environment to show failure case of Zhang approach
 [ ] define what we mean when we apply a path constraint, and what we mean by
 sufficient condition on that path constraint
-[ ] layer 2 sometimes returns infeasible paths for capsule. 
 
 [ ] plan for multi-dof chains -> find good examples and good environments
 find path -> increase clearance until sufficient condition
@@ -301,3 +300,5 @@ find path -> increase clearance until sufficient condition
 [ ] more challenging environments
   [ ] forest with steep ruggy terrain
 
+[ ] orientation of capsule definitely not correct. needs investigating.
+[ ] layer 2 sometimes returns infeasible paths for capsule. 

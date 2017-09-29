@@ -25,6 +25,7 @@ class ShallowHierarchicalMotionPlanner: public HierarchicalMotionPlanner{
     virtual const Config GetSelectedPathGoalConfig();
 
     virtual const std::vector<int>& GetSelectedPathIndices();
+    void DrawGL(double x_ =0.0, double y_=0.0);
 
   private:
     std::vector<Config> solution_path;
