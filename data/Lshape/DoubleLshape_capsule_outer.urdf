@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot name="DoubleLshape_capsule_outer">
+ <link name="body">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.8275" ixy="0" ixz="0" iyy="0.8275" iyz="0" izz="0.64"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="1.5" radius="1.6"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="1.5" radius="1.6"/>
+    </geometry>
+  </collision>
+ </link>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>
