@@ -8,16 +8,23 @@ PlannerBackend::PlannerBackend(RobotWorld *world) :
 }
 
 void PlannerBackend::AddPlannerInput(PlannerInput& _in){
-  std::vector<std::string> algorithms = _in.algorithms;
+  std::vector<PlannerInputAlgorithm> algorithms = _in.algorithms;
 
   for(uint k = 0; k < algorithms.size(); k++){
-    _in.name_algorithm = algorithms.at(k);
-    if(StartsWith(algorithms.at(k).c_str(),"hierarchical")) {
+    _in.name_algorithm = algorithms.at(k).name;
+    _in.max_planning_time = algorithms.at(k).max_planning_time;
+    _in.epsilon_goalregion = algorithms.at(k).epsilon_goalregion;
+    _in.timestep_min = algorithms.at(k).timestep_min;
+    _in.timestep_max = algorithms.at(k).timestep_max;
+
+    std::cout << _in << std::endl;
+
+    if(StartsWith(algorithms.at(k).name.c_str(),"hierarchical")) {
       planners.push_back( new HierarchicalMotionPlanner(world, _in) );
-    } else if(StartsWith(algorithms.at(k).c_str(),"ompl")) {
+    } else if(StartsWith(algorithms.at(k).name.c_str(),"ompl")) {
       planners.push_back( new ShallowHierarchicalMotionPlanner(world, _in) );
     }else{
-      std::cout << "algorithm " << algorithms.at(k) << " unknown." << std::endl;
+      std::cout << "algorithm " << algorithms.at(k).name << " unknown." << std::endl;
       exit(1);
     }
 

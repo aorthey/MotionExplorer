@@ -29,6 +29,7 @@ static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInf
 }
 PlannerStrategyGeometric::PlannerStrategyGeometric()
 {
+  onetopic = true;
 }
 void PlannerStrategyGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspace, PlannerOutput &output)
 {
@@ -163,8 +164,10 @@ void PlannerStrategyGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspa
   {
     output.success = true;
 
-    OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(pd, *obj, cspace);
-    output.paths = onetopic_pathspace.GetConfigPaths();
+    if(onetopic){
+      OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(pd, *obj, cspace);
+      output.paths = onetopic_pathspace.GetConfigPaths();
+    }
 
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Found solution:" << std::endl;
@@ -174,10 +177,12 @@ void PlannerStrategyGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspa
     double dg = pdef->getSolutionDifference();
     std::cout << " solution difference  : " << dg << std::endl;
 
-    //ss.simplifySolution();
+    ss.simplifySolution();
+
     og::PathGeometric path = ss.getSolutionPath();
-    //og::PathSimplifier shortcutter(si);
-    //shortcutter.shortcutPath(path);
+
+    og::PathSimplifier shortcutter(si);
+    shortcutter.shortcutPath(path);
 
     path.interpolate();
 

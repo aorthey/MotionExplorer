@@ -62,8 +62,15 @@ bool PlannerInput::load(TiXmlElement *node)
   TiXmlElement* node_algorithm = FindFirstSubNode(plannersettings, "algorithm");
 
   while(node_algorithm!=NULL){
-    GetStreamText(node_algorithm) >> name_algorithm;
-    algorithms.push_back(name_algorithm);
+    PlannerInputAlgorithm input_algorithm;
+    GetStreamText(node_algorithm) >> input_algorithm.name;
+
+    GetStreamAttributeDefaultDouble(node_algorithm,"maxplanningtime",max_planning_time)  >> input_algorithm.max_planning_time;
+    GetStreamAttributeDefaultDouble(node_algorithm,"epsilongoalregion",epsilon_goalregion)  >> input_algorithm.epsilon_goalregion;
+    GetStreamAttributeDefaultDouble(node_algorithm,"timestepmin",timestep_min)  >> input_algorithm.timestep_min;
+    GetStreamAttributeDefaultDouble(node_algorithm,"timestepmax",timestep_max)  >> input_algorithm.timestep_max;
+
+    algorithms.push_back(input_algorithm);
     node_algorithm = FindNextSiblingNode(node_algorithm, "algorithm");
   }
 

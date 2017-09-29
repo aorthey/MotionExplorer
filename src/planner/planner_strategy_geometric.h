@@ -18,6 +18,12 @@ class PlannerStrategyGeometric: public PlannerStrategy{
 
     PlannerStrategyGeometric();
 
+    void DisableOnetopicReduction(){
+      onetopic=false;
+    }
+  private:
+    bool onetopic;
+
 };
 
 class SE3Project0r : public ob::ProjectionEvaluator

@@ -74,6 +74,15 @@ inline stringstream GetStreamAttribute(TiXmlElement* node, const char *name){
     return stringstream ("NONE");
   }
 }
+inline stringstream GetStreamAttributeDefaultDouble(TiXmlElement *node, const char *name, double default_value){
+  if(ExistStreamAttribute(node, name)){
+    return GetStreamAttribute(node, name);
+  }
+  stringstream ss;
+  ss << default_value;
+  return ss;
+}
+
 inline stringstream GetStreamText(TiXmlElement* node){
 
   if(!node) return stringstream ("NONE");

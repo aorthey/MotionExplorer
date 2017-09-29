@@ -13,12 +13,12 @@ bool OMPLValidityChecker::isValid(const ob::State* state) const
   return isCollisionFree(csi, q);
 }
 
+//same as Singlerobotcspace but ignore other robots
 bool OMPLValidityChecker::isCollisionFree(SingleRobotCSpace *space, Config q) const{
   Robot* robot = space->GetRobot();
   robot->UpdateConfig(q);
   robot->UpdateGeometry();
 
-  //same as Singlerobotcspace but ignore other robots
   int id = space->world.RobotID(space->index);
   vector<int> idrobot(1,id);
   vector<int> idothers;

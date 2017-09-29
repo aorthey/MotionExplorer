@@ -20,14 +20,17 @@ void ShallowHierarchicalMotionPlanner::ExpandPath(){
 
     kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
 
-    if(!IsFeasible( robot, *kcspace, input.q_init)) return;
-    if(!IsFeasible( robot, *kcspace, input.q_goal)) return;
+    //if(!IsFeasible( robot, *kcspace, input.q_init)) return;
+    //if(!IsFeasible( robot, *kcspace, input.q_goal)) return;
 
     cspace = factory.MakeGeometricCSpace(robot, kcspace);
 
     cspace->print();
     PlannerStrategyGeometric strategy;
+    strategy.DisableOnetopicReduction();
     strategy.plan(input, cspace, output);
+
+    output.robot = robot;
 
     if(output.success){
       current_level++;

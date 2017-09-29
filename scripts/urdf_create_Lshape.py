@@ -4,7 +4,7 @@ from math import cos,sin,pi,atan2
 from urdf_create import *
 from urdf_create_primitives import *
 
-L1 = 1.0
+L1 = 2.0
 L2 = 1.5
 thickness1 = 0.4
 thickness2 = 0.2

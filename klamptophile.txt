@@ -768,12 +768,13 @@ some interpolation to get shortest path in pocket
 sufficient condition on that path constraint
 [ ] layer 2 sometimes returns infeasible paths for capsule. 
 
-
 [ ] plan for multi-dof chains -> find good examples and good environments
-
 find path -> increase clearance until sufficient condition
   -> if sufficient condition clerance hit -> done. return path by interpolation. 
   -> else  -> go down one level, find path
+
+[ ] XML: every algorithm should have its own time/epsilon/additional properties
+[ ] Simulator: make planner run on separate threads
 
 [ ] more challenging environments
   [ ] forest with steep ruggy terrain
