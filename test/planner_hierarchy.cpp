@@ -12,6 +12,8 @@ int main(int argc,const char** argv) {
   gui.AddPlannerInput(in);
   gui.SetWindowTitle("HierarchicalMotionPlanner");
 
+  if(!in.exists) env.GetBackendPtr()->drawRobot=1;
+
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "GUI Start" << std::endl;
   std::cout << std::string(80, '-') << std::endl;

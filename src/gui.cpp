@@ -222,6 +222,8 @@ void ForceFieldBackend::RenderWorld()
 
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND); 
+  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
   drawDesired=0;
 
   for(size_t i=0;i<world->terrains.size();i++){
@@ -237,21 +239,25 @@ void ForceFieldBackend::RenderWorld()
     terra->DrawGL();
   }
 
+  //glEnable(GL_POLYGON_STIPPLE);
   if(drawRigidObjects){
     for(size_t i=0;i<world->rigidObjects.size();i++){
       RigidObject *obj = world->rigidObjects[i];
       GLDraw::GeometryAppearance* a = obj->geometry.Appearance();
-      a->SetColor(GLColor(0.8,0.8,0.8));
+      a->SetColor(GLColor(0.6,0.6,0.6,0.2));
+      //std::cout << *a->faceColor << std::endl;
+
       a->drawFaces = false;
       a->drawEdges = false;
       a->drawVertices = false;
       if(drawRigidObjectsFaces) a->drawFaces = true;
       if(drawRigidObjectsEdges) a->drawEdges = true;
       //a->vertexSize = 10;
-      a->edgeSize = 20;
+      a->edgeSize = 10;
       obj->DrawGL();
     }
   }
+  //glDisable(GL_POLYGON_STIPPLE);
 
   if(drawRobot){
     for(size_t i=0;i<world->robots.size();i++) {
@@ -274,13 +280,13 @@ void ForceFieldBackend::RenderWorld()
       }
     }
   }
-  glEnable(GL_LIGHTING);
   glDisable(GL_BLEND); 
+  glEnable(GL_LIGHTING);
 
-  BaseT::RenderWorld();
+  //BaseT::RenderWorld();
 
-  allWidgets.Enable(&allRobotWidgets,drawPoser==1);
-  allWidgets.DrawGL(viewport);
+  //allWidgets.Enable(&allRobotWidgets,drawPoser==1);
+  //allWidgets.DrawGL(viewport);
   vector<ViewRobot> viewRobots = world->robotViews;
 
   Robot *robot = world->robots[0];
@@ -355,42 +361,6 @@ void ForceFieldBackend::RenderWorld()
   if(drawIKextras) GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);
   if(drawForceField) GLDraw::drawForceField(wrenchfield);
   if(drawWrenchField) GLDraw::drawWrenchField(wrenchfield);
-
-//  for(uint i = 0; i < plannerOutput.size(); i++){
-//
-//    Robot *robot_i = world->robots[planner_layer_robot_idx];
-//
-//    if(drawPathStartGoal.at(i)){
-//      Config qi = plannerOutput.at(i).q_init;
-//      Config qg = plannerOutput.at(i).q_goal;
-//      GLDraw::drawGLPathStartGoal(robot_i, qi, qg);
-//    }
-//
-//    SweptVolume sv = plannerOutput.at(i).GetSweptVolume(robot_i);
-//
-//    if(drawPathSweptVolume.at(i)){
-//      GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
-//    }
-//
-//    if(drawPathMilestones.at(i)){
-//      GLDraw::drawGLPathKeyframes(robot_i, sv.GetKeyframeIndices(), sv.GetMatrices(), _appearanceStack, sv.GetColorMilestones());
-//    }
-//    SimplicialComplex cmplx = plannerOutput.at(i).GetSimplicialComplex();
-//
-//    if(drawPlannerTree.at(i)){
-//      SwathVolume swv = plannerOutput.at(i).GetSwathVolume();
-//      GLDraw::drawSwathVolume(swv.GetRobot(), swv.GetMatrices(), swv.GetAppearanceStack(), swv.GetColor());
-//      GLDraw::drawPlannerTree(plannerOutput.at(i).GetTree());
-//    }
-//
-//    if(drawPlannerSimplicialComplex.at(i)){
-//      GLDraw::drawSimplicialComplex(cmplx);
-//    }
-//    if(drawPathShortestPath.at(i)){
-//      GLDraw::drawShortestPath(cmplx);
-//    }
-//  }
-
   if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
   if(drawAxesLabels) GLDraw::drawAxesLabels(viewport);
 
@@ -875,7 +845,7 @@ bool GLUIForceFieldGUI::Initialize()
   AddToKeymap("4","draw_distance_robot_terrain");
   AddToKeymap("5","draw_com_path");
 
-  AddToKeymap("l","toggle_layer");
+  //AddToKeymap("l","toggle_layer");
 
   AddToKeymap("q","draw_minimal");
   AddToKeymap("T","toggle_mode");

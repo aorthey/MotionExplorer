@@ -302,3 +302,5 @@ find path -> increase clearance until sufficient condition
 
 [ ] orientation of capsule definitely not correct. needs investigating.
 [ ] layer 2 sometimes returns infeasible paths for capsule. 
+
+[ ] make objects transparent and with chess texture

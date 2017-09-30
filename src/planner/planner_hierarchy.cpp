@@ -60,8 +60,6 @@ HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, Planner
 
     hierarchy.AddLevel( ii, io, qi, qg);
   }
-  //uint ridx = idxs.at(0);
-  //Robot *r0 = world->robots[ridx];
 
   //remove all nested robots except the original one
   for(uint k = 0; k < idxs.size()-1; k++){
@@ -72,7 +70,7 @@ HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, Planner
   std::cout << "Hierarchical Planner: " << std::endl;
   std::cout << std::string(80, '-') << std::endl;
   std::cout << " Robots  " << std::endl;
-  for(uint k = 0; k < input.layers.size(); k++){
+  for(uint k = 0; k < hierarchy.NumberLevels(); k++){
     uint ii = hierarchy.GetInnerRobotIdx(k);
     uint io = hierarchy.GetOuterRobotIdx(k);
     Robot *ri = world->robots[ii];
@@ -132,7 +130,7 @@ bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
   }else if(level==1){
     cspace_i = factory.MakeGeometricCSpacePathConstraintRollInvariance(robot_inner, cspace_klampt_i, path_constraint);
   }else{
-    return true;
+    return false;
   }
   cspace_i->print();
   PlannerStrategyGeometric strategy;

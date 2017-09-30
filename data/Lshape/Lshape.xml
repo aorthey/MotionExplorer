@@ -26,11 +26,8 @@
     <epsilongoalregion>0.01</epsilongoalregion>
     <maxplanningtime>1800.0</maxplanningtime>
 
-    <algorithm>ompl:pdst</algorithm>
     <algorithm maxplanningtime="1.0">ompl:rrt</algorithm>
-    <algorithm>ompl:rrtconnect</algorithm>
-    <algorithm>ompl:prm</algorithm>
-    <algorithm maxplanningtime="0.1">hierarchical:ompl:prmstar</algorithm>
+    <algorithm maxplanningtime="0.2">hierarchical:ompl:prmstar</algorithm>
 
     <hierarchy>
       <level inner_index="3" outer_index="4"/>

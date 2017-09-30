@@ -31,6 +31,10 @@ void PlannerBackend::AddPlannerInput(PlannerInput& _in){
 
 void PlannerBackend::Start(){
   BaseT::Start();
+  drawPoser = 0;
+  pose_objects = 0;
+
+
 }
 bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
@@ -65,7 +69,7 @@ void PlannerBackend::RenderWorld(){
 
   DEBUG_GL_ERRORS()
 
-  if(planners.at(active_planner)->isActive()){
+  if(planners.size()>0 && planners.at(active_planner)->isActive()){
     Robot* r_in = planners.at(active_planner)->GetOriginalRobot();
     const Config qi_in = planners.at(active_planner)->GetOriginalInitConfig();
     const Config qg_in = planners.at(active_planner)->GetOriginalGoalConfig();
@@ -90,7 +94,6 @@ void PlannerBackend::RenderWorld(){
     for(uint k = 0; k < sibling_paths.size(); k++){
       GLDraw::drawPath(sibling_paths.at(k), magenta, 10);
     }
-
 
     if(selected_path.size()>0){
       GLDraw::drawPath(selected_path, green, 20);
@@ -169,7 +172,9 @@ void PlannerBackend::RenderScreen(){
   DrawText(line_x_pos,line_y_offset,line);
   line_y_offset += line_y_offset_stepsize;
   ////////////////////////////////////////////////////////////
-  planners.at(active_planner)->DrawGL(line_x_pos, line_y_offset);
+  if(planners.size()>0){
+    planners.at(active_planner)->DrawGL(line_x_pos, line_y_offset);
+  }
 
 }
 bool PlannerBackend::OnIdle(){

@@ -90,11 +90,12 @@ bool PlannerInput::load(TiXmlElement *node)
       Layer layer;
       layer.level = level++;
       GetStreamAttribute(lindex, "inner_index") >> layer.inner_index;
+
       if(ExistStreamAttribute(lindex, "outer_index")){
         GetStreamAttribute(lindex, "outer_index") >> layer.outer_index;
         layer.isInnerOuter =true;
       }else{
-        layer.outer_index = -1;
+        layer.outer_index = layer.inner_index;
         layer.isInnerOuter =false;
       }
       robot_idxs.push_back(layer.inner_index);
