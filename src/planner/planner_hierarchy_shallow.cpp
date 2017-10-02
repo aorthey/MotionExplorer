@@ -65,7 +65,7 @@ const Config ShallowHierarchicalMotionPlanner::GetOriginalInitConfig(){
 const Config ShallowHierarchicalMotionPlanner::GetOriginalGoalConfig(){
   return input.q_goal;
 }
-const std::vector<Config>& ShallowHierarchicalMotionPlanner::GetSelectedPath(){
+const std::vector<Config> ShallowHierarchicalMotionPlanner::GetSelectedPath(){
   return solution_path;
 }
 std::vector< std::vector<Config> > ShallowHierarchicalMotionPlanner::GetSiblingPaths(){
@@ -85,7 +85,7 @@ const Config ShallowHierarchicalMotionPlanner::GetSelectedPathInitConfig(){
 const Config ShallowHierarchicalMotionPlanner::GetSelectedPathGoalConfig(){
   return input.q_goal;
 }
-const std::vector<int>& ShallowHierarchicalMotionPlanner::GetSelectedPathIndices(){
+const std::vector<int> ShallowHierarchicalMotionPlanner::GetSelectedPathIndices(){
   const std::vector<int> emptyset;
   return emptyset;
 }

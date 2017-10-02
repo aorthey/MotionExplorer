@@ -18,7 +18,7 @@
 
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
-#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
+//#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 
 #include <Library/KrisLibrary/math/vector.h>
 #include <Library/KrisLibrary/math3d/primitives.h>
@@ -36,14 +36,13 @@ using EIterator = Graph::EIterator;
 
 class OnetopicPathSpaceModifier{
   public:
-    explicit OnetopicPathSpaceModifier( ob::PlannerData& pd_in, const ob::OptimizationObjective& opt, CSpaceOMPL *cspace);
+    explicit OnetopicPathSpaceModifier( ob::PlannerData& pd_in, CSpaceOMPL *cspace);
 
     std::vector< std::vector< Config >> GetConfigPaths();
     std::vector< std::vector< const ob::State* >> GetOMPLStatePaths();
 
   private:
-    //bool testVisibilityRRT(const ob::PlannerData& pd, const ob::SpaceInformationPtr &si_path_space, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2);
-    void ComputeShortestPathsLemon(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt);
+    void ComputeShortestPathsLemon(ob::PlannerData& pd_in);
     void InterpolatePaths( ob::PlannerData& pd );
 
     std::vector< std::vector< Config >> config_paths;

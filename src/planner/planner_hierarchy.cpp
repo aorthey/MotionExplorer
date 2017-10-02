@@ -103,7 +103,8 @@ bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
   if(!active) return false;
 
   uint Nlevel = hierarchy.NumberLevels();
-  PathNode* node = hierarchy.GetPathNodeFromNodes( path_idxs );
+
+  Node<SinglePathNode>* node = hierarchy.GetNode( path_idxs );
 
   uint level = node->level;
 
@@ -124,7 +125,7 @@ bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
   SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,inner_index,&worldsettings);
   CSpaceOMPL* cspace_i;
 
-  std::vector<Config> path_constraint = node->path;
+  std::vector<Config> path_constraint = node->content.path;
   if(level==0){
     cspace_i = factory.MakeGeometricCSpaceRotationalInvariance(robot_inner, cspace_klampt_i);
   }else if(level==1){
@@ -139,11 +140,14 @@ bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
 
   if(!output.success) return false;
 
-  std::vector<int> nodes;
-  if(level>0) nodes.push_back(node->id);
+  std::vector<int> treepath;
+  if(level>0) treepath.push_back(node->id);
 
   for(uint k = 0; k < output.paths.size(); k++){
-    hierarchy.AddPath( output.paths.at(k), nodes );
+    //hierarchy.AddPath( output.paths.at(k), nodes );
+    SinglePathNode node;
+    node.path = output.paths.at(k);
+    hierarchy.AddNode( node, treepath );
   }
 
   return true;
@@ -163,8 +167,8 @@ int HierarchicalMotionPlanner::GetSelectedNode(){
   return current_level_node;
 }
 
-const std::vector<Config>& HierarchicalMotionPlanner::GetSelectedPath(){
-  return hierarchy.GetPathFromNodes( current_path );
+const std::vector<Config> HierarchicalMotionPlanner::GetSelectedPath(){
+  return hierarchy.GetNodeContent( current_path ).path;
 }
 std::vector< std::vector<Config> > HierarchicalMotionPlanner::GetSiblingPaths(){
 
@@ -178,7 +182,7 @@ std::vector< std::vector<Config> > HierarchicalMotionPlanner::GetSiblingPaths(){
       if(k==current_level_node) continue;
 
       path.at(path.size()-1) = k;
-      const std::vector<Config>& siblingk = hierarchy.GetPathFromNodes( path );
+      const std::vector<Config>& siblingk = hierarchy.GetNodeContent( path ).path;
       siblings.push_back(siblingk);
     }
   }
@@ -186,10 +190,10 @@ std::vector< std::vector<Config> > HierarchicalMotionPlanner::GetSiblingPaths(){
 }
 
 const SweptVolume& HierarchicalMotionPlanner::GetSelectedPathSweptVolume(){
-  PathNode* node = hierarchy.GetPathNodeFromNodes( current_path );
+  Node<SinglePathNode>* node = hierarchy.GetNode( current_path );
   uint idx = hierarchy.GetRobotIdx( node->level );
   Robot *robot = world->robots[idx];
-  return node->GetSweptVolume(robot);
+  return node->content.GetSweptVolume(robot);
 }
 
 Robot* HierarchicalMotionPlanner::GetSelectedPathRobot(){
@@ -204,7 +208,7 @@ const Config HierarchicalMotionPlanner::GetSelectedPathInitConfig(){
 const Config HierarchicalMotionPlanner::GetSelectedPathGoalConfig(){
   return hierarchy.GetGoalConfig(current_level);
 }
-const std::vector<int>& HierarchicalMotionPlanner::GetSelectedPathIndices(){
+const std::vector<int> HierarchicalMotionPlanner::GetSelectedPathIndices(){
   return current_path;
 }
 
@@ -233,7 +237,7 @@ void HierarchicalMotionPlanner::CollapsePath(){
   if(!active) return;
   if(current_level>0){
     current_path.erase(current_path.end() - 1);
-    hierarchy.CollapsePath( current_path );
+    hierarchy.DeleteNode( current_path );
     current_level--;
     current_level_node = current_path.back();
   }

@@ -2,14 +2,14 @@
 #include "algorithms/path_visibility.h"
 #include <ompl/util/Console.h>
 
-OnetopicPathSpaceModifier::OnetopicPathSpaceModifier( ob::PlannerData& pd_in, const ob::OptimizationObjective& opt, CSpaceOMPL *cspace_ ):
+OnetopicPathSpaceModifier::OnetopicPathSpaceModifier( ob::PlannerData& pd_in, CSpaceOMPL *cspace_ ):
 cspace(cspace_)
 {
-  ComputeShortestPathsLemon(pd_in, opt);
+  ComputeShortestPathsLemon(pd_in);
   InterpolatePaths(pd_in);
 }
 
-void OnetopicPathSpaceModifier::ComputeShortestPathsLemon(ob::PlannerData& pd_in, const ob::OptimizationObjective& opt){
+void OnetopicPathSpaceModifier::ComputeShortestPathsLemon(ob::PlannerData& pd_in){
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "Onetopic Reduction" << std::endl;
   std::cout << std::string(80, '-') << std::endl;

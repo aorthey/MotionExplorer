@@ -17,14 +17,14 @@ class ShallowHierarchicalMotionPlanner: public HierarchicalMotionPlanner{
     virtual const Config GetOriginalInitConfig();
     virtual const Config GetOriginalGoalConfig();
 
-    virtual const std::vector<Config>& GetSelectedPath();
+    virtual const std::vector<Config> GetSelectedPath();
     virtual std::vector< std::vector<Config> > GetSiblingPaths();
     virtual const SweptVolume& GetSelectedPathSweptVolume();
     virtual Robot* GetSelectedPathRobot();
     virtual const Config GetSelectedPathInitConfig();
     virtual const Config GetSelectedPathGoalConfig();
 
-    virtual const std::vector<int>& GetSelectedPathIndices();
+    virtual const std::vector<int> GetSelectedPathIndices();
     void DrawGL(double x_ =0.0, double y_=0.0);
 
   private:

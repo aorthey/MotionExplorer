@@ -24,7 +24,7 @@
     <freeFloating>1</freeFloating>
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.01</epsilongoalregion>
-    <maxplanningtime>0.2</maxplanningtime>
+    <maxplanningtime>0.01</maxplanningtime>
 
     <algorithm>hierarchical:ompl:prmstar</algorithm>
     <hierarchy>

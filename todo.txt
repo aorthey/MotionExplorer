@@ -268,6 +268,7 @@ easier accessible in GUI. If we like to add one variable, we should only change
 maybe keybindings and oncommand in GUI. everything else is ideally done
 automatically.
 [ ] have <gui></gui> environment to set variables
+[ ] make objects transparent
 [x] test RRT for visibility check between two paths
 [x] test on 6 environments: 
   [x] sphere
@@ -286,6 +287,7 @@ automatically.
 [x] layer 2 sometimes returns infeasible paths for capsule => fundamental issue
 [x] XML: every algorithm should have its own time/epsilon/additional properties
 
+
 [ ] more sophisticated [graph visualization]; using viewpoint to get fixed 3d position
 [ ] sometimes [two nearby paths are not reduced], investigate that (update definition of equivalence first)
 [ ] incorporate [sufficient conditions], visualize that nodes are feasible, use
@@ -294,8 +296,6 @@ some interpolation to get shortest path in pocket
   [ ] forest with steep ruggy terrain
 [ ] orientation of capsule definitely not correct. needs investigating.
 
-[ ] make objects transparent
-[ ] visualize all vertices of one onetopic covering
 [ ] make a list of environments, their picture and what this environment is
 designed to show (and who came up with the environment)
 [ ] XML restructioning
@@ -303,4 +303,6 @@ designed to show (and who came up with the environment)
   default values and with a default algorithm. 
   [ ] make xml with default GUI settings. 
   [ ] let GUI settings be able to set shortcut keys for each setting
+
+[ ] visualize all vertices of one onetopic covering
 

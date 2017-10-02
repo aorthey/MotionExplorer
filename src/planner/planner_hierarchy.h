@@ -1,12 +1,29 @@
 #pragma once
 
 #include "planner/planner.h"
+//#include "elements/pathspace_hierarchy.h"
+#include "elements/hierarchy.h"
 #include "ViewTree.h"
 #include "elements/swept_volume.h"
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 #include "planner/cspace_factory.h"
 #include "planner/planner_strategy_geometric.h"
 #include <KrisLibrary/utils/stringutils.h>
+
+struct SinglePathNode{
+    std::vector<Config> path;
+    std::vector<ob::State*> state_path;
+    bool isSufficient;
+
+    SinglePathNode(){ sv = NULL; }
+    SweptVolume& GetSweptVolume(Robot *robot){
+      if(!sv){
+        sv = new SweptVolume(robot, path, 0);
+      }
+      return *sv;
+    }
+    SweptVolume *sv;
+};
 
 class HierarchicalMotionPlanner: public MotionPlanner{
 
@@ -30,14 +47,14 @@ class HierarchicalMotionPlanner: public MotionPlanner{
     virtual const Config GetOriginalInitConfig();
     virtual const Config GetOriginalGoalConfig();
 
-    virtual const std::vector<Config>& GetSelectedPath();
+    virtual const std::vector<Config> GetSelectedPath();
     virtual std::vector< std::vector<Config> > GetSiblingPaths();
     virtual const SweptVolume& GetSelectedPathSweptVolume();
     virtual Robot* GetSelectedPathRobot();
 
     virtual const Config GetSelectedPathInitConfig();
     virtual const Config GetSelectedPathGoalConfig();
-    virtual const std::vector<int>& GetSelectedPathIndices();
+    virtual const std::vector<int> GetSelectedPathIndices();
     virtual int GetCurrentLevel();
 
     void Print();
@@ -55,7 +72,7 @@ class HierarchicalMotionPlanner: public MotionPlanner{
     int current_level_node;
     std::vector<int> current_path;
 
-    PathspaceHierarchy hierarchy;
+    Hierarchy<SinglePathNode> hierarchy;
 
     ViewTree viewTree;
 

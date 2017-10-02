@@ -60,17 +60,18 @@ class PathspaceHierarchy{
     uint GetOuterRobotIdx( uint level );
     Config GetInitConfig( uint level );
     Config GetGoalConfig( uint level );
-    PathNode* GetPathNodeFromNodes( std::vector<int> nodes );
-
-    const std::vector<Config>& GetPathFromNodes( std::vector<int> nodes );
-    void CollapsePath( std::vector<int> nodes );
 
     void AddLevel( uint idx, Config qi, Config qg );
     void AddLevel( uint inner_idx, uint outer_idx, Config qi, Config qg );
 
+    void CollapsePath( std::vector<int> nodes );
     void Print();
+
+    //methods related to a single-path hierarchical decomposition
+    const std::vector<Config>& GetPathFromNodes( std::vector<int> nodes );
     void AddPath( std::vector<Config> &path_ );
     void AddPath( std::vector<Config> &path_, std::vector<int> nodes);
+    PathNode* GetPathNodeFromNodes( std::vector<int> nodes );
 
   protected:
     //tree root

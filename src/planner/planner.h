@@ -20,7 +20,10 @@ class MotionPlanner{
 
     explicit MotionPlanner(RobotWorld *world_, PlannerInput& input_);
 
-    virtual bool solve();
+    virtual bool solve(){
+      std::cout << "NYI" << std::endl;
+      exit(1);
+    }
 
     const PlannerInput& GetInput();
     const PlannerOutput& GetOutput();

@@ -2,7 +2,7 @@
 #include "elements/swept_volume.h"
 #include "elements/swath_volume.h"
 #include "elements/simplicial_complex.h"
-#include "elements/pathspace_hierarchy.h"
+#include "elements/pathspace.h"
 #include "planner/serialized_tree.h"
 
 class PlannerOutput{
@@ -42,7 +42,7 @@ class PlannerOutput{
     SwathVolume *swv;
     SimplicialComplex cmplx;
     
-    PathspaceHierarchy hierarchy;
+    PathSpace pathspace;
 
     Robot *robot;
 
