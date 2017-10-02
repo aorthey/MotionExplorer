@@ -34,12 +34,6 @@ using Edge = Graph::Edge;
 using VIterator = Graph::VIterator;
 using EIterator = Graph::EIterator;
 
-//Vector3 vertexIndexToVector(const ob::PlannerData& pd, const Vertex &v);
-//std::vector<Vector3> vertexIndicesToVector(const ob::PlannerData& pd, const std::vector<Vertex> &v);
-//const ob::State* vertexIndexToOMPLState(const ob::PlannerData& pd, const Vertex &v);
-//Config OMPLStateToConfig(const ob::State* si);
-//Vector3 OMPLStateToVector3(const ob::State* si);
-
 class OnetopicPathSpaceModifier{
   public:
     explicit OnetopicPathSpaceModifier( ob::PlannerData& pd_in, const ob::OptimizationObjective& opt, CSpaceOMPL *cspace);

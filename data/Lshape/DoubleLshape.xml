@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 
-
 <!-- based on environment from paper "Using workspace information as a guide to
      non-uniform sampling in probabilistic roadmap planners" (Berg_2005) -->
+
 <world>
    <robot name="Lshape" file="/home/aorthey/git/orthoklampt/data/Lshape/DoubleLshape.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
@@ -31,10 +31,12 @@
     <epsilongoalregion>0.01</epsilongoalregion>
     <maxplanningtime>10.0</maxplanningtime>
 
+    <!-- all algorithms and customized settings -->
     <algorithm>ompl:pdst</algorithm>
     <algorithm>ompl:rrt</algorithm>
     <algorithm maxplanningtime="0.1">hierarchical:ompl:prmstar</algorithm>
 
+    <!-- hierarchy settings for hierarchy enabled algorithms -->
     <hierarchy>
       <level inner_index="3" outer_index="4"/>
       <level inner_index="1" outer_index="0"/>

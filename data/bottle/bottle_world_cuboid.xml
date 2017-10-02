@@ -20,21 +20,18 @@
     <se3min config="6  -4 -4 -3.05 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  4 4 2.05 3.141593 1.57 3.141593"/>
     <timestep min="0.01" max="0.1"/>
-    <epsilongoalregion>0.0</epsilongoalregion>
-    <maxplanningtime>0.05</maxplanningtime>
-    <algorithm>hierarchical:ompl:prmstar</algorithm>
-    <drawMilestones>0</drawMilestones>
-    <drawSweptVolume>1</drawSweptVolume>
-    <drawStartGoal>1</drawStartGoal>
-    <drawSimplicialComplex>1</drawSimplicialComplex>
-    <drawShortestPath>0</drawShortestPath>
-    <drawTree>0</drawTree>
+
     <freeFloating>1</freeFloating>
-    <robot>
-      <index>2</index>
-      <index>1</index>
-      <index>0</index>
-    </robot>
+    <timestep min="0.01" max="0.1"/>
+    <epsilongoalregion>0.01</epsilongoalregion>
+    <maxplanningtime>0.2</maxplanningtime>
+
+    <algorithm>hierarchical:ompl:prmstar</algorithm>
+    <hierarchy>
+      <level inner_index="2"/>
+      <level inner_index="1"/>
+      <level inner_index="0"/>
+    </hierarchy>
 
   </plannersettings>
 

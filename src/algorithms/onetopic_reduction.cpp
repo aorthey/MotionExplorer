@@ -2,46 +2,6 @@
 #include "algorithms/path_visibility.h"
 #include <ompl/util/Console.h>
 
-//const ob::State* vertexIndexToOMPLState(const ob::PlannerData& pd, const Vertex &v){
-//  ob::PlannerDataVertex vd = pd.getVertex(v);
-//  const ob::State* si = vd.getState();
-//  return si;
-//}
-//Vector3 OMPLStateToVector3(const ob::State* si){
-//  double x,y,z;
-//  const ob::RealVectorStateSpace::StateType *qomplRnSpace = si->as<ob::RealVectorStateSpace::StateType>();
-//  x = qomplRnSpace->values[0];
-//  y = qomplRnSpace->values[1];
-//  z = qomplRnSpace->values[2];
-//  Vector3 v3(x,y,z);
-//  return v3;
-//}
-//Config OMPLStateToConfig(const ob::State* si){
-//  double x,y,z;
-//  const ob::RealVectorStateSpace::StateType *qomplRnSpace = si->as<ob::RealVectorStateSpace::StateType>();
-//  x = qomplRnSpace->values[0];
-//  y = qomplRnSpace->values[1];
-//  z = qomplRnSpace->values[2];
-//  Config q;q.resize(3);
-//  q[0]=x; q[1]=y; q[2]=z;
-//  return q;
-//}
-//Vector3 vertexIndexToVector(const ob::PlannerData& pd, const Vertex &v){
-//  ob::PlannerDataVertex vd = pd.getVertex(v);
-//  const ob::State* si = vd.getState();
-//  return OMPLStateToVector3(si);
-//}
-//std::vector<Vector3> vertexIndicesToVector(const ob::PlannerData& pd, const std::vector<Vertex> &v){
-//
-//  std::vector<Vector3> output;
-//  for(uint i = 0; i < v.size(); i++){
-//    Vector3 v3 = vertexIndexToVector(pd, v.at(i));
-//    output.push_back(v3);
-//  }
-//  return output;
-//}
-
-
 OnetopicPathSpaceModifier::OnetopicPathSpaceModifier( ob::PlannerData& pd_in, const ob::OptimizationObjective& opt, CSpaceOMPL *cspace_ ):
 cspace(cspace_)
 {
@@ -204,23 +164,22 @@ void OnetopicPathSpaceModifier::ComputeShortestPathsLemon(ob::PlannerData& pd_in
       boost::adjacent_vertices(vertex(v_current,g), g);
    
     bool neighborIsBetter = false;
-    for(; neighbors.first != neighbors.second; ++neighbors.first)
-      {
-        Vertex v_neighbor = *neighbors.first;
-        double ln = distance_shortest_path.at(v_neighbor);
-        if( ln < (lk - 1e-3)){
-          neighborIsBetter = true;
-          //found better neighbor
+    for(; neighbors.first != neighbors.second; ++neighbors.first){
+      Vertex v_neighbor = *neighbors.first;
+      double ln = distance_shortest_path.at(v_neighbor);
+      if( ln < (lk - 1e-3)){
+        neighborIsBetter = true;
+        //found better neighbor
 
-          //extract shortest paths and compare their visibility:
-          const std::vector<Vertex> pcur_idxs = V_shortest_path.at(v_current);
-          const std::vector<Vertex> pneighbor_idxs = V_shortest_path.at(v_neighbor);
+        //extract shortest paths and compare their visibility:
+        const std::vector<Vertex> pcur_idxs = V_shortest_path.at(v_current);
+        const std::vector<Vertex> pneighbor_idxs = V_shortest_path.at(v_neighbor);
 
-          neighborIsBetter = path_checker.isVisible(pd_in, pcur_idxs, pneighbor_idxs);
+        neighborIsBetter = path_checker.isVisible(pd_in, pcur_idxs, pneighbor_idxs);
 
-          if(neighborIsBetter) break; //don't check the other neighbors, we found at least one
-        }
+        if(neighborIsBetter) break; //don't check the other neighbors, we found at least one
       }
+    }
     if(!neighborIsBetter){
       std::vector<Vertex> Vidxs = V_shortest_path.at(i);
       if(Vidxs.size()>0){

@@ -261,6 +261,7 @@ infinite force contact. how to selectively activate/deactivate?
 [ ] do the same, but for M2
 
 General
+[ ] Simulator: make planner run on separate threads
 [ ] add drawFace/drawEdge to terrain XML file
 [ ] draw functions should be stored in map (string/string) structure to be
 easier accessible in GUI. If we like to add one variable, we should only change
@@ -281,26 +282,25 @@ automatically.
 [x] extend ompl to plan with an input path constraint (sublevel planning)
 [x] visualize tree with this velocity window thing
 [x] make onetopic modifier general applicable to any config/space
+[x] create [L-shape] in elongated environment to show failure case of Zhang approach
+[x] layer 2 sometimes returns infeasible paths for capsule => fundamental issue
+[x] XML: every algorithm should have its own time/epsilon/additional properties
+
 [ ] more sophisticated [graph visualization]; using viewpoint to get fixed 3d position
 [ ] sometimes [two nearby paths are not reduced], investigate that (update definition of equivalence first)
 [ ] incorporate [sufficient conditions], visualize that nodes are feasible, use
 some interpolation to get shortest path in pocket
-[x] create [L-shape] in elongated environment to show failure case of Zhang approach
-[ ] define what we mean when we apply a path constraint, and what we mean by
-sufficient condition on that path constraint
-
-[ ] plan for multi-dof chains -> find good examples and good environments
-find path -> increase clearance until sufficient condition
-  -> if sufficient condition clerance hit -> done. return path by interpolation. 
-  -> else  -> go down one level, find path
-
-[ ] XML: every algorithm should have its own time/epsilon/additional properties
-[ ] Simulator: make planner run on separate threads
-
 [ ] more challenging environments
   [ ] forest with steep ruggy terrain
-
 [ ] orientation of capsule definitely not correct. needs investigating.
-[ ] layer 2 sometimes returns infeasible paths for capsule. 
 
-[ ] make objects transparent and with chess texture
+[ ] make objects transparent
+[ ] visualize all vertices of one onetopic covering
+[ ] make a list of environments, their picture and what this environment is
+designed to show (and who came up with the environment)
+[ ] XML restructioning
+  [ ] make xml with default planner settings, which fill in all fields with
+  default values and with a default algorithm. 
+  [ ] make xml with default GUI settings. 
+  [ ] let GUI settings be able to set shortcut keys for each setting
+
