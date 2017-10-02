@@ -135,7 +135,6 @@ void PlannerStrategyGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspa
 
   //ob::PlannerStatus status = 
   ss.solve(ptc);
-
   //solved = ss.haveExactSolutionPath();
 
   //###########################################################################
@@ -166,12 +165,11 @@ void PlannerStrategyGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspa
 
     if(onetopic){
       PathSpace pathspace(pd, cspace);
-      pathspace.Decompose();
+      std::vector<PathSpace> covers = pathspace.Decompose();
 
-      //OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(*pd, cspace);
-        //onetopic_pathspace.GetConfigPaths();
-      output.paths = pathspace.GetDecompositionVantagePaths();
-      //return vantage_paths;
+      for(uint k = 0; k < covers.size(); k++){
+        output.paths.push_back( covers.at(k).GetShortestPath() );
+      }
     }
 
     std::cout << std::string(80, '-') << std::endl;

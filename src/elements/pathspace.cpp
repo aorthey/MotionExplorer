@@ -10,28 +10,32 @@ PathSpace::PathSpace( ob::PlannerDataPtr pd_, CSpaceOMPL *cspace_):
   pd->decoupleFromPlanner();
 }
 
-void PathSpace::Decompose(){
+
+std::vector<Config> PathSpace::GetShortestPath(){
+  return vantage_path;
+}
+std::vector<Config> PathSpace::GetVertices(){
+  return vertices;
+}
+void PathSpace::SetShortestPath(std::vector<Config> path_){
+  vantage_path = path_;
+}
+void PathSpace::SetVertices(std::vector<Config> vertices_){
+  vertices = vertices_;
+}
+
+std::vector<PathSpace> PathSpace::Decompose(){
 
   //get onetopic covers and their vantage paths
   OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(*pd, cspace);
-  vantage_paths = onetopic_pathspace.GetConfigPaths();
+  std::vector<std::vector<Config>> vantage_paths = onetopic_pathspace.GetConfigPaths();
 
+  std::vector<PathSpace> covering;
   for(uint k = 0; k < vantage_paths.size(); k++){
-    //compute all visible vertices
+    PathSpace pk(pd,cspace);
+    pk.SetShortestPath(vantage_paths.at(k));
+    covering.push_back(pk);
   }
+  return covering;
 }
 
-int PathSpace::GetNumberOfDecompositions() const{
-  return vantage_paths.size();  
-}
-const std::vector<std::vector<Config> > PathSpace::GetDecompositionVantagePaths() const{
-  return vantage_paths;
-}
-
-const std::vector<Config> PathSpace::GetDecompositionVantagePath(uint i) const{
-  return vantage_paths.at(i);
-}
-
-const std::vector<Config> PathSpace::GetDecompositionVertices() const{
-
-}

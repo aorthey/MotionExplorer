@@ -59,7 +59,6 @@ void OnetopicPathSpaceModifier::ComputeShortestPathsLemon(ob::PlannerData& pd_in
     std::map<unsigned int, const ob::PlannerDataEdge *> edgeMap;
     pd_in.getEdges(v1, edgeMap);
 
-
     for (const auto &e1 : edgeMap) {
       uint v2 = e1.first;
 

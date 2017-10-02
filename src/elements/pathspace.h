@@ -12,18 +12,21 @@
 // will we use for a decomposition?). 
 
 class PathSpace{
-
   public:
 
     PathSpace();
     PathSpace( ob::PlannerDataPtr pd_, CSpaceOMPL *cspace_);
 
-    virtual void Decompose();
+    std::vector<Config> GetShortestPath();
+    std::vector<Config> GetVertices();
 
-    int GetNumberOfDecompositions() const;
-    const std::vector<std::vector<Config> > GetDecompositionVantagePaths() const;
-    const std::vector<Config> GetDecompositionVantagePath(uint i) const;
-    const std::vector<Config> GetDecompositionVertices() const;
+    void SetShortestPath(std::vector<Config>);
+    void SetVertices(std::vector<Config>);
+
+    //split the pathspace up into smaller pieces.
+    //Note: this decomposition does not need to be a partition, but could also
+    //be a covering.
+    virtual std::vector<PathSpace> Decompose();
 
   protected:
 
@@ -31,6 +34,8 @@ class PathSpace{
 
     CSpaceOMPL *cspace; //contains only ptr, but should also contain deep copy
 
-    std::vector< std::vector<Config> > vantage_paths;
+    std::vector<Config> vantage_path;
+
+    std::vector<Config> vertices;
 };
 

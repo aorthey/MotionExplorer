@@ -141,6 +141,7 @@ Node<T>* Hierarchy<T>::GetNode( std::vector<int> path ){
         std::cout << path.at(j) << " ";
       }
       std::cout << std::endl;
+      std::cout << "number of nodes on current level: " <<current->children.size() << std::endl;
       exit(0);
     }
     current = current->children.at( path.at(k) );
