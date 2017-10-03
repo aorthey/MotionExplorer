@@ -6,6 +6,24 @@
     <active>1</active>
   </state>
   <state>
+    <name>draw_rigid_objects_edges</name>
+    <descr>Draw Edges Mesh of Rigid Objects</descr>
+    <key>e</key>
+    <active>1</active>
+  </state>
+  <state>
+    <name>draw_rigid_objects</name>
+    <descr>Draw Rigid Objects</descr>
+    <key></key>
+    <active>1</active>
+  </state>
+  <state>
+    <name>draw_robot</name>
+    <descr>Draw Original Robot</descr>
+    <key></key>
+    <active>0</active>
+  </state>
+  <state>
     <name>draw_forcefield</name>
     <descr>Draw All ForceFields in Workspace</descr>
     <key>1</key>

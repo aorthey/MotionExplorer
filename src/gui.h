@@ -98,12 +98,8 @@ class ForceFieldBackend : public SimTestBackend
     int drawWrenchField;
     int drawRobotExtras; 
     int drawIKextras;
-    int drawRobot;
     int drawAxes;
     int drawAxesLabels;
-    int drawRigidObjects;
-    int drawRigidObjectsEdges;
-    //int drawRigidObjectsFaces;
 
     void toggle(int &k){
       if(k) k=0;

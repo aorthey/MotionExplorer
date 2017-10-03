@@ -1,8 +1,10 @@
 #include "gui_state.h"
 #include <regex>
 
+
 GUIVariable::GUIVariable(){
   name = "unknown";
+  key = "-1";
 }
 GUIVariable::GUIVariable(std::string name_){
   name = name_;
@@ -22,6 +24,10 @@ void GUIVariable::toggle(){
 
 GUIVariable::operator bool() const{
   return active;
+}
+bool GUIVariable::hasKey() const{
+  if(key == "-1") return false;
+  else return true;
 }
 bool GUIVariable::operator!() const{
   return !active;
@@ -44,7 +50,7 @@ void GUIState::add(const char* name, char* key){
 GUIVariable& GUIState::operator()(const char* str){
   //return variables.at(std::string(str));
   return *variables[std::string(str)];
-  //return variables.find(std::string(str))->second;
+  // return 
 }
 void GUIState::toggle(const char* str){
   //(*this)(str).toggle();

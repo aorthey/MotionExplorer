@@ -4,6 +4,8 @@
 #include <map>
 #include <iostream>
 
+
+
 struct GUIVariable
 {
   GUIVariable();
@@ -19,6 +21,8 @@ struct GUIVariable
   void toggle();
   operator bool() const;
   bool operator!() const;
+
+  bool hasKey() const;
 
   friend std::ostream& operator<< (std::ostream&, const GUIVariable&);
 };

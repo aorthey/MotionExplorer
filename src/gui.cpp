@@ -36,21 +36,22 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   drawDistanceRobotTerrain = 1;
   drawCenterOfMassPath = 1;
 
-  drawRigidObjects = 1;
-  drawRigidObjectsEdges = 0;
-  //drawRigidObjectsFaces = 1;
-
   drawAxes = 0;
   drawAxesLabels = 0;
-  drawRobot = 0;
   drawRobotExtras = 0;
 
   //GUIVariable& v = state("draw_rigid_objects_faces");
-  MapButtonToggle(state("draw_rigid_objects_faces").name, &state("draw_rigid_objects_faces").active);
-  //MapButtonToggle("draw_rigid_objects_faces",&drawRigidObjectsFaces);
 
 
-  MapButtonToggle("draw_rigid_objects_edges",&drawRigidObjectsEdges);
+
+  //MapButtonToggle(state("draw_rigid_objects_faces").name, &state("draw_rigid_objects_faces").active);
+
+  for (auto it = state.variables.begin(); it != state.variables.end(); ++it) {
+    GUIVariable* v = it->second;
+    MapButtonToggle(v->name.c_str(), &v->active);
+  }
+
+
   MapButtonToggle("draw_forcefield",&drawForceField);
   MapButtonToggle("draw_forceellipsoid",&drawForceEllipsoid);
   MapButtonToggle("draw_distance_robot_terrain",&drawDistanceRobotTerrain);
@@ -58,7 +59,6 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
   MapButtonToggle("draw_wrenchfield",&drawWrenchField);
 
   MapButtonToggle("draw_robot_extras",&drawRobotExtras);
-  MapButtonToggle("draw_robot",&drawRobot);
   MapButtonToggle("draw_ik",&drawIKextras);
   MapButtonToggle("draw_fancy_coordinate_axes",&drawAxes);
   MapButtonToggle("draw_fancy_coordinate_axes_labels",&drawAxesLabels);
@@ -242,15 +242,13 @@ void ForceFieldBackend::RenderWorld()
     a->drawVertices = false;
 
     if(state("draw_rigid_objects_faces")) a->drawFaces = true;
-    //if(drawRigidObjectsFaces) a->drawFaces = true;
-    if(drawRigidObjectsEdges) a->drawEdges = true;
+    if(state("draw_rigid_objects_edges")) a->drawEdges = true;
     a->vertexSize = 1;
     a->edgeSize = 10;
     terra->DrawGL();
   }
 
-  //glEnable(GL_POLYGON_STIPPLE);
-  if(drawRigidObjects){
+  if(state("draw_rigid_objects")){
     for(size_t i=0;i<world->rigidObjects.size();i++){
       RigidObject *obj = world->rigidObjects[i];
       GLDraw::GeometryAppearance* a = obj->geometry.Appearance();
@@ -261,17 +259,14 @@ void ForceFieldBackend::RenderWorld()
       a->drawEdges = false;
       a->drawVertices = false;
       if(state("draw_rigid_objects_faces")) a->drawFaces = true;
-      //if(drawRigidObjectsFaces) a->drawFaces = true;
-      //if(state("draw_rigid_objects_faces")) a->drawFaces = true;
-      if(drawRigidObjectsEdges) a->drawEdges = true;
+      if(state("draw_rigid_objects_edges")) a->drawEdges = true;
       //a->vertexSize = 10;
       a->edgeSize = 10;
       obj->DrawGL();
     }
   }
-  //glDisable(GL_POLYGON_STIPPLE);
 
-  if(drawRobot){
+  if(state("draw_robot")){
     for(size_t i=0;i<world->robots.size();i++) {
       Robot *robot = world->robots[i];
       //std::cout << robot->name << " selfcollisions:" << robot->SelfCollision() << std::endl;
@@ -642,9 +637,9 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     //simrobot->SetConfig(planner_p_init);
 
   }else if(cmd=="draw_rigid_objects_faces") {
-    state("draw_rigid_objects_faces").toggle();//toggle(drawRigidObjectsFaces);
-  }else if(cmd=="draw_rigid_objects_edges_toggle") {
-    toggle(drawRigidObjectsEdges);
+    state("draw_rigid_objects_faces").toggle();
+  }else if(cmd=="draw_rigid_objects_edges") {
+    state("draw_rigid_objects_edges").toggle();
   }else if(cmd=="draw_minimal"){
     drawForceField=0;
     drawWrenchField=0;
@@ -718,13 +713,6 @@ bool GLUIForceFieldGUI::Initialize()
   //_backend->SendPlannerOutputToController();
 
   panel = glui->add_rollout("Motion Planning");
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Object Edges");
-  AddControl(checkbox,"draw_rigid_objects_edges");
-  checkbox->set_int_val(_backend->drawRigidObjectsEdges);
-
-  //checkbox = glui->add_checkbox_to_panel(panel, "Draw Object Faces");
-  //AddControl(checkbox,"draw_rigid_objects_faces");
-  //checkbox->set_int_val(_backend->drawRigidObjectsFaces);
 
   uint N = _backend->getNumberOfPaths();
 
@@ -806,9 +794,9 @@ bool GLUIForceFieldGUI::Initialize()
   AddControl(checkbox,"draw_fancy_coordinate_axes_labels");
   checkbox->set_int_val(_backend->drawAxesLabels);
 
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Robot");
-  AddControl(checkbox,"draw_robot");
-  checkbox->set_int_val(_backend->drawRobot);
+  //checkbox = glui->add_checkbox_to_panel(panel, "Draw Robot");
+  //AddControl(checkbox,"draw_robot");
+  //checkbox->set_int_val(_backend->drawRobot);
 
   checkbox = glui->add_checkbox_to_panel(panel, "Draw Force Field");
   AddControl(checkbox,"draw_forcefield");
@@ -851,12 +839,10 @@ bool GLUIForceFieldGUI::Initialize()
 
   for (auto it = state->variables.begin(); it != state->variables.end(); ++it) {
     GUIVariable* v = it->second;
-    AddToKeymap(v->key.c_str(),v->name.c_str());
+    if(v->hasKey()){
+      AddToKeymap(v->key.c_str(),v->name.c_str());
+    }
   }
-
-  //GUIVariable* v = &_backend->state("draw_rigid_objects_faces");
-  //AddToKeymap(v->key.c_str(),v->name.c_str());
-
 
   AddToKeymap("r","reset");
   //AddToKeymap("a","advance");
@@ -872,8 +858,6 @@ bool GLUIForceFieldGUI::Initialize()
 
   AddToKeymap("q","draw_minimal");
   AddToKeymap("T","toggle_mode");
-  //AddToKeymap("f","draw_rigid_objects_faces_toggle");
-  AddToKeymap("e","draw_rigid_objects_edges_toggle");
   AddToKeymap("s","toggle_simulate",true);
   AddToKeymap("p","print_config",true);
   AddToKeymap("g","draw_swept_volume");
@@ -886,20 +870,6 @@ bool GLUIForceFieldGUI::Initialize()
   AddButton("load_motion_planner");
   AddButton("save_motion_planner");
   AddButton("quit");
-//
-//              "{type:button_press,button:simulate}","toggle_simulate","",
-//            "{type:button_press,button:reset}","reset","",
-//            "{type:button_press,button:set_milestone}","command_pose","",
-//            "{type:button_toggle,button:pose_ik_mode,checked:1}","constrain_point_mode","",
-//            "{type:button_toggle,button:pose_ik,checked:0}","pose_mode","",
-//            "{type:button_toggle,button:force_application_mode,checked:1}","force_application_mode","",
-//            "{type:button_toggle,button:force_application_mode,checked:0}","pose_mode","",
-//            "{type:button_toggle,button:do_logging,checked:1}","log_sim","simtest_log.csv",
-//            "{type:button_toggle,button:do_logging,checked:0}","log_sim","",
-//            "{type:button_toggle,button:do_contact_state_logging,checked:1}","log_contact_state","simtest_contact_log.csv",
-//            "{type:button_toggle,button:do_contact_state_logging,checked:0}","log_contact_state","",
-//            "{type:button_toggle,button:do_contact_wrench_logging,checked:1}","log_contact_wrenches","simtest_wrench_log.csv",
-//            "{type:button_toggle,button:do_contact_wrench_logging,checked:0}","log_contact_wrenches","",
 
   return true;
 }
