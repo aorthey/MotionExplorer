@@ -714,8 +714,6 @@ bool GLUIForceFieldGUI::Initialize()
 
   ForceFieldBackend* _backend = static_cast<ForceFieldBackend*>(backend);
 
-
-
   //std::cout << "Open Loop Controller Setup" << std::endl;
   //_backend->SendPlannerOutputToController();
 
@@ -849,8 +847,15 @@ bool GLUIForceFieldGUI::Initialize()
   //Backend::OnCommand: handle the action
 //################################################################################
 
-  GUIVariable* v = &_backend->state("draw_rigid_objects_faces");
-  AddToKeymap(v->key.c_str(),v->name.c_str());
+  GUIState* state = &_backend->state;
+
+  for (auto it = state->variables.begin(); it != state->variables.end(); ++it) {
+    GUIVariable* v = it->second;
+    AddToKeymap(v->key.c_str(),v->name.c_str());
+  }
+
+  //GUIVariable* v = &_backend->state("draw_rigid_objects_faces");
+  //AddToKeymap(v->key.c_str(),v->name.c_str());
 
 
   AddToKeymap("r","reset");

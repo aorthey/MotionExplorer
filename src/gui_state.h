@@ -11,9 +11,7 @@ struct GUIVariable
   GUIVariable(std::string, std::string);
 
   int active;
-  int activitymap_index;
 
-  //char* key;
   std::string key;
   std::string name;
   std::string descr;
@@ -40,8 +38,6 @@ class GUIState{
     bool load(TiXmlElement *node);
 
     std::map<std::string, GUIVariable*> variables;
-
-    std::vector<int> activity;
 
 };
 
