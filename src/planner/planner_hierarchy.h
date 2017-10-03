@@ -35,13 +35,6 @@ class HierarchicalMotionPlanner: public MotionPlanner{
     virtual void CollapsePath();
     virtual void NextPath();
     virtual void PreviousPath();
-
-    void UpdateHierarchy();
-
-    virtual int GetNumberNodesOnSelectedLevel();
-    virtual int GetNumberOfLevels();
-    virtual int GetSelectedLevel();
-    virtual int GetSelectedNode();
     
     virtual Robot* GetOriginalRobot();
     virtual const Config GetOriginalInitConfig();
@@ -51,14 +44,20 @@ class HierarchicalMotionPlanner: public MotionPlanner{
     virtual std::vector< std::vector<Config> > GetSiblingPaths();
     virtual const SweptVolume& GetSelectedPathSweptVolume();
     virtual Robot* GetSelectedPathRobot();
-
     virtual const Config GetSelectedPathInitConfig();
     virtual const Config GetSelectedPathGoalConfig();
-    virtual const std::vector<int> GetSelectedPathIndices();
-    virtual int GetCurrentLevel();
 
-    void Print();
     virtual void DrawGL(double x_ =0.0, double y_=0.0);
+
+    int GetNumberOfLevels();
+    const std::vector<int> GetSelectedPathIndices();
+    int GetNumberNodesOnSelectedLevel();
+    int GetSelectedLevel();
+    int GetSelectedNode();
+
+    void UpdateHierarchy();
+    int GetCurrentLevel();
+    void Print();
     bool isActive();
 
     //for each level: first: number of all nodes, second: node selected on that
@@ -66,7 +65,7 @@ class HierarchicalMotionPlanner: public MotionPlanner{
     //const std::vector<std::pair<int,int> >& GetCaterpillarTreeIndices();
 
   protected:
-    bool solve(std::vector<int> path_idxs);
+    virtual bool solve(std::vector<int> path_idxs);
 
     int current_level;
     int current_level_node;

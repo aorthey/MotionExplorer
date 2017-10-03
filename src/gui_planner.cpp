@@ -70,6 +70,7 @@ void PlannerBackend::RenderWorld(){
   DEBUG_GL_ERRORS()
 
   if(planners.size()>0 && planners.at(active_planner)->isActive()){
+
     Robot* r_in = planners.at(active_planner)->GetOriginalRobot();
     const Config qi_in = planners.at(active_planner)->GetOriginalInitConfig();
     const Config qg_in = planners.at(active_planner)->GetOriginalGoalConfig();

@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <Simulation/ODERobot.h>
 #include <Simulation/WorldSimulation.h>
+#include <boost/filesystem.hpp>
 
 namespace util {
   inline void SetSimulatedRobot( Robot *robot, WorldSimulation &sim, Config &q)
@@ -47,11 +48,9 @@ namespace util {
   }
   inline std::string GetDataFolder()
   {
-    //std::string name = getenv("USER");
-    std::string pwd = getenv("PWD");
-
-    return pwd+"/../data";
-    //return "/home/"+name+"/git/orthoklampt/data";
+    using namespace boost::filesystem;
+    path cur = current_path();
+    return cur.string()+"/../data";
   }
 }// namespace util
 

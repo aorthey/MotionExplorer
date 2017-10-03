@@ -22,6 +22,10 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
     : SimTestBackend(world)
 {
 
+  //GUIState& state = _backend->state;
+  std::string guidef = util::GetDataFolder()+"/settings/gui_default.xml";
+  //state = new GUIState();
+  state.load(guidef.c_str());
 
   drawForceField = 0;
   drawWrenchField = 0;
@@ -34,14 +38,18 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
 
   drawRigidObjects = 1;
   drawRigidObjectsEdges = 0;
-  drawRigidObjectsFaces = 1;
+  //drawRigidObjectsFaces = 1;
 
   drawAxes = 0;
   drawAxesLabels = 0;
   drawRobot = 0;
   drawRobotExtras = 0;
 
-  MapButtonToggle("draw_rigid_objects_faces",&drawRigidObjectsFaces);
+  //GUIVariable& v = state("draw_rigid_objects_faces");
+  MapButtonToggle(state("draw_rigid_objects_faces").name, &state("draw_rigid_objects_faces").active);
+  //MapButtonToggle("draw_rigid_objects_faces",&drawRigidObjectsFaces);
+
+
   MapButtonToggle("draw_rigid_objects_edges",&drawRigidObjectsEdges);
   MapButtonToggle("draw_forcefield",&drawForceField);
   MapButtonToggle("draw_forceellipsoid",&drawForceEllipsoid);
@@ -232,7 +240,9 @@ void ForceFieldBackend::RenderWorld()
     a->drawFaces = false;
     a->drawEdges = false;
     a->drawVertices = false;
-    if(drawRigidObjectsFaces) a->drawFaces = true;
+
+    if(state("draw_rigid_objects_faces")) a->drawFaces = true;
+    //if(drawRigidObjectsFaces) a->drawFaces = true;
     if(drawRigidObjectsEdges) a->drawEdges = true;
     a->vertexSize = 1;
     a->edgeSize = 10;
@@ -250,7 +260,9 @@ void ForceFieldBackend::RenderWorld()
       a->drawFaces = false;
       a->drawEdges = false;
       a->drawVertices = false;
-      if(drawRigidObjectsFaces) a->drawFaces = true;
+      if(state("draw_rigid_objects_faces")) a->drawFaces = true;
+      //if(drawRigidObjectsFaces) a->drawFaces = true;
+      //if(state("draw_rigid_objects_faces")) a->drawFaces = true;
       if(drawRigidObjectsEdges) a->drawEdges = true;
       //a->vertexSize = 10;
       a->edgeSize = 10;
@@ -629,8 +641,8 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     //ODERobot *simrobot = sim.odesim.robot(0);
     //simrobot->SetConfig(planner_p_init);
 
-  }else if(cmd=="draw_rigid_objects_faces_toggle") {
-    toggle(drawRigidObjectsFaces);
+  }else if(cmd=="draw_rigid_objects_faces") {
+    state("draw_rigid_objects_faces").toggle();//toggle(drawRigidObjectsFaces);
   }else if(cmd=="draw_rigid_objects_edges_toggle") {
     toggle(drawRigidObjectsEdges);
   }else if(cmd=="draw_minimal"){
@@ -702,6 +714,8 @@ bool GLUIForceFieldGUI::Initialize()
 
   ForceFieldBackend* _backend = static_cast<ForceFieldBackend*>(backend);
 
+
+
   //std::cout << "Open Loop Controller Setup" << std::endl;
   //_backend->SendPlannerOutputToController();
 
@@ -710,9 +724,9 @@ bool GLUIForceFieldGUI::Initialize()
   AddControl(checkbox,"draw_rigid_objects_edges");
   checkbox->set_int_val(_backend->drawRigidObjectsEdges);
 
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Object Faces");
-  AddControl(checkbox,"draw_rigid_objects_faces");
-  checkbox->set_int_val(_backend->drawRigidObjectsFaces);
+  //checkbox = glui->add_checkbox_to_panel(panel, "Draw Object Faces");
+  //AddControl(checkbox,"draw_rigid_objects_faces");
+  //checkbox->set_int_val(_backend->drawRigidObjectsFaces);
 
   uint N = _backend->getNumberOfPaths();
 
@@ -835,6 +849,10 @@ bool GLUIForceFieldGUI::Initialize()
   //Backend::OnCommand: handle the action
 //################################################################################
 
+  GUIVariable* v = &_backend->state("draw_rigid_objects_faces");
+  AddToKeymap(v->key.c_str(),v->name.c_str());
+
+
   AddToKeymap("r","reset");
   //AddToKeymap("a","advance");
   //AddToKeymap("m","retreat");
@@ -849,7 +867,7 @@ bool GLUIForceFieldGUI::Initialize()
 
   AddToKeymap("q","draw_minimal");
   AddToKeymap("T","toggle_mode");
-  AddToKeymap("f","draw_rigid_objects_faces_toggle");
+  //AddToKeymap("f","draw_rigid_objects_faces_toggle");
   AddToKeymap("e","draw_rigid_objects_edges_toggle");
   AddToKeymap("s","toggle_simulate",true);
   AddToKeymap("p","print_config",true);
@@ -884,7 +902,6 @@ bool GLUIForceFieldGUI::Initialize()
 void GLUIForceFieldGUI::AddButton(const char *key){
   AnyCollection c;
   std::string type =  "{type:button_press,button:"+std::string(key)+"}";
-  //Assert(res == true);
   bool res=c.read(type.c_str());
   if(res){
     AddCommandRule(c,key,"");
@@ -898,7 +915,6 @@ void GLUIForceFieldGUI::AddToKeymap(const char *key, const char *s, bool baseCla
   if(res){
     AddCommandRule(c,s,"");
   }
-
   std::string descr(s);
   descr = std::regex_replace(descr, std::regex("_"), " ");
 

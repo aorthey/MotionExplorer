@@ -52,8 +52,8 @@ HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, Planner
     int level = input.layers.at(k).level;
     int ii = input.layers.at(k).inner_index;
     int io = input.layers.at(k).outer_index;
-    Robot *ri = world->robots[ii];
-    Robot *ro = world->robots[io];
+    Robot* ri = world->robots[ii];
+    Robot* ro = world->robots[io];
 
     Config qi = p_init; qi.resize(ri->q.size());
     Config qg = p_goal; qg.resize(ri->q.size());
@@ -70,11 +70,11 @@ HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, Planner
   std::cout << "Hierarchical Planner: " << std::endl;
   std::cout << std::string(80, '-') << std::endl;
   std::cout << " Robots  " << std::endl;
-  for(uint k = 0; k < hierarchy.NumberLevels(); k++){
+  for(uint k = 0; k < GetNumberOfLevels(); k++){
     uint ii = hierarchy.GetInnerRobotIdx(k);
     uint io = hierarchy.GetOuterRobotIdx(k);
-    Robot *ri = world->robots[ii];
-    Robot *ro = world->robots[io];
+    Robot* ri = world->robots[ii];
+    Robot* ro = world->robots[io];
     std::cout << " Level" << k << std::endl;
     std::cout << "   Robot (inner) : idx " << ii << " name " << ri->name << std::endl;
     std::cout << "   Robot (outer) : idx " << io << " name " << ro->name << std::endl;
@@ -99,6 +99,7 @@ const Config HierarchicalMotionPlanner::GetOriginalGoalConfig(){
   return hierarchy.GetGoalConfig(N);
 }
 //################################################################################
+
 bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
   if(!active) return false;
 
@@ -120,7 +121,7 @@ bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
 
   uint inner_index = hierarchy.GetInnerRobotIdx(level);
   uint outer_index = hierarchy.GetOuterRobotIdx(level);
-  Robot *robot_inner = world->robots[inner_index];
+  Robot* robot_inner = world->robots[inner_index];
 
   SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,inner_index,&worldsettings);
   CSpaceOMPL* cspace_i;
@@ -133,6 +134,7 @@ bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
   }else{
     return false;
   }
+
   cspace_i->print();
   PlannerStrategyGeometric strategy;
   output.robot_idx = inner_index;
@@ -144,7 +146,6 @@ bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
   if(level>0) treepath.push_back(node->id);
 
   for(uint k = 0; k < output.paths.size(); k++){
-    //hierarchy.AddPath( output.paths.at(k), nodes );
     SinglePathNode node;
     node.path = output.paths.at(k);
     hierarchy.AddNode( node, treepath );
@@ -208,10 +209,10 @@ const Config HierarchicalMotionPlanner::GetSelectedPathInitConfig(){
 const Config HierarchicalMotionPlanner::GetSelectedPathGoalConfig(){
   return hierarchy.GetGoalConfig(current_level);
 }
+
 const std::vector<int> HierarchicalMotionPlanner::GetSelectedPathIndices(){
   return current_path;
 }
-
 int HierarchicalMotionPlanner::GetCurrentLevel(){
   return current_level;
 }
@@ -219,7 +220,7 @@ int HierarchicalMotionPlanner::GetCurrentLevel(){
 //folder-like operations on hierarchical path space
 void HierarchicalMotionPlanner::ExpandPath(){
   if(!active) return;
-  int Nmax=hierarchy.NumberLevels();
+  int Nmax=GetNumberOfLevels();
   if(current_level<Nmax-1){
     //current_level_node
     if(solve(current_path)){
@@ -289,7 +290,7 @@ void HierarchicalMotionPlanner::UpdateHierarchy(){
 void HierarchicalMotionPlanner::Print(){
   if(!active) return;
   hierarchy.Print();
-  std::cout << "current level " << current_level << "/" << hierarchy.NumberLevels()-1 << std::endl;
+  std::cout << "current level " << current_level << "/" << GetNumberOfLevels()-1 << std::endl;
   std::cout << "viewTree level " << viewTree.GetLevel() << std::endl;
   std::cout << "current node  " << current_level_node << std::endl;
   std::cout << "current path: ";

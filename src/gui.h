@@ -4,6 +4,7 @@
 #include "elements/swept_volume.h"
 #include "elements/wrench_field.h"
 #include "controller/controller.h"
+#include "gui_state.h"
 
 #include <regex>
 #include <Interface/SimTestGUI.h>
@@ -23,39 +24,10 @@
 
 #define DEBUG 0
 
-//class GUIVariable
-//{
-//  private:
-//    bool active;
-//    char hotkey;
-//    std::string name;
-//    std::string descr;
-//  public:
-//
-//    GUIVariable(std::string name);
-//    GUIVariable(std::string name, std::string descr);
-//    GUIVariable(std::string name, bool active);
-//    GUIVariable(std::string name, char hotkey);
-//    GUIVariable(std::string name, std::string descr, char hotkey);
-//    GUIVariable(std::string name, std::string descr, char hotkey, bool active);
-//
-//    void toggle(){
-//      if(active) active=false;
-//      else active=true;
-//    }
-//
-//    operator bool() const{
-//      return active;
-//    }
-//    bool operator!() const{
-//      return !active;
-//    }
-//};
 
 class ForceFieldBackend : public SimTestBackend
 {
     friend class GLUIForceFieldGUI;
-
   protected:
 
     typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
@@ -131,7 +103,7 @@ class ForceFieldBackend : public SimTestBackend
     int drawAxesLabels;
     int drawRigidObjects;
     int drawRigidObjectsEdges;
-    int drawRigidObjectsFaces;
+    //int drawRigidObjectsFaces;
 
     void toggle(int &k){
       if(k) k=0;
@@ -141,6 +113,9 @@ class ForceFieldBackend : public SimTestBackend
     int line_x_pos;
     int line_y_offset;
     int line_y_offset_stepsize;
+
+    GUIState state;
+
 };
 
 
