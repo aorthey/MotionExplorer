@@ -1,0 +1,15 @@
+<gui>
+  <state>
+    <name>draw_rigid_objects_faces</name>
+    <descr>Draw Face Mesh of Rigid Objects</descr>
+    <key>f</key>
+    <active>1</active>
+  </state>
+  <state>
+    <name>draw_forcefield</name>
+    <descr>Draw All ForceFields in Workspace</descr>
+    <key>1</key>
+    <active>1</active>
+  </state>
+</gui>
+
