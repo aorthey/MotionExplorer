@@ -177,6 +177,19 @@ void PlannerBackend::RenderScreen(){
     planners.at(active_planner)->DrawGL(line_x_pos, line_y_offset);
   }
 
+  //if(plannerOutput.size()>0){
+  //  std::vector<int> bn = plannerOutput.at(0).cmplx.betti_numbers;
+  //  if(bn.size()>2){
+  //    line = "Betti      ";
+  //    line+=(" b0: ["+std::to_string(bn[0])+"]");
+  //    line+=(" b1: ["+std::to_string(bn[1])+"]");
+  //    line+=(" b2: ["+std::to_string(bn[2])+"]");
+  //    DrawText(line_x_pos, line_y_offset, line);
+  //    line_y_offset += line_y_offset_stepsize;
+  //  }
+  //}
+
+
 }
 bool PlannerBackend::OnIdle(){
   return BaseT::OnIdle();

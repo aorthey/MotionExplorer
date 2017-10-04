@@ -28,23 +28,14 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
     GUIVariable* v = it->second;
     MapButtonToggle(v->name.c_str(), &v->active);
   }
-  _frames.clear();
 }
 
-
-///*
-//############################################################################
 //############################################################################
 bool ForceFieldBackend::OnIdle()
 {
-
   bool res=BaseT::OnIdle();
 
   if(simulate) {
-
-    //Simulate Force Field
-    // compute links COM, then get forces from field
-
     sim.odesim.SetGravity(Vector3(0,0,0));
     ODERobot *robot = sim.odesim.robot(0);
     uint Nlinks = robot->robot.links.size();
@@ -94,7 +85,6 @@ bool ForceFieldBackend::OnIdle()
 void ForceFieldBackend::Start()
 {
   BaseT::Start();
-  Robot *robot = world->robots[0];
 
   settings["dragForceMultiplier"] = 500.0;
   drawContacts = 0;
@@ -102,6 +92,7 @@ void ForceFieldBackend::Start()
   //click_mode = ModeForceApplication;
   pose_objects = 1;
 
+  Robot *robot = world->robots[0];
   uint Nlinks  = robot->links.size();
   wrenchfield.init(Nlinks);
 
@@ -109,12 +100,12 @@ void ForceFieldBackend::Start()
 
   show_frames_per_second = true;
 
-  _appearanceStack.clear();
-  _appearanceStack.resize(Nlinks);
-  for(size_t i=0;i<Nlinks;i++) {
-    GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
-    _appearanceStack[i]=a;
-  }
+  //_appearanceStack.clear();
+  //_appearanceStack.resize(Nlinks);
+  //for(size_t i=0;i<Nlinks;i++) {
+  //  GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
+  //  _appearanceStack[i]=a;
+  //}
 }
 
 //############################################################################
@@ -181,33 +172,20 @@ void ForceFieldBackend::RenderWorld()
   glDisable(GL_BLEND); 
   glEnable(GL_LIGHTING);
 
-  //BaseT::RenderWorld();
-
-  //allWidgets.Enable(&allRobotWidgets,drawPoser==1);
-  //allWidgets.DrawGL(viewport);
-  vector<ViewRobot> viewRobots = world->robotViews;
-
-  Robot *robot = world->robots[0];
-  const ODERobot *oderobot = sim.odesim.robot(0);
-  ViewRobot *viewRobot = &viewRobots[0];
-
   if(!world->terrains.empty() && state("draw_distance_robot_terrain")){
+    const ODERobot *oderobot = sim.odesim.robot(0);
     const Terrain *terrain = world->terrains[0];
     GLDraw::drawDistanceRobotTerrain(oderobot, terrain);
   }
   if(state("draw_center_of_mass_path")) GLDraw::drawCenterOfMassPathFromController(sim);
-  if(state("draw_force_ellipsoid")) GLDraw::drawForceEllipsoid(oderobot);
-  if(state("draw_ik")) GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);
+  //if(state("draw_force_ellipsoid")) GLDraw::drawForceEllipsoid(oderobot);
+
   if(state("draw_forcefield")) GLDraw::drawForceField(wrenchfield);
   if(state("draw_wrenchfield")) GLDraw::drawWrenchField(wrenchfield);
   if(state("draw_axes")) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
   if(state("draw_axes_labels")) GLDraw::drawAxesLabels(viewport);
 
-  GLDraw::drawFrames(_frames, _frameLength);
-
-  
-
-
+  //GLDraw::drawFrames(_frames, _frameLength);
 
   //############################################################################
   // visualize applied torque
@@ -219,36 +197,36 @@ void ForceFieldBackend::RenderWorld()
 
   //Untested/Experimental Stuff
 
-  if(state("draw_robot_driver")){
-    Vector T;
-    sim.controlSimulators[0].GetActuatorTorques(T);
-
-    Robot *robot = &oderobot->robot;
-    for(uint i = 0; i < robot->drivers.size(); i++){
-      RobotJointDriver driver = robot->drivers[i];
-      //############################################################################
-      if(driver.type == RobotJointDriver::Rotation){
-      }
-    //############################################################################
-      if(driver.type == RobotJointDriver::Translation){
-        uint didx = driver.linkIndices[0];
-        uint lidx = driver.linkIndices[1];
-        Frame3D Tw = robot->links[lidx].T_World;
-        Vector3 pos = Tw*robot->links[lidx].com;
-        Vector3 dir = Tw*robot->links[didx].w - pos;
-
-        dir = T(i)*dir/dir.norm();
-
-        double r = 0.05;
-        glPushMatrix();
-        //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(1,0.5,0,0.7));
-        glTranslate(pos);
-        drawCone(-dir,2*r,8);
-        glPopMatrix();
-
-      }
-    }
-  }
+//  if(state("draw_robot_driver")){
+//    Vector T;
+//    sim.controlSimulators[0].GetActuatorTorques(T);
+//
+//    Robot *robot = &oderobot->robot;
+//    for(uint i = 0; i < robot->drivers.size(); i++){
+//      RobotJointDriver driver = robot->drivers[i];
+//      //############################################################################
+//      if(driver.type == RobotJointDriver::Rotation){
+//      }
+//    //############################################################################
+//      if(driver.type == RobotJointDriver::Translation){
+//        uint didx = driver.linkIndices[0];
+//        uint lidx = driver.linkIndices[1];
+//        Frame3D Tw = robot->links[lidx].T_World;
+//        Vector3 pos = Tw*robot->links[lidx].com;
+//        Vector3 dir = Tw*robot->links[didx].w - pos;
+//
+//        dir = T(i)*dir/dir.norm();
+//
+//        double r = 0.05;
+//        glPushMatrix();
+//        //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(1,0.5,0,0.7));
+//        glTranslate(pos);
+//        drawCone(-dir,2*r,8);
+//        glPopMatrix();
+//
+//      }
+//    }
+//  }
 
 }//RenderWorld
  
@@ -309,19 +287,6 @@ void ForceFieldBackend::RenderScreen(){
   DrawTextVector(line_x_pos, line_y_offset, "Cmd Torque :", T);
   line_y_offset += line_y_offset_stepsize;
 
-  if(plannerOutput.size()>0){
-    std::vector<int> bn = plannerOutput.at(0).cmplx.betti_numbers;
-    if(bn.size()>2){
-      line = "Betti      ";
-      line+=(" b0: ["+std::to_string(bn[0])+"]");
-      line+=(" b1: ["+std::to_string(bn[1])+"]");
-      line+=(" b2: ["+std::to_string(bn[2])+"]");
-      DrawText(line_x_pos, line_y_offset, line);
-      line_y_offset += line_y_offset_stepsize;
-    }
-  }
-
-
 }
 
 void ForceFieldBackend::DrawTextVector(double xpos, double ypos, const char* prefix, Vector &v){
@@ -378,57 +343,53 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
 
 #include <KrisLibrary/graph/Tree.h>
 
-void ForceFieldBackend::AddPlannerOutput( PlannerOutput pout )
-{
-  plannerOutput.push_back(pout);
+//void ForceFieldBackend::AddPlannerOutput( PlannerOutput pout )
+//{
+//  plannerOutput.push_back(pout);
+//
+//  for(uint k = 0; k < pout.removable_robot_idxs.size(); k++){
+//    uint idx = pout.removable_robot_idxs.at(k);
+//    Robot *rk = world->robots[idx];
+//    sim.odesim.DeleteRobot( rk->name.c_str() );
+//  }
+//}
+//
+//void ForceFieldBackend::SendPlannerOutputToController()
+//{
+//  if(plannerOutput.size()>0){
+//    std::vector<Vector> torques = plannerOutput.at(0).GetTorques();
+//    for(uint i = 0; i < torques.size(); i++){
+//      stringstream qstr;
+//      qstr<<torques.at(i);
+//      string cmd( (i<=0)?("set_torque_control"):("append_torque_control") );
+//      SendCommandStringController(cmd,qstr.str());
+//    }
+//  }
+//}
+//
+//void ForceFieldBackend::SendCommandStringController(string cmd, string arg)
+//{
+//  if(!sim.robotControllers[0]->SendCommand(cmd,arg)) {
+//    std::cout << std::string(80, '-') << std::endl;
+//    std::cout << "ERROR in controller commander" << std::endl;
+//    std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
+//    std::cout << std::string(80, '-') << std::endl;
+//    throw "Controller command not supported!";
+//  }
+//}
 
-  for(uint k = 0; k < pout.removable_robot_idxs.size(); k++){
-    uint idx = pout.removable_robot_idxs.at(k);
-    Robot *rk = world->robots[idx];
-    sim.odesim.DeleteRobot( rk->name.c_str() );
-  }
-}
-
-void ForceFieldBackend::SendPlannerOutputToController()
-{
-  if(plannerOutput.size()>0){
-    std::vector<Vector> torques = plannerOutput.at(0).GetTorques();
-    for(uint i = 0; i < torques.size(); i++){
-      stringstream qstr;
-      qstr<<torques.at(i);
-      string cmd( (i<=0)?("set_torque_control"):("append_torque_control") );
-      SendCommandStringController(cmd,qstr.str());
-    }
-  }
-}
-
-void ForceFieldBackend::SendCommandStringController(string cmd, string arg)
-{
-  if(!sim.robotControllers[0]->SendCommand(cmd,arg)) {
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "ERROR in controller commander" << std::endl;
-    std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
-    std::cout << std::string(80, '-') << std::endl;
-    throw "Controller command not supported!";
-  }
-}
-
-uint ForceFieldBackend::getNumberOfPaths(){
-  return this->plannerOutput.size();
-}
-
-void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength)
-{
-  vector<Vector3> frame;
-  frame.push_back(p);
-  frame.push_back(e1);
-  frame.push_back(e2);
-  frame.push_back(e3);
-
-  _frames.push_back(frame);
-  _frameLength.push_back(frameLength);
-}
-
+//void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength)
+//{
+//  vector<Vector3> frame;
+//  frame.push_back(p);
+//  frame.push_back(e1);
+//  frame.push_back(e2);
+//  frame.push_back(e3);
+//
+//  _frames.push_back(frame);
+//  _frameLength.push_back(frameLength);
+//}
+//
 
 //############################################################################
 //############################################################################
@@ -436,7 +397,6 @@ void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, con
 
 bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
-  //std::cout << "OnCommand: " << cmd << std::endl;
   if(cmd=="advance") {
     SimStep(sim.simStep);
   }else if(cmd=="reset") {
@@ -448,40 +408,46 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
 
     BaseT::OnCommand(cmd,args);
 
-    if(plannerOutput.size()>0){
-      std::cout << "Reseting all robots to first planner output" << std::endl;
-      for(uint k = 0; k < world->robots.size(); k++){
+    //if(plannerOutput.size()>0){
+    //  std::cout << "Reseting all robots to first planner output" << std::endl;
+    //  for(uint k = 0; k < world->robots.size(); k++){
 
-        Robot* robot = world->robots.at(k);
-        uint ridx = plannerOutput.at(0).nested_idx.at(0);
-        if(ridx == k){
-          Config q = plannerOutput.at(0).nested_q_init.at(0);
-          robot->UpdateConfig(q);
-          robot->UpdateGeometry();
-          std::cout << "reseting robot " << robot->name << " to " << robot->q << std::endl;
-        }
+    //    Robot* robot = world->robots.at(k);
+    //    uint ridx = plannerOutput.at(0).nested_idx.at(0);
+    //    if(ridx == k){
+    //      Config q = plannerOutput.at(0).nested_q_init.at(0);
+    //      robot->UpdateConfig(q);
+    //      robot->UpdateGeometry();
+    //      std::cout << "reseting robot " << robot->name << " to " << robot->q << std::endl;
+    //    }
 
-        //for(uint j = 0; j < plannerOutput.at(0).nested_idx.size(); j++){
-        //  uint ridx = plannerOutput.at(0).nested_idx.at(j);
-        //  if(ridx == k){
-        //    Config q = plannerOutput.at(0).nested_q_init.at(j);
-        //    robot->UpdateConfig(q);
-        //    robot->UpdateGeometry();
-        //    std::cout << "reseting robot " << robot->name << " to " << robot->q << std::endl;
-        //  }
-        //}
-      }
-    }else{
-      for(uint k = 0; k < world->robots.size(); k++){
-        Robot* robot = world->robots[k];
-        Config q = robot->q;
-        robot->UpdateConfig(q);
-        robot->UpdateGeometry();
-        std::cout << "reseting robot " << robot->name << " to " << robot->q << std::endl;
-      }
+    //    //for(uint j = 0; j < plannerOutput.at(0).nested_idx.size(); j++){
+    //    //  uint ridx = plannerOutput.at(0).nested_idx.at(j);
+    //    //  if(ridx == k){
+    //    //    Config q = plannerOutput.at(0).nested_q_init.at(j);
+    //    //    robot->UpdateConfig(q);
+    //    //    robot->UpdateGeometry();
+    //    //    std::cout << "reseting robot " << robot->name << " to " << robot->q << std::endl;
+    //    //  }
+    //    //}
+    //  }
+    //}else{
+    //  for(uint k = 0; k < world->robots.size(); k++){
+    //    Robot* robot = world->robots[k];
+    //    Config q = robot->q;
+    //    robot->UpdateConfig(q);
+    //    robot->UpdateGeometry();
+    //    std::cout << "reseting robot " << robot->name << " to " << robot->q << std::endl;
+    //  }
+    //}
+
+    for(uint k = 0; k < world->robots.size(); k++){
+      Robot* robot = world->robots[k];
+      Config q = robot->q;
+      robot->UpdateConfig(q);
+      robot->UpdateGeometry();
+      std::cout << "reseting robot " << robot->name << " to " << robot->q << std::endl;
     }
-
-
 
     for(size_t i=0;i<world->robots.size();i++) {
       Robot* robot = world->robots[i];

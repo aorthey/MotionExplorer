@@ -12,8 +12,6 @@ class PlannerBackend : public ForceFieldBackend
 
     typedef ForceFieldBackend BaseT; 
 
-    //HierarchicalMotionPlanner *planner;
-
     std::vector<HierarchicalMotionPlanner*> planners;
 
     int active_planner;
