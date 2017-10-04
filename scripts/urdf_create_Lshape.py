@@ -4,10 +4,10 @@ from math import cos,sin,pi,atan2
 from urdf_create import *
 from urdf_create_primitives import *
 
-L1 = 2.0
-L2 = 1.5
-thickness1 = 0.4
-thickness2 = 0.2
+L1 = 1.7
+L2 = 1.2
+thicknessx = 0.2
+thicknessy = 1.5
 
 robot_name = 'Lshape'
 folder='Lshape/'
@@ -16,9 +16,9 @@ fname = getPathname(folder, robot_name)
 f = open(fname,'w')
 f.write('<?xml version="1.0"?>\n')
 f.write('<robot name="'+robot_name+'">\n')
-hstr  = createCuboid("link1",0,0,0,L1,thickness1,thickness1)
+hstr  = createCuboid("link1",0,0,0,L1,thicknessy,thicknessx)
 #hstr += createCuboid("link2",-L1/2,0,thickness/2+L2/2,thickness,thickness,L2)
-hstr += createCuboid("link2",-L1/2+thickness1/2,0,L2/2+thickness1/2,thickness2,thickness2,L2)
+hstr += createCuboid("link2",-L1/2+thicknessx/2,0,L2/2+thicknessx/2,thicknessx,thicknessy,L2)
 hstr += createRigidJoint("joint_"+"l1"+"_"+"l2", "link1", "link2")
 f.write(hstr)
 f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
@@ -29,11 +29,11 @@ f.close()
 print "\nCreated new file >>",fname
 
 ### create nested robots
-CreateSphereRobot(folder, robot_name + "_sphere_inner", thickness1/2)
+CreateSphereRobot(folder, robot_name + "_sphere_inner", thicknessx/2)
 d = np.sqrt((L1/2)**2+L2**2)
 CreateSphereRobot(folder, robot_name + "_sphere_outer", d)
 
-CreateCylinderRobot(folder, robot_name + "_capsule_inner", thickness1/2, L1)
+CreateCylinderRobot(folder, robot_name + "_capsule_inner", thicknessx/2, L1)
 
-CreateCylinderRobot(folder, robot_name + "_capsule_outer", L2+thickness1/2, L1)
+CreateCylinderRobot(folder, robot_name + "_capsule_outer", L2+thicknessx/2, L1)
 

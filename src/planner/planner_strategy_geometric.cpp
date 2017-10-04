@@ -73,7 +73,7 @@ void PlannerStrategyGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspa
   if(algorithm=="ompl:rrt") ompl_planner = std::make_shared<og::RRT>(si);
   else if(algorithm=="ompl:rrtstar") ompl_planner = std::make_shared<og::RRTstar>(si);
   else if(algorithm=="ompl:rrtconnect") ompl_planner = std::make_shared<og::RRTConnect>(si);
-  else if(algorithm=="ompl:rrtlazy") ompl_planner = std::make_shared<og::LazyRRT>(si);
+  else if(algorithm=="ompl:lazyrrt") ompl_planner = std::make_shared<og::LazyRRT>(si);
   else if(algorithm=="ompl:rrtsharp") ompl_planner = std::make_shared<og::RRTsharp>(si);
   else if(algorithm=="ompl:prm") ompl_planner = std::make_shared<og::PRM>(si);
   else if(algorithm=="ompl:prmstar") ompl_planner = std::make_shared<og::PRMstar>(si);

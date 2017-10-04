@@ -72,11 +72,11 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] change viewpoint internally
  [ ] Compute Force Closure Grasp from points
  [ ] Compute SE constraints, what is GIWC equivalent?
- [ ] smoothing after path planning
- [ ] refactor kinodynamic planner to make it independent from path planner
+ [x] smoothing after path planning
+ [x] refactor kinodynamic planner to make it independent from path planner
  [ ] decompose GUI into sweptvolumeGUI and forcefieldGUI 
  [ ] save all swept volumes when saving GUI, rewrite all Load/Save functions
- [ ] refactor planner -> use PlannerOutput to store path/roadmap and use
+ [x] refactor planner -> use PlannerOutput to store path/roadmap and use
 PlannerOutput as Input to GUI to shadow the internal things. Also put the
 plannersettings into the xml, so that we can load planner+start/goal config
 without recompiling. Delete the whole plannersetup folder!
@@ -89,7 +89,7 @@ without recompiling. Delete the whole plannersetup folder!
 
  [ ] Needs switch to QT, the file loader from GLUI seems not to work properly. Also the graphics are quite bad. 
  [x] be able to design landscapes/fancy environments and import them to simulator
- [ ] be able to load different landscapes/robots from simulator, plus start/goal
+ [x] be able to load different landscapes/robots from simulator, plus start/goal
 configs, and be able to run different algorithms to find a solution. Then be
 able to save/delete solution paths. So that we can display several output paths
 as swept volumes simultaneously
@@ -167,9 +167,7 @@ COM should retain orientation equal to origin so that we can see forces from
    [ ] *** do kinodynamic planning /w FF
    [ ] ** visualize path speed profile (reuse python display and display in topp)
  [ ] * replace propagation by undulatory motions along each axis, but how would that work?
- [ ] make cspace ompl work with zero-dimensional shape space
- 
- [ ] put all the loader stuff into separate folder each with one file
+ [x] make cspace ompl work with zero-dimensional shape space
 
 -- important
 
@@ -189,39 +187,29 @@ self-collision forces?
    [ ] got another kernel panic after displaying torque based jet propulsion
  [ ] retreat simulation
 
--- unnamed abstractions paper
+-- abstractions 
 
  [x] compute and display distance between links and terrain
  [x] make small 3-leg spider robot, only contacts
  [ ] use some balance controller
  [x] design cave environment
  [x] force is applied even with 000 force field (didn't remove se3drivers)
- [ ] ompl:rrt applied to workspace planner, rework the planning interface
-    [ ] do planning with timelimit and no success return
-    [ ] extract tree, display all 
-    [ ] compute homotopy classes
-
  [x] planning with two robot entities inner/outer SV
     [x] make cspace with two robots, inherit from kinodynamiccspace, make robot + outer shell 
-
--- redesign UI
  [ ] create three hotkey groups: Env Manipulation, Path Manipulation, Robot Manipulation and Simulation
  [x] level planning
    [x] visualize level tree
    [x] visualize level path
    [x] visualize level all paths
- [ ] have different numbers to highlight/show different planner outputs. This
+ [x] have different numbers to highlight/show different planner outputs. This
 way we could build a hierarchical visualization
-
-[ ] planner needs refactoring: new folders validator/integrator. new class setup
+ [ ] planner needs refactoring: new folders validator/integrator. new class setup
 which takes settings and produces a cspace and an algorithm taking
 validator/integrator into account. This setup file should then be replaced by
 Hplanner, so we need to give it more meaningful name 
-[ ] adjust algo such that spheres do not intersect (too many clustered on one point) -> cvx decomp?
-[ ] make sure it works with -wall, -mars, and -cave.
-[x] fix spider urdf
-
-[ ] get new idea for going down one level
+ [ ] adjust algo such that spheres do not intersect (too many clustered on one point) -> cvx decomp?
+ [ ] make sure it works with -wall, -mars, and -cave.
+ [x] fix spider urdf
  [ ] cylinder -> hole example (can easily be compared to ompl, has many
 variations already included in ompl and would nicely act as a ground truth
 example)
@@ -229,80 +217,87 @@ example)
 connected, or use that as a ground truth benchmark)
  [ ] corner element -> hole
 
-[x] install SBL lib
-[x] compute homology groups (HG) of SC
-[x] make bottle planning possible
-[x] visualize internal holes
-[x] changing between visuals changes colors/linewidth of other visuals, but shouldn't.
-[x] ompl cannot deal with zero dimensions
-[ ] compute retraction (GUDHI or CGAL)
-[ ] orientation limits are not respected OMPL
+ [x] install SBL lib
+ [x] compute homology groups (HG) of SC
+ [x] make bottle planning possible
+ [x] visualize internal holes
+ [x] changing between visuals changes colors/linewidth of other visuals, but shouldn't.
+ [x] ompl cannot deal with zero dimensions
+ [ ] compute retraction (GUDHI or CGAL)
+ [ ] orientation limits are not respected OMPL
+ 
+ [x] remove zero measure dimensions from OMPL (i.e. map them to lower space
+ before starting OMPL, there are always problems with that)
+ [ ] there is no way to enforce bounds on SO(3), maybe we need to decompose it somehow
+ [x] have one complete system for rigid link: add arbitrary nested robots.
+ compute shortest paths. Iterate through all solutions.
+ 
+ [x] magneto: 2-dof, 2 magnet robot
+ [x] reset does not work on all robots
+ [x] remove orientation sampling for rotational invariant shapes
+ [x] bottle requires different planner because physics is different: innerouter vs. normal
+ 
+ Contacts 
+ [ ] How to make the contact decisions inside the controller?
+ [ ] most important point is how the hierarchy would work with a contact point
+ [ ] simulate a magnetic-contact. read klampt tutorial about humanoid robot with
+ infinite force contact. how to selectively activate/deactivate?
+ [ ] how to define contact points and add arbitrary force when in contact?
+ [ ] how to make and break contacts
+ [ ] how to adapt sphere/capsule to new structure. it is completely different, how can that work?
+ [ ] can we design a controller which moves M0 around a great arc of an arbitrary sphere?
+ [ ] do the same, but for M2
+ 
+ General
+ [ ] Simulator: make planner run on separate threads
+ [ ] add drawFace/drawEdge to terrain XML file
+ [ ] make objects transparent
+ [x] draw functions should be stored in map (string/string) structure to be
+ easier accessible in GUI. If we like to add one variable, we should only change
+ maybe keybindings and oncommand in GUI. everything else is ideally done
+ automatically.
+ [x] have <gui></gui> environment to set variables
+ [x] test RRT for visibility check between two paths
+ [x] test on 6 environments: 
+   [x] sphere
+   [x] cuboid
+   [x] double cuboid
+   [x] triple T grill (see jaillet 2008)
+   [x] forest of cylinders on a flat surface
+   [x] 3D lattice cuboid
+ [x] visualize tree by text output (and indicate which nodes are where)
+ [x] smooth path
+ [x] interpolate path
+ [x] extend ompl to plan with an input path constraint (sublevel planning)
+ [x] visualize tree with this velocity window thing
+ [x] make onetopic modifier general applicable to any config/space
+ [x] create [L-shape] in elongated environment to show failure case of Zhang approach
+ [x] layer 2 sometimes returns infeasible paths for capsule => fundamental issue
+ [x] XML: every algorithm should have its own time/epsilon/additional properties
+ 
+ [ ] more sophisticated [graph visualization]; using viewpoint to get fixed 3d position
+ [ ] sometimes [two nearby paths are not reduced], investigate that (update definition of equivalence first)
 
-[x] remove zero measure dimensions from OMPL (i.e. map them to lower space
-before starting OMPL, there are always problems with that)
-[ ] there is no way to enforce bounds on SO(3), maybe we need to decompose it somehow
-[x] have one complete system for rigid link: add arbitrary nested robots.
-compute shortest paths. Iterate through all solutions.
+ [ ] incorporate [sufficient conditions], visualize that nodes are feasible, use
+ some interpolation to get shortest path in pocket
+ [ ] more challenging environments
+   [ ] forest with steep ruggy terrain
+ [ ] orientation of capsule definitely not correct. needs investigating.
+ 
+ [ ] make a list of environments, their picture and what this environment is
+ designed to show (and who came up with the environment)
+ 
+ [ ] XML restructioning
+   [ ] make xml with default planner settings, which fill in all fields with
+   default values and with a default algorithm. 
+   [x] make xml with default GUI settings. 
+   [x] let GUI settings be able to set shortcut keys for each setting
+ 
+ [ ] visualize all vertices of one onetopic covering
+ [ ] check if we can store personal information in a PD::Node during planning.  I.e. store sufficiency and maybe some other stuff there
+ [ ] purge this whole serializedtree crap
 
-[x] magneto: 2-dof, 2 magnet robot
-[x] reset does not work on all robots
-[x] remove orientation sampling for rotational invariant shapes
-[x] bottle requires different planner because physics is different: innerouter vs. normal
-
-Contacts 
-[ ] How to make the contact decisions inside the controller?
-[ ] most important point is how the hierarchy would work with a contact point
-[ ] simulate a magnetic-contact. read klampt tutorial about humanoid robot with
-infinite force contact. how to selectively activate/deactivate?
-[ ] how to define contact points and add arbitrary force when in contact?
-[ ] how to make and break contacts
-[ ] how to adapt sphere/capsule to new structure. it is completely different, how can that work?
-[ ] can we design a controller which moves M0 around a great arc of an arbitrary sphere?
-[ ] do the same, but for M2
-
-General
-[ ] Simulator: make planner run on separate threads
-[ ] add drawFace/drawEdge to terrain XML file
-[ ] make objects transparent
-[x] draw functions should be stored in map (string/string) structure to be
-easier accessible in GUI. If we like to add one variable, we should only change
-maybe keybindings and oncommand in GUI. everything else is ideally done
-automatically.
-[x] have <gui></gui> environment to set variables
-[x] test RRT for visibility check between two paths
-[x] test on 6 environments: 
-  [x] sphere
-  [x] cuboid
-  [x] double cuboid
-  [x] triple T grill (see jaillet 2008)
-  [x] forest of cylinders on a flat surface
-  [x] 3D lattice cuboid
-[x] visualize tree by text output (and indicate which nodes are where)
-[x] smooth path
-[x] interpolate path
-[x] extend ompl to plan with an input path constraint (sublevel planning)
-[x] visualize tree with this velocity window thing
-[x] make onetopic modifier general applicable to any config/space
-[x] create [L-shape] in elongated environment to show failure case of Zhang approach
-[x] layer 2 sometimes returns infeasible paths for capsule => fundamental issue
-[x] XML: every algorithm should have its own time/epsilon/additional properties
-
-[ ] more sophisticated [graph visualization]; using viewpoint to get fixed 3d position
-[ ] sometimes [two nearby paths are not reduced], investigate that (update definition of equivalence first)
-[ ] incorporate [sufficient conditions], visualize that nodes are feasible, use
-some interpolation to get shortest path in pocket
-[ ] more challenging environments
-  [ ] forest with steep ruggy terrain
-[ ] orientation of capsule definitely not correct. needs investigating.
-
-[ ] make a list of environments, their picture and what this environment is
-designed to show (and who came up with the environment)
-
-[ ] XML restructioning
-  [ ] make xml with default planner settings, which fill in all fields with
-  default values and with a default algorithm. 
-  [x] make xml with default GUI settings. 
-  [x] let GUI settings be able to set shortcut keys for each setting
-
-[ ] visualize all vertices of one onetopic covering
-[ ] check if we can store personal information in a PD::Node during planning.  I.e. store sufficiency and maybe some other stuff there
+HPlanner
+ [ ] orientation wrong.
+ [ ] position goes through wall in L.
+ 

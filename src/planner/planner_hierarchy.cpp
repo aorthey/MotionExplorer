@@ -1,4 +1,5 @@
 #include "planner/planner_hierarchy.h"
+#include "drawMotionPlanner.h"
 
 HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, PlannerInput& input_):
   MotionPlanner(world_, input_)
@@ -70,7 +71,7 @@ HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, Planner
   std::cout << "Hierarchical Planner: " << std::endl;
   std::cout << std::string(80, '-') << std::endl;
   std::cout << " Robots  " << std::endl;
-  for(uint k = 0; k < GetNumberOfLevels(); k++){
+  for(uint k = 0; k < hierarchy.NumberLevels(); k++){
     uint ii = hierarchy.GetInnerRobotIdx(k);
     uint io = hierarchy.GetOuterRobotIdx(k);
     Robot* ri = world->robots[ii];
@@ -85,19 +86,19 @@ HierarchicalMotionPlanner::HierarchicalMotionPlanner(RobotWorld *world_, Planner
   }
 }
 
-Robot* HierarchicalMotionPlanner::GetOriginalRobot(){
-  uint N = hierarchy.NumberLevels()-1;
-  uint ridx = hierarchy.GetRobotIdx(N);
-  return world->robots[ridx];
-}
-const Config HierarchicalMotionPlanner::GetOriginalInitConfig(){
-  uint N = hierarchy.NumberLevels()-1;
-  return hierarchy.GetInitConfig(N);
-}
-const Config HierarchicalMotionPlanner::GetOriginalGoalConfig(){
-  uint N = hierarchy.NumberLevels()-1;
-  return hierarchy.GetGoalConfig(N);
-}
+//Robot* HierarchicalMotionPlanner::GetOriginalRobot(){
+//  uint N = hierarchy.NumberLevels()-1;
+//  uint ridx = hierarchy.GetRobotIdx(N);
+//  return world->robots[ridx];
+//}
+//const Config HierarchicalMotionPlanner::GetOriginalInitConfig(){
+//  uint N = hierarchy.NumberLevels()-1;
+//  return hierarchy.GetInitConfig(N);
+//}
+//const Config HierarchicalMotionPlanner::GetOriginalGoalConfig(){
+//  uint N = hierarchy.NumberLevels()-1;
+//  return hierarchy.GetGoalConfig(N);
+//}
 //################################################################################
 
 bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
@@ -155,31 +156,13 @@ bool HierarchicalMotionPlanner::solve(std::vector<int> path_idxs){
 }
 
 
-int HierarchicalMotionPlanner::GetNumberNodesOnSelectedLevel(){
-  return hierarchy.NumberNodesOnLevel(current_level);
-}
-int HierarchicalMotionPlanner::GetNumberOfLevels(){
-  return hierarchy.NumberLevels();
-}
-int HierarchicalMotionPlanner::GetSelectedLevel(){
-  return current_level;
-}
-int HierarchicalMotionPlanner::GetSelectedNode(){
-  return current_level_node;
-}
-
-const std::vector<Config> HierarchicalMotionPlanner::GetSelectedPath(){
-  return hierarchy.GetNodeContent( current_path ).path;
-}
 std::vector< std::vector<Config> > HierarchicalMotionPlanner::GetSiblingPaths(){
-
-    //int current_level_node;
   std::vector< std::vector<Config> > siblings;
 
   std::vector<int> path = current_path;
 
   if(path.size()>0){
-    for(uint k = 0; k < GetNumberNodesOnSelectedLevel(); k++){
+    for(uint k = 0; k < hierarchy.NumberNodesOnLevel(current_level); k++){
       if(k==current_level_node) continue;
 
       path.at(path.size()-1) = k;
@@ -190,37 +173,10 @@ std::vector< std::vector<Config> > HierarchicalMotionPlanner::GetSiblingPaths(){
   return siblings;
 }
 
-const SweptVolume& HierarchicalMotionPlanner::GetSelectedPathSweptVolume(){
-  Node<SinglePathNode>* node = hierarchy.GetNode( current_path );
-  uint idx = hierarchy.GetRobotIdx( node->level );
-  Robot *robot = world->robots[idx];
-  return node->content.GetSweptVolume(robot);
-}
-
-Robot* HierarchicalMotionPlanner::GetSelectedPathRobot(){
-  uint idx = hierarchy.GetRobotIdx( current_level );
-  Robot *robot = world->robots[idx];
-  return robot;
-}
-
-const Config HierarchicalMotionPlanner::GetSelectedPathInitConfig(){
-  return hierarchy.GetInitConfig(current_level);
-}
-const Config HierarchicalMotionPlanner::GetSelectedPathGoalConfig(){
-  return hierarchy.GetGoalConfig(current_level);
-}
-
-const std::vector<int> HierarchicalMotionPlanner::GetSelectedPathIndices(){
-  return current_path;
-}
-int HierarchicalMotionPlanner::GetCurrentLevel(){
-  return current_level;
-}
-
 //folder-like operations on hierarchical path space
 void HierarchicalMotionPlanner::ExpandPath(){
   if(!active) return;
-  int Nmax=GetNumberOfLevels();
+  int Nmax=hierarchy.NumberLevels();
   if(current_level<Nmax-1){
     //current_level_node
     if(solve(current_path)){
@@ -280,7 +236,7 @@ void HierarchicalMotionPlanner::UpdateHierarchy(){
     }else{
       uint idx = hierarchy.GetRobotIdx( current_level );
       Robot *robot = world->robots[idx];
-      uint N = GetNumberNodesOnSelectedLevel();
+      uint N = hierarchy.NumberNodesOnLevel(current_level);
       viewTree.PushLevel(N, robot->name);
     }
   }
@@ -290,7 +246,7 @@ void HierarchicalMotionPlanner::UpdateHierarchy(){
 void HierarchicalMotionPlanner::Print(){
   if(!active) return;
   hierarchy.Print();
-  std::cout << "current level " << current_level << "/" << GetNumberOfLevels()-1 << std::endl;
+  std::cout << "current level " << current_level << "/" << hierarchy.NumberLevels()-1 << std::endl;
   std::cout << "viewTree level " << viewTree.GetLevel() << std::endl;
   std::cout << "current node  " << current_level_node << std::endl;
   std::cout << "current path: ";
@@ -301,12 +257,61 @@ void HierarchicalMotionPlanner::Print(){
   std::cout << std::endl;
   std::cout << std::string(80, '-') << std::endl;
 }
-void HierarchicalMotionPlanner::DrawGL(double x_, double y_){
+bool HierarchicalMotionPlanner::isActive(){
+  return active;
+}
+void HierarchicalMotionPlanner::DrawGLScreen(double x_, double y_){
   if(!active) return;
   viewTree.x = x_;
   viewTree.y = y_;
   viewTree.DrawGL();
 }
-bool HierarchicalMotionPlanner::isActive(){
-  return active;
+void HierarchicalMotionPlanner::DrawGL(const GUIState& state){
+
+  uint N = hierarchy.NumberLevels()-1;
+  uint ridx = hierarchy.GetRobotIdx(N);
+  Robot* robot = world->robots[ridx];
+  const Config qi_in = hierarchy.GetInitConfig(N);
+  const Config qg_in = hierarchy.GetGoalConfig(N);
+
+  //###########################################################################
+  // Draw Start/Goal Volume
+  //###########################################################################
+  GLColor lightGrey(0.4,0.4,0.4,0.2);
+  GLColor lightGreen(0.2,0.9,0.2,0.2);
+  GLColor lightRed(0.9,0.2,0.2,0.2);
+  GLDraw::drawRobotAtConfig(robot, qi_in, lightGreen);
+  GLDraw::drawRobotAtConfig(robot, qg_in, lightRed);
+
+  //###########################################################################
+  // Draw Current Selected Path
+  //###########################################################################
+  uint cidx = hierarchy.GetRobotIdx( current_level );
+  robot = world->robots[cidx];
+
+  const std::vector<Config>& selected_path = hierarchy.GetNodeContent( current_path ).path;
+  const Config qi = hierarchy.GetInitConfig(current_level);
+  const Config qg = hierarchy.GetInitConfig(current_level);
+
+  GLColor magenta(0.8,0,0.8,0.5);
+  GLColor green(0.1,0.9,0.1,1);
+
+  GLDraw::drawGLPathStartGoal(robot, qi, qg);
+
+  if(selected_path.size()>0){
+    GLDraw::drawPath(selected_path, green, 20);
+
+    Node<SinglePathNode>* node = hierarchy.GetNode( current_path );
+    const SweptVolume& sv = node->content.GetSweptVolume(robot);
+    GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
+  }
+
+  //###########################################################################
+  // Draw Sibling Paths (Other Onetopic Covers)
+  //###########################################################################
+  std::vector< std::vector<Config> > sibling_paths = GetSiblingPaths();
+  for(uint k = 0; k < sibling_paths.size(); k++){
+    GLDraw::drawPath(sibling_paths.at(k), magenta, 10);
+  }
+
 }

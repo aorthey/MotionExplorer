@@ -30,6 +30,7 @@ class ForceFieldBackend : public SimTestBackend
     friend class GLUIForceFieldGUI;
 
   protected:
+
     typedef SimTestBackend BaseT; //Need to parse it through SimTest to get wrenchies
 
   public:

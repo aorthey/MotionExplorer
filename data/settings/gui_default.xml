@@ -47,6 +47,12 @@
     <key>5</key>
     <active>0</active>
   </checkbox>
+  <checkbox>
+    <name>draw_planner_bounding_box</name>
+    <descr>Draw R3 Bounding Box of Planner</descr>
+    <key>b</key>
+    <active>0</active>
+  </checkbox>
 
   <hotkey>
     <name>reset</name>

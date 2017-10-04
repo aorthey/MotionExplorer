@@ -46,6 +46,8 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     planners.at(active_planner)->ExpandPath();
   }else if(cmd=="hierarchy_up"){
     planners.at(active_planner)->CollapsePath();
+  }else if(cmd=="draw_planner_bounding_box"){
+    state("draw_planner_bounding_box").toggle();
   }else if(cmd=="next_planner"){
     if(active_planner<planners.size()-1) active_planner++;
     else active_planner = 0;
@@ -69,40 +71,24 @@ void PlannerBackend::RenderWorld(){
 
   DEBUG_GL_ERRORS()
 
-  if(planners.size()>0 && planners.at(active_planner)->isActive()){
+  HierarchicalMotionPlanner* planner = planners.at(active_planner);
 
-    Robot* r_in = planners.at(active_planner)->GetOriginalRobot();
-    const Config qi_in = planners.at(active_planner)->GetOriginalInitConfig();
-    const Config qg_in = planners.at(active_planner)->GetOriginalGoalConfig();
+  if(planners.size()>0 && planner->isActive()){
 
-    GLColor lightGrey(0.4,0.4,0.4,0.2);
-    GLColor lightGreen(0.2,0.9,0.2,0.2);
-    GLColor lightRed(0.9,0.2,0.2,0.2);
-    drawRobotAtConfig(r_in, qi_in, lightGreen);
-    drawRobotAtConfig(r_in, qg_in, lightRed);
+    planner->DrawGL(state);
 
-    Robot* robot = planners.at(active_planner)->GetSelectedPathRobot();
-    const std::vector<Config>& selected_path = planners.at(active_planner)->GetSelectedPath();
-    const Config qi = planners.at(active_planner)->GetSelectedPathInitConfig();
-    const Config qg = planners.at(active_planner)->GetSelectedPathGoalConfig();
-
-    GLColor magenta(0.8,0,0.8,0.5);
-    GLColor green(0.1,0.9,0.1,1);
-
-    GLDraw::drawGLPathStartGoal(robot, qi, qg);
-
-    std::vector< std::vector<Config> > sibling_paths = planners.at(active_planner)->GetSiblingPaths();
-    for(uint k = 0; k < sibling_paths.size(); k++){
-      GLDraw::drawPath(sibling_paths.at(k), magenta, 10);
-    }
-
-    if(selected_path.size()>0){
-      GLDraw::drawPath(selected_path, green, 20);
-      const SweptVolume& sv = planners.at(active_planner)->GetSelectedPathSweptVolume();
-      GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
+    if(state("draw_planner_bounding_box")){
+      Config min = planner->GetInput().se3min;
+      Config max = planner->GetInput().se3max;
+      glDisable(GL_LIGHTING);
+      glEnable(GL_BLEND); 
+      GLColor lightgrey(0.5,0.5,0.5,0.5);
+      lightgrey.setCurrentGL();
+      GLDraw::drawBoundingBox(Vector3(min(0),min(1),min(2)), Vector3(max(0),max(1),max(2)));
+      glEnable(GL_LIGHTING);
+      glDisable(GL_BLEND); 
     }
   }
-  glDisable(GL_LIGHTING);
 
   // //experiments on drawing 3d structures on fixed screen position
   // double w = viewport.w;
@@ -162,7 +148,6 @@ void PlannerBackend::RenderWorld(){
 }
 void PlannerBackend::RenderScreen(){
   BaseT::RenderScreen();
-  ////////////////////////////////////////////////////////////
   std::string line;
   line = "Planners       : ";
   for(uint k = 0; k < planners.size(); k++){
@@ -172,9 +157,9 @@ void PlannerBackend::RenderScreen(){
   }
   DrawText(line_x_pos,line_y_offset,line);
   line_y_offset += line_y_offset_stepsize;
-  ////////////////////////////////////////////////////////////
+
   if(planners.size()>0){
-    planners.at(active_planner)->DrawGL(line_x_pos, line_y_offset);
+    planners.at(active_planner)->DrawGLScreen(line_x_pos, line_y_offset);
   }
 
   //if(plannerOutput.size()>0){

@@ -1,13 +1,14 @@
 #pragma once
 
 #include "planner/planner.h"
-//#include "elements/pathspace_hierarchy.h"
 #include "elements/hierarchy.h"
 #include "ViewTree.h"
 #include "elements/swept_volume.h"
-#include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 #include "planner/cspace_factory.h"
+#include "gui_state.h"
 #include "planner/planner_strategy_geometric.h"
+
+#include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 #include <KrisLibrary/utils/stringutils.h>
 
 struct SinglePathNode{
@@ -36,29 +37,11 @@ class HierarchicalMotionPlanner: public MotionPlanner{
     virtual void NextPath();
     virtual void PreviousPath();
     
-    virtual Robot* GetOriginalRobot();
-    virtual const Config GetOriginalInitConfig();
-    virtual const Config GetOriginalGoalConfig();
+    virtual void DrawGL(const GUIState&);
+    virtual void DrawGLScreen(double x_ =0.0, double y_=0.0);
 
-    virtual const std::vector<Config> GetSelectedPath();
-    virtual std::vector< std::vector<Config> > GetSiblingPaths();
-    virtual const SweptVolume& GetSelectedPathSweptVolume();
-    virtual Robot* GetSelectedPathRobot();
-    virtual const Config GetSelectedPathInitConfig();
-    virtual const Config GetSelectedPathGoalConfig();
-
-    virtual void DrawGL(double x_ =0.0, double y_=0.0);
-
-    int GetNumberOfLevels();
-    const std::vector<int> GetSelectedPathIndices();
-    int GetNumberNodesOnSelectedLevel();
-    int GetSelectedLevel();
-    int GetSelectedNode();
-
-    void UpdateHierarchy();
-    int GetCurrentLevel();
-    void Print();
     bool isActive();
+    void Print();
 
     //for each level: first: number of all nodes, second: node selected on that
     //level. produces a tree of nodes with distance 1 to central path
@@ -66,6 +49,8 @@ class HierarchicalMotionPlanner: public MotionPlanner{
 
   protected:
     virtual bool solve(std::vector<int> path_idxs);
+    virtual std::vector< std::vector<Config> > GetSiblingPaths();
+    void UpdateHierarchy();
 
     int current_level;
     int current_level_node;

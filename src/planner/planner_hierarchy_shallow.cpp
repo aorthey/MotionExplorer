@@ -1,4 +1,5 @@
 #include "planner/planner_hierarchy_shallow.h"
+#include "drawMotionPlanner.h"
 
 ShallowHierarchicalMotionPlanner::ShallowHierarchicalMotionPlanner(RobotWorld *world_, PlannerInput& input_):
   HierarchicalMotionPlanner(world_,input_)
@@ -19,9 +20,6 @@ void ShallowHierarchicalMotionPlanner::ExpandPath(){
     Robot *robot = world->robots[robot_idx];
 
     kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
-
-    //if(!IsFeasible( robot, *kcspace, input.q_init)) return;
-    //if(!IsFeasible( robot, *kcspace, input.q_goal)) return;
 
     cspace = factory.MakeGeometricCSpace(robot, kcspace);
 
@@ -55,40 +53,36 @@ void ShallowHierarchicalMotionPlanner::NextPath(){
 void ShallowHierarchicalMotionPlanner::PreviousPath(){
 }
 
-
-Robot* ShallowHierarchicalMotionPlanner::GetOriginalRobot(){
-  return world->robots[input.robot_idx];
-}
-const Config ShallowHierarchicalMotionPlanner::GetOriginalInitConfig(){
-  return input.q_init;
-}
-const Config ShallowHierarchicalMotionPlanner::GetOriginalGoalConfig(){
-  return input.q_goal;
-}
-const std::vector<Config> ShallowHierarchicalMotionPlanner::GetSelectedPath(){
-  return solution_path;
-}
-std::vector< std::vector<Config> > ShallowHierarchicalMotionPlanner::GetSiblingPaths(){
-  std::vector< std::vector<Config> > emptyset;
-  return emptyset;
-}
-const SweptVolume& ShallowHierarchicalMotionPlanner::GetSelectedPathSweptVolume(){
-  return output.GetSweptVolume();
-}
-Robot* ShallowHierarchicalMotionPlanner::GetSelectedPathRobot(){
-  return world->robots[input.robot_idx];
-}
-
-const Config ShallowHierarchicalMotionPlanner::GetSelectedPathInitConfig(){
-  return input.q_init;
-}
-const Config ShallowHierarchicalMotionPlanner::GetSelectedPathGoalConfig(){
-  return input.q_goal;
-}
-const std::vector<int> ShallowHierarchicalMotionPlanner::GetSelectedPathIndices(){
-  const std::vector<int> emptyset;
-  return emptyset;
-}
 void ShallowHierarchicalMotionPlanner::DrawGL(double x_, double y_){
   if(!active) return;
+}
+void ShallowHierarchicalMotionPlanner::DrawGL(const GUIState& state){
+
+  uint ridx = input.robot_idx;
+  Robot* robot = world->robots[ridx];
+  const Config qi = input.q_init;
+  const Config qg = input.q_goal;
+
+  //###########################################################################
+  // Draw Start/Goal Volume
+  //###########################################################################
+  GLColor lightGrey(0.4,0.4,0.4,0.2);
+  GLColor lightGreen(0.2,0.9,0.2,0.2);
+  GLColor lightRed(0.9,0.2,0.2,0.2);
+  GLDraw::drawRobotAtConfig(robot, qi, lightGreen);
+  GLDraw::drawRobotAtConfig(robot, qg, lightRed);
+
+  //###########################################################################
+  // Draw Current Selected Path
+  //###########################################################################
+  GLColor magenta(0.8,0,0.8,0.5);
+  GLColor green(0.1,0.9,0.1,1);
+
+  if(solution_path.size()>0){
+    GLDraw::drawPath(solution_path, green, 20);
+
+    const SweptVolume& sv = output.GetSweptVolume();
+    GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
+  }
+
 }

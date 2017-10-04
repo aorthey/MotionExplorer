@@ -494,18 +494,6 @@ namespace GLDraw{
   void drawPlannerTree(const SerializedTree &_stree, GLColor colorTree)
   {
     double edgeWidth = 3;
-    //double vertexSize = 0.1;
-    //too costly for each round
-    //uint nearestNode = 0;
-    //double bestD = dInf;
-    //for(uint i = 0; i < _stree.size(); i++){
-    //  SerializedTreeNode node = _stree.at(i);
-    //  double d = node.cost_to_goal;
-    //  if(d<bestD){
-    //    bestD = d;
-    //    nearestNode = i;
-    //  }
-    //}
     glDisable(GL_LIGHTING);
     glEnable(GL_BLEND); 
       
