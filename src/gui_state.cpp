@@ -119,6 +119,23 @@ bool GUIState::load(TiXmlElement *node)
     variables[v->name] = v;
     node_state = FindNextSiblingNode(node_state, "hotkey");
   }
+  //################################################################################
+  //properties (fixed active variables)
+  //################################################################################
+  node_state = FindSubNode(node, "property");
+
+  while(node_state!=NULL){
+    GUIVariable* v = new GUIVariable();
+
+    GetStreamAttribute(node_state, "name") >> v->name;
+    GetStreamAttribute(node_state, "key") >> v->key;
+    GetStreamAttribute(node_state, "enabled") >> v->active;
+
+    v->descr = "Fixed active variable";
+    v->type = GUIVariable::Type::PROPERTY;
+    variables[v->name] = v;
+    node_state = FindNextSiblingNode(node_state, "property");
+  }
   return true;
 }
 

@@ -7,7 +7,7 @@
 
 struct GUIVariable
 {
-  enum Type{CHECKBOX, BUTTON, HOTKEY};
+  enum Type{CHECKBOX, BUTTON, HOTKEY, PROPERTY};
 
   GUIVariable();
   GUIVariable(std::string);
@@ -21,8 +21,8 @@ struct GUIVariable
 
   void deactivate();
   void activate();
-
   void toggle();
+
   operator bool() const;
   bool operator!() const;
 

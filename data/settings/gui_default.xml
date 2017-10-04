@@ -47,6 +47,7 @@
     <key>5</key>
     <active>0</active>
   </checkbox>
+
   <hotkey>
     <name>reset</name>
     <descr>Reset</descr>
@@ -67,13 +68,8 @@
     <descr>Screenshot</descr>
     <key>S</key>
   </hotkey>
-  <!--
-  <checkbox>
-    <name>draw_rigid_objects</name>
-    <descr>Draw Rigid Objects</descr>
-    <key></key>
-    <active>1</active>
-  </checkbox>
-  -->
+
+  <property name="draw_axes" enabled="0"/>
+
 </gui>
 

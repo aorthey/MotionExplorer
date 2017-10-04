@@ -28,7 +28,6 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
     GUIVariable* v = it->second;
     MapButtonToggle(v->name.c_str(), &v->active);
   }
-
   _frames.clear();
 }
 
@@ -104,17 +103,14 @@ void ForceFieldBackend::Start()
   pose_objects = 1;
 
   uint Nlinks  = robot->links.size();
-  //std::cout << "links: " << Nlinks << std::endl;
-
-  //use custom force fields
-  sim.odesim.SetGravity(Vector3(0,0,0));
   wrenchfield.init(Nlinks);
+
+  sim.odesim.SetGravity(Vector3(0,0,0));
 
   show_frames_per_second = true;
 
   _appearanceStack.clear();
   _appearanceStack.resize(Nlinks);
-
   for(size_t i=0;i<Nlinks;i++) {
     GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
     _appearanceStack[i]=a;
@@ -141,7 +137,6 @@ void ForceFieldBackend::RenderWorld()
     a->drawFaces = false;
     a->drawEdges = false;
     a->drawVertices = false;
-
     if(state("draw_rigid_objects_faces")) a->drawFaces = true;
     if(state("draw_rigid_objects_edges")) a->drawEdges = true;
     a->vertexSize = 1;
@@ -153,14 +148,11 @@ void ForceFieldBackend::RenderWorld()
     RigidObject *obj = world->rigidObjects[i];
     GLDraw::GeometryAppearance* a = obj->geometry.Appearance();
     a->SetColor(GLColor(0.6,0.6,0.6,0.2));
-    //std::cout << *a->faceColor << std::endl;
-
     a->drawFaces = false;
     a->drawEdges = false;
     a->drawVertices = false;
     if(state("draw_rigid_objects_faces")) a->drawFaces = true;
     if(state("draw_rigid_objects_edges")) a->drawEdges = true;
-    //a->vertexSize = 10;
     a->edgeSize = 10;
     obj->DrawGL();
   }
@@ -198,6 +190,23 @@ void ForceFieldBackend::RenderWorld()
   Robot *robot = world->robots[0];
   const ODERobot *oderobot = sim.odesim.robot(0);
   ViewRobot *viewRobot = &viewRobots[0];
+
+  if(!world->terrains.empty() && state("draw_distance_robot_terrain")){
+    const Terrain *terrain = world->terrains[0];
+    GLDraw::drawDistanceRobotTerrain(oderobot, terrain);
+  }
+  if(state("draw_center_of_mass_path")) GLDraw::drawCenterOfMassPathFromController(sim);
+  if(state("draw_force_ellipsoid")) GLDraw::drawForceEllipsoid(oderobot);
+  if(state("draw_ik")) GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);
+  if(state("draw_forcefield")) GLDraw::drawForceField(wrenchfield);
+  if(state("draw_wrenchfield")) GLDraw::drawWrenchField(wrenchfield);
+  if(state("draw_axes")) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
+  if(state("draw_axes_labels")) GLDraw::drawAxesLabels(viewport);
+
+  GLDraw::drawFrames(_frames, _frameLength);
+
+  
+
 
 
   //############################################################################
@@ -240,35 +249,6 @@ void ForceFieldBackend::RenderWorld()
       }
     }
   }
-
-  //############################################################################
-  // Visualize
-  //
-  // drawrobotextras      : COM, skeleton
-  // drawikextras         : contact links, contact directions
-  // drawforcefield       : a flow/force field on R^3
-  // drawpathsweptvolume  : swept volume along path
-  // drawplannertree      : Cspace tree visualized as COM tree in W
-  // drawaxes             : fancy coordinate axes
-  // drawaxeslabels       : labelling of the coordinate axes [needs fixing]
-  //############################################################################
-
-  if(!world->terrains.empty() && state("draw_distance_robot_terrain")){
-    const Terrain *terrain = world->terrains[0];
-    GLDraw::drawDistanceRobotTerrain(oderobot, terrain);
-  }
-
-  if(state("draw_center_of_mass_path")) GLDraw::drawCenterOfMassPathFromController(sim);
-  if(state("draw_force_ellipsoid")) GLDraw::drawForceEllipsoid(oderobot);
-  if(state("draw_ik")) GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);
-  if(state("draw_forcefield")) GLDraw::drawForceField(wrenchfield);
-  if(state("draw_wrenchfield")) GLDraw::drawWrenchField(wrenchfield);
-  if(state("draw_axes")) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
-  if(state("draw_axes_labels")) GLDraw::drawAxesLabels(viewport);
-
-  GLDraw::drawFrames(_frames, _frameLength);
-
-  
 
 }//RenderWorld
  
@@ -529,6 +509,9 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     state("draw_poser").deactivate();
   }else if(cmd=="draw_forcefield"){
     state("draw_forcefield").toggle();
+  }else if(cmd=="simulate"){
+    state("simulate").toggle();
+    simulate = state("simulate").active;
   }else if(cmd=="draw_wrenchfield"){
     state("draw_wrenchfield").toggle();
   }else if(cmd=="draw_forceellipsoid"){
@@ -537,14 +520,6 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     state("draw_distance_robot_terrain").toggle();
   }else if(cmd=="draw_center_of_mass_path"){
     state("draw_center_of_mass_path").toggle();
-  //}else if(cmd=="draw_planner_tree"){
-  //  state("draw_planner_tree").toggle();
-  //}else if(cmd=="draw_planner_simplicial_complex"){
-  //  state("draw_planner_simplicial_complex").toggle();
-  //}else if(cmd=="draw_swept_volume"){
-  //  state("draw_planner_swept_volume").toggle();
-  //}else if(cmd=="draw_shortest_path"){
-  //  state("draw_shortest_path").toggle();
   }else if(cmd=="toggle_mode"){
     if(click_mode == ModeNormal){
       click_mode = ModeForceApplication;
@@ -569,15 +544,11 @@ GLUIForceFieldGUI::GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _w
 }
 bool GLUIForceFieldGUI::Initialize()
 {
-  std::cout << "Initializing GUI" << std::endl;
   if(!BaseT::Initialize()) return false;
-
   ForceFieldBackend* _backend = static_cast<ForceFieldBackend*>(backend);
-
-  panel = glui->add_rollout("<ForceField>");
-
   GUIState* state = &_backend->state;
 
+  panel = glui->add_rollout("<ForceField>");
   for (auto it = state->variables.begin(); it != state->variables.end(); ++it) {
     GUIVariable* v = it->second;
     std::string descr = v->descr;
@@ -592,8 +563,6 @@ bool GLUIForceFieldGUI::Initialize()
     }
   }
   UpdateGUI();
-
-  //AddButton("quit");
 
   return true;
 }
