@@ -19,14 +19,15 @@ class PathSpace{
 
     std::vector<Config> GetShortestPath();
     std::vector<Config> GetVertices();
-
     void SetShortestPath(std::vector<Config>);
     void SetVertices(std::vector<Config>);
+
+    void AddPlannerOutput(const PlannerOutput& output);
 
     //split the pathspace up into smaller pieces.
     //Note: this decomposition does not need to be a partition, but could also
     //be a covering.
-    virtual std::vector<PathSpace> Decompose();
+    //virtual std::vector<PathSpace*> Decompose();
 
   protected:
 

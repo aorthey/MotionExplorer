@@ -1,11 +1,13 @@
 #include "planner/planner_hierarchy_shallow.h"
+#include "planner/cspace_factory.h"
+#include "planner/planner_strategy_geometric.h"
 #include "drawMotionPlanner.h"
 
-ShallowHierarchicalMotionPlanner::ShallowHierarchicalMotionPlanner(RobotWorld *world_, PlannerInput& input_):
-  HierarchicalMotionPlanner(world_,input_)
+ShallowMotionPlanner::ShallowMotionPlanner(RobotWorld *world_, PlannerInput& input_):
+  MotionPlanner(world_,input_)
 {
 }
-void ShallowHierarchicalMotionPlanner::Expand(){
+void ShallowMotionPlanner::Expand(){
   if(!active) return;
 
   if(current_level==0){
@@ -39,7 +41,7 @@ void ShallowHierarchicalMotionPlanner::Expand(){
     }
   }
 }
-void ShallowHierarchicalMotionPlanner::Collapse(){
+void ShallowMotionPlanner::Collapse(){
   if(!active) return;
 
   if(current_level>0){
@@ -48,15 +50,15 @@ void ShallowHierarchicalMotionPlanner::Collapse(){
   }
 }
 
-void ShallowHierarchicalMotionPlanner::Next(){
+void ShallowMotionPlanner::Next(){
 }
-void ShallowHierarchicalMotionPlanner::Previous(){
+void ShallowMotionPlanner::Previous(){
 }
 
-void ShallowHierarchicalMotionPlanner::DrawGL(double x_, double y_){
+void ShallowMotionPlanner::DrawGLScreen(double x_, double y_){
   if(!active) return;
 }
-void ShallowHierarchicalMotionPlanner::DrawGL(const GUIState& state){
+void ShallowMotionPlanner::DrawGL(const GUIState& state){
   if(!active) return;
 
   uint ridx = input.robot_idx;

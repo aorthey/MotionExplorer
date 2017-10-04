@@ -1,7 +1,7 @@
 #pragma once
 #include "gui.h"
 #include "planner/planner.h"
-#include "planner/planner_hierarchy.h"
+#include "elements/pathspace.h"
 #include "planner/planner_hierarchy_shallow.h"
 
 class PlannerBackend : public ForceFieldBackend
@@ -12,7 +12,7 @@ class PlannerBackend : public ForceFieldBackend
 
     typedef ForceFieldBackend BaseT; 
 
-    std::vector<HierarchicalMotionPlanner*> planners;
+    std::vector<MotionPlanner<PathSpace>*> planners;
 
     int active_planner;
 

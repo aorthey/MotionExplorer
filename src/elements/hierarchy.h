@@ -11,6 +11,7 @@ struct Node{
   std::vector<Node<T>* > children;
 };
 
+//Tree of class Node plus Meta Information about robots and configurations
 template <class T>
 class Hierarchy{
   public:
