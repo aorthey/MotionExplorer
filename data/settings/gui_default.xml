@@ -1,33 +1,79 @@
 <gui>
-  <state>
+  <checkbox>
     <name>draw_rigid_objects_faces</name>
     <descr>Draw Face Mesh of Rigid Objects</descr>
     <key>f</key>
     <active>1</active>
-  </state>
-  <state>
+  </checkbox>
+  <checkbox>
     <name>draw_rigid_objects_edges</name>
     <descr>Draw Edges Mesh of Rigid Objects</descr>
     <key>e</key>
     <active>1</active>
-  </state>
-  <state>
-    <name>draw_rigid_objects</name>
-    <descr>Draw Rigid Objects</descr>
-    <key></key>
-    <active>1</active>
-  </state>
-  <state>
+  </checkbox>
+  <checkbox>
     <name>draw_robot</name>
     <descr>Draw Original Robot</descr>
     <key></key>
     <active>0</active>
-  </state>
-  <state>
+  </checkbox>
+  <checkbox>
     <name>draw_forcefield</name>
     <descr>Draw All ForceFields in Workspace</descr>
     <key>1</key>
     <active>1</active>
-  </state>
+  </checkbox>
+  <checkbox>
+    <name>draw_wrenchfield</name>
+    <descr>Draw All Wrenches for each Link</descr>
+    <key>2</key>
+    <active>0</active>
+  </checkbox>
+  <checkbox>
+    <name>draw_forceellipsoid</name>
+    <descr>Draw Force Ellipsoid</descr>
+    <key>3</key>
+    <active>0</active>
+  </checkbox>
+  <checkbox>
+    <name>draw_distance_robot_terrain</name>
+    <descr>Draw Distance Robot Terrain</descr>
+    <key>4</key>
+    <active>0</active>
+  </checkbox>
+  <checkbox>
+    <name>draw_com_path</name>
+    <descr>Draw Center Of Mass Path</descr>
+    <key>5</key>
+    <active>0</active>
+  </checkbox>
+  <hotkey>
+    <name>reset</name>
+    <descr>Reset</descr>
+    <key>r</key>
+  </hotkey>
+  <hotkey>
+    <name>simulate</name>
+    <descr>Simulate</descr>
+    <key>s</key>
+  </hotkey>
+  <hotkey>
+    <name>advance</name>
+    <descr>Advance by one step</descr>
+    <key>a</key>
+  </hotkey>
+  <hotkey>
+    <name>make_screenshot</name>
+    <descr>Screenshot</descr>
+    <key>S</key>
+  </hotkey>
+  <!--
+  <checkbox>
+    <name>draw_rigid_objects</name>
+    <descr>Draw Rigid Objects</descr>
+    <key></key>
+    <active>1</active>
+  </checkbox>
+  -->
 </gui>
 

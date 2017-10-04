@@ -68,13 +68,6 @@ namespace GLDraw{
     glPopMatrix();
   }
 
-  void drawRobotExtras(ViewRobot *robot, GLColor bodyColor, double COMradius)
-  {
-    robot->DrawCenterOfMass(COMradius);
-    robot->DrawLinkSkeleton();
-    robot->SetColors(bodyColor);
-  }
-
   void drawIKextras(ViewRobot *viewRobot, Robot *robot, std::vector<IKGoal> &constraints, std::vector<int> linksInCollision, GLColor selectedLinkColor)
   {
     for(uint i = 0; i < constraints.size(); i++){

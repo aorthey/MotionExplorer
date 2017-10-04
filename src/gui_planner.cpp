@@ -205,6 +205,20 @@ bool GLUIPlannerGUI::Initialize(){
   AddToKeymap("t","next_planner");
 
   UpdateGUI();
+// save/load planner:
+  //AddControl(glui->add_button_to_panel(panel,"Save state"),"save_state");
+  //GLUI_Button* button;
+  //button = glui->add_button_to_panel(panel,">> Save state");
+  //AddControl(button, "save_motion_planner");
+  //button_file_load = glui->add_button_to_panel(panel,">> Load state");
+  //AddControl(button_file_load, "load_motion_planner");
+// open file from filesystem
+  //browser = new GLUI_FileBrowser(panel, "Loading New State");
+  //browser->set_h(100);
+  //browser->set_w(100);
+  //browser->set_allow_change_dir(1);
+  //browser->fbreaddir("../data/gui");
+
   return true;
 
 }

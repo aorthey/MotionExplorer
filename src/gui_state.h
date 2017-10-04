@@ -1,13 +1,14 @@
+#pragma once
 #include "loader.h"
 #include <string>
 #include <vector>
 #include <map>
 #include <iostream>
 
-
-
 struct GUIVariable
 {
+  enum Type{CHECKBOX, BUTTON, HOTKEY};
+
   GUIVariable();
   GUIVariable(std::string);
   GUIVariable(std::string, std::string);
@@ -18,11 +19,16 @@ struct GUIVariable
   std::string name;
   std::string descr;
 
+  void deactivate();
+  void activate();
+
   void toggle();
   operator bool() const;
   bool operator!() const;
 
   bool hasKey() const;
+
+  Type type;
 
   friend std::ostream& operator<< (std::ostream&, const GUIVariable&);
 };
@@ -43,5 +49,6 @@ class GUIState{
 
     std::map<std::string, GUIVariable*> variables;
 
+    GUIVariable *EMPTY_VARIABLE;
 };
 

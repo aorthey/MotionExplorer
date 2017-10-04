@@ -21,54 +21,13 @@ const double sweptVolume_q_spacing = 0.01;
 ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
     : SimTestBackend(world)
 {
-
-  //GUIState& state = _backend->state;
   std::string guidef = util::GetDataFolder()+"/settings/gui_default.xml";
-  //state = new GUIState();
   state.load(guidef.c_str());
-
-  drawForceField = 0;
-  drawWrenchField = 0;
-  drawIKextras = 0;
-  drawController = 1;
-  drawContactDistances = 1;
-  drawForceEllipsoid = 1;
-  drawDistanceRobotTerrain = 1;
-  drawCenterOfMassPath = 1;
-
-  drawAxes = 0;
-  drawAxesLabels = 0;
-  drawRobotExtras = 0;
-
-  //GUIVariable& v = state("draw_rigid_objects_faces");
-
-
-
-  //MapButtonToggle(state("draw_rigid_objects_faces").name, &state("draw_rigid_objects_faces").active);
 
   for (auto it = state.variables.begin(); it != state.variables.end(); ++it) {
     GUIVariable* v = it->second;
     MapButtonToggle(v->name.c_str(), &v->active);
   }
-
-
-  MapButtonToggle("draw_forcefield",&drawForceField);
-  MapButtonToggle("draw_forceellipsoid",&drawForceEllipsoid);
-  MapButtonToggle("draw_distance_robot_terrain",&drawDistanceRobotTerrain);
-  MapButtonToggle("draw_com_path", &drawCenterOfMassPath);
-  MapButtonToggle("draw_wrenchfield",&drawWrenchField);
-
-  MapButtonToggle("draw_robot_extras",&drawRobotExtras);
-  MapButtonToggle("draw_ik",&drawIKextras);
-  MapButtonToggle("draw_fancy_coordinate_axes",&drawAxes);
-  MapButtonToggle("draw_fancy_coordinate_axes_labels",&drawAxesLabels);
-
-  drawPathShortestPath.clear();
-  drawPathSweptVolume.clear();
-  drawPathMilestones.clear();
-  drawPathStartGoal.clear();
-  drawPlannerTree.clear();
-  drawPlannerSimplicialComplex.clear();
 
   _frames.clear();
 }
@@ -145,35 +104,12 @@ void ForceFieldBackend::Start()
   pose_objects = 1;
 
   uint Nlinks  = robot->links.size();
-  std::cout << "links: " << Nlinks << std::endl;
-  showLinks.resize(Nlinks); //hide certain links 
-
-  for(uint i = 0; i < showLinks.size(); i++){
-    showLinks[i] = 1;
-  }
-  //showLinks[15] = 1;
-  //for(uint i = 43; i < 50; i++) showLinks[i] = 1;
-  //for(uint i = 29; i < 36; i++) showLinks[i] = 1;
+  //std::cout << "links: " << Nlinks << std::endl;
 
   //use custom force fields
   sim.odesim.SetGravity(Vector3(0,0,0));
   wrenchfield.init(Nlinks);
 
-  //disable higher drawing functions
-  //drawBBs,drawPoser,drawDesired,drawEstimated,drawContacts,drawWrenches,drawExpanded,drawTime,doLogging
-  //drawPoser = 0;
-
-  //settings["desired"]["color"][0] = 1;
-  //settings["desired"]["color"][1] = 0;
-  //settings["desired"]["color"][2] = 0;
-  //settings["desired"]["color"][3] = 0.5;
-  //camera.dist = 4;
-  //viewport.n = 0.1;
-  //viewport.f = 100;
-  //viewport.setLensAngle(DtoR(90.0));
-  //DisplayCameraTarget();
-  //Camera::CameraController_Orbit camera;
-  //Camera::Viewport viewport;
   show_frames_per_second = true;
 
   _appearanceStack.clear();
@@ -181,43 +117,8 @@ void ForceFieldBackend::Start()
 
   for(size_t i=0;i<Nlinks;i++) {
     GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
-    if(showLinks[i]) _appearanceStack[i]=a;
+    _appearanceStack[i]=a;
   }
-
-  drawPathShortestPath.clear();
-  drawPathSweptVolume.clear();
-  drawPathMilestones.clear();
-  drawPathStartGoal.clear();
-  drawPlannerTree.clear();
-  drawPlannerSimplicialComplex.clear();
-
-  std::cout << "Setting swept volume paths" << std::endl;
-  for(uint i = 0; i < plannerOutput.size(); i++){
-    drawPathShortestPath.push_back(plannerOutput.at(i).drawShortestPath);
-    drawPathSweptVolume.push_back(plannerOutput.at(i).drawSweptVolume);
-    drawPathStartGoal.push_back(plannerOutput.at(i).drawStartGoal);
-    drawPlannerTree.push_back(plannerOutput.at(i).drawTree);
-    drawPlannerSimplicialComplex.push_back(plannerOutput.at(i).drawSimplicialComplex);
-
-    if(plannerOutput.at(i).drawMilestones) drawPathMilestones.push_back(1);
-    else drawPathMilestones.push_back(0);
-  }
-  for(uint i = 0; i < plannerOutput.size(); i++){
-    std::string dpsv = "draw_path_swept_volume_"+std::to_string(i);
-    MapButtonToggle(dpsv.c_str(),&drawPathSweptVolume.at(i));
-    std::string dpsp = "draw_shortest_path_"+std::to_string(i);
-    MapButtonToggle(dpsp.c_str(),&drawPathShortestPath.at(i));
-    std::string dpms = "draw_path_milestones_"+std::to_string(i);
-    MapButtonToggle(dpms.c_str(),&drawPathMilestones.at(i));
-    std::string dpsg = "draw_path_start_goal_"+std::to_string(i);
-    MapButtonToggle(dpsg.c_str(),&drawPathStartGoal.at(i));
-    std::string dpt = "draw_planner_tree_"+std::to_string(i);
-    MapButtonToggle(dpt.c_str(),&drawPlannerTree.at(i));
-    std::string dpsc = "draw_planner_simplicial_complex_"+std::to_string(i);
-    MapButtonToggle(dpsc.c_str(),&drawPlannerSimplicialComplex.at(i));
-  }
-
-  std::cout << "Finished Initializing Backend" << std::endl;
 }
 
 //############################################################################
@@ -248,22 +149,20 @@ void ForceFieldBackend::RenderWorld()
     terra->DrawGL();
   }
 
-  if(state("draw_rigid_objects")){
-    for(size_t i=0;i<world->rigidObjects.size();i++){
-      RigidObject *obj = world->rigidObjects[i];
-      GLDraw::GeometryAppearance* a = obj->geometry.Appearance();
-      a->SetColor(GLColor(0.6,0.6,0.6,0.2));
-      //std::cout << *a->faceColor << std::endl;
+  for(size_t i=0;i<world->rigidObjects.size();i++){
+    RigidObject *obj = world->rigidObjects[i];
+    GLDraw::GeometryAppearance* a = obj->geometry.Appearance();
+    a->SetColor(GLColor(0.6,0.6,0.6,0.2));
+    //std::cout << *a->faceColor << std::endl;
 
-      a->drawFaces = false;
-      a->drawEdges = false;
-      a->drawVertices = false;
-      if(state("draw_rigid_objects_faces")) a->drawFaces = true;
-      if(state("draw_rigid_objects_edges")) a->drawEdges = true;
-      //a->vertexSize = 10;
-      a->edgeSize = 10;
-      obj->DrawGL();
-    }
+    a->drawFaces = false;
+    a->drawEdges = false;
+    a->drawVertices = false;
+    if(state("draw_rigid_objects_faces")) a->drawFaces = true;
+    if(state("draw_rigid_objects_edges")) a->drawEdges = true;
+    //a->vertexSize = 10;
+    a->edgeSize = 10;
+    obj->DrawGL();
   }
 
   if(state("draw_robot")){
@@ -311,9 +210,7 @@ void ForceFieldBackend::RenderWorld()
 
   //Untested/Experimental Stuff
 
-  int drawRobotDriver = 1;
-
-  if(drawRobotDriver){
+  if(state("draw_robot_driver")){
     Vector T;
     sim.controlSimulators[0].GetActuatorTorques(T);
 
@@ -356,20 +253,18 @@ void ForceFieldBackend::RenderWorld()
   // drawaxeslabels       : labelling of the coordinate axes [needs fixing]
   //############################################################################
 
-  //if(drawCenterOfMassPath) GLDraw::drawCenterOfMassPathFromController(sim);
-  //if(drawForceEllipsoid) GLDraw::drawForceEllipsoid(oderobot);
-
-  if(!world->terrains.empty() && drawDistanceRobotTerrain){
+  if(!world->terrains.empty() && state("draw_distance_robot_terrain")){
     const Terrain *terrain = world->terrains[0];
     GLDraw::drawDistanceRobotTerrain(oderobot, terrain);
   }
 
-  if(drawRobotExtras) GLDraw::drawRobotExtras(viewRobot);
-  if(drawIKextras) GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);
-  if(drawForceField) GLDraw::drawForceField(wrenchfield);
-  if(drawWrenchField) GLDraw::drawWrenchField(wrenchfield);
-  if(drawAxes) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
-  if(drawAxesLabels) GLDraw::drawAxesLabels(viewport);
+  if(state("draw_center_of_mass_path")) GLDraw::drawCenterOfMassPathFromController(sim);
+  if(state("draw_force_ellipsoid")) GLDraw::drawForceEllipsoid(oderobot);
+  if(state("draw_ik")) GLDraw::drawIKextras(viewRobot, robot, _constraints, _linksInCollision, selectedLinkColor);
+  if(state("draw_forcefield")) GLDraw::drawForceField(wrenchfield);
+  if(state("draw_wrenchfield")) GLDraw::drawWrenchField(wrenchfield);
+  if(state("draw_axes")) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
+  if(state("draw_axes_labels")) GLDraw::drawAxesLabels(viewport);
 
   GLDraw::drawFrames(_frames, _frameLength);
 
@@ -558,24 +453,12 @@ void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, con
 //############################################################################
 //############################################################################
 
-void ForceFieldBackend::SetIKConstraints( vector<IKGoal> constraints, string robotname){
-  _constraints = constraints;
-  _robotname = robotname;
-  drawIKextras = 1;
-}
-void ForceFieldBackend::SetIKCollisions( vector<int> linksInCollision )
-{
-  _linksInCollision = linksInCollision;
-  drawIKextras = 1;
-}
 
 bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
   //std::cout << "OnCommand: " << cmd << std::endl;
   if(cmd=="advance") {
     SimStep(sim.simStep);
-  //}else if(cmd=="retreat") {
-    //SimStep(-sim.simStep);
   }else if(cmd=="reset") {
     sim.hooks.clear();
 
@@ -633,53 +516,35 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     }
     sim.controlSimulators[0].Init(world->robots[0], sim.odesim.robot(0), sim.robotControllers[0]);
 
-    //ODERobot *simrobot = sim.odesim.robot(0);
-    //simrobot->SetConfig(planner_p_init);
-
   }else if(cmd=="draw_rigid_objects_faces") {
     state("draw_rigid_objects_faces").toggle();
   }else if(cmd=="draw_rigid_objects_edges") {
     state("draw_rigid_objects_edges").toggle();
   }else if(cmd=="draw_minimal"){
-    drawForceField=0;
-    drawWrenchField=0;
-    drawForceEllipsoid=0;
-    drawDistanceRobotTerrain=0;
-    drawCenterOfMassPath=0;
-    drawPoser = 0;
+    state("draw_forcefield").deactivate();
+    state("draw_wrenchfield").deactivate();
+    state("draw_force_ellipsoid").deactivate();
+    state("draw_distance_robot_terrain").deactivate();
+    state("draw_center_of_mass_path").deactivate();
+    state("draw_poser").deactivate();
   }else if(cmd=="draw_forcefield"){
-    toggle(drawForceField);
+    state("draw_forcefield").toggle();
   }else if(cmd=="draw_wrenchfield"){
-    toggle(drawWrenchField);
+    state("draw_wrenchfield").toggle();
   }else if(cmd=="draw_forceellipsoid"){
-    toggle(drawForceEllipsoid);
+    state("draw_wrenchfield").toggle();
   }else if(cmd=="draw_distance_robot_terrain"){
-    toggle(drawDistanceRobotTerrain);
-  }else if(cmd=="draw_com_path"){
-    toggle(drawCenterOfMassPath);
-  }else if(cmd=="draw_planner_tree_toggle"){
-    for(uint i = 0; i < drawPlannerTree.size(); i++){
-      toggle(drawPlannerTree.at(i));
-    }
-  }else if(cmd=="draw_planner_simplicial_complex"){
-    for(uint i = 0; i < drawPlannerSimplicialComplex.size(); i++){
-      toggle(drawPlannerSimplicialComplex.at(i));
-    }
-  }else if(cmd=="draw_swept_volume"){
-    for(uint i = 0; i < drawPathSweptVolume.size(); i++){
-      toggle(drawPathSweptVolume.at(i));
-    }
-  }else if(cmd=="draw_shortest_path"){
-    for(uint i = 0; i < drawPathShortestPath.size(); i++){
-      toggle(drawPathShortestPath.at(i));
-    }
-  }else if(cmd=="load_motion_planner") {
-    //glutSelectFile ("","","");//char *filename, const char *filter, const char *title)
-    //std::string file_name = browser->get_file();
-    //std::cout << "loading file " << file_name << std::endl;
-
-  }else if(cmd=="save_motion_planner") {
-    std::cout << "saving file " << args.c_str() << std::endl;
+    state("draw_distance_robot_terrain").toggle();
+  }else if(cmd=="draw_center_of_mass_path"){
+    state("draw_center_of_mass_path").toggle();
+  //}else if(cmd=="draw_planner_tree"){
+  //  state("draw_planner_tree").toggle();
+  //}else if(cmd=="draw_planner_simplicial_complex"){
+  //  state("draw_planner_simplicial_complex").toggle();
+  //}else if(cmd=="draw_swept_volume"){
+  //  state("draw_planner_swept_volume").toggle();
+  //}else if(cmd=="draw_shortest_path"){
+  //  state("draw_shortest_path").toggle();
   }else if(cmd=="toggle_mode"){
     if(click_mode == ModeNormal){
       click_mode = ModeForceApplication;
@@ -709,167 +574,26 @@ bool GLUIForceFieldGUI::Initialize()
 
   ForceFieldBackend* _backend = static_cast<ForceFieldBackend*>(backend);
 
-  //std::cout << "Open Loop Controller Setup" << std::endl;
-  //_backend->SendPlannerOutputToController();
-
-  panel = glui->add_rollout("Motion Planning");
-
-  uint N = _backend->getNumberOfPaths();
-
-  std::cout << "N paths " << N << std::endl;
-  for(uint i = 0; i < N; i++){
-    std::string prefix = "Path "+std::to_string(i)+" :";
-
-    std::string dpsv = "draw_path_swept_volume_"+std::to_string(i);
-    std::string descr1 = prefix + "Draw Swept Volume";
-    
-    checkbox = glui->add_checkbox_to_panel(panel, descr1.c_str());
-    AddControl(checkbox,dpsv.c_str());
-    checkbox->set_int_val(_backend->drawPathSweptVolume.at(i));
-
-    linkBox = glui->add_listbox_to_panel(panel,"Show Link",NULL);
-    //toggleMeasurementDrawCheckbox = glui->add_checkbox_to_panel(panel,"Plot value");
-
-    //Robot* robot = world->robots[_backend->plannerOutput.at(i).robot_idx];
-    //uint Nlinks = robot->links.size();
-    //std::cout << "path " << i << "with links " << robot->links.size() << std::endl;
-
-    //for(size_t i=0;i<robot->links.size();i++)
-    //{
-    //  char buf[256];
-    //  strcpy(buf,robot->linkNames[i].c_str());
-    //  linkBox->add_item(i,buf);
-    //}
-    //AddControl(linkBox,"show_links");
-    //checkbox = glui->add_checkbox_to_panel(panel, descr1.c_str());
-    //AddControl(checkbox,dpsv.c_str());
-    //checkbox->set_int_val(_backend->drawPathSweptVolume.at(i));
-
-    std::string dpms = "draw_path_milestones_"+std::to_string(i);
-    std::string descr2 = prefix + "Draw Milestones";
-    checkbox = glui->add_checkbox_to_panel(panel, descr2.c_str());
-    AddControl(checkbox,dpms.c_str());
-    checkbox->set_int_val(_backend->drawPathMilestones.at(i));
-
-    std::string dpsg = "draw_path_start_goal_"+std::to_string(i);
-    std::string descr3 = prefix + "Draw Start Goal";
-    checkbox = glui->add_checkbox_to_panel(panel, descr3.c_str());
-    AddControl(checkbox,dpsg.c_str());
-    checkbox->set_int_val(_backend->drawPathStartGoal.at(i));
-
-    std::string dpt = "draw_planner_tree_"+std::to_string(i);
-    std::string descr4 = prefix + "Draw Planner Tree";
-    checkbox = glui->add_checkbox_to_panel(panel, descr4.c_str());
-    AddControl(checkbox,dpt.c_str());
-    checkbox->set_int_val(_backend->drawPlannerTree.at(i));
-
-    std::string dpsc = "draw_planner_simplicial_complex_"+std::to_string(i);
-    std::string descr5 = prefix + "Draw Planner SimplicialComplex";
-    checkbox = glui->add_checkbox_to_panel(panel, descr5.c_str());
-    AddControl(checkbox,dpsc.c_str());
-    checkbox->set_int_val(_backend->drawPlannerSimplicialComplex.at(i));
-  }
-
-  //AddControl(glui->add_button_to_panel(panel,"Save state"),"save_state");
-  //GLUI_Button* button;
-  //button = glui->add_button_to_panel(panel,">> Save state");
-  //AddControl(button, "save_motion_planner");
-  //button_file_load = glui->add_button_to_panel(panel,">> Load state");
-  //AddControl(button_file_load, "load_motion_planner");
-
-  glui->add_button_to_panel(panel,"Quit",0,(GLUI_Update_CB)exit);
-
-  //browser = new GLUI_FileBrowser(panel, "Loading New State");
-  //browser->set_h(100);
-  //browser->set_w(100);
-  //browser->set_allow_change_dir(1);
-  //browser->fbreaddir("../data/gui");
-
-  panel = glui->add_rollout("Fancy Decorations");
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Coordinate Axes");
-  AddControl(checkbox,"draw_fancy_coordinate_axes");
-  checkbox->set_int_val(_backend->drawAxes);
-
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Coordinate Axes Labels[TODO]");
-  AddControl(checkbox,"draw_fancy_coordinate_axes_labels");
-  checkbox->set_int_val(_backend->drawAxesLabels);
-
-  //checkbox = glui->add_checkbox_to_panel(panel, "Draw Robot");
-  //AddControl(checkbox,"draw_robot");
-  //checkbox->set_int_val(_backend->drawRobot);
-
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Force Field");
-  AddControl(checkbox,"draw_forcefield");
-  checkbox->set_int_val(_backend->drawForceField);
-
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Wrench Field");
-  AddControl(checkbox,"draw_wrenchfield");
-  checkbox->set_int_val(_backend->drawWrenchField);
-
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Force Ellipsoid");
-  AddControl(checkbox,"draw_forceellipsoid");
-  checkbox->set_int_val(_backend->drawForceEllipsoid);
-
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Distance Robot Terrain");
-  AddControl(checkbox,"draw_distance_robot_terrain");
-  checkbox->set_int_val(_backend->drawDistanceRobotTerrain);
-
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw COM Path");
-  AddControl(checkbox,"draw_com_path");
-  checkbox->set_int_val(_backend->drawCenterOfMassPath);
-
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw Robot COM+Skeleton");
-  AddControl(checkbox,"draw_robot_extras");
-  checkbox->set_int_val(_backend->drawRobotExtras);
-
-  checkbox = glui->add_checkbox_to_panel(panel, "Draw IK Constraints");
-  AddControl(checkbox,"draw_ik");
-  checkbox->set_int_val(_backend->drawIKextras);
-
-  UpdateGUI();
-
-//################################################################################
-  //KEYMAPS
-  //add keymaps to GUI
-  //Handle_Keypress: show keymap on -h
-  //Backend::OnCommand: handle the action
-//################################################################################
+  panel = glui->add_rollout("<ForceField>");
 
   GUIState* state = &_backend->state;
 
   for (auto it = state->variables.begin(); it != state->variables.end(); ++it) {
     GUIVariable* v = it->second;
+    std::string descr = v->descr;
     if(v->hasKey()){
       AddToKeymap(v->key.c_str(),v->name.c_str());
+      descr += " [ " + v->key + " ] ";
+    }
+    if(v->type == GUIVariable::Type::CHECKBOX){
+      checkbox = glui->add_checkbox_to_panel(panel, descr.c_str());
+      AddControl(checkbox,v->name.c_str());
+      checkbox->set_int_val(v->active);
     }
   }
+  UpdateGUI();
 
-  AddToKeymap("r","reset");
-  //AddToKeymap("a","advance");
-  //AddToKeymap("m","retreat");
-
-  AddToKeymap("1","draw_forcefield");
-  AddToKeymap("2","draw_wrenchfield");
-  AddToKeymap("3","draw_forceellipsoid");
-  AddToKeymap("4","draw_distance_robot_terrain");
-  AddToKeymap("5","draw_com_path");
-
-  //AddToKeymap("l","toggle_layer");
-
-  AddToKeymap("q","draw_minimal");
-  AddToKeymap("T","toggle_mode");
-  AddToKeymap("s","toggle_simulate",true);
-  AddToKeymap("p","print_config",true);
-  AddToKeymap("g","draw_swept_volume");
-  AddToKeymap("m","draw_milestones");
-  AddToKeymap("n","draw_shortest_path");
-  //AddToKeymap("t","draw_planner_tree_toggle");
-  AddToKeymap("G","draw_planner_simplicial_complex");
-  AddToKeymap("S","make_screenshot");
-
-  AddButton("load_motion_planner");
-  AddButton("save_motion_planner");
-  AddButton("quit");
+  //AddButton("quit");
 
   return true;
 }
@@ -883,35 +607,26 @@ void GLUIForceFieldGUI::AddButton(const char *key){
   }
 }
 
-void GLUIForceFieldGUI::AddToKeymap(const char *key, const char *s, bool baseClass){
+void GLUIForceFieldGUI::AddToKeymap(const char *key, const char *s){
   AnyCollection c;
   std::string type =  "{type:key_down,key:"+std::string(key)+"}";
   bool res=c.read(type.c_str());
   if(res){
     AddCommandRule(c,s,"");
   }
-  std::string descr(s);
-  descr = std::regex_replace(descr, std::regex("_"), " ");
-
-  _keymap[key] = descr;
-
-  if(baseClass){
-    _baseclass_keys[key] = descr;
-  }
-
 }
 
 void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
 {
+  ForceFieldBackend* _backend = static_cast<ForceFieldBackend*>(backend);
+  GUIState* state = &_backend->state;
+
   switch(c) {
     case 'h':
     {
       BaseT::Handle_Keypress(c,x,y);
-
-      std::cout << "--- swept volume" << std::endl;
-      for (Keymap::iterator it=_keymap.begin(); it!=_keymap.end(); ++it){
-        std::cout << it->first << ": " << it->second << '\n';
-      }
+      std::cout << "<forcefield gui>" << std::endl;
+      std::cout << *state << std::endl;
       break;
     }
     case 'S':
@@ -926,12 +641,6 @@ void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
       break;
     }
     default:
-      //for (Keymap::iterator it=_baseclass_keys.begin(); it!=_baseclass_keys.end(); ++it){
-      //  if(c==*it->first){
-      //    BaseT::Handle_Keypress(c,x,y);
-      //    break;
-      //  }
-      //}
       BaseT::Handle_Keypress(c,x,y);
       break;
   }

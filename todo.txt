@@ -263,12 +263,12 @@ infinite force contact. how to selectively activate/deactivate?
 General
 [ ] Simulator: make planner run on separate threads
 [ ] add drawFace/drawEdge to terrain XML file
-[ ] draw functions should be stored in map (string/string) structure to be
+[ ] make objects transparent
+[x] draw functions should be stored in map (string/string) structure to be
 easier accessible in GUI. If we like to add one variable, we should only change
 maybe keybindings and oncommand in GUI. everything else is ideally done
 automatically.
-[ ] have <gui></gui> environment to set variables
-[ ] make objects transparent
+[x] have <gui></gui> environment to set variables
 [x] test RRT for visibility check between two paths
 [x] test on 6 environments: 
   [x] sphere
@@ -301,8 +301,8 @@ designed to show (and who came up with the environment)
 [ ] XML restructioning
   [ ] make xml with default planner settings, which fill in all fields with
   default values and with a default algorithm. 
-  [ ] make xml with default GUI settings. 
-  [ ] let GUI settings be able to set shortcut keys for each setting
+  [x] make xml with default GUI settings. 
+  [x] let GUI settings be able to set shortcut keys for each setting
 
 [ ] visualize all vertices of one onetopic covering
 [ ] check if we can store personal information in a PD::Node during planning.  I.e. store sufficiency and maybe some other stuff there

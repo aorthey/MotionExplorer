@@ -67,9 +67,6 @@ class ForceFieldBackend : public SimTestBackend
 
     void VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength=1.0);
     void VisualizeStartGoal(const Config &p_init, const Config &p_goal);
-    void SetIKConstraints( vector<IKGoal> constraints, string robotname);
-    void SetIKCollisions( vector<int> linksInCollision );
-
     uint getNumberOfPaths();
 
     void VisualizePlannerTree(const SerializedTree &tree);
@@ -78,33 +75,31 @@ class ForceFieldBackend : public SimTestBackend
     void DrawText(int x,int y, std::string s, void* font = GLUT_BITMAP_HELVETICA_18);
     void DrawTextVector(double xpos, double ypos, const char* prefix, Vector &v);
 
-    std::vector<int> showLinks; //hide certain links 
+    //std::vector<int> showLinks; //hide certain links 
+    //std::vector<int> drawPathShortestPath;
+    //std::vector<int> drawPathSweptVolume;
+    //std::vector<int> drawPathMilestones;
+    //std::vector<int> drawPathStartGoal;
+    //std::vector<int> drawPlannerTree;
+    //std::vector<int> drawPlannerSimplicialComplex;
 
-    std::vector<int> drawPathShortestPath;
-    std::vector<int> drawPathSweptVolume;
-    std::vector<int> drawPathMilestones;
-    std::vector<int> drawPathStartGoal;
-    std::vector<int> drawPlannerTree;
-    std::vector<int> drawPlannerSimplicialComplex;
+    //int showSweptVolumes;
+    //int drawController;
+    //int drawContactDistances;
+    //int drawForceEllipsoid;
+    //int drawDistanceRobotTerrain;
+    //int drawCenterOfMassPath;
+    //int drawForceField;
+    //int drawWrenchField;
+    //int drawRobotExtras; 
+    //int drawIKextras;
+    //int drawAxes;
+    //int drawAxesLabels;
 
-    int showSweptVolumes;
-    int drawController;
-    int drawContactDistances;
-    int drawForceEllipsoid;
-    int drawDistanceRobotTerrain;
-    int drawCenterOfMassPath;
-
-    int drawForceField;
-    int drawWrenchField;
-    int drawRobotExtras; 
-    int drawIKextras;
-    int drawAxes;
-    int drawAxesLabels;
-
-    void toggle(int &k){
-      if(k) k=0;
-      else k=1;
-    }
+    //void toggle(int &k){
+    //  if(k) k=0;
+    //  else k=1;
+    //}
 
     int line_x_pos;
     int line_y_offset;
@@ -122,7 +117,7 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
     GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _world);
     virtual bool Initialize();
     //virtual bool OnCommand(const string& cmd,const string& args);
-    void AddToKeymap(const char *key, const char *s, bool baseClass = false);
+    void AddToKeymap(const char *key, const char *s);
     void AddButton(const char *key);
     void browser_control(int control);
 
@@ -133,7 +128,6 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
   private:
     typedef std::map<const char *, std::string> Keymap;
     Keymap _keymap;
-    Keymap _baseclass_keys;
     GLUI_Panel* panel;
     GLUI_Checkbox* checkbox;
     GLUI_FileBrowser *browser;
