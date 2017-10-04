@@ -39,13 +39,13 @@ void PlannerBackend::Start(){
 bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
   if(cmd=="hierarchy_next"){
-    planners.at(active_planner)->NextPath();
+    planners.at(active_planner)->Next();
   }else if(cmd=="hierarchy_previous"){
-    planners.at(active_planner)->PreviousPath();
+    planners.at(active_planner)->Previous();
   }else if(cmd=="hierarchy_down"){
-    planners.at(active_planner)->ExpandPath();
+    planners.at(active_planner)->Expand();
   }else if(cmd=="hierarchy_up"){
-    planners.at(active_planner)->CollapsePath();
+    planners.at(active_planner)->Collapse();
   }else if(cmd=="draw_planner_bounding_box"){
     state("draw_planner_bounding_box").toggle();
   }else if(cmd=="next_planner"){

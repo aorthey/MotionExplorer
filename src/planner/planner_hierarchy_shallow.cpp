@@ -5,7 +5,7 @@ ShallowHierarchicalMotionPlanner::ShallowHierarchicalMotionPlanner(RobotWorld *w
   HierarchicalMotionPlanner(world_,input_)
 {
 }
-void ShallowHierarchicalMotionPlanner::ExpandPath(){
+void ShallowHierarchicalMotionPlanner::Expand(){
   if(!active) return;
 
   if(current_level==0){
@@ -39,7 +39,7 @@ void ShallowHierarchicalMotionPlanner::ExpandPath(){
     }
   }
 }
-void ShallowHierarchicalMotionPlanner::CollapsePath(){
+void ShallowHierarchicalMotionPlanner::Collapse(){
   if(!active) return;
 
   if(current_level>0){
@@ -48,15 +48,16 @@ void ShallowHierarchicalMotionPlanner::CollapsePath(){
   }
 }
 
-void ShallowHierarchicalMotionPlanner::NextPath(){
+void ShallowHierarchicalMotionPlanner::Next(){
 }
-void ShallowHierarchicalMotionPlanner::PreviousPath(){
+void ShallowHierarchicalMotionPlanner::Previous(){
 }
 
 void ShallowHierarchicalMotionPlanner::DrawGL(double x_, double y_){
   if(!active) return;
 }
 void ShallowHierarchicalMotionPlanner::DrawGL(const GUIState& state){
+  if(!active) return;
 
   uint ridx = input.robot_idx;
   Robot* robot = world->robots[ridx];
