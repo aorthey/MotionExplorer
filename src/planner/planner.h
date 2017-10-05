@@ -55,6 +55,9 @@ class MotionPlanner{
 
     bool active;
 
+    void CreateShallowHierarchy();
+    void CreateSinglePathHierarchy();
+
     RobotWorld *world;
     PlannerInput input;
     //PlannerOutput output;

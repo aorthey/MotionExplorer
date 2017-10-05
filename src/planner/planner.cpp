@@ -5,9 +5,9 @@
 #include "planner/strategy_geometric.h"
 #include "drawMotionPlanner.h"
 
-#include "elements/pathspace.h"
-#include "elements/pathspace_atomic.h"
-#include "elements/pathspace_singleton_ompl.h"
+#include "pathspace/pathspace.h"
+#include "pathspace/pathspace_atomic.h"
+#include "pathspace/pathspace_singleton_ompl.h"
 #include <KrisLibrary/utils/stringutils.h>
 
 using namespace GLDraw;
@@ -35,83 +35,78 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   //choose strategy
   //################################################################################
   std::string algorithm = input.name_algorithm;
+  hierarchy = new Hierarchy<PathSpace*>();
+
   if(StartsWith(algorithm.c_str(),"hierarchical")) {
-    if(algorithm.size()<14){
-      RaiseError();
-    }else{
-      std::string subalgorithm = algorithm.substr(13,algorithm.size()-13);
-
-    }
+    CreateSinglePathHierarchy();
   }else if(StartsWith(algorithm.c_str(),"ompl")) {
-    Config p_init = input.q_init;
-    Config p_goal = input.q_goal;
-
-    int idx = input.robot_idx;
-    //Robot* robot = world->robots[idx];
-
-    //two levels: 
-    //  (1) space of all continuous paths
-    hierarchy = new Hierarchy<PathSpace*>();
-    hierarchy->AddLevel( idx, p_init, p_goal);
-    //  (2) a single solution path (if it exists)
-    hierarchy->AddLevel( idx, p_init, p_goal);
-    hierarchy->AddRootNode( new PathSpaceSingletonOMPL(world, input) );
-
+    CreateShallowHierarchy();
   }else{
     RaiseError();
   }
+}
 
+void MotionPlanner::CreateSinglePathHierarchy(){
+  std::string subalgorithm = input.name_algorithm.substr(13,input.name_algorithm.size()-13);
 
+  std::vector<int> idxs = input.robot_idxs;
+  Config p_init = input.q_init;
+  Config p_goal = input.q_goal;
 
+  for(uint k = 0; k < input.layers.size(); k++){
+    int level = input.layers.at(k).level;
+    int ii = input.layers.at(k).inner_index;
+    int io = input.layers.at(k).outer_index;
+    Robot* ri = world->robots[ii];
+    Robot* ro = world->robots[io];
 
-  //################################################################################
-  //
-  //################################################################################
-  //std::vector<int> idxs = input.robot_idxs;
-  //Config p_init = input.q_init;
-  //Config p_goal = input.q_goal;
-  //assert(p_init.size() == p_goal.size());
+    Config qi = p_init; qi.resize(ri->q.size());
+    Config qg = p_goal; qg.resize(ri->q.size());
 
+    if(k==0) hierarchy->AddLevel( ii, io, qi, qg);
 
-  //for(uint k = 0; k < input.layers.size(); k++){
-  //  int level = input.layers.at(k).level;
-  //  int ii = input.layers.at(k).inner_index;
-  //  int io = input.layers.at(k).outer_index;
-  //  Robot* ri = world->robots[ii];
-  //  Robot* ro = world->robots[io];
+    hierarchy->AddLevel( ii, io, qi, qg);
+  }
 
-  //  Config qi = p_init; qi.resize(ri->q.size());
-  //  Config qg = p_goal; qg.resize(ri->q.size());
-
-  //  hierarchy->AddLevel( ii, io, qi, qg);
-  //}
-
-  ////remove all nested robots except the original one
+  //remove all nested robots except the original one
   //for(uint k = 0; k < idxs.size()-1; k++){
   //  output.removable_robot_idxs.push_back(idxs.at(k));
   //}
 
-  //std::cout << std::string(80, '-') << std::endl;
-  //std::cout << " Planner: " << std::endl;
-  //std::cout << std::string(80, '-') << std::endl;
-  //std::cout << " Robots  " << std::endl;
-  //for(uint k = 0; k < hierarchy->NumberLevels(); k++){
-  //  uint ii = hierarchy->GetInnerRobotIdx(k);
-  //  uint io = hierarchy->GetOuterRobotIdx(k);
-  //  Robot* ri = world->robots[ii];
-  //  Robot* ro = world->robots[io];
-  //  std::cout << " Level" << k << std::endl;
-  //  std::cout << "   Robot (inner) : idx " << ii << " name " << ri->name << std::endl;
-  //  std::cout << "   Robot (outer) : idx " << io << " name " << ro->name << std::endl;
-  //  Config qi = hierarchy->GetInitConfig(k);
-  //  Config qg = hierarchy->GetGoalConfig(k);
-  //  std::cout << "      qinit      : " << qi << std::endl;
-  //  std::cout << "      qgoal      : " << qg << std::endl;
-  //}
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << " Planner: " << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << " Robots  " << std::endl;
+  for(uint k = 0; k < hierarchy->NumberLevels(); k++){
+    uint ii = hierarchy->GetInnerRobotIdx(k);
+    uint io = hierarchy->GetOuterRobotIdx(k);
+    Robot* ri = world->robots[ii];
+    Robot* ro = world->robots[io];
+    std::cout << " Level" << k << std::endl;
+    std::cout << "   Robot (inner) : idx " << ii << " name " << ri->name << std::endl;
+    std::cout << "   Robot (outer) : idx " << io << " name " << ro->name << std::endl;
+    Config qi = hierarchy->GetInitConfig(k);
+    Config qg = hierarchy->GetGoalConfig(k);
+    std::cout << "      qinit      : " << qi << std::endl;
+    std::cout << "      qgoal      : " << qg << std::endl;
+  }
+  std::cout << subalgorithm << std::endl;
+
+  hierarchy->AddRootNode( new PathSpace(world, input) );
+  exit(0);
 }
-//const PlannerOutput& MotionPlanner::GetOutput(){
-//  return output;
-//}
+void MotionPlanner::CreateShallowHierarchy(){
+  Config p_init = input.q_init;
+  Config p_goal = input.q_goal;
+  int idx = input.robot_idx;
+
+  //  (1) space of all continuous paths
+  hierarchy->AddLevel( idx, p_init, p_goal);
+  //  (2) a single solution path (if it exists)
+  hierarchy->AddLevel( idx, p_init, p_goal);
+  hierarchy->AddRootNode( new PathSpaceSingletonOMPL(world, input) );
+}
+
 const PlannerInput& MotionPlanner::GetInput(){
   return input;
 }
@@ -207,7 +202,7 @@ void MotionPlanner::Expand(){
 
     PathSpace* P = hierarchy->GetNodeContent(current_path);
     if(P->isAtomic()){
-      std::cout << "Error: Path could not be expanded" << std::endl;
+      std::cout << "Error: Selected Path Space is Atomic." << std::endl;
     }else{
       std::vector<PathSpace*> Pvec = P->Decompose();
       if(Pvec.size()>0){
@@ -219,14 +214,6 @@ void MotionPlanner::Expand(){
         current_path.push_back(current_level_node);
       }
     }
-
-    //if(solve(current_path)){
-    ////if(solve(current_path)){
-    //  //start from node 0 if existing
-    //  current_level++;
-    //  current_level_node=0;
-    //  current_path.push_back(current_level_node);
-    //}
   }
   UpdateHierarchy();
 }

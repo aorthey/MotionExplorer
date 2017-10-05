@@ -25,10 +25,6 @@ class PathSpace{
 
   protected:
 
-    //ob::PlannerDataPtr pd; //contains local copy of PD
-
-    //CSpaceOMPL *cspace; 
-
     std::vector<Config> vantage_path;
     std::vector<Config> vertices;
 
