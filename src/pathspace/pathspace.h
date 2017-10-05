@@ -21,8 +21,14 @@ class PathSpace{
     //be a covering.
     virtual std::vector<PathSpace*> Decompose() = 0;
     virtual void DrawGL(const GUIState&) = 0;
-    virtual bool isAtomic() = 0;
+    virtual bool isAtomic() const = 0;
 
+    RobotWorld* GetWorldPtr();
+    PlannerInput& GetPlannerInput();
+
+    SweptVolume& GetSweptVolume(Robot *robot);
+
+    friend std::ostream& operator<< (std::ostream& out, const PathSpace& space);
   protected:
 
     std::vector<Config> vantage_path;
@@ -31,7 +37,6 @@ class PathSpace{
     RobotWorld *world;
     PlannerInput input;
 
-    SweptVolume& GetSweptVolume(Robot *robot);
     SweptVolume *sv;
 };
 

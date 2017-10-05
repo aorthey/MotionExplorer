@@ -16,5 +16,5 @@ class PathSpaceOnetopicCover: public PathSpace{
     PathSpaceOnetopicCover(RobotWorld *world_, PlannerInput& input_);
     virtual std::vector<PathSpace*> Decompose();
     virtual void DrawGL(const GUIState&);
-    virtual bool isAtomic();
+    virtual bool isAtomic() const;
 };

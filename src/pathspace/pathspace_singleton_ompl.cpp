@@ -4,14 +4,13 @@
 #include "planner/cspace_factory.h"
 #include "planner/strategy_geometric.h"
 #include "drawMotionPlanner.h"
-#include <KrisLibrary/utils/stringutils.h>
 
 PathSpaceSingletonOMPL::PathSpaceSingletonOMPL(RobotWorld *world_, PlannerInput& input_):
   PathSpace(world_, input_)
 {
 }
 
-bool PathSpaceSingletonOMPL::isAtomic(){
+bool PathSpaceSingletonOMPL::isAtomic() const{
   return false;
 }
 std::vector<PathSpace*> PathSpaceSingletonOMPL::Decompose(){

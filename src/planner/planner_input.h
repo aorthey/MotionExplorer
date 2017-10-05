@@ -32,6 +32,9 @@ class PlannerInput{
 
     uint robot_idx;
 
+    uint robot_inner_idx;
+    uint robot_outer_idx;
+
     int freeFloating;
 
     Config se3min;

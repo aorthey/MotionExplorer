@@ -8,6 +8,9 @@
 #include "pathspace/pathspace.h"
 #include "pathspace/pathspace_atomic.h"
 #include "pathspace/pathspace_singleton_ompl.h"
+#include "pathspace/pathspace_onetopic_cover.h"
+#include "pathspace/decorator.h"
+#include "pathspace/decorator_sweptvolume_path.h"
 #include <KrisLibrary/utils/stringutils.h>
 
 using namespace GLDraw;
@@ -47,7 +50,6 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
 }
 
 void MotionPlanner::CreateSinglePathHierarchy(){
-  std::string subalgorithm = input.name_algorithm.substr(13,input.name_algorithm.size()-13);
 
   std::vector<int> idxs = input.robot_idxs;
   Config p_init = input.q_init;
@@ -90,10 +92,16 @@ void MotionPlanner::CreateSinglePathHierarchy(){
     std::cout << "      qinit      : " << qi << std::endl;
     std::cout << "      qgoal      : " << qg << std::endl;
   }
-  std::cout << subalgorithm << std::endl;
 
-  //hierarchy->AddRootNode( new PathSpace(world, input) );
-  exit(0);
+  int ii = input.layers.at(0).inner_index;
+  int io = input.layers.at(0).outer_index;
+  input.robot_inner_idx = ii;
+  input.robot_outer_idx = io;
+  std::string subalgorithm = input.name_algorithm.substr(13,input.name_algorithm.size()-13);
+  input.name_algorithm = subalgorithm;
+  input.robot_idx = ii;
+
+  hierarchy->AddRootNode( new PathSpaceOnetopicCover(world, input) );
 }
 void MotionPlanner::CreateShallowHierarchy(){
   Config p_init = input.q_init;
@@ -104,6 +112,8 @@ void MotionPlanner::CreateShallowHierarchy(){
   hierarchy->AddLevel( idx, p_init, p_goal);
   //  (2) a single solution path (if it exists)
   hierarchy->AddLevel( idx, p_init, p_goal);
+
+  //let root node by a path space, returning one path as decomposition
   hierarchy->AddRootNode( new PathSpaceSingletonOMPL(world, input) );
 }
 
@@ -306,8 +316,25 @@ void MotionPlanner::DrawGLScreen(double x_, double y_){
 
 void MotionPlanner::DrawGL(const GUIState& state){
   if(!active) return;
-  PathSpace* PS = hierarchy->GetNodeContent(current_path);
-  PS->DrawGL(state);
+
+  uint N = hierarchy->NumberNodesOnLevel(current_level);
+
+  PathSpace* P = new PathSpaceDecoratorSweptVolumePath( hierarchy->GetNodeContent(current_path) );
+  P->DrawGL(state);
+  std::cout << *P << std::endl;
+
+  for(uint k = 0; k < N; k++){
+    if(k==current_level_node) continue;
+    current_path.at(current_path.size()-1) = k;
+    PathSpace* Pk = hierarchy->GetNodeContent(current_path);
+    Pk->DrawGL(state);
+  }
+
+  //reset
+  if(current_path.size()>0){
+    current_path.at(current_path.size()-1) = current_level_node;
+  }
+
 }
 
 

@@ -6,7 +6,7 @@ PathSpaceAtomic::PathSpaceAtomic(RobotWorld *world_, PlannerInput& input_):
   PathSpace(world_, input_)
 {
 }
-bool PathSpaceAtomic::isAtomic(){
+bool PathSpaceAtomic::isAtomic() const{
   return true;
 }
 
@@ -21,16 +21,14 @@ void PathSpaceAtomic::DrawGL(const GUIState& state){
   const Config qi_in = input.q_init;
   const Config qg_in = input.q_goal;
 
-  GLColor lightGrey(0.4,0.4,0.4,0.2);
   GLColor lightGreen(0.2,0.9,0.2,0.2);
   GLColor lightRed(0.9,0.2,0.2,0.2);
+  GLColor magenta(0.9,0.1,0.9,0.5);
   GLDraw::drawRobotAtConfig(robot, qi_in, lightGreen);
   GLDraw::drawRobotAtConfig(robot, qg_in, lightRed);
 
   if(vantage_path.size()>0){
-    GLDraw::drawPath(vantage_path, lightGreen, 20);
-    const SweptVolume& sv = GetSweptVolume(robot);
-    GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
+    GLDraw::drawPath(vantage_path, magenta, 10);
   }
 }
 
