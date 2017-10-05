@@ -43,8 +43,8 @@ class MotionPlanner{
     //virtual std::vector< std::vector<Config> > GetSiblingPaths();
     void RaiseError();
 
-    int current_level;
-    int current_level_node;
+    uint current_level;
+    uint current_level_node;
     std::vector<int> current_path;
 
     //PathSpaceHierarchyPtr hierarchy;
