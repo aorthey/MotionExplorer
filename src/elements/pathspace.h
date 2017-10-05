@@ -1,42 +1,41 @@
 #pragma once
 
 #include "planner/cspace.h"
+#include "gui_state.h"
+#include "elements/swept_volume.h"
 #include <ompl/base/PlannerData.h>
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
-
-//this should shadow all those onetopic covers etcetera. I.e. the best would be
-//to just have one abstract pathspace, and then build a onetopicPathspace
-//etcetera.
-//
-// pathspaces should differ in the way they are decomposed (i.e. which criteria
-// will we use for a decomposition?). 
 
 class PathSpace{
   public:
 
-    PathSpace();
-    PathSpace( ob::PlannerDataPtr pd_, CSpaceOMPL *cspace_);
+    PathSpace(RobotWorld *world_, PlannerInput& input_);
 
     std::vector<Config> GetShortestPath();
     std::vector<Config> GetVertices();
     void SetShortestPath(std::vector<Config>);
     void SetVertices(std::vector<Config>);
 
-    void AddPlannerOutput(const PlannerOutput& output);
-
     //split the pathspace up into smaller pieces.
     //Note: this decomposition does not need to be a partition, but could also
     //be a covering.
-    //virtual std::vector<PathSpace*> Decompose();
+    virtual std::vector<PathSpace*> Decompose() = 0;
+    virtual void DrawGL(const GUIState&) = 0;
+    virtual bool isAtomic() = 0;
 
   protected:
 
-    ob::PlannerDataPtr pd; //contains local copy of PD
+    //ob::PlannerDataPtr pd; //contains local copy of PD
 
-    CSpaceOMPL *cspace; //contains only ptr, but should also contain deep copy
+    //CSpaceOMPL *cspace; 
 
     std::vector<Config> vantage_path;
-
     std::vector<Config> vertices;
+
+    RobotWorld *world;
+    PlannerInput input;
+
+    SweptVolume& GetSweptVolume(Robot *robot);
+    SweptVolume *sv;
 };
 
