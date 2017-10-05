@@ -2,7 +2,6 @@
 #include "gui.h"
 #include "planner/planner.h"
 #include "elements/pathspace.h"
-#include "planner/planner_hierarchy_shallow.h"
 
 class PlannerBackend : public ForceFieldBackend
 {
@@ -11,10 +10,8 @@ class PlannerBackend : public ForceFieldBackend
   protected:
 
     typedef ForceFieldBackend BaseT; 
-
-    std::vector<MotionPlanner<PathSpace>*> planners;
-
-    int active_planner;
+    uint active_planner;
+    std::vector<MotionPlanner*> planners;
 
   public:
 

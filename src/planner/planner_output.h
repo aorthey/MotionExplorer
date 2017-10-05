@@ -42,8 +42,6 @@ class PlannerOutput{
     SwathVolume *swv;
     SimplicialComplex cmplx;
     
-    PathSpace pathspace;
-
     Robot *robot;
 
     std::vector< std::vector< Config >>  paths;

@@ -23,14 +23,17 @@
     <!-- default settings for all algorithms (overwriteable) -->
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.01</epsilongoalregion>
-    <maxplanningtime>5.0</maxplanningtime>
+    <maxplanningtime>1.0</maxplanningtime>
 
-    <algorithm maxplanningtime="0.05">hierarchical:ompl:prmstar</algorithm>
+    <algorithm>ompl:rrt</algorithm>
+    <!--
     <algorithm>ompl:kpiece</algorithm>
     <algorithm>ompl:sst</algorithm>
     <algorithm>ompl:lazyrrt</algorithm>
     <algorithm>ompl:rrt</algorithm>
     <algorithm>ompl:pdst</algorithm>
+    <algorithm maxplanningtime="0.05">hierarchical:ompl:prmstar</algorithm>
+-->
 
     <hierarchy>
       <level inner_index="3" outer_index="4"/>

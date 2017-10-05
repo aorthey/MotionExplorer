@@ -49,22 +49,31 @@ Config Hierarchy<T>::GetGoalConfig( uint level ){
 }
 
 template <class T>
+void Hierarchy<T>::AddRootNode(T content_){
+  level_number_nodes.at(0)=1;
+  root = new Node<T>();
+  root->level = 0;
+  root->id = 0;
+  root->content = content_;
+
+}
+template <class T>
 void Hierarchy<T>::AddLevel( uint idx, Config qi, Config qg ){
   AddLevel(idx, idx, qi, qg);
 }
 template <class T>
 void Hierarchy<T>::AddLevel( uint inner_idx, uint outer_idx, Config qi, Config qg ){
-  if(!root){
-    //level0
-    level_robot_inner_idx.push_back(inner_idx);
-    level_robot_outer_idx.push_back(outer_idx);
-    level_q_init.push_back(qi);
-    level_q_goal.push_back(qg);
-    level_number_nodes.push_back(1);
-    root = new Node<T>();
-    root->level = 0;
-    root->id = 0;
-  }
+  //if(!root){
+  //  //level0
+  //  level_robot_inner_idx.push_back(inner_idx);
+  //  level_robot_outer_idx.push_back(outer_idx);
+  //  level_q_init.push_back(qi);
+  //  level_q_goal.push_back(qg);
+  //  level_number_nodes.push_back(1);
+  //  root = new Node<T>();
+  //  root->level = 0;
+  //  root->id = 0;
+  //}
   level_robot_inner_idx.push_back(inner_idx);
   level_robot_outer_idx.push_back(outer_idx);
   level_q_init.push_back(qi);

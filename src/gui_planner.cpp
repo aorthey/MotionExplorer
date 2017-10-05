@@ -17,14 +17,7 @@ void PlannerBackend::AddPlannerInput(PlannerInput& _in){
     _in.timestep_min = algorithms.at(k).timestep_min;
     _in.timestep_max = algorithms.at(k).timestep_max;
 
-    if(StartsWith(algorithms.at(k).name.c_str(),"hierarchical")) {
-      planners.push_back( new MotionPlanner(world, _in) );
-    } else if(StartsWith(algorithms.at(k).name.c_str(),"ompl")) {
-      planners.push_back( new ShallowHierarchicalMotionPlanner(world, _in) );
-    }else{
-      std::cout << "algorithm " << algorithms.at(k).name << " unknown." << std::endl;
-      exit(1);
-    }
+    planners.push_back( new MotionPlanner(world, _in) );
 
   }
 }
@@ -33,9 +26,9 @@ void PlannerBackend::Start(){
   BaseT::Start();
   drawPoser = 0;
   pose_objects = 0;
-
-
 }
+
+
 bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
   if(cmd=="hierarchy_next"){
@@ -69,7 +62,7 @@ void PlannerBackend::RenderWorld(){
 
   DEBUG_GL_ERRORS()
 
-  MotionPlanner<PathSpace>* planner = planners.at(active_planner);
+  MotionPlanner* planner = planners.at(active_planner);
 
   if(planners.size()>0 && planner->isActive()){
 

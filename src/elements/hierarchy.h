@@ -28,6 +28,7 @@ class Hierarchy{
     void AddLevel( uint idx, Config qi, Config qg );
     void AddLevel( uint inner_idx, uint outer_idx, Config qi, Config qg );
 
+    void AddRootNode(T content_);
     void AddNode( T content_ );
     void AddNode( T content, std::vector<int> path);
     void DeleteNode( std::vector<int> path );
