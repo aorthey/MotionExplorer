@@ -1,7 +1,6 @@
 #pragma once
 #include "gui.h"
 #include "planner/planner.h"
-#include "elements/pathspace.h"
 
 class PlannerBackend : public ForceFieldBackend
 {

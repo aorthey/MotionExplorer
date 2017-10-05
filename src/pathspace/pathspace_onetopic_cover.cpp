@@ -1,21 +1,21 @@
 #include "pathspace_onetopic_cover.h"
 
-PathSpaceOnetopicCover(RobotWorld *world_, PlannerInput& input_):
+PathSpaceOnetopicCover::PathSpaceOnetopicCover(RobotWorld *world_, PlannerInput& input_):
   PathSpace(world_, input_)
 {
 
 }
 
-bool isAtomic(){
+bool PathSpaceOnetopicCover::isAtomic(){
   return false;
 }
 
-std::vector<PathSpace*> Decompose(){
+std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
 
 }
 
 
-void DrawGL(const GUIState&){
+void PathSpaceOnetopicCover::DrawGL(const GUIState&){
 
 }
 

@@ -2,7 +2,6 @@
 #include "elements/swept_volume.h"
 #include "elements/swath_volume.h"
 #include "elements/simplicial_complex.h"
-#include "elements/pathspace.h"
 #include "planner/serialized_tree.h"
 
 class PlannerOutput{

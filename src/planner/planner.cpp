@@ -92,7 +92,7 @@ void MotionPlanner::CreateSinglePathHierarchy(){
   }
   std::cout << subalgorithm << std::endl;
 
-  hierarchy->AddRootNode( new PathSpace(world, input) );
+  //hierarchy->AddRootNode( new PathSpace(world, input) );
   exit(0);
 }
 void MotionPlanner::CreateShallowHierarchy(){

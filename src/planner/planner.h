@@ -3,7 +3,7 @@
 #include "planner/planner_input.h"
 //#include "planner/planner_output.h"
 #include "elements/hierarchy.h"
-#include "elements/pathspace.h"
+#include "pathspace/pathspace.h"
 #include "gui_state.h"
 #include "ViewTree.h"
 
@@ -14,8 +14,6 @@
 #include <vector>
 #include <memory>
 
-//typedef std::shared_ptr<Hierarchy<PathSpace*>> PathSpaceHierarchyPtr;
-
 class MotionPlanner{
 
   public:
@@ -23,7 +21,6 @@ class MotionPlanner{
     explicit MotionPlanner(RobotWorld *world_, PlannerInput& input_);
 
     const PlannerInput& GetInput();
-    //const PlannerOutput& GetOutput();
 
     //folder-like operations on hierarchical path space
     virtual void Expand();
