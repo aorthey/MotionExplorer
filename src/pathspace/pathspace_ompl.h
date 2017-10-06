@@ -7,9 +7,9 @@
 // returns singleton path
 // 
 
-class PathSpaceSingletonOMPL: public PathSpace{
+class PathSpaceOMPL: public PathSpace{
   public:
-    PathSpaceSingletonOMPL(RobotWorld *world_, PlannerInput& input_);
+    PathSpaceOMPL(RobotWorld *world_, PlannerInput& input_);
     virtual std::vector<PathSpace*> Decompose();
     virtual void DrawGL(const GUIState&);
     virtual bool isAtomic() const;

@@ -1,5 +1,3 @@
-
-
 #include "planner/planner.h"
 #include "planner/cspace_factory.h"
 #include "planner/strategy_geometric.h"
@@ -7,7 +5,7 @@
 
 #include "pathspace/pathspace.h"
 #include "pathspace/pathspace_atomic.h"
-#include "pathspace/pathspace_singleton_ompl.h"
+#include "pathspace/pathspace_ompl.h"
 #include "pathspace/pathspace_onetopic_cover.h"
 #include "pathspace/decorator.h"
 #include "pathspace/decorator_sweptvolume_path.h"
@@ -103,7 +101,16 @@ void MotionPlanner::CreateSinglePathHierarchy(){
 
   hierarchy->AddRootNode( new PathSpaceOnetopicCover(world, input) );
 }
+
+/** @brief shallow hierarchy contains two pathspaces. The first path space consists of
+  * the space of all continuous paths between init and goal configuration in the
+  * configuration space of robot[idx]. 
+  * The second path space contains of a single path if there exists a feasible
+  * path or the empty set otherwise. 
+  */
+
 void MotionPlanner::CreateShallowHierarchy(){
+
   Config p_init = input.q_init;
   Config p_goal = input.q_goal;
   int idx = input.robot_idx;
@@ -114,7 +121,7 @@ void MotionPlanner::CreateShallowHierarchy(){
   hierarchy->AddLevel( idx, p_init, p_goal);
 
   //let root node by a path space, returning one path as decomposition
-  hierarchy->AddRootNode( new PathSpaceSingletonOMPL(world, input) );
+  hierarchy->AddRootNode( new PathSpaceOMPL(world, input) );
 }
 
 const PlannerInput& MotionPlanner::GetInput(){
@@ -234,7 +241,11 @@ void MotionPlanner::Collapse(){
     current_path.erase(current_path.end() - 1);
     hierarchy->DeleteNode( current_path );
     current_level--;
-    current_level_node = current_path.back();
+    if(current_path.size()>0){
+      current_level_node = current_path.back();
+    }else{
+      current_level_node = 0;
+    }
   }
   UpdateHierarchy();
 }
@@ -269,26 +280,26 @@ void MotionPlanner::Previous(){
 void MotionPlanner::UpdateHierarchy(){
   if(!active) return;
 
-  uint L = viewTree.GetLevel();
+  uint L = viewHierarchy.GetLevel();
   if(current_level == L ){
   }else{
     if(current_level < L){
-      viewTree.PopLevel();
+      viewHierarchy.PopLevel();
     }else{
       uint idx = hierarchy->GetRobotIdx( current_level );
       Robot *robot = world->robots[idx];
       uint N = hierarchy->NumberNodesOnLevel(current_level);
-      viewTree.PushLevel(N, robot->name);
+      viewHierarchy.PushLevel(N, robot->name);
     }
   }
-  viewTree.UpdateSelectionPath( current_path );
+  viewHierarchy.UpdateSelectionPath( current_path );
   Print();
 }
 void MotionPlanner::Print(){
   if(!active) return;
   hierarchy->Print();
   std::cout << "current level " << current_level << "/" << hierarchy->NumberLevels()-1 << std::endl;
-  std::cout << "viewTree level " << viewTree.GetLevel() << std::endl;
+  std::cout << "viewHierarchy level " << viewHierarchy.GetLevel() << std::endl;
   std::cout << "current node  " << current_level_node << std::endl;
   std::cout << "current path: ";
   for(uint k = 0; k < current_path.size(); k++){
@@ -308,9 +319,9 @@ bool MotionPlanner::isHierarchical(){
 void MotionPlanner::DrawGLScreen(double x_, double y_){
   if(!active) return;
   if(isHierarchical()){
-    viewTree.x = x_;
-    viewTree.y = y_;
-    viewTree.DrawGL();
+    viewHierarchy.x = x_;
+    viewHierarchy.y = y_;
+    viewHierarchy.DrawGL();
   }
 }
 
@@ -321,7 +332,8 @@ void MotionPlanner::DrawGL(const GUIState& state){
 
   PathSpace* P = new PathSpaceDecoratorSweptVolumePath( hierarchy->GetNodeContent(current_path) );
   P->DrawGL(state);
-  std::cout << *P << std::endl;
+
+  //std::cout << *P << std::endl;
 
   for(uint k = 0; k < N; k++){
     if(k==current_level_node) continue;
@@ -329,7 +341,6 @@ void MotionPlanner::DrawGL(const GUIState& state){
     PathSpace* Pk = hierarchy->GetNodeContent(current_path);
     Pk->DrawGL(state);
   }
-
   //reset
   if(current_path.size()>0){
     current_path.at(current_path.size()-1) = current_level_node;

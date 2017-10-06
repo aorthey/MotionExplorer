@@ -23,7 +23,7 @@
     <!-- default settings for all algorithms (overwriteable) -->
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.01</epsilongoalregion>
-    <maxplanningtime>1.0</maxplanningtime>
+    <maxplanningtime>0.1</maxplanningtime>
 
     <algorithm>ompl:rrt</algorithm>
     <algorithm maxplanningtime="0.05">hierarchical:ompl:prmstar</algorithm>

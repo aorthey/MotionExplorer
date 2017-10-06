@@ -5,7 +5,7 @@
 #include "elements/hierarchy.h"
 #include "pathspace/pathspace.h"
 #include "gui_state.h"
-#include "ViewTree.h"
+#include "ViewHierarchy.h"
 
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 #include <Modeling/World.h> //RobotWorld
@@ -48,7 +48,7 @@ class MotionPlanner{
     Hierarchy<PathSpace*> *hierarchy;
     void UpdateHierarchy();
     bool isHierarchical();
-    ViewTree viewTree;
+    ViewHierarchy viewHierarchy;
 
     bool active;
 

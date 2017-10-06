@@ -1,19 +1,19 @@
-#include "pathspace_singleton_ompl.h"
+#include "pathspace_ompl.h"
 #include "pathspace_atomic.h"
 
 #include "planner/cspace_factory.h"
 #include "planner/strategy_geometric.h"
 #include "drawMotionPlanner.h"
 
-PathSpaceSingletonOMPL::PathSpaceSingletonOMPL(RobotWorld *world_, PlannerInput& input_):
+PathSpaceOMPL::PathSpaceOMPL(RobotWorld *world_, PlannerInput& input_):
   PathSpace(world_, input_)
 {
 }
 
-bool PathSpaceSingletonOMPL::isAtomic() const{
+bool PathSpaceOMPL::isAtomic() const{
   return false;
 }
-std::vector<PathSpace*> PathSpaceSingletonOMPL::Decompose(){
+std::vector<PathSpace*> PathSpaceOMPL::Decompose(){
   WorldPlannerSettings worldsettings;
   worldsettings.InitializeDefault(*world);
 
@@ -38,17 +38,17 @@ std::vector<PathSpace*> PathSpaceSingletonOMPL::Decompose(){
   strategy.plan(input, cspace, output);
 
   std::vector<PathSpace*> decomposedspace;
+
   if(output.success){
-    vantage_path = output.GetKeyframes();
     decomposedspace.push_back( new PathSpaceAtomic(world, input) );
-    decomposedspace.at(0)->SetShortestPath( vantage_path );
+    decomposedspace.at(0)->SetShortestPath( output.GetKeyframes()  );
   }else{
     std::cout << "Error: Path could not be expanded" << std::endl;
   }
   return decomposedspace;
 
 }
-void PathSpaceSingletonOMPL::DrawGL(const GUIState& state){
+void PathSpaceOMPL::DrawGL(const GUIState& state){
   uint ridx = input.robot_idx;
   Robot* robot = world->robots[ridx];
   const Config qi = input.q_init;
