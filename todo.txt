@@ -299,8 +299,8 @@ HPlanner
  [ ] position goes through wall in L.
  [ ] split fibrebundles up into checker and integrator. put them into subfolders.
  remove the planneradaptor parts (are deprecated)
- [ ] remove serialized tree once and for all
  [ ] new ViewTree to visualize a pathspace exploration
+ [ ] remove serialized tree once and for all
  [ ] multiple restarts of RRT produce same results. reseed?
  [ ] PlannerInput -> AlgorithmInput
  

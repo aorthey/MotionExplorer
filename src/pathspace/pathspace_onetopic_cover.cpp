@@ -69,7 +69,6 @@ void PathSpaceOnetopicCover::DrawGL(const GUIState&){
 
   GLDraw::drawRobotAtConfig(robot, qi_in, lightGreen);
   GLDraw::drawRobotAtConfig(robot, qg_in, lightRed);
-  std::cout << "ONETOPIC" << std::endl;
 
   if(vantage_path.size()>0){
     //GLDraw::drawPath(vantage_path, magenta, 20);

@@ -7,7 +7,10 @@ struct Layer{
   int level;
   int inner_index;
   int outer_index;
+  Config q_init;
+  Config q_goal;
   bool isInnerOuter;
+  //for each layer, put the next lower layer. 
 };
 
 class PlannerInput{
