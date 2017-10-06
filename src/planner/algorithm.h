@@ -3,11 +3,11 @@
 #include "planner_output.h"
 #include "cspace.h"
 
-class Strategy{
+class Algorithm{
   public:
     virtual void plan( const PlannerInput &input, CSpaceOMPL *cspace, PlannerOutput &output) = 0;
 
   protected:
-    Strategy();
+    Algorithm();
 };
 

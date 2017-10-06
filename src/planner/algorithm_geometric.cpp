@@ -1,4 +1,4 @@
-#include "planner/strategy_geometric.h"
+#include "planner/algorithm_geometric.h"
 #include "elements/topological_graph.h"
 #include "algorithms/onetopic_reduction.h"
 
@@ -27,11 +27,11 @@ static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInf
   //obj->setCostThreshold(ob::Cost(0));
   return obj;
 }
-StrategyGeometric::StrategyGeometric()
+AlgorithmGeometric::AlgorithmGeometric()
 {
   onetopic = true;
 }
-void StrategyGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspace, PlannerOutput &output)
+void AlgorithmGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspace, PlannerOutput &output)
 {
   if(!input.exists) return;
 

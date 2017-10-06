@@ -34,6 +34,14 @@
     <algorithm>ompl:rrt</algorithm>
     <algorithm>ompl:pdst</algorithm>
     <algorithm maxplanningtime="0.05">hierarchical:ompl:prmstar</algorithm>
+    <algorithm name="ompl:rrt">
+      <maxplanningtime>0.1</maxplanningtime>
+      <hierarchy>
+        <level inner_index="3" outer_index="4"/>
+        <level inner_index="1" outer_index="0"/>
+        <level inner_index="0"/>
+      </hierarchy>
+    </algorithm>
 -->
 
     <hierarchy>

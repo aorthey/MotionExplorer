@@ -48,7 +48,6 @@ class MotionPlanner{
     Hierarchy<PathSpace*> *hierarchy;
     void UpdateHierarchy();
     bool isHierarchical();
-    ViewHierarchy viewHierarchy;
 
     bool active;
 
@@ -57,7 +56,7 @@ class MotionPlanner{
 
     RobotWorld *world;
     PlannerInput input;
-    //PlannerOutput output;
+    ViewHierarchy viewHierarchy;
 
 };
 

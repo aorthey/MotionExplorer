@@ -300,5 +300,7 @@ HPlanner
  [ ] split fibrebundles up into checker and integrator. put them into subfolders.
  remove the planneradaptor parts (are deprecated)
  [ ] remove serialized tree once and for all
- [ ] ViewTree
+ [ ] new ViewTree to visualize a pathspace exploration
+ [ ] multiple restarts of RRT produce same results. reseed?
+ [ ] PlannerInput -> AlgorithmInput
  

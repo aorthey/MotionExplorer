@@ -2,7 +2,7 @@
 #include "pathspace_atomic.h"
 
 #include "planner/cspace_factory.h"
-#include "planner/strategy_geometric.h"
+#include "planner/algorithm_geometric.h"
 #include "drawMotionPlanner.h"
 
 PathSpaceOMPL::PathSpaceOMPL(RobotWorld *world_, PlannerInput& input_):
@@ -31,11 +31,11 @@ std::vector<PathSpace*> PathSpaceOMPL::Decompose(){
 
   cspace->print();
 
-  StrategyGeometric strategy;
-  strategy.DisableOnetopicReduction();
+  AlgorithmGeometric algorithm;
+  algorithm.DisableOnetopicReduction();
 
   PlannerOutput output;
-  strategy.plan(input, cspace, output);
+  algorithm.plan(input, cspace, output);
 
   std::vector<PathSpace*> decomposedspace;
 

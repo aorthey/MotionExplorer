@@ -1,6 +1,5 @@
 #include "planner/planner.h"
 #include "planner/cspace_factory.h"
-#include "planner/strategy_geometric.h"
 #include "drawMotionPlanner.h"
 
 #include "pathspace/pathspace.h"
@@ -32,9 +31,6 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
     exit(1);
   }
 
-  //################################################################################
-  //choose strategy
-  //################################################################################
   std::string algorithm = input.name_algorithm;
   hierarchy = new Hierarchy<PathSpace*>();
 

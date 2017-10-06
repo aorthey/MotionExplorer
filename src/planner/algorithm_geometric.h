@@ -1,5 +1,5 @@
 #pragma once
-#include "strategy.h"
+#include "algorithm.h"
 
 //#include <boost/program_options.hpp>
 #include <omplapp/apps/SE3RigidBodyPlanning.h>
@@ -12,11 +12,11 @@ namespace oa = ompl::app;
 namespace ot = ompl::tools;
 
 
-class StrategyGeometric: public Strategy{
+class AlgorithmGeometric: public Algorithm{
   public:
     virtual void plan( const PlannerInput &input, CSpaceOMPL *cspace, PlannerOutput &output);
 
-    StrategyGeometric();
+    AlgorithmGeometric();
 
     void DisableOnetopicReduction(){
       onetopic=false;

@@ -2,7 +2,7 @@
 #include "pathspace_atomic.h"
 #include "drawMotionPlanner.h"
 #include "planner/cspace_factory.h"
-#include "planner/strategy_geometric.h"
+#include "planner/algorithm_geometric.h"
 
 PathSpaceOnetopicCover::PathSpaceOnetopicCover(RobotWorld *world_, PlannerInput& input_):
   PathSpace(world_, input_)
@@ -41,9 +41,9 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   //  return false;
   //}
 
-  StrategyGeometric strategy;
+  AlgorithmGeometric algorithm;
   PlannerOutput output;
-  strategy.plan(input, cspace_i, output);
+  algorithm.plan(input, cspace_i, output);
 
   std::vector<PathSpace*> decomposedspace;
 
