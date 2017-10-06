@@ -8,13 +8,10 @@ PlannerBackend::PlannerBackend(RobotWorld *world) :
 }
 
 void PlannerBackend::AddPlannerInput(PlannerMultiInput& _in){
-  //std::vector<PlannerInputAlgorithm> algorithms = _in.algorithms;
-
   for(uint k = 0; k < _in.inputs.size(); k++){
     std::cout << *_in.inputs.at(k) << std::endl;
     planners.push_back( new MotionPlanner(world, *_in.inputs.at(k)) );
   }
-  exit(0);
 }
 
 void PlannerBackend::Start(){

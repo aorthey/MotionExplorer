@@ -82,7 +82,7 @@ bool PlannerMultiInput::load(TiXmlElement *node){
 bool PlannerInput::load(TiXmlElement *node)
 {
   CheckNodeName(node, "plannersettings");
-  TiXmlElement* plannersettings = node;//FindSubNode(node, "plannersettings");
+  TiXmlElement* plannersettings = node;
 
   if(!plannersettings){
     std::cout << "world xml file has no plannersettings" << std::endl;
@@ -115,26 +115,8 @@ bool PlannerInput::load(TiXmlElement *node)
   }
   GetStreamText(node_freeFloating) >> freeFloating;
 
-  //GetStreamText(node_max_planning_time) >> max_planning_time;
-  //GetStreamText(node_epsilon_goalregion) >> epsilon_goalregion;
-
   GetStreamAttribute(node_se3min,"config")  >> se3min;
   GetStreamAttribute(node_se3max,"config")  >> se3max;
-
-  //TiXmlElement* node_algorithm = FindFirstSubNode(plannersettings, "algorithm");
-
-  //while(node_algorithm!=NULL){
-  //  PlannerInputAlgorithm input_algorithm;
-  //  GetStreamText(node_algorithm) >> input_algorithm.name;
-
-  //  GetStreamAttributeDefaultDouble(node_algorithm,"maxplanningtime",max_planning_time)  >> input_algorithm.max_planning_time;
-  //  GetStreamAttributeDefaultDouble(node_algorithm,"epsilongoalregion",epsilon_goalregion)  >> input_algorithm.epsilon_goalregion;
-  //  GetStreamAttributeDefaultDouble(node_algorithm,"timestepmin",timestep_min)  >> input_algorithm.timestep_min;
-  //  GetStreamAttributeDefaultDouble(node_algorithm,"timestepmax",timestep_max)  >> input_algorithm.timestep_max;
-
-  //  algorithms.push_back(input_algorithm);
-  //  node_algorithm = FindNextSiblingNode(node_algorithm, "algorithm");
-  //}
 
   TiXmlElement* node_robot = FindSubNode(plannersettings, "robot");
   if(node_robot){
@@ -196,10 +178,6 @@ std::ostream& operator<< (std::ostream& out, const PlannerInput& pin)
   out << "  dq_goal          : " << pin.dq_goal << std::endl;
   out << "SE3_min            : " << pin.se3min << std::endl;
   out << "SE3_max            : " << pin.se3max << std::endl;
-  //out << "algorithm          : " << pin.name_algorithm << std::endl;
-  //for(uint k = 0; k < pin.algorithms.size(); k++){
-  //  out << "algorithm          : " << pin.algorithms.at(k) << std::endl;
-  //}
   out << "algorithm          : " << pin.name_algorithm << std::endl;
   out << "discr timestep     : [" << pin.timestep_min << "," << pin.timestep_max << "]" << std::endl;
   out << "max planning time  : " << pin.max_planning_time << " (seconds)" << std::endl;

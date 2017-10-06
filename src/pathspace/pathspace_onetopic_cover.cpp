@@ -21,8 +21,8 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
 
   CSpaceFactory factory(input);
 
-  uint inner_index = input.robot_inner_idx;
-  uint outer_index = input.robot_outer_idx;
+  uint inner_index = input.layers.at(0).inner_index;
+  uint outer_index = input.layers.at(0).outer_index;
 
   Robot* robot_inner = world->robots[inner_index];
 
@@ -37,12 +37,11 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   //}else if(level==1){
   //  std::vector<Config> path_constraint = node->content.path;
   //  cspace_i = factory.MakeGeometricCSpacePathConstraintRollInvariance(robot_inner, cspace_klampt_i, path_constraint);
-  //}else{
-  //  return false;
-  //}
 
   AlgorithmGeometric algorithm;
   PlannerOutput output;
+  output.robot_idx = inner_index;
+  input.robot_idx = inner_index;
   algorithm.plan(input, cspace_i, output);
 
   std::vector<PathSpace*> decomposedspace;

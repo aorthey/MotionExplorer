@@ -10,14 +10,6 @@ struct Layer{
   bool isInnerOuter;
 };
 
-struct PlannerInputAlgorithm{
-  double epsilon_goalregion;
-  double max_planning_time;
-  double timestep_min;
-  double timestep_max;
-  std::string name;
-};
-
 class PlannerInput{
   public:
     //general input for any planner method (fixed)
@@ -45,8 +37,6 @@ class PlannerInput{
     double epsilon_goalregion;
     double max_planning_time;
     double timestep_min, timestep_max;
-
-    //std::vector<PlannerInputAlgorithm> algorithms;
 
     //input for hierarchical planner methods
     std::vector<int> robot_idxs;
