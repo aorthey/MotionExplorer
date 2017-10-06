@@ -33,19 +33,9 @@ AlgorithmGeometric::AlgorithmGeometric()
 }
 void AlgorithmGeometric::plan( const PlannerInput &input, CSpaceOMPL *cspace, PlannerOutput &output)
 {
-  if(!input.exists) return;
-
   output.q_init = input.q_init;
   output.q_goal= input.q_goal;
   output.name_algorithm = input.name_algorithm;
-
-  //should be outsourced to some <gui> method
-  output.drawTree = input.drawTree;
-  output.drawSimplicialComplex = input.drawSimplicialComplex;
-  output.drawSweptVolume = input.drawSweptVolume;
-  output.drawMilestones = input.drawMilestones;
-  output.drawStartGoal = input.drawStartGoal;
-  output.drawShortestPath = input.drawShortestPath;
 
   Config p_init = input.q_init;
   Config p_goal = input.q_goal;

@@ -15,7 +15,7 @@ class PlannerBackend : public ForceFieldBackend
   public:
 
     PlannerBackend(RobotWorld *world);
-    virtual void AddPlannerInput(PlannerInput& _in);
+    virtual void AddPlannerInput(PlannerMultiInput& _in);
     virtual void Start();
     virtual bool OnCommand(const string& cmd,const string& args);
     virtual void RenderWorld();
@@ -30,7 +30,7 @@ class GLUIPlannerGUI: public GLUIForceFieldGUI
   public:
     typedef GLUIForceFieldGUI BaseT;
     GLUIPlannerGUI(GenericBackendBase* _backend,RobotWorld* _world);
-    void AddPlannerInput(PlannerInput& _in);
+    void AddPlannerInput(PlannerMultiInput& _in);
     virtual bool Initialize();
 
 };

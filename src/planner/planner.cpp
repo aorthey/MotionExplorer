@@ -20,15 +20,10 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   current_level_node = 0;
   this->world->InitCollisions();
 
-  if(!input.exists){
-    std::cout << "No Planner Settings founds." << std::endl;
-    active = false;
-    return;
-  }
-
   if(!input.freeFloating){
     std::cout << " planner works only with freefloating robots right now x__X;;" << std::endl;
-    exit(1);
+    active = false;
+    return;
   }
 
   std::string algorithm = input.name_algorithm;
@@ -39,7 +34,8 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   }else if(StartsWith(algorithm.c_str(),"ompl")) {
     CreateShallowHierarchy();
   }else{
-    RaiseError();
+    active = false;
+    //RaiseError();
   }
 }
 

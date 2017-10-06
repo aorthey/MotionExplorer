@@ -7,19 +7,14 @@ PlannerBackend::PlannerBackend(RobotWorld *world) :
   active_planner=0;
 }
 
-void PlannerBackend::AddPlannerInput(PlannerInput& _in){
-  std::vector<PlannerInputAlgorithm> algorithms = _in.algorithms;
+void PlannerBackend::AddPlannerInput(PlannerMultiInput& _in){
+  //std::vector<PlannerInputAlgorithm> algorithms = _in.algorithms;
 
-  for(uint k = 0; k < algorithms.size(); k++){
-    _in.name_algorithm = algorithms.at(k).name;
-    _in.max_planning_time = algorithms.at(k).max_planning_time;
-    _in.epsilon_goalregion = algorithms.at(k).epsilon_goalregion;
-    _in.timestep_min = algorithms.at(k).timestep_min;
-    _in.timestep_max = algorithms.at(k).timestep_max;
-
-    planners.push_back( new MotionPlanner(world, _in) );
-
+  for(uint k = 0; k < _in.inputs.size(); k++){
+    std::cout << *_in.inputs.at(k) << std::endl;
+    planners.push_back( new MotionPlanner(world, *_in.inputs.at(k)) );
   }
+  exit(0);
 }
 
 void PlannerBackend::Start(){
@@ -44,11 +39,11 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="next_planner"){
     if(active_planner<planners.size()-1) active_planner++;
     else active_planner = 0;
-    std::cout << planners.at(active_planner)->GetInput() << std::endl;
+    //std::cout << planners.at(active_planner)->GetInput() << std::endl;
   }else if(cmd=="previous_planner"){
     if(active_planner>0) active_planner--;
     else active_planner = planners.size()-1;
-    std::cout << planners.at(active_planner)->GetInput() << std::endl;
+    //std::cout << planners.at(active_planner)->GetInput() << std::endl;
   }else return BaseT::OnCommand(cmd,args);
 
   SendRefresh();
@@ -176,7 +171,7 @@ GLUIPlannerGUI::GLUIPlannerGUI(GenericBackendBase* _backend,RobotWorld* _world):
 {
 }
 
-void GLUIPlannerGUI::AddPlannerInput(PlannerInput& _in){
+void GLUIPlannerGUI::AddPlannerInput(PlannerMultiInput& _in){
   PlannerBackend* _backend = static_cast<PlannerBackend*>(backend);
   _backend->AddPlannerInput(_in);
 }

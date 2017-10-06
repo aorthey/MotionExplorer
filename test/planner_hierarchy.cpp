@@ -6,13 +6,13 @@ int main(int argc,const char** argv) {
 
   EnvironmentLoader env = EnvironmentLoader::from_args(argc, argv);
 
-  PlannerInput in = env.GetPlannerInput();
+  PlannerMultiInput in = env.GetPlannerInput();
 
   GLUIPlannerGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.AddPlannerInput(in);
   gui.SetWindowTitle("HierarchicalMotionPlanner");
 
-  if(!in.exists) env.GetBackendPtr()->state("draw_robot").active = 1;
+  if(in.inputs.empty()) env.GetBackendPtr()->state("draw_robot").active = 1;
 
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "GUI Start" << std::endl;

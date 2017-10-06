@@ -25,9 +25,17 @@
     <epsilongoalregion>0.01</epsilongoalregion>
     <maxplanningtime>0.1</maxplanningtime>
 
-    <algorithm>ompl:rrt</algorithm>
-    <algorithm maxplanningtime="0.05">hierarchical:ompl:prmstar</algorithm>
+    <algorithm name="ompl:rrt"/>
+    <algorithm name="hierarchical:ompl:prmstar">
+      <maxplanningtime>0.05</maxplanningtime>
+      <hierarchy>
+        <level inner_index="3" outer_index="4"/>
+        <level inner_index="1" outer_index="0"/>
+        <level inner_index="0"/>
+      </hierarchy>
+    </algorithm>
     <!--
+    <algorithm maxplanningtime="0.05">hierarchical:ompl:prmstar</algorithm>
     <algorithm>ompl:kpiece</algorithm>
     <algorithm>ompl:sst</algorithm>
     <algorithm>ompl:lazyrrt</algorithm>

@@ -18,14 +18,14 @@ class EnvironmentLoader{
     RobotWorld world;
     PlannerBackendPtr _backend;
     Info info;
-    PlannerInput pin;
+    PlannerMultiInput pin;
 
   public:
     RobotWorld& GetWorld();
     RobotWorld* GetWorldPtr();
     Robot* GetRobotPtr();
     PlannerBackendPtr GetBackendPtr();
-    PlannerInput GetPlannerInput();
+    PlannerMultiInput GetPlannerInput();
 
     static EnvironmentLoader from_args(int argc,const char** argv);
     EnvironmentLoader(const char *xml_file);

@@ -9,6 +9,7 @@ struct Layer{
   int outer_index;
   bool isInnerOuter;
 };
+
 struct PlannerInputAlgorithm{
   double epsilon_goalregion;
   double max_planning_time;
@@ -20,7 +21,6 @@ struct PlannerInputAlgorithm{
 class PlannerInput{
   public:
     //general input for any planner method (fixed)
-    bool exists;
 
     Config q_init;
     Config q_goal;
@@ -31,7 +31,6 @@ class PlannerInput{
     Config qMax;
 
     uint robot_idx;
-
     uint robot_inner_idx;
     uint robot_outer_idx;
 
@@ -40,32 +39,28 @@ class PlannerInput{
     Config se3min;
     Config se3max;
 
-    //std::string name_robot;
     std::string name_algorithm;
 
     //specific input for planner methods
     double epsilon_goalregion;
     double max_planning_time;
     double timestep_min, timestep_max;
-    //std::vector<std::string> algorithms;
 
-    std::vector<PlannerInputAlgorithm> algorithms;
+    //std::vector<PlannerInputAlgorithm> algorithms;
 
     //input for hierarchical planner methods
     std::vector<int> robot_idxs;
     std::vector<Layer> layers;
 
-    //to <gui>
-    int drawShortestPath;
-    int drawSweptVolume;
-    int drawMilestones;
-    int drawStartGoal;
-    int drawTree;
-    int drawSimplicialComplex;
-
     bool load(const char* file);
     bool load(TiXmlElement *node);
 
     friend std::ostream& operator<< (std::ostream& out, const PlannerInput& pin) ;
+};
+
+struct PlannerMultiInput{
+  std::vector<PlannerInput*> inputs;
+  bool load(const char* file);
+  bool load(TiXmlElement *node);
 };
 

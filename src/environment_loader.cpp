@@ -12,7 +12,7 @@ RobotWorld* EnvironmentLoader::GetWorldPtr(){
 Robot* EnvironmentLoader::GetRobotPtr(){
   return world.robots[0];
 }
-PlannerInput EnvironmentLoader::GetPlannerInput(){
+PlannerMultiInput EnvironmentLoader::GetPlannerInput(){
   return pin;
 }
 PlannerBackendPtr EnvironmentLoader::GetBackendPtr(){
@@ -150,37 +150,37 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 
     if(pin.load(file_name.c_str())){
 
-      uint ridx = pin.robot_idxs.at(0);
+      uint ridx = pin.inputs.at(0)->robot_idx;
       Robot *robot = world.robots[ridx];
 
       for(int i = 0; i < 6; i++){
-        robot->qMin[i] = pin.se3min[i];
-        robot->qMax[i] = pin.se3max[i];
+        robot->qMin[i] = pin.inputs.at(0)->se3min[i];
+        robot->qMax[i] = pin.inputs.at(0)->se3max[i];
       }
 
-      pin.qMin = robot->qMin;
-      pin.qMax = robot->qMax;
+      pin.inputs.at(0)->qMin = robot->qMin;
+      pin.inputs.at(0)->qMax = robot->qMax;
       uint N = robot->q.size();
-      robot->q = pin.q_init;
+      robot->q = pin.inputs.at(0)->q_init;
       robot->q.resize(N);
       robot->UpdateFrames();
 
 
       //set oderobot to planner start pos
       ODERobot *simrobot = _backend->sim.odesim.robot(ridx);
-      simrobot->SetConfig(pin.q_init);
+      simrobot->SetConfig(pin.inputs.at(0)->q_init);
       Vector dq;
       _backend->sim.odesim.robot(0)->GetVelocities(dq);
       dq.setZero();
       _backend->sim.odesim.robot(0)->SetVelocities(dq);
 
-      robot->q = pin.q_goal;
+      robot->q = pin.inputs.at(0)->q_goal;
       robot->q.resize(N);
       robot->UpdateFrames();
 
       //set other nested robots
-      for(uint k = 0; k < pin.robot_idxs.size(); k++){
-        uint ik = pin.robot_idxs.at(k);
+      for(uint k = 0; k < pin.inputs.at(0)->robot_idxs.size(); k++){
+        uint ik = pin.inputs.at(0)->robot_idxs.at(k);
         if(ik>=world.robots.size()){
           std::cout << std::string(80, '>') << std::endl;
           std::cout << ">>> [ERROR] Robot with idx " << ik << " does not exists." << std::endl;
@@ -189,13 +189,11 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
         }
         Robot *rk= world.robots.at(ik);
         for(int i = 0; i < 6; i++){
-          rk->qMin[i] = pin.se3min[i];
-          rk->qMax[i] = pin.se3max[i];
+          rk->qMin[i] = pin.inputs.at(0)->se3min[i];
+          rk->qMax[i] = pin.inputs.at(0)->se3max[i];
         }
       }
     }else{
-      std::cout << std::string(80, '-') << std::endl;
-      std::cout << "Motion Planning" << std::endl;
       std::cout << std::string(80, '-') << std::endl;
       std::cout << "No Planner Settings. No Planning" << std::endl;
       std::cout << std::string(80, '-') << std::endl;

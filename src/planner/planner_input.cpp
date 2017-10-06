@@ -2,11 +2,87 @@
 
 #include "planner_input.h"
 
-bool PlannerInput::load(TiXmlElement *node)
-{
-  exists = false;
+bool PlannerMultiInput::load(const char* file){
+  TiXmlDocument doc(file);
+  TiXmlElement *root = GetRootNodeFromDocument(doc);
+  return load(root);
+}
+bool PlannerMultiInput::load(TiXmlElement *node){
   CheckNodeName(node, "world");
   TiXmlElement* plannersettings = FindSubNode(node, "plannersettings");
+
+  if(!plannersettings){
+    std::cout << "world xml file has no plannersettings" << std::endl;
+    return false;
+  }
+
+  TiXmlElement* node_max_planning_time = FindSubNode(plannersettings, "maxplanningtime");
+  TiXmlElement* node_epsilon_goalregion = FindSubNode(plannersettings, "epsilongoalregion");
+  TiXmlElement* node_freeFloating = FindSubNode(plannersettings, "freeFloating");
+  TiXmlElement* node_timestep = FindSubNode(plannersettings, "timestep");
+
+  double timestep_min, timestep_max;
+  if(node_timestep){
+    GetStreamAttribute(node_timestep,"min") >> timestep_min;
+    GetStreamAttribute(node_timestep,"max") >> timestep_max;
+  }else{
+    timestep_min= 0.01;
+    timestep_max= 0.1;
+  }
+
+  TiXmlElement* node_algorithm = FindFirstSubNode(plannersettings, "algorithm");
+
+  while(node_algorithm!=NULL){
+    PlannerInput* input = new PlannerInput();
+    if(!input->load(plannersettings)) return false;
+
+    GetStreamAttribute(node_algorithm,"name") >> input->name_algorithm;
+
+    TiXmlElement* node_max_planning_time = FindSubNode(plannersettings, "maxplanningtime");
+    TiXmlElement* node_epsilon_goalregion = FindSubNode(plannersettings, "epsilongoalregion");
+
+    double max_planning_time, epsilon_goalregion;
+    GetStreamText(node_max_planning_time) >> max_planning_time;
+    GetStreamText(node_epsilon_goalregion) >> epsilon_goalregion;
+    GetStreamAttributeDefaultDouble(node_algorithm,"maxplanningtime",max_planning_time)  >> input->max_planning_time;
+    GetStreamAttributeDefaultDouble(node_algorithm,"epsilongoalregion",epsilon_goalregion)  >> input->epsilon_goalregion;
+    GetStreamAttributeDefaultDouble(node_algorithm,"timestepmin",timestep_min)  >> input->timestep_min;
+    GetStreamAttributeDefaultDouble(node_algorithm,"timestepmax",timestep_max)  >> input->timestep_max;
+
+    TiXmlElement* node_hierarchy = FindSubNode(node_algorithm, "hierarchy");
+    uint level = 0;
+    if(node_hierarchy){
+      TiXmlElement* lindex = FindFirstSubNode(node_hierarchy, "level");
+      while(lindex!=NULL){
+
+        Layer layer;
+        layer.level = level++;
+        GetStreamAttribute(lindex, "inner_index") >> layer.inner_index;
+
+        if(ExistStreamAttribute(lindex, "outer_index")){
+          GetStreamAttribute(lindex, "outer_index") >> layer.outer_index;
+          layer.isInnerOuter =true;
+        }else{
+          layer.outer_index = layer.inner_index;
+          layer.isInnerOuter =false;
+        }
+        input->robot_idxs.push_back(layer.inner_index);
+        input->layers.push_back(layer);
+
+        lindex = FindNextSiblingNode(lindex, "level");
+      }
+    }
+
+    inputs.push_back(input);
+    node_algorithm = FindNextSiblingNode(node_algorithm, "algorithm");
+  }
+
+  return true;
+}
+bool PlannerInput::load(TiXmlElement *node)
+{
+  CheckNodeName(node, "plannersettings");
+  TiXmlElement* plannersettings = node;//FindSubNode(node, "plannersettings");
 
   if(!plannersettings){
     std::cout << "world xml file has no plannersettings" << std::endl;
@@ -25,20 +101,6 @@ bool PlannerInput::load(TiXmlElement *node)
   TiXmlElement* node_epsilon_goalregion = FindSubNode(plannersettings, "epsilongoalregion");
   TiXmlElement* node_freeFloating = FindSubNode(plannersettings, "freeFloating");
 
-  TiXmlElement* node_drawTree = FindSubNode(plannersettings, "drawTree");
-  TiXmlElement* node_drawSimplicialComplex = FindSubNode(plannersettings, "drawSimplicialComplex");
-  TiXmlElement* node_drawSweptVolume = FindSubNode(plannersettings, "drawSweptVolume");
-  TiXmlElement* node_drawMilestones = FindSubNode(plannersettings, "drawMilestones");
-  TiXmlElement* node_drawStartGoal = FindSubNode(plannersettings, "drawStartGoal");
-  TiXmlElement* node_drawShortestPath = FindSubNode(plannersettings, "drawShortestPath");
-
-  GetStreamText(node_drawTree) >> drawTree;
-  GetStreamText(node_drawSimplicialComplex) >> drawSimplicialComplex;
-  GetStreamText(node_drawSweptVolume) >> drawSweptVolume;
-  GetStreamText(node_drawMilestones) >> drawMilestones;
-  GetStreamText(node_drawStartGoal) >> drawStartGoal;
-  GetStreamText(node_drawShortestPath) >> drawShortestPath;
-
   GetStreamAttribute(node_qinit,"config") >> q_init;
   GetStreamAttribute(node_qgoal,"config") >> q_goal;
   GetStreamAttribute(node_dqinit,"config") >> dq_init;
@@ -53,26 +115,26 @@ bool PlannerInput::load(TiXmlElement *node)
   }
   GetStreamText(node_freeFloating) >> freeFloating;
 
-  GetStreamText(node_max_planning_time) >> max_planning_time;
-  GetStreamText(node_epsilon_goalregion) >> epsilon_goalregion;
+  //GetStreamText(node_max_planning_time) >> max_planning_time;
+  //GetStreamText(node_epsilon_goalregion) >> epsilon_goalregion;
 
   GetStreamAttribute(node_se3min,"config")  >> se3min;
   GetStreamAttribute(node_se3max,"config")  >> se3max;
 
-  TiXmlElement* node_algorithm = FindFirstSubNode(plannersettings, "algorithm");
+  //TiXmlElement* node_algorithm = FindFirstSubNode(plannersettings, "algorithm");
 
-  while(node_algorithm!=NULL){
-    PlannerInputAlgorithm input_algorithm;
-    GetStreamText(node_algorithm) >> input_algorithm.name;
+  //while(node_algorithm!=NULL){
+  //  PlannerInputAlgorithm input_algorithm;
+  //  GetStreamText(node_algorithm) >> input_algorithm.name;
 
-    GetStreamAttributeDefaultDouble(node_algorithm,"maxplanningtime",max_planning_time)  >> input_algorithm.max_planning_time;
-    GetStreamAttributeDefaultDouble(node_algorithm,"epsilongoalregion",epsilon_goalregion)  >> input_algorithm.epsilon_goalregion;
-    GetStreamAttributeDefaultDouble(node_algorithm,"timestepmin",timestep_min)  >> input_algorithm.timestep_min;
-    GetStreamAttributeDefaultDouble(node_algorithm,"timestepmax",timestep_max)  >> input_algorithm.timestep_max;
+  //  GetStreamAttributeDefaultDouble(node_algorithm,"maxplanningtime",max_planning_time)  >> input_algorithm.max_planning_time;
+  //  GetStreamAttributeDefaultDouble(node_algorithm,"epsilongoalregion",epsilon_goalregion)  >> input_algorithm.epsilon_goalregion;
+  //  GetStreamAttributeDefaultDouble(node_algorithm,"timestepmin",timestep_min)  >> input_algorithm.timestep_min;
+  //  GetStreamAttributeDefaultDouble(node_algorithm,"timestepmax",timestep_max)  >> input_algorithm.timestep_max;
 
-    algorithms.push_back(input_algorithm);
-    node_algorithm = FindNextSiblingNode(node_algorithm, "algorithm");
-  }
+  //  algorithms.push_back(input_algorithm);
+  //  node_algorithm = FindNextSiblingNode(node_algorithm, "algorithm");
+  //}
 
   TiXmlElement* node_robot = FindSubNode(plannersettings, "robot");
   if(node_robot){
@@ -81,40 +143,39 @@ bool PlannerInput::load(TiXmlElement *node)
     robot_idx = 0;
   }
 
-  TiXmlElement* node_hierarchy = FindSubNode(plannersettings, "hierarchy");
-  uint level = 0;
-  if(node_hierarchy){
-    TiXmlElement* lindex = FindFirstSubNode(node_hierarchy, "level");
-    while(lindex!=NULL){
+//  TiXmlElement* node_hierarchy = FindSubNode(plannersettings, "hierarchy");
+//  uint level = 0;
+//  if(node_hierarchy){
+//    TiXmlElement* lindex = FindFirstSubNode(node_hierarchy, "level");
+//    while(lindex!=NULL){
+//
+//      Layer layer;
+//      layer.level = level++;
+//      GetStreamAttribute(lindex, "inner_index") >> layer.inner_index;
+//
+//      if(ExistStreamAttribute(lindex, "outer_index")){
+//        GetStreamAttribute(lindex, "outer_index") >> layer.outer_index;
+//        layer.isInnerOuter =true;
+//      }else{
+//        layer.outer_index = layer.inner_index;
+//        layer.isInnerOuter =false;
+//      }
+//      robot_idxs.push_back(layer.inner_index);
+//      layers.push_back(layer);
+//
+//      lindex = FindNextSiblingNode(lindex, "level");
+//    }
+//    std::cout << "Loading Robots: ";
+//    for(uint k = 0; k < robot_idxs.size(); k++){
+//      std::cout << " " << robot_idxs.at(k);
+//    }
+//    std::cout << std::endl;
+//
+//  }else{
+//    exists = false;
+//    return false;
+//  }
 
-      Layer layer;
-      layer.level = level++;
-      GetStreamAttribute(lindex, "inner_index") >> layer.inner_index;
-
-      if(ExistStreamAttribute(lindex, "outer_index")){
-        GetStreamAttribute(lindex, "outer_index") >> layer.outer_index;
-        layer.isInnerOuter =true;
-      }else{
-        layer.outer_index = layer.inner_index;
-        layer.isInnerOuter =false;
-      }
-      robot_idxs.push_back(layer.inner_index);
-      layers.push_back(layer);
-
-      lindex = FindNextSiblingNode(lindex, "level");
-    }
-    std::cout << "Loading Robots: ";
-    for(uint k = 0; k < robot_idxs.size(); k++){
-      std::cout << " " << robot_idxs.at(k);
-    }
-    std::cout << std::endl;
-
-  }else{
-    exists = false;
-    return false;
-  }
-
-  exists = true;
   return true;
 }
 
