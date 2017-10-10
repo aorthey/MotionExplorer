@@ -52,6 +52,7 @@ class PlannerInput{
     friend std::ostream& operator<< (std::ostream& out, const PlannerInput& pin) ;
 };
 
+/// @brief multiple plannerinputs (to use several algorithms inside GUI)
 struct PlannerMultiInput{
   std::vector<PlannerInput*> inputs;
   bool load(const char* file);
