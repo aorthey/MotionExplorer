@@ -93,3 +93,14 @@ inline stringstream GetStreamText(TiXmlElement* node){
     return stringstream ("NONE");
   }
 }
+inline stringstream GetStreamTextDefaultDouble(TiXmlElement* node, double default_value){
+  std::stringstream ss;
+  ss = GetStreamText(node);
+  if(ss.str() != "NONE"){
+    return ss;
+  }else{
+    std::stringstream def;
+    def << default_value;
+    return def;
+  }
+}

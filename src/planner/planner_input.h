@@ -39,7 +39,8 @@ class PlannerInput{
     //specific input for planner methods
     double epsilon_goalregion;
     double max_planning_time;
-    double timestep_min, timestep_max;
+    double timestep_min;
+    double timestep_max;
 
     //input for hierarchical planner methods
     std::vector<int> robot_idxs;

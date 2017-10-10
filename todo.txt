@@ -296,11 +296,12 @@ connected, or use that as a ground truth benchmark)
 HPlanner
  [x] going up does not remove SV
  [ ] orientation wrong.
- [ ] position goes through wall in L.
+ [ ] position goes through wall in L (uses triangle meshes and not hierarchy of
+primitives -> maybe we can remove the checker from klampt?)
  [ ] split fibrebundles up into checker and integrator. put them into subfolders.
  remove the planneradaptor parts (are deprecated)
  [ ] new ViewTree to visualize a pathspace exploration
  [ ] remove serialized tree once and for all
  [ ] multiple restarts of RRT produce same results. reseed?
  [ ] PlannerInput -> AlgorithmInput
- 
+ [ ] maxplanningtime not used in algorithm
