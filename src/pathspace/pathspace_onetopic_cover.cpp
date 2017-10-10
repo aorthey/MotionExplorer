@@ -2,7 +2,7 @@
 #include "pathspace_atomic.h"
 #include "drawMotionPlanner.h"
 #include "planner/cspace_factory.h"
-#include "planner/algorithm_geometric.h"
+#include "planner/strategy_geometric.h"
 
 PathSpaceOnetopicCover::PathSpaceOnetopicCover(RobotWorld *world_, PlannerInput& input_):
   PathSpace(world_, input_)
@@ -38,11 +38,11 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   //  std::vector<Config> path_constraint = node->content.path;
   //  cspace_i = factory.MakeGeometricCSpacePathConstraintRollInvariance(robot_inner, cspace_klampt_i, path_constraint);
 
-  AlgorithmGeometric algorithm;
+  StrategyGeometric strategy;
   PlannerOutput output;
   output.robot_idx = inner_index;
   input.robot_idx = inner_index;
-  algorithm.plan(input, cspace_i, output);
+  strategy.plan(input, cspace_i, output);
 
   std::vector<PathSpace*> decomposedspace;
 

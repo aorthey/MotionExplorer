@@ -307,11 +307,12 @@ primitives -> maybe we can remove the checker from klampt?)
  [x] maxplanningtime not used in algorithm
 
 
-
 Planner: PlannerInput -> PlannerOutput
 
-Hierarchical: PlannerInput -> Stack< PathSpaceDescriptions >
+Hierarchical: PlannerInput -> Stack< PathSpaceInput>
 
-PathSpace: PathSpaceDescriptions -> StrategyInput
+PathSpace: PathSpaceInput-> StrategyInput
 
-StrategyInput instead of PlannerOutput
+StrategyInput->StrategyOutput
+
+CollisionChecking->PQP
