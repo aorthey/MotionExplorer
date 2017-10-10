@@ -1,11 +1,11 @@
 #include "pathspace_atomic.h"
 #include "drawMotionPlanner.h"
 
-//using namespace GLDraw;
 PathSpaceAtomic::PathSpaceAtomic(RobotWorld *world_, PathSpaceInput* input_):
   PathSpace(world_, input_)
 {
 }
+
 bool PathSpaceAtomic::isAtomic() const{
   return true;
 }

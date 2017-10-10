@@ -8,11 +8,7 @@ class PathSpaceDecoratorSweptVolumePath: public PathSpaceDecorator{
     {
     }
     void DrawGL(const GUIState&){
-      std::cout << input->q_init << std::endl;
-      std::cout << input->q_goal << std::endl;
-      std::cout << input->robot_idx << std::endl;
 
-      //PathSpaceInput* input = component->GetPathSpaceInput();
       uint ridx = input->robot_idx;
       Robot* robot = world->robots[ridx];
       Config qi_in = input->q_init;
