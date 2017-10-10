@@ -9,10 +9,10 @@ bool PlannerMultiInput::load(const char* file){
 }
 bool PlannerMultiInput::load(TiXmlElement *node){
   CheckNodeName(node, "world");
-  TiXmlElement* plannersettings = FindSubNode(node, "plannersettings");
+  TiXmlElement* node_plannerinput = FindSubNode(node, "plannerinput");
 
-  if(!plannersettings){
-    std::cout << "world xml file has no plannersettings" << std::endl;
+  if(!node_plannerinput){
+    std::cout << "world xml file has no plannerinput" << std::endl;
     return false;
   }
 
@@ -24,7 +24,7 @@ bool PlannerMultiInput::load(TiXmlElement *node){
   double epsilon_goalregion;
   double timestep_min;
   double timestep_max;
-  TiXmlElement* node_timestep = FindSubNode(plannersettings, "timestep");
+  TiXmlElement* node_timestep = FindSubNode(node_plannerinput, "timestep");
   if(node_timestep){
     GetStreamAttribute(node_timestep,"min") >> timestep_min;
     GetStreamAttribute(node_timestep,"max") >> timestep_max;
@@ -32,8 +32,8 @@ bool PlannerMultiInput::load(TiXmlElement *node){
     timestep_min= 0.01;
     timestep_max= 0.1;
   }
-  TiXmlElement* node_max_planning_time = FindSubNode(plannersettings, "maxplanningtime");
-  TiXmlElement* node_epsilon_goalregion = FindSubNode(plannersettings, "epsilongoalregion");
+  TiXmlElement* node_max_planning_time = FindSubNode(node_plannerinput, "maxplanningtime");
+  TiXmlElement* node_epsilon_goalregion = FindSubNode(node_plannerinput, "epsilongoalregion");
 
   GetStreamText(node_max_planning_time) >> max_planning_time;
   GetStreamText(node_epsilon_goalregion) >> epsilon_goalregion;
@@ -42,11 +42,11 @@ bool PlannerMultiInput::load(TiXmlElement *node){
   // loop through all algorithms, search for individual settings; if not found
   // apply default settings 
   //################################################################################
-  TiXmlElement* node_algorithm = FindFirstSubNode(plannersettings, "algorithm");
+  TiXmlElement* node_algorithm = FindFirstSubNode(node_plannerinput, "algorithm");
 
   while(node_algorithm!=NULL){
     PlannerInput* input = new PlannerInput();
-    if(!input->load(plannersettings)) return false;
+    if(!input->load(node_plannerinput)) return false;
 
     GetStreamAttribute(node_algorithm,"name") >> input->name_algorithm;
 
@@ -104,22 +104,22 @@ bool PlannerMultiInput::load(TiXmlElement *node){
 
 bool PlannerInput::load(TiXmlElement *node)
 {
-  CheckNodeName(node, "plannersettings");
-  TiXmlElement* plannersettings = node;
+  CheckNodeName(node, "plannerinput");
+  TiXmlElement* node_plannerinput = node;
 
-  if(!plannersettings){
-    std::cout << "world xml file has no plannersettings" << std::endl;
+  if(!node_plannerinput){
+    std::cout << "world xml file has no plannerinput" << std::endl;
     return false;
   }
 
-  TiXmlElement* node_qinit = FindSubNode(plannersettings, "qinit");
-  TiXmlElement* node_qgoal = FindSubNode(plannersettings, "qgoal");
-  TiXmlElement* node_se3min = FindSubNode(plannersettings, "se3min");
-  TiXmlElement* node_se3max = FindSubNode(plannersettings, "se3max");
+  TiXmlElement* node_qinit = FindSubNode(node_plannerinput, "qinit");
+  TiXmlElement* node_qgoal = FindSubNode(node_plannerinput, "qgoal");
+  TiXmlElement* node_se3min = FindSubNode(node_plannerinput, "se3min");
+  TiXmlElement* node_se3max = FindSubNode(node_plannerinput, "se3max");
 
-  TiXmlElement* node_dqinit = FindSubNode(plannersettings, "dqinit");
-  TiXmlElement* node_dqgoal = FindSubNode(plannersettings, "dqgoal");
-  TiXmlElement* node_freeFloating = FindSubNode(plannersettings, "freeFloating");
+  TiXmlElement* node_dqinit = FindSubNode(node_plannerinput, "dqinit");
+  TiXmlElement* node_dqgoal = FindSubNode(node_plannerinput, "dqgoal");
+  TiXmlElement* node_freeFloating = FindSubNode(node_plannerinput, "freeFloating");
 
   GetStreamAttribute(node_qinit,"config") >> q_init;
   GetStreamAttribute(node_qgoal,"config") >> q_goal;
@@ -131,7 +131,7 @@ bool PlannerInput::load(TiXmlElement *node)
   GetStreamAttribute(node_se3min,"config")  >> se3min;
   GetStreamAttribute(node_se3max,"config")  >> se3max;
 
-  TiXmlElement* node_robot = FindSubNode(plannersettings, "robot");
+  TiXmlElement* node_robot = FindSubNode(node_plannerinput, "robot");
   if(node_robot){
     GetStreamText(node_robot) >> robot_idx;
   }else{

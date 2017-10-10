@@ -10,7 +10,7 @@
 
   <rigidObject name="lshape.tri" file="/home/aorthey/git/orthoklampt/data/terrains/Lshape.tri" translation="0 0 0"/>
 
-  <plannersettings>
+  <plannerinput>
 
     <!-- general settings for all algorithms (fixed) -->
     <qinit config="7  +3.0 +0.0 +0.0 -2.0 +0.6 +0.3 +0"/>
@@ -40,7 +40,7 @@
     <algorithm name="ompl:sst"/>
     <algorithm name="ompl:pdst"/>
 
-  </plannersettings>
+  </plannerinput>
 
 </world>
 

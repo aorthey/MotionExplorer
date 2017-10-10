@@ -42,8 +42,8 @@ class PlannerOutput{
     SimplicialComplex cmplx;
     
     Robot *robot;
-
     std::vector< std::vector< Config >>  paths;
+
   private:
 
     double time;
