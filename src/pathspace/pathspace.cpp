@@ -1,7 +1,7 @@
 #include "pathspace.h"
 #include "algorithms/onetopic_reduction.h"
 
-PathSpace::PathSpace(RobotWorld *world_, PlannerInput& input_):
+PathSpace::PathSpace(RobotWorld *world_, PathSpaceInput* input_):
   world(world_), input(input_)
 {
   sv = NULL;
@@ -10,7 +10,7 @@ PathSpace::PathSpace(RobotWorld *world_, PlannerInput& input_):
 RobotWorld* PathSpace::GetWorldPtr(){
   return world;
 }
-PlannerInput& PathSpace::GetPlannerInput(){
+PathSpaceInput* PathSpace::GetPathSpaceInput(){
   return input;
 }
 
@@ -39,6 +39,8 @@ std::ostream& operator<< (std::ostream& out, const PathSpace& space)
   out << "[PathSpace]" << std::endl;
   out << std::string(80, '-') << std::endl;
   std::cout << " atomic      : " << (space.isAtomic()?"yes":"no") << std::endl;
+  std::cout << " init        : " << space.input->q_init << std::endl;
+  std::cout << " goal        : " << space.input->q_goal << std::endl;
   //uint ii = space.input.robot_inner_idx;
   //uint io = space.input.robot_outer_idx;
   //std::cout << " robot inner : " << ii << " " << space.world->robots[ii]->name << std::endl;

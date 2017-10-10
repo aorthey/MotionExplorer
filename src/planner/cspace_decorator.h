@@ -22,7 +22,7 @@ class CSpaceOMPLDecorator: public CSpaceOMPL
     virtual const oc::RealVectorControlSpacePtr ControlSpacePtr();
     virtual uint GetDimensionality();
     virtual uint GetControlDimensionality();
-    virtual void SetPlannerInput(PlannerInput &input_);
+    virtual void SetCSpaceInput(CSpaceInput &input_);
     virtual Robot* GetRobotPtr();
     virtual CSpace* GetCSpacePtr();
   protected:

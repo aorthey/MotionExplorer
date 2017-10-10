@@ -40,58 +40,59 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
 }
 
 void MotionPlanner::CreateSinglePathHierarchy(){
+  exit(0);
 
-  std::vector<int> idxs = input.robot_idxs;
-  Config p_init = input.q_init;
-  Config p_goal = input.q_goal;
+  // std::vector<int> idxs = input.robot_idxs;
+  // Config p_init = input.q_init;
+  // Config p_goal = input.q_goal;
 
-  for(uint k = 0; k < input.layers.size(); k++){
-    int level = input.layers.at(k).level;
-    int ii = input.layers.at(k).inner_index;
-    int io = input.layers.at(k).outer_index;
-    Robot* ri = world->robots[ii];
-    Robot* ro = world->robots[io];
+  // for(uint k = 0; k < input.layers.size(); k++){
+  //   int level = input.layers.at(k).level;
+  //   int ii = input.layers.at(k).inner_index;
+  //   int io = input.layers.at(k).outer_index;
+  //   Robot* ri = world->robots[ii];
+  //   Robot* ro = world->robots[io];
 
-    Config qi = p_init; qi.resize(ri->q.size());
-    Config qg = p_goal; qg.resize(ri->q.size());
+  //   Config qi = p_init; qi.resize(ri->q.size());
+  //   Config qg = p_goal; qg.resize(ri->q.size());
 
-    if(k==0) hierarchy->AddLevel( ii, io, qi, qg);
+  //   if(k==0) hierarchy->AddLevel( ii, io, qi, qg);
 
-    hierarchy->AddLevel( ii, io, qi, qg);
-  }
+  //   hierarchy->AddLevel( ii, io, qi, qg);
+  // }
 
-  //remove all nested robots except the original one
-  //for(uint k = 0; k < idxs.size()-1; k++){
-  //  output.removable_robot_idxs.push_back(idxs.at(k));
-  //}
+  // //remove all nested robots except the original one
+  // //for(uint k = 0; k < idxs.size()-1; k++){
+  // //  output.removable_robot_idxs.push_back(idxs.at(k));
+  // //}
 
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << " Planner: " << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << " Robots  " << std::endl;
-  for(uint k = 0; k < hierarchy->NumberLevels(); k++){
-    uint ii = hierarchy->GetInnerRobotIdx(k);
-    uint io = hierarchy->GetOuterRobotIdx(k);
-    Robot* ri = world->robots[ii];
-    Robot* ro = world->robots[io];
-    std::cout << " Level" << k << std::endl;
-    std::cout << "   Robot (inner) : idx " << ii << " name " << ri->name << std::endl;
-    std::cout << "   Robot (outer) : idx " << io << " name " << ro->name << std::endl;
-    Config qi = hierarchy->GetInitConfig(k);
-    Config qg = hierarchy->GetGoalConfig(k);
-    std::cout << "      qinit      : " << qi << std::endl;
-    std::cout << "      qgoal      : " << qg << std::endl;
-  }
+  // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << " Planner: " << std::endl;
+  // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << " Robots  " << std::endl;
+  // for(uint k = 0; k < hierarchy->NumberLevels(); k++){
+  //   uint ii = hierarchy->GetInnerRobotIdx(k);
+  //   uint io = hierarchy->GetOuterRobotIdx(k);
+  //   Robot* ri = world->robots[ii];
+  //   Robot* ro = world->robots[io];
+  //   std::cout << " Level" << k << std::endl;
+  //   std::cout << "   Robot (inner) : idx " << ii << " name " << ri->name << std::endl;
+  //   std::cout << "   Robot (outer) : idx " << io << " name " << ro->name << std::endl;
+  //   Config qi = hierarchy->GetInitConfig(k);
+  //   Config qg = hierarchy->GetGoalConfig(k);
+  //   std::cout << "      qinit      : " << qi << std::endl;
+  //   std::cout << "      qgoal      : " << qg << std::endl;
+  // }
 
-  int ii = input.layers.at(0).inner_index;
-  int io = input.layers.at(0).outer_index;
-  input.robot_inner_idx = ii;
-  input.robot_outer_idx = io;
-  std::string subalgorithm = input.name_algorithm.substr(13,input.name_algorithm.size()-13);
-  input.name_algorithm = subalgorithm;
-  input.robot_idx = ii;
+  // int ii = input.layers.at(0).inner_index;
+  // int io = input.layers.at(0).outer_index;
+  // input.robot_inner_idx = ii;
+  // input.robot_outer_idx = io;
+  // std::string subalgorithm = input.name_algorithm.substr(13,input.name_algorithm.size()-13);
+  // input.name_algorithm = subalgorithm;
+  // input.robot_idx = ii;
 
-  hierarchy->AddRootNode( new PathSpaceOnetopicCover(world, input) );
+  // hierarchy->AddRootNode( new PathSpaceOnetopicCover(world, input) );
 }
 
 /** @brief shallow hierarchy contains two pathspaces. The first path space consists of
@@ -113,7 +114,44 @@ void MotionPlanner::CreateShallowHierarchy(){
   hierarchy->AddLevel( idx, p_init, p_goal);
 
   //let root node by a path space, returning one path as decomposition
-  hierarchy->AddRootNode( new PathSpaceOMPL(world, input) );
+  PathSpaceInput* psinput = new PathSpaceInput();
+  psinput->q_init = input.q_init;
+  psinput->q_goal = input.q_goal;
+  psinput->dq_init = input.dq_init;
+  psinput->dq_goal = input.dq_goal;
+  psinput->qMin = input.qMin;
+  psinput->qMax = input.qMax;
+  psinput->se3min = input.se3min;
+  psinput->se3max = input.se3max;
+  psinput->freeFloating = input.freeFloating;
+
+  psinput->name_algorithm = input.name_algorithm;
+  psinput->robot_idx = input.robot_idx;
+  psinput->robot_inner_idx = input.robot_idx;
+  psinput->robot_outer_idx = input.robot_idx;
+  psinput->epsilon_goalregion = input.epsilon_goalregion;
+  psinput->max_planning_time = input.max_planning_time;
+  psinput->timestep_min = input.timestep_min;
+  psinput->timestep_max = input.timestep_max;
+
+  PathSpaceInput* next = new PathSpaceInput();
+  next->q_init = input.q_init;
+  next->q_goal = input.q_goal;
+  next->dq_init = input.dq_init;
+  next->dq_goal = input.dq_goal;
+  next->qMin = input.qMin;
+  next->qMax = input.qMax;
+  next->se3min = input.se3min;
+  next->se3max = input.se3max;
+  next->freeFloating = input.freeFloating;
+  next->robot_idx = input.robot_idx;
+  next->robot_inner_idx = input.robot_idx;
+  next->robot_outer_idx = input.robot_idx;
+  next->SetNextLayer(NULL);
+
+  psinput->SetNextLayer(next);
+
+  hierarchy->AddRootNode( new PathSpaceOMPL(world, psinput) );
 }
 
 const PlannerInput& MotionPlanner::GetInput(){
@@ -323,9 +361,9 @@ void MotionPlanner::DrawGL(const GUIState& state){
   uint N = hierarchy->NumberNodesOnLevel(current_level);
 
   PathSpace* P = new PathSpaceDecoratorSweptVolumePath( hierarchy->GetNodeContent(current_path) );
+  std::cout << *P << std::endl;
   P->DrawGL(state);
 
-  //std::cout << *P << std::endl;
 
   for(uint k = 0; k < N; k++){
     if(k==current_level_node) continue;

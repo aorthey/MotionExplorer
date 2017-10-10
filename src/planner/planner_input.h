@@ -10,7 +10,6 @@ struct Layer{
   Config q_init;
   Config q_goal;
   bool isInnerOuter;
-  //for each layer, put the next lower layer. 
 };
 
 class PlannerInput{
@@ -25,14 +24,12 @@ class PlannerInput{
     Config qMin;
     Config qMax;
 
-    uint robot_idx;
-    uint robot_inner_idx;
-    uint robot_outer_idx;
-
-    int freeFloating;
-
     Config se3min;
     Config se3max;
+
+    uint robot_idx;
+
+    int freeFloating;
 
     std::string name_algorithm;
 

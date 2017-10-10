@@ -1,4 +1,5 @@
 #pragma once
+#include "pathspace/decorator.h"
 
 class PathSpaceDecoratorSweptVolumePath: public PathSpaceDecorator{
   public:
@@ -7,10 +8,15 @@ class PathSpaceDecoratorSweptVolumePath: public PathSpaceDecorator{
     {
     }
     void DrawGL(const GUIState&){
-      uint ridx = input.robot_idx;
+      std::cout << input->q_init << std::endl;
+      std::cout << input->q_goal << std::endl;
+      std::cout << input->robot_idx << std::endl;
+
+      //PathSpaceInput* input = component->GetPathSpaceInput();
+      uint ridx = input->robot_idx;
       Robot* robot = world->robots[ridx];
-      const Config qi_in = input.q_init;
-      const Config qg_in = input.q_goal;
+      Config qi_in = input->q_init;
+      Config qg_in = input->q_goal;
 
       GLColor lightGrey(0.4,0.4,0.4,0.2);
       GLColor lightGreen(0.2,0.9,0.2,0.2);

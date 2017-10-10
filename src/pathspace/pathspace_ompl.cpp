@@ -5,7 +5,7 @@
 #include "planner/strategy_geometric.h"
 #include "drawMotionPlanner.h"
 
-PathSpaceOMPL::PathSpaceOMPL(RobotWorld *world_, PlannerInput& input_):
+PathSpaceOMPL::PathSpaceOMPL(RobotWorld *world_, PathSpaceInput* input_):
   PathSpace(world_, input_)
 {
 }
@@ -17,31 +17,26 @@ std::vector<PathSpace*> PathSpaceOMPL::Decompose(){
   WorldPlannerSettings worldsettings;
   worldsettings.InitializeDefault(*world);
 
-  CSpaceFactory factory(input);
+  CSpaceFactory factory(input->GetCSpaceInput());
   CSpaceOMPL* cspace;
   SingleRobotCSpace* kcspace;
 
-  int robot_idx = input.robot_idx;
-
+  int robot_idx = input->robot_idx;
   Robot *robot = world->robots[robot_idx];
-
   kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
 
   cspace = factory.MakeGeometricCSpace(robot, kcspace);
-
   cspace->print();
 
   StrategyGeometric strategy;
-  strategy.DisableOnetopicReduction();
-
-  PlannerOutput output;
-  strategy.plan(input, cspace, output);
+  StrategyOutput output;
+  strategy.plan(input->GetStrategyInput(), cspace, output);
 
   std::vector<PathSpace*> decomposedspace;
 
   if(output.success){
-    decomposedspace.push_back( new PathSpaceAtomic(world, input) );
-    decomposedspace.at(0)->SetShortestPath( output.GetKeyframes()  );
+    decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
+    decomposedspace.at(0)->SetShortestPath( output.keyframes  );
   }else{
     std::cout << "Error: Path could not be expanded" << std::endl;
   }
@@ -49,10 +44,10 @@ std::vector<PathSpace*> PathSpaceOMPL::Decompose(){
 
 }
 void PathSpaceOMPL::DrawGL(const GUIState& state){
-  uint ridx = input.robot_idx;
+  uint ridx = input->robot_idx;
   Robot* robot = world->robots[ridx];
-  const Config qi = input.q_init;
-  const Config qg = input.q_goal;
+  const Config qi = input->q_init;
+  const Config qg = input->q_goal;
 
   GLColor lightGrey(0.4,0.4,0.4,0.2);
   GLColor lightGreen(0.2,0.9,0.2,0.2);

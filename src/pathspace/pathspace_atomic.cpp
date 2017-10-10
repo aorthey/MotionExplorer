@@ -2,7 +2,7 @@
 #include "drawMotionPlanner.h"
 
 //using namespace GLDraw;
-PathSpaceAtomic::PathSpaceAtomic(RobotWorld *world_, PlannerInput& input_):
+PathSpaceAtomic::PathSpaceAtomic(RobotWorld *world_, PathSpaceInput* input_):
   PathSpace(world_, input_)
 {
 }
@@ -16,10 +16,10 @@ std::vector<PathSpace*> PathSpaceAtomic::Decompose(){
 }
 
 void PathSpaceAtomic::DrawGL(const GUIState& state){
-  uint ridx = input.robot_idx;
+  uint ridx = input->robot_idx;
   Robot* robot = world->robots[ridx];
-  const Config qi_in = input.q_init;
-  const Config qg_in = input.q_goal;
+  const Config qi_in = input->q_init;
+  const Config qg_in = input->q_goal;
 
   GLColor lightGreen(0.2,0.9,0.2,0.2);
   GLColor lightRed(0.9,0.2,0.2,0.2);

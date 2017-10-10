@@ -1,4 +1,5 @@
 #pragma once
+#include "pathspace_input.h"
 #include "pathspace.h"
 
 //PathSpace containing all continuous paths
@@ -9,7 +10,7 @@
 
 class PathSpaceOMPL: public PathSpace{
   public:
-    PathSpaceOMPL(RobotWorld *world_, PlannerInput& input_);
+    PathSpaceOMPL(RobotWorld *world_, PathSpaceInput* input_);
     virtual std::vector<PathSpace*> Decompose();
     virtual void DrawGL(const GUIState&);
     virtual bool isAtomic() const;

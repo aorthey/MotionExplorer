@@ -4,7 +4,7 @@
 #include "planner/cspace_factory.h"
 #include "planner/strategy_geometric.h"
 
-PathSpaceOnetopicCover::PathSpaceOnetopicCover(RobotWorld *world_, PlannerInput& input_):
+PathSpaceOnetopicCover::PathSpaceOnetopicCover(RobotWorld *world_, PathSpaceInput* input_):
   PathSpace(world_, input_)
 {
 
@@ -19,10 +19,10 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   WorldPlannerSettings worldsettings;
   worldsettings.InitializeDefault(*world);
 
-  CSpaceFactory factory(input);
+  CSpaceFactory factory(input->GetCSpaceInput());
 
-  uint inner_index = input.layers.at(0).inner_index;
-  uint outer_index = input.layers.at(0).outer_index;
+  uint inner_index = input->robot_inner_idx;
+  uint outer_index = input->robot_outer_idx;
 
   Robot* robot_inner = world->robots[inner_index];
 
@@ -38,30 +38,33 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   //  std::vector<Config> path_constraint = node->content.path;
   //  cspace_i = factory.MakeGeometricCSpacePathConstraintRollInvariance(robot_inner, cspace_klampt_i, path_constraint);
 
+  //PlannerOutput output;
+  //output.robot_idx = inner_index;
+  //input.robot_idx = inner_index;
+
   StrategyGeometric strategy;
-  PlannerOutput output;
-  output.robot_idx = inner_index;
-  input.robot_idx = inner_index;
-  strategy.plan(input, cspace_i, output);
+  StrategyOutput output;
+  strategy.plan(input->GetStrategyInput(), cspace_i, output);
 
   std::vector<PathSpace*> decomposedspace;
 
   if(!output.success) return decomposedspace;
+  exit(0);
 
-  for(uint k = 0; k < output.paths.size(); k++){
-    PathSpace *pk = new PathSpaceAtomic(world, input);
-    pk->SetShortestPath( output.paths.at(k) );
-    decomposedspace.push_back(pk);
-  }
+  //for(uint k = 0; k < output.paths.size(); k++){
+  //  PathSpace *pk = new PathSpaceAtomic(world, input);
+  //  pk->SetShortestPath( output.paths.at(k) );
+  //  decomposedspace.push_back(pk);
+  //}
   return decomposedspace;
 }
 
 
 void PathSpaceOnetopicCover::DrawGL(const GUIState&){
-  uint ridx = input.robot_idx;
+  uint ridx = input->robot_idx;
   Robot* robot = world->robots[ridx];
-  const Config qi_in = input.q_init;
-  const Config qg_in = input.q_goal;
+  const Config qi_in = input->q_init;
+  const Config qg_in = input->q_goal;
 
   GLColor lightGreen(0.2,0.9,0.2,0.5);
   GLColor lightRed(0.9,0.2,0.2,0.5);

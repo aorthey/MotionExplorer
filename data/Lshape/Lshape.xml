@@ -26,6 +26,8 @@
     <maxplanningtime>0.05</maxplanningtime>
 
     <!-- individual algorithms plus individual settings -->
+    <algorithm name="ompl:rrt"/>
+    <!--
     <algorithm name="hierarchical:ompl:prmstar">
       <maxplanningtime>0.01</maxplanningtime>
       <hierarchy>
@@ -34,7 +36,7 @@
         <level inner_index="0"/>
       </hierarchy>
     </algorithm>
-    <algorithm name="ompl:rrt"/>
+-->
     <algorithm name="ompl:lazyrrt"/>
     <algorithm name="ompl:kpiece"/>
     <algorithm name="ompl:sst"/>

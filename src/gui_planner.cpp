@@ -52,11 +52,11 @@ void PlannerBackend::RenderWorld(){
 
   BaseT::RenderWorld();
 
-  DEBUG_GL_ERRORS()
+  if(planners.empty()) return;
 
   MotionPlanner* planner = planners.at(active_planner);
 
-  if(planners.size()>0 && planner->isActive()){
+  if(planner->isActive()){
 
     planner->DrawGL(state);
 
@@ -125,9 +125,6 @@ void PlannerBackend::RenderWorld(){
   // GLDraw::drawSphere(0.05,16,16);
 
   // glEnable(GL_LIGHTING);
-  // DEBUG_GL_ERRORS()
-
-
 }
 void PlannerBackend::RenderScreen(){
   BaseT::RenderScreen();

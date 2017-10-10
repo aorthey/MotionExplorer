@@ -46,8 +46,8 @@ uint CSpaceOMPLDecorator::GetDimensionality(){
 uint CSpaceOMPLDecorator::GetControlDimensionality(){
   return cspace_ompl->GetControlDimensionality();
 }
-void CSpaceOMPLDecorator::SetPlannerInput(PlannerInput &input_){
-  cspace_ompl->SetPlannerInput(input_);
+void CSpaceOMPLDecorator::SetCSpaceInput(CSpaceInput &input_){
+  cspace_ompl->SetCSpaceInput(input_);
 }
 Robot* CSpaceOMPLDecorator::GetRobotPtr(){
   return cspace_ompl->GetRobotPtr();

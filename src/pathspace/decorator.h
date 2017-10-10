@@ -1,3 +1,4 @@
+#pragma once
 #include "pathspace.h"
 
 class PathSpaceDecorator: public PathSpace{

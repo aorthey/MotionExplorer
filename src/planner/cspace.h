@@ -1,7 +1,7 @@
 #pragma once
 #include "principalfibrebundle.h"
 #include "tangentbundle.h"
-#include "planner_input.h"
+#include "cspace_input.h"
 #include "elements/path_pwl_euclid.h"
 
 #include <ompl/base/spaces/SE3StateSpace.h>
@@ -63,7 +63,7 @@ class CSpaceOMPL
     virtual uint GetControlDimensionality(){
       return control_space->getDimension();
     }
-    virtual void SetPlannerInput(PlannerInput &input_){
+    virtual void SetCSpaceInput(const CSpaceInput &input_){
       input = input_;
     }
     virtual Robot* GetRobotPtr(){
@@ -74,7 +74,7 @@ class CSpaceOMPL
     }
 
   protected:
-    PlannerInput input;
+    CSpaceInput input;
 
     uint Nklampt;
     uint Nompl;
@@ -91,8 +91,6 @@ class CSpaceOMPL
     // klampt_to_ompl: maps a dimension in SE(3)xR^Nklampt to R^Nompl
     std::vector<int> ompl_to_klampt;
     std::vector<int> klampt_to_ompl;
-
-    std::vector< std::pair<int, int> > DimensionalityKlamptToOMPLMap; //maps klampt dimensions to ompl dimensions
 
     ob::StateSpacePtr space;
     oc::RealVectorControlSpacePtr control_space;

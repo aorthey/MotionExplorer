@@ -1,6 +1,7 @@
 #pragma once
 
 #include "planner/cspace.h"
+#include "pathspace/pathspace_input.h"
 #include "gui_state.h"
 #include "elements/swept_volume.h"
 #include <ompl/base/PlannerData.h>
@@ -9,7 +10,7 @@
 class PathSpace{
   public:
 
-    PathSpace(RobotWorld *world_, PlannerInput& input_);
+    PathSpace(RobotWorld *world_, PathSpaceInput* input_);
 
     std::vector<Config> GetShortestPath();
     std::vector<Config> GetVertices();
@@ -24,7 +25,7 @@ class PathSpace{
     virtual bool isAtomic() const = 0;
 
     RobotWorld* GetWorldPtr();
-    PlannerInput& GetPlannerInput();
+    PathSpaceInput* GetPathSpaceInput();
 
     SweptVolume& GetSweptVolume(Robot *robot);
 
@@ -35,8 +36,7 @@ class PathSpace{
     std::vector<Config> vertices;
 
     RobotWorld *world;
-    PlannerInput input;
-
+    PathSpaceInput *input;
     SweptVolume *sv;
 };
 

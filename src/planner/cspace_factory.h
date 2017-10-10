@@ -1,23 +1,24 @@
 #pragma once
 #include "cspace.h"
+#include "cspace_input.h"
 #include "cspace_decorator.h"
 
 
 class CSpaceFactory{
   private:
-    PlannerInput input;
+    const CSpaceInput& input;
   public:
-    CSpaceFactory(PlannerInput &input_): input(input_){};
+    CSpaceFactory(const CSpaceInput &input_): input(input_){};
     virtual KinodynamicCSpaceOMPL* MakeKinodynamicCSpace( Robot *robot, CSpace *kspace){
       KinodynamicCSpaceOMPL *cspace = new KinodynamicCSpaceOMPL(robot, kspace);
-      cspace->SetPlannerInput(input);
+      cspace->SetCSpaceInput(input);
       cspace->initSpace();
       cspace->initControlSpace();
       return cspace;
     }
     virtual GeometricCSpaceOMPL* MakeGeometricCSpace( Robot *robot, CSpace *kspace){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPL(robot, kspace);
-      cspace->SetPlannerInput(input);
+      cspace->SetCSpaceInput(input);
       cspace->initSpace();
       cspace->initControlSpace();
       return cspace;
@@ -25,7 +26,7 @@ class CSpaceFactory{
     //CSpace for a rigid object which has rotational invariance. CSpace is R3
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceRotationalInvariance( Robot *robot, CSpace *inner){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLRotationalInvariance(robot, inner);
-      cspace->SetPlannerInput(input);
+      cspace->SetCSpaceInput(input);
       cspace->initSpace();
       cspace->initControlSpace();
       return cspace;
@@ -40,14 +41,18 @@ class CSpaceFactory{
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLPathConstraintRollInvariance(robot, inner, path);
       //make pwl path from path, then add one more [0,1] dimension to cspace,
       //and make it depend on pwlpath
-      cspace->SetPlannerInput(input);
+      cspace->SetCSpaceInput(input);
       cspace->initSpace();
       cspace->initControlSpace();
       return cspace;
     }
+    //
+    //a configuration q in the innerouter cspace is feasible iff
+    // inner(q) is feasible AND outer(q) is infeasible
+    //
     virtual CSpaceOMPL* MakeCSpaceDecoratorInnerOuter( CSpaceOMPL* cs, CSpace *outer){
       CSpaceOMPL *cspace = new CSpaceOMPLDecoratorInnerOuter(cs, outer);
-      cspace->SetPlannerInput(input);
+      cspace->SetCSpaceInput(input);
       cspace->initSpace();
       cspace->initControlSpace();
       return cspace;

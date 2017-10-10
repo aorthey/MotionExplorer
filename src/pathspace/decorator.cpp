@@ -2,7 +2,7 @@
 #include "drawMotionPlanner.h"
 
 PathSpaceDecorator::PathSpaceDecorator(PathSpace *component_):
-  PathSpace( component_->GetWorldPtr(), component_->GetPlannerInput())
+  PathSpace( component_->GetWorldPtr(), component_->GetPathSpaceInput())
 {
   component = component_;
 }

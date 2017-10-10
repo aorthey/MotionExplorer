@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pathspace_input.h"
 #include "pathspace.h"
 
 //PathSpaceOnetopicCover
@@ -13,7 +14,7 @@
 
 class PathSpaceOnetopicCover: public PathSpace{
   public:
-    PathSpaceOnetopicCover(RobotWorld *world_, PlannerInput& input_);
+    PathSpaceOnetopicCover(RobotWorld *world_, PathSpaceInput* input_);
     virtual std::vector<PathSpace*> Decompose();
     virtual void DrawGL(const GUIState&);
     virtual bool isAtomic() const;
