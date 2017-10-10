@@ -73,6 +73,7 @@ bool PlannerMultiInput::load(TiXmlElement *node){
 
         Layer layer;
         layer.level = level++;
+
         GetStreamAttribute(lindex, "inner_index") >> layer.inner_index;
 
         if(ExistStreamAttribute(lindex, "outer_index")){
@@ -82,6 +83,8 @@ bool PlannerMultiInput::load(TiXmlElement *node){
           layer.outer_index = layer.inner_index;
           layer.isInnerOuter =false;
         }
+        GetStreamAttribute(lindex, "type") >> layer.type;
+
         input->robot_idxs.push_back(layer.inner_index);
         input->layers.push_back(layer);
 

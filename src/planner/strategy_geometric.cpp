@@ -1,8 +1,8 @@
-#include "planner/strategy_geometric.h"
 #include "planner/strategy_input.h"
 #include "planner/strategy_output.h"
-#include "elements/topological_graph.h"
-#include "algorithms/onetopic_reduction.h"
+#include "planner/strategy_geometric.h"
+//#include "elements/topological_graph.h"
+//#include "algorithms/onetopic_reduction.h"
 
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/PathGeometric.h>
@@ -31,7 +31,6 @@ static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInf
 }
 StrategyGeometric::StrategyGeometric()
 {
-  onetopic = true;
 }
 void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, StrategyOutput &output)
 {
@@ -113,7 +112,6 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
   //    reached duration or found solution in epsilon-neighborhood
   //###########################################################################
 
-  bool solved = false;
   double max_planning_time= input.max_planning_time;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
@@ -122,9 +120,7 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
   // solve
   //###########################################################################
 
-  //ob::PlannerStatus status = 
-  ss.solve(ptc);
-  //solved = ss.haveExactSolutionPath();
+  ob::PlannerStatus status = ss.solve(ptc);
 
   //###########################################################################
   // extract roadmap
@@ -132,8 +128,10 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
 
   ob::PlannerDataPtr pd( new ob::PlannerData(si) );
   ss.getPlannerData(*pd);
-  pd->computeEdgeWeights();
+
   const ob::OptimizationObjectivePtr obj = pdef->getOptimizationObjective();
+
+  output.SetPlannerData(pd);
 
   //Topology::TopologicalGraph top(pd, *obj);
   //output.cmplx = top.GetSimplicialComplex();
@@ -145,15 +143,12 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
   // extract solution path if solved
   //###########################################################################
 
-  solved = ss.haveSolutionPath();
+  output.success = ss.haveSolutionPath();
   //return approximate solution
-  output.success = false;
-  if (solved)
+  if (output.success)
   {
-    output.success = true;
 
     //if(onetopic){
-
     //  OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(*pd, cspace);
     //  std::vector<std::vector<Config>> vantage_paths = onetopic_pathspace.GetConfigPaths();
     //  for(uint k = 0; k < vantage_paths.size(); k++){
@@ -170,7 +165,6 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
     std::cout << " solution difference  : " << dg << std::endl;
 
     ss.simplifySolution();
-
 
     og::PathGeometric path = ss.getSolutionPath();
 
@@ -206,8 +200,7 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
     }
     std::cout << keyframes.size() << "/" << keyframes.size() << " : "  <<  keyframes.back() << std::endl;
 
-    //output.SetKeyframes(keyframes);
-    output.keyframes=keyframes;
+    output.shortest_path=keyframes;
     std::cout << std::string(80, '-') << std::endl;
   }else{
     std::cout << "No solution found" << std::endl;

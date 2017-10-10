@@ -10,6 +10,7 @@ struct Layer{
   Config q_init;
   Config q_goal;
   bool isInnerOuter;
+  std::string type;
 };
 
 class PlannerInput{

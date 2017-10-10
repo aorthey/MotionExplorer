@@ -36,7 +36,7 @@ std::vector<PathSpace*> PathSpaceOMPL::Decompose(){
 
   if(output.success){
     decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    decomposedspace.at(0)->SetShortestPath( output.keyframes  );
+    decomposedspace.at(0)->SetShortestPath( output.shortest_path  );
   }else{
     std::cout << "Error: Path could not be expanded" << std::endl;
   }

@@ -41,6 +41,7 @@ std::ostream& operator<< (std::ostream& out, const PathSpace& space)
   std::cout << " atomic      : " << (space.isAtomic()?"yes":"no") << std::endl;
   std::cout << " init        : " << space.input->q_init << std::endl;
   std::cout << " goal        : " << space.input->q_goal << std::endl;
+  std::cout << " type        : " << space.input->type << std::endl;
   //uint ii = space.input.robot_inner_idx;
   //uint io = space.input.robot_outer_idx;
   //std::cout << " robot inner : " << ii << " " << space.world->robots[ii]->name << std::endl;

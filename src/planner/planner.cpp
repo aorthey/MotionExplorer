@@ -65,11 +65,37 @@ void MotionPlanner::CreateSinglePathHierarchy(){
 
     if(k==0){
       psinput = new PathSpaceInput();
+      psinput->q_init = qi;
+      psinput->q_goal = qg;
+      psinput->dq_init = dqi;
+      psinput->dq_goal = dqg;
+
+      psinput->robot_idx = ii;
+      psinput->robot_inner_idx = ii;
+      psinput->robot_outer_idx = io;
+      psinput->type = input.layers.at(k).type;
+
+      psinput->qMin = input.qMin;
+      psinput->qMax = input.qMax;
+      psinput->se3min = input.se3min;
+      psinput->se3max = input.se3max;
+      psinput->freeFloating = input.freeFloating;
+
+      psinput->name_algorithm = subalgorithm;
+      psinput->epsilon_goalregion = input.epsilon_goalregion;
+      psinput->max_planning_time = input.max_planning_time;
+      psinput->timestep_min = input.timestep_min;
+      psinput->timestep_max = input.timestep_max;
+
       psinput_level0 = psinput;
     }else{
-      psinput = psinput->GetNextLayer();
-      psinput = new PathSpaceInput();
+      //PathSpace *next = new PathSpaceInput();
+      //psinput->SetNextLayer(new PathSpaceInput());
+      //psinput = psinput->GetNextLayer();
+      //psinput = new PathSpaceInput();
     }
+    psinput->SetNextLayer(new PathSpaceInput());
+    psinput = psinput->GetNextLayer();
 
     psinput->q_init = qi;
     psinput->q_goal = qg;
@@ -79,6 +105,7 @@ void MotionPlanner::CreateSinglePathHierarchy(){
     psinput->robot_idx = ii;
     psinput->robot_inner_idx = ii;
     psinput->robot_outer_idx = io;
+    psinput->type = input.layers.at(k).type;
 
     psinput->qMin = input.qMin;
     psinput->qMax = input.qMax;
@@ -116,7 +143,6 @@ void MotionPlanner::CreateSinglePathHierarchy(){
     std::cout << "      qgoal      : " << qg << std::endl;
   }
 
-  exit(0);
   hierarchy->AddRootNode( new PathSpaceOnetopicCover(world, psinput_level0) );
 }
 

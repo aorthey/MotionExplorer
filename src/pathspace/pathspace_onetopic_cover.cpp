@@ -3,6 +3,7 @@
 #include "drawMotionPlanner.h"
 #include "planner/cspace_factory.h"
 #include "planner/strategy_geometric.h"
+#include "algorithms/onetopic_reduction.h"
 
 PathSpaceOnetopicCover::PathSpaceOnetopicCover(RobotWorld *world_, PathSpaceInput* input_):
   PathSpace(world_, input_)
@@ -38,10 +39,6 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   //  std::vector<Config> path_constraint = node->content.path;
   //  cspace_i = factory.MakeGeometricCSpacePathConstraintRollInvariance(robot_inner, cspace_klampt_i, path_constraint);
 
-  //PlannerOutput output;
-  //output.robot_idx = inner_index;
-  //input.robot_idx = inner_index;
-
   StrategyGeometric strategy;
   StrategyOutput output;
   strategy.plan(input->GetStrategyInput(), cspace_i, output);
@@ -49,7 +46,20 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   std::vector<PathSpace*> decomposedspace;
 
   if(!output.success) return decomposedspace;
-  exit(0);
+
+  OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(*output.pd, cspace_i);
+  std::vector<std::vector<Config>> vantage_paths = onetopic_pathspace.GetConfigPaths();
+  PathSpaceInput *next = input->GetNextLayer();
+
+  std::cout << next->type << std::endl;
+  for(uint k = 0; k < vantage_paths.size(); k++){
+    PathSpace *pk = new PathSpaceAtomic(world, next);
+    pk->SetShortestPath( vantage_paths.at(k) );
+    decomposedspace.push_back(pk);
+    //output.paths.push_back( vantage_paths.at(k) );
+  }
+
+  //exit(0);
 
   //for(uint k = 0; k < output.paths.size(); k++){
   //  PathSpace *pk = new PathSpaceAtomic(world, input);
