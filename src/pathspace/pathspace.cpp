@@ -20,10 +20,16 @@ std::vector<Config> PathSpace::GetShortestPath(){
 std::vector<Config> PathSpace::GetVertices(){
   return vertices;
 }
-void PathSpace::SetShortestPath(std::vector<Config> path_){
+std::vector<std::pair<Config,Config>> PathSpace::GetEdges(){
+  return edges;
+}
+void PathSpace::SetEdges(const std::vector<std::pair<Config,Config>>& edges_){
+  edges = edges_;
+}
+void PathSpace::SetShortestPath(const std::vector<Config>& path_){
   vantage_path = path_;
 }
-void PathSpace::SetVertices(std::vector<Config> vertices_){
+void PathSpace::SetVertices(const std::vector<Config>& vertices_){
   vertices = vertices_;
 }
 
@@ -42,6 +48,9 @@ std::ostream& operator<< (std::ostream& out, const PathSpace& space)
   std::cout << " init        : " << space.input->q_init << std::endl;
   std::cout << " goal        : " << space.input->q_goal << std::endl;
   std::cout << " type        : " << space.input->type << std::endl;
+  std::cout << " #path vertices  : " << space.vantage_path.size() << std::endl;
+  std::cout << " #graph vertices : " << space.vertices.size() << std::endl;
+  std::cout << " #graph edges    : " << space.edges.size() << std::endl;
   //uint ii = space.input.robot_inner_idx;
   //uint io = space.input.robot_outer_idx;
   //std::cout << " robot inner : " << ii << " " << space.world->robots[ii]->name << std::endl;

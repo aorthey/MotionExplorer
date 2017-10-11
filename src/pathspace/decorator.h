@@ -8,8 +8,7 @@ class PathSpaceDecorator: public PathSpace{
 
     virtual std::vector<PathSpace*> Decompose();
     virtual bool isAtomic() const;
-
-    virtual void DrawGL(const GUIState&);
+    virtual void DrawGL(GUIState&);
 
   protected:
     PathSpace* component;

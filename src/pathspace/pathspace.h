@@ -14,14 +14,15 @@ class PathSpace{
 
     std::vector<Config> GetShortestPath();
     std::vector<Config> GetVertices();
-    void SetShortestPath(std::vector<Config>);
-    void SetVertices(std::vector<Config>);
-
+    std::vector<std::pair<Config,Config>> GetEdges();
+    void SetShortestPath(const std::vector<Config>&);
+    void SetVertices(const std::vector<Config>&);
+    void SetEdges(const std::vector<std::pair<Config,Config>>&);
     //split the pathspace up into smaller pieces.
     //Note: this decomposition does not need to be a partition, but could also
     //be a covering.
     virtual std::vector<PathSpace*> Decompose() = 0;
-    virtual void DrawGL(const GUIState&) = 0;
+    virtual void DrawGL(GUIState&) = 0;
     virtual bool isAtomic() const = 0;
 
     RobotWorld* GetWorldPtr();
@@ -34,6 +35,7 @@ class PathSpace{
 
     std::vector<Config> vantage_path;
     std::vector<Config> vertices;
+    std::vector<std::pair<Config,Config>> edges;
 
     RobotWorld *world;
     PathSpaceInput *input;

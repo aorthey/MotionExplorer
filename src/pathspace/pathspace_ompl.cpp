@@ -36,14 +36,14 @@ std::vector<PathSpace*> PathSpaceOMPL::Decompose(){
 
   if(output.success){
     decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    decomposedspace.at(0)->SetShortestPath( output.shortest_path  );
+    decomposedspace.at(0)->SetShortestPath( output.GetShortestPath() );
   }else{
     std::cout << "Error: Path could not be expanded" << std::endl;
   }
   return decomposedspace;
 
 }
-void PathSpaceOMPL::DrawGL(const GUIState& state){
+void PathSpaceOMPL::DrawGL(GUIState& state){
   uint ridx = input->robot_idx;
   Robot* robot = world->robots[ridx];
   const Config qi = input->q_init;

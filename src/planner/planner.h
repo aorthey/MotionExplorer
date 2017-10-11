@@ -28,7 +28,7 @@ class MotionPlanner{
     virtual void Next();
     virtual void Previous();
     
-    virtual void DrawGL(const GUIState&);
+    virtual void DrawGL(GUIState&);
     virtual void DrawGLScreen(double x_ =0.0, double y_=0.0);
 
     //planner will only be active if input exists and contains a valid algorithm

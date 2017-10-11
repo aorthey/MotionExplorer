@@ -100,6 +100,17 @@ void Hierarchy<T>::Print( ){
 }
 
 template <class T>
+Node<T>* Hierarchy<T>::GetRootNode(){
+  std::vector<int> path;path.clear();
+  return GetNode(path);
+}
+template <class T>
+T Hierarchy<T>::GetRootNodeContent(){
+  Node<T> *node = GetRootNode();
+  return node->content;
+}
+
+template <class T>
 void Hierarchy<T>::DeleteNode( std::vector<int> path ){
   Node<T>* node = GetNode( path );
   //node->children.clear();

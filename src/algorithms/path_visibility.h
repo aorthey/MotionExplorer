@@ -33,10 +33,21 @@ static ob::OptimizationObjectivePtr getThresholdPathLength(const ob::SpaceInform
   return obj;
 }
 
-class PathVisibilityChecker{
+class VisibilityChecker{
+
+  const double max_planning_time_path_path=0.05;
+  const double max_planning_time_path_vertex=0.03;
+  const double epsilon_goalregion = 0.01;
+
   public:
-    PathVisibilityChecker(const ob::SpaceInformationPtr si_path_, CSpaceOMPL *cspace_);
-    bool isVisible(const ob::PlannerData& pd, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2);
+    VisibilityChecker(const ob::SpaceInformationPtr si_path_, CSpaceOMPL *cspace_);
+
+    //path <-> path visibility
+    bool isVisiblePathPath(const ob::PlannerData& pd, const std::vector<Vertex> &p1, const std::vector<Vertex> &p2);
+    //path <-> vertex visibility
+    bool isVisiblePathVertex(const ob::PlannerData& pd, const std::vector<Vertex> &p1, const Vertex& vertex);
+    //vertex <-> vertex visibility
+    bool isVisibleVertexVertex(const ob::PlannerData& pd, const Vertex& v1, const Vertex& v2);
 
   private:
     ob::SpaceInformationPtr si_path;

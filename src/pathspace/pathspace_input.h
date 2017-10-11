@@ -30,6 +30,7 @@ class PathSpaceInput{
     std::string name_algorithm;
 
     std::string type;
+    uint level;
 
     double epsilon_goalregion;
     double max_planning_time;

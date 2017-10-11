@@ -144,6 +144,11 @@ void MotionPlanner::CreateSinglePathHierarchy(){
   }
 
   hierarchy->AddRootNode( new PathSpaceOnetopicCover(world, psinput_level0) );
+  //set direct connection as visualizer for continous path space
+  std::vector<Config> path;
+  path.push_back(psinput_level0->q_init);
+  path.push_back(psinput_level0->q_goal);
+  hierarchy->GetRootNodeContent()->SetShortestPath( path );
 }
 
 /** @brief shallow hierarchy contains two pathspaces. The first path space consists of
@@ -406,11 +411,12 @@ void MotionPlanner::DrawGLScreen(double x_, double y_){
   }
 }
 
-void MotionPlanner::DrawGL(const GUIState& state){
+void MotionPlanner::DrawGL(GUIState& state){
   if(!active) return;
 
   uint N = hierarchy->NumberNodesOnLevel(current_level);
 
+  //PathSpace* P = hierarchy->GetNodeContent(current_path);
   PathSpace* P = new PathSpaceDecoratorSweptVolumePath( hierarchy->GetNodeContent(current_path) );
   std::cout << *P << std::endl;
   P->DrawGL(state);
@@ -422,7 +428,6 @@ void MotionPlanner::DrawGL(const GUIState& state){
     PathSpace* Pk = hierarchy->GetNodeContent(current_path);
     Pk->DrawGL(state);
   }
-  //reset
   if(current_path.size()>0){
     current_path.at(current_path.size()-1) = current_level_node;
   }

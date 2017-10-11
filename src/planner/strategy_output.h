@@ -9,19 +9,27 @@ namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
 struct StrategyOutput{
-  bool success;
-  std::vector<Config> shortest_path;
 
-  ob::ProblemDefinitionPtr pdef;
-  ob::PlannerStatus status;
-  ob::PlannerDataPtr pd;
+  public:
+    StrategyOutput();
 
-  //deep copy
-  void SetPlannerData( ob::PlannerDataPtr pd_ ){
-    pd = pd_;
-    pd->decoupleFromPlanner();
-    /// @todo{do that only when necessary}
-    pd->computeEdgeWeights();
-  }
+    std::vector<Config> GetShortestPath();
+    void SetShortestPath( std::vector<Config> );
+
+    //std::vector<Config> GetRoadmap();
+
+    void SetPlannerData( ob::PlannerDataPtr pd_ );
+
+    bool success;
+
+    ob::PlannerDataPtr GetPlannerDataPtr(){
+      return pd;
+    }
+
+  private:
+
+    std::vector<Config> shortest_path;
+
+    ob::PlannerDataPtr pd;
 
 };

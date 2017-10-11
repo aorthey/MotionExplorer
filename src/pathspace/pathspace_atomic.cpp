@@ -15,7 +15,7 @@ std::vector<PathSpace*> PathSpaceAtomic::Decompose(){
   return output;
 }
 
-void PathSpaceAtomic::DrawGL(const GUIState& state){
+void PathSpaceAtomic::DrawGL(GUIState& state){
   uint ridx = input->robot_idx;
   Robot* robot = world->robots[ridx];
   const Config qi_in = input->q_init;
@@ -24,6 +24,8 @@ void PathSpaceAtomic::DrawGL(const GUIState& state){
   GLColor lightGreen(0.2,0.9,0.2,0.2);
   GLColor lightRed(0.9,0.2,0.2,0.2);
   GLColor magenta(0.9,0.1,0.9,0.5);
+  GLColor grey(0.7,0.7,0.7,1);
+
   GLDraw::drawRobotAtConfig(robot, qi_in, lightGreen);
   GLDraw::drawRobotAtConfig(robot, qg_in, lightRed);
 

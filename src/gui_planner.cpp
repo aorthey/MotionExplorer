@@ -23,6 +23,7 @@ void PlannerBackend::Start(){
 
 bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
+  if(planners.empty()) return BaseT::OnCommand(cmd, args);
   if(cmd=="hierarchy_next"){
     planners.at(active_planner)->Next();
   }else if(cmd=="hierarchy_previous"){
@@ -45,7 +46,6 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
 
   SendRefresh();
   return true;
-
 }
 
 void PlannerBackend::RenderWorld(){

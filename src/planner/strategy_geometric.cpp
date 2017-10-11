@@ -26,7 +26,6 @@ static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInf
 {
   ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
   obj->setCostThreshold(ob::Cost(dInf));
-  //obj->setCostThreshold(ob::Cost(0));
   return obj;
 }
 StrategyGeometric::StrategyGeometric()
@@ -93,6 +92,7 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
   //###########################################################################
   // setup and projection
   //###########################################################################
+
   double epsilon_goalregion = input.epsilon_goalregion;
 
   ss.setStartAndGoalStates(start, goal, epsilon_goalregion);
@@ -114,7 +114,6 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
 
   double max_planning_time= input.max_planning_time;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
-
 
   //###########################################################################
   // solve
@@ -144,18 +143,9 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
   //###########################################################################
 
   output.success = ss.haveSolutionPath();
-  //return approximate solution
+
   if (output.success)
   {
-
-    //if(onetopic){
-    //  OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(*pd, cspace);
-    //  std::vector<std::vector<Config>> vantage_paths = onetopic_pathspace.GetConfigPaths();
-    //  for(uint k = 0; k < vantage_paths.size(); k++){
-    //    output.paths.push_back( vantage_paths.at(k) );
-    //  }
-    //}
-
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Found solution:" << std::endl;
     std::cout << " exact solution       : " << (pdef->hasExactSolution()? "Yes":"No")<< std::endl;
@@ -200,7 +190,7 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
     }
     std::cout << keyframes.size() << "/" << keyframes.size() << " : "  <<  keyframes.back() << std::endl;
 
-    output.shortest_path=keyframes;
+    output.SetShortestPath(keyframes);
     std::cout << std::string(80, '-') << std::endl;
   }else{
     std::cout << "No solution found" << std::endl;

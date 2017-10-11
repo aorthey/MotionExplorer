@@ -9,7 +9,7 @@
    <!--
 -->
 
-  <plannersettings>
+  <plannerinput>
 
     <qinit config="9  0 3 0 -2.0 0.6 0.3 0 0 0"/>
     <qgoal config="9  0.3 -1 0.45 -0.8 -0.6 0 0 0 0"/>
@@ -18,19 +18,18 @@
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.0</epsilongoalregion>
     <maxplanningtime>0.1</maxplanningtime>
-    <algorithm>hierarchical:ompl:prmstar</algorithm>
-    <drawMilestones>10</drawMilestones>
-    <drawSweptVolume>1</drawSweptVolume>
-    <drawStartGoal>1</drawStartGoal>
-    <drawSimplicialComplex>1</drawSimplicialComplex>
-    <drawTree>0</drawTree>
     <freeFloating>1</freeFloating>
-    <robot>
-      <index>1</index>
-      <index>0</index>
-    </robot>
 
-  </plannersettings>
+    <algorithm name="hierarchical:ompl:prmstar">
+      <maxplanningtime>0.1</maxplanningtime>
+      <hierarchy>
+        <level inner_index="1" type="onetopic:rotationalinvariance"/>
+        <level inner_index="0" type="atomic"/>
+      </hierarchy>
+    </algorithm>
+    <algorithm name="ompl:rrt"/>
+
+  </plannerinput>
 
   <forcefield>
     <!--

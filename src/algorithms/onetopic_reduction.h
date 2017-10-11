@@ -40,11 +40,29 @@ class OnetopicPathSpaceModifier{
 
     std::vector< std::vector< Config >> GetConfigPaths();
     std::vector< std::vector< const ob::State* >> GetOMPLStatePaths();
+    std::vector< std::vector< Config >> GetCoverVertices();
+    std::vector< std::vector< std::pair<Config,Config> >> GetCoverEdges();
+    std::vector< Config> GetAllVertices();
+    std::vector< std::pair<Config,Config>> GetAllEdges();
 
   private:
     void ComputeShortestPathsLemon(ob::PlannerData& pd_in);
     void InterpolatePaths( ob::PlannerData& pd );
+    void ComputeCoverVertices( ob::PlannerData& pd );
 
+    std::vector< Vertex > vertices;
+    std::vector< std::pair<Vertex,Vertex> > edges;
+
+    std::vector< Config > config_vertices;
+    std::vector< std::pair<Config,Config> > config_edges;
+
+    std::vector< std::vector< Vertex >> cover_vertices;
+    std::vector< std::vector< std::pair<Vertex,Vertex> >> cover_edges;
+
+    std::vector< std::vector< Config >> cover_config_vertices;
+    std::vector< std::vector< std::pair<Config,Config> >> cover_config_edges;
+
+    std::vector< std::vector< Vertex >> vertex_paths;
     std::vector< std::vector< Config >> config_paths;
     std::vector< std::vector< const ob::State* >> omplstate_paths;
 

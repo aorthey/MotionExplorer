@@ -76,6 +76,7 @@
   </hotkey>
 
   <property name="draw_axes" enabled="0"/>
+  <property name="draw_cover_vertices" enabled="1"/>
 
 </gui>
 

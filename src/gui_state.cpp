@@ -65,6 +65,7 @@ GUIVariable& GUIState::operator()(const char* str){
   }
   return *variables[std::string(str)];
 }
+
 void GUIState::toggle(const char* str){
   (*this)(str).toggle();
 }

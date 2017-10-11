@@ -32,6 +32,9 @@ class Hierarchy{
     void AddNode( T content_ );
     void AddNode( T content, std::vector<int> path);
     void DeleteNode( std::vector<int> path );
+
+    Node<T>* GetRootNode();
+    T GetRootNodeContent();
     Node<T>* GetNode( std::vector<int> nodes );
     T GetNodeContent( std::vector<int> nodes );
 

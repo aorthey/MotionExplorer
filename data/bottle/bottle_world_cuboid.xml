@@ -13,7 +13,7 @@
   <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 1 1" rotateRPY="0 0 1.57"/>
   -->
 
-  <plannersettings>
+  <plannerinput>
 
     <qinit config="9  0 -2 0 -2.0 +0.6 0.3 0 0 0"/>
     <qgoal config="9  0 +2 0 -0.8 -0.6 0.0 0 0 0"/>
@@ -26,14 +26,16 @@
     <epsilongoalregion>0.01</epsilongoalregion>
     <maxplanningtime>0.01</maxplanningtime>
 
-    <algorithm>hierarchical:ompl:prmstar</algorithm>
-    <hierarchy>
-      <level inner_index="2"/>
-      <level inner_index="1"/>
-      <level inner_index="0"/>
-    </hierarchy>
+    <algorithm name="hierarchical:ompl:prmstar">
+      <maxplanningtime>0.03</maxplanningtime>
+      <hierarchy>
+        <level inner_index="2" type="onetopic:rotationalinvariance"/>
+        <level inner_index="1" type="onetopic:rollinvariance"/>
+        <level inner_index="0" type="atomic"/>
+      </hierarchy>
+    </algorithm>
 
-  </plannersettings>
+  </plannerinput>
 
   <forcefield>
     <uniform force="0 0 -1.71" color="1 0 0"/>

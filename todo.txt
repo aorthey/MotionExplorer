@@ -303,16 +303,9 @@ primitives -> maybe we can remove the checker from klampt?)
  [ ] new ViewTree to visualize a pathspace exploration
  [ ] remove serialized tree once and for all
  [ ] multiple restarts of RRT produce same results. reseed!
- [ ] PlannerInput -> AlgorithmInput
+ [x] PlannerInput -> AlgorithmInput
  [x] maxplanningtime not used in algorithm
+ [ ] visualize necessary and sufficient vertices.
+ [x] visualize swath volume of onetopic covering
+ [ ] visualize roadmap plus edges by visualizing it as a dense swath volume
 
-
-Planner: PlannerInput -> PlannerOutput
-
-Hierarchical: PlannerInput -> Stack< PathSpaceInput>
-
-PathSpace: PathSpaceInput-> StrategyInput
-
-StrategyInput->StrategyOutput
-
-CollisionChecking->PQP

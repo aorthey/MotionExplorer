@@ -8,7 +8,6 @@
 PathSpaceOnetopicCover::PathSpaceOnetopicCover(RobotWorld *world_, PathSpaceInput* input_):
   PathSpace(world_, input_)
 {
-
 }
 
 bool PathSpaceOnetopicCover::isAtomic() const{
@@ -39,38 +38,57 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   //  std::vector<Config> path_constraint = node->content.path;
   //  cspace_i = factory.MakeGeometricCSpacePathConstraintRollInvariance(robot_inner, cspace_klampt_i, path_constraint);
 
+  //##############################################################################
+  //Compute roadmap for current cspace
+  //##############################################################################
   StrategyGeometric strategy;
   StrategyOutput output;
   strategy.plan(input->GetStrategyInput(), cspace_i, output);
 
   std::vector<PathSpace*> decomposedspace;
-
   if(!output.success) return decomposedspace;
+  //##############################################################################
+  //compute vantage paths of each onetopic cover
+  //##############################################################################
 
-  OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(*output.pd, cspace_i);
+  OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(*output.GetPlannerDataPtr(), cspace_i);
   std::vector<std::vector<Config>> vantage_paths = onetopic_pathspace.GetConfigPaths();
+
+  std::vector<Config> all_vertices = onetopic_pathspace.GetAllVertices();
+  std::vector<std::pair<Config,Config>> all_edges = onetopic_pathspace.GetAllEdges();
+  std::vector<std::vector<Config>> cover_vertices = onetopic_pathspace.GetCoverVertices();
+  std::vector<std::vector<std::pair<Config,Config>>> cover_edges = onetopic_pathspace.GetCoverEdges();
+
   PathSpaceInput *next = input->GetNextLayer();
 
-  std::cout << next->type << std::endl;
-  for(uint k = 0; k < vantage_paths.size(); k++){
+  //##############################################################################
+  PathSpace *p0 = new PathSpaceAtomic(world, next);
+  Config qi = vantage_paths.at(0).front();
+  Config qg = vantage_paths.at(0).back();
+  std::vector<Config> initpath;
+  initpath.push_back(qi);
+  initpath.push_back(qg);
+  p0->SetShortestPath( initpath );
+  p0->SetVertices(all_vertices);
+  p0->SetEdges(all_edges);
+
+  decomposedspace.push_back(p0);
+
+  for(uint k = 0; k < cover_vertices.size(); k++){
     PathSpace *pk = new PathSpaceAtomic(world, next);
     pk->SetShortestPath( vantage_paths.at(k) );
+    pk->SetVertices(cover_vertices.at(k));
+    pk->SetEdges(cover_edges.at(k));
     decomposedspace.push_back(pk);
-    //output.paths.push_back( vantage_paths.at(k) );
   }
 
-  //exit(0);
+  //##############################################################################
 
-  //for(uint k = 0; k < output.paths.size(); k++){
-  //  PathSpace *pk = new PathSpaceAtomic(world, input);
-  //  pk->SetShortestPath( output.paths.at(k) );
-  //  decomposedspace.push_back(pk);
-  //}
   return decomposedspace;
 }
 
 
-void PathSpaceOnetopicCover::DrawGL(const GUIState&){
+void PathSpaceOnetopicCover::DrawGL(GUIState&){
   uint ridx = input->robot_idx;
   Robot* robot = world->robots[ridx];
   const Config qi_in = input->q_init;
@@ -82,11 +100,5 @@ void PathSpaceOnetopicCover::DrawGL(const GUIState&){
 
   GLDraw::drawRobotAtConfig(robot, qi_in, lightGreen);
   GLDraw::drawRobotAtConfig(robot, qg_in, lightRed);
-
-  if(vantage_path.size()>0){
-    //GLDraw::drawPath(vantage_path, magenta, 20);
-    //const SweptVolume& sv = GetSweptVolume(robot);
-    //GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
-  }
 }
 
