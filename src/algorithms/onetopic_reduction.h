@@ -36,36 +36,56 @@ using EIterator = Graph::EIterator;
 
 class OnetopicPathSpaceModifier{
   public:
-    explicit OnetopicPathSpaceModifier( ob::PlannerData& pd_in, CSpaceOMPL *cspace);
+    explicit OnetopicPathSpaceModifier( ob::PlannerDataPtr pd_in, CSpaceOMPL *cspace);
 
-    std::vector< std::vector< Config >> GetConfigPaths();
-    std::vector< std::vector< const ob::State* >> GetOMPLStatePaths();
-    std::vector< std::vector< Config >> GetCoverVertices();
-    std::vector< std::vector< std::pair<Config,Config> >> GetCoverEdges();
+    std::vector< std::vector< Config >> GetShortestPathForEachCover();
+
     std::vector< Config> GetAllVertices();
     std::vector< std::pair<Config,Config>> GetAllEdges();
+    std::vector< std::vector<Config>> GetAllPaths();
+
+    std::vector< std::vector< Config >> GetCoverVertices();
+    std::vector< std::vector< std::pair<Config,Config> >> GetCoverEdges();
+    std::vector< std::vector<std::vector<Config> >> GetCoverPaths();
 
   private:
-    void ComputeShortestPathsLemon(ob::PlannerData& pd_in);
-    void InterpolatePaths( ob::PlannerData& pd );
-    void ComputeCoverVertices( ob::PlannerData& pd );
 
-    std::vector< Vertex > vertices;
-    std::vector< std::pair<Vertex,Vertex> > edges;
+    void ComputeShortestPathsLemon();
+    void ShortestPathsNonOnetopic();
+    std::vector<Config> VertexPathToConfigPath( const std::vector<Vertex> &path);
+  private:
 
-    std::vector< Config > config_vertices;
-    std::vector< std::pair<Config,Config> > config_edges;
-
-    std::vector< std::vector< Vertex >> cover_vertices;
-    std::vector< std::vector< std::pair<Vertex,Vertex> >> cover_edges;
-
-    std::vector< std::vector< Config >> cover_config_vertices;
-    std::vector< std::vector< std::pair<Config,Config> >> cover_config_edges;
-
-    std::vector< std::vector< Vertex >> vertex_paths;
-    std::vector< std::vector< Config >> config_paths;
-    std::vector< std::vector< const ob::State* >> omplstate_paths;
+    ob::PlannerDataPtr pd;
 
     CSpaceOMPL *cspace;
+
+    std::vector< Vertex > all_vertices;
+    std::vector< Config > all_vertices_config;
+
+    std::vector< std::pair<Vertex,Vertex> > all_edges;
+    std::vector< std::pair<Config,Config> > all_edges_config;
+
+    std::vector< std::vector<Vertex>> all_paths;
+    std::vector< std::vector<Config>> all_paths_config;
+
+
+    std::vector<double> distance_shortest_path; //length of the shortest path from start to goal >including< vertex i
+    double max_distance_shortest_path;
+    double min_distance_shortest_path;
+
+
+    std::vector< std::vector< Vertex >> cover_vertices;
+    std::vector< std::vector< Config >> cover_vertices_config;
+
+    std::vector< std::vector< std::pair<Vertex,Vertex> >> cover_edges;
+    std::vector< std::vector< std::pair<Config,Config> >> cover_edges_config;
+
+    std::vector< std::vector<std::vector<Vertex> >> cover_paths;
+    std::vector< std::vector<std::vector<Config> >> cover_paths_config;
+
+
+    std::vector< std::vector< Vertex >> cover_shortest_paths_vertex;
+    std::vector< std::vector< Config >> cover_shortest_paths_config;
+    std::vector< std::vector< const ob::State* >> cover_shortest_paths_omplstate;
 
 };

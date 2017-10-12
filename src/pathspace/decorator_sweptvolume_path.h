@@ -40,6 +40,16 @@ class PathSpaceDecoratorSweptVolumePath: public PathSpaceDecorator{
 
         }
       }
+      GLColor magenta(0.9,0.1,0.9,0.5);
+      if(paths.size()>0){
+        for(uint k = 0; k < paths.size(); k++){
+          const std::vector<Config> p = paths.at(k);
+          for(uint j = 0; j < p.size(); j++){
+            GLDraw::drawPath( p, magenta, 10);
+          }
+        }
+      }
+
     }
 };
 

@@ -295,17 +295,20 @@ connected, or use that as a ground truth benchmark)
 
 HPlanner
  [x] going up does not remove SV
- [ ] orientation wrong.
  [x] position goes through wall in L (uses triangle meshes and not hierarchy of
 primitives -> maybe we can remove the checker from klampt?)
- [ ] split fibrebundles up into checker and integrator. put them into subfolders.
- remove the planneradaptor parts (are deprecated)
+ [x] PlannerInput -> AlgorithmInput
+ [x] maxplanningtime not used in algorithm
+ [x] visualize swath volume of onetopic covering
+ [x] visualize roadmap plus edges by visualizing it as a dense swath volume
+ [ ] orientation wrong.
+ [ ] split fibrebundles up into checker and integrator. put them into subfolders. 
  [ ] new ViewTree to visualize a pathspace exploration
  [ ] remove serialized tree once and for all
  [ ] multiple restarts of RRT produce same results. reseed!
- [x] PlannerInput -> AlgorithmInput
- [x] maxplanningtime not used in algorithm
  [ ] visualize necessary and sufficient vertices.
- [x] visualize swath volume of onetopic covering
- [ ] visualize roadmap plus edges by visualizing it as a dense swath volume
+ [ ] visualize a onetopic cover by a bunch of threads ?
+ [ ] visualize a onetopic cover by all onetopically equivalent shortest paths
 
+[ ] computing onetopic cover including roadmap is too slow. How could we speed
+it up? Could we already include it in the sampling process?

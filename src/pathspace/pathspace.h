@@ -15,9 +15,12 @@ class PathSpace{
     std::vector<Config> GetShortestPath();
     std::vector<Config> GetVertices();
     std::vector<std::pair<Config,Config>> GetEdges();
+    std::vector<std::vector<Config>> GetPaths();
+
     void SetShortestPath(const std::vector<Config>&);
     void SetVertices(const std::vector<Config>&);
     void SetEdges(const std::vector<std::pair<Config,Config>>&);
+    void SetPaths(const std::vector<std::vector<Config>>&);
     //split the pathspace up into smaller pieces.
     //Note: this decomposition does not need to be a partition, but could also
     //be a covering.
@@ -36,6 +39,7 @@ class PathSpace{
     std::vector<Config> vantage_path;
     std::vector<Config> vertices;
     std::vector<std::pair<Config,Config>> edges;
+    std::vector<std::vector<Config>> paths;
 
     RobotWorld *world;
     PathSpaceInput *input;

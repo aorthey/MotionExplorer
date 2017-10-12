@@ -8,6 +8,7 @@ PathSpaceDecorator::PathSpaceDecorator(PathSpace *component_):
   this->vertices = component->GetVertices();
   this->vantage_path = component->GetShortestPath();
   this->edges = component->GetEdges();
+  this->paths = component->GetPaths();
 }
 
 bool PathSpaceDecorator::isAtomic() const{

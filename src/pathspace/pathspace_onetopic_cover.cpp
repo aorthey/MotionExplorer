@@ -51,13 +51,19 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   //compute vantage paths of each onetopic cover
   //##############################################################################
 
-  OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(*output.GetPlannerDataPtr(), cspace_i);
-  std::vector<std::vector<Config>> vantage_paths = onetopic_pathspace.GetConfigPaths();
+  OnetopicPathSpaceModifier onetopic_pathspace = OnetopicPathSpaceModifier(output.GetPlannerDataPtr(), cspace_i);
+  std::vector<std::vector<Config>> vantage_paths = onetopic_pathspace.GetShortestPathForEachCover();
 
   std::vector<Config> all_vertices = onetopic_pathspace.GetAllVertices();
   std::vector<std::pair<Config,Config>> all_edges = onetopic_pathspace.GetAllEdges();
+  std::vector<std::vector<Config>> all_paths = onetopic_pathspace.GetAllPaths();
+
   std::vector<std::vector<Config>> cover_vertices = onetopic_pathspace.GetCoverVertices();
   std::vector<std::vector<std::pair<Config,Config>>> cover_edges = onetopic_pathspace.GetCoverEdges();
+  std::vector<std::vector<std::vector<Config>>> cover_paths = onetopic_pathspace.GetCoverPaths();
+
+  std::cout << "paths: " << all_paths.size() << std::endl;
+  std::cout << "paths: " << vantage_paths.size() << std::endl;
 
   PathSpaceInput *next = input->GetNextLayer();
 
@@ -71,14 +77,16 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   p0->SetShortestPath( initpath );
   p0->SetVertices(all_vertices);
   p0->SetEdges(all_edges);
+  p0->SetPaths(all_paths);
 
   decomposedspace.push_back(p0);
 
-  for(uint k = 0; k < cover_vertices.size(); k++){
+  for(uint k = 0; k < vantage_paths.size(); k++){
     PathSpace *pk = new PathSpaceAtomic(world, next);
     pk->SetShortestPath( vantage_paths.at(k) );
     pk->SetVertices(cover_vertices.at(k));
     pk->SetEdges(cover_edges.at(k));
+    pk->SetPaths(cover_paths.at(k));
     decomposedspace.push_back(pk);
   }
 
