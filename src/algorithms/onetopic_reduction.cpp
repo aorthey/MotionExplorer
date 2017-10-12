@@ -8,6 +8,7 @@ pd(pd_in), cspace(cspace_)
   pd->decoupleFromPlanner();
   ComputeShortestPathsLemon();
   ShortestPathsNonOnetopic();
+  ComputeOnetopicCoverRoadmap();
   //ComputeCoverVertices(pd_in);
 }
 
@@ -206,15 +207,54 @@ void OnetopicPathSpaceModifier::ShortestPathsNonOnetopic(){
   uint N = cover_shortest_paths_config.size();
   std::cout << "output paths: " << N << std::endl;
 
-  cover_vertices_config.resize(N);
-  cover_vertices.resize(N);
+  //cover_vertices_config.resize(N);
+  //cover_vertices.resize(N);
 
-  cover_edges_config.resize(N);
-  cover_edges.resize(N);
+  //cover_edges_config.resize(N);
+  //cover_edges.resize(N);
 
-  cover_paths.resize(N);
-  cover_paths_config.resize(N);
+  //cover_paths.resize(N);
+  //cover_paths_config.resize(N);
 
+}
+void OnetopicPathSpaceModifier::ComputeOnetopicCoverRoadmap(){
+
+  const ob::SpaceInformationPtr si = pd->getSpaceInformation();
+  VisibilityChecker path_checker(si, cspace);
+  uint N = cover_shortest_paths_config.size();
+
+  for(uint k = 0; k < N ; k++){
+
+    std::vector<Vertex> single_cover_vertex;
+    std::vector<Config> single_cover_vertex_config;
+
+    std::vector<std::pair<Vertex,Vertex>> single_cover_edges;
+    std::vector<std::pair<Config,Config>> single_cover_edges_config;
+
+    std::vector<std::vector<Vertex>> single_cover_path;
+    std::vector<std::vector<Config>> single_cover_path_config;
+
+
+    for(uint j = 0; j < all_paths.size(); j++){
+      bool isVisible = path_checker.isVisiblePathPath(*pd, all_paths.at(j), cover_shortest_paths_vertex.at(k));
+      if(isVisible){
+        single_cover_vertex.push_back(j);
+        single_cover_path.push_back(all_paths.at(j));
+        single_cover_vertex_config.push_back(VertexToConfig(j));
+        single_cover_path_config.push_back( VertexPathToConfigPath(all_paths.at(j)) );
+      }
+    }
+
+    std::cout << "onetopic cover " << k << " has " << single_cover_path.size() << " paths" << std::endl;
+
+    cover_paths.push_back(single_cover_path);
+    cover_paths_config.push_back(single_cover_path_config);
+    cover_vertices.push_back(single_cover_vertex);
+    cover_vertices_config.push_back(single_cover_vertex_config);
+    cover_edges.push_back(single_cover_edges);
+    cover_edges_config.push_back(single_cover_edges_config);
+
+  }
 
   //for(uint k = 0; k < vertex_paths.size(); k++){
   //  std::vector<Vertex> single_cover_vertex;
@@ -269,6 +309,11 @@ void OnetopicPathSpaceModifier::ShortestPathsNonOnetopic(){
 }
 
 
+Config OnetopicPathSpaceModifier::VertexToConfig( const Vertex& v){
+  const ob::State *state = pd->getVertex(v).getState();
+  Config q = cspace->OMPLStateToConfig(state);
+  return q;
+}
 std::vector<Config> OnetopicPathSpaceModifier::VertexPathToConfigPath( const std::vector<Vertex> &path){
   const ob::SpaceInformationPtr si = pd->getSpaceInformation();
 

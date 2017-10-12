@@ -52,7 +52,9 @@ class OnetopicPathSpaceModifier{
 
     void ComputeShortestPathsLemon();
     void ShortestPathsNonOnetopic();
+    void ComputeOnetopicCoverRoadmap();
     std::vector<Config> VertexPathToConfigPath( const std::vector<Vertex> &path);
+    Config VertexToConfig( const Vertex& v);
   private:
 
     ob::PlannerDataPtr pd;

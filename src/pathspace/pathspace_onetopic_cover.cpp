@@ -86,6 +86,7 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
     pk->SetShortestPath( vantage_paths.at(k) );
     pk->SetVertices(cover_vertices.at(k));
     pk->SetEdges(cover_edges.at(k));
+    std::cout << "cover paths[" << k << "] " << cover_paths.at(k).size() << std::endl;
     pk->SetPaths(cover_paths.at(k));
     decomposedspace.push_back(pk);
   }
