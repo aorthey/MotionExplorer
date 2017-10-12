@@ -26,19 +26,11 @@ void OnetopicPathSpaceModifier::ComputeShortestPathsLemon(){
   std::cout << "output paths   : " << std::flush;
 
 //#############################################################################
-// output
-//#############################################################################
-
-  std::vector<Config> V;
-  std::vector<int> Vidx;
-
-//#############################################################################
 // Nodes boost to lemon
 //#############################################################################
   using namespace lemon;
 
   const ob::SpaceInformationPtr si = pd->getSpaceInformation();
-  //Graph g = pd->toBoostGraph();
   uint N = pd->numVertices();
 
   ListGraph lg;
@@ -295,7 +287,7 @@ std::vector<Config> OnetopicPathSpaceModifier::VertexPathToConfigPath( const std
   og::PathSimplifier shortcutter(si);
   shortcutter.shortcutPath(omplpath);
 
-  omplpath.interpolate();
+  //omplpath.interpolate();
 
   std::vector<ob::State *> interpolated_states = omplpath.getStates();
   std::vector<Config> keyframes;

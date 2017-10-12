@@ -53,6 +53,12 @@
     <key>b</key>
     <active>0</active>
   </checkbox>
+  <checkbox>
+    <name>draw_path_space</name>
+    <descr>Draw Path Space</descr>
+    <key>g</key>
+    <active>1</active>
+  </checkbox>
 
   <hotkey>
     <name>reset</name>

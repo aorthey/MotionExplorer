@@ -34,7 +34,6 @@
         <level inner_index="0" type="atomic"/>
       </hierarchy>
     </algorithm>
-
     <algorithm name="ompl:rrt"/>
     <algorithm name="ompl:pdst"/>
 

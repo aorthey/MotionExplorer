@@ -36,7 +36,6 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
     CreateShallowHierarchy();
   }else{
     active = false;
-    //RaiseError();
   }
 }
 
@@ -278,23 +277,6 @@ void MotionPlanner::RaiseError(){
 //  return true;
 //}
 
-
-//std::vector< std::vector<Config> > MotionPlanner::GetSiblingPaths(){
-//  std::vector< std::vector<Config> > siblings;
-//
-//  std::vector<int> path = current_path;
-//
-//  if(path.size()>0){
-//    for(uint k = 0; k < hierarchy->NumberNodesOnLevel(current_level); k++){
-//      if(k==current_level_node) continue;
-//
-//      path.at(path.size()-1) = k;
-//      const std::vector<Config>& siblingk = hierarchy->GetNodeContent( path ).path;
-//      siblings.push_back(siblingk);
-//    }
-//  }
-//  return siblings;
-//}
 
 //folder-like operations on  path space
 void MotionPlanner::Expand(){

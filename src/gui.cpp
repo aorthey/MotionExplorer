@@ -486,6 +486,8 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     state("draw_distance_robot_terrain").toggle();
   }else if(cmd=="draw_center_of_mass_path"){
     state("draw_center_of_mass_path").toggle();
+  }else if(cmd=="draw_path_space"){
+    state("draw_path_space").toggle();
   }else if(cmd=="toggle_mode"){
     if(click_mode == ModeNormal){
       click_mode = ModeForceApplication;
