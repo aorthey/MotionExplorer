@@ -8,6 +8,7 @@
 #include "pathspace/pathspace_onetopic_cover.h"
 #include "pathspace/decorator.h"
 #include "pathspace/decorator_sweptvolume_path.h"
+#include "pathspace/decorator_highlighter.h"
 #include <KrisLibrary/utils/stringutils.h>
 
 using namespace GLDraw;
@@ -417,7 +418,8 @@ void MotionPlanner::DrawGL(GUIState& state){
   uint N = hierarchy->NumberNodesOnLevel(current_level);
 
   //PathSpace* P = hierarchy->GetNodeContent(current_path);
-  PathSpace* P = new PathSpaceDecoratorSweptVolumePath( hierarchy->GetNodeContent(current_path) );
+  //PathSpace* P = new PathSpaceDecoratorSweptVolumePath( hierarchy->GetNodeContent(current_path) );
+  PathSpace* P = new PathSpaceDecoratorHighlighter( hierarchy->GetNodeContent(current_path) );
   std::cout << *P << std::endl;
   P->DrawGL(state);
 

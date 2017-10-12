@@ -43,6 +43,6 @@ namespace GLDraw {
   void drawWireEllipsoid(Vector3 &c, Vector3 &u, Vector3 &v, Vector3 &w, int numSteps=16);
   void drawEllipsoid(Vector3 &c, Vector3 &u, Vector3 &v, Vector3 &w, int numSteps=16);
 
-  void drawPath( const std::vector<Config> &path, GLColor &c, double linewidth = 10);
+  void drawPath( const std::vector<Config> &path, GLColor &c, double linewidth = 10, double ptsize=10);
   void setColor(GLColor &c);
 };

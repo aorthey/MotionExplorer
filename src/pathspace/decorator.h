@@ -1,5 +1,5 @@
 #pragma once
-#include "pathspace.h"
+#include "pathspace/pathspace.h"
 
 class PathSpaceDecorator: public PathSpace{
 

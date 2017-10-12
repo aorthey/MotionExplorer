@@ -9,7 +9,6 @@ pd(pd_in), cspace(cspace_)
   ComputeShortestPathsLemon();
   ShortestPathsNonOnetopic();
   //ComputeCoverVertices(pd_in);
-
 }
 
 /// output:
@@ -211,6 +210,7 @@ void OnetopicPathSpaceModifier::ShortestPathsNonOnetopic(){
       }
     }
   }
+
   uint N = cover_shortest_paths_config.size();
   std::cout << "output paths: " << N << std::endl;
 

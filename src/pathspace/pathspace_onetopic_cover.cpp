@@ -69,8 +69,8 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
 
   //##############################################################################
   PathSpace *p0 = new PathSpaceAtomic(world, next);
-  Config qi = vantage_paths.at(0).front();
-  Config qg = vantage_paths.at(0).back();
+  Config qi = input->q_init;
+  Config qg = input->q_goal;
   std::vector<Config> initpath;
   initpath.push_back(qi);
   initpath.push_back(qg);
