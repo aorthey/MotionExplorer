@@ -46,6 +46,10 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     state("draw_sweptvolume").toggle();
   }else if(cmd=="draw_roadmap"){
     state("draw_roadmap").toggle();
+  }else if(cmd=="draw_roadmap_necessary"){
+    state("draw_roadmap_necessary").toggle();
+  }else if(cmd=="draw_roadmap_sufficient"){
+    state("draw_roadmap_sufficient").toggle();
   }else return BaseT::OnCommand(cmd,args);
 
   SendRefresh();

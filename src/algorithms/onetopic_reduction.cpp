@@ -7,8 +7,8 @@ pd(pd_in), cspace(cspace_)
 {
   pd->decoupleFromPlanner();
   ComputeShortestPathsLemon();
-  ShortestPathsNonOnetopic();
-  ComputeOnetopicCoverRoadmap();
+  //ShortestPathsNonOnetopic();
+  //ComputeOnetopicCoverRoadmap();
   //ComputeCoverVertices(pd_in);
 }
 

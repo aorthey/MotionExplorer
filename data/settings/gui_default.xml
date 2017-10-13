@@ -57,18 +57,30 @@
     <name>draw_path_space</name>
     <descr>Draw Path Space</descr>
     <key>g</key>
-    <active>1</active>
+    <active>0</active>
   </checkbox>
   <checkbox>
     <name>draw_sweptvolume</name>
     <descr>Draw Swept Volume</descr>
-    <key>m</key>
-    <active>1</active>
+    <key>l</key>
+    <active>0</active>
   </checkbox>
   <checkbox>
     <name>draw_roadmap</name>
     <descr>Draw Roadmap Planner </descr>
+    <key></key>
+    <active>1</active>
+  </checkbox>
+  <checkbox>
+    <name>draw_roadmap_necessary</name>
+    <descr>Draw Roadmap Necessary Vertices</descr>
     <key>n</key>
+    <active>1</active>
+  </checkbox>
+  <checkbox>
+    <name>draw_roadmap_sufficient</name>
+    <descr>Draw Roadmap Sufficient Vertices</descr>
+    <key>m</key>
     <active>0</active>
   </checkbox>
 

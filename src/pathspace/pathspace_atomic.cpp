@@ -33,6 +33,6 @@ void PathSpaceAtomic::DrawGL(GUIState& state){
     GLDraw::drawPath(vantage_path, magenta, 10);
   }
 
-  if(state("draw_roadmap")) roadmap.GLDraw();
+  if(state("draw_roadmap")) roadmap.DrawGL(state);
 }
 

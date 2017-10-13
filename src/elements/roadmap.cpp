@@ -3,10 +3,9 @@
 #include "planner/validity_checker_ompl.h"
 
 Roadmap::Roadmap(){
-};
+}
 
 void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *cspace_){
-{
   cspace = cspace_;
   ob::SpaceInformationPtr si = pd->getSpaceInformation();
   std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
@@ -21,8 +20,7 @@ void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *csp
 
 
     V.push_back(q1);
-
-    sufficient.push_back(validity_checker->isSufficient(s));
+    Vsufficient.push_back(validity_checker->isSufficient(s));
 
     std::vector<uint> edgeList;
     pd->getEdges(i, edgeList);
@@ -32,16 +30,19 @@ void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *csp
       Config q2 = cspace->OMPLStateToConfig(sj);
       Config qedge  = q2 - q1;
       E.push_back(std::make_pair(q1,q2));
+      Esufficient.push_back(validity_checker->isSufficient(s) && validity_checker->isSufficient(sj));
     }
-
   }
 }
 
-}
-void Roadmap::GLDraw(){
+void Roadmap::DrawGL(GUIState& state)
+{
   GLColor green(0.2,0.9,0.2,0.5);
   GLColor red(0.9,0.2,0.2,0.5);
   GLColor magenta(0.9,0.1,0.9,0.5);
+
+  GLColor sufficient = green;
+  GLColor necessary = magenta;
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND); 
 
@@ -49,11 +50,10 @@ void Roadmap::GLDraw(){
   for(uint k = 0; k < V.size(); k++){
     Config q = V.at(k);
     Vector3 v(q(0),q(1),q(2));
-    if(sufficient.at(k)){
-      setColor(magenta);
+    if(Vsufficient.at(k)){
+      if(state("draw_roadmap_sufficient")) setColor(sufficient);
     }else{
-      glPointSize(20);
-      setColor(green);
+      if(state("draw_roadmap_necessary")) setColor(necessary);
     }
     drawPoint(v);
   }
@@ -63,7 +63,14 @@ void Roadmap::GLDraw(){
     Config q2 = E.at(k).second;
     Vector3 v1(q1(0),q1(1),q1(2));
     Vector3 v2(q2(0),q2(1),q2(2));
-    drawLineSegment(v1,v2);
+    if(Esufficient.at(k)){
+      setColor(sufficient);
+      if(state("draw_roadmap_sufficient")) drawLineSegment(v1,v2);
+    }else{
+      setColor(necessary);
+      if(state("draw_roadmap_necessary")) drawLineSegment(v1,v2);
+    }
+
   }
 
   glEnable(GL_LIGHTING);

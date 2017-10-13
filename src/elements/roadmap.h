@@ -1,5 +1,6 @@
 #pragma once
 #include "planner/cspace.h"
+#include "gui_state.h"
 #include <ompl/base/PlannerData.h>
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 
@@ -11,12 +12,13 @@ class Roadmap{
 
     void CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL* cspace_);
 
-    void GLDraw();
+    virtual void DrawGL(GUIState&);
 
   private:
     CSpaceOMPL *cspace;
     std::vector<Config> V;
-    std::vector<bool> sufficient;
+    std::vector<bool> Vsufficient;
     std::vector<std::pair<Config,Config>> E;
+    std::vector<bool> Esufficient;
 };
 
