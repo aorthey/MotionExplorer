@@ -42,6 +42,10 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     if(active_planner>0) active_planner--;
     else active_planner = planners.size()-1;
     //std::cout << planners.at(active_planner)->GetInput() << std::endl;
+  }else if(cmd=="draw_sweptvolume"){
+    state("draw_sweptvolume").toggle();
+  }else if(cmd=="draw_roadmap"){
+    state("draw_roadmap").toggle();
   }else return BaseT::OnCommand(cmd,args);
 
   SendRefresh();

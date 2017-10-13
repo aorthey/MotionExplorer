@@ -29,7 +29,7 @@ std::vector<PathSpace*> PathSpaceOMPL::Decompose(){
   cspace->print();
 
   StrategyGeometric strategy;
-  StrategyOutput output;
+  StrategyOutput output(cspace);
   strategy.plan(input->GetStrategyInput(), cspace, output);
 
   std::vector<PathSpace*> decomposedspace;
@@ -37,6 +37,7 @@ std::vector<PathSpace*> PathSpaceOMPL::Decompose(){
   if(output.success){
     decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
     decomposedspace.at(0)->SetShortestPath( output.GetShortestPath() );
+    decomposedspace.at(0)->SetRoadmap( output.GetRoadmap() );
   }else{
     std::cout << "Error: Path could not be expanded" << std::endl;
   }

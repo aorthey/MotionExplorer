@@ -14,7 +14,7 @@ void PathSpaceDecoratorHighlighter::DrawGL(GUIState& state){
 
   GLColor grey(0.8,0.8,0.8,0.5);
   const std::vector<Config> path = component->GetShortestPath();
-  if(path.size()>0){
+  if(state("draw_sweptvolume") && path.size()>0){
     const SweptVolume& sv = component->GetSweptVolume(robot);
     GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
   }

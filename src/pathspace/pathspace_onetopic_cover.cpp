@@ -42,7 +42,7 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   //Compute roadmap for current cspace
   //##############################################################################
   StrategyGeometric strategy;
-  StrategyOutput output;
+  StrategyOutput output(cspace_i);
   strategy.plan(input->GetStrategyInput(), cspace_i, output);
 
   std::vector<PathSpace*> decomposedspace;

@@ -1,4 +1,5 @@
 #pragma once
+#include "elements/roadmap.h"
 #include <omplapp/config.h>
 #include <ompl/base/PlannerData.h>
 #include <ompl/geometric/SimpleSetup.h>
@@ -11,12 +12,13 @@ namespace og = ompl::geometric;
 struct StrategyOutput{
 
   public:
-    StrategyOutput();
+    StrategyOutput(CSpaceOMPL*);
 
     std::vector<Config> GetShortestPath();
     void SetShortestPath( std::vector<Config> );
 
-    //std::vector<Config> GetRoadmap();
+    Roadmap GetRoadmap();
+    void SetRoadmap(Roadmap);
 
     void SetPlannerData( ob::PlannerDataPtr pd_ );
 
@@ -31,5 +33,9 @@ struct StrategyOutput{
     std::vector<Config> shortest_path;
 
     ob::PlannerDataPtr pd;
+
+    Roadmap roadmap;
+
+    CSpaceOMPL *cspace;
 
 };

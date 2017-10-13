@@ -491,49 +491,49 @@ namespace GLDraw{
   }
 
 
-  void drawPlannerTree(const SerializedTree &_stree, GLColor colorTree)
-  {
-    double edgeWidth = 3;
-    glDisable(GL_LIGHTING);
-    glEnable(GL_BLEND); 
-      
-    for(uint i = 0; i < _stree.size(); i++){
-      SerializedTreeNode node = _stree.at(i);
-      Vector3 pos(node.position(0),node.position(1),node.position(2));
-      Vector3 rot(node.position(3),node.position(4),node.position(5));
+  //void drawPlannerTree(const SerializedTree &_stree, GLColor colorTree)
+  //{
+  //  double edgeWidth = 3;
+  //  glDisable(GL_LIGHTING);
+  //  glEnable(GL_BLEND); 
+  //    
+  //  for(uint i = 0; i < _stree.size(); i++){
+  //    SerializedTreeNode node = _stree.at(i);
+  //    Vector3 pos(node.position(0),node.position(1),node.position(2));
+  //    Vector3 rot(node.position(3),node.position(4),node.position(5));
 
-      std::vector<Vector> dirs = node.directions;
+  //    std::vector<Vector> dirs = node.directions;
 
-      ////Fancy Color gradient, red near goal, blue far away, gaussian //distributed
-      //double d = node.cost_to_goal;
-      //double shade = exp(-d*d/0.5); //\in [0,1]
-      //GLColor color(shade,0,1.0-shade);
+  //    ////Fancy Color gradient, red near goal, blue far away, gaussian //distributed
+  //    //double d = node.cost_to_goal;
+  //    //double shade = exp(-d*d/0.5); //\in [0,1]
+  //    //GLColor color(shade,0,1.0-shade);
 
-      glPushMatrix();
-      setColor(colorTree);
-      glTranslate(pos);
+  //    glPushMatrix();
+  //    setColor(colorTree);
+  //    glTranslate(pos);
 
-      //glPointSize(vertexSize);
-      glPointSize(10);
-      drawPoint(Vector3(0,0,0));
+  //    //glPointSize(vertexSize);
+  //    glPointSize(10);
+  //    drawPoint(Vector3(0,0,0));
 
-      glPushMatrix();
-      glLineWidth(edgeWidth);
-      for(uint j = 0; j < dirs.size(); j++){
-        glBegin(GL_LINES);
-        glVertex3f(0.0, 0.0, 0.0);
-        glVertex3f(dirs.at(j)[0], dirs.at(j)[1], dirs.at(j)[2]);
-        glEnd();
-      }
-      glPopMatrix();
+  //    glPushMatrix();
+  //    glLineWidth(edgeWidth);
+  //    for(uint j = 0; j < dirs.size(); j++){
+  //      glBegin(GL_LINES);
+  //      glVertex3f(0.0, 0.0, 0.0);
+  //      glVertex3f(dirs.at(j)[0], dirs.at(j)[1], dirs.at(j)[2]);
+  //      glEnd();
+  //    }
+  //    glPopMatrix();
 
-      glPopMatrix();
-    }
-    glDisable(GL_BLEND); 
-    glEnable(GL_LIGHTING);
-    //glEnable(GL_LIGHTING);
-    //std::cout << "Visualized Tree with " << _stree.size() << " vertices and " << Nedges << " edges." << std::endl;
-  }
+  //    glPopMatrix();
+  //  }
+  //  glDisable(GL_BLEND); 
+  //  glEnable(GL_LIGHTING);
+  //  //glEnable(GL_LIGHTING);
+  //  //std::cout << "Visualized Tree with " << _stree.size() << " vertices and " << Nedges << " edges." << std::endl;
+  //}
 
 #include <GL/freeglut.h>
   void drawAxesLabels(Camera::Viewport& viewport)

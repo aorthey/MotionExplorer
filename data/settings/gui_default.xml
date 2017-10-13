@@ -59,6 +59,18 @@
     <key>g</key>
     <active>1</active>
   </checkbox>
+  <checkbox>
+    <name>draw_sweptvolume</name>
+    <descr>Draw Swept Volume</descr>
+    <key>m</key>
+    <active>1</active>
+  </checkbox>
+  <checkbox>
+    <name>draw_roadmap</name>
+    <descr>Draw Roadmap Planner </descr>
+    <key>n</key>
+    <active>0</active>
+  </checkbox>
 
   <hotkey>
     <name>reset</name>

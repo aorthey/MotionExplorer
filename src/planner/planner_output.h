@@ -2,7 +2,6 @@
 #include "elements/swept_volume.h"
 #include "elements/swath_volume.h"
 #include "elements/simplicial_complex.h"
-#include "planner/serialized_tree.h"
 
 class PlannerOutput{
 
@@ -28,13 +27,6 @@ class PlannerOutput{
     Config dq_init;
     Config dq_goal;
 
-    int drawShortestPath;
-    int drawSweptVolume;
-    int drawMilestones;
-    int drawStartGoal;
-    int drawTree;
-    int drawSimplicialComplex;
-
     bool success;
 
     SweptVolume *sv;
@@ -50,7 +42,7 @@ class PlannerOutput{
     uint nodes;
 
     //tree swath
-    SerializedTree _stree;
+    //SerializedTree _stree;
 
     //path
     std::vector<Config> q;
@@ -62,18 +54,18 @@ class PlannerOutput{
 
     PlannerOutput();
 
-    SweptVolume& GetSweptVolume();
-    SwathVolume& GetSwathVolume();
-    SweptVolume& GetSweptVolume(Robot *robot_);
-    SweptVolume& GetSwathVolume(Robot *robot_);
+    //SweptVolume& GetSweptVolume();
+    //SwathVolume& GetSwathVolume();
+    //SweptVolume& GetSweptVolume(Robot *robot_);
+    //SweptVolume& GetSwathVolume(Robot *robot_);
 
     //void VerticesToFile();
 
     void SetTorques(std::vector<Vector> &torques_);
     const std::vector<Vector>& GetTorques();
     Config GetInitConfiguration();
-    const SerializedTree& GetTree();
-    void SetTree(SerializedTree &stree);
+    //const SerializedTree& GetTree();
+    //void SetTree(SerializedTree &stree);
     const std::vector<Config> GetKeyframes();
     void SetKeyframes(std::vector<Config> &keyframes);
     const SimplicialComplex& GetSimplicialComplex();

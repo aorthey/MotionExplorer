@@ -26,6 +26,9 @@ std::vector<std::pair<Config,Config>> PathSpace::GetEdges(){
 std::vector<std::vector<Config>> PathSpace::GetPaths(){
   return paths;
 }
+Roadmap PathSpace::GetRoadmap(){
+  return roadmap;
+}
 
 void PathSpace::SetEdges(const std::vector<std::pair<Config,Config>>& edges_){
   edges = edges_;
@@ -38,6 +41,9 @@ void PathSpace::SetVertices(const std::vector<Config>& vertices_){
 }
 void PathSpace::SetPaths(const std::vector<std::vector<Config>>& paths_){
   paths = paths_;
+}
+void PathSpace::SetRoadmap(const Roadmap& roadmap_){
+  roadmap = roadmap_;
 }
 
 SweptVolume& PathSpace::GetSweptVolume(Robot *robot){
