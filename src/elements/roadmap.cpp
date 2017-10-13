@@ -3,6 +3,7 @@
 
 Roadmap::Roadmap(){
 };
+
 void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *cspace_){
 {
   cspace = cspace_;

@@ -301,14 +301,14 @@ primitives -> maybe we can remove the checker from klampt?)
  [x] maxplanningtime not used in algorithm
  [x] visualize swath volume of onetopic covering
  [x] visualize roadmap plus edges by visualizing it as a dense swath volume
+ [x] remove serialized tree once and for all
  [ ] orientation wrong.
  [ ] split fibrebundles up into checker and integrator. put them into subfolders. 
  [ ] new ViewTree to visualize a pathspace exploration
- [ ] remove serialized tree once and for all
  [ ] multiple restarts of RRT produce same results. reseed!
- [ ] visualize necessary and sufficient vertices.
  [ ] visualize a onetopic cover by a bunch of threads ?
  [ ] visualize a onetopic cover by all onetopically equivalent shortest paths
+ [ ] visualize necessary and sufficient vertices.
 
 [ ] computing onetopic cover including roadmap is too slow. How could we speed
 it up? Could we already include it in the sampling process?

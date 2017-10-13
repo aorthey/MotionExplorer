@@ -355,17 +355,6 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
 
 }
 
-Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
-  if(Nompl>0){
-    const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-    const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-    return OMPLStateToConfig(qomplSE3, qomplRnState);
-  }else{
-    const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::SE3StateSpace::StateType>();
-    return OMPLStateToConfig(qomplSE3, NULL);
-  }
-}
-
 const oc::StatePropagatorPtr GeometricCSpaceOMPL::StatePropagatorPtr(oc::SpaceInformationPtr si)
 {
   return std::make_shared<PrincipalFibreBundleIntegrator>(si, this);
@@ -765,15 +754,6 @@ Config KinodynamicCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
 
 }
 
-Config KinodynamicCSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
-
-  const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-  const ob::RealVectorStateSpace::StateType *qomplTMState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
-  return OMPLStateToConfig(qomplSE3, qomplRnState, qomplTMState);
-}
-
-
 const oc::StatePropagatorPtr KinodynamicCSpaceOMPL::StatePropagatorPtr(oc::SpaceInformationPtr si)
 {
   return std::make_shared<TangentBundleIntegrator>(si, robot, this);
@@ -890,15 +870,6 @@ Config GeometricCSpaceOMPLRotationalInvariance::OMPLStateToConfig(const ob::Stat
 
 }
 
-Config GeometricCSpaceOMPLRotationalInvariance::OMPLStateToConfig(const ob::ScopedState<> &qompl){
-  const ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::RealVectorStateSpace::StateType>();
-  //double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
-  Config q;q.resize(6);q.setZero();
-  q(0)=qomplRnSpace->values[0];
-  q(1)=qomplRnSpace->values[1];
-  q(2)=qomplRnSpace->values[2];
-  return q;
-}
 //#############################################################################
 //#############################################################################
 GeometricCSpaceOMPLPathConstraintRollInvariance::GeometricCSpaceOMPLPathConstraintRollInvariance(Robot *robot_, CSpace *space_, std::vector<Config> path_):
@@ -954,11 +925,6 @@ Config GeometricCSpaceOMPLPathConstraintRollInvariance::OMPLStateToConfig(const 
   q(5)=0.0;
 
   return q;
-}
-
-Config GeometricCSpaceOMPLPathConstraintRollInvariance::OMPLStateToConfig(const ob::ScopedState<> &qompl){
-  const ob::State* s = qompl.get();
-  return OMPLStateToConfig(s);
 }
 
 

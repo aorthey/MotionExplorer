@@ -1,4 +1,5 @@
 #pragma once
+#include "ompl_state.h"
 #include "principalfibrebundle.h"
 #include "tangentbundle.h"
 #include "cspace_input.h"
@@ -44,8 +45,12 @@ class CSpaceOMPL
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) = 0;
 
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q) = 0;
-    virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl) = 0;
     virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
+
+    virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl){
+      const ob::State* s = qompl.get();
+      return OMPLStateToConfig(s);
+    }
 
     virtual void initSpace() = 0;
     virtual void initControlSpace() = 0;
@@ -114,7 +119,6 @@ class GeometricCSpaceOMPL: public CSpaceOMPL
     virtual void initControlSpace();
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
 
-    virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
     virtual Config OMPLStateToConfig(const ob::State *qompl);
     virtual Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState);
     virtual void print();
@@ -143,7 +147,6 @@ class KinodynamicCSpaceOMPL: public CSpaceOMPL
 
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
 
-    virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
     virtual Config OMPLStateToConfig(const ob::State *qompl);
 
     Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState, const ob::RealVectorStateSpace::StateType *qomplTMState);
@@ -159,7 +162,6 @@ class GeometricCSpaceOMPLRotationalInvariance: public GeometricCSpaceOMPL
     virtual void print();
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
     virtual Config OMPLStateToConfig(const ob::State *qompl);
-    virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
 };
 
 class GeometricCSpaceOMPLPathConstraintRollInvariance: public GeometricCSpaceOMPL
@@ -170,7 +172,6 @@ class GeometricCSpaceOMPLPathConstraintRollInvariance: public GeometricCSpaceOMP
     virtual void print();
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
     virtual Config OMPLStateToConfig(const ob::State *qompl);
-    virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
   private:
     PathPiecewiseLinearEuclidean* path_constraint;
     double t;

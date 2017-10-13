@@ -135,9 +135,6 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
   //Topology::TopologicalGraph top(pd, *obj);
   //output.cmplx = top.GetSimplicialComplex();
 
-  //SerializeTree(pd, cspace);
-  //output.SetTree(_stree);
-
   //###########################################################################
   // extract solution path if solved
   //###########################################################################
