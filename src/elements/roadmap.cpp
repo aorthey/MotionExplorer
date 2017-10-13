@@ -30,7 +30,7 @@ void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *csp
       Config q2 = cspace->OMPLStateToConfig(sj);
       Config qedge  = q2 - q1;
       E.push_back(std::make_pair(q1,q2));
-      Esufficient.push_back(validity_checker->isSufficient(s) && validity_checker->isSufficient(sj));
+      Esufficient.push_back(validity_checker->isSufficient(s) || validity_checker->isSufficient(sj));
     }
   }
 }
@@ -47,30 +47,34 @@ void Roadmap::DrawGL(GUIState& state)
   glEnable(GL_BLEND); 
 
   glPointSize(10);
-  for(uint k = 0; k < V.size(); k++){
-    Config q = V.at(k);
-    Vector3 v(q(0),q(1),q(2));
-    if(Vsufficient.at(k)){
-      if(state("draw_roadmap_sufficient")) setColor(sufficient);
-    }else{
-      if(state("draw_roadmap_necessary")) setColor(necessary);
+  std::cout << "roadmap: v=" << V.size() << " e="<<E.size() << std::endl;
+  if(state("draw_roadmap_vertices")){
+    for(uint k = 0; k < V.size(); k++){
+      Config q = V.at(k);
+      Vector3 v(q(0),q(1),q(2));
+      if(Vsufficient.at(k)){
+        if(state("draw_roadmap_sufficient")) setColor(sufficient);
+      }else{
+        if(state("draw_roadmap_necessary")) setColor(necessary);
+      }
+      drawPoint(v);
     }
-    drawPoint(v);
   }
   glLineWidth(5);
-  for(uint k = 0; k < E.size(); k++){
-    Config q1 = E.at(k).first;
-    Config q2 = E.at(k).second;
-    Vector3 v1(q1(0),q1(1),q1(2));
-    Vector3 v2(q2(0),q2(1),q2(2));
-    if(Esufficient.at(k)){
-      setColor(sufficient);
-      if(state("draw_roadmap_sufficient")) drawLineSegment(v1,v2);
-    }else{
-      setColor(necessary);
-      if(state("draw_roadmap_necessary")) drawLineSegment(v1,v2);
+  if(state("draw_roadmap_edges")){
+    for(uint k = 0; k < E.size(); k++){
+      Config q1 = E.at(k).first;
+      Config q2 = E.at(k).second;
+      Vector3 v1(q1(0),q1(1),q1(2));
+      Vector3 v2(q2(0),q2(1),q2(2));
+      if(Esufficient.at(k)){
+        setColor(sufficient);
+        if(state("draw_roadmap_sufficient")) drawLineSegment(v1,v2);
+      }else{
+        setColor(necessary);
+        if(state("draw_roadmap_necessary")) drawLineSegment(v1,v2);
+      }
     }
-
   }
 
   glEnable(GL_LIGHTING);

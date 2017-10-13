@@ -2,6 +2,7 @@ import os
 import numpy as np
 from math import cos,sin,pi,atan2
 from urdf_create import *
+from urdf_create_primitives import *
 
 body_radius= 0.12
 body_length = 0.5
@@ -39,30 +40,11 @@ f.close()
 print "\nCreated new file >>",fname
 
 ### create nested robots
+CreateSphereRobot(folder, robot_name + "_sphere_inner", body_radius)
 
-nested_robot_name = robot_name + "_sphere"
-fname = pathname + folder + nested_robot_name + ".urdf"
-f = open(fname,'w')
-f.write('<?xml version="1.0"?>\n')
-f.write('<robot name="'+nested_robot_name+'">\n')
-hstr = createSphere("body",0,0,0,body_radius)
-f.write(hstr)
-f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
-f.write('  </klampt>\n')
-f.write('</robot>')
-f.close()
-print "\nCreated new file >>",fname
+CreateSphereRobot(folder, robot_name + "_sphere_outer", body_length+neck_length+cap_height)
 
-nested_robot_name = robot_name + "_capsule"
-fname = pathname + folder + nested_robot_name + ".urdf"
+CreateCylinderRobot(folder, robot_name + "_capsule_inner", body_radius, body_length)
 
-f = open(fname,'w')
-f.write('<?xml version="1.0"?>\n')
-f.write('<robot name="'+nested_robot_name+'">\n')
-hstr = createCylinder("body", 0, 0, 0, body_radius, body_length)
-f.write(hstr)
-f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
-f.write('  </klampt>\n')
-f.write('</robot>')
-f.close()
-print "\nCreated new file >>",fname
+CreateCylinderRobot(folder, robot_name + "_capsule_outer", body_radius, body_length+neck_length+cap_height)
+

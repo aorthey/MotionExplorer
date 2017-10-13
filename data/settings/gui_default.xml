@@ -20,31 +20,31 @@
   <checkbox>
     <name>draw_forcefield</name>
     <descr>Draw All ForceFields in Workspace</descr>
-    <key>1</key>
+    <key></key>
     <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_wrenchfield</name>
     <descr>Draw All Wrenches for each Link</descr>
-    <key>2</key>
+    <key></key>
     <active>0</active>
   </checkbox>
   <checkbox>
     <name>draw_forceellipsoid</name>
     <descr>Draw Force Ellipsoid</descr>
-    <key>3</key>
+    <key></key>
     <active>0</active>
   </checkbox>
   <checkbox>
     <name>draw_distance_robot_terrain</name>
     <descr>Draw Distance Robot Terrain</descr>
-    <key>4</key>
+    <key></key>
     <active>0</active>
   </checkbox>
   <checkbox>
     <name>draw_com_path</name>
     <descr>Draw Center Of Mass Path</descr>
-    <key>5</key>
+    <key></key>
     <active>0</active>
   </checkbox>
   <checkbox>
@@ -68,20 +68,32 @@
   <checkbox>
     <name>draw_roadmap</name>
     <descr>Draw Roadmap Planner </descr>
-    <key></key>
+    <key>0</key>
     <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_roadmap_necessary</name>
     <descr>Draw Roadmap Necessary Vertices</descr>
-    <key>n</key>
+    <key>4</key>
     <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_roadmap_sufficient</name>
     <descr>Draw Roadmap Sufficient Vertices</descr>
-    <key>m</key>
-    <active>0</active>
+    <key>3</key>
+    <active>1</active>
+  </checkbox>
+  <checkbox>
+    <name>draw_roadmap_vertices</name>
+    <descr>Draw Roadmap Vertices</descr>
+    <key>1</key>
+    <active>1</active>
+  </checkbox>
+  <checkbox>
+    <name>draw_roadmap_edges</name>
+    <descr>Draw Roadmap Edges</descr>
+    <key>2</key>
+    <active>1</active>
   </checkbox>
 
   <hotkey>

@@ -77,10 +77,10 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   std::vector<Config> initpath;
   initpath.push_back(qi);
   initpath.push_back(qg);
-  p0->SetShortestPath( initpath );
-  p0->SetVertices(all_vertices);
-  p0->SetEdges(all_edges);
-  p0->SetPaths(all_paths);
+  //p0->SetShortestPath( initpath );
+  //p0->SetVertices(all_vertices);
+  //p0->SetEdges(all_edges);
+  //p0->SetPaths(all_paths);
   p0->SetRoadmap(output.GetRoadmap());
 
   decomposedspace.push_back(p0);
