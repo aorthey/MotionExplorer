@@ -57,5 +57,12 @@ class CSpaceFactory{
       cspace->initControlSpace();
       return cspace;
     }
+    virtual CSpaceOMPL* MakeCSpaceDecoratorNecessarySufficient( CSpaceOMPL* cs, CSpace *outer){
+      CSpaceOMPL *cspace = new CSpaceOMPLDecoratorNecessarySufficient(cs, outer);
+      cspace->SetCSpaceInput(input);
+      cspace->initSpace();
+      cspace->initControlSpace();
+      return cspace;
+    }
 };
 

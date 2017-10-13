@@ -1,5 +1,4 @@
 #pragma once
-#include "ompl_state.h"
 #include "principalfibrebundle.h"
 #include "tangentbundle.h"
 #include "cspace_input.h"

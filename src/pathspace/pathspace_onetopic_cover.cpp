@@ -25,11 +25,14 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   uint outer_index = input->robot_outer_idx;
 
   Robot* robot_inner = world->robots[inner_index];
+  Robot* robot_outer = world->robots[outer_index];
 
   SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,inner_index,&worldsettings);
-  CSpaceOMPL* cspace_i;
+  SingleRobotCSpace* cspace_klampt_o = new SingleRobotCSpace(*world,outer_index,&worldsettings);
 
-  cspace_i = factory.MakeGeometricCSpaceRotationalInvariance(robot_inner, cspace_klampt_i);
+  CSpaceOMPL* cspace_i = factory.MakeGeometricCSpaceRotationalInvariance(robot_inner, cspace_klampt_i);
+
+  cspace_i = factory.MakeCSpaceDecoratorNecessarySufficient(cspace_i, cspace_klampt_o);
   cspace_i->print();
 
   //if(level==0){

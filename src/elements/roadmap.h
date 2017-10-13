@@ -16,6 +16,7 @@ class Roadmap{
   private:
     CSpaceOMPL *cspace;
     std::vector<Config> V;
+    std::vector<bool> sufficient;
     std::vector<std::pair<Config,Config>> E;
 };
 

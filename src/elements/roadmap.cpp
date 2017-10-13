@@ -1,5 +1,6 @@
 #include "roadmap.h"
 #include "drawMotionPlanner.h"
+#include "planner/validity_checker_ompl.h"
 
 Roadmap::Roadmap(){
 };
@@ -9,13 +10,19 @@ void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *csp
   cspace = cspace_;
   ob::SpaceInformationPtr si = pd->getSpaceInformation();
   std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
+  OMPLValidityCheckerPtr validity_checker = std::static_pointer_cast<OMPLValidityChecker>(cspace->StateValidityCheckerPtr(si));
 
   for(uint i = 0; i < pd->numVertices(); i++){
     ob::PlannerDataVertex v = pd->getVertex(i);
     const ob::State* s = v.getState();
 
     Config q1 = cspace->OMPLStateToConfig(s);
+    //ob::StateValidityCheckerPtr validity_checker = cspace->StateValidityCheckerPtr(si);
+
+
     V.push_back(q1);
+
+    sufficient.push_back(validity_checker->isSufficient(s));
 
     std::vector<uint> edgeList;
     pd->getEdges(i, edgeList);
@@ -39,10 +46,15 @@ void Roadmap::GLDraw(){
   glEnable(GL_BLEND); 
 
   glPointSize(10);
-  setColor(green);
   for(uint k = 0; k < V.size(); k++){
     Config q = V.at(k);
     Vector3 v(q(0),q(1),q(2));
+    if(sufficient.at(k)){
+      setColor(magenta);
+    }else{
+      glPointSize(20);
+      setColor(green);
+    }
     drawPoint(v);
   }
   glLineWidth(5);

@@ -361,7 +361,6 @@ const oc::StatePropagatorPtr GeometricCSpaceOMPL::StatePropagatorPtr(oc::SpaceIn
 }
 const ob::StateValidityCheckerPtr GeometricCSpaceOMPL::StateValidityCheckerPtr(ob::SpaceInformationPtr si)
 {
-  //return std::make_shared<PrincipalFibreBundleOMPLValidityChecker>(si, kspace, this);
   return std::make_shared<OMPLValidityChecker>(si, this, kspace);
 }
 const ob::StateValidityCheckerPtr GeometricCSpaceOMPL::StateValidityCheckerPtr(oc::SpaceInformationPtr si)

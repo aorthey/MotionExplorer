@@ -65,3 +65,11 @@ CSpaceOMPLDecoratorInnerOuter::CSpaceOMPLDecoratorInnerOuter(CSpaceOMPL *cspace_
 const ob::StateValidityCheckerPtr CSpaceOMPLDecoratorInnerOuter::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
   return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, cspace_ompl->GetCSpacePtr(), outer);
 }
+
+CSpaceOMPLDecoratorNecessarySufficient::CSpaceOMPLDecoratorNecessarySufficient(CSpaceOMPL *cspace_ompl_, CSpace *outer_):
+  CSpaceOMPLDecorator(cspace_ompl_), outer(outer_)
+{
+}
+const ob::StateValidityCheckerPtr CSpaceOMPLDecoratorNecessarySufficient::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
+  return std::make_shared<OMPLValidityCheckerNecessarySufficient>(si, this, cspace_ompl->GetCSpacePtr(), outer);
+}

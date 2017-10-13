@@ -37,3 +37,12 @@ class CSpaceOMPLDecoratorInnerOuter: public CSpaceOMPLDecorator
   private:
     CSpace *outer;
 };
+
+class CSpaceOMPLDecoratorNecessarySufficient: public CSpaceOMPLDecorator
+{
+  public:
+    CSpaceOMPLDecoratorNecessarySufficient(CSpaceOMPL *_cspace_, CSpace *outer_);
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
+  private:
+    CSpace *outer;
+};
