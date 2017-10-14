@@ -21,7 +21,7 @@ const double sweptVolume_q_spacing = 0.01;
 ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
     : SimTestBackend(world)
 {
-  std::string guidef = util::GetDataFolder()+"/settings/gui_default.xml";
+  std::string guidef = util::GetDataFolder()+"/../settings/gui_default.xml";
   state.load(guidef.c_str());
 
   for (auto it = state.variables.begin(); it != state.variables.end(); ++it) {
