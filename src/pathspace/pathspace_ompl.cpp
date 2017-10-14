@@ -3,7 +3,7 @@
 
 #include "planner/cspace_factory.h"
 #include "planner/strategy_geometric.h"
-#include "drawMotionPlanner.h"
+#include "gui/drawMotionPlanner.h"
 
 PathSpaceOMPL::PathSpaceOMPL(RobotWorld *world_, PathSpaceInput* input_):
   PathSpace(world_, input_)

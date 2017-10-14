@@ -1,4 +1,4 @@
-#include "gui_planner.h"
+#include "gui/gui_planner.h"
 #include "environment_loader.h"
 #include "planner/planner.h"
 

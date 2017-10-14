@@ -84,6 +84,8 @@ without recompiling. Delete the whole plannersetup folder!
  [ ] visualize wrench cone at contact
  [ ] restructure GUI to use GUIVariables
 
+-- irreducible
+ [ ] create pathspace which computes irreducible paths
 
 -- abstractions (longterm goals)
 

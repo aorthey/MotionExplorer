@@ -1,6 +1,6 @@
 #pragma once
 #include <Modeling/Robot.h>
-#include "gui.h"
+#include "gui/gui.h"
 #include "elements/path_pwl_euclid.h"
 
 typedef std::vector<double> doubleVec;

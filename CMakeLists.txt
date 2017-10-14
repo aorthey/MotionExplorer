@@ -1,6 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 PROJECT( Orthoklampt )
+SET(ORTHOKLAMPT_SUBDIRS pathspace planner elements controller algorithms gui)
 
 set(ORTHOKLAMPT_MAJOR_VERSION 0)
 set(ORTHOKLAMPT_MINOR_VERSION 1)
@@ -81,16 +82,23 @@ ENDFOREACH(DEPENDENCY)
 SET(ORTHOKLAMPT_LIBRARIES ${ORTHOKLAMPT_LIBRARIES} ${OMPLAPP_LIBRARIES} ompl_app_base emon)
 
 INCLUDE_DIRECTORIES(src)
-INCLUDE_DIRECTORIES(src/planner)
+#INCLUDE_DIRECTORIES(src/planner)
 
-FILE(GLOB ORTHOKLAMPT_SRC src/*.cpp src/pathspace/*.cpp src/planner/*.cpp src/elements/*.cpp src/controller/*.cpp src/algorithms/*.cpp)
+
+FOREACH(SUBDIR ${ORTHOKLAMPT_SUBDIRS})
+  FILE(GLOB SUBDIR_SRC src/${SUBDIR}/*.cpp)
+  SET(ORTHOKLAMPT_SRC ${ORTHOKLAMPT_SRC} ${SUBDIR_SRC})
+ENDFOREACH(SUBDIR)
+
+FILE(GLOB SUBDIR_SRC src/*.cpp)
+SET(ORTHOKLAMPT_SRC ${ORTHOKLAMPT_SRC} ${SUBDIR_SRC})
+
+#FILE(GLOB ORTHOKLAMPT_SRC src/*.cpp src/pathspace/*.cpp src/planner/*.cpp src/elements/*.cpp src/controller/*.cpp src/gui/*.cpp)
 
 MESSAGE(COLOR_WHITE "-------------------------------------")
 MESSAGE(COLOR_WHITE "-- BUILDING EXECUTABLES")
 MESSAGE(COLOR_WHITE "-------------------------------------")
 MESSAGE(COLOR_WHITE "")
-#MESSAGE("${ORTHOKLAMPT_SRC}")
-#MESSAGE("${ORTHOKLAMPT_LIB}")
 
 FILE(GLOB EXECUTABLES_SOURCES test/*.cpp)
 LIST(SORT EXECUTABLES_SOURCES)

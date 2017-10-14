@@ -1,5 +1,5 @@
 #include "pathspace/decorator_highlighter.h"
-#include "drawMotionPlanner.h"
+#include "gui/drawMotionPlanner.h"
 
 PathSpaceDecoratorHighlighter::PathSpaceDecoratorHighlighter(PathSpace* space_):
   PathSpaceDecorator(space_)

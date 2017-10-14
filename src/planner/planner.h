@@ -4,8 +4,8 @@
 //#include "planner/planner_output.h"
 #include "elements/hierarchy.h"
 #include "pathspace/pathspace.h"
-#include "gui_state.h"
-#include "ViewHierarchy.h"
+#include "gui/gui_state.h"
+#include "gui/ViewHierarchy.h"
 
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 #include <Modeling/World.h> //RobotWorld

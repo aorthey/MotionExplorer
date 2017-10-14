@@ -1,7 +1,7 @@
 #pragma once
 
 #include "util.h"
-#include "gui_planner.h"
+#include "gui/gui_planner.h"
 #include "info.h"
 #include "planner/planner_input.h"
 

@@ -1,5 +1,5 @@
 #include "decorator.h"
-#include "drawMotionPlanner.h"
+#include "gui/drawMotionPlanner.h"
 
 PathSpaceDecorator::PathSpaceDecorator(PathSpace *component_):
   PathSpace( component_->GetWorldPtr(), component_->GetPathSpaceInput())

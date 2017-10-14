@@ -1,6 +1,6 @@
 #include "pathspace_onetopic_cover.h"
 #include "pathspace_atomic.h"
-#include "drawMotionPlanner.h"
+#include "gui/drawMotionPlanner.h"
 #include "planner/cspace_factory.h"
 #include "planner/strategy_geometric.h"
 #include "algorithms/onetopic_reduction.h"

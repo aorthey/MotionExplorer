@@ -3,7 +3,7 @@
 #include "elements/swept_volume.h"
 #include "elements/wrench_field.h"
 #include "controller/controller.h"
-#include "gui_state.h"
+#include "gui/gui_state.h"
 
 #include <regex>
 #include <Interface/SimTestGUI.h>

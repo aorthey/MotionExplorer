@@ -1,5 +1,5 @@
 #include "KrisLibrary/math3d/basis.h"
-#include "drawMotionPlanner.h"
+#include "gui/drawMotionPlanner.h"
 #include "controller/controller.h"
 
 namespace GLDraw{

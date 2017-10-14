@@ -1,5 +1,5 @@
 #include "pathspace_atomic.h"
-#include "drawMotionPlanner.h"
+#include "gui/drawMotionPlanner.h"
 
 PathSpaceAtomic::PathSpaceAtomic(RobotWorld *world_, PathSpaceInput* input_):
   PathSpace(world_, input_)

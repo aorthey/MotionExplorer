@@ -1,6 +1,6 @@
 #pragma once
 #include "planner/cspace.h"
-#include "gui_state.h"
+#include "gui/gui_state.h"
 #include <ompl/base/PlannerData.h>
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 

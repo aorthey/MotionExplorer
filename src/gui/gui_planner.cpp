@@ -1,5 +1,5 @@
-#include "gui_planner.h"
-#include "drawMotionPlanner.h"
+#include "gui/gui_planner.h"
+#include "gui/drawMotionPlanner.h"
 
 PlannerBackend::PlannerBackend(RobotWorld *world) : 
   ForceFieldBackend(world)

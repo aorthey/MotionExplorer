@@ -1,5 +1,5 @@
 #include "roadmap.h"
-#include "drawMotionPlanner.h"
+#include "gui/drawMotionPlanner.h"
 #include "planner/validity_checker_ompl.h"
 
 Roadmap::Roadmap(){

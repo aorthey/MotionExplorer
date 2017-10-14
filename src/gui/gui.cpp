@@ -1,6 +1,6 @@
-#include "gui.h"
 #include "util.h"
-#include "drawMotionPlanner.h"
+#include "gui/drawMotionPlanner.h"
+#include "gui/gui.h"
 
 #include <KrisLibrary/geometry/AnyGeometry.h>
 #include <KrisLibrary/math3d/basis.h>

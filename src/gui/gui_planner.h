@@ -1,5 +1,5 @@
 #pragma once
-#include "gui.h"
+#include "gui/gui.h"
 #include "planner/planner.h"
 
 class PlannerBackend : public ForceFieldBackend

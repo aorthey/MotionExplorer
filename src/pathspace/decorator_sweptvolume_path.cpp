@@ -1,5 +1,5 @@
 #include "pathspace/decorator_sweptvolume_path.h"
-#include "drawMotionPlanner.h"
+#include "gui/drawMotionPlanner.h"
 
 PathSpaceDecoratorSweptVolumePath::PathSpaceDecoratorSweptVolumePath(PathSpace* space_):
   PathSpaceDecorator(space_)

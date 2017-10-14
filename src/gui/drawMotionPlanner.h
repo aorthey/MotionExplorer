@@ -2,7 +2,6 @@
 #include "planner/planner.h"
 #include "elements/wrench_field.h"
 #include "elements/simplicial_complex.h"
-//#include "planner/serialized_tree.h"
 
 #include <KrisLibrary/GLdraw/drawMesh.h>
 #include <KrisLibrary/robotics/IK.h>

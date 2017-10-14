@@ -1,6 +1,6 @@
 #include "planner/planner.h"
 #include "planner/cspace_factory.h"
-#include "drawMotionPlanner.h"
+#include "gui/drawMotionPlanner.h"
 
 #include "pathspace/pathspace.h"
 #include "pathspace/pathspace_atomic.h"
