@@ -46,7 +46,7 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
   //std::cout << start << std::endl;
   //std::cout << goal << std::endl;
 
-  og::SimpleSetup ss(cspace->SpacePtr());//const ControlSpacePtr
+  og::SimpleSetup ss(cspace->SpacePtr());
   const ob::SpaceInformationPtr si = ss.getSpaceInformation();
 
   ss.setStateValidityChecker(cspace->StateValidityCheckerPtr(si));
@@ -64,7 +64,10 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
   else if(algorithm=="ompl:rrtsharp") ompl_planner = std::make_shared<og::RRTsharp>(si);
   else if(algorithm=="ompl:prm") ompl_planner = std::make_shared<og::PRM>(si);
   else if(algorithm=="ompl:prmstar") ompl_planner = std::make_shared<og::PRMstar>(si);
-  else if(algorithm=="ompl:lazyprm") ompl_planner = std::make_shared<og::LazyPRM>(si);
+  else if(algorithm=="ompl:lazyprm"){
+    ompl_planner = std::make_shared<og::LazyPRM>(si);
+    //std::static_pointer_cast<og::LazyPRM>(ompl_planner)->setRange(1);
+  }
   else if(algorithm=="ompl:lazyprmstar") ompl_planner = std::make_shared<og::LazyPRMstar>(si);
   else if(algorithm=="ompl:sst") ompl_planner = std::make_shared<og::SST>(si);
   else if(algorithm=="ompl:pdst") ompl_planner = std::make_shared<og::PDST>(si);

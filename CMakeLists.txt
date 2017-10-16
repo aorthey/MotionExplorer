@@ -93,8 +93,6 @@ ENDFOREACH(SUBDIR)
 FILE(GLOB SUBDIR_SRC src/*.cpp)
 SET(ORTHOKLAMPT_SRC ${ORTHOKLAMPT_SRC} ${SUBDIR_SRC})
 
-#FILE(GLOB ORTHOKLAMPT_SRC src/*.cpp src/pathspace/*.cpp src/planner/*.cpp src/elements/*.cpp src/controller/*.cpp src/gui/*.cpp)
-
 MESSAGE(COLOR_WHITE "-------------------------------------")
 MESSAGE(COLOR_WHITE "-- BUILDING EXECUTABLES")
 MESSAGE(COLOR_WHITE "-------------------------------------")

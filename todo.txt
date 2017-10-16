@@ -314,3 +314,5 @@ primitives -> maybe we can remove the checker from klampt?)
 
 [ ] computing onetopic cover including roadmap is too slow. How could we speed
 it up? Could we already include it in the sampling process?
+[ ] make benchmark for november 10th containing at least 5 algorithms and 5
+environments. Rigid bodies are OK for now.

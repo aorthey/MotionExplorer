@@ -32,7 +32,6 @@ class GLUIPlannerGUI: public GLUIForceFieldGUI
     GLUIPlannerGUI(GenericBackendBase* _backend,RobotWorld* _world);
     void AddPlannerInput(PlannerMultiInput& _in);
     virtual bool Initialize();
-
 };
 
 

@@ -11,8 +11,8 @@
 class PathSpaceOMPL: public PathSpace{
   public:
     PathSpaceOMPL(RobotWorld *world_, PathSpaceInput* input_);
-    virtual std::vector<PathSpace*> Decompose();
-    virtual void DrawGL(GUIState&);
-    virtual bool isAtomic() const;
+    virtual std::vector<PathSpace*> Decompose() override;
+    virtual void DrawGL(GUIState&) override;
+    virtual bool isAtomic() const override;
 };
 

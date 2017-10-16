@@ -6,6 +6,7 @@
 #include "pathspace/pathspace_atomic.h"
 #include "pathspace/pathspace_ompl.h"
 #include "pathspace/pathspace_onetopic_cover.h"
+#include "pathspace/pathspace_hierarchical_roadmap.h"
 #include "pathspace/decorator.h"
 #include "pathspace/decorator_sweptvolume_path.h"
 #include "pathspace/decorator_highlighter.h"
@@ -35,6 +36,9 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   }else if(StartsWith(algorithm.c_str(),"ompl")) {
     CreateShallowHierarchy();
   }else{
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "Unknown algorithm: " << algorithm << std::endl;
+    std::cout << std::string(80, '-') << std::endl;
     active = false;
   }
 }
@@ -43,7 +47,6 @@ void MotionPlanner::CreateSinglePathHierarchy(){
 
   std::vector<int> idxs = input.robot_idxs;
   std::string subalgorithm = input.name_algorithm.substr(13,input.name_algorithm.size()-13);
-
 
   PathSpaceInput *psinput_level0;
   PathSpaceInput *psinput;
@@ -143,13 +146,28 @@ void MotionPlanner::CreateSinglePathHierarchy(){
     std::cout << "      qgoal      : " << qg << std::endl;
   }
 
-  hierarchy->AddRootNode( new PathSpaceOnetopicCover(world, psinput_level0) );
-  //set direct connection as visualizer for continous path space
-  std::vector<Config> path;
-  path.push_back(psinput_level0->q_init);
-  path.push_back(psinput_level0->q_goal);
-  hierarchy->GetRootNodeContent()->SetShortestPath( path );
+  if(StartsWith(subalgorithm.c_str(),"ompl")) {
+    hierarchy->AddRootNode( new PathSpaceOnetopicCover(world, psinput_level0) );
+    std::vector<Config> path;
+    path.push_back(psinput_level0->q_init);
+    path.push_back(psinput_level0->q_goal);
+    hierarchy->GetRootNodeContent()->SetShortestPath( path );
+  }else if(StartsWith(subalgorithm.c_str(),"roadmap")) {
+    std::string roadmapalgorithm = subalgorithm.substr(8,input.name_algorithm.size()-13);
+    psinput_level0->name_algorithm = roadmapalgorithm;
+    hierarchy->AddRootNode( new PathSpaceHierarchicalRoadmap(world, psinput_level0) );
+    std::vector<Config> path;
+    path.push_back(psinput_level0->q_init);
+    path.push_back(psinput_level0->q_goal);
+    hierarchy->GetRootNodeContent()->SetShortestPath( path );
+  }else{
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "Unknown algorithm: " << subalgorithm << std::endl;
+    std::cout << std::string(80, '-') << std::endl;
+    active = false;
+  }
 }
+
 
 /** @brief shallow hierarchy contains two pathspaces. The first path space consists of
   * the space of all continuous paths between init and goal configuration in the

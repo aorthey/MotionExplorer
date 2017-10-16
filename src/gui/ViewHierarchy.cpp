@@ -217,3 +217,55 @@ void ViewHierarchy::DrawLineFromNodeToNode(double x1, double y1, double n1, doub
   glEnd();
 
 }
+  // //experiments on drawing 3d structures on fixed screen position
+  // double w = viewport.w;
+  // double h = viewport.h;
+
+  // Vector3 campos = viewport.position();
+  // Vector3 camdir;
+  // viewport.getViewVector(camdir);
+
+  // Vector3 up,down,left,right;
+
+  // viewport.getClickVector(0,h/2,left);
+  // viewport.getClickVector(w,h/2,right);
+  // viewport.getClickVector(w/2,0,down);
+  // viewport.getClickVector(w/2,h,up);
+
+  // up = up+campos;
+  // down = down+campos;
+  // left = left+campos;
+  // right = right+campos;
+
+  // glLineWidth(10);
+  // glPointSize(20);
+  // GLColor black(1,0,0);
+  // black.setCurrentGL();
+  // GLDraw::drawPoint(campos);
+  // GLDraw::drawPoint(up );
+  // GLDraw::drawPoint(down);
+  // GLDraw::drawPoint(right);
+  // GLDraw::drawPoint(left);
+
+  // GLDraw::drawLineSegment(up, left);
+  // GLDraw::drawLineSegment(up, right);
+  // GLDraw::drawLineSegment(down, right);
+  // GLDraw::drawLineSegment(down, left);
+
+
+  // GLColor grey(0.6,0.6,0.6);
+  // grey.setCurrentGL();
+  // glTranslate(left+0.5*(up-left));
+  // GLDraw::drawSphere(0.05,16,16);
+
+  // Vector3 tt;
+  // viewport.getClickVector(w/8,h/2,tt);
+
+  // glTranslate(tt + 0.1*camdir);
+  // GLDraw::drawSphere(0.05,16,16);
+  // glTranslate(tt + 0.3*camdir);
+  // GLDraw::drawSphere(0.05,16,16);
+  // glTranslate(tt + 0.4*camdir);
+  // GLDraw::drawSphere(0.05,16,16);
+
+  // glEnable(GL_LIGHTING);

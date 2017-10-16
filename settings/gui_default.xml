@@ -74,14 +74,14 @@
   <checkbox>
     <name>draw_roadmap_necessary</name>
     <descr>Draw Roadmap Necessary Vertices</descr>
-    <key>4</key>
+    <key>3</key>
     <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_roadmap_sufficient</name>
     <descr>Draw Roadmap Sufficient Vertices</descr>
-    <key>3</key>
-    <active>0</active>
+    <key>4</key>
+    <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_roadmap_vertices</name>
