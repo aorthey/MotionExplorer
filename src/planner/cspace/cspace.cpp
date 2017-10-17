@@ -1,5 +1,5 @@
-#include "cspace.h"
-#include "validity_checker_ompl.h"
+#include "planner/cspace/cspace.h"
+#include "planner/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
 
 CSpaceOMPL::CSpaceOMPL(Robot *robot_, CSpace *kspace_):
@@ -72,8 +72,6 @@ void GeometricCSpaceOMPL::initSpace()
     exit(0);
   }
 
-  std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(Nompl):"")<< std::endl;
-
   ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());
   ob::SE3StateSpace *cspaceSE3;
   ob::RealVectorStateSpace *cspaceRn;
@@ -87,11 +85,6 @@ void GeometricCSpaceOMPL::initSpace()
     this->space = SE3;
     cspaceSE3 = this->space->as<ob::SE3StateSpace>();
   }
-
-
-  //ob::CompoundStateSpace *cspace = this->space->as<ob::CompoundStateSpace>();
-  //cspace->setSubspaceWeight(0,1);
-  //cspace->setSubspaceWeight(1,0);
 
   //###########################################################################
   // Set bounds
@@ -848,10 +841,6 @@ void GeometricCSpaceOMPLRotationalInvariance::print()
 
 ob::ScopedState<> GeometricCSpaceOMPLRotationalInvariance::ConfigToOMPLState(const Config &q){
   ob::ScopedState<> qompl(space);
-
-  //ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::RealVectorStateSpace::StateType>();
-  //double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
-
   for(uint i = 0; i < 3; i++){
     qompl->as<ob::RealVectorStateSpace::StateType>()->values[i] = q(i);
   }
@@ -860,7 +849,6 @@ ob::ScopedState<> GeometricCSpaceOMPLRotationalInvariance::ConfigToOMPLState(con
 
 Config GeometricCSpaceOMPLRotationalInvariance::OMPLStateToConfig(const ob::State *qompl){
   const ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::RealVectorStateSpace::StateType>();
-  //double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
   Config q;q.resize(6);q.setZero();
   q(0)=qomplRnSpace->values[0];
   q(1)=qomplRnSpace->values[1];
@@ -898,10 +886,10 @@ void GeometricCSpaceOMPLPathConstraintRollInvariance::initSpace()
   cbounds.setHigh(1+1e-10);
   cspaceR->setBounds(cbounds);
 }
+
 void GeometricCSpaceOMPLPathConstraintRollInvariance::print()
 {
 }
-
 
 Config GeometricCSpaceOMPLPathConstraintRollInvariance::OMPLStateToConfig(const ob::State *qompl){
 

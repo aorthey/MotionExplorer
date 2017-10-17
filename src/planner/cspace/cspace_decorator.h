@@ -1,5 +1,5 @@
 #pragma once
-#include "cspace.h"
+#include "planner/cspace/cspace.h"
 
 class CSpaceOMPLDecorator: public CSpaceOMPL
 {

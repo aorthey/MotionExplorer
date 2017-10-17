@@ -1,4 +1,4 @@
-#include "strategy_output.h"
+#include "planner/strategy/strategy_output.h"
 
 StrategyOutput::StrategyOutput(CSpaceOMPL *cspace_):
   cspace(cspace_)
@@ -7,7 +7,6 @@ StrategyOutput::StrategyOutput(CSpaceOMPL *cspace_):
 void StrategyOutput::SetPlannerData( ob::PlannerDataPtr pd_ ){
   pd = pd_;
   pd->decoupleFromPlanner();
-  /// @todo{do that only when necessary}
   pd->computeEdgeWeights();
 }
 void StrategyOutput::SetShortestPath( std::vector<Config> path_){

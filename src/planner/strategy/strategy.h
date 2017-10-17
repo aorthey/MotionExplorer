@@ -1,7 +1,7 @@
 #pragma once
-#include "strategy_input.h"
-#include "strategy_output.h"
-#include "cspace.h"
+#include "planner/strategy/strategy_input.h"
+#include "planner/strategy/strategy_output.h"
+#include "planner/cspace/cspace.h"
 
 class Strategy{
   public:

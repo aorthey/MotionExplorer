@@ -1,6 +1,7 @@
 #pragma once
 
-#include "planner/cspace.h"
+#include "planner/cspace/cspace.h"
+#include "planner/cspace/cspace_factory.h"
 #include "pathspace/pathspace_input.h"
 #include "gui/gui_state.h"
 #include "elements/swept_volume.h"

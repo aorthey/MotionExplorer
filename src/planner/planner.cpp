@@ -1,5 +1,5 @@
 #include "planner/planner.h"
-#include "planner/cspace_factory.h"
+#include "planner/cspace/cspace_factory.h"
 #include "gui/drawMotionPlanner.h"
 
 #include "pathspace/pathspace.h"

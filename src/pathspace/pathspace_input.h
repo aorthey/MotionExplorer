@@ -1,6 +1,6 @@
 #pragma once
-#include "planner/strategy_input.h"
-#include "planner/cspace_input.h"
+#include "planner/strategy/strategy_input.h"
+#include "planner/cspace/cspace_input.h"
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 
 class PathSpaceInput{

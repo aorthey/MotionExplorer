@@ -1,7 +1,7 @@
 #include "lemon_interface.h"
 
 using namespace lemon;
-LemonInterface( ob::PlannerDataPtr pd_ ):
+LemonInterface::LemonInterface( ob::PlannerDataPtr pd_ ):
   pd(pd_)
 {
 //#############################################################################
@@ -42,21 +42,21 @@ LemonInterface( ob::PlannerDataPtr pd_ ):
       pd->getEdgeWeight(v1,v2,&c);
 
       ListGraph::Edge e = lg.addEdge( gn.at(v1), gn.at(v2) );
-      length[e] = c.value();
+      (*length)[e] = c.value();
     }
   }
 
 }
-bool IsConnected(){
-  //auto dstart = Dijkstra<ListGraph, CostMap>(lg, length);
-  //dstart.run(start);
-  //auto dgoal = Dijkstra<ListGraph, CostMap>(lg, length);
-  //dgoal.run(goal);
-  auto dijkstra = Dijkstra<ListGraph, CostMap>(lg, length);
-  //bool reached = dijkstra.path(p).dist(d).run(s,t);
-  bool reached = dijkstra.run(start,goal);
-  return reached;
-}
+//bool LemonInterface::IsConnected(){
+//  //auto dstart = Dijkstra<ListGraph, CostMap>(lg, length);
+//  //dstart.run(start);
+//  //auto dgoal = Dijkstra<ListGraph, CostMap>(lg, length);
+//  //dgoal.run(goal);
+//  auto dijkstra = Dijkstra<ListGraph, CostMap>(lg, length);
+//  //bool reached = dijkstra.path(p).dist(d).run(s,t);
+//  bool reached = dijkstra.run(start,goal);
+//  return reached;
+//}
          // Compute shortest path from node s to each node
          //        dijkstra(g,length).predMap(preds).distMap(dists).run(s);
          //             

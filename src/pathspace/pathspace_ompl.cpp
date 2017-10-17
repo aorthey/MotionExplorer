@@ -1,8 +1,8 @@
 #include "pathspace_ompl.h"
 #include "pathspace_atomic.h"
 
-#include "planner/cspace_factory.h"
-#include "planner/strategy_geometric.h"
+#include "planner/cspace/cspace_factory.h"
+#include "planner/strategy/strategy_geometric.h"
 #include "gui/drawMotionPlanner.h"
 
 PathSpaceOMPL::PathSpaceOMPL(RobotWorld *world_, PathSpaceInput* input_):

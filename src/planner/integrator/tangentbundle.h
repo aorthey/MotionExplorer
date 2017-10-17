@@ -6,9 +6,9 @@
 #include <KrisLibrary/math/diffeq.h>
 #include <Planning/RobotCSpace.h>
 #include <vector>
-#include "liegroupintegrator.h"
-#include "principalfibrebundle.h"
-#include "cspace.h"
+#include "planner/integrator/liegroupintegrator.h"
+#include "planner/integrator/principalfibrebundle.h"
+#include "planner/cspace/cspace.h"
 
 using namespace Math3D;
 class CSpaceOMPL;

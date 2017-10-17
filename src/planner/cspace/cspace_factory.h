@@ -1,7 +1,7 @@
 #pragma once
-#include "cspace.h"
-#include "cspace_input.h"
-#include "cspace_decorator.h"
+#include "planner/cspace/cspace.h"
+#include "planner/cspace/cspace_input.h"
+#include "planner/cspace/cspace_decorator.h"
 
 
 class CSpaceFactory{

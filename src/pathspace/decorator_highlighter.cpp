@@ -48,5 +48,6 @@ void PathSpaceDecoratorHighlighter::DrawGL(GUIState& state){
       }
     }
   }
+  if(state("draw_roadmap")) roadmap.DrawGL(state);
 
 }

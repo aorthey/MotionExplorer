@@ -1,6 +1,6 @@
 //#include <eigen3/unsupported/Eigen/MatrixFunctions>
 #include <iomanip>
-#include "principalfibrebundle.h"
+#include "planner/integrator/principalfibrebundle.h"
 
 using namespace Math3D;
 

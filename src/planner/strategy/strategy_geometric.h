@@ -1,5 +1,5 @@
 #pragma once
-#include "strategy.h"
+#include "planner/strategy/strategy.h"
 
 //#include <boost/program_options.hpp>
 #include <omplapp/apps/SE3RigidBodyPlanning.h>

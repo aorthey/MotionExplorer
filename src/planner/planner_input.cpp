@@ -1,6 +1,6 @@
 #include <KrisLibrary/math/VectorTemplate.h>
 
-#include "planner_input.h"
+#include "planner/planner_input.h"
 
 bool PlannerMultiInput::load(const char* file){
   TiXmlDocument doc(file);

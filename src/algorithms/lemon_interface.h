@@ -2,8 +2,8 @@
 
 #include <ompl/base/PlannerData.h>
 #include <lemon/list_graph.h>
-#include <lemon/cost_map.h>
 #include <lemon/dijkstra.h>
+#include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 namespace ob = ompl::base;
 
 class LemonInterface{
@@ -22,7 +22,7 @@ class LemonInterface{
     std::vector<lemon::ListGraph::Node> gn;
     lemon::ListGraph::Node start, goal;
 
-    lemon::CostMap* length;
+    CostMap* length;
 
 };
 

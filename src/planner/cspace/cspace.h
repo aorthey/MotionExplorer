@@ -1,7 +1,7 @@
 #pragma once
-#include "principalfibrebundle.h"
-#include "tangentbundle.h"
-#include "cspace_input.h"
+#include "planner/integrator/principalfibrebundle.h"
+#include "planner/integrator/tangentbundle.h"
+#include "planner/cspace/cspace_input.h"
 #include "elements/path_pwl_euclid.h"
 
 #include <ompl/base/spaces/SE3StateSpace.h>
@@ -18,6 +18,7 @@
 #include <ompl/control/SimpleSetup.h>
 #include <ompl/control/SpaceInformation.h>
 #include <ompl/control/spaces/RealVectorControlSpace.h>
+#include <Planning/RobotCSpace.h>
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;

@@ -1,9 +1,8 @@
 #include "pathspace/pathspace_hierarchical_roadmap.h"
-
 #include "pathspace_atomic.h"
-#include "planner/cspace_factory.h"
-#include "planner/strategy_geometric.h"
+#include "planner/strategy/strategy_geometric.h"
 #include "gui/drawMotionPlanner.h"
+#include "gui/colors.h"
 
 PathSpaceHierarchicalRoadmap::PathSpaceHierarchicalRoadmap(RobotWorld *world_, PathSpaceInput* input_):
   PathSpace(world_, input_)
@@ -36,7 +35,7 @@ std::vector<PathSpace*> PathSpaceHierarchicalRoadmap::Decompose(){
   uint outer_index = input->robot_outer_idx;
 
   Robot* robot_inner = world->robots[inner_index];
-  Robot* robot_outer = world->robots[outer_index];
+  //Robot* robot_outer = world->robots[outer_index];
 
   SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,inner_index,&worldsettings);
   SingleRobotCSpace* cspace_klampt_o = new SingleRobotCSpace(*world,outer_index,&worldsettings);
@@ -50,16 +49,30 @@ std::vector<PathSpace*> PathSpaceHierarchicalRoadmap::Decompose(){
   strategy.plan(input->GetStrategyInput(), cspace, output);
 
   Roadmap roadmap = output.GetRoadmap();
+  roadmap.cVertex = green;
+  roadmap.cEdge = green;
+
   Roadmap sufficient_roadmap;
-  sufficient_roadmap.CreateFromPlannerDataOnlySufficient(pd, cspace);
+  sufficient_roadmap.CreateFromPlannerDataOnlySufficient(output.GetPlannerDataPtr(), cspace);
+  sufficient_roadmap.cVertex = green;
+  sufficient_roadmap.cEdge = green;
+
+  Roadmap necessary_roadmap;
+  necessary_roadmap.CreateFromPlannerDataOnlyNecessary(output.GetPlannerDataPtr(), cspace);
+  necessary_roadmap.cVertex = magenta;
+  necessary_roadmap.cEdge = magenta;
 
   std::vector<PathSpace*> decomposedspace;
 
   if(output.success){
     decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    decomposedspace.at(0)->SetShortestPath( output.GetShortestPath() );
-    //decomposedspace.at(0)->SetRoadmap( output.GetRoadmap() );
     decomposedspace.at(0)->SetRoadmap( sufficient_roadmap );
+    decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
+    decomposedspace.at(1)->SetRoadmap( necessary_roadmap );
+
+    //decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
+    //decomposedspace.at(1)->SetShortestPath( output.GetShortestPath() );
+    //decomposedspace.at(1)->SetRoadmap( output.GetRoadmap() );
   }else{
     std::cout << "Error: Path could not be expanded" << std::endl;
   }
