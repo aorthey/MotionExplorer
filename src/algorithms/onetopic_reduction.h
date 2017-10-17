@@ -18,7 +18,6 @@
 
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
-//#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 
 #include <Library/KrisLibrary/math/vector.h>
 #include <Library/KrisLibrary/math3d/primitives.h>

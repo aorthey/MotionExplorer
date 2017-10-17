@@ -2,7 +2,7 @@
 #include <Modeling/Robot.h>
 #include "gui/gui.h"
 #include "elements/path_pwl_euclid.h"
-#include "planner/irreducible_projector.h"
+#include "planner/irreducible/irreducible_projector.h"
 
 //Link[0] base0 mass 0
 //Link[1] base1 mass 0
