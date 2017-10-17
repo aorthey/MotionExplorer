@@ -1,6 +1,7 @@
 #include "pathspace/pathspace_hierarchical_roadmap.h"
 #include "pathspace_atomic.h"
 #include "planner/strategy/strategy_geometric.h"
+#include "planner/strategy/strategy_roadmap.h"
 #include "gui/drawMotionPlanner.h"
 #include "gui/colors.h"
 
@@ -35,7 +36,7 @@ std::vector<PathSpace*> PathSpaceHierarchicalRoadmap::Decompose(){
   uint outer_index = input->robot_outer_idx;
 
   Robot* robot_inner = world->robots[inner_index];
-  //Robot* robot_outer = world->robots[outer_index];
+  Robot* robot_outer = world->robots[outer_index];
 
   SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,inner_index,&worldsettings);
   SingleRobotCSpace* cspace_klampt_o = new SingleRobotCSpace(*world,outer_index,&worldsettings);
@@ -48,6 +49,12 @@ std::vector<PathSpace*> PathSpaceHierarchicalRoadmap::Decompose(){
   StrategyOutput output(cspace);
   strategy.plan(input->GetStrategyInput(), cspace, output);
 
+  //###########################################################################
+  // Extract from the planner the roadmap, and decompose the roadmap into a
+  // roadmap containing only sufficient vertices (sufficient_roadmap), and a
+  // roadmap which contains only necessary but not sufficient vertices
+  // (necessary_roadmap). 
+  //###########################################################################
   Roadmap roadmap = output.GetRoadmap();
   roadmap.cVertex = green;
   roadmap.cEdge = green;
@@ -62,6 +69,34 @@ std::vector<PathSpace*> PathSpaceHierarchicalRoadmap::Decompose(){
   necessary_roadmap.cVertex = magenta;
   necessary_roadmap.cEdge = magenta;
 
+  std::vector<Config> Vn = necessary_roadmap.GetVertices();
+  //###########################################################################
+  //for each necessary vertex, create a new underlying cspace and create a
+  //roadmap. this roadmap is then sampled until we find a feasible point. this
+  //vertex is then added to the sufficient_roadmap, marking a feasible vertex.
+  //The underlying roadmap should still grow, because there might be
+  //disconnected components for each vertex
+  //###########################################################################
+  PathSpaceInput *level1 = input->GetNextLayer();
+
+  std::vector<CSpaceOMPL*> slice_spaces;
+  std::vector<StrategyRoadmap*> slice_roadmaps;
+
+  for(uint k = 0; k < Vn.size(); k++){
+    //grow one roadmap for each vertex
+    uint inner_index = level1->robot_inner_idx;
+    uint outer_index = level1->robot_outer_idx;
+
+    Robot* robot_inner = world->robots[inner_index];
+    Robot* robot_outer = world->robots[outer_index];
+
+    SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,inner_index,&worldsettings);
+    CSpaceOMPL *cspace_k = factory.MakeGeometricCSpacePointConstraintSO3(robot_inner, cspace_klampt_i, Vn.at(k));
+    slice_spaces.push_back(cspace_k);
+    StrategyRoadmap *strategy_k = new StrategyRoadmap(cspace_k);
+    slice_roadmaps.push_back(strategy_k);
+  }
+
   std::vector<PathSpace*> decomposedspace;
 
   if(output.success){
@@ -69,12 +104,9 @@ std::vector<PathSpace*> PathSpaceHierarchicalRoadmap::Decompose(){
     decomposedspace.at(0)->SetRoadmap( sufficient_roadmap );
     decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
     decomposedspace.at(1)->SetRoadmap( necessary_roadmap );
-
-    //decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    //decomposedspace.at(1)->SetShortestPath( output.GetShortestPath() );
-    //decomposedspace.at(1)->SetRoadmap( output.GetRoadmap() );
   }else{
     std::cout << "Error: Path could not be expanded" << std::endl;
   }
   return decomposedspace;
+
 }

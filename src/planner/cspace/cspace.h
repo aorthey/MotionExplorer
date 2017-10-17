@@ -177,3 +177,15 @@ class GeometricCSpaceOMPLPathConstraintRollInvariance: public GeometricCSpaceOMP
     double t;
 
 };
+class GeometricCSpaceOMPLPointConstraintSO3: public GeometricCSpaceOMPL
+{
+  public:
+    GeometricCSpaceOMPLPointConstraintSO3(Robot *robot_, CSpace *space_, Config q);
+    virtual void initSpace();
+    virtual void print();
+    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
+    virtual Config OMPLStateToConfig(const ob::State *qompl);
+  private:
+    Config q_constraint;
+
+};

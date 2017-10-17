@@ -2,6 +2,65 @@
 #include "planner/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
 
+std::vector<double> EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q ){
+  double qx = q->x;
+  double qy = q->y;
+  double qz = q->z;
+  double qw = q->w;
+
+  Math3D::QuaternionRotation qr(qw, qx, qy, qz);
+  Math3D::Matrix3 qrM;
+  qr.getMatrix(qrM);
+  Math3D::EulerAngleRotation R;
+  R.setMatrixXYZ(qrM);
+
+  double rx = R[2];
+  double ry = R[1];
+  double rz = R[0];
+
+  if(rx<-M_PI) rx+=2*M_PI;
+  if(rx>M_PI) rx-=2*M_PI;
+
+  if(ry<-M_PI/2) ry+=M_PI;
+  if(ry>M_PI/2) ry-=M_PI;
+
+  if(rz<-M_PI) rz+=2*M_PI;
+  if(rz>M_PI) rz-=2*M_PI;
+
+  std::vector<double> out;
+  out.push_back(rx);
+  out.push_back(ry);
+  out.push_back(rz);
+  return out;
+}
+void OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSpace::StateType *q ){
+  q->setIdentity();
+
+  //q SE3: X Y Z yaw pitch roll
+  //double yaw = q[3];
+  //double pitch = q[4];
+  //double roll = q[5];
+
+  //Math3D::EulerAngleRotation Reuler(q(5),q(4),q(3));
+  //Matrix3 R;
+  //Reuler.getMatrixXYZ(R);
+  Math3D::EulerAngleRotation Reuler(z,y,x);
+  Matrix3 R;
+  Reuler.getMatrixXYZ(R);
+
+  QuaternionRotation qr;
+  qr.setMatrix(R);
+
+  double qx,qy,qz,qw;
+  qr.get(qw,qx,qy,qz);
+
+  q->x = qx;
+  q->y = qy;
+  q->z = qz;
+  q->w = qw;
+}
+
+
 CSpaceOMPL::CSpaceOMPL(Robot *robot_, CSpace *kspace_):
   robot(robot_), kspace(kspace_)
 {
@@ -246,27 +305,29 @@ ob::ScopedState<> GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q){
 
 
   qomplSE3->setXYZ(q[0],q[1],q[2]);
-  qomplSO3->setIdentity();
+  OMPLSO3StateSpaceFromEulerXYZ(q(3),q(4),q(5),qomplSO3);
 
-  //q SE3: X Y Z yaw pitch roll
-  //double yaw = q[3];
-  //double pitch = q[4];
-  //double roll = q[5];
+  //qomplSO3->setIdentity();
 
-  Math3D::EulerAngleRotation Reuler(q(5),q(4),q(3));
-  Matrix3 R;
-  Reuler.getMatrixXYZ(R);
+  ////q SE3: X Y Z yaw pitch roll
+  ////double yaw = q[3];
+  ////double pitch = q[4];
+  ////double roll = q[5];
 
-  QuaternionRotation qr;
-  qr.setMatrix(R);
+  //Math3D::EulerAngleRotation Reuler(q(5),q(4),q(3));
+  //Matrix3 R;
+  //Reuler.getMatrixXYZ(R);
 
-  double qx,qy,qz,qw;
-  qr.get(qw,qx,qy,qz);
+  //QuaternionRotation qr;
+  //qr.setMatrix(R);
 
-  qomplSO3->x = qx;
-  qomplSO3->y = qy;
-  qomplSO3->z = qz;
-  qomplSO3->w = qw;
+  //double qx,qy,qz,qw;
+  //qr.get(qw,qx,qy,qz);
+
+  //qomplSO3->x = qx;
+  //qomplSO3->y = qy;
+  //qomplSO3->z = qz;
+  //qomplSO3->w = qw;
 
   //Math3D::Matrix3 qrM;
   //qr.getMatrix(qrM);
@@ -295,30 +356,34 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType
   q(1) = qomplSE3->getY();
   q(2) = qomplSE3->getZ();
 
-  double qx = qomplSO3->x;
-  double qy = qomplSO3->y;
-  double qz = qomplSO3->z;
-  double qw = qomplSO3->w;
+  //double qx = qomplSO3->x;
+  //double qy = qomplSO3->y;
+  //double qz = qomplSO3->z;
+  //double qw = qomplSO3->w;
 
-  Math3D::QuaternionRotation qr(qw, qx, qy, qz);
-  Math3D::Matrix3 qrM;
-  qr.getMatrix(qrM);
-  Math3D::EulerAngleRotation R;
-  R.setMatrixXYZ(qrM);
+  //Math3D::QuaternionRotation qr(qw, qx, qy, qz);
+  //Math3D::Matrix3 qrM;
+  //qr.getMatrix(qrM);
+  //Math3D::EulerAngleRotation R;
+  //R.setMatrixXYZ(qrM);
 
-  q(3) = R[2];
-  q(4) = R[1];
-  q(5) = R[0];
+  //q(3) = R[2];
+  //q(4) = R[1];
+  //q(5) = R[0];
 
-  if(q(3)<-M_PI) q(3)+=2*M_PI;
-  if(q(3)>M_PI) q(3)-=2*M_PI;
+  //if(q(3)<-M_PI) q(3)+=2*M_PI;
+  //if(q(3)>M_PI) q(3)-=2*M_PI;
 
-  if(q(4)<-M_PI/2) q(4)+=M_PI;
-  if(q(4)>M_PI/2) q(4)-=M_PI;
+  //if(q(4)<-M_PI/2) q(4)+=M_PI;
+  //if(q(4)>M_PI/2) q(4)-=M_PI;
 
-  if(q(5)<-M_PI) q(5)+=2*M_PI;
-  if(q(5)>M_PI) q(5)-=2*M_PI;
+  //if(q(5)<-M_PI) q(5)+=2*M_PI;
+  //if(q(5)>M_PI) q(5)-=2*M_PI;
 
+  std::vector<double> rxyz = EulerXYZFromOMPLSO3StateSpace(qomplSO3);
+  q(3) = rxyz.at(0);
+  q(4) = rxyz.at(1);
+  q(5) = rxyz.at(2);
 
 
   for(uint i = 0; i < Nklampt; i++){
@@ -687,6 +752,8 @@ ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q){
 
   return qompl;
 }
+
+
 Config KinodynamicCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState, const ob::RealVectorStateSpace::StateType *qomplTMState){
   const ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
 
@@ -914,18 +981,10 @@ Config GeometricCSpaceOMPLPathConstraintRollInvariance::OMPLStateToConfig(const 
   return q;
 }
 
-
 ob::ScopedState<> GeometricCSpaceOMPLPathConstraintRollInvariance::ConfigToOMPLState(const Config &q){
   ob::ScopedState<> qompl(space);
-  //ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
   ob::SO2StateSpace::StateType *qomplSO2SpaceA = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
   ob::SO2StateSpace::StateType *qomplSO2SpaceB = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(2);
-
-  //double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
-  //double* qomplSa = static_cast<ob::SO2StateSpace::StateType*>(qomplSO2SpaceA)->value;
-  //double* qomplSb = static_cast<ob::SO2StateSpace::StateType*>(qomplSO2SpaceB)->value;
-  //qomplSa[0] = q[3];
-  //qomplSb[0] = q[4];
   static_cast<ob::SO2StateSpace::StateType*>(qomplSO2SpaceA)->value = q[3];
   static_cast<ob::SO2StateSpace::StateType*>(qomplSO2SpaceB)->value = q[4];
 
@@ -934,5 +993,50 @@ ob::ScopedState<> GeometricCSpaceOMPLPathConstraintRollInvariance::ConfigToOMPLS
 
   //qomplRn[0] = path_constraint->PosFromConfig(qc);
   qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0)->values[0] = path_constraint->PosFromConfig(qc);
+  return qompl;
+}
+GeometricCSpaceOMPLPointConstraintSO3::GeometricCSpaceOMPLPointConstraintSO3(Robot *robot_, CSpace *space_, Config q):
+  GeometricCSpaceOMPL(robot_, space_), q_constraint(q)
+{
+}
+
+void GeometricCSpaceOMPLPointConstraintSO3::initSpace()
+{
+  //###########################################################################
+  //   {q} times SO(3)
+  //###########################################################################
+  std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: {q} x SO(3)" << std::endl;
+
+  ob::StateSpacePtr SO3 = (std::make_shared<ob::SO3StateSpace>());
+  this->space = SO3;
+}
+
+void GeometricCSpaceOMPLPointConstraintSO3::print()
+{
+}
+
+Config GeometricCSpaceOMPLPointConstraintSO3::OMPLStateToConfig(const ob::State *qompl){
+
+  const ob::SO3StateSpace::StateType *qomplSO3 = qompl->as<ob::SO3StateSpace::StateType>();
+
+  std::vector<double> rxyz = EulerXYZFromOMPLSO3StateSpace(qomplSO3);
+
+  Config q;q.resize(6);q.setZero();
+  q(0)=q_constraint(0);
+  q(1)=q_constraint(1);
+  q(2)=q_constraint(2);
+  q(3)=rxyz.at(0);
+  q(4)=rxyz.at(1);
+  q(5)=rxyz.at(2);
+
+  return q;
+}
+
+ob::ScopedState<> GeometricCSpaceOMPLPointConstraintSO3::ConfigToOMPLState(const Config &q){
+  ob::ScopedState<> qompl(space);
+  ob::SO3StateSpace::StateType *qomplSO3 = qompl->as<ob::SO3StateSpace::StateType>();
+
+  OMPLSO3StateSpaceFromEulerXYZ(q(3),q(4),q(5),qomplSO3);
+
   return qompl;
 }

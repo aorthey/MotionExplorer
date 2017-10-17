@@ -46,6 +46,15 @@ class CSpaceFactory{
       cspace->initControlSpace();
       return cspace;
     }
+
+    // CSpace {q} \times SO(3)
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpacePointConstraintSO3( Robot *robot, CSpace *inner, const Config q){
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLPointConstraintSO3(robot, inner, q);
+      cspace->SetCSpaceInput(input);
+      cspace->initSpace();
+      cspace->initControlSpace();
+      return cspace;
+    }
     //
     //a configuration q in the innerouter cspace is feasible iff
     // inner(q) is feasible AND outer(q) is infeasible

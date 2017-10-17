@@ -26,6 +26,7 @@ class Roadmap{
     void SetEdges(const std::vector<std::pair<Config,Config>>&);
 
     GLDraw::GLColor cVertex, cEdge;
+
   private:
 
     CSpaceOMPL *cspace;
