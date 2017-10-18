@@ -1,9 +1,11 @@
-#include "pathspace_onetopic_cover.h"
-#include "pathspace_atomic.h"
+#include "pathspace/pathspace_onetopic_cover.h"
+#include "pathspace/pathspace_atomic.h"
+#include "pathspace/pathspace_input.h"
 #include "gui/drawMotionPlanner.h"
 #include "planner/cspace/cspace_factory.h"
 #include "planner/strategy/strategy_geometric.h"
 #include "algorithms/onetopic_reduction.h"
+#include "gui/colors.h"
 
 PathSpaceOnetopicCover::PathSpaceOnetopicCover(RobotWorld *world_, PathSpaceInput* input_):
   PathSpace(world_, input_)
@@ -106,10 +108,6 @@ void PathSpaceOnetopicCover::DrawGL(GUIState&){
   Robot* robot = world->robots[ridx];
   const Config qi_in = input->q_init;
   const Config qg_in = input->q_goal;
-
-  GLColor lightGreen(0.2,0.9,0.2,0.5);
-  GLColor lightRed(0.9,0.2,0.2,0.5);
-  GLColor magenta(0.9,0.1,0.9,0.5);
 
   GLDraw::drawRobotAtConfig(robot, qi_in, lightGreen);
   GLDraw::drawRobotAtConfig(robot, qg_in, lightRed);

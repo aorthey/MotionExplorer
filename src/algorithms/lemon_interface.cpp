@@ -1,6 +1,13 @@
 #include "lemon_interface.h"
 
 using namespace lemon;
+using Cost = ob::Cost;
+using Graph = ob::PlannerData::Graph;
+using Vertex = Graph::Vertex;
+using Edge = Graph::Edge;
+using VIterator = Graph::VIterator;
+using EIterator = Graph::EIterator;
+
 LemonInterface::LemonInterface( ob::PlannerDataPtr pd_ ):
   pd(pd_)
 {
@@ -10,10 +17,6 @@ LemonInterface::LemonInterface( ob::PlannerDataPtr pd_ ):
 
   const ob::SpaceInformationPtr si = pd->getSpaceInformation();
   N = pd->numVertices();
-
-  //ListGraph lg;
-  //std::vector<ListGraph::Node> gn;
-  //ListGraph::Node start, goal;
 
   for(uint k = 0; k < N; k++){
     ListGraph::Node x = lg.addNode();
@@ -25,8 +28,6 @@ LemonInterface::LemonInterface( ob::PlannerDataPtr pd_ ):
 //#############################################################################
 // Extract edges and weight
 //#############################################################################
-  //typedef ListGraph::EdgeMap<double> CostMap;
-  //CostMap length(lg);
   length = new CostMap(lg);
 
   for(uint v1 = 0; v1 < pd->numVertices(); v1++){
@@ -47,20 +48,43 @@ LemonInterface::LemonInterface( ob::PlannerDataPtr pd_ ):
   }
 
 }
-//bool LemonInterface::IsConnected(){
-//  //auto dstart = Dijkstra<ListGraph, CostMap>(lg, length);
-//  //dstart.run(start);
-//  //auto dgoal = Dijkstra<ListGraph, CostMap>(lg, length);
-//  //dgoal.run(goal);
-//  auto dijkstra = Dijkstra<ListGraph, CostMap>(lg, length);
-//  //bool reached = dijkstra.path(p).dist(d).run(s,t);
-//  bool reached = dijkstra.run(start,goal);
-//  return reached;
-//}
-         // Compute shortest path from node s to each node
-         //        dijkstra(g,length).predMap(preds).distMap(dists).run(s);
-         //             
-         //                    // Compute shortest path from s to t
-         //                           bool reached =
-         //                           dijkstra(g,length).path(p).dist(d).run(s,t);
+std::vector<Vertex> LemonInterface::GetShortestPath(){
+  return GetShortestPath(start, goal);
+}
+std::vector<Vertex> LemonInterface::GetShortestPath( ListGraph::Node s, ListGraph::Node t){
+
+  auto dijkstra = Dijkstra<ListGraph, CostMap>(lg, *length);
+  bool reached = dijkstra.run(s,t);
+
+  if(reached){
+    Path<ListGraph> path_start = dijkstra.path(start);
+    std::vector<ListGraph::Node> path;
+
+    for (Path<ListGraph>::ArcIt it(path_start); it != INVALID; ++it) {
+      ListGraph::Node v = lg.source(it);
+      ListGraph::Node w = lg.target(it);
+      path.push_back(v);
+      path.push_back(w);
+    }
+
+    if(path.size()>0){
+      double L = 0.0;
+      for(uint k = 0; k < path.size()-1; k++){
+        ListGraph::Node v = path.at(k);
+        ListGraph::Node w = path.at(k+1);
+        uint v1i = lg.id(v);
+        uint v2i = lg.id(w);
+        if(v1i!=v2i){
+          //const ob::State *s1 = pd->getVertex(v1i).getState();
+          //const ob::State *s2 = pd->getVertex(v2i).getState();
+          shortest_path_idxs.push_back(v1i);
+          shortest_path_idxs.push_back(v2i);
+        }
+      }
+    }
+
+  }
+  return shortest_path_idxs;
+
+}
 

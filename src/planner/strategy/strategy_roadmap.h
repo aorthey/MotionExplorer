@@ -16,9 +16,16 @@ class StrategyRoadmap: public Strategy{
 
     StrategyRoadmap(CSpaceOMPL *cspace);
 
+    int NumberConnectedComponents();
+    bool hasFeasibleVertex();
+    void planMore();
+
   private:
 
     PRMPtr roadmap_planner;
+
+    int N_ConnectedComponents;
+    int N_FeasibleVertices;
 
 };
 

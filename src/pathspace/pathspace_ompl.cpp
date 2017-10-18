@@ -4,6 +4,7 @@
 #include "planner/cspace/cspace_factory.h"
 #include "planner/strategy/strategy_geometric.h"
 #include "gui/drawMotionPlanner.h"
+#include "gui/colors.h"
 
 PathSpaceOMPL::PathSpaceOMPL(RobotWorld *world_, PathSpaceInput* input_):
   PathSpace(world_, input_)
@@ -50,9 +51,6 @@ void PathSpaceOMPL::DrawGL(GUIState& state){
   const Config qi = input->q_init;
   const Config qg = input->q_goal;
 
-  GLColor lightGrey(0.4,0.4,0.4,0.2);
-  GLColor lightGreen(0.2,0.9,0.2,0.2);
-  GLColor lightRed(0.9,0.2,0.2,0.2);
   GLDraw::drawRobotAtConfig(robot, qi, lightGreen);
   GLDraw::drawRobotAtConfig(robot, qg, lightRed);
 

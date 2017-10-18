@@ -1,13 +1,14 @@
 #pragma once
 
-#include "planner/cspace/cspace.h"
-#include "planner/cspace/cspace_factory.h"
-#include "pathspace/pathspace_input.h"
-#include "gui/gui_state.h"
-#include "elements/swept_volume.h"
 #include "elements/roadmap.h"
-#include <ompl/base/PlannerData.h>
+#include "gui/gui_state.h"
+#include "pathspace/pathspace_input.h"
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
+
+class RobotWorld;
+class SweptVolume;
+
+using namespace GLDraw;
 
 class PathSpace{
   public:

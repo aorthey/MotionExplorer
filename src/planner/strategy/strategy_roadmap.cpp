@@ -15,37 +15,31 @@ StrategyRoadmap::StrategyRoadmap(CSpaceOMPL *cspace){
   roadmap_planner = std::make_shared<og::PRM>(si);
   roadmap_planner->setProblemDefinition(pdef);
   roadmap_planner->setup();
-  double t = 0.01;
+  double t = 0.001;
   roadmap_planner->growRoadmap(t);
-  uint N = roadmap_planner->milestoneCount();
 
   using namespace boost;
-
-  // typedef adjacency_list <vecS, vecS, undirectedS> Graph;
-  // typedef graph_traits<Graph>::vertex_descriptor Vertex;
-  // typedef graph_traits<Graph>::vertices_size_type VertexIndex;
-
   typedef ompl::geometric::PRM::Graph OMPLRoadmap;
   typedef boost::graph_traits< OMPLRoadmap >::vertex_descriptor Vertex;
   typedef boost::graph_traits< OMPLRoadmap >::vertices_size_type VertexIndex;
-  OMPLRoadmap g = roadmap_planner->getRoadmap();
-
-  std::vector<VertexIndex> rank(num_vertices(g));
-  std::vector<Vertex> parent(num_vertices(g));
-
-
   typedef VertexIndex* Rank;
   typedef Vertex* Parent;
+  typedef component_index<VertexIndex> Components;
+
+  OMPLRoadmap g = roadmap_planner->getRoadmap();
+
+  N_FeasibleVertices = num_vertices(g);
+  std::vector<VertexIndex> rank(N_FeasibleVertices);
+  std::vector<Vertex> parent(N_FeasibleVertices);
 
   disjoint_sets<Rank, Parent> ds(&rank[0], &parent[0]);
 
   initialize_incremental_components(g, ds);
   incremental_components(g, ds);
 
-  typedef component_index<VertexIndex> Components;
   Components components(parent.begin(), parent.end());
-  uint Nc = components.size();
-  std::cout << "after " << t << " seconds we found " << Nc << " components with " << N << " vertices on cspace slice." << std::endl;
+  N_ConnectedComponents = components.size();
+  std::cout << "after " << t << " seconds we found " << N_ConnectedComponents << " components with " << N_FeasibleVertices << " vertices on cspace slice." << std::endl;
 
   //BOOST_FOREACH(VertexIndex current_index, components) {
   //  std::cout << "component " << current_index << " contains: ";
@@ -60,6 +54,15 @@ StrategyRoadmap::StrategyRoadmap(CSpaceOMPL *cspace){
   //  std::cout << std::endl;
   //}
 
+}
+bool StrategyRoadmap::hasFeasibleVertex(){
+  return (N_FeasibleVertices>0);
+}
+int StrategyRoadmap::NumberConnectedComponents(){
+  return N_ConnectedComponents;
+}
+
+void StrategyRoadmap::planMore(){
 }
 
 void StrategyRoadmap::plan( const StrategyInput &input, CSpaceOMPL *cspace, StrategyOutput &output){

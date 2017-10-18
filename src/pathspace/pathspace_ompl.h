@@ -1,5 +1,4 @@
 #pragma once
-#include "pathspace_input.h"
 #include "pathspace.h"
 
 //PathSpace containing all continuous paths

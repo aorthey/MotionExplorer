@@ -52,7 +52,7 @@ void Roadmap::CreateFromPlannerDataOnlySufficient(const ob::PlannerDataPtr pd, C
       }
       std::vector<uint> edgeList;
       pd->getEdges(vidx, edgeList);
-      for(int j = 0; j < edgeList.size(); j++){
+      for(uint j = 0; j < edgeList.size(); j++){
         uint widx = edgeList.at(j);
         ob::PlannerDataVertex w = pd->getVertex(widx);
         const ob::State* sj = w.getState();
@@ -113,7 +113,8 @@ void Roadmap::CreateFromPlannerDataOnlyNecessary(const ob::PlannerDataPtr pd, CS
       }
       std::vector<uint> edgeList;
       pd->getEdges(vidx, edgeList);
-      for(int j = 0; j < edgeList.size(); j++){
+      for(uint j = 0; j < edgeList.size(); j++){
+
         uint widx = edgeList.at(j);
         ob::PlannerDataVertex w = pd->getVertex(widx);
         const ob::State* sj = w.getState();
@@ -159,7 +160,7 @@ void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *csp
 
     std::vector<uint> edgeList;
     pd->getEdges(i, edgeList);
-    for(int j = 0; j < edgeList.size(); j++){
+    for(uint j = 0; j < edgeList.size(); j++){
       ob::PlannerDataVertex w = pd->getVertex(edgeList.at(j));
       const ob::State* sj = w.getState();
       Config q2 = cspace->OMPLStateToConfig(sj);
@@ -167,6 +168,45 @@ void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *csp
     }
   }
   pds = pd;
+}
+
+using Graph = ob::PlannerData::Graph;
+using Vertex = Graph::Vertex;
+
+std::vector<Config> Roadmap::GetShortestPath(){
+  std::vector<Vertex> pathv = lemon->GetShortestPath();
+  return VertexPathToConfigPath(pathv);
+}
+
+std::vector<Config> Roadmap::VertexPathToConfigPath( const std::vector<Vertex> &path){
+  const ob::SpaceInformationPtr si = pds->getSpaceInformation();
+
+  std::vector<const ob::State*> states;
+  for(uint k = 0; k < path.size(); k++){
+    Vertex v = path.at(k);
+    const ob::State *sk = pds->getVertex(v).getState();
+    states.push_back(sk);
+  }
+
+  og::PathGeometric omplpath(si);
+  for(uint k = 0; k < states.size(); k++){
+    omplpath.append(states.at(k));
+  }
+
+  og::PathSimplifier shortcutter(si);
+  shortcutter.shortcutPath(omplpath);
+
+  //omplpath.interpolate();
+
+  std::vector<ob::State *> interpolated_states = omplpath.getStates();
+  std::vector<Config> keyframes;
+  for(uint k = 0; k < interpolated_states.size(); k++)
+  {
+    ob::State *state = interpolated_states.at(k);
+    Config q = cspace->OMPLStateToConfig(state);
+    keyframes.push_back(q);
+  }
+  return keyframes;
 }
 
 void Roadmap::DrawGL(GUIState& state)

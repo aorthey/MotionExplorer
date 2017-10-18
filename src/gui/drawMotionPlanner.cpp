@@ -750,14 +750,14 @@ namespace GLDraw{
     glEnable(GL_LIGHTING);
     glDisable(GL_BLEND);
   }
-  void drawPath( const std::vector<Config> &path, GLColor &c, double linewidth, double ptsize){
+  void drawPath( const std::vector<Config> &path, const GLColor c, double linewidth, double ptsize){
     glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);
     glPushMatrix();
 
     glPointSize(ptsize);
     glLineWidth(linewidth);
-    setColor(c);
+    c.setCurrentGL();
     for(uint i = 0; i < path.size()-1; i++){
       Config c1 = path.at(i);
       Config c2 = path.at(i+1);

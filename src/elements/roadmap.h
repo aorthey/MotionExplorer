@@ -1,7 +1,8 @@
 #pragma once
+#include "algorithms/lemon_interface.h"
 #include "planner/cspace/cspace.h"
 #include "gui/gui_state.h"
-#include "algorithms/lemon_interface.h"
+
 #include <ompl/base/PlannerData.h>
 #include <KrisLibrary/GLdraw/GLColor.h>
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
@@ -11,7 +12,6 @@ namespace ob = ompl::base;
 class Roadmap{
 
   public:
-
     Roadmap();
 
     void CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL* cspace_);
@@ -20,14 +20,17 @@ class Roadmap{
 
     virtual void DrawGL(GUIState&);
 
-    std::vector<Config> GetVertices();
-    std::vector<std::pair<Config,Config>> GetEdges();
     void SetVertices(const std::vector<Config>&);
     void SetEdges(const std::vector<std::pair<Config,Config>>&);
+
+    std::vector<Config> GetVertices();
+    std::vector<std::pair<Config,Config>> GetEdges();
+    std::vector<Config> GetShortestPath();
 
     GLDraw::GLColor cVertex, cEdge;
 
   private:
+    std::vector<Config> VertexPathToConfigPath( const std::vector<ob::PlannerData::Graph::Vertex> &path);
 
     CSpaceOMPL *cspace;
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "pathspace/decorator.h"
+#include "elements/swept_volume.h"
 
 class PathSpaceDecoratorSweptVolumePath: public PathSpaceDecorator{
   public:

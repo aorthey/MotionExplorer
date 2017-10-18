@@ -1,9 +1,7 @@
 #pragma once
 
 #include "planner/planner_input.h"
-//#include "planner/planner_output.h"
 #include "elements/hierarchy.h"
-#include "pathspace/pathspace.h"
 #include "gui/gui_state.h"
 #include "gui/ViewHierarchy.h"
 
@@ -14,6 +12,7 @@
 #include <vector>
 #include <memory>
 
+class PathSpace;
 class MotionPlanner{
 
   public:

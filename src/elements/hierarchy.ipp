@@ -154,7 +154,7 @@ Node<T>* Hierarchy<T>::GetNode( std::vector<int> path ){
   Node<T> *current = root;
 
   for(uint k = 0; k < path.size(); k++){
-    if(path.at(k) >= current->children.size()){
+    if(path.at(k) >= (int)current->children.size()){
       std::cout << "node " << path.at(k) << " does not exists on level " << k+1 << " in hierarchical path tree" << std::endl;
       std::cout << "input : ";
       for(uint j = 0; j < path.size(); j++){

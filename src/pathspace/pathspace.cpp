@@ -1,5 +1,12 @@
 #include "pathspace.h"
 #include "algorithms/onetopic_reduction.h"
+#include "elements/roadmap.h"
+#include "planner/cspace/cspace.h"
+#include "planner/cspace/cspace_factory.h"
+#include "pathspace/pathspace_input.h"
+#include "elements/swept_volume.h"
+#include <Planning/RobotCSpace.h>
+#include <ompl/base/PlannerData.h>
 
 PathSpace::PathSpace(RobotWorld *world_, PathSpaceInput* input_):
   world(world_), input(input_)

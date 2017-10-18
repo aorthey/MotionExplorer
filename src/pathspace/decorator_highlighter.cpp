@@ -1,5 +1,10 @@
 #include "pathspace/decorator_highlighter.h"
+#include "pathspace/pathspace_input.h"
+#include "elements/swept_volume.h"
 #include "gui/drawMotionPlanner.h"
+
+const GLColor grey(0.7,0.7,0.7,1);
+const GLColor magenta(0.9,0.1,0.9,0.5);
 
 PathSpaceDecoratorHighlighter::PathSpaceDecoratorHighlighter(PathSpace* space_):
   PathSpaceDecorator(space_)
@@ -12,7 +17,6 @@ void PathSpaceDecoratorHighlighter::DrawGL(GUIState& state){
   uint ridx = input->robot_idx;
   Robot* robot = world->robots[ridx];
 
-  GLColor grey(0.8,0.8,0.8,0.5);
   const std::vector<Config> path = component->GetShortestPath();
   if(state("draw_sweptvolume") && path.size()>0){
     const SweptVolume& sv = component->GetSweptVolume(robot);
@@ -39,7 +43,6 @@ void PathSpaceDecoratorHighlighter::DrawGL(GUIState& state){
     }
   }
 
-  GLColor magenta(0.9,0.1,0.9,0.5);
   if(state("draw_path_space") && paths.size()>0){
     for(uint k = 0; k < paths.size(); k++){
       const std::vector<Config> p = paths.at(k);

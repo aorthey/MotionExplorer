@@ -2,7 +2,6 @@
 #include "planner/cspace/cspace_factory.h"
 #include "gui/drawMotionPlanner.h"
 
-#include "pathspace/pathspace.h"
 #include "pathspace/pathspace_atomic.h"
 #include "pathspace/pathspace_ompl.h"
 #include "pathspace/pathspace_onetopic_cover.h"

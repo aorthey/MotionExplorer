@@ -317,3 +317,6 @@ it up? Could we already include it in the sampling process?
 [ ] make benchmark for november 10th containing at least 5 algorithms and 5
 environments. Rigid bodies are OK for now.
 [ ] write dae->tri converter
+
+[ ] make an abstract roadmap, containing plannerdataptr and lemon interface.
+This roadmap always holds the shortest path, and we can delete edges/vertices.

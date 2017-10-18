@@ -11,7 +11,6 @@ void PathSpaceDecoratorSweptVolumePath::DrawGL(GUIState& state){
 
   uint ridx = input->robot_idx;
   Robot* robot = world->robots[ridx];
-  GLColor grey(0.8,0.8,0.8,0.5);
   const std::vector<Config> path = component->GetShortestPath();
   if(path.size()>0){
     const SweptVolume& sv = component->GetSweptVolume(robot);

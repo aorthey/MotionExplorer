@@ -2,6 +2,7 @@
 #include "pathspace_atomic.h"
 #include "planner/strategy/strategy_geometric.h"
 #include "planner/strategy/strategy_roadmap.h"
+#include "planner/cspace/cspace_factory.h"
 #include "gui/drawMotionPlanner.h"
 #include "gui/colors.h"
 
@@ -19,9 +20,6 @@ void PathSpaceHierarchicalRoadmap::DrawGL(GUIState&){
   const Config qi = input->q_init;
   const Config qg = input->q_goal;
 
-  GLColor lightGrey(0.4,0.4,0.4,0.2);
-  GLColor lightGreen(0.2,0.9,0.2,0.2);
-  GLColor lightRed(0.9,0.2,0.2,0.2);
   GLDraw::drawRobotAtConfig(robot, qi, lightGreen);
   GLDraw::drawRobotAtConfig(robot, qg, lightRed);
 }
@@ -69,7 +67,20 @@ std::vector<PathSpace*> PathSpaceHierarchicalRoadmap::Decompose(){
   necessary_roadmap.cVertex = magenta;
   necessary_roadmap.cEdge = magenta;
 
-  std::vector<Config> Vn = necessary_roadmap.GetVertices();
+  std::vector<Config> shortest_path = roadmap.GetShortestPath();
+  bool done = true;
+  while(!done){
+    //(1) get shortest path from roadmap
+
+
+    //(2) verify shortest path by checking that it is feasible. 
+    PathSpaceInput *level1 = input->GetNextLayer();
+
+    //(3a) if feasible, return path, interpolate along sufficient edges
+    //(3b) if not feasible, remove the infeasible vertex/edge and repeat
+
+  }
+
   //###########################################################################
   //for each necessary vertex, create a new underlying cspace and create a
   //roadmap. this roadmap is then sampled until we find a feasible point. this
@@ -77,33 +88,16 @@ std::vector<PathSpace*> PathSpaceHierarchicalRoadmap::Decompose(){
   //The underlying roadmap should still grow, because there might be
   //disconnected components for each vertex
   //###########################################################################
-  PathSpaceInput *level1 = input->GetNextLayer();
-
-  std::vector<CSpaceOMPL*> slice_spaces;
-  std::vector<StrategyRoadmap*> slice_roadmaps;
-
-  for(uint k = 0; k < Vn.size(); k++){
-    //grow one roadmap for each vertex
-    uint inner_index = level1->robot_inner_idx;
-    uint outer_index = level1->robot_outer_idx;
-
-    Robot* robot_inner = world->robots[inner_index];
-    Robot* robot_outer = world->robots[outer_index];
-
-    SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,inner_index,&worldsettings);
-    CSpaceOMPL *cspace_k = factory.MakeGeometricCSpacePointConstraintSO3(robot_inner, cspace_klampt_i, Vn.at(k));
-    slice_spaces.push_back(cspace_k);
-    StrategyRoadmap *strategy_k = new StrategyRoadmap(cspace_k);
-    slice_roadmaps.push_back(strategy_k);
-  }
 
   std::vector<PathSpace*> decomposedspace;
 
   if(output.success){
     decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    decomposedspace.at(0)->SetRoadmap( sufficient_roadmap );
+    decomposedspace.at(0)->SetShortestPath( shortest_path );
     decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    decomposedspace.at(1)->SetRoadmap( necessary_roadmap );
+    decomposedspace.at(1)->SetRoadmap( sufficient_roadmap );
+    decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
+    decomposedspace.at(2)->SetRoadmap( necessary_roadmap );
   }else{
     std::cout << "Error: Path could not be expanded" << std::endl;
   }

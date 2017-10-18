@@ -1,6 +1,10 @@
 #include "pathspace_atomic.h"
 #include "gui/drawMotionPlanner.h"
 
+const GLColor magenta(0.9,0.1,0.9,0.5);
+const GLColor lightGreen(0.2,0.9,0.2,0.2);
+const GLColor lightRed(0.9,0.2,0.2,0.2);
+
 PathSpaceAtomic::PathSpaceAtomic(RobotWorld *world_, PathSpaceInput* input_):
   PathSpace(world_, input_)
 {
@@ -21,10 +25,6 @@ void PathSpaceAtomic::DrawGL(GUIState& state){
   const Config qi_in = input->q_init;
   const Config qg_in = input->q_goal;
 
-  GLColor lightGreen(0.2,0.9,0.2,0.2);
-  GLColor lightRed(0.9,0.2,0.2,0.2);
-  GLColor magenta(0.9,0.1,0.9,0.5);
-  GLColor grey(0.7,0.7,0.7,1);
 
   GLDraw::drawRobotAtConfig(robot, qi_in, lightGreen);
   GLDraw::drawRobotAtConfig(robot, qg_in, lightRed);
