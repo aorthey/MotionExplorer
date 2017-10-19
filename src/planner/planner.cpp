@@ -156,8 +156,8 @@ void MotionPlanner::CreateSinglePathHierarchy(){
     hierarchy->GetRootNodeContent()->SetShortestPath( path );
   }else if(StartsWith(subalgorithm.c_str(),linear.c_str())) {
     //Zhang_2009 style + shortest path iteration
-    std::string roadmapalgorithm = subalgorithm.substr(linear.size(),subalgorithm.size()-linear.size());
-    psinput_level0->name_algorithm = roadmapalgorithm;
+    std::string subsubalgorithm = subalgorithm.substr(linear.size()+1,subalgorithm.size()-(linear.size()+1));
+    psinput_level0->name_algorithm = subsubalgorithm;
     hierarchy->AddRootNode( new PathSpaceLinearHierarchy(world, psinput_level0) );
     std::vector<Config> path;
     path.push_back(psinput_level0->q_init);

@@ -8,6 +8,8 @@ void StrategyOutput::SetPlannerData( ob::PlannerDataPtr pd_ ){
   pd = pd_;
   pd->decoupleFromPlanner();
   pd->computeEdgeWeights();
+  roadmap = std::make_shared<Roadmap>();
+  roadmap->CreateFromPlannerData(pd, cspace);
 }
 void StrategyOutput::SetProblemDefinition( ob::ProblemDefinitionPtr pdef_ ){
   pdef = pdef_;
@@ -75,11 +77,10 @@ std::vector<std::vector<Config>> StrategyOutput::GetSolutionPaths(){
   return solution_paths;
 }
 
-Roadmap StrategyOutput::GetRoadmap(){
-  roadmap.CreateFromPlannerData(pd, cspace);
+RoadmapPtr StrategyOutput::GetRoadmapPtr(){
   return roadmap;
 }
 
-void StrategyOutput::SetRoadmap(Roadmap roadmap_){
+void StrategyOutput::SetRoadmap(RoadmapPtr roadmap_){
   roadmap = roadmap_;
 }

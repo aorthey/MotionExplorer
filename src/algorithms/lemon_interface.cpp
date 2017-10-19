@@ -55,9 +55,10 @@ std::vector<Vertex> LemonInterface::GetShortestPath( ListGraph::Node s, ListGrap
 
   auto dijkstra = Dijkstra<ListGraph, CostMap>(lg, *length);
   bool reached = dijkstra.run(s,t);
+  std::cout << "lemon: " << reached << std::endl;
 
   if(reached){
-    Path<ListGraph> path_start = dijkstra.path(start);
+    Path<ListGraph> path_start = dijkstra.path(t);
     std::vector<ListGraph::Node> path;
 
     for (Path<ListGraph>::ArcIt it(path_start); it != INVALID; ++it) {

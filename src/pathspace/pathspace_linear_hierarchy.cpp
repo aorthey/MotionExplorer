@@ -53,42 +53,83 @@ std::vector<PathSpace*> PathSpaceLinearHierarchy::Decompose(){
   // roadmap which contains only necessary but not sufficient vertices
   // (necessary_roadmap). 
   //###########################################################################
-  Roadmap roadmap = output.GetRoadmap();
-  roadmap.cVertex = green;
-  roadmap.cEdge = green;
+  RoadmapPtr roadmap = output.GetRoadmapPtr();
+  roadmap->cVertex = green;
+  roadmap->cEdge = green;
 
-  Roadmap sufficient_roadmap;
-  sufficient_roadmap.CreateFromPlannerDataOnlySufficient(output.GetPlannerDataPtr(), cspace);
-  sufficient_roadmap.cVertex = green;
-  sufficient_roadmap.cEdge = green;
+  std::cout << std::string(80, '-') << std::endl;
 
-  Roadmap necessary_roadmap;
-  necessary_roadmap.CreateFromPlannerDataOnlyNecessary(output.GetPlannerDataPtr(), cspace);
-  necessary_roadmap.cVertex = magenta;
-  necessary_roadmap.cEdge = magenta;
+  for(uint k = 0; k < output.GetShortestPath().size(); k++){
+    std::cout << output.GetShortestPath().at(k) << std::endl;
+  }
 
-  std::vector<Config> shortest_path1 = output.GetShortestPath();
-  std::vector<std::vector<Config>> solution_paths = output.GetSolutionPaths();
+  std::cout << std::string(80, '-') << std::endl;
+
+  std::vector<Config> shortest_path = roadmap->GetShortestPath();
+  for(uint k = 0; k < shortest_path.size(); k++){
+    std::cout << shortest_path.at(k) << std::endl;
+  }
+
+  std::cout << std::string(80, '-') << std::endl;
 
   std::vector<PathSpace*> decomposedspace;
-  for(uint k = 0; k < solution_paths.size() ; k++){
-    decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    decomposedspace.back()->SetShortestPath( solution_paths.at(k) );
-  }
-  //std::vector<Config> shortest_path2 = roadmap.GetShortestPath();
-  //std::cout << std::string(80, '-') << std::endl;
-  //for(uint k = 0; k < shortest_path1.size(); k++){
-  //  std::cout << shortest_path1.at(k)   << std::endl;  
-  //}
-  //std::cout << std::string(80, '-') << std::endl;
-  //for(uint k = 0; k < shortest_path2.size(); k++){
-  //  std::cout << shortest_path2.at(k)   << std::endl;  
-  //}
-  //std::cout << std::string(80, '-') << std::endl;
-  //exit(0);
-  //bool done = true;
-  //while(!done){
+
+  bool done = false;
+  while(!done){
   //  //(1) get shortest path from roadmap
+    PathSpaceInput *level0 = input->GetNextLayer();
+    PathSpaceInput *level1 = level0->GetNextLayer();
+    CSpaceFactory factory(level1->GetCSpaceInput());
+
+    uint inner_index = level1->robot_inner_idx;
+    uint outer_index = level1->robot_outer_idx;
+
+    Robot* robot_inner = world->robots[inner_index];
+    Robot* robot_outer = world->robots[outer_index];
+
+    SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,inner_index,&worldsettings);
+    SingleRobotCSpace* cspace_klampt_o = new SingleRobotCSpace(*world,outer_index,&worldsettings);
+
+    uint failed_index;
+    Config qedge_start = level1->q_init;
+
+    for(uint k = 0; k < shortest_path.size()-1; k++){
+      std::vector<Config> edge;
+      edge.push_back(shortest_path.at(k));
+      edge.push_back(shortest_path.at(k+1));
+      CSpaceOMPL* cspace = factory.MakeGeometricCSpacePathConstraintSO3(robot_inner, cspace_klampt_i, edge);
+
+      cspace->print();
+
+      StrategyInput input_level1 = level1->GetStrategyInput();
+
+      input_level1.name_algorithm = "ompl:rrt";
+
+      StrategyGeometric strategy;
+      StrategyOutput output_level1(cspace);
+      strategy.plan(input_level1, cspace, output_level1);
+
+      if(output_level1.success){
+        std::vector<Config> shortest_path = output_level1.GetShortestPath();
+        decomposedspace.push_back( new PathSpaceAtomic(world, level1->GetNextLayer()) );
+        decomposedspace.back()->SetShortestPath( output_level1.GetShortestPath() );
+      }else{
+        //identify infeasible edges.
+        roadmap->removeInfeasibleEdgeAlongShortestPath(failed_index);
+        break;
+      }
+    }
+
+    if(failed_index < shortest_path.size()-1){
+      std::cout << "failed at edge: " << failed_index << "/" << shortest_path.size() << std::endl;
+    }else{
+      std::cout << "path is success" << std::endl;
+    }
+    exit(0);
+
+
+
+  }
 
 
   //  //(2) verify shortest path by checking that it is feasible. 
@@ -107,16 +148,26 @@ std::vector<PathSpace*> PathSpaceLinearHierarchy::Decompose(){
   //disconnected components for each vertex
   //###########################################################################
 
+  //Roadmap sufficient_roadmap;
+  //sufficient_roadmap.CreateFromPlannerDataOnlySufficient(output.GetPlannerDataPtr(), cspace);
+  //sufficient_roadmap.cVertex = green;
+  //sufficient_roadmap.cEdge = green;
 
-  if(output.success){
+  //Roadmap necessary_roadmap;
+  //necessary_roadmap.CreateFromPlannerDataOnlyNecessary(output.GetPlannerDataPtr(), cspace);
+  //necessary_roadmap.cVertex = magenta;
+  //necessary_roadmap.cEdge = magenta;
 
-    decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    decomposedspace.back()->SetRoadmap( sufficient_roadmap );
-    decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    decomposedspace.back()->SetRoadmap( necessary_roadmap );
-  }else{
-    std::cout << "Error: Path could not be expanded" << std::endl;
-  }
+
+  //if(output.success){
+
+  //  decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
+  //  decomposedspace.back()->SetRoadmap( sufficient_roadmap );
+  //  decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
+  //  decomposedspace.back()->SetRoadmap( necessary_roadmap );
+  //}else{
+  //  std::cout << "Error: Path could not be expanded" << std::endl;
+  //}
   return decomposedspace;
 
 }

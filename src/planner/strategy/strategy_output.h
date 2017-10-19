@@ -17,8 +17,8 @@ struct StrategyOutput{
 
     void SetShortestPath( std::vector<Config> );
 
-    Roadmap GetRoadmap();
-    void SetRoadmap(Roadmap);
+    RoadmapPtr GetRoadmapPtr();
+    void SetRoadmap(RoadmapPtr);
 
     void SetPlannerData( ob::PlannerDataPtr pd_ );
     void SetProblemDefinition( ob::ProblemDefinitionPtr pdef_ );
@@ -40,7 +40,7 @@ struct StrategyOutput{
 
     ob::ProblemDefinitionPtr pdef;
 
-    Roadmap roadmap;
+    RoadmapPtr roadmap;
 
     CSpaceOMPL *cspace;
 

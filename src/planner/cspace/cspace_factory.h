@@ -46,6 +46,13 @@ class CSpaceFactory{
       cspace->initControlSpace();
       return cspace;
     }
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpacePathConstraintSO3( Robot *robot, CSpace *inner, const std::vector<Config>& path){
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLPathConstraintSO3(robot, inner, path);
+      cspace->SetCSpaceInput(input);
+      cspace->initSpace();
+      cspace->initControlSpace();
+      return cspace;
+    }
 
     // CSpace {q} \times SO(3)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpacePointConstraintSO3( Robot *robot, CSpace *inner, const Config q){

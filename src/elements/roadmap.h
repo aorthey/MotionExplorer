@@ -29,14 +29,23 @@ class Roadmap{
 
     GLDraw::GLColor cVertex, cEdge;
 
+    void removeInfeasibleEdgeAlongShortestPath(uint index);
   private:
+    std::vector<Config> shortest_path;
+    std::vector<ob::PlannerData::Graph::Vertex> shortest_path_idxs;
+
     std::vector<Config> VertexPathToConfigPath( const std::vector<ob::PlannerData::Graph::Vertex> &path);
 
     CSpaceOMPL *cspace;
 
     std::vector<Config> V;
     std::vector<std::pair<Config,Config>> E;
+    std::vector<std::pair<Config,Config>> E_removed;
+
+    uint Nvertices;
+    uint Nedges;
 
     ob::PlannerDataPtr pds;
     LemonInterface* lemon;
 };
+typedef std::shared_ptr<Roadmap> RoadmapPtr;

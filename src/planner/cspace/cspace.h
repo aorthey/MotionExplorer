@@ -174,9 +174,20 @@ class GeometricCSpaceOMPLPathConstraintRollInvariance: public GeometricCSpaceOMP
     virtual Config OMPLStateToConfig(const ob::State *qompl);
   private:
     PathPiecewiseLinearEuclidean* path_constraint;
-    double t;
-
 };
+
+class GeometricCSpaceOMPLPathConstraintSO3: public GeometricCSpaceOMPL
+{
+  public:
+    GeometricCSpaceOMPLPathConstraintSO3(Robot *robot_, CSpace *space_, std::vector<Config> path_);
+    virtual void initSpace();
+    virtual void print();
+    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
+    virtual Config OMPLStateToConfig(const ob::State *qompl);
+  private:
+    PathPiecewiseLinearEuclidean* path_constraint;
+};
+
 class GeometricCSpaceOMPLPointConstraintSO3: public GeometricCSpaceOMPL
 {
   public:
