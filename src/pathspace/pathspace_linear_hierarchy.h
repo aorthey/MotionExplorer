@@ -8,9 +8,9 @@
 // returns singleton path
 // 
 
-class PathSpaceHierarchicalRoadmap: public PathSpace{
+class PathSpaceLinearHierarchy: public PathSpace{
   public:
-    PathSpaceHierarchicalRoadmap(RobotWorld *world_, PathSpaceInput* input_);
+    PathSpaceLinearHierarchy(RobotWorld *world_, PathSpaceInput* input_);
     virtual std::vector<PathSpace*> Decompose();
     virtual void DrawGL(GUIState&);
     virtual bool isAtomic() const;

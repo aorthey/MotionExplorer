@@ -1,10 +1,6 @@
 #include "pathspace_atomic.h"
 #include "gui/drawMotionPlanner.h"
 
-const GLColor magenta(0.9,0.1,0.9,0.5);
-const GLColor lightGreen(0.2,0.9,0.2,0.2);
-const GLColor lightRed(0.9,0.2,0.2,0.2);
-
 PathSpaceAtomic::PathSpaceAtomic(RobotWorld *world_, PathSpaceInput* input_):
   PathSpace(world_, input_)
 {
@@ -32,7 +28,5 @@ void PathSpaceAtomic::DrawGL(GUIState& state){
   if(vantage_path.size()>0){
     GLDraw::drawPath(vantage_path, magenta, 10);
   }
-
-  //if(state("draw_roadmap")) roadmap.DrawGL(state);
 }
 

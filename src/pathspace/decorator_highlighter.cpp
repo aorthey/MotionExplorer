@@ -3,9 +3,6 @@
 #include "elements/swept_volume.h"
 #include "gui/drawMotionPlanner.h"
 
-const GLColor grey(0.7,0.7,0.7,1);
-const GLColor magenta(0.9,0.1,0.9,0.5);
-
 PathSpaceDecoratorHighlighter::PathSpaceDecoratorHighlighter(PathSpace* space_):
   PathSpaceDecorator(space_)
 {

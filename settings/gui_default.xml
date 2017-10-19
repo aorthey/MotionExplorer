@@ -57,13 +57,13 @@
     <name>draw_path_space</name>
     <descr>Draw Path Space</descr>
     <key>g</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_sweptvolume</name>
     <descr>Draw Swept Volume</descr>
     <key>l</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_roadmap</name>

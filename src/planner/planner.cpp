@@ -5,7 +5,7 @@
 #include "pathspace/pathspace_atomic.h"
 #include "pathspace/pathspace_ompl.h"
 #include "pathspace/pathspace_onetopic_cover.h"
-#include "pathspace/pathspace_hierarchical_roadmap.h"
+#include "pathspace/pathspace_linear_hierarchy.h"
 #include "pathspace/decorator.h"
 #include "pathspace/decorator_sweptvolume_path.h"
 #include "pathspace/decorator_highlighter.h"
@@ -145,16 +145,20 @@ void MotionPlanner::CreateSinglePathHierarchy(){
     std::cout << "      qgoal      : " << qg << std::endl;
   }
 
-  if(StartsWith(subalgorithm.c_str(),"ompl")) {
+  //execute different flavors of hierarchical algorithms
+  std::string linear = "linear";
+  std::string ompl = "ompl";
+  if(StartsWith(subalgorithm.c_str(),ompl.c_str())) {
     hierarchy->AddRootNode( new PathSpaceOnetopicCover(world, psinput_level0) );
     std::vector<Config> path;
     path.push_back(psinput_level0->q_init);
     path.push_back(psinput_level0->q_goal);
     hierarchy->GetRootNodeContent()->SetShortestPath( path );
-  }else if(StartsWith(subalgorithm.c_str(),"roadmap")) {
-    std::string roadmapalgorithm = subalgorithm.substr(8,input.name_algorithm.size()-13);
+  }else if(StartsWith(subalgorithm.c_str(),linear.c_str())) {
+    //Zhang_2009 style + shortest path iteration
+    std::string roadmapalgorithm = subalgorithm.substr(linear.size(),subalgorithm.size()-linear.size());
     psinput_level0->name_algorithm = roadmapalgorithm;
-    hierarchy->AddRootNode( new PathSpaceHierarchicalRoadmap(world, psinput_level0) );
+    hierarchy->AddRootNode( new PathSpaceLinearHierarchy(world, psinput_level0) );
     std::vector<Config> path;
     path.push_back(psinput_level0->q_init);
     path.push_back(psinput_level0->q_goal);

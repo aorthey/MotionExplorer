@@ -159,6 +159,7 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
   const ob::OptimizationObjectivePtr obj = pdef->getOptimizationObjective();
 
   output.SetPlannerData(pd);
+  output.SetProblemDefinition(pdef);
 
   //Topology::TopologicalGraph top(pd, *obj);
   //output.cmplx = top.GetSimplicialComplex();
@@ -179,44 +180,42 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
     double dg = pdef->getSolutionDifference();
     std::cout << " solution difference  : " << dg << std::endl;
 
-    ss.simplifySolution();
+    //og::PathGeometric path = ss.getSolutionPath();
 
-    og::PathGeometric path = ss.getSolutionPath();
+    //og::PathSimplifier shortcutter(si);
+    //shortcutter.shortcutPath(path);
 
-    og::PathSimplifier shortcutter(si);
-    shortcutter.shortcutPath(path);
+    //path.interpolate();
 
-    path.interpolate();
+    //std::cout << "Path Length     : " << path.length() << std::endl;
 
-    std::cout << "Path Length     : " << path.length() << std::endl;
+    //std::vector<ob::State *> states = path.getStates();
+    //std::vector<Config> keyframes;
+    //for(uint i = 0; i < states.size(); i++)
+    //{
+    //  ob::State *state = states.at(i);
 
-    std::vector<ob::State *> states = path.getStates();
-    std::vector<Config> keyframes;
-    for(uint i = 0; i < states.size(); i++)
-    {
-      ob::State *state = states.at(i);
+    //  int N = cspace->GetDimensionality();
+    //  Config cur = cspace->OMPLStateToConfig(state);
+    //  if(N>cur.size()){
+    //    Config qq;qq.resize(N);
+    //    qq.setZero();
+    //    for(int k = 0; k < cur.size(); k++){
+    //      qq(k) = cur(k);
+    //    }
+    //    keyframes.push_back(qq);
+    //  }else keyframes.push_back(cur);
+    //}
 
-      int N = cspace->GetDimensionality();
-      Config cur = cspace->OMPLStateToConfig(state);
-      if(N>cur.size()){
-        Config qq;qq.resize(N);
-        qq.setZero();
-        for(int k = 0; k < cur.size(); k++){
-          qq(k) = cur(k);
-        }
-        keyframes.push_back(qq);
-      }else keyframes.push_back(cur);
-    }
+    //uint istep = max(int(keyframes.size()/10.0),1);
+    //for(uint i = 0; i < keyframes.size(); i+=istep)
+    //{
+    //  std::cout << i << "/" << keyframes.size() << " : "  <<  keyframes.at(i) << std::endl;
+    //}
+    //std::cout << keyframes.size() << "/" << keyframes.size() << " : "  <<  keyframes.back() << std::endl;
 
-    uint istep = max(int(keyframes.size()/10.0),1);
-    for(uint i = 0; i < keyframes.size(); i+=istep)
-    {
-      std::cout << i << "/" << keyframes.size() << " : "  <<  keyframes.at(i) << std::endl;
-    }
-    std::cout << keyframes.size() << "/" << keyframes.size() << " : "  <<  keyframes.back() << std::endl;
-
-    output.SetShortestPath(keyframes);
-    std::cout << std::string(80, '-') << std::endl;
+    //output.SetShortestPath(keyframes);
+    //std::cout << std::string(80, '-') << std::endl;
   }else{
     std::cout << "No solution found" << std::endl;
   }

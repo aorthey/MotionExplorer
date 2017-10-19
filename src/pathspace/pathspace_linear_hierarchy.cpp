@@ -1,4 +1,4 @@
-#include "pathspace/pathspace_hierarchical_roadmap.h"
+#include "pathspace/pathspace_linear_hierarchy.h"
 #include "pathspace_atomic.h"
 #include "planner/strategy/strategy_geometric.h"
 #include "planner/strategy/strategy_roadmap.h"
@@ -6,15 +6,15 @@
 #include "gui/drawMotionPlanner.h"
 #include "gui/colors.h"
 
-PathSpaceHierarchicalRoadmap::PathSpaceHierarchicalRoadmap(RobotWorld *world_, PathSpaceInput* input_):
+PathSpaceLinearHierarchy::PathSpaceLinearHierarchy(RobotWorld *world_, PathSpaceInput* input_):
   PathSpace(world_, input_)
 {
 }
 
-bool PathSpaceHierarchicalRoadmap::isAtomic() const{
+bool PathSpaceLinearHierarchy::isAtomic() const{
   return false;
 }
-void PathSpaceHierarchicalRoadmap::DrawGL(GUIState&){
+void PathSpaceLinearHierarchy::DrawGL(GUIState&){
   uint ridx = input->robot_idx;
   Robot* robot = world->robots[ridx];
   const Config qi = input->q_init;
@@ -24,7 +24,7 @@ void PathSpaceHierarchicalRoadmap::DrawGL(GUIState&){
   GLDraw::drawRobotAtConfig(robot, qg, lightRed);
 }
 
-std::vector<PathSpace*> PathSpaceHierarchicalRoadmap::Decompose(){
+std::vector<PathSpace*> PathSpaceLinearHierarchy::Decompose(){
   WorldPlannerSettings worldsettings;
   worldsettings.InitializeDefault(*world);
 
@@ -67,19 +67,37 @@ std::vector<PathSpace*> PathSpaceHierarchicalRoadmap::Decompose(){
   necessary_roadmap.cVertex = magenta;
   necessary_roadmap.cEdge = magenta;
 
-  std::vector<Config> shortest_path = roadmap.GetShortestPath();
-  bool done = true;
-  while(!done){
-    //(1) get shortest path from roadmap
+  std::vector<Config> shortest_path1 = output.GetShortestPath();
+  std::vector<std::vector<Config>> solution_paths = output.GetSolutionPaths();
 
-
-    //(2) verify shortest path by checking that it is feasible. 
-    PathSpaceInput *level1 = input->GetNextLayer();
-
-    //(3a) if feasible, return path, interpolate along sufficient edges
-    //(3b) if not feasible, remove the infeasible vertex/edge and repeat
-
+  std::vector<PathSpace*> decomposedspace;
+  for(uint k = 0; k < solution_paths.size() ; k++){
+    decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
+    decomposedspace.back()->SetShortestPath( solution_paths.at(k) );
   }
+  //std::vector<Config> shortest_path2 = roadmap.GetShortestPath();
+  //std::cout << std::string(80, '-') << std::endl;
+  //for(uint k = 0; k < shortest_path1.size(); k++){
+  //  std::cout << shortest_path1.at(k)   << std::endl;  
+  //}
+  //std::cout << std::string(80, '-') << std::endl;
+  //for(uint k = 0; k < shortest_path2.size(); k++){
+  //  std::cout << shortest_path2.at(k)   << std::endl;  
+  //}
+  //std::cout << std::string(80, '-') << std::endl;
+  //exit(0);
+  //bool done = true;
+  //while(!done){
+  //  //(1) get shortest path from roadmap
+
+
+  //  //(2) verify shortest path by checking that it is feasible. 
+  //  PathSpaceInput *level1 = input->GetNextLayer();
+
+  //  //(3a) if feasible, return path, interpolate along sufficient edges
+  //  //(3b) if not feasible, remove the infeasible vertex/edge and repeat
+
+  //}
 
   //###########################################################################
   //for each necessary vertex, create a new underlying cspace and create a
@@ -89,15 +107,13 @@ std::vector<PathSpace*> PathSpaceHierarchicalRoadmap::Decompose(){
   //disconnected components for each vertex
   //###########################################################################
 
-  std::vector<PathSpace*> decomposedspace;
 
   if(output.success){
+
     decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    decomposedspace.at(0)->SetShortestPath( shortest_path );
+    decomposedspace.back()->SetRoadmap( sufficient_roadmap );
     decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    decomposedspace.at(1)->SetRoadmap( sufficient_roadmap );
-    decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    decomposedspace.at(2)->SetRoadmap( necessary_roadmap );
+    decomposedspace.back()->SetRoadmap( necessary_roadmap );
   }else{
     std::cout << "Error: Path could not be expanded" << std::endl;
   }

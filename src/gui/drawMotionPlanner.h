@@ -2,7 +2,7 @@
 #include "planner/planner.h"
 #include "elements/wrench_field.h"
 #include "elements/simplicial_complex.h"
-//#include "gui/colors.h"
+#include "gui/colors.h"
 
 #include <KrisLibrary/GLdraw/drawMesh.h>
 #include <KrisLibrary/robotics/IK.h>
