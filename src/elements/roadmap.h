@@ -27,10 +27,15 @@ class Roadmap{
     std::vector<std::pair<Config,Config>> GetEdges();
     std::vector<Config> GetShortestPath();
 
-    GLDraw::GLColor cVertex, cEdge;
+    GLDraw::GLColor cVertex, cEdge, cEdgeRemoved;
 
+    int numEdges();
+    int numVertices();
     void removeInfeasibleEdgeAlongShortestPath(uint index);
+
   private:
+    std::vector<ob::PlannerDataVertex> shortest_path_vertex;
+
     std::vector<Config> shortest_path;
     std::vector<ob::PlannerData::Graph::Vertex> shortest_path_idxs;
 

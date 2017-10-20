@@ -17,6 +17,12 @@ void StrategyOutput::SetProblemDefinition( ob::ProblemDefinitionPtr pdef_ ){
 void StrategyOutput::SetShortestPath( std::vector<Config> path_){
   shortest_path = path_;
 }
+bool StrategyOutput::hasExactSolution(){
+  return pdef->hasExactSolution();
+}
+bool StrategyOutput::hasApproximateSolution(){
+  return pdef->hasApproximateSolution();
+}
 ob::PlannerDataPtr StrategyOutput::GetPlannerDataPtr(){
   return pd;
 }
@@ -27,6 +33,7 @@ ob::ProblemDefinitionPtr StrategyOutput::GetProblemDefinitionPtr(){
 std::vector<Config> StrategyOutput::PathGeometricToConfigPath(og::PathGeometric &path){
   og::PathSimplifier shortcutter(pdef->getSpaceInformation());
   shortcutter.shortcutPath(path);
+  //shortcutter.simplify(path,0.1);
 
   path.interpolate();
 
@@ -83,4 +90,17 @@ RoadmapPtr StrategyOutput::GetRoadmapPtr(){
 
 void StrategyOutput::SetRoadmap(RoadmapPtr roadmap_){
   roadmap = roadmap_;
+}
+
+std::ostream& operator<< (std::ostream& out, const StrategyOutput& so) 
+{
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "Found solution:" << std::endl;
+  std::cout << " exact solution       : " << (so.pdef->hasExactSolution()? "Yes":"No")<< std::endl;
+  std::cout << " approximate solution : " << (so.pdef->hasApproximateSolution()? "Yes":"No")<< std::endl;
+  double dg = so.pdef->getSolutionDifference();
+  std::cout << " solution difference  : " << dg << std::endl;
+  std::cout << " roadmap vertices     : " << so.pd->numVertices() << std::endl;
+  std::cout << " roadmap edges        : " << so.pd->numEdges() << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
 }

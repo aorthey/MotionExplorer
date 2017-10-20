@@ -423,7 +423,7 @@ void MotionPlanner::DrawGL(GUIState& state){
   //PathSpace* P = hierarchy->GetNodeContent(current_path);
   //PathSpace* P = new PathSpaceDecoratorSweptVolumePath( hierarchy->GetNodeContent(current_path) );
   PathSpace* P = new PathSpaceDecoratorHighlighter( hierarchy->GetNodeContent(current_path) );
-  std::cout << *P << std::endl;
+  //std::cout << *P << std::endl;
   P->DrawGL(state);
 
 

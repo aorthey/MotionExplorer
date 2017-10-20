@@ -55,8 +55,6 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
 
   ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
-  //std::cout << start << std::endl;
-  //std::cout << goal << std::endl;
 
   og::SimpleSetup ss(cspace->SpacePtr());
   const ob::SpaceInformationPtr si = ss.getSpaceInformation();
@@ -104,20 +102,6 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
     exit(0);
   }
 
-// * - prm: the Probabilistic Roadmap algorithm
-// * - lazyprm: the Lazy-PRM algorithm (interface not implemented yet)
-// * - perturbation: the PerturbationTree algorithm (interface not implemented yet)
-// * - est: the Expanding Space Trees algorithm (interface not implemented yet)
-// * - rrt: the Rapidly Exploring Random Trees algorithm
-// * - sbl: the Single-Query Bidirectional Lazy planner
-// * - sblprt: the probabilistic roadmap of trees (PRT) algorithm with SBL as the inter-root planner.
-// * - rrt*: the RRT* algorithm for optimal motion planning
-// * - prm*: the PRM* algorithm for optimal motion planning
-// * - lazyprm*: the Lazy-PRM* algorithm for optimal motion planning
-// * - lazyrrg*: the Lazy-RRG* algorithm for optimal motion planning
-// * - fmm: the fast marching method algorithm for resolution-complete optimal motion planning
-// * - fmm*: an anytime fast marching method algorithm for optimal motion planning
-
   //###########################################################################
   // setup and projection
   //###########################################################################
@@ -125,6 +109,10 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
   double epsilon_goalregion = input.epsilon_goalregion;
 
   ss.setStartAndGoalStates(start, goal, epsilon_goalregion);
+
+  //ss.setStartState(start);
+  //ss.setGoal(GoalPtr);
+
   ss.setPlanner(ompl_planner);
   ss.setup();
   //ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
@@ -152,7 +140,6 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
 
   //###########################################################################
   //###########################################################################
-
   ob::PlannerDataPtr pd( new ob::PlannerData(si) );
   ss.getPlannerData(*pd);
 
@@ -160,64 +147,5 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
 
   output.SetPlannerData(pd);
   output.SetProblemDefinition(pdef);
-
-  //Topology::TopologicalGraph top(pd, *obj);
-  //output.cmplx = top.GetSimplicialComplex();
-
-  //###########################################################################
-  // extract solution path if solved
-  //###########################################################################
-
-  output.success = ss.haveSolutionPath();
-
-  if (output.success)
-  {
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "Found solution:" << std::endl;
-    std::cout << " exact solution       : " << (pdef->hasExactSolution()? "Yes":"No")<< std::endl;
-    std::cout << " approximate solution : " << (pdef->hasApproximateSolution()? "Yes":"No")<< std::endl;
-
-    double dg = pdef->getSolutionDifference();
-    std::cout << " solution difference  : " << dg << std::endl;
-
-    //og::PathGeometric path = ss.getSolutionPath();
-
-    //og::PathSimplifier shortcutter(si);
-    //shortcutter.shortcutPath(path);
-
-    //path.interpolate();
-
-    //std::cout << "Path Length     : " << path.length() << std::endl;
-
-    //std::vector<ob::State *> states = path.getStates();
-    //std::vector<Config> keyframes;
-    //for(uint i = 0; i < states.size(); i++)
-    //{
-    //  ob::State *state = states.at(i);
-
-    //  int N = cspace->GetDimensionality();
-    //  Config cur = cspace->OMPLStateToConfig(state);
-    //  if(N>cur.size()){
-    //    Config qq;qq.resize(N);
-    //    qq.setZero();
-    //    for(int k = 0; k < cur.size(); k++){
-    //      qq(k) = cur(k);
-    //    }
-    //    keyframes.push_back(qq);
-    //  }else keyframes.push_back(cur);
-    //}
-
-    //uint istep = max(int(keyframes.size()/10.0),1);
-    //for(uint i = 0; i < keyframes.size(); i+=istep)
-    //{
-    //  std::cout << i << "/" << keyframes.size() << " : "  <<  keyframes.at(i) << std::endl;
-    //}
-    //std::cout << keyframes.size() << "/" << keyframes.size() << " : "  <<  keyframes.back() << std::endl;
-
-    //output.SetShortestPath(keyframes);
-    //std::cout << std::string(80, '-') << std::endl;
-  }else{
-    std::cout << "No solution found" << std::endl;
-  }
 
 }

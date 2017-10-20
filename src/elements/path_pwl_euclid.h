@@ -37,7 +37,6 @@ class PathPiecewiseLinearEuclidean
     // convert path length [0,L] -> [0,1]
     void Normalize();
     virtual void interpolate();
-
 };
 
 //inline PathPiecewiseLinearEuclidean PathPiecewiseLinearEuclidean::from_keyframes(const std::vector<Config> &keyframes){

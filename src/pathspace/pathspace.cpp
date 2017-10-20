@@ -12,6 +12,10 @@ PathSpace::PathSpace(RobotWorld *world_, PathSpaceInput* input_):
   world(world_), input(input_)
 {
   sv = NULL;
+  if(!input){
+    std::cout << "Input does not exists" << std::endl;
+    exit(0);
+  }
 }
 
 RobotWorld* PathSpace::GetWorldPtr(){

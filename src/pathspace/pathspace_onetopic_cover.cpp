@@ -51,7 +51,7 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   strategy.plan(input->GetStrategyInput(), cspace_i, output);
 
   std::vector<PathSpace*> decomposedspace;
-  if(!output.success) return decomposedspace;
+  if(!output.hasExactSolution()) return decomposedspace;
   //##############################################################################
   //compute vantage paths of each onetopic cover
   //##############################################################################

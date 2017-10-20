@@ -1,5 +1,6 @@
 #include "roadmap.h"
 #include "gui/drawMotionPlanner.h"
+#include "gui/colors.h"
 #include "planner/validitychecker/validity_checker_ompl.h"
 
 using namespace GLDraw;
@@ -8,10 +9,9 @@ using namespace GLDraw;
 //typedef ob::PlannerData::NO_VERTEX NO_VERTEX;
 
 Roadmap::Roadmap(){
-  GLColor green(0.2,0.9,0.2,0.5);
-  GLColor magenta(0.9,0.1,0.9,0.5);
   cVertex = green;
   cEdge = green;
+  cEdgeRemoved = grey;
 }
 
 std::vector<Config> Roadmap::GetVertices(){
@@ -148,8 +148,6 @@ void Roadmap::CreateFromPlannerDataOnlyNecessary(const ob::PlannerDataPtr pd, CS
 }
 
 void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *cspace_){
-  lemon = new LemonInterface(pd);
-
   cspace = cspace_;
   ob::SpaceInformationPtr si = pd->getSpaceInformation();
   std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
@@ -169,11 +167,20 @@ void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *csp
       const ob::State* sj = w.getState();
       Config q2 = cspace->OMPLStateToConfig(sj);
       E.push_back(std::make_pair(q1,q2));
+      uint vi = pd->vertexIndex(v);
+      uint wi = pd->vertexIndex(w);
+      //if(pd->edgeExists(vi,wi)){
+      //  std::cout << "trying to set non existing edge!" << std::endl;
+      //  std::cout << "edge: " << q1 << "<->" << q2 << std::endl;
+      //}
     }
   }
-  uint Nvertices = pd->numVertices();
-  uint Nedges = pd->numEdges();
+  Nvertices = pd->numVertices();
+  Nedges = pd->numEdges();
   pds = pd;
+  pds->decoupleFromPlanner();
+  lemon = new LemonInterface(pds);
+
 }
 
 using Graph = ob::PlannerData::Graph;
@@ -193,6 +200,7 @@ std::vector<Config> Roadmap::VertexPathToConfigPath( const std::vector<Vertex> &
   for(uint k = 0; k < path.size(); k++){
     Vertex v = path.at(k);
     const ob::State *sk = pds->getVertex(v).getState();
+    shortest_path_vertex.push_back(pds->getVertex(v));
     states.push_back(sk);
   }
 
@@ -200,9 +208,8 @@ std::vector<Config> Roadmap::VertexPathToConfigPath( const std::vector<Vertex> &
   for(uint k = 0; k < states.size(); k++){
     omplpath.append(states.at(k));
   }
-
-  og::PathSimplifier shortcutter(si);
-  shortcutter.shortcutPath(omplpath);
+  //og::PathSimplifier shortcutter(si);
+  //shortcutter.shortcutPath(omplpath);
 
   //omplpath.interpolate();
 
@@ -216,12 +223,56 @@ std::vector<Config> Roadmap::VertexPathToConfigPath( const std::vector<Vertex> &
   }
   return keyframes;
 }
+int Roadmap::numEdges(){
+  return pds->numEdges();
+}
+int Roadmap::numVertices(){
+  return pds->numVertices();
+}
 void Roadmap::removeInfeasibleEdgeAlongShortestPath(uint index){
   //move along shortest_path_idxs remove all infeasible edges
 
   Vertex vidx = shortest_path_idxs.at(index);
   Vertex widx = shortest_path_idxs.at(index+1);
-  pds->removeEdge(vidx,widx);
+  if(!pds->removeEdge(vidx,widx)){
+    //PlannerData is implemented as DG
+    pds->removeEdge(widx,vidx);
+    //std::cout << std::string(80, '-') << std::endl; 
+    //std::cout << "unable to remove edge between vertices " << vidx << " " << widx << std::endl;
+    //std::cout << std::string(80, '-') << std::endl; 
+
+    //if(pds->getVertex(vidx)==ob::PlannerData::NO_VERTEX){
+    //  std::cout << "vertex " << vidx << " does not exists" << std::endl;
+    //}
+    //if(pds->getVertex(widx)==ob::PlannerData::NO_VERTEX){
+    //  std::cout << "vertex " << widx << " does not exists" << std::endl;
+    //}
+    //Config q1 = cspace->OMPLStateToConfig(pds->getVertex(vidx).getState());
+    //Config q2 = cspace->OMPLStateToConfig(pds->getVertex(widx).getState());
+    //std::cout << "vertex " << vidx << " " << q1 << std::endl;
+    //std::cout << "vertex " << widx << " " << q2 << std::endl;
+    //std::cout << "should be:" << std::endl;
+
+    //std::cout << shortest_path.at(index) << std::endl;
+    //std::cout << shortest_path.at(index+1) << std::endl;
+
+    //ob::PlannerDataVertex v = shortest_path_vertex.at(index);
+    //ob::PlannerDataVertex w = shortest_path_vertex.at(index+1);
+    //Config q3 = cspace->OMPLStateToConfig(v.getState());
+    //Config q4 = cspace->OMPLStateToConfig(w.getState());
+
+    //uint vvi = pds->vertexIndex(v);
+    //uint wwi = pds->vertexIndex(w);
+    //std::cout << "vertex " << vvi << " : " << q3 << std::endl;
+    //std::cout << "vertex " << wwi << " : " << q4 << std::endl;
+    //std::cout << "edge: " << pds->edgeExists(vvi,wwi) << std::endl;
+    //std::cout << "edge: " << pds->edgeExists(wwi,vvi) << std::endl;
+    // for(uint k = 0; k < E.size(); k++){
+    //   std::cout << E.at(k).first << "<->" << E.at(k).second << std::endl;
+    // }
+
+    //exit(0);
+  }
 
   Config q1 = cspace->OMPLStateToConfig(pds->getVertex(vidx).getState());
   Config q2 = cspace->OMPLStateToConfig(pds->getVertex(widx).getState());
@@ -233,13 +284,12 @@ void Roadmap::removeInfeasibleEdgeAlongShortestPath(uint index){
 
 void Roadmap::DrawGL(GUIState& state)
 {
+  if(!pds) return;
 
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND); 
 
   glPointSize(10);
-  std::cout << "roadmap: v=" << V.size() << " e="<<E.size() << std::endl;
-
   //move along PD and visualize
 
   if(state("draw_roadmap_vertices")){
@@ -261,13 +311,6 @@ void Roadmap::DrawGL(GUIState& state)
   glLineWidth(5);
   if(state("draw_roadmap_edges")){
     setColor(cEdge);
-    //for(uint k = 0; k < E.size(); k++){
-    //  Config q1 = E.at(k).first;
-    //  Config q2 = E.at(k).second;
-    //  Vector3 v1(q1(0),q1(1),q1(2));
-    //  Vector3 v2(q2(0),q2(1),q2(2));
-    //  drawLineSegment(v1,v2);
-    //}
     for(uint vidx = 0; vidx < Nvertices; vidx++){
       ob::PlannerDataVertex v = pds->getVertex(vidx);
       if(v==ob::PlannerData::NO_VERTEX) continue;
@@ -283,6 +326,16 @@ void Roadmap::DrawGL(GUIState& state)
         Vector3 v2(q2(0),q2(1),q2(2));
         drawLineSegment(v1,v2);
       }
+    }
+    setColor(cEdgeRemoved);
+    for(uint k = 0; k < E_removed.size(); k++){
+      std::pair<Config,Config> e = E_removed.at(k);
+      Config q1 = e.first;
+      Config q2 = e.second;
+      Vector3 v1(q1(0),q1(1),q1(2));
+      Vector3 v2(q2(0),q2(1),q2(2));
+      drawLineSegment(v1,v2);
+
     }
   }
 

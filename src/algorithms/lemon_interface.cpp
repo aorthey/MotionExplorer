@@ -23,6 +23,11 @@ LemonInterface::LemonInterface( ob::PlannerDataPtr pd_ ):
     gn.push_back(x);
     if(pd->isStartVertex(k)) start = x;
     if(pd->isGoalVertex(k)) goal = x;
+
+    if(pd->getVertex(k)==ob::PlannerData::NO_VERTEX){
+      std::cout << "vertex " << k << " does not exists" << std::endl;
+      exit(0);
+    }
   }
 
 //#############################################################################
@@ -55,34 +60,39 @@ std::vector<Vertex> LemonInterface::GetShortestPath( ListGraph::Node s, ListGrap
 
   auto dijkstra = Dijkstra<ListGraph, CostMap>(lg, *length);
   bool reached = dijkstra.run(s,t);
-  std::cout << "lemon: " << reached << std::endl;
 
+  shortest_path_idxs.clear();
   if(reached){
     Path<ListGraph> path_start = dijkstra.path(t);
     std::vector<ListGraph::Node> path;
 
+    path.push_back(s);
+    uint vidx = lg.id(s);
+    shortest_path_idxs.push_back(vidx);
+
     for (Path<ListGraph>::ArcIt it(path_start); it != INVALID; ++it) {
       ListGraph::Node v = lg.source(it);
       ListGraph::Node w = lg.target(it);
-      path.push_back(v);
       path.push_back(w);
+      uint vidx = lg.id(w);
+      shortest_path_idxs.push_back(vidx);
     }
 
-    if(path.size()>0){
-      double L = 0.0;
-      for(uint k = 0; k < path.size()-1; k++){
-        ListGraph::Node v = path.at(k);
-        ListGraph::Node w = path.at(k+1);
-        uint v1i = lg.id(v);
-        uint v2i = lg.id(w);
-        if(v1i!=v2i){
-          //const ob::State *s1 = pd->getVertex(v1i).getState();
-          //const ob::State *s2 = pd->getVertex(v2i).getState();
-          shortest_path_idxs.push_back(v1i);
-          shortest_path_idxs.push_back(v2i);
-        }
-      }
-    }
+    //if(path.size()>0){
+    //  double L = 0.0;
+    //  for(uint k = 0; k < path.size()-1; k++){
+    //    ListGraph::Node v = path.at(k);
+    //    ListGraph::Node w = path.at(k+1);
+    //    uint v1i = lg.id(v);
+    //    uint v2i = lg.id(w);
+    //    if(v1i!=v2i){
+    //      //const ob::State *s1 = pd->getVertex(v1i).getState();
+    //      //const ob::State *s2 = pd->getVertex(v2i).getState();
+    //      shortest_path_idxs.push_back(v1i);
+    //      shortest_path_idxs.push_back(v2i);
+    //    }
+    //  }
+    //}
 
   }
   return shortest_path_idxs;

@@ -7,8 +7,6 @@ PathPiecewiseLinearEuclidean::PathPiecewiseLinearEuclidean()
 {
 }
 
-
-
 void PathPiecewiseLinearEuclidean::Normalize(){
   double newLength =0.0;
   for(uint i = 0; i < interLength.size(); i++){
@@ -37,6 +35,7 @@ Vector3 PathPiecewiseLinearEuclidean::EvalVec3Milestone(const int k) const{
   if(k<0) q= keyframes.front();
   else if(k>Nkeyframes) q= keyframes.back();
   else q = keyframes.at(k);
+
   Vector3 v; v[0] = q(0); v[1] = q(1); v[2] = q(2);
   return v;
 }
@@ -133,6 +132,9 @@ double PathPiecewiseLinearEuclidean::PosFromConfig(const Config q) const{
     if(d1+d2 <= d+epsilon){
       //q lies on line (q1,q2)
       //
+      if(d<epsilon){
+        return 0;
+      }
       pos += d1/d*interLength.at(k);
       Config qout = Eval(pos);
       assert((qout-q).norm() < epsilon);
