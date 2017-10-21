@@ -65,7 +65,7 @@ int StrategyRoadmap::NumberConnectedComponents(){
 void StrategyRoadmap::planMore(){
 }
 
-void StrategyRoadmap::plan( const StrategyInput &input, CSpaceOMPL *cspace, StrategyOutput &output){
+void StrategyRoadmap::plan( const StrategyInput &input, StrategyOutput &output){
   exit(0);
 }
 

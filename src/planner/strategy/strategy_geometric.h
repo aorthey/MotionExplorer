@@ -14,7 +14,7 @@ namespace ot = ompl::tools;
 
 class StrategyGeometric: public Strategy{
   public:
-    virtual void plan( const StrategyInput &input, CSpaceOMPL *cspace, StrategyOutput &output);
+    virtual void plan( const StrategyInput &input, StrategyOutput &output);
 
     StrategyGeometric();
 

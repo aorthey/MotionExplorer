@@ -48,7 +48,9 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   //##############################################################################
   StrategyGeometric strategy;
   StrategyOutput output(cspace_i);
-  strategy.plan(input->GetStrategyInput(), cspace_i, output);
+  StrategyInput strategy_input = input->GetStrategyInput();
+  strategy_input.cspace = cspace_i;
+  strategy.plan(strategy_input, output);
 
   std::vector<PathSpace*> decomposedspace;
   if(!output.hasExactSolution()) return decomposedspace;

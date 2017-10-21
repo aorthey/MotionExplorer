@@ -12,7 +12,7 @@ class StrategyRoadmap: public Strategy{
   typedef std::shared_ptr<og::PRM> PRMPtr;
   public:
 
-    virtual void plan( const StrategyInput &input, CSpaceOMPL *cspace, StrategyOutput &output) override;
+    virtual void plan( const StrategyInput &input, StrategyOutput &output) override;
 
     StrategyRoadmap(CSpaceOMPL *cspace);
 

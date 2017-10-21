@@ -31,11 +31,13 @@ std::vector<PathSpace*> PathSpaceOMPL::Decompose(){
 
   StrategyGeometric strategy;
   StrategyOutput output(cspace);
-  strategy.plan(input->GetStrategyInput(), cspace, output);
+  StrategyInput strategy_input = input->GetStrategyInput();
+  strategy_input.cspace = cspace;
+  strategy.plan(strategy_input, output);
 
   std::vector<PathSpace*> decomposedspace;
 
-  if(output.hasApproximateSolution()){
+  if(output.hasExactSolution()){
     decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
     decomposedspace.at(0)->SetShortestPath( output.GetShortestPath() );
     decomposedspace.at(0)->SetRoadmap( *output.GetRoadmapPtr() );

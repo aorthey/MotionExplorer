@@ -321,3 +321,4 @@ environments. Rigid bodies are OK for now.
 [ ] make an abstract roadmap, containing plannerdataptr and lemon interface.
 This roadmap always holds the shortest path, and we can delete edges/vertices.
 [ ] roadmap does not return shortest path
+[ ] replay motion, not only swept volume

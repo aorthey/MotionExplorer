@@ -8,6 +8,7 @@
 #include "pathspace/pathspace_linear_hierarchy.h"
 #include "pathspace/decorator.h"
 #include "pathspace/decorator_sweptvolume_path.h"
+#include "pathspace/decorator_path_player.h"
 #include "pathspace/decorator_highlighter.h"
 #include <KrisLibrary/utils/stringutils.h>
 
@@ -422,10 +423,11 @@ void MotionPlanner::DrawGL(GUIState& state){
 
   //PathSpace* P = hierarchy->GetNodeContent(current_path);
   //PathSpace* P = new PathSpaceDecoratorSweptVolumePath( hierarchy->GetNodeContent(current_path) );
-  PathSpace* P = new PathSpaceDecoratorHighlighter( hierarchy->GetNodeContent(current_path) );
   //std::cout << *P << std::endl;
-  P->DrawGL(state);
-
+  Pcurrent = hierarchy->GetNodeContent(current_path);
+  Pcurrent = new PathSpaceDecoratorHighlighter(Pcurrent);
+  Pcurrent = new PathSpaceDecoratorPathPlayer(Pcurrent);
+  Pcurrent->DrawGL(state);
 
   for(uint k = 0; k < N; k++){
     if(k==current_level_node) continue;

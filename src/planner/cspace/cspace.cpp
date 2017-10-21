@@ -1062,7 +1062,6 @@ ob::ScopedState<> GeometricCSpaceOMPLPathConstraintSO3::ConfigToOMPLState(const 
   return qompl;
 }
 
-
 //#############################################################################
 //#############################################################################
 GeometricCSpaceOMPLPointConstraintSO3::GeometricCSpaceOMPLPointConstraintSO3(Robot *robot_, CSpace *space_, Config q):

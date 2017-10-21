@@ -94,13 +94,14 @@ void StrategyOutput::SetRoadmap(RoadmapPtr roadmap_){
 
 std::ostream& operator<< (std::ostream& out, const StrategyOutput& so) 
 {
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Found solution:" << std::endl;
-  std::cout << " exact solution       : " << (so.pdef->hasExactSolution()? "Yes":"No")<< std::endl;
-  std::cout << " approximate solution : " << (so.pdef->hasApproximateSolution()? "Yes":"No")<< std::endl;
+  out << std::string(80, '-') << std::endl;
+  out << "Found solution:" << std::endl;
+  out << " exact solution       : " << (so.pdef->hasExactSolution()? "Yes":"No")<< std::endl;
+  out << " approximate solution : " << (so.pdef->hasApproximateSolution()? "Yes":"No")<< std::endl;
   double dg = so.pdef->getSolutionDifference();
-  std::cout << " solution difference  : " << dg << std::endl;
-  std::cout << " roadmap vertices     : " << so.pd->numVertices() << std::endl;
-  std::cout << " roadmap edges        : " << so.pd->numEdges() << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
+  out << " solution difference  : " << dg << std::endl;
+  out << " roadmap vertices     : " << so.pd->numVertices() << std::endl;
+  out << " roadmap edges        : " << so.pd->numEdges() << std::endl;
+  out << std::string(80, '-') << std::endl;
+  return out;
 }

@@ -54,6 +54,8 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     state("draw_roadmap_necessary").toggle();
   }else if(cmd=="draw_roadmap_sufficient"){
     state("draw_roadmap_sufficient").toggle();
+  }else if(cmd=="draw_play_path"){
+    state("draw_play_path").toggle();
   }else return BaseT::OnCommand(cmd,args);
 
   SendRefresh();

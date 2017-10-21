@@ -53,6 +53,7 @@ class MotionPlanner{
     void CreateShallowHierarchy();
     void CreateSinglePathHierarchy();
 
+    PathSpace *Pcurrent;
     RobotWorld *world;
     PlannerInput input;
     ViewHierarchy viewHierarchy;

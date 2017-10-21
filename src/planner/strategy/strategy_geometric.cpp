@@ -43,12 +43,14 @@ static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInf
 StrategyGeometric::StrategyGeometric()
 {
 }
-void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, StrategyOutput &output)
+void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output)
 {
 
   Config p_init = input.q_init;
   Config p_goal = input.q_goal;
   std::string algorithm = input.name_algorithm;
+  CSpaceOMPL* cspace = input.cspace;
+
   //###########################################################################
   // Config init,goal to OMPL start/goal
   //###########################################################################
@@ -106,16 +108,12 @@ void StrategyGeometric::plan( const StrategyInput &input, CSpaceOMPL *cspace, St
   // setup and projection
   //###########################################################################
 
-  double epsilon_goalregion = input.epsilon_goalregion;
-
-  ss.setStartAndGoalStates(start, goal, epsilon_goalregion);
-
-  //ss.setStartState(start);
-  //ss.setGoal(GoalPtr);
+  ss.setStartState(start);
+  ss.setGoal(input.GetGoalPtr(si));
 
   ss.setPlanner(ompl_planner);
   ss.setup();
-  //ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
+  ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
 
   //set objective to infinite path to just return first solution
   ob::ProblemDefinitionPtr pdef = ss.getProblemDefinition();

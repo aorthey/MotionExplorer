@@ -2,6 +2,7 @@
 #include "pathspace_atomic.h"
 #include "planner/strategy/strategy_geometric.h"
 #include "planner/strategy/strategy_roadmap.h"
+#include "planner/strategy/strategy_input_edgegoal.h"
 #include "planner/cspace/cspace_factory.h"
 #include "gui/drawMotionPlanner.h"
 #include "gui/colors.h"
@@ -45,7 +46,10 @@ std::vector<PathSpace*> PathSpaceLinearHierarchy::Decompose(){
 
   StrategyGeometric strategy;
   StrategyOutput output(cspace);
-  strategy.plan(input->GetStrategyInput(), cspace, output);
+  StrategyInput strategy_input = input->GetStrategyInput();
+  strategy_input.cspace = cspace;
+
+  strategy.plan(strategy_input, output);
 
   //###########################################################################
   // Extract from the planner the roadmap, and decompose the roadmap into a
@@ -123,7 +127,8 @@ std::vector<PathSpace*> PathSpaceLinearHierarchy::Decompose(){
     SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,inner_index,&worldsettings);
     SingleRobotCSpace* cspace_klampt_o = new SingleRobotCSpace(*world,outer_index,&worldsettings);
 
-    uint failed_index;
+    uint last_index;
+    bool failed_edge = false;
     Config qedge_start = level1->q_init;
 
     std::vector<Config> edge_path;
@@ -135,27 +140,48 @@ std::vector<PathSpace*> PathSpaceLinearHierarchy::Decompose(){
 
       cspace->print();
 
-      StrategyInput input_level1 = level1->GetStrategyInput();
+      StrategyInput input_tmp = level1->GetStrategyInput();
+      StrategyInputEdgeGoal input_level1(input_tmp);
 
+      //project onto edge
       input_level1.q_init = qedge_start;
-      if(k>=shortest_path.size()-2){
-        input_level1.q_goal = level1->q_goal;
-      }else{
-        input_level1.q_goal = qedge_start;
-      }
+      input_level1.q_init(0) = shortest_path.at(k)(0);
+      input_level1.q_init(1) = shortest_path.at(k)(1);
+      input_level1.q_init(2) = shortest_path.at(k)(2);
+      input_level1.q_goal = level1->q_goal;
       input_level1.q_goal(0) = shortest_path.at(k+1)(0);
       input_level1.q_goal(1) = shortest_path.at(k+1)(1);
       input_level1.q_goal(2) = shortest_path.at(k+1)(2);
 
       input_level1.name_algorithm = "ompl:rrt";
+      input_level1.cspace = cspace;
 
       StrategyGeometric strategy;
       StrategyOutput output_level1(cspace);
-      std::cout << "Input level1:" << std::endl;
-      std::cout << input_level1.q_init << std::endl;
-      std::cout << input_level1.q_goal << std::endl;
-      strategy.plan(input_level1, cspace, output_level1);
 
+      ob::ScopedState<> ss = cspace->ConfigToOMPLState(input_level1.q_init);
+      ob::State *s = ss.get();
+      const ob::RealVectorStateSpace::StateType *qomplRnSpace = s->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+      double d = qomplRnSpace->values[0];
+      double epsilon = 1e-10;
+      if( abs(d) > epsilon){
+        std::cout << "error start state" << std::endl;
+        std::cout << d << std::endl;
+        std::cout << edge.at(0) << std::endl;
+        std::cout << input_level1.q_init << std::endl;
+        std::cout << std::string(80, '-') << std::endl;
+        std::cout << edge.at(1) << std::endl;
+        std::cout << input_level1.q_goal << std::endl;
+        exit(0);
+      }
+
+
+      //############################################################/
+      ///DESIGN GOAL REGION WHICH HAS ONLY N-1 DIMENSIONS
+      //############################################################/
+      strategy.plan(input_level1, output_level1);
+
+      last_index = k;
       if(output_level1.hasExactSolution()){
         std::vector<Config> edge_shortest_path = output_level1.GetShortestPath();
         for(uint j = 0; j < 6; j++){
@@ -164,16 +190,17 @@ std::vector<PathSpace*> PathSpaceLinearHierarchy::Decompose(){
         edge_path.insert(edge_path.end(), edge_shortest_path.begin(),edge_shortest_path.end());
       }else{
         //identify infeasible edges.
-        failed_index = k;
+        std::cout << "Infeasible Edge" << std::endl;
         std::cout << shortest_path.at(k) << std::endl;
         std::cout << shortest_path.at(k+1) << std::endl;
-        roadmap->removeInfeasibleEdgeAlongShortestPath(failed_index);
+        roadmap->removeInfeasibleEdgeAlongShortestPath(last_index);
+        failed_edge = true;
         break;
       }
     }
 
-    if(failed_index < shortest_path.size()-1){
-      std::cout << "failed at edge: " << failed_index << "/" << shortest_path.size() << std::endl;
+    if(failed_edge){
+      std::cout << "failed at edge: " << last_index << "/" << shortest_path.size() << std::endl;
     }else{
       std::cout << "path is success" << std::endl;
       decomposedspace.push_back( new PathSpaceAtomic(world, level1) );
@@ -181,10 +208,7 @@ std::vector<PathSpace*> PathSpaceLinearHierarchy::Decompose(){
       decomposedspace.back()->SetShortestPath( edge_path );
       done=true;
     }
-
-
   }
-
 
   //  //(2) verify shortest path by checking that it is feasible. 
   //  PathSpaceInput *level1 = input->GetNextLayer();

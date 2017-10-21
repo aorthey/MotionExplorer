@@ -95,6 +95,12 @@
     <key>2</key>
     <active>1</active>
   </checkbox>
+  <checkbox>
+    <name>draw_play_path</name>
+    <descr>Replay Path</descr>
+    <key>5</key>
+    <active>0</active>
+  </checkbox>
 
   <hotkey>
     <name>reset</name>
