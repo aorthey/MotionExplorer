@@ -5,6 +5,7 @@ PlannerBackend::PlannerBackend(RobotWorld *world) :
   ForceFieldBackend(world)
 {
   active_planner=0;
+  t = 0;
 }
 
 void PlannerBackend::AddPlannerInput(PlannerMultiInput& _in){
@@ -56,10 +57,39 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     state("draw_roadmap_sufficient").toggle();
   }else if(cmd=="draw_play_path"){
     state("draw_play_path").toggle();
+    simulate = 0;
+    if(state("draw_play_path")) SendPauseIdle(0);
+    else SendPauseIdle();
   }else return BaseT::OnCommand(cmd,args);
 
   SendRefresh();
   return true;
+}
+bool PlannerBackend::OnIdle(){
+  bool res = BaseT::OnIdle();
+  if(planners.empty()) return res;
+
+  MotionPlanner* planner = planners.at(active_planner);
+  static PathPiecewiseLinearEuclidean *path;
+  if(state("draw_play_path")){
+    if(t<=0){
+      path = planner->GetPath();
+    }
+    if(path){
+      double tstep = 0.01;
+      double T = path->GetLength();
+      std::cout << "play path: " << t << "/" << T << std::endl;
+      if(t>=T){
+        //state("draw_play_path").deactivate();
+        SendPauseIdle();
+      }
+      t+=tstep;
+      SendRefresh();
+    }
+    return true;
+  }
+
+  return res;
 }
 
 void PlannerBackend::RenderWorld(){
@@ -84,6 +114,17 @@ void PlannerBackend::RenderWorld(){
       GLDraw::drawBoundingBox(Vector3(min(0),min(1),min(2)), Vector3(max(0),max(1),max(2)));
       glEnable(GL_LIGHTING);
       glDisable(GL_BLEND); 
+    }
+    static PathPiecewiseLinearEuclidean *path;
+    if(state("draw_play_path")){
+      if(t<=0){
+        path = planner->GetPath();
+      }
+      Config q = path->Eval(t);
+      uint ridx = planner->GetInput().robot_idx;
+      Robot* robot = world->robots[ridx];
+      std::cout << "Robot" << robot->name << ":" << q << std::endl;
+      GLDraw::drawRobotAtConfig(robot, q, grey);
     }
   }
 
@@ -155,23 +196,6 @@ void PlannerBackend::RenderScreen(){
   if(planners.size()>0){
     planners.at(active_planner)->DrawGLScreen(line_x_pos, line_y_offset);
   }
-
-  //if(plannerOutput.size()>0){
-  //  std::vector<int> bn = plannerOutput.at(0).cmplx.betti_numbers;
-  //  if(bn.size()>2){
-  //    line = "Betti      ";
-  //    line+=(" b0: ["+std::to_string(bn[0])+"]");
-  //    line+=(" b1: ["+std::to_string(bn[1])+"]");
-  //    line+=(" b2: ["+std::to_string(bn[2])+"]");
-  //    DrawText(line_x_pos, line_y_offset, line);
-  //    line_y_offset += line_y_offset_stepsize;
-  //  }
-  //}
-
-
-}
-bool PlannerBackend::OnIdle(){
-  return BaseT::OnIdle();
 }
 
 GLUIPlannerGUI::GLUIPlannerGUI(GenericBackendBase* _backend,RobotWorld* _world):

@@ -12,6 +12,9 @@ class PlannerBackend : public ForceFieldBackend
     uint active_planner;
     std::vector<MotionPlanner*> planners;
 
+    //play/replay/stop
+    double t;
+
   public:
 
     PlannerBackend(RobotWorld *world);

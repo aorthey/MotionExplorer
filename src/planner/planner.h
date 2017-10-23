@@ -2,6 +2,7 @@
 
 #include "planner/planner_input.h"
 #include "elements/hierarchy.h"
+#include "elements/path_pwl_euclid.h"
 #include "gui/gui_state.h"
 #include "gui/ViewHierarchy.h"
 
@@ -20,6 +21,8 @@ class MotionPlanner{
     explicit MotionPlanner(RobotWorld *world_, PlannerInput& input_);
 
     const PlannerInput& GetInput();
+
+    PathPiecewiseLinearEuclidean* GetPath();
 
     //folder-like operations on hierarchical path space
     virtual void Expand();
@@ -57,6 +60,9 @@ class MotionPlanner{
     RobotWorld *world;
     PlannerInput input;
     ViewHierarchy viewHierarchy;
+
+    PathPiecewiseLinearEuclidean *pwl;
+    double length;
 
 };
 

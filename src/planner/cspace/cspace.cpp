@@ -1104,7 +1104,6 @@ Config GeometricCSpaceOMPLPointConstraintSO3::OMPLStateToConfig(const ob::State 
 ob::ScopedState<> GeometricCSpaceOMPLPointConstraintSO3::ConfigToOMPLState(const Config &q){
   ob::ScopedState<> qompl(space);
   ob::SO3StateSpace::StateType *qomplSO3 = qompl->as<ob::SO3StateSpace::StateType>();
-
   OMPLSO3StateSpaceFromEulerXYZ(q(3),q(4),q(5),qomplSO3);
 
   return qompl;

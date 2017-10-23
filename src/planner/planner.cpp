@@ -17,6 +17,7 @@ using namespace GLDraw;
 MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   world(world_), input(input_)
 {
+  pwl = NULL;
   active = true;
   current_level = 0;
   current_level_node = 0;
@@ -416,6 +417,13 @@ void MotionPlanner::DrawGLScreen(double x_, double y_){
   }
 }
 
+PathPiecewiseLinearEuclidean* MotionPlanner::GetPath(){
+  if(!active) return NULL;
+  Pcurrent = hierarchy->GetNodeContent(current_path);
+  std::vector<Config> path = Pcurrent->GetShortestPath();
+  pwl = PathPiecewiseLinearEuclidean::from_keyframes(path);
+  return pwl;
+}
 void MotionPlanner::DrawGL(GUIState& state){
   if(!active) return;
 
@@ -426,7 +434,6 @@ void MotionPlanner::DrawGL(GUIState& state){
   //std::cout << *P << std::endl;
   Pcurrent = hierarchy->GetNodeContent(current_path);
   Pcurrent = new PathSpaceDecoratorHighlighter(Pcurrent);
-  Pcurrent = new PathSpaceDecoratorPathPlayer(Pcurrent);
   Pcurrent->DrawGL(state);
 
   for(uint k = 0; k < N; k++){
@@ -440,5 +447,4 @@ void MotionPlanner::DrawGL(GUIState& state){
   }
 
 }
-
 

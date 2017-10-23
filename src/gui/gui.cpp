@@ -97,15 +97,7 @@ void ForceFieldBackend::Start()
   wrenchfield.init(Nlinks);
 
   sim.odesim.SetGravity(Vector3(0,0,0));
-
   show_frames_per_second = true;
-
-  //_appearanceStack.clear();
-  //_appearanceStack.resize(Nlinks);
-  //for(size_t i=0;i<Nlinks;i++) {
-  //  GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
-  //  _appearanceStack[i]=a;
-  //}
 }
 
 //############################################################################

@@ -187,7 +187,17 @@ std::vector<PathSpace*> PathSpaceLinearHierarchy::Decompose(){
         for(uint j = 0; j < 6; j++){
           qedge_start(j) = edge_shortest_path.back()(j);
         }
-        edge_path.insert(edge_path.end(), edge_shortest_path.begin(),edge_shortest_path.end());
+        for(uint j = 6; j < level1->q_init.size(); j++){
+          qedge_start(j) = level1->q_init(j);
+        }
+        for(uint j = 0; j < edge_shortest_path.size(); j++){
+          Config q = level1->q_init;
+          for(uint m = 0; m < 6; m++){
+            q(m) = edge_shortest_path.at(j)(m);
+          }
+          edge_path.push_back(q);
+          //edge_path.insert(edge_path.end(), edge_shortest_path.begin(),edge_shortest_path.end());
+        }
       }else{
         //identify infeasible edges.
         std::cout << "Infeasible Edge" << std::endl;

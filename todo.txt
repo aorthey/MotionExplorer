@@ -304,21 +304,18 @@ primitives -> maybe we can remove the checker from klampt?)
  [x] visualize swath volume of onetopic covering
  [x] visualize roadmap plus edges by visualizing it as a dense swath volume
  [x] remove serialized tree once and for all
- [ ] orientation wrong.
- [ ] split fibrebundles up into checker and integrator. put them into subfolders. 
+ [x] split fibrebundles up into checker and integrator. put them into subfolders. 
  [ ] new ViewTree to visualize a pathspace exploration
  [ ] multiple restarts of RRT produce same results. reseed!
  [ ] visualize a onetopic cover by a bunch of threads ?
  [ ] visualize a onetopic cover by all onetopically equivalent shortest paths
- [ ] visualize necessary and sufficient vertices.
+ [x] visualize necessary and sufficient vertices.
 
 [ ] computing onetopic cover including roadmap is too slow. How could we speed
 it up? Could we already include it in the sampling process?
 [ ] make benchmark for november 10th containing at least 5 algorithms and 5
 environments. Rigid bodies are OK for now.
 [ ] write dae->tri converter
-
-[ ] make an abstract roadmap, containing plannerdataptr and lemon interface.
-This roadmap always holds the shortest path, and we can delete edges/vertices.
-[ ] roadmap does not return shortest path
-[ ] replay motion, not only swept volume
+[ ] simplify final path and interpolate
+[ ] replay motion, not only swept volume (OnIdle)
+[ ] save motion
