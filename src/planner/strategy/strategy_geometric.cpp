@@ -1,6 +1,7 @@
 #include "planner/strategy/strategy_input.h"
 #include "planner/strategy/strategy_output.h"
 #include "planner/strategy/strategy_geometric.h"
+#include "planner/strategy/ompl/ompl_necessary.h"
 
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/PathGeometric.h>
@@ -87,6 +88,7 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   else if(algorithm=="ompl:spars") ompl_planner = std::make_shared<og::SPARS>(si);
   else if(algorithm=="ompl:spars2") ompl_planner = std::make_shared<og::SPARStwo>(si);
 
+  else if(algorithm=="ompl:necessary") ompl_planner = std::make_shared<ompl::NecessaryRRT>(si);
   else if(algorithm=="ompl:stride") ompl_planner = std::make_shared<og::STRIDE>(si);
   else if(algorithm=="ompl:sst") ompl_planner = std::make_shared<og::SST>(si);
   else if(algorithm=="ompl:pdst") ompl_planner = std::make_shared<og::PDST>(si);

@@ -12,10 +12,10 @@
    <robot name="sphere_inner" file="/home/aorthey/git/orthoklampt/data/Lshape/DoubleLshape_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
    <robot name="sphere_outer" file="/home/aorthey/git/orthoklampt/data/Lshape/DoubleLshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-   <!--
   <rigidObject name="doublelshape.tri" file="/home/aorthey/git/orthoklampt/data/terrains/DoubleLshape.tri" translation="0 0 0">
      <display color="0.8 0.8 0.8 0.5" texture="checker" texture_projection="z"/> 
   </rigidObject>
+   <!--
   -->
 
   <plannerinput>
@@ -23,8 +23,8 @@
     <!-- general settings for all algorithms (fixed) -->
     <qinit config="9  3 0 0 -2.0 0.6 0.3 0 0 0"/>
     <qgoal config="9  -3 -1 0.45 -0.8 -0.6 0 0 0 0"/>
-    <se3min config="6  -4 -4 -1 -3.141593 -1.57 -3.141593"/>
-    <se3max config="6  4 4 1 3.141593 1.57 3.141593"/>
+    <se3min config="6  -4 -3 -2 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  4 3 2 3.141593 1.57 3.141593"/>
     <robot>0</robot>
     <freeFloating>1</freeFloating>
 
@@ -33,6 +33,7 @@
     <epsilongoalregion>0.01</epsilongoalregion>
     <maxplanningtime>0.05</maxplanningtime>
 
+    <algorithm name="ompl:necessary"/>
     <algorithm name="hierarchical:linear:ompl:prmstar">
       <maxplanningtime>0.1</maxplanningtime>
       <hierarchy>

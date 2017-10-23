@@ -116,6 +116,7 @@ display tree/start/goal/swept volumes, do planning
 
 -- wrench fields
 
+ [ ] read Randomized path planning on vector fields
  [x] create arbitrary force fields in ODE simulator
  [x] create force field visualization and visualize its effect on each link
  [x] add arrows to visualize flow of power
@@ -317,5 +318,13 @@ it up? Could we already include it in the sampling process?
 environments. Rigid bodies are OK for now.
 [ ] write dae->tri converter
 [ ] simplify final path and interpolate
-[ ] replay motion, not only swept volume (OnIdle)
+[x] replay motion, not only swept volume (OnIdle)
 [ ] save motion
+[ ] outsource all those individual cspaces
+
+
+si->getValidityChecker()
+cast to my own -> get sufficient vs necessary
+
+
+

@@ -155,6 +155,7 @@ std::vector<PathSpace*> PathSpaceLinearHierarchy::Decompose(){
 
       input_level1.name_algorithm = "ompl:rrt";
       input_level1.cspace = cspace;
+      input_level1.max_planning_time = 0.05;
 
       StrategyGeometric strategy;
       StrategyOutput output_level1(cspace);
@@ -174,7 +175,6 @@ std::vector<PathSpace*> PathSpaceLinearHierarchy::Decompose(){
         std::cout << input_level1.q_goal << std::endl;
         exit(0);
       }
-
 
       //############################################################/
       ///DESIGN GOAL REGION WHICH HAS ONLY N-1 DIMENSIONS
@@ -219,14 +219,6 @@ std::vector<PathSpace*> PathSpaceLinearHierarchy::Decompose(){
       done=true;
     }
   }
-
-  //  //(2) verify shortest path by checking that it is feasible. 
-  //  PathSpaceInput *level1 = input->GetNextLayer();
-
-  //  //(3a) if feasible, return path, interpolate along sufficient edges
-  //  //(3b) if not feasible, remove the infeasible vertex/edge and repeat
-
-  //}
 
   //###########################################################################
   //for each necessary vertex, create a new underlying cspace and create a

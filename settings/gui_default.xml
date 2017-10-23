@@ -69,7 +69,7 @@
     <name>draw_roadmap</name>
     <descr>Draw Roadmap Planner </descr>
     <key>0</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_roadmap_necessary</name>

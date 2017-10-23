@@ -996,7 +996,6 @@ ob::ScopedState<> GeometricCSpaceOMPLPathConstraintRollInvariance::ConfigToOMPLS
   return qompl;
 }
 //#############################################################################
-//#############################################################################
 GeometricCSpaceOMPLPathConstraintSO3::GeometricCSpaceOMPLPathConstraintSO3(Robot *robot_, CSpace *space_, std::vector<Config> path_):
   GeometricCSpaceOMPL(robot_, space_)
 {
@@ -1007,7 +1006,7 @@ GeometricCSpaceOMPLPathConstraintSO3::GeometricCSpaceOMPLPathConstraintSO3(Robot
 void GeometricCSpaceOMPLPathConstraintSO3::initSpace()
 {
   //###########################################################################
-  //   R^1 times S times S
+  // @brief $R^1 \times SO(3)$
   //###########################################################################
   std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: [0,1] x SO(3)" << std::endl;
 

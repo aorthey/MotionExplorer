@@ -120,6 +120,8 @@ void PlannerBackend::RenderWorld(){
       if(t<=0){
         path = planner->GetPath();
       }
+    }
+    if(t>0){
       Config q = path->Eval(t);
       uint ridx = planner->GetInput().robot_idx;
       Robot* robot = world->robots[ridx];
