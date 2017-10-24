@@ -43,6 +43,8 @@ std::vector<PathSpace*> PathSpaceOMPL::Decompose(){
     decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
     decomposedspace.at(0)->SetRoadmap( *output.GetRoadmapPtr() );
   }
+  delete cspace;
+  delete kcspace;
   return decomposedspace;
 
 }
