@@ -1,18 +1,25 @@
 #include <ompl/base/Planner.h>
+#include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/util/RandomNumbers.h>
 #include <ompl/tools/config/SelfConfig.h>
 
+namespace ob = ompl::base;
+namespace og = ompl::geometric;
+
 namespace ompl
 {
-  class NecessaryRRT : public base::Planner
+  namespace geometric
   {
-  public:
-    NecessaryRRT(const base::SpaceInformationPtr &si);
-    virtual ~NecessaryRRT(void);
-    virtual base::PlannerStatus solve(const base::PlannerTerminationCondition &ptc);
-    virtual void clear(void);
-    virtual void setup(void);
-    virtual void getPlannerData(base::PlannerData &data) const;
-  };
+    class NecessaryRRT : public RRT
+    {
+    public:
+      NecessaryRRT(const base::SpaceInformationPtr &si, const base::SpaceInformationPtr &si2);
+      ~NecessaryRRT(void);
+      base::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
+      void clear(void) override;
+      void setup(void) override;
+      void getPlannerData(base::PlannerData &data) const override;
+    };
+  }
 }
 

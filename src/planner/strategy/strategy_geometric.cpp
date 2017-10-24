@@ -67,7 +67,6 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   //###########################################################################
   // choose planner
   //###########################################################################
-
   ob::PlannerPtr ompl_planner;
 
   if(algorithm=="ompl:rrt") ompl_planner = std::make_shared<og::RRT>(si);
@@ -88,7 +87,6 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   else if(algorithm=="ompl:spars") ompl_planner = std::make_shared<og::SPARS>(si);
   else if(algorithm=="ompl:spars2") ompl_planner = std::make_shared<og::SPARStwo>(si);
 
-  else if(algorithm=="ompl:necessary") ompl_planner = std::make_shared<ompl::NecessaryRRT>(si);
   else if(algorithm=="ompl:stride") ompl_planner = std::make_shared<og::STRIDE>(si);
   else if(algorithm=="ompl:sst") ompl_planner = std::make_shared<og::SST>(si);
   else if(algorithm=="ompl:pdst") ompl_planner = std::make_shared<og::PDST>(si);
@@ -101,6 +99,9 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   else if(algorithm=="ompl:psbl") ompl_planner = std::make_shared<og::pSBL>(si);
   else if(algorithm=="ompl:fmt") ompl_planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") ompl_planner = std::make_shared<og::BFMT>(si);
+
+  else if(algorithm=="ompl:necessary") ompl_planner = std::make_shared<og::NecessaryRRT>(si, std::make_shared<ob::SpaceInformation>(input.cspace_level1->SpacePtr()));
+
   else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);

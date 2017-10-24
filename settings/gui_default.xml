@@ -87,13 +87,13 @@
     <name>draw_roadmap_vertices</name>
     <descr>Draw Roadmap Vertices</descr>
     <key>1</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_roadmap_edges</name>
     <descr>Draw Roadmap Edges</descr>
     <key>2</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_play_path</name>

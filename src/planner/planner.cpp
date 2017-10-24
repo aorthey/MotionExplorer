@@ -4,15 +4,17 @@
 
 #include "pathspace/pathspace_atomic.h"
 #include "pathspace/pathspace_ompl.h"
+#include "pathspace/pathspace_ompl_twolevel.h"
 #include "pathspace/pathspace_onetopic_cover.h"
 #include "pathspace/pathspace_linear_hierarchy.h"
 #include "pathspace/decorator.h"
 #include "pathspace/decorator_sweptvolume_path.h"
 #include "pathspace/decorator_path_player.h"
 #include "pathspace/decorator_highlighter.h"
-#include <KrisLibrary/utils/stringutils.h>
+#include "util.h"
 
 using namespace GLDraw;
+using namespace util;
 
 MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   world(world_), input(input_)
@@ -32,9 +34,9 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   std::string algorithm = input.name_algorithm;
   hierarchy = new Hierarchy<PathSpace*>();
 
-  if(StartsWith(algorithm.c_str(),"hierarchical")) {
+  if(StartsWith(algorithm,"hierarchical")) {
     CreateSinglePathHierarchy();
-  }else if(StartsWith(algorithm.c_str(),"ompl")) {
+  }else if(StartsWith(algorithm,"ompl")) {
     CreateShallowHierarchy();
   }else{
     std::cout << std::string(80, '-') << std::endl;
@@ -149,18 +151,29 @@ void MotionPlanner::CreateSinglePathHierarchy(){
 
   //execute different flavors of hierarchical algorithms
   std::string linear = "linear";
+  std::string twolevel = "twolevel";
   std::string ompl = "ompl";
-  if(StartsWith(subalgorithm.c_str(),ompl.c_str())) {
+  if(StartsWith(subalgorithm,ompl)) {
     hierarchy->AddRootNode( new PathSpaceOnetopicCover(world, psinput_level0) );
     std::vector<Config> path;
     path.push_back(psinput_level0->q_init);
     path.push_back(psinput_level0->q_goal);
     hierarchy->GetRootNodeContent()->SetShortestPath( path );
-  }else if(StartsWith(subalgorithm.c_str(),linear.c_str())) {
+  }else if(StartsWith(subalgorithm,linear)) {
     //Zhang_2009 style + shortest path iteration
-    std::string subsubalgorithm = subalgorithm.substr(linear.size()+1,subalgorithm.size()-(linear.size()+1));
+    std::string subsubalgorithm = RemoveStringBeginning(subalgorithm, linear);
     psinput_level0->name_algorithm = subsubalgorithm;
     hierarchy->AddRootNode( new PathSpaceLinearHierarchy(world, psinput_level0) );
+    std::vector<Config> path;
+    path.push_back(psinput_level0->q_init);
+    path.push_back(psinput_level0->q_goal);
+    hierarchy->GetRootNodeContent()->SetShortestPath( path );
+  }else if(StartsWith(subalgorithm,twolevel)) {
+    std::string subsubalgorithm = RemoveStringBeginning(subalgorithm, twolevel);
+    std::cout << psinput_level0->name_algorithm << std::endl;
+    std::cout << subsubalgorithm << std::endl;
+    psinput_level0->name_algorithm = subsubalgorithm;
+    hierarchy->AddRootNode( new PathSpaceOMPLTwoLevel(world, psinput_level0) );
     std::vector<Config> path;
     path.push_back(psinput_level0->q_init);
     path.push_back(psinput_level0->q_goal);
@@ -339,6 +352,7 @@ void MotionPlanner::Collapse(){
       current_level_node = 0;
     }
   }
+  PathSpace* P = hierarchy->GetNodeContent(current_path);
   UpdateHierarchy();
 }
 

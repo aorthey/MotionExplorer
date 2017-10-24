@@ -16,6 +16,7 @@ struct StrategyInput{
   double max_planning_time;
   double epsilon_goalregion;
   CSpaceOMPL *cspace;
+  CSpaceOMPL *cspace_level1;
 
   virtual ob::GoalPtr GetGoalPtr(ob::SpaceInformationPtr si) const;
 

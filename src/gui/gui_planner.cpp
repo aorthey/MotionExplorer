@@ -58,8 +58,11 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="draw_play_path"){
     state("draw_play_path").toggle();
     simulate = 0;
-    if(state("draw_play_path")) SendPauseIdle(0);
-    else SendPauseIdle();
+    if(state("draw_play_path")){
+      SendPauseIdle(0);
+    }else{
+      SendPauseIdle();
+    }
   }else return BaseT::OnCommand(cmd,args);
 
   SendRefresh();
@@ -78,13 +81,15 @@ bool PlannerBackend::OnIdle(){
     if(path){
       double tstep = 0.01;
       double T = path->GetLength();
-      std::cout << "play path: " << t << "/" << T << std::endl;
+      //std::cout << "play path: " << t << "/" << T << std::endl;
       if(t>=T){
         //state("draw_play_path").deactivate();
+        t=0;
         SendPauseIdle();
+      }else{
+        t+=tstep;
+        SendRefresh();
       }
-      t+=tstep;
-      SendRefresh();
     }
     return true;
   }
@@ -125,7 +130,7 @@ void PlannerBackend::RenderWorld(){
       Config q = path->Eval(t);
       uint ridx = planner->GetInput().robot_idx;
       Robot* robot = world->robots[ridx];
-      std::cout << "Robot" << robot->name << ":" << q << std::endl;
+      //std::cout << "Robot" << robot->name << ":" << q << std::endl;
       GLDraw::drawRobotAtConfig(robot, q, grey);
     }
   }
