@@ -322,9 +322,17 @@ environments. Rigid bodies are OK for now.
 [ ] save motion
 [ ] outsource all those individual cspaces
 
-
 si->getValidityChecker()
 cast to my own -> get sufficient vs necessary
 
+[ ] create two new classes PathSpaceOMPLSE2, Pathspaceomplse2TwoLevel,
+PathSpaceOMPLSE2OneLevel, which either call an ompl strategy, or call the
+necessary two level strategy. Each class visualizes the roadmap as a tree on 3d,
+which is overlayed onto the environment. We ignore the fact that each slice
+should be loop back onto itself for now. Use those classes to visualize and
+adapt the twolevel algorithm
+
+[ ] create 2d environment for planar lshape in blender with narrow passage (and
+possible misleading initial path)
 
 
