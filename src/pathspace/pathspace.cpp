@@ -12,6 +12,7 @@ PathSpace::PathSpace(RobotWorld *world_, PathSpaceInput* input_):
   world(world_), input(input_)
 {
   sv = NULL;
+  roadmap = NULL;
   if(!input){
     std::cout << "Input does not exists" << std::endl;
     exit(0);
@@ -37,7 +38,7 @@ std::vector<std::pair<Config,Config>> PathSpace::GetEdges(){
 std::vector<std::vector<Config>> PathSpace::GetPaths(){
   return paths;
 }
-Roadmap PathSpace::GetRoadmap(){
+RoadmapPtr PathSpace::GetRoadmap(){
   return roadmap;
 }
 
@@ -53,7 +54,7 @@ void PathSpace::SetVertices(const std::vector<Config>& vertices_){
 void PathSpace::SetPaths(const std::vector<std::vector<Config>>& paths_){
   paths = paths_;
 }
-void PathSpace::SetRoadmap(const Roadmap& roadmap_){
+void PathSpace::SetRoadmap(const RoadmapPtr roadmap_){
   roadmap = roadmap_;
 }
 

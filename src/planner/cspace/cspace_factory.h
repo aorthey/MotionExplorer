@@ -1,5 +1,6 @@
 #pragma once
 #include "planner/cspace/cspace.h"
+#include "planner/cspace/cspace_geometric_se2.h"
 #include "planner/cspace/cspace_input.h"
 #include "planner/cspace/cspace_decorator.h"
 
@@ -48,6 +49,14 @@ class CSpaceFactory{
     }
     virtual GeometricCSpaceOMPL* MakeGeometricCSpacePathConstraintSO3( Robot *robot, CSpace *inner, const std::vector<Config>& path){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLPathConstraintSO3(robot, inner, path);
+      cspace->SetCSpaceInput(input);
+      cspace->initSpace();
+      cspace->initControlSpace();
+      return cspace;
+    }
+    // CSpace  SE(2)
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE2( Robot *robot, CSpace *kspace){
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLSE2(robot, kspace);
       cspace->SetCSpaceInput(input);
       cspace->initSpace();
       cspace->initControlSpace();

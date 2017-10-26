@@ -85,7 +85,7 @@ std::vector<PathSpace*> PathSpaceOnetopicCover::Decompose(){
   //p0->SetVertices(all_vertices);
   //p0->SetEdges(all_edges);
   //p0->SetPaths(all_paths);
-  p0->SetRoadmap(*output.GetRoadmapPtr());
+  p0->SetRoadmap(output.GetRoadmapPtr());
 
   decomposedspace.push_back(p0);
 

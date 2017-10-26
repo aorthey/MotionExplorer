@@ -26,6 +26,8 @@ class Roadmap{
     std::vector<Config> GetVertices();
     std::vector<std::pair<Config,Config>> GetEdges();
     std::vector<Config> GetShortestPath();
+    ob::PlannerDataPtr GetPlannerDataPtr();
+    CSpaceOMPL* GetCSpacePtr();
 
     GLDraw::GLColor cVertex, cEdge, cEdgeRemoved;
 

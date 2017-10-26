@@ -112,7 +112,7 @@ std::vector<PathSpace*> PathSpaceLinearHierarchy::Decompose(){
     if(shortest_path.empty()){
       std::cout << "no more shortest paths found" << std::endl;
       decomposedspace.push_back( new PathSpaceAtomic(world, level1) );
-      decomposedspace.back()->SetRoadmap( *roadmap );
+      decomposedspace.back()->SetRoadmap( roadmap );
       break;
     }
 
@@ -214,7 +214,7 @@ std::vector<PathSpace*> PathSpaceLinearHierarchy::Decompose(){
     }else{
       std::cout << "path is success" << std::endl;
       decomposedspace.push_back( new PathSpaceAtomic(world, level1) );
-      decomposedspace.back()->SetRoadmap( *roadmap );
+      decomposedspace.back()->SetRoadmap( roadmap );
       decomposedspace.back()->SetShortestPath( edge_path );
       done=true;
     }
@@ -228,8 +228,8 @@ std::vector<PathSpace*> PathSpaceLinearHierarchy::Decompose(){
   //disconnected components for each vertex
   //###########################################################################
 
-  decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-  decomposedspace.back()->SetRoadmap( necessary_roadmap );
+  //decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
+  //decomposedspace.back()->SetRoadmap( &necessary_roadmap );
   //decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
   //decomposedspace.back()->SetRoadmap( sufficient_roadmap );
   return decomposedspace;

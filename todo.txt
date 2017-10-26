@@ -331,8 +331,19 @@ necessary two level strategy. Each class visualizes the roadmap as a tree on 3d,
 which is overlayed onto the environment. We ignore the fact that each slice
 should be loop back onto itself for now. Use those classes to visualize and
 adapt the twolevel algorithm
+[ ] move CSPaceOMPL to OMPLSpace and CSpace to KlamptSpace, gets confusing
+otherwise
 
-[ ] create 2d environment for planar lshape in blender with narrow passage (and
+[x] create 2d environment for planar lshape in blender with narrow passage (and
 possible misleading initial path)
 
+[x] visualize rrt on SE(2) on planar Lshape environment
+[ ] visualize N-rrt on SE(2) on planar Lshape environment
+[ ] visualize SN-rrt on SE(2) on planar Lshape environment
+[ ] benchmark SN-rrt and rrt n SE(3)
 
+Minor Things
+[ ] refactor cspace into separate classes
+[ ] include kcspace into cspace factor, and add string type to specify cspace type from the outside
+[ ] refactor factory into one function, should encapsulate everything, no
+kcspace/cspaceompl stuff outside

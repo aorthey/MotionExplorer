@@ -25,24 +25,29 @@ void PlannerBackend::Start(){
 bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
   if(planners.empty()) return BaseT::OnCommand(cmd, args);
+  bool hierarchy_change = false;
   if(cmd=="hierarchy_next"){
     planners.at(active_planner)->Next();
+    hierarchy_change = true;
   }else if(cmd=="hierarchy_previous"){
     planners.at(active_planner)->Previous();
+    hierarchy_change = true;
   }else if(cmd=="hierarchy_down"){
     planners.at(active_planner)->Expand();
+    hierarchy_change = true;
   }else if(cmd=="hierarchy_up"){
     planners.at(active_planner)->Collapse();
+    hierarchy_change = true;
   }else if(cmd=="draw_planner_bounding_box"){
     state("draw_planner_bounding_box").toggle();
   }else if(cmd=="next_planner"){
     if(active_planner<planners.size()-1) active_planner++;
     else active_planner = 0;
-    //std::cout << planners.at(active_planner)->GetInput() << std::endl;
+    hierarchy_change = true;
   }else if(cmd=="previous_planner"){
     if(active_planner>0) active_planner--;
     else active_planner = planners.size()-1;
-    //std::cout << planners.at(active_planner)->GetInput() << std::endl;
+    hierarchy_change = true;
   }else if(cmd=="draw_sweptvolume"){
     state("draw_sweptvolume").toggle();
   }else if(cmd=="draw_roadmap"){
@@ -65,6 +70,14 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     }
   }else return BaseT::OnCommand(cmd,args);
 
+  if(hierarchy_change){
+    if(state("draw_play_path")){
+      t=0;
+      SendPauseIdle();
+      state("draw_play_path").deactivate();
+    }
+  }
+
   SendRefresh();
   return true;
 }
@@ -79,8 +92,8 @@ bool PlannerBackend::OnIdle(){
       path = planner->GetPath();
     }
     if(path){
-      double tstep = 0.01;
       double T = path->GetLength();
+      double tstep = T/1000;
       //std::cout << "play path: " << t << "/" << T << std::endl;
       if(t>=T){
         //state("draw_play_path").deactivate();

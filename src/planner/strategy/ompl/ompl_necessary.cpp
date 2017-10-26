@@ -2,7 +2,7 @@
 #include <ompl/base/goals/GoalSampleableRegion.h>
 
 using namespace ompl::geometric;
-NecessaryRRT::NecessaryRRT(const base::SpaceInformationPtr &si, const base::SpaceInformationPtr &si2): RRT(si)
+NecessaryRRT::NecessaryRRT(const base::SpaceInformationPtr &si, const base::SpaceInformationPtr &si2): RRT(si), si_level2(si2)
 {
   setName("NecessaryRRT");
 }

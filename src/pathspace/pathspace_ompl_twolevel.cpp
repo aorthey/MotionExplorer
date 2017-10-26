@@ -1,5 +1,6 @@
 #include "pathspace_ompl_twolevel.h"
 #include "pathspace_atomic.h"
+#include "elements/roadmap_decorator.h"
 
 #include "planner/cspace/cspace_factory.h"
 #include "planner/strategy/strategy_geometric.h"
@@ -19,36 +20,33 @@ std::vector<PathSpace*> PathSpaceOMPLTwoLevel::Decompose(){
   SingleRobotCSpace *kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
 
   PathSpaceInput* next = input->GetNextLayer()->GetNextLayer();
-
-  CSpaceOMPL *cspace = factory.MakeGeometricCSpace(robot, kcspace);
-  cspace->print();
+  CSpaceOMPL *cspace = factory.MakeGeometricCSpaceRotationalInvariance(robot, kcspace);
 
   StrategyGeometric strategy;
   StrategyOutput output(cspace);
 
-  StrategyInput strategy_input = input->GetStrategyInput();
-  strategy_input.cspace = cspace;
-
   robot_idx = next->robot_idx;
   robot = world->robots[robot_idx];
   SingleRobotCSpace *kcspace1 = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
-  CSpaceOMPL* cspace_level1 = factory.MakeGeometricCSpace(robot, kcspace1);
+  CSpaceOMPL* cspace_level1 = factory.MakeGeometricCSpaceSE2(robot, kcspace1);
   cspace_level1->print();
 
+  StrategyInput strategy_input = input->GetStrategyInput();
+  strategy_input.cspace = cspace;
   strategy_input.cspace_level1 = cspace_level1;
 
   strategy.plan(strategy_input, output);
 
   std::vector<PathSpace*> decomposedspace;
 
+  decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
+
+  RoadmapPtr roadmap1 = output.GetRoadmapPtr();
+  RoadmapDecoratorSE2Ptr roadmap( new RoadmapDecoratorSE2(roadmap1) );
+  decomposedspace.back()->SetRoadmap( roadmap );
+
   if(output.hasExactSolution()){
-    decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    decomposedspace.at(0)->SetShortestPath( output.GetShortestPath() );
-    decomposedspace.at(0)->SetRoadmap( *output.GetRoadmapPtr() );
-  }else{
-    std::cout << "Error: Path could not be expanded" << std::endl;
-    decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    decomposedspace.at(0)->SetRoadmap( *output.GetRoadmapPtr() );
+    decomposedspace.back()->SetShortestPath( output.GetShortestPath() );
   }
   return decomposedspace;
 

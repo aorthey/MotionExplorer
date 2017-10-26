@@ -64,6 +64,11 @@ void OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSp
 CSpaceOMPL::CSpaceOMPL(Robot *robot_, CSpace *kspace_):
   robot(robot_), kspace(kspace_)
 {
+  if(!(robot->joints[0].type==RobotJoint::Floating))
+  {
+    std::cout << "[MotionPlanner] only supports robots with a configuration space equal to SE(3) x R^n" << std::endl;
+    exit(0);
+  }
 }
 
 GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
@@ -87,13 +92,6 @@ GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
     maximum = robot->qMax;
     assert(minimum.size() == 6+Nklampt);
     assert(maximum.size() == 6+Nklampt);
-
-    //vector<double> lowRn, highRn;
-    ////for(uint i = 0; i < Nklampt; i++){
-    //  lowRn.push_back(minimum.at(i+6));
-    //  highRn.push_back(maximum.at(i+6));
-    //}
-    //ob::RealVectorBounds boundsRn(Nklampt);
 
     //ompl does only accept dimensions with strictly positive measure, adding some epsilon space
     double epsilonSpacing=1e-10;
@@ -1074,7 +1072,6 @@ void GeometricCSpaceOMPLPointConstraintSO3::initSpace()
   //   {q} times SO(3)
   //###########################################################################
   std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: {q} x SO(3)" << std::endl;
-
   ob::StateSpacePtr SO3 = (std::make_shared<ob::SO3StateSpace>());
   this->space = SO3;
 }
@@ -1104,6 +1101,5 @@ ob::ScopedState<> GeometricCSpaceOMPLPointConstraintSO3::ConfigToOMPLState(const
   ob::ScopedState<> qompl(space);
   ob::SO3StateSpace::StateType *qomplSO3 = qompl->as<ob::SO3StateSpace::StateType>();
   OMPLSO3StateSpaceFromEulerXYZ(q(3),q(4),q(5),qomplSO3);
-
   return qompl;
 }

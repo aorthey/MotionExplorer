@@ -13,12 +13,14 @@ namespace ompl
     class NecessaryRRT : public RRT
     {
     public:
-      NecessaryRRT(const base::SpaceInformationPtr &si, const base::SpaceInformationPtr &si2);
+      NecessaryRRT(const ob::SpaceInformationPtr &si, const ob::SpaceInformationPtr &si2);
       ~NecessaryRRT(void);
-      base::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
+      base::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override;
       void clear(void) override;
       void setup(void) override;
-      void getPlannerData(base::PlannerData &data) const override;
+      void getPlannerData(ob::PlannerData &data) const override;
+    private:
+      ob::SpaceInformationPtr si_level2;
     };
   }
 }

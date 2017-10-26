@@ -20,6 +20,12 @@ std::vector<Config> Roadmap::GetVertices(){
 std::vector<std::pair<Config,Config>> Roadmap::GetEdges(){
   return E;
 }
+ob::PlannerDataPtr Roadmap::GetPlannerDataPtr(){
+  return pds;
+}
+CSpaceOMPL* Roadmap::GetCSpacePtr(){
+  return cspace;
+}
 void Roadmap::SetVertices(const std::vector<Config> &V_){
   V = V_;
 }
@@ -290,15 +296,9 @@ void Roadmap::DrawGL(GUIState& state)
   glEnable(GL_BLEND); 
 
   glPointSize(10);
-  //move along PD and visualize
 
   if(state("draw_roadmap_vertices")){
     setColor(cVertex);
-    //for(uint k = 0; k < V.size(); k++){
-    //  Config q = V.at(k);
-    //  Vector3 v(q(0),q(1),q(2));
-    //  drawPoint(v);
-    //}
     for(uint vidx = 0; vidx < Nvertices; vidx++){
       ob::PlannerDataVertex v = pds->getVertex(vidx);
       if(v!=ob::PlannerData::NO_VERTEX){
