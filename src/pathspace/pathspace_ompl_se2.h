@@ -9,7 +9,7 @@
 
 class PathSpaceOMPLSE2: public PathSpaceOMPL{
   public:
-    PathSpaceOMPL(RobotWorld *world_, PathSpaceInput* input_);
+    PathSpaceOMPLSE2(RobotWorld *world_, PathSpaceInput* input_);
     virtual std::vector<PathSpace*> Decompose() override;
     virtual void DrawGL(GUIState&) override;
 };
