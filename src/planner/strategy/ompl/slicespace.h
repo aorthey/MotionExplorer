@@ -83,7 +83,8 @@ namespace ompl
         typedef std::function<bool(const Vertex &, const Vertex &)> ConnectionFilter;
 
       public:
-        SliceSpace(ob::SpaceInformationPtr si_);
+        SliceSpace(const ob::SpaceInformationPtr &si);
+
         ~SliceSpace() override{
           si->freeStates(xstates);
         }

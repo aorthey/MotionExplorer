@@ -59,11 +59,11 @@ void RoadmapDecoratorSE2::DrawGL(GUIState& state){
             Vector3 w2(q2(0),q2(1),0);
             drawLineSegment(w1,w2);
           }else{
-            Vector3 v1(q1(0),q1(1),q2(3));
-            Vector3 v2(q2(0),q2(1),2*M_PI);
+            Vector3 v1(q2(0),q2(1),q2(3));
+            Vector3 v2(q1(0),q1(1),2*M_PI);
             drawLineSegment(v1,v2);
-            Vector3 w1(q1(0),q1(1),q1(3));
-            Vector3 w2(q2(0),q2(1),0);
+            Vector3 w1(q2(0),q2(1),q2(3));
+            Vector3 w2(q1(0),q1(1),0);
             drawLineSegment(w1,w2);
           }
         }else{

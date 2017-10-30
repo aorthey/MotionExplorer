@@ -15,8 +15,8 @@
 #define foreach BOOST_FOREACH
 using namespace og;
 
-SliceSpace::SliceSpace(ob::SpaceInformationPtr si_)
-  : base::Planner(si_, "SliceSpace")
+SliceSpace::SliceSpace(const ob::SpaceInformationPtr &si)
+  : base::Planner(si, "SliceSpace")
   , stateProperty_(boost::get(vertex_state_t(), graph))
   , totalConnectionAttemptsProperty_(boost::get(vertex_total_connection_attempts_t(), graph))
   , successfulConnectionAttemptsProperty_(boost::get(vertex_successful_connection_attempts_t(), graph))
@@ -44,44 +44,50 @@ SliceSpace::SliceSpace(ob::SpaceInformationPtr si_)
 
     addedNewSolution_ = false;
 }
+void SliceSpace::setProblemDefinition(const base::ProblemDefinitionPtr &pdef)
+{
+  Planner::setProblemDefinition(pdef);
+}
 
-    //checkValidity();
-    //auto *goal = dynamic_cast<base::GoalSampleableRegion *>(pdef_->getGoal().get());
+ob::PlannerStatus SliceSpace::solve(const ob::PlannerTerminationCondition &ptc){
+    checkValidity();
+    auto *goal = dynamic_cast<base::GoalSampleableRegion *>(pdef_->getGoal().get());
 
-    ////##############################################################################
-    //// Starting conditions
-    ////##############################################################################
-    //if (goal == nullptr){
-    //  OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
-    //  return base::PlannerStatus::UNRECOGNIZED_GOAL_TYPE;
-    //}
-    //while (const base::State *st = pis_.nextStart()){
-    //  startM_.push_back(addMilestone(si_->cloneState(st)));
-    //}
-    //if (startM_.empty()) {
-    //  OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
-    //  return base::PlannerStatus::INVALID_START;
-    //}
-    //if (!goal->couldSample()){
-    //  OMPL_ERROR("%s: Insufficient states in sampleable goal region", getName().c_str());
-    //  return base::PlannerStatus::INVALID_GOAL;
-    //}
+    //##############################################################################
+    // Starting conditions
+    //##############################################################################
+    if (goal == nullptr){
+      OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
+      return base::PlannerStatus::UNRECOGNIZED_GOAL_TYPE;
+    }
+    while (const base::State *st = pis_.nextStart()){
+      startM_.push_back(addMilestone(si_->cloneState(st)));
+    }
+    if (startM_.empty()) {
+      OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
+      return base::PlannerStatus::INVALID_START;
+    }
+    if (!goal->couldSample()){
+      OMPL_ERROR("%s: Insufficient states in sampleable goal region", getName().c_str());
+      return base::PlannerStatus::INVALID_GOAL;
+    }
 
-    //if (goal->maxSampleCount() > goalM_.size() || goalM_.empty())
-    //{
-    //    const base::State *st = goalM_.empty() ? pis_.nextGoal(ptc) : pis_.nextGoal();
-    //    if (st != nullptr)
-    //        goalM_.push_back(addMilestone(si_->cloneState(st)));
+    if (goal->maxSampleCount() > goalM_.size() || goalM_.empty())
+    {
+        const base::State *st = goalM_.empty() ? pis_.nextGoal(ptc) : pis_.nextGoal();
+        if (st != nullptr)
+            goalM_.push_back(addMilestone(si_->cloneState(st)));
 
-    //    if (goalM_.empty())
-    //    {
-    //        OMPL_ERROR("%s: Unable to find any valid goal states", getName().c_str());
-    //        return base::PlannerStatus::INVALID_GOAL;
-    //    }
-    //}
+        if (goalM_.empty())
+        {
+            OMPL_ERROR("%s: Unable to find any valid goal states", getName().c_str());
+            return base::PlannerStatus::INVALID_GOAL;
+        }
+    }
 
-    //unsigned long int nrStartStates = boost::num_vertices(graph);
-    //OMPL_INFORM("%s: Starting planning with %lu states already in datastructure", getName().c_str(), nrStartStates);
+    unsigned long int nrStartStates = boost::num_vertices(graph);
+    OMPL_INFORM("%s: Slice Space ready with %lu states already in datastructure", getName().c_str(), nrStartStates);
+}
 void SliceSpace::Grow(){
   growRoadmap(base::timedPlannerTerminationCondition(2.0 * magic::ROADMAP_BUILD_TIME), xstates[0]);
   expandRoadmap( base::timedPlannerTerminationCondition(magic::ROADMAP_BUILD_TIME), xstates);
