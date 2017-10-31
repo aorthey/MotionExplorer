@@ -9,7 +9,7 @@ GeometricCSpaceOMPLSE2::GeometricCSpaceOMPLSE2(Robot *robot_, CSpace *space_):
 
 void GeometricCSpaceOMPLSE2::initSpace()
 {
-  std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: SE(2)" << std::endl;
+  //std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: SE(2)" << std::endl;
 
   ob::StateSpacePtr SE2 = (std::make_shared<ob::SE2StateSpace>());
   this->space = SE2;
@@ -36,8 +36,9 @@ void GeometricCSpaceOMPLSE2::initSpace()
 void GeometricCSpaceOMPLSE2::print()
 {
   std::cout << std::string(80, '-') << std::endl;
-  std::cout << "OMPL CSPACE SE(2)" << std::endl;
+  std::cout << "[CSpace]" << std::endl;
   std::cout << std::string(80, '-') << std::endl;
+  std::cout << "Name                      : OMPL CSPACE SE(2)" << std::endl;
   std::cout << "Dimensionality Space      :" << GetDimensionality() << std::endl;
 }
 
