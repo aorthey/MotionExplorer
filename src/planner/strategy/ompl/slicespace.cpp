@@ -16,14 +16,13 @@
 using namespace og;
 
 SliceSpace::SliceSpace(const ob::SpaceInformationPtr &si)
-  : base::Planner(si, "SliceSpace")
+  : ob::Planner(si, "SliceSpace")
   , stateProperty_(boost::get(vertex_state_t(), graph))
   , totalConnectionAttemptsProperty_(boost::get(vertex_total_connection_attempts_t(), graph))
   , successfulConnectionAttemptsProperty_(boost::get(vertex_successful_connection_attempts_t(), graph))
-  , weightProperty_(boost::get(boost::edge_weight, graph))
   , disjointSets_(boost::get(boost::vertex_rank, graph), boost::get(boost::vertex_predecessor, graph))
 {
-    specs_.recognizedGoal = base::GOAL_SAMPLEABLE_REGION;
+    specs_.recognizedGoal = ob::GOAL_SAMPLEABLE_REGION;
     specs_.approximateSolutions = false;
     specs_.optimizingPaths = true;
 
@@ -42,22 +41,27 @@ SliceSpace::SliceSpace(const ob::SpaceInformationPtr &si)
 
     addedNewSolution_ = false;
 }
-void SliceSpace::setProblemDefinition(const base::ProblemDefinitionPtr &pdef)
+SliceSpace::~SliceSpace(){
+  si->freeStates(xstates);
+}
+void SliceSpace::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
 {
   Planner::setProblemDefinition(pdef);
 }
 
 ob::PlannerStatus SliceSpace::solve(const ob::PlannerTerminationCondition &ptc){
+  std::cout << "SliceSpace should be used in combination with SLiceSpacePRM, not as a standalone." << std::endl;
+  exit(0);
 }
 
 void SliceSpace::Grow(double t){
   double twothird = (2.0/3.0)*t;
   double onethird = (1.0/3.0)*t;
-  growRoadmap(base::timedPlannerTerminationCondition(twothird), xstates[0]);
-  expandRoadmap( base::timedPlannerTerminationCondition(onethird), xstates);
+  growRoadmap(ob::timedPlannerTerminationCondition(twothird), xstates[0]);
+  expandRoadmap( ob::timedPlannerTerminationCondition(onethird), xstates);
 }
 
-void SliceSpace::growRoadmap(const base::PlannerTerminationCondition &ptc, base::State *workState)
+void SliceSpace::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState)
 {
   while (!ptc)
   {
@@ -76,8 +80,8 @@ void SliceSpace::growRoadmap(const base::PlannerTerminationCondition &ptc, base:
   }
 }
 
-void SliceSpace::expandRoadmap(const base::PlannerTerminationCondition &ptc,
-                                         std::vector<base::State *> &workStates)
+void SliceSpace::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
+                                         std::vector<ob::State *> &workStates)
 {
     PDF<Vertex> pdf;
     foreach (Vertex v, boost::vertices(graph))
@@ -110,8 +114,9 @@ void SliceSpace::expandRoadmap(const base::PlannerTerminationCondition &ptc,
                 disjointSets_.make_set(m);
 
                 // add the edge to the parent vertex
-                const base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[m]);
-                const Graph::edge_property_type properties(weight);
+                //const ob::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[m]);
+                //const Graph::edge_property_type properties(weight);
+                EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[m]));
                 boost::add_edge(v, m, properties, graph);
                 uniteComponents(v, m);
 
@@ -125,8 +130,9 @@ void SliceSpace::expandRoadmap(const base::PlannerTerminationCondition &ptc,
             if (s > 0 || !sameComponent(v, last))
             {
               // add the edge to the parent vertex
-              const base::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[last]);
-              const Graph::edge_property_type properties(weight);
+              //const ob::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[last]);
+              //const Graph::edge_property_type properties(weight);
+              EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[last]));
               boost::add_edge(v, last, properties, graph);
               uniteComponents(v, last);
             }
@@ -143,14 +149,14 @@ bool SliceSpace::sameComponent(Vertex m1, Vertex m2)
     return boost::same_component(m1, m2, disjointSets_);
 }
 
-void SliceSpace::checkForSolution(base::PathPtr &solution)
+void SliceSpace::checkForSolution(ob::PathPtr &solution)
 {
-    auto *goal = static_cast<base::GoalSampleableRegion *>(pdef_->getGoal().get());
+    auto *goal = static_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
     if (!addedNewSolution_)
     {
         if (goal->maxSampleCount() > goalM_.size())
         {
-            const base::State *st = pis_.nextGoal();
+            const ob::State *st = pis_.nextGoal();
             if (st != nullptr)
                 goalM_.push_back(addMilestone(si_->cloneState(st)));
         }
@@ -159,10 +165,10 @@ void SliceSpace::checkForSolution(base::PathPtr &solution)
 }
 
 bool SliceSpace::maybeConstructSolution(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals,
-                                                  base::PathPtr &solution)
+                                                  ob::PathPtr &solution)
 {
-    base::Goal *g = pdef_->getGoal().get();
-    base::Cost sol_cost(opt_->infiniteCost());
+    ob::Goal *g = pdef_->getGoal().get();
+    ob::Cost sol_cost(opt_->infiniteCost());
     foreach (Vertex start, starts)
     {
         foreach (Vertex goal, goals)
@@ -172,10 +178,10 @@ bool SliceSpace::maybeConstructSolution(const std::vector<Vertex> &starts, const
 
             if (same_component && g->isStartGoalPairValid(stateProperty_[goal], stateProperty_[start]))
             {
-                base::PathPtr p = constructSolution(start, goal);
+                ob::PathPtr p = constructSolution(start, goal);
                 if (p)
                 {
-                    base::Cost pathCost = p->cost(opt_);
+                    ob::Cost pathCost = p->cost(opt_);
                     if (opt_->isCostBetterThan(pathCost, bestCost_))
                         bestCost_ = pathCost;
                     // Check if optimization objective is satisfied
@@ -196,7 +202,7 @@ bool SliceSpace::maybeConstructSolution(const std::vector<Vertex> &starts, const
 
     return false;
 }
-ompl::base::PathPtr SliceSpace::constructSolution(const Vertex &start, const Vertex &goal)
+ob::PathPtr SliceSpace::constructSolution(const Vertex &start, const Vertex &goal)
 {
     boost::vector_property_map<Vertex> prev(boost::num_vertices(graph));
 
@@ -208,11 +214,11 @@ ompl::base::PathPtr SliceSpace::constructSolution(const Vertex &start, const Ver
                                 return costHeuristic(v, goal);
                             },
                             boost::predecessor_map(prev)
-                                .distance_compare([this](base::Cost c1, base::Cost c2)
+                                .distance_compare([this](ob::Cost c1, ob::Cost c2)
                                                   {
                                                       return opt_->isCostBetterThan(c1, c2);
                                                   })
-                                .distance_combine([this](base::Cost c1, base::Cost c2)
+                                .distance_combine([this](ob::Cost c1, ob::Cost c2)
                                                   {
                                                       return opt_->combineCosts(c1, c2);
                                                   })
@@ -235,7 +241,7 @@ ompl::base::PathPtr SliceSpace::constructSolution(const Vertex &start, const Ver
 
     return p;
 }
-SliceSpace::Vertex SliceSpace::addMilestone(base::State *state)
+SliceSpace::Vertex SliceSpace::addMilestone(ob::State *state)
 {
     Vertex m = boost::add_vertex(graph);
     stateProperty_[m] = state;
@@ -254,9 +260,14 @@ SliceSpace::Vertex SliceSpace::addMilestone(base::State *state)
             {
                 successfulConnectionAttemptsProperty_[m]++;
                 successfulConnectionAttemptsProperty_[n]++;
-                const base::Cost weight = opt_->motionCost(stateProperty_[n], stateProperty_[m]);
-                const Graph::edge_property_type properties(weight);
-                boost::add_edge(n, m, properties, graph);
+                //const ob::Cost weight = opt_->motionCost(stateProperty_[n], stateProperty_[m]);
+                //const Graph::edge_property_type properties(weight, NULL);
+                EdgeProperty properties(opt_->motionCost(stateProperty_[n], stateProperty_[m]));
+                std::pair<Edge, bool> edge = boost::add_edge(n, m, properties, graph);
+
+                //const Graph::edge_property_type pp = get(
+                //SliceSpace *S = get(edge_associated_slicespace_t(), graph, edge.first);
+
                 uniteComponents(n, m);
             }
         }
@@ -267,22 +278,22 @@ SliceSpace::Vertex SliceSpace::addMilestone(base::State *state)
 }
 
 
-void SliceSpace::getPlannerData(base::PlannerData &data) const
+void SliceSpace::getPlannerData(ob::PlannerData &data) const
 {
     for (unsigned long i : startM_)
         data.addStartVertex(
-            base::PlannerDataVertex(stateProperty_[i], const_cast<SliceSpace *>(this)->disjointSets_.find_set(i)));
+            ob::PlannerDataVertex(stateProperty_[i], const_cast<SliceSpace *>(this)->disjointSets_.find_set(i)));
 
     for (unsigned long i : goalM_)
         data.addGoalVertex(
-            base::PlannerDataVertex(stateProperty_[i], const_cast<SliceSpace *>(this)->disjointSets_.find_set(i)));
+            ob::PlannerDataVertex(stateProperty_[i], const_cast<SliceSpace *>(this)->disjointSets_.find_set(i)));
 
     foreach (const Edge e, boost::edges(graph))
     {
         const Vertex v1 = boost::source(e, graph);
         const Vertex v2 = boost::target(e, graph);
-        data.addEdge(base::PlannerDataVertex(stateProperty_[v1]), base::PlannerDataVertex(stateProperty_[v2]));
-        data.addEdge(base::PlannerDataVertex(stateProperty_[v2]), base::PlannerDataVertex(stateProperty_[v1]));
+        data.addEdge(ob::PlannerDataVertex(stateProperty_[v1]), ob::PlannerDataVertex(stateProperty_[v2]));
+        data.addEdge(ob::PlannerDataVertex(stateProperty_[v2]), ob::PlannerDataVertex(stateProperty_[v1]));
         data.tagState(stateProperty_[v1], const_cast<SliceSpace *>(this)->disjointSets_.find_set(v1));
         data.tagState(stateProperty_[v2], const_cast<SliceSpace *>(this)->disjointSets_.find_set(v2));
     }
@@ -310,39 +321,39 @@ void SliceSpace::setup(){
       if (pdef_->hasOptimizationObjective()){
         opt_ = pdef_->getOptimizationObjective();
       }else{
-        opt_ = std::make_shared<base::PathLengthOptimizationObjective>(si_);
+        opt_ = std::make_shared<ob::PathLengthOptimizationObjective>(si_);
       }
       //checkValidity();
-      auto *goal = dynamic_cast<base::GoalSampleableRegion *>(pdef_->getGoal().get());
+      auto *goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
 
       if (goal == nullptr){
         OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
-        //return base::PlannerStatus::UNRECOGNIZED_GOAL_TYPE;
+        //return ob::PlannerStatus::UNRECOGNIZED_GOAL_TYPE;
         exit(0);
       }
-      while (const base::State *st = pis_.nextStart()){
+      while (const ob::State *st = pis_.nextStart()){
         startM_.push_back(addMilestone(si_->cloneState(st)));
       }
       if (startM_.empty()){
         OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
-        //return base::PlannerStatus::INVALID_START;
+        //return ob::PlannerStatus::INVALID_START;
         exit(0);
       }
       if (!goal->couldSample()){
         OMPL_ERROR("%s: Insufficient states in sampleable goal region", getName().c_str());
-        //return base::PlannerStatus::INVALID_GOAL;
+        //return ob::PlannerStatus::INVALID_GOAL;
         exit(0);
       }
 
       if (goal->maxSampleCount() > goalM_.size() || goalM_.empty()){
-        const base::State *st = pis_.nextGoal();
+        const ob::State *st = pis_.nextGoal();
         if (st != nullptr){
           goalM_.push_back(addMilestone(si_->cloneState(st)));
         }
 
         if (goalM_.empty()){
           OMPL_ERROR("%s: Unable to find any valid goal states", getName().c_str());
-          //return base::PlannerStatus::INVALID_GOAL;
+          //return ob::PlannerStatus::INVALID_GOAL;
           exit(0);
         }
       }
@@ -366,9 +377,9 @@ void SliceSpace::clear()
     clearQuery();
 
     iterations_ = 0;
-    bestCost_ = base::Cost(std::numeric_limits<double>::quiet_NaN());
+    bestCost_ = ob::Cost(std::numeric_limits<double>::quiet_NaN());
 }
-ompl::base::Cost SliceSpace::costHeuristic(Vertex u, Vertex v) const
+ob::Cost SliceSpace::costHeuristic(Vertex u, Vertex v) const
 {
   return opt_->motionCostHeuristic(stateProperty_[u], stateProperty_[v]);
 }
@@ -383,4 +394,38 @@ void SliceSpace::clearQuery()
   startM_.clear();
   goalM_.clear();
   pis_.restart();
+}
+
+double SliceSpace::GetSamplingDensity(){
+  return (double)num_vertices(graph)/si_->getSpaceMeasure();
+}
+
+ob::PathPtr SliceSpace::GetShortestPath(){
+  return GetSolutionPath();
+}
+
+ob::PathPtr SliceSpace::GetSolutionPath(){
+  ob::PathPtr sol;
+  checkForSolution(sol);
+  return sol;
+}
+bool SliceSpace::hasSolution(){
+  return addedNewSolution_;
+}
+
+template <template <typename T> class NN>
+void SliceSpace::setNearestNeighbors()
+{
+    if (nn_ && nn_->size() == 0)
+        OMPL_WARN("Calling setNearestNeighbors will clear all states.");
+    clear();
+    nn_ = std::make_shared<NN<Vertex>>();
+    connectionStrategy_ = ConnectionStrategy();
+    if (isSetup())
+        setup();
+}
+
+void SliceSpace::setConnectionFilter(const ConnectionFilter &connectionFilter)
+{
+    connectionFilter_ = connectionFilter;
 }

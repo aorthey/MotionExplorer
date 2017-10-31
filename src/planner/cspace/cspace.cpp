@@ -936,7 +936,7 @@ void GeometricCSpaceOMPLPathConstraintRollInvariance::initSpace()
   //###########################################################################
   //   R^1 times S times S
   //###########################################################################
-  std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: [0,1] x S^1 x S^1" << std::endl;
+  //std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: [0,1] x S^1 x S^1" << std::endl;
 
   ob::StateSpacePtr R = (std::make_shared<ob::RealVectorStateSpace>(1));
   ob::StateSpacePtr S1a = (std::make_shared<ob::SO2StateSpace>());

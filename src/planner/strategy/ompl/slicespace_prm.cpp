@@ -11,6 +11,8 @@
 #include <boost/graph/incremental_components.hpp>
 #include <boost/property_map/vector_property_map.hpp>
 #include <boost/foreach.hpp>
+#include <queue>
+#include <functional>
 
 #define foreach BOOST_FOREACH
 
@@ -59,19 +61,52 @@ ompl::base::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCon
 {
   base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
                                                        {
-                                                           return ptc || S_0->hasSolution();
+                                                           return ptc || S_1->hasSolution();
                                                        });
-  //auto cmp = [](SliceSpace left, SliceSpace right) 
-  //            { 
-  //              return true;
-  //            };
-  //std::priority_queue<SliceSpace*, std::vector<SliceSpace*>, cmp > Q;
+  auto cmp = [](SliceSpace* left, SliceSpace* right) 
+              { 
+                return left->GetSamplingDensity() < right->GetSamplingDensity();
+              };
+  std::priority_queue<SliceSpace*, std::vector<SliceSpace*>, decltype(cmp)> Q(cmp);
 
-  //S_0->solve(ptcOrSolutionFound);
+  Q.push(S_0);
+  double growth_time = 1e-3;
 
   while(!ptcOrSolutionFound){
-    //SliceSpace* S = Q.pop();
-    S_0->Grow();
+    SliceSpace* S = Q.top();
+    S->Grow(growth_time);
+    base::PathPtr path = S->GetShortestPath();
+    if(path){
+
+      //std::pair<edge_descr_type, bool> result = add_edge (u, v, props, g);
+
+      //check if S is a horizontal or vertical space
+      ///bool vertical = true;
+      ///if(vertical){
+      ///  //found solution in vertical space. this means we need to update the
+      ///  //weight in S_0
+      ///  //E = S->GetUnderlyingEdge()
+      ///  //S_0->SetEdgeWeight(E)
+      ///  //E->weight = d(s,t)
+      ///}else{
+      ///  //S_0!
+      ///  //create new slicespace for an edge without slicespace
+      ///  //iterator throuhg all edges
+      ///  E = path->GetNextEdge()
+      ///  if(E->S){
+      ///    if(E->S->hasSolution()){
+      ///      E->weight = d(E->s,E->t)
+      ///    }else{
+      ///      E->weight = +dInf;
+      ///    }
+      ///  }else{
+      ///    //create new spaceinformationptr, using edge
+      ///    E->S = new SliceSpace();
+      ///    Q.push(E->S);
+      ///    E->weight = +dInf;
+      ///  }
+      ///}
+    }
   }
   base::PathPtr sol = S_0->GetSolutionPath();
 

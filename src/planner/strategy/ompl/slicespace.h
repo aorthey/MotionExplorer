@@ -58,17 +58,28 @@ namespace ompl
         {
             typedef boost::vertex_property_tag kind;
         };
+        struct edge_associated_slicespace_t
+        {
+            typedef boost::vertex_property_tag kind;
+        };
+        struct EdgeProperty: public ob::Cost{
+          EdgeProperty(): ob::Cost(){};
+          EdgeProperty(ob::Cost cost): ob::Cost(cost){};
+          SliceSpace *slicespace;
+        };
+
         typedef boost::adjacency_list<
             boost::vecS, boost::vecS, boost::undirectedS,
-            boost::property<
+              boost::property<
                 vertex_state_t, ob::State *,
-                boost::property<
-                    vertex_total_connection_attempts_t, unsigned long int,
-                    boost::property<vertex_successful_connection_attempts_t, unsigned long int,
-                                    boost::property<boost::vertex_predecessor_t, unsigned long int,
-                                                    boost::property<boost::vertex_rank_t, unsigned long int>>>>>,
-            boost::property<boost::edge_weight_t, ob::Cost>>
-            Graph;
+                boost::property<vertex_total_connection_attempts_t, unsigned long int,
+                boost::property<vertex_successful_connection_attempts_t, unsigned long int,
+                boost::property<boost::vertex_predecessor_t, unsigned long int,
+                boost::property<boost::vertex_rank_t, unsigned long int>>>>
+              >,
+              boost::property<boost::edge_weight_t, EdgeProperty>
+            >Graph;
+
         typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
         typedef boost::graph_traits<Graph>::edge_descriptor Edge;
         typedef std::shared_ptr<NearestNeighbors<Vertex>> RoadmapNeighbors;
@@ -78,42 +89,21 @@ namespace ompl
       public:
         SliceSpace(const ob::SpaceInformationPtr &si);
 
-        ~SliceSpace() override{
-          si->freeStates(xstates);
-        }
-
-        base::PathPtr GetSolutionPath(){
-          ob::PathPtr sol;
-          checkForSolution(sol);
-          return sol;
-        }
-        bool hasSolution(){
-          return addedNewSolution_;
-        }
+        ~SliceSpace() override;
+        double GetSamplingDensity();
+        base::PathPtr GetShortestPath();
+        base::PathPtr GetSolutionPath();
+        bool hasSolution();
 
         void Grow(double t = magic::ROADMAP_BUILD_TIME*3);
-        double volume;
 
         template <template <typename T> class NN>
-        void setNearestNeighbors()
-        {
-            if (nn_ && nn_->size() == 0)
-                OMPL_WARN("Calling setNearestNeighbors will clear all states.");
-            clear();
-            nn_ = std::make_shared<NN<Vertex>>();
-            connectionStrategy_ = ConnectionStrategy();
-            if (isSetup())
-                setup();
-        }
-
-        void setProblemDefinition(const base::ProblemDefinitionPtr &pdef) override;
-
-        void setConnectionFilter(const ConnectionFilter &connectionFilter)
-        {
-            connectionFilter_ = connectionFilter;
-        }
+        void setNearestNeighbors();
 
         void getPlannerData(base::PlannerData &data) const override;
+
+        void setProblemDefinition(const base::ProblemDefinitionPtr &pdef) override;
+        void setConnectionFilter(const ConnectionFilter &connectionFilter);
         base::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
 
         void clearQuery();
@@ -133,13 +123,15 @@ namespace ompl
 
         boost::property_map<Graph, vertex_state_t>::type stateProperty_;
         boost::property_map<Graph, vertex_total_connection_attempts_t>::type totalConnectionAttemptsProperty_;
-        boost::property_map<Graph, vertex_successful_connection_attempts_t>::type
-            successfulConnectionAttemptsProperty_;
-        boost::property_map<Graph, boost::edge_weight_t>::type weightProperty_;
+        boost::property_map<Graph, vertex_successful_connection_attempts_t>::type successfulConnectionAttemptsProperty_;
+        //boost::property_map<Graph, boost::edge_weight_t>::type weightProperty_;
+        //boost::property_map<Graph, edge_associated_slicespace_t>::type edgeAssociatedSliceSpaceProperty_;
+
         boost::disjoint_sets<boost::property_map<Graph, boost::vertex_rank_t>::type,
                              boost::property_map<Graph, boost::vertex_predecessor_t>::type> disjointSets_;
         ConnectionStrategy connectionStrategy_;
         ConnectionFilter connectionFilter_;
+
         RNG rng_;
         bool addedNewSolution_{false};
         base::OptimizationObjectivePtr opt_;
@@ -160,6 +152,7 @@ namespace ompl
                                     base::PathPtr &solution);
         ompl::base::PathPtr constructSolution(const Vertex &start, const Vertex &goal);
     };
+        //double volume{0.0};
 
   };
 };

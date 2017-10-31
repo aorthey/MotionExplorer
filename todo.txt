@@ -343,8 +343,10 @@ possible misleading initial path)
 [ ] benchmark SN-rrt and rrt n SE(3)
 
 Minor Things
-[ ] refactor cspace into separate classes
-[ ] cspace info print is horrible
+[ ] cspace: refactor cspace into separate classes
+[ ] cspace: info print is horrible
+[ ] cspace: remove geometric and replace by namespace. remove cspace from filename?
+[ ] pathspace: starts to get confusing, clean up the mess
 [ ] make some generic printing, using__CLASS__, __FILE__, etcetera
 [ ] include kcspace into cspace factor, and add string type to specify cspace type from the outside
 [ ] refactor factory into one function, should encapsulate everything, no
@@ -355,5 +357,6 @@ SlicePlanner
 [x] be able to grow roadmap on C0 
 [x] remove threads
 [x] outsource everything to slicespace.h
+[x] sort priority queue based on sampling density
 [ ] fix the chart boundary issue in visualizing the SE(2) roadmap
 [ ] be able to compute shortest path on C0, and to adjust edge weights 

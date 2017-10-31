@@ -15,22 +15,21 @@ std::vector<PathSpace*> PathSpaceOMPLTwoLevel::Decompose(){
 
   CSpaceFactory factory(input->GetCSpaceInput());
 
+  /// R^2
   int robot_idx = input->robot_idx;
   Robot *robot = world->robots[robot_idx];
   SingleRobotCSpace *kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
+  CSpaceOMPL *cspace = factory.MakeGeometricCSpaceR2(robot, kcspace);
 
+  /// SO(2)
   PathSpaceInput* next = input->GetNextLayer()->GetNextLayer();
-  CSpaceOMPL *cspace = factory.MakeGeometricCSpaceRotationalInvariance(robot, kcspace);
-
-  StrategyGeometric strategy;
-  StrategyOutput output(cspace);
-
   robot_idx = next->robot_idx;
   robot = world->robots[robot_idx];
   SingleRobotCSpace *kcspace1 = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
   CSpaceOMPL* cspace_level1 = factory.MakeGeometricCSpaceSE2(robot, kcspace1);
-  cspace_level1->print();
 
+  StrategyGeometric strategy;
+  StrategyOutput output(cspace);
   StrategyInput strategy_input = input->GetStrategyInput();
   strategy_input.cspace = cspace;
   strategy_input.cspace_level1 = cspace_level1;
@@ -38,7 +37,6 @@ std::vector<PathSpace*> PathSpaceOMPLTwoLevel::Decompose(){
   strategy.plan(strategy_input, output);
 
   std::vector<PathSpace*> decomposedspace;
-
   decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
 
   RoadmapPtr roadmap1 = output.GetRoadmapPtr();

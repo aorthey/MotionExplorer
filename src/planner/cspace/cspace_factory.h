@@ -1,6 +1,8 @@
 #pragma once
 #include "planner/cspace/cspace.h"
 #include "planner/cspace/cspace_geometric_se2.h"
+#include "planner/cspace/cspace_geometric_r2.h"
+#include "planner/cspace/cspace_geometric_r2_edge_so2.h"
 #include "planner/cspace/cspace_input.h"
 #include "planner/cspace/cspace_decorator.h"
 
@@ -57,6 +59,22 @@ class CSpaceFactory{
     // CSpace  SE(2)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE2( Robot *robot, CSpace *kspace){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLSE2(robot, kspace);
+      cspace->SetCSpaceInput(input);
+      cspace->initSpace();
+      cspace->initControlSpace();
+      return cspace;
+    }
+    // CSpace  R^(2)
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceR2( Robot *robot, CSpace *kspace){
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLR2(robot, kspace);
+      cspace->SetCSpaceInput(input);
+      cspace->initSpace();
+      cspace->initControlSpace();
+      return cspace;
+    }
+    // CSpace  R^(2) Edge \times SO(2)
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceR2EdgeSO2( Robot *robot, CSpace *kspace, const Config &q1, const Config &q2 ){
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLR2EdgeSO2(robot, kspace, q1, q2);
       cspace->SetCSpaceInput(input);
       cspace->initSpace();
       cspace->initControlSpace();
