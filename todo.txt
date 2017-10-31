@@ -344,15 +344,16 @@ possible misleading initial path)
 
 Minor Things
 [ ] refactor cspace into separate classes
+[ ] cspace info print is horrible
+[ ] make some generic printing, using__CLASS__, __FILE__, etcetera
 [ ] include kcspace into cspace factor, and add string type to specify cspace type from the outside
 [ ] refactor factory into one function, should encapsulate everything, no
 kcspace/cspaceompl stuff outside
-[ ] fix the chart boundary issue in visualizing the SE(2) roadmap
 
 
 SlicePlanner
 [x] be able to grow roadmap on C0 
-
 [x] remove threads
-[ ] outsource everything to slicespace.h
+[x] outsource everything to slicespace.h
+[ ] fix the chart boundary issue in visualizing the SE(2) roadmap
 [ ] be able to compute shortest path on C0, and to adjust edge weights 

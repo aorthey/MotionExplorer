@@ -18,7 +18,9 @@ using namespace og;
 
 SliceSpacePRM::SliceSpacePRM(const base::SpaceInformationPtr &si0, const ob::SpaceInformationPtr &si1)
   : base::Planner(si0, "SliceSpacePRM")
-  , roadmap(new SliceSpace(si0))
+  , S_0(new SliceSpace(si0))
+  , S_1(new SliceSpace(si1))
+  , si_level0(si0)
   , si_level1(si1)
 {
   specs_.recognizedGoal = base::GOAL_SAMPLEABLE_REGION;
@@ -34,48 +36,59 @@ SliceSpacePRM::~SliceSpacePRM()
 void SliceSpacePRM::setup()
 {
   Planner::setup();
+  S_0->setProblemDefinition(pdef_);
+  S_0->setup();
 }
 
 void SliceSpacePRM::setProblemDefinition(const base::ProblemDefinitionPtr &pdef)
 {
   Planner::setProblemDefinition(pdef);
+  S_0->setProblemDefinition(pdef);
 }
 
 
 void SliceSpacePRM::clear()
 {
   Planner::clear();
-  roadmap->clear();
+  S_0->clear();
+  S_1->clear();
 }
 
 
 ompl::base::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCondition &ptc)
 {
+  base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
+                                                       {
+                                                           return ptc || S_0->hasSolution();
+                                                       });
+  //auto cmp = [](SliceSpace left, SliceSpace right) 
+  //            { 
+  //              return true;
+  //            };
+  //std::priority_queue<SliceSpace*, std::vector<SliceSpace*>, cmp > Q;
 
-    base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
-                                                         {
-                                                             return ptc || roadmap->hasSolution();
-                                                         });
+  //S_0->solve(ptcOrSolutionFound);
 
-    while(!ptcOrSolutionFound()){
-      roadmap->Grow();
-    }
-    base::PathPtr sol = roadmap->GetSolutionPath();
+  while(!ptcOrSolutionFound){
+    //SliceSpace* S = Q.pop();
+    S_0->Grow();
+  }
+  base::PathPtr sol = S_0->GetSolutionPath();
 
-    if (sol)
-    {
-        base::PlannerSolution psol(sol);
-        psol.setPlannerName(getName());
-        //psol.setOptimized(opt_, bestCost_, roadmap->hasSolution());
-        pdef_->addSolutionPath(psol);
-    }
+  if (sol)
+  {
+      base::PlannerSolution psol(sol);
+      psol.setPlannerName(getName());
+      //psol.setOptimized(opt_, bestCost_, S_0->hasSolution());
+      pdef_->addSolutionPath(psol);
+  }
 
-    return sol ? base::PlannerStatus::EXACT_SOLUTION : base::PlannerStatus::TIMEOUT;
+  return sol ? base::PlannerStatus::EXACT_SOLUTION : base::PlannerStatus::TIMEOUT;
 }
 
 void SliceSpacePRM::getPlannerData(base::PlannerData &data) const
 {
   Planner::getPlannerData(data);
-  roadmap->getPlannerData(data);
+  S_0->getPlannerData(data);
 }
 

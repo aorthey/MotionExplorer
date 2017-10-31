@@ -36,8 +36,6 @@ SliceSpace::SliceSpace(const ob::SpaceInformationPtr &si)
       simpleSampler_ = si_->allocStateSampler();
     }
 
-    bestCost_ = opt_->infiniteCost();
-
     xstates.resize(magic::MAX_RANDOM_BOUNCE_STEPS);
     si_->allocStates(xstates);
 
@@ -50,47 +48,13 @@ void SliceSpace::setProblemDefinition(const base::ProblemDefinitionPtr &pdef)
 }
 
 ob::PlannerStatus SliceSpace::solve(const ob::PlannerTerminationCondition &ptc){
-    checkValidity();
-    auto *goal = dynamic_cast<base::GoalSampleableRegion *>(pdef_->getGoal().get());
-
-    //##############################################################################
-    // Starting conditions
-    //##############################################################################
-    if (goal == nullptr){
-      OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
-      return base::PlannerStatus::UNRECOGNIZED_GOAL_TYPE;
-    }
-    while (const base::State *st = pis_.nextStart()){
-      startM_.push_back(addMilestone(si_->cloneState(st)));
-    }
-    if (startM_.empty()) {
-      OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
-      return base::PlannerStatus::INVALID_START;
-    }
-    if (!goal->couldSample()){
-      OMPL_ERROR("%s: Insufficient states in sampleable goal region", getName().c_str());
-      return base::PlannerStatus::INVALID_GOAL;
-    }
-
-    if (goal->maxSampleCount() > goalM_.size() || goalM_.empty())
-    {
-        const base::State *st = goalM_.empty() ? pis_.nextGoal(ptc) : pis_.nextGoal();
-        if (st != nullptr)
-            goalM_.push_back(addMilestone(si_->cloneState(st)));
-
-        if (goalM_.empty())
-        {
-            OMPL_ERROR("%s: Unable to find any valid goal states", getName().c_str());
-            return base::PlannerStatus::INVALID_GOAL;
-        }
-    }
-
-    unsigned long int nrStartStates = boost::num_vertices(graph);
-    OMPL_INFORM("%s: Slice Space ready with %lu states already in datastructure", getName().c_str(), nrStartStates);
 }
-void SliceSpace::Grow(){
-  growRoadmap(base::timedPlannerTerminationCondition(2.0 * magic::ROADMAP_BUILD_TIME), xstates[0]);
-  expandRoadmap( base::timedPlannerTerminationCondition(magic::ROADMAP_BUILD_TIME), xstates);
+
+void SliceSpace::Grow(double t){
+  double twothird = (2.0/3.0)*t;
+  double onethird = (1.0/3.0)*t;
+  growRoadmap(base::timedPlannerTerminationCondition(twothird), xstates[0]);
+  expandRoadmap( base::timedPlannerTerminationCondition(onethird), xstates);
 }
 
 void SliceSpace::growRoadmap(const base::PlannerTerminationCondition &ptc, base::State *workState)
@@ -238,7 +202,6 @@ ompl::base::PathPtr SliceSpace::constructSolution(const Vertex &start, const Ver
 
     try
     {
-        // Consider using a persistent distance_map if it's slow
         boost::astar_search(graph, start,
                             [this, goal](Vertex v)
                             {
@@ -274,7 +237,6 @@ ompl::base::PathPtr SliceSpace::constructSolution(const Vertex &start, const Ver
 }
 SliceSpace::Vertex SliceSpace::addMilestone(base::State *state)
 {
-
     Vertex m = boost::add_vertex(graph);
     stateProperty_[m] = state;
     totalConnectionAttemptsProperty_[m] = 1;
@@ -307,7 +269,6 @@ SliceSpace::Vertex SliceSpace::addMilestone(base::State *state)
 
 void SliceSpace::getPlannerData(base::PlannerData &data) const
 {
-    // Explicitly add start and goal states:
     for (unsigned long i : startM_)
         data.addStartVertex(
             base::PlannerDataVertex(stateProperty_[i], const_cast<SliceSpace *>(this)->disjointSets_.find_set(i)));
@@ -316,17 +277,12 @@ void SliceSpace::getPlannerData(base::PlannerData &data) const
         data.addGoalVertex(
             base::PlannerDataVertex(stateProperty_[i], const_cast<SliceSpace *>(this)->disjointSets_.find_set(i)));
 
-    // Adding edges and all other vertices simultaneously
     foreach (const Edge e, boost::edges(graph))
     {
         const Vertex v1 = boost::source(e, graph);
         const Vertex v2 = boost::target(e, graph);
         data.addEdge(base::PlannerDataVertex(stateProperty_[v1]), base::PlannerDataVertex(stateProperty_[v2]));
-
-        // Add the reverse edge, since we're constructing an undirected roadmap
         data.addEdge(base::PlannerDataVertex(stateProperty_[v2]), base::PlannerDataVertex(stateProperty_[v1]));
-
-        // Add tags for the newly added vertices
         data.tagState(stateProperty_[v1], const_cast<SliceSpace *>(this)->disjointSets_.find_set(v1));
         data.tagState(stateProperty_[v2], const_cast<SliceSpace *>(this)->disjointSets_.find_set(v2));
     }
@@ -339,7 +295,6 @@ void SliceSpace::setup(){
                                    return distanceFunction(a, b);
                                });
     }
-
     if (!connectionStrategy_){
       connectionStrategy_ = KStrategy<Vertex>(magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
     }
@@ -357,10 +312,47 @@ void SliceSpace::setup(){
       }else{
         opt_ = std::make_shared<base::PathLengthOptimizationObjective>(si_);
       }
+      //checkValidity();
+      auto *goal = dynamic_cast<base::GoalSampleableRegion *>(pdef_->getGoal().get());
+
+      if (goal == nullptr){
+        OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
+        //return base::PlannerStatus::UNRECOGNIZED_GOAL_TYPE;
+        exit(0);
+      }
+      while (const base::State *st = pis_.nextStart()){
+        startM_.push_back(addMilestone(si_->cloneState(st)));
+      }
+      if (startM_.empty()){
+        OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
+        //return base::PlannerStatus::INVALID_START;
+        exit(0);
+      }
+      if (!goal->couldSample()){
+        OMPL_ERROR("%s: Insufficient states in sampleable goal region", getName().c_str());
+        //return base::PlannerStatus::INVALID_GOAL;
+        exit(0);
+      }
+
+      if (goal->maxSampleCount() > goalM_.size() || goalM_.empty()){
+        const base::State *st = pis_.nextGoal();
+        if (st != nullptr){
+          goalM_.push_back(addMilestone(si_->cloneState(st)));
+        }
+
+        if (goalM_.empty()){
+          OMPL_ERROR("%s: Unable to find any valid goal states", getName().c_str());
+          //return base::PlannerStatus::INVALID_GOAL;
+          exit(0);
+        }
+      }
+      unsigned long int nrStartStates = boost::num_vertices(graph);
+      OMPL_INFORM("%s: Slice Space ready with %lu states already in datastructure", getName().c_str(), nrStartStates);
     }else{
       OMPL_INFORM("%s: problem definition is not set, deferring setup completion...", getName().c_str());
       setup_ = false;
     }
+
 }
 void SliceSpace::clear()
 {

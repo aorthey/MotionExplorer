@@ -102,6 +102,7 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   else if(algorithm=="ompl:fmt") ompl_planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") ompl_planner = std::make_shared<og::BFMT>(si);
 
+  //experimental planners
   else if(algorithm=="ompl:necessaryrrt") ompl_planner = std::make_shared<og::NecessaryRRT>(si, std::make_shared<ob::SpaceInformation>(input.cspace_level1->SpacePtr()));
   else if(algorithm=="ompl:necessaryprm") ompl_planner = std::make_shared<og::NecessaryPRM>(si, std::make_shared<ob::SpaceInformation>(input.cspace_level1->SpacePtr()));
   else if(algorithm=="ompl:slicespaceprm") ompl_planner = std::make_shared<og::SliceSpacePRM>(si, std::make_shared<ob::SpaceInformation>(input.cspace_level1->SpacePtr()));

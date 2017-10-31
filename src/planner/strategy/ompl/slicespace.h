@@ -17,15 +17,8 @@ namespace ompl
 {
     namespace magic
     {
-        /** \brief The number of steps to take for a random bounce
-            motion generated as part of the expansion step of PRM. */
         static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
-
-        /** \brief The time in seconds for a single roadmap building operation (dt)*/
-        static const double ROADMAP_BUILD_TIME = 0.2;
-
-        /** \brief The number of nearest neighbors to consider by
-            default in the construction of the PRM roadmap */
+        static const double ROADMAP_BUILD_TIME = 0.01;
         static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
     }
 }
@@ -97,7 +90,8 @@ namespace ompl
         bool hasSolution(){
           return addedNewSolution_;
         }
-        void Grow();
+
+        void Grow(double t = magic::ROADMAP_BUILD_TIME*3);
         double volume;
 
         template <template <typename T> class NN>
