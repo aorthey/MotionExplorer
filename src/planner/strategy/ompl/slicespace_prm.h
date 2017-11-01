@@ -34,14 +34,13 @@ namespace ompl
             void getPlannerData(base::PlannerData &data) const override;
             base::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
 
+            SliceSpace* CreateNewSliceSpaceEdge();
             void clear() override;
             void setup() override;
 
         protected:
-
             SliceSpace *S_0;
             SliceSpace *S_1;
-            //std::vector<SliceSpace*> Q;
 
             ob::SpaceInformationPtr si_level0;
             ob::SpaceInformationPtr si_level1;

@@ -8,6 +8,9 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/pending/disjoint_sets.hpp>
+#include <stack>
+#include <KrisLibrary/math/infnan.h> //dInf, fInf, IsNaN(x)
+using Math::dInf;
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
@@ -44,6 +47,7 @@ namespace ompl
   {
     class SliceSpace: public ob::Planner{
 
+      public:
         struct vertex_state_t
         {
             typedef boost::vertex_property_tag kind;
@@ -58,15 +62,28 @@ namespace ompl
         {
             typedef boost::vertex_property_tag kind;
         };
-        struct edge_associated_slicespace_t
-        {
-            typedef boost::vertex_property_tag kind;
-        };
-        struct EdgeProperty: public ob::Cost{
-          EdgeProperty(): ob::Cost(){};
-          EdgeProperty(ob::Cost cost): ob::Cost(cost){};
+        struct EdgeProperty{
+          EdgeProperty(): cost(+dInf), original_cost(+dInf), slicespace(NULL)
+          {};
+          EdgeProperty(ob::Cost cost_): cost(cost_), original_cost(cost_), slicespace(NULL)
+          {};
+          EdgeProperty(ob::Cost cost_, SliceSpace* slicespace_): cost(cost_), original_cost(cost_), slicespace(slicespace_)
+          {};
+          void setWeight(double d){
+            cost = ob::Cost(d);
+          }
+          ob::Cost getCost(){
+            return cost;
+          }
+          void setOriginalWeight(){
+            cost = original_cost;
+          }
           SliceSpace *slicespace;
+          private:
+            ob::Cost cost;
+            ob::Cost original_cost;
         };
+
 
         typedef boost::adjacency_list<
             boost::vecS, boost::vecS, boost::undirectedS,
@@ -95,6 +112,7 @@ namespace ompl
         base::PathPtr GetSolutionPath();
         bool hasSolution();
 
+
         void Grow(double t = magic::ROADMAP_BUILD_TIME*3);
 
         template <template <typename T> class NN>
@@ -109,7 +127,41 @@ namespace ompl
         void clearQuery();
         void clear() override;
         void setup() override;
+
+        bool horizontal;
+
+        EdgeProperty& GetEdgeAlongShortestPath(uint k){
+          Vertex v = last_vertex_path.at(k);
+          Vertex w = last_vertex_path.at(k+1);
+          std::pair<Edge, bool> edge = boost::edge(v, w, graph);
+          EdgeProperty p = get (boost::edge_weight_t(), graph, edge.first);
+          std::cout << "edge with cost " << p.getCost() << std::endl;
+          if(!p.slicespace){
+            std::cout << "has no slicespace" << std::endl;
+          }
+          Vertex v1 = source(edge.first,graph);
+          Vertex v2 = target(edge.first,graph);
+          return p;
+        }
+        std::vector<Vertex> VerticesAlongShortestPath(){
+          return last_vertex_path;
+        }
+        uint EdgesAlongShortestPath(){
+          return last_vertex_path.size();
+        }
+        Vertex& GetExternalAssociatedEdgeSource(){
+          return external_src;
+        }
+        Vertex& GetExternalAssociatedEdgeTarget(){
+          return external_trg;
+        }
+
+        Graph graph;
     protected:
+        Vertex external_src;
+        Vertex external_trg;
+
+        std::vector<Vertex> last_vertex_path;
 
         base::Cost costHeuristic(Vertex u, Vertex v) const;
         double distanceFunction(const Vertex a, const Vertex b) const;
@@ -119,11 +171,11 @@ namespace ompl
         base::ValidStateSamplerPtr sampler_;
         base::StateSamplerPtr simpleSampler_;
         RoadmapNeighbors nn_;
-        Graph graph;
 
         boost::property_map<Graph, vertex_state_t>::type stateProperty_;
         boost::property_map<Graph, vertex_total_connection_attempts_t>::type totalConnectionAttemptsProperty_;
         boost::property_map<Graph, vertex_successful_connection_attempts_t>::type successfulConnectionAttemptsProperty_;
+
         //boost::property_map<Graph, boost::edge_weight_t>::type weightProperty_;
         //boost::property_map<Graph, edge_associated_slicespace_t>::type edgeAssociatedSliceSpaceProperty_;
 
@@ -151,6 +203,8 @@ namespace ompl
         bool maybeConstructSolution(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals,
                                     base::PathPtr &solution);
         ompl::base::PathPtr constructSolution(const Vertex &start, const Vertex &goal);
+
+
     };
         //double volume{0.0};
 

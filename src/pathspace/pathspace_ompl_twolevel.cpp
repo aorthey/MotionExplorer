@@ -21,7 +21,7 @@ std::vector<PathSpace*> PathSpaceOMPLTwoLevel::Decompose(){
   SingleRobotCSpace *kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
   CSpaceOMPL *cspace = factory.MakeGeometricCSpaceR2(robot, kcspace);
 
-  /// SO(2)
+  /// SE(2)
   PathSpaceInput* next = input->GetNextLayer()->GetNextLayer();
   robot_idx = next->robot_idx;
   robot = world->robots[robot_idx];

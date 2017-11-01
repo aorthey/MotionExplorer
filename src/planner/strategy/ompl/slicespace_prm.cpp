@@ -25,6 +25,7 @@ SliceSpacePRM::SliceSpacePRM(const base::SpaceInformationPtr &si0, const ob::Spa
   , si_level0(si0)
   , si_level1(si1)
 {
+  S_0->horizontal = true;
   specs_.recognizedGoal = base::GOAL_SAMPLEABLE_REGION;
   specs_.approximateSolutions = false;
   specs_.optimizingPaths = true;
@@ -61,7 +62,8 @@ ompl::base::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCon
 {
   base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
                                                        {
-                                                           return ptc || S_1->hasSolution();
+                                                           //return ptc || S_1->hasSolution();
+                                                           return ptc;
                                                        });
   auto cmp = [](SliceSpace* left, SliceSpace* right) 
               { 
@@ -69,45 +71,66 @@ ompl::base::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCon
               };
   std::priority_queue<SliceSpace*, std::vector<SliceSpace*>, decltype(cmp)> Q(cmp);
 
+  S_0->horizontal = true;
   Q.push(S_0);
-  double growth_time = 1e-3;
+  double slice_growth_time = 1e-3;
 
   while(!ptcOrSolutionFound){
     SliceSpace* S = Q.top();
-    S->Grow(growth_time);
-    base::PathPtr path = S->GetShortestPath();
+    S->Grow(slice_growth_time);
+    base::PathPtr path = S->GetSolutionPath();
+    std::cout << "grow: " << slice_growth_time << std::endl;
     if(path){
+      std::cout << "found sol" << std::endl;
+      if(S->horizontal){
+        //S_0
+        std::vector<SliceSpace::Vertex> vpath = S->VerticesAlongShortestPath();
+        for(uint k = 0; k < vpath.size()-1; k++){
+          //SliceSpace::EdgeProperty& e = S->GetEdgeAlongShortestPath(k);
+          //std::cout << "edge with cost " << e.getCost() << std::endl;
+          SliceSpace::Vertex v = vpath.at(k);
+          SliceSpace::Vertex w = vpath.at(k+1);
 
-      //std::pair<edge_descr_type, bool> result = add_edge (u, v, props, g);
+          std::pair<SliceSpace::Edge, bool> edge = boost::edge(v, w, S->graph);
+          SliceSpace::EdgeProperty e = get (boost::edge_weight_t(), S->graph, edge.first);
 
-      //check if S is a horizontal or vertical space
-      ///bool vertical = true;
-      ///if(vertical){
-      ///  //found solution in vertical space. this means we need to update the
-      ///  //weight in S_0
-      ///  //E = S->GetUnderlyingEdge()
-      ///  //S_0->SetEdgeWeight(E)
-      ///  //E->weight = d(s,t)
-      ///}else{
-      ///  //S_0!
-      ///  //create new slicespace for an edge without slicespace
-      ///  //iterator throuhg all edges
-      ///  E = path->GetNextEdge()
-      ///  if(E->S){
-      ///    if(E->S->hasSolution()){
-      ///      E->weight = d(E->s,E->t)
-      ///    }else{
-      ///      E->weight = +dInf;
-      ///    }
-      ///  }else{
-      ///    //create new spaceinformationptr, using edge
-      ///    E->S = new SliceSpace();
-      ///    Q.push(E->S);
-      ///    E->weight = +dInf;
-      ///  }
-      ///}
+          //Vertex v1 = source(edge.first,graph);
+          //Vertex v2 = target(edge.first,graph);
+          if(!e.slicespace){
+            std::cout << "new slicespace" << std::endl;
+            //create new slicespace
+            e.slicespace = CreateNewSliceSpaceEdge();
+            e.setWeight(+dInf);
+            boost::put(boost::edge_weight_t(), S->graph, edge.first, e);
+            break;
+          }else{
+            if(e.slicespace->hasSolution()){
+              //make sure that we update the edge
+              e.setOriginalWeight();
+              boost::put(boost::edge_weight_t(), S->graph, edge.first, e);
+              //edge is OK, go to next edge
+            }else{
+              e.setWeight(+dInf);
+              boost::put(boost::edge_weight_t(), S->graph, edge.first, e);
+              break;
+            }
+          }
+        }
+      }else{
+        //S_edge has solution: we need to update the associated edge in the S_0
+        //graph!
+
+        SliceSpace::Vertex& v = S->GetExternalAssociatedEdgeSource();
+        SliceSpace::Vertex& w = S->GetExternalAssociatedEdgeTarget();
+
+        std::pair<SliceSpace::Edge, bool> edge = boost::edge(v, w, S_0->graph);
+        SliceSpace::EdgeProperty e = get(boost::edge_weight_t(), S_0->graph, edge.first);
+        e.setOriginalWeight();
+        boost::put(boost::edge_weight_t(), S_0->graph, edge.first, e);
+      }
     }
   }
+  std::cout << "timeout!" << std::endl;
   base::PathPtr sol = S_0->GetSolutionPath();
 
   if (sol)
@@ -127,3 +150,14 @@ void SliceSpacePRM::getPlannerData(base::PlannerData &data) const
   S_0->getPlannerData(data);
 }
 
+#include "planner/cspace/cspace_factory.h"
+SliceSpace* SliceSpacePRM::CreateNewSliceSpaceEdge(){
+
+ // int robot_idx = input->robot_idx;
+ // Robot *robot = world->robots[robot_idx];
+ // SingleRobotCSpace *kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
+ // CSpaceOMPL *cspace = factory.MakeGeometricCSpaceR2(robot, kcspace);
+
+  //SliceSpace* S =  new SliceSpace(si_level1);
+  return NULL;
+}

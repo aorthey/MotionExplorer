@@ -351,6 +351,7 @@ Minor Things
 [ ] include kcspace into cspace factor, and add string type to specify cspace type from the outside
 [ ] refactor factory into one function, should encapsulate everything, no
 kcspace/cspaceompl stuff outside
+[ ] fix the chart boundary issue in visualizing the SE(2) roadmap
 
 
 SlicePlanner
@@ -358,5 +359,11 @@ SlicePlanner
 [x] remove threads
 [x] outsource everything to slicespace.h
 [x] sort priority queue based on sampling density
-[ ] fix the chart boundary issue in visualizing the SE(2) roadmap
+[x] add edge slicespace in boost::graph
 [ ] be able to compute shortest path on C0, and to adjust edge weights 
+[ ] be able to add slicespace to edge, and to plan inside this slicespace
+
+The slicespace is added to two different datastructures: priority queue (so we
+can redirect sampling), and to the S_0 graph edges, so that we have a
+correspondence between an edge in S_0 and an associated slicespace. We need that
+to adjust the weight. 

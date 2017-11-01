@@ -22,24 +22,25 @@ SliceSpace::SliceSpace(const ob::SpaceInformationPtr &si)
   , successfulConnectionAttemptsProperty_(boost::get(vertex_successful_connection_attempts_t(), graph))
   , disjointSets_(boost::get(boost::vertex_rank, graph), boost::get(boost::vertex_predecessor, graph))
 {
-    specs_.recognizedGoal = ob::GOAL_SAMPLEABLE_REGION;
-    specs_.approximateSolutions = false;
-    specs_.optimizingPaths = true;
+  horizontal = true;
+  specs_.recognizedGoal = ob::GOAL_SAMPLEABLE_REGION;
+  specs_.approximateSolutions = false;
+  specs_.optimizingPaths = true;
 
-    if (!isSetup())
-      setup();
-    if (!sampler_){
-      sampler_ = si_->allocValidStateSampler();
-    }
-    if (!simpleSampler_){
-      simpleSampler_ = si_->allocStateSampler();
-    }
+  if (!isSetup())
+    setup();
+  if (!sampler_){
+    sampler_ = si_->allocValidStateSampler();
+  }
+  if (!simpleSampler_){
+    simpleSampler_ = si_->allocStateSampler();
+  }
 
-    xstates.resize(magic::MAX_RANDOM_BOUNCE_STEPS);
-    si_->allocStates(xstates);
+  xstates.resize(magic::MAX_RANDOM_BOUNCE_STEPS);
+  si_->allocStates(xstates);
 
 
-    addedNewSolution_ = false;
+  addedNewSolution_ = false;
 }
 SliceSpace::~SliceSpace(){
   si->freeStates(xstates);
@@ -114,7 +115,6 @@ void SliceSpace::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
                 disjointSets_.make_set(m);
 
                 // add the edge to the parent vertex
-                //const ob::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[m]);
                 //const Graph::edge_property_type properties(weight);
                 EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[m]));
                 boost::add_edge(v, m, properties, graph);
@@ -130,7 +130,6 @@ void SliceSpace::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
             if (s > 0 || !sameComponent(v, last))
             {
               // add the edge to the parent vertex
-              //const ob::Cost weight = opt_->motionCost(stateProperty_[v], stateProperty_[last]);
               //const Graph::edge_property_type properties(weight);
               EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[last]));
               boost::add_edge(v, last, properties, graph);
@@ -214,13 +213,13 @@ ob::PathPtr SliceSpace::constructSolution(const Vertex &start, const Vertex &goa
                                 return costHeuristic(v, goal);
                             },
                             boost::predecessor_map(prev)
-                                .distance_compare([this](ob::Cost c1, ob::Cost c2)
+                                .distance_compare([this](EdgeProperty c1, EdgeProperty c2)
                                                   {
-                                                      return opt_->isCostBetterThan(c1, c2);
+                                                      return opt_->isCostBetterThan(c1.getCost(), c2.getCost());
                                                   })
-                                .distance_combine([this](ob::Cost c1, ob::Cost c2)
+                                .distance_combine([this](EdgeProperty c1, EdgeProperty c2)
                                                   {
-                                                      return opt_->combineCosts(c1, c2);
+                                                      return opt_->combineCosts(c1.getCost(), c2.getCost());
                                                   })
                                 .distance_inf(opt_->infiniteCost())
                                 .distance_zero(opt_->identityCost())
@@ -230,14 +229,21 @@ ob::PathPtr SliceSpace::constructSolution(const Vertex &start, const Vertex &goa
     {
     }
 
-    if (prev[goal] == goal)
-        throw Exception(name_, "Could not find solution path");
-
     auto p(std::make_shared<PathGeometric>(si_));
-    for (Vertex pos = goal; prev[pos] != pos; pos = prev[pos])
-        p->append(stateProperty_[pos]);
+    if (prev[goal] == goal){
+      throw Exception(name_, "Could not find solution path");
+    }
+
+    last_vertex_path.clear();
+    for (Vertex pos = goal; prev[pos] != pos; pos = prev[pos]){
+      last_vertex_path.push_back(pos);
+      p->append(stateProperty_[pos]);
+    }
+    last_vertex_path.push_back(start);
     p->append(stateProperty_[start]);
     p->reverse();
+
+    std::reverse(std::begin(last_vertex_path), std::end(last_vertex_path));
 
     return p;
 }
@@ -260,13 +266,14 @@ SliceSpace::Vertex SliceSpace::addMilestone(ob::State *state)
             {
                 successfulConnectionAttemptsProperty_[m]++;
                 successfulConnectionAttemptsProperty_[n]++;
-                //const ob::Cost weight = opt_->motionCost(stateProperty_[n], stateProperty_[m]);
-                //const Graph::edge_property_type properties(weight, NULL);
                 EdgeProperty properties(opt_->motionCost(stateProperty_[n], stateProperty_[m]));
-                std::pair<Edge, bool> edge = boost::add_edge(n, m, properties, graph);
+                boost::add_edge(n, m, properties, graph);
 
-                //const Graph::edge_property_type pp = get(
-                //SliceSpace *S = get(edge_associated_slicespace_t(), graph, edge.first);
+                //std::cout << p.value() << std::endl;
+                //if(!p.slicespace){
+                //  std::cout << "no slice space" << std::endl;
+                //}
+                //exit(0);
 
                 uniteComponents(n, m);
             }
