@@ -1,5 +1,6 @@
 #include "slicespace_prm.h"
 #include "GoalVisitor.hpp"
+#include "planner/validitychecker/validity_checker_ompl.h"
 
 #include <ompl/geometric/planners/prm/ConnectionStrategy.h>
 #include <ompl/base/goals/GoalSampleableRegion.h>
@@ -18,14 +19,17 @@
 
 using namespace og;
 
-SliceSpacePRM::SliceSpacePRM(const base::SpaceInformationPtr &si0, const ob::SpaceInformationPtr &si1)
+SliceSpacePRM::SliceSpacePRM(RobotWorld *world_, const base::SpaceInformationPtr &si0, const ob::SpaceInformationPtr &si1)
   : base::Planner(si0, "SliceSpacePRM")
   , S_0(new SliceSpace(si0))
   , S_1(new SliceSpace(si1))
+  , world(world_)
   , si_level0(si0)
   , si_level1(si1)
 {
   S_0->horizontal = true;
+  S_1->horizontal = true;
+
   specs_.recognizedGoal = base::GOAL_SAMPLEABLE_REGION;
   specs_.approximateSolutions = false;
   specs_.optimizingPaths = true;
@@ -67,7 +71,7 @@ ompl::base::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCon
                                                        });
   auto cmp = [](SliceSpace* left, SliceSpace* right) 
               { 
-                return left->GetSamplingDensity() < right->GetSamplingDensity();
+                return left->GetSamplingDensity() > right->GetSamplingDensity();
               };
   std::priority_queue<SliceSpace*, std::vector<SliceSpace*>, decltype(cmp)> Q(cmp);
 
@@ -77,9 +81,9 @@ ompl::base::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCon
 
   while(!ptcOrSolutionFound){
     SliceSpace* S = Q.top();
+    std::cout << "grow: ("<< S->id << ")" << slice_growth_time << std::endl;
     S->Grow(slice_growth_time);
     base::PathPtr path = S->GetSolutionPath();
-    std::cout << "grow: " << slice_growth_time << std::endl;
     if(path){
       std::cout << "found sol" << std::endl;
       if(S->horizontal){
@@ -94,14 +98,13 @@ ompl::base::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCon
           std::pair<SliceSpace::Edge, bool> edge = boost::edge(v, w, S->graph);
           SliceSpace::EdgeProperty e = get (boost::edge_weight_t(), S->graph, edge.first);
 
-          //Vertex v1 = source(edge.first,graph);
-          //Vertex v2 = target(edge.first,graph);
           if(!e.slicespace){
             std::cout << "new slicespace" << std::endl;
             //create new slicespace
-            e.slicespace = CreateNewSliceSpaceEdge();
+            e.slicespace = CreateNewSliceSpaceEdge(v,w,0);
             e.setWeight(+dInf);
             boost::put(boost::edge_weight_t(), S->graph, edge.first, e);
+            Q.push(e.slicespace);
             break;
           }else{
             if(e.slicespace->hasSolution()){
@@ -150,14 +153,52 @@ void SliceSpacePRM::getPlannerData(base::PlannerData &data) const
   S_0->getPlannerData(data);
 }
 
-#include "planner/cspace/cspace_factory.h"
-SliceSpace* SliceSpacePRM::CreateNewSliceSpaceEdge(){
+SliceSpace* SliceSpacePRM::CreateNewSliceSpaceEdge(SliceSpace::Vertex v, SliceSpace::Vertex w, double yaw){
 
- // int robot_idx = input->robot_idx;
- // Robot *robot = world->robots[robot_idx];
- // SingleRobotCSpace *kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
- // CSpaceOMPL *cspace = factory.MakeGeometricCSpaceR2(robot, kcspace);
+  WorldPlannerSettings worldsettings;
+  worldsettings.InitializeDefault(*world);
 
-  //SliceSpace* S =  new SliceSpace(si_level1);
-  return NULL;
+  CSpaceInput cin;
+  cin.timestep_max = 0.1;
+  cin.timestep_min = 0.01;
+  CSpaceFactory factory(cin);
+
+  int robot_idx = 0;
+  Robot *robot = world->robots[robot_idx];
+  SingleRobotCSpace *kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
+
+  ob::SpaceInformationPtr si = S_0->getSpaceInformation();
+  const ob::StateValidityCheckerPtr checker = si->getStateValidityChecker();
+  OMPLValidityCheckerPtr ochecker = static_pointer_cast<OMPLValidityChecker>(checker);
+  CSpaceOMPL *cspace = ochecker->ompl_space;
+  ob::State* sv = S_0->stateProperty_[v];
+  Config q1 = cspace->OMPLStateToConfig(sv);
+  ob::State* sw = S_0->stateProperty_[w];
+  Config q2 = cspace->OMPLStateToConfig(sw);
+
+  CSpaceOMPL *edge_cspace = factory.MakeGeometricCSpaceR2EdgeSO2(robot, kcspace, q1, q2);
+  ob::SpaceInformationPtr si_edge = std::make_shared<ob::SpaceInformation>(edge_cspace->SpacePtr());
+
+  Config qi; qi.resize(robot->q.size()); qi.setZero();
+  qi(0) = q1(0);
+  qi(1) = q1(1);
+  qi(3) = yaw;
+
+  ///GET position from q1
+
+  SliceSpace* S = new SliceSpace(si_edge);
+
+  ob::ProblemDefinitionPtr pdef = std::make_shared<ob::ProblemDefinition>(si_edge);
+  pdef->addStartState(edge_cspace->ConfigToOMPLState(qi));
+  ob::GoalPtr goal = std::make_shared<GoalRegionEdge>(si_edge);
+  pdef->setGoal(goal);
+  S->setProblemDefinition(pdef);
+
+  ob::State* s = pdef->getStartState(0);
+  std::cout << s << std::endl;
+  exit(0);
+
+  S->setup();
+
+  return S;
 }

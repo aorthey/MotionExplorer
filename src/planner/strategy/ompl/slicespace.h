@@ -25,18 +25,6 @@ namespace ompl
         static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
     }
 }
-class GoalRegionEdge: public ob::GoalRegion{
-  public:
-  GoalRegionEdge(const ob::SpaceInformationPtr &si):
-    GoalRegion(si) {}
-
-  virtual double distanceGoal(const ob::State *qompl) const override{
-    const ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-    //const ob::SO3StateSpace::StateType *qomplSO3 = qompl->as<ob::CompoundState>()->as<ob::SO3StateSpace::StateType>(1);
-    double d = fabs(1.0 - qomplRnSpace->values[0]);
-    return d;
-  }
-};
 namespace ompl
 {
   namespace base
@@ -112,6 +100,8 @@ namespace ompl
         base::PathPtr GetSolutionPath();
         bool hasSolution();
 
+        static int id_counter;
+        int id;
 
         void Grow(double t = magic::ROADMAP_BUILD_TIME*3);
 
@@ -157,6 +147,10 @@ namespace ompl
         }
 
         Graph graph;
+        boost::property_map<Graph, vertex_state_t>::type stateProperty_;
+        boost::property_map<Graph, vertex_total_connection_attempts_t>::type totalConnectionAttemptsProperty_;
+        boost::property_map<Graph, vertex_successful_connection_attempts_t>::type successfulConnectionAttemptsProperty_;
+
     protected:
         Vertex external_src;
         Vertex external_trg;
@@ -171,10 +165,6 @@ namespace ompl
         base::ValidStateSamplerPtr sampler_;
         base::StateSamplerPtr simpleSampler_;
         RoadmapNeighbors nn_;
-
-        boost::property_map<Graph, vertex_state_t>::type stateProperty_;
-        boost::property_map<Graph, vertex_total_connection_attempts_t>::type totalConnectionAttemptsProperty_;
-        boost::property_map<Graph, vertex_successful_connection_attempts_t>::type successfulConnectionAttemptsProperty_;
 
         //boost::property_map<Graph, boost::edge_weight_t>::type weightProperty_;
         //boost::property_map<Graph, edge_associated_slicespace_t>::type edgeAssociatedSliceSpaceProperty_;
@@ -210,3 +200,4 @@ namespace ompl
 
   };
 };
+

@@ -75,9 +75,6 @@ GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
   CSpaceOMPL(robot_, kspace_)
 {
   Nklampt =  robot->q.size() - 6;
-  // std::cout << Nklampt << std::endl;
-  // std::cout << robot->name << std::endl;
-  // std::cout << robot->q.size() << std::endl;
 
   //check if the robot is SE(3) or if we need to add real vector space for joints
   if(Nklampt<=0){
@@ -109,11 +106,6 @@ GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
       }
     }
   }
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Robot \"" << robot->name << "\":" << std::endl;
-  std::cout << "------ Configuration Space (original) : SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(Nklampt):"") << "  [Klampt]"<< std::endl;
-  std::cout << "------ Configuration Space (effective): SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(Nompl):"") << "  [OMPL]" << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
 }
 
 
@@ -236,7 +228,10 @@ void GeometricCSpaceOMPL::print()
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "OMPL CSPACE" << std::endl;
   std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Dimensionality Space      :" << GetDimensionality() << std::endl;
+  std::cout << "Robot \"" << robot->name << "\":" << std::endl;
+  std::cout << "Dimensionality Space            :" << GetDimensionality() << std::endl;
+  std::cout << " Configuration Space (original) : SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(Nklampt):"") << "  [Klampt]"<< std::endl;
+  std::cout << " Configuration Space (effective): SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(Nompl):"") << "  [OMPL]" << std::endl;
 
   ob::SE3StateSpace *cspaceSE3;
   ob::RealVectorStateSpace *cspaceRn;

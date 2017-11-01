@@ -32,6 +32,7 @@ std::vector<PathSpace*> PathSpaceOMPLTwoLevel::Decompose(){
   StrategyOutput output(cspace);
   StrategyInput strategy_input = input->GetStrategyInput();
   strategy_input.cspace = cspace;
+  strategy_input.world = world;
   strategy_input.cspace_level1 = cspace_level1;
 
   strategy.plan(strategy_input, output);

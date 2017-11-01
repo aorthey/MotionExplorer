@@ -1,6 +1,7 @@
 #pragma once
 
 #include "slicespace.h"
+#include "planner/cspace/cspace_factory.h"
 
 #include <ompl/geometric/planners/PlannerIncludes.h>
 #include <ompl/datastructures/NearestNeighbors.h>
@@ -15,36 +16,47 @@ namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
 
+class GoalRegionEdge: public ob::GoalRegion{
+  public:
+    GoalRegionEdge(const ob::SpaceInformationPtr &si): GoalRegion(si) {}
+
+    virtual double distanceGoal(const ob::State *qompl) const override{
+      const ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+      //const ob::SO3StateSpace::StateType *qomplSO3 = qompl->as<ob::CompoundState>()->as<ob::SO3StateSpace::StateType>(1);
+      double d = fabs(1.0 - qomplRnSpace->values[0]);
+      return d;
+    }
+};
+
 namespace ompl
 {
-    namespace base
+  namespace base
+  {
+    OMPL_CLASS_FORWARD(OptimizationObjective);
+  }
+  namespace geometric
+  {
+    class SliceSpacePRM : public base::Planner
     {
-        OMPL_CLASS_FORWARD(OptimizationObjective);
-    }
+      public:
+        SliceSpacePRM(RobotWorld* world_, const base::SpaceInformationPtr &si0, const ob::SpaceInformationPtr &si1);
+        ~SliceSpacePRM() override;
+        void setProblemDefinition(const base::ProblemDefinitionPtr &pdef) override;
+        void getPlannerData(base::PlannerData &data) const override;
+        base::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
 
-    namespace geometric
-    {
+        SliceSpace* CreateNewSliceSpaceEdge(SliceSpace::Vertex v, SliceSpace::Vertex w, double yaw);
+        void clear() override;
+        void setup() override;
 
-        class SliceSpacePRM : public base::Planner
-        {
-        public:
-            SliceSpacePRM(const base::SpaceInformationPtr &si0, const ob::SpaceInformationPtr &si1);
-            ~SliceSpacePRM() override;
-            void setProblemDefinition(const base::ProblemDefinitionPtr &pdef) override;
-            void getPlannerData(base::PlannerData &data) const override;
-            base::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
+      protected:
+        SliceSpace *S_0;
+        SliceSpace *S_1;
+        RobotWorld *world;
 
-            SliceSpace* CreateNewSliceSpaceEdge();
-            void clear() override;
-            void setup() override;
-
-        protected:
-            SliceSpace *S_0;
-            SliceSpace *S_1;
-
-            ob::SpaceInformationPtr si_level0;
-            ob::SpaceInformationPtr si_level1;
-        };
-    }
+        ob::SpaceInformationPtr si_level0;
+        ob::SpaceInformationPtr si_level1;
+    };
+  }
 }
 

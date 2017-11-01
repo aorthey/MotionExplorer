@@ -360,8 +360,9 @@ SlicePlanner
 [x] outsource everything to slicespace.h
 [x] sort priority queue based on sampling density
 [x] add edge slicespace in boost::graph
-[ ] be able to compute shortest path on C0, and to adjust edge weights 
+[x] be able to compute shortest path on C0, and to adjust edge weights 
 [ ] be able to add slicespace to edge, and to plan inside this slicespace
+[ ] create slicespace based on S_0,S_1 and some vertices
 
 The slicespace is added to two different datastructures: priority queue (so we
 can redirect sampling), and to the S_0 graph edges, so that we have a
