@@ -2,5 +2,7 @@
 #include <KrisLibrary/math/infnan.h> //dInf, fInf, IsNaN(x)
 using Math::dInf;
 using Math::fInf;
+const static double iInf = std::numeric_limits<int>::infinity();
+
 
 

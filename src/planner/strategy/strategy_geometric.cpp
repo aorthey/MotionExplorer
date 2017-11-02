@@ -61,7 +61,7 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
 
-  og::SimpleSetup ss(cspace->SpacePtr());
+  og::SimpleSetup ss(cspace->SpaceInformationPtr());
   const ob::SpaceInformationPtr si = ss.getSpaceInformation();
 
   ss.setStateValidityChecker(cspace->StateValidityCheckerPtr(si));
@@ -105,7 +105,7 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   //experimental planners
   //else if(algorithm=="ompl:necessaryrrt") ompl_planner = std::make_shared<og::NecessaryRRT>(si, std::make_shared<ob::SpaceInformation>(input.cspace_level1->SpacePtr()));
   //else if(algorithm=="ompl:necessaryprm") ompl_planner = std::make_shared<og::NecessaryPRM>(si, std::make_shared<ob::SpaceInformation>(input.cspace_level1->SpacePtr()));
-  else if(algorithm=="ompl:slicespaceprm") ompl_planner = std::make_shared<og::SliceSpacePRM>(input.world, si, std::make_shared<ob::SpaceInformation>(input.cspace_level1->SpacePtr()));
+  else if(algorithm=="ompl:slicespaceprm") ompl_planner = std::make_shared<og::SliceSpacePRM>(input.world, si, input.cspace_level1->SpaceInformationPtr());
 
   else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;

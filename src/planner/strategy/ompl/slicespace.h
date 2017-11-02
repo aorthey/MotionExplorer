@@ -3,7 +3,6 @@
 #include <ompl/geometric/planners/PlannerIncludes.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <ompl/base/Cost.h>
-#include <ompl/base/goals/GoalRegion.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
@@ -14,7 +13,6 @@ using Math::dInf;
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
-//abstract away a boost graph plus some convenience functions of PRM
 
 namespace ompl
 {
@@ -112,7 +110,7 @@ namespace ompl
 
         void setProblemDefinition(const base::ProblemDefinitionPtr &pdef) override;
         void setConnectionFilter(const ConnectionFilter &connectionFilter);
-        base::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
+        ob::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
 
         void clearQuery();
         void clear() override;
@@ -139,11 +137,17 @@ namespace ompl
         uint EdgesAlongShortestPath(){
           return last_vertex_path.size();
         }
-        Vertex& GetExternalAssociatedEdgeSource(){
+        const Vertex& GetExternalAssociatedEdgeSource(){
           return external_src;
         }
-        Vertex& GetExternalAssociatedEdgeTarget(){
+        const Vertex& GetExternalAssociatedEdgeTarget(){
           return external_trg;
+        }
+        void SetExternalAssociatedEdgeSource(const Vertex &src){
+          external_src = src;
+        }
+        void SetExternalAssociatedEdgeTarget(const Vertex &trg){
+          external_trg = trg;
         }
 
         Graph graph;
@@ -151,23 +155,25 @@ namespace ompl
         boost::property_map<Graph, vertex_total_connection_attempts_t>::type totalConnectionAttemptsProperty_;
         boost::property_map<Graph, vertex_successful_connection_attempts_t>::type successfulConnectionAttemptsProperty_;
 
+        SliceSpace *S_previous_level;
+        SliceSpace *S_next_level;
+        base::OptimizationObjectivePtr opt_;
     protected:
+
         Vertex external_src;
         Vertex external_trg;
+
+        int goalStatesSampled;
 
         std::vector<Vertex> last_vertex_path;
 
         base::Cost costHeuristic(Vertex u, Vertex v) const;
         double distanceFunction(const Vertex a, const Vertex b) const;
-        ob::SpaceInformationPtr si;
         std::vector<ob::State *> xstates;
 
         base::ValidStateSamplerPtr sampler_;
         base::StateSamplerPtr simpleSampler_;
         RoadmapNeighbors nn_;
-
-        //boost::property_map<Graph, boost::edge_weight_t>::type weightProperty_;
-        //boost::property_map<Graph, edge_associated_slicespace_t>::type edgeAssociatedSliceSpaceProperty_;
 
         boost::disjoint_sets<boost::property_map<Graph, boost::vertex_rank_t>::type,
                              boost::property_map<Graph, boost::vertex_predecessor_t>::type> disjointSets_;
@@ -176,11 +182,11 @@ namespace ompl
 
         RNG rng_;
         bool addedNewSolution_{false};
-        base::OptimizationObjectivePtr opt_;
         unsigned long int iterations_{0};
         base::Cost bestCost_{std::numeric_limits<double>::quiet_NaN()};
         std::vector<Vertex> startM_;
         std::vector<Vertex> goalM_;
+
 
         Vertex addMilestone(base::State *state);
 
@@ -196,7 +202,6 @@ namespace ompl
 
 
     };
-        //double volume{0.0};
 
   };
 };

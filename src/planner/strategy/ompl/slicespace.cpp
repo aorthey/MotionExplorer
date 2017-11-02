@@ -22,7 +22,9 @@ SliceSpace::SliceSpace(const ob::SpaceInformationPtr &si)
   , successfulConnectionAttemptsProperty_(boost::get(vertex_successful_connection_attempts_t(), graph))
   , disjointSets_(boost::get(boost::vertex_rank, graph), boost::get(boost::vertex_predecessor, graph))
 {
+  goalStatesSampled = 0;
   id = id_counter;
+  std::cout << "Hello this is SliceSpace #" << id << "!" << std::endl;
   id_counter++;
 
   horizontal = true;
@@ -46,7 +48,7 @@ SliceSpace::SliceSpace(const ob::SpaceInformationPtr &si)
   addedNewSolution_ = false;
 }
 SliceSpace::~SliceSpace(){
-  si->freeStates(xstates);
+  si_->freeStates(xstates);
 }
 void SliceSpace::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
 {
@@ -59,10 +61,32 @@ ob::PlannerStatus SliceSpace::solve(const ob::PlannerTerminationCondition &ptc){
 }
 
 void SliceSpace::Grow(double t){
-  double twothird = (2.0/3.0)*t;
-  double onethird = (1.0/3.0)*t;
-  growRoadmap(ob::timedPlannerTerminationCondition(twothird), xstates[0]);
-  expandRoadmap( ob::timedPlannerTerminationCondition(onethird), xstates);
+  if(!goalM_.empty()){
+    double twothird = (2.0/3.0)*t;
+    double onethird = (1.0/3.0)*t;
+    growRoadmap(ob::timedPlannerTerminationCondition(twothird), xstates[0]);
+    expandRoadmap( ob::timedPlannerTerminationCondition(onethird), xstates);
+  }else{
+    //sample around goal state to find path
+    const ob::PlannerTerminationCondition ptc = ob::timedPlannerTerminationCondition(t);
+
+    ob::State *st = si_->allocState();
+    while(!ptc){
+      //const ob::State *st = pis_.nextGoal();
+
+      simpleSampler_->sampleUniform(st);
+      goalStatesSampled++;
+
+      ob::RealVectorStateSpace::StateType *qomplRnSpace = st->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+      qomplRnSpace->values[0] = 1.0;
+
+      if(si_->isValid(st)){
+        goalM_.push_back(addMilestone(si_->cloneState(st)));
+        break;
+      }
+    }
+    si_->freeState(st);
+  }
 }
 
 void SliceSpace::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState)
@@ -154,14 +178,14 @@ bool SliceSpace::sameComponent(Vertex m1, Vertex m2)
 void SliceSpace::checkForSolution(ob::PathPtr &solution)
 {
     auto *goal = static_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
-    //ob::Goal* goal = pdef_->getGoal().get();
     if (!addedNewSolution_)
     {
         if (goal->maxSampleCount() > goalM_.size())
         {
             const ob::State *st = pis_.nextGoal();
-            if (st != nullptr)
-                goalM_.push_back(addMilestone(si_->cloneState(st)));
+            if (st != nullptr){
+              goalM_.push_back(addMilestone(si_->cloneState(st)));
+            }
         }
         addedNewSolution_ = maybeConstructSolution(startM_, goalM_, solution);
     }
@@ -300,6 +324,8 @@ void SliceSpace::getPlannerData(ob::PlannerData &data) const
         data.addGoalVertex(
             ob::PlannerDataVertex(stateProperty_[i], const_cast<SliceSpace *>(this)->disjointSets_.find_set(i)));
 
+    std::cout << "Getting Planner Data From SliceSpace #" << id << std::endl;
+    std::cout << "  edges : " << boost::num_edges(graph) << std::endl;
     foreach (const Edge e, boost::edges(graph))
     {
         const Vertex v1 = boost::source(e, graph);
@@ -311,69 +337,62 @@ void SliceSpace::getPlannerData(ob::PlannerData &data) const
     }
 }
 void SliceSpace::setup(){
-    if (!nn_){
-      nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
-      nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
-                               {
-                                   return distanceFunction(a, b);
-                               });
-    }
-    if (!connectionStrategy_){
-      connectionStrategy_ = KStrategy<Vertex>(magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
-    }
+  if (!nn_){
+    nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
+    nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
+                             {
+                                 return distanceFunction(a, b);
+                             });
+  }
+  if (!connectionStrategy_){
+    connectionStrategy_ = KStrategy<Vertex>(magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
+  }
 
-    if (!connectionFilter_){
-        connectionFilter_ = [](const Vertex &, const Vertex &)
-        {
-            return true;
-        };
-    }
+  if (!connectionFilter_){
+    connectionFilter_ = [](const Vertex &, const Vertex &)
+    {
+      return true;
+    };
+  }
 
-    if (pdef_){
-      if (pdef_->hasOptimizationObjective()){
-        opt_ = pdef_->getOptimizationObjective();
-      }else{
-        opt_ = std::make_shared<ob::PathLengthOptimizationObjective>(si_);
-      }
-      //checkValidity();
-      //auto *goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
-
-      //if (goal == nullptr){
-      //  OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
-      //  //return ob::PlannerStatus::UNRECOGNIZED_GOAL_TYPE;
-      //  exit(0);
-      //}
-      while (const ob::State *st = pis_.nextStart()){
-        startM_.push_back(addMilestone(si_->cloneState(st)));
-      }
-      if (startM_.empty()){
-        OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
-        exit(0);
-      }
-      //if (!goal->couldSample()){
-      //  OMPL_ERROR("%s: Insufficient states in sampleable goal region", getName().c_str());
-      //  //return ob::PlannerStatus::INVALID_GOAL;
-      //  exit(0);
-      //}
-
-      //if (goal->maxSampleCount() > goalM_.size() || goalM_.empty()){
-      //  const ob::State *st = pis_.nextGoal();
-      //  if (st != nullptr){
-      //    goalM_.push_back(addMilestone(si_->cloneState(st)));
-      //  }
-
-      //  if (goalM_.empty()){
-      //    OMPL_ERROR("%s: Unable to find any valid goal states", getName().c_str());
-      //    //return ob::PlannerStatus::INVALID_GOAL;
-      //    exit(0);
-      //  }
-      //}
-      unsigned long int nrStartStates = boost::num_vertices(graph);
-      OMPL_INFORM("%s: Slice Space ready with %lu states already in datastructure", getName().c_str(), nrStartStates);
+  if (pdef_){
+    Planner::setup();
+    if (pdef_->hasOptimizationObjective()){
+      opt_ = pdef_->getOptimizationObjective();
     }else{
-      OMPL_INFORM("%s: problem definition is not set, deferring setup completion...", getName().c_str());
-      setup_ = false;
+      opt_ = std::make_shared<ob::PathLengthOptimizationObjective>(si_);
     }
+    auto *goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
+
+    if (goal == nullptr){
+      OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
+      exit(0);
+    }
+
+    while (const ob::State *st = pis_.nextStart()){
+      startM_.push_back(addMilestone(si_->cloneState(st)));
+    }
+    if (startM_.empty()){
+      OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
+      exit(0);
+    }
+    if (!goal->couldSample()){
+      OMPL_ERROR("%s: Insufficient states in sampleable goal region", getName().c_str());
+      exit(0);
+    }
+
+    if (goal->maxSampleCount() > goalM_.size() || goalM_.empty()){
+      const ob::State *st = pis_.nextGoal();
+      if (st != nullptr){
+        goalM_.push_back(addMilestone(si_->cloneState(st)));
+      }
+    }
+    unsigned long int nrStartStates = boost::num_vertices(graph);
+    OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nrStartStates);
+  }else{
+    OMPL_INFORM("%s: problem definition is not set, deferring setup completion...", getName().c_str());
+    setup_ = false;
+  }
 
 }
 void SliceSpace::clear()
@@ -390,6 +409,7 @@ void SliceSpace::clear()
     iterations_ = 0;
     bestCost_ = ob::Cost(std::numeric_limits<double>::quiet_NaN());
 }
+
 ob::Cost SliceSpace::costHeuristic(Vertex u, Vertex v) const
 {
   return opt_->motionCostHeuristic(stateProperty_[u], stateProperty_[v]);
@@ -408,7 +428,19 @@ void SliceSpace::clearQuery()
 }
 
 double SliceSpace::GetSamplingDensity(){
-  return (double)num_vertices(graph)/si_->getSpaceMeasure();
+  if(!goalM_.empty()){
+    return (double)num_vertices(graph)/si_->getSpaceMeasure();
+  }else{
+    //return number of vertices sampled in goal region divided by goal region
+    //measure
+
+    //@TODO { replace space measure by goal space measure! }
+    return (double)goalStatesSampled/si_->getSpaceMeasure();
+    //const ob::State *st = pis_.nextGoal();
+    //if (st != nullptr){
+    //  goalM_.push_back(addMilestone(si_->cloneState(st)));
+    //}
+  }
 }
 
 ob::PathPtr SliceSpace::GetShortestPath(){

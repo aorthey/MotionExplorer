@@ -31,7 +31,6 @@ std::vector<PathSpace*> PathSpaceOMPLSE2::Decompose(){
   strategy.plan(strategy_input, output);
 
   std::vector<PathSpace*> decomposedspace;
-
   decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
   RoadmapPtr roadmap1 = output.GetRoadmapPtr();
   RoadmapDecoratorSE2Ptr roadmap( new RoadmapDecoratorSE2(roadmap1) );

@@ -34,7 +34,7 @@ void GeometricCSpaceOMPLR2EdgeSO2::print()
   std::cout << "[CSpace]" << std::endl;
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "Name                      : OMPL CSPACE R^2 Edge SO(2)" << std::endl;
-  std::cout << "Dimensionality Space      :" << GetDimensionality() << std::endl;
+  std::cout << "Dimensionality Space      : " << GetDimensionality() << std::endl;
 }
 
 ob::ScopedState<> GeometricCSpaceOMPLR2EdgeSO2::ConfigToOMPLState(const Config &q){

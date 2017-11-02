@@ -59,6 +59,14 @@ class CSpaceOMPL
     virtual const ob::StateSpacePtr SpacePtr(){
       return space;
     }
+    virtual ob::SpaceInformationPtr SpaceInformationPtr(){
+      if(!si){
+        si = std::make_shared<ob::SpaceInformation>(SpacePtr());
+        const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr(si);
+        si->setStateValidityChecker(checker);
+      }
+      return si;
+    }
     virtual const oc::RealVectorControlSpacePtr ControlSpacePtr(){
       return control_space;
     }
@@ -97,7 +105,10 @@ class CSpaceOMPL
     std::vector<int> ompl_to_klampt;
     std::vector<int> klampt_to_ompl;
 
+    ob::SpaceInformationPtr si;
+
     ob::StateSpacePtr space;
+
     oc::RealVectorControlSpacePtr control_space;
 
     Robot *robot;
@@ -111,17 +122,18 @@ class GeometricCSpaceOMPL: public CSpaceOMPL
   public:
     GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_);
 
-    virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si);
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si);
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
+    virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) override;
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si) override;
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) override;
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
 
-    virtual void initSpace();
-    virtual void initControlSpace();
-    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
+    virtual void initSpace() override;
+    virtual void initControlSpace() override;
+    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q) override;
 
-    virtual Config OMPLStateToConfig(const ob::State *qompl);
-    virtual Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState);
-    virtual void print();
+    virtual Config OMPLStateToConfig(const ob::State *qompl) override;
+    Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState);
+    virtual void print() override;
 
   protected:
     bool hasRealVectorSpace;
