@@ -16,6 +16,8 @@ struct StrategyInput{
   double max_planning_time;
   double epsilon_goalregion;
   CSpaceOMPL *cspace;
+
+  CSpaceOMPL *cspace_level0;
   CSpaceOMPL *cspace_level1;
   RobotWorld *world;
 

@@ -27,12 +27,11 @@
 
     <!-- default settings for all algorithms (overwriteable) -->
     <timestep min="0.01" max="0.1"/>
-    <epsilongoalregion>0.001</epsilongoalregion>
-    <maxplanningtime>0.5</maxplanningtime>
+    <epsilongoalregion>0.01</epsilongoalregion>
+    <maxplanningtime>0.05</maxplanningtime>
 
     <!-- individual algorithms plus individual settings -->
     <algorithm name="hierarchical:twolevel:ompl:slicespaceprm">
-      <maxplanningtime>0.2</maxplanningtime>
       <hierarchy>
         <level inner_index="3" outer_index="4" type="rotationalinvariance"/>
         <level inner_index="0" outer_index="0" type="atomic"/>

@@ -7,12 +7,6 @@
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/PathGeometric.h>
 
-static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)
-{
-  ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
-  obj->setCostThreshold(ob::Cost(dInf));
-  return obj;
-}
 StrategyGeometricMultiLevel::StrategyGeometricMultiLevel()
 {
 }

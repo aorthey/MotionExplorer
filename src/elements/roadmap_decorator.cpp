@@ -49,7 +49,9 @@ void RoadmapDecoratorSE2::DrawGL(GUIState& state){
         if(q2(3) < 0) q2(3) += 2*M_PI;
 
         double d = fabs(q1(3)-q2(3));
-        if(d>M_PI){
+        //if(d>M_PI){
+        ///@TODO {fix this}
+        if(d<-100){
           //needs to loop back onto itself
           if(q1(3)>q2(3)){
             Vector3 v1(q1(0),q1(1),q1(3));

@@ -363,9 +363,7 @@ SlicePlanner
 [x] be able to compute shortest path on C0, and to adjust edge weights 
 [x] be able to add slicespace to edge, and to plan inside this slicespace
 [x] create slicespace based on S_0,S_1 and some vertices
-[ ] update S_1 based on milestones in S_edge
+[x] update S_1 based on milestones in S_edge
+[ ] compute shortest path on S_1. this means adding start/goal vertices
+[ ] edge goal is never reached. Why?
 
-The slicespace is added to two different datastructures: priority queue (so we
-can redirect sampling), and to the S_0 graph edges, so that we have a
-correspondence between an edge in S_0 and an associated slicespace. We need that
-to adjust the weight. 

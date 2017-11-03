@@ -11,7 +11,6 @@ GeometricCSpaceOMPLR2EdgeSO2::GeometricCSpaceOMPLR2EdgeSO2(Robot *robot_, CSpace
   double y1 = q1(1);
   double x2 = q2(0);
   double y2 = q2(1);
-
   edge_length = sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
 }
 
@@ -48,6 +47,15 @@ ob::ScopedState<> GeometricCSpaceOMPLR2EdgeSO2::ConfigToOMPLState(const Config &
   double length = sqrt((x*x)+(y*y));
 
   double t = length / edge_length;
+  if(t<0 || t>1 || IsNaN(t)){
+    std::cout << "state" << q << " does not exists on edge" << std::endl;
+    std::cout << "q1=" << q1 << std::endl;
+    std::cout << "q2=" << q2 << std::endl;
+    std::cout << "t=" << t << std::endl;
+    std::cout << "length=" << length <<  std::endl;
+    std::cout << "edge_length=" << edge_length <<  std::endl;
+    exit(0);
+  }
 
   qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0)->values[0] = t;
   return qompl;

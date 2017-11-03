@@ -25,28 +25,10 @@ class GoalStateFinalEdge: public ob::GoalState{
     double distanceGoal(const ob::State *qompl) const override{
       const ob::RealVectorStateSpace::StateType *qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
       double d = fabs(1.0 - qomplRnSpace->values[0]);
+      std::cout << "distance goal: " << d << std::endl;
+      exit(0);
       return d;
     }
-    //void sampleGoal(State *st) const override{
-    //  ob::ScopedState<> s(si_);
-
-    //  if((this, s.get()))
-    //  {
-    //    const ob::RealVectorStateSpace::StateType *qomplRnSpace = s->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-    //    qomplRnSpace->values[0] = 1;
-    //    if (si_->satisfiesBounds(s.get()) && si_->isValid(s.get()))
-    //    {
-    //      //s -> state_ -> st
-    //      si_->copyState(state_,s.get());
-    //      si_->copyState(st, state_);
-    //    }
-    //  }
-    //}
-
-    //unsigned int maxSampleCount() const override{
-    //  iInf;
-    //}
-
 };
 
 namespace ompl
@@ -63,6 +45,8 @@ namespace ompl
         SliceSpacePRM(RobotWorld* world_, const base::SpaceInformationPtr &si0, const ob::SpaceInformationPtr &si1);
         ~SliceSpacePRM() override;
         void setProblemDefinition(const base::ProblemDefinitionPtr &pdef) override;
+        void setProblemDefinitionLevel0(const base::ProblemDefinitionPtr &pdef);
+        void setProblemDefinitionLevel1(const base::ProblemDefinitionPtr &pdef);
         void getPlannerData(base::PlannerData &data) const override;
         base::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
 

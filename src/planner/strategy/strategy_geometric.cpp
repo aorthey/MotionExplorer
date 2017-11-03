@@ -102,11 +102,6 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   else if(algorithm=="ompl:fmt") ompl_planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") ompl_planner = std::make_shared<og::BFMT>(si);
 
-  //experimental planners
-  //else if(algorithm=="ompl:necessaryrrt") ompl_planner = std::make_shared<og::NecessaryRRT>(si, std::make_shared<ob::SpaceInformation>(input.cspace_level1->SpacePtr()));
-  //else if(algorithm=="ompl:necessaryprm") ompl_planner = std::make_shared<og::NecessaryPRM>(si, std::make_shared<ob::SpaceInformation>(input.cspace_level1->SpacePtr()));
-  else if(algorithm=="ompl:slicespaceprm") ompl_planner = std::make_shared<og::SliceSpacePRM>(input.world, si, input.cspace_level1->SpaceInformationPtr());
-
   else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);
@@ -138,14 +133,10 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   double max_planning_time= input.max_planning_time;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
-  //###########################################################################
-  // solve
-  //###########################################################################
-
   ob::PlannerStatus status = ss.solve(ptc);
 
   //###########################################################################
-  //###########################################################################
+
   ob::PlannerDataPtr pd( new ob::PlannerData(si) );
   ss.getPlannerData(*pd);
 

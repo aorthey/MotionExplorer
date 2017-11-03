@@ -15,6 +15,8 @@
 #define foreach BOOST_FOREACH
 using namespace og;
 
+#define DEBUG true
+
 SliceSpace::SliceSpace(const ob::SpaceInformationPtr &si)
   : ob::Planner(si, "SliceSpace")
   , stateProperty_(boost::get(vertex_state_t(), graph))
@@ -43,9 +45,6 @@ SliceSpace::SliceSpace(const ob::SpaceInformationPtr &si)
 
   xstates.resize(magic::MAX_RANDOM_BOUNCE_STEPS);
   si_->allocStates(xstates);
-
-
-  addedNewSolution_ = false;
 }
 SliceSpace::~SliceSpace(){
   si_->freeStates(xstates);
@@ -70,22 +69,27 @@ void SliceSpace::Grow(double t){
     //sample around goal state to find path
     const ob::PlannerTerminationCondition ptc = ob::timedPlannerTerminationCondition(t);
 
-    ob::State *st = si_->allocState();
+    //ob::State *st = si_->allocState();
+    ob::ScopedState<> st(si_);
     while(!ptc){
       //const ob::State *st = pis_.nextGoal();
 
-      simpleSampler_->sampleUniform(st);
+      simpleSampler_->sampleUniform(st.get());
       goalStatesSampled++;
 
       ob::RealVectorStateSpace::StateType *qomplRnSpace = st->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
       qomplRnSpace->values[0] = 1.0;
 
-      if(si_->isValid(st)){
-        goalM_.push_back(addMilestone(si_->cloneState(st)));
+      if(si_->isValid(st.get())){
+        goalM_.push_back(addMilestone(si_->cloneState(st.get())));
+        if(DEBUG){
+          std::cout << "new goal" << std::endl;
+          std::cout << st << std::endl;
+        }
         break;
       }
     }
-    si_->freeState(st);
+    //si_->freeState(st);
   }
 }
 
@@ -177,17 +181,17 @@ bool SliceSpace::sameComponent(Vertex m1, Vertex m2)
 
 void SliceSpace::checkForSolution(ob::PathPtr &solution)
 {
-    auto *goal = static_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
-    if (!addedNewSolution_)
-    {
-        if (goal->maxSampleCount() > goalM_.size())
-        {
-            const ob::State *st = pis_.nextGoal();
-            if (st != nullptr){
-              goalM_.push_back(addMilestone(si_->cloneState(st)));
-            }
-        }
-        addedNewSolution_ = maybeConstructSolution(startM_, goalM_, solution);
+    //auto *goal = static_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
+        //if (goal->maxSampleCount() > goalM_.size())
+        //{
+        //    const ob::State *st = pis_.nextGoal();
+        //    if (st != nullptr){
+        //      goalM_.push_back(addMilestone(si_->cloneState(st)));
+        //    }
+        //}
+    bool foundSolution = maybeConstructSolution(startM_, goalM_, solution);
+    if(foundSolution && !addedNewSolution_){
+      addedNewSolution_ = true;
     }
 }
 
