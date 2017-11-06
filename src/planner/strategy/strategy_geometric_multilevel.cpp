@@ -71,6 +71,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
   ob::PlannerStatus status = planner->solve(ptc);
+  std::cout << status << std::endl;
   //ob::PlannerStatus status = ss.solve(ptc);
 
   //###########################################################################

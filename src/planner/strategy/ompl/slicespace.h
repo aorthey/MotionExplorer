@@ -98,6 +98,8 @@ namespace ompl
         base::PathPtr GetSolutionPath();
         bool hasSolution();
 
+        double heuristic_add;
+
         static int id_counter;
         int id;
 
@@ -118,7 +120,7 @@ namespace ompl
 
         bool horizontal;
 
-        EdgeProperty& GetEdgeAlongShortestPath(uint k){
+        const EdgeProperty& GetEdgeAlongShortestPath(uint k){
           Vertex v = last_vertex_path.at(k);
           Vertex w = last_vertex_path.at(k+1);
           std::pair<Edge, bool> edge = boost::edge(v, w, graph);

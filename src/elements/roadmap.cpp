@@ -32,6 +32,9 @@ void Roadmap::SetVertices(const std::vector<Config> &V_){
 void Roadmap::SetEdges(const std::vector<std::pair<Config,Config>> &E_){
   E = E_;
 }
+void Roadmap::SetShortestPath(const std::vector<Config>& s_){
+  shortest_path = s_;
+}
 
 void Roadmap::CreateFromPlannerDataOnlySufficient(const ob::PlannerDataPtr pd, CSpaceOMPL *cspace_){
   cspace = cspace_;
@@ -335,7 +338,6 @@ void Roadmap::DrawGL(GUIState& state)
       Vector3 v1(q1(0),q1(1),q1(2));
       Vector3 v2(q2(0),q2(1),q2(2));
       drawLineSegment(v1,v2);
-
     }
   }
 

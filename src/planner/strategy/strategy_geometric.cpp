@@ -140,8 +140,6 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   ob::PlannerDataPtr pd( new ob::PlannerData(si) );
   ss.getPlannerData(*pd);
 
-  const ob::OptimizationObjectivePtr obj = pdef->getOptimizationObjective();
-
   output.SetPlannerData(pd);
   output.SetProblemDefinition(pdef);
 

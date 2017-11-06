@@ -6,6 +6,7 @@ class RoadmapDecoratorSE2: public Roadmap{
   public:
     RoadmapDecoratorSE2(RoadmapPtr component_);
     virtual void DrawGL(GUIState&);
+    void PlotVertexIndex(uint vidx);
   private:
     RoadmapPtr component;
 };

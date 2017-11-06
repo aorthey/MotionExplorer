@@ -37,7 +37,7 @@ std::vector<PathSpace*> PathSpaceOMPLTwoLevel::Decompose(){
 
   //multilevel input
   strategy_input.cspace_level0 = cspace_level0;
-  strategy_input.cspace_level1 = cspace;
+  strategy_input.cspace_level1 = cspace; //the complete original cspace
 
   strategy.plan(strategy_input, output);
 
@@ -46,8 +46,11 @@ std::vector<PathSpace*> PathSpaceOMPLTwoLevel::Decompose(){
   RoadmapPtr roadmap1 = output.GetRoadmapPtr();
   RoadmapDecoratorSE2Ptr roadmap( new RoadmapDecoratorSE2(roadmap1) );
   decomposedspace.back()->SetRoadmap( roadmap );
+  std::cout << output << std::endl;
 
+  roadmap->SetShortestPath( output.GetShortestPath() );
   if(output.hasExactSolution()){
+    roadmap->SetShortestPath( output.GetShortestPath() );
     decomposedspace.back()->SetShortestPath( output.GetShortestPath() );
   }
   return decomposedspace;

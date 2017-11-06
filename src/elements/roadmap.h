@@ -22,6 +22,7 @@ class Roadmap{
 
     void SetVertices(const std::vector<Config>&);
     void SetEdges(const std::vector<std::pair<Config,Config>>&);
+    void SetShortestPath(const std::vector<Config>&);
 
     std::vector<Config> GetVertices();
     std::vector<std::pair<Config,Config>> GetEdges();

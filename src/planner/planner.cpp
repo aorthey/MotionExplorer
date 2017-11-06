@@ -486,11 +486,11 @@ void MotionPlanner::DrawGLScreen(double x_, double y_){
   }
 }
 
-PathPiecewiseLinearEuclidean* MotionPlanner::GetPath(){
+PathPiecewiseLinearSE3* MotionPlanner::GetPath(){
   if(!active) return NULL;
   Pcurrent = hierarchy->GetNodeContent(current_path);
   std::vector<Config> path = Pcurrent->GetShortestPath();
-  pwl = PathPiecewiseLinearEuclidean::from_keyframes(path);
+  pwl = PathPiecewiseLinearSE3::from_keyframes(path);
   return pwl;
 }
 void MotionPlanner::DrawGL(GUIState& state){

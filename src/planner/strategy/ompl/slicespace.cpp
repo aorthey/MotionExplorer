@@ -24,9 +24,9 @@ SliceSpace::SliceSpace(const ob::SpaceInformationPtr &si)
   , successfulConnectionAttemptsProperty_(boost::get(vertex_successful_connection_attempts_t(), graph))
   , disjointSets_(boost::get(boost::vertex_rank, graph), boost::get(boost::vertex_predecessor, graph))
 {
+  heuristic_add = 0.0;
   goalStatesSampled = 0;
   id = id_counter;
-  std::cout << "Hello this is SliceSpace #" << id << "!" << std::endl;
   id_counter++;
 
   horizontal = true;
@@ -45,6 +45,8 @@ SliceSpace::SliceSpace(const ob::SpaceInformationPtr &si)
 
   xstates.resize(magic::MAX_RANDOM_BOUNCE_STEPS);
   si_->allocStates(xstates);
+
+  std::cout << "Hello this is SliceSpace #" << id << " with measure=" << si_->getSpaceMeasure() << std::endl;
 }
 SliceSpace::~SliceSpace(){
   si_->freeStates(xstates);
@@ -433,7 +435,7 @@ void SliceSpace::clearQuery()
 
 double SliceSpace::GetSamplingDensity(){
   if(!goalM_.empty()){
-    return (double)num_vertices(graph)/si_->getSpaceMeasure();
+    return (double)num_vertices(graph)/si_->getSpaceMeasure() + heuristic_add;
   }else{
     //return number of vertices sampled in goal region divided by goal region
     //measure

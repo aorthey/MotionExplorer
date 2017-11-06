@@ -4,6 +4,7 @@
 
 #include <ompl/geometric/planners/prm/ConnectionStrategy.h>
 #include <ompl/base/goals/GoalSampleableRegion.h>
+#include <ompl/base/goals/GoalState.h>
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
@@ -80,7 +81,7 @@ void SliceSpacePRM::clear()
 }
 
 
-ompl::base::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCondition &ptc)
+ob::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCondition &ptc)
 {
   base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
                                                        {
@@ -91,13 +92,15 @@ ompl::base::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCon
               { 
                 return left->GetSamplingDensity() > right->GetSamplingDensity();
               };
+
   std::priority_queue<SliceSpace*, std::vector<SliceSpace*>, decltype(cmp)> Q(cmp);
 
   S_0->horizontal = true;
   Q.push(S_0);
   double slice_growth_time = 1e-3;
 
-  while(!ptcOrSolutionFound){
+  bool solutionFound = false;
+  while(!ptcOrSolutionFound && !solutionFound){
     SliceSpace* S = Q.top();
     Q.pop();
     std::cout << "grow: ("<< S->id << ")" << slice_growth_time << std::endl;
@@ -112,6 +115,8 @@ ompl::base::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCon
         ob::SO2StateSpace::StateType *SO2;
         SO2 = start->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
         double yaw = SO2->value;
+        std::vector<ob::State*> spath;
+        spath.push_back(start);
         for(uint k = 0; k < vpath.size()-1; k++){
           SliceSpace::Vertex v = vpath.at(k);
           SliceSpace::Vertex w = vpath.at(k+1);
@@ -123,7 +128,16 @@ ompl::base::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCon
           const SliceSpace::Vertex v2 = boost::target(edge.first, S->graph);
 
           if(e.slicespace==NULL){
-            e.slicespace = CreateNewSliceSpaceEdge(v1,v2,yaw);
+            if(k==vpath.size()-2){
+              std::cout << "Final Edge!" << std::endl;
+              const ob::GoalPtr gp = S_1->getProblemDefinition()->getGoal();
+              ob::State *goal = static_pointer_cast<ob::GoalState>(gp)->getState();
+              SO2 = goal->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+              double goal_yaw = SO2->value;
+              e.slicespace = CreateNewSliceSpaceFinalGoalEdge(v1, v2, yaw, goal_yaw);
+            }else{
+              e.slicespace = CreateNewSliceSpaceEdge(v1,v2,yaw);
+            }
             e.setWeight(+dInf);
             boost::put(boost::edge_weight_t(), S->graph, edge.first, e);
             Q.push(e.slicespace);
@@ -137,6 +151,23 @@ ompl::base::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCon
               ///@TODO {extract yaw}
               //only time when we will continue finding edges. We need to
               //extract the right yaw HERE
+              SliceSpace *Sedge = e.slicespace;
+              base::PathPtr path = Sedge->GetSolutionPath();
+
+
+              //how to extract yaw?
+
+              og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+              std::vector<ob::State *> states = gpath.getStates();
+              ob::State *st_final = states.back();
+              SO2 = st_final->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+              yaw = SO2->value;
+
+              if(k==vpath.size()-2){
+                std::cout << "FOUND PATH!!" << std::endl;
+                solutionFound = true;
+              }
+
             }else{
               e.setWeight(+dInf);
               boost::put(boost::edge_weight_t(), S->graph, edge.first, e);
@@ -155,19 +186,91 @@ ompl::base::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCon
         SliceSpace::EdgeProperty e = get(boost::edge_weight_t(), S_0->graph, edge.first);
         e.setOriginalWeight();
         boost::put(boost::edge_weight_t(), S_0->graph, edge.first, e);
+        S->heuristic_add = +dInf;
       }
     }
     Q.push(S);
   }
 
-  Q.push(S_0);
+  //construct shortest path
+  std::vector<SliceSpace::Vertex> sp = S_0->VerticesAlongShortestPath();
+  if(solutionFound){
+    std::cout << "constructing solution" << std::endl;
+
+    SliceSpace::Vertex m = boost::add_vertex(S_1->graph);
+          std::pair<Edge, bool> edge = boost::edge(v, w, graph);
+    S_1->stateProperty_[m] = si_->cloneState(stateM.get());
+
+
+    for(uint k = 0; k < sp.size()-1; k++){
+      SliceSpace::Vertex v = sp.at(k);
+      SliceSpace::Vertex w = sp.at(k+1);
+      std::pair<SliceSpace::Edge, bool> edge = boost::edge(v, w, S_0->graph);
+      SliceSpace::EdgeProperty p = get (boost::edge_weight_t(), S_0->graph, edge.first);
+      if(!p.slicespace){
+        std::cout << "has no slicespace" << std::endl;
+        exit(0);
+      }
+      SliceSpace *S = p.slicespace;
+
+      ///Get S_0 coordinates
+      SliceSpace::Vertex v1 = S->GetExternalAssociatedEdgeSource();
+      SliceSpace::Vertex v2 = S->GetExternalAssociatedEdgeTarget();
+      ob::State *s0 = S_0->stateProperty_[v1];
+      ob::State *s1 = S_0->stateProperty_[v2];
+      const ob::RealVectorStateSpace::StateType *R1 = s0->as<ob::RealVectorStateSpace::StateType>();
+      const ob::RealVectorStateSpace::StateType *R2 = s1->as<ob::RealVectorStateSpace::StateType>();
+
+      ///Get S_edge coordinates
+      base::PathPtr path = S->GetShortestPath();
+      og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+      std::vector<ob::State *> states = gpath.getStates();
+
+      ob::RealVectorStateSpace::StateType *R;
+      ob::SO2StateSpace::StateType *SO2;
+
+      for(uint j = 1; j < states.size(); j++){
+        ob::State *second = states.at(j);
+        R = second->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+        SO2 = second->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+        double t2 = R->values[0];
+        double yaw2 = SO2->value;
+
+        ///Merge coordinates
+        ob::ScopedState<> stateN(S_1->getSpaceInformation());
+        R = stateN->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+        SO2 = stateN->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+        for(uint k = 0; k < 2; k++)
+          R->values[k] = R1->values[k] + t2*(R2->values[k]-R1->values[k]);
+        SO2->value = yaw2;
+
+        SliceSpace::Vertex n = boost::add_vertex(S_1->graph);
+        S_1->stateProperty_[n] = si_->cloneState(stateN.get());
+
+        //SliceSpace::EdgeProperty properties(ob::Cost(0.0));//S_1->opt_->motionCost(S_1->stateProperty_[m], S_1->stateProperty_[n]));
+        SliceSpace::EdgeProperty properties(S_1->opt_->motionCost(S_1->stateProperty_[m], S_1->stateProperty_[n]));
+        boost::add_edge(m, n, properties, S_1->graph);
+
+        stateM = stateN;
+        m = n;
+      }
+    }
+  }
+
+
+
+
   //deconstruct priority queue
+  std::cout << std::string(80, '-') << std::endl;
   while(!Q.empty()){
     SliceSpace *S = Q.top();
     ob::SpaceInformationPtr si = S_1->getSpaceInformation();
+    std::cout << "extracting data from SliceSpace #"<< S->id << " (" 
+      << boost::num_vertices(S->graph) <<  " vertices, " 
+      << boost::num_edges(S->graph) << " edges, " 
+      << S->GetSamplingDensity() << " density, " << S->getSpaceInformation()->getSpaceMeasure() << " measure)" << std::endl;
     if(!S->horizontal){
       //add slicespace data points to S_1
-      std::cout << "extracting data from SliceSpace #"<< S->id << std::endl;
 
       SliceSpace::Vertex v1 = S->GetExternalAssociatedEdgeSource();
       SliceSpace::Vertex v2 = S->GetExternalAssociatedEdgeTarget();
@@ -177,9 +280,7 @@ ompl::base::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCon
       const ob::RealVectorStateSpace::StateType *R1 = s0->as<ob::RealVectorStateSpace::StateType>();
       const ob::RealVectorStateSpace::StateType *R2 = s1->as<ob::RealVectorStateSpace::StateType>();
 
-      //for all vertices
       uint N = boost::num_vertices(S->graph);
-
       ob::RealVectorStateSpace::StateType *R;
       ob::SO2StateSpace::StateType *SO2;
       foreach (const SliceSpace::Edge e, boost::edges(S->graph)){
@@ -288,19 +389,23 @@ ompl::base::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCon
 
     Q.pop();
   }
-  std::cout << "S_1->GetSolutionPath()" << std::endl;
-  //base::PathPtr sol = NULL;
-  base::PathPtr sol = S_0->GetSolutionPath();
-  if (sol)
-  {
-    base::PlannerSolution psol(sol);
-    psol.setPlannerName(getName());
-    //psol.setOptimized(opt_, bestCost_, S_0->hasSolution());
-    ob::ProblemDefinitionPtr pdef = S_0->getProblemDefinition();
-    pdef->addSolutionPath(psol);
+
+  base::PathPtr sol = NULL;
+  if(solutionFound){
+    std::cout << "S_1->GetSolutionPath()" << std::endl;
+    sol = S_1->GetSolutionPath();
+    if (sol)
+    {
+      std::cout << "found solution" << std::endl;
+      base::PlannerSolution psol(sol);
+      psol.setPlannerName(getName());
+      //psol.setOptimized(opt_, bestCost_, S_0->hasSolution());
+      ob::ProblemDefinitionPtr pdef = S_0->getProblemDefinition();
+      S_1->getProblemDefinition()->addSolutionPath(psol);
+    }
   }
 
-  return sol ? base::PlannerStatus::EXACT_SOLUTION : base::PlannerStatus::TIMEOUT;
+  return sol ? ob::PlannerStatus::EXACT_SOLUTION : ob::PlannerStatus::TIMEOUT;
 }
 
 void SliceSpacePRM::getPlannerData(base::PlannerData &data) const
@@ -351,6 +456,58 @@ SliceSpace* SliceSpacePRM::CreateNewSliceSpaceEdge(SliceSpace::Vertex v, SliceSp
   pdef->addStartState(edge_cspace->ConfigToOMPLState(qi));
 
   auto goal=std::make_shared<GoalStateFinalEdge>(si_edge);
+  goal->setState(edge_cspace->ConfigToOMPLState(qg));
+  goal->setThreshold(0.01);
+  pdef->setGoal(goal);
+  pdef->setOptimizationObjective( getThresholdPathLengthObj2(si_edge) );
+  S->setProblemDefinition(pdef);
+  S->setup();
+
+  return S;
+}
+SliceSpace* SliceSpacePRM::CreateNewSliceSpaceFinalGoalEdge(SliceSpace::Vertex v, SliceSpace::Vertex w, double yaw, double goal_yaw){
+
+  CSpaceInput cin;
+  cin.timestep_max = 0.1;
+  cin.timestep_min = 0.01;
+  CSpaceFactory factory(cin);
+
+  int robot_idx = 0;
+  Robot *robot = world->robots[robot_idx];
+  SingleRobotCSpace *kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
+
+  ob::SpaceInformationPtr si = S_0->getSpaceInformation();
+  const ob::StateValidityCheckerPtr checker = si->getStateValidityChecker();
+  OMPLValidityCheckerPtr ochecker = static_pointer_cast<OMPLValidityChecker>(checker);
+  CSpaceOMPL *cspace = ochecker->ompl_space;
+  ob::State* sv = S_0->stateProperty_[v];
+  Config q1 = cspace->OMPLStateToConfig(sv);
+  ob::State* sw = S_0->stateProperty_[w];
+  Config q2 = cspace->OMPLStateToConfig(sw);
+
+  CSpaceOMPL *edge_cspace = factory.MakeGeometricCSpaceR2EdgeSO2(robot, kcspace, q1, q2);
+
+  ob::SpaceInformationPtr si_edge = edge_cspace->SpaceInformationPtr();
+
+  Config qi; qi.resize(robot->q.size()); qi.setZero();
+  qi(0) = q1(0);
+  qi(1) = q1(1);
+  qi(3) = yaw;
+
+  Config qg; qg.resize(robot->q.size()); qg.setZero();
+  qg(0) = q2(0);
+  qg(1) = q2(1);
+  qg(3) = goal_yaw;
+
+  SliceSpace* S = new SliceSpace(si_edge);
+  S->horizontal = false;
+  S->SetExternalAssociatedEdgeSource(v);
+  S->SetExternalAssociatedEdgeTarget(w);
+
+  ob::ProblemDefinitionPtr pdef = std::make_shared<ob::ProblemDefinition>(si_edge);
+  pdef->addStartState(edge_cspace->ConfigToOMPLState(qi));
+
+  auto goal=std::make_shared<ob::GoalState>(si_edge);
   goal->setState(edge_cspace->ConfigToOMPLState(qg));
   goal->setThreshold(0.01);
   pdef->setGoal(goal);

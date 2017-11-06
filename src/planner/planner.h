@@ -3,6 +3,7 @@
 #include "planner/planner_input.h"
 #include "elements/hierarchy.h"
 #include "elements/path_pwl_euclid.h"
+#include "elements/path_pwl_SE3.h"
 #include "gui/gui_state.h"
 #include "gui/ViewHierarchy.h"
 
@@ -22,7 +23,7 @@ class MotionPlanner{
 
     const PlannerInput& GetInput();
 
-    PathPiecewiseLinearEuclidean* GetPath();
+    PathPiecewiseLinearSE3* GetPath();
 
     //folder-like operations on hierarchical path space
     virtual void Expand();
@@ -62,7 +63,7 @@ class MotionPlanner{
     PlannerInput input;
     ViewHierarchy viewHierarchy;
 
-    PathPiecewiseLinearEuclidean *pwl;
+    PathPiecewiseLinearSE3 *pwl;
     double length;
 
 };

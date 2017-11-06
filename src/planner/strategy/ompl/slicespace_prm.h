@@ -51,6 +51,7 @@ namespace ompl
         base::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
 
         SliceSpace* CreateNewSliceSpaceEdge(SliceSpace::Vertex v, SliceSpace::Vertex w, double yaw);
+        SliceSpace* CreateNewSliceSpaceFinalGoalEdge(SliceSpace::Vertex v, SliceSpace::Vertex w, double yaw, double goal_yaw);
         void clear() override;
         void setup() override;
 
