@@ -215,6 +215,9 @@ bool SliceSpace::maybeConstructSolution(const std::vector<Vertex> &starts, const
                 if (p)
                 {
                     ob::Cost pathCost = p->cost(opt_);
+                    //bool better = opt_->isCostBetterThan(pathCost, bestCost_);
+                    //std::cout << pathCost.value() << (better?">":"<") << bestCost_.value() << std::endl;
+
                     if (opt_->isCostBetterThan(pathCost, bestCost_))
                         bestCost_ = pathCost;
                     // Check if optimization objective is satisfied
@@ -413,7 +416,7 @@ void SliceSpace::clear()
     clearQuery();
 
     iterations_ = 0;
-    bestCost_ = ob::Cost(std::numeric_limits<double>::quiet_NaN());
+    bestCost_ = ob::Cost(dInf);
 }
 
 ob::Cost SliceSpace::costHeuristic(Vertex u, Vertex v) const
@@ -435,13 +438,13 @@ void SliceSpace::clearQuery()
 
 double SliceSpace::GetSamplingDensity(){
   if(!goalM_.empty()){
-    return (double)num_vertices(graph)/si_->getSpaceMeasure() + heuristic_add;
+    return (double)num_vertices(graph)/(double)si_->getSpaceMeasure() + heuristic_add;
   }else{
     //return number of vertices sampled in goal region divided by goal region
     //measure
 
     //@TODO { replace space measure by goal space measure! }
-    return (double)goalStatesSampled/si_->getSpaceMeasure();
+    return (double)goalStatesSampled/(double)10*si_->getSpaceMeasure();
     //const ob::State *st = pis_.nextGoal();
     //if (st != nullptr){
     //  goalM_.push_back(addMilestone(si_->cloneState(st)));
@@ -459,7 +462,12 @@ ob::PathPtr SliceSpace::GetSolutionPath(){
   return sol;
 }
 bool SliceSpace::hasSolution(){
-  return addedNewSolution_;
+  if(bestCost_.value() < dInf){
+    if(id==0) std::cout << "Solution #" << id << " : " << bestCost_.value() << std::endl;
+    return addedNewSolution_;
+  }else{
+    return false;
+  }
 }
 
 template <template <typename T> class NN>

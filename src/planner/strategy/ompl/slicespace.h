@@ -166,6 +166,9 @@ namespace ompl
 
         std::vector<Vertex> startM_;
         std::vector<Vertex> goalM_;
+
+        void uniteComponents(Vertex m1, Vertex m2);
+        bool sameComponent(Vertex m1, Vertex m2);
     protected:
 
         Vertex external_src;
@@ -191,13 +194,11 @@ namespace ompl
         RNG rng_;
         bool addedNewSolution_{false};
         unsigned long int iterations_{0};
-        base::Cost bestCost_{std::numeric_limits<double>::quiet_NaN()};
+        base::Cost bestCost_{+dInf};
 
 
         Vertex addMilestone(base::State *state);
 
-        void uniteComponents(Vertex m1, Vertex m2);
-        bool sameComponent(Vertex m1, Vertex m2);
         void growRoadmap(const base::PlannerTerminationCondition &ptc, base::State *workState);
         void expandRoadmap(const base::PlannerTerminationCondition &ptc, std::vector<base::State *> &workStates);
 

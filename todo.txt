@@ -333,14 +333,8 @@ should be loop back onto itself for now. Use those classes to visualize and
 adapt the twolevel algorithm
 [ ] move CSPaceOMPL to OMPLSpace and CSpace to KlamptSpace, gets confusing
 otherwise
-
 [x] create 2d environment for planar lshape in blender with narrow passage (and
 possible misleading initial path)
-
-[x] visualize rrt on SE(2) on planar Lshape environment
-[ ] visualize N-rrt on SE(2) on planar Lshape environment
-[ ] visualize SN-rrt on SE(2) on planar Lshape environment
-[ ] benchmark SN-rrt and rrt n SE(3)
 
 Minor Things
 [ ] cspace: refactor cspace into separate classes
@@ -352,6 +346,7 @@ Minor Things
 [ ] refactor factory into one function, should encapsulate everything, no
 kcspace/cspaceompl stuff outside
 [ ] fix the chart boundary issue in visualizing the SE(2) roadmap
+[ ] rewrite path to use ompl representations, only convert at Eval
 
 
 SlicePlanner
@@ -367,3 +362,8 @@ SlicePlanner
 [x] edge goal is never reached. Why?
 [x] compute shortest path on S_1. this means adding start/goal vertices
 [x] compute feasible solution on easy problem
+[x] visualize rrt on SE(2) on planar Lshape environment
+[x] visualize N-rrt on SE(2) on planar Lshape environment
+[ ] visualize SN-rrt on SE(2) on planar Lshape environment
+[ ] benchmark SN-rrt and rrt n SE(3)
+

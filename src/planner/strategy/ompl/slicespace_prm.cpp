@@ -181,6 +181,7 @@ ob::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCondition &
         SliceSpace::EdgeProperty e = get(boost::edge_weight_t(), S_0->graph, edge.first);
         e.setOriginalWeight();
         boost::put(boost::edge_weight_t(), S_0->graph, edge.first, e);
+
         //S->heuristic_add = +dInf;
       }
     }
@@ -274,80 +275,12 @@ ob::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCondition &
         S_1->stateProperty_[v1_1] = si_->cloneState(state1.get());
         SliceSpace::EdgeProperty properties(S_1->opt_->motionCost(S_1->stateProperty_[v0_1], S_1->stateProperty_[v1_1]));
         boost::add_edge(v0_1, v1_1, properties, S_1->graph);
+        S_1->uniteComponents(v0_1, v1_1);
 
         v0_1 = v1_1;
       }
       v0_0 = v1_0;
 
-//      ob::State* s1_e = states.back();
-//
-//      R = s0_e->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-//      SO2 = s0_e->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-//      double t0 = R->values[0];
-//      double yaw0 = SO2->value;
-//
-//      R = s1_e->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-//      SO2 = s1_e->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-//      double t1 = R->values[0];
-//      double yaw1 = SO2->value;
-//
-//      /// Create new S_1 state at s0
-//      ob::ScopedState<> state0(S_1->getSpaceInformation());
-//      R = state0->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-//      SO2 = state0->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-//      for(uint k = 0; k < 2; k++)
-//        R->values[k] = R1->values[k] + t0*(R2->values[k]-R1->values[k]);
-//      SO2->value = yaw0;
-//
-//      /// Create new S_1 state at s1
-//      ob::ScopedState<> state1(S_1->getSpaceInformation());
-//      R = state1->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-//      SO2 = state1->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-//      for(uint k = 0; k < 2; k++)
-//        R->values[k] = R1->values[k] + t1*(R2->values[k]-R1->values[k]);
-//      SO2->value = yaw1;
-//
-//      /// Add states s0,s1 and edge (s0,s1) to the S_1 roadmap
-//      SliceSpace::Vertex v1_1;
-//      if(k>sp.size()-2){
-//        v1_1 = S_1->goalM_.at(0);
-//      }else{
-//        v1_1 = boost::add_vertex(S_1->graph);
-//      }
-//
-//      S_1->stateProperty_[v0_1] = si_->cloneState(state0.get());
-//      S_1->stateProperty_[v1_1] = si_->cloneState(state1.get());
-//      SliceSpace::EdgeProperty properties(S_1->opt_->motionCost(S_1->stateProperty_[v0_1], S_1->stateProperty_[v1_1]));
-//      boost::add_edge(v0_1, v1_1, properties, S_1->graph);
-//
-//      v0_0 = v1_0;
-//      v0_1 = v1_1;
-
-      ///for(uint j = 1; j < states.size(); j++){
-      ///  ob::State *second = states.at(j);
-      ///  R = second->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-      ///  SO2 = second->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-      ///  double t2 = R->values[0];
-      ///  double yaw2 = SO2->value;
-
-      ///  ///Merge coordinates
-      ///  ob::ScopedState<> stateN(S_1->getSpaceInformation());
-      ///  R = stateN->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-      ///  SO2 = stateN->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-      ///  for(uint k = 0; k < 2; k++)
-      ///    R->values[k] = R1->values[k] + t2*(R2->values[k]-R1->values[k]);
-      ///  SO2->value = yaw2;
-
-      ///  SliceSpace::Vertex n = boost::add_vertex(S_1->graph);
-      ///  S_1->stateProperty_[n] = si_->cloneState(stateN.get());
-
-      ///  //SliceSpace::EdgeProperty properties(ob::Cost(0.0));//S_1->opt_->motionCost(S_1->stateProperty_[m], S_1->stateProperty_[n]));
-      ///  SliceSpace::EdgeProperty properties(S_1->opt_->motionCost(S_1->stateProperty_[m], S_1->stateProperty_[n]));
-      ///  boost::add_edge(m, n, properties, S_1->graph);
-
-      ///  stateM = stateN;
-      ///  m = n;
-      ///}
     }
   }
 
@@ -490,11 +423,9 @@ ob::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCondition &
     sol = S_1->GetSolutionPath();
     if (sol)
     {
-      std::cout << "found solution" << std::endl;
       base::PlannerSolution psol(sol);
       psol.setPlannerName(getName());
-      //psol.setOptimized(opt_, bestCost_, S_0->hasSolution());
-      ob::ProblemDefinitionPtr pdef = S_0->getProblemDefinition();
+      //psol.setOptimized(opt_, bestCost_, S_1->hasSolution());
       S_1->getProblemDefinition()->addSolutionPath(psol);
     }
   }

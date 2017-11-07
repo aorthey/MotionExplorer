@@ -36,9 +36,11 @@ std::vector<PathSpace*> PathSpaceOMPLSE2::Decompose(){
   RoadmapDecoratorSE2Ptr roadmap( new RoadmapDecoratorSE2(roadmap1) );
   decomposedspace.at(0)->SetRoadmap( roadmap );
 
+  std::cout << output << std::endl;
   if(output.hasExactSolution()){
-    roadmap->SetShortestPath( output.GetShortestPath() );
-    decomposedspace.at(0)->SetShortestPath( output.GetShortestPath() );
+    std::vector<Config> path = output.GetShortestPath();
+    roadmap->SetShortestPath( path );
+    decomposedspace.at(0)->SetShortestPath( path );
   }
   return decomposedspace;
 }

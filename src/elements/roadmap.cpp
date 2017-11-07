@@ -201,7 +201,6 @@ std::vector<Config> Roadmap::GetShortestPath(){
   return shortest_path;
 }
 
-
 std::vector<Config> Roadmap::VertexPathToConfigPath( const std::vector<Vertex> &path){
   const ob::SpaceInformationPtr si = pds->getSpaceInformation();
 
@@ -219,7 +218,6 @@ std::vector<Config> Roadmap::VertexPathToConfigPath( const std::vector<Vertex> &
   }
   //og::PathSimplifier shortcutter(si);
   //shortcutter.shortcutPath(omplpath);
-
   //omplpath.interpolate();
 
   std::vector<ob::State *> interpolated_states = omplpath.getStates();
