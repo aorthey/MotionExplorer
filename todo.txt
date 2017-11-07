@@ -365,6 +365,5 @@ SlicePlanner
 [x] create slicespace based on S_0,S_1 and some vertices
 [x] update S_1 based on milestones in S_edge
 [x] edge goal is never reached. Why?
-[ ] compute shortest path on S_1. this means adding start/goal vertices
-[ ] compute feasible solution on easy problem
-
+[x] compute shortest path on S_1. this means adding start/goal vertices
+[x] compute feasible solution on easy problem
