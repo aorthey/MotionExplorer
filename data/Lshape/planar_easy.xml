@@ -12,6 +12,8 @@
   <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/2droom.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
 -->
   <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
+  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="-3 0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="3 2 0" rotateRPY="0 0 0"/>
 
   <plannerinput>
 
@@ -26,8 +28,8 @@
 
     <!-- default settings for all algorithms (overwriteable) -->
     <timestep min="0.001" max="0.01"/>
-    <epsilongoalregion>0.01</epsilongoalregion>
-    <maxplanningtime>0.1</maxplanningtime>
+    <epsilongoalregion>0.0</epsilongoalregion>
+    <maxplanningtime>0.05</maxplanningtime>
 
     <!-- individual algorithms plus individual settings -->
     <algorithm name="hierarchical:twolevel:ompl:slicespaceprm">

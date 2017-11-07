@@ -131,6 +131,9 @@ namespace ompl
           }
           Vertex v1 = source(edge.first,graph);
           Vertex v2 = target(edge.first,graph);
+          ///@TODO{}
+          std::cout << "can't return const" << std::endl;
+          exit(0);
           return p;
         }
         std::vector<Vertex> VerticesAlongShortestPath(){
@@ -160,6 +163,9 @@ namespace ompl
         SliceSpace *S_previous_level;
         SliceSpace *S_next_level;
         base::OptimizationObjectivePtr opt_;
+
+        std::vector<Vertex> startM_;
+        std::vector<Vertex> goalM_;
     protected:
 
         Vertex external_src;
@@ -186,8 +192,6 @@ namespace ompl
         bool addedNewSolution_{false};
         unsigned long int iterations_{0};
         base::Cost bestCost_{std::numeric_limits<double>::quiet_NaN()};
-        std::vector<Vertex> startM_;
-        std::vector<Vertex> goalM_;
 
 
         Vertex addMilestone(base::State *state);
