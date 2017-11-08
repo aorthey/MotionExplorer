@@ -15,7 +15,8 @@ void RoadmapDecoratorSE2::PlotVertexIndex(uint vidx){
   if(v!=ob::PlannerData::NO_VERTEX){
     Config q = cspace->OMPLStateToConfig(v.getState());
     if(q(3) < 0) q(3) += 2*M_PI;
-    Vector3 v(q(0),q(1),q(3));
+    //Vector3 v(q(0),q(1),q(3));
+    Vector3 v(q(0),q(1),0);
     drawPoint(v);
   }
 }
