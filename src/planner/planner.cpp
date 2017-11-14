@@ -7,7 +7,6 @@
 #include "pathspace/pathspace_ompl_se2.h"
 #include "pathspace/pathspace_ompl_twolevel.h"
 #include "pathspace/pathspace_onetopic_cover.h"
-#include "pathspace/pathspace_linear_hierarchy.h"
 #include "pathspace/decorator.h"
 #include "pathspace/decorator_sweptvolume_path.h"
 #include "pathspace/decorator_highlighter.h"
@@ -96,12 +95,8 @@ void MotionPlanner::CreateSinglePathHierarchy(){
       psinput->timestep_max = input.timestep_max;
 
       psinput_level0 = psinput;
-    }else{
-      //PathSpace *next = new PathSpaceInput();
-      //psinput->SetNextLayer(new PathSpaceInput());
-      //psinput = psinput->GetNextLayer();
-      //psinput = new PathSpaceInput();
     }
+
     psinput->SetNextLayer(new PathSpaceInput());
     psinput = psinput->GetNextLayer();
 
@@ -152,20 +147,10 @@ void MotionPlanner::CreateSinglePathHierarchy(){
   }
 
   //execute different flavors of hierarchical algorithms
-  std::string linear = "linear";
   std::string twolevel = "twolevel";
   std::string ompl = "ompl";
   if(StartsWith(subalgorithm,ompl)) {
     hierarchy->AddRootNode( new PathSpaceOnetopicCover(world, psinput_level0) );
-    std::vector<Config> path;
-    path.push_back(psinput_level0->q_init);
-    path.push_back(psinput_level0->q_goal);
-    hierarchy->GetRootNodeContent()->SetShortestPath( path );
-  }else if(StartsWith(subalgorithm,linear)) {
-    //Zhang_2009 style + shortest path iteration
-    std::string subsubalgorithm = RemoveStringBeginning(subalgorithm, linear);
-    psinput_level0->name_algorithm = subsubalgorithm;
-    hierarchy->AddRootNode( new PathSpaceLinearHierarchy(world, psinput_level0) );
     std::vector<Config> path;
     path.push_back(psinput_level0->q_init);
     path.push_back(psinput_level0->q_goal);
@@ -313,62 +298,6 @@ void MotionPlanner::RaiseError(){
   exit(1);
 }
 
-//bool MotionPlanner::solve(std::vector<int> path_idxs){
-//  if(!active) return false;
-//
-//  uint Nlevel = hierarchy->NumberLevels();
-//
-//  Node<T>* node = hierarchy->GetNode( path_idxs );
-//
-//  uint level = node->level;
-//
-//  std::cout << "Planner level " << level << std::endl;
-//  if(level >= Nlevel-1){
-//    std::cout << "reached bottom level -> nothing more to solve" << std::endl;
-//    return false;
-//  }
-//
-//  WorldPlannerSettings worldsettings;
-//  worldsettings.InitializeDefault(*world);
-//  CSpaceFactory factory(input);
-//
-//  uint inner_index = hierarchy->GetInnerRobotIdx(level);
-//  uint outer_index = hierarchy->GetOuterRobotIdx(level);
-//  Robot* robot_inner = world->robots[inner_index];
-//
-//  SingleRobotCSpace* cspace_klampt_i = new SingleRobotCSpace(*world,inner_index,&worldsettings);
-//  CSpaceOMPL* cspace_i;
-//
-//  std::vector<Config> path_constraint = node->content.path;
-//  if(level==0){
-//    cspace_i = factory.MakeGeometricCSpaceRotationalInvariance(robot_inner, cspace_klampt_i);
-//  }else if(level==1){
-//    cspace_i = factory.MakeGeometricCSpacePathConstraintRollInvariance(robot_inner, cspace_klampt_i, path_constraint);
-//  }else{
-//    return false;
-//  }
-//
-//  cspace_i->print();
-//
-//  PlannerStrategyGeometric strategy;
-//  output.robot_idx = inner_index;
-//  strategy.plan(input, cspace_i, output);
-//
-//  if(!output.success) return false;
-//
-//  std::vector<int> treepath;
-//  if(level>0) treepath.push_back(node->id);
-//
-//  for(uint k = 0; k < output.paths.size(); k++){
-//    T node;
-//    node.path = output.paths.at(k);
-//    hierarchy->AddNode( node, treepath );
-//  }
-//
-//  return true;
-//}
-
-
 //folder-like operations on  path space
 void MotionPlanner::Expand(){
   if(!active) return;
@@ -394,6 +323,7 @@ void MotionPlanner::Expand(){
   }
   UpdateHierarchy();
 }
+
 void MotionPlanner::Collapse(){
   if(!active) return;
 
@@ -497,7 +427,6 @@ void MotionPlanner::DrawGL(GUIState& state){
   if(!active) return;
 
   uint N = hierarchy->NumberNodesOnLevel(current_level);
-
   //PathSpace* P = hierarchy->GetNodeContent(current_path);
   //PathSpace* P = new PathSpaceDecoratorSweptVolumePath( hierarchy->GetNodeContent(current_path) );
   //std::cout << *P << std::endl;

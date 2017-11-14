@@ -3,9 +3,8 @@
 class GeometricCSpaceOMPLR2EdgeSO2: public GeometricCSpaceOMPL
 {
   public:
-    GeometricCSpaceOMPLR2EdgeSO2(Robot *robot_, CSpace *space_, const Config& q_src, const Config& q_trg);
+    GeometricCSpaceOMPLR2EdgeSO2(RobotWorld *world_, int robot_idx, const Config& q_src, const Config& q_trg);
     virtual void initSpace();
-    virtual void print();
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
     virtual Config OMPLStateToConfig(const ob::State *qompl);
   private:

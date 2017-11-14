@@ -169,6 +169,7 @@ namespace ompl
 
         void uniteComponents(Vertex m1, Vertex m2);
         bool sameComponent(Vertex m1, Vertex m2);
+        base::Cost bestCost_{+dInf};
     protected:
 
         Vertex external_src;
@@ -194,7 +195,6 @@ namespace ompl
         RNG rng_;
         bool addedNewSolution_{false};
         unsigned long int iterations_{0};
-        base::Cost bestCost_{+dInf};
 
 
         Vertex addMilestone(base::State *state);

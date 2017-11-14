@@ -15,7 +15,6 @@
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
-const static double iInf = std::numeric_limits<int>::infinity();
 #include <ompl/base/goals/GoalState.h>
 
 class GoalStateFinalEdge: public ob::GoalState{
@@ -64,6 +63,10 @@ namespace ompl
 
         ob::SpaceInformationPtr si_level0;
         ob::SpaceInformationPtr si_level1;
+
+        void UpdateAssociatedEdgeInS0(SliceSpace *S, SliceSpace *S_0);
+        void SliceSpaceToS1(SliceSpace *S, SliceSpace *S_0, SliceSpace *S_1 );
+        void ConstructShortestPathOnS1(SliceSpace *S_0, SliceSpace *S_1);
     };
   }
 }

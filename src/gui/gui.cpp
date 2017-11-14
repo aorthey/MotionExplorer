@@ -89,7 +89,7 @@ void ForceFieldBackend::Start()
   settings["dragForceMultiplier"] = 500.0;
   drawContacts = 0;
   drawWrenches = 1;
-  //click_mode = ModeForceApplication;
+  click_mode = ModeForceApplication;
   pose_objects = 1;
 
   Robot *robot = world->robots[0];

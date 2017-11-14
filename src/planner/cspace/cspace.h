@@ -3,6 +3,7 @@
 #include "planner/integrator/tangentbundle.h"
 #include "planner/cspace/cspace_input.h"
 #include "elements/path_pwl_euclid.h"
+#include "klampt.h"
 
 #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/base/ScopedState.h>
@@ -38,7 +39,8 @@ class CSpaceOMPL
 {
   public:
 
-    CSpaceOMPL(Robot *robot_, CSpace *kspace_);
+    CSpaceOMPL(RobotWorld *world_, int robot_idx);
+    CSpaceOMPL(Robot *robot_, CSpaceKlampt *kspace_);
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) = 0;
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si) = 0;
@@ -47,44 +49,21 @@ class CSpaceOMPL
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q) = 0;
     virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
 
-    virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl){
-      const ob::State* s = qompl.get();
-      return OMPLStateToConfig(s);
-    }
-
     virtual void initSpace() = 0;
     virtual void initControlSpace() = 0;
     virtual void print() = 0;
 
-    virtual const ob::StateSpacePtr SpacePtr(){
-      return space;
-    }
-    virtual ob::SpaceInformationPtr SpaceInformationPtr(){
-      if(!si){
-        si = std::make_shared<ob::SpaceInformation>(SpacePtr());
-        const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr(si);
-        si->setStateValidityChecker(checker);
-      }
-      return si;
-    }
-    virtual const oc::RealVectorControlSpacePtr ControlSpacePtr(){
-      return control_space;
-    }
-    virtual uint GetDimensionality(){
-      return space->getDimension();
-    }
-    virtual uint GetControlDimensionality(){
-      return control_space->getDimension();
-    }
-    virtual void SetCSpaceInput(const CSpaceInput &input_){
-      input = input_;
-    }
-    virtual Robot* GetRobotPtr(){
-      return robot;
-    }
-    virtual CSpace* GetCSpacePtr(){
-      return kspace;
-    }
+    friend std::ostream& operator<< (std::ostream& out, const CSpaceOMPL& space);
+
+    virtual void SetCSpaceInput(const CSpaceInput &input_);
+    virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
+    virtual uint GetDimensionality() const;
+    virtual uint GetControlDimensionality() const;
+    virtual Robot* GetRobotPtr();
+    virtual CSpaceKlampt* GetCSpacePtr();
+    virtual const ob::StateSpacePtr SpacePtr();
+    virtual ob::SpaceInformationPtr SpaceInformationPtr();
+    virtual const oc::RealVectorControlSpacePtr ControlSpacePtr();
 
   protected:
     CSpaceInput input;
@@ -106,27 +85,30 @@ class CSpaceOMPL
     std::vector<int> klampt_to_ompl;
 
     ob::SpaceInformationPtr si;
-
     ob::StateSpacePtr space;
-
     oc::RealVectorControlSpacePtr control_space;
 
     Robot *robot;
-    CSpace *kspace;
+    CSpaceKlampt *kspace;
+    RobotWorld *world;
+    WorldPlannerSettings worldsettings;
 };
+
 //GeometricCSpaceOMPL: Space = Configuration manifold; control space = tangent
 //space of configuration manifold, i.e. control happens in velocity space
 //
 class GeometricCSpaceOMPL: public CSpaceOMPL
 {
   public:
-    GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_);
+    GeometricCSpaceOMPL(RobotWorld *world_, int robot_idx);
+    GeometricCSpaceOMPL(Robot *robot_, CSpaceKlampt *kspace_);
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) override;
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si) override;
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) override;
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
 
+    void Init();
     virtual void initSpace() override;
     virtual void initControlSpace() override;
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q) override;
@@ -148,7 +130,7 @@ class GeometricCSpaceOMPL: public CSpaceOMPL
 class KinodynamicCSpaceOMPL: public CSpaceOMPL
 {
   public:
-    KinodynamicCSpaceOMPL(Robot *robot_, CSpace *kspace_);
+    KinodynamicCSpaceOMPL(Robot *robot_, CSpaceKlampt *kspace_);
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si);
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si);
@@ -169,7 +151,7 @@ class KinodynamicCSpaceOMPL: public CSpaceOMPL
 class GeometricCSpaceOMPLRotationalInvariance: public GeometricCSpaceOMPL
 {
   public:
-    GeometricCSpaceOMPLRotationalInvariance(Robot *robot_, CSpace *space_);
+    GeometricCSpaceOMPLRotationalInvariance(Robot *robot_, CSpaceKlampt *kspace_);
     virtual void initSpace();
     virtual void print();
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
@@ -179,7 +161,7 @@ class GeometricCSpaceOMPLRotationalInvariance: public GeometricCSpaceOMPL
 class GeometricCSpaceOMPLPathConstraintRollInvariance: public GeometricCSpaceOMPL
 {
   public:
-    GeometricCSpaceOMPLPathConstraintRollInvariance(Robot *robot_, CSpace *space_, std::vector<Config> path_);
+    GeometricCSpaceOMPLPathConstraintRollInvariance(Robot *robot_, CSpaceKlampt *space_, std::vector<Config> path_);
     virtual void initSpace();
     virtual void print();
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
@@ -191,7 +173,7 @@ class GeometricCSpaceOMPLPathConstraintRollInvariance: public GeometricCSpaceOMP
 class GeometricCSpaceOMPLPathConstraintSO3: public GeometricCSpaceOMPL
 {
   public:
-    GeometricCSpaceOMPLPathConstraintSO3(Robot *robot_, CSpace *space_, std::vector<Config> path_);
+    GeometricCSpaceOMPLPathConstraintSO3(Robot *robot_, CSpaceKlampt *space_, std::vector<Config> path_);
     virtual void initSpace();
     virtual void print();
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
@@ -203,7 +185,7 @@ class GeometricCSpaceOMPLPathConstraintSO3: public GeometricCSpaceOMPL
 class GeometricCSpaceOMPLPointConstraintSO3: public GeometricCSpaceOMPL
 {
   public:
-    GeometricCSpaceOMPLPointConstraintSO3(Robot *robot_, CSpace *space_, Config q);
+    GeometricCSpaceOMPLPointConstraintSO3(Robot *robot_, CSpaceKlampt *space_, Config q);
     virtual void initSpace();
     virtual void print();
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);

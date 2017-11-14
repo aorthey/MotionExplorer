@@ -21,9 +21,9 @@ std::vector<PathSpace*> PathSpaceOMPL::Decompose(){
   CSpaceFactory factory(input->GetCSpaceInput());
 
   int robot_idx = input->robot_idx;
-  Robot *robot = world->robots[robot_idx];
-  SingleRobotCSpace* kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
-  CSpaceOMPL *cspace = factory.MakeGeometricCSpace(robot, kcspace);
+  //Robot *robot = world->robots[robot_idx];
+  //SingleRobotCSpace* kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
+  CSpaceOMPL *cspace = factory.MakeGeometricCSpace(world, robot_idx);
   cspace->print();
 
   StrategyGeometric strategy;
@@ -55,8 +55,8 @@ void PathSpaceOMPL::DrawGL(GUIState& state){
   GLDraw::drawRobotAtConfig(robot, qi, lightGreen);
   GLDraw::drawRobotAtConfig(robot, qg, lightRed);
 
-  std::vector<Config> init_path; 
-  init_path.push_back(qi);
-  init_path.push_back(qg);
-  GLDraw::drawPath(init_path, lightGreen, 20);
+  //std::vector<Config> init_path; 
+  //init_path.push_back(qi);
+  //init_path.push_back(qg);
+  //GLDraw::drawPath(init_path, lightGreen, 20);
 }

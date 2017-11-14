@@ -85,8 +85,8 @@ void SliceSpace::Grow(double t){
       if(si_->isValid(st.get())){
         goalM_.push_back(addMilestone(si_->cloneState(st.get())));
         if(DEBUG){
-          std::cout << "new goal" << std::endl;
-          std::cout << st << std::endl;
+          //std::cout << "new goal" << std::endl;
+          //std::cout << st << std::endl;
         }
         break;
       }
@@ -202,6 +202,7 @@ bool SliceSpace::maybeConstructSolution(const std::vector<Vertex> &starts, const
 {
     ob::Goal *g = pdef_->getGoal().get();
     ob::Cost sol_cost(opt_->infiniteCost());
+    bestCost_ = ob::Cost(+dInf);
     foreach (Vertex start, starts)
     {
         foreach (Vertex goal, goals)

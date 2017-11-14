@@ -10,7 +10,7 @@ int main(int argc,const char** argv) {
 
   GLUIPlannerGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.AddPlannerInput(in);
-  gui.SetWindowTitle("HierarchicalMotionPlanner");
+  gui.SetWindowTitle("MotionPlannerVisualizer");
 
   if(in.inputs.empty()) env.GetBackendPtr()->state("draw_robot").active = 1;
 

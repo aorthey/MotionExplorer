@@ -26,6 +26,7 @@
     <epsilongoalregion>0.01</epsilongoalregion>
     <maxplanningtime>0.01</maxplanningtime>
 
+    <algorithm name="ompl:rrt"/>
     <algorithm name="hierarchical:ompl:prmstar">
       <maxplanningtime>0.5</maxplanningtime>
       <hierarchy>

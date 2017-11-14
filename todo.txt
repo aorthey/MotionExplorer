@@ -325,14 +325,14 @@ environments. Rigid bodies are OK for now.
 si->getValidityChecker()
 cast to my own -> get sufficient vs necessary
 
-[ ] create two new classes PathSpaceOMPLSE2, Pathspaceomplse2TwoLevel,
+[x] create two new classes PathSpaceOMPLSE2, Pathspaceomplse2TwoLevel,
 PathSpaceOMPLSE2OneLevel, which either call an ompl strategy, or call the
 necessary two level strategy. Each class visualizes the roadmap as a tree on 3d,
 which is overlayed onto the environment. We ignore the fact that each slice
 should be loop back onto itself for now. Use those classes to visualize and
 adapt the twolevel algorithm
 [ ] move CSPaceOMPL to OMPLSpace and CSpace to KlamptSpace, gets confusing
-otherwise
+otherwise (factory needs to store the pointers somehow)
 [x] create 2d environment for planar lshape in blender with narrow passage (and
 possible misleading initial path)
 
@@ -340,14 +340,16 @@ Minor Things
 [ ] cspace: refactor cspace into separate classes
 [ ] cspace: info print is horrible
 [ ] cspace: remove geometric and replace by namespace. remove cspace from filename?
-[ ] pathspace: starts to get confusing, clean up the mess
-[ ] make some generic printing, using__CLASS__, __FILE__, etcetera
-[ ] include kcspace into cspace factor, and add string type to specify cspace type from the outside
-[ ] refactor factory into one function, should encapsulate everything, no
+[ ] cspacefactory: constructor by string
+[ ] cspacefactory: include kcspace into cspace factor, and add string type to specify cspace type from the outside
+[ ] cspacefactory: refactor factory into one function, should encapsulate everything, no
 kcspace/cspaceompl stuff outside
+[ ] pathspace: starts to get confusing, clean up the mess
+[ ] base: make some generic printing, using__CLASS__, __FILE__, etcetera
 [ ] fix the chart boundary issue in visualizing the SE(2) roadmap
-[ ] rewrite path to use ompl representations, only convert at Eval
-
+[ ] path: rewrite path to use ompl representations, only convert at Eval
+[ ] make colors changeable from XML
+[ ] refactor slicespace algorithm
 
 SlicePlanner
 [x] be able to grow roadmap on C0 
@@ -364,6 +366,8 @@ SlicePlanner
 [x] compute feasible solution on easy problem
 [x] visualize rrt on SE(2) on planar Lshape environment
 [x] visualize N-rrt on SE(2) on planar Lshape environment
+[x] do you make sure that shortest path does not include +inf?
 [ ] visualize SN-rrt on SE(2) on planar Lshape environment
 [ ] benchmark SN-rrt and rrt n SE(3)
-
+[ ] in some cases we fail to find a solution, even so the solution does not
+contain a loop, why is that?

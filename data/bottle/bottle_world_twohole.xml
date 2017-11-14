@@ -22,6 +22,7 @@
     <maxplanningtime>0.1</maxplanningtime>
     <freeFloating>1</freeFloating>
 
+    <algorithm name="ompl:rrt"/>
     <algorithm name="hierarchical:roadmap:ompl:lazyprm">
       <maxplanningtime>0.5</maxplanningtime>
       <hierarchy>

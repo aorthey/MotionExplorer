@@ -73,7 +73,6 @@ void SliceSpacePRM::setProblemDefinitionLevel1(const base::ProblemDefinitionPtr 
   S_1->setProblemDefinition(pdef);
 }
 
-
 void SliceSpacePRM::clear()
 {
   S_0->clear();
@@ -97,22 +96,19 @@ ob::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCondition &
 
   S_0->horizontal = true;
   Q.push(S_0);
-  double slice_growth_time = 1e-3;
+  double slice_growth_time = 1e-4;
 
   bool solutionFound = false;
   while(!ptcOrSolutionFound && !solutionFound){
     SliceSpace* S = Q.top();
     Q.pop();
-    std::cout << "grow: ("<< S->id << ")" << slice_growth_time << std::endl;
     S->Grow(slice_growth_time);
     base::PathPtr path = S->GetSolutionPath();
     if(S->hasSolution()){
-      std::cout << "found sol at SliceSpace #" << S->id << std::endl;
-      if(S->horizontal){
-        //S_0
+      if(S->horizontal){ //S_0 has solution
+        ob::SO2StateSpace::StateType *SO2;
         std::vector<SliceSpace::Vertex> vpath = S->VerticesAlongShortestPath();
         ob::State *start = S_1->getProblemDefinition()->getStartState(0);
-        ob::SO2StateSpace::StateType *SO2;
         SO2 = start->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
         double yaw = SO2->value;
         std::vector<ob::State*> spath;
@@ -128,6 +124,7 @@ ob::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCondition &
           const SliceSpace::Vertex v2 = boost::target(edge.first, S->graph);
 
           if(e.slicespace==NULL){
+            ompl::msg::setLogLevel(ompl::msg::LOG_ERROR);
             if(k==vpath.size()-2){
               std::cout << "Final Edge!" << std::endl;
               const ob::GoalPtr gp = S_1->getProblemDefinition()->getGoal();
@@ -138,8 +135,11 @@ ob::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCondition &
             }else{
               e.slicespace = CreateNewSliceSpaceEdge(v1,v2,yaw);
             }
+            ompl::msg::setLogLevel(ompl::msg::LOG_INFO);
+
             e.setWeight(+dInf);
             boost::put(boost::edge_weight_t(), S->graph, edge.first, e);
+
             Q.push(e.slicespace);
             break;
           }else{
@@ -170,273 +170,269 @@ ob::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCondition &
             }
           }
         }
-      }else{
-        //S_edge has solution: we need to update the associated edge in the S_0
-        //graph!
-
-        const SliceSpace::Vertex v = S->GetExternalAssociatedEdgeSource();
-        const SliceSpace::Vertex w = S->GetExternalAssociatedEdgeTarget();
-
-        std::pair<SliceSpace::Edge, bool> edge = boost::edge(v, w, S_0->graph);
-        SliceSpace::EdgeProperty e = get(boost::edge_weight_t(), S_0->graph, edge.first);
-        e.setOriginalWeight();
-        boost::put(boost::edge_weight_t(), S_0->graph, edge.first, e);
-
-        //S->heuristic_add = +dInf;
+      }else{ //S_edge has solution
+        UpdateAssociatedEdgeInS0(S,S_0);
       }
     }
     Q.push(S);
   }
 
-  //construct shortest path
-
+  //construct solution path on S_1
   if(solutionFound){
-    std::vector<SliceSpace::Vertex> sp = S_0->VerticesAlongShortestPath();
-    std::cout << "constructing solution. vertices = " << sp.size() << std::endl;
-    for(uint k = 0; k < sp.size(); k++){
-      std::cout << sp.at(k) << std::endl;
-    }
-
-    SliceSpace::Vertex v0_0 = sp.at(0);
-    SliceSpace::Vertex v0_1 = S_1->startM_.at(0);
-
-    ob::RealVectorStateSpace::StateType *R;
-    ob::SO2StateSpace::StateType *SO2;
-
-    for(uint k = 1; k < sp.size(); k++){
-      SliceSpace::Vertex v1_0 = sp.at(k);
-      std::cout << "edge : " << v0_0 << " <-> " << v1_0 << std::endl;
-
-      std::pair<SliceSpace::Edge, bool> edge = boost::edge(v0_0, v1_0, S_0->graph);
-      if(!edge.second){
-        std::cout << "edge does not exists between " << v0_0 << " and " << v1_0 << std::endl;
-        exit(0);
-      }
-      SliceSpace::EdgeProperty pk = get (boost::edge_weight_t(), S_0->graph, edge.first);
-      if(!pk.slicespace){
-        std::cout << "has no slicespace" << std::endl;
-        exit(0);
-      }
-      SliceSpace *S = pk.slicespace;
-
-      ///Get S_0 coordinates
-      ob::State *s0_0 = S_0->stateProperty_[v0_0];
-      ob::State *s1_0 = S_0->stateProperty_[v1_0];
-      const ob::RealVectorStateSpace::StateType *R1 = s0_0->as<ob::RealVectorStateSpace::StateType>();
-      const ob::RealVectorStateSpace::StateType *R2 = s1_0->as<ob::RealVectorStateSpace::StateType>();
-
-      ///Get S_edge coordinates [0,1] \times C_2
-      base::PathPtr path = S->GetShortestPath();
-      og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-      std::vector<ob::State *> states = gpath.getStates();
-
-      std::cout << "  slice vertices: " << states.size() << std::endl;
-      for(uint j = 1; j < states.size(); j++){
-
-        ob::State* s0_e = states.at(j-1);
-
-        R = s0_e->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-        SO2 = s0_e->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-        double t0 = R->values[0];
-        double yaw0 = SO2->value;
-
-        ob::State* s1_e = states.at(j);
-
-        R = s1_e->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-        SO2 = s1_e->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-        double t1 = R->values[0];
-        double yaw1 = SO2->value;
-
-        /// Create new S_1 state at s0
-        ob::ScopedState<> state0(S_1->getSpaceInformation());
-        R = state0->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-        SO2 = state0->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-        for(uint i = 0; i < 2; i++)
-          R->values[i] = R1->values[i] + t0*(R2->values[i]-R1->values[i]);
-        SO2->value = yaw0;
-
-        /// Create new S_1 state at s1
-        ob::ScopedState<> state1(S_1->getSpaceInformation());
-        R = state1->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-        SO2 = state1->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-        for(uint i = 0; i < 2; i++)
-          R->values[i] = R1->values[i] + t1*(R2->values[i]-R1->values[i]);
-        SO2->value = yaw1;
-
-        /// Add states s0,s1 and edge (s0,s1) to the S_1 roadmap
-        SliceSpace::Vertex v1_1;
-        if(k>sp.size()-2 && j>states.size()-2){
-          v1_1 = S_1->goalM_.at(0);
-        }else{
-          v1_1 = boost::add_vertex(S_1->graph);
-        }
-
-        S_1->stateProperty_[v0_1] = si_->cloneState(state0.get());
-        S_1->stateProperty_[v1_1] = si_->cloneState(state1.get());
-        SliceSpace::EdgeProperty properties(S_1->opt_->motionCost(S_1->stateProperty_[v0_1], S_1->stateProperty_[v1_1]));
-        boost::add_edge(v0_1, v1_1, properties, S_1->graph);
-        S_1->uniteComponents(v0_1, v1_1);
-
-        v0_1 = v1_1;
-      }
-      v0_0 = v1_0;
-
-    }
+    ConstructShortestPathOnS1(S_0,S_1);
   }
 
-
-
-
-  //deconstruct priority queue
-  std::cout << std::string(80, '-') << std::endl;
+  //add vertices and edges from slice space to S_1 roadmap
   while(!Q.empty()){
     SliceSpace *S = Q.top();
-    ob::SpaceInformationPtr si = S_1->getSpaceInformation();
-    std::cout << "extracting data from SliceSpace #"<< S->id << " (" 
-      << boost::num_vertices(S->graph) <<  " vertices, " 
-      << boost::num_edges(S->graph) << " edges, " 
-      << S->GetSamplingDensity() << " density, " << S->getSpaceInformation()->getSpaceMeasure() << " measure)" << std::endl;
-    if(!S->horizontal){
-      //add slicespace data points to S_1
-
-      SliceSpace::Vertex v1 = S->GetExternalAssociatedEdgeSource();
-      SliceSpace::Vertex v2 = S->GetExternalAssociatedEdgeTarget();
-
-      ob::State *s0 = S_0->stateProperty_[v1];
-      ob::State *s1 = S_0->stateProperty_[v2];
-      const ob::RealVectorStateSpace::StateType *R1 = s0->as<ob::RealVectorStateSpace::StateType>();
-      const ob::RealVectorStateSpace::StateType *R2 = s1->as<ob::RealVectorStateSpace::StateType>();
-
-      uint N = boost::num_vertices(S->graph);
-      ob::RealVectorStateSpace::StateType *R;
-      ob::SO2StateSpace::StateType *SO2;
-      foreach (const SliceSpace::Edge e, boost::edges(S->graph)){
-
-        const SliceSpace::Vertex v1 = boost::source(e, S->graph);
-        const SliceSpace::Vertex v2 = boost::target(e, S->graph);
-        ob::State *s0 = S->stateProperty_[v1];
-        ob::State *s1 = S->stateProperty_[v2];
-
-        Config q1;q1.resize(6);q1.setZero();
-        Config q2;q2.resize(6);q2.setZero();
-
-        double t = s0->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0)->values[0];
-        for(uint k = 0; k < 2; k++)
-          q1(k) = R1->values[k] + t*(R2->values[k]-R1->values[k]);
-        SO2 = s0->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-        q1(3) = SO2->value;
-
-        t = s1->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0)->values[0];
-        for(uint k = 0; k < 2; k++)
-          q2(k) = R1->values[k] + t*(R2->values[k]-R1->values[k]);
-        SO2 = s1->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-        q2(3) = SO2->value;
-
-        ob::ScopedState<> stateM(si);
-        R = stateM->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-        SO2 = stateM->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-        R->values[0] = q1(0);
-        R->values[1] = q1(1);
-        SO2->value = q1(3);
-        ob::ScopedState<> stateN(si);
-        R = stateN->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-        SO2 = stateN->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-        R->values[0] = q2(0);
-        R->values[1] = q2(1);
-        SO2->value = q2(3);
-
-        SliceSpace::Vertex m = boost::add_vertex(S_1->graph);
-        SliceSpace::Vertex n = boost::add_vertex(S_1->graph);
-        S_1->stateProperty_[m] = si_->cloneState(stateM.get());
-        S_1->stateProperty_[n] = si_->cloneState(stateN.get());
-
-        SliceSpace::EdgeProperty properties(ob::Cost(0.0));//S_1->opt_->motionCost(S_1->stateProperty_[m], S_1->stateProperty_[n]));
-        boost::add_edge(m, n, properties, S_1->graph);
-      }
-
-    }else{
-      //horizontal
-
-      foreach (const SliceSpace::Edge e, boost::edges(S->graph))
-      {
-        const SliceSpace::Vertex v1 = boost::source(e, S->graph);
-        const SliceSpace::Vertex v2 = boost::target(e, S->graph);
-        ob::State *s0 = S->stateProperty_[v1];
-        ob::State *s1 = S->stateProperty_[v2];
-        const ob::RealVectorStateSpace::StateType *R1 = s0->as<ob::RealVectorStateSpace::StateType>();
-        const ob::RealVectorStateSpace::StateType *R2 = s1->as<ob::RealVectorStateSpace::StateType>();
-
-        SliceSpace::Vertex m = boost::add_vertex(S_1->graph);
-        SliceSpace::Vertex m2 = boost::add_vertex(S_1->graph);
-        SliceSpace::Vertex n = boost::add_vertex(S_1->graph);
-        SliceSpace::Vertex n2 = boost::add_vertex(S_1->graph);
-
-        ob::RealVectorStateSpace::StateType *R;
-        ob::SO2StateSpace::StateType *SO2;
-
-        ob::ScopedState<> stateM(si);
-        R = stateM->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-        SO2 = stateM->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-        R->values[0] = R1->values[0];
-        R->values[1] = R1->values[1];
-        SO2->value = 0;
-        ob::ScopedState<> stateN(si);
-        R = stateN->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-        SO2 = stateN->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-        R->values[0] = R2->values[0];
-        R->values[1] = R2->values[1];
-        SO2->value = 0;
-
-        ob::ScopedState<> stateM2(si);
-        R = stateM2->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-        SO2 = stateM2->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-        R->values[0] = R1->values[0];
-        R->values[1] = R1->values[1];
-        SO2->value = 2*M_PI;
-
-        ob::ScopedState<> stateN2(si);
-        R = stateN2->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-        SO2 = stateN2->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-        R->values[0] = R2->values[0];
-        R->values[1] = R2->values[1];
-        SO2->value = 2*M_PI;
-
-        S_1->stateProperty_[m] = si_->cloneState(stateM.get());
-        S_1->stateProperty_[m2] = si_->cloneState(stateM2.get());
-        S_1->stateProperty_[n] = si_->cloneState(stateN.get());
-        S_1->stateProperty_[n2] = si_->cloneState(stateN2.get());
-
-        SliceSpace::EdgeProperty properties(ob::Cost(0.0));//S_1->opt_->motionCost(S_1->stateProperty_[m], S_1->stateProperty_[n]));
-        boost::add_edge(m, n, properties, S_1->graph);
-        //boost::add_edge(m, m2, properties, S_1->graph);
-        //boost::add_edge(n, n2, properties, S_1->graph);
-        //boost::add_edge(m2, n2, properties, S_1->graph);
-      }
-    }
-
+    SliceSpaceToS1(S, S_0, S_1);
     Q.pop();
   }
 
   base::PathPtr sol = NULL;
   if(solutionFound){
-    std::cout << "S_1->GetSolutionPath()" << std::endl;
     sol = S_1->GetSolutionPath();
     if (sol)
     {
       base::PlannerSolution psol(sol);
       psol.setPlannerName(getName());
-      //psol.setOptimized(opt_, bestCost_, S_1->hasSolution());
       S_1->getProblemDefinition()->addSolutionPath(psol);
     }
   }
 
   return sol ? ob::PlannerStatus::EXACT_SOLUTION : ob::PlannerStatus::TIMEOUT;
+
+}
+void SliceSpacePRM::UpdateAssociatedEdgeInS0(SliceSpace *S, SliceSpace *S_0){
+  const SliceSpace::Vertex v = S->GetExternalAssociatedEdgeSource();
+  const SliceSpace::Vertex w = S->GetExternalAssociatedEdgeTarget();
+
+  std::pair<SliceSpace::Edge, bool> edge = boost::edge(v, w, S_0->graph);
+  SliceSpace::EdgeProperty e = get(boost::edge_weight_t(), S_0->graph, edge.first);
+  e.setOriginalWeight();
+  boost::put(boost::edge_weight_t(), S_0->graph, edge.first, e);
 }
 
 void SliceSpacePRM::getPlannerData(base::PlannerData &data) const
 {
   S_1->getPlannerData(data);
 }
+void SliceSpacePRM::ConstructShortestPathOnS1(SliceSpace *S_0, SliceSpace *S_1){
+  std::vector<SliceSpace::Vertex> sp = S_0->VerticesAlongShortestPath();
+  std::cout << "constructing solution. vertices = " << sp.size() << std::endl;
+  for(uint k = 0; k < sp.size(); k++){
+    std::cout << sp.at(k) << std::endl;
+  }
+
+  SliceSpace::Vertex v0_0 = sp.at(0);
+  SliceSpace::Vertex v0_1 = S_1->startM_.at(0);
+
+  ob::RealVectorStateSpace::StateType *R;
+  ob::SO2StateSpace::StateType *SO2;
+
+  for(uint k = 1; k < sp.size(); k++){
+    SliceSpace::Vertex v1_0 = sp.at(k);
+    std::cout << "edge : " << v0_0 << " <-> " << v1_0 << std::endl;
+
+    std::pair<SliceSpace::Edge, bool> edge = boost::edge(v0_0, v1_0, S_0->graph);
+    if(!edge.second){
+      std::cout << "edge does not exists between " << v0_0 << " and " << v1_0 << std::endl;
+      exit(0);
+    }
+    SliceSpace::EdgeProperty pk = get (boost::edge_weight_t(), S_0->graph, edge.first);
+    if(!pk.slicespace){
+      std::cout << "has no slicespace" << std::endl;
+      exit(0);
+    }
+    SliceSpace *S = pk.slicespace;
+
+    ///Get S_0 coordinates
+    ob::State *s0_0 = S_0->stateProperty_[v0_0];
+    ob::State *s1_0 = S_0->stateProperty_[v1_0];
+    const ob::RealVectorStateSpace::StateType *R1 = s0_0->as<ob::RealVectorStateSpace::StateType>();
+    const ob::RealVectorStateSpace::StateType *R2 = s1_0->as<ob::RealVectorStateSpace::StateType>();
+
+    ///Get S_edge coordinates [0,1] \times C_2
+    base::PathPtr path = S->GetShortestPath();
+    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+    std::vector<ob::State *> states = gpath.getStates();
+
+    std::cout << "  slice vertices: " << states.size() << std::endl;
+    for(uint j = 1; j < states.size(); j++){
+
+      ob::State* s0_e = states.at(j-1);
+
+      R = s0_e->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+      SO2 = s0_e->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+      double t0 = R->values[0];
+      double yaw0 = SO2->value;
+
+      ob::State* s1_e = states.at(j);
+
+      R = s1_e->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+      SO2 = s1_e->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+      double t1 = R->values[0];
+      double yaw1 = SO2->value;
+
+      /// Create new S_1 state at s0
+      ob::ScopedState<> state0(S_1->getSpaceInformation());
+      R = state0->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+      SO2 = state0->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+      for(uint i = 0; i < 2; i++)
+        R->values[i] = R1->values[i] + t0*(R2->values[i]-R1->values[i]);
+      SO2->value = yaw0;
+
+      /// Create new S_1 state at s1
+      ob::ScopedState<> state1(S_1->getSpaceInformation());
+      R = state1->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+      SO2 = state1->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+      for(uint i = 0; i < 2; i++)
+        R->values[i] = R1->values[i] + t1*(R2->values[i]-R1->values[i]);
+      SO2->value = yaw1;
+
+      /// Add states s0,s1 and edge (s0,s1) to the S_1 roadmap
+      SliceSpace::Vertex v1_1;
+      if(k>sp.size()-2 && j>states.size()-2){
+        v1_1 = S_1->goalM_.at(0);
+      }else{
+        v1_1 = boost::add_vertex(S_1->graph);
+      }
+
+      S_1->stateProperty_[v0_1] = si_->cloneState(state0.get());
+      S_1->stateProperty_[v1_1] = si_->cloneState(state1.get());
+      SliceSpace::EdgeProperty properties(S_1->opt_->motionCost(S_1->stateProperty_[v0_1], S_1->stateProperty_[v1_1]));
+      boost::add_edge(v0_1, v1_1, properties, S_1->graph);
+      S_1->uniteComponents(v0_1, v1_1);
+
+      v0_1 = v1_1;
+    }
+    v0_0 = v1_0;
+
+  }
+}
+void SliceSpacePRM::SliceSpaceToS1(SliceSpace *S, SliceSpace *S_0, SliceSpace *S_1 ){
+  ob::SpaceInformationPtr si = S_1->getSpaceInformation();
+  std::cout << "extracting from #"<< S->id << " (" 
+    << boost::num_vertices(S->graph) <<  " vertices, " 
+    << boost::num_edges(S->graph) << " edges, " 
+    << S->GetSamplingDensity() << " density, " << S->getSpaceInformation()->getSpaceMeasure() << " measure, " << (S->hasSolution()?"solved":"") << ")" << std::endl;
+
+  if(!S->horizontal){
+    //add slicespace data points to S_1
+
+    SliceSpace::Vertex v1 = S->GetExternalAssociatedEdgeSource();
+    SliceSpace::Vertex v2 = S->GetExternalAssociatedEdgeTarget();
+
+    ob::State *s0 = S_0->stateProperty_[v1];
+    ob::State *s1 = S_0->stateProperty_[v2];
+    const ob::RealVectorStateSpace::StateType *R1 = s0->as<ob::RealVectorStateSpace::StateType>();
+    const ob::RealVectorStateSpace::StateType *R2 = s1->as<ob::RealVectorStateSpace::StateType>();
+
+    uint N = boost::num_vertices(S->graph);
+    ob::RealVectorStateSpace::StateType *R;
+    ob::SO2StateSpace::StateType *SO2;
+    foreach (const SliceSpace::Edge e, boost::edges(S->graph)){
+
+      const SliceSpace::Vertex v1 = boost::source(e, S->graph);
+      const SliceSpace::Vertex v2 = boost::target(e, S->graph);
+      ob::State *s0 = S->stateProperty_[v1];
+      ob::State *s1 = S->stateProperty_[v2];
+
+      Config q1;q1.resize(6);q1.setZero();
+      Config q2;q2.resize(6);q2.setZero();
+
+      double t = s0->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0)->values[0];
+      for(uint k = 0; k < 2; k++)
+        q1(k) = R1->values[k] + t*(R2->values[k]-R1->values[k]);
+      SO2 = s0->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+      q1(3) = SO2->value;
+
+      t = s1->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0)->values[0];
+      for(uint k = 0; k < 2; k++)
+        q2(k) = R1->values[k] + t*(R2->values[k]-R1->values[k]);
+      SO2 = s1->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+      q2(3) = SO2->value;
+
+      ob::ScopedState<> stateM(si);
+      R = stateM->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+      SO2 = stateM->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+      R->values[0] = q1(0);
+      R->values[1] = q1(1);
+      SO2->value = q1(3);
+      ob::ScopedState<> stateN(si);
+      R = stateN->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+      SO2 = stateN->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+      R->values[0] = q2(0);
+      R->values[1] = q2(1);
+      SO2->value = q2(3);
+
+      SliceSpace::Vertex m = boost::add_vertex(S_1->graph);
+      SliceSpace::Vertex n = boost::add_vertex(S_1->graph);
+      S_1->stateProperty_[m] = si_->cloneState(stateM.get());
+      S_1->stateProperty_[n] = si_->cloneState(stateN.get());
+
+      SliceSpace::EdgeProperty properties(ob::Cost(0.0));//S_1->opt_->motionCost(S_1->stateProperty_[m], S_1->stateProperty_[n]));
+      boost::add_edge(m, n, properties, S_1->graph);
+    }
+
+  }else{
+    //horizontal
+
+    foreach (const SliceSpace::Edge e, boost::edges(S->graph))
+    {
+      const SliceSpace::Vertex v1 = boost::source(e, S->graph);
+      const SliceSpace::Vertex v2 = boost::target(e, S->graph);
+      ob::State *s0 = S->stateProperty_[v1];
+      ob::State *s1 = S->stateProperty_[v2];
+      const ob::RealVectorStateSpace::StateType *R1 = s0->as<ob::RealVectorStateSpace::StateType>();
+      const ob::RealVectorStateSpace::StateType *R2 = s1->as<ob::RealVectorStateSpace::StateType>();
+
+      SliceSpace::Vertex m = boost::add_vertex(S_1->graph);
+      SliceSpace::Vertex m2 = boost::add_vertex(S_1->graph);
+      SliceSpace::Vertex n = boost::add_vertex(S_1->graph);
+      SliceSpace::Vertex n2 = boost::add_vertex(S_1->graph);
+
+      ob::RealVectorStateSpace::StateType *R;
+      ob::SO2StateSpace::StateType *SO2;
+
+      ob::ScopedState<> stateM(si);
+      R = stateM->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+      SO2 = stateM->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+      R->values[0] = R1->values[0];
+      R->values[1] = R1->values[1];
+      SO2->value = 0;
+      ob::ScopedState<> stateN(si);
+      R = stateN->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+      SO2 = stateN->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+      R->values[0] = R2->values[0];
+      R->values[1] = R2->values[1];
+      SO2->value = 0;
+
+      ob::ScopedState<> stateM2(si);
+      R = stateM2->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+      SO2 = stateM2->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+      R->values[0] = R1->values[0];
+      R->values[1] = R1->values[1];
+      SO2->value = 2*M_PI;
+
+      ob::ScopedState<> stateN2(si);
+      R = stateN2->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+      SO2 = stateN2->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+      R->values[0] = R2->values[0];
+      R->values[1] = R2->values[1];
+      SO2->value = 2*M_PI;
+
+      S_1->stateProperty_[m] = si_->cloneState(stateM.get());
+      S_1->stateProperty_[m2] = si_->cloneState(stateM2.get());
+      S_1->stateProperty_[n] = si_->cloneState(stateN.get());
+      S_1->stateProperty_[n2] = si_->cloneState(stateN2.get());
+
+      SliceSpace::EdgeProperty properties(ob::Cost(0.0));//S_1->opt_->motionCost(S_1->stateProperty_[m], S_1->stateProperty_[n]));
+      boost::add_edge(m, n, properties, S_1->graph);
+    }
+  }
+}
+
 
 SliceSpace* SliceSpacePRM::CreateNewSliceSpaceEdge(SliceSpace::Vertex v, SliceSpace::Vertex w, double yaw){
 
@@ -446,8 +442,8 @@ SliceSpace* SliceSpacePRM::CreateNewSliceSpaceEdge(SliceSpace::Vertex v, SliceSp
   CSpaceFactory factory(cin);
 
   int robot_idx = 0;
+
   Robot *robot = world->robots[robot_idx];
-  SingleRobotCSpace *kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
 
   ob::SpaceInformationPtr si = S_0->getSpaceInformation();
   const ob::StateValidityCheckerPtr checker = si->getStateValidityChecker();
@@ -458,7 +454,7 @@ SliceSpace* SliceSpacePRM::CreateNewSliceSpaceEdge(SliceSpace::Vertex v, SliceSp
   ob::State* sw = S_0->stateProperty_[w];
   Config q2 = cspace->OMPLStateToConfig(sw);
 
-  CSpaceOMPL *edge_cspace = factory.MakeGeometricCSpaceR2EdgeSO2(robot, kcspace, q1, q2);
+  CSpaceOMPL *edge_cspace = factory.MakeGeometricCSpaceR2EdgeSO2(world, robot_idx, q1, q2);
 
   ob::SpaceInformationPtr si_edge = edge_cspace->SpaceInformationPtr();
 
@@ -498,8 +494,8 @@ SliceSpace* SliceSpacePRM::CreateNewSliceSpaceFinalGoalEdge(SliceSpace::Vertex v
   CSpaceFactory factory(cin);
 
   int robot_idx = 0;
+
   Robot *robot = world->robots[robot_idx];
-  SingleRobotCSpace *kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
 
   ob::SpaceInformationPtr si = S_0->getSpaceInformation();
   const ob::StateValidityCheckerPtr checker = si->getStateValidityChecker();
@@ -510,7 +506,7 @@ SliceSpace* SliceSpacePRM::CreateNewSliceSpaceFinalGoalEdge(SliceSpace::Vertex v
   ob::State* sw = S_0->stateProperty_[w];
   Config q2 = cspace->OMPLStateToConfig(sw);
 
-  CSpaceOMPL *edge_cspace = factory.MakeGeometricCSpaceR2EdgeSO2(robot, kcspace, q1, q2);
+  CSpaceOMPL *edge_cspace = factory.MakeGeometricCSpaceR2EdgeSO2(world, robot_idx, q1, q2);
 
   ob::SpaceInformationPtr si_edge = edge_cspace->SpaceInformationPtr();
 

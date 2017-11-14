@@ -10,6 +10,7 @@ PathSpaceOMPLTwoLevel::PathSpaceOMPLTwoLevel(RobotWorld *world_, PathSpaceInput*
   PathSpaceOMPL(world_, input_)
 {
 }
+
 std::vector<PathSpace*> PathSpaceOMPLTwoLevel::Decompose(){
   WorldPlannerSettings worldsettings;
   worldsettings.InitializeDefault(*world);
@@ -19,15 +20,15 @@ std::vector<PathSpace*> PathSpaceOMPLTwoLevel::Decompose(){
   /// SE(2)
   PathSpaceInput* next = input->GetNextLayer()->GetNextLayer();
   int robot_idx = next->robot_idx;
-  Robot *robot = world->robots[robot_idx];
-  SingleRobotCSpace *kspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
-  CSpaceOMPL* cspace = factory.MakeGeometricCSpaceSE2(robot, kspace);
+  //Robot *robot = world->robots[robot_idx];
+  //SingleRobotCSpace *kspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
+  CSpaceOMPL* cspace = factory.MakeGeometricCSpaceSE2(world, robot_idx);
 
   /// R^2
   robot_idx = input->robot_idx;
-  robot = world->robots[robot_idx];
-  SingleRobotCSpace *kcspace0 = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
-  CSpaceOMPL *cspace_level0 = factory.MakeGeometricCSpaceR2(robot, kcspace0);
+  //robot = world->robots[robot_idx];
+  //SingleRobotCSpace *kcspace0 = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
+  CSpaceOMPL *cspace_level0 = factory.MakeGeometricCSpaceR2(world, robot_idx);
 
   StrategyGeometricMultiLevel strategy;
   StrategyOutput output(cspace);
@@ -48,10 +49,10 @@ std::vector<PathSpace*> PathSpaceOMPLTwoLevel::Decompose(){
   decomposedspace.back()->SetRoadmap( roadmap );
   std::cout << output << std::endl;
 
-  roadmap->SetShortestPath( output.GetShortestPath() );
   if(output.hasExactSolution()){
-    roadmap->SetShortestPath( output.GetShortestPath() );
-    decomposedspace.back()->SetShortestPath( output.GetShortestPath() );
+    std::vector<Config> path = output.GetShortestPath();
+    roadmap->SetShortestPath( path );
+    decomposedspace.at(0)->SetShortestPath( path );
   }
   return decomposedspace;
 

@@ -3,9 +3,8 @@
 class GeometricCSpaceOMPLR2: public GeometricCSpaceOMPL
 {
   public:
-    GeometricCSpaceOMPLR2(Robot *robot_, CSpace *space_);
+    GeometricCSpaceOMPLR2(RobotWorld *world_, int robot_idx);
     virtual void initSpace();
-    virtual void print();
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
     virtual Config OMPLStateToConfig(const ob::State *qompl);
 };

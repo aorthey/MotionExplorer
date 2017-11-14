@@ -14,6 +14,7 @@
 -->
 
   <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/2droom.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
+
   <plannerinput>
 
     <!-- general settings for all algorithms (fixed) -->
@@ -28,7 +29,7 @@
     <!-- default settings for all algorithms (overwriteable) -->
     <timestep min="0.001" max="0.01"/>
     <epsilongoalregion>0.0</epsilongoalregion>
-    <maxplanningtime>1</maxplanningtime>
+    <maxplanningtime>20</maxplanningtime>
 
     <!-- individual algorithms plus individual settings -->
     <algorithm name="hierarchical:twolevel:ompl:slicespaceprm">
@@ -37,7 +38,9 @@
         <level inner_index="0" outer_index="0" type="atomic"/>
       </hierarchy>
     </algorithm>
-    <algorithm name="se2:ompl:rrt"/>
+    <algorithm name="se2:ompl:rrt">
+    <maxplanningtime>0.5</maxplanningtime>
+    </algorithm>
     <!--
     <algorithm name="ompl:biest"/>
     <algorithm name="ompl:rrt"/>

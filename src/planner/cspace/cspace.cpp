@@ -61,6 +61,14 @@ void OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSp
 }
 
 
+CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx):
+  world(world_)
+{
+  robot = world->robots[robot_idx];
+  worldsettings.InitializeDefault(*world);
+  kspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
+}
+
 CSpaceOMPL::CSpaceOMPL(Robot *robot_, CSpace *kspace_):
   robot(robot_), kspace(kspace_)
 {
@@ -70,10 +78,53 @@ CSpaceOMPL::CSpaceOMPL(Robot *robot_, CSpace *kspace_):
     exit(0);
   }
 }
+Config CSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
+  const ob::State* s = qompl.get();
+  return OMPLStateToConfig(s);
+}
 
+const ob::StateSpacePtr CSpaceOMPL::SpacePtr(){
+  return space;
+}
+ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
+  if(!si){
+    si = std::make_shared<ob::SpaceInformation>(SpacePtr());
+    const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr(si);
+    si->setStateValidityChecker(checker);
+  }
+  return si;
+}
+const oc::RealVectorControlSpacePtr CSpaceOMPL::ControlSpacePtr(){
+  return control_space;
+}
+uint CSpaceOMPL::GetDimensionality() const{
+  return space->getDimension();
+}
+uint CSpaceOMPL::GetControlDimensionality() const{
+  return control_space->getDimension();
+}
+void CSpaceOMPL::SetCSpaceInput(const CSpaceInput &input_){
+  input = input_;
+}
+Robot* CSpaceOMPL::GetRobotPtr(){
+  return robot;
+}
+CSpace* CSpaceOMPL::GetCSpacePtr(){
+  return kspace;
+}
+
+GeometricCSpaceOMPL::GeometricCSpaceOMPL(RobotWorld *world_, int robot_idx):
+  CSpaceOMPL(world_, robot_idx)
+{
+  Init();
+}
 GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
   CSpaceOMPL(robot_, kspace_)
 {
+  Init();
+}
+
+void GeometricCSpaceOMPL::Init(){
   Nklampt =  robot->q.size() - 6;
 
   //check if the robot is SE(3) or if we need to add real vector space for joints
@@ -107,7 +158,6 @@ GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
     }
   }
 }
-
 
 void GeometricCSpaceOMPL::initSpace()
 {
@@ -233,8 +283,8 @@ void GeometricCSpaceOMPL::print()
   std::cout << " Configuration Space (original) : SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(Nklampt):"") << "  [Klampt]"<< std::endl;
   std::cout << " Configuration Space (effective): SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(Nompl):"") << "  [OMPL]" << std::endl;
 
-  ob::SE3StateSpace *cspaceSE3;
-  ob::RealVectorStateSpace *cspaceRn;
+  ob::SE3StateSpace *cspaceSE3 = NULL;
+  ob::RealVectorStateSpace *cspaceRn = NULL;
 
   //uint N =  robot->q.size() - 6;
   if(Nompl>0){
@@ -444,8 +494,8 @@ void KinodynamicCSpaceOMPL::print()
   ob::CompoundStateSpace *cspace = space->as<ob::CompoundStateSpace>();
   ob::SE3StateSpace *cspaceSE3 = cspace->as<ob::SE3StateSpace>(0);
 
-  ob::RealVectorStateSpace *cspaceRn;
-  ob::RealVectorStateSpace *cspaceTM;
+  ob::RealVectorStateSpace *cspaceRn = NULL;
+  ob::RealVectorStateSpace *cspaceTM = NULL;
 
   uint N =  robot->q.size() - 6;
   if(N>0){
@@ -942,8 +992,8 @@ void GeometricCSpaceOMPLPathConstraintRollInvariance::initSpace()
   ob::StateSpacePtr S1b = (std::make_shared<ob::SO2StateSpace>());
   this->space = R + S1a + S1b;
   ob::RealVectorStateSpace *cspaceR = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(0);
-  ob::SO2StateSpace *cspaceS1a = this->space->as<ob::CompoundStateSpace>()->as<ob::SO2StateSpace>(1);
-  ob::SO2StateSpace *cspaceS1b = this->space->as<ob::CompoundStateSpace>()->as<ob::SO2StateSpace>(2);
+  //ob::SO2StateSpace *cspaceS1a = this->space->as<ob::CompoundStateSpace>()->as<ob::SO2StateSpace>(1);
+  //ob::SO2StateSpace *cspaceS1b = this->space->as<ob::CompoundStateSpace>()->as<ob::SO2StateSpace>(2);
 
   ob::RealVectorBounds cbounds(1);
   cbounds.setLow(0);
@@ -1011,7 +1061,7 @@ void GeometricCSpaceOMPLPathConstraintSO3::initSpace()
   ob::StateSpacePtr SO3 = (std::make_shared<ob::SO3StateSpace>());
   this->space = R + SO3;
   ob::RealVectorStateSpace *cspaceR = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(0);
-  ob::SO3StateSpace *cspaceSO3 = this->space->as<ob::CompoundStateSpace>()->as<ob::SO3StateSpace>(1);
+  //ob::SO3StateSpace *cspaceSO3 = this->space->as<ob::CompoundStateSpace>()->as<ob::SO3StateSpace>(1);
 
   ob::RealVectorBounds cbounds(1);
   cbounds.setLow(0);
@@ -1101,4 +1151,18 @@ ob::ScopedState<> GeometricCSpaceOMPLPointConstraintSO3::ConfigToOMPLState(const
   ob::SO3StateSpace::StateType *qomplSO3 = qompl->as<ob::SO3StateSpace::StateType>();
   OMPLSO3StateSpaceFromEulerXYZ(q(3),q(4),q(5),qomplSO3);
   return qompl;
+}
+
+std::ostream& operator<< (std::ostream& out, const CSpaceOMPL& space) 
+{
+  out << std::string(80, '-') << std::endl;
+  out << "[ConfigurationSpace]" << std::endl;
+  out << std::string(80, '-') << std::endl;
+  std::cout << "Dimensionality (OMPL)    : " << space.GetDimensionality() << std::endl;
+  //uint ii = space.input.robot_inner_idx;
+  //uint io = space.input.robot_outer_idx;
+  //std::cout << " robot inner : " << ii << " " << space.world->robots[ii]->name << std::endl;
+  //std::cout << " robot outer : " << io << " " << space.world->robots[io]->name << std::endl;
+  out << std::string(80, '-') << std::endl;
+  return out;
 }

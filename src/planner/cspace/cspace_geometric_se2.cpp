@@ -2,8 +2,8 @@
 #include "planner/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SE2StateSpace.h>
 
-GeometricCSpaceOMPLSE2::GeometricCSpaceOMPLSE2(Robot *robot_, CSpace *space_):
-  GeometricCSpaceOMPL(robot_, space_)
+GeometricCSpaceOMPLSE2::GeometricCSpaceOMPLSE2(RobotWorld *world_, int robot_idx):
+  GeometricCSpaceOMPL(world_, robot_idx)
 {
 }
 
@@ -32,14 +32,6 @@ void GeometricCSpaceOMPLSE2::initSpace()
   cspace->setBounds(bounds);
   bounds.check();
 
-}
-void GeometricCSpaceOMPLSE2::print()
-{
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "[CSpace]" << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Name                      : OMPL CSPACE SE(2)" << std::endl;
-  std::cout << "Dimensionality Space      :" << GetDimensionality() << std::endl;
 }
 
 ob::ScopedState<> GeometricCSpaceOMPLSE2::ConfigToOMPLState(const Config &q){

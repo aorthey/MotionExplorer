@@ -3,8 +3,8 @@
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/base/spaces/SO2StateSpace.h>
 
-GeometricCSpaceOMPLR2EdgeSO2::GeometricCSpaceOMPLR2EdgeSO2(Robot *robot_, CSpace *space_, const Config& q_src, const Config& q_trg):
-  GeometricCSpaceOMPL(robot_, space_),
+GeometricCSpaceOMPLR2EdgeSO2::GeometricCSpaceOMPLR2EdgeSO2(RobotWorld *world_, int robot_idx, const Config& q_src, const Config& q_trg):
+  GeometricCSpaceOMPL(world_, robot_idx),
   q1(q_src), q2(q_trg)
 {
   double x1 = q1(0);
@@ -26,14 +26,6 @@ void GeometricCSpaceOMPLR2EdgeSO2::initSpace()
   cbounds.setHigh(1+1e-10);
   cspaceR->setBounds(cbounds);
 
-}
-void GeometricCSpaceOMPLR2EdgeSO2::print()
-{
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "[CSpace]" << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Name                      : OMPL CSPACE R^2 Edge SO(2)" << std::endl;
-  std::cout << "Dimensionality Space      : " << GetDimensionality() << std::endl;
 }
 
 ob::ScopedState<> GeometricCSpaceOMPLR2EdgeSO2::ConfigToOMPLState(const Config &q){
