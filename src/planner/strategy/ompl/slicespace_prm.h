@@ -61,9 +61,6 @@ namespace ompl
         RobotWorld *world;
         WorldPlannerSettings worldsettings;
 
-        ob::SpaceInformationPtr si_level0;
-        ob::SpaceInformationPtr si_level1;
-
         void UpdateAssociatedEdgeInS0(SliceSpace *S, SliceSpace *S_0);
         void SliceSpaceToS1(SliceSpace *S, SliceSpace *S_0, SliceSpace *S_1 );
         void ConstructShortestPathOnS1(SliceSpace *S_0, SliceSpace *S_1);

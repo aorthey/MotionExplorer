@@ -1,7 +1,6 @@
 #include "planner/strategy/strategy_geometric_multilevel.h"
-#include "planner/strategy/ompl/ompl_necessary.h"
-#include "planner/strategy/ompl/necessary_prm.h"
 #include "planner/strategy/ompl/slicespace_prm.h"
+#include "planner/strategy/ompl/level_rrt.h"
 
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/geometric/SimpleSetup.h>
@@ -10,6 +9,7 @@
 StrategyGeometricMultiLevel::StrategyGeometricMultiLevel()
 {
 }
+
 void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutput &output)
 {
 
@@ -48,16 +48,18 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   pdef1->setGoal(goal);
   pdef1->setOptimizationObjective( getThresholdPathLengthObj(si1) );
 
-
   //###########################################################################
   // choose planner
   //###########################################################################
-  typedef std::shared_ptr<og::SliceSpacePRM> SliceSpacePRMPtr;
-    
-  SliceSpacePRMPtr planner = std::make_shared<og::SliceSpacePRM>(input.world, si0, si1);
 
-  planner->setProblemDefinitionLevel0(pdef0);
-  planner->setProblemDefinitionLevel1(pdef1);
+  typedef std::shared_ptr<og::SliceSpacePRM> SliceSpacePRMPtr;
+  typedef std::shared_ptr<og::LevelRRT> LevelRRTPtr;
+  //SliceSpacePRMPtr planner = std::make_shared<og::SliceSpacePRM>(input.world, si0, si1);
+  LevelRRTPtr planner = std::make_shared<og::LevelRRT>(si1, si0);
+
+  planner->setProblemDefinition(pdef1);
+  //planner->setProblemDefinitionLevel0(pdef0);
+  //planner->setProblemDefinitionLevel1(pdef1);
   planner->setup();
 
   //###########################################################################

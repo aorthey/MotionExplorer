@@ -33,11 +33,8 @@ SliceSpacePRM::SliceSpacePRM(RobotWorld *world_, const base::SpaceInformationPtr
   , S_0(new SliceSpace(si0))
   , S_1(new SliceSpace(si1))
   , world(world_)
-  , si_level0(si0)
-  , si_level1(si1)
 {
   worldsettings.InitializeDefault(*world);
-
   //##############################################
 
   S_0->horizontal = true;
@@ -78,7 +75,6 @@ void SliceSpacePRM::clear()
   S_0->clear();
   S_1->clear();
 }
-
 
 ob::PlannerStatus SliceSpacePRM::solve(const base::PlannerTerminationCondition &ptc)
 {

@@ -369,5 +369,8 @@ SlicePlanner
 [x] do you make sure that shortest path does not include +inf?
 [ ] visualize SN-rrt on SE(2) on planar Lshape environment
 [ ] benchmark SN-rrt and rrt n SE(3)
-[ ] in some cases we fail to find a solution, even so the solution does not
-contain a loop, why is that?
+[ ] in some cases we fail to find a solution, even so the solution does not contain a loop, why is that?
+[ ] observed that i found a path towards the goal, but there was a gap in the path, where we found not connections.
+[ ] implement SE(3), compute some path. still retain the SE(2) functionality to debug the algorithm
+
+[ ] implement full edge space planner, but RRT-style

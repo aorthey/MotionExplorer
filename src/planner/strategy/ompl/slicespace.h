@@ -70,7 +70,6 @@ namespace ompl
             ob::Cost original_cost;
         };
 
-
         typedef boost::adjacency_list<
             boost::vecS, boost::vecS, boost::undirectedS,
               boost::property<
