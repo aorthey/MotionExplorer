@@ -1,6 +1,6 @@
 #include "planner/strategy/strategy_geometric_multilevel.h"
 #include "planner/strategy/ompl/slicespace_prm.h"
-#include "planner/strategy/ompl/level_rrt.h"
+#include "planner/strategy/ompl/plain_rrt.h"
 
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/geometric/SimpleSetup.h>
@@ -53,13 +53,22 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   //###########################################################################
 
   typedef std::shared_ptr<og::SliceSpacePRM> SliceSpacePRMPtr;
-  typedef std::shared_ptr<og::LevelRRT> LevelRRTPtr;
+  typedef std::shared_ptr<og::PlainRRT> PlainRRTPtr;
   //SliceSpacePRMPtr planner = std::make_shared<og::SliceSpacePRM>(input.world, si0, si1);
-  LevelRRTPtr planner = std::make_shared<og::LevelRRT>(si1, si0);
+  ob::PlannerPtr planner;
 
-  planner->setProblemDefinition(pdef1);
-  //planner->setProblemDefinitionLevel0(pdef0);
-  //planner->setProblemDefinitionLevel1(pdef1);
+  if(algorithm=="ompl:plain_rrt"){
+    planner = std::make_shared<og::PlainRRT>(si1);
+    planner->setProblemDefinition(pdef1);
+  }else if(algorithm=="ompl:slicespace_prm"){
+    planner = std::make_shared<og::SliceSpacePRM>(input.world, si0, si1);
+    static_pointer_cast<og::SliceSpacePRM>(planner)->setProblemDefinitionLevel0(pdef0);
+    static_pointer_cast<og::SliceSpacePRM>(planner)->setProblemDefinitionLevel1(pdef1);
+  }else{
+    std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
+    exit(0);
+  }
+
   planner->setup();
 
   //###########################################################################
