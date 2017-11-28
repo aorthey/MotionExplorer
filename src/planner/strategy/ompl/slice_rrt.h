@@ -1,3 +1,4 @@
+#include "plain_rrt.h"
 #include <ompl/base/Planner.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/util/RandomNumbers.h>
@@ -15,41 +16,28 @@ namespace ompl
   namespace geometric
   {
 
-    class SliceRRT : public RRT
+    class SliceRRT : public PlainRRT
     {
     public:
 
-      SliceRRT(const ob::SpaceInformationPtr &si);
+      SliceRRT(const ob::SpaceInformationPtr &Ccur, const ob::SpaceInformationPtr &Mcur, SliceRRT *previous = nullptr);
       ~SliceRRT(void);
-      base::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override;
-      void clear(void) override;
-      void setup(void) override;
-      void getPlannerData(ob::PlannerData &data) const override;
 
-    private:
+    protected:
 
-      class Configuration
-      {
-      public:
-        Configuration() = default;
-        Configuration(const base::SpaceInformationPtr &si) : state(si->allocState())
-        {}
-        ~Configuration() = default;
-        base::State *state{nullptr};
-        Configuration *parent{nullptr};
-      };
+      //std::shared_ptr<NearestNeighbors<Configuration *>> G_;
 
-      std::shared_ptr<NearestNeighbors<Configuration *>> G_;
-      Configuration *lastGoalConfiguration_{nullptr};
-
-      void Sample(Configuration *q_random);
-      Configuration* Nearest(Configuration *q_random);
-      Configuration* Connect(Configuration *q_near, Configuration *q_random);
-      bool ConnectedToGoal(Configuration* q);
-      void ConstructSolution(Configuration *q_goal);
-      void Init();
+      virtual void SampleGraph(Configuration *q_random); //samples a configuration along the graph G_
+      virtual void Sample(Configuration *q_random) override; //samples Ccur
+      virtual Configuration* Nearest(Configuration *q_random) override;
+      virtual Configuration* Connect(Configuration *q_near, Configuration *q_random) override;
 
       ob::GoalSampleableRegion *goal;
+
+      double Lgraph{0.0}; //sum of edge weights in graph G_
+      ob::SpaceInformationPtr C;
+      ob::SpaceInformationPtr M;
+      SliceRRT *previous;
 
     };
   }

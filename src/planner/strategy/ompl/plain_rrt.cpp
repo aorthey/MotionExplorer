@@ -8,7 +8,6 @@ PlainRRT::PlainRRT(const base::SpaceInformationPtr &si): RRT(si)
 PlainRRT::~PlainRRT(void)
 {
 }
-
 void PlainRRT::Sample(Configuration *q_random){
   if(rng_.uniform01() < goalBias_){
     goal->sampleGoal(q_random->state);
@@ -51,7 +50,6 @@ bool PlainRRT::ConnectedToGoal(Configuration* q){
 }
 void PlainRRT::ConstructSolution(Configuration *q_goal){
   if (q_goal != nullptr){
-    lastGoalConfiguration_ = q_goal;
 
     std::vector<Configuration *> q_path;
     while (q_goal != nullptr){
@@ -124,7 +122,6 @@ void PlainRRT::clear()
   if(G_){
     G_->clear();
   }
-  lastGoalConfiguration_ = nullptr;
 }
 
 void PlainRRT::setup(void)
@@ -153,8 +150,8 @@ void PlainRRT::getPlannerData(base::PlannerData &data) const
       G_->list(vertices);
     }
 
-    if (lastGoalConfiguration_ != nullptr){
-      data.addGoalVertex(base::PlannerDataVertex(lastGoalConfiguration_->state));
+    if (lastExtendedConfiguration != nullptr){
+      data.addGoalVertex(base::PlannerDataVertex(lastExtendedConfiguration->state));
     }
 
     for (auto &vertex : vertices)
@@ -167,23 +164,37 @@ void PlainRRT::getPlannerData(base::PlannerData &data) const
     }
 }
 
-ob::PlannerStatus PlainRRT::solve(const ob::PlannerTerminationCondition &ptc)
-{
-  Init();
-
+void PlainRRT::Grow(){
+  //Grow
   Configuration *q_random = new Configuration(si_);
   Configuration *q_near = nullptr;
   Configuration *q_new = nullptr;
 
+  Sample(q_random);
+  q_near = Nearest(q_random);
+  q_new = Connect(q_near, q_random);
+
+  if(q_new != nullptr){
+    lastExtendedConfiguration = q_new;
+  }
+  if(q_random->state != nullptr){
+    si_->freeState(q_random->state);
+  }
+  delete q_random;
+}
+
+
+ob::PlannerStatus PlainRRT::solve(const ob::PlannerTerminationCondition &ptc)
+{
+  Init();
+
   while(!ptc){
-    Sample(q_random);
 
-    q_near = Nearest(q_random);
+    Grow();
 
-    q_new = Connect(q_near, q_random);
-
-    if(ConnectedToGoal(q_new)){
-      ConstructSolution(q_new);
+    //CheckSolution
+    if(ConnectedToGoal(lastExtendedConfiguration)){
+      ConstructSolution(lastExtendedConfiguration);
       return ob::PlannerStatus::EXACT_SOLUTION;
     }
   }

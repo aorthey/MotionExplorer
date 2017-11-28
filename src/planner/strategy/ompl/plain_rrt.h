@@ -26,7 +26,9 @@ namespace ompl
       void setup(void) override;
       void getPlannerData(ob::PlannerData &data) const override;
 
-    private:
+      void Grow();
+
+    protected:
 
       class Configuration
       {
@@ -40,11 +42,12 @@ namespace ompl
       };
 
       std::shared_ptr<NearestNeighbors<Configuration *>> G_;
-      Configuration *lastGoalConfiguration_{nullptr};
+      Configuration *lastExtendedConfiguration{nullptr};
 
-      void Sample(Configuration *q_random);
-      Configuration* Nearest(Configuration *q_random);
-      Configuration* Connect(Configuration *q_near, Configuration *q_random);
+      virtual void Sample(Configuration *q_random);
+      virtual Configuration* Nearest(Configuration *q_random);
+      virtual Configuration* Connect(Configuration *q_near, Configuration *q_random);
+
       bool ConnectedToGoal(Configuration* q);
       void ConstructSolution(Configuration *q_goal);
       void Init();
