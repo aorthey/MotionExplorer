@@ -47,7 +47,10 @@ std::vector<PathSpace*> PathSpaceOMPLTwoLevel::Decompose(){
   RoadmapPtr roadmap1 = output.GetRoadmapPtr();
   RoadmapDecoratorSE2Ptr roadmap( new RoadmapDecoratorSE2(roadmap1) );
   decomposedspace.back()->SetRoadmap( roadmap );
+
+  std::cout << std::string(80, '-') << std::endl;
   std::cout << output << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
 
   if(output.hasExactSolution()){
     std::vector<Config> path = output.GetShortestPath();

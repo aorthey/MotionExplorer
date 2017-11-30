@@ -1,24 +1,24 @@
-#include "plain_rrt.h"
+#include "rrt_plain.h"
 
 using namespace ompl::geometric;
-PlainRRT::PlainRRT(const base::SpaceInformationPtr &si): RRT(si)
+RRTPlain::RRTPlain(const base::SpaceInformationPtr &si): RRT(si)
 {
-  setName("PlainRRT");
+  setName("RRTPlain");
 }
-PlainRRT::~PlainRRT(void)
+RRTPlain::~RRTPlain(void)
 {
 }
-void PlainRRT::Sample(Configuration *q_random){
+void RRTPlain::Sample(Configuration *q_random){
   if(rng_.uniform01() < goalBias_){
     goal->sampleGoal(q_random->state);
   }else{
     sampler_->sampleUniform(q_random->state);
   }
 }
-PlainRRT::Configuration* PlainRRT::Nearest(Configuration *q_random){
+RRTPlain::Configuration* RRTPlain::Nearest(Configuration *q_random){
   return G_->nearest(q_random);
 }
-PlainRRT::Configuration* PlainRRT::Connect(Configuration *q_near, Configuration *q_random){
+RRTPlain::Configuration* RRTPlain::Connect(Configuration *q_near, Configuration *q_random){
   //##############################################################################
   // q_new_state <- BALL_maxDistance_(q_near) in direction of q_random
   //##############################################################################
@@ -39,7 +39,7 @@ PlainRRT::Configuration* PlainRRT::Connect(Configuration *q_near, Configuration 
   }
   return nullptr;
 }
-bool PlainRRT::ConnectedToGoal(Configuration* q){
+bool RRTPlain::ConnectedToGoal(Configuration* q){
   double dist=0.0;
   if(q != nullptr){
     if(goal->isSatisfied(q->state, &dist)){
@@ -48,7 +48,7 @@ bool PlainRRT::ConnectedToGoal(Configuration* q){
   }
   return false;
 }
-void PlainRRT::ConstructSolution(Configuration *q_goal){
+void RRTPlain::ConstructSolution(Configuration *q_goal){
   if (q_goal != nullptr){
 
     std::vector<Configuration *> q_path;
@@ -64,7 +64,7 @@ void PlainRRT::ConstructSolution(Configuration *q_goal){
     pdef_->addSolutionPath(path);
   }
 }
-void PlainRRT::Init(){
+void RRTPlain::Init(){
   //setRange(0.1);
 
   std::cout << "Planner " + getName() + " specs:" << std::endl;
@@ -114,7 +114,7 @@ void PlainRRT::Init(){
 }
 
 
-void PlainRRT::clear()
+void RRTPlain::clear()
 {
   Planner::clear();
   sampler_.reset();
@@ -124,7 +124,7 @@ void PlainRRT::clear()
   }
 }
 
-void PlainRRT::setup(void)
+void RRTPlain::setup(void)
 {
   Planner::setup();
   tools::SelfConfig sc(si_, getName());
@@ -140,7 +140,7 @@ void PlainRRT::setup(void)
 
 }
 
-void PlainRRT::getPlannerData(base::PlannerData &data) const
+void RRTPlain::getPlannerData(base::PlannerData &data) const
 {
     Planner::getPlannerData(data);
 
@@ -164,7 +164,7 @@ void PlainRRT::getPlannerData(base::PlannerData &data) const
     }
 }
 
-void PlainRRT::Grow(){
+void RRTPlain::Grow(){
   //Grow
   Configuration *q_random = new Configuration(si_);
   Configuration *q_near = nullptr;
@@ -184,7 +184,7 @@ void PlainRRT::Grow(){
 }
 
 
-ob::PlannerStatus PlainRRT::solve(const ob::PlannerTerminationCondition &ptc)
+ob::PlannerStatus RRTPlain::solve(const ob::PlannerTerminationCondition &ptc)
 {
   Init();
 

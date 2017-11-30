@@ -33,6 +33,9 @@ struct StrategyOutput{
 
     friend std::ostream& operator<< (std::ostream&, const StrategyOutput&);
 
+    double planner_time{-1};
+    double max_planner_time{-1};
+
   private:
 
     std::vector<Config> PathGeometricToConfigPath(og::PathGeometric &path);

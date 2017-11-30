@@ -35,6 +35,8 @@
 #include <ompl/geometric/planners/sbl/pSBL.h>
 #include <ompl/geometric/planners/stride/STRIDE.h>
 
+#include <ompl/util/Time.h>
+
 static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)
 {
   ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
@@ -131,7 +133,10 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   double max_planning_time= input.max_planning_time;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
+  ompl::time::point t_start = ompl::time::now();
   ob::PlannerStatus status = ss.solve(ptc);
+  output.planner_time = ompl::time::seconds(ompl::time::now() - t_start);
+  output.max_planner_time = max_planning_time;
 
   //###########################################################################
 

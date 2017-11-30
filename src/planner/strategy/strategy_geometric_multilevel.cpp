@@ -1,10 +1,15 @@
 #include "planner/strategy/strategy_geometric_multilevel.h"
 #include "planner/strategy/ompl/slicespace_prm.h"
-#include "planner/strategy/ompl/plain_rrt.h"
+#include "planner/strategy/ompl/rrt_plain.h"
+#include "planner/strategy/ompl/prm_plain.h"
+#include "planner/strategy/ompl/prm_slice.h"
+#include "planner/strategy/ompl/prm_multislice.h"
+#include "planner/strategy/ompl/prm_slice_naive.h"
 
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/PathGeometric.h>
+#include <ompl/util/Time.h>
 
 StrategyGeometricMultiLevel::StrategyGeometricMultiLevel()
 {
@@ -53,12 +58,23 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   //###########################################################################
 
   typedef std::shared_ptr<og::SliceSpacePRM> SliceSpacePRMPtr;
-  typedef std::shared_ptr<og::PlainRRT> PlainRRTPtr;
   //SliceSpacePRMPtr planner = std::make_shared<og::SliceSpacePRM>(input.world, si0, si1);
   ob::PlannerPtr planner;
 
-  if(algorithm=="ompl:plain_rrt"){
-    planner = std::make_shared<og::PlainRRT>(si1);
+  if(algorithm=="ompl:rrt_plain"){
+    planner = std::make_shared<og::RRTPlain>(si1);
+    planner->setProblemDefinition(pdef1);
+  }else if(algorithm=="ompl:prm_plain"){
+    planner = std::make_shared<og::PRMPlain>(si1);
+    planner->setProblemDefinition(pdef1);
+  }else if(algorithm=="ompl:prm_slice"){
+    planner = std::make_shared<og::PRMSlice>(si1);
+    planner->setProblemDefinition(pdef1);
+  }else if(algorithm=="ompl:prm_multislice"){
+    std::vector<ob::SpaceInformationPtr> si_vec;
+    si_vec.push_back(si0);
+    si_vec.push_back(si1);
+    planner = std::make_shared<og::PRMMultiSlice>(si_vec);
     planner->setProblemDefinition(pdef1);
   }else if(algorithm=="ompl:slicespace_prm"){
     planner = std::make_shared<og::SliceSpacePRM>(input.world, si0, si1);
@@ -81,10 +97,12 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   double max_planning_time= input.max_planning_time;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
+  ompl::time::point start = ompl::time::now();
   ob::PlannerStatus status = planner->solve(ptc);
-  std::cout << status << std::endl;
-  //ob::PlannerStatus status = ss.solve(ptc);
+  output.planner_time = ompl::time::seconds(ompl::time::now() - start);
+  output.max_planner_time = max_planning_time;
 
+  std::cout << status << std::endl;
   //###########################################################################
 
   ob::PlannerDataPtr pd( new ob::PlannerData(si1) );

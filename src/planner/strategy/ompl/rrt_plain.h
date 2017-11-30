@@ -15,12 +15,12 @@ namespace ompl
   namespace geometric
   {
 
-    class PlainRRT : public RRT
+    class RRTPlain : public RRT
     {
     public:
 
-      PlainRRT(const ob::SpaceInformationPtr &si);
-      ~PlainRRT(void);
+      RRTPlain(const ob::SpaceInformationPtr &si);
+      ~RRTPlain(void);
       base::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override;
       void clear(void) override;
       void setup(void) override;

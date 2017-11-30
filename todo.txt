@@ -373,4 +373,12 @@ SlicePlanner
 [ ] observed that i found a path towards the goal, but there was a gap in the path, where we found not connections.
 [ ] implement SE(3), compute some path. still retain the SE(2) functionality to debug the algorithm
 
-[ ] implement full edge space planner, but RRT-style
+[ ] implement full edge space planner, but PRM-style
+
+[ ] simplify prm_plain to its essential parts
+[ ] implement prm_slice, which samples and connects based on underlying graph
+[ ] implement prm_multislice, which keeps track of several prm_slice algorithms
+
+[ ] what to do with the random bouncing motion!? needs to be restricted to
+graph!? -> how about implementing a naive version, where we only change the
+sampling function first?

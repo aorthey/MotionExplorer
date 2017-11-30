@@ -18,16 +18,32 @@ LemonInterface::LemonInterface( ob::PlannerDataPtr pd_ ):
   const ob::SpaceInformationPtr si = pd->getSpaceInformation();
   N = pd->numVertices();
 
+  bool hasStart = false;
+  bool hasGoal = false;
   for(uint k = 0; k < N; k++){
     ListGraph::Node x = lg.addNode();
     gn.push_back(x);
-    if(pd->isStartVertex(k)) start = x;
-    if(pd->isGoalVertex(k)) goal = x;
+    if(pd->isStartVertex(k)){
+      start = x;
+      hasStart = true;
+    }
+    if(pd->isGoalVertex(k)){
+      goal = x;
+      hasGoal = true;
+    }
 
     if(pd->getVertex(k)==ob::PlannerData::NO_VERTEX){
       std::cout << "vertex " << k << " does not exists" << std::endl;
       exit(0);
     }
+  }
+  if(!hasStart){
+    std::cout << "[LemonInterface] Couldn't find start node in graph!" << std::endl;
+    exit(0);
+  }
+  if(!hasGoal){
+    std::cout << "[LemonInterface] Couldn't find goal node in graph!" << std::endl;
+    exit(0);
   }
 
 //#############################################################################

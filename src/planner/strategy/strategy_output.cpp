@@ -102,6 +102,8 @@ std::ostream& operator<< (std::ostream& out, const StrategyOutput& so)
   out << " solution difference  : " << dg << std::endl;
   out << " roadmap vertices     : " << so.pd->numVertices() << std::endl;
   out << " roadmap edges        : " << so.pd->numEdges() << std::endl;
+  out << " planner time         : " << so.planner_time << std::endl;
+  out << " max planner time     : " << so.max_planner_time << std::endl;
   out << std::string(80, '-') << std::endl;
   return out;
 }
