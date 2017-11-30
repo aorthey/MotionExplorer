@@ -148,8 +148,8 @@ bool PRMSliceNaive::Sample(ob::State *workState){
 
     //workState is element of M1, how do we get values for sub components!?
 
-    std::cout << "M0 : "; M0->printState(s_M0, std::cout);
-    std::cout << "C1 : "; C1->printState(s_C1, std::cout);
+    // std::cout << "M0 : "; M0->printState(s_M0, std::cout);
+    // std::cout << "C1 : "; C1->printState(s_C1, std::cout);
 
     State **workState_comps = workState->as<CompoundState>()->components;
     ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
@@ -172,12 +172,9 @@ bool PRMSliceNaive::Sample(ob::State *workState){
       subspaces[M0_subspaces]->copyState( workState_comps[M0_subspaces], s_C1);
     }
 
-    std::cout << "M1 : "; M1->printState(workState, std::cout);
+    //std::cout << "M1 : "; M1->printState(workState, std::cout);
 
-
-    //workState = s_M1 = s_C1+s_M0
-    //check if the compound state is valid!
-    return true;
+    return M1->isValid(workState);
   }
 }
 
