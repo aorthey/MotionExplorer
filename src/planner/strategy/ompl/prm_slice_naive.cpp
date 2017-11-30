@@ -173,7 +173,6 @@ bool PRMSliceNaive::Sample(ob::State *workState){
     }
 
     std::cout << "M1 : "; M1->printState(workState, std::cout);
-    exit(0);
 
 
     //workState = s_M1 = s_C1+s_M0
