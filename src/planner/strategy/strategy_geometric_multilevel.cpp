@@ -68,14 +68,18 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     planner = std::make_shared<og::PRMPlain>(si1);
     planner->setProblemDefinition(pdef1);
   }else if(algorithm=="ompl:prm_slice"){
-    planner = std::make_shared<og::PRMSlice>(si1);
+    planner = std::make_shared<og::PRMSliceNaive>(si1,nullptr);
     planner->setProblemDefinition(pdef1);
   }else if(algorithm=="ompl:prm_multislice"){
+    std::vector<ob::ProblemDefinitionPtr> pdef_vec;
+    pdef_vec.push_back(pdef0);
+    pdef_vec.push_back(pdef1);
     std::vector<ob::SpaceInformationPtr> si_vec;
     si_vec.push_back(si0);
     si_vec.push_back(si1);
     planner = std::make_shared<og::PRMMultiSlice>(si_vec);
-    planner->setProblemDefinition(pdef1);
+    static_pointer_cast<og::PRMMultiSlice>(planner)->setProblemDefinition(pdef_vec);
+
   }else if(algorithm=="ompl:slicespace_prm"){
     planner = std::make_shared<og::SliceSpacePRM>(input.world, si0, si1);
     static_pointer_cast<og::SliceSpacePRM>(planner)->setProblemDefinitionLevel0(pdef0);

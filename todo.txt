@@ -382,3 +382,5 @@ SlicePlanner
 [ ] what to do with the random bouncing motion!? needs to be restricted to
 graph!? -> how about implementing a naive version, where we only change the
 sampling function first?
+
+[x] MultiSlice should return PRM when only fed with one slice

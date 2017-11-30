@@ -46,7 +46,7 @@ PRMSlice::~PRMSlice(){
   si_->freeStates(xstates);
 }
 
-ob::PlannerStatus PRMSlice::Init(const base::PlannerTerminationCondition &ptc){
+ob::PlannerStatus PRMSlice::Init(){
   checkValidity();
   auto *goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
 
@@ -78,7 +78,7 @@ ob::PlannerStatus PRMSlice::Init(const base::PlannerTerminationCondition &ptc){
 }
 
 ob::PlannerStatus PRMSlice::solve(const ob::PlannerTerminationCondition &ptc){
-  Init(ptc);
+  Init();
 
   addedNewSolution_ = false;
   base::PathPtr sol;

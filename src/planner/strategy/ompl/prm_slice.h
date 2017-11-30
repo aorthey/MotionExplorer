@@ -35,7 +35,7 @@ namespace ompl
 
         virtual bool Sample(ob::State *workState);
 
-        ob::PlannerStatus Init(const base::PlannerTerminationCondition &ptc);
+        ob::PlannerStatus Init();
 
         ob::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
 

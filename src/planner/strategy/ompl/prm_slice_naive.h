@@ -20,10 +20,14 @@ namespace ompl
 
       protected:
 
-        ob::SpaceInformationPtr si_current;    //full configuration space Mi
-        ob::SpaceInformationPtr si_standalone; //configuration space Ci = Mi/Mi-1
+        ob::SpaceInformationPtr M1;    //full configuration space Mi
+        ob::SpaceInformationPtr C1; //configuration space Ci = Mi/Mi-1
 
         base::StateSamplerPtr C1_sampler;
+
+        uint M0_subspaces;
+        uint M1_subspaces;
+        uint C1_subspaces;
 
         PRMSliceNaive *previous;
     };
