@@ -6,6 +6,7 @@ PathPiecewiseLinearSE3::PathPiecewiseLinearSE3()
 }
 
 PathPiecewiseLinearSE3* PathPiecewiseLinearSE3::from_keyframes(const std::vector<Config> &keyframes){
+  if(keyframes.empty()) return nullptr;
   PathPiecewiseLinearSE3* path = new PathPiecewiseLinearSE3();
   path->keyframes=keyframes;
   path->Ndim = keyframes.at(0).size();

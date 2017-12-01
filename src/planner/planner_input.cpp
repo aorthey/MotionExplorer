@@ -38,6 +38,10 @@ bool PlannerMultiInput::load(TiXmlElement *node){
   GetStreamText(node_max_planning_time) >> max_planning_time;
   GetStreamText(node_epsilon_goalregion) >> epsilon_goalregion;
 
+  int isSE2;
+  TiXmlElement* node_se2 = FindSubNode(node_plannerinput, "se2");
+  GetStreamTextDefault<int>(node_se2, 0) >> isSE2;
+
   //################################################################################
   // loop through all algorithms, search for individual settings; if not found
   // apply default settings 
@@ -46,6 +50,7 @@ bool PlannerMultiInput::load(TiXmlElement *node){
 
   while(node_algorithm!=NULL){
     PlannerInput* input = new PlannerInput();
+    input->isSE2=isSE2;
     if(!input->load(node_plannerinput)) return false;
 
     GetStreamAttribute(node_algorithm,"name") >> input->name_algorithm;
@@ -53,13 +58,13 @@ bool PlannerMultiInput::load(TiXmlElement *node){
     TiXmlElement* node_algorithm_max_planning_time = FindSubNode(node_algorithm, "maxplanningtime");
     TiXmlElement* node_algorithm_epsilon_goalregion = FindSubNode(node_algorithm, "epsilongoalregion");
 
-    GetStreamTextDefaultDouble(node_algorithm_max_planning_time, max_planning_time) >> input->max_planning_time;
-    GetStreamTextDefaultDouble(node_algorithm_epsilon_goalregion, epsilon_goalregion) >> input->epsilon_goalregion;
+    GetStreamTextDefault<double>(node_algorithm_max_planning_time, max_planning_time) >> input->max_planning_time;
+    GetStreamTextDefault<double>(node_algorithm_epsilon_goalregion, epsilon_goalregion) >> input->epsilon_goalregion;
 
     TiXmlElement* node_algorithm_timestep = FindSubNode(node_algorithm, "timestep");
     if(node_algorithm_timestep){
-      GetStreamAttributeDefaultDouble(node_algorithm_timestep,"min", timestep_min) >> input->timestep_min;
-      GetStreamAttributeDefaultDouble(node_algorithm_timestep,"max", timestep_max) >> input->timestep_max;
+      GetStreamAttributeDefault<double>(node_algorithm_timestep,"min", timestep_min) >> input->timestep_min;
+      GetStreamAttributeDefault<double>(node_algorithm_timestep,"max", timestep_max) >> input->timestep_max;
     }else{
       input->timestep_min = timestep_min;
       input->timestep_max = timestep_max;

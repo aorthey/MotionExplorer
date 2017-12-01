@@ -30,6 +30,8 @@ class PlannerInput{
 
     uint robot_idx;
 
+    int isSE2;
+
     int freeFloating;
 
     std::string name_algorithm;

@@ -131,6 +131,22 @@ PRMSliceNaive::PRMSliceNaive(const ob::SpaceInformationPtr &si, PRMSliceNaive *p
 PRMSliceNaive::~PRMSliceNaive(){
 }
 
+double PRMSliceNaive::getSamplingDensity(){
+  if(previous == nullptr){
+    return (double)num_vertices(g_)/(double)M1->getSpaceMeasure();
+  }else{
+    //get graph length
+    double Lprev = 0.0;
+    const Graph gprev = previous->getRoadmap();
+    foreach (Edge e, boost::edges(gprev))
+    {
+      ob::Cost weight = get(boost::edge_weight_t(), gprev, e);
+      Lprev += weight.value();
+    }
+    return (double)num_vertices(g_)/(C1->getSpaceMeasure()+Lprev);
+  }
+}
+
 
 bool PRMSliceNaive::Sample(ob::State *workState){
   if(previous == nullptr){
@@ -204,3 +220,9 @@ bool PRMSliceNaive::SampleGraph(ob::State *workState){
   return true;
 
 }
+void PRMSliceNaive::getPlannerData(base::PlannerData &data) const{
+  PRMSlice::getPlannerData(data);
+  std::cout << "Number of start states: " << startM_.size() << std::endl;
+  std::cout << "Number of goal  states: " << goalM_.size() << std::endl;
+}
+

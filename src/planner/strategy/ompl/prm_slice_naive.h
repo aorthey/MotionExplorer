@@ -18,9 +18,13 @@ namespace ompl
         virtual bool Sample(ob::State *workState) override;
         bool SampleGraph(ob::State *workState);
 
+        void getPlannerData(base::PlannerData &data) const override;
+
+        double getSamplingDensity();
+
       protected:
 
-        ob::SpaceInformationPtr M1;    //full configuration space Mi
+        ob::SpaceInformationPtr M1; //full configuration space Mi = si_
         ob::SpaceInformationPtr C1; //configuration space Ci = Mi/Mi-1
 
         base::StateSamplerPtr C1_sampler;

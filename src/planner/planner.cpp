@@ -5,7 +5,8 @@
 #include "pathspace/pathspace_atomic.h"
 #include "pathspace/pathspace_ompl.h"
 #include "pathspace/pathspace_ompl_se2.h"
-#include "pathspace/pathspace_ompl_twolevel.h"
+#include "pathspace/pathspace_multilevel_se2.h"
+#include "pathspace/pathspace_multilevel_se3.h"
 #include "pathspace/pathspace_onetopic_cover.h"
 #include "pathspace/decorator.h"
 #include "pathspace/decorator_sweptvolume_path.h"
@@ -160,7 +161,12 @@ void MotionPlanner::CreateSinglePathHierarchy(){
     std::cout << psinput_level0->name_algorithm << std::endl;
     std::cout << subsubalgorithm << std::endl;
     psinput_level0->name_algorithm = subsubalgorithm;
-    hierarchy->AddRootNode( new PathSpaceOMPLTwoLevel(world, psinput_level0) );
+
+    if(input.isSE2){
+      hierarchy->AddRootNode( new PathSpaceMultiLevelSE2(world, psinput_level0) );
+    }else{
+      hierarchy->AddRootNode( new PathSpaceMultiLevelSE3(world, psinput_level0) );
+    }
     std::vector<Config> path;
     path.push_back(psinput_level0->q_init);
     path.push_back(psinput_level0->q_goal);

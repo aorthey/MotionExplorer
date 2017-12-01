@@ -71,6 +71,9 @@ class CSpaceOMPL
     uint Nklampt;
     uint Nompl;
 
+    std::vector<double> EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
+    void OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSpace::StateType *q );
+
     //klampt:
     //
     // SE(3) x R^Nklampt
@@ -158,17 +161,17 @@ class GeometricCSpaceOMPLRotationalInvariance: public GeometricCSpaceOMPL
     virtual Config OMPLStateToConfig(const ob::State *qompl);
 };
 
-class GeometricCSpaceOMPLPathConstraintRollInvariance: public GeometricCSpaceOMPL
-{
-  public:
-    GeometricCSpaceOMPLPathConstraintRollInvariance(Robot *robot_, CSpaceKlampt *space_, std::vector<Config> path_);
-    virtual void initSpace();
-    virtual void print();
-    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
-    virtual Config OMPLStateToConfig(const ob::State *qompl);
-  private:
-    PathPiecewiseLinearEuclidean* path_constraint;
-};
+// class GeometricCSpaceOMPLPathConstraintRollInvariance: public GeometricCSpaceOMPL
+// {
+//   public:
+//     GeometricCSpaceOMPLPathConstraintRollInvariance(Robot *robot_, CSpaceKlampt *space_, std::vector<Config> path_);
+//     virtual void initSpace();
+//     virtual void print();
+//     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
+//     virtual Config OMPLStateToConfig(const ob::State *qompl);
+//   private:
+//     PathPiecewiseLinearEuclidean* path_constraint;
+// };
 
 class GeometricCSpaceOMPLPathConstraintSO3: public GeometricCSpaceOMPL
 {

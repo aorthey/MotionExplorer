@@ -1,11 +1,13 @@
 #include "planner/cspace/cspace.h"
 
-class GeometricCSpaceOMPLR2: public GeometricCSpaceOMPL
+class GeometricCSpaceOMPLRN: public GeometricCSpaceOMPL
 {
   public:
-    GeometricCSpaceOMPLR2(RobotWorld *world_, int robot_idx);
+    GeometricCSpaceOMPLRN(RobotWorld *world_, int robot_id, int dimension);
     virtual void initSpace();
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
     virtual Config OMPLStateToConfig(const ob::State *qompl);
+  protected:
+    uint N;
 };
 

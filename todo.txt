@@ -384,3 +384,5 @@ graph!? -> how about implementing a naive version, where we only change the
 sampling function first?
 
 [x] MultiSlice should return PRM when only fed with one slice
+[ ] multislice with priority queue
+[ ] verify for SE(3)

@@ -1,7 +1,6 @@
 #include "planner/strategy/strategy_input.h"
 #include "planner/strategy/strategy_output.h"
 #include "planner/strategy/strategy_geometric.h"
-#include "planner/strategy/ompl/slicespace_prm.h"
 
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/PathGeometric.h>

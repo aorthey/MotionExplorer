@@ -1,8 +1,8 @@
 #pragma once
 #include "planner/cspace/cspace.h"
-#include "planner/cspace/cspace_geometric_se2.h"
-#include "planner/cspace/cspace_geometric_r2.h"
-#include "planner/cspace/cspace_geometric_r2_edge_so2.h"
+#include "planner/cspace/cspace_geometric_RN.h"
+#include "planner/cspace/cspace_geometric_SE2.h"
+#include "planner/cspace/cspace_geometric_SE3.h"
 #include "planner/cspace/cspace_input.h"
 #include "planner/cspace/cspace_decorator.h"
 
@@ -35,22 +35,17 @@ class CSpaceFactory{
       return cspace;
     }
 
-    // CSpace which has two rotational degrees of freedom
-    // [0,1] \times S^1 \times S^1
-    // representing a roll-orientation invariant object along an arbitrary R^3
-    // path
 
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpacePathConstraintRollInvariance( Robot *robot, CSpaceKlampt *inner, const std::vector<Config>& path){
-      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLPathConstraintRollInvariance(robot, inner, path);
-      //make pwl path from path, then add one more [0,1] dimension to cspace,
-      //and make it depend on pwlpath
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpacePathConstraintSO3( Robot *robot, CSpaceKlampt *inner, const std::vector<Config>& path){
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLPathConstraintSO3(robot, inner, path);
       cspace->SetCSpaceInput(input);
       cspace->initSpace();
       cspace->initControlSpace();
       return cspace;
     }
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpacePathConstraintSO3( Robot *robot, CSpaceKlampt *inner, const std::vector<Config>& path){
-      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLPathConstraintSO3(robot, inner, path);
+    // CSpace  SE(3)
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE3( RobotWorld *world, int robot_idx){
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLSE3(world, robot_idx);
       cspace->SetCSpaceInput(input);
       cspace->initSpace();
       cspace->initControlSpace();
@@ -64,17 +59,9 @@ class CSpaceFactory{
       cspace->initControlSpace();
       return cspace;
     }
-    // CSpace  R^(2)
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceR2( RobotWorld *world, int robot_idx){
-      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLR2(world, robot_idx);
-      cspace->SetCSpaceInput(input);
-      cspace->initSpace();
-      cspace->initControlSpace();
-      return cspace;
-    }
-    // CSpace  R^(2) Edge \times SO(2)
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceR2EdgeSO2( RobotWorld *world, int robot_idx, const Config &q1, const Config &q2 ){
-      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLR2EdgeSO2(world, robot_idx, q1, q2);
+    // CSpace  R^(N)
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceRN( RobotWorld *world, int robot_idx, int dimension){
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLRN(world, robot_idx, dimension);
       cspace->SetCSpaceInput(input);
       cspace->initSpace();
       cspace->initControlSpace();

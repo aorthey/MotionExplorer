@@ -1,4 +1,4 @@
-#include "planner/cspace/cspace_geometric_se2.h"
+#include "planner/cspace/cspace_geometric_SE2.h"
 #include "planner/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SE2StateSpace.h>
 

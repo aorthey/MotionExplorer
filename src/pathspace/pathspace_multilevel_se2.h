@@ -7,9 +7,9 @@
 // returns singleton path
 // 
 
-class PathSpaceOMPLTwoLevel: public PathSpaceOMPL{
+class PathSpaceMultiLevelSE2: public PathSpaceOMPL{
   public:
-    PathSpaceOMPLTwoLevel(RobotWorld *world_, PathSpaceInput* input_);
+    PathSpaceMultiLevelSE2(RobotWorld *world_, PathSpaceInput* input_);
     std::vector<PathSpace*> Decompose() override;
 };
 

@@ -74,14 +74,6 @@ inline stringstream GetStreamAttribute(TiXmlElement* node, const char *name){
     return stringstream ("NONE");
   }
 }
-inline stringstream GetStreamAttributeDefaultDouble(TiXmlElement *node, const char *name, double default_value){
-  if(ExistStreamAttribute(node, name)){
-    return GetStreamAttribute(node, name);
-  }
-  stringstream ss;
-  ss << default_value;
-  return ss;
-}
 
 inline stringstream GetStreamText(TiXmlElement* node){
 
@@ -93,7 +85,9 @@ inline stringstream GetStreamText(TiXmlElement* node){
     return stringstream ("NONE");
   }
 }
-inline stringstream GetStreamTextDefaultDouble(TiXmlElement* node, double default_value){
+
+template<typename T> 
+inline stringstream GetStreamTextDefault(TiXmlElement* node, T default_value){
   std::stringstream ss;
   ss = GetStreamText(node);
   if(ss.str() != "NONE"){
@@ -103,4 +97,13 @@ inline stringstream GetStreamTextDefaultDouble(TiXmlElement* node, double defaul
     def << default_value;
     return def;
   }
+}
+template<typename T> 
+inline stringstream GetStreamAttributeDefault(TiXmlElement *node, const char *name, T default_value){
+  if(ExistStreamAttribute(node, name)){
+    return GetStreamAttribute(node, name);
+  }
+  stringstream ss;
+  ss << default_value;
+  return ss;
 }
