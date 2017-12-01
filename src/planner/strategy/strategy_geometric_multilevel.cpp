@@ -23,18 +23,14 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
 
   std::vector<ob::SpaceInformationPtr> si_vec; 
   std::vector<ob::ProblemDefinitionPtr> pdef_vec; 
-  CSpaceOMPL* cspace_levelk;
 
-  ob::SpaceInformationPtr sik;
-  ob::ProblemDefinitionPtr pdefk;
   for(uint k = 0; k < input.cspace_levels.size(); k++){
-
-    cspace_levelk = input.cspace_levels.at(k);
-    sik = cspace_levelk->SpaceInformationPtr();
+    CSpaceOMPL* cspace_levelk = input.cspace_levels.at(k);
+    ob::SpaceInformationPtr sik = cspace_levelk->SpaceInformationPtr();
     ob::ScopedState<> startk = cspace_levelk->ConfigToOMPLState(p_init);
     ob::ScopedState<> goalk  = cspace_levelk->ConfigToOMPLState(p_goal);
 
-    pdefk = std::make_shared<ob::ProblemDefinition>(sik);
+    ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
     pdefk->addStartState(startk);
     auto goal=std::make_shared<ob::GoalState>(sik);
     goal->setState(goalk);

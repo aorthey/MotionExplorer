@@ -9,9 +9,9 @@
   <robot name="sphere_outer" file="/home/aorthey/git/orthoklampt/data/Lshape/Lshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
   <!-- <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
-  <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
-       -->
   <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/Lshape.tri" translation="0 0 0" rotateRPY="0 0 0"/>
+       -->
+  <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
 
   <plannerinput>
 

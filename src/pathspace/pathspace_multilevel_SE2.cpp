@@ -36,12 +36,6 @@ std::vector<PathSpace*> PathSpaceMultiLevelSE2::Decompose(){
     input_level = input_level->GetNextLayer();
   }
 
-  //CSpaceOMPL *cspace_level_k;
-  //cspace_level_k = factory.MakeGeometricCSpaceRN(world, input->robot_idx, 2);
-  //cspace_level_k = factory.MakeGeometricCSpaceSE2(world, input->robot_idx);
-  //  cspace_levels.push_back( cspace_level_k );
-  //  input_level = input_level->GetNextLayer()->GetNextLayer();
-
   StrategyGeometricMultiLevel strategy;
   StrategyOutput output(cspace_levels.back());
   StrategyInput strategy_input = input->GetStrategyInput();

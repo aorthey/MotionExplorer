@@ -387,8 +387,10 @@ sampling function first?
 [x] multislice with priority queue
 [x] verify for SE(3)
 [x] make it multilevel
-[ ] collision is broken for multilevel (only first level seems to work)
-[ ] fix R3S2 issue (sublevel components are more than SE3)
-[ ] upper level in collision fix. did you add checker for last level!? or is it
+[x] collision is broken for multilevel (only first level seems to work)
+[x] upper level in collision fix. did you add checker for last level!? or is it
 a an issue of chart boundary overflow? -> if the latter, than make the path an
 ompl path instead (would also be better for deformations)
+[ ] fix R3S2 issue (sublevel components are more than SE3)
+[ ] optimize resulting path
+[ ] fix zero-measure issue (implement new connect and distance functions)
