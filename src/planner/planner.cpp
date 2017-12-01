@@ -149,36 +149,19 @@ void MotionPlanner::CreateSinglePathHierarchy(){
     std::cout << "      qgoal      : " << qg << std::endl;
   }
 
-  //execute different flavors of hierarchical algorithms
-  std::string twolevel = "twolevel";
-  std::string ompl = "ompl";
-  if(StartsWith(subalgorithm,ompl)) {
-    hierarchy->AddRootNode( new PathSpaceOnetopicCover(world, psinput_level0) );
-    std::vector<Config> path;
-    path.push_back(psinput_level0->q_init);
-    path.push_back(psinput_level0->q_goal);
-    hierarchy->GetRootNodeContent()->SetShortestPath( path );
-  }else if(StartsWith(subalgorithm,twolevel)) {
-    std::string subsubalgorithm = RemoveStringBeginning(subalgorithm, twolevel);
-    std::cout << psinput_level0->name_algorithm << std::endl;
-    std::cout << subsubalgorithm << std::endl;
-    psinput_level0->name_algorithm = subsubalgorithm;
+  psinput_level0->name_algorithm = subalgorithm;
 
-    if(input.isSE2){
-      hierarchy->AddRootNode( new PathSpaceMultiLevelSE2(world, psinput_level0) );
-    }else{
-      hierarchy->AddRootNode( new PathSpaceMultiLevelSE3(world, psinput_level0) );
-    }
-    std::vector<Config> path;
-    path.push_back(psinput_level0->q_init);
-    path.push_back(psinput_level0->q_goal);
-    hierarchy->GetRootNodeContent()->SetShortestPath( path );
+  if(input.isSE2){
+    hierarchy->AddRootNode( new PathSpaceMultiLevelSE2(world, psinput_level0) );
   }else{
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "Unknown algorithm: " << subalgorithm << std::endl;
-    std::cout << std::string(80, '-') << std::endl;
-    active = false;
+    hierarchy->AddRootNode( new PathSpaceMultiLevelSE3(world, psinput_level0) );
   }
+  std::vector<Config> path;
+  path.push_back(psinput_level0->q_init);
+  path.push_back(psinput_level0->q_goal);
+  hierarchy->GetRootNodeContent()->SetShortestPath( path );
+
+
 }
 
 

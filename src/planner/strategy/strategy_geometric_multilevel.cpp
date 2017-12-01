@@ -41,36 +41,6 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     si_vec.push_back(sik);
     pdef_vec.push_back(pdefk);
   }
-  //CSpaceOMPL* cspace_level0 = input.cspace_level0;
-  //CSpaceOMPL* cspace_level1 = input.cspace_level1;
-
-  //ob::SpaceInformationPtr si0 = cspace_level0->SpaceInformationPtr();
-  //ob::SpaceInformationPtr si1 = cspace_level1->SpaceInformationPtr();
-
-  ////###########################################################################
-  //// Config init,goal to OMPL start/goal
-  ////###########################################################################
-
-  //ob::ScopedState<> start0 = cspace_level0->ConfigToOMPLState(p_init);
-  //ob::ScopedState<> goal0  = cspace_level0->ConfigToOMPLState(p_goal);
-  //ob::ScopedState<> start1 = cspace_level1->ConfigToOMPLState(p_init);
-  //ob::ScopedState<> goal1  = cspace_level1->ConfigToOMPLState(p_goal);
-
-  //ob::ProblemDefinitionPtr pdef0 = std::make_shared<ob::ProblemDefinition>(si0);
-  //pdef0->addStartState(start0);
-  //auto goal=std::make_shared<ob::GoalState>(si0);
-  //goal->setState(goal0);
-  //goal->setThreshold(input.epsilon_goalregion);
-  //pdef0->setGoal(goal);
-  //pdef0->setOptimizationObjective( getThresholdPathLengthObj(si0) );
-
-  //ob::ProblemDefinitionPtr pdef1 = std::make_shared<ob::ProblemDefinition>(si1);
-  //pdef1->addStartState(start1);
-  //goal=std::make_shared<ob::GoalState>(si1);
-  //goal->setState(goal1);
-  //goal->setThreshold(input.epsilon_goalregion);
-  //pdef1->setGoal(goal);
-  //pdef1->setOptimizationObjective( getThresholdPathLengthObj(si1) );
 
   //###########################################################################
   // choose planner
