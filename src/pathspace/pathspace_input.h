@@ -37,27 +37,11 @@ class PathSpaceInput{
     double timestep_min;
     double timestep_max;
 
-    const CSpaceInput& GetCSpaceInput(){
-      cin = new CSpaceInput();
-      cin->timestep_max = timestep_max;
-      cin->timestep_min = timestep_min;
-      return *cin;
-    }
-    const StrategyInput& GetStrategyInput(){
-      sin = new StrategyInput();
-      sin->q_init = q_init;
-      sin->q_goal = q_goal;
-      sin->name_algorithm = name_algorithm;
-      sin->epsilon_goalregion = epsilon_goalregion;
-      sin->max_planning_time = max_planning_time;
-      return *sin;
-    }
-    PathSpaceInput* GetNextLayer(){
-      return next_layer;
-    }
-    void SetNextLayer(PathSpaceInput* next){
-      next_layer = next;
-    }
+    const CSpaceInput& GetCSpaceInput();
+    const StrategyInput& GetStrategyInput();
+    PathSpaceInput* GetNextLayer();
+    void SetNextLayer(PathSpaceInput* next);
+    friend std::ostream& operator<< (std::ostream&, const PathSpaceInput&);
 
   private:
     CSpaceInput* cin;

@@ -5,8 +5,8 @@
 #include "pathspace/pathspace_atomic.h"
 #include "pathspace/pathspace_ompl.h"
 #include "pathspace/pathspace_ompl_se2.h"
-#include "pathspace/pathspace_multilevel_se2.h"
-#include "pathspace/pathspace_multilevel_se3.h"
+#include "pathspace/pathspace_multilevel_SE2.h"
+#include "pathspace/pathspace_multilevel_SE3.h"
 #include "pathspace/pathspace_onetopic_cover.h"
 #include "pathspace/decorator.h"
 #include "pathspace/decorator_sweptvolume_path.h"
@@ -95,6 +95,7 @@ void MotionPlanner::CreateSinglePathHierarchy(){
       psinput->timestep_min = input.timestep_min;
       psinput->timestep_max = input.timestep_max;
 
+      psinput->level = k;
       psinput_level0 = psinput;
     }
 
@@ -109,6 +110,7 @@ void MotionPlanner::CreateSinglePathHierarchy(){
     psinput->robot_idx = ii;
     psinput->robot_inner_idx = ii;
     psinput->robot_outer_idx = io;
+    psinput->level = k;
     psinput->type = input.layers.at(k).type;
 
     psinput->qMin = input.qMin;

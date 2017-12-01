@@ -1,4 +1,4 @@
-#include "pathspace_multilevel_se3.h"
+#include "pathspace_multilevel_SE3.h"
 #include "pathspace_atomic.h"
 #include "elements/roadmap_decorator.h"
 
@@ -17,23 +17,35 @@ std::vector<PathSpace*> PathSpaceMultiLevelSE3::Decompose(){
 
   CSpaceFactory factory(input->GetCSpaceInput());
 
-  PathSpaceInput* next = input->GetNextLayer()->GetNextLayer();
 
-  int robot_idx = input->robot_idx;
-  CSpaceOMPL *cspace_level0 = factory.MakeGeometricCSpaceRN(world, robot_idx, 3);
+  std::vector<CSpaceOMPL*> cspace_levels;
+  PathSpaceInput* input_level = input->GetNextLayer();
 
-  robot_idx = next->robot_idx;
-  CSpaceOMPL* cspace_level1 = factory.MakeGeometricCSpaceSE3(world, robot_idx);
+  while(input_level){
+    uint k = input_level->level;
+    CSpaceOMPL *cspace_level_k;
+    if(input_level->type=="R3") {
+      cspace_level_k = factory.MakeGeometricCSpaceRN(world, input_level->robot_idx, 3);
+    }else if(input_level->type=="R3S2"){
+      cspace_level_k = factory.MakeGeometricCSpaceSE3(world, input_level->robot_idx);
+    }else if(input_level->type=="SE3"){
+      cspace_level_k = factory.MakeGeometricCSpaceSE3(world, input_level->robot_idx);
+    }else{
+      std::cout << "Type " << input_level->type << " not recognized" << std::endl;
+      exit(0);
+    }
+    cspace_levels.push_back( cspace_level_k );
+    input_level = input_level->GetNextLayer();
+  }
 
   StrategyGeometricMultiLevel strategy;
-  StrategyOutput output(cspace_level1);
+  StrategyOutput output(cspace_levels.back());
   StrategyInput strategy_input = input->GetStrategyInput();
-  strategy_input.cspace = cspace_level1;
+  strategy_input.cspace = cspace_levels.back();
   strategy_input.world = world;
 
   //multilevel input
-  strategy_input.cspace_level0 = cspace_level0;
-  strategy_input.cspace_level1 = cspace_level1; //the complete original cspace
+  strategy_input.cspace_levels = cspace_levels;
 
   strategy.plan(strategy_input, output);
 

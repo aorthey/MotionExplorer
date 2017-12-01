@@ -21,36 +21,60 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   Config p_goal = input.q_goal;
   std::string algorithm = input.name_algorithm;
 
-  CSpaceOMPL* cspace_level0 = input.cspace_level0;
-  CSpaceOMPL* cspace_level1 = input.cspace_level1;
+  std::vector<ob::SpaceInformationPtr> si_vec; 
+  std::vector<ob::ProblemDefinitionPtr> pdef_vec; 
+  CSpaceOMPL* cspace_levelk;
 
-  ob::SpaceInformationPtr si0 = cspace_level0->SpaceInformationPtr();
-  ob::SpaceInformationPtr si1 = cspace_level1->SpaceInformationPtr();
+  ob::SpaceInformationPtr sik;
+  ob::ProblemDefinitionPtr pdefk;
+  for(uint k = 0; k < input.cspace_levels.size(); k++){
 
-  //###########################################################################
-  // Config init,goal to OMPL start/goal
-  //###########################################################################
+    cspace_levelk = input.cspace_levels.at(k);
+    sik = cspace_levelk->SpaceInformationPtr();
+    ob::ScopedState<> startk = cspace_levelk->ConfigToOMPLState(p_init);
+    ob::ScopedState<> goalk  = cspace_levelk->ConfigToOMPLState(p_goal);
 
-  ob::ScopedState<> start0 = cspace_level0->ConfigToOMPLState(p_init);
-  ob::ScopedState<> goal0  = cspace_level0->ConfigToOMPLState(p_goal);
-  ob::ScopedState<> start1 = cspace_level1->ConfigToOMPLState(p_init);
-  ob::ScopedState<> goal1  = cspace_level1->ConfigToOMPLState(p_goal);
+    pdefk = std::make_shared<ob::ProblemDefinition>(sik);
+    pdefk->addStartState(startk);
+    auto goal=std::make_shared<ob::GoalState>(sik);
+    goal->setState(goalk);
+    goal->setThreshold(input.epsilon_goalregion);
+    pdefk->setGoal(goal);
+    pdefk->setOptimizationObjective( getThresholdPathLengthObj(sik) );
 
-  ob::ProblemDefinitionPtr pdef0 = std::make_shared<ob::ProblemDefinition>(si0);
-  pdef0->addStartState(start0);
-  auto goal=std::make_shared<ob::GoalState>(si0);
-  goal->setState(goal0);
-  goal->setThreshold(input.epsilon_goalregion);
-  pdef0->setGoal(goal);
-  pdef0->setOptimizationObjective( getThresholdPathLengthObj(si0) );
+    si_vec.push_back(sik);
+    pdef_vec.push_back(pdefk);
+  }
+  //CSpaceOMPL* cspace_level0 = input.cspace_level0;
+  //CSpaceOMPL* cspace_level1 = input.cspace_level1;
 
-  ob::ProblemDefinitionPtr pdef1 = std::make_shared<ob::ProblemDefinition>(si1);
-  pdef1->addStartState(start1);
-  goal=std::make_shared<ob::GoalState>(si1);
-  goal->setState(goal1);
-  goal->setThreshold(input.epsilon_goalregion);
-  pdef1->setGoal(goal);
-  pdef1->setOptimizationObjective( getThresholdPathLengthObj(si1) );
+  //ob::SpaceInformationPtr si0 = cspace_level0->SpaceInformationPtr();
+  //ob::SpaceInformationPtr si1 = cspace_level1->SpaceInformationPtr();
+
+  ////###########################################################################
+  //// Config init,goal to OMPL start/goal
+  ////###########################################################################
+
+  //ob::ScopedState<> start0 = cspace_level0->ConfigToOMPLState(p_init);
+  //ob::ScopedState<> goal0  = cspace_level0->ConfigToOMPLState(p_goal);
+  //ob::ScopedState<> start1 = cspace_level1->ConfigToOMPLState(p_init);
+  //ob::ScopedState<> goal1  = cspace_level1->ConfigToOMPLState(p_goal);
+
+  //ob::ProblemDefinitionPtr pdef0 = std::make_shared<ob::ProblemDefinition>(si0);
+  //pdef0->addStartState(start0);
+  //auto goal=std::make_shared<ob::GoalState>(si0);
+  //goal->setState(goal0);
+  //goal->setThreshold(input.epsilon_goalregion);
+  //pdef0->setGoal(goal);
+  //pdef0->setOptimizationObjective( getThresholdPathLengthObj(si0) );
+
+  //ob::ProblemDefinitionPtr pdef1 = std::make_shared<ob::ProblemDefinition>(si1);
+  //pdef1->addStartState(start1);
+  //goal=std::make_shared<ob::GoalState>(si1);
+  //goal->setState(goal1);
+  //goal->setThreshold(input.epsilon_goalregion);
+  //pdef1->setGoal(goal);
+  //pdef1->setOptimizationObjective( getThresholdPathLengthObj(si1) );
 
   //###########################################################################
   // choose planner
@@ -59,24 +83,17 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   ob::PlannerPtr planner;
 
   if(algorithm=="ompl:rrt_plain"){
-    planner = std::make_shared<og::RRTPlain>(si1);
-    planner->setProblemDefinition(pdef1);
+    planner = std::make_shared<og::RRTPlain>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
   }else if(algorithm=="ompl:prm_plain"){
-    planner = std::make_shared<og::PRMPlain>(si1);
-    planner->setProblemDefinition(pdef1);
+    planner = std::make_shared<og::PRMPlain>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
   }else if(algorithm=="ompl:prm_slice"){
-    planner = std::make_shared<og::PRMSliceNaive>(si1,nullptr);
-    planner->setProblemDefinition(pdef1);
+    planner = std::make_shared<og::PRMSliceNaive>(si_vec.back(),nullptr);
+    planner->setProblemDefinition(pdef_vec.back());
   }else if(algorithm=="ompl:prm_multislice"){
-    std::vector<ob::ProblemDefinitionPtr> pdef_vec;
-    pdef_vec.push_back(pdef0);
-    pdef_vec.push_back(pdef1);
-    std::vector<ob::SpaceInformationPtr> si_vec;
-    si_vec.push_back(si0);
-    si_vec.push_back(si1);
     planner = std::make_shared<og::PRMMultiSlice>(si_vec);
     static_pointer_cast<og::PRMMultiSlice>(planner)->setProblemDefinition(pdef_vec);
-
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);
@@ -102,10 +119,10 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   std::cout << status << std::endl;
   //###########################################################################
 
-  ob::PlannerDataPtr pd( new ob::PlannerData(si1) );
+  ob::PlannerDataPtr pd( new ob::PlannerData(si_vec.back()) );
   planner->getPlannerData(*pd);
 
   output.SetPlannerData(pd);
-  output.SetProblemDefinition(pdef1);
+  output.SetProblemDefinition(pdef_vec.back());
 
 }

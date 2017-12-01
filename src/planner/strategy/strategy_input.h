@@ -17,8 +17,9 @@ struct StrategyInput{
   double epsilon_goalregion;
   CSpaceOMPL *cspace;
 
-  CSpaceOMPL *cspace_level0;
-  CSpaceOMPL *cspace_level1;
+  //for multilevel planners
+  std::vector<CSpaceOMPL*> cspace_levels;
+
   RobotWorld *world;
 
   virtual ob::GoalPtr GetGoalPtr(ob::SpaceInformationPtr si) const;

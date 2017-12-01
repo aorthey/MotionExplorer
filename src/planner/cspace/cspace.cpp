@@ -62,7 +62,7 @@ void CSpaceOMPL::OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob
 
 
 CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx):
-  world(world_)
+  world(world_), si(nullptr)
 {
   robot = world->robots[robot_idx];
   worldsettings.InitializeDefault(*world);
@@ -86,14 +86,16 @@ Config CSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
 const ob::StateSpacePtr CSpaceOMPL::SpacePtr(){
   return space;
 }
+
 ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
-  if(!si){
+  if(si==nullptr){
     si = std::make_shared<ob::SpaceInformation>(SpacePtr());
     const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr(si);
     si->setStateValidityChecker(checker);
   }
   return si;
 }
+
 const oc::RealVectorControlSpacePtr CSpaceOMPL::ControlSpacePtr(){
   return control_space;
 }

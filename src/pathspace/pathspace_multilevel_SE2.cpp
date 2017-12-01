@@ -1,4 +1,4 @@
-#include "pathspace_multilevel_se2.h"
+#include "pathspace_multilevel_SE2.h"
 #include "pathspace_atomic.h"
 #include "elements/roadmap_decorator.h"
 
@@ -17,28 +17,39 @@ std::vector<PathSpace*> PathSpaceMultiLevelSE2::Decompose(){
 
   CSpaceFactory factory(input->GetCSpaceInput());
 
-  /// SE(2)
-  PathSpaceInput* next = input->GetNextLayer()->GetNextLayer();
-  int robot_idx = next->robot_idx;
-  //Robot *robot = world->robots[robot_idx];
-  //SingleRobotCSpace *kspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
-  CSpaceOMPL* cspace_level1 = factory.MakeGeometricCSpaceSE2(world, robot_idx);
+  std::vector<CSpaceOMPL*> cspace_levels;
+  PathSpaceInput* input_level = input->GetNextLayer();
 
-  /// R^2
-  robot_idx = input->robot_idx;
-  //robot = world->robots[robot_idx];
-  //SingleRobotCSpace *kcspace0 = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
-  CSpaceOMPL *cspace_level0 = factory.MakeGeometricCSpaceRN(world, robot_idx, 2);
+  CSpaceOMPL *cspace_level_k;
+  while(input_level){
+    std::cout << *input_level << std::endl;
+    uint k = input_level->level;
+    if(input_level->type=="R2") {
+      cspace_level_k = factory.MakeGeometricCSpaceRN(world, input_level->robot_idx, 2);
+    }else if(input_level->type=="SE2"){
+      cspace_level_k = factory.MakeGeometricCSpaceSE2(world, input_level->robot_idx);
+    }else{
+      std::cout << "Type " << input_level->type << " not recognized" << std::endl;
+      exit(0);
+    }
+    cspace_levels.push_back( cspace_level_k );
+    input_level = input_level->GetNextLayer();
+  }
+
+  //CSpaceOMPL *cspace_level_k;
+  //cspace_level_k = factory.MakeGeometricCSpaceRN(world, input->robot_idx, 2);
+  //cspace_level_k = factory.MakeGeometricCSpaceSE2(world, input->robot_idx);
+  //  cspace_levels.push_back( cspace_level_k );
+  //  input_level = input_level->GetNextLayer()->GetNextLayer();
 
   StrategyGeometricMultiLevel strategy;
-  StrategyOutput output(cspace_level1);
+  StrategyOutput output(cspace_levels.back());
   StrategyInput strategy_input = input->GetStrategyInput();
-  strategy_input.cspace = cspace_level1;
+  strategy_input.cspace = cspace_levels.back();
   strategy_input.world = world;
 
   //multilevel input
-  strategy_input.cspace_level0 = cspace_level0;
-  strategy_input.cspace_level1 = cspace_level1; //the complete original cspace
+  strategy_input.cspace_levels = cspace_levels;
 
   strategy.plan(strategy_input, output);
 

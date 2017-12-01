@@ -384,5 +384,11 @@ graph!? -> how about implementing a naive version, where we only change the
 sampling function first?
 
 [x] MultiSlice should return PRM when only fed with one slice
-[ ] multislice with priority queue
-[ ] verify for SE(3)
+[x] multislice with priority queue
+[x] verify for SE(3)
+[x] make it multilevel
+[ ] collision is broken for multilevel (only first level seems to work)
+[ ] fix R3S2 issue (sublevel components are more than SE3)
+[ ] upper level in collision fix. did you add checker for last level!? or is it
+a an issue of chart boundary overflow? -> if the latter, than make the path an
+ompl path instead (would also be better for deformations)

@@ -52,11 +52,6 @@ ob::PlannerStatus PRMMultiSlice::solve(const base::PlannerTerminationCondition &
     ompl::time::point t_k_start = ompl::time::now();
     while (!ptcOrSolutionFound())
     {
-      // j \in [0,k]
-      // example: 
-      // k=0: j=0;
-      // k=1: j=0 or j=1;
-      //
       PRMSliceNaive* jslice = Q.top();
       Q.pop();
       jslice->Grow(ROADMAP_BUILD_TIME);
@@ -93,6 +88,14 @@ ob::PlannerStatus PRMMultiSlice::solve(const base::PlannerTerminationCondition &
   }
 
   return ob::PlannerStatus::EXACT_SOLUTION;
+}
+
+void PRMMultiSlice::setup(){
+  Planner::setup();
+  for(uint k = 0; k < slicespaces.size(); k++){
+    PRMSliceNaive *sk = slicespaces.at(k);
+    sk->setup();
+  }
 }
 
 void PRMMultiSlice::setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef){
