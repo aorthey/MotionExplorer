@@ -6,11 +6,17 @@ namespace og = ompl::geometric;
 
 namespace ompl
 {
+  namespace base
+  {
+      OMPL_CLASS_FORWARD(OptimizationObjective);
+  }
   namespace geometric
   {
     class PRMSliceNaive: public og::PRMSlice{
 
       public:
+
+
         PRMSliceNaive(const ob::SpaceInformationPtr &si, PRMSliceNaive *previous_);
 
         ~PRMSliceNaive() override;
@@ -22,6 +28,18 @@ namespace ompl
 
         double getSamplingDensity();
 
+        double distanceFunction(const Vertex a, const Vertex b) const;
+
+        void setup() override;
+
+        void mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1);
+
+        void ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const;
+        void ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const;
+
+        //double distanceGraphFunction(ob::State *qa, ob::State *qb);
+        double distanceGraphFunction(ob::State *qa, ob::State *qb, const Vertex va, const Vertex vb);
+        og::PRM::Vertex addMilestone(base::State *state);
       protected:
 
         ob::SpaceInformationPtr M1; //full configuration space Mi = si_

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "prm_plain.h"
 #include <ompl/geometric/planners/PlannerIncludes.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <ompl/base/Cost.h>
@@ -22,7 +23,8 @@ namespace ompl
   }
   namespace geometric
   {
-    class PRMSlice: public og::PRM{
+    //class PRMSlice: public og::PRM{
+    class PRMSlice: public og::PRMPlain{
 
       public:
         PRMSlice(const ob::SpaceInformationPtr &si);
@@ -46,6 +48,10 @@ namespace ompl
     protected:
 
         std::vector<ob::State *> xstates;
+
+        Edge lastEdgeSampled;
+        Vertex lastVertexSampled;
+        double lastTSampled;
     };
 
   };

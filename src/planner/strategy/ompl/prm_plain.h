@@ -39,6 +39,14 @@ namespace ompl
         {
             typedef boost::vertex_property_tag kind;
         };
+        struct vertex_associated_edge_t
+        {
+            typedef boost::vertex_property_tag kind;
+        };
+        struct vertex_associated_vertex_t
+        {
+            typedef boost::vertex_property_tag kind;
+        };
         struct EdgeProperty{
           EdgeProperty(): cost(+dInf), original_cost(+dInf)
           {};
@@ -65,9 +73,13 @@ namespace ompl
                 boost::property<vertex_total_connection_attempts_t, unsigned long int,
                 boost::property<vertex_successful_connection_attempts_t, unsigned long int,
                 boost::property<boost::vertex_predecessor_t, unsigned long int,
-                boost::property<boost::vertex_rank_t, unsigned long int>>>>
+                boost::property<vertex_associated_edge_t, unsigned long int,
+                boost::property<vertex_associated_vertex_t, unsigned long int,
+                boost::property<boost::vertex_rank_t, unsigned long int>>>>>>
               >,
               boost::property<boost::edge_weight_t, EdgeProperty>
+              //boost::property<boost::edge_weight_t, base::Cost>>
+
             >Graph;
 
         typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
@@ -108,10 +120,12 @@ namespace ompl
           return last_vertex_path.size();
         }
 
-        Graph graph;
+        Graph g_;
         boost::property_map<Graph, vertex_state_t>::type stateProperty_;
         boost::property_map<Graph, vertex_total_connection_attempts_t>::type totalConnectionAttemptsProperty_;
         boost::property_map<Graph, vertex_successful_connection_attempts_t>::type successfulConnectionAttemptsProperty_;
+        boost::property_map<Graph, vertex_associated_edge_t>::type associatedEdgeProperty_;
+        boost::property_map<Graph, vertex_associated_vertex_t>::type associatedVertexProperty_;
 
         base::OptimizationObjectivePtr opt_;
 
@@ -121,6 +135,17 @@ namespace ompl
         void uniteComponents(Vertex m1, Vertex m2);
         bool sameComponent(Vertex m1, Vertex m2);
         base::Cost bestCost_{+dInf};
+
+        unsigned long int milestoneCount() const
+        {
+          return boost::num_vertices(g_);
+        }
+        const Graph &getRoadmap() const
+        {
+            return g_;
+        }
+
+
     protected:
 
         std::vector<Vertex> last_vertex_path;

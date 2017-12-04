@@ -10,8 +10,10 @@
 
   <!-- <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
   <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
+  <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
+  <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 2 0" rotateRPY="0 0 1.57"/>
        -->
-  <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/Lshape.tri" translation="0 0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="Lshaped" file="/home/aorthey/git/orthoklampt/data/terrains/Lshape.tri" translation="0 0 0" rotateRPY="0 0 0"/>
 
   <plannerinput>
 
@@ -36,8 +38,7 @@
       </hierarchy>
     </algorithm>
 
-    <algorithm name="ompl:rrt"/>
-    <algorithm name="ompl:biest"/>
+    <algorithm name="ompl:est"/>
     <algorithm name="ompl:rrt"/>
     <algorithm name="ompl:prmstar"/>
 

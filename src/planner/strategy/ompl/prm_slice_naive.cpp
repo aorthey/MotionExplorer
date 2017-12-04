@@ -1,6 +1,7 @@
 #include "prm_slice_naive.h"
 #include <ompl/datastructures/PDF.h>
 #include <boost/foreach.hpp>
+#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 
 using namespace og;
 using namespace ob;
@@ -140,13 +141,20 @@ double PRMSliceNaive::getSamplingDensity(){
     const Graph gprev = previous->getRoadmap();
     foreach (Edge e, boost::edges(gprev))
     {
-      ob::Cost weight = get(boost::edge_weight_t(), gprev, e);
+      EdgeProperty ep = get(boost::edge_weight_t(), gprev, e);
+      ob::Cost weight = ep.getCost();
       Lprev += weight.value();
     }
     return (double)num_vertices(g_)/(C1->getSpaceMeasure()+Lprev);
   }
 }
 
+
+void PRMSliceNaive::getPlannerData(base::PlannerData &data) const{
+  PRMSlice::getPlannerData(data);
+  std::cout << "Number of start states: " << startM_.size() << std::endl;
+  std::cout << "Number of goal  states: " << goalM_.size() << std::endl;
+}
 
 bool PRMSliceNaive::Sample(ob::State *workState){
   if(previous == nullptr){
@@ -161,34 +169,7 @@ bool PRMSliceNaive::Sample(ob::State *workState){
 
     C1_sampler->sampleUniform(s_C1);
     previous->SampleGraph(s_M0);
-
-    //workState is element of M1, how do we get values for sub components!?
-
-    // std::cout << "M0 : "; M0->printState(s_M0, std::cout);
-    // std::cout << "C1 : "; C1->printState(s_C1, std::cout);
-
-    State **workState_comps = workState->as<CompoundState>()->components;
-    ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
-    const std::vector<StateSpacePtr> subspaces = M1_compound->getSubspaces();
-
-    if(M0_subspaces > 1){
-      State **sM0_comps = s_M0->as<CompoundState>()->components;
-      for(uint k = 0; k < M0_subspaces; k++){
-        subspaces[k]->copyState( workState_comps[k], sM0_comps[k]);
-      }
-    }else{
-      subspaces[0]->copyState( workState_comps[0], s_M0);
-    }
-    if(C1_subspaces > 1){
-      State **sC1_comps = s_C1->as<CompoundState>()->components;
-      for(uint k = M0_subspaces; k < subspaces.size(); k++){
-        subspaces[k]->copyState( workState_comps[k], sC1_comps[k-M0_subspaces]);
-      }
-    }else{
-      subspaces[M0_subspaces]->copyState( workState_comps[M0_subspaces], s_C1);
-    }
-
-    //std::cout << "M1 : "; M1->printState(workState, std::cout);
+    mergeStates(s_M0, s_C1, workState);
 
     return M1->isValid(workState);
   }
@@ -198,7 +179,7 @@ bool PRMSliceNaive::SampleGraph(ob::State *workState){
   PDF<Edge> pdf;
   foreach (Edge e, boost::edges(g_))
   {
-    ob::Cost weight = get(boost::edge_weight_t(), g_, e);
+    ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
     pdf.add(e, weight.value());
   }
   if(pdf.empty()){
@@ -207,7 +188,8 @@ bool PRMSliceNaive::SampleGraph(ob::State *workState){
   }
   Edge e = pdf.sample(rng_.uniform01());
   double t = rng_.uniform01();
-  //std::cout << "sampled edge " << e << " and t=" << t << std::endl;
+
+
 
   const Vertex v1 = boost::source(e, g_);
   const Vertex v2 = boost::target(e, g_);
@@ -216,13 +198,164 @@ bool PRMSliceNaive::SampleGraph(ob::State *workState){
 
   M1->getStateSpace()->interpolate(from, to, t, workState);
 
+  lastEdgeSampled = e;
+  lastTSampled = t;
+  if(t<0.5) lastVertexSampled = v1;
+  else lastVertexSampled = v2;
+
   //this is necessarily feasible
   return true;
 
 }
-void PRMSliceNaive::getPlannerData(base::PlannerData &data) const{
-  PRMSlice::getPlannerData(data);
-  std::cout << "Number of start states: " << startM_.size() << std::endl;
-  std::cout << "Number of goal  states: " << goalM_.size() << std::endl;
+
+void PRMSliceNaive::setup(){
+  og::PRMPlain::setup();
+  nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
+                           {
+                             return distanceFunction(a,b);
+                           });
+
 }
 
+double PRMSliceNaive::distanceFunction(const Vertex a, const Vertex b) const
+{
+  if(previous == nullptr){
+    return si_->distance(stateProperty_[a], stateProperty_[b]);
+  }else{
+    ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
+
+    ob::State* qa = stateProperty_[a];
+    ob::State* qb = stateProperty_[b];
+
+    ob::State* qaC1 = C1->allocState();
+    ob::State* qbC1 = C1->allocState();
+    ob::State* qaM0 = M0->allocState();
+    ob::State* qbM0 = M0->allocState();
+
+    ExtractC1Subspace(qa, qaC1);
+    ExtractC1Subspace(qb, qbC1);
+    ExtractM0Subspace(qa, qaM0);
+    ExtractM0Subspace(qb, qbM0);
+
+    const Vertex vaM0 = associatedVertexProperty_[a];
+    const Vertex vbM0 = associatedVertexProperty_[b];
+
+    double d0 = previous->distanceGraphFunction(qaM0, qbM0, vaM0, vbM0);
+    double d1 = C1->distance(qaC1, qbC1);
+
+    C1->freeState(qaC1);
+    C1->freeState(qbC1);
+    M0->freeState(qaM0);
+    M0->freeState(qbM0);
+
+    return d0 + d1;
+    //return si_->distance(stateProperty_[a], stateProperty_[b]);
+  }
+}
+
+double PRMSliceNaive::distanceGraphFunction(ob::State *qa, ob::State *qb, const Vertex va, const Vertex vb)
+{
+  //@TODO: compute distance qa to va, and subtract or add to total cost
+  //search on graph between vaM0 and vbM0
+
+  ob::PathPtr sol = constructSolution(va, vb);
+  if(sol==nullptr){
+    return +dInf;
+  }else{
+    return sol->length();
+  }
+}
+
+void PRMSliceNaive::ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const{
+  State **q_comps = q->as<CompoundState>()->components;
+  ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
+  const std::vector<StateSpacePtr> subspaces = M1_compound->getSubspaces();
+
+  if(C1_subspaces > 1){
+    State **sC1_comps = qC1->as<CompoundState>()->components;
+    for(uint k = M0_subspaces; k < subspaces.size(); k++){
+      subspaces[k]->copyState( sC1_comps[k-M0_subspaces], q_comps[k]);
+    }
+  }else{
+    subspaces[M0_subspaces]->copyState( qC1, q_comps[M0_subspaces]);
+  }
+}
+
+void PRMSliceNaive::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const{
+  State **q_comps = q->as<CompoundState>()->components;
+  ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
+  const std::vector<StateSpacePtr> subspaces = M1_compound->getSubspaces();
+
+  if(M0_subspaces > 1){
+    State **sM0_comps = qM0->as<CompoundState>()->components;
+    for(uint k = 0; k < M0_subspaces; k++){
+      subspaces[k]->copyState( sM0_comps[k], q_comps[k]);
+    }
+  }else{
+    subspaces[0]->copyState( qM0, q_comps[0]);
+  }
+}
+void PRMSliceNaive::mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1){
+  //
+  //input : qM0 \in M0, qC1 \in C1
+  //output: qM1 = qM0 \circ qC1 \in M1
+  State **qM1_comps = qM1->as<CompoundState>()->components;
+  ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
+  const std::vector<StateSpacePtr> subspaces = M1_compound->getSubspaces();
+
+  if(M0_subspaces > 1){
+    State **sM0_comps = qM0->as<CompoundState>()->components;
+    for(uint k = 0; k < M0_subspaces; k++){
+      subspaces[k]->copyState( qM1_comps[k], sM0_comps[k]);
+    }
+  }else{
+    subspaces[0]->copyState( qM1_comps[0], qM0);
+  }
+  if(C1_subspaces > 1){
+    State **sC1_comps = qC1->as<CompoundState>()->components;
+    for(uint k = M0_subspaces; k < subspaces.size(); k++){
+      subspaces[k]->copyState( qM1_comps[k], sC1_comps[k-M0_subspaces]);
+    }
+  }else{
+    subspaces[M0_subspaces]->copyState( qM1_comps[M0_subspaces], qC1);
+  }
+}
+
+og::PRM::Vertex PRMSliceNaive::addMilestone(base::State *state)
+{
+
+    Vertex m = boost::add_vertex(g_);
+    stateProperty_[m] = state;
+    totalConnectionAttemptsProperty_[m] = 1;
+    successfulConnectionAttemptsProperty_[m] = 0;
+    if(previous != nullptr){
+      associatedVertexProperty_[m] = lastVertexSampled;
+    }
+    //associatedEdgeProperty_[m] = lastEdgeSampled;
+
+    // Initialize to its own (dis)connected component.
+    disjointSets_.make_set(m);
+
+    // Which milestones will we attempt to connect to?
+    const std::vector<Vertex> &neighbors = connectionStrategy_(m);
+
+    foreach (Vertex n, neighbors)
+      if (connectionFilter_(n, m))
+      {
+        totalConnectionAttemptsProperty_[m]++;
+        totalConnectionAttemptsProperty_[n]++;
+        if (si_->checkMotion(stateProperty_[n], stateProperty_[m]))
+        {
+          successfulConnectionAttemptsProperty_[m]++;
+          successfulConnectionAttemptsProperty_[n]++;
+          const base::Cost weight = opt_->motionCost(stateProperty_[n], stateProperty_[m]);
+          const Graph::edge_property_type properties(weight);
+          boost::add_edge(n, m, properties, g_);
+          uniteComponents(n, m);
+        }
+      }
+
+    nn_->add(m);
+
+    return m;
+}

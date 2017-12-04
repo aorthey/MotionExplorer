@@ -25,7 +25,7 @@ namespace ompl
   }
 }
 PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si)
-  : og::PRM(si)
+  : og::PRMPlain(si)
 {
   if (!isSetup())
     setup();
@@ -145,3 +145,6 @@ void PRMSlice::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State
 bool PRMSlice::Sample(ob::State *workState){
   return sampler_->sample(workState);
 }
+
+
+

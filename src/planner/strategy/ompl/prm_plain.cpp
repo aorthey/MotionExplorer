@@ -26,10 +26,10 @@ namespace ompl
 }
 PRMPlain::PRMPlain(const ob::SpaceInformationPtr &si)
   : ob::Planner(si, "PRMPlain")
-  , stateProperty_(boost::get(vertex_state_t(), graph))
-  , totalConnectionAttemptsProperty_(boost::get(vertex_total_connection_attempts_t(), graph))
-  , successfulConnectionAttemptsProperty_(boost::get(vertex_successful_connection_attempts_t(), graph))
-  , disjointSets_(boost::get(boost::vertex_rank, graph), boost::get(boost::vertex_predecessor, graph))
+  , stateProperty_(boost::get(vertex_state_t(), g_))
+  , totalConnectionAttemptsProperty_(boost::get(vertex_total_connection_attempts_t(), g_))
+  , successfulConnectionAttemptsProperty_(boost::get(vertex_successful_connection_attempts_t(), g_))
+  , disjointSets_(boost::get(boost::vertex_rank, g_), boost::get(boost::vertex_predecessor, g_))
 {
   specs_.recognizedGoal = ob::GOAL_SAMPLEABLE_REGION;
   specs_.approximateSolutions = false;
@@ -60,7 +60,7 @@ void PRMPlain::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
 }
 ob::PlannerStatus PRMPlain::Init(const base::PlannerTerminationCondition &ptc){
   checkValidity();
-  unsigned long int nrStartStates = boost::num_vertices(graph);
+  unsigned long int nrStartStates = boost::num_vertices(g_);
   OMPL_INFORM("%s: Starting planning with %lu states already in datastructure", getName().c_str(), nrStartStates);
 }
 
@@ -81,7 +81,7 @@ ob::PlannerStatus PRMPlain::solve(const ob::PlannerTerminationCondition &ptc){
     checkForSolution(sol);
   }
 
-  OMPL_INFORM("%s: Created %u states", getName().c_str(), boost::num_vertices(graph));
+  OMPL_INFORM("%s: Created %u states", getName().c_str(), boost::num_vertices(g_));
 
   if (sol)
   {
@@ -124,7 +124,7 @@ void PRMPlain::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
                                          std::vector<ob::State *> &workStates)
 {
     PDF<Vertex> pdf;
-    foreach (Vertex v, boost::vertices(graph))
+    foreach (Vertex v, boost::vertices(g_))
     {
       const unsigned long int t = totalConnectionAttemptsProperty_[v];
       pdf.add(v, (double)(t - successfulConnectionAttemptsProperty_[v]) / (double)t);
@@ -147,16 +147,16 @@ void PRMPlain::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
           for (unsigned int i = 0; i < s; ++i)
           {
               // add the vertex along the bouncing motion
-              Vertex m = boost::add_vertex(graph);
+              Vertex m = boost::add_vertex(g_);
               stateProperty_[m] = si_->cloneState(workStates[i]);
               totalConnectionAttemptsProperty_[m] = 1;
               successfulConnectionAttemptsProperty_[m] = 0;
               disjointSets_.make_set(m);
 
               // add the edge to the parent vertex
-              //const Graph::edge_property_type properties(weight);
+              //const g_::edge_property_type properties(weight);
               EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[m]));
-              boost::add_edge(v, m, properties, graph);
+              boost::add_edge(v, m, properties, g_);
               uniteComponents(v, m);
 
               // add the vertex to the nearest neighbors data structure
@@ -169,9 +169,9 @@ void PRMPlain::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
           if (s > 0 || !sameComponent(v, last))
           {
             // add the edge to the parent vertex
-            //const Graph::edge_property_type properties(weight);
+            //const g_::edge_property_type properties(weight);
             EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[last]));
-            boost::add_edge(v, last, properties, graph);
+            boost::add_edge(v, last, properties, g_);
             uniteComponents(v, last);
           }
       }
@@ -239,11 +239,11 @@ bool PRMPlain::maybeConstructSolution(const std::vector<Vertex> &starts, const s
 }
 ob::PathPtr PRMPlain::constructSolution(const Vertex &start, const Vertex &goal)
 {
-    boost::vector_property_map<Vertex> prev(boost::num_vertices(graph));
+    boost::vector_property_map<Vertex> prev(boost::num_vertices(g_));
 
     try
     {
-        boost::astar_search(graph, start,
+        boost::astar_search(g_, start,
                             [this, goal](Vertex v)
                             {
                                 return costHeuristic(v, goal);
@@ -285,7 +285,7 @@ ob::PathPtr PRMPlain::constructSolution(const Vertex &start, const Vertex &goal)
 }
 PRMPlain::Vertex PRMPlain::addMilestone(ob::State *state)
 {
-  Vertex m = boost::add_vertex(graph);
+  Vertex m = boost::add_vertex(g_);
   stateProperty_[m] = state;
   totalConnectionAttemptsProperty_[m] = 1;
   successfulConnectionAttemptsProperty_[m] = 0;
@@ -304,7 +304,7 @@ PRMPlain::Vertex PRMPlain::addMilestone(ob::State *state)
         successfulConnectionAttemptsProperty_[m]++;
         successfulConnectionAttemptsProperty_[n]++;
         EdgeProperty properties(opt_->motionCost(stateProperty_[n], stateProperty_[m]));
-        boost::add_edge(n, m, properties, graph);
+        boost::add_edge(n, m, properties, g_);
         uniteComponents(n, m);
       }
     }
@@ -326,11 +326,11 @@ void PRMPlain::getPlannerData(ob::PlannerData &data) const
         data.addGoalVertex(
             ob::PlannerDataVertex(stateProperty_[i], const_cast<PRMPlain *>(this)->disjointSets_.find_set(i)));
 
-    std::cout << "  edges : " << boost::num_edges(graph) << std::endl;
-    foreach (const Edge e, boost::edges(graph))
+    std::cout << "  edges : " << boost::num_edges(g_) << std::endl;
+    foreach (const Edge e, boost::edges(g_))
     {
-        const Vertex v1 = boost::source(e, graph);
-        const Vertex v2 = boost::target(e, graph);
+        const Vertex v1 = boost::source(e, g_);
+        const Vertex v2 = boost::target(e, g_);
         data.addEdge(ob::PlannerDataVertex(stateProperty_[v1]), ob::PlannerDataVertex(stateProperty_[v2]));
         data.addEdge(ob::PlannerDataVertex(stateProperty_[v2]), ob::PlannerDataVertex(stateProperty_[v1]));
         data.tagState(stateProperty_[v1], const_cast<PRMPlain *>(this)->disjointSets_.find_set(v1));
@@ -388,7 +388,7 @@ void PRMPlain::setup(){
         goalM_.push_back(addMilestone(si_->cloneState(st)));
       }
     }
-    unsigned long int nrStartStates = boost::num_vertices(graph);
+    unsigned long int nrStartStates = boost::num_vertices(g_);
     OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nrStartStates);
   }else{
     //OMPL_INFORM("%s: problem definition is not set, deferring setup completion...", getName().c_str());
@@ -398,10 +398,10 @@ void PRMPlain::setup(){
 }
 void PRMPlain::clear()
 {
-  foreach (Vertex v, boost::vertices(graph)){
+  foreach (Vertex v, boost::vertices(g_)){
     si_->freeState(stateProperty_[v]);
   }
-  graph.clear();
+  g_.clear();
   sampler_.reset();
   simpleSampler_.reset();
   if (nn_)
@@ -430,7 +430,7 @@ void PRMPlain::clearQuery()
 }
 
 double PRMPlain::GetSamplingDensity(){
-  return (double)num_vertices(graph)/(double)si_->getSpaceMeasure();
+  return (double)num_vertices(g_)/(double)si_->getSpaceMeasure();
 }
 
 ob::PathPtr PRMPlain::GetShortestPath(){

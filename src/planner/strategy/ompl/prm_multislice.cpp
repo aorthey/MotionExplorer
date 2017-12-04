@@ -29,7 +29,7 @@ PRMMultiSlice::~PRMMultiSlice(){
 
 ob::PlannerStatus PRMMultiSlice::solve(const base::PlannerTerminationCondition &ptc){
   
-  static const double ROADMAP_BUILD_TIME = 0.0001;
+  static const double ROADMAP_BUILD_TIME = 0.01;
 
   auto cmp = [](PRMSliceNaive* left, PRMSliceNaive* right) 
               { 
@@ -55,7 +55,6 @@ ob::PlannerStatus PRMMultiSlice::solve(const base::PlannerTerminationCondition &
       PRMSliceNaive* jslice = Q.top();
       Q.pop();
       jslice->Grow(ROADMAP_BUILD_TIME);
-      //std::cout << "Slice vertices: " << jslice->milestoneCount() << " sampling density: " << jslice->getSamplingDensity() << std::endl;
 
       kslice->checkForSolution(sol_k);
 
