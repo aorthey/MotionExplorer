@@ -30,7 +30,6 @@ PRMPlain::PRMPlain(const ob::SpaceInformationPtr &si)
   , totalConnectionAttemptsProperty_(boost::get(vertex_total_connection_attempts_t(), g_))
   , successfulConnectionAttemptsProperty_(boost::get(vertex_successful_connection_attempts_t(), g_))
   , associatedVertexProperty_(boost::get(vertex_associated_vertex_t(), g_))
-  , associatedEdgeProperty_(boost::get(vertex_associated_edge_t(), g_))
   , disjointSets_(boost::get(boost::vertex_rank, g_), boost::get(boost::vertex_predecessor, g_))
 {
   specs_.recognizedGoal = ob::GOAL_SAMPLEABLE_REGION;

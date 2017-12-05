@@ -125,7 +125,7 @@ namespace ompl
         boost::property_map<Graph, vertex_total_connection_attempts_t>::type totalConnectionAttemptsProperty_;
         boost::property_map<Graph, vertex_successful_connection_attempts_t>::type successfulConnectionAttemptsProperty_;
         boost::property_map<Graph, vertex_associated_vertex_t>::type associatedVertexProperty_;
-        boost::property_map<Graph, vertex_associated_edge_t>::type associatedEdgeProperty_;
+        //boost::property_map<Graph, vertex_associated_edge_t>::type associatedEdgeProperty_;
 
         base::OptimizationObjectivePtr opt_;
 
