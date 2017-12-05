@@ -300,7 +300,7 @@ void PRMSliceNaive::mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1){
 //}
 
 void PRMSliceNaive::setup(){
-  og::PRMPlain::setup();
+  og::PRMBasic::setup();
   nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
                            {
                              return distanceFunction(a,b);
@@ -328,20 +328,22 @@ double PRMSliceNaive::distanceFunction(const Vertex a, const Vertex b) const
     ExtractM0Subspace(qa, qaM0);
     ExtractM0Subspace(qb, qbM0);
 
-    const Vertex vaM0 = associatedVertexProperty_[a];
-    const Vertex vbM0 = associatedVertexProperty_[b];
-    //std::cout << vaM0 << " <-> " << vbM0 << std::endl;
+    const Vertex saM0 = associatedVertexSourceProperty_[a];
+    const Vertex sbM0 = associatedVertexSourceProperty_[b];
+    const Vertex taM0 = associatedVertexTargetProperty_[a];
+    const Vertex tbM0 = associatedVertexTargetProperty_[b];
+    std::cout << saM0 << " <-> " << sbM0 << std::endl;
 
-    //double d0 = previous->distanceGraphFunction(qaM0, qbM0, vaM0, vbM0);
-    //double d1 = C1->distance(qaC1, qbC1);
+    double d0 = previous->distanceGraphFunction(qaM0, qbM0, saM0, sbM0);
+    double d1 = C1->distance(qaC1, qbC1);
 
     C1->freeState(qaC1);
     C1->freeState(qbC1);
     M0->freeState(qaM0);
     M0->freeState(qbM0);
 
-    //return d0 + d1;
-    return si_->distance(stateProperty_[a], stateProperty_[b]);
+    return d0 + d1;
+    //return si_->distance(stateProperty_[a], stateProperty_[b]);
   }
 }
 
@@ -363,10 +365,12 @@ ob::PlannerStatus PRMSliceNaive::Init()
   PRMSlice::Init();
   if(previous!=nullptr){
     for(uint k = 0; k < startM_.size(); k++){
-      associatedVertexProperty_[startM_.at(k)] = previous->startM_.at(k);
+      associatedVertexSourceProperty_[startM_.at(k)] = previous->startM_.at(k);
+      associatedVertexTargetProperty_[startM_.at(k)] = previous->startM_.at(k);
     }
     for(uint k = 0; k < goalM_.size(); k++){
-      associatedVertexProperty_[goalM_.at(k)] = previous->goalM_.at(k);
+      associatedVertexSourceProperty_[goalM_.at(k)] = previous->goalM_.at(k);
+      associatedVertexTargetProperty_[goalM_.at(k)] = previous->startM_.at(k);
     }
   }
 }

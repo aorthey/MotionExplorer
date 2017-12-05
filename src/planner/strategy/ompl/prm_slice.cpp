@@ -25,7 +25,7 @@ namespace ompl
   }
 }
 PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si)
-  : og::PRMPlain(si)
+  : og::PRMBasic(si)
 {
   if (!isSetup())
     setup();

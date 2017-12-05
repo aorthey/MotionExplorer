@@ -1,6 +1,6 @@
 #pragma once
 
-#include "prm_plain.h"
+#include "prm_basic.h"
 #include <ompl/geometric/planners/PlannerIncludes.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <ompl/base/Cost.h>
@@ -8,7 +8,6 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/pending/disjoint_sets.hpp>
-#include <ompl/geometric/planners/prm/PRM.h>
 #include <KrisLibrary/math/infnan.h> //dInf, fInf, IsNaN(x)
 using Math::dInf;
 
@@ -24,7 +23,7 @@ namespace ompl
   namespace geometric
   {
     //class PRMSlice: public og::PRM{
-    class PRMSlice: public og::PRMPlain{
+    class PRMSlice: public og::PRMBasic{
 
       public:
         PRMSlice(const ob::SpaceInformationPtr &si);

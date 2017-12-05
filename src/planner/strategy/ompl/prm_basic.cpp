@@ -1,4 +1,4 @@
-#include "prm_plain.h"
+#include "prm_basic.h"
 #include "GoalVisitor.hpp"
 
 #include <ompl/geometric/planners/prm/ConnectionStrategy.h>
@@ -24,13 +24,14 @@ namespace ompl
     static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
   }
 }
-PRMPlain::PRMPlain(const ob::SpaceInformationPtr &si)
-  : ob::Planner(si, "PRMPlain")
+PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si)
+  : ob::Planner(si, "PRMBasic")
   , stateProperty_(boost::get(vertex_state_t(), g_))
   , totalConnectionAttemptsProperty_(boost::get(vertex_total_connection_attempts_t(), g_))
   , successfulConnectionAttemptsProperty_(boost::get(vertex_successful_connection_attempts_t(), g_))
   , associatedVertexSourceProperty_(boost::get(vertex_associated_vertex_source_t(), g_))
   , associatedVertexTargetProperty_(boost::get(vertex_associated_vertex_target_t(), g_))
+  , associatedTProperty_(boost::get(vertex_associated_t_t(), g_))
   , disjointSets_(boost::get(boost::vertex_rank, g_), boost::get(boost::vertex_predecessor, g_))
 {
   specs_.recognizedGoal = ob::GOAL_SAMPLEABLE_REGION;
@@ -49,24 +50,24 @@ PRMPlain::PRMPlain(const ob::SpaceInformationPtr &si)
   xstates.resize(magic::MAX_RANDOM_BOUNCE_STEPS);
   si_->allocStates(xstates);
 
-  std::cout << "Hello this is PRMPlain with measure=" << si_->getSpaceMeasure() << std::endl;
+  std::cout << "Hello this is PRMBasic with measure=" << si_->getSpaceMeasure() << std::endl;
 }
 
-PRMPlain::~PRMPlain(){
+PRMBasic::~PRMBasic(){
   si_->freeStates(xstates);
 }
 
-void PRMPlain::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
+void PRMBasic::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
 {
   Planner::setProblemDefinition(pdef);
 }
-ob::PlannerStatus PRMPlain::Init(const base::PlannerTerminationCondition &ptc){
+ob::PlannerStatus PRMBasic::Init(const base::PlannerTerminationCondition &ptc){
   checkValidity();
   unsigned long int nrStartStates = boost::num_vertices(g_);
   OMPL_INFORM("%s: Starting planning with %lu states already in datastructure", getName().c_str(), nrStartStates);
 }
 
-ob::PlannerStatus PRMPlain::solve(const ob::PlannerTerminationCondition &ptc){
+ob::PlannerStatus PRMBasic::solve(const ob::PlannerTerminationCondition &ptc){
   Init(ptc);
 
   addedNewSolution_ = false;
@@ -96,14 +97,14 @@ ob::PlannerStatus PRMPlain::solve(const ob::PlannerTerminationCondition &ptc){
   return sol ? base::PlannerStatus::EXACT_SOLUTION : base::PlannerStatus::TIMEOUT;
 }
 
-void PRMPlain::Grow(double t){
+void PRMBasic::Grow(double t){
   double twothird = (2.0/3.0)*t;
   double onethird = (1.0/3.0)*t;
   growRoadmap(ob::timedPlannerTerminationCondition(twothird), xstates[0]);
   expandRoadmap( ob::timedPlannerTerminationCondition(onethird), xstates);
 }
 
-void PRMPlain::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState)
+void PRMBasic::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState)
 {
   while (!ptc)
   {
@@ -122,7 +123,7 @@ void PRMPlain::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State
   }
 }
 
-void PRMPlain::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
+void PRMBasic::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
                                          std::vector<ob::State *> &workStates)
 {
     PDF<Vertex> pdf;
@@ -179,17 +180,17 @@ void PRMPlain::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
       }
     }
 }
-void PRMPlain::uniteComponents(Vertex m1, Vertex m2)
+void PRMBasic::uniteComponents(Vertex m1, Vertex m2)
 {
   disjointSets_.union_set(m1, m2);
 }
 
-bool PRMPlain::sameComponent(Vertex m1, Vertex m2)
+bool PRMBasic::sameComponent(Vertex m1, Vertex m2)
 {
   return boost::same_component(m1, m2, disjointSets_);
 }
 
-void PRMPlain::checkForSolution(ob::PathPtr &solution)
+void PRMBasic::checkForSolution(ob::PathPtr &solution)
 {
   bool foundSolution = maybeConstructSolution(startM_, goalM_, solution);
   if(foundSolution && !addedNewSolution_){
@@ -197,7 +198,7 @@ void PRMPlain::checkForSolution(ob::PathPtr &solution)
   }
 }
 
-bool PRMPlain::maybeConstructSolution(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals,
+bool PRMBasic::maybeConstructSolution(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals,
                                                   ob::PathPtr &solution)
 {
   ob::Goal *g = pdef_->getGoal().get();
@@ -239,7 +240,7 @@ bool PRMPlain::maybeConstructSolution(const std::vector<Vertex> &starts, const s
 
   return false;
 }
-ob::PathPtr PRMPlain::constructSolution(const Vertex &start, const Vertex &goal)
+ob::PathPtr PRMBasic::constructSolution(const Vertex &start, const Vertex &goal)
 {
     boost::vector_property_map<Vertex> prev(boost::num_vertices(g_));
 
@@ -285,7 +286,7 @@ ob::PathPtr PRMPlain::constructSolution(const Vertex &start, const Vertex &goal)
 
     return p;
 }
-PRMPlain::Vertex PRMPlain::addMilestone(ob::State *state)
+PRMBasic::Vertex PRMBasic::addMilestone(ob::State *state)
 {
   Vertex m = boost::add_vertex(g_);
   stateProperty_[m] = state;
@@ -318,15 +319,15 @@ PRMPlain::Vertex PRMPlain::addMilestone(ob::State *state)
 }
 
 
-void PRMPlain::getPlannerData(ob::PlannerData &data) const
+void PRMBasic::getPlannerData(ob::PlannerData &data) const
 {
     for (unsigned long i : startM_)
         data.addStartVertex(
-            ob::PlannerDataVertex(stateProperty_[i], const_cast<PRMPlain *>(this)->disjointSets_.find_set(i)));
+            ob::PlannerDataVertex(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
 
     for (unsigned long i : goalM_)
         data.addGoalVertex(
-            ob::PlannerDataVertex(stateProperty_[i], const_cast<PRMPlain *>(this)->disjointSets_.find_set(i)));
+            ob::PlannerDataVertex(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
 
     std::cout << "  edges : " << boost::num_edges(g_) << std::endl;
     foreach (const Edge e, boost::edges(g_))
@@ -335,11 +336,11 @@ void PRMPlain::getPlannerData(ob::PlannerData &data) const
         const Vertex v2 = boost::target(e, g_);
         data.addEdge(ob::PlannerDataVertex(stateProperty_[v1]), ob::PlannerDataVertex(stateProperty_[v2]));
         data.addEdge(ob::PlannerDataVertex(stateProperty_[v2]), ob::PlannerDataVertex(stateProperty_[v1]));
-        data.tagState(stateProperty_[v1], const_cast<PRMPlain *>(this)->disjointSets_.find_set(v1));
-        data.tagState(stateProperty_[v2], const_cast<PRMPlain *>(this)->disjointSets_.find_set(v2));
+        data.tagState(stateProperty_[v1], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v1));
+        data.tagState(stateProperty_[v2], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v2));
     }
 }
-void PRMPlain::setup(){
+void PRMBasic::setup(){
   if (!nn_){
     nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
     nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
@@ -398,7 +399,7 @@ void PRMPlain::setup(){
   }
 
 }
-void PRMPlain::clear()
+void PRMBasic::clear()
 {
   foreach (Vertex v, boost::vertices(g_)){
     si_->freeState(stateProperty_[v]);
@@ -414,38 +415,38 @@ void PRMPlain::clear()
   bestCost_ = ob::Cost(dInf);
 }
 
-ob::Cost PRMPlain::costHeuristic(Vertex u, Vertex v) const
+ob::Cost PRMBasic::costHeuristic(Vertex u, Vertex v) const
 {
   return opt_->motionCostHeuristic(stateProperty_[u], stateProperty_[v]);
 }
 
-double PRMPlain::distanceFunction(const Vertex a, const Vertex b) const
+double PRMBasic::distanceFunction(const Vertex a, const Vertex b) const
 {
   return si_->distance(stateProperty_[a], stateProperty_[b]);
 }
 
-void PRMPlain::clearQuery()
+void PRMBasic::clearQuery()
 {
   startM_.clear();
   goalM_.clear();
   pis_.restart();
 }
 
-double PRMPlain::GetSamplingDensity(){
+double PRMBasic::GetSamplingDensity(){
   return (double)num_vertices(g_)/(double)si_->getSpaceMeasure();
 }
 
-ob::PathPtr PRMPlain::GetShortestPath(){
+ob::PathPtr PRMBasic::GetShortestPath(){
   return GetSolutionPath();
 }
 
-ob::PathPtr PRMPlain::GetSolutionPath(){
+ob::PathPtr PRMBasic::GetSolutionPath(){
   ob::PathPtr sol;
   checkForSolution(sol);
   return sol;
 }
 
-bool PRMPlain::hasSolution(){
+bool PRMBasic::hasSolution(){
   if(bestCost_.value() < dInf){
     return addedNewSolution_;
   }else{
@@ -454,7 +455,7 @@ bool PRMPlain::hasSolution(){
 }
 
 template <template <typename T> class NN>
-void PRMPlain::setNearestNeighbors()
+void PRMBasic::setNearestNeighbors()
 {
     if (nn_ && nn_->size() == 0)
         OMPL_WARN("Calling setNearestNeighbors will clear all states.");
@@ -465,7 +466,7 @@ void PRMPlain::setNearestNeighbors()
         setup();
 }
 
-void PRMPlain::setConnectionFilter(const ConnectionFilter &connectionFilter)
+void PRMBasic::setConnectionFilter(const ConnectionFilter &connectionFilter)
 {
     connectionFilter_ = connectionFilter;
 }

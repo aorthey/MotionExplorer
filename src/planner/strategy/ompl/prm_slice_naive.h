@@ -13,8 +13,6 @@ namespace ompl
   }
   namespace geometric
   {
-    //using Vertex = og::PRMPlain::Vertex;
-    //using Edge = og::PRMPlain::Edge;
     class PRMSliceNaive: public og::PRMSlice{
 
       public:

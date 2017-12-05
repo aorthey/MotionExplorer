@@ -14,6 +14,7 @@ using Math::dInf;
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
+//copied from ompl/geometric/planners/PRM.h plus some modifications/simplifications
 namespace ompl
 {
   namespace base
@@ -22,7 +23,7 @@ namespace ompl
   }
   namespace geometric
   {
-    class PRMPlain: public ob::Planner{
+    class PRMBasic: public ob::Planner{
 
       public:
         struct vertex_state_t
@@ -48,7 +49,7 @@ namespace ompl
         {
             typedef boost::vertex_property_tag kind;
         };
-        struct vertex_associated_vertex_t_t
+        struct vertex_associated_t_t
         {
             typedef boost::vertex_property_tag kind;
         };
@@ -82,7 +83,7 @@ namespace ompl
                      boost::property<boost::vertex_rank_t, unsigned long int,
                       boost::property<vertex_associated_vertex_target_t, unsigned long int,
                         boost::property<vertex_associated_vertex_source_t, unsigned long int,
-                          boost::property<vertex_associated_vertex_t_t, unsigned long int>
+                          boost::property<vertex_associated_t_t, unsigned long int>
                         >
                       >
                      >
@@ -94,20 +95,6 @@ namespace ompl
              //boost::property<boost::edge_weight_t, base::Cost>>
 
            >Graph;
-          // typedef boost::adjacency_list<
-          //       boost::vecS, boost::vecS, boost::undirectedS,
-          //       boost::property<vertex_state_t, base::State *,
-          //         boost::property<vertex_total_connection_attempts_t, unsigned long int,
-          //           boost::property<vertex_successful_connection_attempts_t, unsigned long int,
-          //             boost::property<boost::vertex_predecessor_t, unsigned long int,
-          //               boost::property<boost::vertex_rank_t, unsigned long int>
-          //             >
-          //           >
-          //         >
-          //       >,
-          //       boost::property<boost::edge_weight_t, base::Cost>>
-          //       Graph;
-
 
         typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
         typedef boost::graph_traits<Graph>::edge_descriptor Edge;
@@ -116,9 +103,9 @@ namespace ompl
         typedef std::function<bool(const Vertex &, const Vertex &)> ConnectionFilter;
 
       public:
-        PRMPlain(const ob::SpaceInformationPtr &si);
+        PRMBasic(const ob::SpaceInformationPtr &si);
 
-        ~PRMPlain() override;
+        ~PRMBasic() override;
         double GetSamplingDensity();
         base::PathPtr GetShortestPath();
         base::PathPtr GetSolutionPath();
@@ -147,6 +134,7 @@ namespace ompl
         boost::property_map<Graph, vertex_successful_connection_attempts_t>::type successfulConnectionAttemptsProperty_;
         boost::property_map<Graph, vertex_associated_vertex_source_t>::type associatedVertexSourceProperty_;
         boost::property_map<Graph, vertex_associated_vertex_target_t>::type associatedVertexTargetProperty_;
+        boost::property_map<Graph, vertex_associated_t_t>::type associatedTProperty_;
 
         base::OptimizationObjectivePtr opt_;
 
