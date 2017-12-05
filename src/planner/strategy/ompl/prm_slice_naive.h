@@ -40,14 +40,13 @@ namespace ompl
 
         //double distanceGraphFunction(ob::State *qa, ob::State *qb);
         double distanceGraphFunction(ob::State *qa, ob::State *qb, const Vertex va, const Vertex vb);
-        og::PRM::Vertex addMilestone(base::State *state);
 
-        Edge lastEdgeSampled;
-        Vertex lastVertexSampled;
+        og::PRMPlain::Vertex lastVertexSampled;
         double lastTSampled;
         bool isSampled{false};
 
       protected:
+        //virtual Vertex addMilestone(base::State *state) override;
 
         ob::SpaceInformationPtr M1; //full configuration space Mi = si_
         ob::SpaceInformationPtr C1; //configuration space Ci = Mi/Mi-1

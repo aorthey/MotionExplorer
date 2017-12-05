@@ -196,10 +196,10 @@ bool PRMSliceNaive::SampleGraph(ob::State *workState){
 
   M1->getStateSpace()->interpolate(from, to, t, workState);
 
-  lastEdgeSampled = e;
-  lastTSampled = t;
   if(t<0.5) lastVertexSampled = v1;
   else lastVertexSampled = v2;
+
+  lastTSampled = t;
   isSampled = true;
 
   return true;
@@ -261,41 +261,44 @@ void PRMSliceNaive::mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1){
   }
 }
 
-og::PRM::Vertex PRMSliceNaive::addMilestone(base::State *state)
-{
+//og::PRMPlain::Vertex PRMSliceNaive::addMilestone(base::State *state)
+//{
+//  return PRMPlain::addMilestone(state);
+//
+//  //Vertex m = boost::add_vertex(g_);
+//  //stateProperty_[m] = state;
+//  //totalConnectionAttemptsProperty_[m] = 1;
+//  //successfulConnectionAttemptsProperty_[m] = 0;
+//  //if(previous != nullptr && previous->isSampled){
+//  //  std::cout << lastVertexSampled << std::endl;
+//  //  associatedVertexProperty_[m] = lastVertexSampled;
+//  //}
+//
+//  //disjointSets_.make_set(m);
+//  //const std::vector<Vertex> &neighbors = connectionStrategy_(m);
+//
+//  //foreach (Vertex n, neighbors)
+//  //{
+//  //  if (connectionFilter_(n, m))
+//  //  {
+//  //    totalConnectionAttemptsProperty_[m]++;
+//  //    totalConnectionAttemptsProperty_[n]++;
+//  //    if (si_->checkMotion(stateProperty_[n], stateProperty_[m]))
+//  //    {
+//  //      successfulConnectionAttemptsProperty_[m]++;
+//  //      successfulConnectionAttemptsProperty_[n]++;
+//  //      EdgeProperty properties(opt_->motionCost(stateProperty_[n], stateProperty_[m]));
+//  //      boost::add_edge(n, m, properties, g_);
+//  //      uniteComponents(n, m);
+//  //    }
+//  //  }
+//  //}
+//
+//  //nn_->add(m);
+//
+//  //return m;
+//}
 
-    Vertex m = boost::add_vertex(g_);
-    stateProperty_[m] = state;
-    totalConnectionAttemptsProperty_[m] = 1;
-    successfulConnectionAttemptsProperty_[m] = 0;
-    if(previous != nullptr && previous->isSampled){
-      associatedVertexProperty_[m] = lastVertexSampled;
-    }
-
-    disjointSets_.make_set(m);
-
-    const std::vector<Vertex> &neighbors = connectionStrategy_(m);
-
-    foreach (Vertex n, neighbors)
-      if (connectionFilter_(n, m))
-      {
-        totalConnectionAttemptsProperty_[m]++;
-        totalConnectionAttemptsProperty_[n]++;
-        if (si_->checkMotion(stateProperty_[n], stateProperty_[m]))
-        {
-          successfulConnectionAttemptsProperty_[m]++;
-          successfulConnectionAttemptsProperty_[n]++;
-          const base::Cost weight = opt_->motionCost(stateProperty_[n], stateProperty_[m]);
-          const Graph::edge_property_type properties(weight);
-          boost::add_edge(n, m, properties, g_);
-          uniteComponents(n, m);
-        }
-      }
-
-    nn_->add(m);
-
-    return m;
-}
 void PRMSliceNaive::setup(){
   og::PRMPlain::setup();
   nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
@@ -327,9 +330,10 @@ double PRMSliceNaive::distanceFunction(const Vertex a, const Vertex b) const
 
     const Vertex vaM0 = associatedVertexProperty_[a];
     const Vertex vbM0 = associatedVertexProperty_[b];
+    //std::cout << vaM0 << " <-> " << vbM0 << std::endl;
 
-    double d0 = previous->distanceGraphFunction(qaM0, qbM0, vaM0, vbM0);
-    double d1 = C1->distance(qaC1, qbC1);
+    //double d0 = previous->distanceGraphFunction(qaM0, qbM0, vaM0, vbM0);
+    //double d1 = C1->distance(qaC1, qbC1);
 
     C1->freeState(qaC1);
     C1->freeState(qbC1);
