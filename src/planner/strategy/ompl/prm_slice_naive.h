@@ -39,15 +39,16 @@ namespace ompl
         void ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const;
         void ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const;
 
-        //double distanceGraphFunction(ob::State *qa, ob::State *qb);
-        double distanceGraphFunction(ob::State *qa, ob::State *qb, const Vertex va, const Vertex vb);
+        double distanceGraphFunction(ob::State *qa, ob::State *qb, 
+            const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb, double ta, double tb);
 
-        Vertex lastVertexSampled;
+        Vertex lastSourceVertexSampled;
+        Vertex lastTargetVertexSampled;
         double lastTSampled;
         bool isSampled{false};
 
       protected:
-        //virtual Vertex addMilestone(base::State *state) override;
+        virtual Vertex addMilestone(base::State *state) override;
 
         ob::SpaceInformationPtr M1; //full configuration space Mi = si_
         ob::SpaceInformationPtr C1; //configuration space Ci = Mi/Mi-1

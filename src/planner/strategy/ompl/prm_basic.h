@@ -177,7 +177,7 @@ namespace ompl
         unsigned long int iterations_{0};
 
 
-        Vertex addMilestone(base::State *state);
+        virtual Vertex addMilestone(base::State *state);
 
         void growRoadmap(const base::PlannerTerminationCondition &ptc, base::State *workState);
         void expandRoadmap(const base::PlannerTerminationCondition &ptc, std::vector<base::State *> &workStates);

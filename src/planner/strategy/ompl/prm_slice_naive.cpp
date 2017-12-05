@@ -196,10 +196,10 @@ bool PRMSliceNaive::SampleGraph(ob::State *workState){
 
   M1->getStateSpace()->interpolate(from, to, t, workState);
 
-  if(t<0.5) lastVertexSampled = v1;
-  else lastVertexSampled = v2;
-
+  lastSourceVertexSampled = v1;
+  lastTargetVertexSampled = v2;
   lastTSampled = t;
+
   isSampled = true;
 
   return true;
@@ -261,43 +261,42 @@ void PRMSliceNaive::mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1){
   }
 }
 
-//og::PRMPlain::Vertex PRMSliceNaive::addMilestone(base::State *state)
-//{
-//  return PRMPlain::addMilestone(state);
-//
-//  //Vertex m = boost::add_vertex(g_);
-//  //stateProperty_[m] = state;
-//  //totalConnectionAttemptsProperty_[m] = 1;
-//  //successfulConnectionAttemptsProperty_[m] = 0;
-//  //if(previous != nullptr && previous->isSampled){
-//  //  std::cout << lastVertexSampled << std::endl;
-//  //  associatedVertexProperty_[m] = lastVertexSampled;
-//  //}
-//
-//  //disjointSets_.make_set(m);
-//  //const std::vector<Vertex> &neighbors = connectionStrategy_(m);
-//
-//  //foreach (Vertex n, neighbors)
-//  //{
-//  //  if (connectionFilter_(n, m))
-//  //  {
-//  //    totalConnectionAttemptsProperty_[m]++;
-//  //    totalConnectionAttemptsProperty_[n]++;
-//  //    if (si_->checkMotion(stateProperty_[n], stateProperty_[m]))
-//  //    {
-//  //      successfulConnectionAttemptsProperty_[m]++;
-//  //      successfulConnectionAttemptsProperty_[n]++;
-//  //      EdgeProperty properties(opt_->motionCost(stateProperty_[n], stateProperty_[m]));
-//  //      boost::add_edge(n, m, properties, g_);
-//  //      uniteComponents(n, m);
-//  //    }
-//  //  }
-//  //}
-//
-//  //nn_->add(m);
-//
-//  //return m;
-//}
+og::PRMBasic::Vertex PRMSliceNaive::addMilestone(base::State *state)
+{
+  Vertex m = boost::add_vertex(g_);
+  stateProperty_[m] = state;
+  totalConnectionAttemptsProperty_[m] = 1;
+  successfulConnectionAttemptsProperty_[m] = 0;
+  if(previous != nullptr && previous->isSampled){
+    associatedVertexSourceProperty_[m] = previous->lastSourceVertexSampled;
+    associatedVertexTargetProperty_[m] = previous->lastTargetVertexSampled;
+    associatedTProperty_[m] = previous->lastTSampled;
+  }
+
+  disjointSets_.make_set(m);
+  const std::vector<Vertex> &neighbors = connectionStrategy_(m);
+
+  foreach (Vertex n, neighbors)
+  {
+    if (connectionFilter_(n, m))
+    {
+      totalConnectionAttemptsProperty_[m]++;
+      totalConnectionAttemptsProperty_[n]++;
+      if (si_->checkMotion(stateProperty_[n], stateProperty_[m]))
+      {
+        successfulConnectionAttemptsProperty_[m]++;
+        successfulConnectionAttemptsProperty_[n]++;
+        EdgeProperty properties(opt_->motionCost(stateProperty_[n], stateProperty_[m]));
+        boost::add_edge(n, m, properties, g_);
+        uniteComponents(n, m);
+      }
+    }
+  }
+
+  nn_->add(m);
+
+  return m;
+}
 
 void PRMSliceNaive::setup(){
   og::PRMBasic::setup();
@@ -328,31 +327,35 @@ double PRMSliceNaive::distanceFunction(const Vertex a, const Vertex b) const
     ExtractM0Subspace(qa, qaM0);
     ExtractM0Subspace(qb, qbM0);
 
-    const Vertex saM0 = associatedVertexSourceProperty_[a];
-    const Vertex sbM0 = associatedVertexSourceProperty_[b];
-    const Vertex taM0 = associatedVertexTargetProperty_[a];
-    const Vertex tbM0 = associatedVertexTargetProperty_[b];
-    std::cout << saM0 << " <-> " << sbM0 << std::endl;
+    //const Vertex vsaM0 = associatedVertexSourceProperty_[a];
+    //const Vertex vsbM0 = associatedVertexSourceProperty_[b];
+    //const Vertex vtaM0 = associatedVertexTargetProperty_[a];
+    //const Vertex vtbM0 = associatedVertexTargetProperty_[b];
+    //double ta = associatedTProperty_[a];
+    //double tb = associatedTProperty_[b];
 
-    double d0 = previous->distanceGraphFunction(qaM0, qbM0, saM0, sbM0);
-    double d1 = C1->distance(qaC1, qbC1);
+    //double d0 = previous->distanceGraphFunction(qaM0, qbM0, vsaM0, vsbM0, vtaM0, vtbM0, ta, tb);
+    //double d1 = C1->distance(qaC1, qbC1);
 
-    C1->freeState(qaC1);
-    C1->freeState(qbC1);
-    M0->freeState(qaM0);
-    M0->freeState(qbM0);
+    //C1->freeState(qaC1);
+    //C1->freeState(qbC1);
+    //M0->freeState(qaM0);
+    //M0->freeState(qbM0);
 
-    return d0 + d1;
-    //return si_->distance(stateProperty_[a], stateProperty_[b]);
+    //return d0 + d1;
+    return si_->distance(stateProperty_[a], stateProperty_[b]);
   }
 }
 
-double PRMSliceNaive::distanceGraphFunction(ob::State *qa, ob::State *qb, const Vertex va, const Vertex vb)
+double PRMSliceNaive::distanceGraphFunction(ob::State *qa, ob::State *qb, 
+    const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb, double ta, double tb)
 {
   //@TODO: compute distance qa to va, and subtract or add to total cost
   //search on graph between vaM0 and vbM0
 
-  ob::PathPtr sol = constructSolution(va, vb);
+  //
+
+  ob::PathPtr sol = constructSolution(vsa, vsb);
   if(sol==nullptr){
     return +dInf;
   }else{

@@ -1,6 +1,6 @@
 #include "planner/strategy/strategy_geometric_multilevel.h"
 #include "planner/strategy/ompl/rrt_plain.h"
-#include "planner/strategy/ompl/prm_plain.h"
+#include "planner/strategy/ompl/prm_basic.h"
 #include "planner/strategy/ompl/prm_slice.h"
 #include "planner/strategy/ompl/prm_multislice.h"
 #include "planner/strategy/ompl/prm_slice_naive.h"
@@ -52,7 +52,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     planner = std::make_shared<og::RRTPlain>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
   }else if(algorithm=="ompl:prm_plain"){
-    planner = std::make_shared<og::PRMPlain>(si_vec.back());
+    planner = std::make_shared<og::PRMBasic>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
   }else if(algorithm=="ompl:prm_slice"){
     planner = std::make_shared<og::PRMSliceNaive>(si_vec.back(),nullptr);
