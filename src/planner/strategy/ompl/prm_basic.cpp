@@ -115,7 +115,7 @@ void PRMBasic::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State
       unsigned int attempts = 0;
       do
       {
-        found = sampler_->sample(workState);
+        found = Sample(workState);
         attempts++;
       } while (attempts < magic::FIND_VALID_STATE_ATTEMPTS_WITHOUT_TERMINATION_CHECK && !found);
     }
@@ -273,16 +273,16 @@ ob::PathPtr PRMBasic::constructSolution(const Vertex &start, const Vertex &goal)
       return NULL;
     }
 
-    last_vertex_path.clear();
+    //last_vertex_path.clear();
     for (Vertex pos = goal; prev[pos] != pos; pos = prev[pos]){
-      last_vertex_path.push_back(pos);
+      //last_vertex_path.push_back(pos);
       p->append(stateProperty_[pos]);
     }
-    last_vertex_path.push_back(start);
+    //last_vertex_path.push_back(start);
     p->append(stateProperty_[start]);
     p->reverse();
 
-    std::reverse(std::begin(last_vertex_path), std::end(last_vertex_path));
+    //std::reverse(std::begin(last_vertex_path), std::end(last_vertex_path));
 
     return p;
 }
@@ -298,18 +298,11 @@ PRMBasic::Vertex PRMBasic::addMilestone(ob::State *state)
 
   foreach (Vertex n, neighbors)
   {
-    if (connectionFilter_(n, m))
-    {
-      totalConnectionAttemptsProperty_[m]++;
-      totalConnectionAttemptsProperty_[n]++;
-      if (si_->checkMotion(stateProperty_[n], stateProperty_[m]))
-      {
-        successfulConnectionAttemptsProperty_[m]++;
-        successfulConnectionAttemptsProperty_[n]++;
-        EdgeProperty properties(opt_->motionCost(stateProperty_[n], stateProperty_[m]));
-        boost::add_edge(n, m, properties, g_);
-        uniteComponents(n, m);
-      }
+    totalConnectionAttemptsProperty_[m]++;
+    totalConnectionAttemptsProperty_[n]++;
+    if(Connect(m,n)){
+      successfulConnectionAttemptsProperty_[m]++;
+      successfulConnectionAttemptsProperty_[n]++;
     }
   }
 
@@ -345,18 +338,11 @@ void PRMBasic::setup(){
     nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
     nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
                              {
-                                 return distanceFunction(a, b);
+                                 return Distance(a, b);
                              });
   }
   if (!connectionStrategy_){
     connectionStrategy_ = KStrategy<Vertex>(magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
-  }
-
-  if (!connectionFilter_){
-    connectionFilter_ = [](const Vertex &, const Vertex &)
-    {
-      return true;
-    };
   }
 
   if (pdef_){
@@ -420,11 +406,6 @@ ob::Cost PRMBasic::costHeuristic(Vertex u, Vertex v) const
   return opt_->motionCostHeuristic(stateProperty_[u], stateProperty_[v]);
 }
 
-double PRMBasic::distanceFunction(const Vertex a, const Vertex b) const
-{
-  return si_->distance(stateProperty_[a], stateProperty_[b]);
-}
-
 void PRMBasic::clearQuery()
 {
   startM_.clear();
@@ -466,7 +447,21 @@ void PRMBasic::setNearestNeighbors()
         setup();
 }
 
-void PRMBasic::setConnectionFilter(const ConnectionFilter &connectionFilter)
+bool PRMBasic::Sample(ob::State *workState){
+  return sampler_->sample(workState);
+}
+double PRMBasic::Distance(const Vertex a, const Vertex b) const
 {
-    connectionFilter_ = connectionFilter;
+  return si_->distance(stateProperty_[a], stateProperty_[b]);
+}
+
+bool PRMBasic::Connect(const Vertex a, const Vertex b){
+  if (si_->checkMotion(stateProperty_[a], stateProperty_[b]))
+  {
+    EdgeProperty properties(opt_->motionCost(stateProperty_[a], stateProperty_[b]));
+    boost::add_edge(a, b, properties, g_);
+    uniteComponents(a, b);
+    return true;
+  }
+  return false;
 }

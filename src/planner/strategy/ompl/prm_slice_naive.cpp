@@ -131,6 +131,99 @@ PRMSliceNaive::PRMSliceNaive(const ob::SpaceInformationPtr &si, PRMSliceNaive *p
 
 PRMSliceNaive::~PRMSliceNaive(){
 }
+ob::PlannerStatus PRMSliceNaive::Init()
+{
+  PRMSlice::Init();
+  if(previous!=nullptr){
+    for(uint k = 0; k < startM_.size(); k++){
+      associatedVertexSourceProperty_[startM_.at(k)] = previous->startM_.at(k);
+      associatedVertexTargetProperty_[startM_.at(k)] = previous->startM_.at(k);
+    }
+    for(uint k = 0; k < goalM_.size(); k++){
+      associatedVertexSourceProperty_[goalM_.at(k)] = previous->goalM_.at(k);
+      associatedVertexTargetProperty_[goalM_.at(k)] = previous->startM_.at(k);
+    }
+  }
+}
+
+void PRMSliceNaive::ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const{
+  State **q_comps = q->as<CompoundState>()->components;
+  ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
+  const std::vector<StateSpacePtr> subspaces = M1_compound->getSubspaces();
+
+  if(C1_subspaces > 1){
+    State **sC1_comps = qC1->as<CompoundState>()->components;
+    for(uint k = M0_subspaces; k < subspaces.size(); k++){
+      subspaces[k]->copyState( sC1_comps[k-M0_subspaces], q_comps[k]);
+    }
+  }else{
+    subspaces[M0_subspaces]->copyState( qC1, q_comps[M0_subspaces]);
+  }
+}
+
+void PRMSliceNaive::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const{
+  State **q_comps = q->as<CompoundState>()->components;
+  ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
+  const std::vector<StateSpacePtr> subspaces = M1_compound->getSubspaces();
+
+  if(M0_subspaces > 1){
+    State **sM0_comps = qM0->as<CompoundState>()->components;
+    for(uint k = 0; k < M0_subspaces; k++){
+      subspaces[k]->copyState( sM0_comps[k], q_comps[k]);
+    }
+  }else{
+    subspaces[0]->copyState( qM0, q_comps[0]);
+  }
+}
+
+void PRMSliceNaive::mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1){
+  //
+  //input : qM0 \in M0, qC1 \in C1
+  //output: qM1 = qM0 \circ qC1 \in M1
+  State **qM1_comps = qM1->as<CompoundState>()->components;
+  ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
+  const std::vector<StateSpacePtr> subspaces = M1_compound->getSubspaces();
+
+  if(M0_subspaces > 1){
+    State **sM0_comps = qM0->as<CompoundState>()->components;
+    for(uint k = 0; k < M0_subspaces; k++){
+      subspaces[k]->copyState( qM1_comps[k], sM0_comps[k]);
+    }
+  }else{
+    subspaces[0]->copyState( qM1_comps[0], qM0);
+  }
+  if(C1_subspaces > 1){
+    State **sC1_comps = qC1->as<CompoundState>()->components;
+    for(uint k = M0_subspaces; k < subspaces.size(); k++){
+      subspaces[k]->copyState( qM1_comps[k], sC1_comps[k-M0_subspaces]);
+    }
+  }else{
+    subspaces[M0_subspaces]->copyState( qM1_comps[M0_subspaces], qC1);
+  }
+}
+
+og::PRMBasic::Vertex PRMSliceNaive::addMilestone(base::State *state)
+{
+  Vertex m = PRMBasic::addMilestone(state);
+    
+  if(previous != nullptr && previous->isSampled){
+    associatedVertexSourceProperty_[m] = previous->lastSourceVertexSampled;
+    associatedVertexTargetProperty_[m] = previous->lastTargetVertexSampled;
+    associatedTProperty_[m] = previous->lastTSampled;
+  }
+
+  return m;
+}
+
+void PRMSliceNaive::setup(){
+  og::PRMBasic::setup();
+  nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
+                           {
+                             return Distance(a,b);
+                           });
+
+}
+
 
 double PRMSliceNaive::getSamplingDensity(){
   if(previous == nullptr){
@@ -206,108 +299,7 @@ bool PRMSliceNaive::SampleGraph(ob::State *workState){
 
 }
 
-void PRMSliceNaive::ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const{
-  State **q_comps = q->as<CompoundState>()->components;
-  ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
-  const std::vector<StateSpacePtr> subspaces = M1_compound->getSubspaces();
-
-  if(C1_subspaces > 1){
-    State **sC1_comps = qC1->as<CompoundState>()->components;
-    for(uint k = M0_subspaces; k < subspaces.size(); k++){
-      subspaces[k]->copyState( sC1_comps[k-M0_subspaces], q_comps[k]);
-    }
-  }else{
-    subspaces[M0_subspaces]->copyState( qC1, q_comps[M0_subspaces]);
-  }
-}
-
-void PRMSliceNaive::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const{
-  State **q_comps = q->as<CompoundState>()->components;
-  ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
-  const std::vector<StateSpacePtr> subspaces = M1_compound->getSubspaces();
-
-  if(M0_subspaces > 1){
-    State **sM0_comps = qM0->as<CompoundState>()->components;
-    for(uint k = 0; k < M0_subspaces; k++){
-      subspaces[k]->copyState( sM0_comps[k], q_comps[k]);
-    }
-  }else{
-    subspaces[0]->copyState( qM0, q_comps[0]);
-  }
-}
-void PRMSliceNaive::mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1){
-  //
-  //input : qM0 \in M0, qC1 \in C1
-  //output: qM1 = qM0 \circ qC1 \in M1
-  State **qM1_comps = qM1->as<CompoundState>()->components;
-  ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
-  const std::vector<StateSpacePtr> subspaces = M1_compound->getSubspaces();
-
-  if(M0_subspaces > 1){
-    State **sM0_comps = qM0->as<CompoundState>()->components;
-    for(uint k = 0; k < M0_subspaces; k++){
-      subspaces[k]->copyState( qM1_comps[k], sM0_comps[k]);
-    }
-  }else{
-    subspaces[0]->copyState( qM1_comps[0], qM0);
-  }
-  if(C1_subspaces > 1){
-    State **sC1_comps = qC1->as<CompoundState>()->components;
-    for(uint k = M0_subspaces; k < subspaces.size(); k++){
-      subspaces[k]->copyState( qM1_comps[k], sC1_comps[k-M0_subspaces]);
-    }
-  }else{
-    subspaces[M0_subspaces]->copyState( qM1_comps[M0_subspaces], qC1);
-  }
-}
-
-og::PRMBasic::Vertex PRMSliceNaive::addMilestone(base::State *state)
-{
-  Vertex m = boost::add_vertex(g_);
-  stateProperty_[m] = state;
-  totalConnectionAttemptsProperty_[m] = 1;
-  successfulConnectionAttemptsProperty_[m] = 0;
-  if(previous != nullptr && previous->isSampled){
-    associatedVertexSourceProperty_[m] = previous->lastSourceVertexSampled;
-    associatedVertexTargetProperty_[m] = previous->lastTargetVertexSampled;
-    associatedTProperty_[m] = previous->lastTSampled;
-  }
-
-  disjointSets_.make_set(m);
-  const std::vector<Vertex> &neighbors = connectionStrategy_(m);
-
-  foreach (Vertex n, neighbors)
-  {
-    if (connectionFilter_(n, m))
-    {
-      totalConnectionAttemptsProperty_[m]++;
-      totalConnectionAttemptsProperty_[n]++;
-      if (si_->checkMotion(stateProperty_[n], stateProperty_[m]))
-      {
-        successfulConnectionAttemptsProperty_[m]++;
-        successfulConnectionAttemptsProperty_[n]++;
-        EdgeProperty properties(opt_->motionCost(stateProperty_[n], stateProperty_[m]));
-        boost::add_edge(n, m, properties, g_);
-        uniteComponents(n, m);
-      }
-    }
-  }
-
-  nn_->add(m);
-
-  return m;
-}
-
-void PRMSliceNaive::setup(){
-  og::PRMBasic::setup();
-  nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
-                           {
-                             return distanceFunction(a,b);
-                           });
-
-}
-
-double PRMSliceNaive::distanceFunction(const Vertex a, const Vertex b) const
+double PRMSliceNaive::Distance(const Vertex a, const Vertex b) const
 {
   if(previous == nullptr){
     return si_->distance(stateProperty_[a], stateProperty_[b]);
@@ -333,17 +325,20 @@ double PRMSliceNaive::distanceFunction(const Vertex a, const Vertex b) const
     //const Vertex vtbM0 = associatedVertexTargetProperty_[b];
     //double ta = associatedTProperty_[a];
     //double tb = associatedTProperty_[b];
-
     //double d0 = previous->distanceGraphFunction(qaM0, qbM0, vsaM0, vsbM0, vtaM0, vtbM0, ta, tb);
-    //double d1 = C1->distance(qaC1, qbC1);
 
-    //C1->freeState(qaC1);
-    //C1->freeState(qbC1);
-    //M0->freeState(qaM0);
-    //M0->freeState(qbM0);
+    //direct distance is suboptimal, we already know the graph datastructure!
+    double d0 = M0->distance(qaM0, qbM0);
 
-    //return d0 + d1;
-    return si_->distance(stateProperty_[a], stateProperty_[b]);
+    double d1 = C1->distance(qaC1, qbC1);
+
+    C1->freeState(qaC1);
+    C1->freeState(qbC1);
+    M0->freeState(qaM0);
+    M0->freeState(qbM0);
+
+    return d0 + d1;
+    //return si_->distance(stateProperty_[a], stateProperty_[b]);
   }
 }
 
@@ -363,17 +358,6 @@ double PRMSliceNaive::distanceGraphFunction(ob::State *qa, ob::State *qb,
   }
 }
 
-ob::PlannerStatus PRMSliceNaive::Init()
-{
-  PRMSlice::Init();
-  if(previous!=nullptr){
-    for(uint k = 0; k < startM_.size(); k++){
-      associatedVertexSourceProperty_[startM_.at(k)] = previous->startM_.at(k);
-      associatedVertexTargetProperty_[startM_.at(k)] = previous->startM_.at(k);
-    }
-    for(uint k = 0; k < goalM_.size(); k++){
-      associatedVertexSourceProperty_[goalM_.at(k)] = previous->goalM_.at(k);
-      associatedVertexTargetProperty_[goalM_.at(k)] = previous->startM_.at(k);
-    }
-  }
+bool PRMSliceNaive::Connect(const Vertex a, const Vertex b){
+  return PRMBasic::Connect(a,b);
 }

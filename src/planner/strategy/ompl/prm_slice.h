@@ -34,8 +34,6 @@ namespace ompl
 
         void growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState);
 
-        virtual bool Sample(ob::State *workState);
-
         virtual ob::PlannerStatus Init();
 
         ob::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;

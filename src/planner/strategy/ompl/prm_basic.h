@@ -100,7 +100,6 @@ namespace ompl
         typedef boost::graph_traits<Graph>::edge_descriptor Edge;
         typedef std::shared_ptr<NearestNeighbors<Vertex>> RoadmapNeighbors;
         typedef std::function<const std::vector<Vertex> &(const Vertex)> ConnectionStrategy;
-        typedef std::function<bool(const Vertex &, const Vertex &)> ConnectionFilter;
 
       public:
         PRMBasic(const ob::SpaceInformationPtr &si);
@@ -120,7 +119,6 @@ namespace ompl
         void getPlannerData(base::PlannerData &data) const override;
 
         void setProblemDefinition(const base::ProblemDefinitionPtr &pdef) override;
-        void setConnectionFilter(const ConnectionFilter &connectionFilter);
         ob::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
 
         void clearQuery();
@@ -157,10 +155,13 @@ namespace ompl
 
     protected:
 
-        std::vector<Vertex> last_vertex_path;
+        virtual double Distance(const Vertex a, const Vertex b) const; // standard si->distance
+        virtual bool Sample(ob::State *workState); //si->sampler
+        virtual bool Connect(const Vertex a, const Vertex b);
+        virtual Vertex addMilestone(base::State *state);
+
 
         base::Cost costHeuristic(Vertex u, Vertex v) const;
-        double distanceFunction(const Vertex a, const Vertex b) const;
         std::vector<ob::State *> xstates;
 
         base::ValidStateSamplerPtr sampler_;
@@ -170,14 +171,10 @@ namespace ompl
         boost::disjoint_sets<boost::property_map<Graph, boost::vertex_rank_t>::type,
                              boost::property_map<Graph, boost::vertex_predecessor_t>::type> disjointSets_;
         ConnectionStrategy connectionStrategy_;
-        ConnectionFilter connectionFilter_;
 
         RNG rng_;
         bool addedNewSolution_{false};
         unsigned long int iterations_{0};
-
-
-        virtual Vertex addMilestone(base::State *state);
 
         void growRoadmap(const base::PlannerTerminationCondition &ptc, base::State *workState);
         void expandRoadmap(const base::PlannerTerminationCondition &ptc, std::vector<base::State *> &workStates);

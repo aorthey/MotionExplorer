@@ -142,9 +142,3 @@ void PRMSlice::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State
   }
 }
 
-bool PRMSlice::Sample(ob::State *workState){
-  return sampler_->sample(workState);
-}
-
-
-

@@ -22,25 +22,13 @@ namespace ompl
 
         ~PRMSliceNaive() override;
 
-        virtual bool Sample(ob::State *workState) override;
-        bool SampleGraph(ob::State *workState);
-
         void getPlannerData(base::PlannerData &data) const override;
 
         double getSamplingDensity();
 
-        double distanceFunction(const Vertex a, const Vertex b) const;
-
         virtual ob::PlannerStatus Init() override;
+
         void setup() override;
-
-        void mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1);
-
-        void ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const;
-        void ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const;
-
-        double distanceGraphFunction(ob::State *qa, ob::State *qb, 
-            const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb, double ta, double tb);
 
         Vertex lastSourceVertexSampled;
         Vertex lastTargetVertexSampled;
@@ -48,7 +36,22 @@ namespace ompl
         bool isSampled{false};
 
       protected:
+
+        //Overrides Distance/Sample/Connect
+        virtual double Distance(const Vertex a, const Vertex b) const override;
+        virtual bool Sample(ob::State *workState) override;
+        virtual bool Connect(const Vertex a, const Vertex b) override;
+
+        bool SampleGraph(ob::State *workState);
+
+        double distanceGraphFunction(ob::State *qa, ob::State *qb, 
+            const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb, double ta, double tb);
+
         virtual Vertex addMilestone(base::State *state) override;
+
+        void mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1);
+        void ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const;
+        void ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const;
 
         ob::SpaceInformationPtr M1; //full configuration space Mi = si_
         ob::SpaceInformationPtr C1; //configuration space Ci = Mi/Mi-1
@@ -60,6 +63,7 @@ namespace ompl
         uint C1_subspaces;
 
         PRMSliceNaive *previous;
+
     };
 
   };
