@@ -4,6 +4,7 @@
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
+
 namespace ompl
 {
   namespace base
@@ -12,6 +13,8 @@ namespace ompl
   }
   namespace geometric
   {
+    //using Vertex = og::PRMPlain::Vertex;
+    //using Edge = og::PRMPlain::Edge;
     class PRMSliceNaive: public og::PRMSlice{
 
       public:
@@ -41,7 +44,7 @@ namespace ompl
         //double distanceGraphFunction(ob::State *qa, ob::State *qb);
         double distanceGraphFunction(ob::State *qa, ob::State *qb, const Vertex va, const Vertex vb);
 
-        og::PRMPlain::Vertex lastVertexSampled;
+        Vertex lastVertexSampled;
         double lastTSampled;
         bool isSampled{false};
 

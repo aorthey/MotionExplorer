@@ -34,19 +34,22 @@ namespace ompl
         {
             typedef boost::vertex_property_tag kind;
         };
-
         struct vertex_successful_connection_attempts_t
         {
             typedef boost::vertex_property_tag kind;
         };
-        struct vertex_associated_edge_t
+
+
+        struct vertex_associated_vertex_source_t
         {
             typedef boost::vertex_property_tag kind;
         };
-        struct vertex_associated_vertex_t
+        struct vertex_associated_vertex_target_t
         {
             typedef boost::vertex_property_tag kind;
         };
+
+
         struct EdgeProperty{
           EdgeProperty(): cost(+dInf), original_cost(+dInf)
           {};
@@ -67,26 +70,38 @@ namespace ompl
         };
 
         typedef boost::adjacency_list<
-            boost::vecS, boost::vecS, boost::undirectedS,
-              boost::property<
-                vertex_state_t, ob::State *,
-                boost::property<vertex_total_connection_attempts_t, unsigned long int,
-                  boost::property<vertex_successful_connection_attempts_t, unsigned long int,
-                    boost::property<boost::vertex_predecessor_t, unsigned long int,
-                      boost::property<vertex_associated_edge_t, unsigned long int,
-                        boost::property<vertex_associated_vertex_t, unsigned long int,
-                          boost::property<boost::vertex_rank_t, unsigned long int
-                          >
-                        >
+           boost::vecS, boost::vecS, boost::undirectedS,
+             boost::property<vertex_state_t, ob::State *,
+               boost::property<vertex_total_connection_attempts_t, unsigned long int,
+                 boost::property<vertex_successful_connection_attempts_t, unsigned long int,
+                   boost::property<boost::vertex_predecessor_t, unsigned long int,
+                     boost::property<boost::vertex_rank_t, unsigned long int,
+                      boost::property<vertex_associated_vertex_target_t, unsigned long int,
+                        boost::property<vertex_associated_vertex_source_t, unsigned long int>
                       >
-                    >
-                  >
-                >
-              >,
-              boost::property<boost::edge_weight_t, EdgeProperty>
-              //boost::property<boost::edge_weight_t, base::Cost>>
+                     >
+                   >
+                 >
+               >
+             >,
+             boost::property<boost::edge_weight_t, EdgeProperty>
+             //boost::property<boost::edge_weight_t, base::Cost>>
 
-            >Graph;
+           >Graph;
+          // typedef boost::adjacency_list<
+          //       boost::vecS, boost::vecS, boost::undirectedS,
+          //       boost::property<vertex_state_t, base::State *,
+          //         boost::property<vertex_total_connection_attempts_t, unsigned long int,
+          //           boost::property<vertex_successful_connection_attempts_t, unsigned long int,
+          //             boost::property<boost::vertex_predecessor_t, unsigned long int,
+          //               boost::property<boost::vertex_rank_t, unsigned long int>
+          //             >
+          //           >
+          //         >
+          //       >,
+          //       boost::property<boost::edge_weight_t, base::Cost>>
+          //       Graph;
+
 
         typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
         typedef boost::graph_traits<Graph>::edge_descriptor Edge;
@@ -124,8 +139,8 @@ namespace ompl
         boost::property_map<Graph, vertex_state_t>::type stateProperty_;
         boost::property_map<Graph, vertex_total_connection_attempts_t>::type totalConnectionAttemptsProperty_;
         boost::property_map<Graph, vertex_successful_connection_attempts_t>::type successfulConnectionAttemptsProperty_;
-        boost::property_map<Graph, vertex_associated_vertex_t>::type associatedVertexProperty_;
-        //boost::property_map<Graph, vertex_associated_edge_t>::type associatedEdgeProperty_;
+        boost::property_map<Graph, vertex_associated_vertex_source_t>::type associatedVertexSourceProperty_;
+        boost::property_map<Graph, vertex_associated_vertex_target_t>::type associatedVertexTargetProperty_;
 
         base::OptimizationObjectivePtr opt_;
 
