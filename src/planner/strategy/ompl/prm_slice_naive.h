@@ -30,6 +30,7 @@ namespace ompl
 
         double distanceFunction(const Vertex a, const Vertex b) const;
 
+        virtual ob::PlannerStatus Init() override;
         void setup() override;
 
         void mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1);
@@ -40,6 +41,12 @@ namespace ompl
         //double distanceGraphFunction(ob::State *qa, ob::State *qb);
         double distanceGraphFunction(ob::State *qa, ob::State *qb, const Vertex va, const Vertex vb);
         og::PRM::Vertex addMilestone(base::State *state);
+
+        Edge lastEdgeSampled;
+        Vertex lastVertexSampled;
+        double lastTSampled;
+        bool isSampled{false};
+
       protected:
 
         ob::SpaceInformationPtr M1; //full configuration space Mi = si_

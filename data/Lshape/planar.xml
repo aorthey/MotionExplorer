@@ -29,7 +29,7 @@
     <!-- default settings for all algorithms (overwriteable) -->
     <timestep min="0.001" max="0.01"/>
     <epsilongoalregion>0.01</epsilongoalregion>
-    <maxplanningtime>20</maxplanningtime>
+    <maxplanningtime>1</maxplanningtime>
 
     <!-- individual algorithms plus individual settings -->
     <algorithm name="hierarchical:ompl:prm_multislice">

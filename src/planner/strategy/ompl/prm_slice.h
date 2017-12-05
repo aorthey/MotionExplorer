@@ -37,7 +37,7 @@ namespace ompl
 
         virtual bool Sample(ob::State *workState);
 
-        ob::PlannerStatus Init();
+        virtual ob::PlannerStatus Init();
 
         ob::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
 
@@ -49,9 +49,6 @@ namespace ompl
 
         std::vector<ob::State *> xstates;
 
-        Edge lastEdgeSampled;
-        Vertex lastVertexSampled;
-        double lastTSampled;
     };
 
   };

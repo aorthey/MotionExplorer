@@ -189,8 +189,6 @@ bool PRMSliceNaive::SampleGraph(ob::State *workState){
   Edge e = pdf.sample(rng_.uniform01());
   double t = rng_.uniform01();
 
-
-
   const Vertex v1 = boost::source(e, g_);
   const Vertex v2 = boost::target(e, g_);
   const ob::State *from = stateProperty_[v1];
@@ -202,68 +200,10 @@ bool PRMSliceNaive::SampleGraph(ob::State *workState){
   lastTSampled = t;
   if(t<0.5) lastVertexSampled = v1;
   else lastVertexSampled = v2;
+  isSampled = true;
 
-  //this is necessarily feasible
   return true;
 
-}
-
-void PRMSliceNaive::setup(){
-  og::PRMPlain::setup();
-  nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
-                           {
-                             return distanceFunction(a,b);
-                           });
-
-}
-
-double PRMSliceNaive::distanceFunction(const Vertex a, const Vertex b) const
-{
-  if(previous == nullptr){
-    return si_->distance(stateProperty_[a], stateProperty_[b]);
-  }else{
-    ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
-
-    ob::State* qa = stateProperty_[a];
-    ob::State* qb = stateProperty_[b];
-
-    ob::State* qaC1 = C1->allocState();
-    ob::State* qbC1 = C1->allocState();
-    ob::State* qaM0 = M0->allocState();
-    ob::State* qbM0 = M0->allocState();
-
-    ExtractC1Subspace(qa, qaC1);
-    ExtractC1Subspace(qb, qbC1);
-    ExtractM0Subspace(qa, qaM0);
-    ExtractM0Subspace(qb, qbM0);
-
-    const Vertex vaM0 = associatedVertexProperty_[a];
-    const Vertex vbM0 = associatedVertexProperty_[b];
-
-    double d0 = previous->distanceGraphFunction(qaM0, qbM0, vaM0, vbM0);
-    double d1 = C1->distance(qaC1, qbC1);
-
-    C1->freeState(qaC1);
-    C1->freeState(qbC1);
-    M0->freeState(qaM0);
-    M0->freeState(qbM0);
-
-    return d0 + d1;
-    //return si_->distance(stateProperty_[a], stateProperty_[b]);
-  }
-}
-
-double PRMSliceNaive::distanceGraphFunction(ob::State *qa, ob::State *qb, const Vertex va, const Vertex vb)
-{
-  //@TODO: compute distance qa to va, and subtract or add to total cost
-  //search on graph between vaM0 and vbM0
-
-  ob::PathPtr sol = constructSolution(va, vb);
-  if(sol==nullptr){
-    return +dInf;
-  }else{
-    return sol->length();
-  }
 }
 
 void PRMSliceNaive::ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const{
@@ -328,15 +268,12 @@ og::PRM::Vertex PRMSliceNaive::addMilestone(base::State *state)
     stateProperty_[m] = state;
     totalConnectionAttemptsProperty_[m] = 1;
     successfulConnectionAttemptsProperty_[m] = 0;
-    if(previous != nullptr){
+    if(previous != nullptr && previous->isSampled){
       associatedVertexProperty_[m] = lastVertexSampled;
     }
-    //associatedEdgeProperty_[m] = lastEdgeSampled;
 
-    // Initialize to its own (dis)connected component.
     disjointSets_.make_set(m);
 
-    // Which milestones will we attempt to connect to?
     const std::vector<Vertex> &neighbors = connectionStrategy_(m);
 
     foreach (Vertex n, neighbors)
@@ -358,4 +295,74 @@ og::PRM::Vertex PRMSliceNaive::addMilestone(base::State *state)
     nn_->add(m);
 
     return m;
+}
+void PRMSliceNaive::setup(){
+  og::PRMPlain::setup();
+  nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
+                           {
+                             return distanceFunction(a,b);
+                           });
+
+}
+
+double PRMSliceNaive::distanceFunction(const Vertex a, const Vertex b) const
+{
+  if(previous == nullptr){
+    return si_->distance(stateProperty_[a], stateProperty_[b]);
+  }else{
+    ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
+
+    ob::State* qa = stateProperty_[a];
+    ob::State* qb = stateProperty_[b];
+
+    ob::State* qaC1 = C1->allocState();
+    ob::State* qbC1 = C1->allocState();
+    ob::State* qaM0 = M0->allocState();
+    ob::State* qbM0 = M0->allocState();
+
+    ExtractC1Subspace(qa, qaC1);
+    ExtractC1Subspace(qb, qbC1);
+    ExtractM0Subspace(qa, qaM0);
+    ExtractM0Subspace(qb, qbM0);
+
+    const Vertex vaM0 = associatedVertexProperty_[a];
+    const Vertex vbM0 = associatedVertexProperty_[b];
+
+    double d0 = previous->distanceGraphFunction(qaM0, qbM0, vaM0, vbM0);
+    double d1 = C1->distance(qaC1, qbC1);
+
+    C1->freeState(qaC1);
+    C1->freeState(qbC1);
+    M0->freeState(qaM0);
+    M0->freeState(qbM0);
+
+    //return d0 + d1;
+    return si_->distance(stateProperty_[a], stateProperty_[b]);
+  }
+}
+
+double PRMSliceNaive::distanceGraphFunction(ob::State *qa, ob::State *qb, const Vertex va, const Vertex vb)
+{
+  //@TODO: compute distance qa to va, and subtract or add to total cost
+  //search on graph between vaM0 and vbM0
+
+  ob::PathPtr sol = constructSolution(va, vb);
+  if(sol==nullptr){
+    return +dInf;
+  }else{
+    return sol->length();
+  }
+}
+
+ob::PlannerStatus PRMSliceNaive::Init()
+{
+  PRMSlice::Init();
+  if(previous!=nullptr){
+    for(uint k = 0; k < startM_.size(); k++){
+      associatedVertexProperty_[startM_.at(k)] = previous->startM_.at(k);
+    }
+    for(uint k = 0; k < goalM_.size(); k++){
+      associatedVertexProperty_[goalM_.at(k)] = previous->goalM_.at(k);
+    }
+  }
 }
