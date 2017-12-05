@@ -48,6 +48,10 @@ namespace ompl
         {
             typedef boost::vertex_property_tag kind;
         };
+        struct vertex_associated_vertex_t_t
+        {
+            typedef boost::vertex_property_tag kind;
+        };
 
 
         struct EdgeProperty{
@@ -77,7 +81,9 @@ namespace ompl
                    boost::property<boost::vertex_predecessor_t, unsigned long int,
                      boost::property<boost::vertex_rank_t, unsigned long int,
                       boost::property<vertex_associated_vertex_target_t, unsigned long int,
-                        boost::property<vertex_associated_vertex_source_t, unsigned long int>
+                        boost::property<vertex_associated_vertex_source_t, unsigned long int,
+                          boost::property<vertex_associated_vertex_t_t, unsigned long int>
+                        >
                       >
                      >
                    >
