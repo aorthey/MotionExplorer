@@ -1,4 +1,6 @@
 #include "prm_slice.h"
+#include "planner/cspace/cspace.h"
+
 #include <ompl/datastructures/PDF.h>
 #include <boost/foreach.hpp>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
@@ -74,7 +76,7 @@ PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
   M1_subspaces = 0;
 
   id = counter++;
-  std::cout << "Level " << id << " SliceSpace" << std::endl;
+  std::cout << "--- Level " << id << " SliceSpace" << std::endl;
   if(previous == nullptr){
   }else{
     const StateSpacePtr M0_space = previous->getSpaceInformation()->getStateSpace();
@@ -106,30 +108,28 @@ PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
       //sanity check it
       if(M0_space->getDimension() >= M1_space->getDimension()){
         std::cout << "Cannot reduce to a bigger cspace. We need M0 < M1." << std::endl;
+        std::cout << "M0 dimension: " << M0_space->getDimension() << std::endl;
+        std::cout << "M1 dimension: " << M1_space->getDimension() << std::endl;
         exit(0);
       }
 
-      if(M0_subspaces >= M1_subspaces){
+      if(M0_subspaces < M1_subspaces){
         //get C1
         C1_subspaces = M1_subspaces - M0_subspaces;
 
-        uint C1_subspaces = 0;
         if(C1_subspaces<=1){
           StateSpacePtr C1_space = M1_decomposed.at(M0_subspaces);
           C1 = std::make_shared<SpaceInformation>(C1_space);
-          C1_subspaces=1;
         }else{
           StateSpacePtr C1_space = std::make_shared<ompl::base::CompoundStateSpace>();
           for(uint k = M0_subspaces; k < M0_subspaces+C1_subspaces; k++){
-            std::cout << "subspace " << k << "/" << M0_subspaces + C1_subspaces << std::endl;
             C1_space->as<ob::CompoundStateSpace>()->addSubspace(M1_decomposed.at(k),1);
           }
           C1 = std::make_shared<SpaceInformation>(C1_space);
-          C1_subspaces = C1_space->as<ob::CompoundStateSpace>()->getSubspaceCount();
         }
       }else{
         StateSpacePtr M1_back = M1_decomposed.back();
-        if((M1_back->StateType == ob::SO3StateSpace) && (M0_space->getDimension() == 5)){
+        if((M1_back->getType() == base::STATE_SPACE_SO3) && (M0_space->getDimension() == 5)){
           StateSpacePtr C1_space = (std::make_shared<ob::SO2StateSpace>());
           C1 = std::make_shared<SpaceInformation>(C1_space);
           C1_subspaces = 1;
@@ -140,10 +140,10 @@ PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
 
       }
 
-      std::cout << "M0 (dimension: " << M0->getStateDimension() << ") contains " << M0_subspaces << " subspaces." << std::endl;
-      std::cout << "M1 (dimension: " << M1->getStateDimension() << ") contains " << M1_subspaces << " subspaces." << std::endl;
-      std::cout << "C1 (dimension: " << C1->getStateDimension() << ") contains " << C1_subspaces << " subspaces." << std::endl;
     }
+    std::cout << "M0 (dimension: " << M0_space->getDimension() << ") contains " << M0_subspaces << " subspaces of type " << M0_space->getName() << " " << M0_space->getType() << std::endl;
+    std::cout << "M1 (dimension: " << M1->getStateDimension() << ") contains " << M1_subspaces  << " subspaces of type " << M1->getStateSpace()->getName() << " " << M1->getStateSpace()->getType() << std::endl;
+    std::cout << "C1 (dimension: " << C1->getStateDimension() << ") contains " << C1_subspaces  << " subspaces of type " << C1->getStateSpace()->getName() << " " << C1->getStateSpace()->getType() << std::endl;
     if (!C1_sampler){
       C1_sampler = C1->allocStateSampler();
     }
@@ -202,29 +202,62 @@ ob::PlannerStatus PRMSlice::Init()
 }
 
 void PRMSlice::ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const{
-  State **q_comps = q->as<CompoundState>()->components;
+  ob::State **q_comps = q->as<CompoundState>()->components;
   ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
   const std::vector<StateSpacePtr> subspaces = M1_compound->getSubspaces();
 
   if(C1_subspaces > 1){
-    State **sC1_comps = qC1->as<CompoundState>()->components;
+    ob::State **sC1_comps = qC1->as<CompoundState>()->components;
     for(uint k = M0_subspaces; k < subspaces.size(); k++){
       subspaces[k]->copyState( sC1_comps[k-M0_subspaces], q_comps[k]);
     }
   }else{
-    subspaces[M0_subspaces]->copyState( qC1, q_comps[M0_subspaces]);
+
+    StateSpacePtr M1_back = subspaces.back();
+    if((M1_back->getType() == base::STATE_SPACE_SO3) && (C1->getStateSpace()->getDimension() == 1)){
+
+      ob::SO3StateSpace::StateType *SO3 = &q->as<ob::SE3StateSpace::StateType>()->rotation();
+
+      std::vector<double> EulerXYZ = CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( SO3);
+
+      qC1->as<ob::SO2StateSpace::StateType>()->value = EulerXYZ.at(2);
+
+    }else{
+      subspaces[M0_subspaces]->copyState( qC1, q_comps[M0_subspaces]);
+    }
   }
 }
 
 void PRMSlice::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const{
-  State **q_comps = q->as<CompoundState>()->components;
+  ob::State **q_comps = q->as<CompoundState>()->components;
   ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
   const std::vector<StateSpacePtr> subspaces = M1_compound->getSubspaces();
 
   if(M0_subspaces > 1){
-    State **sM0_comps = qM0->as<CompoundState>()->components;
-    for(uint k = 0; k < M0_subspaces; k++){
-      subspaces[k]->copyState( sM0_comps[k], q_comps[k]);
+    ob::State **sM0_comps = qM0->as<CompoundState>()->components;
+
+    StateSpacePtr M1_back = subspaces.back();
+    if((M1_back->getType() == base::STATE_SPACE_SO3) && (C1->getStateSpace()->getDimension() == 1)){
+
+
+      ob::SO3StateSpace::StateType *SO3 = &q->as<ob::SE3StateSpace::StateType>()->rotation();
+
+      std::vector<double> EulerXYZ = CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( SO3);
+
+      //qC1->as<ob::SO2StateSpace::StateType>()->value = EulerXYZ.at(2);
+
+      subspaces[0]->copyState( sM0_comps[0], q_comps[0]);
+      sM0_comps[1]->as<ob::SO2StateSpace::StateType>()->value = EulerXYZ.at(0);
+      sM0_comps[2]->as<ob::SO2StateSpace::StateType>()->value = EulerXYZ.at(1);
+
+      //std::cout << "special case" << std::endl;
+      //M1->printState(q);
+      //previous->getSpaceInformation()->printState(qM0);
+
+    }else{
+      for(uint k = 0; k < M0_subspaces; k++){
+        subspaces[k]->copyState( sM0_comps[k], q_comps[k]);
+      }
     }
   }else{
     subspaces[0]->copyState( qM0, q_comps[0]);
@@ -234,25 +267,47 @@ void PRMSlice::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const{
 void PRMSlice::mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1){
   //input : qM0 \in M0, qC1 \in C1
   //output: qM1 = qM0 \circ qC1 \in M1
-  State **qM1_comps = qM1->as<CompoundState>()->components;
+  ob::State **qM1_comps = qM1->as<CompoundState>()->components;
   ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
   const std::vector<StateSpacePtr> subspaces = M1_compound->getSubspaces();
 
-  if(M0_subspaces > 1){
-    State **sM0_comps = qM0->as<CompoundState>()->components;
-    for(uint k = 0; k < M0_subspaces; k++){
-      subspaces[k]->copyState( qM1_comps[k], sM0_comps[k]);
-    }
+  StateSpacePtr M1_back = subspaces.back();
+  if((M1_back->getType() == base::STATE_SPACE_SO3) && (C1->getStateSpace()->getDimension() == 1)){
+    //special case
+
+    ob::State **sM0_comps = qM0->as<CompoundState>()->components;
+    subspaces[0]->copyState( qM1_comps[0], sM0_comps[0]);
+
+    double r = sM0_comps[1]->as<ob::SO2StateSpace::StateType>()->value;
+    double p = sM0_comps[2]->as<ob::SO2StateSpace::StateType>()->value;
+    double y = qC1->as<ob::SO2StateSpace::StateType>()->value;
+
+    ob::SE3StateSpace::StateType *qM1SE3 = qM1->as<ob::SE3StateSpace::StateType>();
+    ob::SO3StateSpace::StateType *qM1SO3 = &qM1SE3->rotation();
+
+    CSpaceOMPL::OMPLSO3StateSpaceFromEulerXYZ(r, p, y, qM1_comps[1]->as<ob::SO3StateSpace::StateType>() );
+
+    //previous->getSpaceInformation()->printState(qM0);
+    //C1->printState(qC1);
+    //M1->printState(qM1);
+    //exit(0);
   }else{
-    subspaces[0]->copyState( qM1_comps[0], qM0);
-  }
-  if(C1_subspaces > 1){
-    State **sC1_comps = qC1->as<CompoundState>()->components;
-    for(uint k = M0_subspaces; k < subspaces.size(); k++){
-      subspaces[k]->copyState( qM1_comps[k], sC1_comps[k-M0_subspaces]);
+    if(M0_subspaces > 1){
+      ob::State **sM0_comps = qM0->as<CompoundState>()->components;
+      for(uint k = 0; k < M0_subspaces; k++){
+        subspaces[k]->copyState( qM1_comps[k], sM0_comps[k]);
+      }
+    }else{
+      subspaces[0]->copyState( qM1_comps[0], qM0);
     }
-  }else{
-    subspaces[M0_subspaces]->copyState( qM1_comps[M0_subspaces], qC1);
+    if(C1_subspaces > 1){
+      ob::State **sC1_comps = qC1->as<CompoundState>()->components;
+      for(uint k = M0_subspaces; k < subspaces.size(); k++){
+        subspaces[k]->copyState( qM1_comps[k], sC1_comps[k-M0_subspaces]);
+      }
+    }else{
+      subspaces[M0_subspaces]->copyState( qM1_comps[M0_subspaces], qC1);
+    }
   }
 }
 

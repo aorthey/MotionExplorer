@@ -59,6 +59,7 @@ ob::PlannerStatus PRMMultiSlice::solve(const base::PlannerTerminationCondition &
       kslice->checkForSolution(sol_k);
 
       if(kslice->hasSolution()){
+        solutions.push_back(sol_k);
         double t_k_end = ompl::time::seconds(ompl::time::now() - t_k_start);
         std::cout << "Found Solution on Level " << k << " after " << t_k_end << " seconds." << std::endl;
         foundKLevelSolution = true;

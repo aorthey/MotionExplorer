@@ -23,6 +23,8 @@ namespace ompl
 
 
       protected:
+        std::vector<og::PathPtr> solutions;
+
         std::vector<PRMSlice*> slicespaces;
         bool foundKLevelSolution{false};
     };
