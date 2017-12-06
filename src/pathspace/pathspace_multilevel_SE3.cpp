@@ -27,7 +27,7 @@ std::vector<PathSpace*> PathSpaceMultiLevelSE3::Decompose(){
     if(input_level->type=="R3") {
       cspace_level_k = factory.MakeGeometricCSpaceRN(world, input_level->robot_idx, 3);
     }else if(input_level->type=="R3S2"){
-      cspace_level_k = factory.MakeGeometricCSpaceSE3(world, input_level->robot_idx);
+      cspace_level_k = factory.MakeGeometricCSpaceR3S2(world, input_level->robot_idx);
     }else if(input_level->type=="SE3"){
       cspace_level_k = factory.MakeGeometricCSpaceSE3(world, input_level->robot_idx);
     }else{

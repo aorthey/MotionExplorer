@@ -39,6 +39,9 @@ namespace ompl
 
       protected:
 
+        static uint counter;
+        uint id;
+
         //Overrides Distance/Sample/Connect
         virtual double Distance(const Vertex a, const Vertex b) const override;
         virtual bool Sample(ob::State *workState) override;
@@ -70,3 +73,4 @@ namespace ompl
 
   };
 };
+

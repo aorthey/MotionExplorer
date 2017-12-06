@@ -17,7 +17,6 @@ namespace ompl
 
         void getPlannerData(base::PlannerData &data) const override;
         ob::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
-        //void clear() override;
         void setup() override;
 
         void setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef);

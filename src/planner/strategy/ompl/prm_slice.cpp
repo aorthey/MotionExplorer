@@ -3,6 +3,8 @@
 #include <boost/foreach.hpp>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 #include <ompl/base/goals/GoalSampleableRegion.h>
+#include <ompl/base/spaces/SO2StateSpace.h>
+#include <ompl/base/spaces/SO3StateSpace.h>
 
 using namespace og;
 using namespace ob;
@@ -62,6 +64,8 @@ namespace ompl
     static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
   }
 }
+uint PRMSlice::counter = 0;
+
 PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
   og::PRMBasic(si), previous(previous_), M1(si)
 {
@@ -69,11 +73,10 @@ PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
   M0_subspaces = 0;
   M1_subspaces = 0;
 
+  id = counter++;
+  std::cout << "Level " << id << " SliceSpace" << std::endl;
   if(previous == nullptr){
-    std::cout << "Level 0 SliceSpace" << std::endl;
-    //C1 = std::make_shared<SpaceInformation>(M1);
   }else{
-    std::cout << "Level 1 SliceSpace" << std::endl;
     const StateSpacePtr M0_space = previous->getSpaceInformation()->getStateSpace();
 
     //create standalone CSpace M1/M0
@@ -94,40 +97,52 @@ PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
         std::cout << "M1 needs to be compound state" << std::endl;
         exit(0);
       }
+
       ob::CompoundStateSpace *M1_compound = M1_space->as<ob::CompoundStateSpace>();
       const std::vector<StateSpacePtr> M1_decomposed = M1_compound->getSubspaces();
       M1_subspaces = M1_decomposed.size();
 
-      std::cout << "M0 contains " << M0_subspaces << " subspaces." << std::endl;
-      std::cout << "M1 contains " << M1_subspaces << " subspaces." << std::endl;
 
       //sanity check it
-      if(M0_subspaces >= M1_subspaces){
+      if(M0_space->getDimension() >= M1_space->getDimension()){
         std::cout << "Cannot reduce to a bigger cspace. We need M0 < M1." << std::endl;
         exit(0);
       }
 
-      //get C1
-      C1_subspaces = M1_subspaces - M0_subspaces;
+      if(M0_subspaces >= M1_subspaces){
+        //get C1
+        C1_subspaces = M1_subspaces - M0_subspaces;
 
-      StateSpacePtr C1_space;
-      if(C1_subspaces<=1){
-        C1_space = M1_decomposed.at(M0_subspaces);
-      }else{
-        for(uint k = M0_subspaces; k < M0_subspaces+C1_subspaces; k++){
-          C1_space->as<ob::CompoundStateSpace>()->addSubspace(M1_decomposed.at(k),1);
+        uint C1_subspaces = 0;
+        if(C1_subspaces<=1){
+          StateSpacePtr C1_space = M1_decomposed.at(M0_subspaces);
+          C1 = std::make_shared<SpaceInformation>(C1_space);
+          C1_subspaces=1;
+        }else{
+          StateSpacePtr C1_space = std::make_shared<ompl::base::CompoundStateSpace>();
+          for(uint k = M0_subspaces; k < M0_subspaces+C1_subspaces; k++){
+            std::cout << "subspace " << k << "/" << M0_subspaces + C1_subspaces << std::endl;
+            C1_space->as<ob::CompoundStateSpace>()->addSubspace(M1_decomposed.at(k),1);
+          }
+          C1 = std::make_shared<SpaceInformation>(C1_space);
+          C1_subspaces = C1_space->as<ob::CompoundStateSpace>()->getSubspaceCount();
         }
-      }
-      C1 = std::make_shared<SpaceInformation>(C1_space);
-
-      //get count of subspaces in C1
-      uint C1_subspaces = 0;
-      if(!C1_space->isCompound()){
-        C1_subspaces=1;
       }else{
-        C1_subspaces = C1_space->as<ob::CompoundStateSpace>()->getSubspaceCount();
+        StateSpacePtr M1_back = M1_decomposed.back();
+        if((M1_back->StateType == ob::SO3StateSpace) && (M0_space->getDimension() == 5)){
+          StateSpacePtr C1_space = (std::make_shared<ob::SO2StateSpace>());
+          C1 = std::make_shared<SpaceInformation>(C1_space);
+          C1_subspaces = 1;
+        }else{
+          std::cout << "Subspaces do not match. We can only handle this in the case of S1xS1 subset SO(3)" << std::endl;
+          exit(0);
+        }
+
       }
-      std::cout << "C1 contains " << C1_subspaces << " subspaces." << std::endl;
+
+      std::cout << "M0 (dimension: " << M0->getStateDimension() << ") contains " << M0_subspaces << " subspaces." << std::endl;
+      std::cout << "M1 (dimension: " << M1->getStateDimension() << ") contains " << M1_subspaces << " subspaces." << std::endl;
+      std::cout << "C1 (dimension: " << C1->getStateDimension() << ") contains " << C1_subspaces << " subspaces." << std::endl;
     }
     if (!C1_sampler){
       C1_sampler = C1->allocStateSampler();
