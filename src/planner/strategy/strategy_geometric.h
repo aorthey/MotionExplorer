@@ -1,7 +1,6 @@
 #pragma once
 #include "planner/strategy/strategy.h"
 
-//#include <boost/program_options.hpp>
 #include <omplapp/apps/SE3RigidBodyPlanning.h>
 #include <omplapp/config.h>
 

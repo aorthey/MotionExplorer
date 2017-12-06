@@ -35,6 +35,7 @@ class PlannerInput{
     int freeFloating;
 
     std::string name_algorithm;
+    std::string name_sampler;
 
     //specific input for planner methods
     double epsilon_goalregion;

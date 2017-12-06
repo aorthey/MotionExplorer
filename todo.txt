@@ -391,8 +391,9 @@ sampling function first?
 [x] upper level in collision fix. did you add checker for last level!? or is it
 a an issue of chart boundary overflow? -> if the latter, than make the path an
 ompl path instead (would also be better for deformations)
-[ ] fix R3S2 issue (sublevel components are more than SE3)
-[ ] optimize resulting path
-[ ] fix zero-measure issue (implement new connect and distance functions)
-[ ] move slice_naive to slice, and create new slice_? which implements some
+[x] fix R3S2 issue (sublevel components are more than SE3)
+[x] fix zero-measure issue (implement new connect and distance functions)
+[x] move slice_naive to slice, and create new slice_? which implements some
 improvements like identifying narrow passages for sampling
+[ ] optimize resulting path
+[ ] fix chart boundary path

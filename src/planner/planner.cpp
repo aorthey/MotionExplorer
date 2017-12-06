@@ -89,6 +89,7 @@ void MotionPlanner::CreateSinglePathHierarchy(){
       psinput->se3max = input.se3max;
       psinput->freeFloating = input.freeFloating;
 
+      psinput->name_sampler = input.name_sampler;
       psinput->name_algorithm = subalgorithm;
       psinput->epsilon_goalregion = input.epsilon_goalregion;
       psinput->max_planning_time = input.max_planning_time;
@@ -119,6 +120,7 @@ void MotionPlanner::CreateSinglePathHierarchy(){
     psinput->se3max = input.se3max;
     psinput->freeFloating = input.freeFloating;
 
+    psinput->name_sampler = input.name_sampler;
     psinput->name_algorithm = subalgorithm;
     psinput->epsilon_goalregion = input.epsilon_goalregion;
     psinput->max_planning_time = input.max_planning_time;
@@ -195,6 +197,7 @@ void MotionPlanner::CreateShallowHierarchy(){
   psinput->se3max = input.se3max;
   psinput->freeFloating = input.freeFloating;
 
+  psinput->name_sampler = input.name_sampler;
   psinput->name_algorithm = input.name_algorithm;
   psinput->robot_idx = input.robot_idx;
   psinput->robot_inner_idx = input.robot_idx;
@@ -248,6 +251,7 @@ void MotionPlanner::CreateShallowHierarchySE2(){
   psinput->se3max = input.se3max;
   psinput->freeFloating = input.freeFloating;
 
+  psinput->name_sampler = input.name_sampler;
   psinput->name_algorithm = algorithm;
   psinput->robot_idx = input.robot_idx;
   psinput->robot_inner_idx = input.robot_idx;

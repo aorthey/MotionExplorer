@@ -13,6 +13,7 @@ struct StrategyInput{
   Config q_init;
   Config q_goal;
   std::string name_algorithm;
+  std::string name_sampler;
   double max_planning_time;
   double epsilon_goalregion;
   CSpaceOMPL *cspace;

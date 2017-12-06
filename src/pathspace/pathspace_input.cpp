@@ -9,6 +9,7 @@ const StrategyInput& PathSpaceInput::GetStrategyInput(){
   sin = new StrategyInput();
   sin->q_init = q_init;
   sin->q_goal = q_goal;
+  sin->name_sampler = name_sampler;
   sin->name_algorithm = name_algorithm;
   sin->epsilon_goalregion = epsilon_goalregion;
   sin->max_planning_time = max_planning_time;

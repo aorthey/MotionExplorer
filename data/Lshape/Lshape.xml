@@ -29,7 +29,9 @@
     <!-- default settings for all algorithms (overwriteable) -->
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.01</epsilongoalregion>
-    <maxplanningtime>2</maxplanningtime>
+    <maxplanningtime>10</maxplanningtime>
+
+    <sampler name="gaussian"/>
 
     <!-- individual algorithms plus individual settings -->
     <algorithm name="hierarchical:ompl:prm_multislice">
@@ -40,8 +42,8 @@
       </hierarchy>
     </algorithm>
 
-    <algorithm name="ompl:est"/>
     <algorithm name="ompl:rrt"/>
+    <algorithm name="ompl:est"/>
     <algorithm name="ompl:prmstar"/>
 
   </plannerinput>

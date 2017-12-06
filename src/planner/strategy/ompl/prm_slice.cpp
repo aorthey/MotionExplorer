@@ -71,6 +71,7 @@ uint PRMSlice::counter = 0;
 PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
   og::PRMBasic(si), previous(previous_), M1(si)
 {
+
   const StateSpacePtr M1_space = M1->getStateSpace();
   M0_subspaces = 0;
   M1_subspaces = 0;

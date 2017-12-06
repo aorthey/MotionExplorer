@@ -24,6 +24,7 @@ bool PlannerMultiInput::load(TiXmlElement *node){
   double epsilon_goalregion;
   double timestep_min;
   double timestep_max;
+  std::string name_sampler;
   TiXmlElement* node_timestep = FindSubNode(node_plannerinput, "timestep");
   if(node_timestep){
     GetStreamAttribute(node_timestep,"min") >> timestep_min;
@@ -38,6 +39,10 @@ bool PlannerMultiInput::load(TiXmlElement *node){
   GetStreamText(node_max_planning_time) >> max_planning_time;
   GetStreamText(node_epsilon_goalregion) >> epsilon_goalregion;
 
+  TiXmlElement* node_sampler = FindSubNode(node_plannerinput, "sampler");
+  //GetStreamAttribute(node_sampler,"name") >> input->name_sampler;
+  GetStreamAttributeDefault<std::string>(node_sampler,"name", "uniform") >> name_sampler;
+
   int isSE2;
   TiXmlElement* node_se2 = FindSubNode(node_plannerinput, "se2");
   GetStreamTextDefault<int>(node_se2, 0) >> isSE2;
@@ -51,6 +56,8 @@ bool PlannerMultiInput::load(TiXmlElement *node){
   while(node_algorithm!=NULL){
     PlannerInput* input = new PlannerInput();
     input->isSE2=isSE2;
+    input->name_sampler = name_sampler;
+
     if(!input->load(node_plannerinput)) return false;
 
     GetStreamAttribute(node_algorithm,"name") >> input->name_algorithm;
@@ -167,6 +174,7 @@ std::ostream& operator<< (std::ostream& out, const PlannerInput& pin)
   out << "SE3_min            : " << pin.se3min << std::endl;
   out << "SE3_max            : " << pin.se3max << std::endl;
   out << "algorithm          : " << pin.name_algorithm << std::endl;
+  out << "sampler            : " << pin.name_sampler << std::endl;
   out << "discr timestep     : [" << pin.timestep_min << "," << pin.timestep_max << "]" << std::endl;
   out << "max planning time  : " << pin.max_planning_time << " (seconds)" << std::endl;
   out << "epsilon_goalregion : " << pin.epsilon_goalregion << std::endl;

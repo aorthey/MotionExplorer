@@ -31,6 +31,8 @@
     <epsilongoalregion>0.01</epsilongoalregion>
     <maxplanningtime>1</maxplanningtime>
 
+    <sampler name="gaussian"/>
+
     <!-- individual algorithms plus individual settings -->
     <algorithm name="hierarchical:ompl:prm_multislice">
       <hierarchy>

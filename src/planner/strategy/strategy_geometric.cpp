@@ -65,6 +65,9 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
 
   ss.setStateValidityChecker(cspace->StateValidityCheckerPtr(si));
 
+  SetSampler(input.name_sampler, si);
+
+
   //###########################################################################
   // choose planner
   //###########################################################################

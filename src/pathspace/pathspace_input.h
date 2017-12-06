@@ -28,6 +28,7 @@ class PathSpaceInput{
     Config se3max;
 
     std::string name_algorithm;
+    std::string name_sampler;
 
     std::string type;
     uint level;
