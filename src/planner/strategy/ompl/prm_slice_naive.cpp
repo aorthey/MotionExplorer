@@ -131,6 +131,7 @@ PRMSliceNaive::PRMSliceNaive(const ob::SpaceInformationPtr &si, PRMSliceNaive *p
 
 PRMSliceNaive::~PRMSliceNaive(){
 }
+
 ob::PlannerStatus PRMSliceNaive::Init()
 {
   PRMSlice::Init();
@@ -141,7 +142,7 @@ ob::PlannerStatus PRMSliceNaive::Init()
     }
     for(uint k = 0; k < goalM_.size(); k++){
       associatedVertexSourceProperty_[goalM_.at(k)] = previous->goalM_.at(k);
-      associatedVertexTargetProperty_[goalM_.at(k)] = previous->startM_.at(k);
+      associatedVertexTargetProperty_[goalM_.at(k)] = previous->goalM_.at(k);
     }
   }
 }
@@ -177,7 +178,6 @@ void PRMSliceNaive::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const{
 }
 
 void PRMSliceNaive::mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1){
-  //
   //input : qM0 \in M0, qC1 \in C1
   //output: qM1 = qM0 \circ qC1 \in M1
   State **qM1_comps = qM1->as<CompoundState>()->components;
@@ -319,16 +319,19 @@ double PRMSliceNaive::Distance(const Vertex a, const Vertex b) const
     ExtractM0Subspace(qa, qaM0);
     ExtractM0Subspace(qb, qbM0);
 
-    //const Vertex vsaM0 = associatedVertexSourceProperty_[a];
-    //const Vertex vsbM0 = associatedVertexSourceProperty_[b];
-    //const Vertex vtaM0 = associatedVertexTargetProperty_[a];
-    //const Vertex vtbM0 = associatedVertexTargetProperty_[b];
-    //double ta = associatedTProperty_[a];
-    //double tb = associatedTProperty_[b];
-    //double d0 = previous->distanceGraphFunction(qaM0, qbM0, vsaM0, vsbM0, vtaM0, vtbM0, ta, tb);
+    const Vertex vsaM0 = associatedVertexSourceProperty_[a];
+    const Vertex vsbM0 = associatedVertexSourceProperty_[b];
+    const Vertex vtaM0 = associatedVertexTargetProperty_[a];
+    const Vertex vtbM0 = associatedVertexTargetProperty_[b];
 
-    //direct distance is suboptimal, we already know the graph datastructure!
-    double d0 = M0->distance(qaM0, qbM0);
+    // double ta = associatedTProperty_[a];
+    // double tb = associatedTProperty_[b];
+
+    ob::PathPtr sol = previous->GetShortestPathOffsetVertices( qaM0, qbM0, vsaM0, vsbM0, vtaM0, vtbM0);
+    double d0 = +dInf;
+    if(sol!=nullptr){
+      d0 = sol->length();
+    }
 
     double d1 = C1->distance(qaC1, qbC1);
 
@@ -342,22 +345,178 @@ double PRMSliceNaive::Distance(const Vertex a, const Vertex b) const
   }
 }
 
-double PRMSliceNaive::distanceGraphFunction(ob::State *qa, ob::State *qb, 
-    const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb, double ta, double tb)
+ob::PathPtr PRMSliceNaive::GetShortestPathOffsetVertices( ob::State *qa, ob::State *qb, 
+  const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb)
 {
-  //@TODO: compute distance qa to va, and subtract or add to total cost
-  //search on graph between vaM0 and vbM0
+  //###########################################################################
+  //construct modified graph
+  //###########################################################################
+  //get edge ea and eb from g, delete both. 
+  //Then add qa as new vertex at ta*ea, and qb at tb*eb. 
+  //Create edge from vsa to qa, vta to qa, vsb to qb, vtb to
+  //qb. 
+  //Search for shortest path. 
+  //Then delete all four edges and the two
+  //vertices. Add ea and eb again to g.
 
-  //
-
-  ob::PathPtr sol = constructSolution(vsa, vsb);
-  if(sol==nullptr){
-    return +dInf;
-  }else{
-    return sol->length();
+  if( !boost::edge(vsa,vta,g_).second){
+    ob::PathPtr path = std::make_shared<og::PathGeometric>(si_, qa, qb);
+    return path;
+    //return nullptr;
   }
+  if( !boost::edge(vsb,vtb,g_).second){
+    ob::PathPtr path = std::make_shared<og::PathGeometric>(si_, qa, qb);
+    return path;
+    //return nullptr;
+  }
+  const Edge ea = boost::edge(vsa,vta,g_).first;
+  const Edge eb = boost::edge(vsb,vtb,g_).first;
+
+  if(ea == eb){
+    ob::PathPtr path = std::make_shared<og::PathGeometric>(si_, qa, qb);
+    return path;
+  }
+
+  remove_edge(vsa, vta, g_);
+  remove_edge(vsb, vtb, g_);
+
+  const Vertex va = add_vertex(g_);
+  stateProperty_[va] = qa;
+  const Vertex vb = add_vertex(g_);
+  stateProperty_[vb] = qb;
+
+  ob::Cost dsa = opt_->motionCost(stateProperty_[vsa], stateProperty_[va]);
+  ob::Cost dta = opt_->motionCost(stateProperty_[va], stateProperty_[vta]);
+  ob::Cost dsb = opt_->motionCost(stateProperty_[vsb], stateProperty_[vb]);
+  ob::Cost dtb = opt_->motionCost(stateProperty_[vb], stateProperty_[vtb]);
+
+  boost::add_edge(vsa, va, EdgeProperty(dsa), g_);
+  boost::add_edge(va, vta, EdgeProperty(dta), g_);
+  boost::add_edge(vsb, vb, EdgeProperty(dsb), g_);
+  boost::add_edge(vb, vtb, EdgeProperty(dtb), g_);
+
+  uniteComponents(vsa, va);
+  uniteComponents(va, vta);
+  uniteComponents(vsb, vb);
+  uniteComponents(vb, vtb);
+
+  //###########################################################################
+  //search in modified graph
+  //###########################################################################
+  ob::PathPtr sol = constructSolution(va, vb);
+
+  //###########################################################################
+  //return to former graph
+  //###########################################################################
+  boost::remove_edge(vsa, va, g_);
+  boost::remove_edge(va, vta, g_);
+  boost::remove_edge(vsb, vb, g_);
+  boost::remove_edge(vb, vtb, g_);
+
+  remove_vertex(va, g_);
+  remove_vertex(vb, g_);
+
+  boost::add_edge(vsa, vta, EdgeProperty(ob::Cost(dsa.value()+dta.value())), g_);
+  boost::add_edge(vsb, vtb, EdgeProperty(ob::Cost(dsb.value()+dtb.value())), g_);
+
+  return sol;
 }
 
 bool PRMSliceNaive::Connect(const Vertex a, const Vertex b){
-  return PRMBasic::Connect(a,b);
+  if(previous==nullptr){
+    //return PRMBasic::Connect(a,b);
+    if (si_->checkMotion(stateProperty_[a], stateProperty_[b]))
+    {
+      EdgeProperty properties(opt_->motionCost(stateProperty_[a], stateProperty_[b]));
+      boost::add_edge(a, b, properties, g_);
+      uniteComponents(a, b);
+      return true;
+    }
+    return false;
+  }else{
+    ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
+
+    ob::State* qa = stateProperty_[a];
+    ob::State* qb = stateProperty_[b];
+
+    ob::State* qaC1 = C1->allocState();
+    ob::State* qbC1 = C1->allocState();
+    ob::State* qaM0 = M0->allocState();
+    ob::State* qbM0 = M0->allocState();
+
+    ExtractC1Subspace(qa, qaC1);
+    ExtractC1Subspace(qb, qbC1);
+    ExtractM0Subspace(qa, qaM0);
+    ExtractM0Subspace(qb, qbM0);
+
+    const Vertex vsaM0 = associatedVertexSourceProperty_[a];
+    const Vertex vsbM0 = associatedVertexSourceProperty_[b];
+    const Vertex vtaM0 = associatedVertexTargetProperty_[a];
+    const Vertex vtbM0 = associatedVertexTargetProperty_[b];
+
+    double ta = associatedTProperty_[a];
+    double tb = associatedTProperty_[b];
+
+    //create PWL function between vertices.
+    ob::PathPtr sol = previous->GetShortestPathOffsetVertices( qaM0, qbM0, vsaM0, vsbM0, vtaM0, vtbM0);
+    if(sol==nullptr){
+      return false;
+    }
+    double D = sol->length();
+
+    og::PathGeometric path = static_cast<og::PathGeometric&>(*sol);
+    std::vector<ob::State *> states = path.getStates();
+
+    Vertex v0 = a;
+    ob::State *s0M0 = states.at(0);
+    ob::State *s0M1 = qa;
+    for(uint i = 1; i < states.size(); i++)
+    {
+
+      ob::State *s1M0 = states.at(i);
+      double d = M0->distance(s0M0, s1M0);
+      ob::State* s1C1 = C1->allocState();
+      C1->getStateSpace()->interpolate(qaC1,qbC1,d/D,s1C1);
+
+      //std::cout << "interpolate[" << i << "/"<< states.size() << "]: " << d << "/" << D << std::endl;
+
+      //mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1);
+      ob::State* s1M1 = M1->allocState();
+      mergeStates(s1M0, s1C1, s1M1);
+
+      C1->freeState(s1C1);
+
+      Vertex v1;
+      if(i<states.size()-1){
+        v1 = boost::add_vertex(g_);
+        stateProperty_[v1] = s1M1;
+      }else{
+        v1 = b;
+      }
+
+      if (si_->checkMotion(s0M1, s1M1))
+      {
+        boost::add_edge(v0, v1, EdgeProperty(ob::Cost(d)), g_);
+        uniteComponents(v0, v1);
+      }else{
+        C1->freeState(qaC1);
+        C1->freeState(qbC1);
+        M0->freeState(qaM0);
+        M0->freeState(qbM0);
+        return false;
+      }
+
+      s0M0 = s1M0;
+
+    }
+
+    C1->freeState(qaC1);
+    C1->freeState(qbC1);
+    M0->freeState(qaM0);
+    M0->freeState(qbM0);
+
+    return true;
+
+  }
+  return false;
 }

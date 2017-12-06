@@ -17,7 +17,6 @@ namespace ompl
 
       public:
 
-
         PRMSliceNaive(const ob::SpaceInformationPtr &si, PRMSliceNaive *previous_);
 
         ~PRMSliceNaive() override;
@@ -31,8 +30,11 @@ namespace ompl
         void setup() override;
 
         Vertex lastSourceVertexSampled;
+
         Vertex lastTargetVertexSampled;
+
         double lastTSampled;
+
         bool isSampled{false};
 
       protected:
@@ -44,8 +46,8 @@ namespace ompl
 
         bool SampleGraph(ob::State *workState);
 
-        double distanceGraphFunction(ob::State *qa, ob::State *qb, 
-            const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb, double ta, double tb);
+        ob::PathPtr GetShortestPathOffsetVertices( ob::State *qa, ob::State *qb, 
+          const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb);
 
         virtual Vertex addMilestone(base::State *state) override;
 

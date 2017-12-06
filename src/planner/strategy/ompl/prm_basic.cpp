@@ -275,17 +275,14 @@ ob::PathPtr PRMBasic::constructSolution(const Vertex &start, const Vertex &goal)
 
     //last_vertex_path.clear();
     for (Vertex pos = goal; prev[pos] != pos; pos = prev[pos]){
-      //last_vertex_path.push_back(pos);
       p->append(stateProperty_[pos]);
     }
-    //last_vertex_path.push_back(start);
     p->append(stateProperty_[start]);
     p->reverse();
 
-    //std::reverse(std::begin(last_vertex_path), std::end(last_vertex_path));
-
     return p;
 }
+
 PRMBasic::Vertex PRMBasic::addMilestone(ob::State *state)
 {
   Vertex m = boost::add_vertex(g_);
@@ -311,34 +308,34 @@ PRMBasic::Vertex PRMBasic::addMilestone(ob::State *state)
   return m;
 }
 
-
 void PRMBasic::getPlannerData(ob::PlannerData &data) const
 {
-    for (unsigned long i : startM_)
-        data.addStartVertex(
-            ob::PlannerDataVertex(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
+  for (unsigned long i : startM_)
+    data.addStartVertex(
+      ob::PlannerDataVertex(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
 
-    for (unsigned long i : goalM_)
-        data.addGoalVertex(
-            ob::PlannerDataVertex(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
+  for (unsigned long i : goalM_)
+    data.addGoalVertex(
+      ob::PlannerDataVertex(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
 
-    std::cout << "  edges : " << boost::num_edges(g_) << std::endl;
-    foreach (const Edge e, boost::edges(g_))
-    {
-        const Vertex v1 = boost::source(e, g_);
-        const Vertex v2 = boost::target(e, g_);
-        data.addEdge(ob::PlannerDataVertex(stateProperty_[v1]), ob::PlannerDataVertex(stateProperty_[v2]));
-        data.addEdge(ob::PlannerDataVertex(stateProperty_[v2]), ob::PlannerDataVertex(stateProperty_[v1]));
-        data.tagState(stateProperty_[v1], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v1));
-        data.tagState(stateProperty_[v2], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v2));
-    }
+  std::cout << "  edges : " << boost::num_edges(g_) << std::endl;
+  foreach (const Edge e, boost::edges(g_))
+  {
+    const Vertex v1 = boost::source(e, g_);
+    const Vertex v2 = boost::target(e, g_);
+    data.addEdge(ob::PlannerDataVertex(stateProperty_[v1]), ob::PlannerDataVertex(stateProperty_[v2]));
+    data.addEdge(ob::PlannerDataVertex(stateProperty_[v2]), ob::PlannerDataVertex(stateProperty_[v1]));
+    data.tagState(stateProperty_[v1], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v1));
+    data.tagState(stateProperty_[v2], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v2));
+  }
 }
+
 void PRMBasic::setup(){
   if (!nn_){
     nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
     nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
                              {
-                                 return Distance(a, b);
+                               return Distance(a, b);
                              });
   }
   if (!connectionStrategy_){

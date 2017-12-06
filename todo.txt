@@ -394,3 +394,5 @@ ompl path instead (would also be better for deformations)
 [ ] fix R3S2 issue (sublevel components are more than SE3)
 [ ] optimize resulting path
 [ ] fix zero-measure issue (implement new connect and distance functions)
+[ ] move slice_naive to slice, and create new slice_? which implements some
+improvements like identifying narrow passages for sampling

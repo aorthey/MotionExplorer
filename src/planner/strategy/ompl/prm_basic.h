@@ -102,9 +102,10 @@ namespace ompl
         typedef std::function<const std::vector<Vertex> &(const Vertex)> ConnectionStrategy;
 
       public:
-        PRMBasic(const ob::SpaceInformationPtr &si);
 
+        PRMBasic(const ob::SpaceInformationPtr &si);
         ~PRMBasic() override;
+
         double GetSamplingDensity();
         base::PathPtr GetShortestPath();
         base::PathPtr GetSolutionPath();
@@ -152,14 +153,12 @@ namespace ompl
             return g_;
         }
 
-
     protected:
 
         virtual double Distance(const Vertex a, const Vertex b) const; // standard si->distance
         virtual bool Sample(ob::State *workState); //si->sampler
         virtual bool Connect(const Vertex a, const Vertex b);
         virtual Vertex addMilestone(base::State *state);
-
 
         base::Cost costHeuristic(Vertex u, Vertex v) const;
         std::vector<ob::State *> xstates;
@@ -183,10 +182,7 @@ namespace ompl
         bool maybeConstructSolution(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals,
                                     base::PathPtr &solution);
         ompl::base::PathPtr constructSolution(const Vertex &start, const Vertex &goal);
-
-
     };
-
   };
 };
 
