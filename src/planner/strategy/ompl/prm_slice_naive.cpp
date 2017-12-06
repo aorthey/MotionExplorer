@@ -424,15 +424,7 @@ ob::PathPtr PRMSliceNaive::GetShortestPathOffsetVertices( ob::State *qa, ob::Sta
 
 bool PRMSliceNaive::Connect(const Vertex a, const Vertex b){
   if(previous==nullptr){
-    //return PRMBasic::Connect(a,b);
-    if (si_->checkMotion(stateProperty_[a], stateProperty_[b]))
-    {
-      EdgeProperty properties(opt_->motionCost(stateProperty_[a], stateProperty_[b]));
-      boost::add_edge(a, b, properties, g_);
-      uniteComponents(a, b);
-      return true;
-    }
-    return false;
+    return PRMBasic::Connect(a,b);
   }else{
     ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
 
@@ -514,9 +506,8 @@ bool PRMSliceNaive::Connect(const Vertex a, const Vertex b){
     C1->freeState(qbC1);
     M0->freeState(qaM0);
     M0->freeState(qbM0);
-
     return true;
-
   }
+
   return false;
 }
