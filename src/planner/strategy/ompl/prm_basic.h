@@ -152,6 +152,7 @@ namespace ompl
         {
             return g_;
         }
+        void checkForSolution(base::PathPtr &solution);
 
     protected:
 
@@ -178,7 +179,6 @@ namespace ompl
         void growRoadmap(const base::PlannerTerminationCondition &ptc, base::State *workState);
         void expandRoadmap(const base::PlannerTerminationCondition &ptc, std::vector<base::State *> &workStates);
 
-        void checkForSolution(base::PathPtr &solution);
         bool maybeConstructSolution(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals,
                                     base::PathPtr &solution);
         ompl::base::PathPtr constructSolution(const Vertex &start, const Vertex &goal);

@@ -1,18 +1,9 @@
 #pragma once
-
 #include "prm_basic.h"
-#include <ompl/geometric/planners/PlannerIncludes.h>
-#include <ompl/datastructures/NearestNeighbors.h>
-#include <ompl/base/Cost.h>
-#include <ompl/base/spaces/RealVectorStateSpace.h>
-#include <boost/graph/graph_traits.hpp>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/pending/disjoint_sets.hpp>
-#include <KrisLibrary/math/infnan.h> //dInf, fInf, IsNaN(x)
-using Math::dInf;
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
+
 
 namespace ompl
 {
@@ -22,33 +13,60 @@ namespace ompl
   }
   namespace geometric
   {
-    //class PRMSlice: public og::PRM{
     class PRMSlice: public og::PRMBasic{
 
       public:
-        PRMSlice(const ob::SpaceInformationPtr &si);
+
+        PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_);
 
         ~PRMSlice() override;
 
-        void Grow(double t);
+        void getPlannerData(base::PlannerData &data) const override;
 
-        void growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState);
+        double getSamplingDensity();
 
         virtual ob::PlannerStatus Init();
 
-        ob::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
+        void setup() override;
 
-        void checkForSolution(base::PathPtr &solution);
+        Vertex lastSourceVertexSampled;
 
-        bool hasSolution();
+        Vertex lastTargetVertexSampled;
 
-    protected:
+        double lastTSampled;
 
-        std::vector<ob::State *> xstates;
+        bool isSampled{false};
+
+      protected:
+
+        //Overrides Distance/Sample/Connect
+        virtual double Distance(const Vertex a, const Vertex b) const override;
+        virtual bool Sample(ob::State *workState) override;
+        virtual bool Connect(const Vertex a, const Vertex b) override;
+
+        bool SampleGraph(ob::State *workState);
+
+        ob::PathPtr GetShortestPathOffsetVertices( ob::State *qa, ob::State *qb, 
+          const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb);
+
+        virtual Vertex addMilestone(base::State *state) override;
+
+        void mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1);
+        void ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const;
+        void ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const;
+
+        ob::SpaceInformationPtr M1; //full configuration space Mi = si_
+        ob::SpaceInformationPtr C1; //configuration space Ci = Mi/Mi-1
+
+        base::StateSamplerPtr C1_sampler;
+
+        uint M0_subspaces;
+        uint M1_subspaces;
+        uint C1_subspaces;
+
+        PRMSlice *previous;
 
     };
 
   };
 };
-
-

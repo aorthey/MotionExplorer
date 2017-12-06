@@ -12,10 +12,10 @@ PRMMultiSlice::PRMMultiSlice(std::vector<ob::SpaceInformationPtr> &si_vec):
   // => to copy SI, we need to copy statespace and copy validitychecker
 
   for(uint k = 0; k < si_vec.size(); k++){
-    PRMSliceNaive* previous = nullptr;
+    PRMSlice* previous = nullptr;
     if(k>0) previous = slicespaces.back();
 
-    PRMSliceNaive* ss = new PRMSliceNaive(si_vec.at(k), previous);
+    PRMSlice* ss = new PRMSlice(si_vec.at(k), previous);
     slicespaces.push_back(ss);
   }
 
@@ -31,17 +31,17 @@ ob::PlannerStatus PRMMultiSlice::solve(const base::PlannerTerminationCondition &
   
   static const double ROADMAP_BUILD_TIME = 0.01;
 
-  auto cmp = [](PRMSliceNaive* left, PRMSliceNaive* right) 
+  auto cmp = [](PRMSlice* left, PRMSlice* right) 
               { 
                 return left->getSamplingDensity() > right->getSamplingDensity();
               };
 
-  std::priority_queue<PRMSliceNaive*, std::vector<PRMSliceNaive*>, decltype(cmp)> Q(cmp);
+  std::priority_queue<PRMSlice*, std::vector<PRMSlice*>, decltype(cmp)> Q(cmp);
 
   for(uint k = 0; k < slicespaces.size(); k++){
     base::PathPtr sol_k;
     foundKLevelSolution = false;
-    PRMSliceNaive *kslice = slicespaces.at(k);
+    PRMSlice *kslice = slicespaces.at(k);
     kslice->Init();
 
     Q.push(kslice);
@@ -52,7 +52,7 @@ ob::PlannerStatus PRMMultiSlice::solve(const base::PlannerTerminationCondition &
     ompl::time::point t_k_start = ompl::time::now();
     while (!ptcOrSolutionFound())
     {
-      PRMSliceNaive* jslice = Q.top();
+      PRMSlice* jslice = Q.top();
       Q.pop();
       jslice->Grow(ROADMAP_BUILD_TIME);
 
@@ -75,7 +75,7 @@ ob::PlannerStatus PRMMultiSlice::solve(const base::PlannerTerminationCondition &
   }
 
 //set pdef solution path!
-  PRMSliceNaive *fullspace = slicespaces.back();
+  PRMSlice *fullspace = slicespaces.back();
   base::PathPtr sol;
   fullspace->checkForSolution(sol);
   if (sol)
@@ -92,7 +92,7 @@ ob::PlannerStatus PRMMultiSlice::solve(const base::PlannerTerminationCondition &
 void PRMMultiSlice::setup(){
   Planner::setup();
   for(uint k = 0; k < slicespaces.size(); k++){
-    PRMSliceNaive *sk = slicespaces.at(k);
+    PRMSlice *sk = slicespaces.at(k);
     sk->setup();
   }
 }
@@ -111,7 +111,7 @@ void PRMMultiSlice::setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &
 
 void PRMMultiSlice::getPlannerData(ob::PlannerData &data) const{
   //Planner::getPlannerData(data);
-  PRMSliceNaive *sb = slicespaces.back();
+  PRMSlice *sb = slicespaces.back();
   sb->getPlannerData(data);
 }
 

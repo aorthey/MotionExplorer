@@ -1,5 +1,5 @@
 #pragma once
-#include "prm_slice_naive.h"
+#include "prm_slice.h"
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
@@ -24,7 +24,7 @@ namespace ompl
 
 
       protected:
-        std::vector<PRMSliceNaive*> slicespaces;
+        std::vector<PRMSlice*> slicespaces;
         bool foundKLevelSolution{false};
     };
   };
