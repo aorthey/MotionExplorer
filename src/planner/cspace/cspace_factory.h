@@ -27,23 +27,6 @@ class CSpaceFactory{
       cspace->initControlSpace();
       return cspace;
     }
-    //CSpace for a rigid object which has rotational invariance. CSpace is R3
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceRotationalInvariance( Robot *robot, CSpaceKlampt *inner){
-      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLRotationalInvariance(robot, inner);
-      cspace->SetCSpaceInput(input);
-      cspace->initSpace();
-      cspace->initControlSpace();
-      return cspace;
-    }
-
-
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpacePathConstraintSO3( Robot *robot, CSpaceKlampt *inner, const std::vector<Config>& path){
-      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLPathConstraintSO3(robot, inner, path);
-      cspace->SetCSpaceInput(input);
-      cspace->initSpace();
-      cspace->initControlSpace();
-      return cspace;
-    }
     // CSpace  SE(3)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE3( RobotWorld *world, int robot_idx){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLSE3(world, robot_idx);
@@ -71,15 +54,6 @@ class CSpaceFactory{
     // CSpace  R^(N)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceRN( RobotWorld *world, int robot_idx, int dimension){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLRN(world, robot_idx, dimension);
-      cspace->SetCSpaceInput(input);
-      cspace->initSpace();
-      cspace->initControlSpace();
-      return cspace;
-    }
-
-    // CSpace {q} \times SO(3)
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpacePointConstraintSO3( Robot *robot, CSpaceKlampt *inner, const Config q){
-      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLPointConstraintSO3(robot, inner, q);
       cspace->SetCSpaceInput(input);
       cspace->initSpace();
       cspace->initControlSpace();

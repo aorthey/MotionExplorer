@@ -2,6 +2,7 @@
 #include "planner/strategy/strategy_output.h"
 #include "planner/strategy/strategy_geometric.h"
 
+#include <ompl/base/ValidStateSampler.h>
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
@@ -60,13 +61,12 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
 
+  setStateSampler(input.name_sampler, cspace->SpaceInformationPtr());
+
   og::SimpleSetup ss(cspace->SpaceInformationPtr());
+
   const ob::SpaceInformationPtr si = ss.getSpaceInformation();
-
   ss.setStateValidityChecker(cspace->StateValidityCheckerPtr(si));
-
-  SetSampler(input.name_sampler, si);
-
 
   //###########################################################################
   // choose planner

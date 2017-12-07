@@ -23,11 +23,10 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   std::vector<ob::SpaceInformationPtr> si_vec; 
   std::vector<ob::ProblemDefinitionPtr> pdef_vec; 
 
-
   for(uint k = 0; k < input.cspace_levels.size(); k++){
     CSpaceOMPL* cspace_levelk = input.cspace_levels.at(k);
     ob::SpaceInformationPtr sik = cspace_levelk->SpaceInformationPtr();
-    SetSampler(input.name_sampler, sik);
+    setStateSampler(input.name_sampler, sik);
 
     ob::ScopedState<> startk = cspace_levelk->ConfigToOMPLState(p_init);
     ob::ScopedState<> goalk  = cspace_levelk->ConfigToOMPLState(p_goal);
@@ -84,7 +83,6 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   output.planner_time = ompl::time::seconds(ompl::time::now() - start);
   output.max_planner_time = max_planning_time;
 
-  std::cout << status << std::endl;
   //###########################################################################
 
   ob::PlannerDataPtr pd( new ob::PlannerData(si_vec.back()) );

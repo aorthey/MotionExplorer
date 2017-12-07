@@ -7,7 +7,6 @@
 #include "pathspace/pathspace_ompl_se2.h"
 #include "pathspace/pathspace_multilevel_SE2.h"
 #include "pathspace/pathspace_multilevel_SE3.h"
-#include "pathspace/pathspace_onetopic_cover.h"
 #include "pathspace/decorator.h"
 #include "pathspace/decorator_sweptvolume_path.h"
 #include "pathspace/decorator_highlighter.h"
@@ -411,11 +410,10 @@ void MotionPlanner::DrawGLScreen(double x_, double y_){
   }
 }
 
-PathPiecewiseLinearSE3* MotionPlanner::GetPath(){
+PathPiecewiseLinear* MotionPlanner::GetPath(){
   if(!active) return NULL;
   Pcurrent = hierarchy->GetNodeContent(current_path);
-  std::vector<Config> path = Pcurrent->GetShortestPath();
-  pwl = PathPiecewiseLinearSE3::from_keyframes(path);
+  pwl = Pcurrent->getShortestPathOMPL();
   return pwl;
 }
 void MotionPlanner::DrawGL(GUIState& state){

@@ -26,6 +26,13 @@ PathSpaceInput* PathSpace::GetPathSpaceInput(){
   return input;
 }
 
+void PathSpace::SetShortestPath(const ob::PathPtr p, CSpaceOMPL *cspace){
+  path_ompl = new PathPiecewiseLinear(p, cspace);
+}
+PathPiecewiseLinear* PathSpace::getShortestPathOMPL(){
+  return path_ompl;
+}
+
 std::vector<Config> PathSpace::GetShortestPath(){
   return vantage_path;
 }

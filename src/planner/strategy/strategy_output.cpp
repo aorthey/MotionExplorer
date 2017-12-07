@@ -31,8 +31,8 @@ ob::ProblemDefinitionPtr StrategyOutput::GetProblemDefinitionPtr(){
 }
 
 std::vector<Config> StrategyOutput::PathGeometricToConfigPath(og::PathGeometric &path){
-  og::PathSimplifier shortcutter(pdef->getSpaceInformation());
-  shortcutter.shortcutPath(path);
+  //og::PathSimplifier shortcutter(pdef->getSpaceInformation());
+  //shortcutter.shortcutPath(path);
   //shortcutter.simplify(path,0.1);
 
   path.interpolate();
@@ -55,13 +55,11 @@ std::vector<Config> StrategyOutput::PathGeometricToConfigPath(og::PathGeometric 
     }else keyframes.push_back(cur);
   }
 
-    //uint istep = max(int(keyframes.size()/10.0),1);
-    //for(uint i = 0; i < keyframes.size(); i+=istep)
-    //{
-    //  std::cout << i << "/" << keyframes.size() << " : "  <<  keyframes.at(i) << std::endl;
-    //}
-    //std::cout << keyframes.size() << "/" << keyframes.size() << " : "  <<  keyframes.back() << std::endl;
   return keyframes;
+}
+
+ob::PathPtr StrategyOutput::getShortestPathOMPL(){
+  return pdef->getSolutionPath();
 }
 
 std::vector<Config> StrategyOutput::GetShortestPath(){

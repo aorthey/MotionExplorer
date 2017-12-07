@@ -15,6 +15,5 @@ class PathPiecewiseLinearEuclidean: public PathPiecewiseLinear
     PathPiecewiseLinearEuclidean();
     static PathPiecewiseLinearEuclidean* from_keyframes(const std::vector<Config> &keyframes);
     static PathPiecewiseLinearEuclidean* from_keyframes(const std::vector<Vector3> &keyframes);
-    virtual void interpolate() override;
 };
 

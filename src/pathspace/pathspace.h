@@ -22,6 +22,10 @@ class PathSpace{
     RoadmapPtr GetRoadmap();
 
     void SetShortestPath(const std::vector<Config>&);
+    void SetShortestPath(const ob::PathPtr p, CSpaceOMPL *cspace);
+
+    PathPiecewiseLinear* getShortestPathOMPL();
+
     void SetVertices(const std::vector<Config>&);
     void SetEdges(const std::vector<std::pair<Config,Config>>&);
     void SetPaths(const std::vector<std::vector<Config>>&);
@@ -46,6 +50,8 @@ class PathSpace{
     std::vector<Config> vertices;
     std::vector<std::pair<Config,Config>> edges;
     std::vector<std::vector<Config>> paths;
+
+    PathPiecewiseLinear *path_ompl;
 
     RobotWorld *world;
     PathSpaceInput *input;

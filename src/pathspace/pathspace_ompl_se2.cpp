@@ -22,7 +22,6 @@ std::vector<PathSpace*> PathSpaceOMPLSE2::Decompose(){
   //Robot *robot = world->robots[robot_idx];
   //SingleRobotCSpace* kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
   CSpaceOMPL *cspace = factory.MakeGeometricCSpaceSE2(world, robot_idx);
-  std::cout << *cspace << std::endl;
 
   StrategyGeometric strategy;
   StrategyOutput output(cspace);
@@ -40,7 +39,8 @@ std::vector<PathSpace*> PathSpaceOMPLSE2::Decompose(){
   if(output.hasExactSolution()){
     std::vector<Config> path = output.GetShortestPath();
     roadmap->SetShortestPath( path );
-    decomposedspace.at(0)->SetShortestPath( path );
+    decomposedspace.at(0)->SetShortestPath( output.getShortestPathOMPL(), cspace );
+    //decomposedspace.at(0)->SetShortestPath( path );
   }
   return decomposedspace;
 }

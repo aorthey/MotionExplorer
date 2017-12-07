@@ -19,12 +19,8 @@ std::vector<PathSpace*> PathSpaceOMPL::Decompose(){
   worldsettings.InitializeDefault(*world);
 
   CSpaceFactory factory(input->GetCSpaceInput());
-
   int robot_idx = input->robot_idx;
-  //Robot *robot = world->robots[robot_idx];
-  //SingleRobotCSpace* kcspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
   CSpaceOMPL *cspace = factory.MakeGeometricCSpace(world, robot_idx);
-  cspace->print();
 
   StrategyGeometric strategy;
   StrategyOutput output(cspace);
@@ -36,7 +32,8 @@ std::vector<PathSpace*> PathSpaceOMPL::Decompose(){
 
   if(output.hasExactSolution()){
     decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    decomposedspace.at(0)->SetShortestPath( output.GetShortestPath() );
+    //decomposedspace.at(0)->SetShortestPath( output.GetShortestPath() );
+    decomposedspace.at(0)->SetShortestPath( output.getShortestPathOMPL(), cspace );
     decomposedspace.at(0)->SetRoadmap( output.GetRoadmapPtr() );
   }else{
     std::cout << "Error: Path could not be expanded" << std::endl;
@@ -54,9 +51,4 @@ void PathSpaceOMPL::DrawGL(GUIState& state){
 
   GLDraw::drawRobotAtConfig(robot, qi, lightGreen);
   GLDraw::drawRobotAtConfig(robot, qg, lightRed);
-
-  //std::vector<Config> init_path; 
-  //init_path.push_back(qi);
-  //init_path.push_back(qg);
-  //GLDraw::drawPath(init_path, lightGreen, 20);
 }

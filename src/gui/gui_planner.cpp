@@ -87,7 +87,7 @@ bool PlannerBackend::OnIdle(){
   if(planners.empty()) return res;
 
   MotionPlanner* planner = planners.at(active_planner);
-  static PathPiecewiseLinearSE3 *path;
+  static PathPiecewiseLinear *path;
   if(state("draw_play_path")){
     if(t<=0){
       path = planner->GetPath();
@@ -134,7 +134,7 @@ void PlannerBackend::RenderWorld(){
       glEnable(GL_LIGHTING);
       glDisable(GL_BLEND); 
     }
-    static PathPiecewiseLinearSE3 *path;
+    static PathPiecewiseLinear *path;
     if(state("draw_play_path")){
       if(t<=0){
         path = planner->GetPath();

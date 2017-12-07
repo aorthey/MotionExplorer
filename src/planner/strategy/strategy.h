@@ -11,6 +11,6 @@ class Strategy{
 
   protected:
     Strategy();
-    void SetSampler(std::string sampler, ob::SpaceInformationPtr si);
+    void setStateSampler(std::string sampler, ob::SpaceInformationPtr si);
 };
 

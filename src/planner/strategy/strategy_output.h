@@ -1,5 +1,6 @@
 #pragma once
 #include "elements/roadmap.h"
+#include "elements/path_pwl.h"
 #include <omplapp/config.h>
 #include <ompl/base/PlannerData.h>
 #include <ompl/base/ProblemDefinition.h>
@@ -26,6 +27,7 @@ struct StrategyOutput{
     ob::ProblemDefinitionPtr GetProblemDefinitionPtr();
 
     std::vector<Config> GetShortestPath();
+    ob::PathPtr getShortestPathOMPL();
     std::vector<std::vector<Config>> GetSolutionPaths();
 
     bool hasExactSolution();

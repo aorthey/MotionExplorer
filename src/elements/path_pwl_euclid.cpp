@@ -5,17 +5,6 @@
 PathPiecewiseLinearEuclidean::PathPiecewiseLinearEuclidean()
 {
 }
-void PathPiecewiseLinearEuclidean::interpolate(){
-  length = 0;
-  interLength.clear();
-  for(uint i = 0; i < Nkeyframes-1; i++){
-    Config q1 = keyframes.at(i);
-    Config q2 = keyframes.at(i+1);
-    double d = (q1-q2).norm();
-    length += d;
-    interLength.push_back(d);
-  }
-}
   
 PathPiecewiseLinearEuclidean* PathPiecewiseLinearEuclidean::from_keyframes(const std::vector<Config> &keyframes){
   PathPiecewiseLinearEuclidean* path = new PathPiecewiseLinearEuclidean();
