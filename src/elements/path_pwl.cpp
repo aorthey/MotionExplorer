@@ -97,9 +97,6 @@ Config PathPiecewiseLinear::Eval(const double t) const{
       return cspace->OMPLStateToConfig(states.back());
     }
 
-    std::cout << "Eval could not find point for value " << t << std::endl;
-    throw;
-
 
   }else{
     if(t<=0) return keyframes.front();
@@ -128,9 +125,9 @@ Config PathPiecewiseLinear::Eval(const double t) const{
       return keyframes.back();
     }
 
-    std::cout << "Eval could not find point for value " << t << std::endl;
-    throw;
   }
+  std::cout << "Eval could not find point for value " << t << std::endl;
+  throw;
 }
 
 void PathPiecewiseLinear::interpolate(){

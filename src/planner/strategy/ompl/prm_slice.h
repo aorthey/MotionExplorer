@@ -37,6 +37,8 @@ namespace ompl
 
         bool isSampled{false};
 
+        static void resetCounter();
+
       protected:
 
         static uint counter;

@@ -11,6 +11,7 @@ PRMMultiSlice::PRMMultiSlice(std::vector<ob::SpaceInformationPtr> &si_vec):
   //
   // => to copy SI, we need to copy statespace and copy validitychecker
 
+  PRMSlice::resetCounter();
   for(uint k = 0; k < si_vec.size(); k++){
     PRMSlice* previous = nullptr;
     if(k>0) previous = slicespaces.back();

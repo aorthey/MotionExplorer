@@ -67,6 +67,9 @@ namespace ompl
   }
 }
 uint PRMSlice::counter = 0;
+void PRMSlice::resetCounter(){
+  PRMSlice::counter = 0;
+}
 
 PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
   og::PRMBasic(si), previous(previous_), M1(si)

@@ -57,7 +57,7 @@
     <name>draw_path_space</name>
     <descr>Draw Path Space</descr>
     <key>g</key>
-    <active>1</active>
+    <active>0</active>
   </checkbox>
   <checkbox>
     <name>draw_sweptvolume</name>
@@ -93,7 +93,7 @@
     <name>draw_roadmap_edges</name>
     <descr>Draw Roadmap Edges</descr>
     <key>2</key>
-    <active>1</active>
+    <active>0</active>
   </checkbox>
   <checkbox>
     <name>draw_play_path</name>
