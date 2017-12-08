@@ -61,6 +61,15 @@ void MotionPlanner::CreateSinglePathHierarchy(){
     Robot* ri = world->robots[ii];
     Robot* ro = world->robots[io];
 
+    if(ri==nullptr){
+      std::cout << "Robot " << ii << " does not exist." << std::endl;
+      exit(0);
+    }
+    if(ro==nullptr){
+      std::cout << "Robot " << io << " does not exist." << std::endl;
+      exit(0);
+    }
+
     Config qi = input.q_init; qi.resize(ri->q.size());
     Config qg = input.q_goal; qg.resize(ri->q.size());
     Config dqi = input.dq_init; dqi.resize(ri->dq.size());

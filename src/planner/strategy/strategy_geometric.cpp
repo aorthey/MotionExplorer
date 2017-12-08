@@ -34,6 +34,7 @@
 #include <ompl/geometric/planners/sbl/SBL.h>
 #include <ompl/geometric/planners/sbl/pSBL.h>
 #include <ompl/geometric/planners/stride/STRIDE.h>
+#include <ompl/geometric/planners/cforest/CForest.h>
 
 #include <ompl/util/Time.h>
 
@@ -91,6 +92,7 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   else if(algorithm=="ompl:spars") ompl_planner = std::make_shared<og::SPARS>(si);
   else if(algorithm=="ompl:spars2") ompl_planner = std::make_shared<og::SPARStwo>(si);
 
+  else if(algorithm=="ompl:cforest") ompl_planner = std::make_shared<og::CForest>(si);
   else if(algorithm=="ompl:stride") ompl_planner = std::make_shared<og::STRIDE>(si);
   else if(algorithm=="ompl:sst") ompl_planner = std::make_shared<og::SST>(si);
   else if(algorithm=="ompl:pdst") ompl_planner = std::make_shared<og::PDST>(si);

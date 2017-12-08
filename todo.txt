@@ -396,5 +396,14 @@ ompl path instead (would also be better for deformations)
 [x] move slice_naive to slice, and create new slice_? which implements some
 improvements like identifying narrow passages for sampling
 [x] fix chart boundary path
-[ ] optimize resulting path
+[ ] optimize resulting path, smooth it
 [ ] visualize each level's solution path!
+[ ] show feasibility of at least one additional joint in SE(3) (three or four
+level planner should be possible)
+[ ] solve Lshape and DoubleLshape in <1s
+  [ ] solve doublelshape in some time T (show that it is indeed feasible) maybe
+make hole bigger
+  [ ] think about better sampling function exploiting underlying graph
+
+[ ] object touched obstacles during play path with multislice.
+[ ] save/load path

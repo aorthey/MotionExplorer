@@ -3,38 +3,32 @@
 <world>
   <robot name="nunchaku" file="/home/aorthey/git/orthoklampt/data/nunchaku/nunchaku.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <terrain  name="onehole.tri" file="/home/aorthey/git/orthoklampt/data/terrains/twohole.tri" translation="0.47 1.5 -1.26"/>
+  <rigidObject  name="onehole.tri" file="/home/aorthey/git/orthoklampt/data/terrains/twohole.tri" translation="0.47 1.5 -1.26"/>
 
-  <plannersettings>
+  <plannerinput>
 
     <qinit config="10   0 -1 0 1.57 0 0 0 0 2.9 0"/>
     <qgoal config="10   0 1 0 1.57 0 0 0 0 -2.9 0"/>
     <se3min config="6   -1e-10 -1 0 1.56 0 0"/>
     <se3max config="6   1e-10  1 0 1.58 0 0"/>
 
+    <robot>0</robot>
+    <freeFloating>1</freeFloating>
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0</epsilongoalregion>
     <maxplanningtime>2</maxplanningtime>
-    <algorithm>ompl:rrt</algorithm>
-    <drawMilestones>10</drawMilestones>
-    <drawSweptVolume>0</drawSweptVolume>
-    <drawStartGoal>1</drawStartGoal>
-    <drawTree>0</drawTree>
-    <robot>
-      <index>0</index>
-    </robot>
 
-  </plannersettings>
+    <sampler name="minimum_clearance"/>
 
-  <forcefield>
-    <!--
-    <radial source="-1.4 0 0" power="3" radius="1.5" color="1 0 1"/>
-    <radial source="1.8 0 0" power="-3" radius="1.5" color="1 0 1"/>
-    <uniform force="0 0 0" color="1 0 0"/> 
-    <robot name="bullet" file="/home/aorthey/git/orthoklampt/data/bullet.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-    -->
-    <uniform force="0 0 -1.71" color="1 0 0"/>
-  </forcefield>
+    <algorithm name="ompl:est"/>
+    <algorithm name="ompl:rrt"/>
+    <algorithm name="hierarchical:ompl:prm_multislice">
+      <hierarchy>
+        <level inner_index="0" outer_index="0" type="SE3"/>
+      </hierarchy>
+    </algorithm>
+
+  </plannerinput>
 
 </world>
 

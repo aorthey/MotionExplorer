@@ -59,7 +59,17 @@ std::vector<Config> StrategyOutput::PathGeometricToConfigPath(og::PathGeometric 
 }
 
 ob::PathPtr StrategyOutput::getShortestPathOMPL(){
-  return pdef->getSolutionPath();
+
+  ob::PathPtr path = pdef->getSolutionPath();
+
+  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+  gpath.interpolate();
+
+  og::PathSimplifier shortcutter(pdef->getSpaceInformation());
+  shortcutter.simplifyMax(gpath);
+  shortcutter.smoothBSpline(gpath);
+
+  return path;
 }
 
 std::vector<Config> StrategyOutput::GetShortestPath(){
