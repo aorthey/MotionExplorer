@@ -13,6 +13,16 @@ struct Layer{
   std::string type;
 };
 
+struct Benchmark{
+  bool isInitialized{false};
+  std::string name;
+  std::string filename;
+  double max_planning_time;
+  double maxmemoryMB;
+  uint Nruns;
+  bool displayProgress;
+};
+
 class PlannerInput{
   public:
     //general input for any planner method (fixed)
@@ -58,5 +68,6 @@ struct PlannerMultiInput{
   std::vector<PlannerInput*> inputs;
   bool load(const char* file);
   bool load(TiXmlElement *node);
+  Benchmark benchmark;
 };
 

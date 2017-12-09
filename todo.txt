@@ -400,8 +400,9 @@ improvements like identifying narrow passages for sampling
 [ ] visualize each level's solution path!
 [ ] show feasibility of at least one additional joint in SE(3) (three or four
 level planner should be possible)
+
 [ ] solve Lshape and DoubleLshape in <1s
-  [ ] solve doublelshape in some time T (show that it is indeed feasible) maybe
+  [x] solve doublelshape in some time T (show that it is indeed feasible) maybe
 make hole bigger
   [ ] think about better sampling function exploiting underlying graph
 

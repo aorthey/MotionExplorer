@@ -14,6 +14,10 @@ void PlannerBackend::AddPlannerInput(PlannerMultiInput& _in){
     std::cout << *_in.inputs.at(k) << std::endl;
     planners.push_back( new MotionPlanner(world, *_in.inputs.at(k)) );
   }
+  if(_in.benchmark.isInitialized){
+    std::cout << "Adding Benchmark" << std::endl;
+    planners.push_back( new MotionPlannerBenchmark(world, _in) );
+  }
 }
 
 void PlannerBackend::Start(){

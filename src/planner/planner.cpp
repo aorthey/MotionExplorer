@@ -308,7 +308,6 @@ void MotionPlanner::Expand(){
   int Nmax=hierarchy->NumberLevels();
   if(current_level<Nmax-1){
     //current_level_node
-
     PathSpace* P = hierarchy->GetNodeContent(current_path);
     if(P->isAtomic()){
       std::cout << "Error: Selected Path Space is Atomic." << std::endl;

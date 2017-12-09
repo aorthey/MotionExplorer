@@ -1,6 +1,7 @@
 #pragma once
 #include "gui/gui.h"
 #include "planner/planner.h"
+#include "planner/planner_benchmark.h"
 
 class PlannerBackend : public ForceFieldBackend
 {

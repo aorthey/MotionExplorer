@@ -18,7 +18,7 @@ class MotionPlanner{
 
   public:
 
-    explicit MotionPlanner(RobotWorld *world_, PlannerInput& input_);
+    MotionPlanner(RobotWorld *world_, PlannerInput& input_);
 
     const PlannerInput& GetInput();
 
@@ -38,6 +38,8 @@ class MotionPlanner{
     void Print();
 
   protected:
+    MotionPlanner() = delete;
+
     //virtual bool solve(std::vector<int> path_idxs);
     //virtual std::vector< std::vector<Config> > GetSiblingPaths();
     void RaiseError();

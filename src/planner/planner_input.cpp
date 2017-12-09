@@ -107,8 +107,53 @@ bool PlannerMultiInput::load(TiXmlElement *node){
     inputs.push_back(input);
     node_algorithm = FindNextSiblingNode(node_algorithm, "algorithm");
   }
+
   for(uint k = 0; k < inputs.size(); k++){
     std::cout << inputs.at(k) << std::endl;
+  }
+
+  //################################################################################
+  // check for benchmarks
+  //################################################################################
+
+  TiXmlElement* node_benchmark = FindFirstSubNode(node_plannerinput, "benchmark");
+  if(node_benchmark!=NULL){
+    benchmark.isInitialized=true;
+    TiXmlElement* node_max_planning_time = FindSubNode(node_benchmark, "maxplanningtime");
+    TiXmlElement* node_memory_mb = FindSubNode(node_benchmark, "maxmemoryMB");
+    TiXmlElement* node_runs = FindSubNode(node_benchmark, "runs");
+    TiXmlElement* node_display_progress = FindSubNode(node_benchmark, "displayProgress");
+    TiXmlElement* node_filename = FindSubNode(node_benchmark, "filename");
+
+    if(!node_max_planning_time){
+      std::cout << "Benchmark needs maxplanningtime variable" << std::endl;
+      exit(0);
+    }
+    if(!node_memory_mb){
+      std::cout << "Benchmark needs maxmemoryMB variable" << std::endl;
+      exit(0);
+    }
+    if(!node_runs){
+      std::cout << "Benchmark needs runs variable" << std::endl;
+      exit(0);
+    }
+
+    GetStreamText(node_max_planning_time) >> benchmark.max_planning_time;
+    GetStreamText(node_memory_mb) >> benchmark.maxmemoryMB;
+    GetStreamText(node_runs) >> benchmark.Nruns;
+    GetStreamText(node_display_progress) >> benchmark.displayProgress;
+    GetStreamAttribute(node_filename,"name") >> benchmark.filename;
+    GetStreamAttribute(node_benchmark,"name") >> benchmark.name;
+
+    // std::cout << "BEnchmark:" << std::endl;
+    // std::cout << benchmark.name << std::endl;
+    // std::cout << benchmark.filename << std::endl;
+    // std::cout << benchmark.Nruns << std::endl;
+    // std::cout << benchmark.max_planning_time << std::endl;
+    // std::cout << benchmark.maxmemoryMB << std::endl;
+    // std::cout << benchmark.displayProgress << std::endl;
+    // exit(0);
+
   }
   return true;
 }
