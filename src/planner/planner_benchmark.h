@@ -9,10 +9,14 @@ class MotionPlannerBenchmark: public MotionPlanner{
 
     explicit MotionPlannerBenchmark(RobotWorld *world_, PlannerMultiInput& input_);
 
-    virtual void Expand();
-    virtual void Collapse();
-    virtual void Next();
-    virtual void Previous();
+    virtual void Expand() override;
+    virtual void Collapse() override;
+    virtual void Next() override;
+    virtual void Previous() override;
+
+    virtual std::string getName() const override;
+  protected:
+    PlannerMultiInput multi_input;
 
 };
 

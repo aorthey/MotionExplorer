@@ -37,6 +37,8 @@ class MotionPlanner{
     bool isActive();
     void Print();
 
+    virtual std::string getName() const;
+
   protected:
     MotionPlanner() = delete;
 

@@ -273,7 +273,6 @@ ob::PathPtr PRMBasic::constructSolution(const Vertex &start, const Vertex &goal)
       return NULL;
     }
 
-    //last_vertex_path.clear();
     for (Vertex pos = goal; prev[pos] != pos; pos = prev[pos]){
       p->append(stateProperty_[pos]);
     }

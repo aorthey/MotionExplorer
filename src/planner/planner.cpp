@@ -46,6 +46,9 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
     active = false;
   }
 }
+std::string MotionPlanner::getName() const{
+  return input.name_algorithm;
+}
 
 void MotionPlanner::CreateSinglePathHierarchy(){
 

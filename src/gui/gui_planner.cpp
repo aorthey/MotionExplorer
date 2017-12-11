@@ -10,13 +10,12 @@ PlannerBackend::PlannerBackend(RobotWorld *world) :
 }
 
 void PlannerBackend::AddPlannerInput(PlannerMultiInput& _in){
+  if(_in.benchmark.isInitialized){
+    planners.push_back( new MotionPlannerBenchmark(world, _in) );
+  }
   for(uint k = 0; k < _in.inputs.size(); k++){
     std::cout << *_in.inputs.at(k) << std::endl;
     planners.push_back( new MotionPlanner(world, *_in.inputs.at(k)) );
-  }
-  if(_in.benchmark.isInitialized){
-    std::cout << "Adding Benchmark" << std::endl;
-    planners.push_back( new MotionPlannerBenchmark(world, _in) );
   }
 }
 
@@ -212,7 +211,7 @@ void PlannerBackend::RenderScreen(){
   line = "Planners       : ";
   for(uint k = 0; k < planners.size(); k++){
     if(k==active_planner) line += "[";
-    line += planners.at(k)->GetInput().name_algorithm + " ";
+    line += planners.at(k)->getName() + " ";
     if(k==active_planner) line += "]";
   }
   DrawText(line_x_pos,line_y_offset,line);

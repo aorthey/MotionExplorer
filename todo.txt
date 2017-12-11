@@ -404,7 +404,10 @@ level planner should be possible)
 [ ] solve Lshape and DoubleLshape in <1s
   [x] solve doublelshape in some time T (show that it is indeed feasible) maybe
 make hole bigger
-  [ ] think about better sampling function exploiting underlying graph
 
+[ ] check if connect function performs as desired! (does constructSolution lie
+on graph!?)
+[ ] think about better sampling function exploiting underlying graph
+[ ] enable benchmark
 [ ] object touched obstacles during play path with multislice.
 [ ] save/load path
