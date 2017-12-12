@@ -5,8 +5,8 @@
 using namespace og;
 
 template <class T>
-PRMMultiSlice<T>::PRMMultiSlice(std::vector<ob::SpaceInformationPtr> &si_vec):
-  ob::Planner(si_vec.back(),"PRMMultiSlice")
+PRMMultiSlice<T>::PRMMultiSlice(std::vector<ob::SpaceInformationPtr> &si_vec, std::string type):
+  ob::Planner(si_vec.back(),"PRMMultiSlice"+type)
 {
   //SpaceInformationPtr contains StateSpacePtr + ValidityChecker
   // and its native StateSampler, inherited by the OMPL StateSpace

@@ -51,9 +51,6 @@ namespace ompl
 
         bool SampleGraph(ob::State *workState);
 
-        ob::PathPtr GetShortestPathOffsetVertices( const ob::State *qa, const ob::State *qb, 
-          const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb);
-
         virtual Vertex addMilestone(ob::State *state) override;
 
         void mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1);
@@ -69,7 +66,7 @@ namespace ompl
         uint M1_subspaces;
         uint C1_subspaces;
 
-        PRMSlice *previous;
+        PRMSlice *previous{nullptr};
 
     };
 

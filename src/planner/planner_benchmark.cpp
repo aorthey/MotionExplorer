@@ -9,12 +9,12 @@ MotionPlannerBenchmark::MotionPlannerBenchmark(RobotWorld *world_, PlannerMultiI
 }
 
 void MotionPlannerBenchmark::Expand(){
-  //ot::Benchmark benchmark(ss, "BenchmarkHumanoidWall");
   for(uint k = 0; k < multi_input.inputs.size(); k++){
     PlannerInput *in = multi_input.inputs.at(k);
     std::cout << "adding algorithm " << in->name_algorithm << std::endl;
   }
   exit(0);
+  //ot::Benchmark benchmark(ss, "BenchmarkHumanoidWall");
   ////benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::PDST>(si)));
   ////benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::SST>(si)));
   ////benchmark.addPlanner(ob::PlannerPtr(std::make_shared<oc::KPIECE1>(si)));

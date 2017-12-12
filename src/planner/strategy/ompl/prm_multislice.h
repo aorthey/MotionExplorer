@@ -14,7 +14,7 @@ namespace ompl
         static_assert(std::is_base_of<og::PRMSlice, T>::value, "Template must inherit from PRMSlice");
 
       public:
-        PRMMultiSlice(std::vector<ob::SpaceInformationPtr> &si_vec);
+        PRMMultiSlice(std::vector<ob::SpaceInformationPtr> &si_vec, std::string type = "");
 
         ~PRMMultiSlice() override;
 

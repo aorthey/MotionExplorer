@@ -432,15 +432,6 @@ bool PRMSlice::SampleGraph(ob::State *workState){
 
   M1->getStateSpace()->interpolate(from, to, t, workState);
 
-  // if(DEBUG){
-  //   std::cout << "SampleGraph" << std::endl;
-  //   std::cout << v1 << std::endl;
-  //   std::cout << v2 << std::endl;
-  //   si_->printState(from);
-  //   si_->printState(to);
-  //   M1->printState(workState);
-  // }
-
   lastSourceVertexSampled = v1;
   lastTargetVertexSampled = v2;
   lastTSampled = t;

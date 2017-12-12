@@ -3,9 +3,9 @@
 #include "planner/strategy/ompl/prm_basic.h"
 #include "planner/strategy/ompl/prm_multislice.h"
 #include "planner/strategy/ompl/prm_slice.h"
+#include "planner/strategy/ompl/prm_slice_connect.h"
 
 #include <ompl/base/goals/GoalState.h>
-#include <ompl/geometric/SimpleSetup.h>
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/util/Time.h>
 
@@ -43,6 +43,11 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef_vec.push_back(pdefk);
   }
 
+  CSpaceOMPL *cspace = input.cspace_levels.back();
+  og::SimpleSetup ss(cspace->SpaceInformationPtr());
+
+  const ob::SpaceInformationPtr si = si_vec.back();
+
   //###########################################################################
   // choose planner
   //###########################################################################
@@ -61,6 +66,10 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   }else if(algorithm=="ompl:prm_multislice"){
     typedef og::PRMMultiSlice<og::PRMSlice> MultiSlice;
     planner = std::make_shared<MultiSlice>(si_vec);
+    static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="ompl:prm_multislice_connect"){
+    typedef og::PRMMultiSlice<og::PRMSliceConnect> MultiSlice;
+    planner = std::make_shared<MultiSlice>(si_vec, "Connect");
     static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
