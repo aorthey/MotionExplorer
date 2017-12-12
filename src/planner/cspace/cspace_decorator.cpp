@@ -31,7 +31,7 @@ void CSpaceOMPLDecorator::initSpace(){
 void CSpaceOMPLDecorator::initControlSpace(){
   cspace_ompl->initControlSpace();
 }
-void CSpaceOMPLDecorator::print(){
+void CSpaceOMPLDecorator::print() const{
   cspace_ompl->print();
 }
 const ob::StateSpacePtr CSpaceOMPLDecorator::SpacePtr(){

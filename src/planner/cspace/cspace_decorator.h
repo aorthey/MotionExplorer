@@ -12,7 +12,7 @@ class CSpaceOMPLDecorator: public CSpaceOMPL
 
     virtual void initSpace();
     virtual void initControlSpace();
-    virtual void print();
+    virtual void print() const override;
 
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
 

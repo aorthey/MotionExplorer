@@ -31,6 +31,8 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     ob::ScopedState<> startk = cspace_levelk->ConfigToOMPLState(p_init);
     ob::ScopedState<> goalk  = cspace_levelk->ConfigToOMPLState(p_goal);
 
+    std::cout << *cspace_levelk << std::endl;
+
     ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
     pdefk->addStartState(startk);
     auto goal=std::make_shared<ob::GoalState>(sik);
@@ -43,10 +45,8 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef_vec.push_back(pdefk);
   }
 
-  CSpaceOMPL *cspace = input.cspace_levels.back();
-  og::SimpleSetup ss(cspace->SpaceInformationPtr());
-
   const ob::SpaceInformationPtr si = si_vec.back();
+  og::SimpleSetup ss(si);
 
   //###########################################################################
   // choose planner
@@ -71,34 +71,98 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     typedef og::PRMMultiSlice<og::PRMSliceConnect> MultiSlice;
     planner = std::make_shared<MultiSlice>(si_vec, "Connect");
     static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="ompl:benchmark"){
+
+    ot::Benchmark benchmark(ss, "Benchmark");
+
+    typedef og::PRMMultiSlice<og::PRMSlice> MultiSlice;
+    planner = std::make_shared<MultiSlice>(si_vec);
+    static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
+    benchmark.addPlanner(planner);
+    planner = std::make_shared<og::RRTPlain>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
+    benchmark.addPlanner(planner);
+
+
+
+    ob::ProblemDefinitionPtr pdef = pdef_vec.back();
+    CSpaceOMPL *cspace = input.cspace_levels.back();
+    ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
+    ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
+    ss.setStartAndGoalStates(start,goal,input.epsilon_goalregion);
+    ss.setup();
+
+    pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
+
+    ot::Benchmark::Request req;
+    req.maxTime = 5;
+    req.maxMem = 10000.0;
+    req.runCount = 5;
+    req.displayProgress = true;
+
+    benchmark.benchmark(req);
+
+    std::string file = "ompl_benchmarky";
+    std::string res = file+".log";
+    benchmark.saveResultsToFile(res.c_str());
+
+    std::string cmd = "ompl_benchmark_statistics.py "+file+".log -d "+file+".db";
+    std::system(cmd.c_str());
+    cmd = "cp "+file+".db"+" ../data/benchmarks/";
+    std::system(cmd.c_str());
+
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);
   }
 
-  planner->setup();
+  //ss.setStartState(start);
+  //ss.setGoal(input.GetGoalPtr(si));
 
-  //###########################################################################
-  // solve
-  //
-  // termination condition: 
-  //    reached duration or found solution in epsilon-neighborhood
-  //###########################################################################
+  ss.setPlanner(planner);
+  ss.setup();
+  //ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
+
+  ob::ProblemDefinitionPtr pdef = ss.getProblemDefinition();
+  pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
   double max_planning_time= input.max_planning_time;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
-  ompl::time::point start = ompl::time::now();
-  ob::PlannerStatus status = planner->solve(ptc);
-  output.planner_time = ompl::time::seconds(ompl::time::now() - start);
+  ompl::time::point t_start = ompl::time::now();
+  ob::PlannerStatus status = ss.solve(ptc);
+  output.planner_time = ompl::time::seconds(ompl::time::now() - t_start);
   output.max_planner_time = max_planning_time;
 
-  //###########################################################################
-
-  ob::PlannerDataPtr pd( new ob::PlannerData(si_vec.back()) );
-  planner->getPlannerData(*pd);
-
+  ob::PlannerDataPtr pd( new ob::PlannerData(si) );
+  ss.getPlannerData(*pd);
   output.SetPlannerData(pd);
-  output.SetProblemDefinition(pdef_vec.back());
+  output.SetProblemDefinition(pdef);
+
+  //  without SimpleSetup
+//  planner->setup();
+//
+//  //###########################################################################
+//  // solve
+//  //
+//  // termination condition: 
+//  //    reached duration or found solution in epsilon-neighborhood
+//  //###########################################################################
+//
+//  double max_planning_time= input.max_planning_time;
+//  ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
+//
+//  ompl::time::point start = ompl::time::now();
+//  ob::PlannerStatus status = planner->solve(ptc);
+//  output.planner_time = ompl::time::seconds(ompl::time::now() - start);
+//  output.max_planner_time = max_planning_time;
+//
+//  //###########################################################################
+//
+//  ob::PlannerDataPtr pd( new ob::PlannerData(si_vec.back()) );
+//  planner->getPlannerData(*pd);
+//
+//  output.SetPlannerData(pd);
+//  output.SetProblemDefinition(pdef_vec.back());
 
 }

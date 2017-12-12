@@ -275,7 +275,7 @@ void GeometricCSpaceOMPL::initControlSpace()
   control_space->setBounds(cbounds);
 }
 
-void GeometricCSpaceOMPL::print()
+void GeometricCSpaceOMPL::print() const
 {
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "OMPL CSPACE" << std::endl;
@@ -486,7 +486,7 @@ KinodynamicCSpaceOMPL::KinodynamicCSpaceOMPL(Robot *robot_, CSpace *kspace_):
 
 }
 
-void KinodynamicCSpaceOMPL::print()
+void KinodynamicCSpaceOMPL::print() const
 {
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "OMPL CSPACE" << std::endl;
@@ -882,11 +882,13 @@ std::ostream& operator<< (std::ostream& out, const CSpaceOMPL& space)
   out << std::string(80, '-') << std::endl;
   out << "[ConfigurationSpace]" << std::endl;
   out << std::string(80, '-') << std::endl;
+  std::cout << "Robot                    : " << space.robot->name << std::endl;
   std::cout << "Dimensionality (OMPL)    : " << space.GetDimensionality() << std::endl;
-  //uint ii = space.input.robot_inner_idx;
-  //uint io = space.input.robot_outer_idx;
-  //std::cout << " robot inner : " << ii << " " << space.world->robots[ii]->name << std::endl;
-  //std::cout << " robot outer : " << io << " " << space.world->robots[io]->name << std::endl;
+  std::cout << "Dimensionality (Klampt)  : " << space.robot->q.size() << std::endl;
+  //space.space->printSettings(std::cout);
+  std::cout << "OMPL Representation      : " << std::endl;
+  space.space->diagram(std::cout << "   ");
+
   out << std::string(80, '-') << std::endl;
   return out;
 }

@@ -51,7 +51,7 @@ class CSpaceOMPL
 
     virtual void initSpace() = 0;
     virtual void initControlSpace() = 0;
-    virtual void print() = 0;
+    virtual void print() const = 0;
 
     friend std::ostream& operator<< (std::ostream& out, const CSpaceOMPL& space);
 
@@ -118,7 +118,7 @@ class GeometricCSpaceOMPL: public CSpaceOMPL
 
     virtual Config OMPLStateToConfig(const ob::State *qompl) override;
     Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState);
-    virtual void print() override;
+    virtual void print() const override;
 
   protected:
     bool hasRealVectorSpace;
@@ -148,6 +148,7 @@ class KinodynamicCSpaceOMPL: public CSpaceOMPL
 
     Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState, const ob::RealVectorStateSpace::StateType *qomplTMState);
 
-    virtual void print();
+    virtual void print() const override;
+
 };
 

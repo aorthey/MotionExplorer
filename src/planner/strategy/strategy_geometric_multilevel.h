@@ -1,5 +1,6 @@
 #pragma once
 #include "planner/strategy/strategy.h"
+#include "planner/strategy/strategy_geometric.h"
 #include <omplapp/apps/SE3RigidBodyPlanning.h>
 #include <omplapp/config.h>
 
@@ -15,7 +16,7 @@ static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInf
   obj->setCostThreshold(ob::Cost(dInf));
   return obj;
 }
-class StrategyGeometricMultiLevel: public Strategy{
+class StrategyGeometricMultiLevel: public StrategyGeometric{
   public:
     virtual void plan( const StrategyInput &input, StrategyOutput &output);
 
