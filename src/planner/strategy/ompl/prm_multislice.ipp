@@ -3,7 +3,9 @@
 #include <queue>
 
 using namespace og;
-PRMMultiSlice::PRMMultiSlice(std::vector<ob::SpaceInformationPtr> &si_vec):
+
+template <class T>
+PRMMultiSlice<T>::PRMMultiSlice(std::vector<ob::SpaceInformationPtr> &si_vec):
   ob::Planner(si_vec.back(),"PRMMultiSlice")
 {
   //SpaceInformationPtr contains StateSpacePtr + ValidityChecker
@@ -11,12 +13,12 @@ PRMMultiSlice::PRMMultiSlice(std::vector<ob::SpaceInformationPtr> &si_vec):
   //
   // => to copy SI, we need to copy statespace and copy validitychecker
 
-  PRMSlice::resetCounter();
+  T::resetCounter();
   for(uint k = 0; k < si_vec.size(); k++){
-    PRMSlice* previous = nullptr;
+    T* previous = nullptr;
     if(k>0) previous = slicespaces.back();
 
-    PRMSlice* ss = new PRMSlice(si_vec.at(k), previous);
+    T* ss = new T(si_vec.at(k), previous);
     slicespaces.push_back(ss);
   }
 
@@ -24,25 +26,27 @@ PRMMultiSlice::PRMMultiSlice(std::vector<ob::SpaceInformationPtr> &si_vec):
 
 }
 
-PRMMultiSlice::~PRMMultiSlice(){
+template <class T>
+PRMMultiSlice<T>::~PRMMultiSlice(){
 }
 
 
-ob::PlannerStatus PRMMultiSlice::solve(const base::PlannerTerminationCondition &ptc){
+template <class T>
+ob::PlannerStatus PRMMultiSlice<T>::solve(const base::PlannerTerminationCondition &ptc){
   
   static const double ROADMAP_BUILD_TIME = 0.01;
 
-  auto cmp = [](PRMSlice* left, PRMSlice* right) 
+  auto cmp = [](T* left, T* right) 
               { 
                 return left->getSamplingDensity() > right->getSamplingDensity();
               };
 
-  std::priority_queue<PRMSlice*, std::vector<PRMSlice*>, decltype(cmp)> Q(cmp);
+  std::priority_queue<T*, std::vector<T*>, decltype(cmp)> Q(cmp);
 
   for(uint k = 0; k < slicespaces.size(); k++){
     base::PathPtr sol_k;
     foundKLevelSolution = false;
-    PRMSlice *kslice = slicespaces.at(k);
+    T *kslice = slicespaces.at(k);
     kslice->Init();
 
     Q.push(kslice);
@@ -53,7 +57,7 @@ ob::PlannerStatus PRMMultiSlice::solve(const base::PlannerTerminationCondition &
     ompl::time::point t_k_start = ompl::time::now();
     while (!ptcOrSolutionFound())
     {
-      PRMSlice* jslice = Q.top();
+      T* jslice = Q.top();
       Q.pop();
       jslice->Grow(ROADMAP_BUILD_TIME);
 
@@ -77,7 +81,7 @@ ob::PlannerStatus PRMMultiSlice::solve(const base::PlannerTerminationCondition &
   }
 
 //set pdef solution path!
-  PRMSlice *fullspace = slicespaces.back();
+  T *fullspace = slicespaces.back();
   base::PathPtr sol;
   fullspace->checkForSolution(sol);
   if (sol)
@@ -91,15 +95,17 @@ ob::PlannerStatus PRMMultiSlice::solve(const base::PlannerTerminationCondition &
   return ob::PlannerStatus::EXACT_SOLUTION;
 }
 
-void PRMMultiSlice::setup(){
+template <class T>
+void PRMMultiSlice<T>::setup(){
   Planner::setup();
   for(uint k = 0; k < slicespaces.size(); k++){
-    PRMSlice *sk = slicespaces.at(k);
+    T *sk = slicespaces.at(k);
     sk->setup();
   }
 }
 
-void PRMMultiSlice::setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef){
+template <class T>
+void PRMMultiSlice<T>::setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef){
 
   assert(pdef.size() == slicespaces.size());
 
@@ -111,9 +117,10 @@ void PRMMultiSlice::setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &
   }
 }
 
-void PRMMultiSlice::getPlannerData(ob::PlannerData &data) const{
+template <class T>
+void PRMMultiSlice<T>::getPlannerData(ob::PlannerData &data) const{
   //Planner::getPlannerData(data);
-  PRMSlice *sb = slicespaces.back();
+  T *sb = slicespaces.back();
   sb->getPlannerData(data);
 }
 

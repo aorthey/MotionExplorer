@@ -407,7 +407,7 @@ make hole bigger
 
 [ ] check if connect function performs as desired! (does constructSolution lie
 on graph!?)
-[ ] think about better sampling function exploiting underlying graph
 [ ] enable benchmark
+[ ] think about better sampling function exploiting underlying graph
 [ ] object touched obstacles during play path with multislice.
 [ ] save/load path

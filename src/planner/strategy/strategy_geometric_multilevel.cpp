@@ -59,8 +59,9 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     planner = std::make_shared<og::PRMSlice>(si_vec.back(),nullptr);
     planner->setProblemDefinition(pdef_vec.back());
   }else if(algorithm=="ompl:prm_multislice"){
-    planner = std::make_shared<og::PRMMultiSlice>(si_vec);
-    static_pointer_cast<og::PRMMultiSlice>(planner)->setProblemDefinition(pdef_vec);
+    typedef og::PRMMultiSlice<og::PRMSlice> MultiSlice;
+    planner = std::make_shared<MultiSlice>(si_vec);
+    static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);

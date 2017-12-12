@@ -13,13 +13,13 @@ namespace ompl
   }
   namespace geometric
   {
-    class PRMSlice: public og::PRMBasic{
+    class PRMSliceConnect: public og::PRMBasic{
 
       public:
 
-        PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_);
+        PRMSliceConnect(const ob::SpaceInformationPtr &si, PRMSliceConnect *previous_);
 
-        ~PRMSlice() override;
+        ~PRMSliceConnect() override;
 
         void getPlannerData(base::PlannerData &data) const override;
 
@@ -69,7 +69,7 @@ namespace ompl
         uint M1_subspaces;
         uint C1_subspaces;
 
-        PRMSlice *previous;
+        PRMSliceConnect *previous;
 
     };
 

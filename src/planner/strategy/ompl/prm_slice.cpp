@@ -154,8 +154,6 @@ PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
     }
 
   }
-  //const StateValidityCheckerPtr checker = si->getStateValidityChecker();
-  //C1->setStateValidityChecker(checker);
 
 }
 
@@ -256,8 +254,6 @@ void PRMSlice::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const{
       sM0_comps[2]->as<ob::SO2StateSpace::StateType>()->value = EulerXYZ.at(1);
 
       //std::cout << "special case" << std::endl;
-      //M1->printState(q);
-      //previous->getSpaceInformation()->printState(qM0);
 
     }else{
       for(uint k = 0; k < M0_subspaces; k++){
@@ -269,7 +265,7 @@ void PRMSlice::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const{
   }
 }
 
-void PRMSlice::mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1){
+void PRMSlice::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1){
   //input : qM0 \in M0, qC1 \in C1
   //output: qM1 = qM0 \circ qC1 \in M1
   ob::State **qM1_comps = qM1->as<CompoundState>()->components;
@@ -292,10 +288,6 @@ void PRMSlice::mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1){
 
     CSpaceOMPL::OMPLSO3StateSpaceFromEulerXYZ(r, p, y, qM1_comps[1]->as<ob::SO3StateSpace::StateType>() );
 
-    //previous->getSpaceInformation()->printState(qM0);
-    //C1->printState(qC1);
-    //M1->printState(qM1);
-    //exit(0);
   }else{
     if(M0_subspaces > 1){
       ob::State **sM0_comps = qM0->as<CompoundState>()->components;
@@ -384,18 +376,51 @@ bool PRMSlice::Sample(ob::State *workState){
 
 bool PRMSlice::SampleGraph(ob::State *workState){
   PDF<Edge> pdf;
+  Vertex v1o,v2o;
   foreach (Edge e, boost::edges(g_))
   {
     ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
     pdf.add(e, weight.value());
     const Vertex v1 = boost::source(e, g_);
     const Vertex v2 = boost::target(e, g_);
-    //std::cout << "Edge: (" << v1 << "," << v2 << ") weight: "<<weight.value() << std::endl;
+
+    // if(DEBUG){
+    //   if(v1o==v1 && v2o==v2){
+    //     std::cout << std::string(80, '-') << std::endl;
+    //     std::cout << "Double edge (num edges: " << num_edges(g_) << ")" << std::endl;
+    //     std::cout << "Edge: (" << v1 << "," << v2 << ") weight: "<<weight.value() << std::endl;
+    //     std::cout << std::string(80, '-') << std::endl;
+    //     uint ctr = 0;
+    //     foreach (Edge e, boost::edges(g_))
+    //     {
+    //       ctr++;
+    //     }
+    //     std::cout << "edges counted: " << ctr << std::endl;
+    //     exit(0);
+    //   }
+    //   if(v1o==v2 && v2o==v1){
+    //     std::cout << std::string(80, '-') << std::endl;
+    //     std::cout << "Double edge (num edges: " << num_edges(g_) << ")" << std::endl;
+    //     std::cout << "Edge: (" << v1 << "," << v2 << ") weight: "<<weight.value() << std::endl;
+    //     std::cout << std::string(80, '-') << std::endl;
+    //     uint ctr = 0;
+    //     foreach (Edge e, boost::edges(g_))
+    //     {
+    //       ctr++;
+    //     }
+    //     std::cout << "edges counted: " << ctr << std::endl;
+    //     exit(0);
+    //   }
+
+    //   v1o = v1;
+    //   v2o = v2;
+    // }
   }
   if(pdf.empty()){
     std::cout << "cannot sample empty(?) graph" << std::endl;
     exit(0);
   }
+
   Edge e = pdf.sample(rng_.uniform01());
   double t = rng_.uniform01();
 
@@ -404,12 +429,17 @@ bool PRMSlice::SampleGraph(ob::State *workState){
   const ob::State *from = stateProperty_[v1];
   const ob::State *to = stateProperty_[v2];
 
-  std::cout << "SampleGraph" << std::endl;
-  std::cout << v1 << std::endl;
-  std::cout << v2 << std::endl;
-  si_->printState(from);
-  si_->printState(to);
+
   M1->getStateSpace()->interpolate(from, to, t, workState);
+
+  // if(DEBUG){
+  //   std::cout << "SampleGraph" << std::endl;
+  //   std::cout << v1 << std::endl;
+  //   std::cout << v2 << std::endl;
+  //   si_->printState(from);
+  //   si_->printState(to);
+  //   M1->printState(workState);
+  // }
 
   lastSourceVertexSampled = v1;
   lastTargetVertexSampled = v2;
@@ -423,301 +453,9 @@ bool PRMSlice::SampleGraph(ob::State *workState){
 
 double PRMSlice::Distance(const Vertex a, const Vertex b) const
 {
-  if(previous == nullptr){
-    return si_->distance(stateProperty_[a], stateProperty_[b]);
-  }else{
-    ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
-
-    ob::State* qa = stateProperty_[a];
-    ob::State* qb = stateProperty_[b];
-
-    ob::State* qaC1 = C1->allocState();
-    ob::State* qbC1 = C1->allocState();
-    ob::State* qaM0 = M0->allocState();
-    ob::State* qbM0 = M0->allocState();
-
-    ExtractC1Subspace(qa, qaC1);
-    ExtractC1Subspace(qb, qbC1);
-    ExtractM0Subspace(qa, qaM0);
-    ExtractM0Subspace(qb, qbM0);
-
-    const Vertex vsaM0 = associatedVertexSourceProperty_[a];
-    const Vertex vsbM0 = associatedVertexSourceProperty_[b];
-    const Vertex vtaM0 = associatedVertexTargetProperty_[a];
-    const Vertex vtbM0 = associatedVertexTargetProperty_[b];
-
-    double ta = associatedTProperty_[a];
-    double tb = associatedTProperty_[b];
-
-    ob::PathPtr sol = previous->GetShortestPathOffsetVertices( qaM0, qbM0, vsaM0, vsbM0, vtaM0, vtbM0);
-    double d0 = +dInf;
-    if(sol!=nullptr){
-      d0 = sol->length();
-    }
-    std::cout << "path distance: " << d0 << std::endl;
-
-    double d1 = C1->distance(qaC1, qbC1);
-
-    C1->freeState(qaC1);
-    C1->freeState(qbC1);
-    M0->freeState(qaM0);
-    M0->freeState(qbM0);
-
-    return d0 + d1;
-    //return si_->distance(stateProperty_[a], stateProperty_[b]);
-  }
-}
-
-ob::PathPtr PRMSlice::GetShortestPathOffsetVertices( ob::State *qa, ob::State *qb, 
-  const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb)
-{
-  //###########################################################################
-  //construct modified graph
-  //###########################################################################
-
-  std::pair<Edge,bool> edge_a = boost::edge(vsa,vta,g_);
-  std::pair<Edge,bool> edge_b = boost::edge(vsb,vtb,g_);
-
-  Vertex va;
-  Vertex vb;
-
-  if(vsa!=vta && vsb!=vtb){
-    const Edge ea = edge_a.first;
-    const Edge eb = edge_b.first;
-    if(ea==eb){
-      ob::PathPtr path = std::make_shared<og::PathGeometric>(si_, qa, qb);
-      return path;
-    }
-  }
-  if( (vsa==vta && vsa==vsb) ||
-      (vsa==vta && vsa==vtb) ||
-      (vsb==vtb && vsb==vsa) ||
-      (vsb==vtb && vsb==vta)){
-    ob::PathPtr path = std::make_shared<og::PathGeometric>(si_, qa, qb);
-    return path;
-  }
-
-  bool isAonEdge = true;
-  bool isBonEdge = true;
-  if(vsa==vta) isAonEdge = false;
-  if(vsb==vtb) isBonEdge = false;
-
-  ob::Cost dsa,dta,dsb,dtb;
-
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "vertices: " << num_vertices(g_) << std::endl;
-  std::cout << "edges: " << num_edges(g_) << std::endl;
-
-  //boost::write_graphviz(std::cout, g_);
-  std::cout << "vsa: " << vsa << std::endl;
-  std::cout << "vta: " << vta << std::endl;
-  std::cout << "vsb: " << vsb << std::endl;
-  std::cout << "vtb: " << vtb << std::endl;
-
-
-  if(isAonEdge){
-    const Edge ea = edge_a.first;
-    remove_edge(vsa, vta, g_);
-    va = add_vertex(g_);
-    stateProperty_[va] = qa;
-
-    dsa = opt_->motionCost(stateProperty_[vsa], stateProperty_[va]);
-    dta = opt_->motionCost(stateProperty_[va], stateProperty_[vta]);
-    boost::add_edge(vsa, va, EdgeProperty(dsa), g_);
-    boost::add_edge(va, vta, EdgeProperty(dta), g_);
-    uniteComponents(vsa, va);
-    uniteComponents(va, vta);
-    std::cout << "added edge vsa-va-vta" << std::endl;
-  }else{
-    va = vsa;
-    stateProperty_[va] = qa;
-  }
-
-  if(isBonEdge){
-    const Edge eb = edge_b.first;
-    EdgeProperty ep = get(boost::edge_weight_t(), g_, eb);
-    ob::Cost weight = ep.getCost();
-
-    remove_edge(vsb, vtb, g_);
-    vb = add_vertex(g_);
-    stateProperty_[vb] = qb;
-
-    dsb = opt_->motionCost(stateProperty_[vsb], stateProperty_[vb]);
-    dtb = opt_->motionCost(stateProperty_[vb], stateProperty_[vtb]);
-    boost::add_edge(vsb, vb, EdgeProperty(dsb), g_);
-    boost::add_edge(vb, vtb, EdgeProperty(dtb), g_);
-    uniteComponents(vsb, vb);
-    uniteComponents(vb, vtb);
-
-    std::cout << "added edge vsb-vb-vtb" << std::endl;
-    std::cout << "dist: vsb-vb: " << dsb.value() << std::endl;
-    std::cout << "dist: vb-vtb: " << dtb.value() << std::endl;
-  }else{
-    vb = vsb;
-    stateProperty_[vb] = qb;
-  }
-
-
-  //###########################################################################
-  //search in modified graph
-  //###########################################################################
-  std::cout << "va: " << va << std::endl;
-  std::cout << "vb: " << vb << std::endl;
-  //boost::write_graphviz(std::cout, g_);
-  si_->printState(qa);
-  si_->printState(stateProperty_[vsa]);
-  si_->printState(stateProperty_[vta]);
-  si_->printState(qb);
-  si_->printState(stateProperty_[vsb]);
-  si_->printState(stateProperty_[vtb]);
-
-  std::cout << "heuristics:" << std::endl;
-  std::cout << opt_->motionCostHeuristic(stateProperty_[vta], stateProperty_[vsa]).value() << std::endl;
-  std::cout << opt_->motionCostHeuristic(stateProperty_[vtb], stateProperty_[vsb]).value() << std::endl;
-  std::cout << opt_->motionCostHeuristic(stateProperty_[va], stateProperty_[vb]).value() << std::endl;
-
-  ob::Cost dd = opt_->motionCost(qa,qb);
-  std::cout << dd.value() << std::endl;
-
-  bool same_component = sameComponent(va, vb);
-  ob::PathPtr sol = nullptr;
-  if(same_component){
-    std::cout << "c1" << std::endl;
-    sol = constructSolution(vsa, vsb);
-    std::cout << "c2" << std::endl;
-    sol = constructSolution(va, vb);
-  }else{
-    std::cout << "not same component" << std::endl;
-    exit(0);
-  }
-  // std::cout << "Edge connection: " << ea << "<->" << eb << std::endl;
-  // sol->print(std::cout);
-  // og::PathGeometric path = static_cast<og::PathGeometric&>(*sol);
-  // std::vector<ob::State *> states = path.getStates();
-  // std::cout << "GetPathOffset states: " << states.size() << std::endl;
-
-  //###########################################################################
-  //return to former graph
-  //###########################################################################
-  if(isAonEdge){
-    std::cout << "rm edge vsa-va-vta" << std::endl;
-    boost::remove_edge(vsa, va, g_);
-    boost::remove_edge(va, vta, g_);
-    clear_vertex(va, g_);
-    remove_vertex(va, g_);
-    boost::add_edge(vsa, vta, EdgeProperty(ob::Cost(dsa.value()+dta.value())), g_);
-    uniteComponents(vsa, vta);
-  }
-  if(isBonEdge){
-    std::cout << "rm edge vsb-vb-vtb" << std::endl;
-    boost::remove_edge(vsb, vb, g_);
-    boost::remove_edge(vb, vtb, g_);
-    clear_vertex(vb, g_);
-    remove_vertex(vb, g_);
-    boost::add_edge(vsb, vtb, EdgeProperty(ob::Cost(dsb.value()+dtb.value())), g_);
-    std::pair<Edge,bool> edge_b = boost::edge(vsb,vtb,g_);
-    //std::cout << "new edge:" << edge_b.first.getCost() << std::endl;
-    uniteComponents(vsb, vtb);
-  }
-  //write_graphviz(std::cout, g_);
-  std::cout << "vertices: " << num_vertices(g_) << std::endl;
-  std::cout << "edges: " << num_edges(g_) << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
-
-  return sol;
+  return si_->distance(stateProperty_[a], stateProperty_[b]);
 }
 
 bool PRMSlice::Connect(const Vertex a, const Vertex b){
-  if(previous==nullptr){
-    return PRMBasic::Connect(a,b);
-  }else{
-    ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
-
-    ob::State* qa = stateProperty_[a];
-    ob::State* qb = stateProperty_[b];
-
-    ob::State* qaC1 = C1->allocState();
-    ob::State* qbC1 = C1->allocState();
-    ob::State* qaM0 = M0->allocState();
-    ob::State* qbM0 = M0->allocState();
-
-    ExtractC1Subspace(qa, qaC1);
-    ExtractC1Subspace(qb, qbC1);
-    ExtractM0Subspace(qa, qaM0);
-    ExtractM0Subspace(qb, qbM0);
-
-    const Vertex vsaM0 = associatedVertexSourceProperty_[a];
-    const Vertex vsbM0 = associatedVertexSourceProperty_[b];
-    const Vertex vtaM0 = associatedVertexTargetProperty_[a];
-    const Vertex vtbM0 = associatedVertexTargetProperty_[b];
-
-    // double ta = associatedTProperty_[a];
-    // double tb = associatedTProperty_[b];
-
-    //create PWL function between vertices.
-    ob::PathPtr sol = previous->GetShortestPathOffsetVertices( qaM0, qbM0, vsaM0, vsbM0, vtaM0, vtbM0);
-    if(sol==nullptr){
-      std::cout << "nullptr" << std::endl;
-      std::cout << vsaM0 << "," << vtaM0 << std::endl;
-      std::cout << vsbM0 << "," << vtbM0 << std::endl;
-      exit(0);
-      return false;
-    }
-    double D = sol->length();
-
-    og::PathGeometric path = static_cast<og::PathGeometric&>(*sol);
-    std::vector<ob::State *> states = path.getStates();
-    std::cout << "Path states: " << states.size() << std::endl;
-
-    Vertex v0 = a;
-    ob::State *s0M0 = states.at(0);
-    ob::State *s0M1 = qa;
-    for(uint i = 1; i < states.size(); i++)
-    {
-
-      ob::State *s1M0 = states.at(i);
-      double d = M0->distance(s0M0, s1M0);
-      ob::State* s1C1 = C1->allocState();
-      C1->getStateSpace()->interpolate(qaC1,qbC1,d/D,s1C1);
-
-      std::cout << "interpolate[" << i << "/"<< states.size() << "]: " << d << "/" << D << std::endl;
-
-      //mergeStates(ob::State *qM0, ob::State *qC1, ob::State *qM1);
-      ob::State* s1M1 = M1->allocState();
-      mergeStates(s1M0, s1C1, s1M1);
-
-      C1->freeState(s1C1);
-
-      Vertex v1;
-      if(i<states.size()-1){
-        v1 = boost::add_vertex(g_);
-        stateProperty_[v1] = s1M1;
-      }else{
-        v1 = b;
-      }
-
-      if (si_->checkMotion(s0M1, s1M1))
-      {
-        boost::add_edge(v0, v1, EdgeProperty(ob::Cost(d)), g_);
-        uniteComponents(v0, v1);
-      }else{
-        C1->freeState(qaC1);
-        C1->freeState(qbC1);
-        M0->freeState(qaM0);
-        M0->freeState(qbM0);
-        return false;
-      }
-
-      s0M0 = s1M0;
-
-    }
-
-    C1->freeState(qaC1);
-    C1->freeState(qbC1);
-    M0->freeState(qaM0);
-    M0->freeState(qbM0);
-    return true;
-  }
-
-  return false;
+  return PRMBasic::Connect(a,b);
 }
