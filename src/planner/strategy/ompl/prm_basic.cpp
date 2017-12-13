@@ -54,8 +54,39 @@ PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si)
 }
 
 PRMBasic::~PRMBasic(){
+  std::cout << "delete PRMBasic" << std::endl;
   si_->freeStates(xstates);
+  foreach (Vertex v, boost::vertices(g_))
+    si_->freeState(stateProperty_[v]);
+  g_.clear();
 }
+
+void PRMBasic::clear()
+{
+  std::cout << "CLEAR BASIC" << std::endl;
+  Planner::clear();
+  //sampler_.reset();
+  //simpleSampler_.reset();
+  foreach (Vertex v, boost::vertices(g_)){
+    si_->freeState(stateProperty_[v]);
+  }
+  g_.clear();
+  if (nn_)
+      nn_->clear();
+  clearQuery();
+
+  iterations_ = 0;
+  bestCost_ = ob::Cost(dInf);
+}
+
+void PRMBasic::clearQuery()
+{
+  startM_.clear();
+  goalM_.clear();
+  pis_.restart();
+}
+
+
 
 void PRMBasic::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
 {
@@ -379,32 +410,9 @@ void PRMBasic::setup(){
   }
 
 }
-void PRMBasic::clear()
-{
-  foreach (Vertex v, boost::vertices(g_)){
-    si_->freeState(stateProperty_[v]);
-  }
-  g_.clear();
-  sampler_.reset();
-  simpleSampler_.reset();
-  if (nn_)
-      nn_->clear();
-  clearQuery();
-
-  iterations_ = 0;
-  bestCost_ = ob::Cost(dInf);
-}
-
 ob::Cost PRMBasic::costHeuristic(Vertex u, Vertex v) const
 {
   return opt_->motionCostHeuristic(stateProperty_[u], stateProperty_[v]);
-}
-
-void PRMBasic::clearQuery()
-{
-  startM_.clear();
-  goalM_.clear();
-  pis_.restart();
 }
 
 double PRMBasic::GetSamplingDensity(){

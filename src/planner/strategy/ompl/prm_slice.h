@@ -65,7 +65,7 @@ namespace ompl
 
         PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_);
 
-        ~PRMSlice() override;
+        virtual ~PRMSlice() override;
 
         void getPlannerData(base::PlannerData &data) const override;
 
@@ -74,6 +74,7 @@ namespace ompl
         virtual ob::PlannerStatus Init();
 
         void setup() override;
+        void clear() override;
 
         Vertex lastSourceVertexSampled;
 

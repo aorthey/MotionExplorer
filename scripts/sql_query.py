@@ -34,9 +34,11 @@ def extractInfoFromSqlDatabase(fname,verbose=True):
   names = cursor.execute("""SELECT name FROM plannerConfigs;""").fetchall()
   plannerids = cursor.execute("""SELECT DISTINCT plannerid FROM runs;""").fetchall()
   timelimit = np.array(cursor.execute("""SELECT timelimit FROM experiments;""").fetchall()).flatten()[0]
+  runcount = np.array(cursor.execute("""SELECT runcount FROM experiments;""").fetchall()).flatten()[0]
+  totaltime = np.array(cursor.execute("""SELECT totaltime FROM experiments;""").fetchall()).flatten()[0]
 
   print 80*"-"
-  print fname," Runs with timelimit=",timelimit,"seconds"
+  print fname," runs=",runcount,", timelimit=",timelimit,"s, totaltime=",totaltime,"s"
   print 80*"-"
   for i in range(0,len(names)):
     name = names[i][0]
@@ -52,7 +54,7 @@ def extractInfoFromSqlDatabase(fname,verbose=True):
 
     #solved = sol.sum()
 
-    sql = """SELECT correct_solution FROM runs WHERE plannerid="""+str(pid)
+    sql = """SELECT solved FROM runs WHERE plannerid="""+str(pid)
     sol = np.array(cursor.execute(sql).fetchall())
     solved = sol.sum()
     runs = sol.shape[0]
@@ -70,8 +72,14 @@ def extractInfoFromSqlDatabase(fname,verbose=True):
     nodessql = cursor.execute(sql).fetchall()
     nodes = np.array(nodessql).mean()
 
+    #sql = """SELECT edge_count FROM runs WHERE plannerid="""+str(pid)
+    #edgessql = cursor.execute(sql).fetchall()
+    #edges = np.array(nodessql).mean()
+
     #print pid,": [",name,"]solved: ",solved,"/",runs," time:",times.mean(),"+/-",times.std()
-    print pid,": [",name,"]solved: ",Dsolved,"/",runs," time:",Dmean,"+/-",Dstd," (nodes:",nodes,")"
+    print pid,": [",'%30s'%name,"] solved: ",Dsolved,\
+    "/",runs," time:",'%.2f'%Dmean,"+/-",'%.2f'%Dstd,\
+    " (minimum time:",'%.2f'%Dtimes.min(),", maximum time:",'%.2f'%Dtimes.max(),", nodes:",nodes,")"
     
   connection.close()
 

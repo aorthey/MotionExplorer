@@ -99,20 +99,28 @@ PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
         }
 
       }
+      C1_sampler = C1->allocStateSampler();
 
     }
     std::cout << "M0 (dimension: " << M0_space->getDimension() << ") contains " << M0_subspaces << " subspaces of type " << M0_space->getName() << " " << M0_space->getType() << std::endl;
     std::cout << "M1 (dimension: " << M1->getStateDimension() << ") contains " << M1_subspaces  << " subspaces of type " << M1->getStateSpace()->getName() << " " << M1->getStateSpace()->getType() << std::endl;
     std::cout << "C1 (dimension: " << C1->getStateDimension() << ") contains " << C1_subspaces  << " subspaces of type " << C1->getStateSpace()->getName() << " " << C1->getStateSpace()->getType() << std::endl;
-    if (!C1_sampler){
-      C1_sampler = C1->allocStateSampler();
-    }
 
   }
 
 }
 
 PRMSlice::~PRMSlice(){
+  std::cout << "delete PRMSLice" << std::endl;
+}
+
+void PRMSlice::clear()
+{
+  PRMBasic::clear();
+  std::cout << "CLEAR PRMSlice" << std::endl;
+  isSampled = false; 
+  //C1_sampler.reset();
+      //C1_sampler = C1->allocStateSampler();
 }
 
 
@@ -283,7 +291,6 @@ void PRMSlice::setup(){
                            {
                              return Distance(a,b);
                            });
-
 }
 
 

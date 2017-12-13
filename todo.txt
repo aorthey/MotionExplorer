@@ -403,3 +403,10 @@ make hole bigger
  [ ] addmilestone calls connect to connect to neighbors. But addmilestone is not
  only called after sampling, it is also called after random bounce motion,
  whereby the new vertex does not lie on any edge! what should we do in that case?
+
+
+BENCHMARKING
+ [x] ensure correct reset
+ [x] output from sql database to cout
+ [ ] visualize all solved paths
+ [ ] replay particular path

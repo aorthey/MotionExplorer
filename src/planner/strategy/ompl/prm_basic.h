@@ -104,7 +104,7 @@ namespace ompl
       public:
 
         PRMBasic(const ob::SpaceInformationPtr &si);
-        ~PRMBasic() override;
+        virtual ~PRMBasic() override;
 
         double GetSamplingDensity();
         ob::PathPtr GetShortestPath();

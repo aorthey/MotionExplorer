@@ -5,6 +5,7 @@
 #include "planner/strategy/ompl/prm_slice.h"
 #include "planner/strategy/ompl/prm_slice_connect.h"
 
+#include <ompl/geometric/planners/prm/PRM.h>
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/util/Time.h>
@@ -74,11 +75,11 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   }else if(algorithm=="ompl:benchmark"){
 
     //### BENCHMARK #########################################################
-    ot::Benchmark benchmark(ss, "Benchmark");
+    ot::Benchmark benchmark(ss, "BenchmarkGeometric");
 
-    planner = std::make_shared<og::RRTPlain>(si_vec.back());
-    planner->setProblemDefinition(pdef_vec.back());
-    benchmark.addPlanner(planner);
+    //planner = std::make_shared<og::PRM>(si_vec.back());
+    //planner->setProblemDefinition(pdef_vec.back());
+    //benchmark.addPlanner(planner);
 
     typedef og::PRMMultiSlice<og::PRMSlice> MultiSlice;
     planner = std::make_shared<MultiSlice>(si_vec);
@@ -90,6 +91,8 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
     ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
     ss.setStartAndGoalStates(start,goal,input.epsilon_goalregion);
+
+    std::cout << "calling ss.setup()" << std::endl;
     ss.setup();
 
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
@@ -110,6 +113,11 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     std::system(cmd.c_str());
     cmd = "cp "+file+".db"+" ../data/benchmarks/";
     std::system(cmd.c_str());
+
+    cmd = "python ../scripts/ompl_output_benchmark.py "+file+".db";
+    std::system(cmd.c_str());
+    exit(0);
+
     //### BENCHMARK #########################################################
 
   }else{
