@@ -29,9 +29,9 @@
     <!-- default settings for all algorithms (overwriteable) -->
     <timestep min="0.001" max="0.01"/>
     <epsilongoalregion>0.01</epsilongoalregion>
-    <maxplanningtime>1</maxplanningtime>
+    <maxplanningtime>10</maxplanningtime>
 
-    <sampler name="gaussian"/>
+    <sampler name="uniform"/>
 
     <!-- individual algorithms plus individual settings -->
     <algorithm name="hierarchical:ompl:prm_multislice_connect">

@@ -38,14 +38,12 @@
 
     <sampler name="obstacle_based"/>
 
-    <benchmark name="DoubleLShapeBenchmark">
-      <maxplanningtime>5</maxplanningtime>
-      <maxmemoryMB>1000</maxmemoryMB>
-      <runs>10</runs>
-      <displayProgress>1</displayProgress>
-      <filename name="data/benchmarks/doublelshape.db"/>
-    </benchmark>
-
+    <algorithm name="hierarchical:ompl:prm_multislice_connect">
+      <hierarchy>
+        <level inner_index="3" outer_index="4" type="R3"/>
+        <level inner_index="0" outer_index="0" type="SE3"/>
+      </hierarchy>
+    </algorithm>
     <algorithm name="hierarchical:ompl:prm_multislice">
       <hierarchy>
         <level inner_index="3" outer_index="4" type="R3"/>
@@ -57,6 +55,16 @@
     <algorithm name="ompl:rrtconnect"/>
     <algorithm name="ompl:kpiece"/>
     <algorithm name="ompl:lazyprm"/>
+
+    <!--
+    <benchmark name="DoubleLShapeBenchmark">
+      <maxplanningtime>5</maxplanningtime>
+      <maxmemoryMB>1000</maxmemoryMB>
+      <runs>10</runs>
+      <displayProgress>1</displayProgress>
+      <filename name="data/benchmarks/doublelshape.db"/>
+    </benchmark>
+    -->
 
 
   </plannerinput>

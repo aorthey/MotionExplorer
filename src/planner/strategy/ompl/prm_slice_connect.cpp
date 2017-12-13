@@ -32,8 +32,6 @@ PRMSliceConnect::PRMSliceConnect(const ob::SpaceInformationPtr &si, PRMSliceConn
 PRMSliceConnect::~PRMSliceConnect(){
 }
 
-
-
 double PRMSliceConnect::Distance(const Vertex a, const Vertex b) const
 {
   if(previous == nullptr){
@@ -76,7 +74,6 @@ double PRMSliceConnect::Distance(const Vertex a, const Vertex b) const
     M0->freeState(qbM0);
 
     return d0 + d1;
-    //return si_->distance(stateProperty_[a], stateProperty_[b]);
   }
 }
 
@@ -275,9 +272,12 @@ bool PRMSliceConnect::Connect(const Vertex a, const Vertex b){
       std::cout << vsaM0 << "," << vtaM0 << std::endl;
       std::cout << vsbM0 << "," << vtbM0 << std::endl;
       exit(0);
-      return false;
     }
     double D = sol->length();
+    if(D>=dInf){
+      std::cout << D << std::endl;
+      exit(0);
+    }
 
     og::PathGeometric path = static_cast<og::PathGeometric&>(*sol);
     std::vector<ob::State *> states = path.getStates();
@@ -306,7 +306,6 @@ bool PRMSliceConnect::Connect(const Vertex a, const Vertex b){
     //  //exit(0);
     //}
     std::vector<Vertex> vpath;
-
 
     for(uint i = 1; i < states.size(); i++)
     {
@@ -392,6 +391,22 @@ bool PRMSliceConnect::Connect(const Vertex a, const Vertex b){
     M0->freeState(qbM0);
     return true;
   }
-
-  return false;
 }
+
+uint PRMSliceConnect::randomBounceMotion(const ob::StateSamplerPtr &sss, 
+    const Vertex &v, std::vector<ob::State *> &states) const
+{
+  uint steps = states.size();
+  const ob::State *prev = stateProperty_[v];
+  std::pair<ob::State *, double> lastValid;
+  uint j = 0;
+  for (uint i = 0; i < steps; ++i)
+  {
+    sss->sampleUniform(states[j]);
+    lastValid.first = states[j];
+    if (si_->checkMotion(prev, states[j], lastValid) || lastValid.second > std::numeric_limits<double>::epsilon())
+      prev = states[j++];
+  }
+  return j;
+}
+

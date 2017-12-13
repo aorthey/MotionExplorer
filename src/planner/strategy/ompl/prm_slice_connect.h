@@ -9,7 +9,7 @@ namespace ompl
 {
   namespace base
   {
-      OMPL_CLASS_FORWARD(OptimizationObjective);
+    OMPL_CLASS_FORWARD(OptimizationObjective);
   }
   namespace geometric
   {
@@ -31,6 +31,9 @@ namespace ompl
         virtual bool Connect(const Vertex a, const Vertex b) override;
 
         bool SampleGraph(ob::State *workState);
+
+        virtual uint randomBounceMotion(const ob::StateSamplerPtr &sss, 
+          const Vertex &v, std::vector<ob::State *> &states) const override;
     };
 
   };

@@ -92,7 +92,7 @@ namespace ompl
                >
              >,
              boost::property<boost::edge_weight_t, EdgeProperty>
-             //boost::property<boost::edge_weight_t, base::Cost>>
+             //boost::property<boost::edge_weight_t, ob::Cost>>
 
            >Graph;
 
@@ -107,20 +107,20 @@ namespace ompl
         ~PRMBasic() override;
 
         double GetSamplingDensity();
-        base::PathPtr GetShortestPath();
-        base::PathPtr GetSolutionPath();
+        ob::PathPtr GetShortestPath();
+        ob::PathPtr GetSolutionPath();
         bool hasSolution();
 
         void Grow(double t);
-        ob::PlannerStatus Init(const base::PlannerTerminationCondition &ptc);
+        ob::PlannerStatus Init(const ob::PlannerTerminationCondition &ptc);
 
         template <template <typename T> class NN>
         void setNearestNeighbors();
 
-        void getPlannerData(base::PlannerData &data) const override;
+        void getPlannerData(ob::PlannerData &data) const override;
 
-        void setProblemDefinition(const base::ProblemDefinitionPtr &pdef) override;
-        ob::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
+        void setProblemDefinition(const ob::ProblemDefinitionPtr &pdef) override;
+        ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override;
 
         void clearQuery();
         void clear() override;
@@ -135,14 +135,14 @@ namespace ompl
         boost::property_map<Graph, vertex_associated_vertex_target_t>::type associatedVertexTargetProperty_;
         boost::property_map<Graph, vertex_associated_t_t>::type associatedTProperty_;
 
-        base::OptimizationObjectivePtr opt_;
+        ob::OptimizationObjectivePtr opt_;
 
         std::vector<Vertex> startM_;
         std::vector<Vertex> goalM_;
 
         void uniteComponents(Vertex m1, Vertex m2);
         bool sameComponent(Vertex m1, Vertex m2);
-        base::Cost bestCost_{+dInf};
+        ob::Cost bestCost_{+dInf};
 
         unsigned long int milestoneCount() const
         {
@@ -152,20 +152,20 @@ namespace ompl
         {
             return g_;
         }
-        void checkForSolution(base::PathPtr &solution);
+        void checkForSolution(ob::PathPtr &solution);
 
     protected:
 
         virtual double Distance(const Vertex a, const Vertex b) const; // standard si->distance
         virtual bool Sample(ob::State *workState); //si->sampler
         virtual bool Connect(const Vertex a, const Vertex b);
-        virtual Vertex addMilestone(base::State *state);
+        virtual Vertex addMilestone(ob::State *state);
 
-        base::Cost costHeuristic(Vertex u, Vertex v) const;
+        ob::Cost costHeuristic(Vertex u, Vertex v) const;
         std::vector<ob::State *> xstates;
 
-        base::ValidStateSamplerPtr sampler_;
-        base::StateSamplerPtr simpleSampler_;
+        ob::ValidStateSamplerPtr sampler_;
+        ob::StateSamplerPtr simpleSampler_;
         RoadmapNeighbors nn_;
 
         boost::disjoint_sets<boost::property_map<Graph, boost::vertex_rank_t>::type,
@@ -176,12 +176,16 @@ namespace ompl
         bool addedNewSolution_{false};
         unsigned long int iterations_{0};
 
-        void growRoadmap(const base::PlannerTerminationCondition &ptc, base::State *workState);
-        void expandRoadmap(const base::PlannerTerminationCondition &ptc, std::vector<base::State *> &workStates);
+        void growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState);
+        void expandRoadmap(const ob::PlannerTerminationCondition &ptc, std::vector<ob::State *> &workStates);
 
         bool maybeConstructSolution(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals,
-                                    base::PathPtr &solution);
-        ompl::base::PathPtr constructSolution(const Vertex &start, const Vertex &goal);
+                                    ob::PathPtr &solution);
+        ob::PathPtr constructSolution(const Vertex &start, const Vertex &goal);
+
+        virtual uint randomBounceMotion(const ob::StateSamplerPtr &sss, 
+            const Vertex &v, std::vector<ob::State *> &states) const;
+
     };
   };
 };

@@ -12,51 +12,6 @@
 using namespace og;
 using namespace ob;
 #define foreach BOOST_FOREACH
-//
-//  Visualization of CSpace Decomposition
-//
-// [    ][    ]
-// [    ][    ]
-// [    ][ M0 ]
-// [ M1 ][____]
-// [    ][    ]
-// [    ][ C1 ]
-// [    ][    ]
-//
-// whereby 
-// M1 = M1
-// M0 = previous->getspaceinformation()
-// C1 = C1
-//
-// Standard PRM is sampling in M1
-// PRMSlice is sampling in G0 x C0, whereby G0 is the roadmap on M0
-//
-//
-//Multilevel M0 \subspace M1 \subspace M2
-//
-// [    ][    ][    ]
-// [    ][    ][ M0 ]
-// [    ][    ][    ]
-// [    ][ M1 ][____]
-// [    ][    ]
-// [ M2 ][    ]
-// [    ][    ]
-// [    ][____]
-// [    ]
-// [    ]
-// [____]
-//
-// [    ][    ][    ]
-// [    ][    ][ C0 ]
-// [    ][    ][    ]
-// [    ][ M1 ][____]
-// [    ][    ][    ]
-// [ M2 ][    ][ C1 ]
-// [    ][    ][    ]
-// [    ][____][____]
-// [    ][    ][    ]
-// [    ][ C2 ][ C2 ]
-// [____][____][____]
 
 namespace ompl
 {
@@ -313,6 +268,7 @@ og::PRMBasic::Vertex PRMSlice::addMilestone(base::State *state)
   Vertex m = PRMBasic::addMilestone(state);
     
   if(previous != nullptr && previous->isSampled){
+    //this is not always correct!
     associatedVertexSourceProperty_[m] = previous->lastSourceVertexSampled;
     associatedVertexTargetProperty_[m] = previous->lastTargetVertexSampled;
     associatedTProperty_[m] = previous->lastTSampled;

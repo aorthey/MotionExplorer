@@ -140,43 +140,41 @@ void PRMBasic::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
     {
       iterations_++;
       Vertex v = pdf.sample(rng_.uniform01());
-      unsigned int s =
-          si_->randomBounceMotion(simpleSampler_, stateProperty_[v], workStates.size(), workStates, false);
+      unsigned int s = randomBounceMotion(simpleSampler_, v, workStates);
       if (s > 0)
       {
-          s--;
-          Vertex last = addMilestone(si_->cloneState(workStates[s]));
+        s--;
+        Vertex last = addMilestone(si_->cloneState(workStates[s]));
 
-          for (unsigned int i = 0; i < s; ++i)
-          {
-              // add the vertex along the bouncing motion
-              Vertex m = boost::add_vertex(g_);
-              stateProperty_[m] = si_->cloneState(workStates[i]);
-              totalConnectionAttemptsProperty_[m] = 1;
-              successfulConnectionAttemptsProperty_[m] = 0;
-              disjointSets_.make_set(m);
+        for (unsigned int i = 0; i < s; ++i)
+        {
+          // add the vertex along the bouncing motion
+          Vertex m = boost::add_vertex(g_);
+          stateProperty_[m] = si_->cloneState(workStates[i]);
+          totalConnectionAttemptsProperty_[m] = 1;
+          successfulConnectionAttemptsProperty_[m] = 0;
+          disjointSets_.make_set(m);
 
-              // add the edge to the parent vertex
-              //const g_::edge_property_type properties(weight);
-              EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[m]));
-              boost::add_edge(v, m, properties, g_);
-              uniteComponents(v, m);
+          // add the edge to the parent vertex
+          EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[m]));
+          boost::add_edge(v, m, properties, g_);
+          uniteComponents(v, m);
 
-              // add the vertex to the nearest neighbors data structure
-              nn_->add(m);
-              v = m;
-          }
+          // add the vertex to the nearest neighbors data structure
+          nn_->add(m);
+          v = m;
+        }
 
-          // if there are intermediary states or the milestone has not been connected to the initially sampled vertex,
-          // we add an edge
-          if (s > 0 || !sameComponent(v, last))
-          {
-            // add the edge to the parent vertex
-            //const g_::edge_property_type properties(weight);
-            EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[last]));
-            boost::add_edge(v, last, properties, g_);
-            uniteComponents(v, last);
-          }
+        // if there are intermediary states or the milestone has not been connected to the initially sampled vertex,
+        // we add an edge
+        if (s > 0 || !sameComponent(v, last))
+        {
+          // add the edge to the parent vertex
+          //const g_::edge_property_type properties(weight);
+          EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[last]));
+          boost::add_edge(v, last, properties, g_);
+          uniteComponents(v, last);
+        }
       }
     }
 }
@@ -288,8 +286,8 @@ PRMBasic::Vertex PRMBasic::addMilestone(ob::State *state)
   stateProperty_[m] = state;
   totalConnectionAttemptsProperty_[m] = 1;
   successfulConnectionAttemptsProperty_[m] = 0;
-
   disjointSets_.make_set(m);
+
   const std::vector<Vertex> &neighbors = connectionStrategy_(m);
 
   foreach (Vertex n, neighbors)
@@ -461,3 +459,21 @@ bool PRMBasic::Connect(const Vertex a, const Vertex b){
   }
   return false;
 }
+
+uint PRMBasic::randomBounceMotion(const ob::StateSamplerPtr &sss, 
+    const Vertex &v, std::vector<ob::State *> &states) const
+{
+  uint steps = states.size();
+  const ob::State *prev = stateProperty_[v];
+  std::pair<ob::State *, double> lastValid;
+  uint j = 0;
+  for (uint i = 0; i < steps; ++i)
+  {
+    sss->sampleUniform(states[j]);
+    lastValid.first = states[j];
+    if (si_->checkMotion(prev, states[j], lastValid) || lastValid.second > std::numeric_limits<double>::epsilon())
+      prev = states[j++];
+  }
+  return j;
+}
+
