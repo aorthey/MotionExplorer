@@ -6,6 +6,9 @@
 #include "planner/strategy/ompl/prm_slice_connect.h"
 
 #include <ompl/geometric/planners/prm/PRM.h>
+#include <ompl/geometric/planners/est/EST.h>
+#include <ompl/geometric/planners/rrt/RRT.h>
+#include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/util/Time.h>
@@ -77,9 +80,17 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     //### BENCHMARK #########################################################
     ot::Benchmark benchmark(ss, "BenchmarkGeometric");
 
-    //planner = std::make_shared<og::PRM>(si_vec.back());
-    //planner->setProblemDefinition(pdef_vec.back());
-    //benchmark.addPlanner(planner);
+    planner = std::make_shared<og::PRM>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
+    benchmark.addPlanner(planner);
+
+    planner = std::make_shared<og::EST>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
+    benchmark.addPlanner(planner);
+
+    planner = std::make_shared<og::RRTConnect>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
+    benchmark.addPlanner(planner);
 
     typedef og::PRMMultiSlice<og::PRMSlice> MultiSlice;
     planner = std::make_shared<MultiSlice>(si_vec);
@@ -98,9 +109,9 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 5;
+    req.maxTime = 60;
     req.maxMem = 10000.0;
-    req.runCount = 5;
+    req.runCount = 10;
     req.displayProgress = true;
 
     benchmark.benchmark(req);
@@ -116,7 +127,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
 
     cmd = "python ../scripts/ompl_output_benchmark.py "+file+".db";
     std::system(cmd.c_str());
-    exit(0);
+    //exit(0);
 
     //### BENCHMARK #########################################################
 
@@ -124,6 +135,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);
   }
+  planner->clear();
 
   //###########################################################################
   //SIMPLE SETUP
@@ -177,6 +189,6 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   planner->getPlannerData(*pd);
 
   output.SetPlannerData(pd);
-  output.SetProblemDefinition(pdef_vec.back());
+  output.SetProblemDefinition(planner->getProblemDefinition());
 
 }

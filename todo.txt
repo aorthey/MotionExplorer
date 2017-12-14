@@ -408,5 +408,6 @@ make hole bigger
 BENCHMARKING
  [x] ensure correct reset
  [x] output from sql database to cout
+ [ ] extensive benchmarking for some SE(3) examples
  [ ] visualize all solved paths
  [ ] replay particular path

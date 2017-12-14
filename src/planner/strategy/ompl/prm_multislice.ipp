@@ -98,6 +98,7 @@ ob::PlannerStatus PRMMultiSlice<T>::solve(const base::PlannerTerminationConditio
       return ob::PlannerStatus::TIMEOUT;
     }
   }
+  std::cout << "Found exact solution" << std::endl;
 
 //set pdef solution path!
   T *fullspace = slicespaces.back();

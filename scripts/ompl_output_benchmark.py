@@ -9,4 +9,3 @@ if __name__ == '__main__':
   if Nargs>1:
     for fname in sys.argv[1:]:
       extractInfoFromSqlDatabase(fname,verbose=False)
-

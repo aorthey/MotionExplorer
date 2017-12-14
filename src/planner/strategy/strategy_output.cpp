@@ -69,6 +69,16 @@ ob::PathPtr StrategyOutput::getShortestPathOMPL(){
   shortcutter.simplifyMax(gpath);
   shortcutter.smoothBSpline(gpath);
 
+  bool valid = false;
+  uint ctr = 0;
+  while((!valid) && (ctr++ < 5)){
+    const std::pair<bool, bool> &p = gpath.checkAndRepair(10);
+    valid = p.second;
+  }
+  if(!gpath.check()){
+    std::cout << "WARNING: path is not valid. Unsuccessfully tried to repair it for " << ctr-1 << " iterations." << std::endl;
+  }
+
   return path;
 }
 
