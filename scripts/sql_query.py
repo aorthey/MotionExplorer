@@ -65,8 +65,8 @@ def extractInfoFromSqlDatabase(fname,verbose=True):
       Dmean = Dtimes.mean() 
       Dstd = Dtimes.std() 
     else:
-      Dmean = 'nan'
-      Dstd = 'nan'
+      Dmean = float('nan')
+      Dstd = float('nan')
 
     sql = """SELECT graph_states FROM runs WHERE plannerid="""+str(pid)
     nodessql = cursor.execute(sql).fetchall()

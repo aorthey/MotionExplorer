@@ -7,6 +7,7 @@
 
 #include <ompl/geometric/planners/prm/PRM.h>
 #include <ompl/geometric/planners/est/EST.h>
+#include <ompl/geometric/planners/sbl/SBL.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/RRTConnect.h>
 #include <ompl/base/goals/GoalState.h>
@@ -84,7 +85,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     planner->setProblemDefinition(pdef_vec.back());
     benchmark.addPlanner(planner);
 
-    planner = std::make_shared<og::EST>(si_vec.back());
+    planner = std::make_shared<og::SBL>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
     benchmark.addPlanner(planner);
 
@@ -116,17 +117,30 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
 
     benchmark.benchmark(req);
 
-    std::string file = "ompl_benchmarky";
+    std::string file = "benchmark";
     std::string res = file+".log";
+    std::string cmd;
+
     benchmark.saveResultsToFile(res.c_str());
 
-    std::string cmd = "ompl_benchmark_statistics.py "+file+".log -d "+file+".db";
+    cmd = "ompl_benchmark_statistics.py "+file+".log -d "+file+".db";
     std::system(cmd.c_str());
+
     cmd = "cp "+file+".db"+" ../data/benchmarks/";
     std::system(cmd.c_str());
 
     cmd = "python ../scripts/ompl_output_benchmark.py "+file+".db";
     std::system(cmd.c_str());
+
+    cmd = "python ../scripts/ompl_benchmark_statistics_simple.py "+file+".log -d "+file+".db -p "+file+".pdf";
+    std::system(cmd.c_str());
+
+    cmd = "pdf2png "+file+".pdf";
+    std::system(cmd.c_str());
+
+    cmd = "eog "+file+"-0.png";
+    std::system(cmd.c_str());
+
     //exit(0);
 
     //### BENCHMARK #########################################################
