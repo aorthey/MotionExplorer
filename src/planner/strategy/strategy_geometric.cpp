@@ -35,6 +35,14 @@
 #include <ompl/geometric/planners/sbl/pSBL.h>
 #include <ompl/geometric/planners/stride/STRIDE.h>
 #include <ompl/geometric/planners/cforest/CForest.h>
+#include "ompl/BridgeTestValidStateSampler.h"
+
+// RRT  -- Rapidly-exploring Random Tree
+// PRM  -- Probabilistic RoadMap 
+// SBL  -- Single-query Bidirectional Lazy PRM
+// pSBL -- Parallel SBL
+// EST  -- Expanding Space Tree
+// FMT  -- Fast Marching Tree
 
 #include <ompl/util/Time.h>
 
@@ -47,6 +55,7 @@ static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInf
 StrategyGeometric::StrategyGeometric()
 {
 }
+
 void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output)
 {
 
@@ -62,12 +71,10 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
 
-  setStateSampler(input.name_sampler, cspace->SpaceInformationPtr());
+  const ob::SpaceInformationPtr si = cspace->SpaceInformationPtr();
+  setStateSampler(input.name_sampler, si);
 
-  og::SimpleSetup ss(cspace->SpaceInformationPtr());
-
-  const ob::SpaceInformationPtr si = ss.getSpaceInformation();
-  ss.setStateValidityChecker(cspace->StateValidityCheckerPtr(si));
+  og::SimpleSetup ss(si);
 
   //###########################################################################
   // choose planner
@@ -122,6 +129,7 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   ss.setup();
   ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
 
+
   //set objective to infinite path to just return first solution
   ob::ProblemDefinitionPtr pdef = ss.getProblemDefinition();
   pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
@@ -136,6 +144,8 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
 
   double max_planning_time= input.max_planning_time;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
+
+
 
   ompl::time::point t_start = ompl::time::now();
   ob::PlannerStatus status = ss.solve(ptc);

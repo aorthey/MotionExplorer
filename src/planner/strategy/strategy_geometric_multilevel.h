@@ -22,5 +22,7 @@ class StrategyGeometricMultiLevel: public StrategyGeometric{
 
     StrategyGeometricMultiLevel();
 
+    void BenchmarkFileToPNG(const std::string&);
+
 };
 

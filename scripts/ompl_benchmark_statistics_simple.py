@@ -320,6 +320,7 @@ def plotAttribute(cur, planners, attribute, typename):
         print('Skipping "%s": no available measurements' % attribute)
         return
 
+    plannerLabelRotation=45
     plt.clf()
     ax = plt.gca()
     if typename == 'ENUM':
@@ -335,7 +336,8 @@ def plotAttribute(cur, planners, attribute, typename):
                 color=matplotlib.cm.hot(int(floor(i*256/numValues))),
                 label=descriptions[i])
             heights = heights + measurements[i]
-        xtickNames = plt.xticks([x+width/2. for x in ind], labels, rotation=30)
+        xtickNames = plt.xticks([x+width/2. for x in ind], labels,
+            rotation=plannerLabelRotation)
         ax.set_ylabel(attribute.replace('_',' ') + ' (%)')
         box = ax.get_position()
         ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
@@ -347,7 +349,7 @@ def plotAttribute(cur, planners, attribute, typename):
         measurementsPercentage = [sum(m) * 100. / len(m) for m in measurements]
         ind = range(len(measurements))
         plt.bar(ind, measurementsPercentage, width)
-        xtickNames = plt.xticks([x + width / 2. for x in ind], labels, rotation=30)
+        xtickNames = plt.xticks([x + width / 2. for x in ind], labels, rotation=plannerLabelRotation)
         ax.set_ylabel(attribute.replace('_',' ') + ' (%)')
     else:
         if int(matplotlibversion.split('.')[0])<1:
@@ -356,7 +358,7 @@ def plotAttribute(cur, planners, attribute, typename):
             plt.boxplot(measurements, notch=0, sym='k+', vert=1, whis=1.5, bootstrap=1000)
         ax.set_ylabel(attribute.replace('_',' '))
         xtickNames = plt.setp(ax,xticklabels=labels)
-        plt.setp(xtickNames, rotation=25)
+        plt.setp(xtickNames, rotation=plannerLabelRotation)
     ax.set_xlabel('Motion planning algorithm')
     ax.yaxis.grid(True, linestyle='-', which='major', color='lightgrey', alpha=0.5)
     if max(nanCounts)>0:
@@ -377,13 +379,25 @@ def plotStatistics(dbname, fname):
     c.execute('PRAGMA table_info(runs)')
     colInfo = c.fetchall()[3:]
 
+    runcount = np.array(c.execute("""SELECT runcount FROM experiments;""").fetchall()).flatten()[0]
+    timelimit = np.array(c.execute("""SELECT timelimit FROM experiments;""").fetchall()).flatten()[0]
+
     pp = PdfPages(fname)
     for col in reversed(colInfo):
-      if col[1] == 'solved' or col[1] == 'time':
-        print col
+      #if col[1] == 'solved' or col[1] == 'time':
+      if col[1] == 'time':
         if col[2] == 'BOOLEAN' or col[2] == 'ENUM' or \
           col[2] == 'INTEGER' or col[2] == 'REAL':
           plotAttribute(c, planners, col[1], col[2])
+          ax = plt.gca()
+          ax.set_ylabel('Time (s)')
+          ax.set_xlabel('Motion Planning Algorithm')
+          txt = "runcount=%d"%runcount
+          ax.text(0.85, 0.95, txt, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
+          txt = "timelimit=%.0f"%timelimit+"s"
+          ax.text(0.85, 0.9, txt, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
+          ax.axhline(timelimit,color='k',linestyle='--')
+          plt.tight_layout()
           pp.savefig(plt.gcf())
 
     pp.close()

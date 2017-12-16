@@ -412,3 +412,8 @@ BENCHMARKING
  [ ] extensive benchmarking for some SE(3) examples
  [ ] visualize all solved paths
  [ ] replay particular path
+ [ ] prettify the output graphs:
+   [ ] add horizontal line time-cut off
+   [ ] add number of runs
+   [ ] add seconds to time
+ [ ] why do we get invalid paths?
