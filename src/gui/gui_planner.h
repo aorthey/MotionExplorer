@@ -16,6 +16,7 @@ class PlannerBackend : public ForceFieldBackend
     //play/replay/stop
     double t;
 
+
   public:
 
     PlannerBackend(RobotWorld *world);
@@ -26,6 +27,7 @@ class PlannerBackend : public ForceFieldBackend
     virtual void RenderScreen();
     virtual bool OnIdle();
 
+    bool isPlanningInProcess{false};
 };
 
 

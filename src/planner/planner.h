@@ -39,6 +39,8 @@ class MotionPlanner{
 
     virtual std::string getName() const;
 
+    friend std::ostream& operator<< (std::ostream& out, const MotionPlanner& planner);
+
   protected:
     MotionPlanner() = delete;
 

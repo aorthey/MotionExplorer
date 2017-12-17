@@ -383,8 +383,11 @@ def plotStatistics(dbname, fname):
     timelimit = np.array(c.execute("""SELECT timelimit FROM experiments;""").fetchall()).flatten()[0]
 
     pp = PdfPages(fname)
+    Dsolved = 0
     for col in reversed(colInfo):
       #if col[1] == 'solved' or col[1] == 'time':
+      if col[1] == 'solved':
+        Dsolved = col[3]
       if col[1] == 'time':
         if col[2] == 'BOOLEAN' or col[2] == 'ENUM' or \
           col[2] == 'INTEGER' or col[2] == 'REAL':

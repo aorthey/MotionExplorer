@@ -145,8 +145,8 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
     _backend->sim.SetController(0, controller);
     _backend->sim.controlSimulators[0].Init(robot, _backend->sim.odesim.robot(0), _backend->sim.robotControllers[0]);
 
-    info(&world);
-    info(&(_backend->sim));
+    //info(&world);
+    //info(&(_backend->sim));
 
     if(pin.load(file_name.c_str())){
 
@@ -227,7 +227,6 @@ std::vector<Config> EnvironmentLoader::GetKeyframesFromFile(const char* file)
   TiXmlElement* q = FindFirstSubNode(root, "q");
   std::vector<Config> keyframes;
   while(q!=NULL){
-    //std::cout << q->GetText() << std::endl;
     Config qconfig;
     GetStreamText(q) >> qconfig;
     keyframes.push_back(qconfig);

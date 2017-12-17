@@ -4,6 +4,7 @@
 #include "planner/strategy/ompl/prm_multislice.h"
 #include "planner/strategy/ompl/prm_slice.h"
 #include "planner/strategy/ompl/prm_slice_connect.h"
+#include "util.h"
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -61,7 +62,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     ob::ScopedState<> startk = cspace_levelk->ConfigToOMPLState(p_init);
     ob::ScopedState<> goalk  = cspace_levelk->ConfigToOMPLState(p_goal);
 
-    std::cout << *cspace_levelk << std::endl;
+    //std::cout << *cspace_levelk << std::endl;
 
     ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
     pdefk->addStartState(startk);
@@ -192,21 +193,29 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     //### BENCHMARK #########################################################
     ot::Benchmark benchmark(ss, "BenchmarkGeometric");
 
-    planner = std::make_shared<og::RRTConnect>(si_vec.back());
-    planner->setProblemDefinition(pdef_vec.back());
-    benchmark.addPlanner(planner);
+    //planner = std::make_shared<og::RRTConnect>(si_vec.back());
+    //planner->setProblemDefinition(pdef_vec.back());
+    //benchmark.addPlanner(planner);
 
-    planner = std::make_shared<og::BFMT>(si_vec.back());
-    planner->setProblemDefinition(pdef_vec.back());
-    benchmark.addPlanner(planner);
+    //planner = std::make_shared<og::BFMT>(si_vec.back());
+    //planner->setProblemDefinition(pdef_vec.back());
+    //benchmark.addPlanner(planner);
 
-    planner = std::make_shared<og::PDST>(si_vec.back());
-    planner->setProblemDefinition(pdef_vec.back());
-    benchmark.addPlanner(planner);
+    //planner = std::make_shared<og::PDST>(si_vec.back());
+    //planner->setProblemDefinition(pdef_vec.back());
+    //benchmark.addPlanner(planner);
 
     typedef og::PRMMultiSlice<og::PRMSlice> MultiSlice;
     planner = std::make_shared<MultiSlice>(si_vec);
     static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
+    benchmark.addPlanner(planner);
+
+    //planner = std::make_shared<og::BFMT>(si_vec.back());
+    //planner->setProblemDefinition(pdef_vec.back());
+    //benchmark.addPlanner(planner);
+    
+    planner = std::make_shared<og::RRTConnect>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
     benchmark.addPlanner(planner);
 
     ob::ProblemDefinitionPtr pdef = pdef_vec.back();
@@ -220,14 +229,16 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 300;
+    req.maxTime = 60;
     req.maxMem = 10000.0;
-    req.runCount = 10;
+    req.runCount = 5;
     req.displayProgress = true;
+
 
     benchmark.benchmark(req);
 
-    std::string file = "benchmark";
+    std::string file = "benchmark_"+util::GetCurrentDateTimeString();
+    std::cout << file << std::endl;
     std::string res = file+".log";
     std::string cmd;
 
@@ -235,7 +246,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
 
     BenchmarkFileToPNG(file);
 
-    //exit(0);
+    exit(0);
 
     //### BENCHMARK #########################################################
 

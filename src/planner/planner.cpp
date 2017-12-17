@@ -144,24 +144,6 @@ void MotionPlanner::CreateSinglePathHierarchy(){
   //  output.removable_robot_idxs.push_back(idxs.at(k));
   //}
 
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << " Planner: " << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << " Robots  " << std::endl;
-  for(uint k = 0; k < hierarchy->NumberLevels(); k++){
-    uint ii = hierarchy->GetInnerRobotIdx(k);
-    uint io = hierarchy->GetOuterRobotIdx(k);
-    Robot* ri = world->robots[ii];
-    Robot* ro = world->robots[io];
-    std::cout << " Level" << k << std::endl;
-    std::cout << "   Robot (inner) : idx " << ii << " name " << ri->name << std::endl;
-    std::cout << "   Robot (outer) : idx " << io << " name " << ro->name << std::endl;
-    Config qi = hierarchy->GetInitConfig(k);
-    Config qg = hierarchy->GetGoalConfig(k);
-    std::cout << "      qinit      : " << qi << std::endl;
-    std::cout << "      qgoal      : " << qg << std::endl;
-  }
-
   psinput_level0->name_algorithm = subalgorithm;
 
   if(input.isSE2){
@@ -448,5 +430,26 @@ void MotionPlanner::DrawGL(GUIState& state){
     current_path.at(current_path.size()-1) = current_level_node;
   }
 
+}
+std::ostream& operator<< (std::ostream& out, const MotionPlanner& planner){
+  out << std::string(80, '-') << std::endl;
+  out << " Planner: " << std::endl;
+  out << std::string(80, '-') << std::endl;
+  out << " Robots  " << std::endl;
+  for(uint k = 0; k < planner.hierarchy->NumberLevels(); k++){
+    uint ii = planner.hierarchy->GetInnerRobotIdx(k);
+    uint io = planner.hierarchy->GetOuterRobotIdx(k);
+    Robot* ri = planner.world->robots[ii];
+    Robot* ro = planner.world->robots[io];
+    out << " Level" << k << std::endl;
+    out << "   Robot (inner) : idx " << ii << " name " << ri->name << std::endl;
+    out << "   Robot (outer) : idx " << io << " name " << ro->name << std::endl;
+    Config qi = planner.hierarchy->GetInitConfig(k);
+    Config qg = planner.hierarchy->GetGoalConfig(k);
+    out << "      qinit      : " << qi << std::endl;
+    out << "      qgoal      : " << qg << std::endl;
+  }
+  out << std::string(80, '-') << std::endl;
+  return out;
 }
 

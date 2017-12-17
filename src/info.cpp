@@ -2,9 +2,9 @@
 
 Info::Info()
 {
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Information Module initialized" << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
+  //std::cout << std::string(80, '-') << std::endl;
+  //std::cout << "Information Module initialized" << std::endl;
+  //std::cout << std::string(80, '-') << std::endl;
 }
 
 void Info::operator()(const MilestonePath &path)

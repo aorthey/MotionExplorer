@@ -92,16 +92,16 @@ const char* ContactStabilityController::Type() const { return "ContactStabilityC
 void ContactStabilityController::Reset() { 
   output.Reset();
   RobotController::Reset(); 
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "["<<Type() << "] Reset" << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
+  //std::cout << std::string(80, '-') << std::endl;
+  //std::cout << "["<<Type() << "] Reset" << std::endl;
+  //std::cout << std::string(80, '-') << std::endl;
 
-  uint Nsensors = sensors->sensors.size();
-  std::cout << "Sensors : " << std::endl;
-  for(uint i = 0; i < Nsensors; i++){
-    std::cout << "         " << sensors->sensors.at(i)->name << std::endl;
-  }
-  std::cout << std::string(80, '-') << std::endl;
+  //uint Nsensors = sensors->sensors.size();
+  //std::cout << "Sensors : " << std::endl;
+  //for(uint i = 0; i < Nsensors; i++){
+  //  std::cout << "         " << sensors->sensors.at(i)->name << std::endl;
+  //}
+  //std::cout << std::string(80, '-') << std::endl;
 } 
 
 const ControllerState& ContactStabilityController::GetControllerState() const {

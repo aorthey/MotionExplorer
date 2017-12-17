@@ -7,6 +7,7 @@ PlannerBackend::PlannerBackend(RobotWorld *world) :
 {
   active_planner=0;
   t = 0;
+  isPlanningInProcess = false;
 }
 
 void PlannerBackend::AddPlannerInput(PlannerMultiInput& _in){
@@ -14,7 +15,7 @@ void PlannerBackend::AddPlannerInput(PlannerMultiInput& _in){
     planners.push_back( new MotionPlannerBenchmark(world, _in) );
   }
   for(uint k = 0; k < _in.inputs.size(); k++){
-    std::cout << *_in.inputs.at(k) << std::endl;
+    //std::cout << *_in.inputs.at(k) << std::endl;
     planners.push_back( new MotionPlanner(world, *_in.inputs.at(k)) );
   }
 }
@@ -27,6 +28,9 @@ void PlannerBackend::Start(){
 
 
 bool PlannerBackend::OnCommand(const string& cmd,const string& args){
+
+  if(isPlanningInProcess) return BaseT::OnCommand(cmd,args);
+
   stringstream ss(args);
   if(planners.empty()) return BaseT::OnCommand(cmd, args);
   bool hierarchy_change = false;
@@ -89,29 +93,34 @@ bool PlannerBackend::OnIdle(){
   bool res = BaseT::OnIdle();
   if(planners.empty()) return res;
 
-  MotionPlanner* planner = planners.at(active_planner);
-  static PathPiecewiseLinear *path;
-  if(state("draw_play_path")){
-    if(t<=0){
-      path = planner->GetPath();
-    }
-    if(path){
-      double T = path->GetLength();
-      double tstep = T/1000;
-      //std::cout << "play path: " << t << "/" << T << std::endl;
-      if(t>=T){
-        //state("draw_play_path").deactivate();
-        t=0;
-        SendPauseIdle();
-      }else{
-        t+=tstep;
-        SendRefresh();
-      }
-    }
-    return true;
-  }
+  if(isPlanningInProcess){
 
+
+  }else{
+    MotionPlanner* planner = planners.at(active_planner);
+    static PathPiecewiseLinear *path;
+    if(state("draw_play_path")){
+      if(t<=0){
+        path = planner->GetPath();
+      }
+      if(path){
+        double T = path->GetLength();
+        double tstep = T/1000;
+        //std::cout << "play path: " << t << "/" << T << std::endl;
+        if(t>=T){
+          //state("draw_play_path").deactivate();
+          t=0;
+          SendPauseIdle();
+        }else{
+          t+=tstep;
+          SendRefresh();
+        }
+      }
+      return true;
+    }
+  }
   return res;
+
 }
 
 void PlannerBackend::RenderWorld(){
@@ -233,7 +242,6 @@ void GLUIPlannerGUI::AddPlannerInput(PlannerMultiInput& _in){
 }
 
 bool GLUIPlannerGUI::Initialize(){
-  std::cout << "Initializing GUI" << std::endl;
   if(!BaseT::Initialize()) return false;
 
   PlannerBackend* _backend = static_cast<PlannerBackend*>(backend);

@@ -20,8 +20,8 @@ bool WrenchField::Load(TiXmlElement *node)
   forcefields.clear();
 
   if(!forcefieldsettings){
-    std::cout << "world xml file has no forcefield" << std::endl;
-    std::cout << " -- setting earth gravity" << std::endl;
+    //std::cout << "world xml file has no forcefield" << std::endl;
+    //std::cout << " -- setting earth gravity" << std::endl;
     SmartPointer<ForceField> f(new UniformForceField(Vector3(0,0,-9.81)));
     forcefields.push_back(f);
     return false;
@@ -281,9 +281,8 @@ Vector3 WrenchField::getCOMPosition(){
 
 void WrenchField::print(){
   std::cout << std::string(80, '-') << std::endl;
-  std::cout << "WrenchField" << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
   std::cout << "Force Fields" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
   for(uint i = 0; i < forcefields.size(); i++){
     forcefields.at(i)->print();
   }

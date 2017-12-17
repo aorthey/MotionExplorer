@@ -108,9 +108,9 @@ bool PlannerMultiInput::load(TiXmlElement *node){
     node_algorithm = FindNextSiblingNode(node_algorithm, "algorithm");
   }
 
-  for(uint k = 0; k < inputs.size(); k++){
-    std::cout << inputs.at(k) << std::endl;
-  }
+  //for(uint k = 0; k < inputs.size(); k++){
+  //  std::cout << inputs.at(k) << std::endl;
+  //}
 
   //################################################################################
   // check for benchmarks
