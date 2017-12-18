@@ -13,6 +13,7 @@ LIST(APPEND CMAKE_MODULE_PATH "${KLAMPT_ROOT}/CMakeModules")
 LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules")
 INCLUDE(CMakeColors)
 MESSAGE(COLOR_WHITE ${DEPENDENCIES})
+set(CMAKE_C_COMPILER "gcc-5")
 set(CMAKE_CXX_COMPILER "g++-5")
 
 ###############################################################################
@@ -114,4 +115,5 @@ ENDFOREACH(FILENAME)
 MESSAGE("-------------------------------------")
 
 #SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall -Werror" )
-SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall" )
+SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall -fmax-errors=5" )
+MESSAGE("Compilers: ${CMAKE_CXX_COMPILER} ${CMAKE_C_COMPILER}")

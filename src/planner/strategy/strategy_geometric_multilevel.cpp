@@ -40,6 +40,61 @@
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/util/Time.h>
 
+void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &run)
+{
+  static uint pid = 0;
+
+  //run["some extra property name INTEGER"] = "some value";
+  // The format of added data is string key, string value pairs,
+  // with the convention that the last word in string key is one of
+  // REAL, INTEGER, BOOLEAN, STRING. (this will be the type of the field
+  // when the log file is processed and saved as a database).
+  // The values are always converted to string.
+  ob::SpaceInformationPtr si = planner->getSpaceInformation();
+  ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
+
+
+  bool solved = pdef->hasExactSolution();
+
+  uint states = boost::lexical_cast<int>(run["graph states INTEGER"]);
+
+  if(!solved && states < 5){
+    std::cout << "ERROR: Planner output has only " << states << std::endl;
+    for (ot::Benchmark::RunProperties::iterator it=run.begin(); it!=run.end(); ++it)
+    {
+      std::cout << it->first << " => " << it->second << '\n';
+    }
+    exit(1);
+  }
+
+  //if(solved){
+  //  std::cout << "Found Solution at run " << pid << std::endl;
+  //  util::PrintCurrentTime();
+  //  const ob::PathPtr &pp = pdef->getSolutionPath();
+  //  oc::PathControl path_control = static_cast<oc::PathControl&>(*pp);
+  //  og::PathGeometric path = path_control.asGeometric();
+
+  //  //og::PathSimplifier shortcutter(si);
+  //  //shortcutter.shortcutPath(path);
+
+  //  vector<Config> keyframes;
+  //  for(int i = 0; i < path.getStateCount(); i++)
+  //  {
+  //    ob::State *state = path.getState(i);
+  //    Config cur = OMPLStateToConfig(state, cspace->getPtr());
+  //    keyframes.push_back(cur);
+  //  }
+  //  std::string sfile = "random_"+std::to_string(pid)+".xml";
+  //  std::cout << "Saving keyframes"<< std::endl;
+  //  Save(keyframes, sfile.c_str());
+  //}else{
+  //  std::cout << "Run " << pid << " no solution" << std::endl;
+
+  //}
+  pid++;
+
+}
+
 StrategyGeometricMultiLevel::StrategyGeometricMultiLevel()
 {
 }
@@ -205,17 +260,17 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     //planner->setProblemDefinition(pdef_vec.back());
     //benchmark.addPlanner(planner);
 
-    typedef og::PRMMultiSlice<og::PRMSlice> MultiSlice;
-    planner = std::make_shared<MultiSlice>(si_vec);
-    static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
-    benchmark.addPlanner(planner);
-
     //planner = std::make_shared<og::BFMT>(si_vec.back());
     //planner->setProblemDefinition(pdef_vec.back());
     //benchmark.addPlanner(planner);
     
     planner = std::make_shared<og::RRTConnect>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
+    benchmark.addPlanner(planner);
+
+    typedef og::PRMMultiSlice<og::PRMSlice> MultiSlice;
+    planner = std::make_shared<MultiSlice>(si_vec);
+    static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
     benchmark.addPlanner(planner);
 
     ob::ProblemDefinitionPtr pdef = pdef_vec.back();
@@ -231,10 +286,10 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     ot::Benchmark::Request req;
     req.maxTime = 60;
     req.maxMem = 10000.0;
-    req.runCount = 5;
+    req.runCount = 10;
     req.displayProgress = true;
 
-
+    benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));
     benchmark.benchmark(req);
 
     std::string file = "benchmark_"+util::GetCurrentDateTimeString();

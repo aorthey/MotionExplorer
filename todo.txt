@@ -356,8 +356,8 @@ make hole bigger
  only called after sampling, it is also called after random bounce motion,
  whereby the new vertex does not lie on any edge! what should we do in that case?
 
-
 BENCHMARKING
+
  [x] ensure correct reset
  [x] output from sql database to cout
  [x] prettify the output graphs:
@@ -366,11 +366,11 @@ BENCHMARKING
    [x] add seconds to time
    [ ] always start at zero
    [ ] visualize the solved instances divided by all
-
  [ ] extensive benchmarking for some SE(3) examples
  [ ] visualize all solved paths
  [ ] replay particular path (let me choose from all solution paths)
  [ ] why do we get invalid paths?
- [ ] error during benchmark with multislice, created zero nodes.
  [ ] rename multislice -> QPRM
+ [ ] catch error during benchmark with multislice, created zero nodes.
+ [ ] compare algorithms: RRTConnect, QMP (the classical, only sampling changed), QMPConnect (adjust also connect function), QMPSufficient (ignore sufficient edges), QMPNarrowPassage (analyse underlying graph structure, change sampling accordingly), QMPcsn (all together)
 

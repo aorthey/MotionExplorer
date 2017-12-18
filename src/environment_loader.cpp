@@ -56,7 +56,6 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
     exit(0);
   }
 
-
   uint Nrobots = world.robots.size();
   if(Nrobots>0){
     name_robot = world.robots[0]->name;
