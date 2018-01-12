@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<robot name="Xshape">
+ <link name="link0">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.00166666666667" ixy="0" ixz="0" iyy="0.164166666667" iyz="0" izz="0.164166666667"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <box size="0.1 1.4 0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <box size="0.1 1.4 0.1"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.164166666667" ixy="0" ixz="0" iyy="0.326666666667" iyz="0" izz="0.164166666667"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.751 0 0"/>
+    <geometry>
+      <box size="1.4 1.4 0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.751 0 0"/>
+    <geometry>
+      <box size="1.4 1.4 0.1"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="link2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.164166666667" ixy="0" ixz="0" iyy="0.164166666667" iyz="0" izz="0.326666666667"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0.751"/>
+    <geometry>
+      <box size="0.1 1.4 1.4"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0.751"/>
+    <geometry>
+      <box size="0.1 1.4 1.4"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="link3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.164166666667" ixy="0" ixz="0" iyy="0.164166666667" iyz="0" izz="0.326666666667"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 -0.751"/>
+    <geometry>
+      <box size="0.1 1.4 1.4"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 -0.751"/>
+    <geometry>
+      <box size="0.1 1.4 1.4"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="link4">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.164166666667" ixy="0" ixz="0" iyy="0.326666666667" iyz="0" izz="0.164166666667"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.751 0 0"/>
+    <geometry>
+      <box size="1.4 1.4 0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.751 0 0"/>
+    <geometry>
+      <box size="1.4 1.4 0.1"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_l0_l1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="link0"/>
+  <child link="link1"/>
+</joint>
+
+<joint name="joint_l0_l2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="link0"/>
+  <child link="link2"/>
+</joint>
+
+<joint name="joint_l0_l3" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="link0"/>
+  <child link="link3"/>
+</joint>
+
+<joint name="joint_l0_l4" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="link0"/>
+  <child link="link4"/>
+</joint>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>
