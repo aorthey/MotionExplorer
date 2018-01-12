@@ -2,7 +2,6 @@
 #include "planner/cspace/cspace.h"
 #include "planner/cspace/cspace_geometric_RN.h"
 #include "planner/cspace/cspace_geometric_SE2.h"
-#include "planner/cspace/cspace_geometric_SE3.h"
 #include "planner/cspace/cspace_geometric_R3S2.h"
 #include "planner/cspace/cspace_input.h"
 #include "planner/cspace/cspace_decorator.h"
@@ -29,11 +28,7 @@ class CSpaceFactory{
     }
     // CSpace  SE(3)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE3( RobotWorld *world, int robot_idx){
-      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLSE3(world, robot_idx);
-      cspace->SetCSpaceInput(input);
-      cspace->initSpace();
-      cspace->initControlSpace();
-      return cspace;
+      return MakeGeometricCSpace(world, robot_idx);
     }
     // CSpace  R^3 \times S1 \times S1
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceR3S2( RobotWorld *world, int robot_idx){

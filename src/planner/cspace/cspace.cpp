@@ -450,9 +450,7 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
   }else{
     const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::SE3StateSpace::StateType>();
     return OMPLStateToConfig(qomplSE3, NULL);
-
   }
-
 }
 
 const oc::StatePropagatorPtr GeometricCSpaceOMPL::StatePropagatorPtr(oc::SpaceInformationPtr si)
