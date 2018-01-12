@@ -315,8 +315,6 @@ double PRMSlice::getSamplingDensity(){
 
 void PRMSlice::getPlannerData(base::PlannerData &data) const{
   PRMBasic::getPlannerData(data);
-  std::cout << "Number of start states: " << startM_.size() << std::endl;
-  std::cout << "Number of goal  states: " << goalM_.size() << std::endl;
 }
 
 bool PRMSlice::Sample(ob::State *workState){

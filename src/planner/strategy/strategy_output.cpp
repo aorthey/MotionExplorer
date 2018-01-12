@@ -115,7 +115,9 @@ void StrategyOutput::SetRoadmap(RoadmapPtr roadmap_){
 std::ostream& operator<< (std::ostream& out, const StrategyOutput& so) 
 {
   out << std::string(80, '-') << std::endl;
-  out << "Found solution:" << std::endl;
+  out << "Planning Output" << std::endl;
+  out << std::string(80, '-') << std::endl;
+  out << " robot                : " << so.cspace->GetRobotPtr()->name << std::endl;
   out << " exact solution       : " << (so.pdef->hasExactSolution()? "Yes":"No")<< std::endl;
   out << " approximate solution : " << (so.pdef->hasApproximateSolution()? "Yes":"No")<< std::endl;
   double dg = so.pdef->getSolutionDifference();

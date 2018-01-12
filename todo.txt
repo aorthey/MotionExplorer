@@ -380,5 +380,8 @@ BENCHMARKING
 ompl->klampt!? (nope, this should affect other planners too)
 ->is not reproducible, i.e. there seems some randomness (but everything up to
 that point should be strictly deterministic!) ->not the right klampt dimension
-returned!
-
+returned! -> it worked for RRT because there we used GeometricCSpace instead of
+SE(3)
+[ ] path replay stops with out of range. path replay is too fast/too slow.
+[ ] displaying sweptvolume results in segfault -> wrong robot is used (the
+inner/outer ones are already deleted)

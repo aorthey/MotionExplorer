@@ -34,16 +34,21 @@ SweptVolume::SweptVolume(Robot *robot, const std::vector<Config> &keyframes, uin
     _appearanceStack[i]=a;
   }
 
+  std::cout << "Getting swept volume: " << robot->name << std::endl;
   for(uint i = 0; i < keyframes.size(); i++)
   {
     Config q = keyframes.at(i);
 
-    Config qq; qq.resize(robot->q.size()); qq.setZero();
-    for(uint k = 0; k < q.size(); k++){
+    Config qq;
+    qq.resize(robot->q.size()); 
+    qq.setZero();
+
+    for(uint k = 0; k < qq.size(); k++){
       qq(k) = q(k);
     }
     AddKeyframe(qq);
   }
+
   if(keyframes.size()>0){
     init = _keyframes.front();
     goal = _keyframes.back();

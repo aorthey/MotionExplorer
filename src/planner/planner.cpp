@@ -18,6 +18,7 @@ using namespace util;
 MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   world(world_), input(input_)
 {
+  current_path.clear();
   pwl = NULL;
   active = true;
   current_level = 0;

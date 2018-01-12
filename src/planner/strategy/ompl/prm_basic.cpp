@@ -352,7 +352,7 @@ void PRMBasic::getPlannerData(ob::PlannerData &data) const
     const Vertex v1 = boost::source(e, g_);
     const Vertex v2 = boost::target(e, g_);
     data.addEdge(ob::PlannerDataVertex(stateProperty_[v1]), ob::PlannerDataVertex(stateProperty_[v2]));
-    data.addEdge(ob::PlannerDataVertex(stateProperty_[v2]), ob::PlannerDataVertex(stateProperty_[v1]));
+    //data.addEdge(ob::PlannerDataVertex(stateProperty_[v2]), ob::PlannerDataVertex(stateProperty_[v1]));
     data.tagState(stateProperty_[v1], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v1));
     data.tagState(stateProperty_[v2], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v2));
   }
@@ -390,13 +390,6 @@ void PRMBasic::setup(){
     if (startM_.empty()){
       OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
       const ob::State *start = pdef_->getStartState(0);
-      if(!si_->isValid(start)){
-        std::cout << "is not valid: " << std::endl;
-        si_->printState(start);
-      }else{
-        std::cout << "---- IS VALID: " << std::endl;
-        si_->printState(start);
-      }
       exit(0);
     }
     if (!goal->couldSample()){

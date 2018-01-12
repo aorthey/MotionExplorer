@@ -131,8 +131,7 @@ void PRMMultiSlice<T>::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef
 
 template <class T>
 void PRMMultiSlice<T>::getPlannerData(ob::PlannerData &data) const{
-  //Planner::getPlannerData(data);
-  T *sb = slicespaces.back();
-  sb->getPlannerData(data);
+  T *lastslice = slicespaces.back();
+  lastslice->getPlannerData(data);
 }
 

@@ -265,16 +265,18 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     planner->setProblemDefinition(pdef_vec.back());
     benchmark.addPlanner(planner);
 
-    planner = std::make_shared<og::PDST>(si_vec.back());
-    planner->setProblemDefinition(pdef_vec.back());
-    benchmark.addPlanner(planner);
-
     planner = std::make_shared<og::PRM>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
     benchmark.addPlanner(planner);
 
     typedef og::PRMMultiSlice<og::PRMSlice> MultiSlice;
+    typedef og::PRMMultiSlice<og::PRMSliceConnect> MultiSliceConnect;
+
     planner = std::make_shared<MultiSlice>(si_vec);
+    static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
+    benchmark.addPlanner(planner);
+
+    planner = std::make_shared<MultiSliceConnect>(si_vec);
     static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
     benchmark.addPlanner(planner);
 
@@ -289,7 +291,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 60;
+    req.maxTime = 30;
     req.maxMem = 10000.0;
     req.runCount = 10;
     req.displayProgress = true;

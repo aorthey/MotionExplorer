@@ -293,7 +293,7 @@ void GeometricCSpaceOMPL::print() const
     cspaceSE3 = space->as<ob::SE3StateSpace>();
   }
 
-//################################################################################
+  //################################################################################
   const ob::RealVectorBounds bounds = cspaceSE3->getBounds();
   std::vector<double> se3min = bounds.low;
   std::vector<double> se3max = bounds.high;
