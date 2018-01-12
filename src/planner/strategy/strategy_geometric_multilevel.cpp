@@ -91,6 +91,7 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   //  std::cout << "Run " << pid << " no solution" << std::endl;
 
   //}
+  std::cout << "Run " << pid << " " << (solved?"solved":"no solution") << std::endl;
   pid++;
 
 }
@@ -117,7 +118,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     ob::ScopedState<> startk = cspace_levelk->ConfigToOMPLState(p_init);
     ob::ScopedState<> goalk  = cspace_levelk->ConfigToOMPLState(p_goal);
 
-    //std::cout << *cspace_levelk << std::endl;
+    std::cout << *cspace_levelk << std::endl;
 
     ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
     pdefk->addStartState(startk);
@@ -149,11 +150,11 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   }else if(algorithm=="ompl:prm_slice"){
     planner = std::make_shared<og::PRMSlice>(si_vec.back(),nullptr);
     planner->setProblemDefinition(pdef_vec.back());
-  }else if(algorithm=="ompl:prm_multislice"){
+  }else if(algorithm=="ompl:qmp"){
     typedef og::PRMMultiSlice<og::PRMSlice> MultiSlice;
     planner = std::make_shared<MultiSlice>(si_vec);
     static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
-  }else if(algorithm=="ompl:prm_multislice_connect"){
+  }else if(algorithm=="ompl:qmpconnect"){
     typedef og::PRMMultiSlice<og::PRMSliceConnect> MultiSlice;
     planner = std::make_shared<MultiSlice>(si_vec, "Connect");
     static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
@@ -256,15 +257,19 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     //planner->setProblemDefinition(pdef_vec.back());
     //benchmark.addPlanner(planner);
 
-    //planner = std::make_shared<og::PDST>(si_vec.back());
-    //planner->setProblemDefinition(pdef_vec.back());
-    //benchmark.addPlanner(planner);
-
     //planner = std::make_shared<og::BFMT>(si_vec.back());
     //planner->setProblemDefinition(pdef_vec.back());
     //benchmark.addPlanner(planner);
-    
+
     planner = std::make_shared<og::RRTConnect>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
+    benchmark.addPlanner(planner);
+
+    planner = std::make_shared<og::PDST>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
+    benchmark.addPlanner(planner);
+
+    planner = std::make_shared<og::PRM>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
     benchmark.addPlanner(planner);
 

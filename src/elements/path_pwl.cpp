@@ -23,6 +23,24 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_):
   }
 }
 
+void PathPiecewiseLinear::Smooth(){
+  if(isOmpl){
+    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+
+    og::PathSimplifier shortcutter(gpath.getSpaceInformation());
+    shortcutter.simplifyMax(gpath);
+
+    length = gpath.length();
+    std::vector<ob::State *> states = gpath.getStates();
+
+    interLength.clear();
+    for(uint k = 1; k < states.size(); k++){
+      ob::State *s0 = states.at(k-1);
+      ob::State *s1 = states.at(k);
+      interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
+    }
+  }
+}
 void PathPiecewiseLinear::Normalize(){
   double newLength =0.0;
   for(uint i = 0; i < interLength.size(); i++){

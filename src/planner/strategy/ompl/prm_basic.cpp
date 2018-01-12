@@ -389,6 +389,14 @@ void PRMBasic::setup(){
     }
     if (startM_.empty()){
       OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
+      const ob::State *start = pdef_->getStartState(0);
+      if(!si_->isValid(start)){
+        std::cout << "is not valid: " << std::endl;
+        si_->printState(start);
+      }else{
+        std::cout << "---- IS VALID: " << std::endl;
+        si_->printState(start);
+      }
       exit(0);
     }
     if (!goal->couldSample()){

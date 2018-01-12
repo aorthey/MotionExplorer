@@ -4,7 +4,6 @@
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
-
 namespace ompl
 {
   namespace base

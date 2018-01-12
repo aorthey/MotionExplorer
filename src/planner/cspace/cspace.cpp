@@ -131,7 +131,6 @@ void GeometricCSpaceOMPL::Init(){
 
   //check if the robot is SE(3) or if we need to add real vector space for joints
   if(Nklampt<=0){
-    hasRealVectorSpace = false;
     Nompl = 0;
   }else{
     //sometimes the joint space are only fixed joints. In that case OMPL
@@ -143,14 +142,12 @@ void GeometricCSpaceOMPL::Init(){
     assert(minimum.size() == 6+Nklampt);
     assert(maximum.size() == 6+Nklampt);
 
-    //ompl does only accept dimensions with strictly positive measure, adding some epsilon space
+    //prune dimensions which are smaller than epsilon (for ompl)
     double epsilonSpacing=1e-10;
-    hasRealVectorSpace = false;
     Nompl = 0;
     for(uint i = 6; i < 6+Nklampt; i++){
 
       if(abs(minimum.at(i)-maximum.at(i))>epsilonSpacing){
-        hasRealVectorSpace = true;
         klampt_to_ompl.push_back(Nompl);
         ompl_to_klampt.push_back(i);
         Nompl++;
@@ -282,8 +279,8 @@ void GeometricCSpaceOMPL::print() const
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "Robot \"" << robot->name << "\":" << std::endl;
   std::cout << "Dimensionality Space            :" << GetDimensionality() << std::endl;
-  std::cout << " Configuration Space (original) : SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(Nklampt):"") << "  [Klampt]"<< std::endl;
-  std::cout << " Configuration Space (effective): SE(3)" << (hasRealVectorSpace?"xR^"+std::to_string(Nompl):"") << "  [OMPL]" << std::endl;
+  std::cout << " Configuration Space (klampt) : SE(3)" << (Nklampt>0?"xR^"+std::to_string(Nklampt):"") << "  [Klampt]"<< std::endl;
+  std::cout << " Configuration Space (ompl)   : SE(3)" << (Nompl>0?"xR^"+std::to_string(Nompl):"") << "  [OMPL]" << std::endl;
 
   ob::SE3StateSpace *cspaceSE3 = NULL;
   ob::RealVectorStateSpace *cspaceRn = NULL;

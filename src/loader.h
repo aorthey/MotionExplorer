@@ -74,6 +74,27 @@ inline stringstream GetStreamAttribute(TiXmlElement* node, const char *name){
     return stringstream ("NONE");
   }
 }
+inline stringstream GetStreamAttributeConfig(TiXmlElement* node, const char *name){
+
+  if(!node) return stringstream ("NONE");
+  const char *na = node->Attribute(name);
+  if(na){
+    //safety check for config
+//  int n;
+//  in >> n;
+//  if(!in) return in;
+//  if(n != v.n)
+//    v.resize(n);
+//  for(int i=0; i<v.n; i++)
+//    in >> v[i];
+//  return in;
+//}
+
+    return stringstream (na);
+  }else{
+    return stringstream ("NONE");
+  }
+}
 
 inline stringstream GetStreamText(TiXmlElement* node){
 

@@ -37,6 +37,7 @@ PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
 
   id = counter++;
   std::cout << "--- Level " << id << " SliceSpace" << std::endl;
+  setName("PRMSlice"+to_string(id));
   if(previous == nullptr){
   }else{
     const StateSpacePtr M0_space = previous->getSpaceInformation()->getStateSpace();

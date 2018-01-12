@@ -59,6 +59,7 @@ class PlannerInput{
 
     bool load(const char* file);
     bool load(TiXmlElement *node);
+    bool GetConfig(const TiXmlElement* node, const char *name, Config &q);
 
     friend std::ostream& operator<< (std::ostream& out, const PlannerInput& pin) ;
 };

@@ -158,6 +158,43 @@ bool PlannerMultiInput::load(TiXmlElement *node){
   return true;
 }
 
+bool PlannerInput::GetConfig(const TiXmlElement* node, const char *name, Config &q){
+  if(!node){
+    q.resize(0);
+    return false;
+  }
+  const char *na = node->Attribute(name);
+  if(na){
+    //safety check for config
+    std::stringstream ss = stringstream(na);
+    int n;
+    ss >> n;
+    double tt;
+
+    int ictr = 0;
+    while(!ss.fail()){
+      ss>>tt;
+      ictr++;
+    }
+    ictr--;
+    if(n!=ictr){
+      std::cout << node->Value() << " Config is not correctly formatted (elements " << ictr << " but expected " << n << ")" << std::endl;
+      exit(0);
+      q.resize(0);
+      return false;
+    }
+
+    ss.clear();
+    ss.seekg(0, std::ios::beg);
+    //std::cout << ss.str() << std::endl;
+    //std::cout << std::string(80, '-') << std::endl;
+    ss >> q;
+    return true;
+  }else{
+    q.resize(0);
+    return false;
+  }
+}
 //################################################################################
 ///@brief get fixed general settings 
 //################################################################################
@@ -181,15 +218,14 @@ bool PlannerInput::load(TiXmlElement *node)
   TiXmlElement* node_dqgoal = FindSubNode(node_plannerinput, "dqgoal");
   TiXmlElement* node_freeFloating = FindSubNode(node_plannerinput, "freeFloating");
 
-  GetStreamAttribute(node_qinit,"config") >> q_init;
-  GetStreamAttribute(node_qgoal,"config") >> q_goal;
-  GetStreamAttribute(node_dqinit,"config") >> dq_init;
-  GetStreamAttribute(node_dqgoal,"config") >> dq_goal;
+  GetConfig(node_qinit , "config", q_init);
+  GetConfig(node_qgoal , "config", q_goal);
+  GetConfig(node_dqinit, "config", dq_init);
+  GetConfig(node_dqgoal, "config", dq_goal);
+  GetConfig(node_se3min, "config", se3min);
+  GetConfig(node_se3max, "config", se3max);
 
   GetStreamText(node_freeFloating) >> freeFloating;
-
-  GetStreamAttribute(node_se3min,"config")  >> se3min;
-  GetStreamAttribute(node_se3max,"config")  >> se3max;
 
   TiXmlElement* node_robot = FindSubNode(node_plannerinput, "robot");
   if(node_robot){

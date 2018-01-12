@@ -11,6 +11,7 @@
 
 using namespace og;
 using namespace ob;
+
 #define foreach BOOST_FOREACH
 #define DEBUG 1
 
@@ -27,6 +28,7 @@ namespace ompl
 PRMSliceConnect::PRMSliceConnect(const ob::SpaceInformationPtr &si, PRMSliceConnect *previous_ ):
   PRMSlice(si, previous_)
 {
+  setName("PRMSliceConnect"+to_string(id));
 }
 
 PRMSliceConnect::~PRMSliceConnect(){

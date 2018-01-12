@@ -8,26 +8,22 @@ template <class T>
 PRMMultiSlice<T>::PRMMultiSlice(std::vector<ob::SpaceInformationPtr> &si_vec_, std::string type):
   ob::Planner(si_vec_.back(),"QMP"+type), si_vec(si_vec_)
 {
-  //SpaceInformationPtr contains StateSpacePtr + ValidityChecker
-  // and its native StateSampler, inherited by the OMPL StateSpace
-  //
-  // => to copy SI, we need to copy statespace and copy validitychecker
-    T::resetCounter();
-    for(uint k = 0; k < si_vec.size(); k++){
-      T* previous = nullptr;
-      if(k>0) previous = slicespaces.back();
+  T::resetCounter();
+  for(uint k = 0; k < si_vec.size(); k++){
+    T* previous = nullptr;
+    if(k>0) previous = slicespaces.back();
 
-      T* ss = new T(si_vec.at(k), previous);
-      slicespaces.push_back(ss);
-    }
+    T* ss = new T(si_vec.at(k), previous);
+    slicespaces.push_back(ss);
+  }
 
-    std::cout << "Created hierarchy with " << si_vec.size() << " levels." << std::endl;
-
+  std::cout << "Created hierarchy with " << si_vec.size() << " levels." << std::endl;
 }
 
 template <class T>
 PRMMultiSlice<T>::~PRMMultiSlice(){
 }
+
 template <class T>
 void PRMMultiSlice<T>::setup(){
 
@@ -131,7 +127,6 @@ void PRMMultiSlice<T>::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef
 
   //ob::ProblemDefinitionPtr pp = pdef.back();
   this->Planner::setProblemDefinition(pdef);
-
 }
 
 template <class T>

@@ -119,9 +119,6 @@ class GeometricCSpaceOMPL: public CSpaceOMPL
     virtual Config OMPLStateToConfig(const ob::State *qompl) override;
     Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState);
     virtual void print() const override;
-
-  protected:
-    bool hasRealVectorSpace;
 };
 
 //KinodynamicCSpaceOMPL: Space = tangent bundle of configuration manifold;

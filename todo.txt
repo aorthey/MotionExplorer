@@ -348,10 +348,10 @@ make hole bigger
  [x] check if connect function performs as desired! (does constructSolution lie
  on graph!?)
  [x] enable benchmark (needs overhaul)
- [ ] think about better sampling function exploiting underlying graph
  [ ] object touched obstacles during play path with multislice in SE(3)
+ [ ] think about better sampling function exploiting underlying graph
  [ ] save/load path
- [ ] connect function returns wrong path because of random bouncing motion
+ [ ] connect function returns wrong path because of random bouncing motion(?)
  [ ] addmilestone calls connect to connect to neighbors. But addmilestone is not
  only called after sampling, it is also called after random bounce motion,
  whereby the new vertex does not lie on any edge! what should we do in that case?
@@ -360,6 +360,7 @@ BENCHMARKING
 
  [x] ensure correct reset
  [x] output from sql database to cout
+ [x] rename multislice -> QMP
  [x] prettify the output graphs:
    [x] add horizontal line time-cut off
    [x] add number of runs
@@ -370,7 +371,14 @@ BENCHMARKING
  [ ] visualize all solved paths
  [ ] replay particular path (let me choose from all solution paths)
  [ ] why do we get invalid paths?
- [ ] rename multislice -> QPRM
  [ ] catch error during benchmark with multislice, created zero nodes.
  [ ] compare algorithms: RRTConnect, QMP (the classical, only sampling changed), QMPConnect (adjust also connect function), QMPSufficient (ignore sufficient edges), QMPNarrowPassage (analyse underlying graph structure, change sampling accordingly), QMPcsn (all together)
+
+[ ] resulting path from RRT is not smooth (but should be smooth through shortcutting)
+[ ] save resulting path to file, and be able to load it back
+[x] invalid start state on Xshape -> maybe bigger problem with converting
+ompl->klampt!? (nope, this should affect other planners too)
+->is not reproducible, i.e. there seems some randomness (but everything up to
+that point should be strictly deterministic!) ->not the right klampt dimension
+returned!
 

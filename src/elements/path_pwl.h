@@ -32,6 +32,7 @@ class PathPiecewiseLinear
 
     // convert path length [0,L] -> [0,1]
     void Normalize();
+    void Smooth();
 
   protected:
     std::vector<Config> keyframes;
