@@ -29,8 +29,6 @@ namespace ompl
         virtual double Distance(const Vertex a, const Vertex b) const override;
         virtual bool Connect(const Vertex a, const Vertex b) override;
 
-        bool SampleGraph(ob::State *workState);
-
         virtual uint randomBounceMotion(const ob::StateSamplerPtr &sss, 
           const Vertex &v, std::vector<ob::State *> &states) const override;
     };

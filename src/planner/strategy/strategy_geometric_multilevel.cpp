@@ -4,6 +4,7 @@
 #include "planner/strategy/ompl/prm_multislice.h"
 #include "planner/strategy/ompl/prm_slice.h"
 #include "planner/strategy/ompl/prm_slice_connect.h"
+#include "planner/strategy/ompl/prm_slice_narrowness.h"
 #include "util.h"
 
 #include <ompl/geometric/planners/rrt/RRT.h>
@@ -157,6 +158,10 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   }else if(algorithm=="ompl:qmpconnect"){
     typedef og::PRMMultiSlice<og::PRMSliceConnect> MultiSlice;
     planner = std::make_shared<MultiSlice>(si_vec, "Connect");
+    static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="ompl:qmpnarrow"){
+    typedef og::PRMMultiSlice<og::PRMSliceNarrow> MultiSlice;
+    planner = std::make_shared<MultiSlice>(si_vec, "Narrow");
     static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="ompl:benchmark_initial"){
     //### BENCHMARK INITIAL #########################################################
@@ -377,20 +382,26 @@ void StrategyGeometricMultiLevel::BenchmarkFileToPNG(const std::string &file){
   std::string cmd;
 
   cmd = "ompl_benchmark_statistics.py "+file+".log -d "+file+".db";
-  std::system(cmd.c_str());
+  int s1 = std::system(cmd.c_str());
 
   cmd = "cp "+file+".db"+" ../data/benchmarks/";
-  std::system(cmd.c_str());
+  int s2 = std::system(cmd.c_str());
 
   cmd = "python ../scripts/ompl_output_benchmark.py "+file+".db";
-  std::system(cmd.c_str());
+  int s3 = std::system(cmd.c_str());
 
   cmd = "python ../scripts/ompl_benchmark_statistics_simple.py "+file+".log -d "+file+".db -p "+file+".pdf";
-  std::system(cmd.c_str());
+  int s4 = std::system(cmd.c_str());
 
   cmd = "convert -density 150 "+file+".pdf -trim -quality 100 "+file+".png";
-  std::system(cmd.c_str());
+  int s5 = std::system(cmd.c_str());
 
   cmd = "eog "+file+".png";
-  std::system(cmd.c_str());
+  int s6 = std::system(cmd.c_str());
+
+  if(s1&s2&s3&s4&s5&s6){
+    std::cout << "Successfully wrote benchmark to " << file << ".png" << std::endl;
+  }else{
+    std::cout << "benchmark to png failed" << std::endl;
+  }
 }

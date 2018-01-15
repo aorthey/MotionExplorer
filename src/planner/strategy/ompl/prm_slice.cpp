@@ -345,7 +345,6 @@ bool PRMSlice::SampleGraph(ob::State *workState){
     pdf.add(e, weight.value());
     const Vertex v1 = boost::source(e, g_);
     const Vertex v2 = boost::target(e, g_);
-
     // if(DEBUG){
     //   if(v1o==v1 && v2o==v2){
     //     std::cout << std::string(80, '-') << std::endl;
@@ -390,7 +389,6 @@ bool PRMSlice::SampleGraph(ob::State *workState){
   const Vertex v2 = boost::target(e, g_);
   const ob::State *from = stateProperty_[v1];
   const ob::State *to = stateProperty_[v2];
-
 
   M1->getStateSpace()->interpolate(from, to, t, workState);
 

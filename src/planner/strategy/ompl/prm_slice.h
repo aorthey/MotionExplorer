@@ -95,8 +95,7 @@ namespace ompl
         virtual double Distance(const Vertex a, const Vertex b) const override;
         virtual bool Sample(ob::State *workState) override;
         virtual bool Connect(const Vertex a, const Vertex b) override;
-
-        bool SampleGraph(ob::State *workState);
+        virtual bool SampleGraph(ob::State *workState);
 
         virtual Vertex addMilestone(ob::State *state) override;
 
