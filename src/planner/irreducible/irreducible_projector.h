@@ -1,7 +1,7 @@
 #pragma once
 #include <Modeling/Robot.h>
 #include "gui/gui.h"
-#include "elements/path_pwl_euclid.h"
+#include "elements/path_pwl.h"
 
 typedef std::vector<double> doubleVec;
 typedef std::vector<doubleVec> doubleVecVec;
@@ -33,7 +33,7 @@ class IrreducibleProjector
 
     pairDoubleVecVec ComputeThetaGammaFromRootPath( const std::vector<Vector3> &rootPos, const std::vector<Matrix3> &rootRot, const std::vector<double> &lengths);
 
-    pairDoubleVec ComputeThetaGammaFromRootPathPosition(const PathPiecewiseLinearEuclidean &path, double t0, const Matrix3 &R0, const std::vector<double> &lengths);
+    pairDoubleVec ComputeThetaGammaFromRootPathPosition(const PathPiecewiseLinear &path, double t0, const Matrix3 &R0, const std::vector<double> &lengths);
 
     virtual std::vector<Config> getSubLinkKeyframes() = 0;
 

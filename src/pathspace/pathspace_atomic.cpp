@@ -26,7 +26,10 @@ void PathSpaceAtomic::DrawGL(GUIState& state){
   GLDraw::drawRobotAtConfig(robot, qg_in, lightRed);
 
   if(vantage_path.size()>0){
-    GLDraw::drawPath(vantage_path, magenta, 10);
+    GLDraw::drawPath(vantage_path, green, 10);
+  }
+  if(path_ompl){
+    path_ompl->DrawGL(state);
   }
 }
 

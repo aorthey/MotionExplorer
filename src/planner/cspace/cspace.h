@@ -2,7 +2,6 @@
 #include "planner/integrator/principalfibrebundle.h"
 #include "planner/integrator/tangentbundle.h"
 #include "planner/cspace/cspace_input.h"
-#include "elements/path_pwl_euclid.h"
 #include "klampt.h"
 
 #include <ompl/base/spaces/SE3StateSpace.h>

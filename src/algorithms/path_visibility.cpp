@@ -17,6 +17,9 @@ class PathPathValidityChecker : public ob::StateValidityChecker
       std::vector<Config> s1;
       std::vector<Config> s2;
 
+      std::cout << "Before using, convert vertices to OMPL path ptr, then feed that into PWL" << std::endl;
+      exit(0);
+
       for(uint k = 0; k < p1.size(); k++){
         const ob::State *state1 = pd_in.getVertex(p1.at(k)).getState();
         Config q1 = cspace->OMPLStateToConfig(state1);
@@ -28,10 +31,10 @@ class PathPathValidityChecker : public ob::StateValidityChecker
         s2.push_back(q2);
       }
 
-      path1 = PathPiecewiseLinearEuclidean::from_keyframes(s1);
-      path1->Normalize();
-      path2 = PathPiecewiseLinearEuclidean::from_keyframes(s2);
-      path2->Normalize();
+      //path1 = new PathPiecewiseLinear(cspace)
+      //path1->Normalize();
+      //path2 = PathPiecewiseLinear::from_keyframes(s2);
+      //path2->Normalize();
     }
 
     virtual bool isValid(const ob::State* state) const{
@@ -58,8 +61,8 @@ class PathPathValidityChecker : public ob::StateValidityChecker
 
     CSpaceOMPL *cspace;
     ob::SpaceInformationPtr si_path;
-    PathPiecewiseLinearEuclidean *path1;
-    PathPiecewiseLinearEuclidean *path2;
+    PathPiecewiseLinear *path1;
+    PathPiecewiseLinear *path2;
 
 };
 class PathVertexValidityChecker : public ob::StateValidityChecker
@@ -69,6 +72,8 @@ class PathVertexValidityChecker : public ob::StateValidityChecker
       ob::StateValidityChecker(si_), cspace(cspace_), si_path(si_path_)
     {
       std::vector<Config> s1;
+      std::cout << "Before using, convert vertices to OMPL path ptr, then feed that into PWL" << std::endl;
+      exit(0);
 
       for(uint k = 0; k < p1.size(); k++){
         const ob::State *state1 = pd_in.getVertex(p1.at(k)).getState();
@@ -78,8 +83,8 @@ class PathVertexValidityChecker : public ob::StateValidityChecker
       const ob::State *state2 = pd_in.getVertex(vertex).getState();
       qvertex = cspace->OMPLStateToConfig(state2);
 
-      path = PathPiecewiseLinearEuclidean::from_keyframes(s1);
-      path->Normalize();
+      //path = PathPiecewiseLinear::from_keyframes(s1);
+      //path->Normalize();
     }
 
     virtual bool isValid(const ob::State* state) const{
@@ -100,7 +105,7 @@ class PathVertexValidityChecker : public ob::StateValidityChecker
 
     CSpaceOMPL *cspace;
     ob::SpaceInformationPtr si_path;
-    PathPiecewiseLinearEuclidean *path;
+    PathPiecewiseLinear *path;
     Config qvertex;
 
 };

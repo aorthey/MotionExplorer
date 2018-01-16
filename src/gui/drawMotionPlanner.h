@@ -1,6 +1,7 @@
 #pragma once
 #include "planner/planner.h"
 #include "elements/wrench_field.h"
+#include "elements/path_pwl.h"
 #include "elements/simplicial_complex.h"
 #include "gui/colors.h"
 

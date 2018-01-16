@@ -1,5 +1,5 @@
 #include "elements/topological_graph.h"
-#include "elements/path_pwl_euclid.h"
+#include "elements/path_pwl.h"
 
 
 //shortest path functions:

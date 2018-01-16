@@ -1,7 +1,6 @@
 #pragma once
 
 #include "planner/cspace/cspace.h"
-#include "elements/path_pwl_euclid.h"
 
 #include <ompl/base/Cost.h>
 #include <ompl/base/PlannerData.h>

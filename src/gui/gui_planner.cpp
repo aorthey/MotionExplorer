@@ -1,5 +1,5 @@
 #include "gui/gui_planner.h"
-#include "elements/path_pwl_SE3.h"
+#include "elements/path_pwl.h"
 #include "gui/drawMotionPlanner.h"
 
 PlannerBackend::PlannerBackend(RobotWorld *world) : 
@@ -152,6 +152,8 @@ void PlannerBackend::RenderWorld(){
         path = planner->GetPath();
         if(!path){
           std::cout << "No path available." << std::endl;
+        }else{
+          //std::cout << *path << std::endl;
         }
       }
     }

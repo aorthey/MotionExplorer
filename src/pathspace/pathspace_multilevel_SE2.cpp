@@ -23,7 +23,7 @@ std::vector<PathSpace*> PathSpaceMultiLevelSE2::Decompose(){
   CSpaceOMPL *cspace_level_k;
   while(input_level){
     std::cout << *input_level << std::endl;
-    uint k = input_level->level;
+    //uint k = input_level->level;
     if(input_level->type=="R2") {
       cspace_level_k = factory.MakeGeometricCSpaceRN(world, input_level->robot_idx, 2);
     }else if(input_level->type=="SE2"){

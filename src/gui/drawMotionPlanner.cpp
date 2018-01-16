@@ -771,6 +771,8 @@ namespace GLDraw{
     glEnable(GL_LIGHTING);
     glLineWidth(1);
   }
+
+
   void drawSimplicialComplex( SimplicialComplex& cmplx ){
 
     glDisable(GL_LIGHTING);
