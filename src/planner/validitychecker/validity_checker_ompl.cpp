@@ -27,10 +27,15 @@ bool OMPLValidityChecker::isCollisionFree(SingleRobotCSpace *space, Config q) co
   for(size_t i=0;i<space->world.rigidObjects.size();i++)
     idothers.push_back(space->world.RigidObjectID(i));
 
-  pair<int,int> res = space->settings->CheckCollision(space->world,idrobot,idothers);
-  if(res.first >= 0) return false;
+  pair<int,int> res;
+
+  //selfcollision checking
   res = space->settings->CheckCollision(space->world,idrobot);
   if(res.first >= 0) return false;
+  //environment collision checking
+  res = space->settings->CheckCollision(space->world,idrobot,idothers);
+  if(res.first >= 0) return false;
+
   return true;
 }
 bool OMPLValidityChecker::isNecessary(const ob::State* state) const

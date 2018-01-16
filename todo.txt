@@ -385,3 +385,5 @@ SE(3)
 [ ] path replay stops with out of range. path replay is too fast/too slow.
 [ ] displaying sweptvolume results in segfault -> wrong robot is used (the
 inner/outer ones are already deleted)
+[ ] implement nearest contact sampler -> verify that RRT can solve DoubleLshape
+in less than 3 seconds.

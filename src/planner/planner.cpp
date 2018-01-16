@@ -408,7 +408,9 @@ PathPiecewiseLinear* MotionPlanner::GetPath(){
   if(!active) return NULL;
   Pcurrent = hierarchy->GetNodeContent(current_path);
   pwl = Pcurrent->getShortestPathOMPL();
-  pwl->Smooth();
+  if(pwl){
+    pwl->Smooth();
+  }
   return pwl;
 }
 void MotionPlanner::DrawGL(GUIState& state){

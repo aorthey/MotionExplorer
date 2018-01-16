@@ -150,9 +150,12 @@ void PlannerBackend::RenderWorld(){
     if(state("draw_play_path")){
       if(t<=0){
         path = planner->GetPath();
+        if(!path){
+          std::cout << "No path available." << std::endl;
+        }
       }
     }
-    if(t>0){
+    if(t>0 && path){
       Config q = path->Eval(t);
       uint ridx = planner->GetInput().robot_idx;
       Robot* robot = world->robots[ridx];

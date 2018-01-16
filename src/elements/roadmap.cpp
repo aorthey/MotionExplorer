@@ -40,7 +40,7 @@ void Roadmap::CreateFromPlannerDataOnlySufficient(const ob::PlannerDataPtr pd, C
   cspace = cspace_;
   ob::SpaceInformationPtr si = pd->getSpaceInformation();
   std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
-  OMPLValidityCheckerPtr validity_checker = std::static_pointer_cast<OMPLValidityChecker>(cspace->StateValidityCheckerPtr(si));
+  OMPLValidityCheckerPtr validity_checker = std::static_pointer_cast<OMPLValidityChecker>(cspace->StateValidityCheckerPtr());
 
   pds = std::make_shared<ob::PlannerData>(si);
 
@@ -50,7 +50,6 @@ void Roadmap::CreateFromPlannerDataOnlySufficient(const ob::PlannerDataPtr pd, C
     const ob::State* s = v.getState();
 
     Config q1 = cspace->OMPLStateToConfig(s);
-    //ob::StateValidityCheckerPtr validity_checker = cspace->StateValidityCheckerPtr(si);
 
     bool isVertexSufficient = validity_checker->isSufficient(s);
 
@@ -102,7 +101,7 @@ void Roadmap::CreateFromPlannerDataOnlyNecessary(const ob::PlannerDataPtr pd, CS
   cspace = cspace_;
   ob::SpaceInformationPtr si = pd->getSpaceInformation();
   std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
-  OMPLValidityCheckerPtr validity_checker = std::static_pointer_cast<OMPLValidityChecker>(cspace->StateValidityCheckerPtr(si));
+  OMPLValidityCheckerPtr validity_checker = std::static_pointer_cast<OMPLValidityChecker>(cspace->StateValidityCheckerPtr());
 
   pds = std::make_shared<ob::PlannerData>(si);
 
@@ -160,7 +159,7 @@ void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *csp
   cspace = cspace_;
   ob::SpaceInformationPtr si = pd->getSpaceInformation();
   std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
-  OMPLValidityCheckerPtr validity_checker = std::static_pointer_cast<OMPLValidityChecker>(cspace->StateValidityCheckerPtr(si));
+  OMPLValidityCheckerPtr validity_checker = std::static_pointer_cast<OMPLValidityChecker>(cspace->StateValidityCheckerPtr());
 
   for(uint i = 0; i < pd->numVertices(); i++){
     ob::PlannerDataVertex v = pd->getVertex(i);

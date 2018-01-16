@@ -11,10 +11,10 @@ const oc::StatePropagatorPtr CSpaceOMPLDecorator::StatePropagatorPtr(oc::SpaceIn
   return cspace_ompl->StatePropagatorPtr(si);
 }
 const ob::StateValidityCheckerPtr CSpaceOMPLDecorator::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
-  return cspace_ompl->StateValidityCheckerPtr(si);
+  return cspace_ompl->StateValidityCheckerPtr();
 }
 const ob::StateValidityCheckerPtr CSpaceOMPLDecorator::StateValidityCheckerPtr(oc::SpaceInformationPtr si){
-  return cspace_ompl->StateValidityCheckerPtr(si);
+  return cspace_ompl->StateValidityCheckerPtr();
 }
 ob::ScopedState<> CSpaceOMPLDecorator::ConfigToOMPLState(const Config &q){
   return cspace_ompl->ConfigToOMPLState(q);

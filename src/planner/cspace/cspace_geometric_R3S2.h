@@ -1,4 +1,4 @@
-#include "planner/cspace/cspace.h"
+#include "planner/cspace/cspace_geometric.h"
 
 class GeometricCSpaceOMPLR3S2: public GeometricCSpaceOMPL
 {

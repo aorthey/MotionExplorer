@@ -1,5 +1,7 @@
 #pragma once
 #include "planner/cspace/cspace.h"
+#include "planner/cspace/cspace_geometric.h"
+#include "planner/cspace/cspace_kinodynamic.h"
 #include "planner/cspace/cspace_geometric_RN.h"
 #include "planner/cspace/cspace_geometric_SE2.h"
 #include "planner/cspace/cspace_geometric_R3S2.h"

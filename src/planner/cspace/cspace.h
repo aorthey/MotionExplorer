@@ -43,8 +43,7 @@ class CSpaceOMPL
     CSpaceOMPL(Robot *robot_, CSpaceKlampt *kspace_);
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) = 0;
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si) = 0;
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) = 0;
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
 
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q) = 0;
     virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
@@ -68,6 +67,9 @@ class CSpaceOMPL
     static std::vector<double> EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
     static void OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSpace::StateType *q );
   protected:
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si) = 0;
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) = 0;
+
     CSpaceInput input;
 
     uint Nklampt;
@@ -95,57 +97,5 @@ class CSpaceOMPL
     CSpaceKlampt *kspace;
     RobotWorld *world;
     WorldPlannerSettings worldsettings;
-};
-
-//GeometricCSpaceOMPL: Space = Configuration manifold; control space = tangent
-//space of configuration manifold, i.e. control happens in velocity space
-//
-class GeometricCSpaceOMPL: public CSpaceOMPL
-{
-  public:
-    GeometricCSpaceOMPL(RobotWorld *world_, int robot_idx);
-    GeometricCSpaceOMPL(Robot *robot_, CSpaceKlampt *kspace_);
-
-    virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) override;
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si) override;
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) override;
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
-
-    void Init();
-    virtual void initSpace() override;
-    virtual void initControlSpace() override;
-    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q) override;
-
-    virtual Config OMPLStateToConfig(const ob::State *qompl) override;
-    Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState);
-    virtual void print() const override;
-};
-
-//KinodynamicCSpaceOMPL: Space = tangent bundle of configuration manifold;
-//control space = tangent space of tangent bundle, i.e. control happens in
-//acceleration space, i.e. we can control torques of revolute joints, forces
-//of prismatic joints, and any additional booster/thruster which act directly
-//on the se(3) component
-
-class KinodynamicCSpaceOMPL: public CSpaceOMPL
-{
-  public:
-    KinodynamicCSpaceOMPL(Robot *robot_, CSpaceKlampt *kspace_);
-
-    virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si);
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si);
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
-
-    virtual void initSpace();
-    virtual void initControlSpace();
-
-    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
-
-    virtual Config OMPLStateToConfig(const ob::State *qompl);
-
-    Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState, const ob::RealVectorStateSpace::StateType *qomplTMState);
-
-    virtual void print() const override;
-
 };
 

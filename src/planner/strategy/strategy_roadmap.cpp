@@ -9,7 +9,7 @@ StrategyRoadmap::StrategyRoadmap(CSpaceOMPL *cspace){
 
   og::SimpleSetup ss(cspace->SpacePtr());
   const ob::SpaceInformationPtr si = ss.getSpaceInformation();
-  ss.setStateValidityChecker(cspace->StateValidityCheckerPtr(si));
+  ss.setStateValidityChecker(cspace->StateValidityCheckerPtr());
   ob::ProblemDefinitionPtr pdef = ss.getProblemDefinition();
 
   roadmap_planner = std::make_shared<og::PRM>(si);
