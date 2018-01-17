@@ -16,11 +16,11 @@
   <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="2 -2 0" rotateRPY="0 0 1.57"/>
   <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="1 0 2" rotateRPY="0 0 1.57"/>
   <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
-  <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
-  -->
   <rigidObject name="doublelshape.tri" file="/home/aorthey/git/orthoklampt/data/terrains/DoubleLshape_large.tri" translation="0 0 0">
      <display color="0.8 0.8 0.8 0.5" texture="checker" texture_projection="z"/> 
   </rigidObject>
+  -->
+  <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
 
   <plannerinput>
 
@@ -35,7 +35,7 @@
     <!-- default settings for all algorithms (overwriteable) -->
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.01</epsilongoalregion>
-    <maxplanningtime>30</maxplanningtime>
+    <maxplanningtime>5</maxplanningtime>
 
     <sampler name="obstacle_based"/>
 
@@ -52,9 +52,7 @@
       </hierarchy>
     </algorithm>
 
-    <algorithm name="ompl:sbl"/>
     <algorithm name="ompl:rrtconnect"/>
-    <algorithm name="ompl:kpiece"/>
     <algorithm name="ompl:lazyprm"/>
 
     <!--

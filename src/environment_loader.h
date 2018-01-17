@@ -1,8 +1,8 @@
 #pragma once
 
 #include "util.h"
-#include "gui/gui_planner.h"
 #include "info.h"
+#include "gui/gui_planner.h"
 #include "planner/planner_input.h"
 
 #include <tinyxml.h>
@@ -29,9 +29,5 @@ class EnvironmentLoader{
 
     static EnvironmentLoader from_args(int argc,const char** argv);
     EnvironmentLoader(const char *xml_file);
-
-    bool LoadPath(const char* file);
-    bool LoadPath(TiXmlElement *node);
-    std::vector<Config> GetKeyframesFromFile(const char* file);
 
 };

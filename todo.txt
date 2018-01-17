@@ -74,7 +74,7 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [ ] Compute SE constraints, what is GIWC equivalent?
  [x] smoothing after path planning
  [x] refactor kinodynamic planner to make it independent from path planner
- [ ] decompose GUI into sweptvolumeGUI and forcefieldGUI 
+ [x] decompose GUI into sweptvolumeGUI and forcefieldGUI 
  [ ] save all swept volumes when saving GUI, rewrite all Load/Save functions
  [x] refactor planner -> use PlannerOutput to store path/roadmap and use
 PlannerOutput as Input to GUI to shadow the internal things. Also put the
@@ -310,16 +310,15 @@ possible misleading initial path)
 
 Minor Things
 [x] cspace: refactor cspace into separate classes
-[ ] cspace: info print is horrible
+[x] cspace: info print is horrible
 [ ] cspace: remove geometric and replace by namespace. remove cspace from filename?
 [ ] cspacefactory: constructor by string
 [ ] cspacefactory: include kcspace into cspace factor, and add string type to specify cspace type from the outside
 [ ] cspacefactory: refactor factory into one function, should encapsulate everything, no
 kcspace/cspaceompl stuff outside
-[ ] pathspace: starts to get confusing, clean up the mess
 [ ] base: make some generic printing, using__CLASS__, __FILE__, etcetera
-[ ] fix the chart boundary issue in visualizing the SE(2) roadmap
-[ ] path: rewrite path to use ompl representations, only convert at Eval
+[x] fix the chart boundary issue in visualizing the SE(2) roadmap
+[x] path: rewrite path to use ompl representations, only convert at Eval
 [ ] make colors changeable from XML
 
 SlicePlanner
@@ -341,20 +340,12 @@ improvements like identifying narrow passages for sampling
 [ ] visualize each level's solution path!
 [ ] show feasibility of at least one additional joint in SE(3) (three or four
 level planner should be possible)
-
-[ ] solve Lshape and DoubleLshape in <1s
- [x] solve doublelshape in some time T (show that it is indeed feasible) maybe
+[x] solve doublelshape in some time T (show that it is indeed feasible) maybe
 make hole bigger
- [x] check if connect function performs as desired! (does constructSolution lie
- on graph!?)
- [x] enable benchmark (needs overhaul)
- [ ] object touched obstacles during play path with multislice in SE(3)
- [ ] think about better sampling function exploiting underlying graph
- [ ] save/load path
- [ ] connect function returns wrong path because of random bouncing motion(?)
- [ ] addmilestone calls connect to connect to neighbors. But addmilestone is not
- only called after sampling, it is also called after random bounce motion,
- whereby the new vertex does not lie on any edge! what should we do in that case?
+[x] check if connect function performs as desired! (does constructSolution lie
+on graph!?)
+[x] enable benchmark (needs overhaul)
+[x] object touched obstacles during play path with multislice in SE(3)
 
 BENCHMARKING
 
@@ -374,16 +365,21 @@ BENCHMARKING
  [ ] catch error during benchmark with multislice, created zero nodes.
  [ ] compare algorithms: RRTConnect, QMP (the classical, only sampling changed), QMPConnect (adjust also connect function), QMPSufficient (ignore sufficient edges), QMPNarrowPassage (analyse underlying graph structure, change sampling accordingly), QMPcsn (all together)
 
-[ ] resulting path from RRT is not smooth (but should be smooth through shortcutting)
-[ ] save resulting path to file, and be able to load it back
 [x] invalid start state on Xshape -> maybe bigger problem with converting
 ompl->klampt!? (nope, this should affect other planners too)
 ->is not reproducible, i.e. there seems some randomness (but everything up to
 that point should be strictly deterministic!) ->not the right klampt dimension
 returned! -> it worked for RRT because there we used GeometricCSpace instead of
 SE(3)
-[ ] path replay stops with out of range. path replay is too fast/too slow.
+[x] path replay stops with out of range. path replay is too fast/too slow.
+
+[x] resulting path from RRT is not smooth (but should be smooth through shortcutting)
+[ ] store path as PWL path including non-smooth + plus smoothed version (remove
+anything else from the roadmap class)
+[ ] save resulting path to file, and be able to load it back (use PWL class)
 [ ] displaying sweptvolume results in segfault -> wrong robot is used (the
 inner/outer ones are already deleted)
-[ ] implement nearest contact sampler -> verify that RRT can solve DoubleLshape
-in less than 3 seconds.
+[ ] swept volume display along wrong path (not the smooth path)
+[ ] swept volume uses the wrong robot index
+
+[ ] identify narrow passage on graph (high priority)

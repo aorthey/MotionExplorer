@@ -1,6 +1,6 @@
 #include "environment_loader.h"
 #include "controller/controller.h"
-#include "loader.h"
+#include "file_input_output.h"
 #include <boost/filesystem.hpp>
 
 RobotWorld& EnvironmentLoader::GetWorld(){
@@ -147,7 +147,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
     //info(&world);
     //info(&(_backend->sim));
 
-    if(pin.load(file_name.c_str())){
+    if(pin.Load(file_name.c_str())){
 
       uint ridx = pin.inputs.at(0)->robot_idx;
       Robot *robot = world.robots[ridx];
@@ -208,29 +208,21 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
   _backend->wrenchfield.print();
 
 }
-bool EnvironmentLoader::LoadPath(const char* file)
-{
-  return false;
-}
-bool EnvironmentLoader::LoadPath(TiXmlElement *node)
-{
-  return false;
-}
-std::vector<Config> EnvironmentLoader::GetKeyframesFromFile(const char* file)
-{
-  std::string file_name = util::GetApplicationFolder()+file;
-  TiXmlDocument doc(file_name.c_str());
-  TiXmlElement *root = GetRootNodeFromDocument(doc);
-  CheckNodeName(root, "path");
-
-  TiXmlElement* q = FindFirstSubNode(root, "q");
-  std::vector<Config> keyframes;
-  while(q!=NULL){
-    Config qconfig;
-    GetStreamText(q) >> qconfig;
-    keyframes.push_back(qconfig);
-    q = FindNextSiblingNode(q, "q");
-  }
-
-  return keyframes;
-}
+//std::vector<Config> EnvironmentLoader::GetKeyframesFromFile(const char* file)
+//{
+//  std::string file_name = util::GetApplicationFolder()+file;
+//  TiXmlDocument doc(file_name.c_str());
+//  TiXmlElement *root = GetRootNodeFromDocument(doc);
+//  CheckNodeName(root, "path");
+//
+//  TiXmlElement* q = FindFirstSubNode(root, "q");
+//  std::vector<Config> keyframes;
+//  while(q!=NULL){
+//    Config qconfig;
+//    GetStreamText(q) >> qconfig;
+//    keyframes.push_back(qconfig);
+//    q = FindNextSiblingNode(q, "q");
+//  }
+//
+//  return keyframes;
+//}

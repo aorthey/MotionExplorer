@@ -1,6 +1,7 @@
-#include <tinyxml.h>
 #include "swept_volume.h"
+#include "file_input_output.h"
 #include "util.h"
+#include <tinyxml.h>
 
 SweptVolume::SweptVolume(Robot *robot){
   _keyframes.clear();
@@ -43,7 +44,7 @@ SweptVolume::SweptVolume(Robot *robot, const std::vector<Config> &keyframes, uin
     qq.resize(robot->q.size()); 
     qq.setZero();
 
-    for(uint k = 0; k < qq.size(); k++){
+    for(int k = 0; k < qq.size(); k++){
       qq(k) = q(k);
     }
     AddKeyframe(qq);
@@ -150,20 +151,8 @@ bool SweptVolume::Load(const char* file)
   std::string pdata = util::GetDataFolder();
   std::string in = pdata+"/sweptvolume/"+file;
 
-  std::cout << "loading data from "<<in << std::endl;
-
   TiXmlDocument doc(in.c_str());
-  if(doc.LoadFile()){
-    TiXmlElement *root = doc.RootElement();
-    if(root){
-      Load(root);
-    }
-  }else{
-    std::cout << doc.ErrorDesc() << std::endl;
-    std::cout << "ERROR" << std::endl;
-    exit(0);
-  }
-  return true;
+  return Load(GetRootNodeFromDocument(doc));
 }
 bool SweptVolume::Save(const char* file)
 {
@@ -177,12 +166,8 @@ bool SweptVolume::Save(const char* file)
     out = pdata+"/sweptvolume/"+file;
   }
 
-  std::cout << "saving data to "<< out << std::endl;
-
   TiXmlDocument doc;
-  TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "", "" );
-  doc.LinkEndChild(decl);
-  TiXmlElement *node = new TiXmlElement("SweptVolume");
+  TiXmlElement *node = CreateRootNodeInDocument(doc, "sweptvolume");
   Save(node);
 
   doc.LinkEndChild(node);
@@ -193,18 +178,19 @@ bool SweptVolume::Save(const char* file)
 }
 bool SweptVolume::Save(TiXmlElement *node)
 {
-  node->SetValue("SweptVolume");
+  node->SetValue("sweptvolume");
 
   //###################################################################
   {
     TiXmlElement c("keyframes");
     for(uint i = 0; i < _keyframes.size(); i++){
-      TiXmlElement cc("qitem");
-      stringstream ss;
-      ss<<_keyframes.at(i);
-      TiXmlText text(ss.str().c_str());
-      cc.InsertEndChild(text);
-      c.InsertEndChild(cc);
+      //TiXmlElement cc("qitem");
+      //stringstream ss;
+      //ss<<_keyframes.at(i);
+      //TiXmlText text(ss.str().c_str());
+      //cc.InsertEndChild(text);
+      //c.InsertEndChild(cc);
+      AddSubNode<Config>(c, "qitem", _keyframes.at(i));
     }
     node->InsertEndChild(c);
   }
@@ -248,11 +234,12 @@ bool SweptVolume::Save(TiXmlElement *node)
   }
   //###################################################################
   {
-    TiXmlElement c("color_milestones");
-    stringstream ss;
-    ss<<color_milestones;
-    TiXmlText text(ss.str().c_str());
-    node->InsertEndChild(text);
+    // TiXmlElement c("color_milestones");
+    // stringstream ss;
+    // ss<<color_milestones;
+    // TiXmlText text(ss.str().c_str());
+    // node->InsertEndChild(text);
+    AddSubNode<GLColor>(*node, "color_milestones", color_milestones);
   }
 
   init = _keyframes.front();
@@ -277,7 +264,7 @@ bool SweptVolume::Load(TiXmlElement *node)
   _keyframes.clear();
   _keyframe_indices.clear();
 
-  if(0!=strcmp(node->Value(),"SweptVolume")) {
+  if(0!=strcmp(node->Value(),"sweptvolume")) {
     std::cout << "Not a SweptVolume file" << std::endl;
     return false;
   }

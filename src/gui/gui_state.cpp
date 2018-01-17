@@ -69,16 +69,15 @@ GUIVariable& GUIState::operator()(const char* str){
 void GUIState::toggle(const char* str){
   (*this)(str).toggle();
 }
-bool GUIState::load(const char* file)
+bool GUIState::Load(const char* file)
 {
   TiXmlDocument doc(file);
   TiXmlElement *root = GetRootNodeFromDocument(doc);
-  return load(root);
+  return Load(root);
 }
-bool GUIState::load(TiXmlElement *node)
+bool GUIState::Load(TiXmlElement *node)
 {
   CheckNodeName(node, "gui");
-
 
   //################################################################################
   //checkbox states

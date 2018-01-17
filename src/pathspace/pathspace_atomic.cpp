@@ -21,7 +21,6 @@ void PathSpaceAtomic::DrawGL(GUIState& state){
   const Config qi_in = input->q_init;
   const Config qg_in = input->q_goal;
 
-
   GLDraw::drawRobotAtConfig(robot, qi_in, lightGreen);
   GLDraw::drawRobotAtConfig(robot, qg_in, lightRed);
 
@@ -32,4 +31,3 @@ void PathSpaceAtomic::DrawGL(GUIState& state){
     path_ompl->DrawGL(state);
   }
 }
-

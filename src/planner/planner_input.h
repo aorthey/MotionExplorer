@@ -1,5 +1,5 @@
 #pragma once
-#include "loader.h"
+#include "file_input_output.h"
 #include <string>
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 
@@ -57,8 +57,8 @@ class PlannerInput{
     std::vector<int> robot_idxs;
     std::vector<Layer> layers;
 
-    bool load(const char* file);
-    bool load(TiXmlElement *node);
+    bool Load(const char* file);
+    bool Load(TiXmlElement *node);
     bool GetConfig(const TiXmlElement* node, const char *name, Config &q);
 
     friend std::ostream& operator<< (std::ostream& out, const PlannerInput& pin) ;
@@ -67,8 +67,8 @@ class PlannerInput{
 /// @brief multiple plannerinputs (to use several algorithms inside GUI)
 struct PlannerMultiInput{
   std::vector<PlannerInput*> inputs;
-  bool load(const char* file);
-  bool load(TiXmlElement *node);
+  bool Load(const char* file);
+  bool Load(TiXmlElement *node);
   Benchmark benchmark;
 };
 

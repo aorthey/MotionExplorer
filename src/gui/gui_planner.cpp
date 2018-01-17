@@ -157,6 +157,11 @@ void PlannerBackend::RenderWorld(){
         }
       }
     }
+    if(state("save_current_path")){
+      std::string fn = "mypath.xml";
+      path->Save(fn.c_str());
+      std::cout << "save path to:" << fn << std::endl;
+    }
     if(t>0 && path){
       Config q = path->Eval(t);
       uint ridx = planner->GetInput().robot_idx;

@@ -13,7 +13,7 @@ PathPiecewiseLinear::PathPiecewiseLinear()
 }
 
 PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_):
-  path(p_),cspace(cspace_)
+  cspace(cspace_), path(p_), path_raw(p_)
 {
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
 
@@ -229,6 +229,54 @@ void PathPiecewiseLinear::DrawGL(GUIState& state)
   glDisable(GL_BLEND);
   glEnable(GL_LIGHTING);
   glLineWidth(1);
+}
+bool PathPiecewiseLinear::Load(const char* fn)
+{
+  TiXmlDocument doc(fn);
+  return Load(GetRootNodeFromDocument(doc));
+}
+bool PathPiecewiseLinear::Load(TiXmlElement *node)
+{
+  CheckNodeName(node, "path_piecewise_linear");
+}
+bool PathPiecewiseLinear::Save(const char* fn)
+{
+  TiXmlDocument doc;
+  TiXmlElement *node = CreateRootNodeInDocument(doc);
+  Save(node);
+  doc.LinkEndChild(node);
+  doc.SaveFile(fn);
+  return true;
+}
+
+bool PathPiecewiseLinear::Save(TiXmlElement *node)
+{
+  node->SetValue("path_piecewise_linear");
+  AddSubNode(*node, "length", length);
+  AddSubNode(*node, "number_of_milestones", interLength.size()+1);
+
+  TiXmlElement il("interlength");
+  for(uint k = 0; k < interLength.size(); k++){
+    AddSubNode(il, "il", interLength.at(k));
+  }
+  node->InsertEndChild(il);
+
+  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+  ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+  ob::StateSpacePtr space = si->getStateSpace();
+  std::vector<ob::State *> states = gpath.getStates();
+
+  for(uint k = 0; k < states.size(); k++){
+    std::vector<double> state_k_serialized;
+    space->copyToReals(state_k_serialized, states.at(k));
+    AddSubNodeVector(*node, "state", state_k_serialized);
+  }
+
+  //void  copyToReals (std::vector< double > &reals, const State *source) const
+      //Copy all the real values from a state source to the array reals using getValueAddressAtLocation()
+       
+      //void  copyFromReals (State *destination, const std::vector< double > &reals) const
+        //Copy the values from reals to the state destination using getValueAddressAtLocation()
 }
   
 std::ostream& operator<< (std::ostream& out, const PathPiecewiseLinear& pwl) 

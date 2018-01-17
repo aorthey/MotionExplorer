@@ -1,5 +1,5 @@
 #pragma once
-#include "loader.h"
+#include "file_input_output.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -44,8 +44,8 @@ class GUIState{
 
     friend std::ostream& operator<< (std::ostream&, const GUIState&);
 
-    bool load(const char* file);
-    bool load(TiXmlElement *node);
+    bool Load(const char* file);
+    bool Load(TiXmlElement *node);
 
     std::map<std::string, GUIVariable*> variables;
 

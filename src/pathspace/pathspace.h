@@ -52,7 +52,7 @@ class PathSpace{
     std::vector<std::pair<Config,Config>> edges;
     std::vector<std::vector<Config>> paths;
 
-    PathPiecewiseLinear *path_ompl;
+    PathPiecewiseLinear *path_ompl{nullptr};
 
     RobotWorld *world;
     PathSpaceInput *input;

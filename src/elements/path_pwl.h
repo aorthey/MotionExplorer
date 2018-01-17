@@ -22,35 +22,32 @@ class PathPiecewiseLinear
     PathPiecewiseLinear();
     PathPiecewiseLinear(ob::PathPtr p, CSpaceOMPL *cspace);
 
-    //virtual void interpolate();
-    //virtual Config ConfigOnSegment(int i, int j, double tloc) const;
     Config Eval(const double t) const;
+    void Normalize(); // convert path length [0,L] -> [0,1]
+    void Smooth();
 
     std::vector<double> GetLengthVector() const;
     double GetLength() const;
     Vector3 EvalVec3(const double t) const;
     Config EvalMilestone(const int k) const;
 
-    // convert path length [0,L] -> [0,1]
-    void Normalize();
-    void Smooth();
-
-    friend std::ostream& operator<< (std::ostream& out, const PathPiecewiseLinear& pwl);
-
     GLColor cVertex{magenta}, cLine{magenta};
     double linewidth{10};
     double ptsize{10};
-
     void DrawGL(GUIState& state);
+    friend std::ostream& operator<< (std::ostream& out, const PathPiecewiseLinear& pwl);
+
+    bool Load(const char *fn);
+    bool Load(TiXmlElement* node);
+    bool Save(const char *fn);
+    bool Save(TiXmlElement* node);
 
   protected:
-    //std::vector<Config> keyframes;
-    //uint Ndim;
-    //uint Nkeyframes;
     double length;
     std::vector<double> interLength;//interLength(i) length towards next milestone point from q(i)
 
     CSpaceOMPL *cspace;
     ob::PathPtr path;
-    bool isOmpl{false};
+    ob::PathPtr path_raw;
+
 };

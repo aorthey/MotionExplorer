@@ -1,13 +1,11 @@
 #include <KrisLibrary/math/VectorTemplate.h>
-
 #include "planner/planner_input.h"
 
-bool PlannerMultiInput::load(const char* file){
+bool PlannerMultiInput::Load(const char* file){
   TiXmlDocument doc(file);
-  TiXmlElement *root = GetRootNodeFromDocument(doc);
-  return load(root);
+  return Load(GetRootNodeFromDocument(doc));
 }
-bool PlannerMultiInput::load(TiXmlElement *node){
+bool PlannerMultiInput::Load(TiXmlElement *node){
   CheckNodeName(node, "world");
   TiXmlElement* node_plannerinput = FindSubNode(node, "plannerinput");
 
@@ -15,7 +13,6 @@ bool PlannerMultiInput::load(TiXmlElement *node){
     std::cout << "world xml file has no plannerinput" << std::endl;
     return false;
   }
-
 
   //################################################################################
   // obtain default settings for all algorithms
@@ -58,7 +55,7 @@ bool PlannerMultiInput::load(TiXmlElement *node){
     input->isSE2=isSE2;
     input->name_sampler = name_sampler;
 
-    if(!input->load(node_plannerinput)) return false;
+    if(!input->Load(node_plannerinput)) return false;
 
     GetStreamAttribute(node_algorithm,"name") >> input->name_algorithm;
 
@@ -199,7 +196,7 @@ bool PlannerInput::GetConfig(const TiXmlElement* node, const char *name, Config 
 ///@brief get fixed general settings 
 //################################################################################
 
-bool PlannerInput::load(TiXmlElement *node)
+bool PlannerInput::Load(TiXmlElement *node)
 {
   CheckNodeName(node, "plannerinput");
   TiXmlElement* node_plannerinput = node;
@@ -237,11 +234,11 @@ bool PlannerInput::load(TiXmlElement *node)
   return true;
 }
 
-bool PlannerInput::load(const char* file)
+bool PlannerInput::Load(const char* file)
 {
   TiXmlDocument doc(file);
   TiXmlElement *root = GetRootNodeFromDocument(doc);
-  return load(root);
+  return Load(root);
 }
 std::ostream& operator<< (std::ostream& out, const PlannerInput& pin) 
 {
