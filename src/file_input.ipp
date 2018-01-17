@@ -2,7 +2,7 @@
 
 using namespace std;
 
-inline bool CheckNodeName(TiXmlElement *node, const char* name)
+bool CheckNodeName(TiXmlElement *node, const char* name)
 {
   if(0!=strcmp(node->Value(),name)) {
     std::cout << "Not a " << name <<  " file" << std::endl;
@@ -10,7 +10,7 @@ inline bool CheckNodeName(TiXmlElement *node, const char* name)
   }
   return true;
 }
-inline TiXmlElement* GetRootNodeFromDocument(TiXmlDocument& doc)
+TiXmlElement* GetRootNodeFromDocument(TiXmlDocument& doc)
 {
   if(doc.LoadFile()){
     TiXmlElement *root = doc.RootElement();
@@ -23,7 +23,7 @@ inline TiXmlElement* GetRootNodeFromDocument(TiXmlDocument& doc)
   return NULL;
 }
 
-inline TiXmlElement* FindSubNode(TiXmlElement* node, const char *name){
+TiXmlElement* FindSubNode(TiXmlElement* node, const char *name){
   if(!node) return NULL;
   TiXmlElement* e=node->FirstChildElement();
   while(e != NULL) 
@@ -34,11 +34,14 @@ inline TiXmlElement* FindSubNode(TiXmlElement* node, const char *name){
   return NULL;
 }
 
-inline TiXmlElement* FindFirstSubNode(TiXmlElement* node, const char *name){
+TiXmlElement* FindFirstSubNode(TiXmlElement* node, const char *name){
   return FindSubNode(node, name);
 }
 
-inline TiXmlElement* FindNextSiblingNode(TiXmlElement* node, const char *name){
+TiXmlElement* FindNextSiblingNode(TiXmlElement* node){
+  return FindNextSiblingNode(node, node->Value());
+}
+TiXmlElement* FindNextSiblingNode(TiXmlElement* node, const char *name){
   while(node != NULL) 
   {
     node = node->NextSiblingElement();
@@ -49,7 +52,7 @@ inline TiXmlElement* FindNextSiblingNode(TiXmlElement* node, const char *name){
   return NULL;
 }
 
-inline bool ExistStreamAttribute(TiXmlElement* node, const char *name){
+bool ExistStreamAttribute(TiXmlElement* node, const char *name){
   if(!node) return false;
   const char *na = node->Attribute(name);
   if(na){
@@ -59,7 +62,7 @@ inline bool ExistStreamAttribute(TiXmlElement* node, const char *name){
   }
 }
 
-inline stringstream GetStreamAttribute(TiXmlElement* node, const char *name){
+stringstream GetStreamAttribute(TiXmlElement* node, const char *name){
 
   if(!node) return stringstream ("NONE");
   const char *na = node->Attribute(name);
@@ -69,7 +72,7 @@ inline stringstream GetStreamAttribute(TiXmlElement* node, const char *name){
     return stringstream ("NONE");
   }
 }
-inline stringstream GetStreamAttributeConfig(TiXmlElement* node, const char *name){
+stringstream GetStreamAttributeConfig(TiXmlElement* node, const char *name){
 
   if(!node) return stringstream ("NONE");
   const char *na = node->Attribute(name);
@@ -91,7 +94,7 @@ inline stringstream GetStreamAttributeConfig(TiXmlElement* node, const char *nam
   }
 }
 
-inline stringstream GetStreamText(TiXmlElement* node){
+stringstream GetStreamText(TiXmlElement* node){
 
   if(!node) return stringstream ("NONE");
   const char *na = node->GetText();
@@ -103,7 +106,7 @@ inline stringstream GetStreamText(TiXmlElement* node){
 }
 
 template<typename T> 
-inline stringstream GetStreamTextDefault(TiXmlElement* node, T default_value){
+stringstream GetStreamTextDefault(TiXmlElement* node, T default_value){
   std::stringstream ss;
   ss = GetStreamText(node);
   if(ss.str() != "NONE"){
@@ -115,7 +118,7 @@ inline stringstream GetStreamTextDefault(TiXmlElement* node, T default_value){
   }
 }
 template<typename T> 
-inline stringstream GetStreamAttributeDefault(TiXmlElement *node, const char *name, T default_value){
+stringstream GetStreamAttributeDefault(TiXmlElement *node, const char *name, T default_value){
   if(ExistStreamAttribute(node, name)){
     return GetStreamAttribute(node, name);
   }
@@ -124,3 +127,27 @@ inline stringstream GetStreamAttributeDefault(TiXmlElement *node, const char *na
   return ss;
 }
 
+template<typename T> 
+T GetSubNodeText(TiXmlElement* node, const char *name)
+{
+  TiXmlElement* subnode = FindSubNode(node, name);
+  std::stringstream ss = GetStreamText(subnode);
+  T _val;
+  ss >> _val;
+  return _val;
+}
+
+template<typename T> 
+inline std::vector<T> GetNodeVector(TiXmlElement* node)
+{
+  std::stringstream ss = GetStreamText(node);
+  int _size;
+  ss >> _size;
+
+  std::vector<T> _val;
+  _val.resize(_size);
+  for(uint k = 0; k < _size; k++){
+    ss >> _val.at(k);
+  }
+  return _val;
+}

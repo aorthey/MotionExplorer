@@ -22,7 +22,7 @@ std::vector<PathSpace*> PathSpaceMultiLevelSE3::Decompose(){
   PathSpaceInput* input_level = input->GetNextLayer();
 
   while(input_level){
-    uint k = input_level->level;
+    //uint k = input_level->level;
     CSpaceOMPL *cspace_level_k;
     if(input_level->type=="R3") {
       cspace_level_k = factory.MakeGeometricCSpaceRN(world, input_level->robot_idx, 3);

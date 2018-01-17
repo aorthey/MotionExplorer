@@ -237,8 +237,36 @@ bool PathPiecewiseLinear::Load(const char* fn)
 }
 bool PathPiecewiseLinear::Load(TiXmlElement *node)
 {
-  CheckNodeName(node, "path_piecewise_linear");
+  bool res = CheckNodeName(node, "path_piecewise_linear");
+  if(!res) return false;
+  length = GetSubNodeText<double>(node, "length");
+
+  interLength.clear();
+
+  TiXmlElement* node_il = FindFirstSubNode(node, "interlength");
+  while(node_il!=NULL){
+    double tmp;
+    GetStreamText(node_il) >> tmp;
+    interLength.push_back(tmp);
+    node_il = FindNextSiblingNode(node_il);
+  }
+
+  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+  ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+  ob::StateSpacePtr space = si->getStateSpace();
+
+  gpath.clear();
+  TiXmlElement* node_state = FindFirstSubNode(node, "state");
+  while(node_state!=NULL){
+    std::vector<double> tmp = GetNodeVector<double>(node_state);
+    ob::State *state = si->allocState();
+    space->copyFromReals(state, tmp);
+    gpath.append(state);
+    node_state = FindNextSiblingNode(node_state);
+  }
+  path = std::make_shared<og::PathGeometric>(gpath);
 }
+
 bool PathPiecewiseLinear::Save(const char* fn)
 {
   TiXmlDocument doc;
@@ -255,17 +283,17 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
   AddSubNode(*node, "length", length);
   AddSubNode(*node, "number_of_milestones", interLength.size()+1);
 
-  TiXmlElement il("interlength");
+  AddComment(*node, "Interlength: Length between States");
   for(uint k = 0; k < interLength.size(); k++){
-    AddSubNode(il, "il", interLength.at(k));
+    AddSubNode(*node, "interlength", interLength.at(k));
   }
-  node->InsertEndChild(il);
 
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
   ob::SpaceInformationPtr si = gpath.getSpaceInformation();
   ob::StateSpacePtr space = si->getStateSpace();
   std::vector<ob::State *> states = gpath.getStates();
 
+  AddComment(*node, "States: Sequence of Configurations in Configuration Space");
   for(uint k = 0; k < states.size(); k++){
     std::vector<double> state_k_serialized;
     space->copyToReals(state_k_serialized, states.at(k));

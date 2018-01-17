@@ -76,6 +76,11 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     }else{
       SendPauseIdle();
     }
+  }else if(cmd=="save_current_path"){
+    state("save_current_path").activate();
+  }else if(cmd=="load_current_path"){
+    state("load_current_path").activate();
+    std::cout << "load current path" << std::endl;
   }else return BaseT::OnCommand(cmd,args);
 
   if(hierarchy_change){
@@ -108,7 +113,6 @@ bool PlannerBackend::OnIdle(){
         double tstep = T/1000;
         //std::cout << "play path: " << t << "/" << T << std::endl;
         if(t>=T){
-          //state("draw_play_path").deactivate();
           t=0;
           SendPauseIdle();
         }else{
@@ -117,6 +121,26 @@ bool PlannerBackend::OnIdle(){
         }
       }
       return true;
+    }
+    if(state("save_current_path")){
+      if(path)
+      {
+        std::string fn = "mypath.xml";
+        path->Save(fn.c_str());
+        std::cout << "save current path to : " << fn << std::endl;
+      }else{
+        std::cout << "cannot save non-existing path." << std::endl;
+      }
+      state("save_current_path").deactivate();
+    }
+    if(state("load_current_path")){
+      if(path)
+      {
+        std::string fn = "mypath.xml";
+        path->Load(fn.c_str());
+        std::cout << "load current path from : " << fn << std::endl;
+        state("load_current_path").deactivate();
+      }
     }
   }
   return res;
@@ -156,11 +180,6 @@ void PlannerBackend::RenderWorld(){
           //std::cout << *path << std::endl;
         }
       }
-    }
-    if(state("save_current_path")){
-      std::string fn = "mypath.xml";
-      path->Save(fn.c_str());
-      std::cout << "save path to:" << fn << std::endl;
     }
     if(t>0 && path){
       Config q = path->Eval(t);

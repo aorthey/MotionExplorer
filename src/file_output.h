@@ -5,6 +5,8 @@
 
 inline TiXmlElement* CreateRootNodeInDocument(TiXmlDocument& doc, const char *name = "default");
 
+inline void AddComment(TiXmlElement& node, const char *str = "");
+
 template <typename T>
 inline void AddSubNode(TiXmlElement& node, const char *name, T _val);
 

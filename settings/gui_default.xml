@@ -66,12 +66,6 @@
     <active>0</active>
   </checkbox>
   <checkbox>
-    <name>draw_roadmap</name>
-    <descr>Draw Roadmap Planner </descr>
-    <key>0</key>
-    <active>1</active>
-  </checkbox>
-  <checkbox>
     <name>draw_roadmap_necessary</name>
     <descr>Draw Roadmap Necessary Vertices</descr>
     <key>3</key>
@@ -101,6 +95,17 @@
     <key>5</key>
     <active>0</active>
   </checkbox>
+
+  <hotkey>
+    <name>save_current_path</name>
+    <descr>Save Current Path</descr>
+    <key>0</key>
+  </hotkey>
+  <hotkey>
+    <name>load_current_path</name>
+    <descr>Load Current Path</descr>
+    <key>9</key>
+  </hotkey>
 
   <hotkey>
     <name>reset</name>

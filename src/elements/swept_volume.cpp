@@ -184,12 +184,6 @@ bool SweptVolume::Save(TiXmlElement *node)
   {
     TiXmlElement c("keyframes");
     for(uint i = 0; i < _keyframes.size(); i++){
-      //TiXmlElement cc("qitem");
-      //stringstream ss;
-      //ss<<_keyframes.at(i);
-      //TiXmlText text(ss.str().c_str());
-      //cc.InsertEndChild(text);
-      //c.InsertEndChild(cc);
       AddSubNode<Config>(c, "qitem", _keyframes.at(i));
     }
     node->InsertEndChild(c);
@@ -224,23 +218,8 @@ bool SweptVolume::Save(TiXmlElement *node)
     }
     node->InsertEndChild(c);
   }
-  //###################################################################
-  {
-    TiXmlElement c("color");
-    stringstream ss;
-    ss<<color;
-    TiXmlText text(ss.str().c_str());
-    node->InsertEndChild(text);
-  }
-  //###################################################################
-  {
-    // TiXmlElement c("color_milestones");
-    // stringstream ss;
-    // ss<<color_milestones;
-    // TiXmlText text(ss.str().c_str());
-    // node->InsertEndChild(text);
-    AddSubNode<GLColor>(*node, "color_milestones", color_milestones);
-  }
+  AddSubNode<GLColor>(*node, "color", color);
+  AddSubNode<GLColor>(*node, "color_milestones", color_milestones);
 
   init = _keyframes.front();
   goal = _keyframes.back();
