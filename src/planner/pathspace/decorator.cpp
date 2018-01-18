@@ -6,7 +6,6 @@ PathSpaceDecorator::PathSpaceDecorator(PathSpace *component_):
 {
   component = component_;
   this->vertices = component->GetVertices();
-  this->vantage_path = component->GetShortestPath();
   this->edges = component->GetEdges();
   this->paths = component->GetPaths();
   this->roadmap = component->GetRoadmap();

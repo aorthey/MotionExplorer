@@ -152,11 +152,10 @@ void MotionPlanner::CreateSinglePathHierarchy(){
   }else{
     hierarchy->AddRootNode( new PathSpaceMultiLevelSE3(world, psinput_level0) );
   }
-  std::vector<Config> path;
-  path.push_back(psinput_level0->q_init);
-  path.push_back(psinput_level0->q_goal);
-  hierarchy->GetRootNodeContent()->SetShortestPath( path );
-
+  //std::vector<Config> path;
+  //path.push_back(psinput_level0->q_init);
+  //path.push_back(psinput_level0->q_goal);
+  //hierarchy->GetRootNodeContent()->SetShortestPath( path );
 
 }
 
@@ -374,7 +373,8 @@ void MotionPlanner::UpdateHierarchy(){
   viewHierarchy.UpdateSelectionPath( current_path );
   Print();
 }
-void MotionPlanner::Print(){
+void MotionPlanner::Print()
+{
   if(!active) return;
   hierarchy->Print();
   std::cout << "current level " << current_level << "/" << hierarchy->NumberLevels()-1 << std::endl;
@@ -456,4 +456,3 @@ std::ostream& operator<< (std::ostream& out, const MotionPlanner& planner){
   out << std::string(80, '-') << std::endl;
   return out;
 }
-

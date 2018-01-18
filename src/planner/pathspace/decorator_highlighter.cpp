@@ -14,11 +14,6 @@ void PathSpaceDecoratorHighlighter::DrawGL(GUIState& state){
   uint ridx = input->robot_idx;
   Robot* robot = world->robots[ridx];
 
-  const std::vector<Config> path = component->GetShortestPath();
-  if(state("draw_sweptvolume") && path.size()>0){
-    const SweptVolume& sv = component->GetSweptVolume(robot);
-    GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
-  }
   if(vertices.size()>0){
     for(uint k = 0; k < vertices.size(); k++){
       const Config q = vertices.at(k);

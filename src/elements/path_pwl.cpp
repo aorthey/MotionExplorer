@@ -12,6 +12,11 @@ PathPiecewiseLinear::PathPiecewiseLinear()
   exit(0);
 }
 
+PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
+  cspace(cspace_)
+{
+}
+
 PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_):
   cspace(cspace_), path(p_), path_raw(p_)
 {
@@ -31,6 +36,8 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_):
 }
 
 void PathPiecewiseLinear::Smooth(){
+  if(!path) return;
+
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
   std::vector<ob::State *> statesB = gpath.getStates();
 
@@ -53,6 +60,8 @@ void PathPiecewiseLinear::Smooth(){
   //gpath update is not saved in path!
 }
 void PathPiecewiseLinear::Normalize(){
+  if(!path) return;
+
   double newLength =0.0;
   for(uint i = 0; i < interLength.size(); i++){
     interLength.at(i) /= length;
@@ -88,6 +97,10 @@ Config PathPiecewiseLinear::EvalMilestone(const int k) const{
 //  return q1 + tloc*(q2-q1);
 //}
 Config PathPiecewiseLinear::Eval(const double t) const{
+  if(!path){
+    std::cout << "Cannot Eval empty path" << std::endl;
+    exit(0);
+  }
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
   ob::SpaceInformationPtr si = gpath.getSpaceInformation();
   std::vector<ob::State *> states = gpath.getStates();
@@ -121,17 +134,18 @@ Config PathPiecewiseLinear::Eval(const double t) const{
   }
   //rounding errors could lead to the fact that the cumulative length is not
   //exactly 1. If t is sufficiently close, we just return the last keyframe.
-  if(length-Tcum > 1e-10){
-    std::cout << "length of path is significantly different from 1.0" << std::endl;
-    std::cout << "length    : " << Tcum << "/" << 1.0 << std::endl;
-    std::cout << "difference: " << 1.0-Tcum << std::endl;
+  double epsilon = 1e-10;
+  if(length-Tcum > epsilon){
+    std::cout << "length of path is significantly different from " << length << std::endl;
+    std::cout << "length    : " << Tcum << "/" << length << std::endl;
+    std::cout << "difference: " << length-Tcum << " > " << epsilon << std::endl;
+    std::cout << "choosen t : " << t << std::endl;
     throw;
   }
 
   if(t>=Tcum){
     return cspace->OMPLStateToConfig(states.back());
   }
-
 
   //}else{
   //  if(t<=0) return keyframes.front();
@@ -202,9 +216,8 @@ Vector3 getXYZ(ob::State *s, ob::StateSpacePtr space_input){
 
 }
 
-void PathPiecewiseLinear::DrawGL(GUIState& state)
-{
-  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
+  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*_path);
   ob::SpaceInformationPtr si = gpath.getSpaceInformation();
   std::vector<ob::State *> states = gpath.getStates();
 
@@ -230,6 +243,15 @@ void PathPiecewiseLinear::DrawGL(GUIState& state)
   glEnable(GL_LIGHTING);
   glLineWidth(1);
 }
+void PathPiecewiseLinear::DrawGL(GUIState& state)
+{
+  if(!path) return;
+  cLine = magenta;
+  DrawGLPathPtr(path);
+  if(!path_raw) return;
+  cLine = green;
+  DrawGLPathPtr(path_raw);
+}
 bool PathPiecewiseLinear::Load(const char* fn)
 {
   TiXmlDocument doc(fn);
@@ -251,20 +273,37 @@ bool PathPiecewiseLinear::Load(TiXmlElement *node)
     node_il = FindNextSiblingNode(node_il);
   }
 
-  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-  ob::SpaceInformationPtr si = gpath.getSpaceInformation();
-  ob::StateSpacePtr space = si->getStateSpace();
-
-  gpath.clear();
-  TiXmlElement* node_state = FindFirstSubNode(node, "state");
-  while(node_state!=NULL){
-    std::vector<double> tmp = GetNodeVector<double>(node_state);
-    ob::State *state = si->allocState();
-    space->copyFromReals(state, tmp);
-    gpath.append(state);
-    node_state = FindNextSiblingNode(node_state);
+  {
+    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+    ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+    ob::StateSpacePtr space = si->getStateSpace();
+    gpath.clear();
+    TiXmlElement* node_state = FindFirstSubNode(node, "state");
+    while(node_state!=NULL){
+      std::vector<double> tmp = GetNodeVector<double>(node_state);
+      ob::State *state = si->allocState();
+      space->copyFromReals(state, tmp);
+      gpath.append(state);
+      node_state = FindNextSiblingNode(node_state);
+    }
+    path = std::make_shared<og::PathGeometric>(gpath);
   }
-  path = std::make_shared<og::PathGeometric>(gpath);
+  {
+    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path_raw);
+    ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+    ob::StateSpacePtr space = si->getStateSpace();
+    gpath.clear();
+    TiXmlElement* node_state = FindFirstSubNode(node, "rawstate");
+    while(node_state!=NULL){
+      std::vector<double> tmp = GetNodeVector<double>(node_state);
+      ob::State *state = si->allocState();
+      space->copyFromReals(state, tmp);
+      gpath.append(state);
+      node_state = FindNextSiblingNode(node_state);
+    }
+    path_raw = std::make_shared<og::PathGeometric>(gpath);
+  }
+  return true;
 }
 
 bool PathPiecewiseLinear::Save(const char* fn)
@@ -281,24 +320,42 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
 {
   node->SetValue("path_piecewise_linear");
   AddSubNode(*node, "length", length);
-  AddSubNode(*node, "number_of_milestones", interLength.size()+1);
+  if(!path) return true; //saving zero length path is ok
 
+  AddSubNode(*node, "number_of_milestones", interLength.size()+1);
   AddComment(*node, "Interlength: Length between States");
   for(uint k = 0; k < interLength.size(); k++){
     AddSubNode(*node, "interlength", interLength.at(k));
   }
 
-  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-  ob::SpaceInformationPtr si = gpath.getSpaceInformation();
-  ob::StateSpacePtr space = si->getStateSpace();
-  std::vector<ob::State *> states = gpath.getStates();
+  {
+    AddComment(*node, "Smoothed States: Sequence of Configurations in Configuration Space");
 
-  AddComment(*node, "States: Sequence of Configurations in Configuration Space");
-  for(uint k = 0; k < states.size(); k++){
-    std::vector<double> state_k_serialized;
-    space->copyToReals(state_k_serialized, states.at(k));
-    AddSubNodeVector(*node, "state", state_k_serialized);
+    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+    ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+    ob::StateSpacePtr space = si->getStateSpace();
+    std::vector<ob::State *> states = gpath.getStates();
+    for(uint k = 0; k < states.size(); k++){
+      std::vector<double> state_k_serialized;
+      space->copyToReals(state_k_serialized, states.at(k));
+      AddSubNodeVector(*node, "state", state_k_serialized);
+    }
   }
+
+  {
+    AddComment(*node, "Raw States: Unsmoothed");
+
+    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path_raw);
+    ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+    ob::StateSpacePtr space = si->getStateSpace();
+    std::vector<ob::State *> states = gpath.getStates();
+    for(uint k = 0; k < states.size(); k++){
+      std::vector<double> state_k_serialized;
+      space->copyToReals(state_k_serialized, states.at(k));
+      AddSubNodeVector(*node, "rawstate", state_k_serialized);
+    }
+  }
+  return true;
 
   //void  copyToReals (std::vector< double > &reals, const State *source) const
       //Copy all the real values from a state source to the array reals using getValueAddressAtLocation()

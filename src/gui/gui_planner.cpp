@@ -80,7 +80,6 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     state("save_current_path").activate();
   }else if(cmd=="load_current_path"){
     state("load_current_path").activate();
-    std::cout << "load current path" << std::endl;
   }else return BaseT::OnCommand(cmd,args);
 
   if(hierarchy_change){
@@ -139,8 +138,8 @@ bool PlannerBackend::OnIdle(){
         std::string fn = "mypath.xml";
         path->Load(fn.c_str());
         std::cout << "load current path from : " << fn << std::endl;
-        state("load_current_path").deactivate();
       }
+      state("load_current_path").deactivate();
     }
   }
   return res;

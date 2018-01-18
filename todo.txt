@@ -374,12 +374,14 @@ SE(3)
 [x] path replay stops with out of range. path replay is too fast/too slow.
 
 [x] resulting path from RRT is not smooth (but should be smooth through shortcutting)
-[ ] store path as PWL path including non-smooth + plus smoothed version (remove
+[x] store path as PWL path including non-smooth + plus smoothed version (remove
 anything else from the roadmap class)
-[ ] save resulting path to file, and be able to load it back (use PWL class)
+[x] save resulting path to file, and be able to load it back (use PWL class)
 [ ] displaying sweptvolume results in segfault -> wrong robot is used (the
 inner/outer ones are already deleted)
 [ ] swept volume display along wrong path (not the smooth path)
 [ ] swept volume uses the wrong robot index
 
+[x] add raw path to pwl
+[ ] rm vantage path from pathspace
 [ ] identify narrow passage on graph (high priority)

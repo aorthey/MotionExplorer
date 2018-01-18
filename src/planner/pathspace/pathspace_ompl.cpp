@@ -32,7 +32,7 @@ std::vector<PathSpace*> PathSpaceOMPL::Decompose(){
 
   if(output.hasExactSolution()){
     decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
-    decomposedspace.at(0)->SetShortestPath( output.GetShortestPath() );
+    //decomposedspace.at(0)->SetShortestPath( output.GetShortestPath() );
     decomposedspace.at(0)->SetShortestPath( output.getShortestPathOMPL(), cspace );
     decomposedspace.at(0)->SetRoadmap( output.GetRoadmapPtr() );
   }else{

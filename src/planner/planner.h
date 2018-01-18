@@ -21,7 +21,6 @@ class MotionPlanner{
     MotionPlanner(RobotWorld *world_, PlannerInput& input_);
 
     const PlannerInput& GetInput();
-
     PathPiecewiseLinear* GetPath();
 
     //folder-like operations on hierarchical path space
@@ -44,15 +43,12 @@ class MotionPlanner{
   protected:
     MotionPlanner() = delete;
 
-    //virtual bool solve(std::vector<int> path_idxs);
-    //virtual std::vector< std::vector<Config> > GetSiblingPaths();
     void RaiseError();
 
     uint current_level;
     uint current_level_node;
     std::vector<int> current_path;
 
-    //PathSpaceHierarchyPtr hierarchy;
     Hierarchy<PathSpace*> *hierarchy;
     void UpdateHierarchy();
     bool isHierarchical();
@@ -69,7 +65,5 @@ class MotionPlanner{
     ViewHierarchy viewHierarchy;
 
     PathPiecewiseLinear *pwl;
-    double length;
-
 };
 

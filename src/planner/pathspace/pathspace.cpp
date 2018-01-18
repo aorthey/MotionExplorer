@@ -33,9 +33,6 @@ PathPiecewiseLinear* PathSpace::getShortestPathOMPL(){
   return path_ompl;
 }
 
-std::vector<Config> PathSpace::GetShortestPath(){
-  return vantage_path;
-}
 std::vector<Config> PathSpace::GetVertices(){
   return vertices;
 }
@@ -52,9 +49,6 @@ RoadmapPtr PathSpace::GetRoadmap(){
 void PathSpace::SetEdges(const std::vector<std::pair<Config,Config>>& edges_){
   edges = edges_;
 }
-void PathSpace::SetShortestPath(const std::vector<Config>& path_){
-  vantage_path = path_;
-}
 void PathSpace::SetVertices(const std::vector<Config>& vertices_){
   vertices = vertices_;
 }
@@ -66,9 +60,11 @@ void PathSpace::SetRoadmap(const RoadmapPtr roadmap_){
 }
 
 SweptVolume& PathSpace::GetSweptVolume(Robot *robot){
-  if(!sv){
-    sv = new SweptVolume(robot, vantage_path, 0);
-  }
+  std::cout << "Needs reimplementation to OMPL pathptr" << std::endl;
+  exit(0);
+  //if(!sv){
+  //  sv = new SweptVolume(robot, vantage_path, 0);
+  //}
   return *sv;
 }
 std::ostream& operator<< (std::ostream& out, const PathSpace& space) 
@@ -80,7 +76,6 @@ std::ostream& operator<< (std::ostream& out, const PathSpace& space)
   std::cout << " init        : " << space.input->q_init << std::endl;
   std::cout << " goal        : " << space.input->q_goal << std::endl;
   std::cout << " type        : " << space.input->type << std::endl;
-  std::cout << " #shortest path vertices  : " << space.vantage_path.size() << std::endl;
   std::cout << " #graph vertices          : " << space.vertices.size() << std::endl;
   std::cout << " #graph edges             : " << space.edges.size() << std::endl;
   std::cout << " #paths size              : " << space.paths.size() << std::endl;
