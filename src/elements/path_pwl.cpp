@@ -91,11 +91,6 @@ Config PathPiecewiseLinear::EvalMilestone(const int k) const{
   //if(k>Nkeyframes) return keyframes.back();
   //return keyframes.at(k);
 }
-//Config PathPiecewiseLinear::ConfigOnSegment(int i, int j, double tloc) const{
-//  Config q1 = keyframes.at(i);
-//  Config q2 = keyframes.at(j);
-//  return q1 + tloc*(q2-q1);
-//}
 Config PathPiecewiseLinear::Eval(const double t) const{
   if(!path){
     std::cout << "Cannot Eval empty path" << std::endl;
@@ -113,10 +108,6 @@ Config PathPiecewiseLinear::Eval(const double t) const{
   assert(interLength.size()==states.size()-1);
 
   for(uint i = 0; i < interLength.size(); i++){
-    // std::cout << std::string(80, '-') << std::endl;
-    // std::cout << "i               : " << i << std::endl;
-    // std::cout << "interlength size: " << interLength.size() << std::endl;
-    // std::cout << "states size     : " << states.size() << std::endl;
     double Tnext = interLength.at(i);
     if((Tcum+Tnext)>=t){
       //t \in [Lcum, Lcum+Lnext]
@@ -147,34 +138,6 @@ Config PathPiecewiseLinear::Eval(const double t) const{
     return cspace->OMPLStateToConfig(states.back());
   }
 
-  //}else{
-  //  if(t<=0) return keyframes.front();
-  //  if(t>=length) return keyframes.back();
-  //  double Tcum = 0;
-  //  assert(interLength.size()==keyframes.size()-1);
-  //  for(uint i = 0; i < interLength.size(); i++){
-  //    double Tnext = interLength.at(i);
-  //    if((Tcum+Tnext)>=t){
-  //      //t \in [Lcum, Lcum+Lnext]
-  //      double tloc = (t-Tcum)/Tnext; //tloc \in [0,1]
-  //      return ConfigOnSegment(i,i+1,tloc);
-  //    }
-  //    Tcum+=Tnext;
-  //  }
-  //  //rounding errors could lead to the fact that the cumulative length is not
-  //  //exactly 1. If t is sufficiently close, we just return the last keyframe.
-  //  if(length-Tcum > 1e-10){
-  //    std::cout << "length of path is significantly different from 1.0" << std::endl;
-  //    std::cout << "length    : " << Tcum << "/" << 1.0 << std::endl;
-  //    std::cout << "difference: " << 1.0-Tcum << std::endl;
-  //    throw;
-  //  }
-
-  //  if(t>=Tcum){
-  //    return keyframes.back();
-  //  }
-
-  //}
   std::cout << "Eval could not find point for value " << t << std::endl;
   throw;
 }
