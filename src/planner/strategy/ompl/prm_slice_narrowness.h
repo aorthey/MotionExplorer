@@ -13,17 +13,23 @@ namespace ompl
   namespace geometric
   {
     class PRMSliceNarrow: public og::PRMSlice{
-
       public:
-
         PRMSliceNarrow(const ob::SpaceInformationPtr &si, PRMSliceNarrow *previous_);
-
         virtual ~PRMSliceNarrow() override;
-
       protected:
-
-        virtual bool SampleGraph(ob::State *workState) override;
-
+        virtual PDF<Edge> GetEdgePDF() override;
+    };
+    class PRMSliceNarrowEdgeDegree: public og::PRMSliceNarrow{
+      public:
+        PRMSliceNarrowEdgeDegree(const ob::SpaceInformationPtr &si, PRMSliceNarrow *previous_);
+      protected:
+        virtual PDF<Edge> GetEdgePDF() override;
+    };
+    class PRMSliceNarrowMinCut: public og::PRMSliceNarrow{
+      public:
+        PRMSliceNarrowMinCut(const ob::SpaceInformationPtr &si, PRMSliceNarrow *previous_);
+      protected:
+        virtual PDF<Edge> GetEdgePDF() override;
     };
 
   };

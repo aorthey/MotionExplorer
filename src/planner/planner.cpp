@@ -428,7 +428,7 @@ void MotionPlanner::DrawGL(GUIState& state){
     if(k==current_level_node) continue;
     current_path.at(current_path.size()-1) = k;
     PathSpace* Pk = hierarchy->GetNodeContent(current_path);
-    Pk->DrawGL(state);
+    //Pk->DrawGL(state);
   }
   if(current_path.size()>0){
     current_path.at(current_path.size()-1) = current_level_node;

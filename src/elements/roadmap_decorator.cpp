@@ -88,20 +88,20 @@ void RoadmapDecoratorSE2::DrawGL(GUIState& state){
     }
   }
 
-  std::vector<Config> shortest_path = component->GetShortestPath();
-  if(state("draw_path_space") && !shortest_path.empty()){
-    glLineWidth(20);
-    magenta.setCurrentGL();
-    for(uint v = 0; v < shortest_path.size()-1; v++){
-      Config q1 = shortest_path.at(v);
-      Config q2 = shortest_path.at(v+1);
-      if(q1(3) < 0) q1(3) += 2*M_PI;
-      if(q2(3) < 0) q2(3) += 2*M_PI;
-      Vector3 v1(q1(0),q1(1),q1(3));
-      Vector3 v2(q2(0),q2(1),q2(3));
-      drawLineSegment(v1,v2);
-    }
-  }
+  //std::vector<Config> shortest_path = component->GetShortestPath();
+  //if(state("draw_path_space") && !shortest_path.empty()){
+  //  glLineWidth(20);
+  //  magenta.setCurrentGL();
+  //  for(uint v = 0; v < shortest_path.size()-1; v++){
+  //    Config q1 = shortest_path.at(v);
+  //    Config q2 = shortest_path.at(v+1);
+  //    if(q1(3) < 0) q1(3) += 2*M_PI;
+  //    if(q2(3) < 0) q2(3) += 2*M_PI;
+  //    Vector3 v1(q1(0),q1(1),q1(3));
+  //    Vector3 v2(q2(0),q2(1),q2(3));
+  //    drawLineSegment(v1,v2);
+  //  }
+  //}
 
   glEnable(GL_LIGHTING);
   glDisable(GL_BLEND); 

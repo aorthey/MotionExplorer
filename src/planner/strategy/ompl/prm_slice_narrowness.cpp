@@ -9,23 +9,47 @@
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/SO3StateSpace.h>
 
+#include <boost/graph/one_bit_color_map.hpp>
+#include <boost/graph/stoer_wagner_min_cut.hpp>
+#include <boost/property_map/property_map.hpp>
+
 using namespace og;
 using namespace ob;
+typedef og::PRMBasic::Edge Edge;
 #define foreach BOOST_FOREACH
 
-PRMSliceNarrow::PRMSliceNarrow(const ob::SpaceInformationPtr &si, PRMSliceNarrow *previous_ ):
+//******************************************************************************
+//******************************************************************************
+PRMSliceNarrow::PRMSliceNarrow(const ob::SpaceInformationPtr &si, PRMSliceNarrow *previous_):
   PRMSlice(si, previous_)
 {
   setName("PRMSliceNarrow"+to_string(id));
 }
 
 PRMSliceNarrow::~PRMSliceNarrow(){
-  std::cout << "delete PRMSLiceNarrow" << to_string(id) << std::endl;
+  std::cout << "delete PRMSliceNarrow" << to_string(id) << std::endl;
 }
 
-bool PRMSliceNarrow::SampleGraph(ob::State *workState){
+ompl::PDF<Edge> PRMSliceNarrow::GetEdgePDF()
+{
   PDF<Edge> pdf;
-  Vertex v1o,v2o;
+  foreach (Edge e, boost::edges(g_))
+  {
+    ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
+    pdf.add(e, weight.value());
+  }
+  return pdf;
+}
+
+//******************************************************************************
+//******************************************************************************
+PRMSliceNarrowEdgeDegree::PRMSliceNarrowEdgeDegree(const ob::SpaceInformationPtr &si, PRMSliceNarrow *previous_):
+  PRMSliceNarrow(si, previous_)
+{
+  setName("PRMSliceNarrow(EdgeDegree)"+to_string(id));
+}
+ompl::PDF<Edge> PRMSliceNarrowEdgeDegree::GetEdgePDF(){
+  PDF<Edge> pdf;
   foreach (Edge e, boost::edges(g_))
   {
     ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
@@ -35,72 +59,47 @@ bool PRMSliceNarrow::SampleGraph(ob::State *workState){
     uint d2 = boost::degree(v2, g_);
 
     uint de = d1*d2;
-
     if(de>0){
       double d = weight.value()*1.0/((double)pow(de,16));
       pdf.add(e, d);
     }else{
-      //pdf.add(e, weight.value());
       pdf.add(e, 0);
     }
-
-    //pdf.add(e, weight.value());
-
-
-
-    // if(DEBUG){
-    //   if(v1o==v1 && v2o==v2){
-    //     std::cout << std::string(80, '-') << std::endl;
-    //     std::cout << "Double edge (num edges: " << num_edges(g_) << ")" << std::endl;
-    //     std::cout << "Edge: (" << v1 << "," << v2 << ") weight: "<<weight.value() << std::endl;
-    //     std::cout << std::string(80, '-') << std::endl;
-    //     uint ctr = 0;
-    //     foreach (Edge e, boost::edges(g_))
-    //     {
-    //       ctr++;
-    //     }
-    //     std::cout << "edges counted: " << ctr << std::endl;
-    //     exit(0);
-    //   }
-    //   if(v1o==v2 && v2o==v1){
-    //     std::cout << std::string(80, '-') << std::endl;
-    //     std::cout << "Double edge (num edges: " << num_edges(g_) << ")" << std::endl;
-    //     std::cout << "Edge: (" << v1 << "," << v2 << ") weight: "<<weight.value() << std::endl;
-    //     std::cout << std::string(80, '-') << std::endl;
-    //     uint ctr = 0;
-    //     foreach (Edge e, boost::edges(g_))
-    //     {
-    //       ctr++;
-    //     }
-    //     std::cout << "edges counted: " << ctr << std::endl;
-    //     exit(0);
-    //   }
-
-    //   v1o = v1;
-    //   v2o = v2;
-    // }
   }
-  if(pdf.empty()){
-    std::cout << "cannot sample empty(?) graph" << std::endl;
-    exit(0);
-  }
-
-  Edge e = pdf.sample(rng_.uniform01());
-  double t = rng_.uniform01();
-
-  const Vertex v1 = boost::source(e, g_);
-  const Vertex v2 = boost::target(e, g_);
-  const ob::State *from = stateProperty_[v1];
-  const ob::State *to = stateProperty_[v2];
-
-  M1->getStateSpace()->interpolate(from, to, t, workState);
-
-  lastSourceVertexSampled = v1;
-  lastTargetVertexSampled = v2;
-  lastTSampled = t;
-
-  isSampled = true;
-
-  return true;
-
+  return pdf;
 }
+
+//******************************************************************************
+//******************************************************************************
+PRMSliceNarrowMinCut::PRMSliceNarrowMinCut(const ob::SpaceInformationPtr &si, PRMSliceNarrow *previous_):
+  PRMSliceNarrow(si, previous_)
+{
+  setName("PRMSliceNarrow(MinCut)"+to_string(id));
+}
+ompl::PDF<Edge> PRMSliceNarrowMinCut::GetEdgePDF(){
+
+  BOOST_AUTO(parities, boost::make_one_bit_color_map(num_vertices(g_), get(boost::vertex_index, g_)));
+  
+  auto wmap = make_transform_value_property_map([](EdgeProperty& e) { return e.getCost().value(); }, get(boost::edge_weight_t(), g_));
+
+  int w = boost::stoer_wagner_min_cut(g_, wmap, boost::parity_map(parities));
+
+  PDF<Edge> pdf;
+  foreach (Edge e, boost::edges(g_))
+  {
+    const Vertex v1 = boost::source(e, g_);
+    const Vertex v2 = boost::target(e, g_);
+    bool p1 = get(parities,v1);
+    bool p2 = get(parities,v2);
+    if(p1==p2){
+      pdf.add(e,0);
+    }else{
+      ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
+      pdf.add(e, weight.value());
+    }
+  }
+
+  return pdf;
+}
+
+

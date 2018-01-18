@@ -163,6 +163,14 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     typedef og::PRMMultiSlice<og::PRMSliceNarrow> MultiSlice;
     planner = std::make_shared<MultiSlice>(si_vec, "Narrow");
     static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="ompl:qmpnarrow_edgedegree"){
+    typedef og::PRMMultiSlice<og::PRMSliceNarrowEdgeDegree> MultiSlice;
+    planner = std::make_shared<MultiSlice>(si_vec, "NarrowEdgeDegree");
+    static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="ompl:qmpnarrow_mincut"){
+    typedef og::PRMMultiSlice<og::PRMSliceNarrowMinCut> MultiSlice;
+    planner = std::make_shared<MultiSlice>(si_vec, "NarrowMinCut");
+    static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="ompl:benchmark_initial"){
     //### BENCHMARK INITIAL #########################################################
     // TRY OUT ALL PLANNERS FOR SOME TIME T, but only single run to access which

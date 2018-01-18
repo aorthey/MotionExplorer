@@ -1,5 +1,6 @@
 #pragma once
 #include "prm_basic.h"
+#include <ompl/datastructures/PDF.h>
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
@@ -96,6 +97,7 @@ namespace ompl
         virtual bool Sample(ob::State *workState) override;
         virtual bool Connect(const Vertex a, const Vertex b) override;
         virtual bool SampleGraph(ob::State *workState);
+        virtual ompl::PDF<og::PRMBasic::Edge> GetEdgePDF();
 
         virtual Vertex addMilestone(ob::State *state) override;
 
@@ -106,7 +108,7 @@ namespace ompl
         ob::SpaceInformationPtr M1; //full configuration space Mi = si_
         ob::SpaceInformationPtr C1; //configuration space Ci = Mi/Mi-1
 
-        base::StateSamplerPtr C1_sampler;
+        ob::StateSamplerPtr C1_sampler;
 
         uint M0_subspaces;
         uint M1_subspaces;

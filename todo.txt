@@ -385,3 +385,5 @@ inner/outer ones are already deleted)
 [x] add raw path to pwl
 [ ] rm vantage path from pathspace
 [ ] identify narrow passage on graph (high priority)
+[ ] next planner select -> old path replay is not immediately updated
+[ ] visualize parity of min_cut as colors of vertices

@@ -11,15 +11,14 @@ PathSpaceDecoratorHighlighter::PathSpaceDecoratorHighlighter(PathSpace* space_):
 void PathSpaceDecoratorHighlighter::DrawGL(GUIState& state){
   component->DrawGL(state);
 
-  uint ridx = input->robot_idx;
+  uint ridx = component->GetPathSpaceInput()->robot_idx;
   Robot* robot = world->robots[ridx];
 
   PathPiecewiseLinear* path = component->getShortestPathOMPL();
-  std::cout << "ROBOT: " << robot->name << std::endl;
-  if(path){
-    const SweptVolume& sv = component->GetSweptVolume(robot);
-    GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
-  }
+  //if(path){
+  //  const SweptVolume& sv = component->GetSweptVolume(robot);
+  //  GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
+  //}
 
 
   if(vertices.size()>0){

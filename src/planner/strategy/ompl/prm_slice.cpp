@@ -23,7 +23,8 @@ namespace ompl
   }
 }
 uint PRMSlice::counter = 0;
-void PRMSlice::resetCounter(){
+void PRMSlice::resetCounter()
+{
   PRMSlice::counter = 0;
 }
 
@@ -111,7 +112,8 @@ PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
 
 }
 
-PRMSlice::~PRMSlice(){
+PRMSlice::~PRMSlice()
+{
   std::cout << "delete PRMSLice" << std::endl;
 }
 
@@ -168,7 +170,8 @@ ob::PlannerStatus PRMSlice::Init()
   }
 }
 
-void PRMSlice::ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const{
+void PRMSlice::ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const
+{
   ob::State **q_comps = q->as<CompoundState>()->components;
   ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
   const std::vector<StateSpacePtr> subspaces = M1_compound->getSubspaces();
@@ -195,7 +198,8 @@ void PRMSlice::ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const{
   }
 }
 
-void PRMSlice::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const{
+void PRMSlice::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const
+{
   ob::State **q_comps = q->as<CompoundState>()->components;
   ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
   const std::vector<StateSpacePtr> subspaces = M1_compound->getSubspaces();
@@ -229,7 +233,8 @@ void PRMSlice::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const{
   }
 }
 
-void PRMSlice::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1){
+void PRMSlice::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1)
+{
   //input : qM0 \in M0, qC1 \in C1
   //output: qM1 = qM0 \circ qC1 \in M1
   ob::State **qM1_comps = qM1->as<CompoundState>()->components;
@@ -286,7 +291,8 @@ og::PRMBasic::Vertex PRMSlice::addMilestone(base::State *state)
   return m;
 }
 
-void PRMSlice::setup(){
+void PRMSlice::setup()
+{
   og::PRMBasic::setup();
   nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
                            {
@@ -295,7 +301,8 @@ void PRMSlice::setup(){
 }
 
 
-double PRMSlice::getSamplingDensity(){
+double PRMSlice::getSamplingDensity()
+{
   if(previous == nullptr){
     return (double)num_vertices(g_)/(double)M1->getSpaceMeasure();
   }else{
@@ -313,11 +320,13 @@ double PRMSlice::getSamplingDensity(){
 }
 
 
-void PRMSlice::getPlannerData(base::PlannerData &data) const{
+void PRMSlice::getPlannerData(base::PlannerData &data) const
+{
   PRMBasic::getPlannerData(data);
 }
 
-bool PRMSlice::Sample(ob::State *workState){
+bool PRMSlice::Sample(ob::State *workState)
+{
   if(previous == nullptr){
     //without any underlying CSpace, the behavior is equal to PRM
     return sampler_->sample(workState);
@@ -336,52 +345,14 @@ bool PRMSlice::Sample(ob::State *workState){
   }
 }
 
-bool PRMSlice::SampleGraph(ob::State *workState){
-  PDF<Edge> pdf;
-  Vertex v1o,v2o;
-  foreach (Edge e, boost::edges(g_))
-  {
-    ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
-    pdf.add(e, weight.value());
-    const Vertex v1 = boost::source(e, g_);
-    const Vertex v2 = boost::target(e, g_);
-    // if(DEBUG){
-    //   if(v1o==v1 && v2o==v2){
-    //     std::cout << std::string(80, '-') << std::endl;
-    //     std::cout << "Double edge (num edges: " << num_edges(g_) << ")" << std::endl;
-    //     std::cout << "Edge: (" << v1 << "," << v2 << ") weight: "<<weight.value() << std::endl;
-    //     std::cout << std::string(80, '-') << std::endl;
-    //     uint ctr = 0;
-    //     foreach (Edge e, boost::edges(g_))
-    //     {
-    //       ctr++;
-    //     }
-    //     std::cout << "edges counted: " << ctr << std::endl;
-    //     exit(0);
-    //   }
-    //   if(v1o==v2 && v2o==v1){
-    //     std::cout << std::string(80, '-') << std::endl;
-    //     std::cout << "Double edge (num edges: " << num_edges(g_) << ")" << std::endl;
-    //     std::cout << "Edge: (" << v1 << "," << v2 << ") weight: "<<weight.value() << std::endl;
-    //     std::cout << std::string(80, '-') << std::endl;
-    //     uint ctr = 0;
-    //     foreach (Edge e, boost::edges(g_))
-    //     {
-    //       ctr++;
-    //     }
-    //     std::cout << "edges counted: " << ctr << std::endl;
-    //     exit(0);
-    //   }
+bool PRMSlice::SampleGraph(ob::State *workState)
+{
 
-    //   v1o = v1;
-    //   v2o = v2;
-    // }
-  }
+  PDF<Edge> pdf = GetEdgePDF();
   if(pdf.empty()){
     std::cout << "cannot sample empty(?) graph" << std::endl;
     exit(0);
   }
-
   Edge e = pdf.sample(rng_.uniform01());
   double t = rng_.uniform01();
 
@@ -402,11 +373,23 @@ bool PRMSlice::SampleGraph(ob::State *workState){
 
 }
 
+ompl::PDF<og::PRMBasic::Edge> PRMSlice::GetEdgePDF()
+{
+  PDF<Edge> pdf;
+  foreach (Edge e, boost::edges(g_))
+  {
+    ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
+    pdf.add(e, weight.value());
+  }
+  return pdf;
+}
+
 double PRMSlice::Distance(const Vertex a, const Vertex b) const
 {
   return si_->distance(stateProperty_[a], stateProperty_[b]);
 }
 
-bool PRMSlice::Connect(const Vertex a, const Vertex b){
+bool PRMSlice::Connect(const Vertex a, const Vertex b)
+{
   return PRMBasic::Connect(a,b);
 }
