@@ -1,5 +1,5 @@
 #pragma once
-#include "pathspace/decorator.h"
+#include "planner/pathspace/decorator.h"
 
 class PathSpaceDecoratorHighlighter: public PathSpaceDecorator{
   public:

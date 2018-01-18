@@ -1,5 +1,5 @@
-#include "pathspace/decorator_highlighter.h"
-#include "pathspace/pathspace_input.h"
+#include "planner/pathspace/decorator_highlighter.h"
+#include "planner/pathspace/pathspace_input.h"
 #include "elements/swept_volume.h"
 #include "gui/drawMotionPlanner.h"
 

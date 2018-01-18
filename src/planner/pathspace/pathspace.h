@@ -3,7 +3,7 @@
 #include "elements/roadmap.h"
 #include "elements/path_pwl.h"
 #include "gui/gui_state.h"
-#include "pathspace/pathspace_input.h"
+#include "planner/pathspace/pathspace_input.h"
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 
 class RobotWorld;
