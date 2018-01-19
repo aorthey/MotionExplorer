@@ -61,6 +61,7 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
 
   if(!solved && states < 5){
     std::cout << "ERROR: Planner output has only " << states << std::endl;
+    std::cout << "   this is an indicator of abnormal behavior." << std::endl;
     for (ot::Benchmark::RunProperties::iterator it=run.begin(); it!=run.end(); ++it)
     {
       std::cout << it->first << " => " << it->second << '\n';
@@ -175,18 +176,24 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     //### BENCHMARK #########################################################
     ot::Benchmark benchmark(ss, "BenchmarkNarrowPassage");
 
+    planner = std::make_shared<og::RRTConnect>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
+    benchmark.addPlanner(planner);
+
     typedef og::PRMMultiSlice<og::PRMSliceNarrow> MultiSlice;
     planner = std::make_shared<MultiSlice>(si_vec, "Uniform");
     static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
     benchmark.addPlanner(planner);
+
     typedef og::PRMMultiSlice<og::PRMSliceNarrowEdgeDegree> MultiSliceEdgeDegree;
     planner = std::make_shared<MultiSliceEdgeDegree>(si_vec, "NarrowEdgeDegree");
     static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
     benchmark.addPlanner(planner);
-    typedef og::PRMMultiSlice<og::PRMSliceNarrowMinCut> MultiSliceMinCut;
-    planner = std::make_shared<MultiSliceMinCut>(si_vec, "NarrowMinCut");
-    static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
-    benchmark.addPlanner(planner);
+
+    //typedef og::PRMMultiSlice<og::PRMSliceNarrowMinCut> MultiSliceMinCut;
+    //planner = std::make_shared<MultiSliceMinCut>(si_vec, "NarrowMinCut");
+    //static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
+    //benchmark.addPlanner(planner);
 
 
     ob::ProblemDefinitionPtr pdef = pdef_vec.back();
@@ -200,7 +207,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 10;
+    req.maxTime = 1200;
     req.maxMem = 10000.0;
     req.runCount = 10;
     req.displayProgress = true;
