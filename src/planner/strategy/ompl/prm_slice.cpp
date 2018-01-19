@@ -287,7 +287,6 @@ og::PRMBasic::Vertex PRMSlice::addMilestone(base::State *state)
     associatedVertexTargetProperty_[m] = previous->lastTargetVertexSampled;
     associatedTProperty_[m] = previous->lastTSampled;
   }
-
   return m;
 }
 

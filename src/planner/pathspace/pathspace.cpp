@@ -33,16 +33,16 @@ PathPiecewiseLinear* PathSpace::getShortestPathOMPL(){
   return path_ompl;
 }
 
-std::vector<Config> PathSpace::GetVertices(){
+const std::vector<Config>& PathSpace::GetVertices(){
   return vertices;
 }
-std::vector<std::pair<Config,Config>> PathSpace::GetEdges(){
+const std::vector<std::pair<Config,Config>>& PathSpace::GetEdges(){
   return edges;
 }
-std::vector<std::vector<Config>> PathSpace::GetPaths(){
-  return paths;
-}
-RoadmapPtr PathSpace::GetRoadmap(){
+//std::vector<std::vector<Config>> PathSpace::GetPaths(){
+//  return paths;
+//}
+const RoadmapPtr PathSpace::GetRoadmap(){
   return roadmap;
 }
 
@@ -52,9 +52,9 @@ void PathSpace::SetEdges(const std::vector<std::pair<Config,Config>>& edges_){
 void PathSpace::SetVertices(const std::vector<Config>& vertices_){
   vertices = vertices_;
 }
-void PathSpace::SetPaths(const std::vector<std::vector<Config>>& paths_){
-  paths = paths_;
-}
+//void PathSpace::SetPaths(const std::vector<std::vector<Config>>& paths_){
+//  paths = paths_;
+//}
 void PathSpace::SetRoadmap(const RoadmapPtr roadmap_){
   roadmap = roadmap_;
 }
@@ -78,7 +78,7 @@ std::ostream& operator<< (std::ostream& out, const PathSpace& space)
   std::cout << " type        : " << space.input->type << std::endl;
   std::cout << " #graph vertices          : " << space.vertices.size() << std::endl;
   std::cout << " #graph edges             : " << space.edges.size() << std::endl;
-  std::cout << " #paths size              : " << space.paths.size() << std::endl;
+  //std::cout << " #paths size              : " << space.paths.size() << std::endl;
   //uint ii = space.input.robot_inner_idx;
   //uint io = space.input.robot_outer_idx;
   //std::cout << " robot inner : " << ii << " " << space.world->robots[ii]->name << std::endl;

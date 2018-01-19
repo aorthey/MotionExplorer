@@ -16,23 +16,17 @@ class PathSpace{
 
     PathSpace(RobotWorld *world_, PathSpaceInput* input_);
 
-    std::vector<Config> GetVertices();
-    std::vector<std::pair<Config,Config>> GetEdges();
-    std::vector<std::vector<Config>> GetPaths();
-    RoadmapPtr GetRoadmap();
-
-    void SetShortestPath(const ob::PathPtr p, CSpaceOMPL *cspace);
-
+    const std::vector<Config>& GetVertices();
+    const std::vector<std::pair<Config,Config>>& GetEdges();
+    const RoadmapPtr GetRoadmap();
     PathPiecewiseLinear* getShortestPathOMPL();
 
     void SetVertices(const std::vector<Config>&);
     void SetEdges(const std::vector<std::pair<Config,Config>>&);
-    void SetPaths(const std::vector<std::vector<Config>>&);
+    //void SetPaths(const std::vector<std::vector<Config>>&);
     void SetRoadmap(const RoadmapPtr);
-    //void SetRoadmap(RoadmapPtr);
-    //split the pathspace up into smaller pieces.
-    //Note: this decomposition does not need to be a partition, but could also
-    //be a covering.
+    void SetShortestPath(const ob::PathPtr p, CSpaceOMPL *cspace);
+
     virtual std::vector<PathSpace*> Decompose() = 0;
     virtual void DrawGL(GUIState&) = 0;
     virtual bool isAtomic() const = 0;
@@ -47,7 +41,7 @@ class PathSpace{
 
     std::vector<Config> vertices;
     std::vector<std::pair<Config,Config>> edges;
-    std::vector<std::vector<Config>> paths;
+    //std::vector<std::vector<Config>> paths;
 
     PathPiecewiseLinear *path_ompl{nullptr};
 

@@ -52,7 +52,6 @@ ompl::PDF<Edge> PRMSliceNarrowEdgeDegree::GetEdgePDF(){
   PDF<Edge> pdf;
   foreach (Edge e, boost::edges(g_))
   {
-    ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
     const Vertex v1 = boost::source(e, g_);
     const Vertex v2 = boost::target(e, g_);
     uint d1 = boost::degree(v1, g_);
@@ -60,6 +59,7 @@ ompl::PDF<Edge> PRMSliceNarrowEdgeDegree::GetEdgePDF(){
 
     uint de = d1*d2;
     if(de>0){
+      ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
       double d = weight.value()*1.0/((double)pow(de,16));
       pdf.add(e, d);
     }else{

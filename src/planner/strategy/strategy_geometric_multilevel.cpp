@@ -171,6 +171,53 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     typedef og::PRMMultiSlice<og::PRMSliceNarrowMinCut> MultiSlice;
     planner = std::make_shared<MultiSlice>(si_vec, "NarrowMinCut");
     static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="ompl:benchmark_narrow"){
+    //### BENCHMARK #########################################################
+    ot::Benchmark benchmark(ss, "BenchmarkNarrowPassage");
+
+    typedef og::PRMMultiSlice<og::PRMSliceNarrow> MultiSlice;
+    planner = std::make_shared<MultiSlice>(si_vec, "Uniform");
+    static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
+    benchmark.addPlanner(planner);
+    typedef og::PRMMultiSlice<og::PRMSliceNarrowEdgeDegree> MultiSliceEdgeDegree;
+    planner = std::make_shared<MultiSliceEdgeDegree>(si_vec, "NarrowEdgeDegree");
+    static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
+    benchmark.addPlanner(planner);
+    typedef og::PRMMultiSlice<og::PRMSliceNarrowMinCut> MultiSliceMinCut;
+    planner = std::make_shared<MultiSliceMinCut>(si_vec, "NarrowMinCut");
+    static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
+    benchmark.addPlanner(planner);
+
+
+    ob::ProblemDefinitionPtr pdef = pdef_vec.back();
+    CSpaceOMPL *cspace = input.cspace_levels.back();
+    ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
+    ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
+    ss.setStartAndGoalStates(start,goal,input.epsilon_goalregion);
+
+    ss.setup();
+
+    pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
+
+    ot::Benchmark::Request req;
+    req.maxTime = 10;
+    req.maxMem = 10000.0;
+    req.runCount = 10;
+    req.displayProgress = true;
+
+    benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));
+    benchmark.benchmark(req);
+
+    std::string file = "benchmark_"+util::GetCurrentDateTimeString();
+    std::cout << file << std::endl;
+    std::string res = file+".log";
+    std::string cmd;
+
+    benchmark.saveResultsToFile(res.c_str());
+
+    BenchmarkFileToPNG(file);
+
+    exit(0);
   }else if(algorithm=="ompl:benchmark_initial"){
     //### BENCHMARK INITIAL #########################################################
     // TRY OUT ALL PLANNERS FOR SOME TIME T, but only single run to access which

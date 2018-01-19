@@ -20,18 +20,21 @@ void PathSpaceDecoratorHighlighter::DrawGL(GUIState& state){
   //  GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
   //}
 
+  const std::vector<Config> cVertices = component->GetVertices();
+  const std::vector<std::pair<Config,Config>> cEdges = component->GetEdges();
+  const RoadmapPtr cRoadmap = component->GetRoadmap();
 
-  if(vertices.size()>0){
-    for(uint k = 0; k < vertices.size(); k++){
-      const Config q = vertices.at(k);
+  if(cVertices.size()>0){
+    for(uint k = 0; k < cVertices.size(); k++){
+      const Config q = cVertices.at(k);
       GLDraw::drawRobotAtConfig(robot, q, grey);
     }
   }
-  if(edges.size()>0){
+  if(cEdges.size()>0){
     double dmin= 0.5;
-    for(uint k = 0; k < edges.size(); k++){
-      Config q1 = edges.at(k).first;
-      Config q2 = edges.at(k).second;
+    for(uint k = 0; k < cEdges.size(); k++){
+      Config q1 = cEdges.at(k).first;
+      Config q2 = cEdges.at(k).second;
 
       double dmax = (q1-q2).norm();
       double d = 0;
@@ -42,14 +45,6 @@ void PathSpaceDecoratorHighlighter::DrawGL(GUIState& state){
     }
   }
 
-  if(state("draw_path_space") && paths.size()>0){
-    for(uint k = 0; k < paths.size(); k++){
-      const std::vector<Config> p = paths.at(k);
-      for(uint j = 0; j < p.size(); j++){
-        GLDraw::drawPath( p, magenta, 3, 1);
-      }
-    }
-  }
-  if(state("draw_roadmap") && roadmap) roadmap->DrawGL(state);
+  if(state("draw_roadmap") && cRoadmap) cRoadmap->DrawGL(state);
 
 }

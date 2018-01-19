@@ -5,10 +5,6 @@ PathSpaceDecorator::PathSpaceDecorator(PathSpace *component_):
   PathSpace( component_->GetWorldPtr(), component_->GetPathSpaceInput())
 {
   component = component_;
-  this->vertices = component->GetVertices();
-  this->edges = component->GetEdges();
-  this->paths = component->GetPaths();
-  this->roadmap = component->GetRoadmap();
 }
 
 bool PathSpaceDecorator::isAtomic() const{
