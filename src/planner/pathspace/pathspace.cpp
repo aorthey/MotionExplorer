@@ -29,7 +29,7 @@ PathSpaceInput* PathSpace::GetPathSpaceInput(){
 void PathSpace::SetShortestPath(const ob::PathPtr p, CSpaceOMPL *cspace){
   path_ompl = new PathPiecewiseLinear(p, cspace);
 }
-PathPiecewiseLinear* PathSpace::getShortestPathOMPL(){
+PathPiecewiseLinear* PathSpace::GetShortestPath(){
   return path_ompl;
 }
 
@@ -39,9 +39,6 @@ const std::vector<Config>& PathSpace::GetVertices(){
 const std::vector<std::pair<Config,Config>>& PathSpace::GetEdges(){
   return edges;
 }
-//std::vector<std::vector<Config>> PathSpace::GetPaths(){
-//  return paths;
-//}
 const RoadmapPtr PathSpace::GetRoadmap(){
   return roadmap;
 }
@@ -52,9 +49,6 @@ void PathSpace::SetEdges(const std::vector<std::pair<Config,Config>>& edges_){
 void PathSpace::SetVertices(const std::vector<Config>& vertices_){
   vertices = vertices_;
 }
-//void PathSpace::SetPaths(const std::vector<std::vector<Config>>& paths_){
-//  paths = paths_;
-//}
 void PathSpace::SetRoadmap(const RoadmapPtr roadmap_){
   roadmap = roadmap_;
 }

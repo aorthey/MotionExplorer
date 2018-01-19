@@ -11,9 +11,5 @@ void PathSpaceDecoratorSweptVolumePath::DrawGL(GUIState& state){
 
   uint ridx = input->robot_idx;
   Robot* robot = world->robots[ridx];
-  PathPiecewiseLinear* path = component->getShortestPathOMPL();
-  if(path){
-    const SweptVolume& sv = component->GetSweptVolume(robot);
-    GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
-  }
+  PathPiecewiseLinear* path = component->GetShortestPath();
 }

@@ -407,7 +407,7 @@ void MotionPlanner::DrawGLScreen(double x_, double y_){
 PathPiecewiseLinear* MotionPlanner::GetPath(){
   if(!active) return NULL;
   Pcurrent = hierarchy->GetNodeContent(current_path);
-  pwl = Pcurrent->getShortestPathOMPL();
+  pwl = Pcurrent->GetShortestPath();
   if(pwl){
     pwl->Smooth();
   }

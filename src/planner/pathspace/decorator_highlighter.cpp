@@ -14,7 +14,7 @@ void PathSpaceDecoratorHighlighter::DrawGL(GUIState& state){
   uint ridx = component->GetPathSpaceInput()->robot_idx;
   Robot* robot = world->robots[ridx];
 
-  PathPiecewiseLinear* path = component->getShortestPathOMPL();
+  PathPiecewiseLinear* path = component->GetShortestPath();
   //if(path){
   //  const SweptVolume& sv = component->GetSweptVolume(robot);
   //  GLDraw::drawGLPathSweptVolume(sv.GetRobot(), sv.GetMatrices(), sv.GetAppearanceStack(), sv.GetColor());
