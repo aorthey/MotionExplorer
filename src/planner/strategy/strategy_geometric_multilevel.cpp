@@ -336,14 +336,9 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     planner->setProblemDefinition(pdef_vec.back());
     benchmark.addPlanner(planner);
 
-    typedef og::PRMMultiSlice<og::PRMSlice> MultiSlice;
-    typedef og::PRMMultiSlice<og::PRMSliceConnect> MultiSliceConnect;
+    typedef og::PRMMultiSlice<og::PRMSliceEdgeDegree> MultiSlice;
 
     planner = std::make_shared<MultiSlice>(si_vec);
-    static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
-    benchmark.addPlanner(planner);
-
-    planner = std::make_shared<MultiSliceConnect>(si_vec);
     static_pointer_cast<MultiSlice>(planner)->setProblemDefinition(pdef_vec);
     benchmark.addPlanner(planner);
 
