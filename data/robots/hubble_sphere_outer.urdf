@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot name="hubble_sphere_outer">
+<link name="body">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="3.6" ixy="0" ixz="0" iyy="3.6" iyz="0" izz="3.6"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="3"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="3"/>
+    </geometry>
+  </visual>
+</link>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>

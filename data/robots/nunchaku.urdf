@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<robot name="nunchaku">
+ <link name="link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.00543333333333" ixy="0" ixz="0" iyy="0.00543333333333" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.285 0 0"/>
+    <geometry>
+      <cylinder length="0.25" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.285 0 0"/>
+    <geometry>
+      <cylinder length="0.25" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.2 0 0"/>
+  <parent link="hinge"/>
+  <child link="connector2"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="1" friction="10"/>
+  <limit lower="-2.99" upper="2.99" effort="1" velocity="100"/>
+</joint>
+
+<joint name="joint_link1_connector" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="link1"/>
+  <child link="connector"/>
+</joint>
+
+ <link name="connector">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.00750225" ixy="0" ixz="0" iyy="0.00750225" iyz="0" izz="2.25e-06"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.003"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.003"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_connector_hinge" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="connector"/>
+  <child link="hinge"/>
+</joint>
+
+ <link name="hinge">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.000925" ixy="0" ixz="0" iyy="0.000925" iyz="0" izz="0.000625"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.2 0 0"/>
+    <geometry>
+      <cylinder length="0.06" radius="0.05"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.2 0 0"/>
+    <geometry>
+      <cylinder length="0.06" radius="0.05"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="connector2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.00750225" ixy="0" ixz="0" iyy="0.00750225" iyz="0" izz="2.25e-06"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.2 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.003"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.2 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.003"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_connector2_link2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="connector2"/>
+  <child link="link2"/>
+</joint>
+
+ <link name="link2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.00543333333333" ixy="0" ixz="0" iyy="0.00543333333333" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.485 0 0"/>
+    <geometry>
+      <cylinder length="0.25" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.485 0 0"/>
+    <geometry>
+      <cylinder length="0.25" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>
