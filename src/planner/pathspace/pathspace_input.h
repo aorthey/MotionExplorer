@@ -40,7 +40,7 @@ class PathSpaceInput{
 
     const CSpaceInput& GetCSpaceInput();
     const StrategyInput& GetStrategyInput();
-    PathSpaceInput* GetNextLayer();
+    PathSpaceInput* GetNextLayer() const;
     void SetNextLayer(PathSpaceInput* next);
     friend std::ostream& operator<< (std::ostream&, const PathSpaceInput&);
 

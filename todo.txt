@@ -387,6 +387,10 @@ path_pwl.h)
 [ ] next planner select -> old path replay is not immediately updated
 [ ] visualize parity of min_cut as colors of vertices
 
-
 GUI
 [ ] abstract class SimTestGUI overwrites hotkey assignment, remove that
+[ ] make button to visualize the drawPoser routines
+[ ] filtration involving SE3RN subspaces not working
+
+[ ] remove sufficient edges (Priority)
+[ ] solve hubble without objects and three layers

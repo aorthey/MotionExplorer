@@ -19,6 +19,7 @@ std::vector<PathSpace*> PathSpaceMultiLevelSE3::Decompose(){
 
   std::vector<CSpaceOMPL*> cspace_levels;
   PathSpaceInput* input_level = input->GetNextLayer();
+  PathSpaceInput* last_level = input_level;
 
   while(input_level){
     //uint k = input_level->level;
@@ -35,13 +36,15 @@ std::vector<PathSpace*> PathSpaceMultiLevelSE3::Decompose(){
       std::cout << "Type " << input_level->type << " not recognized" << std::endl;
       exit(0);
     }
+    std::cout << *input_level << std::endl;
     cspace_levels.push_back( cspace_level_k );
+    last_level = input_level;
     input_level = input_level->GetNextLayer();
   }
 
   StrategyGeometricMultiLevel strategy;
   StrategyOutput output(cspace_levels.back());
-  StrategyInput strategy_input = input->GetStrategyInput();
+  StrategyInput strategy_input = last_level->GetStrategyInput();
   strategy_input.cspace = cspace_levels.back();
   strategy_input.world = world;
 
@@ -51,7 +54,7 @@ std::vector<PathSpace*> PathSpaceMultiLevelSE3::Decompose(){
   strategy.plan(strategy_input, output);
 
   std::vector<PathSpace*> decomposedspace;
-  decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
+  decomposedspace.push_back( new PathSpaceAtomic(world, last_level) );
   RoadmapPtr roadmap = output.GetRoadmapPtr();
   decomposedspace.back()->SetRoadmap( roadmap );
 

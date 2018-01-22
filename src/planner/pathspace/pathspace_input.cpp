@@ -15,7 +15,7 @@ const StrategyInput& PathSpaceInput::GetStrategyInput(){
   sin->max_planning_time = max_planning_time;
   return *sin;
 }
-PathSpaceInput* PathSpaceInput::GetNextLayer(){
+PathSpaceInput* PathSpaceInput::GetNextLayer() const{
   return next_layer;
 }
 void PathSpaceInput::SetNextLayer(PathSpaceInput* next){
@@ -26,11 +26,15 @@ std::ostream& operator<< (std::ostream& out, const PathSpaceInput& psi)
 {
   out << std::string(80, '-') << std::endl;
   out << "[PathSpaceInput]" << std::endl;
-  out << " level  : " << psi.level << std::endl;
-  out << " type   : " << psi.type << std::endl;
-  out << " qinit  : " << psi.q_init << std::endl;
-  out << " qgoal  : " << psi.q_goal << std::endl;
-  cout << std::string(80, '-') << std::endl;
+  const PathSpaceInput *next = &psi;
+  while(next){
+    out << " level  : " << next->level << std::endl;
+    out << " type   : " << next->type << std::endl;
+    out << " qinit  : " << next->q_init << std::endl;
+    out << " qgoal  : " << next->q_goal << std::endl;
+    cout << std::string(80, '-') << std::endl;
+    next = next->GetNextLayer();
+  }
   return out;
 }
 

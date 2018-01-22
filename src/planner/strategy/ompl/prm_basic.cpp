@@ -50,7 +50,7 @@ PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si)
   xstates.resize(magic::MAX_RANDOM_BOUNCE_STEPS);
   si_->allocStates(xstates);
 
-  std::cout << "Hello this is PRMBasic with measure=" << si_->getSpaceMeasure() << std::endl;
+  //std::cout << "Hello this is PRMBasic with measure=" << si_->getSpaceMeasure() << std::endl;
 }
 
 PRMBasic::~PRMBasic(){
