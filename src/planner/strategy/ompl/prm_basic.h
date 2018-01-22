@@ -72,6 +72,7 @@ namespace ompl
           private:
             ob::Cost cost;
             ob::Cost original_cost;
+            bool isSufficient;
         };
 
         typedef boost::adjacency_list<

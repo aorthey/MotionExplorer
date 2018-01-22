@@ -1,5 +1,5 @@
 #pragma once
-#include "prm_slice.h"
+#include "prm_quotient.h"
 #include <type_traits>
 
 namespace ob = ompl::base;
@@ -10,13 +10,13 @@ namespace ompl
   namespace geometric
   {
     template <class T>
-    class PRMMultiSlice: public ob::Planner{
-        static_assert(std::is_base_of<og::PRMSlice, T>::value, "Template must inherit from PRMSlice");
+    class PRMMultiQuotient: public ob::Planner{
+        static_assert(std::is_base_of<og::PRMQuotient, T>::value, "Template must inherit from PRMQuotient");
 
       public:
-        PRMMultiSlice(std::vector<ob::SpaceInformationPtr> &si_vec, std::string type = "");
+        PRMMultiQuotient(std::vector<ob::SpaceInformationPtr> &si_vec, std::string type = "");
 
-        virtual ~PRMMultiSlice() override;
+        virtual ~PRMMultiQuotient() override;
 
         void getPlannerData(base::PlannerData &data) const override;
         ob::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
@@ -29,7 +29,7 @@ namespace ompl
       protected:
         std::vector<base::PathPtr> solutions;
 
-        std::vector<T*> slicespaces;
+        std::vector<T*> Quotientspaces;
         bool foundKLevelSolution{false};
 
         std::vector<ob::SpaceInformationPtr> si_vec;
@@ -37,4 +37,4 @@ namespace ompl
     };
   };
 };
-#include "prm_multislice.ipp"
+#include "prm_multiquotient.ipp"

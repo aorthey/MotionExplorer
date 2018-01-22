@@ -49,8 +49,6 @@ PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si)
 
   xstates.resize(magic::MAX_RANDOM_BOUNCE_STEPS);
   si_->allocStates(xstates);
-
-  //std::cout << "Hello this is PRMBasic with measure=" << si_->getSpaceMeasure() << std::endl;
 }
 
 PRMBasic::~PRMBasic(){
@@ -86,12 +84,11 @@ void PRMBasic::clearQuery()
   pis_.restart();
 }
 
-
-
 void PRMBasic::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
 {
   Planner::setProblemDefinition(pdef);
 }
+
 ob::PlannerStatus PRMBasic::Init(const base::PlannerTerminationCondition &ptc){
   checkValidity();
   unsigned long int nrStartStates = boost::num_vertices(g_);

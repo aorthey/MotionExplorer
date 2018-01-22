@@ -22,7 +22,7 @@ namespace og = ompl::geometric;
 // C1 = C1
 //
 // Standard PRM is sampling in M1
-// PRMSlice is sampling in G0 x C1, whereby G0 is the roadmap on M0
+// PRMQuotient is sampling in G0 x C1, whereby G0 is the roadmap on M0
 //
 //
 // Multilevel $M0 \subspace M1 \subspace M2$
@@ -60,13 +60,13 @@ namespace ompl
   }
   namespace geometric
   {
-    class PRMSlice: public og::PRMBasic{
+    class PRMQuotient: public og::PRMBasic{
 
       public:
 
-        PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_);
+        PRMQuotient(const ob::SpaceInformationPtr &si, PRMQuotient *previous_);
 
-        virtual ~PRMSlice() override;
+        virtual ~PRMQuotient() override;
 
         void getPlannerData(base::PlannerData &data) const override;
 
@@ -114,7 +114,7 @@ namespace ompl
         uint M1_subspaces;
         uint C1_subspaces;
 
-        PRMSlice *previous{nullptr};
+        PRMQuotient *previous{nullptr};
 
     };
 

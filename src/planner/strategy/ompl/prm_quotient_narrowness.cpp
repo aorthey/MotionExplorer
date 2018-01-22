@@ -1,4 +1,4 @@
-#include "prm_slice_narrowness.h"
+#include "prm_quotient_narrowness.h"
 #include "planner/cspace/cspace.h"
 
 #include <ompl/datastructures/PDF.h>
@@ -20,17 +20,17 @@ typedef og::PRMBasic::Edge Edge;
 
 //******************************************************************************
 //******************************************************************************
-PRMSliceNarrow::PRMSliceNarrow(const ob::SpaceInformationPtr &si, PRMSliceNarrow *previous_):
-  PRMSlice(si, previous_)
+PRMQuotientNarrow::PRMQuotientNarrow(const ob::SpaceInformationPtr &si, PRMQuotientNarrow *previous_):
+  PRMQuotient(si, previous_)
 {
-  setName("PRMSliceNarrow"+to_string(id));
+  setName("PRMQuotientNarrow"+to_string(id));
 }
 
-PRMSliceNarrow::~PRMSliceNarrow(){
-  std::cout << "delete PRMSliceNarrow" << to_string(id) << std::endl;
+PRMQuotientNarrow::~PRMQuotientNarrow(){
+  std::cout << "delete PRMQuotientNarrow" << to_string(id) << std::endl;
 }
 
-ompl::PDF<Edge> PRMSliceNarrow::GetEdgePDF()
+ompl::PDF<Edge> PRMQuotientNarrow::GetEdgePDF()
 {
   PDF<Edge> pdf;
   foreach (Edge e, boost::edges(g_))
@@ -43,12 +43,12 @@ ompl::PDF<Edge> PRMSliceNarrow::GetEdgePDF()
 
 //******************************************************************************
 //******************************************************************************
-PRMSliceNarrowEdgeDegree::PRMSliceNarrowEdgeDegree(const ob::SpaceInformationPtr &si, PRMSliceNarrow *previous_):
-  PRMSliceNarrow(si, previous_)
+PRMQuotientNarrowEdgeDegree::PRMQuotientNarrowEdgeDegree(const ob::SpaceInformationPtr &si, PRMQuotientNarrow *previous_):
+  PRMQuotientNarrow(si, previous_)
 {
-  setName("PRMSliceNarrow(EdgeDegree)"+to_string(id));
+  setName("PRMQuotientNarrow(EdgeDegree)"+to_string(id));
 }
-ompl::PDF<Edge> PRMSliceNarrowEdgeDegree::GetEdgePDF(){
+ompl::PDF<Edge> PRMQuotientNarrowEdgeDegree::GetEdgePDF(){
   PDF<Edge> pdf;
   foreach (Edge e, boost::edges(g_))
   {
@@ -71,12 +71,12 @@ ompl::PDF<Edge> PRMSliceNarrowEdgeDegree::GetEdgePDF(){
 
 //******************************************************************************
 //******************************************************************************
-PRMSliceNarrowMinCut::PRMSliceNarrowMinCut(const ob::SpaceInformationPtr &si, PRMSliceNarrow *previous_):
-  PRMSliceNarrow(si, previous_)
+PRMQuotientNarrowMinCut::PRMQuotientNarrowMinCut(const ob::SpaceInformationPtr &si, PRMQuotientNarrow *previous_):
+  PRMQuotientNarrow(si, previous_)
 {
-  setName("PRMSliceNarrow(MinCut)"+to_string(id));
+  setName("PRMQuotientNarrow(MinCut)"+to_string(id));
 }
-ompl::PDF<Edge> PRMSliceNarrowMinCut::GetEdgePDF(){
+ompl::PDF<Edge> PRMQuotientNarrowMinCut::GetEdgePDF(){
 
   BOOST_AUTO(parities, boost::make_one_bit_color_map(num_vertices(g_), get(boost::vertex_index, g_)));
   

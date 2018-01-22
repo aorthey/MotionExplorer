@@ -1,5 +1,5 @@
 #pragma once
-#include "prm_slice.h"
+#include "prm_quotient.h"
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
@@ -12,13 +12,13 @@ namespace ompl
   }
   namespace geometric
   {
-    class PRMSliceConnect: public og::PRMSlice{
+    class PRMQuotientConnect: public og::PRMQuotient{
 
       public:
 
-        PRMSliceConnect(const ob::SpaceInformationPtr &si, PRMSliceConnect *previous_);
+        PRMQuotientConnect(const ob::SpaceInformationPtr &si, PRMQuotientConnect *previous_);
 
-        ~PRMSliceConnect() override;
+        ~PRMQuotientConnect() override;
 
         ob::PathPtr GetShortestPathOffsetVertices( const ob::State *qa, const ob::State *qb, 
           const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb);

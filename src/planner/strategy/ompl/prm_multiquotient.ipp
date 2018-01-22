@@ -1,53 +1,53 @@
-#include "prm_multislice.h"
+#include "prm_multiquotient.h"
 #include <ompl/util/Time.h>
 #include <queue>
 
 using namespace og;
 
 template <class T>
-PRMMultiSlice<T>::PRMMultiSlice(std::vector<ob::SpaceInformationPtr> &si_vec_, std::string type):
+PRMMultiQuotient<T>::PRMMultiQuotient(std::vector<ob::SpaceInformationPtr> &si_vec_, std::string type):
   ob::Planner(si_vec_.back(),"QMP"+type), si_vec(si_vec_)
 {
   T::resetCounter();
   for(uint k = 0; k < si_vec.size(); k++){
     T* previous = nullptr;
-    if(k>0) previous = slicespaces.back();
+    if(k>0) previous = Quotientspaces.back();
 
     T* ss = new T(si_vec.at(k), previous);
-    slicespaces.push_back(ss);
+    Quotientspaces.push_back(ss);
   }
 
   std::cout << "Created hierarchy with " << si_vec.size() << " levels." << std::endl;
 }
 
 template <class T>
-PRMMultiSlice<T>::~PRMMultiSlice(){
+PRMMultiQuotient<T>::~PRMMultiQuotient(){
 }
 
 template <class T>
-void PRMMultiSlice<T>::setup(){
+void PRMMultiQuotient<T>::setup(){
 
   Planner::setup();
-  for(uint k = 0; k < slicespaces.size(); k++){
-    T *sk = slicespaces.at(k);
+  for(uint k = 0; k < Quotientspaces.size(); k++){
+    T *sk = Quotientspaces.at(k);
     sk->setup();
   }
 }
 
 template <class T>
-void PRMMultiSlice<T>::clear(){
-  std::cout << "CLEAR MULTISLICE" << std::endl;
+void PRMMultiQuotient<T>::clear(){
+  std::cout << "CLEAR MULTIQuotient" << std::endl;
   Planner::clear();
   solutions.clear();
-  uint N = slicespaces.size();
+  uint N = Quotientspaces.size();
   for(uint k = 0; k < N; k++){
-    slicespaces.at(k)->clear();
+    Quotientspaces.at(k)->clear();
   }
   foundKLevelSolution = false;
 }
 
 template <class T>
-ob::PlannerStatus PRMMultiSlice<T>::solve(const base::PlannerTerminationCondition &ptc){
+ob::PlannerStatus PRMMultiQuotient<T>::solve(const base::PlannerTerminationCondition &ptc){
   
   static const double ROADMAP_BUILD_TIME = 0.01;
 
@@ -58,13 +58,13 @@ ob::PlannerStatus PRMMultiSlice<T>::solve(const base::PlannerTerminationConditio
 
   std::priority_queue<T*, std::vector<T*>, decltype(cmp)> Q(cmp);
 
-  for(uint k = 0; k < slicespaces.size(); k++){
+  for(uint k = 0; k < Quotientspaces.size(); k++){
     base::PathPtr sol_k;
     foundKLevelSolution = false;
-    T *kslice = slicespaces.at(k);
-    kslice->Init();
+    T *kQuotient = Quotientspaces.at(k);
+    kQuotient->Init();
 
-    Q.push(kslice);
+    Q.push(kQuotient);
 
     base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
                                    { return ptc || foundKLevelSolution; });
@@ -72,21 +72,21 @@ ob::PlannerStatus PRMMultiSlice<T>::solve(const base::PlannerTerminationConditio
     ompl::time::point t_k_start = ompl::time::now();
     while (!ptcOrSolutionFound())
     {
-      T* jslice = Q.top();
+      T* jQuotient = Q.top();
       Q.pop();
-      jslice->Grow(ROADMAP_BUILD_TIME);
+      jQuotient->Grow(ROADMAP_BUILD_TIME);
 
-      kslice->checkForSolution(sol_k);
+      kQuotient->checkForSolution(sol_k);
 
-      if(kslice->hasSolution()){
+      if(kQuotient->hasSolution()){
         solutions.push_back(sol_k);
         double t_k_end = ompl::time::seconds(ompl::time::now() - t_k_start);
         std::cout << "Found Solution on Level " << k << " after " << t_k_end << " seconds." << std::endl;
         foundKLevelSolution = true;
       }
-      Q.push(jslice);
+      Q.push(jQuotient);
     }
-    std::cout << "vertices : " << kslice->milestoneCount() << std::endl;
+    std::cout << "vertices : " << kQuotient->milestoneCount() << std::endl;
 
     if(!foundKLevelSolution){
       std::cout << "could not find a solution on level " << k << std::endl;
@@ -97,7 +97,7 @@ ob::PlannerStatus PRMMultiSlice<T>::solve(const base::PlannerTerminationConditio
   std::cout << "Found exact solution" << std::endl;
 
 //set pdef solution path!
-  T *fullspace = slicespaces.back();
+  T *fullspace = Quotientspaces.back();
   base::PathPtr sol;
   fullspace->checkForSolution(sol);
   if (sol)
@@ -113,25 +113,25 @@ ob::PlannerStatus PRMMultiSlice<T>::solve(const base::PlannerTerminationConditio
 
 
 template <class T>
-void PRMMultiSlice<T>::setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_){
-  //assert(pdef.size() == slicespaces.size());
+void PRMMultiQuotient<T>::setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_){
+  //assert(pdef.size() == Quotientspaces.size());
   pdef_vec = pdef_;
   ob::Planner::setProblemDefinition(pdef_vec.back());
   for(uint k = 0; k < pdef_vec.size(); k++){
-    slicespaces.at(k)->setProblemDefinition(pdef_vec.at(k));
+    Quotientspaces.at(k)->setProblemDefinition(pdef_vec.at(k));
   }
 }
 
 template <class T>
-void PRMMultiSlice<T>::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef){
+void PRMMultiQuotient<T>::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef){
 
   //ob::ProblemDefinitionPtr pp = pdef.back();
   this->Planner::setProblemDefinition(pdef);
 }
 
 template <class T>
-void PRMMultiSlice<T>::getPlannerData(ob::PlannerData &data) const{
-  T *lastslice = slicespaces.back();
-  lastslice->getPlannerData(data);
+void PRMMultiQuotient<T>::getPlannerData(ob::PlannerData &data) const{
+  T *lastQuotient = Quotientspaces.back();
+  lastQuotient->getPlannerData(data);
 }
 

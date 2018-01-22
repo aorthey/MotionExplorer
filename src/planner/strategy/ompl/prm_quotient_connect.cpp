@@ -1,4 +1,4 @@
-#include "prm_slice_connect.h"
+#include "prm_quotient_connect.h"
 #include "planner/cspace/cspace.h"
 
 #include <ompl/datastructures/PDF.h>
@@ -25,16 +25,16 @@ namespace ompl
   }
 }
 
-PRMSliceConnect::PRMSliceConnect(const ob::SpaceInformationPtr &si, PRMSliceConnect *previous_ ):
-  PRMSlice(si, previous_)
+PRMQuotientConnect::PRMQuotientConnect(const ob::SpaceInformationPtr &si, PRMQuotientConnect *previous_ ):
+  PRMQuotient(si, previous_)
 {
-  setName("PRMSliceConnect"+to_string(id));
+  setName("PRMQuotientConnect"+to_string(id));
 }
 
-PRMSliceConnect::~PRMSliceConnect(){
+PRMQuotientConnect::~PRMQuotientConnect(){
 }
 
-double PRMSliceConnect::Distance(const Vertex a, const Vertex b) const
+double PRMQuotientConnect::Distance(const Vertex a, const Vertex b) const
 {
   if(previous == nullptr){
     return si_->distance(stateProperty_[a], stateProperty_[b]);
@@ -62,7 +62,7 @@ double PRMSliceConnect::Distance(const Vertex a, const Vertex b) const
     double ta = associatedTProperty_[a];
     double tb = associatedTProperty_[b];
 
-    ob::PathPtr sol = dynamic_cast<PRMSliceConnect*>(previous)->GetShortestPathOffsetVertices( qaM0, qbM0, vsaM0, vsbM0, vtaM0, vtbM0);
+    ob::PathPtr sol = dynamic_cast<PRMQuotientConnect*>(previous)->GetShortestPathOffsetVertices( qaM0, qbM0, vsaM0, vsbM0, vtaM0, vtbM0);
     double d0 = +dInf;
     if(sol!=nullptr){
       d0 = sol->length();
@@ -79,7 +79,7 @@ double PRMSliceConnect::Distance(const Vertex a, const Vertex b) const
   }
 }
 
-ob::PathPtr PRMSliceConnect::GetShortestPathOffsetVertices( const ob::State *qa, const ob::State *qb, 
+ob::PathPtr PRMQuotientConnect::GetShortestPathOffsetVertices( const ob::State *qa, const ob::State *qb, 
   const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb)
 {
   //###########################################################################
@@ -242,7 +242,7 @@ ob::PathPtr PRMSliceConnect::GetShortestPathOffsetVertices( const ob::State *qa,
   return sol;
 }
 
-bool PRMSliceConnect::Connect(const Vertex a, const Vertex b){
+bool PRMQuotientConnect::Connect(const Vertex a, const Vertex b){
   if(previous==nullptr){
     return PRMBasic::Connect(a,b);
   }else{
@@ -268,7 +268,7 @@ bool PRMSliceConnect::Connect(const Vertex a, const Vertex b){
 
     //create PWL function between vertices.
 
-    ob::PathPtr sol = dynamic_cast<PRMSliceConnect*>(previous)->GetShortestPathOffsetVertices( qaM0, qbM0, vsaM0, vsbM0, vtaM0, vtbM0);
+    ob::PathPtr sol = dynamic_cast<PRMQuotientConnect*>(previous)->GetShortestPathOffsetVertices( qaM0, qbM0, vsaM0, vsbM0, vtaM0, vtbM0);
     if(sol==nullptr){
       std::cout << "nullptr" << std::endl;
       std::cout << vsaM0 << "," << vtaM0 << std::endl;
@@ -395,7 +395,7 @@ bool PRMSliceConnect::Connect(const Vertex a, const Vertex b){
   }
 }
 
-uint PRMSliceConnect::randomBounceMotion(const ob::StateSamplerPtr &sss, 
+uint PRMQuotientConnect::randomBounceMotion(const ob::StateSamplerPtr &sss, 
     const Vertex &v, std::vector<ob::State *> &states) const
 {
   uint steps = states.size();

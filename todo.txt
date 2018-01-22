@@ -393,4 +393,5 @@ GUI
 [ ] filtration involving SE3RN subspaces not working
 
 [ ] remove sufficient edges (Priority)
-[ ] solve hubble without objects and three layers
+[x] solve hubble without objects and three layers
+[ ] rename multislice -> multiquotient

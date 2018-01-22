@@ -1,4 +1,4 @@
-#include "prm_slice.h"
+#include "prm_quotient.h"
 #include "planner/cspace/cspace.h"
 
 #include <ompl/datastructures/PDF.h>
@@ -22,13 +22,13 @@ namespace ompl
     static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
   }
 }
-uint PRMSlice::counter = 0;
-void PRMSlice::resetCounter()
+uint PRMQuotient::counter = 0;
+void PRMQuotient::resetCounter()
 {
-  PRMSlice::counter = 0;
+  PRMQuotient::counter = 0;
 }
 
-PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
+PRMQuotient::PRMQuotient(const ob::SpaceInformationPtr &si, PRMQuotient *previous_ ):
   og::PRMBasic(si), previous(previous_), M1(si)
 {
 
@@ -133,12 +133,12 @@ PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
 
 }
 
-PRMSlice::~PRMSlice()
+PRMQuotient::~PRMQuotient()
 {
   std::cout << "delete PRMQuotient" << std::endl;
 }
 
-void PRMSlice::clear()
+void PRMQuotient::clear()
 {
   PRMBasic::clear();
   std::cout << "CLEAR PRMQuotient" << std::endl;
@@ -148,7 +148,7 @@ void PRMSlice::clear()
 }
 
 
-ob::PlannerStatus PRMSlice::Init()
+ob::PlannerStatus PRMQuotient::Init()
 {
   checkValidity();
   auto *goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
@@ -191,7 +191,7 @@ ob::PlannerStatus PRMSlice::Init()
   }
 }
 
-void PRMSlice::ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const
+void PRMQuotient::ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const
 {
   ob::State **q_comps = q->as<CompoundState>()->components;
   ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
@@ -219,7 +219,7 @@ void PRMSlice::ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const
   }
 }
 
-void PRMSlice::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const
+void PRMQuotient::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const
 {
   ob::State **q_comps = q->as<CompoundState>()->components;
   ob::CompoundStateSpace *M1_compound = M1->getStateSpace()->as<ob::CompoundStateSpace>();
@@ -254,7 +254,7 @@ void PRMSlice::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const
   }
 }
 
-void PRMSlice::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1)
+void PRMQuotient::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1)
 {
   //input : qM0 \in M0, qC1 \in C1
   //output: qM1 = qM0 \circ qC1 \in M1
@@ -336,7 +336,7 @@ void PRMSlice::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State
   }
 }
 
-og::PRMBasic::Vertex PRMSlice::addMilestone(base::State *state)
+og::PRMBasic::Vertex PRMQuotient::addMilestone(base::State *state)
 {
   Vertex m = PRMBasic::addMilestone(state);
     
@@ -349,7 +349,7 @@ og::PRMBasic::Vertex PRMSlice::addMilestone(base::State *state)
   return m;
 }
 
-void PRMSlice::setup()
+void PRMQuotient::setup()
 {
   og::PRMBasic::setup();
   nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
@@ -359,7 +359,7 @@ void PRMSlice::setup()
 }
 
 
-double PRMSlice::getSamplingDensity()
+double PRMQuotient::getSamplingDensity()
 {
   if(previous == nullptr){
     return (double)num_vertices(g_)/(double)M1->getSpaceMeasure();
@@ -378,12 +378,12 @@ double PRMSlice::getSamplingDensity()
 }
 
 
-void PRMSlice::getPlannerData(base::PlannerData &data) const
+void PRMQuotient::getPlannerData(base::PlannerData &data) const
 {
   PRMBasic::getPlannerData(data);
 }
 
-bool PRMSlice::Sample(ob::State *workState)
+bool PRMQuotient::Sample(ob::State *workState)
 {
   if(previous == nullptr){
     //without any underlying CSpace, the behavior is equal to PRM
@@ -403,7 +403,7 @@ bool PRMSlice::Sample(ob::State *workState)
   }
 }
 
-bool PRMSlice::SampleGraph(ob::State *workState)
+bool PRMQuotient::SampleGraph(ob::State *workState)
 {
 
   PDF<Edge> pdf = GetEdgePDF();
@@ -431,7 +431,7 @@ bool PRMSlice::SampleGraph(ob::State *workState)
 
 }
 
-ompl::PDF<og::PRMBasic::Edge> PRMSlice::GetEdgePDF()
+ompl::PDF<og::PRMBasic::Edge> PRMQuotient::GetEdgePDF()
 {
   PDF<Edge> pdf;
   foreach (Edge e, boost::edges(g_))
@@ -442,12 +442,12 @@ ompl::PDF<og::PRMBasic::Edge> PRMSlice::GetEdgePDF()
   return pdf;
 }
 
-double PRMSlice::Distance(const Vertex a, const Vertex b) const
+double PRMQuotient::Distance(const Vertex a, const Vertex b) const
 {
   return si_->distance(stateProperty_[a], stateProperty_[b]);
 }
 
-bool PRMSlice::Connect(const Vertex a, const Vertex b)
+bool PRMQuotient::Connect(const Vertex a, const Vertex b)
 {
   return PRMBasic::Connect(a,b);
 }
