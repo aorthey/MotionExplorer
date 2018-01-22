@@ -397,8 +397,14 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="toggle_mode"){
     if(click_mode == ModeNormal){
       click_mode = ModeForceApplication;
+      drawPoser = 0;
+      drawDesired = 0;
+      pose_objects = 0;
     }else{
       click_mode = ModeNormal;
+      drawPoser = 1;
+      drawDesired = 1;
+      pose_objects = 1;
     }
     std::cout << "Changed Mode to: "<<click_mode << std::endl;
   }else if(cmd=="print_config") {

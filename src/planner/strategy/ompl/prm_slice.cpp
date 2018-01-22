@@ -37,8 +37,8 @@ PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
   M1_subspaces = 0;
 
   id = counter++;
-  std::cout << "--- Level " << id << " SliceSpace" << std::endl;
-  setName("PRMSlice"+to_string(id));
+  std::cout << "--- Level " << id << " QuotientSpace" << std::endl;
+  setName("PRMQuotient"+to_string(id));
   if(previous == nullptr){
     std::cout << "M" << id <<" (dimension: " << M1_space->getDimension() << ") contains " << M1_subspaces << " subspaces of type " << M1_space->getName() << " " << M1_space->getType() << std::endl;
   }else{
@@ -135,13 +135,13 @@ PRMSlice::PRMSlice(const ob::SpaceInformationPtr &si, PRMSlice *previous_ ):
 
 PRMSlice::~PRMSlice()
 {
-  std::cout << "delete PRMSLice" << std::endl;
+  std::cout << "delete PRMQuotient" << std::endl;
 }
 
 void PRMSlice::clear()
 {
   PRMBasic::clear();
-  std::cout << "CLEAR PRMSlice" << std::endl;
+  std::cout << "CLEAR PRMQuotient" << std::endl;
   isSampled = false; 
   //C1_sampler.reset();
       //C1_sampler = C1->allocStateSampler();

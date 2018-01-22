@@ -100,6 +100,12 @@
     <key>5</key>
     <active>0</active>
   </checkbox>
+  <checkbox>
+    <name>toggle_mode</name>
+    <descr>Toggle Mode</descr>
+    <key>m</key>
+    <active>1</active>
+  </checkbox>
 
   <hotkey>
     <name>save_current_path</name>

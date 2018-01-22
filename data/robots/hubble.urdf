@@ -114,6 +114,44 @@
   </collision>
  </link>
 
+ <link name="lid_hinge1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.00583333333333" ixy="0" ixz="0" iyy="0.00583333333333" iyz="0" izz="0.000625"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57079632679 0 0" xyz="1.5 0 0.5"/>
+    <geometry>
+      <cylinder length="0.25" radius="0.05"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57079632679 0 0" xyz="1.5 0 0.5"/>
+    <geometry>
+      <cylinder length="0.25" radius="0.05"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="lid1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0627083333333" ixy="0" ixz="0" iyy="0.0627083333333" iyz="0" izz="0.0625"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57079632679 0" xyz="0.035 0 -0.5"/>
+    <geometry>
+      <cylinder length="0.05" radius="0.5"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57079632679 0" xyz="0.035 0 -0.5"/>
+    <geometry>
+      <cylinder length="0.05" radius="0.5"/>
+    </geometry>
+  </collision>
+ </link>
+
 <joint name="joint_b1_b2" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="body1"/>
@@ -148,6 +186,21 @@
   <axis xyz="0 1 0"/>
   <dynamics damping="0.01" friction="0.5"/>
   <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+<joint name="joint_b1_lid_hinge1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body1"/>
+  <child link="lid_hinge1"/>
+</joint>
+
+<joint name="joint_lid_hinge1_lid1_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="1.5 0 0.5"/>
+  <parent link="lid_hinge1"/>
+  <child link="lid1"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-2.0" upper="0" effort="0.01" velocity="100"/>
 </joint>
 
   <klampt package_root="../../.." default_acc_max="4" >
