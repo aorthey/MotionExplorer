@@ -84,6 +84,8 @@ without recompiling. Delete the whole plannersetup folder!
  [ ] visualize wrench cone at contact
  [ ] restructure GUI to use GUIVariables
 
+
+
 -- irreducible
  [ ] create pathspace which computes irreducible paths
 
@@ -384,3 +386,7 @@ path_pwl.h)
 [ ] identify narrow passage on graph (high priority)
 [ ] next planner select -> old path replay is not immediately updated
 [ ] visualize parity of min_cut as colors of vertices
+
+
+GUI
+[ ] abstract class SimTestGUI overwrites hotkey assignment, remove that

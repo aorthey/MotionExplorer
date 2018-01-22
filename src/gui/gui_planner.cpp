@@ -23,6 +23,7 @@ void PlannerBackend::AddPlannerInput(PlannerMultiInput& _in){
 void PlannerBackend::Start(){
   BaseT::Start();
   drawPoser = 0;
+  drawDesired = 0;
   pose_objects = 0;
 }
 

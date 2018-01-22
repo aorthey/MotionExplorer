@@ -132,6 +132,11 @@
     <descr>Screenshot</descr>
     <key>S</key>
   </hotkey>
+  <hotkey>
+    <name>print_robot_info</name>
+    <descr>Print Robot</descr>
+    <key>i</key>
+  </hotkey>
 
   <property name="draw_axes" enabled="0"/>
   <property name="draw_cover_vertices" enabled="1"/>

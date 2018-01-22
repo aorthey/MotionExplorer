@@ -5,14 +5,14 @@ from math import cos,sin,pi,atan2
 from urdf_create import *
 
 
-robot_names = ['snake','snake_irreducible']
+robot_names = ['robots/snake','snake_irreducible']
 env_names = ['twister/twister.tri','underwater/underwater.tri']
-Nsegments_vec = [1,1]
+Nsegments_vec = [4,4]
 
-length = 0.1
+length = 0.2
 limit = pi/4
-stublength = length/4
-radius = 0.05
+stublength = length/8
+radius = 0.01
 headradius = 0.1
 kappa = (2*sin(limit))/(length*Nsegments_vec[0])
 

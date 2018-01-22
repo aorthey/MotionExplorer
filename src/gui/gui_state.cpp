@@ -157,7 +157,7 @@ std::ostream& operator<< (std::ostream& out, const GUIState& s)
   for (auto it = s.variables.begin(); it != s.variables.end(); ++it) {
     const GUIVariable* v = it->second;
     if(v->hasKey()){
-      std::string s = v->key + ": " + v->descr;
+      std::string s = v->key + ": " + v->descr + " (" + v->name + ")";
       keymap[v->key] = s;
     }
   }

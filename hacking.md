@@ -1,6 +1,7 @@
-## Conventions 
+# Conventions 
 
-### Naming Conventions
+<--! ------------------------------------------------------------------------->
+## Naming Conventions
 
 *CamelCase  (https://en.wikipedia.org/wiki/Camel_case)
 *snake_case (https://en.wikipedia.org/wiki/Snake_case)
@@ -12,39 +13,14 @@ variables    : start lowercase, rest camelcase (myVariableName)
 filenames    : all lowercase  , rest snakecase (my_file_name_convention.h)
 XML naming   : all lowercase  , rest snakecase (<robot_names/>)
 
-### Formatting Conventions
+<--! ------------------------------------------------------------------------->
+## Formatting Conventions
 
 Identation   : 2 whitespaces, no tabs
 Curly Braces : on new line (no egyptian, see below)
 
-## Templated Classes
-
-Declaration file    : templated.h
-Implementation file : templated.ipp
-
-templated.h
-``` c++
-#pragma once
-
-template <typename T>
-void Function(T value);
-
-#include "templated.ipp"
-```
-
-templated.ipp
-``` c++
-#include "templated.h"
-
-template <typename T>
-void Function(T value){
-  std::cout << value << std::endl;
-}
-```
-
-#include "templated.h"
-
-## Creating a new Class.
+<--! ------------------------------------------------------------------------->
+## Class Conventions
 
 Objective: It should be possible to save the whole program in a single XML
 file, and be able to load it again. If Save() of an Object is called, then the
@@ -112,3 +88,42 @@ std::ostream& operator<< (std::ostream& out, const Object& obj)
 }
 
 ```
+<--! ------------------------------------------------------------------------->
+## Templated Classes Conventions
+
+Declaration file    : templated.h
+Implementation file : templated.ipp
+
+templated.h
+``` c++
+#pragma once
+
+template <typename T>
+void Function(T value);
+
+#include "templated.ipp"
+```
+
+templated.ipp
+``` c++
+#include "templated.h"
+
+template <typename T>
+void Function(T value){
+  std::cout << value << std::endl;
+}
+```
+
+#include "templated.h"
+
+<--! ------------------------------------------------------------------------->
+## data/ Folder Convention (Naming Conventions apply)
+
+Robots        as URDF   in data/robots/
+Environments  as .tri   in data/environments/
+Objects       as .tri   in data/environments/
+
+World Files   as .xml   in data/
+
+Format World Files: robot_environment.xml or robot_environment_comment.xml
+

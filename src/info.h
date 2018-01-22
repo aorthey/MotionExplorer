@@ -16,6 +16,7 @@ class Info
     void operator()(const KinodynamicMilestonePath &path);
     void operator()(const MultiPath &path);
     void operator()(RobotWorld *world);
+    void operator()(Robot *robot);
     void operator()(WorldSimulation *sim);
 };
 

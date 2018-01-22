@@ -1,6 +1,7 @@
 #include "util.h"
 #include "gui/drawMotionPlanner.h"
 #include "gui/gui.h"
+#include "info.h"
 
 #include <KrisLibrary/geometry/AnyGeometry.h>
 #include <KrisLibrary/math3d/basis.h>
@@ -87,9 +88,10 @@ void ForceFieldBackend::Start()
   BaseT::Start();
 
   settings["dragForceMultiplier"] = 500.0;
-  drawContacts = 0;
+  drawContacts = 1;
   drawWrenches = 1;
-  click_mode = ModeForceApplication;
+  //click_mode = ModeForceApplication;
+  click_mode = ModeNormal;
   pose_objects = 1;
 
   Robot *robot = world->robots[0];
@@ -107,6 +109,7 @@ void ForceFieldBackend::Start()
 void ForceFieldBackend::RenderWorld()
 {
   DEBUG_GL_ERRORS()
+  BaseT::RenderWorld();
 
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND); 
@@ -330,62 +333,6 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
   return false;
 }
 
-//############################################################################
-//############################################################################
-
-#include <KrisLibrary/graph/Tree.h>
-
-//void ForceFieldBackend::AddPlannerOutput( PlannerOutput pout )
-//{
-//  plannerOutput.push_back(pout);
-//
-//  for(uint k = 0; k < pout.removable_robot_idxs.size(); k++){
-//    uint idx = pout.removable_robot_idxs.at(k);
-//    Robot *rk = world->robots[idx];
-//    sim.odesim.DeleteRobot( rk->name.c_str() );
-//  }
-//}
-//
-//void ForceFieldBackend::SendPlannerOutputToController()
-//{
-//  if(plannerOutput.size()>0){
-//    std::vector<Vector> torques = plannerOutput.at(0).GetTorques();
-//    for(uint i = 0; i < torques.size(); i++){
-//      stringstream qstr;
-//      qstr<<torques.at(i);
-//      string cmd( (i<=0)?("set_torque_control"):("append_torque_control") );
-//      SendCommandStringController(cmd,qstr.str());
-//    }
-//  }
-//}
-//
-//void ForceFieldBackend::SendCommandStringController(string cmd, string arg)
-//{
-//  if(!sim.robotControllers[0]->SendCommand(cmd,arg)) {
-//    std::cout << std::string(80, '-') << std::endl;
-//    std::cout << "ERROR in controller commander" << std::endl;
-//    std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
-//    std::cout << std::string(80, '-') << std::endl;
-//    throw "Controller command not supported!";
-//  }
-//}
-
-//void ForceFieldBackend::VisualizeFrame( const Vector3 &p, const Vector3 &e1, const Vector3 &e2, const Vector3 &e3, double frameLength)
-//{
-//  vector<Vector3> frame;
-//  frame.push_back(p);
-//  frame.push_back(e1);
-//  frame.push_back(e2);
-//  frame.push_back(e3);
-//
-//  _frames.push_back(frame);
-//  _frameLength.push_back(frameLength);
-//}
-//
-
-//############################################################################
-//############################################################################
-
 
 bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
@@ -399,39 +346,6 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     }
 
     BaseT::OnCommand(cmd,args);
-
-    //if(plannerOutput.size()>0){
-    //  std::cout << "Reseting all robots to first planner output" << std::endl;
-    //  for(uint k = 0; k < world->robots.size(); k++){
-
-    //    Robot* robot = world->robots.at(k);
-    //    uint ridx = plannerOutput.at(0).nested_idx.at(0);
-    //    if(ridx == k){
-    //      Config q = plannerOutput.at(0).nested_q_init.at(0);
-    //      robot->UpdateConfig(q);
-    //      robot->UpdateGeometry();
-    //      std::cout << "reseting robot " << robot->name << " to " << robot->q << std::endl;
-    //    }
-
-    //    //for(uint j = 0; j < plannerOutput.at(0).nested_idx.size(); j++){
-    //    //  uint ridx = plannerOutput.at(0).nested_idx.at(j);
-    //    //  if(ridx == k){
-    //    //    Config q = plannerOutput.at(0).nested_q_init.at(j);
-    //    //    robot->UpdateConfig(q);
-    //    //    robot->UpdateGeometry();
-    //    //    std::cout << "reseting robot " << robot->name << " to " << robot->q << std::endl;
-    //    //  }
-    //    //}
-    //  }
-    //}else{
-    //  for(uint k = 0; k < world->robots.size(); k++){
-    //    Robot* robot = world->robots[k];
-    //    Config q = robot->q;
-    //    robot->UpdateConfig(q);
-    //    robot->UpdateGeometry();
-    //    std::cout << "reseting robot " << robot->name << " to " << robot->q << std::endl;
-    //  }
-    //}
 
     for(uint k = 0; k < world->robots.size(); k++){
       Robot* robot = world->robots[k];
@@ -488,7 +402,13 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     }
     std::cout << "Changed Mode to: "<<click_mode << std::endl;
   }else if(cmd=="print_config") {
-    std::cout << world->robots[0]->q <<std::endl;
+    for(uint k = 0; k < world->robots.size(); k++){
+      std::cout << "Robot " << world->robots[k]->name << " : " << world->robots[k]->q <<std::endl;
+    }
+  }else if(cmd=="print_robot_info"){
+    Info info;
+    std::cout << "Robot INFO:" << std::endl;
+    info(world->robots[0]);
   }else return BaseT::OnCommand(cmd,args);
 
   SendRefresh();

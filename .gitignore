@@ -11,4 +11,5 @@
 *.tar
 *.zip
 build/
+data/videos/
 

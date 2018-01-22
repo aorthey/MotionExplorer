@@ -58,6 +58,8 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   bool solved = pdef->hasExactSolution();
 
   uint states = boost::lexical_cast<int>(run["graph states INTEGER"]);
+  double time = boost::lexical_cast<double>(run["time REAL"]);
+  double memory = boost::lexical_cast<double>(run["memory REAL"]);
 
   if(!solved && states < 5){
     std::cout << "ERROR: Planner output has only " << states << std::endl;
@@ -93,7 +95,7 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   //  std::cout << "Run " << pid << " no solution" << std::endl;
 
   //}
-  std::cout << "Run " << pid << " " << (solved?"solved":"no solution") << std::endl;
+  std::cout << "Run " << pid << " " << (solved?"solved":"no solution") << "(time: "<< time << ", states: " << states << ", memory: " << memory << ")" << std::endl;
   pid++;
 
 }
@@ -141,6 +143,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   // choose planner
   //###########################################################################
 
+  std::string file_benchmark = "../data/images/benchmark_"+util::GetCurrentDateTimeString();
   ob::PlannerPtr planner;
 
   if(algorithm=="ompl:rrt_plain"){
@@ -215,14 +218,12 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));
     benchmark.benchmark(req);
 
-    std::string file = "benchmark_"+util::GetCurrentDateTimeString();
-    std::cout << file << std::endl;
-    std::string res = file+".log";
+    std::string res = file_benchmark+".log";
     std::string cmd;
 
     benchmark.saveResultsToFile(res.c_str());
 
-    BenchmarkFileToPNG(file);
+    BenchmarkFileToPNG(file_benchmark);
 
     exit(0);
   }else if(algorithm=="ompl:benchmark_initial"){
@@ -305,11 +306,10 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
 
     benchmark.benchmark(req);
 
-    std::string file = "benchmark_initial";
-    std::string res = file+".log";
+    std::string res = file_benchmark+".log";
 
     benchmark.saveResultsToFile(res.c_str());
-    BenchmarkFileToPNG(file);
+    BenchmarkFileToPNG(file_benchmark);
 
   }else if(algorithm=="ompl:benchmark"){
 
@@ -366,14 +366,12 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));
     benchmark.benchmark(req);
 
-    std::string file = "benchmark_"+util::GetCurrentDateTimeString();
-    std::cout << file << std::endl;
-    std::string res = file+".log";
+    std::string res = file_benchmark+".log";
     std::string cmd;
 
     benchmark.saveResultsToFile(res.c_str());
 
-    BenchmarkFileToPNG(file);
+    BenchmarkFileToPNG(file_benchmark);
 
     exit(0);
 

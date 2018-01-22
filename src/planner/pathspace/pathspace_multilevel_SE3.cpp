@@ -29,6 +29,8 @@ std::vector<PathSpace*> PathSpaceMultiLevelSE3::Decompose(){
       cspace_level_k = factory.MakeGeometricCSpaceR3S2(world, input_level->robot_idx);
     }else if(input_level->type=="SE3"){
       cspace_level_k = factory.MakeGeometricCSpaceSE3(world, input_level->robot_idx);
+    }else if(input_level->type=="SE3RN"){
+      cspace_level_k = factory.MakeGeometricCSpace(world, input_level->robot_idx);
     }else{
       std::cout << "Type " << input_level->type << " not recognized" << std::endl;
       exit(0);
