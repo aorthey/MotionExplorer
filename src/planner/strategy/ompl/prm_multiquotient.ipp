@@ -11,10 +11,10 @@ PRMMultiQuotient<T>::PRMMultiQuotient(std::vector<ob::SpaceInformationPtr> &si_v
   T::resetCounter();
   for(uint k = 0; k < si_vec.size(); k++){
     T* previous = nullptr;
-    if(k>0) previous = QuotientSpaces.back();
+    if(k>0) previous = quotientSpaces.back();
 
     T* ss = new T(si_vec.at(k), previous);
-    QuotientSpaces.push_back(ss);
+    quotientSpaces.push_back(ss);
   }
 
   std::cout << "Created hierarchy with " << si_vec.size() << " levels." << std::endl;
@@ -28,8 +28,8 @@ template <class T>
 void PRMMultiQuotient<T>::setup(){
 
   Planner::setup();
-  for(uint k = 0; k < QuotientSpaces.size(); k++){
-    T *sk = QuotientSpaces.at(k);
+  for(uint k = 0; k < quotientSpaces.size(); k++){
+    T *sk = quotientSpaces.at(k);
     sk->setup();
   }
 }
@@ -39,9 +39,9 @@ void PRMMultiQuotient<T>::clear(){
   std::cout << "CLEAR MULTIQuotient" << std::endl;
   Planner::clear();
   solutions.clear();
-  uint N = QuotientSpaces.size();
+  uint N = quotientSpaces.size();
   for(uint k = 0; k < N; k++){
-    QuotientSpaces.at(k)->clear();
+    quotientSpaces.at(k)->clear();
   }
   foundKLevelSolution = false;
 }
@@ -58,10 +58,10 @@ ob::PlannerStatus PRMMultiQuotient<T>::solve(const base::PlannerTerminationCondi
 
   std::priority_queue<T*, std::vector<T*>, decltype(cmp)> Q(cmp);
 
-  for(uint k = 0; k < QuotientSpaces.size(); k++){
+  for(uint k = 0; k < quotientSpaces.size(); k++){
     base::PathPtr sol_k;
     foundKLevelSolution = false;
-    T *kQuotient = QuotientSpaces.at(k);
+    T *kQuotient = quotientSpaces.at(k);
     kQuotient->Init();
 
     Q.push(kQuotient);
@@ -97,7 +97,7 @@ ob::PlannerStatus PRMMultiQuotient<T>::solve(const base::PlannerTerminationCondi
   std::cout << "Found exact solution" << std::endl;
 
 //set pdef solution path!
-  T *fullspace = QuotientSpaces.back();
+  T *fullspace = quotientSpaces.back();
   base::PathPtr sol;
   fullspace->checkForSolution(sol);
   if (sol)
@@ -114,11 +114,11 @@ ob::PlannerStatus PRMMultiQuotient<T>::solve(const base::PlannerTerminationCondi
 
 template <class T>
 void PRMMultiQuotient<T>::setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_){
-  //assert(pdef.size() == QuotientSpaces.size());
+  //assert(pdef.size() == quotientSpaces.size());
   pdef_vec = pdef_;
   ob::Planner::setProblemDefinition(pdef_vec.back());
   for(uint k = 0; k < pdef_vec.size(); k++){
-    QuotientSpaces.at(k)->setProblemDefinition(pdef_vec.at(k));
+    quotientSpaces.at(k)->setProblemDefinition(pdef_vec.at(k));
   }
 }
 
@@ -131,7 +131,7 @@ void PRMMultiQuotient<T>::setProblemDefinition(const ob::ProblemDefinitionPtr &p
 
 template <class T>
 void PRMMultiQuotient<T>::getPlannerData(ob::PlannerData &data) const{
-  T *lastQuotient = QuotientSpaces.back();
+  T *lastQuotient = quotientSpaces.back();
   lastQuotient->getPlannerData(data);
 }
 

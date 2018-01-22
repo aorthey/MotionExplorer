@@ -29,7 +29,7 @@ namespace ompl
       protected:
         std::vector<base::PathPtr> solutions;
 
-        std::vector<T*> QuotientSpaces;
+        std::vector<T*> quotientSpaces;
         bool foundKLevelSolution{false};
 
         std::vector<ob::SpaceInformationPtr> si_vec;
