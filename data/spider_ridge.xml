@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="spider" file="/home/aorthey/git/orthoklampt/data/spider.urdf" translation="0 0 0" rotateRPY="0 0 0" config="27  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
+  <robot name="spider" file="/home/aorthey/git/orthoklampt/data/robots/spider.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
   <terrain  name="mountain/ridge.tri" file="/home/aorthey/git/orthoklampt/data/terrains/mountain/ridge.tri" translation="0 0 0">
    <display color="0.9 0.5 0.1"/>
@@ -10,15 +10,6 @@
   <forcefield>
     <uniform force="0 0 -3.71" color="1 0 0"/>
   </forcefield>
-
-  <plannersettings>
-
-    <qinit config="27  -1 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
-    <qgoal config="27  2 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
-    <se3min config="6  -6 -6 -1 -3.141592 -1.57 -3.14"/>
-    <se3max config="6  6 6 16 3.141592 1.57 3.14"/>
-
-  </plannersettings>
 
   <simulation>
     <globals maxContacts="20" />

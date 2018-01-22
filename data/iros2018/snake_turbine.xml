@@ -3,8 +3,6 @@
 <world>
   <robot name="snake" file="/home/aorthey/git/orthoklampt/data/robots/snake.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <!-- Irreducible Curvature kappa =2.82842712475 -->
-
   <terrain  name="turbine/turbine.tri" file="/home/aorthey/git/orthoklampt/data/terrains/turbine/turbine.tri" translation="0 0 0">
     <display color="0.7 0.7 0.7 0.5"/>
   </terrain>

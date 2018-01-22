@@ -33,7 +33,7 @@
     <epsilongoalregion>0.01</epsilongoalregion>
     <maxplanningtime>2</maxplanningtime>
 
-    <sampler name="obstacle_based"/>
+    <sampler name="uniform"/>
 
     <algorithm name="hierarchical:ompl:benchmark_narrow">
       <hierarchy>
