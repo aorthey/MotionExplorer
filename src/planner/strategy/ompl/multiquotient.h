@@ -1,5 +1,5 @@
 #pragma once
-#include "prm_quotient.h"
+#include "quotient.h"
 #include <type_traits>
 
 namespace ob = ompl::base;
@@ -10,13 +10,13 @@ namespace ompl
   namespace geometric
   {
     template <class T>
-    class PRMMultiQuotient: public ob::Planner{
-        static_assert(std::is_base_of<og::PRMQuotient, T>::value, "Template must inherit from PRMQuotient");
+    class MultiQuotient: public ob::Planner{
+        static_assert(std::is_base_of<og::Quotient, T>::value, "Template must inherit from QuotientPlanner");
 
       public:
-        PRMMultiQuotient(std::vector<ob::SpaceInformationPtr> &si_vec, std::string type = "");
+        MultiQuotient(std::vector<ob::SpaceInformationPtr> &si_vec, std::string type = "");
 
-        virtual ~PRMMultiQuotient() override;
+        virtual ~MultiQuotient() override;
 
         void getPlannerData(base::PlannerData &data) const override;
         ob::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
@@ -36,4 +36,4 @@ namespace ompl
     };
   };
 };
-#include "prm_multiquotient.ipp"
+#include "multiquotient.ipp"

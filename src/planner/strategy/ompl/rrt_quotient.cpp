@@ -8,7 +8,8 @@ namespace og = ompl::geometric;
 using namespace ompl::geometric;
 using namespace ompl::base;
 
-RRTQuotient::RRTQuotient(const base::SpaceInformationPtr &si) : base::Planner(si, "RRTQuotient")
+RRTQuotient::RRTQuotient(const base::SpaceInformationPtr &si) : 
+  Quotient(si)
 {
   setName("RRTQuotient");
   specs_.recognizedGoal = base::GOAL_SAMPLEABLE_REGION;

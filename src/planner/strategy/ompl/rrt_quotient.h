@@ -1,4 +1,5 @@
 #pragma once
+#include "quotient.h"
 #include <ompl/base/Planner.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/util/RandomNumbers.h>
@@ -17,12 +18,12 @@ namespace ompl
 {
   namespace geometric
   {
-    class RRTQuotient : public base::Planner
+    class RRTQuotient : public Quotient
     {
     public:
         //RRTQuotient(const base::SpaceInformationPtr &si, PRMQuotient *previous_);
         RRTQuotient(const base::SpaceInformationPtr &si);
-        ~RRTQuotient() override;
+        ~RRTQuotient();
         void getPlannerData(base::PlannerData &data) const override;
         base::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
         void clear() override;

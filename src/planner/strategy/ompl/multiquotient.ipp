@@ -1,11 +1,11 @@
-#include "prm_multiquotient.h"
+#include "multiquotient.h"
 #include <ompl/util/Time.h>
 #include <queue>
 
 using namespace og;
 
 template <class T>
-PRMMultiQuotient<T>::PRMMultiQuotient(std::vector<ob::SpaceInformationPtr> &si_vec_, std::string type):
+MultiQuotient<T>::MultiQuotient(std::vector<ob::SpaceInformationPtr> &si_vec_, std::string type):
   ob::Planner(si_vec_.back(),"QMP"+type), si_vec(si_vec_)
 {
   T::resetCounter();
@@ -21,11 +21,11 @@ PRMMultiQuotient<T>::PRMMultiQuotient(std::vector<ob::SpaceInformationPtr> &si_v
 }
 
 template <class T>
-PRMMultiQuotient<T>::~PRMMultiQuotient(){
+MultiQuotient<T>::~MultiQuotient(){
 }
 
 template <class T>
-void PRMMultiQuotient<T>::setup(){
+void MultiQuotient<T>::setup(){
 
   Planner::setup();
   for(uint k = 0; k < quotientSpaces.size(); k++){
@@ -34,7 +34,7 @@ void PRMMultiQuotient<T>::setup(){
 }
 
 template <class T>
-void PRMMultiQuotient<T>::clear(){
+void MultiQuotient<T>::clear(){
   Planner::clear();
   solutions.clear();
   for(uint k = 0; k < quotientSpaces.size(); k++){
@@ -44,9 +44,9 @@ void PRMMultiQuotient<T>::clear(){
 }
 
 template <class T>
-ob::PlannerStatus PRMMultiQuotient<T>::solve(const base::PlannerTerminationCondition &ptc){
+ob::PlannerStatus MultiQuotient<T>::solve(const base::PlannerTerminationCondition &ptc){
   
-  static const double ROADMAP_BUILD_TIME = 0.01;
+  static const double T_GROW = 0.01; //time to grow before checking if solution exists
 
   auto cmp = [](T* left, T* right) 
               { 
@@ -70,7 +70,7 @@ ob::PlannerStatus PRMMultiQuotient<T>::solve(const base::PlannerTerminationCondi
     {
       T* jQuotient = Q.top();
       Q.pop();
-      jQuotient->Grow(ROADMAP_BUILD_TIME);
+      jQuotient->Grow(T_GROW);
 
       quotientSpaces.at(k)->checkForSolution(sol_k);
 
@@ -82,7 +82,6 @@ ob::PlannerStatus PRMMultiQuotient<T>::solve(const base::PlannerTerminationCondi
       }
       Q.push(jQuotient);
     }
-    std::cout << "vertices : " << quotientSpaces.at(k)->milestoneCount() << std::endl;
 
     if(!foundKLevelSolution){
       std::cout << "could not find a solution on level " << k << std::endl;
@@ -92,7 +91,6 @@ ob::PlannerStatus PRMMultiQuotient<T>::solve(const base::PlannerTerminationCondi
   }
   std::cout << "Found exact solution" << std::endl;
 
-//set pdef solution path!
   base::PathPtr sol;
   quotientSpaces.back()->checkForSolution(sol);
   if (sol)
@@ -108,7 +106,7 @@ ob::PlannerStatus PRMMultiQuotient<T>::solve(const base::PlannerTerminationCondi
 
 
 template <class T>
-void PRMMultiQuotient<T>::setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_){
+void MultiQuotient<T>::setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_){
   pdef_vec = pdef_;
   ob::Planner::setProblemDefinition(pdef_vec.back());
   for(uint k = 0; k < pdef_vec.size(); k++){
@@ -117,14 +115,14 @@ void PRMMultiQuotient<T>::setProblemDefinition(std::vector<ob::ProblemDefinition
 }
 
 template <class T>
-void PRMMultiQuotient<T>::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef){
+void MultiQuotient<T>::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef){
 
   //ob::ProblemDefinitionPtr pp = pdef.back();
   this->Planner::setProblemDefinition(pdef);
 }
 
 template <class T>
-void PRMMultiQuotient<T>::getPlannerData(ob::PlannerData &data) const{
+void MultiQuotient<T>::getPlannerData(ob::PlannerData &data) const{
   quotientSpaces.back()->getPlannerData(data);
 }
 

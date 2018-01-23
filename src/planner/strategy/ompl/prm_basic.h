@@ -1,5 +1,6 @@
 #pragma once
 
+#include "quotient.h"
 #include <ompl/geometric/planners/PlannerIncludes.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <ompl/base/Cost.h>
@@ -23,7 +24,7 @@ namespace ompl
   }
   namespace geometric
   {
-    class PRMBasic: public ob::Planner{
+    class PRMBasic: public og::Quotient{
 
       public:
         struct vertex_state_t
@@ -104,8 +105,8 @@ namespace ompl
 
       public:
 
-        PRMBasic(const ob::SpaceInformationPtr &si);
-        virtual ~PRMBasic() override;
+        PRMBasic(const ob::SpaceInformationPtr &si, Quotient *previous = nullptr);
+        ~PRMBasic();
 
         double GetSamplingDensity();
         ob::PathPtr GetShortestPath();
@@ -113,7 +114,7 @@ namespace ompl
         bool hasSolution();
 
         virtual void Grow(double t);
-        ob::PlannerStatus Init(const ob::PlannerTerminationCondition &ptc);
+        virtual void Init() override;
 
         template <template <typename T> class NN>
         void setNearestNeighbors();
@@ -165,8 +166,6 @@ namespace ompl
         ob::Cost costHeuristic(Vertex u, Vertex v) const;
         std::vector<ob::State *> xstates;
 
-        ob::ValidStateSamplerPtr sampler_;
-        ob::StateSamplerPtr simpleSampler_;
         RoadmapNeighbors nn_;
 
         boost::disjoint_sets<boost::property_map<Graph, boost::vertex_rank_t>::type,

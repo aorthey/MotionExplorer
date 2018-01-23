@@ -24,8 +24,8 @@ namespace ompl
     static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
   }
 }
-PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si)
-  : ob::Planner(si, "PRMBasic")
+PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si, Quotient *previous_)
+  : Quotient(si, previous_)
   , stateProperty_(boost::get(vertex_state_t(), g_))
   , totalConnectionAttemptsProperty_(boost::get(vertex_total_connection_attempts_t(), g_))
   , successfulConnectionAttemptsProperty_(boost::get(vertex_successful_connection_attempts_t(), g_))
@@ -34,6 +34,7 @@ PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si)
   , associatedTProperty_(boost::get(vertex_associated_t_t(), g_))
   , disjointSets_(boost::get(boost::vertex_rank, g_), boost::get(boost::vertex_predecessor, g_))
 {
+  setName("PRMBasic");
   specs_.recognizedGoal = ob::GOAL_SAMPLEABLE_REGION;
   specs_.approximateSolutions = false;
   specs_.optimizingPaths = true;
@@ -89,14 +90,14 @@ void PRMBasic::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
   Planner::setProblemDefinition(pdef);
 }
 
-ob::PlannerStatus PRMBasic::Init(const base::PlannerTerminationCondition &ptc){
+void PRMBasic::Init(){
   checkValidity();
   unsigned long int nrStartStates = boost::num_vertices(g_);
   OMPL_INFORM("%s: Starting planning with %lu states already in datastructure", getName().c_str(), nrStartStates);
 }
 
 ob::PlannerStatus PRMBasic::solve(const ob::PlannerTerminationCondition &ptc){
-  Init(ptc);
+  Init();
 
   addedNewSolution_ = false;
   base::PathPtr sol;
