@@ -3,6 +3,7 @@
 #include "planner/strategy/ompl/prm_basic.h"
 #include "planner/strategy/ompl/prm_multiquotient.h"
 #include "planner/strategy/ompl/prm_quotient.h"
+#include "planner/strategy/ompl/rrt_quotient.h"
 #include "planner/strategy/ompl/prm_quotient_connect.h"
 #include "planner/strategy/ompl/prm_quotient_narrowness.h"
 #include "util.h"
@@ -148,6 +149,9 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
 
   if(algorithm=="ompl:rrt_plain"){
     planner = std::make_shared<og::RRTPlain>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
+  }else if(algorithm=="ompl:rrt_quotient"){
+    planner = std::make_shared<og::RRTQuotient>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
   }else if(algorithm=="ompl:prm_plain"){
     planner = std::make_shared<og::PRMBasic>(si_vec.back());

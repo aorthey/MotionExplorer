@@ -29,18 +29,15 @@ void PRMMultiQuotient<T>::setup(){
 
   Planner::setup();
   for(uint k = 0; k < quotientSpaces.size(); k++){
-    T *sk = quotientSpaces.at(k);
-    sk->setup();
+    quotientSpaces.at(k)->setup();
   }
 }
 
 template <class T>
 void PRMMultiQuotient<T>::clear(){
-  std::cout << "CLEAR MULTIQuotient" << std::endl;
   Planner::clear();
   solutions.clear();
-  uint N = quotientSpaces.size();
-  for(uint k = 0; k < N; k++){
+  for(uint k = 0; k < quotientSpaces.size(); k++){
     quotientSpaces.at(k)->clear();
   }
   foundKLevelSolution = false;
@@ -61,10 +58,9 @@ ob::PlannerStatus PRMMultiQuotient<T>::solve(const base::PlannerTerminationCondi
   for(uint k = 0; k < quotientSpaces.size(); k++){
     base::PathPtr sol_k;
     foundKLevelSolution = false;
-    T *kQuotient = quotientSpaces.at(k);
-    kQuotient->Init();
 
-    Q.push(kQuotient);
+    quotientSpaces.at(k)->Init();
+    Q.push(quotientSpaces.at(k));
 
     base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
                                    { return ptc || foundKLevelSolution; });
@@ -76,9 +72,9 @@ ob::PlannerStatus PRMMultiQuotient<T>::solve(const base::PlannerTerminationCondi
       Q.pop();
       jQuotient->Grow(ROADMAP_BUILD_TIME);
 
-      kQuotient->checkForSolution(sol_k);
+      quotientSpaces.at(k)->checkForSolution(sol_k);
 
-      if(kQuotient->hasSolution()){
+      if(quotientSpaces.at(k)->hasSolution()){
         solutions.push_back(sol_k);
         double t_k_end = ompl::time::seconds(ompl::time::now() - t_k_start);
         std::cout << "Found Solution on Level " << k << " after " << t_k_end << " seconds." << std::endl;
@@ -86,7 +82,7 @@ ob::PlannerStatus PRMMultiQuotient<T>::solve(const base::PlannerTerminationCondi
       }
       Q.push(jQuotient);
     }
-    std::cout << "vertices : " << kQuotient->milestoneCount() << std::endl;
+    std::cout << "vertices : " << quotientSpaces.at(k)->milestoneCount() << std::endl;
 
     if(!foundKLevelSolution){
       std::cout << "could not find a solution on level " << k << std::endl;
@@ -97,9 +93,8 @@ ob::PlannerStatus PRMMultiQuotient<T>::solve(const base::PlannerTerminationCondi
   std::cout << "Found exact solution" << std::endl;
 
 //set pdef solution path!
-  T *fullspace = quotientSpaces.back();
   base::PathPtr sol;
-  fullspace->checkForSolution(sol);
+  quotientSpaces.back()->checkForSolution(sol);
   if (sol)
   {
     base::PlannerSolution psol(sol);
@@ -114,7 +109,6 @@ ob::PlannerStatus PRMMultiQuotient<T>::solve(const base::PlannerTerminationCondi
 
 template <class T>
 void PRMMultiQuotient<T>::setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_){
-  //assert(pdef.size() == quotientSpaces.size());
   pdef_vec = pdef_;
   ob::Planner::setProblemDefinition(pdef_vec.back());
   for(uint k = 0; k < pdef_vec.size(); k++){
@@ -131,7 +125,6 @@ void PRMMultiQuotient<T>::setProblemDefinition(const ob::ProblemDefinitionPtr &p
 
 template <class T>
 void PRMMultiQuotient<T>::getPlannerData(ob::PlannerData &data) const{
-  T *lastQuotient = quotientSpaces.back();
-  lastQuotient->getPlannerData(data);
+  quotientSpaces.back()->getPlannerData(data);
 }
 

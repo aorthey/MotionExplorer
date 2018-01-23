@@ -395,3 +395,5 @@ GUI
 [ ] remove sufficient edges (Priority)
 [x] solve hubble without objects and three layers
 [ ] rename multislice -> multiquotient
+[ ] while path is plotted, somehow keep focus on a locus point on the robot,
+i.e. some tracking ability

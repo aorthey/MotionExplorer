@@ -359,6 +359,12 @@ void PRMQuotient::setup()
 }
 
 
+void PRMQuotient::Grow(double t){
+  double T_grow = (2.0/3.0)*t;
+  double T_expand = (1.0/3.0)*t;
+  growRoadmap(ob::timedPlannerTerminationCondition(T_grow), xstates[0]);
+  expandRoadmap( ob::timedPlannerTerminationCondition(T_expand), xstates);
+}
 double PRMQuotient::getSamplingDensity()
 {
   if(previous == nullptr){

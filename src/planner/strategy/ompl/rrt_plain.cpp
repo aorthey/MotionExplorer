@@ -192,7 +192,6 @@ ob::PlannerStatus RRTPlain::solve(const ob::PlannerTerminationCondition &ptc)
 
     Grow();
 
-    //CheckSolution
     if(ConnectedToGoal(lastExtendedConfiguration)){
       ConstructSolution(lastExtendedConfiguration);
       return ob::PlannerStatus::EXACT_SOLUTION;

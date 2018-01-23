@@ -112,7 +112,7 @@ namespace ompl
         ob::PathPtr GetSolutionPath();
         bool hasSolution();
 
-        void Grow(double t);
+        virtual void Grow(double t);
         ob::PlannerStatus Init(const ob::PlannerTerminationCondition &ptc);
 
         template <template <typename T> class NN>
@@ -158,7 +158,7 @@ namespace ompl
     protected:
 
         virtual double Distance(const Vertex a, const Vertex b) const; // standard si->distance
-        virtual bool Sample(ob::State *workState); //si->sampler
+        virtual bool Sample(ob::State *q_random); //si->sampler
         virtual bool Connect(const Vertex a, const Vertex b);
         virtual Vertex addMilestone(ob::State *state);
 

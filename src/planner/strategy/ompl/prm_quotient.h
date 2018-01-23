@@ -87,6 +87,8 @@ namespace ompl
 
         static void resetCounter();
 
+        virtual void Grow(double t) override;
+
       protected:
 
         static uint counter;

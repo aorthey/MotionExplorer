@@ -126,10 +126,10 @@ ob::PlannerStatus PRMBasic::solve(const ob::PlannerTerminationCondition &ptc){
 }
 
 void PRMBasic::Grow(double t){
-  double twothird = (2.0/3.0)*t;
-  double onethird = (1.0/3.0)*t;
-  growRoadmap(ob::timedPlannerTerminationCondition(twothird), xstates[0]);
-  expandRoadmap( ob::timedPlannerTerminationCondition(onethird), xstates);
+  double T_grow = (2.0/3.0)*t;
+  double T_expand = (1.0/3.0)*t;
+  growRoadmap(ob::timedPlannerTerminationCondition(T_grow), xstates[0]);
+  expandRoadmap( ob::timedPlannerTerminationCondition(T_expand), xstates);
 }
 
 void PRMBasic::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState)
@@ -447,8 +447,8 @@ void PRMBasic::setNearestNeighbors()
         setup();
 }
 
-bool PRMBasic::Sample(ob::State *workState){
-  return sampler_->sample(workState);
+bool PRMBasic::Sample(ob::State *q_random){
+  return sampler_->sample(q_random);
 }
 double PRMBasic::Distance(const Vertex a, const Vertex b) const
 {

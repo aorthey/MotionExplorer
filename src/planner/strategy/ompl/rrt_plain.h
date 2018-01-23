@@ -1,3 +1,4 @@
+#pragma once
 #include <ompl/base/Planner.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/util/RandomNumbers.h>

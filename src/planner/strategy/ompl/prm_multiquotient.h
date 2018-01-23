@@ -25,7 +25,6 @@ namespace ompl
         void setProblemDefinition(const ob::ProblemDefinitionPtr &pdef) override;
         void setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_vec_);
 
-
       protected:
         std::vector<base::PathPtr> solutions;
 
