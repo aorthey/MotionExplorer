@@ -62,7 +62,6 @@ PRMBasic::~PRMBasic(){
 
 void PRMBasic::clear()
 {
-  std::cout << "CLEAR BASIC" << std::endl;
   Planner::clear();
   //sampler_.reset();
   //simpleSampler_.reset();
@@ -110,7 +109,7 @@ ob::PlannerStatus PRMBasic::solve(const ob::PlannerTerminationCondition &ptc){
   while (!ptcOrSolutionFound())
   {
     Grow(magic::ROADMAP_BUILD_TIME);
-    checkForSolution(sol);
+    CheckForSolution(sol);
   }
 
   OMPL_INFORM("%s: Created %u states", getName().c_str(), boost::num_vertices(g_));
@@ -217,7 +216,7 @@ bool PRMBasic::sameComponent(Vertex m1, Vertex m2)
   return boost::same_component(m1, m2, disjointSets_);
 }
 
-void PRMBasic::checkForSolution(ob::PathPtr &solution)
+void PRMBasic::CheckForSolution(ob::PathPtr &solution)
 {
   bool foundSolution = maybeConstructSolution(startM_, goalM_, solution);
   if(foundSolution && !addedNewSolution_){
@@ -414,21 +413,20 @@ ob::Cost PRMBasic::costHeuristic(Vertex u, Vertex v) const
   return opt_->motionCostHeuristic(stateProperty_[u], stateProperty_[v]);
 }
 
-double PRMBasic::GetSamplingDensity(){
-  return (double)num_vertices(g_)/(double)si_->getSpaceMeasure();
-}
-
 ob::PathPtr PRMBasic::GetShortestPath(){
   return GetSolutionPath();
+}
+uint PRMBasic::GetNumberOfVertices(){
+  return num_vertices(g_);
 }
 
 ob::PathPtr PRMBasic::GetSolutionPath(){
   ob::PathPtr sol;
-  checkForSolution(sol);
+  CheckForSolution(sol);
   return sol;
 }
 
-bool PRMBasic::hasSolution(){
+bool PRMBasic::HasSolution(){
   if(bestCost_.value() < dInf){
     return addedNewSolution_;
   }else{

@@ -9,7 +9,7 @@ namespace ompl
 {
   namespace geometric
   {
-    template <class T>
+    template <class T, typename Tlast=T>
     class MultiQuotient: public ob::Planner{
         static_assert(std::is_base_of<og::Quotient, T>::value, "Template must inherit from QuotientPlanner");
 
@@ -28,7 +28,7 @@ namespace ompl
       protected:
         std::vector<base::PathPtr> solutions;
 
-        std::vector<T*> quotientSpaces;
+        std::vector<og::Quotient*> quotientSpaces;
         bool foundKLevelSolution{false};
 
         std::vector<ob::SpaceInformationPtr> si_vec;

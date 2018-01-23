@@ -25,7 +25,7 @@ namespace ompl
   }
 }
 
-PRMQuotientConnect::PRMQuotientConnect(const ob::SpaceInformationPtr &si, PRMQuotientConnect *previous_ ):
+PRMQuotientConnect::PRMQuotientConnect(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
   PRMQuotient(si, previous_)
 {
   setName("PRMQuotientConnect"+to_string(id));

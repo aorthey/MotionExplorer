@@ -64,7 +64,7 @@ namespace ompl
 
       public:
 
-        PRMQuotient(const ob::SpaceInformationPtr &si, PRMQuotient *previous_);
+        PRMQuotient(const ob::SpaceInformationPtr &si, Quotient *previous_);
         virtual ~PRMQuotient() override;
 
         void getPlannerData(base::PlannerData &data) const override;

@@ -108,10 +108,10 @@ namespace ompl
         PRMBasic(const ob::SpaceInformationPtr &si, Quotient *previous = nullptr);
         ~PRMBasic();
 
-        double GetSamplingDensity();
+        virtual uint GetNumberOfVertices() override;
         ob::PathPtr GetShortestPath();
         ob::PathPtr GetSolutionPath();
-        bool hasSolution();
+        bool HasSolution() override;
 
         virtual void Grow(double t);
         virtual void Init() override;
@@ -154,7 +154,7 @@ namespace ompl
         {
             return g_;
         }
-        void checkForSolution(ob::PathPtr &solution);
+        void CheckForSolution(ob::PathPtr &solution) override;
 
     protected:
 

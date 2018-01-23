@@ -23,7 +23,7 @@ namespace ompl
   }
 }
 
-PRMQuotient::PRMQuotient(const ob::SpaceInformationPtr &si, PRMQuotient *previous_ ):
+PRMQuotient::PRMQuotient(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
   og::PRMBasic(si, previous_)
 {
   setName("PRMQuotient"+std::to_string(id));

@@ -153,6 +153,10 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   }else if(algorithm=="ompl:rrt_quotient"){
     planner = std::make_shared<og::RRTQuotient>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
+  }else if(algorithm=="ompl:rrt_quotient2"){
+    typedef og::MultiQuotient<og::PRMQuotientNarrow, og::RRTQuotient> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec, "PRMXRRT");
+    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="ompl:prm_plain"){
     planner = std::make_shared<og::PRMBasic>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
@@ -187,15 +191,15 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     planner->setProblemDefinition(pdef_vec.back());
     benchmark.addPlanner(planner);
 
-    typedef og::MultiQuotient<og::PRMQuotientNarrow> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "Uniform");
+    typedef og::MultiQuotient<og::PRMQuotientNarrow, og::RRTQuotient> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec, "QMP_RRT");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
     benchmark.addPlanner(planner);
 
-    typedef og::MultiQuotient<og::PRMQuotientNarrowEdgeDegree> MultiQuotientEdgeDegree;
-    planner = std::make_shared<MultiQuotientEdgeDegree>(si_vec, "NarrowEdgeDegree");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-    benchmark.addPlanner(planner);
+    //typedef og::MultiQuotient<og::PRMQuotientNarrowEdgeDegree> MultiQuotientEdgeDegree;
+    //planner = std::make_shared<MultiQuotientEdgeDegree>(si_vec, "NarrowEdgeDegree");
+    //static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+    //benchmark.addPlanner(planner);
 
     //typedef og::MultiQuotient<og::PRMQuotientNarrowMinCut> MultiQuotientMinCut;
     //planner = std::make_shared<MultiQuotientMinCut>(si_vec, "NarrowMinCut");
@@ -214,9 +218,9 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 1;
+    req.maxTime = 5;
     req.maxMem = 10000.0;
-    req.runCount = 1;
+    req.runCount = 5;
     req.displayProgress = true;
 
     benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));

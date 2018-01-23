@@ -12,10 +12,15 @@ namespace ompl
     {
       public:
         Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_ = nullptr);
-        virtual void Init() = 0;
-        virtual void Grow(double t) = 0;
         virtual bool Sample(ob::State *q_random);
         virtual bool SampleGraph(ob::State *q_random);
+
+        virtual void Init() = 0;
+        virtual void Grow(double t) = 0;
+        virtual bool HasSolution() = 0;
+        virtual void CheckForSolution(ob::PathPtr &solution) = 0;
+        double GetSamplingDensity();
+        virtual uint GetNumberOfVertices() = 0;
 
         static void resetCounter();
       protected:

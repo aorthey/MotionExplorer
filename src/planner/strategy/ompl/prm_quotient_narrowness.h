@@ -14,20 +14,20 @@ namespace ompl
   {
     class PRMQuotientNarrow: public og::PRMQuotient{
       public:
-        PRMQuotientNarrow(const ob::SpaceInformationPtr &si, PRMQuotientNarrow *previous_);
+        PRMQuotientNarrow(const ob::SpaceInformationPtr &si, Quotient *previous_);
         virtual ~PRMQuotientNarrow() override;
       protected:
         virtual PDF<Edge> GetEdgePDF() override;
     };
     class PRMQuotientNarrowEdgeDegree: public og::PRMQuotientNarrow{
       public:
-        PRMQuotientNarrowEdgeDegree(const ob::SpaceInformationPtr &si, PRMQuotientNarrow *previous_);
+        PRMQuotientNarrowEdgeDegree(const ob::SpaceInformationPtr &si, Quotient *previous_);
       protected:
         virtual PDF<Edge> GetEdgePDF() override;
     };
     class PRMQuotientNarrowMinCut: public og::PRMQuotientNarrow{
       public:
-        PRMQuotientNarrowMinCut(const ob::SpaceInformationPtr &si, PRMQuotientNarrow *previous_);
+        PRMQuotientNarrowMinCut(const ob::SpaceInformationPtr &si, Quotient *previous_);
       protected:
         virtual PDF<Edge> GetEdgePDF() override;
     };

@@ -22,7 +22,7 @@ namespace ompl
     {
     public:
         //RRTQuotient(const base::SpaceInformationPtr &si, PRMQuotient *previous_);
-        RRTQuotient(const base::SpaceInformationPtr &si);
+        RRTQuotient(const base::SpaceInformationPtr &si, Quotient *previous_ = nullptr);
         ~RRTQuotient();
         void getPlannerData(base::PlannerData &data) const override;
         base::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
@@ -50,11 +50,14 @@ namespace ompl
             setup();
         }
         virtual void Grow(double t=0);
-        bool hasSolution(){
+        bool HasSolution() override{
           return isSolved;
         }
 
         void setup() override;
+        virtual void CheckForSolution(ob::PathPtr &solution) override;
+
+        virtual uint GetNumberOfVertices() override;
 
     protected:
         class Configuration
@@ -90,12 +93,9 @@ namespace ompl
         {
             return si_->distance(a->state, b->state);
         }
-        virtual void Sample(Configuration *q_random);
 
         GrowState growTree(TreeData &tree, TreeGrowingInfo &tgi, Configuration *rmotion);
         bool ConnectedToGoal();
-        ob::PathPtr ConstructSolution(Configuration *q_start, Configuration *q_goal);
-        void CheckForSolution(ob::PathPtr &solution);
         base::StateSamplerPtr sampler_;
         TreeData tStart_;
         TreeData tGoal_;
@@ -106,6 +106,7 @@ namespace ompl
         std::pair<base::State *, base::State *> connectionPoint_;
         ob::GoalSampleableRegion *goal;
 
+        ob::PathPtr ConstructSolution(Configuration *q_start, Configuration *q_goal);
         //PRMQuotient *previous{nullptr};
         bool startTree;
         bool isTreeConnected{false};

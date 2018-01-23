@@ -8,8 +8,8 @@ namespace og = ompl::geometric;
 using namespace ompl::geometric;
 using namespace ompl::base;
 
-RRTQuotient::RRTQuotient(const base::SpaceInformationPtr &si) : 
-  Quotient(si)
+RRTQuotient::RRTQuotient(const base::SpaceInformationPtr &si, Quotient *previous_) : 
+  Quotient(si, previous_)
 {
   setName("RRTQuotient");
   specs_.recognizedGoal = base::GOAL_SAMPLEABLE_REGION;
@@ -245,9 +245,6 @@ ob::PathPtr RRTQuotient::ConstructSolution(Configuration *q_start, Configuration
   pdef_->addSolutionPath(path, false, 0.0, getName());
   return path;
 }
-void RRTQuotient::Sample(Configuration *q_random){
-  sampler_->sampleUniform(q_random->state);
-}
 
 void RRTQuotient::Grow(double t)
 {
@@ -257,7 +254,7 @@ void RRTQuotient::Grow(double t)
   TreeData &otherTree = startTree ? tStart_ : tGoal_;
 
   Configuration *q_random = new Configuration(si_);
-  Sample(q_random);
+  Sample(q_random->state);
 
   GrowState gs = growTree(tree, tgi, q_random);
   if (gs != TRAPPED)
@@ -321,3 +318,6 @@ PlannerStatus RRTQuotient::solve(const base::PlannerTerminationCondition &ptc)
   return (isSolved? base::PlannerStatus::EXACT_SOLUTION : base::PlannerStatus::TIMEOUT);
 }
 
+uint RRTQuotient::GetNumberOfVertices(){
+  return tStart_->size() + tGoal_->size();
+}

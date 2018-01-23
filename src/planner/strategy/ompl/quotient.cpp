@@ -16,14 +16,14 @@ void Quotient::resetCounter()
 }
 
 Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_):
-  ob::Planner(si,"QuotientPlanner"), previous(previous_), M1(si)
+  ob::Planner(si,"QuotientSpace"), previous(previous_), M1(si)
 {
   const StateSpacePtr M1_space = M1->getStateSpace();
   M0_subspaces = 0;
   M1_subspaces = 0;
 
   id = counter++;
-  std::cout << "--- Level " << id << " QuotientSpace" << std::endl;
+  std::cout << "--- Level " << id << " " << getName() << std::endl;
   setName("Quotient"+std::to_string(id));
   if(previous == nullptr){
     std::cout << "M" << id <<" (dimension: " << M1_space->getDimension() << ") contains " << M1_subspaces << " subspaces of type " << M1_space->getName() << " " << M1_space->getType() << std::endl;
@@ -285,3 +285,7 @@ bool Quotient::SampleGraph(ob::State *q_random)
   exit(0);
   return false;
 }
+double Quotient::GetSamplingDensity(){
+  return (double)GetNumberOfVertices()/(double)si_->getSpaceMeasure();
+}
+

@@ -20,7 +20,7 @@ typedef og::PRMBasic::Edge Edge;
 
 //******************************************************************************
 //******************************************************************************
-PRMQuotientNarrow::PRMQuotientNarrow(const ob::SpaceInformationPtr &si, PRMQuotientNarrow *previous_):
+PRMQuotientNarrow::PRMQuotientNarrow(const ob::SpaceInformationPtr &si, Quotient *previous_):
   PRMQuotient(si, previous_)
 {
   setName("PRMQuotientNarrow"+to_string(id));
@@ -43,7 +43,7 @@ ompl::PDF<Edge> PRMQuotientNarrow::GetEdgePDF()
 
 //******************************************************************************
 //******************************************************************************
-PRMQuotientNarrowEdgeDegree::PRMQuotientNarrowEdgeDegree(const ob::SpaceInformationPtr &si, PRMQuotientNarrow *previous_):
+PRMQuotientNarrowEdgeDegree::PRMQuotientNarrowEdgeDegree(const ob::SpaceInformationPtr &si, Quotient *previous_):
   PRMQuotientNarrow(si, previous_)
 {
   setName("PRMQuotientNarrow(EdgeDegree)"+to_string(id));
@@ -71,7 +71,7 @@ ompl::PDF<Edge> PRMQuotientNarrowEdgeDegree::GetEdgePDF(){
 
 //******************************************************************************
 //******************************************************************************
-PRMQuotientNarrowMinCut::PRMQuotientNarrowMinCut(const ob::SpaceInformationPtr &si, PRMQuotientNarrow *previous_):
+PRMQuotientNarrowMinCut::PRMQuotientNarrowMinCut(const ob::SpaceInformationPtr &si, Quotient *previous_):
   PRMQuotientNarrow(si, previous_)
 {
   setName("PRMQuotientNarrow(MinCut)"+to_string(id));
