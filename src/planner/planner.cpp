@@ -25,11 +25,11 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   current_level_node = 0;
   this->world->InitCollisions();
 
-  if(!input.freeFloating){
-    std::cout << " planner works only with freefloating robots right now x__X;;" << std::endl;
-    active = false;
-    return;
-  }
+  //if(!input.freeFloating){
+  //  std::cout << " planner works only with freefloating robots right now x__X;;" << std::endl;
+  //  active = false;
+  //  return;
+  //}
 
   std::string algorithm = input.name_algorithm;
   hierarchy = new Hierarchy<PathSpace*>();
@@ -408,7 +408,7 @@ PathPiecewiseLinear* MotionPlanner::GetPath(){
   if(!active) return NULL;
   Pcurrent = hierarchy->GetNodeContent(current_path);
   pwl = Pcurrent->GetShortestPath();
-  if(pwl){
+  if(pwl && input.smoothPath){
     pwl->Smooth();
   }
   return pwl;

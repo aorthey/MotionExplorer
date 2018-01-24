@@ -8,4 +8,35 @@
   </terrain>
 
 
+  <plannerinput>
+
+    <qinit  config="17  -3.5 +0.0 +0.0 -0.0 +0.0 +0.0 0 0 0 0 0 0 0 0 0 0 0"/>
+    <qgoal  config="17  +4.5 +0.0 +0.0 -0.0 -0.0 +0.0 0 0 0 0 0 0 0 0 0 0 0"/>
+    <se3min config="6  -5.0 -8.0 -4.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +5.0 +4.0 +4.0 +3.141593 +1.57 +3.141593"/>
+    <robot>0</robot>
+    <freeFloating>1</freeFloating>
+
+    <timestep min="0.01" max="0.1"/>
+    <epsilongoalregion>0.01</epsilongoalregion>
+    <maxplanningtime>10</maxplanningtime>
+
+    <sampler name="obstacle_based"/>
+
+    <algorithm name="hierarchical:ompl:rrt_quotient2">
+      <hierarchy>
+        <level inner_index="0" outer_index="0" type="SE3RN"/>
+      </hierarchy>
+    </algorithm>
+
+    <algorithm name="ompl:rrtconnect"/>
+
+    <algorithm name="hierarchical:ompl:benchmark_narrow">
+      <hierarchy>
+        <level inner_index="0" outer_index="0" type="SE3RN"/>
+      </hierarchy>
+    </algorithm>
+
+  </plannerinput>
+
 </world>

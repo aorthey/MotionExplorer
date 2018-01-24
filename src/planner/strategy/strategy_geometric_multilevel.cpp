@@ -187,13 +187,17 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     //### BENCHMARK #########################################################
     ot::Benchmark benchmark(ss, "BenchmarkNarrowPassage");
 
-    planner = std::make_shared<og::RRTConnect>(si_vec.back());
-    planner->setProblemDefinition(pdef_vec.back());
-    benchmark.addPlanner(planner);
-
     typedef og::MultiQuotient<og::PRMQuotientNarrow, og::RRTQuotient> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMP_RRT");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+    benchmark.addPlanner(planner);
+
+    //planner = std::make_shared<og::PRM>(si_vec.back());
+    //planner->setProblemDefinition(pdef_vec.back());
+    //benchmark.addPlanner(planner);
+
+    planner = std::make_shared<og::RRTConnect>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
     benchmark.addPlanner(planner);
 
     //typedef og::MultiQuotient<og::PRMQuotientNarrowEdgeDegree> MultiQuotientEdgeDegree;
@@ -218,7 +222,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 5;
+    req.maxTime = 120;
     req.maxMem = 10000.0;
     req.runCount = 5;
     req.displayProgress = true;

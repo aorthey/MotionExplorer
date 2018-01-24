@@ -110,15 +110,30 @@ void RRTQuotient::freeMemory()
 
 void RRTQuotient::clear()
 {
-    Planner::clear();
-    sampler_.reset();
-    freeMemory();
-    if (tStart_)
-        tStart_->clear();
-    if (tGoal_)
-        tGoal_->clear();
-    connectionPoint_ = std::make_pair<base::State *, base::State *>(nullptr, nullptr);
+  Planner::clear();
+  sampler_.reset();
+  freeMemory();
+  if (tStart_)
+      tStart_->clear();
+  if (tGoal_)
+      tGoal_->clear();
+  connectionPoint_ = std::make_pair<base::State *, base::State *>(nullptr, nullptr);
+  pis_.restart();
+  startConfiguration = nullptr;
+  goalConfiguration = nullptr;
+  isTreeConnected = false;
+  isSolved = false;
 }
+
+// void RRTQuotient::clear()
+// {
+//   Planner::clear();
+//   //sampler_.reset();
+//   //simpleSampler_.reset();
+//   foreach (Vertex v, boost::vertices(g_)){
+//     si_->freeState(stateProperty_[v]);
+//   }
+//   g_.clear();
 
 RRTQuotient::GrowState RRTQuotient::growTree(TreeData &tree, TreeGrowingInfo &tgi,
                                                                              Configuration *rconfiguration)
@@ -163,17 +178,17 @@ RRTQuotient::GrowState RRTQuotient::growTree(TreeData &tree, TreeGrowingInfo &tg
 }
 void RRTQuotient::Init(){
 
-  std::cout << "Planner " + getName() + " specs:" << std::endl;
-  std::cout << "Multithreaded:                 " << (getSpecs().multithreaded ? "Yes" : "No") << std::endl;
-  std::cout << "Reports approximate solutions: " << (getSpecs().approximateSolutions ? "Yes" : "No") << std::endl;
-  std::cout << "Can optimize solutions:        " << (getSpecs().optimizingPaths ? "Yes" : "No") << std::endl;
-  std::cout << "Range:                         " << getRange() << std::endl;
-  std::cout << "Aware of the following parameters:";
-  std::vector<std::string> params;
-  params_.getParamNames(params);
-  for (auto &param : params)
-      std::cout << " " << param;
-  std::cout << std::endl;
+  //std::cout << "Planner " + getName() + " specs:" << std::endl;
+  //std::cout << "Multithreaded:                 " << (getSpecs().multithreaded ? "Yes" : "No") << std::endl;
+  //std::cout << "Reports approximate solutions: " << (getSpecs().approximateSolutions ? "Yes" : "No") << std::endl;
+  //std::cout << "Can optimize solutions:        " << (getSpecs().optimizingPaths ? "Yes" : "No") << std::endl;
+  //std::cout << "Range:                         " << getRange() << std::endl;
+  //std::cout << "Aware of the following parameters:";
+  //std::vector<std::string> params;
+  //params_.getParamNames(params);
+  //for (auto &param : params)
+  //    std::cout << " " << param;
+  //std::cout << std::endl;
 
   checkValidity();
   goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
@@ -245,6 +260,7 @@ ob::PathPtr RRTQuotient::ConstructSolution(Configuration *q_start, Configuration
   pdef_->addSolutionPath(path, false, 0.0, getName());
   return path;
 }
+
 
 void RRTQuotient::Grow(double t)
 {

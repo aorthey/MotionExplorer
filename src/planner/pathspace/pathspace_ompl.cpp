@@ -20,7 +20,12 @@ std::vector<PathSpace*> PathSpaceOMPL::Decompose(){
 
   CSpaceFactory factory(input->GetCSpaceInput());
   int robot_idx = input->robot_idx;
-  CSpaceOMPL *cspace = factory.MakeGeometricCSpace(world, robot_idx);
+  CSpaceOMPL *cspace;
+  if(input->freeFloating){
+    cspace = factory.MakeGeometricCSpace(world, robot_idx);
+  }else{
+    cspace = factory.MakeGeometricCSpaceFixedBase(world, robot_idx);
+  }
 
   StrategyGeometric strategy;
   StrategyOutput output(cspace);

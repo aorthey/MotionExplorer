@@ -107,7 +107,6 @@ namespace ompl
         ob::GoalSampleableRegion *goal;
 
         ob::PathPtr ConstructSolution(Configuration *q_start, Configuration *q_goal);
-        //PRMQuotient *previous{nullptr};
         bool startTree;
         bool isTreeConnected{false};
         bool isSolved{false};

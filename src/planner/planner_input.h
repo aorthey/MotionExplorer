@@ -53,6 +53,8 @@ class PlannerInput{
     double timestep_min;
     double timestep_max;
 
+    bool smoothPath;
+
     //input for hierarchical planner methods
     std::vector<int> robot_idxs;
     std::vector<Layer> layers;

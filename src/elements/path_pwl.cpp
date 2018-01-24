@@ -142,7 +142,7 @@ Config PathPiecewiseLinear::Eval(const double t) const{
   throw;
 }
 
-Vector3 getXYZ(ob::State *s, ob::StateSpacePtr space_input){
+Vector3 PathPiecewiseLinear::getXYZ(ob::State *s, ob::StateSpacePtr space_input){
   double x = 0;
   double y = 0;
   double z = 0;
@@ -160,15 +160,40 @@ Vector3 getXYZ(ob::State *s, ob::StateSpacePtr space_input){
   }
 
   if(space->getType() == ob::STATE_SPACE_SE3){
-    const ob::SE3StateSpace::StateType *qomplSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+    const ob::SE3StateSpace::StateType *qomplSE3;
+    if(space_input->isCompound()){
+      qomplSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+    }else{
+      qomplSE3 = s->as<ob::SE3StateSpace::StateType>();
+    }
     x = qomplSE3->getX();
     y = qomplSE3->getY();
     z = qomplSE3->getZ();
   }else if(space->getType() == ob::STATE_SPACE_REAL_VECTOR){
-    const ob::RealVectorStateSpace::StateType *qomplRn = s->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-    x = qomplRn->values[0];
-    y = qomplRn->values[1];
-    z = qomplRn->values[2];
+    //fixed base robot: visualize last link
+
+    Config q = cspace->OMPLStateToConfig(s);
+    Robot *robot = cspace->GetRobotPtr();
+    robot->UpdateConfig(q);
+    robot->UpdateGeometry();
+    Vector3 qq;
+    Vector3 zero; zero.setZero();
+    int lastLink = robot->links.size()-1;
+    robot->GetWorldPosition(zero, lastLink, qq);
+
+    x = qq[0];
+    y = qq[1];
+    z = qq[2];
+
+    //const ob::RealVectorStateSpace::StateType *qomplRn;
+    //if(space_input->isCompound()){
+    //  qomplRn = s->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+    //}else{
+    //  qomplRn = s->as<ob::RealVectorStateSpace::StateType>();
+    //}
+    //x = qomplRn->values[0];
+    //y = qomplRn->values[1];
+    //z = qomplRn->values[2];
   }else{
     std::cout << "cannot deal with space type" << space->getType() << std::endl;
     std::cout << "please check ompl/base/StateSpaceTypes.h" << std::endl;

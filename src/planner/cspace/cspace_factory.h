@@ -5,6 +5,7 @@
 #include "planner/cspace/cspace_geometric_RN.h"
 #include "planner/cspace/cspace_geometric_SE2.h"
 #include "planner/cspace/cspace_geometric_R3S2.h"
+#include "planner/cspace/cspace_geometric_fixedbase.h"
 #include "planner/cspace/cspace_input.h"
 #include "planner/cspace/cspace_decorator.h"
 
@@ -23,6 +24,25 @@ class CSpaceFactory{
     }
     virtual GeometricCSpaceOMPL* MakeGeometricCSpace( RobotWorld *world, int robot_idx){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPL(world, robot_idx);
+      cspace->SetCSpaceInput(input);
+      cspace->initSpace();
+      cspace->initControlSpace();
+      return cspace;
+    }
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpace( RobotWorld *world, int robot_idx, const char* type){
+      GeometricCSpaceOMPL *cspace;
+      if(type=="R3"){
+      }else if(type="R3S2"){
+        cspace = new GeometricCSpaceOMPLR3S2(world, robot_idx);
+      }else if(type="SE2"){
+        cspace = new GeometricCSpaceOMPLSE2(world, robot_idx);
+      }else if(type="SE3"){
+        cspace = new GeometricCSpaceOMPL(world, robot_idx);
+      }else if(type="FixedBase"){
+        cspace = new GeometricCSpaceOMPLFixedBase(world, robot_idx);
+      }else{
+        cspace = new GeometricCSpaceOMPL(world, robot_idx);
+      }
       cspace->SetCSpaceInput(input);
       cspace->initSpace();
       cspace->initControlSpace();
@@ -51,6 +71,14 @@ class CSpaceFactory{
     // CSpace  R^(N)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceRN( RobotWorld *world, int robot_idx, int dimension){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLRN(world, robot_idx, dimension);
+      cspace->SetCSpaceInput(input);
+      cspace->initSpace();
+      cspace->initControlSpace();
+      return cspace;
+    }
+    // CSpace  R^(N)
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceFixedBase( RobotWorld *world, int robot_idx){
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLFixedBase(world, robot_idx);
       cspace->SetCSpaceInput(input);
       cspace->initSpace();
       cspace->initControlSpace();
