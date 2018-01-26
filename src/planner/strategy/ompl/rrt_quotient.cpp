@@ -1,12 +1,10 @@
 #include "rrt_quotient.h"
-namespace ob = ompl::base;
-namespace og = ompl::geometric;
-
 #include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/tools/config/SelfConfig.h>
 
 using namespace ompl::geometric;
 using namespace ompl::base;
+using namespace og;
 
 RRTQuotient::RRTQuotient(const base::SpaceInformationPtr &si, Quotient *previous_) : 
   Quotient(si, previous_)
@@ -26,22 +24,22 @@ RRTQuotient::~RRTQuotient()
 
 void RRTQuotient::setup()
 {
-    Planner::setup();
-    tools::SelfConfig sc(si_, getName());
-    sc.configurePlannerRange(maxDistance_);
+  Planner::setup();
+  tools::SelfConfig sc(si_, getName());
+  sc.configurePlannerRange(maxDistance_);
 
-    if (!tStart_)
-        tStart_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
-    if (!tGoal_)
-        tGoal_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
-    tStart_->setDistanceFunction([this](const Configuration *a, const Configuration *b)
-                                 {
-                                     return distanceFunction(a, b);
-                                 });
-    tGoal_->setDistanceFunction([this](const Configuration *a, const Configuration *b)
-                                {
-                                    return distanceFunction(a, b);
-                                });
+  if (!tStart_)
+      tStart_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
+  if (!tGoal_)
+      tGoal_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
+  tStart_->setDistanceFunction([this](const Configuration *a, const Configuration *b)
+                               {
+                                   return distanceFunction(a, b);
+                               });
+  tGoal_->setDistanceFunction([this](const Configuration *a, const Configuration *b)
+                              {
+                                  return distanceFunction(a, b);
+                              });
 }
 void RRTQuotient::getPlannerData(base::PlannerData &data) const
 {
@@ -113,10 +111,12 @@ void RRTQuotient::clear()
   Planner::clear();
   sampler_.reset();
   freeMemory();
-  if (tStart_)
-      tStart_->clear();
-  if (tGoal_)
-      tGoal_->clear();
+  if(tStart_){
+    tStart_->clear();
+  }
+  if(tGoal_){
+    tGoal_->clear();
+  }
   connectionPoint_ = std::make_pair<base::State *, base::State *>(nullptr, nullptr);
   pis_.restart();
   startConfiguration = nullptr;
@@ -124,16 +124,6 @@ void RRTQuotient::clear()
   isTreeConnected = false;
   isSolved = false;
 }
-
-// void RRTQuotient::clear()
-// {
-//   Planner::clear();
-//   //sampler_.reset();
-//   //simpleSampler_.reset();
-//   foreach (Vertex v, boost::vertices(g_)){
-//     si_->freeState(stateProperty_[v]);
-//   }
-//   g_.clear();
 
 RRTQuotient::GrowState RRTQuotient::growTree(TreeData &tree, TreeGrowingInfo &tgi,
                                                                              Configuration *rconfiguration)
@@ -163,18 +153,17 @@ RRTQuotient::GrowState RRTQuotient::growTree(TreeData &tree, TreeGrowingInfo &tg
 
     if (validConfiguration)
     {
-        /* create a configuration */
-        auto *configuration = new Configuration(si_);
-        si_->copyState(configuration->state, dstate);
-        configuration->parent = nconfiguration;
-        configuration->root = nconfiguration->root;
-        tgi.xconfiguration = configuration;
+      auto *configuration = new Configuration(si_);
+      si_->copyState(configuration->state, dstate);
+      configuration->parent = nconfiguration;
+      configuration->root = nconfiguration->root;
+      tgi.xconfiguration = configuration;
 
-        tree->add(configuration);
-        return reach ? REACHED : ADVANCED;
+      tree->add(configuration);
+      return reach ? REACHED : ADVANCED;
     }
     else
-        return TRAPPED;
+      return TRAPPED;
 }
 void RRTQuotient::Init(){
 
@@ -261,6 +250,12 @@ ob::PathPtr RRTQuotient::ConstructSolution(Configuration *q_start, Configuration
   return path;
 }
 
+bool RRTQuotient::SampleGraph(ob::State *workState)
+{
+  std::cout << "NYI" << std::endl;
+  exit(0);
+}
+
 
 void RRTQuotient::Grow(double t)
 {
@@ -270,6 +265,7 @@ void RRTQuotient::Grow(double t)
   TreeData &otherTree = startTree ? tStart_ : tGoal_;
 
   Configuration *q_random = new Configuration(si_);
+  q_random->state = M1->allocState();
   Sample(q_random->state);
 
   GrowState gs = growTree(tree, tgi, q_random);

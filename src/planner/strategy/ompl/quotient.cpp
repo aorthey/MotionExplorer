@@ -37,10 +37,17 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_):
       std::cout << "quotient of state spaces got dimensions wrong." << std::endl;
       exit(0);
     }
-    std::cout << "M0 dimension : " << M0_space->getDimension() << std::endl;
-    std::cout << "C1 dimension : " << C1_space->getDimension() << std::endl;
-    std::cout << "M1 dimension : " << M1_space->getDimension() << std::endl;
+    std::cout << "M0 dimension : " << M0_space->getDimension() << " measure: " << M0_space->getMeasure() << std::endl;
+    std::cout << "C1 dimension : " << C1_space->getDimension() << " measure: " << C1_space->getMeasure() << std::endl;
+    std::cout << "M1 dimension : " << M1_space->getDimension() << " measure: " << M1_space->getMeasure() << std::endl;
   }
+  if (!sampler_){
+    sampler_ = si_->allocValidStateSampler();
+  }
+  //if (!simpleSampler_){
+  //  simpleSampler_ = si_->allocStateSampler();
+  //}
+
 }
 
 
@@ -168,41 +175,46 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const
     M0_dimension = M0->getDimension();
 
     switch (type) {
-      case RN_RM:{
-                   C1 = std::make_shared<ob::RealVectorStateSpace>(M1_dimension-M0_dimension);
-                   break;
-                 }
-      case SE2_R2:{
-                   C1 = std::make_shared<ob::SO2StateSpace>();
-                   break;
-                 }
-      case SE3_R3:{
-                   C1 = std::make_shared<ob::SO3StateSpace>();
-                   break;
-                 }
-      case SE3RN_SE3:{
-                   ob::CompoundStateSpace *M1_compound = M1->as<ob::CompoundStateSpace>();
-                   const std::vector<StateSpacePtr> M1_decomposed = M1_compound->getSubspaces();
+      case RN_RM:
+        {
+          C1 = std::make_shared<ob::RealVectorStateSpace>(M1_dimension-M0_dimension);
+          break;
+        }
+      case SE2_R2:
+        {
+          C1 = std::make_shared<ob::SO2StateSpace>();
+          break;
+        }
+      case SE3_R3:
+        {
+          C1 = std::make_shared<ob::SO3StateSpace>();
+          break;
+        }
+      case SE3RN_SE3:
+        {
+          ob::CompoundStateSpace *M1_compound = M1->as<ob::CompoundStateSpace>();
+          const std::vector<StateSpacePtr> M1_decomposed = M1_compound->getSubspaces();
 
-                   C1_dimension = M1_decomposed.at(1)->getDimension();
-                   C1 = std::make_shared<ob::RealVectorStateSpace>(C1_dimension);
-                   break;
-                 }
-      case SE3RN_SE3RM:{
-                   ob::CompoundStateSpace *M1_compound = M1->as<ob::CompoundStateSpace>();
-                   const std::vector<StateSpacePtr> M1_decomposed = M1_compound->getSubspaces();
-                   ob::CompoundStateSpace *M0_compound = M0->as<ob::CompoundStateSpace>();
-                   const std::vector<StateSpacePtr> M0_decomposed = M0_compound->getSubspaces();
+          C1_dimension = M1_decomposed.at(1)->getDimension();
+          C1 = std::make_shared<ob::RealVectorStateSpace>(C1_dimension);
+          break;
+        }
+      case SE3RN_SE3RM:
+        {
+          ob::CompoundStateSpace *M1_compound = M1->as<ob::CompoundStateSpace>();
+          const std::vector<StateSpacePtr> M1_decomposed = M1_compound->getSubspaces();
+          ob::CompoundStateSpace *M0_compound = M0->as<ob::CompoundStateSpace>();
+          const std::vector<StateSpacePtr> M0_decomposed = M0_compound->getSubspaces();
 
-                   C1_dimension = M1_decomposed.at(1)->getDimension()-M0_decomposed.at(1)->getDimension();
-                   C1 = std::make_shared<ob::RealVectorStateSpace>(C1_dimension);
-                   break;
-                 }
+          C1_dimension = M1_decomposed.at(1)->getDimension()-M0_decomposed.at(1)->getDimension();
+          C1 = std::make_shared<ob::RealVectorStateSpace>(C1_dimension);
+          break;
+        }
       default:
-                 {
-                   std::cout << "unknown type: " << type << std::endl;
-                   exit(0);
-                 }
+        {
+          std::cout << "unknown type: " << type << std::endl;
+          exit(0);
+        }
 
     }
     return C1;
@@ -264,7 +276,7 @@ void Quotient::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State
       {
         ob::SE3StateSpace::StateType *sM1_SE3 = qM1->as<ob::CompoundState>()->as<SE3StateSpace::StateType>(0);
         ob::SO3StateSpace::StateType *sM1_SE3_rotation = &sM1_SE3->rotation();
-        ob::RealVectorStateSpace::StateType *sM1_RN = qM1->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(0);
+        ob::RealVectorStateSpace::StateType *sM1_RN = qM1->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
 
         const ob::SE3StateSpace::StateType *sM0 = qM0->as<SE3StateSpace::StateType>();
         const ob::SO3StateSpace::StateType *sM0_rotation = &sM0->rotation();
@@ -285,11 +297,11 @@ void Quotient::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State
     case SE3RN_SE3RM:{
         ob::SE3StateSpace::StateType *sM1_SE3 = qM1->as<ob::CompoundState>()->as<SE3StateSpace::StateType>(0);
         ob::SO3StateSpace::StateType *sM1_SE3_rotation = &sM1_SE3->rotation();
-        ob::RealVectorStateSpace::StateType *sM1_RN = qM1->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(0);
+        ob::RealVectorStateSpace::StateType *sM1_RN = qM1->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
 
         const ob::SE3StateSpace::StateType *sM0_SE3 = qM0->as<ob::CompoundState>()->as<SE3StateSpace::StateType>(0);
         const ob::SO3StateSpace::StateType *sM0_SE3_rotation = &sM0_SE3->rotation();
-        const ob::RealVectorStateSpace::StateType *sM0_RM = qM0->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(0);
+        const ob::RealVectorStateSpace::StateType *sM0_RM = qM0->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
 
         const ob::RealVectorStateSpace::StateType *sC1 = qC1->as<RealVectorStateSpace::StateType>();
 
@@ -405,12 +417,14 @@ void Quotient::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const
 //    subspaces[0]->copyState( qM0, q_comps[0]);
 //  }
 //}
+
 bool Quotient::SampleGraph(ob::State *q_random)
 {
   std::cout << "NYI" << std::endl;
   exit(0);
-  return false;
 }
+
+
 double Quotient::GetSamplingDensity(){
   return (double)GetNumberOfVertices()/(double)si_->getSpaceMeasure();
 }

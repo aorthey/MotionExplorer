@@ -74,6 +74,7 @@ namespace ompl
 
         ob::SpaceInformationPtr M1; //full configuration space Mi = si_
         ob::SpaceInformationPtr C1; //configuration space Ci = Mi/Mi-1
+
         ob::StateSamplerPtr C1_sampler;
         ob::ValidStateSamplerPtr sampler_;
         ob::StateSamplerPtr simpleSampler_;

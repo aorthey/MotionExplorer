@@ -39,6 +39,8 @@ namespace ompl
         }
         void Init();
 
+        virtual bool SampleGraph(ob::State *q_random) override;
+
         template <template <typename T> class NN>
         void setNearestNeighbors()
         {
@@ -65,7 +67,9 @@ namespace ompl
         public:
           Configuration() = default;
           Configuration(const base::SpaceInformationPtr &si) : state(si->allocState())
-          {}
+          {
+
+          }
           ~Configuration() = default;
           const base::State *root{nullptr};
           base::State *state{nullptr};

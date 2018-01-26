@@ -37,7 +37,7 @@ PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si, Quotient *previous_)
   setName("PRMBasic");
   specs_.recognizedGoal = ob::GOAL_SAMPLEABLE_REGION;
   specs_.approximateSolutions = false;
-  specs_.optimizingPaths = true;
+  specs_.optimizingPaths = false;
 
   if (!isSetup())
     setup();
@@ -442,8 +442,9 @@ void PRMBasic::setNearestNeighbors()
     clear();
     nn_ = std::make_shared<NN<Vertex>>();
     connectionStrategy_ = ConnectionStrategy();
-    if (isSetup())
-        setup();
+    if(!isSetup()){
+      setup();
+    }
 }
 
 bool PRMBasic::Sample(ob::State *q_random){

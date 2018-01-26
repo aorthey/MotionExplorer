@@ -18,8 +18,8 @@ LemonInterface::LemonInterface( ob::PlannerDataPtr pd_ ):
   const ob::SpaceInformationPtr si = pd->getSpaceInformation();
   N = pd->numVertices();
 
-  bool hasStart = false;
-  bool hasGoal = false;
+  hasStart = false;
+  hasGoal = false;
   for(uint k = 0; k < N; k++){
     ListGraph::Node x = lg.addNode();
     gn.push_back(x);
@@ -37,14 +37,12 @@ LemonInterface::LemonInterface( ob::PlannerDataPtr pd_ ):
       exit(0);
     }
   }
-  if(!hasStart){
-    std::cout << "[LemonInterface] Couldn't find start node in graph!" << std::endl;
-    exit(0);
-  }
-  if(!hasGoal){
-    std::cout << "[LemonInterface] Couldn't find goal node in graph!" << std::endl;
-    exit(0);
-  }
+  //if(!hasStart){
+  //  std::cout << "[LemonInterface] Couldn't find start node in graph!" << std::endl;
+  //}
+  //if(!hasGoal){
+  //  std::cout << "[LemonInterface] Couldn't find goal node in graph!" << std::endl;
+  //}
 
 //#############################################################################
 // Extract edges and weight
@@ -70,6 +68,10 @@ LemonInterface::LemonInterface( ob::PlannerDataPtr pd_ ):
 
 }
 std::vector<Vertex> LemonInterface::GetShortestPath(){
+  if(N<=0 || !hasStart || !hasGoal){
+    std::vector<Vertex> emptyset;
+    return emptyset;
+  }
   return GetShortestPath(start, goal);
 }
 std::vector<Vertex> LemonInterface::GetShortestPath( ListGraph::Node s, ListGraph::Node t){

@@ -52,7 +52,7 @@ void MultiQuotient<T,Tlast>::clear(){
 template <class T, class Tlast>
 ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCondition &ptc){
   
-  static const double T_GROW = 0.01; //time to grow before Checking if solution exists
+  static const double T_GROW = 0.001; //time to grow before Checking if solution exists
 
   auto cmp = [](og::Quotient* left, og::Quotient* right) 
               { 

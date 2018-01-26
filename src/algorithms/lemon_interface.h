@@ -25,6 +25,7 @@ class LemonInterface{
     lemon::ListGraph lg;
     std::vector<lemon::ListGraph::Node> gn;
     lemon::ListGraph::Node start, goal;
+    bool hasStart, hasGoal;
 
     CostMap* length;
 

@@ -150,12 +150,9 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   if(algorithm=="ompl:rrt_plain"){
     planner = std::make_shared<og::RRTPlain>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
-  }else if(algorithm=="ompl:rrt_quotient"){
-    planner = std::make_shared<og::RRTQuotient>(si_vec.back());
-    planner->setProblemDefinition(pdef_vec.back());
-  }else if(algorithm=="ompl:rrt_quotient2"){
-    typedef og::MultiQuotient<og::PRMQuotientNarrow, og::RRTQuotient> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "PRMXRRT");
+  }else if(algorithm=="ompl:qmp"){
+    typedef og::MultiQuotient<og::PRMQuotientNarrowEdgeDegree, og::RRTQuotient> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec);
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="ompl:prm_plain"){
     planner = std::make_shared<og::PRMBasic>(si_vec.back());
@@ -163,10 +160,6 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   }else if(algorithm=="ompl:prm_quotient"){
     planner = std::make_shared<og::PRMQuotient>(si_vec.back(),nullptr);
     planner->setProblemDefinition(pdef_vec.back());
-  }else if(algorithm=="ompl:qmp"){
-    typedef og::MultiQuotient<og::PRMQuotient> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec);
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="ompl:qmpconnect"){
     typedef og::MultiQuotient<og::PRMQuotientConnect> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "Connect");
