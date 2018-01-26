@@ -400,5 +400,5 @@ i.e. some tracking ability
 [ ] visualize all paths from multiquotient
 
 [ ] Robot Manipulator
-[ ] rewrite quotient_planner.h to handle specific cases (RN <-> RM, SE3 <->
+[x] rewrite quotient_planner.h to handle specific cases (RN <-> RM, SE3 <->
 SE3RN, R3 <-> SE3, etcetera, instead of trying everything)

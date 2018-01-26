@@ -18,6 +18,22 @@ namespace ob = ompl::base;
 // M1 = M1
 // M0 = previous->getspaceinformation()
 // C1 = C1
+//
+//
+//
+//Cases we can handle:
+// ---- non-compound:
+// (1) M1 Rn       , M0 Rm       , 0<m<n   => C1 = R(n-m)
+// ---- compound:
+// (2) M1 SE2      , M0 R2                 => C1 = SO2
+// (3) M1 SE3      , M0 R3                 => C1 = SO3
+// (4) M1 SE3xRn   , M0 SE3                => C1 = Rn
+// (5) M1 SE3xRn   , M0 SE3xRm   , 0<m<n   => C1 = R(n-m)
+//
+//
+//TO be done:
+///// M1 SE3      , M0 R3xSO2xSO2         =>C1 = SO2
+///// M1 R3xS1xS1 , M0 R3                 =>C1 = SO2xSO2
 namespace ompl
 {
   namespace geometric

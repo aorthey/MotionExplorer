@@ -4,6 +4,7 @@
 #include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/SO3StateSpace.h>
+#include <ompl/base/spaces/SE2StateSpace.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
 
 using namespace ompl::geometric;
@@ -216,61 +217,6 @@ void Quotient::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State
   const StateSpacePtr C1_space = C1->getStateSpace();
   const StateSpacePtr M0_space = previous->getSpaceInformation()->getStateSpace();
 
-  //ob::State **qM1_comps = qM1->as<CompoundState>()->components;
-  //ob::CompoundStateSpace *M1_compound = M1_space->as<ob::CompoundStateSpace>();
-  //const std::vector<StateSpacePtr> M1_subspaces = M1_compound->getSubspaces();
-  //StateSpacePtr M1_back = M1_subspaces.back();
-
-  ////si_->printState(qM0);
-  ////C1->printState(qC1);
-
-  //if((M1_back->getType() == base::STATE_SPACE_SO3) && (C1->getStateSpace()->getDimension() == 1)){
-  //  //special case
-
-  //  ob::State **sM0_comps = qM0->as<CompoundState>()->components;
-  //  M1_subspaces[0]->copyState( qM1_comps[0], sM0_comps[0]);
-
-  //  double r = sM0_comps[1]->as<ob::SO2StateSpace::StateType>()->value;
-  //  double p = sM0_comps[2]->as<ob::SO2StateSpace::StateType>()->value;
-  //  double y = qC1->as<ob::SO2StateSpace::StateType>()->value;
-
-  //  ob::SE3StateSpace::StateType *qM1SE3 = qM1->as<ob::SE3StateSpace::StateType>();
-  //  ob::SO3StateSpace::StateType *qM1SO3 = &qM1SE3->rotation();
-
-  //  CSpaceOMPL::OMPLSO3StateSpaceFromEulerXYZ(r, p, y, qM1_comps[1]->as<ob::SO3StateSpace::StateType>() );
-
-  //}else{
-  //  if(M1_subspaces.at(0)->isCompound()){
-  //    ob::CompoundStateSpace *M1_comp_comp = M1_subspaces.at(0)->as<ob::CompoundStateSpace>();
-  //    const std::vector<StateSpacePtr> M1_1_subspaces = M1_comp_comp->getSubspaces();
-  //    //std::cout << "subspaces: " << M1_1_subspaces.size() << std::endl;
-  //    ob::State **qM1_comps_comps = qM1_comps[0]->as<CompoundState>()->components;
-  ////ob::State **qM1_comps = qM1->as<CompoundState>()->components;
-  //    ob::State **sM0_comps = qM0->as<CompoundState>()->components;
-  //    for(uint k = 0; k < M0_subspaces; k++){
-  //      M1_1_subspaces[k]->copyState( qM1_comps_comps[k], sM0_comps[k]);
-  //    }
-
-  //    M1_subspaces[1]->copyState( qM1_comps[1], qC1);
-  //  }else{
-  //    if(M0_subspaces > 1){
-  //      ob::State **sM0_comps = qM0->as<CompoundState>()->components;
-  //      for(uint k = 0; k < M0_subspaces; k++){
-  //        M1_subspaces[k]->copyState( qM1_comps[k], sM0_comps[k]);
-  //      }
-  //    }else{
-  //      M1_subspaces[0]->copyState( qM1_comps[0], qM0);
-  //    }
-  //    if(C1_subspaces > 1){
-  //      ob::State **sC1_comps = qC1->as<CompoundState>()->components;
-  //      for(uint k = M0_subspaces; k < M1_subspaces.size(); k++){
-  //        M1_subspaces[k]->copyState( qM1_comps[k], sC1_comps[k-M0_subspaces]);
-  //      }
-  //    }else{
-  //      M1_subspaces[M0_subspaces]->copyState( qM1_comps[M0_subspaces], qC1);
-  //    }
-  //  }
-  //}
   switch (type) {
     case RN_RM:
       {
@@ -284,37 +230,93 @@ void Quotient::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State
         for(uint k = M0_dimension; k < M1_dimension; k++){
           sM1->values[k] = sC1->values[k-M0_dimension];
         }
-
-        //M0_space->printState(qM0);
-        //C1_space->printState(qC1);
-        //M1->printState(qM1);
         break;
       }
-    case SE2_R2:{
-                  std::cout << "NYI" << std::endl;
-                  exit(0);
-                 break;
-               }
-    case SE3_R3:{
-                  std::cout << "NYI" << std::endl;
-                  exit(0);
-                 break;
-               }
-    case SE3RN_SE3:{
-                  std::cout << "NYI" << std::endl;
-                  exit(0);
-                 break;
-               }
+    case SE2_R2:
+      {
+        ob::SE2StateSpace::StateType *sM1 = qM1->as<SE2StateSpace::StateType>();
+        const ob::RealVectorStateSpace::StateType *sM0 = qM0->as<RealVectorStateSpace::StateType>();
+        const ob::SO2StateSpace::StateType *sC1 = qC1->as<SO2StateSpace::StateType>();
+
+        sM1->setXY( sM0->values[0], sM0->values[1] );
+        sM1->setYaw( sC1->value );
+
+        break;
+      }
+    case SE3_R3:
+      {
+        ob::SE3StateSpace::StateType *sM1 = qM1->as<SE3StateSpace::StateType>();
+        ob::SO3StateSpace::StateType *sM1_rotation = &sM1->rotation();
+
+        const ob::RealVectorStateSpace::StateType *sM0 = qM0->as<RealVectorStateSpace::StateType>();
+        const ob::SO3StateSpace::StateType *sC1 = qC1->as<SO3StateSpace::StateType>();
+
+        sM1->setXYZ( sM0->values[0], sM0->values[1], sM0->values[2]);
+
+        sM1_rotation->x = sC1->x;
+        sM1_rotation->y = sC1->y;
+        sM1_rotation->z = sC1->z;
+        sM1_rotation->w = sC1->w;
+
+        break;
+      }
+    case SE3RN_SE3:
+      {
+        ob::SE3StateSpace::StateType *sM1_SE3 = qM1->as<ob::CompoundState>()->as<SE3StateSpace::StateType>(0);
+        ob::SO3StateSpace::StateType *sM1_SE3_rotation = &sM1_SE3->rotation();
+        ob::RealVectorStateSpace::StateType *sM1_RN = qM1->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(0);
+
+        const ob::SE3StateSpace::StateType *sM0 = qM0->as<SE3StateSpace::StateType>();
+        const ob::SO3StateSpace::StateType *sM0_rotation = &sM0->rotation();
+        const ob::RealVectorStateSpace::StateType *sC1 = qC1->as<RealVectorStateSpace::StateType>();
+
+        sM1_SE3->setXYZ( sM0->getX(), sM0->getY(), sM0->getZ());
+        sM1_SE3_rotation->x = sM0_rotation->x;
+        sM1_SE3_rotation->y = sM0_rotation->y;
+        sM1_SE3_rotation->z = sM0_rotation->z;
+        sM1_SE3_rotation->w = sM0_rotation->w;
+
+        for(uint k = 0; k < C1_dimension; k++){
+          sM1_RN->values[k] = sC1->values[k];
+        }
+
+        break;
+      }
     case SE3RN_SE3RM:{
-                  std::cout << "NYI" << std::endl;
-                  exit(0);
-                 break;
-               }
+        ob::SE3StateSpace::StateType *sM1_SE3 = qM1->as<ob::CompoundState>()->as<SE3StateSpace::StateType>(0);
+        ob::SO3StateSpace::StateType *sM1_SE3_rotation = &sM1_SE3->rotation();
+        ob::RealVectorStateSpace::StateType *sM1_RN = qM1->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(0);
+
+        const ob::SE3StateSpace::StateType *sM0_SE3 = qM0->as<ob::CompoundState>()->as<SE3StateSpace::StateType>(0);
+        const ob::SO3StateSpace::StateType *sM0_SE3_rotation = &sM0_SE3->rotation();
+        const ob::RealVectorStateSpace::StateType *sM0_RM = qM0->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(0);
+
+        const ob::RealVectorStateSpace::StateType *sC1 = qC1->as<RealVectorStateSpace::StateType>();
+
+        sM1_SE3->setXYZ( sM0_SE3->getX(), sM0_SE3->getY(), sM0_SE3->getZ());
+        sM1_SE3_rotation->x = sM0_SE3_rotation->x;
+        sM1_SE3_rotation->y = sM0_SE3_rotation->y;
+        sM1_SE3_rotation->z = sM0_SE3_rotation->z;
+        sM1_SE3_rotation->w = sM0_SE3_rotation->w;
+
+        //[X Y Z YAW PITCH ROLL] [1...M-1][M...N-1]
+        //SE3                    RN
+        uint M = M1_dimension-6-C1_dimension;
+        uint N = C1_dimension;
+
+        for(uint k = 0; k < M; k++){
+          sM1_RN->values[k] = sM0_RM->values[k];
+        }
+        for(uint k = M; k < M+N; k++){
+          sM1_RN->values[k] = sC1->values[k-M];
+        }
+        break;
+      }
     default:
-               {
-                 std::cout << "cannot merge states" << std::endl;
-                 exit(0);
-               }
+      {
+        std::cout << "cannot merge states" << std::endl;
+        exit(0);
+      }
 
   }
 }
