@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<world>
+
+  <robot name="baxter" file="robots/baxter_description/baxter.urdf"/>
+
+  <forcefield>
+    <uniform force="0 0 -3.71" color="1 0 0"/>
+  </forcefield>
+
+
+  <plannerinput>
+    <!--
+    <qinit config="54 0 0 0 0 0 0 0 0 0 1.17961e-16 0 0 0 0 0 -0.47832 0.4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.29832 1.047 0 0.36 -0.2 0 -6.03684e-16 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+    -->
+    <qinit config="54 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+    <qgoal config="54 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+
+    <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
+    <robot>0</robot>
+    <smoothPath>0</smoothPath>
+
+    <!-- default settings for all algorithms (overwriteable) -->
+    <timestep min="0.01" max="0.1"/>
+    <epsilongoalregion>0.05</epsilongoalregion>
+    <maxplanningtime>10</maxplanningtime>
+
+    <sampler name="obstacle_based"/>
+    <algorithm name="hierarchical:ompl:qmp">
+      <hierarchy>
+        <level inner_index="0" outer_index="0" type="R48"/>
+      </hierarchy>
+    </algorithm>
+
+    <algorithm name="ompl:rrtconnect"/>
+  </plannerinput>
+</world>
