@@ -5,52 +5,6 @@
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
-//
-//  Visualization of CSpace Decomposition
-//
-// [    ][    ]
-// [    ][    ]
-// [    ][ M0 ]
-// [ M1 ][____]
-// [    ][    ]
-// [    ][ C1 ]
-// [    ][    ]
-//
-// whereby 
-// M1 = M1
-// M0 = previous->getspaceinformation()
-// C1 = C1
-//
-// Standard PRM is sampling in M1
-// PRMQuotient is sampling in G0 x C1, whereby G0 is the roadmap on M0
-//
-//
-// Multilevel $M0 \subspace M1 \subspace M2$
-//
-// [    ][    ][    ]
-// [    ][    ][ M0 ]
-// [    ][    ][    ]
-// [    ][ M1 ][____]
-// [    ][    ]
-// [ M2 ][    ]
-// [    ][    ]
-// [    ][____]
-// [    ]
-// [    ]
-// [____]
-//
-// [    ][    ][    ]
-// [    ][    ][ C0 ]
-// [    ][    ][    ]
-// [    ][ M1 ][____]
-// [    ][    ][    ]
-// [ M2 ][    ][ C1 ]
-// [    ][    ][    ]
-// [    ][____][____]
-// [    ][    ][    ]
-// [    ][ C2 ][ C2 ]
-// [____][____][____]
-
 
 namespace ompl
 {

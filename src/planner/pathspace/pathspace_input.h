@@ -38,6 +38,8 @@ class PathSpaceInput{
     double timestep_min;
     double timestep_max;
 
+    bool fixedBase{false};
+
     const CSpaceInput& GetCSpaceInput();
     const StrategyInput& GetStrategyInput();
     PathSpaceInput* GetNextLayer() const;

@@ -233,7 +233,7 @@ double PRMQuotient::getSamplingDensity()
       ob::Cost weight = ep.getCost();
       Lprev += weight.value();
     }
-    return (double)num_vertices(g_)/(C1->getSpaceMeasure()+Lprev);
+    return (double)num_vertices(g_)/(C1->getSpaceMeasure()*Lprev);
   }
 }
 

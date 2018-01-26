@@ -50,7 +50,8 @@ std::vector<PathSpace*> PathSpaceMultiLevelSE3::Decompose(){
       std::string str_dimension = input_level->type.substr(1);
       int N = boost::lexical_cast<int>(str_dimension);
 
-      cspace_level_k = factory.MakeGeometricCSpaceRN(world, input_level->robot_idx, N);
+      //cspace_level_k = factory.MakeGeometricCSpaceRN(world, input_level->robot_idx, N);
+      cspace_level_k = factory.MakeGeometricCSpaceFixedBase(world, input_level->robot_idx, N);
 
       std::cout << *input_level << std::endl;
       cspace_levels.push_back( cspace_level_k );

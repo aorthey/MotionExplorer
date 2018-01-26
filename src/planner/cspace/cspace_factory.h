@@ -38,8 +38,6 @@ class CSpaceFactory{
         cspace = new GeometricCSpaceOMPLSE2(world, robot_idx);
       }else if(type="SE3"){
         cspace = new GeometricCSpaceOMPL(world, robot_idx);
-      }else if(type="FixedBase"){
-        cspace = new GeometricCSpaceOMPLFixedBase(world, robot_idx);
       }else{
         cspace = new GeometricCSpaceOMPL(world, robot_idx);
       }
@@ -77,8 +75,8 @@ class CSpaceFactory{
       return cspace;
     }
     // CSpace  R^(N)
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceFixedBase( RobotWorld *world, int robot_idx){
-      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLFixedBase(world, robot_idx);
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceFixedBase( RobotWorld *world, int robot_idx, int dimension=0){
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLFixedBase(world, robot_idx, dimension);
       cspace->SetCSpaceInput(input);
       cspace->initSpace();
       cspace->initControlSpace();

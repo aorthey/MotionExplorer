@@ -3,6 +3,7 @@ const CSpaceInput& PathSpaceInput::GetCSpaceInput(){
   cin = new CSpaceInput();
   cin->timestep_max = timestep_max;
   cin->timestep_min = timestep_min;
+  cin->fixedBase = fixedBase;
   return *cin;
 }
 const StrategyInput& PathSpaceInput::GetStrategyInput(){

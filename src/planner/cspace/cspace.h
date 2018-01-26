@@ -73,6 +73,7 @@ class CSpaceOMPL
 
     uint Nklampt;
     uint Nompl;
+    bool fixedBase{false};
 
 
     //klampt:

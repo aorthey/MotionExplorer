@@ -66,12 +66,12 @@ std::ostream& operator<< (std::ostream& out, const PathSpace& space)
   out << std::string(80, '-') << std::endl;
   out << "[PathSpace]" << std::endl;
   out << std::string(80, '-') << std::endl;
-  std::cout << " atomic      : " << (space.isAtomic()?"yes":"no") << std::endl;
-  std::cout << " init        : " << space.input->q_init << std::endl;
-  std::cout << " goal        : " << space.input->q_goal << std::endl;
-  std::cout << " type        : " << space.input->type << std::endl;
-  std::cout << " #graph vertices          : " << space.vertices.size() << std::endl;
-  std::cout << " #graph edges             : " << space.edges.size() << std::endl;
+  out << " atomic      : " << (space.isAtomic()?"yes":"no") << std::endl;
+  out << " init        : " << space.input->q_init << std::endl;
+  out << " goal        : " << space.input->q_goal << std::endl;
+  out << " type        : " << space.input->type << std::endl;
+  out << " #graph vertices          : " << space.vertices.size() << std::endl;
+  out << " #graph edges             : " << space.edges.size() << std::endl;
   //std::cout << " #paths size              : " << space.paths.size() << std::endl;
   //uint ii = space.input.robot_inner_idx;
   //uint io = space.input.robot_outer_idx;
