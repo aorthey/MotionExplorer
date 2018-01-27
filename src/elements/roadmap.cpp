@@ -302,9 +302,11 @@ void Roadmap::DrawGL(GUIState& state)
     for(uint vidx = 0; vidx < Nvertices; vidx++){
       ob::PlannerDataVertex v = pds->getVertex(vidx);
       if(v!=ob::PlannerData::NO_VERTEX){
-        Config q = cspace->OMPLStateToConfig(v.getState());
-        Vector3 v(q(0),q(1),q(2));
-        drawPoint(v);
+        //Config q = cspace->OMPLStateToConfig(v.getState());
+        Vector3 q = cspace->getXYZ(v.getState());
+            
+            //(q(0),q(1),q(2));
+        drawPoint(q);
       }
     }
   }

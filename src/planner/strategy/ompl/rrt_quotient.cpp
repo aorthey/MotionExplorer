@@ -157,6 +157,7 @@ RRTQuotient::GrowState RRTQuotient::growTree(TreeData &tree, TreeGrowingInfo &tg
       si_->copyState(configuration->state, dstate);
       configuration->parent = nconfiguration;
       configuration->root = nconfiguration->root;
+      configuration->parent_edge_weight = distanceFunction(configuration, configuration->parent);
       tgi.xconfiguration = configuration;
 
       tree->add(configuration);
@@ -250,11 +251,6 @@ ob::PathPtr RRTQuotient::ConstructSolution(Configuration *q_start, Configuration
   return path;
 }
 
-bool RRTQuotient::SampleGraph(ob::State *workState)
-{
-  std::cout << "NYI" << std::endl;
-  exit(0);
-}
 
 
 void RRTQuotient::Grow(double t)
@@ -269,7 +265,7 @@ void RRTQuotient::Grow(double t)
   Sample(q_random->state);
 
   GrowState gs = growTree(tree, tgi, q_random);
-  if (gs != TRAPPED)
+  if (!isTreeConnected && gs != TRAPPED)
   {
     Configuration *addedConfiguration = tgi.xconfiguration;
 
@@ -335,4 +331,55 @@ uint RRTQuotient::GetNumberOfVertices(){
 }
 uint RRTQuotient::GetNumberOfEdges(){
   return tStart_->size() + tGoal_->size();
+}
+
+ompl::PDF<RRTQuotient::Configuration*> RRTQuotient::GetConfigurationPDF()
+{
+  PDF<Configuration*> pdf;
+  std::vector<Configuration *> configurations;
+  if(tStart_){
+    tStart_->list(configurations);
+  }
+  for (auto &configuration : configurations)
+  {
+    if(!(configuration->parent == nullptr)){
+      pdf.add(configuration, 1.0/configuration->parent_edge_weight);
+    }
+  }
+  configurations.clear();
+  if(tGoal_){
+    tGoal_->list(configurations);
+  }
+  for (auto &configuration : configurations)
+  {
+    if(!(configuration->parent == nullptr)){
+      pdf.add(configuration, 1.0/configuration->parent_edge_weight);
+    }
+  }
+
+  if(pdf.empty()){
+    std::cout << "cannot sample empty(?) graph" << std::endl;
+    exit(0);
+  }
+  return pdf;
+}
+bool RRTQuotient::SampleGraph(ob::State *q_random_graph)
+{
+
+  PDF<Configuration*> pdf = GetConfigurationPDF();
+
+  Configuration *q = pdf.sample(rng_.uniform01());
+  double t = rng_.uniform01();
+  if(t<0.1){
+    double tc = rng_.uniform01();
+    const ob::State *from = connectionPoint_.first;
+    const ob::State *to = connectionPoint_.second;
+    M1->getStateSpace()->interpolate(from, to, tc, q_random_graph);
+  }else{
+    const ob::State *from = q->state;
+    const ob::State *to = q->parent->state;
+    M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
+  }
+
+  return true;
 }

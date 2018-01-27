@@ -51,6 +51,8 @@ class CSpaceOMPL
     virtual void initControlSpace() = 0;
     virtual void print() const = 0;
 
+    Vector3 getXYZ(const ob::State*);
+
     friend std::ostream& operator<< (std::ostream& out, const CSpaceOMPL& space);
 
     virtual void SetCSpaceInput(const CSpaceInput &input_);

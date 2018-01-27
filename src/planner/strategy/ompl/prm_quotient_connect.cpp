@@ -301,20 +301,6 @@ bool PRMQuotientConnect::Connect(const Vertex a, const Vertex b){
 
     double d = 0;
 
-    //if(states.size()>2){
-    //  std::cout << std::string(80, '-') << std::endl;
-    //  std::cout << "A :";
-    //  M0->printState(qaM0);
-    //  for(uint i = 0; i < states.size(); i++){
-    //    std::cout << i << " :";
-    //    M0->printState(states.at(i));
-    //  }
-    //  //M1->printState(qb);
-    //  std::cout << "B :";
-    //  M0->printState(qbM0);
-    //  std::cout << "---- interpolate:" << std::endl;
-    //  //exit(0);
-    //}
     std::vector<Vertex> vpath;
 
     for(uint i = 1; i < states.size(); i++)
@@ -333,12 +319,6 @@ bool PRMQuotientConnect::Connect(const Vertex a, const Vertex b){
 
       //s0M0 contains last vertex on M0, s1M0 contains current vertex on M0
       //s0M1 contains last vertex, s1M1 contains new vertex to be added
-
-      // if(states.size()>2){
-      //   std::cout << "interpolate[" << i << "/"<< states.size()-1 << "]: " << d << "/" << D << std::endl;
-      //   M0->printState(s0M0);
-      //   M0->printState(s1M0);
-      // }
 
       if (si_->checkMotion(s0M1, s1M1))
       {
@@ -363,24 +343,25 @@ bool PRMQuotientConnect::Connect(const Vertex a, const Vertex b){
         ///#DEBUG #################################################
         if(i>=states.size()-1){
           vpath.push_back(v1);
-          if(states.size()>5){
-            for(uint k = 0; k < states.size(); k++){
-              std::cout << k << " :";
-              M0->printState(states.at(k));
-            }
-            std::cout << "VA : " << a << std::endl;
-            for(uint k = 0; k < vpath.size(); k++){
-              std::cout << "V" << k << " : " << vpath.at(k) << std::endl;
-            }
-            std::cout << "VB : " << b << std::endl;
-            for(uint k = 1; k < vpath.size(); k++){
-
-              std::pair<Edge,bool> ek = boost::edge(vpath.at(k-1),vpath.at(k),g_);
-              std::cout << "E" << k << "(" << vpath.at(k-1) << "," << vpath.at(k) << ") : " << (ek.second?"existing":"ERROR") << std::endl;
-            }
-            exit(0);
-          }
         }
+        //  if(states.size()>5){
+        //    for(uint k = 0; k < states.size(); k++){
+        //      std::cout << k << " :";
+        //      M0->printState(states.at(k));
+        //    }
+        //    std::cout << "VA : " << a << std::endl;
+        //    for(uint k = 0; k < vpath.size(); k++){
+        //      std::cout << "V" << k << " : " << vpath.at(k) << std::endl;
+        //    }
+        //    std::cout << "VB : " << b << std::endl;
+        //    for(uint k = 1; k < vpath.size(); k++){
+
+        //      std::pair<Edge,bool> ek = boost::edge(vpath.at(k-1),vpath.at(k),g_);
+        //      std::cout << "E" << k << "(" << vpath.at(k-1) << "," << vpath.at(k) << ") : " << (ek.second?"existing":"ERROR") << std::endl;
+        //    }
+        //    exit(0);
+        //  }
+        //}
         ///#DEBUG #################################################
       }else{
         C1->freeState(qaC1);

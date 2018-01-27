@@ -8,11 +8,10 @@
 #include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/geometric/planners/PlannerIncludes.h>
 #include <ompl/datastructures/NearestNeighbors.h>
-
+#include <ompl/datastructures/PDF.h>
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
-
 
 namespace ompl
 {
@@ -39,7 +38,7 @@ namespace ompl
         }
         void Init();
 
-        virtual bool SampleGraph(ob::State *q_random) override;
+        virtual bool SampleGraph(ob::State *q_random_graph) override;
 
         template <template <typename T> class NN>
         void setNearestNeighbors()
@@ -72,12 +71,14 @@ namespace ompl
 
           }
           ~Configuration() = default;
+          double parent_edge_weight;
           const base::State *root{nullptr};
           base::State *state{nullptr};
           Configuration *parent{nullptr};
         };
 
         typedef std::shared_ptr<NearestNeighbors<Configuration *>> TreeData;
+        ompl::PDF<Configuration*> GetConfigurationPDF();
 
         struct TreeGrowingInfo
         {

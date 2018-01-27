@@ -144,67 +144,67 @@ Config PathPiecewiseLinear::Eval(const double t) const{
   throw;
 }
 
-Vector3 PathPiecewiseLinear::getXYZ(ob::State *s, ob::StateSpacePtr space_input){
-  double x = 0;
-  double y = 0;
-  double z = 0;
-
-  ob::StateSpacePtr space;
-
-  //extract first component subspace
-  if(!space_input->isCompound()){
-    space= space_input;
-  }else{
-    int subspaces = space_input->as<ob::CompoundStateSpace>()->getSubspaceCount();
-    ob::CompoundStateSpace *M1_compound = space_input->as<ob::CompoundStateSpace>();
-    const std::vector<ob::StateSpacePtr> decomposed = M1_compound->getSubspaces();
-    space = decomposed.front();
-  }
-
-  if(space->getType() == ob::STATE_SPACE_SE3){
-    const ob::SE3StateSpace::StateType *qomplSE3;
-    if(space_input->isCompound()){
-      qomplSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-    }else{
-      qomplSE3 = s->as<ob::SE3StateSpace::StateType>();
-    }
-    x = qomplSE3->getX();
-    y = qomplSE3->getY();
-    z = qomplSE3->getZ();
-  }else if(space->getType() == ob::STATE_SPACE_REAL_VECTOR){
-    //fixed base robot: visualize last link
-
-    Config q = cspace->OMPLStateToConfig(s);
-    Robot *robot = cspace->GetRobotPtr();
-    robot->UpdateConfig(q);
-    robot->UpdateGeometry();
-    Vector3 qq;
-    Vector3 zero; zero.setZero();
-    int lastLink = robot->links.size()-1;
-    robot->GetWorldPosition(zero, lastLink, qq);
-
-    x = qq[0];
-    y = qq[1];
-    z = qq[2];
-
-    //const ob::RealVectorStateSpace::StateType *qomplRn;
-    //if(space_input->isCompound()){
-    //  qomplRn = s->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-    //}else{
-    //  qomplRn = s->as<ob::RealVectorStateSpace::StateType>();
-    //}
-    //x = qomplRn->values[0];
-    //y = qomplRn->values[1];
-    //z = qomplRn->values[2];
-  }else{
-    std::cout << "cannot deal with space type" << space->getType() << std::endl;
-    std::cout << "please check ompl/base/StateSpaceTypes.h" << std::endl;
-    exit(0);
-  }
-  Vector3 q(x,y,z);
-  return q;
-
-}
+//Vector3 PathPiecewiseLinear::getXYZ(ob::State *s, ob::StateSpacePtr space_input){
+//  double x = 0;
+//  double y = 0;
+//  double z = 0;
+//
+//  ob::StateSpacePtr space;
+//
+//  //extract first component subspace
+//  if(!space_input->isCompound()){
+//    space= space_input;
+//  }else{
+//    int subspaces = space_input->as<ob::CompoundStateSpace>()->getSubspaceCount();
+//    ob::CompoundStateSpace *M1_compound = space_input->as<ob::CompoundStateSpace>();
+//    const std::vector<ob::StateSpacePtr> decomposed = M1_compound->getSubspaces();
+//    space = decomposed.front();
+//  }
+//
+//  if(space->getType() == ob::STATE_SPACE_SE3){
+//    const ob::SE3StateSpace::StateType *qomplSE3;
+//    if(space_input->isCompound()){
+//      qomplSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+//    }else{
+//      qomplSE3 = s->as<ob::SE3StateSpace::StateType>();
+//    }
+//    x = qomplSE3->getX();
+//    y = qomplSE3->getY();
+//    z = qomplSE3->getZ();
+//  }else if(space->getType() == ob::STATE_SPACE_REAL_VECTOR){
+//    //fixed base robot: visualize last link
+//
+//    Config q = cspace->OMPLStateToConfig(s);
+//    Robot *robot = cspace->GetRobotPtr();
+//    robot->UpdateConfig(q);
+//    robot->UpdateGeometry();
+//    Vector3 qq;
+//    Vector3 zero; zero.setZero();
+//    int lastLink = robot->links.size()-1;
+//    robot->GetWorldPosition(zero, lastLink, qq);
+//
+//    x = qq[0];
+//    y = qq[1];
+//    z = qq[2];
+//
+//    //const ob::RealVectorStateSpace::StateType *qomplRn;
+//    //if(space_input->isCompound()){
+//    //  qomplRn = s->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+//    //}else{
+//    //  qomplRn = s->as<ob::RealVectorStateSpace::StateType>();
+//    //}
+//    //x = qomplRn->values[0];
+//    //y = qomplRn->values[1];
+//    //z = qomplRn->values[2];
+//  }else{
+//    std::cout << "cannot deal with space type" << space->getType() << std::endl;
+//    std::cout << "please check ompl/base/StateSpaceTypes.h" << std::endl;
+//    exit(0);
+//  }
+//  Vector3 q(x,y,z);
+//  return q;
+//
+//}
 
 void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*_path);
@@ -223,8 +223,8 @@ void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
   for(uint i = 0; i < states.size()-1; i++){
     ob::State* c1 = states.at(i);
     ob::State* c2 = states.at(i+1);
-    Vector3 q1 = getXYZ(c1, space);
-    Vector3 q2 = getXYZ(c2, space);
+    Vector3 q1 = cspace->getXYZ(c1);
+    Vector3 q2 = cspace->getXYZ(c2);
     GLDraw::drawPoint(q1);
     GLDraw::drawLineSegment(q1, q2);
   }

@@ -2,6 +2,57 @@
 #include "planner/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
 
+Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
+  double x = 0;
+  double y = 0;
+  double z = 0;
+
+  ob::StateSpacePtr space_first_subspace;
+
+  //extract first component subspace
+  if(!space->isCompound()){
+    space_first_subspace = space;
+  }else{
+    int subspaces = space->as<ob::CompoundStateSpace>()->getSubspaceCount();
+    ob::CompoundStateSpace *M1_compound = space->as<ob::CompoundStateSpace>();
+    const std::vector<ob::StateSpacePtr> decomposed = M1_compound->getSubspaces();
+    space_first_subspace = decomposed.front();
+  }
+
+  if(space_first_subspace->getType() == ob::STATE_SPACE_SE3){
+    const ob::SE3StateSpace::StateType *qomplSE3;
+    if(space->isCompound()){
+      qomplSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+    }else{
+      qomplSE3 = s->as<ob::SE3StateSpace::StateType>();
+    }
+    x = qomplSE3->getX();
+    y = qomplSE3->getY();
+    z = qomplSE3->getZ();
+  }else if(space_first_subspace->getType() == ob::STATE_SPACE_REAL_VECTOR){
+    //fixed base robot: visualize last link
+
+    Config q = OMPLStateToConfig(s);
+    robot->UpdateConfig(q);
+    robot->UpdateGeometry();
+    Vector3 qq;
+    Vector3 zero; zero.setZero();
+    int lastLink = robot->links.size()-1;
+    robot->GetWorldPosition(zero, lastLink, qq);
+
+    x = qq[0];
+    y = qq[1];
+    z = qq[2];
+
+  }else{
+    std::cout << "cannot deal with space type" << space_first_subspace->getType() << std::endl;
+    std::cout << "please check ompl/base/StateSpaceTypes.h" << std::endl;
+    exit(0);
+  }
+  Vector3 q(x,y,z);
+  return q;
+}
+
 std::vector<double> CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q ){
   double qx = q->x;
   double qy = q->y;

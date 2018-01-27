@@ -62,15 +62,15 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   double time = boost::lexical_cast<double>(run["time REAL"]);
   double memory = boost::lexical_cast<double>(run["memory REAL"]);
 
-  if(!solved && states < 5){
-    std::cout << "ERROR: Planner output has only " << states << std::endl;
-    std::cout << "   this is an indicator of abnormal behavior." << std::endl;
-    for (ot::Benchmark::RunProperties::iterator it=run.begin(); it!=run.end(); ++it)
-    {
-      std::cout << it->first << " => " << it->second << '\n';
-    }
-    exit(1);
-  }
+  //if(!solved && states < 5){
+  //  std::cout << "ERROR: Planner output has only " << states << std::endl;
+  //  std::cout << "   this is an indicator of abnormal behavior." << std::endl;
+  //  for (ot::Benchmark::RunProperties::iterator it=run.begin(); it!=run.end(); ++it)
+  //  {
+  //    std::cout << it->first << " => " << it->second << '\n';
+  //  }
+  //  exit(1);
+  //}
 
   //if(solved){
   //  std::cout << "Found Solution at run " << pid << std::endl;
@@ -150,17 +150,17 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   if(algorithm=="ompl:rrt_plain"){
     planner = std::make_shared<og::RRTPlain>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
+  }else if(algorithm=="ompl:qmp_rrt"){
+    //typedef og::MultiQuotient<og::PRMQuotientNarrowEdgeDegree> MultiQuotient;
+    //typedef og::MultiQuotient<og::PRMQuotient, og::RRTQuotient> MultiQuotient;
+    typedef og::MultiQuotient<og::RRTQuotient> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec,"RRT");
+    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="ompl:qmp"){
     //typedef og::MultiQuotient<og::PRMQuotientNarrowEdgeDegree> MultiQuotient;
-    typedef og::MultiQuotient<og::PRMQuotientConnect> MultiQuotient;
+    typedef og::MultiQuotient<og::PRMQuotientNarrowEdgeDegree> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec);
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  }else if(algorithm=="ompl:prm_plain"){
-    planner = std::make_shared<og::PRMBasic>(si_vec.back());
-    planner->setProblemDefinition(pdef_vec.back());
-  }else if(algorithm=="ompl:prm_quotient"){
-    planner = std::make_shared<og::PRMQuotient>(si_vec.back(),nullptr);
-    planner->setProblemDefinition(pdef_vec.back());
   }else if(algorithm=="ompl:qmpconnect"){
     typedef og::MultiQuotient<og::PRMQuotientConnect> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "Connect");
@@ -181,18 +181,30 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     //### BENCHMARK #########################################################
     ot::Benchmark benchmark(ss, "BenchmarkNarrowPassage");
 
-    typedef og::MultiQuotient<og::PRMQuotientNarrow, og::RRTQuotient> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "QMP_RRT");
+    //typedef og::MultiQuotient<og::PRMQuotientNarrow, og::RRTQuotient> MultiQuotient;
+    //planner = std::make_shared<MultiQuotient>(si_vec, "QMP_RRT");
+    //static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+    //benchmark.addPlanner(planner);
+    typedef og::MultiQuotient<og::PRMQuotientNarrow> MultiQuotient;
+    typedef og::MultiQuotient<og::PRMQuotientConnect> MultiQuotientConnect;
+    typedef og::MultiQuotient<og::PRMQuotient, og::RRTQuotient> MultiQuotientRRT;
+    planner = std::make_shared<MultiQuotientRRT>(si_vec,"RRT");
+    static_pointer_cast<MultiQuotientRRT>(planner)->setProblemDefinition(pdef_vec);
+    benchmark.addPlanner(planner);
+
+    planner = std::make_shared<MultiQuotientConnect>(si_vec,"Connect");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
     benchmark.addPlanner(planner);
 
-    //planner = std::make_shared<og::PRM>(si_vec.back());
-    //planner->setProblemDefinition(pdef_vec.back());
-    //benchmark.addPlanner(planner);
+    planner = std::make_shared<MultiQuotient>(si_vec,"Narrow");
+    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+    benchmark.addPlanner(planner);
 
     planner = std::make_shared<og::RRTConnect>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
     benchmark.addPlanner(planner);
+
+
 
     //typedef og::MultiQuotient<og::PRMQuotientNarrowEdgeDegree> MultiQuotientEdgeDegree;
     //planner = std::make_shared<MultiQuotientEdgeDegree>(si_vec, "NarrowEdgeDegree");
@@ -216,9 +228,9 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 120;
+    req.maxTime = 2;
     req.maxMem = 10000.0;
-    req.runCount = 5;
+    req.runCount = 2;
     req.displayProgress = true;
 
     benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));
@@ -290,6 +302,13 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     benchmark.addPlanner(planner);
 
     typedef og::MultiQuotient<og::PRMQuotient> MultiQuotient;
+    typedef og::MultiQuotient<og::PRMQuotientConnect> MultiQuotientConnect;
+    typedef og::MultiQuotient<og::PRMQuotient, og::RRTQuotient> MultiQuotientRRT;
+
+    planner = std::make_shared<MultiQuotientRRT>(si_vec,"RRT");
+    static_pointer_cast<MultiQuotientRRT>(planner)->setProblemDefinition(pdef_vec);
+    benchmark.addPlanner(planner);
+
     planner = std::make_shared<MultiQuotient>(si_vec);
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
     benchmark.addPlanner(planner);
@@ -305,9 +324,9 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 60;
+    req.maxTime = 180;
     req.maxMem = 10000.0;
-    req.runCount = 3;
+    req.runCount = 5;
     req.displayProgress = true;
 
     benchmark.benchmark(req);
