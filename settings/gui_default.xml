@@ -87,7 +87,7 @@
     <name>draw_roadmap_edges</name>
     <descr>Draw Roadmap Edges</descr>
     <key>2</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_roadmap</name>

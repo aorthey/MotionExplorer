@@ -461,7 +461,6 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
 
   output.SetPlannerData(pd);
   output.SetProblemDefinition(planner->getProblemDefinition());
-
 }
 void StrategyGeometricMultiLevel::BenchmarkFileToPNG(const std::string &file){
   std::string cmd;

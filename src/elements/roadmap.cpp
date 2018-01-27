@@ -4,9 +4,6 @@
 #include "planner/validitychecker/validity_checker_ompl.h"
 
 using namespace GLDraw;
-//using NO_VERTEX = ob::PlannerData::NO_VERTEX;
-//using NO_EDGE = ob::PlannerData::NO_EDGE;
-//typedef ob::PlannerData::NO_VERTEX NO_VERTEX;
 
 Roadmap::Roadmap(){
   cVertex = green;
@@ -188,7 +185,6 @@ void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *csp
   pds = pd;
   pds->decoupleFromPlanner();
   lemon = new LemonInterface(pds);
-
 }
 
 using Graph = ob::PlannerData::Graph;

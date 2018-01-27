@@ -20,8 +20,10 @@ PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
 PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_):
   cspace(cspace_), path(p_), path_raw(p_)
 {
+  std::cout << "interpolating" << std::endl;
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
   gpath.interpolate();
+  std::cout << "done" << std::endl;
 
   length = gpath.length();
   std::vector<ob::State *> states = gpath.getStates();

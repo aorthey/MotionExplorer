@@ -343,7 +343,7 @@ ompl::PDF<RRTQuotient::Configuration*> RRTQuotient::GetConfigurationPDF()
   for (auto &configuration : configurations)
   {
     if(!(configuration->parent == nullptr)){
-      pdf.add(configuration, 1.0/configuration->parent_edge_weight);
+      pdf.add(configuration, configuration->parent_edge_weight);
     }
   }
   configurations.clear();
@@ -353,7 +353,7 @@ ompl::PDF<RRTQuotient::Configuration*> RRTQuotient::GetConfigurationPDF()
   for (auto &configuration : configurations)
   {
     if(!(configuration->parent == nullptr)){
-      pdf.add(configuration, 1.0/configuration->parent_edge_weight);
+      pdf.add(configuration, configuration->parent_edge_weight);
     }
   }
 
@@ -370,7 +370,7 @@ bool RRTQuotient::SampleGraph(ob::State *q_random_graph)
 
   Configuration *q = pdf.sample(rng_.uniform01());
   double t = rng_.uniform01();
-  if(t<0.1){
+  if(t<0.05){
     double tc = rng_.uniform01();
     const ob::State *from = connectionPoint_.first;
     const ob::State *to = connectionPoint_.second;
