@@ -45,6 +45,7 @@
         <level inner_index="0" outer_index="0" type="SE3"/>
       </hierarchy>
     </algorithm>
+    <algorithm name="ompl:rrtconnect"/>
 
     <algorithm name="hierarchical:ompl:benchmark_initial">
       <hierarchy>
@@ -53,8 +54,6 @@
       </hierarchy>
     </algorithm>
 
-    <algorithm name="ompl:rrtconnect"/>
-    <algorithm name="ompl:lazyprm"/>
 
     <!--
     <benchmark name="DoubleLShapeBenchmark">

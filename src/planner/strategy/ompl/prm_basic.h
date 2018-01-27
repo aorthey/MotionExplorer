@@ -109,6 +109,7 @@ namespace ompl
         ~PRMBasic();
 
         virtual uint GetNumberOfVertices() override;
+        virtual uint GetNumberOfEdges() override;
         ob::PathPtr GetShortestPath();
         ob::PathPtr GetSolutionPath();
         bool HasSolution() override;

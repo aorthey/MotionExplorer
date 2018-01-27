@@ -53,10 +53,12 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     if(active_planner<planners.size()-1) active_planner++;
     else active_planner = 0;
     hierarchy_change = true;
+    path = planners.at(active_planner)->GetPath();
   }else if(cmd=="previous_planner"){
     if(active_planner>0) active_planner--;
     else active_planner = planners.size()-1;
     hierarchy_change = true;
+    path = planners.at(active_planner)->GetPath();
   }else if(cmd=="draw_sweptvolume"){
     state("draw_sweptvolume").toggle();
   }else if(cmd=="draw_roadmap"){
@@ -103,7 +105,6 @@ bool PlannerBackend::OnIdle(){
 
   }else{
     MotionPlanner* planner = planners.at(active_planner);
-    static PathPiecewiseLinear *path;
     if(state("draw_play_path")){
       if(t<=0){
         path = planner->GetPath();

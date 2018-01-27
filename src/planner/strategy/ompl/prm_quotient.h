@@ -41,9 +41,9 @@ namespace ompl
 
         //Overrides Distance/Sample/Connect
         virtual double Distance(const Vertex a, const Vertex b) const override;
-        virtual bool Sample(ob::State *workState) override;
+        virtual bool Sample(ob::State*) override;
         virtual bool Connect(const Vertex a, const Vertex b) override;
-        virtual bool SampleGraph(ob::State *) override;
+        virtual bool SampleGraph(ob::State*) override;
         virtual ompl::PDF<og::PRMBasic::Edge> GetEdgePDF();
 
         virtual Vertex addMilestone(ob::State *state) override;

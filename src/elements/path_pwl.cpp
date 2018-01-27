@@ -21,6 +21,7 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_):
   cspace(cspace_), path(p_), path_raw(p_)
 {
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+  gpath.interpolate();
 
   length = gpath.length();
   std::vector<ob::State *> states = gpath.getStates();
@@ -31,6 +32,7 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_):
     interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
   }
 
+  path = std::make_shared<og::PathGeometric>(gpath);
   std::cout << "states : " << states.size() << std::endl;
   std::cout << "interLengths : " << interLength.size() << std::endl;
 }

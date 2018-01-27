@@ -60,6 +60,7 @@ namespace ompl
         virtual void CheckForSolution(ob::PathPtr &solution) override;
 
         virtual uint GetNumberOfVertices() override;
+        virtual uint GetNumberOfEdges() override;
 
     protected:
         class Configuration

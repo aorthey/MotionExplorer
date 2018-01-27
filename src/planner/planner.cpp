@@ -377,6 +377,7 @@ void MotionPlanner::UpdateHierarchy(){
     }
   }
   viewHierarchy.UpdateSelectionPath( current_path );
+  GetPath();
   Print();
 }
 void MotionPlanner::Print()

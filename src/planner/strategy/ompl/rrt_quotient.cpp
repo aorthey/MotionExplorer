@@ -333,3 +333,6 @@ PlannerStatus RRTQuotient::solve(const base::PlannerTerminationCondition &ptc)
 uint RRTQuotient::GetNumberOfVertices(){
   return tStart_->size() + tGoal_->size();
 }
+uint RRTQuotient::GetNumberOfEdges(){
+  return tStart_->size() + tGoal_->size();
+}

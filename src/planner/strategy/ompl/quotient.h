@@ -51,6 +51,7 @@ namespace ompl
         virtual void CheckForSolution(ob::PathPtr &solution) = 0;
         double GetSamplingDensity();
         virtual uint GetNumberOfVertices() = 0;
+        virtual uint GetNumberOfEdges() = 0;
 
         static void resetCounter();
 

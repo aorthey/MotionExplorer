@@ -54,6 +54,12 @@ double PRMQuotientConnect::Distance(const Vertex a, const Vertex b) const
     ExtractM0Subspace(qa, qaM0);
     ExtractM0Subspace(qb, qbM0);
 
+    //M0->printState(qaM0);
+    //M1->printState(qa);
+    //std::cout << std::string(80, '-') << std::endl;
+    //M0->printState(qbM0);
+    //M1->printState(qb);
+    //exit(0);
     const Vertex vsaM0 = associatedVertexSourceProperty_[a];
     const Vertex vsbM0 = associatedVertexSourceProperty_[b];
     const Vertex vtaM0 = associatedVertexTargetProperty_[a];
@@ -258,8 +264,10 @@ bool PRMQuotientConnect::Connect(const Vertex a, const Vertex b){
 
     ExtractC1Subspace(qa, qaC1);
     ExtractC1Subspace(qb, qbC1);
+
     ExtractM0Subspace(qa, qaM0);
     ExtractM0Subspace(qb, qbM0);
+
 
     const Vertex vsaM0 = associatedVertexSourceProperty_[a];
     const Vertex vsbM0 = associatedVertexSourceProperty_[b];

@@ -419,6 +419,9 @@ ob::PathPtr PRMBasic::GetShortestPath(){
 uint PRMBasic::GetNumberOfVertices(){
   return num_vertices(g_);
 }
+uint PRMBasic::GetNumberOfEdges(){
+  return num_edges(g_);
+}
 
 ob::PathPtr PRMBasic::GetSolutionPath(){
   ob::PathPtr sol;

@@ -16,6 +16,7 @@ class PlannerBackend : public ForceFieldBackend
     //play/replay/stop
     double t;
 
+    PathPiecewiseLinear *path;
 
   public:
 

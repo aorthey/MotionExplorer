@@ -221,19 +221,21 @@ void PRMQuotient::Grow(double t){
 double PRMQuotient::getSamplingDensity()
 {
   if(previous == nullptr){
-    return (double)num_vertices(g_)/(double)M1->getSpaceMeasure();
+    //return (double)num_vertices(g_)/(double)M1->getSpaceMeasure();
+    return (double)num_vertices(g_);
   }else{
     //get graph length
-    double Lprev = 0.0;
-    og::PRMQuotient *PRMprevious = static_cast<og::PRMQuotient*>(previous);
-    const Graph gprev = PRMprevious->getRoadmap();
-    foreach (Edge e, boost::edges(gprev))
-    {
-      EdgeProperty ep = get(boost::edge_weight_t(), gprev, e);
-      ob::Cost weight = ep.getCost();
-      Lprev += weight.value();
-    }
-    return (double)num_vertices(g_)/(M1->getSpaceMeasure());
+    //double Lprev = 0.0;
+    //og::PRMQuotient *PRMprevious = static_cast<og::PRMQuotient*>(previous);
+    //const Graph gprev = PRMprevious->getRoadmap();
+    //foreach (Edge e, boost::edges(gprev))
+    //{
+    //  EdgeProperty ep = get(boost::edge_weight_t(), gprev, e);
+    //  ob::Cost weight = ep.getCost();
+    //  Lprev += weight.value();
+    //}
+    //return (double)num_vertices(g_)/(M1->getSpaceMeasure());
+    return (double)num_vertices(g_);
   }
 }
 
@@ -243,11 +245,11 @@ void PRMQuotient::getPlannerData(base::PlannerData &data) const
   PRMBasic::getPlannerData(data);
 }
 
-bool PRMQuotient::Sample(ob::State *workState)
+bool PRMQuotient::Sample(ob::State *q_random)
 {
   if(previous == nullptr){
     //without any underlying CSpace, the behavior is equal to PRM
-    return sampler_->sample(workState);
+    return sampler_->sample(q_random);
   }else{
     //Adjusted sampling function: Sampling in G0 x C1
 
@@ -257,13 +259,13 @@ bool PRMQuotient::Sample(ob::State *workState)
 
     C1_sampler->sampleUniform(s_C1);
     previous->SampleGraph(s_M0);
-    mergeStates(s_M0, s_C1, workState);
+    mergeStates(s_M0, s_C1, q_random);
 
-    return M1->isValid(workState);
+    return M1->isValid(q_random);
   }
 }
 
-bool PRMQuotient::SampleGraph(ob::State *workState)
+bool PRMQuotient::SampleGraph(ob::State *q_random_graph)
 {
 
   PDF<Edge> pdf = GetEdgePDF();
@@ -279,7 +281,7 @@ bool PRMQuotient::SampleGraph(ob::State *workState)
   const ob::State *from = stateProperty_[v1];
   const ob::State *to = stateProperty_[v2];
 
-  M1->getStateSpace()->interpolate(from, to, t, workState);
+  M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
 
   lastSourceVertexSampled = v1;
   lastTargetVertexSampled = v2;
