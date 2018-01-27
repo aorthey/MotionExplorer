@@ -35,19 +35,18 @@ class PathPiecewiseLinear
     GLColor cVertex{magenta}, cLine{magenta};
     double linewidth{10};
     double ptsize{10};
-    void DrawGL(GUIState& state);
     virtual void DrawGLPathPtr(ob::PathPtr);
-    friend std::ostream& operator<< (std::ostream& out, const PathPiecewiseLinear& pwl);
 
+    void DrawGL(GUIState& state);
     bool Load(const char *fn);
     bool Load(TiXmlElement* node);
     bool Save(const char *fn);
     bool Save(TiXmlElement* node);
+    friend std::ostream& operator<< (std::ostream& out, const PathPiecewiseLinear& pwl);
 
   protected:
     double length{0};
     std::vector<double> interLength;//interLength(i) length towards next milestone point from q(i)
-    Vector3 getXYZ(ob::State *s, ob::StateSpacePtr space_input);
 
     CSpaceOMPL *cspace;
     ob::PathPtr path;

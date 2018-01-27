@@ -302,10 +302,7 @@ void Roadmap::DrawGL(GUIState& state)
     for(uint vidx = 0; vidx < Nvertices; vidx++){
       ob::PlannerDataVertex v = pds->getVertex(vidx);
       if(v!=ob::PlannerData::NO_VERTEX){
-        //Config q = cspace->OMPLStateToConfig(v.getState());
         Vector3 q = cspace->getXYZ(v.getState());
-            
-            //(q(0),q(1),q(2));
         drawPoint(q);
       }
     }
@@ -316,16 +313,13 @@ void Roadmap::DrawGL(GUIState& state)
     for(uint vidx = 0; vidx < Nvertices; vidx++){
       ob::PlannerDataVertex v = pds->getVertex(vidx);
       if(v==ob::PlannerData::NO_VERTEX) continue;
-      Config q1 = cspace->OMPLStateToConfig(v.getState());
-
       std::vector<uint> edgeList;
       pds->getEdges(vidx, edgeList);
       for(uint j = 0; j < edgeList.size(); j++){
         ob::PlannerDataVertex w = pds->getVertex(edgeList.at(j));
         if(w==ob::PlannerData::NO_VERTEX) continue;
-        Config q2 = cspace->OMPLStateToConfig(w.getState());
-        Vector3 v1(q1(0),q1(1),q1(2));
-        Vector3 v2(q2(0),q2(1),q2(2));
+        Vector3 v1 = cspace->getXYZ(v.getState());
+        Vector3 v2 = cspace->getXYZ(w.getState());
         drawLineSegment(v1,v2);
       }
     }
