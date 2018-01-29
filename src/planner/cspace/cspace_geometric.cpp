@@ -347,9 +347,3 @@ const ob::StateValidityCheckerPtr GeometricCSpaceOMPL::StateValidityCheckerPtr(o
 {
   return std::make_shared<OMPLValidityChecker>(si, this, kspace);
 }
-const ob::StateValidityCheckerPtr GeometricCSpaceOMPL::StateValidityCheckerPtr(oc::SpaceInformationPtr si)
-{
-  std::cout << "KinodynamicCSpaceOMPL only supports OMPL geometric (ob::). You called OMPL control (oc::)" << std::endl;
-  exit(0);
-}
-

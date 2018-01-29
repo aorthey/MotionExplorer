@@ -22,7 +22,6 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
   double timestep_min;
   double timestep_max;
   std::string name_sampler;
-  bool smoothPath;
   TiXmlElement* node_timestep = FindSubNode(node_plannerinput, "timestep");
   if(node_timestep){
     GetStreamAttribute(node_timestep,"min") >> timestep_min;
@@ -37,8 +36,13 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
   GetStreamText(node_max_planning_time) >> max_planning_time;
   GetStreamText(node_epsilon_goalregion) >> epsilon_goalregion;
 
+  bool smoothPath;
   TiXmlElement* node_smooth = FindSubNode(node_plannerinput, "smoothPath");
-  GetStreamTextDefault<double>(node_smooth, 1) >> smoothPath;
+  GetStreamTextDefault<int>(node_smooth, 1) >> smoothPath;
+
+  bool enableSufficiency;
+  TiXmlElement* node_sufficiency = FindSubNode(node_plannerinput, "enableSufficiency");
+  GetStreamTextDefault<int>(node_sufficiency, 0) >> enableSufficiency;
 
   TiXmlElement* node_sampler = FindSubNode(node_plannerinput, "sampler");
   GetStreamAttributeDefault<std::string>(node_sampler,"name", "uniform") >> name_sampler;
@@ -56,6 +60,7 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
   while(node_algorithm!=NULL){
     PlannerInput* input = new PlannerInput();
     input->smoothPath = smoothPath;
+    input->enableSufficiency = enableSufficiency;
     input->isSE2 = isSE2;
     input->name_sampler = name_sampler;
 

@@ -46,7 +46,7 @@
       </hierarchy>
     </algorithm>
 
-    <algorithm name="hierarchical:ompl:benchmark_narrow">
+    <algorithm name="hierarchical:ompl:benchmark_initial">
       <hierarchy>
         <level inner_index="3" type="R3"/>
         <level inner_index="1" type="SE3"/>

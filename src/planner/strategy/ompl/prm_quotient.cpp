@@ -1,5 +1,6 @@
 #include "prm_quotient.h"
 #include "planner/cspace/cspace.h"
+#include "planner/validitychecker/validity_checker_ompl.h"
 
 #include <ompl/datastructures/PDF.h>
 #include <boost/foreach.hpp>
@@ -122,8 +123,8 @@ void PRMQuotient::Grow(double t){
 double PRMQuotient::getSamplingDensity()
 {
   if(previous == nullptr){
-    //return (double)num_vertices(g_)/(double)M1->getSpaceMeasure();
-    return (double)num_vertices(g_);
+    return (double)num_vertices(g_)/(double)M1->getSpaceMeasure();
+    //return (double)num_vertices(g_);
   }else{
     //get graph length
     //double Lprev = 0.0;
@@ -135,8 +136,8 @@ double PRMQuotient::getSamplingDensity()
     //  ob::Cost weight = ep.getCost();
     //  Lprev += weight.value();
     //}
-    //return (double)num_vertices(g_)/(M1->getSpaceMeasure());
-    return (double)num_vertices(g_);
+    return (double)num_vertices(g_)/(M1->getSpaceMeasure());
+    //return (double)num_vertices(g_);
   }
 }
 
@@ -174,19 +175,30 @@ bool PRMQuotient::SampleGraph(ob::State *q_random_graph)
     std::cout << "cannot sample empty(?) graph" << std::endl;
     exit(0);
   }
-  Edge e = pdf.sample(rng_.uniform01());
-  double t = rng_.uniform01();
 
-  const Vertex v1 = boost::source(e, g_);
-  const Vertex v2 = boost::target(e, g_);
-  const ob::State *from = stateProperty_[v1];
-  const ob::State *to = stateProperty_[v2];
+  auto checkerPtr = static_pointer_cast<OMPLValidityCheckerNecessarySufficient>(M1->getStateValidityChecker());
+  while(q_random_graph == NULL || checkerPtr->isSufficient(q_random_graph))
+  {
+    Edge e = pdf.sample(rng_.uniform01());
+    double t = rng_.uniform01();
+    const Vertex v1 = boost::source(e, g_);
+    const Vertex v2 = boost::target(e, g_);
+    const ob::State *from = stateProperty_[v1];
+    const ob::State *to = stateProperty_[v2];
+    M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
 
-  M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
+    lastSourceVertexSampled = v1;
+    lastTargetVertexSampled = v2;
+    lastTSampled = t;
+  }
+    //if(checkerPtr->isSufficient(stateProperty_[a])
+    //    &&checkerPtr->isSufficient(stateProperty_[b]))
+    //{
+    //  weight = ob::Cost(0);
+    //}else{
+    //  weight = opt_->motionCost(stateProperty_[a], stateProperty_[b]);
+    //}
 
-  lastSourceVertexSampled = v1;
-  lastTargetVertexSampled = v2;
-  lastTSampled = t;
 
   isSampled = true;
 

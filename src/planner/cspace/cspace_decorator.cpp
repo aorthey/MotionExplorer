@@ -2,19 +2,18 @@
 #include "planner/validitychecker/validity_checker_ompl.h"
 
 CSpaceOMPLDecorator::CSpaceOMPLDecorator(CSpaceOMPL* cspace_ompl_):
-  CSpaceOMPL(cspace_ompl_->GetRobotPtr(), cspace_ompl_->GetCSpacePtr())
+  CSpaceOMPL(cspace_ompl_->GetRobotPtr(), cspace_ompl_->GetCSpacePtr()), cspace_ompl(cspace_ompl_)
 {
-  cspace_ompl = cspace_ompl_;
-
+  //input = cspace_ompl->input;
+  //Nklampt = cspace_ompl->Nklampt;
+  //Nompl = cspace_ompl->Nompl;
+  //fixedBase = cspace_ompl->fixedBase;
 }
 const oc::StatePropagatorPtr CSpaceOMPLDecorator::StatePropagatorPtr(oc::SpaceInformationPtr si){
   return cspace_ompl->StatePropagatorPtr(si);
 }
-const ob::StateValidityCheckerPtr CSpaceOMPLDecorator::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
-  return cspace_ompl->StateValidityCheckerPtr();
-}
-const ob::StateValidityCheckerPtr CSpaceOMPLDecorator::StateValidityCheckerPtr(oc::SpaceInformationPtr si){
-  return cspace_ompl->StateValidityCheckerPtr();
+const ob::StateValidityCheckerPtr CSpaceOMPLDecorator::StateValidityCheckerPtr(){
+  return StateValidityCheckerPtr(SpaceInformationPtr());
 }
 ob::ScopedState<> CSpaceOMPLDecorator::ConfigToOMPLState(const Config &q){
   return cspace_ompl->ConfigToOMPLState(q);
@@ -40,13 +39,13 @@ const ob::StateSpacePtr CSpaceOMPLDecorator::SpacePtr(){
 const oc::RealVectorControlSpacePtr CSpaceOMPLDecorator::ControlSpacePtr(){
   return cspace_ompl->ControlSpacePtr();
 }
-uint CSpaceOMPLDecorator::GetDimensionality(){
+uint CSpaceOMPLDecorator::GetDimensionality() const{
   return cspace_ompl->GetDimensionality();
 }
-uint CSpaceOMPLDecorator::GetControlDimensionality(){
+uint CSpaceOMPLDecorator::GetControlDimensionality() const{
   return cspace_ompl->GetControlDimensionality();
 }
-void CSpaceOMPLDecorator::SetCSpaceInput(CSpaceInput &input_){
+void CSpaceOMPLDecorator::SetCSpaceInput(const CSpaceInput &input_){
   cspace_ompl->SetCSpaceInput(input_);
 }
 Robot* CSpaceOMPLDecorator::GetRobotPtr(){
@@ -54,6 +53,24 @@ Robot* CSpaceOMPLDecorator::GetRobotPtr(){
 }
 CSpace* CSpaceOMPLDecorator::GetCSpacePtr(){
   return cspace_ompl->GetCSpacePtr();
+}
+ob::SpaceInformationPtr CSpaceOMPLDecorator::SpaceInformationPtr(){
+  if(cspace_ompl->si==nullptr){
+    cspace_ompl->si = std::make_shared<ob::SpaceInformation>(SpacePtr());
+    const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr();
+    cspace_ompl->si->setStateValidityChecker(checker);
+  }
+  return cspace_ompl->si;
+}
+Vector3 CSpaceOMPLDecorator::getXYZ(const ob::State* s){
+  return cspace_ompl->getXYZ(s);
+}
+void CSpaceOMPLDecorator::print(std::ostream& out) const
+{
+  cspace_ompl->print(out);
+}
+const ob::StateValidityCheckerPtr CSpaceOMPLDecorator::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
+  return cspace_ompl->StateValidityCheckerPtr(si);
 }
 
 //#############################################################################
@@ -66,10 +83,16 @@ const ob::StateValidityCheckerPtr CSpaceOMPLDecoratorInnerOuter::StateValidityCh
   return std::make_shared<OMPLValidityCheckerInnerOuter>(si, this, cspace_ompl->GetCSpacePtr(), outer);
 }
 
-CSpaceOMPLDecoratorNecessarySufficient::CSpaceOMPLDecoratorNecessarySufficient(CSpaceOMPL *cspace_ompl_, CSpace *outer_):
-  CSpaceOMPLDecorator(cspace_ompl_), outer(outer_)
+//#############################################################################
+CSpaceOMPLDecoratorNecessarySufficient::CSpaceOMPLDecoratorNecessarySufficient(CSpaceOMPL *cspace_ompl_, uint robot_outer_idx_):
+  CSpaceOMPLDecorator(cspace_ompl_), robot_outer_idx(robot_outer_idx_)
 {
+  outer = new SingleRobotCSpace(*cspace_ompl->world,robot_outer_idx,&cspace_ompl->worldsettings);
+  // SingleRobotCSpace* cso = static_cast<SingleRobotCSpace*>(outer);
+  // Robot *ro = cso->GetRobot();
+  // std::cout << ro->name << std::endl;
+  // exit(0);
 }
 const ob::StateValidityCheckerPtr CSpaceOMPLDecoratorNecessarySufficient::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
-  return std::make_shared<OMPLValidityCheckerNecessarySufficient>(si, this, cspace_ompl->GetCSpacePtr(), outer);
+  return std::make_shared<OMPLValidityCheckerNecessarySufficient>(si, cspace_ompl, outer);
 }

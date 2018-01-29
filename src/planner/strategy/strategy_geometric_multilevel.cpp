@@ -1,11 +1,14 @@
 #include "planner/strategy/strategy_geometric_multilevel.h"
-#include "planner/strategy/ompl/rrt_plain.h"
-#include "planner/strategy/ompl/prm_basic.h"
 #include "planner/strategy/ompl/multiquotient.h"
+
+#include "planner/strategy/ompl/prm_basic.h"
 #include "planner/strategy/ompl/prm_quotient.h"
-#include "planner/strategy/ompl/rrt_quotient.h"
 #include "planner/strategy/ompl/prm_quotient_connect.h"
 #include "planner/strategy/ompl/prm_quotient_narrowness.h"
+
+#include "planner/strategy/ompl/rrt_plain.h"
+#include "planner/strategy/ompl/rrt_quotient.h"
+#include "planner/strategy/ompl/rrt_quotient_sufficiency.h"
 #include "util.h"
 
 #include <ompl/geometric/planners/rrt/RRT.h>
@@ -156,11 +159,19 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     typedef og::MultiQuotient<og::RRTQuotient> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec,"RRT");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="ompl:qmp_rrt_sufficiency"){
+    typedef og::MultiQuotient<og::RRTQuotientSufficiency> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec,"RRTSufficient");
+    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="ompl:qmp"){
-    //typedef og::MultiQuotient<og::PRMQuotientNarrowEdgeDegree> MultiQuotient;
     typedef og::MultiQuotient<og::PRMQuotientNarrowEdgeDegree> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec);
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+  // }else if(algorithm=="ompl:qmp_reject"){
+
+  //   planner = std::make_shared<og::RRTQuotientRejectionSampling>(si_vec);
+  //   static_pointer_cast<og::RRTQuotientRejectionSampling>(planner)->setProblemDefinition(pdef_vec);
+
   }else if(algorithm=="ompl:qmpconnect"){
     typedef og::MultiQuotient<og::PRMQuotientConnect> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "Connect");
@@ -180,42 +191,14 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   }else if(algorithm=="ompl:benchmark_narrow"){
     //### BENCHMARK #########################################################
     ot::Benchmark benchmark(ss, "BenchmarkNarrowPassage");
-
-    //typedef og::MultiQuotient<og::PRMQuotientNarrow, og::RRTQuotient> MultiQuotient;
-    //planner = std::make_shared<MultiQuotient>(si_vec, "QMP_RRT");
-    //static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-    //benchmark.addPlanner(planner);
-    typedef og::MultiQuotient<og::PRMQuotientNarrow> MultiQuotient;
-    typedef og::MultiQuotient<og::PRMQuotientConnect> MultiQuotientConnect;
-    typedef og::MultiQuotient<og::PRMQuotient, og::RRTQuotient> MultiQuotientRRT;
-    planner = std::make_shared<MultiQuotientRRT>(si_vec,"RRT");
-    static_pointer_cast<MultiQuotientRRT>(planner)->setProblemDefinition(pdef_vec);
-    benchmark.addPlanner(planner);
-
-    planner = std::make_shared<MultiQuotientConnect>(si_vec,"Connect");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-    benchmark.addPlanner(planner);
-
-    planner = std::make_shared<MultiQuotient>(si_vec,"Narrow");
+    typedef og::MultiQuotient<og::PRMQuotientNarrowEdgeDegree> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec);
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
     benchmark.addPlanner(planner);
 
     planner = std::make_shared<og::RRTConnect>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
     benchmark.addPlanner(planner);
-
-
-
-    //typedef og::MultiQuotient<og::PRMQuotientNarrowEdgeDegree> MultiQuotientEdgeDegree;
-    //planner = std::make_shared<MultiQuotientEdgeDegree>(si_vec, "NarrowEdgeDegree");
-    //static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-    //benchmark.addPlanner(planner);
-
-    //typedef og::MultiQuotient<og::PRMQuotientNarrowMinCut> MultiQuotientMinCut;
-    //planner = std::make_shared<MultiQuotientMinCut>(si_vec, "NarrowMinCut");
-    //static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-    //benchmark.addPlanner(planner);
-
 
     ob::ProblemDefinitionPtr pdef = pdef_vec.back();
     CSpaceOMPL *cspace = input.cspace_levels.back();
@@ -228,9 +211,9 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 2;
+    req.maxTime = 120;
     req.maxMem = 10000.0;
-    req.runCount = 2;
+    req.runCount = 5;
     req.displayProgress = true;
 
     benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));

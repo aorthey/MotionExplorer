@@ -39,7 +39,10 @@ print "\nCreated new file >>",fname
 ### create nested robots
 CreateSphereRobot(folder, robot_name + "_sphere_inner", thicknessx/2)
 
-CreateSphereRobot(folder, robot_name + "_sphere_outer", L1)
+p = max(max(L1,thicknessx),thicknessy)
+D = np.sqrt( (0.5*p)**2 + p**2)
+
+CreateSphereRobot(folder, robot_name + "_sphere_outer", D)
 
 CreateCylinderRobot(folder, robot_name + "_capsule_inner", thicknessx/2, L1)
 

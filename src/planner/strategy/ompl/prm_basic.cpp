@@ -1,5 +1,6 @@
 #include "prm_basic.h"
 #include "GoalVisitor.hpp"
+#include "planner/validitychecker/validity_checker_ompl.h"
 
 #include <ompl/geometric/planners/prm/ConnectionStrategy.h>
 #include <ompl/base/goals/GoalSampleableRegion.h>
@@ -53,7 +54,6 @@ PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si, Quotient *previous_)
 }
 
 PRMBasic::~PRMBasic(){
-  std::cout << "delete PRMBasic" << std::endl;
   si_->freeStates(xstates);
   foreach (Vertex v, boost::vertices(g_))
     si_->freeState(stateProperty_[v]);
@@ -461,7 +461,17 @@ double PRMBasic::Distance(const Vertex a, const Vertex b) const
 bool PRMBasic::Connect(const Vertex a, const Vertex b){
   if (si_->checkMotion(stateProperty_[a], stateProperty_[b]))
   {
-    EdgeProperty properties(opt_->motionCost(stateProperty_[a], stateProperty_[b]));
+    //ob::Cost weight;
+    //auto checkerPtr = static_pointer_cast<OMPLValidityCheckerNecessarySufficient>(si_->getStateValidityChecker());
+    //if(checkerPtr->isSufficient(stateProperty_[a])
+    //    &&checkerPtr->isSufficient(stateProperty_[b]))
+    //{
+    //  weight = ob::Cost(0);
+    //}else{
+    //  weight = opt_->motionCost(stateProperty_[a], stateProperty_[b]);
+    //}
+    ob::Cost weight = opt_->motionCost(stateProperty_[a], stateProperty_[b]);
+    EdgeProperty properties(weight);
     boost::add_edge(a, b, properties, g_);
     uniteComponents(a, b);
     return true;

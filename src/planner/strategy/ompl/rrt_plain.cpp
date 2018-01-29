@@ -79,25 +79,6 @@ void RRTPlain::Init(){
       std::cout << " " << param;
   std::cout << std::endl;
 
-  ///** \brief The space information for which planning is done */
-  //SpaceInformationPtr si_;
-  ///** \brief The user set problem definition */
-  //ProblemDefinitionPtr pdef_;
-  ///** \brief Utility class to extract valid input states  */
-  //PlannerInputStates pis_;
-  ///** \brief The name of this planner */
-  //std::string name_;
-  ///** \brief The specifications of the planner (its capabilities) */
-  //PlannerSpecs specs_;
-  ///** \brief A map from parameter names to parameter instances for this planner. This field is populated by
-  // * the declareParam() function */
-  //ParamSet params_;
-  ///** \brief A mapping between this planner's progress property names and the functions used for querying
-  // * those progress properties */
-  //PlannerProgressProperties plannerProgressProperties_;
-  ///** \brief Flag indicating whether setup() has been called */
-  //bool setup_;
-
   checkValidity();
   goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
 

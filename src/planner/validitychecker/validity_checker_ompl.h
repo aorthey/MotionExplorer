@@ -27,10 +27,8 @@ class OMPLValidityCheckerInnerOuter: public OMPLValidityChecker
 class OMPLValidityCheckerNecessarySufficient: public OMPLValidityChecker
 {
   public:
-    OMPLValidityCheckerNecessarySufficient(const ob::SpaceInformationPtr &si, CSpaceOMPL *ompl_space_, CSpace *inner_, CSpace *outer_);
-    virtual bool isValid(const ob::State* state) const;
+    OMPLValidityCheckerNecessarySufficient(const ob::SpaceInformationPtr &si, CSpaceOMPL *ompl_space_, CSpace *outer_);
     virtual bool isSufficient(const ob::State* state) const;
-    virtual bool isNecessary(const ob::State* state) const;
 
     CSpace *outer;
 };

@@ -86,19 +86,19 @@ class CSpaceFactory{
     //a configuration q in the innerouter cspace is feasible iff
     // inner(q) is feasible AND outer(q) is infeasible
     //
-    virtual CSpaceOMPL* MakeCSpaceDecoratorInnerOuter( CSpaceOMPL* cs, CSpaceKlampt *outer){
-      CSpaceOMPL *cspace = new CSpaceOMPLDecoratorInnerOuter(cs, outer);
-      cspace->SetCSpaceInput(input);
-      cspace->initSpace();
-      cspace->initControlSpace();
-      return cspace;
-    }
-    virtual CSpaceOMPL* MakeCSpaceDecoratorNecessarySufficient( CSpaceOMPL* cs, CSpaceKlampt *outer){
-      CSpaceOMPL *cspace = new CSpaceOMPLDecoratorNecessarySufficient(cs, outer);
-      cspace->SetCSpaceInput(input);
-      cspace->initSpace();
-      cspace->initControlSpace();
-      return cspace;
-    }
+    //virtual CSpaceOMPL* MakeCSpaceDecoratorInnerOuter( CSpaceOMPL* cs, CSpaceKlampt *outer){
+    //  CSpaceOMPL *cspace = new CSpaceOMPLDecoratorInnerOuter(cs, outer);
+    //  cspace->SetCSpaceInput(input);
+    //  cspace->initSpace();
+    //  cspace->initControlSpace();
+    //  return cspace;
+    //}
+    //virtual CSpaceOMPL* MakeCSpaceDecoratorNecessarySufficient( CSpaceOMPL* cs, CSpaceKlampt *outer){
+    //  CSpaceOMPL *cspace = new CSpaceOMPLDecoratorNecessarySufficient(cs, outer);
+    //  cspace->SetCSpaceInput(input);
+    //  cspace->initSpace();
+    //  cspace->initControlSpace();
+    //  return cspace;
+    //}
 };
 

@@ -23,6 +23,7 @@ namespace ompl
         //RRTQuotient(const base::SpaceInformationPtr &si, PRMQuotient *previous_);
         RRTQuotient(const base::SpaceInformationPtr &si, Quotient *previous_ = nullptr);
         ~RRTQuotient();
+
         void getPlannerData(base::PlannerData &data) const override;
         base::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
         void clear() override;

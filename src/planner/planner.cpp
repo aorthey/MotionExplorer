@@ -101,6 +101,7 @@ void MotionPlanner::CreateSinglePathHierarchy(){
       psinput->se3max = input.se3max;
       psinput->freeFloating = input.freeFloating;
       psinput->fixedBase = !input.freeFloating;
+      psinput->enableSufficiency = input.enableSufficiency;
 
       psinput->name_sampler = input.name_sampler;
       psinput->name_algorithm = subalgorithm;
@@ -132,6 +133,7 @@ void MotionPlanner::CreateSinglePathHierarchy(){
     psinput->se3min = input.se3min;
     psinput->se3max = input.se3max;
     psinput->freeFloating = input.freeFloating;
+    psinput->enableSufficiency = input.enableSufficiency;
     psinput->fixedBase = !input.freeFloating;
 
     psinput->name_sampler = input.name_sampler;
@@ -191,6 +193,7 @@ void MotionPlanner::CreateShallowHierarchy(){
   psinput->se3min = input.se3min;
   psinput->se3max = input.se3max;
   psinput->freeFloating = input.freeFloating;
+  psinput->enableSufficiency = input.enableSufficiency;
   psinput->fixedBase = !input.freeFloating;
 
   psinput->name_sampler = input.name_sampler;
@@ -213,6 +216,7 @@ void MotionPlanner::CreateShallowHierarchy(){
   next->se3min = input.se3min;
   next->se3max = input.se3max;
   next->freeFloating = input.freeFloating;
+  next->enableSufficiency = input.enableSufficiency;
   next->fixedBase = !input.freeFloating;
   next->robot_idx = input.robot_idx;
   next->robot_inner_idx = input.robot_idx;
@@ -247,6 +251,7 @@ void MotionPlanner::CreateShallowHierarchySE2(){
   psinput->se3min = input.se3min;
   psinput->se3max = input.se3max;
   psinput->freeFloating = input.freeFloating;
+  psinput->enableSufficiency = input.enableSufficiency;
   psinput->fixedBase = !input.freeFloating;
 
   psinput->name_sampler = input.name_sampler;
@@ -269,6 +274,7 @@ void MotionPlanner::CreateShallowHierarchySE2(){
   next->se3min = input.se3min;
   next->se3max = input.se3max;
   next->freeFloating = input.freeFloating;
+  next->enableSufficiency = input.enableSufficiency;
   next->fixedBase = !input.freeFloating;
   next->robot_idx = input.robot_idx;
   next->robot_inner_idx = input.robot_idx;

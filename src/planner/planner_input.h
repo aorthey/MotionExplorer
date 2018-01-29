@@ -54,6 +54,7 @@ class PlannerInput{
     double timestep_max;
 
     bool smoothPath;
+    bool enableSufficiency;
 
     //input for hierarchical planner methods
     std::vector<int> robot_idxs;

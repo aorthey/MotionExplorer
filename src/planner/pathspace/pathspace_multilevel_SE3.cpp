@@ -38,6 +38,9 @@ std::vector<PathSpace*> PathSpaceMultiLevelSE3::Decompose(){
         std::cout << "Type " << input_level->type << " not recognized" << std::endl;
         exit(0);
       }
+      if(input->enableSufficiency){
+        cspace_level_k = new CSpaceOMPLDecoratorNecessarySufficient(cspace_level_k, input_level->robot_outer_idx);
+      }
       std::cout << *input_level << std::endl;
       cspace_levels.push_back( cspace_level_k );
       last_level = input_level;
@@ -52,6 +55,9 @@ std::vector<PathSpace*> PathSpaceMultiLevelSE3::Decompose(){
 
       //cspace_level_k = factory.MakeGeometricCSpaceRN(world, input_level->robot_idx, N);
       cspace_level_k = factory.MakeGeometricCSpaceFixedBase(world, input_level->robot_idx, N);
+      if(input->enableSufficiency){
+        cspace_level_k = new CSpaceOMPLDecoratorNecessarySufficient(cspace_level_k, input_level->robot_outer_idx);
+      }
 
       std::cout << *input_level << std::endl;
       cspace_levels.push_back( cspace_level_k );

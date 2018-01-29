@@ -141,7 +141,7 @@ const ob::StateSpacePtr CSpaceOMPL::SpacePtr(){
 ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
   if(si==nullptr){
     si = std::make_shared<ob::SpaceInformation>(SpacePtr());
-    const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr(si);
+    const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr();
     si->setStateValidityChecker(checker);
   }
   return si;
@@ -170,18 +170,22 @@ const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr()
   return StateValidityCheckerPtr(SpaceInformationPtr());
 }
 
-std::ostream& operator<< (std::ostream& out, const CSpaceOMPL& space) 
+void CSpaceOMPL::print(std::ostream& out) const
 {
   out << std::string(80, '-') << std::endl;
   out << "[ConfigurationSpace]" << std::endl;
   out << std::string(80, '-') << std::endl;
-  std::cout << "Robot                    : " << space.robot->name << std::endl;
-  std::cout << "Dimensionality (OMPL)    : " << space.GetDimensionality() << std::endl;
-  std::cout << "Dimensionality (Klampt)  : " << space.robot->q.size() << std::endl;
+  std::cout << "Robot                    : " << robot->name << std::endl;
+  std::cout << "Dimensionality (OMPL)    : " << GetDimensionality() << std::endl;
+  std::cout << "Dimensionality (Klampt)  : " << robot->q.size() << std::endl;
   //space.space->printSettings(std::cout);
   std::cout << "OMPL Representation      : " << std::endl;
-  space.space->diagram(std::cout << "   ");
+  space->diagram(std::cout << "   ");
 
   out << std::string(80, '-') << std::endl;
+}
+std::ostream& operator<< (std::ostream& out, const CSpaceOMPL& space) 
+{
+  space.print(out);
   return out;
 }

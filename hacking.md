@@ -87,7 +87,14 @@ std::ostream& operator<< (std::ostream& out, const Object& obj)
   return out;
 }
 
-```
+``` 
+
+Sometimes, the operator<< must be overloaded by an inherting class (for
+example to implement the Decorator pattern). However, this would require a
+virtual friend, which is not allowed in cpp. See
+https://en.wikibooks.org/wiki/More_C++_Idioms/Virtual_Friend_Function for a
+workaround.
+
 <--! ------------------------------------------------------------------------->
 ## Templated Classes Conventions
 

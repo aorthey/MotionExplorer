@@ -1,4 +1,5 @@
 #include "rrt_quotient.h"
+#include "planner/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/tools/config/SelfConfig.h>
 
@@ -158,8 +159,15 @@ RRTQuotient::GrowState RRTQuotient::growTree(TreeData &tree, TreeGrowingInfo &tg
       configuration->parent = nconfiguration;
       configuration->root = nconfiguration->root;
       configuration->parent_edge_weight = distanceFunction(configuration, configuration->parent);
-      tgi.xconfiguration = configuration;
 
+      auto checkerPtr = static_pointer_cast<OMPLValidityCheckerNecessarySufficient>(si_->getStateValidityChecker());
+      if(checkerPtr->isSufficient(configuration->state) && configuration->parent
+          &&checkerPtr->isSufficient(configuration->parent->state))
+      {
+        configuration->parent_edge_weight = 0;
+      }
+
+      tgi.xconfiguration = configuration;
       tree->add(configuration);
       return reach ? REACHED : ADVANCED;
     }

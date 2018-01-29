@@ -42,23 +42,18 @@ class CSpaceOMPL
     CSpaceOMPL(Robot *robot_, CSpaceKlampt *kspace_);
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) = 0;
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
-
-    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q) = 0;
-    virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
-
     virtual void initSpace() = 0;
     virtual void initControlSpace() = 0;
     virtual void print() const = 0;
+    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q) = 0;
+    virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
 
-    Vector3 getXYZ(const ob::State*);
-
-    friend std::ostream& operator<< (std::ostream& out, const CSpaceOMPL& space);
-
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
+    virtual Vector3 getXYZ(const ob::State*);
     virtual void SetCSpaceInput(const CSpaceInput &input_);
-    virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
     virtual uint GetDimensionality() const;
     virtual uint GetControlDimensionality() const;
+    virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
     virtual Robot* GetRobotPtr();
     virtual CSpaceKlampt* GetCSpacePtr();
     virtual const ob::StateSpacePtr SpacePtr();
@@ -67,8 +62,14 @@ class CSpaceOMPL
 
     static std::vector<double> EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
     static void OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSpace::StateType *q );
+
+    friend std::ostream& operator<< (std::ostream& out, const CSpaceOMPL& space);
+    virtual void print(std::ostream& out) const;
+
+    friend class CSpaceOMPLDecorator;
+    friend class CSpaceOMPLDecoratorNecessarySufficient;
+
   protected:
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si) = 0;
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) = 0;
 
     CSpaceInput input;
@@ -76,7 +77,6 @@ class CSpaceOMPL
     uint Nklampt;
     uint Nompl;
     bool fixedBase{false};
-
 
     //klampt:
     //

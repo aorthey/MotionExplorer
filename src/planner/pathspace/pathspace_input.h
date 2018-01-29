@@ -38,6 +38,7 @@ class PathSpaceInput{
     double timestep_min;
     double timestep_max;
 
+    bool enableSufficiency{false};
     bool fixedBase{false};
 
     const CSpaceInput& GetCSpaceInput();
