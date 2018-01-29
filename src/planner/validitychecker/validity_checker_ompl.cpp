@@ -44,6 +44,7 @@ bool OMPLValidityChecker::isNecessary(const ob::State* state) const
 }
 bool OMPLValidityChecker::isSufficient(const ob::State* state) const
 {
+  exit(0);
   return false;
 }
 

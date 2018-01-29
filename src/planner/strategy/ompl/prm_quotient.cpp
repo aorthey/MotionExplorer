@@ -177,7 +177,8 @@ bool PRMQuotient::SampleGraph(ob::State *q_random_graph)
   }
 
   auto checkerPtr = static_pointer_cast<OMPLValidityCheckerNecessarySufficient>(M1->getStateValidityChecker());
-  while(q_random_graph == NULL || checkerPtr->isSufficient(q_random_graph))
+  bool foundNecessary = false;
+  while(!foundNecessary)
   {
     Edge e = pdf.sample(rng_.uniform01());
     double t = rng_.uniform01();
@@ -190,15 +191,10 @@ bool PRMQuotient::SampleGraph(ob::State *q_random_graph)
     lastSourceVertexSampled = v1;
     lastTargetVertexSampled = v2;
     lastTSampled = t;
+    if(!checkerPtr->isSufficient(q_random_graph)){
+      foundNecessary = true;
+    }
   }
-    //if(checkerPtr->isSufficient(stateProperty_[a])
-    //    &&checkerPtr->isSufficient(stateProperty_[b]))
-    //{
-    //  weight = ob::Cost(0);
-    //}else{
-    //  weight = opt_->motionCost(stateProperty_[a], stateProperty_[b]);
-    //}
-
 
   isSampled = true;
 
