@@ -44,12 +44,12 @@ namespace ompl
         template <template <typename T> class NN>
         void setNearestNeighbors()
         {
-            if ((tStart_ && tStart_->size() != 0) || (tGoal_ && tGoal_->size() != 0))
-                OMPL_WARN("Calling setNearestNeighbors will clear all states.");
-            clear();
-            tStart_ = std::make_shared<NN<Configuration *>>();
-            tGoal_ = std::make_shared<NN<Configuration *>>();
-            setup();
+          if ((tStart_ && tStart_->size() != 0) || (tGoal_ && tGoal_->size() != 0))
+            OMPL_WARN("Calling setNearestNeighbors will clear all states.");
+          clear();
+          tStart_ = std::make_shared<NN<Configuration *>>();
+          tGoal_ = std::make_shared<NN<Configuration *>>();
+          setup();
         }
         virtual void Grow(double t=0);
         bool HasSolution() override{

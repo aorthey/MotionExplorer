@@ -402,3 +402,4 @@ i.e. some tracking ability
 [ ] Robot Manipulator
 [x] rewrite quotient_planner.h to handle specific cases (RN <-> RM, SE3 <->
 SE3RN, R3 <-> SE3, etcetera, instead of trying everything)
+[ ] memory increases for QMP, some structures must be not cleaned up.

@@ -20,7 +20,7 @@ RRTQuotient::RRTQuotient(const base::SpaceInformationPtr &si, Quotient *previous
 
 RRTQuotient::~RRTQuotient()
 {
-    freeMemory();
+  freeMemory();
 }
 
 void RRTQuotient::setup()
@@ -41,6 +41,7 @@ void RRTQuotient::setup()
                               {
                                   return distanceFunction(a, b);
                               });
+  tgi.xstate = si_->allocState();
 }
 void RRTQuotient::getPlannerData(base::PlannerData &data) const
 {
@@ -161,8 +162,8 @@ RRTQuotient::GrowState RRTQuotient::growTree(TreeData &tree, TreeGrowingInfo &tg
       configuration->parent_edge_weight = distanceFunction(configuration, configuration->parent);
 
       auto checkerPtr = static_pointer_cast<OMPLValidityCheckerNecessarySufficient>(si_->getStateValidityChecker());
-      if(checkerPtr->isSufficient(configuration->state) && configuration->parent
-          &&checkerPtr->isSufficient(configuration->parent->state))
+      if(checkerPtr->IsSufficient(configuration->state) && configuration->parent
+          &&checkerPtr->IsSufficient(configuration->parent->state))
       {
         configuration->parent_edge_weight = 0;
       }
@@ -219,7 +220,6 @@ void RRTQuotient::Init(){
   }
   if (!sampler_) sampler_ = si_->allocStateSampler();
 
-  tgi.xstate = si_->allocState();
 }
 
 ob::PathPtr RRTQuotient::ConstructSolution(Configuration *q_start, Configuration *q_goal){
@@ -268,8 +268,8 @@ void RRTQuotient::Grow(double t)
   startTree = !startTree;
   TreeData &otherTree = startTree ? tStart_ : tGoal_;
 
-  Configuration *q_random = new Configuration(si_);
-  q_random->state = M1->allocState();
+  Configuration *q_random = new Configuration(M1);
+  //q_random->state = M1->allocState();
   Sample(q_random->state);
 
   GrowState gs = growTree(tree, tgi, q_random);
@@ -296,7 +296,6 @@ void RRTQuotient::Grow(double t)
     }
 
   }
-  si_->freeState(q_random->state);
   delete q_random;
 }
 bool RRTQuotient::ConnectedToGoal(){

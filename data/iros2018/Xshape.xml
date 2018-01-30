@@ -29,7 +29,21 @@
     <maxplanningtime>5</maxplanningtime>
 
     <sampler name="obstacle_based"/>
+
+    <algorithm name="hierarchical:ompl:benchmark_narrow">
+      <hierarchy>
+        <level inner_index="3" outer_index="4" type="R3"/>
+        <level inner_index="0" outer_index="0" type="SE3"/>
+      </hierarchy>
+    </algorithm>
+
     <algorithm name="hierarchical:ompl:qmp_rrt_sufficiency">
+      <hierarchy>
+        <level inner_index="3" outer_index="4" type="R3"/>
+        <level inner_index="0" outer_index="0" type="SE3"/>
+      </hierarchy>
+    </algorithm>
+    <algorithm name="hierarchical:ompl:qmp_rrt">
       <hierarchy>
         <level inner_index="3" outer_index="4" type="R3"/>
         <level inner_index="0" outer_index="0" type="SE3"/>
@@ -42,13 +56,6 @@
       </hierarchy>
     </algorithm>
     <algorithm name="ompl:rrtconnect"/>
-
-    <algorithm name="hierarchical:ompl:benchmark_narrow">
-      <hierarchy>
-        <level inner_index="3" outer_index="4" type="R3"/>
-        <level inner_index="0" outer_index="0" type="SE3"/>
-      </hierarchy>
-    </algorithm>
 
 
   </plannerinput>

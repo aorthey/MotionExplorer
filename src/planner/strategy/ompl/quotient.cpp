@@ -342,9 +342,13 @@ bool Quotient::Sample(ob::State *q_random)
     ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
     base::State *s_C1 = C1->allocState();
     base::State *s_M0 = M0->allocState();
+
     C1_sampler->sampleUniform(s_C1);
     previous->SampleGraph(s_M0);
     mergeStates(s_M0, s_C1, q_random);
+
+    C1->freeState(s_C1);
+    M0->freeState(s_M0);
 
     return M1->isValid(q_random);
   }

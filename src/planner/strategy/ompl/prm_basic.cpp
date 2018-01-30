@@ -55,9 +55,10 @@ PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si, Quotient *previous_)
 
 PRMBasic::~PRMBasic(){
   si_->freeStates(xstates);
-  foreach (Vertex v, boost::vertices(g_))
-    si_->freeState(stateProperty_[v]);
   g_.clear();
+  if (nn_){
+    nn_->clear();
+  }
 }
 
 void PRMBasic::clear()
@@ -65,12 +66,19 @@ void PRMBasic::clear()
   Planner::clear();
   //sampler_.reset();
   //simpleSampler_.reset();
+  //if (!sampler_){
+  //  sampler_ = si_->allocValidStateSampler();
+  //}
+  //if (!simpleSampler_){
+  //  simpleSampler_ = si_->allocStateSampler();
+  //}
   foreach (Vertex v, boost::vertices(g_)){
     si_->freeState(stateProperty_[v]);
   }
   g_.clear();
-  if (nn_)
-      nn_->clear();
+  if (nn_){
+    nn_->clear();
+  }
   clearQuery();
 
   iterations_ = 0;

@@ -48,7 +48,7 @@ void Roadmap::CreateFromPlannerDataOnlySufficient(const ob::PlannerDataPtr pd, C
 
     Config q1 = cspace->OMPLStateToConfig(s);
 
-    bool isVertexSufficient = validity_checker->isSufficient(s);
+    bool isVertexSufficient = validity_checker->IsSufficient(s);
 
     if(isVertexSufficient){
       V.push_back(q1);
@@ -67,7 +67,7 @@ void Roadmap::CreateFromPlannerDataOnlySufficient(const ob::PlannerDataPtr pd, C
         const ob::State* sj = w.getState();
         Config q2 = cspace->OMPLStateToConfig(sj);
         Config qedge  = q2 - q1;
-        bool isEdgeSufficient = validity_checker->isSufficient(s) && validity_checker->isSufficient(sj);
+        bool isEdgeSufficient = validity_checker->IsSufficient(s) && validity_checker->IsSufficient(sj);
 
         if(isEdgeSufficient){
           if(!pds->vertexExists(w)){
@@ -109,7 +109,7 @@ void Roadmap::CreateFromPlannerDataOnlyNecessary(const ob::PlannerDataPtr pd, CS
     const ob::State* s = v.getState();
     Config q1 = cspace->OMPLStateToConfig(s);
 
-    bool isVertexSufficient = validity_checker->isSufficient(s);
+    bool isVertexSufficient = validity_checker->IsSufficient(s);
 
     if(!isVertexSufficient){
       V.push_back(q1);
@@ -129,7 +129,7 @@ void Roadmap::CreateFromPlannerDataOnlyNecessary(const ob::PlannerDataPtr pd, CS
         const ob::State* sj = w.getState();
         Config q2 = cspace->OMPLStateToConfig(sj);
         Config qedge  = q2 - q1;
-        bool isEdgeSufficient = validity_checker->isSufficient(sj);
+        bool isEdgeSufficient = validity_checker->IsSufficient(sj);
 
         if(!isEdgeSufficient){
           if(!pds->vertexExists(w)){

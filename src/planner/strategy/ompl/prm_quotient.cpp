@@ -38,8 +38,6 @@ void PRMQuotient::clear()
 {
   PRMBasic::clear();
   isSampled = false; 
-  //C1_sampler.reset();
-      //C1_sampler = C1->allocStateSampler();
 }
 
 
@@ -163,13 +161,15 @@ bool PRMQuotient::Sample(ob::State *q_random)
     previous->SampleGraph(s_M0);
     mergeStates(s_M0, s_C1, q_random);
 
+    C1->freeState(s_C1);
+    M0->freeState(s_M0);
+
     return M1->isValid(q_random);
   }
 }
 
 bool PRMQuotient::SampleGraph(ob::State *q_random_graph)
 {
-
   PDF<Edge> pdf = GetEdgePDF();
   if(pdf.empty()){
     std::cout << "cannot sample empty(?) graph" << std::endl;
@@ -191,7 +191,7 @@ bool PRMQuotient::SampleGraph(ob::State *q_random_graph)
     lastSourceVertexSampled = v1;
     lastTargetVertexSampled = v2;
     lastTSampled = t;
-    if(!checkerPtr->isSufficient(q_random_graph)){
+    if(!checkerPtr->IsSufficient(q_random_graph)){
       foundNecessary = true;
     }
   }

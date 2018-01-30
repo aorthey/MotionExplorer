@@ -325,6 +325,21 @@ CSPACE
     void AddContact(const IKGoal& goal);
     void RemoveContact(int link);
     bool SolveContact(int numIters=0,Real tol=0);
+
+-------------------------------------------------------------------------------
+COLLISIONS
+-------------------------------------------------------------------------------
+(Klampt/Planning/RobotCSpace.h)
+-- SingleRobotCSpace  
+  vector<pair<int,int> > collisionPairs;
+  bool CheckCollisionFree();
+  WorldPlannerSettings* settings;
+
+(Klampt/Planning/PlannerSettings.h)
+-- Worldplannersettings
+CheckCollision(world, idrobot, idothers)
+Real DistanceLowerBound(world, idrobot, idothers)
+
 -------------------------------------------------------------------------------
 KINODYNAMIC CSPACE
 -------------------------------------------------------------------------------
