@@ -3,6 +3,7 @@ import pickle as pk
 import sys
 import numpy as np
 import matplotlib.cm as cm
+import matplotlib.colors as colors
 from matplotlib import rc
 rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
 ## for Palatino and other serif fonts use:
@@ -58,12 +59,10 @@ def plotCSpaceDelaunay(PX,PT, maximumEdgeLength = 0.25, continuous=True):
   print tri.simplices
 
   #plt.triplot(PX,PT, triangles, edgecolor='red')#tri.simplices.copy())
-
   #centers = np.sum(pts[triangles], axis=1, dtype='int')/3.0
 
   cx = np.sum(PX[triangles],axis=1)/3.0
   ct = np.sum(PT[triangles],axis=1)/3.0
-
 
   colors = np.array([ (x-1)**2 for x,y in np.vstack((cx,ct)).T])
 
@@ -82,6 +81,32 @@ def plotCSpaceDelaunay(PX,PT, maximumEdgeLength = 0.25, continuous=True):
     plt.text(dxax, 1-dyax,r'$\gg$',transform=ax.transAxes, fontsize=50)
 
   ax.tick_params(axis='both', which='major', pad=15)
+
+def plotCSpaceDelaunayGrey(P1,P2,maximumEdgeLength=0.25):
+  points2D=np.vstack([P1,P2]).T
+  tri = Delaunay(points2D)
+  print tri.simplices.shape, '\n', tri.simplices[0]
+
+  triangles = np.array((tri.simplices[0]))
+  for i in range(0, tri.simplices.shape[0]):
+    simplex = tri.simplices[i]
+    x = tri.points[simplex[0]]
+    y = tri.points[simplex[1]]
+    z = tri.points[simplex[2]]
+    d0 = np.sqrt(np.dot(x-y,x-y))
+    d1 = np.sqrt(np.dot(x-z,x-z))
+    d2 = np.sqrt(np.dot(z-y,z-y))
+    max_edge = max([d0, d1, d2])
+    if max_edge <= maximumEdgeLength:
+      triangles = np.vstack((triangles, simplex))
+
+  print triangles.shape
+  #cx = np.sum(P1[triangles],axis=1)/3.0
+  #ct = np.sum(P2[triangles],axis=1)/3.0
+
+  zFaces = np.ones(triangles.shape[0])
+  cmap = colors.LinearSegmentedColormap.from_list("", [(0.8,0.8,0.8),"grey","grey"])
+  plt.tripcolor(P1, P2, triangles, cmap=cmap, facecolors=zFaces,edgecolors='none')
 
 
 def long_edges(x, y, triangles, radio=22):

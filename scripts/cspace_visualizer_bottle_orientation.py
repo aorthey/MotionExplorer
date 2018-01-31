@@ -30,6 +30,5 @@ plotCSpaceCylindricalProjection(PX,PT)
 plotCSpacePathCylindricalProjection(pathX,pathT)
 plt.savefig("cspace3d.png", bbox_inches='tight')
 
-
 plt.show()
 
