@@ -1,4 +1,5 @@
 #include "planner/strategy/strategy_output.h"
+#include "elements/plannerdata_vertex_annotated.h"
 
 StrategyOutput::StrategyOutput(CSpaceOMPL *cspace_):
   cspace(cspace_)

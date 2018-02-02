@@ -44,9 +44,9 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_):
   if (!sampler_){
     sampler_ = si_->allocValidStateSampler();
   }
-  //if (!simpleSampler_){
-  //  simpleSampler_ = si_->allocStateSampler();
-  //}
+  if (!simpleSampler_){
+    simpleSampler_ = si_->allocStateSampler();
+  }
 
 }
 

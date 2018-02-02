@@ -49,7 +49,7 @@ namespace ompl
         virtual void Grow(double t) = 0;
         virtual bool HasSolution() = 0;
         virtual void CheckForSolution(ob::PathPtr &solution) = 0;
-        double GetSamplingDensity();
+        virtual double GetSamplingDensity();
         virtual uint GetNumberOfVertices() = 0;
         virtual uint GetNumberOfEdges() = 0;
 

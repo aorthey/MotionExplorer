@@ -69,10 +69,11 @@ namespace ompl
           Configuration() = default;
           Configuration(const base::SpaceInformationPtr &si) : state(si->allocState())
           {
-
           }
           ~Configuration() = default;
-          double parent_edge_weight;
+          double parent_edge_weight{0};
+          double openNeighborhoodDistance{0};
+          bool isSufficient{false};
           const base::State *root{nullptr};
           base::State *state{nullptr};
           Configuration *parent{nullptr};

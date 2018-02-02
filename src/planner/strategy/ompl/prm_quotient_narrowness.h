@@ -31,6 +31,13 @@ namespace ompl
       protected:
         virtual PDF<Edge> GetEdgePDF() override;
     };
+    class PRMQuotientNarrowDistance: public og::PRMQuotientNarrow{
+      public:
+        PRMQuotientNarrowDistance(const ob::SpaceInformationPtr &si, Quotient *previous_);
+        virtual double GetSamplingDensity() override;
+      protected:
+        virtual PDF<Edge> GetEdgePDF() override;
+    };
 
   };
 };

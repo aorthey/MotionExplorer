@@ -48,6 +48,15 @@ void MultiQuotient<T,Tlast>::clear(){
   }
   foundKLevelSolution = false;
 }
+void PrintQuotientSpaces(std::vector<Quotient*> quotientSpaces, uint k=0){
+  if(k<=0) k=quotientSpaces.size()-1;
+  for(uint i = 0; i <= k; i++){
+    og::Quotient *Qi = quotientSpaces.at(i);
+    std::cout << ">> level " << i << " vertices " << Qi->GetNumberOfVertices() 
+      << " edges " << Qi->GetNumberOfEdges() 
+      << " density " << Qi->GetSamplingDensity() << std::endl;
+  }
+}
 
 template <class T, class Tlast>
 ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCondition &ptc){
@@ -77,17 +86,13 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
       og::Quotient* jQuotient = Q.top();
       Q.pop();
       jQuotient->Grow(T_GROW);
-
       quotientSpaces.at(k)->CheckForSolution(sol_k);
 
       if(quotientSpaces.at(k)->HasSolution()){
         solutions.push_back(sol_k);
         double t_k_end = ompl::time::seconds(ompl::time::now() - t_k_start);
         std::cout << "Found Solution on Level " << k << " after " << t_k_end << " seconds." << std::endl;
-        for(uint i = 0; i <= k; i++){
-          og::Quotient *Qi = quotientSpaces.at(i);
-          std::cout << ">> level " << i << " vertices " << Qi->GetNumberOfVertices() << " edges " << Qi->GetNumberOfEdges() << std::endl;
-        }
+        PrintQuotientSpaces(quotientSpaces, k);
         foundKLevelSolution = true;
       }
       Q.push(jQuotient);
@@ -96,18 +101,12 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
     if(!foundKLevelSolution){
       std::cout << "could not find a solution on level " << k << std::endl;
       std::cout << "aborting" << std::endl;
-      for(uint i = 0; i <= k; i++){
-        og::Quotient *Qi = quotientSpaces.at(i);
-        std::cout << ">> level " << i << " vertices " << Qi->GetNumberOfVertices() << " edges " << Qi->GetNumberOfEdges() << std::endl;
-      }
+      PrintQuotientSpaces(quotientSpaces, k);
       return ob::PlannerStatus::TIMEOUT;
     }
   }
   std::cout << "Found exact solution" << std::endl;
-  for(uint k = 0; k < quotientSpaces.size(); k++){
-    og::Quotient *Qi = quotientSpaces.at(k);
-    std::cout << ">> level " << k << " vertices " << Qi->GetNumberOfVertices() << " edges " << Qi->GetNumberOfEdges() << std::endl;
-  }
+  PrintQuotientSpaces(quotientSpaces);
 
   base::PathPtr sol;
   quotientSpaces.back()->CheckForSolution(sol);
@@ -120,6 +119,7 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
 
   return ob::PlannerStatus::EXACT_SOLUTION;
 }
+
 
 
 template <class T, class Tlast>

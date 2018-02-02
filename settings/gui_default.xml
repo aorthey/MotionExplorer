@@ -107,11 +107,12 @@
     <active>1</active>
   </checkbox>
 
-  <hotkey>
+  <button>
     <name>save_current_path</name>
     <descr>Save Current Path</descr>
     <key>0</key>
-  </hotkey>
+  </button>
+
   <hotkey>
     <name>load_current_path</name>
     <descr>Load Current Path</descr>

@@ -446,6 +446,21 @@ bool GLUIForceFieldGUI::Initialize()
       checkbox = glui->add_checkbox_to_panel(panel, descr.c_str());
       AddControl(checkbox,v->name.c_str());
       checkbox->set_int_val(v->active);
+    }else if(v->type == GUIVariable::Type::BUTTON){
+      //checkbox = glui->add_checkbox_to_panel(panel, descr.c_str());
+      button = glui->add_button_to_panel(panel, descr.c_str());
+      AddControl(button,v->name.c_str());
+      AddButton(v->name.c_str());
+    }else if(v->type == GUIVariable::Type::HOTKEY){
+      //no graphical representation for hotkey
+    }else if(v->type == GUIVariable::Type::PROPERTY){
+      //no graphical representation for property
+    }else{
+      std::cout << std::string(80, '#') << std::endl;
+      std::cout << "variable type: " << v->type << " unknown." << std::endl;
+      std::cout << "variable " << v->name << " ("<<v->descr << ")" << std::endl;
+      std::cout << std::string(80, '#') << std::endl;
+      exit(0);
     }
   }
   UpdateGUI();

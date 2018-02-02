@@ -38,9 +38,11 @@ double OMPLValidityChecker::Distance(const ob::State* state) const
   res = space->settings->CheckCollision(space->world,idrobot,idothers);
   if(res.first >= 0) return 0;
 
-  //Real DistanceLowerBound(RobotWorld& world,const vector<int>& ids1,const vector<int>& ids2,Real eps=0,Real bound=Inf,int* closest1=NULL,int* closest2=NULL);
-
   double d = space->settings->DistanceLowerBound(space->world, idrobot, idothers);
+  
+  //returns body id of closest
+  //space->settings->DistanceLowerBound(space->world, idrobot, idothers, 0, Inf,int* closest1=NULL,int* closest2=NULL);
+
   return d;
 }
 
@@ -77,7 +79,13 @@ bool OMPLValidityChecker::IsNecessary(const ob::State* state) const
 }
 bool OMPLValidityChecker::IsSufficient(const ob::State* state) const
 {
-  exit(0);
+  static bool first = true;
+  if(first){
+    std::cout << std::string(80, '#') << std::endl;
+    std::cout << "[WARNING] enableSufficiency not activated in XML file" << std::endl;
+    std::cout << std::string(80, '#') << std::endl;
+    first = !first;
+  }
   return false;
 }
 

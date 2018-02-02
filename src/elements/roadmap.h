@@ -55,5 +55,7 @@ class Roadmap{
 
     ob::PlannerDataPtr pds;
     LemonInterface* lemon;
+
+    std::vector<double> distance_vertex_environment;
 };
 typedef std::shared_ptr<Roadmap> RoadmapPtr;

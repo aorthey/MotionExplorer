@@ -54,6 +54,10 @@ namespace ompl
         {
             typedef boost::vertex_property_tag kind;
         };
+        struct vertex_open_neighborhood_distance_t
+        {
+            typedef boost::vertex_property_tag kind;
+        };
 
 
         struct EdgeProperty{
@@ -85,7 +89,9 @@ namespace ompl
                      boost::property<boost::vertex_rank_t, unsigned long int,
                       boost::property<vertex_associated_vertex_target_t, unsigned long int,
                         boost::property<vertex_associated_vertex_source_t, unsigned long int,
-                          boost::property<vertex_associated_t_t, unsigned long int>
+                          boost::property<vertex_open_neighborhood_distance_t, double,
+                            boost::property<vertex_associated_t_t, unsigned long int>
+                          >
                         >
                       >
                      >
@@ -137,6 +143,7 @@ namespace ompl
         boost::property_map<Graph, vertex_associated_vertex_source_t>::type associatedVertexSourceProperty_;
         boost::property_map<Graph, vertex_associated_vertex_target_t>::type associatedVertexTargetProperty_;
         boost::property_map<Graph, vertex_associated_t_t>::type associatedTProperty_;
+        boost::property_map<Graph, vertex_open_neighborhood_distance_t>::type openNeighborhoodDistance_;
 
         ob::OptimizationObjectivePtr opt_;
 
@@ -163,6 +170,8 @@ namespace ompl
         virtual bool Sample(ob::State *q_random); //si->sampler
         virtual bool Connect(const Vertex a, const Vertex b);
         virtual Vertex addMilestone(ob::State *state);
+
+        virtual Vertex CreateNewVertex(ob::State *state);
 
         ob::Cost costHeuristic(Vertex u, Vertex v) const;
         std::vector<ob::State *> xstates;

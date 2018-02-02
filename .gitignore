@@ -12,4 +12,5 @@
 *.zip
 build/
 data/videos/
+data/benchmarks/
 

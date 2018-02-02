@@ -1,5 +1,6 @@
 #include "prm_quotient_narrowness.h"
 #include "planner/cspace/cspace.h"
+#include "planner/validitychecker/validity_checker_ompl.h"
 
 #include <ompl/datastructures/PDF.h>
 #include <boost/foreach.hpp>
@@ -102,4 +103,36 @@ ompl::PDF<Edge> PRMQuotientNarrowMinCut::GetEdgePDF(){
   return pdf;
 }
 
+//******************************************************************************
+//******************************************************************************
+PRMQuotientNarrowDistance::PRMQuotientNarrowDistance(const ob::SpaceInformationPtr &si, Quotient *previous_):
+  PRMQuotientNarrow(si, previous_)
+{
+  setName("PRMQuotientNarrowDistance"+to_string(id));
+}
 
+ompl::PDF<Edge> PRMQuotientNarrowDistance::GetEdgePDF()
+{
+  auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+
+  PDF<Edge> pdf;
+
+  foreach (Edge e, boost::edges(g_))
+  {
+    //ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
+
+    const Vertex v1 = boost::source(e, g_);
+    const Vertex v2 = boost::target(e, g_);
+
+    double d1 = checkerPtr->Distance(stateProperty_[v1]);
+    double d2 = checkerPtr->Distance(stateProperty_[v2]);
+    double d = 1.0/min(d1,d2);
+    pdf.add(e, d);
+  }
+  return pdf;
+}
+
+double PRMQuotientNarrowDistance::GetSamplingDensity()
+{
+  return (double)num_vertices(g_);
+}

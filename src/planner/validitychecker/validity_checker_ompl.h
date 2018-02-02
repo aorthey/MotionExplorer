@@ -14,6 +14,7 @@ class OMPLValidityChecker: public ob::StateValidityChecker
 
     CSpaceOMPL *ompl_space;
     CSpace *inner;
+
 };
 
 class OMPLValidityCheckerInnerOuter: public OMPLValidityChecker

@@ -1,6 +1,7 @@
 #include "roadmap.h"
 #include "gui/drawMotionPlanner.h"
 #include "gui/colors.h"
+#include "elements/plannerdata_vertex_annotated.h"
 #include "planner/validitychecker/validity_checker_ompl.h"
 
 using namespace GLDraw;
@@ -159,11 +160,13 @@ void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *csp
   OMPLValidityCheckerPtr validity_checker = std::static_pointer_cast<OMPLValidityChecker>(cspace->StateValidityCheckerPtr());
 
   for(uint i = 0; i < pd->numVertices(); i++){
-    ob::PlannerDataVertex v = pd->getVertex(i);
+    //ob::PlannerDataVertex v = pd->getVertex(i);
+    PlannerDataVertexAnnotated v = *static_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(i));
     const ob::State* s = v.getState();
     Config q1 = cspace->OMPLStateToConfig(s);
 
     V.push_back(q1);
+    distance_vertex_environment.push_back( v.GetOpenNeighborhoodDistance() );
 
     std::vector<uint> edgeList;
     pd->getEdges(i, edgeList);
@@ -296,10 +299,17 @@ void Roadmap::DrawGL(GUIState& state)
   if(state("draw_roadmap_vertices")){
     setColor(cVertex);
     for(uint vidx = 0; vidx < Nvertices; vidx++){
-      ob::PlannerDataVertex v = pds->getVertex(vidx);
+      //ob::PlannerDataVertex v = pds->getVertex(vidx);
+      PlannerDataVertexAnnotated v = *static_cast<PlannerDataVertexAnnotated*>(&pds->getVertex(vidx));
       if(v!=ob::PlannerData::NO_VERTEX){
+        glPushMatrix();
         Vector3 q = cspace->getXYZ(v.getState());
         drawPoint(q);
+        glTranslate(q);
+        //Xshape
+        double d = v.GetOpenNeighborhoodDistance();
+        drawSphere(d,16,8);
+        glPopMatrix();
       }
     }
   }

@@ -118,7 +118,7 @@ void PRMQuotient::Grow(double t){
   growRoadmap(ob::timedPlannerTerminationCondition(T_grow), xstates[0]);
   expandRoadmap( ob::timedPlannerTerminationCondition(T_expand), xstates);
 }
-double PRMQuotient::getSamplingDensity()
+double PRMQuotient::GetSamplingDensity()
 {
   if(previous == nullptr){
     return (double)num_vertices(g_)/(double)M1->getSpaceMeasure();
@@ -207,8 +207,11 @@ ompl::PDF<og::PRMBasic::Edge> PRMQuotient::GetEdgePDF()
   PDF<Edge> pdf;
   foreach (Edge e, boost::edges(g_))
   {
-    ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
-    pdf.add(e, weight.value());
+    const Vertex v1 = boost::source(e, g_);
+    if(sameComponent(v1, startM_.at(0))){
+      ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
+      pdf.add(e, weight.value());
+    }
   }
   return pdf;
 }

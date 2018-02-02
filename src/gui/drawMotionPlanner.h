@@ -18,6 +18,7 @@
 namespace GLDraw {
   void drawIKextras(ViewRobot *viewrobot, Robot *robot, std::vector<IKGoal> &constraints, std::vector<int> linksInCollision, GLColor selectedLinkColor);
   void drawUniformForceField();
+  void drawSphereAtPosition(Vector3 &pos, double r);
   void drawForceField(WrenchField &wrenchfield);
   void drawWrenchField(WrenchField &wrenchfield);
   void drawCylinderArrowAtPosition(Vector3 &pos, Vector3 &dir, GLColor &color);

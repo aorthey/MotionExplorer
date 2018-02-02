@@ -398,8 +398,7 @@ GUI
 [ ] while path is plotted, somehow keep focus on a locus point on the robot,
 i.e. some tracking ability
 [ ] visualize all paths from multiquotient
-
-[ ] Robot Manipulator
+[x] Robot Manipulator
 [x] rewrite quotient_planner.h to handle specific cases (RN <-> RM, SE3 <->
 SE3RN, R3 <-> SE3, etcetera, instead of trying everything)
-[ ] memory increases for QMP, some structures must be not cleaned up.
+[x] memory increases for QMP, some structures must be not cleaned up.

@@ -1,7 +1,9 @@
 #include "rrt_quotient.h"
 #include "planner/validitychecker/validity_checker_ompl.h"
+#include "elements/plannerdata_vertex_annotated.h"
 #include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/tools/config/SelfConfig.h>
+#include <ompl/base/PlannerData.h>
 
 using namespace ompl::geometric;
 using namespace ompl::base;
@@ -43,10 +45,9 @@ void RRTQuotient::setup()
                               });
   tgi.xstate = si_->allocState();
 }
+
 void RRTQuotient::getPlannerData(base::PlannerData &data) const
 {
-    Planner::getPlannerData(data);
-
     std::vector<Configuration *> configurations;
     if (tStart_)
         tStart_->list(configurations);
@@ -54,10 +55,16 @@ void RRTQuotient::getPlannerData(base::PlannerData &data) const
     for (auto &configuration : configurations)
     {
         if (configuration->parent == nullptr)
-            data.addStartVertex(base::PlannerDataVertex(configuration->state, 1));
-        else
         {
-            data.addEdge(base::PlannerDataVertex(configuration->parent->state, 1), base::PlannerDataVertex(configuration->state, 1));
+          PlannerDataVertexAnnotated v(configuration->state, 1, configuration->openNeighborhoodDistance);
+          data.addStartVertex(v);
+        }else
+        {
+          double d = configuration->openNeighborhoodDistance;
+          double dp = configuration->parent->openNeighborhoodDistance;
+          PlannerDataVertexAnnotated v1(configuration->state, 1, d);
+          PlannerDataVertexAnnotated v2(configuration->parent->state, 1, dp);
+          data.addEdge(v2, v1);
         }
     }
 
@@ -68,16 +75,27 @@ void RRTQuotient::getPlannerData(base::PlannerData &data) const
     for (auto &configuration : configurations)
     {
         if (configuration->parent == nullptr)
-            data.addGoalVertex(base::PlannerDataVertex(configuration->state, 2));
-        else
         {
-            // The edges in the goal tree are reversed to be consistent with start tree
-            data.addEdge(base::PlannerDataVertex(configuration->state, 2), base::PlannerDataVertex(configuration->parent->state, 2));
+          PlannerDataVertexAnnotated v(configuration->state, 2, configuration->openNeighborhoodDistance);
+          data.addGoalVertex(v);
+        }else
+        {
+          double d = configuration->openNeighborhoodDistance;
+          double dp = configuration->parent->openNeighborhoodDistance;
+          PlannerDataVertexAnnotated v1(configuration->state, 2, d);
+          PlannerDataVertexAnnotated v2(configuration->parent->state, 2, dp);
+          data.addEdge(v1, v2);
         }
     }
 
-    // Add the edge connecting the two trees
     data.addEdge(data.vertexIndex(connectionPoint_.first), data.vertexIndex(connectionPoint_.second));
+
+    //std::cout << std::string(80, '-') << std::endl;
+    //for(uint k = 0; k < data.numVertices(); k++){
+    //  PlannerDataVertexAnnotated v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(k));
+    //  std::cout << v.GetOpenNeighborhoodDistance() << std::endl;
+    //}
+    //std::cout << std::string(80, '-') << std::endl;
 }
 
 
@@ -161,11 +179,12 @@ RRTQuotient::GrowState RRTQuotient::growTree(TreeData &tree, TreeGrowingInfo &tg
       configuration->root = nconfiguration->root;
       configuration->parent_edge_weight = distanceFunction(configuration, configuration->parent);
 
-      auto checkerPtr = static_pointer_cast<OMPLValidityCheckerNecessarySufficient>(si_->getStateValidityChecker());
-      if(checkerPtr->IsSufficient(configuration->state) && configuration->parent
-          &&checkerPtr->IsSufficient(configuration->parent->state))
+      auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+      configuration->openNeighborhoodDistance = checkerPtr->Distance(configuration->state);
+
+      if(checkerPtr->IsSufficient(configuration->state))
       {
-        configuration->parent_edge_weight = 0;
+        configuration->isSufficient = true;
       }
 
       tgi.xconfiguration = configuration;
@@ -377,16 +396,19 @@ bool RRTQuotient::SampleGraph(ob::State *q_random_graph)
 
   Configuration *q = pdf.sample(rng_.uniform01());
   double t = rng_.uniform01();
-  if(t<0.05){
-    double tc = rng_.uniform01();
-    const ob::State *from = connectionPoint_.first;
-    const ob::State *to = connectionPoint_.second;
-    M1->getStateSpace()->interpolate(from, to, tc, q_random_graph);
-  }else{
-    const ob::State *from = q->state;
-    const ob::State *to = q->parent->state;
-    M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
-  }
+  //if(t<0.05){
+  //  double tc = rng_.uniform01();
+  //  const ob::State *from = connectionPoint_.first;
+  //  const ob::State *to = connectionPoint_.second;
+  //  M1->getStateSpace()->interpolate(from, to, tc, q_random_graph);
+  //}else{
+  //  const ob::State *from = q->state;
+  //  const ob::State *to = q->parent->state;
+  //  M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
+  //}
+  const ob::State *from = q->state;
+  const ob::State *to = q->parent->state;
+  M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
 
   return true;
 }

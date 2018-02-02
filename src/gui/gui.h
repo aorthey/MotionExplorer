@@ -82,6 +82,7 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
     GLUI_Checkbox* checkbox;
     GLUI_FileBrowser *browser;
     GLUI_Button* button_file_load;
+    GLUI_Button* button;
     GLUI_Listbox* linkBox;
 
 };

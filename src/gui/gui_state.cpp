@@ -120,6 +120,25 @@ bool GUIState::Load(TiXmlElement *node)
     node_state = FindNextSiblingNode(node_state, "hotkey");
   }
   //################################################################################
+  //buttons variables
+  //################################################################################
+  node_state = FindSubNode(node, "button");
+
+  while(node_state!=NULL){
+    GUIVariable* v = new GUIVariable();
+
+    TiXmlElement* node_name = FindSubNode(node_state, "name");
+    TiXmlElement* node_descr = FindSubNode(node_state, "descr");
+    TiXmlElement* node_key = FindSubNode(node_state, "key");
+    if(node_name) GetStreamText(node_name) >> v->name;
+    if(node_descr) std::getline(GetStreamText(node_descr), v->descr);
+    if(node_key) GetStreamText(node_key) >> v->key;
+
+    v->type = GUIVariable::Type::BUTTON;
+    variables[v->name] = v;
+    node_state = FindNextSiblingNode(node_state, "button");
+  }
+  //################################################################################
   //properties (fixed active variables)
   //################################################################################
   node_state = FindSubNode(node, "property");

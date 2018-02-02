@@ -184,12 +184,7 @@ void PRMBasic::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
 
         for (unsigned int i = 0; i < s; ++i)
         {
-          // add the vertex along the bouncing motion
-          Vertex m = boost::add_vertex(g_);
-          stateProperty_[m] = si_->cloneState(workStates[i]);
-          totalConnectionAttemptsProperty_[m] = 1;
-          successfulConnectionAttemptsProperty_[m] = 0;
-          disjointSets_.make_set(m);
+          Vertex m = CreateNewVertex(workStates[i]);
 
           // add the edge to the parent vertex
           EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[m]));
@@ -316,13 +311,10 @@ ob::PathPtr PRMBasic::constructSolution(const Vertex &start, const Vertex &goal)
     return p;
 }
 
+
 PRMBasic::Vertex PRMBasic::addMilestone(ob::State *state)
 {
-  Vertex m = boost::add_vertex(g_);
-  stateProperty_[m] = state;
-  totalConnectionAttemptsProperty_[m] = 1;
-  successfulConnectionAttemptsProperty_[m] = 0;
-  disjointSets_.make_set(m);
+  Vertex m = CreateNewVertex(state);
 
   const std::vector<Vertex> &neighbors = connectionStrategy_(m);
 
@@ -338,6 +330,15 @@ PRMBasic::Vertex PRMBasic::addMilestone(ob::State *state)
 
   nn_->add(m);
 
+  return m;
+}
+PRMBasic::Vertex PRMBasic::CreateNewVertex(ob::State *state)
+{
+  Vertex m = boost::add_vertex(g_);
+  stateProperty_[m] = si_->cloneState(state);
+  totalConnectionAttemptsProperty_[m] = 1;
+  successfulConnectionAttemptsProperty_[m] = 0;
+  disjointSets_.make_set(m);
   return m;
 }
 
