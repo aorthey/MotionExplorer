@@ -61,6 +61,12 @@ PRMBasic::~PRMBasic(){
   }
 }
 
+void PRMBasic::ClearVertices()
+{
+  foreach (Vertex v, boost::vertices(g_)){
+    si_->freeState(stateProperty_[v]);
+  }
+}
 void PRMBasic::clear()
 {
   Planner::clear();
@@ -72,9 +78,7 @@ void PRMBasic::clear()
   //if (!simpleSampler_){
   //  simpleSampler_ = si_->allocStateSampler();
   //}
-  foreach (Vertex v, boost::vertices(g_)){
-    si_->freeState(stateProperty_[v]);
-  }
+  ClearVertices();
   g_.clear();
   if (nn_){
     nn_->clear();

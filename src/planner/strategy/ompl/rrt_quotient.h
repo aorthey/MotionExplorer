@@ -1,7 +1,6 @@
 #pragma once
 #include "quotient.h"
 #include <ompl/base/Planner.h>
-#include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/util/RandomNumbers.h>
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
@@ -13,6 +12,9 @@
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
+//based on <ompl/geometric/planners/rrt/RRTConnect.h> 
+// bidirectional RRT
+
 namespace ompl
 {
   namespace geometric
@@ -20,23 +22,15 @@ namespace ompl
     class RRTQuotient : public Quotient
     {
     public:
-        //RRTQuotient(const base::SpaceInformationPtr &si, PRMQuotient *previous_);
         RRTQuotient(const base::SpaceInformationPtr &si, Quotient *previous_ = nullptr);
         ~RRTQuotient();
 
         void getPlannerData(base::PlannerData &data) const override;
         base::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
         void clear() override;
+        void setRange(double distance);
+        double getRange() const;
 
-        void setRange(double distance)
-        {
-            maxDistance_ = distance;
-        }
-
-        double getRange() const
-        {
-            return maxDistance_;
-        }
         void Init();
 
         virtual bool SampleGraph(ob::State *q_random_graph) override;

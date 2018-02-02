@@ -61,7 +61,7 @@ namespace ompl
         static uint counter;
         uint id;
 
-        enum QuotientSpaceType{ UNKNOWN, RN_RM, SE2_R2, SE3_R3, SE3RN_SE3, SE3RN_SE3RM };
+        enum QuotientSpaceType{ UNKNOWN, ATOMIC_RN, RN_RM, SE2_R2, SE3_R3, SE3RN_SE3, SE3RN_SE3RM };
 
         QuotientSpaceType type;
         uint M1_dimension;

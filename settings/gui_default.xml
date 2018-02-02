@@ -100,13 +100,11 @@
     <key>5</key>
     <active>0</active>
   </checkbox>
-  <checkbox>
+  <button>
     <name>toggle_mode</name>
     <descr>Toggle Mode</descr>
     <key>m</key>
-    <active>1</active>
-  </checkbox>
-
+  </button>
   <button>
     <name>save_current_path</name>
     <descr>Save Current Path</descr>
@@ -118,6 +116,19 @@
     <descr>Load Current Path</descr>
     <key>9</key>
   </hotkey>
+
+  <button>
+    <name>roadmap_visualize_level_0</name>
+    <descr>Roadmap Vis Level 0</descr>
+    <key>7</key>
+    <active>1</active>
+  </button>
+  <button>
+    <name>roadmap_visualize_level_1</name>
+    <descr>Roadmap Vis Level 1</descr>
+    <key>8</key>
+    <active>1</active>
+  </button>
 
   <hotkey>
     <name>reset</name>

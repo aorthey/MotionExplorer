@@ -287,6 +287,49 @@ void Roadmap::removeInfeasibleEdgeAlongShortestPath(uint index){
   lemon = new LemonInterface(pds);
 }
 
+void Roadmap::DrawSingleLevelGL(GUIState &state, uint lvl)
+{
+  uint ctr = 0;
+  if(state("draw_roadmap_vertices")){
+    setColor(cVertex);
+    for(uint vidx = 0; vidx < Nvertices; vidx++){
+      PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&pds->getVertex(vidx));
+      if(v!=ob::PlannerData::NO_VERTEX){
+        glPushMatrix();
+        Vector3 q = cspace->getXYZ(v.getState());
+        if(v.GetLevel()==lvl){
+          ctr++;
+          drawPoint(q);
+          glTranslate(q);
+          double d = v.GetOpenNeighborhoodDistance();
+          drawSphere(d,16,8);
+        }
+        glPopMatrix();
+      }
+    }
+  }
+  std::cout << ctr << " vertices" << std::endl;
+  glLineWidth(5);
+  if(state("draw_roadmap_edges")){
+    setColor(cEdge);
+    for(uint vidx = 0; vidx < Nvertices; vidx++){
+      PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&pds->getVertex(vidx));
+      if(v==ob::PlannerData::NO_VERTEX) continue;
+      if(v.GetLevel()==lvl){
+        std::vector<uint> edgeList;
+        pds->getEdges(vidx, edgeList);
+        for(uint j = 0; j < edgeList.size(); j++){
+          PlannerDataVertexAnnotated &w = *static_cast<PlannerDataVertexAnnotated*>(&pds->getVertex(edgeList.at(j)));
+          if(w==ob::PlannerData::NO_VERTEX) continue;
+          Vector3 v1 = cspace->getXYZ(v.getState());
+          Vector3 v2 = cspace->getXYZ(w.getState());
+          drawLineSegment(v1,v2);
+        }
+      }
+    }
+  }
+
+}
 void Roadmap::DrawGL(GUIState& state)
 {
   if(!pds) return;
@@ -295,48 +338,14 @@ void Roadmap::DrawGL(GUIState& state)
   glEnable(GL_BLEND); 
 
   glPointSize(10);
-
-  if(state("draw_roadmap_vertices")){
-    setColor(cVertex);
-    for(uint vidx = 0; vidx < Nvertices; vidx++){
-      //ob::PlannerDataVertex v = pds->getVertex(vidx);
-      PlannerDataVertexAnnotated v = *static_cast<PlannerDataVertexAnnotated*>(&pds->getVertex(vidx));
-      if(v!=ob::PlannerData::NO_VERTEX){
-        glPushMatrix();
-        Vector3 q = cspace->getXYZ(v.getState());
-        drawPoint(q);
-        glTranslate(q);
-        //Xshape
-        double d = v.GetOpenNeighborhoodDistance();
-        drawSphere(d,16,8);
-        glPopMatrix();
-      }
-    }
-  }
-  glLineWidth(5);
-  if(state("draw_roadmap_edges")){
-    setColor(cEdge);
-    for(uint vidx = 0; vidx < Nvertices; vidx++){
-      ob::PlannerDataVertex v = pds->getVertex(vidx);
-      if(v==ob::PlannerData::NO_VERTEX) continue;
-      std::vector<uint> edgeList;
-      pds->getEdges(vidx, edgeList);
-      for(uint j = 0; j < edgeList.size(); j++){
-        ob::PlannerDataVertex w = pds->getVertex(edgeList.at(j));
-        if(w==ob::PlannerData::NO_VERTEX) continue;
-        Vector3 v1 = cspace->getXYZ(v.getState());
-        Vector3 v2 = cspace->getXYZ(w.getState());
-        drawLineSegment(v1,v2);
-      }
-    }
-    setColor(cEdgeRemoved);
-    for(uint k = 0; k < E_removed.size(); k++){
-      std::pair<Config,Config> e = E_removed.at(k);
-      Config q1 = e.first;
-      Config q2 = e.second;
-      Vector3 v1(q1(0),q1(1),q1(2));
-      Vector3 v2(q2(0),q2(1),q2(2));
-      drawLineSegment(v1,v2);
+  PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&pds->getVertex(0));
+  
+  uint N = v.GetMaxLevel();
+  for(uint k = 0; k < N; k++){
+    std::string str = "roadmap_visualize_level_" + to_string(k);
+    if(state(str.c_str())){
+      std::cout << "LEVEL" << k << std::endl;
+      DrawSingleLevelGL(state, k);
     }
   }
 

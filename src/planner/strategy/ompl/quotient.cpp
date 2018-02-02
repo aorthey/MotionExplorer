@@ -26,8 +26,10 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_):
   setName("Quotient"+std::to_string(id));
   if(previous == nullptr){
     std::cout << "M1 dimension : " << M1_space->getDimension() << std::endl;
+    type = ATOMIC_RN;
   }else{
     const StateSpacePtr M0_space = previous->getSpaceInformation()->getStateSpace();
+
     //C1 = M1 / M0
     const StateSpacePtr C1_space = ComputeQuotientSpace(M1_space, M0_space);
 

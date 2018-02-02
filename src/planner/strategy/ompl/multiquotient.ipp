@@ -1,4 +1,5 @@
 #include "multiquotient.h"
+#include "elements/plannerdata_vertex_annotated.h"
 #include <ompl/util/Time.h>
 #include <queue>
 
@@ -140,6 +141,42 @@ void MultiQuotient<T,Tlast>::setProblemDefinition(const ob::ProblemDefinitionPtr
 
 template <class T, class Tlast>
 void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
-  quotientSpaces.back()->getPlannerData(data);
+  uint Nvertices = data.numVertices();
+  if(Nvertices>0){
+    std::cout << "cannot get planner data if plannerdata is already populated" << std::endl;
+    std::cout << "PlannerData has " << Nvertices << " vertices." << std::endl;
+    exit(0);
+  }
+  uint K = max(solutions.size()+1,quotientSpaces.size());
+  for(uint k = 0; k < K; k++){
+    //get all vertices
+    quotientSpaces.at(k)->getPlannerData(data);
+
+    //remove start and goal vertices for all expect the last space
+    if(k<K-1){
+      uint Nstart = data.numStartVertices();
+      uint Ngoal = data.numGoalVertices();
+      for(uint i = 0; i < Nstart; i++){
+        uint sidx = data.getStartIndex(i);
+        data.removeVertex(sidx);
+      }
+      for(uint i = 0; i < Ngoal; i++){
+        uint sidx = data.getGoalIndex(i);
+        data.removeVertex(sidx);
+      }
+    }
+
+    //label all new vertices
+    uint ctr = 0;
+    for(uint vidx = Nvertices; vidx < data.numVertices(); vidx++){
+      ctr++;
+      PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
+      v.SetLevel(k);
+      v.SetMaxLevel(K);
+    }
+    std::cout << "multiquotient: added " << ctr << " vertices on level " << k << std::endl;
+    Nvertices = data.numVertices();
+  }
+  //quotientSpaces.back()->getPlannerData(data);
 }
 

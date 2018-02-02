@@ -19,6 +19,7 @@ class Roadmap{
     void CreateFromPlannerDataOnlyNecessary(const ob::PlannerDataPtr pd, CSpaceOMPL *cspace_);
 
     virtual void DrawGL(GUIState&);
+    void DrawSingleLevelGL(GUIState &, uint);
 
     void SetVertices(const std::vector<Config>&);
     void SetEdges(const std::vector<std::pair<Config,Config>>&);

@@ -24,10 +24,13 @@ namespace ompl
         virtual Vertex CreateNewVertex(ob::State *state) override;
 
         virtual void getPlannerData(ob::PlannerData &data) const override;
+
+        virtual void ClearVertices() override;
       protected:
 
         virtual bool SampleGraph(ob::State*) override;
-        //virtual ompl::PDF<og::PRMBasic::Edge> GetEdgePDF();
+
+        virtual bool Connect(const Vertex a, const Vertex b) override;
 
     };
 

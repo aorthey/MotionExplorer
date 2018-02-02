@@ -25,6 +25,16 @@ RRTQuotient::~RRTQuotient()
   freeMemory();
 }
 
+void RRTQuotient::setRange(double distance)
+{
+  maxDistance_ = distance;
+}
+
+double RRTQuotient::getRange() const
+{
+  return maxDistance_;
+}
+
 void RRTQuotient::setup()
 {
   Planner::setup();

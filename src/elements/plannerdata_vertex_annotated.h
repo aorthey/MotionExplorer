@@ -7,11 +7,11 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
 {
   public:
     PlannerDataVertexAnnotated(const ob::State *st, int tag=0, double d_ = 1):
-      ob::PlannerDataVertex(st,tag), open_neighborhood_distance(d_)
+      ob::PlannerDataVertex(st,tag), open_neighborhood_distance(d_), level(-1), max_level(0)
     {
     }
     PlannerDataVertexAnnotated(const ob::State *st, double d_ = 1):
-      ob::PlannerDataVertex(st), open_neighborhood_distance(d_)
+      ob::PlannerDataVertex(st), open_neighborhood_distance(d_), level(-1), max_level(0)
     {
     }
     PlannerDataVertexAnnotated (const PlannerDataVertexAnnotated &rhs) : ob::PlannerDataVertex(rhs.state_, rhs.tag_)
@@ -30,6 +30,18 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
     {
       return new PlannerDataVertexAnnotated(*this);
     }
+    void SetLevel(uint level_){
+      level = level_;
+    }
+    uint GetLevel(){
+      return level;
+    }
+    void SetMaxLevel(uint level_){
+      max_level = level_;
+    }
+    uint GetMaxLevel(){
+      return max_level;
+    }
 
     //virtual bool operator==(const PlannerDataVertex &rhs) const override
     //{
@@ -39,6 +51,8 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
 
   protected:
     double open_neighborhood_distance;
+    uint level;
+    uint max_level;
 
     //template <class Archive>
     //void serialize(Archive & ar, const unsigned int version)

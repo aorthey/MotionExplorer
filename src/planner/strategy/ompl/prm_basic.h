@@ -1,6 +1,7 @@
 #pragma once
 
 #include "quotient.h"
+#include "planner/cover/open_set.h"
 #include <ompl/geometric/planners/PlannerIncludes.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <ompl/base/Cost.h>
@@ -58,6 +59,10 @@ namespace ompl
         {
             typedef boost::vertex_property_tag kind;
         };
+        struct vertex_open_neighborhood_t
+        {
+            typedef boost::vertex_property_tag kind;
+        };
 
 
         struct EdgeProperty{
@@ -90,7 +95,9 @@ namespace ompl
                       boost::property<vertex_associated_vertex_target_t, unsigned long int,
                         boost::property<vertex_associated_vertex_source_t, unsigned long int,
                           boost::property<vertex_open_neighborhood_distance_t, double,
-                            boost::property<vertex_associated_t_t, unsigned long int>
+                            boost::property<vertex_open_neighborhood_t, cover::OpenSet*,
+                              boost::property<vertex_associated_t_t, unsigned long int>
+                            >
                           >
                         >
                       >
@@ -131,9 +138,11 @@ namespace ompl
         void setProblemDefinition(const ob::ProblemDefinitionPtr &pdef) override;
         ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override;
 
-        void clearQuery();
-        void clear() override;
         void setup() override;
+
+        virtual void clear() override;
+        void clearQuery();
+        virtual void ClearVertices();
 
         Graph g_;
 
@@ -144,6 +153,7 @@ namespace ompl
         boost::property_map<Graph, vertex_associated_vertex_target_t>::type associatedVertexTargetProperty_;
         boost::property_map<Graph, vertex_associated_t_t>::type associatedTProperty_;
         boost::property_map<Graph, vertex_open_neighborhood_distance_t>::type openNeighborhoodDistance_;
+        boost::property_map<Graph, vertex_open_neighborhood_t>::type openNeighborhood_;
 
         ob::OptimizationObjectivePtr opt_;
 

@@ -61,6 +61,10 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     path = planners.at(active_planner)->GetPath();
   }else if(cmd=="draw_sweptvolume"){
     state("draw_sweptvolume").toggle();
+  }else if(cmd=="roadmap_visualize_level_0"){
+    state("roadmap_visualize_level_0").toggle();
+  }else if(cmd=="roadmap_visualize_level_1"){
+    state("roadmap_visualize_level_1").toggle();
   }else if(cmd=="draw_roadmap"){
     state("draw_roadmap").toggle();
   }else if(cmd=="draw_roadmap_vertices"){

@@ -10,6 +10,8 @@
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
+//based on <ompl/geometric/planners/rrt/RRT.h>
+// unidirectional RRT
 
 namespace ompl
 {

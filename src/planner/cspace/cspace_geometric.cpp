@@ -235,31 +235,6 @@ ob::ScopedState<> GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q){
   qomplSE3->setXYZ(q[0],q[1],q[2]);
   OMPLSO3StateSpaceFromEulerXYZ(q(3),q(4),q(5),qomplSO3);
 
-  //qomplSO3->setIdentity();
-
-  ////q SE3: X Y Z yaw pitch roll
-  ////double yaw = q[3];
-  ////double pitch = q[4];
-  ////double roll = q[5];
-
-  //Math3D::EulerAngleRotation Reuler(q(5),q(4),q(3));
-  //Matrix3 R;
-  //Reuler.getMatrixXYZ(R);
-
-  //QuaternionRotation qr;
-  //qr.setMatrix(R);
-
-  //double qx,qy,qz,qw;
-  //qr.get(qw,qx,qy,qz);
-
-  //qomplSO3->x = qx;
-  //qomplSO3->y = qy;
-  //qomplSO3->z = qz;
-  //qomplSO3->w = qw;
-
-  //Math3D::Matrix3 qrM;
-  //qr.getMatrix(qrM);
-
   if(Nompl>0){
     double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
     for(uint i = 0; i < Nklampt; i++){
@@ -273,40 +248,12 @@ ob::ScopedState<> GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q){
 Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState){
   const ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
 
-  //std::vector<double> reals;
-  //s->copyToReals(reals, qomplRnState);
-  //uint N =  space->getDimension() - 6;
-
   Config q;
   q.resize(6+Nklampt);
 
   q(0) = qomplSE3->getX();
   q(1) = qomplSE3->getY();
   q(2) = qomplSE3->getZ();
-
-  //double qx = qomplSO3->x;
-  //double qy = qomplSO3->y;
-  //double qz = qomplSO3->z;
-  //double qw = qomplSO3->w;
-
-  //Math3D::QuaternionRotation qr(qw, qx, qy, qz);
-  //Math3D::Matrix3 qrM;
-  //qr.getMatrix(qrM);
-  //Math3D::EulerAngleRotation R;
-  //R.setMatrixXYZ(qrM);
-
-  //q(3) = R[2];
-  //q(4) = R[1];
-  //q(5) = R[0];
-
-  //if(q(3)<-M_PI) q(3)+=2*M_PI;
-  //if(q(3)>M_PI) q(3)-=2*M_PI;
-
-  //if(q(4)<-M_PI/2) q(4)+=M_PI;
-  //if(q(4)>M_PI/2) q(4)-=M_PI;
-
-  //if(q(5)<-M_PI) q(5)+=2*M_PI;
-  //if(q(5)>M_PI) q(5)-=2*M_PI;
 
   std::vector<double> rxyz = EulerXYZFromOMPLSO3StateSpace(qomplSO3);
   q(3) = rxyz.at(0);
