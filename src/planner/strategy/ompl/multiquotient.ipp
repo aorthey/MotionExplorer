@@ -94,6 +94,7 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
         double t_k_end = ompl::time::seconds(ompl::time::now() - t_k_start);
         std::cout << "Found Solution on Level " << k << " after " << t_k_end << " seconds." << std::endl;
         PrintQuotientSpaces(quotientSpaces, k);
+        //if(t_k_end < 1) continue;
         foundKLevelSolution = true;
       }
       Q.push(jQuotient);
@@ -147,7 +148,13 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
     std::cout << "PlannerData has " << Nvertices << " vertices." << std::endl;
     exit(0);
   }
-  uint K = max(solutions.size()+1,quotientSpaces.size());
+
+
+  uint K = min(solutions.size()+1,quotientSpaces.size());
+  std::cout << "get vertices from " << K << "quotient spaces." << std::endl;
+  std::cout << "solutions.size()+1    : " << solutions.size()+1 << std::endl;
+  std::cout << "quotientSpaces.size() : " << quotientSpaces.size() << std::endl;
+
   for(uint k = 0; k < K; k++){
     og::Quotient *Qk = quotientSpaces.at(k);
     //get all vertices
@@ -182,12 +189,12 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
         og::Quotient *Qm = quotientSpaces.at(m);
         ob::State *s_C1 = Qm->getC1()->allocState();
         ob::State *s_M1 = Qm->getSpaceInformation()->allocState();
-        quotientSpaces.at(m-1)->getSpaceInformation()->printState(s_M0);
+        //quotientSpaces.at(m-1)->getSpaceInformation()->printState(s_M0);
         Qm->SampleC1(s_C1);
         Qm->mergeStates(s_M0, s_C1, s_M1);
         Qm->getC1()->freeState(s_M0);
         Qm->getC1()->freeState(s_C1);
-        Qm->getSpaceInformation()->printState(s_M1);
+        //Qm->getSpaceInformation()->printState(s_M1);
         s_M0 = s_M1;
       }
       v.setState(s_M0);

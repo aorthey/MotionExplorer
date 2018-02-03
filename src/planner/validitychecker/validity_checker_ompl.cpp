@@ -12,6 +12,33 @@ bool OMPLValidityChecker::isValid(const ob::State* state) const
   SingleRobotCSpace* csi = static_cast<SingleRobotCSpace*>(inner);
   return IsCollisionFree(csi, q);
 }
+void GetGeometries2(RobotWorld& world,const vector<int>& ids,vector<Geometry::AnyCollisionGeometry3D*>& geoms,vector<int>& activeids)
+{
+  geoms.reserve(ids.size());
+  activeids.reserve(ids.size());
+  for(size_t i=0;i<ids.size();i++) {
+    int robotindex = world.IsRobot(ids[i]);;
+    if(robotindex >=0) {
+      //crud, have to expand
+      Robot* robot = world.robots[robotindex];
+      for(size_t j=0;j<robot->links.size();j++) {
+  Geometry::AnyCollisionGeometry3D* g=robot->geometry[j];
+  if(g && !g->Empty()) {
+    geoms.push_back(g);
+    activeids.push_back(world.RobotLinkID(robotindex,j));
+  }
+      }
+    }
+    else {
+      Geometry::AnyCollisionGeometry3D* g=world.GetGeometry(ids[i]);
+      if(g && !g->Empty()) {
+  geoms.push_back(g);
+  activeids.push_back(ids[i]);
+      }
+    }
+  }
+}
+
 
 double OMPLValidityChecker::Distance(const ob::State* state) const
 {
@@ -25,9 +52,13 @@ double OMPLValidityChecker::Distance(const ob::State* state) const
   vector<int> idrobot(1,id);
   vector<int> idothers;
   for(size_t i=0;i<space->world.terrains.size();i++)
+  {
     idothers.push_back(space->world.TerrainID(i));
+  }
   for(size_t i=0;i<space->world.rigidObjects.size();i++)
+  {
     idothers.push_back(space->world.RigidObjectID(i));
+  }
 
   pair<int,int> res;
 
@@ -38,8 +69,39 @@ double OMPLValidityChecker::Distance(const ob::State* state) const
   res = space->settings->CheckCollision(space->world,idrobot,idothers);
   if(res.first >= 0) return 0;
 
-  double d = space->settings->DistanceLowerBound(space->world, idrobot, idothers);
-  
+  int closest1, closest2;
+  double d = space->settings->DistanceLowerBound(space->world, idrobot, idothers, 0, dInf, &closest1, &closest2);
+  ////------------------------------->
+  //std::vector<Geometry::AnyCollisionGeometry3D*> geoms1,geoms2;
+  //vector<int> activeids1,activeids2;
+
+  //GetGeometries2(space->world,idrobot,geoms1,activeids1);
+  //GetGeometries2(space->world,idothers,geoms2,activeids2);
+
+  //vector<AABB3D> bbs1(geoms1.size());
+  //vector<AABB3D> bbs2(geoms2.size());
+  //for(size_t i=0;i<geoms1.size();i++) 
+  //{
+  //  bbs1[i]=geoms1[i]->GetAABB();
+  //  std::cout << bbs1[i].bmin << std::endl;
+  //  std::cout << bbs1[i].bmax << std::endl;
+  //}
+  //for(size_t i=0;i<geoms2.size();i++) 
+  //{
+  //  bbs2[i]=geoms2[i]->GetAABB();
+  //  std::cout << bbs2[i].bmin << std::endl;
+  //  std::cout << bbs2[i].bmax << std::endl;
+  //}
+
+  //int closest1, closest2;
+  //double d = space->settings->DistanceLowerBound(space->world, idrobot, idothers, 0, dInf, &closest1, &closest2);
+  //std::cout << std::string(80, '-') << std::endl;
+  //std::cout << d << std::endl;
+  //std::cout << closest1 << std::endl;
+  //std::cout << closest2 << std::endl;
+  //
+  //exit(0);
+  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
   //returns body id of closest
   //space->settings->DistanceLowerBound(space->world, idrobot, idothers, 0, Inf,int* closest1=NULL,int* closest2=NULL);
 
