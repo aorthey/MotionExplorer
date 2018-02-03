@@ -115,7 +115,7 @@ void ForceFieldBackend::RenderWorld()
   glEnable(GL_BLEND); 
   glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
-  drawDesired=0;
+  //drawDesired=0;
 
   for(size_t i=0;i<world->terrains.size();i++){
     Terrain *terra = world->terrains[i];
@@ -408,8 +408,14 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     }
     std::cout << "Changed Mode to: "<<click_mode << std::endl;
   }else if(cmd=="print_config") {
-    for(uint k = 0; k < world->robots.size(); k++){
-      std::cout << "Robot " << world->robots[k]->name << " : " << world->robots[k]->q <<std::endl;
+    if(drawDesired){
+      for(uint k = 0; k < world->robots.size(); k++){
+        std::cout << "Robot " << world->robots[k]->name << " : " << std::endl << robotWidgets[k].Pose() << std::endl;
+      }
+    }else{
+      for(uint k = 0; k < world->robots.size(); k++){
+        std::cout << "Robot " << world->robots[k]->name << " : " << std::endl << world->robots[k]->q <<std::endl;
+      }
     }
   }else if(cmd=="print_robot_info"){
     Info info;

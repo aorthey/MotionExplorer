@@ -68,6 +68,7 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
     input->enableSufficiency = enableSufficiency;
     input->isSE2 = isSE2;
     input->name_sampler = name_sampler;
+    input->pathSpeed = pathSpeed;
 
     if(!input->Load(node_plannerinput)) return false;
 
