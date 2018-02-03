@@ -71,39 +71,6 @@ double OMPLValidityChecker::Distance(const ob::State* state) const
 
   int closest1, closest2;
   double d = space->settings->DistanceLowerBound(space->world, idrobot, idothers, 0, dInf, &closest1, &closest2);
-  ////------------------------------->
-  //std::vector<Geometry::AnyCollisionGeometry3D*> geoms1,geoms2;
-  //vector<int> activeids1,activeids2;
-
-  //GetGeometries2(space->world,idrobot,geoms1,activeids1);
-  //GetGeometries2(space->world,idothers,geoms2,activeids2);
-
-  //vector<AABB3D> bbs1(geoms1.size());
-  //vector<AABB3D> bbs2(geoms2.size());
-  //for(size_t i=0;i<geoms1.size();i++) 
-  //{
-  //  bbs1[i]=geoms1[i]->GetAABB();
-  //  std::cout << bbs1[i].bmin << std::endl;
-  //  std::cout << bbs1[i].bmax << std::endl;
-  //}
-  //for(size_t i=0;i<geoms2.size();i++) 
-  //{
-  //  bbs2[i]=geoms2[i]->GetAABB();
-  //  std::cout << bbs2[i].bmin << std::endl;
-  //  std::cout << bbs2[i].bmax << std::endl;
-  //}
-
-  //int closest1, closest2;
-  //double d = space->settings->DistanceLowerBound(space->world, idrobot, idothers, 0, dInf, &closest1, &closest2);
-  //std::cout << std::string(80, '-') << std::endl;
-  //std::cout << d << std::endl;
-  //std::cout << closest1 << std::endl;
-  //std::cout << closest2 << std::endl;
-  //
-  //exit(0);
-  //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-  //returns body id of closest
-  //space->settings->DistanceLowerBound(space->world, idrobot, idothers, 0, Inf,int* closest1=NULL,int* closest2=NULL);
 
   return d;
 }

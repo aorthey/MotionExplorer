@@ -39,7 +39,7 @@
     <name>draw_distance_robot_terrain</name>
     <descr>Draw Distance Robot Terrain</descr>
     <key></key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_com_path</name>

@@ -1,6 +1,7 @@
 #include "prm_basic.h"
 #include "GoalVisitor.hpp"
 #include "planner/validitychecker/validity_checker_ompl.h"
+#include "elements/plannerdata_vertex_annotated.h"
 
 #include <ompl/geometric/planners/prm/ConnectionStrategy.h>
 #include <ompl/base/goals/GoalSampleableRegion.h>
@@ -350,18 +351,18 @@ void PRMBasic::getPlannerData(ob::PlannerData &data) const
 {
   for (unsigned long i : startM_)
     data.addStartVertex(
-      ob::PlannerDataVertex(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
+      PlannerDataVertexAnnotated(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
 
   for (unsigned long i : goalM_)
     data.addGoalVertex(
-      ob::PlannerDataVertex(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
+      PlannerDataVertexAnnotated(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
 
   std::cout << "  edges : " << boost::num_edges(g_) << std::endl;
   foreach (const Edge e, boost::edges(g_))
   {
     const Vertex v1 = boost::source(e, g_);
     const Vertex v2 = boost::target(e, g_);
-    data.addEdge(ob::PlannerDataVertex(stateProperty_[v1]), ob::PlannerDataVertex(stateProperty_[v2]));
+    data.addEdge(PlannerDataVertexAnnotated(stateProperty_[v1]), PlannerDataVertexAnnotated(stateProperty_[v2]));
     //data.addEdge(ob::PlannerDataVertex(stateProperty_[v2]), ob::PlannerDataVertex(stateProperty_[v1]));
     data.tagState(stateProperty_[v1], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v1));
     data.tagState(stateProperty_[v2], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v2));

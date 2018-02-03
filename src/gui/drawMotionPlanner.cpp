@@ -702,9 +702,9 @@ namespace GLDraw{
           //double d = query->Distance(0,0.1);
           std::vector<Vector3> vp1,vp2;
           query->InteractingPoints(vp1,vp2);
-          if(vp1.size()!=1){
-            //std::cout << "Warning: got " << vp1.size() << " contact points for single rigid body" << std::endl;
-            //std::cout << "Ignoring Link " << i << "/" << Nlinks << std::endl;
+          if(vp1.size()<1){
+            std::cout << "Warning: got " << vp1.size() << " contact points for single rigid body" << std::endl;
+            std::cout << "Ignoring Link " << i << "/" << Nlinks << std::endl;
           }else{
             //Matrix4 mat = link->T_World;
             //glMultMatrix(mat);

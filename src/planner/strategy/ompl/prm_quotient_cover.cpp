@@ -70,7 +70,7 @@ void PRMQuotientCover::getPlannerData(ob::PlannerData &data) const
     const Vertex v2 = boost::target(e, g_);
     double d1 = openNeighborhoodDistance_[v1];
     double d2 = openNeighborhoodDistance_[v2];
-    data.addEdge(PlannerDataVertexAnnotated(stateProperty_[v1], d1), PlannerDataVertexAnnotated(stateProperty_[v2], d2));
+    data.addEdge(PlannerDataVertexAnnotated(stateProperty_[v1], 0, d1), PlannerDataVertexAnnotated(stateProperty_[v2], 0, d2));
     //data.addEdge(ob::PlannerDataVertex(stateProperty_[v2]), ob::PlannerDataVertex(stateProperty_[v1]));
     data.tagState(stateProperty_[v1], const_cast<PRMQuotientCover *>(this)->disjointSets_.find_set(v1));
     data.tagState(stateProperty_[v2], const_cast<PRMQuotientCover *>(this)->disjointSets_.find_set(v2));
@@ -126,24 +126,26 @@ bool PRMQuotientCover::Connect(const Vertex a, const Vertex b)
   auto checker = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
   ob::StateSpacePtr space = si_->getStateSpace();
 
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Connect:" << std::endl;
-  si_->printState(s1);
-  si_->printState(s2);
-  std::cout << std::string(80, '-') << std::endl;
+  //std::cout << std::string(80, '-') << std::endl;
+  //std::cout << "Connect:" << std::endl;
+  //si_->printState(s1);
+  //si_->printState(s2);
+  //std::cout << std::string(80, '-') << std::endl;
   
   Vertex v_last = a;
   Vertex v_next = a;
   ob::State *s_next = s1;
   OpenSet *o_next = o1;
 
-  double epsilon = 0.001;
-  std::cout << "radius: " << o_next->GetRadius() << " contains: " << (o_next->Contains(s2)?"Yes":"No") << std::endl;
+  double epsilon = 0.01;
+  //std::cout << "radius: " << o_next->GetRadius() << " contains: " << (o_next->Contains(s2)?"Yes":"No") << std::endl;
+
+  //TODO: bisect that
 
   while( checker->isValid(s_next) && !o_next->Contains(s2) && o_next->GetRadius() > epsilon){
     ob::State *s_m = si_->allocState();
     o_next->IntersectionTowards(s2, s_m);
-    si_->printState(s_m);
+    //si_->printState(s_m);
 
     v_next = CreateNewVertex(s_m);
     o_next = openNeighborhood_[v_next];
@@ -156,7 +158,7 @@ bool PRMQuotientCover::Connect(const Vertex a, const Vertex b)
     v_last = v_next;
     si_->freeState(s_m);
   }
-  std::cout << std::string(80, '-') << std::endl;
+  //std::cout << std::string(80, '-') << std::endl;
   if(o_next->Contains(s2)){
     v_next = b;
     ob::Cost weight = opt_->motionCost(stateProperty_[v_last], stateProperty_[v_next]);

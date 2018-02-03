@@ -163,13 +163,13 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     typedef og::MultiQuotient<og::PRMQuotientCover, og::RRTQuotient> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec,"Cover");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  }else if(algorithm=="ompl:qmp_rrt_sufficiency"){
-    typedef og::MultiQuotient<og::RRTQuotientSufficiency> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec,"RRTSufficient");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="ompl:qmp"){
     typedef og::MultiQuotient<og::PRMQuotient> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec);
+    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="ompl:qmp_rrt_sufficiency"){
+    typedef og::MultiQuotient<og::RRTQuotientSufficiency> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec,"RRTSufficient");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   // }else if(algorithm=="ompl:qmp_reject"){
 

@@ -167,20 +167,20 @@ void ForceFieldBackend::RenderWorld()
   glDisable(GL_BLEND); 
   glEnable(GL_LIGHTING);
 
-  if(!world->terrains.empty() && state("draw_distance_robot_terrain")){
+  if(state("draw_distance_robot_terrain")){
     const ODERobot *oderobot = sim.odesim.robot(0);
-    const Terrain *terrain = world->terrains[0];
-    GLDraw::drawDistanceRobotTerrain(oderobot, terrain);
+    for(uint k = 0; k < world->terrains.size(); k++){
+      const Terrain *terrain = world->terrains[k];
+      GLDraw::drawDistanceRobotTerrain(oderobot, terrain);
+    }
   }
+
   if(state("draw_center_of_mass_path")) GLDraw::drawCenterOfMassPathFromController(sim);
   //if(state("draw_force_ellipsoid")) GLDraw::drawForceEllipsoid(oderobot);
-
   if(state("draw_forcefield")) GLDraw::drawForceField(wrenchfield);
   if(state("draw_wrenchfield")) GLDraw::drawWrenchField(wrenchfield);
   if(state("draw_axes")) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
   if(state("draw_axes_labels")) GLDraw::drawAxesLabels(viewport);
-
-  //GLDraw::drawFrames(_frames, _frameLength);
 
   //############################################################################
   // visualize applied torque

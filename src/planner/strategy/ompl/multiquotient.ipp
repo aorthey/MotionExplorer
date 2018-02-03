@@ -151,9 +151,6 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
 
 
   uint K = min(solutions.size()+1,quotientSpaces.size());
-  std::cout << "get vertices from " << K << "quotient spaces." << std::endl;
-  std::cout << "solutions.size()+1    : " << solutions.size()+1 << std::endl;
-  std::cout << "quotientSpaces.size() : " << quotientSpaces.size() << std::endl;
 
   for(uint k = 0; k < K; k++){
     og::Quotient *Qk = quotientSpaces.at(k);

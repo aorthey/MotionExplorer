@@ -6,12 +6,8 @@ namespace ob = ompl::base;
 class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
 {
   public:
-    PlannerDataVertexAnnotated(const ob::State *st, int tag=0, double d_ = 1):
+    PlannerDataVertexAnnotated(const ob::State *st, int tag=0, double d_ = 0.0):
       ob::PlannerDataVertex(st,tag), open_neighborhood_distance(d_), level(-1), max_level(0)
-    {
-    }
-    PlannerDataVertexAnnotated(const ob::State *st, double d_ = 1):
-      ob::PlannerDataVertex(st), open_neighborhood_distance(d_), level(-1), max_level(0)
     {
     }
     PlannerDataVertexAnnotated (const PlannerDataVertexAnnotated &rhs) : ob::PlannerDataVertex(rhs.state_, rhs.tag_)

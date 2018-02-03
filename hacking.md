@@ -1,23 +1,30 @@
 # Conventions 
 
 <--! ------------------------------------------------------------------------->
+-->
+
 ## Naming Conventions
 
-*CamelCase  (https://en.wikipedia.org/wiki/Camel_case)
-*snake_case (https://en.wikipedia.org/wiki/Snake_case)
-*kebab-case (https://en.wikipedia.org/wiki/Kebab_case)
+[CamelCase]  (https://en.wikipedia.org/wiki/Camel_case)
+[snake_case] (https://en.wikipedia.org/wiki/Snake_case)
+[kebab-case] (https://en.wikipedia.org/wiki/Kebab_case)
 
-Class        : start uppercase, rest camelcase (MyClass)
-Functions    : start uppercase, rest camelcase (MyNewFunction)
-variables    : start lowercase, rest camelcase (myVariableName)
-filenames    : all lowercase  , rest snakecase (my_file_name_convention.h)
-XML naming   : all lowercase  , rest snakecase (<robot_names/>)
+* Class        : start uppercase, rest camelcase (MyClass)
+
+* Functions    : start uppercase, rest camelcase (MyNewFunction)
+
+* variables    : start lowercase, rest camelcase (myVariableName)
+
+* filenames    : all lowercase  , rest snakecase (my_file_name_convention.h)
+
+* XML naming   : all lowercase  , rest snakecase (<robot_names/>)
 
 <--! ------------------------------------------------------------------------->
 ## Formatting Conventions
 
-Identation   : 2 whitespaces, no tabs
-Curly Braces : on new line (no egyptian, see below)
+* Identation   : 2 whitespaces, no tabs
+
+* Curly Braces : on new line (no egyptian, see below)
 
 <--! ------------------------------------------------------------------------->
 ## Class Conventions
@@ -27,15 +34,16 @@ file, and be able to load it again. If Save() of an Object is called, then the
 XML should be created recursively from all its member objects.
 
 class Object;
+
 Object obj;
 
 Every Object should be writeable 
-  (1) to the terminal : std::cout << obj << std::endl;
-  (2) to the screen   : obj.DrawGL(state)
-  (3) to a file (xml) : obj.Save(filename) 
+  1. to the terminal : std::cout << obj << std::endl;
+  2. to the screen   : obj.DrawGL(state)
+  3. to a file (xml) : obj.Save(filename) 
 
 Every object should be readable 
-  (1) from a file     : obj.Load(filename)
+  1. from a file     : obj.Load(filename)
 
 Whenever the write does not make sense, implement empty function body
 
