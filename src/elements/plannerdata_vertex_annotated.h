@@ -30,18 +30,31 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
     {
       return new PlannerDataVertexAnnotated(*this);
     }
-    void SetLevel(uint level_){
+    void SetLevel(uint level_)
+    {
       level = level_;
     }
-    uint GetLevel(){
+    uint GetLevel()
+    {
       return level;
     }
-    void SetMaxLevel(uint level_){
+    void SetMaxLevel(uint level_)
+    {
       max_level = level_;
     }
-    uint GetMaxLevel(){
+    uint GetMaxLevel()
+    {
       return max_level;
     }
+    virtual const ob::State *getState() const override
+    {
+      return state_;
+    }
+    void setState(ob::State *s)
+    {
+      state_ = s;
+    }
+
 
     //virtual bool operator==(const PlannerDataVertex &rhs) const override
     //{

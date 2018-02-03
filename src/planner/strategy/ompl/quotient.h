@@ -57,6 +57,10 @@ namespace ompl
 
         friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::Quotient& qtnt);
 
+        const ob::SpaceInformationPtr &getC1() const;
+        bool SampleC1(ob::State *s);
+        void mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1);
+
       protected:
         static uint counter;
         uint id;
@@ -69,7 +73,6 @@ namespace ompl
         uint C1_dimension;
 
         const ob::StateSpacePtr ComputeQuotientSpace(const ob::StateSpacePtr M1, const ob::StateSpacePtr M0);
-        void mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1);
         void ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const;
         void ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const;
 

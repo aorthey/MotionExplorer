@@ -29,7 +29,7 @@
 
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.01</epsilongoalregion>
-    <maxplanningtime>1</maxplanningtime>
+    <maxplanningtime>2</maxplanningtime>
 
     <sampler name="obstacle_based"/>
 

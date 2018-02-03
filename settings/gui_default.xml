@@ -117,18 +117,24 @@
     <key>9</key>
   </hotkey>
 
-  <button>
+  <checkbox>
     <name>roadmap_visualize_level_0</name>
     <descr>Roadmap Vis Level 0</descr>
-    <key>7</key>
+    <key>6</key>
     <active>1</active>
-  </button>
-  <button>
+  </checkbox>
+  <checkbox>
     <name>roadmap_visualize_level_1</name>
     <descr>Roadmap Vis Level 1</descr>
+    <key>7</key>
+    <active>0</active>
+  </checkbox>
+  <checkbox>
+    <name>roadmap_visualize_level_2</name>
+    <descr>Roadmap Vis Level 2</descr>
     <key>8</key>
-    <active>1</active>
-  </button>
+    <active>0</active>
+  </checkbox>
 
   <hotkey>
     <name>reset</name>

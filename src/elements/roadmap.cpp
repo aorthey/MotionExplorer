@@ -308,7 +308,6 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, uint lvl)
       }
     }
   }
-  std::cout << ctr << " vertices" << std::endl;
   glLineWidth(5);
   if(state("draw_roadmap_edges")){
     setColor(cEdge);
@@ -344,7 +343,6 @@ void Roadmap::DrawGL(GUIState& state)
   for(uint k = 0; k < N; k++){
     std::string str = "roadmap_visualize_level_" + to_string(k);
     if(state(str.c_str())){
-      std::cout << "LEVEL" << k << std::endl;
       DrawSingleLevelGL(state, k);
     }
   }

@@ -334,6 +334,14 @@ void Quotient::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State
 
   }
 }
+
+const ob::SpaceInformationPtr &Quotient::getC1() const{
+  return C1;
+}
+
+bool Quotient::SampleC1(ob::State *s){
+  C1_sampler->sampleUniform(s);
+}
 bool Quotient::Sample(ob::State *q_random)
 {
   if(previous == nullptr){

@@ -149,8 +149,9 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
   }
   uint K = max(solutions.size()+1,quotientSpaces.size());
   for(uint k = 0; k < K; k++){
+    og::Quotient *Qk = quotientSpaces.at(k);
     //get all vertices
-    quotientSpaces.at(k)->getPlannerData(data);
+    Qk->getPlannerData(data);
 
     //remove start and goal vertices for all expect the last space
     if(k<K-1){
@@ -173,6 +174,23 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
       PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
       v.SetLevel(k);
       v.SetMaxLevel(K);
+
+      const ob::State *s_V = v.getState();
+      ob::State *s_M0 = Qk->getSpaceInformation()->cloneState(s_V);
+
+      for(uint m = k+1; m < K; m++){
+        og::Quotient *Qm = quotientSpaces.at(m);
+        ob::State *s_C1 = Qm->getC1()->allocState();
+        ob::State *s_M1 = Qm->getSpaceInformation()->allocState();
+        quotientSpaces.at(m-1)->getSpaceInformation()->printState(s_M0);
+        Qm->SampleC1(s_C1);
+        Qm->mergeStates(s_M0, s_C1, s_M1);
+        Qm->getC1()->freeState(s_M0);
+        Qm->getC1()->freeState(s_C1);
+        Qm->getSpaceInformation()->printState(s_M1);
+        s_M0 = s_M1;
+      }
+      v.setState(s_M0);
     }
     std::cout << "multiquotient: added " << ctr << " vertices on level " << k << std::endl;
     Nvertices = data.numVertices();
