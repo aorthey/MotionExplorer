@@ -65,16 +65,16 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     state("roadmap_visualize_level_0").toggle();
   }else if(cmd=="roadmap_visualize_level_1"){
     state("roadmap_visualize_level_1").toggle();
+  }else if(cmd=="roadmap_visualize_level_2"){
+    state("roadmap_visualize_level_2").toggle();
   }else if(cmd=="draw_roadmap"){
     state("draw_roadmap").toggle();
+  }else if(cmd=="draw_roadmap_volume"){
+    state("draw_roadmap_volume").toggle();
   }else if(cmd=="draw_roadmap_vertices"){
     state("draw_roadmap_vertices").toggle();
   }else if(cmd=="draw_roadmap_edges"){
     state("draw_roadmap_edges").toggle();
-  }else if(cmd=="draw_roadmap_necessary"){
-    state("draw_roadmap_necessary").toggle();
-  }else if(cmd=="draw_roadmap_sufficient"){
-    state("draw_roadmap_sufficient").toggle();
   }else if(cmd=="draw_play_path"){
     state("draw_play_path").toggle();
     simulate = 0;
@@ -115,7 +115,7 @@ bool PlannerBackend::OnIdle(){
       }
       if(path){
         double T = path->GetLength();
-        double tstep = T/1000;
+        double tstep = planner->GetInput().pathSpeed*T/1000;
         //std::cout << "play path: " << t << "/" << T << std::endl;
         if(t>=T){
           t=0;

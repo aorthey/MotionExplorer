@@ -66,18 +66,6 @@
     <active>0</active>
   </checkbox>
   <checkbox>
-    <name>draw_roadmap_necessary</name>
-    <descr>Draw Roadmap Necessary Vertices</descr>
-    <key>3</key>
-    <active>0</active>
-  </checkbox>
-  <checkbox>
-    <name>draw_roadmap_sufficient</name>
-    <descr>Draw Roadmap Sufficient Vertices</descr>
-    <key>4</key>
-    <active>0</active>
-  </checkbox>
-  <checkbox>
     <name>draw_roadmap_vertices</name>
     <descr>Draw Roadmap Vertices</descr>
     <key>1</key>
@@ -90,10 +78,18 @@
     <active>1</active>
   </checkbox>
   <checkbox>
+    <name>draw_roadmap_volume</name>
+    <descr>Draw Roadmap Volume</descr>
+    <key>3</key>
+    <active>1</active>
+  </checkbox>
+
+  <checkbox>
     <name>draw_roadmap</name>
     <descr>Draw Roadmap</descr>
     <active>1</active>
   </checkbox>
+
   <checkbox>
     <name>draw_play_path</name>
     <descr>Replay Path</descr>

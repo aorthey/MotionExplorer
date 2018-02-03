@@ -191,6 +191,7 @@ bool PRMQuotient::SampleGraph(ob::State *q_random_graph)
     lastSourceVertexSampled = v1;
     lastTargetVertexSampled = v2;
     lastTSampled = t;
+    foundNecessary = true;
     if(!checkerPtr->IsSufficient(q_random_graph)){
       foundNecessary = true;
     }

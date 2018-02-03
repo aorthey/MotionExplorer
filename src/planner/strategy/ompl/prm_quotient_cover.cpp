@@ -87,7 +87,7 @@ bool PRMQuotientCover::SampleGraph(ob::State *q_random_graph)
   auto checkerPtr = static_pointer_cast<OMPLValidityCheckerNecessarySufficient>(si_->getStateValidityChecker());
   bool foundNecessary = false;
 
-  double epsilon = 0.05;
+  //double epsilon = 0.05;
   while(!foundNecessary)
   {
     Edge e = pdf.sample(rng_.uniform01());
@@ -102,8 +102,9 @@ bool PRMQuotientCover::SampleGraph(ob::State *q_random_graph)
 
     M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
 
-    simpleSampler_->sampleGaussian(q_random_graph, q_random_graph, epsilon);
+    //simpleSampler_->sampleGaussian(q_random_graph, q_random_graph, epsilon);
     //simpleSampler_->sampleUniformNear(q_random_graph, q_random_graph, min(d1,d2));
+    simpleSampler_->sampleGaussian(q_random_graph, q_random_graph, min(d1,d2));
     //simpleSampler_->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
     if(!checkerPtr->IsSufficient(q_random_graph)){
       foundNecessary = true;

@@ -21,6 +21,7 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
   double epsilon_goalregion;
   double timestep_min;
   double timestep_max;
+  double path_speed;
   std::string name_sampler;
   TiXmlElement* node_timestep = FindSubNode(node_plannerinput, "timestep");
   if(node_timestep){
@@ -35,6 +36,10 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
 
   GetStreamText(node_max_planning_time) >> max_planning_time;
   GetStreamText(node_epsilon_goalregion) >> epsilon_goalregion;
+
+  double pathSpeed;
+  TiXmlElement* node_path_speed = FindSubNode(node_plannerinput, "pathSpeed");
+  GetStreamTextDefault<double>(node_path_speed, 1) >> pathSpeed;
 
   bool smoothPath;
   TiXmlElement* node_smooth = FindSubNode(node_plannerinput, "smoothPath");

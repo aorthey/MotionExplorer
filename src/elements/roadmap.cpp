@@ -300,9 +300,11 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, uint lvl)
         if(v.GetLevel()==lvl){
           ctr++;
           drawPoint(q);
-          glTranslate(q);
-          double d = v.GetOpenNeighborhoodDistance();
-          drawSphere(d,16,8);
+          if(state("draw_roadmap_volume")){
+            glTranslate(q);
+            double d = v.GetOpenNeighborhoodDistance();
+            drawSphere(d,16,8);
+          }
         }
         glPopMatrix();
       }

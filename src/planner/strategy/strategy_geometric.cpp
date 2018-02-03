@@ -63,6 +63,7 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
   Config p_goal = input.q_goal;
   std::string algorithm = input.name_algorithm;
   CSpaceOMPL* cspace = input.cspace;
+  std::cout << *cspace << std::endl;
 
   //###########################################################################
   // Config init,goal to OMPL start/goal

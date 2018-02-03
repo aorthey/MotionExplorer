@@ -54,6 +54,7 @@ class PlannerInput{
     double timestep_max;
 
     bool smoothPath;
+    double pathSpeed;
     bool enableSufficiency;
 
     //input for hierarchical planner methods
