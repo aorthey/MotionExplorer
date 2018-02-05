@@ -51,6 +51,13 @@ namespace ompl
         Configuration(const base::SpaceInformationPtr &si) : state(si->allocState())
         {}
         ~Configuration() = default;
+        double GetRadius() const{
+          if(openset){
+            return openset->GetRadius();
+          }else{
+            return 0;
+          }
+        }
         base::State *state{nullptr};
         Configuration *parent{nullptr};
         cover::OpenSetHypersphere *openset{nullptr};
@@ -72,6 +79,9 @@ namespace ompl
       bool hasSolution{false};
       double maxDistance_{0.};
       base::StateSamplerPtr sampler_;
+
+      //see shkolnik_2011 for details
+      double deltaCoverPenetration_;
 
     };
   }

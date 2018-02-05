@@ -23,6 +23,6 @@ namespace cover{
       ob::SpaceInformationPtr si;
       ob::State *sCenter;
 
-      double dist_robot_env{-1};
+      double dist_robot_env{0}; //standard is a zero measure point
   };
 };

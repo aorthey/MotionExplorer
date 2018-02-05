@@ -29,6 +29,8 @@ namespace ompl
       virtual void Sample(RRTUnidirectional::Configuration*) override;
       virtual bool SampleGraph(ob::State*) override;
 
+      bool IsInsideCover(Configuration*);
+
     };
   }
 }

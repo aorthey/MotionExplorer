@@ -185,12 +185,11 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
         og::Quotient *Qm = quotientSpaces.at(m);
         ob::State *s_C1 = Qm->getC1()->allocState();
         ob::State *s_M1 = Qm->getSpaceInformation()->allocState();
-        //quotientSpaces.at(m-1)->getSpaceInformation()->printState(s_M0);
         Qm->SampleC1(s_C1);
         Qm->mergeStates(s_M0, s_C1, s_M1);
         Qm->getC1()->freeState(s_M0);
         Qm->getC1()->freeState(s_C1);
-        Qm->getSpaceInformation()->printState(s_M1);
+        //Qm->getSpaceInformation()->printState(s_M1);
         s_M0 = s_M1;
       }
       v.setState(s_M0);

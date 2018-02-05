@@ -6,6 +6,7 @@ using namespace ompl::geometric;
 
 RRTUnidirectional::RRTUnidirectional(const base::SpaceInformationPtr &si, Quotient *previous ): og::Quotient(si, previous)
 {
+  deltaCoverPenetration_ = 0.01;
 }
 
 RRTUnidirectional::~RRTUnidirectional(void)
@@ -82,7 +83,7 @@ RRTUnidirectional::Configuration* RRTUnidirectional::Connect(Configuration *q_ne
 
     auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
     double d1 = checkerPtr->Distance(q_new->state);
-    q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d1);
+    q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d1 + deltaCoverPenetration_);
 
     G_->add(q_new);
     return q_new;
@@ -145,7 +146,7 @@ void RRTUnidirectional::Init()
 
     auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
     double d1 = checkerPtr->Distance(q_start->state);
-    q_start->openset = new cover::OpenSetHypersphere(si_, q_start->state, d1);
+    q_start->openset = new cover::OpenSetHypersphere(si_, q_start->state, d1 + deltaCoverPenetration_);
 
     G_->add(q_start);
   }
@@ -195,7 +196,11 @@ void RRTUnidirectional::setup(void)
   }
   G_->setDistanceFunction([this](const Configuration *a, const Configuration *b)
                            {
-                              return si_->distance(a->state, b->state);
+                           //distance between surrounding hyperspheres. if
+                           //overlapping, return 0
+                              double ra = a->GetRadius();
+                              double rb = b->GetRadius();
+                              return max( si_->distance(a->state, b->state)-ra-rb, 0.0);
                            });
 
 }
@@ -227,8 +232,6 @@ void RRTUnidirectional::getPlannerData(base::PlannerData &data) const
         si_->printState(vertex->state);
       }
 
-      si_->printState(vertex->state);
-      std::cout << "vertex with d=" << d << std::endl;
     }
 }
 

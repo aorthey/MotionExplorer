@@ -13,20 +13,34 @@ RRTUnidirectionalCover::~RRTUnidirectionalCover(void)
 
 void RRTUnidirectionalCover::Sample(RRTUnidirectional::Configuration *q)
 {
-  if(previous == nullptr){
-    RRTUnidirectional::Sample(q);
-  }else{
-    ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
-    base::State *s_C1 = C1->allocState();
-    base::State *s_M0 = M0->allocState();
+  bool found = false;
+  while(!found){
+    if(previous == nullptr){
+      RRTUnidirectional::Sample(q);
+    }else{
+      ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
+      base::State *s_C1 = C1->allocState();
+      base::State *s_M0 = M0->allocState();
 
-    C1_sampler->sampleUniform(s_C1);
-    previous->SampleGraph(s_M0);
-    mergeStates(s_M0, s_C1, q->state);
+      C1_sampler->sampleUniform(s_C1);
+      previous->SampleGraph(s_M0);
+      mergeStates(s_M0, s_C1, q->state);
 
-    C1->freeState(s_C1);
-    M0->freeState(s_M0);
+      C1->freeState(s_C1);
+      M0->freeState(s_M0);
+    }
+    if(!IsInsideCover(q)){
+      found = true;
+    }
   }
+}
+
+bool RRTUnidirectionalCover::IsInsideCover(Configuration* q)
+{
+  Configuration *qn = G_->nearest(q);
+  NearestNeighbors<Configuration *>::DistanceFunction df = G_->getDistanceFunction();
+  double d = df(q,qn);
+  return d<=0;
 }
 
 bool RRTUnidirectionalCover::SampleGraph(ob::State *q_random_graph)
@@ -40,7 +54,7 @@ bool RRTUnidirectionalCover::SampleGraph(ob::State *q_random_graph)
   double d = q->openset->GetRadius();
 
   sampler_->sampleGaussian(q_random_graph, q_center, d);
-  //sampler_->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
+  //sampler_->sampleUniformNear(q_random_graph, q_center, d);
 
   return true;
 }
