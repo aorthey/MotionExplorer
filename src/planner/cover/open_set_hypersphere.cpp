@@ -5,7 +5,7 @@
 using namespace cover;
 
 OpenSetHypersphere::OpenSetHypersphere(ob::SpaceInformationPtr si_, ob::State *s, double dist_robot_env_):
-  OpenSet(si_, s, dist_robot_env)
+  OpenSet(si_, s, dist_robot_env_)
 {
 }
 

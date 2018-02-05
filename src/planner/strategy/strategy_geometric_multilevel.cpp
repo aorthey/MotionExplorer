@@ -7,9 +7,10 @@
 #include "planner/strategy/ompl/prm_quotient_connect.h"
 #include "planner/strategy/ompl/prm_quotient_narrowness.h"
 
-#include "planner/strategy/ompl/rrt_plain.h"
+#include "planner/strategy/ompl/rrt_unidirectional.h"
+#include "planner/strategy/ompl/rrt_unidirectional_cover.h"
 #include "planner/strategy/ompl/rrt_quotient.h"
-#include "planner/strategy/ompl/rrt_quotient_sufficiency.h"
+#include "planner/strategy/ompl/rrt_quotient_cover.h"
 #include "util.h"
 #include "elements/plannerdata_vertex_annotated.h"
 
@@ -153,33 +154,21 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   ob::PlannerPtr planner;
 
   if(algorithm=="ompl:rrt_plain"){
-    planner = std::make_shared<og::RRTPlain>(si_vec.back());
+    planner = std::make_shared<og::RRTUnidirectional>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
   }else if(algorithm=="ompl:qmp_rrt"){
     typedef og::MultiQuotient<og::PRMQuotientNarrowDistance, og::RRTQuotient> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec,"RRTDistance");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="ompl:qmp_cover"){
-    typedef og::MultiQuotient<og::PRMQuotientCover, og::RRTQuotient> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec,"Cover");
+    typedef og::MultiQuotient<og::RRTUnidirectionalCover> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec,"UniCover");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="ompl:qmp"){
     typedef og::MultiQuotient<og::PRMQuotient> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec);
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  }else if(algorithm=="ompl:qmp_rrt_sufficiency"){
-    typedef og::MultiQuotient<og::RRTQuotientSufficiency> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec,"RRTSufficient");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  // }else if(algorithm=="ompl:qmp_reject"){
 
-  //   planner = std::make_shared<og::RRTQuotientRejectionSampling>(si_vec);
-  //   static_pointer_cast<og::RRTQuotientRejectionSampling>(planner)->setProblemDefinition(pdef_vec);
-
-  }else if(algorithm=="ompl:qmpconnect"){
-    typedef og::MultiQuotient<og::PRMQuotientConnect> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "Connect");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="ompl:qmpnarrow"){
     typedef og::MultiQuotient<og::PRMQuotientNarrow> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "Narrow");

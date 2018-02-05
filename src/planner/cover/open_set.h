@@ -23,6 +23,6 @@ namespace cover{
       ob::SpaceInformationPtr si;
       ob::State *sCenter;
 
-      double dist_robot_env;
+      double dist_robot_env{-1};
   };
 };

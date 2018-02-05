@@ -174,7 +174,6 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
     //label all new vertices
     uint ctr = 0;
     for(uint vidx = Nvertices; vidx < data.numVertices(); vidx++){
-      ctr++;
       PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
       v.SetLevel(k);
       v.SetMaxLevel(K);
@@ -182,7 +181,7 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
       const ob::State *s_V = v.getState();
       ob::State *s_M0 = Qk->getSpaceInformation()->cloneState(s_V);
 
-      for(uint m = k+1; m < K; m++){
+      for(uint m = k+1; m < quotientSpaces.size(); m++){
         og::Quotient *Qm = quotientSpaces.at(m);
         ob::State *s_C1 = Qm->getC1()->allocState();
         ob::State *s_M1 = Qm->getSpaceInformation()->allocState();
@@ -191,10 +190,11 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
         Qm->mergeStates(s_M0, s_C1, s_M1);
         Qm->getC1()->freeState(s_M0);
         Qm->getC1()->freeState(s_C1);
-        //Qm->getSpaceInformation()->printState(s_M1);
+        Qm->getSpaceInformation()->printState(s_M1);
         s_M0 = s_M1;
       }
       v.setState(s_M0);
+      ctr++;
     }
     std::cout << "multiquotient: added " << ctr << " vertices on level " << k << std::endl;
     Nvertices = data.numVertices();

@@ -158,66 +158,51 @@ void RRTQuotient::clear()
 RRTQuotient::GrowState RRTQuotient::growTree(TreeData &tree, TreeGrowingInfo &tgi,
                                                                              Configuration *rconfiguration)
 {
-    /* find closest state in the tree */
-    Configuration *nconfiguration = tree->nearest(rconfiguration);
+  Configuration *nconfiguration = tree->nearest(rconfiguration);
 
-    /* assume we can reach the state we go towards */
-    bool reach = true;
+  bool reach = true;
 
-    /* find state to add */
-    base::State *dstate = rconfiguration->state;
-    double d = si_->distance(nconfiguration->state, rconfiguration->state);
-    if (d > maxDistance_)
+  /* find state to add */
+  base::State *dstate = rconfiguration->state;
+  double d = si_->distance(nconfiguration->state, rconfiguration->state);
+  if (d > maxDistance_)
+  {
+      si_->getStateSpace()->interpolate(nconfiguration->state, rconfiguration->state, maxDistance_ / d, tgi.xstate);
+      dstate = tgi.xstate;
+      reach = false;
+  }
+  // if we are in the start tree, we just check the configuration like we normally do;
+  // if we are in the goal tree, we need to check the configuration in reverse, but checkMotion() assumes the first state it
+  // receives as argument is valid,
+  // so we check that one first
+  bool validConfiguration = tgi.start ?
+                         si_->checkMotion(nconfiguration->state, dstate) :
+                         si_->getStateValidityChecker()->isValid(dstate) && si_->checkMotion(dstate, nconfiguration->state);
+
+  if (validConfiguration)
+  {
+    auto *configuration = new Configuration(si_);
+    si_->copyState(configuration->state, dstate);
+    configuration->parent = nconfiguration;
+    configuration->root = nconfiguration->root;
+    configuration->parent_edge_weight = distanceFunction(configuration, configuration->parent);
+
+    auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+    configuration->openNeighborhoodDistance = checkerPtr->Distance(configuration->state);
+
+    if(checkerPtr->IsSufficient(configuration->state))
     {
-        si_->getStateSpace()->interpolate(nconfiguration->state, rconfiguration->state, maxDistance_ / d, tgi.xstate);
-        dstate = tgi.xstate;
-        reach = false;
+      configuration->isSufficient = true;
     }
-    // if we are in the start tree, we just check the configuration like we normally do;
-    // if we are in the goal tree, we need to check the configuration in reverse, but checkMotion() assumes the first state it
-    // receives as argument is valid,
-    // so we check that one first
-    bool validConfiguration = tgi.start ?
-                           si_->checkMotion(nconfiguration->state, dstate) :
-                           si_->getStateValidityChecker()->isValid(dstate) && si_->checkMotion(dstate, nconfiguration->state);
 
-    if (validConfiguration)
-    {
-      auto *configuration = new Configuration(si_);
-      si_->copyState(configuration->state, dstate);
-      configuration->parent = nconfiguration;
-      configuration->root = nconfiguration->root;
-      configuration->parent_edge_weight = distanceFunction(configuration, configuration->parent);
-
-      auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
-      configuration->openNeighborhoodDistance = checkerPtr->Distance(configuration->state);
-
-      if(checkerPtr->IsSufficient(configuration->state))
-      {
-        configuration->isSufficient = true;
-      }
-
-      tgi.xconfiguration = configuration;
-      tree->add(configuration);
-      return reach ? REACHED : ADVANCED;
-    }
-    else
-      return TRAPPED;
+    tgi.xconfiguration = configuration;
+    tree->add(configuration);
+    return reach ? REACHED : ADVANCED;
+  }
+  else
+    return TRAPPED;
 }
 void RRTQuotient::Init(){
-
-  //std::cout << "Planner " + getName() + " specs:" << std::endl;
-  //std::cout << "Multithreaded:                 " << (getSpecs().multithreaded ? "Yes" : "No") << std::endl;
-  //std::cout << "Reports approximate solutions: " << (getSpecs().approximateSolutions ? "Yes" : "No") << std::endl;
-  //std::cout << "Can optimize solutions:        " << (getSpecs().optimizingPaths ? "Yes" : "No") << std::endl;
-  //std::cout << "Range:                         " << getRange() << std::endl;
-  //std::cout << "Aware of the following parameters:";
-  //std::vector<std::string> params;
-  //params_.getParamNames(params);
-  //for (auto &param : params)
-  //    std::cout << " " << param;
-  //std::cout << std::endl;
-
   checkValidity();
   goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
   if (goal == nullptr)
@@ -225,8 +210,6 @@ void RRTQuotient::Init(){
       OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
       exit(0);
   }
-
-  //add start and goal state to their respective trees
   while (const ob::State *st = pis_.nextStart()){
     auto *q_start = new Configuration(si_);
     si_->copyState(q_start->state, st);
@@ -253,14 +236,13 @@ void RRTQuotient::Init(){
 
 ob::PathPtr RRTQuotient::ConstructSolution(Configuration *q_start, Configuration *q_goal){
   if (q_start->parent != nullptr){
-      q_start = q_start->parent;
+    q_start = q_start->parent;
   }else{
-      q_goal = q_goal->parent;
+    q_goal = q_goal->parent;
   }
 
   connectionPoint_ = std::make_pair(q_start->state, q_goal->state);
 
-  /* construct the solution path */
   Configuration *solution = q_start;
   std::vector<Configuration *> mpath1;
   while (solution != nullptr)

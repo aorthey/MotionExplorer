@@ -139,7 +139,6 @@ double PRMQuotient::GetSamplingDensity()
   }
 }
 
-
 void PRMQuotient::getPlannerData(base::PlannerData &data) const
 {
   PRMBasic::getPlannerData(data);

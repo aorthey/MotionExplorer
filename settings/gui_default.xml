@@ -123,13 +123,13 @@
     <name>roadmap_visualize_level_1</name>
     <descr>Roadmap Vis Level 1</descr>
     <key>7</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
   <checkbox>
     <name>roadmap_visualize_level_2</name>
     <descr>Roadmap Vis Level 2</descr>
     <key>8</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
 
   <hotkey>

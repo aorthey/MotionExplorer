@@ -1,4 +1,6 @@
 #pragma once
+#include "quotient.h"
+#include "planner/cover/open_set_hypersphere.h"
 #include <ompl/base/Planner.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/util/RandomNumbers.h>
@@ -18,18 +20,27 @@ namespace ompl
   namespace geometric
   {
 
-    class RRTPlain : public RRT
+    class RRTUnidirectional : public og::Quotient
     {
     public:
 
-      RRTPlain(const ob::SpaceInformationPtr &si);
-      ~RRTPlain(void);
+      RRTUnidirectional(const ob::SpaceInformationPtr &si, Quotient *previous = nullptr);
+      ~RRTUnidirectional(void);
       base::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override;
       void clear(void) override;
       void setup(void) override;
       void getPlannerData(ob::PlannerData &data) const override;
 
-      void Grow();
+      double getRange() const;
+      void setRange(double distance);
+      void freeMemory();
+
+      virtual uint GetNumberOfVertices() override;
+      virtual uint GetNumberOfEdges() override;
+      virtual void Grow(double t=0) override;
+      virtual void Init() override;
+      virtual bool HasSolution() override;
+      virtual void CheckForSolution(ob::PathPtr &solution) override;
 
     protected:
 
@@ -42,6 +53,7 @@ namespace ompl
         ~Configuration() = default;
         base::State *state{nullptr};
         Configuration *parent{nullptr};
+        cover::OpenSetHypersphere *openset{nullptr};
       };
 
       std::shared_ptr<NearestNeighbors<Configuration *>> G_;
@@ -53,9 +65,13 @@ namespace ompl
 
       bool ConnectedToGoal(Configuration* q);
       void ConstructSolution(Configuration *q_goal);
-      void Init();
 
       ob::GoalSampleableRegion *goal;
+      RNG rng_;
+      double goalBias_{.05};
+      bool hasSolution{false};
+      double maxDistance_{0.};
+      base::StateSamplerPtr sampler_;
 
     };
   }

@@ -1,6 +1,7 @@
 #include "prm_quotient_cover.h"
 #include "planner/cspace/cspace.h"
 #include "planner/cover/open_set.h"
+#include "planner/cover/open_set_bubble.h"
 #include "planner/validitychecker/validity_checker_ompl.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include <ompl/base/PlannerData.h>
@@ -31,7 +32,7 @@ PRMBasic::Vertex PRMQuotientCover::CreateNewVertex(ob::State *state)
   auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
   double d1 = checkerPtr->Distance(stateProperty_[m]);
   openNeighborhoodDistance_[m] = d1;
-  openNeighborhood_[m] = new cover::OpenSet(si_, stateProperty_[m], d1);
+  openNeighborhood_[m] = new cover::OpenSetBubble(si_, stateProperty_[m], d1);
 
   disjointSets_.make_set(m);
 

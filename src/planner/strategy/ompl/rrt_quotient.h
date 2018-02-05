@@ -93,7 +93,7 @@ namespace ompl
 
         double distanceFunction(const Configuration *a, const Configuration *b) const
         {
-            return si_->distance(a->state, b->state);
+          return si_->distance(a->state, b->state);
         }
 
         GrowState growTree(TreeData &tree, TreeGrowingInfo &tgi, Configuration *rmotion);

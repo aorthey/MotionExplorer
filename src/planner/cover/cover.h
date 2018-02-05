@@ -9,8 +9,11 @@ namespace cover{
       bool IsInsideCover(ob::State *s);
       void ComputeCoverAt(ob::State *x);
 
+      void Reduce();
+      void AddOpenSet( OpenSet* set );
+
     protected:
       CSpace *cspace;
-      std::vector<OpenSet> sets;
+      std::vector<OpenSet*> sets;
   };
 };

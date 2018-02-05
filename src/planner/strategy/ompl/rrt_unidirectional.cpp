@@ -1,24 +1,69 @@
-#include "rrt_plain.h"
+#include "rrt_unidirectional.h"
+#include "elements/plannerdata_vertex_annotated.h"
+#include "planner/validitychecker/validity_checker_ompl.h"
 
 using namespace ompl::geometric;
-RRTPlain::RRTPlain(const base::SpaceInformationPtr &si): RRT(si)
-{
-  setName("RRTPlain");
-}
-RRTPlain::~RRTPlain(void)
+
+RRTUnidirectional::RRTUnidirectional(const base::SpaceInformationPtr &si, Quotient *previous ): og::Quotient(si, previous)
 {
 }
-void RRTPlain::Sample(Configuration *q_random){
-  if(rng_.uniform01() < goalBias_){
-    goal->sampleGoal(q_random->state);
+
+RRTUnidirectional::~RRTUnidirectional(void)
+{
+}
+
+void RRTUnidirectional::Sample(Configuration *q_random){
+  if(!hasSolution){
+    if(rng_.uniform01() < goalBias_){
+      goal->sampleGoal(q_random->state);
+    }else{
+      sampler_->sampleUniform(q_random->state);
+    }
   }else{
     sampler_->sampleUniform(q_random->state);
   }
 }
-RRTPlain::Configuration* RRTPlain::Nearest(Configuration *q_random){
+
+void RRTUnidirectional::setRange(double distance)
+{
+  maxDistance_ = distance;
+}
+
+double RRTUnidirectional::getRange() const
+{
+  return maxDistance_;
+}
+
+uint RRTUnidirectional::GetNumberOfVertices()
+{
+  return G_->size();
+}
+
+uint RRTUnidirectional::GetNumberOfEdges()
+{
+  std::vector<Configuration *> configs;
+  if (G_){
+    G_->list(configs);
+  }
+  uint ctr_edges = 0;
+  for (auto &config : configs)
+  {
+    if (config->parent != nullptr)
+    {
+      ctr_edges++;
+    }
+  }
+  return ctr_edges;
+}
+
+
+RRTUnidirectional::Configuration* RRTUnidirectional::Nearest(Configuration *q_random)
+{
   return G_->nearest(q_random);
 }
-RRTPlain::Configuration* RRTPlain::Connect(Configuration *q_near, Configuration *q_random){
+
+RRTUnidirectional::Configuration* RRTUnidirectional::Connect(Configuration *q_near, Configuration *q_random)
+{
   //##############################################################################
   // q_new_state <- BALL_maxDistance_(q_near) in direction of q_random
   //##############################################################################
@@ -34,21 +79,31 @@ RRTPlain::Configuration* RRTPlain::Connect(Configuration *q_near, Configuration 
     auto *q_new = new Configuration(si_);
     si_->copyState(q_new->state, q_random->state);
     q_new->parent = q_near;
+
+    auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+    double d1 = checkerPtr->Distance(q_new->state);
+    q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d1);
+
     G_->add(q_new);
     return q_new;
   }
   return nullptr;
 }
-bool RRTPlain::ConnectedToGoal(Configuration* q){
+
+bool RRTUnidirectional::ConnectedToGoal(Configuration* q)
+{
   double dist=0.0;
   if(q != nullptr){
     if(goal->isSatisfied(q->state, &dist)){
+      hasSolution = true;
       return true;
     }
   }
   return false;
 }
-void RRTPlain::ConstructSolution(Configuration *q_goal){
+
+void RRTUnidirectional::ConstructSolution(Configuration *q_goal)
+{
   if (q_goal != nullptr){
 
     std::vector<Configuration *> q_path;
@@ -64,7 +119,9 @@ void RRTPlain::ConstructSolution(Configuration *q_goal){
     pdef_->addSolutionPath(path);
   }
 }
-void RRTPlain::Init(){
+
+void RRTUnidirectional::Init()
+{
   //setRange(0.1);
 
   std::cout << "Planner " + getName() + " specs:" << std::endl;
@@ -85,6 +142,11 @@ void RRTPlain::Init(){
   while (const ob::State *st = pis_.nextStart()){
     auto *q_start = new Configuration(si_);
     si_->copyState(q_start->state, st);
+
+    auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+    double d1 = checkerPtr->Distance(q_start->state);
+    q_start->openset = new cover::OpenSetHypersphere(si_, q_start->state, d1);
+
     G_->add(q_start);
   }
   if (G_->size() == 0){
@@ -95,7 +157,7 @@ void RRTPlain::Init(){
 }
 
 
-void RRTPlain::clear()
+void RRTUnidirectional::clear()
 {
   Planner::clear();
   sampler_.reset();
@@ -104,8 +166,25 @@ void RRTPlain::clear()
     G_->clear();
   }
 }
+void RRTUnidirectional::freeMemory()
+{
+  if (G_)
+  {
+    std::vector<Configuration *> configurations;
+    G_->list(configurations);
+    for (auto &configuration : configurations)
+    {
+      if (configuration->state != nullptr)
+      {
+        si_->freeState(configuration->state);
+      }
+      delete configuration;
+    }
+  }
+}
 
-void RRTPlain::setup(void)
+
+void RRTUnidirectional::setup(void)
 {
   Planner::setup();
   tools::SelfConfig sc(si_, getName());
@@ -121,10 +200,9 @@ void RRTPlain::setup(void)
 
 }
 
-void RRTPlain::getPlannerData(base::PlannerData &data) const
+void RRTUnidirectional::getPlannerData(base::PlannerData &data) const
 {
-    Planner::getPlannerData(data);
-
+    //Planner::getPlannerData(data);
     std::vector<Configuration *> vertices;
 
     if (G_){
@@ -132,20 +210,30 @@ void RRTPlain::getPlannerData(base::PlannerData &data) const
     }
 
     if (lastExtendedConfiguration != nullptr){
-      data.addGoalVertex(base::PlannerDataVertex(lastExtendedConfiguration->state));
+      data.addGoalVertex(PlannerDataVertexAnnotated(lastExtendedConfiguration->state, 0, lastExtendedConfiguration->openset->GetRadius()));
     }
 
     for (auto &vertex : vertices)
     {
+      double d = vertex->openset->GetRadius();
       if (vertex->parent == nullptr){
-        data.addStartVertex(base::PlannerDataVertex(vertex->state));
+        data.addStartVertex(PlannerDataVertexAnnotated(vertex->state, 0, d));
       }else{
-        data.addEdge(base::PlannerDataVertex(vertex->parent->state), base::PlannerDataVertex(vertex->state));
+        double dp = vertex->parent->openset->GetRadius();
+        data.addEdge(PlannerDataVertexAnnotated(vertex->parent->state, 0, dp), PlannerDataVertexAnnotated(vertex->state, 0, d));
       }
+      if(!vertex->state){
+        std::cout << "vertex state does not exists" << std::endl;
+        si_->printState(vertex->state);
+      }
+
+      si_->printState(vertex->state);
+      std::cout << "vertex with d=" << d << std::endl;
     }
 }
 
-void RRTPlain::Grow(){
+void RRTUnidirectional::Grow(double t)
+{
   //Grow
   Configuration *q_random = new Configuration(si_);
   Configuration *q_near = nullptr;
@@ -165,7 +253,7 @@ void RRTPlain::Grow(){
 }
 
 
-ob::PlannerStatus RRTPlain::solve(const ob::PlannerTerminationCondition &ptc)
+ob::PlannerStatus RRTUnidirectional::solve(const ob::PlannerTerminationCondition &ptc)
 {
   Init();
 
@@ -173,7 +261,8 @@ ob::PlannerStatus RRTPlain::solve(const ob::PlannerTerminationCondition &ptc)
 
     Grow();
 
-    if(ConnectedToGoal(lastExtendedConfiguration)){
+    if(HasSolution())
+    {
       ConstructSolution(lastExtendedConfiguration);
       return ob::PlannerStatus::EXACT_SOLUTION;
     }
@@ -183,3 +272,35 @@ ob::PlannerStatus RRTPlain::solve(const ob::PlannerTerminationCondition &ptc)
   return ob::PlannerStatus::TIMEOUT;
 }
 
+bool RRTUnidirectional::HasSolution()
+{
+  if(!hasSolution){
+    if(ConnectedToGoal(lastExtendedConfiguration)){
+      hasSolution = true;
+    }
+  }
+  return hasSolution;
+}
+
+void RRTUnidirectional::CheckForSolution(ob::PathPtr &solution)
+{
+
+  if(!hasSolution) return;
+
+  Configuration *q_goal = lastExtendedConfiguration;
+  if (q_goal != nullptr){
+
+    std::vector<Configuration *> q_path;
+    while (q_goal != nullptr){
+      q_path.push_back(q_goal);
+      q_goal = q_goal->parent;
+    }
+
+    auto path(std::make_shared<PathGeometric>(si_));
+    for (int i = q_path.size() - 1; i >= 0; --i){
+      path->append(q_path[i]->state);
+    }
+    solution = path;
+    goalBias_ = 0.0;
+  }
+}
