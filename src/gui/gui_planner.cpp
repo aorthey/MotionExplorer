@@ -58,8 +58,6 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     else active_planner = planners.size()-1;
     hierarchy_change = true;
     path = planners.at(active_planner)->GetPath();
-  }else if(cmd=="draw_sweptvolume"){
-    state("draw_sweptvolume").toggle();
   }else if(cmd=="roadmap_visualize_level_0"){
     state("roadmap_visualize_level_0").toggle();
   }else if(cmd=="roadmap_visualize_level_1"){
@@ -68,14 +66,15 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     state("roadmap_visualize_level_2").toggle();
   }else if(cmd=="draw_roadmap"){
     state("draw_roadmap").toggle();
-  }else if(cmd=="draw_path_sweptvolume"){
-    state("draw_path_sweptvolume").toggle();
-  }else if(cmd=="draw_roadmap_volume"){
-    state("draw_roadmap_volume").toggle();
+  }else if(cmd=="draw_roadmap_swathvolume"){
+    state("draw_roadmap_swathvolume").toggle();
   }else if(cmd=="draw_roadmap_vertices"){
     state("draw_roadmap_vertices").toggle();
   }else if(cmd=="draw_roadmap_edges"){
     state("draw_roadmap_edges").toggle();
+
+  }else if(cmd=="draw_path_sweptvolume"){
+    state("draw_path_sweptvolume").toggle();
   }else if(cmd=="draw_play_path"){
     state("draw_play_path").toggle();
     simulate = 0;

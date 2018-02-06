@@ -329,6 +329,7 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, uint lvl)
       }
     }
   }
+
 }
 
 void Roadmap::DrawGL(GUIState& state)
@@ -351,5 +352,20 @@ void Roadmap::DrawGL(GUIState& state)
 
   glEnable(GL_LIGHTING);
   glDisable(GL_BLEND); 
+
+  if(state("draw_roadmap_swathvolume")){
+    if(!swv){
+      std::vector<Config> q;
+      for(uint vidx = 0; vidx < Nvertices; vidx++){
+        PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&pds->getVertex(vidx));
+        if(v.GetLevel()==N-1){
+          Config qi = cspace->OMPLStateToConfig(v.getState());
+          q.push_back(qi);
+        }
+      }
+      swv = new SwathVolume(cspace->GetRobotPtr(), q);
+    }
+    swv->DrawGL(state);
+  }
 }
 

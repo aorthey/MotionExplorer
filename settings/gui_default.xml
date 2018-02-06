@@ -167,6 +167,11 @@
     <key></key>
     <active>0</active>
   </checkbox>
+  <hotkey>
+    <name>draw_roadmap_swathvolume</name>
+    <descr>Draw Roadmap Swathvolume</descr>
+    <key>k</key>
+  </hotkey>
 
   <property name="draw_path" enabled="0"/>
   <property name="draw_path_unsmoothed" enabled="0"/>

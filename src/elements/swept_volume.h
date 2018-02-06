@@ -34,12 +34,11 @@ class SweptVolume
     bool Load(TiXmlElement *node);
 
     void DrawGL(GUIState& state);
+    double sweptvolumeScale{1.0};
+    GLColor color{grey};
 
   protected:
     void AddKeyframe(Config &q );
-
-    double sweptvolumeScale{1.0};
-    GLColor color{grey};
 
     Robot *_robot;
     std::vector<std::vector<Matrix4> > _mats;

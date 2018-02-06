@@ -79,8 +79,7 @@ ompl::PDF<RRTUnidirectional::Configuration*> RRTUnidirectionalCover::GetConfigur
   for (auto &configuration : configurations)
   {
     if(!(configuration->parent == nullptr)){
-      //std::cout << configuration->openset->GetRadius() << std::endl;
-      pdf.add(configuration, 1.0/configuration->openset->GetRadius());
+      pdf.add(configuration, configuration->openset->GetRadius());
     }
   }
 

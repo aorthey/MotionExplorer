@@ -21,15 +21,6 @@ class SwathVolume: public SweptVolume
     SwathVolume(Robot *robot, const std::vector<Config> &vertices);
 
     const std::vector<Config >& GetVertices();
-
-    // bool Save(const char* file=NULL);
-    // bool Save(TiXmlElement *node);
-    // bool Load(const char* file);
-    // bool Load(TiXmlElement *node);
-
-    //void AddVertex(const Config &q );
-
-
 };
 
 

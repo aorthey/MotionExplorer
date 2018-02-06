@@ -1,6 +1,7 @@
 #pragma once
 #include "algorithms/lemon_interface.h"
 #include "planner/cspace/cspace.h"
+#include "elements/swath_volume.h"
 #include "gui/gui_state.h"
 
 #include <ompl/base/PlannerData.h>
@@ -46,6 +47,8 @@ class Roadmap{
     std::vector<Config> VertexPathToConfigPath( const std::vector<ob::PlannerData::Graph::Vertex> &path);
 
     CSpaceOMPL *cspace;
+
+    SwathVolume *swv{nullptr};
 
     std::vector<Config> V;
     std::vector<std::pair<Config,Config>> E;

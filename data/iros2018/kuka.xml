@@ -40,7 +40,7 @@
     <!-- default settings for all algorithms (overwriteable) -->
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.05</epsilongoalregion>
-    <maxplanningtime>5</maxplanningtime>
+    <maxplanningtime>1</maxplanningtime>
 
     <sampler name="obstacle_based"/>
 
