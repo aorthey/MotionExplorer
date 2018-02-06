@@ -403,39 +403,6 @@ namespace GLDraw{
     }//forx
   }
 
-  void drawSwathVolume(Robot *robot, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor swathVolumeColor)
-  {
-    drawGLPathSweptVolume(robot, mats, appearanceStack, swathVolumeColor, 1.0);
-  }
-
-
-
-  void drawGLPathSweptVolume(Robot *robot, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor sweptvolumeColor, double sweptvolumeScale)
-  {
-    //loopin' through the waypoints
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
-    for(uint i = 0; i < mats.size(); i++){
-      for(uint j=0;j<robot->links.size();j++) {
-        if(robot->IsGeometryEmpty(j)) continue;
-        Matrix4 matij = mats.at(i).at(j);
-
-
-        glPushMatrix();
-        glMultMatrix(matij);
-
-        glScalef(sweptvolumeScale, sweptvolumeScale, sweptvolumeScale);
-
-        GLDraw::GeometryAppearance& a = appearanceStack.at(j);
-        a.SetColor(sweptvolumeColor);
-
-        //glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_DST_ALPHA);
-        a.DrawGL();
-        glPopMatrix();
-
-      }
-    }
-  }
   void drawGLPathKeyframes(Robot *robot, std::vector<uint> keyframe_indices, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack,GLColor color, double scale)
   {
     for(uint k = 0; k < keyframe_indices.size(); k++){
@@ -490,50 +457,6 @@ namespace GLDraw{
     }
   }
 
-
-  //void drawPlannerTree(const SerializedTree &_stree, GLColor colorTree)
-  //{
-  //  double edgeWidth = 3;
-  //  glDisable(GL_LIGHTING);
-  //  glEnable(GL_BLEND); 
-  //    
-  //  for(uint i = 0; i < _stree.size(); i++){
-  //    SerializedTreeNode node = _stree.at(i);
-  //    Vector3 pos(node.position(0),node.position(1),node.position(2));
-  //    Vector3 rot(node.position(3),node.position(4),node.position(5));
-
-  //    std::vector<Vector> dirs = node.directions;
-
-  //    ////Fancy Color gradient, red near goal, blue far away, gaussian //distributed
-  //    //double d = node.cost_to_goal;
-  //    //double shade = exp(-d*d/0.5); //\in [0,1]
-  //    //GLColor color(shade,0,1.0-shade);
-
-  //    glPushMatrix();
-  //    setColor(colorTree);
-  //    glTranslate(pos);
-
-  //    //glPointSize(vertexSize);
-  //    glPointSize(10);
-  //    drawPoint(Vector3(0,0,0));
-
-  //    glPushMatrix();
-  //    glLineWidth(edgeWidth);
-  //    for(uint j = 0; j < dirs.size(); j++){
-  //      glBegin(GL_LINES);
-  //      glVertex3f(0.0, 0.0, 0.0);
-  //      glVertex3f(dirs.at(j)[0], dirs.at(j)[1], dirs.at(j)[2]);
-  //      glEnd();
-  //    }
-  //    glPopMatrix();
-
-  //    glPopMatrix();
-  //  }
-  //  glDisable(GL_BLEND); 
-  //  glEnable(GL_LIGHTING);
-  //  //glEnable(GL_LIGHTING);
-  //  //std::cout << "Visualized Tree with " << _stree.size() << " vertices and " << Nedges << " edges." << std::endl;
-  //}
 
 #include <GL/freeglut.h>
   void drawAxesLabels(Camera::Viewport& viewport)
@@ -750,28 +673,6 @@ namespace GLDraw{
     glEnable(GL_LIGHTING);
     glDisable(GL_BLEND);
   }
-  void drawPath( const std::vector<Config> &path, const GLColor c, double linewidth, double ptsize){
-    glDisable(GL_LIGHTING);
-    glEnable(GL_BLEND);
-    glPushMatrix();
-
-    glPointSize(ptsize);
-    glLineWidth(linewidth);
-    c.setCurrentGL();
-    for(uint i = 0; i < path.size()-1; i++){
-      Config c1 = path.at(i);
-      Config c2 = path.at(i+1);
-      Vector3 q1(c1[0],c1[1],c1[2]);
-      Vector3 q2(c2[0],c2[1],c2[2]);
-      drawPoint(q1);
-      drawLineSegment(q1, q2);
-    }
-    glPopMatrix();
-    glDisable(GL_BLEND);
-    glEnable(GL_LIGHTING);
-    glLineWidth(1);
-  }
-
 
   void drawSimplicialComplex( SimplicialComplex& cmplx ){
 
@@ -939,17 +840,6 @@ namespace GLDraw{
       }
       glEnd();
     }
-    //for(float s = -M_PI; s <= M_PI; s += sStep)
-    //{
-    //  glBegin(GL_LINE_LOOP);
-    //  glVertex3f(c[0],c[1],c[2]);
-    //  for(float t = -M_PI/2; t <= M_PI/2; t += tStep)
-    //  {
-    //    Vector3 point = cos(t)*cos(s)*v + cos(t)*sin(s)*w + sin(t)*u + c;
-    //    glVertex3f(point[0],point[1],point[2]);
-    //  }
-    //  glEnd();
-    //}
   }
 };
 

@@ -178,6 +178,7 @@ void PathPiecewiseLinear::DrawGL(GUIState& state)
 {
   if(!path) return;
   cLine = magenta;
+  if(state("draw_path")) DrawGLPathPtr(path_raw);
   DrawGLPathPtr(path);
   if(!path_raw) return;
   cLine = green;

@@ -16,6 +16,7 @@
 
 
 namespace GLDraw {
+
   void drawIKextras(ViewRobot *viewrobot, Robot *robot, std::vector<IKGoal> &constraints, std::vector<int> linksInCollision, GLColor selectedLinkColor);
   void drawUniformForceField();
   void drawSphereAtPosition(Vector3 &pos, double r);
@@ -27,11 +28,6 @@ namespace GLDraw {
 
   void drawShortestPath( SimplicialComplex& cmplx );
   void drawSimplicialComplex( SimplicialComplex& cmplx );
-  void drawSwathVolume(Robot *robot, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor swathVolumeColor=GLColor(0.5,0.8,0.5,0.5));
-
-  void drawGLPathSweptVolume(Robot *robot, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor sweptvolumeColor = GLColor(0.7,0.0,0.9,0.2), double sweptvolumeScale = 0.98);
-  //void drawGLPathMilestones(Robot *robot, std::vector<Config> &keyframes, uint Nmilestones);
-  void drawGLPathStartGoal(Robot *robot, const Config &p_init, const Config &p_goal);
 
   void drawRobotAtConfig(Robot *robot, const Config &q, GLColor color=GLColor(1,0,0), double scale = 1.0);
   //void drawPlannerTree(const SerializedTree &_stree, GLColor colorTree=GLColor(0.3,0.7,0.3));
@@ -45,6 +41,7 @@ namespace GLDraw {
   void drawWireEllipsoid(Vector3 &c, Vector3 &u, Vector3 &v, Vector3 &w, int numSteps=16);
   void drawEllipsoid(Vector3 &c, Vector3 &u, Vector3 &v, Vector3 &w, int numSteps=16);
 
-  void drawPath( const std::vector<Config> &path, const GLColor c, double linewidth = 10, double ptsize=10);
+  //void drawPath( const std::vector<Config> &path, const GLColor c, double linewidth = 10, double ptsize=10);
   void setColor(GLColor &c);
+
 };

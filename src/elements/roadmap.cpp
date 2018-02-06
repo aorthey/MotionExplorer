@@ -329,8 +329,8 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, uint lvl)
       }
     }
   }
-
 }
+
 void Roadmap::DrawGL(GUIState& state)
 {
   if(!pds) return;

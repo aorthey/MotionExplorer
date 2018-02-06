@@ -323,7 +323,6 @@ void SweptVolume::DrawGL(GUIState& state)
       a.SetColor(color);
       a.DrawGL();
       glPopMatrix();
-
     }
   }
   glDisable(GL_BLEND);

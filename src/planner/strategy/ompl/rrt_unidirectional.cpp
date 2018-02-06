@@ -131,17 +131,17 @@ void RRTUnidirectional::Init()
 {
   //setRange(0.1);
 
-  std::cout << "Planner " + getName() + " specs:" << std::endl;
-  std::cout << "Multithreaded:                 " << (getSpecs().multithreaded ? "Yes" : "No") << std::endl;
-  std::cout << "Reports approximate solutions: " << (getSpecs().approximateSolutions ? "Yes" : "No") << std::endl;
-  std::cout << "Can optimize solutions:        " << (getSpecs().optimizingPaths ? "Yes" : "No") << std::endl;
-  std::cout << "Range:                         " << getRange() << std::endl;
-  std::cout << "Aware of the following parameters:";
-  std::vector<std::string> params;
-  params_.getParamNames(params);
-  for (auto &param : params)
-      std::cout << " " << param;
-  std::cout << std::endl;
+  //std::cout << "Planner " + getName() + " specs:" << std::endl;
+  //std::cout << "Multithreaded:                 " << (getSpecs().multithreaded ? "Yes" : "No") << std::endl;
+  //std::cout << "Reports approximate solutions: " << (getSpecs().approximateSolutions ? "Yes" : "No") << std::endl;
+  //std::cout << "Can optimize solutions:        " << (getSpecs().optimizingPaths ? "Yes" : "No") << std::endl;
+  //std::cout << "Range:                         " << getRange() << std::endl;
+  //std::cout << "Aware of the following parameters:";
+  //std::vector<std::string> params;
+  //params_.getParamNames(params);
+  //for (auto &param : params)
+  //    std::cout << " " << param;
+  //std::cout << std::endl;
 
   checkValidity();
   goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
