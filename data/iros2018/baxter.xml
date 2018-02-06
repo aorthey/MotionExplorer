@@ -2,6 +2,7 @@
 <world>
 
   <robot name="baxter" file="../robots/baxter_description/baxter.urdf"/>
+  <robot name="baxter13dof" file="../robots/baxter_description/baxter_13dof.urdf"/>
 
   <forcefield>
     <uniform force="0 0 -3.71" color="1 0 0"/>

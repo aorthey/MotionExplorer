@@ -181,7 +181,20 @@ void PathPiecewiseLinear::DrawGL(GUIState& state)
   DrawGLPathPtr(path);
   if(!path_raw) return;
   cLine = green;
-  DrawGLPathPtr(path_raw);
+  if(state("draw_path_unsmoothed")) DrawGLPathPtr(path_raw);
+  if(state("draw_path_sweptvolume")){
+    if(!sv){
+      double tmin = 0.05;
+      double L = GetLength();
+      uint Nmilestones = int(L/tmin);
+      std::vector<Config> q;
+      for(uint k = 0; k < Nmilestones; k++){
+        q.push_back( Eval(k*tmin) );
+      }
+      sv = new SweptVolume(cspace->GetRobotPtr(), q, Nmilestones);
+    }
+    sv->DrawGL(state);
+  }
 }
 bool PathPiecewiseLinear::Load(const char* fn)
 {

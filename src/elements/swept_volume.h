@@ -1,4 +1,6 @@
 #pragma once
+#include "gui/gui_state.h"
+#include "gui/colors.h"
 #include <KrisLibrary/GLdraw/drawMesh.h>
 #include <KrisLibrary/GLdraw/GLError.h>
 #include <KrisLibrary/GLdraw/GLColor.h>
@@ -31,11 +33,13 @@ class SweptVolume
     bool Load(const char* file);
     bool Load(TiXmlElement *node);
 
+    void DrawGL(GUIState& state);
+
   protected:
     void AddKeyframe(Config &q );
 
-    GLColor color;
-    GLColor color_milestones;
+    double sweptvolumeScale{1.0};
+    GLColor color{grey};
 
     Robot *_robot;
     std::vector<std::vector<Matrix4> > _mats;

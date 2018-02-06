@@ -7,6 +7,7 @@ using namespace ompl::geometric;
 RRTUnidirectional::RRTUnidirectional(const base::SpaceInformationPtr &si, Quotient *previous ): og::Quotient(si, previous)
 {
   deltaCoverPenetration_ = 0.01;
+  goalBias_ = 0.05;
 }
 
 RRTUnidirectional::~RRTUnidirectional(void)
@@ -80,10 +81,15 @@ RRTUnidirectional::Configuration* RRTUnidirectional::Connect(Configuration *q_ne
     auto *q_new = new Configuration(si_);
     si_->copyState(q_new->state, q_random->state);
     q_new->parent = q_near;
+    //std::cout << "parent: " << std::endl;
+    //si_->printState(q_new->parent->state);
+    //std::cout << "new: " << std::endl;
+    //si_->printState(q_new->state);
 
     auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
     double d1 = checkerPtr->Distance(q_new->state);
     q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d1 + deltaCoverPenetration_);
+    //std::cout << "d=" << d1 << std::endl;
 
     G_->add(q_new);
     return q_new;
@@ -146,9 +152,10 @@ void RRTUnidirectional::Init()
 
     auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
     double d1 = checkerPtr->Distance(q_start->state);
-    q_start->openset = new cover::OpenSetHypersphere(si_, q_start->state, d1 + deltaCoverPenetration_);
+    q_start->openset = new cover::OpenSetHypersphere(si_, q_start->state, deltaCoverPenetration_);
 
     G_->add(q_start);
+    //si_->printState(q_start->state);
   }
   if (G_->size() == 0){
     OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
@@ -245,6 +252,11 @@ void RRTUnidirectional::Grow(double t)
   Sample(q_random);
   q_near = Nearest(q_random);
   q_new = Connect(q_near, q_random);
+  //std::cout << "Grow" << std::endl;
+  //si_->printState(q_random->state);
+  //si_->printState(q_near->state);
+  //si_->printState(q_new->state);
+  //exit(0);
 
   if(q_new != nullptr){
     lastExtendedConfiguration = q_new;

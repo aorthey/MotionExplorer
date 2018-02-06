@@ -89,7 +89,6 @@ std::vector<PathSpace*> PathSpaceMultiLevelSE3::Decompose(){
   if(output.hasExactSolution()){
     std::vector<Config> path = output.GetShortestPath();
     roadmap->SetShortestPath( path );
-    //decomposedspace.at(0)->SetShortestPath( path );
     decomposedspace.at(0)->SetShortestPath( output.getShortestPathOMPL(), cspace_levels.back() );
   }
   return decomposedspace;

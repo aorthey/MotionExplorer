@@ -27,7 +27,6 @@ void PlannerBackend::Start(){
   pose_objects = 0;
 }
 
-
 bool PlannerBackend::OnCommand(const string& cmd,const string& args){
 
   if(isPlanningInProcess) return BaseT::OnCommand(cmd,args);
@@ -69,6 +68,8 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     state("roadmap_visualize_level_2").toggle();
   }else if(cmd=="draw_roadmap"){
     state("draw_roadmap").toggle();
+  }else if(cmd=="draw_path_sweptvolume"){
+    state("draw_path_sweptvolume").toggle();
   }else if(cmd=="draw_roadmap_volume"){
     state("draw_roadmap_volume").toggle();
   }else if(cmd=="draw_roadmap_vertices"){

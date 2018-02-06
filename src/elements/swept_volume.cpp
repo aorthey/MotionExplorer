@@ -7,7 +7,6 @@ SweptVolume::SweptVolume(Robot *robot){
   _keyframes.clear();
   _mats.clear();
   _robot = robot;
-  color = GLColor(0.8,0.8,0.8);
   uint Nlinks = _robot->links.size();
 
   _appearanceStack.clear();
@@ -24,7 +23,6 @@ SweptVolume::SweptVolume(Robot *robot, const std::vector<Config> &keyframes, uin
   _keyframes.clear();
   _mats.clear();
   _robot = robot;
-  color = GLColor(0.8,0.8,0.8);
   uint Nlinks = _robot->links.size();
 
   _appearanceStack.clear();
@@ -92,12 +90,12 @@ void SweptVolume::SetColor(const GLColor c){
 GLColor SweptVolume::GetColor() const{
   return color;
 }
-void SweptVolume::SetColorMilestones(const GLColor c){
-  color_milestones= c;
-}
-GLColor SweptVolume::GetColorMilestones() const{
-  return color_milestones;
-}
+//void SweptVolume::SetColorMilestones(const GLColor c){
+//  color_milestones= c;
+//}
+//GLColor SweptVolume::GetColorMilestones() const{
+//  return color_milestones;
+//}
 const Config& SweptVolume::GetStart() const{
   return init;
 }
@@ -219,7 +217,7 @@ bool SweptVolume::Save(TiXmlElement *node)
     node->InsertEndChild(c);
   }
   AddSubNode<GLColor>(*node, "color", color);
-  AddSubNode<GLColor>(*node, "color_milestones", color_milestones);
+  //AddSubNode<GLColor>(*node, "color_milestones", color_milestones);
 
   init = _keyframes.front();
   goal = _keyframes.back();
@@ -305,4 +303,29 @@ bool SweptVolume::Load(TiXmlElement *node)
   }
 
   return true;
+}
+
+void SweptVolume::DrawGL(GUIState& state)
+{
+  glDisable(GL_LIGHTING);
+  glEnable(GL_BLEND);
+  for(uint i = 0; i < _mats.size(); i++){
+    for(uint j=0;j<_robot->links.size();j++) {
+      if(_robot->IsGeometryEmpty(j)) continue;
+      Matrix4 matij = _mats.at(i).at(j);
+
+      glPushMatrix();
+      glMultMatrix(matij);
+
+      glScalef(sweptvolumeScale, sweptvolumeScale, sweptvolumeScale);
+
+      GLDraw::GeometryAppearance& a = _appearanceStack.at(j);
+      a.SetColor(color);
+      a.DrawGL();
+      glPopMatrix();
+
+    }
+  }
+  glDisable(GL_BLEND);
+  glEnable(GL_LIGHTING);
 }

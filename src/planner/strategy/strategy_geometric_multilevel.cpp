@@ -417,13 +417,6 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   //###########################################################################
   planner->setup();
 
-  //###########################################################################
-  // solve
-  //
-  // termination condition: 
-  //    reached duration or found solution in epsilon-neighborhood
-  //###########################################################################
-
   double max_planning_time= input.max_planning_time;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 

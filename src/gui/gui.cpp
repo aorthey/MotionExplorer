@@ -29,6 +29,7 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
     GUIVariable* v = it->second;
     MapButtonToggle(v->name.c_str(), &v->active);
   }
+  active_robot = 0;
 }
 
 //############################################################################
@@ -145,7 +146,16 @@ void ForceFieldBackend::RenderWorld()
 
   if(state("draw_robot")){
     for(size_t i=0;i<world->robots.size();i++) {
+      if(i!=active_robot) continue;
       Robot *robot = world->robots[i];
+      if(state("draw_robot_zero_position")){
+        Config q = robot->q;
+        q.setZero();
+        robot->UpdateConfig(q);
+        robot->UpdateGeometry();
+        sim.odesim.robot(i)->SetConfig(q);
+      }
+
       //std::cout << robot->name << " selfcollisions:" << robot->SelfCollision() << std::endl;
       for(size_t j=0;j<robot->links.size();j++) {
         if(robot->IsGeometryEmpty(j)) continue;
@@ -381,6 +391,22 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     state("draw_poser").deactivate();
   }else if(cmd=="draw_forcefield"){
     state("draw_forcefield").toggle();
+  }else if(cmd=="draw_robot"){
+    state("draw_robot").toggle();
+  }else if(cmd=="draw_robot_next"){
+    uint N = world->robots.size();
+    if(active_robot >= N-1){
+      active_robot = 0;
+    }else{
+      active_robot++;
+    }
+  }else if(cmd=="draw_robot_previous"){
+    uint N = world->robots.size();
+    if(active_robot > 0){
+      active_robot--;
+    }else{
+      active_robot = N-1;
+    }
   }else if(cmd=="simulate"){
     state("simulate").toggle();
     simulate = state("simulate").active;
@@ -510,10 +536,12 @@ void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
       SaveScreenshot();
       std::size_t pos = screenshotFile.find(".ppm");
       std::string outpng = screenshotFile.substr(0,pos)+".png";
-      std::string cmd = "convert "+screenshotFile+" "+outpng;
+      std::string cmd = "pnmtopng "+screenshotFile+" > "+outpng;
       int sres = system(cmd.c_str());
       if(sres) std::cout << "successful stored screenshot" << std::endl;
       IncrementStringDigits(screenshotFile);
+      cmd = "mogrify -crop 650x675+6+327 "+outpng;
+      int s1 = std::system(cmd.c_str());
       break;
     }
     default:

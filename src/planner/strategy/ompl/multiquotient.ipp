@@ -49,6 +49,7 @@ void MultiQuotient<T,Tlast>::clear(){
   }
   foundKLevelSolution = false;
 }
+
 void PrintQuotientSpaces(std::vector<Quotient*> quotientSpaces, uint k=0){
   if(k<=0) k=quotientSpaces.size()-1;
   for(uint i = 0; i <= k; i++){
@@ -94,7 +95,6 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
         double t_k_end = ompl::time::seconds(ompl::time::now() - t_k_start);
         std::cout << "Found Solution on Level " << k << " after " << t_k_end << " seconds." << std::endl;
         PrintQuotientSpaces(quotientSpaces, k);
-        //if(t_k_end < 1) continue;
         foundKLevelSolution = true;
       }
       Q.push(jQuotient);

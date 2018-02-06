@@ -57,6 +57,7 @@ class ForceFieldBackend : public SimTestBackend
     int line_y_offset;
     int line_y_offset_stepsize;
 
+    uint active_robot;
     GUIState state;
 };
 

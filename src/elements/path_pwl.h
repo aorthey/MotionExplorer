@@ -1,6 +1,7 @@
 #pragma once
 #include "gui/gui_state.h"
 #include "gui/colors.h"
+#include "elements/swept_volume.h"
 #include <ompl/geometric/PathGeometric.h>
 #include <Library/KrisLibrary/math/vector.h>
 #include <Library/KrisLibrary/math3d/primitives.h>
@@ -48,7 +49,9 @@ class PathPiecewiseLinear
     double length{0};
     std::vector<double> interLength;//interLength(i) length towards next milestone point from q(i)
 
+    SweptVolume *sv{nullptr};
     CSpaceOMPL *cspace;
+
     ob::PathPtr path;
     ob::PathPtr path_raw;
 
