@@ -186,8 +186,8 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     ot::Benchmark benchmark(ss, "BenchmarkNarrowPassage");
     //typedef og::MultiQuotient<og::PRMQuotient> MultiQuotient;
     //typedef og::MultiQuotient<og::PRMQuotient, og::RRTQuotient> MultiQuotient;
-    typedef og::MultiQuotient<og::PRMQuotient, og::RRTQuotient> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec);
+    typedef og::MultiQuotient<og::RRTUnidirectionalCover> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec,"UniCover");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
     benchmark.addPlanner(planner);
 
@@ -206,9 +206,9 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 60;
+    req.maxTime = 1;
     req.maxMem = 10000.0;
-    req.runCount = 5;
+    req.runCount = 10;
     req.displayProgress = true;
 
     benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));

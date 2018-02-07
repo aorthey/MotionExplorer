@@ -81,15 +81,10 @@ RRTUnidirectional::Configuration* RRTUnidirectional::Connect(Configuration *q_ne
     auto *q_new = new Configuration(si_);
     si_->copyState(q_new->state, q_random->state);
     q_new->parent = q_near;
-    //std::cout << "parent: " << std::endl;
-    //si_->printState(q_new->parent->state);
-    //std::cout << "new: " << std::endl;
-    //si_->printState(q_new->state);
 
     auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
     double d1 = checkerPtr->Distance(q_new->state);
     q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d1 + deltaCoverPenetration_);
-    //std::cout << "d=" << d1 << std::endl;
 
     G_->add(q_new);
     return q_new;
@@ -173,7 +168,10 @@ void RRTUnidirectional::clear()
   if(G_){
     G_->clear();
   }
+  hasSolution = false;
+  lastExtendedConfiguration = nullptr;
 }
+
 void RRTUnidirectional::freeMemory()
 {
   if (G_)
@@ -214,32 +212,32 @@ void RRTUnidirectional::setup(void)
 
 void RRTUnidirectional::getPlannerData(base::PlannerData &data) const
 {
-    //Planner::getPlannerData(data);
-    std::vector<Configuration *> vertices;
+  //Planner::getPlannerData(data);
+  std::vector<Configuration *> vertices;
 
-    if (G_){
-      G_->list(vertices);
+  if (G_){
+    G_->list(vertices);
+  }
+
+  if (lastExtendedConfiguration != nullptr){
+    data.addGoalVertex(PlannerDataVertexAnnotated(lastExtendedConfiguration->state, 0, lastExtendedConfiguration->openset->GetRadius()));
+  }
+
+  for (auto &vertex : vertices)
+  {
+    double d = vertex->openset->GetRadius();
+    if (vertex->parent == nullptr){
+      data.addStartVertex(PlannerDataVertexAnnotated(vertex->state, 0, d));
+    }else{
+      double dp = vertex->parent->openset->GetRadius();
+      data.addEdge(PlannerDataVertexAnnotated(vertex->parent->state, 0, dp), PlannerDataVertexAnnotated(vertex->state, 0, d));
     }
-
-    if (lastExtendedConfiguration != nullptr){
-      data.addGoalVertex(PlannerDataVertexAnnotated(lastExtendedConfiguration->state, 0, lastExtendedConfiguration->openset->GetRadius()));
+    if(!vertex->state){
+      std::cout << "vertex state does not exists" << std::endl;
+      si_->printState(vertex->state);
+      exit(0);
     }
-
-    for (auto &vertex : vertices)
-    {
-      double d = vertex->openset->GetRadius();
-      if (vertex->parent == nullptr){
-        data.addStartVertex(PlannerDataVertexAnnotated(vertex->state, 0, d));
-      }else{
-        double dp = vertex->parent->openset->GetRadius();
-        data.addEdge(PlannerDataVertexAnnotated(vertex->parent->state, 0, dp), PlannerDataVertexAnnotated(vertex->state, 0, d));
-      }
-      if(!vertex->state){
-        std::cout << "vertex state does not exists" << std::endl;
-        si_->printState(vertex->state);
-      }
-
-    }
+  }
 }
 
 void RRTUnidirectional::Grow(double t)
@@ -252,11 +250,6 @@ void RRTUnidirectional::Grow(double t)
   Sample(q_random);
   q_near = Nearest(q_random);
   q_new = Connect(q_near, q_random);
-  //std::cout << "Grow" << std::endl;
-  //si_->printState(q_random->state);
-  //si_->printState(q_near->state);
-  //si_->printState(q_new->state);
-  //exit(0);
 
   if(q_new != nullptr){
     lastExtendedConfiguration = q_new;

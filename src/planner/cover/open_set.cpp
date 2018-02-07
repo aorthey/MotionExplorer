@@ -15,6 +15,10 @@ ob::State* OpenSet::GetCenter() const{
 double OpenSet::GetRadius() const{
   return dist_robot_env;
 }
+void OpenSet::SetRadius(double d_)
+{
+  dist_robot_env = d_;
+}
 
 void OpenSet::IntersectionTowards(const ob::State *sGoal, ob::State *sIntersected){
   double d = Distance(sCenter, sGoal);

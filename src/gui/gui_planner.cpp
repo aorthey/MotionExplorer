@@ -68,6 +68,8 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     state("draw_roadmap").toggle();
   }else if(cmd=="draw_roadmap_swathvolume"){
     state("draw_roadmap_swathvolume").toggle();
+  }else if(cmd=="draw_roadmap_volume"){
+    state("draw_roadmap_volume").toggle();
   }else if(cmd=="draw_roadmap_vertices"){
     state("draw_roadmap_vertices").toggle();
   }else if(cmd=="draw_roadmap_edges"){

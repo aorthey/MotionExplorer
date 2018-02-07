@@ -28,6 +28,7 @@ namespace ompl
       PDF<RRTUnidirectional::Configuration*> GetConfigurationPDF();
       virtual void Sample(RRTUnidirectional::Configuration*) override;
       virtual bool SampleGraph(ob::State*) override;
+      virtual Configuration* Connect(Configuration *q_near, Configuration *q_random) override;
 
       bool IsInsideCover(Configuration*);
 

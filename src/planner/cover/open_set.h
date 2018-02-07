@@ -13,6 +13,7 @@ namespace cover{
       virtual void IntersectionTowards(const ob::State *sGoal, ob::State *sIntersected);
       virtual ob::State* GetCenter() const;
       virtual double GetRadius() const;
+      virtual void SetRadius(double);
 
     protected:
       virtual double Distance(const ob::State *s_lhs, const ob::State *s_rhs) = 0;
