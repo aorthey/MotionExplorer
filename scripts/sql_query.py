@@ -84,11 +84,6 @@ def extractInfoFromSqlDatabase(fname,verbose=True):
   connection.close()
 
 if __name__ == '__main__':
-  fname = "../data/benchmarks/snake_turbine_irreducible.db"
-  fname = "../data/benchmarks/snake_turbine_2017_04_20.db"
-  fname = "../data/benchmarks/snake_turbine_test.db"
-  fname = "../data/benchmarks/snake_turbine_test_irreducible.db"
-  fname = "../data/benchmarks/ompl_irreducible_benchmark.db"
-  fname = "../data/benchmarks/ompl_benchmark.db"
+  fname = "../data/benchmarks/database/ompl_benchmark.db"
   extractInfoFromSqlDatabase(fname)
 

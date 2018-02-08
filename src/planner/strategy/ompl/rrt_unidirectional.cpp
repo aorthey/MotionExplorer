@@ -6,7 +6,7 @@ using namespace ompl::geometric;
 
 RRTUnidirectional::RRTUnidirectional(const base::SpaceInformationPtr &si, Quotient *previous ): og::Quotient(si, previous)
 {
-  deltaCoverPenetration_ = 0.01;
+  deltaCoverPenetration_ = 0.05;
   goalBias_ = 0.05;
 }
 
@@ -70,8 +70,10 @@ RRTUnidirectional::Configuration* RRTUnidirectional::Connect(Configuration *q_ne
   // q_new_state <- BALL_maxDistance_(q_near) in direction of q_random
   //##############################################################################
   double d = si_->distance(q_near->state, q_random->state);
-  if(d > maxDistance_){
-    si_->getStateSpace()->interpolate(q_near->state, q_random->state, maxDistance_ / d, q_random->state);
+  double maxD = q_near->GetRadius();
+  if(d > maxD){
+    //maxD/d -> t \in [0,1] on boundary
+    si_->getStateSpace()->interpolate(q_near->state, q_random->state, maxD / d, q_random->state);
   }
 
   //##############################################################################
@@ -147,7 +149,7 @@ void RRTUnidirectional::Init()
 
     auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
     double d1 = checkerPtr->Distance(q_start->state);
-    q_start->openset = new cover::OpenSetHypersphere(si_, q_start->state, deltaCoverPenetration_);
+    q_start->openset = new cover::OpenSetHypersphere(si_, q_start->state, d1 + deltaCoverPenetration_);
 
     G_->add(q_start);
     //si_->printState(q_start->state);

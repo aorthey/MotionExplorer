@@ -302,10 +302,11 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, uint lvl)
         ctr++;
         drawPoint(q);
       }else{
-        Vector3 q = cspace->getXYZ(v->getState());
-        ctr++;
-        drawPoint(q);
-        if(v!=nullptr && v->GetLevel()==lvl){
+        if(v->GetLevel()==lvl)
+        {
+          Vector3 q = cspace->getXYZ(v->getState());
+          ctr++;
+          drawPoint(q);
           if(state("draw_roadmap_volume")){
             glTranslate(q);
             double d = v->GetOpenNeighborhoodDistance();
@@ -316,6 +317,7 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, uint lvl)
       glPopMatrix();
     }
   }
+  //std::cout << "level " << lvl << " " << ctr << " vertices." << std::endl;
   glLineWidth(5);
   if(state("draw_roadmap_edges")){
     setColor(cEdge);

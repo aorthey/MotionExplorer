@@ -67,24 +67,25 @@ RRTUnidirectional::Configuration* RRTUnidirectionalCover::Connect(Configuration 
   // extend the tree from q_near towards q_new
   //##############################################################################
   if(si_->checkMotion(q_near->state, q_random->state)){
+
     auto *q_new = new Configuration(si_);
     si_->copyState(q_new->state, q_random->state);
     q_new->parent = q_near;
+
     //std::cout << "parent: " << std::endl;
     //si_->printState(q_new->parent->state);
     //std::cout << "new: " << std::endl;
     //si_->printState(q_new->state);
+
     auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
     double d2 = checkerPtr->Distance(q_new->state);
-
-    //double d1 = si_->distance(q_near->state, q_new->state);
-    //q_near->openset->SetRadius(d1 + deltaCoverPenetration_);
     q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d2 + deltaCoverPenetration_);
-    //std::cout << "d=" << d1 << std::endl;
 
     G_->add(q_new);
     return q_new;
+
   }
+
   return nullptr;
 }
 
@@ -99,11 +100,11 @@ bool RRTUnidirectionalCover::SampleGraph(ob::State *q_random_graph)
   const ob::State *q_to = q->parent->state;
   M1->getStateSpace()->interpolate(q_from, q_to, t, q_random_graph);
 
-  //double d = q->openset->GetRadius();
-  double d = 0.05;
-  //sampler_->sampleGaussian(q_random_graph, q_random_graph, d);
+  double d = q->openset->GetRadius();
+  //double d = 0.1;
+  sampler_->sampleGaussian(q_random_graph, q_random_graph, d);
 
-  sampler_->sampleUniformNear(q_random_graph, q_random_graph, d);
+  //sampler_->sampleUniformNear(q_random_graph, q_random_graph, d);
 
   return true;
 }
@@ -118,7 +119,7 @@ ompl::PDF<RRTUnidirectional::Configuration*> RRTUnidirectionalCover::GetConfigur
   for (auto &configuration : configurations)
   {
     if(!(configuration->parent == nullptr)){
-      pdf.add(configuration, 1);//configuration->openset->GetRadius());
+      pdf.add(configuration, 1.0/configuration->openset->GetRadius());
     }
     //pdf.add(configuration, 1);
   }

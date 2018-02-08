@@ -1,0 +1,465 @@
+<?xml version="1.0" ?>
+<!-- ============================================================================================== -->
+<!-- |                                                                                            | -->
+<!-- |    baxter.urdf is DEPRECATED. It is included here for backward compatibility.              | -->
+<!-- |    Please use baxter.urdf.xacro by running:                                                | -->
+<!-- |$ rosrun xacro xacro.py - -inorder `rospack find baxter_description`/urdf/baxter.urdf.xacro | -->
+<!-- |                                                                                            | -->
+<!-- ============================================================================================== -->
+<robot name="baxter">
+  <link name="base">
+  </link>
+  <link name="torso">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/torso/base_link.DAE"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/torso/base_link_collision.DAE"/>
+      </geometry>
+    </collision>
+
+
+    <inertial>
+      <origin rpy="0 0 0" xyz="0.000000 0.000000 0.000000"/>
+      <mass value="35.336455"/>
+      <inertia ixx="1.849155" ixy="-0.000354" ixz="-0.154188" iyy="1.662671" iyz="0.003292" izz="0.802239"/>
+    </inertial>
+  </link>
+  <link name="left_torso_itb">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0.000000 0.000000 0.000000"/>
+      <mass value="0.0001"/>
+      <inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/>
+    </inertial>
+  </link>
+  <link name="pedestal">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/base/PEDESTAL.DAE"/>
+      </geometry>
+      <material name="darkgray">
+        <color rgba=".2 .2 .2 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/base/pedestal_link_collision.DAE"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="60.86397744"/>
+      <inertia ixx="5.0635929" ixy="0.00103417" ixz="0.80199628" iyy="6.08689388" iyz="0.00105311" izz="4.96191932"/>
+    </inertial>
+  </link>
+
+
+  <link name="left_arm_mount">
+    <!-- all defaults -->
+ <gravity>0</gravity>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.0001"/>
+      <inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/>
+    </inertial>
+  </link>
+  <link name="left_upper_shoulder">
+ <gravity>0</gravity>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/upper_shoulder/S0.DAE"/>
+      </geometry>
+      <material name="darkred">
+        <color rgba=".5 .1 .1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.1361"/>
+      <geometry>
+        <cylinder length="0.2722" radius="0.06"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0.01783 0.00086 0.19127"/>
+      <mass value="5.70044"/>
+      <inertia ixx="0.04709102262" ixy="0.00012787556" ixz="0.00614870039" iyy="0.03766976455" iyz="0.00078086899" izz="0.03595988478"/>
+    </inertial>
+  </link>
+  <link name="left_lower_shoulder">
+ <gravity>0</gravity>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/lower_shoulder/S1.DAE"/>
+      </geometry>
+      <material name="darkred">
+        <color rgba=".5 .1 .1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <cylinder length="0.12" radius="0.06"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0.06845 0.00269 -0.00529"/>
+      <mass value="3.22698"/>
+      <inertia ixx="0.01175209419" ixy="-0.00030096398" ixz="0.00207675762" iyy="0.0278859752" iyz="-0.00018821993" izz="0.02078749298"/>
+    </inertial>
+  </link>
+  <link name="left_upper_elbow">
+ <gravity>0</gravity>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/upper_elbow/E0.DAE"/>
+      </geometry>
+      <material name="darkred">
+        <color rgba=".5 .1 .1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 -0.0535"/>
+      <geometry>
+        <cylinder length="0.107" radius="0.06"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin rpy="0 0 0" xyz="-0.00276 0.00132 0.18086"/>
+      <mass value="4.31272"/>
+      <inertia ixx="0.02661733557" ixy="0.00029270634" ixz="0.00392189887" iyy="0.02844355207" iyz="0.0010838933" izz="0.01248008322"/>
+    </inertial>
+  </link>
+  <link name="left_upper_elbow_visual">
+ <gravity>0</gravity>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.1365"/>
+      <geometry>
+        <cylinder length="0.273" radius="0.06"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.0001"/>
+      <inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/>
+    </inertial>
+  </link>
+  <joint name="left_torso_arm_mount" type="fixed">
+    <origin rpy="0 0 0.7854" xyz="0.024645 0.219645 0.118588"/>
+    <parent link="torso"/>
+    <child link="left_arm_mount"/>
+  </joint>
+  <joint name="left_s0" type="revolute">
+    <origin rpy="0 0 0" xyz="0.055695 0 0.011038"/>
+    <axis xyz="0 0 1"/>
+    <parent link="left_arm_mount"/>
+    <child link="left_upper_shoulder"/>
+    <limit effort="50.0" lower="-1.70167993878" upper="1.70167993878" velocity="1.5"/>
+    <dynamics damping="0.7" friction="0.0"/>
+  </joint>
+  <joint name="left_s1" type="revolute">
+    <origin rpy="-1.57079632679 0 0" xyz="0.069 0 0.27035"/>
+    <axis xyz="0 0 1"/>
+    <parent link="left_upper_shoulder"/>
+    <child link="left_lower_shoulder"/>
+    <limit effort="100.0" lower="-2.147" upper="1.047" velocity="1.5"/>
+    <dynamics damping="0.7" friction="0.0"/>
+  </joint>
+  <joint name="left_e0" type="revolute">
+    <origin rpy="1.57079632679 0 1.57079632679" xyz="0.102 0 0"/>
+    <axis xyz="0 0 1"/>
+    <parent link="left_lower_shoulder"/>
+    <child link="left_upper_elbow"/>
+    <limit effort="50.0" lower="-3.05417993878" upper="3.05417993878" velocity="1.5"/>
+    <dynamics damping="0.7" friction="0.0"/>
+  </joint>
+  <joint name="left_e0_fixed" type="fixed">
+    <origin rpy="1.57079632679 0 1.57079632679" xyz="0.107 0 0"/>
+    <axis xyz="0 0 1"/>
+    <parent link="left_lower_shoulder"/>
+    <child link="left_upper_elbow_visual"/>
+  </joint>
+
+  <!-- Transmissions -->
+  <link name="head">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 .00953"/>
+      <geometry>
+        <mesh filename="meshes/head/H0.DAE"/>
+      </geometry>
+      <material name="darkgray">
+        <color rgba=".2 .2 .2 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.0 0 0.0"/>
+      <geometry>
+        <sphere radius="0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.547767"/>
+      <inertia ixx="0.004641" ixy="0.000159" ixz="0.000242" iyy="0.003295" iyz="-0.001324" izz="0.003415"/>
+    </inertial>
+  </link>
+  <link name="sonar_ring">
+    <visual>
+      <origin rpy="0 0 0" xyz="-.0347 0 .00953"/>
+      <geometry>
+        <cylinder length="0.01" radius="0.085"/>
+      </geometry>
+      <material name="darkgray">
+        <color rgba=".2 .2 .2 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.0 0 0.0"/>
+      <geometry>
+        <sphere radius="0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.0001"/>
+      <inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/>
+    </inertial>
+  </link>
+  <link name="screen">
+    <visual>
+      <origin rpy="0 -1.57079632679 0" xyz="0 -.00953 -.0347"/>
+      <geometry>
+        <mesh filename="meshes/head/H1.DAE"/>
+      </geometry>
+      <material name="darkred">
+        <color rgba=".5 .1 .1 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0.0 0 0.0"/>
+      <geometry>
+        <sphere radius="0.001"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.440171"/>
+      <inertia ixx="0.004006" ixy="0.000230" ixz="0.000002" iyy="0.002800" iyz="0.000029" izz="0.001509"/>
+    </inertial>
+  </link>
+  <link name="display">
+    <visual>
+      <origin rpy="0.2617993877991494 0 0" xyz="0 0 0"/>
+      <geometry>
+        <box size="0.218 0.16 0.001"/>
+      </geometry>
+      <material name="black">
+        <color rgba="0 0 0 1"/>
+      </material>
+    </visual>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.0001"/>
+      <inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/>
+    </inertial>
+  </link>
+  <link name="head_camera">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.0001"/>
+      <inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/>
+    </inertial>
+  </link>
+  <link name="dummyhead1">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.0001"/>
+      <inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/>
+    </inertial>
+  </link>
+  <link name="collision_head_link_1">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.001"/>
+      </geometry>
+      <material name="red">
+        <color rgba="0.8 0.3 0.3 0.3"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0.0" xyz="-0.07 -0.04 0.0"/>
+      <geometry>
+        <sphere radius="0.22"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.0001"/>
+      <inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/>
+    </inertial>
+  </link>
+  <link name="collision_head_link_2">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.001"/>
+      </geometry>
+      <material name="red">
+        <color rgba="0.8 0.3 0.3 0.3"/>
+      </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="-0.07 0.04 0.00"/>
+      <geometry>
+        <sphere radius="0.22"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.0001"/>
+      <inertia ixx="1e-08" ixy="0" ixz="0" iyy="1e-08" iyz="0" izz="1e-08"/>
+    </inertial>
+  </link>
+  <joint name="collision_head_1" type="fixed">
+    <origin rpy="0 0 0" xyz="0.11 0 0.75"/>
+    <parent link="base"/>
+    <child link="collision_head_link_1"/>
+  </joint>
+  <joint name="collision_head_2" type="fixed">
+    <origin rpy="0 0 0" xyz="0.11 0 0.75"/>
+    <parent link="base"/>
+    <child link="collision_head_link_2"/>
+  </joint>
+  <joint name="dummy" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="head"/>
+    <child link="dummyhead1"/>
+  </joint>
+  <joint name="torso_t0" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="base"/>
+    <child link="torso"/>
+    <limit effort="50000" lower="-3.01" upper="3.01" velocity="10000"/>
+  </joint>
+  <joint name="left_torso_itb_fixed" type="fixed">
+    <origin rpy="-1.57079632679 3.1415 0" xyz="-0.08897 0.15593 0.389125"/>
+    <parent link="torso"/>
+    <child link="left_torso_itb"/>
+  </joint>
+  <joint name="pedestal_fixed" type="fixed">
+    <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
+    <parent link="torso"/>
+    <child link="pedestal"/>
+  </joint>
+  <joint name="head_pan" type="fixed">
+    <origin rpy="0 0 0" xyz="0.06 0 0.686"/>
+    <axis xyz="0 0 1"/>
+    <parent link="torso"/>
+    <child link="head"/>
+    <limit effort="50000" lower="-1.57079632679" upper="1.57079632679" velocity="10000"/>
+    <dynamics damping="0.7" friction="0.0"/>
+  </joint>
+  <joint name="head_nod" type="fixed">
+    <origin rpy="1.75057 0 1.57079632679" xyz=".1227 0 0"/>
+    <parent link="head"/>
+    <child link="screen"/>
+  </joint>
+  <joint name="head_camera" type="fixed">
+    <origin rpy="1.75057 0 1.57079632679" xyz="0.12839 0 0.06368"/>
+    <parent link="head"/>
+    <child link="head_camera"/>
+  </joint>
+  <joint name="display_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0.0 -0.016 0.0"/>
+    <parent link="screen"/>
+    <child link="display"/>
+  </joint>
+  <joint name="sonar_s0" type="fixed">
+    <origin rpy="0 0 0" xyz="0.0947 0 .817"/>
+    <axis xyz="0 0 1"/>
+    <parent link="torso"/>
+    <child link="sonar_ring"/>
+  </joint>
+
+  <!-- Right Arm -->
+  <!-- Left Arm -->
+  <transmission name="left_tran1">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="left_s0">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="left_motor1">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="left_tran2">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="left_s1">      
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="left_motor2">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+  <transmission name="left_tran3">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="left_e0">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="left_motor3">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <!-- Head -->
+  <transmission name="head1">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="head_pan">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="head_motor1">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+
+  <klampt package_root="../../../.." flip_yz="1" default_acc_max="4" fixed_root_link="1" use_vis_geom="1">
+    <link name="dummyhead1" physical="0" />
+    <link name="head_camera" physical="0" />
+    <link name="display" physical="0" />
+    <link name="left_arm_mount" physical="0" />
+    <link name="left_arm_itb" physical="0" />
+    <link name="left_upper_elbow_visual" physical="0" />
+    <link name="left_upper_forearm_visual" physical="0" />
+    <link name="left_gripper_base" physical="0" />
+    <link name="left_gripper" physical="0" />
+    <link name="left_hand_camera" physical="0" />
+    <link name="left_hand_camera_axis" physical="0" />
+    <link name="left_hand_range" physical="0" />
+    <link name="sonar_ring" physical="0" />
+    <link name="collision_head_link_1" physical="0" />
+    <link name="collision_head_link_2" physical="0" />
+    <link name="left_upper_shoulder" servoP="200" servoI="0" servoD="10"/>
+    <link name="left_lower_shoulder" servoP="600" servoI="0" servoD="10"/>
+    <link name="left_lower_forearm" servoP="20" servoI="0" servoD="1"/>
+   <noselfcollision pairs="collision_head_link_1 collision_head_link_2" />
+    <noselfcollision group1="screen" group2="collision_head_link_1 collision_head_link_2 sonar_ring"/>
+    <noselfcollision group1="torso pedestal" group2="head screen sonar_ring"/>
+    <noselfcollision group1="left_upper_shoulder left_lower_shoulder " group2="head screen collision_head_link_1 collision_head_link_2  torso pedestal sonar_ring"/>
+  </klampt>
+
+</robot>

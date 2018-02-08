@@ -59,24 +59,6 @@
     <key>l</key>
     <active>0</active>
   </checkbox>
-  <checkbox>
-    <name>draw_roadmap_vertices</name>
-    <descr>Draw Roadmap Vertices</descr>
-    <key>1</key>
-    <active>1</active>
-  </checkbox>
-  <checkbox>
-    <name>draw_roadmap_edges</name>
-    <descr>Draw Roadmap Edges</descr>
-    <key>2</key>
-    <active>1</active>
-  </checkbox>
-  <checkbox>
-    <name>draw_roadmap_volume</name>
-    <descr>Draw Roadmap Volume</descr>
-    <key>3</key>
-    <active>1</active>
-  </checkbox>
 
   <checkbox>
     <name>draw_roadmap</name>
@@ -106,25 +88,6 @@
     <descr>Load Current Path</descr>
     <key>9</key>
   </hotkey>
-
-  <checkbox>
-    <name>roadmap_visualize_level_0</name>
-    <descr>Roadmap Vis Level 0</descr>
-    <key>6</key>
-    <active>0</active>
-  </checkbox>
-  <checkbox>
-    <name>roadmap_visualize_level_1</name>
-    <descr>Roadmap Vis Level 1</descr>
-    <key>7</key>
-    <active>1</active>
-  </checkbox>
-  <checkbox>
-    <name>roadmap_visualize_level_2</name>
-    <descr>Roadmap Vis Level 2</descr>
-    <key>8</key>
-    <active>0</active>
-  </checkbox>
 
   <hotkey>
     <name>reset</name>
@@ -172,6 +135,43 @@
     <descr>Draw Roadmap Swathvolume</descr>
     <key>k</key>
   </hotkey>
+
+  <checkbox>
+    <name>roadmap_visualize_level_0</name>
+    <descr>Roadmap Vis Level 0</descr>
+    <key>6</key>
+    <active>0</active>
+  </checkbox>
+  <checkbox>
+    <name>roadmap_visualize_level_1</name>
+    <descr>Roadmap Vis Level 1</descr>
+    <key>7</key>
+    <active>1</active>
+  </checkbox>
+  <checkbox>
+    <name>roadmap_visualize_level_2</name>
+    <descr>Roadmap Vis Level 2</descr>
+    <key>8</key>
+    <active>0</active>
+  </checkbox>
+  <checkbox>
+    <name>draw_roadmap_vertices</name>
+    <descr>Draw Roadmap Vertices</descr>
+    <key>1</key>
+    <active>1</active>
+  </checkbox>
+  <checkbox>
+    <name>draw_roadmap_edges</name>
+    <descr>Draw Roadmap Edges</descr>
+    <key>2</key>
+    <active>0</active>
+  </checkbox>
+  <checkbox>
+    <name>draw_roadmap_volume</name>
+    <descr>Draw Roadmap Volume</descr>
+    <key>3</key>
+    <active>0</active>
+  </checkbox>
 
   <property name="draw_path" enabled="0"/>
   <property name="draw_path_unsmoothed" enabled="0"/>

@@ -160,6 +160,24 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       pin.inputs.at(0)->qMin = robot->qMin;
       pin.inputs.at(0)->qMax = robot->qMax;
       uint N = robot->q.size();
+
+      uint Ni = pin.inputs.at(0)->q_init.size();
+      uint Ng = pin.inputs.at(0)->q_goal.size();
+      if(Ni!=N){
+        std::cout << std::string(80, '#') << std::endl;
+        std::cout << "q_init has " << Ni << " dofs, but robot " << robot->name << " expects " << N << " dofs." << std::endl;
+        std::cout << std::string(80, '#') << std::endl;
+        exit(1);
+      }
+      if(Ng!=N){
+        std::cout << std::string(80, '#') << std::endl;
+        std::cout << "q_goal has " << Ng << " dofs, but robot " << robot->name << " expects " << N << " dofs." << std::endl;
+        std::cout << std::string(80, '#') << std::endl;
+        exit(1);
+      }
+
+
+
       robot->q = pin.inputs.at(0)->q_init;
       robot->q.resize(N);
       robot->UpdateFrames();
