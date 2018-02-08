@@ -293,21 +293,27 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, uint lvl)
   if(state("draw_roadmap_vertices")){
     setColor(cVertex);
     for(uint vidx = 0; vidx < Nvertices; vidx++){
-      PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&pds->getVertex(vidx));
-      if(v!=ob::PlannerData::NO_VERTEX){
-        glPushMatrix();
-        Vector3 q = cspace->getXYZ(v.getState());
-        if(v.GetLevel()==lvl){
-          ctr++;
-          drawPoint(q);
+      glPushMatrix();
+      PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pds->getVertex(vidx));
+      if(v==nullptr){
+        ob::PlannerDataVertex *vd = &pds->getVertex(vidx);
+        if(vd==nullptr) continue;
+        Vector3 q = cspace->getXYZ(vd->getState());
+        ctr++;
+        drawPoint(q);
+      }else{
+        Vector3 q = cspace->getXYZ(v->getState());
+        ctr++;
+        drawPoint(q);
+        if(v!=nullptr && v->GetLevel()==lvl){
           if(state("draw_roadmap_volume")){
             glTranslate(q);
-            double d = v.GetOpenNeighborhoodDistance();
+            double d = v->GetOpenNeighborhoodDistance();
             drawSphere(d,16,8);
           }
         }
-        glPopMatrix();
       }
+      glPopMatrix();
     }
   }
   glLineWidth(5);
