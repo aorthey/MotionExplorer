@@ -12,6 +12,33 @@ RRTUnidirectionalCover::RRTUnidirectionalCover(const base::SpaceInformationPtr &
 RRTUnidirectionalCover::~RRTUnidirectionalCover(void)
 {
 }
+void RRTUnidirectionalCover::getPlannerData(base::PlannerData &data) const
+{
+  std::vector<Configuration *> vertices;
+
+  if (G_){
+    G_->list(vertices);
+  }
+
+  data.addGoalVertex(PlannerDataVertexAnnotated(q_goal->state, 0, q_goal->openset->GetRadius()));
+
+  uint ctr = 0;
+  for (auto &vertex : vertices)
+  {
+    double d = vertex->openset->GetRadius();
+    if (vertex->parent == nullptr){
+      data.addStartVertex(PlannerDataVertexAnnotated(vertex->state, 0, d));
+    }else{
+      double dp = vertex->parent->openset->GetRadius();
+      data.addEdge(PlannerDataVertexAnnotated(vertex->parent->state, 0, dp), PlannerDataVertexAnnotated(vertex->state, 0, d));
+    }
+    if(!vertex->state){
+      std::cout << "vertex state does not exists" << std::endl;
+      si_->printState(vertex->state);
+      exit(0);
+    }
+  }
+}
 
 void RRTUnidirectionalCover::Sample(RRTUnidirectional::Configuration *q)
 {
@@ -157,8 +184,8 @@ bool RRTUnidirectionalCover::SampleGraph(ob::State *q_random_graph)
 
   double d = q->openset->GetRadius();
 
-  sampler_->sampleGaussian(q_random_graph, q_random_graph, d);
-  //sampler_->sampleUniformNear(q_random_graph, q_random_graph, d);
+  //sampler_->sampleGaussian(q_random_graph, q_random_graph, d);
+  sampler_->sampleUniformNear(q_random_graph, q_random_graph, d);
   return true;
 }
 
@@ -174,8 +201,11 @@ ompl::PDF<RRTUnidirectional::Configuration*> RRTUnidirectionalCover::GetConfigur
     if(!(configuration->parent == nullptr)){
       //pdf.add(configuration, 1.0/configuration->openset->GetRadius());
       //pdf.add(configuration, exp(-configuration->openset->GetRadius()));
-      //pdf.add(configuration, configuration->openset->GetRadius());
-      pdf.add(configuration, 1.0);
+      //pdf.add(configuration, d);
+      double d = configuration->openset->GetRadius();
+      //pdf.add(configuration, 1.0);
+      pdf.add(configuration, 1.0/d);
+      //pdf.add(configuration, exp(-d));
     }
   }
 
@@ -184,34 +214,4 @@ ompl::PDF<RRTUnidirectional::Configuration*> RRTUnidirectionalCover::GetConfigur
     exit(0);
   }
   return pdf;
-}
-void RRTUnidirectionalCover::getPlannerData(base::PlannerData &data) const
-{
-  std::vector<Configuration *> vertices;
-
-  if (G_){
-    G_->list(vertices);
-  }
-
-  if(q_goal==nullptr){
-    std::cout << "q_goal not initialized!?" << std::endl;
-  }
-  data.addGoalVertex(PlannerDataVertexAnnotated(q_goal->state, 0, q_goal->openset->GetRadius()));
-
-  uint ctr = 0;
-  for (auto &vertex : vertices)
-  {
-    double d = vertex->openset->GetRadius();
-    if (vertex->parent == nullptr){
-      data.addStartVertex(PlannerDataVertexAnnotated(vertex->state, 0, d));
-    }else{
-      double dp = vertex->parent->openset->GetRadius();
-      data.addEdge(PlannerDataVertexAnnotated(vertex->parent->state, 0, dp), PlannerDataVertexAnnotated(vertex->state, 0, d));
-    }
-    if(!vertex->state){
-      std::cout << "vertex state does not exists" << std::endl;
-      si_->printState(vertex->state);
-      exit(0);
-    }
-  }
 }

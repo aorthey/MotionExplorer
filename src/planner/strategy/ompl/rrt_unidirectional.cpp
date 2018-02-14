@@ -163,8 +163,6 @@ void RRTUnidirectional::Init()
     auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
     double d1 = checkerPtr->Distance(q_goal->state);
     q_goal->openset = new cover::OpenSetHypersphere(si_, q_goal->state, d1);
-    std::cout << "q_goal initizalized" << std::endl;
-    si_->printState(q_goal->state);
   }else{
     OMPL_ERROR("%s: There is no valid goal state!", getName().c_str());
     exit(0);

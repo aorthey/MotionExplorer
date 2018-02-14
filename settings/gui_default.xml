@@ -175,7 +175,7 @@
 
   <slider>
     <name>draw_cover_threshold</name>
-    <value>10</value>
+    <value>1</value>
     <min>0</min>
     <max>20</max>
     <step>1</step>

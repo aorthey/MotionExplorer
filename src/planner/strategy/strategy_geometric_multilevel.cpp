@@ -207,7 +207,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 300;
+    req.maxTime = 600;
     req.maxMem = 10000.0;
     req.runCount = 10;
     req.displayProgress = true;
