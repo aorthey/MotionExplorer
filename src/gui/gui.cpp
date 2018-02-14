@@ -487,6 +487,20 @@ bool GLUIForceFieldGUI::Initialize()
       //no graphical representation for hotkey
     }else if(v->type == GUIVariable::Type::PROPERTY){
       //no graphical representation for property
+    }else if(v->type == GUIVariable::Type::SLIDER){
+      spinner = glui->add_spinner_to_panel(panel, descr.c_str(), GLUI_SPINNER_FLOAT);
+      spinner->set_float_val(v->value);
+      spinner->set_float_limits(v->min, v->max);
+      AddControl(spinner,v->name.c_str());
+      //checkbox->set_int_val(v->active);
+      // GLUI_Translation *GLUI::add_translation_to_panel( 
+      //       GLUI_Panel *panel, const char *name, 
+      //         int trans_type, float *value_ptr,
+      //           int id, GLUI_CB callback 
+      //             )
+      // {
+          //return new GLUI_Translation(panel, name, trans_type, value_ptr, id, callback);
+
     }else{
       std::cout << std::string(80, '#') << std::endl;
       std::cout << "variable type: " << v->type << " unknown." << std::endl;

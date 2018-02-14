@@ -7,7 +7,7 @@
 
 struct GUIVariable
 {
-  enum Type{CHECKBOX, BUTTON, HOTKEY, PROPERTY};
+  enum Type{CHECKBOX, BUTTON, HOTKEY, PROPERTY, SLIDER};
 
   GUIVariable();
   GUIVariable(std::string);
@@ -31,6 +31,11 @@ struct GUIVariable
   Type type;
 
   friend std::ostream& operator<< (std::ostream&, const GUIVariable&);
+
+  double value{0.0};
+  double min{0.0};
+  double max{0.0};
+  double step{0.0};
 };
 
 class GUIState{

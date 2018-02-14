@@ -155,6 +155,31 @@ bool GUIState::Load(TiXmlElement *node)
     variables[v->name] = v;
     node_state = FindNextSiblingNode(node_state, "property");
   }
+  //################################################################################
+  //slider
+  //################################################################################
+  node_state = FindSubNode(node, "slider");
+
+  while(node_state!=NULL){
+    GUIVariable* v = new GUIVariable();
+
+    TiXmlElement* node_name  = FindSubNode(node_state, "name");
+    TiXmlElement* node_descr = FindSubNode(node_state, "descr");
+    TiXmlElement* node_value = FindSubNode(node_state, "value");
+    TiXmlElement* node_min   = FindSubNode(node_state, "min");
+    TiXmlElement* node_max   = FindSubNode(node_state, "max");
+    TiXmlElement* node_step  = FindSubNode(node_state, "step");
+    if(node_name) GetStreamText(node_name) >> v->name;
+    if(node_descr) std::getline(GetStreamText(node_descr), v->descr);
+    if(node_value) GetStreamText(node_value) >> v->value;
+    if(node_min) GetStreamText(node_min) >> v->min;
+    if(node_max) GetStreamText(node_max) >> v->max;
+    if(node_step) GetStreamText(node_step) >> v->step;
+
+    v->type = GUIVariable::Type::SLIDER;
+    variables[v->name] = v;
+    node_state = FindNextSiblingNode(node_state, "slider");
+  }
   return true;
 }
 

@@ -310,7 +310,14 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, uint lvl)
           if(state("draw_roadmap_volume")){
             glTranslate(q);
             double d = v->GetOpenNeighborhoodDistance();
-            drawSphere(d,16,8);
+            GUIVariable& v=state("draw_cover_threshold");
+            if(v.type!=GUIVariable::SLIDER){
+              std::cout << "error: not slider" << std::endl;
+              exit(0);
+            }
+            if(d < v.value){
+              drawSphere(d,16,8);
+            }
           }
         }
       }

@@ -173,6 +173,22 @@
     <active>1</active>
   </checkbox>
 
+  <slider>
+    <name>draw_cover_threshold</name>
+    <value>10</value>
+    <min>0</min>
+    <max>20</max>
+    <step>1</step>
+  </slider>
+  <hotkey>
+    <name>draw_cover_threshold_up</name>
+    <key>z</key>
+  </hotkey>
+  <hotkey>
+    <name>draw_cover_threshold_down</name>
+    <key>x</key>
+  </hotkey>
+
   <property name="draw_path" enabled="0"/>
   <property name="draw_path_unsmoothed" enabled="0"/>
 

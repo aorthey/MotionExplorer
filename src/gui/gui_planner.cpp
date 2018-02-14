@@ -75,6 +75,13 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="draw_roadmap_edges"){
     state("draw_roadmap_edges").toggle();
 
+  }else if(cmd=="draw_cover_threshold_up"){
+    GUIVariable &v = state("draw_cover_threshold");
+    v.value = min(v.max, v.value + v.step);
+  }else if(cmd=="draw_cover_threshold_down"){
+    GUIVariable &v = state("draw_cover_threshold");
+    v.value = max(v.min, v.value - v.step);
+
   }else if(cmd=="draw_path_sweptvolume"){
     state("draw_path_sweptvolume").toggle();
   }else if(cmd=="draw_play_path"){

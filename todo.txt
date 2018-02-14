@@ -410,3 +410,5 @@ QS? Should not happen i thought.
 
 [ ] sampling density should reflect the radius of the vertices, i.e. the volume
 of the cover
+[ ] visualize: shortest path
+[ ] visualize: open sets of radius below threshold (have a dimmer)

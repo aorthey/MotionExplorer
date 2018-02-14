@@ -85,7 +85,7 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
     GLUI_Button* button_file_load;
     GLUI_Button* button;
     GLUI_Listbox* linkBox;
-
+    GLUI_Spinner* spinner;
 };
 
 
