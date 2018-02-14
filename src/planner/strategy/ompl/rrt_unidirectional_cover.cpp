@@ -15,7 +15,11 @@ RRTUnidirectionalCover::~RRTUnidirectionalCover(void)
 void RRTUnidirectionalCover::Sample(RRTUnidirectional::Configuration *q)
 {
   bool found = false;
+  uint attempts = 0;
+  uint max_attempts = 10;
+
   while(!found){
+    attempts++;
     if(previous == nullptr){
       if(!hasSolution && rng_.uniform01() < goalBias_){
         goal->sampleGoal(q->state);
@@ -43,6 +47,10 @@ void RRTUnidirectionalCover::Sample(RRTUnidirectional::Configuration *q)
     if(!IsInsideCover(q)){
       found = true;
     }
+    if(attempts>max_attempts){
+      //std::cout << "WARNING: " << attempts << " attempts." << std::endl;
+      break;
+    }
   }
 }
 
@@ -50,62 +58,106 @@ bool RRTUnidirectionalCover::IsInsideCover(Configuration* q)
 {
   Configuration *qn = G_->nearest(q);
   NearestNeighbors<Configuration *>::DistanceFunction df = G_->getDistanceFunction();
+
   double d = df(q,qn);
   return d<=0;
 }
+
+bool RRTUnidirectionalCover::ConnectedToGoal(Configuration* q)
+{
+  if(IsInsideCover(q_goal)){
+    hasSolution = true;
+    Configuration *qn = G_->nearest(q_goal);
+    q_goal->parent = qn;
+    G_->add(q_goal);
+    return true;
+  }
+  return false;
+}
+
+void RRTUnidirectionalCover::CheckForSolution(ob::PathPtr &solution)
+{
+  if(!hasSolution) return;
+
+  if (q_goal != nullptr){
+
+    std::vector<Configuration *> q_path;
+    while (q_goal != nullptr){
+      q_path.push_back(q_goal);
+      q_goal = q_goal->parent;
+    }
+
+    auto path(std::make_shared<PathGeometric>(si_));
+    for (int i = q_path.size() - 1; i >= 0; --i){
+      path->append(q_path[i]->state);
+    }
+    solution = path;
+    goalBias_ = 0.0;
+  }
+}
+
 RRTUnidirectional::Configuration* RRTUnidirectionalCover::Connect(Configuration *q_near, Configuration *q_random)
 {
   //##############################################################################
-  // q_new_state <- BALL_maxDistance_(q_near) in direction of q_random
+  // Move towards q_random until the boundary of our cover is breached
   //##############################################################################
-  //double d = si_->distance(q_near->state, q_random->state);
-  //if(d > maxDistance_){
-  //  si_->getStateSpace()->interpolate(q_near->state, q_random->state, maxDistance_ / d, q_random->state);
-  //}
 
-  //##############################################################################
-  // extend the tree from q_near towards q_new
-  //##############################################################################
-  if(si_->checkMotion(q_near->state, q_random->state)){
-
-    auto *q_new = new Configuration(si_);
-    si_->copyState(q_new->state, q_random->state);
-    q_new->parent = q_near;
-
-    //std::cout << "parent: " << std::endl;
-    //si_->printState(q_new->parent->state);
-    //std::cout << "new: " << std::endl;
-    //si_->printState(q_new->state);
-
-    auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
-    double d2 = checkerPtr->Distance(q_new->state);
-    q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d2 + deltaCoverPenetration_);
-
-    G_->add(q_new);
-    return q_new;
-
+  double d = si_->distance(q_near->state, q_random->state);
+  double maxD = q_near->GetRadius();
+  if(d > maxD)
+  {
+    //maxD/d -> t \in [0,1] on boundary
+    si_->getStateSpace()->interpolate(q_near->state, q_random->state, maxD / d, q_random->state);
   }
 
-  return nullptr;
+  //##############################################################################
+  //q_new is a point on the outer boundary of our cover. We do not need
+  //to check the motion towards it. It is valid because the edge lies inside
+  //Cfree
+  //##############################################################################
+  auto *q_new = new Configuration(si_);
+  si_->copyState(q_new->state, q_random->state);
+  q_new->parent = q_near;
+
+  auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+  double d_new = checkerPtr->Distance(q_new->state);
+  q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d_new);
+
+  G_->add(q_new);
 }
 
 bool RRTUnidirectionalCover::SampleGraph(ob::State *q_random_graph)
 {
   PDF<Configuration*> pdf = GetConfigurationPDF();
 
-  Configuration *q = pdf.sample(rng_.uniform01());
-  double t = rng_.uniform01();
+  //##############################################################################
+  auto checkerPtr = static_pointer_cast<OMPLValidityCheckerNecessarySufficient>(si_->getStateValidityChecker());
+  //##############################################################################
+  uint attempts = 0;
+  bool foundNecessary = false;
+  Configuration *q;
+  while(!foundNecessary)
+  {
+    q = pdf.sample(rng_.uniform01());
+    double t = rng_.uniform01();
 
-  const ob::State *q_from = q->state;
-  const ob::State *q_to = q->parent->state;
-  M1->getStateSpace()->interpolate(q_from, q_to, t, q_random_graph);
+    const ob::State *q_from = q->state;
+    const ob::State *q_to = q->parent->state;
+    M1->getStateSpace()->interpolate(q_from, q_to, t, q_random_graph);
+
+    if(!checkerPtr->IsSufficient(q_random_graph)){
+      foundNecessary = true;
+    }
+    if(++attempts > 5){
+      break;
+    }
+  }
+
+  if(!foundNecessary) return false;
 
   double d = q->openset->GetRadius();
-  //double d = 0.1;
-  sampler_->sampleGaussian(q_random_graph, q_random_graph, d);
-
-  //sampler_->sampleUniformNear(q_random_graph, q_random_graph, d);
-
+  //sampler_->sampleGaussian(q_random_graph, q_random_graph, d);
+  sampler_->sampleUniformNear(q_random_graph, q_random_graph, d);
   return true;
 }
 
@@ -119,9 +171,9 @@ ompl::PDF<RRTUnidirectional::Configuration*> RRTUnidirectionalCover::GetConfigur
   for (auto &configuration : configurations)
   {
     if(!(configuration->parent == nullptr)){
-      pdf.add(configuration, 1.0/configuration->openset->GetRadius());
+      //pdf.add(configuration, 1.0/configuration->openset->GetRadius());
+      pdf.add(configuration, exp(-configuration->openset->GetRadius()));
     }
-    //pdf.add(configuration, 1);
   }
 
   if(pdf.empty()){
@@ -130,3 +182,59 @@ ompl::PDF<RRTUnidirectional::Configuration*> RRTUnidirectionalCover::GetConfigur
   }
   return pdf;
 }
+
+
+// bool RRTUnidirectionalCover::checkMotion(Configuration *q1, Configuration *q2) 
+// {
+//   ob::State *s1 = q1->state;
+//   ob::State *s2 = q2->state;
+
+//   double d1 = q1->GetRadius();
+//   double d2 = q2->GetRadius();
+
+//   auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+
+//   if (!si_->isValid(s2))
+//   {
+//     return false;
+//   }
+
+//   double d12 = Distance(q1, q2);
+//   const double epsilon = 1e-3;
+
+//   bool result = true;
+//   ob::State *s_next = si_->allocState();
+//   double d = d1/d12;
+//   uint iters = 0;
+//   while(d<1){
+//     iters++;
+//     si_->getStateSpace()->interpolate(s1, s2, d, s_next);
+//     if(!si_->isValid(s_next)){
+//       result = false;
+//       break;
+//     }else{
+//       double dn = checkerPtr->Distance(s_next);
+//       if(dn<epsilon)
+//       {
+//         result =false;
+//         break;
+//       }
+//       d += dn/d12;
+//     }
+//   }
+//   si_->freeState(s_next);
+//   return result;
+// }
+
+  ////##############################################################################
+  //Configuration *q = pdf.sample(rng_.uniform01());
+  //double t = rng_.uniform01();
+
+  //const ob::State *q_from = q->state;
+  //const ob::State *q_to = q->parent->state;
+  //M1->getStateSpace()->interpolate(q_from, q_to, t, q_random_graph);
+
+  //double d = q->openset->GetRadius();
+  //sampler_->sampleGaussian(q_random_graph, q_random_graph, d);
+  ////sampler_->sampleUniformNear(q_random_graph, q_random_graph, d);
+  ////##############################################################################

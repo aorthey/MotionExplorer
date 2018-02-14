@@ -391,14 +391,19 @@ GUI
 [ ] abstract class SimTestGUI overwrites hotkey assignment, remove that
 [ ] make button to visualize the drawPoser routines
 [ ] filtration involving SE3RN subspaces not working
-
-[ ] remove sufficient edges (Priority)
-[x] solve hubble without objects and three layers
-[ ] rename multislice -> multiquotient
-[ ] while path is plotted, somehow keep focus on a locus point on the robot,
-i.e. some tracking ability
-[ ] visualize all paths from multiquotient
 [x] Robot Manipulator
 [x] rewrite quotient_planner.h to handle specific cases (RN <-> RM, SE3 <->
 SE3RN, R3 <-> SE3, etcetera, instead of trying everything)
 [x] memory increases for QMP, some structures must be not cleaned up.
+[x] solve hubble without objects and three layers
+[x] remove sufficient edges (Priority)
+[x] rename multislice -> multiquotient
+[ ] visualize all paths from multiquotient
+[ ] while path is plotted, somehow keep focus on a locus point on the robot,
+i.e. some tracking ability
+
+
+[ ] we need a dimmer to visualize only the spheres below a certain threshold
+[ ] 
+
+

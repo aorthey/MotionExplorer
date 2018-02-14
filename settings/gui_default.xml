@@ -140,13 +140,13 @@
     <name>roadmap_visualize_level_0</name>
     <descr>Roadmap Vis Level 0</descr>
     <key>6</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
   <checkbox>
     <name>roadmap_visualize_level_1</name>
     <descr>Roadmap Vis Level 1</descr>
     <key>7</key>
-    <active>1</active>
+    <active>0</active>
   </checkbox>
   <checkbox>
     <name>roadmap_visualize_level_2</name>
@@ -170,7 +170,7 @@
     <name>draw_roadmap_volume</name>
     <descr>Draw Roadmap Volume</descr>
     <key>3</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
 
   <property name="draw_path" enabled="0"/>

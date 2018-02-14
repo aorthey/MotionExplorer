@@ -128,12 +128,6 @@ bool PRMQuotientCover::Connect(const Vertex a, const Vertex b)
   auto checker = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
   ob::StateSpacePtr space = si_->getStateSpace();
 
-  //std::cout << std::string(80, '-') << std::endl;
-  //std::cout << "Connect:" << std::endl;
-  //si_->printState(s1);
-  //si_->printState(s2);
-  //std::cout << std::string(80, '-') << std::endl;
-  
   Vertex v_last = a;
   Vertex v_next = a;
   ob::State *s_next = s1;

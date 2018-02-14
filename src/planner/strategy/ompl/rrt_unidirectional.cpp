@@ -79,6 +79,7 @@ RRTUnidirectional::Configuration* RRTUnidirectional::Connect(Configuration *q_ne
   //##############################################################################
   // extend the tree from q_near towards q_new
   //##############################################################################
+
   if(si_->checkMotion(q_near->state, q_random->state)){
     auto *q_new = new Configuration(si_);
     si_->copyState(q_new->state, q_random->state);
@@ -86,9 +87,10 @@ RRTUnidirectional::Configuration* RRTUnidirectional::Connect(Configuration *q_ne
 
     auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
     double d1 = checkerPtr->Distance(q_new->state);
-    q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d1 + deltaCoverPenetration_);
+    q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d1);
 
     G_->add(q_new);
+
     return q_new;
   }
   return nullptr;
@@ -144,16 +146,26 @@ void RRTUnidirectional::Init()
   goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
 
   while (const ob::State *st = pis_.nextStart()){
-    auto *q_start = new Configuration(si_);
+    q_start = new Configuration(si_);
     si_->copyState(q_start->state, st);
 
     auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
     double d1 = checkerPtr->Distance(q_start->state);
-    q_start->openset = new cover::OpenSetHypersphere(si_, q_start->state, d1 + deltaCoverPenetration_);
+    q_start->openset = new cover::OpenSetHypersphere(si_, q_start->state, d1);
 
     G_->add(q_start);
-    //si_->printState(q_start->state);
   }
+
+  if (const ob::State *st = pis_.nextGoal()){
+    q_goal = new Configuration(si_);
+    si_->copyState(q_goal->state, st);
+
+    auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+    double d1 = checkerPtr->Distance(q_goal->state);
+    q_goal->openset = new cover::OpenSetHypersphere(si_, q_goal->state, d1);
+  }
+
+
   if (G_->size() == 0){
     OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
     exit(0);
@@ -191,7 +203,6 @@ void RRTUnidirectional::freeMemory()
   }
 }
 
-
 void RRTUnidirectional::setup(void)
 {
   Planner::setup();
@@ -214,7 +225,6 @@ void RRTUnidirectional::setup(void)
 
 void RRTUnidirectional::getPlannerData(base::PlannerData &data) const
 {
-  //Planner::getPlannerData(data);
   std::vector<Configuration *> vertices;
 
   if (G_){
@@ -250,6 +260,10 @@ void RRTUnidirectional::Grow(double t)
   Configuration *q_new = nullptr;
 
   Sample(q_random);
+  if(q_random == nullptr){
+    return;
+  }
+
   q_near = Nearest(q_random);
   q_new = Connect(q_near, q_random);
 

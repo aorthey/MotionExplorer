@@ -10,7 +10,6 @@
 #include "planner/strategy/ompl/rrt_unidirectional.h"
 #include "planner/strategy/ompl/rrt_unidirectional_cover.h"
 #include "planner/strategy/ompl/rrt_quotient.h"
-#include "planner/strategy/ompl/rrt_quotient_cover.h"
 #include "util.h"
 #include "elements/plannerdata_vertex_annotated.h"
 
@@ -156,6 +155,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   if(algorithm=="ompl:rrt_plain"){
     planner = std::make_shared<og::RRTUnidirectional>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
+
   }else if(algorithm=="ompl:qmp_rrt"){
     typedef og::MultiQuotient<og::PRMQuotientNarrowDistance, og::RRTQuotient> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec,"RRTDistance");
@@ -181,6 +181,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     typedef og::MultiQuotient<og::PRMQuotientNarrowMinCut> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "NarrowMinCut");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+
   }else if(algorithm=="ompl:benchmark_narrow"){
     //### BENCHMARK #########################################################
     ot::Benchmark benchmark(ss, "BenchmarkNarrowPassage");
@@ -191,7 +192,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
     benchmark.addPlanner(planner);
 
-    planner = std::make_shared<og::RRT>(si_vec.back());
+    planner = std::make_shared<og::RRTConnect>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
     benchmark.addPlanner(planner);
 
@@ -206,7 +207,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 120;
+    req.maxTime = 300;
     req.maxMem = 10000.0;
     req.runCount = 10;
     req.displayProgress = true;

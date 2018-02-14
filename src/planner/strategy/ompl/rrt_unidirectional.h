@@ -70,10 +70,14 @@ namespace ompl
       virtual Configuration* Nearest(Configuration *q_random);
       virtual Configuration* Connect(Configuration *q_near, Configuration *q_random);
 
-      bool ConnectedToGoal(Configuration* q);
+      virtual bool ConnectedToGoal(Configuration* q);
       void ConstructSolution(Configuration *q_goal);
 
       ob::GoalSampleableRegion *goal;
+
+      Configuration *q_start;
+      Configuration *q_goal;
+
       RNG rng_;
       double goalBias_{.05};
       bool hasSolution{false};

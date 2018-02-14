@@ -23,20 +23,21 @@
   </rigidObject>
   <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0.8 0 0.9" rotateRPY="0 0 0"/>
   <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0.8 0 -0.2" rotateRPY="0 0 0"/>
-  -->
   <rigidObject   name="biolab" file="/home/aorthey/git/orthoklampt/data/terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
     <display color="0.7 0.7 0.7 0.5"/>
   </rigidObject>
-
+  -->
+  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0.8 0 0.9" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0.8 0 -0.2" rotateRPY="0 0 0"/>
 
     <!--
     <qgoal config="54 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
-
     -->
+
   <plannerinput>
 
     <qinit config="54  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.64 -0.7 -0.29418 2.18 0 0 0.82 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.64 -0.66 0 2.1 0 0 0.94 0 0 0 0 0 0 0 0 0 0 0 0 "/>
-    <qgoal config="54  0 0 0 0 0 0 0 0 0 -0.04 0 0 0 0 0 -0.8 0.087 1.64 -0.05 0.3 0 -1.026 0 0 0 0 0 0 0 0 0 0 0 0 0 0.58 0.047 1.05418 0.27 0.14 0 1.174 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+    <qgoal config="54  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.8 0.087 1.64 -0.05 0.3 0 -1.026 0 0 0 0 0 0 0 0 0 0 0 0 0 0.58 0.047 1.05418 0.27 0.14 0 1.174 0 0 0 0 0 0 0 0 0 0 0 0 "/>
 
     <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
@@ -50,9 +51,9 @@
     <epsilongoalregion>0.05</epsilongoalregion>
     <maxplanningtime>10</maxplanningtime>
 
-    <sampler name="uniform"/>
-    <algorithm name="ompl:rrtconnect"/>
-    <algorithm name="hierarchical:ompl:qmp_cover">
+    <sampler name="obstacle_based"/>
+
+    <algorithm name="hierarchical:ompl:qmp">
       <hierarchy>
         <level inner_index="1" type="R3"/>
         <level inner_index="2" type="R7"/>
@@ -60,6 +61,7 @@
         <level inner_index="0" type="R14"/>
       </hierarchy>
     </algorithm>
+    <algorithm name="ompl:rrtconnect"/>
 
   </plannerinput>
 </world>

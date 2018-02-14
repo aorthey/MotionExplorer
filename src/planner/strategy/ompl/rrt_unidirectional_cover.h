@@ -23,12 +23,15 @@ namespace ompl
 
       ~RRTUnidirectionalCover(void);
 
+      virtual void CheckForSolution(ob::PathPtr &solution) override;
     protected:
 
       PDF<RRTUnidirectional::Configuration*> GetConfigurationPDF();
       virtual void Sample(RRTUnidirectional::Configuration*) override;
       virtual bool SampleGraph(ob::State*) override;
       virtual Configuration* Connect(Configuration *q_near, Configuration *q_random) override;
+      //bool checkMotion(Configuration *q1, Configuration *q2);
+      virtual bool ConnectedToGoal(Configuration* q) override;
 
       bool IsInsideCover(Configuration*);
 
