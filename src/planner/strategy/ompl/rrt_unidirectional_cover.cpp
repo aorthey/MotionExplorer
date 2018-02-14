@@ -1,4 +1,5 @@
 #include "rrt_unidirectional_cover.h"
+#include "elements/plannerdata_vertex_annotated.h"
 #include "planner/validitychecker/validity_checker_ompl.h"
 
 using namespace ompl::geometric;
@@ -16,7 +17,7 @@ void RRTUnidirectionalCover::Sample(RRTUnidirectional::Configuration *q)
 {
   bool found = false;
   uint attempts = 0;
-  uint max_attempts = 10;
+  uint max_attempts = 5;
 
   while(!found){
     attempts++;
@@ -65,11 +66,19 @@ bool RRTUnidirectionalCover::IsInsideCover(Configuration* q)
 
 bool RRTUnidirectionalCover::ConnectedToGoal(Configuration* q)
 {
+  if(q_goal == nullptr){
+    std::cout << "(1)STOP, qgoal is nullptr" << std::endl;
+    exit(0);
+  }
   if(IsInsideCover(q_goal)){
     hasSolution = true;
     Configuration *qn = G_->nearest(q_goal);
     q_goal->parent = qn;
     G_->add(q_goal);
+    if(q_goal == nullptr){
+      std::cout << "(2)STOP, qgoal is nullptr" << std::endl;
+      exit(0);
+    }
     return true;
   }
   return false;
@@ -79,12 +88,13 @@ void RRTUnidirectionalCover::CheckForSolution(ob::PathPtr &solution)
 {
   if(!hasSolution) return;
 
-  if (q_goal != nullptr){
+  if (q_goal->parent != nullptr){
 
     std::vector<Configuration *> q_path;
-    while (q_goal != nullptr){
-      q_path.push_back(q_goal);
-      q_goal = q_goal->parent;
+    Configuration *path_ptr = q_goal;
+    while (path_ptr != nullptr){
+      q_path.push_back(path_ptr);
+      path_ptr = path_ptr->parent;
     }
 
     auto path(std::make_shared<PathGeometric>(si_));
@@ -94,6 +104,7 @@ void RRTUnidirectionalCover::CheckForSolution(ob::PathPtr &solution)
     solution = path;
     goalBias_ = 0.0;
   }
+
 }
 
 RRTUnidirectional::Configuration* RRTUnidirectionalCover::Connect(Configuration *q_near, Configuration *q_random)
@@ -115,6 +126,7 @@ RRTUnidirectional::Configuration* RRTUnidirectionalCover::Connect(Configuration 
   //to check the motion towards it. It is valid because the edge lies inside
   //Cfree
   //##############################################################################
+
   auto *q_new = new Configuration(si_);
   si_->copyState(q_new->state, q_random->state);
   q_new->parent = q_near;
@@ -133,31 +145,20 @@ bool RRTUnidirectionalCover::SampleGraph(ob::State *q_random_graph)
   //##############################################################################
   auto checkerPtr = static_pointer_cast<OMPLValidityCheckerNecessarySufficient>(si_->getStateValidityChecker());
   //##############################################################################
-  uint attempts = 0;
-  bool foundNecessary = false;
   Configuration *q;
-  while(!foundNecessary)
-  {
-    q = pdf.sample(rng_.uniform01());
-    double t = rng_.uniform01();
 
-    const ob::State *q_from = q->state;
-    const ob::State *q_to = q->parent->state;
-    M1->getStateSpace()->interpolate(q_from, q_to, t, q_random_graph);
+  q = pdf.sample(rng_.uniform01());
+  double t = rng_.uniform01();
 
-    if(!checkerPtr->IsSufficient(q_random_graph)){
-      foundNecessary = true;
-    }
-    if(++attempts > 5){
-      break;
-    }
-  }
+  const ob::State *q_from = q->state;
+  const ob::State *q_to = q->parent->state;
+  M1->getStateSpace()->interpolate(q_from, q_to, t, q_random_graph);
 
-  if(!foundNecessary) return false;
 
   double d = q->openset->GetRadius();
-  //sampler_->sampleGaussian(q_random_graph, q_random_graph, d);
-  sampler_->sampleUniformNear(q_random_graph, q_random_graph, d);
+
+  sampler_->sampleGaussian(q_random_graph, q_random_graph, d);
+  //sampler_->sampleUniformNear(q_random_graph, q_random_graph, d);
   return true;
 }
 
@@ -172,7 +173,9 @@ ompl::PDF<RRTUnidirectional::Configuration*> RRTUnidirectionalCover::GetConfigur
   {
     if(!(configuration->parent == nullptr)){
       //pdf.add(configuration, 1.0/configuration->openset->GetRadius());
-      pdf.add(configuration, exp(-configuration->openset->GetRadius()));
+      //pdf.add(configuration, exp(-configuration->openset->GetRadius()));
+      //pdf.add(configuration, configuration->openset->GetRadius());
+      pdf.add(configuration, 1.0);
     }
   }
 
@@ -182,59 +185,33 @@ ompl::PDF<RRTUnidirectional::Configuration*> RRTUnidirectionalCover::GetConfigur
   }
   return pdf;
 }
+void RRTUnidirectionalCover::getPlannerData(base::PlannerData &data) const
+{
+  std::vector<Configuration *> vertices;
 
+  if (G_){
+    G_->list(vertices);
+  }
 
-// bool RRTUnidirectionalCover::checkMotion(Configuration *q1, Configuration *q2) 
-// {
-//   ob::State *s1 = q1->state;
-//   ob::State *s2 = q2->state;
+  if(q_goal==nullptr){
+    std::cout << "q_goal not initialized!?" << std::endl;
+  }
+  data.addGoalVertex(PlannerDataVertexAnnotated(q_goal->state, 0, q_goal->openset->GetRadius()));
 
-//   double d1 = q1->GetRadius();
-//   double d2 = q2->GetRadius();
-
-//   auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
-
-//   if (!si_->isValid(s2))
-//   {
-//     return false;
-//   }
-
-//   double d12 = Distance(q1, q2);
-//   const double epsilon = 1e-3;
-
-//   bool result = true;
-//   ob::State *s_next = si_->allocState();
-//   double d = d1/d12;
-//   uint iters = 0;
-//   while(d<1){
-//     iters++;
-//     si_->getStateSpace()->interpolate(s1, s2, d, s_next);
-//     if(!si_->isValid(s_next)){
-//       result = false;
-//       break;
-//     }else{
-//       double dn = checkerPtr->Distance(s_next);
-//       if(dn<epsilon)
-//       {
-//         result =false;
-//         break;
-//       }
-//       d += dn/d12;
-//     }
-//   }
-//   si_->freeState(s_next);
-//   return result;
-// }
-
-  ////##############################################################################
-  //Configuration *q = pdf.sample(rng_.uniform01());
-  //double t = rng_.uniform01();
-
-  //const ob::State *q_from = q->state;
-  //const ob::State *q_to = q->parent->state;
-  //M1->getStateSpace()->interpolate(q_from, q_to, t, q_random_graph);
-
-  //double d = q->openset->GetRadius();
-  //sampler_->sampleGaussian(q_random_graph, q_random_graph, d);
-  ////sampler_->sampleUniformNear(q_random_graph, q_random_graph, d);
-  ////##############################################################################
+  uint ctr = 0;
+  for (auto &vertex : vertices)
+  {
+    double d = vertex->openset->GetRadius();
+    if (vertex->parent == nullptr){
+      data.addStartVertex(PlannerDataVertexAnnotated(vertex->state, 0, d));
+    }else{
+      double dp = vertex->parent->openset->GetRadius();
+      data.addEdge(PlannerDataVertexAnnotated(vertex->parent->state, 0, dp), PlannerDataVertexAnnotated(vertex->state, 0, d));
+    }
+    if(!vertex->state){
+      std::cout << "vertex state does not exists" << std::endl;
+      si_->printState(vertex->state);
+      exit(0);
+    }
+  }
+}

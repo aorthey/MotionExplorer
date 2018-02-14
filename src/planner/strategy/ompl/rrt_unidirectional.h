@@ -50,7 +50,11 @@ namespace ompl
         Configuration() = default;
         Configuration(const base::SpaceInformationPtr &si) : state(si->allocState())
         {}
-        ~Configuration() = default;
+        ~Configuration(){
+          if(openset!=nullptr){
+            delete openset;
+          }
+        }
         double GetRadius() const{
           if(openset){
             return openset->GetRadius();
@@ -75,8 +79,8 @@ namespace ompl
 
       ob::GoalSampleableRegion *goal;
 
-      Configuration *q_start;
-      Configuration *q_goal;
+      Configuration *q_start{nullptr};
+      Configuration *q_goal{nullptr};
 
       RNG rng_;
       double goalBias_{.05};

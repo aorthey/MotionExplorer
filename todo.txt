@@ -404,6 +404,9 @@ i.e. some tracking ability
 
 
 [ ] we need a dimmer to visualize only the spheres below a certain threshold
-[ ] 
+[ ] why are there points accumulated at the boundary of the initial sphere on
+QS? Should not happen i thought.
 
 
+[ ] sampling density should reflect the radius of the vertices, i.e. the volume
+of the cover

@@ -108,14 +108,14 @@ bool RRTUnidirectional::ConnectedToGoal(Configuration* q)
   return false;
 }
 
-void RRTUnidirectional::ConstructSolution(Configuration *q_goal)
+void RRTUnidirectional::ConstructSolution(Configuration *configuration_goal)
 {
-  if (q_goal != nullptr){
+  if (configuration_goal != nullptr){
 
     std::vector<Configuration *> q_path;
-    while (q_goal != nullptr){
-      q_path.push_back(q_goal);
-      q_goal = q_goal->parent;
+    while (configuration_goal != nullptr){
+      q_path.push_back(configuration_goal);
+      configuration_goal = configuration_goal->parent;
     }
 
     auto path(std::make_shared<PathGeometric>(si_));
@@ -163,6 +163,11 @@ void RRTUnidirectional::Init()
     auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
     double d1 = checkerPtr->Distance(q_goal->state);
     q_goal->openset = new cover::OpenSetHypersphere(si_, q_goal->state, d1);
+    std::cout << "q_goal initizalized" << std::endl;
+    si_->printState(q_goal->state);
+  }else{
+    OMPL_ERROR("%s: There is no valid goal state!", getName().c_str());
+    exit(0);
   }
 
 
@@ -254,18 +259,20 @@ void RRTUnidirectional::getPlannerData(base::PlannerData &data) const
 
 void RRTUnidirectional::Grow(double t)
 {
-  //Grow
   Configuration *q_random = new Configuration(si_);
-  Configuration *q_near = nullptr;
-  Configuration *q_new = nullptr;
 
   Sample(q_random);
+
   if(q_random == nullptr){
+    if(q_random->state != nullptr){
+      si_->freeState(q_random->state);
+    }
+    delete q_random;
     return;
   }
 
-  q_near = Nearest(q_random);
-  q_new = Connect(q_near, q_random);
+  Configuration *q_near = Nearest(q_random);
+  Configuration *q_new = Connect(q_near, q_random);
 
   if(q_new != nullptr){
     lastExtendedConfiguration = q_new;
@@ -308,16 +315,15 @@ bool RRTUnidirectional::HasSolution()
 
 void RRTUnidirectional::CheckForSolution(ob::PathPtr &solution)
 {
-
   if(!hasSolution) return;
 
-  Configuration *q_goal = lastExtendedConfiguration;
-  if (q_goal != nullptr){
+  Configuration *configuration_goal = lastExtendedConfiguration;
+  if (configuration_goal != nullptr){
 
     std::vector<Configuration *> q_path;
-    while (q_goal != nullptr){
-      q_path.push_back(q_goal);
-      q_goal = q_goal->parent;
+    while (configuration_goal != nullptr){
+      q_path.push_back(configuration_goal);
+      configuration_goal = configuration_goal->parent;
     }
 
     auto path(std::make_shared<PathGeometric>(si_));

@@ -12,7 +12,7 @@
   <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 0"/>
   <rigidObject name="LshapedTerrain" file="/home/aorthey/git/orthoklampt/data/terrains/Lshape.tri" translation="0 0 0" rotateRPY="0 0 0"/>
        -->
-  <rigidObject name="LshapedTerrain" file="/home/aorthey/git/orthoklampt/data/terrains/Lshape.tri" translation="0 0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 0"/>
 
   <plannerinput>
 
@@ -21,10 +21,6 @@
     <se3min config="6  -5.0 -8.0 -4.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +5.0 +5.0 +4.0 +3.141593 +1.57 +3.141593"/>
     <freeFloating>1</freeFloating>
-    <!--
-    <enableSufficiency>1</enableSufficiency>
-    <enableSufficiency>1</enableSufficiency>
-    -->
     <enableSufficiency>1</enableSufficiency>
     <pathSpeed>5</pathSpeed>
     <smoothPath>1</smoothPath>
@@ -32,7 +28,7 @@
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.01</epsilongoalregion>
     <robot>0</robot>
-    <maxplanningtime>2</maxplanningtime>
+    <maxplanningtime>0.05</maxplanningtime>
 
     <sampler name="obstacle_based"/>
 
