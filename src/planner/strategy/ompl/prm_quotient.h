@@ -30,11 +30,6 @@ namespace ompl
         void setup() override;
         void clear() override;
 
-        Vertex lastSourceVertexSampled;
-        Vertex lastTargetVertexSampled;
-        double lastTSampled;
-        bool isSampled{false};
-
         virtual void Grow(double t) override;
 
       protected:

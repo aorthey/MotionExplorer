@@ -25,11 +25,11 @@
   <rigidObject   name="factory" file="/home/aorthey/git/orthoklampt/data/terrains/factory_hard.tri" translation="0 0 -0.01">
     <display color="0.7 0.7 0.7 0.5"/>
   </rigidObject>
-<rigidObject   name="factory" file="/home/aorthey/git/orthoklampt/data/terrains/factory_hard.tri" translation="0 0 -0.01">
-  <display color="0.7 0.7 0.7 0.5"/>
-</rigidObject>
   <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0.07 0 0.8" rotateRPY="0 0 0"/>
 -->
+  <rigidObject   name="factory" file="/home/aorthey/git/orthoklampt/data/terrains/factory_hard.tri" translation="0 0 -0.01">
+    <display color="0.7 0.7 0.7 0.5"/>
+  </rigidObject>
 
   <plannerinput>
     <qinit config="13 0 0 0 0 0 0 2.94 1.2508 1.52 -0.3 -1.48 1.6544 0 "/>
@@ -47,11 +47,9 @@
 
     <sampler name="obstacle_based"/>
 
-    <algorithm name="hierarchical:ompl:qmp">
+    <algorithm name="hierarchical:ompl:qmp_rrt">
       <hierarchy>
         <level inner_index="2" outer_index="2" type="R3"/>
-        <level inner_index="4" outer_index="4" type="R5"/>
-        <level inner_index="0" outer_index="0" type="R7"/>
       </hierarchy>
     </algorithm>
 

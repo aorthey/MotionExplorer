@@ -107,14 +107,6 @@ void GeometricCSpaceOMPL::initSpace()
     }
     ob::RealVectorBounds boundsRn(Nompl);
 
-    ////ompl does only accept dimensions with strictly positive measure, adding some epsilon space
-    //double epsilonSpacing=1e-10;
-    //for(uint i = 0; i < N; i++){
-    //  if(abs(lowRn.at(i)-highRn.at(i))<epsilonSpacing){
-    //    highRn.at(i)=0;
-    //  }
-    //}
-
     boundsRn.low = lowRn;
     boundsRn.high = highRn;
     boundsRn.check();
@@ -171,7 +163,6 @@ void GeometricCSpaceOMPL::print() const
   ob::SE3StateSpace *cspaceSE3 = NULL;
   ob::RealVectorStateSpace *cspaceRn = NULL;
 
-  //uint N =  robot->q.size() - 6;
   if(Nompl>0){
     cspaceSE3 = space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
     cspaceRn = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
@@ -231,7 +222,6 @@ ob::ScopedState<> GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q){
     qomplSO3 = &qomplSE3->rotation();
   }
 
-
   qomplSE3->setXYZ(q[0],q[1],q[2]);
   OMPLSO3StateSpaceFromEulerXYZ(q(3),q(4),q(5),qomplSO3);
 
@@ -250,6 +240,7 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType
 
   Config q;
   q.resize(6+Nklampt);
+  q.setZero();
 
   q(0) = qomplSE3->getX();
   q(1) = qomplSE3->getY();
@@ -260,17 +251,9 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType
   q(4) = rxyz.at(1);
   q(5) = rxyz.at(2);
 
-
-  for(uint i = 0; i < Nklampt; i++){
-    q(i+6) = 0;
-  }
-
-  if(Nompl>0){
-    //set non-zero dimensions to ompl value
-    for(uint i = 0; i < Nompl; i++){
-      uint idx = ompl_to_klampt.at(i);
-      q(idx) = qomplRnState->values[i];
-    }
+  for(uint i = 0; i < Nompl; i++){
+    uint idx = ompl_to_klampt.at(i);
+    q(idx) = qomplRnState->values[i];
   }
 
   return q;

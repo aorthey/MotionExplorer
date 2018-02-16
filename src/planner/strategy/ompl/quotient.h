@@ -61,6 +61,8 @@ namespace ompl
         bool SampleC1(ob::State *s);
         void mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1);
 
+        double GetGraphLength();
+
       protected:
         static uint counter;
         uint id;
@@ -83,6 +85,7 @@ namespace ompl
         ob::ValidStateSamplerPtr sampler_;
         ob::StateSamplerPtr simpleSampler_;
 
+        double graphLength{0.0};
         Quotient *previous{nullptr};
 
     };

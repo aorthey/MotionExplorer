@@ -7,6 +7,7 @@
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/base/goals/GoalSampleableRegion.h>
+#include <ompl/datastructures/PDF.h>
 
 
 namespace ob = ompl::base;
@@ -41,6 +42,7 @@ namespace ompl
       virtual void Init() override;
       virtual bool HasSolution() override;
       virtual void CheckForSolution(ob::PathPtr &solution) override;
+      virtual double GetSamplingDensity() override;
 
     protected:
 
@@ -56,21 +58,24 @@ namespace ompl
           }
         }
         double GetRadius() const{
-          if(openset){
+          if(openset!=nullptr){
             return openset->GetRadius();
           }else{
             return 0;
           }
         }
+        double parent_edge_weight{0};
         base::State *state{nullptr};
         Configuration *parent{nullptr};
         cover::OpenSetHypersphere *openset{nullptr};
       };
 
       std::shared_ptr<NearestNeighbors<Configuration *>> G_;
-      Configuration *lastExtendedConfiguration{nullptr};
 
       virtual void Sample(Configuration *q_random);
+      virtual bool SampleGraph(ob::State*) override;
+      PDF<RRTUnidirectional::Configuration*> GetConfigurationPDF();
+
       virtual Configuration* Nearest(Configuration *q_random);
       virtual Configuration* Connect(Configuration *q_near, Configuration *q_random);
 
@@ -79,6 +84,7 @@ namespace ompl
 
       ob::GoalSampleableRegion *goal;
 
+      Configuration *lastExtendedConfiguration{nullptr};
       Configuration *q_start{nullptr};
       Configuration *q_goal{nullptr};
 
@@ -87,6 +93,11 @@ namespace ompl
       bool hasSolution{false};
       double maxDistance_{0.};
       base::StateSamplerPtr sampler_;
+
+      uint totalNumberOfSamples{0};
+
+      //thickening of graph
+      double epsilon{0.05};
 
       //see shkolnik_2011 for details
       double deltaCoverPenetration_;

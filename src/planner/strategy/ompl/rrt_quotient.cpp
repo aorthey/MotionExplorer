@@ -162,7 +162,6 @@ RRTQuotient::GrowState RRTQuotient::growTree(TreeData &tree, TreeGrowingInfo &tg
 
   bool reach = true;
 
-  /* find state to add */
   base::State *dstate = rconfiguration->state;
   double d = si_->distance(nconfiguration->state, rconfiguration->state);
   if (d > maxDistance_)
@@ -193,6 +192,7 @@ RRTQuotient::GrowState RRTQuotient::growTree(TreeData &tree, TreeGrowingInfo &tg
     if(checkerPtr->IsSufficient(configuration->state))
     {
       configuration->isSufficient = true;
+      configuration->parent_edge_weight = 0;
     }
 
     tgi.xconfiguration = configuration;
@@ -235,6 +235,8 @@ void RRTQuotient::Init(){
 }
 
 ob::PathPtr RRTQuotient::ConstructSolution(Configuration *q_start, Configuration *q_goal){
+  //this removes a double point, but it will create some problems with the PDF
+  //further down, so we leave it
   if (q_start->parent != nullptr){
     q_start = q_start->parent;
   }else{
@@ -315,7 +317,7 @@ bool RRTQuotient::ConnectedToGoal(){
 
 void RRTQuotient::CheckForSolution(ob::PathPtr &solution)
 {
-  if(ConnectedToGoal()){
+  if(!isSolved && ConnectedToGoal()){
     solution = ConstructSolution(startConfiguration, goalConfiguration);
     isSolved = true;
   }
@@ -354,24 +356,43 @@ uint RRTQuotient::GetNumberOfEdges(){
 ompl::PDF<RRTQuotient::Configuration*> RRTQuotient::GetConfigurationPDF()
 {
   PDF<Configuration*> pdf;
-  std::vector<Configuration *> configurations;
-  if(tStart_){
-    tStart_->list(configurations);
-  }
-  for (auto &configuration : configurations)
-  {
-    if(!(configuration->parent == nullptr)){
+  double t = rng_.uniform01();
+  if(t<0.5){
+    //shortest path heuristic
+    Configuration *configuration = startConfiguration;
+    while (configuration->parent != nullptr)
+    {
       pdf.add(configuration, configuration->parent_edge_weight);
+      configuration = configuration->parent;
     }
-  }
-  configurations.clear();
-  if(tGoal_){
-    tGoal_->list(configurations);
-  }
-  for (auto &configuration : configurations)
-  {
-    if(!(configuration->parent == nullptr)){
+
+    configuration = goalConfiguration;
+    while (configuration->parent != nullptr)
+    {
       pdf.add(configuration, configuration->parent_edge_weight);
+      configuration = configuration->parent;
+    }
+
+  }else{
+    std::vector<Configuration *> configurations;
+    if(tStart_){
+      tStart_->list(configurations);
+    }
+    for (auto &configuration : configurations)
+    {
+      if(!(configuration->parent == nullptr)){
+        pdf.add(configuration, configuration->parent_edge_weight);
+      }
+    }
+    configurations.clear();
+    if(tGoal_){
+      tGoal_->list(configurations);
+    }
+    for (auto &configuration : configurations)
+    {
+      if(!(configuration->parent == nullptr)){
+        pdf.add(configuration, configuration->parent_edge_weight);
+      }
     }
   }
 
@@ -385,22 +406,32 @@ bool RRTQuotient::SampleGraph(ob::State *q_random_graph)
 {
 
   PDF<Configuration*> pdf = GetConfigurationPDF();
-
   Configuration *q = pdf.sample(rng_.uniform01());
   double t = rng_.uniform01();
-  //if(t<0.05){
-  //  double tc = rng_.uniform01();
-  //  const ob::State *from = connectionPoint_.first;
-  //  const ob::State *to = connectionPoint_.second;
-  //  M1->getStateSpace()->interpolate(from, to, tc, q_random_graph);
-  //}else{
-  //  const ob::State *from = q->state;
-  //  const ob::State *to = q->parent->state;
-  //  M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
-  //}
+
   const ob::State *from = q->state;
   const ob::State *to = q->parent->state;
   M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
+  double epsilon = 0.1;
+  simpleSampler_->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
+
+  //auto checkerPtr = static_pointer_cast<OMPLValidityCheckerNecessarySufficient>(M1->getStateValidityChecker());
+  //bool foundNecessary = false;
+  //while(!foundNecessary)
+  //{
+  //  Configuration *q = pdf.sample(rng_.uniform01());
+  //  double t = rng_.uniform01();
+
+  //  const ob::State *from = q->state;
+  //  const ob::State *to = q->parent->state;
+  //  M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
+
+  //  if(!checkerPtr->IsSufficient(q_random_graph)){
+  //    foundNecessary = true;
+  //    double epsilon = 5;
+  //    simpleSampler_->sampleGaussian(q_random_graph, q_random_graph, epsilon);
+  //  }
+  //}
 
   return true;
 }

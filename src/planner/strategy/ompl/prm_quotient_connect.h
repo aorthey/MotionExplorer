@@ -23,6 +23,11 @@ namespace ompl
         ob::PathPtr GetShortestPathOffsetVertices( const ob::State *qa, const ob::State *qb, 
           const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb);
 
+        Vertex lastSourceVertexSampled;
+        Vertex lastTargetVertexSampled;
+        double lastTSampled;
+        bool isSampled{false};
+
       protected:
 
         //Overrides Distance/Sample/Connect

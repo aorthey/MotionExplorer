@@ -32,8 +32,7 @@ class Roadmap{
     ob::PlannerDataPtr GetPlannerDataPtr();
     CSpaceOMPL* GetCSpacePtr();
 
-    GLDraw::GLColor cVertex, cEdge, cEdgeRemoved;
-
+    GLDraw::GLColor cVertex, cEdge;
     int numEdges();
     int numVertices();
     void removeInfeasibleEdgeAlongShortestPath(uint index);

@@ -9,7 +9,6 @@ using namespace GLDraw;
 Roadmap::Roadmap(){
   cVertex = green;
   cEdge = green;
-  cEdgeRemoved = grey;
 }
 
 std::vector<Config> Roadmap::GetVertices(){
@@ -358,9 +357,16 @@ void Roadmap::DrawGL(GUIState& state)
   PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&pds->getVertex(0));
   
   uint N = v.GetMaxLevel();
-  for(uint k = 0; k < N; k++){
+  for(uint k = 0; k < N+1; k++){
     std::string str = "roadmap_visualize_level_" + to_string(k);
     if(state(str.c_str())){
+      if(k%2==0){
+        cVertex = green;
+        cEdge = green;
+      }else{
+        cVertex = red;
+        cEdge = red;
+      }
       DrawSingleLevelGL(state, k);
     }
   }

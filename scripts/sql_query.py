@@ -59,8 +59,9 @@ def extractInfoFromSqlDatabase(fname,verbose=True):
     solved = sol.sum()
     runs = sol.shape[0]
     Dtimes = times
-    #Dtimes = times[times < timelimit]
-    #Dsolved = len(Dtimes)
+    DtimesSolved = times[times < timelimit]
+
+    Dsolved = len(Dtimes)
     if Dsolved>0:
       Dmean = Dtimes.mean() 
       Dstd = Dtimes.std() 
@@ -80,6 +81,10 @@ def extractInfoFromSqlDatabase(fname,verbose=True):
     print pid,": [",'%30s'%name,"] solved: ",Dsolved,\
     "/",runs," time:",'%.2f'%Dmean,"+/-",'%.2f'%Dstd,\
     " (minimum time:",'%.2f'%Dtimes.min(),", maximum time:",'%.2f'%Dtimes.max(),", nodes:",nodes,")"
+    print pid,": [",'%30s'%name,"] solved: ",len(DtimesSolved),\
+    "/",len(DtimesSolved)," time:",'%.2f'%DtimesSolved.mean(),"+/-",'%.2f'%DtimesSolved.std(),\
+    " (minimum time:",'%.2f'%DtimesSolved.min(),", maximum time:",'%.2f'%DtimesSolved.max(),\
+        ", nodes:",np.array(nodessql)[times<timelimit].mean(),")"
     
   connection.close()
 

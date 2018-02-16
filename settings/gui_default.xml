@@ -3,13 +3,13 @@
     <name>draw_rigid_objects_faces</name>
     <descr>Draw Face Mesh of Rigid Objects</descr>
     <key>f</key>
-    <active>1</active>
+    <active>0</active>
   </checkbox>
   <checkbox>
     <name>draw_rigid_objects_edges</name>
     <descr>Draw Edges Mesh of Rigid Objects</descr>
     <key>e</key>
-    <active>1</active>
+    <active>0</active>
   </checkbox>
   <checkbox>
     <name>draw_forcefield</name>
@@ -33,7 +33,7 @@
     <name>draw_distance_robot_terrain</name>
     <descr>Draw Distance Robot Terrain</descr>
     <key></key>
-    <active>1</active>
+    <active>0</active>
   </checkbox>
   <checkbox>
     <name>draw_com_path</name>
@@ -47,6 +47,7 @@
     <key>b</key>
     <active>0</active>
   </checkbox>
+
   <checkbox>
     <name>draw_path_space</name>
     <descr>Draw Path Space</descr>
@@ -140,7 +141,7 @@
     <name>roadmap_visualize_level_0</name>
     <descr>Roadmap Vis Level 0</descr>
     <key>6</key>
-    <active>1</active>
+    <active>0</active>
   </checkbox>
   <checkbox>
     <name>roadmap_visualize_level_1</name>
@@ -152,7 +153,7 @@
     <name>roadmap_visualize_level_2</name>
     <descr>Roadmap Vis Level 2</descr>
     <key>8</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_roadmap_vertices</name>
@@ -164,21 +165,21 @@
     <name>draw_roadmap_edges</name>
     <descr>Draw Roadmap Edges</descr>
     <key>2</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_roadmap_volume</name>
     <descr>Draw Roadmap Volume</descr>
     <key>3</key>
-    <active>1</active>
+    <active>0</active>
   </checkbox>
 
   <slider>
     <name>draw_cover_threshold</name>
-    <value>1</value>
+    <value>20</value>
     <min>0</min>
     <max>20</max>
-    <step>1</step>
+    <step>0.5</step>
   </slider>
   <hotkey>
     <name>draw_cover_threshold_up</name>

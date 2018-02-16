@@ -112,8 +112,6 @@ bool PRMQuotientCover::SampleGraph(ob::State *q_random_graph)
     }
   }
 
-  isSampled = true;
-
   return true;
 
 }
@@ -134,7 +132,6 @@ bool PRMQuotientCover::Connect(const Vertex a, const Vertex b)
   OpenSet *o_next = o1;
 
   double epsilon = 0.01;
-  //std::cout << "radius: " << o_next->GetRadius() << " contains: " << (o_next->Contains(s2)?"Yes":"No") << std::endl;
 
   //TODO: bisect that
 

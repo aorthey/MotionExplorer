@@ -37,7 +37,6 @@ PRMQuotient::~PRMQuotient()
 void PRMQuotient::clear()
 {
   PRMBasic::clear();
-  isSampled = false; 
 }
 
 
@@ -72,18 +71,17 @@ void PRMQuotient::Init()
   unsigned long int nrStartStates = boost::num_vertices(g_);
   OMPL_INFORM("%s: Starting planning with %lu states already in datastructure", getName().c_str(), nrStartStates);
 
-  og::PRMQuotient *PRMprevious = static_cast<og::PRMQuotient*>(previous);
-
-  if(PRMprevious!=nullptr){
-    for(uint k = 0; k < startM_.size(); k++){
-      associatedVertexSourceProperty_[startM_.at(k)] = PRMprevious->startM_.at(k);
-      associatedVertexTargetProperty_[startM_.at(k)] = PRMprevious->startM_.at(k);
-    }
-    for(uint k = 0; k < goalM_.size(); k++){
-      associatedVertexSourceProperty_[goalM_.at(k)] = PRMprevious->goalM_.at(k);
-      associatedVertexTargetProperty_[goalM_.at(k)] = PRMprevious->goalM_.at(k);
-    }
-  }
+  //og::PRMQuotient *PRMprevious = static_cast<og::PRMQuotient*>(previous);
+  //if(PRMprevious!=nullptr){
+  //  for(uint k = 0; k < startM_.size(); k++){
+  //    associatedVertexSourceProperty_[startM_.at(k)] = PRMprevious->startM_.at(k);
+  //    associatedVertexTargetProperty_[startM_.at(k)] = PRMprevious->startM_.at(k);
+  //  }
+  //  for(uint k = 0; k < goalM_.size(); k++){
+  //    associatedVertexSourceProperty_[goalM_.at(k)] = PRMprevious->goalM_.at(k);
+  //    associatedVertexTargetProperty_[goalM_.at(k)] = PRMprevious->goalM_.at(k);
+  //  }
+  //}
 }
 
 
@@ -92,13 +90,13 @@ og::PRMBasic::Vertex PRMQuotient::addMilestone(base::State *state)
 {
   Vertex m = PRMBasic::addMilestone(state);
     
-  og::PRMQuotient *PRMprevious = static_cast<og::PRMQuotient*>(previous);
-  if(PRMprevious != nullptr && PRMprevious->isSampled){
-    //this is not always correct!
-    associatedVertexSourceProperty_[m] = PRMprevious->lastSourceVertexSampled;
-    associatedVertexTargetProperty_[m] = PRMprevious->lastTargetVertexSampled;
-    associatedTProperty_[m] = PRMprevious->lastTSampled;
-  }
+  //og::PRMQuotient *PRMprevious = static_cast<og::PRMQuotient*>(previous);
+  //if(PRMprevious != nullptr && PRMprevious->isSampled){
+  //  //this is not always correct!
+  //  associatedVertexSourceProperty_[m] = PRMprevious->lastSourceVertexSampled;
+  //  associatedVertexTargetProperty_[m] = PRMprevious->lastTargetVertexSampled;
+  //  associatedTProperty_[m] = PRMprevious->lastTSampled;
+  //}
   return m;
 }
 
@@ -122,7 +120,6 @@ double PRMQuotient::GetSamplingDensity()
 {
   if(previous == nullptr){
     return (double)num_vertices(g_)/(double)M1->getSpaceMeasure();
-    //return (double)num_vertices(g_);
   }else{
     //get graph length
     //double Lprev = 0.0;
@@ -134,6 +131,7 @@ double PRMQuotient::GetSamplingDensity()
     //  ob::Cost weight = ep.getCost();
     //  Lprev += weight.value();
     //}
+    //return (double)num_vertices(g_)/(M1->getSpaceMeasure()*Lprev);
     return (double)num_vertices(g_)/(M1->getSpaceMeasure());
     //return (double)num_vertices(g_);
   }
@@ -170,34 +168,47 @@ bool PRMQuotient::Sample(ob::State *q_random)
 bool PRMQuotient::SampleGraph(ob::State *q_random_graph)
 {
   PDF<Edge> pdf = GetEdgePDF();
-  if(pdf.empty()){
-    std::cout << "cannot sample empty(?) graph" << std::endl;
-    exit(0);
-  }
+  //if(pdf.empty()){
+  //  std::cout << "cannot sample empty(?) graph" << std::endl;
+  //  exit(0);
+  //}
 
-  auto checkerPtr = static_pointer_cast<OMPLValidityCheckerNecessarySufficient>(M1->getStateValidityChecker());
-  bool foundNecessary = false;
-  while(!foundNecessary)
-  {
-    Edge e = pdf.sample(rng_.uniform01());
-    double t = rng_.uniform01();
-    const Vertex v1 = boost::source(e, g_);
-    const Vertex v2 = boost::target(e, g_);
-    const ob::State *from = stateProperty_[v1];
-    const ob::State *to = stateProperty_[v2];
-    M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
+  //auto checkerPtr = static_pointer_cast<OMPLValidityCheckerNecessarySufficient>(M1->getStateValidityChecker());
+  //bool foundNecessary = false;
+  //while(!foundNecessary)
+  //{
+    // Edge e = pdf.sample(rng_.uniform01());
+    // double t = rng_.uniform01();
+    // const Vertex v1 = boost::source(e, g_);
+    // const Vertex v2 = boost::target(e, g_);
+    // const ob::State *from = stateProperty_[v1];
+    // const ob::State *to = stateProperty_[v2];
+    // M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
 
-    lastSourceVertexSampled = v1;
-    lastTargetVertexSampled = v2;
-    lastTSampled = t;
-    foundNecessary = true;
-    if(!checkerPtr->IsSufficient(q_random_graph)){
-      foundNecessary = true;
-    }
-  }
+    //lastSourceVertexSampled = v1;
+    //lastTargetVertexSampled = v2;
+    //lastTSampled = t;
+    //foundNecessary = true;
+    //if(!checkerPtr->IsSufficient(q_random_graph)){
+    //  foundNecessary = true;
+    //}
+  //}
 
-  isSampled = true;
+  //isSampled = true;
 
+  Edge e = pdf.sample(rng_.uniform01());
+  double t = rng_.uniform01();
+
+  const Vertex v1 = boost::source(e, g_);
+  const Vertex v2 = boost::target(e, g_);
+  const ob::State *from = stateProperty_[v1];
+  const ob::State *to = stateProperty_[v2];
+
+  M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
+  double epsilon = 0.1; //seems to be unstable on SO(3), look into how the sample gaussian is defined
+  //simpleSampler_->sampleGaussian(q_random_graph, q_random_graph, epsilon);
+  simpleSampler_->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
+  //sampler_->sampleUniformNear(q_random_graph, q_random_graph, d);
   return true;
 
 }
@@ -208,10 +219,12 @@ ompl::PDF<og::PRMBasic::Edge> PRMQuotient::GetEdgePDF()
   foreach (Edge e, boost::edges(g_))
   {
     const Vertex v1 = boost::source(e, g_);
-    if(sameComponent(v1, startM_.at(0))){
-      ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
-      pdf.add(e, weight.value());
-    }
+    //if(sameComponent(v1, startM_.at(0))){
+    //  ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
+    //  pdf.add(e, weight.value());
+    //}
+    ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
+    pdf.add(e, weight.value());
   }
   return pdf;
 }

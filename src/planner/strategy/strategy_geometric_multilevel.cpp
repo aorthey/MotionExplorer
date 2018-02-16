@@ -51,31 +51,14 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
 {
   static uint pid = 0;
 
-  //run["some extra property name INTEGER"] = "some value";
-  // The format of added data is string key, string value pairs,
-  // with the convention that the last word in string key is one of
-  // REAL, INTEGER, BOOLEAN, STRING. (this will be the type of the field
-  // when the log file is processed and saved as a database).
-  // The values are always converted to string.
   ob::SpaceInformationPtr si = planner->getSpaceInformation();
   ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
-
 
   bool solved = pdef->hasExactSolution();
 
   uint states = boost::lexical_cast<int>(run["graph states INTEGER"]);
   double time = boost::lexical_cast<double>(run["time REAL"]);
   double memory = boost::lexical_cast<double>(run["memory REAL"]);
-
-  //if(!solved && states < 5){
-  //  std::cout << "ERROR: Planner output has only " << states << std::endl;
-  //  std::cout << "   this is an indicator of abnormal behavior." << std::endl;
-  //  for (ot::Benchmark::RunProperties::iterator it=run.begin(); it!=run.end(); ++it)
-  //  {
-  //    std::cout << it->first << " => " << it->second << '\n';
-  //  }
-  //  exit(1);
-  //}
 
   //if(solved){
   //  std::cout << "Found Solution at run " << pid << std::endl;
@@ -101,7 +84,8 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   //  std::cout << "Run " << pid << " no solution" << std::endl;
 
   //}
-  std::cout << "Run " << pid << " " << (solved?"solved":"no solution") << "(time: "<< time << ", states: " << states << ", memory: " << memory << ")" << std::endl;
+  std::cout << "Run " << pid << " [" << planner->getName() << "] " << (solved?"solved":"no solution") << "(time: "<< time << ", states: " << states << ", memory: " << memory << ")" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
   pid++;
 
 }
@@ -157,38 +141,32 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     planner->setProblemDefinition(pdef_vec.back());
 
   }else if(algorithm=="ompl:qmp_rrt"){
-    typedef og::MultiQuotient<og::PRMQuotientNarrowDistance, og::RRTQuotient> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec,"RRTDistance");
+    typedef og::MultiQuotient<og::RRTUnidirectional> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec,"RRT");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+
   }else if(algorithm=="ompl:qmp_cover"){
     typedef og::MultiQuotient<og::RRTUnidirectionalCover> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec,"UniCover");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+
+  }else if(algorithm=="ompl:qmp_cover_rrt"){
+    typedef og::MultiQuotient<og::RRTUnidirectionalCover, og::RRTQuotient> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec,"UniCover");
+    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+    
   }else if(algorithm=="ompl:qmp"){
     typedef og::MultiQuotient<og::PRMQuotient> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec);
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
 
-  }else if(algorithm=="ompl:qmpnarrow"){
-    typedef og::MultiQuotient<og::PRMQuotientNarrow> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "Narrow");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  }else if(algorithm=="ompl:qmpnarrow_edgedegree"){
-    typedef og::MultiQuotient<og::PRMQuotientNarrowEdgeDegree> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "NarrowEdgeDegree");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  }else if(algorithm=="ompl:qmpnarrow_mincut"){
-    typedef og::MultiQuotient<og::PRMQuotientNarrowMinCut> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "NarrowMinCut");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-
   }else if(algorithm=="ompl:benchmark_narrow"){
     //### BENCHMARK #########################################################
     ot::Benchmark benchmark(ss, "BenchmarkNarrowPassage");
-    //typedef og::MultiQuotient<og::PRMQuotient> MultiQuotient;
-    //typedef og::MultiQuotient<og::PRMQuotient, og::RRTQuotient> MultiQuotient;
-    typedef og::MultiQuotient<og::RRTUnidirectionalCover> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec,"UniCover");
+
+    typedef og::MultiQuotient<og::RRTUnidirectional> MultiQuotient;
+
+    planner = std::make_shared<MultiQuotient>(si_vec);
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
     benchmark.addPlanner(planner);
 
@@ -207,7 +185,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 600;
+    req.maxTime = 3;
     req.maxMem = 10000.0;
     req.runCount = 10;
     req.displayProgress = true;
@@ -386,32 +364,6 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     exit(0);
   }
   planner->clear();
-
-  //###########################################################################
-  //SIMPLE SETUP
-  //###########################################################################
-  //ss.setStartState(start);
-  //ss.setGoal(input.GetGoalPtr(si));
-
-  //ss.setPlanner(planner);
-  //ss.setup();
-  ////ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
-
-  //ob::ProblemDefinitionPtr pdef = ss.getProblemDefinition();
-  //pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
-
-  //double max_planning_time= input.max_planning_time;
-  //ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
-
-  //ompl::time::point t_start = ompl::time::now();
-  //ob::PlannerStatus status = ss.solve(ptc);
-  //output.planner_time = ompl::time::seconds(ompl::time::now() - t_start);
-  //output.max_planner_time = max_planning_time;
-
-  //ob::PlannerDataPtr pd( new ob::PlannerData(si) );
-  //ss.getPlannerData(*pd);
-  //output.SetPlannerData(pd);
-  //output.SetProblemDefinition(pdef);
 
   //###########################################################################
   //  WITHOUT SimpleSetup

@@ -203,8 +203,8 @@ ompl::PDF<RRTUnidirectional::Configuration*> RRTUnidirectionalCover::GetConfigur
       //pdf.add(configuration, exp(-configuration->openset->GetRadius()));
       //pdf.add(configuration, d);
       double d = configuration->openset->GetRadius();
-      //pdf.add(configuration, 1.0);
-      pdf.add(configuration, 1.0/d);
+      pdf.add(configuration, 1.0);
+      //pdf.add(configuration, 1.0/d);
       //pdf.add(configuration, exp(-d));
     }
   }

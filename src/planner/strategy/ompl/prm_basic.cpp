@@ -73,12 +73,7 @@ void PRMBasic::clear()
   Planner::clear();
   //sampler_.reset();
   //simpleSampler_.reset();
-  //if (!sampler_){
-  //  sampler_ = si_->allocValidStateSampler();
-  //}
-  //if (!simpleSampler_){
-  //  simpleSampler_ = si_->allocStateSampler();
-  //}
+
   ClearVertices();
   g_.clear();
   if (nn_){

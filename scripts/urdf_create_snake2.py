@@ -8,7 +8,7 @@ from urdf_create_primitives import *
 robot_name = 'robots/snake'
 Nsegments = 4
 
-length = 0.2
+length = 0.3
 limit = pi/4
 stublength = length/8
 radius = 0.01

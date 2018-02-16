@@ -59,11 +59,36 @@ std::vector<double> CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( const ob::SO3Stat
   double qz = q->z;
   double qw = q->w;
 
+  double d = sqrt(qx*qx + qy*qy + qz*qz + qw*qw);
+  if(abs(d-1.0) > 1e-10){
+    //scale them down
+    //if(d<0){
+    //  d*=-1;
+    //}
+    qx /= d;
+    qy /= d;
+    qz /= d;
+    qw /= d;
+  }
+
   Math3D::QuaternionRotation qr(qw, qx, qy, qz);
   Math3D::Matrix3 qrM;
   qr.getMatrix(qrM);
   Math3D::EulerAngleRotation R;
-  R.setMatrixXYZ(qrM);
+  bool Rvalid = R.setMatrixXYZ(qrM);
+  if(!Rvalid){
+
+    std::cout << qr << std::endl;
+    std::cout << qrM << std::endl;
+    Real b=Asin(qrM(0,2));  //m(0,2)=sb
+    Real cb = Cos(b);
+    Real ca = qrM(2,2)/cb;   //m(2,2)=ca*cb
+    std::cout << ca << std::endl;
+
+    std::cout << "QuaternionRotation to EulerAngle not valid" << std::endl;
+    exit(0);
+
+  }
 
   double rx = R[2];
   double ry = R[1];

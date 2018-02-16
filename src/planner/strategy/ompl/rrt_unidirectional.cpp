@@ -7,7 +7,9 @@ using namespace ompl::geometric;
 RRTUnidirectional::RRTUnidirectional(const base::SpaceInformationPtr &si, Quotient *previous ): og::Quotient(si, previous)
 {
   deltaCoverPenetration_ = 0.05;
-  goalBias_ = 0.05;
+  goalBias_ = 0.01;
+  totalNumberOfSamples = 0;
+  graphLength = 0.0;
 }
 
 RRTUnidirectional::~RRTUnidirectional(void)
@@ -15,14 +17,28 @@ RRTUnidirectional::~RRTUnidirectional(void)
 }
 
 void RRTUnidirectional::Sample(Configuration *q_random){
-  if(!hasSolution){
-    if(rng_.uniform01() < goalBias_){
+  totalNumberOfSamples++;
+  if(previous == nullptr){
+    if(!hasSolution && rng_.uniform01() < goalBias_){
       goal->sampleGoal(q_random->state);
     }else{
       sampler_->sampleUniform(q_random->state);
     }
   }else{
-    sampler_->sampleUniform(q_random->state);
+    if(!hasSolution && rng_.uniform01() < goalBias_){
+      goal->sampleGoal(q_random->state);
+    }else{
+      ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
+      base::State *s_C1 = C1->allocState();
+      base::State *s_M0 = M0->allocState();
+
+      C1_sampler->sampleUniform(s_C1);
+      previous->SampleGraph(s_M0);
+      mergeStates(s_M0, s_C1, q_random->state);
+
+      C1->freeState(s_C1);
+      M0->freeState(s_M0);
+    }
   }
 }
 
@@ -70,7 +86,8 @@ RRTUnidirectional::Configuration* RRTUnidirectional::Connect(Configuration *q_ne
   // q_new_state <- BALL_maxDistance_(q_near) in direction of q_random
   //##############################################################################
   double d = si_->distance(q_near->state, q_random->state);
-  double maxD = q_near->GetRadius();
+  //double maxD = q_near->GetRadius();
+  double maxD = maxDistance_;
   if(d > maxD){
     //maxD/d -> t \in [0,1] on boundary
     si_->getStateSpace()->interpolate(q_near->state, q_random->state, maxD / d, q_random->state);
@@ -84,16 +101,31 @@ RRTUnidirectional::Configuration* RRTUnidirectional::Connect(Configuration *q_ne
     auto *q_new = new Configuration(si_);
     si_->copyState(q_new->state, q_random->state);
     q_new->parent = q_near;
+    q_new->parent_edge_weight = si_->distance(q_near->state, q_new->state);
+    graphLength += q_new->parent_edge_weight + q_new->parent_edge_weight*epsilon*si_->getSpaceMeasure();
 
-    auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
-    double d1 = checkerPtr->Distance(q_new->state);
-    q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d1);
+    // auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+    // double d1 = checkerPtr->Distance(q_new->state);
+    // q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d1);
 
     G_->add(q_new);
 
     return q_new;
   }
   return nullptr;
+}
+
+double RRTUnidirectional::GetSamplingDensity(){
+  // if(previous==nullptr){
+  //   return (double)GetNumberOfVertices()/((double)si_->getSpaceMeasure());
+  // }else{
+  //   return (double)GetNumberOfVertices()/(previous->GetGraphLength()*C1->getSpaceMeasure());
+  // }
+  if(previous==nullptr){
+    return (double)totalNumberOfSamples/((double)si_->getSpaceMeasure());
+  }else{
+    return (double)totalNumberOfSamples/(previous->GetGraphLength()*C1->getSpaceMeasure());
+  }
 }
 
 bool RRTUnidirectional::ConnectedToGoal(Configuration* q)
@@ -149,9 +181,9 @@ void RRTUnidirectional::Init()
     q_start = new Configuration(si_);
     si_->copyState(q_start->state, st);
 
-    auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
-    double d1 = checkerPtr->Distance(q_start->state);
-    q_start->openset = new cover::OpenSetHypersphere(si_, q_start->state, d1);
+    // auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+    // double d1 = checkerPtr->Distance(q_start->state);
+    // q_start->openset = new cover::OpenSetHypersphere(si_, q_start->state, d1);
 
     G_->add(q_start);
   }
@@ -160,9 +192,9 @@ void RRTUnidirectional::Init()
     q_goal = new Configuration(si_);
     si_->copyState(q_goal->state, st);
 
-    auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
-    double d1 = checkerPtr->Distance(q_goal->state);
-    q_goal->openset = new cover::OpenSetHypersphere(si_, q_goal->state, d1);
+    // auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+    // double d1 = checkerPtr->Distance(q_goal->state);
+    // q_goal->openset = new cover::OpenSetHypersphere(si_, q_goal->state, d1);
   }else{
     OMPL_ERROR("%s: There is no valid goal state!", getName().c_str());
     exit(0);
@@ -187,6 +219,16 @@ void RRTUnidirectional::clear()
   }
   hasSolution = false;
   lastExtendedConfiguration = nullptr;
+  if(q_goal != nullptr){
+    if(q_goal->state!=nullptr){
+      si_->freeState(q_goal->state);
+    }
+    delete q_goal;
+  }
+  q_start = nullptr;
+  q_goal = nullptr;
+
+  pis_.restart();
 }
 
 void RRTUnidirectional::freeMemory()
@@ -219,9 +261,10 @@ void RRTUnidirectional::setup(void)
                            {
                            //distance between surrounding hyperspheres. if
                            //overlapping, return 0
-                              double ra = a->GetRadius();
-                              double rb = b->GetRadius();
-                              return max( si_->distance(a->state, b->state)-ra-rb, 0.0);
+                              //double ra = a->GetRadius();
+                              //double rb = b->GetRadius();
+                              //return max( si_->distance(a->state, b->state)-ra-rb, 0.0);
+                              return si_->distance(a->state, b->state);
                            });
 
 }
@@ -235,16 +278,16 @@ void RRTUnidirectional::getPlannerData(base::PlannerData &data) const
   }
 
   if (lastExtendedConfiguration != nullptr){
-    data.addGoalVertex(PlannerDataVertexAnnotated(lastExtendedConfiguration->state, 0, lastExtendedConfiguration->openset->GetRadius()));
+    data.addGoalVertex(PlannerDataVertexAnnotated(lastExtendedConfiguration->state, 0, lastExtendedConfiguration->GetRadius()));
   }
 
   for (auto &vertex : vertices)
   {
-    double d = vertex->openset->GetRadius();
+    double d = vertex->GetRadius();
     if (vertex->parent == nullptr){
       data.addStartVertex(PlannerDataVertexAnnotated(vertex->state, 0, d));
     }else{
-      double dp = vertex->parent->openset->GetRadius();
+      double dp = vertex->parent->GetRadius();
       data.addEdge(PlannerDataVertexAnnotated(vertex->parent->state, 0, dp), PlannerDataVertexAnnotated(vertex->state, 0, d));
     }
     if(!vertex->state){
@@ -260,14 +303,6 @@ void RRTUnidirectional::Grow(double t)
   Configuration *q_random = new Configuration(si_);
 
   Sample(q_random);
-
-  if(q_random == nullptr){
-    if(q_random->state != nullptr){
-      si_->freeState(q_random->state);
-    }
-    delete q_random;
-    return;
-  }
 
   Configuration *q_near = Nearest(q_random);
   Configuration *q_new = Connect(q_near, q_random);
@@ -331,4 +366,45 @@ void RRTUnidirectional::CheckForSolution(ob::PathPtr &solution)
     solution = path;
     goalBias_ = 0.0;
   }
+}
+bool RRTUnidirectional::SampleGraph(ob::State *q_random_graph)
+{
+  PDF<Configuration*> pdf = GetConfigurationPDF();
+
+  Configuration *q = pdf.sample(rng_.uniform01());
+  double t = rng_.uniform01();
+
+  const ob::State *q_from = q->state;
+  const ob::State *q_to = q->parent->state;
+  M1->getStateSpace()->interpolate(q_from, q_to, t, q_random_graph);
+
+  //std::cout << maxDistance_ << std::endl;
+  //sampler_->sampleGaussian(q_random_graph, q_random_graph, epsilon);
+  sampler_->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
+  return true;
+}
+
+ompl::PDF<RRTUnidirectional::Configuration*> RRTUnidirectional::GetConfigurationPDF()
+{
+  PDF<Configuration*> pdf;
+  std::vector<Configuration *> configurations;
+  if(G_){
+    G_->list(configurations);
+  }
+  for (auto &configuration : configurations)
+  {
+    if(!(configuration->parent == nullptr))
+    {
+      //pdf.add(configuration, 1.0/configuration->GetRadius());
+      //pdf.add(configuration, exp(-configuration->GetRadius()));
+      //pdf.add(configuration, d);
+      //double d = configuration->GetRadius();
+      //pdf.add(configuration, 1.0);
+      pdf.add(configuration, configuration->parent_edge_weight);
+      //pdf.add(configuration, 1.0/d);
+      //pdf.add(configuration, exp(-d));
+    }
+  }
+
+  return pdf;
 }

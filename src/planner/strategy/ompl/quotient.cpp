@@ -42,6 +42,12 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_):
     std::cout << "M0 dimension : " << M0_space->getDimension() << " measure: " << M0_space->getMeasure() << std::endl;
     std::cout << "C1 dimension : " << C1_space->getDimension() << " measure: " << C1_space->getMeasure() << std::endl;
     std::cout << "M1 dimension : " << M1_space->getDimension() << " measure: " << M1_space->getMeasure() << std::endl;
+    if((M0_space->getMeasure()<=0) ||
+       (C1_space->getMeasure()<=0) ||
+       (M1_space->getMeasure()<=0)){
+      std::cout << "zero-measure quotient space detected. abort." << std::endl;
+      exit(0);
+    }
   }
   if (!sampler_){
     sampler_ = si_->allocValidStateSampler();
@@ -179,7 +185,20 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const
     switch (type) {
       case RN_RM:
         {
-          C1 = std::make_shared<ob::RealVectorStateSpace>(M1_dimension-M0_dimension);
+          uint N = M1_dimension - M0_dimension;
+          C1 = std::make_shared<ob::RealVectorStateSpace>(N);
+          C1_dimension = N;
+
+          RealVectorBounds M1_bounds = static_pointer_cast<ob::RealVectorStateSpace>(M1)->getBounds();
+          std::vector<double> low; low.resize(N);
+          std::vector<double> high; high.resize(N);
+          RealVectorBounds C1_bounds(N);
+          for(uint k = 0; k < N; k++){
+            C1_bounds.setLow(k, M1_bounds.low.at(k+M0_dimension));
+            C1_bounds.setHigh(k, M1_bounds.high.at(k+M0_dimension));
+          }
+          static_pointer_cast<ob::RealVectorStateSpace>(C1)->setBounds(C1_bounds);
+
           break;
         }
       case SE2_R2:
@@ -198,7 +217,10 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const
           const std::vector<StateSpacePtr> M1_decomposed = M1_compound->getSubspaces();
 
           C1_dimension = M1_decomposed.at(1)->getDimension();
+
           C1 = std::make_shared<ob::RealVectorStateSpace>(C1_dimension);
+          static_pointer_cast<ob::RealVectorStateSpace>(C1)->setBounds( static_pointer_cast<ob::RealVectorStateSpace>(M1_decomposed.at(1))->getBounds() );
+
           break;
         }
       case SE3RN_SE3RM:
@@ -208,8 +230,20 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const
           ob::CompoundStateSpace *M0_compound = M0->as<ob::CompoundStateSpace>();
           const std::vector<StateSpacePtr> M0_decomposed = M0_compound->getSubspaces();
 
-          C1_dimension = M1_decomposed.at(1)->getDimension()-M0_decomposed.at(1)->getDimension();
+          uint N = M1_decomposed.at(1)->getDimension();
+          uint M = M0_decomposed.at(1)->getDimension();
+          C1_dimension = N-M;
           C1 = std::make_shared<ob::RealVectorStateSpace>(C1_dimension);
+
+          RealVectorBounds M1_bounds = static_pointer_cast<ob::RealVectorStateSpace>(M1_decomposed.at(1))->getBounds();
+          std::vector<double> low; low.resize(C1_dimension);
+          std::vector<double> high; high.resize(C1_dimension);
+          RealVectorBounds C1_bounds(C1_dimension);
+          for(uint k = 0; k < C1_dimension; k++){
+            C1_bounds.setLow(k, M1_bounds.low.at(k+M));
+            C1_bounds.setHigh(k, M1_bounds.high.at(k+M));
+          }
+          static_pointer_cast<ob::RealVectorStateSpace>(C1)->setBounds(C1_bounds);
           break;
         }
       default:
@@ -512,9 +546,13 @@ bool Quotient::SampleGraph(ob::State *q_random)
   exit(0);
 }
 
-
 double Quotient::GetSamplingDensity(){
+  //return (double)GetNumberOfVertices();
   return (double)GetNumberOfVertices()/(double)si_->getSpaceMeasure();
+}
+
+double Quotient::GetGraphLength(){
+  return graphLength;
 }
 
 namespace ompl{

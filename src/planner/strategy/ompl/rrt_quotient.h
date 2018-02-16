@@ -106,6 +106,8 @@ namespace ompl
         double maxDistance_{0.};
         RNG rng_;
         std::pair<base::State *, base::State *> connectionPoint_;
+        Configuration *connectionPointConfiguration;
+
         ob::GoalSampleableRegion *goal;
 
         ob::PathPtr ConstructSolution(Configuration *q_start, Configuration *q_goal);
