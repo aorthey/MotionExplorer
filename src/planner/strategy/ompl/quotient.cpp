@@ -378,6 +378,7 @@ bool Quotient::SampleC1(ob::State *s){
 }
 bool Quotient::Sample(ob::State *q_random)
 {
+  totalNumberOfSamples++;
   if(previous == nullptr){
     return sampler_->sample(q_random);
   }else{
@@ -547,8 +548,15 @@ bool Quotient::SampleGraph(ob::State *q_random)
 }
 
 double Quotient::GetSamplingDensity(){
-  //return (double)GetNumberOfVertices();
-  return (double)GetNumberOfVertices()/(double)si_->getSpaceMeasure();
+  double N = (double)totalNumberOfSamples;
+  if(previous==nullptr){
+    return (double)totalNumberOfSamples/((double)si_->getSpaceMeasure());
+    //return pow(N,(1.0/(double)si_->getStateDimension()));
+    //return totalNumberOfSamples;
+    //return (double)totalNumberOfSamples/(previous->GetGraphLength()*C1->getSpaceMeasure());
+  }else{
+    return (double)totalNumberOfSamples/(previous->GetGraphLength()*C1->getSpaceMeasure());
+  }
 }
 
 double Quotient::GetGraphLength(){

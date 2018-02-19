@@ -37,6 +37,7 @@ LemonInterface::LemonInterface( ob::PlannerDataPtr pd_ ):
       exit(0);
     }
   }
+
   //if(!hasStart){
   //  std::cout << "[LemonInterface] Couldn't find start node in graph!" << std::endl;
   //}
@@ -65,8 +66,8 @@ LemonInterface::LemonInterface( ob::PlannerDataPtr pd_ ):
       (*length)[e] = c.value();
     }
   }
-
 }
+
 std::vector<Vertex> LemonInterface::GetShortestPath(){
   if(N<=0 || !hasStart || !hasGoal){
     std::vector<Vertex> emptyset;
@@ -74,6 +75,7 @@ std::vector<Vertex> LemonInterface::GetShortestPath(){
   }
   return GetShortestPath(start, goal);
 }
+
 std::vector<Vertex> LemonInterface::GetShortestPath( ListGraph::Node s, ListGraph::Node t){
 
   auto dijkstra = Dijkstra<ListGraph, CostMap>(lg, *length);
@@ -114,6 +116,4 @@ std::vector<Vertex> LemonInterface::GetShortestPath( ListGraph::Node s, ListGrap
 
   }
   return shortest_path_idxs;
-
 }
-

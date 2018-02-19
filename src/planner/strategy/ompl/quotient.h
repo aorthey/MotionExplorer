@@ -86,6 +86,7 @@ namespace ompl
         ob::StateSamplerPtr simpleSampler_;
 
         double graphLength{0.0};
+        uint totalNumberOfSamples{0};
         Quotient *previous{nullptr};
 
     };

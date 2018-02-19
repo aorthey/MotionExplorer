@@ -23,7 +23,7 @@ namespace ompl
 
         void getPlannerData(base::PlannerData &data) const override;
 
-        virtual double GetSamplingDensity() override;
+        //virtual double GetSamplingDensity() override;
 
         virtual void Init();
 

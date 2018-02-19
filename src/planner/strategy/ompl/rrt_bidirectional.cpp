@@ -412,7 +412,7 @@ bool RRTBidirectional::SampleGraph(ob::State *q_random_graph)
   const ob::State *from = q->state;
   const ob::State *to = q->parent->state;
   M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
-  double epsilon = 0.1;
+  double epsilon = 0.05;
   simpleSampler_->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
 
   //auto checkerPtr = static_pointer_cast<OMPLValidityCheckerNecessarySufficient>(M1->getStateValidityChecker());

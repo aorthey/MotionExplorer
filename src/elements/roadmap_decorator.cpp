@@ -9,8 +9,9 @@ RoadmapDecoratorSE2::RoadmapDecoratorSE2(RoadmapPtr component_):
 
 
 void RoadmapDecoratorSE2::PlotVertexIndex(uint vidx){
-  ob::PlannerDataPtr pds = component->GetPlannerDataPtr();
-  CSpaceOMPL *cspace = component->GetCSpacePtr();
+  uint N = component->roadmaps_level.size();
+  ob::PlannerDataPtr pds = component->roadmaps_level.at(N-1);
+  CSpaceOMPL *cspace = component->cspace;
   ob::PlannerDataVertex v = pds->getVertex(vidx);
   if(v!=ob::PlannerData::NO_VERTEX){
     Config q = cspace->OMPLStateToConfig(v.getState());
@@ -21,8 +22,9 @@ void RoadmapDecoratorSE2::PlotVertexIndex(uint vidx){
   }
 }
 void RoadmapDecoratorSE2::DrawGL(GUIState& state){
-  ob::PlannerDataPtr pds = component->GetPlannerDataPtr();
-  CSpaceOMPL *cspace = component->GetCSpacePtr();
+  uint N = component->roadmaps_level.size();
+  ob::PlannerDataPtr pds = component->roadmaps_level.at(N-1);
+  CSpaceOMPL *cspace = component->cspace;
     
   if(!pds) return;
 

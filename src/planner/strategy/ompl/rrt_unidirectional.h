@@ -42,7 +42,6 @@ namespace ompl
       virtual void Init() override;
       virtual bool HasSolution() override;
       virtual void CheckForSolution(ob::PathPtr &solution) override;
-      virtual double GetSamplingDensity() override;
 
     protected:
 
@@ -68,6 +67,7 @@ namespace ompl
         base::State *state{nullptr};
         Configuration *parent{nullptr};
         cover::OpenSetHypersphere *openset{nullptr};
+        uint numChildren{0};
       };
 
       std::shared_ptr<NearestNeighbors<Configuration *>> G_;
@@ -94,10 +94,9 @@ namespace ompl
       double maxDistance_{0.};
       base::StateSamplerPtr sampler_;
 
-      uint totalNumberOfSamples{0};
 
       //thickening of graph
-      double epsilon{0.05};
+      double epsilon{0};
 
       //see shkolnik_2011 for details
       double deltaCoverPenetration_;

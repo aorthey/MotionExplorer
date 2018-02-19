@@ -12,53 +12,27 @@ namespace ob = ompl::base;
 
 class Roadmap{
 
+  friend class RoadmapDecoratorSE2;
   public:
     Roadmap();
 
     void CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL* cspace_);
-    void CreateFromPlannerDataOnlySufficient(const ob::PlannerDataPtr pd, CSpaceOMPL* cspace_);
-    void CreateFromPlannerDataOnlyNecessary(const ob::PlannerDataPtr pd, CSpaceOMPL *cspace_);
 
     virtual void DrawGL(GUIState&);
-    void DrawSingleLevelGL(GUIState &, uint);
 
-    void SetVertices(const std::vector<Config>&);
-    void SetEdges(const std::vector<std::pair<Config,Config>>&);
-    void SetShortestPath(const std::vector<Config>&);
-
-    std::vector<Config> GetVertices();
-    std::vector<std::pair<Config,Config>> GetEdges();
-    std::vector<Config> GetShortestPath();
-    ob::PlannerDataPtr GetPlannerDataPtr();
-    CSpaceOMPL* GetCSpacePtr();
-
-    GLDraw::GLColor cVertex, cEdge;
+    GLDraw::GLColor cVertex, cEdge, cPath;
     int numEdges();
     int numVertices();
-    void removeInfeasibleEdgeAlongShortestPath(uint index);
 
   private:
-    std::vector<ob::PlannerDataVertex> shortest_path_vertex;
 
-    std::vector<Config> shortest_path;
-    std::vector<ob::PlannerData::Graph::Vertex> shortest_path_idxs;
-
-    std::vector<Config> VertexPathToConfigPath( const std::vector<ob::PlannerData::Graph::Vertex> &path);
+    void DrawSingleLevelGL(GUIState &, ob::PlannerDataPtr);
+    void DrawPathGL(GUIState &state, std::vector<Vector3> &q);
 
     CSpaceOMPL *cspace;
-
     SwathVolume *swv{nullptr};
 
-    std::vector<Config> V;
-    std::vector<std::pair<Config,Config>> E;
-    std::vector<std::pair<Config,Config>> E_removed;
-
-    uint Nvertices;
-    uint Nedges;
-
-    ob::PlannerDataPtr pds;
-    LemonInterface* lemon;
-
-    std::vector<double> distance_vertex_environment;
+    std::vector<ob::PlannerDataPtr> roadmaps_level;
+    std::vector<std::vector<Vector3>> shortest_path_level;
 };
 typedef std::shared_ptr<Roadmap> RoadmapPtr;

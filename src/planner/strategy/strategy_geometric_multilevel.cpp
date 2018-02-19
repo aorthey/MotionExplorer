@@ -9,7 +9,7 @@
 
 #include "planner/strategy/ompl/rrt_unidirectional.h"
 #include "planner/strategy/ompl/rrt_unidirectional_cover.h"
-#include "planner/strategy/ompl/rrt_quotient.h"
+#include "planner/strategy/ompl/rrt_bidirectional.h"
 #include "util.h"
 #include "elements/plannerdata_vertex_annotated.h"
 
@@ -141,7 +141,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     planner->setProblemDefinition(pdef_vec.back());
 
   }else if(algorithm=="ompl:qmp_rrt"){
-    typedef og::MultiQuotient<og::RRTUnidirectional> MultiQuotient;
+    typedef og::MultiQuotient<og::RRTUnidirectional, og::RRTBidirectional> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec,"RRT");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
 
@@ -151,7 +151,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
 
   }else if(algorithm=="ompl:qmp_cover_rrt"){
-    typedef og::MultiQuotient<og::RRTUnidirectionalCover, og::RRTQuotient> MultiQuotient;
+    typedef og::MultiQuotient<og::RRTUnidirectionalCover, og::RRTUnidirectional> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec,"UniCover");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
     
@@ -185,9 +185,9 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 3;
+    req.maxTime = 15;
     req.maxMem = 10000.0;
-    req.runCount = 10;
+    req.runCount = 5;
     req.displayProgress = true;
 
     benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));
@@ -260,11 +260,6 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
 
     typedef og::MultiQuotient<og::PRMQuotient> MultiQuotient;
     typedef og::MultiQuotient<og::PRMQuotientConnect> MultiQuotientConnect;
-    typedef og::MultiQuotient<og::PRMQuotient, og::RRTQuotient> MultiQuotientRRT;
-
-    planner = std::make_shared<MultiQuotientRRT>(si_vec,"RRT");
-    static_pointer_cast<MultiQuotientRRT>(planner)->setProblemDefinition(pdef_vec);
-    benchmark.addPlanner(planner);
 
     planner = std::make_shared<MultiQuotient>(si_vec);
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);

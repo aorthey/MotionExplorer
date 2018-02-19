@@ -116,26 +116,6 @@ void PRMQuotient::Grow(double t){
   growRoadmap(ob::timedPlannerTerminationCondition(T_grow), xstates[0]);
   expandRoadmap( ob::timedPlannerTerminationCondition(T_expand), xstates);
 }
-double PRMQuotient::GetSamplingDensity()
-{
-  if(previous == nullptr){
-    return (double)num_vertices(g_)/(double)M1->getSpaceMeasure();
-  }else{
-    //get graph length
-    //double Lprev = 0.0;
-    //og::PRMQuotient *PRMprevious = static_cast<og::PRMQuotient*>(previous);
-    //const Graph gprev = PRMprevious->getRoadmap();
-    //foreach (Edge e, boost::edges(gprev))
-    //{
-    //  EdgeProperty ep = get(boost::edge_weight_t(), gprev, e);
-    //  ob::Cost weight = ep.getCost();
-    //  Lprev += weight.value();
-    //}
-    //return (double)num_vertices(g_)/(M1->getSpaceMeasure()*Lprev);
-    return (double)num_vertices(g_)/(M1->getSpaceMeasure());
-    //return (double)num_vertices(g_);
-  }
-}
 
 void PRMQuotient::getPlannerData(base::PlannerData &data) const
 {
@@ -144,6 +124,7 @@ void PRMQuotient::getPlannerData(base::PlannerData &data) const
 
 bool PRMQuotient::Sample(ob::State *q_random)
 {
+  totalNumberOfSamples++;
   if(previous == nullptr){
     //without any underlying CSpace, the behavior is equal to PRM
     return sampler_->sample(q_random);

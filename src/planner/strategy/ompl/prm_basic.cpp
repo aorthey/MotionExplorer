@@ -323,6 +323,7 @@ PRMBasic::Vertex PRMBasic::addMilestone(ob::State *state)
     totalConnectionAttemptsProperty_[m]++;
     totalConnectionAttemptsProperty_[n]++;
     if(Connect(m,n)){
+      graphLength += si_->distance(stateProperty_[m], stateProperty_[n]);
       successfulConnectionAttemptsProperty_[m]++;
       successfulConnectionAttemptsProperty_[n]++;
     }

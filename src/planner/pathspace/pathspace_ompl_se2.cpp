@@ -38,7 +38,7 @@ std::vector<PathSpace*> PathSpaceOMPLSE2::Decompose(){
 
   if(output.hasExactSolution()){
     std::vector<Config> path = output.GetShortestPath();
-    roadmap->SetShortestPath( path );
+    //roadmap->SetShortestPath( path );
     decomposedspace.at(0)->SetShortestPath( output.getShortestPathOMPL(), cspace );
     //decomposedspace.at(0)->SetShortestPath( path );
   }

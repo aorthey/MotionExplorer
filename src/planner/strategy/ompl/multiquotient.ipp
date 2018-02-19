@@ -99,7 +99,7 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
         solutions.push_back(sol_k);
         double t_k_end = ompl::time::seconds(ompl::time::now() - t_k_start);
         std::cout << "Found Solution on Level " << k << " after " << t_k_end << " seconds." << std::endl;
-        //PrintQuotientSpaces(quotientSpaces, k);
+        PrintQuotientSpaces(quotientSpaces, k);
         foundKLevelSolution = true;
       }
       Q.push(jQuotient);

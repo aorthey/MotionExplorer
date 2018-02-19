@@ -2,7 +2,6 @@
 #include "elements/roadmap.h"
 
 class RoadmapDecoratorSE2: public Roadmap{
-  friend Roadmap;
   public:
     RoadmapDecoratorSE2(RoadmapPtr component_);
     virtual void DrawGL(GUIState&);
