@@ -50,8 +50,8 @@ int ViewHierarchy::GetLevel(){
 
 void ViewHierarchy::DrawGL(){
   double height = heightPerLevel * (GetLevel()+1);
-  double x1 = x+width_column1/3;
-  double x2 = x+width_column1+width_column2/3;
+  //double x1 = x+width_column1/3;
+  //double x2 = x+width_column1+width_column2/3;
   double x3 = x+width_column1+width_column2+width_column3/2;
   double y0 = y+heightPerLevel/2;
   double node_radius = heightPerLevel/3;
@@ -95,7 +95,7 @@ void ViewHierarchy::DrawGL(){
 
   DrawNode(x3,y0,node_radius,0);
 
-  for(int k = 0; k < level_nodes.size(); k++){
+  for(uint k = 0; k < level_nodes.size(); k++){
     double yk = y+(k+1)*heightPerLevel+heightPerLevel/2;
     double yprev = y+(k)*heightPerLevel+heightPerLevel/2;
 
@@ -148,7 +148,7 @@ void ViewHierarchy::DrawGL(){
   }
 
   textColor.setCurrentGL();
-  for(int k = 0; k < level_nodes.size()+1; k++){
+  for(uint k = 0; k < level_nodes.size()+1; k++){
     double yk = y+k*heightPerLevel+heightPerLevel/2;
     char buf[64];
     void* font=GLUT_BITMAP_HELVETICA_18;

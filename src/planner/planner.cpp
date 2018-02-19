@@ -8,7 +8,6 @@
 #include "pathspace/pathspace_multilevel_SE2.h"
 #include "pathspace/pathspace_multilevel_SE3.h"
 #include "pathspace/decorator.h"
-#include "pathspace/decorator_sweptvolume_path.h"
 #include "pathspace/decorator_highlighter.h"
 #include "util.h"
 
@@ -56,10 +55,9 @@ void MotionPlanner::CreateSinglePathHierarchy(){
   std::vector<int> idxs = input.robot_idxs;
   std::string subalgorithm = input.name_algorithm.substr(13,input.name_algorithm.size()-13);
 
-  PathSpaceInput *psinput_level0;
-  PathSpaceInput *psinput;
+  PathSpaceInput *psinput_level0 = nullptr;
+  PathSpaceInput *psinput = nullptr;
   for(uint k = 0; k < input.layers.size(); k++){
-    int level = input.layers.at(k).level;
     int ii = input.layers.at(k).inner_index;
     int io = input.layers.at(k).outer_index;
     Robot* ri = world->robots[ii];
@@ -112,6 +110,7 @@ void MotionPlanner::CreateSinglePathHierarchy(){
 
       psinput->level = k;
       psinput_level0 = psinput;
+      psinput_level0->name_algorithm = subalgorithm;
     }
 
     psinput->SetNextLayer(new PathSpaceInput());
@@ -149,17 +148,13 @@ void MotionPlanner::CreateSinglePathHierarchy(){
   //  output.removable_robot_idxs.push_back(idxs.at(k));
   //}
 
-  psinput_level0->name_algorithm = subalgorithm;
-
-  if(input.isSE2){
-    hierarchy->AddRootNode( new PathSpaceMultiLevelSE2(world, psinput_level0) );
-  }else{
-    hierarchy->AddRootNode( new PathSpaceMultiLevelSE3(world, psinput_level0) );
+  if(psinput_level0!=nullptr){
+    if(input.isSE2){
+      hierarchy->AddRootNode( new PathSpaceMultiLevelSE2(world, psinput_level0) );
+    }else{
+      hierarchy->AddRootNode( new PathSpaceMultiLevelSE3(world, psinput_level0) );
+    }
   }
-  //std::vector<Config> path;
-  //path.push_back(psinput_level0->q_init);
-  //path.push_back(psinput_level0->q_goal);
-  //hierarchy->GetRootNodeContent()->SetShortestPath( path );
 
 }
 
@@ -302,7 +297,7 @@ void MotionPlanner::RaiseError(){
 void MotionPlanner::Expand(){
   if(!active) return;
 
-  int Nmax=hierarchy->NumberLevels();
+  uint Nmax=hierarchy->NumberLevels();
   if(current_level<Nmax-1){
     //current_level_node
     PathSpace* P = hierarchy->GetNodeContent(current_path);
@@ -336,14 +331,13 @@ void MotionPlanner::Collapse(){
       current_level_node = 0;
     }
   }
-  PathSpace* P = hierarchy->GetNodeContent(current_path);
   UpdateHierarchy();
 }
 
 void MotionPlanner::Next(){
   if(!active) return;
 
-  int Nmax=hierarchy->NumberNodesOnLevel(current_level);
+  uint Nmax=hierarchy->NumberNodesOnLevel(current_level);
   if(current_level_node<Nmax-1) current_level_node++;
   else current_level_node = 0;
   if(current_level > 0){
@@ -353,7 +347,7 @@ void MotionPlanner::Next(){
 }
 void MotionPlanner::Previous(){
   if(!active) return;
-  int Nmax=hierarchy->NumberNodesOnLevel(current_level);
+  uint Nmax=hierarchy->NumberNodesOnLevel(current_level);
   if(current_level_node>0) current_level_node--;
   else{
     if(Nmax>0){
@@ -440,7 +434,7 @@ void MotionPlanner::DrawGL(GUIState& state){
   for(uint k = 0; k < N; k++){
     if(k==current_level_node) continue;
     current_path.at(current_path.size()-1) = k;
-    PathSpace* Pk = hierarchy->GetNodeContent(current_path);
+    //PathSpace* Pk = hierarchy->GetNodeContent(current_path);
     //Pk->DrawGL(state);
   }
   if(current_path.size()>0){

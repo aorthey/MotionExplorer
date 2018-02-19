@@ -199,7 +199,7 @@ ompl::PDF<og::PRMBasic::Edge> PRMQuotient::GetEdgePDF()
   PDF<Edge> pdf;
   foreach (Edge e, boost::edges(g_))
   {
-    const Vertex v1 = boost::source(e, g_);
+    //const Vertex v1 = boost::source(e, g_);
     //if(sameComponent(v1, startM_.at(0))){
     //  ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
     //  pdf.add(e, weight.value());

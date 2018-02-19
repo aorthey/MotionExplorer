@@ -67,7 +67,6 @@ namespace ompl
         base::State *state{nullptr};
         Configuration *parent{nullptr};
         cover::OpenSetHypersphere *openset{nullptr};
-        uint numChildren{0};
       };
 
       std::shared_ptr<NearestNeighbors<Configuration *>> G_;

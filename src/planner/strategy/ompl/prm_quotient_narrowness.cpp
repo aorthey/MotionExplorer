@@ -83,7 +83,7 @@ ompl::PDF<Edge> PRMQuotientNarrowMinCut::GetEdgePDF(){
   
   auto wmap = make_transform_value_property_map([](EdgeProperty& e) { return e.getCost().value(); }, get(boost::edge_weight_t(), g_));
 
-  int w = boost::stoer_wagner_min_cut(g_, wmap, boost::parity_map(parities));
+  boost::stoer_wagner_min_cut(g_, wmap, boost::parity_map(parities));
 
   PDF<Edge> pdf;
   foreach (Edge e, boost::edges(g_))

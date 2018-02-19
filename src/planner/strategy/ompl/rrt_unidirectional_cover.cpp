@@ -22,7 +22,6 @@ void RRTUnidirectionalCover::getPlannerData(base::PlannerData &data) const
 
   data.addGoalVertex(PlannerDataVertexAnnotated(q_goal->state, 0, q_goal->openset->GetRadius()));
 
-  uint ctr = 0;
   for (auto &vertex : vertices)
   {
     double d = vertex->openset->GetRadius();
@@ -163,6 +162,7 @@ RRTUnidirectional::Configuration* RRTUnidirectionalCover::Connect(Configuration 
   q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d_new);
 
   G_->add(q_new);
+  return q_new;
 }
 
 bool RRTUnidirectionalCover::SampleGraph(ob::State *q_random_graph)
@@ -202,7 +202,7 @@ ompl::PDF<RRTUnidirectional::Configuration*> RRTUnidirectionalCover::GetConfigur
       //pdf.add(configuration, 1.0/configuration->openset->GetRadius());
       //pdf.add(configuration, exp(-configuration->openset->GetRadius()));
       //pdf.add(configuration, d);
-      double d = configuration->openset->GetRadius();
+      //double d = configuration->openset->GetRadius();
       pdf.add(configuration, 1.0);
       //pdf.add(configuration, 1.0/d);
       //pdf.add(configuration, exp(-d));

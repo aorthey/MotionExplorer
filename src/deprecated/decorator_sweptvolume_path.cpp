@@ -9,7 +9,7 @@ PathSpaceDecoratorSweptVolumePath::PathSpaceDecoratorSweptVolumePath(PathSpace* 
 void PathSpaceDecoratorSweptVolumePath::DrawGL(GUIState& state){
   component->DrawGL(state);
 
-  uint ridx = input->robot_idx;
-  Robot* robot = world->robots[ridx];
-  PathPiecewiseLinear* path = component->GetShortestPath();
+  //uint ridx = input->robot_idx;
+  //Robot* robot = world->robots[ridx];
+  //PathPiecewiseLinear* path = component->GetShortestPath();
 }

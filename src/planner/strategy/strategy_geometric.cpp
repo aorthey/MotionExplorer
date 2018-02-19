@@ -149,7 +149,8 @@ void StrategyGeometric::plan( const StrategyInput &input, StrategyOutput &output
 
 
   ompl::time::point t_start = ompl::time::now();
-  ob::PlannerStatus status = ss.solve(ptc);
+  ss.solve(ptc);
+
   output.planner_time = ompl::time::seconds(ompl::time::now() - t_start);
   output.max_planner_time = max_planning_time;
 

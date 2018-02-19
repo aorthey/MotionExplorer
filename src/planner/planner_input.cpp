@@ -21,7 +21,6 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
   double epsilon_goalregion;
   double timestep_min;
   double timestep_max;
-  double path_speed;
   std::string name_sampler;
   TiXmlElement* node_timestep = FindSubNode(node_plannerinput, "timestep");
   if(node_timestep){

@@ -320,5 +320,5 @@ std::ostream& operator<< (std::ostream& out, const PathPiecewiseLinear& pwl)
     out << pwl.Eval(d) << std::endl;  
   }
   out << std::string(80, '-') << std::endl;
-  std::cout << "finish" << std::endl;
+  return out;
 }

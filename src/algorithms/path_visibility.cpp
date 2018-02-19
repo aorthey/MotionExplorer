@@ -8,6 +8,13 @@
 //  it is used to determine inside a RRT planner to verify if two paths p,q are
 //  onetopic, i.e. homotopic by using a linear homotopy deformation.
 
+static ob::OptimizationObjectivePtr getThresholdPathLength(const ob::SpaceInformationPtr& si)
+{
+  ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
+  obj->setCostThreshold(ob::Cost(dInf));
+  return obj;
+}
+
 class PathPathValidityChecker : public ob::StateValidityChecker
 {
   public:

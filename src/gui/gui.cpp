@@ -552,10 +552,10 @@ void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
       std::string outpng = screenshotFile.substr(0,pos)+".png";
       std::string cmd = "pnmtopng "+screenshotFile+" > "+outpng;
       int sres = system(cmd.c_str());
-      if(sres) std::cout << "successful stored screenshot" << std::endl;
       IncrementStringDigits(screenshotFile);
       cmd = "mogrify -crop 650x675+6+327 "+outpng;
       int s1 = std::system(cmd.c_str());
+      if(sres && s1) std::cout << "successful stored and cropped screenshot to " << outpng << std::endl;
       break;
     }
     default:

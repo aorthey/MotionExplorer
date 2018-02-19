@@ -47,6 +47,13 @@
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/util/Time.h>
 
+static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)
+{
+  ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
+  obj->setCostThreshold(ob::Cost(dInf));
+  return obj;
+}
+
 void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &run)
 {
   static uint pid = 0;
@@ -369,7 +376,9 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
   ompl::time::point start = ompl::time::now();
-  ob::PlannerStatus status = planner->solve(ptc);
+  //ob::PlannerStatus status = planner->solve(ptc);
+  planner->solve(ptc);
+
   output.planner_time = ompl::time::seconds(ompl::time::now() - start);
   output.max_planner_time = max_planning_time;
 

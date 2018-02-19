@@ -26,13 +26,6 @@ using Vertex = Graph::Vertex;
 // return true/false
 //
 
-static ob::OptimizationObjectivePtr getThresholdPathLength(const ob::SpaceInformationPtr& si)
-{
-  ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
-  obj->setCostThreshold(ob::Cost(dInf));
-  return obj;
-}
-
 class VisibilityChecker{
 
   const double max_planning_time_path_path=0.05;

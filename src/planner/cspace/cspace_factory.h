@@ -29,23 +29,23 @@ class CSpaceFactory{
       cspace->initControlSpace();
       return cspace;
     }
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpace( RobotWorld *world, int robot_idx, const char* type){
-      GeometricCSpaceOMPL *cspace;
-      if(type=="R3"){
-      }else if(type="R3S2"){
-        cspace = new GeometricCSpaceOMPLR3S2(world, robot_idx);
-      }else if(type="SE2"){
-        cspace = new GeometricCSpaceOMPLSE2(world, robot_idx);
-      }else if(type="SE3"){
-        cspace = new GeometricCSpaceOMPL(world, robot_idx);
-      }else{
-        cspace = new GeometricCSpaceOMPL(world, robot_idx);
-      }
-      cspace->SetCSpaceInput(input);
-      cspace->initSpace();
-      cspace->initControlSpace();
-      return cspace;
-    }
+    //virtual GeometricCSpaceOMPL* MakeGeometricCSpace( RobotWorld *world, int robot_idx, const char* type){
+    //  GeometricCSpaceOMPL *cspace;
+    //  if((type=="R3")){
+    //  }else if(type=="R3S2"){
+    //    cspace = new GeometricCSpaceOMPLR3S2(world, robot_idx);
+    //  }else if(type=="SE2"){
+    //    cspace = new GeometricCSpaceOMPLSE2(world, robot_idx);
+    //  }else if(type=="SE3"){
+    //    cspace = new GeometricCSpaceOMPL(world, robot_idx);
+    //  }else{
+    //    cspace = new GeometricCSpaceOMPL(world, robot_idx);
+    //  }
+    //  cspace->SetCSpaceInput(input);
+    //  cspace->initSpace();
+    //  cspace->initControlSpace();
+    //  return cspace;
+    //}
     // CSpace  SE(3)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE3( RobotWorld *world, int robot_idx){
       return MakeGeometricCSpace(world, robot_idx);

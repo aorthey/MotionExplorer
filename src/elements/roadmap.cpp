@@ -17,7 +17,7 @@ Roadmap::Roadmap()
   cEdge = green;
   cPath = magenta;
 }
-int Roadmap::numEdges()
+uint Roadmap::numEdges()
 {
   uint edge_ctr = 0;
   for(uint k = 0; k < roadmaps_level.size(); k++){
@@ -25,7 +25,7 @@ int Roadmap::numEdges()
   }
   return edge_ctr;
 }
-int Roadmap::numVertices()
+uint Roadmap::numVertices()
 {
   uint vertex_ctr = 0;
   for(uint k = 0; k < roadmaps_level.size(); k++){
@@ -142,7 +142,7 @@ void Roadmap::DrawPathGL(GUIState &state, std::vector<Vector3> &q)
   if(q.size()>1 && state("draw_roadmap_shortest_path"))
   {
     glPushMatrix();
-    glLineWidth(15);
+    glLineWidth(10);
     setColor(cPath);
     for(uint k = 0; k < q.size()-1; k++){
       Vector3 v1 = q.at(k);

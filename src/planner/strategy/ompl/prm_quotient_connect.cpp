@@ -65,8 +65,8 @@ double PRMQuotientConnect::Distance(const Vertex a, const Vertex b) const
     const Vertex vtaM0 = associatedVertexTargetProperty_[a];
     const Vertex vtbM0 = associatedVertexTargetProperty_[b];
 
-    double ta = associatedTProperty_[a];
-    double tb = associatedTProperty_[b];
+    //double ta = associatedTProperty_[a];
+    //double tb = associatedTProperty_[b];
 
     ob::PathPtr sol = dynamic_cast<PRMQuotientConnect*>(previous)->GetShortestPathOffsetVertices( qaM0, qbM0, vsaM0, vsbM0, vtaM0, vtbM0);
     double d0 = +dInf;
@@ -220,11 +220,11 @@ ob::PathPtr PRMQuotientConnect::GetShortestPathOffsetVertices( const ob::State *
 
     boost::clear_vertex(vb, g_);
     boost::remove_vertex(vb, g_);
-    Edge eb = boost::add_edge(vsb, vtb, EdgeProperty(ob::Cost(dsb.value()+dtb.value())), g_).first;
+    boost::add_edge(vsb, vtb, EdgeProperty(ob::Cost(dsb.value()+dtb.value())), g_).first;
     uniteComponents(vsb, vtb);
 
-    const Vertex v1 = boost::source(eb, g_);
-    const Vertex v2 = boost::target(eb, g_);
+    //const Vertex v1 = boost::source(eb, g_);
+    //const Vertex v2 = boost::target(eb, g_);
     //if(DEBUG) std::cout << "restored edge "<< v1 << "," << v2 << " (edges: " << num_edges(g_) << ")" << std::endl;
   }
   if(isAonEdge){

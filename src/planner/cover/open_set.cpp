@@ -27,7 +27,7 @@ void OpenSet::IntersectionTowards(const ob::State *sGoal, ob::State *sIntersecte
     return;
   }
   double t1 = +dist_robot_env/d;
-  double t2 = -dist_robot_env/d;
+  //double t2 = -dist_robot_env/d;
   si->getStateSpace()->interpolate(sCenter, sGoal, t1, sIntersected);
 }
 

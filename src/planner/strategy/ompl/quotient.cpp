@@ -21,7 +21,7 @@ uint Quotient::GetNumberOfSampledVertices()
 }
 
 Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_):
-  ob::Planner(si,"QuotientSpace"), previous(previous_), M1(si)
+  ob::Planner(si,"QuotientSpace"), M1(si), previous(previous_)
 {
   const StateSpacePtr M1_space = M1->getStateSpace();
 
@@ -379,6 +379,7 @@ const ob::SpaceInformationPtr &Quotient::getC1() const{
 
 bool Quotient::SampleC1(ob::State *s){
   C1_sampler->sampleUniform(s);
+  return true;
 }
 bool Quotient::Sample(ob::State *q_random)
 {
@@ -492,7 +493,6 @@ void Quotient::ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const
     case SE3_R3:
       {
         const ob::SE3StateSpace::StateType *sM1 = q->as<SE3StateSpace::StateType>();
-        const ob::SO3StateSpace::StateType *sM1_rotation = &sM1->rotation();
         ob::RealVectorStateSpace::StateType *sM0 = qM0->as<RealVectorStateSpace::StateType>();
 
         sM0->values[0] = sM1->getX();
@@ -553,13 +553,11 @@ bool Quotient::SampleGraph(ob::State *q_random)
 
 double Quotient::GetSamplingDensity(){
   double N = (double)totalNumberOfSamples;
+  //@TODO: needs a more formal definition of sampling density
   if(previous==nullptr){
-    return (double)totalNumberOfSamples/((double)si_->getSpaceMeasure());
-    //return pow(N,(1.0/(double)si_->getStateDimension()));
-    //return totalNumberOfSamples;
-    //return (double)totalNumberOfSamples/(previous->GetGraphLength()*C1->getSpaceMeasure());
+    return N/((double)si_->getSpaceMeasure());
   }else{
-    return (double)totalNumberOfSamples/(previous->GetGraphLength()*C1->getSpaceMeasure());
+    return N/(previous->GetGraphLength()*C1->getSpaceMeasure());
   }
 }
 

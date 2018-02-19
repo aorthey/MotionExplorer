@@ -21,8 +21,8 @@ class Roadmap{
     virtual void DrawGL(GUIState&);
 
     GLDraw::GLColor cVertex, cEdge, cPath;
-    int numEdges();
-    int numVertices();
+    uint numEdges();
+    uint numVertices();
 
   private:
 

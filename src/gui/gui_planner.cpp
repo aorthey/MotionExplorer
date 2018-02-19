@@ -287,7 +287,7 @@ void GLUIPlannerGUI::AddPlannerInput(PlannerMultiInput& _in){
 bool GLUIPlannerGUI::Initialize(){
   if(!BaseT::Initialize()) return false;
 
-  PlannerBackend* _backend = static_cast<PlannerBackend*>(backend);
+  //PlannerBackend* _backend = static_cast<PlannerBackend*>(backend);
 
   AddToKeymap("left","hierarchy_previous");
   AddToKeymap("right","hierarchy_next");

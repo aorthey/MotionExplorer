@@ -18,12 +18,12 @@ void KinodynamicCSpaceOMPL::print() const
   ob::CompoundStateSpace *cspace = space->as<ob::CompoundStateSpace>();
   ob::SE3StateSpace *cspaceSE3 = cspace->as<ob::SE3StateSpace>(0);
 
-  ob::RealVectorStateSpace *cspaceRn = NULL;
+  //ob::RealVectorStateSpace *cspaceRn = NULL;
   ob::RealVectorStateSpace *cspaceTM = NULL;
 
   uint N =  robot->q.size() - 6;
   if(N>0){
-    cspaceRn = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+    //cspaceRn = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
     cspaceTM = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(2);
   }else{
     cspaceTM = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
@@ -95,11 +95,11 @@ void KinodynamicCSpaceOMPL::initSpace()
 
   ob::SE3StateSpace *cspaceSE3 = space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
 
-  ob::RealVectorStateSpace *cspaceRn;
   ob::RealVectorStateSpace *cspaceTM;
+  ob::RealVectorStateSpace *cspaceRN = nullptr;
 
   if(N>0){
-    cspaceRn = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+    cspaceRN = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
     cspaceTM = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(2);
   }else{
     cspaceTM = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
@@ -130,7 +130,8 @@ void KinodynamicCSpaceOMPL::initSpace()
   boundsSE3.check();
   cspaceSE3->setBounds(boundsSE3);
 
-  if(N>0){
+  if(cspaceRN != nullptr)
+  {
     vector<double> lowRn, highRn;
     for(uint i = 0; i < N; i++){
       lowRn.push_back(minimum.at(i+6));
@@ -148,7 +149,7 @@ void KinodynamicCSpaceOMPL::initSpace()
     boundsRn.low = lowRn;
     boundsRn.high = highRn;
     boundsRn.check();
-    cspaceRn->setBounds(boundsRn);
+    cspaceRN->setBounds(boundsRn);
   }
   //###########################################################################
   // Set velocity bounds
@@ -284,7 +285,7 @@ ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q){
   qomplSO3->z = qz;
   qomplSO3->w = qw;
 
-  ob::RealVectorStateSpace::StateType *qomplRnSpace;
+  ob::RealVectorStateSpace::StateType *qomplRnSpace = nullptr;
   ob::RealVectorStateSpace::StateType *qomplTMSpace;
   if(N>0){
     qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
@@ -292,8 +293,11 @@ ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q){
   }else{
     qomplTMSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
   }
-  double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
-  //q.size = 6 + N + (N+6)
+
+  double* qomplRn = nullptr;
+  if(qomplRnSpace!=nullptr){
+    qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
+  }
 
   if(!(q.size() == int(space->getDimension()))){
     if(q.size() == int(0.5*space->getDimension())){
@@ -319,7 +323,6 @@ ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q){
       qomplTM[i]=q(N+6+i);
     }
   }
-
 
   return qompl;
 }

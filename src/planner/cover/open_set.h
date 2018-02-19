@@ -8,6 +8,7 @@ namespace cover{
   class OpenSet{
     public:
       OpenSet(ob::SpaceInformationPtr si_, ob::State *s, double dist_robot_env_);
+      virtual ~OpenSet(){};
 
       virtual bool Contains(ob::State *sPrime);
       virtual void IntersectionTowards(const ob::State *sGoal, ob::State *sIntersected);

@@ -118,7 +118,7 @@ bool PRMQuotientCover::SampleGraph(ob::State *q_random_graph)
 bool PRMQuotientCover::Connect(const Vertex a, const Vertex b)
 {
   OpenSet *o1 = openNeighborhood_[a];
-  OpenSet *o2 = openNeighborhood_[b];
+  //OpenSet *o2 = openNeighborhood_[b];
 
   ob::State *s1 = stateProperty_[a];
   ob::State *s2 = stateProperty_[b];

@@ -115,5 +115,5 @@ ENDFOREACH(FILENAME)
 MESSAGE("-------------------------------------")
 
 #SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall -Werror" )
-SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall -O0 -fmax-errors=5" )
+SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall -Werror -O0 -fmax-errors=3" )
 MESSAGE("Compilers: ${CMAKE_CXX_COMPILER} ${CMAKE_C_COMPILER}")

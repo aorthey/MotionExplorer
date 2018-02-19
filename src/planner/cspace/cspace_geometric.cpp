@@ -58,13 +58,13 @@ void GeometricCSpaceOMPL::initSpace()
 
   ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());
   ob::SE3StateSpace *cspaceSE3;
-  ob::RealVectorStateSpace *cspaceRn;
+  ob::RealVectorStateSpace *cspaceRN = nullptr;
 
   if(Nompl>0){
     ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(Nompl));
     this->space = SE3 + Rn;
     cspaceSE3 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
-    cspaceRn = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+    cspaceRN = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
   }else{
     this->space = SE3;
     cspaceSE3 = this->space->as<ob::SE3StateSpace>();
@@ -95,7 +95,8 @@ void GeometricCSpaceOMPL::initSpace()
   cspaceSE3->setBounds(boundsSE3);
   boundsSE3.check();
 
-  if(Nompl>0){
+  if(cspaceRN!=nullptr)
+  {
     vector<double> lowRn, highRn;
 
     for(uint i = 0; i < Nompl;i++){
@@ -110,7 +111,7 @@ void GeometricCSpaceOMPL::initSpace()
     boundsRn.low = lowRn;
     boundsRn.high = highRn;
     boundsRn.check();
-    cspaceRn->setBounds(boundsRn);
+    cspaceRN->setBounds(boundsRn);
   }
 
 }
@@ -160,12 +161,12 @@ void GeometricCSpaceOMPL::print() const
   std::cout << " Configuration Space (klampt) : SE(3)" << (Nklampt>0?"xR^"+std::to_string(Nklampt):"") << "  [Klampt]"<< std::endl;
   std::cout << " Configuration Space (ompl)   : SE(3)" << (Nompl>0?"xR^"+std::to_string(Nompl):"") << "  [OMPL]" << std::endl;
 
-  ob::SE3StateSpace *cspaceSE3 = NULL;
-  ob::RealVectorStateSpace *cspaceRn = NULL;
+  ob::SE3StateSpace *cspaceSE3 = nullptr;
+  //ob::RealVectorStateSpace *cspaceRn = nullptr;
 
   if(Nompl>0){
     cspaceSE3 = space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
-    cspaceRn = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+    //cspaceRn = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
   }else{
     cspaceSE3 = space->as<ob::SE3StateSpace>();
   }
@@ -220,6 +221,7 @@ ob::ScopedState<> GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q){
   }else{
     qomplSE3 = qompl->as<ob::SE3StateSpace::StateType>();
     qomplSO3 = &qomplSE3->rotation();
+    qomplRnSpace = nullptr;
   }
 
   qomplSE3->setXYZ(q[0],q[1],q[2]);

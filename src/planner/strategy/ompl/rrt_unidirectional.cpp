@@ -7,7 +7,7 @@ using namespace ompl::geometric;
 RRTUnidirectional::RRTUnidirectional(const base::SpaceInformationPtr &si, Quotient *previous ): og::Quotient(si, previous)
 {
   deltaCoverPenetration_ = 0.05;
-  goalBias_ = 0.05;
+  goalBias_ = 0.1;
   totalNumberOfSamples = 0;
   graphLength = 0.0;
   epsilon = 0.001;
@@ -97,7 +97,7 @@ RRTUnidirectional::Configuration* RRTUnidirectional::Connect(Configuration *q_ne
   // move towards q_random until infeasible
   //##############################################################################
   double d_segment = si_->getStateSpace()->getLongestValidSegmentFraction();
-  uint nd = si_->getStateSpace()->validSegmentCount(q_near->state, q_random->state);
+  //uint nd = si_->getStateSpace()->validSegmentCount(q_near->state, q_random->state);
 
   double d_cum = 0;
   double d_lastvalid = 0;
@@ -123,7 +123,6 @@ RRTUnidirectional::Configuration* RRTUnidirectional::Connect(Configuration *q_ne
   q_new->parent = q_near;
   q_new->parent_edge_weight = si_->distance(q_near->state, q_new->state);
   graphLength += q_new->parent_edge_weight;
-  q_new->parent->numChildren++;
 
   auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
   double d1 = checkerPtr->Distance(q_new->state);
@@ -153,7 +152,6 @@ RRTUnidirectional::Configuration* RRTUnidirectional::Connect(Configuration *q_ne
 //    q_new->parent = q_near;
 //    q_new->parent_edge_weight = si_->distance(q_near->state, q_new->state);
 //    graphLength += q_new->parent_edge_weight;// + q_new->parent_edge_weight*epsilon*si_->getSpaceMeasure();
-//    q_new->parent->numChildren++;
 //
 //    auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
 //    double d1 = checkerPtr->Distance(q_new->state);
@@ -213,11 +211,11 @@ void RRTUnidirectional::Init()
     G_->add(q_start);
   }
 
-  if (const ob::State *st = pis_.nextGoal()){
-  }else{
-    OMPL_ERROR("%s: There is no valid goal state!", getName().c_str());
-    exit(0);
-  }
+  //if (const ob::State *st = pis_.nextGoal()){
+  //}else{
+  //  OMPL_ERROR("%s: There is no valid goal state!", getName().c_str());
+  //  exit(0);
+  //}
 
 
   if (G_->size() == 0){
@@ -409,7 +407,7 @@ ompl::PDF<RRTUnidirectional::Configuration*> RRTUnidirectional::GetConfiguration
     {
       if(!(configuration->parent == nullptr))
       {
-        double d = exp(-configuration->GetRadius());
+        //double d = exp(-configuration->GetRadius());
         pdf.add(configuration, configuration->parent_edge_weight);
       }
     }

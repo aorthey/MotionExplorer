@@ -13,7 +13,6 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
   if(!space->isCompound()){
     space_first_subspace = space;
   }else{
-    int subspaces = space->as<ob::CompoundStateSpace>()->getSubspaceCount();
     ob::CompoundStateSpace *M1_compound = space->as<ob::CompoundStateSpace>();
     const std::vector<ob::StateSpacePtr> decomposed = M1_compound->getSubspaces();
     space_first_subspace = decomposed.front();
@@ -138,7 +137,7 @@ void CSpaceOMPL::OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob
 
 
 CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx):
-  world(world_), si(nullptr)
+  si(nullptr), world(world_)
 {
   robot = world->robots[robot_idx];
   worldsettings.InitializeDefault(*world);

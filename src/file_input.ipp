@@ -141,7 +141,7 @@ template<typename T>
 inline std::vector<T> GetNodeVector(TiXmlElement* node)
 {
   std::stringstream ss = GetStreamText(node);
-  int _size;
+  uint _size;
   ss >> _size;
 
   std::vector<T> _val;
