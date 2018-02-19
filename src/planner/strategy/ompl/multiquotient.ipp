@@ -56,22 +56,29 @@ void PrintQuotientSpaces(std::vector<Quotient*> quotientSpaces, uint k=0){
   uint total_sampled_vertices = 0;
   for(uint i = 0; i <= k; i++){
     og::Quotient *Qi = quotientSpaces.at(i);
-    std::cout << ">> level " << i << ": " 
+    uint N = 6;
+    std::cout 
+      << ">> level " << i << ": " 
+      << std::setw(N)
+      << std::setfill(' ')
       << Qi->GetNumberOfVertices() 
       << " vertices ("
+      << std::setw(N)
+      << std::setfill(' ')
       << Qi->GetNumberOfSampledVertices() 
       << " sampled) |"
+      << std::setw(N)
+      << std::setfill(' ')
       << Qi->GetNumberOfEdges() 
-      << " edges |" 
+      << " edges | " 
       << Qi->GetSamplingDensity() 
-      << " density " 
-      << std::endl;
+      << " density \n";
     total_vertices += Qi->GetNumberOfVertices();
     total_sampled_vertices += Qi->GetNumberOfSampledVertices();
   }
   std::cout << std::string(80, '-') << std::endl;
   double total_rejected = 1.0-(double)total_vertices/(double)total_sampled_vertices;
-  std::cout << ">> total: " << total_vertices << " vertices ("<<total_sampled_vertices << " sampled, " << total_rejected << " percent rejected)" << std::endl;
+  std::cout << ">> total: " << total_vertices << " vertices ("<<total_sampled_vertices << " sampled, " << setprecision(2) << total_rejected << " percent rejected)" << std::endl;
   std::cout << std::string(80, '-') << std::endl;
 }
 

@@ -7,10 +7,10 @@ using namespace ompl::geometric;
 RRTUnidirectional::RRTUnidirectional(const base::SpaceInformationPtr &si, Quotient *previous ): og::Quotient(si, previous)
 {
   deltaCoverPenetration_ = 0.05;
-  goalBias_ = 0.01;
+  goalBias_ = 0.05;
   totalNumberOfSamples = 0;
   graphLength = 0.0;
-  epsilon = 0.05;
+  epsilon = 0.001;
 }
 
 RRTUnidirectional::~RRTUnidirectional(void)
@@ -83,38 +83,87 @@ RRTUnidirectional::Configuration* RRTUnidirectional::Nearest(Configuration *q_ra
 
 RRTUnidirectional::Configuration* RRTUnidirectional::Connect(Configuration *q_near, Configuration *q_random)
 {
-  //##############################################################################
-  // q_new_state <- BALL_maxDistance_(q_near) in direction of q_random
-  //##############################################################################
+  //two strategies: either check directly if the edge between q_near and
+  //q_random is feasible and add that (as implemented by RRTConnect)
+  //or: move as long towards q_random as the edge is feasible. Once it becomes
+  //infeasible, set q_random to the last feasible vertex. Might be more
+  //efficient, but why is that not implemented in RRTConnect?
+  //=> it seems we often need to reject samples, especially if the boundary box
+  //of the workspace is not tight. 
+
   double d = si_->distance(q_near->state, q_random->state);
-  //double maxD = q_near->GetRadius();
-  double maxD = maxDistance_;
-  if(d > maxD){
-    //maxD/d -> t \in [0,1] on boundary
-    si_->getStateSpace()->interpolate(q_near->state, q_random->state, maxD / d, q_random->state);
-  }
 
   //##############################################################################
-  // extend the tree from q_near towards q_new
+  // move towards q_random until infeasible
   //##############################################################################
+  double d_segment = si_->getStateSpace()->getLongestValidSegmentFraction();
+  uint nd = si_->getStateSpace()->validSegmentCount(q_near->state, q_random->state);
 
-  if(si_->checkMotion(q_near->state, q_random->state)){
-    auto *q_new = new Configuration(si_);
-    si_->copyState(q_new->state, q_random->state);
-    q_new->parent = q_near;
-    q_new->parent_edge_weight = si_->distance(q_near->state, q_new->state);
-    graphLength += q_new->parent_edge_weight;// + q_new->parent_edge_weight*epsilon*si_->getSpaceMeasure();
-    q_new->parent->numChildren++;
-
-    auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
-    double d1 = checkerPtr->Distance(q_new->state);
-    q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d1);
-
-    G_->add(q_new);
-
-    return q_new;
+  double d_cum = 0;
+  double d_lastvalid = 0;
+  ob::State *q_test = si_->allocState();
+  while(d_cum <= d)
+  {
+    si_->getStateSpace()->interpolate(q_near->state, q_random->state, d_cum / d, q_test);
+    if(si_->isValid(q_test)){
+      d_lastvalid = d_cum;
+    }else{
+      break;
+    }
+    d_cum += d_segment;
   }
-  return nullptr;
+  si_->freeState(q_test);
+
+  if(d_lastvalid<=0) return nullptr;
+
+  si_->getStateSpace()->interpolate(q_near->state, q_random->state, d_lastvalid / d, q_random->state);
+
+  auto *q_new = new Configuration(si_);
+  si_->copyState(q_new->state, q_random->state);
+  q_new->parent = q_near;
+  q_new->parent_edge_weight = si_->distance(q_near->state, q_new->state);
+  graphLength += q_new->parent_edge_weight;
+  q_new->parent->numChildren++;
+
+  auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+  double d1 = checkerPtr->Distance(q_new->state);
+  q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d1);
+
+  G_->add(q_new);
+
+  return q_new;
+//  //##############################################################################
+//  // q_new_state <- BALL_maxDistance_(q_near) in direction of q_random
+//  //##############################################################################
+//  double maxD = maxDistance_;
+//  if(d > maxD){
+//    //maxD/d -> t \in [0,1] on boundary
+//    si_->getStateSpace()->interpolate(q_near->state, q_random->state, maxD / d, q_random->state);
+//    d = maxD; //new distance between q_near and q_random
+//  }
+//
+//
+//  //##############################################################################
+//  // extend the tree from q_near towards q_new
+//  //##############################################################################
+//
+//  if(si_->checkMotion(q_near->state, q_random->state)){
+//    auto *q_new = new Configuration(si_);
+//    si_->copyState(q_new->state, q_random->state);
+//    q_new->parent = q_near;
+//    q_new->parent_edge_weight = si_->distance(q_near->state, q_new->state);
+//    graphLength += q_new->parent_edge_weight;// + q_new->parent_edge_weight*epsilon*si_->getSpaceMeasure();
+//    q_new->parent->numChildren++;
+//
+//    auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+//    double d1 = checkerPtr->Distance(q_new->state);
+//    q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d1);
+//
+//    G_->add(q_new);
+//
+//    return q_new;
+//  }
+//  return nullptr;
 }
 
 bool RRTUnidirectional::ConnectedToGoal(Configuration* q)
@@ -340,7 +389,7 @@ bool RRTUnidirectional::SampleGraph(ob::State *q_random_graph)
   const ob::State *q_from = q->state;
   const ob::State *q_to = q->parent->state;
   M1->getStateSpace()->interpolate(q_from, q_to, t, q_random_graph);
-  epsilon = q->GetRadius();
+  //epsilon = q->GetRadius();
   //sampler_->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
   sampler_->sampleGaussian(q_random_graph, q_random_graph, epsilon);
 
