@@ -385,12 +385,10 @@ anything else from the roadmap class)
 path_pwl.h)
 [ ] identify narrow passage on graph (high priority)
 [ ] next planner select -> old path replay is not immediately updated
-[ ] visualize parity of min_cut as colors of vertices
-
-GUI
 [ ] abstract class SimTestGUI overwrites hotkey assignment, remove that
-[ ] make button to visualize the drawPoser routines
-[ ] filtration involving SE3RN subspaces not working
+
+[x] make button to visualize the drawPoser routines
+[x] filtration involving SE3RN subspaces not working
 [x] Robot Manipulator
 [x] rewrite quotient_planner.h to handle specific cases (RN <-> RM, SE3 <->
 SE3RN, R3 <-> SE3, etcetera, instead of trying everything)
@@ -398,18 +396,14 @@ SE3RN, R3 <-> SE3, etcetera, instead of trying everything)
 [x] solve hubble without objects and three layers
 [x] remove sufficient edges (Priority)
 [x] rename multislice -> multiquotient
-[ ] visualize all paths from multiquotient
+[x] visualize all paths from multiquotient
 [ ] while path is plotted, somehow keep focus on a locus point on the robot,
 i.e. some tracking ability
-
-[ ] we need a dimmer to visualize only the spheres below a certain threshold
-[ ] why are there points accumulated at the boundary of the initial sphere on QS? 
-Should not happen i thought.
-
+[x] we need a dimmer to visualize only the spheres below a certain threshold
 [x] visualize: open sets of radius below threshold (have a dimmer)
 [ ] sampling density should reflect the radius of the vertices, i.e. the volume
 of the cover
-[ ] visualize: shortest path on each level
+[x] visualize: shortest path on each level
 [ ] sampling nearby from a gaussian distribution on SO(3) in OMPL is likely wrong,
 sometimes i get an unnormalized quaternion back when i sample with a high
 stddev. Look into that.

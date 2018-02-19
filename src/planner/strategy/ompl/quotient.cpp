@@ -15,6 +15,10 @@ void Quotient::resetCounter()
 {
   Quotient::counter = 0;
 }
+uint Quotient::GetNumberOfSampledVertices()
+{
+  return totalNumberOfSamples;
+}
 
 Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_):
   ob::Planner(si,"QuotientSpace"), previous(previous_), M1(si)

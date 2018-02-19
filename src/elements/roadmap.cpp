@@ -41,11 +41,24 @@ void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *csp
 
   OMPLValidityCheckerPtr validity_checker = std::static_pointer_cast<OMPLValidityChecker>(cspace->StateValidityCheckerPtr());
   PlannerDataVertexAnnotated *v0 = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(0));
+
   if(v0==nullptr){
+    //shallow hierarchy, take plannerdata as it is, add shortest path
     roadmaps_level.push_back(pd);
     roadmaps_level.at(0)->decoupleFromPlanner();
+    LemonInterface lemon(pd);
+    std::vector<Vertex> pred = lemon.GetShortestPath();
+    std::vector<Vector3> path;
+    for(uint i = 0; i < pred.size(); i++)
+    {
+      Vertex pi = pred.at(i);
+      Vector3 q = cspace->getXYZ(pd->getVertex(pi).getState());
+      path.push_back(q);
+    }
+    shortest_path_level.push_back(path);
     return;
   }
+
   uint N = v0->GetMaxLevel();
   std::cout << "max level: " << N << std::endl;
 

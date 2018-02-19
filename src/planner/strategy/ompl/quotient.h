@@ -53,6 +53,8 @@ namespace ompl
         virtual uint GetNumberOfVertices() = 0;
         virtual uint GetNumberOfEdges() = 0;
 
+        virtual uint GetNumberOfSampledVertices();
+
         static void resetCounter();
 
         friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::Quotient& qtnt);

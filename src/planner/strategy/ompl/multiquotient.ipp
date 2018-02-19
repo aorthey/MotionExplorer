@@ -52,17 +52,27 @@ void MultiQuotient<T,Tlast>::clear(){
 
 void PrintQuotientSpaces(std::vector<Quotient*> quotientSpaces, uint k=0){
   if(k<=0) k=quotientSpaces.size()-1;
+  uint total_vertices = 0;
+  uint total_sampled_vertices = 0;
   for(uint i = 0; i <= k; i++){
     og::Quotient *Qi = quotientSpaces.at(i);
     std::cout << ">> level " << i << ": " 
       << Qi->GetNumberOfVertices() 
-      << " vertices |"
+      << " vertices ("
+      << Qi->GetNumberOfSampledVertices() 
+      << " sampled) |"
       << Qi->GetNumberOfEdges() 
       << " edges |" 
       << Qi->GetSamplingDensity() 
       << " density " 
       << std::endl;
+    total_vertices += Qi->GetNumberOfVertices();
+    total_sampled_vertices += Qi->GetNumberOfSampledVertices();
   }
+  std::cout << std::string(80, '-') << std::endl;
+  double total_rejected = 1.0-(double)total_vertices/(double)total_sampled_vertices;
+  std::cout << ">> total: " << total_vertices << " vertices ("<<total_sampled_vertices << " sampled, " << total_rejected << " percent rejected)" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
 }
 
 template <class T, class Tlast>

@@ -352,7 +352,7 @@ ompl::PDF<RRTUnidirectional::Configuration*> RRTUnidirectional::GetConfiguration
   PDF<Configuration*> pdf;
   std::vector<Configuration *> configurations;
   double t = rng_.uniform01();
-  if(t<0.5){
+  if(t<0.8){
     if(G_){
       G_->list(configurations);
     }
@@ -370,11 +370,8 @@ ompl::PDF<RRTUnidirectional::Configuration*> RRTUnidirectional::GetConfiguration
     std::vector<Configuration *> q_path;
     if (configuration != nullptr){
       while (configuration != nullptr){
-        //double d = exp(-configuration->GetRadius());
         if(configuration->parent !=nullptr){
           q_path.push_back(configuration);
-          //double d = exp(-configuration->GetRadius());
-          //pdf.add(configuration, d);
         }
 
         configuration = configuration->parent;
@@ -384,7 +381,7 @@ ompl::PDF<RRTUnidirectional::Configuration*> RRTUnidirectional::GetConfiguration
     for(uint k = 0; k < q_path.size(); k++){
       Configuration *configuration = q_path.at(k);
       //double d = exp(-configuration->GetRadius());
-      pdf.add(configuration, configuration->parent_edge_weight);
+      pdf.add(configuration, 1.0);//configuration->parent_edge_weight);
     }
   }
 
