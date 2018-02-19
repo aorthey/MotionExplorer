@@ -190,6 +190,8 @@
     <key>x</key>
   </hotkey>
 
+  <property name="draw_roadmap_shortest_path" enabled="1"/>
+
   <property name="draw_path" enabled="0"/>
   <property name="draw_path_unsmoothed" enabled="0"/>
 
