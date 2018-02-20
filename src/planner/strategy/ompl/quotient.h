@@ -47,14 +47,13 @@ namespace ompl
 
         virtual void Init() = 0;
         virtual void Grow(double t) = 0;
-        virtual bool HasSolution() = 0;
         virtual void CheckForSolution(ob::PathPtr &solution) = 0;
         virtual double GetSamplingDensity();
         virtual uint GetNumberOfVertices() = 0;
         virtual uint GetNumberOfEdges() = 0;
 
+        virtual bool HasSolution();
         virtual uint GetNumberOfSampledVertices();
-
         static void resetCounter();
 
         friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::Quotient& qtnt);
@@ -90,6 +89,7 @@ namespace ompl
         double graphLength{0.0};
         uint totalNumberOfSamples{0};
         Quotient *previous{nullptr};
+        bool hasSolution{false};
 
     };
   }

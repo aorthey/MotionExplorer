@@ -63,6 +63,10 @@ namespace ompl
         {
             typedef boost::vertex_property_tag kind;
         };
+        struct vertex_on_shortest_path_t
+        {
+            typedef boost::vertex_property_tag kind;
+        };
 
 
         struct EdgeProperty{
@@ -96,7 +100,9 @@ namespace ompl
                         boost::property<vertex_associated_vertex_source_t, unsigned long int,
                           boost::property<vertex_open_neighborhood_distance_t, double,
                             boost::property<vertex_open_neighborhood_t, cover::OpenSet*,
-                              boost::property<vertex_associated_t_t, unsigned long int>
+                              boost::property<vertex_associated_t_t, unsigned long int,
+                                boost::property<vertex_on_shortest_path_t, bool>
+                              >
                             >
                           >
                         >
@@ -125,7 +131,6 @@ namespace ompl
         virtual uint GetNumberOfEdges() override;
         ob::PathPtr GetShortestPath();
         ob::PathPtr GetSolutionPath();
-        bool HasSolution() override;
 
         virtual void Grow(double t);
         virtual void Init() override;
@@ -154,11 +159,13 @@ namespace ompl
         boost::property_map<Graph, vertex_associated_t_t>::type associatedTProperty_;
         boost::property_map<Graph, vertex_open_neighborhood_distance_t>::type openNeighborhoodDistance_;
         boost::property_map<Graph, vertex_open_neighborhood_t>::type openNeighborhood_;
+        boost::property_map<Graph, vertex_on_shortest_path_t>::type onShortestPath_;
 
         ob::OptimizationObjectivePtr opt_;
 
         std::vector<Vertex> startM_;
         std::vector<Vertex> goalM_;
+        std::vector<Vertex> shortestVertexPath_;
 
         void uniteComponents(Vertex m1, Vertex m2);
         bool sameComponent(Vertex m1, Vertex m2);
@@ -177,7 +184,6 @@ namespace ompl
     protected:
 
         virtual double Distance(const Vertex a, const Vertex b) const; // standard si->distance
-        virtual bool Sample(ob::State *q_random); //si->sampler
         virtual bool Connect(const Vertex a, const Vertex b);
         virtual Vertex addMilestone(ob::State *state);
 

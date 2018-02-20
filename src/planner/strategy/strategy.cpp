@@ -50,8 +50,7 @@ void Strategy::setStateSampler(std::string sampler, ob::SpaceInformationPtr si){
     allocator = allocMinimumClearanceValidStateSampler;
   }else if(sampler=="obstacle_based"){
     allocator = allocObstacleBasedValidStateSampler;
-  }else if(sampler=="bridge"){
-    std::cout << "bridge" << std::endl;
+  }else if(sampler=="bridge" || sampler=="bridge_test"){
     allocator = allocBridgeTestValidStateSampler;
   }else{
     std::cout << "Sampler  " << sampler << " is unknown." << std::endl;

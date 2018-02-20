@@ -78,16 +78,16 @@
     <descr>Toggle Mode</descr>
     <key>m</key>
   </button>
+
   <button>
     <name>save_current_path</name>
     <descr>Save Current Path</descr>
-    <key>0</key>
+    <key>S</key>
   </button>
-
   <hotkey>
     <name>load_current_path</name>
     <descr>Load Current Path</descr>
-    <key>9</key>
+    <key>P</key>
   </hotkey>
 
   <hotkey>
@@ -155,6 +155,13 @@
     <key>8</key>
     <active>1</active>
   </checkbox>
+  <checkbox>
+    <name>roadmap_visualize_level_3</name>
+    <descr>Roadmap Vis Level 3</descr>
+    <key>9</key>
+    <active>0</active>
+  </checkbox>
+
   <checkbox>
     <name>draw_roadmap_vertices</name>
     <descr>Draw Roadmap Vertices</descr>

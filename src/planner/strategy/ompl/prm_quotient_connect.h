@@ -23,19 +23,24 @@ namespace ompl
         ob::PathPtr GetShortestPathOffsetVertices( const ob::State *qa, const ob::State *qb, 
           const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb);
 
-        Vertex lastSourceVertexSampled;
-        Vertex lastTargetVertexSampled;
-        double lastTSampled;
-        bool isSampled{false};
+        void setup() override;
+        virtual void Init() override;
 
       protected:
 
-        //Overrides Distance/Sample/Connect
+        virtual bool SampleGraph(ob::State*) override;
         virtual double Distance(const Vertex a, const Vertex b) const override;
         virtual bool Connect(const Vertex a, const Vertex b) override;
 
         virtual uint randomBounceMotion(const ob::StateSamplerPtr &sss, 
           const Vertex &v, std::vector<ob::State *> &states) const override;
+
+        virtual Vertex addMilestone(ob::State *state) override;
+
+        uint lastSourceVertexSampled;
+        uint lastTargetVertexSampled;
+        double lastTSampled;
+        bool isSampled{false};
     };
 
   };

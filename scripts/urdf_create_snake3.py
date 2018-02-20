@@ -8,7 +8,7 @@ from urdf_create_primitives import *
 robot_name = 'robots/snake'
 Nsegments = 3
 
-headradius = 0.1
+headradius = 0.15
 length = 0.2
 
 limit = pi/4
@@ -54,19 +54,22 @@ def createBranchSegment(parentlinkname, linkname, x, y, z):
   sbj2 = createRigidJoint(linkname+'_fixed', linkname1, linkname2, 0, 0, 0)
   return sbc+sbl1+sbj1+sbl2+sbj2
 
-def createBody(headname):
+def createBody(headname, segments):
   s=''
   branchname = "body"
   s += createBranchSegment(headname,branchname+str(0),-headradius-0.01,0,0)
-  for i in range(1,Nsegments-1):
+  for i in range(1,segments-1):
     if i==1:
       s+= attachBranchSegment(branchname+str(i-1),branchname+str(i),-stublength-sRadius,0,0)
     else:
       s+= attachBranchSegment(branchname+str(i-1),branchname+str(i),-length-2*sRadius,0,0)
 
-  s+= attachBranchSegment(branchname+str(Nsegments-2),branchname+str(Nsegments-1),-length-2*sRadius,0,0,True)
+  if segments>2:
+    s+= attachBranchSegment(branchname+str(segments-2),branchname+str(segments-1),-length-2*sRadius,0,0,True)
+  else:
+    s+= attachBranchSegment(branchname+str(segments-2),branchname+str(segments-1),-stublength-sRadius,0,0,True)
 
-  Njoints = 6 + 1 + 2*(Nsegments-1) + (1+Nsegments)
+  Njoints = 6 + 1 + 2*(segments-1) + (1+segments)
 
   print "[default position config]"
   global config
@@ -81,7 +84,7 @@ f = open(fname,'w')
 f.write('<?xml version="1.0"?>\n')
 f.write('<robot name="'+robot_name+'">\n')
 f.write(createHead("head"))
-f.write(createBody("head"))
+f.write(createBody("head",Nsegments))
 f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
 f.write('  </klampt>\n')
 f.write('</robot>')
@@ -91,7 +94,6 @@ print "\nCreated new file >>",fname
 
 robot_name_head = robot_name + "_head_inner"
 fname = pathname + folder+robot_name_head+'.urdf'
-
 f = open(fname,'w')
 f.write('<?xml version="1.0"?>\n')
 f.write('<robot name="'+robot_name_head+'">\n')
@@ -100,9 +102,20 @@ f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
 f.write('  </klampt>\n')
 f.write('</robot>')
 f.close()
-
 print "\nCreated new file >>",fname
 
+robot_name_onelink = robot_name + "_onelink_inner"
+fname = pathname + folder+robot_name_onelink+'.urdf'
+f = open(fname,'w')
+f.write('<?xml version="1.0"?>\n')
+f.write('<robot name="'+robot_name_onelink+'">\n')
+f.write(createHead("head"))
+f.write(createBody("head",Nsegments-1))
+f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
+f.write('  </klampt>\n')
+f.write('</robot>')
+f.close()
+print "\nCreated new file >>",fname
 ### create nested robots
 CreateSphereRobot(folder, robot_name + "_sphere_inner", headradius)
 CreateSphereRobot(folder, robot_name + "_sphere_outer", Nsegments*length)

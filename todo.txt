@@ -407,3 +407,7 @@ of the cover
 [ ] sampling nearby from a gaussian distribution on SO(3) in OMPL is likely wrong,
 sometimes i get an unnormalized quaternion back when i sample with a high
 stddev. Look into that.
+
+[ ] need remove dependency to SimTestGUI so we can manipulate the unneccessary GUI
+elements
+[ ] enable component hotkeys (C-s,S-p)

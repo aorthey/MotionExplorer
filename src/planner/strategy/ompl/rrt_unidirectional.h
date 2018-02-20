@@ -43,6 +43,7 @@ namespace ompl
       virtual bool HasSolution() override;
       virtual void CheckForSolution(ob::PathPtr &solution) override;
 
+      
     protected:
 
       class Configuration
@@ -63,6 +64,9 @@ namespace ompl
             return 0;
           }
         }
+        uint totalSamples{0}; //how many samples have been drawn from the edge between state and parent
+        uint successfulSamples{0}; //how many of those samples have been successfully incorporated into the graph
+
         double parent_edge_weight{0};
         base::State *state{nullptr};
         Configuration *parent{nullptr};
@@ -77,6 +81,7 @@ namespace ompl
 
       virtual Configuration* Nearest(Configuration *q_random);
       virtual Configuration* Connect(Configuration *q_near, Configuration *q_random);
+      virtual double Distance(ob::State *s_lhs, ob::State *s_rhs);
 
       virtual bool ConnectedToGoal(Configuration* q);
       void ConstructSolution(Configuration *q_goal);
@@ -93,12 +98,13 @@ namespace ompl
       double maxDistance_{0.};
       base::StateSamplerPtr sampler_;
 
-
       //thickening of graph
       double epsilon{0};
 
       //see shkolnik_2011 for details
       double deltaCoverPenetration_;
+    public:
+      Configuration *lastSampled{nullptr};
 
     };
   }

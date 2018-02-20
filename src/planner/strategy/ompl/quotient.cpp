@@ -381,6 +381,11 @@ bool Quotient::SampleC1(ob::State *s){
   C1_sampler->sampleUniform(s);
   return true;
 }
+bool Quotient::HasSolution()
+{
+  return hasSolution;
+}
+
 bool Quotient::Sample(ob::State *q_random)
 {
   totalNumberOfSamples++;

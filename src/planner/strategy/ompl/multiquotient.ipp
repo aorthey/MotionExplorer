@@ -56,6 +56,7 @@ void PrintQuotientSpaces(std::vector<Quotient*> quotientSpaces, uint k=0){
   uint total_sampled_vertices = 0;
   for(uint i = 0; i <= k; i++){
     og::Quotient *Qi = quotientSpaces.at(i);
+    if(Qi->GetNumberOfSampledVertices()<=0) continue;
     uint N = 6;
     std::cout 
       << ">> level " << i << ": " 
@@ -94,6 +95,8 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
 
   std::priority_queue<og::Quotient*, std::vector<og::Quotient*>, decltype(cmp)> Q(cmp);
 
+  const bool DEBUG = true;
+  ompl::time::point t_start = ompl::time::now();
   for(uint k = 0; k < quotientSpaces.size(); k++){
     base::PathPtr sol_k;
     foundKLevelSolution = false;
@@ -104,7 +107,6 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
     base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
                                    { return ptc || foundKLevelSolution; });
 
-    ompl::time::point t_k_start = ompl::time::now();
     while (!ptcOrSolutionFound())
     {
       og::Quotient* jQuotient = Q.top();
@@ -114,22 +116,35 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
 
       if(quotientSpaces.at(k)->HasSolution()){
         solutions.push_back(sol_k);
-        double t_k_end = ompl::time::seconds(ompl::time::now() - t_k_start);
-        std::cout << "Found Solution on Level " << k << " after " << t_k_end << " seconds." << std::endl;
-        PrintQuotientSpaces(quotientSpaces, k);
+        if(DEBUG){
+          double t_k_end = ompl::time::seconds(ompl::time::now() - t_start);
+          std::cout << std::string(80, '#') << std::endl;
+          std::cout << "Found Solution on Level " << k << " after " << t_k_end << " seconds." << std::endl;
+          std::cout << std::string(80, '#') << std::endl;
+          PrintQuotientSpaces(quotientSpaces, k);
+        }
         foundKLevelSolution = true;
       }
       Q.push(jQuotient);
     }
 
     if(!foundKLevelSolution){
-      std::cout << "could not find a solution on level " << k << std::endl;
-      PrintQuotientSpaces(quotientSpaces, k);
+      if(DEBUG){
+        std::cout << std::string(80, '#') << std::endl;
+        std::cout << "could not find a solution on level " << k << std::endl;
+        std::cout << std::string(80, '#') << std::endl;
+        PrintQuotientSpaces(quotientSpaces, k);
+      }
       return ob::PlannerStatus::TIMEOUT;
     }
   }
-  std::cout << "Found exact solution" << std::endl;
-  PrintQuotientSpaces(quotientSpaces);
+  if(DEBUG){
+    double t_end = ompl::time::seconds(ompl::time::now() - t_start);
+    std::cout << std::string(80, '#') << std::endl;
+    std::cout << "Found exact solution after " << t_end << " seconds." << std::endl;
+    std::cout << std::string(80, '#') << std::endl;
+    PrintQuotientSpaces(quotientSpaces);
+  }
 
   base::PathPtr sol;
   quotientSpaces.back()->CheckForSolution(sol);

@@ -78,13 +78,13 @@ def extractInfoFromSqlDatabase(fname,verbose=True):
     #edges = np.array(nodessql).mean()
 
     #print pid,": [",name,"]solved: ",solved,"/",runs," time:",times.mean(),"+/-",times.std()
-    print pid,": [",'%30s'%name,"] solved: ",Dsolved,\
+    print pid,": [",'%30s'%name,"] solved: ",solved,\
     "/",runs," time:",'%.2f'%Dmean,"+/-",'%.2f'%Dstd,\
     " (minimum time:",'%.2f'%Dtimes.min(),", maximum time:",'%.2f'%Dtimes.max(),", nodes:",nodes,")"
-    print pid,": [",'%30s'%name,"] solved: ",len(DtimesSolved),\
-    "/",len(DtimesSolved)," time:",'%.2f'%DtimesSolved.mean(),"+/-",'%.2f'%DtimesSolved.std(),\
-    " (minimum time:",'%.2f'%DtimesSolved.min(),", maximum time:",'%.2f'%DtimesSolved.max(),\
-        ", nodes:",np.array(nodessql)[times<timelimit].mean(),")"
+    #print pid,": [",'%30s'%name,"] solved: ",len(DtimesSolved),\
+    #"/",len(DtimesSolved)," time:",'%.2f'%DtimesSolved.mean(),"+/-",'%.2f'%DtimesSolved.std(),\
+    #" (minimum time:",'%.2f'%DtimesSolved.min(),", maximum time:",'%.2f'%DtimesSolved.max(),\
+    #    ", nodes:",np.array(nodessql)[times<timelimit].mean(),")"
     
   connection.close()
 

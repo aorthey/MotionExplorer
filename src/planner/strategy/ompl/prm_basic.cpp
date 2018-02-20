@@ -21,9 +21,9 @@ namespace ompl
 {
   namespace magic
   {
-    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
+    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 10;
     static const double ROADMAP_BUILD_TIME = 0.01;
-    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
+    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
   }
 }
 PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si, Quotient *previous_)
@@ -34,6 +34,7 @@ PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si, Quotient *previous_)
   , associatedVertexSourceProperty_(boost::get(vertex_associated_vertex_source_t(), g_))
   , associatedVertexTargetProperty_(boost::get(vertex_associated_vertex_target_t(), g_))
   , associatedTProperty_(boost::get(vertex_associated_t_t(), g_))
+  , onShortestPath_(boost::get(vertex_on_shortest_path_t(), g_))
   , disjointSets_(boost::get(boost::vertex_rank, g_), boost::get(boost::vertex_predecessor, g_))
 {
   setName("PRMBasic");
@@ -52,6 +53,7 @@ PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si, Quotient *previous_)
 
   xstates.resize(magic::MAX_RANDOM_BOUNCE_STEPS);
   si_->allocStates(xstates);
+  totalNumberOfSamples = 0;
 }
 
 PRMBasic::~PRMBasic(){
@@ -71,8 +73,6 @@ void PRMBasic::ClearVertices()
 void PRMBasic::clear()
 {
   Planner::clear();
-  //sampler_.reset();
-  //simpleSampler_.reset();
 
   ClearVertices();
   g_.clear();
@@ -99,8 +99,31 @@ void PRMBasic::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
 
 void PRMBasic::Init(){
   checkValidity();
-  unsigned long int nrStartStates = boost::num_vertices(g_);
-  OMPL_INFORM("%s: Starting planning with %lu states already in datastructure", getName().c_str(), nrStartStates);
+  auto *goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
+
+  if (goal == nullptr){
+    OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
+    exit(0);
+  }
+
+  while (const ob::State *st = pis_.nextStart()){
+    startM_.push_back(addMilestone(si_->cloneState(st)));
+  }
+  if (startM_.empty()){
+    OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
+    exit(0);
+  }
+  if (!goal->couldSample()){
+    OMPL_ERROR("%s: Insufficient states in sampleable goal region", getName().c_str());
+    exit(0);
+  }
+
+  if (goal->maxSampleCount() > goalM_.size() || goalM_.empty()){
+    const ob::State *st = pis_.nextGoal();
+    if (st != nullptr){
+      goalM_.push_back(addMilestone(si_->cloneState(st)));
+    }
+  }
 }
 
 ob::PlannerStatus PRMBasic::solve(const ob::PlannerTerminationCondition &ptc){
@@ -221,23 +244,18 @@ bool PRMBasic::sameComponent(Vertex m1, Vertex m2)
 
 void PRMBasic::CheckForSolution(ob::PathPtr &solution)
 {
-  bool foundSolution = maybeConstructSolution(startM_, goalM_, solution);
-  if(foundSolution && !addedNewSolution_){
-    addedNewSolution_ = true;
-  }
+  hasSolution = maybeConstructSolution(startM_, goalM_, solution);
 }
 
 bool PRMBasic::maybeConstructSolution(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals,
                                                   ob::PathPtr &solution)
 {
   ob::Goal *g = pdef_->getGoal().get();
-  ob::Cost sol_cost(opt_->infiniteCost());
   bestCost_ = ob::Cost(+dInf);
   foreach (Vertex start, starts)
   {
     foreach (Vertex goal, goals)
     {
-      // we lock because the connected components algorithm is incremental and may change disjointSets_
       bool same_component = sameComponent(start, goal);
 
       if (same_component && g->isStartGoalPairValid(stateProperty_[goal], stateProperty_[start]))
@@ -246,8 +264,6 @@ bool PRMBasic::maybeConstructSolution(const std::vector<Vertex> &starts, const s
         if (p)
         {
           ob::Cost pathCost = p->cost(opt_);
-          //bool better = opt_->isCostBetterThan(pathCost, bestCost_);
-          //std::cout << pathCost.value() << (better?">":"<") << bestCost_.value() << std::endl;
 
           if (opt_->isCostBetterThan(pathCost, bestCost_)){
             bestCost_ = pathCost;
@@ -255,12 +271,39 @@ bool PRMBasic::maybeConstructSolution(const std::vector<Vertex> &starts, const s
           if (opt_->isSatisfied(pathCost))
           {
             solution = p;
+            //clean up roadmap
+            std::vector<Edge> unconnectedEdges;
+            uint ctr = 0;
+            foreach (Edge e, boost::edges(g_))
+            {
+              ctr++;
+              const Vertex v1 = boost::source(e, g_);
+              if(!sameComponent(v1, startM_.at(0))){
+                unconnectedEdges.push_back(e);
+              }
+            }
+            std::cout << "found " << unconnectedEdges.size() << "/" << ctr <<" unconnectedEdges"  << std::endl;
+            for(uint k = 0; k < unconnectedEdges.size(); k++){
+              Edge &e = unconnectedEdges.at(k);
+              const Vertex v1 = boost::source(e, g_);
+              const Vertex v2 = boost::target(e, g_);
+              boost::remove_edge(boost::vertex(v1, g_), boost::vertex(v2,g_), g_);
+
+              //std::cout << "edge:" << k << " | source:" << v1 << "| target:" << v2 << std::endl;
+              //if(stateProperty_[v1]!=nullptr){
+              //  si_->freeState(stateProperty_[v1]);
+              //  stateProperty_[v1]=nullptr;
+              //  boost::remove_vertex(boost::vertex(v1, g_), g_);
+              //  nn_->remove(v1);
+              //}
+              //if(stateProperty_[v2]!=nullptr){
+              //  stateProperty_[v2]=nullptr;
+              //  si_->freeState(stateProperty_[v2]);
+              //  boost::remove_vertex(boost::vertex(v2, g_), g_);
+              //  nn_->remove(v2);
+              //}
+            }
             return true;
-          }
-          if (opt_->isCostBetterThan(pathCost, sol_cost))
-          {
-            solution = p;
-            sol_cost = pathCost;
           }
         }
       }
@@ -302,10 +345,15 @@ ob::PathPtr PRMBasic::constructSolution(const Vertex &start, const Vertex &goal)
       return NULL;
     }
 
+    shortestVertexPath_.clear();
     for (Vertex pos = goal; prev[pos] != pos; pos = prev[pos]){
+      onShortestPath_[pos] = true;
+      shortestVertexPath_.push_back(pos);
       p->append(stateProperty_[pos]);
     }
     p->append(stateProperty_[start]);
+    onShortestPath_[start] = true;
+
     p->reverse();
 
     return p;
@@ -323,22 +371,22 @@ PRMBasic::Vertex PRMBasic::addMilestone(ob::State *state)
     totalConnectionAttemptsProperty_[m]++;
     totalConnectionAttemptsProperty_[n]++;
     if(Connect(m,n)){
-      graphLength += si_->distance(stateProperty_[m], stateProperty_[n]);
+      graphLength += Distance(m, n);
       successfulConnectionAttemptsProperty_[m]++;
       successfulConnectionAttemptsProperty_[n]++;
     }
   }
-
   nn_->add(m);
-
   return m;
 }
+
 PRMBasic::Vertex PRMBasic::CreateNewVertex(ob::State *state)
 {
   Vertex m = boost::add_vertex(g_);
   stateProperty_[m] = si_->cloneState(state);
-  totalConnectionAttemptsProperty_[m] = 1;
+  totalConnectionAttemptsProperty_[m] = 0;
   successfulConnectionAttemptsProperty_[m] = 0;
+  onShortestPath_[m] = false;
   disjointSets_.make_set(m);
   return m;
 }
@@ -439,30 +487,19 @@ ob::PathPtr PRMBasic::GetSolutionPath(){
   return sol;
 }
 
-bool PRMBasic::HasSolution(){
-  if(bestCost_.value() < dInf){
-    return addedNewSolution_;
-  }else{
-    return false;
-  }
-}
-
 template <template <typename T> class NN>
 void PRMBasic::setNearestNeighbors()
 {
-    if (nn_ && nn_->size() == 0)
-        OMPL_WARN("Calling setNearestNeighbors will clear all states.");
-    clear();
-    nn_ = std::make_shared<NN<Vertex>>();
-    connectionStrategy_ = ConnectionStrategy();
-    if(!isSetup()){
-      setup();
-    }
+  if (nn_ && nn_->size() == 0)
+      OMPL_WARN("Calling setNearestNeighbors will clear all states.");
+  clear();
+  nn_ = std::make_shared<NN<Vertex>>();
+  connectionStrategy_ = ConnectionStrategy();
+  if(!isSetup()){
+    setup();
+  }
 }
 
-bool PRMBasic::Sample(ob::State *q_random){
-  return sampler_->sample(q_random);
-}
 double PRMBasic::Distance(const Vertex a, const Vertex b) const
 {
   return si_->distance(stateProperty_[a], stateProperty_[b]);
@@ -471,15 +508,6 @@ double PRMBasic::Distance(const Vertex a, const Vertex b) const
 bool PRMBasic::Connect(const Vertex a, const Vertex b){
   if (si_->checkMotion(stateProperty_[a], stateProperty_[b]))
   {
-    //ob::Cost weight;
-    //auto checkerPtr = static_pointer_cast<OMPLValidityCheckerNecessarySufficient>(si_->getStateValidityChecker());
-    //if(checkerPtr->isSufficient(stateProperty_[a])
-    //    &&checkerPtr->isSufficient(stateProperty_[b]))
-    //{
-    //  weight = ob::Cost(0);
-    //}else{
-    //  weight = opt_->motionCost(stateProperty_[a], stateProperty_[b]);
-    //}
     ob::Cost weight = opt_->motionCost(stateProperty_[a], stateProperty_[b]);
     EdgeProperty properties(weight);
     boost::add_edge(a, b, properties, g_);

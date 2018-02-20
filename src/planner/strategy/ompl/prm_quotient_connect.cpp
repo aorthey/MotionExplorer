@@ -34,10 +34,74 @@ PRMQuotientConnect::PRMQuotientConnect(const ob::SpaceInformationPtr &si, Quotie
 PRMQuotientConnect::~PRMQuotientConnect(){
 }
 
+void PRMQuotientConnect::setup()
+{
+  og::PRMQuotient::setup();
+  nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
+                           {
+                             return PRMQuotientConnect::Distance(a,b);
+                           });
+}
+
+void PRMQuotientConnect::Init()
+{
+  PRMQuotient::Init();
+
+  og::PRMQuotientConnect *PRMprevious = static_cast<og::PRMQuotientConnect*>(previous);
+  if(PRMprevious!=nullptr){
+    for(uint k = 0; k < startM_.size(); k++){
+      associatedVertexSourceProperty_[startM_.at(k)] = PRMprevious->startM_.at(k);
+      associatedVertexTargetProperty_[startM_.at(k)] = PRMprevious->startM_.at(k);
+      associatedTProperty_[startM_.at(k)] = 0;
+    }
+    for(uint k = 0; k < goalM_.size(); k++){
+      associatedVertexSourceProperty_[goalM_.at(k)] = PRMprevious->goalM_.at(k);
+      associatedVertexTargetProperty_[goalM_.at(k)] = PRMprevious->goalM_.at(k);
+      associatedTProperty_[goalM_.at(k)] = 0;
+    }
+  }
+}
+
+og::PRMBasic::Vertex PRMQuotientConnect::addMilestone(base::State *state)
+{
+  Vertex m = PRMQuotient::addMilestone(state);
+    
+  og::PRMQuotientConnect *PRMprevious = static_cast<og::PRMQuotientConnect*>(previous);
+  if(PRMprevious != nullptr && PRMprevious->isSampled){
+    associatedVertexSourceProperty_[m] = PRMprevious->lastSourceVertexSampled;
+    associatedVertexTargetProperty_[m] = PRMprevious->lastTargetVertexSampled;
+    associatedTProperty_[m] = PRMprevious->lastTSampled;
+  }
+  return m;
+}
+
+bool PRMQuotientConnect::SampleGraph(ob::State *q_random_graph)
+{
+  PDF<Edge> pdf = GetEdgePDF();
+
+  Edge e = pdf.sample(rng_.uniform01());
+  double t = rng_.uniform01();
+
+  const Vertex v1 = boost::source(e, g_);
+  const Vertex v2 = boost::target(e, g_);
+  const ob::State *from = stateProperty_[v1];
+  const ob::State *to = stateProperty_[v2];
+
+  M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
+
+  simpleSampler_->sampleGaussian(q_random_graph, q_random_graph, epsilon);
+
+  lastSourceVertexSampled = v1;
+  lastTargetVertexSampled = v2;
+  lastTSampled = t;
+  isSampled = true;
+  return true;
+}
+
 double PRMQuotientConnect::Distance(const Vertex a, const Vertex b) const
 {
   if(previous == nullptr){
-    return si_->distance(stateProperty_[a], stateProperty_[b]);
+    return PRMQuotient::Distance(a,b);
   }else{
     ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
 
@@ -45,8 +109,9 @@ double PRMQuotientConnect::Distance(const Vertex a, const Vertex b) const
     ob::State* qb = stateProperty_[b];
 
     ob::State* qaC1 = C1->allocState();
-    ob::State* qbC1 = C1->allocState();
     ob::State* qaM0 = M0->allocState();
+
+    ob::State* qbC1 = C1->allocState();
     ob::State* qbM0 = M0->allocState();
 
     ExtractC1Subspace(qa, qaC1);
@@ -54,19 +119,10 @@ double PRMQuotientConnect::Distance(const Vertex a, const Vertex b) const
     ExtractM0Subspace(qa, qaM0);
     ExtractM0Subspace(qb, qbM0);
 
-    //M0->printState(qaM0);
-    //M1->printState(qa);
-    //std::cout << std::string(80, '-') << std::endl;
-    //M0->printState(qbM0);
-    //M1->printState(qb);
-    //exit(0);
     const Vertex vsaM0 = associatedVertexSourceProperty_[a];
     const Vertex vsbM0 = associatedVertexSourceProperty_[b];
     const Vertex vtaM0 = associatedVertexTargetProperty_[a];
     const Vertex vtbM0 = associatedVertexTargetProperty_[b];
-
-    //double ta = associatedTProperty_[a];
-    //double tb = associatedTProperty_[b];
 
     ob::PathPtr sol = dynamic_cast<PRMQuotientConnect*>(previous)->GetShortestPathOffsetVertices( qaM0, qbM0, vsaM0, vsbM0, vtaM0, vtbM0);
     double d0 = +dInf;
@@ -250,7 +306,7 @@ ob::PathPtr PRMQuotientConnect::GetShortestPathOffsetVertices( const ob::State *
 
 bool PRMQuotientConnect::Connect(const Vertex a, const Vertex b){
   if(previous==nullptr){
-    return PRMBasic::Connect(a,b);
+    return PRMQuotient::Connect(a,b);
   }else{
     ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
 
@@ -267,7 +323,6 @@ bool PRMQuotientConnect::Connect(const Vertex a, const Vertex b){
 
     ExtractM0Subspace(qa, qaM0);
     ExtractM0Subspace(qb, qbM0);
-
 
     const Vertex vsaM0 = associatedVertexSourceProperty_[a];
     const Vertex vsbM0 = associatedVertexSourceProperty_[b];
@@ -295,23 +350,21 @@ bool PRMQuotientConnect::Connect(const Vertex a, const Vertex b){
     Vertex v0 = a;
     Vertex v1 = a;
     ob::State *s0M0 = states.at(0);
+    ob::State *s0M1 = qa;
     ob::State *s1M0 = states.at(1);
 
-    ob::State *s0M1 = qa;
-
-    double d = 0;
+    double d_graph_distance = 0;
 
     std::vector<Vertex> vpath;
-
+    vpath.push_back(v0);
     for(uint i = 1; i < states.size(); i++)
     {
-      vpath.push_back(v1);
 
       s1M0 = states.at(i);
-      d += M0->distance(s0M0, s1M0);
+      d_graph_distance += M0->distance(s0M0, s1M0);
 
       ob::State* s1C1 = C1->allocState();
-      C1->getStateSpace()->interpolate(qaC1,qbC1,d/D,s1C1);
+      C1->getStateSpace()->interpolate(qaC1,qbC1,d_graph_distance/D,s1C1);
 
       ob::State *s1M1 = M1->allocState();
       mergeStates(s1M0, s1C1, s1M1);
@@ -322,46 +375,46 @@ bool PRMQuotientConnect::Connect(const Vertex a, const Vertex b){
 
       if (si_->checkMotion(s0M1, s1M1))
       {
-        v0 = v1;
-        stateProperty_[v0] = M1->cloneState(s0M1);
+        //v0 = v1;
+        //stateProperty_[v0] = M1->cloneState(s0M1);
 
         if(i<states.size()-1){
-          v1 = boost::add_vertex(g_);
+          v1 = CreateNewVertex(s1M1);
+          nn_->add(v1);
+          totalNumberOfSamples++;
         }else{
           v1 = b;
         }
-        stateProperty_[v1] = M1->cloneState(s1M1);
-        boost::add_edge(v0, v1, EdgeProperty(ob::Cost(d)), g_);
+        double d01 = M1->distance(s0M1, s1M1);
+        boost::add_edge(v0, v1, EdgeProperty(ob::Cost(d01)), g_);
         uniteComponents(v0, v1);
-        // if(states.size()>2){
-        //   std::cout << "connect " << v0 <<"," << v1 << std::endl;
-        //   M1->printState(stateProperty_[v0]);
-        //   M1->printState(stateProperty_[v1]);
-        //   if(i>=states.size()-1)
-        //     exit(0);
-        // }
+        v0 = v1;
         ///#DEBUG #################################################
-        if(i>=states.size()-1){
-          vpath.push_back(v1);
-        }
-        //  if(states.size()>5){
-        //    for(uint k = 0; k < states.size(); k++){
-        //      std::cout << k << " :";
-        //      M0->printState(states.at(k));
-        //    }
-        //    std::cout << "VA : " << a << std::endl;
-        //    for(uint k = 0; k < vpath.size(); k++){
-        //      std::cout << "V" << k << " : " << vpath.at(k) << std::endl;
-        //    }
-        //    std::cout << "VB : " << b << std::endl;
-        //    for(uint k = 1; k < vpath.size(); k++){
+        // vpath.push_back(v1);
+        // if(i>=states.size()-1){
+        //   if(states.size()>5){
+        //     for(uint k = 0; k < states.size(); k++){
+        //       std::cout << k << " :";
+        //       M0->printState(states.at(k));
+        //     }
+        //     std::cout << "VA : " << a << std::endl;
+        //     for(uint k = 0; k < vpath.size(); k++){
+        //       std::cout << "V" << k << " : " << vpath.at(k) << std::endl;
+        //     }
+        //     std::cout << "VB : " << b << std::endl;
+        //     for(uint k = 1; k < vpath.size(); k++){
 
-        //      std::pair<Edge,bool> ek = boost::edge(vpath.at(k-1),vpath.at(k),g_);
-        //      std::cout << "E" << k << "(" << vpath.at(k-1) << "," << vpath.at(k) << ") : " << (ek.second?"existing":"ERROR") << std::endl;
-        //    }
-        //    exit(0);
-        //  }
-        //}
+        //       std::pair<Edge,bool> ek = boost::edge(vpath.at(k-1),vpath.at(k),g_);
+        //       std::cout << "E" << k << "(" << vpath.at(k-1) << "," << vpath.at(k) << ") : " << (ek.second?"existing":"ERROR") << std::endl;
+        //     }
+        //     for(uint k = 0; k < vpath.size(); k++){
+        //       ob::State *sk = stateProperty_[vpath.at(k)];
+        //       std::cout << k << " :";
+        //       M1->printState(sk);
+        //     }
+        //     exit(0);
+        //   }
+        // }
         ///#DEBUG #################################################
       }else{
         C1->freeState(qaC1);

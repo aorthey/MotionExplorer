@@ -394,6 +394,7 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="draw_robot"){
     state("draw_robot").toggle();
   }else if(cmd=="draw_robot_next"){
+    state("draw_robot").activate();
     uint N = world->robots.size();
     if(active_robot >= N-1){
       active_robot = 0;
@@ -401,6 +402,7 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
       active_robot++;
     }
   }else if(cmd=="draw_robot_previous"){
+    state("draw_robot").activate();
     uint N = world->robots.size();
     if(active_robot > 0){
       active_robot--;
