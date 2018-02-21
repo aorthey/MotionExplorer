@@ -32,14 +32,15 @@ namespace ompl
         virtual double Distance(const Vertex a, const Vertex b) const override;
         virtual bool Connect(const Vertex a, const Vertex b) override;
 
-        virtual uint randomBounceMotion(const ob::StateSamplerPtr &sss, 
-          const Vertex &v, std::vector<ob::State *> &states) const override;
+        //virtual uint randomBounceMotion(const ob::StateSamplerPtr &sss, 
+          //const Vertex &v, std::vector<ob::State *> &states) const override;
 
-        virtual Vertex addMilestone(ob::State *state) override;
+        virtual Vertex CreateNewVertex(ob::State *state) override;
 
-        uint lastSourceVertexSampled;
-        uint lastTargetVertexSampled;
-        double lastTSampled;
+      public:
+        int lastSourceVertexSampled{-1};
+        int lastTargetVertexSampled{-1};
+        double lastTSampled{-1.0};
         bool isSampled{false};
     };
 

@@ -1,4 +1,5 @@
 #include "prm_basic.h"
+#include "common.h"
 #include "GoalVisitor.hpp"
 #include "planner/validitychecker/validity_checker_ompl.h"
 #include "elements/plannerdata_vertex_annotated.h"
@@ -21,7 +22,7 @@ namespace ompl
 {
   namespace magic
   {
-    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 10;
+    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
     static const double ROADMAP_BUILD_TIME = 0.01;
     static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
   }
@@ -124,6 +125,10 @@ void PRMBasic::Init(){
       goalM_.push_back(addMilestone(si_->cloneState(st)));
     }
   }
+  if (goalM_.empty()){
+    OMPL_ERROR("%s: There are no valid goal states!", getName().c_str());
+    exit(0);
+  }
 }
 
 ob::PlannerStatus PRMBasic::solve(const ob::PlannerTerminationCondition &ptc){
@@ -158,9 +163,9 @@ ob::PlannerStatus PRMBasic::solve(const ob::PlannerTerminationCondition &ptc){
 
 void PRMBasic::Grow(double t){
   double T_grow = (2.0/3.0)*t;
-  double T_expand = (1.0/3.0)*t;
   growRoadmap(ob::timedPlannerTerminationCondition(T_grow), xstates[0]);
-  expandRoadmap( ob::timedPlannerTerminationCondition(T_expand), xstates);
+  //double T_expand = (1.0/3.0)*t;
+  //expandRoadmap( ob::timedPlannerTerminationCondition(T_expand), xstates);
 }
 
 void PRMBasic::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState)
@@ -271,7 +276,9 @@ bool PRMBasic::maybeConstructSolution(const std::vector<Vertex> &starts, const s
           if (opt_->isSatisfied(pathCost))
           {
             solution = p;
+            //#################################################################
             //clean up roadmap
+            //#################################################################
             std::vector<Edge> unconnectedEdges;
             uint ctr = 0;
             foreach (Edge e, boost::edges(g_))
@@ -284,11 +291,14 @@ bool PRMBasic::maybeConstructSolution(const std::vector<Vertex> &starts, const s
             }
             std::cout << "found " << unconnectedEdges.size() << "/" << ctr <<" unconnectedEdges"  << std::endl;
             for(uint k = 0; k < unconnectedEdges.size(); k++){
-              Edge &e = unconnectedEdges.at(k);
+              Edge e = unconnectedEdges.at(k);
               const Vertex v1 = boost::source(e, g_);
               const Vertex v2 = boost::target(e, g_);
               boost::remove_edge(boost::vertex(v1, g_), boost::vertex(v2,g_), g_);
-
+              // boost::remove_vertex(boost::vertex(v1, g_), g_);
+              // boost::remove_vertex(boost::vertex(v2, g_), g_);
+              // nn_->remove(v1);
+              // nn_->remove(v2);
               //std::cout << "edge:" << k << " | source:" << v1 << "| target:" << v2 << std::endl;
               //if(stateProperty_[v1]!=nullptr){
               //  si_->freeState(stateProperty_[v1]);
@@ -303,6 +313,20 @@ bool PRMBasic::maybeConstructSolution(const std::vector<Vertex> &starts, const s
               //  nn_->remove(v2);
               //}
             }
+            // uint Nv = boost::num_vertices(g_);
+            // ctr = 0;
+            // foreach (Vertex v, boost::vertices(g_))
+            // {
+            //   if(!sameComponent(v, startM_.at(0))){
+            //     ctr++;
+            //     si_->freeState(stateProperty_[v]);
+            //     nn_->remove(v);
+            //     boost::remove_vertex(boost::vertex(v, g_), g_);
+            //   }
+            // }
+            // std::cout << "removed " << ctr << "/" << Nv <<" vertices."  << std::endl;
+            //#################################################################
+            //#################################################################
             return true;
           }
         }
@@ -345,15 +369,18 @@ ob::PathPtr PRMBasic::constructSolution(const Vertex &start, const Vertex &goal)
       return NULL;
     }
 
-    shortestVertexPath_.clear();
+    std::vector<Vertex> vpath;
     for (Vertex pos = goal; prev[pos] != pos; pos = prev[pos]){
       onShortestPath_[pos] = true;
-      shortestVertexPath_.push_back(pos);
+      vpath.push_back(pos);
       p->append(stateProperty_[pos]);
     }
-    p->append(stateProperty_[start]);
     onShortestPath_[start] = true;
+    vpath.push_back(start);
+    p->append(stateProperty_[start]);
 
+    shortestVertexPath_.clear();
+    shortestVertexPath_.insert( shortestVertexPath_.begin(), vpath.rbegin(), vpath.rend() );
     p->reverse();
 
     return p;
@@ -466,6 +493,7 @@ void PRMBasic::setup(){
   }
 
 }
+
 ob::Cost PRMBasic::costHeuristic(Vertex u, Vertex v) const
 {
   return opt_->motionCostHeuristic(stateProperty_[u], stateProperty_[v]);
@@ -474,9 +502,11 @@ ob::Cost PRMBasic::costHeuristic(Vertex u, Vertex v) const
 ob::PathPtr PRMBasic::GetShortestPath(){
   return GetSolutionPath();
 }
+
 uint PRMBasic::GetNumberOfVertices(){
   return num_vertices(g_);
 }
+
 uint PRMBasic::GetNumberOfEdges(){
   return num_edges(g_);
 }

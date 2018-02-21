@@ -14,16 +14,6 @@ using namespace og;
 using namespace ob;
 #define foreach BOOST_FOREACH
 
-namespace ompl
-{
-  namespace magic
-  {
-    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
-    static const double ROADMAP_BUILD_TIME = 0.01;
-    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
-  }
-}
-
 PRMQuotient::PRMQuotient(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
   og::PRMBasic(si, previous_)
 {
@@ -47,9 +37,9 @@ bool PRMQuotient::SampleGraph(ob::State *q_random_graph)
   const ob::State *to = stateProperty_[v2];
 
   M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
-
-  simpleSampler_->sampleGaussian(q_random_graph, q_random_graph, epsilon);
+  //simpleSampler_->sampleGaussian(q_random_graph, q_random_graph, epsilon);
   //simpleSampler_->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
+
   return true;
 }
 
@@ -57,8 +47,9 @@ ompl::PDF<og::PRMBasic::Edge> PRMQuotient::GetEdgePDF()
 {
   PDF<Edge> pdf;
   double t = rng_.uniform01();
-  if(t<0.9)
+  if(t<0.5)
   {
+    //shortest path heuristic
     foreach (Edge e, boost::edges(g_))
     {
       const Vertex v1 = boost::source(e, g_);

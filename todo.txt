@@ -411,3 +411,5 @@ stddev. Look into that.
 [ ] need remove dependency to SimTestGUI so we can manipulate the unneccessary GUI
 elements
 [ ] enable component hotkeys (C-s,S-p)
+[ ] automate the OnCommand method to automatically switch/case through all
+variables inside the state and toggle them.

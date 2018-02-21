@@ -100,7 +100,7 @@ namespace ompl
                         boost::property<vertex_associated_vertex_source_t, unsigned long int,
                           boost::property<vertex_open_neighborhood_distance_t, double,
                             boost::property<vertex_open_neighborhood_t, cover::OpenSet*,
-                              boost::property<vertex_associated_t_t, unsigned long int,
+                              boost::property<vertex_associated_t_t, double,
                                 boost::property<vertex_on_shortest_path_t, bool>
                               >
                             >

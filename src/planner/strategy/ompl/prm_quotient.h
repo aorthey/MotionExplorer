@@ -22,7 +22,7 @@ namespace ompl
         virtual ~PRMQuotient() override;
 
       protected:
-        double epsilon{0.03}; //graph thickening
+        double epsilon{0.01}; //graph thickening
 
         virtual bool SampleGraph(ob::State*) override;
         virtual ompl::PDF<og::PRMBasic::Edge> GetEdgePDF();

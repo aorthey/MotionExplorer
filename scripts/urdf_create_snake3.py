@@ -8,8 +8,8 @@ from urdf_create_primitives import *
 robot_name = 'robots/snake'
 Nsegments = 3
 
-headradius = 0.15
-length = 0.2
+headradius = 0.12
+length = 0.3
 
 limit = pi/4
 stublength = length/8
@@ -17,7 +17,7 @@ radius = headradius/4
 
 lowerLimit=-limit
 upperLimit=limit
-radius_cylinder = 0.6*headradius
+radius_cylinder = headradius
 
 sRadius = 2*radius
 config = ''

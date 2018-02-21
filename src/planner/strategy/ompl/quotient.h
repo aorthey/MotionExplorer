@@ -76,11 +76,12 @@ namespace ompl
         uint C1_dimension;
 
         const ob::StateSpacePtr ComputeQuotientSpace(const ob::StateSpacePtr M1, const ob::StateSpacePtr M0);
-        void ExtractC1Subspace( ob::State* q, ob::State* qC1 ) const;
-        void ExtractM0Subspace( ob::State* q, ob::State* qM0 ) const;
+        void ExtractC1Subspace( const ob::State* q, ob::State* qC1 ) const;
+        void ExtractM0Subspace( const ob::State* q, ob::State* qM0 ) const;
 
-        ob::SpaceInformationPtr M1; //full configuration space Mi = si_
-        ob::SpaceInformationPtr C1; //configuration space Ci = Mi/Mi-1
+        ob::SpaceInformationPtr M1; //configuration space Mi = si_
+        ob::SpaceInformationPtr M0; //quotient space Mi-1 = Mi/Ci
+        ob::SpaceInformationPtr C1; //standalone configuration space Ci = Mi/Mi-1
 
         ob::StateSamplerPtr C1_sampler;
         ob::ValidStateSamplerPtr sampler_;
