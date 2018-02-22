@@ -408,8 +408,27 @@ of the cover
 sometimes i get an unnormalized quaternion back when i sample with a high
 stddev. Look into that.
 
+[x] remove the visualization of the bounding box for focus view
 [ ] need remove dependency to SimTestGUI so we can manipulate the unneccessary GUI
 elements
 [ ] enable component hotkeys (C-s,S-p)
 [ ] automate the OnCommand method to automatically switch/case through all
 variables inside the state and toggle them.
+
+
+
+[ ] do randomBounceMotion, but constrained to graph!needs probably rewrite of
+expandRoadmap
+[ ] do not sample random edge (RE), but random node-edge (RNE). RNE samples a
+node at random, and then sample an edge at random from all the incoming edges of
+the node. RE has a bias
+towards vertices with high in_degree, while RNE does not. It has been reported
+that a hybrid approach works well, where we sample p*RNE+(1-p)*RE with p=0.8.
+
+[ ] check out what is the best way to sample a graph. seems Edge Sampling is
+suboptimal. Better use something more sophisticated like Random Walk or Forest Fire
+Papers:
+Sampling from Large Graphs
+A Survey and Taxonomy of Graph Sampling
+
+

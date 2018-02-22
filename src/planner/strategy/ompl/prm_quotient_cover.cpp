@@ -103,10 +103,7 @@ bool PRMQuotientCover::SampleGraph(ob::State *q_random_graph)
 
     M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
 
-    //simpleSampler_->sampleGaussian(q_random_graph, q_random_graph, epsilon);
-    //simpleSampler_->sampleUniformNear(q_random_graph, q_random_graph, min(d1,d2));
-    simpleSampler_->sampleGaussian(q_random_graph, q_random_graph, min(d1,d2));
-    //simpleSampler_->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
+    M1_sampler->sampleGaussian(q_random_graph, q_random_graph, min(d1,d2));
     if(!checkerPtr->IsSufficient(q_random_graph)){
       foundNecessary = true;
     }

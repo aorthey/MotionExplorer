@@ -60,8 +60,8 @@ class CSpaceOMPL
     virtual ob::SpaceInformationPtr SpaceInformationPtr();
     virtual const oc::RealVectorControlSpacePtr ControlSpacePtr();
 
-    static std::vector<double> EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
-    static void OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSpace::StateType *q );
+    std::vector<double> EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
+    void OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSpace::StateType *q );
 
     friend std::ostream& operator<< (std::ostream& out, const CSpaceOMPL& space);
     virtual void print(std::ostream& out) const;

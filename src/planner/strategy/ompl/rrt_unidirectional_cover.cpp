@@ -52,7 +52,7 @@ void RRTUnidirectionalCover::Sample(RRTUnidirectional::Configuration *q)
         goal->sampleGoal(q->state);
         found = true;
       }else{
-        sampler_->sampleUniform(q->state);
+        M1_sampler->sampleUniform(q->state);
       }
     }else{
       if(!hasSolution && rng_.uniform01() < goalBias_){
@@ -184,8 +184,7 @@ bool RRTUnidirectionalCover::SampleGraph(ob::State *q_random_graph)
 
   double d = q->openset->GetRadius();
 
-  //sampler_->sampleGaussian(q_random_graph, q_random_graph, d);
-  sampler_->sampleUniformNear(q_random_graph, q_random_graph, d);
+  M1_sampler->sampleUniformNear(q_random_graph, q_random_graph, d);
   return true;
 }
 

@@ -40,6 +40,7 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_):
 
     C1 = std::make_shared<SpaceInformation>(C1_space);
     C1_sampler = C1->allocStateSampler();
+
     if(M0_space->getDimension()+C1_space->getDimension() != M1_space->getDimension()){
       std::cout << "quotient of state spaces got dimensions wrong." << std::endl;
       exit(0);
@@ -53,14 +54,23 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_):
       std::cout << "zero-measure quotient space detected. abort." << std::endl;
       exit(0);
     }
+    if (!C1_sampler){
+      C1_sampler = C1->allocStateSampler();
+    }
   }
-  if (!sampler_){
-    sampler_ = si_->allocValidStateSampler();
+  if (!M1_valid_sampler){
+    M1_valid_sampler = M1->allocValidStateSampler();
   }
-  if (!simpleSampler_){
-    simpleSampler_ = si_->allocStateSampler();
+  if (!M1_sampler){
+    M1_sampler = M1->allocStateSampler();
   }
+}
 
+void Quotient::clear()
+{
+  M1_sampler.reset();
+  M1_valid_sampler.reset();
+  if(previous==nullptr) C1_sampler.reset();
 }
 
 
@@ -262,7 +272,7 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const
 
 }
 
-void Quotient::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1)
+void Quotient::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1) const
 {
   ////input : qM0 \in M0, qC1 \in C1
   ////output: qM1 = qM0 \circ qC1 \in M1
@@ -391,7 +401,7 @@ bool Quotient::Sample(ob::State *q_random)
 {
   totalNumberOfSamples++;
   if(previous == nullptr){
-    return sampler_->sample(q_random);
+    return M1_valid_sampler->sample(q_random);
   }else{
     //Adjusted sampling function: Sampling in G0 x C1
 
@@ -560,8 +570,9 @@ bool Quotient::SampleGraph(ob::State *q_random)
 }
 
 double Quotient::GetSamplingDensity(){
-  //double N = (double)totalNumberOfSamples;
-  double N = (double)GetNumberOfVertices();
+  double N = (double)totalNumberOfSamples;
+  //double N = (double)GetNumberOfVertices();
+  //return N;
   //@TODO: needs a more formal definition of sampling density
   if(previous==nullptr){
     return N/((double)si_->getSpaceMeasure());

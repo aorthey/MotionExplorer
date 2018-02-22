@@ -77,7 +77,9 @@ std::vector<double> CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( const ob::SO3Stat
   bool Rvalid = R.setMatrixXYZ(qrM);
   if(!Rvalid){
 
-    std::cout << qr << std::endl;
+    si->printSettings();
+
+    std::cout << "quaternions: " << qr << std::endl;
     std::cout << qrM << std::endl;
     Real b=Asin(qrM(0,2));  //m(0,2)=sb
     Real cb = Cos(b);

@@ -23,6 +23,8 @@ namespace ompl
         ob::PathPtr GetShortestPathOffsetVertices( const ob::State *qa, const ob::State *qb, 
           const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb);
 
+        ob::PathPtr InterpolateGraphConstraint( const Vertex a, const Vertex b) const;
+
         void setup() override;
         virtual void Init() override;
 
@@ -31,13 +33,14 @@ namespace ompl
         virtual bool SampleGraph(ob::State*) override;
         virtual double Distance(const Vertex a, const Vertex b) const override;
         virtual bool Connect(const Vertex a, const Vertex b) override;
-
-        //virtual uint randomBounceMotion(const ob::StateSamplerPtr &sss, 
-          //const Vertex &v, std::vector<ob::State *> &states) const override;
-
+        virtual bool Sample(ob::State *q_random) override;
         virtual Vertex CreateNewVertex(ob::State *state) override;
+        virtual ompl::PDF<og::PRMBasic::Edge> GetEdgePDF() override;
 
+        //virtual void RandomWalk(const Vertex &v, std::vector<ob::State *> &states) override;
       public:
+        double percentageSamplesOnShortestPath{0.2};
+        double goalBias_{0.05};
         int lastSourceVertexSampled{-1};
         int lastTargetVertexSampled{-1};
         double lastTSampled{-1.0};

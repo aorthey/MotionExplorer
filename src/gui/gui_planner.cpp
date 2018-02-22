@@ -25,6 +25,8 @@ void PlannerBackend::Start(){
   drawPoser = 0;
   drawDesired = 0;
   pose_objects = 0;
+  drawBBs = 0;
+  show_view_target = 0;
 }
 
 bool PlannerBackend::OnCommand(const string& cmd,const string& args){

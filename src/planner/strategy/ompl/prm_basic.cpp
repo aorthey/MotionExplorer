@@ -22,9 +22,9 @@ namespace ompl
 {
   namespace magic
   {
-    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
+    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 2;
     static const double ROADMAP_BUILD_TIME = 0.01;
-    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
+    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 15;
   }
 }
 PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si, Quotient *previous_)
@@ -44,12 +44,8 @@ PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si, Quotient *previous_)
   specs_.optimizingPaths = false;
 
   if (!isSetup())
+  {
     setup();
-  if (!sampler_){
-    sampler_ = si_->allocValidStateSampler();
-  }
-  if (!simpleSampler_){
-    simpleSampler_ = si_->allocStateSampler();
   }
 
   xstates.resize(magic::MAX_RANDOM_BOUNCE_STEPS);
@@ -164,8 +160,8 @@ ob::PlannerStatus PRMBasic::solve(const ob::PlannerTerminationCondition &ptc){
 void PRMBasic::Grow(double t){
   double T_grow = (2.0/3.0)*t;
   growRoadmap(ob::timedPlannerTerminationCondition(T_grow), xstates[0]);
-  //double T_expand = (1.0/3.0)*t;
-  //expandRoadmap( ob::timedPlannerTerminationCondition(T_expand), xstates);
+  double T_expand = (1.0/3.0)*t;
+  expandRoadmap( ob::timedPlannerTerminationCondition(T_expand), xstates);
 }
 
 void PRMBasic::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState)
@@ -190,52 +186,64 @@ void PRMBasic::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State
 void PRMBasic::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
                                          std::vector<ob::State *> &workStates)
 {
-    PDF<Vertex> pdf;
-    foreach (Vertex v, boost::vertices(g_))
-    {
-      const unsigned long int t = totalConnectionAttemptsProperty_[v];
-      pdf.add(v, (double)(t - successfulConnectionAttemptsProperty_[v]) / (double)t);
-    }
+  PDF<Vertex> pdf;
+  //find all nodes which have been tried to expand often (frontier nodes), but
+  //which have not been successfully expanded (boundary nodes). In that case the
+  //vertex has a large voronoi bias but has been stuck. The proposed solution
+  //here starts at the vertex, and does a random walk (randombouncemotion), to
+  //try to get unstuck.
 
-    if (pdf.empty())
-      return;
+  foreach (Vertex v, boost::vertices(g_))
+  {
+    const unsigned long int t = totalConnectionAttemptsProperty_[v];
+    pdf.add(v, (double)(t - successfulConnectionAttemptsProperty_[v]) / (double)t);
+  }
 
-    while (!ptc)
-    {
-      iterations_++;
-      Vertex v = pdf.sample(rng_.uniform01());
-      unsigned int s = randomBounceMotion(simpleSampler_, v, workStates);
-      if (s > 0)
-      {
-        s--;
-        Vertex last = addMilestone(si_->cloneState(workStates[s]));
+  if (pdf.empty())
+    return;
 
-        for (unsigned int i = 0; i < s; ++i)
-        {
-          Vertex m = CreateNewVertex(workStates[i]);
+  while (!ptc)
+  {
+    iterations_++;
+    Vertex v = pdf.sample(rng_.uniform01());
+    RandomWalk(v, workStates);
 
-          // add the edge to the parent vertex
-          EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[m]));
-          boost::add_edge(v, m, properties, g_);
-          uniteComponents(v, m);
+    //unsigned int s = randomBounceMotion(v, workStates);
+    ////s are the number of successfully expanded vertices from v
+    ////s==0 the vertex is still stuck,
+    ////s> 0 the vertex has at least one nearby node which it can expand to
+    //if (s > 0)
+    //{
+    //  s--;
+    //  Vertex last = addMilestone(si_->cloneState(workStates[s]));
 
-          // add the vertex to the nearest neighbors data structure
-          nn_->add(m);
-          v = m;
-        }
+    //  for (unsigned int i = 0; i < s; ++i)
+    //  {
+    //    Vertex m = CreateNewVertex(workStates[i]);
 
-        // if there are intermediary states or the milestone has not been connected to the initially sampled vertex,
-        // we add an edge
-        if (s > 0 || !sameComponent(v, last))
-        {
-          // add the edge to the parent vertex
-          //const g_::edge_property_type properties(weight);
-          EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[last]));
-          boost::add_edge(v, last, properties, g_);
-          uniteComponents(v, last);
-        }
-      }
-    }
+    //    // add the edge to the parent vertex
+    //    EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[m]));
+    //    boost::add_edge(v, m, properties, g_);
+    //    uniteComponents(v, m);
+
+    //    nn_->add(m);
+    //    v = m;
+    //  }
+
+    //  // if there are intermediary states or the milestone has not been connected to the initially sampled vertex,
+    //  // we add an edge
+    //  if (s > 0 || !sameComponent(v, last))
+    //  {
+    //    // add the edge to the parent vertex
+    //    EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[last]));
+    //    boost::add_edge(v, last, properties, g_);
+    //    uniteComponents(v, last);
+    //  }
+    //}
+
+
+
+  }
 }
 void PRMBasic::uniteComponents(Vertex m1, Vertex m2)
 {
@@ -295,36 +303,21 @@ bool PRMBasic::maybeConstructSolution(const std::vector<Vertex> &starts, const s
               const Vertex v1 = boost::source(e, g_);
               const Vertex v2 = boost::target(e, g_);
               boost::remove_edge(boost::vertex(v1, g_), boost::vertex(v2,g_), g_);
-              // boost::remove_vertex(boost::vertex(v1, g_), g_);
-              // boost::remove_vertex(boost::vertex(v2, g_), g_);
-              // nn_->remove(v1);
-              // nn_->remove(v2);
-              //std::cout << "edge:" << k << " | source:" << v1 << "| target:" << v2 << std::endl;
-              //if(stateProperty_[v1]!=nullptr){
-              //  si_->freeState(stateProperty_[v1]);
-              //  stateProperty_[v1]=nullptr;
-              //  boost::remove_vertex(boost::vertex(v1, g_), g_);
-              //  nn_->remove(v1);
-              //}
-              //if(stateProperty_[v2]!=nullptr){
-              //  stateProperty_[v2]=nullptr;
-              //  si_->freeState(stateProperty_[v2]);
-              //  boost::remove_vertex(boost::vertex(v2, g_), g_);
-              //  nn_->remove(v2);
-              //}
             }
-            // uint Nv = boost::num_vertices(g_);
-            // ctr = 0;
-            // foreach (Vertex v, boost::vertices(g_))
-            // {
-            //   if(!sameComponent(v, startM_.at(0))){
-            //     ctr++;
-            //     si_->freeState(stateProperty_[v]);
-            //     nn_->remove(v);
-            //     boost::remove_vertex(boost::vertex(v, g_), g_);
-            //   }
-            // }
-            // std::cout << "removed " << ctr << "/" << Nv <<" vertices."  << std::endl;
+            //uint Nv = boost::num_vertices(g_);
+            ctr = 0;
+            foreach (Vertex v, boost::vertices(g_))
+            {
+              int numberOfInEdges = boost::in_degree(v,g_);
+              if(v>1 && numberOfInEdges<=0)
+              {
+                ctr++;
+                //si_->freeState(stateProperty_[v]);
+                nn_->remove(v);
+                //boost::remove_vertex(boost::vertex(v, g_), g_);
+              }
+            }
+            //std::cout << "removed " << ctr << "/" << Nv <<" vertices."  << std::endl;
             //#################################################################
             //#################################################################
             return true;
@@ -338,52 +331,52 @@ bool PRMBasic::maybeConstructSolution(const std::vector<Vertex> &starts, const s
 }
 ob::PathPtr PRMBasic::constructSolution(const Vertex &start, const Vertex &goal)
 {
-    boost::vector_property_map<Vertex> prev(boost::num_vertices(g_));
+  boost::vector_property_map<Vertex> prev(boost::num_vertices(g_));
 
-    try
-    {
-        boost::astar_search(g_, start,
-                            [this, goal](Vertex v)
-                            {
-                                return costHeuristic(v, goal);
-                            },
-                            boost::predecessor_map(prev)
-                                .distance_compare([this](EdgeProperty c1, EdgeProperty c2)
-                                                  {
-                                                      return opt_->isCostBetterThan(c1.getCost(), c2.getCost());
-                                                  })
-                                .distance_combine([this](EdgeProperty c1, EdgeProperty c2)
-                                                  {
-                                                      return opt_->combineCosts(c1.getCost(), c2.getCost());
-                                                  })
-                                .distance_inf(opt_->infiniteCost())
-                                .distance_zero(opt_->identityCost())
-                                .visitor(AStarGoalVisitor<Vertex>(goal)));
-    }
-    catch (AStarFoundGoal &)
-    {
-    }
+  try
+  {
+      boost::astar_search(g_, start,
+                          [this, goal](Vertex v)
+                          {
+                              return costHeuristic(v, goal);
+                          },
+                          boost::predecessor_map(prev)
+                              .distance_compare([this](EdgeProperty c1, EdgeProperty c2)
+                                                {
+                                                    return opt_->isCostBetterThan(c1.getCost(), c2.getCost());
+                                                })
+                              .distance_combine([this](EdgeProperty c1, EdgeProperty c2)
+                                                {
+                                                    return opt_->combineCosts(c1.getCost(), c2.getCost());
+                                                })
+                              .distance_inf(opt_->infiniteCost())
+                              .distance_zero(opt_->identityCost())
+                              .visitor(AStarGoalVisitor<Vertex>(goal)));
+  }
+  catch (AStarFoundGoal &)
+  {
+  }
 
-    auto p(std::make_shared<PathGeometric>(si_));
-    if (prev[goal] == goal){
-      return NULL;
-    }
+  auto p(std::make_shared<PathGeometric>(si_));
+  if (prev[goal] == goal){
+    return NULL;
+  }
 
-    std::vector<Vertex> vpath;
-    for (Vertex pos = goal; prev[pos] != pos; pos = prev[pos]){
-      onShortestPath_[pos] = true;
-      vpath.push_back(pos);
-      p->append(stateProperty_[pos]);
-    }
-    onShortestPath_[start] = true;
-    vpath.push_back(start);
-    p->append(stateProperty_[start]);
+  std::vector<Vertex> vpath;
+  for (Vertex pos = goal; prev[pos] != pos; pos = prev[pos]){
+    onShortestPath_[pos] = true;
+    vpath.push_back(pos);
+    p->append(stateProperty_[pos]);
+  }
+  onShortestPath_[start] = true;
+  vpath.push_back(start);
+  p->append(stateProperty_[start]);
 
-    shortestVertexPath_.clear();
-    shortestVertexPath_.insert( shortestVertexPath_.begin(), vpath.rbegin(), vpath.rend() );
-    p->reverse();
+  shortestVertexPath_.clear();
+  shortestVertexPath_.insert( shortestVertexPath_.begin(), vpath.rbegin(), vpath.rend() );
+  p->reverse();
 
-    return p;
+  return p;
 }
 
 
@@ -428,7 +421,8 @@ void PRMBasic::getPlannerData(ob::PlannerData &data) const
     data.addGoalVertex(
       PlannerDataVertexAnnotated(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
 
-  std::cout << "  edges : " << boost::num_edges(g_) << std::endl;
+  std::cout << "  edges    : " << boost::num_edges(g_) << std::endl;
+  std::cout << "  vertices : " << boost::num_vertices(g_) << std::endl;
   foreach (const Edge e, boost::edges(g_))
   {
     const Vertex v1 = boost::source(e, g_);
@@ -547,20 +541,56 @@ bool PRMBasic::Connect(const Vertex a, const Vertex b){
   return false;
 }
 
-uint PRMBasic::randomBounceMotion(const ob::StateSamplerPtr &sss, 
-    const Vertex &v, std::vector<ob::State *> &states) const
+//uint PRMBasic::randomBounceMotion(const Vertex &v, std::vector<ob::State *> &states) const
+//{
+//  uint steps = states.size();
+//  const ob::State *prev = stateProperty_[v];
+//  std::pair<ob::State *, double> lastValid;
+//  uint j = 0;
+//  for (uint i = 0; i < steps; ++i)
+//  {
+//    M1_sampler->sampleUniform(states[j]);
+//    lastValid.first = states[j];
+//    if (si_->checkMotion(prev, states[j], lastValid) || lastValid.second > std::numeric_limits<double>::epsilon())
+//      prev = states[j++];
+//  }
+//  return j;
+//}
+
+void PRMBasic::RandomWalk(const Vertex &v, std::vector<ob::State *> &states) 
 {
   uint steps = states.size();
-  const ob::State *prev = stateProperty_[v];
-  std::pair<ob::State *, double> lastValid;
-  uint j = 0;
+  const ob::State *s_prev = stateProperty_[v];
+
+  Vertex v_prev = v;
+
+  uint ctr = 0;
   for (uint i = 0; i < steps; ++i)
   {
-    sss->sampleUniform(states[j]);
-    lastValid.first = states[j];
-    if (si_->checkMotion(prev, states[j], lastValid) || lastValid.second > std::numeric_limits<double>::epsilon())
-      prev = states[j++];
+    ob::State *s_next = states.at(ctr);
+    M1_sampler->sampleUniform(s_next);
+
+    std::pair<ob::State *, double> lastValid;
+    lastValid.first = s_next;
+
+    si_->checkMotion(s_prev, s_next, lastValid);
+
+    if(lastValid.second > std::numeric_limits<double>::epsilon())
+    {
+      Vertex v_next = CreateNewVertex(s_next);
+
+      EdgeProperty properties(opt_->motionCost(stateProperty_[v_prev], stateProperty_[v_next]));
+      boost::add_edge(v_prev, v_next, properties, g_);
+      uniteComponents(v_prev, v_next);
+      nn_->add(v_next);
+
+      v_prev = v_next;
+      s_prev = s_next;
+      ctr++;
+    }
   }
-  return j;
+  if(ctr>0){
+    addMilestone(si_->cloneState(states.at(ctr-1)));
+  }
 }
 

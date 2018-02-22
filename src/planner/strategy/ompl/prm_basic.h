@@ -117,10 +117,13 @@ namespace ompl
 
            >Graph;
 
+
         typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
         typedef boost::graph_traits<Graph>::edge_descriptor Edge;
         typedef std::shared_ptr<NearestNeighbors<Vertex>> RoadmapNeighbors;
         typedef std::function<const std::vector<Vertex> &(const Vertex)> ConnectionStrategy;
+
+        typedef boost::graph_traits<Graph>::in_edge_iterator IEIterator;
 
       public:
 
@@ -209,8 +212,8 @@ namespace ompl
                                     ob::PathPtr &solution);
         ob::PathPtr constructSolution(const Vertex &start, const Vertex &goal);
 
-        virtual uint randomBounceMotion(const ob::StateSamplerPtr &sss, 
-            const Vertex &v, std::vector<ob::State *> &states) const;
+        //virtual uint randomBounceMotion(const Vertex &v, std::vector<ob::State *> &states) const;
+        virtual void RandomWalk(const Vertex &v, std::vector<ob::State *> &states);
 
     };
   };

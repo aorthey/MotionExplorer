@@ -248,6 +248,11 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType
   q(1) = qomplSE3->getY();
   q(2) = qomplSE3->getZ();
 
+  if(std::isnan((double)qomplSO3->x)){
+    si->printSettings();
+    std::cout << qomplSO3 << std::endl;
+    exit(0);
+  }
   std::vector<double> rxyz = EulerXYZFromOMPLSO3StateSpace(qomplSO3);
   q(3) = rxyz.at(0);
   q(4) = rxyz.at(1);

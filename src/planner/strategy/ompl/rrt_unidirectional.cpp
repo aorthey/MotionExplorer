@@ -28,7 +28,7 @@ void RRTUnidirectional::Sample(Configuration *q_random){
     if(!hasSolution && rng_.uniform01() < goalBias_){
       goal->sampleGoal(q_random->state);
     }else{
-      sampler_->sampleUniform(q_random->state);
+      M1_sampler->sampleUniform(q_random->state);
     }
   }else{
     if(!hasSolution && rng_.uniform01() < goalBias_){
@@ -224,19 +224,16 @@ void RRTUnidirectional::Init()
   //  exit(0);
   //}
 
-
   if (G_->size() == 0){
     OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
     exit(0);
   }
-  if (!sampler_) sampler_ = si_->allocStateSampler();
 }
 
 
 void RRTUnidirectional::clear()
 {
   Planner::clear();
-  sampler_.reset();
   freeMemory();
   if(G_){
     G_->clear();
@@ -400,8 +397,7 @@ bool RRTUnidirectional::SampleGraph(ob::State *q_random_graph)
   const ob::State *q_from = q->state;
   const ob::State *q_to = q->parent->state;
   M1->getStateSpace()->interpolate(q_from, q_to, t, q_random_graph);
-  //sampler_->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
-  sampler_->sampleGaussian(q_random_graph, q_random_graph, epsilon);
+  M1_sampler->sampleGaussian(q_random_graph, q_random_graph, epsilon);
 
   lastSampled = q;
   lastSampled->totalSamples++;

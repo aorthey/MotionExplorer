@@ -60,9 +60,10 @@ namespace ompl
 
         const ob::SpaceInformationPtr &getC1() const;
         bool SampleC1(ob::State *s);
-        void mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1);
+        void mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1) const;
 
         double GetGraphLength();
+        virtual void clear() override;
 
       protected:
         static uint counter;
@@ -84,8 +85,8 @@ namespace ompl
         ob::SpaceInformationPtr C1; //standalone configuration space Ci = Mi/Mi-1
 
         ob::StateSamplerPtr C1_sampler;
-        ob::ValidStateSamplerPtr sampler_;
-        ob::StateSamplerPtr simpleSampler_;
+        ob::StateSamplerPtr M1_sampler;
+        ob::ValidStateSamplerPtr M1_valid_sampler;
 
         double graphLength{0.0};
         uint totalNumberOfSamples{0};
