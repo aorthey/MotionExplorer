@@ -191,6 +191,7 @@ namespace ompl
         virtual Vertex addMilestone(ob::State *state);
 
         virtual Vertex CreateNewVertex(ob::State *state);
+        virtual void ConnectVertexToNeighbors(Vertex m);
 
         ob::Cost costHeuristic(Vertex u, Vertex v) const;
         std::vector<ob::State *> xstates;
@@ -213,7 +214,7 @@ namespace ompl
         ob::PathPtr constructSolution(const Vertex &start, const Vertex &goal);
 
         //virtual uint randomBounceMotion(const Vertex &v, std::vector<ob::State *> &states) const;
-        virtual void RandomWalk(const Vertex &v, std::vector<ob::State *> &states);
+        virtual void RandomWalk(const Vertex &v);
 
     };
   };

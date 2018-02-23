@@ -250,7 +250,11 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType
 
   if(std::isnan((double)qomplSO3->x)){
     si->printSettings();
-    std::cout << qomplSO3 << std::endl;
+    std::cout << "SO3 is NaN" << std::endl;
+    std::cout << qomplSO3->x << std::endl;
+    std::cout << qomplSO3->y << std::endl;
+    std::cout << qomplSO3->z << std::endl;
+    std::cout << qomplSO3->w << std::endl;
     exit(0);
   }
   std::vector<double> rxyz = EulerXYZFromOMPLSO3StateSpace(qomplSO3);

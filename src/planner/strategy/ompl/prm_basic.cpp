@@ -22,9 +22,9 @@ namespace ompl
 {
   namespace magic
   {
-    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 2;
+    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
     static const double ROADMAP_BUILD_TIME = 0.01;
-    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 15;
+    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
   }
 }
 PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si, Quotient *previous_)
@@ -96,35 +96,6 @@ void PRMBasic::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
 
 void PRMBasic::Init(){
   checkValidity();
-  auto *goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
-
-  if (goal == nullptr){
-    OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
-    exit(0);
-  }
-
-  while (const ob::State *st = pis_.nextStart()){
-    startM_.push_back(addMilestone(si_->cloneState(st)));
-  }
-  if (startM_.empty()){
-    OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
-    exit(0);
-  }
-  if (!goal->couldSample()){
-    OMPL_ERROR("%s: Insufficient states in sampleable goal region", getName().c_str());
-    exit(0);
-  }
-
-  if (goal->maxSampleCount() > goalM_.size() || goalM_.empty()){
-    const ob::State *st = pis_.nextGoal();
-    if (st != nullptr){
-      goalM_.push_back(addMilestone(si_->cloneState(st)));
-    }
-  }
-  if (goalM_.empty()){
-    OMPL_ERROR("%s: There are no valid goal states!", getName().c_str());
-    exit(0);
-  }
 }
 
 ob::PlannerStatus PRMBasic::solve(const ob::PlannerTerminationCondition &ptc){
@@ -206,43 +177,7 @@ void PRMBasic::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
   {
     iterations_++;
     Vertex v = pdf.sample(rng_.uniform01());
-    RandomWalk(v, workStates);
-
-    //unsigned int s = randomBounceMotion(v, workStates);
-    ////s are the number of successfully expanded vertices from v
-    ////s==0 the vertex is still stuck,
-    ////s> 0 the vertex has at least one nearby node which it can expand to
-    //if (s > 0)
-    //{
-    //  s--;
-    //  Vertex last = addMilestone(si_->cloneState(workStates[s]));
-
-    //  for (unsigned int i = 0; i < s; ++i)
-    //  {
-    //    Vertex m = CreateNewVertex(workStates[i]);
-
-    //    // add the edge to the parent vertex
-    //    EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[m]));
-    //    boost::add_edge(v, m, properties, g_);
-    //    uniteComponents(v, m);
-
-    //    nn_->add(m);
-    //    v = m;
-    //  }
-
-    //  // if there are intermediary states or the milestone has not been connected to the initially sampled vertex,
-    //  // we add an edge
-    //  if (s > 0 || !sameComponent(v, last))
-    //  {
-    //    // add the edge to the parent vertex
-    //    EdgeProperty properties(opt_->motionCost(stateProperty_[v], stateProperty_[last]));
-    //    boost::add_edge(v, last, properties, g_);
-    //    uniteComponents(v, last);
-    //  }
-    //}
-
-
-
+    RandomWalk(v);
   }
 }
 void PRMBasic::uniteComponents(Vertex m1, Vertex m2)
@@ -383,7 +318,12 @@ ob::PathPtr PRMBasic::constructSolution(const Vertex &start, const Vertex &goal)
 PRMBasic::Vertex PRMBasic::addMilestone(ob::State *state)
 {
   Vertex m = CreateNewVertex(state);
+  ConnectVertexToNeighbors(m);
+  return m;
+}
 
+void PRMBasic::ConnectVertexToNeighbors(Vertex m)
+{
   const std::vector<Vertex> &neighbors = connectionStrategy_(m);
 
   foreach (Vertex n, neighbors)
@@ -397,9 +337,7 @@ PRMBasic::Vertex PRMBasic::addMilestone(ob::State *state)
     }
   }
   nn_->add(m);
-  return m;
 }
-
 PRMBasic::Vertex PRMBasic::CreateNewVertex(ob::State *state)
 {
   Vertex m = boost::add_vertex(g_);
@@ -557,17 +495,16 @@ bool PRMBasic::Connect(const Vertex a, const Vertex b){
 //  return j;
 //}
 
-void PRMBasic::RandomWalk(const Vertex &v, std::vector<ob::State *> &states) 
+void PRMBasic::RandomWalk(const Vertex &v)
 {
-  uint steps = states.size();
   const ob::State *s_prev = stateProperty_[v];
 
   Vertex v_prev = v;
 
   uint ctr = 0;
-  for (uint i = 0; i < steps; ++i)
+  for (uint i = 0; i < magic::MAX_RANDOM_BOUNCE_STEPS; ++i)
   {
-    ob::State *s_next = states.at(ctr);
+    ob::State *s_next = xstates[ctr];
     M1_sampler->sampleUniform(s_next);
 
     std::pair<ob::State *, double> lastValid;
@@ -577,7 +514,7 @@ void PRMBasic::RandomWalk(const Vertex &v, std::vector<ob::State *> &states)
 
     if(lastValid.second > std::numeric_limits<double>::epsilon())
     {
-      Vertex v_next = CreateNewVertex(s_next);
+      Vertex v_next = CreateNewVertex(lastValid.first);
 
       EdgeProperty properties(opt_->motionCost(stateProperty_[v_prev], stateProperty_[v_next]));
       boost::add_edge(v_prev, v_next, properties, g_);
@@ -585,12 +522,9 @@ void PRMBasic::RandomWalk(const Vertex &v, std::vector<ob::State *> &states)
       nn_->add(v_next);
 
       v_prev = v_next;
-      s_prev = s_next;
+      s_prev = stateProperty_[v_next];
       ctr++;
     }
-  }
-  if(ctr>0){
-    addMilestone(si_->cloneState(states.at(ctr-1)));
   }
 }
 

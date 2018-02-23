@@ -23,7 +23,7 @@ namespace ompl
         ob::PathPtr GetShortestPathOffsetVertices( const ob::State *qa, const ob::State *qb, 
           const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb);
 
-        ob::PathPtr InterpolateGraphConstraint( const Vertex a, const Vertex b) const;
+        ob::PathPtr InterpolateM1GraphConstraint( const Vertex a, const Vertex b) const;
 
         void setup() override;
         virtual void Init() override;
@@ -37,7 +37,7 @@ namespace ompl
         virtual Vertex CreateNewVertex(ob::State *state) override;
         virtual ompl::PDF<og::PRMBasic::Edge> GetEdgePDF() override;
 
-        //virtual void RandomWalk(const Vertex &v, std::vector<ob::State *> &states) override;
+        virtual void RandomWalk(const Vertex &v) override;
       public:
         double percentageSamplesOnShortestPath{0.2};
         double goalBias_{0.05};
