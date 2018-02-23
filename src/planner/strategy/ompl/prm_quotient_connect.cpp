@@ -573,8 +573,15 @@ void PRMQuotientConnect::RandomWalk(const Vertex &v)
     //#########################################################################
 
     Vertex v_last = addMilestone(s_last);
+    associatedVertexSourceProperty_[v_last]=PRMprevious->lastSourceVertexSampled;
+    associatedVertexTargetProperty_[v_last]=PRMprevious->lastTargetVertexSampled;
+    associatedTProperty_[v_last]=PRMprevious->lastTSampled;
 
     ob::PathPtr solM1 = InterpolateM1GraphConstraint(v_first, v_last);
+    if(!solM1){
+      std::cout << "no path towards sampled configuration" << std::endl;
+      exit(0);
+    }
 
     og::PathGeometric pathM1 = static_cast<og::PathGeometric&>(*solM1);
 
