@@ -218,7 +218,9 @@ void Roadmap::DrawGL(GUIState& state)
       cEdge = (k%2==0?green:red);
       cPath = (k%2==0?magenta:black);
       DrawSingleLevelGL(state, roadmaps_level.at(k));
-      DrawPathGL(state, shortest_path_level.at(k));
+      if(state("draw_path")){
+        DrawPathGL(state, shortest_path_level.at(k));
+      }
     }
   }
 

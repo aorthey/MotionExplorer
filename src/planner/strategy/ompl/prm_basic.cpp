@@ -22,7 +22,7 @@ namespace ompl
 {
   namespace magic
   {
-    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
+    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 1;
     static const double ROADMAP_BUILD_TIME = 0.01;
     static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
   }
@@ -69,6 +69,7 @@ void PRMBasic::ClearVertices()
 }
 void PRMBasic::clear()
 {
+  std::cout << "PRMBasic: clear" << std::endl;
   Planner::clear();
 
   ClearVertices();
@@ -504,14 +505,23 @@ void PRMBasic::RandomWalk(const Vertex &v)
   uint ctr = 0;
   for (uint i = 0; i < magic::MAX_RANDOM_BOUNCE_STEPS; ++i)
   {
+    //s_next = SAMPLE(M1)
+
     ob::State *s_next = xstates[ctr];
     M1_sampler->sampleUniform(s_next);
 
     std::pair<ob::State *, double> lastValid;
     lastValid.first = s_next;
 
+    //check if motion is valid: s_prev -------- s_next
+    //s_prev ------ lastValid ----------------s_next
+    if(!si_->isValid(s_prev)){
+      continue;
+    }
     si_->checkMotion(s_prev, s_next, lastValid);
 
+    //if we made progress towards s_next, then add the last valid state to our
+    //roadmap, connect it to the s_prev state
     if(lastValid.second > std::numeric_limits<double>::epsilon())
     {
       Vertex v_next = CreateNewVertex(lastValid.first);

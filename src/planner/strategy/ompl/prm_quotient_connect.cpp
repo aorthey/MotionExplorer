@@ -22,7 +22,8 @@ namespace ompl
 {
   namespace magic
   {
-    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
+    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
+    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
   }
 }
 
@@ -31,8 +32,8 @@ PRMQuotientConnect::PRMQuotientConnect(const ob::SpaceInformationPtr &si, Quotie
 {
   setName("PRMQuotientConnect"+to_string(id));
   goalBias_ = 0.05;
-  epsilon = 0;
-  percentageSamplesOnShortestPath = 0.1;
+  epsilon = 0.0;
+  percentageSamplesOnShortestPath = 0.05;
 
 }
 
@@ -46,7 +47,6 @@ void PRMQuotientConnect::setup()
   if(PRMprevious==nullptr){
     PRMQuotient::setup();
   }
-
   if (!nn_){
     nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
     nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
@@ -133,18 +133,18 @@ bool PRMQuotientConnect::Sample(ob::State *q_random)
 {
   totalNumberOfSamples++;
   if(previous == nullptr){
-    M1_valid_sampler->sample(q_random);
-    //if(!hasSolution && rng_.uniform01() < goalBias_){
-    //  //q_random = si_->cloneState(stateProperty_[goalM_.at(0)]);
-    //}else{
-    //  M1_valid_sampler->sample(q_random);
-    //}
+    //return M1_valid_sampler->sample(q_random);
+    if(!hasSolution && rng_.uniform01() < goalBias_){
+      q_random = si_->cloneState(stateProperty_[goalM_.at(0)]);
+    }else{
+      M1_valid_sampler->sample(q_random);
+    }
   }else{
     //Adjusted sampling function: Sampling in G0 x C1
-    //if(!hasSolution && rng_.uniform01() < goalBias_){
-    //  //goal->sampleGoal(q_random);
-    //  //q_random = si_->cloneState(stateProperty_[goalM_.at(0)]);
-    //}else{
+    if(!hasSolution && rng_.uniform01() < goalBias_){
+      //goal->sampleGoal(q_random);
+      q_random = si_->cloneState(stateProperty_[goalM_.at(0)]);
+    }else{
       ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
       base::State *s_C1 = C1->allocState();
       base::State *s_M0 = M0->allocState();
@@ -155,7 +155,7 @@ bool PRMQuotientConnect::Sample(ob::State *q_random)
 
       C1->freeState(s_C1);
       M0->freeState(s_M0);
-    //}
+    }
   }
   return M1->isValid(q_random);
 }
@@ -173,6 +173,8 @@ bool PRMQuotientConnect::SampleGraph(ob::State *q_random_graph)
   const ob::State *to = stateProperty_[v2];
 
   M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
+
+  //if(epsilon>0) M1_sampler->sampleGaussian(q_random_graph, q_random_graph, epsilon);
 
   lastSourceVertexSampled = v1;
   lastTargetVertexSampled = v2;
@@ -223,28 +225,28 @@ bool PRMQuotientConnect::Connect(const Vertex a, const Vertex b){
     Vertex v_prevM1 = a;
     ob::State *s_prevM1 = spathM1.at(0);
 
-    for(uint k = 1; k < spathM1.size()-1; k++){
-      if(!si_->checkMotion(spathM1.at(k-1),spathM1.at(k)))
-        return false;
+    for(uint k = 1; k < spathM1.size(); k++){
+      if(!si_->isValid(spathM1.at(k-1))) return false;
+      if(!si_->checkMotion(spathM1.at(k-1),spathM1.at(k))) return false;
 
-      Vertex v_nextM1 = CreateNewVertex(M1->cloneState(spathM1.at(k)));
-      associatedVertexSourceProperty_[v_nextM1]=vpathM0.at(k);
-      associatedVertexTargetProperty_[v_nextM1]=vpathM0.at(k);
-      associatedTProperty_[v_nextM1]=0;
-      nn_->add(v_nextM1);
-      totalNumberOfSamples++;
+      Vertex v_nextM1;
+      if(k==spathM1.size()-1){
+        v_nextM1 = b;
+      }else{
+        v_nextM1 = CreateNewVertex(spathM1.at(k));
+        associatedVertexSourceProperty_[v_nextM1]=vpathM0.at(k);
+        associatedVertexTargetProperty_[v_nextM1]=vpathM0.at(k);
+        associatedTProperty_[v_nextM1]=0;
+        nn_->add(v_nextM1);
+        totalNumberOfSamples++;
+      }
 
-      double dk = M1->distance(spathM1.at(k-1),spathM1.at(k));
+      double dk = M1->distance(s_prevM1, spathM1.at(k));
       boost::add_edge(v_prevM1, v_nextM1, EdgeProperty(ob::Cost(dk)), g_);
       uniteComponents(v_prevM1, v_nextM1);
       v_prevM1 = v_nextM1;
       s_prevM1 = spathM1.at(k);
     }
-
-    //connect last vertex to the final vertex
-    double d_last = M1->distance(s_prevM1, stateProperty_[b]);
-    boost::add_edge(v_prevM1, b, EdgeProperty(ob::Cost(d_last)), g_);
-    uniteComponents(v_prevM1, b);
 
     return true;
 
@@ -502,31 +504,31 @@ ompl::PDF<og::PRMBasic::Edge> PRMQuotientConnect::GetEdgePDF()
   }else{
     //Random Edge (RE) sampling (suffers from high sampling concentrations at
     //vertices with many incoming edges, not ideal, but fast)
-    foreach (Edge e, boost::edges(g_))
-    {
-      const Vertex v1 = boost::source(e, g_);
-
-      if(sameComponent(v1, startM_.at(0))){
-        ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
-        pdf.add(e, weight.value());
-      }
-    }
-    ////Random Node Edge (RNE) sampling
-    //PDF<Vertex> vpdf;
-    //foreach (Vertex v, boost::vertices(g_))
+    //foreach (Edge e, boost::edges(g_))
     //{
-    //  if(sameComponent(v, startM_.at(0))){
-    //    vpdf.add(v,1);
+    //  const Vertex v1 = boost::source(e, g_);
+
+    //  if(sameComponent(v1, startM_.at(0))){
+    //    ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
+    //    pdf.add(e, weight.value());
     //  }
     //}
-    //Vertex v = vpdf.sample(rng_.uniform01());
-    //std::pair<IEIterator, IEIterator> iterators = boost::in_edges(boost::vertex(v, g_), g_);
-    //for (IEIterator iter = iterators.first; iter != iterators.second; ++iter)
-    //{
-    //  //pdf.add(*iter, 1);
-    //  ob::Cost weight = get(boost::edge_weight_t(), g_, *iter).getCost();
-    //  pdf.add(*iter, weight.value());
-    //}
+    ////Random Node Edge (RNE) sampling
+    PDF<Vertex> vpdf;
+    foreach (Vertex v, boost::vertices(g_))
+    {
+      if(sameComponent(v, startM_.at(0))){
+        vpdf.add(v,1);
+      }
+    }
+    Vertex v = vpdf.sample(rng_.uniform01());
+    std::pair<IEIterator, IEIterator> iterators = boost::in_edges(boost::vertex(v, g_), g_);
+    for (IEIterator iter = iterators.first; iter != iterators.second; ++iter)
+    {
+      //pdf.add(*iter, 1);
+      ob::Cost weight = get(boost::edge_weight_t(), g_, *iter).getCost();
+      pdf.add(*iter, weight.value());
+    }
   }
   return pdf;
 }
@@ -538,13 +540,10 @@ void PRMQuotientConnect::RandomWalk(const Vertex &v)
     return PRMQuotient::RandomWalk(v);
   }
 
-  //const ob::State *s_first = stateProperty_[v];
-  //std::cout << "input state:" << std::endl;
-  //M1->printState(s_first);
-
   Vertex v_first = v;
 
-  for (uint i = 0; i < 1; ++i)
+  uint steps = magic::MAX_RANDOM_BOUNCE_STEPS;
+  for (uint i = 0; i < steps; ++i)
   {
 
     //#########################################################################
@@ -572,10 +571,8 @@ void PRMQuotientConnect::RandomWalk(const Vertex &v)
     // std::vector<ob::State *> spath
     //#########################################################################
 
-    Vertex v_last = addMilestone(s_last);
-    associatedVertexSourceProperty_[v_last]=PRMprevious->lastSourceVertexSampled;
-    associatedVertexTargetProperty_[v_last]=PRMprevious->lastTargetVertexSampled;
-    associatedTProperty_[v_last]=PRMprevious->lastTSampled;
+    //Vertex v_last = addMilestone(s_last);
+    Vertex v_last = CreateNewVertex(s_last);
 
     ob::PathPtr solM1 = InterpolateM1GraphConstraint(v_first, v_last);
     if(!solM1){
@@ -588,72 +585,125 @@ void PRMQuotientConnect::RandomWalk(const Vertex &v)
     std::vector<ob::State *> spathM1 = pathM1.getStates();
     std::vector<Vertex> vpathM0 = PRMprevious->shortestVertexPath_;
 
+    const bool DEBUG = false;
+    if(DEBUG){
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << "start edge " << associatedVertexSourceProperty_[v_first] << "<->" 
+        << associatedVertexTargetProperty_[v_first] <<
+        " (" << associatedTProperty_[v_first] << ")" 
+        << std::endl;
+
+      for(uint k = 1; k < vpathM0.size(); k++){
+        std::cout << "edge " << vpathM0.at(k-1) << "<->"<< vpathM0.at(k) << std::endl;
+      }
+
+      std::cout << "goal edge " << associatedVertexSourceProperty_[v_last] << "<->" 
+        << associatedVertexTargetProperty_[v_last] << " (" 
+        << associatedTProperty_[v_last] << ")" << std::endl;
+    }
+
     //#########################################################################
     //move along sol/shortestvertexpath_ until infeasible or target reached.
     //#########################################################################
 
     Vertex v_prevM1 = v_first;
-    ob::State *s_prevM1 = spathM1.at(0);
 
-    bool advanced = false;
     for(uint k = 1; k < spathM1.size(); k++){
-      ob::State *s_nextM1 = spathM1.at(k);
+
       std::pair<ob::State *, double> lastValid;
-      lastValid.first = s_nextM1;
+      lastValid.first = spathM1.at(k);
 
-      //note: lastvalid contains (state,n), whereby state is the last state
-      //still feasible on the straight line between s_prev and s_next. n is a
-      //number in [0,1] showing how much progress has been made on the edge.
+      if(DEBUG) std::cout << "edge " << vpathM0.at(k-1) << "<->"<< vpathM0.at(k) << std::endl;
 
-      if(!si_->checkMotion(s_prevM1, s_nextM1, lastValid)){
-        if(lastValid.second > std::numeric_limits<double>::epsilon()){
-          advanced = true;
-          Vertex v_nextM1 = CreateNewVertex(lastValid.first);
-          associatedVertexSourceProperty_[v_nextM1]=vpathM0.at(k);
-          associatedVertexTargetProperty_[v_nextM1]=vpathM0.at(k);
-          associatedTProperty_[v_nextM1]=0;
-          totalNumberOfSamples++;
-
-          double dl = M1->distance(lastValid.first, s_prevM1);
-          boost::add_edge(v_prevM1, v_nextM1, EdgeProperty(ob::Cost(dl)), g_);
-          uniteComponents(v_prevM1, v_nextM1);
-
-          nn_->add(v_nextM1);
-          v_prevM1 = v_nextM1;
-          s_prevM1 = lastValid.first;
+      if(!si_->isValid(spathM1.at(k-1))){
+        break;
+      }
+      if(!si_->checkMotion(spathM1.at(k-1),spathM1.at(k), lastValid)){
+        if(lastValid.second < std::numeric_limits<double>::epsilon()){
+          break;
         }else{
-          //no progress made, return
+          Vertex v_nextM1 = CreateNewVertex(lastValid.first);
+          if(DEBUG) std::cout << "progress: " <<lastValid.second << std::endl;
+          if(k==1){
+
+            if(DEBUG) std::cout << "first" << std::endl;
+            Vertex vM0 = associatedVertexSourceProperty_[v_first];
+
+            double T1 = associatedTProperty_[v_first];
+            double T2 = lastValid.second;
+
+            if(vM0 == vpathM0.at(1)){
+              vM0 = associatedVertexTargetProperty_[v_first];
+              associatedTProperty_[v_nextM1]=T1-(T2*T1);
+            }else{
+              associatedTProperty_[v_nextM1]=T1+T2*(1-T1);
+            }
+
+            associatedVertexSourceProperty_[v_nextM1]=vM0;
+            associatedVertexTargetProperty_[v_nextM1]=vpathM0.at(k);
+
+
+          }else{
+            if(k>=spathM1.size()-1){
+              //vpathM0(size-2) is the last graph vertex, vpathM0(size-1) is the
+              //vertex which we have deleted again.
+              if(DEBUG) std::cout << "last" << std::endl;
+              Vertex vM0 = associatedVertexTargetProperty_[v_last];
+              double T1 = associatedTProperty_[v_last];
+              double T2 = lastValid.second;
+              if(vM0 == vpathM0.at(vpathM0.size()-2)){
+                vM0 = associatedVertexSourceProperty_[v_last];
+                associatedTProperty_[v_nextM1]=T1+(1-T2)*(1-T1);
+              }else{
+                associatedTProperty_[v_nextM1]=T1*T2;
+              }
+              associatedVertexSourceProperty_[v_nextM1]=vpathM0.at(vpathM0.size()-2);
+              associatedVertexTargetProperty_[v_nextM1]=vM0;
+
+              //double dv = M0->distance(PRMprevious->stateProperty_[vM0], PRMprevious->stateProperty_[vpathM0.at(k)]);
+            }else{
+              if(DEBUG) std::cout << "in between" << std::endl;
+
+              associatedVertexSourceProperty_[v_nextM1]=vpathM0.at(k-1);
+              associatedVertexTargetProperty_[v_nextM1]=vpathM0.at(k);
+              associatedTProperty_[v_nextM1]=lastValid.second;
+            }
+          }
+          if(DEBUG){
+            std::cout << "new vertex associated edges: " 
+            << associatedVertexSourceProperty_[v_nextM1] << "<->"
+            << associatedVertexTargetProperty_[v_nextM1] << " ("
+            << associatedTProperty_[v_nextM1] << ")"
+            << std::endl;
+          }
+
+          double dk = M1->distance(spathM1.at(k), stateProperty_[v_nextM1]);
+          boost::add_edge(v_prevM1, v_nextM1, EdgeProperty(ob::Cost(dk)), g_);
+          uniteComponents(v_prevM1, v_nextM1);
+          nn_->add(v_nextM1);
         }
         break;
-      }else{
-        advanced = true;
-        Vertex v_nextM1;
-        if(k==spathM1.size()-1){
-          //last vertex reached
-          v_nextM1 = v_last;
-        }else{
-          v_nextM1 = CreateNewVertex(s_nextM1);
-          associatedVertexSourceProperty_[v_nextM1]=vpathM0.at(k);
-          associatedVertexTargetProperty_[v_nextM1]=vpathM0.at(k);
-          associatedTProperty_[v_nextM1]=0;
-          nn_->add(v_nextM1);
-          totalNumberOfSamples++;
-        }
-
-        double dk = M1->distance(s_prevM1, s_nextM1);
-        boost::add_edge(v_prevM1, v_nextM1, EdgeProperty(ob::Cost(dk)), g_);
-        uniteComponents(v_prevM1, v_nextM1);
-
-        v_prevM1 = v_nextM1;
-        s_prevM1 = s_nextM1;
       }
-    }
 
-    if(advanced){
-      v_first = v_prevM1;
+      if(DEBUG) std::cout << "feasible" << std::endl;
+      Vertex v_nextM1;
+      if(k<spathM1.size()-1){
+        v_nextM1 = CreateNewVertex(spathM1.at(k));
+        associatedVertexSourceProperty_[v_nextM1]=vpathM0.at(k);
+        associatedVertexTargetProperty_[v_nextM1]=vpathM0.at(k);
+        associatedTProperty_[v_nextM1]=0;
+        nn_->add(v_nextM1);
+        totalNumberOfSamples++;
+      }else{
+        v_nextM1 = v_last;
+      }
+
+      double dk = M1->distance(spathM1.at(k-1),spathM1.at(k));
+      boost::add_edge(v_prevM1, v_nextM1, EdgeProperty(ob::Cost(dk)), g_);
+      uniteComponents(v_prevM1, v_nextM1);
+      v_prevM1 = v_nextM1;
     }
 
   }
-  //exit(0);
 }
 

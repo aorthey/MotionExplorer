@@ -38,6 +38,8 @@ namespace ompl
         virtual ompl::PDF<og::PRMBasic::Edge> GetEdgePDF() override;
 
         virtual void RandomWalk(const Vertex &v) override;
+
+
       public:
         double percentageSamplesOnShortestPath{0.2};
         double goalBias_{0.05};

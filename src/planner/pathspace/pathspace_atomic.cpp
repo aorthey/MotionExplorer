@@ -24,7 +24,7 @@ void PathSpaceAtomic::DrawGL(GUIState& state){
   if(state("planner_draw_start_configuration")) GLDraw::drawRobotAtConfig(robot, qi_in, lightGreen);
   if(state("planner_draw_goal_configuration")) GLDraw::drawRobotAtConfig(robot, qg_in, lightRed);
 
-  if(path_ompl){
+  if(state("draw_path") && path_ompl){
     path_ompl->DrawGL(state);
   }
 }

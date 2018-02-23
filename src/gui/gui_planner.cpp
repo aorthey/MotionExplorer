@@ -70,6 +70,8 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     state("roadmap_visualize_level_3").toggle();
   }else if(cmd=="draw_roadmap"){
     state("draw_roadmap").toggle();
+  }else if(cmd=="draw_path"){
+    state("draw_path").toggle();
   }else if(cmd=="draw_roadmap_swathvolume"){
     state("draw_roadmap_swathvolume").toggle();
   }else if(cmd=="draw_roadmap_volume"){
