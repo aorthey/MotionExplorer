@@ -135,7 +135,7 @@
     <name>roadmap_visualize_level_0</name>
     <descr>Roadmap Vis Level 0</descr>
     <key>6</key>
-    <active>1</active>
+    <active>0</active>
   </checkbox>
   <checkbox>
     <name>roadmap_visualize_level_1</name>
@@ -200,7 +200,7 @@
     <name>draw_path</name>
     <descr>Draw Path</descr>
     <key>g</key>
-    <active>1</active>
+    <active>0</active>
   </checkbox>
 
   <property name="draw_roadmap_shortest_path" enabled="1"/>

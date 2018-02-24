@@ -179,10 +179,14 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     //static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
     //benchmark.addPlanner(planner);
 
-    //typedef og::MultiQuotient<og::PRMQuotient> MultiPRMQuotient;
-    typedef og::MultiQuotient<og::RRTUnidirectional> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec,"RRTUnidirectional");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+    typedef og::MultiQuotient<og::PRMQuotient> MultiPRMQuotient;
+    planner = std::make_shared<MultiPRMQuotient>(si_vec,"PRM");
+    static_pointer_cast<MultiPRMQuotient>(planner)->setProblemDefinition(pdef_vec);
+    benchmark.addPlanner(planner);
+
+    typedef og::MultiQuotient<og::PRMQuotientConnect> MultiPRMConnectQuotient;
+    planner = std::make_shared<MultiPRMConnectQuotient>(si_vec,"PRMConnect");
+    static_pointer_cast<MultiPRMConnectQuotient>(planner)->setProblemDefinition(pdef_vec);
     benchmark.addPlanner(planner);
 
     //typedef og::MultiQuotient<og::PRMQuotientConnect, og::RRTBidirectional> MultiPRMRRTQuotient;
@@ -208,9 +212,9 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 1200;
+    req.maxTime = 3;
     req.maxMem = 10000.0;
-    req.runCount = 10;
+    req.runCount = 2;
     req.displayProgress = true;
 
     benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));

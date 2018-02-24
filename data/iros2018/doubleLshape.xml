@@ -13,10 +13,15 @@
    <robot name="sphere_outer" file="/home/aorthey/git/orthoklampt/data/robots/DoubleLshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
    <!--
+  <rigidObject name="doublelshape.tri" file="/home/aorthey/git/orthoklampt/data/terrains/DoubleLshape_large.tri" translation="0 0 0">
+     <display color="0.8 0.8 0.8 0.5" texture="checker" texture_projection="z"/> 
+  </rigidObject>
   <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="2 -2 0" rotateRPY="0 0 1.57"/>
   <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="1 0 2" rotateRPY="0 0 1.57"/>
   <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
-  <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
+  <rigidObject name="doublelshape.tri" file="/home/aorthey/git/orthoklampt/data/terrains/DoubleLshape_large.tri" translation="0 0 0">
+     <display color="0.8 0.8 0.8 0.5" texture="checker" texture_projection="z"/> 
+  </rigidObject>
   -->
   <rigidObject name="doublelshape.tri" file="/home/aorthey/git/orthoklampt/data/terrains/DoubleLshape_large.tri" translation="0 0 0">
      <display color="0.8 0.8 0.8 0.5" texture="checker" texture_projection="z"/> 
@@ -36,7 +41,7 @@
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.01</epsilongoalregion>
     <smoothPath>0</smoothPath>
-    <maxplanningtime>3</maxplanningtime>
+    <maxplanningtime>0.005</maxplanningtime>
     <enableSufficiency>1</enableSufficiency>
 
     <sampler name="uniform"/>

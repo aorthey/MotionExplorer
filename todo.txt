@@ -431,4 +431,6 @@ Papers:
 Sampling from Large Graphs
 A Survey and Taxonomy of Graph Sampling
 
+[x] too many random walks start at vertex 0, why is that? -> nan values in pdf
+[ ] edges are too long
 

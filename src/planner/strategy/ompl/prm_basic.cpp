@@ -22,9 +22,9 @@ namespace ompl
 {
   namespace magic
   {
-    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 1;
+    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 3;
     static const double ROADMAP_BUILD_TIME = 0.01;
-    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
+    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
   }
 }
 PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si, Quotient *previous_)
@@ -69,7 +69,6 @@ void PRMBasic::ClearVertices()
 }
 void PRMBasic::clear()
 {
-  std::cout << "PRMBasic: clear" << std::endl;
   Planner::clear();
 
   ClearVertices();
@@ -132,8 +131,8 @@ ob::PlannerStatus PRMBasic::solve(const ob::PlannerTerminationCondition &ptc){
 void PRMBasic::Grow(double t){
   double T_grow = (2.0/3.0)*t;
   growRoadmap(ob::timedPlannerTerminationCondition(T_grow), xstates[0]);
-  double T_expand = (1.0/3.0)*t;
-  expandRoadmap( ob::timedPlannerTerminationCondition(T_expand), xstates);
+  //double T_expand = (1.0/3.0)*t;
+  //expandRoadmap( ob::timedPlannerTerminationCondition(T_expand), xstates);
 }
 
 void PRMBasic::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState)
@@ -168,7 +167,16 @@ void PRMBasic::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
   foreach (Vertex v, boost::vertices(g_))
   {
     const unsigned long int t = totalConnectionAttemptsProperty_[v];
-    pdf.add(v, (double)(t - successfulConnectionAttemptsProperty_[v]) / (double)t);
+    if(t!=0){
+      double d = ((double)(t - successfulConnectionAttemptsProperty_[v]) / (double)t);
+      pdf.add(v, d);
+    }
+    // if(std::isnan(d)){
+    //   std::cout << "vertex " << v << " d=" << d << std::endl;
+    //   std::cout << "total   =" << totalConnectionAttemptsProperty_[v] << std::endl;
+    //   std::cout << "success =" << successfulConnectionAttemptsProperty_[v] << std::endl;
+    //   exit(0);
+    // }
   }
 
   if (pdf.empty())
@@ -339,6 +347,7 @@ void PRMBasic::ConnectVertexToNeighbors(Vertex m)
   }
   nn_->add(m);
 }
+
 PRMBasic::Vertex PRMBasic::CreateNewVertex(ob::State *state)
 {
   Vertex m = boost::add_vertex(g_);
@@ -350,29 +359,6 @@ PRMBasic::Vertex PRMBasic::CreateNewVertex(ob::State *state)
   return m;
 }
 
-void PRMBasic::getPlannerData(ob::PlannerData &data) const
-{
-  for (unsigned long i : startM_)
-    data.addStartVertex(
-      PlannerDataVertexAnnotated(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
-
-  for (unsigned long i : goalM_)
-    data.addGoalVertex(
-      PlannerDataVertexAnnotated(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
-
-  std::cout << "  edges    : " << boost::num_edges(g_) << std::endl;
-  std::cout << "  vertices : " << boost::num_vertices(g_) << std::endl;
-  foreach (const Edge e, boost::edges(g_))
-  {
-    const Vertex v1 = boost::source(e, g_);
-    const Vertex v2 = boost::target(e, g_);
-    data.addEdge(PlannerDataVertexAnnotated(stateProperty_[v1]), PlannerDataVertexAnnotated(stateProperty_[v2]));
-    //data.addEdge(ob::PlannerDataVertex(stateProperty_[v2]), ob::PlannerDataVertex(stateProperty_[v1]));
-    data.tagState(stateProperty_[v1], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v1));
-    data.tagState(stateProperty_[v2], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v2));
-  }
-}
-
 void PRMBasic::setup(){
   if (!nn_){
     nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
@@ -382,7 +368,13 @@ void PRMBasic::setup(){
                              });
   }
   if (!connectionStrategy_){
-    connectionStrategy_ = KStrategy<Vertex>(magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
+    //connectionStrategy_ = KStrategy<Vertex>(magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
+    connectionStrategy_ = KStarStrategy<Vertex>(
+    [this]
+    {
+        return GetNumberOfVertices();
+    },
+    nn_, si_->getStateDimension());
   }
 
   if (pdef_){
@@ -536,5 +528,48 @@ void PRMBasic::RandomWalk(const Vertex &v)
       ctr++;
     }
   }
+}
+
+void PRMBasic::getPlannerData(ob::PlannerData &data) const
+{
+  for (unsigned long i : startM_)
+    data.addStartVertex(
+      PlannerDataVertexAnnotated(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
+
+  for (unsigned long i : goalM_)
+    data.addGoalVertex(
+      PlannerDataVertexAnnotated(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
+
+  std::cout << "  edges    : " << boost::num_edges(g_) << std::endl;
+  std::cout << "  vertices : " << boost::num_vertices(g_) << std::endl;
+  foreach (const Edge e, boost::edges(g_))
+  {
+    const Vertex v1 = boost::source(e, g_);
+    const Vertex v2 = boost::target(e, g_);
+    PlannerDataVertexAnnotated p1(stateProperty_[v1]);
+    PlannerDataVertexAnnotated p2(stateProperty_[v2]);
+
+    data.addEdge(p1,p2);
+
+    data.tagState(stateProperty_[v1], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v1));
+    data.tagState(stateProperty_[v2], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v2));
+  }
+
+  foreach(const Vertex v, boost::vertices(g_))
+  {
+    PlannerDataVertexAnnotated &va = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(v));
+    if(boost::same_component(v, startM_.at(0), const_cast<PRMBasic*>(this)->disjointSets_))
+    {
+      va.SetComponent(0);
+    }else{
+      if(boost::same_component(v, goalM_.at(0), const_cast<PRMBasic*>(this)->disjointSets_))
+      {
+        va.SetComponent(1);
+      }else{
+        va.SetComponent(2);
+      }
+    }
+  }
+  // std::cout << std::string(80, '-') << std::endl;
 }
 

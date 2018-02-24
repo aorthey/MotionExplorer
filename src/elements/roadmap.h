@@ -20,7 +20,14 @@ class Roadmap{
 
     virtual void DrawGL(GUIState&);
 
-    GLDraw::GLColor cVertex, cEdge, cPath;
+    GLDraw::GLColor cVertex{green};
+    GLDraw::GLColor cEdge{green};
+    GLDraw::GLColor cPath{magenta};
+    GLDraw::GLColor cVertexOut{gray}; //a vertex not in the same component as the designated start vertex
+    double sizeVertex{6};
+    double widthEdge{10};
+    double widthPath{15};
+
     uint numEdges();
     uint numVertices();
 

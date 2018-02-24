@@ -23,7 +23,6 @@ namespace ompl
   namespace magic
   {
     static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
-    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
   }
 }
 
@@ -31,9 +30,9 @@ PRMQuotientConnect::PRMQuotientConnect(const ob::SpaceInformationPtr &si, Quotie
   PRMQuotient(si, previous_)
 {
   setName("PRMQuotientConnect"+to_string(id));
-  goalBias_ = 0.05;
+  goalBias_ = 0.0;
   epsilon = 0.0;
-  percentageSamplesOnShortestPath = 0.05;
+  percentageSamplesOnShortestPath = 1;
 
 }
 
@@ -53,9 +52,6 @@ void PRMQuotientConnect::setup()
                              {
                                return PRMQuotientConnect::Distance(a,b);
                              });
-  }
-  if (!connectionStrategy_){
-    connectionStrategy_ = KStrategy<Vertex>(magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
   }
 
   if (pdef_){
@@ -208,6 +204,7 @@ double PRMQuotientConnect::Distance(const Vertex a, const Vertex b) const
 }
 
 bool PRMQuotientConnect::Connect(const Vertex a, const Vertex b){
+
   if(previous==nullptr){
     return PRMQuotient::Connect(a,b);
   }else{
@@ -563,6 +560,8 @@ void PRMQuotientConnect::RandomWalk(const Vertex &v)
     M0->freeState(s_last_M0);
     C1->freeState(s_last_C1);
 
+    if(!M1->isValid(s_last)) continue;
+
     //#########################################################################
     //compute interpolation between s_prev and s_last on G_{k-1}
     // the resulting datastructures are
@@ -571,8 +570,8 @@ void PRMQuotientConnect::RandomWalk(const Vertex &v)
     // std::vector<ob::State *> spath
     //#########################################################################
 
-    //Vertex v_last = addMilestone(s_last);
-    Vertex v_last = CreateNewVertex(s_last);
+    Vertex v_last = addMilestone(s_last);
+    //Vertex v_last = CreateNewVertex(s_last);
 
     ob::PathPtr solM1 = InterpolateM1GraphConstraint(v_first, v_last);
     if(!solM1){

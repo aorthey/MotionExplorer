@@ -13,9 +13,6 @@ using Vertex = Graph::Vertex;
 
 Roadmap::Roadmap()
 {
-  cVertex = green;
-  cEdge = green;
-  cPath = magenta;
 }
 uint Roadmap::numEdges()
 {
@@ -142,7 +139,7 @@ void Roadmap::DrawPathGL(GUIState &state, std::vector<Vector3> &q)
   if(q.size()>1 && state("draw_roadmap_shortest_path"))
   {
     glPushMatrix();
-    glLineWidth(10);
+    glLineWidth(widthPath);
     setColor(cPath);
     for(uint k = 0; k < q.size()-1; k++){
       Vector3 v1 = q.at(k);
@@ -155,6 +152,7 @@ void Roadmap::DrawPathGL(GUIState &state, std::vector<Vector3> &q)
 
 void Roadmap::DrawSingleLevelGL(GUIState &state, ob::PlannerDataPtr pd)
 {
+  glPointSize(sizeVertex);
   if(state("draw_roadmap_vertices")){
     setColor(cVertex);
     for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
@@ -162,10 +160,15 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, ob::PlannerDataPtr pd)
 
       ob::PlannerDataVertex *vd = &pd->getVertex(vidx);
       Vector3 q = cspace->getXYZ(vd->getState());
-      drawPoint(q);
-
       PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+
       if(v!=nullptr){
+        if(v->GetComponent()==0){
+          setColor(cVertex);
+        }else{
+          setColor(cVertexOut);
+        }
+        drawPoint(q);
         if(state("draw_roadmap_volume")){
           glTranslate(q);
           double d = v->GetOpenNeighborhoodDistance();
@@ -178,23 +181,38 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, ob::PlannerDataPtr pd)
             drawSphere(d,16,8);
           }
         }
+      }else{
+        drawPoint(q);
       }
       glPopMatrix();
     }
   }
 
-  glLineWidth(5);
+  glLineWidth(widthEdge);
   if(state("draw_roadmap_edges")){
+    ompl::RNG rng(0);
     setColor(cEdge);
     for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
       ob::PlannerDataVertex *v = &pd->getVertex(vidx);
+      PlannerDataVertexAnnotated *va = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+
       std::vector<uint> edgeList;
       pd->getEdges(vidx, edgeList);
       for(uint j = 0; j < edgeList.size(); j++){
         ob::PlannerDataVertex *w = &pd->getVertex(edgeList.at(j));
+        PlannerDataVertexAnnotated *wa = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
         Vector3 v1 = cspace->getXYZ(v->getState());
         Vector3 v2 = cspace->getXYZ(w->getState());
-        drawLineSegment(v1,v2);
+        if(va==nullptr || wa==nullptr){
+          drawLineSegment(v1,v2);
+        }else{
+          if(va->GetComponent()==0 && wa->GetComponent()==0){
+            setColor(cVertex);
+          }else{
+            setColor(cVertexOut);
+          }
+          drawLineSegment(v1,v2);
+        }
       }
     }
   }
@@ -204,8 +222,6 @@ void Roadmap::DrawGL(GUIState& state)
 {
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND); 
-
-  glPointSize(10);
 
   uint N = roadmaps_level.size();
   for(uint k = 0; k < N; k++){

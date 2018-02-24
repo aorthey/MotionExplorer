@@ -190,7 +190,6 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
 
   for(uint k = 0; k < K; k++){
     og::Quotient *Qk = quotientSpaces.at(k);
-    //get all vertices
     Qk->getPlannerData(data);
 
     //remove start and goal vertices for all expect the last space (@TODO WHY?
