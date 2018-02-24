@@ -1,7 +1,7 @@
 #include "plannerdata_vertex_annotated.h"
 
 PlannerDataVertexAnnotated::PlannerDataVertexAnnotated(const ob::State *st, int tag, double d_):
-      ob::PlannerDataVertex(st,tag), open_neighborhood_distance(d_), level(0), max_level(0), component(1)
+      ob::PlannerDataVertex(st,tag), open_neighborhood_distance(d_)
 {
 }
 

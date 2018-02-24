@@ -465,6 +465,7 @@ ob::PathPtr PRMQuotientConnect::GetShortestPathOffsetVertices(const ob::State *q
 
     ob::Cost db = opt_->motionCost(stateProperty_[vsb], stateProperty_[vtb]);
     boost::add_edge(vsb, vtb, EdgeProperty(db), g_);
+    uniteComponents(vsb, vtb);
   }
   if(isAonEdge){
     boost::remove_edge(vsa, va, g_);
@@ -476,6 +477,7 @@ ob::PathPtr PRMQuotientConnect::GetShortestPathOffsetVertices(const ob::State *q
 
     ob::Cost da = opt_->motionCost(stateProperty_[vsa], stateProperty_[vta]);
     boost::add_edge(vsa, vta, EdgeProperty(da), g_);
+    uniteComponents(vsa, vta);
   }
 
   return path;

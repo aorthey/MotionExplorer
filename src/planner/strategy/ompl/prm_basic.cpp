@@ -231,36 +231,37 @@ bool PRMBasic::maybeConstructSolution(const std::vector<Vertex> &starts, const s
             //#################################################################
             //clean up roadmap
             //#################################################################
-            std::vector<Edge> unconnectedEdges;
-            uint ctr = 0;
-            foreach (Edge e, boost::edges(g_))
-            {
-              ctr++;
-              const Vertex v1 = boost::source(e, g_);
-              if(!sameComponent(v1, startM_.at(0))){
-                unconnectedEdges.push_back(e);
-              }
-            }
-            std::cout << "found " << unconnectedEdges.size() << "/" << ctr <<" unconnectedEdges"  << std::endl;
-            for(uint k = 0; k < unconnectedEdges.size(); k++){
-              Edge e = unconnectedEdges.at(k);
-              const Vertex v1 = boost::source(e, g_);
-              const Vertex v2 = boost::target(e, g_);
-              boost::remove_edge(boost::vertex(v1, g_), boost::vertex(v2,g_), g_);
-            }
-            //uint Nv = boost::num_vertices(g_);
-            ctr = 0;
-            foreach (Vertex v, boost::vertices(g_))
-            {
-              int numberOfInEdges = boost::in_degree(v,g_);
-              if(v>1 && numberOfInEdges<=0)
-              {
-                ctr++;
-                //si_->freeState(stateProperty_[v]);
-                nn_->remove(v);
-                //boost::remove_vertex(boost::vertex(v, g_), g_);
-              }
-            }
+            // std::vector<Edge> unconnectedEdges;
+            // uint ctr = 0;
+            // foreach (Edge e, boost::edges(g_))
+            // {
+            //   ctr++;
+            //   const Vertex v1 = boost::source(e, g_);
+            //   if(!sameComponent(v1, startM_.at(0))){
+            //     unconnectedEdges.push_back(e);
+            //   }
+            // }
+            // std::cout << "found " << unconnectedEdges.size() << "/" << ctr <<" unconnectedEdges"  << std::endl;
+            // for(uint k = 0; k < unconnectedEdges.size(); k++){
+            //   Edge e = unconnectedEdges.at(k);
+            //   const Vertex v1 = boost::source(e, g_);
+            //   const Vertex v2 = boost::target(e, g_);
+            //   boost::remove_edge(boost::vertex(v1, g_), boost::vertex(v2,g_), g_);
+            // }
+            // //uint Nv = boost::num_vertices(g_);
+            // ctr = 0;
+            // foreach (Vertex v, boost::vertices(g_))
+            // {
+            //   int numberOfInEdges = boost::in_degree(v,g_);
+            //   if(v>1 && numberOfInEdges<=0)
+            //   {
+            //     ctr++;
+            //     //si_->freeState(stateProperty_[v]);
+            //     nn_->remove(v);
+            //     //boost::remove_vertex(boost::vertex(v, g_), g_);
+            //   }
+            // }
+            // uniteComponents(startM_.at(0), goalM_.at(0));
             //std::cout << "removed " << ctr << "/" << Nv <<" vertices."  << std::endl;
             //#################################################################
             //#################################################################
@@ -542,6 +543,8 @@ void PRMBasic::getPlannerData(ob::PlannerData &data) const
 
   std::cout << "  edges    : " << boost::num_edges(g_) << std::endl;
   std::cout << "  vertices : " << boost::num_vertices(g_) << std::endl;
+  uint startComponent = const_cast<PRMBasic *>(this)->disjointSets_.find_set(startM_.at(0));
+  uint goalComponent = const_cast<PRMBasic *>(this)->disjointSets_.find_set(goalM_.at(0));
   foreach (const Edge e, boost::edges(g_))
   {
     const Vertex v1 = boost::source(e, g_);
@@ -549,27 +552,44 @@ void PRMBasic::getPlannerData(ob::PlannerData &data) const
     PlannerDataVertexAnnotated p1(stateProperty_[v1]);
     PlannerDataVertexAnnotated p2(stateProperty_[v2]);
 
+    //Vertex d1 = data.addVertex(p1);
+    //Vertex d2 = data.addVertex(p2);
     data.addEdge(p1,p2);
 
-    data.tagState(stateProperty_[v1], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v1));
-    data.tagState(stateProperty_[v2], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v2));
-  }
-
-  foreach(const Vertex v, boost::vertices(g_))
-  {
-    PlannerDataVertexAnnotated &va = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(v));
-    if(boost::same_component(v, startM_.at(0), const_cast<PRMBasic*>(this)->disjointSets_))
-    {
-      va.SetComponent(0);
+    //data.tagState(stateProperty_[v1], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v1));
+    //data.tagState(stateProperty_[v2], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v2));
+    uint v1Component = const_cast<PRMBasic *>(this)->disjointSets_.find_set(v1);
+    uint v2Component = const_cast<PRMBasic *>(this)->disjointSets_.find_set(v2);
+    PlannerDataVertexAnnotated &v1a = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(v1));
+    PlannerDataVertexAnnotated &v2a = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(v2));
+    if(v1Component==startComponent || v2Component==startComponent){
+      v1a.SetComponent(0);
+      v2a.SetComponent(0);
+    }else if(v1Component==goalComponent || v2Component==goalComponent){
+      v1a.SetComponent(1);
+      v2a.SetComponent(1);
     }else{
-      if(boost::same_component(v, goalM_.at(0), const_cast<PRMBasic*>(this)->disjointSets_))
-      {
-        va.SetComponent(1);
-      }else{
-        va.SetComponent(2);
-      }
+      v1a.SetComponent(2);
+      v2a.SetComponent(2);
     }
   }
+
+  // //foreach(const Vertex v, boost::vertices(g_))
+  // for(long unsigned int v = 0; v < data.numVertices(); v++)
+  // {
+  //   PlannerDataVertexAnnotated &va = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(v));
+  //   if(boost::same_component(v, startM_.at(0), const_cast<PRMBasic*>(this)->disjointSets_))
+  //   {
+  //     va.SetComponent(0);
+  //   }else{
+  //     if(boost::same_component(v, goalM_.at(0), const_cast<PRMBasic*>(this)->disjointSets_))
+  //     {
+  //       va.SetComponent(1);
+  //     }else{
+  //       va.SetComponent(2);
+  //     }
+  //   }
+  // }
   // std::cout << std::string(80, '-') << std::endl;
 }
 

@@ -31,7 +31,7 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
   protected:
     double open_neighborhood_distance{0.0};
     uint level{0};
-    uint max_level{0};
+    uint max_level{1};
     uint component{1};
 
     //template <class Archive>

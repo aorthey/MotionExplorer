@@ -165,6 +165,8 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, ob::PlannerDataPtr pd)
       if(v!=nullptr){
         if(v->GetComponent()==0){
           setColor(cVertex);
+        }else if(v->GetComponent()==1){
+          setColor(cVertexGoal);
         }else{
           setColor(cVertexOut);
         }
@@ -206,7 +208,7 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, ob::PlannerDataPtr pd)
         if(va==nullptr || wa==nullptr){
           drawLineSegment(v1,v2);
         }else{
-          if(va->GetComponent()==0 && wa->GetComponent()==0){
+          if(va->GetComponent()==0 || wa->GetComponent()==0){
             setColor(cVertex);
           }else{
             setColor(cVertexOut);

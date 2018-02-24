@@ -148,6 +148,11 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     typedef og::MultiQuotient<og::RRTUnidirectional> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec,"RRT");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+
+  }else if(algorithm=="ompl:prm_basic"){
+    planner = std::make_shared<og::PRMBasic>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
+
   }else if(algorithm=="ompl:qmp_prm_connect"){
     typedef og::MultiQuotient<og::PRMQuotientConnect> MultiQuotient;
     //typedef og::MultiQuotient<og::PRMQuotientConnect, og::RRTBidirectional> MultiQuotient;
