@@ -6,7 +6,6 @@
 #include "planner/validitychecker/validity_checker_ompl.h"
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 
-
 using namespace GLDraw;
 using Graph = ob::PlannerData::Graph;
 using Vertex = Graph::Vertex;
@@ -14,6 +13,7 @@ using Vertex = Graph::Vertex;
 Roadmap::Roadmap()
 {
 }
+
 uint Roadmap::numEdges()
 {
   uint edge_ctr = 0;
@@ -22,6 +22,7 @@ uint Roadmap::numEdges()
   }
   return edge_ctr;
 }
+
 uint Roadmap::numVertices()
 {
   uint vertex_ctr = 0;
@@ -170,6 +171,8 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, ob::PlannerDataPtr pd)
         }else{
           setColor(cVertexOut);
         }
+        //std::cout << "vertex " << vidx << " component " << v->GetComponent() << std::endl;
+        if(v->GetComponent()==99) exit(0);
         drawPoint(q);
         if(state("draw_roadmap_volume")){
           glTranslate(q);

@@ -534,13 +534,23 @@ void PRMBasic::RandomWalk(const Vertex &v)
 void PRMBasic::getPlannerData(ob::PlannerData &data) const
 {
   for (unsigned long i : startM_)
-    data.addStartVertex(
-      PlannerDataVertexAnnotated(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
+  {
+    PlannerDataVertexAnnotated pstart(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i));
+    pstart.SetComponent(0);
+    data.addStartVertex(pstart);
+    //PlannerDataVertexAnnotated &va = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vstart));
+    //va.SetComponent(0);
+  }
 
   for (unsigned long i : goalM_)
-    data.addGoalVertex(
-      PlannerDataVertexAnnotated(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i)));
+  {
+    PlannerDataVertexAnnotated pgoal(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i));
+    pgoal.SetComponent(1);
+    data.addGoalVertex(pgoal);
+  }
 
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "getPlannerData" << std::endl;
   std::cout << "  edges    : " << boost::num_edges(g_) << std::endl;
   std::cout << "  vertices : " << boost::num_vertices(g_) << std::endl;
   uint startComponent = const_cast<PRMBasic *>(this)->disjointSets_.find_set(startM_.at(0));
@@ -551,17 +561,17 @@ void PRMBasic::getPlannerData(ob::PlannerData &data) const
     const Vertex v2 = boost::target(e, g_);
     PlannerDataVertexAnnotated p1(stateProperty_[v1]);
     PlannerDataVertexAnnotated p2(stateProperty_[v2]);
+    uint vi1 = data.addVertex(p1);
+    uint vi2 = data.addVertex(p2);
 
-    //Vertex d1 = data.addVertex(p1);
-    //Vertex d2 = data.addVertex(p2);
     data.addEdge(p1,p2);
 
     //data.tagState(stateProperty_[v1], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v1));
     //data.tagState(stateProperty_[v2], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v2));
     uint v1Component = const_cast<PRMBasic *>(this)->disjointSets_.find_set(v1);
     uint v2Component = const_cast<PRMBasic *>(this)->disjointSets_.find_set(v2);
-    PlannerDataVertexAnnotated &v1a = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(v1));
-    PlannerDataVertexAnnotated &v2a = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(v2));
+    PlannerDataVertexAnnotated &v1a = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vi1));
+    PlannerDataVertexAnnotated &v2a = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vi2));
     if(v1Component==startComponent || v2Component==startComponent){
       v1a.SetComponent(0);
       v2a.SetComponent(0);
@@ -572,24 +582,31 @@ void PRMBasic::getPlannerData(ob::PlannerData &data) const
       v1a.SetComponent(2);
       v2a.SetComponent(2);
     }
+    // std::cout << "vertex " << vi1 << " component " << v1a.GetComponent() << std::endl;
+    // std::cout << "vertex " << vi2 << " component " << v2a.GetComponent() << std::endl;
   }
+  std::cout << std::string(80, '-') << std::endl;
 
   // //foreach(const Vertex v, boost::vertices(g_))
-  // for(long unsigned int v = 0; v < data.numVertices(); v++)
-  // {
-  //   PlannerDataVertexAnnotated &va = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(v));
-  //   if(boost::same_component(v, startM_.at(0), const_cast<PRMBasic*>(this)->disjointSets_))
-  //   {
-  //     va.SetComponent(0);
-  //   }else{
-  //     if(boost::same_component(v, goalM_.at(0), const_cast<PRMBasic*>(this)->disjointSets_))
-  //     {
-  //       va.SetComponent(1);
-  //     }else{
-  //       va.SetComponent(2);
-  //     }
-  //   }
-  // }
+  bool stopper = false;
+  for(long unsigned int v = 0; v < data.numVertices(); v++)
+  {
+    PlannerDataVertexAnnotated &va = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(v));
+    //std::cout << "vertex " << v << " component " << va.GetComponent() << std::endl;
+    if(va.GetComponent()>=99) stopper = true;
+    //if(boost::same_component(v, startM_.at(0), const_cast<PRMBasic*>(this)->disjointSets_))
+    //{
+    //  va.SetComponent(0);
+    //}else{
+    //  if(boost::same_component(v, goalM_.at(0), const_cast<PRMBasic*>(this)->disjointSets_))
+    //  {
+    //    va.SetComponent(1);
+    //  }else{
+    //    va.SetComponent(2);
+    //  }
+    //}
+  }
+  if(stopper) exit(0);
   // std::cout << std::string(80, '-') << std::endl;
 }
 

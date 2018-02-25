@@ -8,31 +8,32 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
   public:
     PlannerDataVertexAnnotated(const ob::State *st, int tag=0, double d_ = 0.0);
     PlannerDataVertexAnnotated (const PlannerDataVertexAnnotated &rhs);
-    double GetOpenNeighborhoodDistance() const;
-    void SetOpenNeighborhoodDistance(double d_);
     virtual PlannerDataVertex *clone() const override;
+
+    void SetOpenNeighborhoodDistance(double d_);
+    double GetOpenNeighborhoodDistance() const;
     void SetLevel(uint level_);
     uint GetLevel() const;
     void SetMaxLevel(uint level_);
     uint GetMaxLevel() const;
     void SetComponent(uint component_);
     uint GetComponent() const;
-
-    virtual const ob::State *getState() const override;
     void setState(ob::State *s);
+    virtual const ob::State *getState() const override;
 
-
-    //virtual bool operator==(const PlannerDataVertex &rhs) const override
-    //{
-    //  return state_ == rhs.state_;
-    //}
-
+    virtual bool operator==(const PlannerDataVertex &rhs) const override
+    {
+      return state_ == rhs.getState();
+    }
 
   protected:
     double open_neighborhood_distance{0.0};
     uint level{0};
     uint max_level{1};
-    uint component{1};
+    uint component{99};
+
+    enum ComponentType{START_COMPONENT, GOAL_COMPONENT, OUTLIER_COMPONENT, UNKNOWN};
+    ComponentType component_t;
 
     //template <class Archive>
     //void serialize(Archive & ar, const unsigned int version)
