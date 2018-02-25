@@ -26,6 +26,7 @@ namespace ompl
         ob::PathPtr InterpolateM1GraphConstraint( const Vertex a, const Vertex b) const;
 
         void setup() override;
+        virtual void clear() override;
         virtual void Init() override;
 
       protected:
@@ -41,7 +42,6 @@ namespace ompl
 
 
       public:
-        double percentageSamplesOnShortestPath{0.2};
         double goalBias_{0.05};
         int lastSourceVertexSampled{-1};
         int lastTargetVertexSampled{-1};

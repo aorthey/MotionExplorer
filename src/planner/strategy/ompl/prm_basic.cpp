@@ -69,7 +69,7 @@ void PRMBasic::ClearVertices()
 }
 void PRMBasic::clear()
 {
-  Planner::clear();
+  Quotient::clear();
 
   ClearVertices();
   g_.clear();
@@ -80,6 +80,8 @@ void PRMBasic::clear()
 
   iterations_ = 0;
   bestCost_ = ob::Cost(dInf);
+  setup_ = false;
+  addedNewSolution_ = false;
 }
 
 void PRMBasic::clearQuery()
@@ -131,8 +133,8 @@ ob::PlannerStatus PRMBasic::solve(const ob::PlannerTerminationCondition &ptc){
 void PRMBasic::Grow(double t){
   double T_grow = (2.0/3.0)*t;
   growRoadmap(ob::timedPlannerTerminationCondition(T_grow), xstates[0]);
-  //double T_expand = (1.0/3.0)*t;
-  //expandRoadmap( ob::timedPlannerTerminationCondition(T_expand), xstates);
+  double T_expand = (1.0/3.0)*t;
+  expandRoadmap( ob::timedPlannerTerminationCondition(T_expand), xstates);
 }
 
 void PRMBasic::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState)
@@ -533,13 +535,14 @@ void PRMBasic::RandomWalk(const Vertex &v)
 
 void PRMBasic::getPlannerData(ob::PlannerData &data) const
 {
+  uint startComponent = 0;//const_cast<PRMBasic *>(this)->disjointSets_.find_set(startM_.at(0));
+  uint goalComponent = 1;//const_cast<PRMBasic *>(this)->disjointSets_.find_set(goalM_.at(0));
   for (unsigned long i : startM_)
   {
-    PlannerDataVertexAnnotated pstart(stateProperty_[i], const_cast<PRMBasic *>(this)->disjointSets_.find_set(i));
+    startComponent = const_cast<PRMBasic *>(this)->disjointSets_.find_set(i);
+    PlannerDataVertexAnnotated pstart(stateProperty_[i], startComponent);
     pstart.SetComponent(0);
     data.addStartVertex(pstart);
-    //PlannerDataVertexAnnotated &va = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vstart));
-    //va.SetComponent(0);
   }
 
   for (unsigned long i : goalM_)
@@ -549,12 +552,10 @@ void PRMBasic::getPlannerData(ob::PlannerData &data) const
     data.addGoalVertex(pgoal);
   }
 
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "getPlannerData" << std::endl;
-  std::cout << "  edges    : " << boost::num_edges(g_) << std::endl;
-  std::cout << "  vertices : " << boost::num_vertices(g_) << std::endl;
-  uint startComponent = const_cast<PRMBasic *>(this)->disjointSets_.find_set(startM_.at(0));
-  uint goalComponent = const_cast<PRMBasic *>(this)->disjointSets_.find_set(goalM_.at(0));
+  //std::cout << std::string(80, '-') << std::endl;
+  //std::cout << "getPlannerData" << std::endl;
+  //std::cout << "  edges    : " << boost::num_edges(g_) << std::endl;
+  //std::cout << "  vertices : " << boost::num_vertices(g_) << std::endl;
   foreach (const Edge e, boost::edges(g_))
   {
     const Vertex v1 = boost::source(e, g_);
@@ -585,15 +586,15 @@ void PRMBasic::getPlannerData(ob::PlannerData &data) const
     // std::cout << "vertex " << vi1 << " component " << v1a.GetComponent() << std::endl;
     // std::cout << "vertex " << vi2 << " component " << v2a.GetComponent() << std::endl;
   }
-  std::cout << std::string(80, '-') << std::endl;
+  //std::cout << std::string(80, '-') << std::endl;
 
   // //foreach(const Vertex v, boost::vertices(g_))
-  bool stopper = false;
-  for(long unsigned int v = 0; v < data.numVertices(); v++)
-  {
-    PlannerDataVertexAnnotated &va = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(v));
+  //bool stopper = false;
+  //for(long unsigned int v = 0; v < data.numVertices(); v++)
+  //{
+    //PlannerDataVertexAnnotated &va = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(v));
     //std::cout << "vertex " << v << " component " << va.GetComponent() << std::endl;
-    if(va.GetComponent()>=99) stopper = true;
+    //if(va.GetComponent()>=99) stopper = true;
     //if(boost::same_component(v, startM_.at(0), const_cast<PRMBasic*>(this)->disjointSets_))
     //{
     //  va.SetComponent(0);
@@ -605,8 +606,8 @@ void PRMBasic::getPlannerData(ob::PlannerData &data) const
     //    va.SetComponent(2);
     //  }
     //}
-  }
-  if(stopper) exit(0);
+  //}
+  //if(stopper) exit(0);
   // std::cout << std::string(80, '-') << std::endl;
 }
 

@@ -31,13 +31,19 @@ PRMQuotientConnect::PRMQuotientConnect(const ob::SpaceInformationPtr &si, Quotie
 {
   setName("PRMQuotientConnect"+to_string(id));
   goalBias_ = 0.0;
-  epsilon = 0.0;
-  percentageSamplesOnShortestPath = 1;
-
+  epsilon = 0.1;
+  percentageSamplesOnShortestPath = 0.5;
 }
 
 PRMQuotientConnect::~PRMQuotientConnect(){
+}
 
+void PRMQuotientConnect::clear(){
+  PRMQuotient::clear();
+  lastSourceVertexSampled = -1;
+  lastTargetVertexSampled = -1;
+  lastTSampled = 0;
+  isSampled = false;
 }
 
 void PRMQuotientConnect::setup()
@@ -77,7 +83,7 @@ void PRMQuotientConnect::setup()
       associatedVertexSourceProperty_[m] = PRMprevious->startM_.at(0);
       associatedVertexTargetProperty_[m] = PRMprevious->startM_.at(0);
       associatedTProperty_[m] = 0;
-      std::cout << "start vertex: " << m << " associated:" << PRMprevious->startM_.at(0) << std::endl;
+      //std::cout << "start vertex: " << m << " associated:" << PRMprevious->startM_.at(0) << std::endl;
       ConnectVertexToNeighbors(m);
       startM_.push_back(m);
     }
@@ -97,7 +103,7 @@ void PRMQuotientConnect::setup()
         associatedVertexSourceProperty_[m] = PRMprevious->goalM_.at(0);
         associatedVertexTargetProperty_[m] = PRMprevious->goalM_.at(0);
         associatedTProperty_[m] = 0;
-        std::cout << "goal vertex: " << m << " associated:" << PRMprevious->goalM_.at(0) << std::endl;
+        //std::cout << "goal vertex: " << m << " associated:" << PRMprevious->goalM_.at(0) << std::endl;
         ConnectVertexToNeighbors(m);
         goalM_.push_back(m);
       }
@@ -170,7 +176,8 @@ bool PRMQuotientConnect::SampleGraph(ob::State *q_random_graph)
 
   M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
 
-  //if(epsilon>0) M1_sampler->sampleGaussian(q_random_graph, q_random_graph, epsilon);
+  if(epsilon>0) M1_sampler->sampleGaussian(q_random_graph, q_random_graph, epsilon);
+  //if(epsilon>0) M1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
 
   lastSourceVertexSampled = v1;
   lastTargetVertexSampled = v2;

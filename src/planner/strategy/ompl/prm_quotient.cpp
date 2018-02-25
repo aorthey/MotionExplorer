@@ -37,7 +37,7 @@ bool PRMQuotient::SampleGraph(ob::State *q_random_graph)
   const ob::State *to = stateProperty_[v2];
 
   M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
-  //M1_sampler->sampleGaussian(q_random_graph, q_random_graph, epsilon);
+  M1_sampler->sampleGaussian(q_random_graph, q_random_graph, epsilon);
   //M1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
 
   return true;
@@ -47,7 +47,7 @@ ompl::PDF<og::PRMBasic::Edge> PRMQuotient::GetEdgePDF()
 {
   PDF<Edge> pdf;
   double t = rng_.uniform01();
-  if(t<0.1)
+  if(t<percentageSamplesOnShortestPath)
   {
     //shortest path heuristic
     foreach (Edge e, boost::edges(g_))

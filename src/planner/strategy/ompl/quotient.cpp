@@ -15,6 +15,17 @@ void Quotient::resetCounter()
 {
   Quotient::counter = 0;
 }
+
+void Quotient::clear()
+{
+  Planner::clear();
+  hasSolution = false;
+  Quotient::counter = 0;
+  totalNumberOfSamples = 0;
+  graphLength = 0;
+  if(previous==nullptr) C1_sampler.reset();
+}
+
 uint Quotient::GetNumberOfSampledVertices()
 {
   return totalNumberOfSamples;
@@ -66,13 +77,6 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_):
   }
 }
 
-void Quotient::clear()
-{
-  M1_sampler.reset();
-  M1_valid_sampler.reset();
-  if(previous==nullptr) C1_sampler.reset();
-}
-
 
 const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const StateSpacePtr M0)
 {
@@ -92,12 +96,15 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const
     // (2) M1 SE2      , M0 R2                 => C1 = SO2
     // (3) M1 SE3      , M0 R3                 => C1 = SO3
     // (4) M1 SE3xRn   , M0 SE3                => C1 = Rn
-    // (5) M1 SE3xRn   , M0 SE3xRm   , 0<m<n   => C1 = R(n-m)
+    // (5) M1 SE3xRn   , M0 R3                 => C1 = SO3xRn
+    // (6) M1 SE3xRn   , M0 SE3xRm   , 0<m<n   => C1 = R(n-m)
     ///// M1 SE3      , M0 R3xSO2xSO2         =>C1 = SO2
     ///// M1 R3xS1xS1 , M0 R3                 =>C1 = SO2xSO2
 
     if(!M1->isCompound()){
+      ///##############################################################################/
       //------------------ non-compound cases:
+      ///##############################################################################/
       //
       //------------------ (1) M1 = Rn, M0 = Rm, 0<m<n, C1 = R(n-m)
       if( M1->getType() == base::STATE_SPACE_REAL_VECTOR ){
@@ -119,9 +126,12 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const
         exit(0);
       }
     }else{
+      ///##############################################################################/
       //------------------ compound cases:
+      ///##############################################################################/
       //
       //------------------ (2) M1 = SE2, M0 = R2, C1 = SO2
+      ///##############################################################################/
       if( M1->getType() == base::STATE_SPACE_SE2 ){
         if( M0->getType() == base::STATE_SPACE_REAL_VECTOR){
           if( M0->getDimension() == 2){
@@ -134,9 +144,9 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const
           std::cout << "M1 is SE2 but state " << M0->getType() << " is not handled." << std::endl;
           exit(0);
         }
-        exit(0);
       }
       //------------------ (3) M1 = SE3, M0 = R3, C1 = SO3
+      ///##############################################################################/
       else if( M1->getType() == base::STATE_SPACE_SE3 ){
         if( M0->getType() == base::STATE_SPACE_REAL_VECTOR){
           if( M0->getDimension() == 3){
@@ -150,7 +160,8 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const
           exit(0);
         }
       }
-      //------------------ M1 = COMPOSED
+      //------------------ M1 = SE3xRN
+      ///##############################################################################/
       else{
         ob::CompoundStateSpace *M1_compound = M1->as<ob::CompoundStateSpace>();
         const std::vector<StateSpacePtr> M1_decomposed = M1_compound->getSubspaces();
@@ -160,11 +171,17 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const
               && M1_decomposed.at(1)->getType() == base::STATE_SPACE_REAL_VECTOR){
 
             uint n = M1_decomposed.at(1)->getDimension();
-            //------------------ (4) M1 = SE3xRn, M0 = SE3, C1 = Rn
             if( M0->getType() == base::STATE_SPACE_SE3 ){
+            //------------------ (4) M1 = SE3xRn, M0 = SE3, C1 = Rn
+            ///##############################################################################/
               type = SE3RN_SE3;
+            }else if(M0->getType() == base::STATE_SPACE_REAL_VECTOR){
+            //------------------ (5) M1 = SE3xRn, M0 = R3, C1 = SO3xRN
+            ///##############################################################################/
+              type = SE3RN_R3;
             }else{
-            //------------------ (5) M1 = SE3xRn, M0 = SE3xRm, C1 = R(n-m)
+            //------------------ (6) M1 = SE3xRn, M0 = SE3xRm, C1 = R(n-m)
+            ///##############################################################################/
               ob::CompoundStateSpace *M0_compound = M0->as<ob::CompoundStateSpace>();
               const std::vector<StateSpacePtr> M0_decomposed = M0_compound->getSubspaces();
               uint M0_subspaces = M0_decomposed.size();
@@ -188,6 +205,9 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const
             std::cout << "State compound " <<  M1_decomposed.at(0)->getType() << " and " <<  M1_decomposed.at(1)->getType() << " not recognized."<< std::endl;
             exit(0);
           }
+        }else{
+          std::cout << "M1 has " << M1_subspaces << " but we only support 2." << std::endl;
+          exit(0);
         }
       }
 
@@ -236,6 +256,25 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const
           C1 = std::make_shared<ob::RealVectorStateSpace>(C1_dimension);
           static_pointer_cast<ob::RealVectorStateSpace>(C1)->setBounds( static_pointer_cast<ob::RealVectorStateSpace>(M1_decomposed.at(1))->getBounds() );
 
+          break;
+        }
+      case SE3RN_R3:
+        {
+          ob::CompoundStateSpace *M1_compound = M1->as<ob::CompoundStateSpace>();
+          const std::vector<StateSpacePtr> M1_decomposed = M1_compound->getSubspaces();
+          const std::vector<StateSpacePtr> M1_SE3_decomposed = M1_decomposed.at(0)->as<ob::CompoundStateSpace>()->getSubspaces();
+
+          //const ob::SE3StateSpace *M1_SE3 = M1_SE3_decomposed.at(0)->as<ob::SE3StateSpace>();
+          //const ob::SO3StateSpace *M1_SO3 = M1_SE3_decomposed.at(1)->as<ob::SO3StateSpace>();
+          const ob::RealVectorStateSpace *M1_RN = M1_decomposed.at(1)->as<ob::RealVectorStateSpace>();
+          uint N = M1_RN->getDimension();
+
+          ob::StateSpacePtr SO3(new ob::SO3StateSpace());
+          ob::StateSpacePtr RN(new ob::RealVectorStateSpace(N));
+          RN->as<ob::RealVectorStateSpace>()->setBounds( M1_RN->getBounds() );
+
+          C1 = SO3 + RN;
+          C1_dimension = 3+N;
           break;
         }
       case SE3RN_SE3RM:
@@ -323,6 +362,28 @@ void Quotient::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State
 
         break;
       }
+    case SE3RN_R3:
+      {
+        ob::SE3StateSpace::StateType *sM1_SE3 = qM1->as<ob::CompoundState>()->as<SE3StateSpace::StateType>(0);
+        ob::SO3StateSpace::StateType *sM1_SO3 = &sM1_SE3->rotation();
+        ob::RealVectorStateSpace::StateType *sM1_RN = qM1->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
+
+        const ob::RealVectorStateSpace::StateType *sM0 = qM0->as<RealVectorStateSpace::StateType>();
+        const ob::SO3StateSpace::StateType *sC1_SO3 = qC1->as<ob::CompoundState>()->as<ob::SO3StateSpace::StateType>(0);
+        const ob::RealVectorStateSpace::StateType *sC1_RN = qC1->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
+
+        sM1_SE3->setXYZ( sM0->values[0], sM0->values[1], sM0->values[2]);
+        sM1_SO3->x = sC1_SO3->x;
+        sM1_SO3->y = sC1_SO3->y;
+        sM1_SO3->z = sC1_SO3->z;
+        sM1_SO3->w = sC1_SO3->w;
+
+        for(uint k = 0; k < C1_dimension-3; k++){
+          sM1_RN->values[k] = sC1_RN->values[k];
+        }
+
+        break;
+      }
     case SE3RN_SE3:
       {
         ob::SE3StateSpace::StateType *sM1_SE3 = qM1->as<ob::CompoundState>()->as<SE3StateSpace::StateType>(0);
@@ -378,45 +439,10 @@ void Quotient::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State
     default:
       {
         std::cout << "cannot merge states" << std::endl;
+        std::cout << "type : " << type << " not implemented." << std::endl;
         exit(0);
       }
 
-  }
-}
-
-const ob::SpaceInformationPtr &Quotient::getC1() const{
-  return C1;
-}
-
-bool Quotient::SampleC1(ob::State *s){
-  C1_sampler->sampleUniform(s);
-  return true;
-}
-bool Quotient::HasSolution()
-{
-  return hasSolution;
-}
-
-bool Quotient::Sample(ob::State *q_random)
-{
-  totalNumberOfSamples++;
-  if(previous == nullptr){
-    return M1_valid_sampler->sample(q_random);
-  }else{
-    //Adjusted sampling function: Sampling in G0 x C1
-
-    ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
-    base::State *s_C1 = C1->allocState();
-    base::State *s_M0 = M0->allocState();
-
-    C1_sampler->sampleUniform(s_C1);
-    previous->SampleGraph(s_M0);
-    mergeStates(s_M0, s_C1, q_random);
-
-    C1->freeState(s_C1);
-    M0->freeState(s_M0);
-
-    return M1->isValid(q_random);
   }
 }
 void Quotient::ExtractC1Subspace( const ob::State* q, ob::State* qC1 ) const
@@ -442,14 +468,33 @@ void Quotient::ExtractC1Subspace( const ob::State* q, ob::State* qC1 ) const
     case SE3_R3:
       {
         const ob::SE3StateSpace::StateType *sM1 = q->as<SE3StateSpace::StateType>();
-        const ob::SO3StateSpace::StateType *sM1_rotation = &sM1->rotation();
+        const ob::SO3StateSpace::StateType *sM1_SO3 = &sM1->rotation();
 
-        ob::SO3StateSpace::StateType *sC1 = qC1->as<SO3StateSpace::StateType>();
+        ob::SO3StateSpace::StateType *sC1_SO3 = qC1->as<SO3StateSpace::StateType>();
 
-        sC1->x = sM1_rotation->x;
-        sC1->y = sM1_rotation->y;
-        sC1->z = sM1_rotation->z;
-        sC1->w = sM1_rotation->w;
+        sC1_SO3->x = sM1_SO3->x;
+        sC1_SO3->y = sM1_SO3->y;
+        sC1_SO3->z = sM1_SO3->z;
+        sC1_SO3->w = sM1_SO3->w;
+
+        break;
+      }
+    case SE3RN_R3:
+      {
+        const ob::SE3StateSpace::StateType *sM1_SE3 = q->as<ob::CompoundState>()->as<SE3StateSpace::StateType>(0);
+        const ob::SO3StateSpace::StateType *sM1_SO3 = &sM1_SE3->rotation();
+        const ob::RealVectorStateSpace::StateType *sM1_RN = q->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
+
+        ob::SO3StateSpace::StateType *sC1_SO3 = qC1->as<ob::CompoundState>()->as<SO3StateSpace::StateType>(1);
+        ob::RealVectorStateSpace::StateType *sC1_RN = qC1->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
+
+        sC1_SO3->x = sM1_SO3->x;
+        sC1_SO3->y = sM1_SO3->y;
+        sC1_SO3->z = sM1_SO3->z;
+        sC1_SO3->w = sM1_SO3->w;
+        for(uint k = 0; k < C1_dimension-3; k++){
+          sC1_RN->values[k] = sM1_RN->values[k];
+        }
 
         break;
       }
@@ -517,6 +562,20 @@ void Quotient::ExtractM0Subspace( const ob::State* q, ob::State* qM0 ) const
 
         break;
       }
+    case SE3RN_R3:
+      {
+        const ob::SE3StateSpace::StateType *sM1_SE3 = q->as<ob::CompoundState>()->as<SE3StateSpace::StateType>(0);
+        //const ob::SO3StateSpace::StateType *sM1_SO3 = &sM1_SE3->rotation();
+        //const ob::RealVectorStateSpace::StateType *sM1_RN = q->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
+
+        ob::RealVectorStateSpace::StateType *sM0 = qM0->as<RealVectorStateSpace::StateType>();
+
+        sM0->values[0] = sM1_SE3->getX();
+        sM0->values[1] = sM1_SE3->getY();
+        sM0->values[2] = sM1_SE3->getZ();
+
+        break;
+      }
     case SE3RN_SE3:
       {
         const ob::SE3StateSpace::StateType *sM1_SE3 = q->as<ob::CompoundState>()->as<SE3StateSpace::StateType>(0);
@@ -563,6 +622,42 @@ void Quotient::ExtractM0Subspace( const ob::State* q, ob::State* qM0 ) const
   }
 }
 
+const ob::SpaceInformationPtr &Quotient::getC1() const{
+  return C1;
+}
+
+bool Quotient::SampleC1(ob::State *s){
+  C1_sampler->sampleUniform(s);
+  return true;
+}
+bool Quotient::HasSolution()
+{
+  return hasSolution;
+}
+
+bool Quotient::Sample(ob::State *q_random)
+{
+  totalNumberOfSamples++;
+  if(previous == nullptr){
+    return M1_valid_sampler->sample(q_random);
+  }else{
+    //Adjusted sampling function: Sampling in G0 x C1
+
+    ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
+    base::State *s_C1 = C1->allocState();
+    base::State *s_M0 = M0->allocState();
+
+    C1_sampler->sampleUniform(s_C1);
+    previous->SampleGraph(s_M0);
+    mergeStates(s_M0, s_C1, q_random);
+
+    C1->freeState(s_C1);
+    M0->freeState(s_M0);
+
+    return M1->isValid(q_random);
+  }
+}
+
 bool Quotient::SampleGraph(ob::State *q_random)
 {
   std::cout << "SampleGraph: NYI" << std::endl;
@@ -570,8 +665,8 @@ bool Quotient::SampleGraph(ob::State *q_random)
 }
 
 double Quotient::GetSamplingDensity(){
-  double N = (double)totalNumberOfSamples;
-  //double N = (double)GetNumberOfVertices();
+  //double N = (double)totalNumberOfSamples;
+  double N = (double)GetNumberOfVertices();
   //return N;
   //@TODO: needs a more formal definition of sampling density
   if(previous==nullptr){

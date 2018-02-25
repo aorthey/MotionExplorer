@@ -51,6 +51,7 @@ void MultiQuotient<T,Tlast>::clear(){
 }
 
 void PrintQuotientSpaces(std::vector<Quotient*> quotientSpaces, uint k=0){
+  return;
   if(k<=0) k=quotientSpaces.size()-1;
   uint total_vertices = 0;
   uint total_sampled_vertices = 0;

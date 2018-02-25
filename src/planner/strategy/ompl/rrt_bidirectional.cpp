@@ -62,11 +62,16 @@ void RRTBidirectional::getPlannerData(base::PlannerData &data) const
     if (tStart_)
         tStart_->list(configurations);
 
+    uint startComponent = 0;
+    uint goalComponent = 1;
+    if(isTreeConnected) goalComponent = startComponent; 
+
     for (auto &configuration : configurations)
     {
         if (configuration->parent == nullptr)
         {
           PlannerDataVertexAnnotated v(configuration->state, 1, configuration->openNeighborhoodDistance);
+          v.SetComponent(startComponent);
           data.addStartVertex(v);
         }else
         {
@@ -74,6 +79,8 @@ void RRTBidirectional::getPlannerData(base::PlannerData &data) const
           double dp = configuration->parent->openNeighborhoodDistance;
           PlannerDataVertexAnnotated v1(configuration->state, 1, d);
           PlannerDataVertexAnnotated v2(configuration->parent->state, 1, dp);
+          v1.SetComponent(startComponent);
+          v2.SetComponent(startComponent);
           data.addEdge(v2, v1);
         }
     }
@@ -87,6 +94,7 @@ void RRTBidirectional::getPlannerData(base::PlannerData &data) const
         if (configuration->parent == nullptr)
         {
           PlannerDataVertexAnnotated v(configuration->state, 2, configuration->openNeighborhoodDistance);
+          v.SetComponent(goalComponent);
           data.addGoalVertex(v);
         }else
         {
@@ -94,6 +102,8 @@ void RRTBidirectional::getPlannerData(base::PlannerData &data) const
           double dp = configuration->parent->openNeighborhoodDistance;
           PlannerDataVertexAnnotated v1(configuration->state, 2, d);
           PlannerDataVertexAnnotated v2(configuration->parent->state, 2, dp);
+          v1.SetComponent(goalComponent);
+          v2.SetComponent(goalComponent);
           data.addEdge(v1, v2);
         }
     }
