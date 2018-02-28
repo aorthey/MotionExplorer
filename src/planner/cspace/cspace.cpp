@@ -1,6 +1,7 @@
 #include "planner/cspace/cspace.h"
 #include "planner/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
+#include <ompl/base/spaces/SE2StateSpace.h>
 
 Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
   double x = 0;
@@ -13,9 +14,14 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
   if(!space->isCompound()){
     space_first_subspace = space;
   }else{
-    ob::CompoundStateSpace *M1_compound = space->as<ob::CompoundStateSpace>();
-    const std::vector<ob::StateSpacePtr> decomposed = M1_compound->getSubspaces();
-    space_first_subspace = decomposed.front();
+    if( (space->getType() == ob::STATE_SPACE_SE2) ||
+        (space->getType() == ob::STATE_SPACE_SE2)){
+      space_first_subspace = space;
+    }else{
+      ob::CompoundStateSpace *M1_compound = space->as<ob::CompoundStateSpace>();
+      const std::vector<ob::StateSpacePtr> decomposed = M1_compound->getSubspaces();
+      space_first_subspace = decomposed.front();
+    }
   }
 
   if(space_first_subspace->getType() == ob::STATE_SPACE_SE3){
@@ -28,6 +34,19 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
     x = qomplSE3->getX();
     y = qomplSE3->getY();
     z = qomplSE3->getZ();
+
+  }else if(space_first_subspace->getType() == ob::STATE_SPACE_SE2){
+    const ob::SE2StateSpace::StateType *qomplSE2;
+    if(space->getType()==ob::STATE_SPACE_SE2){
+      qomplSE2 = s->as<ob::SE2StateSpace::StateType>();
+    }else{
+      qomplSE2 = s->as<ob::CompoundState>()->as<ob::SE2StateSpace::StateType>(0);
+    }
+    x = qomplSE2->getX();
+    y = qomplSE2->getY();
+    z = qomplSE2->getYaw();
+    if(z<0) z+= M_PI;
+
   }else if(space_first_subspace->getType() == ob::STATE_SPACE_REAL_VECTOR){
     //fixed base robot: visualize last link
 

@@ -8,7 +8,6 @@
 #include "planner/strategy/ompl/prm_quotient_narrowness.h"
 
 #include "planner/strategy/ompl/rrt_unidirectional.h"
-#include "planner/strategy/ompl/rrt_unidirectional_connect.h"
 #include "planner/strategy/ompl/rrt_unidirectional_cover.h"
 #include "planner/strategy/ompl/rrt_bidirectional.h"
 #include "util.h"
@@ -195,9 +194,18 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
     benchmark.addPlanner(planner);
 
-    //planner = std::make_shared<og::RRTConnect>(si_vec.back());
-    //planner->setProblemDefinition(pdef_vec.back());
-    //benchmark.addPlanner(planner);
+    planner = std::make_shared<og::PRM>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
+    benchmark.addPlanner(planner);
+
+    planner = std::make_shared<og::RRTConnect>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
+    benchmark.addPlanner(planner);
+
+    planner = std::make_shared<og::EST>(si_vec.back());
+    planner->setProblemDefinition(pdef_vec.back());
+    benchmark.addPlanner(planner);
+
 
     ob::ProblemDefinitionPtr pdef = pdef_vec.back();
     CSpaceOMPL *cspace = input.cspace_levels.back();
@@ -210,7 +218,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
     ot::Benchmark::Request req;
-    req.maxTime = 10;
+    req.maxTime = 180;
     req.maxMem = 10000.0;
     req.runCount = 10;
     req.displayProgress = true;

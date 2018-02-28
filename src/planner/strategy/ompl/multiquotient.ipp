@@ -193,22 +193,6 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
     og::Quotient *Qk = quotientSpaces.at(k);
     Qk->getPlannerData(data);
 
-    //remove start and goal vertices for all expect the last space (@TODO WHY?
-    //apparently because we would have multiple start/goal vertices. maybe we
-    //can unmark them instead?)
-    //if(k<K-1){
-    //  uint Nstart = data.numStartVertices();
-    //  uint Ngoal = data.numGoalVertices();
-    //  for(uint i = 0; i < Nstart; i++){
-    //    uint sidx = data.getStartIndex(i);
-    //    data.removeVertex(sidx);
-    //  }
-    //  for(uint i = 0; i < Ngoal; i++){
-    //    uint sidx = data.getGoalIndex(i);
-    //    data.removeVertex(sidx);
-    //  }
-    //}
-
     //label all new vertices
     uint ctr = 0;
     for(uint vidx = Nvertices; vidx < data.numVertices(); vidx++){
@@ -223,7 +207,7 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
         og::Quotient *Qm = quotientSpaces.at(m);
         ob::State *s_C1 = Qm->getC1()->allocState();
         ob::State *s_M1 = Qm->getSpaceInformation()->allocState();
-        Qm->SampleC1(s_C1);
+        //Qm->SampleC1(s_C1);
         Qm->mergeStates(s_M0, s_C1, s_M1);
         quotientSpaces.at(m-1)->getSpaceInformation()->freeState(s_M0);
         Qm->getC1()->freeState(s_C1);

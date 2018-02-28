@@ -54,6 +54,6 @@ void PathSpaceOMPL::DrawGL(GUIState& state){
   const Config qi = input->q_init;
   const Config qg = input->q_goal;
 
-  if(state("planner_draw_start_configuration")) GLDraw::drawRobotAtConfig(robot, qi, lightGreen);
-  if(state("planner_draw_goal_configuration")) GLDraw::drawRobotAtConfig(robot, qg, lightRed);
+  if(state("planner_draw_start_configuration")) GLDraw::drawRobotAtConfig(robot, qi, green);
+  if(state("planner_draw_goal_configuration")) GLDraw::drawRobotAtConfig(robot, qg, red);
 }

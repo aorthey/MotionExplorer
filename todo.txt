@@ -435,3 +435,18 @@ A Survey and Taxonomy of Graph Sampling
 [x] visualize connectivity of roadmap components (each component different
 color)
 [ ] edges are too long
+
+Heuristics applied:
+
+- Increase size of sphere robot to increase clearance of shortest path
+- Sampling mainly around shortest path with diminshing probability over time
+
+
+TODO 01MARCH2018
+
+-- Visualize roadmap computation on SE(2) to explain algorithm
+-- rewrite related work
+-- add coset explanation
+-- incoporate adriens comments
+
+

@@ -50,8 +50,8 @@ std::vector<PathSpace*> PathSpaceMultiLevelSE2::Decompose(){
   std::vector<PathSpace*> decomposedspace;
   decomposedspace.push_back( new PathSpaceAtomic(world, input->GetNextLayer()) );
   RoadmapPtr roadmap1 = output.GetRoadmapPtr();
-  RoadmapDecoratorSE2Ptr roadmap( new RoadmapDecoratorSE2(roadmap1) );
-  decomposedspace.back()->SetRoadmap( roadmap );
+  //RoadmapDecoratorSE2Ptr roadmap( new RoadmapDecoratorSE2(roadmap1) );
+  decomposedspace.back()->SetRoadmap( roadmap1 );
 
   std::cout << std::string(80, '-') << std::endl;
   std::cout << output << std::endl;

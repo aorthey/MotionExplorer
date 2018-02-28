@@ -23,10 +23,10 @@
     <timestep min="0.001" max="0.01"/>
     <epsilongoalregion>0.01</epsilongoalregion>
     <maxplanningtime>1</maxplanningtime>
-    <smoothPath>0</smoothPath>
+    <smoothPath>1</smoothPath>
 
     <!-- individual algorithms plus individual settings -->
-    <algorithm name="hierarchical:ompl:rrt_quotient2">
+    <algorithm name="hierarchical:ompl:qmp_prm_connect">
       <hierarchy>
         <level inner_index="1" outer_index="1" type="R2"/>
         <level inner_index="0" outer_index="0" type="SE2"/>

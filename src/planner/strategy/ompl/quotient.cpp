@@ -40,7 +40,7 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_):
   std::cout << "--- Level " << id << " " << getName() << std::endl;
   setName("Quotient"+std::to_string(id));
   if(previous == nullptr){
-    std::cout << "M1 dimension : " << M1_space->getDimension() << std::endl;
+    std::cout << "M1 dimension : " << M1_space->getDimension() << " measure: " << M1_space->getMeasure() << std::endl;
     type = ATOMIC_RN;
   }else{
     M0 = previous->getSpaceInformation();
@@ -485,7 +485,7 @@ void Quotient::ExtractC1Subspace( const ob::State* q, ob::State* qC1 ) const
         const ob::SO3StateSpace::StateType *sM1_SO3 = &sM1_SE3->rotation();
         const ob::RealVectorStateSpace::StateType *sM1_RN = q->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
 
-        ob::SO3StateSpace::StateType *sC1_SO3 = qC1->as<ob::CompoundState>()->as<SO3StateSpace::StateType>(1);
+        ob::SO3StateSpace::StateType *sC1_SO3 = qC1->as<ob::CompoundState>()->as<SO3StateSpace::StateType>(0);
         ob::RealVectorStateSpace::StateType *sC1_RN = qC1->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
 
         sC1_SO3->x = sM1_SO3->x;

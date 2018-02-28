@@ -374,7 +374,7 @@ def plotStatistics(dbname, fname):
     c = conn.cursor()
     c.execute('PRAGMA FOREIGN_KEYS = ON')
     c.execute('SELECT id, name FROM plannerConfigs')
-    planners = [(t[0],t[1].replace('geometric_','').replace('control_',''))
+    planners = [(t[0],t[1].replace('geometric_','').replace('control_','').replace('QMPPRMQuotientConnect','QMP'))
         for t in c.fetchall()]
     c.execute('PRAGMA table_info(runs)')
     colInfo = c.fetchall()[3:]
@@ -395,9 +395,10 @@ def plotStatistics(dbname, fname):
           ax = plt.gca()
           ax.set_ylabel('Time (s)')
           ax.set_xlabel('Motion Planning Algorithm')
-          txt = "runcount=%d"%runcount
+          ax.set_ylim([0,timelimit+30]);
+          txt = "runcount=%3.0d"%runcount
           ax.text(0.85, 0.95, txt, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
-          txt = "timelimit=%.0f"%timelimit+"s"
+          txt = "timelimit=%3.0f"%timelimit+"s"
           ax.text(0.85, 0.9, txt, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
           ax.axhline(timelimit,color='k',linestyle='--')
           plt.tight_layout()

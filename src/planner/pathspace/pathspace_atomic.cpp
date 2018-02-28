@@ -21,8 +21,8 @@ void PathSpaceAtomic::DrawGL(GUIState& state){
   const Config qi_in = input->q_init;
   const Config qg_in = input->q_goal;
 
-  if(state("planner_draw_start_configuration")) GLDraw::drawRobotAtConfig(robot, qi_in, lightGreen);
-  if(state("planner_draw_goal_configuration")) GLDraw::drawRobotAtConfig(robot, qg_in, lightRed);
+  if(state("planner_draw_start_configuration")) GLDraw::drawRobotAtConfig(robot, qi_in, green);
+  if(state("planner_draw_goal_configuration")) GLDraw::drawRobotAtConfig(robot, qg_in, red);
 
   if(state("draw_path") && path_ompl){
     path_ompl->DrawGL(state);

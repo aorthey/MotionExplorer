@@ -44,15 +44,17 @@
     <robot>0</robot>
     <freeFloating>1</freeFloating>
 
+    <enableSufficiency>1</enableSufficiency>
     <epsilongoalregion>0.01</epsilongoalregion>
     <smoothPath>1</smoothPath>
-    <maxplanningtime>25</maxplanningtime>
+    <maxplanningtime>5</maxplanningtime>
+
     <sampler name="uniform"/>
-    <enableSufficiency>1</enableSufficiency>
 
     <algorithm name="hierarchical:ompl:qmp_prm_connect">
       <hierarchy>
         <level inner_index="3" type="R3"/>
+        <level inner_index="1" type="SE3"/>
         <level inner_index="0" type="SE3RN"/>
       </hierarchy>
     </algorithm>
