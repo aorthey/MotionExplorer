@@ -109,7 +109,6 @@ void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *csp
     {
       Vertex pi = pred.at(i);
       const ob::State *s = pdi->getVertex(pi).getState();
-      cspace->GetSpaceInformation()->printState(s);
       Vector3 q = cspace->getXYZ(s);
       path.push_back(q);
     }

@@ -134,7 +134,7 @@ void ForceFieldBackend::RenderWorld()
   for(size_t i=0;i<world->rigidObjects.size();i++){
     RigidObject *obj = world->rigidObjects[i];
     GLDraw::GeometryAppearance* a = obj->geometry.Appearance();
-    a->SetColor(GLColor(0.6,0.6,0.6,0.2));
+    a->SetColor(GLColor(0.6,0.6,0.6,1));
     a->drawFaces = false;
     a->drawEdges = false;
     a->drawVertices = false;

@@ -8,13 +8,13 @@
   <collision>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-      <sphere radius="0.12"/>
+      <sphere radius="0.2"/>
     </geometry>
   </collision>
   <visual>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-      <sphere radius="0.12"/>
+      <sphere radius="0.2"/>
     </geometry>
   </visual>
 </link>
@@ -27,13 +27,13 @@
   <visual>
     <origin rpy="0 1.57 0" xyz="-0.06 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.12"/>
+      <cylinder length="0.12" radius="0.2"/>
     </geometry>
   </visual>
   <collision>
     <origin rpy="0 1.57 0" xyz="-0.06 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.12"/>
+      <cylinder length="0.12" radius="0.2"/>
     </geometry>
   </collision>
  </link>

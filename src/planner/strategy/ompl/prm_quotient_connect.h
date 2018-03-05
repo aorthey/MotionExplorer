@@ -47,6 +47,7 @@ namespace ompl
         int lastTargetVertexSampled{-1};
         double lastTSampled{-1.0};
         bool isSampled{false};
+        uint samplesOnShortestPath{0};
     };
 
   };

@@ -58,6 +58,7 @@ class CSpaceOMPL
     virtual CSpaceKlampt* GetCSpacePtr();
     virtual const ob::StateSpacePtr SpacePtr();
     virtual ob::SpaceInformationPtr SpaceInformationPtr();
+    virtual ob::SpaceInformationPtr GetSpaceInformation();
     virtual const oc::RealVectorControlSpacePtr ControlSpacePtr();
 
     std::vector<double> EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );

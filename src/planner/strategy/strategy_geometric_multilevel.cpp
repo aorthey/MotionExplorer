@@ -67,30 +67,6 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   double time = boost::lexical_cast<double>(run["time REAL"]);
   double memory = boost::lexical_cast<double>(run["memory REAL"]);
 
-  //if(solved){
-  //  std::cout << "Found Solution at run " << pid << std::endl;
-  //  util::PrintCurrentTime();
-  //  const ob::PathPtr &pp = pdef->getSolutionPath();
-  //  oc::PathControl path_control = static_cast<oc::PathControl&>(*pp);
-  //  og::PathGeometric path = path_control.asGeometric();
-
-  //  //og::PathSimplifier shortcutter(si);
-  //  //shortcutter.shortcutPath(path);
-
-  //  vector<Config> keyframes;
-  //  for(int i = 0; i < path.getStateCount(); i++)
-  //  {
-  //    ob::State *state = path.getState(i);
-  //    Config cur = OMPLStateToConfig(state, cspace->getPtr());
-  //    keyframes.push_back(cur);
-  //  }
-  //  std::string sfile = "random_"+std::to_string(pid)+".xml";
-  //  std::cout << "Saving keyframes"<< std::endl;
-  //  Save(keyframes, sfile.c_str());
-  //}else{
-  //  std::cout << "Run " << pid << " no solution" << std::endl;
-
-  //}
   std::cout << "Run " << pid << " [" << planner->getName() << "] " << (solved?"solved":"no solution") << "(time: "<< time << ", states: " << states << ", memory: " << memory << ")" << std::endl;
   std::cout << std::string(80, '-') << std::endl;
   pid++;
@@ -188,9 +164,9 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     // static_pointer_cast<MultiPRMQuotient>(planner)->setProblemDefinition(pdef_vec);
     // benchmark.addPlanner(planner);
 
-    //typedef og::MultiQuotient<og::PRMQuotientConnect> MultiQuotient;
     typedef og::MultiQuotient<og::PRMQuotientConnect, og::RRTBidirectional> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec,"PRMQuotientConnect");
+    //typedef og::MultiQuotient<og::PRMQuotient> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec);
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
     benchmark.addPlanner(planner);
 
@@ -205,7 +181,6 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     planner = std::make_shared<og::EST>(si_vec.back());
     planner->setProblemDefinition(pdef_vec.back());
     benchmark.addPlanner(planner);
-
 
     ob::ProblemDefinitionPtr pdef = pdef_vec.back();
     CSpaceOMPL *cspace = input.cspace_levels.back();

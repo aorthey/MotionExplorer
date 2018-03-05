@@ -183,6 +183,9 @@ const ob::StateSpacePtr CSpaceOMPL::SpacePtr(){
   return space;
 }
 
+ob::SpaceInformationPtr CSpaceOMPL::GetSpaceInformation(){
+  return SpaceInformationPtr();
+}
 ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
   if(si==nullptr){
     si = std::make_shared<ob::SpaceInformation>(SpacePtr());

@@ -54,7 +54,7 @@
     <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
     <robot>0</robot>
-    <smoothPath>1</smoothPath>
+    <smoothPath>0</smoothPath>
     <pathSpeed>30</pathSpeed>
 
     <sampler name="obstacle_based"/>

@@ -30,9 +30,9 @@ PRMQuotientConnect::PRMQuotientConnect(const ob::SpaceInformationPtr &si, Quotie
   PRMQuotient(si, previous_)
 {
   setName("PRMQuotientConnect"+to_string(id));
-  goalBias_ = 0.03;
-  epsilon = 0.0;
-  percentageSamplesOnShortestPath = 0.2;
+  goalBias_ = 0.0;
+  epsilon = 0.1;
+  percentageSamplesOnShortestPath = 1; //start at 1, then diminish over time
 }
 
 PRMQuotientConnect::~PRMQuotientConnect(){
@@ -42,8 +42,9 @@ void PRMQuotientConnect::clear(){
   PRMQuotient::clear();
   lastSourceVertexSampled = -1;
   lastTargetVertexSampled = -1;
-  lastTSampled = 0;
+  lastTSampled = -1;
   isSampled = false;
+  samplesOnShortestPath = 0;
 }
 
 void PRMQuotientConnect::setup()
@@ -138,6 +139,7 @@ bool PRMQuotientConnect::Sample(ob::State *q_random)
     //return M1_valid_sampler->sample(q_random);
     if(!hasSolution && rng_.uniform01() < goalBias_){
       q_random = si_->cloneState(stateProperty_[goalM_.at(0)]);
+      //goal->sampleGoal(q_random);
     }else{
       M1_valid_sampler->sample(q_random);
     }
@@ -496,7 +498,10 @@ ompl::PDF<og::PRMBasic::Edge> PRMQuotientConnect::GetEdgePDF()
   double t = rng_.uniform01();
   if(t<percentageSamplesOnShortestPath)
   {
-    //shortest path sampling (diminishing return?)
+    //diminishing shortest path sampling
+    percentageSamplesOnShortestPath = exp(-pow(((double)samplesOnShortestPath++/10000.0),2));
+    std::cout << percentageSamplesOnShortestPath << std::endl;
+
     foreach (Edge e, boost::edges(g_))
     {
       const Vertex v1 = boost::source(e, g_);
@@ -519,7 +524,8 @@ ompl::PDF<og::PRMBasic::Edge> PRMQuotientConnect::GetEdgePDF()
     //    pdf.add(e, weight.value());
     //  }
     //}
-    ////Random Node Edge (RNE) sampling
+    ////Random Node Edge (RNE) sampling (better, but still no guarantee of
+    //uniformity. Might be good to investigate random walk samplers)
     PDF<Vertex> vpdf;
     foreach (Vertex v, boost::vertices(g_))
     {
