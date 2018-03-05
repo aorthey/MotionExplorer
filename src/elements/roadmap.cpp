@@ -102,32 +102,15 @@ void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *csp
     pdi->decoupleFromPlanner();
     std::cout << "level " << k << " : " << pdi->numVertices() << " | " << pdi->numEdges() << std::endl;
 
-    //std::vector<ob::PlannerData::Graph::Vertex> pred(pdi->numVertices());
-    //const ob::PlannerData::Graph &graph = pdi->toBoostGraph();
-    //const uint v = pdi->getStartIndex(0);
-
-    //ob::PathLengthOptimizationObjective opt(si);
-
-    //boost::dijkstra_shortest_paths(graph, v, boost::predecessor_map(&pred[0])
-    //                                               .distance_compare([&opt](ob::Cost c1, ob::Cost c2)
-    //                                                                 {
-    //                                                                     return opt.isCostBetterThan(c1, c2);
-    //                                                                 })
-    //                                               .distance_combine([](ob::Cost, ob::Cost c)
-    //                                                                 {
-    //                                                                     return c;
-    //                                                                 })
-    //                                               .distance_inf(opt.infiniteCost())
-    //                                               .distance_zero(opt.identityCost()));
-
-
     LemonInterface lemon(pdi);
     std::vector<Vertex> pred = lemon.GetShortestPath();
     std::vector<Vector3> path;
     for(uint i = 0; i < pred.size(); i++)
     {
       Vertex pi = pred.at(i);
-      Vector3 q = cspace->getXYZ(pdi->getVertex(pi).getState());
+      const ob::State *s = pdi->getVertex(pi).getState();
+      cspace->GetSpaceInformation()->printState(s);
+      Vector3 q = cspace->getXYZ(s);
       path.push_back(q);
     }
     shortest_path_level.push_back(path);

@@ -1,5 +1,7 @@
 #include "multiquotient.h"
 #include "elements/plannerdata_vertex_annotated.h"
+#include <ompl/base/spaces/SO2StateSpace.h>
+#include <ompl/base/spaces/SO3StateSpace.h>
 #include <ompl/util/Time.h>
 #include <queue>
 
@@ -186,7 +188,6 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
     exit(0);
   }
 
-
   uint K = min(solutions.size()+1,quotientSpaces.size());
 
   for(uint k = 0; k < K; k++){
@@ -207,6 +208,12 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
         og::Quotient *Qm = quotientSpaces.at(m);
         ob::State *s_C1 = Qm->getC1()->allocState();
         ob::State *s_M1 = Qm->getSpaceInformation()->allocState();
+        if(Qm->getC1()->getStateSpace()->getType() == ob::STATE_SPACE_SO3) {
+          static_cast<ob::SO3StateSpace::StateType*>(s_C1)->setIdentity();
+        }
+        if(Qm->getC1()->getStateSpace()->getType() == ob::STATE_SPACE_SO2) {
+          static_cast<ob::SO2StateSpace::StateType*>(s_C1)->setIdentity();
+        }
         //Qm->SampleC1(s_C1);
         Qm->mergeStates(s_M0, s_C1, s_M1);
         quotientSpaces.at(m-1)->getSpaceInformation()->freeState(s_M0);
