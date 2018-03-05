@@ -547,6 +547,8 @@ ompl::PDF<og::PRMBasic::Edge> PRMQuotientConnect::GetEdgePDF()
 
 void PRMQuotientConnect::RandomWalk(const Vertex &v) 
 {
+  const bool DEBUG = false;
+
   og::PRMQuotientConnect *PRMprevious = static_cast<og::PRMQuotientConnect*>(previous);
   if(previous == nullptr){
     return PRMQuotient::RandomWalk(v);
@@ -599,7 +601,6 @@ void PRMQuotientConnect::RandomWalk(const Vertex &v)
     std::vector<ob::State *> spathM1 = pathM1.getStates();
     std::vector<Vertex> vpathM0 = PRMprevious->shortestVertexPath_;
 
-    const bool DEBUG = false;
     if(DEBUG){
       std::cout << std::string(80, '-') << std::endl;
       std::cout << "start edge " << associatedVertexSourceProperty_[v_first] << "<->" 

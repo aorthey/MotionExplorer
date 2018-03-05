@@ -1,7 +1,6 @@
 #pragma once
 #include "gui/gui.h"
 #include "planner/planner.h"
-#include "planner/planner_benchmark.h"
 
 class PlannerBackend : public ForceFieldBackend
 {
@@ -27,6 +26,7 @@ class PlannerBackend : public ForceFieldBackend
     virtual void RenderWorld();
     virtual void RenderScreen();
     virtual bool OnIdle();
+    void CenterCameraOn(const Vector3& v);
 
     bool isPlanningInProcess{false};
 };

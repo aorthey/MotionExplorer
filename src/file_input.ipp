@@ -62,16 +62,6 @@ bool ExistStreamAttribute(TiXmlElement* node, const char *name){
   }
 }
 
-stringstream GetStreamAttribute(TiXmlElement* node, const char *name){
-
-  if(!node) return stringstream ("NONE");
-  const char *na = node->Attribute(name);
-  if(na){
-    return stringstream (na);
-  }else{
-    return stringstream ("NONE");
-  }
-}
 stringstream GetStreamAttributeConfig(TiXmlElement* node, const char *name){
 
   if(!node) return stringstream ("NONE");
@@ -104,7 +94,6 @@ stringstream GetStreamText(TiXmlElement* node){
     return stringstream ("NONE");
   }
 }
-
 template<typename T> 
 stringstream GetStreamTextDefault(TiXmlElement* node, T default_value){
   std::stringstream ss;
@@ -117,6 +106,17 @@ stringstream GetStreamTextDefault(TiXmlElement* node, T default_value){
     return def;
   }
 }
+
+stringstream GetStreamAttribute(TiXmlElement* node, const char *attribute)
+{
+  if(!node) return stringstream ("NONE");
+  const char *na = node->Attribute(attribute);
+  if(na){
+    return stringstream (na);
+  }else{
+    return stringstream ("NONE");
+  }
+}
 template<typename T> 
 stringstream GetStreamAttributeDefault(TiXmlElement *node, const char *name, T default_value){
   if(ExistStreamAttribute(node, name)){
@@ -127,15 +127,6 @@ stringstream GetStreamAttributeDefault(TiXmlElement *node, const char *name, T d
   return ss;
 }
 
-template<typename T> 
-T GetSubNodeText(TiXmlElement* node, const char *name)
-{
-  TiXmlElement* subnode = FindSubNode(node, name);
-  std::stringstream ss = GetStreamText(subnode);
-  T _val;
-  ss >> _val;
-  return _val;
-}
 
 template<typename T> 
 inline std::vector<T> GetNodeVector(TiXmlElement* node)
@@ -151,3 +142,67 @@ inline std::vector<T> GetNodeVector(TiXmlElement* node)
   }
   return _val;
 }
+
+template<typename T> 
+T GetSubNodeText(TiXmlElement* node, const char *name)
+{
+  TiXmlElement* subnode = FindSubNode(node, name);
+  if(!subnode){
+    std::cout << "[ERROR] Subnode: " << name << " has not been found." << std::endl;
+    exit(0);
+  }
+  T _val;
+  GetStreamText(subnode) >> _val;
+  return _val;
+}
+template<typename T> 
+T GetSubNodeTextDefault(TiXmlElement* node, const char *name, T default_value)
+{
+  TiXmlElement* subnode = FindSubNode(node, name);
+  if(!subnode){
+    std::cout << "[WARNING] Subnode: " << name << " has not been found. Setting to " << default_value << std::endl;
+  }
+  T _val;
+  GetStreamTextDefault<T>(subnode, default_value) >> _val;
+  return _val;
+}
+template<typename T> 
+inline T GetSubNodeAttribute(TiXmlElement* node, const char *name, const char *attribute)
+{
+  TiXmlElement* subnode = FindSubNode(node, name);
+  if(!subnode){
+    std::cout << "[ERROR] Subnode: " << name << " has not been found." << std::endl;
+    exit(0);
+  }
+
+  T _val;
+  GetStreamAttribute(subnode, attribute) >> _val;
+  return _val;
+}
+template<typename T> 
+inline T GetSubNodeAttributeDefault(TiXmlElement* node, const char *name, const char *attribute, T default_value)
+{
+  TiXmlElement* subnode = FindSubNode(node, name);
+  if(!subnode){
+    std::cout << "[WARNING] Subnode: " << name << " has not been found. Setting to " << default_value << std::endl;
+  }
+  T _val;
+  GetStreamAttributeDefault(subnode, attribute, default_value) >> _val;
+  return _val;
+}
+template<typename T> 
+inline T GetAttribute(TiXmlElement* node, const char *attribute)
+{
+  T _val;
+  GetStreamAttribute(node, attribute) >> _val;
+  return _val;
+}
+
+template<typename T> 
+inline T GetAttributeDefault(TiXmlElement* node, const char *attribute, T default_value)
+{
+  T _val;
+  GetStreamAttributeDefault(node, attribute, default_value) >> _val;
+  return _val;
+}
+

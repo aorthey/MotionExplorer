@@ -9,18 +9,7 @@ struct Layer{
   int outer_index;
   Config q_init;
   Config q_goal;
-  bool isInnerOuter;
   std::string type;
-};
-
-struct Benchmark{
-  bool isInitialized{false};
-  std::string name;
-  std::string filename;
-  double max_planning_time;
-  double maxmemoryMB;
-  uint Nruns;
-  bool displayProgress;
 };
 
 class PlannerInput{
@@ -39,13 +28,11 @@ class PlannerInput{
     Config se3max;
 
     uint robot_idx;
-    int isSE2;
     int freeFloating;
 
     std::string name_algorithm;
     std::string name_sampler;
 
-    //specific input for planner methods
     double epsilon_goalregion;
     double max_planning_time;
     double timestep_min;
@@ -71,6 +58,5 @@ struct PlannerMultiInput{
   std::vector<PlannerInput*> inputs;
   bool Load(const char* file);
   bool Load(TiXmlElement *node);
-  Benchmark benchmark;
 };
 

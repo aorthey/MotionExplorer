@@ -5,6 +5,7 @@ bool PlannerMultiInput::Load(const char* file){
   TiXmlDocument doc(file);
   return Load(GetRootNodeFromDocument(doc));
 }
+
 bool PlannerMultiInput::Load(TiXmlElement *node){
   CheckNodeName(node, "world");
   TiXmlElement* node_plannerinput = FindSubNode(node, "plannerinput");
@@ -14,235 +15,73 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
     return false;
   }
 
-  //################################################################################
-  // obtain default settings for all algorithms
-  //################################################################################
-  double max_planning_time;
-  double epsilon_goalregion;
-  double timestep_min;
-  double timestep_max;
-  std::string name_sampler;
-  TiXmlElement* node_timestep = FindSubNode(node_plannerinput, "timestep");
-  if(node_timestep){
-    GetStreamAttribute(node_timestep,"min") >> timestep_min;
-    GetStreamAttribute(node_timestep,"max") >> timestep_max;
-  }else{
-    timestep_min= 0.01;
-    timestep_max= 0.1;
-  }
-  TiXmlElement* node_max_planning_time = FindSubNode(node_plannerinput, "maxplanningtime");
-  TiXmlElement* node_epsilon_goalregion = FindSubNode(node_plannerinput, "epsilongoalregion");
-
-  GetStreamText(node_max_planning_time) >> max_planning_time;
-  GetStreamText(node_epsilon_goalregion) >> epsilon_goalregion;
-
-  double pathSpeed;
-  TiXmlElement* node_path_speed = FindSubNode(node_plannerinput, "pathSpeed");
-  GetStreamTextDefault<double>(node_path_speed, 1) >> pathSpeed;
-
-  bool smoothPath;
-  TiXmlElement* node_smooth = FindSubNode(node_plannerinput, "smoothPath");
-  GetStreamTextDefault<int>(node_smooth, 1) >> smoothPath;
-
-  bool enableSufficiency;
-  TiXmlElement* node_sufficiency = FindSubNode(node_plannerinput, "enableSufficiency");
-  GetStreamTextDefault<int>(node_sufficiency, 0) >> enableSufficiency;
-
-  TiXmlElement* node_sampler = FindSubNode(node_plannerinput, "sampler");
-  GetStreamAttributeDefault<std::string>(node_sampler,"name", "uniform") >> name_sampler;
-
-  int isSE2;
-  TiXmlElement* node_se2 = FindSubNode(node_plannerinput, "se2");
-  GetStreamTextDefault<int>(node_se2, 0) >> isSE2;
-
-  //################################################################################
-  // loop through all algorithms, search for individual settings; if not found
-  // apply default settings 
-  //################################################################################
   TiXmlElement* node_algorithm = FindFirstSubNode(node_plannerinput, "algorithm");
 
   while(node_algorithm!=NULL){
     PlannerInput* input = new PlannerInput();
-    input->smoothPath = smoothPath;
-    input->enableSufficiency = enableSufficiency;
-    input->isSE2 = isSE2;
-    input->name_sampler = name_sampler;
-    input->pathSpeed = pathSpeed;
-
     if(!input->Load(node_plannerinput)) return false;
 
-    GetStreamAttribute(node_algorithm,"name") >> input->name_algorithm;
-
-    TiXmlElement* node_algorithm_max_planning_time = FindSubNode(node_algorithm, "maxplanningtime");
-    TiXmlElement* node_algorithm_epsilon_goalregion = FindSubNode(node_algorithm, "epsilongoalregion");
-
-    GetStreamTextDefault<double>(node_algorithm_max_planning_time, max_planning_time) >> input->max_planning_time;
-    GetStreamTextDefault<double>(node_algorithm_epsilon_goalregion, epsilon_goalregion) >> input->epsilon_goalregion;
-
-    TiXmlElement* node_algorithm_timestep = FindSubNode(node_algorithm, "timestep");
-    if(node_algorithm_timestep){
-      GetStreamAttributeDefault<double>(node_algorithm_timestep,"min", timestep_min) >> input->timestep_min;
-      GetStreamAttributeDefault<double>(node_algorithm_timestep,"max", timestep_max) >> input->timestep_max;
-    }else{
-      input->timestep_min = timestep_min;
-      input->timestep_max = timestep_max;
-    }
-
-    TiXmlElement* node_hierarchy = FindSubNode(node_algorithm, "hierarchy");
-    uint level = 0;
-    if(node_hierarchy){
-      TiXmlElement* lindex = FindFirstSubNode(node_hierarchy, "level");
-      while(lindex!=NULL){
-
-        Layer layer;
-        layer.level = level++;
-
-        GetStreamAttribute(lindex, "inner_index") >> layer.inner_index;
-
-        if(ExistStreamAttribute(lindex, "outer_index")){
-          GetStreamAttribute(lindex, "outer_index") >> layer.outer_index;
-          layer.isInnerOuter =true;
-        }else{
-          layer.outer_index = layer.inner_index;
-          layer.isInnerOuter =false;
-        }
-        GetStreamAttribute(lindex, "type") >> layer.type;
-
-        input->robot_idxs.push_back(layer.inner_index);
-        input->layers.push_back(layer);
-
-        lindex = FindNextSiblingNode(lindex, "level");
-      }
-    }
-
+    input->name_algorithm = GetAttribute<std::string>(node_algorithm, "name");
     inputs.push_back(input);
-    node_algorithm = FindNextSiblingNode(node_algorithm, "algorithm");
+    node_algorithm = FindNextSiblingNode(node_algorithm);
   }
 
-  //for(uint k = 0; k < inputs.size(); k++){
-  //  std::cout << inputs.at(k) << std::endl;
-  //}
-
-  //################################################################################
-  // check for benchmarks
-  //################################################################################
-
-  TiXmlElement* node_benchmark = FindFirstSubNode(node_plannerinput, "benchmark");
-  if(node_benchmark!=NULL){
-    benchmark.isInitialized=true;
-    TiXmlElement* node_max_planning_time = FindSubNode(node_benchmark, "maxplanningtime");
-    TiXmlElement* node_memory_mb = FindSubNode(node_benchmark, "maxmemoryMB");
-    TiXmlElement* node_runs = FindSubNode(node_benchmark, "runs");
-    TiXmlElement* node_display_progress = FindSubNode(node_benchmark, "displayProgress");
-    TiXmlElement* node_filename = FindSubNode(node_benchmark, "filename");
-
-    if(!node_max_planning_time){
-      std::cout << "Benchmark needs maxplanningtime variable" << std::endl;
-      exit(0);
-    }
-    if(!node_memory_mb){
-      std::cout << "Benchmark needs maxmemoryMB variable" << std::endl;
-      exit(0);
-    }
-    if(!node_runs){
-      std::cout << "Benchmark needs runs variable" << std::endl;
-      exit(0);
-    }
-
-    GetStreamText(node_max_planning_time) >> benchmark.max_planning_time;
-    GetStreamText(node_memory_mb) >> benchmark.maxmemoryMB;
-    GetStreamText(node_runs) >> benchmark.Nruns;
-    GetStreamText(node_display_progress) >> benchmark.displayProgress;
-    GetStreamAttribute(node_filename,"name") >> benchmark.filename;
-    GetStreamAttribute(node_benchmark,"name") >> benchmark.name;
-
-    // std::cout << "BEnchmark:" << std::endl;
-    // std::cout << benchmark.name << std::endl;
-    // std::cout << benchmark.filename << std::endl;
-    // std::cout << benchmark.Nruns << std::endl;
-    // std::cout << benchmark.max_planning_time << std::endl;
-    // std::cout << benchmark.maxmemoryMB << std::endl;
-    // std::cout << benchmark.displayProgress << std::endl;
-    // exit(0);
-
+  for(uint k = 0; k < inputs.size(); k++){
+    std::cout << *inputs.at(k) << std::endl;
   }
+  exit(0);
   return true;
 }
 
-bool PlannerInput::GetConfig(const TiXmlElement* node, const char *name, Config &q){
-  if(!node){
-    q.resize(0);
-    return false;
-  }
-  const char *na = node->Attribute(name);
-  if(na){
-    //safety check for config
-    std::stringstream ss = stringstream(na);
-    int n;
-    ss >> n;
-    double tt;
-
-    int ictr = 0;
-    while(!ss.fail()){
-      ss>>tt;
-      ictr++;
-    }
-    ictr--;
-    if(n!=ictr){
-      std::cout << node->Value() << " Config is not correctly formatted (elements " << ictr << " but expected " << n << ")" << std::endl;
-      exit(0);
-      q.resize(0);
-      return false;
-    }
-
-    ss.clear();
-    ss.seekg(0, std::ios::beg);
-    //std::cout << ss.str() << std::endl;
-    //std::cout << std::string(80, '-') << std::endl;
-    ss >> q;
-    return true;
-  }else{
-    q.resize(0);
-    return false;
-  }
-}
-//################################################################################
-///@brief get fixed general settings 
-//################################################################################
 
 bool PlannerInput::Load(TiXmlElement *node)
 {
   CheckNodeName(node, "plannerinput");
-  TiXmlElement* node_plannerinput = node;
 
-  if(!node_plannerinput){
-    std::cout << "world xml file has no plannerinput" << std::endl;
-    return false;
-  }
+  q_init = GetSubNodeAttribute<Config>(node, "qinit", "config");
+  q_goal = GetSubNodeAttribute<Config>(node, "qgoal", "config");
 
-  TiXmlElement* node_qinit = FindSubNode(node_plannerinput, "qinit");
-  TiXmlElement* node_qgoal = FindSubNode(node_plannerinput, "qgoal");
-  TiXmlElement* node_se3min = FindSubNode(node_plannerinput, "se3min");
-  TiXmlElement* node_se3max = FindSubNode(node_plannerinput, "se3max");
+  Config dq; dq.resize(q_init.size()); dq.setZero();
+  dq_init = GetSubNodeAttributeDefault<Config>(node, "dqinit", "config", dq);
+  dq_goal = GetSubNodeAttributeDefault<Config>(node, "dqgoal", "config", dq);
+  se3min = GetSubNodeAttribute<Config>(node, "se3min", "config");
+  se3max = GetSubNodeAttribute<Config>(node, "se3max", "config");
 
-  TiXmlElement* node_dqinit = FindSubNode(node_plannerinput, "dqinit");
-  TiXmlElement* node_dqgoal = FindSubNode(node_plannerinput, "dqgoal");
-  TiXmlElement* node_freeFloating = FindSubNode(node_plannerinput, "freeFloating");
+  freeFloating = GetSubNodeText<int>(node, "freeFloating");
+  robot_idx = GetSubNodeTextDefault(node, "robot", 0);
 
-  GetConfig(node_qinit , "config", q_init);
-  GetConfig(node_qgoal , "config", q_goal);
-  GetConfig(node_dqinit, "config", dq_init);
-  GetConfig(node_dqgoal, "config", dq_goal);
-  GetConfig(node_se3min, "config", se3min);
-  GetConfig(node_se3max, "config", se3max);
+  timestep_min = GetSubNodeAttributeDefault(node, "timestep", "min", 0.01);
+  timestep_max = GetSubNodeAttributeDefault(node, "timestep", "max", 0.1);
+  max_planning_time = GetSubNodeText<double>(node, "maxplanningtime");
+  epsilon_goalregion = GetSubNodeText<double>(node, "epsilongoalregion");
+  pathSpeed = GetSubNodeTextDefault(node, "pathSpeed", 1.0);
+  smoothPath = GetSubNodeTextDefault(node, "smoothPath", false);
+  enableSufficiency = GetSubNodeTextDefault(node, "enableSufficiency", false);
+  name_sampler = GetSubNodeAttributeDefault<std::string>(node, "sampler", "name", "uniform");
 
-  GetStreamText(node_freeFloating) >> freeFloating;
+  TiXmlElement* node_hierarchy = FindSubNode(node, "hierarchy");
+  uint level = 0;
 
-  TiXmlElement* node_robot = FindSubNode(node_plannerinput, "robot");
-  if(node_robot){
-    GetStreamText(node_robot) >> robot_idx;
+  if(node_hierarchy){
+    TiXmlElement* lindex = FindFirstSubNode(node_hierarchy, "level");
+    robot_idxs.clear();
+    layers.clear();
+    while(lindex!=NULL){
+      Layer layer;
+
+      layer.level = level++;
+      layer.inner_index = GetAttribute<int>(lindex, "inner_index");
+      layer.outer_index = GetAttributeDefault<int>(lindex, "outer_index", layer.inner_index);
+      layer.type = GetAttribute<std::string>(lindex, "type");
+
+      robot_idxs.push_back(layer.inner_index);
+      layers.push_back(layer);
+
+      lindex = FindNextSiblingNode(lindex);
+    }
   }else{
-    robot_idx = 0;
+    std::cout << "Did not specify robot hierarchy." << std::endl;
+    exit(0);
   }
 
   return true;

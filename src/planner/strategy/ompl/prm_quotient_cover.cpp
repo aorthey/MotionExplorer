@@ -14,8 +14,6 @@ using namespace cover;
 
 PRMQuotientCover::PRMQuotientCover(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
   og::PRMQuotient(si, previous_)
-  //og::PRMQuotientNarrowEdgeDegree(si, previous_)
-  //openNeighborhoodDistance_(boost::get(vertex_open_neighborhood_distance_t(), g_))
 {
   openNeighborhood_ = (boost::get(vertex_open_neighborhood_t(), g_));
   openNeighborhoodDistance_ = (boost::get(vertex_open_neighborhood_distance_t(), g_));

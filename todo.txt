@@ -339,8 +339,8 @@ ompl path instead (would also be better for deformations)
 improvements like identifying narrow passages for sampling
 [x] fix chart boundary path
 [x] optimize resulting path, smooth it
-[ ] visualize each level's solution path!
-[ ] show feasibility of at least one additional joint in SE(3) (three or four
+[x] visualize each level's solution path!
+[x] show feasibility of at least one additional joint in SE(3) (three or four
 level planner should be possible)
 [x] solve doublelshape in some time T (show that it is indeed feasible) maybe
 make hole bigger
@@ -358,14 +358,14 @@ BENCHMARKING
    [x] add horizontal line time-cut off
    [x] add number of runs
    [x] add seconds to time
-   [ ] always start at zero
-   [ ] visualize the solved instances divided by all
- [ ] extensive benchmarking for some SE(3) examples
- [ ] visualize all solved paths
+   [x] always start at zero
+   [x] visualize the solved instances divided by all
+ [x] extensive benchmarking for some SE(3) examples
+ [x] visualize all solved paths
  [ ] replay particular path (let me choose from all solution paths)
- [ ] why do we get invalid paths?
- [ ] catch error during benchmark with multislice, created zero nodes.
- [ ] compare algorithms: RRTConnect, QMP (the classical, only sampling changed), QMPConnect (adjust also connect function), QMPSufficient (ignore sufficient edges), QMPNarrowPassage (analyse underlying graph structure, change sampling accordingly), QMPcsn (all together)
+ [x] why do we get invalid paths?
+ [x] catch error during benchmark with multislice, created zero nodes.
+ [x] compare algorithms: RRTConnect, QMP (the classical, only sampling changed), QMPConnect (adjust also connect function), QMPSufficient (ignore sufficient edges), QMPNarrowPassage (analyse underlying graph structure, change sampling accordingly), QMPcsn (all together)
 
 [x] invalid start state on Xshape -> maybe bigger problem with converting
 ompl->klampt!? (nope, this should affect other planners too)
@@ -397,14 +397,14 @@ SE3RN, R3 <-> SE3, etcetera, instead of trying everything)
 [x] remove sufficient edges (Priority)
 [x] rename multislice -> multiquotient
 [x] visualize all paths from multiquotient
-[ ] while path is plotted, somehow keep focus on a locus point on the robot,
-i.e. some tracking ability
+[x] while path is plotted, somehow keep focus on a locus point on the robot,
+i.e. some tracking ability (draw_path_autofocus="1")
 [x] we need a dimmer to visualize only the spheres below a certain threshold
 [x] visualize: open sets of radius below threshold (have a dimmer)
 [ ] sampling density should reflect the radius of the vertices, i.e. the volume
 of the cover
 [x] visualize: shortest path on each level
-[ ] sampling nearby from a gaussian distribution on SO(3) in OMPL is likely wrong,
+[x] sampling nearby from a gaussian distribution on SO(3) in OMPL is likely wrong,
 sometimes i get an unnormalized quaternion back when i sample with a high
 stddev. Look into that.
 
@@ -415,11 +415,9 @@ elements
 [ ] automate the OnCommand method to automatically switch/case through all
 variables inside the state and toggle them.
 
-
-
-[ ] do randomBounceMotion, but constrained to graph!needs probably rewrite of
+[x] do randomBounceMotion, but constrained to graph!needs probably rewrite of
 expandRoadmap
-[ ] do not sample random edge (RE), but random node-edge (RNE). RNE samples a
+[x] do not sample random edge (RE), but random node-edge (RNE). RNE samples a
 node at random, and then sample an edge at random from all the incoming edges of
 the node. RE has a bias
 towards vertices with high in_degree, while RNE does not. It has been reported
@@ -437,16 +435,8 @@ color)
 [ ] edges are too long
 
 Heuristics applied:
-
 - Increase size of sphere robot to increase clearance of shortest path
 - Sampling mainly around shortest path with diminshing probability over time
 
 
-TODO 01MARCH2018
-
--- Visualize roadmap computation on SE(2) to explain algorithm
--- rewrite related work
--- add coset explanation
--- incoporate adriens comments
-
-
+[ ] benchmark should be completely describeable in xml

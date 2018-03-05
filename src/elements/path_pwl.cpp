@@ -85,7 +85,8 @@ double PathPiecewiseLinear::GetLength() const{
 
 Vector3 PathPiecewiseLinear::EvalVec3(const double t) const{
   Config q = Eval(t);
-  Vector3 v; v[0] = q(0); v[1] = q(1); v[2] = q(2);
+  ob::ScopedState<> s = cspace->ConfigToOMPLState(q);
+  Vector3 v = cspace->getXYZ(s.get());
   return v;
 }
 Config PathPiecewiseLinear::EvalMilestone(const int k) const{
@@ -206,6 +207,7 @@ bool PathPiecewiseLinear::Load(TiXmlElement *node)
 {
   bool res = CheckNodeName(node, "path_piecewise_linear");
   if(!res) return false;
+
   length = GetSubNodeText<double>(node, "length");
 
   interLength.clear();

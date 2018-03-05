@@ -10,30 +10,25 @@
 
   <plannerinput>
 
-    <!-- general settings for all algorithms (fixed) -->
     <qinit  config="7  -3.0 +2.0 +0.0 -2.0 +0 +0.0 +0.0"/>
     <qgoal  config="7  -3.0 -3.0 +0.0 -0.4 +0 +0.0 +0.0"/>
     <se3min config="6  -4.0 -4.0 +0.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +4.0 +4.0 +0.0 +3.141593 +1.57 +3.141593"/>
     <robot>0</robot>
     <freeFloating>1</freeFloating>
-    <se2>1</se2>
 
-    <!-- default settings for all algorithms (overwriteable) -->
     <timestep min="0.001" max="0.01"/>
     <epsilongoalregion>0.01</epsilongoalregion>
     <maxplanningtime>1</maxplanningtime>
     <smoothPath>1</smoothPath>
 
-    <!-- individual algorithms plus individual settings -->
-    <algorithm name="hierarchical:ompl:qmp_prm_connect">
-      <hierarchy>
-        <level inner_index="1" outer_index="1" type="R2"/>
-        <level inner_index="0" outer_index="0" type="SE2"/>
-      </hierarchy>
-    </algorithm>
+    <hierarchy>
+      <level inner_index="1" outer_index="1" type="R2"/>
+      <level inner_index="0" outer_index="0" type="SE2"/>
+    </hierarchy>
 
-    <algorithm name="se2:ompl:rrt"/>
+    <algorithm name="hierarchical:ompl:qmp_prm_connect"/>
+    <algorithm name="ompl:rrt"/>
 
   </plannerinput>
 

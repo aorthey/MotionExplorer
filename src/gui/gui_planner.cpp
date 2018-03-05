@@ -11,9 +11,6 @@ PlannerBackend::PlannerBackend(RobotWorld *world) :
 }
 
 void PlannerBackend::AddPlannerInput(PlannerMultiInput& _in){
-  if(_in.benchmark.isInitialized){
-    planners.push_back( new MotionPlannerBenchmark(world, _in) );
-  }
   for(uint k = 0; k < _in.inputs.size(); k++){
     //std::cout << *_in.inputs.at(k) << std::endl;
     planners.push_back( new MotionPlanner(world, *_in.inputs.at(k)) );
@@ -45,6 +42,7 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="hierarchy_down"){
     planners.at(active_planner)->Expand();
     hierarchy_change = true;
+  }else if(cmd=="benchmark"){
   }else if(cmd=="hierarchy_up"){
     planners.at(active_planner)->Collapse();
     hierarchy_change = true;
@@ -125,6 +123,12 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   SendRefresh();
   return true;
 }
+void PlannerBackend::CenterCameraOn(const Vector3& v){
+  //Vector3 bmin = v-epsilon;
+  //Vector3 bmax = v-epsilon;
+  Math3D::AABB3D box(v,v);
+  GLNavigationBackend::CenterCameraOn(box);
+}
 bool PlannerBackend::OnIdle(){
   bool res = BaseT::OnIdle();
   if(planners.empty()) return res;
@@ -148,6 +152,10 @@ bool PlannerBackend::OnIdle(){
         }else{
           t+=tstep;
           SendRefresh();
+        }
+        if(state("draw_path_autofocus")){
+          Vector3 v = path->EvalVec3(t);
+          CenterCameraOn(v);
         }
       }
       return true;
