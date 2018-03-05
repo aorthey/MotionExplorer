@@ -7,10 +7,10 @@
 // returns singleton path
 // 
 
-class PathSpaceOMPL: public PathSpace{
+class PathSpaceMultiLevel: public PathSpace{
   public:
-    PathSpaceOMPL(RobotWorld *world_, PathSpaceInput* input_);
-    virtual std::vector<PathSpace*> Decompose() override;
+    PathSpaceMultiLevel(RobotWorld *world_, PathSpaceInput* input_);
+    std::vector<PathSpace*> Decompose() override;
     virtual void DrawGL(GUIState&) override;
     virtual bool isAtomic() const override;
 };

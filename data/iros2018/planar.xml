@@ -14,12 +14,11 @@
     <qgoal  config="7  -3.0 -3.0 +0.0 -0.4 +0 +0.0 +0.0"/>
     <se3min config="6  -4.0 -4.0 +0.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +4.0 +4.0 +0.0 +3.141593 +1.57 +3.141593"/>
-    <robot>0</robot>
     <freeFloating>1</freeFloating>
 
     <timestep min="0.001" max="0.01"/>
     <epsilongoalregion>0.01</epsilongoalregion>
-    <maxplanningtime>1</maxplanningtime>
+    <maxplanningtime>3</maxplanningtime>
     <smoothPath>1</smoothPath>
 
     <hierarchy>
@@ -28,7 +27,7 @@
     </hierarchy>
 
     <algorithm name="hierarchical:ompl:qmp_prm_connect"/>
-    <algorithm name="ompl:rrt"/>
+    <algorithm name="ompl:prm"/>
 
   </plannerinput>
 

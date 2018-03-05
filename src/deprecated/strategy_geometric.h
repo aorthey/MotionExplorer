@@ -1,5 +1,6 @@
 #pragma once
 #include "planner/strategy/strategy.h"
+
 #include <omplapp/apps/SE3RigidBodyPlanning.h>
 #include <omplapp/config.h>
 
@@ -9,17 +10,12 @@ namespace og = ompl::geometric;
 namespace oa = ompl::app;
 namespace ot = ompl::tools;
 
-class StrategyGeometricMultiLevel: public Strategy{
+
+class StrategyGeometric: public Strategy{
   public:
     virtual void plan( const StrategyInput &input, StrategyOutput &output);
 
-    StrategyGeometricMultiLevel();
-
-    void BenchmarkFileToPNG(const std::string&);
-
-  ob::PlannerPtr GetPlanner(std::string algorithm,
-      std::vector<ob::SpaceInformationPtr> si_vec, 
-      std::vector<ob::ProblemDefinitionPtr> pdef_vec);
+    StrategyGeometric();
 
 };
 

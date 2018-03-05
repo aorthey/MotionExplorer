@@ -1,14 +1,14 @@
 #pragma once
 #include "planner/strategy/strategy_input.h"
+#include "planner/planner_input.h"
 #include "planner/cspace/cspace_input.h"
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 
 class PathSpaceInput{
 
   public:
-    PathSpaceInput(){
-      next_layer = NULL;
-    }
+    PathSpaceInput();
+    PathSpaceInput(const PlannerInput&, int level_);
 
     Config q_init;
     Config q_goal;

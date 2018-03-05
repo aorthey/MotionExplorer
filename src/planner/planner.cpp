@@ -3,7 +3,6 @@
 #include "gui/drawMotionPlanner.h"
 
 #include "pathspace/pathspace_atomic.h"
-#include "pathspace/pathspace_ompl.h"
 #include "pathspace/pathspace_multilevel.h"
 #include "pathspace/decorator.h"
 #include "pathspace/decorator_highlighter.h"
@@ -21,12 +20,6 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   current_level = 0;
   current_level_node = 0;
   this->world->InitCollisions();
-
-  //if(!input.freeFloating){
-  //  std::cout << " planner works only with freefloating robots right now x__X;;" << std::endl;
-  //  active = false;
-  //  return;
-  //}
 
   std::string algorithm = input.name_algorithm;
   hierarchy = new Hierarchy<PathSpace*>();
@@ -78,66 +71,29 @@ void MotionPlanner::CreateSinglePathHierarchy(){
     hierarchy->AddLevel( ii, io, qi, qg); 
 
     if(k==0){
-      psinput = new PathSpaceInput();
-      psinput->q_init = qi;
-      psinput->q_goal = qg;
-      psinput->dq_init = dqi;
-      psinput->dq_goal = dqg;
+      psinput = new PathSpaceInput(input, 0);
+      psinput->type = input.layers.at(0).type;
 
       psinput->robot_idx = ii;
       psinput->robot_inner_idx = ii;
       psinput->robot_outer_idx = io;
-      psinput->type = input.layers.at(k).type;
-
-      psinput->qMin = input.qMin;
-      psinput->qMax = input.qMax;
-      psinput->se3min = input.se3min;
-      psinput->se3max = input.se3max;
-      psinput->freeFloating = input.freeFloating;
-      psinput->fixedBase = !input.freeFloating;
-      psinput->enableSufficiency = input.enableSufficiency;
-
-      psinput->name_sampler = input.name_sampler;
       psinput->name_algorithm = subalgorithm;
-      psinput->epsilon_goalregion = input.epsilon_goalregion;
-      psinput->max_planning_time = input.max_planning_time;
-      psinput->timestep_min = input.timestep_min;
-      psinput->timestep_max = input.timestep_max;
 
-      psinput->level = k;
       psinput_level0 = psinput;
-      psinput_level0->name_algorithm = subalgorithm;
     }
 
-    psinput->SetNextLayer(new PathSpaceInput());
+    psinput->SetNextLayer(new PathSpaceInput(input,k));
     psinput = psinput->GetNextLayer();
-
-    psinput->q_init = qi;
-    psinput->q_goal = qg;
-    psinput->dq_init = dqi;
-    psinput->dq_goal = dqg;
 
     psinput->robot_idx = ii;
     psinput->robot_inner_idx = ii;
     psinput->robot_outer_idx = io;
-    psinput->level = k;
     psinput->type = input.layers.at(k).type;
 
-    psinput->qMin = input.qMin;
-    psinput->qMax = input.qMax;
-    psinput->se3min = input.se3min;
-    psinput->se3max = input.se3max;
-    psinput->freeFloating = input.freeFloating;
-    psinput->enableSufficiency = input.enableSufficiency;
-    psinput->fixedBase = !input.freeFloating;
-
-    psinput->name_sampler = input.name_sampler;
     psinput->name_algorithm = subalgorithm;
-    psinput->epsilon_goalregion = input.epsilon_goalregion;
-    psinput->max_planning_time = input.max_planning_time;
-    psinput->timestep_min = input.timestep_min;
-    psinput->timestep_max = input.timestep_max;
+
   }
+  std::cout << *psinput_level0 << std::endl;
 
   //remove all nested robots except the original one
   //for(uint k = 0; k < idxs.size()-1; k++){
@@ -146,6 +102,9 @@ void MotionPlanner::CreateSinglePathHierarchy(){
 
   if(psinput_level0!=nullptr){
     hierarchy->AddRootNode( new PathSpaceMultiLevel(world, psinput_level0) );
+  }else{
+    std::cout << "root node is zero" << std::endl;
+    exit(0);
   }
 
 }
@@ -162,57 +121,22 @@ void MotionPlanner::CreateShallowHierarchy(){
 
   Config p_init = input.q_init;
   Config p_goal = input.q_goal;
-  int idx = input.robot_idx;
+  int idx = input.robot_idxs.back();
+  std::string type = input.layers.back().type;
 
   //  (1) space of all continuous paths
   hierarchy->AddLevel( idx, p_init, p_goal);
   //  (2) a single solution path (if it exists)
   hierarchy->AddLevel( idx, p_init, p_goal);
 
-  //let root node by a path space, returning one path as decomposition
-  PathSpaceInput* psinput = new PathSpaceInput();
-  psinput->q_init = input.q_init;
-  psinput->q_goal = input.q_goal;
-  psinput->dq_init = input.dq_init;
-  psinput->dq_goal = input.dq_goal;
-  psinput->qMin = input.qMin;
-  psinput->qMax = input.qMax;
-  psinput->se3min = input.se3min;
-  psinput->se3max = input.se3max;
-  psinput->freeFloating = input.freeFloating;
-  psinput->enableSufficiency = input.enableSufficiency;
-  psinput->fixedBase = !input.freeFloating;
 
-  psinput->name_sampler = input.name_sampler;
-  psinput->name_algorithm = input.name_algorithm;
-  psinput->robot_idx = input.robot_idx;
-  psinput->robot_inner_idx = input.robot_idx;
-  psinput->robot_outer_idx = input.robot_idx;
-  psinput->epsilon_goalregion = input.epsilon_goalregion;
-  psinput->max_planning_time = input.max_planning_time;
-  psinput->timestep_min = input.timestep_min;
-  psinput->timestep_max = input.timestep_max;
+  PathSpaceInput* level0 = new PathSpaceInput(input, 0);
+  level0->type = type;
+  PathSpaceInput* level1 = new PathSpaceInput(input, 1);
+  level1->type = type;
+  level0->SetNextLayer(level1);
 
-  PathSpaceInput* next = new PathSpaceInput();
-  next->q_init = input.q_init;
-  next->q_goal = input.q_goal;
-  next->dq_init = input.dq_init;
-  next->dq_goal = input.dq_goal;
-  next->qMin = input.qMin;
-  next->qMax = input.qMax;
-  next->se3min = input.se3min;
-  next->se3max = input.se3max;
-  next->freeFloating = input.freeFloating;
-  next->enableSufficiency = input.enableSufficiency;
-  next->fixedBase = !input.freeFloating;
-  next->robot_idx = input.robot_idx;
-  next->robot_inner_idx = input.robot_idx;
-  next->robot_outer_idx = input.robot_idx;
-  next->SetNextLayer(NULL);
-
-  psinput->SetNextLayer(next);
-
-  hierarchy->AddRootNode( new PathSpaceOMPL(world, psinput) );
+  hierarchy->AddRootNode( new PathSpaceMultiLevel(world, level0) );
 }
 
 const PlannerInput& MotionPlanner::GetInput(){

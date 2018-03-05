@@ -442,7 +442,7 @@ namespace GLDraw{
 
   void drawRobotAtConfig(Robot *robot, const Config &q, GLColor color, double scale){
     Config qq; qq.resize(robot->q.size());qq.setZero();
-    for(int k = 0; k < q.size(); k++) qq(k)=q(k);
+    for(int k = 0; k < qq.size(); k++) qq(k)=q(k);
     robot->UpdateConfig(qq);
     for(uint j=0;j<robot->links.size();j++) {
       if(robot->IsGeometryEmpty(j)) continue;
