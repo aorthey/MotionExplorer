@@ -1,9 +1,11 @@
 <benchmark>
-  <algorithm name="qmp_prm_connect"/>
-  <algorithm name="ompl:kpiece"/>
+  <algorithm name="qmp_connect"/>
   <algorithm name="ompl:stride"/>
+  <algorithm name="ompl:kpiece"/>
   <algorithm name="ompl:rrtconnect"/>
   <algorithm name="ompl:prm"/>
+  <algorithm name="ompl:est"/>
+
   <maxplanningtime>300</maxplanningtime> <!-- runtime in (s) --> 
   <runcount>10</runcount> <!-- number of runs per algorithm --> 
   <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 

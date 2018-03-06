@@ -31,7 +31,7 @@ PRMQuotientConnect::PRMQuotientConnect(const ob::SpaceInformationPtr &si, Quotie
 {
   setName("PRMQuotientConnect"+to_string(id));
   goalBias_ = 0.0;
-  epsilon = 0.0;
+  epsilon = 0.1;
   percentageSamplesOnShortestPath = 1; //start at 1, then diminish over time
 }
 
@@ -558,7 +558,6 @@ void PRMQuotientConnect::RandomWalk(const Vertex &v)
   uint steps = magic::MAX_RANDOM_BOUNCE_STEPS;
   for (uint i = 0; i < steps; ++i)
   {
-
     //#########################################################################
     //Sample s_last uniformly from G_{k-1} \times C_k
     //#########################################################################

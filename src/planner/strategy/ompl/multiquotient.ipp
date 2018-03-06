@@ -226,6 +226,5 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
     std::cout << "multiquotient: added " << ctr << " vertices on level " << k << std::endl;
     Nvertices = data.numVertices();
   }
-  //quotientSpaces.back()->getPlannerData(data);
 }
 

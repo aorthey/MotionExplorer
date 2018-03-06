@@ -101,7 +101,7 @@ as swept volumes simultaneously
       [x] screenshots
       [x] display plannersettings (text+start/goal configs)
 
- [ ] do benchmark planning from inside the simulator by clicking together
+ [x] do benchmark planning from inside the simulator by clicking together
 algorithms and #runs and duration. Have a default benchmarking plus dump
 everything to nice pdf graph / latex table.
  [ ] have ability to retime a path inside simulator, then display the
@@ -188,39 +188,25 @@ self-collision forces?
  [x] reset goes back to wrong position
  [x] reset: momentum is not set back to zero 
  [ ] reset: crash when plotting joint values
- [ ] kernel panic after movie creation
-   [ ] got another kernel panic after displaying torque based jet propulsion
+ [x] kernel panic after movie creation
+   [x] got another kernel panic after displaying torque based jet propulsion
  [ ] retreat simulation
 
 -- abstractions 
 
  [x] compute and display distance between links and terrain
  [x] make small 3-leg spider robot, only contacts
- [ ] use some balance controller
  [x] design cave environment
  [x] force is applied even with 000 force field (didn't remove se3drivers)
  [x] planning with two robot entities inner/outer SV
     [x] make cspace with two robots, inherit from kinodynamiccspace, make robot + outer shell 
- [ ] create three hotkey groups: Env Manipulation, Path Manipulation, Robot Manipulation and Simulation
  [x] level planning
    [x] visualize level tree
    [x] visualize level path
    [x] visualize level all paths
  [x] have different numbers to highlight/show different planner outputs. This
 way we could build a hierarchical visualization
- [ ] planner needs refactoring: new folders validator/integrator. new class setup
-which takes settings and produces a cspace and an algorithm taking
-validator/integrator into account. This setup file should then be replaced by
-Hplanner, so we need to give it more meaningful name 
- [ ] adjust algo such that spheres do not intersect (too many clustered on one point) -> cvx decomp?
- [ ] make sure it works with -wall, -mars, and -cave.
  [x] fix spider urdf
- [ ] cylinder -> hole example (can easily be compared to ompl, has many
-variations already included in ompl and would nicely act as a ground truth
-example)
- [ ] cylinder -> free space as comparison (do not check if start and goal can be
-connected, or use that as a ground truth benchmark)
- [ ] corner element -> hole
 
  [x] install SBL lib
  [x] compute homology groups (HG) of SC
@@ -228,12 +214,10 @@ connected, or use that as a ground truth benchmark)
  [x] visualize internal holes
  [x] changing between visuals changes colors/linewidth of other visuals, but shouldn't.
  [x] ompl cannot deal with zero dimensions
- [ ] compute retraction (GUDHI or CGAL)
- [ ] orientation limits are not respected OMPL
+ [x] orientation limits are not respected OMPL
  
  [x] remove zero measure dimensions from OMPL (i.e. map them to lower space
  before starting OMPL, there are always problems with that)
- [ ] there is no way to enforce bounds on SO(3), maybe we need to decompose it somehow
  [x] have one complete system for rigid link: add arbitrary nested robots.
  compute shortest paths. Iterate through all solutions.
  
@@ -259,20 +243,17 @@ thread. Once finished, return the path and visualize the highest layer path in
 the corresponding color of that planner.
  [ ] make planner run on separate threads
  [ ] it would be nice to repeat an algorithm N times, and visualize the solution paths.
- [ ] add drawFace/drawEdge to terrain XML file
- [ ] make objects transparent
+ [x] add drawFace/drawEdge to terrain XML file
+ [x] make objects transparent
  [ ] more sophisticated [graph visualization]; using viewpoint to get fixed 3d position
- [ ] sometimes [two nearby paths are not reduced], investigate that (update definition of equivalence first)
- [ ] incorporate [sufficient conditions], visualize that nodes are feasible, use
+ [x] sometimes [two nearby paths are not reduced], investigate that (update definition of equivalence first)
+ [x] incorporate [sufficient conditions], visualize that nodes are feasible, use
  some interpolation to get shortest path in pocket
- [ ] more challenging environments
-   [ ] forest with steep ruggy terrain
+ [x] more challenging environments
  [x] orientation of capsule definitely not correct. needs investigating.
- [ ] make a list of environments, their picture and what this environment is
+ [x] make a list of environments, their picture and what this environment is
  designed to show (+ who came up with the environment)
- 
- [ ] visualize all vertices of one onetopic covering
- [ ] check if we can store personal information in a PD::Node during planning.  I.e. store sufficiency and maybe some other stuff there
+ [x] check if we can store personal information in a PD::Node during planning.  I.e. store sufficiency and maybe some other stuff there
 
 HPlanner
  [x] going up does not remove SV
@@ -298,17 +279,6 @@ primitives -> maybe we can remove the checker from klampt?)
  [x] simplify final path and interpolate
  [x] replay motion, not only swept volume (OnIdle)
  [x] outsource all those individual cspaces
-
-[x] create two new classes PathSpaceOMPLSE2, Pathspaceomplse2TwoLevel,
-PathSpaceOMPLSE2OneLevel, which either call an ompl strategy, or call the
-necessary two level strategy. Each class visualizes the roadmap as a tree on 3d,
-which is overlayed onto the environment. We ignore the fact that each slice
-should be loop back onto itself for now. Use those classes to visualize and
-adapt the twolevel algorithm
-[x] move CSPaceOMPL to OMPLSpace and CSpace to KlamptSpace, gets confusing
-otherwise (factory needs to store the pointers somehow)
-[x] create 2d environment for planar lshape in blender with narrow passage (and
-possible misleading initial path)
 
 Minor Things
 [x] cspace: refactor cspace into separate classes
@@ -381,9 +351,9 @@ anything else from the roadmap class)
 [x] add raw path to pwl
 [x] rm vantage path from pathspace
 [x] do comparison uniform, edge index, stoer_wagner_min_cut
-[ ] swept volume uses the wrong robot index (make this available directly in
+[x] swept volume uses the wrong robot index (make this available directly in
 path_pwl.h)
-[ ] identify narrow passage on graph (high priority)
+[x] identify narrow passage on graph (high priority)
 [ ] next planner select -> old path replay is not immediately updated
 [ ] abstract class SimTestGUI overwrites hotkey assignment, remove that
 
@@ -401,7 +371,7 @@ SE3RN, R3 <-> SE3, etcetera, instead of trying everything)
 i.e. some tracking ability (draw_path_autofocus="1")
 [x] we need a dimmer to visualize only the spheres below a certain threshold
 [x] visualize: open sets of radius below threshold (have a dimmer)
-[ ] sampling density should reflect the radius of the vertices, i.e. the volume
+[x] sampling density should reflect the radius of the vertices, i.e. the volume
 of the cover
 [x] visualize: shortest path on each level
 [x] sampling nearby from a gaussian distribution on SO(3) in OMPL is likely wrong,
@@ -434,9 +404,13 @@ A Survey and Taxonomy of Graph Sampling
 color)
 [x] benchmark should be completely describeable in xml
 [x] get rid of double hierarchy construction ompl vs qmp
-[ ] remove algorithm / maxplanningtime etcetera from plannerinputs and put them
+[x] remove algorithm / maxplanningtime etcetera from plannerinputs and put them
 into separate xml file (one setting for everything)
+[ ] benchmark.xml merge with planner.xml?
+[ ] openGL transparency does not work correctly with the bubbles
 
 QMP PLANNER
 [ ] update shortest path after each growing operation (otherwise suboptimal
 paths are sampled, which we do not want)
+[ ] size of bubbles ok with one layer, but changes if another layer is added (is
+there some way that we might confuse the vertices when using getPlannerData?)

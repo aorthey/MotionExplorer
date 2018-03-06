@@ -69,3 +69,12 @@ void PlannerDataVertexAnnotated::setState(ob::State *s)
 {
   state_ = s;
 }
+
+std::ostream& operator<< (std::ostream& out, const PlannerDataVertexAnnotated& v)
+{
+  out << "AnnotatedVertex";
+  out << " ->level " << v.GetLevel() << "/" << v.GetMaxLevel();
+  out << " ->component " << v.GetComponent();
+  out << std::endl;
+  return out;
+}

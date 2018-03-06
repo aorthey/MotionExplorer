@@ -135,7 +135,7 @@
     <name>roadmap_visualize_level_0</name>
     <descr>Roadmap Vis Level 0</descr>
     <key>6</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
   <checkbox>
     <name>roadmap_visualize_level_1</name>
@@ -172,15 +172,15 @@
     <name>draw_roadmap_volume</name>
     <descr>Draw Roadmap Volume</descr>
     <key>3</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
 
   <slider>
     <name>draw_cover_threshold</name>
-    <value>20</value>
+    <value>5</value>
     <min>0</min>
-    <max>20</max>
-    <step>0.5</step>
+    <max>10</max>
+    <step>1</step>
   </slider>
   <hotkey>
     <name>draw_cover_threshold_up</name>

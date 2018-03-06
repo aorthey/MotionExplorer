@@ -1,6 +1,5 @@
 #pragma once
-#include "prm_quotient.h"
-#include "prm_quotient_narrowness.h"
+#include "prm_quotient_connect.h"
 #include <ompl/datastructures/PDF.h>
 
 namespace ob = ompl::base;
@@ -15,22 +14,22 @@ namespace ompl
   }
   namespace geometric
   {
-    class PRMQuotientCover: public og::PRMQuotient{
+    class PRMQuotientConnectCover: public og::PRMQuotientConnect{
 
       public:
 
-        PRMQuotientCover(const ob::SpaceInformationPtr &si, Quotient *previous_);
+        PRMQuotientConnectCover(const ob::SpaceInformationPtr &si, Quotient *previous_);
 
         virtual Vertex CreateNewVertex(ob::State *state) override;
 
         virtual void getPlannerData(ob::PlannerData &data) const override;
 
         virtual void ClearVertices() override;
-      protected:
+      //protected:
 
-        virtual bool SampleGraph(ob::State*) override;
+        //virtual bool SampleGraph(ob::State*) override;
 
-        virtual bool Connect(const Vertex a, const Vertex b) override;
+        //virtual bool Connect(const Vertex a, const Vertex b) override;
 
     };
 

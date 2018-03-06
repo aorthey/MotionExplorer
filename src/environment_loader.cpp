@@ -1,6 +1,6 @@
 #include "environment_loader.h"
 #include "controller/controller.h"
-#include "file_input_output.h"
+#include "file_io.h"
 #include <boost/filesystem.hpp>
 
 RobotWorld& EnvironmentLoader::GetWorld(){

@@ -135,8 +135,8 @@ void Roadmap::DrawPathGL(GUIState &state, std::vector<Vector3> &q)
 
 void Roadmap::DrawSingleLevelGL(GUIState &state, ob::PlannerDataPtr pd)
 {
-  glPointSize(sizeVertex);
   if(state("draw_roadmap_vertices")){
+    glPointSize(sizeVertex);
     setColor(cVertex);
     for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
       glPushMatrix();
@@ -165,6 +165,7 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, ob::PlannerDataPtr pd)
             exit(0);
           }
           if(d < v.value){
+            setColor(cNeighborhoodVolume);
             drawSphere(d,16,8);
           }
         }
@@ -175,9 +176,9 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, ob::PlannerDataPtr pd)
     }
   }
 
-  glLineWidth(widthEdge);
   if(state("draw_roadmap_edges")){
-    ompl::RNG rng(0);
+    glPushMatrix();
+    glLineWidth(widthEdge);
     setColor(cEdge);
     for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
       ob::PlannerDataVertex *v = &pd->getVertex(vidx);
@@ -194,7 +195,7 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, ob::PlannerDataPtr pd)
           drawLineSegment(v1,v2);
         }else{
           if(va->GetComponent()==0 || wa->GetComponent()==0){
-            setColor(cVertex);
+            setColor(cEdge);
           }else if(va->GetComponent()==1 || wa->GetComponent()==1){
             setColor(cVertexGoal);
           }else{
@@ -204,6 +205,7 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, ob::PlannerDataPtr pd)
         }
       }
     }
+    glPopMatrix();
   }
 }
 
@@ -220,7 +222,7 @@ void Roadmap::DrawGL(GUIState& state)
       if(!roadmaps_level.at(k)) return;
       //std::cout << "level " << k << " vertices: " << roadmaps_level.at(k)->numVertices() << std::endl;
       cVertex = (k%2==0?green:red);
-      cEdge = (k%2==0?green:red);
+      cEdge = cVertex;
       cPath = (k%2==0?magenta:black);
       DrawSingleLevelGL(state, roadmaps_level.at(k));
       if(state("draw_path")){

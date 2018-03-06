@@ -26,6 +26,8 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
       return state_ == rhs.getState();
     }
 
+    friend std::ostream& operator<< (std::ostream&, const PlannerDataVertexAnnotated&);
+
   protected:
     double open_neighborhood_distance{0.0};
     uint level{0};

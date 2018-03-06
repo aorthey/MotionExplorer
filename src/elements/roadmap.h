@@ -21,10 +21,11 @@ class Roadmap{
     virtual void DrawGL(GUIState&);
 
     GLDraw::GLColor cVertex{green};
-    GLDraw::GLColor cEdge{lightGreen};
+    GLDraw::GLColor cEdge{magenta};
     GLDraw::GLColor cPath{magenta};
     GLDraw::GLColor cVertexOut{gray}; //a vertex not in the same component as the designated start vertex
     GLDraw::GLColor cVertexGoal{cyan}; //goal component vertex
+    GLDraw::GLColor cNeighborhoodVolume{GLColor(0.1,0.8,0.1,0.2)}; //goal component vertex
     double sizeVertex{8};
     double widthEdge{5};
     double widthPath{15};

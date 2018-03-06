@@ -543,6 +543,7 @@ void PRMBasic::getPlannerData(ob::PlannerData &data) const
     PlannerDataVertexAnnotated pstart(stateProperty_[i], startComponent);
     pstart.SetComponent(0);
     data.addStartVertex(pstart);
+
   }
 
   for (unsigned long i : goalM_)
@@ -586,6 +587,7 @@ void PRMBasic::getPlannerData(ob::PlannerData &data) const
     // std::cout << "vertex " << vi1 << " component " << v1a.GetComponent() << std::endl;
     // std::cout << "vertex " << vi2 << " component " << v2a.GetComponent() << std::endl;
   }
+  //there might be vertices which are not connected with any edge
   //std::cout << std::string(80, '-') << std::endl;
 
   // //foreach(const Vertex v, boost::vertices(g_))

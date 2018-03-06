@@ -1,12 +1,14 @@
 <planner>
-  <algorithm name="qmp_prm_connect"/>
+  <algorithm name="qmp_connect_cover"/>
+  <algorithm name="qmp_connect"/>
   <algorithm name="ompl:stride"/>
   <algorithm name="ompl:kpiece"/>
   <algorithm name="ompl:rrtconnect"/>
-  <algorithm name="ompl:rrt"/>
+  <algorithm name="ompl:prm"/>
+  <algorithm name="ompl:est"/>
   <algorithm name="benchmark"/>
 
-  <maxplanningtime>5</maxplanningtime> <!-- runtime in (s) --> 
+  <maxplanningtime>2</maxplanningtime> <!-- runtime in (s) --> 
   <epsilongoalregion>0.01</epsilongoalregion> 
   <smoothPath>0</smoothPath> <!-- 0: no smoothing, 1: smoothing      -->
   <pathSpeed>1</pathSpeed>   <!-- <1: slower, 1: default, >1: faster -->
