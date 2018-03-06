@@ -1,0 +1,8 @@
+<benchmark>
+  <algorithm name="qmp_prm_connect"/>
+  <algorithm name="ompl:rrtconnect"/>
+  <algorithm name="ompl:prm"/>
+  <maxplanningtime>3</maxplanningtime> <!-- runtime in (s) --> 
+  <runcount>3</runcount> <!-- number of runs per algorithm --> 
+  <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
+</benchmark>
