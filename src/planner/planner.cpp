@@ -21,26 +21,14 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   current_level_node = 0;
   this->world->InitCollisions();
 
-  std::string algorithm = input.name_algorithm;
-  hierarchy = new Hierarchy<PathSpace*>();
-
-  //if(StartsWith(algorithm,"hierarchical")) {
   CreateHierarchy();
-  // }else if(StartsWith(algorithm,"ompl")) {
-  //   CreateShallowHierarchy();
-  //}else{
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  std::cout << "Unknown algorithm: " << algorithm << std::endl;
-  //  std::cout << std::string(80, '-') << std::endl;
-  //  active = false;
-  //}
 }
 std::string MotionPlanner::getName() const{
   return input.name_algorithm;
 }
 
 void MotionPlanner::CreateHierarchy(){
-
+  hierarchy = new Hierarchy<PathSpace*>();
   std::vector<int> idxs = input.robot_idxs;
   //std::string subalgorithm = input.name_algorithm.substr(13,input.name_algorithm.size()-13);
   std::string algorithm = input.name_algorithm;

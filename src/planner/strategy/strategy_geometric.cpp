@@ -1,5 +1,6 @@
 #include "planner/strategy/strategy_geometric.h"
 #include "planner/strategy/ompl/multiquotient.h"
+#include "planner/strategy/benchmark.h"
 
 #include "planner/strategy/ompl/prm_basic.h"
 #include "planner/strategy/ompl/prm_quotient.h"
@@ -199,12 +200,16 @@ void StrategyGeometricMultiLevel::RunBenchmark(
     std::vector<ob::SpaceInformationPtr> si_vec, 
     std::vector<ob::ProblemDefinitionPtr> pdef_vec)
 {
+  BenchmarkInformation binfo;
+
   const ob::SpaceInformationPtr si = si_vec.back();
   std::string file_benchmark = "benchmark_"+util::GetCurrentDateTimeString();
   og::SimpleSetup ss(si);
   ot::Benchmark benchmark(ss, "Benchmark");
 
-  benchmark.addPlanner(GetPlanner("ompl:rrt", si_vec, pdef_vec));
+  for(uint k = 0; k < binfo.algorithms.size(); k++){
+    benchmark.addPlanner(GetPlanner(binfo.algorithms.at(k), si_vec, pdef_vec));
+  }
 
   ob::ProblemDefinitionPtr pdef = pdef_vec.back();
 
@@ -219,9 +224,9 @@ void StrategyGeometricMultiLevel::RunBenchmark(
   pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
   ot::Benchmark::Request req;
-  req.maxTime = 2;
-  req.maxMem = 10000.0;
-  req.runCount = 2;
+  req.maxTime = binfo.maxPlanningTime;
+  req.maxMem = binfo.maxMemory;
+  req.runCount = binfo.runCount;
   req.displayProgress = true;
 
   benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));
@@ -233,9 +238,8 @@ void StrategyGeometricMultiLevel::RunBenchmark(
   benchmark.saveResultsToFile(res.c_str());
 
   BenchmarkFileToPNG(file_benchmark);
-
-  exit(0);
 }
+
 void StrategyGeometricMultiLevel::BenchmarkFileToPNG(const std::string &file)
 {
   std::string cmd;

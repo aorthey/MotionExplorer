@@ -54,10 +54,6 @@ class MotionPlanner{
     bool isHierarchical();
 
     bool active;
-
-    //void CreateShallowHierarchy();
-    //void CreateShallowHierarchySE2();
-    //void CreateSinglePathHierarchy();
     void CreateHierarchy();
 
     PathSpace *Pcurrent;
