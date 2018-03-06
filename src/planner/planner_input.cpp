@@ -47,7 +47,7 @@ bool PlannerInput::Load(TiXmlElement *node)
   se3min = GetSubNodeAttribute<Config>(node, "se3min", "config");
   se3max = GetSubNodeAttribute<Config>(node, "se3max", "config");
 
-  freeFloating = GetSubNodeText<int>(node, "freeFloating");
+  freeFloating = GetSubNodeTextDefault(node, "freeFloating", false);
   robot_idx = GetSubNodeTextDefault(node, "robot", 0);
 
   timestep_min = GetSubNodeAttributeDefault(node, "timestep", "min", 0.01);

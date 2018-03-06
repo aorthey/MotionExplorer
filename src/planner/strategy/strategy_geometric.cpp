@@ -146,71 +146,10 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     typedef og::MultiQuotient<og::PRMQuotient> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec);
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-
-  // }else if(algorithm=="ompl:benchmark"){
-  //   //### BENCHMARK #########################################################
-  //   ot::Benchmark benchmark(ss, "BenchmarkNarrowPassage");
-
-
-  //   //planner = std::make_shared<MultiQuotient>(si_vec,"RRTUnidirectional");
-  //   //static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  //   //benchmark.addPlanner(planner);
-
-  //   // typedef og::MultiQuotient<og::PRMQuotient> MultiPRMQuotient;
-  //   // planner = std::make_shared<MultiPRMQuotient>(si_vec,"PRM");
-  //   // static_pointer_cast<MultiPRMQuotient>(planner)->setProblemDefinition(pdef_vec);
-  //   // benchmark.addPlanner(planner);
-
-  //   typedef og::MultiQuotient<og::PRMQuotientConnect, og::RRTBidirectional> MultiQuotient;
-  //   //typedef og::MultiQuotient<og::PRMQuotient> MultiQuotient;
-  //   planner = std::make_shared<MultiQuotient>(si_vec);
-  //   static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  //   benchmark.addPlanner(planner);
-
-  //   planner = std::make_shared<og::PRM>(si_vec.back());
-  //   planner->setProblemDefinition(pdef_vec.back());
-  //   benchmark.addPlanner(planner);
-
-  //   planner = std::make_shared<og::RRTConnect>(si_vec.back());
-  //   planner->setProblemDefinition(pdef_vec.back());
-  //   benchmark.addPlanner(planner);
-
-  //   planner = std::make_shared<og::EST>(si_vec.back());
-  //   planner->setProblemDefinition(pdef_vec.back());
-  //   benchmark.addPlanner(planner);
-
-  //   ob::ProblemDefinitionPtr pdef = pdef_vec.back();
-  //   CSpaceOMPL *cspace = input.cspace_levels.back();
-  //   ob::ScopedState<> start = cspace->ConfigToOMPLState(p_init);
-  //   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(p_goal);
-  //   ss.setStartAndGoalStates(start,goal,input.epsilon_goalregion);
-
-  //   ss.setup();
-
-  //   pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
-
-  //   ot::Benchmark::Request req;
-  //   req.maxTime = 180;
-  //   req.maxMem = 10000.0;
-  //   req.runCount = 10;
-  //   req.displayProgress = true;
-
-  //   benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));
-  //   benchmark.benchmark(req);
-
-  //   std::string res = file_benchmark+".log";
-  //   std::string cmd;
-
-  //   benchmark.saveResultsToFile(res.c_str());
-
-  //   BenchmarkFileToPNG(file_benchmark);
-
-  //   exit(0);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);
   }
-  //ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
   planner->setProblemDefinition(pdef_vec.back());
   return planner;
 
@@ -218,8 +157,6 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
 
 void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutput &output)
 {
-  Config p_init = input.q_init;
-  Config p_goal = input.q_goal;
   std::string algorithm = input.name_algorithm;
 
   std::vector<ob::SpaceInformationPtr> si_vec; 
@@ -230,8 +167,8 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     ob::SpaceInformationPtr sik = cspace_levelk->SpaceInformationPtr();
     setStateSampler(input.name_sampler, sik);
 
-    ob::ScopedState<> startk = cspace_levelk->ConfigToOMPLState(p_init);
-    ob::ScopedState<> goalk  = cspace_levelk->ConfigToOMPLState(p_goal);
+    ob::ScopedState<> startk = cspace_levelk->ConfigToOMPLState(input.q_init);
+    ob::ScopedState<> goalk  = cspace_levelk->ConfigToOMPLState(input.q_goal);
 
     std::cout << *cspace_levelk << std::endl;
 
@@ -247,42 +184,79 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     pdef_vec.push_back(pdefk);
   }
 
-  const ob::SpaceInformationPtr si = si_vec.back();
-  og::SimpleSetup ss(si);
-
   //###########################################################################
   // choose planner
   //###########################################################################
 
-  std::string file_benchmark = "benchmark_"+util::GetCurrentDateTimeString();
-  ob::PlannerPtr planner = GetPlanner(algorithm, si_vec, pdef_vec);
+  if(algorithm=="benchmark"){
+    RunBenchmark(input, si_vec, pdef_vec);
+  }else{
+    ob::PlannerPtr planner = GetPlanner(algorithm, si_vec, pdef_vec);
+    planner->clear();
+    planner->setup();
 
-  planner->clear();
+    double max_planning_time= input.max_planning_time;
+    ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
-  //###########################################################################
-  //  WITHOUT SimpleSetup
-  //###########################################################################
-  planner->setup();
+    ompl::time::point start = ompl::time::now();
+    //ob::PlannerStatus status = planner->solve(ptc);
+    planner->solve(ptc);
+    output.planner_time = ompl::time::seconds(ompl::time::now() - start);
+    output.max_planner_time = max_planning_time;
 
-  double max_planning_time= input.max_planning_time;
-  ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
+    //###########################################################################
 
-  ompl::time::point start = ompl::time::now();
-  //ob::PlannerStatus status = planner->solve(ptc);
-  planner->solve(ptc);
+    ob::PlannerDataPtr pd( new ob::PlannerData(si_vec.back()) );
+    planner->getPlannerData(*pd);
 
-  output.planner_time = ompl::time::seconds(ompl::time::now() - start);
-  output.max_planner_time = max_planning_time;
-
-  //###########################################################################
-
-  ob::PlannerDataPtr pd( new ob::PlannerData(si_vec.back()) );
-  planner->getPlannerData(*pd);
-
-  output.SetPlannerData(pd);
-  output.SetProblemDefinition(planner->getProblemDefinition());
+    output.SetPlannerData(pd);
+    output.SetProblemDefinition(planner->getProblemDefinition());
+  }
 }
-void StrategyGeometricMultiLevel::BenchmarkFileToPNG(const std::string &file){
+void StrategyGeometricMultiLevel::RunBenchmark(
+    const StrategyInput& input,
+    std::vector<ob::SpaceInformationPtr> si_vec, 
+    std::vector<ob::ProblemDefinitionPtr> pdef_vec)
+{
+  const ob::SpaceInformationPtr si = si_vec.back();
+  std::string file_benchmark = "benchmark_"+util::GetCurrentDateTimeString();
+  og::SimpleSetup ss(si);
+  ot::Benchmark benchmark(ss, "Benchmark");
+
+  benchmark.addPlanner(GetPlanner("ompl:rrt", si_vec, pdef_vec));
+
+  ob::ProblemDefinitionPtr pdef = pdef_vec.back();
+
+  CSpaceOMPL *cspace = input.cspace_levels.back();
+  ob::ScopedState<> start = cspace->ConfigToOMPLState(input.q_init);
+  ob::ScopedState<> goal  = cspace->ConfigToOMPLState(input.q_goal);
+  ss.setStartAndGoalStates(start,goal,input.epsilon_goalregion);
+
+  ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
+  ss.setup();
+
+  pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
+
+  ot::Benchmark::Request req;
+  req.maxTime = 2;
+  req.maxMem = 10000.0;
+  req.runCount = 2;
+  req.displayProgress = true;
+
+  benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));
+  benchmark.benchmark(req);
+
+  std::string res = file_benchmark+".log";
+  std::string cmd;
+
+  benchmark.saveResultsToFile(res.c_str());
+
+  BenchmarkFileToPNG(file_benchmark);
+
+  exit(0);
+}
+void StrategyGeometricMultiLevel::BenchmarkFileToPNG(const std::string &file)
+{
   std::string cmd;
 
   cmd = "ompl_benchmark_statistics.py "+file+".log -d "+file+".db";

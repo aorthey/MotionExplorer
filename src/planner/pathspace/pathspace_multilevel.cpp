@@ -67,12 +67,17 @@ std::vector<PathSpace*> PathSpaceMultiLevel::Decompose(){
     }
   }else{
     while(input_level){
-      //uint k = input_level->level;
       CSpaceOMPL *cspace_level_k;
+
+      if(input_level->type.substr(0,1) != "R"){
+        std::cout << input_level->type.substr(0) << std::endl;
+        std::cout << "fixed robots needs to have configuration space RN, but has " << input_level->type << std::endl;
+        exit(0);
+      }
+
       std::string str_dimension = input_level->type.substr(1);
       int N = boost::lexical_cast<int>(str_dimension);
 
-      //cspace_level_k = factory.MakeGeometricCSpaceRN(world, input_level->robot_idx, N);
       cspace_level_k = factory.MakeGeometricCSpaceFixedBase(world, input_level->robot_idx, N);
       if(input->enableSufficiency){
         cspace_level_k = new CSpaceOMPLDecoratorNecessarySufficient(cspace_level_k, input_level->robot_outer_idx);
@@ -91,7 +96,6 @@ std::vector<PathSpace*> PathSpaceMultiLevel::Decompose(){
   strategy_input.cspace = cspace_levels.back();
   strategy_input.world = world;
 
-  //multilevel input
   strategy_input.cspace_levels = cspace_levels;
 
   strategy.plan(strategy_input, output);

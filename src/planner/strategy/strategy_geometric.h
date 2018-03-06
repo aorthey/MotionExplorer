@@ -17,9 +17,13 @@ class StrategyGeometricMultiLevel: public Strategy{
 
     void BenchmarkFileToPNG(const std::string&);
 
-  ob::PlannerPtr GetPlanner(std::string algorithm,
-      std::vector<ob::SpaceInformationPtr> si_vec, 
-      std::vector<ob::ProblemDefinitionPtr> pdef_vec);
+    ob::PlannerPtr GetPlanner(std::string algorithm,
+        std::vector<ob::SpaceInformationPtr> si_vec, 
+        std::vector<ob::ProblemDefinitionPtr> pdef_vec);
+    void RunBenchmark(
+        const StrategyInput& input,
+        std::vector<ob::SpaceInformationPtr> si_vec, 
+        std::vector<ob::ProblemDefinitionPtr> pdef_vec);
 
 };
 

@@ -26,7 +26,6 @@
 
     <timestep min="0.01" max="0.1"/>
     <epsilongoalregion>0.01</epsilongoalregion>
-    <robot>0</robot>
     <maxplanningtime>1</maxplanningtime>
 
     <sampler name="uniform"/>
@@ -38,6 +37,7 @@
     <algorithm name="hierarchical:ompl:qmp_prm_connect"/>
     <algorithm name="ompl:rrtconnect"/>
     <algorithm name="ompl:rrt"/>
+    <algorithm name="hierarchical:benchmark"/>
 
   </plannerinput>
 

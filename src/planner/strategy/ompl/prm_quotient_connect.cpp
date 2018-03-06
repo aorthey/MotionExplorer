@@ -31,7 +31,7 @@ PRMQuotientConnect::PRMQuotientConnect(const ob::SpaceInformationPtr &si, Quotie
 {
   setName("PRMQuotientConnect"+to_string(id));
   goalBias_ = 0.0;
-  epsilon = 0.1;
+  epsilon = 0.0;
   percentageSamplesOnShortestPath = 1; //start at 1, then diminish over time
 }
 

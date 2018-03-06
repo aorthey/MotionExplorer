@@ -438,5 +438,8 @@ Heuristics applied:
 - Increase size of sphere robot to increase clearance of shortest path
 - Sampling mainly around shortest path with diminshing probability over time
 
-
 [ ] benchmark should be completely describeable in xml
+
+QMP PLANNER
+[ ] update shortest path after each growing operation (otherwise suboptimal
+paths are sampled, which we do not want)
