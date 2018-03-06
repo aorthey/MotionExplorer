@@ -432,16 +432,11 @@ A Survey and Taxonomy of Graph Sampling
 [x] too many random walks start at vertex 0, why is that? -> nan values in pdf
 [x] visualize connectivity of roadmap components (each component different
 color)
-[ ] edges are too long
-
-Heuristics applied:
-- Increase size of sphere robot to increase clearance of shortest path
-- Sampling mainly around shortest path with diminshing probability over time
-
-[ ] benchmark should be completely describeable in xml
-[ ] get rid of double hierarchy construction ompl vs qmp
+[x] benchmark should be completely describeable in xml
+[x] get rid of double hierarchy construction ompl vs qmp
+[ ] remove algorithm / maxplanningtime etcetera from plannerinputs and put them
+into separate xml file (one setting for everything)
 
 QMP PLANNER
 [ ] update shortest path after each growing operation (otherwise suboptimal
 paths are sampled, which we do not want)
-

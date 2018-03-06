@@ -500,7 +500,6 @@ ompl::PDF<og::PRMBasic::Edge> PRMQuotientConnect::GetEdgePDF()
   {
     //diminishing shortest path sampling
     percentageSamplesOnShortestPath = exp(-pow(((double)samplesOnShortestPath++/10000.0),2));
-    std::cout << percentageSamplesOnShortestPath << std::endl;
 
     foreach (Edge e, boost::edges(g_))
     {

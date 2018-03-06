@@ -1,9 +1,28 @@
-#include <KrisLibrary/math/VectorTemplate.h>
+#include "util.h"
 #include "planner/planner_input.h"
+#include <KrisLibrary/math/VectorTemplate.h>
 
 bool PlannerMultiInput::Load(const char* file){
   TiXmlDocument doc(file);
   return Load(GetRootNodeFromDocument(doc));
+}
+
+std::vector<std::string> PlannerMultiInput::GetAlgorithms()
+{
+  std::string pidef = util::GetDataFolder()+"/../settings/planner.xml";
+  TiXmlDocument doc(pidef);
+  TiXmlElement *node = GetRootNodeFromDocument(doc);
+
+  CheckNodeName(node, "planner");
+
+  TiXmlElement* node_algorithm = FindFirstSubNode(node, "algorithm");
+  std::vector<std::string> algorithms;
+  while(node_algorithm!=NULL){
+    std::string a = GetAttribute<std::string>(node_algorithm, "name");
+    algorithms.push_back(a);
+    node_algorithm = FindNextSiblingNode(node_algorithm);
+  }
+  return algorithms;
 }
 
 bool PlannerMultiInput::Load(TiXmlElement *node){
@@ -15,28 +34,48 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
     return false;
   }
 
-  TiXmlElement* node_algorithm = FindFirstSubNode(node_plannerinput, "algorithm");
+  std::vector<std::string> algorithms = GetAlgorithms();
+  for(uint k = 0; k < algorithms.size(); k++){
 
-  while(node_algorithm!=NULL){
     PlannerInput* input = new PlannerInput();
     if(!input->Load(node_plannerinput)) return false;
 
-    input->name_algorithm = GetAttribute<std::string>(node_algorithm, "name");
+    input->name_algorithm = algorithms.at(k);
     inputs.push_back(input);
-    node_algorithm = FindNextSiblingNode(node_algorithm);
   }
 
   for(uint k = 0; k < inputs.size(); k++){
     std::cout << *inputs.at(k) << std::endl;
   }
-  //exit(0);
   return true;
 }
 
+void PlannerInput::SetDefault()
+{
+  std::string pidef = util::GetDataFolder()+"/../settings/planner.xml";
+  TiXmlDocument doc(pidef);
+  TiXmlElement *node = GetRootNodeFromDocument(doc);
+
+  CheckNodeName(node, "planner");
+
+  max_planning_time = GetSubNodeText<double>(node, "maxplanningtime");
+  freeFloating = GetSubNodeText<int>(node, "freeFloating");
+  timestep_min = GetSubNodeAttribute<double>(node, "timestep", "min");
+  timestep_max = GetSubNodeAttribute<double>(node, "timestep", "max");
+  max_planning_time = GetSubNodeText<double>(node, "maxplanningtime");
+  epsilon_goalregion = GetSubNodeText<double>(node, "epsilongoalregion");
+  pathSpeed = GetSubNodeText<double>(node, "pathSpeed");
+  smoothPath = GetSubNodeText<int>(node, "smoothPath");
+  enableSufficiency = GetSubNodeText<int>(node, "enableSufficiency");
+  name_sampler = GetSubNodeAttribute<std::string>(node, "sampler", "name");
+}
 
 bool PlannerInput::Load(TiXmlElement *node)
 {
+  SetDefault();
   CheckNodeName(node, "plannerinput");
+
+  //necessary arguments
 
   q_init = GetSubNodeAttribute<Config>(node, "qinit", "config");
   q_goal = GetSubNodeAttribute<Config>(node, "qgoal", "config");
@@ -46,18 +85,6 @@ bool PlannerInput::Load(TiXmlElement *node)
   dq_goal = GetSubNodeAttributeDefault<Config>(node, "dqgoal", "config", dq);
   se3min = GetSubNodeAttribute<Config>(node, "se3min", "config");
   se3max = GetSubNodeAttribute<Config>(node, "se3max", "config");
-
-  freeFloating = GetSubNodeTextDefault(node, "freeFloating", false);
-  robot_idx = GetSubNodeTextDefault(node, "robot", 0);
-
-  timestep_min = GetSubNodeAttributeDefault(node, "timestep", "min", 0.01);
-  timestep_max = GetSubNodeAttributeDefault(node, "timestep", "max", 0.1);
-  max_planning_time = GetSubNodeText<double>(node, "maxplanningtime");
-  epsilon_goalregion = GetSubNodeText<double>(node, "epsilongoalregion");
-  pathSpeed = GetSubNodeTextDefault(node, "pathSpeed", 1.0);
-  smoothPath = GetSubNodeTextDefault(node, "smoothPath", false);
-  enableSufficiency = GetSubNodeTextDefault(node, "enableSufficiency", false);
-  name_sampler = GetSubNodeAttributeDefault<std::string>(node, "sampler", "name", "uniform");
 
   TiXmlElement* node_hierarchy = FindSubNode(node, "hierarchy");
   uint level = 0;
@@ -83,6 +110,19 @@ bool PlannerInput::Load(TiXmlElement *node)
     std::cout << "Did not specify robot hierarchy." << std::endl;
     exit(0);
   }
+
+  //optional arguments
+
+  freeFloating = GetSubNodeTextDefault(node, "freeFloating", freeFloating);
+  robot_idx = GetSubNodeTextDefault(node, "robot", 0);
+  timestep_min = GetSubNodeAttributeDefault(node, "timestep", "min", timestep_min);
+  timestep_max = GetSubNodeAttributeDefault(node, "timestep", "max", timestep_max);
+  max_planning_time = GetSubNodeTextDefault(node, "maxplanningtime", max_planning_time);
+  epsilon_goalregion = GetSubNodeTextDefault(node, "epsilongoalregion", epsilon_goalregion);
+  pathSpeed = GetSubNodeTextDefault(node, "pathSpeed", pathSpeed);
+  smoothPath = GetSubNodeTextDefault(node, "smoothPath", smoothPath);
+  enableSufficiency = GetSubNodeTextDefault(node, "enableSufficiency", enableSufficiency);
+  name_sampler = GetSubNodeAttributeDefault<std::string>(node, "sampler", "name", name_sampler);
 
   return true;
 }

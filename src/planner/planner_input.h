@@ -48,7 +48,7 @@ class PlannerInput{
 
     bool Load(const char* file);
     bool Load(TiXmlElement *node);
-    bool GetConfig(const TiXmlElement* node, const char *name, Config &q);
+    void SetDefault();
 
     friend std::ostream& operator<< (std::ostream& out, const PlannerInput& pin) ;
 };
@@ -58,5 +58,6 @@ struct PlannerMultiInput{
   std::vector<PlannerInput*> inputs;
   bool Load(const char* file);
   bool Load(TiXmlElement *node);
+  std::vector<std::string> GetAlgorithms();
 };
 

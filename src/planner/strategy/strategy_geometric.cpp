@@ -105,9 +105,9 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:spars2") planner = std::make_shared<og::SPARStwo>(si);
 
   else if(algorithm=="ompl:cforest") planner = std::make_shared<og::CForest>(si);
-  else if(algorithm=="ompl:stride") planner = std::make_shared<og::STRIDE>(si);
   else if(algorithm=="ompl:sst") planner = std::make_shared<og::SST>(si);
   else if(algorithm=="ompl:pdst") planner = std::make_shared<og::PDST>(si);
+  else if(algorithm=="ompl:stride") planner = std::make_shared<og::STRIDE>(si);
   else if(algorithm=="ompl:kpiece") planner = std::make_shared<og::KPIECE1>(si);
   else if(algorithm=="ompl:bkpiece") planner = std::make_shared<og::BKPIECE1>(si);
   else if(algorithm=="ompl:lbkpiece") planner = std::make_shared<og::LBKPIECE1>(si);
@@ -181,7 +181,6 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
     ompl::time::point start = ompl::time::now();
-    //ob::PlannerStatus status = planner->solve(ptc);
     planner->solve(ptc);
     output.planner_time = ompl::time::seconds(ompl::time::now() - start);
     output.max_planner_time = max_planning_time;
