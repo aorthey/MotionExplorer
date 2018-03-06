@@ -36,9 +36,9 @@
       <level inner_index="0" outer_index="0" type="R7"/>
     </hierarchy>
 
-    <algorithm name="hierarchical:ompl:qmp_prm_connect"/>
+    <algorithm name="qmp_prm_connect"/>
     <algorithm name="ompl:rrtconnect"/>
-    <algorithm name="hierarchical:ompl:benchmark_narrow"/>
+    <algorithm name="benchmark"/>
 
   </plannerinput>
 

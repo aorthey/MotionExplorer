@@ -24,25 +24,26 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   std::string algorithm = input.name_algorithm;
   hierarchy = new Hierarchy<PathSpace*>();
 
-  if(StartsWith(algorithm,"hierarchical")) {
-    CreateSinglePathHierarchy();
-  }else if(StartsWith(algorithm,"ompl")) {
-    CreateShallowHierarchy();
-  }else{
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "Unknown algorithm: " << algorithm << std::endl;
-    std::cout << std::string(80, '-') << std::endl;
-    active = false;
-  }
+  //if(StartsWith(algorithm,"hierarchical")) {
+  CreateHierarchy();
+  // }else if(StartsWith(algorithm,"ompl")) {
+  //   CreateShallowHierarchy();
+  //}else{
+  //  std::cout << std::string(80, '-') << std::endl;
+  //  std::cout << "Unknown algorithm: " << algorithm << std::endl;
+  //  std::cout << std::string(80, '-') << std::endl;
+  //  active = false;
+  //}
 }
 std::string MotionPlanner::getName() const{
   return input.name_algorithm;
 }
 
-void MotionPlanner::CreateSinglePathHierarchy(){
+void MotionPlanner::CreateHierarchy(){
 
   std::vector<int> idxs = input.robot_idxs;
-  std::string subalgorithm = input.name_algorithm.substr(13,input.name_algorithm.size()-13);
+  //std::string subalgorithm = input.name_algorithm.substr(13,input.name_algorithm.size()-13);
+  std::string algorithm = input.name_algorithm;
 
   PathSpaceInput *psinput_level0 = nullptr;
   PathSpaceInput *psinput = nullptr;
@@ -77,7 +78,7 @@ void MotionPlanner::CreateSinglePathHierarchy(){
       psinput->robot_idx = ii;
       psinput->robot_inner_idx = ii;
       psinput->robot_outer_idx = io;
-      psinput->name_algorithm = subalgorithm;
+      psinput->name_algorithm = algorithm;
 
       psinput_level0 = psinput;
     }
@@ -90,7 +91,7 @@ void MotionPlanner::CreateSinglePathHierarchy(){
     psinput->robot_outer_idx = io;
     psinput->type = input.layers.at(k).type;
 
-    psinput->name_algorithm = subalgorithm;
+    psinput->name_algorithm = algorithm;
 
   }
   std::cout << *psinput_level0 << std::endl;
@@ -117,27 +118,27 @@ void MotionPlanner::CreateSinglePathHierarchy(){
   * path or the empty set otherwise. 
   */
 
-void MotionPlanner::CreateShallowHierarchy(){
-
-  Config p_init = input.q_init;
-  Config p_goal = input.q_goal;
-  int idx = input.robot_idxs.back();
-  std::string type = input.layers.back().type;
-
-  //  (1) space of all continuous paths
-  hierarchy->AddLevel( idx, p_init, p_goal);
-  //  (2) a single solution path (if it exists)
-  hierarchy->AddLevel( idx, p_init, p_goal);
-
-
-  PathSpaceInput* level0 = new PathSpaceInput(input, 0);
-  level0->type = type;
-  PathSpaceInput* level1 = new PathSpaceInput(input, 1);
-  level1->type = type;
-  level0->SetNextLayer(level1);
-
-  hierarchy->AddRootNode( new PathSpaceMultiLevel(world, level0) );
-}
+//void MotionPlanner::CreateShallowHierarchy(){
+//
+//  Config p_init = input.q_init;
+//  Config p_goal = input.q_goal;
+//  int idx = input.robot_idxs.back();
+//  std::string type = input.layers.back().type;
+//
+//  //  (1) space of all continuous paths
+//  hierarchy->AddLevel( idx, p_init, p_goal);
+//  //  (2) a single solution path (if it exists)
+//  hierarchy->AddLevel( idx, p_init, p_goal);
+//
+//
+//  PathSpaceInput* level0 = new PathSpaceInput(input, 0);
+//  level0->type = type;
+//  PathSpaceInput* level1 = new PathSpaceInput(input, 1);
+//  level1->type = type;
+//  level0->SetNextLayer(level1);
+//
+//  hierarchy->AddRootNode( new PathSpaceMultiLevel(world, level0) );
+//}
 
 const PlannerInput& MotionPlanner::GetInput(){
   return input;

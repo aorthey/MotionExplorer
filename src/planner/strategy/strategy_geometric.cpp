@@ -116,36 +116,17 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:psbl") planner = std::make_shared<og::pSBL>(si);
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
-
-  else if(algorithm=="ompl:qmp_rrt"){
-    typedef og::MultiQuotient<og::RRTUnidirectional> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec,"RRT");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  }else if(algorithm=="ompl:prm_basic"){
-    planner = std::make_shared<og::PRMBasic>(si_vec.back());
-    planner->setProblemDefinition(pdef_vec.back());
-
-  }else if(algorithm=="ompl:qmp_prm_connect"){
+  else if(algorithm=="qmp_prm_connect"){
     //typedef og::MultiQuotient<og::PRMQuotientConnect> MultiQuotient;
     typedef og::MultiQuotient<og::PRMQuotientConnect, og::RRTBidirectional> MultiQuotient;
-    //typedef og::MultiQuotient<og::RRTUnidirectionalConnect> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec,"PRMQuotientConnect");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
 
-  }else if(algorithm=="ompl:qmp_cover"){
+  }else if(algorithm=="qmp_cover"){
     typedef og::MultiQuotient<og::RRTUnidirectionalCover> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec,"UniCover");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
 
-  }else if(algorithm=="ompl:qmp_cover_rrt"){
-    typedef og::MultiQuotient<og::RRTUnidirectionalCover, og::RRTUnidirectional> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec,"UniCover");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-    
-  }else if(algorithm=="ompl:qmp_prm"){
-    typedef og::MultiQuotient<og::PRMQuotient> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec);
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);
