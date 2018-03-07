@@ -553,10 +553,6 @@ void PRMBasic::getPlannerData(ob::PlannerData &data) const
     data.addGoalVertex(pgoal);
   }
 
-  //std::cout << std::string(80, '-') << std::endl;
-  //std::cout << "getPlannerData" << std::endl;
-  //std::cout << "  edges    : " << boost::num_edges(g_) << std::endl;
-  //std::cout << "  vertices : " << boost::num_vertices(g_) << std::endl;
   foreach (const Edge e, boost::edges(g_))
   {
     const Vertex v1 = boost::source(e, g_);
@@ -568,8 +564,6 @@ void PRMBasic::getPlannerData(ob::PlannerData &data) const
 
     data.addEdge(p1,p2);
 
-    //data.tagState(stateProperty_[v1], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v1));
-    //data.tagState(stateProperty_[v2], const_cast<PRMBasic *>(this)->disjointSets_.find_set(v2));
     uint v1Component = const_cast<PRMBasic *>(this)->disjointSets_.find_set(v1);
     uint v2Component = const_cast<PRMBasic *>(this)->disjointSets_.find_set(v2);
     PlannerDataVertexAnnotated &v1a = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vi1));
@@ -584,32 +578,6 @@ void PRMBasic::getPlannerData(ob::PlannerData &data) const
       v1a.SetComponent(2);
       v2a.SetComponent(2);
     }
-    // std::cout << "vertex " << vi1 << " component " << v1a.GetComponent() << std::endl;
-    // std::cout << "vertex " << vi2 << " component " << v2a.GetComponent() << std::endl;
   }
-  //there might be vertices which are not connected with any edge
-  //std::cout << std::string(80, '-') << std::endl;
-
-  // //foreach(const Vertex v, boost::vertices(g_))
-  //bool stopper = false;
-  //for(long unsigned int v = 0; v < data.numVertices(); v++)
-  //{
-    //PlannerDataVertexAnnotated &va = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(v));
-    //std::cout << "vertex " << v << " component " << va.GetComponent() << std::endl;
-    //if(va.GetComponent()>=99) stopper = true;
-    //if(boost::same_component(v, startM_.at(0), const_cast<PRMBasic*>(this)->disjointSets_))
-    //{
-    //  va.SetComponent(0);
-    //}else{
-    //  if(boost::same_component(v, goalM_.at(0), const_cast<PRMBasic*>(this)->disjointSets_))
-    //  {
-    //    va.SetComponent(1);
-    //  }else{
-    //    va.SetComponent(2);
-    //  }
-    //}
-  //}
-  //if(stopper) exit(0);
-  // std::cout << std::string(80, '-') << std::endl;
 }
 

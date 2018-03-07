@@ -410,7 +410,9 @@ into separate xml file (one setting for everything)
 [ ] openGL transparency does not work correctly with the bubbles
 
 QMP PLANNER
+[ ] do some contact planning on atlas, hrp4 and some spider robot.
 [ ] update shortest path after each growing operation (otherwise suboptimal
 paths are sampled, which we do not want)
 [ ] size of bubbles ok with one layer, but changes if another layer is added (is
 there some way that we might confuse the vertices when using getPlannerData?)
+

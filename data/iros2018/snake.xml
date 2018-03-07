@@ -41,40 +41,16 @@
     <qinit config="14  -0.2 -0.0341233 0.0378515 0 0 0 0 0 0 0 0 0 -0.5 0.2"/>
     <qgoal config="14  2.31021 0.668142 0.0378515 0 0 0 0 0 0 0 0.2 0 -0.5 -0.78 "/>
 
-    <robot>0</robot>
     <freeFloating>1</freeFloating>
 
-    <enableSufficiency>1</enableSufficiency>
-    <epsilongoalregion>0.01</epsilongoalregion>
     <smoothPath>1</smoothPath>
-    <maxplanningtime>5</maxplanningtime>
+    <maxplanningtime>2</maxplanningtime>
 
-    <sampler name="uniform"/>
-
-    <algorithm name="hierarchical:ompl:qmp_prm_connect">
-      <hierarchy>
-        <level inner_index="3" type="R3"/>
-        <level inner_index="1" type="SE3"/>
-        <level inner_index="0" type="SE3RN"/>
-      </hierarchy>
-    </algorithm>
-
-    <algorithm name="hierarchical:ompl:qmp_prm">
-      <hierarchy>
-        <level inner_index="3" type="R3"/>
-        <level inner_index="1" type="SE3"/>
-        <level inner_index="5" type="SE3RN"/>
-      </hierarchy>
-    </algorithm>
-
-    <algorithm name="hierarchical:ompl:benchmark_narrow">
-      <hierarchy>
-        <level inner_index="3" type="R3"/>
-        <level inner_index="1" type="SE3"/>
-        <level inner_index="5" type="SE3RN"/>
-        <level inner_index="0" type="SE3RN"/>
-      </hierarchy>
-    </algorithm>
+    <hierarchy>
+      <level inner_index="3" type="R3"/>
+      <level inner_index="1" type="SE3"/>
+      <level inner_index="0" type="SE3RN"/>
+    </hierarchy>
 
   </plannerinput>
 

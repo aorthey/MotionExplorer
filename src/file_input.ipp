@@ -160,7 +160,7 @@ T GetSubNodeTextDefault(TiXmlElement* node, const char *name, T default_value)
 {
   TiXmlElement* subnode = FindSubNode(node, name);
   if(!subnode){
-    std::cout << "[WARNING] Subnode: " << name << " has not been found. Setting to " << default_value << std::endl;
+    //std::cout << "[WARNING] Subnode: " << name << " has not been found. Setting to " << default_value << std::endl;
   }
   T _val;
   GetStreamTextDefault<T>(subnode, default_value) >> _val;
@@ -184,7 +184,7 @@ inline T GetSubNodeAttributeDefault(TiXmlElement* node, const char *name, const 
 {
   TiXmlElement* subnode = FindSubNode(node, name);
   if(!subnode){
-    std::cout << "[WARNING] Subnode: " << name << " has not been found. Setting to " << default_value << std::endl;
+    //std::cout << "[WARNING] Subnode: " << name << " has not been found. Setting to " << default_value << std::endl;
   }
   T _val;
   GetStreamAttributeDefault(subnode, attribute, default_value) >> _val;

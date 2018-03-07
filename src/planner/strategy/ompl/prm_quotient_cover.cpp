@@ -52,7 +52,6 @@ void PRMQuotientConnectCover::getPlannerData(ob::PlannerData &data) const
       ctrStart++;
     }
   }
-
 }
 
 //bool PRMQuotientCover::SampleGraph(ob::State *q_random_graph)

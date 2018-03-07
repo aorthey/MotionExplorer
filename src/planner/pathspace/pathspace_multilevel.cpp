@@ -60,7 +60,7 @@ std::vector<PathSpace*> PathSpaceMultiLevel::Decompose(){
       if(input->enableSufficiency){
         cspace_level_k = new CSpaceOMPLDecoratorNecessarySufficient(cspace_level_k, input_level->robot_outer_idx);
       }
-      std::cout << *input_level << std::endl;
+      //std::cout << *input_level << std::endl;
       cspace_levels.push_back( cspace_level_k );
       last_level = input_level;
       input_level = input_level->GetNextLayer();
@@ -83,7 +83,7 @@ std::vector<PathSpace*> PathSpaceMultiLevel::Decompose(){
         cspace_level_k = new CSpaceOMPLDecoratorNecessarySufficient(cspace_level_k, input_level->robot_outer_idx);
       }
 
-      std::cout << *input_level << std::endl;
+      //std::cout << *input_level << std::endl;
       cspace_levels.push_back( cspace_level_k );
       last_level = input_level;
       input_level = input_level->GetNextLayer();

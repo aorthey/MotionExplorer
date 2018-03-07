@@ -44,9 +44,9 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
     inputs.push_back(input);
   }
 
-  for(uint k = 0; k < inputs.size(); k++){
-    std::cout << *inputs.at(k) << std::endl;
-  }
+  // for(uint k = 0; k < inputs.size(); k++){
+  //   std::cout << *inputs.at(k) << std::endl;
+  // }
   return true;
 }
 
@@ -107,8 +107,14 @@ bool PlannerInput::Load(TiXmlElement *node)
       lindex = FindNextSiblingNode(lindex);
     }
   }else{
-    std::cout << "Did not specify robot hierarchy." << std::endl;
-    exit(0);
+    //std::cout << "[WARNING] Did not specify robot hierarchy. Assuming one layer SE3RN" << std::endl;
+    Layer layer;
+    layer.level = 0;
+    layer.inner_index = 0;
+    layer.outer_index = 0;
+    layer.type = "SE3RN";
+    robot_idxs.push_back(layer.inner_index);
+    layers.push_back(layer);
   }
 
   //optional arguments

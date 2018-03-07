@@ -23,9 +23,7 @@ MultiQuotient<T,Tlast>::MultiQuotient(std::vector<ob::SpaceInformationPtr> &si_v
       T* ss = new T(si_vec.at(k), previous);
       quotientSpaces.push_back(ss);
     }
-
   }
-
   std::cout << "Created hierarchy with " << si_vec.size() << " levels." << std::endl;
 }
 
@@ -200,6 +198,7 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
       PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
       v.SetLevel(k);
       v.SetMaxLevel(K);
+      //std::cout << "[MultiQuotient] vertex " << vidx << " " << v.GetOpenNeighborhoodDistance() << std::endl;
 
       const ob::State *s_V = v.getState();
       ob::State *s_M0 = Qk->getSpaceInformation()->cloneState(s_V);
@@ -223,8 +222,12 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
       v.setState(s_M0);
       ctr++;
     }
-    std::cout << "multiquotient: added " << ctr << " vertices on level " << k << std::endl;
     Nvertices = data.numVertices();
   }
-}
 
+  // for(uint vidx = 0; vidx < data.numVertices(); vidx++){
+  //   PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
+  //   std::cout << "[MultiQuotient] vertex " << vidx << " " << v.GetOpenNeighborhoodDistance() << std::endl;
+  // }
+  //exit(0);
+}

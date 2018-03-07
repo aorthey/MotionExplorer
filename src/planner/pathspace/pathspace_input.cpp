@@ -81,7 +81,7 @@ std::ostream& operator<< (std::ostream& out, const PathSpaceInput& psi)
     out << " robot idx         : " << next->robot_idx << std::endl;
     out << " robot idx (inner) : " << next->robot_inner_idx << std::endl;
     out << " robot idx (outer) : " << next->robot_outer_idx << std::endl;
-    cout << std::string(80, '-') << std::endl;
+    out << std::string(80, '-') << std::endl;
     next = next->GetNextLayer();
   }
   return out;

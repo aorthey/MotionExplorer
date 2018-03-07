@@ -11,7 +11,8 @@ namespace ompl
   {
     template <class T, typename Tlast=T>
     class MultiQuotient: public ob::Planner{
-        static_assert(std::is_base_of<og::Quotient, T>::value, "Template must inherit from QuotientPlanner");
+        static_assert(std::is_base_of<og::Quotient, T>::value, "Template must inherit from Quotient");
+        static_assert(std::is_base_of<og::Quotient, Tlast>::value, "Template must inherit from Quotient");
 
       public:
         MultiQuotient(std::vector<ob::SpaceInformationPtr> &si_vec, std::string type = "");

@@ -82,7 +82,6 @@ void MotionPlanner::CreateHierarchy(){
     psinput->name_algorithm = algorithm;
 
   }
-  std::cout << *psinput_level0 << std::endl;
 
   //remove all nested robots except the original one
   //for(uint k = 0; k < idxs.size()-1; k++){
