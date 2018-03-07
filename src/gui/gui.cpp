@@ -95,9 +95,11 @@ void ForceFieldBackend::Start()
   click_mode = ModeNormal;
   pose_objects = 1;
 
-  Robot *robot = world->robots[0];
-  uint Nlinks  = robot->links.size();
-  wrenchfield.init(Nlinks);
+  if(world->robots.size()>0){
+    Robot *robot = world->robots[0];
+    uint Nlinks  = robot->links.size();
+    wrenchfield.init(Nlinks);
+  }
 
   sim.odesim.SetGravity(Vector3(0,0,0));
   show_frames_per_second = true;

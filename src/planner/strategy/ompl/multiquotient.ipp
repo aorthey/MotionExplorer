@@ -87,7 +87,7 @@ void PrintQuotientSpaces(std::vector<Quotient*> quotientSpaces, uint k=0){
 template <class T, class Tlast>
 ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCondition &ptc){
   
-  static const double T_GROW = 0.001; //time to grow before Checking if solution exists
+  static const double T_GROW = 0.01; //time to grow before Checking if solution exists
 
   auto cmp = [](og::Quotient* left, og::Quotient* right) 
               { 
@@ -198,7 +198,6 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
       PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
       v.SetLevel(k);
       v.SetMaxLevel(K);
-      //std::cout << "[MultiQuotient] vertex " << vidx << " " << v.GetOpenNeighborhoodDistance() << std::endl;
 
       const ob::State *s_V = v.getState();
       ob::State *s_M0 = Qk->getSpaceInformation()->cloneState(s_V);
@@ -225,9 +224,9 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
     Nvertices = data.numVertices();
   }
 
-  // for(uint vidx = 0; vidx < data.numVertices(); vidx++){
-  //   PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
-  //   std::cout << "[MultiQuotient] vertex " << vidx << " " << v.GetOpenNeighborhoodDistance() << std::endl;
-  // }
+  for(uint vidx = 0; vidx < data.numVertices(); vidx++){
+    PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
+    std::cout << "[MultiQuotient] vertex " << vidx << " " << v.GetOpenNeighborhoodDistance() << std::endl;
+  }
   //exit(0);
 }

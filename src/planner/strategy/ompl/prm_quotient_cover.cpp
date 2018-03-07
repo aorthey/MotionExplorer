@@ -40,17 +40,16 @@ void PRMQuotientConnectCover::ClearVertices()
 
 void PRMQuotientConnectCover::getPlannerData(ob::PlannerData &data) const
 {
+  uint N = data.numVertices();
   PRMQuotientConnect::getPlannerData(data);
+  std::cout << "added " << data.numVertices()-N << " vertices." << std::endl;
 
-  std::cout << "added " << data.numVertices() << " vertices." << std::endl;
-  uint ctrStart = 0;
-  for(uint vidx = 0; vidx < data.numVertices(); vidx++){
+  auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+  for(uint vidx = N; vidx < data.numVertices(); vidx++){
     PlannerDataVertexAnnotated *v = static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
-    if(data.vertexExists(*v)){
-      v->SetOpenNeighborhoodDistance(openNeighborhoodDistance_[data.vertexIndex(*v)-ctrStart]);
-    }else{
-      ctrStart++;
-    }
+    const ob::State *s = v->getState();
+    double d1 = checkerPtr->Distance(s);
+    v->SetOpenNeighborhoodDistance(d1);
   }
 }
 

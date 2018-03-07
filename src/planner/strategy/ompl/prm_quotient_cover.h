@@ -30,6 +30,8 @@ namespace ompl
         //virtual bool SampleGraph(ob::State*) override;
 
         //virtual bool Connect(const Vertex a, const Vertex b) override;
+      protected:
+        double delta{0.05};
 
     };
 
