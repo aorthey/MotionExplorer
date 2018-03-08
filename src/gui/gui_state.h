@@ -7,7 +7,7 @@
 
 struct GUIVariable
 {
-  enum Type{CHECKBOX, BUTTON, HOTKEY, PROPERTY, SLIDER};
+  enum Type{CHECKBOX, BUTTON, HOTKEY, TOGGLE, PROPERTY, SLIDER};
 
   GUIVariable();
   GUIVariable(std::string);
@@ -45,7 +45,12 @@ class GUIState{
     void add(const char* name);
     void add(const char* name, char* key);
     GUIVariable& operator()(const char* str);
+
     void toggle(const char* str);
+    void toggle(const std::string &str);
+
+    bool IsToggleable(const char* str);
+    bool IsToggleable(const std::string &str);
 
     friend std::ostream& operator<< (std::ostream&, const GUIState&);
 
@@ -53,6 +58,7 @@ class GUIState{
     bool Load(TiXmlElement *node);
 
     std::map<std::string, GUIVariable*> variables;
+    std::map<std::string, GUIVariable*> toggle_variables;
 
     GUIVariable *EMPTY_VARIABLE;
 };

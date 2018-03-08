@@ -348,6 +348,7 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
 
 bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
+
   if(cmd=="advance") {
     SimStep(sim.simStep);
   }else if(cmd=="reset") {
@@ -380,10 +381,6 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     }
     sim.controlSimulators[0].Init(world->robots[0], sim.odesim.robot(0), sim.robotControllers[0]);
 
-  }else if(cmd=="draw_rigid_objects_faces") {
-    state("draw_rigid_objects_faces").toggle();
-  }else if(cmd=="draw_rigid_objects_edges") {
-    state("draw_rigid_objects_edges").toggle();
   }else if(cmd=="draw_minimal"){
     state("draw_forcefield").deactivate();
     state("draw_wrenchfield").deactivate();
@@ -391,10 +388,6 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     state("draw_distance_robot_terrain").deactivate();
     state("draw_center_of_mass_path").deactivate();
     state("draw_poser").deactivate();
-  }else if(cmd=="draw_forcefield"){
-    state("draw_forcefield").toggle();
-  }else if(cmd=="draw_robot"){
-    state("draw_robot").toggle();
   }else if(cmd=="draw_robot_next"){
     state("draw_robot").activate();
     uint N = world->robots.size();
@@ -414,16 +407,6 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="simulate"){
     state("simulate").toggle();
     simulate = state("simulate").active;
-  }else if(cmd=="draw_wrenchfield"){
-    state("draw_wrenchfield").toggle();
-  }else if(cmd=="draw_forceellipsoid"){
-    state("draw_wrenchfield").toggle();
-  }else if(cmd=="draw_distance_robot_terrain"){
-    state("draw_distance_robot_terrain").toggle();
-  }else if(cmd=="draw_center_of_mass_path"){
-    state("draw_center_of_mass_path").toggle();
-  }else if(cmd=="draw_path_space"){
-    state("draw_path_space").toggle();
   }else if(cmd=="toggle_mode"){
     if(click_mode == ModeNormal){
       click_mode = ModeForceApplication;
@@ -451,6 +434,8 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     Info info;
     std::cout << "Robot INFO:" << std::endl;
     info(world->robots[0]);
+  }else if(state.IsToggleable(cmd.c_str())){
+    state.toggle(cmd);
   }else return BaseT::OnCommand(cmd,args);
 
   SendRefresh();

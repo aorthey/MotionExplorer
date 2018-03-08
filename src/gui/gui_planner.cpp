@@ -46,8 +46,6 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="hierarchy_up"){
     planners.at(active_planner)->Collapse();
     hierarchy_change = true;
-  }else if(cmd=="draw_planner_bounding_box"){
-    state("draw_planner_bounding_box").toggle();
   }else if(cmd=="next_planner"){
     if(active_planner<planners.size()-1) active_planner++;
     else active_planner = 0;
@@ -58,36 +56,10 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     else active_planner = planners.size()-1;
     hierarchy_change = true;
     path = planners.at(active_planner)->GetPath();
-  }else if(cmd=="roadmap_visualize_level_0"){
-    state("roadmap_visualize_level_0").toggle();
-  }else if(cmd=="roadmap_visualize_level_1"){
-    state("roadmap_visualize_level_1").toggle();
-  }else if(cmd=="roadmap_visualize_level_2"){
-    state("roadmap_visualize_level_2").toggle();
-  }else if(cmd=="roadmap_visualize_level_3"){
-    state("roadmap_visualize_level_3").toggle();
-  }else if(cmd=="draw_roadmap"){
-    state("draw_roadmap").toggle();
-  }else if(cmd=="draw_path"){
-    state("draw_path").toggle();
-  }else if(cmd=="draw_roadmap_swathvolume"){
-    state("draw_roadmap_swathvolume").toggle();
-  }else if(cmd=="draw_roadmap_volume"){
-    state("draw_roadmap_volume").toggle();
-  }else if(cmd=="draw_roadmap_vertices"){
-    state("draw_roadmap_vertices").toggle();
-  }else if(cmd=="draw_roadmap_edges"){
-    state("draw_roadmap_edges").toggle();
 
   }else if(cmd=="planner_draw_start_goal_configuration"){
     state("planner_draw_goal_configuration").toggle();
     state("planner_draw_start_configuration").toggle();
-
-  }else if(cmd=="planner_draw_start_configuration"){
-    state("planner_draw_start_configuration").toggle();
-
-  }else if(cmd=="planner_draw_goal_configuration"){
-    state("planner_draw_goal_configuration").toggle();
 
   }else if(cmd=="draw_cover_threshold_up"){
     GUIVariable &v = state("draw_cover_threshold");
@@ -96,8 +68,8 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     GUIVariable &v = state("draw_cover_threshold");
     v.value = max(v.min, v.value - v.step);
 
-  }else if(cmd=="draw_path_sweptvolume"){
-    state("draw_path_sweptvolume").toggle();
+  // }else if(cmd=="draw_path_sweptvolume"){
+  //   state("draw_path_sweptvolume").toggle();
   }else if(cmd=="draw_play_path"){
     state("draw_play_path").toggle();
     simulate = 0;

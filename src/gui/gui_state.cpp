@@ -38,6 +38,7 @@ bool GUIVariable::operator!() const{
   return !active;
 }
 
+//******************************************************************************
 GUIState::GUIState(){
 }
 
@@ -53,6 +54,14 @@ void GUIState::add(const char* name, char* key){
   variables[v->name] = v;
 }
 
+bool GUIState::IsToggleable(const char* str)
+{
+  return (toggle_variables.find(str) != toggle_variables.end());
+}
+bool GUIState::IsToggleable(const std::string &str)
+{
+  return IsToggleable(str.c_str());
+}
 
 GUIVariable& GUIState::operator()(const char* str){
   if ( variables.find(str) == variables.end() ) {
@@ -66,9 +75,15 @@ GUIVariable& GUIState::operator()(const char* str){
   return *variables[std::string(str)];
 }
 
-void GUIState::toggle(const char* str){
+void GUIState::toggle(const char* str)
+{
   (*this)(str).toggle();
 }
+void GUIState::toggle(const std::string &str)
+{
+  return toggle(str.c_str());
+}
+
 bool GUIState::Load(const char* file)
 {
   TiXmlDocument doc(file);
@@ -97,6 +112,7 @@ bool GUIState::Load(TiXmlElement *node)
 
     v->type = GUIVariable::Type::CHECKBOX;
     variables[v->name] = v;
+    toggle_variables[v->name] = v;
     node_state = FindNextSiblingNode(node_state, "checkbox");
   }
 
@@ -117,6 +133,7 @@ bool GUIState::Load(TiXmlElement *node)
 
     v->type = GUIVariable::Type::HOTKEY;
     variables[v->name] = v;
+    toggle_variables[v->name] = v;
     node_state = FindNextSiblingNode(node_state, "hotkey");
   }
   //################################################################################
