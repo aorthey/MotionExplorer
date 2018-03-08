@@ -1,4 +1,4 @@
-#include "prm_quotient_cover.h"
+#include "qmp_connect_cover.h"
 #include "planner/cspace/cspace.h"
 #include "planner/cover/open_set.h"
 #include "planner/cover/open_set_bubble.h"
@@ -12,17 +12,17 @@ using namespace og;
 using namespace ob;
 using namespace cover;
 
-PRMQuotientConnectCover::PRMQuotientConnectCover(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
-  og::PRMQuotientConnect(si, previous_)
+QMPConnectCover::QMPConnectCover(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
+  og::QMPConnect(si, previous_)
 {
   openNeighborhood_ = (boost::get(vertex_open_neighborhood_t(), g_));
   openNeighborhoodDistance_ = (boost::get(vertex_open_neighborhood_distance_t(), g_));
   setName("QMPCover"+std::to_string(id));
 }
 
-PRMBasic::Vertex PRMQuotientConnectCover::CreateNewVertex(ob::State *state)
+PRMBasic::Vertex QMPConnectCover::CreateNewVertex(ob::State *state)
 {
-  Vertex m = PRMQuotientConnect::CreateNewVertex(state);
+  Vertex m = QMPConnect::CreateNewVertex(state);
   auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
   double d1 = checkerPtr->Distance(stateProperty_[m]);
   openNeighborhoodDistance_[m] = d1;
@@ -30,18 +30,18 @@ PRMBasic::Vertex PRMQuotientConnectCover::CreateNewVertex(ob::State *state)
   return m;
 }
 
-void PRMQuotientConnectCover::ClearVertices()
+void QMPConnectCover::ClearVertices()
 {
   foreach (Vertex v, boost::vertices(g_)){
     delete openNeighborhood_[v];
   }
-  PRMQuotientConnect::ClearVertices();
+  QMPConnect::ClearVertices();
 }
 
-void PRMQuotientConnectCover::getPlannerData(ob::PlannerData &data) const
+void QMPConnectCover::getPlannerData(ob::PlannerData &data) const
 {
   uint N = data.numVertices();
-  PRMQuotientConnect::getPlannerData(data);
+  QMPConnect::getPlannerData(data);
   std::cout << "added " << data.numVertices()-N << " vertices." << std::endl;
 
   auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
@@ -53,7 +53,7 @@ void PRMQuotientConnectCover::getPlannerData(ob::PlannerData &data) const
   }
 }
 
-//bool PRMQuotientCover::SampleGraph(ob::State *q_random_graph)
+//bool QMPCover::SampleGraph(ob::State *q_random_graph)
 //{
 //  PDF<Edge> pdf = GetEdgePDF();
 //  if(pdf.empty()){
@@ -88,7 +88,7 @@ void PRMQuotientConnectCover::getPlannerData(ob::PlannerData &data) const
 //  return true;
 //
 //}
-//bool PRMQuotientCover::Connect(const Vertex a, const Vertex b)
+//bool QMPCover::Connect(const Vertex a, const Vertex b)
 //{
 //  OpenSet *o1 = openNeighborhood_[a];
 //  //OpenSet *o2 = openNeighborhood_[b];

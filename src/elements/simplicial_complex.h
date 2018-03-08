@@ -16,7 +16,6 @@ namespace ob = ompl::base;
 struct SimplicialComplex{
   std::vector<Math3D::Vector3> V;
   std::vector<int> Vidx;
-  //std::vector< std::vector<int> > V_shortest_path;
   std::vector< std::vector<ob::PlannerData::Graph::Vertex> > V_shortest_path;
   std::vector<double> distance_shortest_path; //length of the shortest path from start to goal >including< vertex i
   double max_distance_shortest_path;
@@ -28,4 +27,3 @@ struct SimplicialComplex{
   std::vector<Math3D::Vector3> path;
   std::vector<int> betti_numbers;
 };
-

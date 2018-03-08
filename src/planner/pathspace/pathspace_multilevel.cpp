@@ -1,6 +1,5 @@
 #include "pathspace_multilevel.h"
 #include "pathspace_atomic.h"
-#include "elements/roadmap_decorator.h"
 
 #include "planner/cspace/cspace_factory.h"
 #include "planner/strategy/strategy_geometric.h"

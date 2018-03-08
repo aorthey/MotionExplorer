@@ -1,4 +1,4 @@
-#include "prm_quotient.h"
+#include "qmp.h"
 #include "planner/cspace/cspace.h"
 #include "planner/validitychecker/validity_checker_ompl.h"
 
@@ -14,17 +14,17 @@ using namespace og;
 using namespace ob;
 #define foreach BOOST_FOREACH
 
-PRMQuotient::PRMQuotient(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
+QMP::QMP(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
   og::PRMBasic(si, previous_)
 {
-  setName("PRMQuotient"+std::to_string(id));
+  setName("QMP"+std::to_string(id));
 }
 
-PRMQuotient::~PRMQuotient()
+QMP::~QMP()
 {
 }
 
-bool PRMQuotient::SampleGraph(ob::State *q_random_graph)
+bool QMP::SampleGraph(ob::State *q_random_graph)
 {
   PDF<Edge> pdf = GetEdgePDF();
 
@@ -43,7 +43,7 @@ bool PRMQuotient::SampleGraph(ob::State *q_random_graph)
   return true;
 }
 
-ompl::PDF<og::PRMBasic::Edge> PRMQuotient::GetEdgePDF()
+ompl::PDF<og::PRMBasic::Edge> QMP::GetEdgePDF()
 {
   PDF<Edge> pdf;
   double t = rng_.uniform01();

@@ -1,5 +1,5 @@
 #pragma once
-#include "prm_quotient.h"
+#include "qmp.h"
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
@@ -12,13 +12,13 @@ namespace ompl
   }
   namespace geometric
   {
-    class PRMQuotientConnect: public og::PRMQuotient{
+    class QMPConnect: public og::QMP{
 
       public:
 
-        PRMQuotientConnect(const ob::SpaceInformationPtr &si, Quotient *previous_);
+        QMPConnect(const ob::SpaceInformationPtr &si, Quotient *previous_);
 
-        ~PRMQuotientConnect() override;
+        ~QMPConnect() override;
 
         ob::PathPtr GetShortestPathOffsetVertices( const ob::State *qa, const ob::State *qb, 
           const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb);

@@ -14,12 +14,13 @@ namespace ompl
   }
   namespace geometric
   {
-    class PRMQuotient: public og::PRMBasic{
+    //QMP: Quotient-space roadMap Planner
+    class QMP: public og::PRMBasic{
 
       public:
 
-        PRMQuotient(const ob::SpaceInformationPtr &si, Quotient *previous_);
-        virtual ~PRMQuotient() override;
+        QMP(const ob::SpaceInformationPtr &si, Quotient *previous_);
+        virtual ~QMP() override;
 
       protected:
         double epsilon{0.2}; //graph thickening

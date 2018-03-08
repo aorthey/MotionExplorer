@@ -1,5 +1,5 @@
 #include "common.h"
-#include "prm_quotient_connect.h"
+#include "qmp_connect.h"
 #include "planner/cspace/cspace.h"
 
 #include <ompl/datastructures/PDF.h>
@@ -26,20 +26,20 @@ namespace ompl
   }
 }
 
-PRMQuotientConnect::PRMQuotientConnect(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
-  PRMQuotient(si, previous_)
+QMPConnect::QMPConnect(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
+  QMP(si, previous_)
 {
-  setName("PRMQuotientConnect"+to_string(id));
+  setName("QMPConnect"+to_string(id));
   goalBias_ = 0.0;
   epsilon = 0.1;
   percentageSamplesOnShortestPath = 1; //start at 1, then diminish over time
 }
 
-PRMQuotientConnect::~PRMQuotientConnect(){
+QMPConnect::~QMPConnect(){
 }
 
-void PRMQuotientConnect::clear(){
-  PRMQuotient::clear();
+void QMPConnect::clear(){
+  QMP::clear();
   lastSourceVertexSampled = -1;
   lastTargetVertexSampled = -1;
   lastTSampled = -1;
@@ -47,17 +47,17 @@ void PRMQuotientConnect::clear(){
   samplesOnShortestPath = 0;
 }
 
-void PRMQuotientConnect::setup()
+void QMPConnect::setup()
 {
-  og::PRMQuotientConnect *PRMprevious = static_cast<og::PRMQuotientConnect*>(previous);
+  og::QMPConnect *PRMprevious = static_cast<og::QMPConnect*>(previous);
   if(PRMprevious==nullptr){
-    PRMQuotient::setup();
+    QMP::setup();
   }
   if (!nn_){
     nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
     nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
                              {
-                               return PRMQuotientConnect::Distance(a,b);
+                               return QMPConnect::Distance(a,b);
                              });
   }
 
@@ -116,15 +116,15 @@ void PRMQuotientConnect::setup()
   }
 }
 
-void PRMQuotientConnect::Init()
+void QMPConnect::Init()
 {
-  PRMQuotient::Init();
+  QMP::Init();
 
 }
-PRMBasic::Vertex PRMQuotientConnect::CreateNewVertex(ob::State *state)
+PRMBasic::Vertex QMPConnect::CreateNewVertex(ob::State *state)
 {
-  Vertex m = PRMQuotient::CreateNewVertex(state);
-  og::PRMQuotientConnect *PRMprevious = static_cast<og::PRMQuotientConnect*>(previous);
+  Vertex m = QMP::CreateNewVertex(state);
+  og::QMPConnect *PRMprevious = static_cast<og::QMPConnect*>(previous);
   if(PRMprevious != nullptr && PRMprevious->isSampled){
     associatedVertexSourceProperty_[m] = PRMprevious->lastSourceVertexSampled;
     associatedVertexTargetProperty_[m] = PRMprevious->lastTargetVertexSampled;
@@ -132,7 +132,7 @@ PRMBasic::Vertex PRMQuotientConnect::CreateNewVertex(ob::State *state)
   }
   return m;
 }
-bool PRMQuotientConnect::Sample(ob::State *q_random)
+bool QMPConnect::Sample(ob::State *q_random)
 {
   totalNumberOfSamples++;
   if(previous == nullptr){
@@ -164,7 +164,7 @@ bool PRMQuotientConnect::Sample(ob::State *q_random)
   return M1->isValid(q_random);
 }
 
-bool PRMQuotientConnect::SampleGraph(ob::State *q_random_graph)
+bool QMPConnect::SampleGraph(ob::State *q_random_graph)
 {
   PDF<Edge> pdf = GetEdgePDF();
 
@@ -188,13 +188,13 @@ bool PRMQuotientConnect::SampleGraph(ob::State *q_random_graph)
   return true;
 }
 
-double PRMQuotientConnect::Distance(const Vertex a, const Vertex b) const
+double QMPConnect::Distance(const Vertex a, const Vertex b) const
 {
   if(previous == nullptr){
     return si_->distance(stateProperty_[a], stateProperty_[b]);
   }else{
 
-    og::PRMQuotientConnect *PRMprevious = dynamic_cast<og::PRMQuotientConnect*>(previous);
+    og::QMPConnect *PRMprevious = dynamic_cast<og::QMPConnect*>(previous);
     if(!PRMprevious->isSampled) return si_->distance(stateProperty_[a], stateProperty_[b]);
 
     ob::PathPtr M1_path = InterpolateM1GraphConstraint(a, b);
@@ -212,12 +212,12 @@ double PRMQuotientConnect::Distance(const Vertex a, const Vertex b) const
   }
 }
 
-bool PRMQuotientConnect::Connect(const Vertex a, const Vertex b){
+bool QMPConnect::Connect(const Vertex a, const Vertex b){
 
   if(previous==nullptr){
-    return PRMQuotient::Connect(a,b);
+    return QMP::Connect(a,b);
   }else{
-    og::PRMQuotientConnect *PRMprevious = static_cast<og::PRMQuotientConnect*>(previous);
+    og::QMPConnect *PRMprevious = static_cast<og::QMPConnect*>(previous);
 
     ob::PathPtr sol = InterpolateM1GraphConstraint(a,b);
     if(!sol){
@@ -264,9 +264,9 @@ bool PRMQuotientConnect::Connect(const Vertex a, const Vertex b){
 //the resulting path is an interpolation in M1, such that each point lies in the
 //slice of the graph G0
 
-ob::PathPtr PRMQuotientConnect::InterpolateM1GraphConstraint( const Vertex a, const Vertex b) const
+ob::PathPtr QMPConnect::InterpolateM1GraphConstraint( const Vertex a, const Vertex b) const
 {
-  og::PRMQuotientConnect *PRMprevious = dynamic_cast<og::PRMQuotientConnect*>(previous);
+  og::QMPConnect *PRMprevious = dynamic_cast<og::QMPConnect*>(previous);
   ob::State* sa = stateProperty_[a];
   ob::State* sb = stateProperty_[b];
 
@@ -341,7 +341,7 @@ ob::PathPtr PRMQuotientConnect::InterpolateM1GraphConstraint( const Vertex a, co
   return M1_path;
 }
 
-ob::PathPtr PRMQuotientConnect::GetShortestPathOffsetVertices(const ob::State *qa, const ob::State *qb, 
+ob::PathPtr QMPConnect::GetShortestPathOffsetVertices(const ob::State *qa, const ob::State *qb, 
   const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb)
 {
   //###########################################################################
@@ -492,7 +492,7 @@ ob::PathPtr PRMQuotientConnect::GetShortestPathOffsetVertices(const ob::State *q
   return path;
 }
 
-ompl::PDF<og::PRMBasic::Edge> PRMQuotientConnect::GetEdgePDF()
+ompl::PDF<og::PRMBasic::Edge> QMPConnect::GetEdgePDF()
 {
   PDF<Edge> pdf;
   double t = rng_.uniform01();
@@ -544,13 +544,13 @@ ompl::PDF<og::PRMBasic::Edge> PRMQuotientConnect::GetEdgePDF()
   return pdf;
 }
 
-void PRMQuotientConnect::RandomWalk(const Vertex &v) 
+void QMPConnect::RandomWalk(const Vertex &v) 
 {
   const bool DEBUG = false;
 
-  og::PRMQuotientConnect *PRMprevious = static_cast<og::PRMQuotientConnect*>(previous);
+  og::QMPConnect *PRMprevious = static_cast<og::QMPConnect*>(previous);
   if(previous == nullptr){
-    return PRMQuotient::RandomWalk(v);
+    return QMP::RandomWalk(v);
   }
 
   Vertex v_first = v;

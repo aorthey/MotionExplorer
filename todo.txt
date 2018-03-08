@@ -415,15 +415,12 @@ there some way that we might confuse the vertices when using getPlannerData?)
 [ ] do some contact planning on atlas, hrp4, some spider robot and a real
 complicated robot hand with 5 fingers and several revolute joints (is there some
 URDF i could use?)
-
 [ ] update shortest path after each growing operation (otherwise suboptimal
 paths are sampled, which we do not want)
-
 [ ] planner cannot solve problem because there is no understanding of the
 geometry of the QS. We need an exact representation. This can be abstract
 (region-based), but it needs to be exact, so that we have some representation of
 the narrow passage.
-
 [ ] disks in cspace are not optimal, because they cannot reach efficiently into
 tight corners.  I.e. we need infinite number of spheres to cover the boundary of a concave
 surface. => better use more effective ones, or add delta (shkolnik)

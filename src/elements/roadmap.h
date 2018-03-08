@@ -12,7 +12,6 @@ namespace ob = ompl::base;
 
 class Roadmap{
 
-  friend class RoadmapDecoratorSE2;
   public:
     Roadmap();
 

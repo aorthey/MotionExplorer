@@ -3,9 +3,9 @@
 #include "planner/strategy/benchmark.h"
 
 #include "planner/strategy/ompl/prm_basic.h"
-#include "planner/strategy/ompl/prm_quotient.h"
-#include "planner/strategy/ompl/prm_quotient_cover.h"
-#include "planner/strategy/ompl/prm_quotient_connect.h"
+#include "planner/strategy/ompl/qmp.h"
+#include "planner/strategy/ompl/qmp_connect.h"
+#include "planner/strategy/ompl/qmp_connect_cover.h"
 
 #include "planner/strategy/ompl/rrt_unidirectional.h"
 #include "planner/strategy/ompl/rrt_unidirectional_cover.h"
@@ -117,13 +117,13 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
   else if(algorithm=="qmp_connect"){
-    //typedef og::MultiQuotient<og::PRMQuotientConnect, og::RRTBidirectional> MultiQuotient;
-    typedef og::MultiQuotient<og::PRMQuotientConnect, og::RRTBidirectional> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec);
+    //typedef og::MultiQuotient<og::QMPConnect, og::RRTBidirectional> MultiQuotient;
+    typedef og::MultiQuotient<og::QMPConnect, og::RRTBidirectional> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec, "Connect");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="qmp_connect_cover"){
-    typedef og::MultiQuotient<og::PRMQuotientConnectCover> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec,"Cover");
+    typedef og::MultiQuotient<og::QMPConnectCover> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec,"ConnectCover");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;

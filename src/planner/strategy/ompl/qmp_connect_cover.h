@@ -1,5 +1,5 @@
 #pragma once
-#include "prm_quotient_connect.h"
+#include "qmp_connect.h"
 #include <ompl/datastructures/PDF.h>
 
 namespace ob = ompl::base;
@@ -14,11 +14,11 @@ namespace ompl
   }
   namespace geometric
   {
-    class PRMQuotientConnectCover: public og::PRMQuotientConnect{
+    class QMPConnectCover: public og::QMPConnect{
 
       public:
 
-        PRMQuotientConnectCover(const ob::SpaceInformationPtr &si, Quotient *previous_);
+        QMPConnectCover(const ob::SpaceInformationPtr &si, Quotient *previous_);
 
         virtual Vertex CreateNewVertex(ob::State *state) override;
 
