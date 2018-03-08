@@ -1,8 +1,7 @@
 <planner>
+  <algorithm name="qcp"/>
   <algorithm name="qmp_connect_cover"/>
   <algorithm name="qmp_connect"/>
-  <algorithm name="ompl:stride"/>
-  <algorithm name="ompl:kpiece"/>
   <algorithm name="ompl:rrtconnect"/>
   <algorithm name="ompl:prm"/>
   <algorithm name="ompl:est"/>

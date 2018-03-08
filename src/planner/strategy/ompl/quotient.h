@@ -42,15 +42,18 @@ namespace ompl
     {
       public:
         Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_ = nullptr);
+        virtual ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override;
+
         virtual bool Sample(ob::State *q_random);
         virtual bool SampleGraph(ob::State *q_random);
 
         virtual void Init() = 0;
         virtual void Grow(double t) = 0;
         virtual void CheckForSolution(ob::PathPtr &solution) = 0;
+
         virtual double GetSamplingDensity();
-        virtual uint GetNumberOfVertices() = 0;
-        virtual uint GetNumberOfEdges() = 0;
+        virtual uint GetNumberOfVertices();
+        virtual uint GetNumberOfEdges();
 
         virtual bool HasSolution();
         virtual uint GetNumberOfSampledVertices();

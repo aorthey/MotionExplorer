@@ -15,7 +15,7 @@ namespace ompl
         static_assert(std::is_base_of<og::Quotient, Tlast>::value, "Template must inherit from Quotient");
 
       public:
-        MultiQuotient(std::vector<ob::SpaceInformationPtr> &si_vec, std::string type = "");
+        MultiQuotient(std::vector<ob::SpaceInformationPtr> &si_vec, std::string type = "QuotientPlanner");
 
         virtual ~MultiQuotient() override;
 

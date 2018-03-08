@@ -9,7 +9,7 @@ using namespace og;
 
 template <class T, class Tlast>
 MultiQuotient<T,Tlast>::MultiQuotient(std::vector<ob::SpaceInformationPtr> &si_vec_, std::string type):
-  ob::Planner(si_vec_.back(),"QMP"+type), si_vec(si_vec_)
+  ob::Planner(si_vec_.back(), type), si_vec(si_vec_)
 {
   T::resetCounter();
   for(uint k = 0; k < si_vec.size(); k++){

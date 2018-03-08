@@ -10,26 +10,6 @@
 using namespace ompl::geometric;
 using namespace ompl::base;
 
-uint Quotient::counter = 0;
-void Quotient::resetCounter()
-{
-  Quotient::counter = 0;
-}
-
-void Quotient::clear()
-{
-  Planner::clear();
-  hasSolution = false;
-  Quotient::counter = 0;
-  totalNumberOfSamples = 0;
-  graphLength = 0;
-  if(previous==nullptr) C1_sampler.reset();
-}
-
-uint Quotient::GetNumberOfSampledVertices()
-{
-  return totalNumberOfSamples;
-}
 
 Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_):
   ob::Planner(si,"QuotientSpace"), M1(si), M0(si), previous(previous_)
@@ -77,6 +57,40 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_):
   }
 }
 
+ob::PlannerStatus Quotient::solve(const ob::PlannerTerminationCondition &ptc)
+{
+  std::cout << "Quotient-Space cannot be solved alone. Use class MultiQuotient." << std::endl;
+  exit(1);
+}
+
+uint Quotient::counter = 0;
+void Quotient::resetCounter()
+{
+  Quotient::counter = 0;
+}
+
+void Quotient::clear()
+{
+  Planner::clear();
+  hasSolution = false;
+  Quotient::counter = 0;
+  totalNumberOfSamples = 0;
+  graphLength = 0;
+  if(previous==nullptr) C1_sampler.reset();
+}
+
+uint Quotient::GetNumberOfSampledVertices()
+{
+  return totalNumberOfSamples;
+}
+uint Quotient::GetNumberOfVertices()
+{
+  return 0;
+}
+uint Quotient::GetNumberOfEdges()
+{
+  return 0;
+}
 
 const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const StateSpacePtr M0)
 {

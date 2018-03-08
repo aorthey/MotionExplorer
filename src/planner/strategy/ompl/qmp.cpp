@@ -67,7 +67,6 @@ ompl::PDF<og::PRMBasic::Edge> QMP::GetEdgePDF()
 
       if(sameComponent(v1, startM_.at(0))){
         //const std::vector<Vertex> &neighbors = connectionStrategy_(v1);
-
         //pdf.add(e, 1.0/(100*neighbors.size()));
         ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
         pdf.add(e, weight.value());
@@ -76,4 +75,3 @@ ompl::PDF<og::PRMBasic::Edge> QMP::GetEdgePDF()
   }
   return pdf;
 }
-
