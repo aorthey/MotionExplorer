@@ -16,13 +16,9 @@ class PathSpace{
 
     PathSpace(RobotWorld *world_, PathSpaceInput* input_);
 
-    const std::vector<Config>& GetVertices();
-    const std::vector<std::pair<Config,Config>>& GetEdges();
     const RoadmapPtr GetRoadmap();
     PathPiecewiseLinear* GetShortestPath();
 
-    void SetVertices(const std::vector<Config>&);
-    void SetEdges(const std::vector<std::pair<Config,Config>>&);
     void SetRoadmap(const RoadmapPtr);
     void SetShortestPath(const ob::PathPtr p, CSpaceOMPL *cspace);
 
@@ -36,10 +32,6 @@ class PathSpace{
 
     friend std::ostream& operator<< (std::ostream& out, const PathSpace& space);
   protected:
-
-    std::vector<Config> vertices;
-    std::vector<std::pair<Config,Config>> edges;
-    //std::vector<std::vector<Config>> paths;
 
     PathPiecewiseLinear *path_ompl{nullptr};
 

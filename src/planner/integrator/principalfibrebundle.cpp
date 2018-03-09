@@ -137,6 +137,7 @@ void PrincipalFibreBundleAdaptor::BiasedSampleControl(const State& x,const State
 
 void PrincipalFibreBundleIntegrator::propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
 {
+  std::cout << "PROPAGATE" << std::endl;
 
   //###########################################################################
   // OMPL to Config control

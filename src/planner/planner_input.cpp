@@ -44,9 +44,6 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
     inputs.push_back(input);
   }
 
-  // for(uint k = 0; k < inputs.size(); k++){
-  //   std::cout << *inputs.at(k) << std::endl;
-  // }
   return true;
 }
 
@@ -67,6 +64,7 @@ void PlannerInput::SetDefault()
   pathSpeed = GetSubNodeText<double>(node, "pathSpeed");
   smoothPath = GetSubNodeText<int>(node, "smoothPath");
   enableSufficiency = GetSubNodeText<int>(node, "enableSufficiency");
+  kinodynamic = GetSubNodeText<int>(node, "kinodynamic");
   name_sampler = GetSubNodeAttribute<std::string>(node, "sampler", "name");
 }
 
@@ -129,6 +127,7 @@ bool PlannerInput::Load(TiXmlElement *node)
   smoothPath = GetSubNodeTextDefault(node, "smoothPath", smoothPath);
   enableSufficiency = GetSubNodeTextDefault(node, "enableSufficiency", enableSufficiency);
   name_sampler = GetSubNodeAttributeDefault<std::string>(node, "sampler", "name", name_sampler);
+  kinodynamic = GetSubNodeTextDefault(node, "kinodynamic", kinodynamic);
 
   return true;
 }

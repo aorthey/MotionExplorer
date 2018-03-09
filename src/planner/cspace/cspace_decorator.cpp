@@ -2,7 +2,7 @@
 #include "planner/validitychecker/validity_checker_ompl.h"
 
 CSpaceOMPLDecorator::CSpaceOMPLDecorator(CSpaceOMPL* cspace_ompl_):
-  CSpaceOMPL(cspace_ompl_->GetRobotPtr(), cspace_ompl_->GetCSpacePtr()), cspace_ompl(cspace_ompl_)
+  CSpaceOMPL(cspace_ompl_->world, cspace_ompl_->robot_idx), cspace_ompl(cspace_ompl_)
 {
   //input = cspace_ompl->input;
   //Nklampt = cspace_ompl->Nklampt;

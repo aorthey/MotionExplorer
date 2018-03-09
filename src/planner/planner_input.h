@@ -42,6 +42,8 @@ class PlannerInput{
     double pathSpeed;
     bool enableSufficiency;
 
+    bool kinodynamic{false};
+
     //input for hierarchical planner methods
     std::vector<int> robot_idxs;
     std::vector<Layer> layers;

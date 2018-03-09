@@ -40,6 +40,7 @@ class PathSpaceInput{
 
     bool enableSufficiency{false};
     bool fixedBase{false};
+    bool kinodynamic{false};
 
     const CSpaceInput& GetCSpaceInput();
     const StrategyInput& GetStrategyInput();

@@ -8,8 +8,6 @@ PathSpaceInput::PathSpaceInput()
 
 PathSpaceInput::PathSpaceInput(const PlannerInput &input, int level_)
 {
-  int idx = input.robot_idxs.back();
-
   level = level_;
   q_init = input.q_init;
   q_goal = input.q_goal;
@@ -22,6 +20,7 @@ PathSpaceInput::PathSpaceInput(const PlannerInput &input, int level_)
   freeFloating = input.freeFloating;
   enableSufficiency = input.enableSufficiency;
   fixedBase = !input.freeFloating;
+  kinodynamic = input.kinodynamic;
 
   name_sampler = input.name_sampler;
   name_algorithm = input.name_algorithm;
@@ -30,10 +29,11 @@ PathSpaceInput::PathSpaceInput(const PlannerInput &input, int level_)
   timestep_min = input.timestep_min;
   timestep_max = input.timestep_max;
 
-  robot_idx = idx;
-  robot_inner_idx = idx;
-  robot_outer_idx = idx;
-  type = input.layers.back().type;
+  type = input.layers.at(level).type;
+  robot_idx = input.layers.at(level).inner_index;
+  robot_inner_idx = input.layers.at(level).inner_index;
+  robot_outer_idx = input.layers.at(level).outer_index;
+
   next_layer = NULL;
 
 }
@@ -51,6 +51,8 @@ const StrategyInput& PathSpaceInput::GetStrategyInput()
   sin = new StrategyInput();
   sin->q_init = q_init;
   sin->q_goal = q_goal;
+  sin->dq_init = dq_init;
+  sin->dq_goal = dq_goal;
   sin->name_sampler = name_sampler;
   sin->name_algorithm = name_algorithm;
   sin->epsilon_goalregion = epsilon_goalregion;

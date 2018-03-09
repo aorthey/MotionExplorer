@@ -1,5 +1,5 @@
 #pragma once
-#include "planner/cspace/cspace.h"
+#include "planner/cspace/cspace_geometric.h"
 
 //KinodynamicCSpaceOMPL: Space = tangent bundle of configuration manifold;
 //control space = tangent space of tangent bundle, i.e. control happens in
@@ -7,26 +7,27 @@
 //of prismatic joints, and any additional booster/thruster which act directly
 //on the se(3) component
 
-class KinodynamicCSpaceOMPL: public CSpaceOMPL
+class KinodynamicCSpaceOMPL: public GeometricCSpaceOMPL
 {
   public:
-    KinodynamicCSpaceOMPL(Robot *robot_, CSpaceKlampt *kspace_);
+    KinodynamicCSpaceOMPL(RobotWorld *world_, int robot_idx);
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si);
-
     virtual void initSpace();
     virtual void initControlSpace();
-
+    virtual void print() const override;
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
-
+    virtual ob::ScopedState<> ConfigVelocityToOMPLState(const Config &q, const Config &dq);
     virtual Config OMPLStateToConfig(const ob::State *qompl);
 
-    Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState, const ob::RealVectorStateSpace::StateType *qomplTMState);
+    ob::SpaceInformationPtr SpaceInformationPtr() override;
 
-    virtual void print() const override;
+    //Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState, const ob::RealVectorStateSpace::StateType *qomplTMState);
+
   protected:
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si);
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
+    std::vector<int> vel_ompl_to_klampt;
+    std::vector<int> vel_klampt_to_ompl;
 
 };
 

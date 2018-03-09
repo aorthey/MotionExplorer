@@ -3,6 +3,95 @@
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
 
+CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx_):
+  si(nullptr), world(world_), robot_idx(robot_idx_)
+{
+  robot = world->robots[robot_idx];
+  worldsettings.InitializeDefault(*world);
+  kspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
+
+  Nklampt =  robot->q.size() - 6;
+  //check if the robot is SE(3) or if we need to add real vector space for joints
+  if(Nklampt<=0){
+    Nompl = 0;
+  }else{
+    //sometimes the joint space are only fixed joints. In that case OMPL
+    //complains that the real vector space is empty. We check here for that case
+    //and remove the real vector space
+    std::vector<double> minimum, maximum;
+    minimum = robot->qMin;
+    maximum = robot->qMax;
+    assert(minimum.size() == 6+Nklampt);
+    assert(maximum.size() == 6+Nklampt);
+
+    //prune dimensions which are smaller than epsilon (for ompl)
+    double epsilonSpacing=1e-10;
+    Nompl = 0;
+    for(uint i = 6; i < 6+Nklampt; i++){
+
+      if(abs(minimum.at(i)-maximum.at(i))>epsilonSpacing){
+        klampt_to_ompl.push_back(Nompl);
+        ompl_to_klampt.push_back(i);
+        Nompl++;
+      }else{
+        klampt_to_ompl.push_back(-1);
+      }
+    }
+  }
+}
+
+// CSpaceOMPL::CSpaceOMPL(Robot *robot_, CSpace *kspace_):
+//   robot(robot_), kspace(kspace_)
+// {
+//   std::cout << "cspace.cpp: Setting Klampt CSpace externally" << std::endl;
+//   exit(0);
+//   if(!(robot->joints[0].type==RobotJoint::Floating))
+//   {
+//     std::cout << "[MotionPlanner] only supports robots with a configuration space equal to SE(3) x R^n" << std::endl;
+//     exit(0);
+//   }
+// }
+Config CSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
+  const ob::State* s = qompl.get();
+  return OMPLStateToConfig(s);
+}
+
+const ob::StateSpacePtr CSpaceOMPL::SpacePtr(){
+  return space;
+}
+
+ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
+  if(si==nullptr){
+    si = std::make_shared<ob::SpaceInformation>(SpacePtr());
+    const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr();
+    si->setStateValidityChecker(checker);
+  }
+  return si;
+}
+
+const oc::RealVectorControlSpacePtr CSpaceOMPL::ControlSpacePtr(){
+  return control_space;
+}
+uint CSpaceOMPL::GetDimensionality() const{
+  return space->getDimension();
+}
+uint CSpaceOMPL::GetControlDimensionality() const{
+  return control_space->getDimension();
+}
+void CSpaceOMPL::SetCSpaceInput(const CSpaceInput &input_){
+  input = input_;
+}
+Robot* CSpaceOMPL::GetRobotPtr(){
+  return robot;
+}
+CSpace* CSpaceOMPL::GetCSpacePtr(){
+  return kspace;
+}
+const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr()
+{
+  return StateValidityCheckerPtr(SpaceInformationPtr());
+}
+
 Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
   double x = 0;
   double y = 0;
@@ -156,68 +245,6 @@ void CSpaceOMPL::OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob
   q->w = qw;
 }
 
-
-CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx):
-  si(nullptr), world(world_)
-{
-  robot = world->robots[robot_idx];
-  worldsettings.InitializeDefault(*world);
-  kspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
-}
-
-CSpaceOMPL::CSpaceOMPL(Robot *robot_, CSpace *kspace_):
-  robot(robot_), kspace(kspace_)
-{
-  if(!(robot->joints[0].type==RobotJoint::Floating))
-  {
-    std::cout << "[MotionPlanner] only supports robots with a configuration space equal to SE(3) x R^n" << std::endl;
-    exit(0);
-  }
-}
-Config CSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
-  const ob::State* s = qompl.get();
-  return OMPLStateToConfig(s);
-}
-
-const ob::StateSpacePtr CSpaceOMPL::SpacePtr(){
-  return space;
-}
-
-ob::SpaceInformationPtr CSpaceOMPL::GetSpaceInformation(){
-  return SpaceInformationPtr();
-}
-ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
-  if(si==nullptr){
-    si = std::make_shared<ob::SpaceInformation>(SpacePtr());
-    const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr();
-    si->setStateValidityChecker(checker);
-  }
-  return si;
-}
-
-const oc::RealVectorControlSpacePtr CSpaceOMPL::ControlSpacePtr(){
-  return control_space;
-}
-uint CSpaceOMPL::GetDimensionality() const{
-  return space->getDimension();
-}
-uint CSpaceOMPL::GetControlDimensionality() const{
-  return control_space->getDimension();
-}
-void CSpaceOMPL::SetCSpaceInput(const CSpaceInput &input_){
-  input = input_;
-}
-Robot* CSpaceOMPL::GetRobotPtr(){
-  return robot;
-}
-CSpace* CSpaceOMPL::GetCSpacePtr(){
-  return kspace;
-}
-const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr()
-{
-  return StateValidityCheckerPtr(SpaceInformationPtr());
-}
-
 void CSpaceOMPL::print(std::ostream& out) const
 {
   out << std::string(80, '-') << std::endl;
@@ -229,6 +256,7 @@ void CSpaceOMPL::print(std::ostream& out) const
   //space.space->printSettings(std::cout);
   std::cout << "OMPL Representation      : " << std::endl;
   space->diagram(std::cout << "   ");
+  print();
 
   out << std::string(80, '-') << std::endl;
 }

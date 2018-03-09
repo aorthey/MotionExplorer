@@ -8,11 +8,9 @@ class GeometricCSpaceOMPL: public CSpaceOMPL
 {
   public:
     GeometricCSpaceOMPL(RobotWorld *world_, int robot_idx);
-    GeometricCSpaceOMPL(Robot *robot_, CSpaceKlampt *kspace_);
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) override;
 
-    void Init();
     virtual void initSpace() override;
     virtual void initControlSpace() override;
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q) override;

@@ -4,45 +4,44 @@
 GeometricCSpaceOMPL::GeometricCSpaceOMPL(RobotWorld *world_, int robot_idx):
   CSpaceOMPL(world_, robot_idx)
 {
-  Init();
 }
-GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
-  CSpaceOMPL(robot_, kspace_)
-{
-  Init();
-}
+// GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
+//   CSpaceOMPL(robot_, kspace_)
+// {
+//   exit(0);
+// }
 
-void GeometricCSpaceOMPL::Init(){
-  Nklampt =  robot->q.size() - 6;
+// void GeometricCSpaceOMPL::Init(){
+//   Nklampt =  robot->q.size() - 6;
 
-  //check if the robot is SE(3) or if we need to add real vector space for joints
-  if(Nklampt<=0){
-    Nompl = 0;
-  }else{
-    //sometimes the joint space are only fixed joints. In that case OMPL
-    //complains that the real vector space is empty. We check here for that case
-    //and remove the real vector space
-    std::vector<double> minimum, maximum;
-    minimum = robot->qMin;
-    maximum = robot->qMax;
-    assert(minimum.size() == 6+Nklampt);
-    assert(maximum.size() == 6+Nklampt);
+//   //check if the robot is SE(3) or if we need to add real vector space for joints
+//   if(Nklampt<=0){
+//     Nompl = 0;
+//   }else{
+//     //sometimes the joint space are only fixed joints. In that case OMPL
+//     //complains that the real vector space is empty. We check here for that case
+//     //and remove the real vector space
+//     std::vector<double> minimum, maximum;
+//     minimum = robot->qMin;
+//     maximum = robot->qMax;
+//     assert(minimum.size() == 6+Nklampt);
+//     assert(maximum.size() == 6+Nklampt);
 
-    //prune dimensions which are smaller than epsilon (for ompl)
-    double epsilonSpacing=1e-10;
-    Nompl = 0;
-    for(uint i = 6; i < 6+Nklampt; i++){
+//     //prune dimensions which are smaller than epsilon (for ompl)
+//     double epsilonSpacing=1e-10;
+//     Nompl = 0;
+//     for(uint i = 6; i < 6+Nklampt; i++){
 
-      if(abs(minimum.at(i)-maximum.at(i))>epsilonSpacing){
-        klampt_to_ompl.push_back(Nompl);
-        ompl_to_klampt.push_back(i);
-        Nompl++;
-      }else{
-        klampt_to_ompl.push_back(-1);
-      }
-    }
-  }
-}
+//       if(abs(minimum.at(i)-maximum.at(i))>epsilonSpacing){
+//         klampt_to_ompl.push_back(Nompl);
+//         ompl_to_klampt.push_back(i);
+//         Nompl++;
+//       }else{
+//         klampt_to_ompl.push_back(-1);
+//       }
+//     }
+//   }
+// }
 
 void GeometricCSpaceOMPL::initSpace()
 {
@@ -117,6 +116,7 @@ void GeometricCSpaceOMPL::initSpace()
 }
 void GeometricCSpaceOMPL::initControlSpace()
 {
+  exit(0);
   uint NdimControl = robot->q.size();
 
   this->control_space = std::make_shared<oc::RealVectorControlSpace>(space, NdimControl+1);
@@ -224,7 +224,7 @@ ob::ScopedState<> GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q){
     qomplRnSpace = nullptr;
   }
 
-  qomplSE3->setXYZ(q[0],q[1],q[2]);
+  qomplSE3->setXYZ(q(0),q(1),q(2));
   OMPLSO3StateSpaceFromEulerXYZ(q(3),q(4),q(5),qomplSO3);
 
   if(Nompl>0){
@@ -257,6 +257,7 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType
     std::cout << qomplSO3->w << std::endl;
     exit(0);
   }
+
   std::vector<double> rxyz = EulerXYZFromOMPLSO3StateSpace(qomplSO3);
   q(3) = rxyz.at(0);
   q(4) = rxyz.at(1);

@@ -36,10 +36,12 @@ namespace ompl{
 
 class CSpaceOMPL
 {
+  friend class CSpaceOMPLDecorator;
+  friend class CSpaceOMPLDecoratorNecessarySufficient;
   public:
 
-    CSpaceOMPL(RobotWorld *world_, int robot_idx);
-    CSpaceOMPL(Robot *robot_, CSpaceKlampt *kspace_);
+    CSpaceOMPL(RobotWorld *world_, int robot_idx_);
+    //CSpaceOMPL(Robot *robot_, CSpaceKlampt *kspace_);
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) = 0;
     virtual void initSpace() = 0;
@@ -58,7 +60,6 @@ class CSpaceOMPL
     virtual CSpaceKlampt* GetCSpacePtr();
     virtual const ob::StateSpacePtr SpacePtr();
     virtual ob::SpaceInformationPtr SpaceInformationPtr();
-    virtual ob::SpaceInformationPtr GetSpaceInformation();
     virtual const oc::RealVectorControlSpacePtr ControlSpacePtr();
 
     std::vector<double> EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
@@ -67,8 +68,6 @@ class CSpaceOMPL
     friend std::ostream& operator<< (std::ostream& out, const CSpaceOMPL& space);
     virtual void print(std::ostream& out) const;
 
-    friend class CSpaceOMPLDecorator;
-    friend class CSpaceOMPLDecoratorNecessarySufficient;
 
   protected:
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) = 0;
@@ -100,5 +99,7 @@ class CSpaceOMPL
     CSpaceKlampt *kspace;
     RobotWorld *world;
     WorldPlannerSettings worldsettings;
+    int robot_idx;
+
 };
 

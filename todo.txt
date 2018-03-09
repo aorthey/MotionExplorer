@@ -416,3 +416,11 @@ complicated robot hand with 5 fingers and several revolute joints (is there some
 URDF i could use?)
 
 [ ] what does the deform require? --> definition of increasing reachability.
+
+[ ] need nice atlas/hrp4 scenario with grasping and leg movement (climbing
+step!?)
+
+KINODYNAMIC PLANNING
+[ ] do bullet with kRRT
+[ ] do integration via ODESolver::ODE functionality
+[ ] implement propagate, but never use Config

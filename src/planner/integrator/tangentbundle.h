@@ -54,12 +54,3 @@ public:
     CSpaceOMPL *ompl_space;
 };
 
-class TangentBundleOMPLValidityChecker : public ob::StateValidityChecker
-{
-  public:
-    TangentBundleOMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpace *space, CSpaceOMPL *ompl_space_);
-    virtual bool isValid(const ob::State* state) const;
-    CSpace *cspace_;
-    CSpaceOMPL *ompl_space;
-};
-

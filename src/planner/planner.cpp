@@ -4,6 +4,7 @@
 
 #include "pathspace/pathspace_atomic.h"
 #include "pathspace/pathspace_multilevel.h"
+#include "pathspace/pathspace_multilevel_kinodynamic.h"
 #include "pathspace/decorator.h"
 #include "pathspace/decorator_highlighter.h"
 #include "util.h"
@@ -30,7 +31,6 @@ std::string MotionPlanner::getName() const{
 void MotionPlanner::CreateHierarchy(){
   hierarchy = new Hierarchy<PathSpace*>();
   std::vector<int> idxs = input.robot_idxs;
-  //std::string subalgorithm = input.name_algorithm.substr(13,input.name_algorithm.size()-13);
   std::string algorithm = input.name_algorithm;
 
   PathSpaceInput *psinput_level0 = nullptr;
@@ -55,32 +55,16 @@ void MotionPlanner::CreateHierarchy(){
     Config dqi = input.dq_init; dqi.resize(ri->dq.size());
     Config dqg = input.dq_goal; dqg.resize(ri->dq.size());
 
-    if(k==0) hierarchy->AddLevel( ii, io, qi, qg);
-
-    hierarchy->AddLevel( ii, io, qi, qg); 
-
     if(k==0){
+      //add the space of all continuous functions
+      hierarchy->AddLevel( ii, io, qi, qg);
       psinput = new PathSpaceInput(input, 0);
-      psinput->type = input.layers.at(0).type;
-
-      psinput->robot_idx = ii;
-      psinput->robot_inner_idx = ii;
-      psinput->robot_outer_idx = io;
-      psinput->name_algorithm = algorithm;
-
       psinput_level0 = psinput;
     }
 
+    hierarchy->AddLevel( ii, io, qi, qg); 
     psinput->SetNextLayer(new PathSpaceInput(input,k));
     psinput = psinput->GetNextLayer();
-
-    psinput->robot_idx = ii;
-    psinput->robot_inner_idx = ii;
-    psinput->robot_outer_idx = io;
-    psinput->type = input.layers.at(k).type;
-
-    psinput->name_algorithm = algorithm;
-
   }
 
   //remove all nested robots except the original one
@@ -89,43 +73,17 @@ void MotionPlanner::CreateHierarchy(){
   //}
 
   if(psinput_level0!=nullptr){
-    hierarchy->AddRootNode( new PathSpaceMultiLevel(world, psinput_level0) );
+    if(!psinput_level0->kinodynamic){
+      hierarchy->AddRootNode( new PathSpaceMultiLevel(world, psinput_level0) );
+    }else{
+      hierarchy->AddRootNode( new PathSpaceMultiLevelKinodynamic(world, psinput_level0) );
+    }
   }else{
     std::cout << "root node is zero" << std::endl;
     exit(0);
   }
 
 }
-
-
-/** @brief shallow hierarchy contains two pathspaces. The first path space consists of
-  * the space of all continuous paths between init and goal configuration in the
-  * configuration space of robot[idx]. 
-  * The second path space contains of a single path if there exists a feasible
-  * path or the empty set otherwise. 
-  */
-
-//void MotionPlanner::CreateShallowHierarchy(){
-//
-//  Config p_init = input.q_init;
-//  Config p_goal = input.q_goal;
-//  int idx = input.robot_idxs.back();
-//  std::string type = input.layers.back().type;
-//
-//  //  (1) space of all continuous paths
-//  hierarchy->AddLevel( idx, p_init, p_goal);
-//  //  (2) a single solution path (if it exists)
-//  hierarchy->AddLevel( idx, p_init, p_goal);
-//
-//
-//  PathSpaceInput* level0 = new PathSpaceInput(input, 0);
-//  level0->type = type;
-//  PathSpaceInput* level1 = new PathSpaceInput(input, 1);
-//  level1->type = type;
-//  level0->SetNextLayer(level1);
-//
-//  hierarchy->AddRootNode( new PathSpaceMultiLevel(world, level0) );
-//}
 
 const PlannerInput& MotionPlanner::GetInput(){
   return input;
@@ -270,9 +228,6 @@ void MotionPlanner::DrawGL(GUIState& state){
   if(!active) return;
 
   uint N = hierarchy->NumberNodesOnLevel(current_level);
-  //PathSpace* P = hierarchy->GetNodeContent(current_path);
-  //PathSpace* P = new PathSpaceDecoratorSweptVolumePath( hierarchy->GetNodeContent(current_path) );
-  //std::cout << *P << std::endl;
   Pcurrent = hierarchy->GetNodeContent(current_path);
   Pcurrent = new PathSpaceDecoratorHighlighter(Pcurrent);
   Pcurrent->DrawGL(state);
@@ -280,8 +235,6 @@ void MotionPlanner::DrawGL(GUIState& state){
   for(uint k = 0; k < N; k++){
     if(k==current_level_node) continue;
     current_path.at(current_path.size()-1) = k;
-    //PathSpace* Pk = hierarchy->GetNodeContent(current_path);
-    //Pk->DrawGL(state);
   }
   if(current_path.size()>0){
     current_path.at(current_path.size()-1) = current_level_node;

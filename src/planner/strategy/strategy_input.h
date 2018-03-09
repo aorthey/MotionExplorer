@@ -12,6 +12,8 @@ namespace og = ompl::geometric;
 struct StrategyInput{
   Config q_init;
   Config q_goal;
+  Config dq_init;
+  Config dq_goal;
   std::string name_algorithm;
   std::string name_sampler;
   double max_planning_time;
