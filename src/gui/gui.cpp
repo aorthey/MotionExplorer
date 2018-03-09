@@ -118,8 +118,6 @@ void ForceFieldBackend::RenderWorld()
   glEnable(GL_BLEND); 
   glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
-  //drawDesired=0;
-
   for(size_t i=0;i<world->terrains.size();i++){
     Terrain *terra = world->terrains[i];
     GLDraw::GeometryAppearance* a = terra->geometry.Appearance();
@@ -404,6 +402,10 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     }else{
       active_robot = N-1;
     }
+  }else if(cmd=="next_mode"){
+    state.NextMode();
+  }else if(cmd=="previous_mode"){
+    state.PreviousMode();
   }else if(cmd=="simulate"){
     state("simulate").toggle();
     simulate = state("simulate").active;

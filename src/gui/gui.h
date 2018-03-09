@@ -88,5 +88,4 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
     GLUI_Spinner* spinner;
 };
 
-
 typedef SmartPointer<ForceFieldBackend> ForceFieldBackendPtr;

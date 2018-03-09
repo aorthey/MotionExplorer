@@ -3,14 +3,12 @@
 
 
 GUIVariable::GUIVariable(){
-  name = "unknown";
+  name = "";
+  descr = "";
+  key = "NONE";
+  mode = "default";
 }
-GUIVariable::GUIVariable(std::string name_){
-  name = name_;
 
-  descr = std::string(name);
-  descr = std::regex_replace(descr, std::regex("_"), " ");
-}
 GUIVariable::GUIVariable(std::string name_, std::string descr_){
   name = name_;
   descr = descr_;
@@ -40,23 +38,36 @@ bool GUIVariable::operator!() const{
 
 //******************************************************************************
 GUIState::GUIState(){
+  modes.push_back("default");
+  mode = 0;
+  if(!EMPTY_VARIABLE){
+    EMPTY_VARIABLE = new GUIVariable();
+  }
 }
-
-void GUIState::add(const char* name){
-  GUIVariable* v = new GUIVariable(name);
-  v->active = 0;
-  variables[v->name] = v;
+void GUIState::NextMode()
+{
+  if(mode < modes.size()-1) mode++;
+  else mode = 0;
 }
-void GUIState::add(const char* name, char* key){
-  GUIVariable*  v = new GUIVariable(name);
-  v->active = 0;
-  v->key = key;
-  variables[v->name] = v;
+void GUIState::PreviousMode()
+{
+  if(mode > 0) mode--;
+  else mode = modes.size()-1;
+}
+const char* GUIState::GetCurrentMode()
+{
+  return modes.at(mode).c_str();
 }
 
 bool GUIState::IsToggleable(const char* str)
 {
-  return (toggle_variables.find(str) != toggle_variables.end());
+  if(toggle_variables.find(str) != toggle_variables.end()){
+    GUIVariable *v = toggle_variables[std::string(str)];
+    if(v->mode == GetCurrentMode()){
+      return true;
+    }
+  }
+  return false;
 }
 bool GUIState::IsToggleable(const std::string &str)
 {
@@ -64,15 +75,14 @@ bool GUIState::IsToggleable(const std::string &str)
 }
 
 GUIVariable& GUIState::operator()(const char* str){
-  if ( variables.find(str) == variables.end() ) {
-    if(!EMPTY_VARIABLE){
-      EMPTY_VARIABLE = new GUIVariable("empty");
-      EMPTY_VARIABLE->active=0; 
-      EMPTY_VARIABLE->descr="empty variable"; 
+  if ( variables.find(str) != variables.end() ) {
+    GUIVariable *v = variables[std::string(str)];
+    if(v->mode == GetCurrentMode()) {
+      return *variables[std::string(str)];
     }
-    return *EMPTY_VARIABLE;
   }
-  return *variables[std::string(str)];
+  return *EMPTY_VARIABLE;
+
 }
 
 void GUIState::toggle(const char* str)
@@ -90,113 +100,77 @@ bool GUIState::Load(const char* file)
   TiXmlElement *root = GetRootNodeFromDocument(doc);
   return Load(root);
 }
+
+void GUIState::GetTextVariable(TiXmlElement *node, GUIVariable *v)
+{
+  v->name = GetSubNodeText<std::string>(node, "name");
+  std::string default_descr = std::regex_replace(v->name, std::regex("_"), " ");
+  v->descr = GetSubNodeTextDefault<std::string>(node, "descr", default_descr);
+  v->key = GetSubNodeTextDefault<std::string>(node, "key", "NONE");
+  v->mode = GetSubNodeTextDefault<std::string>(node, "mode", v->mode);
+  v->active = GetSubNodeTextDefault<int>(node, "active", 0);
+  v->value = GetSubNodeTextDefault<double>(node, "value", 0);
+  v->min = GetSubNodeTextDefault<double>(node, "min", 0);
+  v->max = GetSubNodeTextDefault<double>(node, "max", 0);
+  v->step = GetSubNodeTextDefault<double>(node, "step", 0);
+
+  for(uint k = 0; k < modes.size(); k++){
+    if(modes.at(k) == v->mode)
+      return;
+  }
+  modes.push_back(v->mode);
+  std::cout << "new mode: " << v->mode << std::endl;
+}
+
+void GUIState::AddVariableFromNode(TiXmlElement *node)
+{
+  GUIVariable* v = new GUIVariable();
+
+  std::string type = node->Value();
+  if(type=="checkbox"){
+    GetTextVariable(node, v);
+    v->type = GUIVariable::Type::CHECKBOX;
+    toggle_variables[v->name] = v;
+  }else if(type=="hotkey"){
+    GetTextVariable(node, v);
+    v->type = GUIVariable::Type::HOTKEY;
+    toggle_variables[v->name] = v;
+  }else if(type=="button"){
+    GetTextVariable(node, v);
+    v->type = GUIVariable::Type::BUTTON;
+    toggle_variables[v->name] = v;
+  }else if(type=="property"){
+    v->name = GetAttribute<std::string>(node, "name");
+    v->key = GetAttributeDefault<std::string>(node, "key", "NONE");
+    v->active = GetAttributeDefault(node, "enabled", 0);
+    v->type = GUIVariable::Type::PROPERTY;
+  }else if(type=="slider"){
+    GetTextVariable(node, v);
+    v->type = GUIVariable::Type::SLIDER;
+  }else{
+    std::cout << "Unknown type of variable: " << type << std::endl;
+  }
+
+  variables[v->name] = v;
+}
+
+void GUIState::AddNodeType(TiXmlElement *node, const char* type)
+{
+  TiXmlElement* node_state = FindSubNode(node, type);
+  while(node_state!=NULL){
+    AddVariableFromNode(node_state);
+    node_state = FindNextSiblingNode(node_state, type);
+  }
+}
+
 bool GUIState::Load(TiXmlElement *node)
 {
   CheckNodeName(node, "gui");
-
-  //################################################################################
-  //checkbox states
-  //################################################################################
-  TiXmlElement* node_state = FindSubNode(node, "checkbox");
-  while(node_state!=NULL){
-    GUIVariable* v = new GUIVariable();
-
-    TiXmlElement* node_name = FindSubNode(node_state, "name");
-    TiXmlElement* node_descr = FindSubNode(node_state, "descr");
-    TiXmlElement* node_key = FindSubNode(node_state, "key");
-    TiXmlElement* node_active = FindSubNode(node_state, "active");
-    if(node_name) GetStreamText(node_name) >> v->name;
-    if(node_descr) std::getline(GetStreamText(node_descr), v->descr);
-    if(node_key) GetStreamText(node_key) >> v->key;
-    if(node_active) GetStreamText(node_active) >> v->active;
-
-    v->type = GUIVariable::Type::CHECKBOX;
-    variables[v->name] = v;
-    toggle_variables[v->name] = v;
-    node_state = FindNextSiblingNode(node_state, "checkbox");
-  }
-
-  //################################################################################
-  //hotkey variables
-  //################################################################################
-  node_state = FindSubNode(node, "hotkey");
-
-  while(node_state!=NULL){
-    GUIVariable* v = new GUIVariable();
-
-    TiXmlElement* node_name = FindSubNode(node_state, "name");
-    TiXmlElement* node_descr = FindSubNode(node_state, "descr");
-    TiXmlElement* node_key = FindSubNode(node_state, "key");
-    if(node_name) GetStreamText(node_name) >> v->name;
-    if(node_descr) std::getline(GetStreamText(node_descr), v->descr);
-    if(node_key) GetStreamText(node_key) >> v->key;
-
-    v->type = GUIVariable::Type::HOTKEY;
-    variables[v->name] = v;
-    toggle_variables[v->name] = v;
-    node_state = FindNextSiblingNode(node_state, "hotkey");
-  }
-  //################################################################################
-  //buttons variables
-  //################################################################################
-  node_state = FindSubNode(node, "button");
-
-  while(node_state!=NULL){
-    GUIVariable* v = new GUIVariable();
-
-    TiXmlElement* node_name = FindSubNode(node_state, "name");
-    TiXmlElement* node_descr = FindSubNode(node_state, "descr");
-    TiXmlElement* node_key = FindSubNode(node_state, "key");
-    if(node_name) GetStreamText(node_name) >> v->name;
-    if(node_descr) std::getline(GetStreamText(node_descr), v->descr);
-    if(node_key) GetStreamText(node_key) >> v->key;
-
-    v->type = GUIVariable::Type::BUTTON;
-    variables[v->name] = v;
-    node_state = FindNextSiblingNode(node_state, "button");
-  }
-  //################################################################################
-  //properties (fixed active variables)
-  //################################################################################
-  node_state = FindSubNode(node, "property");
-
-  while(node_state!=NULL){
-    GUIVariable* v = new GUIVariable();
-
-    GetStreamAttribute(node_state, "name") >> v->name;
-    GetStreamAttribute(node_state, "key") >> v->key;
-    GetStreamAttribute(node_state, "enabled") >> v->active;
-
-    v->descr = "Fixed active variable";
-    v->type = GUIVariable::Type::PROPERTY;
-    variables[v->name] = v;
-    node_state = FindNextSiblingNode(node_state, "property");
-  }
-  //################################################################################
-  //slider
-  //################################################################################
-  node_state = FindSubNode(node, "slider");
-
-  while(node_state!=NULL){
-    GUIVariable* v = new GUIVariable();
-
-    TiXmlElement* node_name  = FindSubNode(node_state, "name");
-    TiXmlElement* node_descr = FindSubNode(node_state, "descr");
-    TiXmlElement* node_value = FindSubNode(node_state, "value");
-    TiXmlElement* node_min   = FindSubNode(node_state, "min");
-    TiXmlElement* node_max   = FindSubNode(node_state, "max");
-    TiXmlElement* node_step  = FindSubNode(node_state, "step");
-    if(node_name) GetStreamText(node_name) >> v->name;
-    if(node_descr) std::getline(GetStreamText(node_descr), v->descr);
-    if(node_value) GetStreamText(node_value) >> v->value;
-    if(node_min) GetStreamText(node_min) >> v->min;
-    if(node_max) GetStreamText(node_max) >> v->max;
-    if(node_step) GetStreamText(node_step) >> v->step;
-
-    v->type = GUIVariable::Type::SLIDER;
-    variables[v->name] = v;
-    node_state = FindNextSiblingNode(node_state, "slider");
-  }
+  AddNodeType(node, "checkbox");
+  AddNodeType(node, "hotkey");
+  AddNodeType(node, "button");
+  AddNodeType(node, "property");
+  AddNodeType(node, "slider");
   return true;
 }
 

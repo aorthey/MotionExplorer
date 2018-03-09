@@ -119,7 +119,7 @@ void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *csp
 
 void Roadmap::DrawPathGL(GUIState &state, std::vector<Vector3> &q)
 {
-  if(q.size()>1 && state("draw_roadmap_shortest_path"))
+  if(q.size()>1)
   {
     glPushMatrix();
     glLineWidth(widthPath);
@@ -225,7 +225,7 @@ void Roadmap::DrawGL(GUIState& state)
       cEdge = cVertex;
       cPath = (k%2==0?magenta:black);
       DrawSingleLevelGL(state, roadmaps_level.at(k));
-      if(state("draw_path")){
+      if(state("draw_roadmap_shortest_path")){
         DrawPathGL(state, shortest_path_level.at(k));
       }
     }

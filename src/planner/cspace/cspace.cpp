@@ -63,7 +63,7 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
     z = qq[2];
 
   }else{
-    std::cout << "cannot deal with space type" << space_first_subspace->getType() << std::endl;
+    std::cout << "cspace:getXYZ: cannot deal with space type" << space_first_subspace->getType() << std::endl;
     std::cout << "please check ompl/base/StateSpaceTypes.h" << std::endl;
     exit(0);
   }

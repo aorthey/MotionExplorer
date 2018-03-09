@@ -79,9 +79,27 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
       SendPauseIdle();
     }
   }else if(cmd=="save_current_path"){
-    state("save_current_path").activate();
+    //state("save_current_path").activate();
+    if(path)
+    {
+      std::string fn = "mypath.xml";
+      path->Save(fn.c_str());
+      std::cout << "save current path to : " << fn << std::endl;
+    }else{
+      std::cout << "cannot save non-existing path." << std::endl;
+    }
   }else if(cmd=="load_current_path"){
-    state("load_current_path").activate();
+    std::cout << "load_current_path: NYI" << std::endl;
+    // if(!path)
+    // {
+    //   MotionPlanner* planner = planners.at(active_planner);
+    //   path = new PathPiecewiseLinear();
+    // }
+    // {
+    //   std::string fn = "mypath.xml";
+    //   path->Load(fn.c_str());
+    //   std::cout << "load current path from : " << fn << std::endl;
+    // }
   }else return BaseT::OnCommand(cmd,args);
 
   if(hierarchy_change){
@@ -131,26 +149,6 @@ bool PlannerBackend::OnIdle(){
         }
       }
       return true;
-    }
-    if(state("save_current_path")){
-      if(path)
-      {
-        std::string fn = "mypath.xml";
-        path->Save(fn.c_str());
-        std::cout << "save current path to : " << fn << std::endl;
-      }else{
-        std::cout << "cannot save non-existing path." << std::endl;
-      }
-      state("save_current_path").deactivate();
-    }
-    if(state("load_current_path")){
-      if(path)
-      {
-        std::string fn = "mypath.xml";
-        path->Load(fn.c_str());
-        std::cout << "load current path from : " << fn << std::endl;
-      }
-      state("load_current_path").deactivate();
     }
   }
   return res;

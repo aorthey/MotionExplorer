@@ -177,14 +177,19 @@ void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
 }
 void PathPiecewiseLinear::DrawGL(GUIState& state)
 {
-  if(!path) return;
-  cLine = magenta;
-  if(state("draw_path")) DrawGLPathPtr(path_raw);
-  DrawGLPathPtr(path);
-  if(!path_raw) return;
-  cLine = green;
-  if(state("draw_path_unsmoothed")) DrawGLPathPtr(path_raw);
+  if(state("draw_path")){
+    if(!path) return;
+    cLine = magenta;
+    DrawGLPathPtr(path);
+  }
+  if(state("draw_path_unsmoothed")) 
+  {
+    if(!path_raw) return;
+    cLine = green;
+    DrawGLPathPtr(path_raw);
+  }
   if(state("draw_path_sweptvolume")){
+    if(!path) return;
     if(!sv){
       double tmin = 0.05;
       double L = GetLength();
@@ -303,12 +308,6 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
     }
   }
   return true;
-
-  //void  copyToReals (std::vector< double > &reals, const State *source) const
-      //Copy all the real values from a state source to the array reals using getValueAddressAtLocation()
-       
-      //void  copyFromReals (State *destination, const std::vector< double > &reals) const
-        //Copy the values from reals to the state destination using getValueAddressAtLocation()
 }
   
 std::ostream& operator<< (std::ostream& out, const PathPiecewiseLinear& pwl) 

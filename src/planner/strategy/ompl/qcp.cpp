@@ -1,4 +1,5 @@
 #include "qcp.h"
+#include <ompl/util/Console.h>
 
 using namespace og;
 // should include a graph of SC
@@ -6,7 +7,6 @@ using namespace og;
 QCP::QCP(const ob::SpaceInformationPtr &si, Quotient *previous_):
   Quotient(si, previous_)
 {
-  std::cout << "QCP" << std::endl;
 }
 
 QCP::~QCP()

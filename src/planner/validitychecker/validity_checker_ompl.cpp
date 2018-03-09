@@ -12,33 +12,6 @@ bool OMPLValidityChecker::isValid(const ob::State* state) const
   SingleRobotCSpace* csi = static_cast<SingleRobotCSpace*>(inner);
   return IsCollisionFree(csi, q);
 }
-void GetGeometries2(RobotWorld& world,const vector<int>& ids,vector<Geometry::AnyCollisionGeometry3D*>& geoms,vector<int>& activeids)
-{
-  geoms.reserve(ids.size());
-  activeids.reserve(ids.size());
-  for(size_t i=0;i<ids.size();i++) {
-    int robotindex = world.IsRobot(ids[i]);;
-    if(robotindex >=0) {
-      //crud, have to expand
-      Robot* robot = world.robots[robotindex];
-      for(size_t j=0;j<robot->links.size();j++) {
-  Geometry::AnyCollisionGeometry3D* g=robot->geometry[j];
-  if(g && !g->Empty()) {
-    geoms.push_back(g);
-    activeids.push_back(world.RobotLinkID(robotindex,j));
-  }
-      }
-    }
-    else {
-      Geometry::AnyCollisionGeometry3D* g=world.GetGeometry(ids[i]);
-      if(g && !g->Empty()) {
-  geoms.push_back(g);
-  activeids.push_back(ids[i]);
-      }
-    }
-  }
-}
-
 
 double OMPLValidityChecker::Distance(const ob::State* state) const
 {
@@ -76,7 +49,8 @@ double OMPLValidityChecker::Distance(const ob::State* state) const
 }
 
 
-//same as Singlerobotcspace but ignore other robots
+//same as Singlerobotcspace but ignore other robots (because QS requires
+//multiple nested robots)
 bool OMPLValidityChecker::IsCollisionFree(SingleRobotCSpace *space, Config q) const{
   Robot* robot = space->GetRobot();
   robot->UpdateConfig(q);
@@ -123,6 +97,7 @@ OMPLValidityCheckerInnerOuter::OMPLValidityCheckerInnerOuter(const ob::SpaceInfo
   OMPLValidityChecker(si, ompl_space_, inner_), outer(outer_)
 {
 }
+
 bool OMPLValidityCheckerInnerOuter::isValid(const ob::State* state) const
 {
   const ob::StateSpacePtr ssp = si_->getStateSpace();
@@ -136,6 +111,7 @@ OMPLValidityCheckerNecessarySufficient::OMPLValidityCheckerNecessarySufficient(c
   OMPLValidityChecker(si, ompl_space_, ompl_space_->GetCSpacePtr()), outer(outer_)
 {
 }
+
 bool OMPLValidityCheckerNecessarySufficient::IsSufficient(const ob::State* state) const
 {
   Config q = ompl_space->OMPLStateToConfig(state);

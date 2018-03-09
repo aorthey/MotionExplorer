@@ -1,4 +1,5 @@
 <gui>
+
   <checkbox>
     <name>draw_rigid_objects_faces</name>
     <descr>Draw Face Mesh of Rigid Objects</descr>
@@ -11,6 +12,7 @@
     <key>e</key>
     <active>0</active>
   </checkbox>
+
   <checkbox>
     <name>draw_forcefield</name>
     <descr>Draw All ForceFields in Workspace</descr>
@@ -76,12 +78,12 @@
   <button>
     <name>save_current_path</name>
     <descr>Save Current Path</descr>
-    <key>S</key>
+    <key>0</key>
   </button>
   <button>
     <name>load_current_path</name>
     <descr>Load Current Path</descr>
-    <key>P</key>
+    <key>9</key>
   </button>
 
   <hotkey>
@@ -196,6 +198,11 @@
     <key>4</key>
   </hotkey>
 
+  <hotkey>
+    <name>next_mode</name>
+    <key>q</key>
+  </hotkey>
+
   <checkbox>
     <name>draw_path</name>
     <descr>Draw Path</descr>
@@ -203,10 +210,10 @@
     <active>0</active>
   </checkbox>
 
-  <property name="draw_roadmap_shortest_path" enabled="1"/>
   <property name="planner_draw_start_configuration" enabled="1"/>
   <property name="planner_draw_goal_configuration" enabled="1"/>
 
+  <property name="draw_roadmap_shortest_path" enabled="0"/>
   <property name="draw_path_unsmoothed" enabled="0"/>
   <property name="draw_path_autofocus" enabled="1"/>
   <property name="draw_axes" enabled="0"/>
