@@ -424,3 +424,4 @@ KINODYNAMIC PLANNING
 [ ] do bullet with kRRT
 [ ] do integration via ODESolver::ODE functionality
 [ ] implement propagate, but never use Config
+[ ] do not allocate new state in propagate function

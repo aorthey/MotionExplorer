@@ -1,6 +1,7 @@
 #include "planner/strategy/strategy_kinodynamic.h"
 #include "planner/cspace/cspace_kinodynamic.h"
 #include "planner/strategy/benchmark.h"
+#include "planner/strategy/ompl/kRRT.h"
 
 #include "util.h"
 #include "elements/plannerdata_vertex_annotated.h"
@@ -29,7 +30,7 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
   const oc::SpaceInformationPtr si = si_vec.back();
 
   if(algorithm=="ompl:rrtconnect"){
-    planner = std::make_shared<oc::RRT>(si);
+    planner = std::make_shared<oc::kRRT>(si);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);

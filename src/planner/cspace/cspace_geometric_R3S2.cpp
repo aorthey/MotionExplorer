@@ -33,8 +33,8 @@ void GeometricCSpaceOMPLR3S2::initSpace()
   bounds.check();
 }
 
-ob::ScopedState<> GeometricCSpaceOMPLR3S2::ConfigToOMPLState(const Config &q){
-  ob::ScopedState<> qompl(space);
+void GeometricCSpaceOMPLR3S2::ConfigToOMPLState(const Config &q, ob::State *qompl)
+{
   ob::SO2StateSpace::StateType *qomplSO2SpaceA = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
   ob::SO2StateSpace::StateType *qomplSO2SpaceB = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(2);
   // static_cast<ob::SO2StateSpace::StateType*>(qomplSO2SpaceA)->value = q(3);
@@ -45,7 +45,6 @@ ob::ScopedState<> GeometricCSpaceOMPLR3S2::ConfigToOMPLState(const Config &q){
   for(uint k = 0; k < 3; k++){
     qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0)->values[k] = q(k);
   }
-  return qompl;
 }
 
 Config GeometricCSpaceOMPLR3S2::OMPLStateToConfig(const ob::State *qompl){

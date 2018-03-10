@@ -72,8 +72,8 @@ void GeometricCSpaceOMPLFixedBase::initSpace()
 
 }
 
-ob::ScopedState<> GeometricCSpaceOMPLFixedBase::ConfigToOMPLState(const Config &q){
-  ob::ScopedState<> qompl(space);
+void GeometricCSpaceOMPLFixedBase::ConfigToOMPLState(const Config &q, ob::State *qompl)
+{
 
   ob::RealVectorStateSpace::StateType *qomplRN = qompl->as<ob::RealVectorStateSpace::StateType>();
   double* qomplRnValues = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRN)->values;
@@ -82,7 +82,6 @@ ob::ScopedState<> GeometricCSpaceOMPLFixedBase::ConfigToOMPLState(const Config &
     if(idx<0) continue;
     else qomplRnValues[idx]=q(6+i);
   }
-  return qompl;
 }
 
 Config GeometricCSpaceOMPLFixedBase::OMPLStateToConfig(const ob::State *qompl){

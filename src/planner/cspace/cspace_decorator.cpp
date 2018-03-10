@@ -15,8 +15,8 @@ const oc::StatePropagatorPtr CSpaceOMPLDecorator::StatePropagatorPtr(oc::SpaceIn
 const ob::StateValidityCheckerPtr CSpaceOMPLDecorator::StateValidityCheckerPtr(){
   return StateValidityCheckerPtr(SpaceInformationPtr());
 }
-ob::ScopedState<> CSpaceOMPLDecorator::ConfigToOMPLState(const Config &q){
-  return cspace_ompl->ConfigToOMPLState(q);
+void CSpaceOMPLDecorator::ConfigToOMPLState(const Config &q, ob::State *qompl){
+  return cspace_ompl->ConfigToOMPLState(q, qompl);
 }
 Config CSpaceOMPLDecorator::OMPLStateToConfig(const ob::ScopedState<> &qompl){
   return cspace_ompl->OMPLStateToConfig(qompl);

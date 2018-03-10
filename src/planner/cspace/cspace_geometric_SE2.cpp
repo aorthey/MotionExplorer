@@ -34,14 +34,13 @@ void GeometricCSpaceOMPLSE2::initSpace()
 
 }
 
-ob::ScopedState<> GeometricCSpaceOMPLSE2::ConfigToOMPLState(const Config &q){
-  ob::ScopedState<> qompl(space);
+void GeometricCSpaceOMPLSE2::ConfigToOMPLState(const Config &q, ob::State *qompl)
+{
   ob::SE2StateSpace::StateType *qomplSE2 = qompl->as<ob::SE2StateSpace::StateType>();
 
   qomplSE2->setXY(q(0),q(1));
   qomplSE2->setYaw(q(3));
 
-  return qompl;
 }
 
 Config GeometricCSpaceOMPLSE2::OMPLStateToConfig(const ob::State *qompl){

@@ -7,48 +7,51 @@
 #include <Planning/RobotCSpace.h>
 #include <vector>
 #include "planner/integrator/liegroupintegrator.h"
-#include "planner/cspace/cspace.h"
 
 using namespace Math3D;
-class KinodynamicCSpaceOMPL;
 
+class KinodynamicCSpaceOMPL;
 // Convention:
-//  The tangent bundle is represented as
+//  The principal fibre bundle is represented as
 //
-//  M = SE(3) x R^N x se(3) x R^N = (SE(3) x R^N) x R^{6+N}
+//  M = SE(3) x R^N 
 //
-//  whereby SE(3)xR^N is the base space which is itself a principal fibre bundle
+//  its tangent space is 
 //
-//  the control space is the tangent space of the tangent bundle plus one
+//  TM = R^{6+N}
+//
+//  and the control space is the tangent space of the tangent space plus one
 //  time step dimension (the last dimension)
 //
-//  TM \union R = U = R^{6+N+1} 
+//  TTM \union R = U = R^{6+N+1} 
 //
 //   the time step-dimension is used as an adaptive time step for integration.
 //   We use usual values between 0.01 and 0.1 for the time step.
-//
-//   each configuration is with respect to an interial frame centered at (0,0,0)
-//   each velocity is spatial, i.e. w.r.t. (0,0,0)
-//
 
 #include <ompl/base/StateSpace.h>
 #include <ompl/control/SimpleSetup.h>
 #include <ompl/control/SpaceInformation.h>
 #include <ompl/control/spaces/RealVectorControlSpace.h>
-
 namespace oc = ompl::control;
 namespace ob = ompl::base;
 
-class TangentBundleIntegrator : public oc::StatePropagator
+class PrincipalFibreBundleIntegrator : public oc::StatePropagator
 {
 public:
 
-    TangentBundleIntegrator(oc::SpaceInformationPtr si, KinodynamicCSpaceOMPL *cspace_) : 
-        oc::StatePropagator(si.get()), cspace(cspace_)
+    PrincipalFibreBundleIntegrator(oc::SpaceInformationPtr si, KinodynamicCSpaceOMPL *cspace_) : 
+        oc::StatePropagator(si), cspace(cspace_)
     {
     }
     virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
-
     KinodynamicCSpaceOMPL *cspace;
 };
 
+// class PrincipalFibreBundleOMPLValidityChecker : public ob::StateValidityChecker
+// {
+//   public:
+//     PrincipalFibreBundleOMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpace *space, CSpaceOMPL *ompl_space_);
+//     virtual bool isValid(const ob::State* state) const;
+//     CSpace *cspace_;
+//     CSpaceOMPL *ompl_space;
+// };

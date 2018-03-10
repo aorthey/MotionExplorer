@@ -6,6 +6,7 @@
 CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx_):
   si(nullptr), world(world_), robot_idx(robot_idx_)
 {
+
   robot = world->robots[robot_idx];
   worldsettings.InitializeDefault(*world);
   kspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
@@ -40,24 +41,15 @@ CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx_):
   }
 }
 
-// CSpaceOMPL::CSpaceOMPL(Robot *robot_, CSpace *kspace_):
-//   robot(robot_), kspace(kspace_)
-// {
-//   std::cout << "cspace.cpp: Setting Klampt CSpace externally" << std::endl;
-//   exit(0);
-//   if(!(robot->joints[0].type==RobotJoint::Floating))
-//   {
-//     std::cout << "[MotionPlanner] only supports robots with a configuration space equal to SE(3) x R^n" << std::endl;
-//     exit(0);
-//   }
-// }
 Config CSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
   const ob::State* s = qompl.get();
   return OMPLStateToConfig(s);
 }
 
-const ob::StateSpacePtr CSpaceOMPL::SpacePtr(){
-  return space;
+ob::ScopedState<> CSpaceOMPL::ConfigToOMPLState(const Config &q){
+  ob::ScopedState<> qompl(space);
+  ConfigToOMPLState(q, qompl.get());
+  return qompl;
 }
 
 ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
@@ -69,11 +61,14 @@ ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
   return si;
 }
 
-const oc::RealVectorControlSpacePtr CSpaceOMPL::ControlSpacePtr(){
-  return control_space;
+const ob::StateSpacePtr CSpaceOMPL::SpacePtr(){
+  return space;
 }
 uint CSpaceOMPL::GetDimensionality() const{
   return space->getDimension();
+}
+const oc::RealVectorControlSpacePtr CSpaceOMPL::ControlSpacePtr(){
+  return control_space;
 }
 uint CSpaceOMPL::GetControlDimensionality() const{
   return control_space->getDimension();
@@ -185,7 +180,7 @@ std::vector<double> CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( const ob::SO3Stat
   bool Rvalid = R.setMatrixXYZ(qrM);
   if(!Rvalid){
 
-    si->printSettings();
+    //si->printSettings();
 
     std::cout << "quaternions: " << qr << std::endl;
     std::cout << qrM << std::endl;

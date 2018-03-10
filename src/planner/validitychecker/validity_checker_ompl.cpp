@@ -8,9 +8,6 @@ OMPLValidityChecker::OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpa
 bool OMPLValidityChecker::isValid(const ob::State* state) const
 {
   const ob::StateSpacePtr ssp = si_->getStateSpace();
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "ISVALID?" << std::endl;
-  si_->printState(state);
   Config q = ompl_space->OMPLStateToConfig(state);
   SingleRobotCSpace* csi = static_cast<SingleRobotCSpace*>(inner);
   return IsCollisionFree(csi, q);

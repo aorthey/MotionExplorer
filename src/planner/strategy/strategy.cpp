@@ -38,7 +38,8 @@ Strategy::Strategy()
 {
 }
 
-void Strategy::setStateSampler(std::string sampler, ob::SpaceInformationPtr si){
+void Strategy::setStateSampler(std::string sampler, ob::SpaceInformationPtr si)
+{
   ob::ValidStateSamplerAllocator allocator;
   if(sampler=="uniform"){
     allocator = allocUniformValidStateSampler;
@@ -58,16 +59,5 @@ void Strategy::setStateSampler(std::string sampler, ob::SpaceInformationPtr si){
   }
   si->clearValidStateSamplerAllocator();
   si->setValidStateSamplerAllocator(allocator);
-
-  //ompl::base::ValidStateSamplerPtr smplr = si->allocValidStateSampler();
-  //double stddev = 10;
-  //if(sampler=="gaussian"){
-  //  static_pointer_cast<ob::GaussianValidStateSampler>(smplr)->setStdDev(stddev);
-  //  std::cout << "gaussian stddev: " << stddev << std::endl;
-  //  //exit(0);
-  //}else if(sampler=="bridge"){
-  //  static_pointer_cast<ob::BridgeTestValidStateSampler>(smplr)->setStdDev(stddev);
-  //}
-
 }
 

@@ -129,6 +129,12 @@ bool PlannerInput::Load(TiXmlElement *node)
   name_sampler = GetSubNodeAttributeDefault<std::string>(node, "sampler", "name", name_sampler);
   kinodynamic = GetSubNodeTextDefault(node, "kinodynamic", kinodynamic);
 
+  if(kinodynamic)
+  {
+    uMin = GetSubNodeAttribute<Config>(node, "control_min", "config");
+    uMax = GetSubNodeAttribute<Config>(node, "control_max", "config");
+  }
+
   return true;
 }
 

@@ -13,10 +13,10 @@ class GeometricCSpaceOMPL: public CSpaceOMPL
 
     virtual void initSpace() override;
     virtual void initControlSpace() override;
-    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q) override;
-
+    virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
     virtual Config OMPLStateToConfig(const ob::State *qompl) override;
     Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState);
+
     virtual void print() const override;
   protected:
     //virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(oc::SpaceInformationPtr si) override;

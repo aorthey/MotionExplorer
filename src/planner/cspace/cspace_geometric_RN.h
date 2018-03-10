@@ -5,7 +5,7 @@ class GeometricCSpaceOMPLRN: public GeometricCSpaceOMPL
   public:
     GeometricCSpaceOMPLRN(RobotWorld *world_, int robot_id, int dimension);
     virtual void initSpace();
-    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
+    virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
     virtual Config OMPLStateToConfig(const ob::State *qompl);
   protected:
     uint N;

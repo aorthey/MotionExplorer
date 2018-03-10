@@ -1,6 +1,4 @@
 #pragma once
-#include "planner/integrator/principalfibrebundle.h"
-#include "planner/integrator/tangentbundle.h"
 #include "planner/cspace/cspace_input.h"
 #include "klampt.h"
 
@@ -41,13 +39,14 @@ class CSpaceOMPL
   public:
 
     CSpaceOMPL(RobotWorld *world_, int robot_idx_);
-    //CSpaceOMPL(Robot *robot_, CSpaceKlampt *kspace_);
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) = 0;
     virtual void initSpace() = 0;
     virtual void initControlSpace() = 0;
     virtual void print() const = 0;
-    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q) = 0;
+
+    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
+    virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) = 0;
     virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
 
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
@@ -67,7 +66,6 @@ class CSpaceOMPL
 
     friend std::ostream& operator<< (std::ostream& out, const CSpaceOMPL& space);
     virtual void print(std::ostream& out) const;
-
 
   protected:
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) = 0;

@@ -207,9 +207,8 @@ void GeometricCSpaceOMPL::print() const
   std::cout << std::string(80, '-') << std::endl;
 }
 
-ob::ScopedState<> GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q){
-  ob::ScopedState<> qompl(space);
-
+void GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q, ob::State *qompl)
+{
   ob::SE3StateSpace::StateType *qomplSE3;
   ob::SO3StateSpace::StateType *qomplSO3;
   ob::RealVectorStateSpace::StateType *qomplRnSpace;
@@ -235,8 +234,8 @@ ob::ScopedState<> GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q){
       else qomplRn[idx]=q(6+i);
     }
   }
-  return qompl;
 }
+
 Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState){
   const ob::SO3StateSpace::StateType *qomplSO3 = &qomplSE3->rotation();
 
@@ -283,7 +282,7 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
 
 const oc::StatePropagatorPtr GeometricCSpaceOMPL::StatePropagatorPtr(oc::SpaceInformationPtr si)
 {
-  return std::make_shared<PrincipalFibreBundleIntegrator>(si, this);
+  exit(0);
 }
 const ob::StateValidityCheckerPtr GeometricCSpaceOMPL::StateValidityCheckerPtr(ob::SpaceInformationPtr si)
 {

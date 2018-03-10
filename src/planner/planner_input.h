@@ -43,6 +43,8 @@ class PlannerInput{
     bool enableSufficiency;
 
     bool kinodynamic{false};
+    Config uMin;
+    Config uMax;
 
     //input for hierarchical planner methods
     std::vector<int> robot_idxs;

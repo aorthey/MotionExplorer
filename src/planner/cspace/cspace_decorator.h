@@ -10,7 +10,7 @@ class CSpaceOMPLDecorator: public CSpaceOMPL
     virtual void initSpace() override;
     virtual void initControlSpace() override;
     virtual void print() const override;
-    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q) override;
+    virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
     virtual Config OMPLStateToConfig(const ob::State *qompl) override;
 
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr() override;

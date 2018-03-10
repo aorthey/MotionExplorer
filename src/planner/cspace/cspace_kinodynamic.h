@@ -13,21 +13,23 @@ class KinodynamicCSpaceOMPL: public GeometricCSpaceOMPL
     KinodynamicCSpaceOMPL(RobotWorld *world_, int robot_idx);
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si);
-    virtual void initSpace();
-    virtual void initControlSpace();
+    virtual void initSpace() override;
+    virtual void initControlSpace() override;
     virtual void print() const override;
-    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
-    virtual ob::ScopedState<> ConfigVelocityToOMPLState(const Config &q, const Config &dq);
-    virtual Config OMPLStateToConfig(const ob::State *qompl);
 
-    ob::SpaceInformationPtr SpaceInformationPtr() override;
+    virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
+    virtual void ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl);
+    ob::ScopedState<> ConfigVelocityToOMPLState(const Config &q, const Config &dq);
 
-    //Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState, const ob::RealVectorStateSpace::StateType *qomplTMState);
+    virtual Config OMPLStateToConfig(const ob::State *qompl) override;
+    virtual Config OMPLStateToVelocity(const ob::State *qompl);
 
-  protected:
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
-    std::vector<int> vel_ompl_to_klampt;
-    std::vector<int> vel_klampt_to_ompl;
+    //virtual ob::ScopedState<> ConfigVelocityToOMPLState(const Config &q, const Config &dq);
+
+    virtual ob::SpaceInformationPtr SpaceInformationPtr() override;
+
+  //protected:
+    //virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
 
 };
 

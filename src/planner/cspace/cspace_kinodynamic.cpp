@@ -1,4 +1,5 @@
 #include "planner/cspace/cspace_kinodynamic.h"
+#include "planner/integrator/tangentbundle.h"
 #include "planner/validitychecker/validity_checker_ompl.h"
 
 KinodynamicCSpaceOMPL::KinodynamicCSpaceOMPL(RobotWorld *world_, int robot_idx):
@@ -167,7 +168,7 @@ void KinodynamicCSpaceOMPL::initSpace()
 }
 void KinodynamicCSpaceOMPL::initControlSpace(){
   uint NdimControl = 6 + Nompl;
-  this->control_space = std::make_shared<oc::RealVectorControlSpace>(space, NdimControl+1);
+  control_space = std::make_shared<oc::RealVectorControlSpace>(space, NdimControl+1);
 
   Vector torques = robot->torqueMax;
 
@@ -192,21 +193,19 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
 
   cbounds.check();
   control_space->setBounds(cbounds);
-  //std::cout << "torque bounds" << std::endl;
-  //for(uint i = 0; i < NdimControl+1; i++){
-  //  std::cout << i << " <" << cbounds.low.at(i) << ","<< cbounds.high.at(i) << ">" << std::endl;
-  //}
 }
+
 
 ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigVelocityToOMPLState(const Config &q, const Config &dq)
 {
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "CONFIG/VELOCITY TO OMPL" << std::endl;
   ob::ScopedState<> qompl(space);
-  qompl = ConfigToOMPLState(q);
-
+  ConfigVelocityToOMPLState(q, dq, qompl.get());
+  return qompl;
+}
+void KinodynamicCSpaceOMPL::ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl)
+{
+  ConfigToOMPLState(q, qompl);
   ob::RealVectorStateSpace::StateType *qomplTMSpace;
-
   if(Nompl>0){
     qomplTMSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
   }else{
@@ -222,15 +221,9 @@ ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigVelocityToOMPLState(const Config 
     if(idx<0) continue;
     else qomplTM[idx]=dq(6+i);
   }
-
-  return qompl;
 }
-ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q){
-
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "CONFIG TO OMPL" << std::endl;
-  ob::ScopedState<> qompl(space);
-
+void KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q, ob::State *qompl)
+{
   ob::SE3StateSpace::StateType *qomplSE3;
   ob::SO3StateSpace::StateType *qomplSO3;
   ob::RealVectorStateSpace::StateType *qomplRnSpace = nullptr;
@@ -253,7 +246,7 @@ ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q){
   }
 
   qomplSE3->setXYZ(q(0),q(1),q(2));
-  OMPLSO3StateSpaceFromEulerXYZ(q(3),q(4),q(5),qomplSO3);
+  OMPLSO3StateSpaceFromEulerXYZ(q(3),q(4),q(5), qomplSO3);
 
   if(Nompl>0){
     double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
@@ -268,14 +261,31 @@ ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q){
   for(uint i = 0; i < (6+Nompl); i++){
     qomplTM[i]=0.0;
   }
-
-  return qompl;
 }
 
+
+
+Config KinodynamicCSpaceOMPL::OMPLStateToVelocity(const ob::State *qompl){
+  const ob::RealVectorStateSpace::StateType *qomplTMState;
+  if(Nompl>0){
+    qomplTMState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
+  }else{
+    qomplTMState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+  }
+  Config dq;
+  dq.resize(6+Nklampt);
+  dq.setZero();
+
+  for(uint i = 0; i < 6; i++){
+    dq(i) = qomplTMState->values[i];
+  }
+  for(uint i = 0; i < Nompl; i++){
+    uint idx = ompl_to_klampt.at(i);
+    dq(idx) = qomplTMState->values[i];
+  }
+  return dq;
+}
 Config KinodynamicCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "OMPL TO CONFIG" << std::endl;
-  si->printState(qompl);
   if(Nompl>0){
     const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
     const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
@@ -283,25 +293,19 @@ Config KinodynamicCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
   }else{
     const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
     Config q = GeometricCSpaceOMPL::OMPLStateToConfig(qomplSE3, NULL);
-    std::cout << q << std::endl;
     return q;
   }
 }
 
 const oc::StatePropagatorPtr KinodynamicCSpaceOMPL::StatePropagatorPtr(oc::SpaceInformationPtr si)
 {
-  return std::make_shared<TangentBundleIntegrator>(si, robot, this);
+  return std::make_shared<TangentBundleIntegrator>(si, this);
   //return std::make_shared<PrincipalFibreBundleIntegrator>(si, this);
 }
-const ob::StateValidityCheckerPtr KinodynamicCSpaceOMPL::StateValidityCheckerPtr(ob::SpaceInformationPtr si)
-{
-  return std::make_shared<OMPLValidityChecker>(si, this, kspace);
-}
 //#############################################################################
-
 ob::SpaceInformationPtr KinodynamicCSpaceOMPL::SpaceInformationPtr(){
   if(si==nullptr){
-    si = std::make_shared<oc::SpaceInformation>(SpacePtr(), control_space);
+    si = std::make_shared<oc::SpaceInformation>(space, control_space);
     const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr(si);
     si->setStateValidityChecker(checker);
     const oc::StatePropagatorPtr integrator = StatePropagatorPtr(static_pointer_cast<oc::SpaceInformation>(si));

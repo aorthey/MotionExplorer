@@ -35,13 +35,12 @@ void GeometricCSpaceOMPLRN::initSpace()
 
 }
 
-ob::ScopedState<> GeometricCSpaceOMPLRN::ConfigToOMPLState(const Config &q){
-  ob::ScopedState<> qompl(space);
+void GeometricCSpaceOMPLRN::ConfigToOMPLState(const Config &q, ob::State *qompl)
+{
   ob::RealVectorStateSpace::StateType *qomplRN = qompl->as<ob::RealVectorStateSpace::StateType>();
   for(uint k = 0; k < N; k++){
     qomplRN->values[k] = q(k);
   }
-  return qompl;
 }
 
 Config GeometricCSpaceOMPLRN::OMPLStateToConfig(const ob::State *qompl){
