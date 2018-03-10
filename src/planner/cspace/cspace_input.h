@@ -1,4 +1,5 @@
 #pragma once
+#include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 
 struct CSpaceInput{
   double timestep_min;

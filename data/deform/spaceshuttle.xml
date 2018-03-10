@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<world>
+  <robot name="bullet" file="/home/aorthey/git/orthoklampt/data/robots/bullet.urdf"/>
+  <rigidObject name="turbine" file="/home/aorthey/git/orthoklampt/data/terrains/turbine/turbine.tri" translation="1 0 2" rotateRPY="0 0 1.57"/>
+
+  <plannerinput>
+    <qinit config="7 +1.0 -3.5 +2.0 +1.57 -0.0 0.0 0"/>
+    <dqinit config="7 0.5 0 0.25 0 0 0 0"/>
+    <qgoal config="7 +1.0 +3.5 +2.0 +1.17 -0.0 0.0 0"/>
+    <dqgoal config="7 0.1 0 0 0 0 0.35 0"/>
+    <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
+
+    <control_min config="6  +1 0 0 -0.6 0 0"/>
+    <control_max config="6  +1 0 0 +0.6 0 0"/>
+
+    <maxplanningtime>1</maxplanningtime>
+    <epsilongoalregion>1</epsilongoalregion> 
+
+    <smoothPath>1</smoothPath>
+    <freeFloating>1</freeFloating>
+    <kinodynamic>1</kinodynamic>
+
+    <hierarchy>
+      <level inner_index="0" type="SE3"/>
+    </hierarchy>
+  </plannerinput>
+</world>

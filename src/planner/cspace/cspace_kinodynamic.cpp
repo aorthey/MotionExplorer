@@ -173,27 +173,16 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
   Vector torques = robot->torqueMax;
 
   ob::RealVectorBounds cbounds(NdimControl+1);
-  cbounds.setLow(-1);
-  cbounds.setHigh(1);
+  cbounds.setLow(0);
+  cbounds.setHigh(0);
 
   cbounds.setLow(NdimControl,input.timestep_min);//propagation step size
   cbounds.setHigh(NdimControl,input.timestep_max);
 
-  ////TODO: remove hardcoded se(3) vector fields
-  std::cout << input.uMin << std::endl;
-  std::cout << input.uMax << std::endl;
-  exit(0);
   for(uint i = 0; i < 6; i++){
-    cbounds.setLow(i,0);
-    cbounds.setHigh(i,0);
+    cbounds.setLow(i,input.uMin(i));
+    cbounds.setHigh(i,input.uMax(i));
   }
-
-  cbounds.setLow(0,1);
-  cbounds.setHigh(0,1);
-
-  cbounds.setLow(4,-0.5);
-  cbounds.setHigh(4,+0.5);
-
   cbounds.check();
   control_space->setBounds(cbounds);
 }
