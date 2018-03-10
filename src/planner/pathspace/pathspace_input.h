@@ -41,6 +41,8 @@ class PathSpaceInput{
     bool enableSufficiency{false};
     bool fixedBase{false};
     bool kinodynamic{false};
+    Config uMin;
+    Config uMax;
 
     const CSpaceInput& GetCSpaceInput();
     const StrategyInput& GetStrategyInput();

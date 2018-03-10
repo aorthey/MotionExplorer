@@ -180,6 +180,9 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
   cbounds.setHigh(NdimControl,input.timestep_max);
 
   ////TODO: remove hardcoded se(3) vector fields
+  std::cout << input.uMin << std::endl;
+  std::cout << input.uMax << std::endl;
+  exit(0);
   for(uint i = 0; i < 6; i++){
     cbounds.setLow(i,0);
     cbounds.setHigh(i,0);

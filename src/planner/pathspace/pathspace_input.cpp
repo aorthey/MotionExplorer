@@ -21,6 +21,8 @@ PathSpaceInput::PathSpaceInput(const PlannerInput &input, int level_)
   enableSufficiency = input.enableSufficiency;
   fixedBase = !input.freeFloating;
   kinodynamic = input.kinodynamic;
+  uMin = input.uMin;
+  uMax = input.uMax;
 
   name_sampler = input.name_sampler;
   name_algorithm = input.name_algorithm;
@@ -44,6 +46,8 @@ const CSpaceInput& PathSpaceInput::GetCSpaceInput()
   cin->timestep_max = timestep_max;
   cin->timestep_min = timestep_min;
   cin->fixedBase = fixedBase;
+  cin->uMin = uMin;
+  cin->uMax = uMax;
   return *cin;
 }
 const StrategyInput& PathSpaceInput::GetStrategyInput()
