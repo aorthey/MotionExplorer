@@ -12,7 +12,7 @@
     <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
 
     <control_min config="6  +1 0 0 -0.6 0 0"/>
-    <control_max config="6  +1 0 0 +0.6 0 0"/>
+    <control_max config="6  +0 0 0 +0.6 0 0"/>
 
     <maxplanningtime>1</maxplanningtime>
     <epsilongoalregion>1</epsilongoalregion> 
