@@ -105,7 +105,13 @@ void GUIState::GetTextVariable(TiXmlElement *node, GUIVariable *v)
 {
   v->name = GetSubNodeText<std::string>(node, "name");
   std::string default_descr = std::regex_replace(v->name, std::regex("_"), " ");
-  v->descr = GetSubNodeTextDefault<std::string>(node, "descr", default_descr);
+
+  TiXmlElement* subnode = FindSubNode(node, "descr");
+  if(subnode){
+    v->descr = subnode->GetText();
+  }else{
+    v->descr = default_descr;
+  }
   v->key = GetSubNodeTextDefault<std::string>(node, "key", "NONE");
   v->mode = GetSubNodeTextDefault<std::string>(node, "mode", v->mode);
   v->active = GetSubNodeTextDefault<int>(node, "active", 0);

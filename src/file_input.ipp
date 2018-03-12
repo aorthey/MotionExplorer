@@ -85,7 +85,6 @@ stringstream GetStreamAttributeConfig(TiXmlElement* node, const char *name){
 }
 
 stringstream GetStreamText(TiXmlElement* node){
-
   if(!node) return stringstream ("NONE");
   const char *na = node->GetText();
   if(na){

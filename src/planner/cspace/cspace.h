@@ -53,6 +53,7 @@ class CSpaceOMPL
     virtual Vector3 getXYZ(const ob::State*);
     virtual void SetCSpaceInput(const CSpaceInput &input_);
     virtual uint GetDimensionality() const;
+    virtual uint GetKlamptDimensionality() const;
     virtual uint GetControlDimensionality() const;
     virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
     virtual Robot* GetRobotPtr();

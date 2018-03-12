@@ -1,6 +1,7 @@
 #pragma once
 #include <KrisLibrary/math3d/primitives.h>
 #include <KrisLibrary/utils/SmartPointer.h>
+#include <KrisLibrary/GLdraw/GLColor.h>
 #include <vector>
 #include <memory>
 #include <iostream>
@@ -10,8 +11,8 @@ class TiXmlElement;
 
 //a wrench (force/torque) \in \R^6 acting at a point on \R^3
 struct Wrench{
-  Math3D::Vector3 torque;
   Math3D::Vector3 force;
+  Math3D::Vector3 torque;
   Math3D::Vector3 position;
 };
 struct Momentum{
@@ -31,8 +32,6 @@ class WrenchField{
     //wrench induced by force field on each link of the main robot
     std::vector<Wrench> wrench_per_link;
 
-    //Wrench wrench_at_com;
-
     COM com;
 
   public: 
@@ -40,11 +39,11 @@ class WrenchField{
     void init(uint Nlinks);
     WrenchField();
 
-    bool LoadFromWorldFile( const char * file);
+    bool Load( const char * file);
     bool Load( TiXmlElement *node );
 
-    //force at position
-    Math3D::Vector3 getForceFieldAtPosition(Math3D::Vector3 &position);
+    Math3D::Vector3 getForce(const Math3D::Vector3 &position, const Math3D::Vector3 &velocity = Math3D::Vector3(0,0,0));
+
     //TODO: force at origin induced by force at position 
     Math3D::Vector3 getTorqueFieldAtPosition(Math3D::Vector3 &position, Math3D::Vector3 &origin);
 

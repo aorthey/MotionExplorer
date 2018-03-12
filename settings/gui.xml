@@ -1,5 +1,4 @@
 <gui>
-
   <checkbox>
     <name>draw_rigid_objects_faces</name>
     <descr>Draw Face Mesh of Rigid Objects</descr>
@@ -16,7 +15,7 @@
   <checkbox>
     <name>draw_forcefield</name>
     <descr>Draw All ForceFields in Workspace</descr>
-    <key></key>
+    <key>F</key>
     <active>1</active>
   </checkbox>
   <checkbox>
@@ -124,8 +123,8 @@
   <checkbox>
     <name>draw_robot</name>
     <descr>Draw Original Robot</descr>
-    <key></key>
-    <active>0</active>
+    <key>R</key>
+    <active>1</active>
   </checkbox>
   <hotkey>
     <name>draw_roadmap_swathvolume</name>
@@ -212,12 +211,10 @@
 
   <property name="planner_draw_start_configuration" enabled="1"/>
   <property name="planner_draw_goal_configuration" enabled="1"/>
-
   <property name="draw_roadmap_shortest_path" enabled="0"/>
   <property name="draw_path_unsmoothed" enabled="0"/>
   <property name="draw_path_autofocus" enabled="1"/>
   <property name="draw_axes" enabled="0"/>
   <property name="draw_cover_vertices" enabled="1"/>
   <property name="draw_robot_zero_position" enabled="1"/>
-
 </gui>

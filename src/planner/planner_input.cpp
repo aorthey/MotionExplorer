@@ -166,7 +166,6 @@ std::ostream& operator<< (std::ostream& out, const PlannerInput& pin)
     out << " " << pin.robot_idxs.at(k);
   }
   out << std::endl;
-    
   out << std::string(80, '-') << std::endl;
   return out;
 }

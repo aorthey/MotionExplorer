@@ -1,6 +1,7 @@
 #include "force_field.h"
 
 using namespace Math3D;
+const double minimumRadiusSingularity = 0.5;
 
 //##############################################################################
 // UniformForceField
@@ -8,7 +9,8 @@ using namespace Math3D;
 UniformForceField::UniformForceField(Vector3 _force){
   force = _force;
 }
-Vector3 UniformForceField::getForceAtPosition(Vector3 position){
+Math3D::Vector3 UniformForceField::getForce(const Math3D::Vector3& position, const Math3D::Vector3& velocity)
+{
   return force;
 }
 
@@ -26,14 +28,15 @@ RadialForceField::RadialForceField(Vector3 _source, double _power, double _radiu
 {
 }
 
-Vector3 RadialForceField::getForceAtPosition(Vector3 position){
+Math3D::Vector3 RadialForceField::getForce(const Math3D::Vector3& position, const Math3D::Vector3& velocity)
+{
   Vector3 relative_position = position - source;
 
   Vector3 F(0,0,0);
 
   double dist = relative_position.normSquared();
   if( minimum_radius <= dist && dist <= maximum_radius){
-    F = (power/(dist*dist))*(relative_position);
+    F = (power/(dist))*(relative_position);
   }
 
   return F;
@@ -64,7 +67,8 @@ CylindricalForceField::CylindricalForceField(Math3D::Vector3 _source, Math3D::Ve
   direction /= direction.length();
 }
 
-Math3D::Vector3 CylindricalForceField::getForceAtPosition(Math3D::Vector3 position){
+Math3D::Vector3 CylindricalForceField::getForce(const Math3D::Vector3& position, const Math3D::Vector3& velocity)
+{
   Vector3 x = position - source;
   Vector3 v = x - (dot(x,direction))*direction;
   //TODO: make it depend on the velocity
@@ -106,10 +110,12 @@ double CylindricalForceField::GetPower(){
 //##############################################################################
 
 UniformRandomForceField::UniformRandomForceField(Vector3 _minforce, Vector3 _maxforce):
-  minforce(_minforce), maxforce(_maxforce){
+  minforce(_minforce), maxforce(_maxforce)
+{
 }
 
-Math3D::Vector3 UniformRandomForceField::getForceAtPosition(Vector3 position){
+Math3D::Vector3 UniformRandomForceField::getForce(const Math3D::Vector3& position, const Math3D::Vector3& velocity)
+{
   Vector3 F;
   for(int i = 0; i < 3; i++){
     F[i] = Math::Rand(minforce[i], maxforce[i]);
@@ -117,7 +123,8 @@ Math3D::Vector3 UniformRandomForceField::getForceAtPosition(Vector3 position){
   return F;
 }
 
-void UniformRandomForceField::print(){
+void UniformRandomForceField::print()
+{
   std::cout << "UniformRandomForceField  : minforce "<<minforce << " maxforce " << maxforce << std::endl;
 }
 ForceFieldTypes UniformRandomForceField::type(){
@@ -128,10 +135,12 @@ ForceFieldTypes UniformRandomForceField::type(){
 //##############################################################################
 
 GaussianRandomForceField::GaussianRandomForceField(Vector3 _mean, Vector3 _std):
-  mean(_mean), stddeviation(_std){
+  mean(_mean), stddeviation(_std)
+{
 }
 
-Math3D::Vector3 GaussianRandomForceField::getForceAtPosition(Vector3 position){
+Math3D::Vector3 GaussianRandomForceField::getForce(const Math3D::Vector3& position, const Math3D::Vector3& velocity)
+{
   Vector3 F;
   for(int i = 0; i < 3; i++){
     F[i] = Math::RandGaussian(mean[i], stddeviation[i]);
@@ -139,17 +148,20 @@ Math3D::Vector3 GaussianRandomForceField::getForceAtPosition(Vector3 position){
   return F;
 }
 
-void GaussianRandomForceField::print(){
+void GaussianRandomForceField::print()
+{
   std::cout << "GaussianRandomForceField  : mean "<< mean << " stddev " << stddeviation << std::endl;
 }
-ForceFieldTypes GaussianRandomForceField::type(){
+ForceFieldTypes GaussianRandomForceField::type()
+{
   return GAUSSIAN_RANDOM;
 }
 
 //##############################################################################
 // OrientedBoundingboxforcefield
 //##############################################################################
-ForceFieldTypes OrientedBoundingBoxForceField::type(){
+ForceFieldTypes OrientedBoundingBoxForceField::type()
+{
   return OBB;
 }
 OrientedBoundingBoxForceField::OrientedBoundingBoxForceField(double _power, Vector3 _center, Vector3 _direction, Vector3 _extension):
@@ -178,7 +190,8 @@ OrientedBoundingBoxForceField::OrientedBoundingBoxForceField(double _power, Vect
   force = _power*_direction;
 }
 
-bool OrientedBoundingBoxForceField::IsInsideBox( const Vector3 &position ){
+bool OrientedBoundingBoxForceField::IsInsideBox( const Vector3 &position )
+{
   Vector3 rel;
   R.mulTranspose(position - center, rel);
 
@@ -189,8 +202,8 @@ bool OrientedBoundingBoxForceField::IsInsideBox( const Vector3 &position ){
   return true;
 }
 
-Vector3 OrientedBoundingBoxForceField::getForceAtPosition(Vector3 position){
-
+Math3D::Vector3 OrientedBoundingBoxForceField::getForce(const Math3D::Vector3& position, const Math3D::Vector3& velocity)
+{
   if(IsInsideBox(position)){
     return force;
   }else{
@@ -212,4 +225,24 @@ Math3D::Vector3 OrientedBoundingBoxForceField::GetExtension(){
 }
 Math3D::Matrix3 OrientedBoundingBoxForceField::GetRotation(){
   return R;
+}
+//##############################################################################
+// Dragforcefield
+//##############################################################################
+DragForceField::DragForceField(double viscosity_):
+  viscosity(viscosity_)
+{
+}
+Math3D::Vector3 DragForceField::getForce(const Math3D::Vector3& position, const Math3D::Vector3& velocity)
+{
+  double v = velocity.norm();
+  double d = v/(viscosity*viscosity);
+  return -d*velocity;
+}
+void DragForceField::print()
+{
+  std::cout << "DragForceField : viscosity " << viscosity << std::endl;
+}
+ForceFieldTypes DragForceField::type(){
+  return DRAG;
 }

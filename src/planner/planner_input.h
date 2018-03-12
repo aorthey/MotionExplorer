@@ -15,7 +15,6 @@ struct Layer{
 class PlannerInput{
   public:
     //general input for any planner method (fixed)
-
     Config q_init;
     Config q_goal;
     Config dq_init;

@@ -414,14 +414,24 @@ there some way that we might confuse the vertices when using getPlannerData?)
 [ ] do some contact planning on atlas, hrp4, some spider robot and a real
 complicated robot hand with 5 fingers and several revolute joints (is there some
 URDF i could use?)
-
 [ ] what does the deform require? --> definition of increasing reachability.
-
 [ ] need nice atlas/hrp4 scenario with grasping and leg movement (climbing
 step!?)
 
 KINODYNAMIC PLANNING
-[ ] do bullet with kRRT
-[ ] do integration via ODESolver::ODE functionality
+[x] do bullet with kRRT
 [ ] implement propagate, but never use Config
+[ ] do integration via ODESolver::ODE functionality
 [ ] do not allocate new state in propagate function
+[ ] understand rigid body motion in arbitrary force field. how can we simulate
+the body?
+
+Directions to go: 
+(1) Kinodynamic Constraints -> needs devising of interesting experiments, like
+nonholonomic constraints, or some non-statically stable systems.
+  -- needs ability to integrate using real forces
+  -- needs ability to simulate forward correctly (there should not be any discrepancy)
+(2) Improve upon geometric planner, by computing neighbordhoods and/or critical
+points
+(3) Make experiments to compare kRRT and RRT+Deform (compare them both)
+(4) Later: compare kRRT, RRT+Deform, kPRM on Quotient spaces, QPM+Deform

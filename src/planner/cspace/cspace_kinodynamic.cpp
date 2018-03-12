@@ -277,6 +277,7 @@ Config KinodynamicCSpaceOMPL::OMPLStateToVelocity(const ob::State *qompl){
   }
   return dq;
 }
+
 Config KinodynamicCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
   if(Nompl>0){
     const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
@@ -292,8 +293,8 @@ Config KinodynamicCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
 const oc::StatePropagatorPtr KinodynamicCSpaceOMPL::StatePropagatorPtr(oc::SpaceInformationPtr si)
 {
   return std::make_shared<TangentBundleIntegrator>(si, this);
-  //return std::make_shared<PrincipalFibreBundleIntegrator>(si, this);
 }
+
 //#############################################################################
 ob::SpaceInformationPtr KinodynamicCSpaceOMPL::SpaceInformationPtr(){
   if(si==nullptr){

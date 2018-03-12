@@ -39,7 +39,7 @@ bool ForceFieldBackend::OnIdle()
 
   if(simulate) {
     sim.odesim.SetGravity(Vector3(0,0,0));
-    ODERobot *robot = sim.odesim.robot(0);
+    ODERobot *robot = sim.odesim.robot(active_robot);
     uint Nlinks = robot->robot.links.size();
 
     sim.hooks.clear();
@@ -53,7 +53,10 @@ bool ForceFieldBackend::OnIdle()
           RobotLink3D *link = &robot->robot.links[i];
           link->GetWorldCOM(com);
           wrenchfield.setPosition(i, com);
-          Vector3 force = wrenchfield.getForceFieldAtPosition(com);
+          Vector3 linmom = robot->robot.GetLinearMomentum(i);
+          Vector3 force = wrenchfield.getForce(com, linmom/link->mass);
+
+          //std::cout << "link " << i << " pos " << com << " force " << force << std::endl;
           Vector3 torque(0,0,0);
 
           wrenchfield.setForce(i, force);
@@ -75,6 +78,18 @@ bool ForceFieldBackend::OnIdle()
     wrenchfield.setCOMPosition(com);
     wrenchfield.setCOMLinearMomentum(LM);
     wrenchfield.setCOMAngularMomentum(AM);
+
+    double dt=settings["updateStep"];
+    Timer timer;
+    SimStep(dt);
+    SendRefresh();
+
+    SensorPlotUpdate();
+
+    Real elapsedTime = timer.ElapsedTime();
+    Real remainingTime = Max(0.0,dt-elapsedTime);
+    //printf("Simulated time %g took time %g, pausing for time %g\n",dt,elapsedTime,remainingTime);
+    SendPauseIdle(remainingTime);
 
     return true;
   }
@@ -148,18 +163,17 @@ void ForceFieldBackend::RenderWorld()
     for(size_t i=0;i<world->robots.size();i++) {
       if(i!=active_robot) continue;
       Robot *robot = world->robots[i];
-      if(state("draw_robot_zero_position")){
-        Config q = robot->q;
-        q.setZero();
-        robot->UpdateConfig(q);
-        robot->UpdateGeometry();
-        sim.odesim.robot(i)->SetConfig(q);
-      }
+      Config q = robot->q;
+      //q.setZero();
+      robot->UpdateConfig(q);
+      robot->UpdateGeometry();
+      sim.odesim.robot(i)->SetConfig(q);
 
       //std::cout << robot->name << " selfcollisions:" << robot->SelfCollision() << std::endl;
       for(size_t j=0;j<robot->links.size();j++) {
         if(robot->IsGeometryEmpty(j)) continue;
 
+        //std::cout << "robot " << i << " link " << j << " draw"  << std::endl;
         sim.odesim.robot(i)->GetLinkTransform(j,robot->links[j].T_World);
         Matrix4 mat = robot->links[j].T_World;
 
@@ -349,6 +363,9 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
 
   if(cmd=="advance"){
     SimStep(sim.simStep);
+  }else if(cmd=="simulate"){
+    state("simulate").toggle();
+    simulate = state("simulate").active;
   }else if(cmd=="reset"){
     sim.hooks.clear();
 
@@ -373,6 +390,7 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
       sim.odesim.robot(i)->GetVelocities(dq);
       dq.setZero();
       sim.odesim.robot(i)->SetVelocities(dq);
+      robot->dq = dq;
       robotWidgets[i].SetPose(robot->q);
       robotWidgets[i].ikPoser.poseGoals.clear();
       robotWidgets[i].ikPoser.RefreshWidgets();
@@ -406,9 +424,6 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
     state.NextMode();
   }else if(cmd=="previous_mode"){
     state.PreviousMode();
-  }else if(cmd=="simulate"){
-    state("simulate").toggle();
-    simulate = state("simulate").active;
   }else if(cmd=="toggle_mode"){
     if(click_mode == ModeNormal){
       click_mode = ModeForceApplication;

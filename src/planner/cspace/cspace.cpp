@@ -67,6 +67,9 @@ const ob::StateSpacePtr CSpaceOMPL::SpacePtr(){
 uint CSpaceOMPL::GetDimensionality() const{
   return space->getDimension();
 }
+uint CSpaceOMPL::GetKlamptDimensionality() const{
+  return Nklampt+6;
+}
 const oc::RealVectorControlSpacePtr CSpaceOMPL::ControlSpacePtr(){
   return control_space;
 }

@@ -3,8 +3,9 @@
 #include "wrench_field.h"
 
 using namespace Math3D;
+using namespace GLDraw;
 
-bool WrenchField::LoadFromWorldFile(const char* file)
+bool WrenchField::Load(const char* file)
 {
   TiXmlDocument doc(file);
   TiXmlElement *root = GetRootNodeFromDocument(doc);
@@ -22,7 +23,7 @@ bool WrenchField::Load(TiXmlElement *node)
   if(!forcefieldsettings){
     //std::cout << "world xml file has no forcefield" << std::endl;
     //std::cout << " -- setting earth gravity" << std::endl;
-    SmartPointer<ForceField> f(new UniformForceField(Vector3(0,0,-9.81)));
+    ForceFieldPtr f(new UniformForceField(Vector3(0,0,-9.81)));
     forcefields.push_back(f);
     return false;
   }
@@ -32,31 +33,14 @@ bool WrenchField::Load(TiXmlElement *node)
   //into a single one
   //############################################################################
   TiXmlElement* forceuniform = FindSubNode(forcefieldsettings, "uniform");
-  Vector3 Funiform;
-  Funiform.setZero();
-  using namespace GLDraw;
-  GLColor colorForce(0.8,0.8,0.8);
 
-  if(ExistStreamAttribute(forceuniform, "force")){
-    GetStreamAttribute(forceuniform,"force") >> Funiform;
-    while(forceuniform){
-      forceuniform = FindNextSiblingNode(forcefieldsettings, "uniform");
-      Vector3 FuniformNext;
-      GetStreamAttribute(forceuniform,"force") >> FuniformNext;
-      stringstream ssc = GetStreamAttribute(forceuniform,"color");
-      Vector3 cc;
-      if(ssc.str()!="NONE"){
-        ssc >> cc;
-        colorForce[0]=cc[0]; colorForce[1]=cc[1]; colorForce[2]=cc[2];
-      }
-      Funiform += FuniformNext;
-    }
+  Vector3 Funiform(0,0,0);
+  while(forceuniform){
+    Funiform += GetAttribute<Vector3>(forceuniform, "force");
+    forceuniform = FindNextSiblingNode(forcefieldsettings);
   }
 
-
-  SmartPointer<ForceField> fu(new UniformForceField(Funiform));
-  fu->SetColor(colorForce);
-
+  ForceFieldPtr fu(new UniformForceField(Funiform));
   forcefields.push_back(fu);
 
   //############################################################################
@@ -64,26 +48,32 @@ bool WrenchField::Load(TiXmlElement *node)
   //############################################################################
   TiXmlElement* forceradial = FindSubNode(forcefieldsettings, "radial");
 
-  while(forceradial!=NULL){
-    Vector3 source;
-    double power, radius;
-    GLColor colorForce(0.8,0.8,0.8);
-    GetStreamAttribute(forceradial,"source") >> source;
-    GetStreamAttribute(forceradial,"power") >> power;
-    GetStreamAttribute(forceradial,"radius") >> radius;
-    stringstream ssc = GetStreamAttribute(forceradial,"color");
-    Vector3 cc;
-    if(ssc.str()!="NONE"){
-      ssc >> cc;
-      colorForce[0]=cc[0]; colorForce[1]=cc[1]; colorForce[2]=cc[2];
-    }
+  while(forceradial){
+    Vector3 source = GetAttribute<Vector3>(forceradial,"source");
+    double power = GetAttribute<double>(forceradial,"power");
+    double radius = GetAttribute<double>(forceradial,"radius");
+    //GLColor color = GetAttributeDefault<GLColor>(forceradial,"color",magenta);
 
-    SmartPointer<ForceField> fr(new RadialForceField(source, power, radius));
-    fr->SetColor(colorForce);
+    ForceFieldPtr fr(new RadialForceField(source, power, radius));
     forcefields.push_back(fr);
 
-    forceradial = FindNextSiblingNode(forceradial, "radial");
+    forceradial = FindNextSiblingNode(forceradial);
   }
+  //############################################################################
+  //Drag Force Field
+  //############################################################################
+  TiXmlElement* forcedrag = FindSubNode(forcefieldsettings, "drag");
+
+  if(forcedrag){
+    double viscosity = GetAttribute<double>(forcedrag, "viscosity");
+    if(viscosity==0){
+      std::cout << "viscosity needs to be non-zero." << std::endl;
+      exit(1);
+    }
+    ForceFieldPtr fd(new DragForceField(viscosity));
+    forcefields.push_back(fd);
+  }
+
   //############################################################################
   //Uniform Random Force Fields
   //############################################################################
@@ -203,11 +193,11 @@ const std::vector<SmartPointer<ForceField> >& WrenchField::GetForceFields() cons
   return forcefields;
 }
 
-Vector3 WrenchField::getForceFieldAtPosition(Vector3 &position){
+Vector3 WrenchField::getForce(const Vector3 &position, const Vector3 &velocity){
 
   Vector3 F(0,0,0);
   for(uint i = 0; i < forcefields.size(); i++){
-    F += forcefields.at(i)->getForceAtPosition(position);
+    F += forcefields.at(i)->getForce(position, velocity);
   }
 
   return F;

@@ -48,6 +48,7 @@ public:
     {
     }
     virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
+    virtual void propagate_deprecated(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const;
 
     KinodynamicCSpaceOMPL *cspace;
 };

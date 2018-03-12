@@ -222,7 +222,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
     }
   }
 
-  _backend->wrenchfield.LoadFromWorldFile(file_name.c_str());
+  _backend->wrenchfield.Load(file_name.c_str());
   _backend->wrenchfield.print();
 
 }
