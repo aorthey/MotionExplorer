@@ -5,7 +5,7 @@
 
   <forcefield>
     <radial source="1 -1 2" power="-0.1" radius="3" color="1 0 1"/>
-    <drag viscosity="1" color="1 0 1"/>
+    <drag viscosity="10" color="1 0 1"/>
   </forcefield>
 
   <!-- <plannerinput> -->
