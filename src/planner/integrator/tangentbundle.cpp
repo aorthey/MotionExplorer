@@ -38,7 +38,7 @@ Matrix3 GetTotalInertiaAtPoint(const Robot *robot, const Vector3 &p)
 // so it is advantageous to change it, adapt it on the fly or even include it
 // into some optimization routine)
 //
-void TangentBundleIntegrator::propagate_deprecated(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
+void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
 {
   //(1) convert state to (q0,dq0,ddq0,u)
   //(2) integrate from (q0,dq0) to (q1,dq1);
@@ -99,7 +99,7 @@ void TangentBundleIntegrator::propagate_deprecated(const ob::State *state, const
   cspace->ConfigVelocityToOMPLState(q1, dq1, result);
 }
 
-void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
+void TangentBundleIntegrator::propagate_deprecated(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
 {
   //###########################################################################
   // (1) Convert state,control to input=(q0,dq0,u)
@@ -139,9 +139,6 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   for(uint k = 6; k < Nklampt; k++){
     fext(k) = ucontrol[k];
   }
-
-
-  exit(0);
 
   //###########################################################################
   // (3) control uand forces are assumed to be instantaneuous at configuration

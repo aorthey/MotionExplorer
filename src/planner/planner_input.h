@@ -61,6 +61,6 @@ struct PlannerMultiInput{
   std::vector<PlannerInput*> inputs;
   bool Load(const char* file);
   bool Load(TiXmlElement *node);
-  std::vector<std::string> GetAlgorithms();
+  std::vector<std::string> GetAlgorithms(bool kinodynamic);
 };
 

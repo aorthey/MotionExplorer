@@ -1,7 +1,7 @@
 #include "force_field.h"
 
 using namespace Math3D;
-const double minimumRadiusSingularity = 0.5;
+const double minimumRadiusSingularity = 0.05;
 
 //##############################################################################
 // UniformForceField

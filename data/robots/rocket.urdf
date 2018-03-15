@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<robot name="rocket">
+ <link name="mid">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.246458333333" ixy="0" ixz="0" iyy="0.246458333333" iyz="0" izz="0.005625"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="1.7" radius="0.15"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="1.7" radius="0.15"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="left">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.19" ixy="0" ixz="0" iyy="0.19" iyz="0" izz="0.0025"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.1 -0.25 0"/>
+    <geometry>
+      <cylinder length="1.5" radius="0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.1 -0.25 0"/>
+    <geometry>
+      <cylinder length="1.5" radius="0.1"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="right">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.19" ixy="0" ixz="0" iyy="0.19" iyz="0" izz="0.0025"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.1 0.25 0"/>
+    <geometry>
+      <cylinder length="1.5" radius="0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.1 0.25 0"/>
+    <geometry>
+      <cylinder length="1.5" radius="0.1"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="s_mid">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.009" ixy="0" ixz="0" iyy="0.009" iyz="0" izz="0.009"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.85 0 0"/>
+    <geometry>
+      <sphere radius="0.15"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.85 0 0"/>
+    <geometry>
+      <sphere radius="0.15"/>
+    </geometry>
+  </visual>
+</link>
+
+<link name="s_left">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.004" ixy="0" ixz="0" iyy="0.004" iyz="0" izz="0.004"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.65 -0.25 0"/>
+    <geometry>
+      <sphere radius="0.1"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.65 -0.25 0"/>
+    <geometry>
+      <sphere radius="0.1"/>
+    </geometry>
+  </visual>
+</link>
+
+<link name="s_right">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.004" ixy="0" ixz="0" iyy="0.004" iyz="0" izz="0.004"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.65 0.25 0"/>
+    <geometry>
+      <sphere radius="0.1"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.65 0.25 0"/>
+    <geometry>
+      <sphere radius="0.1"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_mid_s_mid" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="mid"/>
+  <child link="s_mid"/>
+</joint>
+
+<joint name="joint_mid_left" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="mid"/>
+  <child link="left"/>
+</joint>
+
+<joint name="joint_mid_right" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="mid"/>
+  <child link="right"/>
+</joint>
+
+<joint name="joint_left_s_left" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="left"/>
+  <child link="s_left"/>
+</joint>
+
+<joint name="joint_right_s_right" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="right"/>
+  <child link="s_right"/>
+</joint>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>

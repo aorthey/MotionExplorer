@@ -7,6 +7,7 @@ class GeometricCSpaceOMPLRN: public GeometricCSpaceOMPL
     virtual void initSpace();
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
     virtual Config OMPLStateToConfig(const ob::State *qompl);
+    virtual void print() const override;
   protected:
     uint N;
 };

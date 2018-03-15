@@ -1,17 +1,16 @@
 <planner>
+  <algorithm dynamic="1" name="ompl:rrtconnect"/>
   <algorithm name="ompl:rrtconnect"/>
-  <algorithm name="qcp"/>
   <algorithm name="qmp_connect_cover"/>
   <algorithm name="qmp_connect"/>
   <algorithm name="ompl:prm"/>
-  <algorithm name="ompl:est"/>
   <algorithm name="benchmark"/>
 
   <maxplanningtime>2</maxplanningtime> <!-- runtime in (s) --> 
   <smoothPath>0</smoothPath> <!-- 0: no smoothing, 1: smoothing      -->
   <pathSpeed>1</pathSpeed>   <!-- <1: slower, 1: default, >1: faster -->
   <sampler name="uniform"/> <!-- uniform|gaussian|minimum_clearance|maximum_clearance|obstacle_based|bridge_test -->
-  <timestep min="0.01" max="0.01"/>
+  <timestep min="0.01" max="0.1"/>
   <epsilongoalregion>0.01</epsilongoalregion>
   <freeFloating>0</freeFloating>
   <kinodynamic>0</kinodynamic> 

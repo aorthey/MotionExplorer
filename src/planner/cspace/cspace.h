@@ -42,7 +42,6 @@ class CSpaceOMPL
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) = 0;
     virtual void initSpace() = 0;
-    virtual void initControlSpace() = 0;
     virtual void print() const = 0;
 
     virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);

@@ -27,9 +27,6 @@ Config CSpaceOMPLDecorator::OMPLStateToConfig(const ob::State *qompl){
 void CSpaceOMPLDecorator::initSpace(){
   cspace_ompl->initSpace();
 }
-void CSpaceOMPLDecorator::initControlSpace(){
-  cspace_ompl->initControlSpace();
-}
 void CSpaceOMPLDecorator::print() const{
   cspace_ompl->print();
 }

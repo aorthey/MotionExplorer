@@ -7,7 +7,7 @@ bool PlannerMultiInput::Load(const char* file){
   return Load(GetRootNodeFromDocument(doc));
 }
 
-std::vector<std::string> PlannerMultiInput::GetAlgorithms()
+std::vector<std::string> PlannerMultiInput::GetAlgorithms(bool kinodynamic)
 {
   std::string pidef = util::GetDataFolder()+"/../settings/planner.xml";
   TiXmlDocument doc(pidef);
@@ -17,9 +17,12 @@ std::vector<std::string> PlannerMultiInput::GetAlgorithms()
 
   TiXmlElement* node_algorithm = FindFirstSubNode(node, "algorithm");
   std::vector<std::string> algorithms;
-  while(node_algorithm!=NULL){
+  while(node_algorithm){
     std::string a = GetAttribute<std::string>(node_algorithm, "name");
-    algorithms.push_back(a);
+    bool dynamic = GetAttributeDefault<int>(node_algorithm, "dynamic", false);
+    if(kinodynamic == dynamic){
+      algorithms.push_back(a);
+    }
     node_algorithm = FindNextSiblingNode(node_algorithm);
   }
   return algorithms;
@@ -34,7 +37,9 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
     return false;
   }
 
-  std::vector<std::string> algorithms = GetAlgorithms();
+  bool kinodynamic = GetSubNodeTextDefault<int>(node_plannerinput, "kinodynamic", false);
+  std::vector<std::string> algorithms = GetAlgorithms(kinodynamic);
+
   for(uint k = 0; k < algorithms.size(); k++){
 
     PlannerInput* input = new PlannerInput();
@@ -72,6 +77,25 @@ bool PlannerInput::Load(TiXmlElement *node)
 {
   SetDefault();
   CheckNodeName(node, "plannerinput");
+
+  //optional arguments
+
+  freeFloating = GetSubNodeTextDefault(node, "freeFloating", freeFloating);
+  robot_idx = GetSubNodeTextDefault(node, "robot", 0);
+  timestep_min = GetSubNodeAttributeDefault(node, "timestep", "min", timestep_min);
+  timestep_max = GetSubNodeAttributeDefault(node, "timestep", "max", timestep_max);
+  max_planning_time = GetSubNodeTextDefault(node, "maxplanningtime", max_planning_time);
+  epsilon_goalregion = GetSubNodeTextDefault(node, "epsilongoalregion", epsilon_goalregion);
+  pathSpeed = GetSubNodeTextDefault(node, "pathSpeed", pathSpeed);
+  smoothPath = GetSubNodeTextDefault(node, "smoothPath", smoothPath);
+  enableSufficiency = GetSubNodeTextDefault(node, "enableSufficiency", enableSufficiency);
+  name_sampler = GetSubNodeAttributeDefault<std::string>(node, "sampler", "name", name_sampler);
+  kinodynamic = GetSubNodeTextDefault(node, "kinodynamic", kinodynamic);
+  if(kinodynamic)
+  {
+    uMin = GetSubNodeAttribute<Config>(node, "control_min", "config");
+    uMax = GetSubNodeAttribute<Config>(node, "control_max", "config");
+  }
 
   //necessary arguments
 
@@ -115,25 +139,6 @@ bool PlannerInput::Load(TiXmlElement *node)
     layers.push_back(layer);
   }
 
-  //optional arguments
-
-  freeFloating = GetSubNodeTextDefault(node, "freeFloating", freeFloating);
-  robot_idx = GetSubNodeTextDefault(node, "robot", 0);
-  timestep_min = GetSubNodeAttributeDefault(node, "timestep", "min", timestep_min);
-  timestep_max = GetSubNodeAttributeDefault(node, "timestep", "max", timestep_max);
-  max_planning_time = GetSubNodeTextDefault(node, "maxplanningtime", max_planning_time);
-  epsilon_goalregion = GetSubNodeTextDefault(node, "epsilongoalregion", epsilon_goalregion);
-  pathSpeed = GetSubNodeTextDefault(node, "pathSpeed", pathSpeed);
-  smoothPath = GetSubNodeTextDefault(node, "smoothPath", smoothPath);
-  enableSufficiency = GetSubNodeTextDefault(node, "enableSufficiency", enableSufficiency);
-  name_sampler = GetSubNodeAttributeDefault<std::string>(node, "sampler", "name", name_sampler);
-  kinodynamic = GetSubNodeTextDefault(node, "kinodynamic", kinodynamic);
-
-  if(kinodynamic)
-  {
-    uMin = GetSubNodeAttribute<Config>(node, "control_min", "config");
-    uMax = GetSubNodeAttribute<Config>(node, "control_max", "config");
-  }
 
   return true;
 }

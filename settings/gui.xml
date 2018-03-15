@@ -124,7 +124,7 @@
     <name>draw_robot</name>
     <descr>Draw Original Robot</descr>
     <key>R</key>
-    <active>1</active>
+    <active>0</active>
   </checkbox>
   <hotkey>
     <name>draw_roadmap_swathvolume</name>

@@ -10,8 +10,6 @@ GeometricCSpaceOMPLRN::GeometricCSpaceOMPLRN(RobotWorld *world_, int robot_idx, 
 
 void GeometricCSpaceOMPLRN::initSpace()
 {
-  //std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: SE(2)" << std::endl;
-
   ob::StateSpacePtr RN = (std::make_shared<ob::RealVectorStateSpace>(N));
   this->space = RN;
   ob::RealVectorStateSpace *cspace = this->space->as<ob::RealVectorStateSpace>();
@@ -53,4 +51,31 @@ Config GeometricCSpaceOMPLRN::OMPLStateToConfig(const ob::State *qompl){
   }
   return q;
 
+}
+void GeometricCSpaceOMPLRN::print() const
+{
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "OMPL CSPACE" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "Robot \"" << robot->name << "\":" << std::endl;
+  std::cout << "Dimensionality Space            : R^" << GetDimensionality() << std::endl;
+
+  ob::RealVectorStateSpace *cspace = space->as<ob::RealVectorStateSpace>();
+
+  const ob::RealVectorBounds bounds = cspace->getBounds();
+  std::vector<double> min = bounds.low;
+  std::vector<double> max = bounds.high;
+  std::cout << "RN bounds min     : ";
+  for(uint i = 0; i < min.size(); i++){
+    std::cout << " " << min.at(i);
+  }
+  std::cout << std::endl;
+
+  std::cout << "RN bounds max     : ";
+  for(uint i = 0; i < max.size(); i++){
+    std::cout << " " << max.at(i);
+  }
+  std::cout << std::endl;
+
+  std::cout << std::string(80, '-') << std::endl;
 }

@@ -114,42 +114,6 @@ void GeometricCSpaceOMPL::initSpace()
   }
 
 }
-void GeometricCSpaceOMPL::initControlSpace()
-{
-  exit(0);
-  uint NdimControl = robot->q.size();
-
-  this->control_space = std::make_shared<oc::RealVectorControlSpace>(space, NdimControl+1);
-  ob::RealVectorBounds cbounds(NdimControl+1);
-  cbounds.setLow(-1);
-  cbounds.setHigh(1);
-
-  uint effectiveControlDim = 0;
-  for(uint i = 0; i < NdimControl; i++){
-    double qmin = robot->qMin(i);
-    double qmax = robot->qMax(i);
-    double d = sqrtf((qmin-qmax)*(qmin-qmax));
-    if(d<1e-8){
-      //remove zero-measure dimensions for control
-      cbounds.setLow(i,0);
-      cbounds.setHigh(i,0);
-    }else{
-      effectiveControlDim++;
-      double dqmin = robot->velMin(i);
-      double dqmax = robot->velMax(i);
-      if(dqmin<-1) dqmin=-1;
-      if(dqmax>1) dqmax=1;
-      cbounds.setLow(i,dqmin);
-      cbounds.setHigh(i,dqmax);
-    }
-  }
-
-  cbounds.setLow(NdimControl,input.timestep_min);
-  cbounds.setHigh(NdimControl,input.timestep_max);
-
-  cbounds.check();
-  control_space->setBounds(cbounds);
-}
 
 void GeometricCSpaceOMPL::print() const
 {
@@ -162,14 +126,13 @@ void GeometricCSpaceOMPL::print() const
   std::cout << " Configuration Space (ompl)   : SE(3)" << (Nompl>0?"xR^"+std::to_string(Nompl):"") << "  [OMPL]" << std::endl;
 
   ob::SE3StateSpace *cspaceSE3 = nullptr;
-  //ob::RealVectorStateSpace *cspaceRn = nullptr;
 
   if(Nompl>0){
     cspaceSE3 = space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
-    //cspaceRn = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
   }else{
     cspaceSE3 = space->as<ob::SE3StateSpace>();
   }
+  si->printSettings();
 
   //################################################################################
   const ob::RealVectorBounds bounds = cspaceSE3->getBounds();
@@ -186,23 +149,6 @@ void GeometricCSpaceOMPL::print() const
     std::cout << " " << se3max.at(i);
   }
   std::cout << std::endl;
-
-  ob::RealVectorBounds cbounds = control_space->getBounds();
-  std::vector<double> cbounds_low = cbounds.low;
-  std::vector<double> cbounds_high = cbounds.high;
-
-  std::cout << "Control bounds min   : ";
-  for(uint i = 0; i < cbounds_low.size()-1; i++){
-    std::cout << " " << cbounds_low.at(i);
-  }
-  std::cout << std::endl;
-  std::cout << "Control bounds max   : ";
-  for(uint i = 0; i < cbounds_high.size()-1; i++){
-    std::cout << " " << cbounds_high.at(i);
-  }
-  std::cout << std::endl;
-  std::cout << "Time step            : [" << cbounds_low.back()
-    << "," << cbounds_high.back() << "]" << std::endl;
 
   std::cout << std::string(80, '-') << std::endl;
 }

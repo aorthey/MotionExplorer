@@ -14,7 +14,7 @@ class KinodynamicCSpaceOMPL: public GeometricCSpaceOMPL
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si);
     virtual void initSpace() override;
-    virtual void initControlSpace() override;
+    virtual void initControlSpace();
     virtual void print() const override;
 
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;

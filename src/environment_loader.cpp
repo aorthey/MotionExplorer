@@ -151,6 +151,9 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 
       uint ridx = pin.inputs.at(0)->robot_idx;
       Robot *robot = world.robots[ridx];
+      Vector q_init = pin.inputs.at(0)->q_init;
+      Vector q_goal = pin.inputs.at(0)->q_goal;
+      Vector dq_init = pin.inputs.at(0)->dq_init;
 
       for(int i = 0; i < 6; i++){
         robot->qMin[i] = pin.inputs.at(0)->se3min[i];
@@ -176,24 +179,18 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
         exit(1);
       }
 
+      // robot->q = q_init;
+      // robot->q.resize(N);
+      // robot->UpdateFrames();
 
+      // //set oderobot to planner start pos
+      // ODERobot *simrobot = _backend->sim.odesim.robot(ridx);
+      // simrobot->SetConfig(q_init);
+      // simrobot->SetVelocities(dq_init);
 
-      robot->q = pin.inputs.at(0)->q_init;
-      robot->q.resize(N);
-      robot->UpdateFrames();
-
-
-      //set oderobot to planner start pos
-      ODERobot *simrobot = _backend->sim.odesim.robot(ridx);
-      simrobot->SetConfig(pin.inputs.at(0)->q_init);
-      Vector dq;
-      _backend->sim.odesim.robot(0)->GetVelocities(dq);
-      dq.setZero();
-      _backend->sim.odesim.robot(0)->SetVelocities(dq);
-
-      robot->q = pin.inputs.at(0)->q_goal;
-      robot->q.resize(N);
-      robot->UpdateFrames();
+      // robot->q = q_goal;
+      // robot->q.resize(N);
+      // robot->UpdateFrames();
 
       //set other nested robots
       for(uint k = 0; k < pin.inputs.at(0)->robot_idxs.size(); k++){
@@ -226,21 +223,3 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
   _backend->wrenchfield.print();
 
 }
-//std::vector<Config> EnvironmentLoader::GetKeyframesFromFile(const char* file)
-//{
-//  std::string file_name = util::GetApplicationFolder()+file;
-//  TiXmlDocument doc(file_name.c_str());
-//  TiXmlElement *root = GetRootNodeFromDocument(doc);
-//  CheckNodeName(root, "path");
-//
-//  TiXmlElement* q = FindFirstSubNode(root, "q");
-//  std::vector<Config> keyframes;
-//  while(q!=NULL){
-//    Config qconfig;
-//    GetStreamText(q) >> qconfig;
-//    keyframes.push_back(qconfig);
-//    q = FindNextSiblingNode(q, "q");
-//  }
-//
-//  return keyframes;
-//}

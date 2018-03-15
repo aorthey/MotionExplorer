@@ -2,9 +2,9 @@
 
 <world>
 
-  <robot name="Lshape" file="/home/aorthey/git/orthoklampt/data/Lshape/PlanarLshape.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="sphere_inner" file="/home/aorthey/git/orthoklampt/data/Lshape/Lshape_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="sphere_outer" file="/home/aorthey/git/orthoklampt/data/Lshape/Lshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="Lshape" file="/home/aorthey/git/orthoklampt/data/robots/PlanarLshape.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="sphere_inner" file="/home/aorthey/git/orthoklampt/data/robots/Lshape_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="sphere_outer" file="/home/aorthey/git/orthoklampt/data/robots/Lshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
   <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/2droom.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
 
@@ -16,7 +16,6 @@
     <se3max config="6  +4.0 +4.0 +0.0 +3.141593 +1.57 +3.141593"/>
     <freeFloating>1</freeFloating>
 
-    <timestep min="0.001" max="0.01"/>
     <epsilongoalregion>0.01</epsilongoalregion>
     <maxplanningtime>3</maxplanningtime>
     <smoothPath>1</smoothPath>
@@ -26,7 +25,7 @@
       <level inner_index="0" outer_index="0" type="SE2"/>
     </hierarchy>
 
-    <algorithm name="hierarchical:ompl:qmp_prm_connect"/>
+    <algorithm name="ompl:qmp_prm_connect"/>
     <algorithm name="ompl:prm"/>
 
   </plannerinput>

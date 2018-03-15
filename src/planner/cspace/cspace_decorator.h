@@ -8,7 +8,6 @@ class CSpaceOMPLDecorator: public CSpaceOMPL
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) override;
     virtual void initSpace() override;
-    virtual void initControlSpace() override;
     virtual void print() const override;
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
     virtual Config OMPLStateToConfig(const ob::State *qompl) override;
