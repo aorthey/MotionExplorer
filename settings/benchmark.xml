@@ -41,4 +41,15 @@
     <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 
+  <benchmark name="all_dynamic">
+    <algorithm dynamic="1" name="ompl:est"/>
+    <algorithm dynamic="1" name="ompl:sst"/>
+    <algorithm dynamic="1" name="ompl:pdst"/>
+    <algorithm dynamic="1" name="ompl:rrt"/>
+    <algorithm dynamic="1" name="ompl:kpiece"/>
+
+    <maxplanningtime>300</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>10</runcount> <!-- number of runs per algorithm --> 
+    <maxmemory>10000</maxmemory> <!-- max memory (MB) per run of algorithm--> 
+  </benchmark>
 </benchmarks>

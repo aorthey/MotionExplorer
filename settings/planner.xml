@@ -6,12 +6,13 @@
   <algorithm dynamic="1" name="ompl:pdst"/>
   <algorithm dynamic="1" name="ompl:rrt"/>
   <algorithm dynamic="1" name="ompl:kpiece"/>
+  <algorithm dynamic="1" name="benchmark:all_dynamic"/>
 
-  <algorithm name="benchmark:best_geometric"/>
   <algorithm name="ompl:rrtconnect"/>
   <algorithm name="qmp_connect_cover"/>
   <algorithm name="qmp_connect"/>
   <algorithm name="ompl:prm"/>
+  <algorithm name="benchmark:best_geometric"/>
   <algorithm name="benchmark:all_geometric"/>
 
   <maxplanningtime>2</maxplanningtime> <!-- runtime in (s) --> 
