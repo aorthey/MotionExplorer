@@ -4,6 +4,7 @@
 #include "elements/forcefields/forcefield_uniform.h"
 #include "elements/forcefields/forcefield_radial.h"
 #include "elements/forcefields/forcefield_random.h"
+#include "elements/forcefields/forcefield_obb.h"
 #include "elements/forcefields/forcefield_cylindrical.h"
 
 using namespace Math3D;
@@ -83,7 +84,7 @@ bool WrenchField::Load(TiXmlElement *node)
   //############################################################################
   TiXmlElement* forcerandom = FindSubNode(forcefieldsettings, "uniformrandom");
 
-  while(forcerandom!=NULL){
+  while(forcerandom){
     Vector3 minforce, maxforce;
     GLColor colorForce(0.8,0.8,0.8);
     GetStreamAttribute(forcerandom,"minforce") >> minforce;
@@ -106,7 +107,7 @@ bool WrenchField::Load(TiXmlElement *node)
   //############################################################################
   forcerandom = FindSubNode(forcefieldsettings, "gaussianrandom");
 
-  while(forcerandom!=NULL){
+  while(forcerandom){
     Vector3 mean, stddev;
     GLColor colorForce(0.8,0.8,0.8);
     GetStreamAttribute(forcerandom,"mean") >> mean;
@@ -129,7 +130,7 @@ bool WrenchField::Load(TiXmlElement *node)
   //############################################################################
   TiXmlElement* forcebox = FindSubNode(forcefieldsettings, "orientedbox");
 
-  while(forcebox!=NULL){
+  while(forcebox){
     double power;
     Vector3 center, direction, extension;
     GLColor colorForce(0.8,0.8,0.8);
@@ -156,7 +157,7 @@ bool WrenchField::Load(TiXmlElement *node)
   TiXmlElement* field = FindSubNode(forcefieldsettings, "cylindrical");
 
     //<cylindrical source="3 3 0" direction="0.2 0.2 1.0" elongation="3" power="2" color="0.3 0.3 0.7"/>
-  while(field!=NULL){
+  while(field){
     double elongation, radius, power;
     Vector3 source, direction;
     GLColor colorForce(0.8,0.8,0.8);

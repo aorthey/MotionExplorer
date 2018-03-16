@@ -73,7 +73,6 @@ void CylindricalForceField::DrawGL(GUIState &state)
   glVertex3f(vv[0],vv[1],vv[2]);
   glEnd();
 
-
   double verticalDistanceConcentricCircles = 0.2;
   double horizontalDistanceConcentricCircles = 1;
 
@@ -122,9 +121,7 @@ void CylindricalForceField::DrawGL(GUIState &state)
     }
   }
 
-
   glPopMatrix();
-
   glEnable(GL_LIGHTING);
   glDisable(GL_BLEND); 
 }
