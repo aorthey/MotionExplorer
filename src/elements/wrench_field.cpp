@@ -54,9 +54,11 @@ bool WrenchField::Load(TiXmlElement *node)
     Vector3 source = GetAttribute<Vector3>(forceradial,"source");
     double power = GetAttribute<double>(forceradial,"power");
     double radius = GetAttribute<double>(forceradial,"radius");
-    //GLColor color = GetAttributeDefault<GLColor>(forceradial,"color",magenta);
+    Vector3 cc = GetAttributeDefault<Vector3>(forceradial,"color",Vector3(0.5,0.5,0.5));
+    GLColor colorForce(cc[0],cc[1],cc[2]);
 
     ForceFieldPtr fr(new RadialForceField(source, power, radius));
+    fr->cForce = colorForce;
     forcefields.push_back(fr);
 
     forceradial = FindNextSiblingNode(forceradial);
@@ -94,6 +96,7 @@ bool WrenchField::Load(TiXmlElement *node)
     }
 
     SmartPointer<ForceField> fr(new UniformRandomForceField(minforce, maxforce));
+    fr->cForce = colorForce;
     forcefields.push_back(fr);
 
     forcerandom = FindNextSiblingNode(forcerandom, "uniformrandom");
@@ -116,6 +119,7 @@ bool WrenchField::Load(TiXmlElement *node)
     }
 
     SmartPointer<ForceField> fg(new GaussianRandomForceField(mean, stddev));
+    fg->cForce = colorForce;
     forcefields.push_back(fg);
 
     forcerandom = FindNextSiblingNode(forcerandom, "gaussianrandom");
@@ -141,6 +145,7 @@ bool WrenchField::Load(TiXmlElement *node)
     }
 
     SmartPointer<ForceField> fb(new OrientedBoundingBoxForceField(power, center, direction, extension));
+    fb->cForce = colorForce;
     forcefields.push_back(fb);
 
     forcebox = FindNextSiblingNode(forcebox, "orientedbox");
@@ -170,6 +175,7 @@ bool WrenchField::Load(TiXmlElement *node)
     }
 
     SmartPointer<ForceField> fb(new CylindricalForceField(source, direction, elongation, radius, power));
+    fb->cForce = colorForce;
     forcefields.push_back(fb);
 
     field = FindNextSiblingNode(field, "cylindrical");

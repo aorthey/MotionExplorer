@@ -57,11 +57,7 @@ void CylindricalForceField::DrawGL(GUIState &state)
   Vector3 ndirection = direction;
   ndirection /= ndirection.length();
 
-  //Vector3 source = fr->GetSource();
-  //double elongation = fr->GetElongation();
-  double radius = maximum_radius;
-  //double power = fr->GetPower();
-  //GLColor cForce = fr->GetColor();
+  double radius = GetRadius();
 
   glPushMatrix();
   setColor(cForce);
@@ -78,8 +74,8 @@ void CylindricalForceField::DrawGL(GUIState &state)
   glEnd();
 
 
-  double verticalDistanceConcentricCircles = min(1.0, elongation);
-  double horizontalDistanceConcentricCircles = min(0.5, radius);
+  double verticalDistanceConcentricCircles = 0.2;
+  double horizontalDistanceConcentricCircles = 1;
 
   uint numSteps = 16; 
 
