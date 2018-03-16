@@ -9,8 +9,7 @@ l_side = 1.5
 r_mid = 0.15
 r_side = 0.1
 
-
-def GetXMLString(robot_name, with_lid=True):
+def GetXMLString(robot_name):
   hstr   = '<?xml version="1.0"?>\n'
   hstr  += '<robot name="'+robot_name+'">\n'
   d = (l_mid-l_side)/2
@@ -40,4 +39,3 @@ f = open(fname,'w')
 f.write(GetXMLString(robot_name))
 f.close()
 print "\nCreated new file >>",fname
-

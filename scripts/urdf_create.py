@@ -8,6 +8,32 @@ friction = 0.5
 effort = 0.01
 velocity=100
 
+def createMesh(lname,x=0,y=0,z=0,COLLISION_ENABLED=True):
+  mass = 1
+  Ixx = mass
+  Iyy = mass
+  Izz = mass
+  s= ' <link name="'+lname+'">\n'
+  s+= '  <inertial>\n'
+  s+= '    <mass value="'+str(mass)+'"/>\n'
+  s+= '    <inertia ixx="'+str(Ixx)+'" ixy="0" ixz="0" iyy="'+str(Iyy)+'" iyz="0" izz="'+str(Izz)+'"/>\n'
+  s+= '  </inertial>\n'
+  s+= '  <visual>\n'
+  s+= '    <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
+  s+= '    <geometry>\n'
+  s+= '      <mesh filename="'+lname+'"/>\n'
+  s+= '    </geometry>\n'
+  s+= '  </visual>\n'
+  if COLLISION_ENABLED:
+    s+= '  <collision>\n'
+    s+= '    <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
+    s+= '    <geometry>\n'
+    s+= '      <mesh filename="'+lname+'"/>\n'
+    s+= '    </geometry>\n'
+    s+= '  </collision>\n'
+    s+= ' </link>\n\n'
+  return s
+
 def createCuboid(lname,x,y,z,l,w,h,COLLISION_ENABLED=True):
   Ixx = mass*(1.0/12.0)*(h*h + l*l)
   Iyy = mass*(1.0/12.0)*(w*w + l*l)

@@ -385,6 +385,7 @@ elements
 [ ] automate the OnCommand method to automatically switch/case through all
 variables inside the state and toggle them.
 
+
 [x] do randomBounceMotion, but constrained to graph!needs probably rewrite of
 expandRoadmap
 [x] do not sample random edge (RE), but random node-edge (RNE). RNE samples a
@@ -397,6 +398,7 @@ suboptimal. Better use something more sophisticated like Random Walk or Forest F
 Papers:
 Sampling from Large Graphs
 A Survey and Taxonomy of Graph Sampling
+
 
 [x] too many random walks start at vertex 0, why is that? -> nan values in pdf
 [x] visualize connectivity of roadmap components (each component different
@@ -442,3 +444,6 @@ points
 
 
 [ ] rocket launch is too difficult for kompl to be solved. devise simpler experiment.
+[ ] manipulation with ultra complex hand, such that QS approach will get
+highlighted. Maybe even add some clutter/debris.
+[ ] clip FF at O boundaries

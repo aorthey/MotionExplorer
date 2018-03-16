@@ -167,241 +167,154 @@ namespace GLDraw{
     c.setCurrentGL();
   }
 
-  void drawForceField(WrenchField &W){
-    //Real linewidth=0.01;
-    std::vector<SmartPointer<ForceField> > forcefields = W.GetForceFields();
+  // void drawForceField(WrenchField &W){
+  //   //Real linewidth=0.01;
+  //   std::vector<SmartPointer<ForceField> > forcefields = W.GetForceFields();
 
-    //glDisable(GL_LIGHTING);
-    //glEnable(GL_BLEND); 
-    //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+  //   //glDisable(GL_LIGHTING);
+  //   //glEnable(GL_BLEND); 
+  //   //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
-    for(uint fctr = 0; fctr < forcefields.size(); fctr++){
-      SmartPointer<ForceField> f = forcefields.at(fctr);
-      if(f->type() == UNIFORM){
-        //TODO: how to visualize a uniform field
-      }else if(f->type() == RADIAL){
-
-        SmartPointer<RadialForceField>& fr = *reinterpret_cast<SmartPointer<RadialForceField>*>(&forcefields.at(fctr));
-        //Vector3 source = dynamic_cast<RadialForceField*>(f)->GetSource()
-        Vector3 source = fr->GetSource();
-        double radius = fr->GetRadius();
-        double power = fr->GetPower();
-
-        glPushMatrix();
-        GLColor cForce = fr->GetColor();
-        setColor(cForce);
-        glTranslate(source);
-
-        glPointSize(5);
-        drawPoint(Vector3(0,0,0));
-
-        glLineWidth(2);
-
-        double theta_step = M_PI/4;
-        double gamma_step = theta_step;
-        for(double theta = 0; theta < 2*M_PI; theta+=theta_step){
-          for(double gamma = 0; gamma < M_PI; gamma+=gamma_step){
-            double xs = radius*sin(theta)*cos(gamma);
-            double ys = radius*sin(theta)*sin(gamma);
-            double zs = radius*cos(theta);
-
-            glBegin(GL_LINES);
-            glVertex3f(0,0,0);
-            glVertex3f(xs,ys,zs);
-            glEnd();
-
-
-            Vector3 middle(xs/2,ys/2,zs/2);
-            glPushMatrix();
-            glTranslate(middle);
-            //drawPoint(Vector3(0,0,0));
-
-            Vector3 direction = 0.1*middle; 
-            if(power < 0) {
-              direction *= -1;
-            }
-            GLDraw::drawCone(direction, 0.5*direction.norm());
-            glPopMatrix();
-          }
-        }
-
-
-        glPopMatrix();
-
-      }else if(f->type() == OBB){
-        SmartPointer<OrientedBoundingBoxForceField>& fb = *reinterpret_cast<SmartPointer<OrientedBoundingBoxForceField>*>(&forcefields.at(fctr));
-        double power = fb->GetPower();
-        Vector3 center = fb->GetCenter();
-        Vector3 extension = fb->GetExtension();
-        Matrix3 R = fb->GetRotation();
+  //   for(uint fctr = 0; fctr < forcefields.size(); fctr++){
+  //     SmartPointer<ForceField> f = forcefields.at(fctr);
+  //     if(f->type() == UNIFORM){
+  //       //TODO: how to visualize a uniform field
+  //     }else if(f->type() == OBB){
+  //       SmartPointer<OrientedBoundingBoxForceField>& fb = *reinterpret_cast<SmartPointer<OrientedBoundingBoxForceField>*>(&forcefields.at(fctr));
+  //       double power = fb->GetPower();
+  //       Vector3 center = fb->GetCenter();
+  //       Vector3 extension = fb->GetExtension();
+  //       Matrix3 R = fb->GetRotation();
         
-        glPushMatrix();
-        GLColor cForce = fb->GetColor();
-        setColor(cForce);
-        glTranslate(center);
-        Matrix4 RH(R);
-        RH(3,3) = 1;
-        glMultMatrixd(RH);
+  //       glPushMatrix();
+  //       GLColor cForce = fb->GetColor();
+  //       setColor(cForce);
+  //       glTranslate(center);
+  //       Matrix4 RH(R);
+  //       RH(3,3) = 1;
+  //       glMultMatrixd(RH);
 
-        glPointSize(5);
-        drawPoint(Vector3(0,0,0));
+  //       glPointSize(5);
+  //       drawPoint(Vector3(0,0,0));
 
-        glLineWidth(2);
+  //       glLineWidth(2);
 
-        double ystep = 0.5;
-        double zstep = 0.5;
-        for(double y = -extension[1]/2; y < extension[1]/2; y+=ystep){
-          for(double z = -extension[2]/2; z < extension[2]/2; z+=zstep){
+  //       double ystep = 0.5;
+  //       double zstep = 0.5;
+  //       for(double y = -extension[1]/2; y < extension[1]/2; y+=ystep){
+  //         for(double z = -extension[2]/2; z < extension[2]/2; z+=zstep){
 
-            double x = extension[0]/2;
+  //           double x = extension[0]/2;
 
-            glBegin(GL_LINES);
-            glVertex3f(-x,y,z);
-            glVertex3f(x,y,z);
-            glEnd();
+  //           glBegin(GL_LINES);
+  //           glVertex3f(-x,y,z);
+  //           glVertex3f(x,y,z);
+  //           glEnd();
 
-            double length = 0.1;
-            Vector3 direction(length,0,0);
-            if(power < 0) {
-              direction *= -1;
-            }
-            glPushMatrix();
-            Vector3 middle(-x/2,y,z);
-            glTranslate(middle);
-            GLDraw::drawCone(direction, length/2);
-            glPopMatrix();
-            glPushMatrix();
-            middle = Vector3(x/2,y,z);
-            glTranslate(middle);
-            GLDraw::drawCone(direction, length/2);
-            glPopMatrix();
-          }
-        }
-
-
-        glPopMatrix();
-      }else if(f->type() == CYLINDRICAL){
-
-        SmartPointer<CylindricalForceField>& fr = *reinterpret_cast<SmartPointer<CylindricalForceField>*>(&forcefields.at(fctr));
-        //Vector3 source = dynamic_cast<RadialForceField*>(f)->GetSource()
-        Vector3 source = fr->GetSource();
-        Vector3 direction = fr->GetDirection();
-        direction /= direction.length();
-        double elongation = fr->GetElongation();
-        double radius = fr->GetRadius();
-        double power = fr->GetPower();
-        GLColor cForce = fr->GetColor();
-
-        glPushMatrix();
-        setColor(cForce);
-        glTranslate(source);
-
-        //draw cable axis
-        glPointSize(5);
-        drawPoint(Vector3(0,0,0));
-        glLineWidth(4);
-        Vector3 vv = 0.5*elongation*direction;
-        glBegin(GL_LINES);
-        glVertex3f(-vv[0],-vv[1],-vv[2]);
-        glVertex3f(vv[0],vv[1],vv[2]);
-        glEnd();
+  //           double length = 0.1;
+  //           Vector3 direction(length,0,0);
+  //           if(power < 0) {
+  //             direction *= -1;
+  //           }
+  //           glPushMatrix();
+  //           Vector3 middle(-x/2,y,z);
+  //           glTranslate(middle);
+  //           GLDraw::drawCone(direction, length/2);
+  //           glPopMatrix();
+  //           glPushMatrix();
+  //           middle = Vector3(x/2,y,z);
+  //           glTranslate(middle);
+  //           GLDraw::drawCone(direction, length/2);
+  //           glPopMatrix();
+  //         }
+  //       }
 
 
-        double verticalDistanceConcentricCircles = min(1.0, elongation);
-        double horizontalDistanceConcentricCircles = min(0.5, radius);
+  //       glPopMatrix();
+  //     }else if(f->type() == CYLINDRICAL){
 
-        uint numSteps = 16; 
+  //       SmartPointer<CylindricalForceField>& fr = *reinterpret_cast<SmartPointer<CylindricalForceField>*>(&forcefields.at(fctr));
+  //       //Vector3 source = dynamic_cast<RadialForceField*>(f)->GetSource()
+  //       Vector3 source = fr->GetSource();
+  //       Vector3 direction = fr->GetDirection();
+  //       direction /= direction.length();
+  //       double elongation = fr->GetElongation();
+  //       double radius = fr->GetRadius();
+  //       double power = fr->GetPower();
+  //       GLColor cForce = fr->GetColor();
 
-        for(double dv = -0.5*elongation; dv <= 0.5*elongation; dv+=verticalDistanceConcentricCircles){
-          for(double dr = horizontalDistanceConcentricCircles; dr <= radius; dr+=horizontalDistanceConcentricCircles){
-              glPushMatrix();
-              float inc = fTwoPi/numSteps;
-              Vector3 eu,ev;
-              GetCanonicalBasis(direction,eu,ev);
-              Complex x,dx;
-              dx.setPolar(One,inc);
+  //       glPushMatrix();
+  //       setColor(cForce);
+  //       glTranslate(source);
+
+  //       //draw cable axis
+  //       glPointSize(5);
+  //       drawPoint(Vector3(0,0,0));
+  //       glLineWidth(4);
+  //       Vector3 vv = 0.5*elongation*direction;
+  //       glBegin(GL_LINES);
+  //       glVertex3f(-vv[0],-vv[1],-vv[2]);
+  //       glVertex3f(vv[0],vv[1],vv[2]);
+  //       glEnd();
+
+
+  //       double verticalDistanceConcentricCircles = min(1.0, elongation);
+  //       double horizontalDistanceConcentricCircles = min(0.5, radius);
+
+  //       uint numSteps = 16; 
+
+  //       for(double dv = -0.5*elongation; dv <= 0.5*elongation; dv+=verticalDistanceConcentricCircles){
+  //         for(double dr = horizontalDistanceConcentricCircles; dr <= radius; dr+=horizontalDistanceConcentricCircles){
+  //             glPushMatrix();
+  //             float inc = fTwoPi/numSteps;
+  //             Vector3 eu,ev;
+  //             GetCanonicalBasis(direction,eu,ev);
+  //             Complex x,dx;
+  //             dx.setPolar(One,inc);
               
-              glBegin(GL_LINE_LOOP);
-              x.set(dr,0);
-              for(uint j=0; j<numSteps; j++) {
-                glVertex3v(direction*dv + x.x*eu+x.y*ev);
-                x=x*dx;
-              }
-              glEnd();
+  //             glBegin(GL_LINE_LOOP);
+  //             x.set(dr,0);
+  //             for(uint j=0; j<numSteps; j++) {
+  //               glVertex3v(direction*dv + x.x*eu+x.y*ev);
+  //               x=x*dx;
+  //             }
+  //             glEnd();
 
-              uint Narrows = 5;
-              inc = fTwoPi/Narrows;
-              dx.setPolar(One,inc);
-              x.set(dr,0);
+  //             uint Narrows = 5;
+  //             inc = fTwoPi/Narrows;
+  //             dx.setPolar(One,inc);
+  //             x.set(dr,0);
 
-              for(uint j = 0; j < Narrows; j++){
-                glPushMatrix();
-                Vector3 rr = x.x*eu + x.y*ev;
-                Vector3 arrowS(direction*dv + rr);
-                x=x*dx;
+  //             for(uint j = 0; j < Narrows; j++){
+  //               glPushMatrix();
+  //               Vector3 rr = x.x*eu + x.y*ev;
+  //               Vector3 arrowS(direction*dv + rr);
+  //               x=x*dx;
 
-                glTranslate(arrowS);
-                Vector3 coneori = cross(direction,rr);
-                coneori /= coneori.length();
-                double length = 0.1;
-                if(power < 0) {
-                  coneori *= -1;
-                }
-                GLDraw::drawCone(length*coneori, 0.5*length);
-                glPopMatrix();
-              }
-              glPopMatrix();
+  //               glTranslate(arrowS);
+  //               Vector3 coneori = cross(direction,rr);
+  //               coneori /= coneori.length();
+  //               double length = 0.1;
+  //               if(power < 0) {
+  //                 coneori *= -1;
+  //               }
+  //               GLDraw::drawCone(length*coneori, 0.5*length);
+  //               glPopMatrix();
+  //             }
+  //             glPopMatrix();
 
-          }
-        }
-
-
-        glPopMatrix();
-      }
-    }
-    //glDisable(GL_BLEND); 
-    //glEnable(GL_LIGHTING);
+  //         }
+  //       }
 
 
-  }
-  void drawUniformForceField()
-  {
-    double step = 0.5;
-    Real length = step/6;
-    Real linewidth=0.01;
-    Vector3 dir(1,1,0);
-    GLColor cForce(1,1,1,0.6);
-    for(double x = -3; x < 3; x+=step){
-      for(double y = -3; y < 3; y+=step){
-        for(double z = 0.2; z <= 2; z+=step){
-          Vector3 pos(x,y,z);
-  
-          //glDisable(GL_LIGHTING);
-          //glEnable(GL_BLEND); 
-          //glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-  
-          glPushMatrix();
-          setColor(cForce);
-  
-          glTranslate(pos);
-          //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cForce);
-          drawCylinder(dir*length,linewidth);
-  
-          glPushMatrix();
-  
-          //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,cForce);
-          Real arrowLen = 3*linewidth;
-          Real arrowWidth = 1*linewidth;
-          glTranslate(dir*length);
-          drawCone(dir*arrowLen,arrowWidth,8);
-  
-          glPopMatrix();
-          glPopMatrix();
-          //glEnable(GL_LIGHTING);
-        }//forz
-      }//fory
-    }//forx
-  }
+  //       glPopMatrix();
+  //     }
+  //   }
+  //   //glDisable(GL_BLEND); 
+  //   //glEnable(GL_LIGHTING);
+
+
+  // }
 
   void drawGLPathKeyframes(Robot *robot, std::vector<uint> keyframe_indices, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack,GLColor color, double scale)
   {

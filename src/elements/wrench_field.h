@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 #include <iostream>
-#include "elements/force_field.h"
+#include "elements/forcefields/forcefield.h"
 
 class TiXmlElement;
 
@@ -71,5 +71,6 @@ class WrenchField{
     Math3D::Vector3 getCOMPosition();
 
     void print();
+    void DrawGL(GUIState &state);
 };
 

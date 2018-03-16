@@ -231,9 +231,6 @@ void Roadmap::DrawGL(GUIState& state)
     }
   }
 
-  glEnable(GL_LIGHTING);
-  glDisable(GL_BLEND); 
-
   if(state("draw_roadmap_swathvolume")){
     if(!swv){
       std::vector<Config> q;
@@ -247,5 +244,8 @@ void Roadmap::DrawGL(GUIState& state)
     }
     swv->DrawGL(state);
   }
+  glEnable(GL_LIGHTING);
+  glDisable(GL_BLEND); 
+
 }
 

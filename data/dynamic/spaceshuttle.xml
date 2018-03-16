@@ -4,8 +4,10 @@
   <terrain name="turbine" file="/home/aorthey/git/orthoklampt/data/terrains/turbine/turbine.tri" translation="1 0 2" rotateRPY="0 0 1.57"/>
 
   <forcefield>
-    <!-- <radial source="1 -1 2" power="-0.1" radius="3" color="1 0 1"/> -->
-    <!-- <drag viscosity="0.5" color="1 0 1"/> -->
+    <radial source="1 -1.2 2" power="+5" radius="5" color="1 0 1"/>
+    <radial source="1 +1.5 2" power="-5" radius="5" color="1 0 1"/>
+    <drag viscosity="0.5" color="1 0 1"/> 
+    <uniform force="0 0 -1" color="0 0 0"/> 
   </forcefield>
 
   <plannerinput>
@@ -17,8 +19,8 @@
     <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
     <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
 
-    <control_max config="6  +1 0 0 +0.5 +0.5 0"/>
-    <control_min config="6  -1 0 0 -0.5 -0.5 0"/>
+    <control_max config="6  +1 0 0 +0.5 +0.0 0"/>
+    <control_min config="6  -1 0 0 -0.5 -0.0 0"/>
 
     <maxplanningtime>10</maxplanningtime>
     <epsilongoalregion>1</epsilongoalregion> 

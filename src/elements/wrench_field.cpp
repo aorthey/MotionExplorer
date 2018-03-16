@@ -1,6 +1,10 @@
 #include <KrisLibrary/GLdraw/GLColor.h>
 #include "file_io.h"
 #include "wrench_field.h"
+#include "elements/forcefields/forcefield_uniform.h"
+#include "elements/forcefields/forcefield_radial.h"
+#include "elements/forcefields/forcefield_random.h"
+#include "elements/forcefields/forcefield_cylindrical.h"
 
 using namespace Math3D;
 using namespace GLDraw;
@@ -21,8 +25,6 @@ bool WrenchField::Load(TiXmlElement *node)
   forcefields.clear();
 
   if(!forcefieldsettings){
-    //std::cout << "world xml file has no forcefield" << std::endl;
-    //std::cout << " -- setting earth gravity" << std::endl;
     ForceFieldPtr f(new UniformForceField(Vector3(0,0,-9.81)));
     forcefields.push_back(f);
     return false;
@@ -92,7 +94,6 @@ bool WrenchField::Load(TiXmlElement *node)
     }
 
     SmartPointer<ForceField> fr(new UniformRandomForceField(minforce, maxforce));
-    fr->SetColor(colorForce);
     forcefields.push_back(fr);
 
     forcerandom = FindNextSiblingNode(forcerandom, "uniformrandom");
@@ -115,7 +116,6 @@ bool WrenchField::Load(TiXmlElement *node)
     }
 
     SmartPointer<ForceField> fg(new GaussianRandomForceField(mean, stddev));
-    fg->SetColor(colorForce);
     forcefields.push_back(fg);
 
     forcerandom = FindNextSiblingNode(forcerandom, "gaussianrandom");
@@ -141,7 +141,6 @@ bool WrenchField::Load(TiXmlElement *node)
     }
 
     SmartPointer<ForceField> fb(new OrientedBoundingBoxForceField(power, center, direction, extension));
-    fb->SetColor(colorForce);
     forcefields.push_back(fb);
 
     forcebox = FindNextSiblingNode(forcebox, "orientedbox");
@@ -171,7 +170,6 @@ bool WrenchField::Load(TiXmlElement *node)
     }
 
     SmartPointer<ForceField> fb(new CylindricalForceField(source, direction, elongation, radius, power));
-    fb->SetColor(colorForce);
     forcefields.push_back(fb);
 
     field = FindNextSiblingNode(field, "cylindrical");
@@ -269,6 +267,12 @@ Vector3 WrenchField::getCOMPosition(){
 
 //############################################################################
 
+void WrenchField::DrawGL(GUIState &state)
+{
+  for(uint k = 0; k < forcefields.size(); k++){
+    forcefields.at(k)->DrawGL(state);
+  }
+}
 void WrenchField::print(){
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "Force Fields" << std::endl;
