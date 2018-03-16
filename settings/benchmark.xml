@@ -1,12 +1,44 @@
-<benchmark>
-  <algorithm name="qmp_connect"/>
-  <algorithm name="ompl:stride"/>
-  <algorithm name="ompl:kpiece"/>
-  <algorithm name="ompl:rrtconnect"/>
-  <algorithm name="ompl:prm"/>
-  <algorithm name="ompl:est"/>
+<benchmarks>
 
-  <maxplanningtime>300</maxplanningtime> <!-- runtime in (s) --> 
-  <runcount>10</runcount> <!-- number of runs per algorithm --> 
-  <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
-</benchmark>
+  <benchmark name="best_geometric">
+
+    <!-- <algorithm name="qmp_connect"/> -->
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:prm"/>
+    <algorithm name="ompl:est"/>
+
+    <maxplanningtime>3</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>1</runcount> <!-- number of runs per algorithm --> 
+    <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
+  </benchmark>
+
+  <!-- complete benchmark of all planners -->
+  <benchmark name="all_geometric">
+
+    <!-- <algorithm name="qmp_connect"/> -->
+    <algorithm name="ompl:stride"/>
+    <algorithm name="ompl:kpiece"/>
+    <algorithm name="ompl:lbkpiece"/>
+    <algorithm name="ompl:rrt"/>
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:rrtstar"/>
+    <algorithm name="ompl:lazyrrt"/>
+    <algorithm name="ompl:prm"/>
+    <algorithm name="ompl:prmstar"/>
+    <algorithm name="ompl:lazyprm"/>
+    <algorithm name="ompl:sbl"/>
+    <algorithm name="ompl:est"/>
+    <algorithm name="ompl:biest"/>
+    <algorithm name="ompl:fmt"/>
+    <algorithm name="ompl:bfmt"/>
+    <algorithm name="ompl:pdst"/>
+    <algorithm name="ompl:spars"/>
+    <algorithm name="ompl:cforest"/>
+    <algorithm name="ompl:sst"/>
+
+    <maxplanningtime>300</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>10</runcount> <!-- number of runs per algorithm --> 
+    <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
+  </benchmark>
+
+</benchmarks>

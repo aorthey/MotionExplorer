@@ -6,7 +6,7 @@
 class BenchmarkInformation
 {
   public:
-    BenchmarkInformation();
+    BenchmarkInformation(std::string name_);
 
     bool Load(const char* file);
     bool Load(TiXmlElement *node);
@@ -15,5 +15,6 @@ class BenchmarkInformation
     int maxMemory;
     int runCount;
     std::vector<std::string> algorithms;
+    std::string name;
 };
 

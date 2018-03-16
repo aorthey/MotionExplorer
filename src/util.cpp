@@ -86,6 +86,12 @@ namespace util{
   bool StartsWith(const std::string &s, const std::string &prefix){
     return ::StartsWith(s.c_str(),prefix.c_str());
   }
+  bool EndsWith(const std::string &s, const char* suffix){
+    return ::EndsWith(s.c_str(),suffix);
+  }
+  bool EndsWith(const std::string &s, const std::string &suffix){
+    return ::EndsWith(s.c_str(),suffix.c_str());
+  }
 
   std::string RemoveStringBeginning(const std::string &s, const std::string &prefix){
     std::string out = s.substr(prefix.size()+1,s.size()-(prefix.size()+1));

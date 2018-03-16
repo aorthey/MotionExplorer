@@ -172,7 +172,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   // choose planner
   //###########################################################################
 
-  if(algorithm=="benchmark"){
+  if(util::StartsWith(algorithm,"benchmark")){
     RunBenchmark(input, si_vec, pdef_vec);
   }else{
     ob::PlannerPtr planner = GetPlanner(algorithm, si_vec, pdef_vec);
@@ -201,7 +201,8 @@ void StrategyGeometricMultiLevel::RunBenchmark(
     std::vector<ob::SpaceInformationPtr> si_vec, 
     std::vector<ob::ProblemDefinitionPtr> pdef_vec)
 {
-  BenchmarkInformation binfo;
+  std::cout << input.name_algorithm << std::endl;
+  BenchmarkInformation binfo(input.name_algorithm);
 
   const ob::SpaceInformationPtr si = si_vec.back();
   std::string file_benchmark = "benchmark_"+util::GetCurrentDateTimeString();

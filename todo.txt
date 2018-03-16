@@ -408,6 +408,7 @@ into separate xml file (one setting for everything)
 [ ] benchmark.xml merge with planner.xml?
 [ ] openGL transparency does not work correctly with the bubbles
 
+
 QMP PLANNER
 [x] size of bubbles ok with one layer, but changes if another layer is added (is
 there some way that we might confuse the vertices when using getPlannerData?)
@@ -418,6 +419,7 @@ URDF i could use?)
 [ ] need nice atlas/hrp4 scenario with grasping and leg movement (climbing
 step!?)
 
+
 KINODYNAMIC PLANNING
 [x] do bullet with kRRT
 [ ] implement propagate, but never use Config
@@ -425,6 +427,8 @@ KINODYNAMIC PLANNING
 [ ] do not allocate new state in propagate function
 [ ] understand rigid body motion in arbitrary force field. how can we simulate
 the body?
+[ ] do integration using force fields
+
 
 Directions to go: 
 (1) Kinodynamic Constraints -> needs devising of interesting experiments, like
@@ -435,3 +439,6 @@ nonholonomic constraints, or some non-statically stable systems.
 points
 (3) Make experiments to compare kRRT and RRT+Deform (compare them both)
 (4) Later: compare kRRT, RRT+Deform, kPRM on Quotient spaces, QPM+Deform
+
+
+[ ] rocket launch is too difficult for kompl to be solved. devise simpler experiment.

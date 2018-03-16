@@ -7,6 +7,16 @@
 #include "elements/plannerdata_vertex_annotated.h"
 
 #include <ompl/control/planners/rrt/RRT.h>
+#include <ompl/control/planners/est/EST.h>
+#include <ompl/control/planners/pdst/PDST.h>
+#include <ompl/control/planners/sst/SST.h>
+#include <ompl/control/planners/kpiece/KPIECE1.h>
+#include <ompl/control/planners/ltl/LTLPlanner.h>
+// #include <ompl/control/planners/syclop/SyclopEST.h>
+// #include <ompl/control/planners/syclop/Syclop.h>
+// #include <ompl/control/planners/syclop/SyclopRRT.h>
+
+#include <ompl/control/PlannerData.h>
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/util/Time.h>
 
@@ -29,8 +39,16 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
   ob::PlannerPtr planner;
   const oc::SpaceInformationPtr si = si_vec.back();
 
-  if(algorithm=="ompl:rrtconnect"){
-    planner = std::make_shared<oc::kRRT>(si);
+  if(algorithm=="ompl:rrt"){
+    planner = std::make_shared<oc::RRT>(si);
+  }else if(algorithm=="ompl:est"){
+    planner = std::make_shared<oc::EST>(si);
+  }else if(algorithm=="ompl:sst"){
+    planner = std::make_shared<oc::SST>(si);
+  }else if(algorithm=="ompl:pdst"){
+    planner = std::make_shared<oc::PDST>(si);
+  }else if(algorithm=="ompl:kpiece"){
+    planner = std::make_shared<oc::KPIECE1>(si);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);
@@ -76,9 +94,9 @@ void StrategyKinodynamicMultiLevel::plan( const StrategyInput &input, StrategyOu
   const oc::SpaceInformationPtr si = static_pointer_cast<oc::SpaceInformation>(si_vec.back());
   si->setMinMaxControlDuration(0.01, 0.1);
   si->setPropagationStepSize(1);
+  si->getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(si->getStateSpace())));
 
   ob::PlannerPtr planner = GetPlanner(algorithm, si_vec, pdef_vec);
-  planner->clear();
   planner->setup();
 
   double max_planning_time= input.max_planning_time;

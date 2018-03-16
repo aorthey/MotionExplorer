@@ -65,7 +65,8 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
     if(!(world.robots[0]->joints[0].type == RobotJoint::Floating)){
       std::cout << "First joint of robot should be a free floating joint" << std::endl;
       std::cout << "But actual type is: " << world.robots[0]->joints[0].type << std::endl;
-      exit(0);
+      //exit(0);
+      //break;
     }
 
     Robot *robot = world.robots[0];

@@ -21,6 +21,9 @@ void KinodynamicCSpaceOMPL::print() const
   }
 
 //################################################################################
+  std::cout << "Configuration Space M = SE(3) x R^" << Nompl << std::endl;
+  std::cout << "Tangent Bundle      X = TM = M x R^{6+" << Nompl << "}" << std::endl;
+
   const ob::RealVectorBounds bounds = cspaceSE3->getBounds();
   std::vector<double> se3min = bounds.low;
   std::vector<double> se3max = bounds.high;
@@ -62,12 +65,9 @@ void KinodynamicCSpaceOMPL::initSpace()
   //###########################################################################
   if(!(robot->joints[0].type==RobotJoint::Floating))
   {
-    std::cout << "[MotionPlanner] only supports robots with a configuration space equal to SE(3) x R^n" << std::endl;
+    std::cout << "only supports robots with a configuration space equal to SE(3) x R^n" << std::endl;
     exit(0);
   }
-
-  std::cout << "[MotionPlanner] Robot CSpace: M = SE(3) x R^" << Nompl << std::endl;
-  std::cout << "[MotionPlanner] Tangent Bundle: TM = M x R^{6+" << Nompl << "}" << std::endl;
 
   ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());
 
@@ -166,6 +166,7 @@ void KinodynamicCSpaceOMPL::initSpace()
   cspaceTM->setBounds(boundsTM);
 
 }
+
 void KinodynamicCSpaceOMPL::initControlSpace(){
   uint NdimControl = 6 + Nompl;
   control_space = std::make_shared<oc::RealVectorControlSpace>(space, NdimControl+1);
@@ -194,6 +195,7 @@ ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigVelocityToOMPLState(const Config 
   ConfigVelocityToOMPLState(q, dq, qompl.get());
   return qompl;
 }
+
 void KinodynamicCSpaceOMPL::ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl)
 {
   ConfigToOMPLState(q, qompl);
@@ -214,6 +216,7 @@ void KinodynamicCSpaceOMPL::ConfigVelocityToOMPLState(const Config &q, const Con
     else qomplTM[idx]=dq(6+i);
   }
 }
+
 void KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
   ob::SE3StateSpace::StateType *qomplSE3;
@@ -254,8 +257,6 @@ void KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q, ob::State *qompl)
     qomplTM[i]=0.0;
   }
 }
-
-
 
 Config KinodynamicCSpaceOMPL::OMPLStateToVelocity(const ob::State *qompl){
   const ob::RealVectorStateSpace::StateType *qomplTMState;

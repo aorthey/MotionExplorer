@@ -366,6 +366,7 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="simulate"){
     state("simulate").toggle();
     simulate = state("simulate").active;
+    if(simulate) state("draw_robot").activate();
   }else if(cmd=="reset"){
     sim.hooks.clear();
 

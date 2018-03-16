@@ -12,24 +12,19 @@
 using namespace Math3D;
 class KinodynamicCSpaceOMPL;
 
-// Convention:
-//  The tangent bundle is represented as
+//  The tangent bundle (or state space or phase space)  is represented as
 //
-//  M = SE(3) x R^N x se(3) x R^N = (SE(3) x R^N) x R^{6+N}
+//  X = SE(3) x R^N x se(3) x R^N = (SE(3) x R^N) x R^{6+N}
 //
-//  whereby SE(3)xR^N is the base space which is itself a principal fibre bundle
+//  the acceleration space is TX, the tangent bundle of X
+//  plus a time step dimension (the last dimension)
 //
-//  the control space is the tangent space of the tangent bundle plus one
-//  time step dimension (the last dimension)
-//
-//  TM \union R = U = R^{6+N+1} 
+//  TX \union R = R^{6+N+1} 
 //
 //   the time step-dimension is used as an adaptive time step for integration.
 //   We use usual values between 0.01 and 0.1 for the time step.
 //
-//   each configuration is with respect to an interial frame centered at (0,0,0)
-//   each velocity is spatial, i.e. w.r.t. (0,0,0)
-//
+//  the control space is U
 
 #include <ompl/base/StateSpace.h>
 #include <ompl/control/SimpleSetup.h>

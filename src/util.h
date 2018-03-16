@@ -16,8 +16,12 @@ namespace util {
   void SetSimulatedRobot( Robot *robot, WorldSimulation &sim, Config &q);
   std::string GetApplicationFolder();
   std::string GetDataFolder();
+
   bool StartsWith(const std::string &str, const char* prefix);
   bool StartsWith(const std::string &str, const std::string &prefix);
+  bool EndsWith(const std::string &str, const char* suffix);
+  bool EndsWith(const std::string &str, const std::string &suffix);
+
   std::string RemoveStringBeginning(const std::string &s, const std::string &prefix);
 }// namespace util
 
