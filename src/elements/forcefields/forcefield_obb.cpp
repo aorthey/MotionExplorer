@@ -1,4 +1,6 @@
 #include "forcefield_obb.h"
+#include "gui/drawMotionPlanner.h"
+#include "gui/colors.h"
 
 using namespace Math3D;
 ForceFieldTypes OrientedBoundingBoxForceField::type()
@@ -8,6 +10,12 @@ ForceFieldTypes OrientedBoundingBoxForceField::type()
 OrientedBoundingBoxForceField::OrientedBoundingBoxForceField(double _power, Vector3 _center, Vector3 _direction, Vector3 _extension):
   center(_center), extension(_extension), power(_power)
 {
+  for(uint k = 0; k < 3; k++){
+    if(extension[k] < 0){
+      std::cout << "[OrientedBoundingBoxForceField] extension needs to be non-negative. But it is " << extension << std::endl;
+      exit(1);
+    }
+  }
   Vector3 ex(1,0,0);
 
   std::vector<Vector3> a,b;
@@ -26,7 +34,7 @@ OrientedBoundingBoxForceField::OrientedBoundingBoxForceField(double _power, Vect
     std::cout << "ndirection: " << normdir << std::endl;
     exit(0);
   }
-  std::cout << R << std::endl;
+  //std::cout << R << std::endl;
 
   force = _power*_direction;
 }
@@ -66,4 +74,62 @@ Math3D::Vector3 OrientedBoundingBoxForceField::GetExtension(){
 }
 Math3D::Matrix3 OrientedBoundingBoxForceField::GetRotation(){
   return R;
+}
+void OrientedBoundingBoxForceField::DrawGL(GUIState &state)
+{
+  glDisable(GL_LIGHTING);
+  glEnable(GL_BLEND); 
+
+  //double power = fb->GetPower();
+  //Vector3 center = fb->GetCenter();
+  //Vector3 extension = fb->GetExtension();
+  //Matrix3 R = fb->GetRotation();
+  
+  glPushMatrix();
+  setColor(cForce);
+  glTranslate(center);
+  Matrix4 RH(R);
+  RH(3,3) = 1;
+  glMultMatrixd(RH);
+
+  glPointSize(5);
+  drawPoint(Vector3(0,0,0));
+
+  glLineWidth(2);
+
+  double ystep = 0.5;
+  double zstep = 0.5;
+  for(double y = -extension[1]/2; y < extension[1]/2; y+=ystep){
+    for(double z = -extension[2]/2; z < extension[2]/2; z+=zstep){
+
+      double x = extension[0]/2;
+
+      glBegin(GL_LINES);
+      glVertex3f(-x,y,z);
+      glVertex3f(x,y,z);
+      glEnd();
+
+      double length = 0.1;
+      Vector3 direction(length,0,0);
+      if(power < 0) {
+        direction *= -1;
+      }
+      glPushMatrix();
+      Vector3 middle(-x/2,y,z);
+      glTranslate(middle);
+      GLDraw::drawCone(direction, length/2);
+      glPopMatrix();
+      glPushMatrix();
+      middle = Vector3(x/2,y,z);
+      glTranslate(middle);
+      GLDraw::drawCone(direction, length/2);
+      glPopMatrix();
+    }
+  }
+
+
+  glPopMatrix();
+  glEnable(GL_LIGHTING);
+  glDisable(GL_BLEND); 
+
 }

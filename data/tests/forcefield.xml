@@ -1,0 +1,24 @@
+
+<?xml version="1.0"?>
+<world>
+  <robot name="bullet" file="/home/aorthey/git/orthoklampt/data/robots/bullet.urdf"/>
+
+  <forcefield>
+
+    <radial source="1 -1.2 2" power="+2" radius="5" color="1 0 1"/>
+    <radial source="1 +1.5 2" power="-2" radius="2" color="0 0.8 0"/>
+
+    <cylindrical source="+3 0 -5" direction="+0.2 0.5 1.0" elongation="3" radius="2" power="3" color="0.8 0.3 0.2"/>
+    <cylindrical source="-3 0 -5" direction="-0.2 0.3 1.0" elongation="1" radius="8" power="-3" color="0.3 0.3 0.7"/>
+
+    <orientedbox center="3 5 0" direction="1.0 1.0 0.0" extension="5 5 2" power="5" color="0.8 0.1 0.1"/>
+    <orientedbox center="3 -5 0" direction="1.0 1.0 1.0" extension="2 5 5" power="-5" color="0.1 0.1 0.8"/>
+
+    <drag viscosity="0.5" color="1 0 1"/> 
+
+    <uniform force="0 0 -1" color="0 0 0"/> 
+    <uniform force="0 0 -0.2" color="0 0 0"/> 
+
+  </forcefield>
+
+</world>
