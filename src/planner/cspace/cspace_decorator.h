@@ -19,6 +19,7 @@ class CSpaceOMPLDecorator: public CSpaceOMPL
     virtual uint GetControlDimensionality() const override;
     virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl) override;
     virtual Robot* GetRobotPtr() override;
+    virtual RobotWorld* GetWorldPtr() override;
     virtual CSpaceKlampt* GetCSpacePtr() override;
     virtual const ob::StateSpacePtr SpacePtr() override;
     virtual ob::SpaceInformationPtr SpaceInformationPtr() override;

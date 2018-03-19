@@ -447,3 +447,11 @@ points
 [ ] manipulation with ultra complex hand, such that QS approach will get
 highlighted. Maybe even add some clutter/debris.
 [ ] clip FF at O boundaries
+
+[ ] get obstacle informations from world
+
+
+[ ] think about ways to get T(X.xml)<1. 
+   --- Symmetry of regions (seems to be unique to X).
+   --- Critical points (CP) characterizing important boundaries of the manifold.
+might be hard to compute explicitly

@@ -27,6 +27,8 @@ namespace ompl
         virtual void Init() override;
         virtual void Grow(double t) override;
         virtual void CheckForSolution(ob::PathPtr &solution) override;
+      protected:
+        std::vector<const ob::State*> startS_;
     };
 
   };

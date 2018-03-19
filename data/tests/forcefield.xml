@@ -1,4 +1,4 @@
-
+<!-- Visualize all force fields available -->
 <?xml version="1.0"?>
 <world>
   <robot name="bullet" file="/home/aorthey/git/orthoklampt/data/robots/bullet.urdf"/>
@@ -14,10 +14,15 @@
     <orientedbox center="3 5 0" direction="1.0 1.0 0.0" extension="5 5 2" power="5" color="0.8 0.1 0.1"/>
     <orientedbox center="3 -5 0" direction="1.0 1.0 1.0" extension="2 5 5" power="-5" color="0.1 0.1 0.8"/>
 
+    <!-- Non-visualized force fields -->
+
     <drag viscosity="0.5" color="1 0 1"/> 
 
     <uniform force="0 0 -1" color="0 0 0"/> 
     <uniform force="0 0 -0.2" color="0 0 0"/> 
+
+    <uniformrandom minforce="0 0 0" maxforce="0 0 0.1" color="1 0 0"/>
+    <gaussianrandom mean="0 0 0" stddev="1 1 1" color="1 1 0"/>
 
   </forcefield>
 

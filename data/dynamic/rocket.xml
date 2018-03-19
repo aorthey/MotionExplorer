@@ -6,10 +6,10 @@
   </terrain>
 
   <forcefield>
-    <radial source="2 -2 4" power="-0.1" radius="3" color="1 0 1"/>
-    <radial source="-2 2 4" power="-0.1" radius="3" color="1 0 1"/>
-    <drag viscosity="0.5" color="1 0 1"/>
-    <uniform force="0 0 -3.71" color="1 0 0"/>
+    <radial source="2 -2 1" power="-5" radius="3" color="1 0 1"/>
+    <radial source="1 1 1" power="-5" radius="3" color="1 0 1"/>
+    <!-- <drag viscosity="1.5" color="1 0 1"/> -->
+    <uniform force="0 0 -0.71" color="1 0 0"/>
   </forcefield>
 
   <plannerinput>

@@ -56,6 +56,7 @@ class CSpaceOMPL
     virtual uint GetControlDimensionality() const;
     virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
     virtual Robot* GetRobotPtr();
+    virtual RobotWorld* GetWorldPtr();
     virtual CSpaceKlampt* GetCSpacePtr();
     virtual const ob::StateSpacePtr SpacePtr();
     virtual ob::SpaceInformationPtr SpaceInformationPtr();

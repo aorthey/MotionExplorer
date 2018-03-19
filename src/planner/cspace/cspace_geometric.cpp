@@ -1,5 +1,6 @@
 #include "planner/cspace/cspace_geometric.h"
 #include "planner/validitychecker/validity_checker_ompl.h"
+#include "planner/validitychecker/validity_checker_simplicial_complex.h"
 
 GeometricCSpaceOMPL::GeometricCSpaceOMPL(RobotWorld *world_, int robot_idx):
   CSpaceOMPL(world_, robot_idx)
@@ -232,5 +233,5 @@ const oc::StatePropagatorPtr GeometricCSpaceOMPL::StatePropagatorPtr(oc::SpaceIn
 }
 const ob::StateValidityCheckerPtr GeometricCSpaceOMPL::StateValidityCheckerPtr(ob::SpaceInformationPtr si)
 {
-  return std::make_shared<OMPLValidityChecker>(si, this, kspace);
+  return std::make_shared<ValidityCheckerSimplicialComplex>(si, this, kspace);
 }

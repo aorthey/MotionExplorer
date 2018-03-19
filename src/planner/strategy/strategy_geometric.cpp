@@ -242,31 +242,3 @@ void StrategyGeometricMultiLevel::RunBenchmark(
   BenchmarkFileToPNG(file_benchmark);
 }
 
-void StrategyGeometricMultiLevel::BenchmarkFileToPNG(const std::string &file)
-{
-  std::string cmd;
-
-  cmd = "ompl_benchmark_statistics.py "+file+".log -d "+file+".db";
-  int s1 = std::system(cmd.c_str());
-
-  cmd = "cp "+file+".db"+" ../data/benchmarks/";
-  int s2 = std::system(cmd.c_str());
-
-  cmd = "python ../scripts/ompl_output_benchmark.py "+file+".db";
-  int s3 = std::system(cmd.c_str());
-
-  cmd = "python ../scripts/ompl_benchmark_statistics_simple.py "+file+".log -d "+file+".db -p "+file+".pdf";
-  int s4 = std::system(cmd.c_str());
-
-  cmd = "convert -density 150 "+file+".pdf -trim -quality 100 "+file+".png";
-  int s5 = std::system(cmd.c_str());
-
-  cmd = "eog "+file+".png";
-  int s6 = std::system(cmd.c_str());
-
-  if(s1&s2&s3&s4&s5&s6){
-    std::cout << "Successfully wrote benchmark to " << file << ".png" << std::endl;
-  }else{
-    std::cout << "benchmark to png failed" << std::endl;
-  }
-}

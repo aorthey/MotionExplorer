@@ -18,5 +18,9 @@ class StrategyKinodynamicMultiLevel: public Strategy{
     ob::PlannerPtr GetPlanner(std::string algorithm,
         std::vector<oc::SpaceInformationPtr> si_vec, 
         std::vector<ob::ProblemDefinitionPtr> pdef_vec);
+    void RunBenchmark(
+        const StrategyInput& input,
+        std::vector<oc::SpaceInformationPtr> si_vec, 
+        std::vector<ob::ProblemDefinitionPtr> pdef_vec);
 
 };

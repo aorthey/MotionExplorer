@@ -7,6 +7,7 @@
 class Strategy{
   public:
     virtual void plan( const StrategyInput &input, StrategyOutput &output) = 0;
+    void BenchmarkFileToPNG(const std::string&);
 
   protected:
     Strategy();

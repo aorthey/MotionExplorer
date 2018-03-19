@@ -48,6 +48,9 @@ void CSpaceOMPLDecorator::SetCSpaceInput(const CSpaceInput &input_){
 Robot* CSpaceOMPLDecorator::GetRobotPtr(){
   return cspace_ompl->GetRobotPtr();
 }
+RobotWorld* CSpaceOMPLDecorator::GetWorldPtr(){
+  return cspace_ompl->world;
+}
 CSpace* CSpaceOMPLDecorator::GetCSpacePtr(){
   return cspace_ompl->GetCSpacePtr();
 }

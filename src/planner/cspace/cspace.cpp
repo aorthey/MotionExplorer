@@ -82,6 +82,9 @@ void CSpaceOMPL::SetCSpaceInput(const CSpaceInput &input_){
 Robot* CSpaceOMPL::GetRobotPtr(){
   return robot;
 }
+RobotWorld* CSpaceOMPL::GetWorldPtr(){
+  return world;
+}
 CSpace* CSpaceOMPL::GetCSpacePtr(){
   return kspace;
 }
@@ -258,6 +261,7 @@ void CSpaceOMPL::print(std::ostream& out) const
 
   out << std::string(80, '-') << std::endl;
 }
+
 std::ostream& operator<< (std::ostream& out, const CSpaceOMPL& space) 
 {
   space.print(out);

@@ -6,7 +6,6 @@
     <algorithm name="ompl:rrtconnect"/>
     <algorithm name="ompl:prm"/>
     <algorithm name="ompl:est"/>
-
     <maxplanningtime>3</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>1</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
@@ -35,7 +34,6 @@
     <algorithm name="ompl:spars"/>
     <algorithm name="ompl:cforest"/>
     <algorithm name="ompl:sst"/>
-
     <maxplanningtime>300</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>10</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
@@ -47,9 +45,8 @@
     <algorithm dynamic="1" name="ompl:pdst"/>
     <algorithm dynamic="1" name="ompl:rrt"/>
     <algorithm dynamic="1" name="ompl:kpiece"/>
-
-    <maxplanningtime>300</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>10</runcount> <!-- number of runs per algorithm --> 
+    <maxplanningtime>30</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>2</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>10000</maxmemory> <!-- max memory (MB) per run of algorithm--> 
   </benchmark>
 </benchmarks>
