@@ -320,7 +320,7 @@ def plotAttribute(cur, planners, attribute, typename):
         print('Skipping "%s": no available measurements' % attribute)
         return
 
-    plannerLabelRotation=45
+    plannerLabelRotation=80
     plt.clf()
     ax = plt.gca()
     if typename == 'ENUM':
@@ -395,7 +395,7 @@ def plotStatistics(dbname, fname):
           ax = plt.gca()
           ax.set_ylabel('Time (s)')
           ax.set_xlabel('Motion Planning Algorithm')
-          ax.set_ylim([0,timelimit+30]);
+          ax.set_ylim([0,timelimit+0.15*timelimit]);
           txt = "runcount=%3.0d"%runcount
           ax.text(0.85, 0.95, txt, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
           txt = "timelimit=%3.0f"%timelimit+"s"
