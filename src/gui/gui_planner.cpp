@@ -76,6 +76,12 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     }else{
       SendPauseIdle();
     }
+  }else if(cmd=="simulate_controller"){
+    state("simulate").toggle();
+    simulate = state("simulate").active;
+    if(simulate) state("draw_robot").activate();
+    path = planner->GetPath();
+
   }else if(cmd=="save_current_path"){
     //state("save_current_path").activate();
     if(path)
@@ -117,6 +123,9 @@ void PlannerBackend::CenterCameraOn(const Vector3& v){
   Math3D::AABB3D box(v,v);
   GLNavigationBackend::CenterCameraOn(box);
 }
+
+
+
 bool PlannerBackend::OnIdle(){
   bool res = BaseT::OnIdle();
   if(planners.empty()) return res;
@@ -147,6 +156,8 @@ bool PlannerBackend::OnIdle(){
         }
       }
       return true;
+    }
+    if(state("simulate_controller")){
     }
   }
   return res;

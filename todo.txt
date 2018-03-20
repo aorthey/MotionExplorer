@@ -2,296 +2,276 @@
 TODO
 -------------------------------------------------------------------------------
 
- [x] solve IK for frame-env contact points
- [x] Can't change SIMROBOT anymore, what happened!?
- [x] place robot directly(!) at IK computed solution and THEN start sim 
- [x] place robot feet on floor
- [x] plan path between A and B
- [x] extract milestones between A and B from path
- [x] execute path in GUI
- [x] retime path
- [x] execute trajectory in GUI
- [x] add limits/selfcollision/collision checks to IK
- [x] visualize path in GUI (i.e. visualize the individual link paths)
- [x] swept volume? (for irr paper)
- [x] swept volume transparent without the blueish background
- [x] Move hand such that a set of fingertip points is fulfilled
- [x] set color to link in contact
- [x] importing/exporting blender models? how to best design your own environments? [needs .tri to blender importer. there is none (only for some other tri files). maybe better to convert to dae (collada) ?]
- [x] why does planning fail with 1 additional joint see sentinel
- [x] disable backface culling to display backoriented triangles (just use rigidobject, they are non-culled)
- [x] MultiPath is using linear interpolation between keyframes. However on SO(3)
+[x] solve IK for frame-env contact points
+[x] Can't change SIMROBOT anymore, what happened!?
+[x] place robot directly(!) at IK computed solution and THEN start sim 
+[x] place robot feet on floor
+[x] plan path between A and B
+[x] extract milestones between A and B from path
+[x] execute path in GUI
+[x] retime path
+[x] execute trajectory in GUI
+[x] add limits/selfcollision/collision checks to IK
+[x] visualize path in GUI (i.e. visualize the individual link paths)
+[x] swept volume? (for irr paper)
+[x] swept volume transparent without the blueish background
+[x] Move hand such that a set of fingertip points is fulfilled
+[x] set color to link in contact
+[x] importing/exporting blender models? how to best design your own environments? [needs .tri to blender importer. there is none (only for some other tri files). maybe better to convert to dae (collada) ?]
+[x] why does planning fail with 1 additional joint see sentinel
+[x] disable backface culling to display backoriented triangles (just use rigidobject, they are non-culled)
+[x] MultiPath is using linear interpolation between keyframes. However on SO(3)
 we need a different interpolation due to the gluing of the charts. Check if
 something like that is already implemented, see GeodesicManifold/DynamicPath.
 Just use KinodynamicMilestonePath instead of MultiPath!
- [x] add widgets for planning to gui
- [x] setup kinodynamic planning problem
- [x] control in kinodynamic planning converges to wrong direction
- [x] refactor draw methods in gui.cpp
- [x] make a Klampt Interface where to set all properties like background color etc
- [x] screenshots x_X?
- [x] refactor planner settings
- [x] save kinodynamicmilestonepath to file 
- [x] outsource serialized tree to seperate file
- [x] save motion planner class plus tree and path
- [x] krrt: no forward simulation towards goal (was wrong init rot)
- [x] save/load GUI state including Motion Planning Equipment
- [x] Display/Undisplay Rigid Bodies (to visualize tree)
- [x] implement edge visualization in KrisLibrary/GLDraw/GeometryAppearance.cpp
- [x] install krislib with ompl support (didn't link ompl in klampt lib and this lib)
- [x] ompl does not read the joint limits
- [x] make ompl planners available 
- [x] remove this orange line from origin to p_init
- [x] ompl converts cspace to realvectorspace R, but we need a compound space SE(3)xQ => make own ompl interface
- [x] enable ompl geometric planners
- [x] add omplapp interface to load meshes + collision detection (check omplapp/SE3RigidBodyPlanning.cpp)
-      (/git/ompl/omplapp-1.3.0-Source/demos/SE3RigidBodyPlanning)
- [x] enable ompl kinodynamic planners
- [x] move planner components to planner/
- [x] make button to disable/enable mesh and disable/enable faces of mesh
- [x] run ompl PDST/KPIECE /w def proj
- [x] compute irreducible projection from SE(3) path
- [x] GUI: save current robot state too, not only init/goal of planner
- [x] remove torsion while computing irreducible projection
- [x] reimplement irreducible projection in cpp, make it cleaner
- [x] refactor path_pwl_euclid
- [x] compute projection irreducible for N branches
- [x] extend environment by a new pipe upward curved plus box connector
- [x] make the environment easier to compute for rigid body planning (widen the inner hole maybe!?)
- [x] outsource swept volume to seperate elements file
- [x] check distance function in OMPL -- why is it different depending on number of DOFs?
- [x] find distance to goal for planner output OMPL (how approximate is the solution)
- [x] toggle mesh/faces of objects with keyboard
- [x] add edges to planner tree visualization
- [ ] solve IK for arbitrary rob-env contact points
- [ ] grasp an actual object
- [ ] sample grasps for object and compute IK (findGrasp method)
- [ ] make/break contact events => compute transition paths
- [ ] execute transition paths 
- [x] change viewpoint internally
- [ ] Compute Force Closure Grasp from points
- [ ] Compute SE constraints, what is GIWC equivalent?
- [x] smoothing after path planning
- [x] refactor kinodynamic planner to make it independent from path planner
- [x] decompose GUI into sweptvolumeGUI and forcefieldGUI 
- [x] save all swept volumes when saving GUI, rewrite all Load/Save functions
- [x] refactor planner -> use PlannerOutput to store path/roadmap and use
+[x] add widgets for planning to gui
+[x] setup kinodynamic planning problem
+[x] control in kinodynamic planning converges to wrong direction
+[x] refactor draw methods in gui.cpp
+[x] make a Klampt Interface where to set all properties like background color etc
+[x] screenshots x_X?
+[x] refactor planner settings
+[x] save kinodynamicmilestonepath to file 
+[x] outsource serialized tree to seperate file
+[x] save motion planner class plus tree and path
+[x] krrt: no forward simulation towards goal (was wrong init rot)
+[x] save/load GUI state including Motion Planning Equipment
+[x] Display/Undisplay Rigid Bodies (to visualize tree)
+[x] implement edge visualization in KrisLibrary/GLDraw/GeometryAppearance.cpp
+[x] install krislib with ompl support (didn't link ompl in klampt lib and this lib)
+[x] ompl does not read the joint limits
+[x] make ompl planners available 
+[x] remove this orange line from origin to p_init
+[x] ompl converts cspace to realvectorspace R, but we need a compound space SE(3)xQ => make own ompl interface
+[x] enable ompl geometric planners
+[x] add omplapp interface to load meshes + collision detection (check omplapp/SE3RigidBodyPlanning.cpp)
+    (/git/ompl/omplapp-1.3.0-Source/demos/SE3RigidBodyPlanning)
+[x] enable ompl kinodynamic planners
+[x] move planner components to planner/
+[x] make button to disable/enable mesh and disable/enable faces of mesh
+[x] run ompl PDST/KPIECE /w def proj
+[x] compute irreducible projection from SE(3) path
+[x] GUI: save current robot state too, not only init/goal of planner
+[x] remove torsion while computing irreducible projection
+[x] reimplement irreducible projection in cpp, make it cleaner
+[x] refactor path_pwl_euclid
+[x] compute projection irreducible for N branches
+[x] extend environment by a new pipe upward curved plus box connector
+[x] make the environment easier to compute for rigid body planning (widen the inner hole maybe!?)
+[x] outsource swept volume to seperate elements file
+[x] check distance function in OMPL -- why is it different depending on number of DOFs?
+[x] find distance to goal for planner output OMPL (how approximate is the solution)
+[x] toggle mesh/faces of objects with keyboard
+[x] add edges to planner tree visualization
+[x] change viewpoint internally
+[x] smoothing after path planning
+[x] refactor kinodynamic planner to make it independent from path planner
+[x] decompose GUI into sweptvolumeGUI and forcefieldGUI 
+[x] save all swept volumes when saving GUI, rewrite all Load/Save functions
+[x] refactor planner -> use PlannerOutput to store path/roadmap and use
 PlannerOutput as Input to GUI to shadow the internal things. Also put the
 plannersettings into the xml, so that we can load planner+start/goal config
 without recompiling. Delete the whole plannersetup folder!
- [ ] update to klampt-0.7
- [ ] visualize wrench cone at contact
- [x] restructure GUI to use GUIVariables
+[x] restructure GUI to use GUIVariables
 
-
-[ ] create pathspace which computes irreducible paths
-[ ] Button to save/load GUI state including Motion Planning Equipment
-
--- abstractions (longterm goals)
-
- [ ] Needs switch to QT, the file loader from GLUI seems not to work properly. Also the graphics are quite bad. 
- [x] be able to design landscapes/fancy environments and import them to simulator
- [x] be able to load different landscapes/robots from simulator, plus start/goal
+[x] be able to design landscapes/fancy environments and import them to simulator
+[x] be able to load different landscapes/robots from simulator, plus start/goal
 configs, and be able to run different algorithms to find a solution. Then be
 able to save/delete solution paths. So that we can display several output paths
 as swept volumes simultaneously
-      [x] be able to load different landscapes + plannersettings from simulator 
-      [x] screenshots
-      [x] display plannersettings (text+start/goal configs)
+    [x] be able to load different landscapes + plannersettings from simulator 
+    [x] screenshots
+    [x] display plannersettings (text+start/goal configs)
 
- [x] do benchmark planning from inside the simulator by clicking together
+[x] do benchmark planning from inside the simulator by clicking together
 algorithms and #runs and duration. Have a default benchmarking plus dump
 everything to nice pdf graph / latex table.
- [ ] have ability to retime a path inside simulator, then display the
-output over time inside the simulator. 
- [ ] be able to deform path inside simulator. Ability to load paths from file,
-then display them, then deform them, then to save those paths. 
- [x] have vim-keybindings to quickly move around, save/load, screenshots,
+[x] have vim-keybindings to quickly move around, save/load, screenshots,
 display tree/start/goal/swept volumes, do planning
- [x] EnvironmentLoader should be merged with Backend, so that we can load/save inside
- [ ] use TAB to access different modes: simulation <-> Desired Pose (change goal) blender-like controls?
- [ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
-      andreas dziegielewski http://acg.cs.tau.ac.il/projects/swept-volume/project-page seems promising
- [ ] making a safe static contact
+[x] EnvironmentLoader should be merged with Backend, so that we can load/save inside
 
+--------------------------------------------------------------------------------
 -- wrench fields
+--------------------------------------------------------------------------------
 
-
- [x] create arbitrary force fields in ODE simulator
- [x] create force field visualization and visualize its effect on each link
- [x] add arrows to visualize flow of power
- [x] forces on link => make them better looking like contact wrenches
- [x] compute and display distance between links and terrain
- [x] visualize COM separately in box to quickly see wrenches attacking robot.
- [x] let force be specificable in xml file, uniform, box, uniform inside rigid object, radial from source,
+[x] create arbitrary force fields in ODE simulator
+[x] create force field visualization and visualize its effect on each link
+[x] add arrows to visualize flow of power
+[x] forces on link => make them better looking like contact wrenches
+[x] compute and display distance between links and terrain
+[x] visualize COM separately in box to quickly see wrenches attacking robot.
+[x] let force be specificable in xml file, uniform, box, uniform inside rigid object, radial from source,
 maelstrom from source, and any combination of that. Test with moving robot
 around and visualize wrenches on each link plus wrench on COM
 COM should retain orientation equal to origin so that we can see forces from
- [x] cylindrical FF
- [x] visualize min dist between link and terrain
- [x] add custom controller loop 
- [x] visualize force ellipsoid at each point
- [x] simulate snake, make sure there are no glitches
- [ ] read Randomized path planning on vector fields
- [ ] enable velocity induced FF, drag force, magnetic force, etc
- [ ] apply force to rigidObjects and other robots in the scene
- [ ] composite force fields: intersection and union
- [ ] add constraint to a FF to be inside a given rigid object
- [ ] [URGENT] Plan one path /w speed profile using OMPL, send to controller, execute in the simulator, have perfect path following behavior
-   [x] return only pointers in ompl_space, make a factory
-   [x] finalize kinodynamic space
-   [x] simulate jet propulsion
-   [x] implement tangentbundle integrator
-   [x] *** execute/simulate kinodynamic path (use jet propulsion)
-   [x] torque values are SO(3) x R3 in controller, but should be R3xSO(3).  Why?
-   [x] error: driver 0 is not in PID mode. Why?
-   [x] jet propulsion not implemented yet (see RobotJointDriver)
-   [x] jet propulsion acts on global coordinate frame, not locally on robot link
-   [x] torques not being set properly (robot should move with random torques)
-   [x] segfault /w single rigid body
-   [x] drivers and actuators do not match up. zero joints = zero actuators, therefore segfault. where are the actuators created?
-   [x] display the jet propulsion wrenches to verify
-   [x] why does robot move when disabling force fields? (does not happen after reset!)
-   [ ] display all torques applied
-   [ ] *** do kinodynamic planning /w torque constraints on fibre bundle
-=>>   [ ] fix propagation function
-      [ ] forward simulation is wrong on tangent bundle
-      [ ] calcacceleration returns values on fixed joint
-      [ ] feels like momentum is ignored by propagation function. 
-   [x] gl error when drawing planning tree
-    
-   [x] reset: delete com window
-   [x] reset: go back to init pos not xml config
-   [x] add start velocity plannersettings
-   [x] outsource duration time, algorithm name and epsilon goal (xml plannersettings)
-   [x] put geometricOMPLcspace together with principal fibre bundle, do the same for kinodynamic
-   [ ] ** flow following by forward simulating a PID controlled device
-   [x] OMPL_SPACE remove hardcoded se3 vector fields (and put them into xml, urdf or so)
-   [ ] include FF in tangentbundle integrator
-   [ ] *** do kinodynamic planning /w FF
-   [ ] ** visualize path speed profile (reuse python display and display in topp)
- [ ] * replace propagation by undulatory motions along each axis, but how would that work?
- [x] make cspace ompl work with zero-dimensional shape space
+[x] cylindrical FF
+[x] visualize min dist between link and terrain
+[x] add custom controller loop 
+[x] visualize force ellipsoid at each point
+[x] simulate snake, make sure there are no glitches
+[x] enable velocity induced FF, drag force, magnetic force, etc
+[x] gl error when drawing planning tree
 
--- important
+[x] reset: delete com window
+[x] reset: go back to init pos not xml config
+[x] add start velocity plannersettings
+[x] outsource duration time, algorithm name and epsilon goal (xml plannersettings)
+[x] put geometricOMPLcspace together with principal fibre bundle, do the same for kinodynamic
+[x] OMPL_SPACE remove hardcoded se3 vector fields (and put them into xml, urdf or so)
+[x] make cspace ompl work with zero-dimensional shape space
 
- [x] self collisions occuring when simulating atlas in Klampt. ODERobot
+
+--------------------------------------------------------------------------------
+KINODYNAMIC Planning
+--------------------------------------------------------------------------------
+[x] return only pointers in ompl_space, make a factory
+[x] finalize kinodynamic space
+[x] simulate jet propulsion
+[x] implement tangentbundle integrator
+[x] *** execute/simulate kinodynamic path (use jet propulsion)
+[x] torque values are SO(3) x R3 in controller, but should be R3xSO(3).  Why?
+[x] error: driver 0 is not in PID mode. Why?
+[x] jet propulsion not implemented yet (see RobotJointDriver)
+[x] jet propulsion acts on global coordinate frame, not locally on robot link
+[x] torques not being set properly (robot should move with random torques)
+[x] segfault /w single rigid body
+[x] drivers and actuators do not match up. zero joints = zero actuators, therefore segfault. where are the actuators created?
+[x] display the jet propulsion wrenches to verify
+[x] why does robot move when disabling force fields? (does not happen after reset!)
+[x] display all torques applied
+[x] fix propagation function
+[ ] *** do kinodynamic planning /w torque constraints on fibre bundle
+  [ ] forward simulation is wrong on tangent bundle
+  [ ] calcacceleration returns values on fixed joint
+  [ ] feels like momentum is ignored by propagation function. 
+[ ] Plan using speed profile by TOPP or Klampt
+[ ] Plan one path /w speed profile using OMPL, 
+[ ] send torques or pid values to controller
+[ ] execute path in the simulator, have perfect path following behavior
+[ ] read Randomized path planning on vector fields
+[ ] ** flow following by forward simulating a PID controlled device
+[ ] include FF in tangentbundle integrator
+[ ] *** do kinodynamic planning /w FF
+[ ] ** visualize path speed profile (reuse python display and display in topp)
+[ ] apply force to rigidObjects and other robots in the scene
+[ ] composite force fields: intersection and union
+[ ] add constraint to a FF to be inside a given rigid object
+
+--------------------------------------------------------------------------------
+Contacts 
+--------------------------------------------------------------------------------
+
+[x] self collisions occuring when simulating atlas in Klampt. ODERobot
 correctly determines that collision occurs. But why is it not avoided? maybe
 force too strong? but then terrain would be permeated, too.
-    Simulation/settings.h: const static bool gRobotSelfCollisionsEnabled = true;
- [ ] simulator crash if forces are too high and selfcollision is enabled ---
-happens if we apply a force which overcomes the self-collision and creates
-overlapping meshes. solution: avoid forces higher than ?? or increase
-self-collision forces?
- [x] reset not working anymore
- [x] reset goes back to wrong position
- [x] reset: momentum is not set back to zero 
- [ ] reset: crash when plotting joint values
- [x] kernel panic after movie creation
-   [x] got another kernel panic after displaying torque based jet propulsion
- [ ] retreat simulation
+  Simulation/settings.h: const static bool gRobotSelfCollisionsEnabled = true;
+[x] reset not working anymore
+[x] reset goes back to wrong position
+[x] reset: momentum is not set back to zero 
+[x] kernel panic after movie creation
+ [x] got another kernel panic after displaying torque based jet propulsion
 
--- abstractions 
-
- [x] compute and display distance between links and terrain
- [x] make small 3-leg spider robot, only contacts
- [x] design cave environment
- [x] force is applied even with 000 force field (didn't remove se3drivers)
- [x] planning with two robot entities inner/outer SV
-    [x] make cspace with two robots, inherit from kinodynamiccspace, make robot + outer shell 
- [x] level planning
-   [x] visualize level tree
-   [x] visualize level path
-   [x] visualize level all paths
- [x] have different numbers to highlight/show different planner outputs. This
+[x] compute and display distance between links and terrain
+[x] make small 3-leg spider robot, only contacts
+[x] design cave environment
+[x] force is applied even with 000 force field (didn't remove se3drivers)
+[x] planning with two robot entities inner/outer SV
+  [x] make cspace with two robots, inherit from kinodynamiccspace, make robot + outer shell 
+[x] level planning
+ [x] visualize level tree
+ [x] visualize level path
+ [x] visualize level all paths
+[x] have different numbers to highlight/show different planner outputs. This
 way we could build a hierarchical visualization
- [x] fix spider urdf
- [x] install SBL lib
- [x] compute homology groups (HG) of SC
- [x] make bottle planning possible
- [x] visualize internal holes
- [x] changing between visuals changes colors/linewidth of other visuals, but shouldn't.
- [x] ompl cannot deal with zero dimensions
- [x] orientation limits are not respected OMPL
- 
- [x] remove zero measure dimensions from OMPL (i.e. map them to lower space
- before starting OMPL, there are always problems with that)
- [x] have one complete system for rigid link: add arbitrary nested robots.
- compute shortest paths. Iterate through all solutions.
- 
- [x] magneto: 2-dof, 2 magnet robot
- [x] reset does not work on all robots
- [x] remove orientation sampling for rotational invariant shapes
- [x] bottle requires different planner because physics is different: innerouter vs. normal
- 
- Contacts 
- [ ] How to make the contact decisions inside the controller?
- [ ] most important point is how the hierarchy would work with a contact point
- [ ] simulate a magnetic-contact. read klampt tutorial about humanoid robot with
- infinite force contact. how to selectively activate/deactivate?
- [ ] how to define contact points and add arbitrary force when in contact?
- [ ] how to make and break contacts
- [ ] how to adapt sphere/capsule to new structure. it is completely different, how can that work?
- [ ] can we design a controller which moves M0 around a great arc of an arbitrary sphere?
- [ ] do the same, but for M2
- 
- General
- [ ] color each planner. Have one button to execute each planner in a seperate
-thread. Once finished, return the path and visualize the highest layer path in
-the corresponding color of that planner.
- [ ] make planner run on separate threads
- [ ] it would be nice to repeat an algorithm N times, and visualize the solution paths.
- [x] add drawFace/drawEdge to terrain XML file
- [x] make objects transparent
- [ ] more sophisticated [graph visualization]; using viewpoint to get fixed 3d position
- [x] sometimes [two nearby paths are not reduced], investigate that (update definition of equivalence first)
- [x] incorporate [sufficient conditions], visualize that nodes are feasible, use
- some interpolation to get shortest path in pocket
- [x] more challenging environments
- [x] orientation of capsule definitely not correct. needs investigating.
- [x] make a list of environments, their picture and what this environment is
- designed to show (+ who came up with the environment)
- [x] check if we can store personal information in a PD::Node during planning.  I.e. store sufficiency and maybe some other stuff there
+[x] fix spider urdf
+[x] install SBL lib
+[x] compute homology groups (HG) of SC
+[x] make bottle planning possible
+[x] visualize internal holes
+[x] changing between visuals changes colors/linewidth of other visuals, but shouldn't.
+[x] ompl cannot deal with zero dimensions
+[x] orientation limits are not respected OMPL
+[ ] How to make the contact decisions inside the controller?
+[ ] most important point is how the hierarchy would work with a contact point
+[ ] simulate a magnetic-contact. read klampt tutorial about humanoid robot with
+infinite force contact. how to selectively activate/deactivate?
+[ ] how to define contact points and add arbitrary force when in contact?
+[ ] how to make and break contacts
+[ ] how to adapt sphere/capsule to new structure. it is completely different, how can that work?
+[ ] can we design a controller which moves M0 around a great arc of an arbitrary sphere?
+[ ] do the same, but for M2
+[ ] solve IK for arbitrary rob-env contact points
+[ ] grasp an actual object
+[ ] sample grasps for object and compute IK (findGrasp method)
+[ ] make/break contact events => compute transition paths
+[ ] execute transition paths 
+[ ] Compute Force Closure Grasp from points
+[ ] Compute SE constraints, what is GIWC equivalent?
 
-HPlanner
- [x] going up does not remove SV
- [x] position goes through wall in L (uses triangle meshes and not hierarchy of
+[ ] update to klampt-0.7
+[ ] visualize wrench cone at contact
+[ ] create pathspace which computes irreducible paths
+[ ] Button to save/load GUI state including Motion Planning Equipment
+[ ] Needs switch to QT, the file loader from GLUI seems not to work properly. Also the graphics are quite bad. 
+[ ] have ability to retime a path inside simulator, then display the
+output over time inside the simulator. 
+[ ] be able to deform path inside simulator. Ability to load paths from file,
+then display them, then deform them, then to save those paths. 
+[ ] use TAB to access different modes: simulation <-> Desired Pose (change goal) blender-like controls?
+[ ] better swept volume visualization (have an aggregate or convex hull of successive positions)
+    andreas dziegielewski http://acg.cs.tau.ac.il/projects/swept-volume/project-page seems promising
+[ ] making a safe static contact
+
+--------------------------------------------------------------------------------
+Geometric Planner 
+--------------------------------------------------------------------------------
+
+[x] remove zero measure dimensions from OMPL (i.e. map them to lower space
+before starting OMPL, there are always problems with that)
+[x] have one complete system for rigid link: add arbitrary nested robots.
+compute shortest paths. Iterate through all solutions.
+
+[x] magneto: 2-dof, 2 magnet robot
+[x] reset does not work on all robots
+[x] remove orientation sampling for rotational invariant shapes
+[x] bottle requires different planner because physics is different: innerouter vs. normal
+ 
+[x] add drawFace/drawEdge to terrain XML file
+[x] make objects transparent
+[x] sometimes [two nearby paths are not reduced], investigate that (update definition of equivalence first)
+[x] incorporate [sufficient conditions], visualize that nodes are feasible, use
+some interpolation to get shortest path in pocket
+[x] more challenging environments
+[x] orientation of capsule definitely not correct. needs investigating.
+[x] make a list of environments, their picture and what this environment is
+designed to show (+ who came up with the environment)
+[x] check if we can store personal information in a PD::Node during planning.  I.e. store sufficiency and maybe some other stuff there
+
+[x] going up does not remove SV
+[x] position goes through wall in L (uses triangle meshes and not hierarchy of
 primitives -> maybe we can remove the checker from klampt?)
- [x] PlannerInput -> AlgorithmInput
- [x] maxplanningtime not used in algorithm
- [x] visualize swath volume of onetopic covering
- [x] visualize roadmap plus edges by visualizing it as a dense swath volume
- [x] remove serialized tree once and for all
- [x] split fibrebundles up into checker and integrator. put them into subfolders. 
- [ ] new ViewTree to visualize a pathspace exploration
- [ ] multiple restarts of RRT produce same results. reseed!
- [ ] visualize a onetopic cover by a bunch of threads ?
- [ ] visualize a onetopic cover by all onetopically equivalent shortest paths
- [x] visualize necessary and sufficient vertices.
+[x] PlannerInput -> AlgorithmInput
+[x] maxplanningtime not used in algorithm
+[x] visualize swath volume of onetopic covering
+[x] visualize roadmap plus edges by visualizing it as a dense swath volume
+[x] remove serialized tree once and for all
+[x] split fibrebundles up into checker and integrator. put them into subfolders. 
+[x] visualize a onetopic cover by a bunch of threads ?
+[x] visualize necessary and sufficient vertices.
+[x] make benchmark for november 10th containing at least 5 algorithms and 5
+environments. Rigid bodies are OK for now.
+[x] write dae->tri converter
+[x] simplify final path and interpolate
+[x] replay motion, not only swept volume (OnIdle)
+[x] outsource all those individual cspaces
 
- [ ] computing onetopic cover including roadmap is too slow. How could we speed
- it up? Could we already include it in the sampling process?
- [x] make benchmark for november 10th containing at least 5 algorithms and 5
- environments. Rigid bodies are OK for now.
- [x] write dae->tri converter
- [x] simplify final path and interpolate
- [x] replay motion, not only swept volume (OnIdle)
- [x] outsource all those individual cspaces
-
-Minor Things
 [x] cspace: refactor cspace into separate classes
 [x] cspace: info print is horrible
-[ ] cspace: remove geometric and replace by namespace. remove cspace from filename?
-[ ] cspacefactory: constructor by string
-[ ] cspacefactory: include kcspace into cspace factor, and add string type to specify cspace type from the outside
-[ ] cspacefactory: refactor factory into one function, should encapsulate everything, no
-kcspace/cspaceompl stuff outside
-[ ] base: make some generic printing, using__CLASS__, __FILE__, etcetera
+[x] cspacefactory: include kcspace into cspace factor, and add string type to specify cspace type from the outside
+[x] cspacefactory: refactor factory into one function, should encapsulate everything, no kcspace/cspaceompl stuff outside
 [x] fix the chart boundary issue in visualizing the SE(2) roadmap
 [x] path: rewrite path to use ompl representations, only convert at Eval
-[ ] make colors changeable from XML
-
-SlicePlanner
+[x] make colors changeable from XML
 
 [x] MultiSlice should return PRM when only fed with one slice
 [x] multislice with priority queue
@@ -316,24 +296,20 @@ make hole bigger
 on graph!?)
 [x] enable benchmark (needs overhaul)
 [x] object touched obstacles during play path with multislice in SE(3)
-
-BENCHMARKING
-
- [x] ensure correct reset
- [x] output from sql database to cout
- [x] rename multislice -> QMP
- [x] prettify the output graphs:
-   [x] add horizontal line time-cut off
-   [x] add number of runs
-   [x] add seconds to time
-   [x] always start at zero
-   [x] visualize the solved instances divided by all
- [x] extensive benchmarking for some SE(3) examples
- [x] visualize all solved paths
- [ ] replay particular path (let me choose from all solution paths)
- [x] why do we get invalid paths?
- [x] catch error during benchmark with multislice, created zero nodes.
- [x] compare algorithms: RRTConnect, QMP (the classical, only sampling changed), QMPConnect (adjust also connect function), QMPSufficient (ignore sufficient edges), QMPNarrowPassage (analyse underlying graph structure, change sampling accordingly), QMPcsn (all together)
+[x] ensure correct reset
+[x] output from sql database to cout
+[x] rename multislice -> QMP
+[x] prettify the output graphs:
+ [x] add horizontal line time-cut off
+ [x] add number of runs
+ [x] add seconds to time
+ [x] always start at zero
+ [x] visualize the solved instances divided by all
+[x] extensive benchmarking for some SE(3) examples
+[x] visualize all solved paths
+[x] why do we get invalid paths?
+[x] catch error during benchmark with multislice, created zero nodes.
+[x] compare algorithms: RRTConnect, QMP (the classical, only sampling changed), QMPConnect (adjust also connect function), QMPSufficient (ignore sufficient edges), QMPNarrowPassage (analyse underlying graph structure, change sampling accordingly), QMPcsn (all together)
 
 [x] invalid start state on Xshape -> maybe bigger problem with converting
 ompl->klampt!? (nope, this should affect other planners too)
@@ -352,8 +328,6 @@ anything else from the roadmap class)
 [x] swept volume uses the wrong robot index (make this available directly in
 path_pwl.h)
 [x] identify narrow passage on graph (high priority)
-[ ] abstract class SimTestGUI overwrites hotkey assignment, remove that
-
 [x] make button to visualize the drawPoser routines
 [x] filtration involving SE3RN subspaces not working
 [x] Robot Manipulator
@@ -374,15 +348,7 @@ of the cover
 [x] sampling nearby from a gaussian distribution on SO(3) in OMPL is likely wrong,
 sometimes i get an unnormalized quaternion back when i sample with a high
 stddev. Look into that.
-
 [x] remove the visualization of the bounding box for focus view
-[ ] need remove dependency to SimTestGUI so we can manipulate the unneccessary GUI
-elements
-[ ] enable component hotkeys (C-s,S-p)
-[ ] automate the OnCommand method to automatically switch/case through all
-variables inside the state and toggle them.
-
-
 [x] do randomBounceMotion, but constrained to graph!needs probably rewrite of
 expandRoadmap
 [x] do not sample random edge (RE), but random node-edge (RNE). RNE samples a
@@ -390,11 +356,6 @@ node at random, and then sample an edge at random from all the incoming edges of
 the node. RE has a bias
 towards vertices with high in_degree, while RNE does not. It has been reported
 that a hybrid approach works well, where we sample p*RNE+(1-p)*RE with p=0.8.
-[ ] check out what is the best way to sample a graph. seems Edge Sampling is
-suboptimal. Better use something more sophisticated like Random Walk or Forest Fire
-Papers:
-Sampling from Large Graphs
-A Survey and Taxonomy of Graph Sampling
 
 [x] too many random walks start at vertex 0, why is that? -> nan values in pdf
 [x] visualize connectivity of roadmap components (each component different
@@ -418,36 +379,47 @@ step!?)
 
 KINODYNAMIC PLANNING
 [x] do bullet with kRRT
+[x] do not allocate new state in propagate function
 [ ] implement propagate, but never use Config
 [ ] do integration via ODESolver::ODE functionality (not quite possible, the
 force are coming from Klampt eventually)
-[x] do not allocate new state in propagate function
 [ ] understand rigid body motion in arbitrary force field. how can we simulate
 the body?
 [ ] do integration using force fields
-
-
-Directions to go: 
-(1) Kinodynamic Constraints -> needs devising of interesting experiments, like
-nonholonomic constraints, or some non-statically stable systems.
-  -- needs ability to integrate using real forces
-  -- needs ability to simulate forward correctly (there should not be any discrepancy)
-(2) Improve upon geometric planner, by computing neighbordhoods and/or critical
-points
-(3) Make experiments to compare kRRT and RRT+Deform (compare them both)
-(4) Later: compare kRRT, RRT+Deform, kPRM on Quotient spaces, QPM+Deform
-
-
 [ ] rocket launch is too difficult for kompl to be solved. devise simpler experiment.
 [ ] manipulation with ultra complex hand, such that QS approach will get
 highlighted. Maybe even add some clutter/debris.
 [ ] clip FF at O boundaries
-
 [ ] get obstacle informations from world
-
-
 [ ] think about ways to get T(X.xml)<1. 
    --- Symmetry of regions (seems to be unique to X).
    --- Critical points (CP) characterizing important boundaries of the manifold.
 might be hard to compute explicitly
    --- 
+[ ] plan path, then play path in simulation using controller
+
+[ ] color each planner. Have one button to execute each planner in a seperate
+thread. Once finished, return the path and visualize the highest layer path in
+the corresponding color of that planner.
+[ ] make planner run on separate threads
+[ ] it would be nice to repeat an algorithm N times, and visualize the solution paths.
+[ ] more sophisticated [graph visualization]; using viewpoint to get fixed 3d position
+[ ] new ViewTree to visualize a pathspace exploration
+[ ] multiple restarts of RRT produce same results. reseed!
+[ ] cspace: remove geometric and replace by namespace. remove cspace from filename?
+[ ] base: make some generic printing, using__CLASS__, __FILE__, etcetera
+[ ] simulator crash if forces are too high and selfcollision is enabled ---
+happens if we apply a force which overcomes the self-collision and creates
+overlapping meshes. solution: avoid forces higher than ?? or increase
+self-collision forces?
+[ ] reset: crash when plotting joint values
+[ ] retreat simulation
+ 
+
+[ ] need remove dependency to SimTestGUI so we can manipulate the unneccessary GUI
+elements
+[ ] enable component hotkeys (C-s,S-p)
+[ ] automate the OnCommand method to automatically switch/case through all
+variables inside the state and toggle them.
+[ ] abstract class SimTestGUI overwrites hotkey assignment, remove that
+

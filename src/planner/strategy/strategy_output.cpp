@@ -62,24 +62,39 @@ std::vector<Config> StrategyOutput::PathGeometricToConfigPath(og::PathGeometric 
 ob::PathPtr StrategyOutput::getShortestPathOMPL(){
 
   ob::PathPtr path = pdef->getSolutionPath();
+  if(cspace->isDynamic()){
+    oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+    cpath.interpolate();
+    oc::Control *ctrl = cpath.getControl(0);
+    const oc::RealVectorControlSpace::ControlType *R = ctrl->as<oc::RealVectorControlSpace::ControlType*>();
+    uint N = cspace->GetControlDimensionality();
+    std::cout << "CONTROLS" << std::endl;
+    for(uint k = 0; k < N; k++){
+      std::cout << R[k] << std::endl;
+    }
+    exit(0);
 
-  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-  gpath.interpolate();
 
-  og::PathSimplifier shortcutter(pdef->getSpaceInformation());
-  shortcutter.simplifyMax(gpath);
-  shortcutter.smoothBSpline(gpath);
+  }else{
 
-  bool valid = false;
-  uint ctr = 0;
+    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+    gpath.interpolate();
 
-  while((!valid) && (ctr++ < 5)){
-    const std::pair<bool, bool> &p = gpath.checkAndRepair(10);
-    valid = p.second;
-  }
+    og::PathSimplifier shortcutter(pdef->getSpaceInformation());
+    shortcutter.simplifyMax(gpath);
+    shortcutter.smoothBSpline(gpath);
 
-  if(!gpath.check()){
-    std::cout << "WARNING: path is not valid. Unsuccessfully tried to repair it for " << ctr-1 << " iterations." << std::endl;
+    bool valid = false;
+    uint ctr = 0;
+
+    while((!valid) && (ctr++ < 5)){
+      const std::pair<bool, bool> &p = gpath.checkAndRepair(10);
+      valid = p.second;
+    }
+
+    if(!gpath.check()){
+      std::cout << "WARNING: path is not valid. Unsuccessfully tried to repair it for " << ctr-1 << " iterations." << std::endl;
+    }
   }
 
   return path;

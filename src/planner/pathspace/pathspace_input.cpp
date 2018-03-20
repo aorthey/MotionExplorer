@@ -48,6 +48,7 @@ const CSpaceInput& PathSpaceInput::GetCSpaceInput()
   cin->fixedBase = fixedBase;
   cin->uMin = uMin;
   cin->uMax = uMax;
+  cin->kinodynamic = kinodynamic;
   return *cin;
 }
 const StrategyInput& PathSpaceInput::GetStrategyInput()

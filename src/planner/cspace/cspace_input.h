@@ -7,4 +7,5 @@ struct CSpaceInput{
   Config uMin;
   Config uMax;
   bool fixedBase{false};
+  bool kinodynamic{false};
 };

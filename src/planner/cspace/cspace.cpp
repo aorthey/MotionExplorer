@@ -78,6 +78,8 @@ uint CSpaceOMPL::GetControlDimensionality() const{
 }
 void CSpaceOMPL::SetCSpaceInput(const CSpaceInput &input_){
   input = input_;
+  kinodynamic = input.kinodynamic;
+  fixedBase = input.fixedBase;
 }
 Robot* CSpaceOMPL::GetRobotPtr(){
   return robot;
@@ -91,6 +93,15 @@ CSpace* CSpaceOMPL::GetCSpacePtr(){
 const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr()
 {
   return StateValidityCheckerPtr(SpaceInformationPtr());
+}
+bool CSpaceOMPL::isDynamic(){
+  return kinodynamic;
+}
+bool CSpaceOMPL::isFixedBase(){
+  return fixedBase;
+}
+bool CSpaceOMPL::isFreeFloating(){
+  return !fixedBase;
 }
 
 Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
