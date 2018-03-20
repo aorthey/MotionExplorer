@@ -96,6 +96,11 @@
     <key>s</key>
   </hotkey>
   <hotkey>
+    <name>simulate_controller</name>
+    <key>C</key>
+  </hotkey>
+
+  <hotkey>
     <name>advance</name>
     <descr>Advance by one step</descr>
     <key>a</key>

@@ -20,24 +20,96 @@ PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
 PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_):
   cspace(cspace_), path(p_), path_raw(p_)
 {
-  std::cout << "interpolating" << std::endl;
-  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-  gpath.interpolate();
-  std::cout << "done" << std::endl;
+  if(!cspace->isDynamic()){
+    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
 
-  length = gpath.length();
-  std::vector<ob::State *> states = gpath.getStates();
+    length = gpath.length();
+    std::vector<ob::State *> states = gpath.getStates();
 
-  for(uint k = 0; k < states.size()-1; k++){
-    ob::State *s0 = states.at(k);
-    ob::State *s1 = states.at(k+1);
-    interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
+    for(uint k = 0; k < states.size()-1; k++){
+      ob::State *s0 = states.at(k);
+      ob::State *s1 = states.at(k+1);
+      interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
+    }
+
+    path = std::make_shared<og::PathGeometric>(gpath);
+  }else{
+    oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+
+    length = cpath.length();
+    std::vector<ob::State *> states = cpath.getStates();
+
+    for(uint k = 0; k < states.size()-1; k++){
+      ob::State *s0 = states.at(k);
+      ob::State *s1 = states.at(k+1);
+      interLength.push_back(cpath.getSpaceInformation()->distance(s0,s1));
+    }
+
+    path = std::make_shared<oc::PathControl>(cpath);
+  }
+}
+
+void PathPiecewiseLinear::SendToController(SmartPointer<RobotController> controller)
+{
+  if(!cspace->isDynamic()){
+    std::cout << "Path is not dynamic, cannot access torques" << std::endl;
+    return;
   }
 
-  path = std::make_shared<og::PathGeometric>(gpath);
-  std::cout << "states : " << states.size() << std::endl;
-  std::cout << "interLengths : " << interLength.size() << std::endl;
+  std::vector<string> cmds = controller->Commands();
+  for(uint k = 0; k < cmds.size(); k++){
+    std::cout << cmds.at(k) << std::endl;
+  }
+  oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+  
+  std::vector<oc::Control*> controls = cpath.getControls();
+
+  uint N = cspace->GetControlDimensionality();
+  for(uint k = 0; k < controls.size(); k++){
+    const oc::RealVectorControlSpace::ControlType *Rctrl = controls.at(k)->as<oc::RealVectorControlSpace::ControlType>();
+    stringstream qstr;
+    qstr << N << "  ";
+    for(uint i = 0; i < N; i++){
+      qstr<< Rctrl->values[i] << " ";
+    }
+    string cmd( (k<=0)?("set_torque_control"):("append_torque_control") );
+    if(!controller->SendCommand(cmd,qstr.str())) {
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << "ERROR in controller commander" << std::endl;
+      std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
+      std::cout << std::string(80, '-') << std::endl;
+      throw "Controller command not supported!";
+    }
+  }
+
 }
+// -void MotionPlanner::SendCommandStringController(string cmd, string arg)
+// -{
+// -  if(!_sim->robotControllers[_icontroller]->SendCommand(cmd,arg)) {
+// -    std::cout << std::string(80, '-') << std::endl;
+// -    std::cout << "ERROR in controller commander" << std::endl;
+// -    std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
+// -    std::cout << std::string(80, '-') << std::endl;
+// -    throw "Controller command not supported!";
+ // }
+// -bool MotionPlanner::SendToController()
+// -{
+// -  if(!_isSolved){ return false; }
+ 
+// -  double dstep = 0.1;
+// -  Config q;
+// -  Config dq;
+// -  for(int i = 0; i < _keyframes.size()-1; i++){
+// -    //_path.Evaluate(d, q, dq);
+// -    q = _keyframes.at(i);
+// -    Config q2 = _keyframes.at(i+1);
+// -    double dt = 1.0/_keyframes.size();
+// -    dq = (q-q2)/dt;
+// -    stringstream qstr;
+// -    qstr<<q<<dq;
+// -    string cmd( (i<=0)?("set_qv"):("append_qv") );
+// -    SendCommandStringController(cmd,qstr.str());
+
 
 void PathPiecewiseLinear::Smooth(){
   if(!path) return;

@@ -7,7 +7,7 @@
     <!-- <radial source="1 -1.2 2" power="+5" radius="5" color="1 0 1"/> -->
     <!-- <radial source="1 +1.5 2" power="-5" radius="5" color="1 0 1"/> -->
     <!-- <drag viscosity="0.5" color="1 0 1"/> --> 
-    <!-- <uniform force="0 0 -1" color="0 0 0"/> --> 
+    <uniform force="0 0 0" color="0 0 0"/> 
   </forcefield>
 
   <plannerinput>

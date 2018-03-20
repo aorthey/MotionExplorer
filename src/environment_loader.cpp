@@ -103,18 +103,18 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
         exit(1);
       }
 
-      // robot->q = q_init;
-      // robot->q.resize(N);
-      // robot->UpdateFrames();
+      robot->q = q_init;
+      robot->q.resize(N);
+      robot->UpdateFrames();
 
-      // //set oderobot to planner start pos
-      // ODERobot *simrobot = _backend->sim.odesim.robot(ridx);
-      // simrobot->SetConfig(q_init);
-      // simrobot->SetVelocities(dq_init);
+      //set oderobot to planner start pos
+      ODERobot *simrobot = _backend->sim.odesim.robot(ridx);
+      simrobot->SetConfig(q_init);
+      simrobot->SetVelocities(dq_init);
 
-      // robot->q = q_goal;
-      // robot->q.resize(N);
-      // robot->UpdateFrames();
+      robot->q = q_goal;
+      robot->q.resize(N);
+      robot->UpdateFrames();
 
       //set other nested robots
       for(uint k = 0; k < pin.inputs.at(0)->robot_idxs.size(); k++){
@@ -135,6 +135,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       if(pin.inputs.at(0)->kinodynamic){
         LoadController(robot, *pin.inputs.at(0));
       }
+      util::SetSimulatedRobot(robot, _backend->sim, pin.inputs.at(0)->q_init, pin.inputs.at(0)->dq_init);
     }else{
       std::cout << std::string(80, '-') << std::endl;
       std::cout << "No Planner Settings. No Planning" << std::endl;
@@ -145,6 +146,8 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       ODERobot *simrobot = _backend->sim.odesim.robot(i);
       simrobot->EnableSelfCollisions(true);
     }
+
+
   }
 
   _backend->wrenchfield.Load(file_name.c_str());

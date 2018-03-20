@@ -2,12 +2,18 @@
 #include <KrisLibrary/utils/stringutils.h>
 
 namespace util{
-  void SetSimulatedRobot( Robot *robot, WorldSimulation &sim, Config &q)
+  void SetSimulatedRobot( Robot *robot, WorldSimulation &sim, const Config &q)
+  {
+    Config dq(q); dq.setZero();
+    SetSimulatedRobot( robot, sim, q, dq);
+  }
+  void SetSimulatedRobot( Robot *robot, WorldSimulation &sim, const Config &q, const Config &dq)
   {
     robot->UpdateConfig(q);
     int robotidx = 0;
     ODERobot *simrobot = sim.odesim.robot(robotidx);
     simrobot->SetConfig(q);
+    simrobot->SetVelocities(dq);
   }
 
 

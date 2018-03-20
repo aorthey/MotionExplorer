@@ -65,16 +65,6 @@ ob::PathPtr StrategyOutput::getShortestPathOMPL(){
   if(cspace->isDynamic()){
     oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
     cpath.interpolate();
-    oc::Control *ctrl = cpath.getControl(0);
-    const oc::RealVectorControlSpace::ControlType *R = ctrl->as<oc::RealVectorControlSpace::ControlType*>();
-    uint N = cspace->GetControlDimensionality();
-    std::cout << "CONTROLS" << std::endl;
-    for(uint k = 0; k < N; k++){
-      std::cout << R[k] << std::endl;
-    }
-    exit(0);
-
-
   }else{
 
     og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);

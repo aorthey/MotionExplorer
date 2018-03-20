@@ -25,7 +25,6 @@ class KinodynamicCSpaceOMPL: public GeometricCSpaceOMPL
     virtual Config OMPLStateToVelocity(const ob::State *qompl);
 
     //virtual ob::ScopedState<> ConfigVelocityToOMPLState(const Config &q, const Config &dq);
-
     virtual ob::SpaceInformationPtr SpaceInformationPtr() override;
 
   //protected:

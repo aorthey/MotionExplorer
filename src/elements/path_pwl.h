@@ -16,6 +16,7 @@ namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
 class CSpaceOMPL;
+class RobotController;
 
 class PathPiecewiseLinear
 {
@@ -44,6 +45,8 @@ class PathPiecewiseLinear
     bool Save(const char *fn);
     bool Save(TiXmlElement* node);
     friend std::ostream& operator<< (std::ostream& out, const PathPiecewiseLinear& pwl);
+
+    void SendToController(SmartPointer<RobotController> controller);
 
   protected:
     double length{0};

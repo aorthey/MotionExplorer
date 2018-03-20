@@ -13,7 +13,9 @@ namespace util {
   std::string GetCurrentDateTimeString();
   void PrintCurrentTime();
 
-  void SetSimulatedRobot( Robot *robot, WorldSimulation &sim, Config &q);
+  void SetSimulatedRobot( Robot *robot, WorldSimulation &sim, const Config &q);
+  void SetSimulatedRobot( Robot *robot, WorldSimulation &sim, const Config &q, const Config &dq);
+
   std::string GetApplicationFolder();
   std::string GetDataFolder();
 

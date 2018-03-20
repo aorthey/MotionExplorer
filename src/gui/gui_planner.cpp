@@ -77,10 +77,16 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
       SendPauseIdle();
     }
   }else if(cmd=="simulate_controller"){
+    //get controls
+    MotionPlanner* planner = planners.at(active_planner);
+    path = planner->GetPath();
+    SmartPointer<RobotController> ctrl = sim.robotControllers[0];
+    path->SendToController(ctrl);
+
+    //activate simulation
     state("simulate").toggle();
     simulate = state("simulate").active;
     if(simulate) state("draw_robot").activate();
-    path = planner->GetPath();
 
   }else if(cmd=="save_current_path"){
     //state("save_current_path").activate();

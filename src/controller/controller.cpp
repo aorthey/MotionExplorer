@@ -87,7 +87,7 @@ void ControllerState::Reset(){
 ContactStabilityController::ContactStabilityController(Robot& robot) : RobotController(robot) {
 }
 ContactStabilityController::~ContactStabilityController() {}
-const char* ContactStabilityController::Type() const { return "ContactStabilityController"; }
+const char* ContactStabilityController::Type() const { return "SE3Controller"; }
 
 void ContactStabilityController::Reset() { 
   output.Reset();
@@ -111,7 +111,7 @@ const ControllerState& ContactStabilityController::GetControllerState() const {
 void ContactStabilityController::Update(Real dt) {
   //We'll put our code here: read from this->sensors, and write to this->command.
   //See Sensor.h and Command.h for details on these structures
-  //std::cout << "controller time " << time << " dt=" << dt << std::endl;
+  std::cout << "controller time " << time << " dt=" << dt << std::endl;
 
   Vector qcmd,vcmd;
   Vector qactual,vactual;
@@ -166,6 +166,7 @@ bool ContactStabilityController::SendCommand(const string& name,const string& st
     AppendTorqueAndTime(torque_and_time);
     ZeroTorque = torques.back();
     ZeroTorque.setZero();
+    SetTorqueCommand(ZeroTorque);
     overall_time = times.back();
     return true;
   }else if(name == "append_torque_control") {
@@ -188,10 +189,6 @@ void ContactStabilityController::AppendTorqueAndTime( Vector &torque_and_time )
   Vector torque(torque_tmp);
   torques.push_back(torque);
   times.push_back(torque_and_time(torque_and_time.size()-1));
-  // std::cout << torque_and_time << std::endl;
-  // std::cout << torque << std::endl;
-  // std::cout << "time:" << times.back() << std::endl;
-  // exit(0);
 }
 
 vector<string> ContactStabilityController::Commands() const
@@ -201,11 +198,5 @@ vector<string> ContactStabilityController::Commands() const
   res.push_back("set_torque_control");
   res.push_back("append_torque_control");
   res.push_back("brake");
-  // std::cout << std::string(80, '-') << std::endl;
-  // std::cout << "Controller Commands:" << std::endl;
-  // for(uint i = 0; i < res.size(); i++){
-  //   std::cout << res.at(i) << std::endl;
-  // }
-  // std::cout << std::string(80, '-') << std::endl;
   return res;
 }
