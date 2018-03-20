@@ -120,6 +120,35 @@ void MotionPlanner::Expand(){
     }
   }
   UpdateHierarchy();
+
+
+// -void MotionPlanner::SendCommandStringController(string cmd, string arg)
+// -{
+// -  if(!_sim->robotControllers[_icontroller]->SendCommand(cmd,arg)) {
+// -    std::cout << std::string(80, '-') << std::endl;
+// -    std::cout << "ERROR in controller commander" << std::endl;
+// -    std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
+// -    std::cout << std::string(80, '-') << std::endl;
+// -    throw "Controller command not supported!";
+ // }
+// -bool MotionPlanner::SendToController()
+// -{
+// -  if(!_isSolved){ return false; }
+ 
+// -  double dstep = 0.1;
+// -  Config q;
+// -  Config dq;
+// -  for(int i = 0; i < _keyframes.size()-1; i++){
+// -    //_path.Evaluate(d, q, dq);
+// -    q = _keyframes.at(i);
+// -    Config q2 = _keyframes.at(i+1);
+// -    double dt = 1.0/_keyframes.size();
+// -    dq = (q-q2)/dt;
+// -    stringstream qstr;
+// -    qstr<<q<<dq;
+// -    string cmd( (i<=0)?("set_qv"):("append_qv") );
+// -    SendCommandStringController(cmd,qstr.str());
+
 }
 
 void MotionPlanner::Collapse(){

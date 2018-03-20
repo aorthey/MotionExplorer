@@ -69,84 +69,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       //break;
     }
 
-    Robot *robot = world.robots[0];
-
-
-    bool addSE3drivers = false;
-    if(addSE3drivers){
-      std::cout << "Adding free float driver to robot " << name_robot << std::endl;
-      vector<string>* driverNames = &robot->driverNames;
-      vector<RobotJointDriver>* drivers = &robot->drivers;
-
-      RobotJointDriver translation[3], rotation[3];
-
-      //TODO read any jet propulsion mechanisms directly from XML (i.e. add jet
-      //propulsion while specifying robot urdf)
-      // Rotation is eulerangles ZYX
-
-      for(int i = 2; i >= 0; i--){
-        rotation[i].type = RobotJointDriver::Rotation;
-        rotation[i].linkIndices.push_back(i+3);
-        rotation[i].linkIndices.push_back(5);
-        rotation[i].qmin = -dInf;
-        rotation[i].qmax = dInf;
-        rotation[i].vmin = -dInf;
-        rotation[i].vmax = dInf;
-        rotation[i].tmin = -dInf;
-        rotation[i].tmax = dInf;
-        rotation[i].amin = -dInf;
-        rotation[i].amax = dInf;
-        rotation[i].servoP = 0;
-        rotation[i].servoI = 0;
-        rotation[i].servoD = 0;
-        rotation[i].dryFriction = 0;
-        rotation[i].viscousFriction = 0;
-        drivers->insert(drivers->begin(), rotation[i]);
-        std::string dName = "rotation e"+to_string(i);
-        driverNames->insert(driverNames->begin(), dName.c_str());
-      }
-      for(int i = 2; i >= 0; i--){
-        translation[i].type = RobotJointDriver::Translation;
-        translation[i].linkIndices.push_back(i);
-        translation[i].linkIndices.push_back(5);
-        translation[i].qmin = -dInf;
-        translation[i].qmax = dInf;
-        translation[i].vmin = -dInf;
-        translation[i].vmax = dInf;
-        translation[i].tmin = -dInf;
-        translation[i].tmax = dInf;
-        translation[i].amin = -dInf;
-        translation[i].amax = dInf;
-        translation[i].servoP = 0;
-        translation[i].servoI = 0;
-        translation[i].servoD = 0;
-        translation[i].dryFriction = 0;
-        translation[i].viscousFriction = 0;
-        drivers->insert(drivers->begin(), translation[i]);
-        std::string dName = "translation e"+to_string(i);
-        driverNames->insert(driverNames->begin(), dName.c_str());
-      }
-
-      //  nd = (int) drivers.size();
-      SmartPointer<RobotController> controller = new ContactStabilityController(*robot);
-      RobotControllerFactory::Register("ContactStabilityController", controller);
-      _backend->sim.SetController(0, controller);
-
-      //reinit robot such that drivers are copied to actuators (so we can use them in Command)
-      _backend->sim.controlSimulators[0].Init(robot, _backend->sim.odesim.robot(0), _backend->sim.robotControllers[0]);
-
-      std::cout << std::string(80, '-') << std::endl;
-      std::cout << "LOADED CONTACTSTABILITYCONTROLLER" << std::endl;
-      std::cout << std::string(80, '-') << std::endl;
-    }
-
-    SmartPointer<RobotController> controller = new ContactStabilityController(*robot);
-    RobotControllerFactory::Register("ContactStabilityController", controller);
-    _backend->sim.SetController(0, controller);
-    _backend->sim.controlSimulators[0].Init(robot, _backend->sim.odesim.robot(0), _backend->sim.robotControllers[0]);
-
-    //info(&world);
-    //info(&(_backend->sim));
+    // Robot *robot = world.robots[0];
 
     if(pin.Load(file_name.c_str())){
 
@@ -208,6 +131,10 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
           rk->qMax[i] = pin.inputs.at(0)->se3max[i];
         }
       }
+
+      if(pin.inputs.at(0)->kinodynamic){
+        LoadController(robot, *pin.inputs.at(0));
+      }
     }else{
       std::cout << std::string(80, '-') << std::endl;
       std::cout << "No Planner Settings. No Planning" << std::endl;
@@ -224,3 +151,70 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
   _backend->wrenchfield.print();
 
 }
+void EnvironmentLoader::LoadController(Robot *robot, const PlannerInput &pin)
+{
+  std::cout << "Adding free float driver to robot " << name_robot << std::endl;
+  vector<string>* driverNames = &robot->driverNames;
+  vector<RobotJointDriver>* drivers = &robot->drivers;
+
+  RobotJointDriver translation[3], rotation[3];
+
+  // Rotation is eulerangles ZYX
+
+  Config uMin = pin.uMin;
+  Config uMax = pin.uMax;
+
+  for(int i = 2; i >= 0; i--){
+    rotation[i].type = RobotJointDriver::Rotation;
+    rotation[i].linkIndices.push_back(i+3);
+    rotation[i].linkIndices.push_back(5);
+    rotation[i].qmin = -dInf;
+    rotation[i].qmax = dInf;
+    rotation[i].vmin = -dInf;
+    rotation[i].vmax = dInf;
+    rotation[i].tmin = -dInf;
+    rotation[i].tmax = dInf;
+    rotation[i].amin = uMin(i+3);
+    rotation[i].amax = uMax(i+3);
+    rotation[i].servoP = 0;
+    rotation[i].servoI = 0;
+    rotation[i].servoD = 0;
+    rotation[i].dryFriction = 0;
+    rotation[i].viscousFriction = 0;
+    drivers->insert(drivers->begin(), rotation[i]);
+    std::string dName = "rotation e"+to_string(i);
+    driverNames->insert(driverNames->begin(), dName.c_str());
+  }
+  for(int i = 2; i >= 0; i--){
+    translation[i].type = RobotJointDriver::Translation;
+    translation[i].linkIndices.push_back(i);
+    translation[i].linkIndices.push_back(5);
+    translation[i].qmin = -dInf;
+    translation[i].qmax = dInf;
+    translation[i].vmin = -dInf;
+    translation[i].vmax = dInf;
+    translation[i].tmin = -dInf;
+    translation[i].tmax = dInf;
+    // translation[i].amin = -dInf;
+    // translation[i].amax = dInf;
+    translation[i].amin = uMin(i);
+    translation[i].amax = uMax(i);
+    translation[i].servoP = 0;
+    translation[i].servoI = 0;
+    translation[i].servoD = 0;
+    translation[i].dryFriction = 0;
+    translation[i].viscousFriction = 0;
+    drivers->insert(drivers->begin(), translation[i]);
+    std::string dName = "translation e"+to_string(i);
+    driverNames->insert(driverNames->begin(), dName.c_str());
+  }
+
+  //  nd = (int) drivers.size();
+  SmartPointer<RobotController> controller = new ContactStabilityController(*robot);
+  RobotControllerFactory::Register("SE3Controller", controller);
+  _backend->sim.SetController(0, controller);
+
+  //reinit robot such that drivers are copied to actuators (so we can use them in Command)
+  _backend->sim.controlSimulators[0].Init(robot, _backend->sim.odesim.robot(0), _backend->sim.robotControllers[0]);
+}
+

@@ -63,31 +63,29 @@ Just use KinodynamicMilestonePath instead of MultiPath!
  [x] find distance to goal for planner output OMPL (how approximate is the solution)
  [x] toggle mesh/faces of objects with keyboard
  [x] add edges to planner tree visualization
- [ ] Button to save/load GUI state including Motion Planning Equipment
  [ ] solve IK for arbitrary rob-env contact points
  [ ] grasp an actual object
  [ ] sample grasps for object and compute IK (findGrasp method)
  [ ] make/break contact events => compute transition paths
  [ ] execute transition paths 
- [ ] change viewpoint internally
+ [x] change viewpoint internally
  [ ] Compute Force Closure Grasp from points
  [ ] Compute SE constraints, what is GIWC equivalent?
  [x] smoothing after path planning
  [x] refactor kinodynamic planner to make it independent from path planner
  [x] decompose GUI into sweptvolumeGUI and forcefieldGUI 
- [ ] save all swept volumes when saving GUI, rewrite all Load/Save functions
+ [x] save all swept volumes when saving GUI, rewrite all Load/Save functions
  [x] refactor planner -> use PlannerOutput to store path/roadmap and use
 PlannerOutput as Input to GUI to shadow the internal things. Also put the
 plannersettings into the xml, so that we can load planner+start/goal config
 without recompiling. Delete the whole plannersetup folder!
  [ ] update to klampt-0.7
  [ ] visualize wrench cone at contact
- [ ] restructure GUI to use GUIVariables
+ [x] restructure GUI to use GUIVariables
 
 
-
--- irreducible
- [ ] create pathspace which computes irreducible paths
+[ ] create pathspace which computes irreducible paths
+[ ] Button to save/load GUI state including Motion Planning Equipment
 
 -- abstractions (longterm goals)
 
@@ -118,7 +116,7 @@ display tree/start/goal/swept volumes, do planning
 
 -- wrench fields
 
- [ ] read Randomized path planning on vector fields
+
  [x] create arbitrary force fields in ODE simulator
  [x] create force field visualization and visualize its effect on each link
  [x] add arrows to visualize flow of power
@@ -134,6 +132,7 @@ COM should retain orientation equal to origin so that we can see forces from
  [x] add custom controller loop 
  [x] visualize force ellipsoid at each point
  [x] simulate snake, make sure there are no glitches
+ [ ] read Randomized path planning on vector fields
  [ ] enable velocity induced FF, drag force, magnetic force, etc
  [ ] apply force to rigidObjects and other robots in the scene
  [ ] composite force fields: intersection and union
@@ -167,7 +166,7 @@ COM should retain orientation equal to origin so that we can see forces from
    [x] outsource duration time, algorithm name and epsilon goal (xml plannersettings)
    [x] put geometricOMPLcspace together with principal fibre bundle, do the same for kinodynamic
    [ ] ** flow following by forward simulating a PID controlled device
-   [ ] OMPL_SPACE remove hardcoded se3 vector fields (and put them into xml, urdf or so)
+   [x] OMPL_SPACE remove hardcoded se3 vector fields (and put them into xml, urdf or so)
    [ ] include FF in tangentbundle integrator
    [ ] *** do kinodynamic planning /w FF
    [ ] ** visualize path speed profile (reuse python display and display in topp)
@@ -207,7 +206,6 @@ self-collision forces?
  [x] have different numbers to highlight/show different planner outputs. This
 way we could build a hierarchical visualization
  [x] fix spider urdf
-
  [x] install SBL lib
  [x] compute homology groups (HG) of SC
  [x] make bottle planning possible
@@ -354,7 +352,6 @@ anything else from the roadmap class)
 [x] swept volume uses the wrong robot index (make this available directly in
 path_pwl.h)
 [x] identify narrow passage on graph (high priority)
-[ ] next planner select -> old path replay is not immediately updated
 [ ] abstract class SimTestGUI overwrites hotkey assignment, remove that
 
 [x] make button to visualize the drawPoser routines
@@ -399,7 +396,6 @@ Papers:
 Sampling from Large Graphs
 A Survey and Taxonomy of Graph Sampling
 
-
 [x] too many random walks start at vertex 0, why is that? -> nan values in pdf
 [x] visualize connectivity of roadmap components (each component different
 color)
@@ -409,7 +405,6 @@ color)
 into separate xml file (one setting for everything)
 [ ] benchmark.xml merge with planner.xml?
 [ ] openGL transparency does not work correctly with the bubbles
-
 
 QMP PLANNER
 [x] size of bubbles ok with one layer, but changes if another layer is added (is
@@ -421,12 +416,12 @@ URDF i could use?)
 [ ] need nice atlas/hrp4 scenario with grasping and leg movement (climbing
 step!?)
 
-
 KINODYNAMIC PLANNING
 [x] do bullet with kRRT
 [ ] implement propagate, but never use Config
-[ ] do integration via ODESolver::ODE functionality
-[ ] do not allocate new state in propagate function
+[ ] do integration via ODESolver::ODE functionality (not quite possible, the
+force are coming from Klampt eventually)
+[x] do not allocate new state in propagate function
 [ ] understand rigid body motion in arbitrary force field. how can we simulate
 the body?
 [ ] do integration using force fields
@@ -455,3 +450,4 @@ highlighted. Maybe even add some clutter/debris.
    --- Symmetry of regions (seems to be unique to X).
    --- Critical points (CP) characterizing important boundaries of the manifold.
 might be hard to compute explicitly
+   --- 

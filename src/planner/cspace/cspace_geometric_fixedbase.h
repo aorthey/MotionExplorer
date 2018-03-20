@@ -9,6 +9,7 @@ class GeometricCSpaceOMPLFixedBase: public GeometricCSpaceOMPL
     void Init();
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
     virtual Config OMPLStateToConfig(const ob::State *qompl);
+    virtual void print() const override;
   protected:
     uint N;
 };

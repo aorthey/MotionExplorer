@@ -2,7 +2,7 @@
 <world>
   <robot name="rocket" file="/home/aorthey/git/orthoklampt/data/robots/rocket.urdf"/>
   <terrain name="startramp" file="/home/aorthey/git/orthoklampt/data/terrains/rocket_ramp.tri" translation="0 0 0" rotateRPY="0 0 1.57">
-    <display color="0.7 0.7 0.7 0.5"/>
+     <display color="0.8 0.8 0.8 0.5" texture="checker" texture_projection="z"/> 
   </terrain>
 
   <forcefield>

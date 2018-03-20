@@ -54,5 +54,4 @@ class PathPiecewiseLinear
 
     ob::PathPtr path;
     ob::PathPtr path_raw;
-
 };

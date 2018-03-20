@@ -27,6 +27,8 @@ class EnvironmentLoader{
     PlannerBackendPtr GetBackendPtr();
     PlannerMultiInput GetPlannerInput();
 
+    void LoadController(Robot *robot, const PlannerInput &pin);
+
     static EnvironmentLoader from_args(int argc,const char** argv);
     EnvironmentLoader(const char *xml_file);
 

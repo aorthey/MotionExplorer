@@ -94,3 +94,10 @@ Config GeometricCSpaceOMPLFixedBase::OMPLStateToConfig(const ob::State *qompl){
   return q;
 
 }
+void GeometricCSpaceOMPLFixedBase::print() const
+{
+  std::cout << "Robot \"" << robot->name << "\":" << std::endl;
+  std::cout << "Dimensionality Space            :" << GetDimensionality() << std::endl;
+  std::cout << " Configuration Space (klampt) : " << (Nklampt>0?"xR^"+std::to_string(Nklampt):"") << "  [Klampt]"<< std::endl;
+  std::cout << " Configuration Space (ompl)   : " << (Nompl>0?"xR^"+std::to_string(Nompl):"") << "  [OMPL]" << std::endl;
+}

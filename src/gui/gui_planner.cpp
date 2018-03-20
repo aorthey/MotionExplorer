@@ -68,8 +68,6 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     GUIVariable &v = state("draw_cover_threshold");
     v.value = max(v.min, v.value - v.step);
 
-  // }else if(cmd=="draw_path_sweptvolume"){
-  //   state("draw_path_sweptvolume").toggle();
   }else if(cmd=="draw_play_path"){
     state("draw_play_path").toggle();
     simulate = 0;
