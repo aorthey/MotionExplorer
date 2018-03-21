@@ -120,8 +120,6 @@ void MotionPlanner::Expand(){
     }
   }
   UpdateHierarchy();
-
-
 }
 
 void MotionPlanner::Collapse(){

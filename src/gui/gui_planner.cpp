@@ -7,7 +7,6 @@ PlannerBackend::PlannerBackend(RobotWorld *world) :
 {
   active_planner=0;
   t = 0;
-  isPlanningInProcess = false;
 }
 
 void PlannerBackend::AddPlannerInput(PlannerMultiInput& _in){
@@ -28,10 +27,9 @@ void PlannerBackend::Start(){
 
 bool PlannerBackend::OnCommand(const string& cmd,const string& args){
 
-  if(isPlanningInProcess) return BaseT::OnCommand(cmd,args);
+  if(planners.empty()) return BaseT::OnCommand(cmd, args);
 
   stringstream ss(args);
-  if(planners.empty()) return BaseT::OnCommand(cmd, args);
   bool hierarchy_change = false;
   if(cmd=="hierarchy_next"){
     planners.at(active_planner)->Next();
@@ -80,13 +78,35 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     //get controls
     MotionPlanner* planner = planners.at(active_planner);
     path = planner->GetPath();
-    SmartPointer<RobotController> ctrl = sim.robotControllers[0];
-    path->SendToController(ctrl);
+    if(path){
+      SmartPointer<RobotController> ctrl = sim.robotControllers[0];
 
-    //activate simulation
-    state("simulate").toggle();
-    simulate = state("simulate").active;
-    if(simulate) state("draw_robot").activate();
+      path->SendToController(ctrl);
+
+      Config q = path->Eval(0);
+      Config dq = path->EvalVelocity(0);
+
+      //Robot* robot = &oderobot->robot;
+      ODERobot *oderobot = sim.odesim.robot(0);
+      oderobot->robot.q = q;
+      oderobot->robot.dq = dq;
+      oderobot->robot.UpdateDynamics();
+
+      oderobot->SetConfig(q);
+      oderobot->SetVelocities(dq);
+
+      Robot* robot = world->robots[0];
+      robot->q = q;
+      robot->dq = dq;
+      robot->UpdateDynamics();
+
+      //activate simulation
+      state("simulate").toggle();
+      simulate = state("simulate").active;
+      if(simulate) state("draw_robot").activate();
+    }else{
+      std::cout << "no active control path" << std::endl;
+    }
 
   }else if(cmd=="save_current_path"){
     //state("save_current_path").activate();
@@ -136,35 +156,30 @@ bool PlannerBackend::OnIdle(){
   bool res = BaseT::OnIdle();
   if(planners.empty()) return res;
 
-  if(isPlanningInProcess){
-
-
-  }else{
-    MotionPlanner* planner = planners.at(active_planner);
-    if(state("draw_play_path")){
-      if(t<=0){
-        path = planner->GetPath();
-      }
-      if(path){
-        double T = path->GetLength();
-        double tstep = planner->GetInput().pathSpeed*T/1000;
-        //std::cout << "play path: " << t << "/" << T << std::endl;
-        if(t>=T){
-          t=0;
-          SendPauseIdle();
-        }else{
-          t+=tstep;
-          SendRefresh();
-        }
-        if(state("draw_path_autofocus")){
-          Vector3 v = path->EvalVec3(t);
-          CenterCameraOn(v);
-        }
-      }
-      return true;
+  MotionPlanner* planner = planners.at(active_planner);
+  if(state("draw_play_path")){
+    if(t<=0){
+      path = planner->GetPath();
     }
-    if(state("simulate_controller")){
+    if(path){
+      double T = path->GetLength();
+      double tstep = planner->GetInput().pathSpeed*T/1000;
+      //std::cout << "play path: " << t << "/" << T << std::endl;
+      if(t>=T){
+        t=0;
+        SendPauseIdle();
+      }else{
+        t+=tstep;
+        SendRefresh();
+      }
+      if(state("draw_path_autofocus")){
+        Vector3 v = path->EvalVec3(t);
+        CenterCameraOn(v);
+      }
     }
+    return true;
+  }
+  if(state("simulate_controller")){
   }
   return res;
 

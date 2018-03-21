@@ -27,8 +27,6 @@ class PlannerBackend : public ForceFieldBackend
     virtual void RenderScreen();
     virtual bool OnIdle();
     void CenterCameraOn(const Vector3& v);
-
-    bool isPlanningInProcess{false};
 };
 
 

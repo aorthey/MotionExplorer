@@ -423,3 +423,14 @@ elements
 variables inside the state and toggle them.
 [ ] abstract class SimTestGUI overwrites hotkey assignment, remove that
 
+
+[x] robot should start at q_goal, not at q_init
+[x] all torques should be applied, not only the first one
+[ ] torques should be applied into the relative direction, not globally
+[ ] the resulting path should closely follow the geometric path
+[ ] actuators should be specified in urdf or somewhere together with the robot
+
+-- ompl control simulates a forward torque in relative x direction of the
+object. However, in the klampt simulator, we suddenly apply a global x
+direction, which leads to the unwanted behavior.
+

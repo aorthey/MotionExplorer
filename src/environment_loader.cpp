@@ -104,17 +104,13 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       }
 
       robot->q = q_init;
-      robot->q.resize(N);
+      robot->dq = dq_init;
       robot->UpdateFrames();
 
       //set oderobot to planner start pos
       ODERobot *simrobot = _backend->sim.odesim.robot(ridx);
       simrobot->SetConfig(q_init);
       simrobot->SetVelocities(dq_init);
-
-      robot->q = q_goal;
-      robot->q.resize(N);
-      robot->UpdateFrames();
 
       //set other nested robots
       for(uint k = 0; k < pin.inputs.at(0)->robot_idxs.size(); k++){

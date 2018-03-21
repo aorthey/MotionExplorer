@@ -26,13 +26,17 @@ class PathPiecewiseLinear
     PathPiecewiseLinear(ob::PathPtr p, CSpaceOMPL *cspace);
 
     Config Eval(const double t) const;
+    Config EvalVelocity(const double t) const;
+    //void EvalState(const double t, ob::State *s) const;
+    void EvalState(const double t) const;
+    Vector3 EvalVec3(const double t) const;
+    Config EvalMilestone(const int k) const;
+
     void Normalize(); // convert path length [0,L] -> [0,1]
     void Smooth();
 
     std::vector<double> GetLengthVector() const;
     double GetLength() const;
-    Vector3 EvalVec3(const double t) const;
-    Config EvalMilestone(const int k) const;
 
     GLColor cVertex{magenta}, cLine{magenta};
     double linewidth{10};

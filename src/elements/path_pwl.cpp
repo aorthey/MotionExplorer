@@ -1,5 +1,6 @@
 #include "elements/path_pwl.h"
 #include "planner/cspace/cspace.h"
+#include "planner/cspace/cspace_kinodynamic.h"
 #include "gui/drawMotionPlanner.h"
 #include <iostream>
 #include <ompl/base/spaces/SE3StateSpace.h>
@@ -161,6 +162,7 @@ Vector3 PathPiecewiseLinear::EvalVec3(const double t) const{
   Vector3 v = cspace->getXYZ(s.get());
   return v;
 }
+
 Config PathPiecewiseLinear::EvalMilestone(const int k) const{
   std::cout << "NYI" << std::endl;
   exit(0);
@@ -168,17 +170,25 @@ Config PathPiecewiseLinear::EvalMilestone(const int k) const{
   //if(k>Nkeyframes) return keyframes.back();
   //return keyframes.at(k);
 }
+
 Config PathPiecewiseLinear::Eval(const double t) const{
   if(!path){
     std::cout << "Cannot Eval empty path" << std::endl;
     exit(0);
   }
+
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-  ob::SpaceInformationPtr si = gpath.getSpaceInformation();
   std::vector<ob::State *> states = gpath.getStates();
 
-  if(t<=0) return cspace->OMPLStateToConfig(states.front());
-  if(t>=length) return cspace->OMPLStateToConfig(states.back());
+  ob::SpaceInformationPtr si = cspace->SpaceInformationPtr();
+
+  if(t<=0){
+    si->printState(states.front());
+    return cspace->OMPLStateToConfig(states.front());
+  }
+  if(t>=length){
+    return cspace->OMPLStateToConfig(states.back());
+  }
 
   double Tcum = 0;
 
@@ -189,14 +199,13 @@ Config PathPiecewiseLinear::Eval(const double t) const{
     if((Tcum+Tnext)>=t){
       //t \in [Lcum, Lcum+Lnext]
       double tloc = (t-Tcum)/Tnext; //tloc \in [0,1]
-
       ob::State* s1 = states.at(i);
       ob::State* s2 = states.at(i+1);
       ob::State* sm = si->allocState();
       si->getStateSpace()->interpolate(s1,s2,tloc,sm);
-      Config qm = cspace->OMPLStateToConfig(sm);
+      Config q = cspace->OMPLStateToConfig(sm);
       si->freeState(sm);
-      return qm;
+      return q;
     }
     Tcum+=Tnext;
   }
@@ -217,8 +226,115 @@ Config PathPiecewiseLinear::Eval(const double t) const{
 
   std::cout << "Eval could not find point for value " << t << std::endl;
   throw;
-}
 
+}
+Config PathPiecewiseLinear::EvalVelocity(const double t) const{
+  if(!cspace->isDynamic()) 
+  {
+    Config dq = cspace->GetRobotPtr()->dq;
+    dq.setZero();
+    return dq;
+  }
+
+  KinodynamicCSpaceOMPL *kspace = static_cast<KinodynamicCSpaceOMPL*>(cspace);
+
+  oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+  std::vector<ob::State *> states = cpath.getStates();
+
+  ob::SpaceInformationPtr si = cspace->SpaceInformationPtr();
+
+  if(t<=0){
+    return kspace->OMPLStateToVelocity(states.front());
+  }
+  if(t>=length){
+    return kspace->OMPLStateToVelocity(states.back());
+  }
+
+  double Tcum = 0;
+
+  assert(interLength.size()==states.size()-1);
+
+  for(uint i = 0; i < interLength.size(); i++){
+    double Tnext = interLength.at(i);
+    if((Tcum+Tnext)>=t){
+      //t \in [Lcum, Lcum+Lnext]
+      double tloc = (t-Tcum)/Tnext; //tloc \in [0,1]
+      ob::State* s1 = states.at(i);
+      ob::State* s2 = states.at(i+1);
+      ob::State* sm = si->allocState();
+      si->getStateSpace()->interpolate(s1,s2,tloc,sm);
+      Config q = kspace->OMPLStateToVelocity(sm);
+      si->freeState(sm);
+      return q;
+    }
+    Tcum+=Tnext;
+  }
+  //rounding errors could lead to the fact that the cumulative length is not
+  //exactly 1. If t is sufficiently close, we just return the last keyframe.
+  double epsilon = 1e-10;
+  if(length-Tcum > epsilon){
+    std::cout << "length of path is significantly different from " << length << std::endl;
+    std::cout << "length    : " << Tcum << "/" << length << std::endl;
+    std::cout << "difference: " << length-Tcum << " > " << epsilon << std::endl;
+    std::cout << "choosen t : " << t << std::endl;
+    throw;
+  }
+
+  if(t>=Tcum){
+    return kspace->OMPLStateToVelocity(states.back());
+  }
+
+  std::cout << "Eval could not find point for value " << t << std::endl;
+  throw;
+}
+  // if(!path){
+  //   std::cout << "Cannot Eval empty path" << std::endl;
+  //   exit(0);
+  // }
+  // og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+  // ob::SpaceInformationPtr si = cspace->SpaceInformationPtr();
+  // std::vector<ob::State *> states = gpath.getStates();
+
+  // if(t<=0) return cspace->OMPLStateToConfig(states.front());
+  // if(t>=length) return cspace->OMPLStateToConfig(states.back());
+
+  // double Tcum = 0;
+
+  // assert(interLength.size()==states.size()-1);
+
+  // for(uint i = 0; i < interLength.size(); i++){
+  //   double Tnext = interLength.at(i);
+  //   if((Tcum+Tnext)>=t){
+  //     //t \in [Lcum, Lcum+Lnext]
+  //     double tloc = (t-Tcum)/Tnext; //tloc \in [0,1]
+
+  //     ob::State* s1 = states.at(i);
+  //     ob::State* s2 = states.at(i+1);
+  //     ob::State* sm = si->allocState();
+  //     si->getStateSpace()->interpolate(s1,s2,tloc,sm);
+  //     Config qm = cspace->OMPLStateToConfig(sm);
+  //     si->freeState(sm);
+  //     return qm;
+  //   }
+  //   Tcum+=Tnext;
+  // }
+  // //rounding errors could lead to the fact that the cumulative length is not
+  // //exactly 1. If t is sufficiently close, we just return the last keyframe.
+  // double epsilon = 1e-10;
+  // if(length-Tcum > epsilon){
+  //   std::cout << "length of path is significantly different from " << length << std::endl;
+  //   std::cout << "length    : " << Tcum << "/" << length << std::endl;
+  //   std::cout << "difference: " << length-Tcum << " > " << epsilon << std::endl;
+  //   std::cout << "choosen t : " << t << std::endl;
+  //   throw;
+  // }
+
+  // if(t>=Tcum){
+  //   return cspace->OMPLStateToConfig(states.back());
+  // }
+
+  // std::cout << "Eval could not find point for value " << t << std::endl;
+  // throw;
 
 void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*_path);

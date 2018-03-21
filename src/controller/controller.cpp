@@ -111,7 +111,7 @@ const ControllerState& ContactStabilityController::GetControllerState() const {
 void ContactStabilityController::Update(Real dt) {
   //We'll put our code here: read from this->sensors, and write to this->command.
   //See Sensor.h and Command.h for details on these structures
-  std::cout << "controller time " << time << " dt=" << dt << std::endl;
+  //std::cout << "controller time " << time << " dt=" << dt << std::endl;
 
   Vector qcmd,vcmd;
   Vector qactual,vactual;
@@ -134,11 +134,11 @@ void ContactStabilityController::Update(Real dt) {
 
     uint ictr = 0;
     double t = 0;
-    while(t <= time && ictr<times.size()){
+    while(t <= time*0.1 && ictr<times.size()){
       t+= times.at(ictr++);
     }
     //std::cout << time << "::" << t << "::" << ictr << std::endl;
-    if(t>time){
+    if(t>time*0.1){
       Vector torque = torques.at(ictr-1);
       output.current_torque = torque;
     }else{
@@ -150,8 +150,8 @@ void ContactStabilityController::Update(Real dt) {
 
   //SetPIDCommand(qcmd,vcmd);
   //SetTorqueCommand(const Vector& torques);
-
   RobotController::Update(dt);
+
 }
 bool ContactStabilityController::SendCommand(const string& name,const string& str){
 

@@ -39,21 +39,21 @@ bool ForceFieldBackend::OnIdle()
 
   if(simulate) {
     sim.odesim.SetGravity(Vector3(0,0,0));
-    ODERobot *robot = sim.odesim.robot(active_robot);
-    uint Nlinks = robot->robot.links.size();
+    ODERobot *simrobot = sim.odesim.robot(active_robot);
+    uint Nlinks = simrobot->robot.links.size();
 
     sim.hooks.clear();
 
     for(uint i = 0; i < Nlinks; i++){
-      dBodyID bodyid = robot->body(i);
+      dBodyID bodyid = simrobot->body(i);
 
       if(bodyid){
-        if(!robot->robot.IsGeometryEmpty(i)){
+        if(!simrobot->robot.IsGeometryEmpty(i)){
           Vector3 com;
-          RobotLink3D *link = &robot->robot.links[i];
+          RobotLink3D *link = &simrobot->robot.links[i];
           link->GetWorldCOM(com);
           wrenchfield.setPosition(i, com);
-          Vector3 linmom = robot->robot.GetLinearMomentum(i);
+          Vector3 linmom = simrobot->robot.GetLinearMomentum(i);
           Vector3 force = wrenchfield.getForce(com, linmom/link->mass);
 
           //std::cout << "link " << i << " pos " << com << " force " << force << std::endl;
@@ -68,12 +68,12 @@ bool ForceFieldBackend::OnIdle()
     }
 
 
-    Vector3 com = robot->robot.GetCOM();
+    Vector3 com = simrobot->robot.GetCOM();
     //Real mass = robot->robot.GetTotalMass();
     //Matrix3 intertia = robot->robot.GetTotalInertia();
 
-    Vector3 LM = robot->robot.GetLinearMomentum();
-    Vector3 AM = robot->robot.GetAngularMomentum();
+    Vector3 LM = simrobot->robot.GetLinearMomentum();
+    Vector3 AM = simrobot->robot.GetAngularMomentum();
 
     wrenchfield.setCOMPosition(com);
     wrenchfield.setCOMLinearMomentum(LM);
@@ -162,12 +162,11 @@ void ForceFieldBackend::RenderWorld()
   if(state("draw_robot")){
     for(size_t i=0;i<world->robots.size();i++) {
       if(i!=active_robot) continue;
-      Robot *robot = world->robots[i];
-      Config q = robot->q;
-      //q.setZero();
-      robot->UpdateConfig(q);
-      robot->UpdateGeometry();
-      sim.odesim.robot(i)->SetConfig(q);
+      Robot *robot = &sim.odesim.robot(i)->robot;
+      // Config q = robot->q;
+      // robot->UpdateConfig(q);
+      // robot->UpdateGeometry();
+      // sim.odesim.robot(i)->SetConfig(q);
 
       //std::cout << robot->name << " selfcollisions:" << robot->SelfCollision() << std::endl;
       for(size_t j=0;j<robot->links.size();j++) {
@@ -199,50 +198,50 @@ void ForceFieldBackend::RenderWorld()
     }
   }
 
-  if(state("draw_center_of_mass_path")) GLDraw::drawCenterOfMassPathFromController(sim);
+  if(state("draw_com_path")) GLDraw::drawCenterOfMassPathFromController(sim);
   //if(state("draw_force_ellipsoid")) GLDraw::drawForceEllipsoid(oderobot);
   if(state("draw_forcefield")) wrenchfield.DrawGL(state);
   if(state("draw_axes")) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
   if(state("draw_axes_labels")) GLDraw::drawAxesLabels(viewport);
 
-  //############################################################################
-  // visualize applied torque
-  //############################################################################
-  // SmartPointer<ContactStabilityController>& controller = *reinterpret_cast<SmartPointer<ContactStabilityController>*>(&sim.robotControllers[0]);
-  // ControllerState output = controller->GetControllerState();
-  // Vector torque = output.current_torque;
+//############################################################################
+ //visualize applied torque
+//############################################################################
+ SmartPointer<ContactStabilityController>& controller = *reinterpret_cast<SmartPointer<ContactStabilityController>*>(&sim.robotControllers[0]);
+ ControllerState output = controller->GetControllerState();
+ Vector torque = output.current_torque;
 
-  // //Untested/Experimental Stuff
-  // if(state("draw_robot_driver")){
-  //   Vector T;
-  //   sim.controlSimulators[0].GetActuatorTorques(T);
+ //Untested/Experimental Stuff
+ if(state("draw_robot_driver")){
+   Vector T;
+   sim.controlSimulators[0].GetActuatorTorques(T);
 
-  //   Robot *robot = &sim.odesim.robot(0)->robot;
-  //   for(uint i = 0; i < robot->drivers.size(); i++){
-  //     RobotJointDriver driver = robot->drivers[i];
-  //     //############################################################################
-  //     if(driver.type == RobotJointDriver::Rotation){
-  //     }
-  //   //############################################################################
-  //     if(driver.type == RobotJointDriver::Translation){
-  //       uint didx = driver.linkIndices[0];
-  //       uint lidx = driver.linkIndices[1];
-  //       Frame3D Tw = robot->links[lidx].T_World;
-  //       Vector3 pos = Tw*robot->links[lidx].com;
-  //       Vector3 dir = Tw*robot->links[didx].w - pos;
+   Robot *robot = &sim.odesim.robot(0)->robot;
+   for(uint i = 0; i < robot->drivers.size(); i++){
+     RobotJointDriver driver = robot->drivers[i];
+     //############################################################################
+     if(driver.type == RobotJointDriver::Rotation){
+     }
+   //############################################################################
+     if(driver.type == RobotJointDriver::Translation){
+       uint didx = driver.linkIndices[0];
+       uint lidx = driver.linkIndices[1];
+       Frame3D Tw = robot->links[lidx].T_World;
+       Vector3 pos = Tw*robot->links[lidx].com;
+       Vector3 dir = Tw*robot->links[didx].w - pos;
 
-  //       dir = T(i)*dir/dir.norm();
+       dir = T(i)*dir/dir.norm();
 
-  //       double r = 0.05;
-  //       glPushMatrix();
-  //       //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(1,0.5,0,0.7));
-  //       glTranslate(pos);
-  //       drawCone(-dir,2*r,8);
-  //       glPopMatrix();
+       double r = 0.05;
+       glPushMatrix();
+       //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(1,0.5,0,0.7));
+       glTranslate(pos);
+       drawCone(-dir,2*r,8);
+       glPopMatrix();
 
-  //     }
-  //   }
-  // }
+     }
+   }
+ }
 
 }//RenderWorld
  
@@ -363,7 +362,8 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="simulate"){
     state("simulate").toggle();
     simulate = state("simulate").active;
-    if(simulate) state("draw_robot").activate();
+    state("draw_robot").activate();
+
   }else if(cmd=="reset"){
     sim.hooks.clear();
 
