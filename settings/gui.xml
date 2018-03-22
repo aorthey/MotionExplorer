@@ -3,7 +3,7 @@
     <name>draw_rigid_objects_faces</name>
     <descr>Draw Face Mesh of Rigid Objects</descr>
     <key>f</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_rigid_objects_edges</name>

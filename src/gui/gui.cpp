@@ -234,7 +234,6 @@ void ForceFieldBackend::RenderWorld()
 
        double r = 0.05;
        glPushMatrix();
-       //glMaterialfv(GL_FRONT,GL_AMBIENT_AND_DIFFUSE,GLColor(1,0.5,0,0.7));
        glTranslate(pos);
        drawCone(-dir,2*r,8);
        glPopMatrix();

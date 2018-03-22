@@ -169,7 +169,7 @@ force too strong? but then terrain would be permeated, too.
 [x] reset goes back to wrong position
 [x] reset: momentum is not set back to zero 
 [x] kernel panic after movie creation
- [x] got another kernel panic after displaying torque based jet propulsion
+[x] got another kernel panic after displaying torque based jet propulsion
 
 [x] compute and display distance between links and terrain
 [x] make small 3-leg spider robot, only contacts
@@ -367,6 +367,7 @@ into separate xml file (one setting for everything)
 [ ] benchmark.xml merge with planner.xml?
 [ ] openGL transparency does not work correctly with the bubbles
 
+
 QMP PLANNER
 [x] size of bubbles ok with one layer, but changes if another layer is added (is
 there some way that we might confuse the vertices when using getPlannerData?)
@@ -376,6 +377,7 @@ URDF i could use?)
 [ ] what does the deform require? --> definition of increasing reachability.
 [ ] need nice atlas/hrp4 scenario with grasping and leg movement (climbing
 step!?)
+
 
 KINODYNAMIC PLANNING
 [x] do bullet with kRRT
@@ -395,8 +397,8 @@ highlighted. Maybe even add some clutter/debris.
    --- Symmetry of regions (seems to be unique to X).
    --- Critical points (CP) characterizing important boundaries of the manifold.
 might be hard to compute explicitly
-   --- 
 [ ] plan path, then play path in simulation using controller
+
 
 [ ] color each planner. Have one button to execute each planner in a seperate
 thread. Once finished, return the path and visualize the highest layer path in
@@ -415,7 +417,6 @@ self-collision forces?
 [ ] reset: crash when plotting joint values
 [ ] retreat simulation
  
-
 [ ] need remove dependency to SimTestGUI so we can manipulate the unneccessary GUI
 elements
 [ ] enable component hotkeys (C-s,S-p)
@@ -423,14 +424,28 @@ elements
 variables inside the state and toggle them.
 [ ] abstract class SimTestGUI overwrites hotkey assignment, remove that
 
-
 [x] robot should start at q_goal, not at q_init
 [x] all torques should be applied, not only the first one
 [ ] torques should be applied into the relative direction, not globally
 [ ] the resulting path should closely follow the geometric path
-[ ] actuators should be specified in urdf or somewhere together with the robot
+[ ] actuators should be specified together with urdf, and in relation to a
+certain link (pos and direction relative to link + power)
+[ ] reset back to start position, not zero/zero
+[ ] need to have a threaded version, reading sensor, writing commands, see
+SerialController.h
 
 -- ompl control simulates a forward torque in relative x direction of the
 object. However, in the klampt simulator, we suddenly apply a global x
 direction, which leads to the unwanted behavior.
 
+-- two main imperatives: (1) solve Xshape by introducing new geometric planner
+probably based on SC. (2) solve rocket using QS
+
+-- it seems (2) is easier to do, but (1) could be better at speeding things up,
+making it really workable in the real-world. (2) is necessary to show the
+generality.
+
+-- three things: (1) forward integration on manifold using OMPL/Klampt tools.
+(2) application of torque to a driver using Klampt. (3) visualization of
+application of torque to a driver (this should be read directly from drivers,
+not separate)

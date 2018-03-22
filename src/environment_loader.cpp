@@ -215,5 +215,6 @@ void EnvironmentLoader::LoadController(Robot *robot, const PlannerInput &pin)
 
   //reinit robot such that drivers are copied to actuators (so we can use them in Command)
   _backend->sim.controlSimulators[0].Init(robot, _backend->sim.odesim.robot(0), _backend->sim.robotControllers[0]);
+  controller->Reset();
 }
 

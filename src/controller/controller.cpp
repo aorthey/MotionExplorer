@@ -84,14 +84,24 @@ void ControllerState::Reset(){
 //################################################################################
 //################################################################################
 
-ContactStabilityController::ContactStabilityController(Robot& robot) : RobotController(robot) {
+ContactStabilityController::ContactStabilityController(Robot& robot) : RobotController(robot) 
+{
 }
 ContactStabilityController::~ContactStabilityController() {}
 const char* ContactStabilityController::Type() const { return "SE3Controller"; }
 
 void ContactStabilityController::Reset() { 
+  if(command){
+    uint N = command->actuators.size();
+    if(N>0){
+      ZeroTorque.resize(N); 
+      ZeroTorque.setZero();
+      SetTorqueCommand(ZeroTorque);
+    }
+  }
   output.Reset();
   RobotController::Reset(); 
+
   //std::cout << std::string(80, '-') << std::endl;
   //std::cout << "["<<Type() << "] Reset" << std::endl;
   //std::cout << std::string(80, '-') << std::endl;
@@ -113,13 +123,9 @@ void ContactStabilityController::Update(Real dt) {
   //See Sensor.h and Command.h for details on these structures
   //std::cout << "controller time " << time << " dt=" << dt << std::endl;
 
-  Vector qcmd,vcmd;
   Vector qactual,vactual;
-
-  GetCommandedConfig(qcmd);  //convenience function in RobotController
-  GetCommandedVelocity(vcmd);  //convenience function in RobotController
-  GetSensedConfig(qactual);  //convenience function in RobotController
-  GetSensedVelocity(vactual);  //convenience function in RobotController
+  GetSensedConfig(qactual);
+  GetSensedVelocity(vactual);
 
   Vector3 com = robot.GetCOM();
   Vector3 LM = robot.GetLinearMomentum();
