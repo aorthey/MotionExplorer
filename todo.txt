@@ -399,7 +399,6 @@ highlighted. Maybe even add some clutter/debris.
 might be hard to compute explicitly
 [ ] plan path, then play path in simulation using controller
 
-
 [ ] color each planner. Have one button to execute each planner in a seperate
 thread. Once finished, return the path and visualize the highest layer path in
 the corresponding color of that planner.
@@ -423,16 +422,15 @@ elements
 [ ] automate the OnCommand method to automatically switch/case through all
 variables inside the state and toggle them.
 [ ] abstract class SimTestGUI overwrites hotkey assignment, remove that
-
 [x] robot should start at q_goal, not at q_init
 [x] all torques should be applied, not only the first one
-[ ] torques should be applied into the relative direction, not globally
+[x] torques should be applied into the relative direction, not globally
 [ ] the resulting path should closely follow the geometric path
 [ ] actuators should be specified together with urdf, and in relation to a
 certain link (pos and direction relative to link + power)
-[ ] reset back to start position, not zero/zero
 [ ] need to have a threaded version, reading sensor, writing commands, see
 SerialController.h
+[ ] reset back to start position, not zero/zero
 
 -- ompl control simulates a forward torque in relative x direction of the
 object. However, in the klampt simulator, we suddenly apply a global x
@@ -445,7 +443,10 @@ probably based on SC. (2) solve rocket using QS
 making it really workable in the real-world. (2) is necessary to show the
 generality.
 
--- three things: (1) forward integration on manifold using OMPL/Klampt tools.
-(2) application of torque to a driver using Klampt. (3) visualization of
+-- three things: 
+
+(1) forward integration on manifold using OMPL/Klampt tools.
+(2) application of torque to a driver using Klampt. 
+(3) visualization of
 application of torque to a driver (this should be read directly from drivers,
 not separate)

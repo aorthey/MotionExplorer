@@ -207,6 +207,21 @@ void PlannerBackend::RenderWorld(){
       GLDraw::drawBoundingBox(Vector3(min(0),min(1),min(2)), Vector3(max(0),max(1),max(2)));
       glEnable(GL_LIGHTING);
       glDisable(GL_BLEND); 
+
+      // uint N = 8;
+      // world->lights.resize(N);
+      // for(uint k = 0; k < N; k++){
+      //   world->lights[k].setColor(GLColor(1,1,1));
+      // }
+      // world->lights[0].setPointLight(Vector3(min(0),min(1),min(2)));
+      // world->lights[1].setPointLight(Vector3(min(0),min(1),max(2)));
+      // world->lights[2].setPointLight(Vector3(min(0),max(1),min(2)));
+      // world->lights[3].setPointLight(Vector3(min(0),max(1),max(2)));
+      // world->lights[4].setPointLight(Vector3(max(0),min(1),min(2)));
+      // world->lights[5].setPointLight(Vector3(max(0),min(1),max(2)));
+      // world->lights[6].setPointLight(Vector3(max(0),max(1),min(2)));
+      // world->lights[7].setPointLight(Vector3(max(0),max(1),max(2)));
+
     }
     static PathPiecewiseLinear *path;
     if(state("draw_play_path")){
@@ -227,60 +242,92 @@ void PlannerBackend::RenderWorld(){
       GLDraw::drawRobotAtConfig(robot, q, grey);
     }
   }
+  if(planner->GetInput().kinodynamic){
+    if(state("draw_controller_com_path")) GLDraw::drawCenterOfMassPathFromController(sim);
 
-  // //experiments on drawing 3d structures on fixed screen position
-  // double w = viewport.w;
-  // double h = viewport.h;
+    SmartPointer<ContactStabilityController>& controller = *reinterpret_cast<SmartPointer<ContactStabilityController>*>(&sim.robotControllers[0]);
+    ControllerState output = controller->GetControllerState();
+    Vector torque = output.current_torque;
 
-  // Vector3 campos = viewport.position();
-  // Vector3 camdir;
-  // viewport.getViewVector(camdir);
+    //Untested/Experimental Stuff
+    if(state("draw_controller_driver")){
+      Vector T;
+      sim.controlSimulators[0].GetActuatorTorques(T);
+      Robot *robot = &sim.odesim.robot(0)->robot;
 
-  // Vector3 up,down,left,right;
+      Vector3 dir;
+      for(uint k = 0; k < 3; k++){
+        dir[k] = T[k];
+      }
+      //dir = T(i)*dir/dir.norm();
 
-  // viewport.getClickVector(0,h/2,left);
-  // viewport.getClickVector(w,h/2,right);
-  // viewport.getClickVector(w/2,0,down);
-  // viewport.getClickVector(w/2,h,up);
+      const RobotJointDriver& driver = robot->drivers[0];
+      //uint didx = driver.linkIndices[0];
+      uint lidx = driver.linkIndices[1];
+      Frame3D Tw = robot->links[lidx].T_World;
+      Vector3 pos = Tw*robot->links[lidx].com;
 
-  // up = up+campos;
-  // down = down+campos;
-  // left = left+campos;
-  // right = right+campos;
-
-  // glLineWidth(10);
-  // glPointSize(20);
-  // GLColor black(1,0,0);
-  // black.setCurrentGL();
-  // GLDraw::drawPoint(campos);
-  // GLDraw::drawPoint(up );
-  // GLDraw::drawPoint(down);
-  // GLDraw::drawPoint(right);
-  // GLDraw::drawPoint(left);
-
-  // GLDraw::drawLineSegment(up, left);
-  // GLDraw::drawLineSegment(up, right);
-  // GLDraw::drawLineSegment(down, right);
-  // GLDraw::drawLineSegment(down, left);
-
-
-  // GLColor grey(0.6,0.6,0.6);
-  // grey.setCurrentGL();
-  // glTranslate(left+0.5*(up-left));
-  // GLDraw::drawSphere(0.05,16,16);
-
-  // Vector3 tt;
-  // viewport.getClickVector(w/8,h/2,tt);
-
-  // glTranslate(tt + 0.1*camdir);
-  // GLDraw::drawSphere(0.05,16,16);
-  // glTranslate(tt + 0.3*camdir);
-  // GLDraw::drawSphere(0.05,16,16);
-  // glTranslate(tt + 0.4*camdir);
-  // GLDraw::drawSphere(0.05,16,16);
-
-  // glEnable(GL_LIGHTING);
+      double r = 0.05;
+      glPushMatrix();
+      glTranslate(pos);
+      drawCone(-dir,2*r,8);
+      glPopMatrix();
+    }
+  }
 }
+
+ // //experiments on drawing 3d structures on fixed screen position
+ // double w = viewport.w;
+ // double h = viewport.h;
+
+ // Vector3 campos = viewport.position();
+ // Vector3 camdir;
+ // viewport.getViewVector(camdir);
+
+ // Vector3 up,down,left,right;
+
+ // viewport.getClickVector(0,h/2,left);
+ // viewport.getClickVector(w,h/2,right);
+ // viewport.getClickVector(w/2,0,down);
+ // viewport.getClickVector(w/2,h,up);
+
+ // up = up+campos;
+ // down = down+campos;
+ // left = left+campos;
+ // right = right+campos;
+
+ // glLineWidth(10);
+ // glPointSize(20);
+ // GLColor black(1,0,0);
+ // black.setCurrentGL();
+ // GLDraw::drawPoint(campos);
+ // GLDraw::drawPoint(up );
+ // GLDraw::drawPoint(down);
+ // GLDraw::drawPoint(right);
+ // GLDraw::drawPoint(left);
+
+ // GLDraw::drawLineSegment(up, left);
+ // GLDraw::drawLineSegment(up, right);
+ // GLDraw::drawLineSegment(down, right);
+ // GLDraw::drawLineSegment(down, left);
+
+
+ // GLColor grey(0.6,0.6,0.6);
+ // grey.setCurrentGL();
+ // glTranslate(left+0.5*(up-left));
+ // GLDraw::drawSphere(0.05,16,16);
+
+ // Vector3 tt;
+ // viewport.getClickVector(w/8,h/2,tt);
+
+ // glTranslate(tt + 0.1*camdir);
+ // GLDraw::drawSphere(0.05,16,16);
+ // glTranslate(tt + 0.3*camdir);
+ // GLDraw::drawSphere(0.05,16,16);
+ // glTranslate(tt + 0.4*camdir);
+ // GLDraw::drawSphere(0.05,16,16);
+
+ // glEnable(GL_LIGHTING);
 void PlannerBackend::RenderScreen(){
   BaseT::RenderScreen();
   std::string line;

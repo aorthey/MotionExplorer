@@ -198,49 +198,11 @@ void ForceFieldBackend::RenderWorld()
     }
   }
 
-  if(state("draw_com_path")) GLDraw::drawCenterOfMassPathFromController(sim);
   //if(state("draw_force_ellipsoid")) GLDraw::drawForceEllipsoid(oderobot);
   if(state("draw_forcefield")) wrenchfield.DrawGL(state);
   if(state("draw_axes")) drawCoordWidget(1); //void drawCoordWidget(float len,float axisWidth=0.05,float arrowLen=0.2,float arrowWidth=0.1);
   if(state("draw_axes_labels")) GLDraw::drawAxesLabels(viewport);
 
-//############################################################################
- //visualize applied torque
-//############################################################################
- SmartPointer<ContactStabilityController>& controller = *reinterpret_cast<SmartPointer<ContactStabilityController>*>(&sim.robotControllers[0]);
- ControllerState output = controller->GetControllerState();
- Vector torque = output.current_torque;
-
- //Untested/Experimental Stuff
- if(state("draw_robot_driver")){
-   Vector T;
-   sim.controlSimulators[0].GetActuatorTorques(T);
-
-   Robot *robot = &sim.odesim.robot(0)->robot;
-   for(uint i = 0; i < robot->drivers.size(); i++){
-     RobotJointDriver driver = robot->drivers[i];
-     //############################################################################
-     if(driver.type == RobotJointDriver::Rotation){
-     }
-   //############################################################################
-     if(driver.type == RobotJointDriver::Translation){
-       uint didx = driver.linkIndices[0];
-       uint lidx = driver.linkIndices[1];
-       Frame3D Tw = robot->links[lidx].T_World;
-       Vector3 pos = Tw*robot->links[lidx].com;
-       Vector3 dir = Tw*robot->links[didx].w - pos;
-
-       dir = T(i)*dir/dir.norm();
-
-       double r = 0.05;
-       glPushMatrix();
-       glTranslate(pos);
-       drawCone(-dir,2*r,8);
-       glPopMatrix();
-
-     }
-   }
- }
 
 }//RenderWorld
  

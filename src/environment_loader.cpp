@@ -142,8 +142,6 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       ODERobot *simrobot = _backend->sim.odesim.robot(i);
       simrobot->EnableSelfCollisions(true);
     }
-
-
   }
 
   _backend->wrenchfield.Load(file_name.c_str());
@@ -173,8 +171,10 @@ void EnvironmentLoader::LoadController(Robot *robot, const PlannerInput &pin)
     rotation[i].vmax = dInf;
     rotation[i].amin = -dInf;
     rotation[i].amax = dInf;
-    rotation[i].tmin = uMin(i+3);
-    rotation[i].tmax = uMax(i+3);
+    // rotation[i].tmin = uMin(i+3);
+    // rotation[i].tmax = uMax(i+3);
+    rotation[i].tmin = -dInf;
+    rotation[i].tmax = +dInf;
     rotation[i].servoP = 0;
     rotation[i].servoI = 0;
     rotation[i].servoD = 0;
@@ -189,15 +189,15 @@ void EnvironmentLoader::LoadController(Robot *robot, const PlannerInput &pin)
     translation[i].linkIndices.push_back(i);
     translation[i].linkIndices.push_back(5);
     translation[i].qmin = -dInf;
-    translation[i].qmax = dInf;
+    translation[i].qmax = +dInf;
     translation[i].vmin = -dInf;
     translation[i].vmax = dInf;
     translation[i].amin = -dInf;
     translation[i].amax = dInf;
-    translation[i].tmin = uMin(i);
-    translation[i].tmax = uMax(i);
-    // translation[i].amin = -dInf;
-    // translation[i].amax = dInf;
+    // translation[i].tmin = uMin(i);
+    // translation[i].tmax = uMax(i);
+    translation[i].tmin = -dInf;
+    translation[i].tmax = +dInf;
     translation[i].servoP = 0;
     translation[i].servoI = 0;
     translation[i].servoD = 0;

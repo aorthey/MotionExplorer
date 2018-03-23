@@ -13,19 +13,19 @@
   <plannerinput>
 
     <qinit config="7 +1.0 -3.5 +2.0 +1.14 0.0 0.0 0"/>
-    <dqinit config="7 +0.5 0 0 0 0 0 0"/>
+    <dqinit config="7 0 0 0 0 0 0 0"/>
 
-    <qgoal config="7 +3.0 +2.5 +2.0 +1.57 0.0 0.0 0"/>
+    <qgoal config="7 +4.0 +2.5 +2.0 +1.57 0.0 0.0 0"/>
     <dqgoal config="7 +2.0 0 0 0 0 0 0"/>
 
     <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
     <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
 
     <control_max config="6  +1 0 0 +0.5 +0.0 0"/>
-    <control_min config="6  0 0 0 -0.5 -0.0 0"/>
+    <control_min config="6  +0 0 0 -0.5 +0.0 0"/>
 
-    <maxplanningtime>2</maxplanningtime>
-    <epsilongoalregion>1</epsilongoalregion> 
+    <maxplanningtime>0.1</maxplanningtime>
+    <epsilongoalregion>2</epsilongoalregion> 
 
     <smoothPath>0</smoothPath>
     <freeFloating>1</freeFloating>

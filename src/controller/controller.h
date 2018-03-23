@@ -45,6 +45,7 @@ class ContactStabilityController: public RobotController
     virtual void Update(Real dt);
     virtual bool SendCommand(const string& name,const string& str);
     void AppendTorqueAndTime( Vector &torque_and_time );
+    void SetWrenchCommand(const Vector& wrenches);
 
     virtual vector<string> Commands() const;
 

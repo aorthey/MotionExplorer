@@ -121,11 +121,19 @@ const ControllerState& ContactStabilityController::GetControllerState() const {
 void ContactStabilityController::Update(Real dt) {
   //We'll put our code here: read from this->sensors, and write to this->command.
   //See Sensor.h and Command.h for details on these structures
-  //std::cout << "controller time " << time << " dt=" << dt << std::endl;
+  std::cout << "controller time " << time << " dt=" << dt << std::endl;
 
-  Vector qactual,vactual;
-  GetSensedConfig(qactual);
-  GetSensedVelocity(vactual);
+  Vector q_sensed,dq_sensed;
+  GetSensedConfig(q_sensed);
+  GetSensedVelocity(dq_sensed);
+
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << q_sensed << std::endl;
+  std::cout << robot.q << std::endl;
+
+  robot.q = q_sensed;
+  robot.dq = dq_sensed;
+  robot.UpdateDynamics();
 
   Vector3 com = robot.GetCOM();
   Vector3 LM = robot.GetLinearMomentum();
@@ -150,15 +158,53 @@ void ContactStabilityController::Update(Real dt) {
     }else{
       output.current_torque = ZeroTorque;
     }
-    //std::cout << "Setting torque: " << output.current_torque << std::endl;
-    SetTorqueCommand(output.current_torque);
+    SetWrenchCommand(output.current_torque);
   }
 
-  //SetPIDCommand(qcmd,vcmd);
-  //SetTorqueCommand(const Vector& torques);
   RobotController::Update(dt);
 
 }
+
+void ContactStabilityController::SetWrenchCommand(const Vector& wrenches)
+{
+  if((uint)wrenches.size()!=robot.drivers.size()) {
+    std::cout << "wrenches are size " << wrenches.size() << " but drivers are size " << robot.drivers.size() << std::endl;
+    exit(0);
+  }
+
+  Vector T_wrenches(wrenches); T_wrenches.setZero();
+
+  for(uint i = 0; i < robot.drivers.size(); i++){
+    const RobotJointDriver& driver = robot.drivers[i];
+    //############################################################################
+    if(driver.type == RobotJointDriver::Rotation){
+      T_wrenches[i] = wrenches[i];
+    }
+  //############################################################################
+    if(driver.type == RobotJointDriver::Translation){
+      uint didx = driver.linkIndices[0]; //actual driver
+      uint lidx = driver.linkIndices[1]; //link affected by driver
+      Frame3D Tw = robot.links[lidx].T_World;
+      Vector3 pos = Tw*robot.links[lidx].com;
+      Vector3 dir = Tw*robot.links[didx].w - pos;
+      dir = wrenches(i)*dir/dir.norm();
+      for(uint k = 0; k < 3; k++){
+        T_wrenches[k]+=dir[k];
+      }
+
+    }
+  }
+  //std::cout << "torques: " << wrenches << std::endl;
+  std::cout << "torques: " << T_wrenches << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  //SetTorqueCommand(T_wrenches);
+  for(size_t i=0;i<robot.drivers.size();i++)
+      command->actuators[i].SetTorque(T_wrenches[i]);
+
+
+}
+
+
 bool ContactStabilityController::SendCommand(const string& name,const string& str){
 
   stringstream ss(str);
