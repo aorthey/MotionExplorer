@@ -63,8 +63,6 @@ void ValidityCheckerSimplicialComplex::ComputeNeighborhood(const ob::State* stat
     //typedef IntTriple Tri;
     std::cout << "vertices : " << trimesh.verts.size() << std::endl;
     //triangles are ints(a,b,c) representing vertices which are vector3 in R3
-
-
   }
 
 
