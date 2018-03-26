@@ -220,7 +220,7 @@
   <property name="draw_roadmap_shortest_path" enabled="0"/>
   <property name="draw_path_unsmoothed" enabled="0"/>
   <property name="draw_path_autofocus" enabled="1"/>
-  <property name="draw_axes" enabled="1"/>
+  <property name="draw_axes" enabled="0"/>
   <property name="draw_cover_vertices" enabled="1"/>
   <property name="draw_robot_zero_position" enabled="1"/>
   <property name="draw_controller_driver" enabled="1"/>
