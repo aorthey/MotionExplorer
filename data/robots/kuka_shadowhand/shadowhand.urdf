@@ -1300,6 +1300,9 @@
     <pulsesPerRevolution>90000</pulsesPerRevolution>
   </transmission>
   <klampt package_root="../../../.." flip_yz="1" default_acc_max="4" use_vis_geom="1">
+   <noselfcollision group1="palm" group2="ffproximal mfproximal rfproximal thproximal lfknuckle"/>
+   <noselfcollision group1="thproximal" group2="thmiddle"/>
+   <!-- <noselfcollision group1="thbase thproximal thhub thmiddle thdistal thtip" group2="thbase thproximal thhub thmiddle thdistal thtip"/>-->
   </klampt>
 </robot>
 

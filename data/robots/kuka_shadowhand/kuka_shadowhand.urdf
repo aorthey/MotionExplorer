@@ -13,6 +13,9 @@
   <material name="BiotacGreen">
     <color rgba="0.31 0.85 0.42 1.0"/>
   </material>
+  <material name="Orange">
+    <color rgba="0.8 0.5 0.2 1.0"/>
+  </material>
   <material name="Grey">
     <color rgba="0.2 0.2 0.2 1.0"/>
   </material>
@@ -45,6 +48,7 @@
       <geometry>
         <mesh filename="meshes_arm/arm_base.stl"/>
       </geometry>
+      <material name="Orange"/>
     </collision>
   </link>
   <joint name="kuka_arm_0_joint" type="revolute">
@@ -73,6 +77,7 @@
       <geometry>
         <mesh filename="meshes_arm/arm_segment_a.stl"/>
       </geometry>
+      <material name="Orange"/>
     </collision>
   </link>
   <transmission name="kuka_arm_0_trans" type="pr2_mechanism_model/SimpleTransmission">
@@ -107,9 +112,11 @@
     </visual>
     <collision>
       <origin rpy="1.57 0 3.14159265359" xyz="0 0 0.2"/>
+      <!-- <origin rpy="-1.57 0 0" xyz="0 0 0"/> -->
       <geometry>
         <mesh filename="meshes_arm/arm_segment_b.stl"/>
       </geometry>
+      <material name="Orange"/>
     </collision>
   </link>
   <transmission name="kuka_arm_1_trans" type="pr2_mechanism_model/SimpleTransmission">
@@ -143,6 +150,7 @@
       <geometry>
         <mesh filename="meshes_arm/arm_segment_a.stl"/>
       </geometry>
+      <material name="Orange"/>
     </collision>
   </link>
   <transmission name="kuka_arm_2_trans" type="pr2_mechanism_model/SimpleTransmission">
@@ -176,6 +184,7 @@
       <geometry>
         <mesh filename="meshes_arm/arm_segment_b.stl"/>
       </geometry>
+      <material name="Orange"/>
     </collision>
   </link>
   <transmission name="kuka_arm_3_trans" type="pr2_mechanism_model/SimpleTransmission">
@@ -206,9 +215,10 @@
     </visual>
     <collision>
       <origin rpy="-1.57 0 3.14159265359" xyz="0 0 0"/>
-      <geometry>
+      <geometry name="kuka_arm_5_geom">
         <mesh filename="meshes_arm/arm_segment_last.stl"/>
       </geometry>
+      <material name="Orange"/>
     </collision>
   </link>
   <transmission name="kuka_arm_4_trans" type="pr2_mechanism_model/SimpleTransmission">
@@ -242,6 +252,7 @@
       <geometry>
         <mesh filename="meshes_arm/arm_wrist.stl"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
   <transmission name="kuka_arm_5_trans" type="pr2_mechanism_model/SimpleTransmission">
@@ -275,6 +286,7 @@
       <geometry>
         <mesh filename="meshes_arm/arm_flanche.stl"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
   <transmission name="kuka_arm_6_trans" type="pr2_mechanism_model/SimpleTransmission">
@@ -303,16 +315,17 @@
       <material name="Grey"/>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.09"/>
-      <geometry name="shadow_forearm_collision">
-        <cylinder length="0.180" radius="0.06"/>
+      <origin rpy="0 0 0" xyz="0.0015 -0.013 -0.032"/>
+      <geometry name="shadow_forearm_geom">
+        <!-- <mesh filename="meshes_hand/forearm.dae" scale="0.001 0.001 0.001"/> -->
+        <mesh filename="meshes_hand/forearm_muscle.dae" scale="0.01 0.01 0.01"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
-  <gazebo reference="forearm">
-    <material>Gazebo/Grey</material>
-    <selfCollide>false</selfCollide>
-  </gazebo>
+
+
+
   <link name="wrist">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0.0 0.0"/>
@@ -329,15 +342,13 @@
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry name="wrist_collision_geom">
-        <box size="0.02 0.02 0.02"/>
+      <geometry name="wrist_visual">
+        <mesh filename="meshes_hand/wrist.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="LightGrey"/>
     </collision>
   </link>
-  <gazebo reference="wrist">
-    <material>PR2/Grey2</material>
-    <selfCollide>false</selfCollide>
-  </gazebo>
+  
   <joint name="WRJ2" type="revolute">
     <parent link="forearm"/>
     <child link="wrist"/>
@@ -372,22 +383,11 @@
       <geometry name="palm_visual">
         <mesh filename="meshes_hand/palm.stl" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
-  <gazebo reference="palm">
-    <sensor:contact name="palm_contact_sensor">
-      <geom>palm_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="palm_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>palm</frameName>
-        <bumperTopicName>palm_bumper</bumperTopicName>
-        <interface:bumper name="palm_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>Gazebo/Grey</material>
-  </gazebo>
+  
+
   <joint name="WRJ1" type="revolute">
     <parent link="wrist"/>
     <child link="palm"/>
@@ -396,6 +396,7 @@
     <limit effort="5" lower="-0.78539816339744828" upper="0.6108652381980153" velocity="1.0"/>
     <dynamics damping="100.5"/>
   </joint>
+
   <transmission name="palm_transmission" type="sr_mechanism_model/SimpleTransmission">
     <actuator name="WRJ1"/>
     <joint name="WRJ1"/>
@@ -403,6 +404,8 @@
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
   </transmission>
+
+
   <link name="ffknuckle">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -417,26 +420,14 @@
       <material name="LightGrey"/>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry name="knuckle_collision_geom">
-        <box size="0.005 0.005 0.005"/>
+      <origin rpy="0 0 0" xyz="0 0 0.0005"/>
+      <geometry name="knuckle_visual">
+        <mesh filename="meshes_hand/knuckle.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="LightGrey"/>
     </collision>
   </link>
-  <gazebo reference="ffknuckle">
-    <sensor:contact name="ffknuckle_contact_sensor">
-      <geom>ffknuckle_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="ffknuckle_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>ffknuckle</frameName>
-        <bumperTopicName>ffknuckle_bumper</bumperTopicName>
-        <interface:bumper name="ffknuckle_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>PR2/Grey2</material>
-  </gazebo>
+  
   <joint name="FFJ4" type="revolute">
     <parent link="palm"/>
     <child link="ffknuckle"/>
@@ -467,27 +458,14 @@
       <material name="Grey"/>
     </visual>
     <collision>
-      <origin rpy="0 0 0 " xyz="0 0 0.025"/>
-      <geometry name="proximal_collision_geom">
-        <box size="0.008 0.008 0.04"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="proximal_visual">
+        <mesh filename="meshes_hand/F3.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
-  <gazebo reference="ffproximal">
-    <sensor:contact name="ffproximal_contact_sensor">
-      <geom>ffproximal_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="ffproximal_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>ffproximal</frameName>
-        <bumperTopicName>ffproximal_bumper</bumperTopicName>
-        <interface:bumper name="ffproximal_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>Gazebo/Grey</material>
-    <selfCollide>true</selfCollide>
-  </gazebo>
+  
   <joint name="FFJ3" type="revolute">
     <parent link="ffknuckle"/>
     <child link="ffproximal"/>
@@ -517,27 +495,14 @@
       <material name="Grey"/>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.0125"/>
-      <geometry name="middle_collision_geom">
-        <box size="0.008 0.008 0.015"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="middle_visual">
+        <mesh filename="meshes_hand/F2.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
-  <gazebo reference="ffmiddle">
-    <sensor:contact name="ffmiddle_contact_sensor">
-      <geom>ffmiddle_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="ffmiddle_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>ffmiddle</frameName>
-        <bumperTopicName>ffmiddle_bumper</bumperTopicName>
-        <interface:bumper name="ffmiddle_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>Gazebo/Grey</material>
-    <selfCollide>true</selfCollide>
-  </gazebo>
+  
   <joint name="FFJ2" type="revolute">
     <parent link="ffproximal"/>
     <child link="ffmiddle"/>
@@ -576,30 +541,13 @@
 	   </visual>-->
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry name="distal_collision_geom">
+      <geometry name="distal_visual">
         <mesh filename="meshes_hand/distal_ellipsoid.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
-  <gazebo reference="ffdistal">
-    <sensor:contact name="ffdistal_contact_sensor">
-      <geom>ffdistal_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="ffdistal_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>ffdistal</frameName>
-        <bumperTopicName>ffdistal_bumper</bumperTopicName>
-        <interface:bumper name="ffdistal_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <mu1 value="500.0"/>
-    <mu2 value="500.0"/>
-    <kp value="10000000.0"/>
-    <kd value="1.0"/>
-    <material>Gazebo/Grey</material>
-    <selfCollide>true</selfCollide>
-  </gazebo>
+  
   <joint name="FFJ1" type="revolute">
     <parent link="ffmiddle"/>
     <child link="ffdistal"/>
@@ -619,6 +567,9 @@
     <child link="fftip"/>
     <origin rpy="0 0 0" xyz="0 0 0.026"/>
   </joint>
+
+
+
   <link name="mfknuckle">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -634,10 +585,11 @@
       <material name="LightGrey"/>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry name="knuckle_collision_geom">
-        <box size="0.005 0.005 0.005"/>
+      <origin rpy="0 0 0" xyz="0 0 0.0005"/>
+      <geometry name="knuckle_visual">
+        <mesh filename="meshes_hand/knuckle.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="LightGrey"/>
     </collision>
   </link>
   <joint name="MFJ4" type="revolute">
@@ -670,27 +622,14 @@
       <material name="Grey"/>
     </visual>
     <collision>
-      <origin rpy="0 0 0 " xyz="0 0 0.025"/>
-      <geometry name="proximal_collision_geom">
-        <box size="0.008 0.008 0.04"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="proximal_visual">
+        <mesh filename="meshes_hand/F3.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
-  <gazebo reference="mfproximal">
-    <sensor:contact name="mfproximal_contact_sensor">
-      <geom>mfproximal_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="mfproximal_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>mfproximal</frameName>
-        <bumperTopicName>mfproximal_bumper</bumperTopicName>
-        <interface:bumper name="mfproximal_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>Gazebo/Grey</material>
-    <selfCollide>true</selfCollide>
-  </gazebo>
+  
   <joint name="MFJ3" type="revolute">
     <parent link="mfknuckle"/>
     <child link="mfproximal"/>
@@ -720,27 +659,14 @@
       <material name="Grey"/>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.0125"/>
-      <geometry name="middle_collision_geom">
-        <box size="0.008 0.008 0.015"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="middle_visual">
+        <mesh filename="meshes_hand/F2.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
-  <gazebo reference="mfmiddle">
-    <sensor:contact name="mfmiddle_contact_sensor">
-      <geom>mfmiddle_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="mfmiddle_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>mfmiddle</frameName>
-        <bumperTopicName>mfmiddle_bumper</bumperTopicName>
-        <interface:bumper name="mfmiddle_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>Gazebo/Grey</material>
-    <selfCollide>true</selfCollide>
-  </gazebo>
+  
   <joint name="MFJ2" type="revolute">
     <parent link="mfproximal"/>
     <child link="mfmiddle"/>
@@ -779,30 +705,13 @@
 	   </visual>-->
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry name="distal_collision_geom">
+      <geometry name="distal_visual">
         <mesh filename="meshes_hand/distal_ellipsoid.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
-  <gazebo reference="mfdistal">
-    <sensor:contact name="mfdistal_contact_sensor">
-      <geom>mfdistal_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="mfdistal_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>mfdistal</frameName>
-        <bumperTopicName>mfdistal_bumper</bumperTopicName>
-        <interface:bumper name="mfdistal_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <mu1 value="500.0"/>
-    <mu2 value="500.0"/>
-    <kp value="10000000.0"/>
-    <kd value="1.0"/>
-    <material>Gazebo/Grey</material>
-    <selfCollide>true</selfCollide>
-  </gazebo>
+  
   <joint name="MFJ1" type="revolute">
     <parent link="mfmiddle"/>
     <child link="mfdistal"/>
@@ -837,26 +746,14 @@
       <material name="LightGrey"/>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry name="knuckle_collision_geom">
-        <box size="0.005 0.005 0.005"/>
+      <origin rpy="0 0 0" xyz="0 0 0.0005"/>
+      <geometry name="knuckle_visual">
+        <mesh filename="meshes_hand/knuckle.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="LightGrey"/>
     </collision>
   </link>
-  <gazebo reference="rfknuckle">
-    <sensor:contact name="rfknuckle_contact_sensor">
-      <geom>rfknuckle_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="rfknuckle_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>rfknuckle</frameName>
-        <bumperTopicName>rfknuckle_bumper</bumperTopicName>
-        <interface:bumper name="rfknuckle_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>PR2/Grey2</material>
-  </gazebo>
+  
   <joint name="RFJ4" type="revolute">
     <parent link="palm"/>
     <child link="rfknuckle"/>
@@ -887,27 +784,14 @@
       <material name="Grey"/>
     </visual>
     <collision>
-      <origin rpy="0 0 0 " xyz="0 0 0.025"/>
-      <geometry name="proximal_collision_geom">
-        <box size="0.008 0.008 0.04"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="proximal_visual">
+        <mesh filename="meshes_hand/F3.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
-  <gazebo reference="rfproximal">
-    <sensor:contact name="rfproximal_contact_sensor">
-      <geom>rfproximal_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="rfproximal_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>rfproximal</frameName>
-        <bumperTopicName>rfproximal_bumper</bumperTopicName>
-        <interface:bumper name="rfproximal_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>Gazebo/Grey</material>
-    <selfCollide>true</selfCollide>
-  </gazebo>
+  
   <joint name="RFJ3" type="revolute">
     <parent link="rfknuckle"/>
     <child link="rfproximal"/>
@@ -937,27 +821,14 @@
       <material name="Grey"/>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.0125"/>
-      <geometry name="middle_collision_geom">
-        <box size="0.008 0.008 0.015"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="middle_visual">
+        <mesh filename="meshes_hand/F2.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
-  <gazebo reference="rfmiddle">
-    <sensor:contact name="rfmiddle_contact_sensor">
-      <geom>rfmiddle_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="rfmiddle_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>rfmiddle</frameName>
-        <bumperTopicName>rfmiddle_bumper</bumperTopicName>
-        <interface:bumper name="rfmiddle_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>Gazebo/Grey</material>
-    <selfCollide>true</selfCollide>
-  </gazebo>
+  
   <joint name="RFJ2" type="revolute">
     <parent link="rfproximal"/>
     <child link="rfmiddle"/>
@@ -996,30 +867,13 @@
 	   </visual>-->
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry name="distal_collision_geom">
+      <geometry name="distal_visual">
         <mesh filename="meshes_hand/distal_ellipsoid.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
-  <gazebo reference="rfdistal">
-    <sensor:contact name="rfdistal_contact_sensor">
-      <geom>rfdistal_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="rfdistal_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>rfdistal</frameName>
-        <bumperTopicName>rfdistal_bumper</bumperTopicName>
-        <interface:bumper name="rfdistal_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <mu1 value="500.0"/>
-    <mu2 value="500.0"/>
-    <kp value="10000000.0"/>
-    <kd value="1.0"/>
-    <material>Gazebo/Grey</material>
-    <selfCollide>true</selfCollide>
-  </gazebo>
+  
   <joint name="RFJ1" type="revolute">
     <parent link="rfmiddle"/>
     <child link="rfdistal"/>
@@ -1053,26 +907,14 @@
       <material name="Grey"/>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.04"/>
-      <geometry name="lfmetacarpal_collision_geom">
-        <box size="0.008 0.008 0.03"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="lfmetacarpal_visual">
+        <mesh filename="meshes_hand/lfmetacarpal.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
-  <gazebo reference="lfmetacarpal">
-    <sensor:contact name="lfmetacarpal_contact_sensor">
-      <geom>lfmetacarpal_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="lfmetacarpal_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>lfmetacarpal</frameName>
-        <bumperTopicName>lfmetacarpal_bumper</bumperTopicName>
-        <interface:bumper name="lfmetacarpal_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>Gazebo/Grey</material>
-  </gazebo>
+  
   <joint name="LFJ5" type="revolute">
     <parent link="palm"/>
     <child link="lfmetacarpal"/>
@@ -1103,25 +945,13 @@
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry name="knuckle_collision_geom">
-        <box size="0.005 0.005 0.005"/>
+      <geometry name="knuckle_visual">
+        <mesh filename="meshes_hand/knuckle.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="LightGrey"/>
     </collision>
   </link>
-  <gazebo reference="lfknuckle">
-    <sensor:contact name="lfknuckle_contact_sensor">
-      <geom>lfknuckle_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="lfknuckle_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>lfknuckle</frameName>
-        <bumperTopicName>lfknuckle_bumper</bumperTopicName>
-        <interface:bumper name="lfknuckle_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>PR2/Grey2</material>
-  </gazebo>
+  
   <joint name="LFJ4" type="revolute">
     <parent link="lfmetacarpal"/>
     <child link="lfknuckle"/>
@@ -1151,27 +981,14 @@
       <material name="Grey"/>
     </visual>
     <collision>
-      <origin rpy="0 0 0 " xyz="0 0 0.025"/>
-      <geometry name="proximal_collision_geom">
-        <box size="0.008 0.008 0.04"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="proximal_visual">
+        <mesh filename="meshes_hand/F3.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
-  <gazebo reference="lfproximal">
-    <sensor:contact name="lfproximal_contact_sensor">
-      <geom>lfproximal_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="lfproximal_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>lfproximal</frameName>
-        <bumperTopicName>lfproximal_bumper</bumperTopicName>
-        <interface:bumper name="lfproximal_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>Gazebo/Grey</material>
-    <selfCollide>true</selfCollide>
-  </gazebo>
+  
   <joint name="LFJ3" type="revolute">
     <parent link="lfknuckle"/>
     <child link="lfproximal"/>
@@ -1201,27 +1018,14 @@
       <material name="Grey"/>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.0125"/>
-      <geometry name="middle_collision_geom">
-        <box size="0.008 0.008 0.015"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="middle_visual">
+        <mesh filename="meshes_hand/F2.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
-  <gazebo reference="lfmiddle">
-    <sensor:contact name="lfmiddle_contact_sensor">
-      <geom>lfmiddle_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="lfmiddle_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>lfmiddle</frameName>
-        <bumperTopicName>lfmiddle_bumper</bumperTopicName>
-        <interface:bumper name="lfmiddle_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>Gazebo/Grey</material>
-    <selfCollide>true</selfCollide>
-  </gazebo>
+  
   <joint name="LFJ2" type="revolute">
     <parent link="lfproximal"/>
     <child link="lfmiddle"/>
@@ -1260,30 +1064,13 @@
 	   </visual>-->
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry name="distal_collision_geom">
+      <geometry name="distal_visual">
         <mesh filename="meshes_hand/distal_ellipsoid.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="Grey"/>
     </collision>
   </link>
-  <gazebo reference="lfdistal">
-    <sensor:contact name="lfdistal_contact_sensor">
-      <geom>lfdistal_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="lfdistal_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>lfdistal</frameName>
-        <bumperTopicName>lfdistal_bumper</bumperTopicName>
-        <interface:bumper name="lfdistal_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <mu1 value="500.0"/>
-    <mu2 value="500.0"/>
-    <kp value="10000000.0"/>
-    <kd value="1.0"/>
-    <material>Gazebo/Grey</material>
-    <selfCollide>true</selfCollide>
-  </gazebo>
+  
   <joint name="LFJ1" type="revolute">
     <parent link="lfmiddle"/>
     <child link="lfdistal"/>
@@ -1292,6 +1079,7 @@
     <limit effort="10" lower="0" upper="1.57079632679" velocity="1.0"/>
     <dynamics damping="50.5"/>
   </joint>
+
   <link name="lftip">
     <inertial>
       <mass value="0.001"/>
@@ -1319,10 +1107,13 @@
       </material>
     </visual>
     <collision>
-      <origin rpy="0 0 0 " xyz="0 0 0"/>
-      <geometry name="thbase_collision_geom">
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="thbase_visual">
         <box size="0.001 0.001 0.001"/>
       </geometry>
+      <material name="shadow_thbase_material">
+        <color rgba="0.5 0.5 0.5 1.0"/>
+      </material>
     </collision>
   </link>
   <joint name="THJ5" type="revolute">
@@ -1356,26 +1147,16 @@
       </material>
     </visual>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.019"/>
-      <geometry name="thproximal_collision_geom">
-        <box size="0.008 0.008 0.020"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="thproximal_visual">
+        <mesh filename="meshes_hand/TH3_z.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="shadow_thproximal_material">
+        <color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
     </collision>
   </link>
-  <gazebo reference="thproximal">
-    <sensor:contact name="thproximal_contact_sensor">
-      <geom>thproximal_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="thproximal_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>thproximal</frameName>
-        <bumperTopicName>thproximal_bumper</bumperTopicName>
-        <interface:bumper name="thproximal_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>Gazebo/Grey</material>
-  </gazebo>
+  
   <joint name="THJ4" type="revolute">
     <parent link="thbase"/>
     <child link="thproximal"/>
@@ -1407,26 +1188,16 @@
       </material>
     </visual>
     <collision>
-      <origin rpy="0 0 0 " xyz="0 0 0"/>
-      <geometry name="thhub_collision_geom">
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="thhub_visual">
         <box size="0.001 0.001 0.001"/>
       </geometry>
+      <material name="shadow_thhub_material">
+        <color rgba="0.7 0.7 0.7 1.0"/>
+      </material>
     </collision>
   </link>
-  <gazebo reference="thhub">
-    <sensor:contact name="thhub_contact_sensor">
-      <geom>thhub_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="thhub_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>thhub</frameName>
-        <bumperTopicName>thhub_bumper</bumperTopicName>
-        <interface:bumper name="thhub_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>Gazebo/Grey</material>
-  </gazebo>
+  
   <joint name="THJ3" type="revolute">
     <parent link="thproximal"/>
     <child link="thhub"/>
@@ -1458,26 +1229,16 @@
       </material>
     </visual>
     <collision>
-      <origin rpy="0 0 0 " xyz="0 0 0.016"/>
-      <geometry name="thmiddle_collision_geom">
-        <box size="0.008 0.008 0.015"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry name="thmiddle_visual">
+        <mesh filename="meshes_hand/TH2_z.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="shadow_thmiddle_material">
+        <color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
     </collision>
   </link>
-  <gazebo reference="thmiddle">
-    <sensor:contact name="thmiddle_contact_sensor">
-      <geom>thmiddle_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="thmiddle_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>thmiddle</frameName>
-        <bumperTopicName>thmiddle_bumper</bumperTopicName>
-        <interface:bumper name="thmiddle_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <material>Gazebo/Grey</material>
-  </gazebo>
+  
   <joint name="THJ2" type="revolute">
     <parent link="thhub"/>
     <child link="thmiddle"/>
@@ -1509,31 +1270,16 @@
       </material>
     </visual>
     <collision>
-      <origin rpy="0 0 0 " xyz="0 0.002 0.0025"/>
-      <geometry name="thmiddle_collision_geom">
+      <origin rpy="0 0 0" xyz="0 0.002 0.0025"/>
+      <geometry name="thdistal_visual">
         <mesh filename="meshes_hand/distal_ellipsoid.dae" scale="0.001 0.001 0.001"/>
       </geometry>
+      <material name="shadow_thmiddle_material">
+        <color rgba="0.2 0.2 0.2 1.0"/>
+      </material>
     </collision>
   </link>
-  <gazebo reference="thdistal">
-    <sensor:contact name="thdistal_contact_sensor">
-      <geom>thdistal_geom</geom>
-      <updateRate>100.0</updateRate>
-      <controller:gazebo_ros_bumper name="thdistal_gazebo_ros_bumper_controller" plugin="libgazebo_ros_bumper.so">
-        <alwaysOn>true</alwaysOn>
-        <updateRate>100.0</updateRate>
-        <frameName>thdistal</frameName>
-        <bumperTopicName>thdistal_bumper</bumperTopicName>
-        <interface:bumper name="thdistal_gazebo_ros_bumper_iface"/>
-      </controller:gazebo_ros_bumper>
-    </sensor:contact>
-    <mu1 value="500.0"/>
-    <mu2 value="500.0"/>
-    <kp value="10000000.0"/>
-    <kd value="1.0"/>
-    <material>Gazebo/Grey</material>
-    <selfCollide>true</selfCollide>
-  </gazebo>
+  
   <joint name="THJ1" type="revolute">
     <parent link="thmiddle"/>
     <child link="thdistal"/>
@@ -1560,7 +1306,10 @@
     <motorTorqueConstant>1</motorTorqueConstant>
     <pulsesPerRevolution>90000</pulsesPerRevolution>
   </transmission>
-  <klampt package_root="../../../.." flip_yz="1" default_acc_max="4" use_vis_geom="1">
+
+  <klampt package_root="../../../.." flip_yz="1" default_acc_max="4" use_vis_geom="0" fixed_root_link="1">
+   <noselfcollision group1="palm" group2="ffproximal mfproximal rfproximal thproximal lfknuckle"/>
+   <noselfcollision group1="thproximal" group2="thmiddle"/>
   </klampt>
 </robot>
 
