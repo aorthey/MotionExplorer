@@ -419,7 +419,7 @@ self-collision forces?
 [ ] need remove dependency to SimTestGUI so we can manipulate the unneccessary GUI
 elements
 [ ] enable component hotkeys (C-s,S-p)
-[ ] automate the OnCommand method to automatically switch/case through all
+[x] automate the OnCommand method to automatically switch/case through all
 variables inside the state and toggle them.
 [ ] abstract class SimTestGUI overwrites hotkey assignment, remove that
 [x] robot should start at q_goal, not at q_init
@@ -450,5 +450,3 @@ generality.
 (3) visualization of
 application of torque to a driver (this should be read directly from drivers,
 not separate)
-
-

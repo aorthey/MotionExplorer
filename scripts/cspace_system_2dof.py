@@ -13,22 +13,22 @@ def GetObstacleSpheres():
   R1 = 0.25
   R2 = 0.15
   R3 = 0.2
-  x = np.zeros((3,3)) #x,y,radius
+  x = np.zeros((4,3)) #Nx3: Nobstacle times (x,y,radius)
   x[0,0]=-0.4
   x[0,1]=0.4
   x[0,2]=R1
 
-  # x[1,0]=0.4
-  # x[1,1]=0.7
-  # x[1,2]=R2
+  x[1,0]=0.4
+  x[1,1]=0.7
+  x[1,2]=R2
   
   x[2,0]=0.4
   x[2,1]=-0.5
   x[2,2]=R3
 
-  x[1,0]=-0.8
-  x[1,1]=-0.5
-  x[1,2]=R2
+  x[3,0]=-0.8
+  x[3,1]=-0.5
+  x[3,2]=R2
   return x
 
 

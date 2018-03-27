@@ -1,4 +1,5 @@
 #include "qcp.h"
+#include "elements/plannerdata_vertex_annotated.h"
 #include "planner/validitychecker/validity_checker_simplicial_complex.h"
 #include <ompl/util/Console.h>
 
@@ -21,11 +22,24 @@ void QCP::Init()
 
 void QCP::Grow(double t)
 {
-  auto checkerPtr = static_pointer_cast<ValidityCheckerSimplicialComplex>(si_->getStateValidityChecker());
-  const ob::State *start = startS_.at(0);
-  checkerPtr->ComputeNeighborhood(start);
 }
 
 void QCP::CheckForSolution(ob::PathPtr &solution)
 {
+}
+
+void QCP::getPlannerData(ob::PlannerData &data) const
+{
+  auto checkerPtr = static_pointer_cast<ValidityCheckerSimplicialComplex>(si_->getStateValidityChecker());
+  const ob::State *start = startS_.at(0);
+  cover::OpenSetConvex cvxregion = checkerPtr->ComputeNeighborhood(start);
+
+  PlannerDataVertexAnnotated v(start, 0);
+  v.SetOpenNeighborhoodDistance(32);
+  v.SetOpenSet(cvxregion);
+
+  data.addStartVertex(v);
+
+  //PlannerDataVertexAnnotated *v0 = static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(0));
+  //std::cout << v0->GetOpenSet() << std::endl;
 }

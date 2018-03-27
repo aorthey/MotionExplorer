@@ -153,8 +153,7 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, ob::PlannerDataPtr pd)
         }else{
           setColor(cVertexOut);
         }
-        //std::cout << "vertex " << vidx << " component " << v->GetComponent() << std::endl;
-        //if(v->GetComponent()==99) exit(0);
+        v->DrawGL(state);
         drawPoint(q);
         if(state("draw_roadmap_volume")){
           glTranslate(q);

@@ -12,11 +12,22 @@ PlannerDataVertexAnnotated::PlannerDataVertexAnnotated (const PlannerDataVertexA
   level = rhs.GetLevel();
   max_level = rhs.GetMaxLevel();
   component = rhs.GetComponent();
+  openset = rhs.GetOpenSet();
 }
 
 ob::PlannerDataVertex *PlannerDataVertexAnnotated::clone() const 
 {
   return new PlannerDataVertexAnnotated(*this);
+}
+
+//##############################################################################
+cover::OpenSetConvex PlannerDataVertexAnnotated::GetOpenSet() const
+{
+  return openset;
+}
+void PlannerDataVertexAnnotated::SetOpenSet( cover::OpenSetConvex openset_)
+{
+  openset = openset_;
 }
 
 //##############################################################################
@@ -68,6 +79,10 @@ const ob::State *PlannerDataVertexAnnotated::getState() const
 void PlannerDataVertexAnnotated::setState(ob::State *s)
 {
   state_ = s;
+}
+void PlannerDataVertexAnnotated::DrawGL(GUIState& state)
+{
+  openset.DrawGL(state);
 }
 
 std::ostream& operator<< (std::ostream& out, const PlannerDataVertexAnnotated& v)

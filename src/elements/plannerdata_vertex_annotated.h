@@ -1,14 +1,19 @@
 #pragma once
+#include "planner/cover/open_set_convex.h"
 #include <ompl/base/PlannerData.h>
 #include <boost/serialization/export.hpp>
 namespace ob = ompl::base;
 
 class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
 {
+  //If new elements are added, you need to update the clone/getstate functions!
   public:
     PlannerDataVertexAnnotated(const ob::State *st, int tag=0, double d_ = 0.0);
     PlannerDataVertexAnnotated (const PlannerDataVertexAnnotated &rhs);
     virtual PlannerDataVertex *clone() const override;
+
+    void SetOpenSet( cover::OpenSetConvex );
+    cover::OpenSetConvex GetOpenSet() const;
 
     void SetOpenNeighborhoodDistance(double d_);
     double GetOpenNeighborhoodDistance() const;
@@ -28,7 +33,11 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
 
     friend std::ostream& operator<< (std::ostream&, const PlannerDataVertexAnnotated&);
 
+    void DrawGL(GUIState&);
+
   protected:
+    cover::OpenSetConvex openset;
+
     double open_neighborhood_distance{0.0};
     uint level{0};
     uint max_level{1};

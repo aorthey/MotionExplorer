@@ -8,7 +8,7 @@ c1 = (0.9,0.9,0.9)
 c2 = (0.7,0.7,0.7)
 c3 = (0.5,0.5,0.5)
 
-N = 50
+N = 100
 q1 = np.linspace(-np.pi,np.pi,N)
 q2 = np.linspace(-np.pi,np.pi,N)
 P1 = []
@@ -69,7 +69,6 @@ ax.set_xlabel(r'\theta_1',fontsize=font_size)
 ax.set_ylabel(r'\theta_2',rotation=1.57,fontsize=font_size)
 ax.tick_params(axis='both', which='major', pad=15)
 
-
 lim=3.14
 plt.axis([-lim,lim,-lim,lim])
 ax.annotate(r'q_1', (p1[0]+offset,p1[1]))
@@ -79,7 +78,7 @@ plt.plot(p1[0],p1[1],'o',color='black',markersize=10)
 plt.plot(p2[0],p2[1],'o',color='black',markersize=10)
 plt.plot(p3[0],p3[1],'o',color='black',markersize=10)
 
-plotCSpaceDelaunayGrey(P1,P2)
+plotCSpaceDelaunayGrey(P1,P2,0.15)
 plt.savefig("2dof_cspace_M1.png", bbox_inches='tight')
 
 ############################################################
