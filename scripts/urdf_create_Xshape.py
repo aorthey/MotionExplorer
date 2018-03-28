@@ -10,7 +10,7 @@ thicknessy = L1
 spacing = 0.001
 
 robot_name = 'Xshape'
-folder='Lshape/'
+folder='robots/'
 fname = getPathname(folder, robot_name)
 
 f = open(fname,'w')

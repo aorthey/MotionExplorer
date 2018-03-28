@@ -62,11 +62,11 @@ ValidityCheckerSimplicialComplex::ValidityCheckerSimplicialComplex(const ob::Spa
 {
 }
 
-cover::OpenSetConvex ValidityCheckerSimplicialComplex::ComputeNeighborhood(const ob::State* state) const
+cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(const ob::State* state) const
 {
   if(!isValid(state)){
     std::cout << "need valid state" << std::endl;
-    return cover::OpenSetConvex();
+    return nullptr;
   }
 
   Config q = ompl_space->OMPLStateToConfig(state);
@@ -98,7 +98,6 @@ cover::OpenSetConvex ValidityCheckerSimplicialComplex::ComputeNeighborhood(const
     seed_pt(k) = q(k); //@TODO: not always true
   }
 
-
   const ob::RealVectorBounds& bounds = static_pointer_cast<ob::RealVectorStateSpace>(ompl_space->SpacePtr())->getBounds();
   // std::cout << bounds.low << std::endl;
   // std::cout << bounds.high << std::endl;
@@ -115,7 +114,6 @@ cover::OpenSetConvex ValidityCheckerSimplicialComplex::ComputeNeighborhood(const
     b(k)   = -bounds.low[k];
     b(k+N) = bounds.high[k];
   }
-
   problem.setBounds(iris::Polyhedron(A,b));
 
   Eigen::MatrixXd obs(3,3);
@@ -127,7 +125,8 @@ cover::OpenSetConvex ValidityCheckerSimplicialComplex::ComputeNeighborhood(const
     //std::cout << geometry->TypeName() << std::endl;
     const Meshing::TriMesh& trimesh = geometry->AsTriangleMesh();
     //std::cout << "triangles: " << trimesh.tris.size() << std::endl;
-    for(uint i = 0; i < trimesh.tris.size(); i++){
+    for(uint i = 0; i < trimesh.tris.size(); i++)
+    {
       Vector3 v0 = trimesh.verts.at( trimesh.tris.at(i)[0] );
       Vector3 v1 = trimesh.verts.at( trimesh.tris.at(i)[1] );
       Vector3 v2 = trimesh.verts.at( trimesh.tris.at(i)[2] );
@@ -135,6 +134,7 @@ cover::OpenSetConvex ValidityCheckerSimplicialComplex::ComputeNeighborhood(const
       obs << v0[0], v1[0], v2[0],
              v0[1], v1[1], v2[1],
              v0[2], v1[2], v2[2];
+      std::cout << obs << std::endl;
       problem.addObstacle(obs);
     }
   }
@@ -144,17 +144,9 @@ cover::OpenSetConvex ValidityCheckerSimplicialComplex::ComputeNeighborhood(const
   iris::IRISOptions options;
   iris::IRISRegion region = inflate_region(problem, options);
 
-  cover::OpenSetConvex cvx_region(region);
+  cover::OpenSetConvex *cvx_region = new cover::OpenSetConvex(state, region);
 
   return cvx_region;
-
-  //pair<int,int> res;
-  //selfcollision checking
-  // res = space->settings->CheckCollision(space->world,idrobot);
-  // if(res.first >= 0) return 0;
-  // //environment collision checking
-  // res = space->settings->CheckCollision(space->world,idrobot,idothers);
-  // if(res.first >= 0) return 0;
 }
 
 

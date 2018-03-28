@@ -5,11 +5,19 @@
 using namespace cover;
 
 OpenSetHypersphere::OpenSetHypersphere(ob::SpaceInformationPtr si_, ob::State *s, double dist_robot_env_):
-  OpenSet(si_, s, dist_robot_env_)
+  OpenSet(s), si(si_), radius(dist_robot_env_)
 {
 }
 
 double OpenSetHypersphere::Distance(const ob::State *s_lhs, const ob::State *s_rhs){
   return si->distance(s_lhs, s_rhs);
+}
+bool OpenSetHypersphere::IsInside(ob::State *sPrime)
+{
+  return Distance(sCenter, sPrime) < radius;
+}
+double OpenSetHypersphere::GetRadius()
+{
+  return radius;
 }
 

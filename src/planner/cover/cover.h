@@ -1,5 +1,5 @@
 #pragma once
-#include "cover_open_set.h"
+#include "open_set_convex.h"
 
 namespace cover{
   class Cover{
@@ -7,13 +7,23 @@ namespace cover{
       Cover();
 
       bool IsInsideCover(ob::State *s);
-      void ComputeCoverAt(ob::State *x);
 
       void Reduce();
-      void AddOpenSet( OpenSet* set );
+      void AddOpenSet( OpenSetConvex* set );
+      void AddStartOpenSet( OpenSetConvex* set );
+      void AddGoalOpenSet( OpenSetConvex* set );
 
+      void Clear();
+
+      std::vector<OpenSetConvex*> GetCover() const;
+      int GetStartSetIndex() const;
+      int GetGoalSetIndex() const;
+
+      friend std::ostream& operator<< (std::ostream& out, const Cover& cvr);
     protected:
       CSpace *cspace;
-      std::vector<OpenSet*> sets;
+      int startSet{-1};
+      int goalSet{-1};
+      std::vector<OpenSetConvex*> opensets;
   };
 };

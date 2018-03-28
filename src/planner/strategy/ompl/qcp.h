@@ -1,5 +1,6 @@
 #pragma once
 #include "prm_basic.h"
+#include "planner/cover/cover.h"
 #include <ompl/datastructures/PDF.h>
 
 namespace ob = ompl::base;
@@ -31,6 +32,8 @@ namespace ompl
 
       protected:
         std::vector<const ob::State*> startS_;
+        std::vector<const ob::State*> goalS_;
+        cover::Cover cspace_cover;
     };
 
   };

@@ -1,5 +1,6 @@
 #pragma once
 #include "klampt.h"
+#include "open_set.h"
 #include "gui/gui_state.h"
 #include <ompl/base/State.h>
 #include <ompl/base/SpaceInformation.h>
@@ -8,19 +9,19 @@
 namespace ob = ompl::base;
 
 namespace cover{
-  class OpenSetConvex{
+  class OpenSetConvex: public OpenSet{
     public:
       OpenSetConvex()=default;
-      OpenSetConvex(iris::IRISRegion region_);
+      OpenSetConvex(const ob::State *s, iris::IRISRegion region_);
       virtual ~OpenSetConvex(){};
+      bool IsInside(ob::State *sPrime);
 
       void DrawGL(GUIState&);
 
       friend std::ostream& operator<< (std::ostream& out, const OpenSetConvex& set);
 
-      iris::IRISRegion region;
     protected:
-
+      iris::IRISRegion region;
 
   };
 };

@@ -21,11 +21,11 @@ ob::PlannerDataVertex *PlannerDataVertexAnnotated::clone() const
 }
 
 //##############################################################################
-cover::OpenSetConvex PlannerDataVertexAnnotated::GetOpenSet() const
+cover::OpenSetConvex* PlannerDataVertexAnnotated::GetOpenSet() const
 {
   return openset;
 }
-void PlannerDataVertexAnnotated::SetOpenSet( cover::OpenSetConvex openset_)
+void PlannerDataVertexAnnotated::SetOpenSet( cover::OpenSetConvex *openset_)
 {
   openset = openset_;
 }
@@ -82,7 +82,7 @@ void PlannerDataVertexAnnotated::setState(ob::State *s)
 }
 void PlannerDataVertexAnnotated::DrawGL(GUIState& state)
 {
-  openset.DrawGL(state);
+  openset->DrawGL(state);
 }
 
 std::ostream& operator<< (std::ostream& out, const PlannerDataVertexAnnotated& v)
