@@ -21,11 +21,11 @@ ob::PlannerDataVertex *PlannerDataVertexAnnotated::clone() const
 }
 
 //##############################################################################
-cover::OpenSetConvex* PlannerDataVertexAnnotated::GetOpenSet() const
+cover::OpenSet* PlannerDataVertexAnnotated::GetOpenSet() const
 {
   return openset;
 }
-void PlannerDataVertexAnnotated::SetOpenSet( cover::OpenSetConvex *openset_)
+void PlannerDataVertexAnnotated::SetOpenSet( cover::OpenSet *openset_)
 {
   openset = openset_;
 }

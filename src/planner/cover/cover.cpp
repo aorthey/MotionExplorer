@@ -26,22 +26,22 @@ void Cover::Reduce()
 {
 }
 
-void Cover::AddOpenSet( OpenSetConvex* set )
+void Cover::AddOpenSet( OpenSet* set )
 {
   opensets.push_back(set);
 }
-void Cover::AddStartOpenSet( OpenSetConvex* set )
+void Cover::AddStartOpenSet( OpenSet* set )
 {
   AddOpenSet(set);
   startSet = opensets.size()-1;
 }
-void Cover::AddGoalOpenSet( OpenSetConvex* set )
+void Cover::AddGoalOpenSet( OpenSet* set )
 {
   AddOpenSet(set);
   goalSet = opensets.size()-1;
 }
 
-std::vector<OpenSetConvex*> Cover::GetCover() const
+std::vector<OpenSet*> Cover::GetCover() const
 {
   return opensets;
 }
