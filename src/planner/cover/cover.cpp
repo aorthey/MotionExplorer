@@ -58,7 +58,7 @@ namespace cover{
   {
     std::cout << "Cover contains " << cvr.opensets.size() << " opensets." << std::endl;
     for(uint k = 0; k < cvr.opensets.size(); k++){
-      out << cvr.opensets.at(k) << std::endl;
+      out << *cvr.opensets.at(k) << std::endl;
     }
     return out;
   }

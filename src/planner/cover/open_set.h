@@ -8,6 +8,10 @@
 namespace ob = ompl::base;
 
 namespace cover{
+  //@brief OpenSet represents an open set on the configuration space. OpenSet
+  //has an associated configuration, which is called the center. center needs to
+  //be a member of openset. The shape of the openset is determined by its child
+  //class.
   class OpenSet{
     public:
       OpenSet(CSpaceOMPL *cspace_, const ob::State *s);
@@ -18,6 +22,9 @@ namespace cover{
       const ob::State* GetCenter() const;
 
       GLDraw::GLColor cOpenSet{magenta};
+
+      friend std::ostream& operator<< (std::ostream& out, const OpenSet& set);
+
     protected:
       CSpaceOMPL *cspace;
       const ob::State *sCenter;

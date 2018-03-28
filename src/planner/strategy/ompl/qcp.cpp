@@ -56,6 +56,7 @@ void QCP::getPlannerData(ob::PlannerData &data) const
 {
   auto checkerPtr = static_pointer_cast<ValidityCheckerSimplicialComplex>(si_->getStateValidityChecker());
 
+  std::cout << cspace_cover << std::endl;
   std::vector<cover::OpenSet*> sets = cspace_cover.GetCover();
   for(uint k = 0; k < sets.size(); k++){
     const ob::State *s = sets.at(k)->GetCenter();
