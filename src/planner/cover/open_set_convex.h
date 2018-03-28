@@ -16,7 +16,7 @@ namespace cover{
       virtual ~OpenSetConvex(){};
       bool IsInside(ob::State *sPrime);
 
-      void DrawGL(GUIState&);
+      void DrawGL(GUIState&) override;
 
       friend std::ostream& operator<< (std::ostream& out, const OpenSetConvex& set);
 

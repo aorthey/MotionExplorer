@@ -21,3 +21,16 @@ double OpenSetHypersphere::GetRadius()
   return radius;
 }
 
+void OpenSetHypersphere::DrawGL(GUIState&)
+{
+  if(state("draw_roadmap_volume")){
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND);
+    drawPoint(center);
+    glTranslate(center);
+    setColor(cOpenSet);
+    drawSphere(radius,16,8);
+    glDisable(GL_BLEND);
+    glEnable(GL_LIGHTING);
+  }
+}

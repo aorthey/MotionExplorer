@@ -10,6 +10,7 @@ namespace cover{
       OpenSet(const ob::State *s);
       virtual ~OpenSet();
       virtual bool IsInside(ob::State *sPrime) = 0;
+      virtual void DrawGL(GUIState&) = 0;
 
       const ob::State* GetCenter() const;
     protected:
