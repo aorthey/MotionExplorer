@@ -25,7 +25,7 @@ PRMBasic::Vertex QMPConnectCover::CreateNewVertex(ob::State *state)
   auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
   double d1 = checkerPtr->Distance(stateProperty_[m]);
   openNeighborhoodDistance_[m] = d1;
-  openNeighborhood_[m] = new cover::OpenSetHypersphere(si_, stateProperty_[m], d1);
+  openNeighborhood_[m] = new cover::OpenSetHypersphere(checkerPtr->GetCSpacePtr(), stateProperty_[m], d1);
   return m;
 }
 

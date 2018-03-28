@@ -1,21 +1,25 @@
 #include "planner/validitychecker/validity_checker_ompl.h"
 
-OMPLValidityChecker::OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpaceOMPL *ompl_space_, CSpace *inner_):
-  ob::StateValidityChecker(si), ompl_space(ompl_space_), inner(inner_)
+OMPLValidityChecker::OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_, CSpace *inner_):
+  ob::StateValidityChecker(si), cspace(cspace_), inner(inner_)
 {
 }
 
+CSpaceOMPL* OMPLValidityChecker::GetCSpacePtr() const
+{
+  return cspace;
+}
 bool OMPLValidityChecker::isValid(const ob::State* state) const
 {
   const ob::StateSpacePtr ssp = si_->getStateSpace();
-  Config q = ompl_space->OMPLStateToConfig(state);
+  Config q = cspace->OMPLStateToConfig(state);
   SingleRobotCSpace* csi = static_cast<SingleRobotCSpace*>(inner);
   return IsCollisionFree(csi, q);
 }
 
 double OMPLValidityChecker::Distance(const ob::State* state) const
 {
-  Config q = ompl_space->OMPLStateToConfig(state);
+  Config q = cspace->OMPLStateToConfig(state);
   SingleRobotCSpace* space = static_cast<SingleRobotCSpace*>(inner);
   Robot* robot = space->GetRobot();
   robot->UpdateConfig(q);
@@ -93,28 +97,28 @@ bool OMPLValidityChecker::IsSufficient(const ob::State* state) const
 }
 
 
-OMPLValidityCheckerInnerOuter::OMPLValidityCheckerInnerOuter(const ob::SpaceInformationPtr &si, CSpaceOMPL *ompl_space_, CSpace *inner_, CSpace *outer_):
-  OMPLValidityChecker(si, ompl_space_, inner_), outer(outer_)
+OMPLValidityCheckerInnerOuter::OMPLValidityCheckerInnerOuter(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_, CSpace *inner_, CSpace *outer_):
+  OMPLValidityChecker(si, cspace_, inner_), outer(outer_)
 {
 }
 
 bool OMPLValidityCheckerInnerOuter::isValid(const ob::State* state) const
 {
   const ob::StateSpacePtr ssp = si_->getStateSpace();
-  Config q = ompl_space->OMPLStateToConfig(state);
+  Config q = cspace->OMPLStateToConfig(state);
   SingleRobotCSpace* csi = static_cast<SingleRobotCSpace*>(inner);
   SingleRobotCSpace* cso = static_cast<SingleRobotCSpace*>(outer);
   return IsCollisionFree(csi, q) && (!IsCollisionFree(cso,q));
 }
 
-OMPLValidityCheckerNecessarySufficient::OMPLValidityCheckerNecessarySufficient(const ob::SpaceInformationPtr &si, CSpaceOMPL *ompl_space_, CSpace *outer_):
-  OMPLValidityChecker(si, ompl_space_, ompl_space_->GetCSpacePtr()), outer(outer_)
+OMPLValidityCheckerNecessarySufficient::OMPLValidityCheckerNecessarySufficient(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_, CSpace *outer_):
+  OMPLValidityChecker(si, cspace_, cspace_->GetCSpacePtr()), outer(outer_)
 {
 }
 
 bool OMPLValidityCheckerNecessarySufficient::IsSufficient(const ob::State* state) const
 {
-  Config q = ompl_space->OMPLStateToConfig(state);
+  Config q = cspace->OMPLStateToConfig(state);
   SingleRobotCSpace* cso = static_cast<SingleRobotCSpace*>(outer);
   return IsCollisionFree(cso, q);
 }

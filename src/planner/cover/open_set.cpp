@@ -4,8 +4,8 @@
 
 using namespace cover;
 
-OpenSet::OpenSet(const ob::State *s):
-  sCenter(s)
+OpenSet::OpenSet(CSpaceOMPL *cspace_, const ob::State *s):
+  cspace(cspace_), sCenter(s)
 {
 }
 

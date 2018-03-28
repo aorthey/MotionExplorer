@@ -1,7 +1,6 @@
 #pragma once
 #include "klampt.h"
 #include "open_set.h"
-#include "gui/gui_state.h"
 #include <ompl/base/State.h>
 #include <ompl/base/SpaceInformation.h>
 #include <iris/iris.h>
@@ -12,7 +11,7 @@ namespace cover{
   class OpenSetConvex: public OpenSet{
     public:
       OpenSetConvex()=default;
-      OpenSetConvex(const ob::State *s, iris::IRISRegion region_);
+      OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, iris::IRISRegion region_);
       virtual ~OpenSetConvex(){};
       bool IsInside(ob::State *sPrime);
 

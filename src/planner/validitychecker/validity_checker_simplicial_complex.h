@@ -5,6 +5,6 @@
 class ValidityCheckerSimplicialComplex: public OMPLValidityChecker
 {
   public:
-    ValidityCheckerSimplicialComplex(const ob::SpaceInformationPtr &si, CSpaceOMPL *ompl_space_, CSpace *inner_);
+    ValidityCheckerSimplicialComplex(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_, CSpace *inner_);
     cover::OpenSetConvex* ComputeNeighborhood(const ob::State* state) const;
 };

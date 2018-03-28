@@ -133,7 +133,7 @@ RRTUnidirectional::Configuration* RRTUnidirectional::Connect(Configuration *q_ne
 
   auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
   double d1 = checkerPtr->Distance(q_new->state);
-  q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d1);
+  q_new->openset = new cover::OpenSetHypersphere(checkerPtr->GetCSpacePtr(), q_new->state, d1);
 
   G_->add(q_new);
 
@@ -213,7 +213,7 @@ void RRTUnidirectional::Init()
 
     auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
     double d1 = checkerPtr->Distance(q_start->state);
-    q_start->openset = new cover::OpenSetHypersphere(si_, q_start->state, d1);
+    q_start->openset = new cover::OpenSetHypersphere(checkerPtr->GetCSpacePtr(), q_start->state, d1);
 
     G_->add(q_start);
   }

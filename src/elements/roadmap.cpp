@@ -155,19 +155,19 @@ void Roadmap::DrawSingleLevelGL(GUIState &state, ob::PlannerDataPtr pd)
         }
         v->DrawGL(state);
         drawPoint(q);
-        if(state("draw_roadmap_volume")){
-          glTranslate(q);
-          double d = v->GetOpenNeighborhoodDistance();
-          GUIVariable& v=state("draw_cover_threshold");
-          if(v.type!=GUIVariable::SLIDER){
-            std::cout << "error: not slider" << std::endl;
-            exit(0);
-          }
-          if(d < v.value){
-            setColor(cNeighborhoodVolume);
-            drawSphere(d,16,8);
-          }
-        }
+        // if(state("draw_roadmap_volume")){
+        //   glTranslate(q);
+        //   double d = v->GetOpenNeighborhoodDistance();
+        //   GUIVariable& v=state("draw_cover_threshold");
+        //   if(v.type!=GUIVariable::SLIDER){
+        //     std::cout << "error: not slider" << std::endl;
+        //     exit(0);
+        //   }
+        //   if(d < v.value){
+        //     setColor(cNeighborhoodVolume);
+        //     drawSphere(d,16,8);
+        //   }
+        // }
       }else{
         drawPoint(q);
       }

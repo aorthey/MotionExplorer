@@ -12,8 +12,8 @@ extern "C" {
 
 using namespace cover;
 
-OpenSetConvex::OpenSetConvex(const ob::State *s, iris::IRISRegion region_):
-  OpenSet(s), region(region_)
+OpenSetConvex::OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, iris::IRISRegion region_):
+  OpenSet(cspace_,s), region(region_)
 {
 }
 

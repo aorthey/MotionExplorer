@@ -57,8 +57,8 @@ void testIRIS(){
 
 }
 
-ValidityCheckerSimplicialComplex::ValidityCheckerSimplicialComplex(const ob::SpaceInformationPtr &si, CSpaceOMPL *ompl_space_, CSpace *inner_):
-  OMPLValidityChecker(si, ompl_space_, inner_)
+ValidityCheckerSimplicialComplex::ValidityCheckerSimplicialComplex(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_, CSpace *inner_):
+  OMPLValidityChecker(si, cspace_, inner_)
 {
 }
 
@@ -69,7 +69,7 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
     return nullptr;
   }
 
-  Config q = ompl_space->OMPLStateToConfig(state);
+  Config q = cspace->OMPLStateToConfig(state);
   SingleRobotCSpace* space = static_cast<SingleRobotCSpace*>(inner);
   Robot* robot = space->GetRobot();
   RobotWorld* world = &space->world;
@@ -89,7 +89,7 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
     idothers.push_back(world->RigidObjectID(i));
   }
 
-  uint N = ompl_space->GetDimensionality();
+  uint N = cspace->GetDimensionality();
 
   iris::IRISProblem problem(N);
 
@@ -98,7 +98,7 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
     seed_pt(k) = q(k); //@TODO: not always true
   }
 
-  const ob::RealVectorBounds& bounds = static_pointer_cast<ob::RealVectorStateSpace>(ompl_space->SpacePtr())->getBounds();
+  const ob::RealVectorBounds& bounds = static_pointer_cast<ob::RealVectorStateSpace>(cspace->SpacePtr())->getBounds();
   // std::cout << bounds.low << std::endl;
   // std::cout << bounds.high << std::endl;
 
@@ -144,7 +144,7 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
   iris::IRISOptions options;
   iris::IRISRegion region = inflate_region(problem, options);
 
-  cover::OpenSetConvex *cvx_region = new cover::OpenSetConvex(state, region);
+  cover::OpenSetConvex *cvx_region = new cover::OpenSetConvex(cspace, state, region);
 
   return cvx_region;
 }

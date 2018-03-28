@@ -1,16 +1,18 @@
 #include "open_set_hypersphere.h"
+#include "gui/drawMotionPlanner.h"
+#include "gui/colors.h"
 #include <ompl/base/State.h>
 #include <ompl/base/SpaceInformation.h>
 
 using namespace cover;
 
-OpenSetHypersphere::OpenSetHypersphere(ob::SpaceInformationPtr si_, ob::State *s, double dist_robot_env_):
-  OpenSet(s), si(si_), radius(dist_robot_env_)
+OpenSetHypersphere::OpenSetHypersphere(CSpaceOMPL *cspace_, ob::State *s, double dist_robot_env_):
+  OpenSet(cspace_,s), radius(dist_robot_env_)
 {
 }
 
 double OpenSetHypersphere::Distance(const ob::State *s_lhs, const ob::State *s_rhs){
-  return si->distance(s_lhs, s_rhs);
+  return cspace->SpaceInformationPtr()->distance(s_lhs, s_rhs);
 }
 bool OpenSetHypersphere::IsInside(ob::State *sPrime)
 {
@@ -21,13 +23,14 @@ double OpenSetHypersphere::GetRadius()
   return radius;
 }
 
-void OpenSetHypersphere::DrawGL(GUIState&)
+void OpenSetHypersphere::DrawGL(GUIState& state)
 {
   if(state("draw_roadmap_volume")){
     glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);
-    drawPoint(center);
-    glTranslate(center);
+    Vector3 q = cspace->getXYZ(sCenter);
+    drawPoint(q);
+    glTranslate(q);
     setColor(cOpenSet);
     drawSphere(radius,16,8);
     glDisable(GL_BLEND);

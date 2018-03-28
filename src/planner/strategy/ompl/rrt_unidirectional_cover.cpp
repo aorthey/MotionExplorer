@@ -159,7 +159,7 @@ RRTUnidirectional::Configuration* RRTUnidirectionalCover::Connect(Configuration 
 
   auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
   double d_new = checkerPtr->Distance(q_new->state);
-  q_new->openset = new cover::OpenSetHypersphere(si_, q_new->state, d_new);
+  q_new->openset = new cover::OpenSetHypersphere(checkerPtr->GetCSpacePtr(), q_new->state, d_new);
 
   G_->add(q_new);
   return q_new;

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="snake_onelink_inner" file="/home/aorthey/git/orthoklampt/data/robots/snake_onelink_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+</world>
