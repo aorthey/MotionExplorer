@@ -460,3 +460,8 @@ Better use vertices of obstacles to infer
 point on its surface. But where should it be placed? 
 
 How do we project the vertices of the obstacle into the Cspace?
+
+[ ] IRIS does not work correctly when obstacle bounds are outside of polyhedral
+bounds (see https://github.com/rdeits/iris-distro/issues/68). 
+[ ] initial Xshape region not correct
+[ ] compute approximation of QS using iris and correct libcdd

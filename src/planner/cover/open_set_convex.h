@@ -21,6 +21,5 @@ namespace cover{
 
     protected:
       iris::IRISRegion region;
-
   };
 };

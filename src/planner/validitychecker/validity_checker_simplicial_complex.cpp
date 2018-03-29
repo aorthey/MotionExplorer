@@ -91,11 +91,12 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
 
   uint N = cspace->GetDimensionality();
 
-  iris::IRISProblem problem(N);
+  iris::IRISProblem problem(3);
 
-  Eigen::VectorXd seed_pt(N);
-  for(uint k = 0; k < N; k++){
-    seed_pt(k) = q(k); //@TODO: not always true
+  Eigen::VectorXd seed_pt(3);
+  Vector3 qp = cspace->getXYZ(state);
+  for(uint k = 0; k < 3; k++){
+    seed_pt[k] = qp[k];
   }
 
   const ob::RealVectorBounds& bounds = static_pointer_cast<ob::RealVectorStateSpace>(cspace->SpacePtr())->getBounds();
@@ -120,11 +121,8 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
   for(uint k = 0; k < world->terrains.size(); k++)
   {
     SmartPointer<Terrain> terrain = world->terrains.at(k);
-    //std::cout << "terrain: " << terrain->name << std::endl;
     ManagedGeometry& geometry = terrain->geometry;
-    //std::cout << geometry->TypeName() << std::endl;
     const Meshing::TriMesh& trimesh = geometry->AsTriangleMesh();
-    //std::cout << "triangles: " << trimesh.tris.size() << std::endl;
     for(uint i = 0; i < trimesh.tris.size(); i++)
     {
       Vector3 v0 = trimesh.verts.at( trimesh.tris.at(i)[0] );
@@ -134,19 +132,39 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
       obs << v0[0], v1[0], v2[0],
              v0[1], v1[1], v2[1],
              v0[2], v1[2], v2[2];
-      std::cout << obs << std::endl;
       problem.addObstacle(obs);
     }
   }
-
   problem.setSeedPoint(seed_pt);
 
   iris::IRISOptions options;
-  iris::IRISRegion region = inflate_region(problem, options);
+  options.require_containment = true;
+  iris::IRISDebugData debug;
+  iris::IRISRegion region = inflate_region(problem, options, &debug);
+  uint M = region.polyhedron.getNumberOfConstraints();
+
+  std::cout << M << std::endl;
+
+  std::vector<iris::Polyhedron> phistory = debug.polyhedron_history;
+  std::vector<iris::Ellipsoid> ehistory = debug.ellipsoid_history;
+
+  for(uint k = 0; k < phistory.size(); k++){
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "history: " << k << "/" << phistory.size() << " constraints: " << phistory.at(k).getNumberOfConstraints() << std::endl;
+    std::cout << phistory.at(k).getA() << std::endl;
+    std::cout << phistory.at(k).getB() << std::endl;
+    bool contains_sp = phistory.at(k).contains(seed_pt,1e-10);
+    std::cout << "seed point: " << seed_pt << std::endl;
+    std::cout << (contains_sp?"OK":"violation") << std::endl;
+    if(!contains_sp){
+      exit(0);
+    }
+  }
+
+  uint K = 3;
+  region.polyhedron = phistory.at(K);
+  region.ellipsoid = ehistory.at(K);
 
   cover::OpenSetConvex *cvx_region = new cover::OpenSetConvex(cspace, state, region);
-
   return cvx_region;
 }
-
-

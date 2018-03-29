@@ -39,9 +39,9 @@ void QCP::Init()
   cover::OpenSetConvex *start_region = checkerPtr->ComputeNeighborhood(start);
   cspace_cover.AddStartOpenSet(start_region);
 
-  const ob::State *goal = goalS_.at(0);
-  cover::OpenSetConvex *goal_region = checkerPtr->ComputeNeighborhood(goal);
-  cspace_cover.AddGoalOpenSet(goal_region);
+  // const ob::State *goal = goalS_.at(0);
+  // cover::OpenSetConvex *goal_region = checkerPtr->ComputeNeighborhood(goal);
+  // cspace_cover.AddGoalOpenSet(goal_region);
 }
 
 void QCP::Grow(double t)
