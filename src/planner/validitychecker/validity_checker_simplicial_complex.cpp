@@ -7,7 +7,7 @@
 
 void testIRIS(){
   iris::IRISProblem problem(3);
-  // Inflate a region inside a 1x1 box
+  // Inflate a region inside a 1x1x1 box
   problem.setSeedPoint(Eigen::Vector3d(0.1, 0.1, 0.1));
 
   //obstacle is defined by Matrix NxM whereby N is the number of dimensions, and
@@ -145,25 +145,21 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
 
   std::cout << M << std::endl;
 
-  std::vector<iris::Polyhedron> phistory = debug.polyhedron_history;
-  std::vector<iris::Ellipsoid> ehistory = debug.ellipsoid_history;
+  // std::vector<iris::Polyhedron> phistory = debug.polyhedron_history;
+  // std::vector<iris::Ellipsoid> ehistory = debug.ellipsoid_history;
 
-  for(uint k = 0; k < phistory.size(); k++){
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "history: " << k << "/" << phistory.size() << " constraints: " << phistory.at(k).getNumberOfConstraints() << std::endl;
-    std::cout << phistory.at(k).getA() << std::endl;
-    std::cout << phistory.at(k).getB() << std::endl;
-    bool contains_sp = phistory.at(k).contains(seed_pt,1e-10);
-    std::cout << "seed point: " << seed_pt << std::endl;
-    std::cout << (contains_sp?"OK":"violation") << std::endl;
-    if(!contains_sp){
-      exit(0);
-    }
-  }
-
-  uint K = 3;
-  region.polyhedron = phistory.at(K);
-  region.ellipsoid = ehistory.at(K);
+  // for(uint k = 0; k < phistory.size(); k++){
+  //   std::cout << std::string(80, '-') << std::endl;
+  //   std::cout << "history: " << k << "/" << phistory.size() << " constraints: " << phistory.at(k).getNumberOfConstraints() << std::endl;
+  //   std::cout << phistory.at(k).getA() << std::endl;
+  //   std::cout << phistory.at(k).getB() << std::endl;
+  //   bool contains_sp = phistory.at(k).contains(seed_pt,1e-10);
+  //   std::cout << "seed point: " << seed_pt << std::endl;
+  //   std::cout << (contains_sp?"OK":"violation") << std::endl;
+  //   if(!contains_sp){
+  //     exit(0);
+  //   }
+  // }
 
   cover::OpenSetConvex *cvx_region = new cover::OpenSetConvex(cspace, state, region);
   return cvx_region;

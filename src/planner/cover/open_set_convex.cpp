@@ -2,6 +2,8 @@
 #include "open_set_convex.h"
 #include "gui/drawMotionPlanner.h"
 #include "gui/colors.h"
+#include "3rdparty/vrep.h"
+
 #include "3rdparty/Polyhedron.h"
 // extern "C" {
 //   #include <qhull/qhull_a.h>
@@ -74,36 +76,53 @@ void OpenSetConvex::DrawGL(GUIState&){
   setColor(blue);
   GLDraw::drawWireEllipsoid(center, u, v, w);
 
-  std::cout << "distance seedpt to cvx set: " << (((A_eigen * d_eigen - b_eigen).maxCoeff()<=1e-10)?"contained":"NOT contained") << std::endl;
+  std::cout << "seed point is member of Polyhedron? " << (((A_eigen * d_eigen - b_eigen).maxCoeff()<=1e-10)?"YES":"NO") << std::endl;
+  for(uint k = 0; k < A_eigen.rows(); k++){
+    for(uint j = 0; j < A_eigen.cols(); j++){
+      if(A_eigen(k,j) <= 1e-6){
+        //dirty hack: points below 1e-6 are treated as zero by cdd and causes
+        //some hyperplanes to be ignored (not sure why). this trick here seems
+        //to solve the problem.
+        A_eigen(k,j) += 1e-6;
+      }
+    }
+  }
+  region.polyhedron.setA(A_eigen);
 
   //Both iris and Eigen::Polyhedron are wrong.
   //Must be an error in libcdd which messes things up. Maybe recompile with
   //exact and not floating based arithmetic?
-
   std::vector<Eigen::VectorXd> vxs = region.getPolyhedron().generatorPoints();
-  for(uint k = 0; k < vxs.size(); k++){
-    std::cout << vxs.at(k) << std::endl;
-  }
+  // for(uint k = 0; k < vxs.size(); k++){
+  //   std::cout << vxs.at(k) << std::endl;
+  // }
 
+  // VertexRepresentation vrep(A_eigen, b_eigen);
+  // Eigen::MatrixXd V = vrep.GetVertices();
 
-  Eigen::Polyhedron P;
-  P.vrep(A_eigen, b_eigen);
-  std::pair<Eigen::MatrixXd, Eigen::VectorXd> VV;
-  VV = P.vrep();
-  Eigen::MatrixXd V = VV.first;
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << V << std::endl;
-  exit(0);
+  // Eigen::Polyhedron P;
+  // P.vrep(A_eigen, b_eigen);
+  // std::pair<Eigen::MatrixXd, Eigen::VectorXd> VV;
+  // VV = P.vrep();
+  // Eigen::MatrixXd V = VV.first;
+  // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << V << std::endl;
+  //exit(0);
 
   glPointSize(10);
   glLineWidth(3);
   setColor(black);
 
   std::vector<Point_3> points;
-  for(uint k = 0; k < V.rows(); k++){
-    Point_3 p(V(k,0),V(k,1),V(k,2));
+  for(uint k = 0; k < vxs.size(); k++){
+    Eigen::VectorXd V = vxs.at(k);
+    Point_3 p(V(0),V(1),V(2));
     points.push_back(p);
   }
+  // for(uint k = 0; k < V.rows(); k++){
+  //   Point_3 p(V(k,0),V(k,1),V(k,2));
+  //   points.push_back(p);
+  // }
   Polyhedron_3 poly;
   
   CGAL::convex_hull_3(points.begin(), points.end(), poly);

@@ -21,8 +21,8 @@
 
 #include <Eigen/Core>
 #include <atomic>
-#include <cdd/setoper.h> // Must be included before cdd.h (wtf)
-#include <cdd/cdd.h>
+#include <setoper.h>
+#include <cdd.h>
 #include <mutex>
 #include <utility>
 
