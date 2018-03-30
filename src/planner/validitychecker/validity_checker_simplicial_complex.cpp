@@ -141,9 +141,7 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
   options.require_containment = true;
   iris::IRISDebugData debug;
   iris::IRISRegion region = inflate_region(problem, options, &debug);
-  uint M = region.polyhedron.getNumberOfConstraints();
-
-  std::cout << M << std::endl;
+  //uint M = region.polyhedron.getNumberOfConstraints();
 
   // std::vector<iris::Polyhedron> phistory = debug.polyhedron_history;
   // std::vector<iris::Ellipsoid> ehistory = debug.ellipsoid_history;

@@ -46,6 +46,24 @@ using namespace cover;
 OpenSetConvex::OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, iris::IRISRegion region_):
   OpenSet(cspace_,s), region(region_)
 {
+  Eigen::MatrixXd A_eigen = region.getPolyhedron().getA();
+  Eigen::VectorXd b_eigen = region.getPolyhedron().getB();
+  Eigen::MatrixXd C_eigen = region.getEllipsoid().getC();
+  Eigen::VectorXd d_eigen = region.getEllipsoid().getD();
+  std::cout << "seed point is member of Polyhedron? " << (((A_eigen * d_eigen - b_eigen).maxCoeff()<=1e-10)?"YES":"NO") << std::endl;
+  for(uint k = 0; k < A_eigen.rows(); k++){
+    for(uint j = 0; j < A_eigen.cols(); j++){
+      if(abs(A_eigen(k,j)) <= 1e-6){
+        //dirty hack: points below 1e-6 are treated as zero by cdd and causes
+        //some hyperplanes to be ignored (not sure why). this trick here seems
+        //to solve the problem.
+        //A_eigen(k,j) += boost::math::sign(A_eigen(k,j))*1e-6;
+        A_eigen(k,j) -= 2*1e-6;
+      }
+      A_eigen(k,j) += 2*1e-6;
+    }
+  }
+  region.polyhedron.setA(A_eigen);
 }
 
 bool OpenSetConvex::IsInside(ob::State *sPrime)
@@ -61,7 +79,6 @@ void OpenSetConvex::DrawGL(GUIState&){
 
   Eigen::MatrixXd A_eigen = region.getPolyhedron().getA();
   Eigen::VectorXd b_eigen = region.getPolyhedron().getB();
-
   Eigen::MatrixXd C_eigen = region.getEllipsoid().getC();
   Eigen::VectorXd d_eigen = region.getEllipsoid().getD();
 
@@ -70,24 +87,12 @@ void OpenSetConvex::DrawGL(GUIState&){
   Vector3 v(C_eigen(0,1),C_eigen(1,1),C_eigen(2,1));
   Vector3 w(C_eigen(0,2),C_eigen(1,2),C_eigen(2,2));
 
-  GLColor blue(0.1,0.1,0.9,1);
+  GLColor grey(0.7,0.7,0.7,1);
   GLColor black(0.2,0.2,0.2,1);
   GLColor magenta(0.8,0,0.8,0.3);
-  setColor(blue);
+  setColor(grey);
   GLDraw::drawWireEllipsoid(center, u, v, w);
 
-  std::cout << "seed point is member of Polyhedron? " << (((A_eigen * d_eigen - b_eigen).maxCoeff()<=1e-10)?"YES":"NO") << std::endl;
-  for(uint k = 0; k < A_eigen.rows(); k++){
-    for(uint j = 0; j < A_eigen.cols(); j++){
-      if(A_eigen(k,j) <= 1e-6){
-        //dirty hack: points below 1e-6 are treated as zero by cdd and causes
-        //some hyperplanes to be ignored (not sure why). this trick here seems
-        //to solve the problem.
-        A_eigen(k,j) += 1e-6;
-      }
-    }
-  }
-  region.polyhedron.setA(A_eigen);
 
   //Both iris and Eigen::Polyhedron are wrong.
   //Must be an error in libcdd which messes things up. Maybe recompile with
