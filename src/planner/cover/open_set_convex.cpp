@@ -5,98 +5,6 @@
 #include "3rdparty/vrep.h"
 
 #include "3rdparty/Polyhedron.h"
-// extern "C" {
-//   #include <qhull/qhull_a.h>
-// }
-// namespace SC{
-// #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-// #include <CGAL/Polyhedron_3.h>
-// #include <CGAL/Surface_mesh.h>
-// #include <CGAL/convex_hull_3.h>
-// typedef CGAL::Exact_predicates_inexact_constructions_kernel  K;
-// typedef CGAL::Polyhedron_3<K>                     Polyhedron_3;
-// typedef K::Point_3                                Point_3;
-// typedef CGAL::Surface_mesh<Point_3>               Surface_mesh;
-// };
-
-#include <stdio.h>
-#undef PPL_HAVE_TYPEOF
-#include "ppl.hh"
-#include "iris/iris.h"
-
-// Note: this test is no longer in use (and never really worked anyway). I'm just keeping it around in case I ever want to try again with PPL. 
-
-using namespace Parma_Polyhedra_Library;
-using namespace Eigen;
-
-struct Floating_Real_Open_Interval_Info_Policy {
-  const_bool_nodef(store_special, false);
-  const_bool_nodef(store_open, true);
-  const_bool_nodef(cache_empty, true);
-  const_bool_nodef(cache_singleton, true);
-  const_bool_nodef(cache_normalized, false);
-  const_int_nodef(next_bit, 0);
-  const_bool_nodef(may_be_empty, true);
-  const_bool_nodef(may_contain_infinity, false);
-  const_bool_nodef(check_empty_result, false);
-  const_bool_nodef(check_inexact, false);
-};
-
-typedef Interval_Info_Bitset<unsigned int,
-                             Floating_Real_Open_Interval_Info_Policy> Floating_Real_Open_Interval_Info;
-
-//! The type of an interval with floating point boundaries.
-typedef Interval<double,
-                 Floating_Real_Open_Interval_Info> FP_Interval;
-
-//! The type of an interval linear form.
-typedef Linear_Form<FP_Interval> FP_Linear_Form;
-
-//! The type of an interval abstract store.
-typedef Box<FP_Interval> FP_Interval_Abstract_Store;
-
-void getGenerators(const Polyhedron* self) {
-  const int dim = self->getDimension();
-  NNC_Polyhedron ppl_polyhedron(dim);
-  std::vector<Variable> vars;
-  for (int i=0; i < dim; i++) {
-    Variable v(i);
-    vars.push_back(v);
-  }
-  for (int i=0; i < self->getNumberOfConstraints(); i++) {
-    FP_Linear_Form expr;
-    for (int j=0; j < dim; j++) {
-      expr += FP_Linear_Form(self->getA()(i,j) * vars[j]);
-    }
-    expr.print();
-    printf("\n");
-    FP_Linear_Form right(self->getB()(i) + 0.0 * vars[0]);
-    right.print();
-    printf("\n");
-    ppl_polyhedron.refine_with_linear_form_inequality(expr, right);
-    // ppl_polyhedron.add_constraint(expr <= Linear_Form<double>(self->getB()(i)));
-  }
-
-  auto generators = ppl_polyhedron.generators();
-  generators.print();
-  std::cout << std::endl;
-  for (auto gen = generators.begin(); gen != generators.end(); ++gen) {
-    gen->print();
-    // for (int i=0; i < dim; i++) {
-    //   printf("%f", static_cast<const int>(gen->coefficient(vars[i])));
-    // }
-    printf("\n");
-    // printf(" %d\n", static_cast<const int> gen->divisor());
-  }
-
-  ppl_polyhedron.constraints().print();
-}
-
-
-
-
-
-
 
 
 
@@ -137,19 +45,19 @@ OpenSetConvex::OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, iris::IRIS
   Eigen::MatrixXd C_eigen = region.getEllipsoid().getC();
   Eigen::VectorXd d_eigen = region.getEllipsoid().getD();
   std::cout << "seed point is member of Polyhedron? " << (((A_eigen * d_eigen - b_eigen).maxCoeff()<=1e-10)?"YES":"NO") << std::endl;
-  for(uint k = 0; k < A_eigen.rows(); k++){
-    for(uint j = 0; j < A_eigen.cols(); j++){
-      if(abs(A_eigen(k,j)) <= 1e-6){
-        //dirty hack: points below 1e-6 are treated as zero by cdd and causes
-        //some hyperplanes to be ignored (not sure why). this trick here seems
-        //to solve the problem.
-        //A_eigen(k,j) += boost::math::sign(A_eigen(k,j))*1e-6;
-        A_eigen(k,j) -= 2*1e-6;
-      }
-      A_eigen(k,j) += 2*1e-6;
-    }
-  }
-  region.polyhedron.setA(A_eigen);
+  // for(uint k = 0; k < A_eigen.rows(); k++){
+  //   for(uint j = 0; j < A_eigen.cols(); j++){
+  //     if(abs(A_eigen(k,j)) <= 1e-6){
+  //       //dirty hack: points below 1e-6 are treated as zero by cdd and causes
+  //       //some hyperplanes to be ignored (not sure why). this trick here seems
+  //       //to solve the problem.
+  //       //A_eigen(k,j) += boost::math::sign(A_eigen(k,j))*1e-6;
+  //       A_eigen(k,j) -= 2*1e-6;
+  //     }
+  //     A_eigen(k,j) += 2*1e-6;
+  //   }
+  // }
+  // region.polyhedron.setA(A_eigen);
 }
 
 bool OpenSetConvex::IsInside(ob::State *sPrime)
@@ -179,20 +87,21 @@ void OpenSetConvex::DrawGL(GUIState&){
   setColor(grey);
   GLDraw::drawWireEllipsoid(center, u, v, w);
 
-  getGenerators(&region.getPolyhedron());
-
   //Both iris and Eigen::Polyhedron are wrong.
   //Must be an error in libcdd which messes things up. Maybe recompile with
   //exact and not floating based arithmetic?
+
   std::vector<Eigen::VectorXd> vxs = region.getPolyhedron().generatorPoints();
   for(uint k = 0; k < vxs.size(); k++){
     std::cout << vxs.at(k) << std::endl;
   }
-  exit(0);
 
+  // std::cout << std::string(80, '-') << std::endl;
   // VertexRepresentation vrep(A_eigen, b_eigen);
   // Eigen::MatrixXd V = vrep.GetVertices();
+  // std::cout << V << std::endl;
 
+  //exit(0);
   // Eigen::Polyhedron P;
   // P.vrep(A_eigen, b_eigen);
   // std::pair<Eigen::MatrixXd, Eigen::VectorXd> VV;
