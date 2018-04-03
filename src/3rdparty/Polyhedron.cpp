@@ -18,6 +18,7 @@
 */
 
 #include "Polyhedron.h"
+#include <iostream>
 
 namespace Eigen {
 
@@ -29,7 +30,7 @@ Polyhedron::Polyhedron()
     , polytope_(nullptr)
 {
     if (counter == 0)
-        dd_set_global_constants();
+        ddf_set_global_constants();
     counter++;
 }
 
@@ -38,12 +39,12 @@ Polyhedron::~Polyhedron()
     counter--;
 
     if (matPtr_ != nullptr)
-        dd_FreeMatrix(matPtr_);
+        ddf_FreeMatrix(matPtr_);
     if (polytope_ != nullptr)
-        dd_FreePolyhedra(polytope_);
+        ddf_FreePolyhedra(polytope_);
 
     if (counter == 0)
-        dd_free_global_constants();
+        ddf_free_global_constants();
 }
 
 void Polyhedron::vrep(const Eigen::MatrixXd& A, const Eigen::VectorXd& b)
@@ -63,29 +64,29 @@ void Polyhedron::hrep(const Eigen::MatrixXd& A, const Eigen::VectorXd& b)
 std::pair<Eigen::MatrixXd, Eigen::VectorXd> Polyhedron::vrep() const
 {
     std::unique_lock<std::mutex> lock(mtx);
-    dd_MatrixPtr mat = dd_CopyGenerators(polytope_);
+    ddf_MatrixPtr mat = ddf_CopyGenerators(polytope_);
     return ddfMatrix2EigenMatrix(mat, true);
 }
 
 std::pair<Eigen::MatrixXd, Eigen::VectorXd> Polyhedron::hrep() const
 {
     std::unique_lock<std::mutex> lock(mtx);
-    dd_MatrixPtr mat = dd_CopyInequalities(polytope_);
+    ddf_MatrixPtr mat = ddf_CopyInequalities(polytope_);
     return ddfMatrix2EigenMatrix(mat, false);
 }
 
 void Polyhedron::printVrep() const
 {
     std::unique_lock<std::mutex> lock(mtx);
-    dd_MatrixPtr mat = dd_CopyGenerators(polytope_);
-    dd_WriteMatrix(stdout, mat);
+    ddf_MatrixPtr mat = ddf_CopyGenerators(polytope_);
+    ddf_WriteMatrix(stdout, mat);
 }
 
 void Polyhedron::printHrep() const
 {
     std::unique_lock<std::mutex> lock(mtx);
-    dd_MatrixPtr mat = dd_CopyInequalities(polytope_);
-    dd_WriteMatrix(stdout, mat);
+    ddf_MatrixPtr mat = ddf_CopyInequalities(polytope_);
+    ddf_WriteMatrix(stdout, mat);
 }
 
 /**
@@ -101,25 +102,40 @@ bool Polyhedron::hvrep(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, bool 
 void Polyhedron::initializeMatrixPtr(Eigen::Index rows, Eigen::Index cols, bool isFromGenerators)
 {
     if (matPtr_ != nullptr)
-        dd_FreeMatrix(matPtr_);
+        ddf_FreeMatrix(matPtr_);
     
-    matPtr_ = dd_CreateMatrix(rows, cols);
-    matPtr_->representation = (isFromGenerators ? dd_Generator : dd_Inequality);
+    matPtr_ = ddf_CreateMatrix(rows, cols);
+    matPtr_->representation = (isFromGenerators ? ddf_Generator : ddf_Inequality);
 }
 
 bool Polyhedron::doubleDescription(const Eigen::MatrixXd& matrix, bool isFromGenerators)
 {
     initializeMatrixPtr(matrix.rows(), matrix.cols(), isFromGenerators);
 
-    for (auto row = 0; row < matrix.rows(); ++row)
-        for (auto col = 0; col < matrix.cols(); ++col)
-            matPtr_->matrix[row][col][0] = matrix(row, col);
+    //std::cout << "matrix size: " << matPtr_->rowsize << "x" << matPtr_->colsize << std::endl;
+
+    for (auto row = 0; row < matrix.rows(); ++row){
+      for (auto col = 0; col < matrix.cols(); ++col){
+        //double d = 0;
+#ifdef ddf_GMPRATIONAL
+        mpq_set_d(&matPtr_->matrix[row][col][0], matrix(row, col));
+        //d = mpq_get_d(&matPtr_->matrix[row][col][0]);
+#else
+        matPtr_->matrix[row][col][0] = matrix(row, col);
+        //d = matPtr_->matrix[row][col][0];
+#endif
+        // std::cout << "[" << row << "/" << matrix.rows() << "," << col << "/" << matrix.cols()<< "] : ";
+        // std::cout << matrix(row,col) << " -> ";
+        // std::cout << d;
+        // std::cout << std::endl;
+      }
+    }
 
     if (polytope_ != nullptr)
-        dd_FreePolyhedra(polytope_);
+        ddf_FreePolyhedra(polytope_);
 
-    polytope_ = dd_DDMatrix2Poly(matPtr_, &err_);
-    return (err_ == dd_NoError) ? true : false;
+    polytope_ = ddf_DDMatrix2Poly(matPtr_, &err_);
+    return (err_ == ddf_NoError) ? true : false;
 }
 
 Eigen::MatrixXd Polyhedron::concatenateMatrix(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, bool isFromGenerators)
@@ -131,7 +147,7 @@ Eigen::MatrixXd Polyhedron::concatenateMatrix(const Eigen::MatrixXd& A, const Ei
     return mat;
 }
 
-std::pair<Eigen::MatrixXd, Eigen::VectorXd> Polyhedron::ddfMatrix2EigenMatrix(const dd_MatrixPtr mat, bool isOuputVRep) const
+std::pair<Eigen::MatrixXd, Eigen::VectorXd> Polyhedron::ddfMatrix2EigenMatrix(const ddf_MatrixPtr mat, bool isOuputVRep) const
 {
     double sign = (isOuputVRep ? 1 : -1);
     auto rows = mat->rowsize;
@@ -139,9 +155,17 @@ std::pair<Eigen::MatrixXd, Eigen::VectorXd> Polyhedron::ddfMatrix2EigenMatrix(co
     Eigen::MatrixXd mOut(rows, cols - 1);
     Eigen::VectorXd vOut(rows);
     for (auto row = 0; row < rows; ++row) {
+#ifdef ddf_GMPRATIONAL
+        vOut(row) = mpq_get_d(&mat->matrix[row][0][0]);
+        for (auto col = 1; col < cols; ++col){
+          mOut(row, col-1) = sign*mpq_get_d(&mat->matrix[row][col][0]);
+        }
+#else
         vOut(row) = mat->matrix[row][0][0];
-        for (auto col = 1; col < cols; ++col)
-            mOut(row, col - 1) = sign * mat->matrix[row][col][0];
+        for (auto col = 1; col < cols; ++col){
+          mOut(row, col - 1) = sign * mat->matrix[row][col][0];
+        }
+#endif
     }
 
     return std::make_pair(mOut, vOut);

@@ -4,22 +4,17 @@
 
 namespace ob = ompl::base;
 
-//  Visualization of CSpace Decomposition
+//  Quotient contains a single Quotient Space Decomposition which is nested in a chain of
+//  quotient spaces. This single decomposition can be visualized as
 //
-// [    ][    ]
-// [    ][    ]
 // [    ][ M0 ]
 // [ M1 ][____]
-// [    ][    ]
 // [    ][ C1 ]
 // [    ][    ]
 //
-// whereby 
-// M1 = M1
-// M0 = previous->getspaceinformation()
-// C1 = C1
-//
-//
+//  whereby M1 is the configuration space, C1 is a designated subsapce, and M0 =
+//  M1/C1 is the resulting quotient space. Here we assume that M1 and M0 have
+//  been given, and we compute the inverse of the quotient map, i.e. C1 = M1/M0. 
 //
 //Cases we can handle:
 // ---- non-compound:
@@ -30,8 +25,7 @@ namespace ob = ompl::base;
 // (4) M1 SE3xRn   , M0 SE3                => C1 = Rn
 // (5) M1 SE3xRn   , M0 SE3xRm   , 0<m<n   => C1 = R(n-m)
 //
-//
-//TO be done:
+//TO be done (might be beneficial for rigid objects floating in space)
 ///// M1 SE3      , M0 R3xSO2xSO2         =>C1 = SO2
 ///// M1 R3xS1xS1 , M0 R3                 =>C1 = SO2xSO2
 namespace ompl
@@ -85,7 +79,7 @@ namespace ompl
 
         ob::SpaceInformationPtr M1; //configuration space Mi = si_
         ob::SpaceInformationPtr M0; //quotient space Mi-1 = Mi/Ci
-        ob::SpaceInformationPtr C1; //standalone configuration space Ci = Mi/Mi-1
+        ob::SpaceInformationPtr C1; //subspace Ci = Mi/Mi-1
 
         ob::StateSamplerPtr C1_sampler;
         ob::StateSamplerPtr M1_sampler;

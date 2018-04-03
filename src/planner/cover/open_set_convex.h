@@ -1,11 +1,10 @@
 #pragma once
-#include "klampt.h"
 #include "open_set.h"
 #include <ompl/base/State.h>
-#include <ompl/base/SpaceInformation.h>
 #include <iris/iris.h>
-#include <Eigen/Core>
 namespace ob = ompl::base;
+
+class CSpaceOMPL;
 
 namespace cover{
   class OpenSetConvex: public OpenSet{

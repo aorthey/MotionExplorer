@@ -21,6 +21,9 @@
 
 #include <Eigen/Core>
 #include <atomic>
+#define GMPRATIONAL 1
+// #include <cdd/setoper.h>
+// #include <cdd/cdd.h>
 #include <setoper.h>
 #include <cdd.h>
 #include <mutex>
@@ -76,12 +79,12 @@ private:
     void initializeMatrixPtr(Eigen::Index rows, Eigen::Index cols, bool isFromGenerators);
     bool doubleDescription(const Eigen::MatrixXd& matrix, bool isFromGenerators);
     Eigen::MatrixXd concatenateMatrix(const Eigen::MatrixXd& A, const Eigen::VectorXd& b, bool isFromGenerators);
-    std::pair<Eigen::MatrixXd, Eigen::VectorXd> ddfMatrix2EigenMatrix(const dd_MatrixPtr mat, bool isOuputVRep) const;
+    std::pair<Eigen::MatrixXd, Eigen::VectorXd> ddfMatrix2EigenMatrix(const ddf_MatrixPtr mat, bool isOuputVRep) const;
 
 private:
-    dd_MatrixPtr matPtr_;
-    dd_PolyhedraPtr polytope_;
-    dd_ErrorType err_;
+    ddf_MatrixPtr matPtr_;
+    ddf_PolyhedraPtr polytope_;
+    ddf_ErrorType err_;
 
 private:
     static std::atomic_int counter;
