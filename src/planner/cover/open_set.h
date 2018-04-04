@@ -24,6 +24,7 @@ namespace cover{
       GLDraw::GLColor cOpenSet{magenta};
 
       friend std::ostream& operator<< (std::ostream& out, const OpenSet& set);
+      virtual std::ostream& Print(std::ostream& out) const;
 
     protected:
       CSpaceOMPL *cspace;

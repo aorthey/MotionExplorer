@@ -5,58 +5,6 @@
 #include <Eigen/Core>
 #include <iris/iris.h>
 
-void testIRIS(){
-  iris::IRISProblem problem(3);
-  // Inflate a region inside a 1x1x1 box
-  problem.setSeedPoint(Eigen::Vector3d(0.1, 0.1, 0.1));
-
-  //obstacle is defined by Matrix NxM whereby N is the number of dimensions, and
-  //M are the number of points. It is assumed that the obstacle is convex, i.e.
-  //the obstacle is defined as the convex hull of all the given points
-  Eigen::MatrixXd obs(3,4);
-  //left
-  obs << 0, 0, 0, 0,
-         0, 1, 1, 0,
-         0, 1, 0, 1;
-  problem.addObstacle(obs);
-  //right
-  obs << 1, 1, 1, 1,
-         0, 1, 1, 0,
-         0, 1, 0, 1;
-  problem.addObstacle(obs);
-
-  //front
-  obs << 0, 1, 1, 0,
-         0, 0, 0, 0,
-         0, 0, 1, 1;
-  problem.addObstacle(obs);
-  //back
-  obs << 0, 1, 1, 0,
-         1, 1, 1, 1,
-         0, 0, 1, 1;
-  problem.addObstacle(obs);
-
-  //bottom
-  obs << 0, 1, 0, 1,
-         0, 0, 1, 1,
-         0, 0, 0, 0;
-  problem.addObstacle(obs);
-  //top
-  obs << 0, 1, 0, 1,
-         0, 0, 1, 1,
-         1, 1, 1, 1;
-  problem.addObstacle(obs);
-
-  iris::IRISOptions options;
-  iris::IRISRegion region = inflate_region(problem, options);
-
-  std::cout << "C: " << region.ellipsoid.getC() << std::endl;
-  std::cout << "d: " << region.ellipsoid.getD() << std::endl;
-  std::cout << "A: " << region.polyhedron.getA() << std::endl;
-  std::cout << "b: " << region.polyhedron.getB() << std::endl;
-
-}
-
 ValidityCheckerSimplicialComplex::ValidityCheckerSimplicialComplex(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_, CSpace *inner_):
   OMPLValidityChecker(si, cspace_, inner_)
 {

@@ -47,6 +47,9 @@ void QCP::Init()
 void QCP::Grow(double t)
 {
   //somehow grow convex regions on R3 or sample if on SE(3)
+  // if(previous==nullptr){
+  //   cspace_cover.Grow();
+  // }
 }
 
 void QCP::CheckForSolution(ob::PathPtr &solution)

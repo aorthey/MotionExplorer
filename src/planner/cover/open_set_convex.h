@@ -16,7 +16,7 @@ namespace cover{
 
       void DrawGL(GUIState&) override;
 
-      friend std::ostream& operator<< (std::ostream& out, const OpenSetConvex& set);
+      virtual std::ostream& Print(std::ostream& out) const override;
 
     protected:
       iris::IRISRegion region;

@@ -16,14 +16,20 @@ OpenSet::~OpenSet()
 const ob::State* OpenSet::GetCenter() const{
   return sCenter;
 }
+
+std::ostream& OpenSet::Print(std::ostream& out) const{
+  out << std::string(80, '-') << std::endl;
+  out << "OpenSet" << std::endl;
+  out << std::string(80, '-') << std::endl;
+  out << "Center: " << std::endl;
+  cspace->SpaceInformationPtr()->printState(sCenter, out);
+  return out;
+}
+
 namespace cover{
   std::ostream& operator<< (std::ostream& out, const OpenSet& set)
   {
-    out << std::string(80, '-') << std::endl;
-    out << "OpenSet" << std::endl;
-    out << std::string(80, '-') << std::endl;
-    out << "Center: " << std::endl;
-    set.cspace->SpaceInformationPtr()->printState(set.sCenter, out);
+    set.Print(out);
     return out;
   }
 }
