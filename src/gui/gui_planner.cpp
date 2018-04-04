@@ -197,6 +197,37 @@ void PlannerBackend::RenderWorld(){
 
     planner->DrawGL(state);
 
+
+    if(state("draw_planner_surface_normals")){
+      for(uint k = 0; k < world->terrains.size(); k++)
+      {
+        SmartPointer<Terrain> terrain = world->terrains.at(k);
+        ManagedGeometry& geometry = terrain->geometry;
+        const Meshing::TriMesh& trimesh = geometry->AsTriangleMesh();
+        uint N = trimesh.tris.size();
+        //Eigen::MatrixXd Adj = Eigen::MatrixXd::Zero(N,N);
+        for(uint i = 0; i < N; i++){
+          Vector3 vA = trimesh.TriangleVertex(i,0);
+          Vector3 vB = trimesh.TriangleVertex(i,1);
+          Vector3 vC = trimesh.TriangleVertex(i,2);
+          Vector3 ni = trimesh.TriangleNormal(i);
+          ni /= ni.norm();
+          //compute incenter
+          // double c = vA.distance(vB);
+          // double b = vA.distance(vC);
+          // double a = vB.distance(vC);
+          //Vector3 incenter = (a*vA+b*vB+c*vC)/(a+b+c);
+          Vector3 centroid = (vA+vB+vC)/3.0;
+          //drawLineSegment(incenter, incenter - ni);
+          drawLineSegment(centroid, centroid + ni);
+
+          //how to obtain correct orientation!? (locally orientable? it should
+          //be straightforward to determine if a normal component is enclosed in
+          //the object)
+        }
+      }
+    }
+
     if(state("draw_planner_bounding_box")){
       Config min = planner->GetInput().se3min;
       Config max = planner->GetInput().se3max;

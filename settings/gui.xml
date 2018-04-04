@@ -228,4 +228,5 @@
   <property name="draw_cover_edges" enabled="1"/>
   <property name="draw_cover_faces" enabled="1"/>
   <property name="draw_cover_ellipsoid" enabled="1"/>
+  <property name="draw_planner_surface_normals" enabled="1"/>
 </gui>
