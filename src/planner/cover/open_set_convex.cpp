@@ -2,34 +2,44 @@
 #include "open_set_convex.h"
 #include "gui/drawMotionPlanner.h"
 
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <CGAL/Polyhedron_3.h>
-#include <CGAL/convex_hull_3.h>
-#include <CGAL/Convex_hull_3/dual/halfspace_intersection_3.h>
-
-typedef CGAL::Exact_predicates_inexact_constructions_kernel   K;
-typedef K::Point_3                                            Point_3;
-typedef K::Plane_3                                            Plane_3;
-typedef CGAL::Polyhedron_3<K>                                 Polyhedron_3;
-typedef Polyhedron_3::Vertex_handle                           Vertex_handle;
-typedef Polyhedron_3::Facet                                   Facet;
-typedef Polyhedron_3::Halfedge                                Halfedge;
-typedef Polyhedron_3::Vertex_iterator                         Vertex_iterator;
-typedef Polyhedron_3::Facet_iterator                          Facet_iterator;
-typedef Polyhedron_3::Halfedge_around_facet_circulator        Halfedge_around_facet_circulator;
-typedef Polyhedron_3::Halfedge_handle                         Halfedge_handle;
-typedef Polyhedron_3::Halfedge_iterator                       Halfedge_iterator;
-
 using namespace cover;
 
-OpenSetConvex::OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, iris::IRISRegion region_):
+OpenSetConvex::OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, iris::IRISRegion region_, const iris::Polyhedron &bounds):
   OpenSet(cspace_,s), region(region_)
 {
-  // Eigen::MatrixXd A_eigen = region.getPolyhedron().getA();
-  // Eigen::VectorXd b_eigen = region.getPolyhedron().getB();
-  // Eigen::MatrixXd C_eigen = region.getEllipsoid().getC();
-  // Eigen::VectorXd d_eigen = region.getEllipsoid().getD();
-  //std::cout << "seed point is member of Polyhedron? " << (((A_eigen * d_eigen - b_eigen).maxCoeff()<=1e-10)?"YES":"NO") << std::endl;
+  Eigen::MatrixXd A_eigen = region.getPolyhedron().getA();
+  Eigen::VectorXd b_eigen = region.getPolyhedron().getB();
+  Eigen::MatrixXd C_eigen = region.getEllipsoid().getC();
+  Eigen::VectorXd d_eigen = region.getEllipsoid().getD();
+  bool IsCenterInsideRegion = ((A_eigen * d_eigen - b_eigen).maxCoeff()<=1e-10);
+
+  if(!IsCenterInsideRegion){
+    std::cout << "Center point of convex region is not inside convex region." << std::endl;
+    std::cout << "Center point: " << d_eigen << std::endl;
+    exit(0);
+  }
+
+  //compute CGAL polyhedron_3 from inflated iris region
+  std::list<Plane_3> planes;
+  for(uint k = 0; k < A_eigen.rows(); k++){
+    Plane_3 plane(A_eigen(k,0), A_eigen(k,1), A_eigen(k,2), -b_eigen(k));
+    planes.push_back(plane);
+  }
+  Point_3 pcenter(d_eigen[0],d_eigen[1],d_eigen[2]);
+
+  CGAL::halfspace_intersection_3(planes.begin(), planes.end(), poly, pcenter);
+
+  //compute CGAL polyhedron_3 from bounds
+  A_bounds = bounds.getA();
+  b_bounds = bounds.getB();
+  std::list<Plane_3> bound_planes;
+  for(uint k = 0; k < A_bounds.rows(); k++){
+    Plane_3 plane(A_bounds(k,0), A_bounds(k,1), A_bounds(k,2), -b_bounds(k));
+    bound_planes.push_back(plane);
+  }
+
+  //pcenter is by definition an interior point of bounds
+  CGAL::halfspace_intersection_3(bound_planes.begin(), bound_planes.end(), poly_bounds, pcenter);
 }
 
 bool OpenSetConvex::IsInside(ob::State *sPrime)
@@ -63,16 +73,6 @@ void OpenSetConvex::DrawGL(GUIState& state){
     GLDraw::drawWireEllipsoid(center, u, v, w);
   }
 
-  std::list<Plane_3> planes;
-  for(uint k = 0; k < A_eigen.rows(); k++){
-    Plane_3 plane(A_eigen(k,0), A_eigen(k,1), A_eigen(k,2), -b_eigen(k));
-    planes.push_back(plane);
-  }
-  Point_3 pcenter(d_eigen[0],d_eigen[1],d_eigen[2]);
-
-  Polyhedron_3 poly;
-  CGAL::halfspace_intersection_3(planes.begin(), planes.end(), poly, pcenter);
-
   if(state("draw_cover_vertices")){
     glPointSize(10);
     setColor(black);
@@ -99,8 +99,31 @@ void OpenSetConvex::DrawGL(GUIState& state){
 
   if(state("draw_cover_faces")){
     setColor(magenta);
+    uint ctr = 0;
     for ( Facet_iterator f = poly.facets_begin(); f != poly.facets_end(); ++f)
     {
+      bool active = IsActiveFacet(ctr++);
+      if(active) continue;
+      Halfedge_around_facet_circulator fcirc = f->facet_begin();
+
+      glBegin(GL_POLYGON);
+      CGAL_For_all(fcirc, f->facet_begin())
+      {
+        glVertex3f(fcirc->vertex()->point().x(),
+                   fcirc->vertex()->point().y(),
+                   fcirc->vertex()->point().z());
+      }
+      glEnd();
+    }
+  }
+  if(state("draw_cover_active_faces")){
+    setColor(black);
+    uint ctr = 0;
+    for ( Facet_iterator f = poly.facets_begin(); f != poly.facets_end(); ++f)
+    {
+      bool active = IsActiveFacet(ctr++);
+      if(!active) continue;
+      //std::cout << "face " << ctr << " active: " << (active?"yes":"no") << std::endl;
       Halfedge_around_facet_circulator fcirc = f->facet_begin();
 
       glBegin(GL_POLYGON);
@@ -116,6 +139,71 @@ void OpenSetConvex::DrawGL(GUIState& state){
 
   glDisable(GL_BLEND);
   glEnable(GL_LIGHTING);
+}
+
+bool OpenSetConvex::IsActiveFacet(uint k)
+{
+  const double EPSILON_EQ = 0.01;
+  Vector3 center = GetCenterOfFacet(k);
+  Eigen::VectorXd v(3);
+  for(uint k = 0; k < 3; k++) v[k] = center[k];
+  bool active = false;
+  for(uint j = 0; j < A_bounds.rows(); j++){
+    double d = A_bounds.row(j)*v - b_bounds(k);
+    if( fabs(d) <= EPSILON_EQ ){
+      active = true;
+    }
+  }
+
+  if(!active){
+    return false;
+  }
+  return true;
+}
+
+Vector3 OpenSetConvex::GetCenterOfFacet(uint k)
+{
+  std::vector<Vector3> fk = GetFacet(k);
+  Vector3 center(0,0,0);
+  for(uint k = 0; k < fk.size(); k++){
+    center += fk.at(k);
+  }
+  center /= fk.size();
+  return center;
+}
+
+std::vector<Vector3> OpenSetConvex::GetFacet(uint k)
+{
+  uint N = poly.size_of_facets();
+  std::vector<Vector3> vertices;
+  if(k>=N) return vertices;
+  uint ctr = 0;
+
+  for ( Facet_iterator f = poly.facets_begin(); f != poly.facets_end(); ++f)
+  {
+    if(ctr==k){
+      Halfedge_around_facet_circulator fcirc = f->facet_begin();
+      CGAL_For_all(fcirc, f->facet_begin())
+      {
+        glVertex3f(fcirc->vertex()->point().x(),
+                   fcirc->vertex()->point().y(),
+                   fcirc->vertex()->point().z());
+
+        Vector3 v(fcirc->vertex()->point().x(),
+                   fcirc->vertex()->point().y(),
+                   fcirc->vertex()->point().z());
+        vertices.push_back(v);
+      }
+      return vertices;
+    }
+    ctr++;
+  }
+  std::cout << "WARNING: facet " << k << "/" << N << " not found." << std::endl;
+  return vertices;
+}
+
+uint OpenSetConvex::GetNumberOfFacets(){
+  return poly.size_of_facets();
 }
 
 std::ostream& OpenSetConvex::Print(std::ostream& out) const

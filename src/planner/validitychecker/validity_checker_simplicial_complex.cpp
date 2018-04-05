@@ -102,28 +102,12 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
   }
 
   problem.setSeedPoint(seed_pt);
-
   iris::IRISOptions options;
   options.require_containment = true;
-  iris::IRISDebugData debug;
-  iris::IRISRegion region = inflate_region(problem, options, &debug);
+  //iris::IRISDebugData debug;
+  //iris::IRISRegion region = inflate_region(problem, options, &debug);
+  iris::IRISRegion region = inflate_region(problem, options);
 
-  //uint M = region.polyhedron.getNumberOfConstraints();
-  // std::vector<iris::Polyhedron> phistory = debug.polyhedron_history;
-  // std::vector<iris::Ellipsoid> ehistory = debug.ellipsoid_history;
-  // for(uint k = 0; k < phistory.size(); k++){
-  //   std::cout << std::string(80, '-') << std::endl;
-  //   std::cout << "history: " << k << "/" << phistory.size() << " constraints: " << phistory.at(k).getNumberOfConstraints() << std::endl;
-  //   std::cout << phistory.at(k).getA() << std::endl;
-  //   std::cout << phistory.at(k).getB() << std::endl;
-  //   bool contains_sp = phistory.at(k).contains(seed_pt,1e-10);
-  //   std::cout << "seed point: " << seed_pt << std::endl;
-  //   std::cout << (contains_sp?"OK":"violation") << std::endl;
-  //   if(!contains_sp){
-  //     exit(0);
-  //   }
-  // }
-
-  cover::OpenSetConvex *cvx_region = new cover::OpenSetConvex(cspace, state, region);
+  cover::OpenSetConvex *cvx_region = new cover::OpenSetConvex(cspace, state, region, problem.getBounds());
   return cvx_region;
 }

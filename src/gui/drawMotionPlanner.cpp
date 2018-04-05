@@ -161,7 +161,7 @@ namespace GLDraw{
     glPopMatrix();
 
   }
-  void setColor(GLColor &c){
+  void setColor(const GLColor &c){
     //glColor4f(c[0],c[1],c[2],c[3]);
     //glColor3f(c[0],c[1],c[2]);
     c.setCurrentGL();

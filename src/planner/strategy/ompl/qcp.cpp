@@ -50,6 +50,16 @@ void QCP::Grow(double t)
   // if(previous==nullptr){
   //   cspace_cover.Grow();
   // }
+
+  std::vector<cover::OpenSet*> cover = cspace_cover.GetCover();
+  for(uint k = 0; k < cover.size(); k++){
+    cover::OpenSetConvex* O = static_cast<cover::OpenSetConvex*>(cover.at(k));
+    uint N = O->GetNumberOfFacets();
+    for(uint j = 0; j < N; j++){
+      //std::vector<Vector3> fj = O->GetFacet(j);
+      //check if active
+    }
+  }
 }
 
 void QCP::CheckForSolution(ob::PathPtr &solution)

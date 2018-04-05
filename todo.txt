@@ -460,6 +460,5 @@ obstacles or any existing iris region. This seems not good for narrow passages.
 Better use vertices of obstacles to infer 
 [ ] given two regions, how should we expand it? It seems reasonable to choose a
 point on its surface. But where should it be placed? 
-
 [ ] last meeting: three objectives: (1) growing neighborhood, (2) kinodynamic
 planning, (3) flat hierarchy using onetopic paths

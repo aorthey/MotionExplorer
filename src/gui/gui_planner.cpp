@@ -199,6 +199,8 @@ void PlannerBackend::RenderWorld(){
 
 
     if(state("draw_planner_surface_normals")){
+      glDisable(GL_LIGHTING);
+      glEnable(GL_BLEND); 
       for(uint k = 0; k < world->terrains.size(); k++)
       {
         SmartPointer<Terrain> terrain = world->terrains.at(k);
@@ -206,12 +208,14 @@ void PlannerBackend::RenderWorld(){
         const Meshing::TriMesh& trimesh = geometry->AsTriangleMesh();
         uint N = trimesh.tris.size();
         //Eigen::MatrixXd Adj = Eigen::MatrixXd::Zero(N,N);
+        glLineWidth(3);
+        //GLColor cNormal(0.8,0.5,0.5,0.5);
+        setColor(magenta);
         for(uint i = 0; i < N; i++){
           Vector3 vA = trimesh.TriangleVertex(i,0);
           Vector3 vB = trimesh.TriangleVertex(i,1);
           Vector3 vC = trimesh.TriangleVertex(i,2);
           Vector3 ni = trimesh.TriangleNormal(i);
-          ni /= ni.norm();
           //compute incenter
           // double c = vA.distance(vB);
           // double b = vA.distance(vC);
@@ -226,6 +230,8 @@ void PlannerBackend::RenderWorld(){
           //the object)
         }
       }
+      glEnable(GL_LIGHTING);
+      glDisable(GL_BLEND); 
     }
 
     if(state("draw_planner_bounding_box")){
