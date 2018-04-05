@@ -286,9 +286,6 @@ TopologicalGraph::TopologicalGraph(ob::PlannerData& pd, const ob::OptimizationOb
   //ComputeShortestPathsLemon(pd, obj);
 
 }
-SimplicialComplex& TopologicalGraph::GetSimplicialComplex(){
-  return cmplx;
-}
 //static ob::OptimizationObjectivePtr getThresholdPathLength(const ob::SpaceInformationPtr& si)
 //{
 //  ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));

@@ -2,6 +2,7 @@
 #include "open_set.h"
 #include <ompl/base/State.h>
 #include <iris/iris.h>
+#include <ompl/util/RandomNumbers.h>
 namespace ob = ompl::base;
 
 class CSpaceOMPL;
@@ -39,8 +40,10 @@ namespace cover{
       //The orientation is given by the right-hand rule
       std::vector<Vector3> GetFacet(uint k); 
       uint GetNumberOfFacets();
+      uint GetNumberOfInactiveFacets();
       bool IsActiveFacet(uint k);
       Vector3 GetCenterOfFacet(uint k);
+      Vector3 GetRandomPointOnFacet(uint k);
 
       void DrawGL(GUIState&) override;
 
@@ -52,5 +55,6 @@ namespace cover{
       Polyhedron_3 poly_bounds; //bounding box region around workspace
       Eigen::MatrixXd A_bounds;
       Eigen::VectorXd b_bounds;
+      ompl::RNG rng_;
   };
 };

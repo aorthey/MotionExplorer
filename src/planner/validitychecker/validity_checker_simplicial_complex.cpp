@@ -60,6 +60,9 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
     b(k)   = -bounds.low[k];
     b(k+N) = bounds.high[k];
   }
+  std::cout << N << std::endl;
+  std::cout << A << std::endl;
+  std::cout << b << std::endl;
   problem.setBounds(iris::Polyhedron(A,b));
 
   Eigen::MatrixXd obs(3,3);
@@ -83,7 +86,6 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
              v0[2], v1[2], v2[2];
       problem.addObstacle(obs);
 
-      //Vector3 ni = trimesh.TriangleNormal(i);
       int tri0 = trimesh.GetAdjacentTri(i, 0);
       int tri1 = trimesh.GetAdjacentTri(i, 1);
       int tri2 = trimesh.GetAdjacentTri(i, 2);
@@ -94,20 +96,26 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
       D(i,i) = Adj.row(i).sum();
 
     }
-    std::cout << Adj << std::endl;
+    //std::cout << Adj << std::endl;
     Eigen::MatrixXd L = D - Adj; //laplacian of triangle mesh
     Eigen::FullPivLU<Eigen::MatrixXd> lu_decomp(L);
     Eigen::MatrixXd ker = lu_decomp.kernel();
     std::cout << "Connected Components in Trimesh " << k << " : " << ker.cols() << std::endl;
   }
 
+  std::cout << "seed_pt: " << seed_pt << std::endl;
   problem.setSeedPoint(seed_pt);
   iris::IRISOptions options;
   options.require_containment = true;
-  //iris::IRISDebugData debug;
+  iris::IRISDebugData debug;
   //iris::IRISRegion region = inflate_region(problem, options, &debug);
   iris::IRISRegion region = inflate_region(problem, options);
 
-  cover::OpenSetConvex *cvx_region = new cover::OpenSetConvex(cspace, state, region, problem.getBounds());
-  return cvx_region;
+  double d = region.getEllipsoid().getVolume();
+  if(d>=1e-5){
+    cover::OpenSetConvex *cvx_region = new cover::OpenSetConvex(cspace, state, region, problem.getBounds());
+    return cvx_region;
+  }else{
+    return nullptr;
+  }
 }

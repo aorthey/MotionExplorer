@@ -50,16 +50,36 @@ void QCP::Grow(double t)
   // if(previous==nullptr){
   //   cspace_cover.Grow();
   // }
+  auto checkerPtr = static_pointer_cast<ValidityCheckerSimplicialComplex>(si_->getStateValidityChecker());
+
+  cover::OpenSetConvex *region = nullptr;
 
   std::vector<cover::OpenSet*> cover = cspace_cover.GetCover();
-  for(uint k = 0; k < cover.size(); k++){
-    cover::OpenSetConvex* O = static_cast<cover::OpenSetConvex*>(cover.at(k));
-    uint N = O->GetNumberOfFacets();
-    for(uint j = 0; j < N; j++){
-      //std::vector<Vector3> fj = O->GetFacet(j);
-      //check if active
-    }
+
+  //choose random region in cover
+  //choose random facet
+  //choose random point on facet
+
+  while(region==nullptr){
+    //choose random region in cover
+    uint k_cover = rng.uniformInt(0, cover.size()-1);
+    cover::OpenSetConvex* O = static_cast<cover::OpenSetConvex*>(cover.at(k_cover));
+
+    //choose random facet
+    uint k_facet = rng.uniformInt(0, O->GetNumberOfFacets());
+    if(O->IsActiveFacet(k_facet)) continue;
+    std::vector<Vector3> fj = O->GetFacet(k_facet);
+
+    //choose random point on facet
+    Vector3 v = O->GetRandomPointOnFacet(k_facet);
+    ob::State *sample = si_->allocState();
+    ob::RealVectorStateSpace::StateType *sampleR3 = sample->as<ob::RealVectorStateSpace::StateType>();
+    for(uint i = 0; i < 3; i++) sampleR3->values[i] = v[i];
+
+    region = checkerPtr->ComputeNeighborhood(sample);
   }
+  cspace_cover.AddOpenSet(region);
+
 }
 
 void QCP::CheckForSolution(ob::PathPtr &solution)

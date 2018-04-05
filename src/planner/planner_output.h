@@ -1,7 +1,6 @@
 #pragma once
 #include "elements/swept_volume.h"
 #include "elements/swath_volume.h"
-#include "elements/simplicial_complex.h"
 
 class PlannerOutput{
 
@@ -31,7 +30,6 @@ class PlannerOutput{
 
     SweptVolume *sv;
     SwathVolume *swv;
-    SimplicialComplex cmplx;
     
     Robot *robot;
     std::vector< std::vector< Config >>  paths;
@@ -68,7 +66,6 @@ class PlannerOutput{
     //void SetTree(SerializedTree &stree);
     const std::vector<Config> GetKeyframes();
     void SetKeyframes(std::vector<Config> &keyframes);
-    const SimplicialComplex& GetSimplicialComplex();
 
 };
 

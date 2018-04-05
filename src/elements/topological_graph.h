@@ -1,5 +1,4 @@
 #pragma once
-#include "elements/simplicial_complex.h"
 
 #include <ompl/base/PlannerData.h>
 #include <ompl/base/PlannerDataGraph.h>
@@ -24,8 +23,6 @@ namespace Topology{
     public:
       TopologicalGraph(ob::PlannerData& pd, const ob::OptimizationObjective& obj);
 
-      SimplicialComplex& GetSimplicialComplex();
-
       //void ComputeShortestPaths(ob::PlannerData& pd, const ob::OptimizationObjective& opt);
       void ComputeShortestPathsLemon(ob::PlannerData& pd, const ob::OptimizationObjective& opt);
 
@@ -39,8 +36,5 @@ namespace Topology{
       template<typename T>
       std::vector<std::vector<T> > extractFacetsBetweenPaths( const std::vector<T> &p1, const std::vector<T> &p2);
 
-    private:
-      SimplicialComplex cmplx;
   };
 }
-

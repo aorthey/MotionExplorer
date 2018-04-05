@@ -61,6 +61,7 @@ void OpenSetConvex::DrawGL(GUIState& state){
   GLColor grey(0.7,0.7,0.7,1);
   GLColor black(0.2,0.2,0.2,1);
   GLColor magenta(0.8,0,0.8,0.3);
+  GLColor red(1,0,0,0.5);
 
   if(state("draw_cover_ellipsoid")){
     glLineWidth(1);
@@ -121,8 +122,13 @@ void OpenSetConvex::DrawGL(GUIState& state){
     uint ctr = 0;
     for ( Facet_iterator f = poly.facets_begin(); f != poly.facets_end(); ++f)
     {
+      // Vector3 v = GetCenterOfFacet(ctr);
+      // setColor(red);
+      // glPointSize(20);
+      // drawPoint(v);
       bool active = IsActiveFacet(ctr++);
       if(!active) continue;
+      setColor(red);
       //std::cout << "face " << ctr << " active: " << (active?"yes":"no") << std::endl;
       Halfedge_around_facet_circulator fcirc = f->facet_begin();
 
@@ -147,20 +153,29 @@ bool OpenSetConvex::IsActiveFacet(uint k)
   Vector3 center = GetCenterOfFacet(k);
   Eigen::VectorXd v(3);
   for(uint k = 0; k < 3; k++) v[k] = center[k];
+
   bool active = false;
   for(uint j = 0; j < A_bounds.rows(); j++){
-    double d = A_bounds.row(j)*v - b_bounds(k);
+    double d = A_bounds.row(j)*v - b_bounds(j);
     if( fabs(d) <= EPSILON_EQ ){
       active = true;
     }
   }
-
-  if(!active){
-    return false;
-  }
-  return true;
+  return active;
 }
 
+Vector3 OpenSetConvex::GetRandomPointOnFacet(uint k)
+{
+  std::vector<Vector3> fk = GetFacet(k);
+  Vector3 center = GetCenterOfFacet(k);
+
+  Vector3 v(center);
+  for(uint k = 0; k < fk.size(); k++){
+    v += rng_.uniform01()*(fk.at(k)-center);
+  }
+
+  return v;
+}
 Vector3 OpenSetConvex::GetCenterOfFacet(uint k)
 {
   std::vector<Vector3> fk = GetFacet(k);
@@ -202,6 +217,13 @@ std::vector<Vector3> OpenSetConvex::GetFacet(uint k)
   return vertices;
 }
 
+uint OpenSetConvex::GetNumberOfInactiveFacets(){
+  uint ctr = 0;
+  for(uint k = 0; k < GetNumberOfFacets(); k++){
+    if(!IsActiveFacet(k)) ctr++;
+  }
+  return ctr;
+}
 uint OpenSetConvex::GetNumberOfFacets(){
   return poly.size_of_facets();
 }

@@ -34,6 +34,7 @@ namespace ompl
         std::vector<const ob::State*> startS_;
         std::vector<const ob::State*> goalS_;
         cover::Cover cspace_cover;
+        ompl::RNG rng;
     };
 
   };
