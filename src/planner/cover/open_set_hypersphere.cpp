@@ -18,9 +18,14 @@ bool OpenSetHypersphere::IsInside(ob::State *sPrime)
 {
   return Distance(sCenter, sPrime) < radius;
 }
-double OpenSetHypersphere::GetRadius()
+double OpenSetHypersphere::GetRadius() const
 {
   return radius;
+}
+bool OpenSetHypersphere::IsSubsetOf(const cover::OpenSet *rhs_, double tolerance) const
+{
+  const cover::OpenSetHypersphere *rhs = static_cast<const cover::OpenSetHypersphere*>(rhs_);
+  return (fabs(radius - rhs->GetRadius())<tolerance);
 }
 
 void OpenSetHypersphere::DrawGL(GUIState& state)

@@ -11,7 +11,8 @@ namespace cover{
       virtual bool IsInside(ob::State *sPrime) override;
       void DrawGL(GUIState&) override;
 
-      double GetRadius();
+      virtual bool IsSubsetOf(const cover::OpenSet *rhs_, double tolerance = 1e-5) const override;
+      double GetRadius() const;
     protected:
       double Distance(const ob::State *s_lhs, const ob::State *s_rhs);
       double radius{0};

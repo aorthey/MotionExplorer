@@ -7,11 +7,11 @@ using namespace cover;
 OpenSetConvex::OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, iris::IRISRegion region_, const iris::Polyhedron &bounds):
   OpenSet(cspace_,s), region(region_)
 {
-  Eigen::MatrixXd A_eigen = region.getPolyhedron().getA();
-  Eigen::VectorXd b_eigen = region.getPolyhedron().getB();
+  A_poly = region.getPolyhedron().getA();
+  b_poly = region.getPolyhedron().getB();
   Eigen::MatrixXd C_eigen = region.getEllipsoid().getC();
   Eigen::VectorXd d_eigen = region.getEllipsoid().getD();
-  bool IsCenterInsideRegion = ((A_eigen * d_eigen - b_eigen).maxCoeff()<=1e-10);
+  bool IsCenterInsideRegion = ((A_poly * d_eigen - b_poly).maxCoeff()<=1e-10);
 
   if(!IsCenterInsideRegion){
     std::cout << "Center point of convex region is not inside convex region." << std::endl;
@@ -21,13 +21,16 @@ OpenSetConvex::OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, iris::IRIS
 
   //compute CGAL polyhedron_3 from inflated iris region
   std::list<Plane_3> planes;
-  for(uint k = 0; k < A_eigen.rows(); k++){
-    Plane_3 plane(A_eigen(k,0), A_eigen(k,1), A_eigen(k,2), -b_eigen(k));
+  for(uint k = 0; k < A_poly.rows(); k++){
+    Plane_3 plane(A_poly(k,0), A_poly(k,1), A_poly(k,2), -b_poly(k));
     planes.push_back(plane);
   }
   Point_3 pcenter(d_eigen[0],d_eigen[1],d_eigen[2]);
 
   CGAL::halfspace_intersection_3(planes.begin(), planes.end(), poly, pcenter);
+
+  Nef_polyhedron nef_poly_tmp(poly);
+  nef_poly = nef_poly_tmp;
 
   //compute CGAL polyhedron_3 from bounds
   A_bounds = bounds.getA();
@@ -49,38 +52,51 @@ bool OpenSetConvex::IsInside(ob::State *sPrime)
   return false;
 }
 
-void OpenSetConvex::DrawGL(GUIState& state){
-  glDisable(GL_LIGHTING);
-  glEnable(GL_BLEND);
-
-  Eigen::MatrixXd A_eigen = region.getPolyhedron().getA();
-  Eigen::VectorXd b_eigen = region.getPolyhedron().getB();
-  Eigen::MatrixXd C_eigen = region.getEllipsoid().getC();
-  Eigen::VectorXd d_eigen = region.getEllipsoid().getD();
-
-  GLColor grey(0.7,0.7,0.7,1);
-  GLColor black(0.2,0.2,0.2,1);
-  GLColor magenta(0.8,0,0.8,0.3);
-  GLColor red(1,0,0,0.5);
-
-  if(state("draw_cover_ellipsoid")){
-    glLineWidth(1);
-    setColor(grey);
-
-    Vector3 center(d_eigen[0],d_eigen[1],d_eigen[2]);
-    Vector3 u(C_eigen(0,0),C_eigen(1,0),C_eigen(2,0));
-    Vector3 v(C_eigen(0,1),C_eigen(1,1),C_eigen(2,1));
-    Vector3 w(C_eigen(0,2),C_eigen(1,2),C_eigen(2,2));
-    GLDraw::drawWireEllipsoid(center, u, v, w);
+void OpenSetConvex::RemoveIntersection(const cover::OpenSet *rhs_)
+{
+  const cover::OpenSetConvex *rhs = dynamic_cast<const cover::OpenSetConvex*>(rhs_);
+  if(rhs==nullptr){
+    std::cout << "could not cast rhs to convex open set." << std::endl;
+    exit(0);
   }
+  nef_poly -= rhs->GetNefPolyhedron();
+}
 
+void OpenSetConvex::DrawGLNefPolyhedron(GUIState& state){
+  if(state("draw_cover_edges")){
+    glLineWidth(3);
+    setColor(black);
+    for ( Nef_halfedge_const_iterator e = nef_poly.halfedges_begin(); e != nef_poly.halfedges_end(); ++e)
+    {
+      Point_3 v0 = e->source()->point();
+      Point_3 v1 = e->target()->point();
+      //Vector3 q0(v0[0],v0[1],v0[2]);
+      double x0 = CGAL::to_double(v0[0]);
+      double y0 = CGAL::to_double(v0[1]);
+      double z0 = CGAL::to_double(v0[2]);
+      double x1 = CGAL::to_double(v1[0]);
+      double y1 = CGAL::to_double(v1[1]);
+      double z1 = CGAL::to_double(v1[2]);
+      Vector3 q0(x0,y0,z0);
+      Vector3 q1(x1,y1,z1);
+      drawPoint(q0);
+      drawLineSegment(q0,q1);
+    }
+  }
+}
+
+void OpenSetConvex::DrawGLPolyhedron(GUIState& state){
   if(state("draw_cover_vertices")){
     glPointSize(10);
     setColor(black);
-    for ( Vertex_iterator v = poly.vertices_begin(); v != poly.vertices_end(); ++v)
+    for ( Vertex_const_iterator v = poly.vertices_begin(); v != poly.vertices_end(); ++v)
     {
       Point_3 p = v->point();
-      Vector3 q(p[0],p[1],p[2]);
+      //Vector3 q(p[0],p[1],p[2]);
+      double x = CGAL::to_double(p[0]);
+      double y = CGAL::to_double(p[1]);
+      double z = CGAL::to_double(p[2]);
+      Vector3 q(x,y,z);
       drawPoint(q);
     }
   }
@@ -92,8 +108,15 @@ void OpenSetConvex::DrawGL(GUIState& state){
     {
       Point_3 v0 = e->vertex()->point();
       Point_3 v1 = e->next()->vertex()->point();
-      Vector3 q0(v0[0],v0[1],v0[2]);
-      Vector3 q1(v1[0],v1[1],v1[2]);
+      //Vector3 q0(v0[0],v0[1],v0[2]);
+      double x0 = CGAL::to_double(v0[0]);
+      double y0 = CGAL::to_double(v0[1]);
+      double z0 = CGAL::to_double(v0[2]);
+      double x1 = CGAL::to_double(v1[0]);
+      double y1 = CGAL::to_double(v1[1]);
+      double z1 = CGAL::to_double(v1[2]);
+      Vector3 q0(x0,y0,z0);
+      Vector3 q1(x1,y1,z1);
       drawLineSegment(q0,q1);
     }
   }
@@ -110,9 +133,9 @@ void OpenSetConvex::DrawGL(GUIState& state){
       glBegin(GL_POLYGON);
       CGAL_For_all(fcirc, f->facet_begin())
       {
-        glVertex3f(fcirc->vertex()->point().x(),
-                   fcirc->vertex()->point().y(),
-                   fcirc->vertex()->point().z());
+        glVertex3f(CGAL::to_double(fcirc->vertex()->point().x()),
+                   CGAL::to_double(fcirc->vertex()->point().y()),
+                   CGAL::to_double(fcirc->vertex()->point().z()));
       }
       glEnd();
     }
@@ -135,13 +158,42 @@ void OpenSetConvex::DrawGL(GUIState& state){
       glBegin(GL_POLYGON);
       CGAL_For_all(fcirc, f->facet_begin())
       {
-        glVertex3f(fcirc->vertex()->point().x(),
-                   fcirc->vertex()->point().y(),
-                   fcirc->vertex()->point().z());
+        // glVertex3f(fcirc->vertex()->point().x(),
+        //            fcirc->vertex()->point().y(),
+        //            fcirc->vertex()->point().z());
+        glVertex3f(CGAL::to_double(fcirc->vertex()->point().x()),
+                   CGAL::to_double(fcirc->vertex()->point().y()),
+                   CGAL::to_double(fcirc->vertex()->point().z()));
       }
       glEnd();
     }
   }
+
+}
+
+void OpenSetConvex::DrawGLEllipsoid(GUIState& state)
+{
+  Eigen::MatrixXd C_eigen = region.getEllipsoid().getC();
+  Eigen::VectorXd d_eigen = region.getEllipsoid().getD();
+
+  if(state("draw_cover_ellipsoid")){
+    glLineWidth(1);
+    setColor(grey);
+
+    Vector3 center(d_eigen[0],d_eigen[1],d_eigen[2]);
+    Vector3 u(C_eigen(0,0),C_eigen(1,0),C_eigen(2,0));
+    Vector3 v(C_eigen(0,1),C_eigen(1,1),C_eigen(2,1));
+    Vector3 w(C_eigen(0,2),C_eigen(1,2),C_eigen(2,2));
+    GLDraw::drawWireEllipsoid(center, u, v, w);
+  }
+}
+
+void OpenSetConvex::DrawGL(GUIState& state){
+  glDisable(GL_LIGHTING);
+  glEnable(GL_BLEND);
+
+  DrawGLEllipsoid(state);
+  DrawGLNefPolyhedron(state);
 
   glDisable(GL_BLEND);
   glEnable(GL_LIGHTING);
@@ -162,6 +214,72 @@ bool OpenSetConvex::IsActiveFacet(uint k)
     }
   }
   return active;
+}
+
+std::vector<Eigen::VectorXd> OpenSetConvex::vrep() const
+{
+  std::vector<Eigen::VectorXd> vertices;
+  for ( Vertex_const_iterator v = poly.vertices_begin(); v != poly.vertices_end(); ++v)
+  {
+    Point_3 p = v->point();
+    Eigen::VectorXd q(3);
+    for(uint k = 0; k < 3; k++) q[k] = CGAL::to_double(p[k]);
+    vertices.push_back(q);
+  }
+  return vertices;
+}
+const Nef_polyhedron& OpenSetConvex::GetNefPolyhedron() const
+{
+  return nef_poly;
+}
+const Polyhedron_3& OpenSetConvex::GetPolyhedron() const
+{
+  return poly;
+}
+
+const Eigen::MatrixXd OpenSetConvex::GetA() const
+{
+  return A_poly;
+}
+
+const Eigen::VectorXd OpenSetConvex::GetB() const
+{
+  return b_poly;
+}
+
+bool OpenSetConvex::contains(const Eigen::VectorXd& point, double tolerance) const
+{
+  return (A_poly * point - b_poly).maxCoeff() <= tolerance;
+}
+
+bool OpenSetConvex::IsSubsetOf(const cover::OpenSet *rhs_, double tolerance) const
+{
+  const cover::OpenSetConvex *rhs = dynamic_cast<const cover::OpenSetConvex*>(rhs_);
+  if(rhs==nullptr){
+    std::cout << "could not cast rhs to convex open set." << std::endl;
+    exit(0);
+  }
+
+  const Eigen::MatrixXd A_rhs = rhs->GetA();
+  const Eigen::VectorXd b_rhs = rhs->GetB();
+  std::vector<Eigen::VectorXd> vertices = vrep();
+
+  //polyhedron is contained in rhs IFF all vertices of polyhedron are contained
+  //in rhs
+
+  //(=>) if polyhedron is contained in rhs, then obviously all vertices needs to
+  //be contained.
+  //(<=) if all vertices of polyhedron are contained in rhs, then all the linear
+  //segments are contained by convexity. But then all faces are contained by
+  //convexity since they can be represented as linear segments between edge
+  //points. 
+  for(uint k = 0; k < vertices.size(); k++){
+    if(!rhs->contains(vertices.at(k),tolerance)){
+      return false;
+    }
+  }
+  return true;
+
 }
 
 Vector3 OpenSetConvex::GetRandomPointOnFacet(uint k)
@@ -200,13 +318,13 @@ std::vector<Vector3> OpenSetConvex::GetFacet(uint k)
       Halfedge_around_facet_circulator fcirc = f->facet_begin();
       CGAL_For_all(fcirc, f->facet_begin())
       {
-        glVertex3f(fcirc->vertex()->point().x(),
-                   fcirc->vertex()->point().y(),
-                   fcirc->vertex()->point().z());
+        Vector3 v(CGAL::to_double(fcirc->vertex()->point().x()),
+                   CGAL::to_double(fcirc->vertex()->point().y()),
+                   CGAL::to_double(fcirc->vertex()->point().z()));
 
-        Vector3 v(fcirc->vertex()->point().x(),
-                   fcirc->vertex()->point().y(),
-                   fcirc->vertex()->point().z());
+        // Vector3 v(fcirc->vertex()->point().x(),
+        //            fcirc->vertex()->point().y(),
+        //            fcirc->vertex()->point().z());
         vertices.push_back(v);
       }
       return vertices;

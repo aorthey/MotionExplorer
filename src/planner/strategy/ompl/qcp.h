@@ -1,6 +1,7 @@
 #pragma once
 #include "prm_basic.h"
 #include "planner/cover/cover.h"
+#include "planner/cover/cover_convex_partition.h"
 #include <ompl/datastructures/PDF.h>
 
 namespace ob = ompl::base;
@@ -33,7 +34,7 @@ namespace ompl
       protected:
         std::vector<const ob::State*> startS_;
         std::vector<const ob::State*> goalS_;
-        cover::Cover cspace_cover;
+        cover::CoverConvexPartition cspace_cover;
         ompl::RNG rng;
     };
 

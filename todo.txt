@@ -462,3 +462,7 @@ Better use vertices of obstacles to infer
 point on its surface. But where should it be placed? 
 [ ] last meeting: three objectives: (1) growing neighborhood, (2) kinodynamic
 planning, (3) flat hierarchy using onetopic paths
+
+[ ] active facets removal not enough, we also need to obtain which faces are
+inside other regions, or near obstacles.
+[ ] how does CGAL compute the difference between polyhedra? Maybe we can just take the bounding box and subtract the obstacles to get the complete workspace. Then we can work with that, doing convex decompositions in some way etcetera.

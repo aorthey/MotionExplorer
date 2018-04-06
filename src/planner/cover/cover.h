@@ -13,8 +13,7 @@ namespace cover{
 
       bool IsInsideCover(ob::State *s);
 
-      void Reduce();
-      void AddOpenSet( OpenSet* set );
+      virtual void AddOpenSet( OpenSet* set );
       void AddStartOpenSet( OpenSet* set );
       void AddGoalOpenSet( OpenSet* set );
 
@@ -30,5 +29,7 @@ namespace cover{
       int startSet{-1};
       int goalSet{-1};
       std::vector<OpenSet*> opensets;
+
+      uint rejected_openset{0};
   };
 };

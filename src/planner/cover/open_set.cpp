@@ -13,11 +13,19 @@ OpenSet::~OpenSet()
 {
 }
 
-const ob::State* OpenSet::GetCenter() const{
+bool OpenSet::IsSubsetOf(const cover::OpenSet *rhs, double tolerance) const
+{
+  std::cout << "NYI" << std::endl;
+  exit(0);
+}
+
+const ob::State* OpenSet::GetCenter() const
+{
   return sCenter;
 }
 
-std::ostream& OpenSet::Print(std::ostream& out) const{
+std::ostream& OpenSet::Print(std::ostream& out) const
+{
   out << std::string(80, '-') << std::endl;
   out << "OpenSet" << std::endl;
   out << std::string(80, '-') << std::endl;
