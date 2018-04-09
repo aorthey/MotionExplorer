@@ -466,3 +466,11 @@ planning, (3) flat hierarchy using onetopic paths
 [ ] active facets removal not enough, we also need to obtain which faces are
 inside other regions, or near obstacles.
 [ ] how does CGAL compute the difference between polyhedra? Maybe we can just take the bounding box and subtract the obstacles to get the complete workspace. Then we can work with that, doing convex decompositions in some way etcetera.
+
+[x] use OpenSCAD for building objects (awesome)
+[x] load obstacles into nef_polyhedron_3, and then subtract them from
+poly_bounds;
+[x] compute convex decomposition
+[ ] compute topological information
+[ ] try decomposition with harder surfaces/meshes -> much slower as expected, what
+would be a good approach there? (ignore or abstract E probably)

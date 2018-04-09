@@ -73,8 +73,8 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
     ManagedGeometry& geometry = terrain->geometry;
     const Meshing::TriMesh& trimesh = geometry->AsTriangleMesh();
     uint N = trimesh.tris.size();
-    Eigen::MatrixXd Adj = Eigen::MatrixXd::Zero(N,N);
-    Eigen::MatrixXd D = Eigen::MatrixXd::Zero(N,N);
+    //Eigen::MatrixXd Adj = Eigen::MatrixXd::Zero(N,N);
+    //Eigen::MatrixXd D = Eigen::MatrixXd::Zero(N,N);
     for(uint i = 0; i < N; i++)
     {
       Vector3 v0 = trimesh.TriangleVertex(i,0);
@@ -86,21 +86,20 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
              v0[2], v1[2], v2[2];
       problem.addObstacle(obs);
 
-      int tri0 = trimesh.GetAdjacentTri(i, 0);
-      int tri1 = trimesh.GetAdjacentTri(i, 1);
-      int tri2 = trimesh.GetAdjacentTri(i, 2);
+      // int tri0 = trimesh.GetAdjacentTri(i, 0);
+      // int tri1 = trimesh.GetAdjacentTri(i, 1);
+      // int tri2 = trimesh.GetAdjacentTri(i, 2);
 
-      if(tri0>=0) Adj(i, tri0) = 1;
-      if(tri1>=0) Adj(i, tri1) = 1;
-      if(tri2>=0) Adj(i, tri2) = 1;
-      D(i,i) = Adj.row(i).sum();
+      // if(tri0>=0) Adj(i, tri0) = 1;
+      // if(tri1>=0) Adj(i, tri1) = 1;
+      // if(tri2>=0) Adj(i, tri2) = 1;
+      // D(i,i) = Adj.row(i).sum();
 
     }
-    //std::cout << Adj << std::endl;
-    Eigen::MatrixXd L = D - Adj; //laplacian of triangle mesh
-    Eigen::FullPivLU<Eigen::MatrixXd> lu_decomp(L);
-    Eigen::MatrixXd ker = lu_decomp.kernel();
-    std::cout << "Connected Components in Trimesh " << k << " : " << ker.cols() << std::endl;
+    // Eigen::MatrixXd L = D - Adj; //laplacian of triangle mesh
+    // Eigen::FullPivLU<Eigen::MatrixXd> lu_decomp(L);
+    // Eigen::MatrixXd ker = lu_decomp.kernel();
+    // std::cout << "Connected Components in Trimesh " << k << " : " << ker.cols() << std::endl;
   }
 
   std::cout << "seed_pt: " << seed_pt << std::endl;

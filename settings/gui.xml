@@ -231,7 +231,7 @@
 
   <property name="draw_cover_vertices" enabled="0"/>
   <property name="draw_cover_edges" enabled="1"/>
-  <property name="draw_cover_faces" enabled="0"/>
+  <property name="draw_cover_faces" enabled="1"/>
   <property name="draw_cover_active_faces" enabled="0"/>
   <property name="draw_cover_ellipsoid" enabled="1"/>
 
