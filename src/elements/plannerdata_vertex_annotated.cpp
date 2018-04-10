@@ -82,7 +82,7 @@ void PlannerDataVertexAnnotated::setState(ob::State *s)
 }
 void PlannerDataVertexAnnotated::DrawGL(GUIState& state)
 {
-  openset->DrawGL(state);
+  if(openset != nullptr) openset->DrawGL(state);
 }
 
 std::ostream& operator<< (std::ostream& out, const PlannerDataVertexAnnotated& v)

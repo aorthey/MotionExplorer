@@ -49,6 +49,7 @@ ConvexPolyhedron::ConvexPolyhedron(Eigen::MatrixXd A_, Eigen::VectorXd b_):
   poly = new Polyhedron_3();
   CGAL::halfspace_intersection_3(planes.begin(), planes.end(), *poly);
 }
+
 ConvexPolyhedron::ConvexPolyhedron(Polyhedron_3 &poly_)
 {
   poly = new Polyhedron_3(poly_);

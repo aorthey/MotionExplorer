@@ -15,46 +15,14 @@ OpenSetConvex::OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, iris::IRIS
   Eigen::VectorXd d_eigen = region.getEllipsoid().getD();
 
   polyhedron = new ConvexPolyhedron(A_poly, b_poly, d_eigen);
-
-  // Polyhedron_3 poly = polyhedron->GetCGALPolyhedronNonConst();
-  // Nef_polyhedron nef_poly_tmp(poly);
-  // //nef_poly = nef_poly_tmp;
-
   polyhedron_bounds = new ConvexPolyhedron(bounds.getA(), bounds.getB(), d_eigen);
 
   nef_polyhedron = new NefPolyhedron( polyhedron_bounds );
   nef_polyhedron->SubtractObstacles(cspace);
 
-  cvx_decomposition = nef_polyhedron->GetConvexDecomposition();
+  //cvx_decomposition = nef_polyhedron->GetConvexDecomposition();
 
 }
-
-// void OpenSetConvex::RemoveIntersection(const cover::OpenSet *rhs_)
-// {
-//   const cover::OpenSetConvex *rhs = dynamic_cast<const cover::OpenSetConvex*>(rhs_);
-//   if(rhs==nullptr){
-//     std::cout << "could not cast rhs to convex open set." << std::endl;
-//     exit(0);
-//   }
-//   nef_poly -= rhs->GetNefPolyhedron();
-// }
-
-// bool OpenSetConvex::IsActiveFacet(uint k)
-// {
-//   const double EPSILON_EQ = 0.01;
-//   Vector3 center = GetCenterOfFacet(k);
-//   Eigen::VectorXd v(3);
-//   for(uint k = 0; k < 3; k++) v[k] = center[k];
-
-//   bool active = false;
-//   for(uint j = 0; j < A_bounds.rows(); j++){
-//     double d = A_bounds.row(j)*v - b_bounds(j);
-//     if( fabs(d) <= EPSILON_EQ ){
-//       active = true;
-//     }
-//   }
-//   return active;
-// }
 
 bool OpenSetConvex::IsInside(ob::State *sPrime)
 {
@@ -94,6 +62,23 @@ bool OpenSetConvex::IsSubsetOf(const cover::OpenSet *rhs_, double tolerance) con
   // return true;
 
 }
+// bool OpenSetConvex::IsActiveFacet(uint k)
+// {
+//   const double EPSILON_EQ = 0.01;
+//   Vector3 center = GetCenterOfFacet(k);
+//   Eigen::VectorXd v(3);
+//   for(uint k = 0; k < 3; k++) v[k] = center[k];
+
+//   bool active = false;
+//   for(uint j = 0; j < A_bounds.rows(); j++){
+//     double d = A_bounds.row(j)*v - b_bounds(j);
+//     if( fabs(d) <= EPSILON_EQ ){
+//       active = true;
+//     }
+//   }
+//   return active;
+// }
+
 
 // Vector3 OpenSetConvex::GetRandomPointOnFacet(uint k)
 // {
@@ -178,16 +163,7 @@ void OpenSetConvex::DrawGL(GUIState& state){
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND);
 
-  //DrawGLEllipsoid(state);
-  //DrawGLPolyhedron(state, free_workspace);
-  // for(uint k = 0; k < free_workspace_convex_parts.size(); k++){
-  //   DrawGLPolyhedron(state, free_workspace_convex_parts.at(k));
-  // }
-  // DrawGLPolyhedron(state, nef_poly);
-  // DrawGLPolyhedron(state, poly);
-  //polyhedron->DrawGL(state);
-
-  //nef_polyhedron->DrawGL(state);
+  nef_polyhedron->DrawGL(state);
   for(uint k = 0; k < cvx_decomposition.size(); k++){
     cvx_decomposition.at(k).DrawGL(state);
   }

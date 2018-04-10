@@ -1,6 +1,10 @@
 .*
 !.gitignore
 *.pyc
+*.npy
+*.xacro
+*.pdf
+*.png
 *.swp
 *.7z
 *.dmg

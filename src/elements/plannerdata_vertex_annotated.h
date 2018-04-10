@@ -36,7 +36,7 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
     void DrawGL(GUIState&);
 
   protected:
-    cover::OpenSet *openset;
+    cover::OpenSet *openset{nullptr};
 
     double open_neighborhood_distance{0.0};
     uint level{0};
