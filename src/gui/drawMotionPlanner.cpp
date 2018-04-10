@@ -161,11 +161,6 @@ namespace GLDraw{
     glPopMatrix();
 
   }
-  void setColor(const GLColor &c){
-    //glColor4f(c[0],c[1],c[2],c[3]);
-    //glColor3f(c[0],c[1],c[2]);
-    c.setCurrentGL();
-  }
 
   void drawGLPathKeyframes(Robot *robot, std::vector<uint> keyframe_indices, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack,GLColor color, double scale)
   {

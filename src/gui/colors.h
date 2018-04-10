@@ -20,3 +20,7 @@ const GLColor lightGrey(0.4,0.4,0.4,0.2);
 const GLColor cRobot(0.4,0.4,0.4,0.5);
 const GLColor lightGreen(0.2,0.9,0.2,0.8);
 const GLColor lightRed(0.9,0.2,0.2,0.8);
+
+namespace GLDraw{
+  void setColor(const GLColor &c);
+};
