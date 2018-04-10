@@ -17,8 +17,8 @@ void CoverConvexPartition::AddOpenSet( OpenSet* set_ )
   }
 
   //clip set so that it is not overlapping cover
-  for(uint k = 0; k < opensets.size(); k++){
-    set->RemoveIntersection(opensets.at(k));
-  }
+  // for(uint k = 0; k < opensets.size(); k++){
+  //   set->RemoveIntersection(opensets.at(k));
+  // }
   opensets.push_back(set);
 }

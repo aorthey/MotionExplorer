@@ -1,10 +1,10 @@
 #include "open_set_hypersphere.h"
-#include "gui/drawMotionPlanner.h"
-#include "gui/colors.h"
+#include "gui/common.h"
 #include <ompl/base/State.h>
 #include <ompl/base/SpaceInformation.h>
 
 using namespace cover;
+using namespace GLDraw;
 
 OpenSetHypersphere::OpenSetHypersphere(CSpaceOMPL *cspace_, ob::State *s, double dist_robot_env_):
   OpenSet(cspace_,s), radius(dist_robot_env_)

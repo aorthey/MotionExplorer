@@ -16,9 +16,9 @@ namespace cover{
     public:
       OpenSet(CSpaceOMPL *cspace_, const ob::State *s);
       virtual ~OpenSet();
+
       virtual bool IsInside(ob::State *sPrime) = 0;
       virtual void DrawGL(GUIState&) = 0;
-
       virtual bool IsSubsetOf(const cover::OpenSet *rhs, double tolerance = 1e-5) const = 0;
 
       const ob::State* GetCenter() const;

@@ -1,7 +1,5 @@
 #include "roadmap.h"
-
-#include "gui/drawMotionPlanner.h"
-#include "gui/colors.h"
+#include "gui/common.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/validitychecker/validity_checker_ompl.h"
 #include <boost/graph/dijkstra_shortest_paths.hpp>

@@ -1,4 +1,4 @@
-#include "test/test_iris.h"
+#include "unittests/test_iris.h"
 //#include "test/test_ppl.h"
 
 int main(int argc, char **argv)

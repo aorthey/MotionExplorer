@@ -474,3 +474,5 @@ poly_bounds;
 [ ] compute topological information
 [ ] try decomposition with harder surfaces/meshes -> much slower as expected, what
 would be a good approach there? (ignore or abstract E probably)
+[ ] make computation of free workspace independent of hardcoded files (either
+use OFF or use 
