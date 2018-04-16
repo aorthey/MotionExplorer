@@ -17,11 +17,12 @@ OpenSetConvex::OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, iris::IRIS
   polyhedron = new ConvexPolyhedron(A_poly, b_poly, d_eigen);
   polyhedron_bounds = new ConvexPolyhedron(bounds.getA(), bounds.getB(), d_eigen);
 
+  ellipsoid = new Ellipsoid(C_eigen, d_eigen);
+
   nef_polyhedron = new NefPolyhedron( polyhedron_bounds );
   nef_polyhedron->SubtractObstacles(cspace);
 
-  //cvx_decomposition = nef_polyhedron->GetConvexDecomposition();
-
+  cvx_decomposition = nef_polyhedron->GetConvexDecomposition();
 }
 
 bool OpenSetConvex::IsInside(ob::State *sPrime)
@@ -141,32 +142,15 @@ bool OpenSetConvex::IsSubsetOf(const cover::OpenSet *rhs_, double tolerance) con
 //   return poly.size_of_facets();
 // }
 
-// void OpenSetConvex::DrawGLEllipsoid(GUIState& state)
-// {
-//   Eigen::MatrixXd C_eigen = region.getEllipsoid().getC();
-//   Eigen::VectorXd d_eigen = region.getEllipsoid().getD();
-
-//   if(state("draw_cover_ellipsoid")){
-//     glLineWidth(1);
-//     setColor(grey);
-
-//     Vector3 center(d_eigen[0],d_eigen[1],d_eigen[2]);
-//     Vector3 u(C_eigen(0,0),C_eigen(1,0),C_eigen(2,0));
-//     Vector3 v(C_eigen(0,1),C_eigen(1,1),C_eigen(2,1));
-//     Vector3 w(C_eigen(0,2),C_eigen(1,2),C_eigen(2,2));
-//     GLDraw::drawWireEllipsoid(center, u, v, w);
-//   }
-// }
-
-
 void OpenSetConvex::DrawGL(GUIState& state){
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND);
 
-  nef_polyhedron->DrawGL(state);
-  for(uint k = 0; k < cvx_decomposition.size(); k++){
-    cvx_decomposition.at(k).DrawGL(state);
-  }
+  //nef_polyhedron->DrawGL(state);
+  ellipsoid->DrawGL(state);
+  // for(uint k = 0; k < cvx_decomposition.size(); k++){
+  //   cvx_decomposition.at(k).DrawGL(state);
+  // }
 
   glDisable(GL_BLEND);
   glEnable(GL_LIGHTING);

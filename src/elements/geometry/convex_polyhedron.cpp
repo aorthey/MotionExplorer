@@ -162,4 +162,3 @@ void ConvexPolyhedron::DrawGL(GUIState& state)
   // }
 
 }
-

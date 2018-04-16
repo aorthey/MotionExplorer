@@ -455,24 +455,16 @@ bounds (see https://github.com/rdeits/iris-distro/issues/68).
 [x] compute approximation of QS using iris and correct libcdd
 [x] visualize 3d convex hull by using only the faces. how can we adequately
 enumerate them? Is that a solved problem?
-[ ] seeding of points for iris: grid, and choose the point furthest away from
-obstacles or any existing iris region. This seems not good for narrow passages.
-Better use vertices of obstacles to infer 
-[ ] given two regions, how should we expand it? It seems reasonable to choose a
-point on its surface. But where should it be placed? 
-[ ] last meeting: three objectives: (1) growing neighborhood, (2) kinodynamic
-planning, (3) flat hierarchy using onetopic paths
-
 [ ] active facets removal not enough, we also need to obtain which faces are
 inside other regions, or near obstacles.
-[ ] how does CGAL compute the difference between polyhedra? Maybe we can just take the bounding box and subtract the obstacles to get the complete workspace. Then we can work with that, doing convex decompositions in some way etcetera.
-
+[x] how does CGAL compute the difference between polyhedra? Maybe we can just take the bounding box and subtract the obstacles to get the complete workspace. Then we can work with that, doing convex decompositions in some way etcetera.
 [x] use OpenSCAD for building objects (awesome)
 [x] load obstacles into nef_polyhedron_3, and then subtract them from
 poly_bounds;
 [x] compute convex decomposition
-[ ] compute topological information
+[x] make computation of free workspace independent of hardcoded files (
+using OFF file format)
+[ ] extract narrow passages of environment
+[ ] compute topological information of environment
 [ ] try decomposition with harder surfaces/meshes -> much slower as expected, what
 would be a good approach there? (ignore or abstract E probably)
-[ ] make computation of free workspace independent of hardcoded files (either
-use OFF or use 

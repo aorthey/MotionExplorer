@@ -46,6 +46,7 @@ void NefPolyhedron::SubtractObstacles(CSpaceOMPL *cspace)
     std::cout << "X = X - obstacles ..." << std::endl;
     *poly -= O_k;
   }
+  std::cout << "done" << std::endl;
 
 
 }

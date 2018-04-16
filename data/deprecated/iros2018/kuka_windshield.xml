@@ -10,10 +10,10 @@
   <robot name="kuka_lwr_4links" file="../../robots/kuka_lwr/kuka_4links.urdf"/>
   <robot name="kuka_lwr_5links" file="../../robots/kuka_lwr/kuka_5links.urdf"/>
   <!--
-<terrain   name="factory" file="/home/aorthey/git/orthoklampt/data/terrains/factory2.tri" translation="0 0 -0.01"/>
 -->
-  <terrain name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0.07 0 0.8" rotateRPY="0 0 0"/>
+  <!-- <terrain name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0.07 0 0.8" rotateRPY="0 0 0"/> -->
 
+<terrain   name="factory" file="/home/aorthey/git/orthoklampt/data/terrains/factory2.tri" translation="0 0 -0.01"/>
   <plannerinput>
     <qinit config="14  0 0 0 0 0 0 2.94 1.2508 1.52 -0.3 -1.48 1.6544 0.1 0"/>
     <qgoal config="14  0 0 0 0 0 0 -0.05 1.3 0.34 0.56 -0.17 1.6144 -0.26 0 "/>
@@ -23,9 +23,10 @@
     <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
     <smoothPath>0</smoothPath> <!-- 0: no smoothing, 1: smoothing      -->
-    <pathSpeed>6</pathSpeed>   <!-- <1: slower, 1: default, >1: faster -->
+    <pathSpeed>3</pathSpeed>   <!-- <1: slower, 1: default, >1: faster -->
 
     <freeFloating>0</freeFloating>
+    <maxplanningtime>15</maxplanningtime>
     <epsilongoalregion>0.05</epsilongoalregion>
 
     <hierarchy>

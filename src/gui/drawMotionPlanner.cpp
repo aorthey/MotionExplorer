@@ -508,31 +508,31 @@ namespace GLDraw{
     }
     glPopMatrix();
   }
-  void drawEllipsoid(Vector3 &c, Vector3 &u, Vector3 &v, Vector3 &w, int numSteps)
-  {
-    //x = a*cos(t) cos(s)
-    //y = b*cos(t) sin(s)
-    //z = c*sin(t)
-    //
-    // -pi/2 <= t <= pi/2 
-    // -pi <= s <= pi
+  // void drawEllipsoid(Vector3 &c, Vector3 &u, Vector3 &v, Vector3 &w, int numSteps)
+  // {
+  //   //x = a*cos(t) cos(s)
+  //   //y = b*cos(t) sin(s)
+  //   //z = c*sin(t)
+  //   //
+  //   // -pi/2 <= t <= pi/2 
+  //   // -pi <= s <= pi
 
-    float tStep = M_PI/(float)numSteps;
-    float sStep = 2*M_PI/(float)numSteps;
+  //   float tStep = M_PI/(float)numSteps;
+  //   float sStep = 2*M_PI/(float)numSteps;
 
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    for(float t = -M_PI/2; t <= M_PI/2; t += tStep)
-    {
-      glBegin(GL_TRIANGLE_STRIP);
-      for(float s = -M_PI; s <= M_PI; s += sStep)
-      {
-        Vector3 p1 = cos(t)*cos(s)*u + cos(t)*sin(s)*v + sin(t)*w + c;
-        Vector3 p2 = cos(t+tStep)*cos(s)*u + cos(t+tStep)*sin(s)*v + sin(t+tStep)*w + c;
-        glVertex3f(p1[0],p1[1],p1[2]);
-        glVertex3f(p2[0],p2[1],p2[2]);
-      }
-      glEnd();
-    }
-  }
+  //   //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  //   for(float t = -M_PI/2; t <= M_PI/2; t += tStep)
+  //   {
+  //     glBegin(GL_TRIANGLE_STRIP);
+  //     for(float s = -M_PI; s <= M_PI; s += sStep)
+  //     {
+  //       Vector3 p1 = cos(t)*cos(s)*u + cos(t)*sin(s)*v + sin(t)*w + c;
+  //       Vector3 p2 = cos(t+tStep)*cos(s)*u + cos(t+tStep)*sin(s)*v + sin(t+tStep)*w + c;
+  //       glVertex3f(p1[0],p1[1],p1[2]);
+  //       glVertex3f(p2[0],p2[1],p2[2]);
+  //     }
+  //     glEnd();
+  //   }
+  // }
 };
 

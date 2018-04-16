@@ -3,8 +3,9 @@
 #include <ompl/base/State.h>
 #include <iris/iris.h>
 #include <ompl/util/RandomNumbers.h>
-#include "elements/polyhedron/convex_polyhedron.h"
-#include "elements/polyhedron/nef_polyhedron.h"
+#include "elements/geometry/convex_polyhedron.h"
+#include "elements/geometry/nef_polyhedron.h"
+#include "elements/geometry/ellipsoid.h"
 namespace ob = ompl::base;
 
 class CSpaceOMPL;
@@ -19,8 +20,6 @@ namespace cover{
       virtual bool IsSubsetOf(const cover::OpenSet *rhs_, double tolerance = 1e-5) const override;
       virtual bool IsInside(ob::State *sPrime) override;
 
-      //void ComputeEnvironment();
-
       //facet as ordered sequence of vertices around its outer edge. 
       //The orientation is given by the right-hand rule
       // std::vector<Vector3> GetFacet(uint k); 
@@ -31,11 +30,11 @@ namespace cover{
       // Vector3 GetRandomPointOnFacet(uint k);
 
       virtual void DrawGL(GUIState&) override;
-      //void DrawGLEllipsoid(GUIState& state);
       virtual std::ostream& Print(std::ostream& out) const override;
 
     protected:
       iris::IRISRegion region;
+      Ellipsoid *ellipsoid;
       ConvexPolyhedron *polyhedron;
       ConvexPolyhedron *polyhedron_bounds;
       NefPolyhedron *nef_polyhedron;
