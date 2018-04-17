@@ -67,7 +67,7 @@ std::vector<ConvexPolyhedron> NefPolyhedron::GetConvexDecomposition()
       parts.push_back(cp);
     }
   }
-  //std::cout << "decomposition into " << poly->convex_parts.size() << " convex parts " << std::endl;
+  std::cout << "decomposition into " << poly->convex_parts.size() << " convex parts " << std::endl;
   return parts;
 }
 
