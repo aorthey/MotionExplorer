@@ -146,8 +146,8 @@ void OpenSetConvex::DrawGL(GUIState& state){
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND);
 
-  //nef_polyhedron->DrawGL(state);
-  ellipsoid->DrawGL(state);
+  nef_polyhedron->DrawGL(state);
+  //ellipsoid->DrawGL(state);
   // for(uint k = 0; k < cvx_decomposition.size(); k++){
   //   cvx_decomposition.at(k).DrawGL(state);
   // }

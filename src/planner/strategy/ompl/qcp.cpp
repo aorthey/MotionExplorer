@@ -53,7 +53,6 @@ void QCP::Grow(double t)
   //auto checkerPtr = static_pointer_cast<ValidityCheckerSimplicialComplex>(si_->getStateValidityChecker());
 
   //cover::OpenSetConvex *region = nullptr;
-
   //std::vector<cover::OpenSet*> cover = cspace_cover.GetCover();
 
   ////choose random region in cover
