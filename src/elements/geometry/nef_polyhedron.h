@@ -23,6 +23,9 @@ class NefPolyhedron{
     std::vector<ConvexPolyhedron> GetConvexDecomposition();
 
     void DrawGL(GUIState&);
+
+    const NefPolyhedron& operator+(const NefPolyhedron &rhs);
+    Nef_polyhedron_3* GetCGALPolyhedronNonConst();
   private:
     Nef_polyhedron_3 *poly;
 };

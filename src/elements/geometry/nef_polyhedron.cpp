@@ -50,6 +50,19 @@ void NefPolyhedron::SubtractObstacles(CSpaceOMPL *cspace)
 
 
 }
+
+const NefPolyhedron& NefPolyhedron::operator+(const NefPolyhedron &rhs)
+{
+  *poly += *rhs.poly;
+  return *this;
+}
+
+Nef_polyhedron_3* NefPolyhedron::GetCGALPolyhedronNonConst()
+{
+  return poly;
+}
+
+
 std::vector<ConvexPolyhedron> NefPolyhedron::GetConvexDecomposition()
 {
   CGAL::convex_decomposition_3(*poly);
@@ -67,7 +80,7 @@ std::vector<ConvexPolyhedron> NefPolyhedron::GetConvexDecomposition()
       parts.push_back(cp);
     }
   }
-  std::cout << "decomposition into " << poly->convex_parts.size() << " convex parts " << std::endl;
+  std::cout << "decomposition into " << parts.size() << " convex parts " << std::endl;
   return parts;
 }
 

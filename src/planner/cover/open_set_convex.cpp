@@ -22,7 +22,7 @@ OpenSetConvex::OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, iris::IRIS
   nef_polyhedron = new NefPolyhedron( polyhedron_bounds );
   nef_polyhedron->SubtractObstacles(cspace);
 
-  cvx_decomposition = nef_polyhedron->GetConvexDecomposition();
+  //cvx_decomposition = nef_polyhedron->GetConvexDecomposition();
 }
 
 bool OpenSetConvex::IsInside(ob::State *sPrime)
@@ -148,9 +148,9 @@ void OpenSetConvex::DrawGL(GUIState& state){
 
   nef_polyhedron->DrawGL(state);
   //ellipsoid->DrawGL(state);
-  // for(uint k = 0; k < cvx_decomposition.size(); k++){
-  //   cvx_decomposition.at(k).DrawGL(state);
-  // }
+  for(uint k = 0; k < cvx_decomposition.size(); k++){
+    cvx_decomposition.at(k).DrawGL(state);
+  }
 
   glDisable(GL_BLEND);
   glEnable(GL_LIGHTING);
