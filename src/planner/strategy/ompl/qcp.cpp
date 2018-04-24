@@ -6,100 +6,105 @@
 
 using namespace og;
 QCP::QCP(const ob::SpaceInformationPtr &si, Quotient *previous_):
-  Quotient(si, previous_)
+  Base(si, previous_)
 {
+  openNeighborhood_ = (boost::get(vertex_open_neighborhood_t(), g_));
+  setName("QCP"+std::to_string(id));
 }
 
 QCP::~QCP()
 {
-  cspace_cover.Clear();
+  workspace_regions.clear();
 }
 
 void QCP::Init()
 {
-  if(const ob::State *st = pis_.nextStart()){
-    startS_.push_back(st);
-  }
-  if(const ob::State *gl = pis_.nextGoal()){
-    goalS_.push_back(gl);
-  }
-  if(startS_.empty()){
-    std::cout << "No start states" << std::endl;
-    exit(1);
-  }
-  if(goalS_.empty()){
-    std::cout << "No goal states" << std::endl;
-    exit(1);
-  }
+  if(previous==nullptr)
+  {
+    const ob::State *start = stateProperty_[startM_.at(0)];
+    const ob::State *goal  = stateProperty_[goalM_.at(0)];
+    auto checkerPtr = static_pointer_cast<ValidityCheckerSimplicialComplex>(si_->getStateValidityChecker());
+    workspace_regions.clear();
+    workspace_regions = checkerPtr->GetConvexWorkspaceCover(start, goal);
 
-  auto checkerPtr = static_pointer_cast<ValidityCheckerSimplicialComplex>(si_->getStateValidityChecker());
-  cspace_cover.Clear();
+    for(uint k = 0; k < workspace_regions.size(); k++){
+      ob::State *state = si_->allocState();
+      si_->copyState(state, workspace_regions.at(k)->GetCenter());
+      Vertex m = Base::CreateNewVertex(state);
+      openNeighborhood_[m] = new cover::OpenSetConvex(*workspace_regions.at(k));
+      ConnectVertexToNeighbors(m);
+    }
+  }
+}
 
-  const ob::State *start = startS_.at(0);
-  cover::OpenSetConvex *start_region = checkerPtr->ComputeNeighborhood(start);
-  cspace_cover.AddStartOpenSet(start_region);
-
-  // const ob::State *goal = goalS_.at(0);
-  // cover::OpenSetConvex *goal_region = checkerPtr->ComputeNeighborhood(goal);
-  // cspace_cover.AddGoalOpenSet(goal_region);
+bool QCP::SampleGraph(ob::State *q_random_graph)
+{
+  uint k_cover = rng.uniformInt(0, workspace_regions.size()-1);
+  cover::OpenSetConvex *O = workspace_regions.at(k_cover);
+  O->RandomState(q_random_graph);
+  return true;
 }
 
 void QCP::Grow(double t)
 {
-  //somehow grow convex regions on R3 or sample if on SE(3)
-  // if(previous==nullptr){
-  //   cspace_cover.Grow();
-  // }
-  //auto checkerPtr = static_pointer_cast<ValidityCheckerSimplicialComplex>(si_->getStateValidityChecker());
-
-  //cover::OpenSetConvex *region = nullptr;
-  //std::vector<cover::OpenSet*> cover = cspace_cover.GetCover();
-
-  ////choose random region in cover
-  ////choose random facet
-  ////choose random point on facet
-
-  //while(region==nullptr){
-  //  //choose random region in cover
-  //  uint k_cover = rng.uniformInt(0, cover.size()-1);
-  //  cover::OpenSetConvex* O = static_cast<cover::OpenSetConvex*>(cover.at(k_cover));
-
-  //  //choose random facet
-  //  uint k_facet = rng.uniformInt(0, O->GetNumberOfFacets());
-  //  if(O->IsActiveFacet(k_facet)) continue;
-  //  std::vector<Vector3> fj = O->GetFacet(k_facet);
-
-  //  //choose random point on facet
-  //  Vector3 v = O->GetRandomPointOnFacet(k_facet);
-  //  ob::State *sample = si_->allocState();
-  //  ob::RealVectorStateSpace::StateType *sampleR3 = sample->as<ob::RealVectorStateSpace::StateType>();
-  //  for(uint i = 0; i < 3; i++) sampleR3->values[i] = v[i];
-
-  //  region = checkerPtr->ComputeNeighborhood(sample);
-  //}
-  //cspace_cover.AddOpenSet(region);
-
+  if(previous!=nullptr){
+    Base::Grow(t);
+  }else{
+    std::cout << "[warning] tried growing workspace" << std::endl;
+  }
 }
 
 void QCP::CheckForSolution(ob::PathPtr &solution)
 {
+  if(previous==nullptr){
+    hasSolution = true;
+  }else{
+    return Base::CheckForSolution(solution);
+  }
+}
+
+double QCP::GetSamplingDensity()
+{
+  if(previous==nullptr){
+    return +dInf;
+  }else{
+    return Base::GetSamplingDensity();
+  }
 }
 
 void QCP::getPlannerData(ob::PlannerData &data) const
 {
-  auto checkerPtr = static_pointer_cast<ValidityCheckerSimplicialComplex>(si_->getStateValidityChecker());
+  if(previous==nullptr){
 
-  std::cout << cspace_cover << std::endl;
-  std::vector<cover::OpenSet*> sets = cspace_cover.GetCover();
-  for(uint k = 0; k < sets.size(); k++){
-    const ob::State *s = sets.at(k)->GetCenter();
-    PlannerDataVertexAnnotated v(s, 0);
-    v.SetOpenSet(sets.at(k));
-    if((int)k==cspace_cover.GetStartSetIndex())
-      data.addStartVertex(v);
-    else if((int)k==cspace_cover.GetGoalSetIndex())
-      data.addGoalVertex(v);
-    else 
-      data.addVertex(v);
+    uint N = data.numVertices();
+    Base::getPlannerData(data);
+    std::cout << "added " << data.numVertices()-N << " vertices." << std::endl;
+
+    //std::vector<cover::OpenSet*> sets = cspace_cover.GetCover();
+    // for(uint k = 0; k < workspace_regions.size(); k++){
+    //   std::cout << "region: " << k << "/" << workspace_regions.size() << std::endl;
+    //   const ob::State *s = workspace_regions.at(k)->GetCenter();
+    //   M1->printState(s);
+    //   PlannerDataVertexAnnotated v(s, 0);
+    //   v.SetOpenSet(workspace_regions.at(k));
+    //   // if((int)k==cspace_cover.GetStartSetIndex())
+    //   //   data.addStartVertex(v);
+    //   // else if((int)k==cspace_cover.GetGoalSetIndex())
+    //   //   data.addGoalVertex(v);
+    //   // else 
+    //   data.addVertex(v);
+    //   std::cout << data.numVertices() << std::endl;
+    // }
+    auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+    for(uint vidx = 0; vidx < data.numVertices(); vidx++){
+      PlannerDataVertexAnnotated *v = static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
+      //const ob::State *s = v->getState();
+      v->SetOpenSet(openNeighborhood_[vidx]);
+      // double d1 = checkerPtr->Distance(s);
+      // v->SetOpenNeighborhoodDistance(d1);
+    }
+
+  }else{
+    Base::getPlannerData(data);
   }
 }

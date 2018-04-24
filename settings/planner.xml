@@ -16,7 +16,7 @@
   <algorithm name="benchmark:best_geometric"/>
   <algorithm name="benchmark:all_geometric"/>
 
-  <maxplanningtime>0.01</maxplanningtime> <!-- runtime in (s) --> 
+  <maxplanningtime>120</maxplanningtime> <!-- runtime in (s) --> 
   <smoothPath>0</smoothPath> <!-- 0: no smoothing, 1: smoothing      -->
   <pathSpeed>1</pathSpeed>   <!-- <1: slower, 1: default, >1: faster -->
   <sampler name="uniform"/> <!-- uniform|gaussian|minimum_clearance|maximum_clearance|obstacle_based|bridge_test -->

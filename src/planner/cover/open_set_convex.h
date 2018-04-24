@@ -15,6 +15,8 @@ namespace cover{
     public:
       OpenSetConvex()=default;
       OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, iris::IRISRegion region_, const iris::Polyhedron &bounds);
+      OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, Eigen::MatrixXd A, Eigen::VectorXd b, Eigen::VectorXd center);
+      OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, ConvexPolyhedron *poly_);
       virtual ~OpenSetConvex(){};
 
       virtual bool IsSubsetOf(const cover::OpenSet *rhs_, double tolerance = 1e-5) const override;
@@ -29,15 +31,17 @@ namespace cover{
       // Vector3 GetCenterOfFacet(uint k);
       // Vector3 GetRandomPointOnFacet(uint k);
 
+      void RandomState(ob::State *s);
+
       virtual void DrawGL(GUIState&) override;
       virtual std::ostream& Print(std::ostream& out) const override;
 
     protected:
       iris::IRISRegion region;
-      Ellipsoid *ellipsoid;
-      ConvexPolyhedron *polyhedron;
-      ConvexPolyhedron *polyhedron_bounds;
-      NefPolyhedron *nef_polyhedron;
+      Ellipsoid *ellipsoid{nullptr};
+      ConvexPolyhedron *polyhedron{nullptr};
+      ConvexPolyhedron *polyhedron_bounds{nullptr};
+      NefPolyhedron *nef_polyhedron{nullptr};
       std::vector<ConvexPolyhedron> cvx_decomposition;
 
   };

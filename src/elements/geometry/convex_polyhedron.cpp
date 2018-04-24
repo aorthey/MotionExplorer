@@ -48,11 +48,50 @@ ConvexPolyhedron::ConvexPolyhedron(Eigen::MatrixXd A_, Eigen::VectorXd b_):
   }
   poly = new Polyhedron_3();
   CGAL::halfspace_intersection_3(planes.begin(), planes.end(), *poly);
+  center = GetGeometricCenter();
 }
 
 ConvexPolyhedron::ConvexPolyhedron(Polyhedron_3 &poly_)
 {
   poly = new Polyhedron_3(poly_);
+}
+ConvexPolyhedron::ConvexPolyhedron(const ConvexPolyhedron& cp_)
+{
+  poly = &cp_.GetCGALPolyhedronNonConst();
+  A = cp_.GetA();
+  b = cp_.GetB();
+  center = cp_.GetCenter();
+}
+Eigen::MatrixXd ConvexPolyhedron::GetA() const
+{
+  return A;
+}
+Eigen::VectorXd ConvexPolyhedron::GetB() const
+{
+  return b;
+}
+Eigen::VectorXd ConvexPolyhedron::GetCenter() const
+{
+  return center;
+}
+
+Eigen::VectorXd ConvexPolyhedron::GetRandomPoint()
+{
+  if(!vrep_computed) vrep();
+
+  Eigen::VectorXd r(3);
+
+  Eigen::VectorXd center = GetGeometricCenter();
+  double rk=0;
+  for(uint k = 0; k < vertices.size(); k++){
+    rk = rng_.uniformReal(rk,1);
+    // std::cout << k << ":" << rk << std::endl;
+    // std::cout << "center: " << center << std::endl;
+    // std::cout << "vk: " << vertices.at(k) << std::endl;
+    r += rk*(vertices.at(k) - center) + (1-rk)*center;
+  }
+
+  return r;
 }
 
 const Polyhedron_3& ConvexPolyhedron::GetCGALPolyhedron() const
@@ -64,9 +103,9 @@ Polyhedron_3& ConvexPolyhedron::GetCGALPolyhedronNonConst() const
   return *poly;
 }
 
-std::vector<Eigen::VectorXd> ConvexPolyhedron::vrep() const
+std::vector<Eigen::VectorXd> ConvexPolyhedron::vrep()
 {
-  std::vector<Eigen::VectorXd> vertices;
+  vertices.clear();
   for ( Vertex_const_iterator v = poly->vertices_begin(); v != poly->vertices_end(); ++v)
   {
     Point_3 p = v->point();
@@ -74,12 +113,32 @@ std::vector<Eigen::VectorXd> ConvexPolyhedron::vrep() const
     for(uint k = 0; k < 3; k++) q[k] = CGAL::to_double(p[k]);
     vertices.push_back(q);
   }
+  vrep_computed = true;
   return vertices;
 }
 std::pair<Eigen::MatrixXd, Eigen::VectorXd> ConvexPolyhedron::hrep() const
 {
   return std::make_pair(A,b);
 }
+Eigen::VectorXd ConvexPolyhedron::GetGeometricCenter() const
+{
+  Eigen::VectorXd c(3); c.setZero();
+  uint ctr = 0;
+  for ( Vertex_const_iterator v = poly->vertices_begin(); v != poly->vertices_end(); ++v)
+  {
+    Point_3 p = v->point();
+    double x = CGAL::to_double(p[0]);
+    double y = CGAL::to_double(p[1]);
+    double z = CGAL::to_double(p[2]);
+    c[0] += x;
+    c[1] += y;
+    c[2] += z;
+    ctr++;
+  }
+  if(ctr>0) c /= ctr;
+  return c;
+}
+
 void ConvexPolyhedron::DrawGL(GUIState& state)
 {
   if(state("draw_cover_vertices")){

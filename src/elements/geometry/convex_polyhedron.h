@@ -2,7 +2,7 @@
 #include "gui/gui_state.h"
 #include <vector>
 #include <Eigen/Core>
-
+#include <ompl/util/RandomNumbers.h>
 #include <CGAL/Exact_predicates_exact_constructions_kernel.h>
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Convex_hull_3/dual/halfspace_intersection_3.h>
@@ -24,13 +24,20 @@ class ConvexPolyhedron{
     ConvexPolyhedron(Eigen::MatrixXd A_, Eigen::VectorXd b_);
     ConvexPolyhedron(Eigen::MatrixXd A_, Eigen::VectorXd b_, Eigen::VectorXd center_);
     ConvexPolyhedron(Polyhedron_3 &poly_);
+    ConvexPolyhedron(const ConvexPolyhedron&);
 
     //vrep and hrep (CGAL based)
-    std::vector<Eigen::VectorXd> vrep() const;
+    std::vector<Eigen::VectorXd> vrep();
     std::pair<Eigen::MatrixXd, Eigen::VectorXd> hrep() const;
 
     const Polyhedron_3& GetCGALPolyhedron() const;
     Polyhedron_3& GetCGALPolyhedronNonConst() const;
+
+    Eigen::MatrixXd GetA() const;
+    Eigen::VectorXd GetB() const;
+    Eigen::VectorXd GetCenter() const;
+    Eigen::VectorXd GetGeometricCenter() const;
+    Eigen::VectorXd GetRandomPoint();
 
     void DrawGL(GUIState&);
 
@@ -42,6 +49,8 @@ class ConvexPolyhedron{
     Eigen::VectorXd b;
     Eigen::VectorXd center;
 
-    bool convex;
+    std::vector<Eigen::VectorXd> vertices;
+    bool vrep_computed{false};
+    ompl::RNG rng_;
 
 };

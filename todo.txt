@@ -455,7 +455,7 @@ bounds (see https://github.com/rdeits/iris-distro/issues/68).
 [x] compute approximation of QS using iris and correct libcdd
 [x] visualize 3d convex hull by using only the faces. how can we adequately
 enumerate them? Is that a solved problem?
-[ ] active facets removal not enough, we also need to obtain which faces are
+[x] active facets removal not enough, we also need to obtain which faces are
 inside other regions, or near obstacles.
 [x] how does CGAL compute the difference between polyhedra? Maybe we can just take the bounding box and subtract the obstacles to get the complete workspace. Then we can work with that, doing convex decompositions in some way etcetera.
 [x] use OpenSCAD for building objects (awesome)
@@ -464,7 +464,16 @@ poly_bounds;
 [x] compute convex decomposition
 [x] make computation of free workspace independent of hardcoded files (
 using OFF file format)
-[ ] extract narrow passages of environment
-[ ] compute topological information of environment
+
+[ ] decompose environment
 [ ] try decomposition with harder surfaces/meshes -> much slower as expected, what
 would be a good approach there? (ignore or abstract E probably)
+[ ] extract narrow passages of environment
+[ ] compute topological information of environment
+[ ] solve cardslot environment. Obtain 3D slot representation. How about
+choosing a box at random. Then sample them at random. How about just using it
+with QMP?
+
+
+workspace quotient
+[ ] 

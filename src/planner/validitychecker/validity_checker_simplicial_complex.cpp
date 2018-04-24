@@ -118,3 +118,41 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
     return nullptr;
   }
 }
+
+std::vector<cover::OpenSetConvex*> ValidityCheckerSimplicialComplex::GetConvexWorkspaceCover(const ob::State* start, const ob::State* goal) const
+{
+  const ob::RealVectorBounds& bounds = static_pointer_cast<ob::RealVectorStateSpace>(cspace->SpacePtr())->getBounds();
+  uint N = cspace->GetDimensionality();
+  Eigen::MatrixXd A(2*N,N);
+  for(uint k = 0; k < N; k++){
+    for(uint j = 0; j < N; j++){
+      A(k,  j) = (k==j?-1:0);
+      A(k+N,j) = (k==j?+1:0);
+    }
+  }
+  Eigen::VectorXd b(2*N);
+  for(uint k = 0; k < N; k++){
+    b(k)   = -bounds.low[k];
+    b(k+N) = bounds.high[k];
+  }
+
+  ConvexPolyhedron *polyhedron_bounds = new ConvexPolyhedron(A, b);
+  NefPolyhedron *nef_polyhedron = new NefPolyhedron( polyhedron_bounds );
+  nef_polyhedron->SubtractObstacles(cspace);
+
+  std::vector<ConvexPolyhedron> cvx_decomposition = nef_polyhedron->GetConvexDecomposition();
+
+  std::vector<cover::OpenSetConvex*> open_sets_cvx;
+  for(uint k = 0; k < cvx_decomposition.size(); k++){
+    ConvexPolyhedron& cp = cvx_decomposition.at(k);
+    Eigen::VectorXd c = cp.GetGeometricCenter();
+    Config q(3);
+    for(uint j = 0; j < 3; j++) q(j) = c(j);
+    ob::State *s = si_->allocState();
+    cspace->ConfigToOMPLState(q, s);
+
+    cover::OpenSetConvex *osc = new cover::OpenSetConvex(cspace, s, &cp);
+    open_sets_cvx.push_back(osc);
+  }
+  return open_sets_cvx;
+}

@@ -22,7 +22,26 @@ OpenSetConvex::OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, iris::IRIS
   nef_polyhedron = new NefPolyhedron( polyhedron_bounds );
   nef_polyhedron->SubtractObstacles(cspace);
 
-  //cvx_decomposition = nef_polyhedron->GetConvexDecomposition();
+  cvx_decomposition = nef_polyhedron->GetConvexDecomposition();
+}
+
+OpenSetConvex::OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, Eigen::MatrixXd A, Eigen::VectorXd b, Eigen::VectorXd center):
+  OpenSet(cspace_,s)
+{
+  polyhedron = new ConvexPolyhedron(A, b, center);
+}
+OpenSetConvex::OpenSetConvex(CSpaceOMPL *cspace_, const ob::State *s, ConvexPolyhedron *poly_):
+  OpenSet(cspace_,s)
+{
+  polyhedron = new ConvexPolyhedron(*poly_); //deep copy
+}
+
+void OpenSetConvex::RandomState(ob::State *s)
+{
+  Eigen::VectorXd v = polyhedron->GetRandomPoint();
+  Config q(3);
+  for(uint j = 0; j < 3; j++) q(j) = v(j);
+  cspace->ConfigToOMPLState(q, s);
 }
 
 bool OpenSetConvex::IsInside(ob::State *sPrime)
@@ -146,11 +165,11 @@ void OpenSetConvex::DrawGL(GUIState& state){
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND);
 
-  nef_polyhedron->DrawGL(state);
-  //ellipsoid->DrawGL(state);
-  for(uint k = 0; k < cvx_decomposition.size(); k++){
-    cvx_decomposition.at(k).DrawGL(state);
-  }
+  if(nef_polyhedron) nef_polyhedron->DrawGL(state);
+  if(polyhedron) polyhedron->DrawGL(state);
+  // for(uint k = 0; k < cvx_decomposition.size(); k++){
+  //   cvx_decomposition.at(k).DrawGL(state);
+  // }
 
   glDisable(GL_BLEND);
   glEnable(GL_LIGHTING);
