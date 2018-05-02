@@ -5,7 +5,9 @@
   <robot name="sphere_inner" file="/home/aorthey/git/orthoklampt/data/robots/card_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
   <robot name="sphere_outer" file="/home/aorthey/git/orthoklampt/data/robots/card_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <terrain name="cardslot" file="/home/aorthey/git/orthoklampt/data/terrains/cardslot.tri" translation="0 0 0" rotateRPY="0 0 0"/>
+  <terrain name="cardslot" file="/home/aorthey/git/orthoklampt/data/terrains/cardslot.tri" translation="0 0 0" rotateRPY="0 0 0">
+     <display color="0.8 0.8 0.8 1" texture="checker" texture_projection="z"/> 
+  </terrain>
 
   <plannerinput>
 
@@ -13,7 +15,7 @@
     <!-- <qgoal  config="10  -3.0 -1.0 +0.4 -0.8 -0.6 +0.0 0 0 0 0"/> -->
     <!-- <qinit config="10  0.3 -5.54704 -0.207079 1.57 0 0 0 0 0 0 "/> -->
     <!-- <qgoal config="10  0.3 -2.54704 -0.207079 1.57 0 0 0 0 0 0 "/> -->
-    <qinit  config="7  +5.0 +2.3 +1.3 -2.0 +0.6 +0.3 0"/>
+    <qinit  config="7  +5.0 +2.3 +1.3 +2.0 -0.6 -0.3 0"/>
     <!-- <qinit  config="10  +0.0 +0.0 +0.0 -0.0 +0.0 +0.0 0 0 0 0"/> -->
     <!-- <qgoal  config="10  -2.0 -1.0 +0.4 -0.8 -0.6 +0.0 0 0 0 0"/> -->
     <qgoal config="7  1.0 0 0 0 -1.57 0 0"/>
@@ -22,7 +24,7 @@
     <se3min config="6  -3.0 -4.0 -4.0 -3.141593 -1.57 -3.141593"/>
 
     <freeFloating>1</freeFloating>
-    <maxplanningtime>1.0</maxplanningtime>
+    <maxplanningtime>10</maxplanningtime>
 
     <hierarchy>
       <level inner_index="1" type="R3"/>

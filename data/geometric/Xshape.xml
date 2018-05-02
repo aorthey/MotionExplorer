@@ -16,7 +16,7 @@
 
   <!-- <terrain name="LshapedTerrain1" file="/home/aorthey/git/orthoklampt/data/terrains/Lshape_top.tri" translation="0 0 0" rotateRPY="0 0 0"/> -->
   <!-- <terrain name="LshapedTerrain2" file="/home/aorthey/git/orthoklampt/data/terrains/Lshape_bottom.tri" translation="0 0 -0.1" rotateRPY="0 0 0"/> -->
-  <rigidObject  name="cubes" file="/home/aorthey/git/orthoklampt/data/terrains/Lshape2.tri" translation="0 0 -0.1" rotateRPY="0 0 0"/>
+  <terrain  name="cubes" file="/home/aorthey/git/orthoklampt/data/terrains/Lshape2.tri" translation="0 0 -0.1" rotateRPY="0 0 0"/>
 
   <plannerinput>
 
@@ -33,7 +33,7 @@
     <se3min config="6  -8.0 -8.0 -8.0 -3.141593 -1.57 -3.141593"/>
 
     <freeFloating>1</freeFloating>
-    <maxplanningtime>0.01</maxplanningtime>
+    <maxplanningtime>10</maxplanningtime>
 
     <hierarchy>
       <level inner_index="3" type="R3"/>

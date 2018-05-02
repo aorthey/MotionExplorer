@@ -12,7 +12,7 @@ namespace ob = ompl::base;
 // [    ][ C1 ]
 // [    ][    ]
 //
-//  whereby M1 is the configuration space, C1 is a designated subsapce, and M0 =
+//  whereby M1 is the configuration space, C1 is a designated subspace of M1, and M0 =
 //  M1/C1 is the resulting quotient space. Here we assume that M1 and M0 have
 //  been given, and we compute the inverse of the quotient map, i.e. C1 = M1/M0. 
 //

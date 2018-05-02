@@ -1,5 +1,6 @@
 #pragma once
 #include "gui/gui_state.h"
+#include "klampt.h"
 #include <vector>
 #include <Eigen/Core>
 #include <ompl/util/RandomNumbers.h>
@@ -28,7 +29,9 @@ class ConvexPolyhedron{
 
     //vrep and hrep (CGAL based)
     std::vector<Eigen::VectorXd> vrep();
-    std::pair<Eigen::MatrixXd, Eigen::VectorXd> hrep() const;
+    std::pair<Eigen::MatrixXd, Eigen::VectorXd> hrep();
+    std::pair<Eigen::VectorXd, Eigen::VectorXd> bbox();
+    bool IsInside(const Eigen::VectorXd &p);
 
     const Polyhedron_3& GetCGALPolyhedron() const;
     Polyhedron_3& GetCGALPolyhedronNonConst() const;
@@ -37,11 +40,17 @@ class ConvexPolyhedron{
     Eigen::VectorXd GetB() const;
     Eigen::VectorXd GetCenter() const;
     Eigen::VectorXd GetGeometricCenter() const;
-    Eigen::VectorXd GetRandomPoint();
 
+    Eigen::VectorXd GetRandomPoint();
+    Eigen::VectorXd GetRandomPoint_RejectionSampling();
+
+    friend std::ostream& operator<< (std::ostream& out, const ConvexPolyhedron& cvxp);
     void DrawGL(GUIState&);
 
   protected:
+    Vector3 CGALToVector3(const Point_3 &p) const;
+    Eigen::VectorXd CGALToEigen(const Point_3 &p) const;
+    Point_3 EigenToCGAL(const Eigen::VectorXd &v) const;
 
     Polyhedron_3 *poly;
 
@@ -49,8 +58,13 @@ class ConvexPolyhedron{
     Eigen::VectorXd b;
     Eigen::VectorXd center;
 
+    Eigen::VectorXd bbox_min;
+    Eigen::VectorXd bbox_max;
+
     std::vector<Eigen::VectorXd> vertices;
+    bool bbox_computed{false};
     bool vrep_computed{false};
+    bool hrep_computed{false};
     ompl::RNG rng_;
 
 };

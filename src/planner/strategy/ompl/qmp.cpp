@@ -21,6 +21,7 @@ QMP::QMP(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
 
 QMP::~QMP()
 {
+  samplesOnShortestPath = 0;
 }
 
 bool QMP::SampleGraph(ob::State *q_random_graph)

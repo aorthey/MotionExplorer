@@ -465,8 +465,8 @@ poly_bounds;
 [x] make computation of free workspace independent of hardcoded files (
 using OFF file format)
 
-[ ] decompose environment
-[ ] try decomposition with harder surfaces/meshes -> much slower as expected, what
+[x] decompose environment
+[x] try decomposition with harder surfaces/meshes -> much slower as expected, what
 would be a good approach there? (ignore or abstract E probably)
 [ ] extract narrow passages of environment
 [ ] compute topological information of environment
@@ -474,6 +474,12 @@ would be a good approach there? (ignore or abstract E probably)
 choosing a box at random. Then sample them at random. How about just using it
 with QMP?
 
-
 workspace quotient
-[ ] 
+[x] sample random points from free workspace
+[x] are points sampled from surface or from inside as desired?
+[ ] make colors changeable in xml
+[x] use with QMPConnect as usual [not so nice, still problems in TPs]
+[ ] try solving the cardslot problem using RRTConnect (20mins)
+[ ] compute path towards goal. then do priority sampling along that path.
+[ ] sampling has too many points near the geometric centers (since they have
+higher connection probability). Change that to something more uniform.

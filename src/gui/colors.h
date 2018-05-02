@@ -5,6 +5,9 @@ typedef GLDraw::GLColor GLColor;
 const GLColor red(1,0,0,1);
 const GLColor green(0,1,0,1);
 const GLColor blue(0,0,1,1);
+const GLColor lightred(0.8,0,0,0.5);
+const GLColor lightgreen(0,0.8,0,0.5);
+const GLColor lightblue(0,0,0.8,0.5);
 
 const GLColor yellow(1,1,0,0.5);
 const GLColor magenta(1,0,1,0.5);

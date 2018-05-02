@@ -2,12 +2,13 @@
 
   <benchmark name="best_geometric">
 
-    <!-- <algorithm name="qmp_connect"/> -->
+    <algorithm name="qscp"/>
+    <algorithm name="qmp_connect"/>
     <algorithm name="ompl:rrtconnect"/>
-    <algorithm name="ompl:prm"/>
-    <algorithm name="ompl:est"/>
-    <maxplanningtime>3</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>1</runcount> <!-- number of runs per algorithm --> 
+    <!-- <algorithm name="ompl:prm"/> -->
+    <!-- <algorithm name="ompl:est"/> -->
+    <maxplanningtime>30</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>10</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 

@@ -224,9 +224,9 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
     Nvertices = data.numVertices();
   }
 
-  for(uint vidx = 0; vidx < data.numVertices(); vidx++){
-    PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
-    std::cout << "[MultiQuotient] vertex " << vidx << " " << v.GetOpenNeighborhoodDistance() << std::endl;
-  }
+  // for(uint vidx = 0; vidx < data.numVertices(); vidx++){
+  //   PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
+  //   std::cout << "[MultiQuotient] vertex " << vidx << " " << v.GetOpenNeighborhoodDistance() << std::endl;
+  // }
   //exit(0);
 }

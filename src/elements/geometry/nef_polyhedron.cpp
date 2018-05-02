@@ -46,6 +46,10 @@ void NefPolyhedron::SubtractObstacles(CSpaceOMPL *cspace)
     std::cout << "X = X - obstacles ..." << std::endl;
     *poly -= O_k;
   }
+  if(world->rigidObjects.size() > 0 && world->terrains.size()==0){
+    std::cout << "Error: no terrain object available, but rigid objects." << std::endl;
+    exit(1);
+  }
   std::cout << "done" << std::endl;
 
 
