@@ -8,7 +8,7 @@
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Convex_hull_3/dual/halfspace_intersection_3.h>
 
-typedef CGAL::Exact_predicates_exact_constructions_kernel   Kernel;
+typedef CGAL::Exact_predicates_exact_constructions_kernel         Kernel;
 typedef Kernel::Point_3                                           Point_3;
 typedef Kernel::Plane_3                                           Plane_3;
 typedef CGAL::Polyhedron_3<Kernel>                                Polyhedron_3;
@@ -51,6 +51,7 @@ class ConvexPolyhedron{
     Vector3 CGALToVector3(const Point_3 &p) const;
     Eigen::VectorXd CGALToEigen(const Point_3 &p) const;
     Point_3 EigenToCGAL(const Eigen::VectorXd &v) const;
+    void test_hrep();
 
     Polyhedron_3 *poly;
 
@@ -60,6 +61,9 @@ class ConvexPolyhedron{
 
     Eigen::VectorXd bbox_min;
     Eigen::VectorXd bbox_max;
+
+    uint Nsamples_rejected{0};
+    uint Nsamples{0};
 
     std::vector<Eigen::VectorXd> vertices;
     bool bbox_computed{false};

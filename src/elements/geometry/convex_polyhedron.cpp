@@ -16,6 +16,7 @@ typedef Polyhedron_3::Halfedge_handle                             Halfedge_handl
 #include <CGAL/point_generators_3.h>
 
 using namespace GLDraw;
+#define DEBUG_CVX 0
 
 ConvexPolyhedron::ConvexPolyhedron(Eigen::MatrixXd A_, Eigen::VectorXd b_, Eigen::VectorXd center_):
   A(A_), b(b_), center(center_)
@@ -109,18 +110,46 @@ std::vector<Eigen::VectorXd> ConvexPolyhedron::vrep()
   vrep_computed = true;
   return vertices;
 }
+
+
+struct Plane_equation {
+    template <class Facet>
+    typename Facet::Plane_3 operator()( Facet& f) {
+        typename Facet::Halfedge_handle h = f.halfedge();
+        typedef typename Facet::Plane_3  Plane;
+        return Plane( h->vertex()->point(),
+                      h->next()->vertex()->point(),
+                      h->next()->next()->vertex()->point());
+    }
+};
+
 std::pair<Eigen::MatrixXd, Eigen::VectorXd> ConvexPolyhedron::hrep()
 {
   if(!hrep_computed){
-    std::cout << "HREP" << std::endl;
-    std::cout << A << std::endl;
-    std::cout << b << std::endl;
-    std::cout << std::string(80, '-') << std::endl;
-
     A.resize(poly->size_of_facets(),3);
     b.resize(poly->size_of_facets());
     uint ctr = 0;
-    std::cout << "poly has " << poly->size_of_facets() << " facets" << std::endl;
+    //std::cout << "poly has " << poly->size_of_facets() << " facets" << std::endl;
+
+
+    std::transform( poly->facets_begin(), poly->facets_end(), poly->planes_begin(),
+                            Plane_equation());
+    // CGAL::set_pretty_mode( std::cout);
+    // std::copy( poly->planes_begin(), poly->planes_end(),
+    //                    std::ostream_iterator<Plane_3>( std::cout, "\n"));
+    // exit(0);
+
+    // for ( Facet_const_iterator f = poly->facets_begin(); f != poly->facets_end(); ++f)
+    // {
+    //   Halfedge_around_facet_const_circulator fcirc = f->facet_begin();
+    //   CGAL_For_all(fcirc, f->facet_begin())
+    //   {
+    //     double pa = CGAL::to_double(fcirc->vertex()->point().x());
+    //     double pb = CGAL::to_double(fcirc->vertex()->point().y());
+    //     double pc = CGAL::to_double(fcirc->vertex()->point().z());
+    //     std::cout << "[vertex] " << pa << "," << pb << "," << pc << std::endl;
+    //   }
+    // }
     for ( Facet_const_iterator f = poly->facets_begin(); f != poly->facets_end(); ++f)
     {
       Plane_3 plane = f->plane();
@@ -129,20 +158,17 @@ std::pair<Eigen::MatrixXd, Eigen::VectorXd> ConvexPolyhedron::hrep()
       double pb = CGAL::to_double(plane.b());
       double pc = CGAL::to_double(plane.c());
       double pd = CGAL::to_double(plane.d());
+      //double d = sqrtf(pa*pa+pb*pb+pc*pc);
       A(ctr,0) = pa;
       A(ctr,1) = pb;
       A(ctr,2) = pc;
-      std::cout << pa << pb << pc << std::endl;
-
-      b(ctr) = pd;
+      //std::cout << "[plane] " << pa << "," << pb << "," << pc << "," << pd << std::endl;
+      b(ctr) = -pd;
       ctr++;
 
     }
-    std::cout << A << std::endl;
-    std::cout << b << std::endl;
-    Eigen::VectorXd c(3); c.setZero();
-    std::cout << (A*c-b) << std::endl;
-    exit(0);
+    center = GetGeometricCenter();
+    hrep_computed = true;
   }
   return std::make_pair(A,b);
 }
@@ -165,27 +191,57 @@ Eigen::VectorXd ConvexPolyhedron::GetRandomPoint()
   return GetRandomPoint_RejectionSampling();
 }
 
+void ConvexPolyhedron::test_hrep()
+{
+  if(!hrep_computed) hrep();
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", "[", "]");
+  std::cout << "test halfspace representation" << std::endl;
+  //center (needs to be inside)
+  Eigen::VectorXd center = GetGeometricCenter();
+  std::cout << "[center] " << center.format(CommaInitFmt) << (IsInside(center)?"OK (inside)":">>Error<<") << std::endl;
+  //vertices (need to be inside)
+  for ( Vertex_const_iterator v = poly->vertices_begin(); v != poly->vertices_end(); ++v)
+  {
+    Eigen::VectorXd qv = CGALToEigen(v->point());
+    std::cout << "[vertex] " << qv.format(CommaInitFmt) << (IsInside(qv)?"OK (inside)":">>Error<<") << std::endl;
+  }
+  //extended vertices (should be outside the polyhedron)
+  double epsilon = 1e-5;
+  for ( Vertex_const_iterator v = poly->vertices_begin(); v != poly->vertices_end(); ++v)
+  {
+
+    Eigen::VectorXd qd = CGALToEigen(v->point())-center;
+    Eigen::VectorXd qdn = qd.normalized();
+    Eigen::VectorXd qv = center + qd + epsilon*qdn;
+    std::cout << "[extended-vertex] " << qv.format(CommaInitFmt) << (!IsInside(qv)?"OK (outside)":">>Error<<") << std::endl;
+  }
+}
+
 Eigen::VectorXd ConvexPolyhedron::GetRandomPoint_RejectionSampling()
 {
   if(!vrep_computed) vrep();
   if(!bbox_computed) bbox();
 
-  std::cout << "sampling" << std::endl;
   uint iter = 0;
   while(iter++<10){
+    Nsamples++;
     Eigen::VectorXd r(3);
     for(uint k = 0; k < 3; k++){
       r[k] = rng_.uniformReal(bbox_min[k],bbox_max[k]);
     }
-    std::cout << "trying " << r << std::endl;
-    std::cout << "bbox_min: " << bbox_min << std::endl;
-    std::cout << "bbox_max: " << bbox_max << std::endl;
     if(IsInside(r))
     {
       return r;
     }
+    Nsamples_rejected++;
   }
   std::cout << "[WARNING] could not sample polyhedron" << std::endl;
+  std::cout << *this << std::endl;
+  double r_rate = (double)Nsamples_rejected/(double)Nsamples;
+  std::cout << "Rejection rate: " << r_rate << " (" << Nsamples_rejected << "/" << Nsamples << ")" << std::endl;
+  if(IsInside(center)){
+    return center;
+  }
   return vertices.at(0);
 
 }
@@ -223,7 +279,7 @@ std::pair<Eigen::VectorXd, Eigen::VectorXd> ConvexPolyhedron::bbox()
 {
   if(!vrep_computed) vrep();
 
-  std::cout << *this << std::endl;
+  //std::cout << *this << std::endl;
 
   bbox_min.resize(3); bbox_min.setZero();
   bbox_max.resize(3); bbox_max.setZero();
@@ -252,12 +308,6 @@ Eigen::VectorXd ConvexPolyhedron::GetGeometricCenter() const
     Point_3 p = v->point();
     Eigen::VectorXd cp = CGALToEigen(p);
     c += cp;
-    // double x = CGAL::to_double(p[0]);
-    // double y = CGAL::to_double(p[1]);
-    // double z = CGAL::to_double(p[2]);
-    // c[0] += x;
-    // c[1] += y;
-    // c[2] += z;
     ctr++;
   }
   if(ctr>0) c /= ctr;
@@ -359,13 +409,41 @@ void ConvexPolyhedron::DrawGL(GUIState& state)
 }
 std::ostream& operator<< (std::ostream& out, const ConvexPolyhedron& cvxp)
 {
-  out << "ConvexPolyhedron" << std::endl;
+  out << "[ConvexPolyhedron" << std::endl;
   out << " -- vertices  : " << cvxp.poly->size_of_vertices() << std::endl;
   out << " -- halfedges : " << cvxp.poly->size_of_halfedges() << std::endl;
   out << " -- faces     : " << cvxp.poly->size_of_facets() << std::endl;
+
   out << " -- (hrep) " << (cvxp.hrep_computed?"OK":" not computed") << std::endl;
+  Eigen::IOFormat CleanFmt(4, 0, ", ", "\n", "       [", "]");
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", "[", "]");
+
+  if(cvxp.hrep_computed){
+    out << cvxp.A.format(CleanFmt) << std::endl;
+    out << cvxp.b.format(CleanFmt) << std::endl;
+    Eigen::VectorXd c(3);c.setZero();
+    bool CisInside = ((cvxp.A * c - cvxp.b).maxCoeff()<=1e-10);
+    out << "       zero: " << (CisInside?"inside":"outside") << std::endl;
+    Eigen::VectorXd p = cvxp.GetGeometricCenter();
+    bool PisInside = ((cvxp.A * p - cvxp.b).maxCoeff()<=1e-10);
+    out << "       center: " << p.format(CommaInitFmt) << std::endl;
+    out << "       center: " << (PisInside?"inside":"outside") << std::endl;
+  }
+
   out << " -- (vrep) " << (cvxp.vrep_computed?"OK":" not computed") << std::endl;
-  out << " -- vrep vertices  : " << cvxp.vertices.size() << std::endl;
+  if(cvxp.vrep_computed){
+    out << "       vertices  : " << cvxp.vertices.size() << std::endl;
+    for ( Vertex_const_iterator v = cvxp.poly->vertices_begin(); v != cvxp.poly->vertices_end(); ++v)
+    {
+      Vector3 q = cvxp.CGALToVector3(v->point());
+      out << "       [vertex] " << q << std::endl;
+    }
+  }
+
   out << " -- (bbox) " << (cvxp.bbox_computed?"OK":" not computed") << std::endl;
+  if(cvxp.bbox_computed){
+    out << "       bbox_min " << cvxp.bbox_min.format(CommaInitFmt) << std::endl;
+    out << "       bbox_max " << cvxp.bbox_max.format(CommaInitFmt)  << std::endl;
+  }
   return out;
 }

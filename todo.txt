@@ -483,3 +483,6 @@ workspace quotient
 [ ] compute path towards goal. then do priority sampling along that path.
 [ ] sampling has too many points near the geometric centers (since they have
 higher connection probability). Change that to something more uniform.
+
+
+[ ] need new approach to solving sphere-like environment

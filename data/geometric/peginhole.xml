@@ -24,7 +24,7 @@
     <se3min config="6  -3.0 -4.0 -4.0 -3.141593 -1.57 -3.141593"/>
 
     <freeFloating>1</freeFloating>
-    <maxplanningtime>10</maxplanningtime>
+    <maxplanningtime>1</maxplanningtime>
 
     <hierarchy>
       <level inner_index="1" type="R3"/>

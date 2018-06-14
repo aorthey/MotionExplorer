@@ -145,7 +145,7 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
     }
     x = qomplSE2->getX();
     y = qomplSE2->getY();
-    z = qomplSE2->getYaw();
+    z = 0.0;//qomplSE2->getYaw();
     if(z<0) z+= M_PI;
 
   }else if(space_first_subspace->getType() == ob::STATE_SPACE_REAL_VECTOR){
