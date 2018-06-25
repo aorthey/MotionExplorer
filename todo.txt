@@ -486,3 +486,13 @@ higher connection probability). Change that to something more uniform.
 
 
 [ ] need new approach to solving sphere-like environment
+
+
+
+LH approximation
+[ ] compute QS path. 
+[ ] color LH class
+[ ] repeat for several interesting environments.
+
+Make Graph Sampler/Searcher fault-prove
+[ ] Boost::Graph: Understand how bundled properties can be used on astar_search or dijkstra

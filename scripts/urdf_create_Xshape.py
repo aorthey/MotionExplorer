@@ -5,7 +5,7 @@ from urdf_create import *
 from urdf_create_primitives import *
 
 L1 = 1.4
-thicknessx = 0.1
+thicknessx = 0.3
 thicknessy = L1
 spacing = 0.001
 

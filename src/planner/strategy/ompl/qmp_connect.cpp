@@ -22,7 +22,7 @@ namespace ompl
 {
   namespace magic
   {
-    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
+    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 10;
   }
 }
 
@@ -586,7 +586,6 @@ void QMPConnect::RandomWalk(const Vertex &v)
     //#########################################################################
 
     Vertex v_last = addMilestone(s_last);
-    //Vertex v_last = CreateNewVertex(s_last);
 
     ob::PathPtr solM1 = InterpolateM1GraphConstraint(v_first, v_last);
     if(!solM1){
@@ -719,4 +718,3 @@ void QMPConnect::RandomWalk(const Vertex &v)
 
   }
 }
-

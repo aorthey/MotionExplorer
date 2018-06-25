@@ -72,6 +72,25 @@ uint PlannerDataVertexAnnotated::GetMaxLevel() const
 }
 
 //##############################################################################
+void PlannerDataVertexAnnotated::SetPathClass(uint path_class_)
+{
+  path_class = path_class_;
+}
+uint PlannerDataVertexAnnotated::GetPathClass() const
+{
+  return path_class;
+}
+
+//##############################################################################
+void PlannerDataVertexAnnotated::SetMaxPathClass(uint max_path_class_)
+{
+  max_path_class = max_path_class_;
+}
+uint PlannerDataVertexAnnotated::GetMaxPathClass() const
+{
+  return max_path_class;
+}
+//##############################################################################
 const ob::State *PlannerDataVertexAnnotated::getState() const 
 {
   return state_;

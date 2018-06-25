@@ -182,7 +182,7 @@ namespace ompl
         {
             return g_;
         }
-        void CheckForSolution(ob::PathPtr &solution) override;
+        virtual void CheckForSolution(ob::PathPtr &solution) override;
 
     protected:
 

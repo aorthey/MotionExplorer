@@ -21,6 +21,10 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
     uint GetLevel() const;
     void SetMaxLevel(uint level_);
     uint GetMaxLevel() const;
+    void SetPathClass(uint level_);
+    uint GetPathClass() const;
+    void SetMaxPathClass(uint level_);
+    uint GetMaxPathClass() const;
     void SetComponent(uint component_);
     uint GetComponent() const;
     void setState(ob::State *s);
@@ -41,6 +45,10 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
     double open_neighborhood_distance{0.0};
     uint level{0};
     uint max_level{1};
+
+    uint path_class{0};
+    uint max_path_class{0};
+
     uint component{99};
 
     enum ComponentType{START_COMPONENT, GOAL_COMPONENT, OUTLIER_COMPONENT, UNKNOWN};

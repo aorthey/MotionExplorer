@@ -9,6 +9,8 @@
 #include "planner/strategy/ompl/qmp_connect.h"
 #include "planner/strategy/ompl/qmp_connect_cover.h"
 #include "planner/strategy/ompl/qscp.h"
+#include "planner/strategy/ompl/qslh.h"
+#include "planner/strategy/quotient/qmp2.h"
 #include "planner/strategy/ompl/rrt_unidirectional.h"
 #include "planner/strategy/ompl/rrt_unidirectional_cover.h"
 #include "planner/strategy/ompl/rrt_bidirectional.h"
@@ -116,17 +118,25 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:psbl") planner = std::make_shared<og::pSBL>(si);
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
-  else if(algorithm=="qmp_connect"){
+  else if(algorithm=="hierarchy:qmp_connect"){
     typedef og::MultiQuotient<og::QMPConnect, og::RRTBidirectional> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  }else if(algorithm=="qmp_connect_cover"){
+  }else if(algorithm=="hierarchy:qmp_connect_cover"){
     typedef og::MultiQuotient<og::QMPConnectCover> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnectCover");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  }else if(algorithm=="qscp"){
+  }else if(algorithm=="hierarchy:qscp"){
     typedef og::MultiQuotient<og::QSCP> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QSCP");
+    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="hierarchy:qslh"){
+    typedef og::MultiQuotient<og::QSLH> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec, "QSLH");
+    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="hierarchy:qmp2"){
+    typedef og::MultiQuotient<og::QMP2> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec, "QMP2");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
@@ -190,7 +200,11 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     ob::PlannerDataPtr pd( new ob::PlannerData(si_vec.back()) );
     planner->getPlannerData(*pd);
 
-    output.SetPlannerData(pd);
+    if(util::StartsWith(algorithm,"hierarchy")){
+      output.SetPlannerData(pd);
+    }else{
+      output.SetPlannerData(pd);
+    }
     output.SetProblemDefinition(planner->getProblemDefinition());
   }
 }

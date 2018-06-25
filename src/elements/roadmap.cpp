@@ -203,9 +203,9 @@ void Roadmap::DrawGL(GUIState& state)
     if(state(str.c_str())){
       if(!roadmaps_level.at(k)) return;
       //std::cout << "level " << k << " vertices: " << roadmaps_level.at(k)->numVertices() << std::endl;
-      cVertex = (k%2==0?green:lightred);
-      cEdge = cVertex;
-      cPath = (k%2==0?magenta:magenta);
+      //cVertex = (k%2==0?green:lightred);
+      //cEdge = cVertex;
+      //cPath = (k%2==0?magenta:magenta);
       DrawSingleLevelGL(state, roadmaps_level.at(k));
       if(state("draw_roadmap_shortest_path")){
         DrawPathGL(state, shortest_path_level.at(k));
