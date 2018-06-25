@@ -12,6 +12,9 @@ struct Layer{
   std::string type;
 };
 
+class CSpaceInput;
+class StrategyInput;
+
 class PlannerInput{
   public:
     //general input for any planner method (fixed)
@@ -52,8 +55,13 @@ class PlannerInput{
     bool Load(const char* file);
     bool Load(TiXmlElement *node);
     void SetDefault();
+    const CSpaceInput& GetCSpaceInput();
+    const StrategyInput& GetStrategyInput();
 
     friend std::ostream& operator<< (std::ostream& out, const PlannerInput& pin) ;
+  private:
+    CSpaceInput* cin;
+    StrategyInput* sin;
 };
 
 /// @brief multiple plannerinputs (to use several algorithms inside GUI)

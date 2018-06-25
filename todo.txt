@@ -514,3 +514,8 @@ explore this solution, or continue searching on Q1.
   [ ] button for computing X ms.
   [ ] button for computing until solution found.
   [ ] button for stepping through the currently explored roadmaps
+
+
+
+[ ] get rid completely of pathspace, replace by roadmap. levels should be
+specified in advance, not as recursive chain

@@ -1,5 +1,7 @@
 #include "util.h"
 #include "planner/planner_input.h"
+#include "cspace/cspace_input.h"
+#include "planner/strategy/strategy_input.h"
 #include <KrisLibrary/math/VectorTemplate.h>
 
 bool PlannerMultiInput::Load(const char* file){
@@ -141,6 +143,31 @@ bool PlannerInput::Load(TiXmlElement *node)
 
 
   return true;
+}
+
+const CSpaceInput& PlannerInput::GetCSpaceInput()
+{
+  cin = new CSpaceInput();
+  cin->timestep_max = timestep_max;
+  cin->timestep_min = timestep_min;
+  cin->fixedBase = !freeFloating;
+  cin->uMin = uMin;
+  cin->uMax = uMax;
+  cin->kinodynamic = kinodynamic;
+  return *cin;
+}
+const StrategyInput& PlannerInput::GetStrategyInput()
+{
+  sin = new StrategyInput();
+  sin->q_init = q_init;
+  sin->q_goal = q_goal;
+  sin->dq_init = dq_init;
+  sin->dq_goal = dq_goal;
+  sin->name_sampler = name_sampler;
+  sin->name_algorithm = name_algorithm;
+  sin->epsilon_goalregion = epsilon_goalregion;
+  sin->max_planning_time = max_planning_time;
+  return *sin;
 }
 
 bool PlannerInput::Load(const char* file)

@@ -2,6 +2,7 @@
 
 #include "planner/planner_input.h"
 #include "elements/hierarchy.h"
+#include "elements/roadmap.h"
 #include "elements/path_pwl.h"
 #include "gui/gui_state.h"
 #include "gui/ViewHierarchy.h"
@@ -13,7 +14,6 @@
 #include <vector>
 #include <memory>
 
-class PathSpace;
 class MotionPlanner{
 
   public:
@@ -23,11 +23,15 @@ class MotionPlanner{
     const PlannerInput& GetInput();
     PathPiecewiseLinear* GetPath();
 
-    //folder-like operations on hierarchical path space
+    //folder-like operations on hierarchical roadmap
     virtual void Expand();
     virtual void Collapse();
     virtual void Next();
     virtual void Previous();
+
+    virtual void Step();
+    virtual void Advance(double ms);
+    virtual void AdvanceUntilSolution(double ms);
     
     virtual void DrawGL(GUIState&);
     virtual void DrawGLScreen(double x_ =0.0, double y_=0.0);
@@ -42,21 +46,20 @@ class MotionPlanner{
 
   protected:
     MotionPlanner() = delete;
-
     void RaiseError();
 
-    uint current_level;
-    uint current_level_node;
-    std::vector<int> current_path;
+    uint current_level; //vertical level in hierarchy (tree)
+    uint current_level_node; //horizontal node inside a level
+    std::vector<int> current_path; //current selected path through tree
 
-    Hierarchy<PathSpace*> *hierarchy;
+    Hierarchy<RoadmapPtr> *hierarchy;
+    RoadmapPtr Rcurrent;
     void UpdateHierarchy();
     bool isHierarchical();
 
     bool active;
     void CreateHierarchy();
 
-    PathSpace *Pcurrent;
     RobotWorld *world;
     PlannerInput input;
     ViewHierarchy viewHierarchy;

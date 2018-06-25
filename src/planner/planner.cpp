@@ -1,12 +1,10 @@
 #include "planner/planner.h"
+#include "planner/strategy/strategy_geometric.h"
+#include "planner/strategy/strategy_input.h"
+#include "planner/strategy/strategy_output.h"
 #include "planner/cspace/cspace_factory.h"
 #include "gui/drawMotionPlanner.h"
 
-#include "pathspace/pathspace_atomic.h"
-#include "pathspace/pathspace_multilevel.h"
-#include "pathspace/pathspace_multilevel_kinodynamic.h"
-#include "pathspace/decorator.h"
-#include "pathspace/decorator_highlighter.h"
 #include "util.h"
 
 using namespace GLDraw;
@@ -15,13 +13,12 @@ using namespace util;
 MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   world(world_), input(input_)
 {
-  current_path.clear();
-  pwl = NULL;
+  pwl = nullptr;
   active = true;
   current_level = 0;
   current_level_node = 0;
+  current_path.clear();
   this->world->InitCollisions();
-
   CreateHierarchy();
 }
 std::string MotionPlanner::getName() const{
@@ -29,13 +26,24 @@ std::string MotionPlanner::getName() const{
 }
 
 void MotionPlanner::CreateHierarchy(){
-  hierarchy = new Hierarchy<PathSpace*>();
+  hierarchy = new Hierarchy<RoadmapPtr>();
   std::vector<int> idxs = input.robot_idxs;
   std::string algorithm = input.name_algorithm;
 
-  PathSpaceInput *psinput_level0 = nullptr;
-  PathSpaceInput *psinput = nullptr;
+  std::vector<CSpaceOMPL*> cspace_levels;
+
+  WorldPlannerSettings worldsettings;
+  worldsettings.InitializeDefault(*world);
+
+  CSpaceFactory factory(input.GetCSpaceInput());
+
+  //#########################################################################
+  //For each level, compute the inputs/cspaces for each robot
+  //#########################################################################
   for(uint k = 0; k < input.layers.size(); k++){
+    //#########################################################################
+    //LEVEL k: get robots and compute init/goal
+    //#########################################################################
     int ii = input.layers.at(k).inner_index;
     int io = input.layers.at(k).outer_index;
     Robot* ri = world->robots[ii];
@@ -55,33 +63,77 @@ void MotionPlanner::CreateHierarchy(){
     Config dqi = input.dq_init; dqi.resize(ri->dq.size());
     Config dqg = input.dq_goal; dqg.resize(ri->dq.size());
 
-    if(k==0){
-      //add the space of all continuous functions
-      hierarchy->AddLevel( ii, io, qi, qg);
-      psinput = new PathSpaceInput(input, 0);
-      psinput_level0 = psinput;
-    }
+    //#########################################################################
+    //LEVEL k: given robot k, compute its cspace (free float vs fixed base)
+    //#########################################################################
+    CSpaceOMPL *cspace_level_k;
+    std::string type = input.layers.at(k).type;
 
+    if(input.freeFloating){
+      if(type=="R2") {
+        cspace_level_k = factory.MakeGeometricCSpaceRN(world, ii, 2);
+      }else if(type=="R3") {
+        cspace_level_k = factory.MakeGeometricCSpaceRN(world, ii, 3);
+      }else if(type=="R3S2"){
+        cspace_level_k = factory.MakeGeometricCSpaceR3S2(world, ii);
+      }else if(type=="SE3"){
+        cspace_level_k = factory.MakeGeometricCSpaceSE3(world, ii);
+      }else if(type=="SE2"){
+        cspace_level_k = factory.MakeGeometricCSpaceSE2(world, ii);
+      }else if(type=="SE3RN"){
+        cspace_level_k = factory.MakeGeometricCSpace(world, ii);
+      }else{
+        std::cout << "Type " << type << " not recognized" << std::endl;
+        exit(0);
+      }
+      //if(input->enableSufficiency){
+      //  cspace_level_k = new CSpaceOMPLDecoratorNecessarySufficient(cspace_level_k, input_level->robot_outer_idx);
+      //}
+    }else{
+      if(type.substr(0,1) != "R"){
+        std::cout << type.substr(0) << std::endl;
+        std::cout << "fixed robots needs to have configuration space RN, but has " << type << std::endl;
+        exit(0);
+      }
+
+      std::string str_dimension = type.substr(1);
+      int N = boost::lexical_cast<int>(str_dimension);
+      cspace_level_k = factory.MakeGeometricCSpaceFixedBase(world, ii, N);
+
+    }
+    cspace_levels.push_back( cspace_level_k );
+
+    if(k==0){
+      //add a root node
+      hierarchy->AddLevel( ii, io, qi, qg);
+    }
     hierarchy->AddLevel( ii, io, qi, qg); 
-    psinput->SetNextLayer(new PathSpaceInput(input,k));
-    psinput = psinput->GetNextLayer();
   }
+
+  //hierarchy->AddRootNode( new PathSpaceMultiLevel(world, psinput_level0) );
+
+  StrategyGeometricMultiLevel strategy;
+  StrategyOutput output(cspace_levels.back());
+
+  StrategyInput strategy_input = input.GetStrategyInput();
+  strategy_input.cspace = cspace_levels.back();
+  strategy_input.world = world;
 
   //remove all nested robots except the original one
   //for(uint k = 0; k < idxs.size()-1; k++){
   //  output.removable_robot_idxs.push_back(idxs.at(k));
   //}
 
-  if(psinput_level0!=nullptr){
-    if(!psinput_level0->kinodynamic){
-      hierarchy->AddRootNode( new PathSpaceMultiLevel(world, psinput_level0) );
-    }else{
-      hierarchy->AddRootNode( new PathSpaceMultiLevelKinodynamic(world, psinput_level0) );
-    }
-  }else{
-    std::cout << "root node is zero" << std::endl;
-    exit(0);
-  }
+//  if(psinput_level0!=nullptr){
+//    if(!psinput_level0->kinodynamic){
+//      hierarchy->AddRootNode( new PathSpaceMultiLevel(world, psinput_level0) );
+//    }else{
+//      hierarchy->AddRootNode( new PathSpaceMultiLevelKinodynamic(world, psinput_level0) );
+//    }
+//  }else{
+//    std::cout << "root node is zero" << std::endl;
+//    exit(0);
+//  }
 
 }
 
@@ -97,29 +149,16 @@ void MotionPlanner::RaiseError(){
   exit(1);
 }
 
-//folder-like operations on  path space
+//folder-like operations on hierarchical roadmap
 void MotionPlanner::Expand(){
   if(!active) return;
 
   uint Nmax=hierarchy->NumberLevels();
   if(current_level<Nmax-1){
-    //current_level_node
-    PathSpace* P = hierarchy->GetNodeContent(current_path);
-    if(P->isAtomic()){
-      std::cout << "Error: Selected Path Space is Atomic." << std::endl;
-    }else{
-      std::vector<PathSpace*> Pvec = P->Decompose();
-      if(Pvec.size()>0){
-        for(uint k = 0; k < Pvec.size(); k++){
-          hierarchy->AddNode( Pvec.at(k), current_path);
-        }
-        current_level++;
-        current_level_node=0;
-        current_path.push_back(current_level_node);
-      }
-    }
+    current_level++;
+    current_level_node=0;
+    current_path.push_back(current_level_node);
   }
-  UpdateHierarchy();
 }
 
 void MotionPlanner::Collapse(){
@@ -127,7 +166,6 @@ void MotionPlanner::Collapse(){
 
   if(current_level>0){
     current_path.erase(current_path.end() - 1);
-    hierarchy->DeleteNode( current_path );
     current_level--;
     if(current_path.size()>0){
       current_level_node = current_path.back();
@@ -147,10 +185,10 @@ void MotionPlanner::Next(){
   if(current_level > 0){
     current_path.at(current_level-1) = current_level_node;
   }
-  UpdateHierarchy();
 }
 void MotionPlanner::Previous(){
   if(!active) return;
+
   uint Nmax=hierarchy->NumberNodesOnLevel(current_level);
   if(current_level_node>0) current_level_node--;
   else{
@@ -163,27 +201,26 @@ void MotionPlanner::Previous(){
   if(current_level > 0){
     current_path.at(current_level-1) = current_level_node;
   }
-  UpdateHierarchy();
 }
-void MotionPlanner::UpdateHierarchy(){
-  if(!active) return;
-
-  uint L = viewHierarchy.GetLevel();
-  if(current_level == L ){
-  }else{
-    if(current_level < L){
-      viewHierarchy.PopLevel();
-    }else{
-      uint idx = hierarchy->GetRobotIdx( current_level );
-      Robot *robot = world->robots[idx];
-      uint N = hierarchy->NumberNodesOnLevel(current_level);
-      viewHierarchy.PushLevel(N, robot->name);
-    }
-  }
-  viewHierarchy.UpdateSelectionPath( current_path );
-  GetPath();
-  Print();
-}
+//void MotionPlanner::UpdateHierarchy(){
+//  if(!active) return;
+//
+//  uint L = viewHierarchy.GetLevel();
+//  if(current_level == L ){
+//  }else{
+//    if(current_level < L){
+//      viewHierarchy.PopLevel();
+//    }else{
+//      uint idx = hierarchy->GetRobotIdx( current_level );
+//      Robot *robot = world->robots[idx];
+//      uint N = hierarchy->NumberNodesOnLevel(current_level);
+//      viewHierarchy.PushLevel(N, robot->name);
+//    }
+//  }
+//  viewHierarchy.UpdateSelectionPath( current_path );
+//  GetPath();
+//  Print();
+//}
 void MotionPlanner::Print()
 {
   if(!active) return;
@@ -208,17 +245,17 @@ bool MotionPlanner::isHierarchical(){
 }
 void MotionPlanner::DrawGLScreen(double x_, double y_){
   if(!active) return;
-  // if(isHierarchical()){
-  //   viewHierarchy.x = x_;
-  //   viewHierarchy.y = y_;
-  //   viewHierarchy.DrawGL();
-  // }
+  if(isHierarchical()){
+    viewHierarchy.x = x_;
+    viewHierarchy.y = y_;
+    viewHierarchy.DrawGL();
+  }
 }
 
 PathPiecewiseLinear* MotionPlanner::GetPath(){
   if(!active) return NULL;
-  Pcurrent = hierarchy->GetNodeContent(current_path);
-  pwl = Pcurrent->GetShortestPath();
+  Rcurrent = hierarchy->GetNodeContent(current_path);
+  pwl = Rcurrent->GetShortestPath();
   if(pwl && input.smoothPath){
     pwl->Smooth();
   }
@@ -228,17 +265,15 @@ void MotionPlanner::DrawGL(GUIState& state){
   if(!active) return;
 
   uint N = hierarchy->NumberNodesOnLevel(current_level);
-  Pcurrent = hierarchy->GetNodeContent(current_path);
-  Pcurrent = new PathSpaceDecoratorHighlighter(Pcurrent);
-  Pcurrent->DrawGL(state);
+  Rcurrent = hierarchy->GetNodeContent(current_path);
+  Rcurrent->DrawGL(state);
 
-  for(uint k = 0; k < N; k++){
-    if(k==current_level_node) continue;
-    current_path.at(current_path.size()-1) = k;
-  }
-  if(current_path.size()>0){
-    current_path.at(current_path.size()-1) = current_level_node;
-  }
+  uint ridx = GetRobotIdx(current_level);
+  Robot* robot = world->robots[ridx];
+  const Config qi = GetInitConfig(current_level);
+  const Config qg = GetGoalConfig(current_level);
+  if(state("planner_draw_start_configuration")) GLDraw::drawRobotAtConfig(robot, qi, green);
+  if(state("planner_draw_goal_configuration")) GLDraw::drawRobotAtConfig(robot, qg, red);
 
 }
 std::ostream& operator<< (std::ostream& out, const MotionPlanner& planner){
