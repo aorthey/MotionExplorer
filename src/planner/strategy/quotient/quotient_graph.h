@@ -35,21 +35,19 @@ namespace ompl
         class VertexInternalState{
           public:
             VertexInternalState(){};
-            ob::State *state;
-            uint total_connection_attempts;
-            uint successful_connection_attempts;
-            bool on_shortest_path;
-            unsigned long int associated_vertex_target;
-            unsigned long int associated_vertex_source;
-            double associated_t;
-            double open_neighborhood_distance;
-            cover::OpenSet *open_neighborhood;
+            ob::State *state{nullptr};
+            uint total_connection_attempts{0};
+            uint successful_connection_attempts{0};
+            bool on_shortest_path{false};
+            unsigned long int associated_vertex_target{0};
+            unsigned long int associated_vertex_source{0};
+            double associated_t{-1};
+            double open_neighborhood_distance{0};
+            cover::OpenSet *open_neighborhood{nullptr};
         };
 
         class EdgeInternalState{
           public:
-            EdgeInternalState(): cost(+dInf), original_cost(+dInf)
-            {};
             EdgeInternalState(ob::Cost cost_): cost(cost_), original_cost(cost_)
             {};
             void setWeight(double d){
@@ -62,8 +60,8 @@ namespace ompl
               cost = original_cost;
             }
           private:
-            ob::Cost cost;
-            ob::Cost original_cost;
+            ob::Cost cost{+dInf};
+            ob::Cost original_cost{+dInf};
             bool isSufficient;
         };
 
@@ -76,16 +74,13 @@ namespace ompl
          >Graph;
 
         typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
+        typedef boost::graph_traits<Graph>::edge_descriptor Edge;
         typedef boost::graph_traits<Graph>::vertices_size_type VertexIndex;
         typedef Vertex* VertexParent;
         typedef VertexIndex* VertexRank;
-        typedef boost::graph_traits<Graph>::edge_descriptor Edge;
-        typedef boost::graph_traits<Graph>::in_edge_iterator IEIterator;
-
 
         typedef std::shared_ptr<NearestNeighbors<Vertex>> RoadmapNeighbors;
         typedef std::function<const std::vector<Vertex> &(const Vertex)> ConnectionStrategy;
-
 
       public:
 
@@ -104,7 +99,6 @@ namespace ompl
         void setNearestNeighbors();
 
         void getPlannerData(ob::PlannerData &data) const override;
-        void setProblemDefinition(const ob::ProblemDefinitionPtr &pdef) override;
 
         void setup() override;
 
@@ -122,14 +116,6 @@ namespace ompl
         bool sameComponent(Vertex m1, Vertex m2);
         ob::Cost bestCost_{+dInf};
 
-        unsigned long int milestoneCount() const
-        {
-          return boost::num_vertices(G);
-        }
-        const Graph &getRoadmap() const
-        {
-            return G;
-        }
         virtual void CheckForSolution(ob::PathPtr &solution) override;
 
     protected:

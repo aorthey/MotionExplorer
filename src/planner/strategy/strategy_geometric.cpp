@@ -7,7 +7,6 @@
 #include "planner/strategy/ompl/prm_basic.h"
 #include "planner/strategy/ompl/qmp.h"
 #include "planner/strategy/ompl/qmp_connect.h"
-#include "planner/strategy/ompl/qmp_connect_cover.h"
 #include "planner/strategy/ompl/qscp.h"
 #include "planner/strategy/ompl/qslh.h"
 #include "planner/strategy/quotient/qmp2.h"
@@ -119,12 +118,12 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
   else if(algorithm=="hierarchy:qmp_connect"){
-    typedef og::MultiQuotient<og::QMPConnect, og::RRTBidirectional> MultiQuotient;
+    typedef og::MultiQuotient<og::QMPConnect> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  }else if(algorithm=="hierarchy:qmp_connect_cover"){
-    typedef og::MultiQuotient<og::QMPConnectCover> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnectCover");
+  }else if(algorithm=="hierarchy:qmp_connect_rrt"){
+    typedef og::MultiQuotient<og::QMPConnect, og::RRTBidirectional> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect+RRT");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="hierarchy:qscp"){
     typedef og::MultiQuotient<og::QSCP> MultiQuotient;
@@ -198,11 +197,12 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     //###########################################################################
 
     ob::PlannerDataPtr pd( new ob::PlannerData(si_vec.back()) );
-    planner->getPlannerData(*pd);
 
     if(util::StartsWith(algorithm,"hierarchy")){
+      planner->getPlannerData(*pd);
       output.SetPlannerData(pd);
     }else{
+      planner->getPlannerData(*pd);
       output.SetPlannerData(pd);
     }
     output.SetProblemDefinition(planner->getProblemDefinition());

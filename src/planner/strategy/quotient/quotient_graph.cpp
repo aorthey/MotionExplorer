@@ -23,8 +23,8 @@ namespace ompl
 {
   namespace magic
   {
-    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 3;
-    static const double ROADMAP_BUILD_TIME = 0.01;
+    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
+    static const double ROADMAP_BUILD_TIME = 0.02;
     static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
   }
 }
@@ -72,6 +72,7 @@ void QuotientGraph::clear()
   clearQuery();
 
   iterations_ = 0;
+  totalNumberOfSamples = 0;
   bestCost_ = ob::Cost(dInf);
   setup_ = false;
   addedNewSolution_ = false;
@@ -84,10 +85,10 @@ void QuotientGraph::clearQuery()
   pis_.restart();
 }
 
-void QuotientGraph::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
-{
-  Planner::setProblemDefinition(pdef);
-}
+//void QuotientGraph::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
+//{
+//  Planner::setProblemDefinition(pdef);
+//}
 
 void QuotientGraph::Init(){
   checkValidity();
@@ -188,45 +189,6 @@ bool QuotientGraph::sameComponent(Vertex m1, Vertex m2)
   return boost::same_component(m1, m2, disjointSets_);
 }
 
-void QuotientGraph::CheckForSolution(ob::PathPtr &solution)
-{
-  hasSolution = maybeConstructSolution(startM_, goalM_, solution);
-}
-
-bool QuotientGraph::maybeConstructSolution(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals,
-                                                  ob::PathPtr &solution)
-{
-  ob::Goal *g = pdef_->getGoal().get();
-  bestCost_ = ob::Cost(+dInf);
-  foreach (Vertex start, starts)
-  {
-    foreach (Vertex goal, goals)
-    {
-      bool same_component = sameComponent(start, goal);
-
-      if (same_component && g->isStartGoalPairValid(G[goal].state, G[start].state))
-      {
-        ob::PathPtr p = constructSolution(start, goal);
-        if (p)
-        {
-          ob::Cost pathCost = p->cost(opt_);
-
-          if (opt_->isCostBetterThan(pathCost, bestCost_)){
-            bestCost_ = pathCost;
-          }
-          if (opt_->isSatisfied(pathCost))
-          {
-            solution = p;
-            return true;
-          }
-        }
-      }
-    }
-  }
-
-  return false;
-}
-
 QuotientGraph::Vertex QuotientGraph::addMilestone(ob::State *state)
 {
   Vertex m = CreateNewVertex(state);
@@ -254,9 +216,6 @@ QuotientGraph::Vertex QuotientGraph::CreateNewVertex(ob::State *state)
 {
   Vertex m = boost::add_vertex(G);
   G[m].state = si_->cloneState(state);
-  G[m].total_connection_attempts = 0;
-  G[m].successful_connection_attempts = 0;
-  G[m].on_shortest_path = false;
   disjointSets_.make_set(m);
   return m;
 }
@@ -318,7 +277,6 @@ void QuotientGraph::setup(){
     //OMPL_INFORM("%s: problem definition is not set, deferring setup completion...", getName().c_str());
     setup_ = false;
   }
-
 }
 
 ob::Cost QuotientGraph::costHeuristic(Vertex u, Vertex v) const
@@ -383,8 +341,6 @@ void QuotientGraph::RandomWalk(const Vertex &v)
   uint ctr = 0;
   for (uint i = 0; i < magic::MAX_RANDOM_BOUNCE_STEPS; ++i)
   {
-    //s_next = SAMPLE(M1)
-
     ob::State *s_next = xstates[ctr];
     M1_sampler->sampleUniform(s_next);
 
@@ -414,6 +370,37 @@ void QuotientGraph::RandomWalk(const Vertex &v)
       ctr++;
     }
   }
+}
+
+void QuotientGraph::CheckForSolution(ob::PathPtr &solution)
+{
+  hasSolution = maybeConstructSolution(startM_, goalM_, solution);
+}
+
+bool QuotientGraph::maybeConstructSolution(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals,
+                                                  ob::PathPtr &solution)
+{
+  ob::Goal *g = pdef_->getGoal().get();
+  bestCost_ = ob::Cost(+dInf);
+  foreach (Vertex start, starts)
+  {
+    foreach (Vertex goal, goals)
+    {
+      bool same_component = sameComponent(start, goal);
+
+      if (same_component && g->isStartGoalPairValid(G[goal].state, G[start].state))
+      {
+        ob::PathPtr p = constructSolution(start, goal);
+        if (p)
+        {
+          solution = p;
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
 }
 ob::PathPtr QuotientGraph::constructSolution(const Vertex &start, const Vertex &goal)
 {

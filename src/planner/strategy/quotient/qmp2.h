@@ -23,8 +23,8 @@ namespace ompl
         virtual ~QMP2() override;
 
       protected:
-        double epsilon{0.05}; //graph thickening
-        double percentageSamplesOnShortestPath{1};
+        double epsilon{0.01}; //graph thickening
+        double percentageSamplesOnShortestPath{0.1};
 
         virtual bool SampleGraph(ob::State*) override;
         virtual ompl::PDF<og::QuotientGraph::Edge> GetEdgePDF();

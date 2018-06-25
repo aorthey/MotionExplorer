@@ -42,7 +42,6 @@ namespace ompl
 
 
       public:
-        double goalBias_{0.05};
         int lastSourceVertexSampled{-1};
         int lastTargetVertexSampled{-1};
         double lastTSampled{-1.0};

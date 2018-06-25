@@ -496,3 +496,21 @@ LH approximation
 
 Make Graph Sampler/Searcher fault-prove
 [ ] Boost::Graph: Understand how bundled properties can be used on astar_search or dijkstra
+
+
+[ ] QS. HasSolution. NumberOfSolutions. GetRoadmaps
+
+
+First, we need to search for one solution on Q1. Once found, we can either
+explore this solution, or continue searching on Q1. 
+
+
+[ ] Two modes: interactive/automatic. 
+  Interactive mode: 
+  [ ] button for one step. Meaning one sample is drawn. Then we draw roadmap
+  [ ] button for moving through the explored solution classes.
+  [ ] button for exploring one class for X ms. 
+  Automatic mode: 
+  [ ] button for computing X ms.
+  [ ] button for computing until solution found.
+  [ ] button for stepping through the currently explored roadmaps

@@ -37,8 +37,7 @@ bool QMP::SampleGraph(ob::State *q_random_graph)
   const ob::State *to = stateProperty_[v2];
 
   M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
-  //M1_sampler->sampleGaussian(q_random_graph, q_random_graph, epsilon);
-  //M1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
+  if(epsilon>0) M1_sampler->sampleGaussian(q_random_graph, q_random_graph, epsilon);
 
   return true;
 }

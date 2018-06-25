@@ -87,7 +87,7 @@ void PrintQuotientSpaces(std::vector<Quotient*> quotientSpaces, uint k=0){
 template <class T, class Tlast>
 ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCondition &ptc){
   
-  static const double T_GROW = 0.01; //time to grow before Checking if solution exists
+  static const double T_GROW = 0.1; //time to grow before Checking if solution exists
 
   auto cmp = [](og::Quotient* left, og::Quotient* right) 
               { 

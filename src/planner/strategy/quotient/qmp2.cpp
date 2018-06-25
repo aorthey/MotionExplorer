@@ -38,8 +38,7 @@ bool QMP2::SampleGraph(ob::State *q_random_graph)
 
   M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
   //M1_sampler->sampleGaussian(q_random_graph, q_random_graph, epsilon);
-  //M1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
-
+  M1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
   return true;
 }
 
@@ -55,7 +54,6 @@ ompl::PDF<og::QuotientGraph::Edge> QMP2::GetEdgePDF()
       const Vertex v1 = boost::source(e, G);
       const Vertex v2 = boost::target(e, G);
       if(G[v1].on_shortest_path && G[v2].on_shortest_path){
-        //ob::Cost weight = G[e]get(boost::edge_weight_t(), G, e).getCost();
         ob::Cost weight = G[e].getCost();
         pdf.add(e, weight.value());
       }
@@ -67,8 +65,6 @@ ompl::PDF<og::QuotientGraph::Edge> QMP2::GetEdgePDF()
       const Vertex v1 = boost::source(e, G);
 
       if(sameComponent(v1, startM_.at(0))){
-        //const std::vector<Vertex> &neighbors = connectionStrategy_(v1);
-        //pdf.add(e, 1.0/(100*neighbors.size()));
         ob::Cost weight = G[e].getCost();
         pdf.add(e, weight.value());
       }

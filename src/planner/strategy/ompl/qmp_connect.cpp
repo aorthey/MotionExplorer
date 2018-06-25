@@ -30,9 +30,6 @@ QMPConnect::QMPConnect(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
   QMP(si, previous_)
 {
   setName("QMPConnect"+to_string(id));
-  goalBias_ = 0.0;
-  epsilon = 0.1;
-  percentageSamplesOnShortestPath = 1; //start at 1, then diminish over time
 }
 
 QMPConnect::~QMPConnect(){
