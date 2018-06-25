@@ -18,4 +18,8 @@ build/
 data/videos/
 data/benchmarks/
 data/robots/sr_grasp_description/
+data/robots/atlas/
+data/robots/kuka_shadowhand/
+data/robots/baxter_description/
+
 
