@@ -502,7 +502,7 @@ void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
   GUIState* state = &_backend->state;
 
   switch(c) {
-    case 'h':
+    case 'H':
     {
       BaseT::Handle_Keypress(c,x,y);
       std::cout << "<forcefield gui>" << std::endl;

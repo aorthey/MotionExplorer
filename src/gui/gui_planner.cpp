@@ -44,6 +44,12 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="hierarchy_up"){
     planners.at(active_planner)->Collapse();
     hierarchy_change = true;
+  }else if(cmd=="planner_step"){
+    planners.at(active_planner)->Step();
+  }else if(cmd=="planner_advance_one_second"){
+    planners.at(active_planner)->Advance(1);
+  }else if(cmd=="planner_advance_until_solution"){
+    planners.at(active_planner)->AdvanceUntilSolution();
   }else if(cmd=="next_planner"){
     if(active_planner<planners.size()-1) active_planner++;
     else active_planner = 0;
@@ -398,12 +404,6 @@ bool GLUIPlannerGUI::Initialize(){
   if(!BaseT::Initialize()) return false;
 
   //PlannerBackend* _backend = static_cast<PlannerBackend*>(backend);
-
-  AddToKeymap("left","hierarchy_previous");
-  AddToKeymap("right","hierarchy_next");
-  AddToKeymap("down","hierarchy_down");
-  AddToKeymap("up","hierarchy_up");
-  AddToKeymap("t","next_planner");
 
   UpdateGUI();
 // save/load planner:

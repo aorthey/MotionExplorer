@@ -12,111 +12,132 @@ Roadmap::Roadmap()
 {
 }
 
+Roadmap::Roadmap(const ob::PlannerDataPtr pd_, CSpaceOMPL *cspace_): pd(pd_), cspace(cspace_)
+{
+  std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
+  LemonInterface lemon(pd);
+  std::vector<Vertex> pred = lemon.GetShortestPath();
+  shortest_path.clear();
+  for(uint i = 0; i < pred.size(); i++)
+  {
+    Vertex pi = pred.at(i);
+    Vector3 q = cspace->getXYZ(pd->getVertex(pi).getState());
+    shortest_path.push_back(q);
+  }
+}
+
 uint Roadmap::numEdges()
 {
-  uint edge_ctr = 0;
-  for(uint k = 0; k < roadmaps_level.size(); k++){
-    edge_ctr += roadmaps_level.at(k)->numEdges();
-  }
-  return edge_ctr;
+  if(pd == nullptr) return 0;
+  return pd->numEdges();
 }
 
 uint Roadmap::numVertices()
 {
-  uint vertex_ctr = 0;
-  for(uint k = 0; k < roadmaps_level.size(); k++){
-    vertex_ctr += roadmaps_level.at(k)->numVertices();
-  }
-  return vertex_ctr;
+  if(pd == nullptr) return 0;
+  return pd->numVertices();
 }
 
-void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *cspace_){
-  cspace = cspace_;
-  ob::SpaceInformationPtr si = pd->getSpaceInformation();
-  std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
-
-  OMPLValidityCheckerPtr validity_checker = std::static_pointer_cast<OMPLValidityChecker>(cspace->StateValidityCheckerPtr());
-  PlannerDataVertexAnnotated *v0 = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(0));
-
-  if(v0==nullptr){
-    //shallow hierarchy, take plannerdata as it is, add shortest path
-    roadmaps_level.push_back(pd);
-    roadmaps_level.at(0)->decoupleFromPlanner();
-    LemonInterface lemon(pd);
-    std::vector<Vertex> pred = lemon.GetShortestPath();
-    std::vector<Vector3> path;
-    for(uint i = 0; i < pred.size(); i++)
-    {
-      Vertex pi = pred.at(i);
-      Vector3 q = cspace->getXYZ(pd->getVertex(pi).getState());
-      path.push_back(q);
-    }
-    shortest_path_level.push_back(path);
-    return;
-  }
-
-  uint N = v0->GetMaxLevel();
-  std::cout << "max level: " << N << std::endl;
-
-  for(uint k = 0; k < N; k++){
-    ob::PlannerDataPtr pdi = std::make_shared<ob::PlannerData>(si);
-    roadmaps_level.push_back(pdi);
-  }
-
-  for(uint i = 0; i < pd->numVertices(); i++){
-    PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(i));
-
-    ob::PlannerDataPtr pdi = roadmaps_level.at(v->GetLevel());
-
-    if(pd->isStartVertex(i)){
-      pdi->addStartVertex(*v);
-    }else if(pd->isGoalVertex(i)){
-      pdi->addGoalVertex(*v);
-    }else{
-      pdi->addVertex(*v);
-    }
-
-    std::vector<uint> edgeList;
-    pd->getEdges(i, edgeList);
-
-    for(uint j = 0; j < edgeList.size(); j++){
-      PlannerDataVertexAnnotated *w = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
-      pdi->addVertex(*w);
-      uint vi = pdi->vertexIndex(*v);
-      uint wi = pdi->vertexIndex(*w);
-
-      uint vo = pd->vertexIndex(*v);
-      uint wo = pd->vertexIndex(*w);
-      ob::PlannerDataEdge evw = pd->getEdge(vo,wo);
-      ob::Cost weight;
-      pd->getEdgeWeight(vo, wo, &weight);
-
-      pdi->addEdge(vi, wi, evw, weight);
-    }
-  }
-
-  for(uint k = 0; k < N; k++){
-    ob::PlannerDataPtr pdi = roadmaps_level.at(k);
-    pdi->decoupleFromPlanner();
-    std::cout << "level " << k << " : " << pdi->numVertices() << " | " << pdi->numEdges() << std::endl;
-
-    LemonInterface lemon(pdi);
-    std::vector<Vertex> pred = lemon.GetShortestPath();
-    std::vector<Vector3> path;
-    for(uint i = 0; i < pred.size(); i++)
-    {
-      Vertex pi = pred.at(i);
-      const ob::State *s = pdi->getVertex(pi).getState();
-      Vector3 q = cspace->getXYZ(s);
-      path.push_back(q);
-    }
-    shortest_path_level.push_back(path);
-  }
-
+PathPiecewiseLinear* Roadmap::GetShortestPath(){
+  return path_ompl;
 }
 
-void Roadmap::DrawPathGL(GUIState &state, std::vector<Vector3> &q)
+//void Roadmap::CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL *cspace_){
+//  cspace = cspace_;
+//  ob::SpaceInformationPtr si = pd->getSpaceInformation();
+//  std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
+//
+//  OMPLValidityCheckerPtr validity_checker = std::static_pointer_cast<OMPLValidityChecker>(cspace->StateValidityCheckerPtr());
+//  PlannerDataVertexAnnotated *v0 = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(0));
+//
+//  if(v0==nullptr){
+//    //shallow hierarchy, take plannerdata as it is, add shortest path
+//    roadmaps_level.push_back(pd);
+//    roadmaps_level.at(0)->decoupleFromPlanner();
+//    LemonInterface lemon(pd);
+//    std::vector<Vertex> pred = lemon.GetShortestPath();
+//    std::vector<Vector3> path;
+//    for(uint i = 0; i < pred.size(); i++)
+//    {
+//      Vertex pi = pred.at(i);
+//      Vector3 q = cspace->getXYZ(pd->getVertex(pi).getState());
+//      path.push_back(q);
+//    }
+//    shortest_path_level.push_back(path);
+//    return;
+//  }
+//
+//  uint N = v0->GetMaxLevel();
+//  std::cout << "max level: " << N << std::endl;
+//
+//  for(uint k = 0; k < N; k++){
+//    ob::PlannerDataPtr pdi = std::make_shared<ob::PlannerData>(si);
+//    roadmaps_level.push_back(pdi);
+//  }
+//
+//  for(uint i = 0; i < pd->numVertices(); i++){
+//    PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(i));
+//
+//    ob::PlannerDataPtr pdi = roadmaps_level.at(v->GetLevel());
+//
+//    if(pd->isStartVertex(i)){
+//      pdi->addStartVertex(*v);
+//    }else if(pd->isGoalVertex(i)){
+//      pdi->addGoalVertex(*v);
+//    }else{
+//      pdi->addVertex(*v);
+//    }
+//
+//    std::vector<uint> edgeList;
+//    pd->getEdges(i, edgeList);
+//
+//    for(uint j = 0; j < edgeList.size(); j++){
+//      PlannerDataVertexAnnotated *w = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
+//      pdi->addVertex(*w);
+//      uint vi = pdi->vertexIndex(*v);
+//      uint wi = pdi->vertexIndex(*w);
+//
+//      uint vo = pd->vertexIndex(*v);
+//      uint wo = pd->vertexIndex(*w);
+//      ob::PlannerDataEdge evw = pd->getEdge(vo,wo);
+//      ob::Cost weight;
+//      pd->getEdgeWeight(vo, wo, &weight);
+//
+//      pdi->addEdge(vi, wi, evw, weight);
+//    }
+//  }
+//
+//  for(uint k = 0; k < N; k++){
+//    ob::PlannerDataPtr pdi = roadmaps_level.at(k);
+//    pdi->decoupleFromPlanner();
+//    std::cout << "level " << k << " : " << pdi->numVertices() << " | " << pdi->numEdges() << std::endl;
+//
+//    LemonInterface lemon(pdi);
+//    std::vector<Vertex> pred = lemon.GetShortestPath();
+//    std::vector<Vector3> path;
+//
+//    og::PathGeometric *gpath = new og::PathGeometric(cspace->SpaceInformationPtr()); 
+//    for(uint i = 0; i < pred.size(); i++)
+//    {
+//      Vertex pi = pred.at(i);
+//      const ob::State *s = pdi->getVertex(pi).getState();
+//      gpath->append(s);
+//      Vector3 q = cspace->getXYZ(s);
+//      path.push_back(q);
+//    }
+//    shortest_path_level.push_back(path);
+//    gpath->interpolate();
+//    ob::PathPtr path_ompl_ptr(gpath);
+//    if(pred.size()>0){
+//      path_ompl = new PathPiecewiseLinear(path_ompl_ptr, cspace);
+//    }
+//  }
+//
+//}
+
+void Roadmap::DrawShortestPath(GUIState &state)
 {
+  const std::vector<Vector3>& q = shortest_path;
   if(q.size()>1)
   {
     glPushMatrix();
@@ -131,7 +152,7 @@ void Roadmap::DrawPathGL(GUIState &state, std::vector<Vector3> &q)
   }
 }
 
-void Roadmap::DrawSingleLevelGL(GUIState &state, ob::PlannerDataPtr pd)
+void Roadmap::DrawPlannerData(GUIState &state)
 {
   if(state("draw_roadmap_vertices")){
     glPointSize(sizeVertex);
@@ -196,36 +217,42 @@ void Roadmap::DrawGL(GUIState& state)
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND); 
 
-  uint N = roadmaps_level.size();
-  for(uint k = 0; k < N; k++){
-
-    std::string str = "roadmap_visualize_level_" + to_string(k);
-    if(state(str.c_str())){
-      if(!roadmaps_level.at(k)) return;
-      //std::cout << "level " << k << " vertices: " << roadmaps_level.at(k)->numVertices() << std::endl;
-      //cVertex = (k%2==0?green:lightred);
-      //cEdge = cVertex;
-      //cPath = (k%2==0?magenta:magenta);
-      DrawSingleLevelGL(state, roadmaps_level.at(k));
-      if(state("draw_roadmap_shortest_path")){
-        DrawPathGL(state, shortest_path_level.at(k));
-      }
-    }
+  if(state("draw_roadmap_shortest_path")){
+    DrawShortestPath(state);
   }
+  if(pd!=nullptr) DrawPlannerData(state);
 
-  if(state("draw_roadmap_swathvolume")){
-    if(!swv){
-      std::vector<Config> q;
-      ob::PlannerDataPtr pd = roadmaps_level.at(N-1);
-      for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
-        PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
-        Config qi = cspace->OMPLStateToConfig(v.getState());
-        q.push_back(qi);
-      }
-      swv = new SwathVolume(cspace->GetRobotPtr(), q);
-    }
-    swv->DrawGL(state);
-  }
+
+  //uint N = roadmaps_level.size();
+  //for(uint k = 0; k < N; k++){
+
+  //  std::string str = "roadmap_visualize_level_" + to_string(k);
+  //  if(state(str.c_str())){
+  //    if(!roadmaps_level.at(k)) return;
+  //    //std::cout << "level " << k << " vertices: " << roadmaps_level.at(k)->numVertices() << std::endl;
+  //    //cVertex = (k%2==0?green:lightred);
+  //    //cEdge = cVertex;
+  //    //cPath = (k%2==0?magenta:magenta);
+  //    DrawSingleLevelGL(state, roadmaps_level.at(k));
+  //    if(state("draw_roadmap_shortest_path")){
+  //      DrawPathGL(state, shortest_path_level.at(k));
+  //    }
+  //  }
+  //}
+
+  //if(state("draw_roadmap_swathvolume")){
+  //  if(!swv){
+  //    std::vector<Config> q;
+  //    ob::PlannerDataPtr pd = roadmaps_level.at(N-1);
+  //    for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
+  //      PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+  //      Config qi = cspace->OMPLStateToConfig(v.getState());
+  //      q.push_back(qi);
+  //    }
+  //    swv = new SwathVolume(cspace->GetRobotPtr(), q);
+  //  }
+  //  swv->DrawGL(state);
+  //}
   glEnable(GL_LIGHTING);
   glDisable(GL_BLEND); 
 

@@ -2,6 +2,7 @@
 #include "algorithms/lemon_interface.h"
 #include "planner/cspace/cspace.h"
 #include "elements/swath_volume.h"
+#include "elements/path_pwl.h"
 #include "gui/gui_state.h"
 
 #include <ompl/base/PlannerData.h>
@@ -14,8 +15,10 @@ class Roadmap{
 
   public:
     Roadmap();
+    Roadmap(const ob::PlannerDataPtr, CSpaceOMPL* cspace_);
 
-    void CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL* cspace_);
+    //void CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL* cspace_);
+    PathPiecewiseLinear* GetShortestPath();
 
     virtual void DrawGL(GUIState&);
 
@@ -34,13 +37,16 @@ class Roadmap{
 
   private:
 
-    void DrawSingleLevelGL(GUIState &, ob::PlannerDataPtr);
-    void DrawPathGL(GUIState &state, std::vector<Vector3> &q);
+    //void DrawSingleLevelGL(GUIState &, ob::PlannerDataPtr);
+    void DrawPlannerData(GUIState&);
+    void DrawShortestPath(GUIState&);
 
-    CSpaceOMPL *cspace;
+    ob::PlannerDataPtr pd{nullptr};
+
+    CSpaceOMPL *cspace{nullptr};
     SwathVolume *swv{nullptr};
+    PathPiecewiseLinear *path_ompl{nullptr};
 
-    std::vector<ob::PlannerDataPtr> roadmaps_level;
-    std::vector<std::vector<Vector3>> shortest_path_level;
+    std::vector<Vector3> shortest_path;
 };
 typedef std::shared_ptr<Roadmap> RoadmapPtr;

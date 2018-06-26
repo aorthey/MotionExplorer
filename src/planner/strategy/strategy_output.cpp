@@ -9,8 +9,6 @@ void StrategyOutput::SetPlannerData( ob::PlannerDataPtr pd_ ){
   pd = pd_;
   pd->decoupleFromPlanner();
   pd->computeEdgeWeights();
-  roadmap = std::make_shared<Roadmap>();
-  roadmap->CreateFromPlannerData(pd, cspace);
 }
 void StrategyOutput::SetProblemDefinition( ob::ProblemDefinitionPtr pdef_ ){
   pdef = pdef_;
@@ -110,12 +108,68 @@ std::vector<std::vector<Config>> StrategyOutput::GetSolutionPaths(){
   return solution_paths;
 }
 
-RoadmapPtr StrategyOutput::GetRoadmapPtr(){
-  return roadmap;
-}
+void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, std::vector<CSpaceOMPL*> cspace_levels)
+{
+  uint N = hierarchy->NumberLevels()-1;
+  assert(N == cspace_levels.size());
+  if(!pd){
+    std::cout << "planner data not set." << std::endl;
+    return;
+  }
 
-void StrategyOutput::SetRoadmap(RoadmapPtr roadmap_){
-  roadmap = roadmap_;
+  std::vector<ob::PlannerDataPtr> pd_level;
+
+  PlannerDataVertexAnnotated *v0 = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(0));
+
+  if(v0==nullptr){
+    pd_level.push_back(pd);
+  }else{
+    //only hierarchical data is annotated
+    for(uint k = 0; k < N; k++){
+      ob::PlannerDataPtr pdi = std::make_shared<ob::PlannerData>(cspace_levels.back()->SpaceInformationPtr());
+      pd_level.push_back(pdi);
+    }
+    for(uint i = 0; i < pd->numVertices(); i++){
+      PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(i));
+
+      ob::PlannerDataPtr pdi = pd_level.at(v->GetLevel());
+
+      if(pd->isStartVertex(i)){
+        pdi->addStartVertex(*v);
+      }else if(pd->isGoalVertex(i)){
+        pdi->addGoalVertex(*v);
+      }else{
+        pdi->addVertex(*v);
+      }
+
+      std::vector<uint> edgeList;
+      pd->getEdges(i, edgeList);
+
+      for(uint j = 0; j < edgeList.size(); j++){
+        PlannerDataVertexAnnotated *w = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
+        pdi->addVertex(*w);
+        uint vi = pdi->vertexIndex(*v);
+        uint wi = pdi->vertexIndex(*w);
+
+        uint vo = pd->vertexIndex(*v);
+        uint wo = pd->vertexIndex(*w);
+        ob::PlannerDataEdge evw = pd->getEdge(vo,wo);
+        ob::Cost weight;
+        pd->getEdgeWeight(vo, wo, &weight);
+
+        pdi->addEdge(vi, wi, evw, weight);
+      }
+    }
+  }
+  for(uint k = 0; k < N; k++){
+    //RoadmapPtr roadmap_k = std::make_shared<Roadmap>(pd_level.at(k), cspace_levels.at(k));
+    ob::PlannerDataPtr pdi = pd_level.at(k);
+    pdi->decoupleFromPlanner();
+    std::cout << "level " << k << " : " << pdi->numVertices() << " | " << pdi->numEdges() << std::endl;
+    RoadmapPtr roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back());
+    std::vector<int> path(k+1);
+    hierarchy->UpdateNode( roadmap_k, path);
+  }
 }
 
 std::ostream& operator<< (std::ostream& out, const StrategyOutput& so) 

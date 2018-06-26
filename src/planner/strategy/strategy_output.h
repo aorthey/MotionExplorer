@@ -1,6 +1,6 @@
 #pragma once
-#include "elements/roadmap.h"
 #include "elements/path_pwl.h"
+#include "elements/hierarchical_roadmap.h"
 #include <omplapp/config.h>
 #include <ompl/base/PlannerData.h>
 #include <ompl/base/ProblemDefinition.h>
@@ -14,12 +14,12 @@ namespace og = ompl::geometric;
 struct StrategyOutput{
 
   public:
+
     StrategyOutput(CSpaceOMPL*);
 
     void SetShortestPath( std::vector<Config> );
 
-    RoadmapPtr GetRoadmapPtr();
-    void SetRoadmap(RoadmapPtr);
+    void GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, std::vector<CSpaceOMPL*> cspace_levels);
 
     void SetPlannerData( ob::PlannerDataPtr pd_ );
     void SetProblemDefinition( ob::ProblemDefinitionPtr pdef_ );
@@ -49,8 +49,6 @@ struct StrategyOutput{
     ob::PlannerDataPtr pd;
 
     ob::ProblemDefinitionPtr pdef;
-
-    RoadmapPtr roadmap;
 
     CSpaceOMPL *cspace;
 

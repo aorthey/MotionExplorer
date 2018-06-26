@@ -37,12 +37,12 @@
     <active>0</active>
   </checkbox>
 
-  <checkbox>
-    <name>draw_controller_com_path</name>
-    <descr>Draw Center Of Mass Path</descr>
-    <key></key>
-    <active>1</active>
-  </checkbox>
+  <!-- <checkbox> -->
+  <!--   <name>draw_controller_com_path</name> -->
+  <!--   <descr>Draw Center Of Mass Path</descr> -->
+  <!--   <key></key> -->
+  <!--   <active>1</active> -->
+  <!-- </checkbox> -->
   <checkbox>
     <name>draw_planner_bounding_box</name>
     <descr>Draw R3 Bounding Box of Planner</descr>
@@ -53,7 +53,7 @@
   <checkbox>
     <name>draw_path_sweptvolume</name>
     <descr>Draw Swept Volume</descr>
-    <key>l</key>
+    <key>L</key>
     <active>0</active>
   </checkbox>
 
@@ -91,21 +91,54 @@
     <descr>Reset</descr>
     <key>r</key>
   </hotkey>
-  <hotkey>
-    <name>simulate</name>
-    <descr>Simulate</descr>
-    <key>s</key>
-  </hotkey>
+  <!-- <hotkey> -->
+  <!--   <name>simulate</name> -->
+  <!--   <descr>Simulate</descr> -->
+  <!--   <key>s</key> -->
+  <!-- </hotkey> -->
   <hotkey>
     <name>simulate_controller</name>
     <key>C</key>
   </hotkey>
 
   <hotkey>
-    <name>advance</name>
-    <descr>Advance by one step</descr>
-    <key>a</key>
+    <name>planner_step</name>
+    <descr>Advance Planner by one step</descr>
+    <key>q</key>
   </hotkey>
+  <!-- <hotkey> -->
+  <!--   <name>planner_advance_one_second</name> -->
+  <!--   <descr>Advance Planner by one second</descr> -->
+  <!--   <key>a</key> -->
+  <!-- </hotkey> -->
+  <hotkey>
+    <name>planner_advance_until_solution</name>
+    <descr>Advance Planner until Solution found</descr>
+    <key>w</key>
+  </hotkey>
+  <hotkey>
+    <name>hierarchy_up</name>
+    <key>up</key>
+  </hotkey>
+  <hotkey>
+    <name>hierarchy_down</name>
+    <key>down</key>
+  </hotkey>
+  <hotkey>
+    <name>hierarchy_left</name>
+    <key>left</key>
+  </hotkey>
+  <hotkey>
+    <name>hierarchy_right</name>
+    <key>right</key>
+  </hotkey>
+  <hotkey>
+    <name>next_planner</name>
+    <key>t</key>
+  </hotkey>
+
+
+
   <hotkey>
     <name>make_screenshot</name>
     <descr>Screenshot</descr>
@@ -135,7 +168,7 @@
   <hotkey>
     <name>draw_roadmap_swathvolume</name>
     <descr>Draw Roadmap Swathvolume</descr>
-    <key>k</key>
+    <key>K</key>
   </hotkey>
 
   <checkbox>
@@ -173,45 +206,45 @@
     <name>draw_roadmap_edges</name>
     <descr>Draw Roadmap Edges</descr>
     <key>2</key>
-    <active>0</active>
-  </checkbox>
-  <checkbox>
-    <name>draw_roadmap_volume</name>
-    <descr>Draw Roadmap Volume</descr>
-    <key>3</key>
     <active>1</active>
   </checkbox>
+  <!-- <checkbox> -->
+  <!--   <name>draw_roadmap_volume</name> -->
+  <!--   <descr>Draw Roadmap Volume</descr> -->
+  <!--   <key>3</key> -->
+  <!--   <active>1</active> -->
+  <!-- </checkbox> -->
 
-  <slider>
-    <name>draw_cover_threshold</name>
-    <value>5</value>
-    <min>0</min>
-    <max>10</max>
-    <step>1</step>
-  </slider>
-  <hotkey>
-    <name>draw_cover_threshold_up</name>
-    <key>z</key>
-  </hotkey>
-  <hotkey>
-    <name>draw_cover_threshold_down</name>
-    <key>x</key>
-  </hotkey>
+  <!-- <slider> -->
+  <!--   <name>draw_cover_threshold</name> -->
+  <!--   <value>5</value> -->
+  <!--   <min>0</min> -->
+  <!--   <max>10</max> -->
+  <!--   <step>1</step> -->
+  <!-- </slider> -->
+  <!-- <hotkey> -->
+  <!--   <name>draw_cover_threshold_up</name> -->
+  <!--   <key>z</key> -->
+  <!-- </hotkey> -->
+  <!-- <hotkey> -->
+  <!--   <name>draw_cover_threshold_down</name> -->
+  <!--   <key>x</key> -->
+  <!-- </hotkey> -->
 
   <hotkey>
     <name>planner_draw_start_goal_configuration</name>
     <key>4</key>
   </hotkey>
 
-  <hotkey>
-    <name>next_mode</name>
-    <key>q</key>
-  </hotkey>
+  <!-- <hotkey> -->
+  <!--   <name>next_mode</name> -->
+  <!--   <key>q</key> -->
+  <!-- </hotkey> -->
 
-  <hotkey>
-    <name>draw_cover_single_open_set</name>
-    <key>z</key>
-  </hotkey>
+  <!-- <hotkey> -->
+  <!--   <name>draw_cover_single_open_set</name> -->
+  <!--   <key>z</key> -->
+  <!-- </hotkey> -->
 
   <checkbox>
     <name>draw_path</name>
@@ -222,7 +255,7 @@
 
   <property name="planner_draw_start_configuration" enabled="1"/>
   <property name="planner_draw_goal_configuration" enabled="1"/>
-  <property name="draw_roadmap_shortest_path" enabled="0"/>
+  <property name="draw_roadmap_shortest_path" enabled="1"/>
   <property name="draw_path_unsmoothed" enabled="0"/>
   <property name="draw_path_autofocus" enabled="1"/>
   <property name="draw_axes" enabled="0"/>

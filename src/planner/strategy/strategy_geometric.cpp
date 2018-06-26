@@ -153,7 +153,9 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   std::vector<ob::SpaceInformationPtr> si_vec; 
   std::vector<ob::ProblemDefinitionPtr> pdef_vec; 
 
+  std::cout << "levels: " << input.cspace_levels.size() << std::endl;
   for(uint k = 0; k < input.cspace_levels.size(); k++){
+    std::cout << "levels: " << k << "/" << input.cspace_levels.size() << std::endl;
     CSpaceOMPL* cspace_levelk = input.cspace_levels.at(k);
     ob::SpaceInformationPtr sik = cspace_levelk->SpaceInformationPtr();
     setStateSampler(input.name_sampler, sik);
@@ -205,6 +207,8 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
       planner->getPlannerData(*pd);
       output.SetPlannerData(pd);
     }
+    //output->SetShortestPath( output.getShortestPathOMPL(), input.cspace_levels.back() );
+    //std::vector<Config> path = output.GetShortestPath();
     output.SetProblemDefinition(planner->getProblemDefinition());
   }
 }
