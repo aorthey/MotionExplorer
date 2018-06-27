@@ -112,6 +112,8 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const
     // (4) M1 SE3xRn   , M0 SE3                => C1 = Rn
     // (5) M1 SE3xRn   , M0 R3                 => C1 = SO3xRn
     // (6) M1 SE3xRn   , M0 SE3xRm   , 0<m<n   => C1 = R(n-m)
+    //
+    // Cases not yet implemented
     ///// M1 SE3      , M0 R3xSO2xSO2         =>C1 = SO2
     ///// M1 R3xS1xS1 , M0 R3                 =>C1 = SO2xSO2
 

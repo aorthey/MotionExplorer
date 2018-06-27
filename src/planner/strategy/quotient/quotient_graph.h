@@ -108,7 +108,6 @@ namespace ompl
         void clearQuery();
         virtual void ClearVertices();
 
-        Graph G;
         ob::OptimizationObjectivePtr opt_;
         std::vector<Vertex> startM_;
         std::vector<Vertex> goalM_;
@@ -121,6 +120,9 @@ namespace ompl
         virtual void CheckForSolution(ob::PathPtr &solution) override;
 
     protected:
+
+        Graph G;
+        ob::PathPtr solution_path;
 
         virtual double Distance(const Vertex a, const Vertex b) const; // standard si->distance
         virtual bool Connect(const Vertex a, const Vertex b);
@@ -148,9 +150,7 @@ namespace ompl
         void growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState);
         void expandRoadmap(const ob::PlannerTerminationCondition &ptc, std::vector<ob::State *> &workStates);
 
-        bool maybeConstructSolution(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals,
-                                    ob::PathPtr &solution);
-        ob::PathPtr constructSolution(const Vertex &start, const Vertex &goal);
+        ob::PathPtr GetSolutionPath(const Vertex &start, const Vertex &goal);
 
         virtual void RandomWalk(const Vertex &v);
 

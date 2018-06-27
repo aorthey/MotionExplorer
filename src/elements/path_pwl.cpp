@@ -183,7 +183,6 @@ Config PathPiecewiseLinear::Eval(const double t) const{
   ob::SpaceInformationPtr si = cspace->SpaceInformationPtr();
 
   if(t<=0){
-    si->printState(states.front());
     return cspace->OMPLStateToConfig(states.front());
   }
   if(t>=length){

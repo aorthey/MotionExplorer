@@ -374,35 +374,34 @@ void QuotientGraph::RandomWalk(const Vertex &v)
 
 void QuotientGraph::CheckForSolution(ob::PathPtr &solution)
 {
-  hasSolution = maybeConstructSolution(startM_, goalM_, solution);
-}
-
-bool QuotientGraph::maybeConstructSolution(const std::vector<Vertex> &starts, const std::vector<Vertex> &goals,
-                                                  ob::PathPtr &solution)
-{
-  ob::Goal *g = pdef_->getGoal().get();
-  bestCost_ = ob::Cost(+dInf);
-  foreach (Vertex start, starts)
-  {
-    foreach (Vertex goal, goals)
+  if(hasSolution){
+    solution_path = GetSolutionPath(startM_.at(0), goalM_.at(0));
+    solution = solution_path;
+    return;
+  }else{
+    ob::Goal *g = pdef_->getGoal().get();
+    bestCost_ = ob::Cost(+dInf);
+    foreach (Vertex start, startM_)
     {
-      bool same_component = sameComponent(start, goal);
-
-      if (same_component && g->isStartGoalPairValid(G[goal].state, G[start].state))
+      foreach (Vertex goal, goalM_)
       {
-        ob::PathPtr p = constructSolution(start, goal);
-        if (p)
+        bool same_component = sameComponent(start, goal);
+
+        if (same_component && g->isStartGoalPairValid(G[goal].state, G[start].state))
         {
-          solution = p;
-          return true;
+          solution_path = GetSolutionPath(start, goal);
+          if (solution_path)
+          {
+            solution = solution_path;
+            hasSolution = true;
+            return;
+          }
         }
       }
     }
   }
-
-  return false;
 }
-ob::PathPtr QuotientGraph::constructSolution(const Vertex &start, const Vertex &goal)
+ob::PathPtr QuotientGraph::GetSolutionPath(const Vertex &start, const Vertex &goal)
 {
   std::vector<Vertex> prev(boost::num_vertices(G));
   auto weight = boost::make_transform_value_property_map(std::mem_fn(&EdgeInternalState::getCost), get(boost::edge_bundle, G));
@@ -413,7 +412,7 @@ ob::PathPtr QuotientGraph::constructSolution(const Vertex &start, const Vertex &
                       {
                           return costHeuristic(v, goal);
                       },
-                      boost::predecessor_map(&prev[0])//make_iterator_property_map(prev.begin(), v_index))
+                      boost::predecessor_map(&prev[0])
                         .weight_map(weight)
                         .distance_compare([this](EdgeInternalState c1, EdgeInternalState c2)
                                           {

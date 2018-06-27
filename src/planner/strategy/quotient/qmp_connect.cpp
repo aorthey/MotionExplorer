@@ -194,7 +194,6 @@ bool QMPConnect::SampleGraph(ob::State *q_random_graph)
 double QMPConnect::Distance(const Vertex a, const Vertex b) const
 {
   if(previous == nullptr){
-    //return si_->distance(G[a].state, G[b].state);
     return si_->distance(G[a].state, G[b].state);
   }else{
 
@@ -206,12 +205,6 @@ double QMPConnect::Distance(const Vertex a, const Vertex b) const
     if(M1_path){
       d = M1_path->length();
     }
-
-    //double dM1 = M1->distance(G[a].state,G[b].state);
-    //std::cout << "d_graphM1 = " << d   << std::endl;
-    //std::cout << "d_M1      = " << dM1 << std::endl;
-    //assert(dM1<=d);
-
     return d;
   }
 }
@@ -247,9 +240,6 @@ bool QMPConnect::Connect(const Vertex a, const Vertex b){
         G[v_nextM1].associated_source = vpathM0.at(k);
         G[v_nextM1].associated_target = vpathM0.at(k);
         G[v_nextM1].associated_t = 0;
-        //G[v_nextM1].associated_source=vpathM0.at(k);
-        //G[v_nextM1].associated_target=vpathM0.at(k);
-        //G[v_nextM1].associated_t=0;
         nn_->add(v_nextM1);
         totalNumberOfSamples++;
       }
@@ -462,7 +452,7 @@ ob::PathPtr QMPConnect::GetShortestPathOffsetVertices(const ob::State *qa, const
   ob::PathPtr path = nullptr;
   if(same_component){
     //std::cout << "ConstructSolution: " << va << "<->" << vb << std::endl;
-    path = constructSolution(va, vb);
+    path = GetSolutionPath(va, vb);
   }else{
     std::cout << "WARNING:" << va << " and " << vb << " are not in same component" << std::endl;
   }
@@ -544,9 +534,7 @@ ompl::PDF<og::QuotientGraph::Edge> QMPConnect::GetEdgePDF()
     std::pair<IEIterator, IEIterator> iterators = boost::in_edges(boost::vertex(v, G), G);
     for (IEIterator iter = iterators.first; iter != iterators.second; ++iter)
     {
-      //pdf.add(*iter, 1);
       ob::Cost weight = G[*iter].getCost();
-      //ob::Cost weight = get(boost::edge_weight_t(), G, *iter).getCost();
       pdf.add(*iter, weight.value());
     }
   }

@@ -279,11 +279,6 @@ void PlannerBackend::RenderWorld(){
     }
     if(t>0 && path){
       path->DrawGL(state, t);
-      // Config q = path->Eval(t);
-      // uint ridx = planner->GetInput().robot_idx;
-      // Robot* robot = world->robots[ridx];
-      // //std::cout << "Robot" << robot->name << ":" << q << std::endl;
-      // GLDraw::drawRobotAtConfig(robot, q, grey);
     }
   }
   if(planner->GetInput().kinodynamic){
