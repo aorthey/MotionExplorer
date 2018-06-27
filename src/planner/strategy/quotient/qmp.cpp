@@ -1,4 +1,4 @@
-#include "qmp2.h"
+#include "qmp.h"
 #include "planner/validitychecker/validity_checker_ompl.h"
 
 #include <ompl/datastructures/PDF.h>
@@ -13,18 +13,18 @@ using namespace og;
 using namespace ob;
 #define foreach BOOST_FOREACH
 
-QMP2::QMP2(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
+QMP::QMP(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
   og::QuotientGraph(si, previous_)
 {
-  setName("QMP2"+std::to_string(id));
+  setName("QMP"+std::to_string(id));
 }
 
-QMP2::~QMP2()
+QMP::~QMP()
 {
   samplesOnShortestPath = 0;
 }
 
-bool QMP2::SampleGraph(ob::State *q_random_graph)
+bool QMP::SampleGraph(ob::State *q_random_graph)
 {
   PDF<Edge> pdf = GetEdgePDF();
 
@@ -42,7 +42,7 @@ bool QMP2::SampleGraph(ob::State *q_random_graph)
   return true;
 }
 
-ompl::PDF<og::QuotientGraph::Edge> QMP2::GetEdgePDF()
+ompl::PDF<og::QuotientGraph::Edge> QMP::GetEdgePDF()
 {
   PDF<Edge> pdf;
   double t = rng_.uniform01();

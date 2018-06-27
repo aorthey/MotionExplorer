@@ -1,6 +1,6 @@
 #pragma once
 
-#include "planner/strategy/ompl/quotient.h"
+#include "quotient.h"
 #include "planner/cover/open_set.h"
 #include <ompl/geometric/planners/PlannerIncludes.h>
 #include <ompl/datastructures/NearestNeighbors.h>
@@ -28,6 +28,7 @@ namespace ompl
   {
     class QuotientGraph: public og::Quotient{
 
+        typedef og::Quotient BaseT;
       public:
 
         typedef unsigned long int VertexIndexType;
@@ -39,8 +40,8 @@ namespace ompl
             uint total_connection_attempts{0};
             uint successful_connection_attempts{0};
             bool on_shortest_path{false};
-            unsigned long int associated_vertex_target{0};
-            unsigned long int associated_vertex_source{0};
+            unsigned long int associated_target{0};
+            unsigned long int associated_source{0};
             double associated_t{-1};
             double open_neighborhood_distance{0};
             cover::OpenSet *open_neighborhood{nullptr};
@@ -76,6 +77,7 @@ namespace ompl
         typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
         typedef boost::graph_traits<Graph>::edge_descriptor Edge;
         typedef boost::graph_traits<Graph>::vertices_size_type VertexIndex;
+        typedef boost::graph_traits<Graph>::in_edge_iterator IEIterator;
         typedef Vertex* VertexParent;
         typedef VertexIndex* VertexRank;
 

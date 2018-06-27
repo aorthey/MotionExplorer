@@ -46,8 +46,8 @@ void QMPConnect::clear(){
 
 void QMPConnect::setup()
 {
-  og::QMPConnect *PRMprevious = static_cast<og::QMPConnect*>(previous);
-  if(PRMprevious==nullptr){
+  og::QMPConnect *quotient_previous = static_cast<og::QMPConnect*>(previous);
+  if(quotient_previous==nullptr){
     QMP::setup();
   }
   if (!nn_){
@@ -78,10 +78,13 @@ void QMPConnect::setup()
 
     if(const ob::State *st = pis_.nextStart()){
       Vertex m = CreateNewVertex(si_->cloneState(st));
-      associatedVertexSourceProperty_[m] = PRMprevious->startM_.at(0);
-      associatedVertexTargetProperty_[m] = PRMprevious->startM_.at(0);
-      associatedTProperty_[m] = 0;
-      //std::cout << "start vertex: " << m << " associated:" << PRMprevious->startM_.at(0) << std::endl;
+      G[m].associated_source = quotient_previous->startM_.at(0);
+      G[m].associated_target = quotient_previous->startM_.at(0);
+      G[m].associated_t = 0;
+      // G[m].associated_source = 
+      // G[m].associated_target = quotient_previous->startM_.at(0);
+      // G[m].associated_t = 0;
+      //std::cout << "start vertex: " << m << " associated:" << quotient_previous->startM_.at(0) << std::endl;
       ConnectVertexToNeighbors(m);
       startM_.push_back(m);
     }
@@ -98,15 +101,18 @@ void QMPConnect::setup()
       const ob::State *gl = pis_.nextGoal();
       if (gl != nullptr){
         Vertex m = CreateNewVertex(si_->cloneState(gl));
-        associatedVertexSourceProperty_[m] = PRMprevious->goalM_.at(0);
-        associatedVertexTargetProperty_[m] = PRMprevious->goalM_.at(0);
-        associatedTProperty_[m] = 0;
-        //std::cout << "goal vertex: " << m << " associated:" << PRMprevious->goalM_.at(0) << std::endl;
+        //G[m].associated_source = quotient_previous->goalM_.at(0);
+        //G[m].associated_target = quotient_previous->goalM_.at(0);
+        //G[m].associated_t = 0;
+        G[m].associated_source = quotient_previous->goalM_.at(0);
+        G[m].associated_target = quotient_previous->goalM_.at(0);
+        G[m].associated_t = 0;
+        //std::cout << "goal vertex: " << m << " associated:" << quotient_previous->goalM_.at(0) << std::endl;
         ConnectVertexToNeighbors(m);
         goalM_.push_back(m);
       }
     }
-    unsigned long int nrStartStates = boost::num_vertices(g_);
+    unsigned long int nrStartStates = boost::num_vertices(G);
     OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nrStartStates);
   }else{
     setup_ = false;
@@ -118,14 +124,14 @@ void QMPConnect::Init()
   QMP::Init();
 
 }
-PRMBasic::Vertex QMPConnect::CreateNewVertex(ob::State *state)
+QuotientGraph::Vertex QMPConnect::CreateNewVertex(ob::State *state)
 {
-  Vertex m = QMP::CreateNewVertex(state);
-  og::QMPConnect *PRMprevious = static_cast<og::QMPConnect*>(previous);
-  if(PRMprevious != nullptr && PRMprevious->isSampled){
-    associatedVertexSourceProperty_[m] = PRMprevious->lastSourceVertexSampled;
-    associatedVertexTargetProperty_[m] = PRMprevious->lastTargetVertexSampled;
-    associatedTProperty_[m] = PRMprevious->lastTSampled;
+  Vertex m = BaseT::CreateNewVertex(state);
+  og::QMPConnect *quotient_previous = static_cast<og::QMPConnect*>(previous);
+  if(quotient_previous != nullptr && quotient_previous->isSampled){
+    G[m].associated_source = quotient_previous->lastSourceVertexSampled;
+    G[m].associated_target = quotient_previous->lastTargetVertexSampled;
+    G[m].associated_t = quotient_previous->lastTSampled;
   }
   return m;
 }
@@ -135,7 +141,7 @@ bool QMPConnect::Sample(ob::State *q_random)
   if(previous == nullptr){
     //return M1_valid_sampler->sample(q_random);
     if(!hasSolution && rng_.uniform01() < goalBias_){
-      q_random = si_->cloneState(stateProperty_[goalM_.at(0)]);
+      q_random = si_->cloneState(G[goalM_.at(0)].state);//stateProperty_[goalM_.at(0)]);
       //goal->sampleGoal(q_random);
     }else{
       M1_valid_sampler->sample(q_random);
@@ -144,7 +150,7 @@ bool QMPConnect::Sample(ob::State *q_random)
     //Adjusted sampling function: Sampling in G0 x C1
     if(!hasSolution && rng_.uniform01() < goalBias_){
       //goal->sampleGoal(q_random);
-      q_random = si_->cloneState(stateProperty_[goalM_.at(0)]);
+      q_random = si_->cloneState(G[goalM_.at(0)].state);//stateProperty_[goalM_.at(0)]);
     }else{
       ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
       base::State *s_C1 = C1->allocState();
@@ -168,10 +174,10 @@ bool QMPConnect::SampleGraph(ob::State *q_random_graph)
   Edge e = pdf.sample(rng_.uniform01());
   double t = rng_.uniform01();
 
-  const Vertex v1 = boost::source(e, g_);
-  const Vertex v2 = boost::target(e, g_);
-  const ob::State *from = stateProperty_[v1];
-  const ob::State *to = stateProperty_[v2];
+  const Vertex v1 = boost::source(e, G);
+  const Vertex v2 = boost::target(e, G);
+  const ob::State *from = G[v1].state;//G[v1].state;
+  const ob::State *to = G[v2].state;//G[v2].state;
 
   M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
 
@@ -188,11 +194,12 @@ bool QMPConnect::SampleGraph(ob::State *q_random_graph)
 double QMPConnect::Distance(const Vertex a, const Vertex b) const
 {
   if(previous == nullptr){
-    return si_->distance(stateProperty_[a], stateProperty_[b]);
+    //return si_->distance(G[a].state, G[b].state);
+    return si_->distance(G[a].state, G[b].state);
   }else{
 
-    og::QMPConnect *PRMprevious = dynamic_cast<og::QMPConnect*>(previous);
-    if(!PRMprevious->isSampled) return si_->distance(stateProperty_[a], stateProperty_[b]);
+    og::QMPConnect *quotient_previous = dynamic_cast<og::QMPConnect*>(previous);
+    if(!quotient_previous->isSampled) return si_->distance(G[a].state, G[b].state);
 
     ob::PathPtr M1_path = InterpolateM1GraphConstraint(a, b);
     double d = +dInf;
@@ -200,7 +207,7 @@ double QMPConnect::Distance(const Vertex a, const Vertex b) const
       d = M1_path->length();
     }
 
-    //double dM1 = M1->distance(stateProperty_[a],stateProperty_[b]);
+    //double dM1 = M1->distance(G[a].state,G[b].state);
     //std::cout << "d_graphM1 = " << d   << std::endl;
     //std::cout << "d_M1      = " << dM1 << std::endl;
     //assert(dM1<=d);
@@ -214,7 +221,7 @@ bool QMPConnect::Connect(const Vertex a, const Vertex b){
   if(previous==nullptr){
     return QMP::Connect(a,b);
   }else{
-    og::QMPConnect *PRMprevious = static_cast<og::QMPConnect*>(previous);
+    og::QMPConnect *quotient_previous = static_cast<og::QMPConnect*>(previous);
 
     ob::PathPtr sol = InterpolateM1GraphConstraint(a,b);
     if(!sol){
@@ -223,7 +230,7 @@ bool QMPConnect::Connect(const Vertex a, const Vertex b){
 
     og::PathGeometric path = static_cast<og::PathGeometric&>(*sol);
     std::vector<ob::State *> spathM1 = path.getStates();
-    std::vector<Vertex> vpathM0 = PRMprevious->shortestVertexPath_;
+    std::vector<Vertex> vpathM0 = quotient_previous->shortestVertexPath_;
 
     Vertex v_prevM1 = a;
     ob::State *s_prevM1 = spathM1.at(0);
@@ -237,15 +244,18 @@ bool QMPConnect::Connect(const Vertex a, const Vertex b){
         v_nextM1 = b;
       }else{
         v_nextM1 = CreateNewVertex(spathM1.at(k));
-        associatedVertexSourceProperty_[v_nextM1]=vpathM0.at(k);
-        associatedVertexTargetProperty_[v_nextM1]=vpathM0.at(k);
-        associatedTProperty_[v_nextM1]=0;
+        G[v_nextM1].associated_source = vpathM0.at(k);
+        G[v_nextM1].associated_target = vpathM0.at(k);
+        G[v_nextM1].associated_t = 0;
+        //G[v_nextM1].associated_source=vpathM0.at(k);
+        //G[v_nextM1].associated_target=vpathM0.at(k);
+        //G[v_nextM1].associated_t=0;
         nn_->add(v_nextM1);
         totalNumberOfSamples++;
       }
 
       double dk = M1->distance(s_prevM1, spathM1.at(k));
-      boost::add_edge(v_prevM1, v_nextM1, EdgeProperty(ob::Cost(dk)), g_);
+      boost::add_edge(v_prevM1, v_nextM1, EdgeInternalState(ob::Cost(dk)), G);
       uniteComponents(v_prevM1, v_nextM1);
       v_prevM1 = v_nextM1;
       s_prevM1 = spathM1.at(k);
@@ -263,9 +273,9 @@ bool QMPConnect::Connect(const Vertex a, const Vertex b){
 
 ob::PathPtr QMPConnect::InterpolateM1GraphConstraint( const Vertex a, const Vertex b) const
 {
-  og::QMPConnect *PRMprevious = dynamic_cast<og::QMPConnect*>(previous);
-  ob::State* sa = stateProperty_[a];
-  ob::State* sb = stateProperty_[b];
+  og::QMPConnect *quotient_previous = dynamic_cast<og::QMPConnect*>(previous);
+  ob::State* sa = G[a].state;
+  ob::State* sb = G[b].state;
 
   ob::State* saC1 = C1->allocState();
   ob::State* sbC1 = C1->allocState();
@@ -278,14 +288,14 @@ ob::PathPtr QMPConnect::InterpolateM1GraphConstraint( const Vertex a, const Vert
   ExtractM0Subspace(sa, saM0);
   ExtractM0Subspace(sb, sbM0);
 
-  const Vertex asM0 = associatedVertexSourceProperty_[a];
-  const Vertex atM0 = associatedVertexTargetProperty_[a];
+  const Vertex asM0 = G[a].associated_source;
+  const Vertex atM0 = G[a].associated_target;
 
-  const Vertex bsM0 = associatedVertexSourceProperty_[b];
-  const Vertex btM0 = associatedVertexTargetProperty_[b];
+  const Vertex bsM0 = G[b].associated_source;
+  const Vertex btM0 = G[b].associated_target;
 
   //std::cout << "associated vertices: " << asM0 << "," << atM0 << "|" << bsM0 << "," << btM0 << "." << std::endl;
-  ob::PathPtr M0_path = PRMprevious->GetShortestPathOffsetVertices( saM0, sbM0, asM0, bsM0, atM0, btM0);
+  ob::PathPtr M0_path = quotient_previous->GetShortestPathOffsetVertices( saM0, sbM0, asM0, bsM0, atM0, btM0);
 
   if(!M0_path) return nullptr;
 
@@ -359,8 +369,8 @@ ob::PathPtr QMPConnect::GetShortestPathOffsetVertices(const ob::State *qa, const
 
   //  Case(4): check if ea==eb
   if(vsa!=vta && vsb!=vtb){
-    const Edge ea = boost::edge(vsa,vta,g_).first;
-    const Edge eb = boost::edge(vsb,vtb,g_).first;
+    const Edge ea = boost::edge(vsa,vta,G).first;
+    const Edge eb = boost::edge(vsb,vtb,G).first;
     if(ea==eb){
       ob::PathPtr path = std::make_shared<og::PathGeometric>(si_, qa, qb);
       shortestVertexPath_.clear();
@@ -416,32 +426,32 @@ ob::PathPtr QMPConnect::GetShortestPathOffsetVertices(const ob::State *qa, const
   ob::Cost dsa,dta,dsb,dtb;
 
   if(isAonEdge){
-    boost::remove_edge(vsa, vta, g_);
-    va = boost::add_vertex(g_);
-    stateProperty_[va] = si_->cloneState(qa);
+    boost::remove_edge(vsa, vta, G);
+    va = boost::add_vertex(G);
+    G[va].state = si_->cloneState(qa);
 
-    dsa = opt_->motionCost(stateProperty_[vsa], stateProperty_[va]);
-    dta = opt_->motionCost(stateProperty_[va], stateProperty_[vta]);
-    boost::add_edge(vsa, va, EdgeProperty(dsa), g_);
-    boost::add_edge(va, vta, EdgeProperty(dta), g_);
+    dsa = opt_->motionCost(G[vsa].state, G[va].state);
+    dta = opt_->motionCost(G[va].state, G[vta].state);
+    boost::add_edge(vsa, va, EdgeInternalState(dsa), G);
+    boost::add_edge(va, vta, EdgeInternalState(dta), G);
 
   }else{
     va = vsa;
-    stateProperty_[va] = si_->cloneState(qa);
+    G[va].state = si_->cloneState(qa);
   }
 
   if(isBonEdge){
-    boost::remove_edge(vsb, vtb, g_);
-    vb = boost::add_vertex(g_);
-    stateProperty_[vb] = si_->cloneState(qb);
+    boost::remove_edge(vsb, vtb, G);
+    vb = boost::add_vertex(G);
+    G[vb].state = si_->cloneState(qb);
 
-    dsb = opt_->motionCost(stateProperty_[vsb], stateProperty_[vb]);
-    dtb = opt_->motionCost(stateProperty_[vb], stateProperty_[vtb]);
-    boost::add_edge(vsb, vb, EdgeProperty(dsb), g_);
-    boost::add_edge(vb, vtb, EdgeProperty(dtb), g_);
+    dsb = opt_->motionCost(G[vsb].state, G[vb].state);
+    dtb = opt_->motionCost(G[vb].state, G[vtb].state);
+    boost::add_edge(vsb, vb, EdgeInternalState(dsb), G);
+    boost::add_edge(vb, vtb, EdgeInternalState(dtb), G);
   }else{
     vb = vsb;
-    stateProperty_[vb] = si_->cloneState(qb);
+    G[vb].state = si_->cloneState(qb);
   }
 
   //###########################################################################
@@ -462,34 +472,34 @@ ob::PathPtr QMPConnect::GetShortestPathOffsetVertices(const ob::State *qa, const
   //###########################################################################
 
   if(isBonEdge){
-    boost::remove_edge(vsb, vb, g_);
-    boost::remove_edge(vb, vtb, g_);
-    si_->freeState(stateProperty_[vb]);
+    boost::remove_edge(vsb, vb, G);
+    boost::remove_edge(vb, vtb, G);
+    si_->freeState(G[vb].state);
 
-    boost::clear_vertex(vb, g_);
-    boost::remove_vertex(vb, g_);
+    boost::clear_vertex(vb, G);
+    boost::remove_vertex(vb, G);
 
-    ob::Cost db = opt_->motionCost(stateProperty_[vsb], stateProperty_[vtb]);
-    boost::add_edge(vsb, vtb, EdgeProperty(db), g_);
+    ob::Cost db = opt_->motionCost(G[vsb].state, G[vtb].state);
+    boost::add_edge(vsb, vtb, EdgeInternalState(db), G);
     uniteComponents(vsb, vtb);
   }
   if(isAonEdge){
-    boost::remove_edge(vsa, va, g_);
-    boost::remove_edge(va, vta, g_);
-    si_->freeState(stateProperty_[va]);
+    boost::remove_edge(vsa, va, G);
+    boost::remove_edge(va, vta, G);
+    si_->freeState(G[va].state);
 
-    boost::clear_vertex(va, g_);
-    boost::remove_vertex(va, g_);
+    boost::clear_vertex(va, G);
+    boost::remove_vertex(va, G);
 
-    ob::Cost da = opt_->motionCost(stateProperty_[vsa], stateProperty_[vta]);
-    boost::add_edge(vsa, vta, EdgeProperty(da), g_);
+    ob::Cost da = opt_->motionCost(G[vsa].state, G[vta].state);
+    boost::add_edge(vsa, vta, EdgeInternalState(da), G);
     uniteComponents(vsa, vta);
   }
 
   return path;
 }
 
-ompl::PDF<og::PRMBasic::Edge> QMPConnect::GetEdgePDF()
+ompl::PDF<og::QuotientGraph::Edge> QMPConnect::GetEdgePDF()
 {
   PDF<Edge> pdf;
   double t = rng_.uniform01();
@@ -498,43 +508,45 @@ ompl::PDF<og::PRMBasic::Edge> QMPConnect::GetEdgePDF()
     //diminishing shortest path sampling
     percentageSamplesOnShortestPath = exp(-pow(((double)samplesOnShortestPath++/1000.0),2));
 
-    foreach (Edge e, boost::edges(g_))
+    foreach (Edge e, boost::edges(G))
     {
-      const Vertex v1 = boost::source(e, g_);
-      const Vertex v2 = boost::target(e, g_);
-      if(onShortestPath_[v1] && onShortestPath_[v2])
+      const Vertex v1 = boost::source(e, G);
+      const Vertex v2 = boost::target(e, G);
+      if(G[v1].on_shortest_path && G[v2].on_shortest_path)
       {
-        ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
+        ob::Cost weight = G[e].getCost();
+        //ob::Cost weight = get(boost::edge_weight_t(), G, e).getCost();
         pdf.add(e, weight.value());
       }
     }
   }else{
     //Random Edge (RE) sampling (suffers from high sampling concentrations at
     //vertices with many incoming edges, not ideal, but fast)
-    //foreach (Edge e, boost::edges(g_))
+    //foreach (Edge e, boost::edges(G))
     //{
-    //  const Vertex v1 = boost::source(e, g_);
+    //  const Vertex v1 = boost::source(e, G);
 
     //  if(sameComponent(v1, startM_.at(0))){
-    //    ob::Cost weight = get(boost::edge_weight_t(), g_, e).getCost();
+    //    ob::Cost weight = get(boost::edge_weight_t(), Ge).getCost();
     //    pdf.add(e, weight.value());
     //  }
     //}
     ////Random Node Edge (RNE) sampling (better, but still no guarantee of
     //uniformity. Might be good to investigate random walk samplers)
     PDF<Vertex> vpdf;
-    foreach (Vertex v, boost::vertices(g_))
+    foreach (Vertex v, boost::vertices(G))
     {
       if(sameComponent(v, startM_.at(0))){
         vpdf.add(v,1);
       }
     }
     Vertex v = vpdf.sample(rng_.uniform01());
-    std::pair<IEIterator, IEIterator> iterators = boost::in_edges(boost::vertex(v, g_), g_);
+    std::pair<IEIterator, IEIterator> iterators = boost::in_edges(boost::vertex(v, G), G);
     for (IEIterator iter = iterators.first; iter != iterators.second; ++iter)
     {
       //pdf.add(*iter, 1);
-      ob::Cost weight = get(boost::edge_weight_t(), g_, *iter).getCost();
+      ob::Cost weight = G[*iter].getCost();
+      //ob::Cost weight = get(boost::edge_weight_t(), G, *iter).getCost();
       pdf.add(*iter, weight.value());
     }
   }
@@ -545,7 +557,7 @@ void QMPConnect::RandomWalk(const Vertex &v)
 {
   const bool DEBUG = false;
 
-  og::QMPConnect *PRMprevious = static_cast<og::QMPConnect*>(previous);
+  og::QMPConnect *quotient_previous = static_cast<og::QMPConnect*>(previous);
   if(previous == nullptr){
     return QMP::RandomWalk(v);
   }
@@ -593,22 +605,22 @@ void QMPConnect::RandomWalk(const Vertex &v)
     og::PathGeometric pathM1 = static_cast<og::PathGeometric&>(*solM1);
 
     std::vector<ob::State *> spathM1 = pathM1.getStates();
-    std::vector<Vertex> vpathM0 = PRMprevious->shortestVertexPath_;
+    std::vector<Vertex> vpathM0 = quotient_previous->shortestVertexPath_;
 
     if(DEBUG){
       std::cout << std::string(80, '-') << std::endl;
-      std::cout << "start edge " << associatedVertexSourceProperty_[v_first] << "<->" 
-        << associatedVertexTargetProperty_[v_first] <<
-        " (" << associatedTProperty_[v_first] << ")" 
+      std::cout << "start edge " << G[v_first].associated_source << "<->" 
+        << G[v_first].associated_target <<
+        " (" << G[v_first].associated_t << ")" 
         << std::endl;
 
       for(uint k = 1; k < vpathM0.size(); k++){
         std::cout << "edge " << vpathM0.at(k-1) << "<->"<< vpathM0.at(k) << std::endl;
       }
 
-      std::cout << "goal edge " << associatedVertexSourceProperty_[v_last] << "<->" 
-        << associatedVertexTargetProperty_[v_last] << " (" 
-        << associatedTProperty_[v_last] << ")" << std::endl;
+      std::cout << "goal edge " << G[v_last].associated_source << "<->" 
+        << G[v_last].associated_target << " (" 
+        << G[v_last].associated_t << ")" << std::endl;
     }
 
     //#########################################################################
@@ -636,20 +648,20 @@ void QMPConnect::RandomWalk(const Vertex &v)
           if(k==1){
 
             if(DEBUG) std::cout << "first" << std::endl;
-            Vertex vM0 = associatedVertexSourceProperty_[v_first];
+            Vertex vM0 = G[v_first].associated_source;
 
-            double T1 = associatedTProperty_[v_first];
+            double T1 = G[v_first].associated_t;
             double T2 = lastValid.second;
 
             if(vM0 == vpathM0.at(1)){
-              vM0 = associatedVertexTargetProperty_[v_first];
-              associatedTProperty_[v_nextM1]=T1-(T2*T1);
+              vM0 = G[v_first].associated_target;
+              G[v_nextM1].associated_t=T1-(T2*T1);
             }else{
-              associatedTProperty_[v_nextM1]=T1+T2*(1-T1);
+              G[v_nextM1].associated_t=T1+T2*(1-T1);
             }
 
-            associatedVertexSourceProperty_[v_nextM1]=vM0;
-            associatedVertexTargetProperty_[v_nextM1]=vpathM0.at(k);
+            G[v_nextM1].associated_source=vM0;
+            G[v_nextM1].associated_target=vpathM0.at(k);
 
 
           }else{
@@ -657,37 +669,37 @@ void QMPConnect::RandomWalk(const Vertex &v)
               //vpathM0(size-2) is the last graph vertex, vpathM0(size-1) is the
               //vertex which we have deleted again.
               if(DEBUG) std::cout << "last" << std::endl;
-              Vertex vM0 = associatedVertexTargetProperty_[v_last];
-              double T1 = associatedTProperty_[v_last];
+              Vertex vM0 = G[v_last].associated_target;
+              double T1 = G[v_last].associated_t;
               double T2 = lastValid.second;
               if(vM0 == vpathM0.at(vpathM0.size()-2)){
-                vM0 = associatedVertexSourceProperty_[v_last];
-                associatedTProperty_[v_nextM1]=T1+(1-T2)*(1-T1);
+                vM0 = G[v_last].associated_source;
+                G[v_nextM1].associated_t=T1+(1-T2)*(1-T1);
               }else{
-                associatedTProperty_[v_nextM1]=T1*T2;
+                G[v_nextM1].associated_t=T1*T2;
               }
-              associatedVertexSourceProperty_[v_nextM1]=vpathM0.at(vpathM0.size()-2);
-              associatedVertexTargetProperty_[v_nextM1]=vM0;
+              G[v_nextM1].associated_source=vpathM0.at(vpathM0.size()-2);
+              G[v_nextM1].associated_target=vM0;
 
-              //double dv = M0->distance(PRMprevious->stateProperty_[vM0], PRMprevious->stateProperty_[vpathM0.at(k)]);
+              //double dv = M0->distance(quotient_previous->G[vM0].state, quotient_previous->stateProperty_[vpathM0.at(k)]);
             }else{
               if(DEBUG) std::cout << "in between" << std::endl;
 
-              associatedVertexSourceProperty_[v_nextM1]=vpathM0.at(k-1);
-              associatedVertexTargetProperty_[v_nextM1]=vpathM0.at(k);
-              associatedTProperty_[v_nextM1]=lastValid.second;
+              G[v_nextM1].associated_source=vpathM0.at(k-1);
+              G[v_nextM1].associated_target=vpathM0.at(k);
+              G[v_nextM1].associated_t=lastValid.second;
             }
           }
           if(DEBUG){
             std::cout << "new vertex associated edges: " 
-            << associatedVertexSourceProperty_[v_nextM1] << "<->"
-            << associatedVertexTargetProperty_[v_nextM1] << " ("
-            << associatedTProperty_[v_nextM1] << ")"
+            << G[v_nextM1].associated_source << "<->"
+            << G[v_nextM1].associated_target << " ("
+            << G[v_nextM1].associated_t << ")"
             << std::endl;
           }
 
-          double dk = M1->distance(spathM1.at(k), stateProperty_[v_nextM1]);
-          boost::add_edge(v_prevM1, v_nextM1, EdgeProperty(ob::Cost(dk)), g_);
+          double dk = M1->distance(spathM1.at(k), G[v_nextM1].state);
+          boost::add_edge(v_prevM1, v_nextM1, EdgeInternalState(ob::Cost(dk)), G);
           uniteComponents(v_prevM1, v_nextM1);
           nn_->add(v_nextM1);
         }
@@ -698,9 +710,9 @@ void QMPConnect::RandomWalk(const Vertex &v)
       Vertex v_nextM1;
       if(k<spathM1.size()-1){
         v_nextM1 = CreateNewVertex(spathM1.at(k));
-        associatedVertexSourceProperty_[v_nextM1]=vpathM0.at(k);
-        associatedVertexTargetProperty_[v_nextM1]=vpathM0.at(k);
-        associatedTProperty_[v_nextM1]=0;
+        G[v_nextM1].associated_source=vpathM0.at(k);
+        G[v_nextM1].associated_target=vpathM0.at(k);
+        G[v_nextM1].associated_t=0;
         nn_->add(v_nextM1);
         totalNumberOfSamples++;
       }else{
@@ -708,7 +720,7 @@ void QMPConnect::RandomWalk(const Vertex &v)
       }
 
       double dk = M1->distance(spathM1.at(k-1),spathM1.at(k));
-      boost::add_edge(v_prevM1, v_nextM1, EdgeProperty(ob::Cost(dk)), g_);
+      boost::add_edge(v_prevM1, v_nextM1, EdgeInternalState(ob::Cost(dk)), G);
       uniteComponents(v_prevM1, v_nextM1);
       v_prevM1 = v_nextM1;
     }

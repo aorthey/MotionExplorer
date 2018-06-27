@@ -50,7 +50,8 @@ void MultiQuotient<T,Tlast>::clear(){
   foundKLevelSolution = false;
 }
 
-void PrintQuotientSpaces(std::vector<Quotient*> quotientSpaces, uint k=0){
+void PrintQuotientSpaces(std::vector<Quotient*> quotientSpaces, uint k=0)
+{
   return;
   if(k<=0) k=quotientSpaces.size()-1;
   uint total_vertices = 0;
@@ -85,7 +86,8 @@ void PrintQuotientSpaces(std::vector<Quotient*> quotientSpaces, uint k=0){
 }
 
 template <class T, class Tlast>
-ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCondition &ptc){
+ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCondition &ptc)
+{
   
   static const double T_GROW = 0.1; //time to grow before Checking if solution exists
 
@@ -162,7 +164,8 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
 
 
 template <class T, class Tlast>
-void MultiQuotient<T,Tlast>::setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_){
+void MultiQuotient<T,Tlast>::setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_)
+{
   pdef_vec = pdef_;
   ob::Planner::setProblemDefinition(pdef_vec.back());
   for(uint k = 0; k < pdef_vec.size(); k++){
@@ -171,14 +174,15 @@ void MultiQuotient<T,Tlast>::setProblemDefinition(std::vector<ob::ProblemDefinit
 }
 
 template <class T, class Tlast>
-void MultiQuotient<T,Tlast>::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef){
-
+void MultiQuotient<T,Tlast>::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
+{
   //ob::ProblemDefinitionPtr pp = pdef.back();
   this->Planner::setProblemDefinition(pdef);
 }
 
 template <class T, class Tlast>
-void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const{
+void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const
+{
   uint Nvertices = data.numVertices();
   if(Nvertices>0){
     std::cout << "cannot get planner data if plannerdata is already populated" << std::endl;

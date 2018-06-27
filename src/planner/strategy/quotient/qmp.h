@@ -15,16 +15,17 @@ namespace ompl
   namespace geometric
   {
     //QMP: Quotient-space roadMap Planner
-    class QMP2: public og::QuotientGraph{
+    class QMP: public og::QuotientGraph{
 
       public:
 
-        QMP2(const ob::SpaceInformationPtr &si, Quotient *previous_);
-        virtual ~QMP2() override;
+        QMP(const ob::SpaceInformationPtr &si, Quotient *previous_);
+        virtual ~QMP() override;
 
       protected:
         double epsilon{0.01}; //graph thickening
         double percentageSamplesOnShortestPath{0.1};
+        double goalBias_{0.05};
 
         virtual bool SampleGraph(ob::State*) override;
         virtual ompl::PDF<og::QuotientGraph::Edge> GetEdgePDF();

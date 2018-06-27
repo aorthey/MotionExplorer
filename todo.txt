@@ -518,3 +518,18 @@ explore this solution, or continue searching on Q1.
 [x] get rid completely of pathspace, replace by roadmap. levels should be
 specified in advance, not as recursive chain
 [x] able to execute/smooth solution paths
+
+
+New multiquotient/new quotient
+[ ] quotient: different modes: 
+   [ ] Grow (as usual)
+   [ ] If solution is found: int NumberOfSolutionClasses()
+   [ ] QuotientGraph* GetSolutionClass(uint i): returns a subgraph of G, G being the quotient graph
+   [ ] Grow Quotient Graph
+   [ ] Extend Quotient Graph (basically operating in the "nullspace" of it)
+
+Measures for deciding which solution class to extend:
+- curvature/smoothness
+- clearance
+- shortness
+

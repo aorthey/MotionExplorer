@@ -1,5 +1,5 @@
 #pragma once
-#include "quotient.h"
+#include "planner/strategy/quotient/quotient.h"
 #include <type_traits>
 
 namespace ob = ompl::base;

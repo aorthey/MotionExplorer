@@ -1,5 +1,5 @@
 #pragma once
-#include "quotient.h"
+#include "planner/strategy/quotient/quotient.h"
 #include <ompl/base/Planner.h>
 #include <ompl/util/RandomNumbers.h>
 #include <ompl/tools/config/SelfConfig.h>

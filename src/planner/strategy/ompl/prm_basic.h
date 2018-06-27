@@ -1,6 +1,6 @@
 #pragma once
 
-#include "quotient.h"
+#include "planner/strategy/quotient/quotient.h"
 #include "planner/cover/open_set.h"
 #include <ompl/geometric/planners/PlannerIncludes.h>
 #include <ompl/datastructures/NearestNeighbors.h>

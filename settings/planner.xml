@@ -9,7 +9,8 @@
   <algorithm dynamic="1" name="benchmark:all_dynamic"/>
 
   <algorithm name="hierarchy:qmp_connect_rrt"/>
-  <algorithm name="hierarchy:qmp2"/>
+  <algorithm name="hierarchy:qmp_connect"/>
+  <algorithm name="hierarchy:qmp"/>
   <algorithm name="ompl:rrtconnect"/>
   <algorithm name="ompl:prm"/>
 

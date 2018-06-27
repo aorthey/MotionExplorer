@@ -14,6 +14,7 @@ namespace ompl
   {
     class QMPConnect: public og::QMP{
 
+        typedef og::QMP BaseT;
       public:
 
         QMPConnect(const ob::SpaceInformationPtr &si, Quotient *previous_);
@@ -36,7 +37,7 @@ namespace ompl
         virtual bool Connect(const Vertex a, const Vertex b) override;
         virtual bool Sample(ob::State *q_random) override;
         virtual Vertex CreateNewVertex(ob::State *state) override;
-        virtual ompl::PDF<og::PRMBasic::Edge> GetEdgePDF() override;
+        virtual ompl::PDF<og::QuotientGraph::Edge> GetEdgePDF() override;
 
         virtual void RandomWalk(const Vertex &v) override;
 

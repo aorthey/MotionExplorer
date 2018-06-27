@@ -1,15 +1,11 @@
 #include "util.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/strategy/strategy_geometric.h"
-#include "planner/strategy/ompl/multiquotient.h"
 #include "planner/strategy/benchmark.h"
 
-#include "planner/strategy/ompl/prm_basic.h"
-#include "planner/strategy/ompl/qmp.h"
-#include "planner/strategy/ompl/qmp_connect.h"
-#include "planner/strategy/ompl/qscp.h"
-#include "planner/strategy/ompl/qslh.h"
-#include "planner/strategy/quotient/qmp2.h"
+#include "planner/strategy/quotient/multiquotient.h"
+#include "planner/strategy/quotient/qmp_connect.h"
+#include "planner/strategy/quotient/qmp.h"
 #include "planner/strategy/ompl/rrt_unidirectional.h"
 #include "planner/strategy/ompl/rrt_unidirectional_cover.h"
 #include "planner/strategy/ompl/rrt_bidirectional.h"
@@ -125,17 +121,9 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     typedef og::MultiQuotient<og::QMPConnect, og::RRTBidirectional> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect+RRT");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  }else if(algorithm=="hierarchy:qscp"){
-    typedef og::MultiQuotient<og::QSCP> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "QSCP");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  }else if(algorithm=="hierarchy:qslh"){
-    typedef og::MultiQuotient<og::QSLH> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "QSLH");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  }else if(algorithm=="hierarchy:qmp2"){
-    typedef og::MultiQuotient<og::QMP2> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "QMP2");
+  }else if(algorithm=="hierarchy:qmp"){
+    typedef og::MultiQuotient<og::QMP> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec, "QMP");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
