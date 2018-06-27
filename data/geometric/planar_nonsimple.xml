@@ -20,7 +20,6 @@
     <se3min config="6  -4.0 -4.0 -1.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +4.0 +4.0 +1.0 +3.141593 +1.57 +3.141593"/>
     <freeFloating>1</freeFloating>
-    <smoothPath>1</smoothPath>
     <epsilongoalregion>0.1</epsilongoalregion>
 
     <hierarchy>

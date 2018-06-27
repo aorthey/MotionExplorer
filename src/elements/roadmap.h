@@ -16,6 +16,7 @@ class Roadmap{
   public:
     Roadmap();
     Roadmap(const ob::PlannerDataPtr, CSpaceOMPL* cspace_);
+    Roadmap(const ob::PlannerDataPtr, CSpaceOMPL* cspace_, CSpaceOMPL* quotient_space_);
 
     //void CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL* cspace_);
     PathPiecewiseLinear* GetShortestPath();
@@ -42,8 +43,8 @@ class Roadmap{
     void DrawShortestPath(GUIState&);
 
     ob::PlannerDataPtr pd{nullptr};
-
     CSpaceOMPL *cspace{nullptr};
+    CSpaceOMPL *quotient_space{nullptr};
     SwathVolume *swv{nullptr};
     PathPiecewiseLinear *path_ompl{nullptr};
 

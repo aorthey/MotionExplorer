@@ -23,7 +23,7 @@ class PathPiecewiseLinear
   public:
     PathPiecewiseLinear();
     PathPiecewiseLinear(CSpaceOMPL *cspace);
-    PathPiecewiseLinear(ob::PathPtr p, CSpaceOMPL *cspace);
+    PathPiecewiseLinear(ob::PathPtr p, CSpaceOMPL *cspace, CSpaceOMPL *quotient_space);
 
     Config Eval(const double t) const;
     Config EvalVelocity(const double t) const;
@@ -44,6 +44,8 @@ class PathPiecewiseLinear
     virtual void DrawGLPathPtr(ob::PathPtr);
 
     void DrawGL(GUIState& state);
+    void DrawGL(GUIState& state, double t);
+
     bool Load(const char *fn);
     bool Load(TiXmlElement* node);
     bool Save(const char *fn);
@@ -57,7 +59,8 @@ class PathPiecewiseLinear
     std::vector<double> interLength;//interLength(i) length towards next milestone point from q(i)
 
     SweptVolume *sv{nullptr};
-    CSpaceOMPL *cspace;
+    CSpaceOMPL *cspace{nullptr};
+    CSpaceOMPL *quotient_space{nullptr};
 
     ob::PathPtr path;
     ob::PathPtr path_raw;

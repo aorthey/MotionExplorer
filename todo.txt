@@ -508,14 +508,13 @@ explore this solution, or continue searching on Q1.
 [ ] Two modes: interactive/automatic. 
   Interactive mode: 
   [ ] button for one step. Meaning one sample is drawn. Then we draw roadmap
-  [ ] button for moving through the explored solution classes.
+  [x] button for moving through the explored solution classes.
   [ ] button for exploring one class for X ms. 
   Automatic mode: 
   [ ] button for computing X ms.
-  [ ] button for computing until solution found.
-  [ ] button for stepping through the currently explored roadmaps
+  [x] button for computing until solution found.
+  [x] button for stepping through the currently explored roadmaps
 
-
-
-[ ] get rid completely of pathspace, replace by roadmap. levels should be
+[x] get rid completely of pathspace, replace by roadmap. levels should be
 specified in advance, not as recursive chain
+[ ] able to execute/smooth solution paths

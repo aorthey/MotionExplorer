@@ -40,10 +40,10 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="hierarchy_down"){
     planners.at(active_planner)->Expand();
     hierarchy_change = true;
-  }else if(cmd=="benchmark"){
   }else if(cmd=="hierarchy_up"){
     planners.at(active_planner)->Collapse();
     hierarchy_change = true;
+  }else if(cmd=="benchmark"){
   }else if(cmd=="planner_step"){
     planners.at(active_planner)->Step();
   }else if(cmd=="planner_advance_one_second"){
@@ -141,8 +141,8 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else return BaseT::OnCommand(cmd,args);
 
   if(hierarchy_change){
+    t=0;
     if(state("draw_play_path")){
-      t=0;
       SendPauseIdle();
       state("draw_play_path").deactivate();
     }
@@ -157,8 +157,6 @@ void PlannerBackend::CenterCameraOn(const Vector3& v){
   Math3D::AABB3D box(v,v);
   GLNavigationBackend::CenterCameraOn(box);
 }
-
-
 
 bool PlannerBackend::OnIdle(){
   bool res = BaseT::OnIdle();
@@ -280,11 +278,12 @@ void PlannerBackend::RenderWorld(){
       }
     }
     if(t>0 && path){
-      Config q = path->Eval(t);
-      uint ridx = planner->GetInput().robot_idx;
-      Robot* robot = world->robots[ridx];
-      //std::cout << "Robot" << robot->name << ":" << q << std::endl;
-      GLDraw::drawRobotAtConfig(robot, q, grey);
+      path->DrawGL(state, t);
+      // Config q = path->Eval(t);
+      // uint ridx = planner->GetInput().robot_idx;
+      // Robot* robot = world->robots[ridx];
+      // //std::cout << "Robot" << robot->name << ":" << q << std::endl;
+      // GLDraw::drawRobotAtConfig(robot, q, grey);
     }
   }
   if(planner->GetInput().kinodynamic){

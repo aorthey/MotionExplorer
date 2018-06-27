@@ -166,7 +166,8 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
     ob::PlannerDataPtr pdi = pd_level.at(k);
     pdi->decoupleFromPlanner();
     std::cout << "level " << k << " : " << pdi->numVertices() << " | " << pdi->numEdges() << std::endl;
-    RoadmapPtr roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back());
+    //RoadmapPtr roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back());
+    RoadmapPtr roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.at(k));
     std::vector<int> path(k+1);
     hierarchy->UpdateNode( roadmap_k, path);
   }

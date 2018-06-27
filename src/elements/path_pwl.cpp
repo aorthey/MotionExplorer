@@ -18,8 +18,8 @@ PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
 {
 }
 
-PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_):
-  cspace(cspace_), path(p_), path_raw(p_)
+PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CSpaceOMPL *quotient_space_):
+  cspace(cspace_), quotient_space(quotient_space_), path(p_), path_raw(p_)
 {
   if(!cspace->isDynamic()){
     og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
@@ -362,6 +362,13 @@ void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
   glDisable(GL_BLEND);
   glEnable(GL_LIGHTING);
   glLineWidth(1);
+}
+void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
+{
+  Config q = Eval(t);
+  std::cout << q << std::endl;
+  Robot* robot = quotient_space->GetRobotPtr();
+  GLDraw::drawRobotAtConfig(robot, q, grey);
 }
 void PathPiecewiseLinear::DrawGL(GUIState& state)
 {
