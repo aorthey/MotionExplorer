@@ -517,4 +517,4 @@ explore this solution, or continue searching on Q1.
 
 [x] get rid completely of pathspace, replace by roadmap. levels should be
 specified in advance, not as recursive chain
-[ ] able to execute/smooth solution paths
+[x] able to execute/smooth solution paths

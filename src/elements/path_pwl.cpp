@@ -366,7 +366,6 @@ void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
 void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
 {
   Config q = Eval(t);
-  std::cout << q << std::endl;
   Robot* robot = quotient_space->GetRobotPtr();
   GLDraw::drawRobotAtConfig(robot, q, grey);
 }

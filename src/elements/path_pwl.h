@@ -27,8 +27,6 @@ class PathPiecewiseLinear
 
     Config Eval(const double t) const;
     Config EvalVelocity(const double t) const;
-    //void EvalState(const double t, ob::State *s) const;
-    void EvalState(const double t) const;
     Vector3 EvalVec3(const double t) const;
     Config EvalMilestone(const int k) const;
 
