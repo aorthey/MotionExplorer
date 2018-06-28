@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot name="3DRectangle">
+ <link name="link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.190833333333" ixy="0" ixz="0" iyy="0.190833333333" iyz="0" izz="0.00666666666667"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <box size="2.5 0.5 0.5"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <box size="2.5 0.5 0.5"/>
+    </geometry>
+  </collision>
+ </link>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>
