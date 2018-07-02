@@ -1,6 +1,6 @@
 #include "planner/cspace/cspace_geometric_RN.h"
 
-#include "planner/validitychecker/validity_checker_ompl.h"
+#include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 
 GeometricCSpaceOMPLRN::GeometricCSpaceOMPLRN(RobotWorld *world_, int robot_idx, int dimension):

@@ -117,17 +117,6 @@ void Hierarchy<T>::DeleteNode( std::vector<int> path ){
   level_number_nodes.at(node->level+1)--;
 }
 
-//template <class T>
-//void Hierarchy<T>::AddNode( T content_ ){
-//  Node<T> *next = new Node<T>();
-//  next->level = 1;
-//  next->id = root->children.size();
-//  next->content = content_;
-//
-//  root->children.push_back(next); 
-//  level_number_nodes.at(next->level)++;
-//}
-
 template <class T>
 void Hierarchy<T>::AddNode( T content_, std::vector<int> nodes){
 

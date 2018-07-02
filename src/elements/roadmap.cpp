@@ -1,7 +1,7 @@
 #include "roadmap.h"
 #include "gui/common.h"
 #include "elements/plannerdata_vertex_annotated.h"
-#include "planner/validitychecker/validity_checker_ompl.h"
+#include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 
 using namespace GLDraw;

@@ -1,5 +1,5 @@
 #include "planner/cspace/cspace_geometric_R3S2.h"
-#include "planner/validitychecker/validity_checker_ompl.h"
+#include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SE2StateSpace.h>
 
 GeometricCSpaceOMPLR3S2::GeometricCSpaceOMPLR3S2(RobotWorld *world_, int robot_idx):

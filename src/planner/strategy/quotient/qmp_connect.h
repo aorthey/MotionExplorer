@@ -32,12 +32,13 @@ namespace ompl
 
       protected:
 
-        virtual bool SampleGraph(ob::State*) override;
         virtual double Distance(const Vertex a, const Vertex b) const override;
         virtual bool Connect(const Vertex a, const Vertex b) override;
         virtual bool Sample(ob::State *q_random) override;
         virtual Vertex CreateNewVertex(ob::State *state) override;
-        virtual ompl::PDF<og::QuotientGraph::Edge> GetEdgePDF() override;
+
+        //virtual bool SampleGraph(ob::State*) override;
+        //virtual ompl::PDF<og::QuotientGraph::Edge> GetEdgePDF() override;
 
         virtual void RandomWalk(const Vertex &v) override;
 

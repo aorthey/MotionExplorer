@@ -1,4 +1,4 @@
-#include "planner/irreducible/irreducible_projector.h"
+#include "irreducible_projector.h"
 
 IrreducibleProjector::IrreducibleProjector(Robot *robot){
   _robot = robot;

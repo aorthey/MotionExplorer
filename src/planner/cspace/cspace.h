@@ -106,4 +106,3 @@ class CSpaceOMPL
     int robot_idx;
 
 };
-

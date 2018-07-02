@@ -533,3 +533,6 @@ Measures for deciding which solution class to extend:
 - clearance
 - shortness
 
+
+[ ] do you only search on the connected component of start and goal
+configuration? (the subroadmap)

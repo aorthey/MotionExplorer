@@ -1,4 +1,4 @@
-#include "planner/validitychecker/validity_checker_ompl.h"
+#include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
 OMPLValidityChecker::OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_, CSpace *inner_):
   ob::StateValidityChecker(si), cspace(cspace_), inner(inner_)

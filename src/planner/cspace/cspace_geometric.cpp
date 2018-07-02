@@ -1,6 +1,6 @@
 #include "planner/cspace/cspace_geometric.h"
-#include "planner/validitychecker/validity_checker_ompl.h"
-#include "planner/validitychecker/validity_checker_simplicial_complex.h"
+#include "planner/cspace/validitychecker/validity_checker_ompl.h"
+#include "planner/cspace/validitychecker/validity_checker_simplicial_complex.h"
 
 GeometricCSpaceOMPL::GeometricCSpaceOMPL(RobotWorld *world_, int robot_idx):
   CSpaceOMPL(world_, robot_idx)

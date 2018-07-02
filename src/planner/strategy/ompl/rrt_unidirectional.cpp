@@ -1,7 +1,7 @@
 #include "common.h"
 #include "rrt_unidirectional.h"
 #include "elements/plannerdata_vertex_annotated.h"
-#include "planner/validitychecker/validity_checker_ompl.h"
+#include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
 using namespace ompl::geometric;
 

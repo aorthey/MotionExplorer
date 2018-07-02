@@ -1,6 +1,6 @@
 #include <eigen3/unsupported/Eigen/MatrixFunctions>
 #include <iomanip>
-#include "planner/integrator/liegroupintegrator.h"
+#include "planner/cspace/integrator/liegroupintegrator.h"
 
 void LieGroupIntegrator::Euler_step(std::vector<Matrix4>& p, const Matrix4& dp0, double dt)
 {  

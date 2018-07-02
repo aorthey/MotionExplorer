@@ -1,5 +1,5 @@
 #include "rrt_bidirectional.h"
-#include "planner/validitychecker/validity_checker_ompl.h"
+#include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/tools/config/SelfConfig.h>

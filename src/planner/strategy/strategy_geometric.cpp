@@ -5,6 +5,7 @@
 
 #include "planner/strategy/quotient/multiquotient.h"
 #include "planner/strategy/quotient/qmp_connect.h"
+#include "planner/strategy/quotient/qmp_connect_fast.h"
 #include "planner/strategy/quotient/qmp.h"
 #include "planner/strategy/ompl/rrt_unidirectional.h"
 #include "planner/strategy/ompl/rrt_unidirectional_cover.h"
@@ -40,15 +41,28 @@
 #include <ompl/geometric/planners/sbl/pSBL.h>
 #include <ompl/geometric/planners/stride/STRIDE.h>
 #include <ompl/geometric/planners/cforest/CForest.h>
+
+
+#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
+#include <ompl/base/objectives/MaximizeMinClearanceObjective.h>
+
+
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/util/Time.h>
 
-static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)
+static ob::OptimizationObjectivePtr GetOptimizationObjective(const ob::SpaceInformationPtr& si)
 {
-  ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
-  obj->setCostThreshold(ob::Cost(dInf));
-  return obj;
+  ////path length
+  //ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
+  //obj->setCostThreshold(ob::Cost(dInf));
+  //return obj;
+  ob::OptimizationObjectivePtr lengthObj(new ob::PathLengthOptimizationObjective(si));
+  ob::OptimizationObjectivePtr clearObj(new ob::MaximizeMinClearanceObjective(si));
+  ob::MultiOptimizationObjective* opt = new ob::MultiOptimizationObjective(si);
+  opt->addObjective(lengthObj, 0.0);
+  opt->addObjective(clearObj, 1.0);
+  return ob::OptimizationObjectivePtr(opt);
 }
 
 void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &run)
@@ -121,6 +135,14 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     typedef og::MultiQuotient<og::QMPConnect, og::RRTBidirectional> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect+RRT");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="hierarchy:qmp_connect_fast"){
+    typedef og::MultiQuotient<og::QMPConnectFast, og::RRTBidirectional> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnectFast");
+    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="hierarchy:qmp_rrt"){
+    typedef og::MultiQuotient<og::QMP, og::RRTBidirectional> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec, "QMP+RRT");
+    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="hierarchy:qmp"){
     typedef og::MultiQuotient<og::QMP> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMP");
@@ -141,9 +163,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   std::vector<ob::SpaceInformationPtr> si_vec; 
   std::vector<ob::ProblemDefinitionPtr> pdef_vec; 
 
-  std::cout << "levels: " << input.cspace_levels.size() << std::endl;
   for(uint k = 0; k < input.cspace_levels.size(); k++){
-    std::cout << "levels: " << k << "/" << input.cspace_levels.size() << std::endl;
     CSpaceOMPL* cspace_levelk = input.cspace_levels.at(k);
     ob::SpaceInformationPtr sik = cspace_levelk->SpaceInformationPtr();
     setStateSampler(input.name_sampler, sik);
@@ -151,7 +171,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     ob::ScopedState<> startk = cspace_levelk->ConfigToOMPLState(input.q_init);
     ob::ScopedState<> goalk  = cspace_levelk->ConfigToOMPLState(input.q_goal);
 
-    std::cout << *cspace_levelk << std::endl;
+    //std::cout << *cspace_levelk << std::endl;
 
     ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
     pdefk->addStartState(startk);
@@ -159,7 +179,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     goal->setState(goalk);
     goal->setThreshold(input.epsilon_goalregion);
     pdefk->setGoal(goal);
-    pdefk->setOptimizationObjective( getThresholdPathLengthObj(sik) );
+    pdefk->setOptimizationObjective( GetOptimizationObjective(sik) );
 
     si_vec.push_back(sik);
     pdef_vec.push_back(pdefk);
@@ -227,7 +247,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(
   ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
   ss.setup();
 
-  pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
+  pdef->setOptimizationObjective( GetOptimizationObjective(si) );
 
   ot::Benchmark::Request req;
   req.maxTime = binfo.maxPlanningTime;

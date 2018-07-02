@@ -1,5 +1,5 @@
 #include "planner/cspace/cspace.h"
-#include "planner/validitychecker/validity_checker_ompl.h"
+#include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
 

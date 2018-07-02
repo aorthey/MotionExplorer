@@ -1,4 +1,4 @@
-#include "planner/integrator/tangentbundle.h"
+#include "planner/cspace/integrator/tangentbundle.h"
 #include "planner/cspace/cspace_kinodynamic.h"
 
 Matrix3 GetTotalInertiaAtPoint(const Robot *robot, const Vector3 &p)

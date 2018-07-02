@@ -1,6 +1,6 @@
 #pragma once
 #include "validity_checker_ompl.h"
-#include "planner/cover/open_set_convex.h"
+#include "planner/cspace/cover/open_set_convex.h"
 
 class ValidityCheckerSimplicialComplex: public OMPLValidityChecker
 {

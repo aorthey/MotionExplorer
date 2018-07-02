@@ -134,7 +134,7 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr M1, const
             exit(0);
           }
         }else{
-          std::cout << "M1 is R^"<<n <<" but state " << M1->getType() << " is not handled." << std::endl;
+          std::cout << "M1 is R^"<<n <<" but state " << M0->getType() << " is not handled." << std::endl;
           exit(0);
         }
       }else{

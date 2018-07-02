@@ -1,6 +1,6 @@
 #pragma once
 #include "planner/strategy/quotient/quotient.h"
-#include "planner/cover/open_set_hypersphere.h"
+#include "planner/cspace/cover/open_set_hypersphere.h"
 #include <ompl/base/Planner.h>
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/util/RandomNumbers.h>

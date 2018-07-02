@@ -1,7 +1,7 @@
 #pragma once
 
 #include "quotient.h"
-#include "planner/cover/open_set.h"
+#include "planner/cspace/cover/open_set.h"
 #include <ompl/geometric/planners/PlannerIncludes.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <ompl/base/Cost.h>
@@ -113,8 +113,11 @@ namespace ompl
         std::vector<Vertex> goalM_;
         std::vector<Vertex> shortestVertexPath_;
 
-        void uniteComponents(Vertex m1, Vertex m2);
+        virtual void uniteComponents(Vertex m1, Vertex m2);
         bool sameComponent(Vertex m1, Vertex m2);
+
+        bool InsideStartComponent(Vertex v);
+        bool InsideStartComponent(Edge e);
         ob::Cost bestCost_{+dInf};
 
         virtual void CheckForSolution(ob::PathPtr &solution) override;

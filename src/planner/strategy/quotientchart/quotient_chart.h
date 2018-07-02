@@ -1,0 +1,4 @@
+
+class QuotientChart: public QuotientGraph
+{
+};

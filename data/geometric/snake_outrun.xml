@@ -44,7 +44,8 @@
     <robot>0</robot>
     <freeFloating>1</freeFloating>
 
-    <epsilongoalregion>0.01</epsilongoalregion>
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>5</maxplanningtime>
     <smoothPath>1</smoothPath>
 
     <hierarchy>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "planner/strategy/quotient/quotient.h"
-#include "planner/cover/open_set.h"
+#include "planner/cspace/cover/open_set.h"
 #include <ompl/geometric/planners/PlannerIncludes.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <ompl/base/Cost.h>

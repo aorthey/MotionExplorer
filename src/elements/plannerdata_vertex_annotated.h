@@ -1,5 +1,5 @@
 #pragma once
-#include "planner/cover/open_set.h"
+#include "planner/cspace/cover/open_set.h"
 #include <ompl/base/PlannerData.h>
 #include <boost/serialization/export.hpp>
 namespace ob = ompl::base;

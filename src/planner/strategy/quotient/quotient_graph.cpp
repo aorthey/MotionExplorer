@@ -1,7 +1,7 @@
 #include "quotient_graph.h"
 #include "common.h"
 #include "planner/strategy/ompl/GoalVisitor.hpp"
-#include "planner/validitychecker/validity_checker_ompl.h"
+#include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include "elements/plannerdata_vertex_annotated.h"
 
 #include <ompl/geometric/planners/prm/ConnectionStrategy.h>
@@ -24,8 +24,7 @@ namespace ompl
   namespace magic
   {
     static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
-    static const double ROADMAP_BUILD_TIME = 0.02;
-    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
+    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 3;
   }
 }
 QuotientGraph::QuotientGraph(const ob::SpaceInformationPtr &si, Quotient *previous_)
@@ -179,6 +178,7 @@ void QuotientGraph::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
     RandomWalk(v);
   }
 }
+
 void QuotientGraph::uniteComponents(Vertex m1, Vertex m2)
 {
   disjointSets_.union_set(m1, m2);
@@ -229,13 +229,13 @@ void QuotientGraph::setup(){
                              });
   }
   if (!connectionStrategy_){
-    //connectionStrategy_ = KStrategy<Vertex>(magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
-    connectionStrategy_ = KStarStrategy<Vertex>(
-    [this]
-    {
-        return GetNumberOfVertices();
-    },
-    nn_, si_->getStateDimension());
+    connectionStrategy_ = KStrategy<Vertex>(magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
+    //connectionStrategy_ = KStarStrategy<Vertex>(
+    //[this]
+    //{
+    //    return GetNumberOfVertices();
+    //},
+    //nn_, si_->getStateDimension());
   }
 
   if (pdef_){
@@ -243,7 +243,8 @@ void QuotientGraph::setup(){
     if (pdef_->hasOptimizationObjective()){
       opt_ = pdef_->getOptimizationObjective();
     }else{
-      opt_ = std::make_shared<ob::PathLengthOptimizationObjective>(si_);
+      std::cout << "Needs specification of optimization objective." << std::endl;
+      exit(0);
     }
     auto *goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
 
@@ -451,10 +452,20 @@ ob::PathPtr QuotientGraph::GetSolutionPath(const Vertex &start, const Vertex &go
 
   return p;
 }
-
+bool QuotientGraph::InsideStartComponent(Vertex v)
+{
+  return sameComponent(v, startM_.at(0));
+}
+bool QuotientGraph::InsideStartComponent(Edge e)
+{
+  return sameComponent(startM_.at(0), boost::source(e,G));
+}
 
 void QuotientGraph::getPlannerData(ob::PlannerData &data) const
 {
+  //in case we havent found a solution, there will be at 
+  //least two connected components which we like to color differently
+
   uint startComponent = 0;//const_cast<QuotientGraph *>(this)->disjointSets_.find_set(startM_.at(0));
   uint goalComponent = 1;//const_cast<QuotientGraph *>(this)->disjointSets_.find_set(goalM_.at(0));
   for (unsigned long i : startM_)

@@ -1,5 +1,5 @@
 #include "planner/cspace/cspace_decorator.h"
-#include "planner/validitychecker/validity_checker_ompl.h"
+#include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
 CSpaceOMPLDecorator::CSpaceOMPLDecorator(CSpaceOMPL* cspace_ompl_):
   CSpaceOMPL(cspace_ompl_->world, cspace_ompl_->robot_idx), cspace_ompl(cspace_ompl_)

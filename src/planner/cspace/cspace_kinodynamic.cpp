@@ -1,6 +1,6 @@
 #include "planner/cspace/cspace_kinodynamic.h"
-#include "planner/integrator/tangentbundle.h"
-#include "planner/validitychecker/validity_checker_ompl.h"
+#include "planner/cspace/integrator/tangentbundle.h"
+#include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
 KinodynamicCSpaceOMPL::KinodynamicCSpaceOMPL(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)
