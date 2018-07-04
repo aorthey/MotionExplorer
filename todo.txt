@@ -504,7 +504,6 @@ Make Graph Sampler/Searcher fault-prove
 First, we need to search for one solution on Q1. Once found, we can either
 explore this solution, or continue searching on Q1. 
 
-
 [ ] Two modes: interactive/automatic. 
   Interactive mode: 
   [ ] button for one step. Meaning one sample is drawn. Then we draw roadmap
@@ -519,7 +518,6 @@ explore this solution, or continue searching on Q1.
 specified in advance, not as recursive chain
 [x] able to execute/smooth solution paths
 
-
 New multiquotient/new quotient
 [ ] quotient: different modes: 
    [ ] Grow (as usual)
@@ -533,6 +531,3 @@ Measures for deciding which solution class to extend:
 - clearance
 - shortness
 
-
-[ ] do you only search on the connected component of start and goal
-configuration? (the subroadmap)

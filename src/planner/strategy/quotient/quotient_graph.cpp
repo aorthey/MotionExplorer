@@ -230,12 +230,6 @@ void QuotientGraph::setup(){
   }
   if (!connectionStrategy_){
     connectionStrategy_ = KStrategy<Vertex>(magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
-    //connectionStrategy_ = KStarStrategy<Vertex>(
-    //[this]
-    //{
-    //    return GetNumberOfVertices();
-    //},
-    //nn_, si_->getStateDimension());
   }
 
   if (pdef_){

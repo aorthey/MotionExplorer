@@ -3,18 +3,18 @@
 <link name="body">
   <inertial>
    <mass value="1"/>
-   <inertia ixx="1.125" ixy="0" ixz="0" iyy="1.125" iyz="0" izz="1.125"/>
+   <inertia ixx="1.62" ixy="0" ixz="0" iyy="1.62" iyz="0" izz="1.62"/>
   </inertial>
   <collision>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-      <sphere radius="1.67705098312"/>
+      <sphere radius="2.01246117975"/>
     </geometry>
   </collision>
   <visual>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-      <sphere radius="1.67705098312"/>
+      <sphere radius="2.01246117975"/>
     </geometry>
   </visual>
 </link>
