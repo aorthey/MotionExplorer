@@ -17,10 +17,10 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_):
   const StateSpacePtr M1_space = M1->getStateSpace();
 
   id = counter++;
-  std::cout << "--- Level " << id << " " << getName() << std::endl;
+  if(verbose>0) std::cout << "--- Level " << id << " " << getName() << std::endl;
   setName("Quotient"+std::to_string(id));
   if(parent == nullptr){
-    std::cout << "M1 dimension : " << M1_space->getDimension() << " measure: " << M1_space->getMeasure() << std::endl;
+    if(verbose>0) std::cout << "M1 dimension : " << M1_space->getDimension() << " measure: " << M1_space->getMeasure() << std::endl;
     type = ATOMIC_RN;
   }else{
     M0 = parent->getSpaceInformation();
@@ -36,9 +36,9 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_):
       std::cout << "quotient of state spaces got dimensions wrong." << std::endl;
       exit(0);
     }
-    std::cout << "M0 dimension : " << M0_space->getDimension() << " measure: " << M0_space->getMeasure() << std::endl;
-    std::cout << "C1 dimension : " << C1_space->getDimension() << " measure: " << C1_space->getMeasure() << std::endl;
-    std::cout << "M1 dimension : " << M1_space->getDimension() << " measure: " << M1_space->getMeasure() << std::endl;
+    if(verbose>0) std::cout << "M0 dimension : " << M0_space->getDimension() << " measure: " << M0_space->getMeasure() << std::endl;
+    if(verbose>0) std::cout << "C1 dimension : " << C1_space->getDimension() << " measure: " << C1_space->getMeasure() << std::endl;
+    if(verbose>0) std::cout << "M1 dimension : " << M1_space->getDimension() << " measure: " << M1_space->getMeasure() << std::endl;
     if((M0_space->getMeasure()<=0) ||
        (C1_space->getMeasure()<=0) ||
        (M1_space->getMeasure()<=0)){

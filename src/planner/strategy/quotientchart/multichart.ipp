@@ -108,19 +108,25 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
     jChart->Grow(T_GROW);
 
     if(current_node->FoundNewPath()){
-      found_path_on_last_level = true;
-      // if(current_node->GetLevel() = levels){
-      //   found_path_on_last_level = true;
-      // }else{
-      //   //not yet reached maximal level. create a new sibling chart (containing
-      //   //the solution path plus associated vertices), and create
-      //   //a child of the sibling (the nullspace of the solution path plus its
-      //   //associated vertices on the next quotientchart).
-      //   og::QuotientChart *local = new og::QuotientChart(si_vec.at(current_node->GetLevel(), current_node->GetParent());
-      //   og::QuotientChart *global = new og::QuotientChart(si_vec.at(current_node->GetLevel()+1), local);
+      if(current_node->GetLevel() == levels-1){
+        found_path_on_last_level = true;
+      }else{
+        //not yet reached maximal level. create a new sibling chart (containing
+        //the solution path plus associated vertices), and create
+        //a child of the sibling (the nullspace of the solution path plus its
+        //associated vertices on the next quotientchart).
+        std::cout << "found path on level " << current_node->GetLevel() << std::endl;
+        std::cout << "Trying to extract path subgraph" << std::endl;
+        og::QuotientChart *local = new og::QuotientChart(si_vec.at(current_node->GetLevel()), 
+            static_cast<og::QuotientChart*>(current_node->GetParent()));
+        //Graph G = current_node->GetPathSubgraph( current_node->GetNumberOfPaths() - 1 ); //get last path
+        //local->SetGraph(G);
 
-      //   current_node->AddSibling(local);
-      // }
+        og::QuotientChart *global = new og::QuotientChart(si_vec.at(current_node->GetLevel()+1), local);
+        current_node->AddSibling(local);
+        Q.push(global);
+        exit(0);
+      }
     }
 
     Q.push(jChart);

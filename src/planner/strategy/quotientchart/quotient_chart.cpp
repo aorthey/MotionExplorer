@@ -41,6 +41,16 @@ bool QuotientChart::FoundNewPath()
   CheckForSolution(sol);
   return hasSolution;
 }
+void QuotientChart::AddSibling(QuotientChart *sibling_)
+{
+  siblings.push_back(sibling_);
+}
+//QuotientChart::Graph QuotientChart::GetPathSubgraph(uint k)
+//{
+//  std::cout << "NYI" << std::endl;
+//  exit(0);
+//  return G;
+//}
 void QuotientChart::getPlannerData(ob::PlannerData &data) const
 {
   uint Nvertices = data.numVertices();
