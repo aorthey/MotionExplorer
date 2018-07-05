@@ -26,8 +26,8 @@ namespace ompl
   }
 }
 
-QMPConnect::QMPConnect(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
-  QMP(si, previous_)
+QMPConnect::QMPConnect(const ob::SpaceInformationPtr &si, Quotient *parent_ ):
+  QMP(si, parent_)
 {
   setName("QMPConnect"+to_string(id));
 }
@@ -46,8 +46,8 @@ void QMPConnect::clear(){
 
 void QMPConnect::setup()
 {
-  og::QMPConnect *quotient_previous = static_cast<og::QMPConnect*>(previous);
-  if(quotient_previous==nullptr){
+  og::QMPConnect *quotient_parent = static_cast<og::QMPConnect*>(parent);
+  if(quotient_parent==nullptr){
     QMP::setup();
   }
   if (!nn_){
@@ -78,13 +78,13 @@ void QMPConnect::setup()
 
     if(const ob::State *st = pis_.nextStart()){
       Vertex m = CreateNewVertex(si_->cloneState(st));
-      G[m].associated_source = quotient_previous->startM_.at(0);
-      G[m].associated_target = quotient_previous->startM_.at(0);
+      G[m].associated_source = quotient_parent->startM_.at(0);
+      G[m].associated_target = quotient_parent->startM_.at(0);
       G[m].associated_t = 0;
       // G[m].associated_source = 
-      // G[m].associated_target = quotient_previous->startM_.at(0);
+      // G[m].associated_target = quotient_parent->startM_.at(0);
       // G[m].associated_t = 0;
-      //std::cout << "start vertex: " << m << " associated:" << quotient_previous->startM_.at(0) << std::endl;
+      //std::cout << "start vertex: " << m << " associated:" << quotient_parent->startM_.at(0) << std::endl;
       ConnectVertexToNeighbors(m);
       startM_.push_back(m);
     }
@@ -101,13 +101,13 @@ void QMPConnect::setup()
       const ob::State *gl = pis_.nextGoal();
       if (gl != nullptr){
         Vertex m = CreateNewVertex(si_->cloneState(gl));
-        //G[m].associated_source = quotient_previous->goalM_.at(0);
-        //G[m].associated_target = quotient_previous->goalM_.at(0);
+        //G[m].associated_source = quotient_parent->goalM_.at(0);
+        //G[m].associated_target = quotient_parent->goalM_.at(0);
         //G[m].associated_t = 0;
-        G[m].associated_source = quotient_previous->goalM_.at(0);
-        G[m].associated_target = quotient_previous->goalM_.at(0);
+        G[m].associated_source = quotient_parent->goalM_.at(0);
+        G[m].associated_target = quotient_parent->goalM_.at(0);
         G[m].associated_t = 0;
-        //std::cout << "goal vertex: " << m << " associated:" << quotient_previous->goalM_.at(0) << std::endl;
+        //std::cout << "goal vertex: " << m << " associated:" << quotient_parent->goalM_.at(0) << std::endl;
         ConnectVertexToNeighbors(m);
         goalM_.push_back(m);
       }
@@ -127,18 +127,18 @@ void QMPConnect::Init()
 QuotientGraph::Vertex QMPConnect::CreateNewVertex(ob::State *state)
 {
   Vertex m = BaseT::CreateNewVertex(state);
-  og::QMPConnect *quotient_previous = static_cast<og::QMPConnect*>(previous);
-  if(quotient_previous != nullptr && quotient_previous->isSampled){
-    G[m].associated_source = quotient_previous->lastSourceVertexSampled;
-    G[m].associated_target = quotient_previous->lastTargetVertexSampled;
-    G[m].associated_t = quotient_previous->lastTSampled;
+  og::QMPConnect *quotient_parent = static_cast<og::QMPConnect*>(parent);
+  if(quotient_parent != nullptr && quotient_parent->isSampled){
+    G[m].associated_source = quotient_parent->lastSourceVertexSampled;
+    G[m].associated_target = quotient_parent->lastTargetVertexSampled;
+    G[m].associated_t = quotient_parent->lastTSampled;
   }
   return m;
 }
 bool QMPConnect::Sample(ob::State *q_random)
 {
   totalNumberOfSamples++;
-  if(previous == nullptr){
+  if(parent == nullptr){
     //return M1_valid_sampler->sample(q_random);
     if(!hasSolution && rng_.uniform01() < goalBias_){
       q_random = si_->cloneState(G[goalM_.at(0)].state);//stateProperty_[goalM_.at(0)]);
@@ -152,12 +152,12 @@ bool QMPConnect::Sample(ob::State *q_random)
       //goal->sampleGoal(q_random);
       q_random = si_->cloneState(G[goalM_.at(0)].state);//stateProperty_[goalM_.at(0)]);
     }else{
-      ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
+      ob::SpaceInformationPtr M0 = parent->getSpaceInformation();
       base::State *s_C1 = C1->allocState();
       base::State *s_M0 = M0->allocState();
 
       C1_sampler->sampleUniform(s_C1);
-      previous->SampleGraph(s_M0);
+      parent->SampleGraph(s_M0);
       mergeStates(s_M0, s_C1, q_random);
 
       C1->freeState(s_C1);
@@ -193,12 +193,12 @@ bool QMPConnect::Sample(ob::State *q_random)
 
 double QMPConnect::Distance(const Vertex a, const Vertex b) const
 {
-  if(previous == nullptr){
+  if(parent == nullptr){
     return si_->distance(G[a].state, G[b].state);
   }else{
 
-    og::QMPConnect *quotient_previous = dynamic_cast<og::QMPConnect*>(previous);
-    if(!quotient_previous->isSampled) return si_->distance(G[a].state, G[b].state);
+    og::QMPConnect *quotient_parent = dynamic_cast<og::QMPConnect*>(parent);
+    if(!quotient_parent->isSampled) return si_->distance(G[a].state, G[b].state);
 
     ob::PathPtr M1_path = InterpolateM1GraphConstraint(a, b);
     double d = +dInf;
@@ -211,10 +211,10 @@ double QMPConnect::Distance(const Vertex a, const Vertex b) const
 
 bool QMPConnect::Connect(const Vertex a, const Vertex b){
 
-  if(previous==nullptr){
+  if(parent==nullptr){
     return QMP::Connect(a,b);
   }else{
-    og::QMPConnect *quotient_previous = static_cast<og::QMPConnect*>(previous);
+    og::QMPConnect *quotient_parent = static_cast<og::QMPConnect*>(parent);
 
     ob::PathPtr sol = InterpolateM1GraphConstraint(a,b);
     if(!sol){
@@ -223,7 +223,7 @@ bool QMPConnect::Connect(const Vertex a, const Vertex b){
 
     og::PathGeometric path = static_cast<og::PathGeometric&>(*sol);
     std::vector<ob::State *> spathM1 = path.getStates();
-    std::vector<Vertex> vpathM0 = quotient_previous->shortestVertexPath_;
+    std::vector<Vertex> vpathM0 = quotient_parent->shortestVertexPath_;
 
     Vertex v_prevM1 = a;
     ob::State *s_prevM1 = spathM1.at(0);
@@ -263,7 +263,7 @@ bool QMPConnect::Connect(const Vertex a, const Vertex b){
 
 ob::PathPtr QMPConnect::InterpolateM1GraphConstraint( const Vertex a, const Vertex b) const
 {
-  og::QMPConnect *quotient_previous = dynamic_cast<og::QMPConnect*>(previous);
+  og::QMPConnect *quotient_parent = dynamic_cast<og::QMPConnect*>(parent);
   ob::State* sa = G[a].state;
   ob::State* sb = G[b].state;
 
@@ -285,7 +285,7 @@ ob::PathPtr QMPConnect::InterpolateM1GraphConstraint( const Vertex a, const Vert
   const Vertex btM0 = G[b].associated_target;
 
   //std::cout << "associated vertices: " << asM0 << "," << atM0 << "|" << bsM0 << "," << btM0 << "." << std::endl;
-  ob::PathPtr M0_path = quotient_previous->GetShortestPathOffsetVertices( saM0, sbM0, asM0, bsM0, atM0, btM0);
+  ob::PathPtr M0_path = quotient_parent->GetShortestPathOffsetVertices( saM0, sbM0, asM0, bsM0, atM0, btM0);
 
   if(!M0_path) return nullptr;
 
@@ -540,8 +540,8 @@ void QMPConnect::RandomWalk(const Vertex &v)
 {
   const bool DEBUG = false;
 
-  og::QMPConnect *quotient_previous = static_cast<og::QMPConnect*>(previous);
-  if(previous == nullptr){
+  og::QMPConnect *quotient_parent = static_cast<og::QMPConnect*>(parent);
+  if(parent == nullptr){
     return QMP::RandomWalk(v);
   }
 
@@ -560,7 +560,7 @@ void QMPConnect::RandomWalk(const Vertex &v)
     base::State *s_last_M0 = M0->allocState();
 
     C1_sampler->sampleUniform(s_last_C1);
-    previous->SampleGraph(s_last_M0);
+    parent->SampleGraph(s_last_M0);
 
     mergeStates(s_last_M0, s_last_C1, s_last);
 
@@ -588,7 +588,7 @@ void QMPConnect::RandomWalk(const Vertex &v)
     og::PathGeometric pathM1 = static_cast<og::PathGeometric&>(*solM1);
 
     std::vector<ob::State *> spathM1 = pathM1.getStates();
-    std::vector<Vertex> vpathM0 = quotient_previous->shortestVertexPath_;
+    std::vector<Vertex> vpathM0 = quotient_parent->shortestVertexPath_;
 
     if(DEBUG){
       std::cout << std::string(80, '-') << std::endl;
@@ -664,7 +664,7 @@ void QMPConnect::RandomWalk(const Vertex &v)
               G[v_nextM1].associated_source=vpathM0.at(vpathM0.size()-2);
               G[v_nextM1].associated_target=vM0;
 
-              //double dv = M0->distance(quotient_previous->G[vM0].state, quotient_previous->stateProperty_[vpathM0.at(k)]);
+              //double dv = M0->distance(quotient_parent->G[vM0].state, quotient_parent->stateProperty_[vpathM0.at(k)]);
             }else{
               if(DEBUG) std::cout << "in between" << std::endl;
 

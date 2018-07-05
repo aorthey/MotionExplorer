@@ -127,7 +127,7 @@ namespace ompl
 
       public:
 
-        PRMBasic(const ob::SpaceInformationPtr &si, Quotient *previous = nullptr);
+        PRMBasic(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
         ~PRMBasic();
 
         virtual uint GetNumberOfVertices() override;

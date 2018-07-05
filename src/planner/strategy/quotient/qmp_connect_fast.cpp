@@ -20,8 +20,8 @@
 using namespace og;
 using namespace ob;
 
-QMPConnectFast::QMPConnectFast(const ob::SpaceInformationPtr &si, Quotient *previous_ ):
-  BaseT(si, previous_)
+QMPConnectFast::QMPConnectFast(const ob::SpaceInformationPtr &si, Quotient *parent_ ):
+  BaseT(si, parent_)
 {
   setName("QMPConnectFast"+to_string(id));
   percentageSamplesOnShortestPath = 0.8;
@@ -63,15 +63,15 @@ QMPConnectFast::~QMPConnectFast(){
 bool QMPConnectFast::Sample(ob::State *q_random)
 {
   totalNumberOfSamples++;
-  if(previous == nullptr){
+  if(parent == nullptr){
     M1_valid_sampler->sample(q_random);
   }else{
-    ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
+    ob::SpaceInformationPtr M0 = parent->getSpaceInformation();
     base::State *s_C1 = C1->allocState();
     base::State *s_M0 = M0->allocState();
 
     C1_sampler->sampleUniform(s_C1);
-    previous->SampleGraph(s_M0);
+    parent->SampleGraph(s_M0);
     mergeStates(s_M0, s_C1, q_random);
 
     C1->freeState(s_C1);

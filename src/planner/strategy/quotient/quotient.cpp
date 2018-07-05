@@ -11,20 +11,20 @@ using namespace ompl::geometric;
 using namespace ompl::base;
 
 
-Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_):
-  ob::Planner(si,"QuotientSpace"), M1(si), M0(si), previous(previous_)
+Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_):
+  ob::Planner(si,"QuotientSpace"), M1(si), M0(si), parent(parent_)
 {
   const StateSpacePtr M1_space = M1->getStateSpace();
 
   id = counter++;
   std::cout << "--- Level " << id << " " << getName() << std::endl;
   setName("Quotient"+std::to_string(id));
-  if(previous == nullptr){
+  if(parent == nullptr){
     std::cout << "M1 dimension : " << M1_space->getDimension() << " measure: " << M1_space->getMeasure() << std::endl;
     type = ATOMIC_RN;
   }else{
-    M0 = previous->getSpaceInformation();
-    const StateSpacePtr M0_space = previous->getSpaceInformation()->getStateSpace();
+    M0 = parent->getSpaceInformation();
+    const StateSpacePtr M0_space = parent->getSpaceInformation()->getStateSpace();
 
     //C1 = M1 / M0
     const StateSpacePtr C1_space = ComputeQuotientSpace(M1_space, M0_space);
@@ -76,7 +76,7 @@ void Quotient::clear()
   Quotient::counter = 0;
   totalNumberOfSamples = 0;
   graphLength = 0;
-  if(previous==nullptr) C1_sampler.reset();
+  if(parent==nullptr) C1_sampler.reset();
 }
 
 uint Quotient::GetNumberOfSampledVertices()
@@ -333,7 +333,7 @@ void Quotient::mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State
   ////output: qM1 = qM0 \circ qC1 \in M1
   const StateSpacePtr M1_space = M1->getStateSpace();
   const StateSpacePtr C1_space = C1->getStateSpace();
-  const StateSpacePtr M0_space = previous->getSpaceInformation()->getStateSpace();
+  const StateSpacePtr M0_space = parent->getSpaceInformation()->getStateSpace();
 
   switch (type) {
     case RN_RM:
@@ -650,21 +650,25 @@ bool Quotient::HasSolution()
 {
   return hasSolution;
 }
+Quotient* Quotient::GetParent() const
+{
+  return parent;
+}
 
 bool Quotient::Sample(ob::State *q_random)
 {
   totalNumberOfSamples++;
-  if(previous == nullptr){
+  if(parent == nullptr){
     return M1_valid_sampler->sample(q_random);
   }else{
     //Adjusted sampling function: Sampling in G0 x C1
 
-    ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
+    ob::SpaceInformationPtr M0 = parent->getSpaceInformation();
     base::State *s_C1 = C1->allocState();
     base::State *s_M0 = M0->allocState();
 
     C1_sampler->sampleUniform(s_C1);
-    previous->SampleGraph(s_M0);
+    parent->SampleGraph(s_M0);
     mergeStates(s_M0, s_C1, q_random);
 
     C1->freeState(s_C1);
@@ -685,11 +689,11 @@ double Quotient::GetSamplingDensity(){
   double N = (double)GetNumberOfVertices();
   //return N;
   //@TODO: needs a more formal definition of sampling density
-  if(previous==nullptr){
+  if(parent==nullptr){
     return N/((double)si_->getSpaceMeasure());
   }else{
     return N/((double)si_->getSpaceMeasure());
-    //return N/(previous->GetGraphLength()*C1->getSpaceMeasure());
+    //return N/(parent->GetGraphLength()*C1->getSpaceMeasure());
   }
 }
 
@@ -700,7 +704,7 @@ double Quotient::GetGraphLength(){
 namespace ompl{
   namespace geometric{
     std::ostream& operator<< (std::ostream& out, const Quotient& qtnt){
-      if(qtnt.previous == nullptr){
+      if(qtnt.parent == nullptr){
         out << "M0: ";
         if( qtnt.M1->getStateSpace()->getType() == ob::STATE_SPACE_SE2 ){
           out << "SE(2)" << std::endl;

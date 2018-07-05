@@ -7,6 +7,9 @@
 #include "planner/strategy/quotient/qmp_connect.h"
 #include "planner/strategy/quotient/qmp_connect_fast.h"
 #include "planner/strategy/quotient/qmp.h"
+#include "planner/strategy/quotientchart/multichart.h"
+#include "planner/strategy/quotientchart/quotient_chart.h"
+#include "planner/strategy/quotientchart/qcp.h"
 #include "planner/strategy/ompl/rrt_unidirectional.h"
 #include "planner/strategy/ompl/rrt_unidirectional_cover.h"
 #include "planner/strategy/ompl/rrt_bidirectional.h"
@@ -147,6 +150,10 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     typedef og::MultiQuotient<og::QMP> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMP");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="hierarchy:qcp"){
+    typedef og::MultiChart<og::QCP> MultiChart;
+    planner = std::make_shared<MultiChart>(si_vec, "QCP");
+    static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);

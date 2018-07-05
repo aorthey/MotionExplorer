@@ -22,7 +22,7 @@ namespace ompl
     class RRTBidirectional : public Quotient
     {
     public:
-        RRTBidirectional(const base::SpaceInformationPtr &si, Quotient *previous_ = nullptr);
+        RRTBidirectional(const base::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
         ~RRTBidirectional();
 
         void getPlannerData(base::PlannerData &data) const override;

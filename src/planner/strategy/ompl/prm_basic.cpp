@@ -27,8 +27,8 @@ namespace ompl
     static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
   }
 }
-PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si, Quotient *previous_)
-  : Quotient(si, previous_)
+PRMBasic::PRMBasic(const ob::SpaceInformationPtr &si, Quotient *parent_)
+  : Quotient(si, parent_)
   , stateProperty_(boost::get(vertex_state_t(), g_))
   , totalConnectionAttemptsProperty_(boost::get(vertex_total_connection_attempts_t(), g_))
   , successfulConnectionAttemptsProperty_(boost::get(vertex_successful_connection_attempts_t(), g_))

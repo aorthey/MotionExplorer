@@ -9,8 +9,8 @@ using namespace ompl::geometric;
 using namespace ompl::base;
 using namespace og;
 
-RRTBidirectional::RRTBidirectional(const base::SpaceInformationPtr &si, Quotient *previous_) : 
-  Quotient(si, previous_)
+RRTBidirectional::RRTBidirectional(const base::SpaceInformationPtr &si, Quotient *parent_) : 
+  Quotient(si, parent_)
 {
   setName("RRTBidirectional");
   specs_.recognizedGoal = base::GOAL_SAMPLEABLE_REGION;

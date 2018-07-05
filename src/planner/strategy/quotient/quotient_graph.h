@@ -86,7 +86,7 @@ namespace ompl
 
       public:
 
-        QuotientGraph(const ob::SpaceInformationPtr &si, Quotient *previous = nullptr);
+        QuotientGraph(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
         ~QuotientGraph();
 
         virtual uint GetNumberOfVertices() override;
@@ -139,10 +139,10 @@ namespace ompl
 
         RoadmapNeighbors nn_;
 
-        std::map<Vertex, VertexRank> rank;
-        std::map<Vertex, Vertex> parent;
+        std::map<Vertex, VertexRank> vrank;
+        std::map<Vertex, Vertex> vparent;
         boost::disjoint_sets<boost::associative_property_map<std::map<Vertex, VertexRank> >, boost::associative_property_map<std::map<Vertex, Vertex> > > 
-          disjointSets_{boost::make_assoc_property_map(rank), boost::make_assoc_property_map(parent)};
+          disjointSets_{boost::make_assoc_property_map(vrank), boost::make_assoc_property_map(vparent)};
 
         ConnectionStrategy connectionStrategy_;
 

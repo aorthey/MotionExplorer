@@ -25,7 +25,7 @@ namespace ompl
     {
     public:
 
-      RRTUnidirectional(const ob::SpaceInformationPtr &si, Quotient *previous = nullptr);
+      RRTUnidirectional(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~RRTUnidirectional(void);
       base::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override;
       void clear(void) override;

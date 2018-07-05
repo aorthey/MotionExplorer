@@ -13,6 +13,9 @@ PlannerDataVertexAnnotated::PlannerDataVertexAnnotated (const PlannerDataVertexA
   max_level = rhs.GetMaxLevel();
   component = rhs.GetComponent();
   openset = rhs.GetOpenSet();
+  path_class = rhs.GetPathClass();
+  max_path_class = rhs.GetMaxPathClass();
+  path = rhs.GetPath();
 }
 
 ob::PlannerDataVertex *PlannerDataVertexAnnotated::clone() const 
@@ -20,6 +23,15 @@ ob::PlannerDataVertex *PlannerDataVertexAnnotated::clone() const
   return new PlannerDataVertexAnnotated(*this);
 }
 
+//##############################################################################
+void PlannerDataVertexAnnotated::SetPath(std::vector<int> path_)
+{
+  path = path_;
+}
+std::vector<int> PlannerDataVertexAnnotated::GetPath() const
+{
+  return path;
+}
 //##############################################################################
 cover::OpenSet* PlannerDataVertexAnnotated::GetOpenSet() const
 {

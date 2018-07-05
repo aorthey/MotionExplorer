@@ -1,4 +1,4 @@
-#include "qmp.h"
+#include "qcp.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
 #include <ompl/datastructures/PDF.h>
@@ -9,22 +9,25 @@
 #include <boost/foreach.hpp>
 #include <boost/graph/graphviz.hpp>
 
+#include <boost/random/linear_congruential.hpp>
+#include <boost/random/variate_generator.hpp>
+
 using namespace og;
 using namespace ob;
 #define foreach BOOST_FOREACH
 
-QMP::QMP(const ob::SpaceInformationPtr &si, Quotient *parent_ ):
-  og::QuotientGraph(si, parent_)
+QCP::QCP(const ob::SpaceInformationPtr &si, QuotientChart *parent_ ):
+  BaseT(si, parent_)
 {
-  setName("QMP"+std::to_string(id));
+  setName("QCP"+std::to_string(id));
 }
 
-QMP::~QMP()
+QCP::~QCP()
 {
   samplesOnShortestPath = 0;
 }
 
-bool QMP::SampleGraph(ob::State *q_random_graph)
+bool QCP::SampleGraph(ob::State *q_random_graph)
 {
   //PDF<Edge> pdf = GetEdgePDF();
   //Edge e = pdf.sample(rng_.uniform01());
@@ -65,7 +68,7 @@ bool QMP::SampleGraph(ob::State *q_random_graph)
   return true;
 }
 
-ompl::PDF<og::QuotientGraph::Edge> QMP::GetEdgePDF()
+ompl::PDF<og::QuotientChart::Edge> QCP::GetEdgePDF()
 {
   PDF<Edge> pdf;
   double t = rng_.uniform01();

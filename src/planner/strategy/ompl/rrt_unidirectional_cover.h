@@ -19,7 +19,7 @@ namespace ompl
     class RRTUnidirectionalCover : public RRTUnidirectional
     {
     public:
-      RRTUnidirectionalCover(const ob::SpaceInformationPtr &si, Quotient *previous = nullptr);
+      RRTUnidirectionalCover(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
 
       ~RRTUnidirectionalCover(void);
 

@@ -13,14 +13,14 @@ MultiQuotient<T,Tlast>::MultiQuotient(std::vector<ob::SpaceInformationPtr> &si_v
 {
   T::resetCounter();
   for(uint k = 0; k < si_vec.size(); k++){
-    og::Quotient* previous = nullptr;
-    if(k>0) previous = quotientSpaces.back();
+    og::Quotient* parent = nullptr;
+    if(k>0) parent = quotientSpaces.back();
 
     if(k>0 && k>=si_vec.size()-1){
-      Tlast* ss = new Tlast(si_vec.at(k), previous);
+      Tlast* ss = new Tlast(si_vec.at(k), parent);
       quotientSpaces.push_back(ss);
     }else{
-      T* ss = new T(si_vec.at(k), previous);
+      T* ss = new T(si_vec.at(k), parent);
       quotientSpaces.push_back(ss);
     }
   }

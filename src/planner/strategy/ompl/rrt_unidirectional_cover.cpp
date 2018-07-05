@@ -4,7 +4,7 @@
 
 using namespace ompl::geometric;
 
-RRTUnidirectionalCover::RRTUnidirectionalCover(const base::SpaceInformationPtr &si, og::Quotient *previous ): RRTUnidirectional(si, previous)
+RRTUnidirectionalCover::RRTUnidirectionalCover(const base::SpaceInformationPtr &si, og::Quotient *parent ): RRTUnidirectional(si, parent)
 {
   setName("RRTUniCover");
 }
@@ -47,7 +47,7 @@ void RRTUnidirectionalCover::Sample(RRTUnidirectional::Configuration *q)
 
   while(!found){
     attempts++;
-    if(previous == nullptr){
+    if(parent == nullptr){
       if(!hasSolution && rng_.uniform01() < goalBias_){
         goal->sampleGoal(q->state);
         found = true;
@@ -59,12 +59,12 @@ void RRTUnidirectionalCover::Sample(RRTUnidirectional::Configuration *q)
         goal->sampleGoal(q->state);
         found = true;
       }else{
-        ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
+        ob::SpaceInformationPtr M0 = parent->getSpaceInformation();
         base::State *s_C1 = C1->allocState();
         base::State *s_M0 = M0->allocState();
 
         C1_sampler->sampleUniform(s_C1);
-        previous->SampleGraph(s_M0);
+        parent->SampleGraph(s_M0);
         mergeStates(s_M0, s_C1, q->state);
 
         C1->freeState(s_C1);

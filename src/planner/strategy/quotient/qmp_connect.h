@@ -17,7 +17,7 @@ namespace ompl
         typedef og::QMP BaseT;
       public:
 
-        QMPConnect(const ob::SpaceInformationPtr &si, Quotient *previous_);
+        QMPConnect(const ob::SpaceInformationPtr &si, Quotient *parent_);
 
         ~QMPConnect() override;
 

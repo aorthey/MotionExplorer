@@ -35,7 +35,7 @@ namespace ompl
     class Quotient: public ob::Planner
     {
       public:
-        Quotient(const ob::SpaceInformationPtr &si, Quotient *previous_ = nullptr);
+        Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
         virtual ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override;
 
         virtual bool Sample(ob::State *q_random);
@@ -58,6 +58,8 @@ namespace ompl
         const ob::SpaceInformationPtr &getC1() const;
         bool SampleC1(ob::State *s);
         void mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1) const;
+
+        Quotient* GetParent() const;
 
         double GetGraphLength();
         virtual void clear() override;
@@ -87,7 +89,7 @@ namespace ompl
 
         double graphLength{0.0};
         uint totalNumberOfSamples{0};
-        Quotient *previous{nullptr};
+        Quotient *parent{nullptr};
         bool hasSolution{false};
 
     };

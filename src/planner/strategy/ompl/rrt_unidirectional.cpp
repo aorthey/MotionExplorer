@@ -5,7 +5,7 @@
 
 using namespace ompl::geometric;
 
-RRTUnidirectional::RRTUnidirectional(const base::SpaceInformationPtr &si, Quotient *previous ): og::Quotient(si, previous)
+RRTUnidirectional::RRTUnidirectional(const base::SpaceInformationPtr &si, Quotient *parent ): og::Quotient(si, parent)
 {
   deltaCoverPenetration_ = 0.05;
   goalBias_ = 0.05;
@@ -24,7 +24,7 @@ double RRTUnidirectional::Distance(ob::State *s_lhs, ob::State *s_rhs){
 
 void RRTUnidirectional::Sample(Configuration *q_random){
   totalNumberOfSamples++;
-  if(previous == nullptr){
+  if(parent == nullptr){
     if(!hasSolution && rng_.uniform01() < goalBias_){
       goal->sampleGoal(q_random->state);
     }else{
@@ -34,12 +34,12 @@ void RRTUnidirectional::Sample(Configuration *q_random){
     if(!hasSolution && rng_.uniform01() < goalBias_){
       goal->sampleGoal(q_random->state);
     }else{
-      ob::SpaceInformationPtr M0 = previous->getSpaceInformation();
+      ob::SpaceInformationPtr M0 = parent->getSpaceInformation();
       base::State *s_C1 = C1->allocState();
       base::State *s_M0 = M0->allocState();
 
       C1_sampler->sampleUniform(s_C1);
-      previous->SampleGraph(s_M0);
+      parent->SampleGraph(s_M0);
       mergeStates(s_M0, s_C1, q_random->state);
 
       C1->freeState(s_C1);
@@ -322,9 +322,9 @@ void RRTUnidirectional::Grow(double t)
   Configuration *q_near = Nearest(q_random);
   Configuration *q_new = Connect(q_near, q_random);
 
-  if( previous!=nullptr && q_new != nullptr){
-    if(static_cast<og::RRTUnidirectional*>(previous)->lastSampled!=nullptr){
-      static_cast<og::RRTUnidirectional*>(previous)->lastSampled->successfulSamples++;
+  if( parent!=nullptr && q_new != nullptr){
+    if(static_cast<og::RRTUnidirectional*>(parent)->lastSampled!=nullptr){
+      static_cast<og::RRTUnidirectional*>(parent)->lastSampled->successfulSamples++;
     }
   }
 
