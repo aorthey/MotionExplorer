@@ -194,7 +194,7 @@ void MotionPlanner::Expand(){
   if(current_level<Nmax-1){
     if(hierarchy->HasChildren(current_path)){
       current_level++;
-      current_level_node=0;
+      current_level_node=hierarchy->NumberChildren(current_path)-1;
       current_path.push_back(current_level_node);
     }
   }

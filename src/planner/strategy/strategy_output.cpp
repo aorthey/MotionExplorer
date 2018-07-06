@@ -130,6 +130,11 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
       RoadmapPtr roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.back());
       std::vector<int> path;
       hierarchy->AddNode( roadmap_k, path);
+      if(current->children.size()>0)
+      {
+        std::cout << "ERROR: tried to add unannotated vertices with multiple layers." << std::endl;
+        exit(0);
+      }
       std::cout << "added " << pdi->numVertices() << " unannotated vertices." << std::endl;
     }else{
       std::vector<int> path = v->GetPath();

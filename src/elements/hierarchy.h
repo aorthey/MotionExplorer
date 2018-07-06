@@ -31,8 +31,9 @@ class Hierarchy{
     void AddRootNode(T content_);
     void AddNode( T content, std::vector<int> path);
     void UpdateNode( T content, std::vector<int> path);
-    bool NodeExists( std::vector<int> path);
-    bool HasChildren( std::vector<int> path);
+    bool NodeExists( const std::vector<int> &path);
+    bool HasChildren( const std::vector<int> &path);
+    uint NumberChildren( const std::vector<int> &path);
 
     void DeleteNode( std::vector<int> path );
     void DeleteAllNodes();

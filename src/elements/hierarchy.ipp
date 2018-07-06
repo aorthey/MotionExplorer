@@ -85,7 +85,7 @@ template <class T>
 void Hierarchy<T>::Print(){
   //just the meta information
   std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Hierarchical Path Tree " << std::endl;
+  std::cout << "Hierarchical Tree " << std::endl;
   std::cout << std::string(80, '-') << std::endl;
   std::cout << " levels       : " << NumberLevels() << std::endl;
   std::cout << std::endl;
@@ -121,10 +121,15 @@ void Hierarchy<T>::DeleteNode( std::vector<int> path )
 }
 
 template <class T>
-bool Hierarchy<T>::HasChildren( std::vector<int> path)
+bool Hierarchy<T>::HasChildren( const std::vector<int> &path)
+{
+  return (NumberChildren(path)>0);
+}
+template<class T> 
+uint Hierarchy<T>::NumberChildren( const std::vector<int> &path)
 {
   Node<T>* node = GetNode( path );
-  return (node->children.size()>0);
+  return node->children.size();
 }
 
 template <class T>
@@ -166,7 +171,7 @@ void Hierarchy<T>::UpdateNode( T content_, std::vector<int> nodes){
   current->content = content_;
 }
 template<class T> 
-bool Hierarchy<T>::NodeExists( std::vector<int> path)
+bool Hierarchy<T>::NodeExists( const std::vector<int> &path)
 {
   if(path.empty() && root!=nullptr) return true;
 
@@ -201,7 +206,7 @@ Node<T>* Hierarchy<T>::GetNode( std::vector<int> path ){
 
   for(uint k = 0; k < path.size(); k++){
     if(path.at(k) >= (int)current->children.size()){
-      std::cout << "node " << path.at(k) << " does not exists on level " << k+1 << " in hierarchical path tree" << std::endl;
+      std::cout << "node " << path.at(k) << " does not exists on level " << k+1 << " in hierarchical tree" << std::endl;
       std::cout << "input : ";
       for(uint j = 0; j < path.size(); j++){
         std::cout << path.at(j) << " ";
