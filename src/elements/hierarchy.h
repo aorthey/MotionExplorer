@@ -29,11 +29,14 @@ class Hierarchy{
     void AddLevel( uint inner_idx, uint outer_idx, Config qi, Config qg );
 
     void AddRootNode(T content_);
-    //void AddNode( T content_ );
     void AddNode( T content, std::vector<int> path);
     void UpdateNode( T content, std::vector<int> path);
+    bool NodeExists( std::vector<int> path);
+    bool HasChildren( std::vector<int> path);
+
     void DeleteNode( std::vector<int> path );
     void DeleteAllNodes();
+    void DeleteAllChildNodes( std::vector<int> path );
 
     Node<T>* GetRootNode();
     T GetRootNodeContent();
@@ -44,7 +47,7 @@ class Hierarchy{
 
   protected:
     //tree root
-    Node<T> *root;
+    Node<T> *root{nullptr};
 
     //meta information about tree
     ob::SpaceInformationPtr si;

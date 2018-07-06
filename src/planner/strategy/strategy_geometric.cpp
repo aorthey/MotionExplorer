@@ -212,7 +212,6 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     output.max_planner_time = max_planning_time;
 
     //###########################################################################
-
     ob::PlannerDataPtr pd( new ob::PlannerData(si_vec.back()) );
 
     if(util::StartsWith(algorithm,"hierarchy")){

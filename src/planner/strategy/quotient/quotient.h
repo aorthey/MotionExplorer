@@ -40,15 +40,15 @@ namespace ompl
         virtual ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override;
 
         virtual bool Sample(ob::State *q_random);
-        virtual bool SampleGraph(ob::State *q_random);
 
         virtual void Init() = 0;
         virtual void Grow(double t) = 0;
         virtual void CheckForSolution(ob::PathPtr &solution) = 0;
+        virtual bool SampleGraph(ob::State *q_random) = 0;
 
         virtual double GetSamplingDensity();
-        virtual uint GetNumberOfVertices();
-        virtual uint GetNumberOfEdges();
+        virtual uint GetNumberOfVertices() const;
+        virtual uint GetNumberOfEdges() const;
 
         virtual bool HasSolution();
         virtual uint GetNumberOfSampledVertices();

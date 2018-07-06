@@ -17,23 +17,26 @@ namespace ompl
         virtual void Grow(double t);
         bool FoundNewPath();
 
-        double GetImportance(); 
+        double GetImportance() const;
         void SetImportance(double); 
-        uint GetLevel();
+        uint GetLevel() const;
         void SetLevel(uint);
-        uint GetHorizontalIndex();
+        uint GetHorizontalIndex() const;
+        uint GetNumberOfSiblings() const;
         void SetHorizontalIndex(uint);
-        virtual void getPlannerData(ob::PlannerData &data) const override;
+        uint GetNumberOfPaths() const;
 
         void AddSibling(QuotientChart *sibling_);
+        void SetChild(QuotientChart *child_);
 
         //@brief: assume that there are K different solution paths on the graph. 
         //Extract the k-th solution path, plus all surrounding vertices.
         //"Surrounding" and "different" are implementation specific, for example
         //they could be "all visible vertices from path" and "not homotopic".
         //This is left for subclasses to implement.
-        //Graph GetPathSubgraph(uint k); 
-        void SetGraph( Graph G_ );
+        Graph GetPathSubgraph(uint k); 
+        void SetGraph( Graph G_, QuotientChart *sibling);
+        virtual void getPlannerData(ob::PlannerData &data) const override;
 
 
       private:
@@ -47,6 +50,7 @@ namespace ompl
         bool local_chart{false}; //local: a refinement chart around a given path, global: a chart exploring the whole quotient-space
 
         std::vector<QuotientGraph*> siblings;
+        QuotientGraph *child{nullptr}; //singleton!
     };
   }
 }

@@ -2,16 +2,19 @@
 
 #include "quotient.h"
 #include "planner/cspace/cover/open_set.h"
+#include <stack>
 #include <ompl/geometric/planners/PlannerIncludes.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <ompl/base/Cost.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
+#include <KrisLibrary/math/infnan.h> //dInf, fInf, IsNaN(x)
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/pending/disjoint_sets.hpp>
 #include <boost/property_map/property_map.hpp>
-#include <stack>
-#include <KrisLibrary/math/infnan.h> //dInf, fInf, IsNaN(x)
+#include <boost/graph/random.hpp> 
+#include <boost/random/linear_congruential.hpp>
+#include <boost/random/variate_generator.hpp>
 using Math::dInf;
 
 namespace ob = ompl::base;
@@ -36,6 +39,19 @@ namespace ompl
         class VertexInternalState{
           public:
             VertexInternalState(){};
+            VertexInternalState(const VertexInternalState &vis)
+            {
+              //state = si_->cloneState(vis.state);
+              state = vis.state;
+              total_connection_attempts = vis.total_connection_attempts;
+              successful_connection_attempts = vis.successful_connection_attempts;
+              on_shortest_path = vis.on_shortest_path;
+              associated_target = vis.associated_target;
+              associated_source = vis.associated_source;
+              associated_t = vis.associated_t;
+              open_neighborhood_distance = vis.open_neighborhood_distance;
+              open_neighborhood = vis.open_neighborhood;
+            }
             ob::State *state{nullptr};
             uint total_connection_attempts{0};
             uint successful_connection_attempts{0};
@@ -49,6 +65,7 @@ namespace ompl
 
         class EdgeInternalState{
           public:
+            EdgeInternalState(){};
             EdgeInternalState(ob::Cost cost_): cost(cost_), original_cost(cost_)
             {};
             void setWeight(double d){
@@ -63,7 +80,7 @@ namespace ompl
           private:
             ob::Cost cost{+dInf};
             ob::Cost original_cost{+dInf};
-            bool isSufficient;
+            bool isSufficient{false};
         };
 
         typedef boost::adjacency_list<
@@ -89,13 +106,14 @@ namespace ompl
         QuotientGraph(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
         ~QuotientGraph();
 
-        virtual uint GetNumberOfVertices() override;
-        virtual uint GetNumberOfEdges() override;
+        virtual uint GetNumberOfVertices() const override;
+        virtual uint GetNumberOfEdges() const override;
         ob::PathPtr GetShortestPath();
         ob::PathPtr GetSolutionPath();
 
         virtual void Grow(double t);
         virtual void Init() override;
+        virtual bool SampleGraph(ob::State *q_random_graph) override;
 
         template <template <typename T> class NN>
         void setNearestNeighbors();
@@ -108,19 +126,24 @@ namespace ompl
         void clearQuery();
         virtual void ClearVertices();
 
-        ob::OptimizationObjectivePtr opt_;
-        std::vector<Vertex> startM_;
-        std::vector<Vertex> goalM_;
-        std::vector<Vertex> shortestVertexPath_;
 
         virtual void uniteComponents(Vertex m1, Vertex m2);
         bool sameComponent(Vertex m1, Vertex m2);
 
         bool InsideStartComponent(Vertex v);
         bool InsideStartComponent(Edge e);
-        ob::Cost bestCost_{+dInf};
 
         virtual void CheckForSolution(ob::PathPtr &solution) override;
+
+        std::map<Vertex, VertexRank> vrank;
+        std::map<Vertex, Vertex> vparent;
+        boost::disjoint_sets<boost::associative_property_map<std::map<Vertex, VertexRank> >, boost::associative_property_map<std::map<Vertex, Vertex> > > 
+          disjointSets_{boost::make_assoc_property_map(vrank), boost::make_assoc_property_map(vparent)};
+        ob::Cost bestCost_{+dInf};
+        ob::OptimizationObjectivePtr opt_;
+        std::vector<Vertex> startM_;
+        std::vector<Vertex> goalM_;
+        std::vector<Vertex> shortestVertexPath_;
 
     protected:
 
@@ -139,14 +162,12 @@ namespace ompl
 
         RoadmapNeighbors nn_;
 
-        std::map<Vertex, VertexRank> vrank;
-        std::map<Vertex, Vertex> vparent;
-        boost::disjoint_sets<boost::associative_property_map<std::map<Vertex, VertexRank> >, boost::associative_property_map<std::map<Vertex, Vertex> > > 
-          disjointSets_{boost::make_assoc_property_map(vrank), boost::make_assoc_property_map(vparent)};
-
         ConnectionStrategy connectionStrategy_;
 
         RNG rng_;
+        typedef boost::minstd_rand RNGType;
+        RNGType rng_boost;
+
         bool addedNewSolution_{false};
         unsigned long int iterations_{0};
 

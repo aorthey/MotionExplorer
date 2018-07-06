@@ -53,8 +53,8 @@ namespace ompl
         void setup() override;
         virtual void CheckForSolution(ob::PathPtr &solution) override;
 
-        virtual uint GetNumberOfVertices() override;
-        virtual uint GetNumberOfEdges() override;
+        virtual uint GetNumberOfVertices() const override;
+        virtual uint GetNumberOfEdges() const override;
 
     protected:
         class Configuration

@@ -1,9 +1,6 @@
 #pragma once
 #include "quotient_graph.h"
 #include <ompl/datastructures/PDF.h>
-#include <boost/graph/random.hpp> 
-#include <boost/random/linear_congruential.hpp>
-#include <boost/random/variate_generator.hpp>
 
 
 namespace ob = ompl::base;
@@ -27,8 +24,6 @@ namespace ompl
         virtual ~QMP() override;
 
       protected:
-        typedef boost::minstd_rand RNGType;
-        RNGType rng;
 
         double epsilon{0.05}; //graph thickening
         double percentageSamplesOnShortestPath{0.8};

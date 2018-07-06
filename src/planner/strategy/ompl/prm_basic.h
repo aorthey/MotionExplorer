@@ -130,8 +130,8 @@ namespace ompl
         PRMBasic(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
         ~PRMBasic();
 
-        virtual uint GetNumberOfVertices() override;
-        virtual uint GetNumberOfEdges() override;
+        virtual uint GetNumberOfVertices() const override;
+        virtual uint GetNumberOfEdges() const override;
         ob::PathPtr GetShortestPath();
         ob::PathPtr GetSolutionPath();
 

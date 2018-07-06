@@ -253,11 +253,11 @@ ob::PathPtr QuotientGraph::GetShortestPath(){
   return GetSolutionPath();
 }
 
-uint QuotientGraph::GetNumberOfVertices(){
+uint QuotientGraph::GetNumberOfVertices() const{
   return num_vertices(G);
 }
 
-uint QuotientGraph::GetNumberOfEdges(){
+uint QuotientGraph::GetNumberOfEdges() const{
   return num_edges(G);
 }
 
@@ -448,16 +448,21 @@ void QuotientGraph::getPlannerData(ob::PlannerData &data) const
     data.addGoalVertex(pgoal);
   }
 
+  std::cout << "vertices " << GetNumberOfVertices() << " edges " << GetNumberOfEdges() << std::endl;
+  uint ctr = 0;
   foreach (const Edge e, boost::edges(G))
   {
     const Vertex v1 = boost::source(e, G);
     const Vertex v2 = boost::target(e, G);
+
     PlannerDataVertexAnnotated p1(G[v1].state);
     PlannerDataVertexAnnotated p2(G[v2].state);
+
     uint vi1 = data.addVertex(p1);
     uint vi2 = data.addVertex(p2);
 
     data.addEdge(p1,p2);
+    ctr++;
 
     uint v1Component = const_cast<QuotientGraph *>(this)->disjointSets_.find_set(v1);
     uint v2Component = const_cast<QuotientGraph *>(this)->disjointSets_.find_set(v2);
@@ -474,5 +479,23 @@ void QuotientGraph::getPlannerData(ob::PlannerData &data) const
       v2a.SetComponent(2);
     }
   }
+}
+bool QuotientGraph::SampleGraph(ob::State *q_random_graph)
+{
+  Edge e = boost::random_edge(G, rng_boost);
+  while(!sameComponent(boost::source(e, G), startM_.at(0)))
+  {
+    e = boost::random_edge(G, rng_boost);
+  }
+
+  double s = rng_.uniform01();
+
+  const Vertex v1 = boost::source(e, G);
+  const Vertex v2 = boost::target(e, G);
+  const ob::State *from = G[v1].state;
+  const ob::State *to = G[v2].state;
+
+  M1->getStateSpace()->interpolate(from, to, s, q_random_graph);
+  return true;
 }
 

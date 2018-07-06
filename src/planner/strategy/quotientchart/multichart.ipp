@@ -88,13 +88,21 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
   std::priority_queue<og::QuotientChart*, std::vector<og::QuotientChart*>, decltype(cmp)> Q(cmp);
 
   //ompl::time::point t_start = ompl::time::now();
-  bool found_path_on_last_level = false;
 
   base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
-                                 { return ptc || foundKLevelSolution; });
+                                 { return ptc || found_path_on_last_level; });
 
   root->Init();
   Q.push(root);
+
+  //the leaves contain the direction in which we like to expand the tree,
+  //non-leave nodes are only used for refinement of a specific leave, iff they happen to lie along the path (inside the
+  //tree) from the root node towards the particular leave.
+  //Put another way, if we grow a leave node quotient chart, then all its
+  //parents will be refined (in that way we can make sure that the algorithm is
+  //complete)
+  //Qleaves.push_back(root);
+
   og::QuotientChart* current_node = root;
 
   //each chart has an associated importance weight. If we operate on a certain
@@ -107,29 +115,58 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
     Q.pop();
     jChart->Grow(T_GROW);
 
+    uint k = current_node->GetLevel();
+    //std::cout << "current level: " << k << "/" << levels-1 << " has " << current_node->GetNumberOfVertices() << " vertices." << std::endl;
+
     if(current_node->FoundNewPath()){
-      if(current_node->GetLevel() == levels-1){
+      std::cout << "current level: " << k << "/" << levels-1 << " has " << current_node->GetNumberOfVertices() << " vertices." << std::endl;
+      if(k == levels-1){
+        std::cout << "found path on level " << k << std::endl;
         found_path_on_last_level = true;
+        Q.push(jChart);
       }else{
         //not yet reached maximal level. create a new sibling chart (containing
         //the solution path plus associated vertices), and create
         //a child of the sibling (the nullspace of the solution path plus its
         //associated vertices on the next quotientchart).
-        std::cout << "found path on level " << current_node->GetLevel() << std::endl;
+        std::cout << "found path on level " << k << " (vertices: " << current_node->GetNumberOfVertices() << ")" << std::endl;
         std::cout << "Trying to extract path subgraph" << std::endl;
-        og::QuotientChart *local = new og::QuotientChart(si_vec.at(current_node->GetLevel()), 
-            static_cast<og::QuotientChart*>(current_node->GetParent()));
-        //Graph G = current_node->GetPathSubgraph( current_node->GetNumberOfPaths() - 1 ); //get last path
-        //local->SetGraph(G);
+        //#####################################################################
+        //Local Chart (containing path plus neighborhood)
+        //#####################################################################
 
-        og::QuotientChart *global = new og::QuotientChart(si_vec.at(current_node->GetLevel()+1), local);
+        og::QuotientChart *local = new og::QuotientChart(si_vec.at(k), dynamic_cast<og::QuotientChart*>(current_node->GetParent()));
+        local->setProblemDefinition(pdef_vec.at(k));
+        local->setup();
+        local->SetLevel(k);
+        local->SetHorizontalIndex(current_node->GetNumberOfSiblings()+1);
+        og::QuotientGraph::Graph Gsub = current_node->GetPathSubgraph( current_node->GetNumberOfPaths() - 1 ); //get last path
+        local->SetGraph(Gsub, current_node);
+
+        //#####################################################################
+        //Global Chart (contains the whole quotient pointed to by the local chart)
+        //#####################################################################
+        og::QuotientChart *global = new og::QuotientChart(si_vec.at(k+1), local);
+        global->setProblemDefinition(pdef_vec.at(k+1));
+        global->setup();
+        global->SetLevel(k+1);
+
+        local->SetChild(global); //need to be able to traverse down the tree
+
         current_node->AddSibling(local);
+        //DFS approach: forget about the current node, just take its sibling and
+        //work on that pathway. We can backtrack later by going through the
+        //parent/sibling pointers
+        while( !Q.empty() ) Q.pop();
         Q.push(global);
-        exit(0);
+        //Qleaves.push_back(global);
+        //note that Q contains only the latest added node, while Qleaves
+        //contains all. 
+        current_node = global;
       }
+    }else{
+      Q.push(jChart);
     }
-
-    Q.push(jChart);
   }
   if(found_path_on_last_level)
   {

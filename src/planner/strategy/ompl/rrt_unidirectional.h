@@ -36,8 +36,8 @@ namespace ompl
       void setRange(double distance);
       void freeMemory();
 
-      virtual uint GetNumberOfVertices() override;
-      virtual uint GetNumberOfEdges() override;
+      virtual uint GetNumberOfVertices() const override;
+      virtual uint GetNumberOfEdges() const override;
       virtual void Grow(double t=0) override;
       virtual void Init() override;
       virtual bool HasSolution() override;

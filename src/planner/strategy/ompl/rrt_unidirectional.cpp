@@ -58,12 +58,12 @@ double RRTUnidirectional::getRange() const
   return maxDistance_;
 }
 
-uint RRTUnidirectional::GetNumberOfVertices()
+uint RRTUnidirectional::GetNumberOfVertices() const
 {
   return G_->size();
 }
 
-uint RRTUnidirectional::GetNumberOfEdges()
+uint RRTUnidirectional::GetNumberOfEdges() const
 {
   std::vector<Configuration *> configs;
   if (G_){

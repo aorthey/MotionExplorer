@@ -83,11 +83,11 @@ uint Quotient::GetNumberOfSampledVertices()
 {
   return totalNumberOfSamples;
 }
-uint Quotient::GetNumberOfVertices()
+uint Quotient::GetNumberOfVertices() const
 {
   return 0;
 }
-uint Quotient::GetNumberOfEdges()
+uint Quotient::GetNumberOfEdges() const
 {
   return 0;
 }
@@ -676,12 +676,6 @@ bool Quotient::Sample(ob::State *q_random)
 
     return M1->isValid(q_random);
   }
-}
-
-bool Quotient::SampleGraph(ob::State *q_random)
-{
-  std::cout << "SampleGraph: NYI" << std::endl;
-  exit(0);
 }
 
 double Quotient::GetSamplingDensity(){

@@ -192,9 +192,11 @@ void MotionPlanner::Expand(){
 
   uint Nmax=hierarchy->NumberLevels();
   if(current_level<Nmax-1){
-    current_level++;
-    current_level_node=0;
-    current_path.push_back(current_level_node);
+    if(hierarchy->HasChildren(current_path)){
+      current_level++;
+      current_level_node=0;
+      current_path.push_back(current_level_node);
+    }
   }
   UpdateHierarchy();
 }
@@ -227,7 +229,6 @@ void MotionPlanner::Next(){
 }
 void MotionPlanner::Previous(){
   if(!active) return;
-
   uint Nmax=hierarchy->NumberNodesOnLevel(current_level);
   if(current_level_node>0) current_level_node--;
   else{

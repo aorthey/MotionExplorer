@@ -201,6 +201,7 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const
     for(uint vidx = Nvertices; vidx < data.numVertices(); vidx++){
       PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
       v.SetLevel(k);
+      v.SetPath( std::vector<int>(k));
       v.SetMaxLevel(K);
 
       const ob::State *s_V = v.getState();

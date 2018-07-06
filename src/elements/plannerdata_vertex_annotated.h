@@ -40,7 +40,8 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
 
     virtual bool operator==(const PlannerDataVertex &rhs) const override
     {
-      return state_ == rhs.getState();
+      const PlannerDataVertexAnnotated &v = static_cast<const PlannerDataVertexAnnotated&>(rhs);
+      return (state_ == v.getState() && path == v.GetPath() && level == v.GetLevel());
     }
 
     friend std::ostream& operator<< (std::ostream&, const PlannerDataVertexAnnotated&);

@@ -431,11 +431,11 @@ ob::PathPtr PRMBasic::GetShortestPath(){
   return GetSolutionPath();
 }
 
-uint PRMBasic::GetNumberOfVertices(){
+uint PRMBasic::GetNumberOfVertices() const{
   return num_vertices(g_);
 }
 
-uint PRMBasic::GetNumberOfEdges(){
+uint PRMBasic::GetNumberOfEdges() const{
   return num_edges(g_);
 }
 

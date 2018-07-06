@@ -1,5 +1,7 @@
 #include "planner/strategy/strategy_output.h"
 #include "elements/plannerdata_vertex_annotated.h"
+#include "elements/tree.h"
+#include "common.h"
 
 StrategyOutput::StrategyOutput(CSpaceOMPL *cspace_):
   cspace(cspace_)
@@ -108,31 +110,107 @@ std::vector<std::vector<Config>> StrategyOutput::GetSolutionPaths(){
   return solution_paths;
 }
 
+
+
+
+typedef Tree<ob::PlannerDataPtr> PTree;
+
+void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std::vector<CSpaceOMPL*> cspace_levels)
+{
+  //std::cout << "Current children: " << current->children.size() << std::endl;
+
+  if(current->content != nullptr)
+  {
+    ob::PlannerDataPtr pdi = current->content;
+    pdi->decoupleFromPlanner();
+
+    PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pdi->getVertex(0));
+    if(v==nullptr)
+    {
+      RoadmapPtr roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.back());
+      std::vector<int> path;
+      hierarchy->AddNode( roadmap_k, path);
+      std::cout << "added " << pdi->numVertices() << " unannotated vertices." << std::endl;
+    }else{
+      std::vector<int> path = v->GetPath();
+      uint level = v->GetLevel();
+
+      RoadmapPtr roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.at(level));
+      //std::cout << "level " << path << " : " << pdi->numVertices() << " | " << pdi->numEdges() << std::endl;
+      while(!hierarchy->NodeExists(path)){
+        std::vector<int> ppath(path.begin(), path.end()-1);
+        std::cout << "NEW node: " << path << "->" << ppath << std::endl;
+        hierarchy->AddNode( roadmap_k, ppath);
+      }
+      hierarchy->UpdateNode( roadmap_k, path);
+    }
+  }
+
+  if(current->children.size() == 0)
+  {
+    return;
+  }
+  for(uint k = 0; k < current->children.size(); k++){
+    //std::cout << "Selecting child: " << k << "/" << current->children.size()-1 << std::endl;
+    RecurseTraverseTree(current->children.at(k), hierarchy, cspace_levels);
+  }
+}
+
+
 void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, std::vector<CSpaceOMPL*> cspace_levels)
 {
-  uint N = hierarchy->NumberLevels()-1;
-  assert(N == cspace_levels.size());
+  //uint N = hierarchy->NumberLevels()-1;
+  //assert(N == cspace_levels.size());
   if(!pd){
     std::cout << "planner data not set." << std::endl;
     return;
   }
 
-  std::vector<ob::PlannerDataPtr> pd_level;
-
   PlannerDataVertexAnnotated *v0 = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(0));
 
+  PTree *root = new PTree(nullptr);
+
   if(v0==nullptr){
-    pd_level.push_back(pd);
+    root->children.push_back( new PTree(pd) );
+  // for(uint k = 0; k < N; k++){
+  //   ob::PlannerDataPtr pdi = pd_level.at(k);
+  //   pdi->decoupleFromPlanner();
+  //   std::cout << "level " << k << " : " << pdi->numVertices() << " | " << pdi->numEdges() << std::endl;
+  //   RoadmapPtr roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.at(k));
+  //   std::vector<int> path(k+1);
+  //   hierarchy->UpdateNode( roadmap_k, path);
+  // }
+
   }else{
-    //only hierarchical data is annotated
-    for(uint k = 0; k < N; k++){
-      ob::PlannerDataPtr pdi = std::make_shared<ob::PlannerData>(cspace_levels.back()->SpaceInformationPtr());
-      pd_level.push_back(pdi);
-    }
+    
+    //ob::PlannerDataPtr pd0 = std::make_shared<ob::PlannerData>(cspace_levels.back()->SpaceInformationPtr());
+    //root->children.push_back( new PTree(pd0) );
+
+    std::map<std::vector<int>, int> tree_vertices;
+
     for(uint i = 0; i < pd->numVertices(); i++){
       PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(i));
+      if(v==nullptr)
+      {
+        std::cout << "ERROR: vertex is not annotated." << std::endl;
+        exit(0);
+      }
+      std::vector<int> path = v->GetPath();
 
-      ob::PlannerDataPtr pdi = pd_level.at(v->GetLevel());
+      PTree *current = root;
+
+      for(uint k = 0; k < path.size(); k++){
+        while(current->children.size() <= (uint)path.at(k))
+        {
+          ob::PlannerDataPtr pdk = std::make_shared<ob::PlannerData>(cspace_levels.back()->SpaceInformationPtr());
+          std::cout << "Created new plannerdata: " << path << std::endl;
+          current->children.push_back( new PTree(pdk) );
+        }
+        current = current->children.at(path.at(k));
+      }
+      ob::PlannerDataPtr pdi = current->content;
+
+      tree_vertices[path]++;
 
       if(pd->isStartVertex(i)){
         pdi->addStartVertex(*v);
@@ -161,17 +239,17 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
       }
     }
   }
-  for(uint k = 0; k < N; k++){
-    //RoadmapPtr roadmap_k = std::make_shared<Roadmap>(pd_level.at(k), cspace_levels.at(k));
-    ob::PlannerDataPtr pdi = pd_level.at(k);
-    pdi->decoupleFromPlanner();
-    std::cout << "level " << k << " : " << pdi->numVertices() << " | " << pdi->numEdges() << std::endl;
-    //RoadmapPtr roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back());
-    RoadmapPtr roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.at(k));
-    std::vector<int> path(k+1);
-    hierarchy->UpdateNode( roadmap_k, path);
-  }
+  hierarchy->DeleteAllNodes();
+  hierarchy->AddRootNode( std::make_shared<Roadmap>() ); 
+
+  RecurseTraverseTree(root, hierarchy, cspace_levels);
+
+  hierarchy->Print();
+
+
 }
+
+
 
 std::ostream& operator<< (std::ostream& out, const StrategyOutput& so) 
 {

@@ -34,14 +34,13 @@ namespace ompl
       protected:
         std::vector<base::PathPtr> solutions;
 
-        og::QuotientChart* root;
+        og::QuotientChart* root{nullptr};
         std::vector<og::QuotientChart*> quotientSpaces; //only used to project lower level ob::states into the configuration space (TODO: make this more efficient)
 
         std::vector<uint> current_node;
 
-        uint levels;
-
-        bool foundKLevelSolution{false};
+        uint levels{0};
+        bool found_path_on_last_level{false};
 
         std::vector<ob::SpaceInformationPtr> si_vec;
         std::vector<ob::ProblemDefinitionPtr> pdef_vec;

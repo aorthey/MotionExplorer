@@ -45,10 +45,10 @@ bool QMP::SampleGraph(ob::State *q_random_graph)
     }
     e = pdf.sample(rng_.uniform01());
   }else{
-    e = boost::random_edge(G, rng);
+    e = boost::random_edge(G, rng_boost);
     while(!sameComponent(boost::source(e, G), startM_.at(0)))
     {
-      e = boost::random_edge(G, rng);
+      e = boost::random_edge(G, rng_boost);
     }
   }
 

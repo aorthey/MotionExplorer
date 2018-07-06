@@ -125,11 +125,11 @@
     <key>down</key>
   </hotkey>
   <hotkey>
-    <name>hierarchy_left</name>
+    <name>hierarchy_previous</name>
     <key>left</key>
   </hotkey>
   <hotkey>
-    <name>hierarchy_right</name>
+    <name>hierarchy_next</name>
     <key>right</key>
   </hotkey>
   <hotkey>

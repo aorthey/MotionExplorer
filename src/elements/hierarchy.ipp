@@ -1,4 +1,5 @@
 #include "hierarchy.h"
+#include "common.h"
 
 template <class T>
 Hierarchy<T>::Hierarchy(){root=NULL;};
@@ -111,10 +112,39 @@ T Hierarchy<T>::GetRootNodeContent(){
 }
 
 template <class T>
-void Hierarchy<T>::DeleteNode( std::vector<int> path ){
+void Hierarchy<T>::DeleteNode( std::vector<int> path )
+{
   Node<T>* node = GetNode( path );
-  //node->children.clear();
-  level_number_nodes.at(node->level+1)--;
+  node->children.clear();
+  level_number_nodes.at(node->level)--;
+  delete node;
+}
+
+template <class T>
+bool Hierarchy<T>::HasChildren( std::vector<int> path)
+{
+  Node<T>* node = GetNode( path );
+  return (node->children.size()>0);
+}
+
+template <class T>
+void Hierarchy<T>::DeleteAllChildNodes( std::vector<int> path )
+{
+  Node<T>* node = GetNode( path );
+  //std::cout << "node: " << path << std::endl;
+  for(uint k = 0; k < node->children.size(); k++){
+    path.push_back(k);
+    DeleteAllChildNodes(path);
+    path.pop_back();
+  }
+  DeleteNode(path);
+}
+
+template <class T>
+void Hierarchy<T>::DeleteAllNodes()
+{
+  std::vector<int> path;
+  DeleteAllChildNodes(path);
 }
 
 template <class T>
@@ -134,6 +164,28 @@ template <class T>
 void Hierarchy<T>::UpdateNode( T content_, std::vector<int> nodes){
   Node<T> *current = GetNode(nodes);
   current->content = content_;
+}
+template<class T> 
+bool Hierarchy<T>::NodeExists( std::vector<int> path)
+{
+  if(path.empty() && root!=nullptr) return true;
+
+  Node<T> *current = root;
+  for(uint k = 0; k < path.size(); k++){
+    if(path.at(k) >= (int)current->children.size()){
+      //std::cout << "node " << path.at(k) << " does not exists on level " << k+1 << " in hierarchical path tree" << std::endl;
+      //std::cout << "input : ";
+      //for(uint j = 0; j < path.size(); j++){
+      //  std::cout << path.at(j) << " ";
+      //}
+      //std::cout << std::endl;
+      //std::cout << "number of nodes on current level: " <<current->children.size() << std::endl;
+      //exit(0);
+      return false;
+    }
+    current = current->children.at( path.at(k) );
+  }
+  return true;
 }
 
 template <class T>
