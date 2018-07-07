@@ -60,6 +60,9 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     else active_planner = planners.size()-1;
     hierarchy_change = true;
     path = planners.at(active_planner)->GetPath();
+  }else if(cmd=="smooth_path"){
+    path = planners.at(active_planner)->GetPath();
+    if(path) path->Smooth();
   }else if(cmd=="draw_cover_single_open_set"){
     draw_cover_all_open_sets = false;
     draw_cover_active_open_set++;

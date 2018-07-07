@@ -23,9 +23,9 @@ class Roadmap{
 
     virtual void DrawGL(GUIState&);
 
-    GLDraw::GLColor cVertex{green};
-    GLDraw::GLColor cEdge{green};
-    GLDraw::GLColor cPath{magenta};
+    GLDraw::GLColor cVertex{lightgreen};
+    GLDraw::GLColor cEdge{lightgreen};
+    GLDraw::GLColor cPath{darkmagenta};
     GLDraw::GLColor cVertexOut{gray}; //a vertex not in the same component as the designated start vertex
     GLDraw::GLColor cVertexGoal{cyan}; //goal component vertex
     GLDraw::GLColor cNeighborhoodVolume{GLColor(0.1,0.8,0.1,0.2)}; //goal component vertex

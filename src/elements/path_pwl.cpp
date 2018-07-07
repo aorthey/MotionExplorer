@@ -113,7 +113,7 @@ void PathPiecewiseLinear::SendToController(SmartPointer<RobotController> control
 
 
 void PathPiecewiseLinear::Smooth(){
-  if(!path) return;
+  if(path == nullptr) return;
 
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
   std::vector<ob::State *> statesB = gpath.getStates();
@@ -362,23 +362,25 @@ void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
   glEnable(GL_LIGHTING);
   glLineWidth(1);
 }
+
 void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
 {
   Config q = Eval(t);
   Robot* robot = quotient_space->GetRobotPtr();
   GLDraw::drawRobotAtConfig(robot, q, grey);
 }
+
 void PathPiecewiseLinear::DrawGL(GUIState& state)
 {
   if(state("draw_path")){
-    if(!path) return;
-    cLine = magenta;
+    //if(path==nullptr) return;
+    cLine = cSmoothed;
     DrawGLPathPtr(path);
   }
   if(state("draw_path_unsmoothed")) 
   {
-    if(!path_raw) return;
-    cLine = green;
+    //if(path_raw==nullptr) return;
+    cLine = cUnsmoothed;
     DrawGLPathPtr(path_raw);
   }
   if(state("draw_path_sweptvolume")){

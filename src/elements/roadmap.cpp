@@ -176,9 +176,9 @@ void Roadmap::DrawShortestPath(GUIState &state)
 void Roadmap::DrawPlannerData(GUIState &state)
 {
   if(state("draw_roadmap_vertices")){
-    glPointSize(sizeVertex);
-    setColor(cVertex);
     for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
+      glPointSize(sizeVertex);
+      setColor(cVertex);
       glPushMatrix();
 
       ob::PlannerDataVertex *vd = &pd->getVertex(vidx);
@@ -192,6 +192,16 @@ void Roadmap::DrawPlannerData(GUIState &state)
           setColor(cVertexGoal);
         }else{
           setColor(cVertexOut);
+        }
+        if(pd->isStartVertex(vidx))
+        {
+          glPointSize(2*sizeVertex);
+          setColor(cVertex);
+        }
+        if(pd->isGoalVertex(vidx))
+        {
+          glPointSize(2*sizeVertex);
+          setColor(cVertexGoal);
         }
         v->DrawGL(state);
       }

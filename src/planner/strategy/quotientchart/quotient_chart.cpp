@@ -111,10 +111,12 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
   //###########################################################################
   //Get Data from this chart
   //###########################################################################
+  //if the chart is local, we need to clone new states such that we have
+  //duplicate vertices (sometimes charts are overlapping). 
   std::map<const Vertex, ob::State*> vertexToStates;
 
-  uint startComponent = 0;//const_cast<QuotientChart *>(this)->disjointSets_.find_set(startM_.at(0));
-  uint goalComponent = 1;//const_cast<QuotientChart *>(this)->disjointSets_.find_set(goalM_.at(0));
+  uint startComponent = 0;
+  uint goalComponent = 1;
   for (Vertex i : startM_)
   {
     startComponent = const_cast<QuotientChart *>(this)->disjointSets_.find_set(i);

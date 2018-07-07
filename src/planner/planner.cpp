@@ -257,6 +257,10 @@ void MotionPlanner::UpdateHierarchy(){
       viewHierarchy.PushLevel(N, robot->name);
     }
   }
+  pwl = GetPath();
+  if(pwl && input.smoothPath){
+    pwl->Smooth();
+  }
   viewHierarchy.UpdateSelectionPath( current_path );
 }
 void MotionPlanner::Print()
@@ -293,12 +297,12 @@ void MotionPlanner::DrawGLScreen(double x_, double y_){
 }
 
 PathPiecewiseLinear* MotionPlanner::GetPath(){
-  if(!active) return NULL;
+  if(!active) return nullptr;
   Rcurrent = hierarchy->GetNodeContent(current_path);
   pwl = Rcurrent->GetShortestPath();
-  if(pwl && input.smoothPath){
-    pwl->Smooth();
-  }
+  //if(pwl && input.smoothPath){
+  //  pwl->Smooth();
+  //}
   return pwl;
 }
 void MotionPlanner::DrawGL(GUIState& state){
@@ -307,6 +311,8 @@ void MotionPlanner::DrawGL(GUIState& state){
   //uint N = hierarchy->NumberNodesOnLevel(current_level);
   Rcurrent = hierarchy->GetNodeContent(current_path);
   Rcurrent->DrawGL(state);
+  if(pwl) pwl->DrawGL(state);
+
 
   uint ridx = hierarchy->GetRobotIdx(current_level);
   Robot* robot = world->robots[ridx];

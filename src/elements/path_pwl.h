@@ -37,6 +37,7 @@ class PathPiecewiseLinear
     double GetLength() const;
 
     GLColor cVertex{magenta}, cLine{magenta};
+    GLColor cSmoothed{magenta}, cUnsmoothed{red};
     double linewidth{10};
     double ptsize{10};
     virtual void DrawGLPathPtr(ob::PathPtr);
@@ -60,6 +61,6 @@ class PathPiecewiseLinear
     CSpaceOMPL *cspace{nullptr};
     CSpaceOMPL *quotient_space{nullptr};
 
-    ob::PathPtr path;
-    ob::PathPtr path_raw;
+    ob::PathPtr path{nullptr};
+    ob::PathPtr path_raw{nullptr};
 };

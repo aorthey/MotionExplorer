@@ -8,9 +8,13 @@ const GLColor blue(0,0,1,1);
 const GLColor lightred(0.8,0,0,0.5);
 const GLColor lightgreen(0,0.8,0,0.5);
 const GLColor lightblue(0,0,0.8,0.5);
+const GLColor darkred(0.5,0,0,1);
+const GLColor darkgreen(0,0.5,0,1);
+const GLColor darkblue(0,0,0.5,1);
 
 const GLColor yellow(1,1,0,0.5);
 const GLColor magenta(1,0,1,0.5);
+const GLColor darkmagenta(0.7,0,0.7,0.5);
 const GLColor cyan(0,1,1,0.5);
 
 const GLColor orange(1,0.5,0,0.5);
