@@ -208,7 +208,6 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
         while(current->children.size() <= (uint)path.at(k))
         {
           ob::PlannerDataPtr pdk = std::make_shared<ob::PlannerData>(cspace_levels.back()->SpaceInformationPtr());
-          std::cout << "Created new plannerdata: " << path << std::endl;
           current->children.push_back( new PTree(pdk) );
         }
         current = current->children.at(path.at(k));

@@ -119,9 +119,9 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
     //std::cout << "current level: " << k << "/" << levels-1 << " has " << current_node->GetNumberOfVertices() << " vertices." << std::endl;
 
     if(current_node->FoundNewPath()){
-      std::cout << "current level: " << k << "/" << levels-1 << " has " << current_node->GetNumberOfVertices() << " vertices." << std::endl;
+      //std::cout << "current level: " << k << "/" << levels-1 << " has " << current_node->GetNumberOfVertices() << " vertices." << std::endl;
       if(k == levels-1){
-        std::cout << "found path on level " << k << std::endl;
+        //std::cout << "found path on level " << k << std::endl;
         found_path_on_last_level = true;
         Q.push(jChart);
       }else{
@@ -129,8 +129,8 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
         //the solution path plus associated vertices), and create
         //a child of the sibling (the nullspace of the solution path plus its
         //associated vertices on the next quotientchart).
-        std::cout << "found path on level " << k << " (vertices: " << current_node->GetNumberOfVertices() << ")" << std::endl;
-        std::cout << "Trying to extract path subgraph" << std::endl;
+        // std::cout << "found path on level " << k << " (vertices: " << current_node->GetNumberOfVertices() << ")" << std::endl;
+        // std::cout << "Trying to extract path subgraph" << std::endl;
         //#####################################################################
         //Local Chart (containing path plus neighborhood)
         //#####################################################################

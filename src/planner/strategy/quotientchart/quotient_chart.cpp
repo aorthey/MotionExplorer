@@ -92,6 +92,7 @@ uint QuotientChart::GetNumberOfSiblings() const
 void QuotientChart::getPlannerData(ob::PlannerData &data) const
 {
   uint Nvertices = data.numVertices();
+  uint Nedges = data.numEdges();
 
   //###########################################################################
   //Get Path for this chart
@@ -143,9 +144,7 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
     data.addGoalVertex(pgoal);
   }
 
-  std::cout << "vertices " << GetNumberOfVertices() << " edges " << GetNumberOfEdges() << std::endl;
-  uint ctr = 0;
-
+  //std::cout << "vertices " << GetNumberOfVertices() << " edges " << GetNumberOfEdges() << std::endl;
 
   foreach( const Vertex v, boost::vertices(G))
   {
@@ -179,7 +178,6 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
     p2.SetPath(path);
 
     uint vi1,vi2;
-
     if(v1==startM_.at(0)){
       vi1 = data.addStartVertex(p1);
     }else{
@@ -190,10 +188,8 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
     }else{
       vi2 = data.addVertex(p2);
     }
-    //uint vi2 = data.addVertex(p2);
 
     data.addEdge(p1,p2);
-    ctr++;
 
     uint v1Component = const_cast<QuotientChart *>(this)->disjointSets_.find_set(v1);
     uint v2Component = const_cast<QuotientChart *>(this)->disjointSets_.find_set(v2);
@@ -211,20 +207,15 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
     }
   }
 
-
-  //for(uint vidx = Nvertices; vidx < data.numVertices(); vidx++)
-  //{
-  //  PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
-  //  v.SetLevel(level);
-  //  v.SetPath(path);
-  //}
   //###########################################################################
   //Get Data From all siblings
   //###########################################################################
 
   std::cout << "QuotientChart vIdx " << level << " | hIdx " << horizontal_index 
     << " | siblings " << siblings.size() << " | path " << path 
-    << " | vertices: " << data.numVertices() - Nvertices << std::endl;
+    << " | vertices " << data.numVertices() - Nvertices 
+    << " | edges " << data.numEdges() - Nedges
+    << std::endl;
 
   for(uint i = 0; i < siblings.size(); i++){
     siblings.at(i)->getPlannerData(data);

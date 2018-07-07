@@ -50,11 +50,6 @@ int ViewHierarchy::GetLevel(){
 
 void ViewHierarchy::DrawGL(){
   double height = heightPerLevel * (GetLevel()+1);
-  //double x1 = x+width_column1/3;
-  //double x2 = x+width_column1+width_column2/3;
-  double x3 = x+width_column1+width_column2+width_column3/2;
-  double y0 = y+heightPerLevel/2;
-  double node_radius = heightPerLevel/3;
 
   glDisable(GL_LIGHTING);
   glDisable(GL_DEPTH_TEST);
@@ -93,58 +88,34 @@ void ViewHierarchy::DrawGL(){
     glEnd();
   }
 
-  DrawNode(x3,y0,node_radius,0);
+
+  double xprev = x+width_column1+width_column2+width_column2;
+  double yprev = y+heightPerLevel/2;
+  double node_radius = heightPerLevel/3;
+  double node_radius_unselected = node_radius - node_radius/4;
+  double node_radius_selected = node_radius - node_radius/8;
+
+  double xstep = node_radius*2.5;
+
+  DrawNode(xprev,yprev,node_radius_selected,0);
 
   for(uint k = 0; k < level_nodes.size(); k++){
-    double yk = y+(k+1)*heightPerLevel+heightPerLevel/2;
-    double yprev = y+(k)*heightPerLevel+heightPerLevel/2;
+    double yn = y+(k+1)*heightPerLevel+heightPerLevel/2;
 
-    uint Nnodes = level_nodes.at(k);
-    uint Snode = selected_path.at(k);
+    uint nodes_on_level = level_nodes.at(k);
+    uint selected_node = selected_path.at(k);
 
-    DrawNode(x3,yk,node_radius,Snode);
-
-    DrawLineFromNodeToNode(x3,yprev,node_radius,x3,yk,node_radius);
-
-    double xll = x3 - node_radius*4.5;
-    double xl = x3 - node_radius*2.5;
-    double xr = x3 + node_radius*2.5;
-    double xrr = x3 + node_radius*4.5;
-
-    double n1= node_radius - node_radius/8;
-    double n2= node_radius - node_radius/4;
-
-    if(Nnodes>1){
-      DrawLineFromNodeToNode(x3,yprev,node_radius,xl,yk,n1);
-      DrawLineFromNodeToNode(x3,yprev,node_radius,xr,yk,n1);
-      DrawLineFromNodeToNode(x3,yprev,node_radius,xll,yk,n2);
-      DrawLineFromNodeToNode(x3,yprev,node_radius,xrr,yk,n2);
-      if(Snode>1){
-        DrawNode(xll,yk,n2,Snode-2);
-      }else{
-        DrawNode(xll,yk,n2,Nnodes-1);
-      }
-      if(Snode>0){
-        DrawNode(xl,yk,n1, Snode-1);
-      }else{
-        DrawNode(xl,yk,n1,Nnodes-1);
-        DrawNode(xll,yk,n2, Nnodes-2);
-      }
-
-      if(Snode<Nnodes-2){
-        DrawNode(xrr,yk,n2, Snode+2);
-      }else{
-        DrawNode(xrr,yk,n2, 0);
-      }
-      if(Snode<Nnodes-1){
-        DrawNode(xr,yk,n1, Snode+1);
-      }else{
-        DrawNode(xr,yk,n1, 0);
-        DrawNode(xrr,yk,n2, 1);
-      }
+    for(uint i = 0; i < nodes_on_level; i++){
+      double xn = xprev + xstep*i;
+      double r = (i==selected_node? node_radius_selected: node_radius_unselected);
+      DrawNode(xn,yn,r,i);
+      (i==selected_node? glLineWidth(10): glLineWidth(5));
+      DrawLineFromNodeToNode(xprev,yprev,r,xn,yn,r);
+      glLineWidth(5);
     }
 
-    //}
+    xprev = xprev + xstep*selected_node;
+    yprev = yn;
   }
 
   textColor.setCurrentGL();

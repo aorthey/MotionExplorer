@@ -256,12 +256,12 @@ void ForceFieldBackend::RenderScreen(){
   sim.controlSimulators[0].GetSensedVelocity(dq);
   sim.controlSimulators[0].GetActuatorTorques(T);
 
-  DrawTextVector(line_x_pos, line_y_offset, "Position   :", q);
-  line_y_offset += line_y_offset_stepsize;
-  DrawTextVector(line_x_pos, line_y_offset, "Velocity   :", dq);
-  line_y_offset += line_y_offset_stepsize;
-  DrawTextVector(line_x_pos, line_y_offset, "Cmd Torque :", T);
-  line_y_offset += line_y_offset_stepsize;
+  // DrawTextVector(line_x_pos, line_y_offset, "Position   :", q);
+  // line_y_offset += line_y_offset_stepsize;
+  // DrawTextVector(line_x_pos, line_y_offset, "Velocity   :", dq);
+  // line_y_offset += line_y_offset_stepsize;
+  // DrawTextVector(line_x_pos, line_y_offset, "Cmd Torque :", T);
+  // line_y_offset += line_y_offset_stepsize;
 
 }
 
