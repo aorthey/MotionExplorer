@@ -182,6 +182,10 @@ void QuotientGraph::ConnectVertexToNeighbors(Vertex m)
   nn_->add(m);
 }
 
+const og::QuotientGraph::Graph& QuotientGraph::GetGraph() const{
+  return G;
+}
+
 QuotientGraph::Vertex QuotientGraph::CreateNewVertex(ob::State *state)
 {
   Vertex m = boost::add_vertex(G);
@@ -219,6 +223,7 @@ void QuotientGraph::setup(){
 
     while (const ob::State *st = pis_.nextStart()){
       startM_.push_back(addMilestone(si_->cloneState(st)));
+      G[startM_.back()].start = true;
     }
     if (startM_.empty()){
       OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
@@ -234,6 +239,7 @@ void QuotientGraph::setup(){
       const ob::State *st = pis_.nextGoal();
       if (st != nullptr){
         goalM_.push_back(addMilestone(si_->cloneState(st)));
+        G[goalM_.back()].goal = true;
       }
     }
     unsigned long int nrStartStates = boost::num_vertices(G);

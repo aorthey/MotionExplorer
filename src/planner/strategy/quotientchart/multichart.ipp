@@ -140,8 +140,8 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
         local->SetLevel(k);
         local->SetHorizontalIndex(current_node->GetNumberOfSiblings()+1);
 
-        og::QuotientGraph::Graph Gsub = current_node->GetPathSubgraph( current_node->GetNumberOfPaths() - 1 ); //get last path
-        local->SetGraph(Gsub, current_node);
+        //og::QuotientGraph::Graph Gsub = current_node->GetPathSubgraph( current_node->GetNumberOfPaths() - 1 ); //get last path
+        local->SetSubGraph(current_node, current_node->GetNumberOfPaths()-1);
 
         //#####################################################################
         //Global Chart (contains the whole quotient pointed to by the local chart)

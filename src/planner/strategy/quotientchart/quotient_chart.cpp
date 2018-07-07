@@ -59,16 +59,46 @@ void QuotientChart::AddSibling(QuotientChart *sibling_)
 {
   siblings.push_back(sibling_);
 }
-void QuotientChart::SetGraph( Graph G_, QuotientChart *sibling)
+
+void QuotientChart::SetSubGraph( const QuotientChart *sibling, uint k )
 {
-  boost::copy_graph( G_, G);
+  local_chart = true;
+  opt_ = sibling->opt_;
+
+  boost::copy_graph( sibling->GetGraph(), G);
   startM_ = sibling->startM_;
   goalM_ = sibling->goalM_;
-  level = sibling->GetLevel();
-  number_of_paths = 0;
-  local_chart = true;
-  disjointSets_ = sibling->disjointSets_;
-  nn_ = sibling->nn_;
+
+  //level = sibling->GetLevel();
+  //number_of_paths = 0;
+  //local_chart = true;
+
+  //std::vector<Vertex> shortestVertexPath = sibling->shortestVertexPath_;
+  //const og::QuotientChart::Graph& Gprime = sibling->GetGraph();
+
+  //opt_ = sibling->opt_;
+
+  //for(uint k = 0; k < shortestVertexPath.size()-1; k++){
+  //  Vertex v1prime = shortestVertexPath.at(k);
+  //  Vertex v2prime = shortestVertexPath.at(k+1);
+
+  //  Vertex v1 = boost::add_vertex(G);
+  //  Vertex v2 = boost::add_vertex(G);
+  //  G[v1] = Gprime[v1prime];
+  //  G[v2] = Gprime[v2prime];
+
+  //  if(k==0) startM_.push_back(v1);
+  //  if(k==shortestVertexPath.size()-2) goalM_.push_back(v2);
+
+  //  ob::Cost weight = opt_->motionCost(G[v1].state, G[v2].state);
+  //  EdgeInternalState properties(weight);
+
+  //  boost::add_edge(v1, v2, properties, G);
+  //  uniteComponents(v1, v2);
+  //  nn_->add(v1);
+  //  nn_->add(v2);
+
+  //}
 }
 
 uint QuotientChart::GetNumberOfPaths() const
@@ -76,10 +106,6 @@ uint QuotientChart::GetNumberOfPaths() const
   return number_of_paths;
 }
 
-og::QuotientChart::Graph QuotientChart::GetPathSubgraph(uint k)
-{
-  return G;
-}
 void QuotientChart::SetChild(QuotientChart *child_)
 {
   if(siblings.size()>0) 

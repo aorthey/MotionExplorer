@@ -12,7 +12,6 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/random.hpp> 
-#include <boost/graph/subgraph.hpp> 
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/variate_generator.hpp>
 using Math::dInf;
@@ -60,6 +59,8 @@ namespace ompl
             unsigned long int associated_source{0};
             double associated_t{-1};
             double open_neighborhood_distance{0};
+            bool start{false};
+            bool goal{false};
             cover::OpenSet *open_neighborhood{nullptr};
         };
 
@@ -144,6 +145,8 @@ namespace ompl
         std::vector<Vertex> startM_;
         std::vector<Vertex> goalM_;
         std::vector<Vertex> shortestVertexPath_;
+
+        const Graph& GetGraph() const;
 
     protected:
 

@@ -35,8 +35,9 @@ namespace ompl
         //"Surrounding" and "different" are implementation specific, for example
         //they could be "all visible vertices from path" and "not homotopic".
         //This is left for subclasses to implement.
-        Graph GetPathSubgraph(uint k); 
-        void SetGraph( Graph G_, QuotientChart *sibling);
+        //Graph GetPathSubgraph(uint k); 
+        //void SetGraph( Graph G_, QuotientChart *sibling);
+        void SetSubGraph( const QuotientChart *sibling, uint k );
         virtual void getPlannerData(ob::PlannerData &data) const override;
 
 
