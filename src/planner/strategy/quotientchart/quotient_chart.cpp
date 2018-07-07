@@ -10,6 +10,10 @@ QuotientChart::QuotientChart(const ob::SpaceInformationPtr &si, og::QuotientChar
   : BaseT(si, parent_)
 {
 }
+void QuotientChart::setup() 
+{
+  if(!local_chart) BaseT::setup();
+}
 void QuotientChart::Grow(double t)
 {
   BaseT::Grow(t);
@@ -130,8 +134,7 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
     pstart.SetLevel(level);
     pstart.SetPath(path);
     pstart.SetComponent(startComponent);
-    uint ki = data.addStartVertex(pstart);
-    std::cout << "ADDED START VERTEX: " << ki << std::endl;
+    data.addStartVertex(pstart);
   }
 
   for (Vertex i : goalM_)
@@ -145,8 +148,7 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
     pgoal.SetLevel(level);
     pgoal.SetPath(path);
     pgoal.SetComponent(goalComponent);
-    uint kg = data.addGoalVertex(pgoal);
-    std::cout << "ADDED GOAL VERTEX: " << kg << std::endl;
+    data.addGoalVertex(pgoal);
   }
 
   foreach( const Vertex v, boost::vertices(G))
@@ -171,21 +173,10 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
     PlannerDataVertexAnnotated p1(s1);
     PlannerDataVertexAnnotated p2(s2);
 
+    data.addEdge(p1,p2);
+
     uint vi1 = data.vertexIndex(p1);
     uint vi2 = data.vertexIndex(p2);
-      // ,vi2;
-    // if(v1==startM_.at(0)){
-      // vi1 = data.addStartVertex(p1);
-    // }else{
-      // vi1 = data.addVertex(p1);
-    // }
-    // if(v2==goalM_.at(0)){
-      // vi2 = data.addGoalVertex(p2);
-    // }else{
-      // vi2 = data.addVertex(p2);
-    // }
-
-    data.addEdge(p1,p2);
 
     uint v1Component = const_cast<QuotientChart *>(this)->disjointSets_.find_set(v1);
     uint v2Component = const_cast<QuotientChart *>(this)->disjointSets_.find_set(v2);

@@ -16,6 +16,7 @@ namespace ompl
 
         virtual void Grow(double t);
         bool FoundNewPath();
+        virtual void setup() override;
 
         double GetImportance() const;
         void SetImportance(double); 

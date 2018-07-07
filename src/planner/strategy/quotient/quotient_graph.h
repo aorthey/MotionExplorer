@@ -120,7 +120,7 @@ namespace ompl
 
         void getPlannerData(ob::PlannerData &data) const override;
 
-        void setup() override;
+        virtual void setup() override;
 
         virtual void clear() override;
         void clearQuery();
