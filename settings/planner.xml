@@ -8,8 +8,8 @@
   <algorithm dynamic="1" name="ompl:kpiece"/>
   <algorithm dynamic="1" name="benchmark:all_dynamic"/>
 
-  <algorithm name="hierarchy:qmp"/>
   <algorithm name="hierarchy:qcp"/>
+  <algorithm name="hierarchy:qmp"/>
   <algorithm name="ompl:rrtconnect"/>
 
   <!--
@@ -20,7 +20,7 @@
   <algorithm name="benchmark:all_geometric"/>
 -->
 
-  <maxplanningtime>0.5</maxplanningtime>      <!-- runtime in (s) --> 
+  <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
   <smoothPath>0</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
   <pathSpeed>1</pathSpeed>                    <!-- <1: slower, 1: default, >1: faster -->
   <sampler name="uniform"/>                   <!-- uniform|gaussian|minimum_clearance|maximum_clearance|obstacle_based|bridge_test -->

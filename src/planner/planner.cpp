@@ -168,7 +168,6 @@ void MotionPlanner::AdvanceUntilSolution()
   strategy_input.world = world;
 
   strategy.plan(strategy_input, output);
-
   std::cout << output << std::endl;
 
   output.GetHierarchicalRoadmap( hierarchy, cspace_levels );

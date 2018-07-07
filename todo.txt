@@ -531,3 +531,5 @@ Measures for deciding which solution class to extend:
 - clearance
 - shortness
 
+[ ] copy only connected component
+[ ] display path on QS (QCP)

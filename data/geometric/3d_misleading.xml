@@ -5,7 +5,6 @@
   <robot name="rectangle" file="/home/aorthey/git/orthoklampt/data/robots/3DRectangle.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
   <robot name="sphere_inner" file="/home/aorthey/git/orthoklampt/data/robots/3DRectangle_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <rigidObject name="box" file="/home/aorthey/git/orthoklampt/data/terrains/3droom_misleading.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
 
   <plannerinput>
 
@@ -14,7 +13,6 @@
     <se3min config="6  -2.5 -2.5 -0.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +2.5 +5.0 +3.0 +3.141593 +1.57 +3.141593"/>
     <freeFloating>1</freeFloating>
-    <maxplanningtime>2</maxplanningtime>
     <epsilongoalregion>0.01</epsilongoalregion>
 
     <hierarchy>

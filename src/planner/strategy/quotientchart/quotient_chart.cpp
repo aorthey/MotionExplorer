@@ -57,7 +57,6 @@ void QuotientChart::AddSibling(QuotientChart *sibling_)
 }
 void QuotientChart::SetGraph( Graph G_, QuotientChart *sibling)
 {
-  //G = G_;
   boost::copy_graph( G_, G);
   startM_ = sibling->startM_;
   goalM_ = sibling->goalM_;
@@ -111,50 +110,87 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
   //###########################################################################
   //Get Data from this chart
   //###########################################################################
+  std::map<const Vertex, ob::State*> vertexToStates;
+
   uint startComponent = 0;//const_cast<QuotientChart *>(this)->disjointSets_.find_set(startM_.at(0));
   uint goalComponent = 1;//const_cast<QuotientChart *>(this)->disjointSets_.find_set(goalM_.at(0));
-  for (unsigned long i : startM_)
+  for (Vertex i : startM_)
   {
     startComponent = const_cast<QuotientChart *>(this)->disjointSets_.find_set(i);
-    PlannerDataVertexAnnotated pstart(G[i].state, startComponent);
+
+    ob::State *s = (local_chart?si_->cloneState(G[i].state):G[i].state);
+    vertexToStates[i] = s;
+
+    PlannerDataVertexAnnotated pstart(s, startComponent);
     pstart.SetLevel(level);
     pstart.SetPath(path);
-    pstart.SetComponent(0);
+    pstart.SetComponent(startComponent);
     data.addStartVertex(pstart);
 
   }
 
-  for (unsigned long i : goalM_)
+  for (Vertex i : goalM_)
   {
-    PlannerDataVertexAnnotated pgoal(G[i].state, const_cast<QuotientChart *>(this)->disjointSets_.find_set(i));
+    goalComponent = const_cast<QuotientChart *>(this)->disjointSets_.find_set(i);
+
+    ob::State *s = (local_chart?si_->cloneState(G[i].state):G[i].state);
+    vertexToStates[i] = s;
+
+    PlannerDataVertexAnnotated pgoal(s, goalComponent);
     pgoal.SetLevel(level);
     pgoal.SetPath(path);
-    pgoal.SetComponent(1);
+    pgoal.SetComponent(goalComponent);
     data.addGoalVertex(pgoal);
   }
 
   std::cout << "vertices " << GetNumberOfVertices() << " edges " << GetNumberOfEdges() << std::endl;
   uint ctr = 0;
+
+
+  foreach( const Vertex v, boost::vertices(G))
+  {
+    if(vertexToStates.find(v) == vertexToStates.end()) {
+      ob::State *s = (local_chart?si_->cloneState(G[v].state):G[v].state);
+      vertexToStates[v] = s;
+      PlannerDataVertexAnnotated p(s);
+      p.SetLevel(level);
+      p.SetPath(path);
+      data.addVertex(p);
+    }
+    //otherwise vertex is a goal or start vertex and has already been added
+  }
+    // PlannerDataVertexAnnotated p1((local_chart?si_->cloneState(G[v1].state):G[v1].state));
+    // PlannerDataVertexAnnotated p2((local_chart?si_->cloneState(G[v2].state):G[v2].state));
   foreach (const Edge e, boost::edges(G))
   {
     const Vertex v1 = boost::source(e, G);
     const Vertex v2 = boost::target(e, G);
 
-    // //dirty hack to make sure that plannerData does not remove some vertices as
-    // //duplicated
-    //double epsilon = 1e-5;
-    //@TODO: put that into Vertexinternalstate
-
-    PlannerDataVertexAnnotated p1(si_->cloneState(G[v1].state));
-    PlannerDataVertexAnnotated p2(si_->cloneState(G[v2].state));
+    //PlannerDataVertexAnnotated p1(G[v1].state);
+    //PlannerDataVertexAnnotated p2(G[v2].state);
+    ob::State *s1 = vertexToStates[v1];
+    ob::State *s2 = vertexToStates[v2];
+    PlannerDataVertexAnnotated p1(s1);
+    PlannerDataVertexAnnotated p2(s2);
 
     p1.SetLevel(level);
     p1.SetPath(path);
     p2.SetLevel(level);
     p2.SetPath(path);
 
-    uint vi1 = data.addVertex(p1);
-    uint vi2 = data.addVertex(p2);
+    uint vi1,vi2;
+
+    if(v1==startM_.at(0)){
+      vi1 = data.addStartVertex(p1);
+    }else{
+      vi1 = data.addVertex(p1);
+    }
+    if(v2==goalM_.at(0)){
+      vi2 = data.addGoalVertex(p2);
+    }else{
+      vi2 = data.addVertex(p2);
+    }
+    //uint vi2 = data.addVertex(p2);
 
     data.addEdge(p1,p2);
     ctr++;
@@ -186,9 +222,9 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
   //Get Data From all siblings
   //###########################################################################
 
-  std::cout << "QuotientChart level " << level << " horIndex:" << horizontal_index 
-    << " has " << siblings.size() << " siblings| Path: " << path 
-    << " vertices: " << data.numVertices() - Nvertices << std::endl;
+  std::cout << "QuotientChart vIdx " << level << " | hIdx " << horizontal_index 
+    << " | siblings " << siblings.size() << " | path " << path 
+    << " | vertices: " << data.numVertices() - Nvertices << std::endl;
 
   for(uint i = 0; i < siblings.size(); i++){
     siblings.at(i)->getPlannerData(data);
