@@ -111,6 +111,8 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
   //###########################################################################
   //Get Data from this chart
   //###########################################################################
+  std::cout << "vertices " << GetNumberOfVertices() << " edges " << GetNumberOfEdges() << std::endl;
+
   //if the chart is local, we need to clone new states such that we have
   //duplicate vertices (sometimes charts are overlapping). 
   std::map<const Vertex, ob::State*> vertexToStates;
@@ -128,8 +130,8 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
     pstart.SetLevel(level);
     pstart.SetPath(path);
     pstart.SetComponent(startComponent);
-    data.addStartVertex(pstart);
-
+    uint ki = data.addStartVertex(pstart);
+    std::cout << "ADDED START VERTEX: " << ki << std::endl;
   }
 
   for (Vertex i : goalM_)
@@ -143,10 +145,9 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
     pgoal.SetLevel(level);
     pgoal.SetPath(path);
     pgoal.SetComponent(goalComponent);
-    data.addGoalVertex(pgoal);
+    uint kg = data.addGoalVertex(pgoal);
+    std::cout << "ADDED GOAL VERTEX: " << kg << std::endl;
   }
-
-  //std::cout << "vertices " << GetNumberOfVertices() << " edges " << GetNumberOfEdges() << std::endl;
 
   foreach( const Vertex v, boost::vertices(G))
   {
@@ -160,36 +161,29 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
     }
     //otherwise vertex is a goal or start vertex and has already been added
   }
-    // PlannerDataVertexAnnotated p1((local_chart?si_->cloneState(G[v1].state):G[v1].state));
-    // PlannerDataVertexAnnotated p2((local_chart?si_->cloneState(G[v2].state):G[v2].state));
   foreach (const Edge e, boost::edges(G))
   {
     const Vertex v1 = boost::source(e, G);
     const Vertex v2 = boost::target(e, G);
 
-    //PlannerDataVertexAnnotated p1(G[v1].state);
-    //PlannerDataVertexAnnotated p2(G[v2].state);
     ob::State *s1 = vertexToStates[v1];
     ob::State *s2 = vertexToStates[v2];
     PlannerDataVertexAnnotated p1(s1);
     PlannerDataVertexAnnotated p2(s2);
 
-    p1.SetLevel(level);
-    p1.SetPath(path);
-    p2.SetLevel(level);
-    p2.SetPath(path);
-
-    uint vi1,vi2;
-    if(v1==startM_.at(0)){
-      vi1 = data.addStartVertex(p1);
-    }else{
-      vi1 = data.addVertex(p1);
-    }
-    if(v2==goalM_.at(0)){
-      vi2 = data.addGoalVertex(p2);
-    }else{
-      vi2 = data.addVertex(p2);
-    }
+    uint vi1 = data.vertexIndex(p1);
+    uint vi2 = data.vertexIndex(p2);
+      // ,vi2;
+    // if(v1==startM_.at(0)){
+      // vi1 = data.addStartVertex(p1);
+    // }else{
+      // vi1 = data.addVertex(p1);
+    // }
+    // if(v2==goalM_.at(0)){
+      // vi2 = data.addGoalVertex(p2);
+    // }else{
+      // vi2 = data.addVertex(p2);
+    // }
 
     data.addEdge(p1,p2);
 

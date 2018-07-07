@@ -137,7 +137,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
 
         og::QuotientChart *local = new og::QuotientChart(si_vec.at(k), dynamic_cast<og::QuotientChart*>(current_node->GetParent()));
         local->setProblemDefinition(pdef_vec.at(k));
-        local->setup();
         local->SetLevel(k);
         local->SetHorizontalIndex(current_node->GetNumberOfSiblings()+1);
         og::QuotientGraph::Graph Gsub = current_node->GetPathSubgraph( current_node->GetNumberOfPaths() - 1 ); //get last path

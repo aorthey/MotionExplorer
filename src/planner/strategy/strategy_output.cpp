@@ -177,20 +177,7 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
 
   if(v0==nullptr){
     root->children.push_back( new PTree(pd) );
-  // for(uint k = 0; k < N; k++){
-  //   ob::PlannerDataPtr pdi = pd_level.at(k);
-  //   pdi->decoupleFromPlanner();
-  //   std::cout << "level " << k << " : " << pdi->numVertices() << " | " << pdi->numEdges() << std::endl;
-  //   RoadmapPtr roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.at(k));
-  //   std::vector<int> path(k+1);
-  //   hierarchy->UpdateNode( roadmap_k, path);
-  // }
-
   }else{
-    
-    //ob::PlannerDataPtr pd0 = std::make_shared<ob::PlannerData>(cspace_levels.back()->SpaceInformationPtr());
-    //root->children.push_back( new PTree(pd0) );
-
     std::map<std::vector<int>, int> tree_vertices;
 
     for(uint i = 0; i < pd->numVertices(); i++){
@@ -243,11 +230,10 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
       }
     }
   }
+
   hierarchy->DeleteAllNodes();
   hierarchy->AddRootNode( std::make_shared<Roadmap>() ); 
-
   RecurseTraverseTree(root, hierarchy, cspace_levels);
-
   hierarchy->Print();
 
 

@@ -141,8 +141,6 @@
     <key>z</key>
   </hotkey>
 
-
-
   <hotkey>
     <name>make_screenshot</name>
     <descr>Screenshot</descr>
