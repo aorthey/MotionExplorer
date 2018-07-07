@@ -139,6 +139,7 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
         local->setProblemDefinition(pdef_vec.at(k));
         local->SetLevel(k);
         local->SetHorizontalIndex(current_node->GetNumberOfSiblings()+1);
+
         og::QuotientGraph::Graph Gsub = current_node->GetPathSubgraph( current_node->GetNumberOfPaths() - 1 ); //get last path
         local->SetGraph(Gsub, current_node);
 

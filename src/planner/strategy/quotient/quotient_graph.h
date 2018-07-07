@@ -8,11 +8,11 @@
 #include <ompl/base/Cost.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <KrisLibrary/math/infnan.h> //dInf, fInf, IsNaN(x)
+#include <boost/pending/disjoint_sets.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
-#include <boost/pending/disjoint_sets.hpp>
-#include <boost/property_map/property_map.hpp>
 #include <boost/graph/random.hpp> 
+#include <boost/graph/subgraph.hpp> 
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/variate_generator.hpp>
 using Math::dInf;
