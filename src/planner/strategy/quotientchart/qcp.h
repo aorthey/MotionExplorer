@@ -1,5 +1,5 @@
 #pragma once
-#include "quotient_chart.h"
+#include "quotient_chart_complex.h"
 #include <ompl/datastructures/PDF.h>
 #include <boost/graph/random.hpp> 
 #include <boost/random/linear_congruential.hpp>
@@ -14,8 +14,8 @@ namespace ompl
   namespace geometric
   {
     //QCP: Quotient-space roadMap Planner
-    class QCP: public og::QuotientChart{
-      typedef og::QuotientChart BaseT;
+    class QCP: public og::QuotientChartComplex{
+      typedef og::QuotientChartComplex BaseT;
       public:
 
         QCP(const ob::SpaceInformationPtr &si, QuotientChart *parent_ = nullptr);
@@ -25,9 +25,9 @@ namespace ompl
         typedef boost::minstd_rand RNGType;
         RNGType rng;
 
-        double epsilon{0.05}; //graph thickening
-        double percentageSamplesOnShortestPath{0.8};
-        double goalBias_{0.05};
+        double epsilon{0.0}; //graph thickening
+        double percentageSamplesOnShortestPath{0.0};
+        double goalBias_{0.0};
         PDF<Vertex> vpdf;
 
         virtual bool SampleGraph(ob::State*) override;

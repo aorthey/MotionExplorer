@@ -25,6 +25,7 @@ class ViewHierarchy
   void UpdateSelectionPath( std::vector<int> path );
   void DrawGL();
   int GetLevel();
+  void Clear();
 
   int x,y,heightPerLevel,width;
   int width_column1;

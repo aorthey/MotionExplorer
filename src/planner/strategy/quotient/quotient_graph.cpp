@@ -47,7 +47,7 @@ QuotientGraph::QuotientGraph(const ob::SpaceInformationPtr &si, Quotient *parent
 
 QuotientGraph::~QuotientGraph(){
   si_->freeStates(xstates);
-  //G.clear();
+  G.clear();
   if (nn_){
     nn_->clear();
   }
@@ -64,7 +64,7 @@ void QuotientGraph::clear()
   Quotient::clear();
 
   ClearVertices();
-  //G.clear();
+  G.clear();
   if (nn_){
     nn_->clear();
   }
@@ -273,18 +273,18 @@ ob::PathPtr QuotientGraph::GetSolutionPath(){
   return sol;
 }
 
-template <template <typename T> class NN>
-void QuotientGraph::setNearestNeighbors()
-{
-  if (nn_ && nn_->size() == 0)
-      OMPL_WARN("Calling setNearestNeighbors will clear all states.");
-  clear();
-  nn_ = std::make_shared<NN<Vertex>>();
-  connectionStrategy_ = ConnectionStrategy();
-  if(!isSetup()){
-    setup();
-  }
-}
+// template <template <typename T> class NN>
+// void QuotientGraph::setNearestNeighbors()
+// {
+//   if (nn_ && nn_->size() == 0)
+//       OMPL_WARN("Calling setNearestNeighbors will clear all states.");
+//   clear();
+//   nn_ = std::make_shared<NN<Vertex>>();
+//   connectionStrategy_ = ConnectionStrategy();
+//   if(!isSetup()){
+//     setup();
+//   }
+// }
 
 double QuotientGraph::Distance(const Vertex a, const Vertex b) const
 {

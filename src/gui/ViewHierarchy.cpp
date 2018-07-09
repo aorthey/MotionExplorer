@@ -36,7 +36,8 @@ void ViewHierarchy::UpdateSelectionPath( std::vector<int> path ){
     exit(1);
   }
 }
-void ViewHierarchy::PopLevel(){
+void ViewHierarchy::PopLevel()
+{
   if(level_nodes.size()>0){
     level_nodes.erase( level_nodes.end() - 1);
     level_robot_name.erase( level_robot_name.end() - 1);
@@ -44,8 +45,15 @@ void ViewHierarchy::PopLevel(){
   }
 }
 
-int ViewHierarchy::GetLevel(){
+int ViewHierarchy::GetLevel()
+{
   return level_nodes.size();
+}
+void ViewHierarchy::Clear()
+{
+  level_nodes.clear();
+  selected_path.clear();
+  level_robot_name.clear();
 }
 
 void ViewHierarchy::DrawGL(){

@@ -6,7 +6,7 @@
 using namespace og;
 #define foreach BOOST_FOREACH
 
-QuotientChart::QuotientChart(const ob::SpaceInformationPtr &si, og::QuotientChart *parent_)
+QuotientChart::QuotientChart(const ob::SpaceInformationPtr &si, og::Quotient *parent_)
   : BaseT(si, parent_)
 {
 }
@@ -16,7 +16,8 @@ void QuotientChart::setup()
 }
 void QuotientChart::Grow(double t)
 {
-  BaseT::Grow(t);
+  //BaseT::Grow(t);
+  growRoadmap(ob::timedPlannerTerminationCondition(t), xstates[0]);
 }
 double QuotientChart::GetImportance() const
 {
@@ -69,54 +70,89 @@ void QuotientChart::SetSubGraph( QuotientChart *sibling, uint k )
   level = sibling->GetLevel();
   startM_ = sibling->startM_;
   goalM_ = sibling->goalM_;
+  number_of_paths = 0;
 
-  //boost::copy_graph( Gprime, G);
 
-  foreach (Vertex vprime, boost::vertices(Gprime))
-  {
-    if(sibling->sameComponent(vprime, startM_.at(0))){
-      Vertex v1 = boost::add_vertex(G);
-      G[v1] = Gprime[vprime];
-    }
+  enum CopyMode{ALL, CONNECTED_COMPONENT, SHORTEST_PATH, SHORTEST_PATH_LINEAR_HOMOTOPY};
+
+  CopyMode mode = SHORTEST_PATH;
+
+  std::map<Vertex, Vertex> GprimetoG;
+  switch(mode){
+    case ALL:
+      {
+        //###########################################################################
+        //Copy the whole graph
+        //###########################################################################
+        boost::copy_graph( Gprime, G);
+        break;
+      }
+    case CONNECTED_COMPONENT:
+      {
+        //###########################################################################
+        //Copy connected component of the start node
+        //###########################################################################
+        foreach (Vertex vprime, boost::vertices(Gprime))
+        {
+          if(sibling->sameComponent(vprime, startM_.at(0))){
+            Vertex v1 = boost::add_vertex(G);
+            G[v1] = Gprime[vprime];
+            GprimetoG[vprime] = v1;
+          }
+        }
+        foreach (Edge eprime, boost::edges(Gprime))
+        {
+          const Vertex v1 = boost::source(eprime, Gprime);
+          const Vertex v2 = boost::target(eprime, Gprime);
+          if(sibling->sameComponent(v1, startM_.at(0))){
+            boost::add_edge(GprimetoG[v1], GprimetoG[v2], Gprime[eprime], G);
+          }
+        }
+        break;
+      }
+    case SHORTEST_PATH:
+      {
+        //###########################################################################
+        //Copy only the edges and vertices along the shortest path
+        //###########################################################################
+        startM_.clear();
+        goalM_.clear();
+        std::vector<Vertex> shortestVertexPath = sibling->shortestVertexPath_;
+
+        Vertex v1 = boost::add_vertex(G);
+        for(uint k = 0; k < shortestVertexPath.size()-1; k++){
+          Vertex v1prime = shortestVertexPath.at(k);
+          Vertex v2prime = shortestVertexPath.at(k+1);
+
+          Vertex v2 = boost::add_vertex(G);
+          G[v1] = Gprime[v1prime];
+          G[v2] = Gprime[v2prime];
+
+          Edge eprime = boost::edge(v1prime,v2prime,Gprime).first;
+
+          if(k==0) startM_.push_back(v1);
+          if(k==shortestVertexPath.size()-2) goalM_.push_back(v2);
+          boost::add_edge(v1, v2, Gprime[eprime], G);
+
+          v1 = v2;
+        }
+        break;
+      }
+    case SHORTEST_PATH_LINEAR_HOMOTOPY:
+      {
+        //###########################################################################
+        //Copy edges and vertices along the shortest path
+        //+ all edges belonging to same path space cover
+        //###########################################################################
+        startM_.clear();
+        goalM_.clear();
+      }
+    default:
+      {
+        std::cout << "Mode " << mode << " not recognized." << std::endl;
+        exit(0);
+      }
   }
-  foreach (Edge eprime, boost::edges(Gprime))
-  {
-    const Vertex v1 = boost::source(eprime, Gprime);
-    const Vertex v2 = boost::target(eprime, Gprime);
-    if(sibling->sameComponent(v1, startM_.at(0))){
-      boost::add_edge(v1, v2, Gprime[eprime], G);
-    }
-  }
-  //G = sibling->GetGraph();
-
-  //number_of_paths = 0;
-
-  //std::vector<Vertex> shortestVertexPath = sibling->shortestVertexPath_;
-  //const og::QuotientChart::Graph& Gprime = sibling->GetGraph();
-
-  //opt_ = sibling->opt_;
-
-  //for(uint k = 0; k < shortestVertexPath.size()-1; k++){
-  //  Vertex v1prime = shortestVertexPath.at(k);
-  //  Vertex v2prime = shortestVertexPath.at(k+1);
-
-  //  Vertex v1 = boost::add_vertex(G);
-  //  Vertex v2 = boost::add_vertex(G);
-  //  G[v1] = Gprime[v1prime];
-  //  G[v2] = Gprime[v2prime];
-
-  //  if(k==0) startM_.push_back(v1);
-  //  if(k==shortestVertexPath.size()-2) goalM_.push_back(v2);
-
-  //  ob::Cost weight = opt_->motionCost(G[v1].state, G[v2].state);
-  //  EdgeInternalState properties(weight);
-
-  //  boost::add_edge(v1, v2, properties, G);
-  //  uniteComponents(v1, v2);
-  //  nn_->add(v1);
-  //  nn_->add(v2);
-
-  //}
 }
 
 uint QuotientChart::GetNumberOfPaths() const
@@ -124,15 +160,6 @@ uint QuotientChart::GetNumberOfPaths() const
   return number_of_paths;
 }
 
-void QuotientChart::SetChild(QuotientChart *child_)
-{
-  if(siblings.size()>0) 
-  {
-    std::cout << "You cannot have a child if you already have siblings." << std::endl;
-    exit(0);
-  }
-  child = child_;
-}
 uint QuotientChart::GetNumberOfSiblings() const
 {
   return siblings.size();
@@ -176,6 +203,7 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
 
     PlannerDataVertexAnnotated pstart(s, startComponent);
     pstart.SetLevel(level);
+    pstart.SetOpenNeighborhoodDistance(G[i].open_neighborhood_distance);
     pstart.SetPath(path);
     pstart.SetComponent(startComponent);
     data.addStartVertex(pstart);
@@ -191,6 +219,7 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
     PlannerDataVertexAnnotated pgoal(s, goalComponent);
     pgoal.SetLevel(level);
     pgoal.SetPath(path);
+    pgoal.SetOpenNeighborhoodDistance(G[i].open_neighborhood_distance);
     pgoal.SetComponent(goalComponent);
     data.addGoalVertex(pgoal);
   }
@@ -201,6 +230,7 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
       ob::State *s = (local_chart?si_->cloneState(G[v].state):G[v].state);
       vertexToStates[v] = s;
       PlannerDataVertexAnnotated p(s);
+      p.SetOpenNeighborhoodDistance(G[v].open_neighborhood_distance);
       p.SetLevel(level);
       p.SetPath(path);
       data.addVertex(p);

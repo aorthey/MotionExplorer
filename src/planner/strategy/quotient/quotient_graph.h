@@ -97,8 +97,6 @@ namespace ompl
            EdgeInternalState
          > Graph;
 
-        //typedef boost::subgraph<RootGraph> Graph;
-
         typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
         typedef boost::graph_traits<Graph>::edge_descriptor Edge;
         typedef boost::graph_traits<Graph>::vertices_size_type VertexIndex;
@@ -123,8 +121,8 @@ namespace ompl
         virtual void Init() override;
         virtual bool SampleGraph(ob::State *q_random_graph) override;
 
-        template <template <typename T> class NN>
-        void setNearestNeighbors();
+        // template <template <typename T> class NN>
+        // void setNearestNeighbors();
 
         void getPlannerData(ob::PlannerData &data) const override;
 
@@ -182,8 +180,8 @@ namespace ompl
         bool addedNewSolution_{false};
         unsigned long int iterations_{0};
 
-        void growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState);
-        void expandRoadmap(const ob::PlannerTerminationCondition &ptc, std::vector<ob::State *> &workStates);
+        virtual void growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState);
+        virtual void expandRoadmap(const ob::PlannerTerminationCondition &ptc, std::vector<ob::State *> &workStates);
 
         ob::PathPtr GetSolutionPath(const Vertex &start, const Vertex &goal);
 

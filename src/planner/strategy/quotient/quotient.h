@@ -61,6 +61,9 @@ namespace ompl
         void mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1) const;
 
         Quotient* GetParent() const;
+        Quotient* GetChild() const;
+        void SetChild(Quotient *child_);
+        void SetParent(Quotient *parent_);
 
         double GetGraphLength();
         virtual void clear() override;
@@ -90,9 +93,10 @@ namespace ompl
 
         double graphLength{0.0};
         uint totalNumberOfSamples{0};
-        Quotient *parent{nullptr};
         bool hasSolution{false};
 
+        Quotient *parent{nullptr};
+        Quotient *child{nullptr};
     };
   }
 }

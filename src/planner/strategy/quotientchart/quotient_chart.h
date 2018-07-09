@@ -12,7 +12,7 @@ namespace ompl
         typedef og::QuotientGraph BaseT;
         typedef og::QuotientGraph::Graph Graph;
       public:
-        QuotientChart(const ob::SpaceInformationPtr &si, QuotientChart *parent_ = nullptr);
+        QuotientChart(const ob::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
 
         virtual void Grow(double t);
         bool FoundNewPath();
@@ -28,15 +28,12 @@ namespace ompl
         uint GetNumberOfPaths() const;
 
         void AddSibling(QuotientChart *sibling_);
-        void SetChild(QuotientChart *child_);
 
         //@brief: assume that there are K different solution paths on the graph. 
         //Extract the k-th solution path, plus all surrounding vertices.
         //"Surrounding" and "different" are implementation specific, for example
         //they could be "all visible vertices from path" and "not homotopic".
         //This is left for subclasses to implement.
-        //Graph GetPathSubgraph(uint k); 
-        //void SetGraph( Graph G_, QuotientChart *sibling);
         void SetSubGraph( QuotientChart *sibling, uint k );
         virtual void getPlannerData(ob::PlannerData &data) const override;
 
@@ -53,7 +50,6 @@ namespace ompl
         bool local_chart{false}; //local: a refinement chart around a given path, global: a chart exploring the whole quotient-space
 
         std::vector<QuotientGraph*> siblings;
-        QuotientGraph *child{nullptr}; //singleton!
     };
   }
 }

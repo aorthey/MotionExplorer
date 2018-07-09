@@ -148,6 +148,9 @@ void MotionPlanner::CreateHierarchy(){
 
 void MotionPlanner::Clear()
 {
+  current_level = 0;
+  current_level_node = 0;
+  current_path.clear();
 }
 
 void MotionPlanner::Step()
@@ -160,6 +163,12 @@ void MotionPlanner::Advance(double ms)
 }
 void MotionPlanner::AdvanceUntilSolution()
 {
+  if(!active) return;
+  current_level = 0;
+  current_level_node = 0;
+  current_path.clear();
+  viewHierarchy.Clear();
+
   StrategyOutput output(cspace_levels.back());
 
   StrategyInput strategy_input = input.GetStrategyInput();

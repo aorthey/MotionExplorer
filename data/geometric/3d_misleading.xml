@@ -5,7 +5,7 @@
   <robot name="rectangle" file="/home/aorthey/git/orthoklampt/data/robots/3DRectangle.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
   <robot name="sphere_inner" file="/home/aorthey/git/orthoklampt/data/robots/3DRectangle_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-
+  <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/3droom_misleading.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
   <plannerinput>
 
     <qinit  config="6  0.0 +4.0 +0.5 -1.57 +0.00 +0.0 +0.0"/>

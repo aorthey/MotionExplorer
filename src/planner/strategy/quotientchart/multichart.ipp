@@ -119,9 +119,11 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
     //std::cout << "current level: " << k << "/" << levels-1 << " has " << current_node->GetNumberOfVertices() << " vertices." << std::endl;
 
     if(current_node->FoundNewPath()){
-      //std::cout << "current level: " << k << "/" << levels-1 << " has " << current_node->GetNumberOfVertices() << " vertices." << std::endl;
+      std::cout << std::string(80, '#') << std::endl;
+      std::cout << "found path on level " << k << "/" << levels-1 << " (" << current_node->GetNumberOfVertices() << " vertices)" << std::endl;
+      std::cout << std::string(80, '#') << std::endl;
+
       if(k == levels-1){
-        //std::cout << "found path on level " << k << std::endl;
         found_path_on_last_level = true;
         Q.push(jChart);
       }else{
@@ -139,8 +141,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
         local->setProblemDefinition(pdef_vec.at(k));
         local->SetLevel(k);
         local->SetHorizontalIndex(current_node->GetNumberOfSiblings()+1);
-
-        //og::QuotientGraph::Graph Gsub = current_node->GetPathSubgraph( current_node->GetNumberOfPaths() - 1 ); //get last path
         local->SetSubGraph(current_node, current_node->GetNumberOfPaths()-1);
 
         //#####################################################################
@@ -150,8 +150,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
         global->setProblemDefinition(pdef_vec.at(k+1));
         global->setup();
         global->SetLevel(k+1);
-
-        local->SetChild(global); //need to be able to traverse down the tree
 
         current_node->AddSibling(local);
         //DFS approach: forget about the current node, just take its sibling and

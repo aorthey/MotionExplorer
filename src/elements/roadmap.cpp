@@ -59,8 +59,6 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
     ob::PathPtr path_ompl_ptr(gpath);
     if(pred.size()>0){
       path_ompl = new PathPiecewiseLinear(path_ompl_ptr, cspace, quotient_space);
-    }else{
-      std::cout << "LEMON did not find shortest path." << std::endl;
     }
   }
   return path_ompl;
@@ -114,6 +112,8 @@ void Roadmap::DrawPlannerData(GUIState &state)
           setColor(cVertexGoal);
         }
         v->DrawGL(state);
+        double d = v->GetOpenNeighborhoodDistance();
+        drawSphere(d,16,8);
       }
       drawPoint(q);
       glPopMatrix();

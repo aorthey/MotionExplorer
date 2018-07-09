@@ -14,6 +14,8 @@ using namespace ompl::base;
 Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_):
   ob::Planner(si,"QuotientSpace"), M1(si), M0(si), parent(parent_)
 {
+  if(parent!=nullptr) parent->SetChild(this); //need to be able to traverse down the tree
+
   const StateSpacePtr M1_space = M1->getStateSpace();
 
   id = counter++;
@@ -653,6 +655,18 @@ bool Quotient::HasSolution()
 Quotient* Quotient::GetParent() const
 {
   return parent;
+}
+Quotient* Quotient::GetChild() const
+{
+  return child;
+}
+void Quotient::SetChild(Quotient *child_)
+{
+  child = child_;
+}
+void Quotient::SetParent(Quotient *parent_)
+{
+  parent = parent_;
 }
 
 bool Quotient::Sample(ob::State *q_random)
