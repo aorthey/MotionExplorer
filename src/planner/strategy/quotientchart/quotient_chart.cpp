@@ -2,6 +2,7 @@
 #include "elements/plannerdata_vertex_annotated.h"
 #include "common.h"
 #include <boost/foreach.hpp>
+#include <boost/graph/filtered_graph.hpp>
 
 using namespace og;
 #define foreach BOOST_FOREACH
@@ -68,7 +69,8 @@ void QuotientChart::SetSubGraph( const QuotientChart *sibling, uint k )
   startM_ = sibling->startM_;
   goalM_ = sibling->goalM_;
 
-  boost::copy_graph( sibling->GetGraph(), G);
+  //boost::copy_graph( sibling->GetGraph(), G);
+  G = sibling->GetGraph();
 
   //number_of_paths = 0;
 
