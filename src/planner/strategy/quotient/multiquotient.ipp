@@ -1,4 +1,3 @@
-#include "multiquotient.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/SO3StateSpace.h>

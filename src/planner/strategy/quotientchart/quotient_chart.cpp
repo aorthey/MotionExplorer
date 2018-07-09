@@ -64,14 +64,13 @@ void QuotientChart::SetSubGraph( const QuotientChart *sibling, uint k )
 {
   local_chart = true;
   opt_ = sibling->opt_;
-
-  boost::copy_graph( sibling->GetGraph(), G);
+  level = sibling->GetLevel();
   startM_ = sibling->startM_;
   goalM_ = sibling->goalM_;
 
-  //level = sibling->GetLevel();
+  boost::copy_graph( sibling->GetGraph(), G);
+
   //number_of_paths = 0;
-  //local_chart = true;
 
   //std::vector<Vertex> shortestVertexPath = sibling->shortestVertexPath_;
   //const og::QuotientChart::Graph& Gprime = sibling->GetGraph();
