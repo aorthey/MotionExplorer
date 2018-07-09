@@ -12,6 +12,8 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/random.hpp> 
+#include <boost/graph/subgraph.hpp>
+#include <boost/graph/properties.hpp>
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/variate_generator.hpp>
 using Math::dInf;
@@ -37,7 +39,7 @@ namespace ompl
 
         class VertexInternalState{
           public:
-            VertexInternalState(){};
+            VertexInternalState() = default;
             VertexInternalState(const VertexInternalState &vis)
             {
               //state = si_->cloneState(vis.state);
@@ -66,7 +68,7 @@ namespace ompl
 
         class EdgeInternalState{
           public:
-            EdgeInternalState(){};
+            EdgeInternalState() = default;
             EdgeInternalState(ob::Cost cost_): cost(cost_), original_cost(cost_)
             {};
             void setWeight(double d){
@@ -84,13 +86,18 @@ namespace ompl
             bool isSufficient{false};
         };
 
+        // typedef boost::property<boost::vertex_index_t, std::size_t, VertexInternalState> vertex_prop;
+        // typedef boost::property<boost::edge_index_t, std::size_t, EdgeInternalState> edge_prop;
+
         typedef boost::adjacency_list<
            boost::vecS, 
            boost::vecS, 
            boost::undirectedS,
            VertexInternalState,
            EdgeInternalState
-         >Graph;
+         > Graph;
+
+        //typedef boost::subgraph<RootGraph> Graph;
 
         typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
         typedef boost::graph_traits<Graph>::edge_descriptor Edge;
@@ -140,6 +147,7 @@ namespace ompl
         std::map<Vertex, Vertex> vparent;
         boost::disjoint_sets<boost::associative_property_map<std::map<Vertex, VertexRank> >, boost::associative_property_map<std::map<Vertex, Vertex> > > 
           disjointSets_{boost::make_assoc_property_map(vrank), boost::make_assoc_property_map(vparent)};
+
         ob::Cost bestCost_{+dInf};
         ob::OptimizationObjectivePtr opt_;
         std::vector<Vertex> startM_;

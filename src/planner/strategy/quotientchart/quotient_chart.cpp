@@ -2,7 +2,6 @@
 #include "elements/plannerdata_vertex_annotated.h"
 #include "common.h"
 #include <boost/foreach.hpp>
-#include <boost/graph/filtered_graph.hpp>
 
 using namespace og;
 #define foreach BOOST_FOREACH
@@ -61,16 +60,34 @@ void QuotientChart::AddSibling(QuotientChart *sibling_)
   siblings.push_back(sibling_);
 }
 
-void QuotientChart::SetSubGraph( const QuotientChart *sibling, uint k )
+void QuotientChart::SetSubGraph( QuotientChart *sibling, uint k )
 {
+  const og::QuotientGraph::Graph& Gprime = sibling->GetGraph();
+
   local_chart = true;
   opt_ = sibling->opt_;
   level = sibling->GetLevel();
   startM_ = sibling->startM_;
   goalM_ = sibling->goalM_;
 
-  //boost::copy_graph( sibling->GetGraph(), G);
-  G = sibling->GetGraph();
+  //boost::copy_graph( Gprime, G);
+
+  foreach (Vertex vprime, boost::vertices(Gprime))
+  {
+    if(sibling->sameComponent(vprime, startM_.at(0))){
+      Vertex v1 = boost::add_vertex(G);
+      G[v1] = Gprime[vprime];
+    }
+  }
+  foreach (Edge eprime, boost::edges(Gprime))
+  {
+    const Vertex v1 = boost::source(eprime, Gprime);
+    const Vertex v2 = boost::target(eprime, Gprime);
+    if(sibling->sameComponent(v1, startM_.at(0))){
+      boost::add_edge(v1, v2, Gprime[eprime], G);
+    }
+  }
+  //G = sibling->GetGraph();
 
   //number_of_paths = 0;
 

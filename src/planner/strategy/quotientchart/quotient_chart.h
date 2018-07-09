@@ -37,11 +37,12 @@ namespace ompl
         //This is left for subclasses to implement.
         //Graph GetPathSubgraph(uint k); 
         //void SetGraph( Graph G_, QuotientChart *sibling);
-        void SetSubGraph( const QuotientChart *sibling, uint k );
+        void SetSubGraph( QuotientChart *sibling, uint k );
         virtual void getPlannerData(ob::PlannerData &data) const override;
 
-
       private:
+        //boost::subgraph< og::QuotientGraph::Graph > G_chart;
+
         double importance{0};//how important is the current chart for solving the problem
         double density{0};
 

@@ -47,7 +47,7 @@ QuotientGraph::QuotientGraph(const ob::SpaceInformationPtr &si, Quotient *parent
 
 QuotientGraph::~QuotientGraph(){
   si_->freeStates(xstates);
-  G.clear();
+  //G.clear();
   if (nn_){
     nn_->clear();
   }
@@ -64,7 +64,7 @@ void QuotientGraph::clear()
   Quotient::clear();
 
   ClearVertices();
-  G.clear();
+  //G.clear();
   if (nn_){
     nn_->clear();
   }
@@ -488,6 +488,8 @@ void QuotientGraph::getPlannerData(ob::PlannerData &data) const
 }
 bool QuotientGraph::SampleGraph(ob::State *q_random_graph)
 {
+  if(num_edges(G) == 0) return false;
+
   Edge e = boost::random_edge(G, rng_boost);
   while(!sameComponent(boost::source(e, G), startM_.at(0)))
   {
