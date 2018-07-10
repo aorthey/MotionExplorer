@@ -22,7 +22,6 @@ QuotientChartComplex::QuotientChartComplex(const ob::SpaceInformationPtr &si, og
                              return Distance(a,b);
                            });
 
-  //using Point = std::vector<float>;
   using Simplex_tree = Gudhi::Simplex_tree<>;
   Simplex_tree stree;
   stree.insert_simplex({0, 1}, 0.);
@@ -32,6 +31,13 @@ QuotientChartComplex::QuotientChartComplex(const ob::SpaceInformationPtr &si, og
   SC.set_type("Nerve");
   SC.create_complex(stree);
 
+  std::cout << "Graph induced complex is of dimension " << stree.dimension() << " - " << stree.num_simplices()
+                    << " simplices - " << stree.num_vertices() << " vertices." << std::endl;
+
+  exit(0);
+
+  //Step1: Fill cover complex with graph plus the radius
+  //Cover_complex -> create_complex -> SimplexTree (efficient representation of a simplicial complex) -> betti_numbers
 }
 
 bool QuotientChartComplex::Sample(ob::State *q_random)

@@ -534,4 +534,4 @@ Measures for deciding which solution class to extend:
 [x] copy only connected component
 [x] display path on QS (QCP)
 [x] display smoothed path + raw
-[ ] copy only shortest path on QS
+[x] copy only shortest path on QS
