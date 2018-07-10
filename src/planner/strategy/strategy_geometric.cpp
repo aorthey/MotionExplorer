@@ -5,7 +5,6 @@
 
 #include "planner/strategy/quotient/multiquotient.h"
 #include "planner/strategy/quotient/qmp_connect.h"
-#include "planner/strategy/quotient/qmp_connect_fast.h"
 #include "planner/strategy/quotient/qmp.h"
 #include "planner/strategy/quotientchart/multichart.h"
 #include "planner/strategy/quotientchart/quotient_chart.h"
@@ -137,10 +136,6 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   }else if(algorithm=="hierarchy:qmp_connect_rrt"){
     typedef og::MultiQuotient<og::QMPConnect, og::RRTBidirectional> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect+RRT");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  }else if(algorithm=="hierarchy:qmp_connect_fast"){
-    typedef og::MultiQuotient<og::QMPConnectFast, og::RRTBidirectional> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnectFast");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="hierarchy:qmp_rrt"){
     typedef og::MultiQuotient<og::QMP, og::RRTBidirectional> MultiQuotient;

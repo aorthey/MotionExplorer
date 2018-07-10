@@ -106,23 +106,25 @@ void Roadmap::DrawPlannerData(GUIState &state)
         {
           glPointSize(2*sizeVertex);
           setColor(cVertexStart);
-        }
-        if(pd->isGoalVertex(vidx))
-        {
-          glPointSize(2*sizeVertex);
-          setColor(cVertexGoal);
+        }else{
+          if(pd->isGoalVertex(vidx))
+          {
+            glPointSize(2*sizeVertex);
+            setColor(cVertexGoal);
+          }
         }
 
         double d = v->GetOpenNeighborhoodDistance();
 
+        bool startOrGoal = pd->isStartVertex(vidx) || pd->isGoalVertex(vidx);
         if(state("draw_roadmap_infeasible_vertices"))
         {
-          if(d<=0){
+          if(d<=0 && !startOrGoal){
             setColor(red);
           }
           drawPoint(q);
         }else{
-          if(d>0){
+          if(d>0 || startOrGoal){
             drawPoint(q);
           }
         }

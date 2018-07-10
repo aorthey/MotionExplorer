@@ -5,6 +5,10 @@
 #include <ompl/geometric/planners/prm/ConnectionStrategy.h>
 #include <boost/foreach.hpp>
 
+#include <gudhi/graph_simplicial_complex.h>
+#include <gudhi/Simplex_tree.h>
+#include <gudhi/GIC.h>
+
 using namespace og;
 #define foreach BOOST_FOREACH
 
@@ -17,6 +21,17 @@ QuotientChartComplex::QuotientChartComplex(const ob::SpaceInformationPtr &si, og
                            {
                              return Distance(a,b);
                            });
+
+  //using Point = std::vector<float>;
+  using Simplex_tree = Gudhi::Simplex_tree<>;
+  Simplex_tree stree;
+  stree.insert_simplex({0, 1}, 0.);
+
+  using Point = Vertex;
+  Gudhi::cover_complex::Cover_complex<Point> SC;
+  SC.set_type("Nerve");
+  SC.create_complex(stree);
+
 }
 
 bool QuotientChartComplex::Sample(ob::State *q_random)
