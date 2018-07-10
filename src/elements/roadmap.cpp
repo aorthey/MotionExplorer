@@ -91,6 +91,7 @@ void Roadmap::DrawPlannerData(GUIState &state)
 
       ob::PlannerDataVertex *vd = &pd->getVertex(vidx);
       Vector3 q = cspace->getXYZ(vd->getState());
+
       PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
 
       if(v!=nullptr){
@@ -111,11 +112,34 @@ void Roadmap::DrawPlannerData(GUIState &state)
           glPointSize(2*sizeVertex);
           setColor(cVertexGoal);
         }
-        v->DrawGL(state);
+
         double d = v->GetOpenNeighborhoodDistance();
-        drawSphere(d,16,8);
+
+        if(state("draw_roadmap_infeasible_vertices"))
+        {
+          if(d<=0){
+            setColor(red);
+          }
+          drawPoint(q);
+        }else{
+          if(d>0){
+            drawPoint(q);
+          }
+        }
+
+        if(state("draw_roadmap_volume")){
+          glTranslate(q);
+          if(quotient_space->GetDimensionality()<=2){
+            Vector3 q2(0,0,1);
+            drawCircle(q2, d);
+          }else{
+            drawSphere(d, 16, 8);
+          }
+        }
+      }else{
+        drawPoint(q);
       }
-      drawPoint(q);
+
       glPopMatrix();
     }
   }

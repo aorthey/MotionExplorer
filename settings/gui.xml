@@ -62,6 +62,11 @@
     <descr>Draw Roadmap</descr>
     <active>1</active>
   </checkbox>
+  <checkbox>
+    <name>draw_roadmap_shortest_path</name>
+    <active>1</active>
+    <key>g</key>
+  </checkbox>
 
   <checkbox>
     <name>draw_play_path</name>
@@ -210,12 +215,17 @@
     <key>2</key>
     <active>1</active>
   </checkbox>
-  <!-- <checkbox> -->
-  <!--   <name>draw_roadmap_volume</name> -->
-  <!--   <descr>Draw Roadmap Volume</descr> -->
-  <!--   <key>3</key> -->
-  <!--   <active>1</active> -->
-  <!-- </checkbox> -->
+  <checkbox>
+    <name>draw_roadmap_volume</name>
+    <descr>Draw Roadmap Volume</descr>
+    <key>3</key>
+    <active>1</active>
+  </checkbox>
+  <checkbox>
+    <name>draw_roadmap_infeasible_vertices</name>
+    <key>4</key>
+    <active>1</active>
+  </checkbox>
 
   <!-- <slider> -->
   <!--   <name>draw_cover_threshold</name> -->
@@ -235,7 +245,7 @@
 
   <hotkey>
     <name>planner_draw_start_goal_configuration</name>
-    <key>4</key>
+    <key>G</key>
   </hotkey>
 
   <!-- <hotkey> -->
@@ -248,17 +258,9 @@
   <!--   <key>z</key> -->
   <!-- </hotkey> -->
 
-  <checkbox>
-    <name>draw_path</name>
-    <descr>Draw Path</descr>
-    <key>g</key>
-    <active>1</active>
-  </checkbox>
-
   <property name="planner_draw_start_configuration" enabled="1"/>
   <property name="planner_draw_goal_configuration" enabled="1"/>
-  <property name="draw_roadmap_shortest_path" enabled="1"/>
-  <property name="draw_path" enabled="1"/>
+  <property name="draw_path" enabled="0"/>
   <property name="draw_path_unsmoothed" enabled="0"/>
   <property name="draw_path_autofocus" enabled="1"/>
   <property name="draw_axes" enabled="0"/>

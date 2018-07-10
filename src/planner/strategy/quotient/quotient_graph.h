@@ -97,13 +97,13 @@ namespace ompl
            EdgeInternalState
          > Graph;
 
+        typedef boost::graph_traits<Graph> BGT;
         typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
         typedef boost::graph_traits<Graph>::edge_descriptor Edge;
         typedef boost::graph_traits<Graph>::vertices_size_type VertexIndex;
         typedef boost::graph_traits<Graph>::in_edge_iterator IEIterator;
         typedef Vertex* VertexParent;
         typedef VertexIndex* VertexRank;
-
         typedef std::shared_ptr<NearestNeighbors<Vertex>> RoadmapNeighbors;
         typedef std::function<const std::vector<Vertex> &(const Vertex)> ConnectionStrategy;
 

@@ -15,7 +15,7 @@ QuotientChartComplex::QuotientChartComplex(const ob::SpaceInformationPtr &si, og
   nn_infeasible.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
   nn_infeasible->setDistanceFunction([this](const Vertex a, const Vertex b)
                            {
-                             return Distance(a, b);
+                             return Distance(a,b);
                            });
 }
 
@@ -41,6 +41,9 @@ bool QuotientChartComplex::Sample(ob::State *q_random)
     return M1->isValid(q_random);
   }
 }
+void QuotientChartComplex::Grow(double t){
+  growRoadmap(ob::timedPlannerTerminationCondition(t), xstates[0]);
+}
 
 void QuotientChartComplex::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState)
 {
@@ -48,21 +51,41 @@ void QuotientChartComplex::growRoadmap(const ob::PlannerTerminationCondition &pt
   {
     iterations_++;
     bool found_feasible = Sample(workState);
+
     if(found_feasible)
     {
       Vertex vf = addMilestone(si_->cloneState(workState));
       if(nn_infeasible->size()>0)
       {
+        si_->printState(workState);
         const Vertex vfi = nn_infeasible->nearest(vf);
-        G[vf].open_neighborhood_distance = Distance(vf, vfi);
+        double dn = Distance(vf, vfi);
+        G[vf].open_neighborhood_distance = min(dn, epsilon_max_neighborhood);
       }else{
-        G[vf].open_neighborhood_distance = 0;
+        G[vf].open_neighborhood_distance = epsilon_max_neighborhood;
+      }
+    }else{
+      Vertex v_infeasible = boost::add_vertex(G);
+      G[v_infeasible].state = si_->cloneState(workState);
+      nn_infeasible->add(v_infeasible);
+      //update the feasible radii
+
+      if(nn_->size()>0){
+        std::vector<Vertex> neighbors;
+        nn_->nearestR(v_infeasible, epsilon_max_neighborhood, neighbors);
+
+        for(uint k = 0; k < neighbors.size(); k++){
+          Vertex nk = neighbors.at(k);
+          double dn = Distance(nk, v_infeasible)/2.0;
+          double dold = G[nk].open_neighborhood_distance;
+          G[nk].open_neighborhood_distance = min(dn, dold);
+        }
       }
 
-    }else{
-      Vertex vi = boost::add_vertex(G_infeasible);
-      G_infeasible[vi].state = si_->cloneState(workState);
-      nn_infeasible->add(vi);
     }
   }
+}
+double QuotientChartComplex::Distance(const Vertex a, const Vertex b) const
+{
+  return BaseT::Distance(a,b);
 }
