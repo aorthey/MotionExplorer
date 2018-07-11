@@ -23,7 +23,7 @@ namespace ompl
         virtual void getPlannerData(ob::PlannerData &data) const override;
 
       private:
-        double epsilon_max_neighborhood{1.0};
+        double epsilon_max_neighborhood{2.0};
         Simplex_tree simplex;
 
         typedef std::vector< std::vector<int> > LocalSimplicialComplex;

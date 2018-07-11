@@ -127,21 +127,24 @@ void QuotientChartComplex::growRoadmap(const ob::PlannerTerminationCondition &pt
       }
 
     }else{
+      //#######################################################################
+      //Add infeasible vertex 
+      //#######################################################################
       Vertex v_infeasible = boost::add_vertex(G);
       G[v_infeasible].state = si_->cloneState(workState);
       nn_infeasible->add(v_infeasible);
 
-      //update the feasible radii
-      if(nn_->size()>0){
-        std::vector<Vertex> neighbors;
-        nn_->nearestR(v_infeasible, epsilon_max_neighborhood, neighbors);
+      //#######################################################################
+      //Update all sphere radii
+      //#######################################################################
+      std::vector<Vertex> neighbors;
+      nn_->nearestR(v_infeasible, epsilon_max_neighborhood, neighbors);
 
-        for(uint k = 0; k < neighbors.size(); k++){
-          Vertex nk = neighbors.at(k);
-          double dn = Distance(nk, v_infeasible)/2.0;
-          double dold = G[nk].open_neighborhood_distance;
-          G[nk].open_neighborhood_distance = min(dn, dold);
-        }
+      for(uint k = 0; k < neighbors.size(); k++){
+        Vertex nk = neighbors.at(k);
+        double dn = Distance(nk, v_infeasible)/2.0;
+        double dold = G[nk].open_neighborhood_distance;
+        G[nk].open_neighborhood_distance = min(dn, dold);
       }
 
     }
@@ -154,25 +157,15 @@ double QuotientChartComplex::Distance(const Vertex a, const Vertex b) const
 void QuotientChartComplex::getPlannerData(ob::PlannerData &data) const
 {
   uint Nvertices = data.numVertices();
-  //uint Nedges = data.numEdges();
   BaseT::getPlannerData(data);
-
-  //get all the simplices
-  //Complex_simplex_range Gudhi::Simplex_tree< SimplexTreeOptions >::complex_simplex_range 
-  //const Simplex_tree::Complex_simplex_range range = const_cast<const QuotientChartComplex*>(this)->simplex.complex_simplex_range();
 
   for(uint vidx = Nvertices; vidx < data.numVertices(); vidx++){
     PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
     const ob::State *s = v.getState();
-    //const LocalSimplicialComplex& lsc = 
-      //simplicial_complex[s];
-    //dirty 
     v.SetComplex(const_cast<QuotientChartComplex*>(this)->simplicial_complex[s]);
     const std::vector<std::vector<int>> &cmplx = v.GetComplex();
     //std::cout << "vertex " << vidx << " has " << cmplx.size() << " simplices." << std::endl;
-
   }
-
   std::cout << "Graph induced complex is of dimension " << simplex.upper_bound_dimension() 
                     << " - " << simplex.num_vertices() << " vertices." << std::endl;
 

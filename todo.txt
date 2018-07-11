@@ -536,8 +536,10 @@ Measures for deciding which solution class to extend:
 [x] display smoothed path + raw
 [x] copy only shortest path on QS
 
-[ ] get triangulation from graph plus covering
+[x] get triangulation from graph plus covering
 [ ] make infeasible vertices and spheres independent of vertex visualization
+[ ] Update simplicial complex dynamically, based on incoming feasible and
+infeasible samples. Also update the sphere radii.
 
 
 [ ] Step1: Create simplicial complex. Use simplicial complex for sampling
