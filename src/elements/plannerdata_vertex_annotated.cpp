@@ -16,6 +16,7 @@ PlannerDataVertexAnnotated::PlannerDataVertexAnnotated (const PlannerDataVertexA
   path_class = rhs.GetPathClass();
   max_path_class = rhs.GetMaxPathClass();
   path = rhs.GetPath();
+  simplicial_complex_local = rhs.GetComplex();
 }
 
 ob::PlannerDataVertex *PlannerDataVertexAnnotated::clone() const 
@@ -31,6 +32,15 @@ void PlannerDataVertexAnnotated::SetPath(std::vector<int> path_)
 std::vector<int> PlannerDataVertexAnnotated::GetPath() const
 {
   return path;
+}
+//##############################################################################
+void PlannerDataVertexAnnotated::SetComplex(std::vector<std::vector<int>> complex_)
+{
+  simplicial_complex_local = complex_;
+}
+std::vector<std::vector<int>> PlannerDataVertexAnnotated::GetComplex() const
+{
+  return simplicial_complex_local;
 }
 //##############################################################################
 cover::OpenSet* PlannerDataVertexAnnotated::GetOpenSet() const

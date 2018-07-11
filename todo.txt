@@ -535,3 +535,9 @@ Measures for deciding which solution class to extend:
 [x] display path on QS (QCP)
 [x] display smoothed path + raw
 [x] copy only shortest path on QS
+
+[ ] get triangulation from graph plus covering
+[ ] make infeasible vertices and spheres independent of vertex visualization
+
+
+[ ] Step1: Create simplicial complex. Use simplicial complex for sampling

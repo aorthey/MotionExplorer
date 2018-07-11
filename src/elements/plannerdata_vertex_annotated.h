@@ -33,6 +33,9 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
     void SetMaxPathClass(uint level_);
     uint GetMaxPathClass() const;
 
+    void SetComplex(std::vector<std::vector<int>> complex_);
+    std::vector<std::vector<int>> GetComplex() const;
+
     void SetComponent(uint component_);
     uint GetComponent() const;
     void setState(ob::State *s);
@@ -59,6 +62,8 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
     uint max_path_class{0};
 
     std::vector<int> path;
+
+    std::vector<std::vector<int>> simplicial_complex_local;
 
     uint component{99};
 

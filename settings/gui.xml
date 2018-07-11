@@ -71,7 +71,7 @@
   <checkbox>
     <name>draw_play_path</name>
     <descr>Replay Path</descr>
-    <key>5</key>
+    <key>u</key>
     <active>0</active>
   </checkbox>
   <button>
@@ -205,25 +205,27 @@
 
   <checkbox>
     <name>draw_roadmap_vertices</name>
-    <descr>Draw Roadmap Vertices</descr>
     <key>1</key>
     <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_roadmap_edges</name>
-    <descr>Draw Roadmap Edges</descr>
     <key>2</key>
     <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_roadmap_volume</name>
-    <descr>Draw Roadmap Volume</descr>
     <key>3</key>
     <active>1</active>
   </checkbox>
   <checkbox>
-    <name>draw_roadmap_infeasible_vertices</name>
+    <name>draw_roadmap_complex</name>
     <key>4</key>
+    <active>1</active>
+  </checkbox>
+  <checkbox>
+    <name>draw_roadmap_infeasible_vertices</name>
+    <key>5</key>
     <active>1</active>
   </checkbox>
 
@@ -258,8 +260,8 @@
   <!--   <key>z</key> -->
   <!-- </hotkey> -->
 
-  <property name="planner_draw_start_configuration" enabled="1"/>
-  <property name="planner_draw_goal_configuration" enabled="1"/>
+  <property name="planner_draw_start_configuration" enabled="0"/>
+  <property name="planner_draw_goal_configuration" enabled="0"/>
   <property name="draw_path" enabled="0"/>
   <property name="draw_path_unsmoothed" enabled="0"/>
   <property name="draw_path_autofocus" enabled="1"/>
