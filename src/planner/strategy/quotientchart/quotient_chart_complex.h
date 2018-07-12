@@ -15,6 +15,7 @@ namespace ompl
         using Simplex_tree = Gudhi::Simplex_tree<>;
       public:
         QuotientChartComplex(const ob::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
+        virtual void setup() override;
 
         virtual double Distance(const Vertex a, const Vertex b) const override;
         virtual void Grow(double t) override;
@@ -25,6 +26,8 @@ namespace ompl
       private:
         double epsilon_max_neighborhood{2.0};
         Simplex_tree simplex;
+
+        uint ntry;
 
         typedef std::vector< std::vector<int> > LocalSimplicialComplex;
         std::map<const ob::State*, LocalSimplicialComplex> simplicial_complex;

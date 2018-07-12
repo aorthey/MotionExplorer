@@ -83,67 +83,73 @@ void Roadmap::DrawShortestPath(GUIState &state)
 
 void Roadmap::DrawPlannerData(GUIState &state)
 {
-  if(state("draw_roadmap_vertices")){
-    for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
-      glPointSize(sizeVertex);
-      setColor(cVertex);
-      glPushMatrix();
+  for(uint vidx = 0; vidx < pd->numVertices(); vidx++)
+  {
+    glPointSize(sizeVertex);
+    setColor(cVertex);
+    glPushMatrix();
 
-      ob::PlannerDataVertex *vd = &pd->getVertex(vidx);
-      Vector3 q = cspace->getXYZ(vd->getState());
+    ob::PlannerDataVertex *vd = &pd->getVertex(vidx);
+    Vector3 q = cspace->getXYZ(vd->getState());
 
-      PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+    PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
 
-      if(v!=nullptr){
-        if(v->GetComponent()==0){
-          setColor(cVertex);
-        }else if(v->GetComponent()==1){
-          setColor(cVertexComponentGoal);
-        }else{
-          setColor(cVertexComponentOut);
-        }
-        if(pd->isStartVertex(vidx))
+    if(v!=nullptr)
+    {
+      if(v->GetComponent()==0){
+        setColor(cVertex);
+      }else if(v->GetComponent()==1){
+        setColor(cVertexComponentGoal);
+      }else{
+        setColor(cVertexComponentOut);
+      }
+      if(pd->isStartVertex(vidx))
+      {
+        glPointSize(2*sizeVertex);
+        setColor(cVertexStart);
+      }else{
+        if(pd->isGoalVertex(vidx))
         {
           glPointSize(2*sizeVertex);
-          setColor(cVertexStart);
-        }else{
-          if(pd->isGoalVertex(vidx))
-          {
-            glPointSize(2*sizeVertex);
-            setColor(cVertexGoal);
-          }
+          setColor(cVertexGoal);
         }
-
-        double d = v->GetOpenNeighborhoodDistance();
-
-        bool startOrGoal = pd->isStartVertex(vidx) || pd->isGoalVertex(vidx);
-        if(state("draw_roadmap_infeasible_vertices"))
-        {
-          if(d<=0 && !startOrGoal){
-            setColor(red);
-          }
-          drawPoint(q);
-        }else{
-          if(d>0 || startOrGoal){
-            drawPoint(q);
-          }
-        }
-
-        if(state("draw_roadmap_volume")){
-          glTranslate(q);
-          if(quotient_space->GetDimensionality()<=2){
-            Vector3 q2(0,0,1);
-            drawCircle(q2, d);
-          }else{
-            drawSphere(d, 16, 8);
-          }
-        }
-      }else{
-        drawPoint(q);
       }
 
-      glPopMatrix();
+      double d = v->GetOpenNeighborhoodDistance();
+      bool startOrGoal = pd->isStartVertex(vidx) || pd->isGoalVertex(vidx);
+
+      if(state("draw_roadmap_vertices")){
+        if(d>0 || startOrGoal){
+          drawPoint(q);
+        }
+      }
+      if(state("draw_roadmap_infeasible_vertices"))
+      {
+        if(d<=0 && !startOrGoal){
+          setColor(red);
+          drawPoint(q);
+        }
+      }
+      if(state("draw_roadmap_volume")){
+        glTranslate(q);
+        setColor(cNeighborhoodVolume);
+        if(quotient_space->GetDimensionality()<=2){
+          Vector3 q2(0,0,1);
+          drawCircle(q2, d);
+        }else{
+          drawSphere(d, 16, 8);
+        }
+      }
+
+
+    }else{
+      if(state("draw_roadmap_vertices"))
+      {
+        drawPoint(q);
+      }
     }
+
+    glPopMatrix();
   }
 
   if(state("draw_roadmap_edges")){

@@ -102,6 +102,7 @@ namespace ompl
         typedef boost::graph_traits<Graph>::edge_descriptor Edge;
         typedef boost::graph_traits<Graph>::vertices_size_type VertexIndex;
         typedef boost::graph_traits<Graph>::in_edge_iterator IEIterator;
+        typedef boost::graph_traits<Graph>::out_edge_iterator OEIterator;
         typedef Vertex* VertexParent;
         typedef VertexIndex* VertexRank;
         typedef std::shared_ptr<NearestNeighbors<Vertex>> RoadmapNeighbors;

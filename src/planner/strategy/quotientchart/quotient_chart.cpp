@@ -10,6 +10,10 @@ QuotientChart::QuotientChart(const ob::SpaceInformationPtr &si, og::Quotient *pa
   : BaseT(si, parent_)
 {
 }
+bool QuotientChart::IsExhausted() const
+{
+  return false;
+}
 void QuotientChart::setup() 
 {
   if(!local_chart) BaseT::setup();
@@ -127,6 +131,10 @@ void QuotientChart::SetSubGraph( QuotientChart *sibling, uint k )
           Vertex v2 = boost::add_vertex(G);
           G[v1] = Gprime[v1prime];
           G[v2] = Gprime[v2prime];
+
+          // double d1 = Gprime[v1prime].open_neighborhood_distance;
+          // double d2 = G[v1].open_neighborhood_distance;
+          // std::cout << d1 << "->" << d2 << std::endl;
 
           Edge eprime = boost::edge(v1prime,v2prime,Gprime).first;
 

@@ -41,6 +41,7 @@ namespace ompl
 
         uint levels{0};
         bool found_path_on_last_level{false};
+        bool exhausted_levels{false};
 
         std::vector<ob::SpaceInformationPtr> si_vec;
         std::vector<ob::ProblemDefinitionPtr> pdef_vec;

@@ -32,39 +32,41 @@ bool QCP::SampleGraph(ob::State *q_random_graph)
   //PDF<Edge> pdf = GetEdgePDF();
   //Edge e = pdf.sample(rng_.uniform01());
 
-  Edge e;
-  double t = rng_.uniform01();
-  if(t<percentageSamplesOnShortestPath)
-  {
-    //shortest path heuristic
-    PDF<Edge> pdf;
-    percentageSamplesOnShortestPath = exp(-pow(((double)samplesOnShortestPath++/1000.0),2));
+  // Edge e;
+  // double t = rng_.uniform01();
+  // if(t<percentageSamplesOnShortestPath)
+  // {
+  //   //shortest path heuristic
+  //   PDF<Edge> pdf;
+  //   percentageSamplesOnShortestPath = exp(-pow(((double)samplesOnShortestPath++/1000.0),2));
 
-    for(uint k = 0; k < shortestVertexPath_.size()-1; k++){
-      Vertex v1 = shortestVertexPath_.at(k);
-      Vertex v2 = shortestVertexPath_.at(k+1);
-      Edge e = boost::edge(v1,v2,G).first;
-      pdf.add(e, G[e].getCost().value());
-    }
-    e = pdf.sample(rng_.uniform01());
-  }else{
-    e = boost::random_edge(G, rng);
-    while(!sameComponent(boost::source(e, G), startM_.at(0)))
-    {
-      e = boost::random_edge(G, rng);
-    }
-  }
+  //   for(uint k = 0; k < shortestVertexPath_.size()-1; k++){
+  //     Vertex v1 = shortestVertexPath_.at(k);
+  //     Vertex v2 = shortestVertexPath_.at(k+1);
+  //     Edge e = boost::edge(v1,v2,G).first;
+  //     pdf.add(e, G[e].getCost().value());
+  //   }
+  //   e = pdf.sample(rng_.uniform01());
+  // }else{
+  //   e = boost::random_edge(G, rng);
+  //   while(!sameComponent(boost::source(e, G), startM_.at(0)))
+  //   {
+  //     e = boost::random_edge(G, rng);
+  //   }
+  // }
 
-  double s = rng_.uniform01();
+  Vertex v = boost::random_vertex(G, rng);
+  M1_sampler->sampleUniformNear(q_random_graph, q_random_graph, G[v].open_neighborhood_distance);
+  // double s = rng_.uniform01();
 
-  const Vertex v1 = boost::source(e, G);
-  const Vertex v2 = boost::target(e, G);
-  const ob::State *from = G[v1].state;
-  const ob::State *to = G[v2].state;
+  // const Vertex v1 = boost::source(e, G);
+  // const Vertex v2 = boost::target(e, G);
+  // const ob::State *from = G[v1].state;
+  // const ob::State *to = G[v2].state;
 
-  M1->getStateSpace()->interpolate(from, to, s, q_random_graph);
+  // M1->getStateSpace()->interpolate(from, to, s, q_random_graph);
   //M1_sampler->sampleGaussian(q_random_graph, q_random_graph, epsilon);
-  if(epsilon>0) M1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
+  //if(epsilon>0) M1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
   return true;
 }
 
