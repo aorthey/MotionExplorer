@@ -80,6 +80,7 @@ namespace ompl
             void setOriginalWeight(){
               cost = original_cost;
             }
+            std::vector<std::vector<int> > ksimplex;
           private:
             ob::Cost cost{+dInf};
             ob::Cost original_cost{+dInf};

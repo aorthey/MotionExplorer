@@ -546,5 +546,8 @@ infeasible samples. Also update the sphere radii.
 
 
 Problems:
-[ ] spheres should not exceed boundary (why not, might be even better, otherwise
+[x] spheres should not exceed boundary (why not, might be even better, otherwise
 we need infinite number of spheres)
+[ ] make one-step algorithm (is a bit too difficult, only if really needed)
+[ ] inscribe simplicial complex, update simplicial complex, and most importantly
+have an algorithm which can sparsify the complex
