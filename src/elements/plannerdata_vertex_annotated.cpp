@@ -17,8 +17,17 @@ PlannerDataVertexAnnotated::PlannerDataVertexAnnotated (const PlannerDataVertexA
   max_path_class = rhs.GetMaxPathClass();
   path = rhs.GetPath();
   simplicial_complex_local = rhs.GetComplex();
+  infeasible = rhs.IsInfeasible();
 }
 
+void PlannerDataVertexAnnotated::SetInfeasible()
+{
+  infeasible=true;
+}
+bool PlannerDataVertexAnnotated::IsInfeasible() const
+{
+  return infeasible;
+}
 ob::PlannerDataVertex *PlannerDataVertexAnnotated::clone() const 
 {
   return new PlannerDataVertexAnnotated(*this);
@@ -34,6 +43,10 @@ std::vector<int> PlannerDataVertexAnnotated::GetPath() const
   return path;
 }
 //##############################################################################
+void PlannerDataVertexAnnotated::AddComplex(std::vector<int> simplex_)
+{
+  simplicial_complex_local.push_back(simplex_);
+}
 void PlannerDataVertexAnnotated::SetComplex(std::vector<std::vector<int>> complex_)
 {
   simplicial_complex_local = complex_;

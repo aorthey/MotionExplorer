@@ -35,8 +35,6 @@ namespace ompl
         typedef og::Quotient BaseT;
       public:
 
-        typedef unsigned long int VertexIndexType;
-
         class VertexInternalState{
           public:
             VertexInternalState() = default;

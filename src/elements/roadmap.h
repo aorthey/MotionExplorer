@@ -32,7 +32,8 @@ class Roadmap{
 
     GLDraw::GLColor cVertexComponentOut{gray}; //a vertex not in the same component as the designated start vertex
     GLDraw::GLColor cVertexComponentGoal{cyan}; //goal component vertex
-    GLDraw::GLColor cNeighborhoodVolume{lightgreen}; //goal component vertex
+    GLDraw::GLColor cNeighborhoodVolume{lightgreen};
+    GLDraw::GLColor cNeighborhoodVolumeInfeasible{lightred}; 
     double sizeVertex{8};
     double widthEdge{5};
     double widthPath{15};

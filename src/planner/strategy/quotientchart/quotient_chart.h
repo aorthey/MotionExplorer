@@ -43,8 +43,7 @@ namespace ompl
         void SetSubGraph( QuotientChart *sibling, uint k );
         virtual void getPlannerData(ob::PlannerData &data) const override;
 
-      private:
-        //boost::subgraph< og::QuotientGraph::Graph > G_chart;
+      protected:
 
         double importance{0};//how important is the current chart for solving the problem
         double density{0};

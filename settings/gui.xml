@@ -214,12 +214,12 @@
     <active>1</active>
   </checkbox>
   <checkbox>
-    <name>draw_roadmap_volume</name>
+    <name>draw_roadmap_complex</name>
     <key>3</key>
     <active>1</active>
   </checkbox>
   <checkbox>
-    <name>draw_roadmap_complex</name>
+    <name>draw_roadmap_volume</name>
     <key>4</key>
     <active>1</active>
   </checkbox>

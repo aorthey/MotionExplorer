@@ -1,60 +1,128 @@
 #pragma once
+#include <ompl/base/SpaceInformation.h>
+#include <ompl/base/Planner.h>
+#include <ompl/datastructures/NearestNeighbors.h>
+//#include <boost/pending/disjoint_sets.hpp>
+#include <boost/graph/graph_traits.hpp>
+#include <boost/graph/adjacency_list.hpp>
+//#include <boost/graph/random.hpp> 
+//#include <boost/graph/subgraph.hpp>
+//#include <boost/graph/properties.hpp>
+//#include <boost/random/linear_congruential.hpp>
+//#include <boost/random/variate_generator.hpp>
+#include <gudhi/graph_simplicial_complex.h>
+#include <gudhi/Simplex_tree.h>
 
-class SimplicialComplex
+namespace ob = ompl::base;
+
+namespace ompl
 {
-  //implements vietoris rips complex
-  class VertexInternalState{
-    public:
-      VertexInternalState() = default;
-      VertexInternalState(const VertexInternalState &vis) = default;
-      ob::State *state{nullptr};
-      double open_neighborhood_distance{0};
-  };
+  namespace geometric
+  {
+    //@brief: implements vietoris rips complex
+    class SimplicialComplex
+    {
 
-  class EdgeInternalState{
-    public:
-      EdgeInternalState() = default;
-      EdgeInternalState(double weight_): weight(weight_){};
-      void setWeight(double weight_){
-        weight = weight_;
-      }
-      double getWeight(){
-        return weight;
-      }
-    private:
-      double weight;
-  };
+      public:
+        struct GudhiOptions : Gudhi::Simplex_tree_options_full_featured {
+          static const bool store_key = false;
+          static const bool store_filtration = false;
+          typedef int Vertex_handle;
+        };
+        using Simplex_tree = Gudhi::Simplex_tree<GudhiOptions>;
+        using Vertex_handle = Simplex_tree::Vertex_handle;
+        using typeVectorVertex = std::vector<Vertex_handle>;
+        using typePairSimplexBool = std::pair<Simplex_tree::Simplex_handle, bool>;
 
-  typedef boost::adjacency_list<
-     boost::vecS, 
-     boost::vecS, 
-     boost::undirectedS,
-     VertexInternalState,
-     EdgeInternalState
-   > Graph;
+        ob::SpaceInformationPtr si;
+        double epsilon_max_neighborhood;
+        Simplex_tree simplexTree;
 
-  typedef boost::graph_traits<Graph> BGT;
-  typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
-  typedef boost::graph_traits<Graph>::edge_descriptor Edge;
-  typedef boost::graph_traits<Graph>::vertices_size_type VertexIndex;
-  typedef boost::graph_traits<Graph>::in_edge_iterator IEIterator;
-  typedef boost::graph_traits<Graph>::out_edge_iterator OEIterator;
-  typedef Vertex* VertexParent;
-  typedef VertexIndex* VertexRank;
-  typedef std::shared_ptr<NearestNeighbors<Vertex>> RoadmapNeighbors;
-  typedef std::function<const std::vector<Vertex> &(const Vertex)> ConnectionStrategy;
+        class VertexInternalState{
+          public:
+            VertexInternalState() = default;
+            VertexInternalState(const VertexInternalState &vis) = default;
+            ob::State *state{nullptr};
+            double open_neighborhood_distance{0.0};
+            bool isStart{false};
+            bool isGoal{false};
+            bool isInfeasible{false};
+        };
 
-  public:
-    RoadmapNeighbors nn_infeasible;
-    RoadmapNeighbors nn_feasible;
+        class EdgeInternalState{
+          public:
+            EdgeInternalState() = default;
+            EdgeInternalState(double weight_): weight(weight_){};
+            void setWeight(double weight_){
+              weight = weight_;
+            }
+            double getWeight(){
+              return weight;
+            }
+          private:
+            double weight;
+        };
 
-    SimplicialComplex
+        typedef boost::adjacency_list<
+           boost::vecS, 
+           boost::vecS, 
+           boost::undirectedS,
+           VertexInternalState,
+           EdgeInternalState
+         > Graph;
 
-    void AddVertex(ob::State *s);
-    void AddEdge(ob::State *s1, ob::State *s2);
+        typedef boost::graph_traits<Graph> BGT;
+        typedef BGT::vertex_descriptor Vertex;
+        typedef BGT::edge_descriptor Edge;
+        typedef BGT::vertices_size_type VertexIndex;
+        typedef BGT::in_edge_iterator IEIterator;
+        typedef BGT::out_edge_iterator OEIterator;
+        typedef BGT::adjacency_iterator adjacency_iterator;
+        typedef Vertex* VertexParent;
+        typedef VertexIndex* VertexRank;
+        typedef std::shared_ptr<NearestNeighbors<Vertex>> RoadmapNeighbors;
+        typedef std::function<const std::vector<Vertex> &(const Vertex)> ConnectionStrategy;
 
-    void RemoveEdge(Vertex v1, Vertex v2);
+        RoadmapNeighbors nn_infeasible;
+        RoadmapNeighbors nn_feasible;
 
+        Graph G;
 
+        SimplicialComplex(ob::SpaceInformationPtr si_, ob::Planner* planner_, double epsilon_max_neighborhood_ = 1.0);
+
+        const Graph& GetGraph();
+        void AddStart(const ob::State *s);
+        void AddGoal(const ob::State *s);
+        double Distance(const Vertex a, const Vertex b);
+
+        Vertex AddFeasible(const ob::State *s);
+        Vertex AddInfeasible(const ob::State *s);
+        Vertex Add(const ob::State *s, RoadmapNeighbors nn_positive, RoadmapNeighbors nn_negative);
+
+        void AddEdge(const Vertex v, const Vertex b);
+        void RemoveEdge(const Vertex v, const Vertex b);
+
+        //ntry is the number of failures to update the simplicial complex when
+        //adding new samples. The more failures we accumulate, the better our
+        //approximation will be. As suggested by simeon_2000, we could terminate
+        //the algorithm if ntry becomes larger than some user set value M.
+        //However, in our case, it seems more adequate to compute some kind of
+        //average ntry (over the last 100 samples or something).:W
+        uint ntry{0};
+
+        std::vector<int> ntry_over_iterations;
+
+        //Simeon_2000: Parameter ntry is the number of failures before the  insertion of a
+        //new  guard node.  1/ntry gives an estimation of  the volume not yet
+        //covered by visibility domains. It estimates the fraction between the
+        //non-covered volume and the total volume of CS free. This is a
+        //critical parameter which controls the end of the algorithm.  Hence,
+        //the algorithm stops when ntry becomes greater than a user set value M
+        //, which means that the volume of the free space covered by
+        //visibility domains becomes probably greater than (1 - 1/M).
+        //
+
+    };
+
+  }
 }
-

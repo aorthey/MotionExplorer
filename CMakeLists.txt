@@ -42,6 +42,11 @@ FIND_PACKAGE(iris REQUIRED)
 SET(DEPENDENCIES ${DEPENDENCIES} IRIS)
 INCLUDE_DIRECTORIES("/home/aorthey/git/orthoklampt/src/3rdparty/gudhi/include/")
 
+#find_package(PythonLibs 2.7.6 EXACT REQUIRED)
+#set(PYTHON_LIBRARY "\\usr\\lib\\python2.7")
+#set(PYTHON_INCLUDE_DIR "\\usr\\include\\python2.7")
+#SET(DEPENDENCIES ${DEPENDENCIES} PYTHON)
+
 #cmake_policy(SET CMP0015 NEW)
 #SET(SBL_USE_LIBS ESBTL CGAL MPFR Boost)
 #if ( SBL_FOUND )

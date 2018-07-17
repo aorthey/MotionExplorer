@@ -116,23 +116,24 @@ void Roadmap::DrawPlannerData(GUIState &state)
       }
 
       double d = v->GetOpenNeighborhoodDistance();
-      bool startOrGoal = pd->isStartVertex(vidx) || pd->isGoalVertex(vidx);
+      //bool startOrGoal = pd->isStartVertex(vidx) || pd->isGoalVertex(vidx);
 
       if(state("draw_roadmap_vertices")){
-        if(d>0 || startOrGoal){
+        if(!v->IsInfeasible()){
           drawPoint(q);
         }
       }
       if(state("draw_roadmap_infeasible_vertices"))
       {
-        if(d<=0 && !startOrGoal){
+        if(v->IsInfeasible()){
           setColor(red);
           drawPoint(q);
         }
       }
       if(state("draw_roadmap_volume")){
         glTranslate(q);
-        setColor(cNeighborhoodVolume);
+        if(!v->IsInfeasible()) setColor(cNeighborhoodVolume);
+        else setColor(cNeighborhoodVolumeInfeasible);
         if(quotient_space->GetDimensionality()<=2){
           Vector3 q2(0,0,1);
           drawCircle(q2, d);
@@ -224,7 +225,7 @@ void Roadmap::DrawPlannerData(GUIState &state)
             }
           default:
             {
-              std::cout << "cannot visualize simplex of dimensionality " << K << std::endl;
+              //std::cout << "cannot visualize simplex of dimensionality " << K << std::endl;
               break;
             }
                    

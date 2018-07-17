@@ -30,10 +30,14 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
     void SetPathClass(uint level_);
     uint GetPathClass() const;
 
+    void SetInfeasible();
+    bool IsInfeasible() const;
+
     void SetMaxPathClass(uint level_);
     uint GetMaxPathClass() const;
 
     void SetComplex(std::vector<std::vector<int>> complex_);
+    void AddComplex(std::vector<int> simplex_);
     std::vector<std::vector<int>> GetComplex() const;
 
     void SetComponent(uint component_);
@@ -54,6 +58,7 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
   protected:
     cover::OpenSet *openset{nullptr};
 
+    bool infeasible{false};
     double open_neighborhood_distance{0.0};
     uint level{0};
     uint max_level{1};
