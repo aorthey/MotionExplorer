@@ -79,24 +79,6 @@ void SimplicialComplex::AddSimplices(const Vertex v, RoadmapNeighbors nn)
     }
   }
   //#######################################################################
-  //Get graph neighborhood represented as local adjacency map (and connect
-  //edges)
-  //#######################################################################
-  // uint N = neighbors.size();
-  // MatrixXi A(N,N); A.setZero();
-
-  // for(uint k = 0; k < N; k++){
-  //   Vertex vk = neighbors.at(k);
-  //   Edge e = AddEdge(v, vk).first;
-  //   for(uint j = k+1; j < N; j++){
-  //     Vertex vj = neighbors.at(j);
-  //     if(HaveIntersectingSpheres(vk, vj))
-  //     {
-  //       A(i,j) = 1;
-  //     }
-  //   }
-  // }
-  //#######################################################################
   //Compute simplices
   //#######################################################################
   //VectorXi S_A = A.rowwise().sum();
@@ -112,10 +94,27 @@ void SimplicialComplex::AddSimplices(const Vertex v, RoadmapNeighbors nn)
   }
 }
 
-//
-// o----o     o
-//  \  /
-//   o------o
+void SimplicialComplex::comb(int N, Simplex *coface, std::vector<Vertex> vertices)
+{
+  std::string bitmask(N-1, 1); // K leading 1's
+  bitmask.resize(N, 0); // N-K trailing 0's
+
+  do {
+    std::vector<unsigned long int> facet;
+    for (int i = 0; i < N; i++)
+    {
+      if (bitmask[i]) facet.push_back(vertices.at(i));
+    }
+    //std::cout << "facet: " << facet << std::endl;
+    if(N>3){
+      Simplex *kfacet = simplex_map[facet];
+      kfacet->AddCoface(coface);
+    }else{
+      Edge e = boost::edge(facet.at(0), facet.at(1), G).first;
+      G[e].cofaces.push_back(coface);
+    }
+  } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
+}
 
 void SimplicialComplex::AddSimplexAndCofaces(const std::vector<Vertex> sigma, std::vector<Vertex> neighbors, Simplex *parent)
 {
@@ -133,6 +132,15 @@ void SimplicialComplex::AddSimplexAndCofaces(const std::vector<Vertex> sigma, st
       gamma_v.push_back(vi);
       Simplex* gamma = new Simplex(gamma_v);
       simplex_map[gamma_v] = gamma;
+      std::cout << gamma_v << std::endl;
+      if(K<=2){
+        Edge e = boost::edge(sigma.at(0), sigma.at(1), G).first;
+        G[e].cofaces.push_back(gamma);
+      }else{
+        simplex_map[sigma]->AddCoface(gamma);
+      }
+      comb(K+1, gamma, gamma_v);
+      //exit(0);
     }
     std::vector<Vertex> neighbors_of_neighbors;
     for(uint j = i+1; j < N; j++){

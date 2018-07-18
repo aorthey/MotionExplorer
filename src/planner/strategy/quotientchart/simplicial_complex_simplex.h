@@ -13,7 +13,7 @@ namespace ompl
 
         void Clear();
         std::vector<simplex_t> GetVertices() const;
-        void AddCoFace(Simplex* coface);
+        void AddCoface(Simplex* coface);
 
         std::vector<Simplex*> facets;
         std::vector<Simplex*> cofaces;

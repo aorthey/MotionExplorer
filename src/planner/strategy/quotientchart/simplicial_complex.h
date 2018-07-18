@@ -46,9 +46,9 @@ namespace ompl
                   cofaces.at(k)->Clear();
                 }
               }
+              std::vector<Simplex*> cofaces;
             private:
               double weight;
-              std::vector<Simplex*> cofaces;
           };
 
           typedef boost::adjacency_list<
@@ -76,6 +76,7 @@ namespace ompl
           typedef VerticesToSimplexMap::iterator ISimplexMap;
 
           std::vector<std::vector<Vertex>> GetSimplicesOfDimension(uint k);
+          void comb(int N, Simplex *coface, std::vector<Vertex> vertices);
 
           ob::SpaceInformationPtr si;
           double epsilon_max_neighborhood{0};

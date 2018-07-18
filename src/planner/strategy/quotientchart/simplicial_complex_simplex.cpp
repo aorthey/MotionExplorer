@@ -35,21 +35,22 @@ void Simplex::Clear()
   for(uint k = 0; k < cofaces.size(); k++){
     cofaces.at(k)->Clear();
   }
-  for(uint k = 0; k < facets.size(); k++){
-    Simplex *facet = facets.at(k);
-    for(uint j = 0; j < facet->cofaces.size(); j++){
-      Simplex *coface = facet->cofaces.at(j);
-      if(coface == this)
-      {
-        facet->cofaces.erase(facet->cofaces.begin() + j);
-        break;
-      }
-    }
-  }
+  // for(uint k = 0; k < facets.size(); k++){
+  //   Simplex *facet = facets.at(k);
+  //   for(uint j = 0; j < facet->cofaces.size(); j++){
+  //     Simplex *coface = facet->cofaces.at(j);
+  //     if(coface == this)
+  //     {
+  //       facet->cofaces.erase(facet->cofaces.begin() + j);
+  //       break;
+  //     }
+  //   }
+  // }
+  vertices.clear();
   //no pointers should be left, we can remove this simplex
 }
 
-void Simplex::AddCoFace(Simplex* coface)
+void Simplex::AddCoface(Simplex* coface)
 {
   cofaces.push_back(coface);
 }
