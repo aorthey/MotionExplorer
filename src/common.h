@@ -21,3 +21,4 @@ std::ostream& operator<< (std::ostream& out, const std::map<T,TT> &t_map){
   out << "}";
   return out;
 }
+typedef unsigned int uint;

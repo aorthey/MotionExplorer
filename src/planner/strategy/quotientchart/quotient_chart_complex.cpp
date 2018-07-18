@@ -5,6 +5,7 @@
 #include <boost/foreach.hpp>
 
 using namespace og;
+using namespace ogt;
 #define foreach BOOST_FOREACH
 
 QuotientChartComplex::QuotientChartComplex(const ob::SpaceInformationPtr &si, og::Quotient *parent_)
@@ -14,7 +15,7 @@ QuotientChartComplex::QuotientChartComplex(const ob::SpaceInformationPtr &si, og
 void QuotientChartComplex::setup() 
 {
   if(pdef_ && !setup_){
-    simplicial_complex = new SimplicialComplex(si_, this);
+    simplicial_complex = new ogt::SimplicialComplex(si_, this);
 
     if(const ob::State *s = pis_.nextStart()){
       simplicial_complex->AddStart(s);
@@ -196,26 +197,33 @@ void QuotientChartComplex::getPlannerData(ob::PlannerData &data) const
   //###########################################################################
 
   uint N = si_->getStateDimension();
-  simplicial_complex->simplexTree.expansion(N);
-
-  std::vector<int> ctr(N+1);
-
-  for(auto k_simplex: simplicial_complex->simplexTree.skeleton_simplex_range(N))
-  {
-    uint k_size = simplicial_complex->simplexTree.dimension(k_simplex);
-    ctr.at(k_size)++;
-    if(k_size <= N){
-      std::vector<int> ks;
-      for (auto vertex : simplicial_complex->simplexTree.simplex_vertex_range(k_simplex)) ks.push_back(vertex);
-      PlannerDataVertexAnnotated *v = static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(ks.at(0)));
-      v->AddComplex(ks);
-    }
+  std::vector<std::vector<SimplicialComplex::Vertex>> k_skeleton = simplicial_complex->GetSimplicesOfDimension(N+1);
+  for(uint i = 0; i < k_skeleton.size(); i++){
+    std::vector<SimplicialComplex::Vertex> ks = k_skeleton.at(i);
+    PlannerDataVertexAnnotated *v = static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(ks.at(0)));
+    v->AddComplex(ks);
   }
 
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "* The complex contains " << simplicial_complex->simplexTree.num_simplices() << " simplices " << ctr;
-  std::cout << "   - dimension " << simplicial_complex->simplexTree.dimension() << "\n";
-  std::cout << std::string(80, '-') << std::endl;
+  // simplicial_complex->simplexTree.expansion(N);
+
+  // std::vector<int> ctr(N+1);
+
+  // for(auto k_simplex: simplicial_complex->simplexTree.skeleton_simplex_range(N))
+  // {
+  //   uint k_size = simplicial_complex->simplexTree.dimension(k_simplex);
+  //   ctr.at(k_size)++;
+  //   if(k_size <= N){
+  //     std::vector<int> ks;
+  //     for (auto vertex : simplicial_complex->simplexTree.simplex_vertex_range(k_simplex)) ks.push_back(vertex);
+  //     PlannerDataVertexAnnotated *v = static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(ks.at(0)));
+  //     v->AddComplex(ks);
+  //   }
+  // }
+
+  // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << "* The complex contains " << simplicial_complex->simplexTree.num_simplices() << " simplices " << ctr;
+  // std::cout << "   - dimension " << simplicial_complex->simplexTree.dimension() << "\n";
+  // std::cout << std::string(80, '-') << std::endl;
 
 
   //###########################################################################

@@ -43,15 +43,15 @@ std::vector<int> PlannerDataVertexAnnotated::GetPath() const
   return path;
 }
 //##############################################################################
-void PlannerDataVertexAnnotated::AddComplex(std::vector<int> simplex_)
+void PlannerDataVertexAnnotated::AddComplex(std::vector<long unsigned int> simplex_)
 {
   simplicial_complex_local.push_back(simplex_);
 }
-void PlannerDataVertexAnnotated::SetComplex(std::vector<std::vector<int>> complex_)
+void PlannerDataVertexAnnotated::SetComplex(std::vector<std::vector<long unsigned int>> complex_)
 {
   simplicial_complex_local = complex_;
 }
-std::vector<std::vector<int>> PlannerDataVertexAnnotated::GetComplex() const
+std::vector<std::vector<long unsigned int>> PlannerDataVertexAnnotated::GetComplex() const
 {
   return simplicial_complex_local;
 }

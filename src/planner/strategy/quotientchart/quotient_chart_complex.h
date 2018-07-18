@@ -3,6 +3,7 @@
 #include "simplicial_complex.h"
 
 namespace ob = ompl::base;
+namespace ogt = ompl::geometric::topology;
 
 namespace ompl
 {
@@ -29,7 +30,7 @@ namespace ompl
         double epsilon_max_neighborhood{1.0};
         uint ntry;
 
-        SimplicialComplex *simplicial_complex;
+        ogt::SimplicialComplex *simplicial_complex;
 
     };
   }

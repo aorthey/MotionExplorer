@@ -192,12 +192,12 @@ void Roadmap::DrawPlannerData(GUIState &state)
 
       ob::PlannerDataVertex *v1 = &pd->getVertex(vidx);
       PlannerDataVertexAnnotated *v1a = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
-      std::vector<std::vector<int>> simplices = v1a->GetComplex();
+      std::vector<std::vector<long unsigned int>> simplices = v1a->GetComplex();
       //if(simplices.size()>0) std::cout << "vertex " << vidx << " has " << simplices.size() << " simplices." << std::endl;
 
       Vector3 p1 = cspace->getXYZ(v1->getState());
       for(uint i = 0; i < simplices.size(); i++){
-        const std::vector<int>& svertices = simplices.at(i);
+        const std::vector<long unsigned int>& svertices = simplices.at(i);
 
         uint K = svertices.size();
         std::vector<Vector3> pvec;

@@ -1,13 +1,15 @@
 #include "simplicial_complex.h"
 #include "common.h"
 #include <ompl/tools/config/SelfConfig.h>
-#include <gudhi/Debug_utils.h>
+#include <Eigen/Core>
 
-using namespace ompl::geometric;
 using namespace ompl::base;
+using namespace Eigen;
+using namespace ompl::geometric;
+using namespace ompl::geometric::topology;
 
 SimplicialComplex::SimplicialComplex(ob::SpaceInformationPtr si_, ob::Planner* planner_, double epsilon_max_neighborhood_):
-  si(si_), epsilon_max_neighborhood(epsilon_max_neighborhood_)
+  si(si_), epsilon_max_neighborhood(epsilon_max_neighborhood_), max_dimension(si_->getStateDimension())
 {
   nn_feasible.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(planner_));
   nn_feasible->setDistanceFunction([this](const Vertex a, const Vertex b)
@@ -39,15 +41,113 @@ double SimplicialComplex::Distance(const Vertex a, const Vertex b)
   return si->distance(G[a].state, G[b].state);
 }
 
-void SimplicialComplex::AddEdge(const Vertex a, const Vertex b)
+std::pair<SimplicialComplex::Edge, bool> SimplicialComplex::AddEdge(const Vertex a, const Vertex b)
 {
   EdgeInternalState properties(Distance(a,b));
-  boost::add_edge(a, b, properties, G);
+  return boost::add_edge(a, b, properties, G);
 }
+
+bool SimplicialComplex::HaveIntersectingSpheres(const Vertex a, const Vertex b)
+{
+  double d_overall = Distance(a, b);
+  double d_a = G[a].open_neighborhood_distance;
+  double d_b = G[b].open_neighborhood_distance;
+  return ((d_a+d_b) >= d_overall);
+}
+
 void SimplicialComplex::RemoveEdge(const Vertex a, const Vertex b)
 {
   Edge e = boost::edge(a, b, G).first;
+  G[e].Clear();
   boost::remove_edge(e, G);
+}
+
+void SimplicialComplex::AddSimplices(const Vertex v, RoadmapNeighbors nn)
+{
+  //#######################################################################
+  //Get all neighbors which will share an edge
+  //#######################################################################
+  std::vector<Vertex> suspected_neighbors;
+  nn->nearestR(v, 2*epsilon_max_neighborhood, suspected_neighbors);
+
+  std::vector<Vertex> neighbors;
+  for(uint k = 0; k < suspected_neighbors.size(); k++){
+    Vertex vk = suspected_neighbors.at(k);
+    if(HaveIntersectingSpheres(v,vk)){
+      AddEdge(v, vk);
+      neighbors.push_back(vk);
+    }
+  }
+  //#######################################################################
+  //Get graph neighborhood represented as local adjacency map (and connect
+  //edges)
+  //#######################################################################
+  // uint N = neighbors.size();
+  // MatrixXi A(N,N); A.setZero();
+
+  // for(uint k = 0; k < N; k++){
+  //   Vertex vk = neighbors.at(k);
+  //   Edge e = AddEdge(v, vk).first;
+  //   for(uint j = k+1; j < N; j++){
+  //     Vertex vj = neighbors.at(j);
+  //     if(HaveIntersectingSpheres(vk, vj))
+  //     {
+  //       A(i,j) = 1;
+  //     }
+  //   }
+  // }
+  //#######################################################################
+  //Compute simplices
+  //#######################################################################
+  //VectorXi S_A = A.rowwise().sum();
+
+  if(neighbors.size()>0)
+  {
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "vertex " << v << " nbrs " << neighbors << std::endl;
+    std::cout << "max_dimension: " << max_dimension << std::endl;
+    std::vector<Vertex> sigma;
+    sigma.push_back(v);
+    AddSimplexAndCofaces(sigma, neighbors);
+  }
+}
+
+//
+// o----o     o
+//  \  /
+//   o------o
+
+void SimplicialComplex::AddSimplexAndCofaces(const std::vector<Vertex> sigma, std::vector<Vertex> neighbors, Simplex *parent)
+{
+  if(sigma.size()>max_dimension) return;
+
+  uint K = sigma.size();
+  uint N = neighbors.size();
+
+  for(uint i = 0; i < N; i++){
+    Vertex vi = neighbors.at(i);
+    if(K > 1){
+      std::cout << "simplex: " << sigma << " \\cup " << vi << " max_dimension: " << max_dimension << std::endl;
+
+      std::vector<Vertex> gamma_v(sigma);
+      gamma_v.push_back(vi);
+      Simplex* gamma = new Simplex(gamma_v);
+      simplex_map[gamma_v] = gamma;
+    }
+    std::vector<Vertex> neighbors_of_neighbors;
+    for(uint j = i+1; j < N; j++){
+      Vertex vj = neighbors.at(j);
+      if(HaveIntersectingSpheres(vi, vj))
+      {
+        neighbors_of_neighbors.push_back(vj);
+      }
+    }
+    if(neighbors_of_neighbors.size()>0){
+      std::vector<Vertex> tau(sigma);
+      tau.push_back(vi);
+      AddSimplexAndCofaces(tau, neighbors_of_neighbors);
+    }
+  }
 }
 
 //General Strategy for adding a feasible (infeasible) vertex
@@ -71,26 +171,11 @@ SimplicialComplex::Vertex SimplicialComplex::AddInfeasible(const ob::State *s)
 
 SimplicialComplex::Vertex SimplicialComplex::AddFeasible(const ob::State *s)
 {
-  Vertex v = Add(s, nn_feasible, nn_infeasible);
-  simplexTree.insert_simplex({(int)v});
-
-  // std::vector<Vertex> neighbors;
-  // nn_positive->nearestR(v, 2*epsilon_max_neighborhood, neighbors);
-  // for(uint k = 0; k < ; k++){
-  // }
-
-  std::pair<adjacency_iterator, adjacency_iterator> neighbors =
-    boost::adjacent_vertices(boost::vertex(v,G), G);
- 
-  for(; neighbors.first != neighbors.second; ++neighbors.first)
-  {
-    simplexTree.insert_simplex({(int)v, (int)*neighbors.first});
-  }
-
+  Vertex v = Add(s, nn_feasible, nn_infeasible, true);
   return v;
 }
 
-SimplicialComplex::Vertex SimplicialComplex::Add(const ob::State *s, RoadmapNeighbors nn_positive, RoadmapNeighbors nn_negative)
+SimplicialComplex::Vertex SimplicialComplex::Add(const ob::State *s, RoadmapNeighbors nn_positive, RoadmapNeighbors nn_negative, bool addSimplices)
 {
   //#######################################################################
   //Add vertex to graph
@@ -113,24 +198,17 @@ SimplicialComplex::Vertex SimplicialComplex::Add(const ob::State *s, RoadmapNeig
   //#######################################################################
   //Connect to all intersecting samples, create local 1-skeleton
   //#######################################################################
-  std::vector<Vertex> neighbors;
-  nn_positive->nearestR(v, 2*epsilon_max_neighborhood, neighbors);
-  double d = G[v].open_neighborhood_distance;
 
-  for(uint k = 0; k < neighbors.size(); k++){
-    Vertex vk = neighbors.at(k);
-    double dall = Distance(v, vk);
-    double dk = G[vk].open_neighborhood_distance;
-    if(d+dk > dall){
-      AddEdge(v, vk);
-    }
+  if(addSimplices)
+  {
+    AddSimplices(v, nn_positive);
   }
 
   //#######################################################################
   //Update all sphere radii of the negative neighbors. If a sphere radius is changed, remove edges
   //which are not contained in the sphere anymore
   //#######################################################################
-  neighbors.clear();
+  std::vector<Vertex> neighbors;
   nn_negative->nearestR(v, epsilon_max_neighborhood, neighbors);
 
   bool morphological_change = false;
@@ -150,11 +228,15 @@ SimplicialComplex::Vertex SimplicialComplex::Add(const ob::State *s, RoadmapNeig
       for (next = eo; eo != eo_end; eo = next) {
         ++next;
         const Vertex vkn = boost::target(*eo, G);
-        double dall = Distance(vk, vkn);
-        double ds_kn = G[vkn].open_neighborhood_distance;
-        if(ds_kn + ds_k < dall){
+        if(!HaveIntersectingSpheres(vk, vkn))
+        {
           edge_removal.push_back(vkn);
         }
+        // double dall = Distance(vk, vkn);
+        // double ds_kn = G[vkn].open_neighborhood_distance;
+        // if(ds_kn + ds_k < dall){
+        //   edge_removal.push_back(vkn);
+        // }
       }
       for(uint k = 0; k < edge_removal.size(); k++){
         const Vertex vkn = edge_removal.at(k);
@@ -165,6 +247,8 @@ SimplicialComplex::Vertex SimplicialComplex::Add(const ob::State *s, RoadmapNeig
   }
   if(morphological_change) ntry=0;
   else ntry++;
+  ntry_over_iterations.push_back(ntry);
+
   //#######################################################################
   //add vertex to neighborhood structure
   //#######################################################################
@@ -175,78 +259,18 @@ SimplicialComplex::Vertex SimplicialComplex::Add(const ob::State *s, RoadmapNeig
 
 const SimplicialComplex::Graph& SimplicialComplex::GetGraph()
 {
-  // std::cout << "* The complex contains " << simplexTree.num_simplices() << " simplices\n";
-  // std::cout << "   - dimension " << simplexTree.dimension() << "\n";
-  
-  // std::cout << "* Iterator on Simplices in the filtration, with [filtration value]:\n";
-  // for (auto f_simplex : simplexTree.filtration_simplex_range()) {
-  //   std::cout << "   "
-  //             << "[" << simplexTree.filtration(f_simplex) << "] ";
-  //   for (auto vertex : simplexTree.simplex_vertex_range(f_simplex)) std::cout << "(" << vertex << ")";
-  //   std::cout << std::endl;
-  // }
   return G;
 }
 
-        // struct Ksimplex{
-        //   Ksimplex(std::vector<int> vertices_):
-        //     vertices(vertices_) 
-        //   {
-        //     uint N = vertices.size();
-        //     if(N>2) comb(N,N-1);
-        //   };
+std::vector<std::vector<SimplicialComplex::Vertex>> SimplicialComplex::GetSimplicesOfDimension(uint k)
+{
+  std::vector<std::vector<SimplicialComplex::Vertex>> v;
 
-        //   void comb(int N, int K)
-        //   {
-        //     std::string bitmask(K, 1); // K leading 1's
-        //     bitmask.resize(N, 0); // N-K trailing 0's
-        //     do {
-        //       std::vector<int> facet;
-        //       for (int i = 0; i < N; i++)
-        //       {
-        //           if (bitmask[i]) facet.push_back(vertices.at(i));
-        //       }
-        //       Ksimplex *kfacet = simplicial_complex[facet];
-        //       facets.push_back(kfacet);
-        //       kfacet->AddCoFace(this);
-
-        //     } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
-        //   }
-
-        //   void Clear()
-        //   {
-        //     for(uint k = 0; k < cofaces.size(); k++){
-        //       cofaces.at(k)->Clear();
-        //     }
-        //     for(uint k = 0; k < facets.size(); k++){
-        //       Ksimplex *facet = facets.at(k);
-        //       for(uint j = 0; j < facet->cofaces.size(); j++){
-        //         Ksimplex *coface = facet->cofaces.at(j);
-        //         if(coface == this)
-        //         {
-        //           facet->cofaces.erase(facet->cofaces.begin() + j);
-        //           break;
-        //         }
-        //       }
-        //     }
-        //     //no pointers should be left, we can remove this Ksimplex
-        //   }
-
-        //   void AddCoFace(Ksimplex* coface)
-        //   {
-        //     cofaces.push_back(coface);
-        //   }
-
-        //   std::vector<Ksimplex*> facets;
-        //   std::vector<Ksimplex*> cofaces;
-        //   std::vector<int> vertices;
-        // };
-
-        // std::map<std::vector<int>, Ksimplex*> simplicial_complex;
-
-        // //typedef std::vector< std::vector<int> > LocalSimplicialComplex;
-        // //typedef std::pair<const ob::State*, const ob::State*> EdgeVertices;
-        // //std::map<const ob::State*, LocalSimplicialComplex> simplicial_complex;
-        // //std::map<Edge, LocalSimplicialComplex> simplicial_complex;
-
-        // RoadmapNeighbors nn_infeasible;
+  for(ISimplexMap it=simplex_map.begin(); it!=simplex_map.end(); ++it)
+  {
+    if(it->first.size()==k){
+      v.push_back(it->first);
+    }
+  }
+  return v;
+}
