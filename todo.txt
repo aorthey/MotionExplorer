@@ -551,3 +551,6 @@ we need infinite number of spheres)
 [ ] make one-step algorithm (is a bit too difficult, only if really needed)
 [ ] inscribe simplicial complex, update simplicial complex, and most importantly
 have an algorithm which can sparsify the complex
+
+[ ] issue: some paths go farther than the epsilon specified by complex --- how
+to remedy that ?

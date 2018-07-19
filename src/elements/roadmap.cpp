@@ -83,6 +83,8 @@ void Roadmap::DrawShortestPath(GUIState &state)
 
 void Roadmap::DrawPlannerData(GUIState &state)
 {
+  glDisable(GL_LIGHTING);
+  glEnable(GL_BLEND); 
   for(uint vidx = 0; vidx < pd->numVertices(); vidx++)
   {
     glPointSize(sizeVertex);
@@ -184,24 +186,25 @@ void Roadmap::DrawPlannerData(GUIState &state)
     }
     glPopMatrix();
   }
+  glDisable(GL_CULL_FACE);
   if(state("draw_roadmap_complex")){
     glPushMatrix();
     glLineWidth(widthEdge);
     setColor(cComplex);
     for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
 
-      ob::PlannerDataVertex *v1 = &pd->getVertex(vidx);
+      //ob::PlannerDataVertex *v1 = &pd->getVertex(vidx);
+      //Vector3 p1 = cspace->getXYZ(v1->getState());
+
       PlannerDataVertexAnnotated *v1a = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
       std::vector<std::vector<long unsigned int>> simplices = v1a->GetComplex();
       //if(simplices.size()>0) std::cout << "vertex " << vidx << " has " << simplices.size() << " simplices." << std::endl;
 
-      Vector3 p1 = cspace->getXYZ(v1->getState());
       for(uint i = 0; i < simplices.size(); i++){
         const std::vector<long unsigned int>& svertices = simplices.at(i);
 
         uint K = svertices.size();
         std::vector<Vector3> pvec;
-        pvec.push_back(p1);
         for(uint k = 0; k < K; k++){
           ob::PlannerDataVertex *vk = &pd->getVertex(svertices.at(k));
           Vector3 p = cspace->getXYZ(vk->getState());
@@ -236,6 +239,8 @@ void Roadmap::DrawPlannerData(GUIState &state)
     }
     glPopMatrix();
   }
+  glEnable(GL_LIGHTING);
+  glDisable(GL_BLEND); 
 }
 
 void Roadmap::DrawGL(GUIState& state)

@@ -198,6 +198,8 @@ void QuotientChartComplex::getPlannerData(ob::PlannerData &data) const
 
   uint N = si_->getStateDimension();
   std::vector<std::vector<SimplicialComplex::Vertex>> k_skeleton = simplicial_complex->GetSimplicesOfDimension(N+1);
+  std::cout << "simplices of dimension " << N+1 << ":" << k_skeleton.size() << std::endl;
+
   for(uint i = 0; i < k_skeleton.size(); i++){
     std::vector<SimplicialComplex::Vertex> ks = k_skeleton.at(i);
     PlannerDataVertexAnnotated *v = static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(ks.at(0)));

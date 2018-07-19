@@ -46,7 +46,7 @@ void Simplex::Clear()
   //     }
   //   }
   // }
-  vertices.clear();
+  //vertices.clear();
   //no pointers should be left, we can remove this simplex
 }
 

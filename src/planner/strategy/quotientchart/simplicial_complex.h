@@ -72,8 +72,8 @@ namespace ompl
           typedef std::function<const std::vector<Vertex> &(const Vertex)> ConnectionStrategy;
 
           typedef std::map<std::vector<Vertex>, Simplex*> VerticesToSimplexMap;
-          VerticesToSimplexMap simplex_map;
           typedef VerticesToSimplexMap::iterator ISimplexMap;
+          VerticesToSimplexMap simplex_map;
 
           std::vector<std::vector<Vertex>> GetSimplicesOfDimension(uint k);
           void comb(int N, Simplex *coface, std::vector<Vertex> vertices);

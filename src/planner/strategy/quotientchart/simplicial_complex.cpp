@@ -57,9 +57,9 @@ bool SimplicialComplex::HaveIntersectingSpheres(const Vertex a, const Vertex b)
 
 void SimplicialComplex::RemoveEdge(const Vertex a, const Vertex b)
 {
-  Edge e = boost::edge(a, b, G).first;
-  G[e].Clear();
-  boost::remove_edge(e, G);
+  //Edge e = boost::edge(a, b, G).first;
+  //G[e].Clear();
+  //boost::remove_edge(e, G);
 }
 
 void SimplicialComplex::AddSimplices(const Vertex v, RoadmapNeighbors nn)
@@ -74,25 +74,71 @@ void SimplicialComplex::AddSimplices(const Vertex v, RoadmapNeighbors nn)
   for(uint k = 0; k < suspected_neighbors.size(); k++){
     Vertex vk = suspected_neighbors.at(k);
     if(HaveIntersectingSpheres(v,vk)){
-      AddEdge(v, vk);
+      //AddEdge(v, vk);
       neighbors.push_back(vk);
     }
   }
   //#######################################################################
   //Compute simplices
   //#######################################################################
-  //VectorXi S_A = A.rowwise().sum();
-
   if(neighbors.size()>0)
   {
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "vertex " << v << " nbrs " << neighbors << std::endl;
-    std::cout << "max_dimension: " << max_dimension << std::endl;
     std::vector<Vertex> sigma;
     sigma.push_back(v);
     AddSimplexAndCofaces(sigma, neighbors);
   }
 }
+
+void SimplicialComplex::AddSimplexAndCofaces(const std::vector<Vertex> sigma, std::vector<Vertex> neighbors, Simplex *parent)
+{
+  if(sigma.size()>max_dimension) return;
+
+  uint K = sigma.size();
+  uint N = neighbors.size();
+  //std::cout << "simplex: " << sigma << " neighbors " << neighbors << std::endl;
+
+  for(uint i = 0; i < N; i++){
+    Vertex vi = neighbors.at(i);
+    if(K > 1){
+
+      std::vector<Vertex> gamma_v(sigma);
+      gamma_v.push_back(vi);
+      std::sort(gamma_v.begin(), gamma_v.end());
+      Simplex* gamma = new Simplex(gamma_v);
+      simplex_map[gamma_v] = gamma;
+
+      std::cout << "simplex added: " << gamma_v << std::endl;
+
+      //if(K<=2){
+      //  Edge e = boost::edge(sigma.at(0), sigma.at(1), G).first;
+      //  //G[e].cofaces.push_back(gamma);
+      //}else{
+      //  simplex_map[sigma]->AddCoface(gamma);
+      //}
+      //connect pointers such that nearby cofaces are connected
+      //comb(K+1, gamma, gamma_v);
+    }else{
+      AddEdge(sigma.at(0), vi);
+    }
+    std::vector<Vertex> neighbors_of_neighbor;
+    for(uint j = i+1; j < N; j++){
+      Vertex vj = neighbors.at(j);
+      if(HaveIntersectingSpheres(vi, vj))
+      {
+        neighbors_of_neighbor.push_back(vj);
+      }
+    }
+    if(neighbors_of_neighbor.size()>0){
+      std::vector<Vertex> tau(sigma);
+      tau.push_back(vi);
+      AddSimplexAndCofaces(tau, neighbors_of_neighbor);
+    }
+  }
+}
+
+
 
 void SimplicialComplex::comb(int N, Simplex *coface, std::vector<Vertex> vertices)
 {
@@ -116,47 +162,6 @@ void SimplicialComplex::comb(int N, Simplex *coface, std::vector<Vertex> vertice
   } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
 }
 
-void SimplicialComplex::AddSimplexAndCofaces(const std::vector<Vertex> sigma, std::vector<Vertex> neighbors, Simplex *parent)
-{
-  if(sigma.size()>max_dimension) return;
-
-  uint K = sigma.size();
-  uint N = neighbors.size();
-
-  for(uint i = 0; i < N; i++){
-    Vertex vi = neighbors.at(i);
-    if(K > 1){
-      std::cout << "simplex: " << sigma << " \\cup " << vi << " max_dimension: " << max_dimension << std::endl;
-
-      std::vector<Vertex> gamma_v(sigma);
-      gamma_v.push_back(vi);
-      Simplex* gamma = new Simplex(gamma_v);
-      simplex_map[gamma_v] = gamma;
-      std::cout << gamma_v << std::endl;
-      if(K<=2){
-        Edge e = boost::edge(sigma.at(0), sigma.at(1), G).first;
-        G[e].cofaces.push_back(gamma);
-      }else{
-        simplex_map[sigma]->AddCoface(gamma);
-      }
-      comb(K+1, gamma, gamma_v);
-      //exit(0);
-    }
-    std::vector<Vertex> neighbors_of_neighbors;
-    for(uint j = i+1; j < N; j++){
-      Vertex vj = neighbors.at(j);
-      if(HaveIntersectingSpheres(vi, vj))
-      {
-        neighbors_of_neighbors.push_back(vj);
-      }
-    }
-    if(neighbors_of_neighbors.size()>0){
-      std::vector<Vertex> tau(sigma);
-      tau.push_back(vi);
-      AddSimplexAndCofaces(tau, neighbors_of_neighbors);
-    }
-  }
-}
 
 //General Strategy for adding a feasible (infeasible) vertex
 //(1) Add state to graph
