@@ -83,8 +83,9 @@ void Roadmap::DrawShortestPath(GUIState &state)
 
 void Roadmap::DrawPlannerData(GUIState &state)
 {
-  glDisable(GL_LIGHTING);
   glEnable(GL_BLEND); 
+  glDisable(GL_LIGHTING);
+  glDisable(GL_CULL_FACE);
   for(uint vidx = 0; vidx < pd->numVertices(); vidx++)
   {
     glPointSize(sizeVertex);
@@ -186,7 +187,6 @@ void Roadmap::DrawPlannerData(GUIState &state)
     }
     glPopMatrix();
   }
-  glDisable(GL_CULL_FACE);
   if(state("draw_roadmap_complex")){
     glPushMatrix();
     glLineWidth(widthEdge);
@@ -239,6 +239,7 @@ void Roadmap::DrawPlannerData(GUIState &state)
     }
     glPopMatrix();
   }
+  glEnable(GL_CULL_FACE);
   glEnable(GL_LIGHTING);
   glDisable(GL_BLEND); 
 }

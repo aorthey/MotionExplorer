@@ -8,6 +8,9 @@ using namespace Eigen;
 using namespace ompl::geometric;
 using namespace ompl::geometric::topology;
 
+#define DEBUG 
+#undef DEBUG
+
 SimplicialComplex::SimplicialComplex(ob::SpaceInformationPtr si_, ob::Planner* planner_, double epsilon_max_neighborhood_):
   si(si_), epsilon_max_neighborhood(epsilon_max_neighborhood_), max_dimension(si_->getStateDimension())
 {
@@ -21,9 +24,6 @@ SimplicialComplex::SimplicialComplex(ob::SpaceInformationPtr si_, ob::Planner* p
                            {
                              return Distance(a,b);
                            });
-
-
-
 }
 
 void SimplicialComplex::AddStart(const ob::State *s)
@@ -31,20 +31,16 @@ void SimplicialComplex::AddStart(const ob::State *s)
   Vertex v = AddFeasible(s);
   G[v].isStart = true;
 }
+
 void SimplicialComplex::AddGoal(const ob::State *s)
 {
   Vertex v = AddFeasible(s);
   G[v].isGoal = true;
 }
+
 double SimplicialComplex::Distance(const Vertex a, const Vertex b)
 {
   return si->distance(G[a].state, G[b].state);
-}
-
-std::pair<SimplicialComplex::Edge, bool> SimplicialComplex::AddEdge(const Vertex a, const Vertex b)
-{
-  EdgeInternalState properties(Distance(a,b));
-  return boost::add_edge(a, b, properties, G);
 }
 
 bool SimplicialComplex::HaveIntersectingSpheres(const Vertex a, const Vertex b)
@@ -55,11 +51,106 @@ bool SimplicialComplex::HaveIntersectingSpheres(const Vertex a, const Vertex b)
   return ((d_a+d_b) >= d_overall);
 }
 
+//#############################################################################
+//Remove Simplices from Complex
+//#############################################################################
+
 void SimplicialComplex::RemoveEdge(const Vertex a, const Vertex b)
 {
-  //Edge e = boost::edge(a, b, G).first;
-  //G[e].Clear();
-  //boost::remove_edge(e, G);
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "deleting edge : " << a << " - " << b << std::endl;
+  Edge e = boost::edge(a, b, G).first;
+  RemoveCofaces(e);
+  boost::remove_edge(e, G);
+}
+
+void SimplicialComplex::RemoveCofaces(Edge &e)
+{
+  std::cout << "edge has " << G[e].cofaces.size() << " cofaces." << std::endl;
+  uint N = G[e].cofaces.size();
+  for(uint k = 0; k < N; k++)
+  {
+    std::cout << "coface [" << k << "] " << G[e].cofaces.at(k)->vertices << std::endl;
+  }
+
+  const std::vector<Simplex*> cofaces = G[e].cofaces;
+  for(uint k = 0; k < cofaces.size(); k++)
+  {
+    std::cout << "remove coface " << cofaces.at(k)->vertices << std::endl;
+    Simplex *s = cofaces.at(k);
+    RemoveSimplexAndCofaces(s);
+    delete s;
+  }
+
+  G[e].cofaces.clear();
+  std::cout << std::string(80, '-') << std::endl;
+}
+
+void SimplicialComplex::RemoveSimplexAndCofaces(Simplex *s)
+{
+  std::vector<Vertex> vertices = s->vertices;
+
+  uint N = vertices.size();
+
+  //(1) remove simplex from the global simplexMap
+  ISimplexMap it = simplex_map.find(vertices);
+  simplex_map.erase(it);
+
+  //(2) remove the ptrs to simplex from all facets
+  if(N>3){
+    //in case all facets are simplices
+    for(uint k = 0; k < s->facets.size(); k++)
+    {
+      Simplex *facet = s->facets.at(k);
+      for(uint j = 0; j < facet->cofaces.size(); j++)
+      {
+        Simplex *coface = facet->cofaces.at(j);
+        if(coface == s)
+        {
+          facet->cofaces.erase(facet->cofaces.begin() + j);
+          break;
+        }
+      }
+    }
+  }else{
+    //in case all facets are edges
+
+    for(uint k = 0; k < s->edge_facets.size(); k++)
+    {
+      std::vector<Vertex> vfacet = s->edge_facets.at(k);
+      std::cout << "delete ptr to " << vertices << " from facet " << vfacet << std::endl;
+      Edge e = boost::edge(vfacet.at(0), vfacet.at(1), G).first;
+
+      // if(!boost::edge(vfacet.at(0), vfacet.at(1), G).second)
+      // {
+      //   std::cout << "Edge " << vfacet << " does not exist." << std::endl;
+      //   exit(0);
+      // }
+
+      for(uint j = 0; j < G[e].cofaces.size(); j++)
+      {
+        Simplex *coface = G[e].cofaces.at(j);
+        if(coface == s)
+        {
+          G[e].cofaces.erase(G[e].cofaces.begin() + j);
+          break;
+        }
+      }
+    }
+  }
+  //(3) recursively delete all its cofaces
+  for(uint k = 0; k < s->cofaces.size(); k++){
+    RemoveSimplexAndCofaces(s->cofaces.at(k));
+  }
+}
+//#############################################################################
+//Add Simplices to Complex
+//#############################################################################
+
+std::pair<SimplicialComplex::Edge, bool> SimplicialComplex::AddEdge(const Vertex a, const Vertex b)
+{
+  EdgeInternalState properties(Distance(a,b));
+  return boost::add_edge(a, b, properties, G);
 }
 
 void SimplicialComplex::AddSimplices(const Vertex v, RoadmapNeighbors nn)
@@ -74,21 +165,50 @@ void SimplicialComplex::AddSimplices(const Vertex v, RoadmapNeighbors nn)
   for(uint k = 0; k < suspected_neighbors.size(); k++){
     Vertex vk = suspected_neighbors.at(k);
     if(HaveIntersectingSpheres(v,vk)){
-      //AddEdge(v, vk);
+      AddEdge(v, vk);
       neighbors.push_back(vk);
     }
   }
+
   //#######################################################################
   //Compute simplices
   //#######################################################################
   if(neighbors.size()>0)
   {
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "vertex " << v << " nbrs " << neighbors << std::endl;
     std::vector<Vertex> sigma;
     sigma.push_back(v);
     AddSimplexAndCofaces(sigma, neighbors);
   }
+}
+
+void SimplicialComplex::comb(int N, Simplex *coface, std::vector<Vertex> vertices)
+{
+  std::string bitmask(N-1, 1); // K leading 1's
+  bitmask.resize(N, 0); // N-K trailing 0's
+
+  do {
+    std::vector<unsigned long int> facet;
+    for (int i = 0; i < N; i++)
+    {
+      if (bitmask[i]) facet.push_back(vertices.at(i));
+    }
+    std::cout << "add coface " << coface->vertices << " to facet " << facet << " ";
+    if(N>3){
+      Simplex *kfacet = simplex_map[facet];
+      if(kfacet == nullptr)
+      {
+        std::cout << "facet " << facet << " does not exist in simplex_map" << std::endl;
+      }
+      kfacet->AddCoface(coface);
+      coface->facets.push_back(kfacet);
+      std::cout << "(" << kfacet->cofaces.size() << " cofaces)" << std::endl;
+    }else{
+      Edge e = boost::edge(facet.at(0), facet.at(1), G).first;
+      G[e].cofaces.push_back(coface);
+      coface->edge_facets.push_back(facet);
+      std::cout << "(" << G[e].cofaces.size() << " cofaces)" << std::endl;
+    }
+  } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
 }
 
 void SimplicialComplex::AddSimplexAndCofaces(const std::vector<Vertex> sigma, std::vector<Vertex> neighbors, Simplex *parent)
@@ -97,7 +217,6 @@ void SimplicialComplex::AddSimplexAndCofaces(const std::vector<Vertex> sigma, st
 
   uint K = sigma.size();
   uint N = neighbors.size();
-  //std::cout << "simplex: " << sigma << " neighbors " << neighbors << std::endl;
 
   for(uint i = 0; i < N; i++){
     Vertex vi = neighbors.at(i);
@@ -109,19 +228,11 @@ void SimplicialComplex::AddSimplexAndCofaces(const std::vector<Vertex> sigma, st
       Simplex* gamma = new Simplex(gamma_v);
       simplex_map[gamma_v] = gamma;
 
-      std::cout << "simplex added: " << gamma_v << std::endl;
-
-      //if(K<=2){
-      //  Edge e = boost::edge(sigma.at(0), sigma.at(1), G).first;
-      //  //G[e].cofaces.push_back(gamma);
-      //}else{
-      //  simplex_map[sigma]->AddCoface(gamma);
-      //}
+      std::cout << "new simplex: " << gamma_v << std::endl;
       //connect pointers such that nearby cofaces are connected
-      //comb(K+1, gamma, gamma_v);
-    }else{
-      AddEdge(sigma.at(0), vi);
+      comb(K+1, gamma, gamma_v);
     }
+
     std::vector<Vertex> neighbors_of_neighbor;
     for(uint j = i+1; j < N; j++){
       Vertex vj = neighbors.at(j);
@@ -139,28 +250,6 @@ void SimplicialComplex::AddSimplexAndCofaces(const std::vector<Vertex> sigma, st
 }
 
 
-
-void SimplicialComplex::comb(int N, Simplex *coface, std::vector<Vertex> vertices)
-{
-  std::string bitmask(N-1, 1); // K leading 1's
-  bitmask.resize(N, 0); // N-K trailing 0's
-
-  do {
-    std::vector<unsigned long int> facet;
-    for (int i = 0; i < N; i++)
-    {
-      if (bitmask[i]) facet.push_back(vertices.at(i));
-    }
-    //std::cout << "facet: " << facet << std::endl;
-    if(N>3){
-      Simplex *kfacet = simplex_map[facet];
-      kfacet->AddCoface(coface);
-    }else{
-      Edge e = boost::edge(facet.at(0), facet.at(1), G).first;
-      G[e].cofaces.push_back(coface);
-    }
-  } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
-}
 
 
 //General Strategy for adding a feasible (infeasible) vertex
@@ -245,11 +334,6 @@ SimplicialComplex::Vertex SimplicialComplex::Add(const ob::State *s, RoadmapNeig
         {
           edge_removal.push_back(vkn);
         }
-        // double dall = Distance(vk, vkn);
-        // double ds_kn = G[vkn].open_neighborhood_distance;
-        // if(ds_kn + ds_k < dall){
-        //   edge_removal.push_back(vkn);
-        // }
       }
       for(uint k = 0; k < edge_removal.size(); k++){
         const Vertex vkn = edge_removal.at(k);
@@ -281,7 +365,7 @@ std::vector<std::vector<SimplicialComplex::Vertex>> SimplicialComplex::GetSimpli
 
   for(ISimplexMap it=simplex_map.begin(); it!=simplex_map.end(); ++it)
   {
-    if(it->first.size()==k){
+    if(it->first.size()<=k){
       v.push_back(it->first);
     }
   }

@@ -244,7 +244,6 @@ void MultiChart<T>::getPlannerData(ob::PlannerData &data) const
       if(Qm->getC1()->getStateSpace()->getType() == ob::STATE_SPACE_SO2) {
         static_cast<ob::SO2StateSpace::StateType*>(s_C1)->setIdentity();
       }
-      //Qm->SampleC1(s_C1);
       Qm->mergeStates(s_M0, s_C1, s_M1);
       quotientSpaces.at(m-1)->getSpaceInformation()->freeState(s_M0);
       Qm->getC1()->freeState(s_C1);

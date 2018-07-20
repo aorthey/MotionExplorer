@@ -41,11 +41,6 @@ namespace ompl
               double getWeight(){
                 return weight;
               }
-              void Clear(){
-                for(uint k = 0; k < cofaces.size(); k++){
-                  cofaces.at(k)->Clear();
-                }
-              }
               std::vector<Simplex*> cofaces;
             private:
               double weight;
@@ -94,10 +89,12 @@ namespace ompl
           void AddGoal(const ob::State *s);
           double Distance(const Vertex a, const Vertex b);
 
-          std::pair<Edge, bool> AddEdge(const Vertex a, const Vertex b);
           void RemoveEdge(const Vertex v, const Vertex b);
-          Vertex Add(const ob::State *s, RoadmapNeighbors nn_positive, RoadmapNeighbors nn_negative, bool addSimplices=false);
+          void RemoveCofaces(Edge &e);
+          void RemoveSimplexAndCofaces(Simplex *s);
 
+          std::pair<Edge, bool> AddEdge(const Vertex a, const Vertex b);
+          Vertex Add(const ob::State *s, RoadmapNeighbors nn_positive, RoadmapNeighbors nn_negative, bool addSimplices=false);
           void AddSimplices(const Vertex v, RoadmapNeighbors nn);
           void AddSimplexAndCofaces(const std::vector<Vertex> sigma, std::vector<Vertex> neighbors, Simplex *parent=nullptr);
           bool HaveIntersectingSpheres(const Vertex a, const Vertex b);

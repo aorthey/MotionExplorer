@@ -8,13 +8,13 @@ namespace ompl
     namespace topology
     {
       typedef long unsigned int simplex_t;
+
       struct Simplex{
         Simplex(std::vector<simplex_t> vertices_);
-
-        void Clear();
         std::vector<simplex_t> GetVertices() const;
         void AddCoface(Simplex* coface);
 
+        std::vector<std::vector<simplex_t>> edge_facets;
         std::vector<Simplex*> facets;
         std::vector<Simplex*> cofaces;
         std::vector<simplex_t> vertices;

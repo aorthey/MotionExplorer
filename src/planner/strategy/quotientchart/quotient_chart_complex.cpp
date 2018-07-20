@@ -11,6 +11,8 @@ using namespace ogt;
 QuotientChartComplex::QuotientChartComplex(const ob::SpaceInformationPtr &si, og::Quotient *parent_)
   : BaseT(si, parent_)
 {
+  rng_.setSeed(0);
+  rng_boost.seed(0);
 }
 void QuotientChartComplex::setup() 
 {
