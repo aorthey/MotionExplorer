@@ -147,8 +147,40 @@ void SimplicialComplex::RemoveSimplexAndCofaces(Simplex *s)
 //Add Simplices to Complex
 //#############################################################################
 
+void SimplicialComplex::comb(int N, Simplex *coface, std::vector<Vertex> vertices)
+{
+  std::string bitmask(N-1, 1); // K leading 1's
+  bitmask.resize(N, 0); // N-K trailing 0's
+
+  do {
+    std::vector<unsigned long int> facet;
+    for (int i = 0; i < N; i++)
+    {
+      if (bitmask[i]) facet.push_back(vertices.at(i));
+    }
+    std::cout << "add coface " << coface->vertices << " to facet " << facet << " ";
+    if(N>3){
+      Simplex *kfacet = simplex_map[facet];
+      if(kfacet == nullptr)
+      {
+        std::cout << "facet " << facet << " does not exist in simplex_map" << std::endl;
+      }
+      kfacet->AddCoface(coface);
+      coface->facets.push_back(kfacet);
+      std::cout << "(" << kfacet->cofaces.size() << " cofaces)" << std::endl;
+    }else{
+      Edge e = boost::edge(facet.at(0), facet.at(1), G).first;
+      G[e].cofaces.push_back(coface);
+      coface->edge_facets.push_back(facet);
+      std::cout << "(" << G[e].cofaces.size() << " cofaces)" << std::endl;
+    }
+  } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
+}
+
+
 std::pair<SimplicialComplex::Edge, bool> SimplicialComplex::AddEdge(const Vertex a, const Vertex b)
 {
+  std::cout << "adding edge : " << a << "-" << b << std::endl;
   EdgeInternalState properties(Distance(a,b));
   return boost::add_edge(a, b, properties, G);
 }
@@ -181,36 +213,6 @@ void SimplicialComplex::AddSimplices(const Vertex v, RoadmapNeighbors nn)
   }
 }
 
-void SimplicialComplex::comb(int N, Simplex *coface, std::vector<Vertex> vertices)
-{
-  std::string bitmask(N-1, 1); // K leading 1's
-  bitmask.resize(N, 0); // N-K trailing 0's
-
-  do {
-    std::vector<unsigned long int> facet;
-    for (int i = 0; i < N; i++)
-    {
-      if (bitmask[i]) facet.push_back(vertices.at(i));
-    }
-    std::cout << "add coface " << coface->vertices << " to facet " << facet << " ";
-    if(N>3){
-      Simplex *kfacet = simplex_map[facet];
-      if(kfacet == nullptr)
-      {
-        std::cout << "facet " << facet << " does not exist in simplex_map" << std::endl;
-      }
-      kfacet->AddCoface(coface);
-      coface->facets.push_back(kfacet);
-      std::cout << "(" << kfacet->cofaces.size() << " cofaces)" << std::endl;
-    }else{
-      Edge e = boost::edge(facet.at(0), facet.at(1), G).first;
-      G[e].cofaces.push_back(coface);
-      coface->edge_facets.push_back(facet);
-      std::cout << "(" << G[e].cofaces.size() << " cofaces)" << std::endl;
-    }
-  } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
-}
-
 void SimplicialComplex::AddSimplexAndCofaces(const std::vector<Vertex> sigma, std::vector<Vertex> neighbors, Simplex *parent)
 {
   if(sigma.size()>max_dimension) return;
@@ -238,6 +240,13 @@ void SimplicialComplex::AddSimplexAndCofaces(const std::vector<Vertex> sigma, st
       Vertex vj = neighbors.at(j);
       if(HaveIntersectingSpheres(vi, vj))
       {
+        std::vector<Vertex> gamma_vj(sigma);
+        gamma_vj.push_back(vi);
+        gamma_vj.push_back(vj);
+        std::sort(gamma_vj.begin(), gamma_vj.end());
+        Simplex* gamma = new Simplex(gamma_vj);
+        simplex_map[gamma_vj] = gamma;
+        //add already here?
         neighbors_of_neighbor.push_back(vj);
       }
     }
@@ -303,6 +312,8 @@ SimplicialComplex::Vertex SimplicialComplex::Add(const ob::State *s, RoadmapNeig
 
   if(addSimplices)
   {
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "adding vertex : " << v << std::endl;
     AddSimplices(v, nn_positive);
   }
 
