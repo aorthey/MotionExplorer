@@ -24,6 +24,7 @@ SimplicialComplex::SimplicialComplex(ob::SpaceInformationPtr si_, ob::Planner* p
                            {
                              return Distance(a,b);
                            });
+  k_simplices.resize(max_dimension+1);
 }
 
 void SimplicialComplex::AddStart(const ob::State *s)
@@ -55,135 +56,87 @@ bool SimplicialComplex::HaveIntersectingSpheres(const Vertex a, const Vertex b)
 //Remove Simplices from Complex
 //#############################################################################
 
+bool SimplicialComplex::EdgeExists(const Vertex a, const Vertex b)
+{
+  return boost::edge(a, b, G).second;
+}
+
 void SimplicialComplex::RemoveEdge(const Vertex a, const Vertex b)
 {
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "deleting edge : " << a << " - " << b << std::endl;
   Edge e = boost::edge(a, b, G).first;
-  RemoveCofaces(e);
+  SimplexNode sn = G[e].simplex_representation;
+  if(a != S[sn].vertices.at(0) && a != S[sn].vertices.at(1))
+  {
+    std::cout << "simplex representation differs." << std::endl;
+    std::cout << "edge " << a << "-" << b << std::endl;
+    std::cout << "simplex : " << S[sn].vertices << std::endl;
+    exit(0);
+  }
+  RemoveSimplexNode(sn);
   boost::remove_edge(e, G);
 }
-
-void SimplicialComplex::RemoveCofaces(Edge &e)
+void SimplicialComplex::RemoveSimplexNode(SimplexNode &s)
 {
-  std::cout << "edge has " << G[e].cofaces.size() << " cofaces." << std::endl;
-  uint N = G[e].cofaces.size();
-  for(uint k = 0; k < N; k++)
-  {
-    std::cout << "coface [" << k << "] " << G[e].cofaces.at(k)->vertices << std::endl;
+  std::cout << "simplex " << S[s].vertices << std::endl;
+  SC_OEIterator eo, eo_end, next;
+  tie(eo, eo_end) = boost::out_edges(s, S);
+  for (next = eo; eo != eo_end; eo = next) {
+    ++next;
+    SimplexNode sn = boost::target(*eo, S);
+    RemoveSimplexNode(sn);
   }
 
-  const std::vector<Simplex*> cofaces = G[e].cofaces;
-  for(uint k = 0; k < cofaces.size(); k++)
-  {
-    std::cout << "remove coface " << cofaces.at(k)->vertices << std::endl;
-    Simplex *s = cofaces.at(k);
-    RemoveSimplexAndCofaces(s);
-    delete s;
-  }
+  //remove simplex from k-simplices map
+  uint N = S[s].vertices.size();
+  std::cout << "removing simplex " << S[s].vertices << std::endl;
+  auto it = k_simplices.at(N).find(S[s].vertices);
+  k_simplices.at(N).erase(it);
 
-  G[e].cofaces.clear();
-  std::cout << std::string(80, '-') << std::endl;
+  //remove facet ptrs
+  boost::clear_vertex(s, S);
+  //remove simplex from hasse diagram
+  boost::remove_vertex(s, S);
+
 }
 
-void SimplicialComplex::RemoveSimplexAndCofaces(Simplex *s)
+SimplicialComplex::SimplexNode SimplicialComplex::AddSimplexNode(std::vector<Vertex> v)
 {
-  std::vector<Vertex> vertices = s->vertices;
-
-  uint N = vertices.size();
-
-  //(1) remove simplex from the global simplexMap
-  ISimplexMap it = simplex_map.find(vertices);
-  simplex_map.erase(it);
-
-  //(2) remove the ptrs to simplex from all facets
-  if(N>3){
-    //in case all facets are simplices
-    for(uint k = 0; k < s->facets.size(); k++)
-    {
-      Simplex *facet = s->facets.at(k);
-      for(uint j = 0; j < facet->cofaces.size(); j++)
-      {
-        Simplex *coface = facet->cofaces.at(j);
-        if(coface == s)
-        {
-          facet->cofaces.erase(facet->cofaces.begin() + j);
-          break;
-        }
-      }
-    }
-  }else{
-    //in case all facets are edges
-
-    for(uint k = 0; k < s->edge_facets.size(); k++)
-    {
-      std::vector<Vertex> vfacet = s->edge_facets.at(k);
-      std::cout << "delete ptr to " << vertices << " from facet " << vfacet << std::endl;
-      Edge e = boost::edge(vfacet.at(0), vfacet.at(1), G).first;
-
-      // if(!boost::edge(vfacet.at(0), vfacet.at(1), G).second)
-      // {
-      //   std::cout << "Edge " << vfacet << " does not exist." << std::endl;
-      //   exit(0);
-      // }
-
-      for(uint j = 0; j < G[e].cofaces.size(); j++)
-      {
-        Simplex *coface = G[e].cofaces.at(j);
-        if(coface == s)
-        {
-          G[e].cofaces.erase(G[e].cofaces.begin() + j);
-          break;
-        }
-      }
-    }
-  }
-  //(3) recursively delete all its cofaces
-  for(uint k = 0; k < s->cofaces.size(); k++){
-    RemoveSimplexAndCofaces(s->cofaces.at(k));
-  }
+  std::sort(v.begin(), v.end());
+  SimplexNode s = boost::add_vertex(S);
+  std::cout << "add simplex : " << v << std::endl;
+  S[s].vertices = v;
+  k_simplices.at(v.size())[v] = &s;
+  return s;
 }
+
+
 //#############################################################################
-//Add Simplices to Complex
+//Add edge and simplices
 //#############################################################################
-
-void SimplicialComplex::comb(int N, Simplex *coface, std::vector<Vertex> vertices)
-{
-  std::string bitmask(N-1, 1); // K leading 1's
-  bitmask.resize(N, 0); // N-K trailing 0's
-
-  do {
-    std::vector<unsigned long int> facet;
-    for (int i = 0; i < N; i++)
-    {
-      if (bitmask[i]) facet.push_back(vertices.at(i));
-    }
-    std::cout << "add coface " << coface->vertices << " to facet " << facet << " ";
-    if(N>3){
-      Simplex *kfacet = simplex_map[facet];
-      if(kfacet == nullptr)
-      {
-        std::cout << "facet " << facet << " does not exist in simplex_map" << std::endl;
-      }
-      kfacet->AddCoface(coface);
-      coface->facets.push_back(kfacet);
-      std::cout << "(" << kfacet->cofaces.size() << " cofaces)" << std::endl;
-    }else{
-      Edge e = boost::edge(facet.at(0), facet.at(1), G).first;
-      G[e].cofaces.push_back(coface);
-      coface->edge_facets.push_back(facet);
-      std::cout << "(" << G[e].cofaces.size() << " cofaces)" << std::endl;
-    }
-  } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
-}
-
 
 std::pair<SimplicialComplex::Edge, bool> SimplicialComplex::AddEdge(const Vertex a, const Vertex b)
 {
   std::cout << "adding edge : " << a << "-" << b << std::endl;
-  EdgeInternalState properties(Distance(a,b));
-  return boost::add_edge(a, b, properties, G);
+
+  //#######################################################################
+  //Add edge to 1-skeleton
+  //#######################################################################
+  double d = Distance(a,b);
+  EdgeInternalState properties(d);
+  std::pair<SimplicialComplex::Edge, bool> e = boost::add_edge(a, b, properties, G);
+
+  //#######################################################################
+  //create simplex
+  //#######################################################################
+  std::vector<Vertex> vertices{a,b};
+  G[e.first].simplex_representation = AddSimplexNode(vertices);
+
+  std::cout << "simplex : " << S[G[e.first].simplex_representation].vertices << std::endl;
+  return e;
 }
+
 
 void SimplicialComplex::AddSimplices(const Vertex v, RoadmapNeighbors nn)
 {
@@ -202,64 +155,45 @@ void SimplicialComplex::AddSimplices(const Vertex v, RoadmapNeighbors nn)
     }
   }
 
-  //#######################################################################
-  //Compute simplices
-  //#######################################################################
-  if(neighbors.size()>0)
-  {
-    std::vector<Vertex> sigma;
-    sigma.push_back(v);
-    AddSimplexAndCofaces(sigma, neighbors);
-  }
+  std::vector<Vertex> sigma; sigma.push_back(v);
+  std::sort(neighbors.begin(), neighbors.end());
+
+  AddSimplex(sigma, neighbors);
 }
 
-void SimplicialComplex::AddSimplexAndCofaces(const std::vector<Vertex> sigma, std::vector<Vertex> neighbors, Simplex *parent)
+void SimplicialComplex::AddSimplex( std::vector<Vertex>& sigma, std::vector<Vertex>& N)
 {
-  if(sigma.size()>max_dimension) return;
+  if(sigma.size()<=max_dimension+1) return;
 
-  uint K = sigma.size();
-  uint N = neighbors.size();
-
-  for(uint i = 0; i < N; i++){
-    Vertex vi = neighbors.at(i);
-    if(K > 1){
-
-      std::vector<Vertex> gamma_v(sigma);
-      gamma_v.push_back(vi);
-      std::sort(gamma_v.begin(), gamma_v.end());
-      Simplex* gamma = new Simplex(gamma_v);
-      simplex_map[gamma_v] = gamma;
-
-      std::cout << "new simplex: " << gamma_v << std::endl;
-      //connect pointers such that nearby cofaces are connected
-      comb(K+1, gamma, gamma_v);
+  //we already added vertices for edge-simplices, so we do not want to have
+  //double entries in that case
+  if(sigma.size()>1){
+    for(uint k = 0; k < N.size(); k++)
+    {
+      Vertex vk = N.at(k);
+      std::vector<Vertex> tau(sigma); tau.push_back(vk);
+      AddSimplexNode(tau);
     }
-
-    std::vector<Vertex> neighbors_of_neighbor;
-    for(uint j = i+1; j < N; j++){
-      Vertex vj = neighbors.at(j);
-      if(HaveIntersectingSpheres(vi, vj))
+  }
+  for(uint k = 0; k < N.size(); k++){
+    Vertex vk = N.at(k);
+    std::vector<Vertex> M;
+    for(uint j = k+1; j < N.size(); j++){
+      Vertex vj = N.at(j);
+      if(EdgeExists(vk, vj))
       {
-        std::vector<Vertex> gamma_vj(sigma);
-        gamma_vj.push_back(vi);
-        gamma_vj.push_back(vj);
-        std::sort(gamma_vj.begin(), gamma_vj.end());
-        Simplex* gamma = new Simplex(gamma_vj);
-        simplex_map[gamma_vj] = gamma;
-        //add already here?
-        neighbors_of_neighbor.push_back(vj);
+        M.push_back(vj);
       }
     }
-    if(neighbors_of_neighbor.size()>0){
-      std::vector<Vertex> tau(sigma);
-      tau.push_back(vi);
-      AddSimplexAndCofaces(tau, neighbors_of_neighbor);
-    }
+    std::vector<Vertex> tau(sigma); tau.push_back(vk);
+    AddSimplex(tau, M);
   }
 }
 
 
-
+//#############################################################################
+//Add infeasible or feasible vertices to simplicial complex
+//#############################################################################
 
 //General Strategy for adding a feasible (infeasible) vertex
 //(1) Add state to graph
@@ -374,11 +308,14 @@ std::vector<std::vector<SimplicialComplex::Vertex>> SimplicialComplex::GetSimpli
 {
   std::vector<std::vector<SimplicialComplex::Vertex>> v;
 
-  for(ISimplexMap it=simplex_map.begin(); it!=simplex_map.end(); ++it)
+  std::cout << "SimplicialComplex: " << std::endl;
+  for(uint k = 0; k < k_simplices.size(); k++){
+    std::cout << "simplices of size " << k << ":" << k_simplices.at(k).size() << std::endl;
+  }
+  std::cout << "input dimension: " << k-1 << std::endl;
+  for(auto it=k_simplices.at(k-1).begin(); it!=k_simplices.at(k-1).end(); ++it)
   {
-    if(it->first.size()<=k){
-      v.push_back(it->first);
-    }
+    v.push_back(it->first);
   }
   return v;
 }

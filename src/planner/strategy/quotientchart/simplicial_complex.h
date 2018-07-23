@@ -6,6 +6,7 @@
 //#include <boost/pending/disjoint_sets.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
+#include <unordered_map>
 
 namespace ob = ompl::base;
 
@@ -18,8 +19,41 @@ namespace ompl
       //@brief: implements vietoris rips complex
       class SimplicialComplex
       {
+        typedef long unsigned int vertex_t;
 
         public:
+          //###################################################################
+          //Simplicial Complex as Hasse Diagram representation 
+          //###################################################################
+          class SimplexNodeInternalState{
+            public:
+              SimplexNodeInternalState() = default;
+              SimplexNodeInternalState(const SimplexNodeInternalState &vis) = default;
+              std::vector<vertex_t> vertices;
+          };
+          class SimplexConnectionInternalState{
+            public:
+              SimplexConnectionInternalState() = default;
+          };
+          typedef boost::adjacency_list<
+             boost::vecS, 
+             boost::vecS, 
+             boost::directedS,
+             SimplexNodeInternalState,
+             SimplexConnectionInternalState
+           > SimplicialComplexGraph;
+
+          typedef boost::graph_traits<SimplicialComplexGraph> SCBGT;
+          typedef SCBGT::vertex_descriptor SimplexNode;
+          typedef SCBGT::edge_descriptor SimplexEdge;
+          typedef SCBGT::in_edge_iterator SC_IEIterator;
+          typedef SCBGT::out_edge_iterator SC_OEIterator;
+
+          void RemoveSimplexNode(SimplexNode &s);
+
+          //###################################################################
+          //1-skeleton representation as boost undirected graph
+          //###################################################################
           class VertexInternalState{
             public:
               VertexInternalState() = default;
@@ -41,7 +75,7 @@ namespace ompl
               double getWeight(){
                 return weight;
               }
-              std::vector<Simplex*> cofaces;
+              SimplexNode simplex_representation;
             private:
               double weight;
           };
@@ -64,41 +98,39 @@ namespace ompl
           typedef Vertex* VertexParent;
           typedef VertexIndex* VertexRank;
           typedef std::shared_ptr<NearestNeighbors<Vertex>> RoadmapNeighbors;
-          typedef std::function<const std::vector<Vertex> &(const Vertex)> ConnectionStrategy;
 
-          typedef std::map<std::vector<Vertex>, Simplex*> VerticesToSimplexMap;
-          typedef VerticesToSimplexMap::iterator ISimplexMap;
-          VerticesToSimplexMap simplex_map;
+          const Graph& GetGraph();
+          void RemoveEdge(const Vertex v, const Vertex b);
+          bool EdgeExists(const Vertex a, const Vertex b); 
 
-          std::vector<std::vector<Vertex>> GetSimplicesOfDimension(uint k);
-          void comb(int N, Simplex *coface, std::vector<Vertex> vertices);
+          void AddSimplex( std::vector<Vertex>& sigma, std::vector<Vertex>& N);
 
+          std::vector<std::map<std::vector<Vertex>, SimplexNode*>> k_simplices;
+          //typedef std::unordered_map<std::vector<Vertex>,SimplexNode>>::iterator KSimplicesIterator;
+
+          SimplexNode AddSimplexNode(std::vector<Vertex> v);
+          //###################################################################
+          //data structures
+          //###################################################################
           ob::SpaceInformationPtr si;
           double epsilon_max_neighborhood{0};
           uint max_dimension{0};
-
           RoadmapNeighbors nn_infeasible;
           RoadmapNeighbors nn_feasible;
-
           Graph G;
+          SimplicialComplexGraph S;
+
+          //###################################################################
+          //
+          //###################################################################
 
           SimplicialComplex(ob::SpaceInformationPtr si_, ob::Planner* planner_, double epsilon_max_neighborhood_ = 1.0);
-
-          const Graph& GetGraph();
-          void AddStart(const ob::State *s);
-          void AddGoal(const ob::State *s);
+          std::vector<std::vector<Vertex>> GetSimplicesOfDimension(uint k);
           double Distance(const Vertex a, const Vertex b);
-
-          void RemoveEdge(const Vertex v, const Vertex b);
-          void RemoveCofaces(Edge &e);
-          void RemoveSimplexAndCofaces(Simplex *s);
-
+          bool HaveIntersectingSpheres(const Vertex a, const Vertex b);
           std::pair<Edge, bool> AddEdge(const Vertex a, const Vertex b);
           Vertex Add(const ob::State *s, RoadmapNeighbors nn_positive, RoadmapNeighbors nn_negative, bool addSimplices=false);
           void AddSimplices(const Vertex v, RoadmapNeighbors nn);
-          void AddSimplexAndCofaces(const std::vector<Vertex> sigma, std::vector<Vertex> neighbors, Simplex *parent=nullptr);
-          bool HaveIntersectingSpheres(const Vertex a, const Vertex b);
-
 
           //ntry is the number of failures to update the simplicial complex when
           //adding new samples. The more failures we accumulate, the better our
@@ -107,25 +139,15 @@ namespace ompl
           //However, in our case, it seems more adequate to compute some kind of
           //average ntry (over the last 100 samples or something).:W
           uint ntry{0};
-
           std::vector<int> ntry_over_iterations;
-
-          //Simeon_2000: Parameter ntry is the number of failures before the  insertion of a
-          //new  guard node.  1/ntry gives an estimation of  the volume not yet
-          //covered by visibility domains. It estimates the fraction between the
-          //non-covered volume and the total volume of CS free. This is a
-          //critical parameter which controls the end of the algorithm.  Hence,
-          //the algorithm stops when ntry becomes greater than a user set value M
-          //, which means that the volume of the free space covered by
-          //visibility domains becomes probably greater than (1 - 1/M).
-          //
-
 
 
         public:
           //all methods which should be made available at the end to the outside
           Vertex AddFeasible(const ob::State *s);
           Vertex AddInfeasible(const ob::State *s);
+          void AddStart(const ob::State *s);
+          void AddGoal(const ob::State *s);
 
 
       };

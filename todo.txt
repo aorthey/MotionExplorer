@@ -566,5 +566,4 @@ triangles! (and we do not currently delete any triangles)
 But we have changed the sizes of the spheres! So that is why we sometimes have
 those cases where the sphere has changed, but the edges have not been removed!
 
-
 [ ] make them all smart ptrs
