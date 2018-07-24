@@ -23,7 +23,8 @@ namespace ompl
 
         public:
           //###################################################################
-          //Simplicial Complex as Hasse Diagram representation 
+          //Simplicial Complex as Hasse Diagram representation using a boost
+          //directed graph
           //###################################################################
           class SimplexNodeInternalState{
             public:
@@ -36,8 +37,8 @@ namespace ompl
               SimplexConnectionInternalState() = default;
           };
           typedef boost::adjacency_list<
-             boost::vecS, 
-             boost::vecS, 
+             boost::setS,  //do not change to vecS, otherwise vertex indices are not stable after removal
+             boost::setS, 
              boost::directedS,
              SimplexNodeInternalState,
              SimplexConnectionInternalState
@@ -49,10 +50,11 @@ namespace ompl
           typedef SCBGT::in_edge_iterator SC_IEIterator;
           typedef SCBGT::out_edge_iterator SC_OEIterator;
 
-          void RemoveSimplexNode(SimplexNode &s);
+          void RemoveSimplexNode(SimplexNode s);
+          void HasseDiagramAddIncomingEdges(SimplexNode sigma);
 
           //###################################################################
-          //1-skeleton representation as boost undirected graph
+          //1-skeleton representation of simplicial complex as boost undirected graph
           //###################################################################
           class VertexInternalState{
             public:
@@ -105,8 +107,8 @@ namespace ompl
 
           void AddSimplex( std::vector<Vertex>& sigma, std::vector<Vertex>& N);
 
-          std::vector<std::map<std::vector<Vertex>, SimplexNode*>> k_simplices;
-          //typedef std::unordered_map<std::vector<Vertex>,SimplexNode>>::iterator KSimplicesIterator;
+          std::vector<std::map<std::vector<Vertex>, SimplexNode>> k_simplices;
+          //typedef std::map<std::vector<Vertex>, SimplexNode>>::iterator KSimplicesIterator;
 
           SimplexNode AddSimplexNode(std::vector<Vertex> v);
           //###################################################################
@@ -124,7 +126,7 @@ namespace ompl
           //
           //###################################################################
 
-          SimplicialComplex(ob::SpaceInformationPtr si_, ob::Planner* planner_, double epsilon_max_neighborhood_ = 1.0);
+          SimplicialComplex(ob::SpaceInformationPtr si_, ob::Planner* planner_, double epsilon_max_neighborhood_ = 0.5);
           std::vector<std::vector<Vertex>> GetSimplicesOfDimension(uint k);
           double Distance(const Vertex a, const Vertex b);
           bool HaveIntersectingSpheres(const Vertex a, const Vertex b);
@@ -141,6 +143,7 @@ namespace ompl
           uint ntry{0};
           std::vector<int> ntry_over_iterations;
 
+          friend std::ostream& operator<< (std::ostream&, const SimplicialComplex&);
 
         public:
           //all methods which should be made available at the end to the outside

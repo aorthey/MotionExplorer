@@ -29,6 +29,7 @@ class Roadmap{
     GLDraw::GLColor cEdge{lightgreen};
     GLDraw::GLColor cPath{darkmagenta};
     GLDraw::GLColor cComplex{magenta};
+    GLDraw::GLColor cComplexQuad{lightblue};
 
     GLDraw::GLColor cVertexComponentOut{gray}; //a vertex not in the same component as the designated start vertex
     GLDraw::GLColor cVertexComponentGoal{cyan}; //goal component vertex

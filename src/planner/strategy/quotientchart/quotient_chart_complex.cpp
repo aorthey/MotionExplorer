@@ -11,8 +11,8 @@ using namespace ogt;
 QuotientChartComplex::QuotientChartComplex(const ob::SpaceInformationPtr &si, og::Quotient *parent_)
   : BaseT(si, parent_)
 {
-  rng_.setSeed(1);
-  rng_boost.seed(1);
+  // rng_.setSeed(1);
+  // rng_boost.seed(1);
 }
 void QuotientChartComplex::setup() 
 {
@@ -59,65 +59,6 @@ bool QuotientChartComplex::Sample(ob::State *q_random)
   }
   return M1->isValid(q_random);
 }
-
-//void QuotientChartComplex::RemoveSimplices(Vertex v1, Vertex v2)
-//{
-//  //removal of edge leads to removal of all associated simplices
-//  //simplicial_complex[boost::edge(v1,v2,G).first].clear();
-//}
-//
-//void QuotientChartComplex::AddSimplices(Vertex v1, Vertex v2)
-//{
-//
-//  // double d1 = G[v1].open_neighborhood_distance;
-//  // double d2 = G[v2].open_neighborhood_distance;
-//
-//  // nn_->nearestR(v1, G[v1].open_neighborhood_distance, neighbors1);
-//  // nn_->nearestR(v2, G[v2].open_neighborhood_distance, neighbors2);
-//
-//  std::vector<Vertex> neighbors1;
-//  std::vector<Vertex> neighbors2;
-//
-//  OEIterator e1, e1_end, e2, e2_end, next;
-//  tie(e1, e1_end) = boost::out_edges(v1, G);
-//  tie(e2, e2_end) = boost::out_edges(v2, G);
-//
-//  for (next = e1; e1 != e1_end; e1 = next) {
-//    ++next;
-//    const Vertex vn1 = boost::target(*e1, G);
-//    neighbors1.push_back(vn1);
-//  }
-//  for (next = e2; e2 != e2_end; e2 = next) {
-//    ++next;
-//    const Vertex vn2 = boost::target(*e2, G);
-//    neighbors2.push_back(vn2);
-//  }
-//
-//  for(uint i = 0; i < neighbors1.size(); i++){
-//    for(uint j = 0; j < neighbors2.size(); j++){
-//      const Vertex vn1 = neighbors1.at(i);
-//      const Vertex vn2 = neighbors2.at(j);
-//      if(vn1==vn2)
-//      {
-//        ////same vertex, so there exists a clique between them
-//        //std::vector<int> ksimplex;
-//        //ksimplex.push_back(v1);
-//        //ksimplex.push_back(v2);
-//        //ksimplex.push_back(vn1);
-//        //// ksimplex.push_back(0);
-//        //// ksimplex.push_back(1);
-//        //// ksimplex.push_back(2);
-//        //// ksimplex.push_back(3);
-//
-//        //Ksimplex *ks = new Ksimplex(ksimplex);
-//        //simplicial_complex[ksimplex] = ks;
-//        ////simplicial_complex[boost::edge(vn1,vn2,G).first].push_back(ksimplex);
-//      }
-//    }
-//  }
-//  EdgeInternalState properties(ob::Cost(Distance(v1,v2)));
-//  boost::add_edge(v1, v2, properties, G);
-//}
 
 void QuotientChartComplex::Grow(double t){
   ob::State *workState = xstates[0];

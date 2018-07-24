@@ -218,11 +218,13 @@ void Roadmap::DrawPlannerData(GUIState &state)
             }
           case 3:
             {
+              setColor(cComplex);
               drawTriangle(pvec.at(0), pvec.at(1), pvec.at(2));
               break;
             }
           case 4:
             {
+              setColor(cComplexQuad);
               drawQuad(pvec.at(0), pvec.at(1), pvec.at(2), pvec.at(3));
               break;
             }

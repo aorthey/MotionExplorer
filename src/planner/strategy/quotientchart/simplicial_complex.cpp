@@ -63,23 +63,24 @@ bool SimplicialComplex::EdgeExists(const Vertex a, const Vertex b)
 
 void SimplicialComplex::RemoveEdge(const Vertex a, const Vertex b)
 {
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "deleting edge : " << a << " - " << b << std::endl;
   Edge e = boost::edge(a, b, G).first;
   SimplexNode sn = G[e].simplex_representation;
-  if(a != S[sn].vertices.at(0) && a != S[sn].vertices.at(1))
+
+  if( (a != S[sn].vertices.at(0) && a != S[sn].vertices.at(1))
+      ||(b != S[sn].vertices.at(0) && b != S[sn].vertices.at(1)))
   {
-    std::cout << "simplex representation differs." << std::endl;
-    std::cout << "edge " << a << "-" << b << std::endl;
-    std::cout << "simplex : " << S[sn].vertices << std::endl;
+    std::cout << ">>> simplex representation differs." << std::endl;
+    std::cout << ">>> edge " << a << "-" << b << std::endl;
+    std::cout << ">>> simplex : " << S[sn].vertices << std::endl;
     exit(0);
   }
+  //std::cout << "removing edge " << a << "-" << b << ": associated simplex " << S[sn].vertices << std::endl;
   RemoveSimplexNode(sn);
   boost::remove_edge(e, G);
 }
-void SimplicialComplex::RemoveSimplexNode(SimplexNode &s)
+
+void SimplicialComplex::RemoveSimplexNode(SimplexNode s)
 {
-  std::cout << "simplex " << S[s].vertices << std::endl;
   SC_OEIterator eo, eo_end, next;
   tie(eo, eo_end) = boost::out_edges(s, S);
   for (next = eo; eo != eo_end; eo = next) {
@@ -89,26 +90,70 @@ void SimplicialComplex::RemoveSimplexNode(SimplexNode &s)
   }
 
   //remove simplex from k-simplices map
-  uint N = S[s].vertices.size();
-  std::cout << "removing simplex " << S[s].vertices << std::endl;
+  uint N = S[s].vertices.size()-1;
   auto it = k_simplices.at(N).find(S[s].vertices);
-  k_simplices.at(N).erase(it);
+
+  if(it!=k_simplices.at(N).end()){
+    k_simplices.at(N).erase(it);
+  }else{
+    std::cout << "removing simplex " << S[s].vertices << std::endl;
+    std::cout << "simplex " << S[s].vertices << " has not been found in map." << std::endl;
+    std::cout << k_simplices.at(N) << std::endl;
+    exit(0);
+  }
 
   //remove facet ptrs
   boost::clear_vertex(s, S);
   //remove simplex from hasse diagram
   boost::remove_vertex(s, S);
-
 }
 
 SimplicialComplex::SimplexNode SimplicialComplex::AddSimplexNode(std::vector<Vertex> v)
 {
   std::sort(v.begin(), v.end());
-  SimplexNode s = boost::add_vertex(S);
-  std::cout << "add simplex : " << v << std::endl;
-  S[s].vertices = v;
-  k_simplices.at(v.size())[v] = &s;
-  return s;
+  uint N = v.size()-1;
+  auto it = k_simplices.at(N).find(v);
+  if(it!=k_simplices.at(N).end()){
+    return (*it).second;
+  }else{
+    SimplexNode s = boost::add_vertex(S);
+    S[s].vertices = v;
+    k_simplices.at(v.size()-1)[v] = s;
+    if(v.size()>2) HasseDiagramAddIncomingEdges(s);
+    return s;
+  }
+}
+
+void SimplicialComplex::HasseDiagramAddIncomingEdges(SimplexNode sigma)
+{
+  const std::vector<Vertex>& vertices = S[sigma].vertices;
+  uint N = vertices.size();
+  uint N_facet_dimension = N-2;
+  
+  //iterate over all facets by taking all vertex permuatations of size N-1
+  std::string bitmask(N-1, 1); // N-1 leading 1's
+  bitmask.resize(N, 0); // 1 trailing 0
+
+  do{
+    std::vector<unsigned long int> facet;
+    for (uint i = 0; i < N; i++)
+    {
+      if (bitmask[i]) facet.push_back(vertices.at(i));
+    }
+    auto it = k_simplices.at(N_facet_dimension).find(facet);
+    SimplexNode tau;
+    if(it == k_simplices.at(N_facet_dimension).end())
+    {
+      //std::cout << "tried adding coface " << vertices << " to facet " << facet << std::endl;
+      //std::cout << "BUT: facet " << facet << " does not exist in simplex_map" << std::endl;
+      //std::cout << "simplex map: " << k_simplices.at(N_facet_dimension) << std::endl;
+      //exit(0);
+      tau = AddSimplexNode(facet);
+    }else{
+      tau = (*it).second;
+    }
+    boost::add_edge(tau, sigma, S);
+  }while(std::prev_permutation(bitmask.begin(), bitmask.end()));
 }
 
 
@@ -118,8 +163,6 @@ SimplicialComplex::SimplexNode SimplicialComplex::AddSimplexNode(std::vector<Ver
 
 std::pair<SimplicialComplex::Edge, bool> SimplicialComplex::AddEdge(const Vertex a, const Vertex b)
 {
-  std::cout << "adding edge : " << a << "-" << b << std::endl;
-
   //#######################################################################
   //Add edge to 1-skeleton
   //#######################################################################
@@ -132,11 +175,8 @@ std::pair<SimplicialComplex::Edge, bool> SimplicialComplex::AddEdge(const Vertex
   //#######################################################################
   std::vector<Vertex> vertices{a,b};
   G[e.first].simplex_representation = AddSimplexNode(vertices);
-
-  std::cout << "simplex : " << S[G[e.first].simplex_representation].vertices << std::endl;
   return e;
 }
-
 
 void SimplicialComplex::AddSimplices(const Vertex v, RoadmapNeighbors nn)
 {
@@ -156,40 +196,39 @@ void SimplicialComplex::AddSimplices(const Vertex v, RoadmapNeighbors nn)
   }
 
   std::vector<Vertex> sigma; sigma.push_back(v);
-  std::sort(neighbors.begin(), neighbors.end());
-
   AddSimplex(sigma, neighbors);
 }
 
-void SimplicialComplex::AddSimplex( std::vector<Vertex>& sigma, std::vector<Vertex>& N)
+void SimplicialComplex::AddSimplex( std::vector<Vertex>& sigma, std::vector<Vertex>& neighbors)
 {
-  if(sigma.size()<=max_dimension+1) return;
+  if(sigma.size()>max_dimension) return;
 
   //we already added vertices for edge-simplices, so we do not want to have
   //double entries in that case
+  //SimplexNode s = k_simplices.at(sigma.size())[sigma];
   if(sigma.size()>1){
-    for(uint k = 0; k < N.size(); k++)
+    for(uint k = 0; k < neighbors.size(); k++)
     {
-      Vertex vk = N.at(k);
+      Vertex vk = neighbors.at(k);
       std::vector<Vertex> tau(sigma); tau.push_back(vk);
       AddSimplexNode(tau);
     }
   }
-  for(uint k = 0; k < N.size(); k++){
-    Vertex vk = N.at(k);
-    std::vector<Vertex> M;
-    for(uint j = k+1; j < N.size(); j++){
-      Vertex vj = N.at(j);
+
+  for(uint k = 0; k < neighbors.size(); k++){
+    Vertex vk = neighbors.at(k);
+    std::vector<Vertex> neighbors_of_neighbor;
+    for(uint j = k+1; j < neighbors.size(); j++){
+      Vertex vj = neighbors.at(j);
       if(EdgeExists(vk, vj))
       {
-        M.push_back(vj);
+        neighbors_of_neighbor.push_back(vj);
       }
     }
     std::vector<Vertex> tau(sigma); tau.push_back(vk);
-    AddSimplex(tau, M);
+    AddSimplex(tau, neighbors_of_neighbor);
   }
 }
-
 
 //#############################################################################
 //Add infeasible or feasible vertices to simplicial complex
@@ -246,8 +285,6 @@ SimplicialComplex::Vertex SimplicialComplex::Add(const ob::State *s, RoadmapNeig
 
   if(addSimplices)
   {
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "adding vertex : " << v << std::endl;
     AddSimplices(v, nn_positive);
   }
 
@@ -304,18 +341,28 @@ const SimplicialComplex::Graph& SimplicialComplex::GetGraph()
   return G;
 }
 
+namespace ompl{ namespace geometric{ namespace topology{
+  std::ostream& operator<< (std::ostream& out, const SimplicialComplex& sc)
+  {
+    out << "SimplicialComplex: " << std::endl;
+    for(uint k = 0; k < sc.k_simplices.size(); k++){
+      out << "simplices of size " << k << ":" << sc.k_simplices.at(k).size() << std::endl;
+    }
+    return out;
+  }
+}}};
+
 std::vector<std::vector<SimplicialComplex::Vertex>> SimplicialComplex::GetSimplicesOfDimension(uint k)
 {
   std::vector<std::vector<SimplicialComplex::Vertex>> v;
 
-  std::cout << "SimplicialComplex: " << std::endl;
-  for(uint k = 0; k < k_simplices.size(); k++){
-    std::cout << "simplices of size " << k << ":" << k_simplices.at(k).size() << std::endl;
-  }
-  std::cout << "input dimension: " << k-1 << std::endl;
-  for(auto it=k_simplices.at(k-1).begin(); it!=k_simplices.at(k-1).end(); ++it)
-  {
-    v.push_back(it->first);
+  std::cout << *this << std::endl;
+  for(uint n = 2; n < k; n++){
+    for(auto it=k_simplices.at(n).begin(); it!=k_simplices.at(n).end(); ++it)
+    {
+      uint cofaces = boost::out_degree(it->second, S);
+      if(cofaces==0) v.push_back(it->first);
+    }
   }
   return v;
 }

@@ -27,7 +27,6 @@ namespace ompl
         void RemoveSimplices(Vertex v1, Vertex v2);
 
       private:
-        double epsilon_max_neighborhood{1.0};
         uint ntry;
 
         ogt::SimplicialComplex *simplicial_complex;
