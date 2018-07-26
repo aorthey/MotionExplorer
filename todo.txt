@@ -555,15 +555,12 @@ have an algorithm which can sparsify the complex
 [ ] issue: some paths go farther than the epsilon specified by complex --- how
 to remedy that ?
 
-
 I thought that we do not see the triangle sometimes is because they are removed
 when an infeasible sample is obtained, but the edges itself are not removed.
-
 However, this seems to not be true, whenever we create edges, we also create
 triangles! (and we do not currently delete any triangles)
 
-
 But we have changed the sizes of the spheres! So that is why we sometimes have
 those cases where the sphere has changed, but the edges have not been removed!
-
 [ ] make them all smart ptrs
+[ ] refactor simplicial complex

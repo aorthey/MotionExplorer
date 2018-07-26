@@ -149,28 +149,6 @@ void QuotientChartComplex::getPlannerData(ob::PlannerData &data) const
     v->AddComplex(ks);
   }
 
-  // simplicial_complex->simplexTree.expansion(N);
-
-  // std::vector<int> ctr(N+1);
-
-  // for(auto k_simplex: simplicial_complex->simplexTree.skeleton_simplex_range(N))
-  // {
-  //   uint k_size = simplicial_complex->simplexTree.dimension(k_simplex);
-  //   ctr.at(k_size)++;
-  //   if(k_size <= N){
-  //     std::vector<int> ks;
-  //     for (auto vertex : simplicial_complex->simplexTree.simplex_vertex_range(k_simplex)) ks.push_back(vertex);
-  //     PlannerDataVertexAnnotated *v = static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(ks.at(0)));
-  //     v->AddComplex(ks);
-  //   }
-  // }
-
-  // std::cout << std::string(80, '-') << std::endl;
-  // std::cout << "* The complex contains " << simplicial_complex->simplexTree.num_simplices() << " simplices " << ctr;
-  // std::cout << "   - dimension " << simplicial_complex->simplexTree.dimension() << "\n";
-  // std::cout << std::string(80, '-') << std::endl;
-
-
   //###########################################################################
   //Get Data From all siblings
   //###########################################################################
