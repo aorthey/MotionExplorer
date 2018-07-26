@@ -1,5 +1,6 @@
 #include "simplicial_complex_hasse_diagram.h"
 #include "common.h"
+#include <iostream>
 
 using namespace ompl::geometric::topology;
 void HasseDiagram::RemoveNode(SimplexNode s)
@@ -40,6 +41,7 @@ void HasseDiagram::RemoveNode(SimplexNode s)
   //remove simplex from hasse diagram
   boost::remove_vertex(s, S);
 }
+
 void HasseDiagram::SetMaxDimension(uint max_dimension_)
 {
   max_dimension = max_dimension_;

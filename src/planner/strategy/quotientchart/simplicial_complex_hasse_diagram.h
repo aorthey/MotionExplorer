@@ -1,14 +1,7 @@
 #pragma once
-//#include "simplicial_complex_simplex.h"
-#include <ompl/base/SpaceInformation.h>
-#include <ompl/base/Planner.h>
-#include <ompl/datastructures/NearestNeighbors.h>
-//#include <boost/pending/disjoint_sets.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <unordered_map>
-
-namespace ob = ompl::base;
 
 namespace ompl
 {

@@ -340,7 +340,6 @@ namespace ompl{ namespace geometric{ namespace topology{
       out << "simplices of size " << k << ":" << sc.hasse_diagram.k_simplices.at(k).size() << std::endl;
     }
     return out;
-    return out;
   }
 }}};
 

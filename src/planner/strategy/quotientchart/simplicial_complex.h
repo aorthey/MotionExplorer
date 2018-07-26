@@ -19,40 +19,7 @@ namespace ompl
       //@brief: implements vietoris rips complex
       class SimplicialComplex
       {
-        //typedef long unsigned int vertex_t;
-
         public:
-          ////###################################################################
-          ////Simplicial Complex as Hasse Diagram representation using a boost
-          ////directed graph
-          ////###################################################################
-          //class SimplexNodeInternalState{
-          //  public:
-          //    SimplexNodeInternalState() = default;
-          //    SimplexNodeInternalState(const SimplexNodeInternalState &vis) = default;
-          //    std::vector<vertex_t> vertices;
-          //};
-          //class SimplexConnectionInternalState{
-          //  public:
-          //    SimplexConnectionInternalState() = default;
-          //};
-          //typedef boost::adjacency_list<
-          //   boost::setS,  //do not change to vecS, otherwise vertex indices are not stable after removal
-          //   boost::setS, 
-          //   boost::directedS,
-          //   SimplexNodeInternalState,
-          //   SimplexConnectionInternalState
-          // > SimplicialComplexGraph;
-
-          //typedef boost::graph_traits<SimplicialComplexGraph> SCBGT;
-          //typedef SCBGT::vertex_descriptor SimplexNode;
-          //typedef SCBGT::edge_descriptor SimplexEdge;
-          //typedef SCBGT::in_edge_iterator SC_IEIterator;
-          //typedef SCBGT::out_edge_iterator SC_OEIterator;
-
-          //void RemoveSimplexNode(SimplexNode s);
-          //void HasseDiagramAddIncomingEdges(SimplexNode sigma);
-
           //###################################################################
           //1-skeleton representation of simplicial complex as boost undirected graph
           //###################################################################
@@ -101,15 +68,11 @@ namespace ompl
           typedef VertexIndex* VertexRank;
           typedef std::shared_ptr<NearestNeighbors<Vertex>> RoadmapNeighbors;
 
-          const Graph& GetGraph();
           void RemoveEdge(const Vertex v, const Vertex b);
           bool EdgeExists(const Vertex a, const Vertex b); 
 
           void AddSimplex( std::vector<Vertex>& sigma, std::vector<Vertex>& N);
 
-          //std::vector<std::map<std::vector<Vertex>, SimplexNode>> k_simplices;
-          //typedef std::map<std::vector<Vertex>, SimplexNode>>::iterator KSimplicesIterator;
-          //SimplexNode AddSimplexNode(std::vector<Vertex> v);
           //###################################################################
           //data structures
           //###################################################################
@@ -149,6 +112,7 @@ namespace ompl
           Vertex AddInfeasible(const ob::State *s);
           void AddStart(const ob::State *s);
           void AddGoal(const ob::State *s);
+          const Graph& GetGraph();
 
 
       };

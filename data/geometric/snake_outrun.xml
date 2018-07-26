@@ -13,9 +13,9 @@
     <display color="0.7 0.7 0.7 0.5"/>
   </terrain>
   <rigidObject  name="twister/twister.tri" file="/home/aorthey/git/orthoklampt/data/terrains/twister/twister.tri" translation="0 0 0"/>
-  <terrain name="outrun" file="/home/aorthey/git/orthoklampt/data/terrains/outrun.tri" translation="0 0 0"/>
-  -->
   <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 -1 1.0" rotateRPY="0 0 0"/>
+  -->
+  <terrain name="outrun" file="/home/aorthey/git/orthoklampt/data/terrains/outrun.tri" translation="0 0 0"/>
 
 
   <plannerinput>
