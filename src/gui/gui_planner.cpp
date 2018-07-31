@@ -374,13 +374,18 @@ void PlannerBackend::RenderScreen(){
   BaseT::RenderScreen();
   std::string line;
   line = "Planners       : ";
+  DrawText(line_x_pos,line_y_offset,line);
+  line_y_offset += line_y_offset_stepsize;
+
   for(uint k = 0; k < planners.size(); k++){
+    line = "               ";
     if(k==active_planner) line += "[";
     line += planners.at(k)->getName() + " ";
     if(k==active_planner) line += "]";
+
+    DrawText(line_x_pos,line_y_offset,line);
+    line_y_offset += line_y_offset_stepsize;
   }
-  DrawText(line_x_pos,line_y_offset,line);
-  line_y_offset += line_y_offset_stepsize;
 
   if(planners.size()>0){
     planners.at(active_planner)->DrawGLScreen(line_x_pos, line_y_offset);

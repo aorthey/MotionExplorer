@@ -541,10 +541,6 @@ Measures for deciding which solution class to extend:
 [ ] Update simplicial complex dynamically, based on incoming feasible and
 infeasible samples. Also update the sphere radii.
 
-
-[ ] Step1: Create simplicial complex. Use simplicial complex for sampling
-
-
 Problems:
 [x] spheres should not exceed boundary (why not, might be even better, otherwise
 we need infinite number of spheres)

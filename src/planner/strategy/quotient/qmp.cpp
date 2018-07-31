@@ -27,16 +27,13 @@ QMP::~QMP()
 
 bool QMP::SampleGraph(ob::State *q_random_graph)
 {
-  //PDF<Edge> pdf = GetEdgePDF();
-  //Edge e = pdf.sample(rng_.uniform01());
-
   Edge e;
   double t = rng_.uniform01();
   if(t<percentageSamplesOnShortestPath)
   {
     //shortest path heuristic
     PDF<Edge> pdf;
-    //percentageSamplesOnShortestPath = exp(-pow(((double)samplesOnShortestPath++/1000.0),2));
+    percentageSamplesOnShortestPath = exp(-pow(((double)samplesOnShortestPath++/1000.0),2));
 
     for(uint k = 0; k < startGoalVertexPath_.size()-1; k++){
       Vertex v1 = startGoalVertexPath_.at(k);

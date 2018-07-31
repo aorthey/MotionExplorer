@@ -24,7 +24,7 @@ namespace ompl
   namespace magic
   {
     static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
-    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 3;
+    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
   }
 }
 QuotientGraph::QuotientGraph(const ob::SpaceInformationPtr &si, Quotient *parent_)
@@ -343,8 +343,8 @@ void QuotientGraph::CheckForSolution(ob::PathPtr &solution)
 {
   if(hasSolution){
     solution_path = GetPath(startM_.at(0), goalM_.at(0));
-    solution = solution_path;
     startGoalVertexPath_ = shortestVertexPath_;
+    solution = solution_path;
     return;
   }else{
     ob::Goal *g = pdef_->getGoal().get();
@@ -376,7 +376,7 @@ ob::PathPtr QuotientGraph::GetPath(const Vertex &start, const Vertex &goal)
   auto weight = boost::make_transform_value_property_map(std::mem_fn(&EdgeInternalState::getCost), get(boost::edge_bundle, G));
   try
   {
-  boost::astar_search(G, start,
+    boost::astar_search(G, start,
                       [this, goal](const Vertex v)
                       {
                           return costHeuristic(v, goal);
@@ -401,7 +401,7 @@ ob::PathPtr QuotientGraph::GetPath(const Vertex &start, const Vertex &goal)
 
   auto p(std::make_shared<PathGeometric>(si_));
   if (prev[goal] == goal){
-    return NULL;
+    return nullptr;
   }
 
   std::vector<Vertex> vpath;

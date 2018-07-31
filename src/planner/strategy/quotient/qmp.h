@@ -26,9 +26,9 @@ namespace ompl
 
       protected:
 
-        double epsilon{0.05}; //graph thickening
+        double epsilon{0.1}; //graph thickening
         double percentageSamplesOnShortestPath{1.0};
-        double goalBias_{0.05};
+        double goalBias_{0.1};
         PDF<Vertex> vpdf;
 
         virtual bool SampleGraph(ob::State*) override;
