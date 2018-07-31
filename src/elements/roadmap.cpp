@@ -193,10 +193,8 @@ void Roadmap::DrawPlannerData(GUIState &state)
     setColor(cComplex);
     for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
 
-      //ob::PlannerDataVertex *v1 = &pd->getVertex(vidx);
-      //Vector3 p1 = cspace->getXYZ(v1->getState());
-
       PlannerDataVertexAnnotated *v1a = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+      if(v1a==nullptr) break;
       std::vector<std::vector<long unsigned int>> simplices = v1a->GetComplex();
       //if(simplices.size()>0) std::cout << "vertex " << vidx << " has " << simplices.size() << " simplices." << std::endl;
 

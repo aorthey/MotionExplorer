@@ -37,9 +37,6 @@ namespace ompl
         virtual bool Sample(ob::State *q_random) override;
         virtual Vertex CreateNewVertex(ob::State *state) override;
 
-        //virtual bool SampleGraph(ob::State*) override;
-        //virtual ompl::PDF<og::QuotientGraph::Edge> GetEdgePDF() override;
-
         virtual void RandomWalk(const Vertex &v) override;
 
 

@@ -87,7 +87,7 @@ namespace ompl
           //###################################################################
           //
           //###################################################################
-          SimplicialComplex(ob::SpaceInformationPtr si_, ob::Planner* planner_, double epsilon_max_neighborhood_ = 0.5);
+          SimplicialComplex(ob::SpaceInformationPtr si_, ob::Planner* planner_, double epsilon_max_neighborhood_ = 2);
           std::vector<std::vector<Vertex>> GetSimplicesOfDimension(uint k);
           double Distance(const Vertex a, const Vertex b);
           bool HaveIntersectingSpheres(const Vertex a, const Vertex b);

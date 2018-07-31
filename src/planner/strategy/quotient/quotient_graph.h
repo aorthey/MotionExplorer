@@ -78,15 +78,11 @@ namespace ompl
             void setOriginalWeight(){
               cost = original_cost;
             }
-            std::vector<std::vector<int> > ksimplex;
           private:
             ob::Cost cost{+dInf};
             ob::Cost original_cost{+dInf};
             bool isSufficient{false};
         };
-
-        // typedef boost::property<boost::vertex_index_t, std::size_t, VertexInternalState> vertex_prop;
-        // typedef boost::property<boost::edge_index_t, std::size_t, EdgeInternalState> edge_prop;
 
         typedef boost::adjacency_list<
            boost::vecS, 
@@ -97,11 +93,11 @@ namespace ompl
          > Graph;
 
         typedef boost::graph_traits<Graph> BGT;
-        typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
-        typedef boost::graph_traits<Graph>::edge_descriptor Edge;
-        typedef boost::graph_traits<Graph>::vertices_size_type VertexIndex;
-        typedef boost::graph_traits<Graph>::in_edge_iterator IEIterator;
-        typedef boost::graph_traits<Graph>::out_edge_iterator OEIterator;
+        typedef BGT::vertex_descriptor Vertex;
+        typedef BGT::edge_descriptor Edge;
+        typedef BGT::vertices_size_type VertexIndex;
+        typedef BGT::in_edge_iterator IEIterator;
+        typedef BGT::out_edge_iterator OEIterator;
         typedef Vertex* VertexParent;
         typedef VertexIndex* VertexRank;
         typedef std::shared_ptr<NearestNeighbors<Vertex>> RoadmapNeighbors;
@@ -114,15 +110,14 @@ namespace ompl
 
         virtual uint GetNumberOfVertices() const override;
         virtual uint GetNumberOfEdges() const override;
-        ob::PathPtr GetShortestPath();
         ob::PathPtr GetSolutionPath();
 
         virtual void Grow(double t);
         virtual void Init() override;
         virtual bool SampleGraph(ob::State *q_random_graph) override;
 
-        // template <template <typename T> class NN>
-        // void setNearestNeighbors();
+        template <template <typename T> class NN>
+        void setNearestNeighbors();
 
         void getPlannerData(ob::PlannerData &data) const override;
 
@@ -151,6 +146,7 @@ namespace ompl
         std::vector<Vertex> startM_;
         std::vector<Vertex> goalM_;
         std::vector<Vertex> shortestVertexPath_;
+        std::vector<Vertex> startGoalVertexPath_;
 
         const Graph& GetGraph() const;
 
@@ -183,7 +179,7 @@ namespace ompl
         virtual void growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState);
         virtual void expandRoadmap(const ob::PlannerTerminationCondition &ptc, std::vector<ob::State *> &workStates);
 
-        ob::PathPtr GetSolutionPath(const Vertex &start, const Vertex &goal);
+        ob::PathPtr GetPath(const Vertex &start, const Vertex &goal);
 
         virtual void RandomWalk(const Vertex &v);
 

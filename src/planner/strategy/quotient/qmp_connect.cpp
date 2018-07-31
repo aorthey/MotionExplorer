@@ -22,7 +22,7 @@ namespace ompl
 {
   namespace magic
   {
-    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 10;
+    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
   }
 }
 
@@ -46,76 +46,26 @@ void QMPConnect::clear(){
 
 void QMPConnect::setup()
 {
-  og::QMPConnect *quotient_parent = static_cast<og::QMPConnect*>(parent);
-  if(quotient_parent==nullptr){
-    QMP::setup();
-  }
-  if (!nn_){
-    nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
-    nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
-                             {
-                               return QMPConnect::Distance(a,b);
-                             });
-  }
+  BaseT::setup();
 
-  if (pdef_){
-    Planner::setup();
-    if (pdef_->hasOptimizationObjective()){
-      opt_ = pdef_->getOptimizationObjective();
+  if(setup_)
+  {
+    og::QMPConnect *quotient_parent = static_cast<og::QMPConnect*>(parent);
+    if(quotient_parent==nullptr){
     }else{
-      opt_ = std::make_shared<ob::PathLengthOptimizationObjective>(si_);
-    }
-    auto *goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
-
-    if (goal == nullptr){
-      OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
-      exit(0);
-    }
-
-    //we assume here that there is one single start and that we can sample one
-    //single goal state associated with the problem. @TODO: make this more
-    //general
-
-    if(const ob::State *st = pis_.nextStart()){
-      Vertex m = CreateNewVertex(si_->cloneState(st));
-      G[m].associated_source = quotient_parent->startM_.at(0);
-      G[m].associated_target = quotient_parent->startM_.at(0);
-      G[m].associated_t = 0;
-      // G[m].associated_source = 
-      // G[m].associated_target = quotient_parent->startM_.at(0);
-      // G[m].associated_t = 0;
-      //std::cout << "start vertex: " << m << " associated:" << quotient_parent->startM_.at(0) << std::endl;
-      ConnectVertexToNeighbors(m);
-      startM_.push_back(m);
-    }
-    if (startM_.empty()){
-      OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
-      exit(0);
-    }
-    if (!goal->couldSample()){
-      OMPL_ERROR("%s: Insufficient states in sampleable goal region", getName().c_str());
-      exit(0);
-    }
-
-    if (goal->maxSampleCount() > goalM_.size() || goalM_.empty()){
-      const ob::State *gl = pis_.nextGoal();
-      if (gl != nullptr){
-        Vertex m = CreateNewVertex(si_->cloneState(gl));
-        //G[m].associated_source = quotient_parent->goalM_.at(0);
-        //G[m].associated_target = quotient_parent->goalM_.at(0);
-        //G[m].associated_t = 0;
-        G[m].associated_source = quotient_parent->goalM_.at(0);
-        G[m].associated_target = quotient_parent->goalM_.at(0);
+      for(uint i = 0; i < startM_.size(); i++){
+        Vertex m = startM_.at(i);
+        G[m].associated_source = quotient_parent->startM_.at(0);
+        G[m].associated_target = quotient_parent->startM_.at(0);
         G[m].associated_t = 0;
-        //std::cout << "goal vertex: " << m << " associated:" << quotient_parent->goalM_.at(0) << std::endl;
-        ConnectVertexToNeighbors(m);
-        goalM_.push_back(m);
+      }
+      for(uint i = 0; i < goalM_.size(); i++){
+        Vertex m = goalM_.at(i);
+        G[m].associated_source = quotient_parent->startM_.at(0);
+        G[m].associated_target = quotient_parent->startM_.at(0);
+        G[m].associated_t = 0;
       }
     }
-    unsigned long int nrStartStates = boost::num_vertices(G);
-    OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nrStartStates);
-  }else{
-    setup_ = false;
   }
 }
 
@@ -452,7 +402,7 @@ ob::PathPtr QMPConnect::GetShortestPathOffsetVertices(const ob::State *qa, const
   ob::PathPtr path = nullptr;
   if(same_component){
     //std::cout << "ConstructSolution: " << va << "<->" << vb << std::endl;
-    path = GetSolutionPath(va, vb);
+    path = GetPath(va, vb);
   }else{
     std::cout << "WARNING:" << va << " and " << vb << " are not in same component" << std::endl;
   }
@@ -489,52 +439,6 @@ ob::PathPtr QMPConnect::GetShortestPathOffsetVertices(const ob::State *qa, const
   return path;
 }
 
-// ompl::PDF<og::QuotientGraph::Edge> QMPConnect::GetEdgePDF()
-// {
-//   PDF<Edge> pdf;
-//   double t = rng_.uniform01();
-//   if(t<percentageSamplesOnShortestPath)
-//   {
-//     //diminishing shortest path sampling
-//     percentageSamplesOnShortestPath = exp(-pow(((double)samplesOnShortestPath++/10000.0),2));
-
-//     for(uint k = 0; k < shortestVertexPath_.size()-1; k++){
-//       Vertex v1 = shortestVertexPath_.at(k);
-//       Vertex v2 = shortestVertexPath_.at(k+1);
-//       Edge e = boost::edge(v1,v2,G).first;
-//       pdf.add(e, G[e].getCost().value());
-//     }
-//   }else{
-//     //Random Edge (RE) sampling (suffers from high sampling concentrations at
-//     //vertices with many incoming edges, not ideal, but fast)
-//     //foreach (Edge e, boost::edges(G))
-//     //{
-//     //  const Vertex v1 = boost::source(e, G);
-
-//     //  if(sameComponent(v1, startM_.at(0))){
-//     //    ob::Cost weight = get(boost::edge_weight_t(), Ge).getCost();
-//     //    pdf.add(e, weight.value());
-//     //  }
-//     //}
-//     ////Random Node Edge (RNE) sampling (better, but still no guarantee of
-//     //uniformity. Might be good to investigate random walk samplers)
-//     PDF<Vertex> vpdf;
-//     foreach (Vertex v, boost::vertices(G))
-//     {
-//       if(sameComponent(v, startM_.at(0))){
-//         vpdf.add(v,1);
-//       }
-//     }
-//     Vertex v = vpdf.sample(rng_.uniform01());
-//     std::pair<IEIterator, IEIterator> iterators = boost::in_edges(boost::vertex(v, G), G);
-//     for (IEIterator iter = iterators.first; iter != iterators.second; ++iter)
-//     {
-//       ob::Cost weight = G[*iter].getCost();
-//       pdf.add(*iter, weight.value());
-//     }
-//   }
-//   return pdf;
-// }
 
 void QMPConnect::RandomWalk(const Vertex &v) 
 {

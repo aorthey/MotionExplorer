@@ -17,7 +17,7 @@ QuotientChartComplex::QuotientChartComplex(const ob::SpaceInformationPtr &si, og
 void QuotientChartComplex::setup() 
 {
   if(pdef_ && !setup_){
-    simplicial_complex = new ogt::SimplicialComplex(si_, this, 1.0);
+    simplicial_complex = new ogt::SimplicialComplex(si_, this);
 
     if(const ob::State *s = pis_.nextStart()){
       simplicial_complex->AddStart(s);

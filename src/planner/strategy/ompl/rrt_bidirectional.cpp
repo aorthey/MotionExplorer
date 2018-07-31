@@ -198,12 +198,6 @@ RRTBidirectional::GrowState RRTBidirectional::growTree(TreeData &tree, TreeGrowi
     auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
     configuration->openNeighborhoodDistance = checkerPtr->Distance(configuration->state);
 
-    if(checkerPtr->IsSufficient(configuration->state))
-    {
-      configuration->isSufficient = true;
-      configuration->parent_edge_weight = 0;
-    }
-
     tgi.xconfiguration = configuration;
     tree->add(configuration);
     return reach ? REACHED : ADVANCED;
@@ -423,24 +417,6 @@ bool RRTBidirectional::SampleGraph(ob::State *q_random_graph)
   M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
   double epsilon = 0.05;
   M1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
-
-  //auto checkerPtr = static_pointer_cast<OMPLValidityCheckerNecessarySufficient>(M1->getStateValidityChecker());
-  //bool foundNecessary = false;
-  //while(!foundNecessary)
-  //{
-  //  Configuration *q = pdf.sample(rng_.uniform01());
-  //  double t = rng_.uniform01();
-
-  //  const ob::State *from = q->state;
-  //  const ob::State *to = q->parent->state;
-  //  M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
-
-  //  if(!checkerPtr->IsSufficient(q_random_graph)){
-  //    foundNecessary = true;
-  //    double epsilon = 5;
-  //    simpleSampler_->sampleGaussian(q_random_graph, q_random_graph, epsilon);
-  //  }
-  //}
 
   return true;
 }

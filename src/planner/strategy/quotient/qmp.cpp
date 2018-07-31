@@ -1,4 +1,5 @@
 #include "qmp.h"
+#include "common.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
 #include <ompl/datastructures/PDF.h>
@@ -14,7 +15,7 @@ using namespace ob;
 #define foreach BOOST_FOREACH
 
 QMP::QMP(const ob::SpaceInformationPtr &si, Quotient *parent_ ):
-  og::QuotientGraph(si, parent_)
+  BaseT(si, parent_)
 {
   setName("QMP"+std::to_string(id));
 }
@@ -35,13 +36,13 @@ bool QMP::SampleGraph(ob::State *q_random_graph)
   {
     //shortest path heuristic
     PDF<Edge> pdf;
-    percentageSamplesOnShortestPath = exp(-pow(((double)samplesOnShortestPath++/1000.0),2));
+    //percentageSamplesOnShortestPath = exp(-pow(((double)samplesOnShortestPath++/1000.0),2));
 
-    for(uint k = 0; k < shortestVertexPath_.size()-1; k++){
-      Vertex v1 = shortestVertexPath_.at(k);
-      Vertex v2 = shortestVertexPath_.at(k+1);
-      Edge e = boost::edge(v1,v2,G).first;
-      pdf.add(e, G[e].getCost().value());
+    for(uint k = 0; k < startGoalVertexPath_.size()-1; k++){
+      Vertex v1 = startGoalVertexPath_.at(k);
+      Vertex v2 = startGoalVertexPath_.at(k+1);
+      Edge ek = boost::edge(v1,v2,G).first;
+      pdf.add(ek, G[ek].getCost().value());
     }
     e = pdf.sample(rng_.uniform01());
   }else{
@@ -65,49 +66,3 @@ bool QMP::SampleGraph(ob::State *q_random_graph)
   return true;
 }
 
-ompl::PDF<og::QuotientGraph::Edge> QMP::GetEdgePDF()
-{
-  PDF<Edge> pdf;
-  double t = rng_.uniform01();
-  if(t<percentageSamplesOnShortestPath)
-  {
-    //shortest path heuristic
-    percentageSamplesOnShortestPath = exp(-pow(((double)samplesOnShortestPath++/10000.0),2));
-
-    for(uint k = 0; k < shortestVertexPath_.size()-1; k++){
-      Vertex v1 = shortestVertexPath_.at(k);
-      Vertex v2 = shortestVertexPath_.at(k+1);
-      Edge e = boost::edge(v1,v2,G).first;
-      pdf.add(e, G[e].getCost().value());
-    }
-
-  }else{
-    //Random Edge (RE) sampling (suffers from high sampling concentrations at
-    //vertices with many incoming edges, not ideal, but fast)
-    //foreach (Edge e, boost::edges(G))
-    //{
-    //  const Vertex v1 = boost::source(e, G);
-
-    //  if(sameComponent(v1, startM_.at(0))){
-    //    ob::Cost weight = get(boost::edge_weight_t(), Ge).getCost();
-    //    pdf.add(e, weight.value());
-    //  }
-    //}
-    ////Random Node Edge (RNE) sampling (better, but still no guarantee of
-    //uniformity. Might be good to investigate random walk samplers)
-    foreach (Vertex v, boost::vertices(G))
-    {
-      if(sameComponent(v, startM_.at(0))){
-        vpdf.add(v,1);
-      }
-    }
-    Vertex v = vpdf.sample(rng_.uniform01());
-    std::pair<IEIterator, IEIterator> iterators = boost::in_edges(boost::vertex(v, G), G);
-    for (IEIterator iter = iterators.first; iter != iterators.second; ++iter)
-    {
-      ob::Cost weight = G[*iter].getCost();
-      pdf.add(*iter, weight.value());
-    }
-  }
-  return pdf;
-}

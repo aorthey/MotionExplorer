@@ -563,4 +563,17 @@ triangles! (and we do not currently delete any triangles)
 But we have changed the sizes of the spheres! So that is why we sometimes have
 those cases where the sphere has changed, but the edges have not been removed!
 [ ] make them all smart ptrs
-[ ] refactor simplicial complex
+[x] refactor simplicial complex
+
+What needs to be done:
+[ ] think deeply about the right complex to use. the complex should have the
+following specification: easily extendable, easily shrinkable, minimal
+represenation given all the data points.
+
+Complex should grow from a given start position.
+Complex should be minimal, i.e. all interior points are not vertices.
+Sampling is adaptive, i.e. Given the complex, we have prefered sampling
+directions/subspaces. For example sampling on the boundary of the complex.
+
+[ ] fix edge missing in vertex path: reason: we have updated the shortest vertex
+path, but we computed it for different vertices before

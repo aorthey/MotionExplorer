@@ -191,6 +191,7 @@ QuotientGraph::Vertex QuotientGraph::CreateNewVertex(ob::State *state)
   Vertex m = boost::add_vertex(G);
   G[m].state = si_->cloneState(state);
   disjointSets_.make_set(m);
+
   return m;
 }
 
@@ -245,7 +246,6 @@ void QuotientGraph::setup(){
     unsigned long int nrStartStates = boost::num_vertices(G);
     OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nrStartStates);
   }else{
-    //OMPL_INFORM("%s: problem definition is not set, deferring setup completion...", getName().c_str());
     setup_ = false;
   }
 }
@@ -253,10 +253,6 @@ void QuotientGraph::setup(){
 ob::Cost QuotientGraph::costHeuristic(Vertex u, Vertex v) const
 {
   return opt_->motionCostHeuristic(G[u].state, G[v].state);
-}
-
-ob::PathPtr QuotientGraph::GetShortestPath(){
-  return GetSolutionPath();
 }
 
 uint QuotientGraph::GetNumberOfVertices() const{
@@ -273,18 +269,18 @@ ob::PathPtr QuotientGraph::GetSolutionPath(){
   return sol;
 }
 
-// template <template <typename T> class NN>
-// void QuotientGraph::setNearestNeighbors()
-// {
-//   if (nn_ && nn_->size() == 0)
-//       OMPL_WARN("Calling setNearestNeighbors will clear all states.");
-//   clear();
-//   nn_ = std::make_shared<NN<Vertex>>();
-//   connectionStrategy_ = ConnectionStrategy();
-//   if(!isSetup()){
-//     setup();
-//   }
-// }
+template <template <typename T> class NN>
+void QuotientGraph::setNearestNeighbors()
+{
+  if (nn_ && nn_->size() == 0)
+      OMPL_WARN("Calling setNearestNeighbors will clear all states.");
+  clear();
+  nn_ = std::make_shared<NN<Vertex>>();
+  connectionStrategy_ = ConnectionStrategy();
+  if(!isSetup()){
+    setup();
+  }
+}
 
 double QuotientGraph::Distance(const Vertex a, const Vertex b) const
 {
@@ -346,8 +342,9 @@ void QuotientGraph::RandomWalk(const Vertex &v)
 void QuotientGraph::CheckForSolution(ob::PathPtr &solution)
 {
   if(hasSolution){
-    solution_path = GetSolutionPath(startM_.at(0), goalM_.at(0));
+    solution_path = GetPath(startM_.at(0), goalM_.at(0));
     solution = solution_path;
+    startGoalVertexPath_ = shortestVertexPath_;
     return;
   }else{
     ob::Goal *g = pdef_->getGoal().get();
@@ -360,11 +357,12 @@ void QuotientGraph::CheckForSolution(ob::PathPtr &solution)
 
         if (same_component && g->isStartGoalPairValid(G[goal].state, G[start].state))
         {
-          solution_path = GetSolutionPath(start, goal);
+          solution_path = GetPath(start, goal);
           if (solution_path)
           {
             solution = solution_path;
             hasSolution = true;
+            startGoalVertexPath_ = shortestVertexPath_;
             return;
           }
         }
@@ -372,7 +370,7 @@ void QuotientGraph::CheckForSolution(ob::PathPtr &solution)
     }
   }
 }
-ob::PathPtr QuotientGraph::GetSolutionPath(const Vertex &start, const Vertex &goal)
+ob::PathPtr QuotientGraph::GetPath(const Vertex &start, const Vertex &goal)
 {
   std::vector<Vertex> prev(boost::num_vertices(G));
   auto weight = boost::make_transform_value_property_map(std::mem_fn(&EdgeInternalState::getCost), get(boost::edge_bundle, G));

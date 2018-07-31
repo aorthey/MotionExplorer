@@ -137,13 +137,13 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     typedef og::MultiQuotient<og::QMPConnect, og::RRTBidirectional> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect+RRT");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-  }else if(algorithm=="hierarchy:qmp_rrt"){
-    typedef og::MultiQuotient<og::QMP, og::RRTBidirectional> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "QMP+RRT");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="hierarchy:qmp"){
     typedef og::MultiQuotient<og::QMP> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMP");
+    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="hierarchy:qmp_rrt"){
+    typedef og::MultiQuotient<og::QMP, og::RRTBidirectional> MultiQuotient;
+    planner = std::make_shared<MultiQuotient>(si_vec, "QMP+RRT");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="hierarchy:qcp"){
     typedef og::MultiChart<og::QCP> MultiChart;

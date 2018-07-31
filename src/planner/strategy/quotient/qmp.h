@@ -18,6 +18,7 @@ namespace ompl
     //QMP: Quotient-space roadMap Planner
     class QMP: public og::QuotientGraph{
 
+      typedef og::QuotientGraph BaseT;
       public:
 
         QMP(const ob::SpaceInformationPtr &si, Quotient *parent_);
@@ -26,12 +27,12 @@ namespace ompl
       protected:
 
         double epsilon{0.05}; //graph thickening
-        double percentageSamplesOnShortestPath{0.8};
+        double percentageSamplesOnShortestPath{1.0};
         double goalBias_{0.05};
         PDF<Vertex> vpdf;
 
         virtual bool SampleGraph(ob::State*) override;
-        virtual ompl::PDF<og::QuotientGraph::Edge> GetEdgePDF();
+        //virtual ompl::PDF<og::QuotientGraph::Edge> GetEdgePDF();
         uint samplesOnShortestPath{0};
 
     };

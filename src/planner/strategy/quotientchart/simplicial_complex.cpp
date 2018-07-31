@@ -24,7 +24,6 @@ SimplicialComplex::SimplicialComplex(ob::SpaceInformationPtr si_, ob::Planner* p
                            {
                              return Distance(a,b);
                            });
-  //k_simplices.resize(max_dimension+1);
   hasse_diagram.SetMaxDimension(max_dimension);
 }
 
@@ -70,84 +69,6 @@ void SimplicialComplex::RemoveEdge(const Vertex a, const Vertex b)
   boost::remove_edge(e, graph);
 }
 
-// void SimplicialComplex::RemoveSimplexNode(SimplexNode s)
-// {
-//   SC_OEIterator eo, eo_end, next;
-//   tie(eo, eo_end) = boost::out_edges(s, S);
-//   for (next = eo; eo != eo_end; eo = next) {
-//     ++next;
-//     SimplexNode sn = boost::target(*eo, S);
-//     RemoveSimplexNode(sn);
-//   }
-
-//   //remove simplex from k-simplices map
-//   uint N = S[s].vertices.size()-1;
-//   auto it = k_simplices.at(N).find(S[s].vertices);
-
-//   if(it!=k_simplices.at(N).end()){
-//     k_simplices.at(N).erase(it);
-//   }else{
-//     std::cout << "removing simplex " << S[s].vertices << std::endl;
-//     std::cout << "simplex " << S[s].vertices << " has not been found in map." << std::endl;
-//     std::cout << k_simplices.at(N) << std::endl;
-//     exit(0);
-//   }
-
-//   //remove facet ptrs
-//   boost::clear_vertex(s, S);
-//   //remove simplex from hasse diagram
-//   boost::remove_vertex(s, S);
-// }
-
-// SimplicialComplex::SimplexNode SimplicialComplex::AddSimplexNode(std::vector<Vertex> v)
-// {
-//   std::sort(v.begin(), v.end());
-//   uint N = v.size()-1;
-//   auto it = k_simplices.at(N).find(v);
-//   if(it!=k_simplices.at(N).end()){
-//     return (*it).second;
-//   }else{
-//     SimplexNode s = boost::add_vertex(S);
-//     S[s].vertices = v;
-//     k_simplices.at(v.size()-1)[v] = s;
-//     if(v.size()>2) HasseDiagramAddIncomingEdges(s);
-//     return s;
-//   }
-// }
-
-// void SimplicialComplex::HasseDiagramAddIncomingEdges(SimplexNode sigma)
-// {
-//   const std::vector<Vertex>& vertices = S[sigma].vertices;
-//   uint N = vertices.size();
-//   uint N_facet_dimension = N-2;
-  
-//   //iterate over all facets by taking all vertex permuatations of size N-1
-//   std::string bitmask(N-1, 1); // N-1 leading 1's
-//   bitmask.resize(N, 0); // 1 trailing 0
-
-//   do{
-//     std::vector<unsigned long int> facet;
-//     for (uint i = 0; i < N; i++)
-//     {
-//       if (bitmask[i]) facet.push_back(vertices.at(i));
-//     }
-//     auto it = k_simplices.at(N_facet_dimension).find(facet);
-//     SimplexNode tau;
-//     if(it == k_simplices.at(N_facet_dimension).end())
-//     {
-//       //std::cout << "tried adding coface " << vertices << " to facet " << facet << std::endl;
-//       //std::cout << "BUT: facet " << facet << " does not exist in simplex_map" << std::endl;
-//       //std::cout << "simplex map: " << k_simplices.at(N_facet_dimension) << std::endl;
-//       //exit(0);
-//       tau = AddSimplexNode(facet);
-//     }else{
-//       tau = (*it).second;
-//     }
-//     boost::add_edge(tau, sigma, S);
-//   }while(std::prev_permutation(bitmask.begin(), bitmask.end()));
-// }
-
-
 //#############################################################################
 //Add edge and simplices
 //#############################################################################
@@ -176,6 +97,7 @@ void SimplicialComplex::AddSimplices(const Vertex v, RoadmapNeighbors nn)
   //#######################################################################
   std::vector<Vertex> suspected_neighbors;
   nn->nearestR(v, 2*epsilon_max_neighborhood, suspected_neighbors);
+  //nn->nearestK(v, 10, suspected_neighbors);
 
   std::vector<Vertex> neighbors;
   for(uint k = 0; k < suspected_neighbors.size(); k++){
@@ -285,6 +207,7 @@ SimplicialComplex::Vertex SimplicialComplex::Add(const ob::State *s, RoadmapNeig
   //#######################################################################
   std::vector<Vertex> neighbors;
   nn_negative->nearestR(v, epsilon_max_neighborhood, neighbors);
+  //nn_negative->nearestK(v, 10, neighbors);
 
   bool morphological_change = false;
   for(uint k = 0; k < neighbors.size(); k++){
