@@ -16,10 +16,19 @@ bool OMPLValidityChecker::isValid(const ob::State* state) const
   return IsCollisionFree(klampt_single_robot_cspace, q);
 }
 
+double OMPLValidityChecker::SufficientDistance(const ob::State* state) const
+{
+  return 0;
+}
+
 double OMPLValidityChecker::Distance(const ob::State* state) const
 {
+  return DistanceToRobot(state, klampt_single_robot_cspace);
+}
+
+double OMPLValidityChecker::DistanceToRobot(const ob::State* state, SingleRobotCSpace *space) const
+{
   Config q = cspace->OMPLStateToConfig(state);
-  SingleRobotCSpace* space = static_cast<SingleRobotCSpace*>(klampt_single_robot_cspace);
   Robot* robot = space->GetRobot();
   robot->UpdateConfig(q);
   robot->UpdateGeometry();
@@ -112,4 +121,9 @@ bool OMPLValidityCheckerNecessarySufficient::IsSufficientFeasible(const ob::Stat
 {
   Config q = cspace->OMPLStateToConfig(state);
   return IsCollisionFree(klampt_single_robot_cspace_outer_approximation, q);
+}
+
+double OMPLValidityCheckerNecessarySufficient::SufficientDistance(const ob::State* state) const
+{
+  return DistanceToRobot(state, klampt_single_robot_cspace_outer_approximation);
 }

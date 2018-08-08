@@ -105,9 +105,12 @@ const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr(ob::SpaceI
   }
 }
 
-void CSpaceOMPL::SetSufficient(const uint robot_outer_idx){
-  klampt_cspace_outer = new SingleRobotCSpace(*world, robot_outer_idx, &worldsettings);
-  enableSufficiency = true;
+void CSpaceOMPL::SetSufficient(const uint robot_idx_outer_){
+  robot_idx_outer = robot_idx_outer_;
+  if(robot_idx_outer != robot_idx){
+    klampt_cspace_outer = new SingleRobotCSpace(*world, robot_idx_outer, &worldsettings);
+    enableSufficiency = true;
+  }
 }
 
 bool CSpaceOMPL::isDynamic(){

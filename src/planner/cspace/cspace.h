@@ -108,6 +108,7 @@ class CSpaceOMPL
     RobotWorld *world{nullptr};
 
     WorldPlannerSettings worldsettings;
-    int robot_idx;
+    int robot_idx{0};
+    int robot_idx_outer{0};
 
 };

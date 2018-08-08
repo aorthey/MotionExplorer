@@ -48,8 +48,6 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
     }
     if(robot_inner_idx != robot_outer_idx){
       cspace_level->SetSufficient(robot_outer_idx);
-
-      //cspace_level = new CSpaceOMPLDecoratorNecessarySufficient(cspace_level, robot_outer_idx);
     }
   }else{
     if(type.substr(0,1) != "R"){
