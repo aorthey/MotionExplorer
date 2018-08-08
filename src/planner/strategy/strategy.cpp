@@ -1,13 +1,12 @@
 #include "planner/strategy/strategy.h"
 
-#include "ompl/BridgeTestValidStateSampler.h"
-
 #include <ompl/base/ValidStateSampler.h>
 #include <ompl/base/samplers/UniformValidStateSampler.h>
 #include <ompl/base/samplers/GaussianValidStateSampler.h>
 #include <ompl/base/samplers/ObstacleBasedValidStateSampler.h>
 #include <ompl/base/samplers/MinimumClearanceValidStateSampler.h>
 #include <ompl/base/samplers/MaximizeClearanceValidStateSampler.h>
+#include <ompl/base/samplers/BridgeTestValidStateSampler.h>
 
 ob::ValidStateSamplerPtr allocUniformValidStateSampler(const ob::SpaceInformation *si)
 {
