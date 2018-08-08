@@ -1,26 +1,25 @@
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
-OMPLValidityChecker::OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_, CSpace *inner_):
-  ob::StateValidityChecker(si), cspace(cspace_), inner(inner_)
+OMPLValidityChecker::OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_):
+  ob::StateValidityChecker(si), cspace(cspace_)
 {
+  klampt_single_robot_cspace = static_cast<SingleRobotCSpace*>(cspace_->GetCSpaceKlamptPtr());
 }
 
-CSpaceOMPL* OMPLValidityChecker::GetCSpacePtr() const
+CSpaceOMPL* OMPLValidityChecker::GetCSpaceOMPLPtr() const
 {
   return cspace;
 }
 bool OMPLValidityChecker::isValid(const ob::State* state) const
 {
-  const ob::StateSpacePtr ssp = si_->getStateSpace();
   Config q = cspace->OMPLStateToConfig(state);
-  SingleRobotCSpace* csi = static_cast<SingleRobotCSpace*>(inner);
-  return IsCollisionFree(csi, q);
+  return IsCollisionFree(klampt_single_robot_cspace, q);
 }
 
 double OMPLValidityChecker::Distance(const ob::State* state) const
 {
   Config q = cspace->OMPLStateToConfig(state);
-  SingleRobotCSpace* space = static_cast<SingleRobotCSpace*>(inner);
+  SingleRobotCSpace* space = static_cast<SingleRobotCSpace*>(klampt_single_robot_cspace);
   Robot* robot = space->GetRobot();
   robot->UpdateConfig(q);
   robot->UpdateGeometry();
@@ -80,45 +79,37 @@ bool OMPLValidityChecker::IsCollisionFree(SingleRobotCSpace *space, Config q) co
 
   return true;
 }
-bool OMPLValidityChecker::IsNecessary(const ob::State* state) const
+bool OMPLValidityChecker::IsFeasible(const ob::State* state) const
 {
   return isValid(state);
 }
-bool OMPLValidityChecker::IsSufficient(const ob::State* state) const
+bool OMPLValidityChecker::IsSufficientFeasible(const ob::State* state) const
 {
-  static bool first = true;
-  if(first){
-    std::cout << std::string(80, '#') << std::endl;
-    std::cout << "[WARNING] enableSufficiency not activated in XML file" << std::endl;
-    std::cout << std::string(80, '#') << std::endl;
-    first = !first;
-  }
   return false;
 }
 
+// OMPLValidityCheckerInnerOuter::OMPLValidityCheckerInnerOuter(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_, CSpace *inner_, CSpace *outer_):
+//   OMPLValidityChecker(si, cspace_, inner_), outer(outer_)
+// {
+// }
 
-OMPLValidityCheckerInnerOuter::OMPLValidityCheckerInnerOuter(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_, CSpace *inner_, CSpace *outer_):
-  OMPLValidityChecker(si, cspace_, inner_), outer(outer_)
+// bool OMPLValidityCheckerInnerOuter::isValid(const ob::State* state) const
+// {
+//   const ob::StateSpacePtr ssp = si_->getStateSpace();
+//   Config q = cspace->OMPLStateToConfig(state);
+//   SingleRobotCSpace* csi = static_cast<SingleRobotCSpace*>(inner);
+//   SingleRobotCSpace* cso = static_cast<SingleRobotCSpace*>(outer);
+//   return IsCollisionFree(csi, q) && (!IsCollisionFree(cso,q));
+// }
+
+OMPLValidityCheckerNecessarySufficient::OMPLValidityCheckerNecessarySufficient(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_, CSpaceKlampt *outer_):
+  OMPLValidityChecker(si, cspace_)
 {
+  klampt_single_robot_cspace_outer_approximation = static_cast<SingleRobotCSpace*>(outer_); 
 }
 
-bool OMPLValidityCheckerInnerOuter::isValid(const ob::State* state) const
+bool OMPLValidityCheckerNecessarySufficient::IsSufficientFeasible(const ob::State* state) const
 {
-  const ob::StateSpacePtr ssp = si_->getStateSpace();
   Config q = cspace->OMPLStateToConfig(state);
-  SingleRobotCSpace* csi = static_cast<SingleRobotCSpace*>(inner);
-  SingleRobotCSpace* cso = static_cast<SingleRobotCSpace*>(outer);
-  return IsCollisionFree(csi, q) && (!IsCollisionFree(cso,q));
-}
-
-OMPLValidityCheckerNecessarySufficient::OMPLValidityCheckerNecessarySufficient(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_, CSpace *outer_):
-  OMPLValidityChecker(si, cspace_, cspace_->GetCSpacePtr()), outer(outer_)
-{
-}
-
-bool OMPLValidityCheckerNecessarySufficient::IsSufficient(const ob::State* state) const
-{
-  Config q = cspace->OMPLStateToConfig(state);
-  SingleRobotCSpace* cso = static_cast<SingleRobotCSpace*>(outer);
-  return IsCollisionFree(cso, q);
+  return IsCollisionFree(klampt_single_robot_cspace_outer_approximation, q);
 }

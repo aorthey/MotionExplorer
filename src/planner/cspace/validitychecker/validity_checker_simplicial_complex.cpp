@@ -6,8 +6,8 @@
 #include <Eigen/Dense>
 #include <iris/iris.h>
 
-ValidityCheckerSimplicialComplex::ValidityCheckerSimplicialComplex(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_, CSpace *inner_):
-  OMPLValidityChecker(si, cspace_, inner_)
+ValidityCheckerSimplicialComplex::ValidityCheckerSimplicialComplex(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_):
+  OMPLValidityChecker(si, cspace_)
 {
 }
 
@@ -19,7 +19,7 @@ cover::OpenSetConvex* ValidityCheckerSimplicialComplex::ComputeNeighborhood(cons
   }
 
   Config q = cspace->OMPLStateToConfig(state);
-  SingleRobotCSpace* space = static_cast<SingleRobotCSpace*>(inner);
+  SingleRobotCSpace* space = static_cast<SingleRobotCSpace*>(klampt_single_robot_cspace);
   Robot* robot = space->GetRobot();
   RobotWorld* world = &space->world;
 

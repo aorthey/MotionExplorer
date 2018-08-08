@@ -24,31 +24,33 @@ std::string MotionPlanner::getName() const{
   return input.name_algorithm;
 }
 
-CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint ridx)
+CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robot_inner_idx, const uint robot_outer_idx)
 {
   CSpaceFactory factory(input.GetCSpaceInput());
 
   CSpaceOMPL* cspace_level;
   if(input.freeFloating){
     if(type=="R2") {
-      cspace_level = factory.MakeGeometricCSpaceRN(world, ridx, 2);
+      cspace_level = factory.MakeGeometricCSpaceRN(world, robot_inner_idx, 2);
     }else if(type=="R3") {
-      cspace_level = factory.MakeGeometricCSpaceRN(world, ridx, 3);
+      cspace_level = factory.MakeGeometricCSpaceRN(world, robot_inner_idx, 3);
     }else if(type=="R3S2"){
-      cspace_level = factory.MakeGeometricCSpaceR3S2(world, ridx);
+      cspace_level = factory.MakeGeometricCSpaceR3S2(world, robot_inner_idx);
     }else if(type=="SE3"){
-      cspace_level = factory.MakeGeometricCSpaceSE3(world, ridx);
+      cspace_level = factory.MakeGeometricCSpaceSE3(world, robot_inner_idx);
     }else if(type=="SE2"){
-      cspace_level = factory.MakeGeometricCSpaceSE2(world, ridx);
+      cspace_level = factory.MakeGeometricCSpaceSE2(world, robot_inner_idx);
     }else if(type=="SE3RN"){
-      cspace_level = factory.MakeGeometricCSpace(world, ridx);
+      cspace_level = factory.MakeGeometricCSpace(world, robot_inner_idx);
     }else{
       std::cout << "Type " << type << " not recognized" << std::endl;
       exit(0);
     }
-    //if(input->enableSufficiency){
-    //  cspace_level_k = new CSpaceOMPLDecoratorNecessarySufficient(cspace_level_k, input_level->robot_outer_idx);
-    //}
+    if(robot_inner_idx != robot_outer_idx){
+      cspace_level->SetSufficient(robot_outer_idx);
+
+      //cspace_level = new CSpaceOMPLDecoratorNecessarySufficient(cspace_level, robot_outer_idx);
+    }
   }else{
     if(type.substr(0,1) != "R"){
       std::cout << type.substr(0) << std::endl;
@@ -58,7 +60,7 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint ridx
 
     std::string str_dimension = type.substr(1);
     int N = boost::lexical_cast<int>(str_dimension);
-    cspace_level = factory.MakeGeometricCSpaceFixedBase(world, ridx, N);
+    cspace_level = factory.MakeGeometricCSpaceFixedBase(world, robot_inner_idx, N);
 
   }
   return cspace_level;
@@ -102,7 +104,7 @@ void MotionPlanner::CreateHierarchy(){
       //LEVEL k: given robot k, compute its cspace (free float vs fixed base)
       //#########################################################################
       std::string type = input.layers.at(k).type;
-      CSpaceOMPL *cspace_level_k = ComputeCSpace(type, ii);
+      CSpaceOMPL *cspace_level_k = ComputeCSpace(type, ii, io);
       cspace_levels.push_back( cspace_level_k );
 
       if(k==0){

@@ -9,17 +9,15 @@ CSpaceOMPLDecorator::CSpaceOMPLDecorator(CSpaceOMPL* cspace_ompl_):
   //Nompl = cspace_ompl->Nompl;
   //fixedBase = cspace_ompl->fixedBase;
 }
+
+// const ob::StateValidityCheckerPtr CSpaceOMPLDecorator::StateValidityCheckerPtr(){
+//   return StateValidityCheckerPtr(SpaceInformationPtr());
+// }
 const oc::StatePropagatorPtr CSpaceOMPLDecorator::StatePropagatorPtr(oc::SpaceInformationPtr si){
   return cspace_ompl->StatePropagatorPtr(si);
 }
-const ob::StateValidityCheckerPtr CSpaceOMPLDecorator::StateValidityCheckerPtr(){
-  return StateValidityCheckerPtr(SpaceInformationPtr());
-}
 void CSpaceOMPLDecorator::ConfigToOMPLState(const Config &q, ob::State *qompl){
   return cspace_ompl->ConfigToOMPLState(q, qompl);
-}
-Config CSpaceOMPLDecorator::OMPLStateToConfig(const ob::ScopedState<> &qompl){
-  return cspace_ompl->OMPLStateToConfig(qompl);
 }
 Config CSpaceOMPLDecorator::OMPLStateToConfig(const ob::State *qompl){
   return cspace_ompl->OMPLStateToConfig(qompl);
@@ -30,48 +28,48 @@ void CSpaceOMPLDecorator::initSpace(){
 void CSpaceOMPLDecorator::print() const{
   cspace_ompl->print();
 }
-const ob::StateSpacePtr CSpaceOMPLDecorator::SpacePtr(){
-  return cspace_ompl->SpacePtr();
-}
-const oc::RealVectorControlSpacePtr CSpaceOMPLDecorator::ControlSpacePtr(){
-  return cspace_ompl->ControlSpacePtr();
-}
-uint CSpaceOMPLDecorator::GetDimensionality() const{
-  return cspace_ompl->GetDimensionality();
-}
-uint CSpaceOMPLDecorator::GetControlDimensionality() const{
-  return cspace_ompl->GetControlDimensionality();
-}
-void CSpaceOMPLDecorator::SetCSpaceInput(const CSpaceInput &input_){
-  cspace_ompl->SetCSpaceInput(input_);
-}
-Robot* CSpaceOMPLDecorator::GetRobotPtr(){
-  return cspace_ompl->GetRobotPtr();
-}
-RobotWorld* CSpaceOMPLDecorator::GetWorldPtr(){
-  return cspace_ompl->world;
-}
-CSpace* CSpaceOMPLDecorator::GetCSpacePtr(){
-  return cspace_ompl->GetCSpacePtr();
-}
-ob::SpaceInformationPtr CSpaceOMPLDecorator::SpaceInformationPtr(){
-  if(cspace_ompl->si==nullptr){
-    cspace_ompl->si = std::make_shared<ob::SpaceInformation>(SpacePtr());
-    const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr();
-    cspace_ompl->si->setStateValidityChecker(checker);
-  }
-  return cspace_ompl->si;
-}
-Vector3 CSpaceOMPLDecorator::getXYZ(const ob::State* s){
-  return cspace_ompl->getXYZ(s);
-}
-void CSpaceOMPLDecorator::print(std::ostream& out) const
-{
-  cspace_ompl->print(out);
-}
-const ob::StateValidityCheckerPtr CSpaceOMPLDecorator::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
-  return cspace_ompl->StateValidityCheckerPtr(si);
-}
+// const ob::StateSpacePtr CSpaceOMPLDecorator::SpacePtr(){
+//   return cspace_ompl->SpacePtr();
+// }
+// const oc::RealVectorControlSpacePtr CSpaceOMPLDecorator::ControlSpacePtr(){
+//   return cspace_ompl->ControlSpacePtr();
+// }
+// uint CSpaceOMPLDecorator::GetDimensionality() const{
+//   return cspace_ompl->GetDimensionality();
+// }
+// uint CSpaceOMPLDecorator::GetControlDimensionality() const{
+//   return cspace_ompl->GetControlDimensionality();
+// }
+// void CSpaceOMPLDecorator::SetCSpaceInput(const CSpaceInput &input_){
+//   cspace_ompl->SetCSpaceInput(input_);
+// }
+// Robot* CSpaceOMPLDecorator::GetRobotPtr(){
+//   return cspace_ompl->GetRobotPtr();
+// }
+// RobotWorld* CSpaceOMPLDecorator::GetWorldPtr(){
+//   return cspace_ompl->world;
+// }
+// CSpace* CSpaceOMPLDecorator::GetCSpacePtr(){
+//   return cspace_ompl->GetCSpacePtr();
+// }
+// ob::SpaceInformationPtr CSpaceOMPLDecorator::SpaceInformationPtr(){
+//   if(cspace_ompl->si==nullptr){
+//     cspace_ompl->si = std::make_shared<ob::SpaceInformation>(SpacePtr());
+//     const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr();
+//     cspace_ompl->si->setStateValidityChecker(checker);
+//   }
+//   return cspace_ompl->si;
+// }
+// Vector3 CSpaceOMPLDecorator::getXYZ(const ob::State* s){
+//   return cspace_ompl->getXYZ(s);
+// }
+// void CSpaceOMPLDecorator::print(std::ostream& out) const
+// {
+//   cspace_ompl->print(out);
+// }
+// const ob::StateValidityCheckerPtr CSpaceOMPLDecorator::StateValidityCheckerPtr(ob::SpaceInformationPtr si){
+//   return cspace_ompl->StateValidityCheckerPtr(si);
+// }
 
 //#############################################################################
 

@@ -43,10 +43,10 @@ class CSpaceOMPL
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) = 0;
     virtual void initSpace() = 0;
     virtual void print() const = 0;
-
-    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) = 0;
     virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
+
+    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
 
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
     virtual Vector3 getXYZ(const ob::State*);
@@ -57,7 +57,7 @@ class CSpaceOMPL
     virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
     virtual Robot* GetRobotPtr();
     virtual RobotWorld* GetWorldPtr();
-    virtual CSpaceKlampt* GetCSpacePtr();
+    virtual CSpaceKlampt* GetCSpaceKlamptPtr();
     virtual const ob::StateSpacePtr SpacePtr();
     virtual ob::SpaceInformationPtr SpaceInformationPtr();
     virtual const oc::RealVectorControlSpacePtr ControlSpacePtr();
@@ -72,8 +72,10 @@ class CSpaceOMPL
     friend std::ostream& operator<< (std::ostream& out, const CSpaceOMPL& space);
     virtual void print(std::ostream& out) const;
 
+    void SetSufficient(const uint robot_outer_idx);
+
   protected:
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) = 0;
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
 
     CSpaceInput input;
 
@@ -81,6 +83,7 @@ class CSpaceOMPL
     uint Nompl;
     bool fixedBase{false};
     bool kinodynamic{false};
+    bool enableSufficiency{false};
 
     //klampt:
     //
@@ -99,9 +102,11 @@ class CSpaceOMPL
     ob::StateSpacePtr space;
     oc::RealVectorControlSpacePtr control_space;
 
-    Robot *robot;
-    CSpaceKlampt *kspace;
-    RobotWorld *world;
+    Robot *robot{nullptr};
+    CSpaceKlampt *klampt_cspace{nullptr};
+    CSpaceKlampt *klampt_cspace_outer{nullptr};
+    RobotWorld *world{nullptr};
+
     WorldPlannerSettings worldsettings;
     int robot_idx;
 

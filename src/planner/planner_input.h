@@ -40,9 +40,9 @@ class PlannerInput{
     double timestep_min;
     double timestep_max;
 
-    bool smoothPath;
-    double pathSpeed;
-    bool enableSufficiency;
+    bool smoothPath{false};
+    double pathSpeed{1};
+    bool enableSufficiency{false};
 
     bool kinodynamic{false};
     Config uMin;

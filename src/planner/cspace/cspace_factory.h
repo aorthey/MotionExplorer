@@ -7,7 +7,6 @@
 #include "planner/cspace/cspace_geometric_R3S2.h"
 #include "planner/cspace/cspace_geometric_fixedbase.h"
 #include "planner/cspace/cspace_input.h"
-#include "planner/cspace/cspace_decorator.h"
 
 
 class CSpaceFactory{

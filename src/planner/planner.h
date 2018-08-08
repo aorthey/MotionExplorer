@@ -72,6 +72,6 @@ class MotionPlanner{
     StrategyGeometricMultiLevel strategy; //the actual algorithm implementation
 
     PathPiecewiseLinear *pwl;
-    CSpaceOMPL* ComputeCSpace(const std::string type, const uint ridx);
+    CSpaceOMPL* ComputeCSpace(const std::string type, const uint robot_inner_index, const uint robot_outer_index = 0);
 };
 

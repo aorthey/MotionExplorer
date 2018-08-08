@@ -131,10 +131,6 @@ RRTUnidirectional::Configuration* RRTUnidirectional::Connect(Configuration *q_ne
   q_new->parent_edge_weight = Distance(q_near->state, q_new->state);
   graphLength += q_new->parent_edge_weight;
 
-  auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
-  double d1 = checkerPtr->Distance(q_new->state);
-  q_new->openset = new cover::OpenSetHypersphere(checkerPtr->GetCSpacePtr(), q_new->state, d1);
-
   G_->add(q_new);
 
   return q_new;
@@ -210,10 +206,6 @@ void RRTUnidirectional::Init()
   while (const ob::State *st = pis_.nextStart()){
     q_start = new Configuration(si_);
     si_->copyState(q_start->state, st);
-
-    auto checkerPtr = static_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
-    double d1 = checkerPtr->Distance(q_start->state);
-    q_start->openset = new cover::OpenSetHypersphere(checkerPtr->GetCSpacePtr(), q_start->state, d1);
 
     G_->add(q_start);
   }

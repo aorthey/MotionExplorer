@@ -1,48 +1,9 @@
 #include "planner/cspace/cspace_geometric.h"
-#include "planner/cspace/validitychecker/validity_checker_ompl.h"
-#include "planner/cspace/validitychecker/validity_checker_simplicial_complex.h"
 
 GeometricCSpaceOMPL::GeometricCSpaceOMPL(RobotWorld *world_, int robot_idx):
   CSpaceOMPL(world_, robot_idx)
 {
 }
-// GeometricCSpaceOMPL::GeometricCSpaceOMPL(Robot *robot_, CSpace *kspace_):
-//   CSpaceOMPL(robot_, kspace_)
-// {
-//   exit(0);
-// }
-
-// void GeometricCSpaceOMPL::Init(){
-//   Nklampt =  robot->q.size() - 6;
-
-//   //check if the robot is SE(3) or if we need to add real vector space for joints
-//   if(Nklampt<=0){
-//     Nompl = 0;
-//   }else{
-//     //sometimes the joint space are only fixed joints. In that case OMPL
-//     //complains that the real vector space is empty. We check here for that case
-//     //and remove the real vector space
-//     std::vector<double> minimum, maximum;
-//     minimum = robot->qMin;
-//     maximum = robot->qMax;
-//     assert(minimum.size() == 6+Nklampt);
-//     assert(maximum.size() == 6+Nklampt);
-
-//     //prune dimensions which are smaller than epsilon (for ompl)
-//     double epsilonSpacing=1e-10;
-//     Nompl = 0;
-//     for(uint i = 6; i < 6+Nklampt; i++){
-
-//       if(abs(minimum.at(i)-maximum.at(i))>epsilonSpacing){
-//         klampt_to_ompl.push_back(Nompl);
-//         ompl_to_klampt.push_back(i);
-//         Nompl++;
-//       }else{
-//         klampt_to_ompl.push_back(-1);
-//       }
-//     }
-//   }
-// }
 
 void GeometricCSpaceOMPL::initSpace()
 {
@@ -230,8 +191,4 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
 const oc::StatePropagatorPtr GeometricCSpaceOMPL::StatePropagatorPtr(oc::SpaceInformationPtr si)
 {
   exit(0);
-}
-const ob::StateValidityCheckerPtr GeometricCSpaceOMPL::StateValidityCheckerPtr(ob::SpaceInformationPtr si)
-{
-  return std::make_shared<ValidityCheckerSimplicialComplex>(si, this, kspace);
 }

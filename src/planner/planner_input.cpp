@@ -123,6 +123,7 @@ bool PlannerInput::Load(TiXmlElement *node)
       layer.level = level++;
       layer.inner_index = GetAttribute<int>(lindex, "inner_index");
       layer.outer_index = GetAttributeDefault<int>(lindex, "outer_index", layer.inner_index);
+
       layer.type = GetAttribute<std::string>(lindex, "type");
 
       robot_idxs.push_back(layer.inner_index);
@@ -140,7 +141,6 @@ bool PlannerInput::Load(TiXmlElement *node)
     robot_idxs.push_back(layer.inner_index);
     layers.push_back(layer);
   }
-
 
   return true;
 }

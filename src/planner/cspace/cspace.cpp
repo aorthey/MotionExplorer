@@ -1,5 +1,6 @@
 #include "planner/cspace/cspace.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
+#include "planner/cspace/validitychecker/validity_checker_simplicial_complex.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
 
@@ -9,7 +10,7 @@ CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx_):
 
   robot = world->robots[robot_idx];
   worldsettings.InitializeDefault(*world);
-  kspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
+  klampt_cspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
 
   Nklampt =  robot->q.size() - 6;
   //check if the robot is SE(3) or if we need to add real vector space for joints
@@ -87,13 +88,28 @@ Robot* CSpaceOMPL::GetRobotPtr(){
 RobotWorld* CSpaceOMPL::GetWorldPtr(){
   return world;
 }
-CSpace* CSpaceOMPL::GetCSpacePtr(){
-  return kspace;
+CSpace* CSpaceOMPL::GetCSpaceKlamptPtr(){
+  return klampt_cspace;
 }
 const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr()
 {
   return StateValidityCheckerPtr(SpaceInformationPtr());
 }
+const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr(ob::SpaceInformationPtr si)
+{
+  if(enableSufficiency)
+  {
+    return std::make_shared<OMPLValidityCheckerNecessarySufficient>(si, this, klampt_cspace_outer);
+  }else{
+    return std::make_shared<OMPLValidityChecker>(si, this);
+  }
+}
+
+void CSpaceOMPL::SetSufficient(const uint robot_outer_idx){
+  klampt_cspace_outer = new SingleRobotCSpace(*world, robot_outer_idx, &worldsettings);
+  enableSufficiency = true;
+}
+
 bool CSpaceOMPL::isDynamic(){
   return kinodynamic;
 }

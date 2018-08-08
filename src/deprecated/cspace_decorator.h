@@ -12,22 +12,29 @@ class CSpaceOMPLDecorator: public CSpaceOMPL
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
     virtual Config OMPLStateToConfig(const ob::State *qompl) override;
 
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr() override;
-    virtual Vector3 getXYZ(const ob::State*) override;
-    virtual void SetCSpaceInput(const CSpaceInput &input_) override;
-    virtual uint GetDimensionality() const override;
-    virtual uint GetControlDimensionality() const override;
-    virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl) override;
-    virtual Robot* GetRobotPtr() override;
-    virtual RobotWorld* GetWorldPtr() override;
-    virtual CSpaceKlampt* GetCSpacePtr() override;
-    virtual const ob::StateSpacePtr SpacePtr() override;
-    virtual ob::SpaceInformationPtr SpaceInformationPtr() override;
-    virtual const oc::RealVectorControlSpacePtr ControlSpacePtr() override;
-    virtual void print(std::ostream& out) const override;
+    using CSpaceOMPL::StateValidityCheckerPtr;
+    using CSpaceOMPL::getXYZ;
+    using CSpaceOMPL::SetCSpaceInput;
+    using CSpaceOMPL::GetDimensionality;
+    using CSpaceOMPL::GetKlamptDimensionality;
+    using CSpaceOMPL::GetControlDimensionality;
+    using CSpaceOMPL::OMPLStateToConfig;
+    using CSpaceOMPL::GetRobotPtr;
+    using CSpaceOMPL::GetWorldPtr;
+    using CSpaceOMPL::GetCSpacePtr;
+    using CSpaceOMPL::SpacePtr;
+    using CSpaceOMPL::SpaceInformationPtr;
+    using CSpaceOMPL::ControlSpacePtr;
+
+    using CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace;
+    using CSpaceOMPL::OMPLSO3StateSpaceFromEulerXYZ;
+    using CSpaceOMPL::isDynamic;
+    using CSpaceOMPL::isFixedBase;
+    using CSpaceOMPL::isFreeFloating;
+    using CSpaceOMPL::print;
 
   protected:
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) override;
+    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) override = 0;
     CSpaceOMPL *cspace_ompl;
 
 };
