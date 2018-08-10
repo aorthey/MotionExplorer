@@ -52,8 +52,24 @@ ob::ScopedState<> CSpaceOMPL::ConfigToOMPLState(const Config &q){
   return qompl;
 }
 
+void CSpaceOMPL::Init()
+{
+  this->initSpace();
+
+  //std::cout << "averageValidMotionLength:" << std::endl;
+  //double lm = si->averageValidMotionLength(1000);
+  //std::cout << lm << std::endl;
+  //std::cout << "Initialized cspace" << std::endl;
+  //exit(0);
+}
 ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
+  // if(si==nullptr){
+  //   si = std::make_shared<ob::SpaceInformation>(SpacePtr());
+  //   const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr();
+  //   si->setStateValidityChecker(checker);
+  // }
   if(si==nullptr){
+    space->printSettings(std::cout);
     si = std::make_shared<ob::SpaceInformation>(SpacePtr());
     const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr();
     si->setStateValidityChecker(checker);
@@ -214,8 +230,6 @@ std::vector<double> CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( const ob::SO3Stat
   Math3D::EulerAngleRotation R;
   bool Rvalid = R.setMatrixXYZ(qrM);
   if(!Rvalid){
-
-    //si->printSettings();
 
     std::cout << "quaternions: " << qr << std::endl;
     std::cout << qrM << std::endl;

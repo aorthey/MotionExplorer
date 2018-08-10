@@ -99,8 +99,8 @@ void KinodynamicCSpaceOMPL::initSpace()
   minimum = robot->qMin;
   maximum = robot->qMax;
 
-  assert(minimum.size() == 6+N);
-  assert(maximum.size() == 6+N);
+  //assert(minimum.size() == 6+N);
+  //assert(maximum.size() == 6+N);
 
   vector<double> lowSE3;
   lowSE3.push_back(minimum.at(0));

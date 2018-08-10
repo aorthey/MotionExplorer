@@ -432,23 +432,6 @@ certain link (pos and direction relative to link + power)
 SerialController.h
 [ ] reset back to start position, not zero/zero
 
--- ompl control simulates a forward torque in relative x direction of the
-object. However, in the klampt simulator, we suddenly apply a global x
-direction, which leads to the unwanted behavior.
-
--- two main imperatives: (1) solve Xshape by introducing new geometric planner
-probably based on SC. (2) solve rocket using QS
-
--- it seems (2) is easier to do, but (1) could be better at speeding things up,
-making it really workable in the real-world. (2) is necessary to show the
-generality.
-
-(1) forward integration on manifold using OMPL/Klampt tools.
-(2) application of torque to a driver using Klampt. 
-(3) visualization of
-application of torque to a driver (this should be read directly from drivers,
-not separate)
-
 [x] IRIS does not work correctly when obstacle bounds are outside of polyhedral
 bounds (see https://github.com/rdeits/iris-distro/issues/68). 
 [x] initial Xshape region not correct
@@ -468,41 +451,15 @@ using OFF file format)
 [x] decompose environment
 [x] try decomposition with harder surfaces/meshes -> much slower as expected, what
 would be a good approach there? (ignore or abstract E probably)
-[ ] extract narrow passages of environment
-[ ] compute topological information of environment
-[ ] solve cardslot environment. Obtain 3D slot representation. How about
-choosing a box at random. Then sample them at random. How about just using it
-with QMP?
 
-workspace quotient
 [x] sample random points from free workspace
 [x] are points sampled from surface or from inside as desired?
-[ ] make colors changeable in xml
 [x] use with QMPConnect as usual [not so nice, still problems in TPs]
 [ ] try solving the cardslot problem using RRTConnect (20mins)
 [ ] compute path towards goal. then do priority sampling along that path.
 [ ] sampling has too many points near the geometric centers (since they have
 higher connection probability). Change that to something more uniform.
-
-
-[ ] need new approach to solving sphere-like environment
-
-
-
-LH approximation
-[ ] compute QS path. 
-[ ] color LH class
-[ ] repeat for several interesting environments.
-
-Make Graph Sampler/Searcher fault-prove
-[ ] Boost::Graph: Understand how bundled properties can be used on astar_search or dijkstra
-
-
-[ ] QS. HasSolution. NumberOfSolutions. GetRoadmaps
-
-
-First, we need to search for one solution on Q1. Once found, we can either
-explore this solution, or continue searching on Q1. 
+[x] Boost::Graph: Understand how bundled properties can be used on astar_search or dijkstra
 
 [ ] Two modes: interactive/automatic. 
   Interactive mode: 
@@ -517,59 +474,22 @@ explore this solution, or continue searching on Q1.
 [x] get rid completely of pathspace, replace by roadmap. levels should be
 specified in advance, not as recursive chain
 [x] able to execute/smooth solution paths
-
-New multiquotient/new quotient
-[ ] quotient: different modes: 
-   [ ] Grow (as usual)
-   [ ] If solution is found: int NumberOfSolutionClasses()
-   [ ] QuotientGraph* GetSolutionClass(uint i): returns a subgraph of G, G being the quotient graph
-   [ ] Grow Quotient Graph
-   [ ] Extend Quotient Graph (basically operating in the "nullspace" of it)
-
-Measures for deciding which solution class to extend:
-- curvature/smoothness
-- clearance
-- shortness
-
 [x] copy only connected component
 [x] display path on QS (QCP)
 [x] display smoothed path + raw
 [x] copy only shortest path on QS
-
 [x] get triangulation from graph plus covering
-[ ] make infeasible vertices and spheres independent of vertex visualization
-[ ] Update simplicial complex dynamically, based on incoming feasible and
+[x] Update simplicial complex dynamically, based on incoming feasible and
 infeasible samples. Also update the sphere radii.
-
-Problems:
 [x] spheres should not exceed boundary (why not, might be even better, otherwise
 we need infinite number of spheres)
-[ ] make one-step algorithm (is a bit too difficult, only if really needed)
-[ ] inscribe simplicial complex, update simplicial complex, and most importantly
-have an algorithm which can sparsify the complex
-
-[ ] issue: some paths go farther than the epsilon specified by complex --- how
-to remedy that ?
-
-I thought that we do not see the triangle sometimes is because they are removed
-when an infeasible sample is obtained, but the edges itself are not removed.
-However, this seems to not be true, whenever we create edges, we also create
-triangles! (and we do not currently delete any triangles)
-
-But we have changed the sizes of the spheres! So that is why we sometimes have
-those cases where the sphere has changed, but the edges have not been removed!
-[ ] make them all smart ptrs
-[x] refactor simplicial complex
-
-What needs to be done:
-[ ] think deeply about the right complex to use. the complex should have the
-following specification: easily extendable, easily shrinkable, minimal
-represenation given all the data points.
-
-Complex should grow from a given start position.
-Complex should be minimal, i.e. all interior points are not vertices.
-Sampling is adaptive, i.e. Given the complex, we have prefered sampling
-directions/subspaces. For example sampling on the boundary of the complex.
-
 [x] fix edge missing in vertex path: reason: we have updated the shortest vertex
 path, but we computed it for different vertices before
+
+
+
+-------------------------------------------------------------------------------
+Simulator
+-------------------------------------------------------------------------------
+[ ] make colors changeable in xml
+

@@ -46,9 +46,9 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
       std::cout << "Type " << type << " not recognized" << std::endl;
       exit(0);
     }
-    if(robot_inner_idx != robot_outer_idx){
-      cspace_level->SetSufficient(robot_outer_idx);
-    }
+    //if(robot_inner_idx != robot_outer_idx){
+    //  cspace_level->SetSufficient(robot_outer_idx);
+    //}
   }else{
     if(type.substr(0,1) != "R"){
       std::cout << type.substr(0) << std::endl;
@@ -177,6 +177,7 @@ void MotionPlanner::AdvanceUntilSolution()
   strategy_input.world = world;
 
   strategy.plan(strategy_input, output);
+  std::cout << "finished planning" << std::endl;
   std::cout << output << std::endl;
 
   output.GetHierarchicalRoadmap( hierarchy, cspace_levels );

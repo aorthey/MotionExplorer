@@ -41,7 +41,8 @@ class CSpaceOMPL
     CSpaceOMPL(RobotWorld *world_, int robot_idx_);
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) = 0;
-    virtual void initSpace() = 0;
+    virtual void Init();
+
     virtual void print() const = 0;
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) = 0;
     virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
@@ -76,6 +77,7 @@ class CSpaceOMPL
 
   protected:
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
+    virtual void initSpace() = 0;
 
     CSpaceInput input;
 

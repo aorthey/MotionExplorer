@@ -329,8 +329,8 @@ std::vector<Config> OnetopicPathSpaceModifier::VertexPathToConfigPath( const std
     omplpath.append(states.at(k));
   }
 
-  og::PathSimplifier shortcutter(si);
-  shortcutter.shortcutPath(omplpath);
+  //og::PathSimplifier shortcutter(si);
+  //shortcutter.shortcutPath(omplpath);
 
   //omplpath.interpolate();
 

@@ -4,9 +4,10 @@ PROJECT( Orthoklampt )
 SET(ORTHOKLAMPT_SUBDIRS pathspace planner elements controller algorithms gui 3rdparty)
 
 set(ORTHOKLAMPT_MAJOR_VERSION 0)
-set(ORTHOKLAMPT_MINOR_VERSION 1)
+set(ORTHOKLAMPT_MINOR_VERSION 2)
 set(ORTHOKLAMPT_PATCH_VERSION 0)
 set(ORTHOKLAMPT_VERSION ${ORTHOKLAMPT_MAJOR_VERSION}.${ORTHOKLAMPT_MINOR_VERSION}.${ORTHOKLAMPT_PATCH_VERSION})
+#set (CMAKE_CXX_STANDARD 11)
 
 SET(KLAMPT_ROOT /home/aorthey/git/Klampt/)
 LIST(APPEND CMAKE_MODULE_PATH "${KLAMPT_ROOT}/CMakeModules")
@@ -16,17 +17,23 @@ MESSAGE(COLOR_WHITE ${DEPENDENCIES})
 set(CMAKE_C_COMPILER "gcc-5")
 set(CMAKE_CXX_COMPILER "g++-5")
 
+#SET(CMAKE_BUILD_TYPE Release)
+
 ###############################################################################
 MESSAGE("${CMAKE_MODULE_PATH}")
 ###############################################################################
-
+FIND_PACKAGE(ompl 1.4.0 REQUIRED)
 SET(DEPENDENCIES ${DEPENDENCIES} OMPL)
-FOREACH(DEPENDENCY ${DEPENDENCIES})
-  FIND_PACKAGE(${DEPENDENCY} REQUIRED)
-ENDFOREACH(DEPENDENCY)
 
-FIND_PACKAGE(Eigen3 REQUIRED)
-SET(DEPENDENCIES ${DEPENDENCIES} EIGEN3)
+### OMPL REquirements: CMAKE 2.8.7, Eigen 3.3, Boost 1.54, compile both with
+### same libs
+
+#FIND_PACKAGE(Eigen3 3.2 REQUIRED)
+#SET(DEPENDENCIES ${DEPENDENCIES} EIGEN3)
+find_package(PkgConfig)
+pkg_search_module(Eigen3 3.3 REQUIRED eigen3)
+SET(DEPENDENCIES ${DEPENDENCIES} Eigen3)
+#INCLUDE_DIRECTORIES(SYSTEM ${Eigen3_INCLUDE_DIRS})
 
 FIND_PACKAGE(CGAL 4.12 REQUIRED)
 SET(DEPENDENCIES ${DEPENDENCIES} CGAL)
@@ -38,40 +45,6 @@ SET(DEPENDENCIES ${DEPENDENCIES} KLAMPT)
 FIND_PACKAGE(Boost 1.55.0 REQUIRED COMPONENTS filesystem thread serialization system)
 SET(DEPENDENCIES ${DEPENDENCIES} Boost)
 
-FIND_PACKAGE(iris REQUIRED)
-SET(DEPENDENCIES ${DEPENDENCIES} IRIS)
-INCLUDE_DIRECTORIES("/home/aorthey/git/orthoklampt/src/3rdparty/gudhi/include/")
-
-#find_package(PythonLibs 2.7.6 EXACT REQUIRED)
-#set(PYTHON_LIBRARY "\\usr\\lib\\python2.7")
-#set(PYTHON_INCLUDE_DIR "\\usr\\include\\python2.7")
-#SET(DEPENDENCIES ${DEPENDENCIES} PYTHON)
-
-#cmake_policy(SET CMP0015 NEW)
-#SET(SBL_USE_LIBS ESBTL CGAL MPFR Boost)
-#if ( SBL_FOUND )
-#  INCLUDE(${SBL_USE_FILE}) 
-#endif()
-#INCLUDE_DIRECTORIES("/usr/local/sbl/Core/Betti_numbers/include/")
-#INCLUDE_DIRECTORIES(${SBL_DIR})
-#set(SBL_INTERNAL_ARCHITECTURE OFF)
-#set(SBL_FOUND TRUE)
-#if(EXISTS ${SBL_DIR}/UseSBL.cmake)
-# set(SBL_CMAKE_DIR "${SBL_DIR}")
-#  MESSAGE("1")
-# set(SBL_USE_FILE "${SBL_CMAKE_DIR}/UseSBL.cmake")
-#else()
-#  if(EXISTS ${SBL_DIR}/cmake/Modules/UseSBL.cmake)
-#   set(SBL_CMAKE_DIR "${SBL_DIR}/cmake/Modules")
-#   set(SBL_USE_FILE "${SBL_CMAKE_DIR}/UseSBL.cmake")
-#  else()
-#    if(EXISTS ${SBL_DIR}/share/cmake/Modules/UseSBL.cmake)
-#     set(SBL_CMAKE_DIR "${SBL_DIR}/share/cmake/Modules")
-#     set(SBL_USE_FILE "${SBL_CMAKE_DIR}/UseSBL.cmake")
-#    endif()
-#  endif()
-#endif()
-#FIND_PACKAGE(SBL REQUIRED)
 
 MESSAGE(COLOR_WHITE "-------------------------------------")
 MESSAGE(COLOR_WHITE "-- INCLUDING DEPENDENCIES")
@@ -139,5 +112,8 @@ ENDFOREACH(FILENAME)
 MESSAGE("-------------------------------------")
 
 #SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall -Werror" )
-SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall -Werror -O3 -fmax-errors=10" )
+#SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wdeprecated-declarations -std=c++11 -g -Wall -Werror -O3 -fmax-errors=10" )
+SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wdeprecated-declarations -std=c++11 -g -Wall -Werror -fmax-errors=10" )
 MESSAGE("Compilers: ${CMAKE_CXX_COMPILER} ${CMAKE_C_COMPILER}")
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"

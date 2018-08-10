@@ -18,7 +18,7 @@ class CSpaceFactory{
     virtual KinodynamicCSpaceOMPL* MakeKinodynamicCSpace( RobotWorld *world, int robot_idx){
       KinodynamicCSpaceOMPL *cspace = new KinodynamicCSpaceOMPL(world, robot_idx);
       cspace->SetCSpaceInput(input);
-      cspace->initSpace();
+      cspace->Init();
       cspace->initControlSpace();
       return cspace;
     }
@@ -26,7 +26,7 @@ class CSpaceFactory{
     virtual GeometricCSpaceOMPL* MakeGeometricCSpace( RobotWorld *world, int robot_idx){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPL(world, robot_idx);
       cspace->SetCSpaceInput(input);
-      cspace->initSpace();
+      cspace->Init();
       return cspace;
     }
 
@@ -38,28 +38,28 @@ class CSpaceFactory{
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceR3S2( RobotWorld *world, int robot_idx){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLR3S2(world, robot_idx);
       cspace->SetCSpaceInput(input);
-      cspace->initSpace();
+      cspace->Init();
       return cspace;
     }
     // CSpace  SE(2)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE2( RobotWorld *world, int robot_idx){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLSE2(world, robot_idx);
       cspace->SetCSpaceInput(input);
-      cspace->initSpace();
+      cspace->Init();
       return cspace;
     }
     // CSpace  R^(N)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceRN( RobotWorld *world, int robot_idx, int dimension){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLRN(world, robot_idx, dimension);
       cspace->SetCSpaceInput(input);
-      cspace->initSpace();
+      cspace->Init();
       return cspace;
     }
     // CSpace  R^(N)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceFixedBase( RobotWorld *world, int robot_idx, int dimension=0){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLFixedBase(world, robot_idx);
       cspace->SetCSpaceInput(input);
-      cspace->initSpace();
+      cspace->Init();
       return cspace;
     }
 };

@@ -22,5 +22,6 @@ class StrategyGeometricMultiLevel: public Strategy{
         std::vector<ob::SpaceInformationPtr> si_vec, 
         std::vector<ob::ProblemDefinitionPtr> pdef_vec);
 
+    ob::PlannerPtr planner;
 };
 

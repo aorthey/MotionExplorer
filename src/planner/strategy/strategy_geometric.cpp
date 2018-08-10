@@ -158,6 +158,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
 
 }
 
+#include <ompl/base/samplers/UniformValidStateSampler.h>
 void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutput &output)
 {
   std::string algorithm = input.name_algorithm;
@@ -194,8 +195,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   if(util::StartsWith(algorithm,"benchmark")){
     RunBenchmark(input, si_vec, pdef_vec);
   }else{
-    ob::PlannerPtr planner = GetPlanner(algorithm, si_vec, pdef_vec);
-    planner->clear();
+    planner = GetPlanner(algorithm, si_vec, pdef_vec);
     planner->setup();
 
     double max_planning_time= input.max_planning_time;
@@ -209,6 +209,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     //###########################################################################
     ob::PlannerDataPtr pd( new ob::PlannerData(si_vec.back()) );
 
+    std::cout << "get planner data" << std::endl;
     if(util::StartsWith(algorithm,"hierarchy")){
       planner->getPlannerData(*pd);
       output.SetPlannerData(pd);
@@ -216,9 +217,14 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
       planner->getPlannerData(*pd);
       output.SetPlannerData(pd);
     }
+    std::cout << pd->properties << std::endl;
     //output->SetShortestPath( output.getShortestPathOMPL(), input.cspace_levels.back() );
     //std::vector<Config> path = output.GetShortestPath();
-    output.SetProblemDefinition(planner->getProblemDefinition());
+    ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
+    std::cout << "pdef" << std::endl;
+    output.SetProblemDefinition(pdef);
+    std::cout << output << std::endl;
+    std::cout << "done." << std::endl;
   }
 }
 void StrategyGeometricMultiLevel::RunBenchmark(
@@ -245,7 +251,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(input.q_goal);
   ss.setStartAndGoalStates(start,goal,input.epsilon_goalregion);
 
-  ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
+  //ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
   ss.setup();
 
   pdef->setOptimizationObjective( GetOptimizationObjective(si) );

@@ -117,7 +117,7 @@ void StrategyKinodynamicMultiLevel::plan( const StrategyInput &input, StrategyOu
     const oc::SpaceInformationPtr si = static_pointer_cast<oc::SpaceInformation>(si_vec.back());
     si->setMinMaxControlDuration(0.01, 0.1);
     si->setPropagationStepSize(1);
-    si->getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(si->getStateSpace())));
+    //si->getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(si->getStateSpace())));
 
     ob::PlannerPtr planner = GetPlanner(algorithm, si_vec, pdef_vec);
     planner->setup();
@@ -172,7 +172,7 @@ void StrategyKinodynamicMultiLevel::RunBenchmark(
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(input.q_goal);
   ss.setStartAndGoalStates(start,goal,input.epsilon_goalregion);
 
-  ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
+  //ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
   ss.setup();
 
   pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
