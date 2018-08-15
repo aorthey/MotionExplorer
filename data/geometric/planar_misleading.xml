@@ -11,8 +11,8 @@
   <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
   <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="-2.8 0 0" rotateRPY="0 0 0.78"/>
   <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="1.8 0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/2droom_misleading.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
 -->
+  <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/2droom_misleading.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
 
   <plannerinput>
 
@@ -25,7 +25,7 @@
 
     <hierarchy>
       <level inner_index="1" type="R2"/>
-      <!-- <level inner_index="0" type="SE2"/> -->
+      <level inner_index="0" type="SE2"/>
     </hierarchy>
 
   </plannerinput>

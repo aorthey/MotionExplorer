@@ -17,7 +17,7 @@ MESSAGE(COLOR_WHITE ${DEPENDENCIES})
 set(CMAKE_C_COMPILER "gcc-5")
 set(CMAKE_CXX_COMPILER "g++-5")
 
-#SET(CMAKE_BUILD_TYPE Release)
+SET(CMAKE_BUILD_TYPE Debug)
 
 ###############################################################################
 MESSAGE("${CMAKE_MODULE_PATH}")
@@ -113,7 +113,7 @@ MESSAGE("-------------------------------------")
 
 #SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall -Werror" )
 #SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wdeprecated-declarations -std=c++11 -g -Wall -Werror -O3 -fmax-errors=10" )
-SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wdeprecated-declarations -std=c++11 -g -Wall -Werror -fmax-errors=10" )
+SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wdeprecated-declarations -std=c++11 -g -Wall -Werror -O3 -fmax-errors=10" )
 MESSAGE("Compilers: ${CMAKE_CXX_COMPILER} ${CMAKE_C_COMPILER}")
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"

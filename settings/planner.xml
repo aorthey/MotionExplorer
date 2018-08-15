@@ -8,9 +8,12 @@
   <algorithm dynamic="1" name="ompl:kpiece"/>
   <algorithm dynamic="1" name="benchmark:all_dynamic"/>
 
+  <algorithm name="hierarchy:qmp_connect"/>
+  <algorithm name="hierarchy:qcp"/>
   <algorithm name="ompl:rrtconnect"/>
+  <algorithm name="ompl:prm"/>
+
   <!-- <algorithm name="ompl:prm"/> -->
-  <!-- <algorithm name="hierarchy:qcp"/> -->
   <!-- <algorithm name="hierarchy:qmp_connect_rrt"/> -->
   <!-- <algorithm name="hierarchy:qmp_connect"/> -->
 

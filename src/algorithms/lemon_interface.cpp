@@ -91,7 +91,7 @@ std::vector<Vertex> LemonInterface::GetShortestPath( ListGraph::Node s, ListGrap
     shortest_path_idxs.push_back(vidx);
 
     for (Path<ListGraph>::ArcIt it(path_start); it != INVALID; ++it) {
-      ListGraph::Node v = lg.source(it);
+      //ListGraph::Node v = lg.source(it);
       ListGraph::Node w = lg.target(it);
       path.push_back(w);
       uint vidx = lg.id(w);

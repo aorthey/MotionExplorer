@@ -493,3 +493,5 @@ Simulator
 -------------------------------------------------------------------------------
 [ ] make colors changeable in xml
 
+
+[ ] try again with -O3, and with Release settings without -g
