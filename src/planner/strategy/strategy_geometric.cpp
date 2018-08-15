@@ -8,6 +8,7 @@
 #include "planner/strategy/quotient/qmp.h"
 #include "planner/strategy/quotientchart/multichart.h"
 #include "planner/strategy/quotientchart/quotient_chart.h"
+#include "planner/strategy/quotientchart/qmp_sufficient.h"
 #include "planner/strategy/quotientchart/qcp.h"
 #include "planner/strategy/ompl/rrt_unidirectional.h"
 #include "planner/strategy/ompl/rrt_unidirectional_cover.h"
@@ -149,6 +150,10 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     typedef og::MultiChart<og::QCP> MultiChart;
     planner = std::make_shared<MultiChart>(si_vec, "QCP");
     static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="hierarchy:qmp_sufficient"){
+    typedef og::MultiChart<og::QMPSufficient> MultiChart;
+    planner = std::make_shared<MultiChart>(si_vec, "QMPSufficient");
+    static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);
@@ -173,8 +178,6 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
 
     ob::ScopedState<> startk = cspace_levelk->ConfigToOMPLState(input.q_init);
     ob::ScopedState<> goalk  = cspace_levelk->ConfigToOMPLState(input.q_goal);
-
-    //std::cout << *cspace_levelk << std::endl;
 
     ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
     pdefk->addStartState(startk);
@@ -209,7 +212,6 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     //###########################################################################
     ob::PlannerDataPtr pd( new ob::PlannerData(si_vec.back()) );
 
-    std::cout << "get planner data" << std::endl;
     if(util::StartsWith(algorithm,"hierarchy")){
       planner->getPlannerData(*pd);
       output.SetPlannerData(pd);
@@ -217,14 +219,8 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
       planner->getPlannerData(*pd);
       output.SetPlannerData(pd);
     }
-    std::cout << pd->properties << std::endl;
-    //output->SetShortestPath( output.getShortestPathOMPL(), input.cspace_levels.back() );
-    //std::vector<Config> path = output.GetShortestPath();
     ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
-    std::cout << "pdef" << std::endl;
     output.SetProblemDefinition(pdef);
-    std::cout << output << std::endl;
-    std::cout << "done." << std::endl;
   }
 }
 void StrategyGeometricMultiLevel::RunBenchmark(
@@ -232,7 +228,6 @@ void StrategyGeometricMultiLevel::RunBenchmark(
     std::vector<ob::SpaceInformationPtr> si_vec, 
     std::vector<ob::ProblemDefinitionPtr> pdef_vec)
 {
-  std::cout << input.name_algorithm << std::endl;
   BenchmarkInformation binfo(input.name_algorithm);
 
   const ob::SpaceInformationPtr si = si_vec.back();

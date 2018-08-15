@@ -206,6 +206,9 @@ void PlannerBackend::RenderWorld(){
 
     planner->DrawGL(state);
 
+    Vector3 a(3,0,0);
+    Vector3 b(-3,0,0);
+    drawLineSegment(a,b);
 
     if(state("draw_planner_surface_normals")){
       glDisable(GL_LIGHTING);

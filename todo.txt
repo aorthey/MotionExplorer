@@ -493,5 +493,8 @@ Simulator
 -------------------------------------------------------------------------------
 [ ] make colors changeable in xml
 
-
-[ ] try again with -O3, and with Release settings without -g
+[ ] compute cspace map for RRT | QMP (check which one is sufficient, and which
+one is not)
+[ ] do the same, but this time with slabs instead of slices
+[ ] how to automate the distance computation
+[ ] start from q_init, then expand outwards

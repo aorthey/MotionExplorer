@@ -8,8 +8,6 @@
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 #include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/base/PlannerDataGraph.h>
-#include <ompl/base/spaces/SO2StateSpace.h>
-#include <ompl/base/spaces/SO3StateSpace.h>
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/tools/config/MagicConstants.h>
 #include <ompl/geometric/planners/prm/ConnectionStrategy.h>

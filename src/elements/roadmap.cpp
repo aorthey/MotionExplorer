@@ -55,9 +55,9 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
       Vector3 q = cspace->getXYZ(s);
       shortest_path.push_back(q);
     }
-    gpath->interpolate();
-    ob::PathPtr path_ompl_ptr(gpath);
     if(pred.size()>0){
+      gpath->interpolate();
+      ob::PathPtr path_ompl_ptr(gpath);
       path_ompl = new PathPiecewiseLinear(path_ompl_ptr, cspace, quotient_space);
     }
   }

@@ -45,3 +45,4 @@ class OMPLValidityCheckerNecessarySufficient: public OMPLValidityChecker
     SingleRobotCSpace *klampt_single_robot_cspace_outer_approximation;
 };
 typedef std::shared_ptr<OMPLValidityChecker> OMPLValidityCheckerPtr;
+typedef std::shared_ptr<OMPLValidityCheckerNecessarySufficient> OMPLValidityCheckerNecessarySufficientPtr;

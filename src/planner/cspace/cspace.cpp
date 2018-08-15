@@ -55,21 +55,9 @@ ob::ScopedState<> CSpaceOMPL::ConfigToOMPLState(const Config &q){
 void CSpaceOMPL::Init()
 {
   this->initSpace();
-
-  //std::cout << "averageValidMotionLength:" << std::endl;
-  //double lm = si->averageValidMotionLength(1000);
-  //std::cout << lm << std::endl;
-  //std::cout << "Initialized cspace" << std::endl;
-  //exit(0);
 }
 ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
-  // if(si==nullptr){
-  //   si = std::make_shared<ob::SpaceInformation>(SpacePtr());
-  //   const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr();
-  //   si->setStateValidityChecker(checker);
-  // }
-  if(si==nullptr){
-    space->printSettings(std::cout);
+  if(!si){
     si = std::make_shared<ob::SpaceInformation>(SpacePtr());
     const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr();
     si->setStateValidityChecker(checker);
@@ -122,10 +110,12 @@ const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr(ob::SpaceI
 
 void CSpaceOMPL::SetSufficient(const uint robot_idx_outer_){
   robot_idx_outer = robot_idx_outer_;
+  std::cout << "setting sufficient robot: " << robot_idx_outer << " vs " << robot_idx << std::endl;
   if(robot_idx_outer != robot_idx){
     klampt_cspace_outer = new SingleRobotCSpace(*world, robot_idx_outer, &worldsettings);
     enableSufficiency = true;
   }
+  std::cout << (enableSufficiency?"Yes sufficiency":"No")<< std::endl;
 }
 
 bool CSpaceOMPL::isDynamic(){
