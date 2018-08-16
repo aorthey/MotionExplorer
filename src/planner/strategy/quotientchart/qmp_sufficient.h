@@ -22,6 +22,9 @@ namespace ompl
         virtual ~QMPSufficient() override;
         void Grow(double t) override;
         bool Sample(ob::State *q_random) override;
+        void getPlannerData(ob::PlannerData &data) const;
+        void setup() override;
+
       private:
         bool checkSufficiency{false};
         OMPLValidityCheckerNecessarySufficientPtr checker;

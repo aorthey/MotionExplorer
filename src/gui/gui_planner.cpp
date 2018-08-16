@@ -206,10 +206,6 @@ void PlannerBackend::RenderWorld(){
 
     planner->DrawGL(state);
 
-    Vector3 a(3,0,0);
-    Vector3 b(-3,0,0);
-    drawLineSegment(a,b);
-
     if(state("draw_planner_surface_normals")){
       glDisable(GL_LIGHTING);
       glEnable(GL_BLEND); 
@@ -249,9 +245,21 @@ void PlannerBackend::RenderWorld(){
     if(state("draw_planner_bounding_box")){
       Config min = planner->GetInput().se3min;
       Config max = planner->GetInput().se3max;
+
+      //minimal width of bounding box, otherwise near zero volumes are not
+      //visible
+      double minimal_width = 0.1;
+      for(uint k = 0; k < 3; k++){
+        double d = fabs(max(k)-min(k));
+        if(d<minimal_width){
+          max(k)+=minimal_width/2.0;
+          min(k)-=minimal_width/2.0;
+        }
+      }
+
       glDisable(GL_LIGHTING);
       glEnable(GL_BLEND); 
-      GLColor lightgrey(0.5,0.5,0.5,0.5);
+      GLColor lightgrey(0.5,0.5,0.5,0.8);
       lightgrey.setCurrentGL();
       GLDraw::drawBoundingBox(Vector3(min(0),min(1),min(2)), Vector3(max(0),max(1),max(2)));
       glEnable(GL_LIGHTING);

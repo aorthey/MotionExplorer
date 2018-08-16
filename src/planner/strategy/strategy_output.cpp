@@ -147,6 +147,8 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
         std::cout << "NEW node: " << path << "->" << ppath << std::endl;
         hierarchy->AddNode( roadmap_k, ppath);
       }
+      std::string fname = "roadmap_level_"+std::to_string(level)+".roadmap";
+      roadmap_k->Save(fname.c_str());
       hierarchy->UpdateNode( roadmap_k, path);
     }
   }

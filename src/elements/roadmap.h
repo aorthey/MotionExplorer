@@ -23,6 +23,9 @@ class Roadmap{
 
     virtual void DrawGL(GUIState&);
 
+    bool Save(const char* fn);
+    bool Save(TiXmlElement *node);
+
     GLDraw::GLColor cVertex{lightgreen};
     GLDraw::GLColor cVertexStart{green};
     GLDraw::GLColor cVertexGoal{red};

@@ -32,6 +32,20 @@ void AddSubNodeVector(TiXmlElement& node, const char *name, std::vector<T> _val)
   node.InsertEndChild(subnode);
 }
 
+template <typename T>
+TiXmlElement* ReturnSubNodeVector(TiXmlElement& node, const char *name, std::vector<T> _val){
+
+  TiXmlElement* subnode = new TiXmlElement(name);
+  stringstream ss;
+  ss << _val.size() << "  ";
+  for(uint k = 0; k < _val.size(); k++){
+    ss << _val.at(k) << " ";
+  }
+  TiXmlText text(ss.str().c_str());
+  subnode->InsertEndChild(text);
+  return subnode;
+}
+
 void AddComment(TiXmlElement& node, const char *str)
 {
   TiXmlComment * comment = new TiXmlComment();

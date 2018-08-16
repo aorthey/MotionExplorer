@@ -50,6 +50,10 @@ namespace ompl
               associated_t = vis.associated_t;
               open_neighborhood_distance = vis.open_neighborhood_distance;
               open_neighborhood = vis.open_neighborhood;
+              isFeasible = vis.isFeasible;
+              isSufficient = vis.isSufficient;
+              start = vis.start;
+              goal = vis.goal;
             }
             ob::State *state{nullptr};
             uint total_connection_attempts{0};
@@ -61,6 +65,8 @@ namespace ompl
             double open_neighborhood_distance{0};
             bool start{false};
             bool goal{false};
+            bool isSufficient{false};
+            bool isFeasible{false};
             cover::OpenSet *open_neighborhood{nullptr};
         };
 

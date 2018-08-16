@@ -495,6 +495,15 @@ Simulator
 
 [ ] compute cspace map for RRT | QMP (check which one is sufficient, and which
 one is not)
+-- requires to obtain samples from planner, whereby each sample is designated as
+feasible/infeasible/sufficient feasible.
+[ ] produce slice pattern on QS
+[ ] produce samples on CS
+[ ] produce exact QS
+[ ] produce exact CS
+
 [ ] do the same, but this time with slabs instead of slices
 [ ] how to automate the distance computation
 [ ] start from q_init, then expand outwards
+[ ] outsource graph/refactor -> make templated version such that every class can
+write their own vertex(edge-)internalstate classes

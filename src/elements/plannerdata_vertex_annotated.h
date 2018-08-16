@@ -8,6 +8,8 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
 {
   //If new elements are added, you need to update the clone/getstate functions!
   public:
+    enum class FeasibilityType{FEASIBLE, INFEASIBLE, SUFFICIENT_FEASIBLE};
+
     PlannerDataVertexAnnotated(const ob::State *st, int tag=0, double d_ = 0.0);
     PlannerDataVertexAnnotated (const PlannerDataVertexAnnotated &rhs);
     virtual PlannerDataVertex *clone() const override;
@@ -27,6 +29,11 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
     void SetMaxLevel(uint level_);
     uint GetMaxLevel() const;
 
+    void SetFeasibility(FeasibilityType feasibility_t_);
+    FeasibilityType GetFeasibility() const;
+    void SetComponent(uint component_);
+    uint GetComponent() const;
+
     void SetPathClass(uint level_);
     uint GetPathClass() const;
 
@@ -40,8 +47,6 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
     void AddComplex(std::vector<long unsigned int> simplex_);
     std::vector<std::vector<long unsigned int>> GetComplex() const;
 
-    void SetComponent(uint component_);
-    uint GetComponent() const;
     void setState(ob::State *s);
     virtual const ob::State *getState() const override;
 
@@ -74,6 +79,7 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
 
     enum ComponentType{START_COMPONENT, GOAL_COMPONENT, OUTLIER_COMPONENT, UNKNOWN};
     ComponentType component_t;
+    FeasibilityType feasibility_t;
 
     //template <class Archive>
     //void serialize(Archive & ar, const unsigned int version)

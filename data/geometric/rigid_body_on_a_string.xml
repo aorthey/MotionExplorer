@@ -14,16 +14,19 @@
   <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/2droom_misleading.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
 -->
 
-  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 -2 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="3.8 -1.2 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="4.2 -1.2 0" rotateRPY="0 0 1.57"/>
+  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="4.2 1.2 0" rotateRPY="0 0 1.57"/>
+  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="-4.5 -0.2 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cylinder.tri" translation="0 -1.7 0" rotateRPY="0 0 0"/>
   <plannerinput>
 
-    <qinit  config="7  -3.0 +0.0 +0.0 -1.47 +0 +0.0 +0.0"/>
-    <qgoal  config="7  +3.0 +0.0 +0.0 -1.8 +0 +0.0 +0.0"/>
-    <se3min config="6  -4.0 -0.01 -0.0 -3.141593 -1.57 -3.141593"/>
-    <se3max config="6  +4.0 +0.01 +0.0 +3.141593 +1.57 +3.141593"/>
+    <qinit  config="8  -2.0 +0.0 +0.0 -1.47 +0 +0.0 +0.0 0.0"/>
+    <qgoal  config="8  +3.0 +0.0 +0.0 -1.8 +0 +0.0 +0.0 0.0"/>
+    <se3min config="6  -5.0 -0.001 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +5.0 +0.001 +0.0 +3.141593 +1.57 +3.141593"/>
     <freeFloating>1</freeFloating>
     <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>0.02</maxplanningtime>      <!-- runtime in (s) --> 
 
     <hierarchy>
       <level inner_index="1" outer_index="2" type="R2"/>

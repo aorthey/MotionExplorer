@@ -259,3 +259,56 @@ void Roadmap::DrawGL(GUIState& state)
 
 }
 
+bool Roadmap::Save(const char* fn)
+{
+  TiXmlDocument doc;
+  TiXmlElement *node = CreateRootNodeInDocument(doc);
+  Save(node);
+  doc.LinkEndChild(node);
+  doc.SaveFile(fn);
+  return true;
+}
+bool Roadmap::Save(TiXmlElement *node)
+{
+  node->SetValue("roadmap");
+
+  AddSubNode(*node, "num_vertices", numVertices());
+  AddSubNode(*node, "num_edges", numEdges());
+
+  {
+    AddComment(*node, "vertices");
+    ob::SpaceInformationPtr si = cspace->SpaceInformationPtr();
+    ob::StateSpacePtr space = si->getStateSpace();
+
+    for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
+      ob::PlannerDataVertex *vd = &pd->getVertex(vidx);
+      std::vector<double> state_serialized;
+      space->copyToReals(state_serialized, vd->getState());
+      TiXmlElement *subnode = ReturnSubNodeVector(*node, "state", state_serialized);
+
+      PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+      if(v!=nullptr){
+        using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
+        FeasibilityType feasibility_t = v->GetFeasibility();
+        if(feasibility_t == FeasibilityType::INFEASIBLE){
+          subnode->SetAttribute("feasible", "no");
+          subnode->SetAttribute("sufficient", "no");
+        }else if(feasibility_t == FeasibilityType::SUFFICIENT_FEASIBLE){
+          subnode->SetAttribute("feasible", "yes");
+          subnode->SetAttribute("sufficient", "yes");
+        }else{
+          subnode->SetAttribute("feasible", "yes");
+          subnode->SetAttribute("sufficient", "no");
+        }
+      }else{
+        subnode->SetAttribute("feasible", "unknown");
+        subnode->SetAttribute("sufficient", "unknown");
+      }
+      node->InsertEndChild(*subnode);
+    }
+
+  }
+
+  return true;
+}
+

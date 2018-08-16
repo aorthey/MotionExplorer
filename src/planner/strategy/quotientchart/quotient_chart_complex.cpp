@@ -78,13 +78,8 @@ double QuotientChartComplex::Distance(const Vertex a, const Vertex b) const
 {
   return BaseT::Distance(a,b);
 }
-//#include "3rdparty/matplotlibcpp.h"
-  // namespace plt = matplotlibcpp;
-  // plt::plot({1,3,2,4});
-  // plt::show();
 void QuotientChartComplex::getPlannerData(ob::PlannerData &data) const
 {
-
 
   uint Nvertices = data.numVertices();
   uint Nedges = data.numEdges();

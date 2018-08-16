@@ -1,5 +1,7 @@
 #include "plannerdata_vertex_annotated.h"
 
+using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
+
 PlannerDataVertexAnnotated::PlannerDataVertexAnnotated(const ob::State *st, int tag, double d_):
       ob::PlannerDataVertex(st,tag), open_neighborhood_distance(d_)
 {
@@ -18,6 +20,7 @@ PlannerDataVertexAnnotated::PlannerDataVertexAnnotated (const PlannerDataVertexA
   path = rhs.GetPath();
   simplicial_complex_local = rhs.GetComplex();
   infeasible = rhs.IsInfeasible();
+  feasibility_t = rhs.GetFeasibility();
 }
 
 void PlannerDataVertexAnnotated::SetInfeasible()
@@ -33,6 +36,15 @@ ob::PlannerDataVertex *PlannerDataVertexAnnotated::clone() const
   return new PlannerDataVertexAnnotated(*this);
 }
 
+//##############################################################################
+void PlannerDataVertexAnnotated::SetFeasibility(FeasibilityType feasibility_t_)
+{
+  feasibility_t = feasibility_t_;
+}
+FeasibilityType PlannerDataVertexAnnotated::GetFeasibility() const
+{
+  return feasibility_t;
+}
 //##############################################################################
 void PlannerDataVertexAnnotated::SetPath(std::vector<int> path_)
 {
