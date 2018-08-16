@@ -497,9 +497,10 @@ Simulator
 one is not)
 -- requires to obtain samples from planner, whereby each sample is designated as
 feasible/infeasible/sufficient feasible.
-[ ] produce slice pattern on QS
+
+[x] produce slice pattern on QS
 [ ] produce samples on CS
-[ ] produce exact QS
+[x] produce exact QS
 [ ] produce exact CS
 
 [ ] do the same, but this time with slabs instead of slices
