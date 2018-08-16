@@ -499,9 +499,10 @@ one is not)
 feasible/infeasible/sufficient feasible.
 
 [x] produce slice pattern on QS
-[ ] produce samples on CS
+[x] produce samples on CS
 [x] produce exact QS
-[ ] produce exact CS
+[x] produce exact CS
+[x] visualize outer inner approximation in workspace
 
 [ ] do the same, but this time with slabs instead of slices
 [ ] how to automate the distance computation

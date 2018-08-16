@@ -110,12 +110,10 @@ const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr(ob::SpaceI
 
 void CSpaceOMPL::SetSufficient(const uint robot_idx_outer_){
   robot_idx_outer = robot_idx_outer_;
-  std::cout << "setting sufficient robot: " << robot_idx_outer << " vs " << robot_idx << std::endl;
   if(robot_idx_outer != robot_idx){
     klampt_cspace_outer = new SingleRobotCSpace(*world, robot_idx_outer, &worldsettings);
     enableSufficiency = true;
   }
-  std::cout << (enableSufficiency?"Yes sufficiency":"No")<< std::endl;
 }
 
 bool CSpaceOMPL::isDynamic(){

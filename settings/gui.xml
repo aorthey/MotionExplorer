@@ -156,16 +156,16 @@
     <descr>Print Robot</descr>
     <key>i</key>
   </hotkey>
-  <hotkey>
-    <name>draw_robot_previous</name>
-    <descr>Draw Previous Robot</descr>
-    <key>N</key>
-  </hotkey>
-  <hotkey>
-    <name>draw_robot_next</name>
-    <descr>Draw Next Robot</descr>
-    <key>M</key>
-  </hotkey>
+  <!-- <hotkey> -->
+  <!--   <name>draw_robot_previous</name> -->
+  <!--   <descr>Draw Previous Robot</descr> -->
+  <!--   <key>N</key> -->
+  <!-- </hotkey> -->
+  <!-- <hotkey> -->
+  <!--   <name>draw_robot_next</name> -->
+  <!--   <descr>Draw Next Robot</descr> -->
+  <!--   <key>M</key> -->
+  <!-- </hotkey> -->
   <checkbox>
     <name>draw_robot</name>
     <descr>Draw Original Robot</descr>
@@ -248,6 +248,16 @@
   <hotkey>
     <name>planner_draw_start_goal_configuration</name>
     <key>G</key>
+  </hotkey>
+  <hotkey>
+    <name>planner_draw_start_goal_configuration_sufficient</name>
+    <key>M</key>
+    <active>1</active>
+  </hotkey>
+  <hotkey>
+    <name>planner_draw_start_goal_configuration_necessary</name>
+    <key>N</key>
+    <active>1</active>
   </hotkey>
 
   <!-- <hotkey> -->

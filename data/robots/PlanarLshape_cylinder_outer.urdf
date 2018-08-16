@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="PlanarLshape_sphere_outer">
+<robot name="PlanarLshape_cylinder_outer">
  <link name="body">
   <inertial>
     <mass value="1"/>

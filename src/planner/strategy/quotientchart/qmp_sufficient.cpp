@@ -37,8 +37,10 @@ void QMPSufficient::setup()
   if(setup_){
     Vertex vs = startM_.at(0);
     Vertex vg = goalM_.at(0);
-    G[vs].isSufficient = checker->IsSufficientFeasible(G[vs].state);
-    G[vg].isSufficient = checker->IsSufficientFeasible(G[vg].state);
+    if(checkSufficiency){
+      G[vs].isSufficient = checker->IsSufficientFeasible(G[vs].state);
+      G[vg].isSufficient = checker->IsSufficientFeasible(G[vg].state);
+    }
     G[vs].isFeasible = true;
     G[vg].isFeasible = true;
   }
