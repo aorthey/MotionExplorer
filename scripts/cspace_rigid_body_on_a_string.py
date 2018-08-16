@@ -43,10 +43,10 @@ def plotPoints(fname):
     if not feasible:
       plt.axvline(x, color='k', linewidth=1)
     elif sufficient:
-      plt.axvline(x, color='m', linewidth=1)
+      plt.axvline(x, color='0.8', linewidth=1)
     else:
-      delta=0.01
-      plt.plot([x,x],[-delta,+delta],'-',color='k', linewidth=1)
+      delta=0.05
+      plt.plot([x,x],[-delta,+delta],'-',color='0.8', linewidth=1)
 
 def plotQuotientSpaceBackground(fname):
   Q = getPoints(fname)

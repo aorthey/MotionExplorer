@@ -17,14 +17,14 @@ def CreateSphereRobot(folder_name, robot_name, radius):
   f.close()
   print "\nCreated new file >>",fname,"[sphere robot radius=",radius,"]"
 
-def CreateCylinderRobot(folder_name, robot_name, radius, length):
+def CreateCylinderRobot(folder_name, robot_name, radius, length, yaw=0):
   fname = getPathname(folder_name, robot_name)
 
   f = open(fname,'w')
   f.write('<?xml version="1.0"?>\n')
   f.write('<robot name="'+robot_name+'">\n')
-  #hstr = createSphere("body",0,0,0,radius,PHYSICAL=True)
   hstr = createCylinder("body", 0, 0, 0, radius, length)
+  hstr = createRotatedCylinder("body",0,0,0,0,0,yaw,radius,length)
   f.write(hstr)
   f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
   f.write('  </klampt>\n')
