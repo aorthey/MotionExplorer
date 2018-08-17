@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="2dof" file="/home/aorthey/git/orthoklampt/data/robots/2dof_manip.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="2dof_inner" file="/home/aorthey/git/orthoklampt/data/robots/2dof_manip_1dof_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="2dof_outer" file="/home/aorthey/git/orthoklampt/data/robots/2dof_manip_1dof_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+  <rigidObject name="cylinder.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cylinder.tri" translation="-2 +2 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cylinder.tri" translation="-2.5 -2.5 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cylinder.tri" translation="1 -2.0 0" rotateRPY="0 0 0"/>
+
+  <plannerinput>
+
+    <qinit  config="9  -0.0 +0.0 +0.0 0.0 0.0 0.0  +0.4 0.0 -0.3"/>
+    <qgoal  config="9  +0.0 +0.0 +0.0 0.0 0.0 0.0  -1.2 0.0 -0.2"/>
+    <se3min config="6  -5.0 -0.001 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +5.0 +0.001 +0.0 +3.141593 +1.57 +3.141593"/>
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>0.2</maxplanningtime>      <!-- runtime in (s) --> 
+
+    <hierarchy>
+      <level inner_index="1" outer_index="2" type="R1"/>
+      <!-- <level inner_index="0" type="R2"/> -->
+      <!-- <level inner_index="0" type="SE2"/> -->
+    </hierarchy>
+
+  </plannerinput>
+
+</world>
+
+
+

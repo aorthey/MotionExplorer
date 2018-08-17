@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<robot name="2dof_manip_1dof_inner">
+ <link name="link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0102083333333" ixy="0" ixz="0" iyy="0.0102083333333" iyz="0" izz="0.01"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.05" radius="0.2"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.05" radius="0.2"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="link2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.722708333333" ixy="0" ixz="0" iyy="0.722708333333" iyz="0" izz="0.7225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 1.9 0"/>
+    <geometry>
+      <cylinder length="0.05" radius="1.7"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 1.9 0"/>
+    <geometry>
+      <cylinder length="0.05" radius="1.7"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_link1_link2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="link1"/>
+  <child link="link2"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>
