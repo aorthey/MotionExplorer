@@ -70,7 +70,6 @@ void PlannerInput::SetDefault()
   epsilon_goalregion = GetSubNodeText<double>(node, "epsilongoalregion");
   pathSpeed = GetSubNodeText<double>(node, "pathSpeed");
   smoothPath = GetSubNodeText<int>(node, "smoothPath");
-  enableSufficiency = GetSubNodeText<int>(node, "enableSufficiency");
   kinodynamic = GetSubNodeText<int>(node, "kinodynamic");
   name_sampler = GetSubNodeAttribute<std::string>(node, "sampler", "name");
 }
@@ -90,7 +89,6 @@ bool PlannerInput::Load(TiXmlElement *node)
   epsilon_goalregion = GetSubNodeTextDefault(node, "epsilongoalregion", epsilon_goalregion);
   pathSpeed = GetSubNodeTextDefault(node, "pathSpeed", pathSpeed);
   smoothPath = GetSubNodeTextDefault(node, "smoothPath", smoothPath);
-  enableSufficiency = GetSubNodeTextDefault(node, "enableSufficiency", enableSufficiency);
   name_sampler = GetSubNodeAttributeDefault<std::string>(node, "sampler", "name", name_sampler);
   kinodynamic = GetSubNodeTextDefault(node, "kinodynamic", kinodynamic);
   if(kinodynamic)

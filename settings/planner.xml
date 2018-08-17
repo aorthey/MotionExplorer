@@ -33,5 +33,4 @@
   <epsilongoalregion>0.01</epsilongoalregion>
   <freeFloating>0</freeFloating>
   <kinodynamic>0</kinodynamic> 
-  <enableSufficiency>0</enableSufficiency>
 </planner>

@@ -1,46 +1,33 @@
 import sys
 import numpy as np
 from cspace_visualizer import *
+from cspace_rigid_body_on_a_string_generate_data import *
 from cspace_system_2dof import *
 import cspace_system_2dof as dof
 
 grey = '0.6'
 font_size = 45
 lim=5.0
-showSamples = False
+showSamples = True
+maxSamples = 200
+maxInfeasibleElements = 1000
+output_name = "rigid_body_on_a_string"
 
-def getPoints(fname):
-  import xml.etree.ElementTree
-  root = xml.etree.ElementTree.parse(fname).getroot()
-  Q = list()
-  for child in root.findall('state'):
-    sufficient = child.get('sufficient')
-    feasible = child.get('feasible')
-    state = child.text
-    state = state.split(" ")
-    x = state[2]
-    y = state[3]
-    theta = state[4]
-    if feasible=='yes':
-      feasible = True
-    else:
-      feasible = False
-    if sufficient=='yes':
-      sufficient = True
-    else:
-      sufficient = False
-    q = list()
-    q.append(state[2])
-    q.append(state[3])
-    q.append(state[4])
-    q.append(feasible)
-    q.append(sufficient)
-    Q.append(q)
-  return Q
+qsname = output_name+"_qspace.png"
+csname = output_name+"_cspace.png"
+qsname_samples = output_name+"_qspace_samples.png"
+csname_samples = output_name+"_cspace_samples.png"
 
-def plotQSPoints(fname):
+#qfname = "../build/qs_dense.roadmap"
+#cfname = "../build/cs_dense.roadmap"
+qfname = "../build/roadmap_level_0_robot_1.roadmap"
+cfname = "../build/roadmap_level_0_robot_0.roadmap"
+generateQuotientSpaceDense(qfname, 1000)
+generateCSpaceDense(cfname, 60000)
+
+def plotQSPoints():
     
-  Q = getPoints(fname)
+  Q = getPoints(qfname, maxSamples)
   for q in Q:
     x = float(q[0])
     y = float(q[1])
@@ -54,9 +41,8 @@ def plotQSPoints(fname):
       delta=0.05
       plt.plot([x,x],[-delta,+delta],'-',color=grey, linewidth=1)
 
-def plotCSPoints(fname):
-    
-  Q = getPoints(fname)
+def plotCSPoints():
+  Q = getPoints(cfname, maxSamples)
   for q in Q:
     x = float(q[0])
     t = float(q[2])
@@ -77,6 +63,9 @@ def plotCSpaceBackground():
   plotCSpaceDelaunayGrey(P1,P2,0.15)
 
 
+###############################################################################
+## QUOTIENT-SPACE
+###############################################################################
 fig = plt.figure(0)
 fig.patch.set_facecolor('white')
 ax = fig.gca()
@@ -84,11 +73,15 @@ ax.set_xlabel(r'x',fontsize=font_size)
 ax.set_ylabel(r'\theta',rotation=1.57,fontsize=font_size)
 ax.tick_params(axis='both', which='major', pad=15)
 plt.axis([-lim,lim,-3.14,3.14])
-if showSamples:
-  fname = "../build/qs_samples.roadmap"
-  plotQSPoints(fname)
 plotQuotientSpaceBackground()
+plt.savefig(qsname, bbox_inches='tight')
+if showSamples:
+  plotQSPoints()
+  plt.savefig(qsname_samples, bbox_inches='tight')
 
+###############################################################################
+## CSPACE
+###############################################################################
 fig = plt.figure(1)
 fig.patch.set_facecolor('white')
 ax = fig.gca()
@@ -96,8 +89,9 @@ ax.set_xlabel(r'x',fontsize=font_size)
 ax.set_ylabel(r'\theta',rotation=1.57,fontsize=font_size)
 ax.tick_params(axis='both', which='major', pad=15)
 plt.axis([-lim,lim,-3.14,3.14])
-if showSamples:
-  fname = "../build/cs_samples.roadmap"
-  plotCSPoints(fname)
 plotCSpaceBackground()
+plt.savefig(csname, bbox_inches='tight')
+if showSamples:
+  plotQSPoints()
+  plt.savefig(csname_samples, bbox_inches='tight')
 plt.show()

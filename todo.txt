@@ -493,19 +493,27 @@ Simulator
 -------------------------------------------------------------------------------
 [ ] make colors changeable in xml
 
-[ ] compute cspace map for RRT | QMP (check which one is sufficient, and which
-one is not)
--- requires to obtain samples from planner, whereby each sample is designated as
-feasible/infeasible/sufficient feasible.
-
 [x] produce slice pattern on QS
 [x] produce samples on CS
 [x] produce exact QS
 [x] produce exact CS
 [x] visualize outer inner approximation in workspace
 
-[ ] do the same, but this time with slabs instead of slices
-[ ] how to automate the distance computation
-[ ] start from q_init, then expand outwards
-[ ] outsource graph/refactor -> make templated version such that every class can
-write their own vertex(edge-)internalstate classes
+[ ] do the same for a manipulator arm (2D)
+  [ ] construct manipulator arm + inner + outer
+  [ ] construct environment (same as last paper?)
+  [ ] visualize cspaces
+
+[ ] automate visualization of cspace/qspace (get both at the same time, then
+move to filenames, and execute script)
+
+[x] do the same, but this time with slabs instead of slices
+[o] visualize slabs on manifold embedded in R3 (not so important)
+
+
+[ ] redo algorithm using outer approx
+  [ ] how to automate the distance computation for general robots
+  [ ] start from q_init, then expand outwards
+  [ ] outsource graph/refactor -> make templated version such that every class can
+  write their own vertex(edge-)internalstate classes
+

@@ -40,28 +40,30 @@ class CSpaceOMPL
 
     CSpaceOMPL(RobotWorld *world_, int robot_idx_);
 
-    virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) = 0;
     virtual void Init();
+    virtual ob::SpaceInformationPtr SpaceInformationPtr();
 
+    virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) = 0;
     virtual void print() const = 0;
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) = 0;
     virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
 
-    virtual ob::ScopedState<> ConfigToOMPLState(const Config &q);
+    Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
+    ob::ScopedState<> ConfigToOMPLState(const Config &q);
 
-    virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
-    virtual Vector3 getXYZ(const ob::State*);
-    virtual void SetCSpaceInput(const CSpaceInput &input_);
-    virtual uint GetDimensionality() const;
-    virtual uint GetKlamptDimensionality() const;
-    virtual uint GetControlDimensionality() const;
-    virtual Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
-    virtual Robot* GetRobotPtr();
-    virtual RobotWorld* GetWorldPtr();
-    virtual CSpaceKlampt* GetCSpaceKlamptPtr();
-    virtual const ob::StateSpacePtr SpacePtr();
-    virtual ob::SpaceInformationPtr SpaceInformationPtr();
-    virtual const oc::RealVectorControlSpacePtr ControlSpacePtr();
+    const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
+    Vector3 getXYZ(const ob::State*);
+
+    void SetCSpaceInput(const CSpaceInput &input_);
+    uint GetDimensionality() const;
+    uint GetKlamptDimensionality() const;
+    uint GetControlDimensionality() const;
+    Robot* GetRobotPtr();
+    int GetRobotIndex() const;
+    RobotWorld* GetWorldPtr();
+    CSpaceKlampt* GetCSpaceKlamptPtr();
+    const ob::StateSpacePtr SpacePtr();
+    const oc::RealVectorControlSpacePtr ControlSpacePtr();
 
     std::vector<double> EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
     void OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSpace::StateType *q );

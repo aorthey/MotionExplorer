@@ -70,8 +70,13 @@ void QMPSufficient::Grow(double t){
       bool sufficient = checker->IsSufficientFeasible(state);
       if(sufficient){
         number_of_sufficient_samples++;
-        //double d = checker->SufficientDistance(state);
+        double d = checker->SufficientDistance(state);
         G[m].isSufficient = true;
+        G[m].outerApproximationDistance = d;
+      }else{
+        double d = checker->Distance(state);
+        G[m].isSufficient = false;
+        G[m].innerApproximationDistance = d;
       }
     }
   }else{
@@ -134,9 +139,17 @@ void QMPSufficient::getPlannerData(ob::PlannerData &data) const
     p.SetLevel(level);
     p.SetPath(path);
 
-    if(!G[v].isFeasible) p.SetFeasibility(FeasibilityType::INFEASIBLE);
-    else if(G[v].isSufficient) p.SetFeasibility(FeasibilityType::SUFFICIENT_FEASIBLE);
-    else p.SetFeasibility(FeasibilityType::FEASIBLE);
+    if(!G[v].isFeasible){
+      p.SetFeasibility(FeasibilityType::INFEASIBLE);
+    }else{
+      if(G[v].isSufficient){
+        p.SetFeasibility(FeasibilityType::SUFFICIENT_FEASIBLE);
+        p.SetOpenNeighborhoodDistance(G[v].outerApproximationDistance);
+      }else{
+        p.SetFeasibility(FeasibilityType::FEASIBLE);
+        p.SetOpenNeighborhoodDistance(G[v].innerApproximationDistance);
+      }
+    }
 
     if(G[v].start) data.addStartVertex(p);
     else if(G[v].goal) data.addGoalVertex(p);

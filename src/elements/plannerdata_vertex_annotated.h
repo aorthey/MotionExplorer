@@ -31,6 +31,7 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
 
     void SetFeasibility(FeasibilityType feasibility_t_);
     FeasibilityType GetFeasibility() const;
+
     void SetComponent(uint component_);
     uint GetComponent() const;
 

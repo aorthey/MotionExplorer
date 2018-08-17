@@ -293,17 +293,20 @@ bool Roadmap::Save(TiXmlElement *node)
         if(feasibility_t == FeasibilityType::INFEASIBLE){
           subnode->SetAttribute("feasible", "no");
           subnode->SetAttribute("sufficient", "no");
-        }else if(feasibility_t == FeasibilityType::SUFFICIENT_FEASIBLE){
-          subnode->SetAttribute("feasible", "yes");
-          subnode->SetAttribute("sufficient", "yes");
         }else{
           subnode->SetAttribute("feasible", "yes");
-          subnode->SetAttribute("sufficient", "no");
+          if(feasibility_t == FeasibilityType::SUFFICIENT_FEASIBLE){
+            subnode->SetAttribute("sufficient", "yes");
+          }else{
+            subnode->SetAttribute("sufficient", "no");
+          }
         }
       }else{
         subnode->SetAttribute("feasible", "unknown");
         subnode->SetAttribute("sufficient", "unknown");
       }
+      double d = v->GetOpenNeighborhoodDistance();
+      subnode->SetDoubleAttribute("open_ball_radius", d);
       node->InsertEndChild(*subnode);
     }
 

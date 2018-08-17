@@ -42,7 +42,6 @@ class PlannerInput{
 
     bool smoothPath{false};
     double pathSpeed{1};
-    bool enableSufficiency{false};
 
     bool kinodynamic{false};
     Config uMin;

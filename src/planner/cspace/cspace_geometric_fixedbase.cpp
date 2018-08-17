@@ -5,11 +5,6 @@
 GeometricCSpaceOMPLFixedBase::GeometricCSpaceOMPLFixedBase(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)
 {
-  Init();
-}
-
-
-void GeometricCSpaceOMPLFixedBase::Init(){
   Nklampt =  robot->q.size() - 6;
 
   if(Nklampt<=0){
@@ -39,6 +34,8 @@ void GeometricCSpaceOMPLFixedBase::Init(){
     }
   }
 }
+
+
 void GeometricCSpaceOMPLFixedBase::initSpace()
 {
 
@@ -46,6 +43,7 @@ void GeometricCSpaceOMPLFixedBase::initSpace()
     std::cout << "Fixed Base robot needs to have at least one actuated joint." << std::endl;
     exit(0);
   }
+  std::cout << "number of joints: " << Nompl << std::endl;
 
   ob::StateSpacePtr RN = (std::make_shared<ob::RealVectorStateSpace>(Nompl));
   this->space = RN;

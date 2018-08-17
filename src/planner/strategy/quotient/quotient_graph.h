@@ -54,6 +54,8 @@ namespace ompl
               isSufficient = vis.isSufficient;
               start = vis.start;
               goal = vis.goal;
+              innerApproximationDistance = vis.innerApproximationDistance;
+              outerApproximationDistance = vis.outerApproximationDistance;
             }
             ob::State *state{nullptr};
             uint total_connection_attempts{0};
@@ -62,7 +64,9 @@ namespace ompl
             unsigned long int associated_target{0};
             unsigned long int associated_source{0};
             double associated_t{-1};
-            double open_neighborhood_distance{0};
+            double open_neighborhood_distance{0.0};
+            double innerApproximationDistance{0.0};
+            double outerApproximationDistance{0.0};
             bool start{false};
             bool goal{false};
             bool isSufficient{false};

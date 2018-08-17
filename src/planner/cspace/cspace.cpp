@@ -71,6 +71,10 @@ const ob::StateSpacePtr CSpaceOMPL::SpacePtr(){
 uint CSpaceOMPL::GetDimensionality() const{
   return space->getDimension();
 }
+int CSpaceOMPL::GetRobotIndex() const
+{
+  return robot_idx;
+}
 uint CSpaceOMPL::GetKlamptDimensionality() const{
   return Nklampt+6;
 }
