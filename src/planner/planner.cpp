@@ -46,10 +46,6 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
       std::cout << "Type " << type << " not recognized" << std::endl;
       exit(0);
     }
-    if(robot_inner_idx != robot_outer_idx){
-      std::cout << "setting sufficient." << std::endl;
-      cspace_level->SetSufficient(robot_outer_idx);
-    }
   }else{
     if(type.substr(0,1) != "R"){
       std::cout << type.substr(0) << std::endl;
@@ -61,6 +57,10 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
     int N = boost::lexical_cast<int>(str_dimension);
     cspace_level = factory.MakeGeometricCSpaceFixedBase(world, robot_inner_idx, N);
 
+  }
+  if(robot_inner_idx != robot_outer_idx){
+    std::cout << "setting sufficient." << std::endl;
+    cspace_level->SetSufficient(robot_outer_idx);
   }
   return cspace_level;
 }

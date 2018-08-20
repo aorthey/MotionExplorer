@@ -44,7 +44,7 @@
   <child link="link2"/>
   <axis xyz="0 0 1"/>
   <dynamics damping="0.01" friction="0.5"/>
-  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+  <limit lower="-3.14" upper="3.14" effort="0.01" velocity="100"/>
 </joint>
 
   <klampt package_root="../../.." default_acc_max="4" >

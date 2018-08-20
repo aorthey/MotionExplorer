@@ -498,22 +498,25 @@ Simulator
 [x] produce exact QS
 [x] produce exact CS
 [x] visualize outer inner approximation in workspace
+[x] do the same for a manipulator arm (2D)
+  [x] construct manipulator arm + inner + outer
+  [x] construct environment (same as last paper?)
+  [x] outer robot is not correctly checked
+  [x] visualize cspaces
 
-[ ] do the same for a manipulator arm (2D)
-  [ ] construct manipulator arm + inner + outer
-  [ ] construct environment (same as last paper?)
-  [ ] visualize cspaces
-
-[ ] automate visualization of cspace/qspace (get both at the same time, then
+[x] automate visualization of cspace/qspace (get both at the same time, then
 move to filenames, and execute script)
-
 [x] do the same, but this time with slabs instead of slices
-[o] visualize slabs on manifold embedded in R3 (not so important)
 
-
-[ ] redo algorithm using outer approx
-  [ ] how to automate the distance computation for general robots
+[ ] finish sufficient algorithm
+  [x] how to automate the distance computation for general robots
   [ ] start from q_init, then expand outwards
   [ ] outsource graph/refactor -> make templated version such that every class can
   write their own vertex(edge-)internalstate classes
 
+once algorithm is done:
+  [ ] visualize algorithm expansion by a movie through cspace (run algorithm until
+  termination, save roadmap, then each frame is adding one more vertex and/or
+  edge)
+  [ ] solve 3D rigid body example (if that works, we can start generalizing,
+also it is easy compared to manip)

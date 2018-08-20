@@ -9,48 +9,6 @@ grey = '0.6'
 font_size = 45
 lim=5.0
 
-def getPoints(fname, maxElements = float('inf')):
-  import xml.etree.ElementTree
-  root = xml.etree.ElementTree.parse(fname).getroot()
-  Q = list()
-  ctr = 0
-  for child in root.findall('state'):
-    if ctr > maxElements:
-      return Q
-    sufficient = child.get('sufficient')
-    feasible = child.get('feasible')
-    open_ball_radius = child.get('open_ball_radius')
-    state = child.text
-    state = state.split(" ")
-
-
-    #### change here depending on which values you get
-    x = state[2]
-    if len(state)>5:
-      y = state[3]
-      theta = state[4]
-    else:
-      y = 0
-      theta = 0
-    if feasible=='yes':
-      feasible = True
-    else:
-      feasible = False
-    if sufficient=='yes':
-      sufficient = True
-    else:
-      sufficient = False
-    q = list()
-    q.append(x)
-    q.append(y)
-    q.append(theta)
-    q.append(feasible)
-    q.append(sufficient)
-    q.append(open_ball_radius)
-    Q.append(q)
-    ctr += 1
-  return Q
-
 def generateCSpaceDense(fname, maxElements = float('inf')):
   Q = getPoints(fname)
   P1 = []

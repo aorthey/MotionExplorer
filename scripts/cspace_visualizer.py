@@ -84,7 +84,7 @@ def plotCSpaceDelaunay(PX,PT, maximumEdgeLength = 0.25, continuous=True):
 
 def plotCSpaceDelaunayGrey(P1,P2,maximumEdgeLength=0.25):
   points2D=np.vstack([P1,P2]).T
-  tri = Delaunay(points2D,'QJ')
+  tri = Delaunay(points2D)
   print tri.simplices.shape, '\n', tri.simplices[0]
 
   triangles = np.array((tri.simplices[0]))
@@ -191,3 +191,113 @@ def plotCSpaceCylindricalProjection(PX,PT):
   ax.set_ylabel(r'\phi')
   ax.set_zlabel(r'z')
   ax.tick_params(axis='both', which='major', pad=15)
+
+def getPoints(fname, maxElements = float('inf')):
+  ### output: [feasible {True,False}, sufficient {True,False}, open_ball_radius
+  ### {real}, number_of_states {int}, states {vector of real}]
+
+  import xml.etree.ElementTree
+  root = xml.etree.ElementTree.parse(fname).getroot()
+  Q = list()
+  ctr = 0
+  for child in root.findall('state'):
+    if ctr > maxElements:
+      return Q
+    sufficient = child.get('sufficient')
+    feasible = child.get('feasible')
+    open_ball_radius = child.get('open_ball_radius')
+    state = child.text
+    state = state.split(" ")
+
+    if feasible=='yes':
+      feasible = True
+    else:
+      feasible = False
+    if sufficient=='yes':
+      sufficient = True
+    else:
+      sufficient = False
+    q = list()
+    q.append(feasible)
+    q.append(sufficient)
+    q.append(open_ball_radius)
+
+    for s in state:
+      if s != '':
+        q.append(s)
+
+    Q.append(q)
+    ctr += 1
+  return Q
+
+def generateInfeasibleSamplesOneDim(fname, dim1=0, maxElements = float('inf')):
+  Q = getPoints(fname)
+  theta = np.linspace(-np.pi,np.pi,100)
+  P1 = []
+  P2 = []
+  ctr = 0
+  for q in Q:
+    feasible = q[0]
+    #sufficient = q[1]
+    #ball_radius = q[2]
+    #num_states = q[3]
+    x = q[4+dim1]
+    if not feasible:
+      ctr += 1
+      for j in range(theta.shape[0]):
+        P1 = np.append(P1,x)
+        P2 = np.append(P2,theta[j])
+    if ctr > maxElements:
+      break
+  # np.save('tmp_QS_dense_1',P1)
+  # np.save('tmp_QS_dense_2',P2)
+  return [P1,P2]
+
+def generateInfeasibleSamplesTwoDim(fname, dim1=0, dim2=1, maxElements = float('inf')):
+  Q = getPoints(fname)
+  P1 = []
+  P2 = []
+  ctr = 0
+  for q in Q:
+    feasible = q[0]
+    #sufficient = q[1]
+    #ball_radius = q[2]
+    #num_states = q[3]
+    x = q[4+dim1]
+    y = q[4+dim2]
+    if not feasible:
+      ctr += 1
+      P1 = np.append(P1,x)
+      P2 = np.append(P2,y)
+    if ctr > maxElements:
+      break
+  # np.save('tmp_QS_dense_1',P1)
+  # np.save('tmp_QS_dense_2',P2)
+  return [P1,P2]
+
+def plotSamplesOneDim(fname, dim1=0, maxElements = float('inf')):
+  Q = getPoints(fname, maxElements)
+  for q in Q:
+    feasible = q[0]
+    sufficient = q[1]
+    d = float(q[2])
+    x = float(q[4+dim1])
+    if not feasible:
+      plt.axvline(x, color='k', linewidth=1)
+    elif sufficient:
+      plt.axvspan(x-d, x+d, alpha=0.5, hatch="/")
+    else:
+      delta=0.05
+      plt.fill([x-d, x+d, x+d, x-d], [-delta,-delta,+delta,+delta], fill=False, hatch='\\')
+
+def plotSamplesTwoDim(fname, dim1=0, dim2=1, maxElements=float('inf')):
+  Q = getPoints(fname, maxElements)
+  for q in Q:
+    t1 = float(q[4+dim1])
+    t2 = float(q[4+dim2])
+    feasible = q[0]
+    if feasible:
+      plt.plot(t1,t2,'o',color='0.6', linewidth=1)
+    else:
+      plt.plot(t1,t2,'x',color='k', linewidth=1)
+
