@@ -191,7 +191,6 @@ QuotientGraph::Vertex QuotientGraph::CreateNewVertex(ob::State *state)
   Vertex m = boost::add_vertex(G);
   G[m].state = si_->cloneState(state);
   disjointSets_.make_set(m);
-
   return m;
 }
 

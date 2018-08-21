@@ -90,7 +90,7 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
   //ompl::time::point t_start = ompl::time::now();
 
   base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
-                                 { return ptc || found_path_on_last_level || exhausted_levels; });
+                                 { return ptc || found_path_on_last_level || saturated_levels; });
 
   root->Init();
   Q.push(root);
@@ -117,16 +117,16 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
 
     uint k = current_node->GetLevel();
 
-    if(current_node->IsExhausted()){
-      if(Q.empty()) exhausted_levels = true;
+    if(current_node->IsSaturated()){
+      if(Q.empty()) saturated_levels = true;
     }
     Q.push(jChart);
     continue;
 
-    if(current_node->IsExhausted()){
-      //level is exhausted, if there are no more charts to consider there is
+    if(current_node->IsSaturated()){
+      //level is saturated, if there are no more charts to consider there is
       //nothing to be done
-      if(Q.empty()) exhausted_levels = true;
+      if(Q.empty()) saturated_levels = true;
     }else{
       if(current_node->FoundNewPath()){
         std::cout << std::string(80, '#') << std::endl;

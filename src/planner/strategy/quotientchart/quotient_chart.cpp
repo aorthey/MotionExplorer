@@ -10,7 +10,7 @@ QuotientChart::QuotientChart(const ob::SpaceInformationPtr &si, og::Quotient *pa
   : BaseT(si, parent_)
 {
 }
-bool QuotientChart::IsExhausted() const
+bool QuotientChart::IsSaturated() const
 {
   return false;
 }

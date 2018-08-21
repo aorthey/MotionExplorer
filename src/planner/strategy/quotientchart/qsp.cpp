@@ -45,7 +45,6 @@ void QSP::setup()
   }
 }
 
-
 QSP::~QSP()
 {
 }
@@ -54,8 +53,8 @@ void QSP::Grow(double t){
   ob::State *state = xstates[0];
   iterations_++;
   bool isFeasible = Sample(state);
-
   number_of_samples++;
+
   // Three cases:
   // state is infeasible => state X P_k is infeasible
   // state is sufficient feasible => state X X_{k+1} is feasible
@@ -78,6 +77,7 @@ void QSP::Grow(double t){
         G[m].innerApproximationDistance = d;
       }
     }
+    addMilestone(state);
   }else{
     number_of_infeasible_samples++;
   }
@@ -104,6 +104,7 @@ bool QSP::Sample(ob::State *q_random)
   //}
   return M1->isValid(q_random);
 }
+
 using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
 void QSP::getPlannerData(ob::PlannerData &data) const
 {

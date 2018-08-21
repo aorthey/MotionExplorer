@@ -29,11 +29,11 @@ namespace ompl
 
         void AddSibling(QuotientChart *sibling_);
 
-        //IsExhausted(): chart cannot be grown anymore
+        //IsSaturated(): chart cannot be grown anymore
         //e.g. the sampling sequence hit some upper density limit,
         //or the structure has not been changed for at least 1/M new samples
         //(see visibilityPRM)
-        bool IsExhausted() const; 
+        bool IsSaturated() const; 
 
         //@brief: assume that there are K different solution paths on the graph. 
         //Extract the k-th solution path, plus all surrounding vertices.

@@ -528,3 +528,5 @@ also it is easy compared to manip)
 by side? (seems like a 1-weekend project)
 [ ] make something work on 3D xshape
 [ ] evaluate performance wrt RRT, maybe all OMPL planners
+
+--- do not add samples if they are not connectable to the start component
