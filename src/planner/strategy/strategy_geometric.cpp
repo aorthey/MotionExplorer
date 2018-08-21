@@ -10,6 +10,7 @@
 #include "planner/strategy/quotientchart/quotient_chart.h"
 #include "planner/strategy/quotientchart/qmp_sufficient.h"
 #include "planner/strategy/quotientchart/qcp.h"
+#include "planner/strategy/quotientchart/qsp.h"
 #include "planner/strategy/ompl/rrt_unidirectional.h"
 #include "planner/strategy/ompl/rrt_unidirectional_cover.h"
 #include "planner/strategy/ompl/rrt_bidirectional.h"
@@ -149,6 +150,10 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   }else if(algorithm=="hierarchy:qcp"){
     typedef og::MultiChart<og::QCP> MultiChart;
     planner = std::make_shared<MultiChart>(si_vec, "QCP");
+    static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
+  }else if(algorithm=="hierarchy:qsp"){
+    typedef og::MultiChart<og::QSP> MultiChart;
+    planner = std::make_shared<MultiChart>(si_vec, "QSP");
     static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="hierarchy:qmp_sufficient"){
     typedef og::MultiChart<og::QMPSufficient> MultiChart;

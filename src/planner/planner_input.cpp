@@ -105,8 +105,11 @@ bool PlannerInput::Load(TiXmlElement *node)
   Config dq; dq.resize(q_init.size()); dq.setZero();
   dq_init = GetSubNodeAttributeDefault<Config>(node, "dqinit", "config", dq);
   dq_goal = GetSubNodeAttributeDefault<Config>(node, "dqgoal", "config", dq);
-  se3min = GetSubNodeAttribute<Config>(node, "se3min", "config");
-  se3max = GetSubNodeAttribute<Config>(node, "se3max", "config");
+
+  se3min.resize(6); se3min.setZero();
+  se3max.resize(6); se3max.setZero();
+  se3min = GetSubNodeAttributeDefault<Config>(node, "se3min", "config", se3min);
+  se3max = GetSubNodeAttributeDefault<Config>(node, "se3max", "config", se3max);
 
   TiXmlElement* node_hierarchy = FindSubNode(node, "hierarchy");
   uint level = 0;

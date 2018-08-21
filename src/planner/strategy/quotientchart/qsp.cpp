@@ -1,4 +1,4 @@
-#include "qmp_sufficient.h"
+#include "qsp.h"
 #include "elements/plannerdata_vertex_annotated.h"
 
 #include <ompl/datastructures/PDF.h>
@@ -14,10 +14,10 @@ using namespace og;
 using namespace ob;
 #define foreach BOOST_FOREACH
 
-QMPSufficient::QMPSufficient(const ob::SpaceInformationPtr &si, QuotientChart *parent_ ):
+QSP::QSP(const ob::SpaceInformationPtr &si, QuotientChart *parent_ ):
   BaseT(si, parent_)
 {
-  setName("QMPSufficient"+std::to_string(id));
+  setName("QSP"+std::to_string(id));
   number_of_samples = 0;
   number_of_infeasible_samples = 0;
   number_of_sufficient_samples = 0;
@@ -31,7 +31,7 @@ QMPSufficient::QMPSufficient(const ob::SpaceInformationPtr &si, QuotientChart *p
   }
 
 }
-void QMPSufficient::setup()
+void QSP::setup()
 {
   BaseT::setup();
   if(setup_){
@@ -47,11 +47,11 @@ void QMPSufficient::setup()
 }
 
 
-QMPSufficient::~QMPSufficient()
+QSP::~QSP()
 {
 }
 
-void QMPSufficient::Grow(double t){
+void QSP::Grow(double t){
   ob::State *state = xstates[0];
   iterations_++;
   bool isFeasible = Sample(state);
@@ -84,7 +84,7 @@ void QMPSufficient::Grow(double t){
   }
 }
 
-bool QMPSufficient::Sample(ob::State *q_random)
+bool QSP::Sample(ob::State *q_random)
 {
   M1_sampler->sampleUniform(q_random);
   //totalNumberOfSamples++;
@@ -106,7 +106,7 @@ bool QMPSufficient::Sample(ob::State *q_random)
   return M1->isValid(q_random);
 }
 using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
-void QMPSufficient::getPlannerData(ob::PlannerData &data) const
+void QSP::getPlannerData(ob::PlannerData &data) const
 {
 
   //###########################################################################
