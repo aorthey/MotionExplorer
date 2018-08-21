@@ -11,9 +11,9 @@
 #include "planner/strategy/quotientchart/qmp_sufficient.h"
 #include "planner/strategy/quotientchart/qcp.h"
 #include "planner/strategy/quotientchart/qsp.h"
-#include "planner/strategy/ompl/rrt_unidirectional.h"
-#include "planner/strategy/ompl/rrt_unidirectional_cover.h"
-#include "planner/strategy/ompl/rrt_bidirectional.h"
+#include "planner/strategy/ompl_remastered/rrt_unidirectional.h"
+#include "planner/strategy/ompl_remastered/rrt_unidirectional_cover.h"
+#include "planner/strategy/ompl_remastered/rrt_bidirectional.h"
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>

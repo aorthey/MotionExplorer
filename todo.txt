@@ -508,15 +508,23 @@ Simulator
 move to filenames, and execute script)
 [x] do the same, but this time with slabs instead of slices
 
-[ ] finish sufficient algorithm
-  [x] how to automate the distance computation for general robots
-  [ ] start from q_init, then expand outwards
-  [ ] outsource graph/refactor -> make templated version such that every class can
-  write their own vertex(edge-)internalstate classes
-
 once algorithm is done:
   [ ] visualize algorithm expansion by a movie through cspace (run algorithm until
   termination, save roadmap, then each frame is adding one more vertex and/or
   edge)
   [ ] solve 3D rigid body example (if that works, we can start generalizing,
 also it is easy compared to manip)
+
+
+
+[ ] finish sufficient algorithm
+  [x] how to automate the distance computation for general robots
+  [ ] start from q_init, then expand outwards
+  [ ] outsource graph/refactor -> make templated version such that every class can
+  write their own vertex(edge-)internalstate classes
+
+[ ] make something work on 2D rigid body on a thread
+[ ] make movie of expansion on 2D cspace, plus 2D qspace plus 2D workspace side
+by side? (seems like a 1-weekend project)
+[ ] make something work on 3D xshape
+[ ] evaluate performance wrt RRT, maybe all OMPL planners

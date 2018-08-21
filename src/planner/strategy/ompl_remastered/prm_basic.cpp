@@ -1,6 +1,6 @@
 #include "prm_basic.h"
 #include "common.h"
-#include "GoalVisitor.hpp"
+#include "planner/strategy/GoalVisitor.hpp"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include "elements/plannerdata_vertex_annotated.h"
 

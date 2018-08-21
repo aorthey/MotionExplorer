@@ -25,7 +25,6 @@ QSP::QSP(const ob::SpaceInformationPtr &si, QuotientChart *parent_ ):
   checker = dynamic_pointer_cast<OMPLValidityCheckerNecessarySufficient>(si->getStateValidityChecker());
   if(!checker){
     checkSufficiency = false;
-    //OMPL_WARN("Sufficient checker not set!");
   }else{
     checkSufficiency = true;
   }
