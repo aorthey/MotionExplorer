@@ -530,3 +530,7 @@ by side? (seems like a 1-weekend project)
 [ ] evaluate performance wrt RRT, maybe all OMPL planners
 
 --- do not add samples if they are not connectable to the start component
+[ ] some neighborhoods are clearly intersecting obstacles. Why?
+
+
+[ ] start/goal not copied when local chart is created!

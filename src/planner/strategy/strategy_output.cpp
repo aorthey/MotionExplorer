@@ -144,7 +144,6 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
       //std::cout << "level " << path << " : " << pdi->numVertices() << " | " << pdi->numEdges() << std::endl;
       while(!hierarchy->NodeExists(path)){
         std::vector<int> ppath(path.begin(), path.end()-1);
-        std::cout << "NEW node: " << path << "->" << ppath << std::endl;
         hierarchy->AddNode( roadmap_k, ppath);
       }
       //uint robot_idx = cspace_levels.at(level)->GetRobotIndex();

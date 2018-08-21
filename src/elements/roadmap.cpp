@@ -22,7 +22,6 @@ Roadmap::Roadmap(const ob::PlannerDataPtr pd_, CSpaceOMPL *cspace_, CSpaceOMPL *
   pd(pd_), cspace(cspace_), quotient_space(quotient_space_)
 {
   std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
-  std::cout << "start index: " << pd->getStartIndex(0) << " goal: " << pd->getGoalIndex(0) << std::endl;
   path_ompl = GetShortestPath();
 }
 
@@ -134,6 +133,7 @@ void Roadmap::DrawPlannerData(GUIState &state)
         }
       }
       if(state("draw_roadmap_volume")){
+        //std::cout << "roadmap volume: " << d << std::endl;
         glTranslate(q);
         if(!v->IsInfeasible()) setColor(cNeighborhoodVolume);
         else setColor(cNeighborhoodVolumeInfeasible);

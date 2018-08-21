@@ -75,6 +75,7 @@ void QSP::Grow(double t){
         double d = checker->Distance(state);
         G[m].isSufficient = false;
         G[m].innerApproximationDistance = d;
+        pdf_necessary_vertices.add(m, d);
       }
     }
     addMilestone(state);
@@ -85,25 +86,38 @@ void QSP::Grow(double t){
 
 bool QSP::Sample(ob::State *q_random)
 {
-  M1_sampler->sampleUniform(q_random);
-  //totalNumberOfSamples++;
-  //if(parent == nullptr){
-  //  M1_sampler->sampleUniform(q_random);
-  //}else{
-  //  //Adjusted sampling function: Sampling in G0 x C1
-  //  ob::SpaceInformationPtr M0 = parent->getSpaceInformation();
-  //  base::State *s_C1 = C1->allocState();
-  //  base::State *s_M0 = M0->allocState();
+  totalNumberOfSamples++;
+  if(parent == nullptr){
+    return M1_valid_sampler->sample(q_random);
+  }else{
+    ob::SpaceInformationPtr M0 = parent->getSpaceInformation();
+    base::State *s_C1 = C1->allocState();
+    base::State *s_M0 = M0->allocState();
 
-  //  C1_sampler->sampleUniform(s_C1);
-  //  parent->SampleGraph(s_M0);
-  //  mergeStates(s_M0, s_C1, q_random);
+    C1_sampler->sampleUniform(s_C1);
+    parent->SampleGraph(s_M0);
+    mergeStates(s_M0, s_C1, q_random);
 
-  //  C1->freeState(s_C1);
-  //  M0->freeState(s_M0);
-  //}
-  return M1->isValid(q_random);
+    C1->freeState(s_C1);
+    M0->freeState(s_M0);
+
+    return M1->isValid(q_random);
+  }
 }
+
+bool QSP::SampleGraph(ob::State *q_random_graph)
+{
+  //q_random_graph is already allocated! 
+  if (pdf_necessary_vertices.empty()){
+    return false;
+  }
+  Vertex m = pdf_necessary_vertices.sample(rng_.uniform01());
+  q_random_graph = G[m].state;
+
+  M1_sampler->sampleUniformNear(q_random_graph, q_random_graph, G[m].innerApproximationDistance);
+  return true;
+}
+
 
 using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
 void QSP::getPlannerData(ob::PlannerData &data) const
@@ -122,9 +136,11 @@ void QSP::getPlannerData(ob::PlannerData &data) const
   }
 
   std::reverse(std::begin(path), std::end(path));
+  
   //###########################################################################
   //Get Data from this chart
   //###########################################################################
+  std::cout << "vertices: " << boost::num_vertices(G) << std::endl;
   foreach (const Vertex v, boost::vertices(G))
   {
     PlannerDataVertexAnnotated p(G[v].state);
@@ -142,15 +158,36 @@ void QSP::getPlannerData(ob::PlannerData &data) const
         p.SetFeasibility(FeasibilityType::FEASIBLE);
         p.SetOpenNeighborhoodDistance(G[v].innerApproximationDistance);
       }
+      std::cout << "volume: " << p.GetOpenNeighborhoodDistance() << std::endl;
     }
 
     if(G[v].start) data.addStartVertex(p);
     else if(G[v].goal) data.addGoalVertex(p);
     else data.addVertex(p);
   }
+
+  foreach (const Edge e, boost::edges(G))
+  {
+    const Vertex v1 = boost::source(e, G);
+    const Vertex v2 = boost::target(e, G);
+
+    PlannerDataVertexAnnotated *p1 = dynamic_cast<PlannerDataVertexAnnotated*>(&data.getVertex(v1));
+    PlannerDataVertexAnnotated *p2 = dynamic_cast<PlannerDataVertexAnnotated*>(&data.getVertex(v2));
+    data.addEdge(*p1,*p2);
+
+  }
   std::cout << "Samples: " << number_of_samples << " (" 
     << 100.0*(double)number_of_infeasible_samples/(double)number_of_samples << "\% infeasible | "
     << 100.0*(double)(number_of_samples-number_of_infeasible_samples)/(double)number_of_samples << "\% feasible | "
     << 100.0*(double)number_of_sufficient_samples/(double)number_of_samples << "\% sufficient)"
     << std::endl;
+
+  //###########################################################################
+  //recursively traverse other charts
+  //###########################################################################
+  for(uint i = 0; i < siblings.size(); i++){
+    siblings.at(i)->getPlannerData(data);
+  }
+  if(child!=nullptr) child->getPlannerData(data);
+
 }

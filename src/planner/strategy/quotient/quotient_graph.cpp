@@ -24,7 +24,7 @@ namespace ompl
   namespace magic
   {
     static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
-    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 5;
+    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 3;
   }
 }
 QuotientGraph::QuotientGraph(const ob::SpaceInformationPtr &si, Quotient *parent_)

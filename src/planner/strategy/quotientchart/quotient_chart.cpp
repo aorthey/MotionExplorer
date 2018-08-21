@@ -79,7 +79,7 @@ void QuotientChart::SetSubGraph( QuotientChart *sibling, uint k )
 
   enum CopyMode{ALL, CONNECTED_COMPONENT, SHORTEST_PATH, SHORTEST_PATH_LINEAR_HOMOTOPY};
 
-  CopyMode mode = SHORTEST_PATH;
+  CopyMode mode = ALL;
 
   std::map<Vertex, Vertex> GprimetoG;
   switch(mode){
@@ -194,7 +194,7 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
   //###########################################################################
   //Get Data from this chart
   //###########################################################################
-  std::cout << "vertices " << GetNumberOfVertices() << " edges " << GetNumberOfEdges() << std::endl;
+  std::cout << "[QuotientChart] vertices " << GetNumberOfVertices() << " edges " << GetNumberOfEdges() << std::endl;
 
   //if the chart is local, we need to clone new states such that we have
   //duplicate vertices (sometimes charts are overlapping). 

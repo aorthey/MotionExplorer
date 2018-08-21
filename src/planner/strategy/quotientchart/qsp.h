@@ -23,9 +23,11 @@ namespace ompl
         void Grow(double t) override;
         bool Sample(ob::State *q_random) override;
         void getPlannerData(ob::PlannerData &data) const;
+        bool SampleGraph(ob::State *q_random_graph) override;
         void setup() override;
 
       private:
+        PDF<Vertex> pdf_necessary_vertices;
         bool checkSufficiency{false};
         OMPLValidityCheckerNecessarySufficientPtr checker;
         uint number_of_samples;
