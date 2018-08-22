@@ -22,13 +22,15 @@ namespace ompl
         virtual ~QSP() override;
         void Grow(double t) override;
         bool Sample(ob::State *q_random) override;
-        void getPlannerData(ob::PlannerData &data) const;
+        //void getPlannerData(ob::PlannerData &data) const;
+        virtual PlannerDataVertexAnnotated getPlannerDataVertex(ob::State *state, Vertex v) const override;
         bool SampleGraph(ob::State *q_random_graph) override;
         void setup() override;
 
       private:
         PDF<Vertex> pdf_necessary_vertices;
         bool checkSufficiency{false};
+        void CheckVertexSufficiency(Vertex v);
         OMPLValidityCheckerNecessarySufficientPtr checker;
         uint number_of_samples;
         uint number_of_infeasible_samples;

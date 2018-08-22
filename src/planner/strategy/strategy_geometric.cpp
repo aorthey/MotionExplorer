@@ -131,34 +131,42 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:psbl") planner = std::make_shared<og::pSBL>(si);
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
+
   else if(algorithm=="hierarchy:qmp_connect"){
     typedef og::MultiQuotient<og::QMPConnect> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+
   }else if(algorithm=="hierarchy:qmp_connect_rrt"){
     typedef og::MultiQuotient<og::QMPConnect, og::RRTBidirectional> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect+RRT");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+
   }else if(algorithm=="hierarchy:qmp"){
     typedef og::MultiQuotient<og::QMP> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMP");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+
   }else if(algorithm=="hierarchy:qmp_rrt"){
     typedef og::MultiQuotient<og::QMP, og::RRTBidirectional> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMP+RRT");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+
   }else if(algorithm=="hierarchy:qcp"){
     typedef og::MultiChart<og::QCP> MultiChart;
     planner = std::make_shared<MultiChart>(si_vec, "QCP");
     static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
+
   }else if(algorithm=="hierarchy:qsp"){
     typedef og::MultiChart<og::QSP> MultiChart;
     planner = std::make_shared<MultiChart>(si_vec, "QSP");
     static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
+
   }else if(algorithm=="hierarchy:qmp_sufficient"){
     typedef og::MultiChart<og::QMPSufficient> MultiChart;
     planner = std::make_shared<MultiChart>(si_vec, "QMPSufficient");
     static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
+
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);

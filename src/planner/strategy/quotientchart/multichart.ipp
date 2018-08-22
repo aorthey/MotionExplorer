@@ -87,8 +87,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
 
   std::priority_queue<og::QuotientChart*, std::vector<og::QuotientChart*>, decltype(cmp)> Q(cmp);
 
-  //ompl::time::point t_start = ompl::time::now();
-
   base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
                                  { return ptc || found_path_on_last_level || saturated_levels; });
 
@@ -115,7 +113,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
     Q.pop();
     jChart->Grow(T_GROW);
 
-
     if(current_node->IsSaturated()){
       //level is saturated, if there are no more charts to consider there is
       //nothing to be done
@@ -128,6 +125,7 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
         std::cout << std::string(80, '#') << std::endl;
 
         if(k == levels-1){
+          std::cout << "Last level reached. We are done." << std::endl;
           found_path_on_last_level = true;
           Q.push(jChart);
         }else{
@@ -143,9 +141,11 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
 
           og::QuotientChart *local = new T(si_vec.at(k), dynamic_cast<T*>(current_node->GetParent()));
           local->setProblemDefinition(pdef_vec.at(k));
+          local->SetSubGraph(current_node, current_node->GetNumberOfPaths()-1);
           local->SetLevel(k);
           local->SetHorizontalIndex(current_node->GetNumberOfSiblings()+1);
-          local->SetSubGraph(current_node, current_node->GetNumberOfPaths()-1);
+
+          current_node->AddSibling(local);
 
           //#####################################################################
           //Global Chart (contains the whole quotient pointed to by the local chart)
@@ -155,7 +155,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
           global->setup();
           global->SetLevel(k+1);
 
-          current_node->AddSibling(local);
           //DFS approach: forget about the current node, just take its sibling and
           //work on that pathway. We can backtrack later by going through the
           //parent/sibling pointers
@@ -167,10 +166,12 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
             Q.push(levels_to_be_added);
             levels_to_be_added = dynamic_cast<og::QuotientChart*>(levels_to_be_added->GetParent());
           }
+
           //Qleaves.push_back(global);
           //note that Q contains only the latest added node, while Qleaves
           //contains all. 
           current_node = global;
+
         }
       }else{
         Q.push(jChart);

@@ -515,8 +515,6 @@ once algorithm is done:
   [ ] solve 3D rigid body example (if that works, we can start generalizing,
 also it is easy compared to manip)
 
-
-
 [ ] finish sufficient algorithm
   [x] how to automate the distance computation for general robots
   [ ] start from q_init, then expand outwards
@@ -529,8 +527,6 @@ by side? (seems like a 1-weekend project)
 [ ] make something work on 3D xshape
 [ ] evaluate performance wrt RRT, maybe all OMPL planners
 
---- do not add samples if they are not connectable to the start component
-[ ] some neighborhoods are clearly intersecting obstacles. Why?
-
-
+[ ] some neighborhoods are clearly intersecting obstacles. (The planar Lshape case!)
 [ ] start/goal not copied when local chart is created!
+[x] copy of graph does not work correctly

@@ -1,4 +1,5 @@
 #include "quotient_graph.h"
+
 #include "common.h"
 #include "planner/strategy/GoalVisitor.hpp"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
@@ -182,8 +183,17 @@ void QuotientGraph::ConnectVertexToNeighbors(Vertex m)
   nn_->add(m);
 }
 
-const og::QuotientGraph::Graph& QuotientGraph::GetGraph() const{
+const og::QuotientGraph::Graph& QuotientGraph::GetGraph() const
+{
   return G;
+}
+const og::QuotientGraph::RoadmapNeighborsPtr& QuotientGraph::GetRoadmapNeighborsPtr() const
+{
+  return nn_;
+}
+const og::QuotientGraph::ConnectionStrategy& QuotientGraph::GetConnectionStrategy() const
+{
+  return connectionStrategy_;
 }
 
 QuotientGraph::Vertex QuotientGraph::CreateNewVertex(ob::State *state)

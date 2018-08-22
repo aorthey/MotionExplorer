@@ -132,7 +132,11 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
       hierarchy->AddNode( roadmap_k, path);
       if(current->children.size()>0)
       {
-        std::cout << "ERROR: tried to add unannotated vertices with multiple layers." << std::endl;
+        if(pdi->numVertices()>0){
+          std::cout << "ERROR: tried to add " << pdi->numVertices() << " unannotated vertices with a hierarchy of multiple layers." << std::endl;
+        }else{
+          OMPL_ERROR("ERROR: tried to create roadmap with zero vertices.");
+        }
         exit(0);
       }
       std::cout << "added " << pdi->numVertices() << " unannotated vertices." << std::endl;

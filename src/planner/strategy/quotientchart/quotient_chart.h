@@ -1,5 +1,6 @@
 #pragma once
 #include "planner/strategy/quotient/quotient_graph.h"
+#include "elements/plannerdata_vertex_annotated.h"
 
 namespace ob = ompl::base;
 
@@ -42,7 +43,11 @@ namespace ompl
         //This is left for subclasses to implement.
         void SetSubGraph( QuotientChart *sibling, uint k );
         virtual void getPlannerData(ob::PlannerData &data) const override;
+        //virtual void setPlannerDataVertexProperties(PlannerDataVertexAnnotated &p);
+        virtual PlannerDataVertexAnnotated getPlannerDataVertex(ob::State *state, Vertex v) const;
 
+      private:
+        PlannerDataVertexAnnotated getAnnotatedVertex(Vertex vertex, std::vector<int> &path, std::map<const Vertex, ob::State*> &vertexToStates) const;
       protected:
 
         double importance{0};//how important is the current chart for solving the problem
