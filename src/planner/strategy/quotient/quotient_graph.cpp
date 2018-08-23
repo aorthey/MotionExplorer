@@ -170,7 +170,6 @@ QuotientGraph::Vertex QuotientGraph::addMilestone(ob::State *state)
 void QuotientGraph::ConnectVertexToNeighbors(Vertex m)
 {
   const std::vector<Vertex> &neighbors = connectionStrategy_(m);
-  std::cout << "number of neighbors: " << neighbors.size() << std::endl;
 
   foreach (Vertex n, neighbors)
   {
