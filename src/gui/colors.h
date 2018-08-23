@@ -14,6 +14,7 @@ const GLColor darkblue(0,0,0.5,1);
 
 const GLColor yellow(1,1,0,0.5);
 const GLColor magenta(1,0,1,0.5);
+const GLColor lightmagenta(0.9,0.3,0.9,0.3);
 const GLColor darkmagenta(0.7,0,0.7,0.5);
 const GLColor cyan(0,1,1,0.5);
 

@@ -141,11 +141,9 @@ namespace ompl
         void getPlannerData(ob::PlannerData &data) const override;
 
         virtual void setup() override;
-
         virtual void clear() override;
         void clearQuery();
         virtual void ClearVertices();
-
 
         virtual void uniteComponents(Vertex m1, Vertex m2);
         bool sameComponent(Vertex m1, Vertex m2);

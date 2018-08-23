@@ -52,23 +52,23 @@ void RRTUnidirectionalCover::Sample(RRTUnidirectional::Configuration *q)
         goal->sampleGoal(q->state);
         found = true;
       }else{
-        M1_sampler->sampleUniform(q->state);
+        Q1_sampler->sampleUniform(q->state);
       }
     }else{
       if(!hasSolution && rng_.uniform01() < goalBias_){
         goal->sampleGoal(q->state);
         found = true;
       }else{
-        ob::SpaceInformationPtr M0 = parent->getSpaceInformation();
-        base::State *s_C1 = C1->allocState();
-        base::State *s_M0 = M0->allocState();
+        ob::SpaceInformationPtr Q0 = parent->getSpaceInformation();
+        base::State *s_X1 = X1->allocState();
+        base::State *s_Q0 = Q0->allocState();
 
-        C1_sampler->sampleUniform(s_C1);
-        parent->SampleGraph(s_M0);
-        mergeStates(s_M0, s_C1, q->state);
+        X1_sampler->sampleUniform(s_X1);
+        parent->SampleGraph(s_Q0);
+        mergeStates(s_Q0, s_X1, q->state);
 
-        C1->freeState(s_C1);
-        M0->freeState(s_M0);
+        X1->freeState(s_X1);
+        Q0->freeState(s_Q0);
       }
     }
     if(!IsInsideCover(q)){
@@ -179,12 +179,12 @@ bool RRTUnidirectionalCover::SampleGraph(ob::State *q_random_graph)
 
   const ob::State *q_from = q->state;
   const ob::State *q_to = q->parent->state;
-  M1->getStateSpace()->interpolate(q_from, q_to, t, q_random_graph);
+  Q1->getStateSpace()->interpolate(q_from, q_to, t, q_random_graph);
 
 
   double d = q->openset->GetRadius();
 
-  M1_sampler->sampleUniformNear(q_random_graph, q_random_graph, d);
+  Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, d);
   return true;
 }
 

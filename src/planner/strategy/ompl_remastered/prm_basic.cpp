@@ -483,7 +483,7 @@ bool PRMBasic::Connect(const Vertex a, const Vertex b){
 //  uint j = 0;
 //  for (uint i = 0; i < steps; ++i)
 //  {
-//    M1_sampler->sampleUniform(states[j]);
+//    Q1_sampler->sampleUniform(states[j]);
 //    lastValid.first = states[j];
 //    if (si_->checkMotion(prev, states[j], lastValid) || lastValid.second > std::numeric_limits<double>::epsilon())
 //      prev = states[j++];
@@ -500,10 +500,10 @@ void PRMBasic::RandomWalk(const Vertex &v)
   uint ctr = 0;
   for (uint i = 0; i < magic::MAX_RANDOM_BOUNCE_STEPS; ++i)
   {
-    //s_next = SAMPLE(M1)
+    //s_next = SAMPLE(Q1)
 
     ob::State *s_next = xstates[ctr];
-    M1_sampler->sampleUniform(s_next);
+    Q1_sampler->sampleUniform(s_next);
 
     std::pair<ob::State *, double> lastValid;
     lastValid.first = s_next;

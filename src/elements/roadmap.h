@@ -38,6 +38,7 @@ class Roadmap{
     GLDraw::GLColor cVertexComponentGoal{cyan}; //goal component vertex
     GLDraw::GLColor cNeighborhoodVolume{lightgreen};
     GLDraw::GLColor cNeighborhoodVolumeInfeasible{lightred}; 
+    GLDraw::GLColor cNeighborhoodVolumeSufficient{lightmagenta}; 
     double sizeVertex{8};
     double widthEdge{5};
     double widthPath{15};

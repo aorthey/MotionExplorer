@@ -24,7 +24,7 @@ namespace ompl
         ob::PathPtr GetShortestPathOffsetVertices( const ob::State *qa, const ob::State *qb, 
           const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb);
 
-        ob::PathPtr InterpolateM1GraphConstraint( const Vertex a, const Vertex b) const;
+        ob::PathPtr InterpolateQ1GraphConstraint( const Vertex a, const Vertex b) const;
 
         void setup() override;
         virtual void clear() override;

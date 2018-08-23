@@ -86,24 +86,24 @@ void QMPSufficient::Grow(double t){
 
 bool QMPSufficient::Sample(ob::State *q_random)
 {
-  M1_sampler->sampleUniform(q_random);
+  Q1_sampler->sampleUniform(q_random);
   //totalNumberOfSamples++;
   //if(parent == nullptr){
-  //  M1_sampler->sampleUniform(q_random);
+  //  Q1_sampler->sampleUniform(q_random);
   //}else{
-  //  //Adjusted sampling function: Sampling in G0 x C1
-  //  ob::SpaceInformationPtr M0 = parent->getSpaceInformation();
-  //  base::State *s_C1 = C1->allocState();
-  //  base::State *s_M0 = M0->allocState();
+  //  //Adjusted sampling function: Sampling in G0 x X1
+  //  ob::SpaceInformationPtr Q0 = parent->getSpaceInformation();
+  //  base::State *s_X1 = X1->allocState();
+  //  base::State *s_Q0 = Q0->allocState();
 
-  //  C1_sampler->sampleUniform(s_C1);
-  //  parent->SampleGraph(s_M0);
-  //  mergeStates(s_M0, s_C1, q_random);
+  //  X1_sampler->sampleUniform(s_X1);
+  //  parent->SampleGraph(s_Q0);
+  //  mergeStates(s_Q0, s_X1, q_random);
 
-  //  C1->freeState(s_C1);
-  //  M0->freeState(s_M0);
+  //  X1->freeState(s_X1);
+  //  Q0->freeState(s_Q0);
   //}
-  return M1->isValid(q_random);
+  return Q1->isValid(q_random);
 }
 using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
 void QMPSufficient::getPlannerData(ob::PlannerData &data) const

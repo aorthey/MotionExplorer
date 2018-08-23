@@ -7,27 +7,27 @@ namespace ob = ompl::base;
 //  Quotient contains a single Quotient Space Decomposition which is nested in a chain of
 //  quotient spaces. This single decomposition can be visualized as
 //
-// [    ][ M0 ]
-// [ M1 ][____]
-// [    ][ C1 ]
+// [    ][ Q0 ]
+// [ Q1 ][____]
+// [    ][ X1 ]
 // [    ][    ]
 //
-//  whereby M1 is the configuration space, C1 is a designated subspace of M1, and M0 =
-//  M1/C1 is the resulting quotient space. Here we assume that M1 and M0 have
-//  been given, and we compute the inverse of the quotient map, i.e. C1 = M1/M0. 
+//  whereby Q1 is the configuration space, X1 is a designated subspace of Q1, and Q0 =
+//  Q1/X1 is the resulting quotient space. Here we assume that Q1 and Q0 have
+//  been given, and we compute the inverse of the quotient map, i.e. X1 = Q1/Q0. 
 //
 //Cases we can handle:
 // ---- non-compound:
-// (1) M1 Rn       , M0 Rm       , 0<m<n   => C1 = R(n-m)
+// (1) Q1 Rn       , Q0 Rm       , 0<m<n   => X1 = R(n-m)
 // ---- compound:
-// (2) M1 SE2      , M0 R2                 => C1 = SO2
-// (3) M1 SE3      , M0 R3                 => C1 = SO3
-// (4) M1 SE3xRn   , M0 SE3                => C1 = Rn
-// (5) M1 SE3xRn   , M0 SE3xRm   , 0<m<n   => C1 = R(n-m)
+// (2) Q1 SE2      , Q0 R2                 => X1 = SO2
+// (3) Q1 SE3      , Q0 R3                 => X1 = SO3
+// (4) Q1 SE3xRn   , Q0 SE3                => X1 = Rn
+// (5) Q1 SE3xRn   , Q0 SE3xRm   , 0<m<n   => X1 = R(n-m)
 //
 //TO be done (might be beneficial for rigid objects floating in space)
-///// M1 SE3      , M0 R3xSO2xSO2         =>C1 = SO2
-///// M1 R3xS1xS1 , M0 R3                 =>C1 = SO2xSO2
+///// Q1 SE3      , Q0 R3xSO2xSO2         =>X1 = SO2
+///// Q1 R3xS1xS1 , Q0 R3                 =>X1 = SO2xSO2
 namespace ompl
 {
   namespace geometric
@@ -56,9 +56,9 @@ namespace ompl
 
         friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::Quotient& qtnt);
 
-        const ob::SpaceInformationPtr &getC1() const;
-        bool SampleC1(ob::State *s);
-        void mergeStates(const ob::State *qM0, const ob::State *qC1, ob::State *qM1) const;
+        const ob::SpaceInformationPtr &getX1() const;
+        bool SampleX1(ob::State *s);
+        void mergeStates(const ob::State *qQ0, const ob::State *qX1, ob::State *qQ1) const;
 
         Quotient* GetParent() const;
         Quotient* GetChild() const;
@@ -75,21 +75,21 @@ namespace ompl
         enum QuotientSpaceType{ UNKNOWN, ATOMIC_RN, RN_RM, SE2_R2, SE3_R3, SE3RN_R3, SE3RN_SE3, SE3RN_SE3RM };
 
         QuotientSpaceType type;
-        uint M1_dimension;
-        uint M0_dimension;
-        uint C1_dimension;
+        uint Q1_dimension;
+        uint Q0_dimension;
+        uint X1_dimension;
 
-        const ob::StateSpacePtr ComputeQuotientSpace(const ob::StateSpacePtr M1, const ob::StateSpacePtr M0);
-        void ExtractC1Subspace( const ob::State* q, ob::State* qC1 ) const;
-        void ExtractM0Subspace( const ob::State* q, ob::State* qM0 ) const;
+        const ob::StateSpacePtr ComputeQuotientSpace(const ob::StateSpacePtr Q1, const ob::StateSpacePtr Q0);
+        void ExtractX1Subspace( const ob::State* q, ob::State* qX1 ) const;
+        void ExtractQ0Subspace( const ob::State* q, ob::State* qQ0 ) const;
 
-        ob::SpaceInformationPtr M1; //configuration space Mi = si_
-        ob::SpaceInformationPtr M0; //quotient space Mi-1 = Mi/Ci
-        ob::SpaceInformationPtr C1; //subspace Ci = Mi/Mi-1
+        ob::SpaceInformationPtr Q1; //configuration space Mi = si_
+        ob::SpaceInformationPtr Q0; //quotient space Mi-1 = Mi/Ci
+        ob::SpaceInformationPtr X1; //subspace Ci = Mi/Mi-1
 
-        ob::StateSamplerPtr C1_sampler;
-        ob::StateSamplerPtr M1_sampler;
-        ob::ValidStateSamplerPtr M1_valid_sampler;
+        ob::StateSamplerPtr X1_sampler;
+        ob::StateSamplerPtr Q1_sampler;
+        ob::ValidStateSamplerPtr Q1_valid_sampler;
 
         double graphLength{0.0};
         uint totalNumberOfSamples{0};

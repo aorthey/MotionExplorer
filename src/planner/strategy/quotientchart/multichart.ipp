@@ -233,24 +233,24 @@ void MultiChart<T>::getPlannerData(ob::PlannerData &data) const
     uint k = v.GetLevel();
 
     const ob::State *s_V = v.getState();
-    ob::State *s_M0 = si_vec.at(k)->cloneState(s_V);
+    ob::State *s_Q0 = si_vec.at(k)->cloneState(s_V);
 
     for(uint m = k+1; m < levels; m++){
       og::QuotientChart *Qm = quotientSpaces.at(m);
-      ob::State *s_C1 = Qm->getC1()->allocState();
-      ob::State *s_M1 = Qm->getSpaceInformation()->allocState();
-      if(Qm->getC1()->getStateSpace()->getType() == ob::STATE_SPACE_SO3) {
-        static_cast<ob::SO3StateSpace::StateType*>(s_C1)->setIdentity();
+      ob::State *s_X1 = Qm->getX1()->allocState();
+      ob::State *s_Q1 = Qm->getSpaceInformation()->allocState();
+      if(Qm->getX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO3) {
+        static_cast<ob::SO3StateSpace::StateType*>(s_X1)->setIdentity();
       }
-      if(Qm->getC1()->getStateSpace()->getType() == ob::STATE_SPACE_SO2) {
-        static_cast<ob::SO2StateSpace::StateType*>(s_C1)->setIdentity();
+      if(Qm->getX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO2) {
+        static_cast<ob::SO2StateSpace::StateType*>(s_X1)->setIdentity();
       }
-      Qm->mergeStates(s_M0, s_C1, s_M1);
-      quotientSpaces.at(m-1)->getSpaceInformation()->freeState(s_M0);
-      Qm->getC1()->freeState(s_C1);
-      s_M0 = s_M1;
+      Qm->mergeStates(s_Q0, s_X1, s_Q1);
+      quotientSpaces.at(m-1)->getSpaceInformation()->freeState(s_Q0);
+      Qm->getX1()->freeState(s_X1);
+      s_Q0 = s_Q1;
     }
-    v.setState(s_M0);
+    v.setState(s_Q0);
   }
 
 }

@@ -52,9 +52,11 @@ void QSP::CheckVertexSufficiency(Vertex v){
     number_of_sufficient_samples++;
     double d = checker->SufficientDistance(G[v].state);
     G[v].outerApproximationDistance = d;
+    G[v].open_neighborhood_distance = d;
   }else{
     double d = checker->Distance(G[v].state);
     G[v].innerApproximationDistance = d;
+    G[v].open_neighborhood_distance = d;
     pdf_necessary_vertices.add(v, d);
   }
 }
@@ -74,9 +76,9 @@ void QSP::Grow(double t){
   // state is sufficient feasible => state X X_{k+1} is feasible
   // state is feasible (but not sufficient) => nothing can be said
 
+  Vertex m = CreateNewVertex(state);
   if(isFeasible)
   {
-    Vertex m = CreateNewVertex(state);
     G[m].isFeasible = true;
     if(checkSufficiency){
       CheckVertexSufficiency(m);
@@ -90,32 +92,33 @@ void QSP::Grow(double t){
 bool QSP::Sample(ob::State *q_random)
 {
   if(parent == nullptr){
-    M1_sampler->sampleUniform(q_random);
+    Q1_sampler->sampleUniform(q_random);
   }else{
-    ob::SpaceInformationPtr M0 = parent->getSpaceInformation();
-    base::State *s_C1 = C1->allocState();
-    base::State *s_M0 = M0->allocState();
+    ob::SpaceInformationPtr Q0 = parent->getSpaceInformation();
+    base::State *s_X1 = X1->allocState();
+    base::State *s_Q0 = Q0->allocState();
 
-    C1_sampler->sampleUniform(s_C1);
-    parent->SampleGraph(s_M0);
-    mergeStates(s_M0, s_C1, q_random);
+    X1_sampler->sampleUniform(s_X1);
+    parent->SampleGraph(s_Q0);
+    mergeStates(s_Q0, s_X1, q_random);
 
-    C1->freeState(s_C1);
-    M0->freeState(s_M0);
+    X1->freeState(s_X1);
+    Q0->freeState(s_Q0);
   }
-  return M1->isValid(q_random);
+  return Q1->isValid(q_random);
 }
 
 bool QSP::SampleGraph(ob::State *q_random_graph)
 {
   //q_random_graph is already allocated! 
   if (pdf_necessary_vertices.empty()){
+    std::cout << "ERROR: no necessary vertices." << std::endl;
     return false;
   }
   Vertex m = pdf_necessary_vertices.sample(rng_.uniform01());
-  q_random_graph = G[m].state;
+  q_random_graph = si_->cloneState(G[m].state);
 
-  M1_sampler->sampleUniformNear(q_random_graph, q_random_graph, G[m].innerApproximationDistance);
+  Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, G[m].innerApproximationDistance);
   return true;
 }
 
@@ -125,6 +128,7 @@ PlannerDataVertexAnnotated QSP::getPlannerDataVertex(ob::State *state, Vertex v)
   PlannerDataVertexAnnotated p(state);
   if(!G[v].isFeasible){
     p.SetFeasibility(FeasibilityType::INFEASIBLE);
+    p.SetInfeasible();
   }else{
     if(G[v].isSufficient){
       p.SetFeasibility(FeasibilityType::SUFFICIENT_FEASIBLE);

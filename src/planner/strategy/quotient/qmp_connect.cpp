@@ -87,32 +87,32 @@ bool QMPConnect::Sample(ob::State *q_random)
 {
   totalNumberOfSamples++;
   if(parent == nullptr){
-    //return M1_valid_sampler->sample(q_random);
+    //return Q1_valid_sampler->sample(q_random);
     if(!hasSolution && rng_.uniform01() < goalBias_){
       q_random = si_->cloneState(G[goalM_.at(0)].state);//stateProperty_[goalM_.at(0)]);
       //goal->sampleGoal(q_random);
     }else{
-      M1_valid_sampler->sample(q_random);
+      Q1_valid_sampler->sample(q_random);
     }
   }else{
-    //Adjusted sampling function: Sampling in G0 x C1
+    //Adjusted sampling function: Sampling in G0 x X1
     if(!hasSolution && rng_.uniform01() < goalBias_){
       //goal->sampleGoal(q_random);
       q_random = si_->cloneState(G[goalM_.at(0)].state);//stateProperty_[goalM_.at(0)]);
     }else{
-      ob::SpaceInformationPtr M0 = parent->getSpaceInformation();
-      base::State *s_C1 = C1->allocState();
-      base::State *s_M0 = M0->allocState();
+      ob::SpaceInformationPtr Q0 = parent->getSpaceInformation();
+      base::State *s_X1 = X1->allocState();
+      base::State *s_Q0 = Q0->allocState();
 
-      C1_sampler->sampleUniform(s_C1);
-      parent->SampleGraph(s_M0);
-      mergeStates(s_M0, s_C1, q_random);
+      X1_sampler->sampleUniform(s_X1);
+      parent->SampleGraph(s_Q0);
+      mergeStates(s_Q0, s_X1, q_random);
 
-      C1->freeState(s_C1);
-      M0->freeState(s_M0);
+      X1->freeState(s_X1);
+      Q0->freeState(s_Q0);
     }
   }
-  return M1->isValid(q_random);
+  return Q1->isValid(q_random);
 }
 
 // bool QMPConnect::SampleGraph(ob::State *q_random_graph)
@@ -127,10 +127,10 @@ bool QMPConnect::Sample(ob::State *q_random)
 //   const ob::State *from = G[v1].state;//G[v1].state;
 //   const ob::State *to = G[v2].state;//G[v2].state;
 
-//   M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
+//   Q1->getStateSpace()->interpolate(from, to, t, q_random_graph);
 
-//   if(epsilon>0) M1_sampler->sampleGaussian(q_random_graph, q_random_graph, epsilon);
-//   //if(epsilon>0) M1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
+//   if(epsilon>0) Q1_sampler->sampleGaussian(q_random_graph, q_random_graph, epsilon);
+//   //if(epsilon>0) Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
 
 //   lastSourceVertexSampled = v1;
 //   lastTargetVertexSampled = v2;
@@ -148,10 +148,10 @@ double QMPConnect::Distance(const Vertex a, const Vertex b) const
     og::QMPConnect *quotient_parent = dynamic_cast<og::QMPConnect*>(parent);
     if(!quotient_parent->isSampled) return si_->distance(G[a].state, G[b].state);
 
-    ob::PathPtr M1_path = InterpolateM1GraphConstraint(a, b);
+    ob::PathPtr Q1_path = InterpolateQ1GraphConstraint(a, b);
     double d = +dInf;
-    if(M1_path){
-      d = M1_path->length();
+    if(Q1_path){
+      d = Q1_path->length();
     }
     return d;
   }
@@ -164,39 +164,39 @@ bool QMPConnect::Connect(const Vertex a, const Vertex b){
   }else{
     og::QMPConnect *quotient_parent = static_cast<og::QMPConnect*>(parent);
 
-    ob::PathPtr sol = InterpolateM1GraphConstraint(a,b);
+    ob::PathPtr sol = InterpolateQ1GraphConstraint(a,b);
     if(!sol){
       return false;
     }
 
     og::PathGeometric path = static_cast<og::PathGeometric&>(*sol);
-    std::vector<ob::State *> spathM1 = path.getStates();
-    std::vector<Vertex> vpathM0 = quotient_parent->shortestVertexPath_;
+    std::vector<ob::State *> spathQ1 = path.getStates();
+    std::vector<Vertex> vpathQ0 = quotient_parent->shortestVertexPath_;
 
-    Vertex v_prevM1 = a;
-    ob::State *s_prevM1 = spathM1.at(0);
+    Vertex v_prevQ1 = a;
+    ob::State *s_prevQ1 = spathQ1.at(0);
 
-    for(uint k = 1; k < spathM1.size(); k++){
-      if(!si_->isValid(spathM1.at(k-1))) return false;
-      if(!si_->checkMotion(spathM1.at(k-1),spathM1.at(k))) return false;
+    for(uint k = 1; k < spathQ1.size(); k++){
+      if(!si_->isValid(spathQ1.at(k-1))) return false;
+      if(!si_->checkMotion(spathQ1.at(k-1),spathQ1.at(k))) return false;
 
-      Vertex v_nextM1;
-      if(k==spathM1.size()-1){
-        v_nextM1 = b;
+      Vertex v_nextQ1;
+      if(k==spathQ1.size()-1){
+        v_nextQ1 = b;
       }else{
-        v_nextM1 = CreateNewVertex(spathM1.at(k));
-        G[v_nextM1].associated_source = vpathM0.at(k);
-        G[v_nextM1].associated_target = vpathM0.at(k);
-        G[v_nextM1].associated_t = 0;
-        nn_->add(v_nextM1);
+        v_nextQ1 = CreateNewVertex(spathQ1.at(k));
+        G[v_nextQ1].associated_source = vpathQ0.at(k);
+        G[v_nextQ1].associated_target = vpathQ0.at(k);
+        G[v_nextQ1].associated_t = 0;
+        nn_->add(v_nextQ1);
         totalNumberOfSamples++;
       }
 
-      double dk = M1->distance(s_prevM1, spathM1.at(k));
-      boost::add_edge(v_prevM1, v_nextM1, EdgeInternalState(ob::Cost(dk)), G);
-      uniteComponents(v_prevM1, v_nextM1);
-      v_prevM1 = v_nextM1;
-      s_prevM1 = spathM1.at(k);
+      double dk = Q1->distance(s_prevQ1, spathQ1.at(k));
+      boost::add_edge(v_prevQ1, v_nextQ1, EdgeInternalState(ob::Cost(dk)), G);
+      uniteComponents(v_prevQ1, v_nextQ1);
+      v_prevQ1 = v_nextQ1;
+      s_prevQ1 = spathQ1.at(k);
     }
 
     return true;
@@ -205,39 +205,39 @@ bool QMPConnect::Connect(const Vertex a, const Vertex b){
 }
 
 
-//@brief qa,qb \in M1. vsa,vsb,vta,vtb are vertices on G0
-//the resulting path is an interpolation in M1, such that each point lies in the
+//@brief qa,qb \in Q1. vsa,vsb,vta,vtb are vertices on G0
+//the resulting path is an interpolation in Q1, such that each point lies in the
 //slice of the graph G0
 
-ob::PathPtr QMPConnect::InterpolateM1GraphConstraint( const Vertex a, const Vertex b) const
+ob::PathPtr QMPConnect::InterpolateQ1GraphConstraint( const Vertex a, const Vertex b) const
 {
   og::QMPConnect *quotient_parent = dynamic_cast<og::QMPConnect*>(parent);
   ob::State* sa = G[a].state;
   ob::State* sb = G[b].state;
 
-  ob::State* saC1 = C1->allocState();
-  ob::State* sbC1 = C1->allocState();
-  ExtractC1Subspace(sa, saC1);
-  ExtractC1Subspace(sb, sbC1);
+  ob::State* saX1 = X1->allocState();
+  ob::State* sbX1 = X1->allocState();
+  ExtractX1Subspace(sa, saX1);
+  ExtractX1Subspace(sb, sbX1);
 
-  ob::State* saM0 = M0->allocState();
-  ob::State* sbM0 = M0->allocState();
+  ob::State* saQ0 = Q0->allocState();
+  ob::State* sbQ0 = Q0->allocState();
 
-  ExtractM0Subspace(sa, saM0);
-  ExtractM0Subspace(sb, sbM0);
+  ExtractQ0Subspace(sa, saQ0);
+  ExtractQ0Subspace(sb, sbQ0);
 
-  const Vertex asM0 = G[a].associated_source;
-  const Vertex atM0 = G[a].associated_target;
+  const Vertex asQ0 = G[a].associated_source;
+  const Vertex atQ0 = G[a].associated_target;
 
-  const Vertex bsM0 = G[b].associated_source;
-  const Vertex btM0 = G[b].associated_target;
+  const Vertex bsQ0 = G[b].associated_source;
+  const Vertex btQ0 = G[b].associated_target;
 
-  //std::cout << "associated vertices: " << asM0 << "," << atM0 << "|" << bsM0 << "," << btM0 << "." << std::endl;
-  ob::PathPtr M0_path = quotient_parent->GetShortestPathOffsetVertices( saM0, sbM0, asM0, bsM0, atM0, btM0);
+  //std::cout << "associated vertices: " << asQ0 << "," << atQ0 << "|" << bsQ0 << "," << btQ0 << "." << std::endl;
+  ob::PathPtr Q0_path = quotient_parent->GetShortestPathOffsetVertices( saQ0, sbQ0, asQ0, bsQ0, atQ0, btQ0);
 
-  if(!M0_path) return nullptr;
+  if(!Q0_path) return nullptr;
 
-  double D = M0_path->length();
+  double D = Q0_path->length();
   if(D>=dInf){
     std::cout << D << std::endl;
     exit(0);
@@ -248,42 +248,42 @@ ob::PathPtr QMPConnect::InterpolateM1GraphConstraint( const Vertex a, const Vert
   //interpolate along shortestvertexpath_
   //###########################################################################
 
-  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*M0_path);
-  std::vector<ob::State *> M0_spath = gpath.getStates();
+  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*Q0_path);
+  std::vector<ob::State *> Q0_spath = gpath.getStates();
 
   //#########################################################################
-  // move along vertices of M0 and create new milestones on M1
+  // move along vertices of Q0 and create new milestones on Q1
   //#########################################################################
 
-  auto M1_path = std::make_shared<PathGeometric>(M1);
+  auto Q1_path = std::make_shared<PathGeometric>(Q1);
 
-  M1_path->append(sa);
+  Q1_path->append(sa);
 
   double d_graph_distance = 0.0;
 
-  for(uint i = 1; i < M0_spath.size(); i++)
+  for(uint i = 1; i < Q0_spath.size(); i++)
   {
-    ob::State *s_prevM0 = M0_spath.at(i-1);
-    ob::State *s_nextM0 = M0_spath.at(i);
+    ob::State *s_prevQ0 = Q0_spath.at(i-1);
+    ob::State *s_nextQ0 = Q0_spath.at(i);
 
-    d_graph_distance += M0->distance(s_prevM0, s_nextM0);
+    d_graph_distance += Q0->distance(s_prevQ0, s_nextQ0);
 
-    ob::State* s_nextC1 = C1->allocState();
-    C1->getStateSpace()->interpolate(saC1, sbC1, d_graph_distance/D,s_nextC1);
+    ob::State* s_nextX1 = X1->allocState();
+    X1->getStateSpace()->interpolate(saX1, sbX1, d_graph_distance/D,s_nextX1);
 
-    ob::State *s_nextM1 = M1->allocState();
-    mergeStates(s_nextM0, s_nextC1, s_nextM1);
-    C1->freeState(s_nextC1);
+    ob::State *s_nextQ1 = Q1->allocState();
+    mergeStates(s_nextQ0, s_nextX1, s_nextQ1);
+    X1->freeState(s_nextX1);
 
-    M1_path->append(s_nextM1);
+    Q1_path->append(s_nextQ1);
   }
 
-  M0->freeState(saM0);
-  M0->freeState(sbM0);
-  C1->freeState(saC1);
-  C1->freeState(sbC1);
+  Q0->freeState(saQ0);
+  Q0->freeState(sbQ0);
+  X1->freeState(saX1);
+  X1->freeState(sbX1);
 
-  return M1_path;
+  return Q1_path;
 }
 
 ob::PathPtr QMPConnect::GetShortestPathOffsetVertices(const ob::State *qa, const ob::State *qb, 
@@ -458,18 +458,18 @@ void QMPConnect::RandomWalk(const Vertex &v)
 
     ob::State *s_last = xstates[0];
 
-    base::State *s_last_C1 = C1->allocState();
-    base::State *s_last_M0 = M0->allocState();
+    base::State *s_last_X1 = X1->allocState();
+    base::State *s_last_Q0 = Q0->allocState();
 
-    C1_sampler->sampleUniform(s_last_C1);
-    parent->SampleGraph(s_last_M0);
+    X1_sampler->sampleUniform(s_last_X1);
+    parent->SampleGraph(s_last_Q0);
 
-    mergeStates(s_last_M0, s_last_C1, s_last);
+    mergeStates(s_last_Q0, s_last_X1, s_last);
 
-    M0->freeState(s_last_M0);
-    C1->freeState(s_last_C1);
+    Q0->freeState(s_last_Q0);
+    X1->freeState(s_last_X1);
 
-    if(!M1->isValid(s_last)) continue;
+    if(!Q1->isValid(s_last)) continue;
 
     //#########################################################################
     //compute interpolation between s_prev and s_last on G_{k-1}
@@ -481,16 +481,16 @@ void QMPConnect::RandomWalk(const Vertex &v)
 
     Vertex v_last = addMilestone(s_last);
 
-    ob::PathPtr solM1 = InterpolateM1GraphConstraint(v_first, v_last);
-    if(!solM1){
+    ob::PathPtr solQ1 = InterpolateQ1GraphConstraint(v_first, v_last);
+    if(!solQ1){
       std::cout << "no path towards sampled configuration" << std::endl;
       exit(0);
     }
 
-    og::PathGeometric pathM1 = static_cast<og::PathGeometric&>(*solM1);
+    og::PathGeometric pathQ1 = static_cast<og::PathGeometric&>(*solQ1);
 
-    std::vector<ob::State *> spathM1 = pathM1.getStates();
-    std::vector<Vertex> vpathM0 = quotient_parent->shortestVertexPath_;
+    std::vector<ob::State *> spathQ1 = pathQ1.getStates();
+    std::vector<Vertex> vpathQ0 = quotient_parent->shortestVertexPath_;
 
     if(DEBUG){
       std::cout << std::string(80, '-') << std::endl;
@@ -499,8 +499,8 @@ void QMPConnect::RandomWalk(const Vertex &v)
         " (" << G[v_first].associated_t << ")" 
         << std::endl;
 
-      for(uint k = 1; k < vpathM0.size(); k++){
-        std::cout << "edge " << vpathM0.at(k-1) << "<->"<< vpathM0.at(k) << std::endl;
+      for(uint k = 1; k < vpathQ0.size(); k++){
+        std::cout << "edge " << vpathQ0.at(k-1) << "<->"<< vpathQ0.at(k) << std::endl;
       }
 
       std::cout << "goal edge " << G[v_last].associated_source << "<->" 
@@ -512,102 +512,102 @@ void QMPConnect::RandomWalk(const Vertex &v)
     //move along sol/shortestvertexpath_ until infeasible or target reached.
     //#########################################################################
 
-    Vertex v_prevM1 = v_first;
+    Vertex v_prevQ1 = v_first;
 
-    for(uint k = 1; k < spathM1.size(); k++){
+    for(uint k = 1; k < spathQ1.size(); k++){
 
       std::pair<ob::State *, double> lastValid;
-      lastValid.first = spathM1.at(k);
+      lastValid.first = spathQ1.at(k);
 
-      if(DEBUG) std::cout << "edge " << vpathM0.at(k-1) << "<->"<< vpathM0.at(k) << std::endl;
+      if(DEBUG) std::cout << "edge " << vpathQ0.at(k-1) << "<->"<< vpathQ0.at(k) << std::endl;
 
-      if(!si_->isValid(spathM1.at(k-1))){
+      if(!si_->isValid(spathQ1.at(k-1))){
         break;
       }
-      if(!si_->checkMotion(spathM1.at(k-1),spathM1.at(k), lastValid)){
+      if(!si_->checkMotion(spathQ1.at(k-1),spathQ1.at(k), lastValid)){
         if(lastValid.second < std::numeric_limits<double>::epsilon()){
           break;
         }else{
-          Vertex v_nextM1 = CreateNewVertex(lastValid.first);
+          Vertex v_nextQ1 = CreateNewVertex(lastValid.first);
           if(DEBUG) std::cout << "progress: " <<lastValid.second << std::endl;
           if(k==1){
 
             if(DEBUG) std::cout << "first" << std::endl;
-            Vertex vM0 = G[v_first].associated_source;
+            Vertex vQ0 = G[v_first].associated_source;
 
             double T1 = G[v_first].associated_t;
             double T2 = lastValid.second;
 
-            if(vM0 == vpathM0.at(1)){
-              vM0 = G[v_first].associated_target;
-              G[v_nextM1].associated_t=T1-(T2*T1);
+            if(vQ0 == vpathQ0.at(1)){
+              vQ0 = G[v_first].associated_target;
+              G[v_nextQ1].associated_t=T1-(T2*T1);
             }else{
-              G[v_nextM1].associated_t=T1+T2*(1-T1);
+              G[v_nextQ1].associated_t=T1+T2*(1-T1);
             }
 
-            G[v_nextM1].associated_source=vM0;
-            G[v_nextM1].associated_target=vpathM0.at(k);
+            G[v_nextQ1].associated_source=vQ0;
+            G[v_nextQ1].associated_target=vpathQ0.at(k);
 
 
           }else{
-            if(k>=spathM1.size()-1){
-              //vpathM0(size-2) is the last graph vertex, vpathM0(size-1) is the
+            if(k>=spathQ1.size()-1){
+              //vpathQ0(size-2) is the last graph vertex, vpathQ0(size-1) is the
               //vertex which we have deleted again.
               if(DEBUG) std::cout << "last" << std::endl;
-              Vertex vM0 = G[v_last].associated_target;
+              Vertex vQ0 = G[v_last].associated_target;
               double T1 = G[v_last].associated_t;
               double T2 = lastValid.second;
-              if(vM0 == vpathM0.at(vpathM0.size()-2)){
-                vM0 = G[v_last].associated_source;
-                G[v_nextM1].associated_t=T1+(1-T2)*(1-T1);
+              if(vQ0 == vpathQ0.at(vpathQ0.size()-2)){
+                vQ0 = G[v_last].associated_source;
+                G[v_nextQ1].associated_t=T1+(1-T2)*(1-T1);
               }else{
-                G[v_nextM1].associated_t=T1*T2;
+                G[v_nextQ1].associated_t=T1*T2;
               }
-              G[v_nextM1].associated_source=vpathM0.at(vpathM0.size()-2);
-              G[v_nextM1].associated_target=vM0;
+              G[v_nextQ1].associated_source=vpathQ0.at(vpathQ0.size()-2);
+              G[v_nextQ1].associated_target=vQ0;
 
-              //double dv = M0->distance(quotient_parent->G[vM0].state, quotient_parent->stateProperty_[vpathM0.at(k)]);
+              //double dv = Q0->distance(quotient_parent->G[vQ0].state, quotient_parent->stateProperty_[vpathQ0.at(k)]);
             }else{
               if(DEBUG) std::cout << "in between" << std::endl;
 
-              G[v_nextM1].associated_source=vpathM0.at(k-1);
-              G[v_nextM1].associated_target=vpathM0.at(k);
-              G[v_nextM1].associated_t=lastValid.second;
+              G[v_nextQ1].associated_source=vpathQ0.at(k-1);
+              G[v_nextQ1].associated_target=vpathQ0.at(k);
+              G[v_nextQ1].associated_t=lastValid.second;
             }
           }
           if(DEBUG){
             std::cout << "new vertex associated edges: " 
-            << G[v_nextM1].associated_source << "<->"
-            << G[v_nextM1].associated_target << " ("
-            << G[v_nextM1].associated_t << ")"
+            << G[v_nextQ1].associated_source << "<->"
+            << G[v_nextQ1].associated_target << " ("
+            << G[v_nextQ1].associated_t << ")"
             << std::endl;
           }
 
-          double dk = M1->distance(spathM1.at(k), G[v_nextM1].state);
-          boost::add_edge(v_prevM1, v_nextM1, EdgeInternalState(ob::Cost(dk)), G);
-          uniteComponents(v_prevM1, v_nextM1);
-          nn_->add(v_nextM1);
+          double dk = Q1->distance(spathQ1.at(k), G[v_nextQ1].state);
+          boost::add_edge(v_prevQ1, v_nextQ1, EdgeInternalState(ob::Cost(dk)), G);
+          uniteComponents(v_prevQ1, v_nextQ1);
+          nn_->add(v_nextQ1);
         }
         break;
       }
 
       if(DEBUG) std::cout << "feasible" << std::endl;
-      Vertex v_nextM1;
-      if(k<spathM1.size()-1){
-        v_nextM1 = CreateNewVertex(spathM1.at(k));
-        G[v_nextM1].associated_source=vpathM0.at(k);
-        G[v_nextM1].associated_target=vpathM0.at(k);
-        G[v_nextM1].associated_t=0;
-        nn_->add(v_nextM1);
+      Vertex v_nextQ1;
+      if(k<spathQ1.size()-1){
+        v_nextQ1 = CreateNewVertex(spathQ1.at(k));
+        G[v_nextQ1].associated_source=vpathQ0.at(k);
+        G[v_nextQ1].associated_target=vpathQ0.at(k);
+        G[v_nextQ1].associated_t=0;
+        nn_->add(v_nextQ1);
         totalNumberOfSamples++;
       }else{
-        v_nextM1 = v_last;
+        v_nextQ1 = v_last;
       }
 
-      double dk = M1->distance(spathM1.at(k-1),spathM1.at(k));
-      boost::add_edge(v_prevM1, v_nextM1, EdgeInternalState(ob::Cost(dk)), G);
-      uniteComponents(v_prevM1, v_nextM1);
-      v_prevM1 = v_nextM1;
+      double dk = Q1->distance(spathQ1.at(k-1),spathQ1.at(k));
+      boost::add_edge(v_prevQ1, v_nextQ1, EdgeInternalState(ob::Cost(dk)), G);
+      uniteComponents(v_prevQ1, v_nextQ1);
+      v_prevQ1 = v_nextQ1;
     }
 
   }

@@ -318,7 +318,7 @@ void QuotientGraph::RandomWalk(const Vertex &v)
   for (uint i = 0; i < magic::MAX_RANDOM_BOUNCE_STEPS; ++i)
   {
     ob::State *s_next = xstates[ctr];
-    M1_sampler->sampleUniform(s_next);
+    Q1_sampler->sampleUniform(s_next);
 
     std::pair<ob::State *, double> lastValid;
     lastValid.first = s_next;
@@ -510,7 +510,7 @@ bool QuotientGraph::SampleGraph(ob::State *q_random_graph)
   const ob::State *from = G[v1].state;
   const ob::State *to = G[v2].state;
 
-  M1->getStateSpace()->interpolate(from, to, s, q_random_graph);
+  Q1->getStateSpace()->interpolate(from, to, s, q_random_graph);
   return true;
 }
 

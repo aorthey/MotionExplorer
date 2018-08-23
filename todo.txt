@@ -527,6 +527,11 @@ by side? (seems like a 1-weekend project)
 [ ] make something work on 3D xshape
 [ ] evaluate performance wrt RRT, maybe all OMPL planners
 
-[ ] some neighborhoods are clearly intersecting obstacles. (The planar Lshape case!)
+[x] some neighborhoods are clearly intersecting obstacles. (The planar Lshape case!)
 [ ] start/goal not copied when local chart is created!
 [x] copy of graph does not work correctly
+[ ] sampling points on Lshape are all on middleline ?
+
+
+[ ] what happens if there are no necessary vertices, but only because there are
+only sufficient ones?

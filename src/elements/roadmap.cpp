@@ -133,10 +133,16 @@ void Roadmap::DrawPlannerData(GUIState &state)
         }
       }
       if(state("draw_roadmap_volume")){
-        //std::cout << "roadmap volume: " << d << std::endl;
         glTranslate(q);
-        if(!v->IsInfeasible()) setColor(cNeighborhoodVolume);
-        else setColor(cNeighborhoodVolumeInfeasible);
+
+        using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
+        FeasibilityType feasibility_t = v->GetFeasibility();
+        if(feasibility_t == FeasibilityType::SUFFICIENT_FEASIBLE){
+          setColor(cNeighborhoodVolumeSufficient);
+        }else{
+          setColor(cNeighborhoodVolume);
+        }
+
         if(quotient_space->GetDimensionality()<=2){
           Vector3 q2(0,0,1);
           drawCircle(q2, d);

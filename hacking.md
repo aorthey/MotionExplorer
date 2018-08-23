@@ -27,6 +27,15 @@
 * Curly Braces : on new line (no egyptian, see below)
 
 <--! ------------------------------------------------------------------------->
+## Git Commit Message Convention
+
+* Written in imperative. Right: "Fix bug #3", Wrong: "Fixed bug #3". 
+
+* Rule of thumb: Message should complete sentence "This commit will ..."
+
+* Capitalize first letter.
+
+<--! ------------------------------------------------------------------------->
 ## Class Conventions
 
 Objective: It should be possible to save the whole program in a single XML

@@ -284,8 +284,8 @@ void RRTBidirectional::Grow(double t)
   startTree = !startTree;
   TreeData &otherTree = startTree ? tStart_ : tGoal_;
 
-  Configuration *q_random = new Configuration(M1);
-  //q_random->state = M1->allocState();
+  Configuration *q_random = new Configuration(Q1);
+  //q_random->state = Q1->allocState();
   Sample(q_random->state);
 
   GrowState gs = growTree(tree, tgi, q_random);
@@ -414,9 +414,9 @@ bool RRTBidirectional::SampleGraph(ob::State *q_random_graph)
 
   const ob::State *from = q->state;
   const ob::State *to = q->parent->state;
-  M1->getStateSpace()->interpolate(from, to, t, q_random_graph);
+  Q1->getStateSpace()->interpolate(from, to, t, q_random_graph);
   double epsilon = 0.05;
-  M1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
+  Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
 
   return true;
 }
