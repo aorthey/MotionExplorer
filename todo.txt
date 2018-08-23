@@ -532,6 +532,5 @@ by side? (seems like a 1-weekend project)
 [x] copy of graph does not work correctly
 [ ] sampling points on Lshape are all on middleline ?
 
-
 [ ] what happens if there are no necessary vertices, but only because there are
 only sufficient ones?

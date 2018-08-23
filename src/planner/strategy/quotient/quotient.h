@@ -12,6 +12,10 @@ namespace ob = ompl::base;
 // [    ][ X1 ]
 // [    ][    ]
 //
+//  cspace X = X0 x X1 
+//  Q0 = X0
+//  Q1 = X0 x X1
+//
 //  whereby Q1 is the configuration space, X1 is a designated subspace of Q1, and Q0 =
 //  Q1/X1 is the resulting quotient space. Here we assume that Q1 and Q0 have
 //  been given, and we compute the inverse of the quotient map, i.e. X1 = Q1/Q0. 
@@ -26,8 +30,8 @@ namespace ob = ompl::base;
 // (5) Q1 SE3xRn   , Q0 SE3xRm   , 0<m<n   => X1 = R(n-m)
 //
 //TO be done (might be beneficial for rigid objects floating in space)
-///// Q1 SE3      , Q0 R3xSO2xSO2         =>X1 = SO2
-///// Q1 R3xS1xS1 , Q0 R3                 =>X1 = SO2xSO2
+///// Q1 SE3        , Q0 R3xSO2xSO2         =>X1 = SO2
+///// Q1 R3xSO2xSO2 , Q0 R3                 =>X1 = SO2xSO2
 namespace ompl
 {
   namespace geometric

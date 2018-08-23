@@ -72,9 +72,7 @@ void QuotientChart::SetSubGraph( QuotientChart *sibling, uint k )
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "sibling graph: " << boost::num_vertices(Gprime) << " vertices | " << boost::num_edges(Gprime) << " edges."<< std::endl;
 
-  nn_ = sibling->GetRoadmapNeighborsPtr();
-  //connectionStrategy_ = KStrategy<Vertex>(3, nn_);
-  //connectionStrategy_ = sibling->GetConnectionStrategy();
+  //nn_ = sibling->GetRoadmapNeighborsPtr();
 
   local_chart = true;
   opt_ = sibling->opt_;

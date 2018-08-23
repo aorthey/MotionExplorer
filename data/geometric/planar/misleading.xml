@@ -3,8 +3,8 @@
 <world>
 
   <robot name="Lshape" file="/home/aorthey/git/orthoklampt/data/robots/PlanarLshape.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="sphere_inner" file="/home/aorthey/git/orthoklampt/data/robots/PlanarLshape_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="sphere_outer" file="/home/aorthey/git/orthoklampt/data/robots/PlanarLshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="disk_inner" file="/home/aorthey/git/orthoklampt/data/robots/PlanarLshape_cylinder_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="disk_outer" file="/home/aorthey/git/orthoklampt/data/robots/PlanarLshape_cylinder_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
 <!--
   <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="3 2 0" rotateRPY="0 0 0"/>

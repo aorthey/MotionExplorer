@@ -22,10 +22,12 @@ namespace ompl
         virtual ~QSP() override;
         void Grow(double t) override;
         bool Sample(ob::State *q_random) override;
-        //void getPlannerData(ob::PlannerData &data) const;
         virtual PlannerDataVertexAnnotated getPlannerDataVertex(ob::State *state, Vertex v) const override;
         bool SampleGraph(ob::State *q_random_graph) override;
         void setup() override;
+        virtual void SetSubGraph( QuotientChart *sibling, uint k ) override;
+
+        PDF<Vertex> GetNecessaryVertices() const;
 
       private:
         PDF<Vertex> pdf_necessary_vertices;
