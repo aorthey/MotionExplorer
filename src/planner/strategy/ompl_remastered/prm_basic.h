@@ -25,7 +25,8 @@ namespace ompl
   }
   namespace geometric
   {
-    class PRMBasic: public og::Quotient{
+    class PRMBasic: public og::Quotient
+    {
 
       public:
         struct vertex_state_t
@@ -144,7 +145,6 @@ namespace ompl
         void getPlannerData(ob::PlannerData &data) const override;
 
         void setProblemDefinition(const ob::ProblemDefinitionPtr &pdef) override;
-        ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override;
 
         void setup() override;
 

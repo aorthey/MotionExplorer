@@ -12,6 +12,7 @@ MultiChart<T>::MultiChart(std::vector<ob::SpaceInformationPtr> &si_vec_, std::st
   ob::Planner(si_vec_.back(), type), si_vec(si_vec_)
 {
   T::resetCounter();
+
   levels = si_vec.size();
   root = new T(si_vec.at(0), nullptr);
   root->SetLevel(0);

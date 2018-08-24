@@ -59,7 +59,6 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
 
   }
   if(robot_inner_idx != robot_outer_idx){
-    std::cout << "setting sufficient." << std::endl;
     cspace_level->SetSufficient(robot_outer_idx);
   }
   return cspace_level;
@@ -82,7 +81,6 @@ void MotionPlanner::CreateHierarchy(){
       //#########################################################################
       int ii = input.layers.at(k).inner_index;
       int io = input.layers.at(k).outer_index;
-      std::cout << "layer: " << k << " inner:" << ii << " outer:" << io << std::endl;
       Robot* ri = world->robots[ii];
       Robot* ro = world->robots[io];
 

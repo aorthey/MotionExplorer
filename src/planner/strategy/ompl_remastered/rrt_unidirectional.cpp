@@ -330,25 +330,6 @@ void RRTUnidirectional::Grow(double t)
 }
 
 
-ob::PlannerStatus RRTUnidirectional::solve(const ob::PlannerTerminationCondition &ptc)
-{
-  Init();
-
-  while(!ptc){
-
-    Grow();
-
-    if(HasSolution())
-    {
-      ConstructSolution(lastExtendedConfiguration);
-      return ob::PlannerStatus::EXACT_SOLUTION;
-    }
-  }
-
-  OMPL_INFORM("%s: Created %u states", getName().c_str(), G_->size());
-  return ob::PlannerStatus::TIMEOUT;
-}
-
 bool RRTUnidirectional::HasSolution()
 {
   if(!hasSolution){

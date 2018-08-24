@@ -20,7 +20,6 @@ void QuotientChart::setup()
 }
 void QuotientChart::Grow(double t)
 {
-  //BaseT::Grow(t);
   growRoadmap(ob::timedPlannerTerminationCondition(t), xstates[0]);
 }
 double QuotientChart::GetImportance() const

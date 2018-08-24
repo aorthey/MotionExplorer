@@ -38,28 +38,49 @@ void QSP::setup()
   if(setup_){
     Vertex vs = startM_.at(0);
     Vertex vg = goalM_.at(0);
-    if(checkSufficiency){
-      CheckVertexSufficiency(vs);
-      CheckVertexSufficiency(vg);
-    }
+    CheckVertexSufficiency(vs);
+    CheckVertexSufficiency(vg);
     G[vs].isFeasible = true;
     G[vg].isFeasible = true;
   }
 }
 
 void QSP::CheckVertexSufficiency(Vertex v){
-  G[v].isSufficient = checker->IsSufficientFeasible(G[v].state);
-  if(G[v].isSufficient){
-    number_of_sufficient_samples++;
-    double d = checker->SufficientDistance(G[v].state);
-    G[v].outerApproximationDistance = d;
-    G[v].open_neighborhood_distance = d;
+
+  double d = 0;
+  if(!checkSufficiency){
   }else{
-    double d = checker->Distance(G[v].state);
-    G[v].innerApproximationDistance = d;
-    G[v].open_neighborhood_distance = d;
-    pdf_necessary_vertices.add(v, d);
+
+    G[v].isSufficient = checker->IsSufficientFeasible(G[v].state);
+    if(G[v].isSufficient){
+      number_of_sufficient_samples++;
+      d = checker->SufficientDistance(G[v].state);
+    }else{
+      d = checker->Distance(G[v].state);
+      pdf_necessary_vertices.add(v, d);
+    }
   }
+  //G[v].outerApproximationDistance = d;
+  //G[v].innerApproximationDistance = d;
+  G[v].open_neighborhood_distance = d;
+
+  //G[v].isSufficient = checker->IsSufficientFeasible(G[v].state);
+  ////three cases: 
+  ////(1) do not check sufficiency -> Distance->V
+  ////(2) check sufficieny 
+  ////(2a) isSufficient -> Sufficientdistance ->V
+  ////(2b) !issufficient -> Distance ->V
+  //if(G[v].isSufficient){
+  //  number_of_sufficient_samples++;
+  //  double d = checker->SufficientDistance(G[v].state);
+  //  G[v].outerApproximationDistance = d;
+  //  G[v].open_neighborhood_distance = d;
+  //}else{
+  //  double d = checker->Distance(G[v].state);
+  //  G[v].innerApproximationDistance = d;
+  //  G[v].open_neighborhood_distance = d;
+  //  pdf_necessary_vertices.add(v, d);
+  //}
 }
 
 QSP::~QSP()
@@ -80,9 +101,7 @@ void QSP::Grow(double t){
   if(isFeasible)
   {
     G[m].isFeasible = true;
-    if(checkSufficiency){
-      CheckVertexSufficiency(m);
-    }
+    CheckVertexSufficiency(m);
     ConnectVertexToNeighbors(m);
   }else{
     number_of_infeasible_samples++;
@@ -167,10 +186,10 @@ PlannerDataVertexAnnotated QSP::getPlannerDataVertex(ob::State *state, Vertex v)
   }else{
     if(G[v].isSufficient){
       p.SetFeasibility(FeasibilityType::SUFFICIENT_FEASIBLE);
-      p.SetOpenNeighborhoodDistance(G[v].outerApproximationDistance);
+      p.SetOpenNeighborhoodDistance(G[v].open_neighborhood_distance);
     }else{
       p.SetFeasibility(FeasibilityType::FEASIBLE);
-      p.SetOpenNeighborhoodDistance(G[v].innerApproximationDistance);
+      p.SetOpenNeighborhoodDistance(G[v].open_neighborhood_distance);
     }
   }
   return p;

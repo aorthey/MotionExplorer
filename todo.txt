@@ -521,16 +521,19 @@ also it is easy compared to manip)
   [ ] outsource graph/refactor -> make templated version such that every class can
   write their own vertex(edge-)internalstate classes
 
+[x] some neighborhoods are clearly intersecting obstacles. (The planar Lshape case!)
+[x] start/goal not copied when local chart is created!
+[x] copy of graph does not work correctly
+[x] sampling points on Lshape are all on middleline ?
+
+
 [ ] make something work on 2D rigid body on a thread
-[ ] make movie of expansion on 2D cspace, plus 2D qspace plus 2D workspace side
-by side? (seems like a 1-weekend project)
+[ ] make movie of expansion on 2D cspace, plus 2D qspace plus 2D workspace side by side? (seems like a 1-weekend project)
 [ ] make something work on 3D xshape
 [ ] evaluate performance wrt RRT, maybe all OMPL planners
+[ ] fix distance on CS
+[ ] grow tree on QS. Sampling is done by rejection sampling from the boundary of the cover.
+[ ] what happens if there are no necessary vertices, but only because there are only sufficient ones?
 
-[x] some neighborhoods are clearly intersecting obstacles. (The planar Lshape case!)
-[ ] start/goal not copied when local chart is created!
-[x] copy of graph does not work correctly
-[ ] sampling points on Lshape are all on middleline ?
-
-[ ] what happens if there are no necessary vertices, but only because there are
-only sufficient ones?
+[ ] try out first on 2D misleading
+[ ] somehow QG is called, but should call QST

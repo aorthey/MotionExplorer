@@ -205,6 +205,7 @@ QuotientGraph::Vertex QuotientGraph::CreateNewVertex(ob::State *state)
 }
 
 void QuotientGraph::setup(){
+  std::cout << "calling QG setup" << std::endl;
   if (!nn_){
     nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
     nn_->setDistanceFunction([this](const Vertex a, const Vertex b)

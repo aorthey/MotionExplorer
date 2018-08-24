@@ -1,12 +1,13 @@
 # Conventions 
 
-<--! ------------------------------------------------------------------------->
--->
+<!--- ------------------------------------------------------------------------->
 
 ## Naming Conventions
 
 [CamelCase]  (https://en.wikipedia.org/wiki/Camel_case)
+
 [snake_case] (https://en.wikipedia.org/wiki/Snake_case)
+
 [kebab-case] (https://en.wikipedia.org/wiki/Kebab_case)
 
 * Class        : start uppercase, rest camelcase (MyClass)
@@ -19,14 +20,14 @@
 
 * XML naming   : all lowercase  , rest snakecase (<robot_names/>)
 
-<--! ------------------------------------------------------------------------->
+<!--- ------------------------------------------------------------------------->
 ## Formatting Conventions
 
 * Identation   : 2 whitespaces, no tabs
 
 * Curly Braces : on new line (no egyptian, see below)
 
-<--! ------------------------------------------------------------------------->
+<!--- ------------------------------------------------------------------------->
 ## Git Commit Message Convention
 
 * Written in imperative. Right: "Fix bug #3", Wrong: "Fixed bug #3". 
@@ -35,18 +36,17 @@
 
 * Capitalize first letter.
 
-<--! ------------------------------------------------------------------------->
+<!--- ------------------------------------------------------------------------->
 ## Class Conventions
 
-Objective: It should be possible to save the whole program in a single XML
-file, and be able to load it again. If Save() of an Object is called, then the
-XML should be created recursively from all its member objects.
+Every class should be writeable to the terminal, to the screen and to a file.
+Every class should be readable from a file. Writing to the terminal allows one
+to quickly check the content of the class, writing to the screen provides a
+visual aid, and writing to a file allows one to save the whole program in a
+single XML file. Reading from a file allows one to restore the whole program at
+any instance in time.
 
-class Object;
-
-Object obj;
-
-Every Object should be writeable 
+In short, every Object should be writeable 
   1. to the terminal : std::cout << obj << std::endl;
   2. to the screen   : obj.DrawGL(state)
   3. to a file (xml) : obj.Save(filename) 
@@ -54,20 +54,21 @@ Every Object should be writeable
 Every object should be readable 
   1. from a file     : obj.Load(filename)
 
-Whenever the write does not make sense, implement empty function body
+Whenever a write does not make sense, implement empty function body
 
-### Example
+### Example of minimal Object
 
 ``` c++
 //object.h
+#pragma once
 class Object
 {
-    bool Load(const char *fn);
-    bool Load(TiXmlElement* node);
-    bool Save(const char *fn);
-    bool Save(TiXmlElement* node);
-    void DrawGL(GUIState& state);
-    friend std::ostream& operator<< (std::ostream& out, const Object& obj);
+  bool Load(const char *fn);
+  bool Load(TiXmlElement* node);
+  bool Save(const char *fn);
+  bool Save(TiXmlElement* node);
+  void DrawGL(GUIState& state);
+  friend std::ostream& operator<< (std::ostream& out, const Object& obj);
 }
 ```
 
@@ -108,11 +109,63 @@ std::ostream& operator<< (std::ostream& out, const Object& obj)
 
 Sometimes, the operator<< must be overloaded by an inherting class (for
 example to implement the Decorator pattern). However, this would require a
-virtual friend, which is not allowed in cpp. See
-https://en.wikibooks.org/wiki/More_C++_Idioms/Virtual_Friend_Function for a
-workaround.
+virtual friend, which is not allowed in cpp. A good solution is proposed by  
+https://en.wikibooks.org/wiki/More_C++_Idioms/Virtual_Friend_Function :
+Implement the operator<< only on the parent class, and let it call a virtual function
+Print, which then can be overriden as usual.
 
-<--! ------------------------------------------------------------------------->
+### Example of operator<< inheritance pattern
+
+``` c++
+//object.h
+#pragma once
+class Object
+{
+  friend std::ostream& operator<< (std::ostream& out, const Object& obj);
+  virtual void Print(std::ostream &out);
+}
+class SubObject: Object
+{
+  virtual void Print(std::ostream &out) override;
+}
+``` 
+``` c++
+//object.cpp
+std::ostream& operator<< (std::ostream& out, const Object& obj) 
+{
+  Print(out);
+  return out;
+}
+void Object::Print(std::ostream &out)
+{
+  out << std::string(80, '-') << std::endl;
+  out << "[Object] " << std::endl;
+  out << std::string(80, '-') << std::endl;
+}
+void SubObject::Print(std::ostream &out)
+{
+  out << std::string(80, '-') << std::endl;
+  out << "[SubObject] " << std::endl;
+  out << std::string(80, '-') << std::endl;
+}
+``` 
+
+<!--- ------------------------------------------------------------------------->
+## Inherited Classes Conventions
+
+When inheriting, create a base type BaseT to denote the super class
+
+``` c++
+//subobject.h
+#pragma once
+class SubObject: Object
+{
+  typedef BaseT Object;
+}
+```
+
+
+<!--- ------------------------------------------------------------------------->
 ## Templated Classes Conventions
 
 Declaration file    : templated.h
@@ -140,7 +193,7 @@ void Function(T value){
 
 #include "templated.h"
 
-<--! ------------------------------------------------------------------------->
+<!--- ------------------------------------------------------------------------->
 ## data/ Folder Convention (Naming Conventions apply)
 
 Robots        as URDF   in data/robots/

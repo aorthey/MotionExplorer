@@ -326,29 +326,6 @@ void RRTBidirectional::CheckForSolution(ob::PathPtr &solution)
   }
 }
 
-PlannerStatus RRTBidirectional::solve(const base::PlannerTerminationCondition &ptc)
-{
-  Init();
-
-  while (!ptc)
-  {
-    Grow();
-
-    if(ConnectedToGoal()){
-      ConstructSolution(startConfiguration, goalConfiguration);
-      isSolved = true;
-      break;
-    }
-  }
-
-  si_->freeState(tgi.xstate);
-
-  OMPL_INFORM("%s: Created %u states (%u start + %u goal)", getName().c_str(), tStart_->size() + tGoal_->size(),
-              tStart_->size(), tGoal_->size());
-
-  return (isSolved? base::PlannerStatus::EXACT_SOLUTION : base::PlannerStatus::TIMEOUT);
-}
-
 uint RRTBidirectional::GetNumberOfVertices() const{
   return tStart_->size() + tGoal_->size();
 }

@@ -26,7 +26,6 @@ namespace ompl
         ~RRTBidirectional();
 
         void getPlannerData(base::PlannerData &data) const override;
-        base::PlannerStatus solve(const base::PlannerTerminationCondition &ptc) override;
         void clear() override;
         void setRange(double distance);
         double getRange() const;

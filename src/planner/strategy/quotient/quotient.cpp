@@ -14,6 +14,7 @@ using namespace ompl::base;
 Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_):
   ob::Planner(si,"QuotientSpace"), Q1(si), Q0(si), parent(parent_)
 {
+  setName("QST"+std::to_string(id));
   if(parent!=nullptr) parent->SetChild(this); //need to be able to traverse down the tree
 
   const StateSpacePtr Q1_space = Q1->getStateSpace();
@@ -51,17 +52,46 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_):
       X1_sampler = X1->allocStateSampler();
     }
   }
+
   if (!Q1_valid_sampler){
     Q1_valid_sampler = Q1->allocValidStateSampler();
   }
   if (!Q1_sampler){
     Q1_sampler = Q1->allocStateSampler();
   }
+
+  checker = dynamic_pointer_cast<OMPLValidityCheckerNecessarySufficient>(si->getStateValidityChecker());
+  if(!checker){
+    checkOuterRobot = false;
+  }else{
+    checkOuterRobot = true;
+  }
+}
+
+bool Quotient::IsOuterRobotFeasible(ob::State *state)
+{
+  if(checkOuterRobot){
+    return checker->IsSufficientFeasible(state);
+  }else{
+    return false;
+  }
+}
+double Quotient::DistanceOuterRobotToObstacle(ob::State *state)
+{
+  if(checkOuterRobot){
+    return checker->SufficientDistance(state);
+  }else{
+    return 0.0;
+  }
+}
+double Quotient::DistanceInnerRobotToObstacle(ob::State *state)
+{
+  return checker->Distance(state);
 }
 
 ob::PlannerStatus Quotient::solve(const ob::PlannerTerminationCondition &ptc)
 {
-  std::cout << "Quotient-Space cannot be solved alone. Use class MultiQuotient." << std::endl;
+  OMPL_ERROR("A Quotient-Space cannot be solved alone. Use class MultiQuotient to solve Quotient-Spaces.");
   exit(1);
 }
 

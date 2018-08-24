@@ -1,10 +1,11 @@
 #pragma once
 
 #include <ompl/base/Planner.h>
+#include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
 namespace ob = ompl::base;
 
-//  Quotient contains a single Quotient Space Decomposition which is nested in a chain of
+//  Quotient Q1 contains a single Quotient Space Decomposition which is nested in a chain of
 //  quotient spaces. This single decomposition can be visualized as
 //
 // [    ][ Q0 ]
@@ -41,7 +42,7 @@ namespace ompl
       public:
         uint verbose = 1;
         Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
-        virtual ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override;
+        ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override final; //final prevents subclasses to override
 
         virtual bool Sample(ob::State *q_random);
 
@@ -101,6 +102,14 @@ namespace ompl
 
         Quotient *parent{nullptr};
         Quotient *child{nullptr};
+
+
+        //Outer robot available
+        OMPLValidityCheckerNecessarySufficientPtr checker;
+        bool checkOuterRobot{false};
+        bool IsOuterRobotFeasible(ob::State *state);
+        double DistanceOuterRobotToObstacle(ob::State *state);
+        double DistanceInnerRobotToObstacle(ob::State *state);
     };
   }
 }

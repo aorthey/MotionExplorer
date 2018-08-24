@@ -11,8 +11,8 @@
 #include "planner/strategy/quotientchart/qmp_sufficient.h"
 #include "planner/strategy/quotientchart/qcp.h"
 #include "planner/strategy/quotientchart/qsp.h"
+#include "planner/strategy/quotient_algorithms/qst.h"
 #include "planner/strategy/ompl_remastered/rrt_unidirectional.h"
-#include "planner/strategy/ompl_remastered/rrt_unidirectional_cover.h"
 #include "planner/strategy/ompl_remastered/rrt_bidirectional.h"
 
 #include <ompl/geometric/planners/rrt/RRT.h>
@@ -132,11 +132,6 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
 
-  //same as the ompl algorithms, but have been refactored to understand better
-  //the algorithms
-  else if(algorithm=="ompl_remastered:rrt") planner = std::make_shared<og::RRTUnidirectional>(si);
-  else if(algorithm=="ompl_remastered:rrtconnect") planner = std::make_shared<og::RRTBidirectional>(si);
-
   else if(algorithm=="hierarchy:qmp_connect"){
     typedef og::MultiQuotient<og::QMPConnect> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect");
@@ -165,6 +160,11 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   }else if(algorithm=="hierarchy:qsp"){
     typedef og::MultiChart<og::QSP> MultiChart;
     planner = std::make_shared<MultiChart>(si_vec, "QSP");
+    static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
+
+  }else if(algorithm=="hierarchy:qst"){
+    typedef og::MultiChart<og::QST> MultiChart;
+    planner = std::make_shared<MultiChart>(si_vec, "QST");
     static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
 
   }else if(algorithm=="hierarchy:qmp_sufficient"){

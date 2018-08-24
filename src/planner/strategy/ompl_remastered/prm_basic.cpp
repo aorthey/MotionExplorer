@@ -100,36 +100,6 @@ void PRMBasic::Init(){
   checkValidity();
 }
 
-ob::PlannerStatus PRMBasic::solve(const ob::PlannerTerminationCondition &ptc){
-  Init();
-
-  addedNewSolution_ = false;
-  base::PathPtr sol;
-
-  bestCost_ = opt_->infiniteCost();
-
-  base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
-                                 { return ptc || addedNewSolution_; });
-
-  while (!ptcOrSolutionFound())
-  {
-    Grow(magic::ROADMAP_BUILD_TIME);
-    CheckForSolution(sol);
-  }
-
-  OMPL_INFORM("%s: Created %u states", getName().c_str(), boost::num_vertices(g_));
-
-  if (sol)
-  {
-    base::PlannerSolution psol(sol);
-    psol.setPlannerName(getName());
-    psol.setOptimized(opt_, bestCost_, addedNewSolution_);
-    pdef_->addSolutionPath(psol);
-  }
-
-  return sol ? base::PlannerStatus::EXACT_SOLUTION : base::PlannerStatus::TIMEOUT;
-}
-
 void PRMBasic::Grow(double t){
   double T_grow = (2.0/3.0)*t;
   growRoadmap(ob::timedPlannerTerminationCondition(T_grow), xstates[0]);
