@@ -132,6 +132,11 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
 
+  //same as the ompl algorithms, but have been refactored to understand better
+  //the algorithms
+  else if(algorithm=="ompl_remastered:rrt") planner = std::make_shared<og::RRTUnidirectional>(si);
+  else if(algorithm=="ompl_remastered:rrtconnect") planner = std::make_shared<og::RRTBidirectional>(si);
+
   else if(algorithm=="hierarchy:qmp_connect"){
     typedef og::MultiQuotient<og::QMPConnect> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect");
