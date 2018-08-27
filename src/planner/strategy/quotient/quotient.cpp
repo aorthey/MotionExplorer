@@ -14,14 +14,14 @@ using namespace ompl::base;
 Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_):
   ob::Planner(si,"QuotientSpace"), Q1(si), Q0(si), parent(parent_)
 {
-  setName("QST"+std::to_string(id));
+  id = counter++;
+
   if(parent!=nullptr) parent->SetChild(this); //need to be able to traverse down the tree
 
   const StateSpacePtr Q1_space = Q1->getStateSpace();
 
-  id = counter++;
-  if(verbose>0) std::cout << "--- Level " << id << " " << getName() << std::endl;
-  setName("Quotient"+std::to_string(id));
+  if(verbose>0) std::cout << "--- QuotientSpace" << id << std::endl;
+
   if(parent == nullptr){
     if(verbose>0) std::cout << "Q1 dimension : " << Q1_space->getDimension() << " measure: " << Q1_space->getMeasure() << std::endl;
     type = ATOMIC_RN;
@@ -697,6 +697,14 @@ void Quotient::SetChild(Quotient *child_)
 void Quotient::SetParent(Quotient *parent_)
 {
   parent = parent_;
+}
+uint Quotient::GetLevel() const
+{
+  return level;
+}
+void Quotient::SetLevel(uint level_)
+{
+  level = level_;
 }
 
 bool Quotient::Sample(ob::State *q_random)

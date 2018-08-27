@@ -21,8 +21,7 @@ namespace ompl
 
         double GetImportance() const;
         void SetImportance(double); 
-        uint GetLevel() const;
-        void SetLevel(uint);
+        std::vector<int> GetPath() const;
         uint GetHorizontalIndex() const;
         uint GetNumberOfSiblings() const;
         void SetHorizontalIndex(uint);
@@ -54,7 +53,6 @@ namespace ompl
         double density{0};
 
         uint horizontal_index{0};
-        uint level{0};
 
         uint number_of_paths{0};
         bool local_chart{false}; //local: a refinement chart around a given path, global: a chart exploring the whole quotient-space

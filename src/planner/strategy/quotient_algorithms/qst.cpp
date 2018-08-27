@@ -8,266 +8,21 @@ using namespace ompl::geometric;
 QST::QST(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
   setName("QST"+std::to_string(id));
+  if (!cover_tree){
+    cover_tree.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
+    cover_tree->setDistanceFunction([this](const Configuration *a, const Configuration *b)
+                             {
+                                return OpenNeighborhoodDistance(a,b);
+                              });
+  }
 }
 
 QST::~QST(void)
 {
 }
 
-void QST::AddConfiguration(Configuration *q)
-{
-  bool feasible = Q1->isValid(q->state);
-
-  if(feasible){
-
-    if(IsOuterRobotFeasible(q->state))
-    {
-      q->isSufficientFeasible = true;
-      q->openNeighborhoodRadius = DistanceOuterRobotToObstacle(q->state);
-    }else{
-      q->openNeighborhoodRadius = DistanceInnerRobotToObstacle(q->state);
-      pdf_necessary_vertices.add(q, q->openNeighborhoodRadius);
-    }
-    pdf_all_vertices.add(q, q->openNeighborhoodRadius);
-
-    //why do we need the nearestneighbors structure here?
-    cspace_tree->add(q);
-  }
-
-}
-void QST::AddState(ob::State *state)
-{
-  Configuration *q = new Configuration(Q1, state);
-  AddConfiguration(q);
-}
-
-
-void QST::Grow(double t)
-{
-  Configuration *q_random = new Configuration(si_);
-
-  Sample(q_random);
-
-  bool feasible = Q1->isValid(q_random->state);
-
-  if(feasible){
-
-    if(IsOuterRobotFeasible(q_random->state))
-    {
-      q_random->isSufficientFeasible = true;
-      q_random->openNeighborhoodRadius = DistanceOuterRobotToObstacle(q_random->state);
-    }else{
-      q_random->openNeighborhoodRadius = DistanceInnerRobotToObstacle(q_random->state);
-      pdf_necessary_vertices.add(q_random, q_random->openNeighborhoodRadius);
-    }
-    pdf_all_vertices.add(q_random, q_random->openNeighborhoodRadius);
-
-    //why do we need the nearestneighbors structure here?
-    cspace_tree->add(q_random);
-  }
-
-  if(q_random->state != nullptr){
-    si_->freeState(q_random->state);
-  }
-  delete q_random;
-}
-
-
-double QST::Distance(const Configuration *q_from, const Configuration *q_to)
-{
-  double d = si_->distance(q_from->state, q_to->state);
-  return d;
-}
-
-void QST::Sample(Configuration *q_random){
-  if(parent == nullptr){
-    //Q1_sampler->sampleUniform(q_random->state);
-    Configuration *q = pdf_all_vertices.sample(rng_.uniform01());
-    double radius = q->openNeighborhoodRadius;
-    uint dimension = Q1->getStateDimension();
-
-    ob::State *qk = Q1->allocState();
-    Q1_sampler->sampleGaussian(qk, q->state, 1);
-
-    std::cout << radius << std::endl;
-    std::cout << dimension << std::endl;
-    std::cout << "Need to sample from ball of radius " << radius << ": NIY" << std::endl;
-    exit(0);
-
-    //how to sample on the boundary!?
-
-
-  }else{
-    std::cout << "NIY" << std::endl;
-    exit(0);
-    // ob::SpaceInformationPtr Q0 = parent->getSpaceInformation();
-    // base::State *s_X1 = X1->allocState();
-    // base::State *s_Q0 = Q0->allocState();
-
-    // X1_sampler->sampleUniform(s_X1);
-    // parent->SampleGraph(s_Q0);
-    // mergeStates(s_Q0, s_X1, q_random->state);
-
-    // X1->freeState(s_X1);
-    // Q0->freeState(s_Q0);
-  }
-}
-
-uint QST::GetNumberOfVertices() const
-{
-  return cspace_tree->size();
-}
-
-uint QST::GetNumberOfEdges() const
-{
-  std::vector<Configuration *> configs;
-  if (cspace_tree){
-    cspace_tree->list(configs);
-  }
-  uint ctr_edges = 0;
-  for (auto &config : configs)
-  {
-    if (config->parent != nullptr)
-    {
-      ctr_edges++;
-    }
-  }
-  return ctr_edges;
-}
-
-// QST::Configuration* QST::Nearest(Configuration *q)
-// {
-//   return cspace_tree->nearest(q);
-// }
-
-// QST::Configuration* QST::Connect(Configuration *q_from, Configuration *q_to)
-// {
-//   //two strategies: either check directly if the edge between q_near and
-//   //q_random is feasible and add that (as implemented by RRTConnect)
-//   //or: move as long towards q_random as the edge is feasible. Once it becomes
-//   //infeasible, set q_random to the last feasible vertex. Might be more
-//   //efficient, but why is that not implemented in RRTConnect?
-//   //=> it seems we often need to reject samples, especially if the boundary box
-//   //of the workspace is not tight. 
-
-//   double d = Distance(q_from, q_to);
-
-//   //##############################################################################
-//   // move towards q_to until infeasible
-//   //##############################################################################
-//   double d_segment = si_->getStateSpace()->getLongestValidSegmentFraction();
-//   //uint nd = si_->getStateSpace()->validSegmentCount(q_near->state, q_random->state);
-
-//   double d_cum = 0;
-//   double d_lastvalid = 0;
-//   ob::State *q_test = si_->allocState();
-//   while(d_cum <= d)
-//   {
-//     si_->getStateSpace()->interpolate(q_from->state, q_to->state, d_cum / d, q_test);
-//     if(si_->isValid(q_test)){
-//       d_lastvalid = d_cum;
-//     }else{
-//       break;
-//     }
-//     d_cum += d_segment;
-//   }
-//   si_->freeState(q_test);
-
-//   if(d_lastvalid<=0) return nullptr;
-
-//   auto *q_new = new Configuration(si_);
-//   q_new->state = si_->allocState();
-
-//   si_->getStateSpace()->interpolate(q_from->state, q_to->state, d_lastvalid / d, q_new->state);
-
-//   //si_->copyState(q_new->state, q_to->state);
-//   q_new->parent = q_from;
-//   q_new->parent_edge_weight = Distance(q_from->state, q_new->state);
-//   graphLength += q_new->parent_edge_weight;
-
-//   cspace_tree->add(q_new);
-
-//   return q_new;
-// }
-
-bool QST::ConnectedToGoal(Configuration* q)
-{
-  double dist=0.0;
-  if(q != nullptr){
-    if(goal->isSatisfied(q->state, &dist)){
-      hasSolution = true;
-      return true;
-    }
-  }
-  return false;
-}
-
-void QST::ConstructSolution(Configuration *configuration_goal)
-{
-  if (configuration_goal != nullptr){
-
-    std::vector<Configuration *> q_path;
-    while (configuration_goal != nullptr){
-      q_path.push_back(configuration_goal);
-      configuration_goal = configuration_goal->parent;
-    }
-
-    auto path(std::make_shared<PathGeometric>(si_));
-    for (int i = q_path.size() - 1; i >= 0; --i){
-      path->append(q_path[i]->state);
-    }
-    pdef_->addSolutionPath(path);
-  }
-}
-
-void QST::Init()
-{
-
-  checkValidity();
-}
-
-
-void QST::clear()
-{
-  Planner::clear();
-  freeMemory();
-  if(cspace_tree){
-    cspace_tree->clear();
-  }
-  hasSolution = false;
-  lastExtendedConfiguration = nullptr;
-  q_start = nullptr;
-  q_goal = nullptr;
-
-  pis_.restart();
-}
-
-void QST::freeMemory()
-{
-  if (cspace_tree)
-  {
-    std::vector<Configuration *> configurations;
-    cspace_tree->list(configurations);
-    for (auto &configuration : configurations)
-    {
-      if (configuration->state != nullptr)
-      {
-        si_->freeState(configuration->state);
-      }
-      delete configuration;
-    }
-  }
-}
-
 void QST::setup(void)
 {
-  if (!cspace_tree){
-    cspace_tree.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
-    cspace_tree->setDistanceFunction([this](const Configuration *a, const Configuration *b)
-                             {
-                                return Distance(a,b);
-                                });
-  }
 
   if (pdef_){
     if (pdef_->hasOptimizationObjective()){
@@ -290,72 +45,244 @@ void QST::setup(void)
       exit(0);
     }
     
-    OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), cspace_tree->size());
+    OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), cover_tree->size());
     setup_ = true;
   }else{
     setup_ = false;
   }
 
 }
-void QST::getPlannerData(base::PlannerData &data) const
+
+void QST::AddConfiguration(Configuration *q)
 {
-  std::vector<Configuration *> vertices;
+  bool feasible = Q1->isValid(q->state);
 
-  if (cspace_tree){
-    cspace_tree->list(vertices);
-  }
+  if(feasible){
 
-  if (lastExtendedConfiguration != nullptr){
-    data.addGoalVertex(PlannerDataVertexAnnotated(lastExtendedConfiguration->state, 0, lastExtendedConfiguration->GetRadius()));
-  }
-
-  for (auto &vertex : vertices)
-  {
-    double d = vertex->GetRadius();
-    if (vertex->parent == nullptr){
-      data.addStartVertex(PlannerDataVertexAnnotated(vertex->state, 0, d));
+    if(IsOuterRobotFeasible(q->state))
+    {
+      q->isSufficientFeasible = true;
+      q->openNeighborhoodRadius = DistanceOuterRobotToObstacle(q->state);
     }else{
-      double dp = vertex->parent->GetRadius();
-      data.addEdge(PlannerDataVertexAnnotated(vertex->parent->state, 0, dp), PlannerDataVertexAnnotated(vertex->state, 0, d));
+      q->openNeighborhoodRadius = DistanceInnerRobotToObstacle(q->state);
+      pdf_necessary_vertices.add(q, q->openNeighborhoodRadius);
     }
-    if(!vertex->state){
-      std::cout << "vertex state does not exists" << std::endl;
-      si_->printState(vertex->state);
-      exit(0);
+    pdf_all_vertices.add(q, q->openNeighborhoodRadius);
+    cover_tree->add(q);
+  }else{
+    if(q->state != nullptr){
+      si_->freeState(q->state);
     }
+    delete q;
+  }
+
+}
+void QST::AddState(ob::State *state)
+{
+  Configuration *q = new Configuration(Q1, state);
+  AddConfiguration(q);
+}
+
+
+void QST::Grow(double t)
+{
+  Configuration *q_random = new Configuration(si_);
+
+  Sample(q_random);
+
+  Configuration *q_nearest = Nearest(q_random);
+
+  Connect(q_nearest, q_random);
+
+  AddConfiguration(q_random);
+
+  if(q_random != nullptr)
+  {
+    q_random->parent = q_nearest;
+  }
+
+}
+
+bool QST::Sample(Configuration *q_random){
+  if(parent == nullptr){
+    if(!hasSolution && rng_.uniform01() < goalBias){
+      q_random->state = si_->cloneState(q_goal->state);
+    }else{
+      Q1_sampler->sampleUniform(q_random->state);
+    }
+      // Configuration *q = pdf_all_vertices.sample(rng_.uniform01());
+      // sampleUniformOnNeighborhoodBoundary(q_random, q);
+
+      //check that the sampled configuration is not inside the cover, but on
+      //boundary
+      // std::vector<Configuration*> neighbors;
+      // cover_tree->nearestR(q_random, 1e-10, neighbors);
+    return true;
+  }else{
+    std::cout << "NIY" << std::endl;
+    exit(0);
+    return false;
+    // ob::SpaceInformationPtr Q0 = parent->getSpaceInformation();
+    // base::State *s_X1 = X1->allocState();
+    // base::State *s_Q0 = Q0->allocState();
+
+    // X1_sampler->sampleUniform(s_X1);
+    // parent->SampleGraph(s_Q0);
+    // mergeStates(s_Q0, s_X1, q_random->state);
+
+    // X1->freeState(s_X1);
+    // Q0->freeState(s_Q0);
   }
 }
 
-bool QST::HasSolution()
+QST::Configuration* QST::Nearest(Configuration *q) const
 {
-  if(!hasSolution){
-    if(ConnectedToGoal(lastExtendedConfiguration)){
-      hasSolution = true;
+  return cover_tree->nearest(q);
+}
+
+void QST::Connect(const Configuration *q_from, Configuration *q_to)
+{
+  double d = Distance(q_from, q_to);
+  double radius = q_from->GetRadius();
+  si_->getStateSpace()->interpolate(q_from->state, q_to->state, radius / d, q_to->state);
+}
+
+double QST::Distance(const Configuration *q_from, const Configuration *q_to)
+{
+  double d = si_->distance(q_from->state, q_to->state);
+  return d;
+}
+
+double QST::OpenNeighborhoodDistance(const Configuration *q_from, const Configuration *q_to)
+{
+  double d_from = q_from->GetRadius();
+  double d_to = q_to->GetRadius();
+  double d = si_->distance(q_from->state, q_to->state);
+
+  //note that this is a pseudometric: invalidates second axiom of metric : d(x,y) = 0  iff x=y. But here we only have d(x,x)=0
+  double d_open_neighborhood_distance = std::max(d - d_from - d_to, 0.0); 
+  return d_open_neighborhood_distance;
+}
+
+bool QST::sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Configuration *center)
+{
+  //sample on boundary of open neighborhood
+  // (1) first sample gaussian point qk around q
+  // (2) project qk onto neighborhood
+  // (*) this works because gaussian is symmetric around origin
+  // (*) this does not work when qk is near to q, so we need to sample as long
+  // as it is not near
+  //
+  double radius = center->openNeighborhoodRadius;
+
+  double dist_q_qk = 0;
+  double epsilon_min_distance = 1e-10;
+
+  //@DEBUG
+  if(epsilon_min_distance >= radius){
+    OMPL_ERROR("neighborhood is too small to sample the boundary.");
+    std::cout << "neighborhood radius: " << radius << std::endl;
+    std::cout << "minimal distance to be able to sample: " << epsilon_min_distance << std::endl;
+    exit(0);
+  }
+
+  //sample as long as we are not outside the ball of radius epsilon_min_distance
+  while(dist_q_qk < epsilon_min_distance){
+    Q1_sampler->sampleGaussian(sample->state, center->state, 1);
+    dist_q_qk = si_->distance(center->state, sample->state);
+  }
+  si_->getStateSpace()->interpolate(center->state, sample->state, radius/dist_q_qk, sample->state);
+
+  return true;
+}
+
+
+uint QST::GetNumberOfVertices() const
+{
+  return cover_tree->size();
+}
+
+uint QST::GetNumberOfEdges() const
+{
+  std::vector<Configuration *> configs;
+  if (cover_tree){
+    cover_tree->list(configs);
+  }
+  uint ctr_edges = 0;
+  for (auto &config : configs)
+  {
+    if (config->parent != nullptr)
+    {
+      ctr_edges++;
     }
   }
-  return hasSolution;
+  return ctr_edges;
+}
+
+void QST::Init()
+{
+
+  checkValidity();
+}
+
+
+void QST::clear()
+{
+  Planner::clear();
+  freeMemory();
+  if(cover_tree){
+    cover_tree->clear();
+  }
+  hasSolution = false;
+  q_start = nullptr;
+  q_goal = nullptr;
+
+  pis_.restart();
+}
+
+void QST::freeMemory()
+{
+  if (cover_tree)
+  {
+    std::vector<Configuration *> configurations;
+    cover_tree->list(configurations);
+    for (auto &configuration : configurations)
+    {
+      if (configuration->state != nullptr)
+      {
+        si_->freeState(configuration->state);
+      }
+      delete configuration;
+    }
+  }
 }
 
 void QST::CheckForSolution(ob::PathPtr &solution)
 {
-  if(!hasSolution) return;
-
-  Configuration *configuration_goal = lastExtendedConfiguration;
-  if (configuration_goal != nullptr){
-
-    std::vector<Configuration *> q_path;
-    while (configuration_goal != nullptr){
-      q_path.push_back(configuration_goal);
-      configuration_goal = configuration_goal->parent;
+  Configuration *q_nearest = Nearest(q_goal);
+  if(OpenNeighborhoodDistance(q_nearest, q_goal) <= 0)
+  {
+    if(q_goal->parent == nullptr){
+      q_goal->parent = q_nearest;
+      cover_tree->add(q_goal);
     }
 
+    Configuration *q_next = q_goal;
+    std::vector<Configuration *> q_path;
+    while (q_next != nullptr){
+      q_path.push_back(q_next);
+      q_next = q_next->parent;
+    }
     auto path(std::make_shared<PathGeometric>(si_));
     for (int i = q_path.size() - 1; i >= 0; --i){
-      path->append(q_path[i]->state);
+      path->append(q_path.at(i)->state);
     }
     solution = path;
+
+    hasSolution = true;
   }
 }
+
 bool QST::SampleGraph(ob::State *q_random_graph)
 {
   std::cout << "NIY" << std::endl;
@@ -372,3 +299,91 @@ bool QST::SampleGraph(ob::State *q_random_graph)
   //lastSampled->totalSamples++;
   //return true;
 }
+
+void QST::SetSubGraph( QuotientChart *sibling, uint k )
+{
+  local_chart = true;
+  opt_ = sibling->opt_;
+  level = sibling->GetLevel();
+  startM_ = sibling->startM_;
+  goalM_ = sibling->goalM_;
+  number_of_paths = 0;
+
+  std::cout << "NYI" << std::endl;
+  exit(0);
+  std::cout << "new graph: " << GetNumberOfVertices() << " vertices | " << GetNumberOfEdges() << " edges."<< std::endl;
+}
+void QST::getPlannerData(base::PlannerData &data) const
+{
+  uint Nvertices = data.numVertices();
+  uint Nedges = data.numEdges();
+  //###########################################################################
+  //Get Path for this chart
+  //###########################################################################
+  std::vector<int> path = GetPath();
+
+  //###########################################################################
+  //Obtain vertices
+  //###########################################################################
+  std::vector<Configuration *> vertices;
+  if (cover_tree){
+    cover_tree->list(vertices);
+  }
+
+  //if (lastExtendedConfiguration != nullptr){
+  //data.addGoalVertex(pvertex);
+
+  for (auto &vertex : vertices)
+  {
+    ob::State *state = (local_chart?si_->cloneState(vertex->state):vertex->state);
+    double d = vertex->GetRadius();
+
+    PlannerDataVertexAnnotated pvertex(state);
+    pvertex.SetLevel(level);
+    pvertex.SetPath(path);
+    pvertex.SetOpenNeighborhoodDistance(d);
+
+    using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
+    if(vertex->isSufficientFeasible){
+      pvertex.SetFeasibility(FeasibilityType::SUFFICIENT_FEASIBLE);
+    }else{
+      pvertex.SetFeasibility(FeasibilityType::FEASIBLE);
+    }
+
+    if(vertex->parent == nullptr){
+      data.addStartVertex(pvertex);
+    }else{
+      if(vertex == q_goal){
+        data.addGoalVertex(pvertex);
+      }else{
+        data.addVertex(pvertex);
+      }
+
+      PlannerDataVertexAnnotated parent_vertex(vertex->parent->state);
+      parent_vertex.SetLevel(level);
+      parent_vertex.SetPath(path);
+      parent_vertex.SetOpenNeighborhoodDistance(vertex->parent->GetRadius());
+      data.addEdge(pvertex, parent_vertex);
+    }
+    if(!vertex->state){
+      std::cout << "vertex state does not exists" << std::endl;
+      si_->printState(vertex->state);
+      exit(0);
+    }
+  }
+  //###########################################################################
+  //Get Data From all siblings
+  //###########################################################################
+
+  std::cout << "[QuotientChart] vIdx " << level << " | hIdx " << horizontal_index 
+    << " | siblings " << siblings.size() << " | path " << path 
+    << " | vertices " << data.numVertices() - Nvertices 
+    << " | edges " << data.numEdges() - Nedges
+    << std::endl;
+
+  for(uint i = 0; i < siblings.size(); i++){
+    siblings.at(i)->getPlannerData(data);
+  }
+  if(child!=nullptr) child->getPlannerData(data);
+}
+

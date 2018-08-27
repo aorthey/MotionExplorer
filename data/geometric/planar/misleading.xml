@@ -21,12 +21,11 @@
     <se3min config="6  -4.0 -4.0 -1.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +4.0 +4.0 +1.0 +3.141593 +1.57 +3.141593"/>
     <freeFloating>1</freeFloating>
-    <maxplanningtime>0.01</maxplanningtime>      <!-- runtime in (s) --> 
-    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>0.05</maxplanningtime>      <!-- runtime in (s) --> 
 
     <hierarchy>
       <level inner_index="1" outer_index="2" type="R2"/>
-      <!-- <level inner_index="0" type="SE2"/> -->
+      <level inner_index="0" outer_index="0" type="SE2"/>
     </hierarchy>
 
   </plannerinput>

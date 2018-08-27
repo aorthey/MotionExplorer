@@ -30,14 +30,6 @@ void QuotientChart::SetImportance(double importance_)
 {
   importance = importance_;
 }
-uint QuotientChart::GetLevel() const
-{
-  return level;
-}
-void QuotientChart::SetLevel(uint level_)
-{
-  level = level_;
-}
 uint QuotientChart::GetHorizontalIndex() const
 {
   return horizontal_index;
@@ -194,16 +186,9 @@ PlannerDataVertexAnnotated QuotientChart::getAnnotatedVertex(Vertex vertex, std:
   return pvertex;
 }
 
-void QuotientChart::getPlannerData(ob::PlannerData &data) const
+std::vector<int> QuotientChart::GetPath() const
 {
-  uint Nvertices = data.numVertices();
-  uint Nedges = data.numEdges();
-
-  //###########################################################################
-  //Get Path for this chart
-  //###########################################################################
   std::vector<int> path;
-
   path.push_back(GetHorizontalIndex());
   og::QuotientChart *parent = static_cast<og::QuotientChart*>(GetParent());
   while(parent!=nullptr)
@@ -213,6 +198,17 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
   }
 
   std::reverse(std::begin(path), std::end(path));
+  return path;
+}
+void QuotientChart::getPlannerData(ob::PlannerData &data) const
+{
+  uint Nvertices = data.numVertices();
+  uint Nedges = data.numEdges();
+
+  //###########################################################################
+  //Get Path for this chart
+  //###########################################################################
+  std::vector<int> path = GetPath();
 
   //###########################################################################
   //Get Data from this chart

@@ -3,7 +3,8 @@
 <world>
 
   <robot name="Lshape" file="/home/aorthey/git/orthoklampt/data/robots/PlanarRectangle.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="sphere_inner" file="/home/aorthey/git/orthoklampt/data/robots/PlanarRectangle_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="disk_inner" file="/home/aorthey/git/orthoklampt/data/robots/PlanarRectangle_cylinder_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="disk_outer" file="/home/aorthey/git/orthoklampt/data/robots/PlanarRectangle_cylinder_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
 <!--
   <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="3 2 0" rotateRPY="0 0 0"/>
@@ -23,7 +24,7 @@
     <epsilongoalregion>0.1</epsilongoalregion>
 
     <hierarchy>
-      <level inner_index="1" type="R2"/>
+      <level inner_index="1" outer_index="2" type="R2"/>
       <level inner_index="0" type="SE2"/>
     </hierarchy>
 

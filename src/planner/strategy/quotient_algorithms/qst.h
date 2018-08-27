@@ -29,7 +29,6 @@ namespace ompl
       virtual uint GetNumberOfEdges() const override;
       virtual void Grow(double t=0) override;
       virtual void Init() override;
-      virtual bool HasSolution() override;
       virtual void CheckForSolution(ob::PathPtr &solution) override;
 
       
@@ -57,29 +56,28 @@ namespace ompl
         double openNeighborhoodRadius{0.0}; //might be L1 or L2 radius
       };
 
-      std::shared_ptr<NearestNeighbors<Configuration *>> cspace_tree;
+      std::shared_ptr<NearestNeighbors<Configuration *>> cover_tree;
 
+      void SetSubGraph( QuotientChart *sibling, uint k ) override;
       void AddState(ob::State *state);
       void AddConfiguration(Configuration *q);
 
-      virtual void Sample(Configuration *q_random);
+      bool sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
+
+      virtual bool Sample(Configuration *q_random);
       virtual bool SampleGraph(ob::State*) override;
 
-      //virtual Configuration* Nearest(Configuration *q);
-      //virtual Configuration* Connect(Configuration *q_from, Configuration *q_to);
-      virtual double Distance(const Configuration *q_from, const Configuration *q_to);
-
-      virtual bool ConnectedToGoal(Configuration* q);
+      Configuration* Nearest(Configuration *q) const;
+      void Connect(const Configuration *q_from, Configuration *q_to);
+      double Distance(const Configuration *q_from, const Configuration *q_to);
+      double OpenNeighborhoodDistance(const Configuration *q_from, const Configuration *q_to);
       void ConstructSolution(Configuration *q_goal);
 
-      ob::GoalSampleableRegion *goal;
-
-      Configuration *lastExtendedConfiguration{nullptr};
       Configuration *q_start{nullptr};
       Configuration *q_goal{nullptr};
 
       RNG rng_;
-      double maxDistance_{0.};
+      double goalBias{0.05};
 
       PDF<Configuration*> pdf_necessary_vertices;
       PDF<Configuration*> pdf_all_vertices;

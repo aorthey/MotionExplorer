@@ -50,12 +50,12 @@ namespace ompl
         virtual void Grow(double t) = 0;
         virtual void CheckForSolution(ob::PathPtr &solution) = 0;
         virtual bool SampleGraph(ob::State *q_random) = 0;
+        virtual bool HasSolution();
 
         virtual double GetSamplingDensity();
         virtual uint GetNumberOfVertices() const;
         virtual uint GetNumberOfEdges() const;
 
-        virtual bool HasSolution();
         virtual uint GetNumberOfSampledVertices();
         static void resetCounter();
 
@@ -67,6 +67,8 @@ namespace ompl
 
         Quotient* GetParent() const;
         Quotient* GetChild() const;
+        uint GetLevel() const;
+        void SetLevel(uint);
         void SetChild(Quotient *child_);
         void SetParent(Quotient *parent_);
 
@@ -76,6 +78,7 @@ namespace ompl
       protected:
         static uint counter;
         uint id;
+        uint level{0};
 
         enum QuotientSpaceType{ UNKNOWN, ATOMIC_RN, RN_RM, SE2_R2, SE3_R3, SE3RN_R3, SE3RN_SE3, SE3RN_SE3RM };
 
