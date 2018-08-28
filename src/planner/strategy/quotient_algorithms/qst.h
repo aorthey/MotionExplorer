@@ -32,6 +32,7 @@ namespace ompl
       virtual void CheckForSolution(ob::PathPtr &solution) override;
 
       
+      
     protected:
 
       class Configuration
@@ -50,40 +51,54 @@ namespace ompl
         uint successfulSamples{0}; //how many of those samples have been successfully incorporated into the graph
 
         double parentEdgeWeight{0.0};
+
         base::State *state{nullptr};
         Configuration *parent{nullptr};
+        Configuration *coset{nullptr}; //the underlying coset this configuration belongs to (on the quotient-space)
+
         bool isSufficientFeasible{false};
         double openNeighborhoodRadius{0.0}; //might be L1 or L2 radius
       };
 
-      std::shared_ptr<NearestNeighbors<Configuration *>> cover_tree;
 
       void SetSubGraph( QuotientChart *sibling, uint k ) override;
       void AddState(ob::State *state);
       void AddConfiguration(Configuration *q);
-
       bool sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
 
       virtual bool Sample(Configuration *q_random);
-      virtual bool SampleGraph(ob::State*) override;
+      virtual Configuration* SampleTree(ob::State*);
 
       Configuration* Nearest(Configuration *q) const;
       void Connect(const Configuration *q_from, Configuration *q_to);
+
       double Distance(const Configuration *q_from, const Configuration *q_to);
-      double OpenNeighborhoodDistance(const Configuration *q_from, const Configuration *q_to);
+      double DistanceQ1(const Configuration *q_from, const Configuration *q_to);
+      double DistanceX1(const Configuration *q_from, const Configuration *q_to);
+      double DistanceTree(const Configuration *q_from, const Configuration *q_to);
+      double DistanceOpenNeighborhood(const Configuration *q_from, const Configuration *q_to);
+
       void ConstructSolution(Configuration *q_goal);
 
+      RNG rng_;
+
+      double goalBias{0.05};
+      std::shared_ptr<NearestNeighbors<Configuration *>> cover_tree;
       Configuration *q_start{nullptr};
       Configuration *q_goal{nullptr};
-
-      RNG rng_;
-      double goalBias{0.05};
-
       PDF<Configuration*> pdf_necessary_vertices;
       PDF<Configuration*> pdf_all_vertices;
 
     public:
-      Configuration *lastSampled{nullptr};
+
+      std::shared_ptr<NearestNeighbors<Configuration *>> GetTree() const;
+      Configuration* GetStartConfiguration() const;
+      Configuration* GetGoalConfiguration() const;
+      const PDF<Configuration*>& GetPDFNecessaryVertices() const;
+      const PDF<Configuration*>& GetPDFAllVertices() const;
+      double GetGoalBias() const;
+
+      //Configuration *lastSampled{nullptr};
 
     };
   }

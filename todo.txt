@@ -542,3 +542,4 @@ also it is easy compared to manip)
 [x] goal bias
 [ ] overlapping magenta and green areas, why?
 
+
