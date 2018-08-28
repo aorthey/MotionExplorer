@@ -62,7 +62,13 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_):
 
   checker = dynamic_pointer_cast<OMPLValidityCheckerNecessarySufficient>(si->getStateValidityChecker());
   if(!checker){
+    OMPL_INFORM("Validity Checker only uses inner robot.");
     checkOuterRobot = false;
+    checker = dynamic_pointer_cast<OMPLValidityChecker>(si_->getStateValidityChecker());
+    if(!checker){
+      OMPL_ERROR("Validity Checker cannot compute distances.");
+      exit(0);
+    }
   }else{
     checkOuterRobot = true;
   }

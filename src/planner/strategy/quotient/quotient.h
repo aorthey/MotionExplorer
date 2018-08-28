@@ -44,14 +44,13 @@ namespace ompl
         Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
         ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override final; //final prevents subclasses to override
 
-        virtual bool Sample(ob::State *q_random);
-
         virtual void Init() = 0;
         virtual void Grow(double t) = 0;
         virtual void CheckForSolution(ob::PathPtr &solution) = 0;
         virtual bool SampleGraph(ob::State *q_random) = 0;
-        virtual bool HasSolution();
 
+        virtual bool HasSolution();
+        virtual bool Sample(ob::State *q_random);
         virtual double GetSamplingDensity();
         virtual uint GetNumberOfVertices() const;
         virtual uint GetNumberOfEdges() const;
@@ -108,7 +107,7 @@ namespace ompl
 
 
         //Outer robot available
-        OMPLValidityCheckerNecessarySufficientPtr checker;
+        OMPLValidityCheckerPtr checker;
         bool checkOuterRobot{false};
         bool IsOuterRobotFeasible(ob::State *state);
         double DistanceOuterRobotToObstacle(ob::State *state);
