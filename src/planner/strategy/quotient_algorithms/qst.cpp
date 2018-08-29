@@ -130,19 +130,9 @@ bool QST::Sample(Configuration *q_random){
 }
 og::QST::Configuration* QST::SampleTree(ob::State *q_random_graph)
 {
-  // std::cout << "there are " << pdf_necessary_vertices.size() << " necessary vertices." << std::endl;
-  // std::cout << "and " << GetNumberOfVertices() << " vertices overall." << std::endl;
-  // for(uint k = 0; k < (uint)min((int)pdf_necessary_vertices.size(),5); k++){
-  //   Configuration *qk = pdf_necessary_vertices[k];
-  //   std::cout << "vertex " << k << " radius " << qk->openNeighborhoodRadius << std::endl;
-  // }
-  // exit(0);
   Configuration *q = pdf_necessary_vertices.sample(rng_.uniform01());
-
   double d = q->openNeighborhoodRadius;
-
   Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, d);
-
   return q;
 }
 
