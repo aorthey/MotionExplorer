@@ -23,6 +23,12 @@ void PlannerBackend::Start(){
   pose_objects = 0;
   drawBBs = 0;
   show_view_target = 0;
+
+  if(state("load_view_from_file")){
+    this->OnCommand("load_view","");
+  }
+
+
 }
 
 bool PlannerBackend::OnCommand(const string& cmd,const string& args){
@@ -141,6 +147,16 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     //   path->Load(fn.c_str());
     //   std::cout << "load current path from : " << fn << std::endl;
     // }
+  }else if(cmd=="save_view"){
+    Robot *robot = world->robots[active_robot];
+    std::string rname = robot->name;
+    std::string fname = "../data/viewport/robot_"+rname+".viewport";
+    BaseT::OnCommand("save_view",fname.c_str());
+  }else if(cmd=="load_view"){
+    Robot *robot = world->robots[active_robot];
+    std::string rname = robot->name;
+    std::string fname = "../data/viewport/robot_"+rname+".viewport";
+    BaseT::OnCommand("load_view",fname.c_str());
   }else return BaseT::OnCommand(cmd,args);
 
   if(hierarchy_change){

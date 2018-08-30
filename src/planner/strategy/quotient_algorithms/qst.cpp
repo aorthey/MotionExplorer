@@ -48,6 +48,15 @@ void QST::setup(void)
       OMPL_ERROR("%s: There are no valid goal states!", getName().c_str());
       exit(0);
     }
+
+    //the minimal_bounding_sphere has as center the start configuration, 
+    //and radius equal to the start configuration radius
+    minimal_bounding_sphere = new Configuration(si_, q_start->state);
+    minimal_bounding_sphere->SetRadius(q_start->GetRadius());
+    //we will denote the configuration without parent as the root configuration. 
+    //we make a self-referential parent here to distinguish it from a root
+    //configuration
+    minimal_bounding_sphere->parent = minimal_bounding_sphere; 
     
     OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), cover_tree->size());
     setup_ = true;
@@ -57,7 +66,7 @@ void QST::setup(void)
 
 }
 
-void QST::AddConfiguration(Configuration *q)
+bool QST::AddConfiguration(Configuration *q)
 {
   bool feasible = Q1->isValid(q->state);
 
@@ -66,20 +75,29 @@ void QST::AddConfiguration(Configuration *q)
     if(IsOuterRobotFeasible(q->state))
     {
       q->isSufficientFeasible = true;
-      q->openNeighborhoodRadius = DistanceOuterRobotToObstacle(q->state);
+      q->SetRadius(DistanceOuterRobotToObstacle(q->state));
     }else{
-      q->openNeighborhoodRadius = DistanceInnerRobotToObstacle(q->state);
-      pdf_necessary_vertices.add(q, q->openNeighborhoodRadius);
+      q->SetRadius(DistanceInnerRobotToObstacle(q->state));
     }
-    pdf_all_vertices.add(q, q->openNeighborhoodRadius);
+
+    if(q->GetRadius()<threshold_clearance){
+      q->clear(Q1);
+      delete q;
+      return false;
+    }
+
+    if(!q->isSufficientFeasible){
+      pdf_necessary_vertices.add(q, q->GetRadius());
+    }
+
+    pdf_all_vertices.add(q, q->GetRadius());
     cover_tree->add(q);
   }else{
-    if(q->state != nullptr){
-      si_->freeState(q->state);
-    }
+    q->clear(Q1);
     delete q;
+    return false;
   }
-
+  return true;
 }
 void QST::AddState(ob::State *state)
 {
@@ -91,18 +109,58 @@ void QST::AddState(ob::State *state)
 void QST::Grow(double t)
 {
   Configuration *q_random = new Configuration(si_);
-
   Sample(q_random);
-
   Configuration *q_nearest = Nearest(q_random);
 
+  if(q_nearest->state == q_random->state){
+    //if there is a nan inside nearest, then q_random is returned apparently
+    std::cout << "states are identical" << std::endl;
+    exit(0);
+  }
   Connect(q_nearest, q_random);
 
-  AddConfiguration(q_random);
-
-  if(q_random != nullptr)
+  if(AddConfiguration(q_random))
   {
     q_random->parent = q_nearest;
+    //adjust minimal_bounding_sphere
+
+    ob::State *s_center = minimal_bounding_sphere->state;
+    ob::State *s_m = q_random->state;
+
+    double d_center = minimal_bounding_sphere->GetRadius();
+    double d_x = si_->distance(s_center, s_m);
+    double d_m = q_random->GetRadius();
+
+    if((d_m+d_x) > d_center){
+      double d_new = (d_m + d_x + d_center)/2.0;
+      double d_adj = d_x + d_m - d_new;
+
+      si_->getStateSpace()->interpolate(s_center, s_m, d_adj / d_x, minimal_bounding_sphere->state);
+      minimal_bounding_sphere->SetRadius(d_new);
+
+      if(d_new > 3){
+        std::cout << "updating minimal_bounding_sphere" << std::endl;
+        std::cout << "state1 (nearest) - radius    : " << q_nearest->GetRadius() << std::endl;
+        Q1->printState(q_nearest->state);
+        std::cout << "                 - sufficient: " << (q_nearest->isSufficientFeasible?"Yes":"No") << std::endl;
+        std::cout << "                 - valid     : " << (Q1->isValid(q_nearest->state)?"Yes":"No") << std::endl;
+        std::cout << "state2 (random)  - radius    : " << q_random->GetRadius() << std::endl;
+        Q1->printState(q_random->state);
+        std::cout << "                 - sufficient: " << (q_random->isSufficientFeasible?"Yes":"No") << std::endl;
+        std::cout << "                 - valid     : " << (Q1->isValid(q_random->state)?"Yes":"No") << std::endl;
+        std::cout << "bounding sphere: " << minimal_bounding_sphere->GetRadius() << std::endl;
+        Q1->printState(minimal_bounding_sphere->state);
+        std::cout << "d_center : " << d_center << std::endl;
+        std::cout << "d_x      : " << d_x << std::endl;
+        std::cout << "d_m      : " << d_m << std::endl;
+        std::cout << "d_new    : " << d_new << std::endl;
+        std::cout << "d_adj    :" << d_adj << std::endl;
+        std::cout << "new minimal_bounding_sphere" << std::endl;
+        Q1->printState(minimal_bounding_sphere->state);
+        std::cout << "radius: " << minimal_bounding_sphere->GetRadius() << std::endl;
+        exit(0);
+      }
+    }
   }
 
 }
@@ -112,7 +170,7 @@ bool QST::Sample(Configuration *q_random){
     if(!hasSolution && rng_.uniform01() < goalBias){
       q_random->state = si_->cloneState(q_goal->state);
     }else{
-      Q1_sampler->sampleUniform(q_random->state);
+      sampleUniformOnNeighborhoodBoundary(q_random, minimal_bounding_sphere);
     }
     return true;
   }else{
@@ -297,6 +355,26 @@ double QST::DistanceOpenNeighborhood(const Configuration *q_from, const Configur
   double d = si_->distance(q_from->state, q_to->state);
 
   //note that this is a pseudometric: invalidates second axiom of metric : d(x,y) = 0  iff x=y. But here we only have d(x,x)=0
+  if(d!=d){
+    std::cout << "NaN detected." << std::endl;
+    std::cout << "d_from " << d_from << std::endl;
+    std::cout << "d_to " << d_to << std::endl;
+    std::cout << "d " << d << std::endl;
+    std::cout << "configuration 1: " << std::endl;
+    Q1->printState(q_from->state);
+    std::cout << "configuration 2: " << std::endl;
+    Q1->printState(q_to->state);
+
+    std::vector<Configuration *> vertices;
+    if (cover_tree){
+      cover_tree->list(vertices);
+    }
+    for (auto &vertex : vertices){
+      Q1->printState(vertex->state);
+      std::cout << "vertex " << vertex->GetRadius() << std::endl;
+    }
+    exit(0);
+  }
   double d_open_neighborhood_distance = std::max(d - d_from - d_to, 0.0); 
   return d_open_neighborhood_distance;
 }
@@ -323,8 +401,8 @@ bool QST::sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Confi
     exit(0);
   }
 
-  //sample as long as we are not outside the ball of radius epsilon_min_distance
-  while(dist_q_qk < epsilon_min_distance){
+  //sample as long as we are inside the ball of radius epsilon_min_distance
+  while(dist_q_qk <= epsilon_min_distance){
     Q1_sampler->sampleGaussian(sample->state, center->state, 1);
     dist_q_qk = si_->distance(center->state, sample->state);
   }
@@ -485,13 +563,14 @@ void QST::getPlannerData(base::PlannerData &data) const
   //###########################################################################
   //Obtain vertices
   //###########################################################################
+  minimal_bounding_sphere->isSufficientFeasible = true;
+  std::cout << "Minimal bounding sphere volume: " << minimal_bounding_sphere->GetRadius() << std::endl;
+  cover_tree->add(minimal_bounding_sphere);
+
   std::vector<Configuration *> vertices;
   if (cover_tree){
     cover_tree->list(vertices);
   }
-
-  //if (lastExtendedConfiguration != nullptr){
-  //data.addGoalVertex(pvertex);
 
   for (auto &vertex : vertices)
   {

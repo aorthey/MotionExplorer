@@ -47,6 +47,13 @@ namespace ompl
         double GetRadius() const{
           return openNeighborhoodRadius;
         }
+        void SetRadius(double radius){
+          openNeighborhoodRadius = radius;
+        }
+        void clear(const base::SpaceInformationPtr &si){
+          si->freeState(state);
+        }
+
         uint totalSamples{0}; //how many samples have been drawn from the edge between state and parent
         uint successfulSamples{0}; //how many of those samples have been successfully incorporated into the graph
 
@@ -63,7 +70,7 @@ namespace ompl
 
       void SetSubGraph( QuotientChart *sibling, uint k ) override;
       void AddState(ob::State *state);
-      void AddConfiguration(Configuration *q);
+      bool AddConfiguration(Configuration *q);
       bool sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
 
       virtual bool Sample(Configuration *q_random);
@@ -89,6 +96,9 @@ namespace ompl
       PDF<Configuration*> pdf_necessary_vertices;
       PDF<Configuration*> pdf_all_vertices;
 
+      Configuration *minimal_bounding_sphere{nullptr};
+      double threshold_clearance{1e-8};
+
     public:
 
       std::shared_ptr<NearestNeighbors<Configuration *>> GetTree() const;
@@ -97,6 +107,7 @@ namespace ompl
       const PDF<Configuration*>& GetPDFNecessaryVertices() const;
       const PDF<Configuration*>& GetPDFAllVertices() const;
       double GetGoalBias() const;
+
 
       //Configuration *lastSampled{nullptr};
 
