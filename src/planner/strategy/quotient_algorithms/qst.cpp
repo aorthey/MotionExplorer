@@ -90,7 +90,9 @@ bool QST::AddConfiguration(Configuration *q)
       pdf_necessary_vertices.add(q, q->GetRadius());
     }
 
-    pdf_all_vertices.add(q, q->GetRadius());
+    PDF_Element *q_element = pdf_all_vertices.add(q, q->GetImportance());
+    q->SetPDFElement(q_element);
+
     cover_tree->add(q);
   }else{
     q->clear(Q1);
@@ -109,21 +111,26 @@ void QST::AddState(ob::State *state)
 void QST::Grow(double t)
 {
   Configuration *q_random = new Configuration(si_);
+
+  //standard sampler: get from minimal_bounding_sphere, then expand nearest node
+  //to it. Problem: Many nodes will repeatedly move into a wall, since we do not
+  //track how often a node has been tried to be expanded.
   Sample(q_random);
   Configuration *q_nearest = Nearest(q_random);
-
-  if(q_nearest->state == q_random->state){
-    //if there is a nan inside nearest, then q_random is returned apparently
-    std::cout << "states are identical" << std::endl;
-    exit(0);
-  }
   Connect(q_nearest, q_random);
 
+  //proposed solution: expand frontier nodes more often, nodes which lie near
+  //the boundary of the minimal_bounding_sphere 
+
+
+  q_nearest->number_attempted_expansions++;
   if(AddConfiguration(q_random))
   {
     q_random->parent = q_nearest;
-    //adjust minimal_bounding_sphere
+    q_nearest->number_successful_expansions++;
+    q_nearest->AddExpandedRadius(q_random->GetRadius());
 
+    //adjust minimal_bounding_sphere
     ob::State *s_center = minimal_bounding_sphere->state;
     ob::State *s_m = q_random->state;
 
@@ -138,39 +145,50 @@ void QST::Grow(double t)
       si_->getStateSpace()->interpolate(s_center, s_m, d_adj / d_x, minimal_bounding_sphere->state);
       minimal_bounding_sphere->SetRadius(d_new);
 
-      if(d_new > 3){
-        std::cout << "updating minimal_bounding_sphere" << std::endl;
-        std::cout << "state1 (nearest) - radius    : " << q_nearest->GetRadius() << std::endl;
-        Q1->printState(q_nearest->state);
-        std::cout << "                 - sufficient: " << (q_nearest->isSufficientFeasible?"Yes":"No") << std::endl;
-        std::cout << "                 - valid     : " << (Q1->isValid(q_nearest->state)?"Yes":"No") << std::endl;
-        std::cout << "state2 (random)  - radius    : " << q_random->GetRadius() << std::endl;
-        Q1->printState(q_random->state);
-        std::cout << "                 - sufficient: " << (q_random->isSufficientFeasible?"Yes":"No") << std::endl;
-        std::cout << "                 - valid     : " << (Q1->isValid(q_random->state)?"Yes":"No") << std::endl;
-        std::cout << "bounding sphere: " << minimal_bounding_sphere->GetRadius() << std::endl;
-        Q1->printState(minimal_bounding_sphere->state);
-        std::cout << "d_center : " << d_center << std::endl;
-        std::cout << "d_x      : " << d_x << std::endl;
-        std::cout << "d_m      : " << d_m << std::endl;
-        std::cout << "d_new    : " << d_new << std::endl;
-        std::cout << "d_adj    :" << d_adj << std::endl;
-        std::cout << "new minimal_bounding_sphere" << std::endl;
-        Q1->printState(minimal_bounding_sphere->state);
-        std::cout << "radius: " << minimal_bounding_sphere->GetRadius() << std::endl;
-        exit(0);
-      }
+      // if(d_new != d_new){
+      //   std::cout << "updating minimal_bounding_sphere" << std::endl;
+      //   std::cout << "state1 (nearest) - radius    : " << q_nearest->GetRadius() << std::endl;
+      //   Q1->printState(q_nearest->state);
+      //   std::cout << "                 - sufficient: " << (q_nearest->isSufficientFeasible?"Yes":"No") << std::endl;
+      //   std::cout << "                 - valid     : " << (Q1->isValid(q_nearest->state)?"Yes":"No") << std::endl;
+      //   std::cout << "state2 (random)  - radius    : " << q_random->GetRadius() << std::endl;
+      //   Q1->printState(q_random->state);
+      //   std::cout << "                 - sufficient: " << (q_random->isSufficientFeasible?"Yes":"No") << std::endl;
+      //   std::cout << "                 - valid     : " << (Q1->isValid(q_random->state)?"Yes":"No") << std::endl;
+      //   std::cout << "bounding sphere: " << minimal_bounding_sphere->GetRadius() << std::endl;
+      //   Q1->printState(minimal_bounding_sphere->state);
+      //   std::cout << "d_center : " << d_center << std::endl;
+      //   std::cout << "d_x      : " << d_x << std::endl;
+      //   std::cout << "d_m      : " << d_m << std::endl;
+      //   std::cout << "d_new    : " << d_new << std::endl;
+      //   std::cout << "d_adj    :" << d_adj << std::endl;
+      //   std::cout << "new minimal_bounding_sphere" << std::endl;
+      //   Q1->printState(minimal_bounding_sphere->state);
+      //   std::cout << "radius: " << minimal_bounding_sphere->GetRadius() << std::endl;
+      //   exit(0);
+      // }
     }
   }
+
+  //update PDF
+  q_nearest->UpdateBoundingSphereBoundaryDistance(Distance(q_nearest, minimal_bounding_sphere), minimal_bounding_sphere->GetRadius());
+  pdf_all_vertices.update(static_cast<PDF_Element*>(q_nearest->GetPDFElement()), q_nearest->GetImportance());
 
 }
 
 bool QST::Sample(Configuration *q_random){
   if(parent == nullptr){
-    if(!hasSolution && rng_.uniform01() < goalBias){
+    double r = rng_.uniform01();
+    if(!hasSolution && r < goalBias){
       q_random->state = si_->cloneState(q_goal->state);
     }else{
+      //if(r < goalBias){
+      //}else{
+        //expand 
       sampleUniformOnNeighborhoodBoundary(q_random, minimal_bounding_sphere);
+      // Configuration *q = pdf_all_vertices.sample(rng_.uniform01());
+      // sampleUniformOnNeighborhoodBoundary(q_random, q);
+      //}
     }
     return true;
   }else{
@@ -518,10 +536,6 @@ void QST::SetSubGraph( QuotientChart *sibling, uint k )
   goalBias = rhs->GetGoalBias();
 
   std::cout << "new graph: " << GetNumberOfVertices() << " vertices | " << GetNumberOfEdges() << " edges."<< std::endl;
-  // for(uint k = 0; k < (uint)min((int)pdf_necessary_vertices.size(),5); k++){
-  //   Configuration *qk = pdf_necessary_vertices[k];
-  //   std::cout << "vertex " << k << " radius " << qk->openNeighborhoodRadius << std::endl;
-  // }
 }
 
 std::shared_ptr<ompl::NearestNeighbors<QST::Configuration *>> QST::GetTree() const
@@ -536,11 +550,11 @@ QST::Configuration* QST::GetGoalConfiguration() const
 {
   return q_goal;
 }
-const ompl::PDF<QST::Configuration*>& QST::GetPDFNecessaryVertices() const
+const QST::PDF& QST::GetPDFNecessaryVertices() const
 {
   return pdf_necessary_vertices;
 }
-const ompl::PDF<QST::Configuration*>& QST::GetPDFAllVertices() const
+const QST::PDF& QST::GetPDFAllVertices() const
 {
   return pdf_all_vertices;
 }
@@ -548,7 +562,6 @@ double QST::GetGoalBias() const
 {
   return goalBias;
 }
-
 
 
 void QST::getPlannerData(base::PlannerData &data) const

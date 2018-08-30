@@ -44,20 +44,50 @@ namespace ompl
         Configuration(const base::SpaceInformationPtr &si, const ob::State *state_) : state(si->cloneState(state_))
         {}
         ~Configuration(){};
-        double GetRadius() const{
+        double GetRadius() const
+        {
           return openNeighborhoodRadius;
         }
-        void SetRadius(double radius){
+        void SetRadius(double radius)
+        {
           openNeighborhoodRadius = radius;
         }
-        void clear(const base::SpaceInformationPtr &si){
+        void clear(const base::SpaceInformationPtr &si)
+        {
           si->freeState(state);
         }
+        void SetPDFElement(void *element_)
+        {
+          element = element_;
+        }
+        void* GetPDFElement()
+        {
+          return element;
+        }
+        double GetImportance()
+        {
+          //return openNeighborhoodRadius;
+          //return ((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
+          return exp(-((double)number_attempted_expansions));
+          //return distanceBoundingSphereBoundary;
+        }
+        void UpdateBoundingSphereBoundaryDistance(double d, double radius_minimal_bounding_sphere)
+        {
+          double dx = radius_minimal_bounding_sphere - d;
 
-        uint totalSamples{0}; //how many samples have been drawn from the edge between state and parent
-        uint successfulSamples{0}; //how many of those samples have been successfully incorporated into the graph
+          distanceBoundingSphereBoundary = sqrt(dx*dx);
+        }
+        void AddExpandedRadius(double r)
+        {
+          sumNeighborRadii+=r;
+        }
+
+        uint number_attempted_expansions{0};
+        uint number_successful_expansions{0};
 
         double parentEdgeWeight{0.0};
+        double sumNeighborRadii{0.0};
+        double distanceBoundingSphereBoundary{0.0};
 
         base::State *state{nullptr};
         Configuration *parent{nullptr};
@@ -65,8 +95,11 @@ namespace ompl
 
         bool isSufficientFeasible{false};
         double openNeighborhoodRadius{0.0}; //might be L1 or L2 radius
+        void *element;
       };
 
+      typedef ompl::PDF<Configuration*> PDF;
+      typedef PDF::Element PDF_Element;
 
       void SetSubGraph( QuotientChart *sibling, uint k ) override;
       void AddState(ob::State *state);
@@ -93,8 +126,8 @@ namespace ompl
       std::shared_ptr<NearestNeighbors<Configuration *>> cover_tree;
       Configuration *q_start{nullptr};
       Configuration *q_goal{nullptr};
-      PDF<Configuration*> pdf_necessary_vertices;
-      PDF<Configuration*> pdf_all_vertices;
+      PDF pdf_necessary_vertices;
+      PDF pdf_all_vertices;
 
       Configuration *minimal_bounding_sphere{nullptr};
       double threshold_clearance{1e-8};
@@ -104,8 +137,8 @@ namespace ompl
       std::shared_ptr<NearestNeighbors<Configuration *>> GetTree() const;
       Configuration* GetStartConfiguration() const;
       Configuration* GetGoalConfiguration() const;
-      const PDF<Configuration*>& GetPDFNecessaryVertices() const;
-      const PDF<Configuration*>& GetPDFAllVertices() const;
+      const PDF& GetPDFNecessaryVertices() const;
+      const PDF& GetPDFAllVertices() const;
       double GetGoalBias() const;
 
 
