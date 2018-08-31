@@ -23,7 +23,6 @@ namespace ompl
       virtual void setup() override;
       void getPlannerData(ob::PlannerData &data) const override;
 
-      void freeMemory();
 
       virtual uint GetNumberOfVertices() const override;
       virtual uint GetNumberOfEdges() const override;
@@ -67,27 +66,14 @@ namespace ompl
         double GetImportance()
         {
           //return openNeighborhoodRadius;
-          //return ((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
-          return exp(-((double)number_attempted_expansions));
-          //return distanceBoundingSphereBoundary;
-        }
-        void UpdateBoundingSphereBoundaryDistance(double d, double radius_minimal_bounding_sphere)
-        {
-          double dx = radius_minimal_bounding_sphere - d;
-
-          distanceBoundingSphereBoundary = sqrt(dx*dx);
-        }
-        void AddExpandedRadius(double r)
-        {
-          sumNeighborRadii+=r;
+          return ((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
+          //return 1.0/((double)number_attempted_expansions+1);
         }
 
         uint number_attempted_expansions{0};
         uint number_successful_expansions{0};
 
         double parentEdgeWeight{0.0};
-        double sumNeighborRadii{0.0};
-        double distanceBoundingSphereBoundary{0.0};
 
         base::State *state{nullptr};
         Configuration *parent{nullptr};
@@ -100,11 +86,15 @@ namespace ompl
 
       typedef ompl::PDF<Configuration*> PDF;
       typedef PDF::Element PDF_Element;
+      typedef std::shared_ptr<NearestNeighbors<Configuration*>> NearestNeighborsPtr;
 
       void SetSubGraph( QuotientChart *sibling, uint k ) override;
       void AddState(ob::State *state);
       bool AddConfiguration(Configuration *q);
+      void RemoveConfiguration(Configuration *q);
+
       bool sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
+      bool sampleHalfBallOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
 
       virtual bool Sample(Configuration *q_random);
       virtual Configuration* SampleTree(ob::State*);
@@ -123,14 +113,14 @@ namespace ompl
       RNG rng_;
 
       double goalBias{0.05};
-      std::shared_ptr<NearestNeighbors<Configuration *>> cover_tree;
+      NearestNeighborsPtr cover_tree;
+      NearestNeighborsPtr vertex_tree;
       Configuration *q_start{nullptr};
       Configuration *q_goal{nullptr};
       PDF pdf_necessary_vertices;
       PDF pdf_all_vertices;
 
-      Configuration *minimal_bounding_sphere{nullptr};
-      double threshold_clearance{1e-8};
+      double threshold_clearance{0.001};
 
     public:
 
@@ -140,6 +130,7 @@ namespace ompl
       const PDF& GetPDFNecessaryVertices() const;
       const PDF& GetPDFAllVertices() const;
       double GetGoalBias() const;
+      void freeTree( NearestNeighborsPtr nn);
 
 
       //Configuration *lastSampled{nullptr};

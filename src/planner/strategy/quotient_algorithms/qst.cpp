@@ -15,6 +15,13 @@ QST::QST(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, pare
                                 return DistanceOpenNeighborhood(a,b);
                               });
   }
+  if (!vertex_tree){
+    vertex_tree.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
+    vertex_tree->setDistanceFunction([this](const Configuration *a, const Configuration *b)
+                             {
+                                return DistanceQ1(a,b);
+                              });
+  }
 }
 
 QST::~QST(void)
@@ -32,8 +39,14 @@ void QST::setup(void)
       exit(0);
     }
     if(const ob::State *state = pis_.nextStart()){
-      q_start = new Configuration(si_, state);
-      AddConfiguration(q_start);
+      std::cout << "adding: " << std::endl;
+      q_start = new Configuration(Q1, state);
+      bool added = AddConfiguration(q_start);
+      if(!added)
+      {
+        OMPL_ERROR("Could not add start state.");
+        exit(0);
+      }
       if(parent != nullptr)
       {
         q_start->coset = static_cast<og::QST*>(parent)->q_start;
@@ -49,15 +62,6 @@ void QST::setup(void)
       exit(0);
     }
 
-    //the minimal_bounding_sphere has as center the start configuration, 
-    //and radius equal to the start configuration radius
-    minimal_bounding_sphere = new Configuration(si_, q_start->state);
-    minimal_bounding_sphere->SetRadius(q_start->GetRadius());
-    //we will denote the configuration without parent as the root configuration. 
-    //we make a self-referential parent here to distinguish it from a root
-    //configuration
-    minimal_bounding_sphere->parent = minimal_bounding_sphere; 
-    
     OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), cover_tree->size());
     setup_ = true;
   }else{
@@ -94,6 +98,7 @@ bool QST::AddConfiguration(Configuration *q)
     q->SetPDFElement(q_element);
 
     cover_tree->add(q);
+    vertex_tree->add(q);
   }else{
     q->clear(Q1);
     delete q;
@@ -112,84 +117,106 @@ void QST::Grow(double t)
 {
   Configuration *q_random = new Configuration(si_);
 
-  //standard sampler: get from minimal_bounding_sphere, then expand nearest node
-  //to it. Problem: Many nodes will repeatedly move into a wall, since we do not
-  //track how often a node has been tried to be expanded.
   Sample(q_random);
-  Configuration *q_nearest = Nearest(q_random);
-  Connect(q_nearest, q_random);
 
-  //proposed solution: expand frontier nodes more often, nodes which lie near
-  //the boundary of the minimal_bounding_sphere 
-
-
-  q_nearest->number_attempted_expansions++;
-  if(AddConfiguration(q_random))
-  {
-    q_random->parent = q_nearest;
-    q_nearest->number_successful_expansions++;
-    q_nearest->AddExpandedRadius(q_random->GetRadius());
-
-    //adjust minimal_bounding_sphere
-    ob::State *s_center = minimal_bounding_sphere->state;
-    ob::State *s_m = q_random->state;
-
-    double d_center = minimal_bounding_sphere->GetRadius();
-    double d_x = si_->distance(s_center, s_m);
-    double d_m = q_random->GetRadius();
-
-    if((d_m+d_x) > d_center){
-      double d_new = (d_m + d_x + d_center)/2.0;
-      double d_adj = d_x + d_m - d_new;
-
-      si_->getStateSpace()->interpolate(s_center, s_m, d_adj / d_x, minimal_bounding_sphere->state);
-      minimal_bounding_sphere->SetRadius(d_new);
-
-      // if(d_new != d_new){
-      //   std::cout << "updating minimal_bounding_sphere" << std::endl;
-      //   std::cout << "state1 (nearest) - radius    : " << q_nearest->GetRadius() << std::endl;
-      //   Q1->printState(q_nearest->state);
-      //   std::cout << "                 - sufficient: " << (q_nearest->isSufficientFeasible?"Yes":"No") << std::endl;
-      //   std::cout << "                 - valid     : " << (Q1->isValid(q_nearest->state)?"Yes":"No") << std::endl;
-      //   std::cout << "state2 (random)  - radius    : " << q_random->GetRadius() << std::endl;
-      //   Q1->printState(q_random->state);
-      //   std::cout << "                 - sufficient: " << (q_random->isSufficientFeasible?"Yes":"No") << std::endl;
-      //   std::cout << "                 - valid     : " << (Q1->isValid(q_random->state)?"Yes":"No") << std::endl;
-      //   std::cout << "bounding sphere: " << minimal_bounding_sphere->GetRadius() << std::endl;
-      //   Q1->printState(minimal_bounding_sphere->state);
-      //   std::cout << "d_center : " << d_center << std::endl;
-      //   std::cout << "d_x      : " << d_x << std::endl;
-      //   std::cout << "d_m      : " << d_m << std::endl;
-      //   std::cout << "d_new    : " << d_new << std::endl;
-      //   std::cout << "d_adj    :" << d_adj << std::endl;
-      //   std::cout << "new minimal_bounding_sphere" << std::endl;
-      //   Q1->printState(minimal_bounding_sphere->state);
-      //   std::cout << "radius: " << minimal_bounding_sphere->GetRadius() << std::endl;
-      //   exit(0);
-      // }
+  //reject samples which are inside another sphere
+  std::vector<Configuration*> nbhs;
+  cover_tree->nearestK(q_random, 2, nbhs);
+  if(nbhs.size()>1){
+    double d = DistanceOpenNeighborhood(q_random,nbhs.at(1));
+    if(d<=threshold_clearance){
+      q_random->clear(Q1);
+      delete q_random;
+      return;
     }
   }
 
-  //update PDF
-  q_nearest->UpdateBoundingSphereBoundaryDistance(Distance(q_nearest, minimal_bounding_sphere), minimal_bounding_sphere->GetRadius());
-  pdf_all_vertices.update(static_cast<PDF_Element*>(q_nearest->GetPDFElement()), q_nearest->GetImportance());
+  Configuration *q_nearest = Nearest(q_random);
 
+  Connect(q_nearest, q_random);
+
+  //#########################################################################
+  //added:
+  //#########################################################################
+  // (1) sample only in half ball, instead of ball
+  // (2) a successful expansion is an expansion where the ball does not
+  // significantly shrink
+  // (3) samples are rejected if they are inside the cover -> we require them to
+  // lie on the boundary
+  // (4) If a new sample has a NBH covering other NBHs, then remove those other
+  // NBHs
+  // (5) remove vertices if their importance drops below some threshold
+  //#########################################################################
+
+  if(AddConfiguration(q_random))
+  {
+    //#########################################################################
+    //remove all points which are inside our new configuration
+    //#########################################################################
+    double rq = q_random->GetRadius();
+    vertex_tree->nearestR(q_random, rq, nbhs);
+    for(uint k = 0; k < nbhs.size(); k++){
+      double rk = nbhs.at(k)->GetRadius();
+      double dx = DistanceQ1(q_random, nbhs.at(k));
+      if(rk > rq+dx){
+        if(q_nearest == nbhs.at(k))
+        {
+          q_nearest = q_nearest->parent;
+        }
+        RemoveConfiguration(nbhs.at(k));
+      }
+    }
+
+    //#########################################################################
+    //make sure we do not remove q_nearest!
+    //#########################################################################
+    q_random->parent = q_nearest;
+
+    //#########################################################################
+    //successful expansion is one where we do not shrink significantly the balls
+    //#########################################################################
+    if(0.9*q_nearest->GetRadius() <= q_random->GetRadius())
+    {
+      q_nearest->number_successful_expansions++;
+    }
+  }
+  //update PDF
+  if(q_nearest){
+    pdf_all_vertices.update(static_cast<PDF_Element*>(q_nearest->GetPDFElement()), q_nearest->GetImportance());
+
+    // if(q_nearest->GetImportance() < 0.1){
+    //   //do not expand exhausted vertices
+    //   pdf_all_vertices.remove(static_cast<PDF_Element*>(q_nearest->GetPDFElement()));
+    //   cover_tree->remove(q_nearest);
+    // }
+  }
+}
+
+void QST::RemoveConfiguration(Configuration *q)
+{
+  pdf_all_vertices.remove(static_cast<PDF_Element*>(q->GetPDFElement()));
+  cover_tree->remove(q);
+  vertex_tree->remove(q);
+  q->clear(Q1);
+  delete q;
 }
 
 bool QST::Sample(Configuration *q_random){
   if(parent == nullptr){
-    double r = rng_.uniform01();
-    if(!hasSolution && r < goalBias){
-      q_random->state = si_->cloneState(q_goal->state);
-    }else{
-      //if(r < goalBias){
-      //}else{
-        //expand 
-      sampleUniformOnNeighborhoodBoundary(q_random, minimal_bounding_sphere);
-      // Configuration *q = pdf_all_vertices.sample(rng_.uniform01());
-      // sampleUniformOnNeighborhoodBoundary(q_random, q);
-      //}
-    }
+
+    //double r = rng_.uniform01();
+    //if(r<goalBias){
+    //  q_random->state = si_->cloneState(q_goal->state);
+    //}else{
+    //}
+    Configuration *q = pdf_all_vertices.sample(rng_.uniform01());
+    q->number_attempted_expansions++;
+    pdf_all_vertices.update(static_cast<PDF_Element*>(q->GetPDFElement()), q->GetImportance());
+
+    //sampleUniformOnNeighborhoodBoundary(q_random, q);
+    //more sophisticated sampling where we try to sample only on the halfball
+    sampleHalfBallOnNeighborhoodBoundary(q_random, q);
+
     return true;
   }else{
     //Q1 = X0 x X1
@@ -397,6 +424,52 @@ double QST::DistanceOpenNeighborhood(const Configuration *q_from, const Configur
   return d_open_neighborhood_distance;
 }
 
+bool QST::sampleHalfBallOnNeighborhoodBoundary(Configuration *sample, const Configuration *center)
+{
+  //sample on boundary of open neighborhood
+  // (1) first sample gaussian point qk around q
+  // (2) project qk onto neighborhood
+  // (*) this works because gaussian is symmetric around origin
+  // (*) this does not work when qk is near to q, so we need to sample as long
+  // as it is not near
+  //
+  double radius = center->openNeighborhoodRadius;
+
+  double dist_q_qk = 0;
+  double epsilon_min_distance = 1e-10;
+
+  //@DEBUG
+  if(epsilon_min_distance >= radius){
+    OMPL_ERROR("neighborhood is too small to sample the boundary.");
+    std::cout << "neighborhood radius: " << radius << std::endl;
+    std::cout << "minimal distance to be able to sample: " << epsilon_min_distance << std::endl;
+    exit(0);
+  }
+
+  //sample as long as we are inside the ball of radius epsilon_min_distance
+  while(dist_q_qk <= epsilon_min_distance){
+    Q1_sampler->sampleGaussian(sample->state, center->state, 1);
+    dist_q_qk = si_->distance(center->state, sample->state);
+  }
+
+  //S = sample->state
+  //C = center->state
+  //P = center->parent->state
+
+
+  si_->getStateSpace()->interpolate(center->state, sample->state, radius/dist_q_qk, sample->state);
+
+  Configuration *q_parent = center->parent;
+  if(q_parent !=nullptr)
+  {
+    if(DistanceQ1(q_parent, sample) < q_parent->GetRadius()){
+      si_->getStateSpace()->interpolate(sample->state, center->state, 2, sample->state);
+    }
+  }
+
+  return true;
+
+}
 bool QST::sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Configuration *center)
 {
   //sample on boundary of open neighborhood
@@ -462,9 +535,13 @@ void QST::Init()
 void QST::clear()
 {
   Planner::clear();
-  freeMemory();
+  freeTree(cover_tree);
   if(cover_tree){
     cover_tree->clear();
+  }
+  freeTree(vertex_tree);
+  if(vertex_tree){
+    vertex_tree->clear();
   }
   hasSolution = false;
   q_start = nullptr;
@@ -473,17 +550,17 @@ void QST::clear()
   pis_.restart();
 }
 
-void QST::freeMemory()
+void QST::freeTree( NearestNeighborsPtr nn)
 {
-  if (cover_tree)
+  if(nn)
   {
     std::vector<Configuration *> configurations;
-    cover_tree->list(configurations);
+    nn->list(configurations);
     for (auto &configuration : configurations)
     {
       if (configuration->state != nullptr)
       {
-        si_->freeState(configuration->state);
+        Q1->freeState(configuration->state);
       }
       delete configuration;
     }
@@ -576,9 +653,6 @@ void QST::getPlannerData(base::PlannerData &data) const
   //###########################################################################
   //Obtain vertices
   //###########################################################################
-  minimal_bounding_sphere->isSufficientFeasible = true;
-  std::cout << "Minimal bounding sphere volume: " << minimal_bounding_sphere->GetRadius() << std::endl;
-  cover_tree->add(minimal_bounding_sphere);
 
   std::vector<Configuration *> vertices;
   if (cover_tree){
