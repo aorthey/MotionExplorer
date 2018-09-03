@@ -66,7 +66,7 @@ namespace ompl
         double GetImportance()
         {
           //return openNeighborhoodRadius;
-          return ((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
+          return openNeighborhoodRadius*((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
           //return 1.0/((double)number_attempted_expansions+1);
         }
 
@@ -120,7 +120,7 @@ namespace ompl
       PDF pdf_necessary_vertices;
       PDF pdf_all_vertices;
 
-      double threshold_clearance{0.001};
+      double threshold_clearance{0.01};
 
     public:
 

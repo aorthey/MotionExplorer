@@ -13,7 +13,7 @@ CSpaceOMPL* OMPLValidityChecker::GetCSpaceOMPLPtr() const
 bool OMPLValidityChecker::isValid(const ob::State* state) const
 {
   Config q = cspace->OMPLStateToConfig(state);
-  return IsCollisionFree(klampt_single_robot_cspace, q);
+  return IsCollisionFree(klampt_single_robot_cspace, q) && si_->satisfiesBounds(state);
 }
 
 double OMPLValidityChecker::SufficientDistance(const ob::State* state) const

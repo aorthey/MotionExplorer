@@ -148,8 +148,17 @@ void QST::Grow(double t)
   // (5) remove vertices if their importance drops below some threshold
   //#########################################################################
 
-  if(AddConfiguration(q_random))
+  const uint max_extension_steps = 1000;
+  uint step = 0;
+
+  while(AddConfiguration(q_random) && step++ < max_extension_steps)
   {
+    std::cout << "steps " << step << "/" << max_extension_steps << std::endl;
+    std::cout << "from " << std::endl;
+    Q1->printState(q_nearest->state);
+    std::cout << "to " << std::endl;
+    Q1->printState(q_random->state);
+
     //#########################################################################
     //remove all points which are inside our new configuration
     //#########################################################################
@@ -173,13 +182,46 @@ void QST::Grow(double t)
     q_random->parent = q_nearest;
 
     //#########################################################################
-    //successful expansion is one where we do not shrink significantly the balls
+    //successful expansion: An expansion, where we do not shrink significantly the radii
     //#########################################################################
     if(0.9*q_nearest->GetRadius() <= q_random->GetRadius())
     {
       q_nearest->number_successful_expansions++;
+      q_random->number_successful_expansions++; //importance=1
+    }else{
+      break;
     }
+    //#########################################################################
+    //if it is going well, continue
+    //#########################################################################
+
+    Configuration *q_next = new Configuration(si_);
+
+    double d = Distance(q_nearest, q_random);
+    double radius = q_random->GetRadius();
+    Q1->getStateSpace()->interpolate(q_nearest->state, q_random->state, 1 + radius/d, q_next->state);
+
+    double dn = Distance(q_nearest, q_next);
+    if( fabs(d + radius - dn) > 1e-10)
+    {
+      std::cout << "interpolate not working correctly." << std::endl;
+      std::cout << "nearest:" << std::endl;
+      Q1->printState(q_nearest->state);
+      std::cout << "random:" << std::endl;
+      Q1->printState(q_random->state);
+      std::cout << "radius q_random:" << radius << std::endl;
+      std::cout << "next:" << std::endl;
+      Q1->printState(q_next->state);
+      std::cout << "distance q_random to q_next:" << Distance(q_random, q_next) << ". should be " << radius << std::endl;
+      exit(0);
+    }
+
+    Connect(q_random, q_next);
+
+    q_nearest = q_random;
+    q_random = q_next;
   }
+
   //update PDF
   if(q_nearest){
     pdf_all_vertices.update(static_cast<PDF_Element*>(q_nearest->GetPDFElement()), q_nearest->GetImportance());
@@ -215,7 +257,11 @@ bool QST::Sample(Configuration *q_random){
 
     //sampleUniformOnNeighborhoodBoundary(q_random, q);
     //more sophisticated sampling where we try to sample only on the halfball
-    sampleHalfBallOnNeighborhoodBoundary(q_random, q);
+    if(q->GetImportance() >= 0.5){
+      sampleHalfBallOnNeighborhoodBoundary(q_random, q);
+    }else{
+      sampleUniformOnNeighborhoodBoundary(q_random, q);
+    }
 
     return true;
   }else{
