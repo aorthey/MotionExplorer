@@ -66,7 +66,7 @@ namespace ompl
         double GetImportance()
         {
           //return openNeighborhoodRadius;
-          return openNeighborhoodRadius*((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
+          return openNeighborhoodRadius;//*((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
           //return 1.0/((double)number_attempted_expansions+1);
         }
 
@@ -95,6 +95,7 @@ namespace ompl
 
       bool sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
       bool sampleHalfBallOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
+      Configuration* EstimateBestNextState(const Configuration *q_last, const Configuration *q_current);
 
       virtual bool Sample(Configuration *q_random);
       virtual Configuration* SampleTree(ob::State*);

@@ -126,7 +126,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
         std::cout << std::string(80, '#') << std::endl;
 
         if(k == levels-1){
-          std::cout << "Last level reached. We are done." << std::endl;
           found_path_on_last_level = true;
           Q.push(jChart);
         }else{

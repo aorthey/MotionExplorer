@@ -112,6 +112,7 @@ namespace ompl
         bool IsOuterRobotFeasible(ob::State *state);
         double DistanceOuterRobotToObstacle(ob::State *state);
         double DistanceInnerRobotToObstacle(ob::State *state);
+        double DistanceRobotToObstacle(ob::State *state);
     };
   }
 }

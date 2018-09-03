@@ -95,6 +95,19 @@ double Quotient::DistanceInnerRobotToObstacle(ob::State *state)
   return checker->Distance(state);
 }
 
+double Quotient::DistanceRobotToObstacle(ob::State *state)
+{
+  if(checkOuterRobot){
+    if(IsOuterRobotFeasible(state)){
+      return DistanceOuterRobotToObstacle(state);
+    }else{
+      return DistanceInnerRobotToObstacle(state);
+    }
+  }else{
+    return DistanceInnerRobotToObstacle(state);
+  }
+}
+
 ob::PlannerStatus Quotient::solve(const ob::PlannerTerminationCondition &ptc)
 {
   OMPL_ERROR("A Quotient-Space cannot be solved alone. Use class MultiQuotient to solve Quotient-Spaces.");

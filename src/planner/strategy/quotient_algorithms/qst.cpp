@@ -32,12 +32,16 @@ void QST::setup(void)
 {
 
   if (pdef_){
+    //#########################################################################
     if (pdef_->hasOptimizationObjective()){
       opt_ = pdef_->getOptimizationObjective();
     }else{
       OMPL_ERROR("%s: Did not specify optimization function.", getName().c_str());
       exit(0);
     }
+    //#########################################################################
+    //Adding start configuration
+    //#########################################################################
     if(const ob::State *state = pis_.nextStart()){
       std::cout << "adding: " << std::endl;
       q_start = new Configuration(Q1, state);
@@ -55,13 +59,21 @@ void QST::setup(void)
       OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
       exit(0);
     }
+    //#########################################################################
+    //Adding goal configuration
+    //#########################################################################
     if(const ob::State *state = pis_.nextGoal()){
       q_goal = new Configuration(si_, state);
+      if(parent != nullptr)
+      {
+        q_goal->coset = static_cast<og::QST*>(parent)->q_goal;
+      }
     }else{
       OMPL_ERROR("%s: There are no valid goal states!", getName().c_str());
       exit(0);
     }
 
+    //#########################################################################
     OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), cover_tree->size());
     setup_ = true;
   }else{
@@ -153,11 +165,11 @@ void QST::Grow(double t)
 
   while(AddConfiguration(q_random) && step++ < max_extension_steps)
   {
-    std::cout << "steps " << step << "/" << max_extension_steps << std::endl;
-    std::cout << "from " << std::endl;
-    Q1->printState(q_nearest->state);
-    std::cout << "to " << std::endl;
-    Q1->printState(q_random->state);
+    // std::cout << "steps " << step << "/" << max_extension_steps << std::endl;
+    // std::cout << "from " << std::endl;
+    // Q1->printState(q_nearest->state);
+    // std::cout << "to " << std::endl;
+    // Q1->printState(q_random->state);
 
     //#########################################################################
     //remove all points which are inside our new configuration
@@ -184,54 +196,96 @@ void QST::Grow(double t)
     //#########################################################################
     //successful expansion: An expansion, where we do not shrink significantly the radii
     //#########################################################################
-    if(0.9*q_nearest->GetRadius() <= q_random->GetRadius())
+    if(0.8*q_nearest->GetRadius() <= q_random->GetRadius())
     {
       q_nearest->number_successful_expansions++;
-      q_random->number_successful_expansions++; //importance=1
+      //q_random->number_successful_expansions++; //importance=1
     }else{
-      break;
     }
     //#########################################################################
-    //if it is going well, continue
+    //Momentum: if it is going well, continue
     //#########################################################################
 
-    Configuration *q_next = new Configuration(si_);
+    Configuration *q_next = EstimateBestNextState(q_nearest, q_random);
 
-    double d = Distance(q_nearest, q_random);
-    double radius = q_random->GetRadius();
-    Q1->getStateSpace()->interpolate(q_nearest->state, q_random->state, 1 + radius/d, q_next->state);
-
-    double dn = Distance(q_nearest, q_next);
-    if( fabs(d + radius - dn) > 1e-10)
-    {
-      std::cout << "interpolate not working correctly." << std::endl;
-      std::cout << "nearest:" << std::endl;
-      Q1->printState(q_nearest->state);
-      std::cout << "random:" << std::endl;
-      Q1->printState(q_random->state);
-      std::cout << "radius q_random:" << radius << std::endl;
-      std::cout << "next:" << std::endl;
-      Q1->printState(q_next->state);
-      std::cout << "distance q_random to q_next:" << Distance(q_random, q_next) << ". should be " << radius << std::endl;
-      exit(0);
-    }
+    //@DEBUG
+    //double dn = Distance(q_nearest, q_next);
+    // if( fabs(d + radius - dn) > 1e-10)
+    // {
+    //   std::cout << "interpolate not working correctly." << std::endl;
+    //   std::cout << "nearest:" << std::endl;
+    //   Q1->printState(q_nearest->state);
+    //   std::cout << "random:" << std::endl;
+    //   Q1->printState(q_random->state);
+    //   std::cout << "radius q_random:" << radius << std::endl;
+    //   std::cout << "next:" << std::endl;
+    //   Q1->printState(q_next->state);
+    //   std::cout << "distance q_random to q_next:" << Distance(q_random, q_next) << ". should be " << radius << std::endl;
+    //   exit(0);
+    // }
 
     Connect(q_random, q_next);
 
     q_nearest = q_random;
     q_random = q_next;
+    q_nearest->number_attempted_expansions++;
+    pdf_all_vertices.update(static_cast<PDF_Element*>(q_nearest->GetPDFElement()), q_nearest->GetImportance());
   }
 
   //update PDF
-  if(q_nearest){
-    pdf_all_vertices.update(static_cast<PDF_Element*>(q_nearest->GetPDFElement()), q_nearest->GetImportance());
+  pdf_all_vertices.update(static_cast<PDF_Element*>(q_nearest->GetPDFElement()), q_nearest->GetImportance());
+  //if(q_nearest){
 
     // if(q_nearest->GetImportance() < 0.1){
     //   //do not expand exhausted vertices
     //   pdf_all_vertices.remove(static_cast<PDF_Element*>(q_nearest->GetPDFElement()));
     //   cover_tree->remove(q_nearest);
     // }
-  }
+  //}
+}
+QST::Configuration* QST::EstimateBestNextState(const Configuration *q_last, const Configuration *q_current)
+{
+    Configuration *q_next = new Configuration(Q1);
+
+    //#########################################################################
+    //Strategy 1: Linear Interpolation
+    //#########################################################################
+    //we implement that by starting at q_nearest, interpolating to q_random, and
+    //then overshooting radius/d to q_next
+    //double d = Distance(q_last, q_current);
+    //double radius = q_current->GetRadius();
+    //Q1->getStateSpace()->interpolate(q_last->state, q_current->state, 1 + radius/d, q_next->state);
+    //#########################################################################
+    //Strategy 2: Try to find better state
+    //#########################################################################
+    double d = Distance(q_last, q_current);
+    double radius = q_current->GetRadius();
+    ob::State *tmp = Q1->allocState();
+    ob::State *best = Q1->allocState();
+    Q1->getStateSpace()->interpolate(q_last->state, q_current->state, 1 + radius/d, q_next->state);
+
+    double d_best = fabs(DistanceRobotToObstacle(q_next->state)-radius);
+    best = Q1->cloneState(tmp);
+    for(uint k = 0; k < 3; k++)
+    {
+      Q1_sampler->sampleUniformNear(tmp, q_next->state, 0.1*radius);
+      double d_next = fabs(DistanceRobotToObstacle(tmp)-radius);
+      if(d_next < d_best)
+      {
+        best = Q1->cloneState(tmp);
+        d_best = d_next;
+      }
+    }
+    q_next->state = Q1->cloneState(best);
+    q_next->SetRadius( DistanceRobotToObstacle(best) );
+
+    Q1->freeState(best);
+    Q1->freeState(tmp);
+
+    //#########################################################################
+    //return q_next
+    //#########################################################################
+    return q_next;
 }
 
 void QST::RemoveConfiguration(Configuration *q)
@@ -246,21 +300,19 @@ void QST::RemoveConfiguration(Configuration *q)
 bool QST::Sample(Configuration *q_random){
   if(parent == nullptr){
 
-    //double r = rng_.uniform01();
-    //if(r<goalBias){
-    //  q_random->state = si_->cloneState(q_goal->state);
-    //}else{
-    //}
-    Configuration *q = pdf_all_vertices.sample(rng_.uniform01());
-    q->number_attempted_expansions++;
-    pdf_all_vertices.update(static_cast<PDF_Element*>(q->GetPDFElement()), q->GetImportance());
-
-    //sampleUniformOnNeighborhoodBoundary(q_random, q);
-    //more sophisticated sampling where we try to sample only on the halfball
-    if(q->GetImportance() >= 0.5){
-      sampleHalfBallOnNeighborhoodBoundary(q_random, q);
+    double r = rng_.uniform01();
+    if(r<goalBias){
+      q_random->state = si_->cloneState(q_goal->state);
     }else{
-      sampleUniformOnNeighborhoodBoundary(q_random, q);
+      Configuration *q = pdf_all_vertices.sample(rng_.uniform01());
+      q->number_attempted_expansions++;
+      pdf_all_vertices.update(static_cast<PDF_Element*>(q->GetPDFElement()), q->GetImportance());
+
+      if(q->GetImportance() >= 0.5){
+        sampleHalfBallOnNeighborhoodBoundary(q_random, q);
+      }else{
+        sampleUniformOnNeighborhoodBoundary(q_random, q);
+      }
     }
 
     return true;
@@ -357,6 +409,17 @@ double QST::DistanceTree(const Configuration *q_from, const Configuration *q_to)
   // The length of the resulting path is the unique shortest path on the tree
   // between q_to and q_from
 
+  //###########################################################################
+  //DEBUG
+  //###########################################################################
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "from" << std::endl;
+  Q1->printState(q_from->state);
+  std::cout << "to" << std::endl;
+  Q1->printState(q_to->state);
+
+
+
   std::vector<const Configuration *> path_1;
   const Configuration *q_ptr1 = q_from;
 
@@ -379,7 +442,6 @@ double QST::DistanceTree(const Configuration *q_from, const Configuration *q_to)
   //###########################################################################
   //DEBUG
   //###########################################################################
-  std::cout << std::string(80, '-') << std::endl;
   std::cout << "path1: " << path_1.size() << std::endl;
   for(uint k = 0; k < path_1.size(); k++){
     Q1->printState(path_1.at(k)->state);
