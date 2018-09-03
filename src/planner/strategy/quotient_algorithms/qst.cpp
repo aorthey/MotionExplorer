@@ -264,20 +264,27 @@ QST::Configuration* QST::EstimateBestNextState(const Configuration *q_last, cons
     ob::State *best = Q1->allocState();
     Q1->getStateSpace()->interpolate(q_last->state, q_current->state, 1 + radius/d, q_next->state);
 
-    double d_best = fabs(DistanceRobotToObstacle(q_next->state)-radius);
+    //double d_best = fabs(DistanceRobotToObstacle(q_next->state)-radius);
+    double d_best = DistanceRobotToObstacle(q_next->state);
     best = Q1->cloneState(tmp);
-    for(uint k = 0; k < 3; k++)
+    for(uint k = 0; k < 10; k++)
     {
       Q1_sampler->sampleUniformNear(tmp, q_next->state, 0.1*radius);
-      double d_next = fabs(DistanceRobotToObstacle(tmp)-radius);
-      if(d_next < d_best)
+      //project onto metric ball
+      double dk = Q1->distance(tmp, q_current->state);
+      Q1->getStateSpace()->interpolate(q_current->state, tmp, radius/dk, tmp);
+
+      double dtmp = DistanceRobotToObstacle(tmp);
+      //double d_next = fabs(dtmp-radius);
+      double d_next = dtmp;
+      if(d_next > d_best && dtmp > threshold_clearance)
       {
         best = Q1->cloneState(tmp);
         d_best = d_next;
       }
     }
     q_next->state = Q1->cloneState(best);
-    q_next->SetRadius( DistanceRobotToObstacle(best) );
+    //q_next->SetRadius( DistanceRobotToObstacle(best) );
 
     Q1->freeState(best);
     Q1->freeState(tmp);
