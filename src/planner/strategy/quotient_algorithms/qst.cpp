@@ -247,34 +247,35 @@ QST::Configuration* QST::EstimateBestNextState(const Configuration *q_last, cons
 {
     Configuration *q_next = new Configuration(Q1);
 
+    double d = Distance(q_last, q_current);
+    double radius = q_current->GetRadius();
+
     //#########################################################################
     //Strategy 1: Linear Interpolation
     //#########################################################################
     //we implement that by starting at q_nearest, interpolating to q_random, and
     //then overshooting radius/d to q_next
-    //double d = Distance(q_last, q_current);
-    //double radius = q_current->GetRadius();
     //Q1->getStateSpace()->interpolate(q_last->state, q_current->state, 1 + radius/d, q_next->state);
+
     //#########################################################################
     //Strategy 2: Try to find better state
     //#########################################################################
-    double d = Distance(q_last, q_current);
-    double radius = q_current->GetRadius();
     ob::State *tmp = Q1->allocState();
     ob::State *best = Q1->allocState();
     Q1->getStateSpace()->interpolate(q_last->state, q_current->state, 1 + radius/d, q_next->state);
 
     //double d_best = fabs(DistanceRobotToObstacle(q_next->state)-radius);
-    double d_best = DistanceRobotToObstacle(q_next->state);
-    best = Q1->cloneState(tmp);
+    double d_best = DistanceInnerRobotToObstacle(q_next->state);
+
+    best = Q1->cloneState(q_next->state);
     for(uint k = 0; k < 10; k++)
     {
-      Q1_sampler->sampleUniformNear(tmp, q_next->state, 0.1*radius);
+      Q1_sampler->sampleGaussian(tmp, q_next->state, 0.1*radius);
       //project onto metric ball
       double dk = Q1->distance(tmp, q_current->state);
       Q1->getStateSpace()->interpolate(q_current->state, tmp, radius/dk, tmp);
 
-      double dtmp = DistanceRobotToObstacle(tmp);
+      double dtmp = DistanceInnerRobotToObstacle(tmp);
       //double d_next = fabs(dtmp-radius);
       double d_next = dtmp;
       if(d_next > d_best && dtmp > threshold_clearance)
