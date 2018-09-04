@@ -8,13 +8,13 @@
   <visual>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-      <cylinder length="0.1" radius="0.35"/>
+      <cylinder length="0.1" radius="0.38"/>
     </geometry>
   </visual>
   <collision>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-      <cylinder length="0.1" radius="0.35"/>
+      <cylinder length="0.1" radius="0.38"/>
     </geometry>
   </collision>
  </link>

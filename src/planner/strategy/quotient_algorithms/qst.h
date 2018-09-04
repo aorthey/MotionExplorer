@@ -65,8 +65,8 @@ namespace ompl
         }
         double GetImportance()
         {
-          //return openNeighborhoodRadius;
-          return openNeighborhoodRadius;//*((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
+          return openNeighborhoodRadius;
+          //return ((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
           //return 1.0/((double)number_attempted_expansions+1);
         }
 
@@ -89,16 +89,17 @@ namespace ompl
       typedef std::shared_ptr<NearestNeighbors<Configuration*>> NearestNeighborsPtr;
 
       void SetSubGraph( QuotientChart *sibling, uint k ) override;
-      void AddState(ob::State *state);
-      bool AddConfiguration(Configuration *q);
+      bool AddConfiguration(Configuration *q, Configuration *q_parent=nullptr);
       void RemoveConfiguration(Configuration *q);
 
       bool sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
       bool sampleHalfBallOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
-      Configuration* EstimateBestNextState(const Configuration *q_last, const Configuration *q_current);
+      Configuration* EstimateBestNextState(Configuration *q_last, Configuration *q_current);
 
       virtual bool Sample(Configuration *q_random);
       virtual Configuration* SampleTree(ob::State*);
+      bool IsSampleInsideCover(Configuration *q);
+      void RemoveCoveredSamples(Configuration *q);
 
       Configuration* Nearest(Configuration *q) const;
       void Connect(const Configuration *q_from, Configuration *q_to);

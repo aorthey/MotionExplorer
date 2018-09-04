@@ -82,7 +82,7 @@ void QST::setup(void)
 
 }
 
-bool QST::AddConfiguration(Configuration *q)
+bool QST::AddConfiguration(Configuration *q, Configuration *q_parent)
 {
   bool feasible = Q1->isValid(q->state);
 
@@ -97,6 +97,9 @@ bool QST::AddConfiguration(Configuration *q)
     }
 
     if(q->GetRadius()<threshold_clearance){
+      // std::cout << std::string(80, '-') << std::endl;
+      // std::cout << "rejected configuration w radius " << q->GetRadius() << std::endl;
+      // Q1->printState(q->state);
       q->clear(Q1);
       delete q;
       return false;
@@ -111,19 +114,55 @@ bool QST::AddConfiguration(Configuration *q)
 
     cover_tree->add(q);
     vertex_tree->add(q);
+    // std::cout << std::string(80, '-') << std::endl;
+    // std::cout << "added configuration w radius " << q->GetRadius() << std::endl;
+    // Q1->printState(q->state);
   }else{
+    // std::cout << std::string(80, '-') << std::endl;
+    // std::cout << "rejected configuration w radius " << q->GetRadius() << std::endl;
+    // Q1->printState(q->state);
+
     q->clear(Q1);
     delete q;
     return false;
   }
+  q->parent = q_parent;
   return true;
 }
-void QST::AddState(ob::State *state)
+
+
+bool QST::IsSampleInsideCover(Configuration *q)
 {
-  Configuration *q = new Configuration(Q1, state);
-  AddConfiguration(q);
+  std::vector<Configuration*> neighbors;
+  cover_tree->nearestK(q, 2, neighbors);
+  if(neighbors.size()>1){
+    double d = DistanceOpenNeighborhood(q, neighbors.at(1));
+    if(d<=threshold_clearance){
+      return true;
+    }
+  }
+  return false;
 }
 
+void QST::RemoveCoveredSamples(Configuration *q)
+{
+  double rq = q->GetRadius();
+  std::vector<Configuration*> neighbors;
+  vertex_tree->nearestR(q, rq, neighbors);
+  for(uint k = 0; k < neighbors.size(); k++){
+    double rk = neighbors.at(k)->GetRadius();
+    double dx = DistanceQ1(q, neighbors.at(k));
+    if(rk > rq+dx){
+      //if we need to remove the parent of q, then the parent of q changes to
+      //the parent of the parent of q
+      if(q->parent == neighbors.at(k))
+      {
+        q->parent = q->parent->parent;
+      }
+      RemoveConfiguration(neighbors.at(k));
+    }
+  }
+}
 
 void QST::Grow(double t)
 {
@@ -131,16 +170,10 @@ void QST::Grow(double t)
 
   Sample(q_random);
 
-  //reject samples which are inside another sphere
-  std::vector<Configuration*> nbhs;
-  cover_tree->nearestK(q_random, 2, nbhs);
-  if(nbhs.size()>1){
-    double d = DistanceOpenNeighborhood(q_random,nbhs.at(1));
-    if(d<=threshold_clearance){
-      q_random->clear(Q1);
-      delete q_random;
-      return;
-    }
+  if(IsSampleInsideCover(q_random)){
+    q_random->clear(Q1);
+    delete q_random;
+    return;
   }
 
   Configuration *q_nearest = Nearest(q_random);
@@ -162,74 +195,33 @@ void QST::Grow(double t)
 
   const uint max_extension_steps = 1000;
   uint step = 0;
-
-  while(AddConfiguration(q_random) && step++ < max_extension_steps)
-  {
-    // std::cout << "steps " << step << "/" << max_extension_steps << std::endl;
-    // std::cout << "from " << std::endl;
-    // Q1->printState(q_nearest->state);
-    // std::cout << "to " << std::endl;
-    // Q1->printState(q_random->state);
-
-    //#########################################################################
-    //remove all points which are inside our new configuration
-    //#########################################################################
-    double rq = q_random->GetRadius();
-    vertex_tree->nearestR(q_random, rq, nbhs);
-    for(uint k = 0; k < nbhs.size(); k++){
-      double rk = nbhs.at(k)->GetRadius();
-      double dx = DistanceQ1(q_random, nbhs.at(k));
-      if(rk > rq+dx){
-        if(q_nearest == nbhs.at(k))
-        {
-          q_nearest = q_nearest->parent;
-        }
-        RemoveConfiguration(nbhs.at(k));
-      }
-    }
-
-    //#########################################################################
-    //make sure we do not remove q_nearest!
-    //#########################################################################
-    q_random->parent = q_nearest;
-
-    //#########################################################################
-    //successful expansion: An expansion, where we do not shrink significantly the radii
-    //#########################################################################
-    if(0.8*q_nearest->GetRadius() <= q_random->GetRadius())
+  
+  if(AddConfiguration(q_random, q_nearest)){
+    while(step++ < max_extension_steps)
     {
-      q_nearest->number_successful_expansions++;
-      //q_random->number_successful_expansions++; //importance=1
-    }else{
+      //#########################################################################
+      //remove all points which have neighborhoods inside our new neighborhood
+      //#########################################################################
+      RemoveCoveredSamples(q_random);
+
+      //#########################################################################
+      //Momentum: if it is going well, continue
+      //#########################################################################
+      q_random->number_attempted_expansions++;
+
+      Configuration *q_next = EstimateBestNextState(q_nearest, q_random);
+
+      if(q_next == nullptr)
+      {
+        break;
+      }
+
+      Connect(q_random, q_next);
+
+      q_nearest = q_random;
+      q_random = q_next;
+      pdf_all_vertices.update(static_cast<PDF_Element*>(q_nearest->GetPDFElement()), q_nearest->GetImportance());
     }
-    //#########################################################################
-    //Momentum: if it is going well, continue
-    //#########################################################################
-
-    Configuration *q_next = EstimateBestNextState(q_nearest, q_random);
-
-    //@DEBUG
-    //double dn = Distance(q_nearest, q_next);
-    // if( fabs(d + radius - dn) > 1e-10)
-    // {
-    //   std::cout << "interpolate not working correctly." << std::endl;
-    //   std::cout << "nearest:" << std::endl;
-    //   Q1->printState(q_nearest->state);
-    //   std::cout << "random:" << std::endl;
-    //   Q1->printState(q_random->state);
-    //   std::cout << "radius q_random:" << radius << std::endl;
-    //   std::cout << "next:" << std::endl;
-    //   Q1->printState(q_next->state);
-    //   std::cout << "distance q_random to q_next:" << Distance(q_random, q_next) << ". should be " << radius << std::endl;
-    //   exit(0);
-    // }
-
-    Connect(q_random, q_next);
-
-    q_nearest = q_random;
-    q_random = q_next;
-    q_nearest->number_attempted_expansions++;
-    pdf_all_vertices.update(static_cast<PDF_Element*>(q_nearest->GetPDFElement()), q_nearest->GetImportance());
   }
 
   //update PDF
@@ -243,57 +235,105 @@ void QST::Grow(double t)
     // }
   //}
 }
-QST::Configuration* QST::EstimateBestNextState(const Configuration *q_last, const Configuration *q_current)
+QST::Configuration* QST::EstimateBestNextState(Configuration *q_last, Configuration *q_current)
 {
     Configuration *q_next = new Configuration(Q1);
 
-    double d = Distance(q_last, q_current);
-    double radius = q_current->GetRadius();
+    double d_last_to_current = Distance(q_last, q_current);
+    double radius_current = q_current->GetRadius();
+    Q1->getStateSpace()->interpolate(q_last->state, q_current->state, 1 + radius_current/d_last_to_current, q_next->state);
 
-    //#########################################################################
-    //Strategy 1: Linear Interpolation
-    //#########################################################################
-    //we implement that by starting at q_nearest, interpolating to q_random, and
-    //then overshooting radius/d to q_next
-    //Q1->getStateSpace()->interpolate(q_last->state, q_current->state, 1 + radius/d, q_next->state);
-
-    //#########################################################################
-    //Strategy 2: Try to find better state
-    //#########################################################################
-    ob::State *tmp = Q1->allocState();
-    ob::State *best = Q1->allocState();
-    Q1->getStateSpace()->interpolate(q_last->state, q_current->state, 1 + radius/d, q_next->state);
-
-    //double d_best = fabs(DistanceRobotToObstacle(q_next->state)-radius);
-    double d_best = DistanceInnerRobotToObstacle(q_next->state);
-
-    best = Q1->cloneState(q_next->state);
-    for(uint k = 0; k < 10; k++)
+    if(!AddConfiguration(q_next, q_current))
     {
-      Q1_sampler->sampleGaussian(tmp, q_next->state, 0.1*radius);
-      //project onto metric ball
-      double dk = Q1->distance(tmp, q_current->state);
-      Q1->getStateSpace()->interpolate(q_current->state, tmp, radius/dk, tmp);
+      return nullptr;
+    }
 
-      double dtmp = DistanceInnerRobotToObstacle(tmp);
-      //double d_next = fabs(dtmp-radius);
-      double d_next = dtmp;
-      if(d_next > d_best && dtmp > threshold_clearance)
-      {
-        best = Q1->cloneState(tmp);
-        d_best = d_next;
+    //#######################################################################
+    // We sample the distance function to obtain K samples {q_1,\cdots,q_K}.
+    // For each $q_k$ we compute the value of the distance function dk_radius.
+    // Then we employ two strategies to choose the next sample to follow:
+    //
+    //either follow isolines : min( fabs(radius_k_sample - current_radius) )
+    //or follow the steepest ascent: max(radius_k_sample)
+
+    double radius_best = q_next->GetRadius();
+
+    uint K_samples = 5;
+    double SAMPLING_RADIUS = 0.1*radius_current;
+
+    double radius_ratio = radius_best / radius_current;
+
+    //change from necessary to sufficient -> always considered good
+    if(!q_current->isSufficientFeasible && q_next->isSufficientFeasible)
+    {
+      return q_next;
+    }
+    if(q_current->isSufficientFeasible && !q_next->isSufficientFeasible)
+    {
+      RemoveConfiguration(q_next);
+      return nullptr;
+    }
+
+    if(radius_ratio > 1){
+      //we encountered a bigger radius neighborhood. this is great, we should go
+      //into that direction
+      return q_next;
+    }else{
+      //if next neighborhood is exceptionally small, try to sample more broadly.
+      //Otherwise sample smaller. This corresponds to having more speed in the
+      //momentum of sampling.
+      if(radius_ratio > 0.1){
+        SAMPLING_RADIUS = (1.0-radius_ratio+0.1)*radius_current;
+      }else{
+        SAMPLING_RADIUS = radius_current;
       }
     }
-    q_next->state = Q1->cloneState(best);
-    //q_next->SetRadius( DistanceRobotToObstacle(best) );
 
-    Q1->freeState(best);
-    Q1->freeState(tmp);
+    Configuration *q_best = q_next;
 
+    for(uint k = 0; k < K_samples; k++)
+    {
+      //obtain sample q_k, and radius radius_k
+      Configuration *q_k = new Configuration(Q1);
+      Q1_sampler->sampleGaussian(q_k->state, q_next->state, SAMPLING_RADIUS);
+      double d_current_to_k = Q1->distance(q_k->state, q_current->state);
+      Q1->getStateSpace()->interpolate(q_current->state, q_k->state, radius_current/d_current_to_k, q_k->state);
+
+      if(!AddConfiguration(q_k, q_current)){
+        continue;
+      }
+      q_k->parent = q_current;
+
+      double radius_next = q_k->GetRadius();
+
+      //#######################################################################
+      //current strategy:
+      //
+      //always go from necessary to sufficient
+      //never go from sufficient to necessary
+      //if both are necessary (sufficient), decide on radius
+      //#######################################################################
+
+      if(!q_best->isSufficientFeasible && q_k->isSufficientFeasible)
+      {
+        q_best = q_k;
+        radius_best = radius_next;
+      }else{
+        if(q_best->isSufficientFeasible && !q_k->isSufficientFeasible){
+          continue;
+        }else{
+          if(radius_next > radius_best)
+          {
+            q_best = q_k;
+            radius_best = radius_next;
+          }
+        }
+      }
+    }
     //#########################################################################
     //return q_next
     //#########################################################################
-    return q_next;
+    return q_best;
 }
 
 void QST::RemoveConfiguration(Configuration *q)
@@ -556,7 +596,18 @@ bool QST::sampleHalfBallOnNeighborhoodBoundary(Configuration *sample, const Conf
 
   //@DEBUG
   if(epsilon_min_distance >= radius){
+    std::cout << std::string(80, '-') << std::endl;
     OMPL_ERROR("neighborhood is too small to sample the boundary.");
+
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "states currently considered:" << std::endl;
+    for(uint k = 0; k < pdf_all_vertices.size(); k++){
+      Configuration *q = pdf_all_vertices[k];
+      std::cout << "state " << k << " with radius " << q->GetRadius() << " has values:" << std::endl;
+      Q1->printState(q->state);
+    }
+    std::cout << std::string(80, '-') << std::endl;
+    
     std::cout << "neighborhood radius: " << radius << std::endl;
     std::cout << "minimal distance to be able to sample: " << epsilon_min_distance << std::endl;
     exit(0);
@@ -603,8 +654,18 @@ bool QST::sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Confi
   //@DEBUG
   if(epsilon_min_distance >= radius){
     OMPL_ERROR("neighborhood is too small to sample the boundary.");
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "states currently considered:" << std::endl;
+    for(uint k = 0; k < pdf_all_vertices.size(); k++){
+      Configuration *q = pdf_all_vertices[k];
+      std::cout << "state " << k << " with radius " << q->GetRadius() << " has values:" << std::endl;
+      Q1->printState(q->state);
+    }
+    std::cout << std::string(80, '-') << std::endl;
     std::cout << "neighborhood radius: " << radius << std::endl;
     std::cout << "minimal distance to be able to sample: " << epsilon_min_distance << std::endl;
+    std::cout << "state:" << std::endl;
+    Q1->printState(center->state);
     exit(0);
   }
 
@@ -689,10 +750,10 @@ void QST::CheckForSolution(ob::PathPtr &solution)
   if(DistanceOpenNeighborhood(q_nearest, q_goal) <= 0)
   {
     if(q_goal->parent == nullptr){
+      //goal has not been added before
       q_goal->parent = q_nearest;
       cover_tree->add(q_goal);
     }
-
     Configuration *q_next = q_goal;
     std::vector<Configuration *> q_path;
     while (q_next != nullptr){
