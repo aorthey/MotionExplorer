@@ -77,6 +77,8 @@ namespace ompl
 
         base::State *state{nullptr};
         Configuration *parent{nullptr};
+        std::vector<Configuration*> children;
+
         Configuration *coset{nullptr}; //the underlying coset this configuration belongs to (on the quotient-space)
 
         bool isSufficientFeasible{false};

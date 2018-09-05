@@ -97,9 +97,6 @@ bool QST::AddConfiguration(Configuration *q, Configuration *q_parent)
     }
 
     if(q->GetRadius()<threshold_clearance){
-      // std::cout << std::string(80, '-') << std::endl;
-      // std::cout << "rejected configuration w radius " << q->GetRadius() << std::endl;
-      // Q1->printState(q->state);
       q->clear(Q1);
       delete q;
       return false;
@@ -114,19 +111,13 @@ bool QST::AddConfiguration(Configuration *q, Configuration *q_parent)
 
     cover_tree->add(q);
     vertex_tree->add(q);
-    // std::cout << std::string(80, '-') << std::endl;
-    // std::cout << "added configuration w radius " << q->GetRadius() << std::endl;
-    // Q1->printState(q->state);
   }else{
-    // std::cout << std::string(80, '-') << std::endl;
-    // std::cout << "rejected configuration w radius " << q->GetRadius() << std::endl;
-    // Q1->printState(q->state);
-
     q->clear(Q1);
     delete q;
     return false;
   }
   q->parent = q_parent;
+  if(q_parent != nullptr) q_parent->children.push_back(q);
   return true;
 }
 
@@ -136,30 +127,40 @@ bool QST::IsSampleInsideCover(Configuration *q)
   std::vector<Configuration*> neighbors;
   cover_tree->nearestK(q, 2, neighbors);
   if(neighbors.size()>1){
-    double d = DistanceOpenNeighborhood(q, neighbors.at(1));
-    if(d<=threshold_clearance){
+    //first element is parent
+    Configuration *qn = neighbors.at(1);
+    double dqn = DistanceQ1(qn, q);
+    double rn = qn->GetRadius();
+    if( dqn < rn ){
       return true;
     }
+    // double d = DistanceOpenNeighborhood(q, neighbors.at(1));
+    // if(d<=threshold_clearance){
+    //   return true;
+    // }
   }
   return false;
 }
 
 void QST::RemoveCoveredSamples(Configuration *q)
 {
-  double rq = q->GetRadius();
+  double radius_q = q->GetRadius();
   std::vector<Configuration*> neighbors;
-  vertex_tree->nearestR(q, rq, neighbors);
+  vertex_tree->nearestR(q, radius_q, neighbors);
+
   for(uint k = 0; k < neighbors.size(); k++){
-    double rk = neighbors.at(k)->GetRadius();
-    double dx = DistanceQ1(q, neighbors.at(k));
-    if(rk > rq+dx){
-      //if we need to remove the parent of q, then the parent of q changes to
-      //the parent of the parent of q
-      if(q->parent == neighbors.at(k))
-      {
-        q->parent = q->parent->parent;
-      }
-      RemoveConfiguration(neighbors.at(k));
+
+    Configuration *qn = neighbors.at(k);
+
+    if(qn == q) continue;
+    if(qn->parent == nullptr) continue;
+    if(qn == q->parent) continue;
+
+    double dx = DistanceQ1(q, qn);
+    //double radius_k = qn->GetRadius();
+    //if(radius_q > radius_k+dx){
+    if(radius_q > dx){
+      RemoveConfiguration(qn);
     }
   }
 }
@@ -196,13 +197,14 @@ void QST::Grow(double t)
   const uint max_extension_steps = 1000;
   uint step = 0;
   
+  //remove sample inside a cover
   if(AddConfiguration(q_random, q_nearest)){
     while(step++ < max_extension_steps)
     {
       //#########################################################################
       //remove all points which have neighborhoods inside our new neighborhood
       //#########################################################################
-      RemoveCoveredSamples(q_random);
+      //RemoveCoveredSamples(q_random);
 
       //#########################################################################
       //Momentum: if it is going well, continue
@@ -213,6 +215,10 @@ void QST::Grow(double t)
 
       if(q_next == nullptr)
       {
+        break;
+      }
+      if(IsSampleInsideCover(q_next)){
+        RemoveConfiguration(q_next);
         break;
       }
 
@@ -341,6 +347,17 @@ void QST::RemoveConfiguration(Configuration *q)
   pdf_all_vertices.remove(static_cast<PDF_Element*>(q->GetPDFElement()));
   cover_tree->remove(q);
   vertex_tree->remove(q);
+  if(q->parent==nullptr){
+    OMPL_ERROR("Trying to remove start configuration");
+    exit(0);
+  }
+  //if q is not a leaf node, we need to rewire all its children
+  for(uint k = 0; k < q->children.size(); k++){
+    Configuration *qc = q->children.at(k);
+    qc->parent = q->parent;
+  }
+  q->children.clear();
+
   q->clear(Q1);
   delete q;
 }
