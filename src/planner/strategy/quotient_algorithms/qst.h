@@ -91,7 +91,7 @@ namespace ompl
       typedef std::shared_ptr<NearestNeighbors<Configuration*>> NearestNeighborsPtr;
 
       void SetSubGraph( QuotientChart *sibling, uint k ) override;
-      bool AddConfiguration(Configuration *q, Configuration *q_parent=nullptr);
+      bool AddConfiguration(Configuration *q, Configuration *q_parent=nullptr, bool allowInsideCover=false);
       void RemoveConfiguration(Configuration *q);
 
       bool sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
@@ -104,7 +104,7 @@ namespace ompl
       void RemoveCoveredSamples(Configuration *q);
 
       Configuration* Nearest(Configuration *q) const;
-      void Connect(const Configuration *q_from, Configuration *q_to);
+      bool Connect(const Configuration *q_from, Configuration *q_to);
 
       double Distance(const Configuration *q_from, const Configuration *q_to);
       double DistanceQ1(const Configuration *q_from, const Configuration *q_to);
@@ -125,6 +125,7 @@ namespace ompl
       PDF pdf_all_vertices;
 
       double threshold_clearance{0.01};
+      double epsilon_min_distance{1e-10};
 
     public:
 
