@@ -197,13 +197,21 @@ void QST::RemoveCoveredSamples(Configuration *q)
 
 void QST::Grow(double t)
 {
+  //#########################################################################
+  //Do not grow the cover if it is saturated, i.e. it cannot be expanded anymore
+  // --- we have successfully computed Q1_{free}, the free space of Q1
+  //#########################################################################
   if(saturated) return;
 
+  //#########################################################################
+  //Sample a configuration different from the current cover
+  //#########################################################################
   Configuration *q_random = new Configuration(si_);
-
   Sample(q_random);
 
-
+  //#########################################################################
+  //Nearest in cover
+  //#########################################################################
   Configuration *q_nearest = Nearest(q_random);
   if(q_nearest->state == q_random->state){
     OMPL_ERROR("sampled and nearest states are equivalent.");
@@ -214,51 +222,40 @@ void QST::Grow(double t)
     exit(0);
   }
 
-  if(!Connect(q_nearest, q_random)){
-    q_random->clear(Q1);
-    delete q_random;
-    return;
-  }
+  //#########################################################################
+  //Connect nearest to random --- while staying in neighborhood of q_nearest
+  //#########################################################################
+  Connect(q_nearest, q_random);
 
+  //#########################################################################
+  //Try to expand further in that direction until we hit an infeasible point, or
+  //the time is up
+  //
   //  q_nearest  ---->  q_random  ---->  q_next
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "new iteration" << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
+  //#########################################################################
   if(AddConfiguration(q_random, q_nearest)){
     const uint max_extension_steps = 1000;
     uint step = 0;
     while(step++ < max_extension_steps)
     {
-      //#########################################################################
-      //Momentum: if it is going well, continue
-      //#########################################################################
       q_random->number_attempted_expansions++;
-
-      std::cout << std::string(80, '-') << std::endl;
-      std::cout << "step: " << step << std::endl;
-      std::cout << "q_random:" << std::endl;
-      Q1->printState(q_random->state);
       pdf_all_vertices.update(static_cast<PDF_Element*>(q_random->GetPDFElement()), q_random->GetImportance());
 
+      q_nearest = q_random->parent;
       Configuration *q_next = EstimateBestNextState(q_nearest, q_random);
 
       if(q_next == nullptr)
       {
-        std::cout << "q_next is nullptr" << std::endl;
+        if(verbose>1) std::cout << "q_next is nullptr" << std::endl;
         break;
       }
-      std::cout << "q_next:" << std::endl;
-      Q1->printState(q_next->state);
       //note that q_random might have been removed if the neighborhood is a
       //proper subset of the neighborhood of q_next
       if(q_random == nullptr){
         Connect(q_nearest, q_next);
       }else{
-        std::cout << "q_random:" << std::endl;
-        Q1->printState(q_random->state);
         Connect(q_random, q_next);
         pdf_all_vertices.update(static_cast<PDF_Element*>(q_random->GetPDFElement()), q_random->GetImportance());
-        q_nearest = q_random;
       }
       q_random = q_next;
     }
@@ -268,14 +265,6 @@ void QST::Grow(double t)
   if(q_nearest != nullptr){
     pdf_all_vertices.update(static_cast<PDF_Element*>(q_nearest->GetPDFElement()), q_nearest->GetImportance());
   }
-  //if(q_nearest){
-
-    // if(q_nearest->GetImportance() < 0.1){
-    //   //do not expand exhausted vertices
-    //   pdf_all_vertices.remove(static_cast<PDF_Element*>(q_nearest->GetPDFElement()));
-    //   cover_tree->remove(q_nearest);
-    // }
-  //}
 }
 QST::Configuration* QST::EstimateBestNextState(Configuration *q_last, Configuration *q_current)
 {
@@ -283,10 +272,12 @@ QST::Configuration* QST::EstimateBestNextState(Configuration *q_last, Configurat
 
     Configuration *q_next = new Configuration(Q1);
 
-    std::cout << "from" << std::endl;
-    Q1->printState(q_last->state);
-    std::cout << "to" << std::endl;
-    Q1->printState(q_current->state);
+    if(verbose>1){
+      std::cout << "from" << std::endl;
+      Q1->printState(q_last->state);
+      std::cout << "to" << std::endl;
+      Q1->printState(q_current->state);
+    }
 
     double d_last_to_current = Distance(q_last, q_current);
     double radius_current = q_current->GetRadius();
@@ -301,9 +292,11 @@ QST::Configuration* QST::EstimateBestNextState(Configuration *q_last, Configurat
     //or follow the steepest ascent: max(radius_k_sample)
 
     double radius_best = DistanceInnerRobotToObstacle(q_next->state);
-    std::cout << "next" << std::endl;
-    Q1->printState(q_next->state);
-    std::cout << "radius " << radius_best << std::endl;
+    if(verbose>1){
+      std::cout << "next" << std::endl;
+      Q1->printState(q_next->state);
+      std::cout << "radius " << radius_best << std::endl;
+    }
 
     //double radius_best = q_next->GetRadius();
     double SAMPLING_RADIUS = 0.1*radius_current;
@@ -342,9 +335,11 @@ QST::Configuration* QST::EstimateBestNextState(Configuration *q_last, Configurat
 
       double radius_next = DistanceInnerRobotToObstacle(q_k->state);
 
-      std::cout << "q_k" << std::endl;
-      Q1->printState(q_k->state);
-      std::cout << "radius: " << radius_next << std::endl;
+      if(verbose>1){
+        std::cout << "q_k" << std::endl;
+        Q1->printState(q_k->state);
+        std::cout << "radius: " << radius_next << std::endl;
+      }
 
       if(q_best->isSufficientFeasible && !q_k->isSufficientFeasible)
       {
@@ -456,14 +451,10 @@ QST::Configuration* QST::Nearest(Configuration *q) const
 
 bool QST::Connect(const Configuration *q_from, Configuration *q_to)
 {
-  try{
-    double d = Distance(q_from, q_to);
-    double radius = q_from->GetRadius();
-    double step_size = radius/d;
-    si_->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_to->state);
-  }catch (const std::exception& e){
-    std::cout << e.what();
-  }
+  double d = Distance(q_from, q_to);
+  double radius = q_from->GetRadius();
+  double step_size = radius/d;
+  si_->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_to->state);
   return true;
 }
 
