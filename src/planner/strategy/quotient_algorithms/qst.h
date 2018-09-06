@@ -117,6 +117,7 @@ namespace ompl
       RNG rng_;
 
       double goalBias{0.1};
+      double voronoiBias{0.3};
       NearestNeighborsPtr cover_tree;
       NearestNeighborsPtr vertex_tree;
       Configuration *q_start{nullptr};

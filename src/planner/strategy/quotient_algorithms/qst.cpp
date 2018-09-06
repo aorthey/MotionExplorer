@@ -261,6 +261,19 @@ QST::Configuration* QST::EstimateBestNextState(Configuration *q_last, Configurat
       return nullptr;
     }
 
+
+    //#######################################################################
+    //change from necessary to sufficient -> always considered good
+    // if(!q_current->isSufficientFeasible && q_next->isSufficientFeasible)
+    // {
+    //   return q_next;
+    // }
+    // if(q_current->isSufficientFeasible && !q_next->isSufficientFeasible)
+    // {
+    //   RemoveConfiguration(q_next);
+    //   return nullptr;
+    // }
+
     //#######################################################################
     // We sample the distance function to obtain K samples {q_1,\cdots,q_K}.
     // For each $q_k$ we compute the value of the distance function dk_radius.
@@ -270,22 +283,8 @@ QST::Configuration* QST::EstimateBestNextState(Configuration *q_last, Configurat
     //or follow the steepest ascent: max(radius_k_sample)
 
     double radius_best = q_next->GetRadius();
-
     double SAMPLING_RADIUS = 0.1*radius_current;
-
     double radius_ratio = radius_best / radius_current;
-
-    //change from necessary to sufficient -> always considered good
-    if(!q_current->isSufficientFeasible && q_next->isSufficientFeasible)
-    {
-      return q_next;
-    }
-    if(q_current->isSufficientFeasible && !q_next->isSufficientFeasible)
-    {
-      RemoveConfiguration(q_next);
-      return nullptr;
-    }
-
     if(radius_ratio > 1){
       //we encountered a bigger radius neighborhood. this is great, we should go
       //into that direction
@@ -319,20 +318,42 @@ QST::Configuration* QST::EstimateBestNextState(Configuration *q_last, Configurat
 
       double radius_next = q_k->GetRadius();
 
+      ////#######################################################################
+      ////current strategy:
+      ////
+      ////always go from necessary to sufficient
+      ////never go from sufficient to necessary
+      ////if both are necessary (sufficient), decide on radius
+      ////#######################################################################
+      //if(!q_best->isSufficientFeasible && q_k->isSufficientFeasible)
+      //{
+      //  q_best = q_k;
+      //  radius_best = radius_next;
+      //}else{
+      //  if(q_best->isSufficientFeasible && !q_k->isSufficientFeasible){
+      //    continue;
+      //  }else{
+      //    if(radius_next > radius_best)
+      //    {
+      //      q_best = q_k;
+      //      radius_best = radius_next;
+      //    }
+      //  }
+      //}
       //#######################################################################
       //current strategy:
       //
-      //always go from necessary to sufficient
-      //never go from sufficient to necessary
+      //always go from sufficient to necessary
+      //never go from necessary to sufficient
       //if both are necessary (sufficient), decide on radius
       //#######################################################################
 
-      if(!q_best->isSufficientFeasible && q_k->isSufficientFeasible)
+      if(q_best->isSufficientFeasible && !q_k->isSufficientFeasible)
       {
         q_best = q_k;
         radius_best = radius_next;
       }else{
-        if(q_best->isSufficientFeasible && !q_k->isSufficientFeasible){
+        if(!q_best->isSufficientFeasible && q_k->isSufficientFeasible){
           continue;
         }else{
           if(radius_next > radius_best)
@@ -376,14 +397,24 @@ bool QST::Sample(Configuration *q_random){
     if(r<goalBias){
       q_random->state = si_->cloneState(q_goal->state);
     }else{
-      Configuration *q = pdf_all_vertices.sample(rng_.uniform01());
-      q->number_attempted_expansions++;
-      pdf_all_vertices.update(static_cast<PDF_Element*>(q->GetPDFElement()), q->GetImportance());
-
-      if(q->GetImportance() >= 0.5){
-        sampleHalfBallOnNeighborhoodBoundary(q_random, q);
+      if(r< goalBias + (1-goalBias)*voronoiBias){
+        Q1_sampler->sampleUniform(q_random->state);
       }else{
-        sampleUniformOnNeighborhoodBoundary(q_random, q);
+        Configuration *q;
+        if(pdf_necessary_vertices.size()>0){
+          q = pdf_necessary_vertices.sample(rng_.uniform01());
+          q->number_attempted_expansions++;
+          pdf_necessary_vertices.update(static_cast<PDF_Element*>(q->GetPDFElement()), q->GetImportance());
+        }else{
+          q = pdf_all_vertices.sample(rng_.uniform01());
+          q->number_attempted_expansions++;
+          pdf_all_vertices.update(static_cast<PDF_Element*>(q->GetPDFElement()), q->GetImportance());
+        }
+        if(q->GetImportance() >= 0.5){
+          sampleHalfBallOnNeighborhoodBoundary(q_random, q);
+        }else{
+          sampleUniformOnNeighborhoodBoundary(q_random, q);
+        }
       }
     }
 
@@ -867,6 +898,7 @@ void QST::getPlannerData(base::PlannerData &data) const
     cover_tree->list(vertices);
   }
 
+  uint ctr_sufficient = 0;
   for (auto &vertex : vertices)
   {
     ob::State *state = (local_chart?si_->cloneState(vertex->state):vertex->state);
@@ -880,6 +912,7 @@ void QST::getPlannerData(base::PlannerData &data) const
     using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
     if(vertex->isSufficientFeasible){
       pvertex.SetFeasibility(FeasibilityType::SUFFICIENT_FEASIBLE);
+      ctr_sufficient++;
     }else{
       pvertex.SetFeasibility(FeasibilityType::FEASIBLE);
     }
@@ -910,8 +943,9 @@ void QST::getPlannerData(base::PlannerData &data) const
   //###########################################################################
 
   std::cout << "[QuotientChart] vIdx " << level << " | hIdx " << horizontal_index 
-    << " | siblings " << siblings.size() << " | path " << path 
-    << " | vertices " << data.numVertices() - Nvertices 
+    << " | siblings " << siblings.size() << " | path " << path << std::endl;
+
+  std::cout << "               | vertices " << data.numVertices() - Nvertices << " (" << ctr_sufficient << " sufficient)" 
     << " | edges " << data.numEdges() - Nedges
     << std::endl;
 

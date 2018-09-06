@@ -148,7 +148,6 @@ void Roadmap::DrawPlannerData(GUIState &state)
           Vector3 q2(0,0,1);
           (wired?drawWireCircle(q2, d):drawCircle(q2,d));
         }else{
-          //drawWireSphere(d, 16, 8);
           (wired?drawWireSphere(d, 16):drawSphere(d, 16, 8));
         }
       }
