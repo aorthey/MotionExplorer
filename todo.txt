@@ -545,3 +545,4 @@ also it is easy compared to manip)
 
 
 [ ] distance should be from neighborhoods, not from vertices
+[ ] 

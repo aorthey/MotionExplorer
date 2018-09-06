@@ -133,7 +133,7 @@ bool PlannerInput::Load(TiXmlElement *node)
       lindex = FindNextSiblingNode(lindex);
     }
   }else{
-    //std::cout << "[WARNING] Did not specify robot hierarchy. Assuming one layer SE3RN" << std::endl;
+    std::cout << "[WARNING] Did not specify robot hierarchy. Assuming one layer SE3RN" << std::endl;
     Layer layer;
     layer.level = 0;
     layer.inner_index = 0;

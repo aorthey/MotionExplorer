@@ -25,7 +25,7 @@ namespace ompl
   namespace magic
   {
     static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
-    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 3;
+    static const unsigned int DEFAULT_NEAREST_NEIGHBORS = 10;
   }
 }
 QuotientGraph::QuotientGraph(const ob::SpaceInformationPtr &si, Quotient *parent_)
@@ -200,6 +200,8 @@ QuotientGraph::Vertex QuotientGraph::CreateNewVertex(ob::State *state)
 {
   Vertex m = boost::add_vertex(G);
   G[m].state = si_->cloneState(state);
+  G[m].total_connection_attempts = 1;
+  G[m].successful_connection_attempts = 0;
   disjointSets_.make_set(m);
   return m;
 }

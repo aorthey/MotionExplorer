@@ -123,21 +123,33 @@ void MotionPlanner::CreateHierarchy(){
 
     hierarchy->Print();
   }else{
-    //shallow algorithm
+    //shallow algorithm (use last robot in hierarchy)
 
-    Config qi = input.q_init;
-    Config qg = input.q_goal;
-    Config dqi = input.dq_init;
-    Config dqg = input.dq_goal;
-    uint ridx = input.robot_idx;
+    // Config qi = input.q_init;
+    // Config qg = input.q_goal;
+    // Config dqi = input.dq_init;
+    // Config dqg = input.dq_goal;
+    // uint ridx = input.robot_idx;
+
+    int robot_idx = input.layers.back().inner_index;
+    Robot* robot = world->robots[robot_idx];
+    if(robot==nullptr){
+      std::cout << "Robot " << robot_idx << " does not exist." << std::endl;
+      exit(0);
+    }
+
+    Config qi = input.q_init; qi.resize(robot->q.size());
+    Config qg = input.q_goal; qg.resize(robot->q.size());
+    Config dqi = input.dq_init; dqi.resize(robot->dq.size());
+    Config dqg = input.dq_goal; dqg.resize(robot->dq.size());
 
     std::string type = input.layers.back().type;
-    CSpaceOMPL *cspace_level = ComputeCSpace(type, ridx);
+    CSpaceOMPL *cspace_level = ComputeCSpace(type, robot_idx);
     cspace_levels.push_back( cspace_level );
 
     //two levels, so we can collapse the roadmap 
-    hierarchy->AddLevel( ridx, ridx, qi, qg);
-    hierarchy->AddLevel( ridx, ridx, qi, qg);
+    hierarchy->AddLevel( robot_idx, robot_idx, qi, qg);
+    hierarchy->AddLevel( robot_idx, robot_idx, qi, qg);
 
     hierarchy->AddRootNode( std::make_shared<Roadmap>() ); 
     std::vector<int> path;
