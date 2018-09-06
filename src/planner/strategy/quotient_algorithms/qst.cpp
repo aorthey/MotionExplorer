@@ -2,6 +2,8 @@
 #include "qst.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
+#include <limits>
+
 
 using namespace ompl::geometric;
 
@@ -43,7 +45,6 @@ void QST::setup(void)
     //Adding start configuration
     //#########################################################################
     if(const ob::State *state = pis_.nextStart()){
-      std::cout << "adding: " << std::endl;
       q_start = new Configuration(Q1, state);
       bool added = AddConfiguration(q_start);
       if(!added)
@@ -59,6 +60,7 @@ void QST::setup(void)
       OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
       exit(0);
     }
+
     //#########################################################################
     //Adding goal configuration
     //#########################################################################
@@ -71,6 +73,13 @@ void QST::setup(void)
     }else{
       OMPL_ERROR("%s: There are no valid goal states!", getName().c_str());
       exit(0);
+    }
+
+    //double distance_start_to_goal = DistanceQ1(q_start, q_goal);
+    if(q_start->GetRadius() == std::numeric_limits<double>::infinity())
+    {
+      OMPL_INFORM("Note: start state covers quotient-space.");
+      saturated = true;
     }
 
     //#########################################################################
@@ -188,21 +197,22 @@ void QST::RemoveCoveredSamples(Configuration *q)
 
 void QST::Grow(double t)
 {
+  if(saturated) return;
+
   Configuration *q_random = new Configuration(si_);
 
   Sample(q_random);
 
+
   Configuration *q_nearest = Nearest(q_random);
-  // if(q_nearest->state == q_random->state){
-  //   std::cout << std::string(80, '-') << std::endl;
-  //   std::cout << "nearest state" << std::endl;
-  //   Q1->printState(q_nearest->state);
-  //   std::cout << "sample state" << std::endl;
-  //   Q1->printState(q_random->state);
-  //   std::cout << "radius q_nearest:" << std::endl;
-  //   std::cout << q_nearest->GetRadius() << std::endl;
-  //   exit(0);
-  // }
+  if(q_nearest->state == q_random->state){
+    OMPL_ERROR("sampled and nearest states are equivalent.");
+    std::cout << "sampled state" << std::endl;
+    Q1->printState(q_random->state);
+    std::cout << "nearest state" << std::endl;
+    Q1->printState(q_nearest->state);
+    exit(0);
+  }
 
   if(!Connect(q_nearest, q_random)){
     q_random->clear(Q1);
@@ -210,6 +220,10 @@ void QST::Grow(double t)
     return;
   }
 
+  //  q_nearest  ---->  q_random  ---->  q_next
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "new iteration" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
   if(AddConfiguration(q_random, q_nearest)){
     const uint max_extension_steps = 1000;
     uint step = 0;
@@ -220,23 +234,40 @@ void QST::Grow(double t)
       //#########################################################################
       q_random->number_attempted_expansions++;
 
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << "step: " << step << std::endl;
+      std::cout << "q_random:" << std::endl;
+      Q1->printState(q_random->state);
+      pdf_all_vertices.update(static_cast<PDF_Element*>(q_random->GetPDFElement()), q_random->GetImportance());
+
       Configuration *q_next = EstimateBestNextState(q_nearest, q_random);
 
       if(q_next == nullptr)
       {
+        std::cout << "q_next is nullptr" << std::endl;
         break;
       }
-
-      Connect(q_random, q_next);
-
-      q_nearest = q_random;
+      std::cout << "q_next:" << std::endl;
+      Q1->printState(q_next->state);
+      //note that q_random might have been removed if the neighborhood is a
+      //proper subset of the neighborhood of q_next
+      if(q_random == nullptr){
+        Connect(q_nearest, q_next);
+      }else{
+        std::cout << "q_random:" << std::endl;
+        Q1->printState(q_random->state);
+        Connect(q_random, q_next);
+        pdf_all_vertices.update(static_cast<PDF_Element*>(q_random->GetPDFElement()), q_random->GetImportance());
+        q_nearest = q_random;
+      }
       q_random = q_next;
-      pdf_all_vertices.update(static_cast<PDF_Element*>(q_nearest->GetPDFElement()), q_nearest->GetImportance());
     }
   }
 
   //update PDF
-  pdf_all_vertices.update(static_cast<PDF_Element*>(q_nearest->GetPDFElement()), q_nearest->GetImportance());
+  if(q_nearest != nullptr){
+    pdf_all_vertices.update(static_cast<PDF_Element*>(q_nearest->GetPDFElement()), q_nearest->GetImportance());
+  }
   //if(q_nearest){
 
     // if(q_nearest->GetImportance() < 0.1){
@@ -252,27 +283,14 @@ QST::Configuration* QST::EstimateBestNextState(Configuration *q_last, Configurat
 
     Configuration *q_next = new Configuration(Q1);
 
+    std::cout << "from" << std::endl;
+    Q1->printState(q_last->state);
+    std::cout << "to" << std::endl;
+    Q1->printState(q_current->state);
+
     double d_last_to_current = Distance(q_last, q_current);
     double radius_current = q_current->GetRadius();
     Q1->getStateSpace()->interpolate(q_last->state, q_current->state, 1 + radius_current/d_last_to_current, q_next->state);
-
-    if(!AddConfiguration(q_next, q_current, true))
-    {
-      return nullptr;
-    }
-
-
-    //#######################################################################
-    //change from necessary to sufficient -> always considered good
-    // if(!q_current->isSufficientFeasible && q_next->isSufficientFeasible)
-    // {
-    //   return q_next;
-    // }
-    // if(q_current->isSufficientFeasible && !q_next->isSufficientFeasible)
-    // {
-    //   RemoveConfiguration(q_next);
-    //   return nullptr;
-    // }
 
     //#######################################################################
     // We sample the distance function to obtain K samples {q_1,\cdots,q_K}.
@@ -282,12 +300,21 @@ QST::Configuration* QST::EstimateBestNextState(Configuration *q_last, Configurat
     //either follow isolines : min( fabs(radius_k_sample - current_radius) )
     //or follow the steepest ascent: max(radius_k_sample)
 
-    double radius_best = q_next->GetRadius();
+    double radius_best = DistanceInnerRobotToObstacle(q_next->state);
+    std::cout << "next" << std::endl;
+    Q1->printState(q_next->state);
+    std::cout << "radius " << radius_best << std::endl;
+
+    //double radius_best = q_next->GetRadius();
     double SAMPLING_RADIUS = 0.1*radius_current;
     double radius_ratio = radius_best / radius_current;
     if(radius_ratio > 1){
       //we encountered a bigger radius neighborhood. this is great, we should go
       //into that direction
+      if(!AddConfiguration(q_next, q_current, true))
+      {
+        return nullptr;
+      }
       return q_next;
     }else{
       //if next neighborhood is exceptionally small, try to sample more broadly.
@@ -300,6 +327,9 @@ QST::Configuration* QST::EstimateBestNextState(Configuration *q_last, Configurat
       }
     }
 
+    //#######################################################################
+    //keep q_next constant
+    q_next = const_cast<Configuration*>(q_next);
     Configuration *q_best = q_next;
 
     for(uint k = 0; k < K_samples; k++)
@@ -307,62 +337,34 @@ QST::Configuration* QST::EstimateBestNextState(Configuration *q_last, Configurat
       //obtain sample q_k, and radius radius_k
       Configuration *q_k = new Configuration(Q1);
       Q1_sampler->sampleUniformNear(q_k->state, q_next->state, SAMPLING_RADIUS);
-      double d_current_to_k = Q1->distance(q_k->state, q_current->state);
+      double d_current_to_k = DistanceQ1(q_k, q_current);
       Q1->getStateSpace()->interpolate(q_current->state, q_k->state, radius_current/d_current_to_k, q_k->state);
 
-      if(!AddConfiguration(q_k, q_current, true)){
-        continue;
-      }
+      double radius_next = DistanceInnerRobotToObstacle(q_k->state);
 
-      q_k->parent = q_current;
-
-      double radius_next = q_k->GetRadius();
-
-      ////#######################################################################
-      ////current strategy:
-      ////
-      ////always go from necessary to sufficient
-      ////never go from sufficient to necessary
-      ////if both are necessary (sufficient), decide on radius
-      ////#######################################################################
-      //if(!q_best->isSufficientFeasible && q_k->isSufficientFeasible)
-      //{
-      //  q_best = q_k;
-      //  radius_best = radius_next;
-      //}else{
-      //  if(q_best->isSufficientFeasible && !q_k->isSufficientFeasible){
-      //    continue;
-      //  }else{
-      //    if(radius_next > radius_best)
-      //    {
-      //      q_best = q_k;
-      //      radius_best = radius_next;
-      //    }
-      //  }
-      //}
-      //#######################################################################
-      //current strategy:
-      //
-      //always go from sufficient to necessary
-      //never go from necessary to sufficient
-      //if both are necessary (sufficient), decide on radius
-      //#######################################################################
+      std::cout << "q_k" << std::endl;
+      Q1->printState(q_k->state);
+      std::cout << "radius: " << radius_next << std::endl;
 
       if(q_best->isSufficientFeasible && !q_k->isSufficientFeasible)
       {
         q_best = q_k;
         radius_best = radius_next;
       }else{
-        if(!q_best->isSufficientFeasible && q_k->isSufficientFeasible){
-          continue;
+        if(radius_next > radius_best)
+        {
+          q_best = q_k;
+          radius_best = radius_next;
         }else{
-          if(radius_next > radius_best)
-          {
-            q_best = q_k;
-            radius_best = radius_next;
-          }
+          q_k->clear(Q1);
+          delete q_k;
+          continue;
         }
       }
+    }
+    if(!AddConfiguration(q_best, q_current, true))
+    {
+      return nullptr;
     }
     //#########################################################################
     //return q_next
@@ -394,10 +396,10 @@ bool QST::Sample(Configuration *q_random){
   if(parent == nullptr){
 
     double r = rng_.uniform01();
-    if(r<goalBias){
+    if(!hasSolution && r<goalBias){
       q_random->state = si_->cloneState(q_goal->state);
     }else{
-      if(r< goalBias + (1-goalBias)*voronoiBias){
+      if(r < goalBias + (1-goalBias)*voronoiBias){
         Q1_sampler->sampleUniform(q_random->state);
       }else{
         Configuration *q;
@@ -410,11 +412,12 @@ bool QST::Sample(Configuration *q_random){
           q->number_attempted_expansions++;
           pdf_all_vertices.update(static_cast<PDF_Element*>(q->GetPDFElement()), q->GetImportance());
         }
-        if(q->GetImportance() >= 0.5){
-          sampleHalfBallOnNeighborhoodBoundary(q_random, q);
-        }else{
-          sampleUniformOnNeighborhoodBoundary(q_random, q);
-        }
+        sampleHalfBallOnNeighborhoodBoundary(q_random, q);
+        //if(q->GetImportance() >= 0.5){
+        //  sampleHalfBallOnNeighborhoodBoundary(q_random, q);
+        //}else{
+        //  sampleUniformOnNeighborhoodBoundary(q_random, q);
+        //}
       }
     }
 
@@ -426,6 +429,11 @@ bool QST::Sample(Configuration *q_random){
     ob::State *stateQ0 = Q0->allocState();
     X1_sampler->sampleUniform(stateX1);
     q_random->coset = static_cast<og::QST*>(parent)->SampleTree(stateQ0);
+    if(q_random->coset == nullptr){
+      OMPL_ERROR("no coset found for state");
+      Q1->printState(q_random->state);
+      exit(0);
+    }
     mergeStates(stateQ0, stateX1, q_random->state);
     X1->freeState(stateX1);
     Q0->freeState(stateQ0);
@@ -448,14 +456,14 @@ QST::Configuration* QST::Nearest(Configuration *q) const
 
 bool QST::Connect(const Configuration *q_from, Configuration *q_to)
 {
-  double d = Distance(q_from, q_to);
-  // if(d<epsilon_min_distance){
-  //   return false;
-  // }
-  double radius = q_from->GetRadius();
-  double step_size = radius/d;
-
-  si_->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_to->state);
+  try{
+    double d = Distance(q_from, q_to);
+    double radius = q_from->GetRadius();
+    double step_size = radius/d;
+    si_->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_to->state);
+  }catch (const std::exception& e){
+    std::cout << e.what();
+  }
   return true;
 }
 
@@ -464,6 +472,9 @@ double QST::Distance(const Configuration *q_from, const Configuration *q_to)
   if(parent == nullptr){
     return DistanceQ1(q_from, q_to);
   }else{
+    if(q_to->coset == nullptr || q_from->coset == nullptr){
+      return DistanceQ1(q_from, q_to);
+    }
     og::QST *qst_parent = dynamic_cast<og::QST*>(parent);
     return qst_parent->DistanceTree(q_from->coset, q_to->coset)+DistanceX1(q_from, q_to);
   }
@@ -521,13 +532,14 @@ double QST::DistanceTree(const Configuration *q_from, const Configuration *q_to)
   //###########################################################################
   //DEBUG
   //###########################################################################
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "from" << std::endl;
-  Q1->printState(q_from->state);
-  std::cout << "to" << std::endl;
-  Q1->printState(q_to->state);
 
-
+  if(verbose>1){
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "from" << std::endl;
+    Q1->printState(q_from->state);
+    std::cout << "to" << std::endl;
+    Q1->printState(q_to->state);
+  }
 
   std::vector<const Configuration *> path_1;
   const Configuration *q_ptr1 = q_from;
@@ -551,15 +563,17 @@ double QST::DistanceTree(const Configuration *q_from, const Configuration *q_to)
   //###########################################################################
   //DEBUG
   //###########################################################################
-  std::cout << "path1: " << path_1.size() << std::endl;
-  for(uint k = 0; k < path_1.size(); k++){
-    Q1->printState(path_1.at(k)->state);
+  if(verbose > 1){
+    std::cout << "path1: " << path_1.size() << std::endl;
+    for(uint k = 0; k < path_1.size(); k++){
+      Q1->printState(path_1.at(k)->state);
+    }
+    std::cout << "path2: " << path_2.size() << std::endl;
+    for(uint k = 0; k < path_2.size(); k++){
+      Q1->printState(path_2.at(k)->state);
+    }
+    std::cout << std::string(80, '-') << std::endl;
   }
-  std::cout << "path2: " << path_2.size() << std::endl;
-  for(uint k = 0; k < path_2.size(); k++){
-    Q1->printState(path_2.at(k)->state);
-  }
-  std::cout << std::string(80, '-') << std::endl;
   //###########################################################################
 
   std::vector<const Configuration*>::iterator it1 = path_1.end()-1;
@@ -579,6 +593,7 @@ double QST::DistanceTree(const Configuration *q_from, const Configuration *q_to)
     it2++;
   }
 
+
   //measure distance q_from to it1, it1 to it2, and it2 to q_to
   //q_from to it1
   auto path(std::make_shared<PathGeometric>(Q1));
@@ -597,10 +612,12 @@ double QST::DistanceTree(const Configuration *q_from, const Configuration *q_to)
   }
   path->append((*it2)->state);
 
-  //std::cout << "path: " << path->getStateCount() << std::endl;
-  //for(uint k = 0; k < path->getStateCount(); k++){
-  //  Q1->printState(path->getState(k));
-  //}
+  if(verbose>1){
+    std::cout << "final path: " << path->getStateCount() << std::endl;
+    for(uint k = 0; k < path->getStateCount(); k++){
+      Q1->printState(path->getState(k));
+    }
+  }
 
   //###########################################################################
   //(2) estimate distance along path
@@ -638,7 +655,7 @@ double QST::DistanceOpenNeighborhood(const Configuration *q_from, const Configur
     Q1->printState(q_to->state);
     std::cout << std::string(80, '-') << std::endl;
 
-    exit(0);
+    exit(1);
   }
   double d_open_neighborhood_distance = std::max(d - d_from - d_to, 0.0); 
   return d_open_neighborhood_distance;
@@ -685,8 +702,6 @@ bool QST::sampleHalfBallOnNeighborhoodBoundary(Configuration *sample, const Conf
   //S = sample->state
   //C = center->state
   //P = center->parent->state
-
-
   si_->getStateSpace()->interpolate(center->state, sample->state, radius/dist_q_qk, sample->state);
 
   Configuration *q_parent = center->parent;

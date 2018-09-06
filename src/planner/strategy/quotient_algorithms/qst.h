@@ -30,6 +30,7 @@ namespace ompl
       virtual void Init() override;
       virtual void CheckForSolution(ob::PathPtr &solution) override;
 
+      uint verbose{1};
       
       
     protected:
@@ -116,8 +117,9 @@ namespace ompl
 
       RNG rng_;
 
-      double goalBias{0.1};
-      double voronoiBias{0.3};
+      double goalBias{0.05}; //in [0,1]
+      double voronoiBias{0.3}; //in [0,1]
+
       NearestNeighborsPtr cover_tree;
       NearestNeighborsPtr vertex_tree;
       Configuration *q_start{nullptr};
@@ -127,6 +129,7 @@ namespace ompl
 
       double threshold_clearance{0.01};
       double epsilon_min_distance{1e-10};
+      bool saturated{false}; //if space is saturated, then we the whole free space has been found
 
     public:
 
