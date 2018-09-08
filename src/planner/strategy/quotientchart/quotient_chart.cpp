@@ -9,6 +9,7 @@ using namespace og;
 QuotientChart::QuotientChart(const ob::SpaceInformationPtr &si, og::Quotient *parent_)
   : BaseT(si, parent_)
 {
+  UpdateChartPath();
 }
 
 void QuotientChart::setup() 
@@ -23,6 +24,11 @@ void QuotientChart::SetChartHorizontalIndex(uint chartHorizontalIndex_)
 {
   chartHorizontalIndex = chartHorizontalIndex_;
 
+  UpdateChartPath();
+}
+
+void QuotientChart::UpdateChartPath() 
+{
   chartPath.clear();
   chartPath.push_back(chartHorizontalIndex);
   og::QuotientChart *parent = static_cast<og::QuotientChart*>(GetParent());
@@ -31,9 +37,7 @@ void QuotientChart::SetChartHorizontalIndex(uint chartHorizontalIndex_)
     chartPath.push_back(parent->GetChartHorizontalIndex());
     parent = static_cast<og::QuotientChart*>(parent->GetParent());
   }
-
   std::reverse(std::begin(chartPath), std::end(chartPath));
-
 }
 
 bool QuotientChart::FoundNewPath()
@@ -193,8 +197,8 @@ bool QuotientChart::IsSaturated() const
 
 void QuotientChart::getPlannerData(ob::PlannerData &data) const
 {
-  // uint Nvertices = data.numVertices();
-  // uint Nedges = data.numEdges();
+  uint Nvertices = data.numVertices();
+  uint Nedges = data.numEdges();
 
   //###########################################################################
   //Get Data from this chart
@@ -241,11 +245,11 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
   //Get Data From all siblings
   //###########################################################################
 
-//  std::cout << "[QuotientChart] vIdx " << level << " | hIdx " << horizontal_index 
-//    << " | siblings " << siblings.size() << " | chart_path " << chart_path 
-//    << " | vertices " << data.numVertices() - Nvertices 
-//    << " | edges " << data.numEdges() - Nedges
-//    << std::endl;
+  std::cout << "[QuotientChart] vIdx " << level << " | hIdx " << chartHorizontalIndex
+    << " | siblings " << chartSiblings.size() << " | chart_path " << chartPath
+    << " | vertices " << data.numVertices() - Nvertices 
+    << " | edges " << data.numEdges() - Nedges
+    << std::endl;
 
   for(uint i = 0; i < chartSiblings.size(); i++){
     chartSiblings.at(i)->getPlannerData(data);

@@ -544,10 +544,12 @@ also it is easy compared to manip)
 [ ] distance should be from neighborhoods, not from vertices
 
 Goal: refactor QST
-[ ] boost::graph seems better option --- rewiring seems to be an important option
+[x] boost::graph seems better option --- rewiring seems to be an important option
 
 
-[ ] need graph, not tree (otherwise it will get complicated to rewire tree)
+[x] need graph, not tree (otherwise it will get complicated to rewire tree)
 [ ] bug in doubleLshape (returns nullptr as state somewhere)
-[ ] QNG should be independent from QuotientGraph (too much overlap) --> refactor
+[x] QNG should be independent from QuotientGraph (too much overlap) --> refactor
 quotient-chart
+
+[ ] 

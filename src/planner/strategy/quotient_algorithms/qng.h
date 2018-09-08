@@ -12,7 +12,7 @@ namespace ompl
   namespace geometric
   {
 
-    //Quotient-space Sufficient neighborhood graph planner (QNG)
+    //Quotient-space sufficient Neighborhood Graph planner (QNG)
     class QNG: public og::QuotientChart
     {
       typedef og::QuotientChart BaseT;
@@ -22,9 +22,12 @@ namespace ompl
       ~QNG(void);
       virtual void clear() override;
       virtual void setup() override;
-      virtual void getPlannerDataAnnotated(base::PlannerData &data) const override;
       
     protected:
+
+      //#######################################################################
+      //Configuration
+      //#######################################################################
       class Configuration{
         public:
           Configuration() = default;
@@ -71,6 +74,8 @@ namespace ompl
         bool isStart{false};
         bool isGoal{false};
 
+        int index{0};
+
         //#####################################################################
         //Neighborhood Computations
         //#####################################################################
@@ -108,8 +113,8 @@ namespace ompl
          boost::vecS, 
          boost::undirectedS,
          Configuration,
-         //EdgeInternalState
-         boost::property<boost::edge_index_t,int, EdgeInternalState> 
+         EdgeInternalState
+         //boost::property<boost::edge_index_t,int, EdgeInternalState> 
        > Graph;
 
       typedef boost::graph_traits<Graph> BGT;
@@ -126,13 +131,11 @@ namespace ompl
       typedef PDF::Element PDF_Element;
 
       virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
-      std::vector<Configuration*> GetConfigurationsInsideNeighborhood(Configuration *q);
-      bool IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rhs);
 
       void AddConfiguration(Configuration *q);
-
       //need to supply q_coset, the pointer to the underlying equivalence class
       Configuration* AddState(const ob::State *state, Configuration *q_coset);
+
       void RemoveConfiguration(Configuration *q);
 
       bool sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
@@ -142,7 +145,7 @@ namespace ompl
       virtual bool Sample(Configuration *q_random);
       Configuration* SampleQuotientCover(ob::State *state) const;
 
-      bool IsSampleInsideCover(Configuration *q);
+      bool IsConfigurationInsideCover(Configuration *q);
       void Grow(double t) override;
       void Init() override;
       bool GetSolution(ob::PathPtr &solution) override;
@@ -151,17 +154,36 @@ namespace ompl
 
       void RemoveCoveredSamples(Configuration *q);
 
-      Configuration* Nearest(Configuration *q) const;
       bool Connect(const Configuration *q_from, Configuration *q_to);
 
-      double Distance(const Configuration *q_from, const Configuration *q_to);
+      //#######################################################################
+      //Distance Computations
+      //#######################################################################
       double DistanceQ1(const Configuration *q_from, const Configuration *q_to);
       double DistanceX1(const Configuration *q_from, const Configuration *q_to);
-      double DistanceCover(const Configuration *q_from, const Configuration *q_to);
-      double DistanceOpenNeighborhood(const Configuration *q_from, const Configuration *q_to);
+      double DistanceOverCover(const Configuration *q_from, const Configuration *q_to);
+      double DistanceConfigurationConfiguration(const Configuration *q_from, const Configuration *q_to);
+      //Note: this is a pseudometric: invalidates second axiom of metric : d(x,y) = 0  iff x=y. But here we only have d(x,x)=0
+      double DistanceNeighborhoodNeighborhood(const Configuration *q_from, const Configuration *q_to);
+      //Note: this is a pseudometric: invalidates second axiom of metric : d(x,y) = 0  iff x=y. But here we only have d(x,x)=0
+      double DistanceConfigurationNeighborhood(const Configuration *q_from, const Configuration *q_to);
 
-      void ConstructSolution(Configuration *q_goal);
+      //#######################################################################
+      //Neighborhood Set Computations
+      //#######################################################################
+      bool IsConfigurationInsideNeighborhood(Configuration *q, Configuration *qn);
+      std::vector<Configuration*> GetConfigurationsInsideNeighborhood(Configuration *q);
+      bool IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rhs);
 
+      //#######################################################################
+      //Cover Algorithms
+      //#######################################################################
+      std::vector<Vertex> GetCoverPath(const Vertex& start, const Vertex& goal);
+      Configuration* Nearest(Configuration *q) const;
+
+      virtual void getPlannerDataAnnotated(base::PlannerData &data) const override;
+      PlannerDataVertexAnnotated getAnnotatedVertex(Vertex vertex, std::map<const Vertex, ob::State*> &vertexToStates) const;
+      //#######################################################################
       RNG rng_;
       double goalBias{0.05}; //in [0,1]
       double voronoiBias{0.3}; //in [0,1]
@@ -171,6 +193,12 @@ namespace ompl
 
       Configuration *q_start{nullptr};
       Configuration *q_goal{nullptr};
+
+      Vertex v_start;
+      Vertex v_goal;
+
+
+
       PDF pdf_necessary_configurations;
       PDF pdf_all_configurations;
 

@@ -22,6 +22,7 @@ namespace ompl
         virtual void setup() override;
 
         std::vector<int> GetChartPath() const;
+        void UpdateChartPath();
 
         uint GetChartHorizontalIndex() const;
         void SetChartHorizontalIndex(uint);

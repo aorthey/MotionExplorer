@@ -3,7 +3,13 @@
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <limits>
+#include <boost/graph/astar_search.hpp>
+#include <boost/graph/incremental_components.hpp>
+#include <boost/property_map/vector_property_map.hpp>
+#include <boost/property_map/transform_value_property_map.hpp>
+#include <boost/foreach.hpp>
 
+#define foreach BOOST_FOREACH
 
 using namespace ompl::geometric;
 
@@ -14,14 +20,14 @@ QNG::QNG(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, pare
     nearest_cover.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
     nearest_cover->setDistanceFunction([this](const Configuration *a, const Configuration *b)
                              {
-                                return DistanceOpenNeighborhood(a,b);
+                                return DistanceNeighborhoodNeighborhood(a,b);
                               });
   }
   if (!nearest_vertex){
     nearest_vertex.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
     nearest_vertex->setDistanceFunction([this](const Configuration *a, const Configuration *b)
                              {
-                                return DistanceQ1(a,b);
+                                return DistanceConfigurationConfiguration(a,b);
                               });
   }
 }
@@ -51,11 +57,11 @@ void QNG::setup(void)
         coset = static_cast<og::QNG*>(parent)->q_start;
       }
       q_start = AddState(state, coset);
-
       if(q_start == nullptr){
         OMPL_ERROR("%s: Could not add start state!", getName().c_str());
         exit(0);
       }
+      v_start = q_start->index;
     }else{
       OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
       exit(0);
@@ -75,6 +81,7 @@ void QNG::setup(void)
         OMPL_ERROR("%s: Could not add goal state!", getName().c_str());
         exit(0);
       }
+      v_goal = q_goal->index;
     }else{
       OMPL_ERROR("%s: There are no valid goal states!", getName().c_str());
       exit(0);
@@ -100,6 +107,7 @@ void QNG::AddConfiguration(Configuration *q)
   Vertex v = boost::add_vertex(*q, graph);
   graph[v].number_attempted_expansions = 0;
   graph[v].number_successful_expansions = 0;
+  graph[v].index = v;
 
   PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
   q->SetPDFElement(q_element);
@@ -111,7 +119,7 @@ QNG::Configuration* QNG::AddState(const ob::State *state, Configuration *q_coset
 {
 
   Configuration *q = new Configuration(Q1, state);
-  if(IsSampleInsideCover(q)){
+  if(IsConfigurationInsideCover(q)){
     q->Remove(Q1);
     return nullptr;
   }
@@ -151,35 +159,20 @@ QNG::Configuration* QNG::AddState(const ob::State *state, Configuration *q_coset
   return q;
 }
 
+bool QNG::IsConfigurationInsideNeighborhood(Configuration *q, Configuration *qn)
+{
+  return (DistanceConfigurationConfiguration(q, qn) <= 0);
+}
 
-//if new sample is inside the current cover, return true
-//we check the two nearest points. only one of them can be a parent, ignore that
-//one, and check distance of the second one.
-
-bool QNG::IsSampleInsideCover(Configuration *q)
+bool QNG::IsConfigurationInsideCover(Configuration *q)
 {
   std::vector<Configuration*> neighbors;
 
   nearest_cover->nearestK(q, 2, neighbors);
 
-  for(uint k = 0; k < neighbors.size(); k++)
-  {
-    //Configuration *qn = neighbors.at(k);
-    //the configuration is allowed to be on the boundary of the parent
-    std::cout << "is inside cover" << std::endl;
-    std::cout << "NYI" << std::endl;
-    exit(0);
-    // if(qn != q->parent){
+  if(neighbors.size()<=1) return false;
 
-    //   double dqn = DistanceQ1(qn, q);
-    //   double radius_n = qn->GetRadius();
-    //   if( dqn < radius_n ){
-    //     //std::cout << "distance rejected: " << dqn << " < " << radius_n << std::endl;
-    //     return true;
-    //   }
-    // }
-  }
-  return false;
+  return IsConfigurationInsideNeighborhood(q, neighbors.at(0)) && IsConfigurationInsideNeighborhood(q, neighbors.at(1));
 }
 
 bool QNG::IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rhs)
@@ -196,6 +189,7 @@ std::vector<QNG::Configuration*> QNG::GetConfigurationsInsideNeighborhood(Config
   nearest_vertex->nearestR(q, q->GetRadius(), neighbors);
   return neighbors;
 }
+
 
 //If the neighborhood of q is a superset of any other neighborhood, then delete
 //the other neighborhood, and rewire the tree.
@@ -220,7 +214,6 @@ void QNG::RemoveCoveredSamples(Configuration *q)
 
 void QNG::Grow(double t)
 {
-  std::cout << "grow" << std::endl;
   return;
   //#########################################################################
   //Do not grow the cover if it is saturated, i.e. it cannot be expanded anymore
@@ -460,16 +453,18 @@ QNG::Configuration* QNG::Nearest(Configuration *q) const
   return nearest_cover->nearest(q);
 }
 
+//@TODO: should be fixed to reflect the distance on the underlying
+//quotient-space, i.e. similar to QMPConnect. For now we use DistanceQ1
 bool QNG::Connect(const Configuration *q_from, Configuration *q_to)
 {
-  double d = Distance(q_from, q_to);
+  double d = DistanceQ1(q_from, q_to);
   double radius = q_from->GetRadius();
   double step_size = radius/d;
   si_->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_to->state);
   return true;
 }
 
-double QNG::Distance(const Configuration *q_from, const Configuration *q_to)
+double QNG::DistanceConfigurationConfiguration(const Configuration *q_from, const Configuration *q_to)
 {
   if(parent == nullptr){
     //the very first quotient-space => usual metric
@@ -483,7 +478,7 @@ double QNG::Distance(const Configuration *q_from, const Configuration *q_to)
     //metric defined by distance on cover of quotient-space plus distance on the
     //subspace Q1/Q0
     og::QNG *QNG_parent = dynamic_cast<og::QNG*>(parent);
-    return QNG_parent->DistanceCover(q_from->coset, q_to->coset)+DistanceX1(q_from, q_to);
+    return QNG_parent->DistanceOverCover(q_from->coset, q_to->coset)+DistanceX1(q_from, q_to);
   }
 }
 
@@ -504,13 +499,18 @@ double QNG::DistanceX1(const Configuration *q_from, const Configuration *q_to)
   return d;
 }
 
-double QNG::DistanceOpenNeighborhood(const Configuration *q_from, const Configuration *q_to)
+double QNG::DistanceConfigurationNeighborhood(const Configuration *q_from, const Configuration *q_to)
+{
+  double d_to = q_to->GetRadius();
+  double d = DistanceConfigurationConfiguration(q_from, q_to);
+  return std::max(d - d_to, 0.0);
+}
+double QNG::DistanceNeighborhoodNeighborhood(const Configuration *q_from, const Configuration *q_to)
 {
   double d_from = q_from->GetRadius();
   double d_to = q_to->GetRadius();
   double d = si_->distance(q_from->state, q_to->state);
 
-  //note that this is a pseudometric: invalidates second axiom of metric : d(x,y) = 0  iff x=y. But here we only have d(x,x)=0
   if(d!=d){
     // std::vector<Configuration *> vertices;
     // std::cout << std::string(80, '-') << std::endl;
@@ -535,7 +535,7 @@ double QNG::DistanceOpenNeighborhood(const Configuration *q_from, const Configur
   return d_open_neighborhood_distance;
 }
 
-double QNG::DistanceCover(const Configuration *q_from, const Configuration *q_to)
+double QNG::DistanceOverCover(const Configuration *q_from, const Configuration *q_to)
 {
   std::cout << "distance quotient cover" << std::endl;
   std::cout << "NYI" << std::endl;
@@ -666,10 +666,9 @@ void QNG::clear()
 
 bool QNG::GetSolution(ob::PathPtr &solution)
 {
-  std::cout << "get solution" << std::endl;
-  std::cout << "NYI" << std::endl;
-  exit(0);
-    //hasSolution = true;
+  std::vector<Vertex> path = GetCoverPath(v_start, v_goal);
+  if(path.size()>0) hasSolution = true;
+  return hasSolution;
 }
 
 void QNG::CopyChartFromSibling( QuotientChart *sibling, uint k )
@@ -701,57 +700,103 @@ double QNG::GetGoalBias() const
   return goalBias;
 }
 
+std::vector<QNG::Vertex> QNG::GetCoverPath(const Vertex& start, const Vertex& goal)
+{
+  std::vector<Vertex> prev(boost::num_vertices(graph));
+  auto weight = boost::make_transform_value_property_map(std::mem_fn(&EdgeInternalState::getCost), get(boost::edge_bundle, graph));
+
+  boost::astar_search(graph, start,
+                    [this, goal](const Vertex &v)
+                    {
+                        return ob::Cost(DistanceQ1(&graph[v], &graph[goal]));
+                    },
+                    boost::predecessor_map(&prev[0])
+                      .weight_map(weight)
+                      .distance_compare([this](EdgeInternalState c1, EdgeInternalState c2)
+                                        {
+                                            return opt_->isCostBetterThan(c1.getCost(), c2.getCost());
+                                        })
+                      .distance_combine([this](EdgeInternalState c1, EdgeInternalState c2)
+                                        {
+                                            return opt_->combineCosts(c1.getCost(), c2.getCost());
+                                        })
+                      .distance_inf(opt_->infiniteCost())
+                      .distance_zero(opt_->identityCost())
+                    );
+
+  std::vector<Vertex> path;
+
+  if (prev[goal] == goal){
+    return path;
+  }
+  for(Vertex pos = goal; prev[pos] != pos; pos = prev[pos]){
+    path.push_back(pos);
+  }
+  path.push_back(start);
+  std::reverse(path.begin(), path.end());
+  return path;
+}
+
+
+PlannerDataVertexAnnotated QNG::getAnnotatedVertex(Vertex vertex, std::map<const Vertex, ob::State*> &vertexToStates) const
+{
+  ob::State *state = (isLocalChart?si_->cloneState(graph[vertex].state):graph[vertex].state);
+  vertexToStates[vertex] = state;
+  PlannerDataVertexAnnotated pvertex(state);
+  pvertex.SetLevel(GetLevel());
+  pvertex.SetPath(GetChartPath());
+  //std::cout << GetChartPath() << std::endl;
+  pvertex.SetOpenNeighborhoodDistance(graph[vertex].GetRadius());
+
+  if(!state){
+    std::cout << "vertex state does not exists" << std::endl;
+    Q1->printState(state);
+    exit(0);
+  }
+
+  using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
+  if(graph[vertex].isSufficientFeasible){
+    pvertex.SetFeasibility(FeasibilityType::SUFFICIENT_FEASIBLE);
+  }else{
+    pvertex.SetFeasibility(FeasibilityType::FEASIBLE);
+  }
+  return pvertex;
+}
+
 
 void QNG::getPlannerDataAnnotated(base::PlannerData &data) const
 {
+  std::map<const Vertex, ob::State*> vertexToStates;
 
-  //###########################################################################
-  //Obtain vertices
-  //###########################################################################
-  // std::vector<Configuration *> vertices;
-  // if (nearest_cover){
-  //   nearest_cover->list(vertices);
-  // }
+  PlannerDataVertexAnnotated pstart = getAnnotatedVertex(v_start, vertexToStates);
+  data.addStartVertex(pstart);
 
-  //uint ctr_sufficient = 0;
-  // for (auto &vertex : vertices)
-  // {
-  //   ob::State *state = (local_chart?si_->cloneState(vertex->state):vertex->state);
-  //   double d = vertex->GetRadius();
+  //std::cout << data.vertexIndex(pstart) << std::endl;
 
-  //   PlannerDataVertexAnnotated pvertex(state);
-  //   pvertex.SetLevel(level);
-  //   pvertex.SetPath(path);
-  //   pvertex.SetOpenNeighborhoodDistance(d);
 
-  //   using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
-  //   if(vertex->isSufficientFeasible){
-  //     pvertex.SetFeasibility(FeasibilityType::SUFFICIENT_FEASIBLE);
-  //     ctr_sufficient++;
-  //   }else{
-  //     pvertex.SetFeasibility(FeasibilityType::FEASIBLE);
-  //   }
+  PlannerDataVertexAnnotated pgoal = getAnnotatedVertex(v_goal, vertexToStates);
+  data.addGoalVertex(pgoal);
 
-  //   if(vertex == nullptr){
-  //     data.addStartVertex(pvertex);
-  //   }else{
-  //     if(vertex == q_goal){
-  //       data.addGoalVertex(pvertex);
-  //     }else{
-  //       data.addVertex(pvertex);
-  //     }
+  //std::cout << data.vertexIndex(pgoal) << std::endl;
 
-  //     PlannerDataVertexAnnotated parent_vertex(vertex->parent->state);
-  //     parent_vertex.SetLevel(level);
-  //     parent_vertex.SetPath(path);
-  //     parent_vertex.SetOpenNeighborhoodDistance(vertex->parent->GetRadius());
-  //     data.addEdge(pvertex, parent_vertex);
-  //   }
-  //   if(!vertex->state){
-  //     std::cout << "vertex state does not exists" << std::endl;
-  //     si_->printState(vertex->state);
-  //     exit(0);
-  //   }
-  // }
+  foreach( const Vertex v, boost::vertices(graph))
+  {
+    if(vertexToStates.find(v) == vertexToStates.end()) {
+      PlannerDataVertexAnnotated p = getAnnotatedVertex(v, vertexToStates);
+      data.addVertex(p);
+    }
+    //otherwise vertex is a goal or start vertex and has already been added
+  }
+  foreach (const Edge e, boost::edges(graph))
+  {
+    const Vertex v1 = boost::source(e, graph);
+    const Vertex v2 = boost::target(e, graph);
+
+    ob::State *s1 = vertexToStates[v1];
+    ob::State *s2 = vertexToStates[v2];
+    PlannerDataVertexAnnotated p1(s1);
+    PlannerDataVertexAnnotated p2(s2);
+    data.addEdge(p1,p2);
+  }
 }
 
