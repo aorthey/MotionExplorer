@@ -88,7 +88,7 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
           std::cout << std::string(80, '#') << std::endl;
           std::cout << "Found Solution on Level " << k << " after " << t_k_end << " seconds." << std::endl;
           std::cout << std::string(80, '#') << std::endl;
-          std::cout << quotientSpaces.at(k) << std::endl;
+          std::cout << *quotientSpaces.at(k) << std::endl;
         }
         foundKLevelSolution = true;
       }
@@ -100,7 +100,7 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
         std::cout << std::string(80, '#') << std::endl;
         std::cout << "could not find a solution on level " << k << std::endl;
         std::cout << std::string(80, '#') << std::endl;
-        std::cout << quotientSpaces.at(k) << std::endl;
+        std::cout << *quotientSpaces.at(k) << std::endl;
       }
       return ob::PlannerStatus::TIMEOUT;
     }

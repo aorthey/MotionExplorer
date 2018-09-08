@@ -763,42 +763,42 @@ void Quotient::Print(std::ostream& out) const
     }else if( Q1->getStateSpace()->getType() == ob::STATE_SPACE_SE3 ){
       out << "SE(3)" << std::endl;
     }else if( Q1->getStateSpace()->getType() == ob::STATE_SPACE_REAL_VECTOR ){
-      out << "R^" << Q1_dimension << std::endl;
+      out << "R^" << Q1->getStateDimension() << std::endl;
     }else{
       out << "unknown" << std::endl;
     }
-  }
-  switch (type) {
-    case Quotient::RN_RM:
-      {
-        out << "Q0: R^"<< Q0_dimension << " | Q1: R^" << Q1_dimension << " | X1: R^" << Q1_dimension-Q0_dimension<< std::endl;
-        break;
-      }
-    case Quotient::SE2_R2:
-      {
-        out << "Q0: SE(2) | Q1: R^2 | X1: SO(2)" << std::endl;
-        break;
-      }
-    case Quotient::SE3_R3:
-      {
-        out << "Q0: SE(3) | Q1: R^3 | X1: SO(3)" << std::endl;
-        break;
-      }
-    case Quotient::SE3RN_SE3:
-      {
-        out << "Q0: SE(3)xR^" << X1_dimension << " | Q1: SE(3) | X1: R^" << X1_dimension << std::endl;
-        break;
-      }
-    case Quotient::SE3RN_SE3RM:
-      {
-        out << "Q0: SE(3)xR^" << Q0_dimension-6 << " | Q1: SE(3)xR^"<<Q1_dimension-6 << " | X1: R^" << X1_dimension << std::endl;
-        break;
-      }
-    default:
-     {
-       out << "unknown type: " << type << std::endl;
-     }
-
+  }else{
+    switch (type) {
+      case Quotient::RN_RM:
+        {
+          out << "Q0: R^"<< Q0_dimension << " | Q1: R^" << Q1_dimension << " | X1: R^" << Q1_dimension-Q0_dimension<< std::endl;
+          break;
+        }
+      case Quotient::SE2_R2:
+        {
+          out << "Q0: R^2 | Q1: SE(2) | X1: SO(2)" << std::endl;
+          break;
+        }
+      case Quotient::SE3_R3:
+        {
+          out << "Q0: R^3 | Q1: SE(3) | X1: SO(3)" << std::endl;
+          break;
+        }
+      case Quotient::SE3RN_SE3:
+        {
+          out << "Q0: SE(3) | Q1: SE(3)xR^" << X1_dimension << " | X1: R^" << X1_dimension << std::endl;
+          break;
+        }
+      case Quotient::SE3RN_SE3RM:
+        {
+          out << "Q0: SE(3)xR^" << Q0_dimension-6 << " | Q1: SE(3)xR^"<<Q1_dimension-6 << " | X1: R^" << X1_dimension << std::endl;
+          break;
+        }
+      default:
+       {
+         out << "unknown type: " << type << std::endl;
+       }
+    }
   }
 }
 

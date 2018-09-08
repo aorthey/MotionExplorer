@@ -166,6 +166,7 @@ bool QNG::IsSampleInsideCover(Configuration *q)
   {
     //Configuration *qn = neighbors.at(k);
     //the configuration is allowed to be on the boundary of the parent
+    std::cout << "is inside cover" << std::endl;
     std::cout << "NYI" << std::endl;
     exit(0);
     // if(qn != q->parent){
@@ -181,37 +182,45 @@ bool QNG::IsSampleInsideCover(Configuration *q)
   return false;
 }
 
+bool QNG::IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rhs)
+{
+  double distance_centers = DistanceQ1(lhs, rhs);
+  double radius_rhs = rhs->GetRadius();
+  double radius_lhs = lhs->GetRadius();
+  return (radius_rhs > (radius_lhs + distance_centers));
+}
+
+std::vector<QNG::Configuration*> QNG::GetConfigurationsInsideNeighborhood(Configuration *q)
+{
+  std::vector<Configuration*> neighbors;
+  nearest_vertex->nearestR(q, q->GetRadius(), neighbors);
+  return neighbors;
+}
+
 //If the neighborhood of q is a superset of any other neighborhood, then delete
 //the other neighborhood, and rewire the tree.
 void QNG::RemoveCoveredSamples(Configuration *q)
 {
-  double radius_q = q->GetRadius();
-  std::vector<Configuration*> neighbors;
+  std::vector<Configuration*> neighbors = GetConfigurationsInsideNeighborhood(q);
 
-  //get all vertices inside open set of q
-  nearest_vertex->nearestR(q, radius_q, neighbors);
+  for(uint k = 0; k < neighbors.size(); k++){
 
-  std::cout << "NYI" << std::endl;
-  exit(0);
-  // for(uint k = 0; k < neighbors.size(); k++){
+    Configuration *qn = neighbors.at(k);
 
-  //   Configuration *qn = neighbors.at(k);
+    //do not delete start/goal
+    if(qn->isStart) continue;
+    if(qn->isGoal) continue;
 
-  //   if(qn->parent == nullptr) continue; //start configuration
-  //   //if(qn == q->parent) continue; //parent configuration
-
-  //   double distance_q_qn = DistanceQ1(q, qn);
-  //   double radius_k = qn->GetRadius();
-
-  //   //if(radius_q > distance_q_qn){
-  //   if(radius_q > radius_k+distance_q_qn){
-  //     RemoveConfiguration(qn);
-  //   }
-  // }
+    if(IsNeighborhoodInsideNeighborhood(qn, q))
+    {
+      RemoveConfiguration(qn);
+    }
+  }
 }
 
 void QNG::Grow(double t)
 {
+  std::cout << "grow" << std::endl;
   return;
   //#########################################################################
   //Do not grow the cover if it is saturated, i.e. it cannot be expanded anymore
@@ -385,17 +394,13 @@ QNG::Configuration* QNG::EstimateBestNextState(Configuration *q_last, Configurat
     // return q_best;
 }
 
-// void QNG::RemoveConfiguration(Configuration *q)
-// {
-//   pdf_all_configurations.remove(static_cast<PDF_Element*>(q->GetPDFElement()));
-//   nearest_cover->remove(q);
-//   nearest_vertex->remove(q);
-//   if(q->parent==nullptr){
-//     OMPL_ERROR("Trying to remove start configuration");
-//     exit(0);
-//   }
-//   q->Remove(Q1);
-// }
+void QNG::RemoveConfiguration(Configuration *q)
+{
+  pdf_all_configurations.remove(static_cast<PDF_Element*>(q->GetPDFElement()));
+  nearest_cover->remove(q);
+  nearest_vertex->remove(q);
+  q->Remove(Q1);
+}
 
 bool QNG::Sample(Configuration *q_random){
   if(parent == nullptr){
@@ -444,6 +449,7 @@ bool QNG::Sample(Configuration *q_random){
 //return state in Q0 and the nearest configuration
 QNG::Configuration* QNG::SampleQuotientCover(ob::State *state) const
 {
+  std::cout << "sample quotient cover" << std::endl;
   std::cout << "NYI" << std::endl;
   exit(0);
 }
@@ -531,6 +537,7 @@ double QNG::DistanceOpenNeighborhood(const Configuration *q_from, const Configur
 
 double QNG::DistanceCover(const Configuration *q_from, const Configuration *q_to)
 {
+  std::cout << "distance quotient cover" << std::endl;
   std::cout << "NYI" << std::endl;
   exit(0);
 
@@ -579,6 +586,7 @@ bool QNG::sampleHalfBallOnNeighborhoodBoundary(Configuration *sample, const Conf
   //P = center->parent->state
   si_->getStateSpace()->interpolate(center->state, sample->state, radius/dist_q_qk, sample->state);
 
+  std::cout << "sample neighborhood" << std::endl;
   std::cout << "NYI" << std::endl;
   exit(0);
   // Configuration *q_parent = center->parent;
@@ -658,6 +666,7 @@ void QNG::clear()
 
 bool QNG::GetSolution(ob::PathPtr &solution)
 {
+  std::cout << "get solution" << std::endl;
   std::cout << "NYI" << std::endl;
   exit(0);
     //hasSolution = true;
@@ -665,6 +674,7 @@ bool QNG::GetSolution(ob::PathPtr &solution)
 
 void QNG::CopyChartFromSibling( QuotientChart *sibling, uint k )
 {
+  std::cout << "copy chart " << std::endl;
   std::cout << "NYI" << std::endl;
   exit(0);
 }

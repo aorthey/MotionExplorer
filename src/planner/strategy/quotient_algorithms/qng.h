@@ -66,8 +66,15 @@ namespace ompl
         base::State *state{nullptr};
         Configuration *coset{nullptr}; //the underlying coset this Vertex elongs to (on the quotient-space)
         bool isSufficientFeasible{false};
-        double openNeighborhoodRadius{0.0}; //might be L1 or L2 radius
         void *element;
+
+        bool isStart{false};
+        bool isGoal{false};
+
+        //#####################################################################
+        //Neighborhood Computations
+        //#####################################################################
+        double openNeighborhoodRadius{0.0}; //might be L1 or L2 radius
       };
 
       class EdgeInternalState{
@@ -119,12 +126,14 @@ namespace ompl
       typedef PDF::Element PDF_Element;
 
       virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
+      std::vector<Configuration*> GetConfigurationsInsideNeighborhood(Configuration *q);
+      bool IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rhs);
 
       void AddConfiguration(Configuration *q);
 
       //need to supply q_coset, the pointer to the underlying equivalence class
       Configuration* AddState(const ob::State *state, Configuration *q_coset);
-      //void RemoveConfiguration(Configuration *q);
+      void RemoveConfiguration(Configuration *q);
 
       bool sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
       bool sampleHalfBallOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
