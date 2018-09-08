@@ -1,7 +1,7 @@
 #include "planner/strategy/strategy_kinodynamic.h"
 #include "planner/cspace/cspace_kinodynamic.h"
 #include "planner/strategy/benchmark.h"
-#include "planner/strategy/ompl_remastered/kRRT.h"
+//#include "planner/strategy/ompl_remastered/kRRT.h"
 
 #include "util.h"
 #include "elements/plannerdata_vertex_annotated.h"

@@ -25,7 +25,7 @@ QMP::~QMP()
   samplesOnShortestPath = 0;
 }
 
-bool QMP::SampleGraph(ob::State *q_random_graph)
+bool QMP::SampleQuotient(ob::State *q_random_graph)
 {
   Edge e;
   double t = rng_.uniform01();

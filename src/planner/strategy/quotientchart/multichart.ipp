@@ -41,40 +41,6 @@ void MultiChart<T>::clear(){
   root->clear();
 }
 
-//void PrintQuotientSpaces(std::vector<Quotient*> quotientSpaces, uint k=0)
-//{
-//  return;
-//  if(k<=0) k=quotientSpaces.size()-1;
-//  uint total_vertices = 0;
-//  uint total_sampled_vertices = 0;
-//  for(uint i = 0; i <= k; i++){
-//    og::Quotient *Qi = quotientSpaces.at(i);
-//    if(Qi->GetNumberOfSampledVertices()<=0) continue;
-//    uint N = 6;
-//    std::cout 
-//      << ">> level " << i << ": " 
-//      << std::setw(N)
-//      << std::setfill(' ')
-//      << Qi->GetNumberOfVertices() 
-//      << " vertices ("
-//      << std::setw(N)
-//      << std::setfill(' ')
-//      << Qi->GetNumberOfSampledVertices() 
-//      << " sampled) |"
-//      << std::setw(N)
-//      << std::setfill(' ')
-//      << Qi->GetNumberOfEdges() 
-//      << " edges | " 
-//      << Qi->GetSamplingDensity() 
-//      << " density \n";
-//    total_vertices += Qi->GetNumberOfVertices();
-//    total_sampled_vertices += Qi->GetNumberOfSampledVertices();
-//  }
-//  std::cout << std::string(80, '-') << std::endl;
-//  double total_rejected = 1.0-(double)total_vertices/(double)total_sampled_vertices;
-//  std::cout << ">> total: " << total_vertices << " vertices ("<<total_sampled_vertices << " sampled, " << setprecision(2) << total_rejected << " percent rejected)" << std::endl;
-//  std::cout << std::string(80, '-') << std::endl;
-//}
 
 template <class T>
 ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &ptc)
@@ -122,7 +88,7 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
       uint k = current_node->GetLevel();
       if(current_node->FoundNewPath()){
         std::cout << std::string(80, '#') << std::endl;
-        std::cout << "found path on level " << k << "/" << levels-1 << " (" << current_node->GetNumberOfVertices() << " vertices)" << std::endl;
+        std::cout << "found path on level " << k << "/" << levels-1 << std::endl;
         std::cout << std::string(80, '#') << std::endl;
 
         if(k == levels-1){
@@ -141,11 +107,11 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
 
           og::QuotientChart *local = new T(si_vec.at(k), dynamic_cast<T*>(current_node->GetParent()));
           local->setProblemDefinition(pdef_vec.at(k));
-          local->SetSubGraph(current_node, current_node->GetNumberOfPaths()-1);
+          local->CopyChartFromSibling(current_node, current_node->GetChartNumberOfComponents()-1);
           local->SetLevel(k);
-          local->SetHorizontalIndex(current_node->GetNumberOfSiblings()+1);
+          local->SetChartHorizontalIndex(current_node->GetChartNumberOfComponents()+1);
 
-          current_node->AddSibling(local);
+          current_node->AddChartSibling(local);
 
           //#####################################################################
           //Global Chart (contains the whole quotient pointed to by the local chart)
@@ -181,8 +147,7 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
   if(found_path_on_last_level)
   {
     base::PathPtr sol;
-    current_node->CheckForSolution(sol);
-    if (sol)
+    if(current_node->GetSolution(sol))
     {
       base::PlannerSolution psol(sol);
       psol.setPlannerName(getName());
@@ -237,17 +202,17 @@ void MultiChart<T>::getPlannerData(ob::PlannerData &data) const
 
     for(uint m = k+1; m < levels; m++){
       og::QuotientChart *Qm = quotientSpaces.at(m);
-      ob::State *s_X1 = Qm->getX1()->allocState();
+      ob::State *s_X1 = Qm->GetX1()->allocState();
       ob::State *s_Q1 = Qm->getSpaceInformation()->allocState();
-      if(Qm->getX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO3) {
+      if(Qm->GetX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO3) {
         static_cast<ob::SO3StateSpace::StateType*>(s_X1)->setIdentity();
       }
-      if(Qm->getX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO2) {
+      if(Qm->GetX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO2) {
         static_cast<ob::SO2StateSpace::StateType*>(s_X1)->setIdentity();
       }
-      Qm->mergeStates(s_Q0, s_X1, s_Q1);
+      Qm->MergeStates(s_Q0, s_X1, s_Q1);
       quotientSpaces.at(m-1)->getSpaceInformation()->freeState(s_Q0);
-      Qm->getX1()->freeState(s_X1);
+      Qm->GetX1()->freeState(s_X1);
       s_Q0 = s_Q1;
     }
     v.setState(s_Q0);

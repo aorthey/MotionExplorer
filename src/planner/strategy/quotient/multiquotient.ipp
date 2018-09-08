@@ -49,41 +49,6 @@ void MultiQuotient<T,Tlast>::clear(){
   foundKLevelSolution = false;
 }
 
-void PrintQuotientSpaces(std::vector<Quotient*> quotientSpaces, uint k=0)
-{
-  return;
-  if(k<=0) k=quotientSpaces.size()-1;
-  uint total_vertices = 0;
-  uint total_sampled_vertices = 0;
-  for(uint i = 0; i <= k; i++){
-    og::Quotient *Qi = quotientSpaces.at(i);
-    if(Qi->GetNumberOfSampledVertices()<=0) continue;
-    uint N = 6;
-    std::cout 
-      << ">> level " << i << ": " 
-      << std::setw(N)
-      << std::setfill(' ')
-      << Qi->GetNumberOfVertices() 
-      << " vertices ("
-      << std::setw(N)
-      << std::setfill(' ')
-      << Qi->GetNumberOfSampledVertices() 
-      << " sampled) |"
-      << std::setw(N)
-      << std::setfill(' ')
-      << Qi->GetNumberOfEdges() 
-      << " edges | " 
-      << Qi->GetSamplingDensity() 
-      << " density \n";
-    total_vertices += Qi->GetNumberOfVertices();
-    total_sampled_vertices += Qi->GetNumberOfSampledVertices();
-  }
-  std::cout << std::string(80, '-') << std::endl;
-  double total_rejected = 1.0-(double)total_vertices/(double)total_sampled_vertices;
-  std::cout << ">> total: " << total_vertices << " vertices ("<<total_sampled_vertices << " sampled, " << setprecision(2) << total_rejected << " percent rejected)" << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
-}
-
 template <class T, class Tlast>
 ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCondition &ptc)
 {
@@ -92,7 +57,7 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
 
   auto cmp = [](og::Quotient* left, og::Quotient* right) 
               { 
-                return left->GetSamplingDensity() > right->GetSamplingDensity();
+                return left->GetImportance() > right->GetImportance();
               };
 
   std::priority_queue<og::Quotient*, std::vector<og::Quotient*>, decltype(cmp)> Q(cmp);
@@ -114,16 +79,16 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
       og::Quotient* jQuotient = Q.top();
       Q.pop();
       jQuotient->Grow(T_GROW);
-      quotientSpaces.at(k)->CheckForSolution(sol_k);
+      bool hasSolution = quotientSpaces.at(k)->GetSolution(sol_k);
 
-      if(quotientSpaces.at(k)->HasSolution()){
+      if(hasSolution){
         solutions.push_back(sol_k);
         if(DEBUG){
           double t_k_end = ompl::time::seconds(ompl::time::now() - t_start);
           std::cout << std::string(80, '#') << std::endl;
           std::cout << "Found Solution on Level " << k << " after " << t_k_end << " seconds." << std::endl;
           std::cout << std::string(80, '#') << std::endl;
-          PrintQuotientSpaces(quotientSpaces, k);
+          std::cout << quotientSpaces.at(k) << std::endl;
         }
         foundKLevelSolution = true;
       }
@@ -135,7 +100,7 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
         std::cout << std::string(80, '#') << std::endl;
         std::cout << "could not find a solution on level " << k << std::endl;
         std::cout << std::string(80, '#') << std::endl;
-        PrintQuotientSpaces(quotientSpaces, k);
+        std::cout << quotientSpaces.at(k) << std::endl;
       }
       return ob::PlannerStatus::TIMEOUT;
     }
@@ -145,12 +110,10 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
     std::cout << std::string(80, '#') << std::endl;
     std::cout << "Found exact solution after " << t_end << " seconds." << std::endl;
     std::cout << std::string(80, '#') << std::endl;
-    PrintQuotientSpaces(quotientSpaces);
   }
 
   base::PathPtr sol;
-  quotientSpaces.back()->CheckForSolution(sol);
-  if (sol)
+  if(quotientSpaces.back()->GetSolution(sol))
   {
     base::PlannerSolution psol(sol);
     psol.setPlannerName(getName());
@@ -208,18 +171,18 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const
 
       for(uint m = k+1; m < quotientSpaces.size(); m++){
         og::Quotient *Qm = quotientSpaces.at(m);
-        ob::State *s_X1 = Qm->getX1()->allocState();
+        ob::State *s_X1 = Qm->GetX1()->allocState();
         ob::State *s_Q1 = Qm->getSpaceInformation()->allocState();
-        if(Qm->getX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO3) {
+        if(Qm->GetX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO3) {
           static_cast<ob::SO3StateSpace::StateType*>(s_X1)->setIdentity();
         }
-        if(Qm->getX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO2) {
+        if(Qm->GetX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO2) {
           static_cast<ob::SO2StateSpace::StateType*>(s_X1)->setIdentity();
         }
         //Qm->SampleX1(s_X1);
-        Qm->mergeStates(s_Q0, s_X1, s_Q1);
+        Qm->MergeStates(s_Q0, s_X1, s_Q1);
         quotientSpaces.at(m-1)->getSpaceInformation()->freeState(s_Q0);
-        Qm->getX1()->freeState(s_X1);
+        Qm->GetX1()->freeState(s_X1);
         s_Q0 = s_Q1;
       }
       v.setState(s_Q0);

@@ -127,23 +127,26 @@ namespace ompl
         QuotientGraph(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
         ~QuotientGraph();
 
-        virtual uint GetNumberOfVertices() const override;
-        virtual uint GetNumberOfEdges() const override;
+        virtual uint GetNumberOfVertices() const;
+        virtual uint GetNumberOfEdges() const;
+
         ob::PathPtr GetSolutionPath();
 
         virtual void Grow(double t);
         virtual void Init() override;
-        virtual bool SampleGraph(ob::State *q_random_graph) override;
-
-        template <template <typename T> class NN>
-        void setNearestNeighbors();
-
-        void getPlannerData(ob::PlannerData &data) const override;
+        virtual bool SampleQuotient(ob::State*) override;
+        virtual bool GetSolution(ob::PathPtr &solution) override;
+        virtual void getPlannerData(ob::PlannerData &data) const override;
+        virtual double GetImportance() const override;
 
         virtual void setup() override;
         virtual void clear() override;
         void clearQuery();
         virtual void ClearVertices();
+
+
+        template <template <typename T> class NN>
+        void setNearestNeighbors();
 
         virtual void uniteComponents(Vertex m1, Vertex m2);
         bool sameComponent(Vertex m1, Vertex m2);
@@ -151,7 +154,6 @@ namespace ompl
         bool InsideStartComponent(Vertex v);
         bool InsideStartComponent(Edge e);
 
-        virtual void CheckForSolution(ob::PathPtr &solution) override;
 
         std::map<Vertex, VertexRank> vrank;
         std::map<Vertex, Vertex> vparent;
@@ -159,16 +161,17 @@ namespace ompl
           disjointSets_{boost::make_assoc_property_map(vrank), boost::make_assoc_property_map(vparent)};
 
         ob::Cost bestCost_{+dInf};
-        ob::OptimizationObjectivePtr opt_;
         std::vector<Vertex> startM_;
         std::vector<Vertex> goalM_;
         std::vector<Vertex> shortestVertexPath_;
         std::vector<Vertex> startGoalVertexPath_;
 
         const Graph& GetGraph() const;
+        double GetGraphLength() const;
         const RoadmapNeighborsPtr& GetRoadmapNeighborsPtr() const;
         const ConnectionStrategy& GetConnectionStrategy() const;
 
+        virtual void Print(std::ostream& out) const override;
     protected:
 
         virtual double Distance(const Vertex a, const Vertex b) const; // standard si->distance
@@ -195,6 +198,8 @@ namespace ompl
         typedef boost::minstd_rand RNGType;
         RNGType rng_boost;
 
+        double graphLength{0.0};
+        uint totalNumberOfSamples{0};
 
     };
   };

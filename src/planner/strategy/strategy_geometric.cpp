@@ -8,13 +8,13 @@
 #include "planner/strategy/quotient/qmp.h"
 #include "planner/strategy/quotientchart/multichart.h"
 #include "planner/strategy/quotientchart/quotient_chart.h"
-#include "planner/strategy/quotientchart/qmp_sufficient.h"
-#include "planner/strategy/quotientchart/qcp.h"
-#include "planner/strategy/quotientchart/qsp.h"
-#include "planner/strategy/quotient_algorithms/qst.h"
+// #include "planner/strategy/quotientchart/qmp_sufficient.h"
+// #include "planner/strategy/quotientchart/qcp.h"
+// #include "planner/strategy/quotientchart/qsp.h"
+//#include "planner/strategy/quotient_algorithms/qst.h"
 #include "planner/strategy/quotient_algorithms/qng.h"
-#include "planner/strategy/ompl_remastered/rrt_unidirectional.h"
-#include "planner/strategy/ompl_remastered/rrt_bidirectional.h"
+// #include "planner/strategy/ompl_remastered/rrt_unidirectional.h"
+// #include "planner/strategy/ompl_remastered/rrt_bidirectional.h"
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -138,44 +138,45 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
 
-  }else if(algorithm=="hierarchy:qmp_connect_rrt"){
-    typedef og::MultiQuotient<og::QMPConnect, og::RRTBidirectional> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect+RRT");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-
   }else if(algorithm=="hierarchy:qmp"){
     typedef og::MultiQuotient<og::QMP> MultiQuotient;
     planner = std::make_shared<MultiQuotient>(si_vec, "QMP");
     static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
 
-  }else if(algorithm=="hierarchy:qmp_rrt"){
-    typedef og::MultiQuotient<og::QMP, og::RRTBidirectional> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "QMP+RRT");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-
-  }else if(algorithm=="hierarchy:qcp"){
-    typedef og::MultiChart<og::QCP> MultiChart;
-    planner = std::make_shared<MultiChart>(si_vec, "QCP");
-    static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
-
-  }else if(algorithm=="hierarchy:qsp"){
-    typedef og::MultiChart<og::QSP> MultiChart;
-    planner = std::make_shared<MultiChart>(si_vec, "QSP");
-    static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
-
-  }else if(algorithm=="hierarchy:qst"){
-    typedef og::MultiChart<og::QST> MultiChart;
-    planner = std::make_shared<MultiChart>(si_vec, "QST");
-    static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
   }else if(algorithm=="hierarchy:qng"){
     typedef og::MultiChart<og::QNG> MultiChart;
     planner = std::make_shared<MultiChart>(si_vec, "QNG");
     static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
 
-  }else if(algorithm=="hierarchy:qmp_sufficient"){
-    typedef og::MultiChart<og::QMPSufficient> MultiChart;
-    planner = std::make_shared<MultiChart>(si_vec, "QMPSufficient");
-    static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
+  // }else if(algorithm=="hierarchy:qmp_connect_rrt"){
+  //   typedef og::MultiQuotient<og::QMPConnect, og::RRTBidirectional> MultiQuotient;
+  //   planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect+RRT");
+  //   static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+
+  // }else if(algorithm=="hierarchy:qmp_rrt"){
+  //   typedef og::MultiQuotient<og::QMP, og::RRTBidirectional> MultiQuotient;
+  //   planner = std::make_shared<MultiQuotient>(si_vec, "QMP+RRT");
+  //   static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+
+  // }else if(algorithm=="hierarchy:qcp"){
+  //   typedef og::MultiChart<og::QCP> MultiChart;
+  //   planner = std::make_shared<MultiChart>(si_vec, "QCP");
+  //   static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
+
+  // }else if(algorithm=="hierarchy:qsp"){
+  //   typedef og::MultiChart<og::QSP> MultiChart;
+  //   planner = std::make_shared<MultiChart>(si_vec, "QSP");
+  //   static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
+
+  // }else if(algorithm=="hierarchy:qst"){
+  //   typedef og::MultiChart<og::QST> MultiChart;
+  //   planner = std::make_shared<MultiChart>(si_vec, "QST");
+  //   static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
+
+  // }else if(algorithm=="hierarchy:qmp_sufficient"){
+  //   typedef og::MultiChart<og::QMPSufficient> MultiChart;
+  //   planner = std::make_shared<MultiChart>(si_vec, "QMPSufficient");
+  //   static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
 
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;

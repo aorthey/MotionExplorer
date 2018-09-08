@@ -22,11 +22,7 @@ namespace ompl
       ~QNG(void);
       virtual void clear() override;
       virtual void setup() override;
-      void getPlannerData(ob::PlannerData &data) const override;
-
-      virtual uint GetNumberOfVertices() const override;
-      virtual uint GetNumberOfEdges() const override;
-      
+      virtual void getPlannerDataAnnotated(base::PlannerData &data) const override;
       
     protected:
       class Configuration{
@@ -122,21 +118,27 @@ namespace ompl
       typedef ompl::PDF<Configuration*> PDF;
       typedef PDF::Element PDF_Element;
 
-      void SetSubGraph( QuotientChart *sibling, uint k ) override;
+      virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
 
       void AddConfiguration(Configuration *q);
 
       //need to supply q_coset, the pointer to the underlying equivalence class
       Configuration* AddState(const ob::State *state, Configuration *q_coset);
-      void RemoveConfiguration(Configuration *q);
+      //void RemoveConfiguration(Configuration *q);
 
-      bool sampleUniformOnNeighborhoodBoundary(Vertex sample, const Vertex center);
-      bool sampleHalfBallOnNeighborhoodBoundary(Vertex sample, const Vertex center);
-      Vertex EstimateBestNextState(Vertex q_last, Vertex q_current);
+      bool sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
+      bool sampleHalfBallOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
+      Configuration* EstimateBestNextState(Configuration *q_last, Configuration *q_current);
 
-      virtual bool Sample(Vertex q_random);
+      virtual bool Sample(Configuration *q_random);
+      Configuration* SampleQuotientCover(ob::State *state) const;
+
       bool IsSampleInsideCover(Configuration *q);
       void Grow(double t) override;
+      void Init() override;
+      bool GetSolution(ob::PathPtr &solution) override;
+      Configuration* GetStartConfiguration() const;
+      Configuration* GetGoalConfiguration() const;
 
       void RemoveCoveredSamples(Configuration *q);
 

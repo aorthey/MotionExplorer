@@ -412,7 +412,7 @@ bool QST::Sample(Configuration *q_random){
       Q1->printState(q_random->state);
       exit(0);
     }
-    mergeStates(stateQ0, stateX1, q_random->state);
+    MergeStates(stateQ0, stateX1, q_random->state);
     X1->freeState(stateX1);
     Q0->freeState(stateQ0);
     return true;
@@ -795,7 +795,7 @@ void QST::freeTree( NearestNeighborsPtr nn)
   }
 }
 
-void QST::CheckForSolution(ob::PathPtr &solution)
+bool QST::GetSolution(ob::PathPtr &solution)
 {
   Configuration *q_nearest = Nearest(q_goal);
   if(DistanceOpenNeighborhood(q_nearest, q_goal) <= 0)
@@ -819,6 +819,7 @@ void QST::CheckForSolution(ob::PathPtr &solution)
 
     hasSolution = true;
   }
+  return hasSolution;
 }
 
 void QST::SetSubGraph( QuotientChart *sibling, uint k )

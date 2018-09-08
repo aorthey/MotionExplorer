@@ -73,6 +73,7 @@ void QuotientGraph::clear()
 
   iterations_ = 0;
   totalNumberOfSamples = 0;
+  graphLength = 0;
   bestCost_ = ob::Cost(dInf);
   setup_ = false;
   addedNewSolution_ = false;
@@ -85,10 +86,14 @@ void QuotientGraph::clearQuery()
   pis_.restart();
 }
 
-//void QuotientGraph::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
-//{
-//  Planner::setProblemDefinition(pdef);
-//}
+//@TODO: this were the settings we used for IROS'18. While they worked well in
+//our examples, there is no good reason why we used this particular formula.
+//Needs revision.
+double QuotientGraph::GetImportance() const{
+  double N = (double)totalNumberOfSamples;
+  return N/((double)si_->getSpaceMeasure());
+    //return N/(parent->GetGraphLength()*X1->getSpaceMeasure());
+}
 
 void QuotientGraph::Init(){
   checkValidity();
@@ -220,7 +225,7 @@ void QuotientGraph::setup(){
   }
 
   if (pdef_){
-    Planner::setup();
+    BaseT::setup();
     if (pdef_->hasOptimizationObjective()){
       opt_ = pdef_->getOptimizationObjective();
     }else{
@@ -273,12 +278,6 @@ uint QuotientGraph::GetNumberOfVertices() const{
 
 uint QuotientGraph::GetNumberOfEdges() const{
   return num_edges(G);
-}
-
-ob::PathPtr QuotientGraph::GetSolutionPath(){
-  ob::PathPtr sol;
-  CheckForSolution(sol);
-  return sol;
 }
 
 template <template <typename T> class NN>
@@ -351,13 +350,17 @@ void QuotientGraph::RandomWalk(const Vertex &v)
   }
 }
 
-void QuotientGraph::CheckForSolution(ob::PathPtr &solution)
+double QuotientGraph::GetGraphLength() const{
+  return graphLength;
+}
+
+bool QuotientGraph::GetSolution(ob::PathPtr &solution)
 {
   if(hasSolution){
     solution_path = GetPath(startM_.at(0), goalM_.at(0));
     startGoalVertexPath_ = shortestVertexPath_;
     solution = solution_path;
-    return;
+    return true;
   }else{
     ob::Goal *g = pdef_->getGoal().get();
     bestCost_ = ob::Cost(+dInf);
@@ -375,12 +378,13 @@ void QuotientGraph::CheckForSolution(ob::PathPtr &solution)
             solution = solution_path;
             hasSolution = true;
             startGoalVertexPath_ = shortestVertexPath_;
-            return;
+            return true;
           }
         }
       }
     }
   }
+  return hasSolution;
 }
 ob::PathPtr QuotientGraph::GetPath(const Vertex &start, const Vertex &goal)
 {
@@ -496,7 +500,7 @@ void QuotientGraph::getPlannerData(ob::PlannerData &data) const
     }
   }
 }
-bool QuotientGraph::SampleGraph(ob::State *q_random_graph)
+bool QuotientGraph::SampleQuotient(ob::State *q_random_graph)
 {
   if(num_edges(G) == 0) return false;
 
@@ -515,5 +519,10 @@ bool QuotientGraph::SampleGraph(ob::State *q_random_graph)
 
   Q1->getStateSpace()->interpolate(from, to, s, q_random_graph);
   return true;
+}
+void QuotientGraph::Print(std::ostream& out) const
+{
+  BaseT::Print(out);
+  out << "[QuotientGraph has " << GetNumberOfVertices() << " vertices and " << GetNumberOfEdges() << " edges.]" << std::endl;
 }
 

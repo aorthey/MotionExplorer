@@ -31,7 +31,7 @@ namespace ompl
         double goalBias_{0.1};
         PDF<Vertex> vpdf;
 
-        virtual bool SampleGraph(ob::State*) override;
+        virtual bool SampleQuotient(ob::State*) override;
         //virtual ompl::PDF<og::QuotientGraph::Edge> GetEdgePDF();
         uint samplesOnShortestPath{0};
 

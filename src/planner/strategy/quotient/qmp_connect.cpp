@@ -105,8 +105,8 @@ bool QMPConnect::Sample(ob::State *q_random)
       base::State *s_Q0 = Q0->allocState();
 
       X1_sampler->sampleUniform(s_X1);
-      parent->SampleGraph(s_Q0);
-      mergeStates(s_Q0, s_X1, q_random);
+      parent->SampleQuotient(s_Q0);
+      MergeStates(s_Q0, s_X1, q_random);
 
       X1->freeState(s_X1);
       Q0->freeState(s_Q0);
@@ -115,7 +115,7 @@ bool QMPConnect::Sample(ob::State *q_random)
   return Q1->isValid(q_random);
 }
 
-// bool QMPConnect::SampleGraph(ob::State *q_random_graph)
+// bool QMPConnect::SampleQuotient(ob::State *q_random_graph)
 // {
 //   PDF<Edge> pdf = GetEdgePDF();
 
@@ -272,7 +272,7 @@ ob::PathPtr QMPConnect::InterpolateQ1GraphConstraint( const Vertex a, const Vert
     X1->getStateSpace()->interpolate(saX1, sbX1, d_graph_distance/D,s_nextX1);
 
     ob::State *s_nextQ1 = Q1->allocState();
-    mergeStates(s_nextQ0, s_nextX1, s_nextQ1);
+    MergeStates(s_nextQ0, s_nextX1, s_nextQ1);
     X1->freeState(s_nextX1);
 
     Q1_path->append(s_nextQ1);
@@ -462,9 +462,9 @@ void QMPConnect::RandomWalk(const Vertex &v)
     base::State *s_last_Q0 = Q0->allocState();
 
     X1_sampler->sampleUniform(s_last_X1);
-    parent->SampleGraph(s_last_Q0);
+    parent->SampleQuotient(s_last_Q0);
 
-    mergeStates(s_last_Q0, s_last_X1, s_last);
+    MergeStates(s_last_Q0, s_last_X1, s_last);
 
     Q0->freeState(s_last_Q0);
     X1->freeState(s_last_X1);

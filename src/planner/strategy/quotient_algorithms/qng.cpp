@@ -98,9 +98,8 @@ void QNG::setup(void)
 void QNG::AddConfiguration(Configuration *q)
 {
   Vertex v = boost::add_vertex(*q, graph);
-  G[v].total_connection_attempts = 1;
-  G[v].successful_connection_attempts = 0;
-  disjointSets_.make_set(v);
+  graph[v].number_attempted_expansions = 0;
+  graph[v].number_successful_expansions = 0;
 
   PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
   q->SetPDFElement(q_element);
@@ -286,115 +285,117 @@ void QNG::Grow(double t)
 }
 QNG::Configuration* QNG::EstimateBestNextState(Configuration *q_last, Configuration *q_current)
 {
-    uint K_samples = 3; //how many samples to test for best direction (depends maybe also on radius)
+  std::cout << "NYI" << std::endl;
+  exit(0);
+    // uint K_samples = 3; //how many samples to test for best direction (depends maybe also on radius)
 
-    Configuration *q_next = new Configuration(Q1);
+    // Configuration *q_next = new Configuration(Q1);
 
-    if(verbose>1){
-      std::cout << "from" << std::endl;
-      Q1->printState(q_last->state);
-      std::cout << "to" << std::endl;
-      Q1->printState(q_current->state);
-    }
+    // if(verbose>1){
+    //   std::cout << "from" << std::endl;
+    //   Q1->printState(q_last->state);
+    //   std::cout << "to" << std::endl;
+    //   Q1->printState(q_current->state);
+    // }
 
-    double d_last_to_current = Distance(q_last, q_current);
-    double radius_current = q_current->GetRadius();
-    Q1->getStateSpace()->interpolate(q_last->state, q_current->state, 1 + radius_current/d_last_to_current, q_next->state);
+    // double d_last_to_current = Distance(q_last, q_current);
+    // double radius_current = q_current->GetRadius();
+    // Q1->getStateSpace()->interpolate(q_last->state, q_current->state, 1 + radius_current/d_last_to_current, q_next->state);
 
-    //#######################################################################
-    // We sample the distance function to obtain K samples {q_1,\cdots,q_K}.
-    // For each $q_k$ we compute the value of the distance function dk_radius.
-    // Then we employ two strategies to choose the next sample to follow:
-    //
-    //either follow isolines : min( fabs(radius_k_sample - current_radius) )
-    //or follow the steepest ascent: max(radius_k_sample)
+    // //#######################################################################
+    // // We sample the distance function to obtain K samples {q_1,\cdots,q_K}.
+    // // For each $q_k$ we compute the value of the distance function dk_radius.
+    // // Then we employ two strategies to choose the next sample to follow:
+    // //
+    // //either follow isolines : min( fabs(radius_k_sample - current_radius) )
+    // //or follow the steepest ascent: max(radius_k_sample)
 
-    double radius_best = DistanceInnerRobotToObstacle(q_next->state);
-    if(verbose>1){
-      std::cout << "next" << std::endl;
-      Q1->printState(q_next->state);
-      std::cout << "radius " << radius_best << std::endl;
-    }
+    // double radius_best = DistanceInnerRobotToObstacle(q_next->state);
+    // if(verbose>1){
+    //   std::cout << "next" << std::endl;
+    //   Q1->printState(q_next->state);
+    //   std::cout << "radius " << radius_best << std::endl;
+    // }
 
-    //double radius_best = q_next->GetRadius();
-    double SAMPLING_RADIUS = 0.1*radius_current;
-    double radius_ratio = radius_best / radius_current;
-    if(radius_ratio > 1){
-      //we encountered a bigger radius neighborhood. this is great, we should go
-      //into that direction
-      if(!AddConfiguration(q_next, q_current, true))
-      {
-        return nullptr;
-      }
-      return q_next;
-    }else{
-      //if next neighborhood is exceptionally small, try to sample more broadly.
-      //Otherwise sample smaller. This corresponds to having more speed in the
-      //momentum of sampling.
-      if(radius_ratio > 0.1){
-        SAMPLING_RADIUS = (1.0-radius_ratio+0.1)*radius_current;
-      }else{
-        SAMPLING_RADIUS = radius_current;
-      }
-    }
+    // //double radius_best = q_next->GetRadius();
+    // double SAMPLING_RADIUS = 0.1*radius_current;
+    // double radius_ratio = radius_best / radius_current;
+    // if(radius_ratio > 1){
+    //   //we encountered a bigger radius neighborhood. this is great, we should go
+    //   //into that direction
+    //   if(!AddConfiguration(q_next))
+    //   {
+    //     return nullptr;
+    //   }
+    //   return q_next;
+    // }else{
+    //   //if next neighborhood is exceptionally small, try to sample more broadly.
+    //   //Otherwise sample smaller. This corresponds to having more speed in the
+    //   //momentum of sampling.
+    //   if(radius_ratio > 0.1){
+    //     SAMPLING_RADIUS = (1.0-radius_ratio+0.1)*radius_current;
+    //   }else{
+    //     SAMPLING_RADIUS = radius_current;
+    //   }
+    // }
 
-    //#######################################################################
-    //keep q_next constant
-    q_next = const_cast<Configuration*>(q_next);
-    Configuration *q_best = q_next;
+    // //#######################################################################
+    // //keep q_next constant
+    // q_next = const_cast<Configuration*>(q_next);
+    // Configuration *q_best = q_next;
 
-    for(uint k = 0; k < K_samples; k++)
-    {
-      //obtain sample q_k, and radius radius_k
-      Configuration *q_k = new Configuration(Q1);
-      Q1_sampler->sampleUniformNear(q_k->state, q_next->state, SAMPLING_RADIUS);
-      double d_current_to_k = DistanceQ1(q_k, q_current);
-      Q1->getStateSpace()->interpolate(q_current->state, q_k->state, radius_current/d_current_to_k, q_k->state);
+    // for(uint k = 0; k < K_samples; k++)
+    // {
+    //   //obtain sample q_k, and radius radius_k
+    //   Configuration *q_k = new Configuration(Q1);
+    //   Q1_sampler->sampleUniformNear(q_k->state, q_next->state, SAMPLING_RADIUS);
+    //   double d_current_to_k = DistanceQ1(q_k, q_current);
+    //   Q1->getStateSpace()->interpolate(q_current->state, q_k->state, radius_current/d_current_to_k, q_k->state);
 
-      double radius_next = DistanceInnerRobotToObstacle(q_k->state);
+    //   double radius_next = DistanceInnerRobotToObstacle(q_k->state);
 
-      if(verbose>1){
-        std::cout << "q_k" << std::endl;
-        Q1->printState(q_k->state);
-        std::cout << "radius: " << radius_next << std::endl;
-      }
+    //   if(verbose>1){
+    //     std::cout << "q_k" << std::endl;
+    //     Q1->printState(q_k->state);
+    //     std::cout << "radius: " << radius_next << std::endl;
+    //   }
 
-      if(q_best->isSufficientFeasible && !q_k->isSufficientFeasible)
-      {
-        q_best = q_k;
-        radius_best = radius_next;
-      }else{
-        if(radius_next > radius_best)
-        {
-          q_best = q_k;
-          radius_best = radius_next;
-        }else{
-          q_k->Remove(Q1);
-          continue;
-        }
-      }
-    }
-    if(!AddConfiguration(q_best, q_current, true))
-    {
-      return nullptr;
-    }
-    //#########################################################################
-    //return q_next
-    //#########################################################################
-    return q_best;
+    //   if(q_best->isSufficientFeasible && !q_k->isSufficientFeasible)
+    //   {
+    //     q_best = q_k;
+    //     radius_best = radius_next;
+    //   }else{
+    //     if(radius_next > radius_best)
+    //     {
+    //       q_best = q_k;
+    //       radius_best = radius_next;
+    //     }else{
+    //       q_k->Remove(Q1);
+    //       continue;
+    //     }
+    //   }
+    // }
+    // if(!AddConfiguration(q_best))
+    // {
+    //   return nullptr;
+    // }
+    // //#########################################################################
+    // //return q_next
+    // //#########################################################################
+    // return q_best;
 }
 
-void QNG::RemoveConfiguration(Configuration *q)
-{
-  pdf_all_configurations.remove(static_cast<PDF_Element*>(q->GetPDFElement()));
-  nearest_cover->remove(q);
-  nearest_vertex->remove(q);
-  if(q->parent==nullptr){
-    OMPL_ERROR("Trying to remove start configuration");
-    exit(0);
-  }
-  q->Remove(Q1);
-}
+// void QNG::RemoveConfiguration(Configuration *q)
+// {
+//   pdf_all_configurations.remove(static_cast<PDF_Element*>(q->GetPDFElement()));
+//   nearest_cover->remove(q);
+//   nearest_vertex->remove(q);
+//   if(q->parent==nullptr){
+//     OMPL_ERROR("Trying to remove start configuration");
+//     exit(0);
+//   }
+//   q->Remove(Q1);
+// }
 
 bool QNG::Sample(Configuration *q_random){
   if(parent == nullptr){
@@ -427,18 +428,26 @@ bool QNG::Sample(Configuration *q_random){
     ob::State *stateX1 = X1->allocState();
     ob::State *stateQ0 = Q0->allocState();
     X1_sampler->sampleUniform(stateX1);
-    q_random->coset = static_cast<og::QNG*>(parent)->SampleCover(stateQ0);
+    q_random->coset = static_cast<og::QNG*>(parent)->SampleQuotientCover(stateQ0);
     if(q_random->coset == nullptr){
       OMPL_ERROR("no coset found for state");
       Q1->printState(q_random->state);
       exit(0);
     }
-    mergeStates(stateQ0, stateX1, q_random->state);
+    MergeStates(stateQ0, stateX1, q_random->state);
     X1->freeState(stateX1);
     Q0->freeState(stateQ0);
     return true;
   }
 }
+
+//return state in Q0 and the nearest configuration
+QNG::Configuration* QNG::SampleQuotientCover(ob::State *state) const
+{
+  std::cout << "NYI" << std::endl;
+  exit(0);
+}
+
 
 QNG::Configuration* QNG::Nearest(Configuration *q) const
 {
@@ -457,11 +466,16 @@ bool QNG::Connect(const Configuration *q_from, Configuration *q_to)
 double QNG::Distance(const Configuration *q_from, const Configuration *q_to)
 {
   if(parent == nullptr){
+    //the very first quotient-space => usual metric
     return DistanceQ1(q_from, q_to);
   }else{
-    if(q_to->coset == nullptr || q_from->coset == nullptr){
+    if(q_to->coset == nullptr || q_from->coset == nullptr)
+    {
+      //could not find a coset on the quotient-space  => usual metric
       return DistanceQ1(q_from, q_to);
     }
+    //metric defined by distance on cover of quotient-space plus distance on the
+    //subspace Q1/Q0
     og::QNG *QNG_parent = dynamic_cast<og::QNG*>(parent);
     return QNG_parent->DistanceCover(q_from->coset, q_to->coset)+DistanceX1(q_from, q_to);
   }
@@ -515,6 +529,13 @@ double QNG::DistanceOpenNeighborhood(const Configuration *q_from, const Configur
   return d_open_neighborhood_distance;
 }
 
+double QNG::DistanceCover(const Configuration *q_from, const Configuration *q_to)
+{
+  std::cout << "NYI" << std::endl;
+  exit(0);
+
+}
+
 bool QNG::sampleHalfBallOnNeighborhoodBoundary(Configuration *sample, const Configuration *center)
 {
   //sample on boundary of open neighborhood
@@ -558,13 +579,15 @@ bool QNG::sampleHalfBallOnNeighborhoodBoundary(Configuration *sample, const Conf
   //P = center->parent->state
   si_->getStateSpace()->interpolate(center->state, sample->state, radius/dist_q_qk, sample->state);
 
-  Configuration *q_parent = center->parent;
-  if(q_parent !=nullptr)
-  {
-    if(DistanceQ1(q_parent, sample) < q_parent->GetRadius()){
-      si_->getStateSpace()->interpolate(sample->state, center->state, 2, sample->state);
-    }
-  }
+  std::cout << "NYI" << std::endl;
+  exit(0);
+  // Configuration *q_parent = center->parent;
+  // if(q_parent !=nullptr)
+  // {
+  //   if(DistanceQ1(q_parent, sample) < q_parent->GetRadius()){
+  //     si_->getStateSpace()->interpolate(sample->state, center->state, 2, sample->state);
+  //   }
+  // }
 
   return true;
 
@@ -611,31 +634,8 @@ bool QNG::sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Confi
 }
 
 
-uint QNG::GetNumberOfVertices() const
-{
-  return nearest_vertex->size();
-}
-
-uint QNG::GetNumberOfEdges() const
-{
-  std::vector<Configuration *> configs;
-  if (nearest_vertex){
-    nearest_vertex->list(configs);
-  }
-  uint ctr_edges = 0;
-  for (auto &config : configs)
-  {
-    if (config->parent != nullptr)
-    {
-      ctr_edges++;
-    }
-  }
-  return ctr_edges;
-}
-
 void QNG::Init()
 {
-
   checkValidity();
 }
 
@@ -656,75 +656,19 @@ void QNG::clear()
   pis_.restart();
 }
 
-void QNG::freeTree( NearestNeighborsPtr nn)
+bool QNG::GetSolution(ob::PathPtr &solution)
 {
-  if(nn)
-  {
-    std::vector<Configuration *> configurations;
-    nn->list(configurations);
-    for (auto &configuration : configurations)
-    {
-      if (configuration->state != nullptr)
-      {
-        Q1->freeState(configuration->state);
-      }
-      delete configuration;
-    }
-  }
+  std::cout << "NYI" << std::endl;
+  exit(0);
+    //hasSolution = true;
 }
 
-void QNG::CheckForSolution(ob::PathPtr &solution)
+void QNG::CopyChartFromSibling( QuotientChart *sibling, uint k )
 {
-  Configuration *q_nearest = Nearest(q_goal);
-  if(DistanceOpenNeighborhood(q_nearest, q_goal) <= 0)
-  {
-    if(q_goal->parent == nullptr){
-      //goal has not been added before
-      q_goal->parent = q_nearest;
-      nearest_cover->add(q_goal);
-    }
-    Configuration *q_next = q_goal;
-    std::vector<Configuration *> q_path;
-    while (q_next != nullptr){
-      q_path.push_back(q_next);
-      q_next = q_next->parent;
-    }
-    auto path(std::make_shared<PathGeometric>(si_));
-    for (int i = q_path.size() - 1; i >= 0; --i){
-      path->append(q_path.at(i)->state);
-    }
-    solution = path;
-
-    hasSolution = true;
-  }
+  std::cout << "NYI" << std::endl;
+  exit(0);
 }
 
-void QNG::SetSubGraph( QuotientChart *sibling, uint k )
-{
-  QNG *rhs = dynamic_cast<og::QNG*>(sibling);
-  std::cout << "old graph: " << rhs->GetNumberOfVertices() << " vertices | " << rhs->GetNumberOfEdges() << " edges."<< std::endl;
-
-  local_chart = true;
-  opt_ = rhs->opt_;
-  level = rhs->GetLevel();
-  startM_ = rhs->startM_;
-  goalM_ = rhs->goalM_;
-  number_of_paths = 0;
-
-  nearest_cover = rhs->GetTree();
-  q_start = rhs->GetStartConfiguration();
-  q_goal = rhs->GetGoalConfiguration();
-  pdf_necessary_configurations = rhs->GetPDFNecessaryVertices();
-  pdf_all_configurations = rhs->GetPDFAllVertices();
-  goalBias = rhs->GetGoalBias();
-
-  std::cout << "new graph: " << GetNumberOfVertices() << " vertices | " << GetNumberOfEdges() << " edges."<< std::endl;
-}
-
-std::shared_ptr<ompl::NearestNeighbors<QNG::Configuration *>> QNG::GetTree() const
-{
-  return nearest_cover;
-}
 QNG::Configuration* QNG::GetStartConfiguration() const
 {
   return q_start;
@@ -733,6 +677,7 @@ QNG::Configuration* QNG::GetGoalConfiguration() const
 {
   return q_goal;
 }
+
 const QNG::PDF& QNG::GetPDFNecessaryVertices() const
 {
   return pdf_necessary_configurations;
@@ -747,77 +692,56 @@ double QNG::GetGoalBias() const
 }
 
 
-void QNG::getPlannerData(base::PlannerData &data) const
+void QNG::getPlannerDataAnnotated(base::PlannerData &data) const
 {
-  uint Nvertices = data.numVertices();
-  uint Nedges = data.numEdges();
-  //###########################################################################
-  //Get Path for this chart
-  //###########################################################################
-  std::vector<int> path = GetPath();
 
   //###########################################################################
   //Obtain vertices
   //###########################################################################
-  std::vector<Configuration *> vertices;
-  if (nearest_cover){
-    nearest_cover->list(vertices);
-  }
+  // std::vector<Configuration *> vertices;
+  // if (nearest_cover){
+  //   nearest_cover->list(vertices);
+  // }
 
-  uint ctr_sufficient = 0;
-  for (auto &vertex : vertices)
-  {
-    ob::State *state = (local_chart?si_->cloneState(vertex->state):vertex->state);
-    double d = vertex->GetRadius();
+  //uint ctr_sufficient = 0;
+  // for (auto &vertex : vertices)
+  // {
+  //   ob::State *state = (local_chart?si_->cloneState(vertex->state):vertex->state);
+  //   double d = vertex->GetRadius();
 
-    PlannerDataVertexAnnotated pvertex(state);
-    pvertex.SetLevel(level);
-    pvertex.SetPath(path);
-    pvertex.SetOpenNeighborhoodDistance(d);
+  //   PlannerDataVertexAnnotated pvertex(state);
+  //   pvertex.SetLevel(level);
+  //   pvertex.SetPath(path);
+  //   pvertex.SetOpenNeighborhoodDistance(d);
 
-    using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
-    if(vertex->isSufficientFeasible){
-      pvertex.SetFeasibility(FeasibilityType::SUFFICIENT_FEASIBLE);
-      ctr_sufficient++;
-    }else{
-      pvertex.SetFeasibility(FeasibilityType::FEASIBLE);
-    }
+  //   using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
+  //   if(vertex->isSufficientFeasible){
+  //     pvertex.SetFeasibility(FeasibilityType::SUFFICIENT_FEASIBLE);
+  //     ctr_sufficient++;
+  //   }else{
+  //     pvertex.SetFeasibility(FeasibilityType::FEASIBLE);
+  //   }
 
-    if(vertex->parent == nullptr){
-      data.addStartVertex(pvertex);
-    }else{
-      if(vertex == q_goal){
-        data.addGoalVertex(pvertex);
-      }else{
-        data.addVertex(pvertex);
-      }
+  //   if(vertex == nullptr){
+  //     data.addStartVertex(pvertex);
+  //   }else{
+  //     if(vertex == q_goal){
+  //       data.addGoalVertex(pvertex);
+  //     }else{
+  //       data.addVertex(pvertex);
+  //     }
 
-      PlannerDataVertexAnnotated parent_vertex(vertex->parent->state);
-      parent_vertex.SetLevel(level);
-      parent_vertex.SetPath(path);
-      parent_vertex.SetOpenNeighborhoodDistance(vertex->parent->GetRadius());
-      data.addEdge(pvertex, parent_vertex);
-    }
-    if(!vertex->state){
-      std::cout << "vertex state does not exists" << std::endl;
-      si_->printState(vertex->state);
-      exit(0);
-    }
-  }
-  //###########################################################################
-  //Get Data From all siblings
-  //###########################################################################
-
-  std::cout << "[QuotientChart] vIdx " << level << " | hIdx " << horizontal_index 
-    << " | siblings " << siblings.size() << " | path " << path << std::endl;
-
-  std::cout << "               | vertices " << data.numVertices() - Nvertices << " (" << ctr_sufficient << " sufficient)" 
-    << " | edges " << data.numEdges() - Nedges
-    << std::endl;
-
-  for(uint i = 0; i < siblings.size(); i++){
-    siblings.at(i)->getPlannerData(data);
-  }
-  if(child!=nullptr) child->getPlannerData(data);
+  //     PlannerDataVertexAnnotated parent_vertex(vertex->parent->state);
+  //     parent_vertex.SetLevel(level);
+  //     parent_vertex.SetPath(path);
+  //     parent_vertex.SetOpenNeighborhoodDistance(vertex->parent->GetRadius());
+  //     data.addEdge(pvertex, parent_vertex);
+  //   }
+  //   if(!vertex->state){
+  //     std::cout << "vertex state does not exists" << std::endl;
+  //     si_->printState(vertex->state);
+  //     exit(0);
+  //   }
+  // }
 }
 

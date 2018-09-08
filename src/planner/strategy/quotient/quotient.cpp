@@ -125,22 +125,9 @@ void Quotient::clear()
   Planner::clear();
   hasSolution = false;
   Quotient::counter = 0;
-  totalNumberOfSamples = 0;
-  graphLength = 0;
+  //totalNumberOfSamples = 0;
+  //graphLength = 0;
   if(parent==nullptr) X1_sampler.reset();
-}
-
-uint Quotient::GetNumberOfSampledVertices()
-{
-  return totalNumberOfSamples;
-}
-uint Quotient::GetNumberOfVertices() const
-{
-  return 0;
-}
-uint Quotient::GetNumberOfEdges() const
-{
-  return 0;
 }
 
 const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const StateSpacePtr Q0)
@@ -378,7 +365,7 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const
 
 }
 
-void Quotient::mergeStates(const ob::State *qQ0, const ob::State *qX1, ob::State *qQ1) const
+void Quotient::MergeStates(const ob::State *qQ0, const ob::State *qX1, ob::State *qQ1) const
 {
   ////input : qQ0 \in Q0, qX1 \in X1
   ////output: qQ1 = qQ0 \circ qX1 \in Q1
@@ -689,16 +676,25 @@ void Quotient::ExtractQ0Subspace( const ob::State* q, ob::State* qQ0 ) const
   }
 }
 
-const ob::SpaceInformationPtr &Quotient::getX1() const{
+const ob::SpaceInformationPtr& Quotient::GetX1() const
+{
   return X1;
 }
-
-bool Quotient::SampleX1(ob::State *s){
-  X1_sampler->sampleUniform(s);
-  return true;
+const ob::SpaceInformationPtr& Quotient::GetQ1() const
+{
+  return Q1;
 }
+const ob::SpaceInformationPtr& Quotient::GetQ0() const
+{
+  return Q0;
+}
+
 bool Quotient::HasSolution()
 {
+  if(!hasSolution){
+    ob::PathPtr path;
+    hasSolution = GetSolution(path);
+  }
   return hasSolution;
 }
 Quotient* Quotient::GetParent() const
@@ -728,19 +724,17 @@ void Quotient::SetLevel(uint level_)
 
 bool Quotient::Sample(ob::State *q_random)
 {
-  totalNumberOfSamples++;
   if(parent == nullptr){
     return Q1_valid_sampler->sample(q_random);
   }else{
     //Adjusted sampling function: Sampling in G0 x X1
-
-    ob::SpaceInformationPtr Q0 = parent->getSpaceInformation();
+    ob::SpaceInformationPtr Q0 = parent->GetQ1(); //Q0 is Q1 of parent!
     base::State *s_X1 = X1->allocState();
     base::State *s_Q0 = Q0->allocState();
 
     X1_sampler->sampleUniform(s_X1);
-    parent->SampleGraph(s_Q0);
-    mergeStates(s_Q0, s_X1, q_random);
+    parent->SampleQuotient(s_Q0);
+    MergeStates(s_Q0, s_X1, q_random);
 
     X1->freeState(s_X1);
     Q0->freeState(s_Q0);
@@ -748,90 +742,71 @@ bool Quotient::Sample(ob::State *q_random)
     return Q1->isValid(q_random);
   }
 }
-
-double Quotient::GetSamplingDensity(){
-  //double N = (double)totalNumberOfSamples;
-  double N = (double)GetNumberOfVertices();
-  //return N;
-  //@TODO: needs a more formal definition of sampling density
-  if(parent==nullptr){
-    return N/((double)si_->getSpaceMeasure());
-  }else{
-    return N/((double)si_->getSpaceMeasure());
-    //return N/(parent->GetGraphLength()*X1->getSpaceMeasure());
-  }
+bool Quotient::SampleQuotient(ob::State *state)
+{
+  return Q1_valid_sampler->sample(state);
 }
 
-double Quotient::GetGraphLength(){
-  return graphLength;
+double Quotient::GetImportance() const
+{
+  return 0;
+}
+void Quotient::Print(std::ostream& out) const
+{
+  out << std::string(80, '-') << std::endl;
+  out << "[QuotientSpace]" << std::endl;
+  out << std::string(80, '-') << std::endl;
+  if(parent == nullptr){
+    out << "Q0: ";
+    if( Q1->getStateSpace()->getType() == ob::STATE_SPACE_SE2 ){
+      out << "SE(2)" << std::endl;
+    }else if( Q1->getStateSpace()->getType() == ob::STATE_SPACE_SE3 ){
+      out << "SE(3)" << std::endl;
+    }else if( Q1->getStateSpace()->getType() == ob::STATE_SPACE_REAL_VECTOR ){
+      out << "R^" << Q1_dimension << std::endl;
+    }else{
+      out << "unknown" << std::endl;
+    }
+  }
+  switch (type) {
+    case Quotient::RN_RM:
+      {
+        out << "Q0: R^"<< Q0_dimension << " | Q1: R^" << Q1_dimension << " | X1: R^" << Q1_dimension-Q0_dimension<< std::endl;
+        break;
+      }
+    case Quotient::SE2_R2:
+      {
+        out << "Q0: SE(2) | Q1: R^2 | X1: SO(2)" << std::endl;
+        break;
+      }
+    case Quotient::SE3_R3:
+      {
+        out << "Q0: SE(3) | Q1: R^3 | X1: SO(3)" << std::endl;
+        break;
+      }
+    case Quotient::SE3RN_SE3:
+      {
+        out << "Q0: SE(3)xR^" << X1_dimension << " | Q1: SE(3) | X1: R^" << X1_dimension << std::endl;
+        break;
+      }
+    case Quotient::SE3RN_SE3RM:
+      {
+        out << "Q0: SE(3)xR^" << Q0_dimension-6 << " | Q1: SE(3)xR^"<<Q1_dimension-6 << " | X1: R^" << X1_dimension << std::endl;
+        break;
+      }
+    default:
+     {
+       out << "unknown type: " << type << std::endl;
+     }
+
+  }
 }
 
 namespace ompl{
   namespace geometric{
-    std::ostream& operator<< (std::ostream& out, const Quotient& qtnt){
-      if(qtnt.parent == nullptr){
-        out << "Q0: ";
-        if( qtnt.Q1->getStateSpace()->getType() == ob::STATE_SPACE_SE2 ){
-          out << "SE(2)" << std::endl;
-        }else if( qtnt.Q1->getStateSpace()->getType() == ob::STATE_SPACE_SE3 ){
-          out << "SE(3)" << std::endl;
-        }else if( qtnt.Q1->getStateSpace()->getType() == ob::STATE_SPACE_REAL_VECTOR ){
-          out << "R^" << qtnt.Q1_dimension << std::endl;
-        }else{
-          out << "unknown" << std::endl;
-        }
-      }
-      switch (qtnt.type) {
-        case Quotient::RN_RM:
-          {
-            out << "Q0: R^"<< qtnt.Q0_dimension << " | Q1: R^" << qtnt.Q1_dimension << " | X1: R^" << qtnt.Q1_dimension-qtnt.Q0_dimension<< std::endl;
-            break;
-          }
-        case Quotient::SE2_R2:
-          {
-            out << "Q0: SE(2) | Q1: R^2 | X1: SO(2)" << std::endl;
-            break;
-          }
-        case Quotient::SE3_R3:
-          {
-            out << "Q0: SE(3) | Q1: R^3 | X1: SO(3)" << std::endl;
-            break;
-          }
-        case Quotient::SE3RN_SE3:
-          {
-            out << "Q0: SE(3)xR^" << qtnt.X1_dimension << " | Q1: SE(3) | X1: R^" << qtnt.X1_dimension << std::endl;
-            break;
-          }
-        case Quotient::SE3RN_SE3RM:
-          {
-            out << "Q0: SE(3)xR^" << qtnt.Q0_dimension-6 << " | Q1: SE(3)xR^"<<qtnt.Q1_dimension-6 << " | X1: R^" << qtnt.X1_dimension << std::endl;
-            break;
-          }
-        default:
-         {
-           out << "unknown type: " << qtnt.type << std::endl;
-         }
-
-      }
+    std::ostream& operator<< (std::ostream& out, const Quotient& quotient_){
+      quotient_.Print(out);
       return out;
-
     }
   }
 }
-
-//std::string typeToString(StateSpaceType type)
-//{
-//  std::string out;
-//  if(type==base::STATE_SPACE_REAL_VECTOR){
-//
-//  }else if(type==base::STATE_SPACE_SO2){
-//  }else if(type==base::STATE_SPACE_SO3){
-//  }else if(type==base::STATE_SPACE_SE2){
-//  }else if(type==base::STATE_SPACE_SE3){
-//  }else if(type==base::STATE_SPACE_TIME){
-//  }else if(type==base::STATE_SPACE_DISCRETE){
-//  }else{
-//    out = "UNKNOWN";
-//  }
-//  return out;
-//}

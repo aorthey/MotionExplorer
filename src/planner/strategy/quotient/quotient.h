@@ -46,24 +46,20 @@ namespace ompl
 
         virtual void Init() = 0;
         virtual void Grow(double t) = 0;
-        virtual void CheckForSolution(ob::PathPtr &solution) = 0;
-        virtual bool SampleGraph(ob::State *q_random) = 0;
+        virtual bool GetSolution(ob::PathPtr &solution) = 0;
 
-        virtual bool HasSolution();
+        virtual bool SampleQuotient(ob::State *q_random);
         virtual bool Sample(ob::State *q_random);
-        virtual double GetSamplingDensity();
-        virtual uint GetNumberOfVertices() const;
-        virtual uint GetNumberOfEdges() const;
+        virtual bool HasSolution();
+        virtual void clear() override;
 
-        virtual uint GetNumberOfSampledVertices();
+        virtual double GetImportance() const;
+
         static void resetCounter();
-
-        friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::Quotient& qtnt);
-
-        const ob::SpaceInformationPtr &getX1() const;
-        bool SampleX1(ob::State *s);
-        void mergeStates(const ob::State *qQ0, const ob::State *qX1, ob::State *qQ1) const;
-
+        void MergeStates(const ob::State *qQ0, const ob::State *qX1, ob::State *qQ1) const;
+        const ob::SpaceInformationPtr &GetX1() const;
+        const ob::SpaceInformationPtr &GetQ1() const;
+        const ob::SpaceInformationPtr &GetQ0() const;
         Quotient* GetParent() const;
         Quotient* GetChild() const;
         uint GetLevel() const;
@@ -71,40 +67,39 @@ namespace ompl
         void SetChild(Quotient *child_);
         void SetParent(Quotient *parent_);
 
-        double GetGraphLength();
-        virtual void clear() override;
+        friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::Quotient& qtnt);
+        virtual void Print(std::ostream& out) const;
 
       protected:
-        static uint counter;
-        uint id;
-        uint level{0};
-
-        enum QuotientSpaceType{ UNKNOWN, ATOMIC_RN, RN_RM, SE2_R2, SE3_R3, SE3RN_R3, SE3RN_SE3, SE3RN_SE3RM };
-
-        QuotientSpaceType type;
-        uint Q1_dimension;
-        uint Q0_dimension;
-        uint X1_dimension;
 
         const ob::StateSpacePtr ComputeQuotientSpace(const ob::StateSpacePtr Q1, const ob::StateSpacePtr Q0);
         void ExtractX1Subspace( const ob::State* q, ob::State* qX1 ) const;
         void ExtractQ0Subspace( const ob::State* q, ob::State* qQ0 ) const;
 
-        ob::SpaceInformationPtr Q1; //configuration space Mi = si_
-        ob::SpaceInformationPtr Q0; //quotient space Mi-1 = Mi/Ci
-        ob::SpaceInformationPtr X1; //subspace Ci = Mi/Mi-1
+        ob::SpaceInformationPtr Q1;
+        ob::SpaceInformationPtr Q0;
+        ob::SpaceInformationPtr X1;
 
         ob::StateSamplerPtr X1_sampler;
         ob::StateSamplerPtr Q1_sampler;
         ob::ValidStateSamplerPtr Q1_valid_sampler;
 
-        double graphLength{0.0};
-        uint totalNumberOfSamples{0};
+        ob::OptimizationObjectivePtr opt_;
+
+        enum QuotientSpaceType{ UNKNOWN, ATOMIC_RN, RN_RM, SE2_R2, SE3_R3, SE3RN_R3, SE3RN_SE3, SE3RN_SE3RM };
+        QuotientSpaceType type;
+        uint Q1_dimension;
+        uint Q0_dimension;
+        uint X1_dimension;
+
+        static uint counter;
+        uint id;
+        uint level{0};
+
         bool hasSolution{false};
 
         Quotient *parent{nullptr};
         Quotient *child{nullptr};
-
 
         //Outer robot available
         OMPLValidityCheckerPtr checker;

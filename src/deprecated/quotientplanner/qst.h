@@ -25,15 +25,11 @@ namespace ompl
       virtual void setup() override;
       void getPlannerData(ob::PlannerData &data) const override;
 
-
-      virtual uint GetNumberOfVertices() const override;
-      virtual uint GetNumberOfEdges() const override;
       virtual void Grow(double t=0) override;
       virtual void Init() override;
-      virtual void CheckForSolution(ob::PathPtr &solution) override;
+      virtual bool GetSolution(ob::PathPtr &solution) override;
 
       uint verbose{1};
-      
       
     protected:
 
