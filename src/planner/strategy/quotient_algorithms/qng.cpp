@@ -118,42 +118,81 @@ void QNG::setup(void)
 //#############################################################################
 void QNG::AddConfigurationToCover(Configuration *q)
 {
-  std::cout << "adding config to cover" << std::endl;
-  Q1->printState(q->state);
-  RemoveConfigurationsFromCoverCoveredBy(q);
-  Q1->printState(q->state);
+  //get all neighbors before adding q (otherwise q might be neighbor of itself)
+  std::vector<Configuration*> neighbors = GetConfigurationsInsideNeighborhood(q);
 
+  //(1) add to cover graph
   Vertex v = boost::add_vertex(q, graph);
   graph[v]->number_attempted_expansions = 0;
   graph[v]->number_successful_expansions = 0;
   graph[v]->index = v;
+  put(propmapIndex, v, index_ctr++);
+  graph[v]->index_number = index_ctr-1;
 
-  disjointSets_.make_set(v);
-
-  PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
-  q->SetPDFElement(q_element);
-
+  //(2) add to nearest neighbor structure
   nearest_cover->add(q);
   nearest_vertex->add(q);
 
+  //(3) add to PDF
+  PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
+  q->SetPDFElement(q_element);
   if(!q->isSufficientFeasible){
     PDF_Element *q_necessary_element = pdf_necessary_configurations.add(q, q->GetRadius());
     q->SetNecessaryPDFElement(q_necessary_element);
   }
+
+  //Clean UP and Connect
+  //(1) Remove All Configurations with neighborhoods inside current neighborhood
+  //(2) Add Edges to All Configurations with centers inside the current neighborhood 
+  std::cout << "neighbors:" << neighbors.size() << std::endl;
+  for(uint k = 0; k < neighbors.size(); k++){
+    Configuration *qn = neighbors.at(k);
+    if(IsNeighborhoodInsideNeighborhood(qn, q))
+    {
+      //do not delete start/goal
+      if(qn->isStart){
+        AddEdge(q, qn);
+      }else if(qn->isGoal){
+        AddEdge(q, qn);
+      }else{
+        RemoveConfigurationFromCover(qn);
+      }
+    }else{
+      AddEdge(q, qn);
+    }
+  }
+  if(q->parent_neighbor != nullptr){
+    AddEdge(q, q->parent_neighbor);
+  }
+}
+void QNG::AddEdge(Configuration *q_from, Configuration *q_to)
+{
+  std::cout << "adding edge " << q_from->index_number << " - " << q_to->index_number << std::endl;
+  double d = DistanceQ1(q_from, q_to);
+  EdgeInternalState properties(d);
+  boost::add_edge(q_from->index, q_to->index, properties, graph);
 }
 
 void QNG::RemoveConfigurationFromCover(Configuration *q)
 {
+  //(1) Remove from PDF
   pdf_all_configurations.remove(static_cast<PDF_Element*>(q->GetPDFElement()));
   if(!q->isSufficientFeasible){
     pdf_necessary_configurations.remove(static_cast<PDF_Element*>(q->GetNecessaryPDFElement()));
   }
+  //(2) Remove from nearest neighbors structure
   nearest_cover->remove(q);
   nearest_vertex->remove(q);
 
-  boost::remove_vertex(q->index, graph);
-
+  //(3) Remove from cover graph
   q->Remove(Q1);
+  //propmapIndex.erase(q->index);
+
+  std::cout << "**** removing " << q->index_number << std::endl;
+  boost::remove_vertex(q->index, graph);
+  //put(propmapIndex, v, index_ctr++);
+
+  delete q;
 }
 
 
@@ -240,23 +279,17 @@ void QNG::Grow(double t)
   //Sample a configuration different from the current cover
   //#########################################################################
 
-  std::cout << std::string(80, '-') << std::endl;
-
   Configuration *q_random = nullptr;
   while(q_random == nullptr && !ptc){
     q_random = Sample();
   }
 
   if(q_random == nullptr) return;
-  std::cout << "random:" << std::endl;
-  Q1->printState(q_random->state);
 
-  // //#########################################################################
-  // //Nearest in cover
-  // //#########################################################################
+  //#########################################################################
+  //Nearest in cover
+  //#########################################################################
   Configuration *q_nearest = Nearest(q_random);
-  std::cout << "nearest:" << std::endl;
-  Q1->printState(q_nearest->state);
 
   if(q_nearest->state == q_random->state){
     OMPL_ERROR("sampled and nearest states are equivalent.");
@@ -279,17 +312,8 @@ void QNG::Grow(double t)
   // //  q_nearest  ---->  q_random  ---->  q_next
   // //#########################################################################
 
-
   AddConfigurationToCover(q_random);
   //nearest could have been removed!
-
-  std::cout << "distance:" << std::endl;
-  Q1->printState(q_random->state);
-  Q1->printState(q_nearest->state);
-  double d = DistanceQ1(q_random, q_nearest);
-  EdgeInternalState properties(d);
-  boost::add_edge(q_random->index, q_nearest->index, properties, graph);
-  UniteComponents(q_random->index, q_nearest->index);
 
   //
   // if(AddConfiguration(q_random, q_nearest)){
@@ -434,6 +458,7 @@ QNG::Configuration* QNG::EstimateBestNextState(Configuration *q_last, Configurat
 QNG::Configuration* QNG::Sample(){
   ob::State *state = Q1->allocState();
   Configuration *q_coset = nullptr;
+  Configuration *q_parent = nullptr;
 
   if(parent == nullptr){
 
@@ -463,6 +488,7 @@ QNG::Configuration* QNG::Sample(){
           }
           //sample its boundary
           sampleHalfBallOnNeighborhoodBoundary(state, q);
+          q_parent = q;
         }
       }
     }else{
@@ -490,6 +516,7 @@ QNG::Configuration* QNG::Sample(){
   }
   Configuration* q_random = CreateConfigurationFromStateAndCoset(state, q_coset);
   Q1->freeState(state);
+  if(q_random!=nullptr) q_random->parent_neighbor = q_parent;
   return q_random;
 }
 
@@ -603,7 +630,7 @@ bool QNG::IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rh
 std::vector<QNG::Configuration*> QNG::GetConfigurationsInsideNeighborhood(Configuration *q)
 {
   std::vector<Configuration*> neighbors;
-  nearest_vertex->nearestR(q, q->GetRadius(), neighbors);
+  nearest_vertex->nearestR(q, q->GetRadius()+threshold_clearance*0.5, neighbors);
   return neighbors;
 }
 
@@ -765,38 +792,50 @@ double QNG::GetGoalBias() const
   return goalBias;
 }
 
-void QNG::UniteComponents(Vertex v1, Vertex v2)
-{
-  disjointSets_.union_set(v1, v2);
-}
+struct found_goal {}; // exception for termination
 
-bool QNG::SameComponent(Vertex v1, Vertex v2)
+template <class Vertex>
+class astar_goal_visitor : public boost::default_astar_visitor
 {
-  return boost::same_component(v1, v2, disjointSets_);
-}
+public:
+  astar_goal_visitor(Vertex goal) : m_goal(goal) {}
+  template <class Graph>
+  void examine_vertex(Vertex u, Graph& g) {
+    if(u == m_goal)
+      throw found_goal();
+  }
+private:
+  Vertex m_goal;
+};
+
 
 std::vector<QNG::Vertex> QNG::GetCoverPath(const Vertex& start, const Vertex& goal)
 {
   std::vector<Vertex> path;
-  if(!SameComponent(start, goal)) 
-  {
-    return path;
-  }
 
   std::cout << "finding path between " << start << " - " << goal << std::endl;
   Q1->printState(graph[start]->state);
   Q1->printState(graph[goal]->state);
 
-  std::vector<Vertex> prev(boost::num_vertices(graph));
+    //vector<Vertex> p(num_vertices(G), graph_traits<G>::null_vertex()); //the predecessor array
+  std::vector<Vertex> prev(boost::num_vertices(graph), boost::graph_traits<Graph>::null_vertex());
   auto weight = boost::make_transform_value_property_map(std::mem_fn(&EdgeInternalState::getCost), get(boost::edge_bundle, graph));
+  auto predecessor = boost::make_iterator_property_map(prev.begin(), propmapIndex);
 
+  //auto v_index = get(boost::vertex_index, g);
+
+
+  try{
   boost::astar_search(graph, start,
                     [this, goal](const Vertex &v)
                     {
                         return ob::Cost(DistanceQ1(graph[v], graph[goal]));
                     },
-                    boost::predecessor_map(&prev[0])
+                    //boost::predecessor_map(&prev[0])
+                      predecessor_map(predecessor)
                       .weight_map(weight)
+                      .visitor(astar_goal_visitor<Vertex>(goal))
+                      .vertex_index_map(propmapIndex)
                       .distance_compare([this](EdgeInternalState c1, EdgeInternalState c2)
                                         {
                                             return opt_->isCostBetterThan(c1.getCost(), c2.getCost());
@@ -808,29 +847,36 @@ std::vector<QNG::Vertex> QNG::GetCoverPath(const Vertex& start, const Vertex& go
                       .distance_inf(opt_->infiniteCost())
                       .distance_zero(opt_->identityCost())
                     );
-
-
-  if (prev[goal] == goal){
-    return path;
+  }catch(found_goal fg){
+    //std::cout << prev[goal] << std::endl;
+    // for(Vertex v = goal;; v = prev[v])
+    // {
+    //   path.push_back(v);
+    //   if(prev[v] == v)
+    //     break;
+    // }
+    std::cout << "found goal" << std::endl;
+    //list<Vertex>::iterator spi = shortest_path.begin();
   }
-  for(Vertex pos = goal; prev[pos] != pos; pos = prev[pos]){
-    path.push_back(pos);
-  }
-  path.push_back(start);
-  std::reverse(path.begin(), path.end());
+
+  // if (prev[goal.index] == goal){
+  //   return path;
+  // }
+  // for(Vertex pos = goal; prev[pos] != pos; pos = prev[pos]){
+  //   path.push_back(pos);
+  // }
+  // path.push_back(start);
+  // std::reverse(path.begin(), path.end());
   return path;
 }
 
 
-PlannerDataVertexAnnotated QNG::getAnnotatedVertex(Vertex vertex, std::map<const Vertex, ob::State*> &vertexToStates) const
+PlannerDataVertexAnnotated QNG::getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const
 {
-  ob::State *state = (isLocalChart?si_->cloneState(graph[vertex]->state):graph[vertex]->state);
-  vertexToStates[vertex] = state;
   PlannerDataVertexAnnotated pvertex(state);
   pvertex.SetLevel(GetLevel());
   pvertex.SetPath(GetChartPath());
-  //std::cout << GetChartPath() << std::endl;
-  pvertex.SetOpenNeighborhoodDistance(graph[vertex]->GetRadius());
+  pvertex.SetOpenNeighborhoodDistance(radius);
 
   if(!state){
     std::cout << "vertex state does not exists" << std::endl;
@@ -839,34 +885,44 @@ PlannerDataVertexAnnotated QNG::getAnnotatedVertex(Vertex vertex, std::map<const
   }
 
   using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
-  if(graph[vertex]->isSufficientFeasible){
+  if(sufficient){
     pvertex.SetFeasibility(FeasibilityType::SUFFICIENT_FEASIBLE);
   }else{
     pvertex.SetFeasibility(FeasibilityType::FEASIBLE);
   }
   return pvertex;
 }
+PlannerDataVertexAnnotated QNG::getAnnotatedVertex(Vertex vertex) const
+{
+  ob::State *state = (isLocalChart?si_->cloneState(graph[vertex]->state):graph[vertex]->state);
+  return getAnnotatedVertex(state, graph[vertex]->GetRadius(), graph[vertex]->isSufficientFeasible);
+}
 
 
 void QNG::getPlannerDataAnnotated(base::PlannerData &data) const
 {
-  std::map<const Vertex, ob::State*> vertexToStates;
+  std::cout << "graph has " << boost::num_vertices(graph) << " vertices and " << boost::num_edges(graph) << " edges." << std::endl;
+  std::map<const Vertex, const ob::State*> vertexToStates;
 
-  PlannerDataVertexAnnotated pstart = getAnnotatedVertex(v_start, vertexToStates);
+  PlannerDataVertexAnnotated pstart = getAnnotatedVertex(v_start);
+  vertexToStates[v_start] = pstart.getState();
   data.addStartVertex(pstart);
-  std::cout << data.vertexIndex(pstart) << std::endl;
 
-  if(hasSolution){
-    PlannerDataVertexAnnotated pgoal = getAnnotatedVertex(v_goal, vertexToStates);
-    data.addGoalVertex(pgoal);
-    std::cout << data.vertexIndex(pgoal) << std::endl;
-  }
+  // if(hasSolution){
+  //   PlannerDataVertexAnnotated pgoal = getAnnotatedVertex(v_goal);
+  //   data.addGoalVertex(pgoal);
+  //   std::cout << "hasSolution " << data.vertexIndex(pgoal) << std::endl;
+  // }else{
+  //   PlannerDataVertexAnnotated pgoal = getAnnotatedVertex(q_goal->state, q_goal->GetRadius(), q_goal->isSufficientFeasible);
+  //   data.addGoalVertex(pgoal);
+  // }
 
   foreach( const Vertex v, boost::vertices(graph))
   {
     if(vertexToStates.find(v) == vertexToStates.end()) {
-      PlannerDataVertexAnnotated p = getAnnotatedVertex(v, vertexToStates);
+      PlannerDataVertexAnnotated p = getAnnotatedVertex(v);
       data.addVertex(p);
+      vertexToStates[v] = p.getState();
     }
     //otherwise vertex is a goal or start vertex and has already been added
   }
@@ -875,11 +931,12 @@ void QNG::getPlannerDataAnnotated(base::PlannerData &data) const
     const Vertex v1 = boost::source(e, graph);
     const Vertex v2 = boost::target(e, graph);
 
-    ob::State *s1 = vertexToStates[v1];
-    ob::State *s2 = vertexToStates[v2];
+    const ob::State *s1 = vertexToStates[v1];
+    const ob::State *s2 = vertexToStates[v2];
     PlannerDataVertexAnnotated p1(s1);
     PlannerDataVertexAnnotated p2(s2);
     data.addEdge(p1,p2);
   }
+  std::cout << "added " << data.numVertices() << " vertices and " << data.numEdges() << " edges."<< std::endl;
 }
 

@@ -245,7 +245,7 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
   //Get Data From all siblings
   //###########################################################################
 
-  std::cout << "[QuotientChart] vIdx " << level << " | hIdx " << chartHorizontalIndex
+  std::cout << "[QuotientChart] " << (isLocalChart?"[local]":"") << " level " << level << " | hIdx " << chartHorizontalIndex
     << " | siblings " << chartSiblings.size() << " | chart_path " << chartPath
     << " | vertices " << data.numVertices() - Nvertices 
     << " | edges " << data.numEdges() - Nedges

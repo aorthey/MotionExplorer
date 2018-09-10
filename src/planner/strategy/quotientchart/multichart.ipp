@@ -197,6 +197,9 @@ void MultiChart<T>::getPlannerData(ob::PlannerData &data) const
     v.SetMaxLevel(levels);
     uint k = v.GetLevel();
 
+    // std::cout << data.vertexIndex(v) << " vertex " << vidx << "/" << data.numVertices() << std::endl;
+    // std::cout << v.GetOpenNeighborhoodDistance() << std::endl;
+    // si_vec.at(k)->printState(v.getState());
     const ob::State *s_V = v.getState();
     ob::State *s_Q0 = si_vec.at(k)->cloneState(s_V);
 

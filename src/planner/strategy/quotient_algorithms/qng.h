@@ -77,6 +77,8 @@ namespace ompl
 
         base::State *state{nullptr};
         Configuration *coset{nullptr}; //the underlying coset this Vertex elongs to (on the quotient-space)
+        Configuration *parent_neighbor{nullptr};
+
         bool isSufficientFeasible{false};
         void *pdf_element;
         void *pdf_necessary_element;
@@ -84,7 +86,19 @@ namespace ompl
         bool isStart{false};
         bool isGoal{false};
 
-        int index{0};
+        int index_number{0};
+        void *index{nullptr};
+
+        // typedef std::map<typename boost::graph_traits<Graph>::vertex_descriptor, size_t> IndexMap;
+        // IndexMap mapIndex;
+        // boost::associative_property_map<IndexMap> propmapIndex(mapIndex);
+        // size_t i=0;
+        // BGL_FORALL_VERTICES(v, waypoint_graph, Waypoing)
+        // {
+        //      put(propmapIndex, v, i++);
+        // }
+        //astar_search(waypoint_graph, start, my_heuristic, boost::visitor(my_visitor).vertex_index_map(propmapIndex));
+
 
         //#####################################################################
         //Neighborhood Computations
@@ -121,8 +135,8 @@ namespace ompl
       };
 
       typedef boost::adjacency_list<
-         boost::vecS, 
-         boost::vecS, 
+         boost::listS, //do not change to vecS, otherwise vertex indices are not stable after removal
+         boost::listS, 
          boost::undirectedS,
          Configuration*,
          //boost::property<boost::edge_index_t,int, EdgeInternalState> 
@@ -142,16 +156,21 @@ namespace ompl
       typedef std::shared_ptr<NearestNeighbors<Configuration*>> NearestNeighborsPtr;
       typedef ompl::PDF<Configuration*> PDF;
       typedef PDF::Element PDF_Element;
+      
+      //keep manual track of indices, because we sometimes need to remove
+      //vertices
+      typedef std::map<typename boost::graph_traits<Graph>::vertex_descriptor, size_t> IndexMap;
+      IndexMap VertexToIndex;
+      boost::associative_property_map<IndexMap> propmapIndex{VertexToIndex};
+      int index_ctr{0};
 
       virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
 
-      std::map<Vertex, VertexRank> vrank;
-      std::map<Vertex, Vertex> vparent;
-      boost::disjoint_sets<boost::associative_property_map<std::map<Vertex, VertexRank> >, boost::associative_property_map<std::map<Vertex, Vertex> > > 
-        disjointSets_{boost::make_assoc_property_map(vrank), boost::make_assoc_property_map(vparent)};
+      // std::map<Vertex, VertexRank> vrank;
+      // std::map<Vertex, Vertex> vparent;
+      // boost::disjoint_sets<boost::associative_property_map<std::map<Vertex, VertexRank> >, boost::associative_property_map<std::map<Vertex, Vertex> > > 
+      //   disjointSets_{boost::make_assoc_property_map(vrank), boost::make_assoc_property_map(vparent)};
 
-      void UniteComponents(Vertex v1, Vertex v2);
-      bool SameComponent(Vertex v1, Vertex v2);
 
       //#######################################################################
       //Configuration Create, Remove, Add 
@@ -161,6 +180,7 @@ namespace ompl
 
       void AddConfigurationToCover(Configuration *q);
       void RemoveConfigurationFromCover(Configuration *q);
+      void AddEdge(Configuration *q_from, Configuration *q_to);
 
       Configuration* GetStartConfiguration() const;
       Configuration* GetGoalConfiguration() const;
@@ -210,7 +230,8 @@ namespace ompl
       Configuration* Nearest(Configuration *q) const;
 
       virtual void getPlannerDataAnnotated(base::PlannerData &data) const override;
-      PlannerDataVertexAnnotated getAnnotatedVertex(Vertex vertex, std::map<const Vertex, ob::State*> &vertexToStates) const;
+      PlannerDataVertexAnnotated getAnnotatedVertex(Vertex vertex) const;
+      PlannerDataVertexAnnotated getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const;
       //#######################################################################
       RNG rng_;
       double goalBias{0.05}; //in [0,1]
@@ -222,8 +243,8 @@ namespace ompl
       Configuration *q_start{nullptr};
       Configuration *q_goal{nullptr};
 
-      Vertex v_start{0};
-      Vertex v_goal{0};
+      Vertex v_start;
+      Vertex v_goal;
 
       PDF pdf_necessary_configurations;
       PDF pdf_all_configurations;
