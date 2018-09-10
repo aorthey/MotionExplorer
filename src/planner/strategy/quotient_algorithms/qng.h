@@ -3,6 +3,7 @@
 #include <ompl/datastructures/PDF.h>
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/datastructures/NearestNeighbors.h>
+#include <boost/pending/disjoint_sets.hpp>
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
@@ -50,11 +51,19 @@ namespace ompl
         }
         void SetPDFElement(void *element_)
         {
-          element = element_;
+          pdf_element = element_;
         }
         void* GetPDFElement()
         {
-          return element;
+          return pdf_element;
+        }
+        void SetNecessaryPDFElement(void *element_)
+        {
+          pdf_necessary_element = element_;
+        }
+        void* GetNecessaryPDFElement()
+        {
+          return pdf_necessary_element;
         }
         double GetImportance()
         {
@@ -69,7 +78,8 @@ namespace ompl
         base::State *state{nullptr};
         Configuration *coset{nullptr}; //the underlying coset this Vertex elongs to (on the quotient-space)
         bool isSufficientFeasible{false};
-        void *element;
+        void *pdf_element;
+        void *pdf_necessary_element;
 
         bool isStart{false};
         bool isGoal{false};
@@ -85,12 +95,13 @@ namespace ompl
       class EdgeInternalState{
         public:
           EdgeInternalState() = default;
-          EdgeInternalState(ob::Cost cost_): cost(cost_), original_cost(cost_)
+          EdgeInternalState(ob::Cost cost_): cost(cost_)
+          {};
+          EdgeInternalState(double w): cost(w)
           {};
           EdgeInternalState(const EdgeInternalState &eis)
           {
             cost = eis.cost;
-            original_cost = eis.original_cost;
             isSufficient = eis.isSufficient;
           }
           void setWeight(double d){
@@ -99,22 +110,24 @@ namespace ompl
           ob::Cost getCost(){
             return cost;
           }
-          void setOriginalWeight(){
-            cost = original_cost;
-          }
         private:
           ob::Cost cost{+dInf};
-          ob::Cost original_cost{+dInf};
           bool isSufficient{false};
+      };
+
+      class GraphBundle{
+        // put PDFs and neighborhood structures here
+        std::string name;
       };
 
       typedef boost::adjacency_list<
          boost::vecS, 
          boost::vecS, 
          boost::undirectedS,
-         Configuration,
-         EdgeInternalState
+         Configuration*,
          //boost::property<boost::edge_index_t,int, EdgeInternalState> 
+         EdgeInternalState,
+         GraphBundle
        > Graph;
 
       typedef boost::graph_traits<Graph> BGT;
@@ -132,29 +145,44 @@ namespace ompl
 
       virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
 
-      void AddConfiguration(Configuration *q);
-      //need to supply q_coset, the pointer to the underlying equivalence class
-      Configuration* AddState(const ob::State *state, Configuration *q_coset);
+      std::map<Vertex, VertexRank> vrank;
+      std::map<Vertex, Vertex> vparent;
+      boost::disjoint_sets<boost::associative_property_map<std::map<Vertex, VertexRank> >, boost::associative_property_map<std::map<Vertex, Vertex> > > 
+        disjointSets_{boost::make_assoc_property_map(vrank), boost::make_assoc_property_map(vparent)};
 
-      void RemoveConfiguration(Configuration *q);
+      void UniteComponents(Vertex v1, Vertex v2);
+      bool SameComponent(Vertex v1, Vertex v2);
 
-      bool sampleUniformOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
-      bool sampleHalfBallOnNeighborhoodBoundary(Configuration *sample, const Configuration *center);
-      Configuration* EstimateBestNextState(Configuration *q_last, Configuration *q_current);
+      //#######################################################################
+      //Configuration Create, Remove, Add 
+      //#######################################################################
 
-      virtual bool Sample(Configuration *q_random);
-      Configuration* SampleQuotientCover(ob::State *state) const;
+      Configuration* CreateConfigurationFromStateAndCoset(const ob::State *state, Configuration *q_coset);
 
-      bool IsConfigurationInsideCover(Configuration *q);
-      void Grow(double t) override;
-      void Init() override;
-      bool GetSolution(ob::PathPtr &solution) override;
+      void AddConfigurationToCover(Configuration *q);
+      void RemoveConfigurationFromCover(Configuration *q);
+
       Configuration* GetStartConfiguration() const;
       Configuration* GetGoalConfiguration() const;
 
-      void RemoveCoveredSamples(Configuration *q);
+      bool IsConfigurationInsideCover(Configuration *q);
+      void RemoveConfigurationsFromCoverCoveredBy(Configuration *q);
 
-      bool Connect(const Configuration *q_from, Configuration *q_to);
+      //#######################################################################
+      //Sampling
+      //#######################################################################
+      bool sampleUniformOnNeighborhoodBoundary(ob::State *state, const Configuration *center);
+      bool sampleHalfBallOnNeighborhoodBoundary(ob::State *state, const Configuration *center);
+      Configuration* EstimateBestNextState(Configuration *q_last, Configuration *q_current);
+
+      Configuration* Sample();
+      Configuration* SampleQuotientCover(ob::State *state) const;
+
+      void Grow(double t) override;
+      void Init() override;
+      bool GetSolution(ob::PathPtr &solution) override;
+
+      bool Interpolate(const Configuration *q_from, Configuration *q_to);
 
       //#######################################################################
       //Distance Computations
@@ -194,10 +222,8 @@ namespace ompl
       Configuration *q_start{nullptr};
       Configuration *q_goal{nullptr};
 
-      Vertex v_start;
-      Vertex v_goal;
-
-
+      Vertex v_start{0};
+      Vertex v_goal{0};
 
       PDF pdf_necessary_configurations;
       PDF pdf_all_configurations;

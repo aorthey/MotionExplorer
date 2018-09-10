@@ -552,4 +552,8 @@ Goal: refactor QST
 [x] QNG should be independent from QuotientGraph (too much overlap) --> refactor
 quotient-chart
 
-[ ] 
+[ ] Outsource everything into quotient_cover. Interact only via Sample|Add|Nearest
+
+-- > should have a neighborhood structure. this includes the center ob::State*,
+radius, and probably geometry. This neighborhood has to be filled up, then we
+can add it to the cover.
