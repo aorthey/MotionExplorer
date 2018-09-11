@@ -69,7 +69,7 @@ void QNG::setup(void)
         OMPL_ERROR("%s: Could not add start state!", getName().c_str());
         exit(0);
       }
-      AddConfigurationToCover(q_start);
+      v_start = AddConfigurationToCover(q_start);
     }else{
       OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
       exit(0);
@@ -89,8 +89,6 @@ void QNG::setup(void)
       exit(0);
     }
 
-    v_start = q_start->index;
-    v_goal = q_goal->index;
     q_start->isStart = true;
     q_goal->isGoal = true;
 
@@ -116,7 +114,7 @@ void QNG::setup(void)
 //#############################################################################
 //Configuration methods
 //#############################################################################
-void QNG::AddConfigurationToCover(Configuration *q)
+QNG::Vertex QNG::AddConfigurationToCover(Configuration *q)
 {
   //get all neighbors before adding q (otherwise q might be neighbor of itself)
   std::vector<Configuration*> neighbors = GetConfigurationsInsideNeighborhood(q);
@@ -125,9 +123,12 @@ void QNG::AddConfigurationToCover(Configuration *q)
   Vertex v = boost::add_vertex(q, graph);
   graph[v]->number_attempted_expansions = 0;
   graph[v]->number_successful_expansions = 0;
-  graph[v]->index = v;
-  put(propmapIndex, v, index_ctr++);
-  graph[v]->index_number = index_ctr-1;
+
+  //assign vertex to a unique index
+  put(vertexToIndex, v, index_ctr);
+  put(indexToVertex, index_ctr, v);
+  graph[v]->index = index_ctr;
+  index_ctr++;
 
   //(2) add to nearest neighbor structure
   nearest_cover->add(q);
@@ -141,12 +142,21 @@ void QNG::AddConfigurationToCover(Configuration *q)
     q->SetNecessaryPDFElement(q_necessary_element);
   }
 
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "*** ADD VERTEX " << q->index << std::endl;
+
   //Clean UP and Connect
   //(1) Remove All Configurations with neighborhoods inside current neighborhood
   //(2) Add Edges to All Configurations with centers inside the current neighborhood 
-  std::cout << "neighbors:" << neighbors.size() << std::endl;
+  std::cout << "Vertex: " << q->index << " has number of neighbors: " << neighbors.size() << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
   for(uint k = 0; k < neighbors.size(); k++){
     Configuration *qn = neighbors.at(k);
+    if(qn==q){
+      std::cout << "configuration equals neighbor." << std::endl;
+      exit(0);
+    }
+    std::cout << "Vertex" << q->index << " and neighbor " << qn->index << std::endl;
     if(IsNeighborhoodInsideNeighborhood(qn, q))
     {
       //do not delete start/goal
@@ -155,22 +165,63 @@ void QNG::AddConfigurationToCover(Configuration *q)
       }else if(qn->isGoal){
         AddEdge(q, qn);
       }else{
+        //old constellation
+        //v1 -------                                    |
+        //          \                                   |
+        //v2-------- vn ------- vq                      |
+        //          /                                   |
+        //v3--------                                    |
+        //
+        //new constellation
+        //v1 ---------------                            |
+        //                  \                           |
+        //v2--------------- vq                          |
+        //                  /                           |
+        //v3----------------                            |
+        //
+        //get all edges into qn, and rewire them to q
+        Vertex vq = get(indexToVertex, q->index);
+        Vertex vn = get(indexToVertex, qn->index);
+        // Vertex vq = indexToVertex(q->index);
+        // Vertex vn = indexToVertex(qn->index);
+        OEIterator edge_iter, edge_iter_end, next; 
+        boost::tie(edge_iter, edge_iter_end) = boost::out_edges(vn, graph);
+
+        std::cout << "removing " << boost::out_degree(vn, graph) << " edges from " << qn->index << std::endl;
+
+        for(next = edge_iter; edge_iter != edge_iter_end; edge_iter = next)
+        {
+          //add v_target to vq
+          ++next;
+          const Vertex v_target = boost::target(*edge_iter, graph);
+          double d = DistanceQ1(graph[v_target], q);
+          EdgeInternalState properties(d);
+          std::cout << "add " << get(vertexToIndex, vq) << "-" << get(vertexToIndex, v_target) << std::endl;
+          boost::add_edge(v_target, vq, properties, graph);
+        }
         RemoveConfigurationFromCover(qn);
       }
     }else{
       AddEdge(q, qn);
     }
   }
+  std::cout << "adding parent neighbor if any" << std::endl;
   if(q->parent_neighbor != nullptr){
-    AddEdge(q, q->parent_neighbor);
+    //check that vertex has not been previously deleted
+    if(indexToVertexStdMap.count(q->parent_neighbor->index) > 0){
+      AddEdge(q, q->parent_neighbor);
+    }
   }
+  return v;
 }
 void QNG::AddEdge(Configuration *q_from, Configuration *q_to)
 {
-  std::cout << "adding edge " << q_from->index_number << " - " << q_to->index_number << std::endl;
+  std::cout << "adding edge " << q_from->index << " - " << q_to->index << std::endl;
   double d = DistanceQ1(q_from, q_to);
   EdgeInternalState properties(d);
-  boost::add_edge(q_from->index, q_to->index, properties, graph);
+  Vertex v_from = get(indexToVertex, q_from->index);
+  Vertex v_to = get(indexToVertex, q_to->index);
+  boost::add_edge(v_from, v_to, properties, graph);
 }
 
 void QNG::RemoveConfigurationFromCover(Configuration *q)
@@ -186,11 +237,23 @@ void QNG::RemoveConfigurationFromCover(Configuration *q)
 
   //(3) Remove from cover graph
   q->Remove(Q1);
-  //propmapIndex.erase(q->index);
 
-  std::cout << "**** removing " << q->index_number << std::endl;
-  boost::remove_vertex(q->index, graph);
-  //put(propmapIndex, v, index_ctr++);
+  std::cout << "**** removing " << q->index << std::endl;
+
+  //erase entry from indexmap
+  Vertex vq = get(indexToVertex, q->index);
+  vertexToIndexStdMap.erase(vq);
+  indexToVertexStdMap.erase(q->index);
+
+  //check that they do not exist in indextovertex anymore
+  if(indexToVertexStdMap.count(q->index) > 0){
+    vertex_index_type vit_before = get(vertexToIndex, vq);
+    vertex_index_type vit_after = get(vertexToIndex, vq);
+    std::cout << vit_before << " - " << vit_after << std::endl;
+    exit(0);
+  }
+
+  boost::remove_vertex(vq, graph);
 
   delete q;
 }
@@ -820,10 +883,7 @@ std::vector<QNG::Vertex> QNG::GetCoverPath(const Vertex& start, const Vertex& go
     //vector<Vertex> p(num_vertices(G), graph_traits<G>::null_vertex()); //the predecessor array
   std::vector<Vertex> prev(boost::num_vertices(graph), boost::graph_traits<Graph>::null_vertex());
   auto weight = boost::make_transform_value_property_map(std::mem_fn(&EdgeInternalState::getCost), get(boost::edge_bundle, graph));
-  auto predecessor = boost::make_iterator_property_map(prev.begin(), propmapIndex);
-
-  //auto v_index = get(boost::vertex_index, g);
-
+  auto predecessor = boost::make_iterator_property_map(prev.begin(), vertexToIndex);
 
   try{
   boost::astar_search(graph, start,
@@ -835,7 +895,7 @@ std::vector<QNG::Vertex> QNG::GetCoverPath(const Vertex& start, const Vertex& go
                       predecessor_map(predecessor)
                       .weight_map(weight)
                       .visitor(astar_goal_visitor<Vertex>(goal))
-                      .vertex_index_map(propmapIndex)
+                      .vertex_index_map(vertexToIndex)
                       .distance_compare([this](EdgeInternalState c1, EdgeInternalState c2)
                                         {
                                             return opt_->isCostBetterThan(c1.getCost(), c2.getCost());

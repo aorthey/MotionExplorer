@@ -23,6 +23,8 @@ namespace ompl
       ~QNG(void);
       virtual void clear() override;
       virtual void setup() override;
+
+      typedef uint vertex_index_type;
       
     protected:
 
@@ -86,19 +88,8 @@ namespace ompl
         bool isStart{false};
         bool isGoal{false};
 
-        int index_number{0};
-        void *index{nullptr};
-
-        // typedef std::map<typename boost::graph_traits<Graph>::vertex_descriptor, size_t> IndexMap;
-        // IndexMap mapIndex;
-        // boost::associative_property_map<IndexMap> propmapIndex(mapIndex);
-        // size_t i=0;
-        // BGL_FORALL_VERTICES(v, waypoint_graph, Waypoing)
-        // {
-        //      put(propmapIndex, v, i++);
-        // }
-        //astar_search(waypoint_graph, start, my_heuristic, boost::visitor(my_visitor).vertex_index_map(propmapIndex));
-
+        vertex_index_type index{0};
+        //void *index{nullptr};
 
         //#####################################################################
         //Neighborhood Computations
@@ -159,10 +150,15 @@ namespace ompl
       
       //keep manual track of indices, because we sometimes need to remove
       //vertices
-      typedef std::map<typename boost::graph_traits<Graph>::vertex_descriptor, size_t> IndexMap;
-      IndexMap VertexToIndex;
-      boost::associative_property_map<IndexMap> propmapIndex{VertexToIndex};
-      int index_ctr{0};
+      typedef std::map<typename boost::graph_traits<Graph>::vertex_descriptor, vertex_index_type> VertexToIndexMap;
+      VertexToIndexMap vertexToIndexStdMap;
+      boost::associative_property_map<VertexToIndexMap> vertexToIndex{vertexToIndexStdMap};
+
+      typedef std::map<vertex_index_type, typename boost::graph_traits<Graph>::vertex_descriptor> IndexToVertexMap;
+      IndexToVertexMap indexToVertexStdMap;
+      boost::associative_property_map<IndexToVertexMap> indexToVertex{indexToVertexStdMap};
+
+      vertex_index_type index_ctr{0};
 
       virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
 
@@ -178,7 +174,7 @@ namespace ompl
 
       Configuration* CreateConfigurationFromStateAndCoset(const ob::State *state, Configuration *q_coset);
 
-      void AddConfigurationToCover(Configuration *q);
+      Vertex AddConfigurationToCover(Configuration *q);
       void RemoveConfigurationFromCover(Configuration *q);
       void AddEdge(Configuration *q_from, Configuration *q_to);
 
