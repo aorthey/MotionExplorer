@@ -17,7 +17,7 @@ namespace ompl
       typedef og::QuotientChart BaseT;
     public:
 
-      uint verbose{0};
+      uint verbose{2};
 
       QuotientChartCover(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QuotientChartCover(void);
@@ -182,6 +182,7 @@ namespace ompl
 
       bool IsConfigurationInsideCover(Configuration *q);
       void RemoveConfigurationsFromCoverCoveredBy(Configuration *q);
+      bool ComputeNeighborhood(Configuration *q);
 
       //#######################################################################
       //Distance Computations
@@ -207,7 +208,6 @@ namespace ompl
       void SampleUniform(Configuration*);
 
       bool sampleUniformOnNeighborhoodBoundary(ob::State *state, const Configuration *center);
-      Configuration* EstimateBestNextState(Configuration *q_last, Configuration *q_current);
 
       void Connect(const Configuration*, const Configuration*, Configuration*);
       void Grow(double t) override;
@@ -234,7 +234,7 @@ namespace ompl
       PlannerDataVertexAnnotated getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const;
       //#######################################################################
       RNG rng_;
-      double goalBias{0.1}; //in [0,1]
+      double goalBias{0.0}; //in [0,1]
       double voronoiBias{0.3}; //in [0,1]
 
       NearestNeighborsPtr nearest_cover{nullptr};

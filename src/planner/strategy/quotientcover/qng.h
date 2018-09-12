@@ -24,6 +24,7 @@ namespace ompl
       QNG(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QNG(void);
       virtual void Grow(double t) override;
+      Configuration* EstimateBestNextState(Configuration *q_last, Configuration *q_current);
     };
   }
 }

@@ -73,12 +73,14 @@ void QuotientChartCover::setup(void)
     //Adding start configuration
     //#########################################################################
     if(const ob::State *state_start = pis_.nextStart()){
-      q_start = CreateConfigurationFromStateAndCoset(state_start, coset_start);
-      if(q_start == nullptr){
+      q_start = new Configuration(Q1, state_start);
+      if(!ComputeNeighborhood(q_start))
+      {
         OMPL_ERROR("%s: Could not add start state!", getName().c_str());
         exit(0);
       }
       v_start = AddConfigurationToCover(q_start);
+      q_start->coset = coset_start;
     }else{
       OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
       exit(0);
@@ -88,11 +90,13 @@ void QuotientChartCover::setup(void)
     //Adding goal configuration
     //#########################################################################
     if(const ob::State *state_goal = pis_.nextGoal()){
-      q_goal = CreateConfigurationFromStateAndCoset(state_goal, coset_goal);
-      if(q_goal == nullptr){
+      q_goal = new Configuration(Q1, state_goal);
+      if(!ComputeNeighborhood(q_goal))
+      {
         OMPL_ERROR("%s: Could not add goal state!", getName().c_str());
         exit(0);
       }
+      q_goal->coset = coset_goal;
     }else{
       OMPL_ERROR("%s: There are no valid goal states!", getName().c_str());
       exit(0);
@@ -153,6 +157,7 @@ QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCover(Configura
 
   if(verbose>0) std::cout << std::string(80, '-') << std::endl;
   if(verbose>0) std::cout << "*** ADD VERTEX " << q->index << std::endl;
+  if(verbose>0) Q1->printState(q->state);
 
   if(q->parent_neighbor != nullptr){
     AddEdge(q, q->parent_neighbor);
@@ -267,11 +272,9 @@ void QuotientChartCover::RemoveConfigurationFromCover(Configuration *q)
   nearest_cover->remove(q);
   nearest_vertex->remove(q);
 
-  //(3) Remove from cover graph
-  q->Remove(Q1);
-
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "*** REMOVE VERTEX " << q->index << std::endl;
+  Q1->printState(q->state);
 
   //erase entry from indexmap
   Vertex vq = get(indexToVertex, q->index);
@@ -288,21 +291,21 @@ void QuotientChartCover::RemoveConfigurationFromCover(Configuration *q)
 
   boost::remove_vertex(vq, graph);
 
+  //(3) Remove from cover graph
+  Q1->printState(q->state);
+  q->Remove(Q1);
   delete q;
   q=nullptr;
 }
 
-
-QuotientChartCover::Configuration* QuotientChartCover::CreateConfigurationFromStateAndCoset(const ob::State *state, Configuration *q_coset)
+bool QuotientChartCover::ComputeNeighborhood(Configuration *q)
 {
-  Configuration *q = new Configuration(Q1, state);
-
-  //cannot create configurations inside cover
+  if(q==nullptr) return false;
   if(IsConfigurationInsideCover(q)){
     q->Remove(Q1);
-    return nullptr;
+    q=nullptr;
+    return false;
   }
-  q->coset = q_coset;
 
   bool feasible = Q1->isValid(q->state);
 
@@ -316,14 +319,17 @@ QuotientChartCover::Configuration* QuotientChartCover::CreateConfigurationFromSt
     }
     if(q->GetRadius()<threshold_clearance){
       q->Remove(Q1);
-      return nullptr;
+      q=nullptr;
+      return false;
     }
   }else{
     q->Remove(Q1);
-    return nullptr;
+    q=nullptr;
+    return false;
   }
 
-  return q;
+  return true;
+
 }
 void QuotientChartCover::RemoveConfigurationsFromCoverCoveredBy(Configuration *q)
 {
@@ -382,107 +388,6 @@ void QuotientChartCover::Grow(double t)
 
 }
 
-QuotientChartCover::Configuration* QuotientChartCover::EstimateBestNextState(Configuration *q_last, Configuration *q_current)
-{
-  std::cout << "NYI" << std::endl;
-  exit(0);
-    // uint K_samples = 3; //how many samples to test for best direction (depends maybe also on radius)
-
-    // Configuration *q_next = new Configuration(Q1);
-
-    // if(verbose>1){
-    //   std::cout << "from" << std::endl;
-    //   Q1->printState(q_last->state);
-    //   std::cout << "to" << std::endl;
-    //   Q1->printState(q_current->state);
-    // }
-
-    // double d_last_to_current = Distance(q_last, q_current);
-    // double radius_current = q_current->GetRadius();
-    // Q1->getStateSpace()->interpolate(q_last->state, q_current->state, 1 + radius_current/d_last_to_current, q_next->state);
-
-    // //#######################################################################
-    // // We sample the distance function to obtain K samples {q_1,\cdots,q_K}.
-    // // For each $q_k$ we compute the value of the distance function dk_radius.
-    // // Then we employ two strategies to choose the next sample to follow:
-    // //
-    // //either follow isolines : min( fabs(radius_k_sample - current_radius) )
-    // //or follow the steepest ascent: max(radius_k_sample)
-
-    // double radius_best = DistanceInnerRobotToObstacle(q_next->state);
-    // if(verbose>1){
-    //   std::cout << "next" << std::endl;
-    //   Q1->printState(q_next->state);
-    //   std::cout << "radius " << radius_best << std::endl;
-    // }
-
-    // //double radius_best = q_next->GetRadius();
-    // double SAMPLING_RADIUS = 0.1*radius_current;
-    // double radius_ratio = radius_best / radius_current;
-    // if(radius_ratio > 1){
-    //   //we encountered a bigger radius neighborhood. this is great, we should go
-    //   //into that direction
-    //   if(!AddConfiguration(q_next))
-    //   {
-    //     return nullptr;
-    //   }
-    //   return q_next;
-    // }else{
-    //   //if next neighborhood is exceptionally small, try to sample more broadly.
-    //   //Otherwise sample smaller. This corresponds to having more speed in the
-    //   //momentum of sampling.
-    //   if(radius_ratio > 0.1){
-    //     SAMPLING_RADIUS = (1.0-radius_ratio+0.1)*radius_current;
-    //   }else{
-    //     SAMPLING_RADIUS = radius_current;
-    //   }
-    // }
-
-    // //#######################################################################
-    // //keep q_next constant
-    // q_next = const_cast<Configuration*>(q_next);
-    // Configuration *q_best = q_next;
-
-    // for(uint k = 0; k < K_samples; k++)
-    // {
-    //   //obtain sample q_k, and radius radius_k
-    //   Configuration *q_k = new Configuration(Q1);
-    //   Q1_sampler->sampleUniformNear(q_k->state, q_next->state, SAMPLING_RADIUS);
-    //   double d_current_to_k = DistanceQ1(q_k, q_current);
-    //   Q1->getStateSpace()->interpolate(q_current->state, q_k->state, radius_current/d_current_to_k, q_k->state);
-
-    //   double radius_next = DistanceInnerRobotToObstacle(q_k->state);
-
-    //   if(verbose>1){
-    //     std::cout << "q_k" << std::endl;
-    //     Q1->printState(q_k->state);
-    //     std::cout << "radius: " << radius_next << std::endl;
-    //   }
-
-    //   if(q_best->isSufficientFeasible && !q_k->isSufficientFeasible)
-    //   {
-    //     q_best = q_k;
-    //     radius_best = radius_next;
-    //   }else{
-    //     if(radius_next > radius_best)
-    //     {
-    //       q_best = q_k;
-    //       radius_best = radius_next;
-    //     }else{
-    //       q_k->Remove(Q1);
-    //       continue;
-    //     }
-    //   }
-    // }
-    // if(!AddConfiguration(q_best))
-    // {
-    //   return nullptr;
-    // }
-    // //#########################################################################
-    // //return q_next
-    // //#########################################################################
-    // return q_best;
-}
 //#############################################################################
 //Sampling Configurations (on quotient space)
 //#############################################################################
@@ -578,32 +483,35 @@ QuotientChartCover::Configuration* QuotientChartCover::SampleValid(ob::PlannerTe
   while(!ptc){
     q = Sample();
     //ignore samples inside cover (rejection sampling)
-    if(q == nullptr) continue;
-    if(IsConfigurationInsideCover(q)){
-      q->Remove(Q1);
-      q = nullptr;
-      continue;
-    }
-    bool feasible = Q1->isValid(q->state);
-    if(feasible){
-      if(IsOuterRobotFeasible(q->state))
-      {
-        q->isSufficientFeasible = true;
-        q->SetRadius(DistanceOuterRobotToObstacle(q->state));
-      }else{
-        q->SetRadius(DistanceInnerRobotToObstacle(q->state));
-      }
-      if(q->GetRadius()<threshold_clearance){
-        q->Remove(Q1);
-        q = nullptr;
-        continue;
-      }
-    }else{
-      q->Remove(Q1);
-      q = nullptr;
-      continue;
-    }
-    break;
+    if(ComputeNeighborhood(q)) break;
+    else q = nullptr;
+    // q = nullptr;
+    // if(q == nullptr) continue;
+    // if(IsConfigurationInsideCover(q)){
+    //   q->Remove(Q1);
+    //   q = nullptr;
+    //   continue;
+    // }
+    // bool feasible = Q1->isValid(q->state);
+    // if(feasible){
+    //   if(IsOuterRobotFeasible(q->state))
+    //   {
+    //     q->isSufficientFeasible = true;
+    //     q->SetRadius(DistanceOuterRobotToObstacle(q->state));
+    //   }else{
+    //     q->SetRadius(DistanceInnerRobotToObstacle(q->state));
+    //   }
+    //   if(q->GetRadius()<threshold_clearance){
+    //     q->Remove(Q1);
+    //     q = nullptr;
+    //     continue;
+    //   }
+    // }else{
+    //   q->Remove(Q1);
+    //   q = nullptr;
+    //   continue;
+    // }
+    // break;
   }
   return q;
 }
@@ -878,11 +786,6 @@ std::vector<QuotientChartCover::Vertex> QuotientChartCover::GetCoverPath(const V
 {
   std::vector<Vertex> path;
 
-  std::cout << "finding path between " << start << " - " << goal << std::endl;
-  Q1->printState(graph[start]->state);
-  Q1->printState(graph[goal]->state);
-
-    //vector<Vertex> p(num_vertices(G), graph_traits<G>::null_vertex()); //the predecessor array
   std::vector<Vertex> prev(boost::num_vertices(graph), boost::graph_traits<Graph>::null_vertex());
   auto weight = boost::make_transform_value_property_map(std::mem_fn(&EdgeInternalState::getCost), get(boost::edge_bundle, graph));
   auto predecessor = boost::make_iterator_property_map(prev.begin(), vertexToIndex);
@@ -910,7 +813,6 @@ std::vector<QuotientChartCover::Vertex> QuotientChartCover::GetCoverPath(const V
                       .distance_zero(opt_->identityCost())
                     );
   }catch(found_goal fg){
-    //std::cout << prev[get(vertexToIndex, goal)] << std::endl;
     for(Vertex v = goal;; v = prev[get(vertexToIndex, v)])
     {
       path.push_back(v);
@@ -918,16 +820,7 @@ std::vector<QuotientChartCover::Vertex> QuotientChartCover::GetCoverPath(const V
         break;
     }
     std::reverse(path.begin(), path.end());
-    //list<Vertex>::iterator spi = shortest_path.begin();
   }
-
-  // if (prev[goal.index] == goal){
-  //   return path;
-  // }
-  // for(Vertex pos = goal; prev[pos] != pos; pos = prev[pos]){
-  //   path.push_back(pos);
-  // }
-  // path.push_back(start);
   return path;
 }
 
@@ -962,7 +855,7 @@ PlannerDataVertexAnnotated QuotientChartCover::getAnnotatedVertex(Vertex vertex)
 
 void QuotientChartCover::getPlannerDataAnnotated(base::PlannerData &data) const
 {
-  std::cout << "graph has " << boost::num_vertices(graph) << " vertices (index ctr: " << index_ctr << ") and " << boost::num_edges(graph) << " edges." << std::endl;
+  std::cout << "graph has " << boost::num_vertices(graph) << " (idx: " << index_ctr << ") vertices and " << boost::num_edges(graph) << " edges." << std::endl;
   std::map<const Vertex, const ob::State*> vertexToStates;
 
   PlannerDataVertexAnnotated pstart = getAnnotatedVertex(v_start);
