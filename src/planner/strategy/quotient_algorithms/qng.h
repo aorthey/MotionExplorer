@@ -19,6 +19,8 @@ namespace ompl
       typedef og::QuotientChart BaseT;
     public:
 
+      uint verbose{0};
+
       QNG(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QNG(void);
       virtual void clear() override;
@@ -89,7 +91,6 @@ namespace ompl
         bool isGoal{false};
 
         vertex_index_type index{0};
-        //void *index{nullptr};
 
         //#####################################################################
         //Neighborhood Computations
@@ -185,32 +186,39 @@ namespace ompl
       void RemoveConfigurationsFromCoverCoveredBy(Configuration *q);
 
       //#######################################################################
-      //Sampling
-      //#######################################################################
-      bool sampleUniformOnNeighborhoodBoundary(ob::State *state, const Configuration *center);
-      bool sampleHalfBallOnNeighborhoodBoundary(ob::State *state, const Configuration *center);
-      Configuration* EstimateBestNextState(Configuration *q_last, Configuration *q_current);
-
-      Configuration* Sample();
-      Configuration* SampleQuotientCover(ob::State *state) const;
-
-      void Grow(double t) override;
-      void Init() override;
-      bool GetSolution(ob::PathPtr &solution) override;
-
-      bool Interpolate(const Configuration *q_from, Configuration *q_to);
-
-      //#######################################################################
       //Distance Computations
       //#######################################################################
       double DistanceQ1(const Configuration *q_from, const Configuration *q_to);
       double DistanceX1(const Configuration *q_from, const Configuration *q_to);
-      double DistanceOverCover(const Configuration *q_from, const Configuration *q_to);
+
+      double DistanceConfigurationConfigurationCover(const Configuration *q_from, const Configuration *q_to);
       double DistanceConfigurationConfiguration(const Configuration *q_from, const Configuration *q_to);
       //Note: this is a pseudometric: invalidates second axiom of metric : d(x,y) = 0  iff x=y. But here we only have d(x,x)=0
       double DistanceNeighborhoodNeighborhood(const Configuration *q_from, const Configuration *q_to);
       //Note: this is a pseudometric: invalidates second axiom of metric : d(x,y) = 0  iff x=y. But here we only have d(x,x)=0
       double DistanceConfigurationNeighborhood(const Configuration *q_from, const Configuration *q_to);
+
+      //#######################################################################
+      //Sampling 
+      //#######################################################################
+      Configuration* SampleBoundary(std::string type);
+      Configuration* Sample();
+      Configuration* SampleValid(ob::PlannerTerminationCondition &ptc);
+      Configuration* SampleQuotientCover(ob::State *state) const;
+      void SampleGoal(Configuration*);
+      void SampleUniform(Configuration*);
+
+      bool sampleUniformOnNeighborhoodBoundary(ob::State *state, const Configuration *center);
+      Configuration* EstimateBestNextState(Configuration *q_last, Configuration *q_current);
+
+
+
+      void Connect(const Configuration*, const Configuration*, Configuration*);
+      void Grow(double t) override;
+      void Init() override;
+      bool GetSolution(ob::PathPtr &solution) override;
+
+      bool Interpolate(const Configuration *q_from, Configuration *q_to);
 
       //#######################################################################
       //Neighborhood Set Computations
@@ -230,7 +238,7 @@ namespace ompl
       PlannerDataVertexAnnotated getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const;
       //#######################################################################
       RNG rng_;
-      double goalBias{0.05}; //in [0,1]
+      double goalBias{0.1}; //in [0,1]
       double voronoiBias{0.3}; //in [0,1]
 
       NearestNeighborsPtr nearest_cover{nullptr};
