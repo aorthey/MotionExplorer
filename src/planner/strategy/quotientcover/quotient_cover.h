@@ -12,17 +12,15 @@ namespace ompl
 {
   namespace geometric
   {
-
-    //Quotient-space sufficient Neighborhood Graph planner (QNG)
-    class QNG: public og::QuotientChart
+    class QuotientChartCover: public og::QuotientChart
     {
       typedef og::QuotientChart BaseT;
     public:
 
       uint verbose{0};
 
-      QNG(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
-      ~QNG(void);
+      QuotientChartCover(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
+      ~QuotientChartCover(void);
       virtual void clear() override;
       virtual void setup() override;
 
@@ -211,8 +209,6 @@ namespace ompl
       bool sampleUniformOnNeighborhoodBoundary(ob::State *state, const Configuration *center);
       Configuration* EstimateBestNextState(Configuration *q_last, Configuration *q_current);
 
-
-
       void Connect(const Configuration*, const Configuration*, Configuration*);
       void Grow(double t) override;
       void Init() override;
@@ -268,4 +264,5 @@ namespace ompl
     };
   }
 }
+
 

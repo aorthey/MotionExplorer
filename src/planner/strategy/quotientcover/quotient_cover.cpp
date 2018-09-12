@@ -1,5 +1,5 @@
 #include "common.h"
-#include "qng.h"
+#include "quotient_cover.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <limits>
@@ -13,9 +13,9 @@
 
 using namespace ompl::geometric;
 
-QNG::QNG(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
+QuotientChartCover::QuotientChartCover(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
-  setName("QNG"+std::to_string(id));
+  setName("QuotientChartCover"+std::to_string(id));
   if (!nearest_cover){
     nearest_cover.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
     nearest_cover->setDistanceFunction([this](const Configuration *a, const Configuration *b)
@@ -42,14 +42,14 @@ QNG::QNG(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, pare
   }
 }
 
-QNG::~QNG(void)
+QuotientChartCover::~QuotientChartCover(void)
 {
 }
 //#############################################################################
 //SETUP
 //#############################################################################
 
-void QNG::setup(void)
+void QuotientChartCover::setup(void)
 {
   if (pdef_){
     //#########################################################################
@@ -66,8 +66,8 @@ void QNG::setup(void)
     Configuration *coset_goal = nullptr;
     if(parent != nullptr)
     {
-      coset_start = static_cast<og::QNG*>(parent)->q_start;
-      coset_goal = static_cast<og::QNG*>(parent)->q_goal;
+      coset_start = static_cast<og::QuotientChartCover*>(parent)->q_start;
+      coset_goal = static_cast<og::QuotientChartCover*>(parent)->q_goal;
     }
     //#########################################################################
     //Adding start configuration
@@ -113,7 +113,7 @@ void QNG::setup(void)
     //#########################################################################
     OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nearest_cover->size());
     setup_ = true;
-    std::cout << "start: " << v_start << " goal: " << v_goal << std::endl;
+    std::cout << "start: " << get(vertexToIndex, v_start) << " goal: " << get(vertexToIndex, v_goal) << std::endl;
   }else{
     setup_ = false;
   }
@@ -123,7 +123,7 @@ void QNG::setup(void)
 //#############################################################################
 //Configuration methods
 //#############################################################################
-QNG::Vertex QNG::AddConfigurationToCover(Configuration *q)
+QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCover(Configuration *q)
 {
   //get all neighbors before adding q (otherwise q might be neighbor of itself)
   std::vector<Configuration*> neighbors = GetConfigurationsInsideNeighborhood(q);
@@ -246,7 +246,7 @@ QNG::Vertex QNG::AddConfigurationToCover(Configuration *q)
   }
   return v;
 }
-void QNG::AddEdge(Configuration *q_from, Configuration *q_to)
+void QuotientChartCover::AddEdge(Configuration *q_from, Configuration *q_to)
 {
   //std::cout << "adding edge " << q_from->index << " - " << q_to->index << std::endl;
   double d = DistanceQ1(q_from, q_to);
@@ -256,7 +256,7 @@ void QNG::AddEdge(Configuration *q_from, Configuration *q_to)
   boost::add_edge(v_from, v_to, properties, graph);
 }
 
-void QNG::RemoveConfigurationFromCover(Configuration *q)
+void QuotientChartCover::RemoveConfigurationFromCover(Configuration *q)
 {
   //(1) Remove from PDF
   pdf_all_configurations.remove(static_cast<PDF_Element*>(q->GetPDFElement()));
@@ -293,7 +293,7 @@ void QNG::RemoveConfigurationFromCover(Configuration *q)
 }
 
 
-QNG::Configuration* QNG::CreateConfigurationFromStateAndCoset(const ob::State *state, Configuration *q_coset)
+QuotientChartCover::Configuration* QuotientChartCover::CreateConfigurationFromStateAndCoset(const ob::State *state, Configuration *q_coset)
 {
   Configuration *q = new Configuration(Q1, state);
 
@@ -325,7 +325,7 @@ QNG::Configuration* QNG::CreateConfigurationFromStateAndCoset(const ob::State *s
 
   return q;
 }
-void QNG::RemoveConfigurationsFromCoverCoveredBy(Configuration *q)
+void QuotientChartCover::RemoveConfigurationsFromCoverCoveredBy(Configuration *q)
 {
   //If the neighborhood of q is a superset of any other neighborhood, then delete
   //the other neighborhood, and rewire the graph
@@ -347,12 +347,12 @@ void QNG::RemoveConfigurationsFromCoverCoveredBy(Configuration *q)
 }
 
 
-bool QNG::IsConfigurationInsideNeighborhood(Configuration *q, Configuration *qn)
+bool QuotientChartCover::IsConfigurationInsideNeighborhood(Configuration *q, Configuration *qn)
 {
   return (DistanceConfigurationConfiguration(q, qn) <= 0);
 }
 
-bool QNG::IsConfigurationInsideCover(Configuration *q)
+bool QuotientChartCover::IsConfigurationInsideCover(Configuration *q)
 {
   std::vector<Configuration*> neighbors;
 
@@ -363,7 +363,7 @@ bool QNG::IsConfigurationInsideCover(Configuration *q)
   return IsConfigurationInsideNeighborhood(q, neighbors.at(0)) && IsConfigurationInsideNeighborhood(q, neighbors.at(1));
 }
 
-void QNG::Grow(double t)
+void QuotientChartCover::Grow(double t)
 {
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
   //#########################################################################
@@ -382,7 +382,7 @@ void QNG::Grow(double t)
 
 }
 
-QNG::Configuration* QNG::EstimateBestNextState(Configuration *q_last, Configuration *q_current)
+QuotientChartCover::Configuration* QuotientChartCover::EstimateBestNextState(Configuration *q_last, Configuration *q_current)
 {
   std::cout << "NYI" << std::endl;
   exit(0);
@@ -487,16 +487,16 @@ QNG::Configuration* QNG::EstimateBestNextState(Configuration *q_last, Configurat
 //Sampling Configurations (on quotient space)
 //#############################################################################
 
-void QNG::SampleGoal(Configuration *q)
+void QuotientChartCover::SampleGoal(Configuration *q)
 {
   q->state = Q1->cloneState(q_goal->state);
   if(parent == nullptr){
   }else{
-    q->coset = static_cast<og::QNG*>(parent)->q_goal;
+    q->coset = static_cast<og::QuotientChartCover*>(parent)->q_goal;
   }
 }
 
-void QNG::SampleUniform(Configuration *q)
+void QuotientChartCover::SampleUniform(Configuration *q)
 {
   if(parent == nullptr){
     Q1_sampler->sampleUniform(q->state);
@@ -504,7 +504,7 @@ void QNG::SampleUniform(Configuration *q)
     ob::State *stateX1 = X1->allocState();
     ob::State *stateQ0 = Q0->allocState();
     X1_sampler->sampleUniform(stateX1);
-    q->coset = static_cast<og::QNG*>(parent)->SampleQuotientCover(stateQ0);
+    q->coset = static_cast<og::QuotientChartCover*>(parent)->SampleQuotientCover(stateQ0);
     if(q->coset == nullptr){
       OMPL_ERROR("no coset found for state");
       Q1->printState(q->state);
@@ -520,7 +520,7 @@ void QNG::SampleUniform(Configuration *q)
 //Sampling Configurations (On boundary of cover)
 //#############################################################################
 
-QNG::Configuration* QNG::SampleBoundary(std::string type)
+QuotientChartCover::Configuration* QuotientChartCover::SampleBoundary(std::string type)
 {
   Configuration *q_random = new Configuration(Q1);
   if(type == "voronoi"){
@@ -553,7 +553,7 @@ QNG::Configuration* QNG::SampleBoundary(std::string type)
 //#############################################################################
 
 
-QNG::Configuration* QNG::Sample(){
+QuotientChartCover::Configuration* QuotientChartCover::Sample(){
   Configuration *q_random;
   if(!hasSolution){
     double r = rng_.uniform01();
@@ -572,7 +572,7 @@ QNG::Configuration* QNG::Sample(){
   }
   return q_random;
 }
-QNG::Configuration* QNG::SampleValid(ob::PlannerTerminationCondition &ptc)
+QuotientChartCover::Configuration* QuotientChartCover::SampleValid(ob::PlannerTerminationCondition &ptc)
 {
   Configuration *q = nullptr;
   while(!ptc){
@@ -608,14 +608,14 @@ QNG::Configuration* QNG::SampleValid(ob::PlannerTerminationCondition &ptc)
   return q;
 }
 
-QNG::Configuration* QNG::SampleQuotientCover(ob::State *state) const
+QuotientChartCover::Configuration* QuotientChartCover::SampleQuotientCover(ob::State *state) const
 {
   std::cout << "sample quotient cover" << std::endl;
   std::cout << "NYI" << std::endl;
   exit(0);
 }
 
-bool QNG::sampleUniformOnNeighborhoodBoundary(ob::State *state, const Configuration *center)
+bool QuotientChartCover::sampleUniformOnNeighborhoodBoundary(ob::State *state, const Configuration *center)
 {
   //sample on boundary of open neighborhood
   // (1) first sample gaussian point qk around q
@@ -658,7 +658,7 @@ bool QNG::sampleUniformOnNeighborhoodBoundary(ob::State *state, const Configurat
 
 //@brief: move from q_from to q_to until the neighborhood of q_from is
 //intersected. Return the intersection point in q_out
-void QNG::Connect(const Configuration *q_from, const Configuration *q_to, Configuration *q_out)
+void QuotientChartCover::Connect(const Configuration *q_from, const Configuration *q_to, Configuration *q_out)
 {
   double radius = q_from->openNeighborhoodRadius;
 
@@ -674,7 +674,7 @@ void QNG::Connect(const Configuration *q_from, const Configuration *q_to, Config
 
 }
 
-bool QNG::IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rhs)
+bool QuotientChartCover::IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rhs)
 {
   double distance_centers = DistanceQ1(lhs, rhs);
   double radius_rhs = rhs->GetRadius();
@@ -682,7 +682,7 @@ bool QNG::IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rh
   return (radius_rhs > (radius_lhs + distance_centers));
 }
 
-std::vector<QNG::Configuration*> QNG::GetConfigurationsInsideNeighborhood(Configuration *q)
+std::vector<QuotientChartCover::Configuration*> QuotientChartCover::GetConfigurationsInsideNeighborhood(Configuration *q)
 {
   std::vector<Configuration*> neighbors;
   nearest_vertex->nearestR(q, q->GetRadius()+threshold_clearance*0.5, neighbors);
@@ -690,7 +690,7 @@ std::vector<QNG::Configuration*> QNG::GetConfigurationsInsideNeighborhood(Config
 }
 
 
-QNG::Configuration* QNG::Nearest(Configuration *q) const
+QuotientChartCover::Configuration* QuotientChartCover::Nearest(Configuration *q) const
 {
   if(parent == nullptr){
     return nearest_cover->nearest(q);
@@ -702,7 +702,7 @@ QNG::Configuration* QNG::Nearest(Configuration *q) const
 
 //@TODO: should be fixed to reflect the distance on the underlying
 //quotient-space, i.e. similar to QMPConnect. For now we use DistanceQ1
-bool QNG::Interpolate(const Configuration *q_from, Configuration *q_to)
+bool QuotientChartCover::Interpolate(const Configuration *q_from, Configuration *q_to)
 {
   double d = DistanceQ1(q_from, q_to);
   double radius = q_from->GetRadius();
@@ -716,12 +716,12 @@ bool QNG::Interpolate(const Configuration *q_from, Configuration *q_to)
 //Distance Functions
 //#############################################################################
 
-double QNG::DistanceQ1(const Configuration *q_from, const Configuration *q_to)
+double QuotientChartCover::DistanceQ1(const Configuration *q_from, const Configuration *q_to)
 {
   return Q1->distance(q_from->state, q_to->state);
 }
 
-double QNG::DistanceX1(const Configuration *q_from, const Configuration *q_to)
+double QuotientChartCover::DistanceX1(const Configuration *q_from, const Configuration *q_to)
 {
   ob::State *stateFrom = X1->allocState();
   ob::State *stateTo = X1->allocState();
@@ -733,7 +733,7 @@ double QNG::DistanceX1(const Configuration *q_from, const Configuration *q_to)
   return d;
 }
 
-double QNG::DistanceConfigurationConfiguration(const Configuration *q_from, const Configuration *q_to)
+double QuotientChartCover::DistanceConfigurationConfiguration(const Configuration *q_from, const Configuration *q_to)
 {
   if(parent == nullptr){
     //the very first quotient-space => usual metric
@@ -747,18 +747,18 @@ double QNG::DistanceConfigurationConfiguration(const Configuration *q_from, cons
     }
     //metric defined by distance on cover of quotient-space plus distance on the
     //subspace Q1/Q0
-    og::QNG *QNG_parent = dynamic_cast<og::QNG*>(parent);
-    return QNG_parent->DistanceConfigurationConfigurationCover(q_from->coset, q_to->coset)+DistanceX1(q_from, q_to);
+    og::QuotientChartCover *QuotientChartCover_parent = dynamic_cast<og::QuotientChartCover*>(parent);
+    return QuotientChartCover_parent->DistanceConfigurationConfigurationCover(q_from->coset, q_to->coset)+DistanceX1(q_from, q_to);
   }
 }
 
-double QNG::DistanceConfigurationNeighborhood(const Configuration *q_from, const Configuration *q_to)
+double QuotientChartCover::DistanceConfigurationNeighborhood(const Configuration *q_from, const Configuration *q_to)
 {
   double d_to = q_to->GetRadius();
   double d = DistanceConfigurationConfiguration(q_from, q_to);
   return std::max(d - d_to, 0.0);
 }
-double QNG::DistanceNeighborhoodNeighborhood(const Configuration *q_from, const Configuration *q_to)
+double QuotientChartCover::DistanceNeighborhoodNeighborhood(const Configuration *q_from, const Configuration *q_to)
 {
   double d_from = q_from->GetRadius();
   double d_to = q_to->GetRadius();
@@ -782,7 +782,7 @@ double QNG::DistanceNeighborhoodNeighborhood(const Configuration *q_from, const 
   return d_open_neighborhood_distance;
 }
 
-double QNG::DistanceConfigurationConfigurationCover(const Configuration *q_from, const Configuration *q_to)
+double QuotientChartCover::DistanceConfigurationConfigurationCover(const Configuration *q_from, const Configuration *q_to)
 {
   std::cout << "shortest path distance on cover" << std::endl;
   std::cout << "NYI" << std::endl;
@@ -790,13 +790,13 @@ double QNG::DistanceConfigurationConfigurationCover(const Configuration *q_from,
 }
 
 
-void QNG::Init()
+void QuotientChartCover::Init()
 {
   checkValidity();
 }
 
 
-void QNG::clear()
+void QuotientChartCover::clear()
 {
   Planner::clear();
   if(nearest_cover){
@@ -812,7 +812,7 @@ void QNG::clear()
   pis_.restart();
 }
 
-bool QNG::GetSolution(ob::PathPtr &solution)
+bool QuotientChartCover::GetSolution(ob::PathPtr &solution)
 {
   //create solution only if we already found a path
   if(hasSolution){
@@ -826,33 +826,33 @@ bool QNG::GetSolution(ob::PathPtr &solution)
   return hasSolution;
 }
 
-void QNG::CopyChartFromSibling( QuotientChart *sibling, uint k )
+void QuotientChartCover::CopyChartFromSibling( QuotientChart *sibling, uint k )
 {
   std::cout << "copy chart " << std::endl;
   std::cout << "NYI" << std::endl;
   exit(0);
 }
 
-QNG::Configuration* QNG::GetStartConfiguration() const
+QuotientChartCover::Configuration* QuotientChartCover::GetStartConfiguration() const
 {
   return q_start;
 }
-QNG::Configuration* QNG::GetGoalConfiguration() const
+QuotientChartCover::Configuration* QuotientChartCover::GetGoalConfiguration() const
 {
   return q_goal;
 }
 
-const QNG::PDF& QNG::GetPDFNecessaryVertices() const
+const QuotientChartCover::PDF& QuotientChartCover::GetPDFNecessaryVertices() const
 {
   return pdf_necessary_configurations;
 }
 
-const QNG::PDF& QNG::GetPDFAllVertices() const
+const QuotientChartCover::PDF& QuotientChartCover::GetPDFAllVertices() const
 {
   return pdf_all_configurations;
 }
 
-double QNG::GetGoalBias() const
+double QuotientChartCover::GetGoalBias() const
 {
   return goalBias;
 }
@@ -874,7 +874,7 @@ private:
 };
 
 
-std::vector<QNG::Vertex> QNG::GetCoverPath(const Vertex& start, const Vertex& goal)
+std::vector<QuotientChartCover::Vertex> QuotientChartCover::GetCoverPath(const Vertex& start, const Vertex& goal)
 {
   std::vector<Vertex> path;
 
@@ -910,14 +910,14 @@ std::vector<QNG::Vertex> QNG::GetCoverPath(const Vertex& start, const Vertex& go
                       .distance_zero(opt_->identityCost())
                     );
   }catch(found_goal fg){
-    //std::cout << prev[goal] << std::endl;
-    // for(Vertex v = goal;; v = prev[v])
-    // {
-    //   path.push_back(v);
-    //   if(prev[v] == v)
-    //     break;
-    // }
-    std::cout << "found goal" << std::endl;
+    //std::cout << prev[get(vertexToIndex, goal)] << std::endl;
+    for(Vertex v = goal;; v = prev[get(vertexToIndex, v)])
+    {
+      path.push_back(v);
+      if(prev[get(vertexToIndex, v)] == v)
+        break;
+    }
+    std::reverse(path.begin(), path.end());
     //list<Vertex>::iterator spi = shortest_path.begin();
   }
 
@@ -928,12 +928,11 @@ std::vector<QNG::Vertex> QNG::GetCoverPath(const Vertex& start, const Vertex& go
   //   path.push_back(pos);
   // }
   // path.push_back(start);
-  // std::reverse(path.begin(), path.end());
   return path;
 }
 
 
-PlannerDataVertexAnnotated QNG::getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const
+PlannerDataVertexAnnotated QuotientChartCover::getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const
 {
   PlannerDataVertexAnnotated pvertex(state);
   pvertex.SetLevel(GetLevel());
@@ -954,14 +953,14 @@ PlannerDataVertexAnnotated QNG::getAnnotatedVertex(ob::State* state, double radi
   }
   return pvertex;
 }
-PlannerDataVertexAnnotated QNG::getAnnotatedVertex(Vertex vertex) const
+PlannerDataVertexAnnotated QuotientChartCover::getAnnotatedVertex(Vertex vertex) const
 {
   ob::State *state = (isLocalChart?si_->cloneState(graph[vertex]->state):graph[vertex]->state);
   return getAnnotatedVertex(state, graph[vertex]->GetRadius(), graph[vertex]->isSufficientFeasible);
 }
 
 
-void QNG::getPlannerDataAnnotated(base::PlannerData &data) const
+void QuotientChartCover::getPlannerDataAnnotated(base::PlannerData &data) const
 {
   std::cout << "graph has " << boost::num_vertices(graph) << " vertices (index ctr: " << index_ctr << ") and " << boost::num_edges(graph) << " edges." << std::endl;
   std::map<const Vertex, const ob::State*> vertexToStates;

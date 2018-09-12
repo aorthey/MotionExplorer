@@ -8,13 +8,7 @@
 #include "planner/strategy/quotient/qmp.h"
 #include "planner/strategy/quotientchart/multichart.h"
 #include "planner/strategy/quotientchart/quotient_chart.h"
-// #include "planner/strategy/quotientchart/qmp_sufficient.h"
-// #include "planner/strategy/quotientchart/qcp.h"
-// #include "planner/strategy/quotientchart/qsp.h"
-//#include "planner/strategy/quotient_algorithms/qst.h"
-#include "planner/strategy/quotient_algorithms/qng.h"
-// #include "planner/strategy/ompl_remastered/rrt_unidirectional.h"
-// #include "planner/strategy/ompl_remastered/rrt_bidirectional.h"
+#include "planner/strategy/quotientcover/qng.h"
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
