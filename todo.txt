@@ -557,3 +557,6 @@ quotient-chart
 -- > should have a neighborhood structure. this includes the center ob::State*,
 radius, and probably geometry. This neighborhood has to be filled up, then we
 can add it to the cover.
+[ ] problem: add configuration during momentum expansion
+
+

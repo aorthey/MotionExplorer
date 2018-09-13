@@ -129,9 +129,23 @@ void QuotientChartCover::setup(void)
 //#############################################################################
 QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCover(Configuration *q)
 {
+
+  //###########################################################################
+  //safety checks
+  if(q->GetRadius()<minimum_neighborhood_radius)
+  {
+    OMPL_ERROR("Trying to add configuration to cover, but Neighborhood is too small.");
+    std::cout << "state" << std::endl;
+    Q1->printState(q->state);
+    std::cout << "radius: " << q->GetRadius() << std::endl;
+    exit(0);
+  }
+
+  //###########################################################################
   //get all neighbors before adding q (otherwise q might be neighbor of itself)
   std::vector<Configuration*> neighbors = GetConfigurationsInsideNeighborhood(q);
 
+  //###########################################################################
   //(1) add to cover graph
   Vertex v = boost::add_vertex(q, graph);
   graph[v]->number_attempted_expansions = 0;
@@ -143,10 +157,12 @@ QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCover(Configura
   graph[v]->index = index_ctr;
   index_ctr++;
 
+  //###########################################################################
   //(2) add to nearest neighbor structure
   nearest_cover->add(q);
   nearest_vertex->add(q);
 
+  //###########################################################################
   //(3) add to PDF
   PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
   q->SetPDFElement(q_element);
@@ -156,13 +172,14 @@ QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCover(Configura
   }
 
   if(verbose>0) std::cout << std::string(80, '-') << std::endl;
-  if(verbose>0) std::cout << "*** ADD VERTEX " << q->index << std::endl;
+  if(verbose>0) std::cout << "*** ADD VERTEX " << q->index << " (radius " << q->GetRadius() << ")" << std::endl;
   if(verbose>0) Q1->printState(q->state);
 
   if(q->parent_neighbor != nullptr){
     AddEdge(q, q->parent_neighbor);
   }
 
+  //###########################################################################
   //Clean UP and Connect
   //(1) Remove All Configurations with neighborhoods inside current neighborhood
   //(2) Add Edges to All Configurations with centers inside the current neighborhood 
@@ -251,6 +268,7 @@ QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCover(Configura
   }
   return v;
 }
+
 void QuotientChartCover::AddEdge(Configuration *q_from, Configuration *q_to)
 {
   //std::cout << "adding edge " << q_from->index << " - " << q_to->index << std::endl;
@@ -317,7 +335,7 @@ bool QuotientChartCover::ComputeNeighborhood(Configuration *q)
     }else{
       q->SetRadius(DistanceInnerRobotToObstacle(q->state));
     }
-    if(q->GetRadius()<threshold_clearance){
+    if(q->GetRadius()<=minimum_neighborhood_radius){
       q->Remove(Q1);
       q=nullptr;
       return false;
@@ -355,17 +373,14 @@ void QuotientChartCover::RemoveConfigurationsFromCoverCoveredBy(Configuration *q
 
 bool QuotientChartCover::IsConfigurationInsideNeighborhood(Configuration *q, Configuration *qn)
 {
-  return (DistanceConfigurationConfiguration(q, qn) <= 0);
+  return (DistanceConfigurationNeighborhood(q, qn) <= 0);
 }
 
 bool QuotientChartCover::IsConfigurationInsideCover(Configuration *q)
 {
   std::vector<Configuration*> neighbors;
-
   nearest_cover->nearestK(q, 2, neighbors);
-
   if(neighbors.size()<=1) return false;
-
   return IsConfigurationInsideNeighborhood(q, neighbors.at(0)) && IsConfigurationInsideNeighborhood(q, neighbors.at(1));
 }
 
@@ -475,6 +490,7 @@ QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundary(){
   }
   return q_random;
 }
+
 QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundaryValid(ob::PlannerTerminationCondition &ptc)
 {
   Configuration *q = nullptr;
@@ -506,12 +522,19 @@ bool QuotientChartCover::SampleNeighborhoodBoundary(Configuration *q_random, con
   double radius = q_center->GetRadius();
   double dist_q_qk = 0;
 
-  if(epsilon_min_distance >= radius){
+  if(minimum_neighborhood_radius >= radius){
     OMPL_ERROR("neighborhood is too small to sample the boundary.");
+    std::cout << std::string(80, '#') << std::endl;
+    std::cout << "Configuration " << std::endl;
+    Q1->printState(q_center->state);
+    std::cout << "radius: " << radius << std::endl;
+    std::cout << "min distance: " << minimum_neighborhood_radius << std::endl;
+    std::cout << std::string(80, '#') << std::endl;
     exit(0);
   }
-  //sample as long as we are inside the ball of radius epsilon_min_distance
-  while(dist_q_qk <= epsilon_min_distance){
+  //sample as long as we are inside the ball of radius
+  //minimum_neighborhood_radius
+  while(dist_q_qk <= minimum_neighborhood_radius){
     Q1_sampler->sampleGaussian(q_random->state, q_center->state, 1);
     dist_q_qk = Q1->distance(q_center->state, q_random->state);
   }
@@ -526,23 +549,20 @@ bool QuotientChartCover::SampleNeighborhoodBoundaryHalfBall(Configuration *q_ran
   //q0 ---- q1 (q_center) ----- q2 (q_random)
   Configuration *q0 = q_center->parent_neighbor;
 
-  //case0: no parent is available, there is not halfball
+  //case1: no parent is available, there is no halfball
   if(q0==nullptr) return true;
 
-
+  //case2: q_center is overlapping q0
   double radius_q0 = q0->GetRadius();
   double radius_q1 = q_center->GetRadius();
-
-  //case1: q_center is overlapping q0
   if(2*radius_q0 < radius_q1) return true;
 
+  //case3: q_random is lying already on outer half ball
   double d12 = DistanceConfigurationConfiguration(q_center, q_random);
   double d02 = DistanceConfigurationConfiguration(q0, q_random);
-
-  //case2: q_random is lying already on outer half ball
   if(d02 > d12) return true;
 
-  //case3: q_random is lying on inner half ball => point reflection in q_center.
+  //case4: q_random is lying on inner half ball => point reflection in q_center.
   //this is accomplished by interpolating from q_random to q_center, and then
   //following the same distance until the outer ball is hit
   Q1->getStateSpace()->interpolate(q_random->state, q_center->state, 2, q_random->state);
@@ -579,7 +599,7 @@ bool QuotientChartCover::IsNeighborhoodInsideNeighborhood(Configuration *lhs, Co
 std::vector<QuotientChartCover::Configuration*> QuotientChartCover::GetConfigurationsInsideNeighborhood(Configuration *q)
 {
   std::vector<Configuration*> neighbors;
-  nearest_vertex->nearestR(q, q->GetRadius()+threshold_clearance*0.5, neighbors);
+  nearest_vertex->nearestR(q, q->GetRadius()+minimum_neighborhood_radius*0.5, neighbors);
   return neighbors;
 }
 
@@ -887,3 +907,11 @@ void QuotientChartCover::getPlannerDataAnnotated(base::PlannerData &data) const
   std::cout << "added " << data.numVertices() << " vertices and " << data.numEdges() << " edges."<< std::endl;
 }
 
+namespace ompl{
+  namespace geometric{
+    std::ostream& operator<< (std::ostream& out, const QuotientChartCover::Configuration& q){
+      out << q.GetRadius() << std::endl;
+      return out;
+    }
+  }
+}

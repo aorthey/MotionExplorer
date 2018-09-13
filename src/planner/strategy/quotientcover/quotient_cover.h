@@ -26,7 +26,6 @@ namespace ompl
 
       typedef uint vertex_index_type;
       
-    protected:
 
       //#######################################################################
       //Configuration
@@ -69,8 +68,8 @@ namespace ompl
         }
         double GetImportance()
         {
-          //return openNeighborhoodRadius;
-          return ((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
+          return openNeighborhoodRadius;
+          //return ((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
           //return 1.0/((double)number_attempted_expansions+1);
         }
 
@@ -94,6 +93,8 @@ namespace ompl
         //Neighborhood Computations
         //#####################################################################
         double openNeighborhoodRadius{0.0}; //might be L1 or L2 radius
+
+        friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::QuotientChartCover::Configuration&);
       };
 
       class EdgeInternalState{
@@ -147,6 +148,7 @@ namespace ompl
       typedef ompl::PDF<Configuration*> PDF;
       typedef PDF::Element PDF_Element;
       
+    protected:
       //keep manual track of indices, because we sometimes need to remove
       //vertices
       typedef std::map<typename boost::graph_traits<Graph>::vertex_descriptor, vertex_index_type> VertexToIndexMap;
@@ -197,15 +199,14 @@ namespace ompl
       double DistanceConfigurationNeighborhood(const Configuration *q_from, const Configuration *q_to);
 
       //#######################################################################
-      //Sampling 
+      //Sampling Sample{Structure}{Substructure}
       //#######################################################################
       Configuration* SampleCoverBoundary(std::string type);
-      Configuration* SampleCoverBoundary();
+      virtual Configuration* SampleCoverBoundary();
       Configuration* SampleCoverBoundaryValid(ob::PlannerTerminationCondition &ptc);
       Configuration* SampleQuotientCover(ob::State *state) const;
       void SampleGoal(Configuration*);
       void SampleUniform(Configuration*);
-
       bool SampleNeighborhoodBoundary(Configuration*, const Configuration*);
       bool SampleNeighborhoodBoundaryHalfBall(Configuration*, const Configuration*);
 
@@ -251,8 +252,7 @@ namespace ompl
       PDF pdf_necessary_configurations;
       PDF pdf_all_configurations;
 
-      double threshold_clearance{0.01};
-      double epsilon_min_distance{1e-10};
+      double minimum_neighborhood_radius{1e-10}; //minimum allowed radius, otherwise configuration is considered INVALID 
       bool saturated{false}; //if space is saturated, then we the whole free space has been found
 
       Graph graph;

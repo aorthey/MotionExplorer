@@ -45,7 +45,7 @@ void MultiChart<T>::clear(){
 template <class T>
 ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &ptc)
 {
-  static const double T_GROW = 0.0001; //time to grow before Checking if solution exists
+  static const double T_GROW = 0.01; //time to grow before Checking if solution exists
 
   auto cmp = [](og::QuotientChart* left, og::QuotientChart* right) 
               { 
