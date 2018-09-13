@@ -69,8 +69,8 @@ namespace ompl
         }
         double GetImportance()
         {
-          return openNeighborhoodRadius;
-          //return ((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
+          //return openNeighborhoodRadius;
+          return ((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
           //return 1.0/((double)number_attempted_expansions+1);
         }
 
@@ -166,7 +166,6 @@ namespace ompl
       // boost::disjoint_sets<boost::associative_property_map<std::map<Vertex, VertexRank> >, boost::associative_property_map<std::map<Vertex, Vertex> > > 
       //   disjointSets_{boost::make_assoc_property_map(vrank), boost::make_assoc_property_map(vparent)};
 
-
       //#######################################################################
       //Configuration Create, Remove, Add 
       //#######################################################################
@@ -200,14 +199,15 @@ namespace ompl
       //#######################################################################
       //Sampling 
       //#######################################################################
-      Configuration* SampleBoundary(std::string type);
-      Configuration* Sample();
-      Configuration* SampleValid(ob::PlannerTerminationCondition &ptc);
+      Configuration* SampleCoverBoundary(std::string type);
+      Configuration* SampleCoverBoundary();
+      Configuration* SampleCoverBoundaryValid(ob::PlannerTerminationCondition &ptc);
       Configuration* SampleQuotientCover(ob::State *state) const;
       void SampleGoal(Configuration*);
       void SampleUniform(Configuration*);
 
-      bool sampleUniformOnNeighborhoodBoundary(ob::State *state, const Configuration *center);
+      bool SampleNeighborhoodBoundary(Configuration*, const Configuration*);
+      //bool sampleUniformOnNeighborhoodBoundary(ob::State *state, const Configuration *center);
 
       void Connect(const Configuration*, const Configuration*, Configuration*);
       void Grow(double t) override;
@@ -236,6 +236,8 @@ namespace ompl
       RNG rng_;
       double goalBias{0.0}; //in [0,1]
       double voronoiBias{0.3}; //in [0,1]
+
+      bool isConnected{false};
 
       NearestNeighborsPtr nearest_cover{nullptr};
       NearestNeighborsPtr nearest_vertex{nullptr};

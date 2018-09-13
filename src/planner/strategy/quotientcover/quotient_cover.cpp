@@ -381,11 +381,10 @@ void QuotientChartCover::Grow(double t)
   //#########################################################################
   //Sample a configuration different from the current cover
   //#########################################################################
-  Configuration *q_random = SampleValid(ptc);
+  Configuration *q_random = SampleCoverBoundaryValid(ptc);
   if(q_random == nullptr) return;
 
   AddConfigurationToCover(q_random);
-
 }
 
 //#############################################################################
@@ -425,7 +424,7 @@ void QuotientChartCover::SampleUniform(Configuration *q)
 //Sampling Configurations (On boundary of cover)
 //#############################################################################
 
-QuotientChartCover::Configuration* QuotientChartCover::SampleBoundary(std::string type)
+QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundary(std::string type)
 {
   Configuration *q_random = new Configuration(Q1);
   if(type == "voronoi"){
@@ -439,7 +438,7 @@ QuotientChartCover::Configuration* QuotientChartCover::SampleBoundary(std::strin
 
     //sample its boundary
     //sampleHalfBallOnNeighborhoodBoundary(q_random->state, q_nearest);
-    sampleUniformOnNeighborhoodBoundary(q_random->state, q_nearest);
+    SampleNeighborhoodBoundary(q_random, q_nearest);
     q_random->parent_neighbor = q_nearest;
     return q_random;
   }else{
@@ -457,18 +456,17 @@ QuotientChartCover::Configuration* QuotientChartCover::SampleBoundary(std::strin
 // Main Sample Function
 //#############################################################################
 
-
-QuotientChartCover::Configuration* QuotientChartCover::Sample(){
+QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundary(){
   Configuration *q_random;
   if(!hasSolution){
     double r = rng_.uniform01();
     if(r<goalBias){
-      q_random = SampleBoundary("goal");
+      q_random = SampleCoverBoundary("goal");
     }else{
       if(r < (goalBias + voronoiBias)){
-        q_random = SampleBoundary("voronoi");
+        q_random = SampleCoverBoundary("voronoi");
       }else{
-        q_random = SampleBoundary("boundary");
+        q_random = SampleCoverBoundary("boundary");
       }
     }
   }else{
@@ -477,41 +475,14 @@ QuotientChartCover::Configuration* QuotientChartCover::Sample(){
   }
   return q_random;
 }
-QuotientChartCover::Configuration* QuotientChartCover::SampleValid(ob::PlannerTerminationCondition &ptc)
+QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundaryValid(ob::PlannerTerminationCondition &ptc)
 {
   Configuration *q = nullptr;
   while(!ptc){
-    q = Sample();
+    q = SampleCoverBoundary();
     //ignore samples inside cover (rejection sampling)
     if(ComputeNeighborhood(q)) break;
     else q = nullptr;
-    // q = nullptr;
-    // if(q == nullptr) continue;
-    // if(IsConfigurationInsideCover(q)){
-    //   q->Remove(Q1);
-    //   q = nullptr;
-    //   continue;
-    // }
-    // bool feasible = Q1->isValid(q->state);
-    // if(feasible){
-    //   if(IsOuterRobotFeasible(q->state))
-    //   {
-    //     q->isSufficientFeasible = true;
-    //     q->SetRadius(DistanceOuterRobotToObstacle(q->state));
-    //   }else{
-    //     q->SetRadius(DistanceInnerRobotToObstacle(q->state));
-    //   }
-    //   if(q->GetRadius()<threshold_clearance){
-    //     q->Remove(Q1);
-    //     q = nullptr;
-    //     continue;
-    //   }
-    // }else{
-    //   q->Remove(Q1);
-    //   q = nullptr;
-    //   continue;
-    // }
-    // break;
   }
   return q;
 }
@@ -523,7 +494,7 @@ QuotientChartCover::Configuration* QuotientChartCover::SampleQuotientCover(ob::S
   exit(0);
 }
 
-bool QuotientChartCover::sampleUniformOnNeighborhoodBoundary(ob::State *state, const Configuration *center)
+bool QuotientChartCover::SampleNeighborhoodBoundary(Configuration *q_random, const Configuration *q_center)
 {
   //sample on boundary of open neighborhood
   // (1) first sample gaussian point qk around q
@@ -532,34 +503,19 @@ bool QuotientChartCover::sampleUniformOnNeighborhoodBoundary(ob::State *state, c
   // (*) this does not work when qk is near to q, so we need to sample as long
   // as it is not near
   //
-  double radius = center->openNeighborhoodRadius;
-
+  double radius = q_center->GetRadius();
   double dist_q_qk = 0;
 
-  //@DEBUG
   if(epsilon_min_distance >= radius){
     OMPL_ERROR("neighborhood is too small to sample the boundary.");
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "states currently considered:" << std::endl;
-    for(uint k = 0; k < pdf_all_configurations.size(); k++){
-      Configuration *q = pdf_all_configurations[k];
-      std::cout << "state " << k << " with radius " << q->GetRadius() << " has values:" << std::endl;
-      Q1->printState(q->state);
-    }
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "neighborhood radius: " << radius << std::endl;
-    std::cout << "minimal distance to be able to sample: " << epsilon_min_distance << std::endl;
-    std::cout << "state:" << std::endl;
-    Q1->printState(center->state);
     exit(0);
   }
-
   //sample as long as we are inside the ball of radius epsilon_min_distance
   while(dist_q_qk <= epsilon_min_distance){
-    Q1_sampler->sampleGaussian(state, center->state, 1);
-    dist_q_qk = si_->distance(center->state, state);
+    Q1_sampler->sampleGaussian(q_random->state, q_center->state, 1);
+    dist_q_qk = Q1->distance(q_center->state, q_random->state);
   }
-  si_->getStateSpace()->interpolate(center->state, state, radius/dist_q_qk, state);
+  Q1->getStateSpace()->interpolate(q_center->state, q_random->state, radius/dist_q_qk, q_random->state);
 
   return true;
 }
@@ -615,7 +571,7 @@ bool QuotientChartCover::Interpolate(const Configuration *q_from, Configuration 
   double d = DistanceQ1(q_from, q_to);
   double radius = q_from->GetRadius();
   double step_size = radius/d;
-  si_->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_to->state);
+  Q1->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_to->state);
   return true;
 }
 
@@ -722,16 +678,26 @@ void QuotientChartCover::clear()
 
 bool QuotientChartCover::GetSolution(ob::PathPtr &solution)
 {
-  //create solution only if we already found a path
-  if(hasSolution){
-    std::vector<Vertex> vpath = GetCoverPath(v_start, v_goal);
-    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*solution);
-    gpath.clear();
-    for(uint k = 0; k < vpath.size(); k++){
-      gpath.append(graph[vpath.at(k)]->state);
+  if(!isConnected){
+    Configuration* qn = Nearest(q_goal);
+    double d_goal = DistanceNeighborhoodNeighborhood(qn, q_goal);
+    if(d_goal < 1e-10){
+      v_goal = AddConfigurationToCover(q_goal);
+      isConnected = true;
     }
   }
-  return hasSolution;
+  if(isConnected){
+    auto gpath(std::make_shared<PathGeometric>(Q1));
+    std::vector<Vertex> vpath = GetCoverPath(v_start, v_goal);
+    //og::PathGeometric gpath = static_cast<og::PathGeometric&>(*solution);
+    gpath->clear();
+    for(uint k = 0; k < vpath.size(); k++){
+      gpath->append(graph[vpath.at(k)]->state);
+    }
+    solution = gpath;
+    return true;
+  }
+  return false;
 }
 
 void QuotientChartCover::CopyChartFromSibling( QuotientChart *sibling, uint k )
@@ -848,7 +814,7 @@ PlannerDataVertexAnnotated QuotientChartCover::getAnnotatedVertex(ob::State* sta
 }
 PlannerDataVertexAnnotated QuotientChartCover::getAnnotatedVertex(Vertex vertex) const
 {
-  ob::State *state = (isLocalChart?si_->cloneState(graph[vertex]->state):graph[vertex]->state);
+  ob::State *state = (isLocalChart?Q1->cloneState(graph[vertex]->state):graph[vertex]->state);
   return getAnnotatedVertex(state, graph[vertex]->GetRadius(), graph[vertex]->isSufficientFeasible);
 }
 
@@ -861,6 +827,12 @@ void QuotientChartCover::getPlannerDataAnnotated(base::PlannerData &data) const
   PlannerDataVertexAnnotated pstart = getAnnotatedVertex(v_start);
   vertexToStates[v_start] = pstart.getState();
   data.addStartVertex(pstart);
+
+  if(isConnected){
+    PlannerDataVertexAnnotated pgoal = getAnnotatedVertex(v_goal);
+    vertexToStates[v_goal] = pgoal.getState();
+    data.addGoalVertex(pgoal);
+  }
 
   foreach( const Vertex v, boost::vertices(graph))
   {

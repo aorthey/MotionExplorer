@@ -34,7 +34,7 @@ void QNG::Grow(double t)
   //#########################################################################
   //Sample a configuration different from the current cover
   //#########################################################################
-  Configuration *q_random = SampleValid(ptc);
+  Configuration *q_random = SampleCoverBoundaryValid(ptc);
   if(q_random == nullptr) return;
 
   AddConfigurationToCover(q_random);

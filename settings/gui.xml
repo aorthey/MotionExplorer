@@ -260,6 +260,11 @@
     <key>N</key>
     <active>1</active>
   </hotkey>
+  <hotkey>
+    <name>reset_view</name>
+    <key>z</key>
+    <active>0</active>
+  </hotkey>
 
   <!-- <hotkey> -->
   <!--   <name>next_mode</name> -->
