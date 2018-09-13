@@ -437,8 +437,8 @@ QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundary(std::
     pdf_all_configurations.update(static_cast<PDF_Element*>(q_nearest->GetPDFElement()), q_nearest->GetImportance());
 
     //sample its boundary
-    //sampleHalfBallOnNeighborhoodBoundary(q_random->state, q_nearest);
-    SampleNeighborhoodBoundary(q_random, q_nearest);
+    //SampleNeighborhoodBoundary(q_random, q_nearest);
+    SampleNeighborhoodBoundaryHalfBall(q_random, q_nearest);
     q_random->parent_neighbor = q_nearest;
     return q_random;
   }else{
@@ -516,6 +516,36 @@ bool QuotientChartCover::SampleNeighborhoodBoundary(Configuration *q_random, con
     dist_q_qk = Q1->distance(q_center->state, q_random->state);
   }
   Q1->getStateSpace()->interpolate(q_center->state, q_random->state, radius/dist_q_qk, q_random->state);
+
+  return true;
+}
+bool QuotientChartCover::SampleNeighborhoodBoundaryHalfBall(Configuration *q_random, const Configuration *q_center)
+{
+  SampleNeighborhoodBoundary(q_random, q_center);
+
+  //q0 ---- q1 (q_center) ----- q2 (q_random)
+  Configuration *q0 = q_center->parent_neighbor;
+
+  //case0: no parent is available, there is not halfball
+  if(q0==nullptr) return true;
+
+
+  double radius_q0 = q0->GetRadius();
+  double radius_q1 = q_center->GetRadius();
+
+  //case1: q_center is overlapping q0
+  if(2*radius_q0 < radius_q1) return true;
+
+  double d12 = DistanceConfigurationConfiguration(q_center, q_random);
+  double d02 = DistanceConfigurationConfiguration(q0, q_random);
+
+  //case2: q_random is lying already on outer half ball
+  if(d02 > d12) return true;
+
+  //case3: q_random is lying on inner half ball => point reflection in q_center.
+  //this is accomplished by interpolating from q_random to q_center, and then
+  //following the same distance until the outer ball is hit
+  Q1->getStateSpace()->interpolate(q_random->state, q_center->state, 2, q_random->state);
 
   return true;
 }

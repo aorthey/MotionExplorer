@@ -207,7 +207,7 @@ namespace ompl
       void SampleUniform(Configuration*);
 
       bool SampleNeighborhoodBoundary(Configuration*, const Configuration*);
-      //bool sampleUniformOnNeighborhoodBoundary(ob::State *state, const Configuration *center);
+      bool SampleNeighborhoodBoundaryHalfBall(Configuration*, const Configuration*);
 
       void Connect(const Configuration*, const Configuration*, Configuration*);
       void Grow(double t) override;
