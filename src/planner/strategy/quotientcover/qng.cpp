@@ -99,7 +99,6 @@ void QNG::Grow(double t)
       for(uint k = 0; k < q_children.size(); k++){
         AddConfigurationToCover(q_children.at(k));
       }
-
     }else{
       //classical RRT-like expansion with goal-bias
       Configuration *q_random = SampleCoverBoundaryValid(ptc);
@@ -129,16 +128,19 @@ std::vector<QNG::Configuration*> QNG::ExpandNeighborhood(Configuration *q)
   }else{
     //(1) get a point q_next, which lies on the intersection of the line from q_parent to q with the neighborhood around q
 
+    //q_parent ---- q ---- q_next
     Configuration *q_next = new Configuration(Q1);
     double d_last_to_current = DistanceConfigurationConfiguration(q->parent_neighbor, q);
     double radius_current = q->GetRadius();
-    Q1->getStateSpace()->interpolate(q->parent_neighbor->state, q_next->state, 1 + radius_current/d_last_to_current, q_next->state);
-
+    Q1->getStateSpace()->interpolate(q->parent_neighbor->state, q->state, 1 + radius_current/d_last_to_current, q_next->state);
     if(ComputeNeighborhood(q_next)){
       q_children.push_back(q_next);
-
     }
+    //TODO sample around q_next
 
+  }
+  for(uint k = 0; k < q_children.size(); k++){
+    q_children.at(k)->parent_neighbor = q;
   }
 
   return q_children;
