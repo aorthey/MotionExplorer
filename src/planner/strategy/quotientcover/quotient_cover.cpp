@@ -60,16 +60,6 @@ void QuotientChartCover::setup(void)
       exit(0);
     }
     //#########################################################################
-    //Parent data if available
-    //#########################################################################
-    Configuration *coset_start = nullptr;
-    Configuration *coset_goal = nullptr;
-    if(parent != nullptr)
-    {
-      coset_start = static_cast<og::QuotientChartCover*>(parent)->q_start;
-      coset_goal = static_cast<og::QuotientChartCover*>(parent)->q_goal;
-    }
-    //#########################################################################
     //Adding start configuration
     //#########################################################################
     if(const ob::State *state_start = pis_.nextStart()){
@@ -79,8 +69,6 @@ void QuotientChartCover::setup(void)
         OMPL_ERROR("%s: Could not add start state!", getName().c_str());
         exit(0);
       }
-      v_start = AddConfigurationToCover(q_start);
-      q_start->coset = coset_start;
     }else{
       OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
       exit(0);
@@ -96,14 +84,22 @@ void QuotientChartCover::setup(void)
         OMPL_ERROR("%s: Could not add goal state!", getName().c_str());
         exit(0);
       }
-      q_goal->coset = coset_goal;
     }else{
       OMPL_ERROR("%s: There are no valid goal states!", getName().c_str());
       exit(0);
     }
+    //#########################################################################
+    //Parent data if available
+    //#########################################################################
+    if(parent != nullptr)
+    {
+      q_start->coset = static_cast<og::QuotientChartCover*>(parent)->q_start;
+      q_goal->coset = static_cast<og::QuotientChartCover*>(parent)->q_goal;
+    }
 
     q_start->isStart = true;
     q_goal->isGoal = true;
+    v_start = AddConfigurationToCover(q_start);
 
     //#########################################################################
     //Check saturation
@@ -127,9 +123,8 @@ void QuotientChartCover::setup(void)
 //#############################################################################
 //Configuration methods
 //#############################################################################
-QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCover(Configuration *q)
+QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCoverWithoutAddingEdges(Configuration *q)
 {
-
   //###########################################################################
   //safety checks
   if(q->GetRadius()<minimum_neighborhood_radius)
@@ -140,10 +135,6 @@ QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCover(Configura
     std::cout << "radius: " << q->GetRadius() << std::endl;
     exit(0);
   }
-
-  //###########################################################################
-  //get all neighbors before adding q (otherwise q might be neighbor of itself)
-  std::vector<Configuration*> neighbors = GetConfigurationsInsideNeighborhood(q);
 
   //###########################################################################
   //(1) add to cover graph
@@ -175,21 +166,37 @@ QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCover(Configura
   if(verbose>0) std::cout << "*** ADD VERTEX " << q->index << " (radius " << q->GetRadius() << ")" << std::endl;
   if(verbose>0) Q1->printState(q->state);
 
+  q->goal_distance = DistanceQ1(q, q_goal);
+
   if(q->parent_neighbor != nullptr){
     AddEdge(q, q->parent_neighbor);
   }
+
+  return v;
+}
+QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCover(Configuration *q)
+{
+  std::vector<Configuration*> neighbors = GetConfigurationsInsideNeighborhood(q);
+
+  Vertex v = AddConfigurationToCoverWithoutAddingEdges(q);
 
   //###########################################################################
   //Clean UP and Connect
   //(1) Remove All Configurations with neighborhoods inside current neighborhood
   //(2) Add Edges to All Configurations with centers inside the current neighborhood 
-
   if(verbose>0) std::cout << "Vertex: " << q->index << " has number of neighbors: " << neighbors.size() << std::endl;
   if(verbose>0) std::cout << std::string(80, '-') << std::endl;
+  //for(uint k = 0; k < std::min(neighbors.size(),3LU); k++){
   for(uint k = 0; k < neighbors.size(); k++){
     Configuration *qn = neighbors.at(k);
     if(qn==q){
+      std::cout << std::string(80, '#') << std::endl;
       std::cout << "configuration equals neighbor." << std::endl;
+      std::cout << "state added with radius " << q->GetRadius() << std::endl;
+      Q1->printState(q->state);
+      std::cout << "state neighbor with radius " << qn->GetRadius() << std::endl;
+      Q1->printState(qn->state);
+      std::cout << std::string(80, '#') << std::endl;
       exit(0);
     }
     //do not connect to parent, we already connected that
@@ -328,13 +335,14 @@ bool QuotientChartCover::ComputeNeighborhood(Configuration *q)
   bool feasible = Q1->isValid(q->state);
 
   if(feasible){
+
     if(IsOuterRobotFeasible(q->state))
     {
       q->isSufficientFeasible = true;
-      q->SetRadius(DistanceOuterRobotToObstacle(q->state));
-    }else{
-      q->SetRadius(DistanceInnerRobotToObstacle(q->state));
+      q->SetOuterRadius(DistanceOuterRobotToObstacle(q->state));
     }
+
+    q->SetRadius(DistanceInnerRobotToObstacle(q->state));
     if(q->GetRadius()<=minimum_neighborhood_radius){
       q->Remove(Q1);
       q=nullptr;
@@ -464,6 +472,10 @@ QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundary(std::
   Configuration *q_nearest = Nearest(q_random);
   Connect(q_nearest, q_random, q_random);
   q_random->parent_neighbor = q_nearest;
+  if(q_random == q_nearest){
+    std::cout << "sampling invalid: nearest and random are equal" << std::endl;
+    exit(0);
+  }
   return q_random;
 }
 
@@ -593,13 +605,22 @@ bool QuotientChartCover::IsNeighborhoodInsideNeighborhood(Configuration *lhs, Co
   double distance_centers = DistanceQ1(lhs, rhs);
   double radius_rhs = rhs->GetRadius();
   double radius_lhs = lhs->GetRadius();
+  if(radius_rhs < minimum_neighborhood_radius || radius_lhs < minimum_neighborhood_radius)
+  {
+    std::cout << "neighborhood inclusion failed" << std::endl;
+    std::cout << "neighborhood1 with radius: " << radius_rhs << std::endl;
+    Q1->printState(rhs->state);
+    std::cout << "neighborhood2 with radius: " << radius_lhs << std::endl;
+    Q1->printState(lhs->state);
+    exit(0);
+  }
   return (radius_rhs > (radius_lhs + distance_centers));
 }
 
 std::vector<QuotientChartCover::Configuration*> QuotientChartCover::GetConfigurationsInsideNeighborhood(Configuration *q)
 {
   std::vector<Configuration*> neighbors;
-  nearest_vertex->nearestR(q, q->GetRadius()+minimum_neighborhood_radius*0.5, neighbors);
+  nearest_vertex->nearestR(q, q->GetRadius(), neighbors);
   return neighbors;
 }
 

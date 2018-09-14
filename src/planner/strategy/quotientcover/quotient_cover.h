@@ -17,7 +17,7 @@ namespace ompl
       typedef og::QuotientChart BaseT;
     public:
 
-      uint verbose{2};
+      uint verbose{0};
 
       QuotientChartCover(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QuotientChartCover(void);
@@ -46,6 +46,10 @@ namespace ompl
         {
           openNeighborhoodRadius = radius;
         }
+        void SetOuterRadius(double radius)
+        {
+          openNeighborhoodOuterRadius = radius;
+        }
         void Remove(const base::SpaceInformationPtr &si)
         {
           si->freeState(state);
@@ -66,13 +70,16 @@ namespace ompl
         {
           return pdf_necessary_element;
         }
-        double GetImportance()
+        double GetImportance() const
         {
-          return openNeighborhoodRadius;
+          //return openNeighborhoodRadius + 1.0/goal_distance+1;
+          double d = GetRadius();
+          return d;
           //return ((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
           //return 1.0/((double)number_attempted_expansions+1);
         }
 
+        double goal_distance{0};
         uint number_attempted_expansions{0};
         uint number_successful_expansions{0};
 
@@ -93,6 +100,7 @@ namespace ompl
         //Neighborhood Computations
         //#####################################################################
         double openNeighborhoodRadius{0.0}; //might be L1 or L2 radius
+        double openNeighborhoodOuterRadius{0.0}; //might be L1 or L2 radius
 
         friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::QuotientChartCover::Configuration&);
       };
@@ -175,6 +183,7 @@ namespace ompl
       Configuration* CreateConfigurationFromStateAndCoset(const ob::State *state, Configuration *q_coset);
 
       Vertex AddConfigurationToCover(Configuration *q);
+      Vertex AddConfigurationToCoverWithoutAddingEdges(Configuration *q);
       void RemoveConfigurationFromCover(Configuration *q);
       void AddEdge(Configuration *q_from, Configuration *q_to);
 
@@ -235,7 +244,7 @@ namespace ompl
       PlannerDataVertexAnnotated getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const;
       //#######################################################################
       RNG rng_;
-      double goalBias{0.0}; //in [0,1]
+      double goalBias{0.1}; //in [0,1]
       double voronoiBias{0.3}; //in [0,1]
 
       bool isConnected{false};
@@ -252,7 +261,7 @@ namespace ompl
       PDF pdf_necessary_configurations;
       PDF pdf_all_configurations;
 
-      double minimum_neighborhood_radius{1e-10}; //minimum allowed radius, otherwise configuration is considered INVALID 
+      double minimum_neighborhood_radius{1e-5}; //minimum allowed radius, otherwise configuration is considered INVALID 
       bool saturated{false}; //if space is saturated, then we the whole free space has been found
 
       Graph graph;
