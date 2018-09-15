@@ -20,7 +20,7 @@ namespace ompl
       typedef og::QuotientChartCover BaseT;
     public:
 
-      uint verbose{1};
+      uint verbose{0};
 
       QNG(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QNG(void);
@@ -35,7 +35,7 @@ namespace ompl
       std::vector<Configuration*> ExpandNeighborhood(Configuration*);
       void ExpandSubsetNeighborhood(const Configuration*, const Configuration*, std::vector<Configuration*>&);
 
-      double importanceSamplingBias{0.7};
+      double importanceSamplingBias{0.0};
       uint NUMBER_OF_EXPANSION_SAMPLES{7};
 
     private:

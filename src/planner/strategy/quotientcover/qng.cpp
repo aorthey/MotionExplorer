@@ -93,11 +93,9 @@ void QNG::Grow(double t)
     AddConfigurationToCoverWithoutAddingEdges(q);
   }
 
-  //strategy: e
-
   if(verbose>0) std::cout << std::string(80, '-') << std::endl;
   if(verbose>0) std::cout << "expanding neighborhood with radius " << q->GetRadius() << std::endl;
-  Q1->printState(q->state);
+  if(verbose>0) Q1->printState(q->state);
 
   //get all children (samples on the boundary of the neighborhood)
   std::vector<Configuration*> q_children = ExpandNeighborhood(q);
@@ -109,9 +107,6 @@ void QNG::Grow(double t)
     priority_configurations.push(q_children.at(k));
   }
   if(verbose>0) std::cout << "size priority_queue:" << priority_configurations.size() << std::endl;
-
-
-
 
   double r = rng_.uniform01();
   if(r < importanceSamplingBias){

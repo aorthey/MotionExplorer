@@ -753,6 +753,7 @@ bool QuotientChartCover::GetSolution(ob::PathPtr &solution)
     Configuration* qn = Nearest(q_goal);
     double d_goal = DistanceNeighborhoodNeighborhood(qn, q_goal);
     if(d_goal < 1e-10){
+      q_goal->parent_neighbor = qn;
       v_goal = AddConfigurationToCover(q_goal);
       isConnected = true;
     }
@@ -760,7 +761,6 @@ bool QuotientChartCover::GetSolution(ob::PathPtr &solution)
   if(isConnected){
     auto gpath(std::make_shared<PathGeometric>(Q1));
     std::vector<Vertex> vpath = GetCoverPath(v_start, v_goal);
-    //og::PathGeometric gpath = static_cast<og::PathGeometric&>(*solution);
     gpath->clear();
     for(uint k = 0; k < vpath.size(); k++){
       gpath->append(graph[vpath.at(k)]->state);
