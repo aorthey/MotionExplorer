@@ -40,7 +40,7 @@ namespace ompl
     class Quotient: public ob::Planner
     {
       public:
-        const uint verbose{0};
+        const uint verbose{1};
         Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
         ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override final; //final prevents subclasses to override
 

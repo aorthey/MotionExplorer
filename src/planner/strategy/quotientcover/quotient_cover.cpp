@@ -136,6 +136,7 @@ QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCoverWithoutAdd
     std::cout << "radius: " << q->GetRadius() << std::endl;
     exit(0);
   }
+  totalVolumeOfCover += q->GetRadius();
 
   //###########################################################################
   //(1) add to cover graph
@@ -289,6 +290,8 @@ void QuotientChartCover::AddEdge(Configuration *q_from, Configuration *q_to)
 
 void QuotientChartCover::RemoveConfigurationFromCover(Configuration *q)
 {
+  totalVolumeOfCover -= q->GetRadius();
+
   //(1) Remove from PDF
   pdf_all_configurations.remove(static_cast<PDF_Element*>(q->GetPDFElement()));
   if(!q->isSufficientFeasible){
@@ -393,8 +396,17 @@ bool QuotientChartCover::IsConfigurationInsideCover(Configuration *q)
   return IsConfigurationInsideNeighborhood(q, neighbors.at(0)) && IsConfigurationInsideNeighborhood(q, neighbors.at(1));
 }
 
+double QuotientChartCover::GetImportance() const
+{
+  //approximation of total volume covered
+  return 1.0/((totalVolumeOfCover/Q1->getStateSpace()->getMeasure())+1);
+}
+
 void QuotientChartCover::Grow(double t)
 {
+  if(parent!=nullptr){
+    std::cout << "Growing Cspace" << std::endl;
+  }
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
   //#########################################################################
   //Do not grow the cover if it is saturated, i.e. it cannot be expanded anymore
@@ -628,12 +640,13 @@ std::vector<QuotientChartCover::Configuration*> QuotientChartCover::GetConfigura
 
 QuotientChartCover::Configuration* QuotientChartCover::Nearest(Configuration *q) const
 {
-  if(parent == nullptr){
-    return nearest_cover->nearest(q);
-  }else{
-    std::cout << "Nearest NYI" << std::endl;
-    exit(0);
-  }
+  //shortest path on graph should be implemented in distance function
+  return nearest_cover->nearest(q);
+  // if(parent == nullptr){
+  // }else{
+  //   std::cout << "Nearest NYI" << std::endl;
+  //   exit(0);
+  // }
 }
 
 //@TODO: should be fixed to reflect the distance on the underlying
@@ -678,13 +691,24 @@ double QuotientChartCover::DistanceConfigurationConfiguration(const Configuratio
     if(q_to->coset == nullptr || q_from->coset == nullptr)
     {
       //could not find a coset on the quotient-space  => usual metric
-      std::cout << "[WARNING] could not find coset for a configuration" << std::endl;
-      return DistanceQ1(q_from, q_to);
+      std::cout << std::string(80, '#') << std::endl;
+      std::cout << "[ERROR] could not find coset for a configuration" << std::endl;
+      std::cout << std::string(80, '#') << std::endl;
+      std::cout << "from:" << std::endl;
+      Q1->printState(q_from->state);
+      std::cout << (q_from->coset==nullptr?"has no coset":"") << std::endl;
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << "to:" << std::endl;
+      Q1->printState(q_to->state);
+      std::cout << (q_to->coset==nullptr?"has no coset":"") << std::endl;
+      std::cout << *this << std::endl;
+      exit(0);
+      //return DistanceQ1(q_from, q_to);
     }
     //metric defined by distance on cover of quotient-space plus distance on the
     //subspace Q1/Q0
-    og::QuotientChartCover *QuotientChartCover_parent = dynamic_cast<og::QuotientChartCover*>(parent);
-    return QuotientChartCover_parent->DistanceConfigurationConfigurationCover(q_from->coset, q_to->coset)+DistanceX1(q_from, q_to);
+    og::QuotientChartCover *parent_chart = dynamic_cast<og::QuotientChartCover*>(parent);
+    return parent_chart->DistanceConfigurationConfigurationCover(q_from->coset, q_to->coset)+DistanceX1(q_from, q_to);
   }
 }
 
@@ -720,9 +744,32 @@ double QuotientChartCover::DistanceNeighborhoodNeighborhood(const Configuration 
 
 double QuotientChartCover::DistanceConfigurationConfigurationCover(const Configuration *q_from, const Configuration *q_to)
 {
-  std::cout << "shortest path distance on cover" << std::endl;
-  std::cout << "NYI" << std::endl;
-  exit(0);
+  Vertex v_from = get(indexToVertex, q_from->index);
+  Vertex v_to = get(indexToVertex, q_to->index);
+  std::vector<Vertex> vpath = GetCoverPath(v_from, v_to);
+  if(vpath.empty()){
+    //path should always exist, since we are sampling on the connected cover
+    //component
+    std::cout << std::string(80, '#') << std::endl;
+    std::cout << "[ERROR] could not find a path on quotient-space" << std::endl;
+    std::cout << *this << std::endl;
+    std::cout << std::string(80, '#') << std::endl;
+    std::cout << "from:" << std::endl;
+    Q1->printState(q_from->state);
+    Q1->printState(graph[v_from]->state);
+    std::cout << "index:" << graph[v_from]->index << std::endl;
+    std::cout << "to:" << std::endl;
+    Q1->printState(q_to->state);
+    Q1->printState(graph[v_to]->state);
+    std::cout << "index:" << graph[v_to]->index << std::endl;
+    exit(0);
+  }
+
+  double path_length = 0.0;
+  for(uint k = 1; k < vpath.size(); k++){
+    path_length += DistanceConfigurationConfiguration(graph[vpath.at(k)], graph[vpath.at(k-1)]);
+  }
+  return path_length;
 }
 
 
@@ -794,7 +841,10 @@ void QuotientChartCover::CopyChartFromSibling( QuotientChart *sibling_chart, uin
   nearest_cover = sibling->GetNearestNeighborsCover();
   nearest_vertex = sibling->GetNearestNeighborsVertex();
   q_start = sibling->GetStartConfiguration();
+  q_start->state = Q1->cloneState(sibling->GetStartConfiguration()->state);
   q_goal = sibling->GetGoalConfiguration();
+  q_goal->state = Q1->cloneState(sibling->GetGoalConfiguration()->state);
+
   pdf_necessary_configurations = sibling->GetPDFNecessaryConfigurations();
   pdf_all_configurations = sibling->GetPDFAllConfigurations();
   isConnected = true;
@@ -805,6 +855,8 @@ void QuotientChartCover::CopyChartFromSibling( QuotientChart *sibling_chart, uin
 
   vertexToIndex = sibling->vertexToIndex;
   indexToVertex = sibling->indexToVertex;
+  index_ctr = sibling->index_ctr;
+
   std::cout << "new graph: " << boost::num_vertices(graph) << " vertices | " << boost::num_edges(graph) << " edges."<< std::endl;
   // std::cout << "copy chart " << std::endl;
   // std::cout << "NYI" << std::endl;
@@ -867,6 +919,10 @@ std::vector<QuotientChartCover::Vertex> QuotientChartCover::GetCoverPath(const V
   std::vector<Vertex> prev(boost::num_vertices(graph), boost::graph_traits<Graph>::null_vertex());
   auto weight = boost::make_transform_value_property_map(std::mem_fn(&EdgeInternalState::getCost), get(boost::edge_bundle, graph));
   auto predecessor = boost::make_iterator_property_map(prev.begin(), vertexToIndex);
+  std::cout << "searching path from" << std::endl;
+  Q1->printState(graph[start]->state);
+  std::cout << "path to" << std::endl;
+  Q1->printState(graph[goal]->state);
 
   try{
   boost::astar_search(graph, start,
@@ -898,6 +954,10 @@ std::vector<QuotientChartCover::Vertex> QuotientChartCover::GetCoverPath(const V
         break;
     }
     std::reverse(path.begin(), path.end());
+    std::cout << "path from" << std::endl;
+    Q1->printState(graph[path.at(0)]->state);
+    std::cout << "path to" << std::endl;
+    Q1->printState(graph[path.back()]->state);
   }
   return path;
 }
@@ -967,6 +1027,11 @@ void QuotientChartCover::getPlannerDataAnnotated(base::PlannerData &data) const
     data.addEdge(p1,p2);
   }
   std::cout << "added " << data.numVertices() << " vertices and " << data.numEdges() << " edges."<< std::endl;
+}
+void QuotientChartCover::Print(std::ostream& out) const
+{
+  BaseT::Print(out);
+  out << std::endl << "     [ChartCover] has " << boost::num_vertices(graph) << " vertices and " << boost::num_edges(graph) << " edges.";
 }
 
 namespace ompl{

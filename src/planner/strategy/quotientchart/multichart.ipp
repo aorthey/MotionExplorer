@@ -49,7 +49,7 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
 
   auto cmp = [](og::QuotientChart* left, og::QuotientChart* right) 
               { 
-                return left->GetImportance() > right->GetImportance();
+                return left->GetImportance() < right->GetImportance();
               };
 
   std::priority_queue<og::QuotientChart*, std::vector<og::QuotientChart*>, decltype(cmp)> Q(cmp);
@@ -139,6 +139,7 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
           //note that Q contains only the latest added node, while Qleaves
           //contains all. 
           current_chart = global;
+
 
         }
       }else{

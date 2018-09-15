@@ -40,15 +40,8 @@ namespace ompl
         //This is left for subclasses to implement.
 
         virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) = 0;
-
         virtual void getPlannerData(ob::PlannerData &data) const override;
-
-
-        //virtual void setPlannerDataVertexProperties(PlannerDataVertexAnnotated &p);
-        //virtual PlannerDataVertexAnnotated getPlannerDataVertex(ob::State *state, Vertex v) const;
-
-      //private:
-        //PlannerDataVertexAnnotated getAnnotatedVertex(Vertex vertex, std::vector<int> &path, std::map<const Vertex, ob::State*> &vertexToStates) const;
+        virtual void Print(std::ostream& out) const override;
       protected:
 
         std::vector<int> chartPath;

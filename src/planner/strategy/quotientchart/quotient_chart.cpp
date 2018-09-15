@@ -256,3 +256,10 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
   }
   if(child!=nullptr) child->getPlannerData(data);
 }
+
+void QuotientChart::Print(std::ostream& out) const
+{
+  BaseT::Print(out);
+  out << std::endl << "  [Chart] " << (isLocalChart?"(local)":"") << " level " << level << " | hIdx " << chartHorizontalIndex
+    << " | siblings " << chartSiblings.size() << " | chart_path " << chartPath;
+}

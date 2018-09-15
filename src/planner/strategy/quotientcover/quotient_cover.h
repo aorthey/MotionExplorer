@@ -135,8 +135,8 @@ namespace ompl
       };
 
       typedef boost::adjacency_list<
-         boost::listS, //do not change to vecS, otherwise vertex indices are not stable after removal
-         boost::listS, 
+         boost::setS, //do not change to vecS, otherwise vertex indices are not stable after removal
+         boost::setS, 
          boost::undirectedS,
          Configuration*,
          //boost::property<boost::edge_index_t,int, EdgeInternalState> 
@@ -167,8 +167,9 @@ namespace ompl
       IndexToVertexMap indexToVertexStdMap;
       boost::associative_property_map<IndexToVertexMap> indexToVertex{indexToVertexStdMap};
 
-    protected:
       vertex_index_type index_ctr{0};
+
+    protected:
 
       virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
 
@@ -222,6 +223,8 @@ namespace ompl
       void Init() override;
       bool GetSolution(ob::PathPtr &solution) override;
 
+      virtual double GetImportance() const override;
+
       bool Interpolate(const Configuration *q_from, Configuration *q_to);
 
       //#######################################################################
@@ -245,6 +248,8 @@ namespace ompl
       const double goalBias{0.1}; //in [0,1]
       const double voronoiBias{0.3}; //in [0,1]
       const double minimum_neighborhood_radius{1e-5}; //minimum allowed radius, otherwise configuration is considered INVALID 
+
+      double totalVolumeOfCover{0.0};
 
       bool isConnected{false};
 
@@ -273,6 +278,7 @@ namespace ompl
 
 
       double GetGoalBias() const;
+      virtual void Print(std::ostream& out) const override;
 
     };
   }
