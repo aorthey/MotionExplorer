@@ -40,7 +40,7 @@ namespace ompl
     class Quotient: public ob::Planner
     {
       public:
-        uint verbose = 1;
+        const uint verbose{0};
         Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
         ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override final; //final prevents subclasses to override
 
@@ -68,6 +68,7 @@ namespace ompl
         void SetParent(Quotient *parent_);
 
         friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::Quotient& qtnt);
+        //friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::Quotient* qtnt);
         virtual void Print(std::ostream& out) const;
 
       protected:

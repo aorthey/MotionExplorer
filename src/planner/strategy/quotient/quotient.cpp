@@ -753,50 +753,49 @@ double Quotient::GetImportance() const
 }
 void Quotient::Print(std::ostream& out) const
 {
-  out << std::string(80, '-') << std::endl;
-  out << "[QuotientSpace]" << std::endl;
-  out << std::string(80, '-') << std::endl;
+  out << "[QuotientSpace"<< id << "] ";
   if(parent == nullptr){
-    out << "Q0: ";
+    out << "Q" << level << ": ";
     if( Q1->getStateSpace()->getType() == ob::STATE_SPACE_SE2 ){
-      out << "SE(2)" << std::endl;
+      out << "SE(2)";
     }else if( Q1->getStateSpace()->getType() == ob::STATE_SPACE_SE3 ){
-      out << "SE(3)" << std::endl;
+      out << "SE(3)";
     }else if( Q1->getStateSpace()->getType() == ob::STATE_SPACE_REAL_VECTOR ){
-      out << "R^" << Q1->getStateDimension() << std::endl;
+      out << "R^" << Q1->getStateDimension();
     }else{
-      out << "unknown" << std::endl;
+      out << "unknown";
     }
   }else{
+    out << "Q" << level << ": ";
     switch (type) {
       case Quotient::RN_RM:
         {
-          out << "Q0: R^"<< Q0_dimension << " | Q1: R^" << Q1_dimension << " | X1: R^" << Q1_dimension-Q0_dimension<< std::endl;
+          out << "R^"<< Q0_dimension << " | Q" << level+1 << ": R^" << Q1_dimension << " | X" << level+1 << ": R^" << Q1_dimension-Q0_dimension;
           break;
         }
       case Quotient::SE2_R2:
         {
-          out << "Q0: R^2 | Q1: SE(2) | X1: SO(2)" << std::endl;
+          out << "R^2 | Q" << level+1 << ": SE(2) | X" << level+1 << ": SO(2)";
           break;
         }
       case Quotient::SE3_R3:
         {
-          out << "Q0: R^3 | Q1: SE(3) | X1: SO(3)" << std::endl;
+          out << "R^3 | Q" << level+1 << ": SE(3) | X" << level+1 << ": SO(3)";
           break;
         }
       case Quotient::SE3RN_SE3:
         {
-          out << "Q0: SE(3) | Q1: SE(3)xR^" << X1_dimension << " | X1: R^" << X1_dimension << std::endl;
+          out << "SE(3) | Q" << level+1 << ": SE(3)xR^" << X1_dimension << " | X" << level+1 << ": R^" << X1_dimension;
           break;
         }
       case Quotient::SE3RN_SE3RM:
         {
-          out << "Q0: SE(3)xR^" << Q0_dimension-6 << " | Q1: SE(3)xR^"<<Q1_dimension-6 << " | X1: R^" << X1_dimension << std::endl;
+          out << "SE(3)xR^" << Q0_dimension-6 << " | Q" << level+1 << ": SE(3)xR^"<<Q1_dimension-6 << " | X" << level+1 << ": R^" << X1_dimension;
           break;
         }
       default:
        {
-         out << "unknown type: " << type << std::endl;
+         out << "unknown type: " << type;
        }
     }
   }
@@ -808,5 +807,9 @@ namespace ompl{
       quotient_.Print(out);
       return out;
     }
+    // std::ostream& operator<< (std::ostream& out, const Quotient* quotient_){
+    //   quotient_->Print(out);
+    //   return out;
+    // }
   }
 }
