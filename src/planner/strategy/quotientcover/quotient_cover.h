@@ -129,7 +129,8 @@ namespace ompl
       };
 
       class GraphBundle{
-        // put PDFs and neighborhood structures here
+        // put PDFs and neighborhood structures here (so they get copied when
+        // copying the graph)
         std::string name;
       };
 
@@ -156,7 +157,6 @@ namespace ompl
       typedef ompl::PDF<Configuration*> PDF;
       typedef PDF::Element PDF_Element;
       
-    protected:
       //keep manual track of indices, because we sometimes need to remove
       //vertices
       typedef std::map<typename boost::graph_traits<Graph>::vertex_descriptor, vertex_index_type> VertexToIndexMap;
@@ -167,6 +167,7 @@ namespace ompl
       IndexToVertexMap indexToVertexStdMap;
       boost::associative_property_map<IndexToVertexMap> indexToVertex{indexToVertexStdMap};
 
+    protected:
       vertex_index_type index_ctr{0};
 
       virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
@@ -186,9 +187,6 @@ namespace ompl
       Vertex AddConfigurationToCoverWithoutAddingEdges(Configuration *q);
       void RemoveConfigurationFromCover(Configuration *q);
       void AddEdge(Configuration *q_from, Configuration *q_to);
-
-      Configuration* GetStartConfiguration() const;
-      Configuration* GetGoalConfiguration() const;
 
       bool IsConfigurationInsideCover(Configuration *q);
       void RemoveConfigurationsFromCoverCoveredBy(Configuration *q);
@@ -244,32 +242,36 @@ namespace ompl
       PlannerDataVertexAnnotated getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const;
       //#######################################################################
       RNG rng_;
-      double goalBias{0.1}; //in [0,1]
-      double voronoiBias{0.3}; //in [0,1]
+      const double goalBias{0.1}; //in [0,1]
+      const double voronoiBias{0.3}; //in [0,1]
+      const double minimum_neighborhood_radius{1e-5}; //minimum allowed radius, otherwise configuration is considered INVALID 
 
       bool isConnected{false};
 
       NearestNeighborsPtr nearest_cover{nullptr};
       NearestNeighborsPtr nearest_vertex{nullptr};
-
       Configuration *q_start{nullptr};
       Configuration *q_goal{nullptr};
-
       Vertex v_start;
       Vertex v_goal;
-
       PDF pdf_necessary_configurations;
       PDF pdf_all_configurations;
 
-      double minimum_neighborhood_radius{1e-5}; //minimum allowed radius, otherwise configuration is considered INVALID 
       bool saturated{false}; //if space is saturated, then we the whole free space has been found
 
       Graph graph;
 
     public:
+      Configuration* GetStartConfiguration() const;
+      Configuration* GetGoalConfiguration() const;
+      const Graph& GetGraph() const;
+      const PDF& GetPDFNecessaryConfigurations() const;
+      const PDF& GetPDFAllConfigurations() const;
 
-      const PDF& GetPDFNecessaryVertices() const;
-      const PDF& GetPDFAllVertices() const;
+      const NearestNeighborsPtr& GetNearestNeighborsCover() const;
+      const NearestNeighborsPtr& GetNearestNeighborsVertex() const;
+
+
       double GetGoalBias() const;
 
     };

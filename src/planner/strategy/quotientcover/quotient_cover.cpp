@@ -4,6 +4,7 @@
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <limits>
 #include <boost/graph/astar_search.hpp>
+#include <boost/graph/copy.hpp>
 #include <boost/graph/incremental_components.hpp>
 #include <boost/property_map/vector_property_map.hpp>
 #include <boost/property_map/transform_value_property_map.hpp>
@@ -771,11 +772,43 @@ bool QuotientChartCover::GetSolution(ob::PathPtr &solution)
   return false;
 }
 
-void QuotientChartCover::CopyChartFromSibling( QuotientChart *sibling, uint k )
+const QuotientChartCover::Graph& QuotientChartCover::GetGraph() const
 {
-  std::cout << "copy chart " << std::endl;
-  std::cout << "NYI" << std::endl;
-  exit(0);
+  return graph;
+}
+
+void QuotientChartCover::CopyChartFromSibling( QuotientChart *sibling_chart, uint k )
+{
+  QuotientChartCover *sibling = dynamic_cast<QuotientChartCover*>(sibling_chart);
+  if(sibling == nullptr)
+  {
+    std::cout << "copying chart from non cover." << std::endl;
+    std::cout << *sibling_chart << std::endl;
+    exit(0);
+  }
+
+  const og::QuotientChartCover::Graph& graph_prime = sibling->GetGraph();
+
+  std::cout << "sibling graph: " << boost::num_vertices(graph_prime) << " vertices | " << boost::num_edges(graph_prime) << " edges."<< std::endl;
+
+  nearest_cover = sibling->GetNearestNeighborsCover();
+  nearest_vertex = sibling->GetNearestNeighborsVertex();
+  q_start = sibling->GetStartConfiguration();
+  q_goal = sibling->GetGoalConfiguration();
+  pdf_necessary_configurations = sibling->GetPDFNecessaryConfigurations();
+  pdf_all_configurations = sibling->GetPDFAllConfigurations();
+  isConnected = true;
+  isLocalChart = true;
+  opt_ = sibling->opt_;
+  level = sibling->GetLevel();
+  boost::copy_graph( graph_prime, graph, vertex_index_map(sibling->vertexToIndex));
+
+  vertexToIndex = sibling->vertexToIndex;
+  indexToVertex = sibling->indexToVertex;
+  std::cout << "new graph: " << boost::num_vertices(graph) << " vertices | " << boost::num_edges(graph) << " edges."<< std::endl;
+  // std::cout << "copy chart " << std::endl;
+  // std::cout << "NYI" << std::endl;
+  // exit(0);
 }
 
 QuotientChartCover::Configuration* QuotientChartCover::GetStartConfiguration() const
@@ -787,14 +820,22 @@ QuotientChartCover::Configuration* QuotientChartCover::GetGoalConfiguration() co
   return q_goal;
 }
 
-const QuotientChartCover::PDF& QuotientChartCover::GetPDFNecessaryVertices() const
+const QuotientChartCover::PDF& QuotientChartCover::GetPDFNecessaryConfigurations() const
 {
   return pdf_necessary_configurations;
 }
 
-const QuotientChartCover::PDF& QuotientChartCover::GetPDFAllVertices() const
+const QuotientChartCover::PDF& QuotientChartCover::GetPDFAllConfigurations() const
 {
   return pdf_all_configurations;
+}
+const QuotientChartCover::NearestNeighborsPtr& QuotientChartCover::GetNearestNeighborsCover() const
+{
+  return nearest_cover;
+}
+const QuotientChartCover::NearestNeighborsPtr& QuotientChartCover::GetNearestNeighborsVertex() const
+{
+  return nearest_vertex;
 }
 
 double QuotientChartCover::GetGoalBias() const
