@@ -9,6 +9,7 @@
 #include <boost/property_map/vector_property_map.hpp>
 #include <boost/property_map/transform_value_property_map.hpp>
 #include <boost/foreach.hpp>
+#include <boost/graph/graphviz.hpp>
 
 #define foreach BOOST_FOREACH
 
@@ -41,6 +42,8 @@ QuotientChartCover::QuotientChartCover(const base::SpaceInformationPtr &si, Quot
     std::cout << "(should be below "<< maxBias << ")" << std::endl;
     exit(0);
   }
+  graph[boost::graph_bundle].name = getName()+"_graph";
+  graph[boost::graph_bundle].Q1 = Q1;
 }
 
 QuotientChartCover::~QuotientChartCover(void)
@@ -102,6 +105,11 @@ void QuotientChartCover::setup(void)
     q_goal->isGoal = true;
     v_start = AddConfigurationToCover(q_start);
 
+    std::cout << "start: "; Q1->printState(q_start->state);
+    std::cout << "goal: "; Q1->printState(q_goal->state);
+
+    std::cout << "start: " << get(vertexToIndex, v_start) << " goal: " << get(vertexToIndex, v_goal) << std::endl;
+
     //#########################################################################
     //Check saturation
     //#########################################################################
@@ -114,7 +122,6 @@ void QuotientChartCover::setup(void)
     //#########################################################################
     OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nearest_cover->size());
     setup_ = true;
-    std::cout << "start: " << get(vertexToIndex, v_start) << " goal: " << get(vertexToIndex, v_goal) << std::endl;
   }else{
     setup_ = false;
   }
@@ -301,8 +308,8 @@ void QuotientChartCover::RemoveConfigurationFromCover(Configuration *q)
   nearest_cover->remove(q);
   nearest_vertex->remove(q);
 
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "*** REMOVE VERTEX " << q->index << std::endl;
+  if(verbose>0) std::cout << std::string(80, '-') << std::endl;
+  if(verbose>0) std::cout << "*** REMOVE VERTEX " << q->index << std::endl;
   Q1->printState(q->state);
 
   //erase entry from indexmap
@@ -419,6 +426,8 @@ void QuotientChartCover::Grow(double t)
   //#########################################################################
   Configuration *q_random = SampleCoverBoundaryValid(ptc);
   if(q_random == nullptr) return;
+
+  if(verbose>1) std::cout << "sampled "; Q1->printState(q_random->state);
 
   AddConfigurationToCover(q_random);
 }
@@ -735,7 +744,6 @@ double QuotientChartCover::DistanceNeighborhoodNeighborhood(const Configuration 
     std::cout << "configuration 2: " << std::endl;
     Q1->printState(q_to->state);
     std::cout << std::string(80, '-') << std::endl;
-
     exit(1);
   }
   double d_open_neighborhood_distance = std::max(d - d_from - d_to, 0.0); 
@@ -840,10 +848,14 @@ void QuotientChartCover::CopyChartFromSibling( QuotientChart *sibling_chart, uin
 
   nearest_cover = sibling->GetNearestNeighborsCover();
   nearest_vertex = sibling->GetNearestNeighborsVertex();
-  q_start = sibling->GetStartConfiguration();
-  q_start->state = Q1->cloneState(sibling->GetStartConfiguration()->state);
-  q_goal = sibling->GetGoalConfiguration();
-  q_goal->state = Q1->cloneState(sibling->GetGoalConfiguration()->state);
+  v_start = sibling->v_start;
+  v_goal = sibling->v_goal;
+  q_start = graph[v_start];
+  q_goal = graph[v_goal];
+  //q_start = sibling->GetStartConfiguration();
+  //q_start->state = Q1->cloneState(sibling->GetStartConfiguration()->state);
+  //q_goal = sibling->GetGoalConfiguration();
+  //q_goal->state = Q1->cloneState(sibling->GetGoalConfiguration()->state);
 
   pdf_necessary_configurations = sibling->GetPDFNecessaryConfigurations();
   pdf_all_configurations = sibling->GetPDFAllConfigurations();
@@ -852,15 +864,22 @@ void QuotientChartCover::CopyChartFromSibling( QuotientChart *sibling_chart, uin
   opt_ = sibling->opt_;
   level = sibling->GetLevel();
   boost::copy_graph( graph_prime, graph, vertex_index_map(sibling->vertexToIndex));
+  graph[boost::graph_bundle].Q1 = Q1;
 
-  vertexToIndex = sibling->vertexToIndex;
-  indexToVertex = sibling->indexToVertex;
+  // vertexToIndexStdMap = sibling->vertexToIndexStdMap;
+  // indexToVertexStdMap = sibling->indexToVertexStdMap;
+  // vertexToIndex = sibling->vertexToIndex;
+  // indexToVertex = sibling->indexToVertex;
+
+  foreach( const Vertex v, boost::vertices(graph))
+  {
+    put(vertexToIndex, v, graph[v]->index);
+    put(indexToVertex, graph[v]->index, v);
+  }
   index_ctr = sibling->index_ctr;
 
+  //indices are mixed up!
   std::cout << "new graph: " << boost::num_vertices(graph) << " vertices | " << boost::num_edges(graph) << " edges."<< std::endl;
-  // std::cout << "copy chart " << std::endl;
-  // std::cout << "NYI" << std::endl;
-  // exit(0);
 }
 
 QuotientChartCover::Configuration* QuotientChartCover::GetStartConfiguration() const
@@ -911,18 +930,19 @@ private:
   Vertex m_goal;
 };
 
-
 std::vector<QuotientChartCover::Vertex> QuotientChartCover::GetCoverPath(const Vertex& start, const Vertex& goal)
 {
   std::vector<Vertex> path;
-
-  std::vector<Vertex> prev(boost::num_vertices(graph), boost::graph_traits<Graph>::null_vertex());
+  std::vector<Vertex> prev(boost::num_vertices(graph));
   auto weight = boost::make_transform_value_property_map(std::mem_fn(&EdgeInternalState::getCost), get(boost::edge_bundle, graph));
   auto predecessor = boost::make_iterator_property_map(prev.begin(), vertexToIndex);
-  std::cout << "searching path from" << std::endl;
-  Q1->printState(graph[start]->state);
-  std::cout << "path to" << std::endl;
-  Q1->printState(graph[goal]->state);
+
+  //check that vertices exists in graph
+  if(verbose>3) std::cout << std::string(80, '-') << std::endl;
+  if(verbose>3) std::cout << "searching from " << get(vertexToIndex, start) << " to " << get(vertexToIndex, goal) << std::endl;
+  if(verbose>3) Q1->printState(graph[start]->state);
+  if(verbose>3) Q1->printState(graph[goal]->state);
+  if(verbose>3) std::cout << graph << std::endl;
 
   try{
   boost::astar_search(graph, start,
@@ -947,17 +967,22 @@ std::vector<QuotientChartCover::Vertex> QuotientChartCover::GetCoverPath(const V
                       .distance_zero(opt_->identityCost())
                     );
   }catch(found_goal fg){
+    std::cout << boost::num_vertices(graph) << std::endl;
+
     for(Vertex v = goal;; v = prev[get(vertexToIndex, v)])
     {
       path.push_back(v);
-      if(prev[get(vertexToIndex, v)] == v)
+      if(verbose>3)std::cout << std::string(80, '-') << std::endl;
+      if(verbose>3)std::cout << "v:" << graph[v]->index << std::endl;
+      if(verbose>3)std::cout << "idx:" << get(vertexToIndex, v) << std::endl;
+      if(graph[prev[get(vertexToIndex, v)]]->index == graph[v]->index)
         break;
     }
     std::reverse(path.begin(), path.end());
-    std::cout << "path from" << std::endl;
-    Q1->printState(graph[path.at(0)]->state);
-    std::cout << "path to" << std::endl;
-    Q1->printState(graph[path.back()]->state);
+    // std::cout << "path from" << std::endl;
+    // Q1->printState(graph[path.at(0)]->state);
+    // std::cout << "path to" << std::endl;
+    // Q1->printState(graph[path.back()]->state);
   }
   return path;
 }
@@ -1037,7 +1062,34 @@ void QuotientChartCover::Print(std::ostream& out) const
 namespace ompl{
   namespace geometric{
     std::ostream& operator<< (std::ostream& out, const QuotientChartCover::Configuration& q){
+      out << "[Configuration]";
       out << q.GetRadius() << std::endl;
+      return out;
+    }
+    std::ostream& operator<< (std::ostream& out, const QuotientChartCover::Graph& graph)
+    {
+      out << std::string(80, '-') << std::endl;
+      out << "[Graph]" << std::endl;
+      out << std::string(80, '-') << std::endl;
+      ob::SpaceInformationPtr Q1 = graph[boost::graph_bundle].Q1;
+
+      foreach(const QuotientChartCover::Vertex v, boost::vertices(graph))
+      {
+        QuotientChartCover::Configuration *q = graph[v];
+        std::cout << "vertex " << q->index << " radius " << q->GetRadius() << " : ";
+        Q1->printState(q->state);
+      }
+      foreach (const QuotientChartCover::Edge e, boost::edges(graph))
+      {
+        const QuotientChartCover::Vertex v1 = boost::source(e, graph);
+        const QuotientChartCover::Vertex v2 = boost::target(e, graph);
+        std::cout << "edge from " << graph[v1]->index << " to " << graph[v2]->index << " (weight " << graph[e].getWeight() << ")" << std::endl;
+      }
+
+      out << std::string(80, '-') << std::endl;
+      out << "--- graph " << graph[boost::graph_bundle].name << std::endl;
+      out << "---       has " << boost::num_vertices(graph) << " vertices and " << boost::num_edges(graph) << " edges." << std::endl;
+      out << std::string(80, '-') << std::endl;
       return out;
     }
   }

@@ -17,7 +17,7 @@ namespace ompl
       typedef og::QuotientChart BaseT;
     public:
 
-      const uint verbose{0};
+      const uint verbose{2};
 
       QuotientChartCover(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QuotientChartCover(void);
@@ -120,7 +120,10 @@ namespace ompl
           void setWeight(double d){
             cost = ob::Cost(d);
           }
-          ob::Cost getCost(){
+          double getWeight() const{
+            return cost.value();
+          }
+          ob::Cost getCost() const{
             return cost;
           }
         private:
@@ -128,10 +131,11 @@ namespace ompl
           bool isSufficient{false};
       };
 
-      class GraphBundle{
+      struct GraphBundle{
         // put PDFs and neighborhood structures here (so they get copied when
         // copying the graph)
-        std::string name;
+        std::string name{"graph"};
+        ob::SpaceInformationPtr Q1;
       };
 
       typedef boost::adjacency_list<
@@ -143,6 +147,7 @@ namespace ompl
          EdgeInternalState,
          GraphBundle
        > Graph;
+      friend std::ostream& operator<< (std::ostream& out, const Graph& graph);
 
       typedef boost::graph_traits<Graph> BGT;
       typedef BGT::vertex_descriptor Vertex;
@@ -166,7 +171,6 @@ namespace ompl
       typedef std::map<vertex_index_type, typename boost::graph_traits<Graph>::vertex_descriptor> IndexToVertexMap;
       IndexToVertexMap indexToVertexStdMap;
       boost::associative_property_map<IndexToVertexMap> indexToVertex{indexToVertexStdMap};
-
       vertex_index_type index_ctr{0};
 
     protected:

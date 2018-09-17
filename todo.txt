@@ -558,5 +558,3 @@ quotient-chart
 radius, and probably geometry. This neighborhood has to be filled up, then we
 can add it to the cover.
 [ ] problem: add configuration during momentum expansion
-
-
