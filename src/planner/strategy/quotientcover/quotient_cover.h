@@ -17,14 +17,14 @@ namespace ompl
       typedef og::QuotientChart BaseT;
     public:
 
-      const uint verbose{2};
+      const uint verbose{0};
 
       QuotientChartCover(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QuotientChartCover(void);
       virtual void clear() override;
       virtual void setup() override;
 
-      typedef uint vertex_index_type;
+      typedef int vertex_index_type;
       
 
       //#######################################################################
@@ -94,7 +94,7 @@ namespace ompl
         bool isStart{false};
         bool isGoal{false};
 
-        vertex_index_type index{0};
+        vertex_index_type index{-1};
 
         //#####################################################################
         //Neighborhood Computations
@@ -216,9 +216,10 @@ namespace ompl
       Configuration* SampleCoverBoundary(std::string type);
       virtual Configuration* SampleCoverBoundary();
       Configuration* SampleCoverBoundaryValid(ob::PlannerTerminationCondition &ptc);
-      Configuration* SampleQuotientCover(ob::State *state) const;
+      Configuration* SampleQuotientCover(ob::State *state);
       void SampleGoal(Configuration*);
       void SampleUniform(Configuration*);
+      void SampleRandomNeighborhoodBoundary(Configuration *q);
       bool SampleNeighborhoodBoundary(Configuration*, const Configuration*);
       bool SampleNeighborhoodBoundaryHalfBall(Configuration*, const Configuration*);
 
@@ -237,6 +238,7 @@ namespace ompl
       bool IsConfigurationInsideNeighborhood(Configuration *q, Configuration *qn);
       std::vector<Configuration*> GetConfigurationsInsideNeighborhood(Configuration *q);
       bool IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rhs);
+      void GetCosetFromQuotientSpace(Configuration *q);
 
       //#######################################################################
       //Cover Algorithms
@@ -283,6 +285,7 @@ namespace ompl
 
       double GetGoalBias() const;
       virtual void Print(std::ostream& out) const override;
+      void Print(const Configuration *q) const;
 
     };
   }

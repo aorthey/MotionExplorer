@@ -73,6 +73,8 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
   //each chart has an associated importance weight. If we operate on a certain
   //path [i,j,k], then the charts Q_i, Q_ij and Q_ijk have the usual importance
   //as in the quotientspace approach. All other charts are set to zero.
+
+  ompl::time::point t_start = ompl::time::now();
   while(!ptcOrSolutionFound)
   {
     //growing the charts occurs in the path below current_chart.
@@ -87,8 +89,10 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
     }else{
       uint k = current_chart->GetLevel();
       if(current_chart->FoundNewPath()){
+        double t_k_end = ompl::time::seconds(ompl::time::now() - t_start);
         std::cout << std::string(80, '#') << std::endl;
-        std::cout << "found path on level " << k+1 << " of " << levels << std::endl;
+        //std::cout << "found path on level " << k+1 << " of " << levels << std::endl;
+        std::cout << "Found Path on Level " << k+1 << "/" << levels << " after " << t_k_end << " seconds." << std::endl;
         std::cout << std::string(80, '-') << std::endl;
         std::cout << *current_chart << std::endl;
         std::cout << std::string(80, '#') << std::endl;
@@ -111,7 +115,7 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
           local->setProblemDefinition(pdef_vec.at(k));
           local->CopyChartFromSibling(current_chart, current_chart->GetChartNumberOfComponents()-1);
           local->SetLevel(k);
-          local->SetChartHorizontalIndex(current_chart->GetChartNumberOfComponents()+1);
+          local->SetChartHorizontalIndex(current_chart->GetChartNumberOfComponents());
 
           current_chart->AddChartSibling(local);
 
@@ -129,11 +133,12 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
           while( !Q.empty() ) Q.pop();
 
           og::QuotientChart *levels_to_be_added = global;
-          while(levels_to_be_added!=nullptr)
-          {
-            Q.push(levels_to_be_added);
-            levels_to_be_added = dynamic_cast<og::QuotientChart*>(levels_to_be_added->GetParent());
-          }
+          //while(levels_to_be_added!=nullptr)
+          //{
+          //  Q.push(levels_to_be_added);
+          //  levels_to_be_added = dynamic_cast<og::QuotientChart*>(levels_to_be_added->GetParent());
+          //}
+          Q.push(levels_to_be_added);
 
           //Qleaves.push_back(global);
           //note that Q contains only the latest added node, while Qleaves
