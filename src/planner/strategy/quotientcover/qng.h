@@ -20,7 +20,7 @@ namespace ompl
       typedef og::QuotientChartCover BaseT;
     public:
 
-      const uint verbose{0};
+      uint verbose{0};
 
       QNG(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QNG(void);
@@ -30,12 +30,15 @@ namespace ompl
       Configuration* EstimateBestNextState(Configuration *q_last, Configuration *q_current);
 
       virtual Configuration* SampleCoverBoundary() override;
+      virtual void AddConfigurationToPDF(Configuration *q) override;
+      virtual Configuration* SampleQuotientCover(ob::State *state) override;
 
       void AddToFastTrackConditional(std::vector<Configuration*>);
       std::vector<Configuration*> ExpandNeighborhood(Configuration*);
       void ExpandSubsetNeighborhood(const Configuration*, const Configuration*, std::vector<Configuration*>&);
 
-      double importanceSamplingBias{0.0};
+      const double shortestPathBias{1.0};
+      const double importanceSamplingBias{0.0};
       uint NUMBER_OF_EXPANSION_SAMPLES{0};
 
     private:
@@ -51,13 +54,6 @@ namespace ompl
         }
       };
       std::priority_queue<Configuration*, std::vector<Configuration*>, CmpConfigurationPtrs> priority_configurations;
-               
-      //fast track configurations are boundary nodes which are locally the
-      //largest, i.e. for a given neighborhood, if we have N samples on the
-      //boundary, then the fast track configuration is the samples with the
-      //largest neighborhood. we like to expand them first, since they can lead
-      //us to free open spaces and help us navigate through narrow passages
-      std::vector<Configuration*> fast_track_configurations;
     };
   }
 }

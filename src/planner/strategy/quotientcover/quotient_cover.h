@@ -17,7 +17,7 @@ namespace ompl
       typedef og::QuotientChart BaseT;
     public:
 
-      const uint verbose{0};
+      const uint verbose{1};
 
       QuotientChartCover(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QuotientChartCover(void);
@@ -190,9 +190,10 @@ namespace ompl
 
       Vertex AddConfigurationToCover(Configuration *q);
       Vertex AddConfigurationToCoverWithoutAddingEdges(Configuration *q);
+
       void RemoveConfigurationFromCover(Configuration *q);
       void AddEdge(Configuration *q_from, Configuration *q_to);
-
+      virtual void AddConfigurationToPDF(Configuration *q);
       bool IsConfigurationInsideCover(Configuration *q);
       void RemoveConfigurationsFromCoverCoveredBy(Configuration *q);
       bool ComputeNeighborhood(Configuration *q);
@@ -213,23 +214,27 @@ namespace ompl
       //#######################################################################
       //Sampling Sample{Structure}{Substructure}
       //#######################################################################
+      virtual Configuration* Sample();
+
       Configuration* SampleCoverBoundary(std::string type);
       virtual Configuration* SampleCoverBoundary();
+      virtual Configuration* SampleQuotientCover(ob::State *state);
       Configuration* SampleCoverBoundaryValid(ob::PlannerTerminationCondition &ptc);
-      Configuration* SampleQuotientCover(ob::State *state);
-      void SampleGoal(Configuration*);
-      void SampleUniform(Configuration*);
       void SampleRandomNeighborhoodBoundary(Configuration *q);
       bool SampleNeighborhoodBoundary(Configuration*, const Configuration*);
       bool SampleNeighborhoodBoundaryHalfBall(Configuration*, const Configuration*);
 
+      void SampleGoal(Configuration*);
+      void SampleUniform(Configuration*);
+      //#######################################################################
+      //Connect strategies
+      //#######################################################################
       void Connect(const Configuration*, const Configuration*, Configuration*);
       void Grow(double t) override;
       void Init() override;
       bool GetSolution(ob::PathPtr &solution) override;
 
       virtual double GetImportance() const override;
-
       bool Interpolate(const Configuration *q_from, Configuration *q_to);
 
       //#######################################################################
@@ -256,9 +261,10 @@ namespace ompl
       const double minimum_neighborhood_radius{1e-5}; //minimum allowed radius, otherwise configuration is considered INVALID 
 
       double totalVolumeOfCover{0.0};
-
       bool isConnected{false};
+      bool saturated{false}; //if space is saturated, then we the whole free space has been found
 
+      Graph graph;
       NearestNeighborsPtr nearest_cover{nullptr};
       NearestNeighborsPtr nearest_vertex{nullptr};
       Configuration *q_start{nullptr};
@@ -267,10 +273,8 @@ namespace ompl
       Vertex v_goal;
       PDF pdf_necessary_configurations;
       PDF pdf_all_configurations;
-
-      bool saturated{false}; //if space is saturated, then we the whole free space has been found
-
-      Graph graph;
+      std::vector<Vertex> shortest_path_start_goal;
+      std::vector<Vertex> shortest_path_start_goal_necessary_vertices;
 
     public:
       Configuration* GetStartConfiguration() const;

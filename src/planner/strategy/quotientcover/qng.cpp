@@ -16,15 +16,14 @@ using namespace ompl::geometric;
 QNG::QNG(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
   setName("QNG"+std::to_string(id));
-  if(importanceSamplingBias>0.9)
-  {
-  }
   NUMBER_OF_EXPANSION_SAMPLES = Q1->getStateDimension()+1;
+  if(parent!=nullptr) verbose=1;
 }
 
 QNG::~QNG(void)
 {
 }
+
 void QNG::clear()
 {
   BaseT::clear();
@@ -32,7 +31,6 @@ void QNG::clear()
   {
     priority_configurations.pop();
   }
-  fast_track_configurations.clear();
   firstRun = true;
 }
 
@@ -40,6 +38,7 @@ void QNG::setup(void)
 {
   BaseT::setup();
 }
+
 void QNG::Grow(double t)
 {
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
@@ -97,13 +96,12 @@ void QNG::Grow(double t)
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "--- expanding neighborhood: "; 
     Print(q);
+    std::cout << "--- children:" << std::endl;
   }
 
-  //get all children (samples on the boundary of the neighborhood)
   std::vector<Configuration*> q_children = ExpandNeighborhood(q);
-
-  if(verbose>0) std::cout << "--- children:" << std::endl;
-  for(uint k = 0; k < q_children.size(); k++){
+  for(uint k = 0; k < q_children.size(); k++)
+  {
     if(verbose>0) Print(q_children.at(k));
     priority_configurations.push(q_children.at(k));
   }
@@ -112,24 +110,6 @@ void QNG::Grow(double t)
   if(q_random == nullptr) return;
   priority_configurations.push(q_random);
 
-  // double r = rng_.uniform01();
-  // if(r < importanceSamplingBias){
-  //   Configuration *q_important = pdf_all_configurations.sample(rng_.uniform01());
-  //   q_important->number_attempted_expansions++;
-  //   pdf_all_configurations.update(static_cast<PDF_Element*>(q_important->GetPDFElement()), q_important->GetImportance());
-
-  //   std::vector<Configuration*> q_children = ExpandNeighborhood(q_important);
-
-  //   for(uint k = 0; k < q_children.size(); k++){
-  //     priority_configurations.push(q_children.at(k));
-  //   }
-  // }else{
-  //   //classical RRT-like expansion with goal-bias
-  //   Configuration *q_random = SampleCoverBoundaryValid(ptc);
-  //   if(q_random == nullptr) return;
-  //   priority_configurations.push(q_random);
-  // }
-  
 }
 
 std::vector<QNG::Configuration*> QNG::ExpandNeighborhood(Configuration *q)
@@ -138,45 +118,26 @@ std::vector<QNG::Configuration*> QNG::ExpandNeighborhood(Configuration *q)
   if(q->parent_neighbor == nullptr)
   {
     //if no parent neighbor is available, just sample on the neighborhood boundary
-    for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES; k++){
+    for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES; k++)
+    {
       Configuration *q_random = new Configuration(Q1);
       SampleNeighborhoodBoundary(q_random, q);
       if(ComputeNeighborhood(q_random))
       {
-        GetCosetFromQuotientSpace(q_random);
         q_children.push_back(q_random);
       }
     }
   }else{
-
-    //############################################################################
-    //(1) get a point q_next, which lies on the intersection of the line from q_parent to q with the neighborhood around q
-    //############################################################################
-
-    //q_last ---- q ---- q_next
-
+    //q_last (q->parent_neighbor)---- q_current (q) ---- q_next
     Configuration *q_next = new Configuration(Q1);
-    double d_last_to_current = DistanceConfigurationConfiguration(q->parent_neighbor, q);
-    double radius_current = q->GetRadius();
+    const double d_last_to_current = DistanceConfigurationConfiguration(q->parent_neighbor, q);
+    const double radius_current = q->GetRadius();
     Q1->getStateSpace()->interpolate(q->parent_neighbor->state, q->state, 1 + radius_current/d_last_to_current, q_next->state);
-    if(ComputeNeighborhood(q_next)){
-      GetCosetFromQuotientSpace(q_next);
+    if(ComputeNeighborhood(q_next))
+    {
       q_children.push_back(q_next);
       ExpandSubsetNeighborhood(q, q_next, q_children);
     }
-
-    // for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES-1; k++){
-    //   Configuration *q_k = new Configuration(Q1);
-    //   SampleNeighborhoodBoundaryHalfBall(q_k, q);
-    //   if(ComputeNeighborhood(q_k)){
-    //     q_children.push_back(q_k);
-    //   }
-    // }
-
-    //if(ComputeNeighborhood(q_next)){
-    //  q_children.push_back(q_next);
-    //  ExpandSubsetNeighborhood(q, q_next, q_children);
-    //}
   }
 
   for(uint k = 0; k < q_children.size(); k++){
@@ -187,9 +148,9 @@ std::vector<QNG::Configuration*> QNG::ExpandNeighborhood(Configuration *q)
 }
 void QNG::ExpandSubsetNeighborhood(const Configuration *q_last, const Configuration *q_current, std::vector<Configuration*> &q_children)
 {
-  double radius_current = q_current->GetRadius();
-  double radius_last = q_last->GetRadius();
-  double radius_ratio = radius_current / radius_last;
+  const double radius_current = q_current->GetRadius();
+  const double radius_last = q_last->GetRadius();
+  const double radius_ratio = radius_current / radius_last;
   //radius ratio tells us about how the current radius has evolved from last
   //radius
   //Case1: radius_ratio > 1: 
@@ -199,7 +160,8 @@ void QNG::ExpandSubsetNeighborhood(const Configuration *q_last, const Configurat
   //   linearly adjust sampling radius. the smaller our change, the bigger we
   //   should sample to escape the bad neighborhood
   double SAMPLING_RADIUS = 0.0;
-  if(radius_ratio > 1){
+  if(radius_ratio > 1)
+  {
     return;
   }else{
     //if(radius_ratio > 0.1){
@@ -210,19 +172,21 @@ void QNG::ExpandSubsetNeighborhood(const Configuration *q_last, const Configurat
     SAMPLING_RADIUS = radius_current;
   }
 
-  for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES-1; k++){
+  for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES-1; k++)
+  {
     Configuration *q_k = new Configuration(Q1);
     Q1_sampler->sampleUniformNear(q_k->state, q_current->state, SAMPLING_RADIUS);
 
-    double d_last_to_k = DistanceQ1(q_last, q_k);
+    const double d_last_to_k = DistanceQ1(q_last, q_k);
 
     //project onto ball of radius radius_last around q_last
-    Q1->getStateSpace()->interpolate(q_last->state, q_k->state, min(radius_last/d_last_to_k,1.0), q_k->state);
+    //Q1->getStateSpace()->interpolate(q_last->state, q_k->state, min(radius_last/d_last_to_k,1.0), q_k->state);
+    Q1->getStateSpace()->interpolate(q_last->state, q_k->state, radius_last/d_last_to_k, q_k->state);
 
-    if(!ComputeNeighborhood(q_k)){
+    if(!ComputeNeighborhood(q_k))
+    {
       continue;
     }
-    GetCosetFromQuotientSpace(q_k);
     q_children.push_back(q_k);
   }
 }
@@ -230,6 +194,7 @@ void QNG::ExpandSubsetNeighborhood(const Configuration *q_last, const Configurat
 QNG::Configuration* QNG::SampleCoverBoundary(){
   Configuration *q_random;
   if(!hasSolution){
+    //phase1 sampling: solution has not been found
     double r = rng_.uniform01();
     if(r<goalBias){
       q_random = BaseT::SampleCoverBoundary("goal");
@@ -237,8 +202,42 @@ QNG::Configuration* QNG::SampleCoverBoundary(){
       q_random = BaseT::SampleCoverBoundary("voronoi");
     }
   }else{
-    std::cout << "hasSolution sampler NYI"<< std::endl;
+    //phase2 sampling: grow solution and associated roadmap
+    std::cout << "Phase2 (hasSolution) sampler NYI"<< std::endl;
     exit(0);
   }
   return q_random;
+}
+
+void QNG::AddConfigurationToPDF(Configuration *q)
+{
+  PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
+  q->SetPDFElement(q_element);
+
+  if(!q->isSufficientFeasible){
+    //all necessary elements are equal
+    PDF_Element *q_necessary_element = pdf_necessary_configurations.add(q, 1);
+    q->SetNecessaryPDFElement(q_necessary_element);
+  }
+}
+QNG::Configuration* QNG::SampleQuotientCover(ob::State *state) 
+{
+  double r = rng_.uniform01();
+  Configuration *q_coset = nullptr;
+  if(r<shortestPathBias)
+  {
+    if(shortest_path_start_goal_necessary_vertices.empty())
+    {
+      std::cout << "[WARNING] shortest path does not have any necessary vertices! -- should be detected on CS" << std::endl;
+      exit(0);
+    }
+    int k = rng_.uniformInt(0, shortest_path_start_goal_necessary_vertices.size()-1);
+    const Vertex vk = shortest_path_start_goal_necessary_vertices.at(k);
+    q_coset = graph[vk];
+    Q1_sampler->sampleUniformNear(state, q_coset->state, q_coset->GetRadius());
+  }else{
+    q_coset = pdf_necessary_configurations.sample(rng_.uniform01());
+    Q1_sampler->sampleUniformNear(state, q_coset->state, q_coset->GetRadius());
+  }
+  return q_coset;
 }

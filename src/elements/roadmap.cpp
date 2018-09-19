@@ -143,8 +143,13 @@ void Roadmap::DrawPlannerData(GUIState &state)
           setColor(cNeighborhoodVolume);
         }
 
+        ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
+
+        // if( si->getType() == base::STATE_SPACE_SE2 ){
+        // }
+
         bool wired = true;
-        if(quotient_space->GetDimensionality()<=2){
+        if(quotient_space->GetDimensionality()<=2 || si->getStateSpace()->getType()==ob::STATE_SPACE_SE2){
           Vector3 q2(0,0,1);
           (wired?drawWireCircle(q2, d):drawCircle(q2,d));
         }else{

@@ -721,6 +721,10 @@ void Quotient::SetLevel(uint level_)
 {
   level = level_;
 }
+Quotient::QuotientSpaceType Quotient::GetType() const
+{
+  return type;
+}
 
 bool Quotient::Sample(ob::State *q_random)
 {

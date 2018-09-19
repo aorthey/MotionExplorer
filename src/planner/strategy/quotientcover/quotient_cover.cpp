@@ -126,6 +126,17 @@ void QuotientChartCover::setup(void)
 //#############################################################################
 //Configuration methods
 //#############################################################################
+void QuotientChartCover::AddConfigurationToPDF(Configuration *q)
+{
+  PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
+  q->SetPDFElement(q_element);
+
+  if(!q->isSufficientFeasible){
+    PDF_Element *q_necessary_element = pdf_necessary_configurations.add(q, q->GetRadius());
+    q->SetNecessaryPDFElement(q_necessary_element);
+  }
+}
+
 QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCoverWithoutAddingEdges(Configuration *q)
 {
   //###########################################################################
@@ -159,12 +170,7 @@ QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCoverWithoutAdd
 
   //###########################################################################
   //(3) add to PDF
-  PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
-  q->SetPDFElement(q_element);
-  if(!q->isSufficientFeasible){
-    PDF_Element *q_necessary_element = pdf_necessary_configurations.add(q, q->GetRadius());
-    q->SetNecessaryPDFElement(q_necessary_element);
-  }
+  AddConfigurationToPDF(q);
 
   if(verbose>0) std::cout << std::string(80, '-') << std::endl;
   if(verbose>0) std::cout << "*** ADD VERTEX " << q->index << " (radius " << q->GetRadius() << ")" << std::endl;
@@ -358,6 +364,7 @@ bool QuotientChartCover::ComputeNeighborhood(Configuration *q)
     q=nullptr;
     return false;
   }
+  GetCosetFromQuotientSpace(q);
 
   return true;
 
@@ -500,7 +507,8 @@ QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundary(std::
   Configuration *q_nearest = Nearest(q_random);
   Connect(q_nearest, q_random, q_random);
   q_random->parent_neighbor = q_nearest;
-  if(q_random == q_nearest){
+  if(q_random == q_nearest)
+  {
     std::cout << "sampling invalid: nearest and random are equal" << std::endl;
     exit(0);
   }
@@ -512,7 +520,12 @@ QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundary(std::
 // Main Sample Function
 //#############################################################################
 
-QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundary(){
+QuotientChartCover::Configuration* QuotientChartCover::Sample()
+{
+  return SampleCoverBoundary();
+}
+QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundary()
+{
   Configuration *q_random;
   if(!hasSolution){
     double r = rng_.uniform01();
@@ -822,6 +835,9 @@ void QuotientChartCover::clear()
   hasSolution = false;
   q_start = nullptr;
   q_goal = nullptr;
+  shortest_path_start_goal.clear();
+  pdf_necessary_configurations.clear();
+  pdf_all_configurations.clear();
 
   pis_.restart();
 }
@@ -839,10 +855,19 @@ bool QuotientChartCover::GetSolution(ob::PathPtr &solution)
   }
   if(isConnected){
     auto gpath(std::make_shared<PathGeometric>(Q1));
-    std::vector<Vertex> vpath = GetCoverPath(v_start, v_goal);
+    shortest_path_start_goal.clear();
+    shortest_path_start_goal_necessary_vertices.clear();
+    shortest_path_start_goal = GetCoverPath(v_start, v_goal);
     gpath->clear();
-    for(uint k = 0; k < vpath.size(); k++){
-      gpath->append(graph[vpath.at(k)]->state);
+    //std::cout << "SHORTEST PATH" << std::endl;
+    for(uint k = 0; k < shortest_path_start_goal.size(); k++){
+      Configuration *q = graph[shortest_path_start_goal.at(k)];
+      //std::cout << "vertex " << q->index << " " << (q->isSufficientFeasible?"sufficient":"") << std::endl;
+      gpath->append(q->state);
+      if(!q->isSufficientFeasible)
+      {
+        shortest_path_start_goal_necessary_vertices.push_back(shortest_path_start_goal.at(k));
+      }
     }
     solution = gpath;
     return true;
@@ -894,6 +919,8 @@ void QuotientChartCover::CopyChartFromSibling( QuotientChart *sibling_chart, uin
   // vertexToIndex = sibling->vertexToIndex;
   // indexToVertex = sibling->indexToVertex;
 
+  shortest_path_start_goal = sibling->shortest_path_start_goal;
+  shortest_path_start_goal_necessary_vertices = sibling->shortest_path_start_goal_necessary_vertices;
   foreach( const Vertex v, boost::vertices(graph))
   {
     put(vertexToIndex, v, graph[v]->index);

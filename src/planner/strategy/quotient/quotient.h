@@ -39,6 +39,8 @@ namespace ompl
   {
     class Quotient: public ob::Planner
     {
+      enum QuotientSpaceType{ UNKNOWN, ATOMIC_RN, RN_RM, SE2_R2, SE3_R3, SE3RN_R3, SE3RN_SE3, SE3RN_SE3RM };
+
       public:
         const uint verbose{1};
         Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
@@ -64,6 +66,7 @@ namespace ompl
         Quotient* GetChild() const;
         uint GetLevel() const;
         void SetLevel(uint);
+        QuotientSpaceType GetType() const;
         void SetChild(Quotient *child_);
         void SetParent(Quotient *parent_);
 
@@ -87,7 +90,6 @@ namespace ompl
 
         ob::OptimizationObjectivePtr opt_;
 
-        enum QuotientSpaceType{ UNKNOWN, ATOMIC_RN, RN_RM, SE2_R2, SE3_R3, SE3RN_R3, SE3RN_SE3, SE3RN_SE3RM };
         QuotientSpaceType type;
         uint Q1_dimension;
         uint Q0_dimension;

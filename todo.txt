@@ -558,6 +558,15 @@ quotient-chart
 radius, and probably geometry. This neighborhood has to be filled up, then we
 can add it to the cover.
 [ ] problem: add configuration during momentum expansion
-
-
 [ ] Implement Zhang_2009 without deformation
+
+it seems that we are expanding the cover but do not stay in the neighborhoods in
+which we initially sampled. This means we need to adjust that somehow.
+
+Note: voronoi bias when applied to the underlying cover makes a lot of sense,
+since that is what we want: we like to expand such that we sample rapidly all
+over the cover. An adjusted voronoi bias would be perfect for that. However,
+when we do not have the luxury of using the underlying cover, then the voronoi
+bias might be misleading.
+
+[ ] implement better connection strategy!
