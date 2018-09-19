@@ -17,7 +17,7 @@ namespace ompl
       typedef og::QuotientChart BaseT;
     public:
 
-      const uint verbose{1};
+      const uint verbose{0};
 
       QuotientChartCover(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QuotientChartCover(void);

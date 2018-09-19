@@ -20,7 +20,7 @@ namespace ompl
       typedef og::QuotientChartCover BaseT;
     public:
 
-      uint verbose{0};
+      const uint verbose{1};
 
       QNG2(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QNG2(void);

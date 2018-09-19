@@ -310,7 +310,7 @@ void QuotientChartCover::RemoveConfigurationFromCover(Configuration *q)
 
   if(verbose>0) std::cout << std::string(80, '-') << std::endl;
   if(verbose>0) std::cout << "*** REMOVE VERTEX " << q->index << std::endl;
-  Q1->printState(q->state);
+  if(verbose>0) Q1->printState(q->state);
 
   //erase entry from indexmap
   Vertex vq = get(indexToVertex, q->index);
@@ -328,7 +328,6 @@ void QuotientChartCover::RemoveConfigurationFromCover(Configuration *q)
   boost::remove_vertex(vq, graph);
 
   //(3) Remove from cover graph
-  Q1->printState(q->state);
   q->Remove(Q1);
   delete q;
   q=nullptr;
@@ -849,7 +848,7 @@ bool QuotientChartCover::GetSolution(ob::PathPtr &solution)
     double d_goal = DistanceNeighborhoodNeighborhood(qn, q_goal);
     if(d_goal < 1e-10){
       q_goal->parent_neighbor = qn;
-      v_goal = AddConfigurationToCover(q_goal);
+      v_goal = AddConfigurationToCoverWithoutAddingEdges(q_goal);
       isConnected = true;
     }
   }
@@ -1027,10 +1026,6 @@ std::vector<QuotientChartCover::Vertex> QuotientChartCover::GetCoverPath(const V
         break;
     }
     std::reverse(path.begin(), path.end());
-    // std::cout << "path from" << std::endl;
-    // Q1->printState(graph[path.at(0)]->state);
-    // std::cout << "path to" << std::endl;
-    // Q1->printState(graph[path.back()]->state);
   }
   return path;
 }
