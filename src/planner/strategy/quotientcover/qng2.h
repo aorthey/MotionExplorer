@@ -21,6 +21,7 @@ namespace ompl
     public:
 
       const uint verbose{1};
+      bool firstRun{true};
 
       QNG2(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QNG2(void);

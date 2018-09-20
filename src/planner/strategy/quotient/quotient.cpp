@@ -758,8 +758,9 @@ double Quotient::GetImportance() const
 void Quotient::Print(std::ostream& out) const
 {
   out << "[QuotientSpace"<< id << "] ";
+  uint sublevel = std::max(1U, level);
   if(parent == nullptr){
-    out << "Q" << level << ": ";
+    out << "X" << sublevel << "=Q" << sublevel << ": ";
     if( Q1->getStateSpace()->getType() == ob::STATE_SPACE_SE2 ){
       out << "SE(2)";
     }else if( Q1->getStateSpace()->getType() == ob::STATE_SPACE_SE3 ){
@@ -770,7 +771,7 @@ void Quotient::Print(std::ostream& out) const
       out << "unknown";
     }
   }else{
-    out << "Q" << level << ": ";
+    out << "X" << sublevel << "=Q" << sublevel << ": ";
     switch (type) {
       case Quotient::RN_RM:
         {

@@ -1104,16 +1104,25 @@ void QuotientChartCover::Print(const Configuration *q) const
   std::cout << " | index: " << q->index;
   std::cout << " | radius: " << q->GetRadius();
   std::cout << " | coset : " << (q->coset==nullptr?"-":std::to_string(q->coset->index)) << std::endl;
+  if(q->index < 0)
+  {
+    std::cout << "[### STATE NOT MEMBER OF COVER]" << std::endl;
+  }
   if(parent != nullptr && q->coset==nullptr)
   {
     std::cout << "### STATE HAS NO COSET" << std::endl;
+    exit(0);
+  }
+  if(q->GetRadius() < minimum_neighborhood_radius)
+  {
+    std::cout << "### STATE HAS ZERO-MEASURE NEIGHBORHOOD" << std::endl;
     exit(0);
   }
 }
 void QuotientChartCover::Print(std::ostream& out) const
 {
   BaseT::Print(out);
-  out << std::endl << "     [ChartCover] has " << boost::num_vertices(graph) << " vertices and " << boost::num_edges(graph) << " edges.";
+  out << std::endl << "    [ChartCover] has " << boost::num_vertices(graph) << " vertices and " << boost::num_edges(graph) << " edges.";
 }
 
 namespace ompl{

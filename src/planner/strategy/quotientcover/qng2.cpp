@@ -27,6 +27,7 @@ QNG2::~QNG2(void)
 void QNG2::clear()
 {
   BaseT::clear();
+  firstRun = true;
 }
 
 void QNG2::setup(void)
@@ -38,7 +39,16 @@ void QNG2::Grow(double t)
 {
   if(saturated) return;
 
-  Configuration *q_random = Sample();
+  Configuration *q_random = nullptr;
+  if(firstRun){
+    q_random = new Configuration(Q1);
+    SampleGoal(q_random);
+    firstRun = false;
+  }else{
+    q_random = Sample();
+  }
+
+
   Configuration *q_nearest = Nearest(q_random);
   //############################################################################
   //project random onto neighborhood of q_nearest
@@ -50,13 +60,21 @@ void QNG2::Grow(double t)
   if(ComputeNeighborhood(q_random))
   {
     q_random->parent_neighbor = q_nearest;
-    AddConfigurationToCover(q_random);
+    AddConfigurationToCoverWithoutAddingEdges(q_random);
     ConnectRecurseLargest(q_nearest, q_random);
   }
 }
 
 void QNG2::ConnectRecurseLargest(Configuration *q_from, Configuration *q_next)
 {
+  double d_goal = DistanceNeighborhoodNeighborhood(q_next, q_goal);
+  if(d_goal < 1e-10){
+    //we reached goal
+    q_goal->parent_neighbor = q_next;
+    v_goal = AddConfigurationToCoverWithoutAddingEdges(q_goal);
+    isConnected = true;
+    return;
+  }
   //############################################################################
   //(1) analyse next configuration
   //############################################################################
@@ -67,7 +85,6 @@ void QNG2::ConnectRecurseLargest(Configuration *q_from, Configuration *q_next)
   const double d_from_to_next = DistanceConfigurationConfiguration(q_from, q_next);
   Configuration *q_extend = new Configuration(Q1);
   Q1->getStateSpace()->interpolate(q_from->state, q_next->state, 1 + radius_next/d_from_to_next, q_extend->state);
-  q_extend->parent_neighbor = q_next;
 
   if(radius_ratio > 1){
     //############################################################################
@@ -76,7 +93,7 @@ void QNG2::ConnectRecurseLargest(Configuration *q_from, Configuration *q_next)
     if(ComputeNeighborhood(q_extend))
     {
       q_extend->parent_neighbor = q_next;
-      AddConfigurationToCover(q_extend);
+      AddConfigurationToCoverWithoutAddingEdges(q_extend);
       return ConnectRecurseLargest(q_next, q_extend);
     }
   }else{
@@ -87,21 +104,27 @@ void QNG2::ConnectRecurseLargest(Configuration *q_from, Configuration *q_next)
     double largest_radius = 0;
     uint largest_idx = 0;
     std::vector<Configuration*> q_spawnlings;
+
     bool extendFeasible = ComputeNeighborhood(q_extend);
     if(extendFeasible)
     {
       q_extend->parent_neighbor = q_next;
-      AddConfigurationToCover(q_extend);
+      AddConfigurationToCoverWithoutAddingEdges(q_extend);
       q_spawnlings.push_back(q_extend);
       largest_radius = q_extend->GetRadius();
     }
     
-    for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES-1; k++)
+    for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES; k++)
     {
       Configuration *q_k = new Configuration(Q1);
 
       //directed sampling
       if(extendFeasible){
+        if(verbose>2) std::cout << std::string(80, '-') << std::endl;
+        if(verbose>2) std::cout << "extend feasible" << std::endl;
+        if(verbose>2) Print(q_from);
+        if(verbose>2) Print(q_next);
+        if(verbose>2) Print(q_extend);
         Q1_sampler->sampleUniformNear(q_k->state, q_extend->state, 0.75*radius_next);
       }else{
         SampleNeighborhoodBoundaryHalfBall(q_k, q_next);
@@ -112,8 +135,8 @@ void QNG2::ConnectRecurseLargest(Configuration *q_from, Configuration *q_next)
       if(ComputeNeighborhood(q_k))
       {
         q_k->parent_neighbor = q_next;
-        AddConfigurationToCover(q_k);
-
+        AddConfigurationToCoverWithoutAddingEdges(q_k);
+        //q_extend might have been remove here.
         q_spawnlings.push_back(q_k);
         if(largest_radius < q_k->GetRadius()){
           largest_radius = q_k->GetRadius();
@@ -132,6 +155,9 @@ void QNG2::ConnectRecurseLargest(Configuration *q_from, Configuration *q_next)
       {
         return ConnectRecurseLargest(q_next, q_spawnlings.at(largest_idx));
       }else{
+        if(verbose>2) std::cout << std::string(80, '#') << std::endl;
+        if(verbose>2) std::cout << "TERMINATE" << std::endl;
+        if(verbose>2) std::cout << std::string(80, '#') << std::endl;
         return;
       }
 
@@ -139,6 +165,9 @@ void QNG2::ConnectRecurseLargest(Configuration *q_from, Configuration *q_next)
       //############################################################################
       //(1b2) all children are infeasible => terminate
       //############################################################################
+      if(verbose>2) std::cout << std::string(80, '#') << std::endl;
+      if(verbose>2) std::cout << "TERMINATE" << std::endl;
+      if(verbose>2) std::cout << std::string(80, '#') << std::endl;
       return;
     }
   }
