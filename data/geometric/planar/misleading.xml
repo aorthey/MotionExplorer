@@ -10,9 +10,9 @@
   <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="3 2 0" rotateRPY="0 0 0"/>
   <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
   <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="-2.8 0 0" rotateRPY="0 0 0.78"/>
-  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="-2.8 0 0" rotateRPY="0 0 1.57"/>
 -->
-  <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/2droom_misleading.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
+  <!-- <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/2droom_misleading.tri" translation="0 0 0" rotateRPY="0 0 1.57"/> -->
+  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="-2.8 0 0" rotateRPY="0 0 1.57"/>
 
   <plannerinput>
 

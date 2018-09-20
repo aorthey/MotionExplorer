@@ -452,6 +452,7 @@ void QuotientChartCover::GetCosetFromQuotientSpace(Configuration *q)
 void QuotientChartCover::SampleGoal(Configuration *q)
 {
   q->state = Q1->cloneState(q_goal->state);
+  q->coset = q_goal->coset;
 }
 
 void QuotientChartCover::SampleUniform(Configuration *q)
@@ -858,7 +859,6 @@ bool QuotientChartCover::GetSolution(ob::PathPtr &solution)
     shortest_path_start_goal_necessary_vertices.clear();
     shortest_path_start_goal = GetCoverPath(v_start, v_goal);
     gpath->clear();
-    //std::cout << "SHORTEST PATH" << std::endl;
     for(uint k = 0; k < shortest_path_start_goal.size(); k++){
       Configuration *q = graph[shortest_path_start_goal.at(k)];
       //std::cout << "vertex " << q->index << " " << (q->isSufficientFeasible?"sufficient":"") << std::endl;

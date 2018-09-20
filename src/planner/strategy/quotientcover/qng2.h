@@ -13,7 +13,6 @@ namespace ompl
 {
   namespace geometric
   {
-
     //Quotient-space sufficient Neighborhood Graph planner (QNG2)
     class QNG2: public og::QuotientChartCover
     {
@@ -34,9 +33,8 @@ namespace ompl
       virtual Configuration* Sample() override;
       void ConnectRecurseLargest(Configuration *q_from, Configuration *q_next);
 
-      const double shortestPathBias{1.0};
+      const double shortestPathBias{0.0};
       uint NUMBER_OF_EXPANSION_SAMPLES{0};
-
     };
   }
 }

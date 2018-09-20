@@ -1,5 +1,6 @@
 #pragma once
 #include "planner/cspace/cspace.h"
+#include "neighborhood.h"
 
 class OMPLValidityChecker: public ob::StateValidityChecker
 {
@@ -22,16 +23,8 @@ class OMPLValidityChecker: public ob::StateValidityChecker
 
     CSpaceOMPL *cspace;
     SingleRobotCSpace *klampt_single_robot_cspace;
+    Neighborhood *neighborhood;
 };
-
-// class OMPLValidityCheckerInnerOuter: public OMPLValidityChecker
-// {
-//   public:
-//     OMPLValidityCheckerInnerOuter(const ob::SpaceInformationPtr &si, CSpaceOMPL *ompl_space_, CSpace *inner_, CSpace *outer_);
-//     virtual bool isValid(const ob::State* state) const;
-
-//     CSpace *outer;
-// };
 
 class OMPLValidityCheckerNecessarySufficient: public OMPLValidityChecker
 {

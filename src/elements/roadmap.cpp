@@ -65,6 +65,8 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
 
 void Roadmap::DrawShortestPath(GUIState &state)
 {
+  glEnable(GL_BLEND); 
+  glDisable(GL_LIGHTING);
   const std::vector<Vector3>& q = shortest_path;
   if(q.size()>1)
   {
@@ -78,6 +80,8 @@ void Roadmap::DrawShortestPath(GUIState &state)
     }
     glPopMatrix();
   }
+  glEnable(GL_LIGHTING);
+  glDisable(GL_BLEND); 
 }
 
 void Roadmap::DrawPlannerData(GUIState &state)
@@ -88,6 +92,7 @@ void Roadmap::DrawPlannerData(GUIState &state)
   for(uint vidx = 0; vidx < pd->numVertices(); vidx++)
   {
     glPointSize(sizeVertex);
+    glLineWidth(widthEdge);
     setColor(cVertex);
     glPushMatrix();
 
@@ -118,7 +123,6 @@ void Roadmap::DrawPlannerData(GUIState &state)
       }
 
       double d = v->GetOpenNeighborhoodDistance();
-      //bool startOrGoal = pd->isStartVertex(vidx) || pd->isGoalVertex(vidx);
 
       if(state("draw_roadmap_vertices")){
         if(!v->IsInfeasible()){
@@ -148,12 +152,11 @@ void Roadmap::DrawPlannerData(GUIState &state)
         // if( si->getType() == base::STATE_SPACE_SE2 ){
         // }
 
-        bool wired = true;
         if(quotient_space->GetDimensionality()<=2 || si->getStateSpace()->getType()==ob::STATE_SPACE_SE2){
           Vector3 q2(0,0,1);
-          (wired?drawWireCircle(q2, d):drawCircle(q2,d));
+          (wiredNeighborhood?drawWireCircle(q2, d):drawCircle(q2,d));
         }else{
-          (wired?drawWireSphere(d, 16):drawSphere(d, 16, 8));
+          (wiredNeighborhood?drawWireSphere(d, 16):drawSphere(d, 16, 8));
         }
       }
 
@@ -258,17 +261,10 @@ void Roadmap::DrawPlannerData(GUIState &state)
 
 void Roadmap::DrawGL(GUIState& state)
 {
-  glDisable(GL_LIGHTING);
-  glEnable(GL_BLEND); 
-
+  if(pd!=nullptr) DrawPlannerData(state);
   if(state("draw_roadmap_shortest_path")){
     DrawShortestPath(state);
   }
-  if(pd!=nullptr) DrawPlannerData(state);
-
-  glEnable(GL_LIGHTING);
-  glDisable(GL_BLEND); 
-
 }
 
 bool Roadmap::Save(const char* fn)

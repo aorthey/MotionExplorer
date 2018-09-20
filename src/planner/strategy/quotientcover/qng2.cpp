@@ -48,7 +48,6 @@ void QNG2::Grow(double t)
     q_random = Sample();
   }
 
-
   Configuration *q_nearest = Nearest(q_random);
   //############################################################################
   //project random onto neighborhood of q_nearest
@@ -65,24 +64,28 @@ void QNG2::Grow(double t)
   }
 }
 
+//@brief: move towards q_next, but prefer configuration with largest neighborhood (potential function like expansion).
+//Stop if next neighborhood is significantly smaller (10 percent), if an
+//obstacle is hit (all neighborhoods infeasible), or if the goal has been
+//reached
 void QNG2::ConnectRecurseLargest(Configuration *q_from, Configuration *q_next)
 {
-  double d_goal = DistanceNeighborhoodNeighborhood(q_next, q_goal);
+  const double d_goal = DistanceNeighborhoodNeighborhood(q_next, q_goal);
   if(d_goal < 1e-10){
-    //we reached goal
     q_goal->parent_neighbor = q_next;
     v_goal = AddConfigurationToCoverWithoutAddingEdges(q_goal);
     isConnected = true;
     return;
   }
+
   //############################################################################
   //(1) analyse next configuration
   //############################################################################
   const double radius_from = q_from->GetRadius();
   const double radius_next = q_next->GetRadius();
   const double radius_ratio = radius_next / radius_from;
-
   const double d_from_to_next = DistanceConfigurationConfiguration(q_from, q_next);
+
   Configuration *q_extend = new Configuration(Q1);
   Q1->getStateSpace()->interpolate(q_from->state, q_next->state, 1 + radius_next/d_from_to_next, q_extend->state);
 
@@ -136,7 +139,6 @@ void QNG2::ConnectRecurseLargest(Configuration *q_from, Configuration *q_next)
       {
         q_k->parent_neighbor = q_next;
         AddConfigurationToCoverWithoutAddingEdges(q_k);
-        //q_extend might have been remove here.
         q_spawnlings.push_back(q_k);
         if(largest_radius < q_k->GetRadius()){
           largest_radius = q_k->GetRadius();
@@ -171,10 +173,8 @@ void QNG2::ConnectRecurseLargest(Configuration *q_from, Configuration *q_next)
       return;
     }
   }
-
-
-
 }
+
 
 //############################################################################
 //Quotient Space Sampling Strategies
@@ -190,8 +190,8 @@ QNG2::Configuration* QNG2::Sample()
       SampleUniform(q_random);
     }
   }else{
-    std::cout << "hasSolution sampler NYI"<< std::endl;
-    exit(0);
+    SampleUniform(q_random);
+    std::cout << "TODO: Phase2 Sampler only uses uniform."<< std::endl;
   }
   return q_random;
 }

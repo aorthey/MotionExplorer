@@ -569,4 +569,5 @@ over the cover. An adjusted voronoi bias would be perfect for that. However,
 when we do not have the luxury of using the underlying cover, then the voronoi
 bias might be misleading.
 
-[ ] implement better connection strategy!
+[x] implement better connection strategy!
+[ ] neighborhood not correct for rigid body

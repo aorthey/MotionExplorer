@@ -1,9 +1,51 @@
+#include "neighborhood_RN.h"
+#include "neighborhood_SE2.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
+#include <ompl/base/StateSpaceTypes.h>
 
 OMPLValidityChecker::OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_):
   ob::StateValidityChecker(si), cspace(cspace_)
 {
   klampt_single_robot_cspace = static_cast<SingleRobotCSpace*>(cspace_->GetCSpaceKlamptPtr());
+
+  //set neighborhood
+  int space_type = cspace->SpaceInformationPtr()->getStateSpace()->getType();
+  if(cspace->isFreeFloating()){
+    uint n = cspace->GetDimensionality();
+    if(space_type == ob::STATE_SPACE_REAL_VECTOR && n<=3){
+      //rotational invariant rigid object
+      std::cout << "R" << n << " neighborhood" << std::endl;
+      neighborhood = new NeighborhoodRN();
+    }else if(space_type == ob::STATE_SPACE_SE2){
+      std::cout << "SE2 neighborhood" << std::endl;
+      neighborhood = new NeighborhoodSE2();
+    }else if(space_type == ob::STATE_SPACE_SE3){
+      std::cout << "Do not know how to compute a neighborhood for type " << space_type << std::endl;
+      exit(0);
+    }else{
+      std::cout << "Do not know how to compute a neighborhood for type " << space_type << std::endl;
+      exit(0);
+    }
+  }else{
+    if(space_type==ob::STATE_SPACE_REAL_VECTOR){
+      std::cout << "Do not know how to compute a neighborhood for type " << space_type << std::endl;
+      std::cout << "NYI" << std::endl;
+      exit(0);
+    }else{
+      std::cout << "Do not know how to compute a neighborhood for type " << space_type << std::endl;
+      exit(0);
+    }
+
+  }
+    //STATE_SPACE_UNKNOWN = 0,
+    //STATE_SPACE_REAL_VECTOR = 1,
+    //STATE_SPACE_SO2 = 2,
+    //STATE_SPACE_SO3 = 3,
+    //STATE_SPACE_SE2 = 4,
+    //STATE_SPACE_SE3 = 5,
+    //STATE_SPACE_TIME = 6,
+    //STATE_SPACE_DISCRETE = 7,
+
 }
 
 CSpaceOMPL* OMPLValidityChecker::GetCSpaceOMPLPtr() const
@@ -57,7 +99,7 @@ double OMPLValidityChecker::DistanceToRobot(const ob::State* state, SingleRobotC
   int closest1, closest2;
   double d = space->settings->DistanceLowerBound(space->world, idrobot, idothers, 0, dInf, &closest1, &closest2);
 
-  return d;
+  return neighborhood->WorkspaceDistanceToConfigurationSpaceDistance(d);
 }
 
 
@@ -125,5 +167,6 @@ bool OMPLValidityCheckerNecessarySufficient::IsSufficientFeasible(const ob::Stat
 
 double OMPLValidityCheckerNecessarySufficient::SufficientDistance(const ob::State* state) const
 {
-  return DistanceToRobot(state, klampt_single_robot_cspace_outer_approximation);
+  double dw = DistanceToRobot(state, klampt_single_robot_cspace_outer_approximation);
+  return neighborhood->WorkspaceDistanceToConfigurationSpaceDistance(dw);
 }

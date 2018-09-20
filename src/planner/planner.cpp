@@ -329,7 +329,7 @@ void MotionPlanner::DrawGL(GUIState& state){
   //uint N = hierarchy->NumberNodesOnLevel(current_level);
   Rcurrent = hierarchy->GetNodeContent(current_path);
   Rcurrent->DrawGL(state);
-  if(pwl) pwl->DrawGL(state);
+  //if(pwl) pwl->DrawGL(state);
 
   uint ridx = hierarchy->GetRobotIdx(current_level);
   Robot* robot = world->robots[ridx];
