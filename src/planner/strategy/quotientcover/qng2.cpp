@@ -1,4 +1,5 @@
 #include "common.h"
+
 #include "qng2.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
@@ -16,7 +17,7 @@ using namespace ompl::geometric;
 QNG2::QNG2(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
   setName("QNG2"+std::to_string(id));
-  NUMBER_OF_EXPANSION_SAMPLES = Q1->getStateDimension()+1;
+  NUMBER_OF_EXPANSION_SAMPLES = Q1->getStateDimension()+2;
   std::cout << "Number of expansion samples: " << NUMBER_OF_EXPANSION_SAMPLES << std::endl;
 }
 
@@ -41,199 +42,89 @@ void QNG2::Grow(double t)
 
   Configuration *q_random = Sample();
   Configuration *q_nearest = Nearest(q_random);
-
-  //############################################################################
-  //project random onto neighborhood of q_nearest (TODO: might not be a good
-  //idea actually. Better keep q_random, and interpolate towards q_random, but
-  //stop at neighborhood
-  //############################################################################
-
   Connect(q_nearest, q_random);
-
-  // const double radius_nearest = q_nearest->GetRadius();
-  // double d = DistanceConfigurationConfiguration(q_nearest, q_random);
-  // Q1->getStateSpace()->interpolate(q_nearest->state, q_random->state, radius_nearest/d, q_random->state);
-
-  // if(ComputeNeighborhood(q_random))
-  // {
-  //   q_random->parent_neighbor = q_nearest;
-  //   AddConfigurationToCoverWithoutAddingEdges(q_random);
-  //   ConnectRecurseLargest(q_nearest, q_random);
-  // }
 }
 
-void QNG2::Connect(const Configuration *q_from, const Configuration *q_next)
+void QNG2::Connect(Configuration *q_from, Configuration *q_next)
 {
+  //terminate condition (1) reached q_next
+  const double d_from_to_next = DistanceNeighborhoodNeighborhood(q_from, q_next);
+  if(d_from_to_next < 1e-10){
+    if(ComputeNeighborhood(q_next)){
+      q_next->parent_neighbor = q_from;
+      AddConfigurationToCoverWithoutAddingEdges(q_next);
+    }
+    return;
+  }
 
-  Configuration *q_step = ProjectConfigurationOntoNeighborhoodBoundary(q_from, q_next);
+  std::vector<Configuration*> q_children = GenerateCandidateDirections(q_from, q_next);
 
-  std::vector<Configuration*> q_children = GenerateCandidateDirections();
+  double radius_largest = 0;
+  uint idx_largest = 0;
+  for(uint k = 0; k < q_children.size(); k++)
+  {
+    Configuration *q_k = q_children.at(k);
+    double r = q_k->GetRadius();
+    if(r > radius_largest)
+    {
+      radius_largest = r;
+      idx_largest = k;
+    }
+    q_k->parent_neighbor = q_from;
+    AddConfigurationToCoverWithoutAddingEdges(q_k);
+  }
 
+  //terminate conditions
+  //(1) next neighborhood too small
+  if(radius_largest < 0.1*q_from->GetRadius()) return;
+
+  //(3) no feasible neighborhoods
+  if(!q_children.empty())
+  {
+    return Connect(q_children.at(idx_largest), q_next);
+  }
 }
-std::vector<Configuration*> GenerateCandidateDirections(Configuration *q_from, Configuration *q_next)
+std::vector<QuotientChartCover::Configuration*> QNG2::GenerateCandidateDirections(Configuration *q_from, Configuration *q_next)
 {
   std::vector<Configuration*> q_children;
 
+  //            \                                           |
+  //             \q_k                                       |
+  //              \                                         |
+  // q_from        |q_proj                      q_next      |
+  //              /                                         |
+  //             /                                          |
   Configuration *q_proj = new Configuration(Q1);
-  const double radius_neighborhood = q_from->GetRadius();
+  const double radius_from = q_from->GetRadius();
   double d = DistanceConfigurationConfiguration(q_from, q_next);
-  Q1->getStateSpace()->interpolate(q_from->state, q_next->state, radius_neighborhood/d, q_proj->state);
-  Interpolate(q_from, q_to, 
+  Q1->getStateSpace()->interpolate(q_from->state, q_next->state, radius_from/d, q_proj->state);
 
   bool isProjectedFeasible = ComputeNeighborhood(q_proj);
   if(isProjectedFeasible)
   {
-    q_proj->parent_neighbor = q;
+    q_proj->parent_neighbor = q_from;
     q_children.push_back(q_proj);
   }
   for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES; k++){
     Configuration *q_k = new Configuration(Q1);
 
     if(isProjectedFeasible){
-      Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.75*q_proj->GetRadius());
+      Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.5*q_from->GetRadius());
     }else{
       SampleNeighborhoodBoundaryHalfBall(q_k, q_from);
     }
-    const double d_next_to_k = DistanceConfigurationConfiguration(q_next, q_k);
-    Q1->getStateSpace()->interpolate(q_next->state, q_k->state, radius_next/d_next_to_k, q_k->state);
+    //SampleNeighborhoodBoundaryHalfBall(q_k, q_from);
+
+    const double d_from_to_k = DistanceConfigurationConfiguration(q_from, q_k);
+    Q1->getStateSpace()->interpolate(q_from->state, q_k->state, radius_from/d_from_to_k, q_k->state);
 
     if(ComputeNeighborhood(q_k))
     {
-      q_k->parent_neighbor = q_next;
-      AddConfigurationToCoverWithoutAddingEdges(q_k);
-      q_spawnlings.push_back(q_k);
-      if(largest_radius < q_k->GetRadius()){
-        largest_radius = q_k->GetRadius();
-        largest_idx = q_spawnlings.size()-1;
-      }
+      q_k->parent_neighbor = q_from;
+      q_children.push_back(q_k);
     }
   }
-}
-
-Configuration* QNG2::ProjectConfigurationOntoNeighborhoodBoundary(Configuration *q, Configuration *q_outside)
-{
-  Configuration *q_proj = new Configuration(Q1);
-  const double radius_neighborhood = q->GetRadius();
-  double d = DistanceConfigurationConfiguration(q, q_outside);
-  Q1->getStateSpace()->interpolate(q->state, q_outside->state, radius_neighborhood/d, q_proj->state);
-
-  if(ComputeNeighborhood(q_proj))
-  {
-    q_proj->parent_neighbor = q;
-    AddConfigurationToCoverWithoutAddingEdges(q_random);
-    ConnectRecurseLargest(q_nearest, q_random);
-  }
-}
-
-//@brief: move towards q_next, but prefer configuration with largest neighborhood (potential function like expansion).
-//Stop if next neighborhood is significantly smaller (10 percent), if an
-//obstacle is hit (all neighborhoods infeasible), or if the goal has been
-//reached
-void QNG2::ConnectRecurseLargest(Configuration *q_from, Configuration *q_next)
-{
-  const double d_goal = DistanceNeighborhoodNeighborhood(q_next, q_goal);
-  if(d_goal < 1e-10){
-    q_goal->parent_neighbor = q_next;
-    v_goal = AddConfigurationToCoverWithoutAddingEdges(q_goal);
-    isConnected = true;
-    return;
-  }
-
-  //############################################################################
-  //(1) analyse next configuration
-  //############################################################################
-  const double radius_from = q_from->GetRadius();
-  const double radius_next = q_next->GetRadius();
-  const double radius_ratio = radius_next / radius_from;
-  const double d_from_to_next = DistanceConfigurationConfiguration(q_from, q_next);
-
-  Configuration *q_extend = new Configuration(Q1);
-  Q1->getStateSpace()->interpolate(q_from->state, q_next->state, 1 + radius_next/d_from_to_next, q_extend->state);
-
-  if(radius_ratio > 1){
-    //############################################################################
-    //(1a) next configuration is larger or on isoline => terminate and go into that direction
-    //############################################################################
-    if(ComputeNeighborhood(q_extend))
-    {
-      q_extend->parent_neighbor = q_next;
-      AddConfigurationToCoverWithoutAddingEdges(q_extend);
-      return ConnectRecurseLargest(q_next, q_extend);
-    }
-  }else{
-    //############################################################################
-    //(1b) next configuration is smaller or equal => spawn M configurations,
-    //and go into the largest direction from there
-    //############################################################################
-    double largest_radius = 0;
-    uint largest_idx = 0;
-    std::vector<Configuration*> q_spawnlings;
-
-    bool extendFeasible = ComputeNeighborhood(q_extend);
-    if(extendFeasible)
-    {
-      q_extend->parent_neighbor = q_next;
-      AddConfigurationToCoverWithoutAddingEdges(q_extend);
-      q_spawnlings.push_back(q_extend);
-      largest_radius = q_extend->GetRadius();
-    }
-    
-    for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES; k++)
-    {
-      Configuration *q_k = new Configuration(Q1);
-
-      //directed sampling
-      if(extendFeasible){
-        if(verbose>2) std::cout << std::string(80, '-') << std::endl;
-        if(verbose>2) std::cout << "extend feasible" << std::endl;
-        if(verbose>2) Print(q_from);
-        if(verbose>2) Print(q_next);
-        if(verbose>2) Print(q_extend);
-        Q1_sampler->sampleUniformNear(q_k->state, q_extend->state, 0.75*radius_next);
-      }else{
-        SampleNeighborhoodBoundaryHalfBall(q_k, q_next);
-      }
-      const double d_next_to_k = DistanceConfigurationConfiguration(q_next, q_k);
-      Q1->getStateSpace()->interpolate(q_next->state, q_k->state, radius_next/d_next_to_k, q_k->state);
-
-      if(ComputeNeighborhood(q_k))
-      {
-        q_k->parent_neighbor = q_next;
-        AddConfigurationToCoverWithoutAddingEdges(q_k);
-        q_spawnlings.push_back(q_k);
-        if(largest_radius < q_k->GetRadius()){
-          largest_radius = q_k->GetRadius();
-          largest_idx = q_spawnlings.size()-1;
-        }
-      }
-    }
-    if(!q_spawnlings.empty())
-    {
-      //############################################################################
-      //(1b1) expand into direction of configuration with largest neighborhood
-      //-- if neighborhood is rapidly decreasing, then we are near obstacles,
-      //=> terminate
-      //############################################################################
-      if(largest_radius >= 0.1*q_next->GetRadius())
-      {
-        return ConnectRecurseLargest(q_next, q_spawnlings.at(largest_idx));
-      }else{
-        if(verbose>2) std::cout << std::string(80, '#') << std::endl;
-        if(verbose>2) std::cout << "TERMINATE" << std::endl;
-        if(verbose>2) std::cout << std::string(80, '#') << std::endl;
-        return;
-      }
-
-    }else{
-      //############################################################################
-      //(1b2) all children are infeasible => terminate
-      //############################################################################
-      if(verbose>2) std::cout << std::string(80, '#') << std::endl;
-      if(verbose>2) std::cout << "TERMINATE" << std::endl;
-      if(verbose>2) std::cout << std::string(80, '#') << std::endl;
-      return;
-    }
-  }
+  return q_children;
 }
 
 void QNG2::AddConfigurationToPDF(Configuration *q)

@@ -29,9 +29,12 @@ namespace ompl
       virtual void clear() override;
 
       virtual void AddConfigurationToPDF(Configuration *q) override;
+
       virtual Configuration* SampleQuotientCover(ob::State *state) override;
       virtual Configuration* Sample() override;
-      void ConnectRecurseLargest(Configuration *q_from, Configuration *q_next);
+
+      void Connect(Configuration *q_from, Configuration *q_next);
+      std::vector<Configuration*> GenerateCandidateDirections(Configuration *q_from, Configuration *q_next);
 
       const double shortestPathBias{0.0};
       uint NUMBER_OF_EXPANSION_SAMPLES{0};

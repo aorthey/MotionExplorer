@@ -571,3 +571,8 @@ bias might be misleading.
 
 [x] implement better connection strategy!
 [ ] neighborhood not correct for rigid body
+
+[ ] quotient(space) -> quotientcover -> quotientcoversampler ->
+quotientcoverinterpolator
+[ ] goto goal, but constrained towards higher distance function values
+(projection onto hyperplane, i.e. going orthogonal is allowed

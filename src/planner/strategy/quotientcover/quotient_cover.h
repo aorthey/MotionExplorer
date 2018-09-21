@@ -235,7 +235,10 @@ namespace ompl
       bool GetSolution(ob::PathPtr &solution) override;
 
       virtual double GetImportance() const override;
-      bool Interpolate(const Configuration *q_from, Configuration *q_to);
+
+      bool Interpolate(const Configuration*, Configuration*);
+      bool Interpolate(const Configuration*, const Configuration*, Configuration*);
+      bool Interpolate(const Configuration*, const Configuration*, double step_size, Configuration*);
 
       //#######################################################################
       //Neighborhood Set Computations

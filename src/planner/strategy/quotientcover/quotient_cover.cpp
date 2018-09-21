@@ -705,59 +705,59 @@ bool QuotientChartCover::Interpolate(const Configuration *q_from, const Configur
     Q1->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_interp->state);
   }else{
     //interpolate along cover on Q0 plus interpolate along X1
-    ob::State *s_fromX1 = X1->allocState();
-    ob::State *s_fromQ0 = Q0->allocState();
-    ExtractX1Subspace(q_from->state, s_fromX1);
-    ExtractQ0Subspace(q_from->state, s_fromQ0);
-    ob::State *s_toX1 = X1->allocState();
-    ob::State *s_toQ0 = Q0->allocState();
-    ExtractX1Subspace(q_to->state, s_toX1);
-    ExtractQ0Subspace(q_to->state, s_toQ0);
-    ob::State *s_interpX1 = X1->allocState();
-    ob::State *s_interpQ0 = Q0->allocState();
-    ExtractX1Subspace(q_interp->state, s_interpX1);
-    ExtractQ0Subspace(q_interp->state, s_interpQ0);
+    //ob::State *s_fromX1 = X1->allocState();
+    //ob::State *s_fromQ0 = Q0->allocState();
+    //ExtractX1Subspace(q_from->state, s_fromX1);
+    //ExtractQ0Subspace(q_from->state, s_fromQ0);
+    //ob::State *s_toX1 = X1->allocState();
+    //ob::State *s_toQ0 = Q0->allocState();
+    //ExtractX1Subspace(q_to->state, s_toX1);
+    //ExtractQ0Subspace(q_to->state, s_toQ0);
+    //ob::State *s_interpX1 = X1->allocState();
+    //ob::State *s_interpQ0 = Q0->allocState();
+    //ExtractX1Subspace(q_interp->state, s_interpX1);
+    //ExtractQ0Subspace(q_interp->state, s_interpQ0);
 
-    double dX1 = X1->distance(s_fromX1, s_toX1);
-    double d = Q1->distance(q_from->state, q_to->state);
-    double step_size_X1 = dX1*step_size/d;
-    X1->getStateSpace()->interpolate(s_fromX1, s_toX1, step_size_X1, s_interpX1);
-    double step_size_Q0 = sqrtf(step_size*step_size - step_size_X1*step_size_X1);
+    //double dX1 = X1->distance(s_fromX1, s_toX1);
+    //double d = Q1->distance(q_from->state, q_to->state);
+    //double step_size_X1 = dX1*step_size/d;
+    //X1->getStateSpace()->interpolate(s_fromX1, s_toX1, step_size_X1, s_interpX1);
+    //double step_size_Q0 = sqrtf(step_size*step_size - step_size_X1*step_size_X1);
 
-    if(step_size_Q0 <= 0){
-      std::cout << "distance is zero" << std::endl;
-      exit(0);
-    }
+    //if(step_size_Q0 <= 0){
+    //  std::cout << "distance is zero" << std::endl;
+    //  exit(0);
+    //}
 
-    og::QuotientChartCover *qcc_parent = static_cast<og::QuotientChartCover*>(parent);
-    const Vertex v_from = get(indexToVertex, q_from->index);
-    const Vertex v_to = get(indexToVertex, q_to->index);
-    std::vector<Vertex> cpath = qcc_parent->GetCoverPath(v_from, v_to);
+    //og::QuotientChartCover *qcc_parent = static_cast<og::QuotientChartCover*>(parent);
+    //const Vertex v_from = get(indexToVertex, q_from->index);
+    //const Vertex v_to = get(indexToVertex, q_to->index);
+    //std::vector<Vertex> cpath = qcc_parent->GetCoverPath(v_from, v_to);
 
-    std::vector<Configuration*> qpath = qcc_parent->GetCoverPath(q_from->coset, q_to->coset);
-    double length_shortest_path_Q0 = 0.0;
-
-
-
-    for(uint k = 1; k < ; k++){
-    }
+    //std::vector<Configuration*> qpath = qcc_parent->GetCoverPath(q_from->coset, q_to->coset);
+    //double length_shortest_path_Q0 = 0.0;
 
 
 
-    double d_from_coset = Q0->distance(s_fromQ0, q_from->coset->state);
-    if(d_from_coset > step_size_Q0)
-    {
-    }
+    //for(uint k = 1; k < ; k++){
+    //}
 
 
-    qcc_parent->InterpolateCover(q_from->coset, q_to->coset, step_size_Q0, q_interp->coset)
 
-    Q0->freeState(s_interpQ0);
-    X1->freeState(s_interpX1);
-    Q0->freeState(s_toQ0);
-    X1->freeState(s_toX1);
-    Q0->freeState(s_fromQ0);
-    X1->freeState(s_fropX1);
+    //double d_from_coset = Q0->distance(s_fromQ0, q_from->coset->state);
+    //if(d_from_coset > step_size_Q0)
+    //{
+    //}
+
+
+    //qcc_parent->InterpolateCover(q_from->coset, q_to->coset, step_size_Q0, q_interp->coset)
+
+    //Q0->freeState(s_interpQ0);
+    //X1->freeState(s_interpX1);
+    //Q0->freeState(s_toQ0);
+    //X1->freeState(s_toX1);
+    //Q0->freeState(s_fromQ0);
+    //X1->freeState(s_fropX1);
     std::cout << "Interpolate(): NYI" << std::endl;
     exit(0);
 
@@ -1040,15 +1040,14 @@ private:
   Vertex m_goal;
 };
 
-//TODO: cache results here
-std::vector<Configuration*> QuotientChartCover::GetCoverPath(const Configuration *q_source, const Configuration *q_sink)
+std::vector<QuotientChartCover::Configuration*> QuotientChartCover::GetCoverPath(const Configuration *q_source, const Configuration *q_sink)
 {
   const Vertex v_source = get(indexToVertex, q_source->index);
   const Vertex v_sink = get(indexToVertex, q_sink->index);
   std::vector<Vertex> v_path = GetCoverPath(v_source, v_sink);
   std::vector<Configuration*> q_path;
   for(uint k = 0; k < v_path.size(); k++){
-    q_path.push_back(graph[v_path]);
+    q_path.push_back(graph[v_path.at(k)]);
   }
   return q_path;
 }
