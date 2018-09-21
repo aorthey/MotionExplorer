@@ -248,7 +248,9 @@ namespace ompl
       //#######################################################################
       //Cover Algorithms
       //#######################################################################
-      std::vector<Vertex> GetCoverPath(const Vertex& start, const Vertex& goal);
+      std::vector<Vertex> GetCoverPath(const Vertex& v_source, const Vertex& v_sink);
+      std::vector<Configuration*> GetCoverPath(const Configuration *q_source, const Configuration *q_sink);
+
       Configuration* Nearest(Configuration *q) const;
 
       virtual void getPlannerDataAnnotated(base::PlannerData &data) const override;

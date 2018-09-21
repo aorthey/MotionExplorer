@@ -687,19 +687,77 @@ QuotientChartCover::Configuration* QuotientChartCover::Nearest(Configuration *q)
 
 //@TODO: should be fixed to reflect the distance on the underlying
 //quotient-space, i.e. similar to QMPConnect. For now we use DistanceQ1
+
 bool QuotientChartCover::Interpolate(const Configuration *q_from, Configuration *q_to)
 {
+  return Interpolate(q_from, q_to, q_to);
+}
+
+bool QuotientChartCover::Interpolate(const Configuration *q_from, const Configuration *q_to, Configuration *q_interp)
+{
+  double d = DistanceConfigurationConfiguration(q_from, q_to);
+  double radius = q_from->GetRadius();
+  return Interpolate(q_from, q_to, radius/d, q_interp);
+}
+bool QuotientChartCover::Interpolate(const Configuration *q_from, const Configuration *q_to, double step_size, Configuration *q_interp)
+{
   if(parent==nullptr){
-    double d = DistanceQ1(q_from, q_to);
-    double radius = q_from->GetRadius();
-    double step_size = radius/d;
-    Q1->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_to->state);
+    Q1->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_interp->state);
   }else{
+    //interpolate along cover on Q0 plus interpolate along X1
+    ob::State *s_fromX1 = X1->allocState();
+    ob::State *s_fromQ0 = Q0->allocState();
+    ExtractX1Subspace(q_from->state, s_fromX1);
+    ExtractQ0Subspace(q_from->state, s_fromQ0);
+    ob::State *s_toX1 = X1->allocState();
+    ob::State *s_toQ0 = Q0->allocState();
+    ExtractX1Subspace(q_to->state, s_toX1);
+    ExtractQ0Subspace(q_to->state, s_toQ0);
+    ob::State *s_interpX1 = X1->allocState();
+    ob::State *s_interpQ0 = Q0->allocState();
+    ExtractX1Subspace(q_interp->state, s_interpX1);
+    ExtractQ0Subspace(q_interp->state, s_interpQ0);
+
+    double dX1 = X1->distance(s_fromX1, s_toX1);
+    double d = Q1->distance(q_from->state, q_to->state);
+    double step_size_X1 = dX1*step_size/d;
+    X1->getStateSpace()->interpolate(s_fromX1, s_toX1, step_size_X1, s_interpX1);
+    double step_size_Q0 = sqrtf(step_size*step_size - step_size_X1*step_size_X1);
+
+    if(step_size_Q0 <= 0){
+      std::cout << "distance is zero" << std::endl;
+      exit(0);
+    }
+
     og::QuotientChartCover *qcc_parent = static_cast<og::QuotientChartCover*>(parent);
     const Vertex v_from = get(indexToVertex, q_from->index);
     const Vertex v_to = get(indexToVertex, q_to->index);
     std::vector<Vertex> cpath = qcc_parent->GetCoverPath(v_from, v_to);
 
+    std::vector<Configuration*> qpath = qcc_parent->GetCoverPath(q_from->coset, q_to->coset);
+    double length_shortest_path_Q0 = 0.0;
+
+
+
+    for(uint k = 1; k < ; k++){
+    }
+
+
+
+    double d_from_coset = Q0->distance(s_fromQ0, q_from->coset->state);
+    if(d_from_coset > step_size_Q0)
+    {
+    }
+
+
+    qcc_parent->InterpolateCover(q_from->coset, q_to->coset, step_size_Q0, q_interp->coset)
+
+    Q0->freeState(s_interpQ0);
+    X1->freeState(s_interpX1);
+    Q0->freeState(s_toQ0);
+    X1->freeState(s_toX1);
+    Q0->freeState(s_fromQ0);
+    X1->freeState(s_fropX1);
     std::cout << "Interpolate(): NYI" << std::endl;
     exit(0);
 
@@ -753,6 +811,9 @@ double QuotientChartCover::DistanceConfigurationConfiguration(const Configuratio
     //metric defined by distance on cover of quotient-space plus distance on the
     //subspace Q1/Q0
     og::QuotientChartCover *parent_chart = dynamic_cast<og::QuotientChartCover*>(parent);
+    //TODO: needs to be adjusted, so that the shortest path has first element
+    //q_from, and last element q_to, not their cosets. otherwise metric is
+    //invalid over small distances
     return parent_chart->DistanceConfigurationConfigurationCover(q_from->coset, q_to->coset)+DistanceX1(q_from, q_to);
   }
 }
@@ -979,7 +1040,19 @@ private:
   Vertex m_goal;
 };
 
-std::vector<QuotientChartCover::Vertex> QuotientChartCover::GetCoverPath(const Vertex& start, const Vertex& goal)
+//TODO: cache results here
+std::vector<Configuration*> QuotientChartCover::GetCoverPath(const Configuration *q_source, const Configuration *q_sink)
+{
+  const Vertex v_source = get(indexToVertex, q_source->index);
+  const Vertex v_sink = get(indexToVertex, q_sink->index);
+  std::vector<Vertex> v_path = GetCoverPath(v_source, v_sink);
+  std::vector<Configuration*> q_path;
+  for(uint k = 0; k < v_path.size(); k++){
+    q_path.push_back(graph[v_path]);
+  }
+  return q_path;
+}
+std::vector<QuotientChartCover::Vertex> QuotientChartCover::GetCoverPath(const Vertex& v_source, const Vertex& v_sink)
 {
   std::vector<Vertex> path;
   std::vector<Vertex> prev(boost::num_vertices(graph));
@@ -988,21 +1061,20 @@ std::vector<QuotientChartCover::Vertex> QuotientChartCover::GetCoverPath(const V
 
   //check that vertices exists in graph
   if(verbose>3) std::cout << std::string(80, '-') << std::endl;
-  if(verbose>3) std::cout << "searching from " << get(vertexToIndex, start) << " to " << get(vertexToIndex, goal) << std::endl;
-  if(verbose>3) Q1->printState(graph[start]->state);
-  if(verbose>3) Q1->printState(graph[goal]->state);
+  if(verbose>3) std::cout << "searching from " << get(vertexToIndex, v_source) << " to " << get(vertexToIndex, v_sink) << std::endl;
+  if(verbose>3) Q1->printState(graph[v_source]->state);
+  if(verbose>3) Q1->printState(graph[v_sink]->state);
   if(verbose>3) std::cout << graph << std::endl;
 
   try{
-    boost::astar_search(graph, start,
-                    [this, goal](const Vertex &v)
+    boost::astar_search(graph, v_source,
+                    [this, v_sink](const Vertex &v)
                     {
-                        return ob::Cost(DistanceQ1(graph[v], graph[goal]));
+                        return ob::Cost(DistanceQ1(graph[v], graph[v_sink]));
                     },
-                    //boost::predecessor_map(&prev[0])
                       predecessor_map(predecessor)
                       .weight_map(weight)
-                      .visitor(astar_goal_visitor<Vertex>(goal))
+                      .visitor(astar_goal_visitor<Vertex>(v_sink))
                       .vertex_index_map(vertexToIndex)
                       .distance_compare([this](EdgeInternalState c1, EdgeInternalState c2)
                                         {
@@ -1016,7 +1088,7 @@ std::vector<QuotientChartCover::Vertex> QuotientChartCover::GetCoverPath(const V
                       .distance_zero(opt_->identityCost())
                     );
   }catch(found_goal fg){
-    for(Vertex v = goal;; v = prev[get(vertexToIndex, v)])
+    for(Vertex v = v_sink;; v = prev[get(vertexToIndex, v)])
     {
       path.push_back(v);
       if(verbose>3)std::cout << std::string(80, '-') << std::endl;
