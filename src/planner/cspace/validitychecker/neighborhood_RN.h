@@ -4,8 +4,8 @@
 struct NeighborhoodRN: public Neighborhood
 {
   NeighborhoodRN() = default;
-  double WorkspaceDistanceToConfigurationSpaceDistance(double d) override
+  double ComputeNeighborhoodConstant() override
   {
-    return d;
+    return 1;
   }
 };

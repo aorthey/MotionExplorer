@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 
 <world>
-
   <robot name="Lshape" file="/home/aorthey/git/orthoklampt/data/robots/PlanarLshape.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
   <robot name="disk_inner" file="/home/aorthey/git/orthoklampt/data/robots/PlanarLshape_cylinder_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
   <robot name="disk_outer" file="/home/aorthey/git/orthoklampt/data/robots/PlanarLshape_cylinder_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
@@ -21,7 +20,7 @@
     <se3min config="6  -4.0 -4.0 -1.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +4.0 +4.0 +1.0 +3.141593 +1.57 +3.141593"/>
     <freeFloating>1</freeFloating>
-    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>0.05</maxplanningtime>      <!-- runtime in (s) --> 
 
     <hierarchy>
       <level inner_index="1" outer_index="2" type="R2"/>

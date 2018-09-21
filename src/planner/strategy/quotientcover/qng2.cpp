@@ -39,21 +39,16 @@ void QNG2::Grow(double t)
 {
   if(saturated) return;
 
-  Configuration *q_random = nullptr;
-  if(firstRun){
-    q_random = new Configuration(Q1);
-    SampleGoal(q_random);
-    firstRun = false;
-  }else{
-    q_random = Sample();
-  }
-
+  Configuration *q_random = Sample();
   Configuration *q_nearest = Nearest(q_random);
+
   //############################################################################
-  //project random onto neighborhood of q_nearest
+  //project random onto neighborhood of q_nearest (TODO: might not be a good
+  //idea actually. Better keep q_random, and interpolate towards q_random, but
+  //stop at neighborhood
   //############################################################################
   const double radius_nearest = q_nearest->GetRadius();
-  double d = DistanceQ1(q_nearest, q_random);
+  double d = DistanceConfigurationConfiguration(q_nearest, q_random);
   Q1->getStateSpace()->interpolate(q_nearest->state, q_random->state, radius_nearest/d, q_random->state);
 
   if(ComputeNeighborhood(q_random))
@@ -132,7 +127,7 @@ void QNG2::ConnectRecurseLargest(Configuration *q_from, Configuration *q_next)
       }else{
         SampleNeighborhoodBoundaryHalfBall(q_k, q_next);
       }
-      const double d_next_to_k = DistanceQ1(q_next, q_k);
+      const double d_next_to_k = DistanceConfigurationConfiguration(q_next, q_k);
       Q1->getStateSpace()->interpolate(q_next->state, q_k->state, radius_next/d_next_to_k, q_k->state);
 
       if(ComputeNeighborhood(q_k))
@@ -175,13 +170,34 @@ void QNG2::ConnectRecurseLargest(Configuration *q_from, Configuration *q_next)
   }
 }
 
+void QNG2::AddConfigurationToPDF(Configuration *q)
+{
+  PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
+  q->SetPDFElement(q_element);
+  if(!q->isSufficientFeasible){
+    PDF_Element *q_necessary_element = pdf_necessary_configurations.add(q, 1);
+    q->SetNecessaryPDFElement(q_necessary_element);
+  }
+}
+
 
 //############################################################################
 //Quotient Space Sampling Strategies
 //############################################################################
 QNG2::Configuration* QNG2::Sample()
 {
+  //first run should always go towards the goal (many environments can be solved
+  //in that way, similar to potential field approach/generalized interpolation
+  //towards goal --- it is the first thing
+  //one should try).
+
   Configuration *q_random = new Configuration(Q1);
+  if(firstRun){
+    SampleGoal(q_random);
+    firstRun = false;
+    return q_random;
+  }
+
   if(!hasSolution){
     double r = rng_.uniform01();
     if(r<goalBias){
@@ -196,16 +212,6 @@ QNG2::Configuration* QNG2::Sample()
   return q_random;
 }
 
-
-void QNG2::AddConfigurationToPDF(Configuration *q)
-{
-  PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
-  q->SetPDFElement(q_element);
-  if(!q->isSufficientFeasible){
-    PDF_Element *q_necessary_element = pdf_necessary_configurations.add(q, 1);
-    q->SetNecessaryPDFElement(q_necessary_element);
-  }
-}
 QNG2::Configuration* QNG2::SampleQuotientCover(ob::State *state) 
 {
   double r = rng_.uniform01();

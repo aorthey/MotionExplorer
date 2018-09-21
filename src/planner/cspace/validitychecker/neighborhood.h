@@ -1,6 +1,13 @@
 #pragma once
+#include <iostream>
+
 struct Neighborhood
 {
-  Neighborhood() = default;
-  virtual double WorkspaceDistanceToConfigurationSpaceDistance(double) = 0;
+  public:
+    Neighborhood();
+    void Init();
+    double WorkspaceDistanceToConfigurationSpaceDistance(double d);
+    virtual double ComputeNeighborhoodConstant() = 0;
+  private:
+    double c{0};
 };

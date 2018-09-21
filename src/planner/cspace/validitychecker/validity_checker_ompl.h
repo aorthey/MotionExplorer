@@ -21,9 +21,9 @@ class OMPLValidityChecker: public ob::StateValidityChecker
   protected:
     double DistanceToRobot(const ob::State* state, SingleRobotCSpace *space) const;
 
-    CSpaceOMPL *cspace;
-    SingleRobotCSpace *klampt_single_robot_cspace;
-    Neighborhood *neighborhood;
+    CSpaceOMPL *cspace{nullptr};
+    SingleRobotCSpace *klampt_single_robot_cspace{nullptr};
+    Neighborhood *neighborhood{nullptr};
 };
 
 class OMPLValidityCheckerNecessarySufficient: public OMPLValidityChecker
