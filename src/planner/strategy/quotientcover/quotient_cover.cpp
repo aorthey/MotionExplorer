@@ -704,63 +704,20 @@ bool QuotientChartCover::Interpolate(const Configuration *q_from, const Configur
   if(parent==nullptr){
     Q1->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_interp->state);
   }else{
-    //interpolate along cover on Q0 plus interpolate along X1
-    //ob::State *s_fromX1 = X1->allocState();
-    //ob::State *s_fromQ0 = Q0->allocState();
-    //ExtractX1Subspace(q_from->state, s_fromX1);
-    //ExtractQ0Subspace(q_from->state, s_fromQ0);
-    //ob::State *s_toX1 = X1->allocState();
-    //ob::State *s_toQ0 = Q0->allocState();
-    //ExtractX1Subspace(q_to->state, s_toX1);
-    //ExtractQ0Subspace(q_to->state, s_toQ0);
-    //ob::State *s_interpX1 = X1->allocState();
-    //ob::State *s_interpQ0 = Q0->allocState();
-    //ExtractX1Subspace(q_interp->state, s_interpX1);
-    //ExtractQ0Subspace(q_interp->state, s_interpQ0);
-
-    //double dX1 = X1->distance(s_fromX1, s_toX1);
-    //double d = Q1->distance(q_from->state, q_to->state);
-    //double step_size_X1 = dX1*step_size/d;
-    //X1->getStateSpace()->interpolate(s_fromX1, s_toX1, step_size_X1, s_interpX1);
-    //double step_size_Q0 = sqrtf(step_size*step_size - step_size_X1*step_size_X1);
-
-    //if(step_size_Q0 <= 0){
-    //  std::cout << "distance is zero" << std::endl;
-    //  exit(0);
-    //}
-
-    //og::QuotientChartCover *qcc_parent = static_cast<og::QuotientChartCover*>(parent);
-    //const Vertex v_from = get(indexToVertex, q_from->index);
-    //const Vertex v_to = get(indexToVertex, q_to->index);
-    //std::vector<Vertex> cpath = qcc_parent->GetCoverPath(v_from, v_to);
-
-    //std::vector<Configuration*> qpath = qcc_parent->GetCoverPath(q_from->coset, q_to->coset);
-    //double length_shortest_path_Q0 = 0.0;
-
-
-
-    //for(uint k = 1; k < ; k++){
-    //}
-
-
-
-    //double d_from_coset = Q0->distance(s_fromQ0, q_from->coset->state);
-    //if(d_from_coset > step_size_Q0)
-    //{
-    //}
-
-
-    //qcc_parent->InterpolateCover(q_from->coset, q_to->coset, step_size_Q0, q_interp->coset)
-
-    //Q0->freeState(s_interpQ0);
-    //X1->freeState(s_interpX1);
-    //Q0->freeState(s_toQ0);
-    //X1->freeState(s_toX1);
-    //Q0->freeState(s_fromQ0);
-    //X1->freeState(s_fropX1);
-    std::cout << "Interpolate(): NYI" << std::endl;
-    exit(0);
-
+    std::vector<const Configuration*> path = GetInterpolationPath(q_from, q_to);
+    const Configuration *q_next = nullptr;
+    double d = 0;
+    double d_last_to_next = 0;
+    uint ctr = 0;
+    while(d < step_size && ctr < path.size()){
+      d_last_to_next = DistanceQ1(path.at(ctr), path.at(ctr+1));
+      d += d_last_to_next;
+      q_next = path.at(ctr+1);
+      ctr++;
+    }
+    const Configuration *q_last = path.at(ctr-1);
+    double step = d_last_to_next - (d-step_size);
+    Q1->getStateSpace()->interpolate(q_last->state, q_next->state, step/d_last_to_next, q_interp->state);
   }
   return true;
 }
