@@ -31,7 +31,7 @@ namespace ompl
 
       virtual Configuration* SampleCoverBoundary() override;
       virtual void AddConfigurationToPDF(Configuration *q) override;
-      virtual Configuration* SampleQuotientCover(ob::State *state) override;
+      virtual Configuration* SampleUniformQuotientCover(ob::State *state) override;
 
       void AddToFastTrackConditional(std::vector<Configuration*>);
       std::vector<Configuration*> ExpandNeighborhood(Configuration*);

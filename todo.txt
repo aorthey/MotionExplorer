@@ -545,34 +545,22 @@ also it is easy compared to manip)
 
 Goal: refactor QST
 [x] boost::graph seems better option --- rewiring seems to be an important option
-
-
 [x] need graph, not tree (otherwise it will get complicated to rewire tree)
-[ ] bug in doubleLshape (returns nullptr as state somewhere)
+[x] bug in doubleLshape (returns nullptr as state somewhere) -> was the issue of
+adding configurations which removed parent
 [x] QNG should be independent from QuotientGraph (too much overlap) --> refactor
 quotient-chart
-
-[ ] Outsource everything into quotient_cover. Interact only via Sample|Add|Nearest
-
--- > should have a neighborhood structure. this includes the center ob::State*,
-radius, and probably geometry. This neighborhood has to be filled up, then we
-can add it to the cover.
-[ ] problem: add configuration during momentum expansion
-[ ] Implement Zhang_2009 without deformation
-
-it seems that we are expanding the cover but do not stay in the neighborhoods in
-which we initially sampled. This means we need to adjust that somehow.
-
-Note: voronoi bias when applied to the underlying cover makes a lot of sense,
-since that is what we want: we like to expand such that we sample rapidly all
-over the cover. An adjusted voronoi bias would be perfect for that. However,
-when we do not have the luxury of using the underlying cover, then the voronoi
-bias might be misleading.
-
+[x] Outsource everything into quotient_cover. Interact only via Sample|Add|Nearest
+[x] problem: add configuration during momentum expansion
 [x] implement better connection strategy!
-[ ] neighborhood not correct for rigid body
-
+[x] neighborhood not correct for rigid body
+[ ] Implement Zhang_2009 without deformation
 [ ] quotient(space) -> quotientcover -> quotientcoversampler ->
-quotientcoverinterpolator
+quotientcoverinterpolator ?
 [ ] goto goal, but constrained towards higher distance function values
 (projection onto hyperplane, i.e. going orthogonal is allowed
+[ ] need some benchmarking against RRT on 2d examples
+
+
+
+

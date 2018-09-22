@@ -463,7 +463,7 @@ void QuotientChartCover::SampleUniform(Configuration *q)
     ob::State *stateX1 = X1->allocState();
     ob::State *stateQ0 = Q0->allocState();
     X1_sampler->sampleUniform(stateX1);
-    q->coset = static_cast<og::QuotientChartCover*>(parent)->SampleQuotientCover(stateQ0);
+    q->coset = static_cast<og::QuotientChartCover*>(parent)->SampleUniformQuotientCover(stateQ0);
     if(q->coset == nullptr){
       OMPL_ERROR("no coset found for state");
       Q1->printState(q->state);
@@ -557,7 +557,7 @@ QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundaryValid(
   return q;
 }
 
-QuotientChartCover::Configuration* QuotientChartCover::SampleQuotientCover(ob::State *state) 
+QuotientChartCover::Configuration* QuotientChartCover::SampleUniformQuotientCover(ob::State *state) 
 {
   Configuration *q_coset = pdf_all_configurations.sample(rng_.uniform01());
 
@@ -795,27 +795,100 @@ double QuotientChartCover::DistanceConfigurationConfiguration(const Configuratio
   }else{
     if(q_to->coset == nullptr || q_from->coset == nullptr)
     {
-      // std::cout << std::string(80, '#') << std::endl;
-      // std::cout << "[ERROR] could not find coset for a configuration" << std::endl;
-      // std::cout << std::string(80, '#') << std::endl;
-      // std::cout << "from:"; Print(q_from);
-      // std::cout << std::string(80, '-') << std::endl;
-      // std::cout << "to:"; Print(q_to);
-      // std::cout << std::string(80, '-') << std::endl;
-      // std::cout << *this << std::endl;
-      // exit(0);
+      std::cout << std::string(80, '#') << std::endl;
+      std::cout << "[ERROR] could not find coset for a configuration" << std::endl;
+      std::cout << std::string(80, '#') << std::endl;
+      std::cout << "from:"; Print(q_from);
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << "to:"; Print(q_to);
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << *this << std::endl;
+      exit(0);
       //could not find a coset on the quotient-space  => usual metric
       //fall-back metric
-      return DistanceQ1(q_from, q_to);
+      //return DistanceQ1(q_from, q_to);
     }
-    //metric defined by distance on cover of quotient-space plus distance on the
-    //subspace Q1/Q0
-    og::QuotientChartCover *parent_chart = dynamic_cast<og::QuotientChartCover*>(parent);
-    //TODO: needs to be adjusted, so that the shortest path has first element
-    //q_from, and last element q_to, not their cosets. otherwise metric is
-    //invalid over small distances
-    return parent_chart->DistanceConfigurationConfigurationCover(q_from->coset, q_to->coset)+DistanceX1(q_from, q_to);
+    return DistanceConfigurationConfigurationCover(q_from, q_to)+DistanceX1(q_from, q_to);
   }
+}
+
+
+double QuotientChartCover::DistanceConfigurationConfigurationCover(const Configuration *q_from, const Configuration *q_to)
+{
+  std::vector<const Configuration*> path = GetInterpolationPath(q_from, q_to);
+  double d = 0;
+  for(uint k = 0; k < path.size()-1; k++){
+    d += DistanceQ1(path.at(k), path.at(k+1));
+  }
+  return d;
+}
+
+std::vector<const QuotientChartCover::Configuration*> QuotientChartCover::GetInterpolationPath(const Configuration *q_from, const Configuration *q_to)
+{
+  std::vector<const Configuration*> path_Q1;
+
+  og::QuotientChartCover *parent_chart = dynamic_cast<og::QuotientChartCover*>(parent);
+  //(1) get shortest path on Q0 between q_from->coset to q_to->coset
+  std::vector<const Configuration*> path_Q0_cover = parent_chart->GetCoverPath(q_from->coset, q_to->coset);
+  //(2) remove first and last element (the cosets should be replaced by q_from
+  //and q_to)
+  path_Q0_cover.erase(path_Q0_cover.begin());
+  path_Q0_cover.pop_back();
+
+  //(3) obtain Q0 state from q_from!
+  if(path_Q0_cover.empty()){
+    path_Q1.push_back(q_from);
+    path_Q1.push_back(q_to);
+  }else{
+    ob::State *s_fromQ0 = Q0->allocState();
+    ExtractQ0Subspace(q_from->state, s_fromQ0);
+    Configuration *q_fromQ0 = new Configuration(Q0, s_fromQ0);
+
+    ob::State *s_toQ0 = Q0->allocState();
+    ExtractQ0Subspace(q_to->state, s_toQ0);
+    Configuration *q_toQ0 = new Configuration(Q0, s_toQ0);
+
+    //distance along cover path
+    double d = 0;
+    std::vector<double> d_vec;
+    double d0 = parent_chart->DistanceConfigurationConfiguration(q_fromQ0, path_Q0_cover.at(0));
+    d_vec.push_back(d0); d+=d0;
+    for(uint k = 1; k < path_Q0_cover.size(); k++){
+      double dk = parent_chart->DistanceConfigurationConfiguration(path_Q0_cover.at(k-1), path_Q0_cover.at(k));
+      d_vec.push_back(dk); d+=dk;
+    }
+    double d1= parent_chart->DistanceConfigurationConfiguration(path_Q0_cover.back(), q_toQ0);
+    d_vec.push_back(d1); d+=d1;
+
+    q_toQ0->Remove(Q0);
+    q_fromQ0->Remove(Q0);
+    Q0->freeState(s_toQ0);
+    Q0->freeState(s_fromQ0);
+
+    //interpolate on X1
+    ob::State *s_fromX1 = X1->allocState();
+    ExtractX1Subspace(q_from->state, s_fromX1);
+    ob::State *s_toX1 = X1->allocState();
+    ExtractX1Subspace(q_to->state, s_toX1);
+
+    double d_next = 0;
+    path_Q1.push_back(q_from);
+    for(uint k = 0; k < path_Q0_cover.size(); k++){
+      ob::State *s_kX1 = X1->allocState();
+      d_next += d_vec.at(k);
+      X1->getStateSpace()->interpolate(s_fromX1, s_toX1, d_next/d, s_kX1);
+
+      Configuration *qk = new Configuration(Q1);
+      MergeStates(path_Q0_cover.at(k)->state, s_kX1, qk->state);
+      path_Q1.push_back(qk);
+      X1->freeState(s_kX1);
+    }
+    path_Q1.push_back(q_to);
+
+    X1->freeState(s_toX1);
+    X1->freeState(s_fromX1);
+  }
+  return path_Q1;
 }
 
 double QuotientChartCover::DistanceConfigurationNeighborhood(const Configuration *q_from, const Configuration *q_to)
@@ -846,37 +919,6 @@ double QuotientChartCover::DistanceNeighborhoodNeighborhood(const Configuration 
   double d_open_neighborhood_distance = std::max(d - d_from - d_to, 0.0); 
   return d_open_neighborhood_distance;
 }
-
-double QuotientChartCover::DistanceConfigurationConfigurationCover(const Configuration *q_from, const Configuration *q_to)
-{
-  Vertex v_from = get(indexToVertex, q_from->index);
-  Vertex v_to = get(indexToVertex, q_to->index);
-  std::vector<Vertex> vpath = GetCoverPath(v_from, v_to);
-  if(vpath.empty()){
-    //path should always exist, since we are sampling on the connected cover
-    //component
-    std::cout << std::string(80, '#') << std::endl;
-    std::cout << "[ERROR] could not find a path on quotient-space" << std::endl;
-    std::cout << *this << std::endl;
-    std::cout << std::string(80, '#') << std::endl;
-    std::cout << "from:" << std::endl;
-    Q1->printState(q_from->state);
-    Q1->printState(graph[v_from]->state);
-    std::cout << "index:" << graph[v_from]->index << std::endl;
-    std::cout << "to:" << std::endl;
-    Q1->printState(q_to->state);
-    Q1->printState(graph[v_to]->state);
-    std::cout << "index:" << graph[v_to]->index << std::endl;
-    exit(0);
-  }
-
-  double path_length = 0.0;
-  for(uint k = 1; k < vpath.size(); k++){
-    path_length += DistanceConfigurationConfiguration(graph[vpath.at(k)], graph[vpath.at(k-1)]);
-  }
-  return path_length;
-}
-
 
 void QuotientChartCover::Init()
 {
@@ -1040,12 +1082,12 @@ private:
   Vertex m_goal;
 };
 
-std::vector<QuotientChartCover::Configuration*> QuotientChartCover::GetCoverPath(const Configuration *q_source, const Configuration *q_sink)
+std::vector<const QuotientChartCover::Configuration*> QuotientChartCover::GetCoverPath(const Configuration *q_source, const Configuration *q_sink)
 {
   const Vertex v_source = get(indexToVertex, q_source->index);
   const Vertex v_sink = get(indexToVertex, q_sink->index);
   std::vector<Vertex> v_path = GetCoverPath(v_source, v_sink);
-  std::vector<Configuration*> q_path;
+  std::vector<const Configuration*> q_path;
   for(uint k = 0; k < v_path.size(); k++){
     q_path.push_back(graph[v_path.at(k)]);
   }

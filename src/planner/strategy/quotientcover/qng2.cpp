@@ -17,7 +17,7 @@ using namespace ompl::geometric;
 QNG2::QNG2(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
   setName("QNG2"+std::to_string(id));
-  NUMBER_OF_EXPANSION_SAMPLES = Q1->getStateDimension()+2;
+  NUMBER_OF_EXPANSION_SAMPLES = Q1->getStateDimension()+1;
   std::cout << "Number of expansion samples: " << NUMBER_OF_EXPANSION_SAMPLES << std::endl;
 }
 
@@ -74,11 +74,12 @@ void QNG2::Connect(Configuration *q_from, Configuration *q_next)
     AddConfigurationToCoverWithoutAddingEdges(q_k);
   }
 
-  //terminate conditions
-  //(1) next neighborhood too small
-  if(radius_largest < 0.1*q_from->GetRadius()) return;
+  if(radius_largest <= 0.1*q_from->GetRadius())
+  {
+    return;
+  }
 
-  //(3) no feasible neighborhoods
+  //terminate condition (2) no feasible neighborhoods
   if(!q_children.empty())
   {
     return Connect(q_children.at(idx_largest), q_next);
@@ -104,12 +105,17 @@ std::vector<QuotientChartCover::Configuration*> QNG2::GenerateCandidateDirection
   {
     q_proj->parent_neighbor = q_from;
     q_children.push_back(q_proj);
+    double radius_proj = q_proj->GetRadius();
+    //terminate if projected moves towards larger neighborhoods
+    if(radius_proj >= radius_from){
+      return q_children;
+    }
   }
   for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES; k++){
     Configuration *q_k = new Configuration(Q1);
 
     if(isProjectedFeasible){
-      Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.5*q_from->GetRadius());
+      Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.75*radius_from);
     }else{
       SampleNeighborhoodBoundaryHalfBall(q_k, q_from);
     }
@@ -169,7 +175,7 @@ QNG2::Configuration* QNG2::Sample()
   return q_random;
 }
 
-QNG2::Configuration* QNG2::SampleQuotientCover(ob::State *state) 
+QNG2::Configuration* QNG2::SampleUniformQuotientCover(ob::State *state) 
 {
   double r = rng_.uniform01();
   Configuration *q_coset = nullptr;

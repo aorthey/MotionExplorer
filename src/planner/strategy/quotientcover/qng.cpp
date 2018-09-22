@@ -220,7 +220,7 @@ void QNG::AddConfigurationToPDF(Configuration *q)
     q->SetNecessaryPDFElement(q_necessary_element);
   }
 }
-QNG::Configuration* QNG::SampleQuotientCover(ob::State *state) 
+QNG::Configuration* QNG::SampleUniformQuotientCover(ob::State *state) 
 {
   double r = rng_.uniform01();
   Configuration *q_coset = nullptr;

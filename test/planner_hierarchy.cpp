@@ -2,9 +2,12 @@
 #include "environment_loader.h"
 #include "planner/planner.h"
 
-int main(int argc,const char** argv) {
+int main(int argc, char **argv) {
 
   EnvironmentLoader env = EnvironmentLoader::from_args(argc, argv);
+
+  strncpy(argv[0], std::string(80,'#').c_str(), strlen(argv[0]));
+  for(int i = 1; i < argc; i++) memset(argv[i], 0, strlen(argv[i]));
 
   PlannerMultiInput in = env.GetPlannerInput();
 

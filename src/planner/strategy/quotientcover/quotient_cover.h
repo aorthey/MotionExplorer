@@ -204,12 +204,17 @@ namespace ompl
       double DistanceQ1(const Configuration *q_from, const Configuration *q_to);
       double DistanceX1(const Configuration *q_from, const Configuration *q_to);
 
-      double DistanceConfigurationConfigurationCover(const Configuration *q_from, const Configuration *q_to);
       double DistanceConfigurationConfiguration(const Configuration *q_from, const Configuration *q_to);
       //Note: this is a pseudometric: invalidates second axiom of metric : d(x,y) = 0  iff x=y. But here we only have d(x,x)=0
       double DistanceNeighborhoodNeighborhood(const Configuration *q_from, const Configuration *q_to);
       //Note: this is a pseudometric: invalidates second axiom of metric : d(x,y) = 0  iff x=y. But here we only have d(x,x)=0
       double DistanceConfigurationNeighborhood(const Configuration *q_from, const Configuration *q_to);
+
+      double DistanceConfigurationConfigurationCover(const Configuration *q_from, const Configuration *q_to);
+
+      std::vector<const Configuration*> GetInterpolationPath(const Configuration *q_from, const Configuration *q_to);
+      std::vector<Vertex> GetCoverPath(const Vertex& v_source, const Vertex& v_sink);
+      std::vector<const Configuration*> GetCoverPath(const Configuration *q_source, const Configuration *q_sink);
 
       //#######################################################################
       //Sampling Sample{Structure}{Substructure}
@@ -218,7 +223,6 @@ namespace ompl
 
       Configuration* SampleCoverBoundary(std::string type);
       virtual Configuration* SampleCoverBoundary();
-      virtual Configuration* SampleQuotientCover(ob::State *state);
       Configuration* SampleCoverBoundaryValid(ob::PlannerTerminationCondition &ptc);
       void SampleRandomNeighborhoodBoundary(Configuration *q);
       bool SampleNeighborhoodBoundary(Configuration*, const Configuration*);
@@ -226,6 +230,7 @@ namespace ompl
 
       void SampleGoal(Configuration*);
       void SampleUniform(Configuration*);
+      virtual Configuration* SampleUniformQuotientCover(ob::State *state);
       //#######################################################################
       //Connect strategies
       //#######################################################################
@@ -251,8 +256,6 @@ namespace ompl
       //#######################################################################
       //Cover Algorithms
       //#######################################################################
-      std::vector<Vertex> GetCoverPath(const Vertex& v_source, const Vertex& v_sink);
-      std::vector<Configuration*> GetCoverPath(const Configuration *q_source, const Configuration *q_sink);
 
       Configuration* Nearest(Configuration *q) const;
 

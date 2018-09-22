@@ -19,7 +19,7 @@ PlannerBackendPtr EnvironmentLoader::GetBackendPtr(){
   return _backend;
 }
 
-EnvironmentLoader EnvironmentLoader::from_args(int argc,const char** argv){
+EnvironmentLoader EnvironmentLoader::from_args(int argc, char** argv){
   std::string exec = argv[0];
   std::string file;
   std::vector<std::string> all_args;

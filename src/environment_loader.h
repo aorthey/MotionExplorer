@@ -29,7 +29,7 @@ class EnvironmentLoader{
 
     void LoadController(Robot *robot, const PlannerInput &pin);
 
-    static EnvironmentLoader from_args(int argc,const char** argv);
+    static EnvironmentLoader from_args(int argc,char** argv);
     EnvironmentLoader(const char *xml_file);
 
 };
