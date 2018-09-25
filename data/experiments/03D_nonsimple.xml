@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="Lshape" file="/home/aorthey/git/orthoklampt/data/robots/PlanarRectangle.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="disk_inner" file="/home/aorthey/git/orthoklampt/data/robots/PlanarRectangle_cylinder_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="disk_outer" file="/home/aorthey/git/orthoklampt/data/robots/PlanarRectangle_cylinder_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+<!--
+  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="3 2 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
+  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="-2.8 0 0" rotateRPY="0 0 0.78"/>
+  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="1.8 0 0" rotateRPY="0 0 0"/>
+-->
+  <rigidObject name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/2droom_nonsimple.tri" translation="0 0 0" rotateRPY="0 0 0"/>
+
+  <plannerinput>
+
+    <qinit  config="6  +2.5 -0.5 +0.0 -0.0 +0 +0.0"/>
+    <qgoal  config="6  +0.5 -2.5 +0.0 +1.57 +0 +0.0"/>
+    <se3min config="6  -4.0 -4.0 -1.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +4.0 +4.0 +1.0 +3.141593 +1.57 +3.141593"/>
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>0.5</maxplanningtime>
+
+    <hierarchy>
+      <level inner_index="1" outer_index="2" type="R2"/>
+      <level inner_index="0" type="SE2"/>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>
+
+
+

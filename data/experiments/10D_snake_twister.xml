@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="snake" file="/home/aorthey/git/orthoklampt/data/robots/snake.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="snake_sphere_inner" file="/home/aorthey/git/orthoklampt/data/robots/snake_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="snake_sphere_outer" file="/home/aorthey/git/orthoklampt/data/robots/snake_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <rigidObject  name="twister/twister.tri" file="/home/aorthey/git/orthoklampt/data/terrains/twister/twister.tri" translation="0 0 0"/>
+
+  <plannerinput>
+
+    <se3min config="6  -6 -2.5 -1.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +6 +2.0 +3.0 +3.141593 +1.57 +3.141593"/>
+
+    <qinit config="14  -0.0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
+    <qgoal config="14  +2.1 +0.7 0 0 0 0 0 0 0 0 0 0 0 0"/>
+
+    <freeFloating>1</freeFloating>
+    <hierarchy>
+      <level inner_index="1" outer_index="2" type="R3"/>
+      <level inner_index="0" type="SE3RN"/>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>
