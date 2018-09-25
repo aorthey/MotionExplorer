@@ -7,6 +7,7 @@ struct Layer{
   int level;
   int inner_index;
   int outer_index;
+  double cspace_constant;
   Config q_init;
   Config q_goal;
   std::string type;

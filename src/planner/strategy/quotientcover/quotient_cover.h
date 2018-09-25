@@ -196,7 +196,7 @@ namespace ompl
       virtual void AddConfigurationToPDF(Configuration *q);
       bool IsConfigurationInsideCover(Configuration *q);
       void RemoveConfigurationsFromCoverCoveredBy(Configuration *q);
-      bool ComputeNeighborhood(Configuration *q);
+      bool ComputeNeighborhood(Configuration *q, bool verbose = false);
 
       //#######################################################################
       //Distance Computations

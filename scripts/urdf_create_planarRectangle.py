@@ -4,7 +4,7 @@ from math import cos,sin,pi,atan2
 from urdf_create import *
 from urdf_create_primitives import *
 
-length = 1.2
+length = 2.0
 width = 0.7
 
 height = 0.1

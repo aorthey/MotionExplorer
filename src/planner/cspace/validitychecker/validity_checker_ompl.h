@@ -17,6 +17,7 @@ class OMPLValidityChecker: public ob::StateValidityChecker
     bool IsCollisionFree(SingleRobotCSpace *space, Config q) const;
 
     CSpaceOMPL* GetCSpaceOMPLPtr() const;
+    void SetNeighborhood(double);
 
   protected:
     double DistanceToRobot(const ob::State* state, SingleRobotCSpace *space) const;

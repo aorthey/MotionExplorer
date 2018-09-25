@@ -68,7 +68,7 @@ void QuotientChartCover::setup(void)
     //#########################################################################
     if(const ob::State *state_start = pis_.nextStart()){
       q_start = new Configuration(Q1, state_start);
-      if(!ComputeNeighborhood(q_start))
+      if(!ComputeNeighborhood(q_start, true))
       {
         OMPL_ERROR("%s: Could not add start state!", getName().c_str());
         exit(0);
@@ -83,7 +83,7 @@ void QuotientChartCover::setup(void)
     //#########################################################################
     if(const ob::State *state_goal = pis_.nextGoal()){
       q_goal = new Configuration(Q1, state_goal);
-      if(!ComputeNeighborhood(q_goal))
+      if(!ComputeNeighborhood(q_goal, true))
       {
         OMPL_ERROR("%s: Could not add goal state!", getName().c_str());
         exit(0);
@@ -333,10 +333,11 @@ void QuotientChartCover::RemoveConfigurationFromCover(Configuration *q)
   q=nullptr;
 }
 
-bool QuotientChartCover::ComputeNeighborhood(Configuration *q)
+bool QuotientChartCover::ComputeNeighborhood(Configuration *q, bool verbose)
 {
   if(q==nullptr) return false;
   if(IsConfigurationInsideCover(q)){
+    if(verbose) std::cout << "[ComputeNeighborhood] State Rejected: Inside Cover" << std::endl;
     q->Remove(Q1);
     q=nullptr;
     return false;
@@ -354,11 +355,13 @@ bool QuotientChartCover::ComputeNeighborhood(Configuration *q)
 
     q->SetRadius(DistanceInnerRobotToObstacle(q->state));
     if(q->GetRadius()<=minimum_neighborhood_radius){
+      if(verbose) std::cout << "[ComputeNeighborhood] State Rejected: Radius Too Small (radius="<< q->GetRadius() << ")" << std::endl;
       q->Remove(Q1);
       q=nullptr;
       return false;
     }
   }else{
+    if(verbose) std::cout << "[ComputeNeighborhood] State Rejected: Infeasible" << std::endl;
     q->Remove(Q1);
     q=nullptr;
     return false;

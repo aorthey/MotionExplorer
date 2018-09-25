@@ -249,6 +249,10 @@
     <name>planner_draw_start_goal_configuration</name>
     <key>G</key>
   </hotkey>
+  <hotkey>
+    <name>draw_text</name>
+    <key>I</key>
+  </hotkey>
 
   <hotkey>
     <name>planner_draw_start_goal_configuration_sufficient</name>
@@ -284,6 +288,8 @@
   <property name="draw_axes" enabled="0"/>
   <property name="draw_robot_zero_position" enabled="1"/>
   <property name="draw_controller_driver" enabled="1"/>
+  <property name="draw_text_robot_info" enabled="1"/>
+  <property name="draw_text_planner" enabled="1"/>
 
   <property name="draw_cover_geometric_center" enabled="1"/>
   <property name="draw_cover_vertices" enabled="1"/>

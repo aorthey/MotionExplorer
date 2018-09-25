@@ -2,6 +2,7 @@
 #include "planner/strategy/strategy_input.h"
 #include "planner/strategy/strategy_output.h"
 #include "planner/cspace/cspace_factory.h"
+#include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include "gui/drawMotionPlanner.h"
 
 #include "util.h"
@@ -103,6 +104,8 @@ void MotionPlanner::CreateHierarchy(){
       //#########################################################################
       std::string type = input.layers.at(k).type;
       CSpaceOMPL *cspace_level_k = ComputeCSpace(type, ii, io);
+      dynamic_pointer_cast<OMPLValidityChecker>(cspace_level_k->StateValidityCheckerPtr())->SetNeighborhood(input.layers.at(k).cspace_constant);
+
       cspace_levels.push_back( cspace_level_k );
 
       if(k==0){
@@ -125,12 +128,6 @@ void MotionPlanner::CreateHierarchy(){
   }else{
     //shallow algorithm (use last robot in hierarchy)
 
-    // Config qi = input.q_init;
-    // Config qg = input.q_goal;
-    // Config dqi = input.dq_init;
-    // Config dqg = input.dq_goal;
-    // uint ridx = input.robot_idx;
-
     int robot_idx = input.layers.back().inner_index;
     Robot* robot = world->robots[robot_idx];
     if(robot==nullptr){
@@ -145,6 +142,7 @@ void MotionPlanner::CreateHierarchy(){
 
     std::string type = input.layers.back().type;
     CSpaceOMPL *cspace_level = ComputeCSpace(type, robot_idx);
+    dynamic_pointer_cast<OMPLValidityChecker>(cspace_level->StateValidityCheckerPtr())->SetNeighborhood(input.layers.back().cspace_constant);
     cspace_levels.push_back( cspace_level );
 
     //two levels, so we can collapse the roadmap 

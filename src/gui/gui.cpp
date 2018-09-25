@@ -207,62 +207,65 @@ void ForceFieldBackend::RenderWorld()
 }//RenderWorld
  
 void ForceFieldBackend::RenderScreen(){
+  
   BaseT::RenderScreen();
 
-  line_x_pos = 20;
-  line_y_offset = 60;
-  line_y_offset_stepsize = 20;
+  if(state("draw_text_robot_info")){
+    line_x_pos = 20;
+    line_y_offset = 60;
+    line_y_offset_stepsize = 20;
 
-  std::string line;
+    std::string line;
 
-  if(world->robots.size()>0){
-    line = "Robots      : ";
-    for(uint i = 0; i < world->robots.size(); i++){
-      line += ((i>0)?" | ":"");
-      line += world->robots[i]->name;
+    if(world->robots.size()>0){
+      line = "Robots      : ";
+      for(uint i = 0; i < world->robots.size(); i++){
+        line += ((i>0)?" | ":"");
+        line += world->robots[i]->name;
+      }
+      DrawText(line_x_pos,line_y_offset,line);
+      line_y_offset += line_y_offset_stepsize;
     }
+
+    if(world->terrains.size()>0){
+      line = "Terrains    : ";
+      for(uint i = 0; i < world->terrains.size(); i++){
+        std::string geom = world->terrains[i]->geomFile;
+        line += ((i>0)?" | ":"");
+        line += std::string(basename(geom.c_str()));
+      }
+      DrawText(line_x_pos,line_y_offset,line);
+      line_y_offset += line_y_offset_stepsize;
+    }
+    if(world->rigidObjects.size()>0){
+      line = "RigidObjects: ";
+      for(uint i = 0; i < world->rigidObjects.size(); i++){
+        std::string geom = world->rigidObjects[i]->geomFile;
+        line += ((i>0)?" | ":"");
+        line += std::string(basename(geom.c_str()));
+      }
+      DrawText(line_x_pos,line_y_offset,line);
+      line_y_offset += line_y_offset_stepsize;
+    }
+
+    line = "Mode       : ";
+    line += (click_mode == ModeForceApplication?"ForceApplication":"PositionSetter");
     DrawText(line_x_pos,line_y_offset,line);
     line_y_offset += line_y_offset_stepsize;
+
+    Vector q,dq,T;
+    sim.controlSimulators[0].GetSensedConfig(q);
+    sim.controlSimulators[0].GetSensedVelocity(dq);
+    sim.controlSimulators[0].GetActuatorTorques(T);
+
+    // DrawTextVector(line_x_pos, line_y_offset, "Position   :", q);
+    // line_y_offset += line_y_offset_stepsize;
+    // DrawTextVector(line_x_pos, line_y_offset, "Velocity   :", dq);
+    // line_y_offset += line_y_offset_stepsize;
+    // DrawTextVector(line_x_pos, line_y_offset, "Cmd Torque :", T);
+    // line_y_offset += line_y_offset_stepsize;
+
   }
-
-  if(world->terrains.size()>0){
-    line = "Terrains    : ";
-    for(uint i = 0; i < world->terrains.size(); i++){
-      std::string geom = world->terrains[i]->geomFile;
-      line += ((i>0)?" | ":"");
-      line += std::string(basename(geom.c_str()));
-    }
-    DrawText(line_x_pos,line_y_offset,line);
-    line_y_offset += line_y_offset_stepsize;
-  }
-  if(world->rigidObjects.size()>0){
-    line = "RigidObjects: ";
-    for(uint i = 0; i < world->rigidObjects.size(); i++){
-      std::string geom = world->rigidObjects[i]->geomFile;
-      line += ((i>0)?" | ":"");
-      line += std::string(basename(geom.c_str()));
-    }
-    DrawText(line_x_pos,line_y_offset,line);
-    line_y_offset += line_y_offset_stepsize;
-  }
-
-  line = "Mode       : ";
-  line += (click_mode == ModeForceApplication?"ForceApplication":"PositionSetter");
-  DrawText(line_x_pos,line_y_offset,line);
-  line_y_offset += line_y_offset_stepsize;
-
-  Vector q,dq,T;
-  sim.controlSimulators[0].GetSensedConfig(q);
-  sim.controlSimulators[0].GetSensedVelocity(dq);
-  sim.controlSimulators[0].GetActuatorTorques(T);
-
-  // DrawTextVector(line_x_pos, line_y_offset, "Position   :", q);
-  // line_y_offset += line_y_offset_stepsize;
-  // DrawTextVector(line_x_pos, line_y_offset, "Velocity   :", dq);
-  // line_y_offset += line_y_offset_stepsize;
-  // DrawTextVector(line_x_pos, line_y_offset, "Cmd Torque :", T);
-  // line_y_offset += line_y_offset_stepsize;
-
 }
 
 void ForceFieldBackend::DrawTextVector(double xpos, double ypos, const char* prefix, Vector &v){
@@ -502,11 +505,14 @@ void GLUIForceFieldGUI::Handle_Keypress(unsigned char c,int x,int y)
   GUIState* state = &_backend->state;
 
   switch(c) {
-    case 'H':
+    case 'h':
     {
+      std::cout << std::string(80, '-') << std::endl;
       BaseT::Handle_Keypress(c,x,y);
+      std::cout << std::string(80, '-') << std::endl;
       std::cout << "<forcefield gui>" << std::endl;
       std::cout << *state << std::endl;
+      std::cout << std::string(80, '-') << std::endl;
       break;
     }
     case 'S':

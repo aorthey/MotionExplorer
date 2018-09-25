@@ -56,11 +56,12 @@ void CSpaceOMPL::Init()
 {
   this->initSpace();
 }
+
 ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
   if(!si){
     si = std::make_shared<ob::SpaceInformation>(SpacePtr());
-    const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr();
-    si->setStateValidityChecker(checker);
+    validity_checker = StateValidityCheckerPtr(si);
+    si->setStateValidityChecker(validity_checker);
   }
   return si;
 }
@@ -100,16 +101,22 @@ CSpace* CSpaceOMPL::GetCSpaceKlamptPtr(){
 }
 const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr()
 {
-  return StateValidityCheckerPtr(SpaceInformationPtr());
+  if(!validity_checker){
+    si = std::make_shared<ob::SpaceInformation>(SpacePtr());
+    validity_checker = StateValidityCheckerPtr(si);
+    si->setStateValidityChecker(validity_checker);
+  }
+  return validity_checker;
 }
 const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr(ob::SpaceInformationPtr si)
 {
   if(enableSufficiency)
   {
-    return std::make_shared<OMPLValidityCheckerNecessarySufficient>(si, this, klampt_cspace_outer);
+    validity_checker = std::make_shared<OMPLValidityCheckerNecessarySufficient>(si, this, klampt_cspace_outer);
   }else{
-    return std::make_shared<OMPLValidityChecker>(si, this);
+    validity_checker = std::make_shared<OMPLValidityChecker>(si, this);
   }
+  return validity_checker;
 }
 
 void CSpaceOMPL::SetSufficient(const uint robot_idx_outer_){

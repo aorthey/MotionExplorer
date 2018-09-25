@@ -101,6 +101,7 @@ class CSpaceOMPL
     std::vector<int> ompl_to_klampt;
     std::vector<int> klampt_to_ompl;
 
+    ob::StateValidityCheckerPtr validity_checker;
     ob::SpaceInformationPtr si;
     ob::StateSpacePtr space;
     oc::RealVectorControlSpacePtr control_space;

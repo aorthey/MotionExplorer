@@ -82,7 +82,9 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="draw_cover_threshold_down"){
     GUIVariable &v = state("draw_cover_threshold");
     v.value = max(v.min, v.value - v.step);
-
+  }else if(cmd=="draw_text"){
+    state("draw_text_robot_info").toggle();
+    state("draw_text_planner").toggle();
   }else if(cmd=="draw_play_path"){
     state("draw_play_path").toggle();
     simulate = 0;
@@ -399,23 +401,25 @@ void PlannerBackend::RenderWorld(){
  // glEnable(GL_LIGHTING);
 void PlannerBackend::RenderScreen(){
   BaseT::RenderScreen();
-  std::string line;
-  line = "Planners       : ";
-  DrawText(line_x_pos,line_y_offset,line);
-  line_y_offset += line_y_offset_stepsize;
-
-  for(uint k = 0; k < planners.size(); k++){
-    line = "               ";
-    if(k==active_planner) line += "[";
-    line += planners.at(k)->getName() + " ";
-    if(k==active_planner) line += "]";
-
+  if(state("draw_text_planner")){
+    std::string line;
+    line = "Planners       : ";
     DrawText(line_x_pos,line_y_offset,line);
     line_y_offset += line_y_offset_stepsize;
-  }
 
-  if(planners.size()>0){
-    planners.at(active_planner)->DrawGLScreen(line_x_pos, line_y_offset);
+    for(uint k = 0; k < planners.size(); k++){
+      line = "               ";
+      if(k==active_planner) line += "[";
+      line += planners.at(k)->getName() + " ";
+      if(k==active_planner) line += "]";
+
+      DrawText(line_x_pos,line_y_offset,line);
+      line_y_offset += line_y_offset_stepsize;
+    }
+
+    if(planners.size()>0){
+      planners.at(active_planner)->DrawGLScreen(line_x_pos, line_y_offset);
+    }
   }
 }
 

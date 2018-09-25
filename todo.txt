@@ -561,6 +561,11 @@ quotientcoverinterpolator ?
 (projection onto hyperplane, i.e. going orthogonal is allowed
 [ ] need some benchmarking against RRT on 2d examples
 
+[ ] fix no-coset bug
+[ ] create all benchmark-able environments, plus neighborhood computation plus
+outer shell
 
+[ ] what to do with SE3xRn robots? What to do with robots which cannot compute a
+distance?
 
-
+[ ] neighborhood should be an independent module, getting input from xml/robot urdf
