@@ -39,6 +39,7 @@ namespace ompl
   {
     class Quotient: public ob::Planner
     {
+      typedef ob::Planner BaseT;
       enum QuotientSpaceType{ UNKNOWN, ATOMIC_RN, RN_RM, SE2_R2, SE3_R3, SE3RN_R3, SE3RN_SE3, SE3RN_SE3RM };
 
       public:
@@ -54,6 +55,7 @@ namespace ompl
         virtual bool Sample(ob::State *q_random);
         virtual bool HasSolution();
         virtual void clear() override;
+        virtual void setup() override;
 
         virtual double GetImportance() const;
 

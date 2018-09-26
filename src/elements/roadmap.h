@@ -41,7 +41,7 @@ class Roadmap{
     GLDraw::GLColor cNeighborhoodVolumeSufficient{lightmagenta}; 
     double sizeVertex{10};
     double widthEdge{5};
-    double widthPath{10};
+    double widthPath{15};
 
     bool wiredNeighborhood{true};
 

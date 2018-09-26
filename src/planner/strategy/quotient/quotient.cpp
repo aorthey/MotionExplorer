@@ -125,14 +125,15 @@ void Quotient::resetCounter()
   Quotient::counter = 0;
 }
 
+void Quotient::setup()
+{
+  hasSolution = false;
+  if(parent==nullptr) X1_sampler.reset();
+}
 void Quotient::clear()
 {
-  Planner::clear();
   hasSolution = false;
-  Quotient::counter = 0;
-  //totalNumberOfSamples = 0;
-  //graphLength = 0;
-  if(parent==nullptr) X1_sampler.reset();
+  if(child!=nullptr) child->clear();
 }
 
 const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const StateSpacePtr Q0)

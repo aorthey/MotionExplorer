@@ -11,18 +11,18 @@ template <class T>
 MultiChart<T>::MultiChart(std::vector<ob::SpaceInformationPtr> &si_vec_, std::string type):
   ob::Planner(si_vec_.back(), type), si_vec(si_vec_)
 {
-  T::resetCounter();
+  //T::resetCounter();
 
-  levels = si_vec.size();
-  root_chart = new T(si_vec.at(0), nullptr);
-  root_chart->SetLevel(0);
+  //levels = si_vec.size();
+  //root_chart = new T(si_vec.at(0), nullptr);
+  //root_chart->SetLevel(0);
 
-  for(uint k = 0; k < si_vec.size(); k++){
-    og::QuotientChart* parent = nullptr;
-    if(k>0) parent = quotientCharts.back();
-    T* ss = new T(si_vec.at(k), parent);
-    quotientCharts.push_back(ss);
-  }
+  //for(uint k = 0; k < si_vec.size(); k++){
+  //  og::QuotientChart* parent = nullptr;
+  //  if(k>0) parent = quotientCharts.back();
+  //  T* ss = new T(si_vec.at(k), parent);
+  //  quotientCharts.push_back(ss);
+  //}
 }
 
 template <class T>
@@ -32,13 +32,39 @@ MultiChart<T>::~MultiChart(){
 template <class T>
 void MultiChart<T>::setup(){
   Planner::setup();
-  root_chart->setup();
+  if(pdef_){
+    T::resetCounter();
+    levels = si_vec.size();
+    root_chart = new T(si_vec.at(0), nullptr);
+    root_chart->SetLevel(0);
+
+    for(uint k = 0; k < si_vec.size(); k++){
+      og::QuotientChart* parent = nullptr;
+      if(k>0) parent = quotientCharts.back();
+      T* ss = new T(si_vec.at(k), parent);
+      quotientCharts.push_back(ss);
+    }
+
+    found_path_on_last_level = false;
+    saturated_levels = false;
+    root_chart->setProblemDefinition(pdef_vec.at(0));
+    root_chart->setup();
+  }else{
+    OMPL_INFORM("%s: problem definition is not set, deferring setup completion...", getName().c_str());
+    setup_ = false;
+  }
 }
 
 template <class T>
 void MultiChart<T>::clear(){
-  Planner::clear();
   root_chart->clear();
+  found_path_on_last_level = false;
+  saturated_levels = false;
+  for(uint k = 0; k < quotientCharts.size(); k++){
+    quotientCharts.at(k)->clear();
+  }
+  quotientCharts.clear();
+  Planner::clear();
 }
 
 
@@ -74,7 +100,7 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
   //path [i,j,k], then the charts Q_i, Q_ij and Q_ijk have the usual importance
   //as in the quotientspace approach. All other charts are set to zero.
 
-  ompl::time::point t_start = ompl::time::now();
+  //ompl::time::point t_start = ompl::time::now();
   while(!ptcOrSolutionFound)
   {
     //growing the charts occurs in the path below current_chart.
@@ -89,16 +115,24 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
     }else{
       uint k = current_chart->GetLevel();
       if(current_chart->FoundNewPath()){
-        double t_k_end = ompl::time::seconds(ompl::time::now() - t_start);
-        std::cout << std::string(80, '#') << std::endl;
+        //double t_k_end = ompl::time::seconds(ompl::time::now() - t_start);
+        //std::cout << std::string(80, '#') << std::endl;
         //std::cout << "found path on level " << k+1 << " of " << levels << std::endl;
-        std::cout << "Found Path on Level " << k+1 << "/" << levels << " after " << t_k_end << " seconds." << std::endl;
-        std::cout << std::string(80, '-') << std::endl;
-        std::cout << *current_chart << std::endl;
-        std::cout << std::string(80, '#') << std::endl;
+        // std::cout << "Found Path on Level " << k+1 << "/" << levels << " after " << t_k_end << " seconds." << std::endl;
+        // std::cout << std::string(80, '-') << std::endl;
+        // std::cout << *current_chart << std::endl;
+        // std::cout << std::string(80, '#') << std::endl;
 
         if(k == levels-1){
           found_path_on_last_level = true;
+
+          //add solution
+          base::PathPtr sol;
+          current_chart->GetSolution(sol);
+          base::PlannerSolution psol(sol);
+          psol.setPlannerName(getName());
+          pdef_->addSolutionPath(psol);
+
           Q.push(jChart);
         }else{
           //not yet reached maximal level. create a new sibling chart (containing
@@ -152,18 +186,27 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
       }
     }
   }
+
   if(found_path_on_last_level)
   {
-    base::PathPtr sol;
-    if(current_chart->GetSolution(sol))
-    {
-      base::PlannerSolution psol(sol);
-      psol.setPlannerName(getName());
-      pdef_->addSolutionPath(psol);
-    }else{
-      std::cout << "error: expected a solution path" << std::endl;
-      exit(0);
-    }
+    //base::PathPtr sol;
+    //if(current_chart->GetSolution(sol))
+    //{
+    //  base::PlannerSolution psol(sol);
+    //  psol.setPlannerName(getName());
+    //  pdef_->addSolutionPath(psol);
+    //}else{
+    //  std::cout << std::string(80, '#') << std::endl;
+    //  std::cout << std::string(80, '#') << std::endl;
+    //  OMPL_ERROR("error: expected a solution path");
+    //  std::cout << std::string(80, '#') << std::endl;
+    //  std::cout << std::string(80, '#') << std::endl;
+    //  std::cout << "current_chart:" << std::endl;
+    //  std::cout << *current_chart << std::endl;
+    //  std::cout << "root_chart:" << std::endl;
+    //  std::cout << *root_chart << std::endl;
+    //  exit(0);
+    //}
 
     return ob::PlannerStatus::EXACT_SOLUTION;
   }
@@ -178,7 +221,6 @@ void MultiChart<T>::setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &
 {
   pdef_vec = pdef_;
   ob::Planner::setProblemDefinition(pdef_vec.back());
-  root_chart->setProblemDefinition(pdef_vec.at(0));
 }
 
 template <class T>

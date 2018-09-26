@@ -20,6 +20,7 @@ namespace ompl
         bool FoundNewPath();
 
         virtual void setup() override;
+        virtual void clear() override;
 
         std::vector<int> GetChartPath() const;
         void UpdateChartPath();

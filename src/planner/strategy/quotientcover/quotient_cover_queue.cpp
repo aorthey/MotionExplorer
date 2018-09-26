@@ -17,21 +17,27 @@ QuotientChartCoverQueue::QuotientChartCoverQueue(const base::SpaceInformationPtr
 {
   setName(typeid(*this).name()+std::to_string(id));
   NUMBER_OF_EXPANSION_SAMPLES = (Q1->getStateDimension()+1)*1;
-  std::cout << "Number of samples: " << NUMBER_OF_EXPANSION_SAMPLES << std::endl;
 }
 
 QuotientChartCoverQueue::~QuotientChartCoverQueue(void)
 {
 }
 
+void QuotientChartCoverQueue::setup()
+{
+  BaseT::setup();
+  NUMBER_OF_EXPANSION_SAMPLES = (Q1->getStateDimension()+1)*1;
+  firstRun = true;
+}
 void QuotientChartCoverQueue::clear()
 {
   BaseT::clear();
   while(!priority_configurations.empty()) 
   {
+    Configuration *q = priority_configurations.top();
+    if(q!=nullptr) q->Remove(Q1);
     priority_configurations.pop();
   }
-  firstRun = false;
 }
 
 void QuotientChartCoverQueue::Grow(double t)
@@ -40,6 +46,9 @@ void QuotientChartCoverQueue::Grow(double t)
 
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
 
+  //############################################################################
+  //Get the configuration with the largest neighborhood (NBH) from the queue
+  //############################################################################
   Configuration *q = nullptr;
   if(firstRun)
   {
@@ -47,9 +56,12 @@ void QuotientChartCoverQueue::Grow(double t)
     firstRun = false;
   }else{
     if(priority_configurations.empty()){
-      saturated = true;
-      std::cout << "Space got saturated." << std::endl;
-      return;
+      //try random directions
+      //saturated = true;
+      //std::cout << "Space got saturated." << std::endl;
+      Configuration *q_random = SampleCoverBoundaryValid(ptc);
+      if(q_random == nullptr) return;
+      priority_configurations.push(q_random);
     }
     q = priority_configurations.top();
     priority_configurations.pop();
@@ -61,17 +73,23 @@ void QuotientChartCoverQueue::Grow(double t)
     AddConfigurationToCoverWithoutAddingEdges(q);
   }
 
+  //############################################################################
+  // Expand largest NBH. This expansion can be biased towards the goal/random
+  // directions/voronoi regions, etcetera. The actual algorithm will implement
+  // this function.
+  //############################################################################
+
   std::vector<Configuration*> q_children = ExpandNeighborhood(q, NUMBER_OF_EXPANSION_SAMPLES);
   for(uint k = 0; k < q_children.size(); k++)
   {
     priority_configurations.push(q_children.at(k));
+    //Configuration *q_random = SampleCoverBoundaryValid(ptc);
+    //if(q_random == nullptr) return;
+    //priority_configurations.push(q_random);
   }
 
-  Configuration *q_random = SampleCoverBoundaryValid(ptc);
-  if(q_random == nullptr) return;
-  priority_configurations.push(q_random);
-
 }
+
 QuotientChartCoverQueue::Configuration* QuotientChartCoverQueue::SampleCoverBoundary(){
   Configuration *q_random;
   if(!hasSolution){
@@ -100,4 +118,9 @@ void QuotientChartCoverQueue::AddConfigurationToPDF(Configuration *q)
     PDF_Element *q_necessary_element = pdf_necessary_configurations.add(q, 1);
     q->SetNecessaryPDFElement(q_necessary_element);
   }
+}
+void QuotientChartCoverQueue::Print(std::ostream& out) const
+{
+  BaseT::Print(out);
+  out << std::endl << " |------ [Queue] has " << priority_configurations.size() << " configurations left in priority queue.";
 }

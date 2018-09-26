@@ -221,7 +221,7 @@ namespace ompl
       //#######################################################################
       virtual Configuration* Sample();
 
-      Configuration* SampleCoverBoundary(std::string type);
+      virtual Configuration* SampleCoverBoundary(std::string type);
       virtual Configuration* SampleCoverBoundary();
       Configuration* SampleCoverBoundaryValid(ob::PlannerTerminationCondition &ptc);
       void SampleRandomNeighborhoodBoundary(Configuration *q);

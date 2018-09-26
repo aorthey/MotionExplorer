@@ -8,6 +8,7 @@
   <algorithm dynamic="1" name="ompl:kpiece"/>
   <algorithm dynamic="1" name="benchmark:all_dynamic"/>
 
+  <algorithm name="benchmark:minimal"/>
   <algorithm name="hierarchy:qng"/>
   <algorithm name="hierarchy:qng2"/>
   <algorithm name="hierarchy:qmp"/>

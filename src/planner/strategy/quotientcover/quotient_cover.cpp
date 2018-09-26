@@ -18,6 +18,17 @@ using namespace ompl::geometric;
 QuotientChartCover::QuotientChartCover(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
   setName("QuotientChartCover"+std::to_string(id));
+}
+
+QuotientChartCover::~QuotientChartCover(void)
+{
+}
+//#############################################################################
+//SETUP
+//#############################################################################
+
+void QuotientChartCover::setup(void)
+{
   if (!nearest_cover){
     nearest_cover.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
     nearest_cover->setDistanceFunction([this](const Configuration *a, const Configuration *b)
@@ -44,17 +55,11 @@ QuotientChartCover::QuotientChartCover(const base::SpaceInformationPtr &si, Quot
   }
   graph[boost::graph_bundle].name = getName()+"_graph";
   graph[boost::graph_bundle].Q1 = Q1;
-}
 
-QuotientChartCover::~QuotientChartCover(void)
-{
-}
-//#############################################################################
-//SETUP
-//#############################################################################
+  saturated = false;
+  isConnected = false;
+  totalVolumeOfCover = 0.0;
 
-void QuotientChartCover::setup(void)
-{
   if (pdef_){
     //#########################################################################
     if (pdef_->hasOptimizationObjective()){
@@ -116,12 +121,44 @@ void QuotientChartCover::setup(void)
 
     //#########################################################################
     OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nearest_cover->size());
-    setup_ = true;
   }else{
     setup_ = false;
   }
 
 }
+void QuotientChartCover::clear()
+{
+  BaseT::clear();
+  //Nearestneighbors
+  if(nearest_cover){
+    nearest_cover->clear();
+  }
+  if(nearest_vertex){
+    nearest_vertex->clear();
+  }
+  q_start = nullptr;
+  q_goal = nullptr;
+  shortest_path_start_goal.clear();
+  shortest_path_start_goal_necessary_vertices.clear();
+  //Cover graph
+  foreach (Vertex v, boost::vertices(graph)){
+    if(graph[v]!=nullptr) graph[v]->Remove(Q1);
+  }
+  graph.clear();
+
+  //PDF
+  pdf_necessary_configurations.clear();
+  pdf_all_configurations.clear();
+  setup_ = false;
+
+  //index maps
+  vertexToIndexStdMap.clear();
+  indexToVertexStdMap.clear();
+  index_ctr = 0;
+
+  pis_.restart();
+}
+
 
 //#############################################################################
 //Configuration methods
@@ -890,25 +927,6 @@ void QuotientChartCover::Init()
 }
 
 
-void QuotientChartCover::clear()
-{
-  Planner::clear();
-  if(nearest_cover){
-    nearest_cover->clear();
-  }
-  if(nearest_vertex){
-    nearest_vertex->clear();
-  }
-  hasSolution = false;
-  q_start = nullptr;
-  q_goal = nullptr;
-  shortest_path_start_goal.clear();
-  pdf_necessary_configurations.clear();
-  pdf_all_configurations.clear();
-
-  pis_.restart();
-}
-
 bool QuotientChartCover::GetSolution(ob::PathPtr &solution)
 {
   if(!isConnected){
@@ -1199,7 +1217,7 @@ void QuotientChartCover::Print(const Configuration *q) const
 void QuotientChartCover::Print(std::ostream& out) const
 {
   BaseT::Print(out);
-  out << std::endl << "    [ChartCover] has " << boost::num_vertices(graph) << " vertices and " << boost::num_edges(graph) << " edges.";
+  out << std::endl << " |---- [ChartCover] has " << boost::num_vertices(graph) << " vertices and " << boost::num_edges(graph) << " edges.";
 }
 
 namespace ompl{

@@ -269,7 +269,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(input.q_goal);
   ss.setStartAndGoalStates(start,goal,input.epsilon_goalregion);
 
-  ss.getStateSpace()->registerProjection("SE3", ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
+  //ss.getStateSpace()->registerProjection("SE3", ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
   ss.setup();
 
   pdef->setOptimizationObjective( GetOptimizationObjective(si) );

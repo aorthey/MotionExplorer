@@ -46,6 +46,62 @@ QuotientGraph::QuotientGraph(const ob::SpaceInformationPtr &si, Quotient *parent
   totalNumberOfSamples = 0;
 }
 
+void QuotientGraph::setup(){
+  if (!nn_){
+    nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
+    nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
+                             {
+                               return Distance(a, b);
+                             });
+  }
+  if (!connectionStrategy_){
+    connectionStrategy_ = KStrategy<Vertex>(magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
+  }
+
+  if (pdef_){
+    BaseT::setup();
+    if (pdef_->hasOptimizationObjective()){
+      opt_ = pdef_->getOptimizationObjective();
+    }else{
+      std::cout << "Needs specification of optimization objective." << std::endl;
+      exit(0);
+    }
+    auto *goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
+
+    if (goal == nullptr){
+      OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
+      exit(0);
+    }
+
+    while (const ob::State *st = pis_.nextStart()){
+      startM_.push_back(addMilestone(si_->cloneState(st)));
+      G[startM_.back()].start = true;
+    }
+    if (startM_.empty()){
+      OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
+      //const ob::State *start = pdef_->getStartState(0);
+      exit(0);
+    }
+    if (!goal->couldSample()){
+      OMPL_ERROR("%s: Insufficient states in sampleable goal region", getName().c_str());
+      exit(0);
+    }
+
+    if (goal->maxSampleCount() > goalM_.size() || goalM_.empty()){
+      const ob::State *st = pis_.nextGoal();
+      if (st != nullptr){
+        goalM_.push_back(addMilestone(si_->cloneState(st)));
+        G[goalM_.back()].goal = true;
+      }
+    }
+    unsigned long int nrStartStates = boost::num_vertices(G);
+    OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nrStartStates);
+    setup_ = true;
+  }else{
+    setup_ = false;
+  }
+}
+
 QuotientGraph::~QuotientGraph(){
   si_->freeStates(xstates);
   G.clear();
@@ -211,61 +267,6 @@ QuotientGraph::Vertex QuotientGraph::CreateNewVertex(ob::State *state)
   return m;
 }
 
-void QuotientGraph::setup(){
-  std::cout << "calling QG setup" << std::endl;
-  if (!nn_){
-    nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
-    nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
-                             {
-                               return Distance(a, b);
-                             });
-  }
-  if (!connectionStrategy_){
-    connectionStrategy_ = KStrategy<Vertex>(magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
-  }
-
-  if (pdef_){
-    BaseT::setup();
-    if (pdef_->hasOptimizationObjective()){
-      opt_ = pdef_->getOptimizationObjective();
-    }else{
-      std::cout << "Needs specification of optimization objective." << std::endl;
-      exit(0);
-    }
-    auto *goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
-
-    if (goal == nullptr){
-      OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
-      exit(0);
-    }
-
-    while (const ob::State *st = pis_.nextStart()){
-      startM_.push_back(addMilestone(si_->cloneState(st)));
-      G[startM_.back()].start = true;
-    }
-    if (startM_.empty()){
-      OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
-      //const ob::State *start = pdef_->getStartState(0);
-      exit(0);
-    }
-    if (!goal->couldSample()){
-      OMPL_ERROR("%s: Insufficient states in sampleable goal region", getName().c_str());
-      exit(0);
-    }
-
-    if (goal->maxSampleCount() > goalM_.size() || goalM_.empty()){
-      const ob::State *st = pis_.nextGoal();
-      if (st != nullptr){
-        goalM_.push_back(addMilestone(si_->cloneState(st)));
-        G[goalM_.back()].goal = true;
-      }
-    }
-    unsigned long int nrStartStates = boost::num_vertices(G);
-    OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nrStartStates);
-  }else{
-    setup_ = false;
-  }
-}
 
 ob::Cost QuotientGraph::costHeuristic(Vertex u, Vertex v) const
 {

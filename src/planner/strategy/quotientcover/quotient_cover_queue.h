@@ -25,10 +25,13 @@ namespace ompl
       ~QuotientChartCoverQueue(void);
       virtual void Grow(double t) override;
       void clear() override;
+      void setup() override;
       virtual std::vector<Configuration*> ExpandNeighborhood(Configuration*, const int) = 0;
 
       virtual Configuration* SampleCoverBoundary() override;
       virtual void AddConfigurationToPDF(Configuration *q) override;
+      virtual void Print(std::ostream& out) const override;
+
     private:
       bool firstRun{true};
       uint NUMBER_OF_EXPANSION_SAMPLES{0};

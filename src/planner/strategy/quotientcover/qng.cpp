@@ -22,37 +22,78 @@ QNG::~QNG(void)
 {
 }
 
-std::vector<QNG::Configuration*> QNG::ExpandNeighborhood(Configuration *q, const int M_samples)
+std::vector<QNG::Configuration*> QNG::ExpandNeighborhood(Configuration *q_current, const int M_samples)
 {
   std::vector<Configuration*> q_children;
-  if(q->parent_neighbor == nullptr)
+  if(q_current->parent_neighbor == nullptr)
   {
     //if no parent neighbor is available, just sample on the neighborhood boundary
     for(int k = 0; k < M_samples; k++)
     {
       Configuration *q_random = new Configuration(Q1);
-      SampleNeighborhoodBoundary(q_random, q);
+      SampleNeighborhoodBoundary(q_random, q_current);
       if(ComputeNeighborhood(q_random))
       {
         q_children.push_back(q_random);
       }
     }
   }else{
-    for(int k = 0; k < M_samples; k++)
+
+    //############################################################################
+    // Get projected sample
+    //############################################################################
+    Configuration *q_proj = new Configuration(Q1);
+    Configuration *q_last = q_current->parent_neighbor;
+    const double radius_current = q_current->GetRadius();
+    const double radius_last = q_last->GetRadius();
+    const double step_size = (radius_last+radius_current)/radius_last;
+    Q1->getStateSpace()->interpolate(q_last->state, q_current->state, step_size, q_proj->state);
+
+    //############################################################################
+    // (1) q_proj is feasible: 
+    //    (1a) neighborhood is bigger than current neighborhood -> return q_proj
+    //    (1b) otherwise compute other neighborhoods
+    // (2) q_proj is infeasible:
+    //    (2a) sample broadly
+    //############################################################################
+    if(ComputeNeighborhood(q_proj))
     {
-      Configuration *q_random = new Configuration(Q1);
-      SampleNeighborhoodBoundaryHalfBall(q_random, q);
-      if(ComputeNeighborhood(q_random))
+      q_children.push_back(q_proj);
+
+      const double radius_proj = q_proj->GetRadius();
+      const double radius_ratio = radius_proj / radius_current;
+      if(radius_ratio < 1)
       {
-        if(q_random->GetRadius() > 0.1*q->GetRadius()){
-          q_children.push_back(q_random);
+        for(int k = 0; k < M_samples-1; k++)
+        {
+          Configuration *q_k = new Configuration(Q1);
+          Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.5*radius_current);
+
+          if(ComputeNeighborhood(q_k))
+          {
+            q_children.push_back(q_k);
+          }
+        }
+      }
+
+    }else{
+      for(int k = 0; k < M_samples; k++)
+      {
+        Configuration *q_k = new Configuration(Q1);
+        SampleNeighborhoodBoundaryHalfBall(q_k, q_current);
+
+        if(ComputeNeighborhood(q_k))
+        {
+          q_children.push_back(q_k);
+          //if(q_k->GetRadius() > 0.1*q_current->GetRadius()){
+          //}
         }
       }
     }
   }
 
   for(uint k = 0; k < q_children.size(); k++){
-    q_children.at(k)->parent_neighbor = q;
+    q_children.at(k)->parent_neighbor = q_current;
   }
 
   return q_children;
