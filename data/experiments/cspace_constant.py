@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def SpecialEuclideanNeighborhood(rmax):
   r1 = 1
   r2 = rmax

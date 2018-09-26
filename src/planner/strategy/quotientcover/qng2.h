@@ -33,6 +33,7 @@ namespace ompl
       virtual Configuration* SampleUniformQuotientCover(ob::State *state) override;
       virtual Configuration* Sample() override;
 
+      void ExpandLargestDirection(Configuration *q_current);
       void Connect(Configuration *q_from, Configuration *q_next);
       std::vector<Configuration*> GenerateCandidateDirections(Configuration *q_from, Configuration *q_next);
 

@@ -21,8 +21,8 @@ std::vector<std::string> PlannerMultiInput::GetAlgorithms(bool kinodynamic)
   std::vector<std::string> algorithms;
   while(node_algorithm){
     std::string a = GetAttribute<std::string>(node_algorithm, "name");
-    bool dynamic = GetAttributeDefault<int>(node_algorithm, "dynamic", false);
-    if(kinodynamic == dynamic){
+    bool isDynamic = GetAttributeDefault<int>(node_algorithm, "dynamic", false);
+    if(kinodynamic == isDynamic){
       algorithms.push_back(a);
     }
     node_algorithm = FindNextSiblingNode(node_algorithm);

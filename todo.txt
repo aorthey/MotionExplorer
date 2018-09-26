@@ -569,3 +569,13 @@ outer shell
 distance?
 
 [ ] neighborhood should be an independent module, getting input from xml/robot urdf
+
+
+More Structure
+-- Neighborhood
+-- Quotients
+
+[ ] Fix 02D_disk, i.e. have a good expansion strategy (consider it as fixed if we can repeatedly
+solve it in under 0.5s).
+[ ] Fix 03D_misleading, i.e. have a good interpolation/expansion strategy if
+using cover

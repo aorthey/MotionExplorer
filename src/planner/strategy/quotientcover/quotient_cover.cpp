@@ -141,6 +141,7 @@ QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCoverWithoutAdd
 {
   //###########################################################################
   //safety checks
+  //###########################################################################
   if(q->GetRadius()<minimum_neighborhood_radius)
   {
     OMPL_ERROR("Trying to add configuration to cover, but Neighborhood is too small.");
@@ -153,6 +154,7 @@ QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCoverWithoutAdd
 
   //###########################################################################
   //(1) add to cover graph
+  //###########################################################################
   Vertex v = boost::add_vertex(q, graph);
   graph[v]->number_attempted_expansions = 0;
   graph[v]->number_successful_expansions = 0;
@@ -165,11 +167,13 @@ QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCoverWithoutAdd
 
   //###########################################################################
   //(2) add to nearest neighbor structure
+  //###########################################################################
   nearest_cover->add(q);
   nearest_vertex->add(q);
 
   //###########################################################################
   //(3) add to PDF
+  //###########################################################################
   AddConfigurationToPDF(q);
 
   if(verbose>0) std::cout << std::string(80, '-') << std::endl;
@@ -594,7 +598,7 @@ bool QuotientChartCover::SampleNeighborhoodBoundary(Configuration *q_random, con
     OMPL_ERROR("neighborhood is too small to sample the boundary.");
     std::cout << std::string(80, '#') << std::endl;
     std::cout << "Configuration " << std::endl;
-    Q1->printState(q_center->state);
+    Print(q_center);
     std::cout << "radius: " << radius << std::endl;
     std::cout << "min distance: " << minimum_neighborhood_radius << std::endl;
     std::cout << std::string(80, '#') << std::endl;

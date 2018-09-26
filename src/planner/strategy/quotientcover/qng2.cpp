@@ -17,7 +17,7 @@ using namespace ompl::geometric;
 QNG2::QNG2(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
   setName("QNG2"+std::to_string(id));
-  NUMBER_OF_EXPANSION_SAMPLES = Q1->getStateDimension()+1;
+  NUMBER_OF_EXPANSION_SAMPLES = (Q1->getStateDimension()+1)*2;
   std::cout << "Number of expansion samples: " << NUMBER_OF_EXPANSION_SAMPLES << std::endl;
 }
 
@@ -40,9 +40,70 @@ void QNG2::Grow(double t)
 {
   if(saturated) return;
 
-  Configuration *q_random = Sample();
-  Configuration *q_nearest = Nearest(q_random);
-  Connect(q_nearest, q_random);
+  double r = rng_.uniform01();
+  if(r<0.2){
+    Configuration *q_random = Sample();
+    Configuration *q_nearest = Nearest(q_random);
+    Connect(q_nearest, q_random);
+  }else{
+    Configuration *q_random = new Configuration(Q1);
+    SampleRandomNeighborhoodBoundary(q_random);
+    if(ComputeNeighborhood(q_random))
+    {
+      AddConfigurationToCoverWithoutAddingEdges(q_random);
+      ExpandLargestDirection(q_random);
+    }
+  }
+}
+void QNG2::ExpandLargestDirection(Configuration *q_current)
+{
+  std::vector<Configuration*> q_children;
+
+  //############################################################################
+  //Candidate configurations
+  //############################################################################
+  Configuration *q_last = q_current->parent_neighbor;
+  for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES; k++){
+    Configuration *q_next = new Configuration(Q1);
+    if(q_last == nullptr){
+      std::cout << "sampling Neighborhood boundary" << std::endl;
+      SampleNeighborhoodBoundary(q_next, q_current);
+    }else{
+      SampleNeighborhoodBoundaryHalfBall(q_next, q_current);
+    }
+    if(ComputeNeighborhood(q_next))
+    {
+      q_next->parent_neighbor = q_current;
+      q_children.push_back(q_next);
+    }
+  }
+
+  double radius_largest = 0;
+  uint idx_largest = 0;
+  for(uint k = 0; k < q_children.size(); k++)
+  {
+    Configuration *q_k = q_children.at(k);
+    double r = q_k->GetRadius();
+    if(r > radius_largest)
+    {
+      radius_largest = r;
+      idx_largest = k;
+    }
+    q_k->parent_neighbor = q_current;
+    AddConfigurationToCoverWithoutAddingEdges(q_k);
+  }
+
+  if(radius_largest <= 0.1*q_current->GetRadius())
+  {
+    return;
+  }
+
+  //terminate condition (2) no feasible neighborhoods
+  if(!q_children.empty())
+  {
+    return ExpandLargestDirection(q_children.at(idx_largest));
+  }
+
 }
 
 void QNG2::Connect(Configuration *q_from, Configuration *q_next)
@@ -110,15 +171,19 @@ std::vector<QuotientChartCover::Configuration*> QNG2::GenerateCandidateDirection
     if(radius_proj >= radius_from){
       return q_children;
     }
+  }else{
+    return q_children;
   }
   for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES; k++){
     Configuration *q_k = new Configuration(Q1);
 
-    if(isProjectedFeasible){
-      Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.75*radius_from);
-    }else{
-      SampleNeighborhoodBoundaryHalfBall(q_k, q_from);
-    }
+    Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.5*radius_from);
+
+    //if(isProjectedFeasible){
+    //  Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.75*radius_from);
+    //}else{
+    //  SampleNeighborhoodBoundaryHalfBall(q_k, q_from);
+    //}
     //SampleNeighborhoodBoundaryHalfBall(q_k, q_from);
 
     const double d_from_to_k = DistanceConfigurationConfiguration(q_from, q_k);
@@ -153,14 +218,12 @@ QNG2::Configuration* QNG2::Sample()
   //in that way, similar to potential field approach/generalized interpolation
   //towards goal --- it is the first thing
   //one should try).
-
   Configuration *q_random = new Configuration(Q1);
   if(firstRun){
     SampleGoal(q_random);
     firstRun = false;
     return q_random;
   }
-
   if(!hasSolution){
     double r = rng_.uniform01();
     if(r<goalBias){
