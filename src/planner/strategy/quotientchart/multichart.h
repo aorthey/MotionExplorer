@@ -17,6 +17,7 @@ namespace ompl
       //vertices.
       //
     class MultiChart: public ob::Planner{
+        typedef ob::Planner BaseT;
         static_assert(std::is_base_of<og::QuotientChart, T>::value, "Template must inherit from QuotientChart");
 
       public:

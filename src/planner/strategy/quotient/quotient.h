@@ -43,7 +43,7 @@ namespace ompl
       enum QuotientSpaceType{ UNKNOWN, ATOMIC_RN, RN_RM, SE2_R2, SE3_R3, SE3RN_R3, SE3RN_SE3, SE3RN_SE3RM };
 
       public:
-        const uint verbose{1};
+        const uint verbose{0};
         Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
         ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override final; //final prevents subclasses to override
 

@@ -246,20 +246,22 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
 
 }
 
-
-
 std::ostream& operator<< (std::ostream& out, const StrategyOutput& so) 
 {
   out << std::string(80, '-') << std::endl;
   out << "Planning Output" << std::endl;
   out << std::string(80, '-') << std::endl;
   out << " robot                : " << so.cspace->GetRobotPtr()->name << std::endl;
-  out << " exact solution       : " << (so.pdef->hasExactSolution()? "Yes":"No")<< std::endl;
-  out << " approximate solution : " << (so.pdef->hasApproximateSolution()? "Yes":"No")<< std::endl;
-  double dg = so.pdef->getSolutionDifference();
-  out << " solution difference  : " << dg << std::endl;
-  out << " roadmap vertices     : " << so.pd->numVertices() << std::endl;
-  out << " roadmap edges        : " << so.pd->numEdges() << std::endl;
+  if(so.pdef){
+    out << " exact solution       : " << (so.pdef->hasExactSolution()? "Yes":"No")<< std::endl;
+    out << " approximate solution : " << (so.pdef->hasApproximateSolution()? "Yes":"No")<< std::endl;
+    double dg = so.pdef->getSolutionDifference();
+    out << " solution difference  : " << dg << std::endl;
+  }
+  if(so.pd){
+    out << " roadmap vertices     : " << so.pd->numVertices() << std::endl;
+    out << " roadmap edges        : " << so.pd->numEdges() << std::endl;
+  }
   out << " planner time         : " << so.planner_time << std::endl;
   out << " max planner time     : " << so.max_planner_time << std::endl;
   out << std::string(80, '-') << std::endl;

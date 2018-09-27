@@ -29,6 +29,7 @@ QuotientChartCover::~QuotientChartCover(void)
 
 void QuotientChartCover::setup(void)
 {
+  BaseT::setup();
   if (!nearest_cover){
     nearest_cover.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
     nearest_cover->setDistanceFunction([this](const Configuration *a, const Configuration *b)
@@ -118,7 +119,6 @@ void QuotientChartCover::setup(void)
       OMPL_INFORM("Note: start state covers quotient-space.");
       saturated = true;
     }
-
     //#########################################################################
     OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nearest_cover->size());
   }else{

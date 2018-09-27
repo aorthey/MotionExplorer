@@ -15,7 +15,6 @@ using namespace ompl::geometric;
 
 QuotientChartCoverQueue::QuotientChartCoverQueue(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
-  setName(typeid(*this).name()+std::to_string(id));
   NUMBER_OF_EXPANSION_SAMPLES = (Q1->getStateDimension()+1)*1;
 }
 

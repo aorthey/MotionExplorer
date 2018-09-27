@@ -222,6 +222,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     RunBenchmark(input, si_vec, pdef_vec);
   }else{
     planner = GetPlanner(algorithm, si_vec, pdef_vec);
+    planner->clear();
     planner->setup();
 
     double max_planning_time= input.max_planning_time;

@@ -15,7 +15,7 @@ using namespace ompl::geometric;
 
 QNG::QNG(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
-  setName(typeid(*this).name()+std::to_string(id));
+  setName("QNG"+std::to_string(id));
 }
 
 QNG::~QNG(void)

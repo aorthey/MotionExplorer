@@ -57,14 +57,14 @@ void MultiChart<T>::setup(){
 
 template <class T>
 void MultiChart<T>::clear(){
-  root_chart->clear();
+  if(root_chart) root_chart->clear();
   found_path_on_last_level = false;
   saturated_levels = false;
   for(uint k = 0; k < quotientCharts.size(); k++){
     quotientCharts.at(k)->clear();
   }
   quotientCharts.clear();
-  Planner::clear();
+  BaseT::clear();
 }
 
 
@@ -82,7 +82,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
 
   base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
                                  { return ptc || found_path_on_last_level || saturated_levels; });
-
   root_chart->Init();
   Q.push(root_chart);
 
