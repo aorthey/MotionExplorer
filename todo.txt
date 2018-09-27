@@ -561,15 +561,12 @@ quotientcoverinterpolator ?
 (projection onto hyperplane, i.e. going orthogonal is allowed
 [ ] need some benchmarking against RRT on 2d examples
 
-[ ] fix no-coset bug
+[x] fix no-coset bug
 [ ] create all benchmark-able environments, plus neighborhood computation plus
 outer shell
-
 [ ] what to do with SE3xRn robots? What to do with robots which cannot compute a
 distance?
-
 [ ] neighborhood should be an independent module, getting input from xml/robot urdf
-
 
 More Structure
 -- Neighborhood
@@ -579,3 +576,7 @@ More Structure
 solve it in under 0.5s).
 [ ] Fix 03D_misleading, i.e. have a good interpolation/expansion strategy if
 using cover
+
+[ ] possible R2 benchmarks: null-homotopic, circle-like, N-circle-like
+[ ] possible SE(2) benchmarks: null-homotopic, circle-like, circle-like + misleading, circle-like + non-simple, N-circle-like
+

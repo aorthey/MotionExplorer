@@ -35,6 +35,7 @@ class PlannerInput{
 
     std::string name_algorithm;
     std::string name_sampler;
+    std::string environment_name;
 
     double epsilon_goalregion;
     double max_planning_time;

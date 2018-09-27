@@ -29,7 +29,6 @@ std::vector<QNG::Configuration*> QNG::ExpandNeighborhood(Configuration *q_curren
   if(q_current->parent_neighbor == nullptr)
   {
     //if no parent neighbor is available, just sample on the neighborhood boundary
-    //if(verbose>0) std::cout << "init sampling around NEIGHBORHOOD" << std::endl;
     for(int k = 0; k < M_samples; k++)
     {
       Configuration *q_random = new Configuration(Q1);

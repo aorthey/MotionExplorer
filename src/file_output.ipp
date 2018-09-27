@@ -7,6 +7,12 @@ TiXmlElement* CreateRootNodeInDocument(TiXmlDocument& doc, const char *name)
   TiXmlElement *root = new TiXmlElement(name);
   return root;
 }
+TiXmlElement* CreateSubNode(TiXmlElement& parent_node, const char *name)
+{
+  TiXmlElement *subnode = new TiXmlElement(name);
+  parent_node.InsertEndChild(*subnode);
+  return subnode;
+}
 
 template <typename T>
 void AddSubNode(TiXmlElement& node, const char *name, T _val){

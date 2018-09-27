@@ -1,6 +1,6 @@
 #include "planner/strategy/strategy_kinodynamic.h"
 #include "planner/cspace/cspace_kinodynamic.h"
-#include "planner/strategy/benchmark_input.h"
+#include "planner/benchmark/benchmark_input.h"
 //#include "planner/strategy/ompl_remastered/kRRT.h"
 
 #include "util.h"

@@ -3,7 +3,21 @@
 #include <tinyxml.h>
 #include <vector>
 
+//INSERTION OF ELEMENTS HAS TO BE DONE FIRST BY INSERTING IN THE DEEPEST
+//ELEMENT, THEN GOING UPWARDS. 
+//
+// Example:
+// TiXmlElement root();
+// TiXmlElement subnode();
+// TiXmlElement subsubnode();
+// 
+// WORKS:
+// AddSubNode(subnode, "name", "sub");
+// node->insertendchild(subnode);
+//
+
 inline TiXmlElement* CreateRootNodeInDocument(TiXmlDocument& doc, const char *name = "default");
+inline TiXmlElement* CreateSubNode(TiXmlElement& parent_node, const char *name = "default");
 
 inline void AddComment(TiXmlElement& node, const char *str = "");
 

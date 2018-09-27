@@ -120,8 +120,51 @@ void QuotientChartCoverQueue::AddConfigurationToPDF(Configuration *q)
     q->SetNecessaryPDFElement(q_necessary_element);
   }
 }
+void QuotientChartCoverQueue::CopyChartFromSibling( QuotientChart *sibling_chart, uint k )
+{
+  BaseT::CopyChartFromSibling(sibling_chart, k);
+
+  QuotientChartCoverQueue *sibling = dynamic_cast<QuotientChartCoverQueue*>(sibling_chart);
+  if(sibling == nullptr)
+  {
+    std::cout << "copying chart from non queue." << std::endl;
+    std::cout << *sibling_chart << std::endl;
+    exit(0);
+  }
+
+  priority_configurations = sibling->GetPriorityQueue();
+  NUMBER_OF_EXPANSION_SAMPLES = sibling->NUMBER_OF_EXPANSION_SAMPLES;
+}
+
+const QuotientChartCoverQueue::ConfigurationPriorityQueue& QuotientChartCoverQueue::GetPriorityQueue()
+{
+  return priority_configurations;
+}
+
 void QuotientChartCoverQueue::Print(std::ostream& out) const
 {
   BaseT::Print(out);
   out << std::endl << " |------ [Queue] has " << priority_configurations.size() << " configurations left in priority queue.";
+}
+
+QuotientChartCoverQueue::Configuration* QuotientChartCoverQueue::SampleUniformQuotientCover(ob::State *state) 
+{
+  double r = rng_.uniform01();
+  Configuration *q_coset = nullptr;
+  if(r<shortestPathBias)
+  {
+    if(shortest_path_start_goal_necessary_vertices.empty())
+    {
+      std::cout << "[WARNING] shortest path does not have any necessary vertices! -- should be detected on CS" << std::endl;
+      exit(0);
+    }
+    int k = rng_.uniformInt(0, shortest_path_start_goal_necessary_vertices.size()-1);
+    const Vertex vk = shortest_path_start_goal_necessary_vertices.at(k);
+    q_coset = graph[vk];
+    Q1_sampler->sampleUniformNear(state, q_coset->state, q_coset->GetRadius());
+  }else{
+    q_coset = pdf_necessary_configurations.sample(rng_.uniform01());
+    Q1_sampler->sampleUniformNear(state, q_coset->state, q_coset->GetRadius());
+  }
+  return q_coset;
 }

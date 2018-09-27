@@ -31,11 +31,14 @@ namespace ompl
       virtual Configuration* SampleCoverBoundary() override;
       virtual void AddConfigurationToPDF(Configuration *q) override;
       virtual void Print(std::ostream& out) const override;
+      virtual Configuration* SampleUniformQuotientCover(ob::State *state) override;
+      virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
 
     private:
       bool firstRun{true};
       uint NUMBER_OF_EXPANSION_SAMPLES{0};
       const double goalBias{0.3};
+      const double shortestPathBias{1.0};
 
       struct CmpConfigurationPtrs
       {
@@ -44,7 +47,10 @@ namespace ompl
            return lhs->GetImportance() < rhs->GetImportance();
         }
       };
-      std::priority_queue<Configuration*, std::vector<Configuration*>, CmpConfigurationPtrs> priority_configurations;
+      typedef std::priority_queue<Configuration*, std::vector<Configuration*>, CmpConfigurationPtrs> ConfigurationPriorityQueue;
+      ConfigurationPriorityQueue priority_configurations;
+    public:
+      const ConfigurationPriorityQueue& GetPriorityQueue();
     };
   }
 }

@@ -3,10 +3,18 @@
 #include "cspace/cspace_input.h"
 #include "planner/strategy/strategy_input.h"
 #include <KrisLibrary/math/VectorTemplate.h>
+#include <boost/filesystem.hpp>
 
 bool PlannerMultiInput::Load(const char* file){
   TiXmlDocument doc(file);
-  return Load(GetRootNodeFromDocument(doc));
+  Load(GetRootNodeFromDocument(doc));
+  boost::filesystem::path p(file);
+
+  for(uint k = 0; k < inputs.size(); k++){
+
+    inputs.at(k)->environment_name = p.filename().string();
+  }
+  return true;
 }
 
 std::vector<std::string> PlannerMultiInput::GetAlgorithms(bool kinodynamic)
@@ -169,6 +177,7 @@ const StrategyInput& PlannerInput::GetStrategyInput()
   sin->name_algorithm = name_algorithm;
   sin->epsilon_goalregion = epsilon_goalregion;
   sin->max_planning_time = max_planning_time;
+  sin->environment_name = environment_name;
   return *sin;
 }
 
@@ -176,6 +185,7 @@ bool PlannerInput::Load(const char* file)
 {
   TiXmlDocument doc(file);
   TiXmlElement *root = GetRootNodeFromDocument(doc);
+  environment_name = file;
   return Load(root);
 }
 std::ostream& operator<< (std::ostream& out, const PlannerInput& pin) 
@@ -199,6 +209,7 @@ std::ostream& operator<< (std::ostream& out, const PlannerInput& pin)
   for(uint k = 0; k < pin.robot_idxs.size(); k++){
     out << " " << pin.robot_idxs.at(k);
   }
+  out << "environment        : " << pin.environment_name << std::endl;
   out << std::endl;
   out << std::string(80, '-') << std::endl;
   return out;

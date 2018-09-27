@@ -16,6 +16,7 @@ struct StrategyInput{
   Config dq_goal;
   std::string name_algorithm;
   std::string name_sampler;
+  std::string environment_name;
   double max_planning_time;
   double epsilon_goalregion;
   CSpaceOMPL *cspace;

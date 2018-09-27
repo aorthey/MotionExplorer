@@ -1,7 +1,8 @@
 #include "util.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/strategy/strategy_geometric.h"
-#include "planner/strategy/benchmark_input.h"
+#include "planner/benchmark/benchmark_input.h"
+#include "planner/benchmark/benchmark_output.h"
 
 #include "planner/strategy/quotient/multiquotient.h"
 #include "planner/strategy/quotient/qmp_connect.h"
@@ -261,7 +262,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(
   const ob::SpaceInformationPtr si = si_vec.back();
   std::string file_benchmark = "benchmark_"+util::GetCurrentDateTimeString();
   og::SimpleSetup ss(si);
-  ot::Benchmark benchmark(ss, "Benchmark");
+  ot::Benchmark benchmark(ss, input.environment_name);
 
   for(uint k = 0; k < binput.algorithms.size(); k++){
     benchmark.addPlanner(GetPlanner(binput.algorithms.at(k), si_vec, pdef_vec));
@@ -291,8 +292,12 @@ void StrategyGeometricMultiLevel::RunBenchmark(
   std::string res = file_benchmark+".log";
   std::string cmd;
 
-  benchmark.saveResultsToFile(res.c_str());
-  BenchmarkFileToPNG(file_benchmark);
+  //benchmark.saveResultsToFile(res.c_str());
+  //BenchmarkFileToPNG(file_benchmark);
+
+  BenchmarkOutput boutput(benchmark.getRecordedExperimentData());
+  std::string xml_file = file_benchmark + ".xml";
+  boutput.Save(xml_file.c_str());
 
 }
 
