@@ -297,7 +297,7 @@ namespace ompl
 
       double GetGoalBias() const;
       virtual void Print(std::ostream& out) const override;
-      void Print(const Configuration *q) const;
+      void Print(const Configuration *q, bool stopOnError=true) const;
 
     };
   }

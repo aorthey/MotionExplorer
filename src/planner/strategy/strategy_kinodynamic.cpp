@@ -1,6 +1,6 @@
 #include "planner/strategy/strategy_kinodynamic.h"
 #include "planner/cspace/cspace_kinodynamic.h"
-#include "planner/strategy/benchmark.h"
+#include "planner/strategy/benchmark_input.h"
 //#include "planner/strategy/ompl_remastered/kRRT.h"
 
 #include "util.h"
@@ -144,22 +144,22 @@ void StrategyKinodynamicMultiLevel::RunBenchmark(
     std::vector<ob::ProblemDefinitionPtr> pdef_vec)
 {
   std::cout << input.name_algorithm << std::endl;
-  BenchmarkInformation binfo(input.name_algorithm);
+  BenchmarkInput binput(input.name_algorithm);
 
   const oc::SpaceInformationPtr si = static_pointer_cast<oc::SpaceInformation>(si_vec.back());
   std::string file_benchmark = "benchmark_kinodynamic_"+util::GetCurrentDateTimeString();
   oc::SimpleSetup ss(si);
   ot::Benchmark benchmark(ss, "Benchmark");
 
-  for(uint k = 0; k < binfo.algorithms.size(); k++){
-    if(util::StartsWith(binfo.algorithms.at(k), "syclop"))
+  for(uint k = 0; k < binput.algorithms.size(); k++){
+    if(util::StartsWith(binput.algorithms.at(k), "syclop"))
     {
-      // ob::PlannerPtr planner = GetPlanner(binfo.algorithms.at(k), si_vec, pdef_vec);
+      // ob::PlannerPtr planner = GetPlanner(binput.algorithms.at(k), si_vec, pdef_vec);
       // GridDecomposition(20, 3, const base::RealVectorBounds &b);
       std::cout << "cannot handle syclop" << std::endl;
       exit(0);
     }else{
-      benchmark.addPlanner(GetPlanner(binfo.algorithms.at(k), si_vec, pdef_vec));
+      benchmark.addPlanner(GetPlanner(binput.algorithms.at(k), si_vec, pdef_vec));
     }
   }
 
@@ -178,9 +178,9 @@ void StrategyKinodynamicMultiLevel::RunBenchmark(
   pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
 
   ot::Benchmark::Request req;
-  req.maxTime = binfo.maxPlanningTime;
-  req.maxMem = binfo.maxMemory;
-  req.runCount = binfo.runCount;
+  req.maxTime = binput.maxPlanningTime;
+  req.maxMem = binput.maxMemory;
+  req.runCount = binput.runCount;
   req.displayProgress = true;
 
   benchmark.setPostRunEvent(std::bind(&PostRunEventKinodynamic, std::placeholders::_1, std::placeholders::_2));

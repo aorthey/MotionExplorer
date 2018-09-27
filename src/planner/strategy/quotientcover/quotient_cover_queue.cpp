@@ -15,7 +15,7 @@ using namespace ompl::geometric;
 
 QuotientChartCoverQueue::QuotientChartCoverQueue(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
-  NUMBER_OF_EXPANSION_SAMPLES = (Q1->getStateDimension()+1)*1;
+  if(parent != nullptr) verbose = 1;
 }
 
 QuotientChartCoverQueue::~QuotientChartCoverQueue(void)
@@ -57,7 +57,7 @@ void QuotientChartCoverQueue::Grow(double t)
     if(priority_configurations.empty()){
       //try random directions
       //saturated = true;
-      //std::cout << "Space got saturated." << std::endl;
+      if(verbose>0) std::cout << "Space got saturated." << std::endl;
       Configuration *q_random = SampleCoverBoundaryValid(ptc);
       if(q_random == nullptr) return;
       priority_configurations.push(q_random);
@@ -82,10 +82,12 @@ void QuotientChartCoverQueue::Grow(double t)
   for(uint k = 0; k < q_children.size(); k++)
   {
     priority_configurations.push(q_children.at(k));
-    //Configuration *q_random = SampleCoverBoundaryValid(ptc);
-    //if(q_random == nullptr) return;
-    //priority_configurations.push(q_random);
   }
+
+  //add different biases to remove planner from getting stuck
+  Configuration *q_random = SampleCoverBoundaryValid(ptc);
+  if(q_random == nullptr) return;
+  priority_configurations.push(q_random);
 
 }
 

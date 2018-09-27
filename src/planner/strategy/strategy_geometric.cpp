@@ -1,7 +1,7 @@
 #include "util.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/strategy/strategy_geometric.h"
-#include "planner/strategy/benchmark.h"
+#include "planner/strategy/benchmark_input.h"
 
 #include "planner/strategy/quotient/multiquotient.h"
 #include "planner/strategy/quotient/qmp_connect.h"
@@ -22,14 +22,13 @@
 #include <ompl/geometric/planners/rrt/TRRT.h>
 #include <ompl/geometric/planners/rrt/BiTRRT.h>
 #include <ompl/geometric/planners/rrt/LBTRRT.h>
+#include <ompl/geometric/planners/rrt/SORRTstar.h>
 #include <ompl/geometric/planners/prm/PRM.h>
 #include <ompl/geometric/planners/prm/PRMstar.h>
 #include <ompl/geometric/planners/prm/LazyPRM.h>
 #include <ompl/geometric/planners/prm/LazyPRMstar.h>
 #include <ompl/geometric/planners/prm/SPARS.h>
 #include <ompl/geometric/planners/prm/SPARStwo.h>
-#include <ompl/geometric/planners/sst/SST.h>
-#include <ompl/geometric/planners/pdst/PDST.h>
 #include <ompl/geometric/planners/kpiece/KPIECE1.h>
 #include <ompl/geometric/planners/kpiece/BKPIECE1.h>
 #include <ompl/geometric/planners/kpiece/LBKPIECE1.h>
@@ -37,15 +36,17 @@
 #include <ompl/geometric/planners/fmt/BFMT.h>
 #include <ompl/geometric/planners/est/EST.h>
 #include <ompl/geometric/planners/est/BiEST.h>
+#include <ompl/geometric/planners/est/ProjEST.h>
 #include <ompl/geometric/planners/sbl/SBL.h>
 #include <ompl/geometric/planners/sbl/pSBL.h>
 #include <ompl/geometric/planners/stride/STRIDE.h>
+#include <ompl/geometric/planners/sst/SST.h>
+#include <ompl/geometric/planners/pdst/PDST.h>
 #include <ompl/geometric/planners/cforest/CForest.h>
-
+#include <ompl/geometric/planners/bitstar/BITstar.h>
 
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 #include <ompl/base/objectives/MaximizeMinClearanceObjective.h>
-
 
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/geometric/PathGeometric.h>
@@ -91,7 +92,6 @@ StrategyGeometricMultiLevel::StrategyGeometricMultiLevel()
 ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     std::vector<ob::SpaceInformationPtr> si_vec, 
     std::vector<ob::ProblemDefinitionPtr> pdef_vec)
-
 {
   ob::PlannerPtr planner;
   const ob::SpaceInformationPtr si = si_vec.back();
@@ -104,8 +104,10 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:rrtxstatic") planner = std::make_shared<og::RRTXstatic>(si);
   else if(algorithm=="ompl:informedrrtstar") planner = std::make_shared<og::InformedRRTstar>(si);
   else if(algorithm=="ompl:lazyrrt") planner = std::make_shared<og::LazyRRT>(si);
+  else if(algorithm=="ompl:trrt") planner = std::make_shared<og::TRRT>(si);
   else if(algorithm=="ompl:btrrt") planner = std::make_shared<og::BiTRRT>(si);
   else if(algorithm=="ompl:lbtrrt") planner = std::make_shared<og::LBTRRT>(si);
+  else if(algorithm=="ompl:sorrtstar") planner = std::make_shared<og::SORRTstar>(si);
 
   else if(algorithm=="ompl:prm") planner = std::make_shared<og::PRM>(si);
   else if(algorithm=="ompl:prmstar") planner = std::make_shared<og::PRMstar>(si);
@@ -123,10 +125,12 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:lbkpiece") planner = std::make_shared<og::LBKPIECE1>(si);
   else if(algorithm=="ompl:est") planner = std::make_shared<og::EST>(si);
   else if(algorithm=="ompl:biest") planner = std::make_shared<og::BiEST>(si);
+  else if(algorithm=="ompl:projest") planner = std::make_shared<og::ProjEST>(si);
   else if(algorithm=="ompl:sbl") planner = std::make_shared<og::SBL>(si);
   else if(algorithm=="ompl:psbl") planner = std::make_shared<og::pSBL>(si);
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
+  else if(algorithm=="ompl:bitstar") planner = std::make_shared<og::BITstar>(si);
 
   else if(algorithm=="hierarchy:qmp_connect"){
     typedef og::MultiQuotient<og::QMPConnect> MultiQuotient;
@@ -225,7 +229,7 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
     planner->clear();
     planner->setup();
 
-    double max_planning_time= input.max_planning_time;
+    double max_planning_time = input.max_planning_time;
     ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
     ompl::time::point start = ompl::time::now();
@@ -252,15 +256,15 @@ void StrategyGeometricMultiLevel::RunBenchmark(
     std::vector<ob::SpaceInformationPtr> si_vec, 
     std::vector<ob::ProblemDefinitionPtr> pdef_vec)
 {
-  BenchmarkInformation binfo(input.name_algorithm);
+  BenchmarkInput binput(input.name_algorithm);
 
   const ob::SpaceInformationPtr si = si_vec.back();
   std::string file_benchmark = "benchmark_"+util::GetCurrentDateTimeString();
   og::SimpleSetup ss(si);
   ot::Benchmark benchmark(ss, "Benchmark");
 
-  for(uint k = 0; k < binfo.algorithms.size(); k++){
-    benchmark.addPlanner(GetPlanner(binfo.algorithms.at(k), si_vec, pdef_vec));
+  for(uint k = 0; k < binput.algorithms.size(); k++){
+    benchmark.addPlanner(GetPlanner(binput.algorithms.at(k), si_vec, pdef_vec));
   }
 
   ob::ProblemDefinitionPtr pdef = pdef_vec.back();
@@ -276,9 +280,9 @@ void StrategyGeometricMultiLevel::RunBenchmark(
   pdef->setOptimizationObjective( GetOptimizationObjective(si) );
 
   ot::Benchmark::Request req;
-  req.maxTime = binfo.maxPlanningTime;
-  req.maxMem = binfo.maxMemory;
-  req.runCount = binfo.runCount;
+  req.maxTime = binput.maxPlanningTime;
+  req.maxMem = binput.maxMemory;
+  req.runCount = binput.runCount;
   req.displayProgress = true;
 
   benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));
@@ -288,7 +292,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(
   std::string cmd;
 
   benchmark.saveResultsToFile(res.c_str());
-
   BenchmarkFileToPNG(file_benchmark);
+
 }
 

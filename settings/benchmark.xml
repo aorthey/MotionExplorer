@@ -13,40 +13,57 @@
   </benchmark>
 
   <benchmark name="minimal">
-
     <algorithm name="hierarchy:qng"/>
     <!-- <algorithm name="ompl:rrtconnect"/> -->
-    <!-- <algorithm name="ompl:rrt"/> -->
-    <maxplanningtime>2</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>2</runcount> <!-- number of runs per algorithm --> 
+    <algorithm name="ompl:kpiece"/>
+    <maxplanningtime>3</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>5</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 
   <!-- complete benchmark of all planners -->
   <benchmark name="all_geometric">
+    <algorithm name="hierarchy:qng"/>
 
-    <!-- <algorithm name="qmp_connect"/> -->
-    <algorithm name="ompl:stride"/>
-    <algorithm name="ompl:kpiece"/>
-    <algorithm name="ompl:lbkpiece"/>
     <algorithm name="ompl:rrt"/>
     <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:prrt"/>
     <algorithm name="ompl:rrtstar"/>
+    <algorithm name="ompl:rrtxstatic"/>
+    <algorithm name="ompl:informedrrtstar"/>
     <algorithm name="ompl:lazyrrt"/>
+    <algorithm name="ompl:trrt"/>
+    <algorithm name="ompl:btrrt"/>
+    <algorithm name="ompl:lbtrrt"/>
+
+    <algorithm name="ompl:sorrtstar"/>
     <algorithm name="ompl:prm"/>
     <algorithm name="ompl:prmstar"/>
     <algorithm name="ompl:lazyprm"/>
-    <algorithm name="ompl:sbl"/>
-    <algorithm name="ompl:est"/>
-    <algorithm name="ompl:biest"/>
-    <algorithm name="ompl:fmt"/>
-    <algorithm name="ompl:bfmt"/>
-    <algorithm name="ompl:pdst"/>
+    <algorithm name="ompl:lazyprmstar"/>
     <algorithm name="ompl:spars"/>
+    <algorithm name="ompl:spars2"/>
     <algorithm name="ompl:cforest"/>
     <algorithm name="ompl:sst"/>
-    <maxplanningtime>300</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>10</runcount> <!-- number of runs per algorithm --> 
+    <algorithm name="ompl:pdst"/>
+
+    <algorithm name="ompl:stride"/>
+    <algorithm name="ompl:kpiece"/>
+    <algorithm name="ompl:bkpiece"/>
+    <algorithm name="ompl:lbkpiece"/>
+    <algorithm name="ompl:est"/>
+    <algorithm name="ompl:biest"/>
+    <algorithm name="ompl:projest"/>
+    <algorithm name="ompl:sbl"/>
+    <algorithm name="ompl:psbl"/>
+    <algorithm name="ompl:fmt"/>
+
+    <algorithm name="ompl:bfmt"/>
+
+    <!-- <algorithm name="ompl:bitstar"/> -->
+
+    <maxplanningtime>3</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>3</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 

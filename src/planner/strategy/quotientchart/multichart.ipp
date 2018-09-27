@@ -41,8 +41,8 @@ void MultiChart<T>::setup(){
     for(uint k = 0; k < si_vec.size(); k++){
       og::QuotientChart* parent = nullptr;
       if(k>0) parent = quotientCharts.back();
-      T* ss = new T(si_vec.at(k), parent);
-      quotientCharts.push_back(ss);
+      T* chart_k = new T(si_vec.at(k), parent);
+      quotientCharts.push_back(chart_k);
     }
 
     found_path_on_last_level = false;
@@ -57,14 +57,19 @@ void MultiChart<T>::setup(){
 
 template <class T>
 void MultiChart<T>::clear(){
+  BaseT::clear();
   if(root_chart) root_chart->clear();
   found_path_on_last_level = false;
   saturated_levels = false;
   for(uint k = 0; k < quotientCharts.size(); k++){
     quotientCharts.at(k)->clear();
   }
+  solutions.clear();
+  pdef_->clearSolutionPaths();
+  for(uint k = 0; k < pdef_vec.size(); k++){
+    pdef_vec.at(k)->clearSolutionPaths();
+  }
   quotientCharts.clear();
-  BaseT::clear();
 }
 
 
@@ -112,8 +117,8 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
       //nothing to be done
       if(Q.empty()) saturated_levels = true;
     }else{
-      uint k = current_chart->GetLevel();
       if(current_chart->FoundNewPath()){
+        uint k = current_chart->GetLevel();
         //double t_k_end = ompl::time::seconds(ompl::time::now() - t_start);
         //std::cout << std::string(80, '#') << std::endl;
         //std::cout << "found path on level " << k+1 << " of " << levels << std::endl;
@@ -185,34 +190,8 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
       }
     }
   }
-
-  if(found_path_on_last_level)
-  {
-    //base::PathPtr sol;
-    //if(current_chart->GetSolution(sol))
-    //{
-    //  base::PlannerSolution psol(sol);
-    //  psol.setPlannerName(getName());
-    //  pdef_->addSolutionPath(psol);
-    //}else{
-    //  std::cout << std::string(80, '#') << std::endl;
-    //  std::cout << std::string(80, '#') << std::endl;
-    //  OMPL_ERROR("error: expected a solution path");
-    //  std::cout << std::string(80, '#') << std::endl;
-    //  std::cout << std::string(80, '#') << std::endl;
-    //  std::cout << "current_chart:" << std::endl;
-    //  std::cout << *current_chart << std::endl;
-    //  std::cout << "root_chart:" << std::endl;
-    //  std::cout << *root_chart << std::endl;
-    //  exit(0);
-    //}
-
-    return ob::PlannerStatus::EXACT_SOLUTION;
-  }
-  return ob::PlannerStatus::TIMEOUT;
-
+  return (found_path_on_last_level? ob::PlannerStatus::EXACT_SOLUTION : ob::PlannerStatus::TIMEOUT);
 }
-
 
 
 template <class T>

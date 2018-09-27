@@ -18,11 +18,11 @@ void QuotientChart::setup()
 }
 void QuotientChart::clear() 
 {
+  BaseT::clear();
   for(uint k = 0; k < chartSiblings.size(); k++){
     chartSiblings.at(k)->clear();
   }
   chartSiblings.clear();
-  BaseT::clear();
 }
 
 uint QuotientChart::GetChartHorizontalIndex() const
@@ -87,6 +87,8 @@ bool QuotientChart::IsSaturated() const
 void QuotientChart::getPlannerData(ob::PlannerData &data) const
 {
   getPlannerDataAnnotated(data);
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << *this << std::endl;
   for(uint i = 0; i < chartSiblings.size(); i++){
     chartSiblings.at(i)->getPlannerData(data);
   }

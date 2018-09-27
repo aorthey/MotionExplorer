@@ -17,6 +17,7 @@ namespace ompl
     class QNG: public og::QuotientChartCoverQueue
     {
       typedef og::QuotientChartCoverQueue BaseT;
+      int verbose{0};
     public:
 
       QNG(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);

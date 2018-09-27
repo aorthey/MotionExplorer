@@ -38,7 +38,7 @@ namespace ompl
         og::QuotientChart* root_chart{nullptr};
         std::vector<og::QuotientChart*> quotientCharts; //only used to project lower level ob::states into the configuration space (TODO: make this more efficient)
 
-        std::vector<uint> current_chart;
+        //std::vector<uint> current_chart;
 
         uint levels{0};
         bool found_path_on_last_level{false};
