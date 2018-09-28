@@ -260,9 +260,11 @@ void StrategyGeometricMultiLevel::RunBenchmark(
   BenchmarkInput binput(input.name_algorithm);
 
   const ob::SpaceInformationPtr si = si_vec.back();
-  std::string file_benchmark = "benchmark_"+util::GetCurrentDateTimeString();
+
+  std::string environment_name = util::GetFileBasename(input.environment_name);
+  std::string file_benchmark = environment_name+"_"+util::GetCurrentDateTimeString();
   og::SimpleSetup ss(si);
-  ot::Benchmark benchmark(ss, input.environment_name);
+  ot::Benchmark benchmark(ss, environment_name);
 
   for(uint k = 0; k < binput.algorithms.size(); k++){
     benchmark.addPlanner(GetPlanner(binput.algorithms.at(k), si_vec, pdef_vec));
@@ -294,10 +296,9 @@ void StrategyGeometricMultiLevel::RunBenchmark(
 
   //benchmark.saveResultsToFile(res.c_str());
   //BenchmarkFileToPNG(file_benchmark);
-
   BenchmarkOutput boutput(benchmark.getRecordedExperimentData());
-  std::string xml_file = file_benchmark + ".xml";
+  std::string xml_file = util::GetDataFolder()+"/benchmarks/"+file_benchmark+ ".xml";
   boutput.Save(xml_file.c_str());
-
+  boutput.PrintPDF();
 }
 

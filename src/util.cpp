@@ -85,6 +85,24 @@ namespace util{
     path cur = current_path();
     return cur.string()+"/../data";
   }
+  std::string GetFileBasename(const char *file)
+  {
+    boost::filesystem::path p(file);
+    return p.stem().string();
+  }
+  std::string GetFileBasename(const std::string& file)
+  {
+    return GetFileBasename(file.c_str());
+  }
+  std::string GetFileExtension(const char *file)
+  {
+    boost::filesystem::path p(file);
+    return p.extension().string();
+  }
+  std::string GetFileExtension(const std::string& file)
+  {
+    return GetFileExtension(file.c_str());
+  }
 
   bool StartsWith(const std::string &s, const char* prefix){
     return ::StartsWith(s.c_str(),prefix);

@@ -18,6 +18,10 @@ namespace util {
 
   std::string GetApplicationFolder();
   std::string GetDataFolder();
+  std::string GetFileBasename(const char *file);
+  std::string GetFileBasename(const std::string& file);
+  std::string GetFileExtension(const char *file);
+  std::string GetFileExtension(const std::string& file);
 
   bool StartsWith(const std::string &str, const char* prefix);
   bool StartsWith(const std::string &str, const std::string &prefix);
