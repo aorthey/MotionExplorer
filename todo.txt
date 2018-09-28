@@ -580,3 +580,11 @@ using cover
 [ ] possible R2 benchmarks: null-homotopic, circle-like, N-circle-like
 [ ] possible SE(2) benchmarks: null-homotopic, circle-like, circle-like + misleading, circle-like + non-simple, N-circle-like
 
+what we could do: assume granularity of space. I.e. two points of distance
+smaller than some delta are not distinguishable anymore
+
+
+3Phases:
+(1) Quotient-Space without parent => nothing we can do
+(2) Quotient-Space with parent => exploit parents cover
+(3) Quotient-Space with solution => expand

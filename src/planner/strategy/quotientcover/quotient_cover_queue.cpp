@@ -45,6 +45,21 @@ void QuotientChartCoverQueue::Grow(double t)
 
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
 
+  //if(parent != nullptr){
+  //  //exploit knowledge about cover chart
+  //  //try moving towards goal
+  //  if(firstRun)
+  //  {
+  //    q = q_start;
+  //    firstRun = false;
+  //  }else{
+  //  }
+
+  //  Connect(q_start, q_goal, q_next);
+
+  //  return;
+  //}
+
   //############################################################################
   //Get the configuration with the largest neighborhood (NBH) from the queue
   //############################################################################
@@ -54,22 +69,29 @@ void QuotientChartCoverQueue::Grow(double t)
     q = q_start;
     firstRun = false;
   }else{
-    if(priority_configurations.empty()){
-      //try random directions
-      //saturated = true;
-      if(verbose>0) std::cout << "Space got saturated." << std::endl;
-      Configuration *q_random = SampleCoverBoundaryValid(ptc);
-      if(q_random == nullptr) return;
-      priority_configurations.push(q_random);
+    double r = rng_.uniform01();
+    if(r<1.0){
+      if(priority_configurations.empty()){
+        //try random directions
+        //saturated = true;
+        if(verbose>0) std::cout << "Space got saturated." << std::endl;
+        Configuration *q_random = SampleCoverBoundaryValid(ptc);
+        if(q_random == nullptr) return;
+        priority_configurations.push(q_random);
+      }
+      q = priority_configurations.top();
+      priority_configurations.pop();
+      if(IsConfigurationInsideCover(q)){
+        q->Remove(Q1);
+        q=nullptr;
+        return;
+      }
+      AddConfigurationToCoverWithoutAddingEdges(q);
+    }else{
+      Configuration *q_random = new Configuration(Q1);
+      SampleGoal(q_random);
+      q = Nearest(q_random);
     }
-    q = priority_configurations.top();
-    priority_configurations.pop();
-    if(IsConfigurationInsideCover(q)){
-      q->Remove(Q1);
-      q=nullptr;
-      return;
-    }
-    AddConfigurationToCoverWithoutAddingEdges(q);
   }
 
   //############################################################################
@@ -83,7 +105,6 @@ void QuotientChartCoverQueue::Grow(double t)
   {
     priority_configurations.push(q_children.at(k));
   }
-
   //add different biases to remove planner from getting stuck
   Configuration *q_random = SampleCoverBoundaryValid(ptc);
   if(q_random == nullptr) return;

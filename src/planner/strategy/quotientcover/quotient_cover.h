@@ -230,6 +230,7 @@ namespace ompl
       //Connect strategies
       //#######################################################################
       void Connect(const Configuration*, const Configuration*, Configuration*);
+      //void Connect(const Configuration*, const Configuration*);
       void Grow(double t) override;
       void Init() override;
       bool GetSolution(ob::PathPtr &solution) override;

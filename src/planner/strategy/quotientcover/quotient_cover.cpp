@@ -686,6 +686,24 @@ void QuotientChartCover::Connect(const Configuration *q_from, const Configuratio
   double radius = q_from->GetRadius();
   double dist_qfrom_qto = DistanceQ1(q_from, q_to);
   Q1->getStateSpace()->interpolate(q_from->state, q_to->state, radius/dist_qfrom_qto, q_out->state);
+  //if(parent==nullptr){
+  //  Q1->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_interp->state);
+  //}else{
+  //  std::vector<const Configuration*> path = GetInterpolationPath(q_from, q_to);
+  //  const Configuration *q_next = nullptr;
+  //  double d = 0;
+  //  double d_last_to_next = 0;
+  //  uint ctr = 0;
+  //  while(d < step_size && ctr < path.size()){
+  //    d_last_to_next = DistanceQ1(path.at(ctr), path.at(ctr+1));
+  //    d += d_last_to_next;
+  //    q_next = path.at(ctr+1);
+  //    ctr++;
+  //  }
+  //  const Configuration *q_last = path.at(ctr-1);
+  //  double step = d_last_to_next - (d-step_size);
+  //  Q1->getStateSpace()->interpolate(q_last->state, q_next->state, step/d_last_to_next, q_interp->state);
+  //}
 
   // if(parent == nullptr)
   // {

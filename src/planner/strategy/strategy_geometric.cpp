@@ -127,18 +127,17 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:biest") planner = std::make_shared<og::BiEST>(si);
   else if(algorithm=="ompl:projest") planner = std::make_shared<og::ProjEST>(si);
   else if(algorithm=="ompl:sbl") planner = std::make_shared<og::SBL>(si);
-  else if(algorithm=="ompl:psbl") planner = std::make_shared<og::pSBL>(si);
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
   else if(algorithm=="ompl:bitstar"){
+    std::cout << "Planner " << algorithm << " returns seg-fault. Removed." << std::endl;
+    exit(0);
     //planner = std::make_shared<og::BITstar>(si);
-    std::cout << "planner " << algorithm << " returns seg-fault. Removed." << std::endl;
-    exit(0);
   }
-  else if(algorithm=="ompl:prrt"){
-    //planner = std::make_shared<og::pRRT>(si);
-    std::cout << "planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
+  else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){
+    std::cout << "Planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
     exit(0);
+    //planner = std::make_shared<og::pRRT>(si);
   }
 
   else if(algorithm=="hierarchy:qmp_connect"){
