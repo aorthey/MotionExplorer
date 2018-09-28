@@ -99,7 +99,6 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
 
   if(algorithm=="ompl:rrt") planner = std::make_shared<og::RRT>(si);
   else if(algorithm=="ompl:rrtconnect") planner = std::make_shared<og::RRTConnect>(si);
-  else if(algorithm=="ompl:prrt") planner = std::make_shared<og::pRRT>(si);
   else if(algorithm=="ompl:rrtsharp") planner = std::make_shared<og::RRTsharp>(si);
   else if(algorithm=="ompl:rrtstar") planner = std::make_shared<og::RRTstar>(si);
   else if(algorithm=="ompl:rrtxstatic") planner = std::make_shared<og::RRTXstatic>(si);
@@ -131,7 +130,16 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:psbl") planner = std::make_shared<og::pSBL>(si);
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
-  else if(algorithm=="ompl:bitstar") planner = std::make_shared<og::BITstar>(si);
+  else if(algorithm=="ompl:bitstar"){
+    //planner = std::make_shared<og::BITstar>(si);
+    std::cout << "planner " << algorithm << " returns seg-fault. Removed." << std::endl;
+    exit(0);
+  }
+  else if(algorithm=="ompl:prrt"){
+    //planner = std::make_shared<og::pRRT>(si);
+    std::cout << "planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
+    exit(0);
+  }
 
   else if(algorithm=="hierarchy:qmp_connect"){
     typedef og::MultiQuotient<og::QMPConnect> MultiQuotient;
@@ -152,35 +160,6 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     typedef og::MultiChart<og::QNG2> MultiChart;
     planner = std::make_shared<MultiChart>(si_vec, "QNG2");
     static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
-  // }else if(algorithm=="hierarchy:qmp_connect_rrt"){
-  //   typedef og::MultiQuotient<og::QMPConnect, og::RRTBidirectional> MultiQuotient;
-  //   planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect+RRT");
-  //   static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-
-  // }else if(algorithm=="hierarchy:qmp_rrt"){
-  //   typedef og::MultiQuotient<og::QMP, og::RRTBidirectional> MultiQuotient;
-  //   planner = std::make_shared<MultiQuotient>(si_vec, "QMP+RRT");
-  //   static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-
-  // }else if(algorithm=="hierarchy:qcp"){
-  //   typedef og::MultiChart<og::QCP> MultiChart;
-  //   planner = std::make_shared<MultiChart>(si_vec, "QCP");
-  //   static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
-
-  // }else if(algorithm=="hierarchy:qsp"){
-  //   typedef og::MultiChart<og::QSP> MultiChart;
-  //   planner = std::make_shared<MultiChart>(si_vec, "QSP");
-  //   static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
-
-  // }else if(algorithm=="hierarchy:qst"){
-  //   typedef og::MultiChart<og::QST> MultiChart;
-  //   planner = std::make_shared<MultiChart>(si_vec, "QST");
-  //   static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
-
-  // }else if(algorithm=="hierarchy:qmp_sufficient"){
-  //   typedef og::MultiChart<og::QMPSufficient> MultiChart;
-  //   planner = std::make_shared<MultiChart>(si_vec, "QMPSufficient");
-  //   static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
 
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
@@ -263,6 +242,10 @@ void StrategyGeometricMultiLevel::RunBenchmark(
 
   std::string environment_name = util::GetFileBasename(input.environment_name);
   std::string file_benchmark = environment_name+"_"+util::GetCurrentDateTimeString();
+  std::string output_file_without_extension = util::GetDataFolder()+"/benchmarks/"+file_benchmark;
+  std::string log_file = output_file_without_extension+".log";
+  std::string xml_file = output_file_without_extension+".xml";
+
   og::SimpleSetup ss(si);
   ot::Benchmark benchmark(ss, environment_name);
 
@@ -312,14 +295,10 @@ void StrategyGeometricMultiLevel::RunBenchmark(
   //############################################################################
 
   benchmark.benchmark(req);
-  std::string res = file_benchmark+".log";
-  std::string cmd;
+  benchmark.saveResultsToFile(log_file.c_str());
 
-
-  //benchmark.saveResultsToFile(res.c_str());
   //BenchmarkFileToPNG(file_benchmark);
   BenchmarkOutput boutput(benchmark.getRecordedExperimentData());
-  std::string xml_file = util::GetDataFolder()+"/benchmarks/"+file_benchmark+ ".xml";
   boutput.Save(xml_file.c_str());
   boutput.PrintPDF();
 }

@@ -27,7 +27,6 @@
 
     <algorithm name="ompl:rrt"/>
     <algorithm name="ompl:rrtconnect"/>
-    <algorithm name="ompl:prrt"/>
     <algorithm name="ompl:rrtstar"/>
     <algorithm name="ompl:rrtxstatic"/>
     <algorithm name="ompl:informedrrtstar"/>
@@ -35,8 +34,8 @@
     <algorithm name="ompl:trrt"/>
     <algorithm name="ompl:btrrt"/>
     <algorithm name="ompl:lbtrrt"/>
-
     <algorithm name="ompl:sorrtstar"/>
+
     <algorithm name="ompl:prm"/>
     <algorithm name="ompl:prmstar"/>
     <algorithm name="ompl:lazyprm"/>
@@ -46,8 +45,8 @@
     <algorithm name="ompl:cforest"/>
     <algorithm name="ompl:sst"/>
     <algorithm name="ompl:pdst"/>
-
     <algorithm name="ompl:stride"/>
+
     <algorithm name="ompl:kpiece"/>
     <algorithm name="ompl:bkpiece"/>
     <algorithm name="ompl:lbkpiece"/>
@@ -57,10 +56,12 @@
     <algorithm name="ompl:sbl"/>
     <algorithm name="ompl:psbl"/>
     <algorithm name="ompl:fmt"/>
-
     <algorithm name="ompl:bfmt"/>
 
-    <!-- <algorithm name="ompl:bitstar"/> -->
+    <!-- PLANNERS AVAILABLE, BUT NOT USED: -->
+    <!-- <algorithm name="ompl:prrt"/> RETURNS INFEASIBLE PATH -->
+    <!-- <algorithm name="ompl:bitstar"/> SEG FAULT-->
+
 
     <maxplanningtime>0.5</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>1</runcount> <!-- number of runs per algorithm --> 
