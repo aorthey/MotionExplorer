@@ -289,10 +289,32 @@ void StrategyGeometricMultiLevel::RunBenchmark(
   req.displayProgress = true;
 
   benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));
-  benchmark.benchmark(req);
 
+  //############################################################################
+  // Estimate time requirement
+  //############################################################################
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "BENCHMARKING" << std::endl;
+  double worst_case_time_estimate_in_seconds = binput.algorithms.size()*binput.runCount*binput.maxPlanningTime;
+  double worst_case_time_estimate_in_minutes = worst_case_time_estimate_in_seconds/60.0;
+  double worst_case_time_estimate_in_hours = worst_case_time_estimate_in_minutes/60.0;
+  std::cout << "Worst-case time requirement: ";
+  if(worst_case_time_estimate_in_hours < 1){
+    if(worst_case_time_estimate_in_minutes < 1){
+      std::cout << worst_case_time_estimate_in_seconds << "s" << std::endl;
+    }else{
+      std::cout << worst_case_time_estimate_in_minutes << "m" << std::endl;
+    }
+  }else{
+    std::cout << worst_case_time_estimate_in_hours << "h" << std::endl;
+  }
+  std::cout << std::string(80, '-') << std::endl;
+  //############################################################################
+
+  benchmark.benchmark(req);
   std::string res = file_benchmark+".log";
   std::string cmd;
+
 
   //benchmark.saveResultsToFile(res.c_str());
   //BenchmarkFileToPNG(file_benchmark);
