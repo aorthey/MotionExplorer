@@ -11,6 +11,7 @@
 #include "planner/strategy/quotientchart/quotient_chart.h"
 #include "planner/strategy/quotientcover/qng.h"
 #include "planner/strategy/quotientcover/qng2.h"
+#include "planner/strategy/quotientcover/qng_goal_directed.h"
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -137,29 +138,17 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){
     std::cout << "Planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
     exit(0);
-    //planner = std::make_shared<og::pRRT>(si);
   }
-
   else if(algorithm=="hierarchy:qmp_connect"){
-    typedef og::MultiQuotient<og::QMPConnect> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "QMPConnect");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-
+    planner = GetSharedMultiChartPtr<og::QMPConnect>(si_vec, pdef_vec);
   }else if(algorithm=="hierarchy:qmp"){
-    typedef og::MultiQuotient<og::QMP> MultiQuotient;
-    planner = std::make_shared<MultiQuotient>(si_vec, "QMP");
-    static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
-
+    planner = GetSharedMultiChartPtr<og::QMP>(si_vec, pdef_vec);
   }else if(algorithm=="hierarchy:qng"){
-    typedef og::MultiChart<og::QNG> MultiChart;
-    planner = std::make_shared<MultiChart>(si_vec, "QNG");
-    static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
-
+    planner = GetSharedMultiChartPtr<og::QNG>(si_vec, pdef_vec);
+  }else if(algorithm=="hierarchy:qng_goal_directed"){
+    planner = GetSharedMultiChartPtr<og::QNGGoalDirected>(si_vec, pdef_vec);
   }else if(algorithm=="hierarchy:qng2"){
-    typedef og::MultiChart<og::QNG2> MultiChart;
-    planner = std::make_shared<MultiChart>(si_vec, "QNG2");
-    static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
-
+    planner = GetSharedMultiChartPtr<og::QNG2>(si_vec, pdef_vec);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);
@@ -167,6 +156,17 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   planner->setProblemDefinition(pdef_vec.back());
   return planner;
 
+}
+
+template<typename T> 
+ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiChartPtr( 
+    std::vector<ob::SpaceInformationPtr> si_vec, 
+    std::vector<ob::ProblemDefinitionPtr> pdef_vec)
+{
+  typedef og::MultiChart<T> MultiChart;
+  ob::PlannerPtr planner = std::make_shared<MultiChart>(si_vec);
+  static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
+  return planner;
 }
 
 #include <ompl/base/samplers/UniformValidStateSampler.h>
