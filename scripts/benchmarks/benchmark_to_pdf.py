@@ -73,13 +73,19 @@ def XMLtoPDF(fname):
   #max lowest mean value be visualized as bold
   ###################################################################################
   bestTimeIdx = np.mean(vtimes,axis=0).argmin()
-  ctr = 0
-  for ticklabel in plt.gca().get_xticklabels():
-    if ctr == bestTimeIdx:
-      ticklabel.set_fontweight('extra bold')
-      ticklabel.set_fontsize('large')
-    ctr=ctr+1
+  bestTime = np.mean(vtimes,axis=0).min()
+  ##only if bestTime is unique
+  if bestTime < timelimit:
+    ctr = 0
+    for ticklabel in plt.gca().get_xticklabels():
+      if ctr == bestTimeIdx:
+        ticklabel.set_fontweight('extra bold')
+        ticklabel.set_fontsize('large')
+      ctr=ctr+1
 
+  ###################################################################################
+  #visualize timelimit and runcount in upper right corner
+  ###################################################################################
   txt = "runcount=%3.0d"%runcount
   ax.text(0.85, 0.95, txt, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
   print timelimit
@@ -87,15 +93,14 @@ def XMLtoPDF(fname):
     txt = "timelimit=%3.1f"%timelimit+"s"
   else:
     txt = "timelimit=%3.0f"%timelimit+"s"
-
   ax.text(0.85, 0.9, txt, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
   ax.axhline(timelimit,color='k',linestyle='--')
+
+
   plt.tight_layout()
   pp.savefig(plt.gcf())
   pp.close()
 
-  #fig.savefig('foo.png', bbox_inches='tight')
-  #plt.show()
   cmd = "apvlv "+fname_pdf
   os.system(cmd)
 

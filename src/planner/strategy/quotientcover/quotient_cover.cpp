@@ -1249,6 +1249,7 @@ void QuotientChartCover::Print(const Configuration *q, bool stopOnError) const
   if(q->GetRadius() < minimum_neighborhood_radius)
   {
     std::cout << "### STATE HAS ZERO-MEASURE NEIGHBORHOOD" << std::endl;
+    std::cout << "### -- RADIUS OF NEIGHBORHOOD: " << q->GetRadius() << " (minimum: " << minimum_neighborhood_radius << ")" << std::endl;
     if(stopOnError) exit(0);
   }
 }

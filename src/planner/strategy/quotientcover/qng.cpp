@@ -33,7 +33,6 @@ std::vector<QNG::Configuration*> QNG::ExpandNeighborhood(Configuration *q_curren
     {
       Configuration *q_random = new Configuration(Q1);
       SampleNeighborhoodBoundary(q_random, q_current);
-      //if(verbose>0) QuotientChartCover::Print(q_random, false);
       if(ComputeNeighborhood(q_random))
       {
         q_children.push_back(q_random);

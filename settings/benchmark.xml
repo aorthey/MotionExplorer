@@ -66,7 +66,7 @@
 
     <maxplanningtime>5</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>10</runcount> <!-- number of runs per algorithm --> 
-    <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
+    <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 
   <benchmark name="all_dynamic">
