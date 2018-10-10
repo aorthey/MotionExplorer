@@ -133,16 +133,15 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:bitstar"){
     std::cout << "Planner " << algorithm << " returns seg-fault. Removed." << std::endl;
     exit(0);
-    //planner = std::make_shared<og::BITstar>(si);
   }
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){
     std::cout << "Planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
     exit(0);
   }
   else if(algorithm=="hierarchy:qmp_connect"){
-    planner = GetSharedMultiChartPtr<og::QMPConnect>(si_vec, pdef_vec);
+    planner = GetSharedMultiQuotientPtr<og::QMPConnect>(si_vec, pdef_vec);
   }else if(algorithm=="hierarchy:qmp"){
-    planner = GetSharedMultiChartPtr<og::QMP>(si_vec, pdef_vec);
+    planner = GetSharedMultiQuotientPtr<og::QMP>(si_vec, pdef_vec);
   }else if(algorithm=="hierarchy:qng"){
     planner = GetSharedMultiChartPtr<og::QNG>(si_vec, pdef_vec);
   }else if(algorithm=="hierarchy:qng_goal_directed"){
@@ -158,14 +157,25 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
 
 }
 
-template<typename T> 
+template<typename T_Algorithm> 
 ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiChartPtr( 
     std::vector<ob::SpaceInformationPtr> si_vec, 
     std::vector<ob::ProblemDefinitionPtr> pdef_vec)
 {
-  typedef og::MultiChart<T> MultiChart;
+  typedef og::MultiChart<T_Algorithm> MultiChart;
   ob::PlannerPtr planner = std::make_shared<MultiChart>(si_vec);
   static_pointer_cast<MultiChart>(planner)->setProblemDefinition(pdef_vec);
+  return planner;
+}
+
+template<typename T_Algorithm> 
+ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiQuotientPtr( 
+    std::vector<ob::SpaceInformationPtr> si_vec, 
+    std::vector<ob::ProblemDefinitionPtr> pdef_vec)
+{
+  typedef og::MultiQuotient<T_Algorithm> MultiQuotient;
+  ob::PlannerPtr planner = std::make_shared<MultiQuotient>(si_vec);
+  static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   return planner;
 }
 
