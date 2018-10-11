@@ -6,12 +6,22 @@
 
 class Strategy{
   public:
-    virtual void plan( const StrategyInput &input, StrategyOutput &output) = 0;
+    virtual void Plan( StrategyOutput &output) = 0;
+    virtual void Step( StrategyOutput &output) = 0;
+    virtual void Init( const StrategyInput &input) = 0;
     void BenchmarkFileToPNG(const std::string&);
+
+    bool IsInitialized();
 
   protected:
     Strategy();
     void setStateSampler(std::string sampler, ob::SpaceInformationPtr si);
+
+    bool isInitialized{false};
+
+    ob::PlannerPtr planner;
+
+    double max_planning_time;
 };
 
 class SE3Project0r : public ob::ProjectionEvaluator

@@ -180,7 +180,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiQuotientPtr(
 }
 
 #include <ompl/base/samplers/UniformValidStateSampler.h>
-void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutput &output)
+void StrategyGeometricMultiLevel::Init( const StrategyInput &input )
 {
   std::string algorithm = input.name_algorithm;
 
@@ -212,33 +212,109 @@ void StrategyGeometricMultiLevel::plan( const StrategyInput &input, StrategyOutp
   //###########################################################################
 
   if(util::StartsWith(algorithm,"benchmark")){
+    //No Init, directly execute benchmark
     RunBenchmark(input, si_vec, pdef_vec);
   }else{
     planner = GetPlanner(algorithm, si_vec, pdef_vec);
     planner->clear();
     planner->setup();
-
-    double max_planning_time = input.max_planning_time;
-    ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
-
-    ompl::time::point start = ompl::time::now();
-    planner->solve(ptc);
-    output.planner_time = ompl::time::seconds(ompl::time::now() - start);
-    output.max_planner_time = max_planning_time;
-
-    //###########################################################################
-    ob::PlannerDataPtr pd( new ob::PlannerData(si_vec.back()) );
-
-    if(util::StartsWith(algorithm,"hierarchy")){
-      planner->getPlannerData(*pd);
-      output.SetPlannerData(pd);
-    }else{
-      planner->getPlannerData(*pd);
-      output.SetPlannerData(pd);
-    }
-    ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
-    output.SetProblemDefinition(pdef);
+    std::cout << "Planner Initialized" << std::endl;
+    isInitialized = true;
   }
+  max_planning_time = input.max_planning_time;
+}
+
+void StrategyGeometricMultiLevel::Step(StrategyOutput &output)
+{
+  ob::IterationTerminationCondition itc(1);
+  ob::PlannerTerminationCondition ptc(itc);
+
+  ompl::time::point start = ompl::time::now();
+  planner->solve(ptc);
+  output.planner_time = ompl::time::seconds(ompl::time::now() - start);
+  output.max_planner_time = max_planning_time;
+
+  //###########################################################################
+  ob::PlannerDataPtr pd( new ob::PlannerData(planner->getSpaceInformation()) );
+  planner->getPlannerData(*pd);
+  output.SetPlannerData(pd);
+  ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
+  output.SetProblemDefinition(pdef);
+}
+
+void StrategyGeometricMultiLevel::Plan(StrategyOutput &output)
+{
+  ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
+  ompl::time::point start = ompl::time::now();
+  planner->solve(ptc);
+  output.planner_time = ompl::time::seconds(ompl::time::now() - start);
+  output.max_planner_time = max_planning_time;
+
+  //###########################################################################
+  ob::PlannerDataPtr pd( new ob::PlannerData(planner->getSpaceInformation()) );
+
+  planner->getPlannerData(*pd);
+  output.SetPlannerData(pd);
+  ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
+  output.SetProblemDefinition(pdef);
+
+  // std::string algorithm = input.name_algorithm;
+
+  // std::vector<ob::SpaceInformationPtr> si_vec; 
+  // std::vector<ob::ProblemDefinitionPtr> pdef_vec; 
+
+  // for(uint k = 0; k < input.cspace_levels.size(); k++){
+  //   CSpaceOMPL* cspace_levelk = input.cspace_levels.at(k);
+  //   ob::SpaceInformationPtr sik = cspace_levelk->SpaceInformationPtr();
+  //   setStateSampler(input.name_sampler, sik);
+
+  //   ob::ScopedState<> startk = cspace_levelk->ConfigToOMPLState(input.q_init);
+  //   ob::ScopedState<> goalk  = cspace_levelk->ConfigToOMPLState(input.q_goal);
+
+  //   ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
+  //   pdefk->addStartState(startk);
+  //   auto goal=std::make_shared<ob::GoalState>(sik);
+  //   goal->setState(goalk);
+  //   goal->setThreshold(input.epsilon_goalregion);
+  //   pdefk->setGoal(goal);
+  //   pdefk->setOptimizationObjective( GetOptimizationObjective(sik) );
+
+  //   si_vec.push_back(sik);
+  //   pdef_vec.push_back(pdefk);
+  // }
+
+  // //###########################################################################
+  // // choose planner
+  // //###########################################################################
+
+  // if(util::StartsWith(algorithm,"benchmark")){
+  //   RunBenchmark(input, si_vec, pdef_vec);
+  // }else{
+  //   planner = GetPlanner(algorithm, si_vec, pdef_vec);
+  //   planner->clear();
+  //   planner->setup();
+
+  //   double max_planning_time = input.max_planning_time;
+  //   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
+
+  //   ompl::time::point start = ompl::time::now();
+  //   planner->solve(ptc);
+  //   output.planner_time = ompl::time::seconds(ompl::time::now() - start);
+  //   output.max_planner_time = max_planning_time;
+
+  //   //###########################################################################
+  //   ob::PlannerDataPtr pd( new ob::PlannerData(si_vec.back()) );
+
+  //   if(util::StartsWith(algorithm,"hierarchy")){
+  //     planner->getPlannerData(*pd);
+  //     output.SetPlannerData(pd);
+  //   }else{
+  //     planner->getPlannerData(*pd);
+  //     output.SetPlannerData(pd);
+  //   }
+  //   ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
+  //   output.SetProblemDefinition(pdef);
+  // }
 }
 void StrategyGeometricMultiLevel::RunBenchmark(
     const StrategyInput& input,

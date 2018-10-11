@@ -52,8 +52,6 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="benchmark"){
   }else if(cmd=="planner_step"){
     planners.at(active_planner)->Step();
-  }else if(cmd=="planner_advance_one_second"){
-    planners.at(active_planner)->Advance(1);
   }else if(cmd=="planner_advance_until_solution"){
     planners.at(active_planner)->AdvanceUntilSolution();
   }else if(cmd=="next_planner"){

@@ -1236,6 +1236,7 @@ void QuotientChartCover::Print(const Configuration *q, bool stopOnError) const
   Q1->printState(q->state);
   std::cout << " | index: " << q->index;
   std::cout << " | radius: " << q->GetRadius();
+  std::cout << " | distance goal: " << q->GetGoalDistance();
   std::cout << " | coset : " << (q->coset==nullptr?"-":std::to_string(q->coset->index)) << std::endl;
   if(q->index < 0)
   {

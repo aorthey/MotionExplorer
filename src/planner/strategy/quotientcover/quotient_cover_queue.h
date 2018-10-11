@@ -34,7 +34,7 @@ namespace ompl
       virtual Configuration* SampleUniformQuotientCover(ob::State *state) override;
       virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
 
-    private:
+    protected:
       bool firstRun{true};
       uint NUMBER_OF_EXPANSION_SAMPLES{0};
       const double goalBias{0.5};

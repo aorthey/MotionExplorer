@@ -10,7 +10,9 @@ namespace ot = ompl::tools;
 
 class StrategyGeometricMultiLevel: public Strategy{
   public:
-    virtual void plan( const StrategyInput &input, StrategyOutput &output);
+    virtual void Plan( StrategyOutput &output) override;
+    virtual void Step( StrategyOutput &output) override;
+    virtual void Init( const StrategyInput &input) override;
 
     StrategyGeometricMultiLevel();
 
@@ -30,7 +32,5 @@ class StrategyGeometricMultiLevel: public Strategy{
     ob::PlannerPtr GetSharedMultiQuotientPtr( 
         std::vector<ob::SpaceInformationPtr> si_vec, 
         std::vector<ob::ProblemDefinitionPtr> pdef_vec);
-
-    ob::PlannerPtr planner;
 };
 

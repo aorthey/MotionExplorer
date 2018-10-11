@@ -88,3 +88,7 @@ void Strategy::BenchmarkFileToPNG(const std::string &file)
     std::cout << "benchmark to png failed" << std::endl;
   }
 }
+bool Strategy::IsInitialized()
+{
+  return isInitialized;
+}

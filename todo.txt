@@ -572,7 +572,7 @@ More Structure
 -- Neighborhood
 -- Quotients
 
-[ ] Fix 02D_disk, i.e. have a good expansion strategy (consider it as fixed if we can repeatedly
+[x] Fix 02D_disk, i.e. have a good expansion strategy (consider it as fixed if we can repeatedly
 solve it in under 0.5s).
 [ ] Fix 03D_misleading, i.e. have a good interpolation/expansion strategy if
 using cover
@@ -591,7 +591,10 @@ smaller than some delta are not distinguishable anymore
 [ ] Check out LazySP, if that could add some additional speedup in the case of
 the 2d-disk
 
-Exploration along cover not efficient
+Exploration along cover not efficient/working
 
 Lazy evaluation: First take shortest path, evaluate it. If infeasible, take next
 path (that is basically the idea behind being lazy).
+
+[ ] Would be good to see incremental changes in the planner (step through
+planner)

@@ -39,7 +39,6 @@ std::vector<QNG::Configuration*> QNG::ExpandNeighborhood(Configuration *q_curren
       }
     }
   }else{
-
     //############################################################################
     // Get projected sample
     //############################################################################

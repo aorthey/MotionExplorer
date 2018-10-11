@@ -165,11 +165,24 @@ void MotionPlanner::Clear()
 
 void MotionPlanner::Step()
 {
-  std::cout << "NIY" << std::endl;
-}
-void MotionPlanner::Advance(double ms)
-{
-  std::cout << "NIY" << std::endl;
+  if(!active) return;
+  current_level = 0;
+  current_level_node = 0;
+  current_path.clear();
+  viewHierarchy.Clear();
+
+  if(!strategy.IsInitialized()){
+    StrategyInput strategy_input = input.GetStrategyInput();
+    strategy_input.cspace_levels = cspace_levels;
+    strategy_input.cspace = cspace_levels.back();
+    strategy_input.world = world;
+    strategy.Init(strategy_input);
+  }
+
+  StrategyOutput output(cspace_levels.back());
+  strategy.Step(output);
+  std::cout << output << std::endl;
+  output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
 }
 void MotionPlanner::AdvanceUntilSolution()
 {
@@ -179,17 +192,28 @@ void MotionPlanner::AdvanceUntilSolution()
   current_path.clear();
   viewHierarchy.Clear();
 
+  // StrategyInput strategy_input = input.GetStrategyInput();
+  // strategy_input.cspace_levels = cspace_levels;
+  // strategy_input.cspace = cspace_levels.back();
+  // strategy_input.world = world;
+  if(!strategy.IsInitialized()){
+    StrategyInput strategy_input = input.GetStrategyInput();
+    strategy_input.cspace_levels = cspace_levels;
+    strategy_input.cspace = cspace_levels.back();
+    strategy_input.world = world;
+    strategy.Init(strategy_input);
+  }
+
   StrategyOutput output(cspace_levels.back());
-
-  StrategyInput strategy_input = input.GetStrategyInput();
-  strategy_input.cspace_levels = cspace_levels;
-  strategy_input.cspace = cspace_levels.back();
-  strategy_input.world = world;
-
-  strategy.plan(strategy_input, output);
+  //strategy.init(strategy_input);
+  strategy.Plan(output);
   std::cout << output << std::endl;
 
   output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
+}
+void MotionPlanner::Advance(double ms)
+{
+  std::cout << "NIY" << std::endl;
 }
 
 const PlannerInput& MotionPlanner::GetInput(){

@@ -78,8 +78,12 @@ namespace ompl
           //return ((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
           //return 1.0/((double)number_attempted_expansions+1);
         }
+        double GetGoalDistance() const
+        {
+          return goal_distance;
+        }
 
-        double goal_distance{0};
+        double goal_distance{0.0};
         uint number_attempted_expansions{0};
         uint number_successful_expansions{0};
 
