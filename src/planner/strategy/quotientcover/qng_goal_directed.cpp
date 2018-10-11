@@ -16,15 +16,15 @@ void QNGGoalDirected::clear()
   BaseT::clear();
   while(!configurations_sorted_by_nearest_to_goal.empty()) 
   {
-    Configuration *q = configurations_sorted_by_nearest_to_goal.top();
-    if(q!=nullptr) q->Remove(Q1);
     configurations_sorted_by_nearest_to_goal.pop();
   }
 }
 void QNGGoalDirected::setup()
 {
   BaseT::setup();
-  configurations_sorted_by_nearest_to_goal.push(q_start);
+  if(setup_){
+    configurations_sorted_by_nearest_to_goal.push(q_start);
+  }
 }
 
 void QNGGoalDirected::IncreaseGoalBias()

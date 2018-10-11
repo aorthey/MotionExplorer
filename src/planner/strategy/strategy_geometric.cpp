@@ -242,6 +242,11 @@ void StrategyGeometricMultiLevel::Step(StrategyOutput &output)
   output.SetProblemDefinition(pdef);
 }
 
+void StrategyGeometricMultiLevel::Clear()
+{
+  planner->clear();
+  planner->setup();
+}
 void StrategyGeometricMultiLevel::Plan(StrategyOutput &output)
 {
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
@@ -251,8 +256,8 @@ void StrategyGeometricMultiLevel::Plan(StrategyOutput &output)
   output.max_planner_time = max_planning_time;
 
   //###########################################################################
-  ob::PlannerDataPtr pd( new ob::PlannerData(planner->getSpaceInformation()) );
 
+  ob::PlannerDataPtr pd( new ob::PlannerData(planner->getSpaceInformation()) );
   planner->getPlannerData(*pd);
   output.SetPlannerData(pd);
   ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();

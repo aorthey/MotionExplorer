@@ -13,6 +13,7 @@ class StrategyGeometricMultiLevel: public Strategy{
     virtual void Plan( StrategyOutput &output) override;
     virtual void Step( StrategyOutput &output) override;
     virtual void Init( const StrategyInput &input) override;
+    virtual void Clear() override;
 
     StrategyGeometricMultiLevel();
 

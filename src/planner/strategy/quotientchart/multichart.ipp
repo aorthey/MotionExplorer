@@ -58,6 +58,7 @@ void MultiChart<T>::setup(){
 template <class T>
 void MultiChart<T>::clear(){
   BaseT::clear();
+
   if(root_chart) root_chart->clear();
   found_path_on_last_level = false;
   saturated_levels = false;

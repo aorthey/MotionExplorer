@@ -202,6 +202,8 @@ void MotionPlanner::AdvanceUntilSolution()
     strategy_input.cspace = cspace_levels.back();
     strategy_input.world = world;
     strategy.Init(strategy_input);
+  }else{
+    strategy.Clear();
   }
 
   StrategyOutput output(cspace_levels.back());
@@ -228,6 +230,32 @@ void MotionPlanner::RaiseError(){
   exit(1);
 }
 
+void MotionPlanner::ExpandFull(){
+  if(!active) return;
+
+  uint Nmax=hierarchy->NumberLevels();
+
+  current_level = 0;
+  current_level_node = 0;
+  current_path.clear();
+  viewHierarchy.Clear();
+
+  while(true){
+    if(current_level<Nmax-1){
+      if(hierarchy->HasChildren(current_path)){
+        current_level++;
+        current_level_node=hierarchy->NumberChildren(current_path)-1;
+        current_path.push_back(current_level_node);
+      }else{
+        break;
+      }
+    }else{
+      break;
+    }
+    UpdateHierarchy();
+  }
+  UpdateHierarchy();
+}
 //folder-like operations on hierarchical roadmap
 void MotionPlanner::Expand(){
   if(!active) return;

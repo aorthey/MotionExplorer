@@ -24,6 +24,7 @@ class MotionPlanner{
     PathPiecewiseLinear* GetPath();
 
     //folder-like operations on hierarchical roadmap
+    virtual void ExpandFull();
     virtual void Expand();
     virtual void Collapse();
     virtual void Next();
