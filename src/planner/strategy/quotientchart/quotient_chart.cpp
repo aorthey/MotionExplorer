@@ -19,13 +19,12 @@ void QuotientChart::setup()
 
 void QuotientChart::clear() 
 {
-  //if(!isLocalChart){
   BaseT::clear();
   for(uint k = 0; k < chartSiblings.size(); k++){
     chartSiblings.at(k)->clear();
   }
   chartSiblings.clear();
-  //}
+  UpdateChartPath();
 }
 
 uint QuotientChart::GetChartHorizontalIndex() const

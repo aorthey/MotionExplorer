@@ -11,11 +11,18 @@ template <class T>
 MultiChart<T>::MultiChart(std::vector<ob::SpaceInformationPtr> &si_vec_, std::string type):
   ob::Planner(si_vec_.back(), type), si_vec(si_vec_)
 {
-  //T::resetCounter();
+  T::resetCounter();
 
-  //levels = si_vec.size();
-  //root_chart = new T(si_vec.at(0), nullptr);
-  //root_chart->SetLevel(0);
+  levels = si_vec.size();
+  root_chart = new T(si_vec.at(0), nullptr);
+  root_chart->SetLevel(0);
+
+  for(uint k = 0; k < si_vec.size(); k++){
+    og::QuotientChart* parent = nullptr;
+    if(k>0) parent = quotientCharts.back();
+    T* chart_k = new T(si_vec.at(k), parent);
+    quotientCharts.push_back(chart_k);
+  }
 
   //for(uint k = 0; k < si_vec.size(); k++){
   //  og::QuotientChart* parent = nullptr;
@@ -33,27 +40,17 @@ MultiChart<T>::~MultiChart(){
 
 template <class T>
 void MultiChart<T>::setup(){
-  if(!setup_) Planner::setup();
+  if(!setup_) BaseT::setup();
   if(pdef_){
     std::cout << "SETUP MULTICHART" << std::endl;
     T::resetCounter();
-    levels = si_vec.size();
-    //si_vec.at(0)->printSettings();
 
-    root_chart = new T(si_vec.at(0), nullptr);
-    root_chart->SetLevel(0);
-
-    found_path_on_last_level = false;
-    saturated_levels = false;
     root_chart->setProblemDefinition(pdef_vec.at(0));
     root_chart->setup();
 
-    for(uint k = 0; k < si_vec.size(); k++){
-      og::QuotientChart* parent = nullptr;
-      if(k>0) parent = quotientCharts.back();
-      T* chart_k = new T(si_vec.at(k), parent);
-      quotientCharts.push_back(chart_k);
-    }
+    found_path_on_last_level = false;
+    saturated_levels = false;
+
   }else{
     OMPL_INFORM("%s: problem definition is not set, deferring setup completion...", getName().c_str());
     setup_ = false;

@@ -1,5 +1,5 @@
 #include "common.h"
-#include "quotient_cover.h"
+#include "quotient_chart_cover.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <limits>
@@ -128,6 +128,7 @@ void QuotientChartCover::setup(void)
 void QuotientChartCover::clear()
 {
   BaseT::clear();
+  totalVolumeOfCover = 0.0;
 
   //Nearestneighbors
   if(nearest_cover) nearest_cover->clear();
@@ -158,12 +159,22 @@ void QuotientChartCover::clear()
   vertexToIndexStdMap.clear();
   indexToVertexStdMap.clear();
   index_ctr = 0;
-
-  if(q_start) v_start = AddConfigurationToCover(q_start);
-
   isConnected = false;
-  totalVolumeOfCover = 0.0;
-  saturated = false;
+
+
+  if(q_start){
+    v_start = AddConfigurationToCover(q_start);
+
+    if(q_start->GetRadius() == std::numeric_limits<double>::infinity())
+    {
+      OMPL_INFORM("Note: start state covers quotient-space.");
+      saturated = true;
+    }else{
+      saturated = false;
+    }
+  }else{
+    saturated = false;
+  }
 }
 
 

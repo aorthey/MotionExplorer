@@ -1,5 +1,5 @@
 #include "common.h"
-#include "quotient_cover_queue.h"
+#include "quotient_chart_cover_queue.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <limits>
@@ -39,6 +39,8 @@ void QuotientChartCoverQueue::clear()
     //if(q!=nullptr) q->Remove(Q1);
     priority_configurations.pop();
   }
+  NUMBER_OF_EXPANSION_SAMPLES = (Q1->getStateDimension()+1)*1;
+  firstRun = true;
 }
 
 void QuotientChartCoverQueue::Grow(double t)

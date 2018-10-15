@@ -129,12 +129,12 @@ void Quotient::setup()
 {
   BaseT::setup();
   hasSolution = false;
-  if(parent==nullptr) X1_sampler.reset();
 }
 void Quotient::clear()
 {
   BaseT::clear();
   hasSolution = false;
+  if(parent==nullptr) X1_sampler.reset();
   if(child!=nullptr) child->clear();
 }
 

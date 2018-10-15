@@ -588,6 +588,8 @@ planner)
 [x] Fix issue of start state rejected when using DLS
 
 
+[ ] Fix MultiChart clear/setup not working correctly.
+
 
 SOLVE 03D, find cover exploration.
 SOLVE 06D_DLS, find FAST cover exploration

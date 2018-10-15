@@ -14,18 +14,25 @@ QNGGoalDirected::~QNGGoalDirected(void)
 void QNGGoalDirected::clear()
 {
   BaseT::clear();
+
   while(!configurations_sorted_by_nearest_to_goal.empty()) 
   {
     configurations_sorted_by_nearest_to_goal.pop();
   }
+  if(q_start) configurations_sorted_by_nearest_to_goal.push(q_start);
+  IncreaseGoalBias();
 }
 void QNGGoalDirected::setup()
 {
   BaseT::setup();
   if(setup_){
+    while(!configurations_sorted_by_nearest_to_goal.empty()) 
+    {
+      configurations_sorted_by_nearest_to_goal.pop();
+    }
     configurations_sorted_by_nearest_to_goal.push(q_start);
   }
-  goalDirectionAdaptiveBias = 1.0;
+  IncreaseGoalBias();
 }
 
 void QNGGoalDirected::IncreaseGoalBias()
