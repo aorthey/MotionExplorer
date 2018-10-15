@@ -33,8 +33,10 @@ void QuotientChartCoverQueue::clear()
   BaseT::clear();
   while(!priority_configurations.empty()) 
   {
-    Configuration *q = priority_configurations.top();
-    if(q!=nullptr) q->Remove(Q1);
+    //Configuration *q = priority_configurations.top();
+    //priority_configurations have not yet been added to graph, so we need to
+    //remove them manually
+    //if(q!=nullptr) q->Remove(Q1);
     priority_configurations.pop();
   }
 }

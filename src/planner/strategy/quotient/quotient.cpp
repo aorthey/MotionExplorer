@@ -134,6 +134,7 @@ void Quotient::setup()
 void Quotient::clear()
 {
   BaseT::clear();
+  hasSolution = false;
   if(child!=nullptr) child->clear();
 }
 

@@ -132,32 +132,38 @@ void QuotientChartCover::clear()
   //Nearestneighbors
   if(nearest_cover) nearest_cover->clear();
   if(nearest_vertex) nearest_vertex->clear();
-  nearest_cover = nullptr;
-  nearest_vertex = nullptr;
 
   shortest_path_start_goal.clear();
   shortest_path_start_goal_necessary_vertices.clear();
 
   //Cover graph
-  foreach (Vertex v, boost::vertices(graph)){
-    if(graph[v]!=nullptr) graph[v]->Remove(Q1);
+  // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << "Cleaning up " << getName() << " local:" << (isLocalChart?"Yes":"No") << std::endl;
+  if(!isLocalChart){
+    foreach (Vertex v, boost::vertices(graph)){
+      if(graph[v]!=nullptr){
+        if(!graph[v]->isStart && !graph[v]->isGoal){
+          graph[v]->Remove(Q1);
+        }
+      }
+    }
   }
   graph.clear();
-
-  q_start = nullptr;
-  q_goal = nullptr;
 
   //PDF
   pdf_necessary_configurations.clear();
   pdf_all_configurations.clear();
-  setup_ = false;
 
   //index maps
   vertexToIndexStdMap.clear();
   indexToVertexStdMap.clear();
   index_ctr = 0;
 
-  pis_.restart();
+  if(q_start) v_start = AddConfigurationToCover(q_start);
+
+  isConnected = false;
+  totalVolumeOfCover = 0.0;
+  saturated = false;
 }
 
 

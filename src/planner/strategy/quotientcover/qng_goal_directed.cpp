@@ -25,6 +25,7 @@ void QNGGoalDirected::setup()
   if(setup_){
     configurations_sorted_by_nearest_to_goal.push(q_start);
   }
+  goalDirectionAdaptiveBias = 1.0;
 }
 
 void QNGGoalDirected::IncreaseGoalBias()
@@ -75,7 +76,6 @@ void QNGGoalDirected::Grow(double t)
     double r = rng_.uniform01();
     if(r <= goalDirectionAdaptiveBias){
       bool progress = ExpandTowardsGoal(ptc);
-
       if(progress) IncreaseGoalBias();
       else DecreaseGoalBias();
     }else{
@@ -135,10 +135,6 @@ bool QNGGoalDirected::SteerTowards(Configuration *q_from, Configuration *q_next)
   if(q_children.empty()){
     return false;
   }
-  //if(radius_largest <= 0.1*q_from->GetRadius())
-  //{
-  //  return false;
-  //}
 
   Configuration *q_best = q_children.at(idx_largest);
   AddConfigurationToCoverWithoutAddingEdges(q_best);
@@ -186,13 +182,6 @@ std::vector<QuotientChartCover::Configuration*> QNGGoalDirected::GenerateCandida
     Configuration *q_k = new Configuration(Q1);
 
     Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.5*radius_from);
-
-    //if(isProjectedFeasible){
-    //  Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.75*radius_from);
-    //}else{
-    //  SampleNeighborhoodBoundaryHalfBall(q_k, q_from);
-    //}
-    //SampleNeighborhoodBoundaryHalfBall(q_k, q_from);
 
     const double d_from_to_k = DistanceConfigurationConfiguration(q_from, q_k);
     Q1->getStateSpace()->interpolate(q_from->state, q_k->state, radius_from/d_from_to_k, q_k->state);

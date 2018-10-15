@@ -583,19 +583,11 @@ using cover
 what we could do: assume granularity of space. I.e. two points of distance
 smaller than some delta are not distinguishable anymore
 
-3Phases:
-(1) Quotient-Space without parent => nothing we can do
-(2) Quotient-Space with parent => exploit parents cover
-(3) Quotient-Space with solution => expand
-
-[ ] Check out LazySP, if that could add some additional speedup in the case of
-the 2d-disk
-
-Exploration along cover not efficient/working
-
-Lazy evaluation: First take shortest path, evaluate it. If infeasible, take next
-path (that is basically the idea behind being lazy).
-
 [x] Would be good to see incremental changes in the planner (step through
 planner)
-[ ] Fix issue of start state rejected when using DLS
+[x] Fix issue of start state rejected when using DLS
+
+
+
+SOLVE 03D, find cover exploration.
+SOLVE 06D_DLS, find FAST cover exploration
