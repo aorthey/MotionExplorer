@@ -1,5 +1,8 @@
 import numpy as np
 
+# constant is computed by taking the largest sphere around the robot (rmax), and
+# then computing how the inscribed ball changes
+
 def SpecialEuclideanNeighborhood(rmax):
   r1 = 1
   r2 = rmax
@@ -10,5 +13,7 @@ def SpecialEuclideanNeighborhood(rmax):
   c= k2*np.cos(0.5*np.pi - np.arctan(k1/k2))
   return c
 
-print "PlanarLshape:",SpecialEuclideanNeighborhood(1.58902485821)
-print "Xshape:",SpecialEuclideanNeighborhood(1.70073513517)
+print "03D_misleading (PlanarLshape)    :",SpecialEuclideanNeighborhood(1.58902485821)
+print "03D_nonsimple (PlanarRectangle)  :",SpecialEuclideanNeighborhood(1.05948)
+print "06D_misleading_Xshape            :",SpecialEuclideanNeighborhood(1.70073513517)
+print "06D_doubleLshape                 :",SpecialEuclideanNeighborhood(1.677)

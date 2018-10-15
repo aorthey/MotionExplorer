@@ -77,6 +77,7 @@ void QuotientChartCover::setup(void)
       if(!ComputeNeighborhood(q_start, true))
       {
         OMPL_ERROR("%s: Could not add start state!", getName().c_str());
+        QuotientChartCover::Print(q_start, false);
         exit(0);
       }
     }else{
@@ -1012,8 +1013,7 @@ void QuotientChartCover::CopyChartFromSibling( QuotientChart *sibling_chart, uin
   }
 
   const og::QuotientChartCover::Graph& graph_prime = sibling->GetGraph();
-
-  std::cout << "sibling graph: " << boost::num_vertices(graph_prime) << " vertices | " << boost::num_edges(graph_prime) << " edges."<< std::endl;
+  if(verbose>0) std::cout << "sibling graph: " << boost::num_vertices(graph_prime) << " vertices | " << boost::num_edges(graph_prime) << " edges."<< std::endl;
 
   nearest_cover = sibling->GetNearestNeighborsCover();
   nearest_vertex = sibling->GetNearestNeighborsVertex();
@@ -1048,9 +1048,7 @@ void QuotientChartCover::CopyChartFromSibling( QuotientChart *sibling_chart, uin
     put(indexToVertex, graph[v]->index, v);
   }
   index_ctr = sibling->index_ctr;
-
-  //indices are mixed up!
-  std::cout << "new graph: " << boost::num_vertices(graph) << " vertices | " << boost::num_edges(graph) << " edges."<< std::endl;
+  if(verbose>0) std::cout << "new graph: " << boost::num_vertices(graph) << " vertices | " << boost::num_edges(graph) << " edges."<< std::endl;
 }
 
 QuotientChartCover::Configuration* QuotientChartCover::GetStartConfiguration() const

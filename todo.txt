@@ -596,5 +596,6 @@ Exploration along cover not efficient/working
 Lazy evaluation: First take shortest path, evaluate it. If infeasible, take next
 path (that is basically the idea behind being lazy).
 
-[ ] Would be good to see incremental changes in the planner (step through
+[x] Would be good to see incremental changes in the planner (step through
 planner)
+[ ] Fix issue of start state rejected when using DLS

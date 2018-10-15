@@ -192,6 +192,12 @@ inline T GetSubNodeAttributeDefault(TiXmlElement* node, const char *name, const 
 template<typename T> 
 inline T GetAttribute(TiXmlElement* node, const char *attribute)
 {
+  if(!ExistStreamAttribute(node, attribute)){
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "[ERROR] Attribute:" << attribute << " does not exist." << std::endl;
+    std::cout << std::string(80, '-') << std::endl;
+    exit(0);
+  }
   T _val;
   GetStreamAttribute(node, attribute) >> _val;
   return _val;

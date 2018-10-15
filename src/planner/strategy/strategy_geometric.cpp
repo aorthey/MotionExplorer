@@ -218,7 +218,6 @@ void StrategyGeometricMultiLevel::Init( const StrategyInput &input )
     planner = GetPlanner(algorithm, si_vec, pdef_vec);
     planner->clear();
     planner->setup();
-    std::cout << "Planner Initialized" << std::endl;
     isInitialized = true;
   }
   max_planning_time = input.max_planning_time;

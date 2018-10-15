@@ -24,8 +24,8 @@
     <maxplanningtime>0.5</maxplanningtime>
 
     <hierarchy>
-      <level inner_index="1" outer_index="2" type="R2"/>
-      <level inner_index="0" type="SE2"/>
+      <level inner_index="1" outer_index="2" cspace_constant="1" type="R2"/>
+      <level inner_index="0" cspace_constant="0.532623641291" type="SE2"/>
     </hierarchy>
 
   </plannerinput>
