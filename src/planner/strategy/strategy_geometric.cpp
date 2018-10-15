@@ -5,13 +5,13 @@
 #include "planner/benchmark/benchmark_output.h"
 
 #include "planner/strategy/quotient/multiquotient.h"
-#include "planner/strategy/quotient/qmp_connect.h"
-#include "planner/strategy/quotient/qmp.h"
+#include "planner/strategy/quotient/algorithms/qmp_connect.h"
+#include "planner/strategy/quotient/algorithms/qmp.h"
+
 #include "planner/strategy/quotientchart/multichart.h"
-#include "planner/strategy/quotientchart/quotient_chart.h"
-#include "planner/strategy/quotientcover/qng.h"
-#include "planner/strategy/quotientcover/qng2.h"
-#include "planner/strategy/quotientcover/qng_goal_directed.h"
+#include "planner/strategy/quotientchart/algorithms/qng.h"
+#include "planner/strategy/quotientchart/algorithms/qng2.h"
+#include "planner/strategy/quotientchart/algorithms/qng_goal_directed.h"
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
