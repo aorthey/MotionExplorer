@@ -1,5 +1,5 @@
 #include "common.h"
-#include "quotient_chart_cover.h"
+#include "quotient_cover.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <limits>
@@ -15,19 +15,19 @@
 
 using namespace ompl::geometric;
 
-QuotientChartCover::QuotientChartCover(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
+QuotientCover::QuotientCover(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
-  setName("QuotientChartCover"+std::to_string(id));
+  setName("QuotientCover"+std::to_string(id));
 }
 
-QuotientChartCover::~QuotientChartCover(void)
+QuotientCover::~QuotientCover(void)
 {
 }
 //#############################################################################
 //SETUP
 //#############################################################################
 
-void QuotientChartCover::setup(void)
+void QuotientCover::setup(void)
 {
   BaseT::setup();
   if (!nearest_cover){
@@ -77,7 +77,7 @@ void QuotientChartCover::setup(void)
       if(!ComputeNeighborhood(q_start, true))
       {
         OMPL_ERROR("%s: Could not add start state!", getName().c_str());
-        QuotientChartCover::Print(q_start, false);
+        QuotientCover::Print(q_start, false);
         exit(0);
       }
     }else{
@@ -104,8 +104,8 @@ void QuotientChartCover::setup(void)
     //#########################################################################
     if(parent != nullptr)
     {
-      q_start->coset = static_cast<og::QuotientChartCover*>(parent)->q_start;
-      q_goal->coset = static_cast<og::QuotientChartCover*>(parent)->q_goal;
+      q_start->coset = static_cast<og::QuotientCover*>(parent)->q_start;
+      q_goal->coset = static_cast<og::QuotientCover*>(parent)->q_goal;
     }
     q_start->isStart = true;
     q_goal->isGoal = true;
@@ -125,7 +125,7 @@ void QuotientChartCover::setup(void)
   }
 
 }
-void QuotientChartCover::clear()
+void QuotientCover::clear()
 {
   BaseT::clear();
   totalVolumeOfCover = 0.0;
@@ -138,14 +138,10 @@ void QuotientChartCover::clear()
   shortest_path_start_goal_necessary_vertices.clear();
 
   //Cover graph
-  // std::cout << std::string(80, '-') << std::endl;
-  // std::cout << "Cleaning up " << getName() << " local:" << (isLocalChart?"Yes":"No") << std::endl;
-  if(!isLocalChart){
-    foreach (Vertex v, boost::vertices(graph)){
-      if(graph[v]!=nullptr){
-        if(!graph[v]->isStart && !graph[v]->isGoal){
-          graph[v]->Remove(Q1);
-        }
+  foreach (Vertex v, boost::vertices(graph)){
+    if(graph[v]!=nullptr){
+      if(!graph[v]->isStart && !graph[v]->isGoal){
+        graph[v]->Remove(Q1);
       }
     }
   }
@@ -185,7 +181,7 @@ void QuotientChartCover::clear()
 //#############################################################################
 //Configuration methods
 //#############################################################################
-void QuotientChartCover::AddConfigurationToPDF(Configuration *q)
+void QuotientCover::AddConfigurationToPDF(Configuration *q)
 {
   PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
   q->SetPDFElement(q_element);
@@ -196,7 +192,7 @@ void QuotientChartCover::AddConfigurationToPDF(Configuration *q)
   }
 }
 
-QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCoverWithoutAddingEdges(Configuration *q)
+QuotientCover::Vertex QuotientCover::AddConfigurationToCoverWithoutAddingEdges(Configuration *q)
 {
   //###########################################################################
   //safety checks
@@ -247,7 +243,7 @@ QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCoverWithoutAdd
 
   return v;
 }
-QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCover(Configuration *q)
+QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
 {
   std::vector<Configuration*> neighbors = GetConfigurationsInsideNeighborhood(q);
 
@@ -349,7 +345,7 @@ QuotientChartCover::Vertex QuotientChartCover::AddConfigurationToCover(Configura
   return v;
 }
 
-void QuotientChartCover::AddEdge(Configuration *q_from, Configuration *q_to)
+void QuotientCover::AddEdge(Configuration *q_from, Configuration *q_to)
 {
   double d = DistanceQ1(q_from, q_to);
   EdgeInternalState properties(d);
@@ -358,7 +354,7 @@ void QuotientChartCover::AddEdge(Configuration *q_from, Configuration *q_to)
   boost::add_edge(v_from, v_to, properties, graph);
 }
 
-void QuotientChartCover::RemoveConfigurationFromCover(Configuration *q)
+void QuotientCover::RemoveConfigurationFromCover(Configuration *q)
 {
   totalVolumeOfCover -= q->GetRadius();
 
@@ -396,7 +392,7 @@ void QuotientChartCover::RemoveConfigurationFromCover(Configuration *q)
   q=nullptr;
 }
 
-bool QuotientChartCover::ComputeNeighborhood(Configuration *q, bool verbose)
+bool QuotientCover::ComputeNeighborhood(Configuration *q, bool verbose)
 {
   if(q==nullptr) return false;
   if(IsConfigurationInsideCover(q)){
@@ -406,7 +402,7 @@ bool QuotientChartCover::ComputeNeighborhood(Configuration *q, bool verbose)
     return false;
   }
 
-  // QuotientChartCover::Print(q,false);
+  // QuotientCover::Print(q,false);
   // Q1->printState(q->state);
   bool feasible = Q1->isValid(q->state);
 
@@ -436,7 +432,7 @@ bool QuotientChartCover::ComputeNeighborhood(Configuration *q, bool verbose)
   return true;
 
 }
-void QuotientChartCover::RemoveConfigurationsFromCoverCoveredBy(Configuration *q)
+void QuotientCover::RemoveConfigurationsFromCoverCoveredBy(Configuration *q)
 {
   //If the neighborhood of q is a superset of any other neighborhood, then delete
   //the other neighborhood, and rewire the graph
@@ -458,12 +454,12 @@ void QuotientChartCover::RemoveConfigurationsFromCoverCoveredBy(Configuration *q
 }
 
 
-bool QuotientChartCover::IsConfigurationInsideNeighborhood(Configuration *q, Configuration *qn)
+bool QuotientCover::IsConfigurationInsideNeighborhood(Configuration *q, Configuration *qn)
 {
   return (DistanceConfigurationNeighborhood(q, qn) <= 0);
 }
 
-bool QuotientChartCover::IsConfigurationInsideCover(Configuration *q)
+bool QuotientCover::IsConfigurationInsideCover(Configuration *q)
 {
   std::vector<Configuration*> neighbors;
   nearest_cover->nearestK(q, 2, neighbors);
@@ -471,13 +467,13 @@ bool QuotientChartCover::IsConfigurationInsideCover(Configuration *q)
   return IsConfigurationInsideNeighborhood(q, neighbors.at(0)) && IsConfigurationInsideNeighborhood(q, neighbors.at(1));
 }
 
-double QuotientChartCover::GetImportance() const
+double QuotientCover::GetImportance() const
 {
   //approximation of total volume covered
   return 1.0/((totalVolumeOfCover/Q1->getStateSpace()->getMeasure())+1);
 }
 
-void QuotientChartCover::Grow(double t)
+void QuotientCover::Grow(double t)
 {
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
   //#########################################################################
@@ -496,7 +492,7 @@ void QuotientChartCover::Grow(double t)
 
   AddConfigurationToCover(q_random);
 }
-void QuotientChartCover::GetCosetFromQuotientSpace(Configuration *q)
+void QuotientCover::GetCosetFromQuotientSpace(Configuration *q)
 {
   if(parent != nullptr)
   {
@@ -504,7 +500,7 @@ void QuotientChartCover::GetCosetFromQuotientSpace(Configuration *q)
     //(2) find nearest configuration to q_projected on Q0
     //(3) set nearest to coset of q
 
-    og::QuotientChartCover *qcc_parent = static_cast<og::QuotientChartCover*>(parent);
+    og::QuotientCover *qcc_parent = static_cast<og::QuotientCover*>(parent);
     Configuration *q_projected = new Configuration(Q0);
     ExtractQ0Subspace(q->state, q_projected->state);
     q->coset = qcc_parent->Nearest(q_projected);
@@ -517,13 +513,13 @@ void QuotientChartCover::GetCosetFromQuotientSpace(Configuration *q)
 //Sampling Configurations (on quotient space)
 //#############################################################################
 
-void QuotientChartCover::SampleGoal(Configuration *q)
+void QuotientCover::SampleGoal(Configuration *q)
 {
   q->state = Q1->cloneState(q_goal->state);
   q->coset = q_goal->coset;
 }
 
-void QuotientChartCover::SampleUniform(Configuration *q)
+void QuotientCover::SampleUniform(Configuration *q)
 {
   if(parent == nullptr){
     Q1_sampler->sampleUniform(q->state);
@@ -531,7 +527,7 @@ void QuotientChartCover::SampleUniform(Configuration *q)
     ob::State *stateX1 = X1->allocState();
     ob::State *stateQ0 = Q0->allocState();
     X1_sampler->sampleUniform(stateX1);
-    q->coset = static_cast<og::QuotientChartCover*>(parent)->SampleUniformQuotientChartCover(stateQ0);
+    q->coset = static_cast<og::QuotientCover*>(parent)->SampleUniformQuotientCover(stateQ0);
     if(q->coset == nullptr){
       OMPL_ERROR("no coset found for state");
       Q1->printState(q->state);
@@ -542,7 +538,7 @@ void QuotientChartCover::SampleUniform(Configuration *q)
     Q0->freeState(stateQ0);
   }
 }
-void QuotientChartCover::SampleRandomNeighborhoodBoundary(Configuration *q)
+void QuotientCover::SampleRandomNeighborhoodBoundary(Configuration *q)
 {
   Configuration *q_nearest = pdf_all_configurations.sample(rng_.uniform01());
   q_nearest->number_attempted_expansions++;
@@ -557,7 +553,7 @@ void QuotientChartCover::SampleRandomNeighborhoodBoundary(Configuration *q)
 //Sampling Configurations (On boundary of cover)
 //#############################################################################
 
-QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundary(std::string type)
+QuotientCover::Configuration* QuotientCover::SampleCoverBoundary(std::string type)
 {
   Configuration *q_random = new Configuration(Q1);
   if(type == "voronoi"){
@@ -588,11 +584,11 @@ QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundary(std::
 // Main Sample Function
 //#############################################################################
 
-QuotientChartCover::Configuration* QuotientChartCover::Sample()
+QuotientCover::Configuration* QuotientCover::Sample()
 {
   return SampleCoverBoundary();
 }
-QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundary()
+QuotientCover::Configuration* QuotientCover::SampleCoverBoundary()
 {
   Configuration *q_random;
   if(!hasSolution){
@@ -613,7 +609,7 @@ QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundary()
   return q_random;
 }
 
-QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundaryValid(ob::PlannerTerminationCondition &ptc)
+QuotientCover::Configuration* QuotientCover::SampleCoverBoundaryValid(ob::PlannerTerminationCondition &ptc)
 {
   Configuration *q = nullptr;
   while(!ptc){
@@ -625,7 +621,7 @@ QuotientChartCover::Configuration* QuotientChartCover::SampleCoverBoundaryValid(
   return q;
 }
 
-QuotientChartCover::Configuration* QuotientChartCover::SampleUniformQuotientChartCover(ob::State *state) 
+QuotientCover::Configuration* QuotientCover::SampleUniformQuotientCover(ob::State *state) 
 {
   Configuration *q_coset = pdf_all_configurations.sample(rng_.uniform01());
 
@@ -643,7 +639,7 @@ QuotientChartCover::Configuration* QuotientChartCover::SampleUniformQuotientChar
   return q_coset;
 }
 
-bool QuotientChartCover::SampleNeighborhoodBoundary(Configuration *q_random, const Configuration *q_center)
+bool QuotientCover::SampleNeighborhoodBoundary(Configuration *q_random, const Configuration *q_center)
 {
   //sample on boundary of open neighborhood
   // (1) first sample gaussian point qk around q
@@ -675,7 +671,7 @@ bool QuotientChartCover::SampleNeighborhoodBoundary(Configuration *q_random, con
 
   return true;
 }
-bool QuotientChartCover::SampleNeighborhoodBoundaryHalfBall(Configuration *q_random, const Configuration *q_center)
+bool QuotientCover::SampleNeighborhoodBoundaryHalfBall(Configuration *q_random, const Configuration *q_center)
 {
   SampleNeighborhoodBoundary(q_random, q_center);
 
@@ -705,7 +701,7 @@ bool QuotientChartCover::SampleNeighborhoodBoundaryHalfBall(Configuration *q_ran
 
 //@brief: move from q_from to q_to until the neighborhood of q_from is
 //intersected. Return the intersection point in q_out
-void QuotientChartCover::Connect(const Configuration *q_from, const Configuration *q_to, Configuration *q_out)
+void QuotientCover::Connect(const Configuration *q_from, const Configuration *q_to, Configuration *q_out)
 {
   double radius = q_from->GetRadius();
   double dist_qfrom_qto = DistanceQ1(q_from, q_to);
@@ -741,7 +737,7 @@ void QuotientChartCover::Connect(const Configuration *q_from, const Configuratio
 
 }
 
-bool QuotientChartCover::IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rhs)
+bool QuotientCover::IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rhs)
 {
   double distance_centers = DistanceQ1(lhs, rhs);
   double radius_rhs = rhs->GetRadius();
@@ -758,7 +754,7 @@ bool QuotientChartCover::IsNeighborhoodInsideNeighborhood(Configuration *lhs, Co
   return (radius_rhs > (radius_lhs + distance_centers));
 }
 
-std::vector<QuotientChartCover::Configuration*> QuotientChartCover::GetConfigurationsInsideNeighborhood(Configuration *q)
+std::vector<QuotientCover::Configuration*> QuotientCover::GetConfigurationsInsideNeighborhood(Configuration *q)
 {
   std::vector<Configuration*> neighbors;
   nearest_vertex->nearestR(q, q->GetRadius(), neighbors);
@@ -766,7 +762,7 @@ std::vector<QuotientChartCover::Configuration*> QuotientChartCover::GetConfigura
 }
 
 
-QuotientChartCover::Configuration* QuotientChartCover::Nearest(Configuration *q) const
+QuotientCover::Configuration* QuotientCover::Nearest(Configuration *q) const
 {
   return nearest_cover->nearest(q);
 }
@@ -774,18 +770,18 @@ QuotientChartCover::Configuration* QuotientChartCover::Nearest(Configuration *q)
 //@TODO: should be fixed to reflect the distance on the underlying
 //quotient-space, i.e. similar to QMPConnect. For now we use DistanceQ1
 
-bool QuotientChartCover::Interpolate(const Configuration *q_from, Configuration *q_to)
+bool QuotientCover::Interpolate(const Configuration *q_from, Configuration *q_to)
 {
   return Interpolate(q_from, q_to, q_to);
 }
 
-bool QuotientChartCover::Interpolate(const Configuration *q_from, const Configuration *q_to, Configuration *q_interp)
+bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration *q_to, Configuration *q_interp)
 {
   double d = DistanceConfigurationConfiguration(q_from, q_to);
   double radius = q_from->GetRadius();
   return Interpolate(q_from, q_to, radius/d, q_interp);
 }
-bool QuotientChartCover::Interpolate(const Configuration *q_from, const Configuration *q_to, double step_size, Configuration *q_interp)
+bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration *q_to, double step_size, Configuration *q_interp)
 {
   if(parent==nullptr){
     Q1->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_interp->state);
@@ -813,12 +809,12 @@ bool QuotientChartCover::Interpolate(const Configuration *q_from, const Configur
 //Distance Functions
 //#############################################################################
 
-double QuotientChartCover::DistanceQ1(const Configuration *q_from, const Configuration *q_to)
+double QuotientCover::DistanceQ1(const Configuration *q_from, const Configuration *q_to)
 {
   return Q1->distance(q_from->state, q_to->state);
 }
 
-double QuotientChartCover::DistanceX1(const Configuration *q_from, const Configuration *q_to)
+double QuotientCover::DistanceX1(const Configuration *q_from, const Configuration *q_to)
 {
   ob::State *stateFrom = X1->allocState();
   ob::State *stateTo = X1->allocState();
@@ -830,7 +826,7 @@ double QuotientChartCover::DistanceX1(const Configuration *q_from, const Configu
   return d;
 }
 
-double QuotientChartCover::DistanceConfigurationConfiguration(const Configuration *q_from, const Configuration *q_to)
+double QuotientCover::DistanceConfigurationConfiguration(const Configuration *q_from, const Configuration *q_to)
 {
   if(parent == nullptr){
     //the very first quotient-space => usual metric
@@ -856,7 +852,7 @@ double QuotientChartCover::DistanceConfigurationConfiguration(const Configuratio
 }
 
 
-double QuotientChartCover::DistanceConfigurationConfigurationCover(const Configuration *q_from, const Configuration *q_to)
+double QuotientCover::DistanceConfigurationConfigurationCover(const Configuration *q_from, const Configuration *q_to)
 {
   std::vector<const Configuration*> path = GetInterpolationPath(q_from, q_to);
   double d = 0;
@@ -866,7 +862,7 @@ double QuotientChartCover::DistanceConfigurationConfigurationCover(const Configu
   return d;
 }
 
-std::vector<const QuotientChartCover::Configuration*> QuotientChartCover::GetInterpolationPath(const Configuration *q_from, const Configuration *q_to)
+std::vector<const QuotientCover::Configuration*> QuotientCover::GetInterpolationPath(const Configuration *q_from, const Configuration *q_to)
 {
   if(q_from->coset == nullptr || q_to->coset == nullptr){
     OMPL_ERROR("Cannot interpolate without cosets");
@@ -882,7 +878,7 @@ std::vector<const QuotientChartCover::Configuration*> QuotientChartCover::GetInt
   }
   std::vector<const Configuration*> path_Q1;
 
-  og::QuotientChartCover *parent_chart = dynamic_cast<og::QuotientChartCover*>(parent);
+  og::QuotientCover *parent_chart = dynamic_cast<og::QuotientCover*>(parent);
 
   //(0) get shortest path on Q0 between q_from->coset to q_to->coset
   std::vector<const Configuration*> path_Q0_cover = parent_chart->GetCoverPath(q_from->coset, q_to->coset);
@@ -953,13 +949,13 @@ std::vector<const QuotientChartCover::Configuration*> QuotientChartCover::GetInt
   return path_Q1;
 }
 
-double QuotientChartCover::DistanceConfigurationNeighborhood(const Configuration *q_from, const Configuration *q_to)
+double QuotientCover::DistanceConfigurationNeighborhood(const Configuration *q_from, const Configuration *q_to)
 {
   double d_to = q_to->GetRadius();
   double d = DistanceConfigurationConfiguration(q_from, q_to);
   return std::max(d - d_to, 0.0);
 }
-double QuotientChartCover::DistanceNeighborhoodNeighborhood(const Configuration *q_from, const Configuration *q_to)
+double QuotientCover::DistanceNeighborhoodNeighborhood(const Configuration *q_from, const Configuration *q_to)
 {
   double d_from = q_from->GetRadius();
   double d_to = q_to->GetRadius();
@@ -967,8 +963,9 @@ double QuotientChartCover::DistanceNeighborhoodNeighborhood(const Configuration 
 
   if(d!=d){
     std::cout << std::string(80, '-') << std::endl;
-    std::cout << "NaN detected." << std::endl;
+    std::cout << *this << std::endl;
     std::cout << "at " << getName() << ":" << id << std::endl;
+    std::cout << "NaN detected." << std::endl;
     std::cout << "d_from " << d_from << std::endl;
     std::cout << "d_to " << d_to << std::endl;
     std::cout << "d " << d << std::endl;
@@ -977,19 +974,20 @@ double QuotientChartCover::DistanceNeighborhoodNeighborhood(const Configuration 
     std::cout << "configuration 2: " << std::endl;
     Print(q_to, false);
     std::cout << std::string(80, '-') << std::endl;
+    throw "";
     exit(1);
   }
   double d_open_neighborhood_distance = std::max(d - d_from - d_to, 0.0); 
   return d_open_neighborhood_distance;
 }
 
-void QuotientChartCover::Init()
+void QuotientCover::Init()
 {
   checkValidity();
 }
 
 
-bool QuotientChartCover::GetSolution(ob::PathPtr &solution)
+bool QuotientCover::GetSolution(ob::PathPtr &solution)
 {
   if(!isConnected){
     Configuration* qn = Nearest(q_goal);
@@ -1021,88 +1019,39 @@ bool QuotientChartCover::GetSolution(ob::PathPtr &solution)
   return false;
 }
 
-const QuotientChartCover::Graph& QuotientChartCover::GetGraph() const
+const QuotientCover::Graph& QuotientCover::GetGraph() const
 {
   return graph;
 }
 
-void QuotientChartCover::CopyChartFromSibling( QuotientChart *sibling_chart, uint k )
-{
-  QuotientChartCover *sibling = dynamic_cast<QuotientChartCover*>(sibling_chart);
-  if(sibling == nullptr)
-  {
-    std::cout << "copying chart from non cover." << std::endl;
-    std::cout << *sibling_chart << std::endl;
-    exit(0);
-  }
-
-  const og::QuotientChartCover::Graph& graph_prime = sibling->GetGraph();
-  if(verbose>0) std::cout << "sibling graph: " << boost::num_vertices(graph_prime) << " vertices | " << boost::num_edges(graph_prime) << " edges."<< std::endl;
-
-  nearest_cover = sibling->GetNearestNeighborsCover();
-  nearest_vertex = sibling->GetNearestNeighborsVertex();
-  v_start = sibling->v_start;
-  v_goal = sibling->v_goal;
-  q_start = graph[v_start];
-  q_goal = graph[v_goal];
-  //q_start = sibling->GetStartConfiguration();
-  //q_start->state = Q1->cloneState(sibling->GetStartConfiguration()->state);
-  //q_goal = sibling->GetGoalConfiguration();
-  //q_goal->state = Q1->cloneState(sibling->GetGoalConfiguration()->state);
-
-  pdf_necessary_configurations = sibling->GetPDFNecessaryConfigurations();
-  pdf_all_configurations = sibling->GetPDFAllConfigurations();
-  isConnected = true;
-  isLocalChart = true;
-  opt_ = sibling->opt_;
-  level = sibling->GetLevel();
-  boost::copy_graph( graph_prime, graph, vertex_index_map(sibling->vertexToIndex));
-  graph[boost::graph_bundle].Q1 = Q1;
-
-  // vertexToIndexStdMap = sibling->vertexToIndexStdMap;
-  // indexToVertexStdMap = sibling->indexToVertexStdMap;
-  // vertexToIndex = sibling->vertexToIndex;
-  // indexToVertex = sibling->indexToVertex;
-
-  shortest_path_start_goal = sibling->shortest_path_start_goal;
-  shortest_path_start_goal_necessary_vertices = sibling->shortest_path_start_goal_necessary_vertices;
-  foreach( const Vertex v, boost::vertices(graph))
-  {
-    put(vertexToIndex, v, graph[v]->index);
-    put(indexToVertex, graph[v]->index, v);
-  }
-  index_ctr = sibling->index_ctr;
-  if(verbose>0) std::cout << "new graph: " << boost::num_vertices(graph) << " vertices | " << boost::num_edges(graph) << " edges."<< std::endl;
-}
-
-QuotientChartCover::Configuration* QuotientChartCover::GetStartConfiguration() const
+QuotientCover::Configuration* QuotientCover::GetStartConfiguration() const
 {
   return q_start;
 }
-QuotientChartCover::Configuration* QuotientChartCover::GetGoalConfiguration() const
+QuotientCover::Configuration* QuotientCover::GetGoalConfiguration() const
 {
   return q_goal;
 }
 
-const QuotientChartCover::PDF& QuotientChartCover::GetPDFNecessaryConfigurations() const
+const QuotientCover::PDF& QuotientCover::GetPDFNecessaryConfigurations() const
 {
   return pdf_necessary_configurations;
 }
 
-const QuotientChartCover::PDF& QuotientChartCover::GetPDFAllConfigurations() const
+const QuotientCover::PDF& QuotientCover::GetPDFAllConfigurations() const
 {
   return pdf_all_configurations;
 }
-const QuotientChartCover::NearestNeighborsPtr& QuotientChartCover::GetNearestNeighborsCover() const
+const QuotientCover::NearestNeighborsPtr& QuotientCover::GetNearestNeighborsCover() const
 {
   return nearest_cover;
 }
-const QuotientChartCover::NearestNeighborsPtr& QuotientChartCover::GetNearestNeighborsVertex() const
+const QuotientCover::NearestNeighborsPtr& QuotientCover::GetNearestNeighborsVertex() const
 {
   return nearest_vertex;
 }
 
-double QuotientChartCover::GetGoalBias() const
+double QuotientCover::GetGoalBias() const
 {
   return goalBias;
 }
@@ -1123,7 +1072,7 @@ private:
   Vertex m_goal;
 };
 
-std::vector<const QuotientChartCover::Configuration*> QuotientChartCover::GetCoverPath(const Configuration *q_source, const Configuration *q_sink)
+std::vector<const QuotientCover::Configuration*> QuotientCover::GetCoverPath(const Configuration *q_source, const Configuration *q_sink)
 {
   const Vertex v_source = get(indexToVertex, q_source->index);
   const Vertex v_sink = get(indexToVertex, q_sink->index);
@@ -1135,7 +1084,7 @@ std::vector<const QuotientChartCover::Configuration*> QuotientChartCover::GetCov
   }
   return q_path;
 }
-std::vector<QuotientChartCover::Vertex> QuotientChartCover::GetCoverPath(const Vertex& v_source, const Vertex& v_sink)
+std::vector<QuotientCover::Vertex> QuotientCover::GetCoverPath(const Vertex& v_source, const Vertex& v_sink)
 {
   std::vector<Vertex> path;
   std::vector<Vertex> prev(boost::num_vertices(graph));
@@ -1186,11 +1135,10 @@ std::vector<QuotientChartCover::Vertex> QuotientChartCover::GetCoverPath(const V
 }
 
 
-PlannerDataVertexAnnotated QuotientChartCover::getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const
+PlannerDataVertexAnnotated QuotientCover::getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const
 {
   PlannerDataVertexAnnotated pvertex(state);
   pvertex.SetLevel(GetLevel());
-  pvertex.SetPath(GetChartPath());
   pvertex.SetOpenNeighborhoodDistance(radius);
 
   if(!state){
@@ -1207,14 +1155,14 @@ PlannerDataVertexAnnotated QuotientChartCover::getAnnotatedVertex(ob::State* sta
   }
   return pvertex;
 }
-PlannerDataVertexAnnotated QuotientChartCover::getAnnotatedVertex(Vertex vertex) const
+PlannerDataVertexAnnotated QuotientCover::getAnnotatedVertex(Vertex vertex) const
 {
-  ob::State *state = (isLocalChart?Q1->cloneState(graph[vertex]->state):graph[vertex]->state);
+  ob::State *state = graph[vertex]->state;
   return getAnnotatedVertex(state, graph[vertex]->GetRadius(), graph[vertex]->isSufficientFeasible);
 }
 
 
-void QuotientChartCover::getPlannerDataAnnotated(base::PlannerData &data) const
+void QuotientCover::getPlannerData(base::PlannerData &data) const
 {
   if(verbose>0) std::cout << "graph has " << boost::num_vertices(graph) << " (idx: " << index_ctr << ") vertices and " << boost::num_edges(graph) << " edges." << std::endl;
   std::map<const uint, const ob::State*> indexToStates;
@@ -1229,7 +1177,6 @@ void QuotientChartCover::getPlannerDataAnnotated(base::PlannerData &data) const
     data.addGoalVertex(pgoal);
   }
 
-  //TODO: goal and start are added two times if chart is local
   foreach( const Vertex v, boost::vertices(graph))
   {
     if(indexToStates.find(graph[v]->index) == indexToStates.end()) {
@@ -1253,7 +1200,7 @@ void QuotientChartCover::getPlannerDataAnnotated(base::PlannerData &data) const
   if(verbose>0) std::cout << "added " << data.numVertices() << " vertices and " << data.numEdges() << " edges."<< std::endl;
 }
 
-void QuotientChartCover::Print(const Configuration *q, bool stopOnError) const
+void QuotientCover::Print(const Configuration *q, bool stopOnError) const
 {
   Q1->printState(q->state);
   std::cout << " | index: " << q->index;
@@ -1276,36 +1223,36 @@ void QuotientChartCover::Print(const Configuration *q, bool stopOnError) const
     if(stopOnError) exit(0);
   }
 }
-void QuotientChartCover::Print(std::ostream& out) const
+void QuotientCover::Print(std::ostream& out) const
 {
   BaseT::Print(out);
-  out << std::endl << " |---- [ChartCover] has " << boost::num_vertices(graph) << " vertices and " << boost::num_edges(graph) << " edges.";
+  out << std::endl << " |---- [Cover] has " << boost::num_vertices(graph) << " vertices and " << boost::num_edges(graph) << " edges.";
 }
 
 namespace ompl{
   namespace geometric{
-    std::ostream& operator<< (std::ostream& out, const QuotientChartCover::Configuration& q){
+    std::ostream& operator<< (std::ostream& out, const QuotientCover::Configuration& q){
       out << "[Configuration]";
       out << q.GetRadius() << std::endl;
       return out;
     }
-    std::ostream& operator<< (std::ostream& out, const QuotientChartCover::Graph& graph)
+    std::ostream& operator<< (std::ostream& out, const QuotientCover::Graph& graph)
     {
       out << std::string(80, '-') << std::endl;
       out << "[Graph]" << std::endl;
       out << std::string(80, '-') << std::endl;
       ob::SpaceInformationPtr Q1 = graph[boost::graph_bundle].Q1;
 
-      foreach(const QuotientChartCover::Vertex v, boost::vertices(graph))
+      foreach(const QuotientCover::Vertex v, boost::vertices(graph))
       {
-        QuotientChartCover::Configuration *q = graph[v];
+        QuotientCover::Configuration *q = graph[v];
         std::cout << "vertex " << q->index << " radius " << q->GetRadius() << " : ";
         Q1->printState(q->state);
       }
-      foreach (const QuotientChartCover::Edge e, boost::edges(graph))
+      foreach (const QuotientCover::Edge e, boost::edges(graph))
       {
-        const QuotientChartCover::Vertex v1 = boost::source(e, graph);
-        const QuotientChartCover::Vertex v2 = boost::target(e, graph);
+        const QuotientCover::Vertex v1 = boost::source(e, graph);
+        const QuotientCover::Vertex v2 = boost::target(e, graph);
         std::cout << "edge from " << graph[v1]->index << " to " << graph[v2]->index << " (weight " << graph[e].getWeight() << ")" << std::endl;
       }
 

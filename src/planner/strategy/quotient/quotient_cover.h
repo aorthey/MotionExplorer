@@ -1,5 +1,5 @@
 #pragma once
-#include "quotient_chart.h"
+#include "quotient.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include <ompl/datastructures/PDF.h>
 #include <ompl/tools/config/SelfConfig.h>
@@ -13,15 +13,15 @@ namespace ompl
 {
   namespace geometric
   {
-    class QuotientChartCover: public og::QuotientChart
+    class QuotientCover: public og::Quotient
     {
-      typedef og::QuotientChart BaseT;
+      typedef og::Quotient BaseT;
     public:
 
       const uint verbose{0};
 
-      QuotientChartCover(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
-      ~QuotientChartCover(void);
+      QuotientCover(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
+      ~QuotientCover(void);
       virtual void clear() override;
       virtual void setup() override;
 
@@ -120,7 +120,7 @@ namespace ompl
         double openNeighborhoodRadius{0.0}; //might be L1 or L2 radius
         double openNeighborhoodOuterRadius{0.0}; //might be L1 or L2 radius
 
-        friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::QuotientChartCover::Configuration&);
+        friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::QuotientCover::Configuration&);
       };
 
       class EdgeInternalState{
@@ -241,7 +241,7 @@ namespace ompl
 
       void SampleGoal(Configuration*);
       void SampleUniform(Configuration*);
-      virtual Configuration* SampleUniformQuotientChartCover(ob::State *state);
+      virtual Configuration* SampleUniformQuotientCover(ob::State *state);
       //#######################################################################
       //Connect strategies
       //#######################################################################
@@ -271,10 +271,9 @@ namespace ompl
 
       Configuration* Nearest(Configuration *q) const;
 
-      virtual void getPlannerDataAnnotated(base::PlannerData &data) const override;
+      virtual void getPlannerData(base::PlannerData &data) const override;
       PlannerDataVertexAnnotated getAnnotatedVertex(Vertex vertex) const;
       PlannerDataVertexAnnotated getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const;
-      virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
       //#######################################################################
       RNG rng_;
       const double goalBias{0.1}; //in [0,1]

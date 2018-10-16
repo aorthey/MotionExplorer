@@ -14,7 +14,6 @@ MultiChart<T>::MultiChart(std::vector<ob::SpaceInformationPtr> &si_vec_, std::st
   T::resetCounter();
 
   levels = si_vec.size();
-  std::cout << "levels: " << levels << std::endl;
   root_chart = new T(si_vec.at(0), nullptr);
   root_chart->SetLevel(0);
 
@@ -44,7 +43,6 @@ void MultiChart<T>::setup(){
   if(!setup_) BaseT::setup();
   if(pdef_){
     std::cout << "SETUP MULTICHART" << std::endl;
-    T::resetCounter();
 
     root_chart->setProblemDefinition(pdef_vec.at(0));
     root_chart->setup();
@@ -63,8 +61,6 @@ void MultiChart<T>::clear(){
   BaseT::clear();
   std::cout << "CLEAR MULTICHART" << std::endl;
 
-  if(root_chart) root_chart->clear();
-
   found_path_on_last_level = false;
   saturated_levels = false;
 
@@ -73,9 +69,18 @@ void MultiChart<T>::clear(){
   for(uint k = 0; k < pdef_vec.size(); k++){
     pdef_vec.at(k)->clearSolutionPaths();
   }
-  for(uint k = 0; k < quotientCharts.size(); k++){
-    quotientCharts.at(k)->clear();
-  }
+
+
+  if(root_chart) root_chart->clear();
+  root_chart->setProblemDefinition(pdef_vec.at(0));
+  dynamic_cast<QuotientChart*>(root_chart)->DeleteSubCharts();
+
+  std::cout << si_vec.at(0)->getStateValidityChecker()->getSpecs().hasValidDirectionComputation << std::endl;
+
+  std::cout << "FINISHED CLEARING MULTICHART" << std::endl;
+  //for(uint k = 0; k < quotientCharts.size(); k++){
+  //  quotientCharts.at(k)->clear();
+  //}
 }
 
 

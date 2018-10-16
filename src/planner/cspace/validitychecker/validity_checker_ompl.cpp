@@ -1,4 +1,5 @@
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
+#include "common.h"
 #include <ompl/base/StateSpaceTypes.h>
 
 OMPLValidityChecker::OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_):

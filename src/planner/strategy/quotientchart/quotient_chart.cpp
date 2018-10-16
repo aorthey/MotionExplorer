@@ -20,11 +20,26 @@ void QuotientChart::setup()
 void QuotientChart::clear() 
 {
   BaseT::clear();
+  std::cout << "Clear chart " << chartPath << std::endl;
   for(uint k = 0; k < chartSiblings.size(); k++){
     chartSiblings.at(k)->clear();
   }
+  isLocalChart = false;
+}
+
+void QuotientChart::DeleteSubCharts()
+{
+  for(uint k = 0; k < chartSiblings.size(); k++){
+    chartSiblings.at(k)->DeleteSubCharts();
+  }
+  for(uint k = 0; k < chartSiblings.size(); k++){
+    delete chartSiblings.at(k);
+  }
   chartSiblings.clear();
-  UpdateChartPath();
+  if(child){
+    static_cast<QuotientChart*>(child)->DeleteSubCharts();
+    delete child;
+  }
 }
 
 uint QuotientChart::GetChartHorizontalIndex() const

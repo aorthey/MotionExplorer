@@ -9,9 +9,9 @@
 #include "planner/strategy/quotient/algorithms/qmp.h"
 
 #include "planner/strategy/quotientchart/multichart.h"
-#include "planner/strategy/quotientchart/algorithms/qng.h"
-#include "planner/strategy/quotientchart/algorithms/qng2.h"
-#include "planner/strategy/quotientchart/algorithms/qng_goal_directed.h"
+//#include "planner/strategy/quotientchart/algorithms/qng2.h"
+#include "planner/strategy/quotient/algorithms/qng.h"
+#include "planner/strategy/quotient/algorithms/qng_goal_directed.h"
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -145,13 +145,13 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     planner = GetSharedMultiQuotientPtr<og::QMP>(si_vec, pdef_vec);
     planner->setName("QMP");
   }else if(algorithm=="hierarchy:qng"){
-    planner = GetSharedMultiChartPtr<og::QNG>(si_vec, pdef_vec);
+    planner = GetSharedMultiQuotientPtr<og::QNG>(si_vec, pdef_vec);
     planner->setName("QNG");
   }else if(algorithm=="hierarchy:qng_goal_directed"){
-    planner = GetSharedMultiChartPtr<og::QNGGoalDirected>(si_vec, pdef_vec);
+    planner = GetSharedMultiQuotientPtr<og::QNGGoalDirected>(si_vec, pdef_vec);
     planner->setName("QNGGoalDirected");
-  }else if(algorithm=="hierarchy:qng2"){
-    planner = GetSharedMultiChartPtr<og::QNG2>(si_vec, pdef_vec);
+  // }else if(algorithm=="hierarchy:qng2"){
+  //   planner = GetSharedMultiChartPtr<og::QNG2>(si_vec, pdef_vec);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);
@@ -221,6 +221,7 @@ void StrategyGeometricMultiLevel::Init( const StrategyInput &input )
   }else{
     planner = GetPlanner(algorithm, si_vec, pdef_vec);
     planner->setup();
+    planner->clear();
     isInitialized = true;
   }
   max_planning_time = input.max_planning_time;

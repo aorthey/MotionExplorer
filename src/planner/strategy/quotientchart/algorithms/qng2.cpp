@@ -238,7 +238,7 @@ QNG2::Configuration* QNG2::Sample()
   return q_random;
 }
 
-QNG2::Configuration* QNG2::SampleUniformQuotientCover(ob::State *state) 
+QNG2::Configuration* QNG2::SampleUniformQuotientChartCover(ob::State *state) 
 {
   double r = rng_.uniform01();
   Configuration *q_coset = nullptr;

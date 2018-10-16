@@ -1,5 +1,5 @@
 #pragma once
-#include "planner/strategy/quotientchart/quotient_chart_cover_queue.h"
+#include "planner/strategy/quotient/quotient_cover_queue.h"
 #include <ompl/datastructures/PDF.h>
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/datastructures/NearestNeighbors.h>
@@ -14,9 +14,9 @@ namespace ompl
   {
 
     //Quotient-space sufficient Neighborhood Graph planner (QNG)
-    class QNG: public og::QuotientChartCoverQueue
+    class QNG: public og::QuotientCoverQueue
     {
-      typedef og::QuotientChartCoverQueue BaseT;
+      typedef og::QuotientCoverQueue BaseT;
       int verbose{0};
     public:
 

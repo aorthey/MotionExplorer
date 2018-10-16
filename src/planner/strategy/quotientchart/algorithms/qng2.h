@@ -30,7 +30,7 @@ namespace ompl
 
       virtual void AddConfigurationToPDF(Configuration *q) override;
 
-      virtual Configuration* SampleUniformQuotientCover(ob::State *state) override;
+      virtual Configuration* SampleUniformQuotientChartCover(ob::State *state) override;
       virtual Configuration* Sample() override;
 
       void ExpandLargestDirection(Configuration *q_current);

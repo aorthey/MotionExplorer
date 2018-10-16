@@ -32,6 +32,7 @@ namespace ompl
         uint GetChartNumberOfComponents() const;
 
         void AddChartSibling(QuotientChart *sibling_);
+        void DeleteSubCharts();
 
         virtual bool IsSaturated() const;
         //@brief: assume that there are K different solution paths on the graph. 

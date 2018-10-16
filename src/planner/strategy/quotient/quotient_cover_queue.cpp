@@ -1,5 +1,5 @@
 #include "common.h"
-#include "quotient_chart_cover_queue.h"
+#include "quotient_cover_queue.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <limits>
@@ -13,22 +13,22 @@
 
 using namespace ompl::geometric;
 
-QuotientChartCoverQueue::QuotientChartCoverQueue(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
+QuotientCoverQueue::QuotientCoverQueue(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
   if(parent != nullptr) verbose = 1;
 }
 
-QuotientChartCoverQueue::~QuotientChartCoverQueue(void)
+QuotientCoverQueue::~QuotientCoverQueue(void)
 {
 }
 
-void QuotientChartCoverQueue::setup()
+void QuotientCoverQueue::setup()
 {
   BaseT::setup();
   NUMBER_OF_EXPANSION_SAMPLES = (Q1->getStateDimension()+1)*1;
   firstRun = true;
 }
-void QuotientChartCoverQueue::clear()
+void QuotientCoverQueue::clear()
 {
   BaseT::clear();
   while(!priority_configurations.empty()) 
@@ -43,7 +43,7 @@ void QuotientChartCoverQueue::clear()
   firstRun = true;
 }
 
-void QuotientChartCoverQueue::Grow(double t)
+void QuotientCoverQueue::Grow(double t)
 {
   if(saturated) return;
 
@@ -116,7 +116,7 @@ void QuotientChartCoverQueue::Grow(double t)
 
 }
 
-QuotientChartCoverQueue::Configuration* QuotientChartCoverQueue::SampleCoverBoundary(){
+QuotientCoverQueue::Configuration* QuotientCoverQueue::SampleCoverBoundary(){
   Configuration *q_random;
   if(!hasSolution){
     //phase1 sampling: solution has not been found
@@ -134,7 +134,7 @@ QuotientChartCoverQueue::Configuration* QuotientChartCoverQueue::SampleCoverBoun
   return q_random;
 }
 
-void QuotientChartCoverQueue::AddConfigurationToPDF(Configuration *q)
+void QuotientCoverQueue::AddConfigurationToPDF(Configuration *q)
 {
   PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
   q->SetPDFElement(q_element);
@@ -145,34 +145,19 @@ void QuotientChartCoverQueue::AddConfigurationToPDF(Configuration *q)
     q->SetNecessaryPDFElement(q_necessary_element);
   }
 }
-void QuotientChartCoverQueue::CopyChartFromSibling( QuotientChart *sibling_chart, uint k )
-{
-  BaseT::CopyChartFromSibling(sibling_chart, k);
 
-  QuotientChartCoverQueue *sibling = dynamic_cast<QuotientChartCoverQueue*>(sibling_chart);
-  if(sibling == nullptr)
-  {
-    std::cout << "copying chart from non queue." << std::endl;
-    std::cout << *sibling_chart << std::endl;
-    exit(0);
-  }
-
-  priority_configurations = sibling->GetPriorityQueue();
-  NUMBER_OF_EXPANSION_SAMPLES = sibling->NUMBER_OF_EXPANSION_SAMPLES;
-}
-
-const QuotientChartCoverQueue::ConfigurationPriorityQueue& QuotientChartCoverQueue::GetPriorityQueue()
+const QuotientCoverQueue::ConfigurationPriorityQueue& QuotientCoverQueue::GetPriorityQueue()
 {
   return priority_configurations;
 }
 
-void QuotientChartCoverQueue::Print(std::ostream& out) const
+void QuotientCoverQueue::Print(std::ostream& out) const
 {
   BaseT::Print(out);
   out << std::endl << " |------ [Queue] has " << priority_configurations.size() << " configurations left in priority queue.";
 }
 
-QuotientChartCoverQueue::Configuration* QuotientChartCoverQueue::SampleUniformQuotientChartCover(ob::State *state) 
+QuotientCoverQueue::Configuration* QuotientCoverQueue::SampleUniformQuotientCover(ob::State *state) 
 {
   double r = rng_.uniform01();
   Configuration *q_coset = nullptr;

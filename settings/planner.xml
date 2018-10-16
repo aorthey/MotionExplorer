@@ -10,7 +10,7 @@
 
   <algorithm name="hierarchy:qng_goal_directed"/>
   <algorithm name="benchmark:minimal"/>
-  <algorithm name="hierarchy:qng"/>
+  <algorithm name="hierarchy:qmp"/>
   <algorithm name="ompl:spars"/>
   <algorithm name="ompl:kpiece"/>
   <algorithm name="benchmark:all_geometric"/>

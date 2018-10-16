@@ -136,6 +136,7 @@ void Quotient::clear()
   hasSolution = false;
   if(parent==nullptr) X1_sampler.reset();
   if(child!=nullptr) child->clear();
+  child = nullptr;
 }
 
 const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const StateSpacePtr Q0)

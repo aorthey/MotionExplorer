@@ -47,6 +47,11 @@ void MultiQuotient<T,Tlast>::clear(){
     quotientSpaces.at(k)->clear();
   }
   foundKLevelSolution = false;
+
+  pdef_->clearSolutionPaths();
+  for(uint k = 0; k < pdef_vec.size(); k++){
+    pdef_vec.at(k)->clearSolutionPaths();
+  }
 }
 
 template <class T, class Tlast>
@@ -57,7 +62,7 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
 
   auto cmp = [](og::Quotient* left, og::Quotient* right) 
               { 
-                return left->GetImportance() > right->GetImportance();
+                return left->GetImportance() < right->GetImportance();
               };
 
   std::priority_queue<og::Quotient*, std::vector<og::Quotient*>, decltype(cmp)> Q(cmp);

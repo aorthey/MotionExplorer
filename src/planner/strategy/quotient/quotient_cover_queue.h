@@ -1,5 +1,5 @@
 #pragma once
-#include "quotient_chart_cover.h"
+#include "quotient_cover.h"
 #include <ompl/datastructures/PDF.h>
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/datastructures/NearestNeighbors.h>
@@ -14,15 +14,15 @@ namespace ompl
   namespace geometric
   {
 
-    class QuotientChartCoverQueue: public og::QuotientChartCover
+    class QuotientCoverQueue: public og::QuotientCover
     {
-      typedef og::QuotientChartCover BaseT;
+      typedef og::QuotientCover BaseT;
     public:
 
       uint verbose{0};
 
-      QuotientChartCoverQueue(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
-      ~QuotientChartCoverQueue(void);
+      QuotientCoverQueue(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
+      ~QuotientCoverQueue(void);
       virtual void Grow(double t) override;
       void clear() override;
       void setup() override;
@@ -31,8 +31,7 @@ namespace ompl
       virtual Configuration* SampleCoverBoundary() override;
       virtual void AddConfigurationToPDF(Configuration *q) override;
       virtual void Print(std::ostream& out) const override;
-      virtual Configuration* SampleUniformQuotientChartCover(ob::State *state) override;
-      virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
+      virtual Configuration* SampleUniformQuotientCover(ob::State *state) override;
 
     protected:
       bool firstRun{true};

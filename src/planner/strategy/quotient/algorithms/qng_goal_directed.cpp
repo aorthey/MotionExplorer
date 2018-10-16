@@ -10,7 +10,9 @@ QNGGoalDirected::QNGGoalDirected(const base::SpaceInformationPtr &si, Quotient *
 
 QNGGoalDirected::~QNGGoalDirected(void)
 {
+  clear();
 }
+
 void QNGGoalDirected::clear()
 {
   BaseT::clear();
@@ -79,6 +81,9 @@ void QNGGoalDirected::Grow(double t)
   //
   //strategy: Expand towards free space only. 
 
+  if(parent != nullptr){
+    std::cout << "grow level "<< id << std::endl;
+  }
   if(!hasSolution){
     double r = rng_.uniform01();
     if(r <= goalDirectionAdaptiveBias){
@@ -111,9 +116,9 @@ bool QNGGoalDirected::SteerTowards(Configuration *q_from, Configuration *q_next)
   {
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "from:" << std::endl;
-    QuotientChartCover::Print(q_from);
+    QuotientCover::Print(q_from);
     std::cout << "steer towards:" << std::endl;
-    QuotientChartCover::Print(q_next);
+    QuotientCover::Print(q_next);
   }
 
   std::vector<Configuration*> q_children = GenerateCandidateDirections(q_from, q_next);
@@ -157,7 +162,7 @@ bool QNGGoalDirected::SteerTowards(Configuration *q_from, Configuration *q_next)
   return true;
 }
 
-std::vector<QuotientChartCover::Configuration*> QNGGoalDirected::GenerateCandidateDirections(Configuration *q_from, Configuration *q_next)
+std::vector<QuotientCover::Configuration*> QNGGoalDirected::GenerateCandidateDirections(Configuration *q_from, Configuration *q_next)
 {
   std::vector<Configuration*> q_children;
 
@@ -173,6 +178,7 @@ std::vector<QuotientChartCover::Configuration*> QNGGoalDirected::GenerateCandida
   Q1->getStateSpace()->interpolate(q_from->state, q_next->state, radius_from/d, q_proj->state);
 
   bool isProjectedFeasible = ComputeNeighborhood(q_proj);
+
   if(isProjectedFeasible)
   {
     q_proj->parent_neighbor = q_from;
@@ -224,7 +230,7 @@ void QNGGoalDirected::ExpandTowardsFreeSpace(ob::PlannerTerminationCondition &pt
   AddConfigurationToCoverWithoutAddingEdges(q);
   configurations_sorted_by_nearest_to_goal.push(q);
 
-  if(verbose>0) QuotientChartCover::Print(q);
+  if(verbose>0) QuotientCover::Print(q);
 
   std::vector<Configuration*> q_children = ExpandNeighborhood(q, NUMBER_OF_EXPANSION_SAMPLES);
   for(uint k = 0; k < q_children.size(); k++)
@@ -232,7 +238,8 @@ void QNGGoalDirected::ExpandTowardsFreeSpace(ob::PlannerTerminationCondition &pt
     priority_configurations.push(q_children.at(k));
   }
   //add different biases to remove planner from getting stuck
-  Configuration *q_random = SampleCoverBoundaryValid(ptc);
-  if(q_random == nullptr) return;
-  priority_configurations.push(q_random);
+  Configuration *q_random = QuotientCover::SampleCoverBoundary("voronoi");
+  if(ComputeNeighborhood(q_random)){
+    priority_configurations.push(q_random);
+  }
 }
