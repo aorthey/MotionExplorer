@@ -110,9 +110,10 @@ void QuotientCoverQueue::Grow(double t)
     priority_configurations.push(q_children.at(k));
   }
   //add different biases to remove planner from getting stuck
-  Configuration *q_random = SampleCoverBoundaryValid(ptc);
-  if(q_random == nullptr) return;
-  priority_configurations.push(q_random);
+  Configuration *q_random = QuotientCover::SampleCoverBoundary("voronoi");
+  if(ComputeNeighborhood(q_random)){
+    priority_configurations.push(q_random);
+  }
 
 }
 

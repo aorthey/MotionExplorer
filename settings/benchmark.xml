@@ -13,7 +13,6 @@
   </benchmark>
 
   <benchmark name="minimal">
-    <algorithm name="hierarchy:qng"/>
     <algorithm name="hierarchy:qng_goal_directed"/>
     <!-- <algorithm name="ompl:rrtconnect"/> -->
     <algorithm name="ompl:kpiece"/>

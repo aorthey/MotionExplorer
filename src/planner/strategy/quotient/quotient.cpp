@@ -129,14 +129,14 @@ void Quotient::setup()
 {
   BaseT::setup();
   hasSolution = false;
+  if(verbose>0) std::cout << "SETUP QUOTIENTSPACE " << id << std::endl;
 }
 void Quotient::clear()
 {
   BaseT::clear();
   hasSolution = false;
   if(parent==nullptr) X1_sampler.reset();
-  if(child!=nullptr) child->clear();
-  child = nullptr;
+  if(verbose>0) std::cout << "CLEAR QUOTIENTSPACE " << id << std::endl;
 }
 
 const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const StateSpacePtr Q0)

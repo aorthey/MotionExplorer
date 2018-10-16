@@ -81,9 +81,6 @@ void QNGGoalDirected::Grow(double t)
   //
   //strategy: Expand towards free space only. 
 
-  if(parent != nullptr){
-    std::cout << "grow level "<< id << std::endl;
-  }
   if(!hasSolution){
     double r = rng_.uniform01();
     if(r <= goalDirectionAdaptiveBias){
