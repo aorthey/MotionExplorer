@@ -14,6 +14,7 @@ MultiChart<T>::MultiChart(std::vector<ob::SpaceInformationPtr> &si_vec_, std::st
   T::resetCounter();
 
   levels = si_vec.size();
+  std::cout << "levels: " << levels << std::endl;
   root_chart = new T(si_vec.at(0), nullptr);
   root_chart->SetLevel(0);
 
