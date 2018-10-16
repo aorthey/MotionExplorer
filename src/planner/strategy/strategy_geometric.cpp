@@ -220,7 +220,6 @@ void StrategyGeometricMultiLevel::Init( const StrategyInput &input )
     RunBenchmark(input, si_vec, pdef_vec);
   }else{
     planner = GetPlanner(algorithm, si_vec, pdef_vec);
-    planner->clear();
     planner->setup();
     isInitialized = true;
   }
@@ -248,7 +247,6 @@ void StrategyGeometricMultiLevel::Step(StrategyOutput &output)
 void StrategyGeometricMultiLevel::Clear()
 {
   planner->clear();
-  //planner->setup();
 }
 void StrategyGeometricMultiLevel::Plan(StrategyOutput &output)
 {
@@ -295,7 +293,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(
   CSpaceOMPL *cspace = input.cspace_levels.back();
   ob::ScopedState<> start = cspace->ConfigToOMPLState(input.q_init);
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(input.q_goal);
-  ss.setStartAndGoalStates(start,goal,input.epsilon_goalregion);
+  ss.setStartAndGoalStates(start, goal, input.epsilon_goalregion);
 
   //ss.getStateSpace()->registerProjection("SE3", ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
   ss.setup();

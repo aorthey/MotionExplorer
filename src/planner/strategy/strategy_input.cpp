@@ -12,9 +12,10 @@ std::ostream& operator<< (std::ostream& out, const StrategyInput& si)
 {
   out << std::string(80, '-') << std::endl;
   out << "[StrategyInput]" << std::endl;
-  out << si.q_init << std::endl;
-  out << si.q_goal << std::endl;
-  out << si.name_algorithm << std::endl;
-  cout << std::string(80, '-') << std::endl;
+  out << "init config : " << si.q_init << std::endl;
+  out << "goal config : " << si.q_goal << std::endl;
+  out << "algorithm   : " << si.name_algorithm << std::endl;
+  out << "levels      : " << si.cspace_levels.size() << std::endl;
+  out << std::string(80, '-') << std::endl;
   return out;
 }

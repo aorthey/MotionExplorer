@@ -64,6 +64,7 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
   }
   return cspace_level;
 }
+
 void MotionPlanner::CreateHierarchy(){
   hierarchy = std::make_shared<HierarchicalRoadmap>();
   std::vector<int> idxs = input.robot_idxs;
@@ -75,7 +76,7 @@ void MotionPlanner::CreateHierarchy(){
   //#########################################################################
   //For each level, compute the inputs/cspaces for each robot
   //#########################################################################
-  if(util::StartsWith(algorithm, "hierarchy")){
+  if(util::StartsWith(algorithm, "hierarchy") || util::StartsWith(algorithm, "benchmark")){
     for(uint k = 0; k < input.layers.size(); k++){
       //#########################################################################
       //LEVEL k: get robots and compute init/goal
@@ -197,6 +198,7 @@ void MotionPlanner::AdvanceUntilSolution()
   // strategy_input.cspace = cspace_levels.back();
   // strategy_input.world = world;
   if(!strategy.IsInitialized()){
+    std::cout << "init strategy: " << cspace_levels.size() << std::endl;
     StrategyInput strategy_input = input.GetStrategyInput();
     strategy_input.cspace_levels = cspace_levels;
     strategy_input.cspace = cspace_levels.back();
