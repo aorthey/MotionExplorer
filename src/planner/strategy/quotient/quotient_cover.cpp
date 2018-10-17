@@ -472,8 +472,10 @@ double QuotientCover::GetImportance() const
 {
   //approximation of total volume covered
   //double percentageCovered = totalVolumeOfCover/Q1->getStateSpace()->getMeasure();
-  //the more sampled, the less important it becomes
-  return 1.0/(totalVolumeOfCover+1);
+  //the more sampled, the less important this space becomes
+  //return 1.0/(totalVolumeOfCover+1);
+
+  return 1.0/(boost::num_vertices(graph)+1);
 }
 
 void QuotientCover::Grow(double t)
@@ -780,9 +782,9 @@ bool QuotientCover::Interpolate(const Configuration *q_from, Configuration *q_to
 
 bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration *q_to, Configuration *q_interp)
 {
-  double d = DistanceConfigurationConfiguration(q_from, q_to);
+  //double d = DistanceConfigurationConfiguration(q_from, q_to);
   double radius = q_from->GetRadius();
-  return Interpolate(q_from, q_to, radius/d, q_interp);
+  return Interpolate(q_from, q_to, radius, q_interp);
 }
 bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration *q_to, double step_size, Configuration *q_interp)
 {
@@ -793,18 +795,17 @@ bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration
     //waypoints to get the point on the path of distance step_size from q_from
 
     std::vector<const Configuration*> path = GetInterpolationPath(q_from, q_to);
-    const Configuration *q_next = nullptr;
     double d = 0;
     double d_last_to_next = 0;
     uint ctr = 0;
     while(d < step_size && ctr < path.size()){
       d_last_to_next = DistanceQ1(path.at(ctr), path.at(ctr+1));
       d += d_last_to_next;
-      q_next = path.at(ctr+1);
       ctr++;
     }
+    const Configuration *q_next = path.at(ctr);
     const Configuration *q_last = path.at(ctr-1);
-    double step = d_last_to_next - (d-step_size);
+    double step = d_last_to_next - d + step_size;
     Q1->getStateSpace()->interpolate(q_last->state, q_next->state, step/d_last_to_next, q_interp->state);
   }
   return true;

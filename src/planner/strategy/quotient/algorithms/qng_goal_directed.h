@@ -24,9 +24,12 @@ namespace ompl
 
       bool ExpandTowardsGoal(ob::PlannerTerminationCondition &ptc);
       void ExpandTowardsFreeSpace(ob::PlannerTerminationCondition &ptc);
+      void AddConnections(ob::PlannerTerminationCondition &ptc);
 
       bool SteerTowards(Configuration *q_from, Configuration *q_next);
       std::vector<Configuration*> GenerateCandidateDirections(Configuration *q_from, Configuration *q_next);
+      
+      double GetImportance() const;
 
     private:
       //TODO: remove adaptive goal bias, replace by percentage of checking while
@@ -34,6 +37,7 @@ namespace ompl
 
       const double goalDirectionBias{0.1}; //when not making progress, how often should we check if progress can be made?
       const double thresholdObstaclesHorizon{0.1}; //if moving towards a configuration, do not repell this movement while above obstaclesHorizon. If below, repell to steer robot away from obstacles.
+      const double connectivityBias{0.5}; //when solution has been found, this bias increases connectivity
       bool progressMadeTowardsGoal{true};
 
 

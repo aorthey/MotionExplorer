@@ -103,6 +103,9 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
         }
         foundKLevelSolution = true;
         currentQuotientLevel = k+1;
+        if(currentQuotientLevel < quotientSpaces.size()-1){
+          quotientSpaces.at(k+1)->clear();
+        }
       }
       Q.push(jQuotient);
     }
@@ -112,7 +115,9 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
         std::cout << std::string(80, '#') << std::endl;
         std::cout << "could not find a solution on level " << k << std::endl;
         std::cout << std::string(80, '#') << std::endl;
-        std::cout << *quotientSpaces.at(k) << std::endl;
+        for(uint i = 0; i < k+1; i++){
+          std::cout << *quotientSpaces.at(i) << std::endl;
+        }
       }
       return ob::PlannerStatus::TIMEOUT;
     }

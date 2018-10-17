@@ -602,3 +602,9 @@ plugin so to speak. A vim-scoped, or vim-cpp-scoped
 
 [ ] Replace Grow(t) with solve(ptc), not sure why this has been added in the
 first place (maybe to be sure we do not call it without Multiquotient)
+
+[ ] grow does not work correctly on CS. It seems the first expansion does not
+move towards boundary
+
+[ ] once a path has been found, it seems to be important to connect vertices
+with each other, increase the connectivity of the cover

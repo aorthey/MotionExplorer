@@ -77,8 +77,20 @@ void QNGGoalDirected::Grow(double t)
       }
     }
   }else{
-    ExpandTowardsFreeSpace(ptc);
+    double r = rng_.uniform01();
+    if(r<connectivityBias){
+      AddConnections(ptc);
+    }else{
+      ExpandTowardsFreeSpace(ptc);
+    }
   }
+}
+
+void QNGGoalDirected::AddConnections(ob::PlannerTerminationCondition &ptc)
+{
+  //add another queue showing which nodes have not been connected so far, and
+  //which are far away in the tree
+
 }
 
 bool QNGGoalDirected::ExpandTowardsGoal(ob::PlannerTerminationCondition &ptc)
@@ -247,5 +259,15 @@ void QNGGoalDirected::ExpandTowardsFreeSpace(ob::PlannerTerminationCondition &pt
   Configuration *q_random = QuotientCover::SampleCoverBoundary("voronoi");
   if(ComputeNeighborhood(q_random)){
     priority_configurations.push(q_random);
+  }
+}
+double QNGGoalDirected::GetImportance() const
+{
+  //if we currently are making progress towards the goal, then this space should
+  //be prefered
+  if(progressMadeTowardsGoal){
+    return 1.0;
+  }else{
+    return BaseT::GetImportance();
   }
 }
