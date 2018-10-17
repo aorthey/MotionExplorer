@@ -24,6 +24,7 @@ namespace ompl
       ~QNG(void);
 
       virtual std::vector<Configuration*> ExpandNeighborhood(Configuration*, const int) override;
+      virtual Configuration* SampleUniformQuotientCover(ob::State *state) override;
 
     };
   }

@@ -22,8 +22,6 @@ namespace ompl
       void setup() override;
       virtual void Grow(double t) override;
 
-      void IncreaseGoalBias();
-      void DecreaseGoalBias();
       bool ExpandTowardsGoal(ob::PlannerTerminationCondition &ptc);
       void ExpandTowardsFreeSpace(ob::PlannerTerminationCondition &ptc);
 
@@ -31,8 +29,13 @@ namespace ompl
       std::vector<Configuration*> GenerateCandidateDirections(Configuration *q_from, Configuration *q_next);
 
     private:
-      double goalDirectionAdaptiveBias{1.0};
-      bool progressMade{false};
+      //TODO: remove adaptive goal bias, replace by percentage of checking while
+      //not progressMade=false
+
+      const double goalDirectionBias{0.1}; //when not making progress, how often should we check if progress can be made?
+      const double thresholdObstaclesHorizon{0.1}; //if moving towards a configuration, do not repell this movement while above obstaclesHorizon. If below, repell to steer robot away from obstacles.
+      bool progressMadeTowardsGoal{true};
+
 
       struct CmpGoalDistancePtrs
       {

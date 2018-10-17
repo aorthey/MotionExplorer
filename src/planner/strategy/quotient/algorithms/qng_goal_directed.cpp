@@ -22,7 +22,7 @@ void QNGGoalDirected::clear()
     configurations_sorted_by_nearest_to_goal.pop();
   }
   if(q_start) configurations_sorted_by_nearest_to_goal.push(q_start);
-  IncreaseGoalBias();
+  progressMadeTowardsGoal = true;
 }
 void QNGGoalDirected::setup()
 {
@@ -34,23 +34,9 @@ void QNGGoalDirected::setup()
     }
     configurations_sorted_by_nearest_to_goal.push(q_start);
   }
-  IncreaseGoalBias();
+  progressMadeTowardsGoal = true;
 }
 
-void QNGGoalDirected::IncreaseGoalBias()
-{
-  goalDirectionAdaptiveBias = 1.0;
-}
-void QNGGoalDirected::DecreaseGoalBias()
-{
-  goalDirectionAdaptiveBias = 0.1;
-  //goalDirectionAdaptiveBias /= 2.0;
-  ////do not go below 10 percent. because otherwise we might run into problems
-  ////when exploring a huge maze for several minutes. The goal bias could drop to
-  ////almost zero, and we would almost never go towards the goal.
-  //if(goalDirectionAdaptiveBias<0.1) 
-  //  goalDirectionAdaptiveBias = 0.1;
-}
 
 void QNGGoalDirected::Grow(double t)
 {
@@ -82,13 +68,15 @@ void QNGGoalDirected::Grow(double t)
   //strategy: Expand towards free space only. 
 
   if(!hasSolution){
-    double r = rng_.uniform01();
-    if(r <= goalDirectionAdaptiveBias){
-      bool progress = ExpandTowardsGoal(ptc);
-      if(progress) IncreaseGoalBias();
-      else DecreaseGoalBias();
+    if(progressMadeTowardsGoal){
+      progressMadeTowardsGoal = ExpandTowardsGoal(ptc);
     }else{
-      ExpandTowardsFreeSpace(ptc);
+      double r = rng_.uniform01();
+      if(r <= goalDirectionBias){
+        progressMadeTowardsGoal = ExpandTowardsGoal(ptc);
+      }else{
+        ExpandTowardsFreeSpace(ptc);
+      }
     }
   }else{
     ExpandTowardsFreeSpace(ptc);
@@ -118,42 +106,57 @@ bool QNGGoalDirected::SteerTowards(Configuration *q_from, Configuration *q_next)
     QuotientCover::Print(q_next);
   }
 
-  std::vector<Configuration*> q_children = GenerateCandidateDirections(q_from, q_next);
-
-  double radius_largest = 0;
-  uint idx_largest = 0;
-  for(uint k = 0; k < q_children.size(); k++)
+  const double radius_from = q_from->GetRadius();
+  if(radius_from > thresholdObstaclesHorizon)
   {
-    Configuration *q_k = q_children.at(k);
-    double r = q_k->GetRadius();
-    if(r > radius_largest)
+    //move directly towards q_next
+    Configuration *q_proj = new Configuration(Q1);
+    Interpolate(q_from, q_next, q_proj);
+    bool isProjectedFeasible = ComputeNeighborhood(q_proj);
+    return isProjectedFeasible;
+
+  }else{
+
+    std::vector<Configuration*> q_children = GenerateCandidateDirections(q_from, q_next);
+
+    //############################################################################
+    //get best child: here best means the one with the largest radius, but this
+    //might not be the best choice
+    //############################################################################
+    double radius_best = 0;
+    uint idx_best = 0;
+    for(uint k = 0; k < q_children.size(); k++)
     {
-      radius_largest = r;
-      idx_largest = k;
+      Configuration *q_k = q_children.at(k);
+      double r = q_k->GetRadius();
+      if(r > radius_best)
+      {
+        radius_best = r;
+        idx_best = k;
+      }
+      q_k->parent_neighbor = q_from;
     }
-    q_k->parent_neighbor = q_from;
-    //AddConfigurationToCoverWithoutAddingEdges(q_k);
-    //priority_configurations.push(q_k);
-    //configurations_sorted_by_nearest_to_goal.push(q_k);
-  }
 
 
-  //############################################################################
-  //when to declare no progress made
-  //############################################################################
-  if(q_children.empty()){
-    return false;
-  }
+    //############################################################################
+    //when to declare no progress made
+    //############################################################################
+    if(q_children.empty()){
+      return false;
+    }
 
-  Configuration *q_best = q_children.at(idx_largest);
-  AddConfigurationToCoverWithoutAddingEdges(q_best);
-  configurations_sorted_by_nearest_to_goal.push(q_best);
+    Configuration *q_best = q_children.at(idx_best);
+    AddConfigurationToCoverWithoutAddingEdges(q_best);
+    configurations_sorted_by_nearest_to_goal.push(q_best);
 
-  for(uint k = 0; k < q_children.size(); k++)
-  {
-    Configuration *q_k = q_children.at(k);
-    if(k!=idx_largest){
-      priority_configurations.push(q_k);
+    //add the smaller children to the priority_configurations to be extended at
+    //a later stage if required
+    for(uint k = 0; k < q_children.size(); k++)
+    {
+      Configuration *q_k = q_children.at(k);
+      if(k!=idx_best){
+        priority_configurations.push(q_k);
+      }
     }
   }
   return true;

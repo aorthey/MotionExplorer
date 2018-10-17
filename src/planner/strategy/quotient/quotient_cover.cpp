@@ -786,6 +786,9 @@ bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration
   if(parent==nullptr){
     Q1->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_interp->state);
   }else{
+    //move along path until step_size is reached. Then interpolate between the
+    //waypoints to get the point on the path of distance step_size from q_from
+
     std::vector<const Configuration*> path = GetInterpolationPath(q_from, q_to);
     const Configuration *q_next = nullptr;
     double d = 0;

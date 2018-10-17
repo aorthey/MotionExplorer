@@ -151,13 +151,35 @@ virtual bool SelfCollision(Real distance=0);
     void GetChildList(std::vector<std::vector<int> >& children) const;
 
 
-Anygeometry: AnyCollisionQuery
 RobotLink3D (KrisLibrary/robotics/RobotLink3d.h
   Type type; {revolute,prismatic}
   Vector3 w;
   Real mass;
   Vector3 com;
   Matrix3 inertia;
+
+
+AnyCollisionQuery: KrisLibrary/geometry/AnyGeometry.cpp
+
+  //extracts the pairs of interacting points on a previous call to
+  //WithinDistance[All], PenetrationDepth, or Distance.  Points are given
+  //in local frames.
+  void InteractingPoints(std::vector<Vector3>& p1,std::vector<Vector3>& p2)
+const;
+bool CheckCollision(AnyCollisionGeometry3D* m1,AnyCollisionGeometry3D* m2,Real
+tol)
+{
+  if(!m1 || !m2) return false;
+  Assert(tol >= 0);
+  AnyCollisionQuery q(*m1,*m2);
+  if(tol == 0) {
+    return q.Collide();
+  }
+  else {
+    return q.WithinDistance(tol);
+  }
+}
+
 
 
 
@@ -469,3 +491,11 @@ and set a Command Class:
   RobotSensors sensors;
 
 We need to reinit this one after changing the driver!
+
+
+
+
+
+
+
+

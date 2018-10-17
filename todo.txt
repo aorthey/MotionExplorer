@@ -586,7 +586,16 @@ smaller than some delta are not distinguishable anymore
 [x] Would be good to see incremental changes in the planner (step through
 planner)
 [x] Fix issue of start state rejected when using DLS
-[ ] Fix MultiChart clear/setup not working correctly.
+[x] Fix MultiChart clear/setup not working correctly.
+
+Next: Think about how to sample the cover better. Especially how to exploit the
+distance function in a more meaningful way
 
 SOLVE 03D, find cover exploration.
 SOLVE 06D_DLS, find FAST cover exploration
+
+
+find vim addon which highlights "vi{" plus makes the parentheses bold, so that
+we quicker can judge in which scope we are. A scope-aware or scope-highlighting
+plugin so to speak. A vim-scoped, or vim-cpp-scoped
+
