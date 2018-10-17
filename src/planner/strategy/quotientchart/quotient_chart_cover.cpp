@@ -983,11 +983,6 @@ double QuotientChartCover::DistanceNeighborhoodNeighborhood(const Configuration 
   return d_open_neighborhood_distance;
 }
 
-void QuotientChartCover::Init()
-{
-  checkValidity();
-}
-
 
 bool QuotientChartCover::GetSolution(ob::PathPtr &solution)
 {

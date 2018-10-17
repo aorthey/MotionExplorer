@@ -599,3 +599,6 @@ find vim addon which highlights "vi{" plus makes the parentheses bold, so that
 we quicker can judge in which scope we are. A scope-aware or scope-highlighting
 plugin so to speak. A vim-scoped, or vim-cpp-scoped
 
+
+[ ] Replace Grow(t) with solve(ptc), not sure why this has been added in the
+first place (maybe to be sure we do not call it without Multiquotient)

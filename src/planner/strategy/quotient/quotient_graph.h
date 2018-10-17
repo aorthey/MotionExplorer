@@ -133,7 +133,6 @@ namespace ompl
         ob::PathPtr GetSolutionPath();
 
         virtual void Grow(double t);
-        virtual void Init() override;
         virtual bool SampleQuotient(ob::State*) override;
         virtual bool GetSolution(ob::PathPtr &solution) override;
         virtual void getPlannerData(ob::PlannerData &data) const override;

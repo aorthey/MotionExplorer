@@ -65,7 +65,9 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
   return cspace_level;
 }
 
-void MotionPlanner::CreateHierarchy(){
+void MotionPlanner::CreateHierarchy()
+{
+
   hierarchy = std::make_shared<HierarchicalRoadmap>();
   std::vector<int> idxs = input.robot_idxs;
   std::string algorithm = input.name_algorithm;
@@ -159,9 +161,14 @@ void MotionPlanner::CreateHierarchy(){
 
 void MotionPlanner::Clear()
 {
+  if(!active) return;
+  pwl = nullptr;
   current_level = 0;
   current_level_node = 0;
   current_path.clear();
+
+  strategy.Clear();
+  viewHierarchy.Clear();
 }
 
 void MotionPlanner::Step()

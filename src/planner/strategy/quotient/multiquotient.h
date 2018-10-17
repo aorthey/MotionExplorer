@@ -28,12 +28,25 @@ namespace ompl
 
       protected:
         std::vector<base::PathPtr> solutions;
-
         std::vector<og::Quotient*> quotientSpaces;
+
         bool foundKLevelSolution{false};
+        uint currentQuotientLevel{0};
 
         std::vector<ob::SpaceInformationPtr> si_vec;
         std::vector<ob::ProblemDefinitionPtr> pdef_vec;
+
+        struct CmpQuotientSpacePtrs
+        {
+          // ">" operator: smallest value is top in queue
+          // "<" operator: largest value is top in queue (default)
+          bool operator()(const Quotient* lhs, const Quotient* rhs) const
+          {
+             return lhs->GetImportance() < rhs->GetImportance();
+          }
+        };
+        typedef std::priority_queue<og::Quotient*, std::vector<og::Quotient*>, CmpQuotientSpacePtrs> QuotientSpacePriorityQueue;
+        QuotientSpacePriorityQueue Q;
     };
   };
 };

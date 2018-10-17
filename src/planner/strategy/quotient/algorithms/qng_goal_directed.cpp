@@ -51,11 +51,9 @@ void QNGGoalDirected::Grow(double t)
   //############################################################################
   //Phase1: No Solution has been found
   //############################################################################
+  //Principle1: As long as we make progress, move towards the goal.
   //
-  //strategy: With probability 'goaldirectionadaptivebias' move towards goal. If
-  //progress is made, increase goaldirectionadaptivebias. If no progress is
-  //made, decrease. With probability '1.0 - goaldirectionadaptivebias' expand
-  //towards free space. The rational here is that whenever we can 'see' the
+  //The rational here is that whenever we can 'see' the
   //goal, then we should move straight towards it. But whenever we are lost, we
   //should expand quickly to capture the free space. The expansion towards free
   //space biases the search towards larger neighborhoods, which is a modified
@@ -85,7 +83,8 @@ void QNGGoalDirected::Grow(double t)
 
 bool QNGGoalDirected::ExpandTowardsGoal(ob::PlannerTerminationCondition &ptc)
 {
-  //is it possible that we add here a state with zero-measure NBH?
+  //is it possible that we add here a state with zero-measure NBH? (No, but
+  //should be refactored)
   Configuration *q_nearest = configurations_sorted_by_nearest_to_goal.top();
   const double goalDistance = q_nearest->GetGoalDistance();
   if(goalDistance < 1e-10){
@@ -113,6 +112,13 @@ bool QNGGoalDirected::SteerTowards(Configuration *q_from, Configuration *q_next)
     Configuration *q_proj = new Configuration(Q1);
     Interpolate(q_from, q_next, q_proj);
     bool isProjectedFeasible = ComputeNeighborhood(q_proj);
+
+    if(isProjectedFeasible){
+      q_proj->parent_neighbor = q_from;
+      AddConfigurationToCoverWithoutAddingEdges(q_proj);
+      configurations_sorted_by_nearest_to_goal.push(q_proj);
+    }
+
     return isProjectedFeasible;
 
   }else{

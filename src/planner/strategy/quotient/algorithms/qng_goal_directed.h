@@ -12,7 +12,7 @@ namespace ompl
     class QNGGoalDirected: public og::QNG
     {
       typedef og::QNG BaseT;
-      int verbose{0};
+      const int verbose{0};
     public:
 
       QNGGoalDirected(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
@@ -39,9 +39,11 @@ namespace ompl
 
       struct CmpGoalDistancePtrs
       {
+        // ">" operator: smallest value is top in queue
+        // "<" operator: largest value is top in queue (default)
         bool operator()(const Configuration* lhs, const Configuration* rhs) const
         {
-           return lhs->GetGoalDistance() < rhs->GetGoalDistance();
+           return lhs->GetGoalDistance() > rhs->GetGoalDistance();
         }
       };
       typedef std::priority_queue<Configuration*, std::vector<Configuration*>, CmpGoalDistancePtrs> GoalDistancePriorityQueue;

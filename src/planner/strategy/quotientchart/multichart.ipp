@@ -98,7 +98,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
 
   base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
                                  { return ptc || found_path_on_last_level || saturated_levels; });
-  root_chart->Init();
   Q.push(root_chart);
 
   //the leaves contain the direction in which we like to expand the tree,

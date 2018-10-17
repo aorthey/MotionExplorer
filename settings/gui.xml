@@ -91,25 +91,30 @@
     <key>9</key>
   </button>
 
-  <hotkey>
-    <name>reset</name>
-    <descr>Reset</descr>
-    <key>r</key>
-  </hotkey>
+  <!-- <hotkey> -->
+  <!--   <name>reset</name> -->
+  <!--   <descr>Reset</descr> -->
+  <!--   <key>r</key> -->
+  <!-- </hotkey> -->
   <!-- <hotkey> -->
   <!--   <name>simulate</name> -->
   <!--   <descr>Simulate</descr> -->
   <!--   <key>s</key> -->
   <!-- </hotkey> -->
-  <hotkey>
-    <name>simulate_controller</name>
-    <key>C</key>
-  </hotkey>
+  <!-- <hotkey> -->
+  <!--   <name>simulate_controller</name> -->
+  <!--   <key>C</key> -->
+  <!-- </hotkey> -->
 
   <hotkey>
     <name>planner_step</name>
     <descr>Advance Planner by one step</descr>
     <key>q</key>
+  </hotkey>
+
+  <hotkey>
+    <name>planner_clear</name>
+    <key>C</key>
   </hotkey>
   <!-- <hotkey> -->
   <!--   <name>planner_advance_one_second</name> -->

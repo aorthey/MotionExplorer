@@ -41,6 +41,8 @@ namespace ompl
 
       struct CmpConfigurationPtrs
       {
+        // ">" operator: smallest value is top in queue
+        // "<" operator: largest value is top in queue (default)
         bool operator()(const Configuration* lhs, const Configuration* rhs) const
         {
            return lhs->GetImportance() < rhs->GetImportance();

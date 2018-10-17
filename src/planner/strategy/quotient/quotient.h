@@ -47,7 +47,6 @@ namespace ompl
         Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
         ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override final; //final prevents subclasses to override
 
-        virtual void Init() = 0;
         virtual void Grow(double t) = 0;
         virtual bool GetSolution(ob::PathPtr &solution) = 0;
 

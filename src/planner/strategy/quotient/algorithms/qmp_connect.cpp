@@ -67,11 +67,6 @@ void QMPConnect::setup()
   }
 }
 
-void QMPConnect::Init()
-{
-  QMP::Init();
-
-}
 QuotientGraph::Vertex QMPConnect::CreateNewVertex(ob::State *state)
 {
   Vertex m = BaseT::CreateNewVertex(state);

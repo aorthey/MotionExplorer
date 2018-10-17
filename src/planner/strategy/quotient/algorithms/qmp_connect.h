@@ -28,7 +28,6 @@ namespace ompl
 
         void setup() override;
         virtual void clear() override;
-        virtual void Init() override;
 
       protected:
 

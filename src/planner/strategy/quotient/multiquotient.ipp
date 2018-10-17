@@ -37,21 +37,27 @@ void MultiQuotient<T,Tlast>::setup(){
   for(uint k = 0; k < quotientSpaces.size(); k++){
     quotientSpaces.at(k)->setup();
   }
+  currentQuotientLevel = 0;
 }
 
 template <class T, class Tlast>
 void MultiQuotient<T,Tlast>::clear(){
   Planner::clear();
-  solutions.clear();
   for(uint k = 0; k < quotientSpaces.size(); k++){
     quotientSpaces.at(k)->clear();
   }
+  while(!Q.empty()) Q.pop();
+
   foundKLevelSolution = false;
 
+  solutions.clear();
   pdef_->clearSolutionPaths();
   for(uint k = 0; k < pdef_vec.size(); k++){
     pdef_vec.at(k)->clearSolutionPaths();
   }
+  currentQuotientLevel = 0;
+  
+
 }
 
 template <class T, class Tlast>
@@ -60,20 +66,20 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
   
   static const double T_GROW = 0.01; //time to grow before Checking if solution exists
 
-  auto cmp = [](og::Quotient* left, og::Quotient* right) 
-              { 
-                return left->GetImportance() < right->GetImportance();
-              };
+  //auto cmp = [](og::Quotient* left, og::Quotient* right) 
+  //            { 
+  //              return left->GetImportance() < right->GetImportance();
+  //            };
 
-  std::priority_queue<og::Quotient*, std::vector<og::Quotient*>, decltype(cmp)> Q(cmp);
+  //std::priority_queue<og::Quotient*, std::vector<og::Quotient*>, decltype(cmp)> Q(cmp);
 
   const bool DEBUG = true;
   ompl::time::point t_start = ompl::time::now();
-  for(uint k = 0; k < quotientSpaces.size(); k++){
+
+  for(uint k = currentQuotientLevel; k < quotientSpaces.size(); k++){
     base::PathPtr sol_k;
     foundKLevelSolution = false;
 
-    quotientSpaces.at(k)->Init();
     Q.push(quotientSpaces.at(k));
 
     base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
@@ -96,6 +102,7 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
           std::cout << *quotientSpaces.at(k) << std::endl;
         }
         foundKLevelSolution = true;
+        currentQuotientLevel = k+1;
       }
       Q.push(jQuotient);
     }

@@ -151,10 +151,6 @@ double QuotientGraph::GetImportance() const{
     //return N/(parent->GetGraphLength()*X1->getSpaceMeasure());
 }
 
-void QuotientGraph::Init(){
-  checkValidity();
-}
-
 void QuotientGraph::Grow(double t){
   double T_grow = (2.0/3.0)*t;
   growRoadmap(ob::timedPlannerTerminationCondition(T_grow), xstates[0]);

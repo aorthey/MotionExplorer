@@ -120,6 +120,7 @@ void QuotientCover::setup(void)
     }
     //#########################################################################
     OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nearest_cover->size());
+    checkValidity();
   }else{
     setup_ = false;
   }
@@ -470,7 +471,9 @@ bool QuotientCover::IsConfigurationInsideCover(Configuration *q)
 double QuotientCover::GetImportance() const
 {
   //approximation of total volume covered
-  return 1.0/((totalVolumeOfCover/Q1->getStateSpace()->getMeasure())+1);
+  //double percentageCovered = totalVolumeOfCover/Q1->getStateSpace()->getMeasure();
+  //the more sampled, the less important it becomes
+  return 1.0/(totalVolumeOfCover+1);
 }
 
 void QuotientCover::Grow(double t)
@@ -983,12 +986,6 @@ double QuotientCover::DistanceNeighborhoodNeighborhood(const Configuration *q_fr
   double d_open_neighborhood_distance = std::max(d - d_from - d_to, 0.0); 
   return d_open_neighborhood_distance;
 }
-
-void QuotientCover::Init()
-{
-  checkValidity();
-}
-
 
 bool QuotientCover::GetSolution(ob::PathPtr &solution)
 {
