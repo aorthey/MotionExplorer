@@ -266,10 +266,11 @@ double QNGGoalDirected::GetImportance() const
 
 double QNGGoalDirected::ValueConnectivity(Configuration *q)
 {
-  Vertex v = get(indexToVertex, q->index);
-  double d_alpha = std::pow(2.0,boost::degree(v, graph));
+  //Vertex v = get(indexToVertex, q->index);
+  //double d_alpha = std::pow(2.0,boost::degree(v, graph));
   //double d_alpha = boost::degree(v, graph)+1;
-  double d_connectivity = q->GetRadius()/d_alpha;
+  //double d_connectivity = q->GetRadius()/d_alpha;
+  double d_connectivity = q->GetRadius();
   return d_connectivity;
 }
 
