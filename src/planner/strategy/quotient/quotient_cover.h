@@ -84,6 +84,15 @@ namespace ompl
         {
           return pdf_necessary_element;
         }
+        void SetConnectivityPDFElement(void *element_)
+        {
+          pdf_connectivity_element = element_;
+        }
+        void* GetConnectivityPDFElement()
+        {
+          return pdf_connectivity_element;
+        }
+
         double GetImportance() const
         {
           //return openNeighborhoodRadius + 1.0/goal_distance+1;
@@ -108,6 +117,7 @@ namespace ompl
         bool isSufficientFeasible{false};
         void *pdf_element;
         void *pdf_necessary_element;
+        void *pdf_connectivity_element;
 
         bool isStart{false};
         bool isGoal{false};
@@ -199,11 +209,13 @@ namespace ompl
 
       Configuration* CreateConfigurationFromStateAndCoset(const ob::State *state, Configuration *q_coset);
 
-      Vertex AddConfigurationToCover(Configuration *q);
+      virtual Vertex AddConfigurationToCover(Configuration *q);
       Vertex AddConfigurationToCoverWithoutAddingEdges(Configuration *q);
 
       void RemoveConfigurationFromCover(Configuration *q);
       void AddEdge(Configuration *q_from, Configuration *q_to);
+      bool EdgeExists(Configuration *q_from, Configuration *q_to);
+
       virtual void AddConfigurationToPDF(Configuration *q);
       bool IsConfigurationInsideCover(Configuration *q);
       void RemoveConfigurationsFromCoverCoveredBy(Configuration *q);

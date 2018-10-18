@@ -599,7 +599,6 @@ find vim addon which highlights "vi{" plus makes the parentheses bold, so that
 we quicker can judge in which scope we are. A scope-aware or scope-highlighting
 plugin so to speak. A vim-scoped, or vim-cpp-scoped
 
-
 [ ] Replace Grow(t) with solve(ptc), not sure why this has been added in the
 first place (maybe to be sure we do not call it without Multiquotient)
 
@@ -608,3 +607,9 @@ move towards boundary
 
 [ ] once a path has been found, it seems to be important to connect vertices
 with each other, increase the connectivity of the cover
+
+[ ] Create more difficult environments, maybe long pipe-maze with several narrow
+passages (so that it becomes pertinent to use quotient-spaces)
+
+
+expansion step fails to project next configuration onto NBH boundary

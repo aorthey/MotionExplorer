@@ -37,14 +37,11 @@ void QNGGoalDirected::setup()
   progressMadeTowardsGoal = true;
 }
 
-
 void QNGGoalDirected::Grow(double t)
 {
-
   //############################################################################
   //QNGGoalDirected: Two phase expansion planner
   //############################################################################
-
   if(saturated) return;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
 
@@ -78,19 +75,12 @@ void QNGGoalDirected::Grow(double t)
     }
   }else{
     double r = rng_.uniform01();
-    if(r<connectivityBias){
-      AddConnections(ptc);
+    if(r<rewireBias){
+      RewireCover(ptc);
     }else{
       ExpandTowardsFreeSpace(ptc);
     }
   }
-}
-
-void QNGGoalDirected::AddConnections(ob::PlannerTerminationCondition &ptc)
-{
-  //add another queue showing which nodes have not been connected so far, and
-  //which are far away in the tree
-
 }
 
 bool QNGGoalDirected::ExpandTowardsGoal(ob::PlannerTerminationCondition &ptc)
@@ -127,7 +117,8 @@ bool QNGGoalDirected::SteerTowards(Configuration *q_from, Configuration *q_next)
 
     if(isProjectedFeasible){
       q_proj->parent_neighbor = q_from;
-      AddConfigurationToCoverWithoutAddingEdges(q_proj);
+      //AddConfigurationToCoverWithoutAddingEdges(q_proj);
+      AddConfigurationToCover(q_proj);
       configurations_sorted_by_nearest_to_goal.push(q_proj);
     }
 
@@ -164,7 +155,8 @@ bool QNGGoalDirected::SteerTowards(Configuration *q_from, Configuration *q_next)
     }
 
     Configuration *q_best = q_children.at(idx_best);
-    AddConfigurationToCoverWithoutAddingEdges(q_best);
+    //AddConfigurationToCoverWithoutAddingEdges(q_best);
+    AddConfigurationToCover(q_best);
     configurations_sorted_by_nearest_to_goal.push(q_best);
 
     //add the smaller children to the priority_configurations to be extended at
@@ -192,8 +184,7 @@ std::vector<QuotientCover::Configuration*> QNGGoalDirected::GenerateCandidateDir
   //             /                                          |
   Configuration *q_proj = new Configuration(Q1);
   const double radius_from = q_from->GetRadius();
-  double d = DistanceConfigurationConfiguration(q_from, q_next);
-  Q1->getStateSpace()->interpolate(q_from->state, q_next->state, radius_from/d, q_proj->state);
+  Interpolate(q_from, q_next, q_proj);
 
   bool isProjectedFeasible = ComputeNeighborhood(q_proj);
 
@@ -245,7 +236,8 @@ void QNGGoalDirected::ExpandTowardsFreeSpace(ob::PlannerTerminationCondition &pt
     q=nullptr;
     return;
   }
-  AddConfigurationToCoverWithoutAddingEdges(q);
+  //AddConfigurationToCoverWithoutAddingEdges(q);
+  AddConfigurationToCover(q);
   configurations_sorted_by_nearest_to_goal.push(q);
 
   if(verbose>0) QuotientCover::Print(q);
@@ -271,3 +263,40 @@ double QNGGoalDirected::GetImportance() const
     return BaseT::GetImportance();
   }
 }
+
+double QNGGoalDirected::ValueConnectivity(Configuration *q)
+{
+  Vertex v = get(indexToVertex, q->index);
+  double d_alpha = std::pow(2.0,boost::degree(v, graph));
+  //double d_alpha = boost::degree(v, graph)+1;
+  double d_connectivity = q->GetRadius()/d_alpha;
+  return d_connectivity;
+}
+
+QuotientCover::Vertex QNGGoalDirected::AddConfigurationToCover(Configuration *q)
+{
+  QuotientCover::Vertex v = BaseT::AddConfigurationToCover(q);
+
+  PDF_Element *q_element = pdf_connectivity_configurations.add(q, ValueConnectivity(q));
+  q->SetConnectivityPDFElement(q_element);
+  return v;
+}
+
+void QNGGoalDirected::RewireCover(ob::PlannerTerminationCondition &ptc)
+{
+  Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
+
+  //find all vertices which intersect NBH, then check if they have an edge in
+  //common. Then add one if they don't.
+
+  std::vector<Configuration*> q_neighbors = GetConfigurationsInsideNeighborhood(q);
+  for(uint k = 0; k < q_neighbors.size(); k++){
+    Configuration *qk = q_neighbors.at(k);
+    if(!EdgeExists(q, qk)){
+      pdf_connectivity_configurations.update(static_cast<PDF_Element*>(qk->GetConnectivityPDFElement()), ValueConnectivity(qk));
+      AddEdge(q, qk);
+    }
+  }
+  pdf_connectivity_configurations.update(static_cast<PDF_Element*>(q->GetConnectivityPDFElement()), ValueConnectivity(q));
+}
+

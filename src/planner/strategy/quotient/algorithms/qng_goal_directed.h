@@ -24,7 +24,9 @@ namespace ompl
 
       bool ExpandTowardsGoal(ob::PlannerTerminationCondition &ptc);
       void ExpandTowardsFreeSpace(ob::PlannerTerminationCondition &ptc);
-      void AddConnections(ob::PlannerTerminationCondition &ptc);
+      void RewireCover(ob::PlannerTerminationCondition &ptc);
+
+      virtual Vertex AddConfigurationToCover(Configuration *q) override;
 
       bool SteerTowards(Configuration *q_from, Configuration *q_next);
       std::vector<Configuration*> GenerateCandidateDirections(Configuration *q_from, Configuration *q_next);
@@ -37,9 +39,8 @@ namespace ompl
 
       const double goalDirectionBias{0.1}; //when not making progress, how often should we check if progress can be made?
       const double thresholdObstaclesHorizon{0.1}; //if moving towards a configuration, do not repell this movement while above obstaclesHorizon. If below, repell to steer robot away from obstacles.
-      const double connectivityBias{0.5}; //when solution has been found, this bias increases connectivity
+      const double rewireBias{0.5}; //when solution has been found, this bias increases connectivity
       bool progressMadeTowardsGoal{true};
-
 
       struct CmpGoalDistancePtrs
       {
@@ -53,6 +54,9 @@ namespace ompl
       typedef std::priority_queue<Configuration*, std::vector<Configuration*>, CmpGoalDistancePtrs> GoalDistancePriorityQueue;
       GoalDistancePriorityQueue configurations_sorted_by_nearest_to_goal;
 
+      //PDF which assigns a value to each configuration, depending on its connectivity
+      PDF pdf_connectivity_configurations;
+      double ValueConnectivity(Configuration *q);
     };
   }
 }

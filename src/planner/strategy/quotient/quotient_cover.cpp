@@ -355,6 +355,13 @@ void QuotientCover::AddEdge(Configuration *q_from, Configuration *q_to)
   boost::add_edge(v_from, v_to, properties, graph);
 }
 
+bool QuotientCover::EdgeExists(Configuration *q_from, Configuration *q_to)
+{
+  Vertex v_from = get(indexToVertex, q_from->index);
+  Vertex v_to = get(indexToVertex, q_to->index);
+  return boost::edge(v_from, v_to, graph).second;
+}
+
 void QuotientCover::RemoveConfigurationFromCover(Configuration *q)
 {
   totalVolumeOfCover -= q->GetRadius();
@@ -881,7 +888,8 @@ std::vector<const QuotientCover::Configuration*> QuotientCover::GetInterpolation
     std::cout << "to:"; Print(q_to);
     std::cout << std::string(80, '-') << std::endl;
     std::cout << *this << std::endl;
-    exit(0);
+    throw "InterpolateWithoutCosets";
+    exit(1);
   }
   std::vector<const Configuration*> path_Q1;
 

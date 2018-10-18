@@ -66,18 +66,10 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
   
   static const double T_GROW = 0.01; //time to grow before Checking if solution exists
 
-  //auto cmp = [](og::Quotient* left, og::Quotient* right) 
-  //            { 
-  //              return left->GetImportance() < right->GetImportance();
-  //            };
-
-  //std::priority_queue<og::Quotient*, std::vector<og::Quotient*>, decltype(cmp)> Q(cmp);
-
   const bool DEBUG = true;
   ompl::time::point t_start = ompl::time::now();
 
   for(uint k = currentQuotientLevel; k < quotientSpaces.size(); k++){
-    base::PathPtr sol_k;
     foundKLevelSolution = false;
 
     Q.push(quotientSpaces.at(k));
@@ -90,9 +82,24 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
       og::Quotient* jQuotient = Q.top();
       Q.pop();
       jQuotient->Grow(T_GROW);
-      bool hasSolution = quotientSpaces.at(k)->GetSolution(sol_k);
+      //bool hasSolution = quotientSpaces.at(k)->GetSolution(sol_k);
 
+
+      //############################################################################
+      // if(k>0){
+      //   std::cout << std::string(80, '-') << std::endl;
+      //   std::cout << "Current Importance Values" << std::endl;
+      //   for(uint i = 0; i <= k; i++){
+      //     og::Quotient *iQ = quotientSpaces.at(i);
+      //     std::cout << "level " << i << " : " << iQ->GetImportance() << std::endl;
+      //   }
+      // }
+      //############################################################################
+
+      bool hasSolution = quotientSpaces.at(k)->HasSolution();
       if(hasSolution){
+        base::PathPtr sol_k;
+        quotientSpaces.at(k)->GetSolution(sol_k);
         solutions.push_back(sol_k);
         if(DEBUG){
           double t_k_end = ompl::time::seconds(ompl::time::now() - t_start);
