@@ -49,6 +49,8 @@ std::vector<QNG::Configuration*> QNG::ExpandNeighborhood(Configuration *q_curren
     const double step_size = (radius_last+radius_current)/radius_last;
     Q1->getStateSpace()->interpolate(q_last->state, q_current->state, step_size, q_proj->state);
 
+    //Interpolate(q_last, q_current, q_proj);
+
     //############################################################################
     // (1) q_proj is feasible: 
     //    (1a) neighborhood is bigger than current neighborhood -> return q_proj

@@ -6,35 +6,29 @@ using namespace ompl::geometric;
 QNGGoalDirected::QNGGoalDirected(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
   setName("QNGGoalDirected"+std::to_string(id));
+  progressMadeTowardsGoal = true;
 }
 
 QNGGoalDirected::~QNGGoalDirected(void)
 {
-  clear();
+}
+
+void QNGGoalDirected::setup()
+{
+  BaseT::setup();
 }
 
 void QNGGoalDirected::clear()
 {
-  BaseT::clear();
-
+  pdf_connectivity_configurations.clear();
   while(!configurations_sorted_by_nearest_to_goal.empty()) 
   {
     configurations_sorted_by_nearest_to_goal.pop();
   }
-  if(q_start) configurations_sorted_by_nearest_to_goal.push(q_start);
+
   progressMadeTowardsGoal = true;
-}
-void QNGGoalDirected::setup()
-{
-  BaseT::setup();
-  if(setup_){
-    while(!configurations_sorted_by_nearest_to_goal.empty()) 
-    {
-      configurations_sorted_by_nearest_to_goal.pop();
-    }
-    configurations_sorted_by_nearest_to_goal.push(q_start);
-  }
-  progressMadeTowardsGoal = true;
+
+  BaseT::clear();
 }
 
 void QNGGoalDirected::Grow(double t)
@@ -75,7 +69,7 @@ void QNGGoalDirected::Grow(double t)
     }
   }else{
     double r = rng_.uniform01();
-    if(r<rewireBias){
+    if(r <= rewireBias){
       RewireCover(ptc);
     }else{
       ExpandTowardsFreeSpace(ptc);
@@ -117,9 +111,7 @@ bool QNGGoalDirected::SteerTowards(Configuration *q_from, Configuration *q_next)
 
     if(isProjectedFeasible){
       q_proj->parent_neighbor = q_from;
-      //AddConfigurationToCoverWithoutAddingEdges(q_proj);
       AddConfigurationToCover(q_proj);
-      configurations_sorted_by_nearest_to_goal.push(q_proj);
     }
 
     return isProjectedFeasible;
@@ -155,9 +147,7 @@ bool QNGGoalDirected::SteerTowards(Configuration *q_from, Configuration *q_next)
     }
 
     Configuration *q_best = q_children.at(idx_best);
-    //AddConfigurationToCoverWithoutAddingEdges(q_best);
     AddConfigurationToCover(q_best);
-    configurations_sorted_by_nearest_to_goal.push(q_best);
 
     //add the smaller children to the priority_configurations to be extended at
     //a later stage if required
@@ -203,13 +193,27 @@ std::vector<QuotientCover::Configuration*> QNGGoalDirected::GenerateCandidateDir
   for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES; k++){
     Configuration *q_k = new Configuration(Q1);
 
-    Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.5*radius_from);
+    Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.25*radius_from);
 
     const double d_from_to_k = DistanceConfigurationConfiguration(q_from, q_k);
     Q1->getStateSpace()->interpolate(q_from->state, q_k->state, radius_from/d_from_to_k, q_k->state);
 
     if(ComputeNeighborhood(q_k))
     {
+
+      if(fabs(radius_from - DistanceConfigurationConfiguration(q_from, q_k))>1e-5){
+        std::cout << std::string(80, '-') << std::endl;
+        std::cout << "projected point not on boundary!" << std::endl;
+        QuotientCover::Print(q_from, false);
+        QuotientCover::Print(q_k, false);
+        std::cout << "radius from: " << radius_from << std::endl;
+        std::cout << "dist original: " << d_from_to_k << std::endl;
+        std::cout << "dist from to proj: " << DistanceConfigurationConfiguration(q_from, q_proj) << std::endl;
+        std::cout << "step size : " << radius_from/d_from_to_k << std::endl;
+        std::cout << "dist after interp: " << DistanceConfigurationConfiguration(q_from, q_k) << std::endl;
+        exit(0);
+      }
+
       q_k->parent_neighbor = q_from;
       q_children.push_back(q_k);
     }
@@ -236,9 +240,7 @@ void QNGGoalDirected::ExpandTowardsFreeSpace(ob::PlannerTerminationCondition &pt
     q=nullptr;
     return;
   }
-  //AddConfigurationToCoverWithoutAddingEdges(q);
   AddConfigurationToCover(q);
-  configurations_sorted_by_nearest_to_goal.push(q);
 
   if(verbose>0) QuotientCover::Print(q);
 
@@ -257,7 +259,7 @@ double QNGGoalDirected::GetImportance() const
 {
   //if we currently are making progress towards the goal, then this space should
   //be prefered
-  if(progressMadeTowardsGoal){
+  if(!hasSolution && progressMadeTowardsGoal){
     return 1.0;
   }else{
     return BaseT::GetImportance();
@@ -266,11 +268,11 @@ double QNGGoalDirected::GetImportance() const
 
 double QNGGoalDirected::ValueConnectivity(Configuration *q)
 {
-  //Vertex v = get(indexToVertex, q->index);
-  //double d_alpha = std::pow(2.0,boost::degree(v, graph));
+  Vertex v = get(indexToVertex, q->index);
+  double d_alpha = std::pow(2.0,boost::degree(v, graph));
   //double d_alpha = boost::degree(v, graph)+1;
-  //double d_connectivity = q->GetRadius()/d_alpha;
-  double d_connectivity = q->GetRadius();
+  double d_connectivity = q->GetRadius()/d_alpha;
+  //double d_connectivity = q->GetRadius();
   return d_connectivity;
 }
 
@@ -280,6 +282,9 @@ QuotientCover::Vertex QNGGoalDirected::AddConfigurationToCover(Configuration *q)
 
   PDF_Element *q_element = pdf_connectivity_configurations.add(q, ValueConnectivity(q));
   q->SetConnectivityPDFElement(q_element);
+
+  configurations_sorted_by_nearest_to_goal.push(q);
+
   return v;
 }
 
@@ -290,14 +295,29 @@ void QNGGoalDirected::RewireCover(ob::PlannerTerminationCondition &ptc)
   //find all vertices which intersect NBH, then check if they have an edge in
   //common. Then add one if they don't.
 
-  std::vector<Configuration*> q_neighbors = GetConfigurationsInsideNeighborhood(q);
-  for(uint k = 0; k < q_neighbors.size(); k++){
-    Configuration *qk = q_neighbors.at(k);
-    if(!EdgeExists(q, qk)){
-      pdf_connectivity_configurations.update(static_cast<PDF_Element*>(qk->GetConnectivityPDFElement()), ValueConnectivity(qk));
-      AddEdge(q, qk);
+  //RewireConfiguration(q);
+  //for(uint k = 0; k < q_neighbors.size(); k++){
+  //  Configuration *qk = q_neighbors.at(k);
+  //  if(!EdgeExists(q, qk)){
+  //    pdf_connectivity_configurations.update(static_cast<PDF_Element*>(qk->GetConnectivityPDFElement()), ValueConnectivity(qk));
+  //    AddEdge(q, qk);
+  //  }
+  //}
+
+  //add one more edges
+  std::vector<Configuration*> neighbors;
+  Vertex v = get(indexToVertex, q->index);
+  uint K = boost::degree(v, graph)+1;
+  nearest_cover->nearestK(q, K, neighbors);
+
+  if(neighbors.size()>=K){
+    Configuration *qn = neighbors.at(K-1);
+    double dn = DistanceNeighborhoodNeighborhood(q, qn);
+    if(dn <= 1e-10){
+      AddEdge(q, qn);
+      pdf_connectivity_configurations.update(static_cast<PDF_Element*>(qn->GetConnectivityPDFElement()), ValueConnectivity(qn));
+      pdf_connectivity_configurations.update(static_cast<PDF_Element*>(q->GetConnectivityPDFElement()), ValueConnectivity(q));
     }
   }
-  pdf_connectivity_configurations.update(static_cast<PDF_Element*>(q->GetConnectivityPDFElement()), ValueConnectivity(q));
 }
 

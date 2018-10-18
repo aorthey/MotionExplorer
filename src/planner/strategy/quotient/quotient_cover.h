@@ -64,6 +64,7 @@ namespace ompl
           isSufficientFeasible = false;
           pdf_element = nullptr;
           pdf_necessary_element = nullptr;
+          pdf_connectivity_element = nullptr;
 
           index = -1;
           goal_distance = 0.0;
@@ -220,6 +221,7 @@ namespace ompl
       bool IsConfigurationInsideCover(Configuration *q);
       void RemoveConfigurationsFromCoverCoveredBy(Configuration *q);
       bool ComputeNeighborhood(Configuration *q, bool verbose = false);
+      void RewireConfiguration(Configuration *q);
 
       //#######################################################################
       //Distance Computations
@@ -272,7 +274,10 @@ namespace ompl
       //Neighborhood Set Computations
       //#######################################################################
       bool IsConfigurationInsideNeighborhood(Configuration *q, Configuration *qn);
+
       std::vector<Configuration*> GetConfigurationsInsideNeighborhood(Configuration *q);
+      std::vector<Configuration*> GetConfigurationsIntersectingNeighborhood(Configuration *q);
+
       bool IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rhs);
       void GetCosetFromQuotientSpace(Configuration *q);
 

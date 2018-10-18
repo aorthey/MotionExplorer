@@ -43,11 +43,13 @@ void MultiQuotient<T,Tlast>::setup(){
 template <class T, class Tlast>
 void MultiQuotient<T,Tlast>::clear(){
   Planner::clear();
+
   for(uint k = 0; k < quotientSpaces.size(); k++){
     quotientSpaces.at(k)->clear();
   }
-  while(!Q.empty()) Q.pop();
+  currentQuotientLevel = 0;
 
+  while(!Q.empty()) Q.pop();
   foundKLevelSolution = false;
 
   solutions.clear();
@@ -55,9 +57,6 @@ void MultiQuotient<T,Tlast>::clear(){
   for(uint k = 0; k < pdef_vec.size(); k++){
     pdef_vec.at(k)->clearSolutionPaths();
   }
-  currentQuotientLevel = 0;
-  
-
 }
 
 template <class T, class Tlast>
@@ -69,10 +68,13 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
   const bool DEBUG = true;
   ompl::time::point t_start = ompl::time::now();
 
+  // std::cout << "QuotientSpaces in Queue: " << Q.size() << std::endl;
+  // if(Q.size()>0) std::cout << Q.top()->GetImportance() << std::endl;
+
   for(uint k = currentQuotientLevel; k < quotientSpaces.size(); k++){
     foundKLevelSolution = false;
 
-    Q.push(quotientSpaces.at(k));
+    if(Q.size()<=currentQuotientLevel) Q.push(quotientSpaces.at(k));
 
     base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
                                    { return ptc || foundKLevelSolution; });
@@ -82,19 +84,6 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
       og::Quotient* jQuotient = Q.top();
       Q.pop();
       jQuotient->Grow(T_GROW);
-      //bool hasSolution = quotientSpaces.at(k)->GetSolution(sol_k);
-
-
-      //############################################################################
-      // if(k>0){
-      //   std::cout << std::string(80, '-') << std::endl;
-      //   std::cout << "Current Importance Values" << std::endl;
-      //   for(uint i = 0; i <= k; i++){
-      //     og::Quotient *iQ = quotientSpaces.at(i);
-      //     std::cout << "level " << i << " : " << iQ->GetImportance() << std::endl;
-      //   }
-      // }
-      //############################################################################
 
       bool hasSolution = quotientSpaces.at(k)->HasSolution();
       if(hasSolution){

@@ -36,6 +36,12 @@ void QuotientCover::setup(void)
                              {
                                 return DistanceNeighborhoodNeighborhood(a,b);
                               });
+    if(!nearest_cover->reportsSortedResults())
+    {
+      std::cout << "nearest cover does not report sorted results, but required for rewiring" << std::endl;
+      exit(0);
+    }
+
   }
   if (!nearest_vertex){
     nearest_vertex.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
@@ -157,7 +163,7 @@ void QuotientCover::clear()
   indexToVertexStdMap.clear();
   index_ctr = 0;
   isConnected = false;
-
+  saturated = false;
 
   if(q_start){
     q_start->Clear();
@@ -167,12 +173,9 @@ void QuotientCover::clear()
     {
       OMPL_INFORM("Note: start state covers quotient-space.");
       saturated = true;
-    }else{
-      saturated = false;
     }
-  }else{
-    saturated = false;
   }
+
   if(q_goal){
     q_goal->Clear();
   }
@@ -773,6 +776,20 @@ std::vector<QuotientCover::Configuration*> QuotientCover::GetConfigurationsInsid
   return neighbors;
 }
 
+void QuotientCover::RewireConfiguration(Configuration *q)
+{
+  std::vector<Configuration*> neighbors;
+  Vertex v = get(indexToVertex, q->index);
+  uint K = boost::degree(v, graph)+1;
+
+  nearest_cover->nearestK(q, K, neighbors);
+  Configuration *qn = neighbors.at(K-1);
+  double dn = DistanceNeighborhoodNeighborhood(q, qn);
+  if(dn <= 1e-10){
+    AddEdge(q, qn);
+  }
+}
+
 
 QuotientCover::Configuration* QuotientCover::Nearest(Configuration *q) const
 {
@@ -789,9 +806,26 @@ bool QuotientCover::Interpolate(const Configuration *q_from, Configuration *q_to
 
 bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration *q_to, Configuration *q_interp)
 {
-  //double d = DistanceConfigurationConfiguration(q_from, q_to);
+  double d = DistanceConfigurationConfiguration(q_from, q_to);
   double radius = q_from->GetRadius();
-  return Interpolate(q_from, q_to, radius, q_interp);
+  double step_size = radius/d;
+  bool success = Interpolate(q_from, q_to, step_size, q_interp);
+
+  double d_proj = DistanceConfigurationConfiguration(q_from, q_interp);
+  if(fabs(d_proj - radius)>1e-5){
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "Interpolate not successful" << std::endl;
+    Print(q_from, false);
+    Print(q_to, false);
+    Print(q_interp, false);
+    std::cout << "radius from: " << radius << std::endl;
+    std::cout << "dist from to to: " << d << std::endl;
+    std::cout << "dist from to proj: " << d_proj << std::endl;
+    std::cout << "step size: " << step_size << std::endl;
+    exit(0);
+  }
+
+  return success;
 }
 bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration *q_to, double step_size, Configuration *q_interp)
 {
@@ -1003,7 +1037,7 @@ bool QuotientCover::GetSolution(ob::PathPtr &solution)
     double d_goal = DistanceNeighborhoodNeighborhood(qn, q_goal);
     if(d_goal < 1e-10){
       q_goal->parent_neighbor = qn;
-      v_goal = AddConfigurationToCoverWithoutAddingEdges(q_goal);
+      v_goal = AddConfigurationToCover(q_goal);
       isConnected = true;
     }
   }
