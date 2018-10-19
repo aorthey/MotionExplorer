@@ -193,7 +193,7 @@ std::vector<QuotientCover::Configuration*> QNGGoalDirected::GenerateCandidateDir
   for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES; k++){
     Configuration *q_k = new Configuration(Q1);
 
-    Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.25*radius_from);
+    Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.5*radius_from);
 
     const double d_from_to_k = DistanceConfigurationConfiguration(q_from, q_k);
     Q1->getStateSpace()->interpolate(q_from->state, q_k->state, radius_from/d_from_to_k, q_k->state);

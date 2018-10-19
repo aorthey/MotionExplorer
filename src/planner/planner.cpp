@@ -192,6 +192,37 @@ void MotionPlanner::Step()
   std::cout << output << std::endl;
   output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
 }
+void MotionPlanner::StepOneLevel()
+{
+  if(!active) return;
+
+  if(!strategy.IsInitialized()){
+    current_level = 0;
+    current_level_node = 0;
+    current_path.clear();
+    viewHierarchy.Clear();
+    StrategyInput strategy_input = input.GetStrategyInput();
+    strategy_input.cspace_levels = cspace_levels;
+    strategy_input.cspace = cspace_levels.back();
+    strategy_input.world = world;
+    strategy.Init(strategy_input);
+  }
+
+  StrategyOutput output(cspace_levels.back());
+
+  uint numberOfSolutionPathsCurrentLevel = 0;
+  while(numberOfSolutionPathsCurrentLevel < 1)
+  {
+    strategy.Step(output);
+    //std::cout << output << std::endl;
+    output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
+    numberOfSolutionPathsCurrentLevel = hierarchy->NumberNodesOnLevel(current_level+2);
+    std::cout << " current level: " << current_level << std::endl;
+    std::cout << " cspace level: " << cspace_levels.size() << std::endl;
+    std::cout << " solved levels: " << numberOfSolutionPathsCurrentLevel << std::endl;
+  }
+  std::cout << output << std::endl;
+}
 void MotionPlanner::AdvanceUntilSolution()
 {
   if(!active) return;
@@ -200,10 +231,6 @@ void MotionPlanner::AdvanceUntilSolution()
   current_path.clear();
   viewHierarchy.Clear();
 
-  // StrategyInput strategy_input = input.GetStrategyInput();
-  // strategy_input.cspace_levels = cspace_levels;
-  // strategy_input.cspace = cspace_levels.back();
-  // strategy_input.world = world;
   if(!strategy.IsInitialized()){
     std::cout << "init strategy: " << cspace_levels.size() << std::endl;
     StrategyInput strategy_input = input.GetStrategyInput();
@@ -216,15 +243,9 @@ void MotionPlanner::AdvanceUntilSolution()
   }
 
   StrategyOutput output(cspace_levels.back());
-  //strategy.init(strategy_input);
   strategy.Plan(output);
   std::cout << output << std::endl;
-
   output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
-}
-void MotionPlanner::Advance(double ms)
-{
-  std::cout << "NIY" << std::endl;
 }
 
 const PlannerInput& MotionPlanner::GetInput(){

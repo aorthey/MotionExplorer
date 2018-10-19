@@ -111,10 +111,14 @@
     <descr>Advance Planner by one step</descr>
     <key>q</key>
   </hotkey>
-
   <hotkey>
     <name>planner_clear</name>
     <key>C</key>
+  </hotkey>
+
+  <hotkey>
+    <name>planner_step_one_level</name>
+    <key>a</key>
   </hotkey>
   <!-- <hotkey> -->
   <!--   <name>planner_advance_one_second</name> -->

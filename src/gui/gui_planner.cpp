@@ -53,6 +53,10 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="planner_step"){
     planners.at(active_planner)->Step();
     planners.at(active_planner)->ExpandFull();
+  }else if(cmd=="planner_step_one_level"){
+    planners.at(active_planner)->StepOneLevel();
+    planners.at(active_planner)->Expand();
+    hierarchy_change = true;
   }else if(cmd=="planner_clear"){
     std::cout << "CLEAR PLanner" << std::endl;
     planners.at(active_planner)->Clear();

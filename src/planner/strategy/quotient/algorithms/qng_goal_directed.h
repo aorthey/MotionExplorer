@@ -38,7 +38,7 @@ namespace ompl
       //not progressMade=false
 
       const double goalDirectionBias{0.1}; //when not making progress, how often should we check if progress can be made?
-      const double thresholdObstaclesHorizon{0.1}; //if moving towards a configuration, do not repell this movement while above obstaclesHorizon. If below, repell to steer robot away from obstacles.
+      const double thresholdObstaclesHorizon{0.5}; //if moving towards a configuration, do not repell this movement while above obstaclesHorizon. If below, repell to steer robot away from obstacles.
       const double rewireBias{0.5}; //when solution has been found, this bias increases connectivity
       bool progressMadeTowardsGoal{true};
 

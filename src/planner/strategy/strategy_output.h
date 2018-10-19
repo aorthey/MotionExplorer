@@ -28,7 +28,7 @@ struct StrategyOutput{
 
     std::vector<Config> GetShortestPath();
     ob::PathPtr getShortestPathOMPL();
-    std::vector<std::vector<Config>> GetSolutionPaths();
+    //std::vector<std::vector<Config>> GetSolutionPaths();
 
     bool hasExactSolution();
     bool hasApproximateSolution();
@@ -42,7 +42,7 @@ struct StrategyOutput{
 
     std::vector<Config> PathGeometricToConfigPath(og::PathGeometric &path);
 
-    std::vector<std::vector<Config>> solution_paths;
+    //std::vector<std::vector<Config>> solution_paths;
 
     std::vector<Config> shortest_path;
 

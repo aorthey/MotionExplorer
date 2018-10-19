@@ -32,7 +32,7 @@ class MotionPlanner{
 
     //operations on motion planning strategy (the underlying algorithm)
     virtual void Step();
-    virtual void Advance(double ms);
+    virtual void StepOneLevel();
     virtual void AdvanceUntilSolution();
     
     virtual void DrawGL(GUIState&);

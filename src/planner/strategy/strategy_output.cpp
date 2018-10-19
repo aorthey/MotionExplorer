@@ -100,18 +100,15 @@ std::vector<Config> StrategyOutput::GetShortestPath(){
   return path;
 }
 
-std::vector<std::vector<Config>> StrategyOutput::GetSolutionPaths(){
-  solution_paths.clear();
-  std::vector<ob::PlannerSolution> paths = pdef->getSolutions();
-  for(uint k = 0; k < paths.size(); k++){
-    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*paths.at(k).path_);
-    solution_paths.push_back( PathGeometricToConfigPath(gpath) );
-  }
-  return solution_paths;
-}
-
-
-
+//std::vector<std::vector<Config>> StrategyOutput::GetSolutionPaths(){
+//  solution_paths.clear();
+//  std::vector<ob::PlannerSolution> paths = pdef->getSolutions();
+//  for(uint k = 0; k < paths.size(); k++){
+//    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*paths.at(k).path_);
+//    solution_paths.push_back( PathGeometricToConfigPath(gpath) );
+//  }
+//  return solution_paths;
+//}
 
 typedef Tree<ob::PlannerDataPtr> PTree;
 
