@@ -195,6 +195,9 @@ void MotionPlanner::Step()
 void MotionPlanner::StepOneLevel()
 {
   if(!active) return;
+  if(cspace_levels.size()<=2){
+    return AdvanceUntilSolution();
+  }
 
   if(!strategy.IsInitialized()){
     current_level = 0;
@@ -214,12 +217,8 @@ void MotionPlanner::StepOneLevel()
   while(numberOfSolutionPathsCurrentLevel < 1)
   {
     strategy.Step(output);
-    //std::cout << output << std::endl;
     output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
     numberOfSolutionPathsCurrentLevel = hierarchy->NumberNodesOnLevel(current_level+2);
-    std::cout << " current level: " << current_level << std::endl;
-    std::cout << " cspace level: " << cspace_levels.size() << std::endl;
-    std::cout << " solved levels: " << numberOfSolutionPathsCurrentLevel << std::endl;
   }
   std::cout << output << std::endl;
 }

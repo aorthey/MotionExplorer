@@ -12,7 +12,7 @@ namespace ompl
     class QNGGoalDirected: public og::QNG
     {
       typedef og::QNG BaseT;
-      const int verbose{2};
+      const int verbose{3};
     public:
 
       QNGGoalDirected(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
@@ -26,10 +26,12 @@ namespace ompl
       void ExpandTowardsFreeSpace(ob::PlannerTerminationCondition &ptc);
       void RewireCover(ob::PlannerTerminationCondition &ptc);
 
+      bool ConfigurationHasNeighborhoodLargerThan(Configuration *q, double radius);
       virtual Vertex AddConfigurationToCover(Configuration *q) override;
 
-      bool SteerTowards(Configuration *q_from, Configuration *q_next);
+      bool StepTowards(Configuration *q_from, Configuration *q_next);
       std::vector<Configuration*> GenerateCandidateDirections(Configuration *q_from, Configuration *q_next);
+      void ExpandTowardsFreeSpaceVoronoiBias(const ob::PlannerTerminationCondition &ptc);
       
       double GetImportance() const;
 
@@ -39,8 +41,9 @@ namespace ompl
 
       const double goalDirectionBias{0.1}; //when not making progress, how often should we check if progress can be made?
       const double thresholdObstaclesHorizon{0.5}; //if moving towards a configuration, do not repell this movement while above obstaclesHorizon. If below, repell to steer robot away from obstacles.
-      const double rewireBias{0.5}; //when solution has been found, this bias increases connectivity
+      const double rewireBias{0.2}; //when solution has been found, this bias increases connectivity
       bool progressMadeTowardsGoal{true};
+      bool terminated{false};
 
       struct CmpGoalDistancePtrs
       {

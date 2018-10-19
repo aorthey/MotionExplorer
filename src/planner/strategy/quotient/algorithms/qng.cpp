@@ -47,9 +47,10 @@ std::vector<QNG::Configuration*> QNG::ExpandNeighborhood(Configuration *q_curren
     const double radius_current = q_current->GetRadius();
     const double radius_last = q_last->GetRadius();
     const double step_size = (radius_last+radius_current)/radius_last;
-    Q1->getStateSpace()->interpolate(q_last->state, q_current->state, step_size, q_proj->state);
+    // Q1->getStateSpace()->interpolate(q_last->state, q_current->state, step_size, q_proj->state);
 
-    //Interpolate(q_last, q_current, q_proj);
+    Interpolate(q_last, q_current, step_size, q_proj);
+    if(verbose>2) CheckConfigurationIsOnBoundary(q_proj, q_current);
 
     //############################################################################
     // (1) q_proj is feasible: 
@@ -60,6 +61,7 @@ std::vector<QNG::Configuration*> QNG::ExpandNeighborhood(Configuration *q_curren
     //############################################################################
     if(ComputeNeighborhood(q_proj))
     {
+      q_proj->parent_neighbor = q_current;
       q_children.push_back(q_proj);
 
       const double radius_proj = q_proj->GetRadius();
@@ -69,7 +71,15 @@ std::vector<QNG::Configuration*> QNG::ExpandNeighborhood(Configuration *q_curren
         for(int k = 0; k < M_samples-1; k++)
         {
           Configuration *q_k = new Configuration(Q1);
+          //should be intersected with the cover if we are on the upper level
+          //space.
+
           Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.5*radius_current);
+
+          std::cout << "interpolate qng q_k" << std::endl;
+          Interpolate(q_current, q_k);
+          std::cout << "done interpolate qng q_k" << std::endl;
+          if(verbose>2) CheckConfigurationIsOnBoundary(q_k, q_current);
 
           if(ComputeNeighborhood(q_k))
           {

@@ -520,6 +520,10 @@ void QuotientCover::GetCosetFromQuotientSpace(Configuration *q)
     ExtractQ0Subspace(q->state, q_projected->state);
     q->coset = qcc_parent->Nearest(q_projected);
     q_projected->Remove(Q0);
+    // Print(q);
+    // std::cout << "coset: " << q->coset->index << std::endl;
+    delete q_projected;
+
   }
 }
 
@@ -790,6 +794,37 @@ void QuotientCover::RewireConfiguration(Configuration *q)
   }
 }
 
+uint QuotientCover::GetLargestNeighborhoodIndex(const std::vector<Configuration*> &q_children)
+{
+  assert(q_children.size()>0);
+  double radius_best = 0;
+  uint idx_best = 0;
+  for(uint k = 0; k < q_children.size(); k++)
+  {
+    Configuration *q_k = q_children.at(k);
+    double r = q_k->GetRadius();
+    if(r > radius_best)
+    {
+      radius_best = r;
+      idx_best = k;
+    }
+  }
+  return idx_best;
+}
+
+void QuotientCover::CheckConfigurationIsOnBoundary(Configuration *q_boundary, Configuration *q)
+{
+  double d_outcome = DistanceConfigurationConfiguration(q_boundary, q);
+  if(fabs(d_outcome - q->GetRadius())>1e-10)
+  {
+      std::cout << "Point not on boundary!" << std::endl;
+      QuotientCover::Print(q, false);
+      QuotientCover::Print(q_boundary, false);
+      std::cout << "radius neighborhood: " << q->GetRadius() << std::endl;
+      std::cout << "dist to point: " << d_outcome << std::endl;
+      exit(1);
+  }
+}
 
 QuotientCover::Configuration* QuotientCover::Nearest(Configuration *q) const
 {
@@ -810,45 +845,71 @@ bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration
   double radius = q_from->GetRadius();
   double step_size = radius/d;
   bool success = Interpolate(q_from, q_to, step_size, q_interp);
-
-  double d_proj = DistanceConfigurationConfiguration(q_from, q_interp);
-  if(fabs(d_proj - radius)>1e-5){
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "Interpolate not successful" << std::endl;
-    Print(q_from, false);
-    Print(q_to, false);
-    Print(q_interp, false);
-    std::cout << "radius from: " << radius << std::endl;
-    std::cout << "dist from to to: " << d << std::endl;
-    std::cout << "dist from to proj: " << d_proj << std::endl;
-    std::cout << "step size: " << step_size << std::endl;
-    exit(0);
-  }
-
   return success;
 }
+//stepsize \in [0,1]
 bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration *q_to, double step_size, Configuration *q_interp)
 {
   if(parent==nullptr){
+    //double d = DistanceConfigurationConfiguration(q_from, q_to);
     Q1->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_interp->state);
   }else{
     //move along path until step_size is reached. Then interpolate between the
     //waypoints to get the point on the path of distance step_size from q_from
 
+    //q_from ---- q1 ----- q2 --- ... ---- q_to
+    //-----------------------d----------------
+    //--------------d_step
+
+    //@TODO: optimize that we do not use distance config config two times, or
+    //use internal cache?
+
+    double d_from_to = DistanceConfigurationConfiguration(q_from, q_to);
+    double d_step = d_from_to*step_size;
+
     std::vector<const Configuration*> path = GetInterpolationPath(q_from, q_to);
     double d = 0;
     double d_last_to_next = 0;
     uint ctr = 0;
-    while(d < step_size && ctr < path.size()){
+
+    while(d < d_step && ctr < path.size()-1){
       d_last_to_next = DistanceQ1(path.at(ctr), path.at(ctr+1));
       d += d_last_to_next;
       ctr++;
     }
+
     const Configuration *q_next = path.at(ctr);
     const Configuration *q_last = path.at(ctr-1);
-    double step = d_last_to_next - d + step_size;
+    double step = d_last_to_next - (d - d_step);
     Q1->getStateSpace()->interpolate(q_last->state, q_next->state, step/d_last_to_next, q_interp->state);
+    std::cout << "radius q_from: " << q_from->GetRadius() << std::endl;
+    std::cout << "dist last next: " << d_last_to_next << std::endl;
+    std::cout << "step: " << step << std::endl;
+    double d_proj = DistanceConfigurationConfiguration(q_from, q_interp);
+    double d_proj_q1 = DistanceQ1(q_from, q_interp);
+    std::cout << "dist proj: " << d_proj << std::endl;
+    std::cout << "dist proj_q1: " << d_proj_q1 << std::endl;
   }
+
+  // double d_proj = DistanceConfigurationConfiguration(q_from, q_interp);
+  // double d_to = DistanceConfigurationConfiguration(q_from, q_to);
+  // if(fabs(d_proj - q_from->GetRadius())>1e-5){
+  //   std::cout << std::string(80, '-') << std::endl;
+  //   std::cout << "Interpolate not successful" << std::endl;
+  //   std::cout << "FROM:" << std::endl;
+  //   Print(q_from, false);
+  //   std::cout << "TO:" << std::endl;
+  //   Print(q_to, false);
+  //   std::cout << "PROJECTED RESULT:" << std::endl;
+  //   Print(q_interp, false);
+  //   std::cout << "radius from: " << q_from->GetRadius() << std::endl;
+  //   std::cout << "dist from to proj: " << d_proj << std::endl;
+  //   std::cout << "(should all be equivalent)" << std::endl;
+  //   std::cout << "dist from to to: " << d_to << std::endl;
+  //   std::cout << "step size: " << step_size << std::endl;
+  //   exit(0);
+  // }
+
   return true;
 }
 

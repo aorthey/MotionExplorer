@@ -244,6 +244,30 @@ void StrategyGeometricMultiLevel::Step(StrategyOutput &output)
   ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
   output.SetProblemDefinition(pdef);
 }
+//void StrategyGeometricMultiLevel::StepOneLevel(StrategyOutput &output)
+//{
+//  ompl::time::point start = ompl::time::now();
+//  std::string algorithm = input.name_algorithm;
+//  //###########################################################################
+//
+//  ob::IterationTerminationCondition itc(1);
+//  ob::PlannerTerminationCondition ptc_step(itc);
+//  ob::PlannerTerminationCondition ptc_time( ob::timedPlannerTerminationCondition(max_planning_time) );
+//  ob::PlannerTerminationCondition ptc(plannerAndTerminationCondition(ptc_time, ptc_step));
+//
+//
+//  planner->solve(ptc);
+//
+//  ob::PlannerDataPtr pd( new ob::PlannerData(planner->getSpaceInformation()) );
+//  planner->getPlannerData(*pd);
+//  output.SetPlannerData(pd);
+//  ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
+//  output.SetProblemDefinition(pdef);
+//  //###########################################################################
+//
+//  output.planner_time = ompl::time::seconds(ompl::time::now() - start);
+//  output.max_planner_time = max_planning_time;
+//}
 
 void StrategyGeometricMultiLevel::Clear()
 {

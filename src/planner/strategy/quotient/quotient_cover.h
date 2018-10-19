@@ -222,6 +222,8 @@ namespace ompl
       void RemoveConfigurationsFromCoverCoveredBy(Configuration *q);
       bool ComputeNeighborhood(Configuration *q, bool verbose = false);
       void RewireConfiguration(Configuration *q);
+      void CheckConfigurationIsOnBoundary(Configuration *q_boundary, Configuration *q);
+      uint GetLargestNeighborhoodIndex(const std::vector<Configuration*> &q_children);
 
       //#######################################################################
       //Distance Computations

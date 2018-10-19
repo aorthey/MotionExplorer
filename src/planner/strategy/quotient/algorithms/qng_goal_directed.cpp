@@ -64,7 +64,8 @@ void QNGGoalDirected::Grow(double t)
       if(r <= goalDirectionBias){
         progressMadeTowardsGoal = ExpandTowardsGoal(ptc);
       }else{
-        ExpandTowardsFreeSpace(ptc);
+        //ExpandTowardsFreeSpace(ptc);
+        ExpandTowardsFreeSpaceVoronoiBias(ptc);
       }
     }
   }else{
@@ -87,79 +88,40 @@ bool QNGGoalDirected::ExpandTowardsGoal(ob::PlannerTerminationCondition &ptc)
     hasSolution = true;
     return true;
   }
-  return SteerTowards(q_nearest, q_goal);
+  return StepTowards(q_nearest, q_goal);
 }
+//Create a bunch of children configurations into the direction of q_next. then
+//choose the child with the largest neighborhood and add it. The remaining
+//children are added to the priority queue for later extensions
 
-bool QNGGoalDirected::SteerTowards(Configuration *q_from, Configuration *q_next)
+bool QNGGoalDirected::StepTowards(Configuration *q_from, Configuration *q_next)
 {
-  if(verbose>1)
-  {
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "from:" << std::endl;
-    QuotientCover::Print(q_from);
-    std::cout << "steer towards:" << std::endl;
-    QuotientCover::Print(q_next);
+  std::vector<Configuration*> q_children = GenerateCandidateDirections(q_from, q_next);
+
+  if(q_children.empty()){
+    return false;
   }
 
-  const double radius_from = q_from->GetRadius();
-  if(radius_from > thresholdObstaclesHorizon)
+  uint idx_best = GetLargestNeighborhoodIndex(q_children);
+
+  Configuration *q_best = q_children.at(idx_best);
+  AddConfigurationToCover(q_best);
+
+  //add the smaller children to the priority_configurations to be extended at
+  //a later stage if required
+  for(uint k = 0; k < q_children.size(); k++)
   {
-    //move directly towards q_next
-    Configuration *q_proj = new Configuration(Q1);
-    Interpolate(q_from, q_next, q_proj);
-    bool isProjectedFeasible = ComputeNeighborhood(q_proj);
-
-    if(isProjectedFeasible){
-      q_proj->parent_neighbor = q_from;
-      AddConfigurationToCover(q_proj);
-    }
-
-    return isProjectedFeasible;
-
-  }else{
-
-    std::vector<Configuration*> q_children = GenerateCandidateDirections(q_from, q_next);
-
-    //############################################################################
-    //get best child: here best means the one with the largest radius, but this
-    //might not be the best choice
-    //############################################################################
-    double radius_best = 0;
-    uint idx_best = 0;
-    for(uint k = 0; k < q_children.size(); k++)
-    {
-      Configuration *q_k = q_children.at(k);
-      double r = q_k->GetRadius();
-      if(r > radius_best)
-      {
-        radius_best = r;
-        idx_best = k;
-      }
-      q_k->parent_neighbor = q_from;
-    }
-
-
-    //############################################################################
-    //when to declare no progress made
-    //############################################################################
-    if(q_children.empty()){
-      return false;
-    }
-
-    Configuration *q_best = q_children.at(idx_best);
-    AddConfigurationToCover(q_best);
-
-    //add the smaller children to the priority_configurations to be extended at
-    //a later stage if required
-    for(uint k = 0; k < q_children.size(); k++)
-    {
-      Configuration *q_k = q_children.at(k);
-      if(k!=idx_best){
-        priority_configurations.push(q_k);
-      }
+    Configuration *q_k = q_children.at(k);
+    if(k!=idx_best){
+      priority_configurations.push(q_k);
     }
   }
   return true;
+}
+
+bool QNGGoalDirected::ConfigurationHasNeighborhoodLargerThan(Configuration *q, double radius)
+{
+  return q->GetRadius() >= radius;
 }
 
 std::vector<QuotientCover::Configuration*> QNGGoalDirected::GenerateCandidateDirections(Configuration *q_from, Configuration *q_next)
@@ -172,49 +134,106 @@ std::vector<QuotientCover::Configuration*> QNGGoalDirected::GenerateCandidateDir
   // q_from        |q_proj                      q_next      |
   //              /                                         |
   //             /                                          |
+  //############################################################################
+  //Case(1): Next projected onto neighborhood has larger radius => expand
+  //directly, larger is always better
+  //############################################################################
   Configuration *q_proj = new Configuration(Q1);
+
   const double radius_from = q_from->GetRadius();
   Interpolate(q_from, q_next, q_proj);
+  std::cout << "proj is on boundary" << std::endl;
+  if(verbose>2) CheckConfigurationIsOnBoundary(q_proj, q_from);
+  std::cout << "yes" << std::endl;
+  q_proj->parent_neighbor = q_from;
 
-  bool isProjectedFeasible = ComputeNeighborhood(q_proj);
+  if(!ComputeNeighborhood(q_proj)) return q_children;
 
-  if(isProjectedFeasible)
+  if(ConfigurationHasNeighborhoodLargerThan(q_proj, radius_from))
   {
-    q_proj->parent_neighbor = q_from;
     q_children.push_back(q_proj);
-    double radius_proj = q_proj->GetRadius();
-    //terminate if projected moves towards larger neighborhoods
-    if(radius_proj >= radius_from){
-      return q_children;
-    }
-  }else{
     return q_children;
   }
+  std::cout << std::string(80, '-') << std::endl;
+
+  //############################################################################
+  //Case(2): Next projected is smaller. Try continuing in the direction of
+  //parent (added momentum)
+  //############################################################################
+  Configuration *q_sample_direction = q_proj;
+
+  if(q_from->parent_neighbor != nullptr){
+    Configuration *q_momentum = new Configuration(Q1);
+
+    double radius_parent = q_from->parent_neighbor->GetRadius();
+    double step = (radius_from+radius_parent)/radius_parent;
+    Interpolate(q_from->parent_neighbor, q_from, step, q_momentum);
+
+  // std::cout << "dist parent to from: " << DistanceConfigurationConfiguration(q_from->parent_neighbor, q_from) << std::endl;
+    // std::cout << "radius parent NBH:" << radius_parent << std::endl;
+    // std::cout << "radius from NBH:" << radius_from << std::endl;
+    // std::cout << "step:" << step << std::endl;
+    // QuotientCover::Print(q_from->parent_neighbor, false);
+    //############################################################################
+
+    std::cout << "momentum is on boundary" << std::endl;
+    if(verbose>2) CheckConfigurationIsOnBoundary(q_momentum, q_from);
+    q_momentum->parent_neighbor = q_from;
+    //############################################################################
+
+    if(ComputeNeighborhood(q_momentum)){
+      q_children.push_back(q_momentum);
+      if(ConfigurationHasNeighborhoodLargerThan(q_momentum, radius_from))
+      {
+        return q_children;
+      }
+    }
+
+    if(q_momentum->GetRadius() > q_proj->GetRadius())
+    {
+      q_sample_direction = q_momentum;
+    }
+  }
+
+  std::cout << std::string(80, '-') << std::endl;
+  //############################################################################
+  //Case(3): Neither proj nor momentum configuration are better. Try random
+  //sampling
+  //############################################################################
+
   for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES; k++){
     Configuration *q_k = new Configuration(Q1);
 
-    Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.5*radius_from);
+    Q1_sampler->sampleUniformNear(q_k->state, q_sample_direction->state, 0.5*radius_from);
 
     const double d_from_to_k = DistanceConfigurationConfiguration(q_from, q_k);
-    Q1->getStateSpace()->interpolate(q_from->state, q_k->state, radius_from/d_from_to_k, q_k->state);
 
+    double step_size = radius_from/d_from_to_k;
+    Q1->getStateSpace()->interpolate(q_from->state, q_k->state, step_size, q_k->state);
+
+    // std::cout << "radius q_from: " << q_from->GetRadius() << std::endl;
+    // std::cout << "d_from_to_k  : " << d_from_to_k << std::endl;
+    // std::cout << "step         : " << step_size << std::endl;
+    // std::cout << "d_from_to_k  (after proj): " << DistanceQ1(q_from, q_k) << std::endl;
+    // double d_outcome = DistanceConfigurationConfiguration(q_from, q_k);
+    // std::cout << "d_from_to_k  (graph metric): " << d_outcome << std::endl;
+
+    //PROBLEM: q_k does not have a coset after sampling. Therefore we utilize
+    //internally DistanceQ1. After Computeneighborhood, the coset is set, and we
+    //can actually utilize the graph metric. However, under the graph metric,
+    //the distance changes and it is not on the boundary anymore. Not sure how
+    //to resolve
+    //
+    //
     if(ComputeNeighborhood(q_k))
     {
-
-      if(fabs(radius_from - DistanceConfigurationConfiguration(q_from, q_k))>1e-5){
-        std::cout << std::string(80, '-') << std::endl;
-        std::cout << "projected point not on boundary!" << std::endl;
-        QuotientCover::Print(q_from, false);
-        QuotientCover::Print(q_k, false);
-        std::cout << "radius from: " << radius_from << std::endl;
-        std::cout << "dist original: " << d_from_to_k << std::endl;
-        std::cout << "dist from to proj: " << DistanceConfigurationConfiguration(q_from, q_proj) << std::endl;
-        std::cout << "step size : " << radius_from/d_from_to_k << std::endl;
-        std::cout << "dist after interp: " << DistanceConfigurationConfiguration(q_from, q_k) << std::endl;
-        exit(0);
-      }
-
+      // d_outcome = DistanceConfigurationConfiguration(q_from, q_k);
+      // std::cout << "d_from_to_k  (graph metric): " << d_outcome << std::endl;
+      //############################################################################
+      //if(verbose>2) CheckConfigurationIsOnBoundary(q_k, q_from);
       q_k->parent_neighbor = q_from;
+      //############################################################################
+
       q_children.push_back(q_k);
     }
   }
@@ -244,7 +263,9 @@ void QNGGoalDirected::ExpandTowardsFreeSpace(ob::PlannerTerminationCondition &pt
 
   if(verbose>0) QuotientCover::Print(q);
 
+
   std::vector<Configuration*> q_children = ExpandNeighborhood(q, NUMBER_OF_EXPANSION_SAMPLES);
+
   for(uint k = 0; k < q_children.size(); k++)
   {
     priority_configurations.push(q_children.at(k));
@@ -255,6 +276,30 @@ void QNGGoalDirected::ExpandTowardsFreeSpace(ob::PlannerTerminationCondition &pt
     priority_configurations.push(q_random);
   }
 }
+
+void QNGGoalDirected::ExpandTowardsFreeSpaceVoronoiBias(const ob::PlannerTerminationCondition &ptc)
+{
+  //Sample Random Configuration on underlying cover
+  Configuration *q_random = QuotientCover::SampleCoverBoundary("voronoi");
+  //do not compute neighborhood
+
+  terminated = false;
+  base::PlannerTerminationCondition ptcOrConfigurationReached([this, &ptc]
+                                 { return ptc || terminated; });
+
+  //should have coset, but zero-measure neighborhood
+  while(!ptc()){
+    Configuration *q_nearest = Nearest(q_random);
+    if(DistanceNeighborhoodNeighborhood(q_nearest, q_random) < 1e-10)
+    {
+      terminated = true;
+    }else{
+      terminated = !StepTowards(q_nearest, q_random);
+    }
+  }
+
+}
+
 double QNGGoalDirected::GetImportance() const
 {
   //if we currently are making progress towards the goal, then this space should
