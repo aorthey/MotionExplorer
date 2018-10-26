@@ -10,7 +10,7 @@
 
   <algorithm name="hierarchy:qng_goal_directed"/>
   <algorithm name="benchmark:minimal"/>
-  <algorithm name="hierarchy:qmp"/>
+  <algorithm name="hierarchy:qmp_connect"/>
   <algorithm name="ompl:spars"/>
   <algorithm name="ompl:kpiece"/>
   <algorithm name="benchmark:all_geometric"/>
@@ -30,7 +30,7 @@
 -->
 
   <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
-  <smoothPath>0</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
+  <smoothPath>1</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
   <pathSpeed>1</pathSpeed>                    <!-- <1: slower, 1: default, >1: faster -->
   <sampler name="uniform"/>                   <!-- uniform|gaussian|minimum_clearance|maximum_clearance|obstacle_based|bridge_test -->
   <timestep min="0.01" max="0.1"/>

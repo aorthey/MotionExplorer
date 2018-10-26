@@ -1,9 +1,7 @@
 <benchmarks>
 
   <benchmark name="best_geometric">
-
-    <algorithm name="qscp"/>
-    <algorithm name="qmp_connect"/>
+    <algorithm name="hierarchy:qmp_connect"/>
     <algorithm name="ompl:rrtconnect"/>
     <!-- <algorithm name="ompl:prm"/> -->
     <!-- <algorithm name="ompl:est"/> -->
@@ -63,8 +61,7 @@
     <!-- <algorithm name="ompl:psbl"/> RETURNS INFEASIBLE PATH -->
     <!-- <algorithm name="ompl:bitstar"/> SEG FAULT-->
 
-
-    <maxplanningtime>5</maxplanningtime> <!-- runtime in (s) --> 
+    <maxplanningtime>30</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>10</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>

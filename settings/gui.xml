@@ -293,7 +293,7 @@
   <property name="planner_draw_goal_configuration" enabled="1"/>
   <property name="draw_path" enabled="1"/>
   <property name="draw_path_unsmoothed" enabled="0"/>
-  <property name="draw_path_autofocus" enabled="1"/>
+  <property name="draw_path_autofocus" enabled="0"/>
   <property name="draw_axes" enabled="0"/>
   <property name="draw_robot_zero_position" enabled="1"/>
   <property name="draw_controller_driver" enabled="1"/>
