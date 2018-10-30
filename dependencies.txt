@@ -1,4 +1,0 @@
-sudo apt-get install g++-5 libboost1.55-all-dev
-
-Klamp't
-
