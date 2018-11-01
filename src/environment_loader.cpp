@@ -31,9 +31,7 @@ EnvironmentLoader EnvironmentLoader::from_args(int argc, char** argv){
     std::cout << "Usage: <xml world file>" << std::endl;
     exit(0);
   }
-  using namespace boost::filesystem;
-  path cur = current_path();
-  file = cur.string()+"/"+file;
+  file = util::GetExecFilePath()+"/"+file;
   return EnvironmentLoader(file.c_str());
 }
 EnvironmentLoader::EnvironmentLoader(const char *file_name_){

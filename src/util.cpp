@@ -75,12 +75,12 @@ namespace util{
   }
   std::string GetApplicationFolder()
   {
-    return GetExecPath()+"/../";
+    return GetExecFilePath()+"/../";
   }
 
   std::string GetDataFolder()
   {
-    return GetExecPath()+"/../data";
+    return GetExecFilePath()+"/../data";
   }
 //https://stackoverflow.com/questions/143174/how-do-i-get-the-directory-that-a-program-is-running-from
   std::string GetExecPath()
@@ -88,6 +88,11 @@ namespace util{
     char result[ PATH_MAX ];
     ssize_t count = readlink( "/proc/self/exe", result, PATH_MAX );
     return std::string( result, (count > 0) ? count : 0 );
+  }
+  std::string GetExecFilePath()
+  {
+    boost::filesystem::path p(GetExecPath());
+    return p.parent_path().string();
   }
   std::string GetFileBasename(const char *file)
   {

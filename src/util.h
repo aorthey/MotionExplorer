@@ -17,6 +17,7 @@ namespace util {
   void SetSimulatedRobot( Robot *robot, WorldSimulation &sim, const Config &q, const Config &dq);
 
   std::string GetExecPath();
+  std::string GetExecFilePath();
   std::string GetApplicationFolder();
   std::string GetDataFolder();
   std::string GetFileBasename(const char *file);
