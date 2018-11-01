@@ -8,16 +8,16 @@
 
 <world>
 
-   <robot name="Lshape" file="/home/aorthey/git/orthoklampt/data/robots/DoubleLshape.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-   <robot name="capsule_inner" file="/home/aorthey/git/orthoklampt/data/robots/DoubleLshape_capsule_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-   <robot name="capsule_outer" file="/home/aorthey/git/orthoklampt/data/robots/DoubleLshape_capsule_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-   <robot name="sphere_inner" file="/home/aorthey/git/orthoklampt/data/robots/DoubleLshape_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-   <robot name="sphere_outer" file="/home/aorthey/git/orthoklampt/data/robots/DoubleLshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+   <robot name="Lshape" file="../robots/DoubleLshape.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+   <robot name="capsule_inner" file="../robots/DoubleLshape_capsule_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+   <robot name="capsule_outer" file="../robots/DoubleLshape_capsule_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+   <robot name="sphere_inner" file="../robots/DoubleLshape_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+   <robot name="sphere_outer" file="../robots/DoubleLshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <terrain name="doublelshape.tri" file="/home/aorthey/git/orthoklampt/data/terrains/DoubleLshape_large.tri" translation="0 0 0">
+  <terrain name="doublelshape.tri" file="../terrains/DoubleLshape_large.tri" translation="0 0 0">
      <display color="0.8 0.8 0.8 0.5" texture="checker" texture_projection="z"/> 
   </terrain>
-  <!-- <terrain name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/> -->
+  <!-- <terrain name="O1" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/> -->
 
   <plannerinput>
 

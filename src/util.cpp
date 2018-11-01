@@ -1,5 +1,7 @@
 #include "util.h"
 #include <KrisLibrary/utils/stringutils.h>
+#include <limits.h>
+#include <unistd.h>
 
 namespace util{
   void SetSimulatedRobot( Robot *robot, WorldSimulation &sim, const Config &q)
@@ -73,17 +75,19 @@ namespace util{
   }
   std::string GetApplicationFolder()
   {
-    //std::string name = getenv("USER");
-    std::string pwd = getenv("PWD");
-
-    //return "/home/"+name+"/git/orthoklampt/";
-    return pwd+"/../";
+    return GetExecPath()+"/../";
   }
+
   std::string GetDataFolder()
   {
-    using namespace boost::filesystem;
-    path cur = current_path();
-    return cur.string()+"/../data";
+    return GetExecPath()+"/../data";
+  }
+//https://stackoverflow.com/questions/143174/how-do-i-get-the-directory-that-a-program-is-running-from
+  std::string GetExecPath()
+  {
+    char result[ PATH_MAX ];
+    ssize_t count = readlink( "/proc/self/exe", result, PATH_MAX );
+    return std::string( result, (count > 0) ? count : 0 );
   }
   std::string GetFileBasename(const char *file)
   {

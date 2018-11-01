@@ -2,9 +2,9 @@
 
 <world>
 
-  <robot name="disk" file="/home/aorthey/git/orthoklampt/data/robots/cylinder_anti_voronoi_bias.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="disk" file="../robots/cylinder_anti_voronoi_bias.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <terrain name="O1" file="/home/aorthey/git/orthoklampt/data/terrains/2droom_anti_voronoi_bias.tri" translation="0 0 0" rotateRPY="0 0 1.57">
+  <terrain name="O1" file="../terrains/2droom_anti_voronoi_bias.tri" translation="0 0 0" rotateRPY="0 0 1.57">
      <display color="0.8 0.8 0.8 0.5" texture="checker" texture_projection="z"/>
   </terrain>
 

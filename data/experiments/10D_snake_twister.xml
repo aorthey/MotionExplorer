@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="snake" file="/home/aorthey/git/orthoklampt/data/robots/snake.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="snake_sphere_inner" file="/home/aorthey/git/orthoklampt/data/robots/snake_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="snake_sphere_outer" file="/home/aorthey/git/orthoklampt/data/robots/snake_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <rigidObject  name="twister/twister.tri" file="/home/aorthey/git/orthoklampt/data/terrains/twister/twister.tri" translation="0 0 0"/>
+  <robot name="snake" file="../robots/snake.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="snake_sphere_inner" file="../robots/snake_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="snake_sphere_outer" file="../robots/snake_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <rigidObject  name="twister/twister.tri" file="../terrains/twister/twister.tri" translation="0 0 0"/>
 
   <plannerinput>
 
