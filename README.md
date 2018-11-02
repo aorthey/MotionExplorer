@@ -27,6 +27,13 @@ The planners and settings are defined and can be modified in
 settings/planner.xml
 
 Current important keys:
+
+
+      [General Control]
+      Left Mouse Click: Move Camera
+      Shift+Left Mouse Click: Zoom In/Out
+      e: on/off show edges of objects
+      f: on/off show faces of objects
       h : help
 
       [before planning] 
