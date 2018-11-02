@@ -18,3 +18,25 @@
       cmake ..
       make -j10
       ./planner_hierarchy ../data/experiments/06D_doubleLshape.xml
+
+<h3>Use</h3>
+
+GUI uses hotkeys which are defined and can be modified in settings/gui.xml
+
+The planners and settings are defined and can be modified in
+settings/planner.xml
+
+Current important keys:
+      h : help
+
+      [before planning] 
+      t : switch to next planner
+      w : plan until solution found or timelimit reached
+      a : plan one step (needs to be supported by planner)
+      b : draw bounding box of sampling domain
+
+      [after planning] 
+      u : start/stop moving robot along found path (if any)
+      
+
+
