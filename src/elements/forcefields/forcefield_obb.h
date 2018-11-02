@@ -7,7 +7,7 @@ class OrientedBoundingBoxForceField: public ForceField{
     OrientedBoundingBoxForceField(double power, Math3D::Vector3 _center, Math3D::Vector3 _direction, Math3D::Vector3 _extension);
 
     virtual Math3D::Vector3 getForce(const Math3D::Vector3& position, const Math3D::Vector3& velocity) override;
-    virtual void print() override;
+    virtual void Print(std::ostream &out) const override;
     virtual ForceFieldTypes type() override;
     virtual void DrawGL(GUIState &state) override;
 

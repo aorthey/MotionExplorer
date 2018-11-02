@@ -24,8 +24,9 @@ Math3D::Vector3 RadialForceField::getForce(const Math3D::Vector3& position, cons
   return F;
 }
 
-void RadialForceField::print(){
-  std::cout << "RadialForceField  : source:" << source << " power: "<< power << " radius "<< maximum_radius << " color " << cForce << std::endl;
+void RadialForceField::Print(std::ostream &out) const
+{
+  out << "RadialForceField  : source:" << source << " power: "<< power << " radius "<< maximum_radius << " color " << cForce;
 }
 
 ForceFieldTypes RadialForceField::type(){

@@ -26,11 +26,13 @@ Math3D::Vector3 CylindricalForceField::getForce(const Math3D::Vector3& position,
   return F;
 }
 
-void CylindricalForceField::print(){
-  std::cout << "CylindricalForceField  : source:" << source << " direction: "<< direction;
-  std::cout << " elongation " << elongation << " radius " << maximum_radius;
-  std::cout << " power "<< power << " color " << cForce << std::endl;
+void CylindricalForceField::Print(std::ostream &out) const
+{
+  out << "CylindricalForceField  : source:" << source << " direction: "<< direction;
+  out << " elongation " << elongation << " radius " << maximum_radius;
+  out << " power "<< power << " color " << cForce;
 }
+
 ForceFieldTypes CylindricalForceField::type(){
   return CYLINDRICAL;
 }

@@ -6,7 +6,7 @@ class CylindricalForceField: public ForceField{
     CylindricalForceField(Math3D::Vector3 _source, Math3D::Vector3 _direction, double _elongation, double _radius, double _power);
 
     virtual Math3D::Vector3 getForce(const Math3D::Vector3& position, const Math3D::Vector3& velocity) override;
-    virtual void print() override;
+    virtual void Print(std::ostream &out) const override;
     virtual ForceFieldTypes type() override;
     virtual void DrawGL(GUIState &state) override;
 

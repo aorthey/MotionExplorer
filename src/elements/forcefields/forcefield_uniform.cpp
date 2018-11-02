@@ -8,9 +8,9 @@ Math3D::Vector3 UniformForceField::getForce(const Math3D::Vector3& position, con
 {
   return force;
 }
-void UniformForceField::print()
+void UniformForceField::Print(std::ostream &out) const
 {
-  std::cout << "UniformForceField : force " << force << std::endl;
+  out << "UniformForceField : force " << force;
 }
 ForceFieldTypes UniformForceField::type()
 {

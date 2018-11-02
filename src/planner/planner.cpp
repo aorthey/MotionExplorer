@@ -127,7 +127,7 @@ void MotionPlanner::CreateHierarchy()
       path.push_back(0);
     }
 
-    hierarchy->Print();
+    //std::cout << hierarchy.get() << std::endl;
   }else{
     //shallow algorithm (use last robot in hierarchy)
 

@@ -122,27 +122,27 @@ Print, which then can be overriden as usual.
 class Object
 {
   friend std::ostream& operator<< (std::ostream& out, const Object& obj);
-  virtual void Print(std::ostream &out);
+  virtual void Print(std::ostream &out) const;
 }
 class SubObject: Object
 {
-  virtual void Print(std::ostream &out) override;
+  virtual void Print(std::ostream &out) const override;
 }
 ``` 
 ``` c++
 //object.cpp
 std::ostream& operator<< (std::ostream& out, const Object& obj) 
 {
-  Print(out);
+  obj.Print(out);
   return out;
 }
-void Object::Print(std::ostream &out)
+void Object::Print(std::ostream &out) const
 {
   out << std::string(80, '-') << std::endl;
   out << "[Object] " << std::endl;
   out << std::string(80, '-') << std::endl;
 }
-void SubObject::Print(std::ostream &out)
+void SubObject::Print(std::ostream &out) const
 {
   out << std::string(80, '-') << std::endl;
   out << "[SubObject] " << std::endl;

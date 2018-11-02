@@ -19,9 +19,9 @@ Math3D::Vector3 UniformRandomForceField::getForce(const Math3D::Vector3& positio
   return F;
 }
 
-void UniformRandomForceField::print()
+void UniformRandomForceField::Print(std::ostream &out) const
 {
-  std::cout << "UniformRandomForceField  : minforce "<<minforce << " maxforce " << maxforce << std::endl;
+  out << "UniformRandomForceField  : minforce "<<minforce << " maxforce " << maxforce;
 }
 ForceFieldTypes UniformRandomForceField::type(){
   return UNIFORM_RANDOM;
@@ -44,9 +44,9 @@ Math3D::Vector3 GaussianRandomForceField::getForce(const Math3D::Vector3& positi
   return F;
 }
 
-void GaussianRandomForceField::print()
+void GaussianRandomForceField::Print(std::ostream& out) const
 {
-  std::cout << "GaussianRandomForceField  : mean "<< mean << " stddev " << stddeviation << std::endl;
+  out << "GaussianRandomForceField  : mean "<< mean << " stddev " << stddeviation;
 }
 ForceFieldTypes GaussianRandomForceField::type()
 {

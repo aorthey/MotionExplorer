@@ -70,7 +70,7 @@ class WrenchField{
     Math3D::Vector3 getCOMTorque();
     Math3D::Vector3 getCOMPosition();
 
-    void print();
     void DrawGL(GUIState &state);
+    friend std::ostream& operator<< (std::ostream& out, const WrenchField& wf);
 };
 

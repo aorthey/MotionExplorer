@@ -1,6 +1,7 @@
 #include <KrisLibrary/GLdraw/GLColor.h>
 #include "file_io.h"
 #include "wrench_field.h"
+#include "elements/forcefields/forcefield_drag.h"
 #include "elements/forcefields/forcefield_uniform.h"
 #include "elements/forcefields/forcefield_radial.h"
 #include "elements/forcefields/forcefield_random.h"
@@ -280,13 +281,14 @@ void WrenchField::DrawGL(GUIState &state)
     forcefields.at(k)->DrawGL(state);
   }
 }
-void WrenchField::print(){
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Force Fields" << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
-  for(uint i = 0; i < forcefields.size(); i++){
-    forcefields.at(i)->print();
+std::ostream& operator<< (std::ostream& out, const WrenchField& wf) 
+{
+  out << std::string(80, '-') << std::endl;
+  out << "Force Fields" << std::endl;
+  out << std::string(80, '-') << std::endl;
+  for(uint i = 0; i < wf.forcefields.size(); i++){
+    out << *wf.forcefields.at(i) << std::endl;
   }
-  std::cout << std::string(80, '-') << std::endl;
-
+  out << std::string(80, '-') << std::endl;
+  return out;
 }

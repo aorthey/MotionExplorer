@@ -60,9 +60,11 @@ Math3D::Vector3 OrientedBoundingBoxForceField::getForce(const Math3D::Vector3& p
   }
 }
 
-void OrientedBoundingBoxForceField::print(){
-  std::cout << "OrientedBoundingBoxForceField : force " << force  << " center " << center << " extension " << extension << std::endl;
+void OrientedBoundingBoxForceField::Print(std::ostream &out) const
+{
+  out << "OrientedBoundingBoxForceField : force " << force  << " center " << center << " extension " << extension;
 }
+
 double OrientedBoundingBoxForceField::GetPower(){
   return power;
 }
