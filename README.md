@@ -9,7 +9,24 @@
 </ul>
 
 
-  sudo apt-get install g++-5 libboost1.55-all-dev libeigen3-dev
+Ubuntu 16.04
+sudo apt-get install g++-5 libboost1.55-all-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev
+Ubuntu 18.04
+sudo apt-get install g++-5 libboost1.65-all-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev libqhull-dev
+
+<h3>Install Klampt</h3>
+      sudo apt-get install g++ cmake git libboost-system-dev libboost-thread-dev freeglut3 freeglut3-dev libglpk-dev python-dev python-opengl libxmu-dev libxi-dev libqt4-dev
+      git clone git@github.com:aorthey/Klampt.git
+      cd Klampt/Library
+      make unpack-deps
+      rm -rf KrisLibrary
+      git clone git@github.com:aorthey/KrisLibrary.git
+      make deps
+      cd ..
+      cmake .
+      make
+
+
 
 <h3>Install</h3>
 
@@ -30,8 +47,9 @@ Current important keys:
 
 
       [General Control]
-      Left Mouse Click: Move Camera
-      Shift+Left Mouse Click: Zoom In/Out
+      Left Mouse Click: Move Camera around Focal Point
+      Ctrl + Left Mouse Click: Move Focal Point
+      Shift + Left Mouse Click: Zoom In/Out from Focal Point
       e: on/off show edges of objects
       f: on/off show faces of objects
       h : help
