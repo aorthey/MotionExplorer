@@ -321,6 +321,7 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
 bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
 
+  std::cout << "ForceFieldBackend: " << cmd << std::endl;
   if(cmd=="advance"){
     SimStep(sim.simStep);
   }else if(cmd=="simulate"){
@@ -412,9 +413,14 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="print_robot_info"){
     Info info;
     info(world->robots[0]);
-  }else if(state.IsToggleable(cmd.c_str())){
-    state.toggle(cmd);
-  }else return BaseT::OnCommand(cmd,args);
+  }else{
+    bool base_result = BaseT::OnCommand(cmd,args);
+    if(!base_result){
+      if(state.IsToggleable(cmd.c_str())){
+        state.toggle(cmd);
+      }
+    }
+  }
 
   SendRefresh();
   return true;

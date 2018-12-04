@@ -142,9 +142,7 @@ std::vector<QuotientCover::Configuration*> QNGGoalDirected::GenerateCandidateDir
 
   const double radius_from = q_from->GetRadius();
   Interpolate(q_from, q_next, q_proj);
-  std::cout << "proj is on boundary" << std::endl;
   if(verbose>2) CheckConfigurationIsOnBoundary(q_proj, q_from);
-  std::cout << "yes" << std::endl;
   q_proj->parent_neighbor = q_from;
 
   if(!ComputeNeighborhood(q_proj)) return q_children;
@@ -154,7 +152,6 @@ std::vector<QuotientCover::Configuration*> QNGGoalDirected::GenerateCandidateDir
     q_children.push_back(q_proj);
     return q_children;
   }
-  std::cout << std::string(80, '-') << std::endl;
 
   //############################################################################
   //Case(2): Next projected is smaller. Try continuing in the direction of
@@ -176,7 +173,6 @@ std::vector<QuotientCover::Configuration*> QNGGoalDirected::GenerateCandidateDir
     // QuotientCover::Print(q_from->parent_neighbor, false);
     //############################################################################
 
-    std::cout << "momentum is on boundary" << std::endl;
     if(verbose>2) CheckConfigurationIsOnBoundary(q_momentum, q_from);
     q_momentum->parent_neighbor = q_from;
     //############################################################################
@@ -195,7 +191,6 @@ std::vector<QuotientCover::Configuration*> QNGGoalDirected::GenerateCandidateDir
     }
   }
 
-  std::cout << std::string(80, '-') << std::endl;
   //############################################################################
   //Case(3): Neither proj nor momentum configuration are better. Try random
   //sampling

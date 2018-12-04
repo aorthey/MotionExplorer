@@ -109,7 +109,8 @@ MESSAGE("-------------------------------------")
 
 #SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall -Werror" )
 #SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wdeprecated-declarations -std=c++11 -g -Wall -Werror -O3 -fmax-errors=10" )
-SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wdeprecated-declarations -std=c++11 -g -Wall -Werror -O3 -fmax-errors=10" )
+#SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wdeprecated-declarations -std=c++11 -g -Wall -Werror -O3 -fmax-errors=10" )
+SET( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wdeprecated-declarations -std=c++11 -g -O3 -fmax-errors=10" )
 MESSAGE("Compilers: ${CMAKE_CXX_COMPILER} ${CMAKE_C_COMPILER}")
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"

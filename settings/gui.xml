@@ -278,6 +278,14 @@
     <key>z</key>
     <active>0</active>
   </hotkey>
+  <hotkey>
+    <name>load_view</name>
+    <key>v</key>
+  </hotkey>
+  <hotkey>
+    <name>save_view</name>
+    <key>V</key>
+  </hotkey>
 
   <!-- <hotkey> -->
   <!--   <name>next_mode</name> -->

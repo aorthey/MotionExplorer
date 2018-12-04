@@ -2,6 +2,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/subgraph.hpp>
 #include <boost/foreach.hpp>
+#include <iostream>
 
 /// adventures using bundled properties with subgraphs. works only for vertices
 //so far. Tried to apply patches #10709 and #10708 from boost bugtracking:

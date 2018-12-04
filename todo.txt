@@ -616,3 +616,8 @@ Think about strategy to expand on cover. Certainly different from free space?
 [ ] why is the step too long (do we add any states in between --- yes, but
 projection onto NBH seems to go wrong)
 [ ] smoothed path is not displayed (but the original one)
+[ ] remove Lemon Librarz
+
+
+Expand as long as making progress (into certain direction) -> disrupt if
+progress towards goal can be made
