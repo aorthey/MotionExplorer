@@ -132,7 +132,7 @@ bool PlannerInput::Load(TiXmlElement *node)
       layer.level = level++;
       layer.inner_index = GetAttribute<int>(lindex, "inner_index");
       layer.outer_index = GetAttributeDefault<int>(lindex, "outer_index", layer.inner_index);
-      layer.cspace_constant = GetAttribute<double>(lindex, "cspace_constant");
+      layer.cspace_constant = GetAttributeDefault<double>(lindex, "cspace_constant", 0);
 
       layer.type = GetAttribute<std::string>(lindex, "type");
 

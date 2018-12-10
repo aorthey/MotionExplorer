@@ -7,23 +7,15 @@
   <robot name="sphere_inner" file="../robots/Xshape_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
   <robot name="sphere_outer" file="../robots/Xshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <!-- 
-  <rigidObject name="O1" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
-  <rigidObject name="O1" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="LshapedTerrain" file="../terrains/Lshape.tri" translation="0 0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="O1" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 0"/>
-   -->
-
-  <!-- <terrain name="LshapedTerrain1" file="../terrains/Lshape_top.tri" translation="0 0 0" rotateRPY="0 0 0"/> -->
-  <!-- <terrain name="LshapedTerrain2" file="../terrains/Lshape_bottom.tri" translation="0 0 -0.1" rotateRPY="0 0 0"/> -->
   <terrain  name="cubes" file="../terrains/Lshape2.tri" translation="0 0 -0.1" rotateRPY="0 0 0"/>
+
 
   <plannerinput>
     <qinit config="10  +3.5 +0.0 +1.5 -2.00 +0.6 +0.3 0 0 0 0"/>
     <qgoal config="10  -3.5 -2.5 +1.0 +1.57 +0.0 +0.0 0 0 0 0 "/>
 
-    <se3max config="6  +8.0 +8.0 +8.0 +3.141593 +1.57 +3.141593"/>
     <se3min config="6  -8.0 -8.0 -8.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +8.0 +8.0 +8.0 +3.141593 +1.57 +3.141593"/>
 
     <freeFloating>1</freeFloating>
     <maxplanningtime>0.5</maxplanningtime>

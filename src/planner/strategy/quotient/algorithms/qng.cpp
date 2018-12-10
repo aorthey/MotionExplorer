@@ -76,9 +76,7 @@ std::vector<QNG::Configuration*> QNG::ExpandNeighborhood(Configuration *q_curren
 
           Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.5*radius_current);
 
-          std::cout << "interpolate qng q_k" << std::endl;
           Interpolate(q_current, q_k);
-          std::cout << "done interpolate qng q_k" << std::endl;
           if(verbose>2) CheckConfigurationIsOnBoundary(q_k, q_current);
 
           if(ComputeNeighborhood(q_k))

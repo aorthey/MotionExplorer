@@ -8,26 +8,24 @@
 
 <world>
 
-   <robot name="Lshape" file="../robots/DoubleLshape.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+   <robot name="DoubleLshape" file="../robots/DoubleLshape.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
    <robot name="capsule_inner" file="../robots/DoubleLshape_capsule_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
    <robot name="capsule_outer" file="../robots/DoubleLshape_capsule_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
    <robot name="sphere_inner" file="../robots/DoubleLshape_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
    <robot name="sphere_outer" file="../robots/DoubleLshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <terrain name="doublelshape.tri" file="../terrains/DoubleLshape_large.tri" translation="0 0 0">
-     <display color="0.8 0.8 0.8 0.5" texture="checker" texture_projection="z"/> 
-  </terrain>
+   <terrain name="doublelshape.tri" file="../terrains/DoubleLshape_large.tri" translation="0 0 0"/>
   <!-- <terrain name="O1" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/> -->
 
   <plannerinput>
-
     <qinit config="9  +3.00 +0.90 +0.00 -2.0 0.6 0.3 0 0 0"/>
     <qgoal config="9  -3.00 -1.00 +0.45 -0.8 -0.6 0 0 0 0"/>
-    <!-- <qinit config="9  3 0 0 -2.0 0.6 0.3 0 0 0"/> -->
-    <!-- <qgoal config="9  -3 -1 0.45 -0.8 -0.6 0 0 0 0"/> -->
+
     <se3min config="6  -6 -10 -10 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +6 +10 +10 +3.141593 +1.57 +3.141593"/>
+
     <freeFloating>1</freeFloating>
+    <maxplanningtime>0.5</maxplanningtime>
 
     <hierarchy>
       <level inner_index="3" outer_index="4" cspace_constant="1" type="R3"/>

@@ -30,51 +30,40 @@ void QNGGoalDirected::clear()
 
   BaseT::clear();
 }
+void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
+{
+  if(progressMadeTowardsGoal){
+    progressMadeTowardsGoal = ExpandTowardsGoal(ptc);
+  }else{
+    double r = rng_.uniform01();
+    if(r <= goalDirectionBias){
+      //Check occasionally if we can break through towards the goal
+      progressMadeTowardsGoal = ExpandTowardsGoal(ptc);
+    }else{
+      ExpandTowardsFreeSpace(ptc);
+      //ExpandTowardsFreeSpaceVoronoiBias(ptc);
+    }
+  }
+}
+void QNGGoalDirected::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
+{
+  double r = rng_.uniform01();
+  if(r <= rewireBias){
+    RewireCover(ptc);
+  }else{
+    ExpandTowardsFreeSpace(ptc);
+  }
+}
 
 void QNGGoalDirected::Grow(double t)
 {
-  //############################################################################
-  //QNGGoalDirected: Two phase expansion planner
-  //############################################################################
   if(saturated) return;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
 
-  //############################################################################
-  //Phase1: No Solution has been found
-  //############################################################################
-  //Principle1: As long as we make progress, move towards the goal.
-  //
-  //The rational here is that whenever we can 'see' the
-  //goal, then we should move straight towards it. But whenever we are lost, we
-  //should expand quickly to capture the free space. The expansion towards free
-  //space biases the search towards larger neighborhoods, which is a modified
-  //voronoi bias, but restricted to the free space only.
-  //
-  //############################################################################
-  //Phase2: Solution Found
-  //############################################################################
-  //
-  //strategy: Expand towards free space only. 
-
   if(!hasSolution){
-    if(progressMadeTowardsGoal){
-      progressMadeTowardsGoal = ExpandTowardsGoal(ptc);
-    }else{
-      double r = rng_.uniform01();
-      if(r <= goalDirectionBias){
-        progressMadeTowardsGoal = ExpandTowardsGoal(ptc);
-      }else{
-        //ExpandTowardsFreeSpace(ptc);
-        ExpandTowardsFreeSpaceVoronoiBias(ptc);
-      }
-    }
+    GrowWithoutSolution(ptc);
   }else{
-    double r = rng_.uniform01();
-    if(r <= rewireBias){
-      RewireCover(ptc);
-    }else{
-      ExpandTowardsFreeSpace(ptc);
-    }
+    GrowWithSolution(ptc);
   }
 }
 
@@ -90,10 +79,10 @@ bool QNGGoalDirected::ExpandTowardsGoal(ob::PlannerTerminationCondition &ptc)
   }
   return StepTowards(q_nearest, q_goal);
 }
+
 //Create a bunch of children configurations into the direction of q_next. then
 //choose the child with the largest neighborhood and add it. The remaining
 //children are added to the priority queue for later extensions
-
 bool QNGGoalDirected::StepTowards(Configuration *q_from, Configuration *q_next)
 {
   std::vector<Configuration*> q_children = GenerateCandidateDirections(q_from, q_next);
@@ -240,8 +229,6 @@ void QNGGoalDirected::ExpandTowardsFreeSpace(ob::PlannerTerminationCondition &pt
 {
   if(priority_configurations.empty()){
     //try random directions
-    //saturated = true;
-    if(verbose>0) std::cout << "Space got saturated." << std::endl;
     Configuration *q_random = SampleCoverBoundaryValid(ptc);
     if(q_random == nullptr) return;
     priority_configurations.push(q_random);
@@ -255,9 +242,7 @@ void QNGGoalDirected::ExpandTowardsFreeSpace(ob::PlannerTerminationCondition &pt
     return;
   }
   AddConfigurationToCover(q);
-
   if(verbose>0) QuotientCover::Print(q);
-
 
   std::vector<Configuration*> q_children = ExpandNeighborhood(q, NUMBER_OF_EXPANSION_SAMPLES);
 

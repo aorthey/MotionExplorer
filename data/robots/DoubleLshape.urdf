@@ -38,12 +38,6 @@
   </collision>
  </link>
 
-<joint name="joint_l1_l2" type="fixed">
-  <origin rpy="0 0 0" xyz="0 0 0"/>
-  <parent link="link1"/>
-  <child link="link2"/>
-</joint>
-
  <link name="link3">
   <inertial>
     <mass value="1"/>
@@ -63,12 +57,6 @@
   </collision>
  </link>
 
-<joint name="joint_l1_l3" type="fixed">
-  <origin rpy="0 0 0" xyz="0 0 0"/>
-  <parent link="link1"/>
-  <child link="link3"/>
-</joint>
-
  <link name="link4">
   <inertial>
     <mass value="1"/>
@@ -87,6 +75,18 @@
     </geometry>
   </collision>
  </link>
+
+<joint name="joint_l1_l2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="link1"/>
+  <child link="link2"/>
+</joint>
+
+<joint name="joint_l1_l3" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="link1"/>
+  <child link="link3"/>
+</joint>
 
 <joint name="joint_l3_l4" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>

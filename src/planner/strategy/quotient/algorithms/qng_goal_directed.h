@@ -12,7 +12,7 @@ namespace ompl
     class QNGGoalDirected: public og::QNG
     {
       typedef og::QNG BaseT;
-      const int verbose{3};
+      const int verbose{0};
     public:
 
       QNGGoalDirected(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
@@ -21,9 +21,11 @@ namespace ompl
       void clear() override;
       void setup() override;
       virtual void Grow(double t) override;
-
+      void GrowWithSolution(ob::PlannerTerminationCondition &ptc);
+      void GrowWithoutSolution(ob::PlannerTerminationCondition &ptc);
       bool ExpandTowardsGoal(ob::PlannerTerminationCondition &ptc);
       void ExpandTowardsFreeSpace(ob::PlannerTerminationCondition &ptc);
+
       void RewireCover(ob::PlannerTerminationCondition &ptc);
 
       bool ConfigurationHasNeighborhoodLargerThan(Configuration *q, double radius);
@@ -39,7 +41,7 @@ namespace ompl
       //TODO: remove adaptive goal bias, replace by percentage of checking while
       //not progressMade=false
 
-      const double goalDirectionBias{0.1}; //when not making progress, how often should we check if progress can be made?
+      const double goalDirectionBias{0.05}; //when not making progress, how often should we check if progress can be made?
       const double thresholdObstaclesHorizon{0.5}; //if moving towards a configuration, do not repell this movement while above obstaclesHorizon. If below, repell to steer robot away from obstacles.
       const double rewireBias{0.2}; //when solution has been found, this bias increases connectivity
       bool progressMadeTowardsGoal{true};

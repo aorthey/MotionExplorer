@@ -50,6 +50,7 @@ namespace ompl
       };
       typedef std::priority_queue<Configuration*, std::vector<Configuration*>, CmpConfigurationPtrs> ConfigurationPriorityQueue;
       ConfigurationPriorityQueue priority_configurations;
+
     public:
       const ConfigurationPriorityQueue& GetPriorityQueue();
     };

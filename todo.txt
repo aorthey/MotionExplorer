@@ -621,3 +621,17 @@ projection onto NBH seems to go wrong)
 
 Expand as long as making progress (into certain direction) -> disrupt if
 progress towards goal can be made
+
+
+
+-- Do not smooth several times
+-- seems to work well on QS. But on CS, the steps are too small. Exploration not
+fast enough, we often get stuck. Why?
+-- It seems that we do not sample on the boundary. Or the boundary is wrongly
+visualized.
+
+[ ] Not exactly on Boundary!
+[ ] We iterate too far into the smallest ball
+[ ] There seems not to be a good alternative strategy once we see that there is
+no move towards the goal. We somehow get stuck exploring all the alternative
+routes of mediocre balls. (Instead of going towards a larger unexplored area)

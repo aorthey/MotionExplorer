@@ -324,7 +324,6 @@ namespace ompl
       const NearestNeighborsPtr& GetNearestNeighborsCover() const;
       const NearestNeighborsPtr& GetNearestNeighborsVertex() const;
 
-
       double GetGoalBias() const;
       virtual void Print(std::ostream& out) const override;
       void Print(const Configuration *q, bool stopOnError=true) const;

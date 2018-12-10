@@ -813,6 +813,7 @@ void Quotient::Print(std::ostream& out) const
        }
     }
   }
+  out << " [Importance:" << GetImportance() << "]";
 }
 
 namespace ompl{

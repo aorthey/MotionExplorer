@@ -33,7 +33,6 @@ void PlannerBackend::Start(){
 
 bool PlannerBackend::OnCommand(const string& cmd,const string& args){
 
-  std::cout << "PlannerBackend: " << cmd << std::endl;
   if(planners.empty()) return BaseT::OnCommand(cmd, args);
 
   stringstream ss(args);

@@ -98,7 +98,7 @@ f = open(fname,'w')
 f.write('<?xml version="1.0"?>\n')
 f.write('<robot name="'+robot_name+'">\n')
 
-Njoints = 6+numberLegs*7
+Njoints = 6+2+numberLegs*7
 
 config = "config=\""+str(Njoints)+" "+" 0"*Njoints+"\""
 print config
@@ -152,8 +152,8 @@ forcestr += '  </forcefield>\n\n'
 f.write(forcestr)
 
 plannersettingsstr  = '  <plannersettings>\n\n'
-plannersettingsstr += '    <qinit config="'+str(Njoints)+'  -1 0 4'+(Njoints-3)*" 0"+'"/>\n'
-plannersettingsstr += '    <qgoal config="'+str(Njoints)+'  2 0 4'+(Njoints-3)*" 0"+'"/>\n'
+plannersettingsstr += '    <qinit config="'+str(Njoints)+'  -1 0 4 0 0 0'+(Njoints-6)*" 0"+'"/>\n'
+plannersettingsstr += '    <qgoal config="'+str(Njoints)+'  2 0 4 0 0 0'+(Njoints-6)*" 0"+'"/>\n'
 plannersettingsstr += '    <se3min config="6  -6 -6 -1 -3.141592 -1.57 -3.14"/>\n'
 plannersettingsstr += '    <se3max config="6  6 6 16 3.141592 1.57 3.14"/>\n\n'
 plannersettingsstr += '  </plannersettings>\n\n'

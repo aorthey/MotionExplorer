@@ -321,7 +321,6 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
 bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
 
-  std::cout << "ForceFieldBackend: " << cmd << std::endl;
   if(cmd=="advance"){
     SimStep(sim.simStep);
   }else if(cmd=="simulate"){
