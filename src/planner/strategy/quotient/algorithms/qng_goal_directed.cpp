@@ -3,6 +3,9 @@
 
 using namespace ompl::geometric;
 
+//############################################################################
+// Setup
+//############################################################################
 QNGGoalDirected::QNGGoalDirected(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
   setName("QNGGoalDirected"+std::to_string(id));
@@ -30,31 +33,11 @@ void QNGGoalDirected::clear()
 
   BaseT::clear();
 }
-void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
-{
-  if(progressMadeTowardsGoal){
-    progressMadeTowardsGoal = ExpandTowardsGoal(ptc);
-  }else{
-    double r = rng_.uniform01();
-    if(r <= goalDirectionBias){
-      //Check occasionally if we can break through towards the goal
-      progressMadeTowardsGoal = ExpandTowardsGoal(ptc);
-    }else{
-      ExpandTowardsFreeSpace(ptc);
-      //ExpandTowardsFreeSpaceVoronoiBias(ptc);
-    }
-  }
-}
-void QNGGoalDirected::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
-{
-  double r = rng_.uniform01();
-  if(r <= rewireBias){
-    RewireCover(ptc);
-  }else{
-    ExpandTowardsFreeSpace(ptc);
-  }
-}
 
+
+//############################################################################
+// Grow Functions
+//############################################################################
 void QNGGoalDirected::Grow(double t)
 {
   if(saturated) return;
@@ -67,7 +50,28 @@ void QNGGoalDirected::Grow(double t)
   }
 }
 
-bool QNGGoalDirected::ExpandTowardsGoal(ob::PlannerTerminationCondition &ptc)
+void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
+{
+  if(progressMadeTowardsGoal){
+    progressMadeTowardsGoal = StepTowardsGoal(ptc);
+  }else{
+    StepTowardsFreeSpace(ptc);
+  }
+}
+void QNGGoalDirected::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
+{
+  double r = rng_.uniform01();
+  if(r <= rewireBias){
+    RewireCover(ptc);
+  }else{
+    StepTowardsFreeSpace(ptc);
+  }
+}
+
+//############################################################################
+// Step Functions
+//############################################################################
+bool QNGGoalDirected::StepTowardsGoal(ob::PlannerTerminationCondition &ptc)
 {
   //is it possible that we add here a state with zero-measure NBH? (No, but
   //should be refactored)
@@ -79,6 +83,61 @@ bool QNGGoalDirected::ExpandTowardsGoal(ob::PlannerTerminationCondition &ptc)
   }
   return StepTowards(q_nearest, q_goal);
 }
+
+void QNGGoalDirected::StepTowardsFreeSpace(ob::PlannerTerminationCondition &ptc)
+{
+  if(priority_configurations.empty()){
+    //try random directions
+    Configuration *q_random = SampleCoverBoundaryValid(ptc);
+    if(q_random == nullptr) return;
+    priority_configurations.push(q_random);
+  }
+
+  Configuration *q = priority_configurations.top();
+  priority_configurations.pop();
+  if(IsConfigurationInsideCover(q)){
+    q->Remove(Q1);
+    q=nullptr;
+    return;
+  }
+  AddConfigurationToCover(q);
+  if(verbose>0) QuotientCover::Print(q);
+
+  std::vector<Configuration*> q_children = ExpandNeighborhood(q, NUMBER_OF_EXPANSION_SAMPLES);
+
+  for(uint k = 0; k < q_children.size(); k++)
+  {
+    priority_configurations.push(q_children.at(k));
+  }
+  //add different biases to remove planner from getting stuck
+  Configuration *q_random = QuotientCover::SampleCoverBoundary("voronoi");
+  if(ComputeNeighborhood(q_random)){
+    priority_configurations.push(q_random);
+  }
+}
+
+void QNGGoalDirected::StepTowardsFreeSpaceVoronoiBias(const ob::PlannerTerminationCondition &ptc)
+{
+  //Sample Random Configuration on underlying cover
+  Configuration *q_random = QuotientCover::SampleCoverBoundary("voronoi");
+  //do not compute neighborhood
+
+  terminated = false;
+  base::PlannerTerminationCondition ptcOrConfigurationReached([this, &ptc]
+                                 { return ptc || terminated; });
+
+  //should have coset, but zero-measure neighborhood
+  while(!ptc()){
+    Configuration *q_nearest = Nearest(q_random);
+    if(DistanceNeighborhoodNeighborhood(q_nearest, q_random) < 1e-10)
+    {
+      terminated = true;
+    }else{
+      terminated = !StepTowards(q_nearest, q_random);
+    }
+  }
+}
+
 
 //Create a bunch of children configurations into the direction of q_next. then
 //choose the child with the largest neighborhood and add it. The remaining
@@ -224,61 +283,9 @@ std::vector<QuotientCover::Configuration*> QNGGoalDirected::GenerateCandidateDir
   return q_children;
 }
 
-
-void QNGGoalDirected::ExpandTowardsFreeSpace(ob::PlannerTerminationCondition &ptc)
-{
-  if(priority_configurations.empty()){
-    //try random directions
-    Configuration *q_random = SampleCoverBoundaryValid(ptc);
-    if(q_random == nullptr) return;
-    priority_configurations.push(q_random);
-  }
-
-  Configuration *q = priority_configurations.top();
-  priority_configurations.pop();
-  if(IsConfigurationInsideCover(q)){
-    q->Remove(Q1);
-    q=nullptr;
-    return;
-  }
-  AddConfigurationToCover(q);
-  if(verbose>0) QuotientCover::Print(q);
-
-  std::vector<Configuration*> q_children = ExpandNeighborhood(q, NUMBER_OF_EXPANSION_SAMPLES);
-
-  for(uint k = 0; k < q_children.size(); k++)
-  {
-    priority_configurations.push(q_children.at(k));
-  }
-  //add different biases to remove planner from getting stuck
-  Configuration *q_random = QuotientCover::SampleCoverBoundary("voronoi");
-  if(ComputeNeighborhood(q_random)){
-    priority_configurations.push(q_random);
-  }
-}
-
-void QNGGoalDirected::ExpandTowardsFreeSpaceVoronoiBias(const ob::PlannerTerminationCondition &ptc)
-{
-  //Sample Random Configuration on underlying cover
-  Configuration *q_random = QuotientCover::SampleCoverBoundary("voronoi");
-  //do not compute neighborhood
-
-  terminated = false;
-  base::PlannerTerminationCondition ptcOrConfigurationReached([this, &ptc]
-                                 { return ptc || terminated; });
-
-  //should have coset, but zero-measure neighborhood
-  while(!ptc()){
-    Configuration *q_nearest = Nearest(q_random);
-    if(DistanceNeighborhoodNeighborhood(q_nearest, q_random) < 1e-10)
-    {
-      terminated = true;
-    }else{
-      terminated = !StepTowards(q_nearest, q_random);
-    }
-  }
-
-}
+//############################################################################
+// Misc Functions
+//############################################################################
 
 double QNGGoalDirected::GetImportance() const
 {
@@ -308,7 +315,17 @@ QuotientCover::Vertex QNGGoalDirected::AddConfigurationToCover(Configuration *q)
   PDF_Element *q_element = pdf_connectivity_configurations.add(q, ValueConnectivity(q));
   q->SetConnectivityPDFElement(q_element);
 
+  Configuration *q_nearest = nullptr;
+  if(!configurations_sorted_by_nearest_to_goal.empty()){
+    q_nearest = configurations_sorted_by_nearest_to_goal.top();
+  }
+
   configurations_sorted_by_nearest_to_goal.push(q);
+  if(q_nearest != configurations_sorted_by_nearest_to_goal.top()){
+    //change in nearest towards goal. This should trigger the step towards goal
+    //method. This removes the goalBias
+    progressMadeTowardsGoal = true;
+  }
 
   return v;
 }
