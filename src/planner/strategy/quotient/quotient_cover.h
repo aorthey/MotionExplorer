@@ -189,6 +189,7 @@ namespace ompl
       typedef std::shared_ptr<NearestNeighbors<Configuration*>> NearestNeighborsPtr;
       typedef ompl::PDF<Configuration*> PDF;
       typedef PDF::Element PDF_Element;
+
       
       //keep manual track of indices, because we sometimes need to remove
       //vertices
@@ -208,7 +209,8 @@ namespace ompl
       //#######################################################################
       Configuration* CreateConfigurationFromStateAndCoset(const ob::State *state, Configuration *q_coset);
       virtual Vertex AddConfigurationToCover(Configuration *q);
-      Vertex AddConfigurationToCoverWithoutAddingEdges(Configuration *q);
+      virtual Vertex AddConfigurationToCoverGraph(Configuration *q);
+      void RerouteEdgesFromTo(Configuration *q_from, Configuration *q_to);
 
       void RemoveConfigurationFromCover(Configuration *q);
       void AddEdge(Configuration *q_from, Configuration *q_to);
@@ -260,7 +262,7 @@ namespace ompl
       //#######################################################################
       void Connect(const Configuration*, const Configuration*, Configuration*);
       //void Connect(const Configuration*, const Configuration*);
-      void Grow(double t) override;
+      virtual void Grow(double t) override = 0;
       bool GetSolution(ob::PathPtr &solution) override;
 
       virtual double GetImportance() const override;
@@ -273,9 +275,9 @@ namespace ompl
       //Neighborhood Set Computations
       //#######################################################################
       bool IsConfigurationInsideNeighborhood(Configuration *q, Configuration *qn);
+      std::vector<Configuration*> GetIntersectingNeighborhoodConfigurations(Configuration *q);
 
       std::vector<Configuration*> GetConfigurationsInsideNeighborhood(Configuration *q);
-      std::vector<Configuration*> GetConfigurationsIntersectingNeighborhood(Configuration *q);
 
       bool IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rhs);
       void GetCosetFromQuotientSpace(Configuration *q);
@@ -298,7 +300,7 @@ namespace ompl
       bool saturated{false}; //if space is saturated, then we the whole free space has been found
 
       Graph graph;
-      NearestNeighborsPtr nearest_cover{nullptr};
+      NearestNeighborsPtr nearest_neighborhood{nullptr};
       NearestNeighborsPtr nearest_vertex{nullptr};
       Configuration *q_start{nullptr};
       Configuration *q_goal{nullptr};
@@ -319,7 +321,7 @@ namespace ompl
       const NearestNeighborsPtr& GetNearestNeighborsVertex() const;
 
       virtual void Print(std::ostream& out) const override;
-      void Print(const Configuration *q, bool stopOnError=true) const;
+      virtual void Print(const Configuration *q, bool stopOnError=true) const;
 
     };
   }

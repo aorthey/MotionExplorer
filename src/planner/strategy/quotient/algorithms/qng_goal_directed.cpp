@@ -51,9 +51,9 @@ void QNGGoalDirected::Grow(double t)
     //GrowWithSolution(ptc);
   }
   int M = boost::num_edges(graph);
-  if( abs(N-M) > 10 ){
+  if( abs(N-M) > 100 ){
     std::cout << "increase of edges from " << N << " to " << M << std::endl;
-    exit(0);
+    //exit(0);
   }
 }
 
@@ -158,8 +158,7 @@ std::vector<QuotientCover::Configuration*> QNGGoalDirected::GenerateCandidateDir
   Configuration *q_proj = new Configuration(Q1);
 
   const double radius_from = q_from->GetRadius();
-  Interpolate(q_from, q_next, q_proj);
-  if(verbose>2) CheckConfigurationIsOnBoundary(q_proj, q_from);
+  Connect(q_from, q_next, q_proj);
   q_proj->parent_neighbor = q_from;
 
   if(!ComputeNeighborhood(q_proj)) return q_children;
@@ -183,14 +182,7 @@ std::vector<QuotientCover::Configuration*> QNGGoalDirected::GenerateCandidateDir
     double step = (radius_from+radius_parent)/radius_parent;
     Interpolate(q_from->parent_neighbor, q_from, step, q_momentum);
 
-  // std::cout << "dist parent to from: " << DistanceConfigurationConfiguration(q_from->parent_neighbor, q_from) << std::endl;
-    // std::cout << "radius parent NBH:" << radius_parent << std::endl;
-    // std::cout << "radius from NBH:" << radius_from << std::endl;
-    // std::cout << "step:" << step << std::endl;
-    // QuotientCover::Print(q_from->parent_neighbor, false);
-    //############################################################################
-
-    if(verbose>2) CheckConfigurationIsOnBoundary(q_momentum, q_from);
+    //CheckConfigurationIsOnBoundary(q_momentum, q_from);
     q_momentum->parent_neighbor = q_from;
     //############################################################################
 
@@ -286,7 +278,7 @@ void QNGGoalDirected::RewireCover(ob::PlannerTerminationCondition &ptc)
   std::vector<Configuration*> neighbors;
   Vertex v = get(indexToVertex, q->index);
   uint K = boost::degree(v, graph)+1;
-  nearest_cover->nearestK(q, K, neighbors);
+  nearest_neighborhood->nearestK(q, K, neighbors);
 
   if(neighbors.size()>=K){
     Configuration *qn = neighbors.at(K-1);
@@ -301,7 +293,7 @@ void QNGGoalDirected::RewireCover(ob::PlannerTerminationCondition &ptc)
 
 QuotientCover::Vertex QNGGoalDirected::AddConfigurationToCover(Configuration *q)
 {
-  QuotientCover::Vertex v = BaseT::AddConfigurationToCoverWithoutAddingEdges(q);
+  QuotientCover::Vertex v = BaseT::AddConfigurationToCover(q);
 
   PDF_Element *q_element = pdf_connectivity_configurations.add(q, ValueConnectivity(q));
   q->SetConnectivityPDFElement(q_element);

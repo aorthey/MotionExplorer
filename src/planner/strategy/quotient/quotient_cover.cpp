@@ -10,6 +10,10 @@
 #include <boost/property_map/transform_value_property_map.hpp>
 #include <boost/foreach.hpp>
 #include <boost/graph/graphviz.hpp>
+#include <ompl/datastructures/NearestNeighborsGNAT.h>
+#include <ompl/datastructures/NearestNeighborsGNATNoThreadSafety.h>
+#include <ompl/datastructures/NearestNeighborsFLANN.h>
+#include <ompl/datastructures/NearestNeighborsSqrtApprox.h>
 
 #define foreach BOOST_FOREACH
 
@@ -24,19 +28,24 @@ QuotientCover::~QuotientCover(void)
 {
 }
 //#############################################################################
+//#############################################################################
 //SETUP
+//#############################################################################
 //#############################################################################
 
 void QuotientCover::setup(void)
 {
   BaseT::setup();
-  if (!nearest_cover){
-    nearest_cover.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
-    nearest_cover->setDistanceFunction([this](const Configuration *a, const Configuration *b)
+  if (!nearest_neighborhood){
+                            // return new NearestNeighborsGNAT<_T>();
+
+    nearest_neighborhood.reset(new NearestNeighborsGNAT<Configuration *>());
+    //nearest_neighborhood.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
+    nearest_neighborhood->setDistanceFunction([this](const Configuration *a, const Configuration *b)
                              {
                                 return DistanceNeighborhoodNeighborhood(a,b);
                               });
-    if(!nearest_cover->reportsSortedResults())
+    if(!nearest_neighborhood->reportsSortedResults())
     {
       std::cout << "nearest cover does not report sorted results, but required for rewiring" << std::endl;
       exit(0);
@@ -116,7 +125,7 @@ void QuotientCover::setup(void)
       saturated = true;
     }
     //#########################################################################
-    OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nearest_cover->size());
+    OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nearest_neighborhood->size());
     checkValidity();
   }else{
     setup_ = false;
@@ -129,7 +138,7 @@ void QuotientCover::clear()
   totalVolumeOfCover = 0.0;
 
   //Nearestneighbors
-  if(nearest_cover) nearest_cover->clear();
+  if(nearest_neighborhood) nearest_neighborhood->clear();
   if(nearest_vertex) nearest_vertex->clear();
 
   shortest_path_start_goal.clear();
@@ -172,10 +181,157 @@ void QuotientCover::clear()
   }
 }
 
+//#############################################################################
+//#############################################################################
+//Add Configuration to Cover methods
+//#############################################################################
+//#############################################################################
 
-//#############################################################################
-//Configuration methods
-//#############################################################################
+QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
+{
+  //###########################################################################
+  //STEP1: Check that q can be projected onto a feasible area of QS
+  //###########################################################################
+  if(parent != nullptr){
+    std::cout << "NYI" << std::endl;
+    exit(0);
+  }
+
+  if(q->GetRadius() <= 0){
+    std::cout << "[WARNING] Tried adding a zero-measure neighborhood." << std::endl;
+    return BGT::null_vertex();
+  }
+
+  //check if q is not already in cover
+  if(IsConfigurationInsideCover(q)) return BGT::null_vertex();
+
+  //###########################################################################
+  //STEP2: Get all neighbors which are intersecting neighborhood of q
+  //###########################################################################
+  std::vector<Configuration*> neighbors = GetIntersectingNeighborhoodConfigurations(q);
+  uint K = (Q1->getStateDimension()+2);
+  uint N = neighbors.size();
+  if(N<=0 && !q->isStart){
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << *this << std::endl;
+    std::cout << "neighbors are empty" << std::endl;
+    Print(q, false);
+    Configuration *qn = nearest_neighborhood->nearest(q);
+    std::cout << "nearest:" << std::endl;
+    Print(qn, false);
+    std::cout << "distance: " << DistanceNeighborhoodNeighborhood(q,qn) << std::endl;
+    std::cout << "distance: " << DistanceConfigurationConfiguration(q,qn) << std::endl;
+
+    std::vector<Configuration*> neighbors;
+    nearest_neighborhood->nearestK(q, 1, neighbors);
+    Configuration *qk = neighbors.at(0);
+    std::cout << "distance: " << DistanceNeighborhoodNeighborhood(q,qk) << " to " << qk->index << std::endl;
+
+    nearest_neighborhood->integrityCheck();
+    for(uint k = 0; k < 20; k++){
+      neighbors.clear();
+      nearest_neighborhood->nearestR(q, 1e-20, neighbors);
+      std::cout << k << ":" << neighbors.size() << std::endl;
+    }
+
+    double dstep = 1e-20;
+    for(double d = dstep; d < 1.0; d*=10){
+      nearest_neighborhood->nearestR(q, 0, neighbors);
+      std::cout << d << ":" << neighbors.size() << std::endl;
+      if(neighbors.size()>0){
+        for(uint k = 0; k < neighbors.size(); k++){
+          Configuration *qk = neighbors.at(k);
+          std::cout << "distance: " << DistanceNeighborhoodNeighborhood(q,qk) << " to " << qk->index << std::endl;
+        }
+
+        break;
+      }
+
+    }
+    std::cout << nearest_neighborhood->size() << std::endl;
+    std::cout << neighbors.size() << std::endl;
+    exit(0);
+  }
+
+  //###########################################################################
+  //STEP3: Verify that neighborhood of q is not a subset of any intersecting
+  //neighborhood
+  //###########################################################################
+  for(uint k = 0; k < neighbors.size(); k++){
+    Configuration *qn = neighbors.at(k);
+    if(IsNeighborhoodInsideNeighborhood(q, qn))
+      return BGT::null_vertex();
+  }
+
+  //###########################################################################
+  //STEP4: Add q to cover
+  //###########################################################################
+  Vertex v = AddConfigurationToCoverGraph(q);
+
+  //###########################################################################
+  //STEP5: Add edge for each neighbor. Remove all subset neighbors
+  //###########################################################################
+  //bound number of connections. We can always rewire later on
+  for(uint k = 0; k < std::min(N,K); k++){
+    Configuration *qn = neighbors.at(k);
+    if(!IsNeighborhoodInsideNeighborhood(qn, q))
+    {
+      AddEdge(q, qn);
+    }else{
+      if(qn->isStart || qn->isGoal){
+        AddEdge(q, qn);
+      }else{
+        RerouteEdgesFromTo(qn, q);
+        //std::cout << "edges before rewiring: " << W << " after: " << V << std::endl;
+        RemoveConfigurationFromCover(qn);
+      }
+    }
+  }
+  return v;
+}
+
+void QuotientCover::AddEdge(Configuration *q_from, Configuration *q_to)
+{
+  double d = DistanceQ1(q_from, q_to);
+  EdgeInternalState properties(d);
+  Vertex v_from = get(indexToVertex, q_from->index);
+  Vertex v_to = get(indexToVertex, q_to->index);
+  boost::add_edge(v_from, v_to, properties, graph);
+}
+
+bool QuotientCover::EdgeExists(Configuration *q_from, Configuration *q_to)
+{
+  Vertex v_from = get(indexToVertex, q_from->index);
+  Vertex v_to = get(indexToVertex, q_to->index);
+  return boost::edge(v_from, v_to, graph).second;
+}
+
+std::vector<QuotientCover::Configuration*> QuotientCover::GetIntersectingNeighborhoodConfigurations(Configuration *q)
+{
+  std::vector<Configuration*> neighbors;
+  nearest_neighborhood->nearestR(q, 1e-10, neighbors);
+  return neighbors;
+}
+
+void QuotientCover::RerouteEdgesFromTo(Configuration *q_from, Configuration *q_to)
+{
+  Vertex v_from = get(indexToVertex, q_from->index);
+  Vertex v_to = get(indexToVertex, q_to->index);
+  OEIterator edge_iter, edge_iter_end, next; 
+  boost::tie(edge_iter, edge_iter_end) = boost::out_edges(v_from, graph);
+
+  for(next = edge_iter; edge_iter != edge_iter_end; edge_iter = next)
+  {
+    //for each edge, create a new one pointing to q_to
+    ++next;
+    const Vertex v_target = boost::target(*edge_iter, graph);
+    double d = DistanceQ1(graph[v_target], q_to);
+    EdgeInternalState properties(d);
+    boost::add_edge(v_target, v_to, properties, graph);
+  }
+}
+
 void QuotientCover::AddConfigurationToPDF(Configuration *q)
 {
   PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
@@ -186,7 +342,7 @@ void QuotientCover::AddConfigurationToPDF(Configuration *q)
   }
 }
 
-QuotientCover::Vertex QuotientCover::AddToCoverGraph(Configuration *q)
+QuotientCover::Vertex QuotientCover::AddConfigurationToCoverGraph(Configuration *q)
 {
   if(q->GetRadius()<minimum_neighborhood_radius)
   {
@@ -214,7 +370,7 @@ QuotientCover::Vertex QuotientCover::AddToCoverGraph(Configuration *q)
   //###########################################################################
   //(2) add to nearest neighbor structure
   //###########################################################################
-  nearest_cover->add(q);
+  nearest_neighborhood->add(q);
   nearest_vertex->add(q);
 
   //###########################################################################
@@ -225,176 +381,11 @@ QuotientCover::Vertex QuotientCover::AddToCoverGraph(Configuration *q)
 
   return v;
 }
-
-//QuotientCover::Vertex QuotientCover::AddConfigurationToCoverWithoutAddingEdges(Configuration *q)
-//{
-//  //###########################################################################
-//  //safety checks
-//  //###########################################################################
-//  if(q->GetRadius()<minimum_neighborhood_radius)
-//  {
-//    OMPL_ERROR("Trying to add configuration to cover, but Neighborhood is too small.");
-//    std::cout << "state" << std::endl;
-//    Q1->printState(q->state);
-//    std::cout << "radius: " << q->GetRadius() << std::endl;
-//    exit(0);
-//  }
-//  totalVolumeOfCover += q->GetRadius();
-
-//  //###########################################################################
-//  //(1) add to cover graph
-//  //###########################################################################
-//  Vertex v = boost::add_vertex(q, graph);
-//  graph[v]->number_attempted_expansions = 0;
-//  graph[v]->number_successful_expansions = 0;
-
-//  //assign vertex to a unique index
-//  put(vertexToIndex, v, index_ctr);
-//  put(indexToVertex, index_ctr, v);
-//  graph[v]->index = index_ctr;
-//  index_ctr++;
-
-//  //###########################################################################
-//  //(2) add to nearest neighbor structure
-//  //###########################################################################
-//  nearest_cover->add(q);
-//  nearest_vertex->add(q);
-
-//  //###########################################################################
-//  //(3) add to PDF
-//  //###########################################################################
-//  AddConfigurationToPDF(q);
-
-//  if(verbose>0) std::cout << std::string(80, '-') << std::endl;
-//  if(verbose>0) std::cout << "*** ADD VERTEX " << q->index << " (radius " << q->GetRadius() << ")" << std::endl;
-//  if(verbose>0) Print(q);
-
-//  q->goal_distance = DistanceQ1(q, q_goal);
-
-//  if(q->parent_neighbor != nullptr){
-//    AddEdge(q, q->parent_neighbor);
-//  }
-
-//  return v;
-//}
-QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
-{
-  std::vector<Configuration*> neighbors = GetConfigurationsInsideNeighborhood(q);
-
-  Vertex v = AddConfigurationToCoverWithoutAddingEdges(q);
-
-  //###########################################################################
-  //Clean UP and Connect
-  //(1) Remove All Configurations with neighborhoods inside current neighborhood
-  //(2) Add Edges to All Configurations with centers inside the current neighborhood 
-  if(verbose>0) std::cout << "Vertex: " << q->index << " has number of neighbors: " << neighbors.size() << std::endl;
-  if(verbose>0) std::cout << std::string(80, '-') << std::endl;
-  //for(uint k = 0; k < std::min(neighbors.size(),3LU); k++){
-  for(uint k = 0; k < neighbors.size(); k++){
-    Configuration *qn = neighbors.at(k);
-    if(qn==q){
-      std::cout << std::string(80, '#') << std::endl;
-      std::cout << "configuration equals neighbor." << std::endl;
-      std::cout << "state added with radius " << q->GetRadius() << std::endl;
-      Q1->printState(q->state);
-      std::cout << "state neighbor with radius " << qn->GetRadius() << std::endl;
-      Q1->printState(qn->state);
-      std::cout << std::string(80, '#') << std::endl;
-      exit(0);
-    }
-    //do not connect to parent, we already connected that
-    if(qn == q->parent_neighbor) continue;
-    if(IsNeighborhoodInsideNeighborhood(qn, q))
-    {
-      //do not delete start/goal
-      if(qn->isStart){
-        AddEdge(q, qn);
-      }else if(qn->isGoal){
-        AddEdge(q, qn);
-      }else{
-        //old constellation
-        //v1 -------                                    |
-        //          \                                   |
-        //v2-------- vn ------- vq                      |
-        //          /                                   |
-        //v3--------                                    |
-        //
-        //after edge adding 
-        //v1 -------------------                        |
-        //          \           \                       |
-        //v2-------- vn ------- vq                      |
-        //          /           /                       |
-        //v3--------------------                        |
-        //after edge removal 
-        //v1 -------------------                        |
-        //                      \                       |
-        //v2------   vn   ----- vq                      |
-        //        \------/      /                       |
-        //v3--------------------                        |
-        //after vertex removal
-        //v1 ---------------                            |
-        //                  \                           |
-        //v2--------------- vq                          |
-        //                  /                           |
-        //v3----------------                            |
-        //
-        //get all edges into qn, and rewire them to q
-        Vertex vn = get(indexToVertex, qn->index);
-        OEIterator edge_iter, edge_iter_end, next; 
-        boost::tie(edge_iter, edge_iter_end) = boost::out_edges(vn, graph);
-
-        vertex_index_type vi = get(vertexToIndex, v);
-        vertex_index_type vni = get(vertexToIndex, vn);
-        if(verbose>1) std::cout << "vertex " << qn->index << " needs to be removed" << std::endl;
-        if(verbose>1) std::cout << "vertex " << vi << "(" << q->index << ") and neighbor " << vni << "(" << qn->index << ")" << std::endl;
-        if(verbose>1) std::cout << "removing " << boost::out_degree(vn, graph) << " edges from vertex " << vni << std::endl;
-
-        for(next = edge_iter; edge_iter != edge_iter_end; edge_iter = next)
-        {
-          //add v_target to v
-          ++next;
-          const Vertex v_target = boost::target(*edge_iter, graph);
-          //segfault, because v_target points to an already removed vertex!
-          if(verbose>1) std::cout << "REWIRE EDGE from " << vni << "(" << get(vertexToIndex, vn) << ") to " << get(vertexToIndex, v_target) << "(" << graph[v_target]->index << ")" << std::endl;
-          double d = DistanceQ1(graph[v_target], q);
-          EdgeInternalState properties(d);
-
-          if(v_target!=v)
-          {
-            //do not add to itself
-            if(verbose>1) std::cout << "add " << get(vertexToIndex, v) << "-" << get(vertexToIndex, v_target) 
-              << "(" << graph[v_target]->index << ")" << std::endl;
-
-            //vertex might be invalidated
-            boost::add_edge(v_target, v, properties, graph);
-          }
-        }
-        boost::clear_vertex(vn, graph);
-        RemoveConfigurationFromCover(qn);
-      }
-    }else{
-      AddEdge(q, qn);
-    }
-  }
-  return v;
-}
-
-void QuotientCover::AddEdge(Configuration *q_from, Configuration *q_to)
-{
-  double d = DistanceQ1(q_from, q_to);
-  EdgeInternalState properties(d);
-  Vertex v_from = get(indexToVertex, q_from->index);
-  Vertex v_to = get(indexToVertex, q_to->index);
-  boost::add_edge(v_from, v_to, properties, graph);
-}
-
-bool QuotientCover::EdgeExists(Configuration *q_from, Configuration *q_to)
-{
-  Vertex v_from = get(indexToVertex, q_from->index);
-  Vertex v_to = get(indexToVertex, q_to->index);
-  return boost::edge(v_from, v_to, graph).second;
-}
-
+//#############################################################################
+//#############################################################################
+//Remove Configuration from Cover methods
+//#############################################################################
+//#############################################################################
 void QuotientCover::RemoveConfigurationFromCover(Configuration *q)
 {
   totalVolumeOfCover -= q->GetRadius();
@@ -404,13 +395,11 @@ void QuotientCover::RemoveConfigurationFromCover(Configuration *q)
   if(!q->isSufficientFeasible){
     pdf_necessary_configurations.remove(static_cast<PDF_Element*>(q->GetNecessaryPDFElement()));
   }
-  //(2) Remove from nearest neighbors structure
-  nearest_cover->remove(q);
-  nearest_vertex->remove(q);
 
-  if(verbose>0) std::cout << std::string(80, '-') << std::endl;
-  if(verbose>0) std::cout << "*** REMOVE VERTEX " << q->index << std::endl;
-  if(verbose>0) Q1->printState(q->state);
+
+  //(2) Remove from nearest neighbors structure
+  nearest_neighborhood->remove(q);
+  nearest_vertex->remove(q);
 
   //erase entry from indexmap
   Vertex vq = get(indexToVertex, q->index);
@@ -425,8 +414,8 @@ void QuotientCover::RemoveConfigurationFromCover(Configuration *q)
     exit(0);
   }
 
+  boost::clear_vertex(vq, graph);
   boost::remove_vertex(vq, graph);
-
   //(3) Remove from cover graph
   q->Remove(Q1);
   delete q;
@@ -471,29 +460,7 @@ bool QuotientCover::ComputeNeighborhood(Configuration *q, bool verbose)
   GetCosetFromQuotientSpace(q);
 
   return true;
-
 }
-void QuotientCover::RemoveConfigurationsFromCoverCoveredBy(Configuration *q)
-{
-  //If the neighborhood of q is a superset of any other neighborhood, then delete
-  //the other neighborhood, and rewire the graph
-  std::vector<Configuration*> neighbors = GetConfigurationsInsideNeighborhood(q);
-
-  for(uint k = 0; k < neighbors.size(); k++){
-
-    Configuration *qn = neighbors.at(k);
-
-    //do not delete start/goal
-    if(qn->isStart) continue;
-    if(qn->isGoal) continue;
-
-    if(IsNeighborhoodInsideNeighborhood(qn, q))
-    {
-      RemoveConfigurationFromCover(qn);
-    }
-  }
-}
-
 
 bool QuotientCover::IsConfigurationInsideNeighborhood(Configuration *q, Configuration *qn)
 {
@@ -503,7 +470,7 @@ bool QuotientCover::IsConfigurationInsideNeighborhood(Configuration *q, Configur
 bool QuotientCover::IsConfigurationInsideCover(Configuration *q)
 {
   std::vector<Configuration*> neighbors;
-  nearest_cover->nearestK(q, 2, neighbors);
+  nearest_neighborhood->nearestK(q, 2, neighbors);
   if(neighbors.size()<=1) return false;
   return IsConfigurationInsideNeighborhood(q, neighbors.at(0)) && IsConfigurationInsideNeighborhood(q, neighbors.at(1));
 }
@@ -520,25 +487,6 @@ double QuotientCover::GetImportance() const
   //return importance;
 }
 
-void QuotientCover::Grow(double t)
-{
-  ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
-  //#########################################################################
-  //Do not grow the cover if it is saturated, i.e. it cannot be expanded anymore
-  // --- we have successfully computed Q1_{free}, the free space of Q1
-  //#########################################################################
-  if(saturated) return;
-
-  //#########################################################################
-  //Sample a configuration different from the current cover
-  //#########################################################################
-  Configuration *q_random = SampleCoverBoundaryValid(ptc);
-  if(q_random == nullptr) return;
-
-  if(verbose>1) std::cout << "sampled "; Q1->printState(q_random->state);
-
-  AddConfigurationToCover(q_random);
-}
 void QuotientCover::GetCosetFromQuotientSpace(Configuration *q)
 {
   if(parent != nullptr)
@@ -803,7 +751,7 @@ void QuotientCover::RewireConfiguration(Configuration *q)
   Vertex v = get(indexToVertex, q->index);
   uint K = boost::degree(v, graph)+1;
 
-  nearest_cover->nearestK(q, K, neighbors);
+  nearest_neighborhood->nearestK(q, K, neighbors);
   Configuration *qn = neighbors.at(K-1);
   double dn = DistanceNeighborhoodNeighborhood(q, qn);
   if(dn <= 1e-10){
@@ -845,7 +793,7 @@ void QuotientCover::CheckConfigurationIsOnBoundary(Configuration *q_boundary, Co
 
 QuotientCover::Configuration* QuotientCover::Nearest(Configuration *q) const
 {
-  return nearest_cover->nearest(q);
+  return nearest_neighborhood->nearest(q);
 }
 
 //@TODO: should be fixed to reflect the distance on the underlying
@@ -911,10 +859,6 @@ bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration
       // std::cout << "radius q_from: " << q_from->GetRadius() << std::endl;
       // std::cout << "dist last next: " << d_last_to_next << std::endl;
       // std::cout << "step: " << step << std::endl;
-      double d_proj = DistanceConfigurationConfiguration(q_from, q_interp);
-      double d_proj_q1 = DistanceQ1(q_from, q_interp);
-      // std::cout << "dist proj: " << d_proj << std::endl;
-      // std::cout << "dist proj_q1: " << d_proj_q1 << std::endl;
     }
   }
 
@@ -1095,7 +1039,8 @@ double QuotientCover::DistanceNeighborhoodNeighborhood(const Configuration *q_fr
     throw "";
     exit(1);
   }
-  double d_open_neighborhood_distance = std::max(d - d_from - d_to, 0.0); 
+  double d_open_neighborhood_distance = (double)std::max(d - d_from - d_to, 0.0); 
+  //std::cout << d << "," << d_from << "," << d_to << "," << d_open_neighborhood_distance << std::endl;
   return d_open_neighborhood_distance;
 }
 
@@ -1156,7 +1101,7 @@ const QuotientCover::PDF& QuotientCover::GetPDFAllConfigurations() const
 }
 const QuotientCover::NearestNeighborsPtr& QuotientCover::GetNearestNeighborsCover() const
 {
-  return nearest_cover;
+  return nearest_neighborhood;
 }
 const QuotientCover::NearestNeighborsPtr& QuotientCover::GetNearestNeighborsVertex() const
 {

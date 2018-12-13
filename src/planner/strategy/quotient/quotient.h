@@ -72,7 +72,6 @@ namespace ompl
         void SetParent(Quotient *parent_);
 
         friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::Quotient& qtnt);
-        //friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::Quotient* qtnt);
         virtual void Print(std::ostream& out) const;
 
       protected:

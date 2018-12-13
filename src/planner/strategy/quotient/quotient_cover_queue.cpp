@@ -93,7 +93,7 @@ void QuotientCoverQueue::Grow(double t)
         q=nullptr;
         return;
       }
-      AddConfigurationToCoverWithoutAddingEdges(q);
+      AddConfigurationToCover(q);
     }else{
       Configuration *q_random = new Configuration(Q1);
       SampleGoal(q_random);
