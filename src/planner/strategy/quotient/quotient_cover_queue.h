@@ -36,7 +36,6 @@ namespace ompl
     protected:
       bool firstRun{true};
       uint NUMBER_OF_EXPANSION_SAMPLES{0};
-      const double goalBias{0.5};
       const double shortestPathBias{1.0};
 
       struct CmpConfigurationPtrs

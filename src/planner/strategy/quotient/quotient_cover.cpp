@@ -51,15 +51,6 @@ void QuotientCover::setup(void)
                               });
   }
 
-  const double maxBias = 0.9;
-  if(goalBias+voronoiBias >= maxBias)
-  {
-    std::cout << "goal and voronoi bias are too big." << std::endl;
-    std::cout << "goal bias: " << goalBias << std::endl;
-    std::cout << "voronoi bias: " << voronoiBias << std::endl;
-    std::cout << "(should be below "<< maxBias << ")" << std::endl;
-    exit(0);
-  }
   graph[boost::graph_bundle].name = getName()+"_graph";
   graph[boost::graph_bundle].Q1 = Q1;
 
@@ -189,18 +180,14 @@ void QuotientCover::AddConfigurationToPDF(Configuration *q)
 {
   PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
   q->SetPDFElement(q_element);
-
   if(!q->isSufficientFeasible){
     PDF_Element *q_necessary_element = pdf_necessary_configurations.add(q, q->GetRadius());
     q->SetNecessaryPDFElement(q_necessary_element);
   }
 }
 
-QuotientCover::Vertex QuotientCover::AddConfigurationToCoverWithoutAddingEdges(Configuration *q)
+QuotientCover::Vertex QuotientCover::AddToCoverGraph(Configuration *q)
 {
-  //###########################################################################
-  //safety checks
-  //###########################################################################
   if(q->GetRadius()<minimum_neighborhood_radius)
   {
     OMPL_ERROR("Trying to add configuration to cover, but Neighborhood is too small.");
@@ -234,19 +221,62 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCoverWithoutAddingEdges(C
   //(3) add to PDF
   //###########################################################################
   AddConfigurationToPDF(q);
-
-  if(verbose>0) std::cout << std::string(80, '-') << std::endl;
-  if(verbose>0) std::cout << "*** ADD VERTEX " << q->index << " (radius " << q->GetRadius() << ")" << std::endl;
-  if(verbose>0) Print(q);
-
   q->goal_distance = DistanceQ1(q, q_goal);
-
-  if(q->parent_neighbor != nullptr){
-    AddEdge(q, q->parent_neighbor);
-  }
 
   return v;
 }
+
+//QuotientCover::Vertex QuotientCover::AddConfigurationToCoverWithoutAddingEdges(Configuration *q)
+//{
+//  //###########################################################################
+//  //safety checks
+//  //###########################################################################
+//  if(q->GetRadius()<minimum_neighborhood_radius)
+//  {
+//    OMPL_ERROR("Trying to add configuration to cover, but Neighborhood is too small.");
+//    std::cout << "state" << std::endl;
+//    Q1->printState(q->state);
+//    std::cout << "radius: " << q->GetRadius() << std::endl;
+//    exit(0);
+//  }
+//  totalVolumeOfCover += q->GetRadius();
+
+//  //###########################################################################
+//  //(1) add to cover graph
+//  //###########################################################################
+//  Vertex v = boost::add_vertex(q, graph);
+//  graph[v]->number_attempted_expansions = 0;
+//  graph[v]->number_successful_expansions = 0;
+
+//  //assign vertex to a unique index
+//  put(vertexToIndex, v, index_ctr);
+//  put(indexToVertex, index_ctr, v);
+//  graph[v]->index = index_ctr;
+//  index_ctr++;
+
+//  //###########################################################################
+//  //(2) add to nearest neighbor structure
+//  //###########################################################################
+//  nearest_cover->add(q);
+//  nearest_vertex->add(q);
+
+//  //###########################################################################
+//  //(3) add to PDF
+//  //###########################################################################
+//  AddConfigurationToPDF(q);
+
+//  if(verbose>0) std::cout << std::string(80, '-') << std::endl;
+//  if(verbose>0) std::cout << "*** ADD VERTEX " << q->index << " (radius " << q->GetRadius() << ")" << std::endl;
+//  if(verbose>0) Print(q);
+
+//  q->goal_distance = DistanceQ1(q, q_goal);
+
+//  if(q->parent_neighbor != nullptr){
+//    AddEdge(q, q->parent_neighbor);
+//  }
+
+//  return v;
+//}
 QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
 {
   std::vector<Configuration*> neighbors = GetConfigurationsInsideNeighborhood(q);
@@ -485,9 +515,9 @@ double QuotientCover::GetImportance() const
   //the more sampled, the less important this space becomes
   //return 1.0/(totalVolumeOfCover+1);
 
-  //return 1.0/(boost::num_vertices(graph)+1);
-  double importance = pow((double)level+1,2.0);
-  return importance;
+  return 1.0/(boost::num_vertices(graph)+1);
+  //double importance = pow((double)2.0, level);
+  //return importance;
 }
 
 void QuotientCover::Grow(double t)
@@ -611,13 +641,7 @@ QuotientCover::Configuration* QuotientCover::Sample()
 }
 QuotientCover::Configuration* QuotientCover::SampleCoverBoundary()
 {
-  Configuration *q_random;
-  double r = rng_.uniform01();
-  if(r < (voronoiBias)){
-    q_random = SampleCoverBoundary("voronoi");
-  }else{
-    q_random = SampleCoverBoundary("boundary");
-  }
+  Configuration *q_random = SampleCoverBoundary("boundary");
   return q_random;
 }
 
@@ -638,16 +662,16 @@ QuotientCover::Configuration* QuotientCover::SampleUniformQuotientCover(ob::Stat
   Configuration *q_coset = pdf_all_configurations.sample(rng_.uniform01());
 
   Q1_sampler->sampleUniformNear(state, q_coset->state, q_coset->GetRadius());
-  if(q_coset->isSufficientFeasible)
-  {
-    //project onto a random shell outside of sufficient neighborhood
-    double r_necessary = q_coset->GetRadius();
-    double r_sufficient = q_coset->openNeighborhoodOuterRadius;
-    double r_01 = rng_.uniform01();
-    double r_shell = r_sufficient + r_01*(r_necessary - r_sufficient);
-    double d = Q1->distance(q_coset->state, state);
-    Q1->getStateSpace()->interpolate(q_coset->state, state, r_shell/d, state);
-  }
+  //if(q_coset->isSufficientFeasible)
+  //{
+  //  //project onto a random shell outside of sufficient neighborhood
+  //  double r_necessary = q_coset->GetRadius();
+  //  double r_sufficient = q_coset->openNeighborhoodOuterRadius;
+  //  double r_01 = rng_.uniform01();
+  //  double r_shell = r_sufficient + r_01*(r_necessary - r_sufficient);
+  //  double d = Q1->distance(q_coset->state, state);
+  //  Q1->getStateSpace()->interpolate(q_coset->state, state, r_shell/d, state);
+  //}
   return q_coset;
 }
 
@@ -1137,11 +1161,6 @@ const QuotientCover::NearestNeighborsPtr& QuotientCover::GetNearestNeighborsCove
 const QuotientCover::NearestNeighborsPtr& QuotientCover::GetNearestNeighborsVertex() const
 {
   return nearest_vertex;
-}
-
-double QuotientCover::GetGoalBias() const
-{
-  return goalBias;
 }
 
 struct found_goal {}; // exception for termination

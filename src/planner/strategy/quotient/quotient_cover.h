@@ -27,7 +27,6 @@ namespace ompl
 
       typedef int vertex_index_type;
       
-
       //#######################################################################
       //Configuration
       //#######################################################################
@@ -207,9 +206,7 @@ namespace ompl
       //#######################################################################
       //Configuration Create, Remove, Add 
       //#######################################################################
-
       Configuration* CreateConfigurationFromStateAndCoset(const ob::State *state, Configuration *q_coset);
-
       virtual Vertex AddConfigurationToCover(Configuration *q);
       Vertex AddConfigurationToCoverWithoutAddingEdges(Configuration *q);
 
@@ -294,8 +291,6 @@ namespace ompl
       PlannerDataVertexAnnotated getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const;
       //#######################################################################
       RNG rng_;
-      const double goalBias{0.1}; //in [0,1]
-      const double voronoiBias{0.3}; //in [0,1]
       const double minimum_neighborhood_radius{1e-5}; //minimum allowed radius, otherwise configuration is considered INVALID 
 
       double totalVolumeOfCover{0.0};
@@ -320,11 +315,9 @@ namespace ompl
       const Graph& GetGraph() const;
       const PDF& GetPDFNecessaryConfigurations() const;
       const PDF& GetPDFAllConfigurations() const;
-
       const NearestNeighborsPtr& GetNearestNeighborsCover() const;
       const NearestNeighborsPtr& GetNearestNeighborsVertex() const;
 
-      double GetGoalBias() const;
       virtual void Print(std::ostream& out) const override;
       void Print(const Configuration *q, bool stopOnError=true) const;
 

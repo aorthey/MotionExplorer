@@ -1,4 +1,5 @@
 #include "common.h"
+#include "gui/common.h"
 #include "qng_goal_directed.h"
 
 using namespace ompl::geometric;
@@ -29,8 +30,7 @@ void QNGGoalDirected::clear()
     configurations_sorted_by_nearest_to_goal.pop();
   }
 
-  progressMadeTowardsGoal = true;
-
+  nearest_to_goal_has_changed = true;
   BaseT::clear();
 }
 
@@ -43,98 +43,63 @@ void QNGGoalDirected::Grow(double t)
   if(saturated) return;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
 
+  int N = boost::num_edges(graph);
   if(!hasSolution){
     GrowWithoutSolution(ptc);
   }else{
-    GrowWithSolution(ptc);
+    exit(0);
+    //GrowWithSolution(ptc);
+  }
+  int M = boost::num_edges(graph);
+  if( abs(N-M) > 10 ){
+    std::cout << "increase of edges from " << N << " to " << M << std::endl;
+    exit(0);
   }
 }
 
 void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
 {
-  if(progressMadeTowardsGoal){
-    progressMadeTowardsGoal = StepTowardsGoal(ptc);
-  }else{
-    StepTowardsFreeSpace(ptc);
+  if(nearest_to_goal_has_changed){
+    q_lodestar = q_goal;
+    nearest_to_goal_has_changed = false;
   }
+  StepTowardsLodestar();
 }
+
 void QNGGoalDirected::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
 {
   double r = rng_.uniform01();
   if(r <= rewireBias){
     RewireCover(ptc);
   }else{
-    StepTowardsFreeSpace(ptc);
+    StepTowardsLodestar();
   }
+}
+bool QNGGoalDirected::GetSolution(ob::PathPtr &solution)
+{
+  //will be called only once
+  bool result = BaseT::GetSolution(solution);
+  if(result){
+    //update lodestar
+    q_lodestar = new Configuration(Q1);
+    SampleUniform(q_lodestar);
+    if(level>0) QuotientCover::Print(q_lodestar, false);
+  }
+  return result;
 }
 
 //############################################################################
 // Step Functions
 //############################################################################
-bool QNGGoalDirected::StepTowardsGoal(ob::PlannerTerminationCondition &ptc)
+void QNGGoalDirected::StepTowardsLodestar()
 {
-  //is it possible that we add here a state with zero-measure NBH? (No, but
-  //should be refactored)
-  Configuration *q_nearest = configurations_sorted_by_nearest_to_goal.top();
-  const double goalDistance = q_nearest->GetGoalDistance();
-  if(goalDistance < 1e-10){
-    hasSolution = true;
-    return true;
-  }
-  return StepTowards(q_nearest, q_goal);
-}
-
-void QNGGoalDirected::StepTowardsFreeSpace(ob::PlannerTerminationCondition &ptc)
-{
-  if(priority_configurations.empty()){
-    //try random directions
-    Configuration *q_random = SampleCoverBoundaryValid(ptc);
-    if(q_random == nullptr) return;
-    priority_configurations.push(q_random);
-  }
-
-  Configuration *q = priority_configurations.top();
-  priority_configurations.pop();
-  if(IsConfigurationInsideCover(q)){
-    q->Remove(Q1);
-    q=nullptr;
-    return;
-  }
-  AddConfigurationToCover(q);
-  if(verbose>0) QuotientCover::Print(q);
-
-  std::vector<Configuration*> q_children = ExpandNeighborhood(q, NUMBER_OF_EXPANSION_SAMPLES);
-
-  for(uint k = 0; k < q_children.size(); k++)
-  {
-    priority_configurations.push(q_children.at(k));
-  }
-  //add different biases to remove planner from getting stuck
-  Configuration *q_random = QuotientCover::SampleCoverBoundary("voronoi");
-  if(ComputeNeighborhood(q_random)){
-    priority_configurations.push(q_random);
-  }
-}
-
-void QNGGoalDirected::StepTowardsFreeSpaceVoronoiBias(const ob::PlannerTerminationCondition &ptc)
-{
-  //Sample Random Configuration on underlying cover
-  Configuration *q_random = QuotientCover::SampleCoverBoundary("voronoi");
-  //do not compute neighborhood
-
-  terminated = false;
-  base::PlannerTerminationCondition ptcOrConfigurationReached([this, &ptc]
-                                 { return ptc || terminated; });
-
-  //should have coset, but zero-measure neighborhood
-  while(!ptc()){
-    Configuration *q_nearest = Nearest(q_random);
-    if(DistanceNeighborhoodNeighborhood(q_nearest, q_random) < 1e-10)
-    {
-      terminated = true;
-    }else{
-      terminated = !StepTowards(q_nearest, q_random);
-    }
+  Configuration *q_nearest = Nearest(q_lodestar);
+  bool madeProgress = StepTowards(q_nearest, q_lodestar);
+  if(!madeProgress){
+    //change lodestar
+    q_lodestar = new Configuration(Q1);
+    SampleUniform(q_lodestar);
+    if(level>0) QuotientCover::Print(q_lodestar, false);
   }
 }
 
@@ -144,6 +109,10 @@ void QNGGoalDirected::StepTowardsFreeSpaceVoronoiBias(const ob::PlannerTerminati
 //children are added to the priority queue for later extensions
 bool QNGGoalDirected::StepTowards(Configuration *q_from, Configuration *q_next)
 {
+  const double distanceFromTo = DistanceNeighborhoodNeighborhood(q_from, q_next);
+  if(distanceFromTo < 1e-10){
+    return false;
+  }
   std::vector<Configuration*> q_children = GenerateCandidateDirections(q_from, q_next);
 
   if(q_children.empty()){
@@ -287,17 +256,6 @@ std::vector<QuotientCover::Configuration*> QNGGoalDirected::GenerateCandidateDir
 // Misc Functions
 //############################################################################
 
-double QNGGoalDirected::GetImportance() const
-{
-  //if we currently are making progress towards the goal, then this space should
-  //be prefered
-  if(!hasSolution && progressMadeTowardsGoal){
-    return 1.0;
-  }else{
-    return BaseT::GetImportance();
-  }
-}
-
 double QNGGoalDirected::ValueConnectivity(Configuration *q)
 {
   Vertex v = get(indexToVertex, q->index);
@@ -306,28 +264,6 @@ double QNGGoalDirected::ValueConnectivity(Configuration *q)
   double d_connectivity = q->GetRadius()/d_alpha;
   //double d_connectivity = q->GetRadius();
   return d_connectivity;
-}
-
-QuotientCover::Vertex QNGGoalDirected::AddConfigurationToCover(Configuration *q)
-{
-  QuotientCover::Vertex v = BaseT::AddConfigurationToCover(q);
-
-  PDF_Element *q_element = pdf_connectivity_configurations.add(q, ValueConnectivity(q));
-  q->SetConnectivityPDFElement(q_element);
-
-  Configuration *q_nearest = nullptr;
-  if(!configurations_sorted_by_nearest_to_goal.empty()){
-    q_nearest = configurations_sorted_by_nearest_to_goal.top();
-  }
-
-  configurations_sorted_by_nearest_to_goal.push(q);
-  if(q_nearest != configurations_sorted_by_nearest_to_goal.top()){
-    //change in nearest towards goal. This should trigger the step towards goal
-    //method. This removes the goalBias
-    progressMadeTowardsGoal = true;
-  }
-
-  return v;
 }
 
 void QNGGoalDirected::RewireCover(ob::PlannerTerminationCondition &ptc)
@@ -361,5 +297,27 @@ void QNGGoalDirected::RewireCover(ob::PlannerTerminationCondition &ptc)
       pdf_connectivity_configurations.update(static_cast<PDF_Element*>(q->GetConnectivityPDFElement()), ValueConnectivity(q));
     }
   }
+}
+
+QuotientCover::Vertex QNGGoalDirected::AddConfigurationToCover(Configuration *q)
+{
+  QuotientCover::Vertex v = BaseT::AddConfigurationToCoverWithoutAddingEdges(q);
+
+  PDF_Element *q_element = pdf_connectivity_configurations.add(q, ValueConnectivity(q));
+  q->SetConnectivityPDFElement(q_element);
+
+  Configuration *q_nearest = nullptr;
+  if(!configurations_sorted_by_nearest_to_goal.empty()){
+    q_nearest = configurations_sorted_by_nearest_to_goal.top();
+  }
+
+  configurations_sorted_by_nearest_to_goal.push(q);
+  if(q_nearest != configurations_sorted_by_nearest_to_goal.top()){
+    //change in nearest towards goal. This should trigger the step towards goal
+    //method. This removes the goalBias
+    nearest_to_goal_has_changed = true;
+  }
+
+  return v;
 }
 

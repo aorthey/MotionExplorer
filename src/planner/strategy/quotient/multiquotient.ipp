@@ -22,6 +22,7 @@ MultiQuotient<T,Tlast>::MultiQuotient(std::vector<ob::SpaceInformationPtr> &si_v
       T* ss = new T(si_vec.at(k), parent);
       quotientSpaces.push_back(ss);
     }
+    quotientSpaces.back()->SetLevel(k);
   }
   std::cout << "Created hierarchy with " << si_vec.size() << " levels." << std::endl;
 }
@@ -84,8 +85,8 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
       og::Quotient* jQuotient = Q.top();
       Q.pop();
       jQuotient->Grow(T_GROW);
-
       bool hasSolution = quotientSpaces.at(k)->HasSolution();
+
       if(hasSolution){
         base::PathPtr sol_k;
         quotientSpaces.at(k)->GetSolution(sol_k);

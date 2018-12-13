@@ -766,7 +766,7 @@ double Quotient::GetImportance() const
 }
 void Quotient::Print(std::ostream& out) const
 {
-  out << "[QuotientSpace"<< id << "] ";
+  out << "[QuotientSpace: id"<< id << " |lvl" << level << "] ";
   uint sublevel = std::max(1U, level);
   if(parent == nullptr){
     out << "X" << sublevel << "=Q" << sublevel << ": ";

@@ -26,6 +26,9 @@ void QuotientCoverQueue::setup()
 {
   BaseT::setup();
   NUMBER_OF_EXPANSION_SAMPLES = (Q1->getStateDimension()+1)*1;
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "NUMBER_OF_EXPANSION_SAMPLES " << NUMBER_OF_EXPANSION_SAMPLES << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
   firstRun = true;
 }
 void QuotientCoverQueue::clear()
@@ -74,7 +77,7 @@ void QuotientCoverQueue::Grow(double t)
     firstRun = false;
   }else{
     double r = rng_.uniform01();
-    if(r<1.0){
+    if(r<0.9){
       if(priority_configurations.empty()){
         //try random directions
         //saturated = true;
@@ -121,12 +124,7 @@ QuotientCoverQueue::Configuration* QuotientCoverQueue::SampleCoverBoundary(){
   Configuration *q_random;
   if(!hasSolution){
     //phase1 sampling: solution has not been found
-    double r = rng_.uniform01();
-    if(r<goalBias){
-      q_random = BaseT::SampleCoverBoundary("goal");
-    }else{
-      q_random = BaseT::SampleCoverBoundary("voronoi");
-    }
+    q_random = BaseT::SampleCoverBoundary("voronoi");
   }else{
     //phase2 sampling: grow solution and associated roadmap
     std::cout << "Phase2 (hasSolution) sampler NYI"<< std::endl;
