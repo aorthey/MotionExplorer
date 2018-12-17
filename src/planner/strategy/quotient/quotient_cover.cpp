@@ -1,5 +1,6 @@
 #include "common.h"
 #include "quotient_cover.h"
+
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <limits>
@@ -13,6 +14,7 @@
 #include <ompl/datastructures/NearestNeighborsGNAT.h>
 #include <ompl/datastructures/NearestNeighborsGNATNoThreadSafety.h>
 #include <ompl/datastructures/NearestNeighborsFLANN.h>
+#include <ompl/datastructures/NearestNeighborsLinear.h>
 #include <ompl/datastructures/NearestNeighborsSqrtApprox.h>
 
 #define foreach BOOST_FOREACH
@@ -39,7 +41,12 @@ void QuotientCover::setup(void)
   if (!nearest_neighborhood){
                             // return new NearestNeighborsGNAT<_T>();
 
-    nearest_neighborhood.reset(new NearestNeighborsGNAT<Configuration *>());
+    //nearest_neighborhood.reset(new NearestNeighborsGNAT<Configuration *>());
+    //nearest_neighborhood.reset(new NearestNeighborsGNATNoThreadSafety<Configuration *>());
+
+    //TODO: works only with linear version, why does it break with FLANN or
+    //GNAT?
+    nearest_neighborhood.reset(new NearestNeighborsLinear<Configuration *>()); 
     //nearest_neighborhood.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
     nearest_neighborhood->setDistanceFunction([this](const Configuration *a, const Configuration *b)
                              {
@@ -193,8 +200,8 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
   //STEP1: Check that q can be projected onto a feasible area of QS
   //###########################################################################
   if(parent != nullptr){
-    std::cout << "NYI" << std::endl;
-    exit(0);
+    //std::cout << "NYI" << std::endl;
+    //exit(0);
   }
 
   if(q->GetRadius() <= 0){
@@ -224,11 +231,13 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
     std::cout << "distance: " << DistanceConfigurationConfiguration(q,qn) << std::endl;
 
     std::vector<Configuration*> neighbors;
+    std::cout << "NearestK" << std::endl;
     nearest_neighborhood->nearestK(q, 1, neighbors);
     Configuration *qk = neighbors.at(0);
+    Print(qk, false);
     std::cout << "distance: " << DistanceNeighborhoodNeighborhood(q,qk) << " to " << qk->index << std::endl;
+    std::cout << "distance: " << DistanceConfigurationConfiguration(q,qn) << std::endl;
 
-    nearest_neighborhood->integrityCheck();
     for(uint k = 0; k < 20; k++){
       neighbors.clear();
       nearest_neighborhood->nearestR(q, 1e-20, neighbors);
@@ -690,6 +699,26 @@ void QuotientCover::Connect(const Configuration *q_from, const Configuration *q_
   double radius = q_from->GetRadius();
   double dist_qfrom_qto = DistanceQ1(q_from, q_to);
   Q1->getStateSpace()->interpolate(q_from->state, q_to->state, radius/dist_qfrom_qto, q_out->state);
+
+  double dist_qfrom_qout = DistanceQ1(q_from, q_out);
+  if(fabs(radius - dist_qfrom_qout) > 1e-10)
+  {
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "from:" << std::endl;
+    Print(q_from, false);
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "to:" << std::endl;
+    Print(q_to, false);
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "out:" << std::endl;
+    Print(q_out, false);
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "Radius q_from            : " << radius << std::endl;
+    std::cout << "Distance q_from to q_out : " << dist_qfrom_qout << std::endl;
+    exit(-1);
+  }
+
   //if(parent==nullptr){
   //  Q1->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_interp->state);
   //}else{

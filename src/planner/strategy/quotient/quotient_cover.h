@@ -9,6 +9,7 @@
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
+
 namespace ompl
 {
   namespace geometric
@@ -202,8 +203,6 @@ namespace ompl
       boost::associative_property_map<IndexToVertexMap> indexToVertex{indexToVertexStdMap};
       vertex_index_type index_ctr{0};
 
-    protected:
-
       //#######################################################################
       //Configuration Create, Remove, Add 
       //#######################################################################
@@ -288,7 +287,10 @@ namespace ompl
 
       Configuration* Nearest(Configuration *q) const;
 
+
       virtual void getPlannerData(base::PlannerData &data) const override;
+
+    protected:
       PlannerDataVertexAnnotated getAnnotatedVertex(Vertex vertex) const;
       PlannerDataVertexAnnotated getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const;
       //#######################################################################
@@ -312,6 +314,7 @@ namespace ompl
       std::vector<Vertex> shortest_path_start_goal_necessary_vertices;
 
     public:
+
       Configuration* GetStartConfiguration() const;
       Configuration* GetGoalConfiguration() const;
       const Graph& GetGraph() const;

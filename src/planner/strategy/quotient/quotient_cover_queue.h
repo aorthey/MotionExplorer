@@ -14,6 +14,7 @@ namespace ompl
   namespace geometric
   {
 
+    class StepStrategy;
     class QuotientCoverQueue: public og::QuotientCover
     {
       typedef og::QuotientCover BaseT;
@@ -33,7 +34,10 @@ namespace ompl
       virtual void Print(std::ostream& out) const override;
       virtual Configuration* SampleUniformQuotientCover(ob::State *state) override;
 
+      void AddConfigurationToPriorityQueue(Configuration *q);
     protected:
+      StepStrategy *step_strategy;
+
       bool firstRun{true};
       uint NUMBER_OF_EXPANSION_SAMPLES{0};
       const double shortestPathBias{1.0};

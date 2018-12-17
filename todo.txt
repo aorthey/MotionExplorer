@@ -635,3 +635,6 @@ visualized.
 [ ] There seems not to be a good alternative strategy once we see that there is
 no move towards the goal. We somehow get stuck exploring all the alternative
 routes of mediocre balls. (Instead of going towards a larger unexplored area)
+
+
+[ ] Make StepTowards a strategy
