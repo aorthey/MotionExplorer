@@ -697,6 +697,14 @@ const ob::SpaceInformationPtr& Quotient::GetQ0() const
 {
   return Q0;
 }
+const ob::StateSamplerPtr& Quotient::GetX1SamplerPtr() const
+{
+  return X1_sampler;
+}
+const ob::StateSamplerPtr& Quotient::GetQ1SamplerPtr() const
+{
+  return Q1_sampler;
+}
 
 bool Quotient::HasSolution()
 {

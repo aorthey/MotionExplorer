@@ -2,6 +2,7 @@
 #include "gui/common.h"
 #include "qng_goal_directed.h"
 #include "planner/strategy/quotient/step_strategy/step_straight.h"
+#include "planner/strategy/quotient/step_strategy/step_adaptive.h"
 
 using namespace ompl::geometric;
 
@@ -12,7 +13,7 @@ QNGGoalDirected::QNGGoalDirected(const base::SpaceInformationPtr &si, Quotient *
 {
   setName("QNGGoalDirected"+std::to_string(id));
   progressMadeTowardsGoal = true;
-  step_strategy = new StepStrategyStraight();
+  step_strategy = new StepStrategyAdaptive();
   step_strategy->SetSpace(this);
 }
 
@@ -105,138 +106,6 @@ void QNGGoalDirected::StepTowardsLodestar()
   }
 }
 
-
-////Create a bunch of children configurations into the direction of q_next. then
-////choose the child with the largest neighborhood and add it. The remaining
-////children are added to the priority queue for later extensions
-//bool QNGGoalDirected::StepTowards(Configuration *q_from, Configuration *q_next)
-//{
-//  const double distanceFromTo = DistanceNeighborhoodNeighborhood(q_from, q_next);
-//  if(distanceFromTo < 1e-10){
-//    return false;
-//  }
-//  std::vector<Configuration*> q_children = GenerateCandidateDirections(q_from, q_next);
-
-//  if(q_children.empty()){
-//    return false;
-//  }
-
-//  uint idx_best = GetLargestNeighborhoodIndex(q_children);
-
-//  Configuration *q_best = q_children.at(idx_best);
-//  AddConfigurationToCover(q_best);
-
-//  //add the smaller children to the priority_configurations to be extended at
-//  //a later stage if required
-//  for(uint k = 0; k < q_children.size(); k++)
-//  {
-//    Configuration *q_k = q_children.at(k);
-//    if(k!=idx_best){
-//      priority_configurations.push(q_k);
-//    }
-//  }
-//  return true;
-//}
-
-//bool QNGGoalDirected::ConfigurationHasNeighborhoodLargerThan(Configuration *q, double radius)
-//{
-//  return (q->GetRadius() >= radius);
-//}
-
-//std::vector<QuotientCover::Configuration*> QNGGoalDirected::GenerateCandidateDirections(Configuration *q_from, Configuration *q_next)
-//{
-//  std::vector<Configuration*> q_children;
-
-//  //            \                                           |
-//  //             \q_k                                       |
-//  //              \                                         |
-//  // q_from        |q_proj                      q_next      |
-//  //              /                                         |
-//  //             /                                          |
-//  //############################################################################
-//  //Case(1): Next projected onto neighborhood has larger radius => expand
-//  //directly, larger is always better
-//  //############################################################################
-//  Configuration *q_proj = new Configuration(Q1);
-
-//  const double radius_from = q_from->GetRadius();
-//  Connect(q_from, q_next, q_proj);
-//  q_proj->parent_neighbor = q_from;
-
-//  if(!ComputeNeighborhood(q_proj)) return q_children;
-
-//  if(ConfigurationHasNeighborhoodLargerThan(q_proj, radius_from))
-//  {
-//    q_children.push_back(q_proj);
-//    return q_children;
-//  }
-
-//  //############################################################################
-//  //Case(2): Next projected is smaller
-//  //############################################################################
-//  //if(q_from->parent_neighbor != nullptr){
-//  //  Configuration *q_sample_direction = q_proj;
-//  //  Configuration *q_momentum = new Configuration(Q1);
-
-//  //  double radius_parent = q_from->parent_neighbor->GetRadius();
-//  //  double step = (radius_from+radius_parent)/radius_parent;
-//  //  Interpolate(q_from->parent_neighbor, q_from, step, q_momentum);
-
-//  //  //CheckConfigurationIsOnBoundary(q_momentum, q_from);
-//  //  q_momentum->parent_neighbor = q_from;
-//  //  //############################################################################
-
-//  //  if(ComputeNeighborhood(q_momentum)){
-//  //    q_children.push_back(q_momentum);
-//  //    if(ConfigurationHasNeighborhoodLargerThan(q_momentum, radius_from))
-//  //    {
-//  //      return q_children;
-//  //    }
-//  //  }
-
-//  //  if(q_momentum->GetRadius() > q_proj->GetRadius())
-//  //  {
-//  //    q_sample_direction = q_momentum;
-//  //  }
-//  //}
-
-//  //############################################################################
-//  //Case(3): Neither proj nor momentum configuration are better. Try random
-//  //sampling
-//  //############################################################################
-//  for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES; k++){
-//    Configuration *q_k = new Configuration(Q1);
-
-//    Q1_sampler->sampleUniformNear(q_k->state, q_proj->state, 0.5*radius_from);
-
-//    const double d_from_to_k = DistanceConfigurationConfiguration(q_from, q_k);
-
-//    double step_size = radius_from/d_from_to_k;
-//    Q1->getStateSpace()->interpolate(q_from->state, q_k->state, step_size, q_k->state);
-
-//    // std::cout << "radius q_from: " << q_from->GetRadius() << std::endl;
-//    // std::cout << "d_from_to_k  : " << d_from_to_k << std::endl;
-//    // std::cout << "step         : " << step_size << std::endl;
-//    // std::cout << "d_from_to_k  (after proj): " << DistanceQ1(q_from, q_k) << std::endl;
-//    // double d_outcome = DistanceConfigurationConfiguration(q_from, q_k);
-//    // std::cout << "d_from_to_k  (graph metric): " << d_outcome << std::endl;
-
-//    //PROBLEM: q_k does not have a coset after sampling. Therefore we utilize
-//    //internally DistanceQ1. After Computeneighborhood, the coset is set, and we
-//    //can actually utilize the graph metric. However, under the graph metric,
-//    //the distance changes and it is not on the boundary anymore. Not sure how
-//    //to resolve
-//    //
-//    //
-//    if(ComputeNeighborhood(q_k))
-//    {
-//      CheckConfigurationIsOnBoundary(q_k, q_from);
-//      q_k->parent_neighbor = q_from;
-//      q_children.push_back(q_k);
-//    }
-//  }
-//  return q_children;
-//}
 
 //############################################################################
 // Misc Functions

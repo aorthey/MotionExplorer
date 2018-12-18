@@ -63,6 +63,10 @@ namespace ompl
         const ob::SpaceInformationPtr &GetX1() const;
         const ob::SpaceInformationPtr &GetQ1() const;
         const ob::SpaceInformationPtr &GetQ0() const;
+
+        const ob::StateSamplerPtr &GetX1SamplerPtr() const;
+        const ob::StateSamplerPtr &GetQ1SamplerPtr() const;
+
         Quotient* GetParent() const;
         Quotient* GetChild() const;
         uint GetLevel() const;

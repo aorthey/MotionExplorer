@@ -637,4 +637,6 @@ no move towards the goal. We somehow get stuck exploring all the alternative
 routes of mediocre balls. (Instead of going towards a larger unexplored area)
 
 
-[ ] Make StepTowards a strategy
+[x] Make StepTowards a strategy 
+Does not show equal performance, because we directly wire the new states
+

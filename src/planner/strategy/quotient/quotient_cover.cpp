@@ -788,24 +788,6 @@ void QuotientCover::RewireConfiguration(Configuration *q)
   }
 }
 
-uint QuotientCover::GetLargestNeighborhoodIndex(const std::vector<Configuration*> &q_children)
-{
-  assert(q_children.size()>0);
-  double radius_best = 0;
-  uint idx_best = 0;
-  for(uint k = 0; k < q_children.size(); k++)
-  {
-    Configuration *q_k = q_children.at(k);
-    double r = q_k->GetRadius();
-    if(r > radius_best)
-    {
-      radius_best = r;
-      idx_best = k;
-    }
-  }
-  return idx_best;
-}
-
 void QuotientCover::CheckConfigurationIsOnBoundary(Configuration *q_boundary, Configuration *q)
 {
   double d_outcome = DistanceConfigurationConfiguration(q_boundary, q);
