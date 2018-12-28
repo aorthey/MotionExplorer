@@ -13,6 +13,7 @@ namespace ompl
         StepStrategyStraight() = default;
 
         virtual bool Towards(og::QuotientCover::Configuration *q_from, og::QuotientCover::Configuration *q_to) override;
+        virtual bool Expand(og::QuotientCover::Configuration *q_from) override;
 
       private:
 

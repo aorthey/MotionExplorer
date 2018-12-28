@@ -640,3 +640,28 @@ routes of mediocre balls. (Instead of going towards a larger unexplored area)
 [x] Make StepTowards a strategy 
 Does not show equal performance, because we directly wire the new states
 
+
+
+We would like to discover a voronoi bias for the free space. Given all our
+information, the only way we can infer anything about the free space is by
+observing the size of the neighborhoods (NBHs). 
+
+Every NBH should have a direction in which it is growing. This direction can be
+helpful to sample more effectively. Also, it could help to expand the largest
+NBHs into the right direction. I.e. instead of having a lodestar, we could just
+go for a large NBH direction, which would be some implicit free space bias.
+
+
+
+Experiments for paper:
+[ ] Rigid Body 2D misleading
+[ ] Rigid Body 2D labyrinth
+[ ] Rigid Body 2D non-simple
+[ ] Rigid Body 3D as IROS
+[ ] Articulated Body 3D
+[ ] Manipulator
+[ ] Manipulator DualArm
+[ ] Humanoid Robot!
+[ ] Hand Movement
+[ ] Dubins Car (Kinodynamic)
+

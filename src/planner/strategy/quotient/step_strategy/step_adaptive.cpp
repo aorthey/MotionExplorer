@@ -9,11 +9,55 @@ bool StepStrategyAdaptive::Towards(QuotientCover::Configuration *q_from, Quotien
     return false;
   }
   std::vector<Configuration*> q_children = GenerateCandidateDirections(q_from, q_to);
+  return ChooseBestDirection(q_children);
+}
 
+bool StepStrategyAdaptive::Expand(QuotientCover::Configuration *q_from)
+{
+  if(q_from->parent_neighbor != nullptr){
+
+    Configuration *q_next = new Configuration(quotient_cover_queue->GetQ1());
+
+    //############################################################################
+    //Generate q_next in the direction away from parent
+    // q_parent ------- q_from --------- q_next
+    //############################################################################
+    double radius_from = q_from->GetRadius();
+    double radius_parent = q_from->parent_neighbor->GetRadius();
+    double step = (radius_from+radius_parent)/radius_parent;
+
+    quotient_cover_queue->Interpolate(q_from->parent_neighbor, q_from, step, q_next);
+
+    q_next->parent_neighbor = q_from;
+
+    //############################################################################
+    //Addconfigurationrandomperturbation
+    //############################################################################
+    std::vector<Configuration*> q_children;
+    if(quotient_cover_queue->ComputeNeighborhood(q_next)){
+      q_children.push_back(q_next);
+      if(q_next->GetRadius() >= radius_from){
+        //return if we go towards larger area
+        return ChooseBestDirection(q_children);
+      }
+    }else{
+      //no progress made
+      return false;
+    }
+    GenerateRandomChildrenAroundConfiguration(q_next, q_children, radius_from);
+    return ChooseBestDirection(q_children);
+  }else{
+    std::cout << "tried to expand start configuration straight. Not defined." << std::endl;
+    exit(0);
+    return false;
+  }
+}
+
+bool StepStrategyAdaptive::ChooseBestDirection(const std::vector<Configuration*> &q_children)
+{
   if(q_children.empty()){
     return false;
   }
-
   uint idx_best = GetLargestNeighborhoodIndex(q_children);
 
   Configuration *q_best = q_children.at(idx_best);
@@ -86,46 +130,32 @@ std::vector<QuotientCover::Configuration*> StepStrategyAdaptive::GenerateCandida
   }
 
   //############################################################################
-  //Case(2): PC is smaller. Try out different alternative directions. Then
-  //choose the locally largest.
-  //############################################################################
-  if(q_from->parent_neighbor != nullptr){
-    Configuration *q_momentum = new Configuration(quotient_cover_queue->GetQ1());
-
-    double radius_parent = q_from->parent_neighbor->GetRadius();
-    double step = (radius_from+radius_parent)/radius_parent;
-    quotient_cover_queue->Interpolate(q_from->parent_neighbor, q_from, step, q_momentum);
-
-    q_momentum->parent_neighbor = q_from;
-    //############################################################################
-
-    if(quotient_cover_queue->ComputeNeighborhood(q_momentum)){
-      q_children.push_back(q_momentum);
-    }
-  }
-
-  //############################################################################
-  //Case(3): Neighter PC nor momentum configuration are better. Try random
+  //Case(2): Try random
   //sampling near PC, but on boundary of q_from
   //############################################################################
 
-  uint NUMBER_OF_EXPANSION_SAMPLES = (quotient_cover_queue->GetQ1()->getStateDimension()+1);
+  GenerateRandomChildrenAroundConfiguration(q_proj, q_children, radius_from);
+  return q_children;
+}
+
+void StepStrategyAdaptive::GenerateRandomChildrenAroundConfiguration(Configuration *q, std::vector<Configuration*> &q_children, double radius_from)
+{
+  uint NUMBER_OF_EXPANSION_SAMPLES = (quotient_cover_queue->GetQ1()->getStateDimension()+2);
 
   for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES; k++){
     Configuration *q_k = new Configuration(quotient_cover_queue->GetQ1());
 
     //Sample a configuration on the boundary of q_from, randomly distributed
     //around PC
-    quotient_cover_queue->GetQ1SamplerPtr()->sampleUniformNear(q_k->state, q_proj->state, 0.5*radius_from);
-    const double d_from_to_k = quotient_cover_queue->DistanceConfigurationConfiguration(q_from, q_k);
+    quotient_cover_queue->GetQ1SamplerPtr()->sampleGaussian(q_k->state, q->state, radius_from);
+    const double d_from_to_k = quotient_cover_queue->DistanceConfigurationConfiguration(q, q_k);
     double step_size = radius_from/d_from_to_k;
-    quotient_cover_queue->GetQ1()->getStateSpace()->interpolate(q_from->state, q_k->state, step_size, q_k->state);
+    quotient_cover_queue->GetQ1()->getStateSpace()->interpolate(q->state, q_k->state, step_size, q_k->state);
 
     if(quotient_cover_queue->ComputeNeighborhood(q_k))
     {
-      q_k->parent_neighbor = q_from;
+      q_k->parent_neighbor = q;
       q_children.push_back(q_k);
     }
   }
-  return q_children;
 }

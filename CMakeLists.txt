@@ -29,6 +29,12 @@ MESSAGE($OMPL_VERSION)
 ### OMPL REquirements: CMAKE 2.8.7, Eigen 3.3, Boost 1.55, compile both with
 ### same libs
 
+# find FLANN with pkg-config
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(FLANN REQUIRED flann)
+SET(DEPENDENCIES ${DEPENDENCIES} FLANN)
+
+
 find_package(PkgConfig)
 pkg_search_module(Eigen3 3.3 REQUIRED eigen3)
 SET(DEPENDENCIES ${DEPENDENCIES} Eigen3)

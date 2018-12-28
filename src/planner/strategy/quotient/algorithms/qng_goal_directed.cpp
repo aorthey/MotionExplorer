@@ -35,6 +35,7 @@ void QNGGoalDirected::clear()
   }
 
   nearest_to_goal_has_changed = true;
+  progressMadeTowardsGoal = true;
   BaseT::clear();
 }
 
@@ -62,11 +63,14 @@ void QNGGoalDirected::Grow(double t)
 
 void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
 {
-  if(nearest_to_goal_has_changed){
-    q_lodestar = q_goal;
-    nearest_to_goal_has_changed = false;
+  if(nearest_to_goal_has_changed || progressMadeTowardsGoal)
+  {
+    Configuration *q_nearest = configurations_sorted_by_nearest_to_goal.top();
+    progressMadeTowardsGoal = step_strategy->Towards(q_nearest, q_goal);
+  }else{
+    Configuration *q_largest = priority_configurations.top();
+    step_strategy->Expand(q_largest);
   }
-  StepTowardsLodestar();
 }
 
 void QNGGoalDirected::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
@@ -114,6 +118,7 @@ void QNGGoalDirected::StepTowardsLodestar()
 double QNGGoalDirected::ValueConnectivity(Configuration *q)
 {
   Vertex v = get(indexToVertex, q->index);
+  //QuotientCover::Print(q, false);
   double d_alpha = std::pow(2.0,boost::degree(v, graph));
   //double d_alpha = boost::degree(v, graph)+1;
   double d_connectivity = q->GetRadius()/d_alpha;
@@ -127,7 +132,6 @@ void QNGGoalDirected::RewireCover(ob::PlannerTerminationCondition &ptc)
 
   //find all vertices which intersect NBH, then check if they have an edge in
   //common. Then add one if they don't.
-
   //RewireConfiguration(q);
   //for(uint k = 0; k < q_neighbors.size(); k++){
   //  Configuration *qk = q_neighbors.at(k);

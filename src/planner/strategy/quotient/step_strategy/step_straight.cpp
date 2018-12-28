@@ -21,3 +21,28 @@ bool StepStrategyStraight::Towards(QuotientCover::Configuration *q_from, Quotien
 
   return false;
 }
+bool StepStrategyStraight::Expand(QuotientCover::Configuration *q_from)
+{
+  if(q_from->parent_neighbor != nullptr){
+    Configuration *q_next = new Configuration(quotient_cover_queue->GetQ1());
+
+    // q_parent ------- q_from --------- q_next
+    double radius_from = q_from->GetRadius();
+    double radius_parent = q_from->parent_neighbor->GetRadius();
+    double step = (radius_from+radius_parent)/radius_parent;
+
+    quotient_cover_queue->Interpolate(q_from->parent_neighbor, q_from, step, q_next);
+
+    q_next->parent_neighbor = q_from;
+    //############################################################################
+
+    if(quotient_cover_queue->ComputeNeighborhood(q_next)){
+      quotient_cover_queue->AddConfigurationToCover(q_next);
+      return true;
+    }
+  }else{
+    std::cout << "tried to expand start configuration straight. Not defined." << std::endl;
+    exit(0);
+  }
+  return false;
+}

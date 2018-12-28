@@ -16,6 +16,13 @@
 #include <ompl/datastructures/NearestNeighborsFLANN.h>
 #include <ompl/datastructures/NearestNeighborsLinear.h>
 #include <ompl/datastructures/NearestNeighborsSqrtApprox.h>
+#include <flann/algorithms/autotuned_index.h>
+ 
+#if OMPL_HAVE_FLANN == 0
+#error FLANN is not available. Please use a different NearestNeighbors data structure.
+#endif
+#include <flann/flann.hpp>
+
 
 #define foreach BOOST_FOREACH
 
@@ -30,24 +37,68 @@ QuotientCover::~QuotientCover(void)
 {
 }
 //#############################################################################
-//#############################################################################
 //SETUP
 //#############################################################################
-//#############################################################################
+namespace ompl{
+  template <typename _T>
+  class FLANNConfigurationDistance
+  {
+  public:
+      using ElementType = QuotientCover::Configuration *;
+      using ResultType = double;
+
+      FLANNConfigurationDistance(const typename NearestNeighbors<_T>::DistanceFunction &distFun) : distFun_(distFun)
+      {
+      }
+
+      template <typename Iterator1, typename Iterator2>
+      ResultType operator()(Iterator1 a, Iterator2 b, size_t /*size*/, ResultType /*worst_dist*/ = -1) const
+      {
+          return distFun_(*a, *b);
+      }
+
+  protected:
+      const typename NearestNeighbors<_T>::DistanceFunction &distFun_;
+  };
+
+  template <typename _T, typename _Dist = FLANNConfigurationDistance<_T>>
+  class NearestNeighborsFLANNConfigurationLinear : public NearestNeighborsFLANN<_T, _Dist>
+  {
+  public:
+      NearestNeighborsFLANNConfigurationLinear()
+        : NearestNeighborsFLANN<_T, _Dist>(std::shared_ptr<flann::LinearIndexParams>(new flann::LinearIndexParams()))
+      {
+      }
+  };
+  template <typename _T, typename _Dist = FLANNConfigurationDistance<_T>>
+  class NearestNeighborsFLANNConfigurationHierarchicalClustering : public NearestNeighborsFLANN<_T, _Dist>
+  {
+  public:
+      NearestNeighborsFLANNConfigurationHierarchicalClustering()
+        : NearestNeighborsFLANN<_T, _Dist>(std::shared_ptr<flann::HierarchicalClusteringIndexParams>(
+              new flann::HierarchicalClusteringIndexParams()))
+      {
+      }
+
+  };
+
+}
+
 
 void QuotientCover::setup(void)
 {
   BaseT::setup();
   if (!nearest_neighborhood){
-                            // return new NearestNeighborsGNAT<_T>();
-
+    //return new NearestNeighborsGNAT<_T>();
     //nearest_neighborhood.reset(new NearestNeighborsGNAT<Configuration *>());
     //nearest_neighborhood.reset(new NearestNeighborsGNATNoThreadSafety<Configuration *>());
-
-    //TODO: works only with linear version, why does it break with FLANN or
-    //GNAT?
+    //nearest_neighborhood.reset(new NearestNeighborsSqrtApprox<Configuration *>());
     nearest_neighborhood.reset(new NearestNeighborsLinear<Configuration *>()); 
+    //nearest_neighborhood.reset(new NearestNeighborsFLANNConfigurationLinear<Configuration*>()); 
+    //nearest_neighborhood.reset(new NearestNeighborsFLANNConfigurationHierarchicalClustering<Configuration*>()); 
+    //nearest_neighborhood.reset(new NearestNeighborsFLANNHierarchicalClustering<Configuration *>()); 
     //nearest_neighborhood.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
+
     nearest_neighborhood->setDistanceFunction([this](const Configuration *a, const Configuration *b)
                              {
                                 return DistanceNeighborhoodNeighborhood(a,b);
@@ -200,12 +251,13 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
   //STEP1: Check that q can be projected onto a feasible area of QS
   //###########################################################################
   if(parent != nullptr){
-    //std::cout << "NYI" << std::endl;
-    //exit(0);
+    std::cout << "NYI" << std::endl;
+    exit(0);
   }
 
   if(q->GetRadius() <= 0){
     std::cout << "[WARNING] Tried adding a zero-measure neighborhood." << std::endl;
+    exit(0);
     return BGT::null_vertex();
   }
 
@@ -215,62 +267,71 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
   //###########################################################################
   //STEP2: Get all neighbors which are intersecting neighborhood of q
   //###########################################################################
-  std::vector<Configuration*> neighbors = GetIntersectingNeighborhoodConfigurations(q);
-  uint K = (Q1->getStateDimension()+2);
-  uint N = neighbors.size();
-  if(N<=0 && !q->isStart){
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << *this << std::endl;
-    std::cout << "neighbors are empty" << std::endl;
-    Print(q, false);
-    Configuration *qn = nearest_neighborhood->nearest(q);
-    std::cout << "nearest:" << std::endl;
-    Print(qn, false);
-    std::cout << "distance: " << DistanceNeighborhoodNeighborhood(q,qn) << std::endl;
-    std::cout << "distance: " << DistanceConfigurationConfiguration(q,qn) << std::endl;
+  // std::vector<Configuration*> neighbors = GetIntersectingNeighborhoodConfigurations(q);
+  // uint N = neighbors.size();
+  // if(N<=0 && !q->isStart){
+  //   std::cout << std::string(80, '-') << std::endl;
+  //   std::cout << std::string(80, '-') << std::endl;
+  //   std::cout << *this << std::endl;
+  //   std::cout << "neighbors are empty" << std::endl;
+  //   Print(q, false);
+  //   Configuration *qn = nearest_neighborhood->nearest(q);
+  //   std::cout << "nearest:" << std::endl;
+  //   Print(qn, false);
+  //   std::cout << "distance: " << DistanceNeighborhoodNeighborhood(q,qn) << std::endl;
+  //   std::cout << "distance: " << DistanceConfigurationConfiguration(q,qn) << std::endl;
 
-    std::vector<Configuration*> neighbors;
-    std::cout << "NearestK" << std::endl;
-    nearest_neighborhood->nearestK(q, 1, neighbors);
-    Configuration *qk = neighbors.at(0);
-    Print(qk, false);
-    std::cout << "distance: " << DistanceNeighborhoodNeighborhood(q,qk) << " to " << qk->index << std::endl;
-    std::cout << "distance: " << DistanceConfigurationConfiguration(q,qn) << std::endl;
+  //   std::vector<Configuration*> neighbors;
+  //   std::cout << "NearestK" << std::endl;
+  //   nearest_neighborhood->nearestK(q, 1, neighbors);
+  //   Configuration *qk = neighbors.at(0);
+  //   Print(qk, false);
+  //   std::cout << "distance: " << DistanceNeighborhoodNeighborhood(q,qk) << " to " << qk->index << std::endl;
+  //   std::cout << "distance: " << DistanceConfigurationConfiguration(q,qn) << std::endl;
 
-    for(uint k = 0; k < 20; k++){
-      neighbors.clear();
-      nearest_neighborhood->nearestR(q, 1e-20, neighbors);
-      std::cout << k << ":" << neighbors.size() << std::endl;
-    }
+  //   for(uint k = 0; k < 20; k++){
+  //     neighbors.clear();
+  //     nearest_neighborhood->nearestR(q, 1e-20, neighbors);
+  //     std::cout << k << ":" << neighbors.size() << std::endl;
+  //   }
 
-    double dstep = 1e-20;
-    for(double d = dstep; d < 1.0; d*=10){
-      nearest_neighborhood->nearestR(q, 0, neighbors);
-      std::cout << d << ":" << neighbors.size() << std::endl;
-      if(neighbors.size()>0){
-        for(uint k = 0; k < neighbors.size(); k++){
-          Configuration *qk = neighbors.at(k);
-          std::cout << "distance: " << DistanceNeighborhoodNeighborhood(q,qk) << " to " << qk->index << std::endl;
-        }
+  //   double dstep = 1e-20;
+  //   for(double d = dstep; d < 1.0; d*=10){
+  //     nearest_neighborhood->nearestR(q, 0, neighbors);
+  //     std::cout << d << ":" << neighbors.size() << std::endl;
+  //     if(neighbors.size()>0){
+  //       for(uint k = 0; k < neighbors.size(); k++){
+  //         Configuration *qk = neighbors.at(k);
+  //         std::cout << "distance: " << DistanceNeighborhoodNeighborhood(q,qk) << " to " << qk->index << std::endl;
+  //       }
 
-        break;
-      }
+  //       break;
+  //     }
 
-    }
-    std::cout << nearest_neighborhood->size() << std::endl;
-    std::cout << neighbors.size() << std::endl;
-    exit(0);
-  }
+  //   }
+  //   std::cout << nearest_neighborhood->size() << std::endl;
+  //   std::cout << neighbors.size() << std::endl;
+  //   exit(0);
+  // }
 
   //###########################################################################
   //STEP3: Verify that neighborhood of q is not a subset of any intersecting
   //neighborhood
   //###########################################################################
+  uint K = (Q1->getStateDimension()+1);
+
+  std::vector<Configuration*> neighbors;
+  nearest_neighborhood->nearestK(q, K, neighbors);
+
   for(uint k = 0; k < neighbors.size(); k++){
     Configuration *qn = neighbors.at(k);
     if(IsNeighborhoodInsideNeighborhood(q, qn))
       return BGT::null_vertex();
+  }
+
+  if(neighbors.empty() && !q->isStart){
+    std::cout << "adding Configuration not on boundary of cover!" << std::endl;
+    exit(0);
   }
 
   //###########################################################################
@@ -282,18 +343,22 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
   //STEP5: Add edge for each neighbor. Remove all subset neighbors
   //###########################################################################
   //bound number of connections. We can always rewire later on
-  for(uint k = 0; k < std::min(N,K); k++){
-    Configuration *qn = neighbors.at(k);
-    if(!IsNeighborhoodInsideNeighborhood(qn, q))
+  for(uint k = 0; k < neighbors.size(); k++){
+    Configuration *qk = neighbors.at(k);
+    if(!IsNeighborhoodInsideNeighborhood(qk, q))
     {
-      AddEdge(q, qn);
-    }else{
-      if(qn->isStart || qn->isGoal){
-        AddEdge(q, qn);
+      const double dqqk = DistanceNeighborhoodNeighborhood(qk, q);
+      if(dqqk < 1e-10){
+        AddEdge(q, qk);
       }else{
-        RerouteEdgesFromTo(qn, q);
-        //std::cout << "edges before rewiring: " << W << " after: " << V << std::endl;
-        RemoveConfigurationFromCover(qn);
+        break;
+      }
+    }else{
+      if(qk->isStart || qk->isGoal){
+        AddEdge(q, qk);
+      }else{
+        RerouteEdgesFromTo(qk, q);
+        RemoveConfigurationFromCover(qk);
       }
     }
   }
