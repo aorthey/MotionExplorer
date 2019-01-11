@@ -8,19 +8,23 @@ namespace ompl
   {
     class StepStrategyAdaptive: public og::StepStrategy{
 
+        typedef og::StepStrategy BaseT;
+        const int verbose{0};
       public:
 
         StepStrategyAdaptive() = default;
 
         virtual bool Towards(og::QuotientCover::Configuration *q_from, og::QuotientCover::Configuration *q_to) override;
-        virtual bool Expand(og::QuotientCover::Configuration *q_from) override;
+        virtual bool ExpandOutside(og::QuotientCover::Configuration *q_from) override;
+        virtual bool ExpandRandom(og::QuotientCover::Configuration *q_from) override;
 
       private:
         bool ChooseBestDirection(const std::vector<og::QuotientCover::Configuration*> &q_children);
 
-        void GenerateRandomChildrenAroundConfiguration(og::QuotientCover::Configuration* q, std::vector<og::QuotientCover::Configuration*> &q_children, double radius_from);
+        void GenerateRandomChildrenOnBoundaryAroundConfiguration(og::QuotientCover::Configuration* q_center, og::QuotientCover::Configuration* q_near, std::vector<og::QuotientCover::Configuration*> &q_children);
 
         uint GetLargestNeighborhoodIndex(const std::vector<og::QuotientCover::Configuration*> &q_children);
+        uint GetLargestNeighborhoodIndexOutsideCover(const std::vector<QuotientCover::Configuration*> &q_children);
 
         bool ConfigurationHasNeighborhoodLargerThan(og::QuotientCover::Configuration *q, double radius);
 

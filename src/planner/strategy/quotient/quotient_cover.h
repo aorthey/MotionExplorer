@@ -19,7 +19,7 @@ namespace ompl
       typedef og::Quotient BaseT;
     public:
 
-      const uint verbose{0};
+      const uint verbose{2};
 
       QuotientCover(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QuotientCover(void);
@@ -294,7 +294,7 @@ namespace ompl
       PlannerDataVertexAnnotated getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const;
       //#######################################################################
       RNG rng_;
-      const double minimum_neighborhood_radius{1e-5}; //minimum allowed radius, otherwise configuration is considered INVALID 
+      const double minimum_neighborhood_radius{1e-2}; //minimum allowed radius, otherwise configuration is considered INVALID 
 
       double totalVolumeOfCover{0.0};
       bool isConnected{false};

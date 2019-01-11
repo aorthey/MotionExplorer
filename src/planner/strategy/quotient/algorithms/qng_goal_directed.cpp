@@ -45,6 +45,7 @@ void QNGGoalDirected::clear()
 //############################################################################
 void QNGGoalDirected::Grow(double t)
 {
+
   if(saturated) return;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
 
@@ -54,6 +55,7 @@ void QNGGoalDirected::Grow(double t)
   }else{
     GrowWithSolution(ptc);
   }
+  //DEBUG
   int M = boost::num_edges(graph);
   if( abs(N-M) > 100 ){
     std::cout << "increase of edges from " << N << " to " << M << std::endl;
@@ -65,11 +67,24 @@ void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
 {
   if(nearest_to_goal_has_changed || progressMadeTowardsGoal)
   {
+    nearest_to_goal_has_changed = false;
+    if(verbose>1) std::cout << "Step Towards Goal" << std::endl;
     Configuration *q_nearest = configurations_sorted_by_nearest_to_goal.top();
     progressMadeTowardsGoal = step_strategy->Towards(q_nearest, q_goal);
+    if(verbose>1) std::cout << "Progress: "<< (progressMadeTowardsGoal?"Yes":"No") << std::endl;
   }else{
-    Configuration *q_largest = priority_configurations.top();
-    step_strategy->Expand(q_largest);
+    if(!priority_configurations.empty()){
+      if(verbose>1) std::cout << "Expand Largest" << std::endl;
+      Configuration *q_largest = priority_configurations.top();
+      step_strategy->ExpandOutside(q_largest);
+      priority_configurations.pop();
+    }else{
+      //empty priority configurations. This means we have to restart from
+      //somewhere
+      if(verbose>1) std::cout << "Generate New Configurations" << std::endl;
+      Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
+      step_strategy->ExpandRandom(q);
+    }
   }
 }
 
@@ -79,37 +94,10 @@ void QNGGoalDirected::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
   if(r <= rewireBias){
     RewireCover(ptc);
   }else{
-    StepTowardsLodestar();
+    std::cout << "NYI" << std::endl;
+    exit(0);
   }
 }
-bool QNGGoalDirected::GetSolution(ob::PathPtr &solution)
-{
-  //will be called only once
-  bool result = BaseT::GetSolution(solution);
-  if(result){
-    //update lodestar
-    q_lodestar = new Configuration(Q1);
-    SampleUniform(q_lodestar);
-    if(level>0) QuotientCover::Print(q_lodestar, false);
-  }
-  return result;
-}
-
-//############################################################################
-// Step Functions
-//############################################################################
-void QNGGoalDirected::StepTowardsLodestar()
-{
-  Configuration *q_nearest = Nearest(q_lodestar);
-  bool madeProgress = step_strategy->Towards(q_nearest, q_lodestar);
-  if(!madeProgress){
-    //change lodestar
-    q_lodestar = new Configuration(Q1);
-    SampleUniform(q_lodestar);
-    if(level>0) QuotientCover::Print(q_lodestar, false);
-  }
-}
-
 
 //############################################################################
 // Misc Functions
@@ -117,12 +105,12 @@ void QNGGoalDirected::StepTowardsLodestar()
 
 double QNGGoalDirected::ValueConnectivity(Configuration *q)
 {
-  Vertex v = get(indexToVertex, q->index);
+  //Vertex v = get(indexToVertex, q->index);
   //QuotientCover::Print(q, false);
-  double d_alpha = std::pow(2.0,boost::degree(v, graph));
+  //double d_alpha = std::pow(2.0,boost::degree(v, graph));
   //double d_alpha = boost::degree(v, graph)+1;
-  double d_connectivity = q->GetRadius()/d_alpha;
-  //double d_connectivity = q->GetRadius();
+  //double d_connectivity = q->GetRadius()/d_alpha;
+  double d_connectivity = q->GetRadius();
   return d_connectivity;
 }
 

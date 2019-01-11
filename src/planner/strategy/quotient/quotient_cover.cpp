@@ -91,9 +91,9 @@ void QuotientCover::setup(void)
   if (!nearest_neighborhood){
     //return new NearestNeighborsGNAT<_T>();
     //nearest_neighborhood.reset(new NearestNeighborsGNAT<Configuration *>());
-    //nearest_neighborhood.reset(new NearestNeighborsGNATNoThreadSafety<Configuration *>());
+    nearest_neighborhood.reset(new NearestNeighborsGNATNoThreadSafety<Configuration *>());
     //nearest_neighborhood.reset(new NearestNeighborsSqrtApprox<Configuration *>());
-    nearest_neighborhood.reset(new NearestNeighborsLinear<Configuration *>()); 
+    //nearest_neighborhood.reset(new NearestNeighborsLinear<Configuration *>()); 
     //nearest_neighborhood.reset(new NearestNeighborsFLANNConfigurationLinear<Configuration*>()); 
     //nearest_neighborhood.reset(new NearestNeighborsFLANNConfigurationHierarchicalClustering<Configuration*>()); 
     //nearest_neighborhood.reset(new NearestNeighborsFLANNHierarchicalClustering<Configuration *>()); 
@@ -538,13 +538,15 @@ bool QuotientCover::ComputeNeighborhood(Configuration *q, bool verbose)
 
 bool QuotientCover::IsConfigurationInsideNeighborhood(Configuration *q, Configuration *qn)
 {
-  return (DistanceConfigurationNeighborhood(q, qn) <= 0);
+  return (DistanceConfigurationNeighborhood(q, qn) <= 1e-10);
 }
 
 bool QuotientCover::IsConfigurationInsideCover(Configuration *q)
 {
+  //std::cout << "is inside cover" << std::endl;
   std::vector<Configuration*> neighbors;
   nearest_neighborhood->nearestK(q, 2, neighbors);
+  //std::cout << "nbs: " << neighbors.size() << std::endl;
   if(neighbors.size()<=1) return false;
   return IsConfigurationInsideNeighborhood(q, neighbors.at(0)) && IsConfigurationInsideNeighborhood(q, neighbors.at(1));
 }
@@ -694,6 +696,11 @@ QuotientCover::Configuration* QuotientCover::SampleUniformQuotientCover(ob::Stat
   //  double d = Q1->distance(q_coset->state, state);
   //  Q1->getStateSpace()->interpolate(q_coset->state, state, r_shell/d, state);
   //}
+
+  //Project sampled state onto the boundary!
+  double d = Q1->distance(q_coset->state, state);
+  Q1->getStateSpace()->interpolate(state, q_coset->state, q_coset->GetRadius()/d, q_coset->state);
+
   return q_coset;
 }
 

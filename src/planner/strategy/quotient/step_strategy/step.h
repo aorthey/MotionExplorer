@@ -19,7 +19,9 @@ namespace ompl
         //parent. This step can be done straight, or it can be perturbed by
         //adjacent obstacles
         //return bool: if we successfully stepped or not
-        virtual bool Expand(og::QuotientCover::Configuration *q_from) = 0;
+
+        virtual bool ExpandOutside(og::QuotientCover::Configuration *q_from);
+        virtual bool ExpandRandom(og::QuotientCover::Configuration *q_from);
 
         void SetSpace(og::QuotientCoverQueue*);
 
