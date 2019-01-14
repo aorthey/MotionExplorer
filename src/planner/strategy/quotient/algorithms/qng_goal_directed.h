@@ -1,5 +1,5 @@
 #pragma once
-#include "qng.h"
+#include "planner/strategy/quotient/quotient_cover_queue.h"
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
@@ -9,10 +9,10 @@ namespace ompl
   namespace geometric
   {
 
-    class QNGGoalDirected: public og::QNG
+    class QNGGoalDirected: public og::QuotientCoverQueue
     {
-      typedef og::QNG BaseT;
-      const int verbose{0};
+      typedef og::QuotientCoverQueue BaseT;
+      const int verbose{2};
     public:
 
       QNGGoalDirected(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);

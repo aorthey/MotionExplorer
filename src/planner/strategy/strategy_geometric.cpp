@@ -10,7 +10,7 @@
 
 #include "planner/strategy/quotientchart/multichart.h"
 //#include "planner/strategy/quotientchart/algorithms/qng2.h"
-#include "planner/strategy/quotient/algorithms/qng.h"
+//#include "planner/strategy/quotient/algorithms/qng.h"
 #include "planner/strategy/quotient/algorithms/qng_goal_directed.h"
 
 #include <ompl/geometric/planners/rrt/RRT.h>
@@ -144,9 +144,6 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   }else if(algorithm=="hierarchy:qmp"){
     planner = GetSharedMultiQuotientPtr<og::QMP>(si_vec, pdef_vec);
     planner->setName("QMP");
-  }else if(algorithm=="hierarchy:qng"){
-    planner = GetSharedMultiQuotientPtr<og::QNG>(si_vec, pdef_vec);
-    planner->setName("QNG");
   }else if(algorithm=="hierarchy:qng_goal_directed"){
     planner = GetSharedMultiQuotientPtr<og::QNGGoalDirected>(si_vec, pdef_vec);
     planner->setName("QNGGoalDirected");

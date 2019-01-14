@@ -68,23 +68,47 @@ void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
   if(nearest_to_goal_has_changed || progressMadeTowardsGoal)
   {
     nearest_to_goal_has_changed = false;
+    //############################################################################
+    //STATE1: GoalOriented Strategy
+    //############################################################################
+
     if(verbose>1) std::cout << "Step Towards Goal" << std::endl;
     Configuration *q_nearest = configurations_sorted_by_nearest_to_goal.top();
     progressMadeTowardsGoal = step_strategy->Towards(q_nearest, q_goal);
     if(verbose>1) std::cout << "Progress: "<< (progressMadeTowardsGoal?"Yes":"No") << std::endl;
+
+    //############################################################################
   }else{
-    if(!priority_configurations.empty()){
-      if(verbose>1) std::cout << "Expand Largest" << std::endl;
-      Configuration *q_largest = priority_configurations.top();
-      step_strategy->ExpandOutside(q_largest);
-      priority_configurations.pop();
-    }else{
-      //empty priority configurations. This means we have to restart from
-      //somewhere
-      if(verbose>1) std::cout << "Generate New Configurations" << std::endl;
-      Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
-      step_strategy->ExpandRandom(q);
-    }
+    //############################################################################
+    //STATE2: ExtendFreeSpace Strategy
+    //############################################################################
+
+    Configuration *q_member = priority_queue_member_configurations.top();
+    std::cout << boost::degree(q_member, graph) << std::endl;
+    exit(0);
+    //if(boost::degree(q_member->index, graph)>1){
+    //  //take the largest candidate
+    //}else{
+    //  Configuration *q_member = priority_queue_member_configurations.top();
+
+    //}
+
+
+    // Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
+    // step_strategy->ExpandRandom(q);
+    // if(!priority_configurations.empty()){
+    //   if(verbose>1) std::cout << "Expand Largest" << std::endl;
+    //   Configuration *q_largest = priority_configurations.top();
+    //   step_strategy->ExpandOutside(q_largest);
+    //   priority_configurations.pop();
+    // }
+    //else{
+    //  //empty priority configurations. This means we have to restart from
+    //  //somewhere
+    //  if(verbose>1) std::cout << "Generate New Configurations" << std::endl;
+    //  Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
+    //  step_strategy->ExpandRandom(q);
+    //}
   }
 }
 

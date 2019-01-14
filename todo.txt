@@ -666,3 +666,37 @@ Experiments for paper:
 [ ] Dubins Car (Kinodynamic)
 
 What happens if we cannot expand the largest? WEll we go l
+
+(1) Every NBH should have an associated direction. This direction points outward
+from the cover. 
+What we haven't done yet is to define where the direction is pointing given more
+than one connected nodes. Also how can we define an interior NBH inside the
+cover? Can we maybe assign interiority as a function of connections?
+
+(2) A random direction is sampled when none of the directions yielded a good
+result.
+
+
+TRANSFER TO VBN:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

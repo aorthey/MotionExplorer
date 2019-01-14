@@ -33,96 +33,26 @@ void QuotientCoverQueue::setup()
 }
 void QuotientCoverQueue::AddConfigurationToPriorityQueue(Configuration *q)
 {
-  priority_configurations.push(q);
+  priority_queue_candidate_configurations.push(q);
 }
 
 void QuotientCoverQueue::clear()
 {
   BaseT::clear();
-  while(!priority_configurations.empty()) 
+  while(!priority_queue_candidate_configurations.empty()) 
   {
-    //Configuration *q = priority_configurations.top();
-    //priority_configurations have not yet been added to graph, so we need to
-    //remove them manually
-    //if(q!=nullptr) q->Remove(Q1);
-    priority_configurations.pop();
+    priority_queue_candidate_configurations.pop();
   }
   NUMBER_OF_EXPANSION_SAMPLES = (Q1->getStateDimension()+1)*1;
   firstRun = true;
 }
 
-void QuotientCoverQueue::Grow(double t)
+
+QuotientCover::Vertex QuotientCoverQueue::AddConfigurationToCover(Configuration *q)
 {
-  if(saturated) return;
-
-  ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
-
-  //if(parent != nullptr){
-  //  //exploit knowledge about cover chart
-  //  //try moving towards goal
-  //  if(firstRun)
-  //  {
-  //    q = q_start;
-  //    firstRun = false;
-  //  }else{
-  //  }
-
-  //  Connect(q_start, q_goal, q_next);
-
-  //  return;
-  //}
-
-  //############################################################################
-  //Get the configuration with the largest neighborhood (NBH) from the queue
-  //############################################################################
-  Configuration *q = nullptr;
-  if(firstRun)
-  {
-    q = q_start;
-    firstRun = false;
-  }else{
-    double r = rng_.uniform01();
-    if(r<0.9){
-      if(priority_configurations.empty()){
-        //try random directions
-        //saturated = true;
-        if(verbose>0) std::cout << "Space got saturated." << std::endl;
-        Configuration *q_random = SampleCoverBoundaryValid(ptc);
-        if(q_random == nullptr) return;
-        priority_configurations.push(q_random);
-      }
-      q = priority_configurations.top();
-      priority_configurations.pop();
-      if(IsConfigurationInsideCover(q)){
-        q->Remove(Q1);
-        q=nullptr;
-        return;
-      }
-      AddConfigurationToCover(q);
-    }else{
-      Configuration *q_random = new Configuration(Q1);
-      SampleGoal(q_random);
-      q = Nearest(q_random);
-    }
-  }
-
-  //############################################################################
-  // Expand largest NBH. This expansion can be biased towards the goal/random
-  // directions/voronoi regions, etcetera. The actual algorithm will implement
-  // this function.
-  //############################################################################
-
-  std::vector<Configuration*> q_children = ExpandNeighborhood(q, NUMBER_OF_EXPANSION_SAMPLES);
-  for(uint k = 0; k < q_children.size(); k++)
-  {
-    priority_configurations.push(q_children.at(k));
-  }
-  //add different biases to remove planner from getting stuck
-  Configuration *q_random = QuotientCover::SampleCoverBoundary("voronoi");
-  if(ComputeNeighborhood(q_random)){
-    priority_configurations.push(q_random);
-  }
-
+  Vertex v = BaseT::AddConfigurationToCover(q);
+  priority_queue_member_configurations.push(q);
+  return v;
 }
 
 QuotientCoverQueue::Configuration* QuotientCoverQueue::SampleCoverBoundary(){
@@ -150,15 +80,15 @@ void QuotientCoverQueue::AddConfigurationToPDF(Configuration *q)
   }
 }
 
-const QuotientCoverQueue::ConfigurationPriorityQueue& QuotientCoverQueue::GetPriorityQueue()
+const QuotientCoverQueue::CandidateConfigurationPriorityQueue& QuotientCoverQueue::GetPriorityQueue()
 {
-  return priority_configurations;
+  return priority_queue_candidate_configurations;
 }
 
 void QuotientCoverQueue::Print(std::ostream& out) const
 {
   BaseT::Print(out);
-  out << std::endl << " |------ [Queue] has " << priority_configurations.size() << " configurations left in priority queue.";
+  out << std::endl << " |------ [Queue] has " << priority_queue_candidate_configurations.size() << " configurations left in priority queue.";
 }
 
 QuotientCoverQueue::Configuration* QuotientCoverQueue::SampleUniformQuotientCover(ob::State *state) 
