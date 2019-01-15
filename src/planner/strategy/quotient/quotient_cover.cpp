@@ -10,6 +10,7 @@
 #include <boost/property_map/vector_property_map.hpp>
 #include <boost/property_map/transform_value_property_map.hpp>
 #include <boost/foreach.hpp>
+#include <boost/graph/connected_components.hpp>
 #include <boost/graph/graphviz.hpp>
 #include <ompl/datastructures/NearestNeighborsGNAT.h>
 #include <ompl/datastructures/NearestNeighborsGNATNoThreadSafety.h>
@@ -363,6 +364,41 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
     }
   }
   return v;
+}
+
+int QuotientCover::GetNumberOfEdges(Configuration *q)
+{
+  if(q->index < 0) return 0;
+  Vertex v = get(indexToVertex, q->index);
+  return boost::out_degree(v, graph);
+}
+
+QuotientCover::Configuration* QuotientCover::GetInwardPointingConfiguration(Configuration *q)
+{
+  if(q->parent_neighbor != nullptr){
+    return q->parent_neighbor;
+  }
+  int kd = GetNumberOfEdges(q);
+  if(kd > 1){
+    std::cout << "cannot (yet) compute the average of more than one state" << std::endl;
+    std::cout << "index " << q->index << " has edges: " << kd << std::endl;
+    exit(0);
+  }else{
+    std::cout << "index " << q->index << " has edges: " << kd << std::endl;
+  }
+
+  //PROBLEM: point might not lie directly on boundary (but is that a problem?)
+  Vertex v = get(indexToVertex, q->index);
+  OEIterator edge_iter, edge_iter_end, next;
+  boost::tie(edge_iter, edge_iter_end) = boost::out_edges(v, graph);
+  Configuration *q_anti = nullptr;
+  for(next = edge_iter; edge_iter != edge_iter_end; edge_iter = next)
+  {
+    ++next;
+    QuotientCover::Vertex v_target = boost::target(*edge_iter, graph);
+    q_anti = graph[v_target];
+  }
+  return q_anti;
 }
 
 void QuotientCover::AddEdge(Configuration *q_from, Configuration *q_to)
@@ -1361,7 +1397,9 @@ void QuotientCover::Print(const Configuration *q, bool stopOnError) const
 void QuotientCover::Print(std::ostream& out) const
 {
   BaseT::Print(out);
-  out << std::endl << " |---- [Cover] has " << boost::num_vertices(graph) << " vertices and " << boost::num_edges(graph) << " edges.";
+
+  out << std::endl << " |---- [Cover] has " << boost::num_vertices(graph) << " vertices and " << boost::num_edges(graph) << " edges. ";
+    //<< num_components << " connected components.";
 }
 
 namespace ompl{

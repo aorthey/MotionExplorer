@@ -45,6 +45,10 @@ void QNGGoalDirected::clear()
 //############################################################################
 void QNGGoalDirected::Grow(double t)
 {
+  if(firstRun){
+    firstRun = false;
+    AddConfigurationToPriorityQueue(q_start);
+  }
 
   if(saturated) return;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
@@ -75,21 +79,39 @@ void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
     if(verbose>1) std::cout << "Step Towards Goal" << std::endl;
     Configuration *q_nearest = configurations_sorted_by_nearest_to_goal.top();
     progressMadeTowardsGoal = step_strategy->Towards(q_nearest, q_goal);
+    if(!progressMadeTowardsGoal){
+      q_nearest->number_attempted_expansions++;
+    }
     if(verbose>1) std::cout << "Progress: "<< (progressMadeTowardsGoal?"Yes":"No") << std::endl;
 
     //############################################################################
   }else{
-    //############################################################################
-    //STATE2: ExtendFreeSpace Strategy
-    //############################################################################
+    if(!priority_queue_candidate_configurations.empty()){
+      //############################################################################
+      //STATE2: ExtendFreeSpace Strategy (Active Node Expansion)
+      //############################################################################
+      if(verbose>1) std::cout << "Expand Largest Single-Connected Node" << std::endl;
+      Configuration *q = priority_queue_candidate_configurations.top();
+      priority_queue_candidate_configurations.pop();
+      if(q->index < 0){
+        AddConfigurationToCover(q);
+      }
+      step_strategy->ExpandOutside(q);
+    }else{
+      std::cout << "exhausted all candidates. NYI" << std::endl;
+      exit(0);
+      //############################################################################
+      //STATE3: FindNewWays (Passive Node Expansion)
+      //############################################################################
+    }
 
-    Configuration *q_member = priority_queue_member_configurations.top();
-    std::cout << boost::degree(q_member, graph) << std::endl;
-    exit(0);
-    //if(boost::degree(q_member->index, graph)>1){
-    //  //take the largest candidate
-    //}else{
-    //  Configuration *q_member = priority_queue_member_configurations.top();
+    //while(!priority_queue_candidate_configurations.empty()){
+    //  Configuration *q_member = priority_queue_candidate_configurations.top();
+    //  //QuotientCover::Print(q_member, false);
+    //  std::cout << q_member->index << " : " << q_member->number_attempted_expansions << "|" << q_member->GetRadius() << std::endl;
+    //  priority_queue_candidate_configurations.pop();
+    //}
+    //exit(0);
 
     //}
 

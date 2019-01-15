@@ -114,6 +114,7 @@ namespace ompl
         base::State *state{nullptr};
         Configuration *coset{nullptr}; //the underlying coset this Vertex elongs to (on the quotient-space)
         Configuration *parent_neighbor{nullptr};
+        base::State *inward_pointing_state{nullptr}; //interpolate(inward_pointing_state, state, 2, next) gives a outward pointing state
 
         bool isSufficientFeasible{false};
         void *pdf_element;
@@ -172,7 +173,6 @@ namespace ompl
          boost::setS, 
          boost::undirectedS,
          Configuration*,
-         //boost::property<boost::edge_index_t,int, EdgeInternalState> 
          EdgeInternalState,
          GraphBundle
        > Graph;
@@ -214,6 +214,8 @@ namespace ompl
       void RemoveConfigurationFromCover(Configuration *q);
       void AddEdge(Configuration *q_from, Configuration *q_to);
       bool EdgeExists(Configuration *q_from, Configuration *q_to);
+      int GetNumberOfEdges(Configuration *q);
+      Configuration* GetInwardPointingConfiguration(Configuration *q);
 
       virtual void AddConfigurationToPDF(Configuration *q);
       bool IsConfigurationInsideCover(Configuration *q);

@@ -25,10 +25,6 @@ QuotientCoverQueue::~QuotientCoverQueue(void)
 void QuotientCoverQueue::setup()
 {
   BaseT::setup();
-  //NUMBER_OF_EXPANSION_SAMPLES = (Q1->getStateDimension()+1)*1;
-  //std::cout << std::string(80, '-') << std::endl;
-  //std::cout << "NUMBER_OF_EXPANSION_SAMPLES " << NUMBER_OF_EXPANSION_SAMPLES << std::endl;
-  //std::cout << std::string(80, '-') << std::endl;
   firstRun = true;
 }
 void QuotientCoverQueue::AddConfigurationToPriorityQueue(Configuration *q)

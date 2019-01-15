@@ -14,6 +14,11 @@ namespace ompl
   namespace geometric
   {
 
+    //@TODO: Rename to QuotientCoverAnalyzer, and put all the analysis tools in this class 
+    //(nearest to goal, largest radius, least connection), and keep track of them here. All
+    //other strategies can use this as a central points of information to aid
+    //their choice of the best cover region to expand
+
     class StepStrategy;
     class QuotientCoverQueue: public og::QuotientCover
     {
@@ -65,9 +70,7 @@ namespace ompl
         bool operator()(const Configuration* lhs, const Configuration* rhs) const
         {
           uint klhs = max(lhs->number_attempted_expansions,1U);
-          std::cout << lhs->index << ":" << klhs << std::endl;
           uint krhs = max(rhs->number_attempted_expansions,1U);
-          std::cout << rhs->index << ":" << krhs << std::endl;
           if(krhs < klhs){
             return true;
           }else{
