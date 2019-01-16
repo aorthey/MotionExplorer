@@ -19,7 +19,7 @@ namespace ompl
         virtual bool ExpandRandom(og::QuotientCover::Configuration *q_from) override;
 
       private:
-        bool ChooseBestDirection(const std::vector<og::QuotientCover::Configuration*> &q_children);
+        bool ChooseBestDirection(const std::vector<og::QuotientCover::Configuration*> &q_children, bool addBestToPriorityQueue = false);
 
         void GenerateRandomChildrenOnBoundaryAroundConfiguration(og::QuotientCover::Configuration* q_center, og::QuotientCover::Configuration* q_near, std::vector<og::QuotientCover::Configuration*> &q_children);
 

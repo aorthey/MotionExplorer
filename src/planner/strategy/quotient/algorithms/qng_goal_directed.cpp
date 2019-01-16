@@ -91,12 +91,14 @@ void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
       //STATE2: ExtendFreeSpace Strategy (Active Node Expansion)
       //############################################################################
       if(verbose>1) std::cout << "Expand Largest Single-Connected Node" << std::endl;
+
       Configuration *q = priority_queue_candidate_configurations.top();
       priority_queue_candidate_configurations.pop();
       if(q->index < 0){
         AddConfigurationToCover(q);
       }
       step_strategy->ExpandOutside(q);
+      //PrintQueue();
     }else{
       std::cout << "exhausted all candidates. NYI" << std::endl;
       exit(0);

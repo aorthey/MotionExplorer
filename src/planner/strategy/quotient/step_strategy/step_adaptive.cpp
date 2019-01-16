@@ -53,17 +53,17 @@ bool StepStrategyAdaptive::ExpandOutside(QuotientCover::Configuration *q_from)
     q_children.push_back(q_next);
     if(q_next->GetRadius() >= radius_from){
       //return if we go towards larger area
-      return ChooseBestDirection(q_children);
+      return ChooseBestDirection(q_children, true);
     }
   }else{
     //no progress made
     return false;
   }
   GenerateRandomChildrenOnBoundaryAroundConfiguration(q_from /*center*/, q_next /*pt on boundary*/, q_children);
-  return ChooseBestDirection(q_children);
+  return ChooseBestDirection(q_children, true);
 }
 
-bool StepStrategyAdaptive::ChooseBestDirection(const std::vector<Configuration*> &q_children)
+bool StepStrategyAdaptive::ChooseBestDirection(const std::vector<Configuration*> &q_children, bool addBestToPriorityQueue)
 {
   if(q_children.empty()){
     return false;
@@ -80,8 +80,12 @@ bool StepStrategyAdaptive::ChooseBestDirection(const std::vector<Configuration*>
   for(uint k = 0; k < q_children.size(); k++)
   {
     Configuration *q_k = q_children.at(k);
-    if(k!=idx_best){
+    if(addBestToPriorityQueue){
       quotient_cover_queue->AddConfigurationToPriorityQueue(q_k);
+    }else{
+      if(k!=idx_best){
+        quotient_cover_queue->AddConfigurationToPriorityQueue(q_k);
+      }
     }
   }
   return true;

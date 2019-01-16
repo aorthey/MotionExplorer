@@ -90,6 +90,7 @@ namespace ompl
 
     public:
       const CandidateConfigurationPriorityQueue& GetPriorityQueue();
+      void PrintQueue();
     };
   }
 }

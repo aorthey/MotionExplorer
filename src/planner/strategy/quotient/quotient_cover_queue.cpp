@@ -43,12 +43,27 @@ void QuotientCoverQueue::clear()
   firstRun = true;
 }
 
-
 QuotientCover::Vertex QuotientCoverQueue::AddConfigurationToCover(Configuration *q)
 {
   Vertex v = BaseT::AddConfigurationToCover(q);
   priority_queue_member_configurations.push(q);
   return v;
+}
+
+void QuotientCoverQueue::PrintQueue()
+{
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "PriorityQueue" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+
+  //Make temporary copy, then iterate over it
+  CandidateConfigurationPriorityQueue printout_queue = priority_queue_candidate_configurations;
+
+  while(!printout_queue.empty()){
+    Configuration *q_member = printout_queue.top();
+    std::cout << q_member->index << " : " << q_member->number_attempted_expansions << "|" << q_member->GetRadius() << std::endl;
+    printout_queue.pop();
+  }
 }
 
 QuotientCoverQueue::Configuration* QuotientCoverQueue::SampleCoverBoundary(){
