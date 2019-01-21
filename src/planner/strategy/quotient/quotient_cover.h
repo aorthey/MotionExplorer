@@ -205,6 +205,7 @@ namespace ompl
       void SampleGoal(Configuration*);
       void SampleUniform(Configuration*);
       virtual Configuration* SampleUniformQuotientCover(ob::State *state);
+      Configuration* SampleOnBoundaryUniformNear(const Configuration *q_center, const double radius, const Configuration* q_near);
       //#######################################################################
       //Connect strategies
       //#######################################################################

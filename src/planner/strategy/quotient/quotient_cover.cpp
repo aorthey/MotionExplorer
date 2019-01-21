@@ -374,6 +374,20 @@ int QuotientCover::GetNumberOfEdges(Configuration *q)
   return boost::out_degree(v, graph);
 }
 
+QuotientCover::Configuration* QuotientCover::SampleOnBoundaryUniformNear(const Configuration *q_center, const double radius, const Configuration* q_near)
+{
+  Configuration *q_next = new Configuration(Q1);
+
+  //Sample in Ambient Space
+  GetQ1SamplerPtr()->sampleUniformNear(q_next->state, q_near->state /*mean*/, radius_sampling);
+
+  //Project sample down onto boundary
+  const double d_from_to_next = quotient_cover_queue->DistanceConfigurationConfiguration(q_center, q_next);
+  double step_size = q_center->GetRadius()/d_from_to_next;
+  quotient_cover_queue->GetQ1()->getStateSpace()->interpolate(q_center->state, q_next->state, step_size, q_next->state);
+  return q_next;
+}
+
 QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Configuration *q_center)
 {
 
