@@ -374,17 +374,19 @@ int QuotientCover::GetNumberOfEdges(Configuration *q)
   return boost::out_degree(v, graph);
 }
 
-QuotientCover::Configuration* QuotientCover::SampleOnBoundaryUniformNear(const Configuration *q_center, const double radius, const Configuration* q_near)
+QuotientCover::Configuration* QuotientCover::SampleOnBoundaryUniformNear(Configuration *q_center, const double radius, const Configuration* q_near)
 {
   Configuration *q_next = new Configuration(Q1);
 
   //Sample in Ambient Space
-  GetQ1SamplerPtr()->sampleUniformNear(q_next->state, q_near->state /*mean*/, radius_sampling);
+  GetQ1SamplerPtr()->sampleUniformNear(q_next->state, q_near->state /*mean*/, radius);
 
   //Project sample down onto boundary
-  const double d_from_to_next = quotient_cover_queue->DistanceConfigurationConfiguration(q_center, q_next);
+  const double d_from_to_next = DistanceConfigurationConfiguration(q_center, q_next);
   double step_size = q_center->GetRadius()/d_from_to_next;
-  quotient_cover_queue->GetQ1()->getStateSpace()->interpolate(q_center->state, q_next->state, step_size, q_next->state);
+  Q1->getStateSpace()->interpolate(q_center->state, q_next->state, step_size, q_next->state);
+
+  q_next->parent_neighbor = q_center;
   return q_next;
 }
 
@@ -1398,6 +1400,8 @@ void QuotientCover::Print(const Configuration *q, bool stopOnError) const
   std::cout << " | radius: " << q->GetRadius();
   std::cout << " | distance goal: " << q->GetGoalDistance();
   std::cout << " | coset : " << (q->coset==nullptr?"-":std::to_string(q->coset->index)) << std::endl;
+  std::cout << " | parent index : " << (q->parent_neighbor==nullptr?"-":std::to_string(q->parent_neighbor->index)) << std::endl;
+  std::cout << " | neighbors : " << (q->number_of_neighbors) << std::endl;
   if(q->index < 0)
   {
     std::cout << "[### STATE NOT MEMBER OF COVER]" << std::endl;

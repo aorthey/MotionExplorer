@@ -86,7 +86,6 @@ void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
 
     //############################################################################
   }else{
-    PrintQueue(10);
     if(!priority_queue_candidate_configurations.empty()){
       //############################################################################
       //STATE2: ExtendFreeSpace Strategy (Active Node Expansion)

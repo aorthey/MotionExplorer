@@ -55,7 +55,7 @@ namespace ompl
 
           friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::QuotientCover::Configuration&);
 
-          double goal_distance{0.0};
+          double goal_distance{+dInf};
           uint number_attempted_expansions{0};
           uint number_successful_expansions{0};
 
@@ -205,7 +205,7 @@ namespace ompl
       void SampleGoal(Configuration*);
       void SampleUniform(Configuration*);
       virtual Configuration* SampleUniformQuotientCover(ob::State *state);
-      Configuration* SampleOnBoundaryUniformNear(const Configuration *q_center, const double radius, const Configuration* q_near);
+      Configuration* SampleOnBoundaryUniformNear(Configuration *q_center, const double radius, const Configuration* q_near);
       //#######################################################################
       //Connect strategies
       //#######################################################################
@@ -243,7 +243,7 @@ namespace ompl
       PlannerDataVertexAnnotated getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const;
       //#######################################################################
       RNG rng_;
-      const double minimum_neighborhood_radius{1e-3}; //minimum allowed radius, otherwise configuration is considered INVALID 
+      const double minimum_neighborhood_radius{1e-2}; //minimum allowed radius, otherwise configuration is considered INVALID 
 
       double totalVolumeOfCover{0.0};
       bool isConnected{false};

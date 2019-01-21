@@ -51,6 +51,11 @@ void QuotientCoverQueue::setup()
 }
 void QuotientCoverQueue::AddConfigurationToPriorityQueue(Configuration *q)
 {
+  if(q->parent_neighbor == nullptr && !q->isStart){
+    std::cout << "Tried adding configuration without parent" << std::endl;
+    QuotientCover::Print(q, false);
+    exit(0);
+  }
   priority_queue_candidate_configurations.push(q);
 }
 
