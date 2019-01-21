@@ -17,6 +17,28 @@ QuotientCoverQueue::QuotientCoverQueue(const base::SpaceInformationPtr &si, Quot
 {
   if(parent != nullptr) verbose = 1;
 }
+// ">" operator: smallest value is top in queue
+// "<" operator: largest value is top in queue (default)
+bool QuotientCoverQueue::CmpCandidateConfigurationPtrs::operator()(const Configuration* lhs, const Configuration* rhs) const
+{
+   return lhs->GetRadius() < rhs->GetRadius();
+}
+// ">" operator: smallest value is top in queue
+// "<" operator: largest value is top in queue (default)
+bool QuotientCoverQueue::CmpMemberConfigurationPtrs::operator()(const Configuration* lhs, const Configuration* rhs) const
+{
+  uint klhs = max(lhs->number_attempted_expansions,1U);
+  uint krhs = max(rhs->number_attempted_expansions,1U);
+  if(krhs < klhs){
+    return true;
+  }else{
+    if(krhs > klhs){
+      return false;
+    }else{
+      return lhs->GetRadius() < rhs->GetRadius();
+    }
+  }
+}
 
 QuotientCoverQueue::~QuotientCoverQueue(void)
 {
@@ -50,7 +72,7 @@ QuotientCover::Vertex QuotientCoverQueue::AddConfigurationToCover(Configuration 
   return v;
 }
 
-void QuotientCoverQueue::PrintQueue()
+void QuotientCoverQueue::PrintQueue(int n_head)
 {
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "PriorityQueue" << std::endl;
@@ -59,7 +81,9 @@ void QuotientCoverQueue::PrintQueue()
   //Make temporary copy, then iterate over it
   CandidateConfigurationPriorityQueue printout_queue = priority_queue_candidate_configurations;
 
-  while(!printout_queue.empty()){
+  int n_ctr = 0;
+  while(!printout_queue.empty() && (n_ctr++ <= n_head)){
+
     Configuration *q_member = printout_queue.top();
     std::cout << q_member->index << " : " << q_member->number_attempted_expansions << "|" << q_member->GetRadius() << std::endl;
     printout_queue.pop();

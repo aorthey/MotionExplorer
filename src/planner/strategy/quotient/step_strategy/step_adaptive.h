@@ -9,7 +9,7 @@ namespace ompl
     class StepStrategyAdaptive: public og::StepStrategy{
 
         typedef og::StepStrategy BaseT;
-        const int verbose{0};
+        const int verbose{1};
       public:
 
         StepStrategyAdaptive() = default;

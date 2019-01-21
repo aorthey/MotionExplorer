@@ -17,33 +17,11 @@ bool StepStrategyAdaptive::ExpandOutside(QuotientCover::Configuration *q_from)
   if(q_from == nullptr){
     std::cout << "Warning: Expanding non-existing q" << std::endl;
   }
-  //############################################################################
-  //STEP1: Compute principal direction of node (a direction which points
-  //maximally outside)
-  //############################################################################
-  Configuration* q_anti = quotient_cover_queue->GetInwardPointingConfiguration(q_from);
-  Configuration *q_next = new Configuration(quotient_cover_queue->GetQ1());
-
-  //############################################################################
-  //Generate q_next in the direction away from q_anti
-  // q_anti -------> q_from ---------> q_next
-  //############################################################################
-  double radius_from = q_from->GetRadius();
-  double radius_anti = quotient_cover_queue->DistanceConfigurationConfiguration(q_anti, q_from);
-  double step = (radius_from+radius_anti)/radius_anti;
-
-  quotient_cover_queue->Interpolate(q_anti, q_from, step, q_next);
-
-  double dnext = quotient_cover_queue->DistanceConfigurationConfiguration(q_next, q_from);
-  if(fabs(dnext - radius_from) > 1e-10){
-    std::cout << "WARNING: interpolated point outside boundary" << std::endl;
-    quotient_cover_queue->QuotientCover::Print(q_from, false);
-    quotient_cover_queue->QuotientCover::Print(q_next, false);
-    std::cout << "Distance: " << dnext << " Radius: " << radius_from << std::endl;
-    exit(0);
-  }
-
-  q_next->parent_neighbor = q_from;
+  Configuration* q_next = quotient_cover_queue->GetOutwardPointingConfiguration(q_from);
+  // std::cout << "Extending:" << std::endl;
+  // quotient_cover_queue->QuotientCover::Print(q_from, false);
+  // std::cout << "Outward pointing point:" << std::endl;
+  // quotient_cover_queue->QuotientCover::Print(q_next, false);
 
   //############################################################################
   //Addconfigurationrandomperturbation
@@ -51,7 +29,7 @@ bool StepStrategyAdaptive::ExpandOutside(QuotientCover::Configuration *q_from)
   std::vector<Configuration*> q_children;
   if(quotient_cover_queue->ComputeNeighborhood(q_next)){
     q_children.push_back(q_next);
-    if(q_next->GetRadius() >= radius_from){
+    if(q_next->GetRadius() >= q_from->GetRadius()){
       //return if we go towards larger area
       return ChooseBestDirection(q_children, true);
     }
@@ -61,6 +39,41 @@ bool StepStrategyAdaptive::ExpandOutside(QuotientCover::Configuration *q_from)
   }
   GenerateRandomChildrenOnBoundaryAroundConfiguration(q_from /*center*/, q_next /*pt on boundary*/, q_children);
   return ChooseBestDirection(q_children, true);
+//uint NUMBER_OF_EXPANSION_SAMPLES = (quotient_cover_queue->GetQ1()->getStateDimension()+2);
+
+  //const double radius_center = q_center->GetRadius();
+  //double radius_child = q_near->GetRadius();
+  //double ratio = radius_child/radius_center;
+
+  //double radius_sampling = q_center->GetRadius();
+
+  //for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES; k++){
+  //  Configuration *q_k = new Configuration(quotient_cover_queue->GetQ1());
+
+  //  //Sample a configuration on the boundary of q_from, randomly distributed around PC
+  //  //quotient_cover_queue->GetQ1SamplerPtr()->sampleUniformNear(q_k->state, q_near->state /*mean*/, 0.5*radius_nbh);
+  //  quotient_cover_queue->GetQ1SamplerPtr()->sampleUniformNear(q_k->state, q_near->state /*mean*/, 2*q_near->GetRadius());
+
+  //  //SAMPLE AROUND q_near, PROJECT ONTO BOUNDARY OF NBH OF q_center!
+  //  const double d_from_to_k = quotient_cover_queue->DistanceConfigurationConfiguration(q_center, q_k);
+  //  double step_size = radius_nbh/d_from_to_k;
+  //  quotient_cover_queue->GetQ1()->getStateSpace()->interpolate(q_center->state, q_k->state, step_size, q_k->state);
+
+  //  if(quotient_cover_queue->ComputeNeighborhood(q_k))
+  //  {
+  //    q_k->parent_neighbor = q_center;
+  //    q_children.push_back(q_k);
+  //    const double d_from_to_k_new = quotient_cover_queue->DistanceConfigurationConfiguration(q_center, q_k);
+  //    if(verbose){
+  //      if(fabs(d_from_to_k_new-radius_nbh) > 1e-10){
+  //        std::cout << "Warning: Child not on boundary. Distance is " << d_from_to_k_new << " but should be " << radius_nbh << std::endl;
+  //        exit(0);
+  //      }
+  //      //std::cout << "PriorityQueue add NBH with radius " << q_k->GetRadius() << std::endl;
+  //    }
+  //  }
+  //  double radius_k = q_k->GetRadius();
+  //}
 }
 
 bool StepStrategyAdaptive::ChooseBestDirection(const std::vector<Configuration*> &q_children, bool addBestToPriorityQueue)
@@ -205,13 +218,14 @@ void StepStrategyAdaptive::GenerateRandomChildrenOnBoundaryAroundConfiguration(C
 {
   uint NUMBER_OF_EXPANSION_SAMPLES = (quotient_cover_queue->GetQ1()->getStateDimension()+2);
 
-  double radius_nbh = q_center->GetRadius();
+  const double radius_nbh = q_center->GetRadius();
 
   for(uint k = 0; k < NUMBER_OF_EXPANSION_SAMPLES; k++){
     Configuration *q_k = new Configuration(quotient_cover_queue->GetQ1());
 
     //Sample a configuration on the boundary of q_from, randomly distributed around PC
-    quotient_cover_queue->GetQ1SamplerPtr()->sampleUniformNear(q_k->state, q_near->state /*mean*/, 0.5*radius_nbh);
+    //quotient_cover_queue->GetQ1SamplerPtr()->sampleUniformNear(q_k->state, q_near->state /*mean*/, 0.5*radius_nbh);
+    quotient_cover_queue->GetQ1SamplerPtr()->sampleUniformNear(q_k->state, q_near->state /*mean*/, 2*q_near->GetRadius());
 
     //SAMPLE AROUND q_near, PROJECT ONTO BOUNDARY OF NBH OF q_center!
     const double d_from_to_k = quotient_cover_queue->DistanceConfigurationConfiguration(q_center, q_k);
@@ -223,7 +237,7 @@ void StepStrategyAdaptive::GenerateRandomChildrenOnBoundaryAroundConfiguration(C
       q_k->parent_neighbor = q_center;
       q_children.push_back(q_k);
       const double d_from_to_k_new = quotient_cover_queue->DistanceConfigurationConfiguration(q_center, q_k);
-      if(verbose>1){
+      if(verbose){
         if(fabs(d_from_to_k_new-radius_nbh) > 1e-10){
           std::cout << "Warning: Child not on boundary. Distance is " << d_from_to_k_new << " but should be " << radius_nbh << std::endl;
           exit(0);
@@ -260,12 +274,12 @@ bool StepStrategyAdaptive::ExpandRandom(QuotientCover::Configuration *q_from)
     q_children.push_back(q_next);
     if(q_next->GetRadius() >= radius_from){
       //return if we go towards larger area
-      return ChooseBestDirection(q_children);
+      return ChooseBestDirection(q_children, true);
     }
   }else{
     //no progress made
     return false;
   }
   GenerateRandomChildrenOnBoundaryAroundConfiguration(q_from, q_next, q_children);
-  return ChooseBestDirection(q_children);
+  return ChooseBestDirection(q_children, true);
 }

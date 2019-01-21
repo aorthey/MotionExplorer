@@ -86,6 +86,7 @@ void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
 
     //############################################################################
   }else{
+    PrintQueue(10);
     if(!priority_queue_candidate_configurations.empty()){
       //############################################################################
       //STATE2: ExtendFreeSpace Strategy (Active Node Expansion)
@@ -98,41 +99,14 @@ void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
         AddConfigurationToCover(q);
       }
       step_strategy->ExpandOutside(q);
-      //PrintQueue();
     }else{
-      std::cout << "exhausted all candidates. NYI" << std::endl;
-      exit(0);
       //############################################################################
       //STATE3: FindNewWays (Passive Node Expansion)
       //############################################################################
+      if(verbose>1) std::cout << "Generate New Configurations" << std::endl;
+      Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
+      step_strategy->ExpandRandom(q);
     }
-
-    //while(!priority_queue_candidate_configurations.empty()){
-    //  Configuration *q_member = priority_queue_candidate_configurations.top();
-    //  //QuotientCover::Print(q_member, false);
-    //  std::cout << q_member->index << " : " << q_member->number_attempted_expansions << "|" << q_member->GetRadius() << std::endl;
-    //  priority_queue_candidate_configurations.pop();
-    //}
-    //exit(0);
-
-    //}
-
-
-    // Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
-    // step_strategy->ExpandRandom(q);
-    // if(!priority_configurations.empty()){
-    //   if(verbose>1) std::cout << "Expand Largest" << std::endl;
-    //   Configuration *q_largest = priority_configurations.top();
-    //   step_strategy->ExpandOutside(q_largest);
-    //   priority_configurations.pop();
-    // }
-    //else{
-    //  //empty priority configurations. This means we have to restart from
-    //  //somewhere
-    //  if(verbose>1) std::cout << "Generate New Configurations" << std::endl;
-    //  Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
-    //  step_strategy->ExpandRandom(q);
-    //}
   }
 }
 

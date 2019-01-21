@@ -56,31 +56,11 @@ namespace ompl
 
       struct CmpCandidateConfigurationPtrs
       {
-        // ">" operator: smallest value is top in queue
-        // "<" operator: largest value is top in queue (default)
-        bool operator()(const Configuration* lhs, const Configuration* rhs) const
-        {
-           return lhs->GetRadius() < rhs->GetRadius();
-        }
+        bool operator()(const Configuration* lhs, const Configuration* rhs) const;
       };
       struct CmpMemberConfigurationPtrs
       {
-        // ">" operator: smallest value is top in queue
-        // "<" operator: largest value is top in queue (default)
-        bool operator()(const Configuration* lhs, const Configuration* rhs) const
-        {
-          uint klhs = max(lhs->number_attempted_expansions,1U);
-          uint krhs = max(rhs->number_attempted_expansions,1U);
-          if(krhs < klhs){
-            return true;
-          }else{
-            if(krhs > klhs){
-              return false;
-            }else{
-              return lhs->GetRadius() < rhs->GetRadius();
-            }
-          }
-        }
+        bool operator()(const Configuration* lhs, const Configuration* rhs) const;
       };
       typedef std::priority_queue<Configuration*, std::vector<Configuration*>, CmpCandidateConfigurationPtrs> CandidateConfigurationPriorityQueue;
       typedef std::priority_queue<Configuration*, std::vector<Configuration*>, CmpMemberConfigurationPtrs> MemberConfigurationPriorityQueue;
@@ -90,7 +70,7 @@ namespace ompl
 
     public:
       const CandidateConfigurationPriorityQueue& GetPriorityQueue();
-      void PrintQueue();
+      void PrintQueue(int n_head = std::numeric_limits<int>::infinity()); //print the fist n items
     };
   }
 }

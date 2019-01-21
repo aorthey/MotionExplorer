@@ -37,6 +37,7 @@ QuotientCover::QuotientCover(const base::SpaceInformationPtr &si, Quotient *pare
 QuotientCover::~QuotientCover(void)
 {
 }
+
 //#############################################################################
 //SETUP
 //#############################################################################
@@ -373,32 +374,32 @@ int QuotientCover::GetNumberOfEdges(Configuration *q)
   return boost::out_degree(v, graph);
 }
 
-QuotientCover::Configuration* QuotientCover::GetInwardPointingConfiguration(Configuration *q)
+QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Configuration *q_center)
 {
-  if(q->parent_neighbor != nullptr){
-    return q->parent_neighbor;
-  }
-  int kd = GetNumberOfEdges(q);
-  if(kd > 1){
-    std::cout << "cannot (yet) compute the average of more than one state" << std::endl;
-    std::cout << "index " << q->index << " has edges: " << kd << std::endl;
-    exit(0);
-  }else{
-    std::cout << "index " << q->index << " has edges: " << kd << std::endl;
-  }
 
-  //PROBLEM: point might not lie directly on boundary (but is that a problem?)
-  Vertex v = get(indexToVertex, q->index);
-  OEIterator edge_iter, edge_iter_end, next;
-  boost::tie(edge_iter, edge_iter_end) = boost::out_edges(v, graph);
-  Configuration *q_anti = nullptr;
-  for(next = edge_iter; edge_iter != edge_iter_end; edge_iter = next)
-  {
-    ++next;
-    QuotientCover::Vertex v_target = boost::target(*edge_iter, graph);
-    q_anti = graph[v_target];
+  Configuration *q_inward_to_outward = new Configuration(GetQ1(), q_center->GetInwardPointingConfiguration());
+
+  double radius = q_center->GetRadius();
+  double distance_center_inward = DistanceConfigurationConfiguration(q_inward_to_outward, q_center);
+  double step = (radius + distance_center_inward)/distance_center_inward;
+
+  Interpolate(q_inward_to_outward, q_center, step, q_inward_to_outward);
+
+  //############################################################################
+  //DEBUG
+  //############################################################################
+  double d_center_outward = DistanceConfigurationConfiguration(q_inward_to_outward, q_center);
+  if(fabs(d_center_outward - radius) > 1e-10){
+    std::cout << "WARNING: interpolated point outside boundary" << std::endl;
+    QuotientCover::Print(q_inward_to_outward, false);
+    QuotientCover::Print(q_center, false);
+    std::cout << "Distance: " << d_center_outward << " Radius: " << radius << std::endl;
+    exit(0);
   }
-  return q_anti;
+  //############################################################################
+
+  q_inward_to_outward->parent_neighbor = q_center;
+  return q_inward_to_outward;
 }
 
 void QuotientCover::AddEdge(Configuration *q_from, Configuration *q_to)
@@ -408,6 +409,12 @@ void QuotientCover::AddEdge(Configuration *q_from, Configuration *q_to)
   Vertex v_from = get(indexToVertex, q_from->index);
   Vertex v_to = get(indexToVertex, q_to->index);
   boost::add_edge(v_from, v_to, properties, graph);
+
+  q_from->UpdateRiemannianCenterOfMass(Q1, q_to);
+  q_to->UpdateRiemannianCenterOfMass(Q1, q_from);
+
+  q_from->number_of_neighbors++;
+  q_to->number_of_neighbors++;
 }
 
 bool QuotientCover::EdgeExists(Configuration *q_from, Configuration *q_to)
@@ -427,7 +434,6 @@ std::vector<QuotientCover::Configuration*> QuotientCover::GetIntersectingNeighbo
 void QuotientCover::RerouteEdgesFromTo(Configuration *q_from, Configuration *q_to)
 {
   Vertex v_from = get(indexToVertex, q_from->index);
-  Vertex v_to = get(indexToVertex, q_to->index);
   OEIterator edge_iter, edge_iter_end, next; 
   boost::tie(edge_iter, edge_iter_end) = boost::out_edges(v_from, graph);
 
@@ -436,9 +442,9 @@ void QuotientCover::RerouteEdgesFromTo(Configuration *q_from, Configuration *q_t
     //for each edge, create a new one pointing to q_to
     ++next;
     const Vertex v_target = boost::target(*edge_iter, graph);
-    double d = DistanceQ1(graph[v_target], q_to);
-    EdgeInternalState properties(d);
-    boost::add_edge(v_target, v_to, properties, graph);
+    Configuration *q_reroute = graph[v_target];
+
+    AddEdge(q_reroute, q_to);
   }
 }
 
@@ -1404,11 +1410,6 @@ void QuotientCover::Print(std::ostream& out) const
 
 namespace ompl{
   namespace geometric{
-    std::ostream& operator<< (std::ostream& out, const QuotientCover::Configuration& q){
-      out << "[Configuration]";
-      out << q.GetRadius() << std::endl;
-      return out;
-    }
     std::ostream& operator<< (std::ostream& out, const QuotientCover::Graph& graph)
     {
       out << std::string(80, '-') << std::endl;

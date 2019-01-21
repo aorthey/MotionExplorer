@@ -34,105 +34,53 @@ namespace ompl
       class Configuration{
         public:
           Configuration() = default;
-        Configuration(const base::SpaceInformationPtr &si) : state(si->allocState())
-        {}
-        Configuration(const base::SpaceInformationPtr &si, const ob::State *state_) : state(si->cloneState(state_))
-        {}
-        ~Configuration(){};
-        double GetRadius() const
-        {
-          return openNeighborhoodRadius;
-        }
-        void SetRadius(double radius)
-        {
-          openNeighborhoodRadius = radius;
-        }
-        void SetOuterRadius(double radius)
-        {
-          openNeighborhoodOuterRadius = radius;
-        }
-        void Remove(const base::SpaceInformationPtr &si)
-        {
-          si->freeState(state);
-        }
-        void Clear()
-        {
-          number_attempted_expansions = 0;
-          number_successful_expansions = 0;
+          Configuration(const base::SpaceInformationPtr &si);
+          Configuration(const base::SpaceInformationPtr &si, const ob::State *state_);
+          ~Configuration();
+          double GetRadius() const;
+          void SetRadius(double radius);
+          void SetOuterRadius(double radius);
+          void Remove(const base::SpaceInformationPtr &si);
+          void Clear();
+          void SetPDFElement(void *element_);
+          void* GetPDFElement();
+          void SetNecessaryPDFElement(void *element_);
+          void* GetNecessaryPDFElement();
+          void SetConnectivityPDFElement(void *element_);
+          void* GetConnectivityPDFElement();
+          double GetImportance() const;
+          double GetGoalDistance() const;
+          ob::State* GetInwardPointingConfiguration() const;
+          void UpdateRiemannianCenterOfMass(ob::SpaceInformationPtr si, Configuration* q_new);
 
-          parent_neighbor = nullptr;
-          isSufficientFeasible = false;
-          pdf_element = nullptr;
-          pdf_necessary_element = nullptr;
-          pdf_connectivity_element = nullptr;
+          friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::QuotientCover::Configuration&);
 
-          index = -1;
-          goal_distance = 0.0;
-        }
-        void SetPDFElement(void *element_)
-        {
-          pdf_element = element_;
-        }
-        void* GetPDFElement()
-        {
-          return pdf_element;
-        }
-        void SetNecessaryPDFElement(void *element_)
-        {
-          pdf_necessary_element = element_;
-        }
-        void* GetNecessaryPDFElement()
-        {
-          return pdf_necessary_element;
-        }
-        void SetConnectivityPDFElement(void *element_)
-        {
-          pdf_connectivity_element = element_;
-        }
-        void* GetConnectivityPDFElement()
-        {
-          return pdf_connectivity_element;
-        }
+          double goal_distance{0.0};
+          uint number_attempted_expansions{0};
+          uint number_successful_expansions{0};
 
-        double GetImportance() const
-        {
-          //return openNeighborhoodRadius + 1.0/goal_distance+1;
-          double d = GetRadius();
-          return d;
-          //return ((double)number_successful_expansions+1)/((double)number_attempted_expansions+2);
-          //return 1.0/((double)number_attempted_expansions+1);
-        }
-        double GetGoalDistance() const
-        {
-          return goal_distance;
-        }
+          base::State *state{nullptr};
+          Configuration *coset{nullptr}; //the underlying coset this Vertex elongs to (on the quotient-space)
+          Configuration *parent_neighbor{nullptr};
+          base::State *riemannian_center_of_mass{nullptr}; //interpolate(inward_pointing_state, state, 2, next) gives a outward pointing state
+          uint number_of_neighbors{0};
 
-        double goal_distance{0.0};
-        uint number_attempted_expansions{0};
-        uint number_successful_expansions{0};
+          bool isSufficientFeasible{false};
+          void *pdf_element;
+          void *pdf_necessary_element;
+          void *pdf_connectivity_element;
 
-        base::State *state{nullptr};
-        Configuration *coset{nullptr}; //the underlying coset this Vertex elongs to (on the quotient-space)
-        Configuration *parent_neighbor{nullptr};
-        base::State *inward_pointing_state{nullptr}; //interpolate(inward_pointing_state, state, 2, next) gives a outward pointing state
+          bool isStart{false};
+          bool isGoal{false};
 
-        bool isSufficientFeasible{false};
-        void *pdf_element;
-        void *pdf_necessary_element;
-        void *pdf_connectivity_element;
+          vertex_index_type index{-1};
 
-        bool isStart{false};
-        bool isGoal{false};
+          //#####################################################################
+          //Neighborhood Computations
+          //#####################################################################
+          double openNeighborhoodRadius{0.0}; //might be L1 or L2 radius
+          double openNeighborhoodOuterRadius{0.0}; //might be L1 or L2 radius
 
-        vertex_index_type index{-1};
-
-        //#####################################################################
-        //Neighborhood Computations
-        //#####################################################################
-        double openNeighborhoodRadius{0.0}; //might be L1 or L2 radius
-        double openNeighborhoodOuterRadius{0.0}; //might be L1 or L2 radius
-
-        friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::QuotientCover::Configuration&);
       };
 
       class EdgeInternalState{
@@ -215,7 +163,7 @@ namespace ompl
       void AddEdge(Configuration *q_from, Configuration *q_to);
       bool EdgeExists(Configuration *q_from, Configuration *q_to);
       int GetNumberOfEdges(Configuration *q);
-      Configuration* GetInwardPointingConfiguration(Configuration *q);
+      Configuration* GetOutwardPointingConfiguration(Configuration *q);
 
       virtual void AddConfigurationToPDF(Configuration *q);
       bool IsConfigurationInsideCover(Configuration *q);
