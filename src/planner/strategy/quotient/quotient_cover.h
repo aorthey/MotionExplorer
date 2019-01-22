@@ -19,7 +19,7 @@ namespace ompl
       typedef og::Quotient BaseT;
     public:
 
-      const uint verbose{2};
+      const uint verbose{0};
 
       QuotientCover(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QuotientCover(void);
@@ -220,6 +220,9 @@ namespace ompl
       bool Interpolate(const Configuration*, const Configuration*, Configuration*);
       bool Interpolate(const Configuration*, const Configuration*, double step_size, Configuration*);
 
+      bool InterpolateOnBoundary(const Configuration* q_center, const Configuration* q1, const Configuration* q2, double step, Configuration*);
+      void ProjectConfigurationOntoBoundary(const Configuration *q_center, Configuration* q_projected);
+
       //#######################################################################
       //Neighborhood Set Computations
       //#######################################################################
@@ -243,7 +246,7 @@ namespace ompl
       PlannerDataVertexAnnotated getAnnotatedVertex(ob::State* state, double radius, bool sufficient) const;
       //#######################################################################
       RNG rng_;
-      const double minimum_neighborhood_radius{1e-2}; //minimum allowed radius, otherwise configuration is considered INVALID 
+      const double minimum_neighborhood_radius{1e-3}; //minimum allowed radius, otherwise configuration is considered INVALID 
 
       double totalVolumeOfCover{0.0};
       bool isConnected{false};

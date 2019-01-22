@@ -56,6 +56,12 @@ void QuotientCoverQueue::AddConfigurationToPriorityQueue(Configuration *q)
     QuotientCover::Print(q, false);
     exit(0);
   }
+  if(q->GetRadius() <= minimum_neighborhood_radius){
+    std::cout << "Tried adding configuration with zero-measure radius" << std::endl;
+    QuotientCover::Print(q, false);
+    exit(0);
+  }
+
   priority_queue_candidate_configurations.push(q);
 }
 

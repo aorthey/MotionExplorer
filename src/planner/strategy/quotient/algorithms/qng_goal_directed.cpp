@@ -86,6 +86,8 @@ void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
 
     //############################################################################
   }else{
+    std::cout << std::string(80, '-') << std::endl;
+    if(verbose>1) PrintQueue(10);
     if(!priority_queue_candidate_configurations.empty()){
       //############################################################################
       //STATE2: ExtendFreeSpace Strategy (Active Node Expansion)
@@ -106,6 +108,8 @@ void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
       Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
       step_strategy->ExpandRandom(q);
     }
+    if(verbose>1) PrintQueue(10);
+    std::cout << std::string(80, '-') << std::endl;
   }
 }
 

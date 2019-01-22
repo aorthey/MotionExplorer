@@ -20,8 +20,7 @@ namespace ompl
 
       private:
         bool ChooseBestDirection(const std::vector<og::QuotientCover::Configuration*> &q_children, bool addBestToPriorityQueue = false);
-
-        void GenerateRandomChildrenOnBoundaryAroundConfiguration(og::QuotientCover::Configuration* q_center, og::QuotientCover::Configuration* q_near, std::vector<og::QuotientCover::Configuration*> &q_children);
+        bool ChooseBestDirectionOnlyAddBestToQueue(const std::vector<og::QuotientCover::Configuration*> &q_children);
 
         uint GetLargestNeighborhoodIndex(const std::vector<og::QuotientCover::Configuration*> &q_children);
         uint GetLargestNeighborhoodIndexOutsideCover(const std::vector<QuotientCover::Configuration*> &q_children);

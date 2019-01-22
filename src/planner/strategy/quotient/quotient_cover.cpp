@@ -380,11 +380,7 @@ QuotientCover::Configuration* QuotientCover::SampleOnBoundaryUniformNear(Configu
 
   //Sample in Ambient Space
   GetQ1SamplerPtr()->sampleUniformNear(q_next->state, q_near->state /*mean*/, radius);
-
-  //Project sample down onto boundary
-  const double d_from_to_next = DistanceConfigurationConfiguration(q_center, q_next);
-  double step_size = q_center->GetRadius()/d_from_to_next;
-  Q1->getStateSpace()->interpolate(q_center->state, q_next->state, step_size, q_next->state);
+  ProjectConfigurationOntoBoundary(q_center, q_next);
 
   q_next->parent_neighbor = q_center;
   return q_next;
@@ -1006,6 +1002,18 @@ bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration
   return true;
 }
 
+bool QuotientCover::InterpolateOnBoundary(const Configuration* q_center, const Configuration* q1, const Configuration* q2, double step, Configuration* q_out)
+{
+  Q1->getStateSpace()->interpolate(q1->state, q2->state, step, q_out->state);
+  ProjectConfigurationOntoBoundary(q_center, q_out);
+  return true;
+}
+void QuotientCover::ProjectConfigurationOntoBoundary(const Configuration *q_center, Configuration* q_projected)
+{
+  const double d_center_to_proj = DistanceConfigurationConfiguration(q_center, q_projected);
+  double step_size = q_center->GetRadius()/d_center_to_proj;
+  Q1->getStateSpace()->interpolate(q_center->state, q_projected->state, step_size, q_projected->state);
+}
 
 //#############################################################################
 //Distance Functions

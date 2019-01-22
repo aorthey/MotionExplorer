@@ -12,7 +12,7 @@ namespace ompl
     class QNGGoalDirected: public og::QuotientCoverQueue
     {
       typedef og::QuotientCoverQueue BaseT;
-      const int verbose{0};
+      const int verbose{2};
     public:
 
       QNGGoalDirected(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);

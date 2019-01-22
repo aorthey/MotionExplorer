@@ -238,9 +238,7 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
   hierarchy->DeleteAllNodes();
   hierarchy->AddRootNode( std::make_shared<Roadmap>() ); 
   RecurseTraverseTree(root, hierarchy, cspace_levels);
-  hierarchy->Print();
-
-
+  //hierarchy->Print();
 }
 
 std::ostream& operator<< (std::ostream& out, const StrategyOutput& so) 
