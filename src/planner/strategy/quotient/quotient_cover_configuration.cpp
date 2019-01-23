@@ -32,7 +32,7 @@ void QuotientCover::Configuration::SetOuterRadius(double radius)
 void QuotientCover::Configuration::Remove(const base::SpaceInformationPtr &si)
 {
   si->freeState(state);
-  if(riemannian_center_of_mass) si->freeState(riemannian_center_of_mass);
+  if(riemannian_center_of_mass != nullptr) si->freeState(riemannian_center_of_mass);
 }
 void QuotientCover::Configuration::Clear()
 {

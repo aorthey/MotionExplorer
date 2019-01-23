@@ -86,9 +86,9 @@ void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
 
     //############################################################################
   }else{
-    std::cout << std::string(80, '-') << std::endl;
-    if(verbose>1) PrintQueue(10);
     if(!priority_queue_candidate_configurations.empty()){
+      if(verbose>1) std::cout << std::string(80, '-') << std::endl;
+      if(verbose>1) PrintQueue(10);
       //############################################################################
       //STATE2: ExtendFreeSpace Strategy (Active Node Expansion)
       //############################################################################
@@ -100,6 +100,8 @@ void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
         AddConfigurationToCover(q);
       }
       step_strategy->ExpandOutside(q);
+      if(verbose>1) PrintQueue(10);
+      if(verbose>1) std::cout << std::string(80, '-') << std::endl;
     }else{
       //############################################################################
       //STATE3: FindNewWays (Passive Node Expansion)
@@ -108,8 +110,6 @@ void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
       Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
       step_strategy->ExpandRandom(q);
     }
-    if(verbose>1) PrintQueue(10);
-    std::cout << std::string(80, '-') << std::endl;
   }
 }
 

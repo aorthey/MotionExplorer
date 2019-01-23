@@ -383,6 +383,7 @@ QuotientCover::Configuration* QuotientCover::SampleOnBoundaryUniformNear(Configu
   ProjectConfigurationOntoBoundary(q_center, q_next);
 
   q_next->parent_neighbor = q_center;
+  ComputeNeighborhood(q_next);
   return q_next;
 }
 
@@ -390,6 +391,11 @@ QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Con
 {
 
   Configuration *q_inward_to_outward = new Configuration(GetQ1(), q_center->GetInwardPointingConfiguration());
+
+  std::cout << "inward pointing from" << std::endl;
+
+  Q1->printState(q_center->state);
+  Q1->printState(q_inward_to_outward->state);
 
   double radius = q_center->GetRadius();
   double distance_center_inward = DistanceConfigurationConfiguration(q_inward_to_outward, q_center);
