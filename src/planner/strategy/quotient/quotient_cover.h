@@ -222,6 +222,7 @@ namespace ompl
 
       bool InterpolateOnBoundary(const Configuration* q_center, const Configuration* q1, const Configuration* q2, double step, Configuration*);
       void ProjectConfigurationOntoBoundary(const Configuration *q_center, Configuration* q_projected);
+      Configuration* NearestConfigurationOnBoundary(Configuration *q_center, const Configuration* q_outside);
 
       //#######################################################################
       //Neighborhood Set Computations

@@ -31,6 +31,7 @@ void QuotientCover::Configuration::SetOuterRadius(double radius)
 
 void QuotientCover::Configuration::Remove(const base::SpaceInformationPtr &si)
 {
+  Clear();
   si->freeState(state);
   if(riemannian_center_of_mass != nullptr) si->freeState(riemannian_center_of_mass);
 }
@@ -46,7 +47,6 @@ void QuotientCover::Configuration::Clear()
   pdf_connectivity_element = nullptr;
 
   index = -1;
-  goal_distance = 0.0;
 }
 void QuotientCover::Configuration::SetPDFElement(void *element_)
 {

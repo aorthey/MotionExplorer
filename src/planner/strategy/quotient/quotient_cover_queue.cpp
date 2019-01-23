@@ -64,6 +64,7 @@ void QuotientCoverQueue::AddConfigurationToPriorityQueue(Configuration *q)
 void QuotientCoverQueue::clear()
 {
   BaseT::clear();
+  std::cout << "clear cover" << std::endl;
   while(!priority_queue_candidate_configurations.empty()) 
   {
     priority_queue_candidate_configurations.pop();

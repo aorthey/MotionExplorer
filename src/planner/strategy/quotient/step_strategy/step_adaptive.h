@@ -21,6 +21,7 @@ namespace ompl
       private:
         bool ChooseBestDirection(const std::vector<og::QuotientCover::Configuration*> &q_children, bool addBestToPriorityQueue = false);
         bool ChooseBestDirectionOnlyAddBestToQueue(const std::vector<og::QuotientCover::Configuration*> &q_children);
+        bool ExpandTowardsSteepestAscentDirectionFromInitialDirection(og::QuotientCover::Configuration *q_from, og::QuotientCover::Configuration *q_initial);
 
         uint GetLargestNeighborhoodIndex(const std::vector<og::QuotientCover::Configuration*> &q_children);
         uint GetLargestNeighborhoodIndexOutsideCover(const std::vector<QuotientCover::Configuration*> &q_children);

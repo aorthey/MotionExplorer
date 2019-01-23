@@ -185,7 +185,7 @@ void QuotientCover::setup(void)
       saturated = true;
     }
     //#########################################################################
-    OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nearest_neighborhood->size());
+    OMPL_INFORM("%s: ready with %lu states in datastructure (start radius: %f)", getName().c_str(), nearest_neighborhood->size(), q_start->GetRadius());
     checkValidity();
   }else{
     setup_ = false;
@@ -267,56 +267,6 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
   if(IsConfigurationInsideCover(q)) return BGT::null_vertex();
 
   //###########################################################################
-  //STEP2: Get all neighbors which are intersecting neighborhood of q
-  //###########################################################################
-  // std::vector<Configuration*> neighbors = GetIntersectingNeighborhoodConfigurations(q);
-  // uint N = neighbors.size();
-  // if(N<=0 && !q->isStart){
-  //   std::cout << std::string(80, '-') << std::endl;
-  //   std::cout << std::string(80, '-') << std::endl;
-  //   std::cout << *this << std::endl;
-  //   std::cout << "neighbors are empty" << std::endl;
-  //   Print(q, false);
-  //   Configuration *qn = nearest_neighborhood->nearest(q);
-  //   std::cout << "nearest:" << std::endl;
-  //   Print(qn, false);
-  //   std::cout << "distance: " << DistanceNeighborhoodNeighborhood(q,qn) << std::endl;
-  //   std::cout << "distance: " << DistanceConfigurationConfiguration(q,qn) << std::endl;
-
-  //   std::vector<Configuration*> neighbors;
-  //   std::cout << "NearestK" << std::endl;
-  //   nearest_neighborhood->nearestK(q, 1, neighbors);
-  //   Configuration *qk = neighbors.at(0);
-  //   Print(qk, false);
-  //   std::cout << "distance: " << DistanceNeighborhoodNeighborhood(q,qk) << " to " << qk->index << std::endl;
-  //   std::cout << "distance: " << DistanceConfigurationConfiguration(q,qn) << std::endl;
-
-  //   for(uint k = 0; k < 20; k++){
-  //     neighbors.clear();
-  //     nearest_neighborhood->nearestR(q, 1e-20, neighbors);
-  //     std::cout << k << ":" << neighbors.size() << std::endl;
-  //   }
-
-  //   double dstep = 1e-20;
-  //   for(double d = dstep; d < 1.0; d*=10){
-  //     nearest_neighborhood->nearestR(q, 0, neighbors);
-  //     std::cout << d << ":" << neighbors.size() << std::endl;
-  //     if(neighbors.size()>0){
-  //       for(uint k = 0; k < neighbors.size(); k++){
-  //         Configuration *qk = neighbors.at(k);
-  //         std::cout << "distance: " << DistanceNeighborhoodNeighborhood(q,qk) << " to " << qk->index << std::endl;
-  //       }
-
-  //       break;
-  //     }
-
-  //   }
-  //   std::cout << nearest_neighborhood->size() << std::endl;
-  //   std::cout << neighbors.size() << std::endl;
-  //   exit(0);
-  // }
-
-  //###########################################################################
   //STEP3: Verify that neighborhood of q is not a subset of any intersecting
   //neighborhood
   //###########################################################################
@@ -383,16 +333,18 @@ QuotientCover::Configuration* QuotientCover::SampleOnBoundaryUniformNear(Configu
   ProjectConfigurationOntoBoundary(q_center, q_next);
 
   q_next->parent_neighbor = q_center;
-  ComputeNeighborhood(q_next);
-  return q_next;
+  if(ComputeNeighborhood(q_next)){
+    return q_next;
+  }else{
+    return nullptr;
+  }
 }
 
 QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Configuration *q_center)
 {
+  if(q_center->isStart) return nullptr;
 
   Configuration *q_inward_to_outward = new Configuration(GetQ1(), q_center->GetInwardPointingConfiguration());
-
-  std::cout << "inward pointing from" << std::endl;
 
   Q1->printState(q_center->state);
   Q1->printState(q_inward_to_outward->state);
@@ -415,9 +367,13 @@ QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Con
     exit(0);
   }
   //############################################################################
-
   q_inward_to_outward->parent_neighbor = q_center;
-  return q_inward_to_outward;
+
+  if(ComputeNeighborhood(q_inward_to_outward)){
+    return q_inward_to_outward;
+  }else{
+    return nullptr;
+  }
 }
 
 void QuotientCover::AddEdge(Configuration *q_from, Configuration *q_to)
@@ -1019,6 +975,19 @@ void QuotientCover::ProjectConfigurationOntoBoundary(const Configuration *q_cent
   const double d_center_to_proj = DistanceConfigurationConfiguration(q_center, q_projected);
   double step_size = q_center->GetRadius()/d_center_to_proj;
   Q1->getStateSpace()->interpolate(q_center->state, q_projected->state, step_size, q_projected->state);
+}
+QuotientCover::Configuration* QuotientCover::NearestConfigurationOnBoundary(Configuration *q_center, const Configuration* q_outside)
+{
+  Configuration *q_projected = new Configuration(Q1);
+  const double d_center_to_proj = DistanceConfigurationConfiguration(q_center, q_outside);
+  double step_size = q_center->GetRadius()/d_center_to_proj;
+  Q1->getStateSpace()->interpolate(q_center->state, q_outside->state, step_size, q_projected->state);
+  q_projected->parent_neighbor = q_center;
+  if(ComputeNeighborhood(q_projected)){
+    return q_projected;
+  }else{
+    return nullptr;
+  }
 }
 
 //#############################################################################
