@@ -9,13 +9,10 @@
   <algorithm dynamic="1" name="benchmark:all_dynamic"/>
 
   <algorithm name="hierarchy:qng_goal_directed"/>
-  <algorithm name="hierarchy:qng"/>
-  <algorithm name="benchmark:minimal"/>
-  <algorithm name="hierarchy:qmp_connect"/>
-  <algorithm name="ompl:spars"/>
   <algorithm name="ompl:kpiece"/>
-  <algorithm name="benchmark:all_geometric"/>
   <algorithm name="ompl:rrt"/>
+  <algorithm name="benchmark:minimal"/>
+  <algorithm name="benchmark:best_geometric"/>
   <!-- <algorithm name="ompl:prm"/> -->
 
   <!-- <algorithm name="ompl:prm"/> -->

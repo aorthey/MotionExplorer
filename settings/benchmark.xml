@@ -1,18 +1,19 @@
 <benchmarks>
 
   <benchmark name="best_geometric">
-    <algorithm name="hierarchy:qmp_connect"/>
+    <algorithm name="hierarchy:qng_goal_directed"/>
     <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:kpiece"/>
     <!-- <algorithm name="ompl:prm"/> -->
     <!-- <algorithm name="ompl:est"/> -->
-    <maxplanningtime>30</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>10</runcount> <!-- number of runs per algorithm --> 
+    <maxplanningtime>3</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>5</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 
   <benchmark name="minimal">
     <algorithm name="hierarchy:qng_goal_directed"/>
-    <!-- <algorithm name="ompl:rrtconnect"/> -->
+    <algorithm name="ompl:rrtconnect"/>
     <algorithm name="ompl:kpiece"/>
     <maxplanningtime>2</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>3</runcount> <!-- number of runs per algorithm --> 

@@ -344,9 +344,6 @@ QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Con
 {
   Configuration *q_inward_to_outward = new Configuration(GetQ1(), q_center->GetInwardPointingConfiguration());
 
-  Q1->printState(q_center->state);
-  Q1->printState(q_inward_to_outward->state);
-
   double radius = q_center->GetRadius();
   double distance_center_inward = DistanceConfigurationConfiguration(q_inward_to_outward, q_center);
   double step = (radius + distance_center_inward)/distance_center_inward;
