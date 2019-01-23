@@ -342,8 +342,6 @@ QuotientCover::Configuration* QuotientCover::SampleOnBoundaryUniformNear(Configu
 
 QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Configuration *q_center)
 {
-  if(q_center->isStart) return nullptr;
-
   Configuration *q_inward_to_outward = new Configuration(GetQ1(), q_center->GetInwardPointingConfiguration());
 
   Q1->printState(q_center->state);

@@ -10,6 +10,9 @@ bool StepStrategyAdaptive::Towards(QuotientCover::Configuration *q_from, Quotien
   }
 
   Configuration *q_proj = quotient_cover_queue->NearestConfigurationOnBoundary(q_from, q_to);
+  if(q_from->isStart){
+    return ExpandTowardsSteepestAscentDirectionFromInitialDirection(q_from, q_proj);
+  }
   Configuration* q_outward = quotient_cover_queue->GetOutwardPointingConfiguration(q_from);
 
   double r_proj = 0;
@@ -46,16 +49,18 @@ bool StepStrategyAdaptive::ExpandTowardsSteepestAscentDirectionFromInitialDirect
 
   const uint M = (quotient_cover_queue->GetQ1()->getStateDimension()+2);
 
-  while(q_initial == nullptr){
+  uint ctr = 0;
+  while(q_initial == nullptr && ctr++ <= M){
     q_initial = quotient_cover_queue->SampleOnBoundaryUniformNear(q_from, q_from->GetRadius(), q_from);
   }
+
   if(q_initial == nullptr){
     return false;
   }
+  ctr = 0;
 
   double radius_last = q_initial->GetRadius();
 
-  uint ctr = 0;
 
   Configuration *q_last = q_initial;
   Configuration *q_next;
