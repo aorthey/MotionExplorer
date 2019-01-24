@@ -253,8 +253,7 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
   //STEP1: Check that q can be projected onto a feasible area of QS
   //###########################################################################
   if(parent != nullptr){
-    std::cout << "NYI" << std::endl;
-    exit(0);
+    std::cout << "Warning: Please check if configuration (and NBH) can be completely projected onto the QS cover" << std::endl;
   }
 
   if(q->GetRadius() <= 0){

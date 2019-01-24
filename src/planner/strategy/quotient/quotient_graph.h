@@ -137,6 +137,8 @@ namespace ompl
         virtual bool GetSolution(ob::PathPtr &solution) override;
         virtual void getPlannerData(ob::PlannerData &data) const override;
         virtual double GetImportance() const override;
+        void Init();
+        bool firstRun{true};
 
         virtual void setup() override;
         virtual void clear() override;

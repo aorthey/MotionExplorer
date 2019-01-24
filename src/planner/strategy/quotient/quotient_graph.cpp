@@ -66,36 +66,7 @@ void QuotientGraph::setup(){
       std::cout << "Needs specification of optimization objective." << std::endl;
       exit(0);
     }
-    auto *goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
-
-    if (goal == nullptr){
-      OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
-      exit(0);
-    }
-
-    while (const ob::State *st = pis_.nextStart()){
-      startM_.push_back(addMilestone(si_->cloneState(st)));
-      G[startM_.back()].start = true;
-    }
-    if (startM_.empty()){
-      OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
-      //const ob::State *start = pdef_->getStartState(0);
-      exit(0);
-    }
-    if (!goal->couldSample()){
-      OMPL_ERROR("%s: Insufficient states in sampleable goal region", getName().c_str());
-      exit(0);
-    }
-
-    if (goal->maxSampleCount() > goalM_.size() || goalM_.empty()){
-      const ob::State *st = pis_.nextGoal();
-      if (st != nullptr){
-        goalM_.push_back(addMilestone(si_->cloneState(st)));
-        G[goalM_.back()].goal = true;
-      }
-    }
-    unsigned long int nrStartStates = boost::num_vertices(G);
-    OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nrStartStates);
+    firstRun = true;
     setup_ = true;
   }else{
     setup_ = false;
@@ -122,17 +93,17 @@ void QuotientGraph::clear()
 
   ClearVertices();
   G.clear();
-  if (nn_){
+  if(nn_){
     nn_->clear();
   }
   clearQuery();
-
   iterations_ = 0;
   totalNumberOfSamples = 0;
   graphLength = 0;
   bestCost_ = ob::Cost(dInf);
   setup_ = false;
   addedNewSolution_ = false;
+  firstRun = true;
 }
 
 void QuotientGraph::clearQuery()
@@ -147,11 +118,49 @@ void QuotientGraph::clearQuery()
 //Needs revision.
 double QuotientGraph::GetImportance() const{
   double N = (double)totalNumberOfSamples;
-  return N/((double)si_->getSpaceMeasure());
+  //return /((double)si_->getSpaceMeasure());
+  return 1.0/(N+1);
     //return N/(parent->GetGraphLength()*X1->getSpaceMeasure());
 }
 
+void QuotientGraph::Init()
+{
+  auto *goal = dynamic_cast<ob::GoalSampleableRegion *>(pdef_->getGoal().get());
+  if (goal == nullptr){
+    OMPL_ERROR("%s: Unknown type of goal", getName().c_str());
+    exit(0);
+  }
+
+  if(const ob::State *st = pis_.nextStart()){
+    if (st != nullptr){
+      startM_.push_back(addMilestone(si_->cloneState(st)));
+      G[startM_.back()].start = true;
+    }
+  }
+  if (startM_.empty()){
+    OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
+    exit(0);
+  }
+
+  if(const ob::State *st = pis_.nextGoal()){
+    if (st != nullptr){
+      goalM_.push_back(addMilestone(si_->cloneState(st)));
+      G[goalM_.back()].goal = true;
+    }
+  }
+  if (goalM_.empty()){
+    OMPL_ERROR("%s: There are no valid goal states!", getName().c_str());
+    exit(0);
+  }
+  //unsigned long int nrStartStates = boost::num_vertices(G);
+  //OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nrStartStates);
+}
+
 void QuotientGraph::Grow(double t){
+  if(firstRun){
+    Init();
+    firstRun = false;
+  }
   double T_grow = (2.0/3.0)*t;
   growRoadmap(ob::timedPlannerTerminationCondition(T_grow), xstates[0]);
   double T_expand = (1.0/3.0)*t;
@@ -354,7 +363,7 @@ double QuotientGraph::GetGraphLength() const{
 bool QuotientGraph::GetSolution(ob::PathPtr &solution)
 {
   if(hasSolution){
-    solution_path = GetPath(startM_.at(0), goalM_.at(0));
+    solution_path = GetPath(startM_.back(), goalM_.back());
     startGoalVertexPath_ = shortestVertexPath_;
     solution = solution_path;
     return true;

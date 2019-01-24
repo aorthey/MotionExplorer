@@ -69,9 +69,6 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
   const bool DEBUG = true;
   ompl::time::point t_start = ompl::time::now();
 
-  // std::cout << "QuotientSpaces in Queue: " << Q.size() << std::endl;
-  // if(Q.size()>0) std::cout << Q.top()->GetImportance() << std::endl;
-
   for(uint k = currentQuotientLevel; k < quotientSpaces.size(); k++){
     foundKLevelSolution = false;
 
@@ -95,14 +92,14 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
           double t_k_end = ompl::time::seconds(ompl::time::now() - t_start);
           std::cout << std::string(80, '#') << std::endl;
           std::cout << "Found Solution on Level " << k << " after " << t_k_end << " seconds." << std::endl;
-          std::cout << std::string(80, '#') << std::endl;
           std::cout << *quotientSpaces.at(k) << std::endl;
+          std::cout << std::string(80, '#') << std::endl;
         }
         foundKLevelSolution = true;
         currentQuotientLevel = k+1;
-        if(currentQuotientLevel < quotientSpaces.size()-1){
-          quotientSpaces.at(k+1)->clear();
-        }
+        // if(currentQuotientLevel < quotientSpaces.size()-1){
+        //   quotientSpaces.at(k+1)->clear();
+        // }
       }
       Q.push(jQuotient);
     }
@@ -174,6 +171,7 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const
 
     //label all new vertices
     uint ctr = 0;
+    std::cout << data.numVertices() << "," << Nvertices << std::endl;
     for(uint vidx = Nvertices; vidx < data.numVertices(); vidx++){
       PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
       v.SetLevel(k);

@@ -69,6 +69,7 @@ void QuotientCoverQueue::clear()
   {
     priority_queue_candidate_configurations.pop();
   }
+  std::cout << "pop PQ. Done." << std::endl;
   NUMBER_OF_EXPANSION_SAMPLES = (Q1->getStateDimension()+1)*1;
   firstRun = true;
 }

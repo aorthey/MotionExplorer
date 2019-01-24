@@ -25,6 +25,19 @@ QMP::~QMP()
   samplesOnShortestPath = 0;
 }
 
+bool QMP::GetSolution(ob::PathPtr &solution)
+{
+  if(BaseT::GetSolution(solution)){
+    for(uint k = 0; k < startGoalVertexPath_.size()-1; k++){
+      Vertex v1 = startGoalVertexPath_.at(k);
+      Vertex v2 = startGoalVertexPath_.at(k+1);
+      Edge ek = boost::edge(v1,v2,G).first;
+      pdf_edges_on_shortest_path.add(ek, G[ek].getCost().value());
+    }
+  }
+  return hasSolution;
+}
+
 bool QMP::SampleQuotient(ob::State *q_random_graph)
 {
   Edge e;
@@ -32,16 +45,8 @@ bool QMP::SampleQuotient(ob::State *q_random_graph)
   if(t<percentageSamplesOnShortestPath)
   {
     //shortest path heuristic
-    PDF<Edge> pdf;
     percentageSamplesOnShortestPath = exp(-pow(((double)samplesOnShortestPath++/1000.0),2));
-
-    for(uint k = 0; k < startGoalVertexPath_.size()-1; k++){
-      Vertex v1 = startGoalVertexPath_.at(k);
-      Vertex v2 = startGoalVertexPath_.at(k+1);
-      Edge ek = boost::edge(v1,v2,G).first;
-      pdf.add(ek, G[ek].getCost().value());
-    }
-    e = pdf.sample(rng_.uniform01());
+    e = pdf_edges_on_shortest_path.sample(rng_.uniform01());
   }else{
     e = boost::random_edge(G, rng_boost);
     while(!sameComponent(boost::source(e, G), startM_.at(0)))
@@ -62,4 +67,3 @@ bool QMP::SampleQuotient(ob::State *q_random_graph)
   if(epsilon>0) Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
   return true;
 }
-

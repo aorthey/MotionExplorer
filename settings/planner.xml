@@ -8,6 +8,8 @@
   <algorithm dynamic="1" name="ompl:kpiece"/>
   <algorithm dynamic="1" name="benchmark:all_dynamic"/>
 
+  <algorithm name="hierarchy:qmp"/>
+  <algorithm name="hierarchy:qmp_connect"/>
   <algorithm name="hierarchy:qng_goal_directed"/>
   <algorithm name="ompl:kpiece"/>
   <algorithm name="ompl:rrt"/>

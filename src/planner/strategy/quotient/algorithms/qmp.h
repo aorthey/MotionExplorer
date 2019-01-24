@@ -24,15 +24,17 @@ namespace ompl
         QMP(const ob::SpaceInformationPtr &si, Quotient *parent_);
         virtual ~QMP() override;
 
+        virtual bool GetSolution(ob::PathPtr &solution) override;
       protected:
 
-        double epsilon{0.1}; //graph thickening
+        double epsilon{0.05}; //graph thickening
         double percentageSamplesOnShortestPath{1.0};
         double goalBias_{0.1};
         PDF<Vertex> vpdf;
 
+        PDF<Edge> pdf_edges_on_shortest_path;
+
         virtual bool SampleQuotient(ob::State*) override;
-        //virtual ompl::PDF<og::QuotientGraph::Edge> GetEdgePDF();
         uint samplesOnShortestPath{0};
 
     };

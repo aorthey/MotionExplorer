@@ -84,7 +84,7 @@ bool QMPConnect::Sample(ob::State *q_random)
   if(parent == nullptr){
     //return Q1_valid_sampler->sample(q_random);
     if(!hasSolution && rng_.uniform01() < goalBias_){
-      q_random = si_->cloneState(G[goalM_.at(0)].state);//stateProperty_[goalM_.at(0)]);
+      q_random = Q1->cloneState(G[goalM_.back()].state);//stateProperty_[goalM_.at(0)]);
       //goal->sampleGoal(q_random);
     }else{
       Q1_valid_sampler->sample(q_random);
@@ -93,7 +93,7 @@ bool QMPConnect::Sample(ob::State *q_random)
     //Adjusted sampling function: Sampling in G0 x X1
     if(!hasSolution && rng_.uniform01() < goalBias_){
       //goal->sampleGoal(q_random);
-      q_random = si_->cloneState(G[goalM_.at(0)].state);//stateProperty_[goalM_.at(0)]);
+      q_random = Q1->cloneState(G[goalM_.back()].state);//stateProperty_[goalM_.at(0)]);
     }else{
       ob::SpaceInformationPtr Q0 = parent->getSpaceInformation();
       base::State *s_X1 = X1->allocState();

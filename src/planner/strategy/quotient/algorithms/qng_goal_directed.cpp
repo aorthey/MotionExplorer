@@ -34,9 +34,11 @@ void QNGGoalDirected::clear()
     configurations_sorted_by_nearest_to_goal.pop();
   }
 
+  std::cout << "pop nearest to goal PQ. Done." << std::endl;
   nearest_to_goal_has_changed = true;
   progressMadeTowardsGoal = true;
   BaseT::clear();
+  std::cout << "QNGGoalDirected::clear Done." << std::endl;
 }
 
 
