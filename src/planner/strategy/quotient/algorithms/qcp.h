@@ -9,14 +9,15 @@ namespace ompl
   namespace geometric
   {
 
-    class QNGGoalDirected: public og::QuotientCoverQueue
+    //QCP: Quotient-space Cover Planner
+    class QCP: public og::QuotientCoverQueue
     {
       typedef og::QuotientCoverQueue BaseT;
       const int verbose{0};
     public:
 
-      QNGGoalDirected(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
-      ~QNGGoalDirected(void);
+      QCP(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
+      ~QCP(void);
 
       void clear() override;
       void setup() override;

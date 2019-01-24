@@ -1,6 +1,6 @@
 #include "common.h"
 #include "gui/common.h"
-#include "qng_goal_directed.h"
+#include "qcp.h"
 #include "planner/strategy/quotient/step_strategy/step_straight.h"
 #include "planner/strategy/quotient/step_strategy/step_adaptive.h"
 
@@ -9,24 +9,24 @@ using namespace ompl::geometric;
 //############################################################################
 // Setup
 //############################################################################
-QNGGoalDirected::QNGGoalDirected(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
+QCP::QCP(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
-  setName("QNGGoalDirected"+std::to_string(id));
+  setName("QCP"+std::to_string(id));
   progressMadeTowardsGoal = true;
   step_strategy = new StepStrategyAdaptive();
   step_strategy->SetSpace(this);
 }
 
-QNGGoalDirected::~QNGGoalDirected(void)
+QCP::~QCP(void)
 {
 }
 
-void QNGGoalDirected::setup()
+void QCP::setup()
 {
   BaseT::setup();
 }
 
-void QNGGoalDirected::clear()
+void QCP::clear()
 {
   pdf_connectivity_configurations.clear();
   while(!configurations_sorted_by_nearest_to_goal.empty()) 
@@ -38,14 +38,14 @@ void QNGGoalDirected::clear()
   nearest_to_goal_has_changed = true;
   progressMadeTowardsGoal = true;
   BaseT::clear();
-  std::cout << "QNGGoalDirected::clear Done." << std::endl;
+  std::cout << "QCP::clear Done." << std::endl;
 }
 
 
 //############################################################################
 // Grow Functions
 //############################################################################
-void QNGGoalDirected::Grow(double t)
+void QCP::Grow(double t)
 {
   if(firstRun){
     firstRun = false;
@@ -69,7 +69,7 @@ void QNGGoalDirected::Grow(double t)
   }
 }
 
-void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
+void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
 {
   if(nearest_to_goal_has_changed || progressMadeTowardsGoal)
   {
@@ -115,7 +115,7 @@ void QNGGoalDirected::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
   }
 }
 
-void QNGGoalDirected::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
+void QCP::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
 {
   double r = rng_.uniform01();
   if(r <= rewireBias){
@@ -130,7 +130,7 @@ void QNGGoalDirected::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
 // Misc Functions
 //############################################################################
 
-double QNGGoalDirected::ValueConnectivity(Configuration *q)
+double QCP::ValueConnectivity(Configuration *q)
 {
   //Vertex v = get(indexToVertex, q->index);
   //QuotientCover::Print(q, false);
@@ -141,7 +141,7 @@ double QNGGoalDirected::ValueConnectivity(Configuration *q)
   return d_connectivity;
 }
 
-void QNGGoalDirected::RewireCover(ob::PlannerTerminationCondition &ptc)
+void QCP::RewireCover(ob::PlannerTerminationCondition &ptc)
 {
   Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
 
@@ -173,7 +173,7 @@ void QNGGoalDirected::RewireCover(ob::PlannerTerminationCondition &ptc)
   }
 }
 
-QuotientCover::Vertex QNGGoalDirected::AddConfigurationToCover(Configuration *q)
+QuotientCover::Vertex QCP::AddConfigurationToCover(Configuration *q)
 {
   QuotientCover::Vertex v = BaseT::AddConfigurationToCover(q);
 
