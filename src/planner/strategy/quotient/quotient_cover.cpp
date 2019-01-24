@@ -120,9 +120,6 @@ void QuotientCover::setup(void)
                               });
   }
 
-  graph[boost::graph_bundle].name = getName()+"_graph";
-  graph[boost::graph_bundle].Q1 = Q1;
-
   saturated = false;
   isConnected = false;
   totalVolumeOfCover = 0.0;
@@ -135,61 +132,69 @@ void QuotientCover::setup(void)
       OMPL_ERROR("%s: Did not specify optimization function.", getName().c_str());
       exit(0);
     }
-    //#########################################################################
-    //Adding start configuration
-    //#########################################################################
-    if(const ob::State *state_start = pis_.nextStart()){
-      q_start = new Configuration(Q1, state_start);
-      if(!ComputeNeighborhood(q_start, true))
-      {
-        OMPL_ERROR("%s: Could not add start state!", getName().c_str());
-        QuotientCover::Print(q_start, false);
-        exit(0);
-      }
-    }else{
-      OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
-      exit(0);
-    }
-
-    //#########################################################################
-    //Adding goal configuration
-    //#########################################################################
-    if(const ob::State *state_goal = pis_.nextGoal()){
-      q_goal = new Configuration(Q1, state_goal);
-      if(!ComputeNeighborhood(q_goal, true))
-      {
-        OMPL_ERROR("%s: Could not add goal state!", getName().c_str());
-        exit(0);
-      }
-    }else{
-      OMPL_ERROR("%s: There are no valid goal states!", getName().c_str());
-      exit(0);
-    }
-    //#########################################################################
-    //Parent data if available
-    //#########################################################################
-    if(parent != nullptr)
-    {
-      q_start->coset = static_cast<og::QuotientCover*>(parent)->q_start;
-      q_goal->coset = static_cast<og::QuotientCover*>(parent)->q_goal;
-    }
-    q_start->isStart = true;
-    q_goal->isGoal = true;
-    v_start = AddConfigurationToCover(q_start);
-    //#########################################################################
-    //Check saturation
-    //#########################################################################
-    if(q_start->GetRadius() == std::numeric_limits<double>::infinity())
-    {
-      OMPL_INFORM("Note: start state covers quotient-space.");
-      saturated = true;
-    }
-    //#########################################################################
-    OMPL_INFORM("%s: ready with %lu states in datastructure (start radius: %f)", getName().c_str(), nearest_neighborhood->size(), q_start->GetRadius());
     checkValidity();
+    setup_ = true;
   }else{
     setup_ = false;
   }
+
+}
+void QuotientCover::Init()
+{
+  graph[boost::graph_bundle].name = getName()+"_graph";
+  graph[boost::graph_bundle].Q1 = Q1;
+
+  //#########################################################################
+  //Adding start configuration
+  //#########################################################################
+  if(const ob::State *state_start = pis_.nextStart()){
+    q_start = new Configuration(Q1, state_start);
+    if(!ComputeNeighborhood(q_start, true))
+    {
+      OMPL_ERROR("%s: Could not add start state!", getName().c_str());
+      QuotientCover::Print(q_start, false);
+      exit(0);
+    }
+  }else{
+    OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
+    exit(0);
+  }
+
+  //#########################################################################
+  //Adding goal configuration
+  //#########################################################################
+  if(const ob::State *state_goal = pis_.nextGoal()){
+    q_goal = new Configuration(Q1, state_goal);
+    if(!ComputeNeighborhood(q_goal, true))
+    {
+      OMPL_ERROR("%s: Could not add goal state!", getName().c_str());
+      exit(0);
+    }
+  }else{
+    OMPL_ERROR("%s: There are no valid goal states!", getName().c_str());
+    exit(0);
+  }
+  //#########################################################################
+  //Parent data if available
+  //#########################################################################
+  if(parent != nullptr)
+  {
+    q_start->coset = static_cast<og::QuotientCover*>(parent)->q_start;
+    q_goal->coset = static_cast<og::QuotientCover*>(parent)->q_goal;
+  }
+  q_start->isStart = true;
+  q_goal->isGoal = true;
+  v_start = AddConfigurationToCover(q_start);
+  //#########################################################################
+  //Check saturation
+  //#########################################################################
+  if(q_start->GetRadius() == std::numeric_limits<double>::infinity())
+  {
+    OMPL_INFORM("Note: start state covers quotient-space.");
+    saturated = true;
+  }
+  //#########################################################################
+  OMPL_INFORM("%s: ready with %lu states in datastructure (start radius: %f)", getName().c_str(), nearest_neighborhood->size(), q_start->GetRadius());
 
 }
 void QuotientCover::clear()
@@ -207,9 +212,7 @@ void QuotientCover::clear()
   //Cover graph
   foreach (Vertex v, boost::vertices(graph)){
     if(graph[v]!=nullptr){
-      if(!graph[v]->isStart && !graph[v]->isGoal){
-        graph[v]->Remove(Q1);
-      }
+      graph[v]->Remove(Q1);
     }
   }
   graph.clear();
@@ -224,16 +227,10 @@ void QuotientCover::clear()
   index_ctr = 0;
   isConnected = false;
   saturated = false;
+  firstRun = true;
 
   if(q_start){
     q_start->Clear();
-    v_start = AddConfigurationToCover(q_start);
-
-    if(q_start->GetRadius() == std::numeric_limits<double>::infinity())
-    {
-      OMPL_INFORM("Note: start state covers quotient-space.");
-      saturated = true;
-    }
   }
 
   if(q_goal){
@@ -339,13 +336,37 @@ QuotientCover::Configuration* QuotientCover::SampleOnBoundaryUniformNear(Configu
   }
 }
 
+void QuotientCover::InterpolateUntilNeighborhoodBoundary(const Configuration *q_center, const Configuration *q_desired, Configuration *q_out)
+{
+
+  double radius = q_center->GetRadius();
+  double distance_center_desired = DistanceConfigurationConfiguration(q_center, q_desired);
+  double step = (radius)/distance_center_desired;
+
+  Interpolate(q_center, q_desired, step, q_out);
+
+  //############################################################################
+  //DEBUG
+  //############################################################################
+  double d_center_outward = DistanceConfigurationConfiguration(q_center, q_out);
+  if(fabs(d_center_outward - radius) > 1e-10){
+    std::cout << "WARNING: interpolated point outside boundary" << std::endl;
+    QuotientCover::Print(q_out, false);
+    QuotientCover::Print(q_center, false);
+    std::cout << "Distance: " << d_center_outward << " Radius: " << radius << std::endl;
+    exit(0);
+  }
+
+}
+
 QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Configuration *q_center)
 {
   Configuration *q_inward_to_outward = new Configuration(GetQ1(), q_center->GetInwardPointingConfiguration());
+  q_inward_to_outward->parent_neighbor = q_center;
 
   double radius = q_center->GetRadius();
   double distance_center_inward = DistanceConfigurationConfiguration(q_inward_to_outward, q_center);
-  double step = (radius + distance_center_inward)/distance_center_inward;
+  double step = (radius+distance_center_inward)/distance_center_inward;
 
   Interpolate(q_inward_to_outward, q_center, step, q_inward_to_outward);
 
@@ -361,7 +382,6 @@ QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Con
     exit(0);
   }
   //############################################################################
-  q_inward_to_outward->parent_neighbor = q_center;
 
   if(ComputeNeighborhood(q_inward_to_outward)){
     return q_inward_to_outward;

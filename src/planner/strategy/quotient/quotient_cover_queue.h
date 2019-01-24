@@ -42,7 +42,6 @@ namespace ompl
     protected:
       StepStrategy *step_strategy;
 
-      bool firstRun{true};
       uint NUMBER_OF_EXPANSION_SAMPLES{0};
       const double shortestPathBias{1.0};
 

@@ -40,9 +40,7 @@ namespace ompl
       //TODO: remove adaptive goal bias, replace by percentage of checking while
       const double thresholdObstaclesHorizon{0.5}; //if moving towards a configuration, do not repell this movement while above obstaclesHorizon. If below, repell to steer robot away from obstacles.
       const double rewireBias{0.2}; //when solution has been found, this bias trades off exploration vs exploitation
-
       bool progressMadeTowardsGoal{true};
-
       bool nearest_to_goal_has_changed{true};
 
       struct CmpGoalDistancePtrs

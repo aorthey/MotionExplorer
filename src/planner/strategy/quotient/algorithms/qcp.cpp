@@ -34,11 +34,10 @@ void QCP::clear()
     configurations_sorted_by_nearest_to_goal.pop();
   }
 
-  std::cout << "pop nearest to goal PQ. Done." << std::endl;
   nearest_to_goal_has_changed = true;
   progressMadeTowardsGoal = true;
+  firstRun = true;
   BaseT::clear();
-  std::cout << "QCP::clear Done." << std::endl;
 }
 
 
@@ -49,6 +48,7 @@ void QCP::Grow(double t)
 {
   if(firstRun){
     firstRun = false;
+    Init();
     AddConfigurationToPriorityQueue(q_start);
   }
 
@@ -121,8 +121,8 @@ void QCP::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
   if(r <= rewireBias){
     RewireCover(ptc);
   }else{
-    std::cout << "NYI" << std::endl;
-    exit(0);
+    Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
+    step_strategy->ExpandRandom(q);
   }
 }
 

@@ -219,6 +219,7 @@ namespace ompl
       bool Interpolate(const Configuration*, Configuration*);
       bool Interpolate(const Configuration*, const Configuration*, Configuration*);
       bool Interpolate(const Configuration*, const Configuration*, double step_size, Configuration*);
+      void InterpolateUntilNeighborhoodBoundary(const Configuration *q_center, const Configuration *q_desired, Configuration *q_out);
 
       bool InterpolateOnBoundary(const Configuration* q_center, const Configuration* q1, const Configuration* q2, double step, Configuration*);
       void ProjectConfigurationOntoBoundary(const Configuration *q_center, Configuration* q_projected);
@@ -241,6 +242,8 @@ namespace ompl
 
       Configuration* Nearest(Configuration *q) const;
       virtual void getPlannerData(base::PlannerData &data) const override;
+
+      void Init();
 
     protected:
       PlannerDataVertexAnnotated getAnnotatedVertex(Vertex vertex) const;

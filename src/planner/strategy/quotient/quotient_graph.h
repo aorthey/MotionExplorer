@@ -138,7 +138,6 @@ namespace ompl
         virtual void getPlannerData(ob::PlannerData &data) const override;
         virtual double GetImportance() const override;
         void Init();
-        bool firstRun{true};
 
         virtual void setup() override;
         virtual void clear() override;
