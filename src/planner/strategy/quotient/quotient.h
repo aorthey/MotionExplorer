@@ -107,6 +107,7 @@ namespace ompl
         uint id;
         uint level{0};
 
+        bool firstRun{true};
         bool hasSolution{false};
 
         Quotient *parent{nullptr};

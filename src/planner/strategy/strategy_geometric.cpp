@@ -147,8 +147,6 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   }else if(algorithm=="hierarchy:qcp"){
     planner = GetSharedMultiQuotientPtr<og::QCP>(si_vec, pdef_vec);
     planner->setName("QCP");
-  // }else if(algorithm=="hierarchy:qng2"){
-  //   planner = GetSharedMultiChartPtr<og::QNG2>(si_vec, pdef_vec);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);

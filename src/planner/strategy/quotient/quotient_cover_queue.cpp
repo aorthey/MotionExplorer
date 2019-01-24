@@ -47,7 +47,6 @@ QuotientCoverQueue::~QuotientCoverQueue(void)
 void QuotientCoverQueue::setup()
 {
   BaseT::setup();
-  firstRun = true;
 }
 void QuotientCoverQueue::AddConfigurationToPriorityQueue(Configuration *q)
 {
@@ -64,12 +63,10 @@ void QuotientCoverQueue::AddConfigurationToPriorityQueue(Configuration *q)
 void QuotientCoverQueue::clear()
 {
   BaseT::clear();
-  std::cout << "clear cover" << std::endl;
   while(!priority_queue_candidate_configurations.empty()) 
   {
     priority_queue_candidate_configurations.pop();
   }
-  std::cout << "pop PQ. Done." << std::endl;
   NUMBER_OF_EXPANSION_SAMPLES = (Q1->getStateDimension()+1)*1;
   firstRun = true;
 }

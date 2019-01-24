@@ -171,7 +171,6 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const
 
     //label all new vertices
     uint ctr = 0;
-    std::cout << data.numVertices() << "," << Nvertices << std::endl;
     for(uint vidx = Nvertices; vidx < data.numVertices(); vidx++){
       PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
       v.SetLevel(k);
