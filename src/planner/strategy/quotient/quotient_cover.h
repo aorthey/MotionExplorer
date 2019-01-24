@@ -172,6 +172,9 @@ namespace ompl
       void RewireConfiguration(Configuration *q);
       void CheckConfigurationIsOnBoundary(Configuration *q_boundary, Configuration *q);
 
+      void Init();
+      bool firstRun{true};
+
       //#######################################################################
       //Distance Computations
       //#######################################################################
@@ -219,9 +222,13 @@ namespace ompl
       bool Interpolate(const Configuration*, Configuration*);
       bool Interpolate(const Configuration*, const Configuration*, Configuration*);
       bool Interpolate(const Configuration*, const Configuration*, double step_size, Configuration*);
-      void InterpolateUntilNeighborhoodBoundary(const Configuration *q_center, const Configuration *q_desired, Configuration *q_out);
 
+      //Interpolate along a straight line from q_center to q_desired. Terminate
+      //if the neighborhood boundary of q_center is reached. The result is
+      //written into q_out
+      void InterpolateUntilNeighborhoodBoundary(const Configuration *q_center, const Configuration *q_desired, Configuration *q_out);
       bool InterpolateOnBoundary(const Configuration* q_center, const Configuration* q1, const Configuration* q2, double step, Configuration*);
+
       void ProjectConfigurationOntoBoundary(const Configuration *q_center, Configuration* q_projected);
       Configuration* NearestConfigurationOnBoundary(Configuration *q_center, const Configuration* q_outside);
 
@@ -242,8 +249,6 @@ namespace ompl
 
       Configuration* Nearest(Configuration *q) const;
       virtual void getPlannerData(base::PlannerData &data) const override;
-
-      void Init();
 
     protected:
       PlannerDataVertexAnnotated getAnnotatedVertex(Vertex vertex) const;

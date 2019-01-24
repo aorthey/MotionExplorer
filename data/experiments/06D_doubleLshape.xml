@@ -14,8 +14,8 @@
    <robot name="sphere_inner" file="../robots/DoubleLshape_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
    <robot name="sphere_outer" file="../robots/DoubleLshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-   <terrain name="doublelshape.tri" file="../terrains/DoubleLshape_large.tri" translation="0 0 0"/>
-  <!-- <terrain name="O1" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/> -->
+   <!-- <terrain name="doublelshape.tri" file="../terrains/DoubleLshape_large.tri" translation="0 0 0"/> -->
+  <terrain name="O1" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
 
   <plannerinput>
     <qinit config="9  +3.00 +0.90 +0.00 -2.0 0.6 0.3 0 0 0"/>
