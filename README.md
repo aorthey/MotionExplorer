@@ -9,12 +9,15 @@
 </ul>
 
 <h3>Ubuntu 16.04</h3>
+
       sudo apt-get install g++-5 libboost1.55-all-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev
 
 <h3>Ubuntu 18.04</h3>
+
       sudo apt-get install g++-5 libboost1.65-all-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev libqhull-dev
 
 <h3>Install Klampt 0.6 (all Ubuntu versions)</h3>
+
       sudo apt-get install g++ cmake git libboost-system-dev libboost-thread-dev freeglut3 freeglut3-dev libglpk-dev python-dev python-opengl libxmu-dev libxi-dev libqt4-dev
       git clone git@github.com:aorthey/Klampt.git
       cd Klampt/Library
