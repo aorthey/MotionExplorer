@@ -14,6 +14,13 @@ planning library (OMPL), developed at Rice University, which provides implementa
 algorithms. Second, the Klamp't library, developed at Duke University, which
 provides a dynamical simulator, especially known for its realistic contact-point computations. 
 
+More about those projects you can find here:
+
+Open Motion Planning Library (OMPL): http://ompl.kavrakilab.org/
+
+Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.pratt.duke.edu/klampt/
+
+
 <h1>Dependencies</h1>
 
 <ul>
@@ -71,12 +78,14 @@ Current important keys:
       Shift + Left Mouse Click: Zoom In/Out from Focal Point
       e: on/off show edges of objects
       f: on/off show faces of objects
-      h : help
+      V: save viewpoint
+      v: load viewpoint
+      h: help
 
       [before planning] 
       t : switch to next planner
       w : plan until solution found or timelimit reached
-      a : plan one step (needs to be supported by planner)
+      q : plan one step (needs to be supported by planner)
       b : draw bounding box of sampling domain
 
       [after planning] 
