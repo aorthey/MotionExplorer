@@ -65,7 +65,6 @@ QuotientCover::Configuration* QuotientCoverQueue::PriorityQueueCandidate_PopTop(
   return q;
 }
 
-
 QuotientCoverQueue::~QuotientCoverQueue(void)
 {
 }
