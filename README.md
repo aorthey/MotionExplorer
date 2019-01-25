@@ -1,20 +1,20 @@
-<h3>Dependencies</h3>
+<h2>Dependencies</h2>
 
 <ul>
-  <li> Eigen 3.3
-  <li> Boost 1.55
   <li> OMPL 1.4.0
   <li> Klampt 0.6 (modified version github.com/aorthey/Klampt and
   github.com/aorthey/KrisLibrary)
+  <li> Eigen 3.3
+  <li> Boost 1.55 or later
 </ul>
 
+<h3>Ubuntu 16.04</h3>
+      sudo apt-get install g++-5 libboost1.55-all-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev
 
-Ubuntu 16.04
-sudo apt-get install g++-5 libboost1.55-all-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev
-Ubuntu 18.04
-sudo apt-get install g++-5 libboost1.65-all-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev libqhull-dev
+<h3>Ubuntu 18.04</h3>
+      sudo apt-get install g++-5 libboost1.65-all-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev libqhull-dev
 
-<h3>Install Klampt</h3>
+<h3>Install Klampt 0.6 (all Ubuntu versions)</h3>
       sudo apt-get install g++ cmake git libboost-system-dev libboost-thread-dev freeglut3 freeglut3-dev libglpk-dev python-dev python-opengl libxmu-dev libxi-dev libqt4-dev
       git clone git@github.com:aorthey/Klampt.git
       cd Klampt/Library
@@ -28,7 +28,7 @@ sudo apt-get install g++-5 libboost1.65-all-dev libeigen3-dev libassimp-dev libf
 
 
 
-<h3>Install</h3>
+<h2>Install</h2>
 
       mkdir build
       cd build
