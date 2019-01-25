@@ -19,14 +19,14 @@ namespace ompl
       typedef og::Quotient BaseT;
     public:
 
-      const uint verbose{0};
+      const uint verbose{4};
 
       QuotientCover(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QuotientCover(void);
       virtual void clear() override;
       virtual void setup() override;
 
-      typedef int vertex_index_type;
+      typedef int normalized_index_type;
       
       //#######################################################################
       //Configuration
@@ -73,7 +73,7 @@ namespace ompl
           bool isStart{false};
           bool isGoal{false};
 
-          vertex_index_type index{-1};
+          normalized_index_type index{-1}; //in [0,num_vertices(graph)]
 
           //#####################################################################
           //Neighborhood Computations
@@ -141,15 +141,19 @@ namespace ompl
 
       
       //keep manual track of indices, because we sometimes need to remove
-      //vertices
-      typedef std::map<typename boost::graph_traits<Graph>::vertex_descriptor, vertex_index_type> VertexToIndexMap;
-      VertexToIndexMap vertexToIndexStdMap;
-      boost::associative_property_map<VertexToIndexMap> vertexToIndex{vertexToIndexStdMap};
+      //vertices. Vertex (the number assigned to a boost::graph vertex) might
+      //need to be deleted. But astar and similar algorithms need a number
+      //between [0, num_vertices(graph)]. We therefore need to map that to an
+      //integer we call normalized_index_type
+      typedef std::map<typename boost::graph_traits<Graph>::vertex_descriptor, normalized_index_type> VertexToNormalizedIndexMap;
+      VertexToNormalizedIndexMap vertexToNormalizedIndexStdMap;
+      boost::associative_property_map<VertexToNormalizedIndexMap> vertexToNormalizedIndex{vertexToNormalizedIndexStdMap};
 
-      typedef std::map<vertex_index_type, typename boost::graph_traits<Graph>::vertex_descriptor> IndexToVertexMap;
-      IndexToVertexMap indexToVertexStdMap;
-      boost::associative_property_map<IndexToVertexMap> indexToVertex{indexToVertexStdMap};
-      vertex_index_type index_ctr{0};
+      typedef std::map<normalized_index_type, typename boost::graph_traits<Graph>::vertex_descriptor> NormalizedIndexToVertexMap;
+      NormalizedIndexToVertexMap normalizedIndexToVertexStdMap;
+      boost::associative_property_map<NormalizedIndexToVertexMap> normalizedIndexToVertex{normalizedIndexToVertexStdMap};
+
+      normalized_index_type index_ctr{0};
 
       //#######################################################################
       //Configuration Create, Remove, Add 
@@ -159,7 +163,7 @@ namespace ompl
       virtual Vertex AddConfigurationToCoverGraph(Configuration *q);
       void RerouteEdgesFromTo(Configuration *q_from, Configuration *q_to);
 
-      void RemoveConfigurationFromCover(Configuration *q);
+      virtual void RemoveConfigurationFromCover(Configuration *q);
       void AddEdge(Configuration *q_from, Configuration *q_to);
       bool EdgeExists(Configuration *q_from, Configuration *q_to);
       int GetNumberOfEdges(Configuration *q);

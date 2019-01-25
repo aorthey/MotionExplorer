@@ -185,6 +185,7 @@ void QuotientCover::Init()
   }
   q_start->isStart = true;
   q_goal->isGoal = true;
+
   v_start = AddConfigurationToCover(q_start);
   //#########################################################################
   //Check saturation
@@ -194,6 +195,28 @@ void QuotientCover::Init()
     OMPL_INFORM("Note: start state covers quotient-space.");
     saturated = true;
   }
+
+  //#########################################################################
+  //TEST1: Delete last element
+  //#########################################################################
+  Configuration *q = new Configuration(Q1);
+  q->openNeighborhoodRadius = 0.5;
+  AddConfigurationToCover(q);
+  RemoveConfigurationFromCover(q);
+
+
+  //#########################################################################
+  //TEST2: Delete middle element
+  //#########################################################################
+  Configuration *q2 = new Configuration(Q1);
+  Configuration *q3 = new Configuration(Q1);
+  q2->openNeighborhoodRadius = 0.5;
+  q3->openNeighborhoodRadius = 0.5;
+
+  AddConfigurationToCover(q2);
+  AddConfigurationToCover(q3);
+  RemoveConfigurationFromCover(q2);
+  RemoveConfigurationFromCover(q3);
   //#########################################################################
   //checkValidity();
   OMPL_INFORM("%s: ready with %lu states in datastructure (start radius: %f)", getName().c_str(), nearest_neighborhood->size(), q_start->GetRadius());
@@ -224,8 +247,8 @@ void QuotientCover::clear()
   pdf_all_configurations.clear();
 
   //index maps
-  vertexToIndexStdMap.clear();
-  indexToVertexStdMap.clear();
+  vertexToNormalizedIndexStdMap.clear();
+  normalizedIndexToVertexStdMap.clear();
   index_ctr = 0;
   isConnected = false;
   saturated = false;
@@ -322,7 +345,7 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
 int QuotientCover::GetNumberOfEdges(Configuration *q)
 {
   if(q->index < 0) return 0;
-  Vertex v = get(indexToVertex, q->index);
+  Vertex v = get(normalizedIndexToVertex, q->index);
   return boost::out_degree(v, graph);
 }
 
@@ -400,8 +423,8 @@ void QuotientCover::AddEdge(Configuration *q_from, Configuration *q_to)
 {
   double d = DistanceQ1(q_from, q_to);
   EdgeInternalState properties(d);
-  Vertex v_from = get(indexToVertex, q_from->index);
-  Vertex v_to = get(indexToVertex, q_to->index);
+  Vertex v_from = get(normalizedIndexToVertex, q_from->index);
+  Vertex v_to = get(normalizedIndexToVertex, q_to->index);
   boost::add_edge(v_from, v_to, properties, graph);
 
   q_from->UpdateRiemannianCenterOfMass(Q1, q_to);
@@ -413,8 +436,8 @@ void QuotientCover::AddEdge(Configuration *q_from, Configuration *q_to)
 
 bool QuotientCover::EdgeExists(Configuration *q_from, Configuration *q_to)
 {
-  Vertex v_from = get(indexToVertex, q_from->index);
-  Vertex v_to = get(indexToVertex, q_to->index);
+  Vertex v_from = get(normalizedIndexToVertex, q_from->index);
+  Vertex v_to = get(normalizedIndexToVertex, q_to->index);
   return boost::edge(v_from, v_to, graph).second;
 }
 
@@ -425,22 +448,6 @@ std::vector<QuotientCover::Configuration*> QuotientCover::GetIntersectingNeighbo
   return neighbors;
 }
 
-void QuotientCover::RerouteEdgesFromTo(Configuration *q_from, Configuration *q_to)
-{
-  Vertex v_from = get(indexToVertex, q_from->index);
-  OEIterator edge_iter, edge_iter_end, next; 
-  boost::tie(edge_iter, edge_iter_end) = boost::out_edges(v_from, graph);
-
-  for(next = edge_iter; edge_iter != edge_iter_end; edge_iter = next)
-  {
-    //for each edge, create a new one pointing to q_to
-    ++next;
-    const Vertex v_target = boost::target(*edge_iter, graph);
-    Configuration *q_reroute = graph[v_target];
-
-    AddEdge(q_reroute, q_to);
-  }
-}
 
 void QuotientCover::AddConfigurationToPDF(Configuration *q)
 {
@@ -472,9 +479,10 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCoverGraph(Configuration 
   graph[v]->number_successful_expansions = 0;
 
   //assign vertex to a unique index
-  put(vertexToIndex, v, index_ctr);
-  put(indexToVertex, index_ctr, v);
+  put(vertexToNormalizedIndex, v, index_ctr);
+  put(normalizedIndexToVertex, index_ctr, v);
   graph[v]->index = index_ctr;
+  //std::cout << "AddConfiguration idx ctr " << graph[v]->index << std::endl;
   index_ctr++;
 
   //###########################################################################
@@ -499,37 +507,110 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCoverGraph(Configuration 
 void QuotientCover::RemoveConfigurationFromCover(Configuration *q)
 {
   totalVolumeOfCover -= q->GetRadius();
+  const Vertex vq = get(normalizedIndexToVertex, q->index);
 
+  //###########################################################################
   //(1) Remove from PDF
+  //###########################################################################
   pdf_all_configurations.remove(static_cast<PDF_Element*>(q->GetPDFElement()));
   if(!q->isSufficientFeasible){
     pdf_necessary_configurations.remove(static_cast<PDF_Element*>(q->GetNecessaryPDFElement()));
   }
 
-
+  //###########################################################################
   //(2) Remove from nearest neighbors structure
+  //###########################################################################
   nearest_neighborhood->remove(q);
   nearest_vertex->remove(q);
 
-  //erase entry from indexmap
-  Vertex vq = get(indexToVertex, q->index);
-  vertexToIndexStdMap.erase(vq);
-  indexToVertexStdMap.erase(q->index);
+  std::cout << "[REMOVE] index " << q->index << "," << get(vertexToNormalizedIndex, vq) << std::endl; 
+  std::cout << "before delete:" << boost::num_vertices(graph) << "v, " << boost::num_edges(graph) << "e" << std::endl;
+  std::cout << "num edges: " << boost::degree(vq, graph) << std::endl;
 
-  //check that they do not exist in indextovertex anymore
-  if(indexToVertexStdMap.count(q->index) > 0){
-    vertex_index_type vit_before = get(vertexToIndex, vq);
-    vertex_index_type vit_after = get(vertexToIndex, vq);
-    std::cout << vit_before << " - " << vit_after << std::endl;
-    exit(0);
+  //###########################################################################
+  //(3) Remove from cover graph
+  //###########################################################################
+  //check that they do not exist in normalizedIndexToVertex anymore
+  vertexToNormalizedIndexStdMap.erase(vq);
+  normalizedIndexToVertexStdMap.erase(q->index);
+
+  index_ctr--; //points to last element
+  if(q->index == index_ctr){
+    //delete last element
+  }else{
+    Vertex v_last_in_graph = normalizedIndexToVertexStdMap[index_ctr];
+    Configuration *q_last = graph[v_last_in_graph];
+
+    normalizedIndexToVertexStdMap.erase(q_last->index);
+
+    std::cout << "idx " << q_last->index << "->" << q->index << std::endl;
+    q_last->index = q->index;
+    //vertexToNormalizedIndexStdMap[v_last_in_graph] = q->index;
+    // normalizedIndexToVertexStdMap[q_last->index] = v_last_in_graph;
+    put(vertexToNormalizedIndex, v_last_in_graph, q_last->index);
+    put(normalizedIndexToVertex, q_last->index, v_last_in_graph);
   }
+
+  //the last vertex index needs to point to the just purged index to obtain a
+  //normalized index
+
+  // put(vertexToNormalizedIndex, v, index_ctr);
+  // put(normalizedIndexToVertex, index_ctr, v);
+  // graph[v]->index = index_ctr;
+  // index_ctr++;
 
   boost::clear_vertex(vq, graph);
   boost::remove_vertex(vq, graph);
-  //(3) Remove from cover graph
+  //erase entry from indexmap
+
+  // normalized_index_type vit_before = get(vertexToNormalizedIndex, vq);
+  // std::cout << vit_before << std::endl;
+  // put(vertexToNormalizedIndex, v, index_ctr);
+  // put(normalizedIndexToVertex, index_ctr, v);
+
+  //############################################################################
+  //DEBUG
+  // if(normalizedIndexToVertexStdMap.count(q->index) > 0){
+  //   std::cout << "index not deleted while removing configuration." << std::endl;
+  //   normalized_index_type vit_before = get(vertexToNormalizedIndex, vq);
+  //   normalized_index_type vit_after = get(vertexToNormalizedIndex, vq);
+  //   std::cout << vit_before << " - " << vit_after << std::endl;
+  //   exit(0);
+  // }
+  // if(vertexToNormalizedIndexStdMap.count(vq) > 0){
+  //   std::cout << "index not deleted while removing configuration." << std::endl;
+  //   normalized_index_type vit_before = get(vertexToNormalizedIndex, vq);
+  //   normalized_index_type vit_after = get(vertexToNormalizedIndex, vq);
+  //   std::cout << vit_before << " - " << vit_after << std::endl;
+  //   exit(0);
+  // }
+  std::cout << "after delete:" << boost::num_vertices(graph) << "v, " << boost::num_edges(graph) << "e" << std::endl;
+  //############################################################################
+    
+  //###########################################################################
+  //(4) delete q
+  //###########################################################################
   q->Remove(Q1);
   delete q;
   q=nullptr;
+}
+
+//All edges pointing to q_from should be rerouted to point to q_to
+void QuotientCover::RerouteEdgesFromTo(Configuration *q_from, Configuration *q_to)
+{
+  Vertex v_from = get(normalizedIndexToVertex, q_from->index);
+  OEIterator edge_iter, edge_iter_end, next; 
+  boost::tie(edge_iter, edge_iter_end) = boost::out_edges(v_from, graph);
+
+  for(next = edge_iter; edge_iter != edge_iter_end; edge_iter = next)
+  {
+    //for each edge, create a new one pointing to q_to
+    ++next;
+    const Vertex v_target = boost::target(*edge_iter, graph);
+    Configuration *q_reroute = graph[v_target];
+
+    AddEdge(q_reroute, q_to);
+  }
 }
 
 bool QuotientCover::ComputeNeighborhood(Configuration *q, bool verbose)
@@ -885,7 +966,7 @@ std::vector<QuotientCover::Configuration*> QuotientCover::GetConfigurationsInsid
 void QuotientCover::RewireConfiguration(Configuration *q)
 {
   std::vector<Configuration*> neighbors;
-  Vertex v = get(indexToVertex, q->index);
+  Vertex v = get(normalizedIndexToVertex, q->index);
   uint K = boost::degree(v, graph)+1;
 
   nearest_neighborhood->nearestK(q, K, neighbors);
@@ -1165,7 +1246,6 @@ double QuotientCover::DistanceNeighborhoodNeighborhood(const Configuration *q_fr
   double d_from = q_from->GetRadius();
   double d_to = q_to->GetRadius();
   double d = DistanceConfigurationConfiguration(q_from, q_to);
-
   if(d!=d){
     std::cout << std::string(80, '-') << std::endl;
     std::cout << *this << std::endl;
@@ -1182,6 +1262,7 @@ double QuotientCover::DistanceNeighborhoodNeighborhood(const Configuration *q_fr
     throw "";
     exit(1);
   }
+
   double d_open_neighborhood_distance = (double)std::max(d - d_from - d_to, 0.0); 
   //std::cout << d << "," << d_from << "," << d_to << "," << d_open_neighborhood_distance << std::endl;
   return d_open_neighborhood_distance;
@@ -1195,13 +1276,38 @@ bool QuotientCover::GetSolution(ob::PathPtr &solution)
     if(d_goal < 1e-10){
       q_goal->parent_neighbor = qn;
       v_goal = AddConfigurationToCover(q_goal);
+      AddEdge(q_goal, qn);
       isConnected = true;
     }
   }
   if(isConnected){
+
+
     auto gpath(std::make_shared<PathGeometric>(Q1));
-    shortest_path_start_goal.clear();
-    shortest_path_start_goal_necessary_vertices.clear();
+    //shortest_path_start_goal.clear();
+    //shortest_path_start_goal_necessary_vertices.clear();
+
+    //############################################################################
+    //DEBUG
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "found goal" << std::endl;
+    double d_goal = DistanceNeighborhoodNeighborhood(q_goal, q_goal->parent_neighbor);
+    std::cout << "distance: " << d_goal << std::endl;
+    QuotientCover::Print(q_start, false);
+    QuotientCover::Print(q_goal, false);
+    std::cout << std::string(80, '-') << std::endl;
+    //############################################################################
+
+    if(v_start != get(normalizedIndexToVertex, q_start->index)){
+      std::cout << "start index wrong:" << std::endl;
+      std::cout << v_start << " vs " << q_start->index << std::endl;
+      exit(0);
+    }
+    if(v_goal != get(normalizedIndexToVertex, q_goal->index)){
+      std::cout << "goal index wrong:" << std::endl;
+      std::cout << v_goal << " vs " << q_goal->index << std::endl;
+      exit(0);
+    }
     shortest_path_start_goal = GetCoverPath(v_start, v_goal);
     gpath->clear();
     for(uint k = 0; k < shortest_path_start_goal.size(); k++){
@@ -1269,10 +1375,13 @@ private:
 
 std::vector<const QuotientCover::Configuration*> QuotientCover::GetCoverPath(const Configuration *q_source, const Configuration *q_sink)
 {
-  const Vertex v_source = get(indexToVertex, q_source->index);
-  const Vertex v_sink = get(indexToVertex, q_sink->index);
+  const Vertex v_source = get(normalizedIndexToVertex, q_source->index);
+  const Vertex v_sink = get(normalizedIndexToVertex, q_sink->index);
   std::vector<const Configuration*> q_path;
-  if(v_source == v_sink) return q_path;
+  if(v_source == v_sink){
+    q_path.push_back(q_source);
+    return q_path;
+  }
   std::vector<Vertex> v_path = GetCoverPath(v_source, v_sink);
   for(uint k = 0; k < v_path.size(); k++){
     q_path.push_back(graph[v_path.at(k)]);
@@ -1284,14 +1393,15 @@ std::vector<QuotientCover::Vertex> QuotientCover::GetCoverPath(const Vertex& v_s
   std::vector<Vertex> path;
   std::vector<Vertex> prev(boost::num_vertices(graph));
   auto weight = boost::make_transform_value_property_map(std::mem_fn(&EdgeInternalState::getCost), get(boost::edge_bundle, graph));
-  auto predecessor = boost::make_iterator_property_map(prev.begin(), vertexToIndex);
+  auto predecessor = boost::make_iterator_property_map(prev.begin(), vertexToNormalizedIndex);
 
   //check that vertices exists in graph
   if(verbose>3) std::cout << std::string(80, '-') << std::endl;
-  if(verbose>3) std::cout << "searching from " << get(vertexToIndex, v_source) << " to " << get(vertexToIndex, v_sink) << std::endl;
+  if(verbose>3) std::cout << "searching from " << get(vertexToNormalizedIndex, v_source) << " to " << get(vertexToNormalizedIndex, v_sink) << std::endl;
+  if(verbose>3) std::cout << "Max vertices: " << boost::num_vertices(graph) << ", idx ctr=" << index_ctr << std::endl;
   if(verbose>3) Q1->printState(graph[v_source]->state);
   if(verbose>3) Q1->printState(graph[v_sink]->state);
-  if(verbose>3) std::cout << graph << std::endl;
+  //if(verbose>3) std::cout << graph << std::endl;
 
   try{
     boost::astar_search(graph, v_source,
@@ -1302,7 +1412,7 @@ std::vector<QuotientCover::Vertex> QuotientCover::GetCoverPath(const Vertex& v_s
                       predecessor_map(predecessor)
                       .weight_map(weight)
                       .visitor(astar_goal_visitor<Vertex>(v_sink))
-                      .vertex_index_map(vertexToIndex)
+                      .vertex_index_map(vertexToNormalizedIndex)
                       .distance_compare([this](EdgeInternalState c1, EdgeInternalState c2)
                                         {
                                             return opt_->isCostBetterThan(c1.getCost(), c2.getCost());
@@ -1315,17 +1425,25 @@ std::vector<QuotientCover::Vertex> QuotientCover::GetCoverPath(const Vertex& v_s
                       .distance_zero(opt_->identityCost())
                     );
   }catch(found_goal fg){
-    for(Vertex v = v_sink;; v = prev[get(vertexToIndex, v)])
+    std::cout << "found path" << std::endl;
+    for(Vertex v = v_sink;; v = prev[get(vertexToNormalizedIndex, v)])
     {
       path.push_back(v);
-      if(verbose>3)std::cout << std::string(80, '-') << std::endl;
-      if(verbose>3)std::cout << "v:" << graph[v]->index << std::endl;
-      if(verbose>3)std::cout << "idx:" << get(vertexToIndex, v) << std::endl;
-      if(graph[prev[get(vertexToIndex, v)]]->index == graph[v]->index)
+      // if(verbose>3)std::cout << std::string(80, '-') << std::endl;
+      // if(verbose>3)std::cout << "v:" << graph[v]->index << std::endl;
+      // if(verbose>3)std::cout << "idx:" << get(vertexToNormalizedIndex, v) << std::endl;
+      if(graph[prev[get(vertexToNormalizedIndex, v)]]->index == graph[v]->index)
         break;
     }
     std::reverse(path.begin(), path.end());
+  }catch(const std::exception& e){
+    std::cerr << "ERROR: " << e.what() << std::endl;
+    exit(-1);
+  }catch(...){
+    std::cerr << "ERROR: " << std::endl;
+    exit(-1);
   }
+
   return path;
 }
 
@@ -1405,6 +1523,7 @@ void QuotientCover::Print(const Configuration *q, bool stopOnError) const
   std::cout << " | coset : " << (q->coset==nullptr?"-":std::to_string(q->coset->index)) << std::endl;
   std::cout << " | parent index : " << (q->parent_neighbor==nullptr?"-":std::to_string(q->parent_neighbor->index)) << std::endl;
   std::cout << " | neighbors : " << (q->number_of_neighbors) << std::endl;
+  std::cout << (q->isGoal?" | GOAL STATE":"") << (q->isStart?" | START STATE":"") << std::endl;
   if(q->index < 0)
   {
     std::cout << "[### STATE NOT MEMBER OF COVER]" << std::endl;

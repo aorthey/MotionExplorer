@@ -28,6 +28,7 @@ namespace ompl
 
       void RewireCover(ob::PlannerTerminationCondition &ptc);
       virtual Vertex AddConfigurationToCover(Configuration *q) override;
+      virtual void RemoveConfigurationFromCover(Configuration *q) override;
 
     private:
       //TODO: remove adaptive goal bias, replace by percentage of checking while

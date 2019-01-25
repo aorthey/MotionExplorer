@@ -46,7 +46,9 @@ void QuotientCover::Configuration::Clear()
   pdf_necessary_element = nullptr;
   pdf_connectivity_element = nullptr;
 
+  openNeighborhoodRadius = 0;
   index = -1;
+  goal_distance = +dInf;
 }
 void QuotientCover::Configuration::SetPDFElement(void *element_)
 {
