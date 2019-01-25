@@ -39,6 +39,32 @@ bool QuotientCoverQueue::CmpMemberConfigurationPtrs::operator()(const Configurat
     }
   }
 }
+// ">" operator: smallest value is top in queue
+// "<" operator: largest value is top in queue (default)
+bool QuotientCoverQueue::CmpGoalDistancePtrs::operator()(const Configuration* lhs, const Configuration* rhs) const
+{
+   return lhs->GetGoalDistance() > rhs->GetGoalDistance();
+}
+QuotientCover::Configuration* QuotientCoverQueue::PriorityQueueNearestToGoal_Top()
+{
+  Configuration *q_nearest = configurations_sorted_by_nearest_to_goal.top();
+  while(q_nearest->index < 0 && !configurations_sorted_by_nearest_to_goal.empty()){
+    configurations_sorted_by_nearest_to_goal.pop();
+    q_nearest = configurations_sorted_by_nearest_to_goal.top();
+  }
+  return q_nearest;
+}
+
+QuotientCover::Configuration* QuotientCoverQueue::PriorityQueueCandidate_PopTop()
+{
+  Configuration *q = nullptr;
+  while(q==nullptr && !priority_queue_candidate_configurations.empty()){
+    q = priority_queue_candidate_configurations.top();
+    priority_queue_candidate_configurations.pop();
+  }
+  return q;
+}
+
 
 QuotientCoverQueue::~QuotientCoverQueue(void)
 {
@@ -67,6 +93,11 @@ void QuotientCoverQueue::clear()
   {
     priority_queue_candidate_configurations.pop();
   }
+  while(!configurations_sorted_by_nearest_to_goal.empty()) 
+  {
+    configurations_sorted_by_nearest_to_goal.pop();
+  }
+  nearest_to_goal_has_changed = true;
   NUMBER_OF_EXPANSION_SAMPLES = (Q1->getStateDimension()+1)*1;
 }
 
@@ -74,6 +105,12 @@ QuotientCover::Vertex QuotientCoverQueue::AddConfigurationToCover(Configuration 
 {
   Vertex v = BaseT::AddConfigurationToCover(q);
   priority_queue_member_configurations.push(q);
+
+  configurations_sorted_by_nearest_to_goal.push(q);
+  if(q == configurations_sorted_by_nearest_to_goal.top()){
+    nearest_to_goal_has_changed = true;
+  }
+
   return v;
 }
 

@@ -29,14 +29,7 @@ void QCP::setup()
 void QCP::clear()
 {
   pdf_connectivity_configurations.clear();
-  while(!configurations_sorted_by_nearest_to_goal.empty()) 
-  {
-    configurations_sorted_by_nearest_to_goal.pop();
-  }
-
-  nearest_to_goal_has_changed = true;
   progressMadeTowardsGoal = true;
-  firstRun = true;
   BaseT::clear();
 }
 
@@ -80,12 +73,13 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
 
     if(verbose>1) std::cout << "Step Towards Goal" << std::endl;
 
-    //@TODO: outsource this computation to the cover_queue class
-    Configuration *q_nearest = configurations_sorted_by_nearest_to_goal.top();
-    while(q_nearest->index < 0 && !configurations_sorted_by_nearest_to_goal.empty()){
-      configurations_sorted_by_nearest_to_goal.pop();
-      q_nearest = configurations_sorted_by_nearest_to_goal.top();
-    }
+    ////@TODO: outsource this computation to the cover_queue class
+    //Configuration *q_nearest = configurations_sorted_by_nearest_to_goal.top();
+    //while(q_nearest->index < 0 && !configurations_sorted_by_nearest_to_goal.empty()){
+    //  configurations_sorted_by_nearest_to_goal.pop();
+    //  q_nearest = configurations_sorted_by_nearest_to_goal.top();
+    //}
+    Configuration* q_nearest = PriorityQueueNearestToGoal_Top();
     if(q_nearest == nullptr) return;
 
     progressMadeTowardsGoal = step_strategy->Towards(q_nearest, q_goal);
@@ -104,13 +98,14 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
       //############################################################################
       if(verbose>1) std::cout << "Expand Largest Single-Connected Node" << std::endl;
 
-      Configuration *q = nullptr;
-      while(q==nullptr && !priority_queue_candidate_configurations.empty()){
-        q = priority_queue_candidate_configurations.top();
-        priority_queue_candidate_configurations.pop();
-      }
-      //TODO: workaround in the case that a PQ candidate has been removed from
-      //the graph
+      //Configuration *q = nullptr;
+      //while(q==nullptr && !priority_queue_candidate_configurations.empty()){
+      //  q = priority_queue_candidate_configurations.top();
+      //  priority_queue_candidate_configurations.pop();
+      //}
+      ////TODO: workaround in the case that a PQ candidate has been removed from
+      ////the graph
+      Configuration* q = PriorityQueueCandidate_PopTop();
       if(q==nullptr) return;
       if(q->index < 0){
         AddConfigurationToCover(q);
@@ -194,17 +189,11 @@ QuotientCover::Vertex QCP::AddConfigurationToCover(Configuration *q)
   PDF_Element *q_element = pdf_connectivity_configurations.add(q, ValueConnectivity(q));
   q->SetConnectivityPDFElement(q_element);
 
-  configurations_sorted_by_nearest_to_goal.push(q);
-  if(q == configurations_sorted_by_nearest_to_goal.top()){
-    nearest_to_goal_has_changed = true;
-  }
-
   return v;
 }
 void QCP::RemoveConfigurationFromCover(Configuration *q)
 {
   pdf_connectivity_configurations.remove(static_cast<PDF_Element*>(q->GetConnectivityPDFElement()));
-  //TODO: nearest to goal might be deleted in that step
   BaseT::RemoveConfigurationFromCover(q);
 }
 

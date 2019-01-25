@@ -133,10 +133,44 @@ void QuotientCover::setup(void)
       exit(0);
     }
     checkValidity();
+    //Test();
     setup_ = true;
   }else{
     setup_ = false;
   }
+
+}
+void QuotientCover::Test()
+{
+  //#########################################################################
+  //TEST0: Add/Delete mockup start element
+  //#########################################################################
+  Configuration *q = new Configuration(Q1);
+  q->openNeighborhoodRadius = 0.5;
+  q->isStart = true;
+  AddConfigurationToCover(q);
+  RemoveConfigurationFromCover(q);
+  //#########################################################################
+  //TEST1: Delete last element
+  //#########################################################################
+  Configuration *q1 = new Configuration(Q1);
+  q1->openNeighborhoodRadius = 0.5;
+  AddConfigurationToCover(q1);
+  RemoveConfigurationFromCover(q1);
+
+  //#########################################################################
+  //TEST2: Delete middle element
+  //#########################################################################
+  Configuration *q2 = new Configuration(Q1);
+  Configuration *q3 = new Configuration(Q1);
+  q2->openNeighborhoodRadius = 0.5;
+  q3->openNeighborhoodRadius = 0.5;
+
+  AddConfigurationToCover(q2);
+  AddConfigurationToCover(q3);
+  RemoveConfigurationFromCover(q2);
+  RemoveConfigurationFromCover(q3);
+  //#########################################################################
 
 }
 void QuotientCover::Init()
@@ -196,28 +230,6 @@ void QuotientCover::Init()
     saturated = true;
   }
 
-  //#########################################################################
-  //TEST1: Delete last element
-  //#########################################################################
-  Configuration *q = new Configuration(Q1);
-  q->openNeighborhoodRadius = 0.5;
-  AddConfigurationToCover(q);
-  RemoveConfigurationFromCover(q);
-
-
-  //#########################################################################
-  //TEST2: Delete middle element
-  //#########################################################################
-  Configuration *q2 = new Configuration(Q1);
-  Configuration *q3 = new Configuration(Q1);
-  q2->openNeighborhoodRadius = 0.5;
-  q3->openNeighborhoodRadius = 0.5;
-
-  AddConfigurationToCover(q2);
-  AddConfigurationToCover(q3);
-  RemoveConfigurationFromCover(q2);
-  RemoveConfigurationFromCover(q3);
-  //#########################################################################
   //checkValidity();
   OMPL_INFORM("%s: ready with %lu states in datastructure (start radius: %f)", getName().c_str(), nearest_neighborhood->size(), q_start->GetRadius());
 
@@ -284,8 +296,8 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
 
   if(q->GetRadius() <= 0){
     std::cout << "[WARNING] Tried adding a zero-measure neighborhood." << std::endl;
+    QuotientCover::Print(q, false);
     exit(0);
-    return BGT::null_vertex();
   }
 
   //check if q is not already in cover
@@ -523,9 +535,9 @@ void QuotientCover::RemoveConfigurationFromCover(Configuration *q)
   nearest_neighborhood->remove(q);
   nearest_vertex->remove(q);
 
-  std::cout << "[REMOVE] index " << q->index << "," << get(vertexToNormalizedIndex, vq) << std::endl; 
-  std::cout << "before delete:" << boost::num_vertices(graph) << "v, " << boost::num_edges(graph) << "e" << std::endl;
-  std::cout << "num edges: " << boost::degree(vq, graph) << std::endl;
+  // std::cout << "[REMOVE] index " << q->index << "," << get(vertexToNormalizedIndex, vq) << std::endl; 
+  // std::cout << "before delete:" << boost::num_vertices(graph) << "v, " << boost::num_edges(graph) << "e" << std::endl;
+  // std::cout << "num edges: " << boost::degree(vq, graph) << std::endl;
 
   //###########################################################################
   //(3) Remove from cover graph
@@ -543,7 +555,7 @@ void QuotientCover::RemoveConfigurationFromCover(Configuration *q)
 
     normalizedIndexToVertexStdMap.erase(q_last->index);
 
-    std::cout << "idx " << q_last->index << "->" << q->index << std::endl;
+    std::cout << "[REMOVE] idx " << q_last->index << "->" << q->index << std::endl;
     q_last->index = q->index;
     //vertexToNormalizedIndexStdMap[v_last_in_graph] = q->index;
     // normalizedIndexToVertexStdMap[q_last->index] = v_last_in_graph;
@@ -584,7 +596,7 @@ void QuotientCover::RemoveConfigurationFromCover(Configuration *q)
   //   std::cout << vit_before << " - " << vit_after << std::endl;
   //   exit(0);
   // }
-  std::cout << "after delete:" << boost::num_vertices(graph) << "v, " << boost::num_edges(graph) << "e" << std::endl;
+  //std::cout << "after delete:" << boost::num_vertices(graph) << "v, " << boost::num_edges(graph) << "e" << std::endl;
   //############################################################################
     
   //###########################################################################
@@ -1289,13 +1301,13 @@ bool QuotientCover::GetSolution(ob::PathPtr &solution)
 
     //############################################################################
     //DEBUG
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "found goal" << std::endl;
-    double d_goal = DistanceNeighborhoodNeighborhood(q_goal, q_goal->parent_neighbor);
-    std::cout << "distance: " << d_goal << std::endl;
-    QuotientCover::Print(q_start, false);
-    QuotientCover::Print(q_goal, false);
-    std::cout << std::string(80, '-') << std::endl;
+    // std::cout << std::string(80, '-') << std::endl;
+    // std::cout << "found goal" << std::endl;
+    // double d_goal = DistanceNeighborhoodNeighborhood(q_goal, q_goal->parent_neighbor);
+    // std::cout << "distance: " << d_goal << std::endl;
+    // QuotientCover::Print(q_start, false);
+    // QuotientCover::Print(q_goal, false);
+    // std::cout << std::string(80, '-') << std::endl;
     //############################################################################
 
     if(v_start != get(normalizedIndexToVertex, q_start->index)){
@@ -1425,7 +1437,6 @@ std::vector<QuotientCover::Vertex> QuotientCover::GetCoverPath(const Vertex& v_s
                       .distance_zero(opt_->identityCost())
                     );
   }catch(found_goal fg){
-    std::cout << "found path" << std::endl;
     for(Vertex v = v_sink;; v = prev[get(vertexToNormalizedIndex, v)])
     {
       path.push_back(v);

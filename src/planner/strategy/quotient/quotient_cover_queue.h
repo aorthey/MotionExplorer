@@ -39,11 +39,15 @@ namespace ompl
       virtual Vertex AddConfigurationToCover(Configuration *q) override;
 
       void AddConfigurationToPriorityQueue(Configuration *q);
+
     protected:
       StepStrategy *step_strategy;
 
       uint NUMBER_OF_EXPANSION_SAMPLES{0};
       const double shortestPathBias{1.0};
+
+      Configuration* PriorityQueueNearestToGoal_Top();
+      Configuration* PriorityQueueCandidate_PopTop();
 
       //Two Priorityqueues:
       // PriorityQueue Candidates: Nodes which have a computed neighborhood, but
@@ -61,11 +65,21 @@ namespace ompl
       {
         bool operator()(const Configuration* lhs, const Configuration* rhs) const;
       };
+      struct CmpGoalDistancePtrs
+      {
+        bool operator()(const Configuration* lhs, const Configuration* rhs) const;
+      };
+
+
+      typedef std::priority_queue<Configuration*, std::vector<Configuration*>, CmpGoalDistancePtrs> GoalDistancePriorityQueue;
       typedef std::priority_queue<Configuration*, std::vector<Configuration*>, CmpCandidateConfigurationPtrs> CandidateConfigurationPriorityQueue;
       typedef std::priority_queue<Configuration*, std::vector<Configuration*>, CmpMemberConfigurationPtrs> MemberConfigurationPriorityQueue;
 
+      GoalDistancePriorityQueue configurations_sorted_by_nearest_to_goal;
       CandidateConfigurationPriorityQueue priority_queue_candidate_configurations;
       MemberConfigurationPriorityQueue priority_queue_member_configurations;
+
+      bool nearest_to_goal_has_changed{true};
 
     public:
       const CandidateConfigurationPriorityQueue& GetPriorityQueue();

@@ -19,7 +19,7 @@ namespace ompl
       typedef og::Quotient BaseT;
     public:
 
-      const uint verbose{4};
+      const uint verbose{0};
 
       QuotientCover(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QuotientCover(void);
@@ -178,6 +178,7 @@ namespace ompl
 
       void Init();
       bool firstRun{true};
+      void Test();
 
       //#######################################################################
       //Distance Computations
