@@ -1,4 +1,20 @@
-<h2>Dependencies</h2>
+<h1>Orthoklampt</h1>
+
+An experimental motion planning framework, in which new planning algorithms can
+quickly be developed and be benchmarked against other algorithms. As input we use
+robots (in .urdf files), environments (in .tri files), and worlds (in .xml
+files). 
+
+The framework can fully be controlled by using hotkeys (in a vim-like fashion),
+so that we can quickly test out new algorithm, either by letting them run until
+a solution is found, or by letting them run for a single iteration.
+
+The framework is build upon two open-source projects: First the open motion
+planning library (OMPL), developed at Rice University, which provides implementations of many planning
+algorithms. Second, the Klamp't library, developed at Duke University, which
+provides a dynamical simulator, especially known for its realistic contact-point computations. 
+
+<h1>Dependencies</h1>
 
 <ul>
   <li> OMPL 1.4.0
@@ -31,7 +47,7 @@
 
 
 
-<h2>Install</h2>
+<h1>Install</h1>
 
       mkdir build
       cd build
@@ -39,7 +55,7 @@
       make -j10
       ./planner_hierarchy ../data/experiments/06D_doubleLshape.xml
 
-<h3>Use</h3>
+<h1>Use</h1>
 
 GUI uses hotkeys which are defined and can be modified in settings/gui.xml
 
