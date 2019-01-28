@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="Lshape" file="../robots/PlanarLshape.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="disk_inner" file="../robots/PlanarLshape_cylinder_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="disk_outer" file="../robots/PlanarLshape_cylinder_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+<!--
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="3 2 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="-2.8 0 0" rotateRPY="0 0 0.78"/>
+-->
+  <rigidObject name="O1" file="../terrains/2droom_corner.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
+  <!-- <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="-2.8 0 0" rotateRPY="0 0 1.57"/> -->
+
+  <plannerinput>
+
+    <qinit  config="8  +2.0 +2.2 +0.0 -1.47 +0 +0.0 +0.0 0.0"/>
+    <qgoal  config="8  -2.9 -2.0 +0.0 -1.8 +0 +0.0 +0.0 0.0"/>
+    <se3min config="6  -4.0 -4.0 -1.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +4.0 +4.0 +1.0 +3.141593 +1.57 +3.141593"/>
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+
+    <hierarchy>
+      <level inner_index="1" outer_index="2" cspace_constant="1" type="R2"/>
+      <level inner_index="0" cspace_constant="0.532623641291" type="SE2"/>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>
