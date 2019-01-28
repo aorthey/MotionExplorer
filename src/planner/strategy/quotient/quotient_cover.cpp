@@ -377,29 +377,6 @@ QuotientCover::Configuration* QuotientCover::SampleOnBoundaryUniformNear(Configu
   }
 }
 
-void QuotientCover::InterpolateUntilNeighborhoodBoundary(const Configuration *q_center, const Configuration *q_desired, Configuration *q_out)
-{
-
-  double radius = q_center->GetRadius();
-  double distance_center_desired = DistanceConfigurationConfiguration(q_center, q_desired);
-  double step = (radius)/distance_center_desired;
-
-  Interpolate(q_center, q_desired, step, q_out);
-
-  //############################################################################
-  //DEBUG
-  //############################################################################
-  double d_center_outward = DistanceConfigurationConfiguration(q_center, q_out);
-  if(fabs(d_center_outward - radius) > 1e-10){
-    std::cout << "WARNING: interpolated point outside boundary" << std::endl;
-    QuotientCover::Print(q_out, false);
-    QuotientCover::Print(q_center, false);
-    std::cout << "Distance: " << d_center_outward << " Radius: " << radius << std::endl;
-    exit(0);
-  }
-
-}
-
 QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Configuration *q_center)
 {
   Configuration *q_inward_to_outward = new Configuration(GetQ1(), q_center->GetInwardPointingConfiguration());
@@ -415,14 +392,18 @@ QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Con
   //############################################################################
   //DEBUG
   //############################################################################
-  double d_center_outward = DistanceConfigurationConfiguration(q_center, q_inward_to_outward);
-  if(fabs(d_center_outward - radius) > 1e-10){
-    std::cout << "WARNING: interpolated point outside boundary" << std::endl;
-    QuotientCover::Print(q_inward_to_outward, false);
-    QuotientCover::Print(q_center, false);
-    std::cout << "Distance: " << d_center_outward << " Radius: " << radius << std::endl;
-    exit(0);
-  }
+  //double d_center_outward = DistanceConfigurationConfiguration(q_center, q_inward_to_outward);
+
+  //if parent is not null, then the new distance should be smaller or equal to
+  //the conf-conf distance
+  // double d_center_outward = DistanceQ1(q_center, q_inward_to_outward);
+  // if(fabs(d_center_outward - radius) > 1e-10){
+  //   std::cout << "WARNING: interpolated point outside boundary" << std::endl;
+  //   QuotientCover::Print(q_inward_to_outward, false);
+  //   QuotientCover::Print(q_center, false);
+  //   std::cout << "Distance: " << d_center_outward << " Radius: " << radius << std::endl;
+  //   exit(0);
+  // }
 
   if(ComputeNeighborhood(q_inward_to_outward)){
     return q_inward_to_outward;
@@ -1008,6 +989,11 @@ QuotientCover::Configuration* QuotientCover::Nearest(Configuration *q) const
   return nearest_neighborhood->nearest(q);
 }
 
+//############################################################################
+//############################################################################
+//INTERPOLATE
+//############################################################################
+//############################################################################
 //@TODO: should be fixed to reflect the distance on the underlying
 //quotient-space, i.e. similar to QMPConnect. For now we use DistanceQ1
 
@@ -1039,6 +1025,9 @@ bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration
 
     //@TODO: optimize that we do not use distance config config two times, or
     //use internal cache?
+    //cosets can be nullptr, because sometimes we just want to give a direction,
+    //but this direction is not member of the cover (should we maybe remove this
+    //possibility?)
     if(q_to->coset == nullptr)
     {
       if(q_from->coset == nullptr) {
@@ -1076,6 +1065,29 @@ bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration
   return true;
 }
 
+void QuotientCover::InterpolateUntilNeighborhoodBoundary(const Configuration *q_center, const Configuration *q_desired, Configuration *q_out)
+{
+
+  double radius = q_center->GetRadius();
+  double distance_center_desired = DistanceConfigurationConfiguration(q_center, q_desired);
+  double step = (radius)/distance_center_desired;
+
+  Interpolate(q_center, q_desired, step, q_out);
+
+  //############################################################################
+  //DEBUG
+  //############################################################################
+  double d_center_outward = DistanceConfigurationConfiguration(q_center, q_out);
+  if(fabs(d_center_outward - radius) > 1e-10){
+    std::cout << "WARNING: interpolated point outside boundary" << std::endl;
+    QuotientCover::Print(q_out, false);
+    QuotientCover::Print(q_center, false);
+    std::cout << "Distance: " << d_center_outward << " Radius: " << radius << std::endl;
+    exit(0);
+  }
+
+}
+
 bool QuotientCover::InterpolateOnBoundary(const Configuration* q_center, const Configuration* q1, const Configuration* q2, double step, Configuration* q_out)
 {
   Q1->getStateSpace()->interpolate(q1->state, q2->state, step, q_out->state);
@@ -1093,7 +1105,10 @@ QuotientCover::Configuration* QuotientCover::NearestConfigurationOnBoundary(Conf
   Configuration *q_projected = new Configuration(Q1);
   const double d_center_to_proj = DistanceConfigurationConfiguration(q_center, q_outside);
   double step_size = q_center->GetRadius()/d_center_to_proj;
-  Q1->getStateSpace()->interpolate(q_center->state, q_outside->state, step_size, q_projected->state);
+
+  Interpolate(q_center, q_outside, step_size, q_projected);
+  ////Q1->getStateSpace()->interpolate(q_center->state, q_outside->state, step_size, q_projected->state);
+
   q_projected->parent_neighbor = q_center;
   if(ComputeNeighborhood(q_projected)){
     return q_projected;
@@ -1181,11 +1196,13 @@ std::vector<const QuotientCover::Configuration*> QuotientCover::GetInterpolation
   //(0) get shortest path on Q0 between q_from->coset to q_to->coset
   std::vector<const Configuration*> path_Q0_cover = parent_chart->GetCoverPath(q_from->coset, q_to->coset);
 
-  if(path_Q0_cover.empty()){
+  if(path_Q0_cover.size()<=1){
     //(1) cosets are equivalent => straight line interpolation
     path_Q1.push_back(q_from);
     path_Q1.push_back(q_to);
   }else{
+
+    //Assume that we have at least two non-equal configurations in cover
     path_Q0_cover.erase(path_Q0_cover.begin());
     path_Q0_cover.pop_back();
 
@@ -1491,6 +1508,8 @@ void QuotientCover::getPlannerData(base::PlannerData &data) const
 {
   if(verbose>0) std::cout << "graph has " << boost::num_vertices(graph) << " (idx: " << index_ctr << ") vertices and " << boost::num_edges(graph) << " edges." << std::endl;
   std::map<const uint, const ob::State*> indexToStates;
+
+  if(boost::num_vertices(graph)<=0) return;
 
   PlannerDataVertexAnnotated pstart = getAnnotatedVertex(v_start);
   indexToStates[graph[v_start]->index] = pstart.getState();

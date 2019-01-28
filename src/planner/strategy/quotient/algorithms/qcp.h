@@ -13,7 +13,7 @@ namespace ompl
     class QCP: public og::QuotientCoverQueue
     {
       typedef og::QuotientCoverQueue BaseT;
-      const int verbose{2};
+      const int verbose{0};
     public:
 
       QCP(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);

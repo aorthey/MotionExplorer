@@ -60,7 +60,7 @@ namespace ompl
           uint number_successful_expansions{0};
 
           base::State *state{nullptr};
-          Configuration *coset{nullptr}; //the underlying coset this Vertex elongs to (on the quotient-space)
+          Configuration *coset{nullptr}; //the underlying coset this Vertex belongs to (on the quotient-space)
           Configuration *parent_neighbor{nullptr};
           base::State *riemannian_center_of_mass{nullptr}; //interpolate(inward_pointing_state, state, 2, next) gives a outward pointing state
           uint number_of_neighbors{0};

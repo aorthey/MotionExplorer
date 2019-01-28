@@ -105,6 +105,7 @@ QuotientCover::Vertex QuotientCoverQueue::AddConfigurationToCover(Configuration 
   Vertex v = BaseT::AddConfigurationToCover(q);
   priority_queue_member_configurations.push(q);
 
+
   configurations_sorted_by_nearest_to_goal.push(q);
   if(q == configurations_sorted_by_nearest_to_goal.top()){
     nearest_to_goal_has_changed = true;
