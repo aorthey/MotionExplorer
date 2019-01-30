@@ -128,10 +128,12 @@ void QCP::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
 {
   double r = rng_.uniform01();
   if(r <= rewireBias){
-    RewireCover(ptc);
+    //RewireCover(ptc);
   }else{
     Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
-    step_strategy->ExpandRandom(q);
+    step_strategy->ExpandOutside(q);
+    //step_strategy->ExpandRandom(q);
+    pdf_connectivity_configurations.update(static_cast<PDF_Element*>(q->GetConnectivityPDFElement()), ValueConnectivity(q));
   }
 }
 
@@ -143,10 +145,10 @@ double QCP::ValueConnectivity(Configuration *q)
 {
   //Vertex v = get(indexToVertex, q->index);
   //QuotientCover::Print(q, false);
-  //double d_alpha = std::pow(2.0,boost::degree(v, graph));
+  double d_alpha = q->number_attempted_expansions;
   //double d_alpha = boost::degree(v, graph)+1;
   //double d_connectivity = q->GetRadius()/d_alpha;
-  double d_connectivity = q->GetRadius();
+  double d_connectivity = 1.0/(d_alpha+1);
   return d_connectivity;
 }
 
@@ -164,6 +166,11 @@ void QCP::RewireCover(ob::PlannerTerminationCondition &ptc)
   //    AddEdge(q, qk);
   //  }
   //}
+  if(q==nullptr){
+    std::cout << "Configuration does not exist." << std::endl;
+    QuotientCover::Print(q, false);
+    exit(0);
+  }
 
   //add one more edges
   std::vector<Configuration*> neighbors;

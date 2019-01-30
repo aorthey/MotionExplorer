@@ -32,7 +32,7 @@ namespace ompl
 
     private:
       //TODO: remove adaptive goal bias, replace by percentage of checking while
-      const double rewireBias{0.2}; //when solution has been found, this bias trades off exploration vs exploitation
+      const double rewireBias{0.1}; //when solution has been found, this bias trades off exploration vs exploitation
       bool progressMadeTowardsGoal{true};
 
       //PDF which assigns a value to each configuration, depending on its connectivity

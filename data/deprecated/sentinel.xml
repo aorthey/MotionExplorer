@@ -3,19 +3,10 @@
 <world>
 
 
-  <robot name="sentinel" file="/home/aorthey/git/orthoklampt/data/sentinel.urdf" translation="0 0 0" rotateRPY="0 0 0" config="7 0 0 0 0 0 0 0"/>
+  <robot name="sentinel" file="/home/aorthey/git/orthoklampt/data/deprecated/sentinel_complete.urdf" translation="0 0 0" rotateRPY="0 0 0" config="143 
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
   <!--
   -->
-  <rigidObject name="tunnel" file="/home/aorthey/git/orthoklampt/data/terrains/tunnel/tunnel_branch2.tri" translation="0 0 0" rotateRPY="0 0 0"/>
-
-  <simulation>
-    <globals maxContacts="20" />
-    <robot index="0">
-      <!--
-      <controller type="PolynomialPathController" />
-      -->
-      <controller type="MilestonePathController" />
-    </robot>
-  </simulation>
+  <rigidObject name="tunnel" file="/home/aorthey/git/orthoklampt/data/terrains/turbine/turbine.tri" translation="0 0 0" rotateRPY="0 0 0"/>
 
 </world>

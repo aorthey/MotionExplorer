@@ -186,7 +186,7 @@ void QuotientCover::Init()
     if(!ComputeNeighborhood(q_start, true))
     {
       OMPL_ERROR("%s: Could not add start state!", getName().c_str());
-      QuotientCover::Print(q_start, false);
+      Q1->printState(state_start);
       exit(0);
     }
   }else{
@@ -351,6 +351,17 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
       }
     }
   }
+
+  uint Ne = GetNumberOfEdges(q);
+  if(!q->isStart && Ne<=0){
+    std::cout << "Detected no neighbors" << std::endl;
+    QuotientCover::Print(q, false);
+    throw "";
+    throw "";
+    exit(0);
+  }
+
+
   return v;
 }
 
@@ -630,7 +641,8 @@ bool QuotientCover::ComputeNeighborhood(Configuration *q, bool verbose)
 
     q->SetRadius(DistanceInnerRobotToObstacle(q->state));
     if(q->GetRadius()<=minimum_neighborhood_radius){
-      if(verbose) std::cout << "[ComputeNeighborhood] State Rejected: Radius Too Small (radius="<< q->GetRadius() << ")" << std::endl;
+      if(verbose) std::cout << "[ComputeNeighborhood] State Rejected: Radius Too Small (radius="<< q->GetRadius() << ", minimum="
+       << minimum_neighborhood_radius << ")" << std::endl;
       q->Remove(Q1);
       q=nullptr;
       return false;
@@ -1052,6 +1064,8 @@ bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration
         ctr++;
       }
 
+      //TODO: Needs revision
+
       const Configuration *q_next = path.at(ctr);
       const Configuration *q_last = path.at(ctr-1);
       double step = d_last_to_next - (d - d_step);
@@ -1100,14 +1114,17 @@ void QuotientCover::ProjectConfigurationOntoBoundary(const Configuration *q_cent
   double step_size = q_center->GetRadius()/d_center_to_proj;
   Interpolate(q_center, q_projected, step_size, q_projected);
 }
+
 QuotientCover::Configuration* QuotientCover::NearestConfigurationOnBoundary(Configuration *q_center, const Configuration* q_outside)
 {
   Configuration *q_projected = new Configuration(Q1);
-  const double d_center_to_proj = DistanceConfigurationConfiguration(q_center, q_outside);
-  double step_size = q_center->GetRadius()/d_center_to_proj;
+  InterpolateUntilNeighborhoodBoundary(q_center, q_outside, q_projected);
 
-  Interpolate(q_center, q_outside, step_size, q_projected);
-  ////Q1->getStateSpace()->interpolate(q_center->state, q_outside->state, step_size, q_projected->state);
+  //const double d_center_to_proj = DistanceConfigurationConfiguration(q_center, q_outside);
+  //double step_size = q_center->GetRadius()/d_center_to_proj;
+
+  //Interpolate(q_center, q_outside, step_size, q_projected);
+  //////Q1->getStateSpace()->interpolate(q_center->state, q_outside->state, step_size, q_projected->state);
 
   q_projected->parent_neighbor = q_center;
   if(ComputeNeighborhood(q_projected)){
@@ -1310,7 +1327,7 @@ bool QuotientCover::GetSolution(ob::PathPtr &solution)
     }
   }
   if(isConnected){
-
+    std::cout << "CONNECTION FOUND ON LVL" << GetLevel() << std::endl;
 
     auto gpath(std::make_shared<PathGeometric>(Q1));
     //shortest_path_start_goal.clear();

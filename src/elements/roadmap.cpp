@@ -44,6 +44,12 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
 
     LemonInterface lemon(pd);
     std::vector<Vertex> pred = lemon.GetShortestPath();
+    // std::cout << std::string(80, '*') << std::endl;
+    // std::cout << std::string(80, '*') << std::endl;
+    // std::cout << "LEMON PATH" << std::endl;
+    // std::cout << std::string(80, '*') << std::endl;
+    // std::cout << std::string(80, '*') << std::endl;
+    // std::cout << pred.size() << std::endl;
     og::PathGeometric *gpath = new og::PathGeometric(cspace->SpaceInformationPtr()); 
     shortest_path.clear();
     for(uint i = 0; i < pred.size(); i++)

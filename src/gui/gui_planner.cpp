@@ -84,7 +84,10 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="planner_draw_start_goal_configuration"){
     state("planner_draw_goal_configuration").toggle();
     state("planner_draw_start_configuration").toggle();
-
+  }else if(cmd=="planner_draw_goal_configuration"){
+    state("planner_draw_goal_configuration").toggle();
+  }else if(cmd=="planner_draw_start_configuration"){
+    state("planner_draw_start_configuration").toggle();
   }else if(cmd=="draw_cover_threshold_up"){
     GUIVariable &v = state("draw_cover_threshold");
     v.value = min(v.max, v.value + v.step);

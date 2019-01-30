@@ -10,11 +10,9 @@
 
   <algorithm name="hierarchy:qcp"/>
   <algorithm name="hierarchy:qmp"/>
-  <algorithm name="hierarchy:qmp_connect"/>
-  <algorithm name="ompl:kpiece"/>
   <algorithm name="ompl:rrt"/>
-  <algorithm name="benchmark:minimal"/>
-  <algorithm name="benchmark:best_geometric"/>
+  <!-- <algorithm name="benchmark:minimal"/> -->
+  <!-- <algorithm name="benchmark:best_geometric"/> -->
   <!-- <algorithm name="ompl:prm"/> -->
 
   <!-- <algorithm name="ompl:prm"/> -->

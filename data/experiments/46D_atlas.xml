@@ -1,0 +1,29 @@
+
+<?xml version="1.0"?>
+
+<world>
+
+
+  <robot name="atlas" file="/home/aorthey/git/orthoklampt/data/robots/atlas/atlas.urdf" translation="0 0 0" rotateRPY="0 0 0" config="46
+    -2 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+  <!--
+  -->
+  <terrain name="mountain" file="/home/aorthey/git/orthoklampt/data/terrains/mountain/ridge.tri" translation="0 0 0" rotateRPY="0 0 0">
+   <display color="0.9 0.5 0.3"/>
+  </terrain>
+
+  <plannerinput>
+
+    <qinit config="46      -2 0 3.0 0 0 0 0 0 0 0 -1 0 +0.0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+    <qgoal config="46      +2.1 0 1.8 1 0 0 0 0 0 0 -1 0 -0.8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 +0.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+
+    <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
+
+    <hierarchy>
+      <level inner_index="0" type="R46"/>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>

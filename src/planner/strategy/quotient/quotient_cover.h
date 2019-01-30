@@ -29,7 +29,7 @@ namespace ompl
       typedef int normalized_index_type;
       
       //#######################################################################
-      //Configuration
+      //Configuration = ob::State + Open Neighborhood
       //#######################################################################
       class Configuration{
         public:

@@ -14,7 +14,7 @@ bool PlannerMultiInput::Load(const char* file){
 
     inputs.at(k)->environment_name = p.filename().string();
   }
-  return true;
+  return (inputs.size()>0);
 }
 
 std::vector<std::string> PlannerMultiInput::GetAlgorithms(bool kinodynamic)
