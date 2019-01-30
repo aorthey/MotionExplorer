@@ -398,13 +398,13 @@ QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Con
   double distance_center_inward = DistanceConfigurationConfiguration(q_inward_to_outward, q_center);
   double step = (radius+distance_center_inward)/distance_center_inward;
 
+  //Make sure that this stops at the boundary 
   Interpolate(q_inward_to_outward, q_center, step, q_inward_to_outward);
 
   //############################################################################
   //DEBUG
   //############################################################################
   //double d_center_outward = DistanceConfigurationConfiguration(q_center, q_inward_to_outward);
-
   //if parent is not null, then the new distance should be smaller or equal to
   //the conf-conf distance
   // double d_center_outward = DistanceQ1(q_center, q_inward_to_outward);
@@ -695,7 +695,7 @@ void QuotientCover::GetCosetFromQuotientSpace(Configuration *q)
 
     og::QuotientCover *qcc_parent = static_cast<og::QuotientCover*>(parent);
     Configuration *q_projected = new Configuration(Q0);
-    ExtractQ0Subspace(q->state, q_projected->state);
+    ProjectQ0Subspace(q->state, q_projected->state);
     q->coset = qcc_parent->Nearest(q_projected);
     q_projected->Remove(Q0);
     // Print(q);
@@ -1040,6 +1040,9 @@ bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration
     //cosets can be nullptr, because sometimes we just want to give a direction,
     //but this direction is not member of the cover (should we maybe remove this
     //possibility?)
+
+    X1->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_interp->state);
+
     if(q_to->coset == nullptr)
     {
       if(q_from->coset == nullptr) {
@@ -1078,6 +1081,53 @@ bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration
 
   return true;
 }
+      //ob::State *s_fromQ0 = Q0->allocState();
+      //ProjectQ0Subspace(q_from->state, s_fromQ0);
+      //Configuration *q_fromQ0 = new Configuration(Q0, s_fromQ0);
+
+      //ob::State *s_toQ0 = Q0->allocState();
+      //ProjectQ0Subspace(q_to->state, s_toQ0);
+      //Configuration *q_toQ0 = new Configuration(Q0, s_toQ0);
+
+      ////distance along cover path
+      //double d = 0;
+      //std::vector<double> d_vec;
+      //double d0 = parent_chart->DistanceConfigurationConfiguration(q_fromQ0, path_Q0_cover.at(0));
+      //d_vec.push_back(d0); d+=d0;
+      //for(uint k = 1; k < path_Q0_cover.size(); k++){
+      //  double dk = parent_chart->DistanceConfigurationConfiguration(path_Q0_cover.at(k-1), path_Q0_cover.at(k));
+      //  d_vec.push_back(dk); d+=dk;
+      //}
+      //double d1= parent_chart->DistanceConfigurationConfiguration(path_Q0_cover.back(), q_toQ0);
+      //d_vec.push_back(d1); d+=d1;
+
+      //q_toQ0->Remove(Q0);
+      //q_fromQ0->Remove(Q0);
+      //Q0->freeState(s_toQ0);
+      //Q0->freeState(s_fromQ0);
+
+      ////interpolate on X1
+      //ob::State *s_fromX1 = X1->allocState();
+      //ProjectX1Subspace(q_from->state, s_fromX1);
+      //ob::State *s_toX1 = X1->allocState();
+      //ProjectX1Subspace(q_to->state, s_toX1);
+
+      //double d_next = 0;
+      //path_Q1.push_back(q_from);
+      //for(uint k = 0; k < path_Q0_cover.size(); k++){
+      //  ob::State *s_kX1 = X1->allocState();
+      //  d_next += d_vec.at(k);
+      //  X1->getStateSpace()->interpolate(s_fromX1, s_toX1, d_next/d, s_kX1);
+
+      //  Configuration *qk = new Configuration(Q1);
+      //  MergeStates(path_Q0_cover.at(k)->state, s_kX1, qk->state);
+      //  path_Q1.push_back(qk);
+      //  X1->freeState(s_kX1);
+      //}
+      //path_Q1.push_back(q_to);
+
+      //X1->freeState(s_toX1);
+      //X1->freeState(s_fromX1);
 
 void QuotientCover::InterpolateUntilNeighborhoodBoundary(const Configuration *q_center, const Configuration *q_desired, Configuration *q_out)
 {
@@ -1099,7 +1149,6 @@ void QuotientCover::InterpolateUntilNeighborhoodBoundary(const Configuration *q_
     std::cout << "Distance: " << d_center_outward << " Radius: " << radius << std::endl;
     exit(0);
   }
-
 }
 
 bool QuotientCover::InterpolateOnBoundary(const Configuration* q_center, const Configuration* q1, const Configuration* q2, double step, Configuration* q_out)
@@ -1147,8 +1196,8 @@ double QuotientCover::DistanceX1(const Configuration *q_from, const Configuratio
 {
   ob::State *stateFrom = X1->allocState();
   ob::State *stateTo = X1->allocState();
-  ExtractX1Subspace(q_from->state, stateFrom);
-  ExtractX1Subspace(q_to->state, stateTo);
+  ProjectX1Subspace(q_from->state, stateFrom);
+  ProjectX1Subspace(q_to->state, stateTo);
   double d = X1->distance(stateFrom, stateTo);
   X1->freeState(stateFrom);
   X1->freeState(stateTo);
@@ -1230,11 +1279,11 @@ std::vector<const QuotientCover::Configuration*> QuotientCover::GetInterpolation
     }else{
       //(3) cosets have nonzero path between them => interpolate along that path
       ob::State *s_fromQ0 = Q0->allocState();
-      ExtractQ0Subspace(q_from->state, s_fromQ0);
+      ProjectQ0Subspace(q_from->state, s_fromQ0);
       Configuration *q_fromQ0 = new Configuration(Q0, s_fromQ0);
 
       ob::State *s_toQ0 = Q0->allocState();
-      ExtractQ0Subspace(q_to->state, s_toQ0);
+      ProjectQ0Subspace(q_to->state, s_toQ0);
       Configuration *q_toQ0 = new Configuration(Q0, s_toQ0);
 
       //distance along cover path
@@ -1256,9 +1305,9 @@ std::vector<const QuotientCover::Configuration*> QuotientCover::GetInterpolation
 
       //interpolate on X1
       ob::State *s_fromX1 = X1->allocState();
-      ExtractX1Subspace(q_from->state, s_fromX1);
+      ProjectX1Subspace(q_from->state, s_fromX1);
       ob::State *s_toX1 = X1->allocState();
-      ExtractX1Subspace(q_to->state, s_toX1);
+      ProjectX1Subspace(q_to->state, s_toX1);
 
       double d_next = 0;
       path_Q1.push_back(q_from);

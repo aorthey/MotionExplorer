@@ -38,7 +38,7 @@ namespace ompl
       virtual Vertex AddConfigurationToCover(Configuration *q) override;
 
       void AddConfigurationToPriorityQueue(Configuration *q);
-      void PrintQueue(int n_head = std::numeric_limits<int>::infinity()); //print the fist n items
+      void PrintQueue(int n_head = std::numeric_limits<int>::infinity()); //print the first n items
 
     protected:
 

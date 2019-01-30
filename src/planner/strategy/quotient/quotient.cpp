@@ -510,7 +510,7 @@ void Quotient::MergeStates(const ob::State *qQ0, const ob::State *qX1, ob::State
 
   }
 }
-void Quotient::ExtractX1Subspace( const ob::State* q, ob::State* qX1 ) const
+void Quotient::ProjectX1Subspace( const ob::State* q, ob::State* qX1 ) const
 {
   switch(type){
     case RN_RM:
@@ -594,7 +594,7 @@ void Quotient::ExtractX1Subspace( const ob::State* q, ob::State* qX1 ) const
   }
 }
 
-void Quotient::ExtractQ0Subspace( const ob::State* q, ob::State* qQ0 ) const
+void Quotient::ProjectQ0Subspace( const ob::State* q, ob::State* qQ0 ) const
 {
 
   switch(type){

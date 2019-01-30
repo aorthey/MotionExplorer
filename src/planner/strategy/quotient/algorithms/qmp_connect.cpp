@@ -212,14 +212,14 @@ ob::PathPtr QMPConnect::InterpolateQ1GraphConstraint( const Vertex a, const Vert
 
   ob::State* saX1 = X1->allocState();
   ob::State* sbX1 = X1->allocState();
-  ExtractX1Subspace(sa, saX1);
-  ExtractX1Subspace(sb, sbX1);
+  ProjectX1Subspace(sa, saX1);
+  ProjectX1Subspace(sb, sbX1);
 
   ob::State* saQ0 = Q0->allocState();
   ob::State* sbQ0 = Q0->allocState();
 
-  ExtractQ0Subspace(sa, saQ0);
-  ExtractQ0Subspace(sb, sbQ0);
+  ProjectQ0Subspace(sa, saQ0);
+  ProjectQ0Subspace(sb, sbQ0);
 
   const Vertex asQ0 = G[a].associated_source;
   const Vertex atQ0 = G[a].associated_target;

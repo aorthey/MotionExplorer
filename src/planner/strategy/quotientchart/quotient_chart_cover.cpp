@@ -506,7 +506,7 @@ void QuotientChartCover::GetCosetFromQuotientSpace(Configuration *q)
 
     og::QuotientChartCover *qcc_parent = static_cast<og::QuotientChartCover*>(parent);
     Configuration *q_projected = new Configuration(Q0);
-    ExtractQ0Subspace(q->state, q_projected->state);
+    ProjectQ0Subspace(q->state, q_projected->state);
     q->coset = qcc_parent->Nearest(q_projected);
     q_projected->Remove(Q0);
   }
@@ -822,8 +822,8 @@ double QuotientChartCover::DistanceX1(const Configuration *q_from, const Configu
 {
   ob::State *stateFrom = X1->allocState();
   ob::State *stateTo = X1->allocState();
-  ExtractX1Subspace(q_from->state, stateFrom);
-  ExtractX1Subspace(q_to->state, stateTo);
+  ProjectX1Subspace(q_from->state, stateFrom);
+  ProjectX1Subspace(q_to->state, stateTo);
   double d = X1->distance(stateFrom, stateTo);
   X1->freeState(stateFrom);
   X1->freeState(stateTo);
@@ -902,11 +902,11 @@ std::vector<const QuotientChartCover::Configuration*> QuotientChartCover::GetInt
     }else{
       //(3) cosets have nonzero path between them => interpolate along that path
       ob::State *s_fromQ0 = Q0->allocState();
-      ExtractQ0Subspace(q_from->state, s_fromQ0);
+      ProjectQ0Subspace(q_from->state, s_fromQ0);
       Configuration *q_fromQ0 = new Configuration(Q0, s_fromQ0);
 
       ob::State *s_toQ0 = Q0->allocState();
-      ExtractQ0Subspace(q_to->state, s_toQ0);
+      ProjectQ0Subspace(q_to->state, s_toQ0);
       Configuration *q_toQ0 = new Configuration(Q0, s_toQ0);
 
       //distance along cover path
@@ -928,9 +928,9 @@ std::vector<const QuotientChartCover::Configuration*> QuotientChartCover::GetInt
 
       //interpolate on X1
       ob::State *s_fromX1 = X1->allocState();
-      ExtractX1Subspace(q_from->state, s_fromX1);
+      ProjectX1Subspace(q_from->state, s_fromX1);
       ob::State *s_toX1 = X1->allocState();
-      ExtractX1Subspace(q_to->state, s_toX1);
+      ProjectX1Subspace(q_to->state, s_toX1);
 
       double d_next = 0;
       path_Q1.push_back(q_from);

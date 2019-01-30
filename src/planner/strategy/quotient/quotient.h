@@ -83,10 +83,10 @@ namespace ompl
         const ob::StateSpacePtr ComputeQuotientSpace(const ob::StateSpacePtr Q1, const ob::StateSpacePtr Q0);
 
         //Quotient Space Projection Operators
-        //  ExtractX1Subspace: Q0 \times X1 \rightarrow X1
-        //  ExtractQ0Subspace: Q0 \times X1 \rightarrow Q0
-        void ExtractX1Subspace( const ob::State* q, ob::State* qX1 ) const;
-        void ExtractQ0Subspace( const ob::State* q, ob::State* qQ0 ) const;
+        //  ProjectX1Subspace: Q0 \times X1 \rightarrow X1
+        //  ProjectQ0Subspace: Q0 \times X1 \rightarrow Q0
+        void ProjectX1Subspace( const ob::State* q, ob::State* qX1 ) const;
+        void ProjectQ0Subspace( const ob::State* q, ob::State* qQ0 ) const;
 
         ob::SpaceInformationPtr Q1;
         ob::SpaceInformationPtr Q0;
