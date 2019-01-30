@@ -64,21 +64,14 @@ void QCP::Grow(double t)
 
 void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
 {
-  if(nearest_to_goal_has_changed || progressMadeTowardsGoal)
+  if(NearestToGoalHasChanged() || progressMadeTowardsGoal)
   {
-    nearest_to_goal_has_changed = false;
     //############################################################################
     //STATE1: GoalOriented Strategy
     //############################################################################
 
     if(verbose>1) std::cout << "Step Towards Goal" << std::endl;
 
-    ////@TODO: outsource this computation to the cover_queue class
-    //Configuration *q_nearest = configurations_sorted_by_nearest_to_goal.top();
-    //while(q_nearest->index < 0 && !configurations_sorted_by_nearest_to_goal.empty()){
-    //  configurations_sorted_by_nearest_to_goal.pop();
-    //  q_nearest = configurations_sorted_by_nearest_to_goal.top();
-    //}
     Configuration* q_nearest = PriorityQueueNearestToGoal_Top();
     if(q_nearest == nullptr) return;
 
@@ -90,7 +83,8 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
 
     //############################################################################
   }else{
-    if(!priority_queue_candidate_configurations.empty()){
+    Configuration* q = PriorityQueueCandidate_PopTop();
+    if(q!=nullptr){
       if(verbose>1) std::cout << std::string(80, '-') << std::endl;
       if(verbose>1) PrintQueue(10);
       //############################################################################
@@ -98,15 +92,6 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
       //############################################################################
       if(verbose>1) std::cout << "Expand Largest Single-Connected Node" << std::endl;
 
-      //Configuration *q = nullptr;
-      //while(q==nullptr && !priority_queue_candidate_configurations.empty()){
-      //  q = priority_queue_candidate_configurations.top();
-      //  priority_queue_candidate_configurations.pop();
-      //}
-      ////TODO: workaround in the case that a PQ candidate has been removed from
-      ////the graph
-      Configuration* q = PriorityQueueCandidate_PopTop();
-      if(q==nullptr) return;
       if(q->index < 0){
         AddConfigurationToCover(q);
       }
@@ -118,7 +103,7 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
       //STATE3: FindNewWays (Passive Node Expansion)
       //############################################################################
       if(verbose>1) std::cout << "Generate New Configurations" << std::endl;
-      Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
+      q = pdf_connectivity_configurations.sample(rng_.uniform01());
       step_strategy->ExpandRandom(q);
     }
   }

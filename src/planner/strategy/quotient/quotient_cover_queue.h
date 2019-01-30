@@ -23,24 +23,25 @@ namespace ompl
     class QuotientCoverQueue: public og::QuotientCover
     {
       typedef og::QuotientCover BaseT;
+
     public:
-
-      uint verbose{0};
-
+      const uint verbose{0};
       QuotientCoverQueue(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QuotientCoverQueue(void);
       void clear() override;
       void setup() override;
+      virtual void Print(std::ostream& out) const override;
 
       virtual Configuration* SampleCoverBoundary() override;
       virtual void AddConfigurationToPDF(Configuration *q) override;
-      virtual void Print(std::ostream& out) const override;
       virtual Configuration* SampleUniformQuotientCover(ob::State *state) override;
       virtual Vertex AddConfigurationToCover(Configuration *q) override;
 
       void AddConfigurationToPriorityQueue(Configuration *q);
+      void PrintQueue(int n_head = std::numeric_limits<int>::infinity()); //print the fist n items
 
     protected:
+
       StepStrategy *step_strategy;
 
       uint NUMBER_OF_EXPANSION_SAMPLES{0};
@@ -49,6 +50,9 @@ namespace ompl
       Configuration* PriorityQueueNearestToGoal_Top();
       Configuration* PriorityQueueCandidate_PopTop();
 
+      bool NearestToGoalHasChanged();
+
+    private:
       //Two Priorityqueues:
       // PriorityQueue Candidates: Nodes which have a computed neighborhood, but
       // have not been added yet. They can be thought of as (soon-to-be)
@@ -70,7 +74,6 @@ namespace ompl
         bool operator()(const Configuration* lhs, const Configuration* rhs) const;
       };
 
-
       typedef std::priority_queue<Configuration*, std::vector<Configuration*>, CmpGoalDistancePtrs> GoalDistancePriorityQueue;
       typedef std::priority_queue<Configuration*, std::vector<Configuration*>, CmpCandidateConfigurationPtrs> CandidateConfigurationPriorityQueue;
       typedef std::priority_queue<Configuration*, std::vector<Configuration*>, CmpMemberConfigurationPtrs> MemberConfigurationPriorityQueue;
@@ -80,10 +83,6 @@ namespace ompl
       MemberConfigurationPriorityQueue priority_queue_member_configurations;
 
       bool nearest_to_goal_has_changed{true};
-
-    public:
-      const CandidateConfigurationPriorityQueue& GetPriorityQueue();
-      void PrintQueue(int n_head = std::numeric_limits<int>::infinity()); //print the fist n items
     };
   }
 }

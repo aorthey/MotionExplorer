@@ -663,7 +663,6 @@ Experiments for paper:
 [ ] Hand Movement
 [ ] Dubins Car (Kinodynamic)
 
-[ ] Rename Configuration to Neighborhood
 [ ] Encapsulate Cover Queue
 [ ] Path on CS is sometimes not displayed
 [ ] REMOVE LEMON

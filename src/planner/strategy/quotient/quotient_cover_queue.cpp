@@ -15,7 +15,6 @@ using namespace ompl::geometric;
 
 QuotientCoverQueue::QuotientCoverQueue(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
-  if(parent != nullptr) verbose = 1;
 }
 // ">" operator: smallest value is top in queue
 // "<" operator: largest value is top in queue (default)
@@ -114,6 +113,16 @@ QuotientCover::Vertex QuotientCoverQueue::AddConfigurationToCover(Configuration 
   return v;
 }
 
+bool QuotientCoverQueue::NearestToGoalHasChanged()
+{
+  if(nearest_to_goal_has_changed){
+    nearest_to_goal_has_changed = false;
+    return true;
+  }else{
+    return false;
+  }
+}
+
 void QuotientCoverQueue::PrintQueue(int n_head)
 {
   std::cout << std::string(80, '-') << std::endl;
@@ -155,11 +164,6 @@ void QuotientCoverQueue::AddConfigurationToPDF(Configuration *q)
     PDF_Element *q_necessary_element = pdf_necessary_configurations.add(q, 1);
     q->SetNecessaryPDFElement(q_necessary_element);
   }
-}
-
-const QuotientCoverQueue::CandidateConfigurationPriorityQueue& QuotientCoverQueue::GetPriorityQueue()
-{
-  return priority_queue_candidate_configurations;
 }
 
 void QuotientCoverQueue::Print(std::ostream& out) const
