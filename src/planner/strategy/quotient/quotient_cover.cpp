@@ -384,10 +384,6 @@ int QuotientCover::GetNumberOfEdges(Configuration *q)
 
 QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Configuration *q_center)
 {
-  //To interpolated towards the outward pointing configuration, we do not use
-  //any information on the quotient space, this is basically normal
-  //interpolation on Q1
-
   Configuration *q_inward_to_outward = new Configuration(GetQ1(), q_center->GetInwardPointingConfiguration());
   q_inward_to_outward->parent_neighbor = q_center;
   q_inward_to_outward->coset = q_center->coset;
@@ -397,7 +393,7 @@ QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Con
   double step = (radius+distance_center_inward)/distance_center_inward;
 
   //Make sure that this stops at the boundary 
-  InterpolateQ1(q_inward_to_outward, q_center, step, q_inward_to_outward);
+  metric->InterpolateQ1(q_inward_to_outward, q_center, step, q_inward_to_outward);
 
   if(ComputeNeighborhood(q_inward_to_outward)){
     return q_inward_to_outward;
@@ -716,7 +712,7 @@ QuotientCover::Configuration* QuotientCover::SampleNeighborhoodBoundary(Configur
     d = metric->DistanceConfigurationConfiguration(q_next, q_center);
   }
 
-  GetQ1()->getStateSpace()->interpolate(q_center->state, q_next->state, radius/d, q_next->state);
+  metric->InterpolateQ1(q_center, q_next, radius/d, q_next);
   q_next->parent_neighbor = q_center;
 
   return q_next;
@@ -830,11 +826,6 @@ bool QuotientCover::Interpolate(const Configuration *q_from, Configuration *q_to
 {
   return Interpolate(q_from, q_to, q_to);
 }
-bool QuotientCover::InterpolateQ1(const Configuration *q_from, const Configuration *q_to, double step_size, Configuration *q_interp)
-{
-  Q1->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_interp->state);
-  return true;
-}
 
 bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration *q_to, Configuration *q_interp)
 {
@@ -890,7 +881,7 @@ void QuotientCover::InterpolateUntilNeighborhoodBoundary(const Configuration *q_
   double distance_center_desired = metric->DistanceConfigurationConfiguration(q_center, q_desired);
   double step = (radius)/distance_center_desired;
 
-  InterpolateQ1(q_center, q_desired, step, q_out);
+  metric->InterpolateQ1(q_center, q_desired, step, q_out);
 
   //############################################################################
   //DEBUG

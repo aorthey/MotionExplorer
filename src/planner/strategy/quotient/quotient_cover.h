@@ -207,7 +207,6 @@ namespace ompl
       bool Interpolate(const Configuration* q_from, const Configuration* q_to, Configuration* q_output);
 
       bool Interpolate(const Configuration*, const Configuration*, double step_size, Configuration*);
-      bool InterpolateQ1(const Configuration*, const Configuration*, double step_size, Configuration*);
 
       void InterpolateUntilNeighborhoodBoundary(const Configuration *q_center, const Configuration *q_desired, Configuration *q_out);
 

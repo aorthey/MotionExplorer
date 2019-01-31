@@ -11,7 +11,10 @@ double QuotientMetric::DistanceQ1(const og::QuotientCover::Configuration *q_from
 {
   return quotient_cover->GetQ1()->distance(q_from->state, q_to->state);
 }
-
+void QuotientMetric::InterpolateQ1(const Configuration *q_from, const Configuration *q_to, double step, Configuration* q_out)
+{
+  return quotient_cover->GetQ1()->getStateSpace()->interpolate(q_from->state, q_to->state, step, q_out->state);
+}
 double QuotientMetric::DistanceX1(const QuotientCover::Configuration *q_from, const QuotientCover::Configuration *q_to)
 {
   ob::State *stateFrom = quotient_cover->GetX1()->allocState();
