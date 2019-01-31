@@ -19,7 +19,7 @@ namespace ompl
     //other strategies can use this as a central points of information to aid
     //their choice of the best cover region to expand
 
-    class StepStrategy;
+    OMPL_CLASS_FORWARD(StepStrategy);
     class QuotientCoverQueue: public og::QuotientCover
     {
       typedef og::QuotientCover BaseT;
@@ -32,9 +32,7 @@ namespace ompl
       void setup() override;
       virtual void Print(std::ostream& out) const override;
 
-      //virtual Configuration* SampleCoverBoundary() override;
       virtual void AddConfigurationToPDF(Configuration *q) override;
-      //virtual Configuration* SampleUniformQuotientCover(ob::State *state) override;
       virtual Vertex AddConfigurationToCover(Configuration *q) override;
 
       void AddConfigurationToPriorityQueue(Configuration *q);
@@ -42,7 +40,7 @@ namespace ompl
 
     protected:
 
-      StepStrategy *step_strategy;
+      StepStrategyPtr step_strategy;
 
       uint NUMBER_OF_EXPANSION_SAMPLES{0};
       const double shortestPathBias{1.0};

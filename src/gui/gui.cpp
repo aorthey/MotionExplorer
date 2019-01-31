@@ -317,7 +317,6 @@ bool ForceFieldBackend::Save(TiXmlElement *node)
   return false;
 }
 
-
 bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   stringstream ss(args);
 

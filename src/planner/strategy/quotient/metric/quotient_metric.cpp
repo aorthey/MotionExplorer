@@ -11,6 +11,7 @@ double QuotientMetric::DistanceQ1(const og::QuotientCover::Configuration *q_from
 {
   return quotient_cover->GetQ1()->distance(q_from->state, q_to->state);
 }
+
 double QuotientMetric::DistanceX1(const QuotientCover::Configuration *q_from, const QuotientCover::Configuration *q_to)
 {
   ob::State *stateFrom = quotient_cover->GetX1()->allocState();
@@ -22,6 +23,7 @@ double QuotientMetric::DistanceX1(const QuotientCover::Configuration *q_from, co
   quotient_cover->GetX1()->freeState(stateTo);
   return d;
 }
+
 double QuotientMetric::DistanceConfigurationNeighborhood(const Configuration *q_from, const Configuration *q_to)
 {
   double d_to = q_to->GetRadius();

@@ -1,9 +1,8 @@
 #include "common.h"
 #include "gui/common.h"
 #include "qcp.h"
-#include "planner/strategy/quotient/step_strategy/step_straight.h"
-#include "planner/strategy/quotient/step_strategy/step_adaptive.h"
 #include "planner/strategy/quotient/metric/quotient_metric.h"
+#include "planner/strategy/quotient/step_strategy/step.h"
 
 using namespace ompl::geometric;
 
@@ -14,7 +13,6 @@ QCP::QCP(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, pare
 {
   setName("QCP"+std::to_string(id));
   progressMadeTowardsGoal = true;
-  step_strategy = new StepStrategyAdaptive(this);
 }
 
 QCP::~QCP(void)

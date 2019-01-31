@@ -72,11 +72,6 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_):
   }else{
     checkOuterRobot = true;
   }
-  // ob::State *state = Q1->allocState();
-  // std::cout << "TEST NEIGHBORHOOD" << std::endl;
-  // checker->Distance(state);
-  // Q1->freeState(state);
-
 }
 
 bool Quotient::IsOuterRobotFeasible(ob::State *state)

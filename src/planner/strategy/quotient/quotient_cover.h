@@ -63,9 +63,9 @@ namespace ompl
 
           base::State *state{nullptr};
           Configuration *coset{nullptr}; //the underlying coset this Vertex belongs to (on the quotient-space)
-          Configuration *parent_neighbor{nullptr};
-          base::State *riemannian_center_of_mass{nullptr}; //interpolate(inward_pointing_state, state, 2, next) gives a outward pointing state
-          uint number_of_neighbors{0};
+          Configuration *parent_neighbor{nullptr}; //the configuration from which this configuration has been spawned
+          base::State *riemannian_center_of_mass{nullptr}; //geometric mean constrained to neighborhood boundary
+          uint number_of_neighbors{0}; //counter for incremental computation of riemannian center of mass (RCoM)
 
           bool isSufficientFeasible{false};
           void *pdf_element;
@@ -190,40 +190,28 @@ namespace ompl
       //Sampling Sample{Structure}{Substructure}
       //#######################################################################
 
-      // virtual Configuration* SampleCoverBoundary(std::string type);
-      // virtual Configuration* SampleCoverBoundary();
-      // Configuration* SampleCoverBoundaryValid(ob::PlannerTerminationCondition &ptc);
-      // void SampleRandomNeighborhoodBoundary(Configuration *q);
-      // bool SampleNeighborhoodBoundary(Configuration*, const Configuration*);
-      // bool SampleNeighborhoodBoundaryHalfBall(Configuration*, const Configuration*);
-
       void SampleGoal(Configuration*);
       void SampleUniform(Configuration*);
       virtual Configuration* SampleUniformQuotientCover(ob::State *state);
       Configuration* SampleNeighborhoodBoundary(Configuration *q);
-      Configuration* SampleOnBoundaryUniformNear(Configuration *q_center, const double radius, const Configuration* q_near);
+      Configuration* SampleNeighborhoodBoundaryUniformNear(Configuration *q_center, const Configuration* q_near, const double radius);
 
       //#######################################################################
       //Connect strategies
       //#######################################################################
-      void Connect(const Configuration*, const Configuration*, Configuration*);
-      //void Connect(const Configuration*, const Configuration*);
       virtual void Grow(double t) override = 0;
       bool GetSolution(ob::PathPtr &solution) override;
-
       virtual double GetImportance() const override;
 
       bool Interpolate(const Configuration*, Configuration*);
-      bool Interpolate(const Configuration*, const Configuration*, Configuration*);
+      bool Interpolate(const Configuration* q_from, const Configuration* q_to, Configuration* q_output);
+
       bool Interpolate(const Configuration*, const Configuration*, double step_size, Configuration*);
+      bool InterpolateQ1(const Configuration*, const Configuration*, double step_size, Configuration*);
 
-      //Interpolate along a straight line from q_center to q_desired. Terminate
-      //if the neighborhood boundary of q_center is reached. The result is
-      //written into q_out
       void InterpolateUntilNeighborhoodBoundary(const Configuration *q_center, const Configuration *q_desired, Configuration *q_out);
-      bool InterpolateOnBoundary(const Configuration* q_center, const Configuration* q1, const Configuration* q2, double step, Configuration*);
 
-      void ProjectConfigurationOntoBoundary(const Configuration *q_center, Configuration* q_projected);
+      void ProjectConfigurationOntoNeighborhoodBoundary(const Configuration *q_center, Configuration* q_projected);
       Configuration* NearestConfigurationOnBoundary(Configuration *q_center, const Configuration* q_outside);
 
       //#######################################################################
@@ -274,7 +262,6 @@ namespace ompl
 
       Configuration* GetStartConfiguration() const;
       Configuration* GetGoalConfiguration() const;
-      const Graph& GetGraph() const;
       const PDF& GetPDFNecessaryConfigurations() const;
       const PDF& GetPDFAllConfigurations() const;
       const NearestNeighborsPtr& GetNearestNeighborsCover() const;
