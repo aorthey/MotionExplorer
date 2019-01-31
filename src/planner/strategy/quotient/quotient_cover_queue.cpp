@@ -141,19 +141,6 @@ void QuotientCoverQueue::PrintQueue(int n_head)
   }
 }
 
-QuotientCoverQueue::Configuration* QuotientCoverQueue::SampleCoverBoundary(){
-  Configuration *q_random;
-  if(!hasSolution){
-    //phase1 sampling: solution has not been found
-    q_random = BaseT::SampleCoverBoundary("voronoi");
-  }else{
-    //phase2 sampling: grow solution and associated roadmap
-    std::cout << "Phase2 (hasSolution) sampler NYI"<< std::endl;
-    exit(0);
-  }
-  return q_random;
-}
-
 void QuotientCoverQueue::AddConfigurationToPDF(Configuration *q)
 {
   PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
@@ -172,24 +159,36 @@ void QuotientCoverQueue::Print(std::ostream& out) const
   out << std::endl << " |------ [Queue] has " << priority_queue_candidate_configurations.size() << " configurations left in priority queue.";
 }
 
-QuotientCoverQueue::Configuration* QuotientCoverQueue::SampleUniformQuotientCover(ob::State *state) 
-{
-  double r = rng_.uniform01();
-  Configuration *q_coset = nullptr;
-  if(r<shortestPathBias)
-  {
-    if(shortest_path_start_goal_necessary_vertices.empty())
-    {
-      std::cout << "[WARNING] shortest path does not have any necessary vertices! -- should be detected on CS" << std::endl;
-      exit(0);
-    }
-    int k = rng_.uniformInt(0, shortest_path_start_goal_necessary_vertices.size()-1);
-    const Vertex vk = shortest_path_start_goal_necessary_vertices.at(k);
-    q_coset = graph[vk];
-    Q1_sampler->sampleUniformNear(state, q_coset->state, q_coset->GetRadius());
-  }else{
-    q_coset = pdf_necessary_configurations.sample(rng_.uniform01());
-    Q1_sampler->sampleUniformNear(state, q_coset->state, q_coset->GetRadius());
-  }
-  return q_coset;
-}
+//QuotientCoverQueue::Configuration* QuotientCoverQueue::SampleCoverBoundary(){
+//  Configuration *q_random;
+//  if(!hasSolution){
+//    //phase1 sampling: solution has not been found
+//    q_random = BaseT::SampleCoverBoundary("voronoi");
+//  }else{
+//    //phase2 sampling: grow solution and associated roadmap
+//    std::cout << "Phase2 (hasSolution) sampler NYI"<< std::endl;
+//    exit(0);
+//  }
+//  return q_random;
+//}
+// QuotientCoverQueue::Configuration* QuotientCoverQueue::SampleUniformQuotientCover(ob::State *state) 
+// {
+//   double r = rng_.uniform01();
+//   Configuration *q_coset = nullptr;
+//   if(r<shortestPathBias)
+//   {
+//     if(shortest_path_start_goal_necessary_vertices.empty())
+//     {
+//       std::cout << "[WARNING] shortest path does not have any necessary vertices! -- should be detected on CS" << std::endl;
+//       exit(0);
+//     }
+//     int k = rng_.uniformInt(0, shortest_path_start_goal_necessary_vertices.size()-1);
+//     const Vertex vk = shortest_path_start_goal_necessary_vertices.at(k);
+//     q_coset = graph[vk];
+//     Q1_sampler->sampleUniformNear(state, q_coset->state, q_coset->GetRadius());
+//   }else{
+//     q_coset = pdf_necessary_configurations.sample(rng_.uniform01());
+//     Q1_sampler->sampleUniformNear(state, q_coset->state, q_coset->GetRadius());
+//   }
+//   return q_coset;
+// }

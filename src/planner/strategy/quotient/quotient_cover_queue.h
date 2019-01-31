@@ -32,9 +32,9 @@ namespace ompl
       void setup() override;
       virtual void Print(std::ostream& out) const override;
 
-      virtual Configuration* SampleCoverBoundary() override;
+      //virtual Configuration* SampleCoverBoundary() override;
       virtual void AddConfigurationToPDF(Configuration *q) override;
-      virtual Configuration* SampleUniformQuotientCover(ob::State *state) override;
+      //virtual Configuration* SampleUniformQuotientCover(ob::State *state) override;
       virtual Vertex AddConfigurationToCover(Configuration *q) override;
 
       void AddConfigurationToPriorityQueue(Configuration *q);

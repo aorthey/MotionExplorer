@@ -1,10 +1,16 @@
 #include "step_adaptive.h"
+#include "planner/strategy/quotient/quotient_cover_queue.h"
+#include "planner/strategy/quotient/metric/quotient_metric.h"
 using namespace ompl::geometric;
 using Configuration = QuotientCover::Configuration;
 
+StepStrategyAdaptive::StepStrategyAdaptive(QuotientCoverQueue *quotient_cover_queue_):
+  StepStrategy(quotient_cover_queue_)
+{
+}
 bool StepStrategyAdaptive::Towards(QuotientCover::Configuration *q_from, QuotientCover::Configuration *q_to)
 {
-  const double distanceFromTo = quotient_cover_queue->DistanceNeighborhoodNeighborhood(q_from, q_to);
+  const double distanceFromTo = quotient_cover_queue->GetMetric()->DistanceNeighborhoodNeighborhood(q_from, q_to);
   if(distanceFromTo < 1e-10){
     return false;
   }

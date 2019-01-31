@@ -28,11 +28,6 @@ namespace ompl{
           else diff = -2.0*pi - diff;
           v_result = v_from - diff * t;
         }
-        //v_result = v_result - 2*pi*floor(v_result/2*pi);
-        //double signedPI = boost::math::copysign(pi, v_result);
-        //v_result = std::fmod(v_result+signedPI,(2*pi)) - signedPI;
-        //std::fmod(v_result, 2*pi);
-        //std::fmod(v_result, 2*pi);
         while(v_result < -pi) v_result += 2.0*pi;
         while(v_result > +pi) v_result -= 2.0*pi;
       }

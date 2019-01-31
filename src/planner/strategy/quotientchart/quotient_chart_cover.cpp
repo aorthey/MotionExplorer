@@ -888,8 +888,7 @@ std::vector<const QuotientChartCover::Configuration*> QuotientChartCover::GetInt
   std::vector<const Configuration*> path_Q0_cover = parent_chart->GetCoverPath(q_from->coset, q_to->coset);
 
   if(path_Q0_cover.empty()){
-    //(1) cosets are equivalent => straight line interpolation
-    path_Q1.push_back(q_from);
+    //(1) cosets are equivalent => straight line interpolation path_Q1.push_back(q_from);
     path_Q1.push_back(q_to);
   }else{
     path_Q0_cover.erase(path_Q0_cover.begin());
@@ -931,7 +930,7 @@ std::vector<const QuotientChartCover::Configuration*> QuotientChartCover::GetInt
       ProjectX1Subspace(q_from->state, s_fromX1);
       ob::State *s_toX1 = X1->allocState();
       ProjectX1Subspace(q_to->state, s_toX1);
-
+      ProjectX1Subspace(q_to->state, s_toX1);
       double d_next = 0;
       path_Q1.push_back(q_from);
       for(uint k = 0; k < path_Q0_cover.size(); k++){

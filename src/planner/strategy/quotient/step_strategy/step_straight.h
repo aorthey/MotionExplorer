@@ -10,7 +10,8 @@ namespace ompl
 
       public:
 
-        StepStrategyStraight() = default;
+        StepStrategyStraight() = delete;
+        StepStrategyStraight(og::QuotientCoverQueue*);
 
         virtual bool Towards(og::QuotientCover::Configuration *q_from, og::QuotientCover::Configuration *q_to) override;
 

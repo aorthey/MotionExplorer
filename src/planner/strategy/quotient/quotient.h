@@ -78,15 +78,15 @@ namespace ompl
         friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::Quotient& qtnt);
         virtual void Print(std::ostream& out) const;
 
-      protected:
-
-        const ob::StateSpacePtr ComputeQuotientSpace(const ob::StateSpacePtr Q1, const ob::StateSpacePtr Q0);
-
         //Quotient Space Projection Operators
         //  ProjectX1Subspace: Q0 \times X1 \rightarrow X1
         //  ProjectQ0Subspace: Q0 \times X1 \rightarrow Q0
         void ProjectX1Subspace( const ob::State* q, ob::State* qX1 ) const;
         void ProjectQ0Subspace( const ob::State* q, ob::State* qQ0 ) const;
+
+      protected:
+
+        const ob::StateSpacePtr ComputeQuotientSpace(const ob::StateSpacePtr Q1, const ob::StateSpacePtr Q0);
 
         ob::SpaceInformationPtr Q1;
         ob::SpaceInformationPtr Q0;

@@ -14,6 +14,8 @@ namespace ompl
 {
   namespace geometric
   {
+    OMPL_CLASS_FORWARD(QuotientMetric);
+
     class QuotientCover: public og::Quotient
     {
       typedef og::Quotient BaseT;
@@ -180,20 +182,6 @@ namespace ompl
       bool firstRun{true};
       void Test();
 
-      //#######################################################################
-      //Distance Computations
-      //#######################################################################
-      double DistanceQ1(const Configuration *q_from, const Configuration *q_to);
-      double DistanceX1(const Configuration *q_from, const Configuration *q_to);
-
-      double DistanceConfigurationConfiguration(const Configuration *q_from, const Configuration *q_to);
-      //Note: this is a pseudometric: invalidates second axiom of metric : d(x,y) = 0  iff x=y. But here we only have d(x,x)=0
-      double DistanceNeighborhoodNeighborhood(const Configuration *q_from, const Configuration *q_to);
-      //Note: this is a pseudometric: invalidates second axiom of metric : d(x,y) = 0  iff x=y. But here we only have d(x,x)=0
-      double DistanceConfigurationNeighborhood(const Configuration *q_from, const Configuration *q_to);
-
-      double DistanceConfigurationConfigurationCover(const Configuration *q_from, const Configuration *q_to);
-
       std::vector<const Configuration*> GetInterpolationPath(const Configuration *q_from, const Configuration *q_to);
       std::vector<Vertex> GetCoverPath(const Vertex& v_source, const Vertex& v_sink);
       std::vector<const Configuration*> GetCoverPath(const Configuration *q_source, const Configuration *q_sink);
@@ -201,19 +189,20 @@ namespace ompl
       //#######################################################################
       //Sampling Sample{Structure}{Substructure}
       //#######################################################################
-      virtual Configuration* Sample();
 
-      virtual Configuration* SampleCoverBoundary(std::string type);
-      virtual Configuration* SampleCoverBoundary();
-      Configuration* SampleCoverBoundaryValid(ob::PlannerTerminationCondition &ptc);
-      void SampleRandomNeighborhoodBoundary(Configuration *q);
-      bool SampleNeighborhoodBoundary(Configuration*, const Configuration*);
-      bool SampleNeighborhoodBoundaryHalfBall(Configuration*, const Configuration*);
+      // virtual Configuration* SampleCoverBoundary(std::string type);
+      // virtual Configuration* SampleCoverBoundary();
+      // Configuration* SampleCoverBoundaryValid(ob::PlannerTerminationCondition &ptc);
+      // void SampleRandomNeighborhoodBoundary(Configuration *q);
+      // bool SampleNeighborhoodBoundary(Configuration*, const Configuration*);
+      // bool SampleNeighborhoodBoundaryHalfBall(Configuration*, const Configuration*);
 
       void SampleGoal(Configuration*);
       void SampleUniform(Configuration*);
       virtual Configuration* SampleUniformQuotientCover(ob::State *state);
+      Configuration* SampleNeighborhoodBoundary(Configuration *q);
       Configuration* SampleOnBoundaryUniformNear(Configuration *q_center, const double radius, const Configuration* q_near);
+
       //#######################################################################
       //Connect strategies
       //#######################################################################
@@ -278,7 +267,10 @@ namespace ompl
       std::vector<Vertex> shortest_path_start_goal;
       std::vector<Vertex> shortest_path_start_goal_necessary_vertices;
 
+      QuotientMetricPtr metric{nullptr};
     public:
+
+      const QuotientMetricPtr& GetMetric();
 
       Configuration* GetStartConfiguration() const;
       Configuration* GetGoalConfiguration() const;

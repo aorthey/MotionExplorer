@@ -3,6 +3,7 @@
 #include "qcp.h"
 #include "planner/strategy/quotient/step_strategy/step_straight.h"
 #include "planner/strategy/quotient/step_strategy/step_adaptive.h"
+#include "planner/strategy/quotient/metric/quotient_metric.h"
 
 using namespace ompl::geometric;
 
@@ -13,8 +14,7 @@ QCP::QCP(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, pare
 {
   setName("QCP"+std::to_string(id));
   progressMadeTowardsGoal = true;
-  step_strategy = new StepStrategyAdaptive();
-  step_strategy->SetSpace(this);
+  step_strategy = new StepStrategyAdaptive(this);
 }
 
 QCP::~QCP(void)
@@ -165,7 +165,7 @@ void QCP::RewireCover(ob::PlannerTerminationCondition &ptc)
 
   if(neighbors.size()>=K){
     Configuration *qn = neighbors.at(K-1);
-    double dn = DistanceNeighborhoodNeighborhood(q, qn);
+    double dn = metric->DistanceNeighborhoodNeighborhood(q, qn);
     if(dn <= 1e-10){
       AddEdge(q, qn);
       pdf_connectivity_configurations.update(static_cast<PDF_Element*>(qn->GetConnectivityPDFElement()), ValueConnectivity(qn));

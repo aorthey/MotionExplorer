@@ -13,6 +13,7 @@ namespace ompl
       public:
 
         StepStrategyAdaptive() = default;
+        StepStrategyAdaptive(og::QuotientCoverQueue*);
 
         virtual bool Towards(og::QuotientCover::Configuration *q_from, og::QuotientCover::Configuration *q_to) override;
         virtual bool ExpandOutside(og::QuotientCover::Configuration *q_from) override;
