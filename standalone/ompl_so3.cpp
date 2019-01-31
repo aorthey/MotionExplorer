@@ -225,29 +225,28 @@ int main(int argc,const char** argv)
   //############################################################################
   Msamples = 1e2;
   std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Test 3/" << numberTests << ": Check that interpolation steps outside [0,1] are correctly executed." << std::endl;
+  std::cout << "Test 3/" << numberTests << ": Check that interpolation steps outside [0,1] are correctly executed (locally)." << std::endl;
   for(uint k = 0; k < Msamples; k++){
     sampler->sampleUniform(s1);
     sampler->sampleUniformNear(s2, s1, 0.5);
-    double interp_step = 1.0+rng.uniformReal(0.5,1);
+    double interp_step = 1.0+rng.uniformReal(-3,1);
 
     space->interpolate(s1, s2, interp_step, s3_new);
     space->SO3StateSpace::interpolate(s1, s2, interp_step, s3_orig);
 
     double d12 = space->distance(s1, s2);
-    double d23 = space->distance(s1, s3_orig);
+    double d23 = space->distance(s2, s3_orig);
+    double d13 = space->distance(s1, s3_orig);
 
     //if(!space->equalStates(s3_new, s3_orig))
-    if( fabs(d23 - interp_step*d12) > 1e-10)
+    if( fabs(d13 - fabs(interp_step)*(d12)) > 1e-10)
     {
       //NOTE: s3_new == s3_orig compares the pointers!
       std::cout << std::string(80, '-') << std::endl;
-      std::cout << "distance s1-s2     : " << space->distance(s1,s2) << std::endl;
-      std::cout << "distance s2-s3_new : " << space->distance(s2,s3_new) << std::endl;
-      std::cout << "distance s2-s3_orig: " << space->distance(s2,s3_orig) << std::endl;
+      std::cout << "distance s1-s2     : " << d12 << std::endl;
+      std::cout << "distance s2-s3     : " << d23 << std::endl;
+      std::cout << "distance s1-s3     : " << d13 << std::endl;
       std::cout << std::string(80, '-') << std::endl;
-      std::cout << "distance s1-s3_new : " << space->distance(s1,s3_new) << std::endl;
-      std::cout << "distance s1-s3_orig: " << space->distance(s1,s3_orig) << std::endl;
       std::cout << "Error on interpolation (interpolation step=" << interp_step << ")" << std::endl;
       std::cout << "On sample " << k << "/" << Msamples << std::endl;
       space->printState(s3_new, std::cout);
