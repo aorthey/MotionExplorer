@@ -672,3 +672,6 @@ Experiments for paper:
 
 
 [ ] Outsource interpolate
+
+[ ] Comment out all interpolate, move to metric, and implement
+EuclideaMEtricInterpolation

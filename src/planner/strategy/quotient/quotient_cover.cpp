@@ -104,10 +104,10 @@ void QuotientCover::setup(void)
     //return new NearestNeighborsGNAT<_T>();
     //nearest_neighborhood.reset(new NearestNeighborsGNAT<Configuration *>());
     //nearest_neighborhood.reset(new NearestNeighborsGNATNoThreadSafety<Configuration *>());
-    nearest_neighborhood.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
+    //nearest_neighborhood.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
     //nearest_neighborhood.reset(new NearestNeighborsSqrtApprox<Configuration *>());
     //nearest_neighborhood.reset(new NearestNeighborsLinear<Configuration *>()); 
-    //nearest_neighborhood.reset(new NearestNeighborsFLANNConfigurationLinear<Configuration*>()); 
+    nearest_neighborhood.reset(new NearestNeighborsFLANNConfigurationLinear<Configuration*>()); 
     //nearest_neighborhood.reset(new NearestNeighborsFLANNConfigurationHierarchicalClustering<Configuration*>()); 
     //nearest_neighborhood.reset(new NearestNeighborsFLANNHierarchicalClustering<Configuration *>()); 
     //nearest_neighborhood.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
@@ -330,7 +330,7 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
   }
 
   if(neighbors.empty() && !q->isStart){
-    std::cout << "adding Configuration not on boundary of cover!" << std::endl;
+    OMPL_ERROR("Found no neighbors for Configuration");
     exit(0);
   }
 
@@ -365,9 +365,46 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
 
   uint Ne = GetNumberOfEdges(q);
   if(!q->isStart && Ne<=0){
+
     std::cout << "Detected no neighbors. This is usually a problem of the Interpolate() function, which has probably interpolated to a configuration which lies OUTSIDE of our cover (i.e. we went outside of the neighborhood we started with)." << std::endl;
     QuotientCover::Print(q, false);
-    throw "";
+    QuotientCover::Print(q->parent_neighbor, false);
+    OMPL_ERROR("No Neighbors -- Cannot add to cover (Needs to be one single connected component)");
+    double d1 = metric->DistanceConfigurationConfiguration(q, q->parent_neighbor);
+    double d2 = q->parent_neighbor->GetRadius();
+    std::cout << (EdgeExists(q, q->parent_neighbor)?"Edge exists":"No Edge")<< std::endl;
+    const double dqqk = metric->DistanceNeighborhoodNeighborhood(q, q->parent_neighbor);
+    std::cout << "Distance to parent  : " << d1 << std::endl;
+    std::cout << "Radius of parent NBH: " << d2 << std::endl;
+    std::cout << "Distance of configuration to boundary of nearest NBH: " << fabs(d1-d2) << std::endl;
+    std::cout << "Distance NBH-NBH    : " << dqqk << std::endl;
+    std::cout << "NearestK found " << neighbors.size() << " neighbors." << std::endl;
+    Configuration *qn = nearest_neighborhood->nearest(q);
+    std::cout << "Distance to nearest NBH: " << metric->DistanceNeighborhoodNeighborhood(q, qn) << std::endl;
+    std::cout << "Distance to nearest Config: " << metric->DistanceConfigurationConfiguration(q, qn) << std::endl;
+    for(uint k = 0; k < neighbors.size(); k++){
+      Configuration *qk = neighbors.at(k);
+      std::cout << "NEIGHBOR " << k << "/" << neighbors.size()<< ":";
+      if(qk==q->parent_neighbor){
+        std::cout << " IS PARENT NEIGHBOR";
+      }
+      if(IsNeighborhoodInsideNeighborhood(qk, q)){
+        std::cout << "is inside current NBH (and has been flagged for removal)";
+      }else{
+        const double dqqk = metric->DistanceNeighborhoodNeighborhood(qk, q);
+        const double dqk = metric->DistanceConfigurationConfiguration(qk, q);
+        if(dqqk < 1e-10){
+          std::cout << "OK (added edge)";
+          AddEdge(q, qk);
+        }else{
+          std::cout << "Edge not added because distnace of NBHs is: " << dqqk << ", distance of configs is: " << dqk;
+        }
+      }
+      std::cout << "|" << std::endl;
+
+    }
+    std::cout << "parent had " << q->parent_neighbor->number_of_neighbors << " neighbors." << std::endl;
+    //(Did we just delete all its neighbors in the last step?)
     exit(0);
   }
 
@@ -818,107 +855,17 @@ QuotientCover::Configuration* QuotientCover::Nearest(Configuration *q) const
   return nearest_neighborhood->nearest(q);
 }
 
-//############################################################################
-//INTERPOLATE
-//############################################################################
-
-bool QuotientCover::Interpolate(const Configuration *q_from, Configuration *q_to)
-{
-  return Interpolate(q_from, q_to, q_to);
-}
-
-bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration *q_to, Configuration *q_interp)
-{
-  double d = metric->DistanceConfigurationConfiguration(q_from, q_to);
-  double radius = q_from->GetRadius();
-  double step_size = radius/d;
-  bool success = Interpolate(q_from, q_to, step_size, q_interp);
-  return success;
-}
-//stepsize \in [0,1]
-bool QuotientCover::Interpolate(const Configuration *q_from, const Configuration *q_to, double step_size, Configuration *q_interp)
-{
-  if(parent==nullptr){
-    Q1->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_interp->state);
-  }else{
-
-    //X1->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_interp->state);
-
-    if(q_to->coset == nullptr || q_from->coset == nullptr)
-    {
-      Q1->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_interp->state);
-    }else{
-      std::vector<const Configuration*> path = GetInterpolationPath(q_from, q_to);
-
-      double d_from_to = metric->DistanceConfigurationConfiguration(q_from, q_to);
-      double d_step = d_from_to*step_size;
-
-      double d = 0;
-      double d_last_to_next = 0;
-      uint ctr = 0;
-
-      while(d < d_step && ctr < path.size()-1){
-        d_last_to_next = metric->DistanceQ1(path.at(ctr), path.at(ctr+1));
-        d += d_last_to_next;
-        ctr++;
-      }
-
-      //TODO: Needs revision
-
-      const Configuration *q_next = path.at(ctr);
-      const Configuration *q_last = path.at(ctr-1);
-      double step = d_last_to_next - (d - d_step);
-      Q1->getStateSpace()->interpolate(q_last->state, q_next->state, step/d_last_to_next, q_interp->state);
-    }
-  }
-
-  return true;
-}
-
-void QuotientCover::InterpolateUntilNeighborhoodBoundary(const Configuration *q_center, const Configuration *q_desired, Configuration *q_out)
-{
-  double radius = q_center->GetRadius();
-  double distance_center_desired = metric->DistanceConfigurationConfiguration(q_center, q_desired);
-  double step = (radius)/distance_center_desired;
-
-  metric->InterpolateQ1(q_center, q_desired, step, q_out);
-
-  //############################################################################
-  //DEBUG
-  //############################################################################
-  double d_center_outward = metric->DistanceConfigurationConfiguration(q_center, q_out);
-  if(fabs(d_center_outward - radius) > 1e-10){
-    std::cout << "WARNING: interpolated point outside boundary" << std::endl;
-    QuotientCover::Print(q_out, false);
-    QuotientCover::Print(q_center, false);
-    std::cout << "Distance: " << d_center_outward << " Radius: " << radius << std::endl;
-    exit(0);
-  }
-}
-
-// bool QuotientCover::InterpolateOnBoundary(const Configuration* q_center, const Configuration* q1, const Configuration* q2, double step, Configuration* q_out)
-// {
-//   Q1->getStateSpace()->interpolate(q1->state, q2->state, step, q_out->state);
-//   ProjectConfigurationOntoNeighborhoodBoundary(q_center, q_out);
-//   return true;
-// }
 void QuotientCover::ProjectConfigurationOntoNeighborhoodBoundary(const Configuration *q_center, Configuration* q_projected)
 {
   const double d_center_to_proj = metric->DistanceConfigurationConfiguration(q_center, q_projected);
   double step_size = q_center->GetRadius()/d_center_to_proj;
-  Interpolate(q_center, q_projected, step_size, q_projected);
+  metric->Interpolate(q_center, q_projected, step_size, q_projected);
 }
 
 QuotientCover::Configuration* QuotientCover::NearestConfigurationOnBoundary(Configuration *q_center, const Configuration* q_outside)
 {
   Configuration *q_projected = new Configuration(Q1);
-  InterpolateUntilNeighborhoodBoundary(q_center, q_outside, q_projected);
-
-  //const double d_center_to_proj = DistanceConfigurationConfiguration(q_center, q_outside);
-  //double step_size = q_center->GetRadius()/d_center_to_proj;
-
-  //Interpolate(q_center, q_outside, step_size, q_projected);
-  //////Q1->getStateSpace()->interpolate(q_center->state, q_outside->state, step_size, q_projected->state);
+  metric->Interpolate(q_center, q_outside, q_projected);
 
   q_projected->parent_neighbor = q_center;
   if(ComputeNeighborhood(q_projected)){

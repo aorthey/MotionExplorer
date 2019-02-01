@@ -203,12 +203,10 @@ namespace ompl
       bool GetSolution(ob::PathPtr &solution) override;
       virtual double GetImportance() const override;
 
-      bool Interpolate(const Configuration*, Configuration*);
-      bool Interpolate(const Configuration* q_from, const Configuration* q_to, Configuration* q_output);
-
-      bool Interpolate(const Configuration*, const Configuration*, double step_size, Configuration*);
-
-      void InterpolateUntilNeighborhoodBoundary(const Configuration *q_center, const Configuration *q_desired, Configuration *q_out);
+      // bool Interpolate(const Configuration*, Configuration*);
+      // bool Interpolate(const Configuration* q_from, const Configuration* q_to, Configuration* q_output);
+      // bool Interpolate(const Configuration*, const Configuration*, double step_size, Configuration*);
+      // void InterpolateUntilNeighborhoodBoundary(const Configuration *q_center, const Configuration *q_desired, Configuration *q_out);
 
       void ProjectConfigurationOntoNeighborhoodBoundary(const Configuration *q_center, Configuration* q_projected);
       Configuration* NearestConfigurationOnBoundary(Configuration *q_center, const Configuration* q_outside);

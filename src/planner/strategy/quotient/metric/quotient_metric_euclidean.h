@@ -15,6 +15,7 @@ namespace ompl
         QuotientMetricEuclidean(og::QuotientCover*); 
 
         virtual double DistanceConfigurationConfiguration(const og::QuotientCover::Configuration *q_from, const og::QuotientCover::Configuration *q_to) override;
+        virtual void Interpolate(const Configuration *q_from, const Configuration *q_to, double step, Configuration* q_interp) override;
 
     };
   }

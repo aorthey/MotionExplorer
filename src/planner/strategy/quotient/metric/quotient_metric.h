@@ -14,6 +14,9 @@ namespace ompl
         QuotientMetric() = delete;
         QuotientMetric(og::QuotientCover*); 
 
+        //############################################################################
+        //Distance Functions
+        //############################################################################
         virtual double DistanceConfigurationConfiguration(const Configuration *q_from, const Configuration *q_to) = 0;
 
         double DistanceConfigurationNeighborhood(const Configuration *q_from, const Configuration *q_to);
@@ -22,7 +25,20 @@ namespace ompl
         double DistanceQ1(const Configuration *q_from, const Configuration *q_to);
         double DistanceX1(const Configuration *q_from, const Configuration *q_to);
 
-        void InterpolateQ1(const Configuration *q_from, const Configuration *q_to, double step, Configuration* q_out);
+        //############################################################################
+        //Interpolate Functions
+        //############################################################################
+        virtual void Interpolate(const Configuration *q_from, const Configuration *q_to, double step, Configuration* q_interp) = 0;
+
+        void Interpolate(const Configuration *q_from, Configuration *q_to);
+        void Interpolate(const Configuration *q_from, const Configuration *q_to, Configuration* q_interp);
+        void InterpolateQ1(const Configuration *q_from, const Configuration *q_to, double step, Configuration* q_interp);
+
+
+      // bool Interpolate(const Configuration*, Configuration*);
+      // bool Interpolate(const Configuration* q_from, const Configuration* q_to, Configuration* q_output);
+      // bool Interpolate(const Configuration*, const Configuration*, double step_size, Configuration*);
+      // void InterpolateUntilNeighborhoodBoundary(const Configuration *q_center, const Configuration *q_desired, Configuration *q_out);
       protected:
 
         og::QuotientCover *quotient_cover;

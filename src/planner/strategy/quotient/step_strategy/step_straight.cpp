@@ -17,7 +17,7 @@ bool StepStrategyStraight::Towards(QuotientCover::Configuration *q_from, Quotien
 
   Configuration *q_proj = new Configuration(quotient_cover_queue->GetQ1());
 
-  quotient_cover_queue->Interpolate(q_from, q_to, q_proj);
+  quotient_cover_queue->GetMetric()->Interpolate(q_from, q_to, q_proj);
   q_proj->parent_neighbor = q_from;
 
   if(quotient_cover_queue->ComputeNeighborhood(q_proj)){
