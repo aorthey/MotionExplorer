@@ -1,7 +1,6 @@
 #include "common.h"
 #include "quotient_cover.h"
 #include "metric/quotient_metric.h"
-#include "metric/quotient_metric_euclidean.h"
 
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
@@ -98,7 +97,7 @@ void QuotientCover::setup(void)
   BaseT::setup();
   if(metric == nullptr)
   {
-    metric = std::make_shared<QuotientMetricEuclidean>(this);
+    metric = std::make_shared<QuotientMetric>(this);
   }
   if (!nearest_neighborhood){
     //return new NearestNeighborsGNAT<_T>();
@@ -364,6 +363,7 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
   }
 
   uint Ne = GetNumberOfEdges(q);
+
   if(!q->isStart && Ne<=0){
 
     std::cout << "Detected no neighbors. This is usually a problem of the Interpolate() function, which has probably interpolated to a configuration which lies OUTSIDE of our cover (i.e. we went outside of the neighborhood we started with)." << std::endl;
@@ -447,8 +447,8 @@ void QuotientCover::AddEdge(Configuration *q_from, Configuration *q_to)
   Vertex v_to = get(normalizedIndexToVertex, q_to->index);
   boost::add_edge(v_from, v_to, properties, graph);
 
-  q_from->UpdateRiemannianCenterOfMass(Q1, q_to);
-  q_to->UpdateRiemannianCenterOfMass(Q1, q_from);
+  q_from->UpdateRiemannianCenterOfMass(this, q_to);
+  q_to->UpdateRiemannianCenterOfMass(this, q_from);
 
   q_from->number_of_neighbors++;
   q_to->number_of_neighbors++;

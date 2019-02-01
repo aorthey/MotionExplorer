@@ -17,7 +17,7 @@ namespace ompl
         //############################################################################
         //Distance Functions
         //############################################################################
-        virtual double DistanceConfigurationConfiguration(const Configuration *q_from, const Configuration *q_to) = 0;
+        virtual double DistanceConfigurationConfiguration(const Configuration *q_from, const Configuration *q_to);
 
         double DistanceConfigurationNeighborhood(const Configuration *q_from, const Configuration *q_to);
         double DistanceNeighborhoodNeighborhood(const Configuration *q_from, const Configuration *q_to);
@@ -28,7 +28,7 @@ namespace ompl
         //############################################################################
         //Interpolate Functions
         //############################################################################
-        virtual void Interpolate(const Configuration *q_from, const Configuration *q_to, double step, Configuration* q_interp) = 0;
+        virtual void Interpolate(const Configuration *q_from, const Configuration *q_to, double step, Configuration* q_interp);
 
         void Interpolate(const Configuration *q_from, Configuration *q_to);
         void Interpolate(const Configuration *q_from, const Configuration *q_to, Configuration* q_interp);

@@ -53,7 +53,7 @@ namespace ompl
           double GetImportance() const;
           double GetGoalDistance() const;
           ob::State* GetInwardPointingConfiguration() const;
-          void UpdateRiemannianCenterOfMass(ob::SpaceInformationPtr si, Configuration* q_new);
+          void UpdateRiemannianCenterOfMass(og::QuotientCover*, Configuration*);
 
           friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::QuotientCover::Configuration&);
 
@@ -252,7 +252,10 @@ namespace ompl
       std::vector<Vertex> shortest_path_start_goal;
       std::vector<Vertex> shortest_path_start_goal_necessary_vertices;
 
+    private:
       QuotientMetricPtr metric{nullptr};
+
+
     public:
 
       const QuotientMetricPtr& GetMetric();

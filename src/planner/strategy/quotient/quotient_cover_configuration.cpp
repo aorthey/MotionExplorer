@@ -1,5 +1,6 @@
 #include "common.h"
 #include "quotient_cover.h"
+#include "metric/quotient_metric.h"
 
 using namespace ompl::geometric;
 //#############################################################################
@@ -124,11 +125,11 @@ ob::State* QuotientCover::Configuration::GetInwardPointingConfiguration() const
 //(seems to be solving this exact problem)
 //https://link.springer.com/content/pdf/10.1007/978-3-319-22957-7.pdf#page=27
 //
-void QuotientCover::Configuration::UpdateRiemannianCenterOfMass(ob::SpaceInformationPtr si, Configuration* q_new)
+void QuotientCover::Configuration::UpdateRiemannianCenterOfMass(og::QuotientCover *quotient_cover, Configuration* q_new)
 {
   //Case1: There is only a single neighbor => RCoM = neighbor
   if(number_of_neighbors == 0){
-    riemannian_center_of_mass = si->cloneState(q_new->state); //clone=alloc+copy=colloc
+    riemannian_center_of_mass = quotient_cover->GetQ1()->cloneState(q_new->state); //clone=alloc+copy=colloc
   }else{
     //Case2: Multiple neighbors, update RCoM by moving along the
     //geodesic between RCoM and q_to. If the total distance between RCoM
@@ -137,15 +138,34 @@ void QuotientCover::Configuration::UpdateRiemannianCenterOfMass(ob::SpaceInforma
     //@TODO just walk through ambient space for now. Not sure how to get the
     //geodesic from here
 
-    si->getStateSpace()->interpolate(riemannian_center_of_mass, q_new->state, (1.0/(number_of_neighbors+1)), riemannian_center_of_mass );
+    const ob::StateSpacePtr& Q1 = quotient_cover->GetQ1()->getStateSpace();
+
+    Q1->interpolate(riemannian_center_of_mass, q_new->state, (1.0/(number_of_neighbors+1)), riemannian_center_of_mass );
     //Project onto NBH
-    double d = si->distance(this->state, riemannian_center_of_mass);
-    if(d<1e-10){
-      std::cout << "[WARNING]: RIemannian Center of Mass conincides with center" << std::endl;
-      //in that case we should try to interpolate constrained to a plane going
-      //through 
+    double d = Q1->distance(this->state, riemannian_center_of_mass);
+    if(d<1e-5){
+      //If RCoM lies close to center, this means that the old RCoM and the new
+      //state lie opposite to each other on the neighborhood, they are
+      //antipoles. Therefore, there exists a unique plane through the center,
+      //which has as normal the direction from center to one of the poles. 
+      //
+      //Our strategy here consists in randomly perturbating the RCoM, and then
+      //projecting it back onto the plane, thereby making sure that the RCoM
+      //is meaningful while staying away from the center (so that it can be
+      //projected onto the neighborhood)
+      //NOTE: on SO(n) this will be a geodesic. What you describe is basically a
+      //projection of the point onto the geodesic spanned by this->state and
+      //q_new->state. It is not clear how we can do that in OMPL. Can we somehow
+      //work around here?
+
+      std::cout << "[WARNING]: Riemannian Center of Mass conincides with center" << std::endl;
+      quotient_cover->GetQ1SamplerPtr()->sampleUniformNear(riemannian_center_of_mass, this->state, this->GetRadius());
+
+      //Update distance
+      d = Q1->distance(this->state, riemannian_center_of_mass);
     }
-    si->getStateSpace()->interpolate( this->state, riemannian_center_of_mass, GetRadius()/d, riemannian_center_of_mass);
+    //Project RCoM onto boundary
+    Q1->interpolate( this->state, riemannian_center_of_mass, GetRadius()/d, riemannian_center_of_mass);
   }
 }
 

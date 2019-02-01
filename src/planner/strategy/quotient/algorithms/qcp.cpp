@@ -163,7 +163,7 @@ void QCP::RewireCover(ob::PlannerTerminationCondition &ptc)
 
   if(neighbors.size()>=K){
     Configuration *qn = neighbors.at(K-1);
-    double dn = metric->DistanceNeighborhoodNeighborhood(q, qn);
+    double dn = GetMetric()->DistanceNeighborhoodNeighborhood(q, qn);
     if(dn <= 1e-10){
       AddEdge(q, qn);
       pdf_connectivity_configurations.update(static_cast<PDF_Element*>(qn->GetConnectivityPDFElement()), ValueConnectivity(qn));

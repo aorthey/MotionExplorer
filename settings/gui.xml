@@ -74,22 +74,6 @@
     <key>u</key>
     <active>0</active>
   </checkbox>
-  <button>
-    <name>toggle_mode</name>
-    <descr>Toggle Mode</descr>
-    <key>m</key>
-  </button>
-
-  <button>
-    <name>save_current_path</name>
-    <descr>Save Current Path</descr>
-    <key>0</key>
-  </button>
-  <button>
-    <name>load_current_path</name>
-    <descr>Load Current Path</descr>
-    <key>9</key>
-  </button>
 
   <!-- <hotkey> -->
   <!--   <name>reset</name> -->
@@ -188,31 +172,6 @@
   </hotkey>
 
   <checkbox>
-    <name>roadmap_visualize_level_0</name>
-    <descr>Roadmap Vis Level 0</descr>
-    <key>6</key>
-    <active>1</active>
-  </checkbox>
-  <checkbox>
-    <name>roadmap_visualize_level_1</name>
-    <descr>Roadmap Vis Level 1</descr>
-    <key>7</key>
-    <active>1</active>
-  </checkbox>
-  <checkbox>
-    <name>roadmap_visualize_level_2</name>
-    <descr>Roadmap Vis Level 2</descr>
-    <key>8</key>
-    <active>0</active>
-  </checkbox>
-  <checkbox>
-    <name>roadmap_visualize_level_3</name>
-    <descr>Roadmap Vis Level 3</descr>
-    <key>9</key>
-    <active>0</active>
-  </checkbox>
-
-  <checkbox>
     <name>draw_roadmap_vertices</name>
     <key>1</key>
     <active>1</active>
@@ -237,22 +196,6 @@
     <key>5</key>
     <active>1</active>
   </checkbox>
-
-  <!-- <slider> -->
-  <!--   <name>draw_cover_threshold</name> -->
-  <!--   <value>5</value> -->
-  <!--   <min>0</min> -->
-  <!--   <max>10</max> -->
-  <!--   <step>1</step> -->
-  <!-- </slider> -->
-  <!-- <hotkey> -->
-  <!--   <name>draw_cover_threshold_up</name> -->
-  <!--   <key>z</key> -->
-  <!-- </hotkey> -->
-  <!-- <hotkey> -->
-  <!--   <name>draw_cover_threshold_down</name> -->
-  <!--   <key>x</key> -->
-  <!-- </hotkey> -->
 
   <hotkey>
     <name>planner_draw_start_goal_configuration</name>
@@ -281,19 +224,35 @@
     <key>N</key>
     <active>1</active>
   </hotkey>
-  <hotkey>
+
+
+  <button>
     <name>reset_view</name>
     <key>z</key>
-    <active>0</active>
-  </hotkey>
-  <hotkey>
+  </button>
+  <button>
     <name>load_view</name>
     <key>v</key>
-  </hotkey>
-  <hotkey>
+  </button>
+  <button>
     <name>save_view</name>
     <key>V</key>
-  </hotkey>
+  </button>
+  <button>
+    <name>toggle_mode</name>
+    <descr>Toggle Mode</descr>
+    <key>m</key>
+  </button>
+  <button>
+    <name>save_current_path</name>
+    <descr>Save Current Path</descr>
+    <key>0</key>
+  </button>
+  <button>
+    <name>load_current_path</name>
+    <descr>Load Current Path</descr>
+    <key>9</key>
+  </button>
 
   <!-- <hotkey> -->
   <!--   <name>next_mode</name> -->

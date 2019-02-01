@@ -56,6 +56,10 @@ double QuotientMetric::DistanceNeighborhoodNeighborhood(const Configuration *q_f
   double d_open_neighborhood_distance = (double)std::max(d - d_from - d_to, 0.0); 
   return d_open_neighborhood_distance;
 }
+double QuotientMetric::DistanceConfigurationConfiguration(const Configuration *q_from, const Configuration *q_to) 
+{
+  return DistanceQ1(q_from, q_to);
+}
 //############################################################################
 //Interpolate Functions
 //############################################################################
@@ -73,6 +77,11 @@ void QuotientMetric::Interpolate(const Configuration *q_from, const Configuratio
   double radius = q_from->GetRadius();
   double step_size = radius/d;
   Interpolate(q_from, q_to, step_size, q_interp);
+}
+
+void QuotientMetric::Interpolate(const Configuration *q_from, const Configuration *q_to, double step_size, Configuration *q_interp)
+{
+  return quotient_cover->GetQ1()->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_interp->state);
 }
 
 //stepsize \in [0,1]

@@ -671,7 +671,15 @@ Experiments for paper:
  [ ] Interpolate (QuotientCover.cpp:1055)
 
 
-[ ] Outsource interpolate
-
-[ ] Comment out all interpolate, move to metric, and implement
+[x] Outsource interpolate
+[x] Comment out all interpolate, move to metric, and implement
 EuclideaMEtricInterpolation
+
+[ ] Why is NearestK not working correctly? (because of pseudo metric?) (because
+of pseudo metric?)
+[ ] What to do if Riemannian CoM lies near center? Random Perturbation (this
+would cause the algorithm to move towards bad position). 
+
+Main problem is the ambiguity which has been raised, i.e. it is a classical case
+where several RCoM coexists. Which one should we pick?  Better: Random
+Perturbation, but then project back onto the plane
