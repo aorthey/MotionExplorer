@@ -159,6 +159,24 @@
   <!--   <descr>Draw Next Robot</descr> -->
   <!--   <key>M</key> -->
   <!-- </hotkey> -->
+
+
+  <slider>
+    <name>path_speed</name>
+    <value>1</value>
+    <min>0.5</min>
+    <max>100</max>
+    <step>0.5</step>
+  </slider>
+  <hotkey>
+    <name>path_speed_increase</name>
+    <key>8</key>
+  </hotkey>
+  <hotkey>
+    <name>path_speed_decrease</name>
+    <key>7</key>
+  </hotkey>
+
   <checkbox>
     <name>draw_robot</name>
     <descr>Draw Original Robot</descr>

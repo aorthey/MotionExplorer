@@ -20,7 +20,7 @@ class MotionPlanner{
 
     MotionPlanner(RobotWorld *world_, PlannerInput& input_);
 
-    const PlannerInput& GetInput();
+    PlannerInput& GetInput();
     PathPiecewiseLinear* GetPath();
 
     //folder-like operations on hierarchical roadmap

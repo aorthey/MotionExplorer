@@ -88,12 +88,20 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     state("planner_draw_goal_configuration").toggle();
   }else if(cmd=="planner_draw_start_configuration"){
     state("planner_draw_start_configuration").toggle();
-  }else if(cmd=="draw_cover_threshold_up"){
-    GUIVariable &v = state("draw_cover_threshold");
+  }else if(cmd=="path_speed_increase"){
+    MotionPlanner* planner = planners.at(active_planner);
+    GUIVariable &v = state("path_speed");
+    v.value = planner->GetInput().pathSpeed;
     v.value = min(v.max, v.value + v.step);
-  }else if(cmd=="draw_cover_threshold_down"){
-    GUIVariable &v = state("draw_cover_threshold");
+    planner->GetInput().pathSpeed = v.value;
+    std::cout << "Increased path speed to " << v.value << std::endl;
+  }else if(cmd=="path_speed_decrease"){
+    MotionPlanner* planner = planners.at(active_planner);
+    GUIVariable &v = state("path_speed");
+    v.value = planner->GetInput().pathSpeed;
     v.value = max(v.min, v.value - v.step);
+    planner->GetInput().pathSpeed = v.value;
+    std::cout << "Decreased path speed to " << v.value << std::endl;
   }else if(cmd=="draw_text"){
     state("draw_text_robot_info").toggle();
     state("draw_text_planner").toggle();

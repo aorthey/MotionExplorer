@@ -247,7 +247,7 @@ void MotionPlanner::AdvanceUntilSolution()
   output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
 }
 
-const PlannerInput& MotionPlanner::GetInput(){
+PlannerInput& MotionPlanner::GetInput(){
   return input;
 }
 bool MotionPlanner::isActive(){
