@@ -160,7 +160,6 @@
   <!--   <key>M</key> -->
   <!-- </hotkey> -->
 
-
   <slider>
     <name>path_speed</name>
     <value>1</value>

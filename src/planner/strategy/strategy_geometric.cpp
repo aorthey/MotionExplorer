@@ -12,6 +12,7 @@
 //#include "planner/strategy/quotientchart/algorithms/qng2.h"
 //#include "planner/strategy/quotient/algorithms/qng.h"
 #include "planner/strategy/quotient/algorithms/qcp.h"
+#include "planner/strategy/quotient/algorithms/qsampler.h"
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -147,6 +148,9 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   }else if(algorithm=="hierarchy:qcp"){
     planner = GetSharedMultiQuotientPtr<og::QCP>(si_vec, pdef_vec);
     planner->setName("QCP");
+  }else if(algorithm=="hierarchy:sampler"){
+    planner = GetSharedMultiQuotientPtr<og::QSampler>(si_vec, pdef_vec);
+    planner->setName("QSampler");
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);

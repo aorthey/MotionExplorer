@@ -17,7 +17,7 @@ namespace ompl
     public:
 
       QCP(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
-      ~QCP(void);
+      ~QCP(void) = default;
 
       void clear() override;
       void setup() override;

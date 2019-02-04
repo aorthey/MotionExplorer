@@ -200,7 +200,7 @@ namespace ompl
       //Connect strategies
       //#######################################################################
       virtual void Grow(double t) override = 0;
-      bool GetSolution(ob::PathPtr &solution) override;
+      virtual bool GetSolution(ob::PathPtr &solution) override;
       virtual double GetImportance() const override;
 
       // bool Interpolate(const Configuration*, Configuration*);

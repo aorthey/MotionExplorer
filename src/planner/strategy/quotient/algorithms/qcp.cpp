@@ -15,10 +15,6 @@ QCP::QCP(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, pare
   progressMadeTowardsGoal = true;
 }
 
-QCP::~QCP(void)
-{
-}
-
 void QCP::setup()
 {
   BaseT::setup();

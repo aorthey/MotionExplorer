@@ -33,15 +33,15 @@ Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.prat
 
 <h3>Ubuntu 16.04</h3>
 
-      sudo apt-get install g++-5 libboost1.55-all-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev
+      sudo apt-get install libboost1.55-all-dev
 
 <h3>Ubuntu 18.04</h3>
 
-      sudo apt-get install g++-5 libboost1.65-all-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev libqhull-dev
+      sudo apt-get install libboost1.65-all-dev
 
 <h3>Install Klampt 0.6 (all Ubuntu versions)</h3>
 
-      sudo apt-get install g++ cmake git libboost-system-dev libboost-thread-dev freeglut3 freeglut3-dev libglpk-dev python-dev python-opengl libxmu-dev libxi-dev libqt4-dev
+      sudo apt-get install g++-5 cmake git libboost-system-dev libboost-thread-dev freeglut3 freeglut3-dev libglpk-dev python-dev python-opengl libxmu-dev libxi-dev libqt4-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev libqhull-dev
       git clone git@github.com:aorthey/Klampt.git
       cd Klampt/Library
       make unpack-deps
@@ -51,8 +51,6 @@ Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.prat
       cd ..
       cmake .
       make
-
-
 
 <h1>Install</h1>
 

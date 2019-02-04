@@ -142,8 +142,8 @@ void QuotientCover::Configuration::UpdateRiemannianCenterOfMass(og::QuotientCove
 
     Q1->interpolate(riemannian_center_of_mass, q_new->state, (1.0/(number_of_neighbors+1)), riemannian_center_of_mass );
     //Project onto NBH
-    double d = Q1->distance(this->state, riemannian_center_of_mass);
-    if(d<1e-5){
+    double d = 0;//Q1->distance(this->state, riemannian_center_of_mass);
+    while((d = Q1->distance(this->state, riemannian_center_of_mass)) < 1e-5){
       //If RCoM lies close to center, this means that the old RCoM and the new
       //state lie opposite to each other on the neighborhood, they are
       //antipoles. Therefore, there exists a unique plane through the center,
@@ -158,11 +158,11 @@ void QuotientCover::Configuration::UpdateRiemannianCenterOfMass(og::QuotientCove
       //q_new->state. It is not clear how we can do that in OMPL. Can we somehow
       //work around here?
 
-      std::cout << "[WARNING]: Riemannian Center of Mass conincides with center" << std::endl;
+      //std::cout << "[WARNING]: Riemannian Center of Mass conincides with center" << std::endl;
       quotient_cover->GetQ1SamplerPtr()->sampleUniformNear(riemannian_center_of_mass, this->state, this->GetRadius());
 
       //Update distance
-      d = Q1->distance(this->state, riemannian_center_of_mass);
+      //d = Q1->distance(this->state, riemannian_center_of_mass);
     }
     //Project RCoM onto boundary
     Q1->interpolate( this->state, riemannian_center_of_mass, GetRadius()/d, riemannian_center_of_mass);

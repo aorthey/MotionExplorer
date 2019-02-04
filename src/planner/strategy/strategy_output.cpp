@@ -122,9 +122,10 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
     pdi->decoupleFromPlanner();
 
     PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pdi->getVertex(0));
+    RoadmapPtr roadmap_k = nullptr;
     if(v==nullptr)
     {
-      RoadmapPtr roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.back());
+      roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.back());
       std::vector<int> path;
       hierarchy->AddNode( roadmap_k, path);
       if(current->children.size()>0)
@@ -138,21 +139,23 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
       }
       std::cout << "added " << pdi->numVertices() << " unannotated vertices." << std::endl;
     }else{
+      std::cout << std::string(80, '#') << std::endl;
+      std::cout << "added " << pdi->numVertices() << " annotated vertices." << std::endl;
+      std::cout << std::string(80, '#') << std::endl;
       std::vector<int> path = v->GetPath();
       uint level = v->GetLevel();
 
-      RoadmapPtr roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.at(level));
+      roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.at(level));
       //std::cout << "level " << path << " : " << pdi->numVertices() << " | " << pdi->numEdges() << std::endl;
       while(!hierarchy->NodeExists(path)){
         std::vector<int> ppath(path.begin(), path.end()-1);
         hierarchy->AddNode( roadmap_k, ppath);
       }
-      //uint robot_idx = cspace_levels.at(level)->GetRobotIndex();
-      std::string rname = cspace_levels.at(level)->GetRobotPtr()->name;
-      std::string fname = "../data/samples/cspace_robot_"+rname+".samples";
-      roadmap_k->Save(fname.c_str());
       hierarchy->UpdateNode( roadmap_k, path);
     }
+    std::string rname = cspace_levels.back()->GetRobotPtr()->name;
+    std::string fname = "../data/samples/cspace_robot_"+rname+".samples";
+    roadmap_k->Save(fname.c_str());
   }
 
   if(current->children.size() == 0)
