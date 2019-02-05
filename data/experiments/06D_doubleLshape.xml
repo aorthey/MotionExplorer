@@ -13,6 +13,7 @@
    <robot name="capsule_outer" file="../robots/DoubleLshape_capsule_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
    <robot name="sphere_inner" file="../robots/DoubleLshape_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
    <robot name="sphere_outer" file="../robots/DoubleLshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+   <robot name="point_inner" file="../robots/DoubleLshape_point_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
    <terrain name="doublelshape.tri" file="../terrains/DoubleLshape_large.tri" translation="0 0 0"/>
   <!-- <terrain name="O1" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/> -->
@@ -28,6 +29,7 @@
     <maxplanningtime>1</maxplanningtime>
 
     <hierarchy>
+      <level inner_index="5" outer_index="4" cspace_constant="1" type="R3"/>
       <level inner_index="3" outer_index="4" cspace_constant="1" type="R3"/>
       <level inner_index="0" cspace_constant="0.512159005656" type="SE3"/>
     </hierarchy>
