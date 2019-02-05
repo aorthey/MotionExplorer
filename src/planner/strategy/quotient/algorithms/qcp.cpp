@@ -184,3 +184,19 @@ void QCP::RemoveConfigurationFromCover(Configuration *q)
 }
 
 
+double QCP::GetImportance() const
+{
+  //approximation of total volume covered
+  //double percentageCovered = totalVolumeOfCover/Q1->getStateSpace()->getMeasure();
+  //the more sampled, the less important this space becomes
+  //return 1.0/(totalVolumeOfCover+1);
+
+  if(!hasSolution && progressMadeTowardsGoal){
+    //If we move towards goal, greedily allocate all computational resources
+    return +dInf;
+  }else{
+    return 1.0/(boost::num_vertices(graph)+1);
+  }
+  //double importance = pow((double)2.0, level);
+  //return importance;
+}

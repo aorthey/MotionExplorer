@@ -26,6 +26,8 @@ namespace ompl
       void GrowWithSolution(ob::PlannerTerminationCondition &ptc);
       void GrowWithoutSolution(ob::PlannerTerminationCondition &ptc);
 
+      virtual double GetImportance() const override;
+
       void RewireCover(ob::PlannerTerminationCondition &ptc);
       virtual Vertex AddConfigurationToCover(Configuration *q) override;
       virtual void RemoveConfigurationFromCover(Configuration *q) override;

@@ -171,10 +171,10 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const
         uint n = Q1->getDimension();
         if( Q0->getType() == base::STATE_SPACE_REAL_VECTOR ){
           uint m = Q0->getDimension();
-          if(n>m && m>0){
+          if(n>=m && m>0){
             type = RN_RM;
           }else{
-            std::cout << "not allowed: we need n>m>0, but have " << n << ">" << m << ">0" << std::endl;
+            std::cout << "not allowed: dimensionality needs to be monotonically increasing. we need n>=m>0, but have " << n << ">=" << m << ">0" << std::endl;
             exit(0);
           }
         }else{
