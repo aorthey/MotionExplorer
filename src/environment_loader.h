@@ -21,6 +21,7 @@ class EnvironmentLoader{
     PlannerMultiInput pin;
 
   public:
+    bool startGUI();
     RobotWorld& GetWorld();
     RobotWorld* GetWorldPtr();
     Robot* GetRobotPtr();

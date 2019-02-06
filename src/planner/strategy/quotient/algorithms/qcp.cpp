@@ -63,9 +63,6 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
     //############################################################################
     //STATE1: GoalOriented Strategy
     //############################################################################
-
-    if(verbose>1) std::cout << "Step Towards Goal" << std::endl;
-
     Configuration* q_nearest = PriorityQueueNearestToGoal_Top();
     if(q_nearest == nullptr) return;
 
@@ -73,30 +70,20 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
     if(!progressMadeTowardsGoal){
       q_nearest->number_attempted_expansions++;
     }
-    if(verbose>1) std::cout << "Progress: "<< (progressMadeTowardsGoal?"Yes":"No") << std::endl;
-
-    //############################################################################
   }else{
     Configuration* q = PriorityQueueCandidate_PopTop();
     if(q!=nullptr){
-      if(verbose>1) std::cout << std::string(80, '-') << std::endl;
-      if(verbose>1) PrintQueue(10);
       //############################################################################
       //STATE2: ExtendFreeSpace Strategy (Active Node Expansion)
       //############################################################################
-      if(verbose>1) std::cout << "Expand Largest Single-Connected Node" << std::endl;
-
       if(q->index < 0){
         AddConfigurationToCover(q);
       }
       step_strategy->ExpandOutside(q);
-      if(verbose>1) PrintQueue(10);
-      if(verbose>1) std::cout << std::string(80, '-') << std::endl;
     }else{
       //############################################################################
       //STATE3: FindNewWays (Passive Node Expansion)
       //############################################################################
-      if(verbose>1) std::cout << "Generate New Configurations" << std::endl;
       q = pdf_connectivity_configurations.sample(rng_.uniform01());
       step_strategy->ExpandRandom(q);
     }
@@ -107,7 +94,7 @@ void QCP::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
 {
   double r = rng_.uniform01();
   if(r <= rewireBias){
-    //RewireCover(ptc);
+    RewireCover(ptc);
   }else{
     Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
     step_strategy->ExpandOutside(q);

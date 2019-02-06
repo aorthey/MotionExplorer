@@ -10,7 +10,7 @@
   <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
   <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="-2.8 0 0" rotateRPY="0 0 0.78"/>
 -->
-  <rigidObject name="O1" file="../terrains/2droom_corner.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
+  <rigidObject name="O1" file="../terrains/2droom/2droom_corner.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
   <!-- <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="-2.8 0 0" rotateRPY="0 0 1.57"/> -->
 
   <plannerinput>

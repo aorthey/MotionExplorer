@@ -63,11 +63,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
     if(!(world.robots[0]->joints[0].type == RobotJoint::Floating)){
       std::cout << "First joint of robot should be a free floating joint" << std::endl;
       std::cout << "But actual type is: " << world.robots[0]->joints[0].type << std::endl;
-      //exit(0);
-      //break;
     }
-
-    // Robot *robot = world.robots[0];
 
     if(pin.Load(file_name.c_str())){
 
@@ -145,6 +141,11 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
   _backend->wrenchfield.Load(file_name.c_str());
   //std::cout << _backend->wrenchfield << std::endl;
 }
+bool EnvironmentLoader::startGUI()
+{
+  return pin.startGUI();
+}
+
 void EnvironmentLoader::LoadController(Robot *robot, const PlannerInput &pin)
 {
   std::cout << "Adding free float driver to robot " << name_robot << std::endl;

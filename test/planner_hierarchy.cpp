@@ -14,13 +14,17 @@ int main(int argc, char **argv) {
   GLUIPlannerGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.AddPlannerInput(in);
   gui.SetWindowTitle("MotionPlannerVisualizer");
-
   if(in.inputs.empty()) env.GetBackendPtr()->state("draw_robot").active = 1;
 
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "GUI Start" << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
-  gui.Run();
+  if(env.startGUI()){
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "GUI Start" << std::endl;
+    std::cout << std::string(80, '-') << std::endl;
+    gui.Run();
+  }else{
+    //directly run first planner
+    gui.backend->OnCommand("planner_advance_until_solution","");
+  }
 
   return 0;
 }

@@ -16,6 +16,11 @@ bool PlannerMultiInput::Load(const char* file){
   }
   return (inputs.size()>0);
 }
+bool PlannerMultiInput::startGUI()
+{
+  if(inputs.size()>0) return inputs.at(0)->startGUI;
+  else return true;
+}
 
 std::vector<std::string> PlannerMultiInput::GetAlgorithms(bool kinodynamic)
 {
@@ -80,6 +85,7 @@ void PlannerInput::SetDefault()
   smoothPath = GetSubNodeText<int>(node, "smoothPath");
   kinodynamic = GetSubNodeText<int>(node, "kinodynamic");
   name_sampler = GetSubNodeAttribute<std::string>(node, "sampler", "name");
+  startGUI = GetSubNodeTextDefault<int>(node, "startGUI", true);
 }
 
 bool PlannerInput::Load(TiXmlElement *node)
