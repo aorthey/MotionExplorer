@@ -141,10 +141,6 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
   _backend->wrenchfield.Load(file_name.c_str());
   //std::cout << _backend->wrenchfield << std::endl;
 }
-bool EnvironmentLoader::startGUI()
-{
-  return pin.startGUI();
-}
 
 void EnvironmentLoader::LoadController(Robot *robot, const PlannerInput &pin)
 {

@@ -49,8 +49,6 @@ class PlannerInput{
     Config uMin;
     Config uMax;
 
-    bool startGUI{true};
-
     //input for hierarchical planner methods
     std::vector<int> robot_idxs;
     std::vector<Layer> layers;
@@ -73,6 +71,5 @@ struct PlannerMultiInput{
   bool Load(const char* file);
   bool Load(TiXmlElement *node);
   std::vector<std::string> GetAlgorithms(bool kinodynamic);
-  bool startGUI();
 };
 

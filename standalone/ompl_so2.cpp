@@ -4,6 +4,7 @@
 #include <ompl/util/Time.h>
 #include <iostream>
 #include <boost/math/constants/constants.hpp>
+#include "ompl/base/spaces/SO2StateSpaceFullInterpolate.h"
 
 
 namespace ob = ompl::base;

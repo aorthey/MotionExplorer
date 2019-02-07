@@ -63,7 +63,6 @@ namespace ompl
 
           base::State *state{nullptr};
           Configuration *coset{nullptr}; //the underlying coset this Vertex belongs to (on the quotient-space)
-          Configuration *parent_neighbor{nullptr}; //the configuration from which this configuration has been spawned
           base::State *riemannian_center_of_mass{nullptr}; //geometric mean constrained to neighborhood boundary
           uint number_of_neighbors{0}; //counter for incremental computation of riemannian center of mass (RCoM)
 

@@ -27,7 +27,7 @@ bool StepStrategy::ExpandRandom(QuotientCover::Configuration *q_from)
   double d = metric->DistanceConfigurationConfiguration(q_next, q_from);
   quotient_cover_queue->GetQ1()->getStateSpace()->interpolate(q_from->state, q_next->state, q_from->GetRadius()/d, q_next->state);
 
-  q_next->parent_neighbor = q_from;
+  //q_next->parent_neighbor = q_from;
   //############################################################################
 
   if(quotient_cover_queue->ComputeNeighborhood(q_next)){

@@ -4,11 +4,7 @@ import re
 import numpy as np
 
 fname = "/home/aorthey/git/orthoklampt/build/"
-#out = subprocess.check_output(["cd", fname])
-out = subprocess.check_output(["ls", "-la"],cwd=fname)
 
-#print out
-#out = subprocess.check_output(["makerunarg", "planner_standalone", "../data/experiments/03D_corner.xml"],cwd=fname, shell=True)
 def Execute(name, N, max_time):
   times = []
   for i in range(0,N):
@@ -17,16 +13,17 @@ def Execute(name, N, max_time):
     except Exception, e:
       out = str(e.output)
     m = re.search(r'(planner time.*:).*(\d+\.\d+)',out)
-    t = float(m.group(2))
-    times.append(t)
-    #print "time:",m.group(2)
 
+    if m is None:
+      times.append(max_time)
+    else:
+      t = float(m.group(2))
+      times.append(t)
   times = np.array(times)
   sN = len(times[times < max_time])
-  print name,":",sN,"/",N," successful. Average time: ",np.mean(times), ", Worst time: ",np.max(times)
+  print name,":",sN,"/",N," successful. Times: (Average:",np.mean(times), "Worst:",np.max(times), "Max:", max_time,")"
 
-
-  
-#Execute("02D_disk.xml", 5, 1.0)
+Execute("02D_disk.xml", 5, 1.0)
 Execute("03D_corner.xml", 5, 0.5)
 Execute("03D_misleading.xml", 5, 0.5)
+Execute("03D_nonsimple.xml", 5, 2.0)

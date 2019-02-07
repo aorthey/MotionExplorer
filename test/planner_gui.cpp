@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
 
   GLUIPlannerGUI gui(env.GetBackendPtr(),env.GetWorldPtr());
   gui.AddPlannerInput(in);
-  gui.SetWindowTitle("MotionPlannerVisualizer");
+  gui.SetWindowTitle("MotionPlannerGUI");
   if(in.inputs.empty()) env.GetBackendPtr()->state("draw_robot").active = 1;
 
   std::cout << std::string(80, '-') << std::endl;

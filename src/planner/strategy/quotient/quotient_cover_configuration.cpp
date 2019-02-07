@@ -41,7 +41,6 @@ void QuotientCover::Configuration::Clear()
   number_attempted_expansions = 0;
   number_successful_expansions = 0;
 
-  parent_neighbor = nullptr;
   isSufficientFeasible = false;
   pdf_element = nullptr;
   pdf_necessary_element = nullptr;
@@ -90,13 +89,6 @@ double QuotientCover::Configuration::GetGoalDistance() const
 }
 ob::State* QuotientCover::Configuration::GetInwardPointingConfiguration() const
 {
-  if(number_of_neighbors==0){
-    if(parent_neighbor==nullptr){
-      std::cout << "No neighbors, no parent. Cannot compute an Outward pointing configuration" << std::endl;
-      exit(0);
-    }
-    return parent_neighbor->state;
-  }
   return riemannian_center_of_mass;
 }
 

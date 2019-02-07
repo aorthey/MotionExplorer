@@ -368,16 +368,7 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
 
     std::cout << "Detected no neighbors. This is usually a problem of the Interpolate() function, which has probably interpolated to a configuration which lies OUTSIDE of our cover (i.e. we went outside of the neighborhood we started with)." << std::endl;
     QuotientCover::Print(q, false);
-    QuotientCover::Print(q->parent_neighbor, false);
     OMPL_ERROR("No Neighbors -- Cannot add to cover (Needs to be one single connected component)");
-    double d1 = metric->DistanceConfigurationConfiguration(q, q->parent_neighbor);
-    double d2 = q->parent_neighbor->GetRadius();
-    std::cout << (EdgeExists(q, q->parent_neighbor)?"Edge exists":"No Edge")<< std::endl;
-    const double dqqk = metric->DistanceNeighborhoodNeighborhood(q, q->parent_neighbor);
-    std::cout << "Distance to parent  : " << d1 << std::endl;
-    std::cout << "Radius of parent NBH: " << d2 << std::endl;
-    std::cout << "Distance of configuration to boundary of nearest NBH: " << fabs(d1-d2) << std::endl;
-    std::cout << "Distance NBH-NBH    : " << dqqk << std::endl;
     std::cout << "NearestK found " << neighbors.size() << " neighbors." << std::endl;
     Configuration *qn = nearest_neighborhood->nearest(q);
     std::cout << "Distance to nearest NBH: " << metric->DistanceNeighborhoodNeighborhood(q, qn) << std::endl;
@@ -385,9 +376,6 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
     for(uint k = 0; k < neighbors.size(); k++){
       Configuration *qk = neighbors.at(k);
       std::cout << "NEIGHBOR " << k << "/" << neighbors.size()<< ":";
-      if(qk==q->parent_neighbor){
-        std::cout << " IS PARENT NEIGHBOR";
-      }
       if(IsNeighborhoodInsideNeighborhood(qk, q)){
         std::cout << "is inside current NBH (and has been flagged for removal)";
       }else{
@@ -403,8 +391,6 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
       std::cout << "|" << std::endl;
 
     }
-    std::cout << "parent had " << q->parent_neighbor->number_of_neighbors << " neighbors." << std::endl;
-    //(Did we just delete all its neighbors in the last step?)
     exit(0);
   }
 
@@ -422,7 +408,6 @@ int QuotientCover::GetNumberOfEdges(Configuration *q)
 QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Configuration *q_center)
 {
   Configuration *q_inward_to_outward = new Configuration(GetQ1(), q_center->GetInwardPointingConfiguration());
-  q_inward_to_outward->parent_neighbor = q_center;
   q_inward_to_outward->coset = q_center->coset;
 
   double radius = q_center->GetRadius();
@@ -750,7 +735,6 @@ QuotientCover::Configuration* QuotientCover::SampleNeighborhoodBoundary(Configur
   }
 
   metric->InterpolateQ1(q_center, q_next, radius/d, q_next);
-  q_next->parent_neighbor = q_center;
 
   return q_next;
 }
@@ -786,7 +770,6 @@ QuotientCover::Configuration* QuotientCover::SampleNeighborhoodBoundaryUniformNe
 
   ProjectConfigurationOntoNeighborhoodBoundary(q_center, q_next);
 
-  q_next->parent_neighbor = q_center;
   if(ComputeNeighborhood(q_next)){
     return q_next;
   }else{
@@ -867,7 +850,6 @@ QuotientCover::Configuration* QuotientCover::NearestConfigurationOnBoundary(Conf
   Configuration *q_projected = new Configuration(Q1);
   metric->Interpolate(q_center, q_outside, q_projected);
 
-  q_projected->parent_neighbor = q_center;
   if(ComputeNeighborhood(q_projected)){
     return q_projected;
   }else{
@@ -971,7 +953,6 @@ bool QuotientCover::GetSolution(ob::PathPtr &solution)
     Configuration* qn = Nearest(q_goal);
     double d_goal = metric->DistanceNeighborhoodNeighborhood(qn, q_goal);
     if(d_goal < 1e-10){
-      q_goal->parent_neighbor = qn;
       v_goal = AddConfigurationToCover(q_goal);
       AddEdge(q_goal, qn);
       isConnected = true;
@@ -986,7 +967,6 @@ bool QuotientCover::GetSolution(ob::PathPtr &solution)
     //DEBUG
     // std::cout << std::string(80, '-') << std::endl;
     // std::cout << "found goal" << std::endl;
-    // double d_goal = DistanceNeighborhoodNeighborhood(q_goal, q_goal->parent_neighbor);
     // std::cout << "distance: " << d_goal << std::endl;
     // QuotientCover::Print(q_start, false);
     // QuotientCover::Print(q_goal, false);
@@ -1210,7 +1190,6 @@ void QuotientCover::Print(const Configuration *q, bool stopOnError) const
   std::cout << " | radius: " << q->GetRadius();
   std::cout << " | distance goal: " << q->GetGoalDistance();
   std::cout << " | coset : " << (q->coset==nullptr?"-":std::to_string(q->coset->index)) << std::endl;
-  std::cout << " | parent index : " << (q->parent_neighbor==nullptr?"-":std::to_string(q->parent_neighbor->index)) << std::endl;
   std::cout << " | neighbors : " << (q->number_of_neighbors) << std::endl;
   std::cout << (q->isGoal?" | GOAL STATE":"") << (q->isStart?" | START STATE":"") << std::endl;
   if(q->index < 0)

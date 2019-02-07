@@ -679,3 +679,6 @@ EuclideaMEtricInterpolation
 of pseudo metric?)
 
 [ ] Still problem when removing a vertex 
+
+
+REPLACE SO2 WITH SO2INTERPOLATE
