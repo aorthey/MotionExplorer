@@ -108,6 +108,7 @@ namespace ompl
           ob::Cost cost{+dInf};
           bool isSufficient{false};
       };
+    private:
 
       struct GraphBundle{
         // put PDFs and neighborhood structures here (so they get copied when
@@ -126,6 +127,7 @@ namespace ompl
        > Graph;
       friend std::ostream& operator<< (std::ostream& out, const Graph& graph);
 
+    protected:
       typedef boost::graph_traits<Graph> BGT;
       typedef BGT::vertex_descriptor Vertex;
       typedef BGT::edge_descriptor Edge;
@@ -135,9 +137,6 @@ namespace ompl
       typedef Vertex* VertexParent;
       typedef VertexIndex* VertexRank;
       //typedef std::function<const std::vector<Vertex> &(const Vertex)> ConnectionStrategy;
-      typedef std::shared_ptr<NearestNeighbors<Configuration*>> NearestNeighborsPtr;
-      typedef ompl::PDF<Configuration*> PDF;
-      typedef PDF::Element PDF_Element;
 
       
       //keep manual track of indices, because we sometimes need to remove
@@ -152,9 +151,13 @@ namespace ompl
       typedef std::map<normalized_index_type, typename boost::graph_traits<Graph>::vertex_descriptor> NormalizedIndexToVertexMap;
       NormalizedIndexToVertexMap normalizedIndexToVertexStdMap;
       boost::associative_property_map<NormalizedIndexToVertexMap> normalizedIndexToVertex{normalizedIndexToVertexStdMap};
-
       normalized_index_type index_ctr{0};
 
+    public:
+
+      typedef std::shared_ptr<NearestNeighbors<Configuration*>> NearestNeighborsPtr;
+      typedef ompl::PDF<Configuration*> PDF;
+      typedef PDF::Element PDF_Element;
       //#######################################################################
       //Configuration Create, Remove, Add 
       //#######################################################################
@@ -169,7 +172,6 @@ namespace ompl
 
       bool ComputeNeighborhood(Configuration *q, bool verbose = false);
       void RewireConfiguration(Configuration *q);
-      void RerouteEdgesFromTo(Configuration *q_from, Configuration *q_to);
 
       std::vector<Vertex> GetCoverPath(const Vertex& v_source, const Vertex& v_sink);
       std::vector<const Configuration*> GetCoverPath(const Configuration *q_source, const Configuration *q_sink);
@@ -196,9 +198,7 @@ namespace ompl
       Configuration* GetOutwardPointingConfiguration(Configuration *q);
 
       void Init();
-      bool firstRun{true};
       void Test();
-
 
       //#######################################################################
       //Neighborhood Set Computations
@@ -206,7 +206,8 @@ namespace ompl
       bool IsConfigurationInsideNeighborhood(Configuration *q, Configuration *qn);
       bool IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rhs);
       bool IsConfigurationInsideCover(Configuration *q);
-      Configuration* Nearest(Configuration *q) const;
+      Configuration* NearestNeighborhood(const Configuration *q) const;
+      Configuration* NearestConfiguration(const Configuration *q) const;
 
       virtual void getPlannerData(base::PlannerData &data) const override;
 
@@ -219,23 +220,24 @@ namespace ompl
 
       double totalVolumeOfCover{0.0};
       bool isConnected{false};
-      bool saturated{false}; //if space is saturated, then we the whole free space has been found
+      bool saturated{false}; //if space is saturated, then the whole free space has been found
+      bool firstRun{true};
 
       Graph graph;
       NearestNeighborsPtr nearest_neighborhood{nullptr};
-      NearestNeighborsPtr nearest_vertex{nullptr};
-      Configuration *q_start{nullptr};
-      Configuration *q_goal{nullptr};
-      Vertex v_start;
-      Vertex v_goal;
+      NearestNeighborsPtr nearest_configuration{nullptr};
       PDF pdf_necessary_configurations;
       PDF pdf_all_configurations;
       std::vector<Vertex> shortest_path_start_goal;
       std::vector<Vertex> shortest_path_start_goal_necessary_vertices;
 
     private:
+      void RerouteEdgesFromTo(Configuration *q_from, Configuration *q_to);
+      Configuration *q_start{nullptr};
+      Configuration *q_goal{nullptr};
       QuotientMetricPtr metric{nullptr};
-
+      Vertex v_start;
+      Vertex v_goal;
 
     public:
 

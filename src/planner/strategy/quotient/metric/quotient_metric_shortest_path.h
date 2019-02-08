@@ -8,6 +8,7 @@ namespace ompl
   {
     class QuotientMetricShortestPath: public QuotientMetric
     {
+        typedef og::QuotientMetric BaseT;
       public:
         typedef og::QuotientCover::Configuration Configuration;
 
@@ -22,7 +23,11 @@ namespace ompl
         //############################################################################
         //Interpolate Functions
         //############################################################################
-        virtual void Interpolate(const Configuration *q_from, const Configuration *q_to, double step, Configuration* q_interp);
+        virtual void Interpolate(const Configuration *q_from, const Configuration *q_to, const double step, Configuration* q_interp) override;
+        virtual void Interpolate(const Configuration *q_from, const Configuration *q_to, Configuration *q_interp) override;
+
+      protected:
+        std::vector<const QuotientCover::Configuration*> GetInterpolationPath(const Configuration *q_from, const Configuration *q_to);
 
 
     };

@@ -37,7 +37,7 @@ void QCP::Grow(double t)
   if(firstRun){
     firstRun = false;
     Init();
-    AddConfigurationToPriorityQueue(q_start);
+    AddConfigurationToPriorityQueue(GetStartConfiguration());
   }
 
   if(saturated) return;
@@ -68,8 +68,12 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
     if(q_nearest == nullptr) return;
 
     q_nearest->number_attempted_expansions++;
-    progressMadeTowardsGoal = step_strategy->Towards(q_nearest, q_goal);
+    std::cout << "step towards goal" << std::endl;
+    progressMadeTowardsGoal = step_strategy->Towards(q_nearest, GetGoalConfiguration());
+    std::cout << "DONE: step towards goal" << std::endl;
+    std::cout << std::string(80, '-') << std::endl;
   }else{
+    std::cout << "step expand" << std::endl;
     Configuration* q = PriorityQueueCandidate_PopTop();
     if(q!=nullptr){
       //############################################################################

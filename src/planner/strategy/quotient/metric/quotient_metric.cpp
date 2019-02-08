@@ -63,7 +63,7 @@ double QuotientMetric::DistanceConfigurationConfiguration(const Configuration *q
 //############################################################################
 //Interpolate Functions
 //############################################################################
-void QuotientMetric::InterpolateQ1(const Configuration *q_from, const Configuration *q_to, double step, Configuration* q_out)
+void QuotientMetric::InterpolateQ1(const Configuration *q_from, const Configuration *q_to, const double step, Configuration* q_out)
 {
   return quotient_cover->GetQ1()->getStateSpace()->interpolate(q_from->state, q_to->state, step, q_out->state);
 }
@@ -79,7 +79,7 @@ void QuotientMetric::Interpolate(const Configuration *q_from, const Configuratio
   Interpolate(q_from, q_to, step_size, q_interp);
 }
 
-void QuotientMetric::Interpolate(const Configuration *q_from, const Configuration *q_to, double step_size, Configuration *q_interp)
+void QuotientMetric::Interpolate(const Configuration *q_from, const Configuration *q_to, const double step_size, Configuration *q_interp)
 {
   return quotient_cover->GetQ1()->getStateSpace()->interpolate(q_from->state, q_to->state, step_size, q_interp->state);
 }

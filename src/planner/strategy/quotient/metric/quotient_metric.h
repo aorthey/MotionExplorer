@@ -28,11 +28,11 @@ namespace ompl
         //############################################################################
         //Interpolate Functions
         //############################################################################
-        virtual void Interpolate(const Configuration *q_from, const Configuration *q_to, double step, Configuration* q_interp);
+        virtual void Interpolate(const Configuration *q_from, const Configuration *q_to, const double step, Configuration* q_interp);
+        virtual void Interpolate(const Configuration *q_from, const Configuration *q_to, Configuration* q_interp);
 
         void Interpolate(const Configuration *q_from, Configuration *q_to);
-        void Interpolate(const Configuration *q_from, const Configuration *q_to, Configuration* q_interp);
-        void InterpolateQ1(const Configuration *q_from, const Configuration *q_to, double step, Configuration* q_interp);
+        void InterpolateQ1(const Configuration *q_from, const Configuration *q_to, const double step, Configuration* q_interp);
 
 
       // bool Interpolate(const Configuration*, Configuration*);

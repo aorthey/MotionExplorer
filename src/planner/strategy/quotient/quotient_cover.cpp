@@ -137,9 +137,9 @@ void QuotientCover::setup(void)
     }
 
   }
-  if (!nearest_vertex){
-    nearest_vertex.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
-    nearest_vertex->setDistanceFunction([this](const Configuration *a, const Configuration *b)
+  if (!nearest_configuration){
+    nearest_configuration.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
+    nearest_configuration->setDistanceFunction([this](const Configuration *a, const Configuration *b)
                              {
                                 return metric->DistanceConfigurationConfiguration(a,b);
                               });
@@ -261,7 +261,7 @@ void QuotientCover::clear()
 
   //Nearestneighbors
   if(nearest_neighborhood) nearest_neighborhood->clear();
-  if(nearest_vertex) nearest_vertex->clear();
+  if(nearest_configuration) nearest_configuration->clear();
 
   shortest_path_start_goal.clear();
   shortest_path_start_goal_necessary_vertices.clear();
@@ -487,7 +487,7 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCoverGraph(Configuration 
   //(2) add to nearest neighbor structure
   //###########################################################################
   nearest_neighborhood->add(q);
-  nearest_vertex->add(q);
+  nearest_configuration->add(q);
 
   //###########################################################################
   //(3) add to PDF
@@ -519,7 +519,7 @@ void QuotientCover::RemoveConfigurationFromCover(Configuration *q)
   //(2) Remove from nearest neighbors structure
   //###########################################################################
   nearest_neighborhood->remove(q);
-  nearest_vertex->remove(q);
+  nearest_configuration->remove(q);
 
   //###########################################################################
   //(3) Remove from cover graph
@@ -790,9 +790,13 @@ void QuotientCover::RewireConfiguration(Configuration *q)
 //   }
 // }
 
-QuotientCover::Configuration* QuotientCover::Nearest(Configuration *q) const
+QuotientCover::Configuration* QuotientCover::NearestNeighborhood(const Configuration *q) const
 {
-  return nearest_neighborhood->nearest(q);
+  return nearest_neighborhood->nearest(const_cast<Configuration*>(q));
+}
+QuotientCover::Configuration* QuotientCover::NearestConfiguration(const Configuration *q) const
+{
+  return nearest_configuration->nearest(const_cast<Configuration*>(q));
 }
 
 void QuotientCover::ProjectConfigurationOntoNeighborhoodBoundary(const Configuration *q_center, Configuration* q_projected)
@@ -805,7 +809,9 @@ void QuotientCover::ProjectConfigurationOntoNeighborhoodBoundary(const Configura
 QuotientCover::Configuration* QuotientCover::NearestConfigurationOnBoundary(Configuration *q_center, const Configuration* q_outside)
 {
   Configuration *q_projected = new Configuration(Q1);
+  std::cout << "NearestConfigurationOnBoundary" << std::endl;
   metric->Interpolate(q_center, q_outside, q_projected);
+  std::cout << "Done NearestConfigurationOnBoundary" << std::endl;
 
   if(ComputeNeighborhood(q_projected)){
     return q_projected;
@@ -818,7 +824,7 @@ QuotientCover::Configuration* QuotientCover::NearestConfigurationOnBoundary(Conf
 bool QuotientCover::GetSolution(ob::PathPtr &solution)
 {
   if(!isConnected){
-    Configuration* qn = Nearest(q_goal);
+    Configuration* qn = NearestNeighborhood(q_goal);
     double d_goal = metric->DistanceNeighborhoodNeighborhood(qn, q_goal);
     if(d_goal < 1e-10){
       v_goal = AddConfigurationToCover(q_goal);
@@ -890,7 +896,7 @@ const QuotientCover::NearestNeighborsPtr& QuotientCover::GetNearestNeighborsCove
 }
 const QuotientCover::NearestNeighborsPtr& QuotientCover::GetNearestNeighborsVertex() const
 {
-  return nearest_vertex;
+  return nearest_configuration;
 }
 
 struct found_goal {}; // exception for termination
@@ -1073,9 +1079,7 @@ void QuotientCover::Print(const Configuration *q, bool stopOnError) const
 void QuotientCover::Print(std::ostream& out) const
 {
   BaseT::Print(out);
-
   out << std::endl << " |---- [Cover] has " << boost::num_vertices(graph) << " vertices and " << boost::num_edges(graph) << " edges. ";
-    //<< num_components << " connected components.";
 }
 
 namespace ompl{
