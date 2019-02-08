@@ -3,6 +3,7 @@
 <world>
 
   <robot name="disk" file="../robots/cylinder_anti_voronoi_bias.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="point" file="../robots/cylinder_point.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
   <terrain name="O1" file="../terrains/2droom/2droom_narrow.tri" translation="0 0 0" rotateRPY="0 0 1.57">
      <display color="0.8 0.8 0.8 0.5" texture="checker" texture_projection="z"/>
@@ -18,6 +19,8 @@
     <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
 
     <hierarchy>
+      <!-- <level inner_index="0" cspace_constant="1" type="R2"/> -->
+      <level inner_index="1" cspace_constant="1" type="R2"/>
       <level inner_index="0" cspace_constant="1" type="R2"/>
     </hierarchy>
 

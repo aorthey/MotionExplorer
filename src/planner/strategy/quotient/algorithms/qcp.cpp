@@ -13,6 +13,7 @@ QCP::QCP(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, pare
 {
   setName("QCP"+std::to_string(id));
   progressMadeTowardsGoal = true;
+  SetMetric("shortestpath");
 }
 
 void QCP::setup()
@@ -66,10 +67,8 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
     Configuration* q_nearest = PriorityQueueNearestToGoal_Top();
     if(q_nearest == nullptr) return;
 
+    q_nearest->number_attempted_expansions++;
     progressMadeTowardsGoal = step_strategy->Towards(q_nearest, q_goal);
-    if(!progressMadeTowardsGoal){
-      q_nearest->number_attempted_expansions++;
-    }
   }else{
     Configuration* q = PriorityQueueCandidate_PopTop();
     if(q!=nullptr){

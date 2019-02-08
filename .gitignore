@@ -17,6 +17,7 @@
 build/
 data/videos/
 data/benchmarks/
+data/samples/
 data/robots/sr_grasp_description/
 data/robots/atlas/
 data/robots/kuka_shadowhand/

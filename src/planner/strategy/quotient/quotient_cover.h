@@ -31,7 +31,7 @@ namespace ompl
       typedef int normalized_index_type;
       
       //#######################################################################
-      //Configuration = ob::State + Open Neighborhood
+      //Configuration = ob::State + Open Neighborhood (Disk)
       //#######################################################################
       class Configuration{
         public:
@@ -62,7 +62,6 @@ namespace ompl
           uint number_successful_expansions{0};
 
           base::State *state{nullptr};
-          Configuration *coset{nullptr}; //the underlying coset this Vertex belongs to (on the quotient-space)
           base::State *riemannian_center_of_mass{nullptr}; //geometric mean constrained to neighborhood boundary
           uint number_of_neighbors{0}; //counter for incremental computation of riemannian center of mass (RCoM)
 
@@ -159,29 +158,19 @@ namespace ompl
       //#######################################################################
       //Configuration Create, Remove, Add 
       //#######################################################################
-      Configuration* CreateConfigurationFromStateAndCoset(const ob::State *state, Configuration *q_coset);
       virtual Vertex AddConfigurationToCover(Configuration *q);
       virtual Vertex AddConfigurationToCoverGraph(Configuration *q);
-      void RerouteEdgesFromTo(Configuration *q_from, Configuration *q_to);
-
+      virtual void AddConfigurationToPDF(Configuration *q);
       virtual void RemoveConfigurationFromCover(Configuration *q);
+
       void AddEdge(Configuration *q_from, Configuration *q_to);
       bool EdgeExists(Configuration *q_from, Configuration *q_to);
       int GetNumberOfEdges(Configuration *q);
-      Configuration* GetOutwardPointingConfiguration(Configuration *q);
 
-      virtual void AddConfigurationToPDF(Configuration *q);
-      bool IsConfigurationInsideCover(Configuration *q);
-      void RemoveConfigurationsFromCoverCoveredBy(Configuration *q);
       bool ComputeNeighborhood(Configuration *q, bool verbose = false);
       void RewireConfiguration(Configuration *q);
-      void CheckConfigurationIsOnBoundary(Configuration *q_boundary, Configuration *q);
+      void RerouteEdgesFromTo(Configuration *q_from, Configuration *q_to);
 
-      void Init();
-      bool firstRun{true};
-      void Test();
-
-      std::vector<const Configuration*> GetInterpolationPath(const Configuration *q_from, const Configuration *q_to);
       std::vector<Vertex> GetCoverPath(const Vertex& v_source, const Vertex& v_sink);
       std::vector<const Configuration*> GetCoverPath(const Configuration *q_source, const Configuration *q_sink);
 
@@ -191,41 +180,34 @@ namespace ompl
 
       void SampleGoal(Configuration*);
       void SampleUniform(Configuration*);
-      virtual Configuration* SampleUniformQuotientCover(ob::State *state);
+      virtual void SampleUniformQuotientCover(ob::State *state);
       Configuration* SampleNeighborhoodBoundary(Configuration *q);
       Configuration* SampleNeighborhoodBoundaryUniformNear(Configuration *q_center, const Configuration* q_near, const double radius);
 
       //#######################################################################
-      //Connect strategies
+      //Misc
       //#######################################################################
       virtual void Grow(double t) override = 0;
       virtual bool GetSolution(ob::PathPtr &solution) override;
       virtual double GetImportance() const override;
 
-      // bool Interpolate(const Configuration*, Configuration*);
-      // bool Interpolate(const Configuration* q_from, const Configuration* q_to, Configuration* q_output);
-      // bool Interpolate(const Configuration*, const Configuration*, double step_size, Configuration*);
-      // void InterpolateUntilNeighborhoodBoundary(const Configuration *q_center, const Configuration *q_desired, Configuration *q_out);
-
       void ProjectConfigurationOntoNeighborhoodBoundary(const Configuration *q_center, Configuration* q_projected);
       Configuration* NearestConfigurationOnBoundary(Configuration *q_center, const Configuration* q_outside);
+      Configuration* GetOutwardPointingConfiguration(Configuration *q);
+
+      void Init();
+      bool firstRun{true};
+      void Test();
+
 
       //#######################################################################
       //Neighborhood Set Computations
       //#######################################################################
       bool IsConfigurationInsideNeighborhood(Configuration *q, Configuration *qn);
-      std::vector<Configuration*> GetIntersectingNeighborhoodConfigurations(Configuration *q);
-
-      std::vector<Configuration*> GetConfigurationsInsideNeighborhood(Configuration *q);
-
       bool IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rhs);
-      void GetCosetFromQuotientSpace(Configuration *q);
-
-      //#######################################################################
-      //Cover Algorithms
-      //#######################################################################
-
+      bool IsConfigurationInsideCover(Configuration *q);
       Configuration* Nearest(Configuration *q) const;
+
       virtual void getPlannerData(base::PlannerData &data) const override;
 
     protected:
@@ -258,6 +240,7 @@ namespace ompl
     public:
 
       const QuotientMetricPtr& GetMetric();
+      void SetMetric(const std::string&); //arguments: euclidean, shortestpath
 
       Configuration* GetStartConfiguration() const;
       Configuration* GetGoalConfiguration() const;
