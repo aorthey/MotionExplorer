@@ -67,13 +67,11 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
     Configuration* q_nearest = PriorityQueueNearestToGoal_Top();
     if(q_nearest == nullptr) return;
 
+    //std::cout << "GOTO GOAL" << std::endl;
     q_nearest->number_attempted_expansions++;
-    std::cout << "step towards goal" << std::endl;
     progressMadeTowardsGoal = step_strategy->Towards(q_nearest, GetGoalConfiguration());
-    std::cout << "DONE: step towards goal" << std::endl;
-    std::cout << std::string(80, '-') << std::endl;
   }else{
-    std::cout << "step expand" << std::endl;
+    //std::cout << "EXPAND RNADOM" << std::endl;
     Configuration* q = PriorityQueueCandidate_PopTop();
     if(q!=nullptr){
       //############################################################################

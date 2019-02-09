@@ -135,6 +135,10 @@
     <key>t</key>
   </hotkey>
   <hotkey>
+    <name>previous_planner</name>
+    <key>T</key>
+  </hotkey>
+  <hotkey>
     <name>smooth_path</name>
     <key>z</key>
   </hotkey>

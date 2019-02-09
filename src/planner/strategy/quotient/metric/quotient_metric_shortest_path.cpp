@@ -12,7 +12,16 @@ QuotientMetricShortestPath::QuotientMetricShortestPath(og::QuotientCover* quotie
 //############################################################################
 double QuotientMetricShortestPath::DistanceConfigurationConfiguration(const Configuration *q_from, const Configuration *q_to) 
 {
-  return DistanceQ1(q_from, q_to);
+  if(quotient_cover->GetParent()==nullptr){
+    return DistanceQ1(q_from, q_to);
+  }else{
+    std::vector<const Configuration*> path = GetInterpolationPath(q_from, q_to);
+    double d = 0;
+    for(uint k = 0; k < path.size()-1; k++){
+      d += quotient_cover->GetMetric()->DistanceQ1(path.at(k), path.at(k+1));
+    }
+    return d;
+  }
 }
 //############################################################################
 //Interpolate Functions
@@ -38,24 +47,24 @@ void QuotientMetricShortestPath::Interpolate(const Configuration *q_from, const 
   if(quotient_cover->GetParent()==nullptr){
     InterpolateQ1(q_from, q_to, step_size, q_interp);
   }else{
-    std::cout << "Welcome to Interpolate: The Way of the Quotient Cover" << std::endl;
+    //std::cout << "Welcome to Interpolate: The Way of the Quotient Cover" << std::endl;
     std::vector<const Configuration*> path = GetInterpolationPath(q_from, q_to);
 
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "INTERPOLATED PATH Q0" << std::endl;
-    std::cout << std::string(80, '-') << std::endl;
-    for(uint i = 0; i < path.size(); i++){
-      const Configuration *qi = path.at(i);
-      quotient_cover->QuotientCover::Print(qi, false);
-    }
-    std::cout << std::string(80, '-') << std::endl;
+    // std::cout << std::string(80, '-') << std::endl;
+    // std::cout << "INTERPOLATED PATH Q0" << std::endl;
+    // std::cout << std::string(80, '-') << std::endl;
+    // for(uint i = 0; i < path.size(); i++){
+    //   const Configuration *qi = path.at(i);
+    //   quotient_cover->QuotientCover::Print(qi, false);
+    // }
+    //std::cout << std::string(80, '-') << std::endl;
 
     double d = 0;
     double d_last_to_next = 0;
     uint ctr = 0;
 
-    std::cout << "radius: " << q_from->GetRadius() << std::endl;
-    std::cout << "step s: " << step_size << std::endl;
+    // std::cout << "radius: " << q_from->GetRadius() << std::endl;
+    // std::cout << "step s: " << step_size << std::endl;
     while(d < q_from->GetRadius() && ctr < path.size()-1){
       d_last_to_next = quotient_cover->GetMetric()->DistanceQ1(path.at(ctr), path.at(ctr+1));
       d += d_last_to_next;
@@ -81,16 +90,24 @@ void QuotientMetricShortestPath::Interpolate(const Configuration *q_from, const 
 
     //SANITY CHECK
     double dfp = DistanceQ1(q_from, q_interp);
-    if(fabs(dfp-q_from->GetRadius()) > 1e-5){
-      std::cout << "Interpolated outside cover" << std::endl;
-      quotient_cover->QuotientCover::Print(q_from, false);
-      quotient_cover->QuotientCover::Print(q_interp, false);
-      std::cout << "desired step size: " << step_size << std::endl;
-      std::cout << "actual step size : " << dfp << std::endl;
-      std::cout << "radius NBH       : " << q_from->GetRadius() << std::endl;
-      std::cout << "path size: " << path.size() << std::endl;
-      std::cout << "ctr size: " << ctr << std::endl;
-      exit(0);
+    if(fabs(dfp-q_from->GetRadius()) > 1e-10){
+      //Project onto NBH
+      double step_size = q_from->GetRadius()/dfp;
+      InterpolateQ1(q_from, q_interp, step_size, q_interp);
+      if(fabs(DistanceQ1(q_from, q_interp)-q_from->GetRadius()) > 1e-10){
+        std::cout << "Interpolated outside cover" << std::endl;
+        quotient_cover->QuotientCover::Print(q_from, false);
+        quotient_cover->QuotientCover::Print(q_interp, false);
+        std::cout << "desired step size: " << step_size << std::endl;
+        std::cout << "actual step size : " << dfp << std::endl;
+        std::cout << "radius NBH       : " << q_from->GetRadius() << std::endl;
+        std::cout << "path size: " << path.size() << std::endl;
+        std::cout << "ctr size: " << ctr << std::endl;
+        std::cout << "dist q_from-q_last   : " << DistanceQ1(q_from, q_last) << std::endl;
+        std::cout << "dist q_from-q_next   : " << d << std::endl;
+        std::cout << "dist q_from-q_to     : " << DistanceQ1(q_from, q_to) << std::endl;
+        exit(0);
+      }
     }
   }
 }
@@ -106,16 +123,15 @@ std::vector<const QuotientCover::Configuration*> QuotientMetricShortestPath::Get
 
 
   //(0) get shortest path on Q0 between q_from->coset to q_to->coset
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "ORIGINAL q_from" << std::endl;
-  quotient_cover->QuotientCover::Print(q_from, false);
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "ORIGINAL q_to" << std::endl;
-  quotient_cover->QuotientCover::Print(q_to, false);
+  // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << "ORIGINAL q_from" << std::endl;
+  // quotient_cover->QuotientCover::Print(q_from, false);
+  // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << "ORIGINAL q_to" << std::endl;
+  // quotient_cover->QuotientCover::Print(q_to, false);
 
   ob::State* s_from_Q0 = Q0->allocState();
   ob::State* s_to_Q0 = Q0->allocState();
-
 
   quotient_cover->ProjectQ0Subspace(q_from->state, s_from_Q0);
   quotient_cover->ProjectQ0Subspace(q_to->state, s_to_Q0);
@@ -126,20 +142,21 @@ std::vector<const QuotientCover::Configuration*> QuotientMetricShortestPath::Get
   const Configuration *q_from_nearest_Q0 = parent_chart->NearestConfiguration( q_from_Q0 );
   const Configuration *q_to_nearest_Q0 = parent_chart->NearestConfiguration( q_to_Q0 );
 
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "PROJECTED q_from" << std::endl;
-  parent_chart->QuotientCover::Print(q_from_nearest_Q0, false);
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "PROJECTED q_to" << std::endl;
-  parent_chart->QuotientCover::Print(q_to_nearest_Q0, false);
-  std::cout << std::string(80, '-') << std::endl;
-
   std::vector<const Configuration*> path_Q0_cover = parent_chart->GetCoverPath(q_from_nearest_Q0, q_to_nearest_Q0);
-  std::cout << "PATH ON COVER:" << std::endl;
-  for(uint i = 0; i < path_Q0_cover.size(); i++){
-    const Configuration *qi = path_Q0_cover.at(i);
-    parent_chart->QuotientCover::Print(qi, false);
-  }
+
+  // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << "PROJECTED q_from" << std::endl;
+  // parent_chart->QuotientCover::Print(q_from_nearest_Q0, false);
+  // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << "PROJECTED q_to" << std::endl;
+  // parent_chart->QuotientCover::Print(q_to_nearest_Q0, false);
+  // std::cout << std::string(80, '-') << std::endl;
+
+  // std::cout << "PATH ON COVER:" << std::endl;
+  // for(uint i = 0; i < path_Q0_cover.size(); i++){
+  //   const Configuration *qi = path_Q0_cover.at(i);
+  //   parent_chart->QuotientCover::Print(qi, false);
+  // }
 
   if(path_Q0_cover.size()<=1){
     //(1) cosets are equivalent => straight line interpolation

@@ -809,9 +809,7 @@ void QuotientCover::ProjectConfigurationOntoNeighborhoodBoundary(const Configura
 QuotientCover::Configuration* QuotientCover::NearestConfigurationOnBoundary(Configuration *q_center, const Configuration* q_outside)
 {
   Configuration *q_projected = new Configuration(Q1);
-  std::cout << "NearestConfigurationOnBoundary" << std::endl;
   metric->Interpolate(q_center, q_outside, q_projected);
-  std::cout << "Done NearestConfigurationOnBoundary" << std::endl;
 
   if(ComputeNeighborhood(q_projected)){
     return q_projected;
@@ -1065,6 +1063,7 @@ void QuotientCover::Print(const Configuration *q, bool stopOnError) const
   std::cout << " | distance goal: " << q->GetGoalDistance();
   std::cout << " | neighbors : " << (q->number_of_neighbors) << std::endl;
   std::cout << (q->isGoal?" | GOAL STATE":"") << (q->isStart?" | START STATE":"") << std::endl;
+  if(!stopOnError) return;
   if(q->index < 0)
   {
     std::cout << "[### STATE NOT MEMBER OF COVER]" << std::endl;
