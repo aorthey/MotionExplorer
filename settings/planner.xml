@@ -1,11 +1,11 @@
 <!-- Default Planner Settings -->
 <planner>
 
-  <algorithm dynamic="1" name="ompl:est"/>
-  <algorithm dynamic="1" name="ompl:sst"/>
-  <algorithm dynamic="1" name="ompl:pdst"/>
-  <algorithm dynamic="1" name="ompl:rrt"/>
-  <algorithm dynamic="1" name="ompl:kpiece"/>
+  <algorithm dynamic="1" name="ompl:dynamic:rrt"/>
+  <algorithm dynamic="1" name="ompl:dynamic:est"/>
+  <algorithm dynamic="1" name="ompl:dynamic:sst"/>
+  <algorithm dynamic="1" name="ompl:dynamic:pdst"/>
+  <algorithm dynamic="1" name="ompl:dynamic:kpiece"/>
   <algorithm dynamic="1" name="benchmark:all_dynamic"/>
 
   <!-- <algorithm name="hierarchy:sampler"/> -->
@@ -36,5 +36,4 @@
   <epsilongoalregion>0.01</epsilongoalregion>
   <freeFloating>0</freeFloating>
   <kinodynamic>0</kinodynamic> 
-  <startGUI>0</startGUI> 
 </planner>

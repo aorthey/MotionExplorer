@@ -5,7 +5,6 @@
 #include "elements/path_pwl.h"
 #include "gui/gui_state.h"
 #include "gui/ViewHierarchy.h"
-#include "planner/strategy/strategy_geometric.h"
 
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 #include <Modeling/World.h> //RobotWorld
@@ -13,6 +12,9 @@
 #include <tinyxml.h>
 #include <vector>
 #include <memory>
+
+class Strategy;
+typedef std::shared_ptr<Strategy> StrategyPtr;
 
 class MotionPlanner{
 
@@ -70,7 +72,7 @@ class MotionPlanner{
     std::vector<CSpaceOMPL*> cspace_levels;
     PlannerInput input;
     ViewHierarchy viewHierarchy;
-    StrategyGeometricMultiLevel strategy; //the actual algorithm implementation
+    StrategyPtr strategy; //the actual algorithm implementation
 
     PathPiecewiseLinear *pwl;
     CSpaceOMPL* ComputeCSpace(const std::string type, const uint robot_inner_index, const uint robot_outer_index = 0);

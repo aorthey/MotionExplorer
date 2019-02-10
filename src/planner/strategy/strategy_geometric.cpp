@@ -88,10 +88,6 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
 
 }
 
-StrategyGeometricMultiLevel::StrategyGeometricMultiLevel()
-{
-}
-
 ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     std::vector<ob::SpaceInformationPtr> si_vec, 
     std::vector<ob::ProblemDefinitionPtr> pdef_vec)

@@ -36,4 +36,3 @@ CreateSphereRobot(folder, robot_name + "_sphere_outer", d)
 CreateCylinderRobot(folder, robot_name + "_capsule_inner", thicknessx/2, L1)
 
 CreateCylinderRobot(folder, robot_name + "_capsule_outer", L2+thicknessx/2, L1)
-

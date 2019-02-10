@@ -2,6 +2,7 @@
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
+#include <ompl/base/spaces/SE3StateSpace.h>
 
 CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx_):
   si(nullptr), world(world_), robot_idx(robot_idx_)

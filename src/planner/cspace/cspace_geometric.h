@@ -1,5 +1,6 @@
 #pragma once
 #include "planner/cspace/cspace.h"
+#include <ompl/base/spaces/SE3StateSpace.h>
 
 //GeometricCSpaceOMPL: Space = Configuration manifold; control space = tangent
 //space of configuration manifold, i.e. control happens in velocity space

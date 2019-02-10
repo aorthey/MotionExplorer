@@ -2,7 +2,7 @@
 #include "planner/cspace/cspace_input.h"
 #include "klampt.h"
 
-#include <ompl/base/spaces/SE3StateSpace.h>
+#include <ompl/base/spaces/SO3StateSpace.h>
 #include <ompl/base/ScopedState.h>
 #include <ompl/base/StateSpace.h>
 #include <ompl/base/PlannerData.h>

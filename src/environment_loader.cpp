@@ -124,6 +124,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 
       if(pin.inputs.at(0)->kinodynamic){
         LoadController(robot, *pin.inputs.at(0));
+        std::cout << "Loaded Controller for robot " << name_robot << std::endl;
       }
       util::SetSimulatedRobot(robot, _backend->sim, pin.inputs.at(0)->q_init, pin.inputs.at(0)->dq_init);
     }else{

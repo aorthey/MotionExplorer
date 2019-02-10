@@ -33,10 +33,6 @@ ob::ValidStateSamplerPtr allocBridgeTestValidStateSampler(const ob::SpaceInforma
   return std::make_shared<ob::BridgeTestValidStateSampler>(si);
 }
 
-Strategy::Strategy()
-{
-}
-
 void Strategy::setStateSampler(std::string sampler, ob::SpaceInformationPtr si)
 {
   ob::ValidStateSamplerAllocator allocator;

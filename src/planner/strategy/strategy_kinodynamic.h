@@ -11,7 +11,11 @@ namespace ot = ompl::tools;
 
 class StrategyKinodynamicMultiLevel: public Strategy{
   public:
-    virtual void plan( const StrategyInput &input, StrategyOutput &output);
+    //virtual void plan( const StrategyInput &input, StrategyOutput &output);
+    virtual void Plan( StrategyOutput &output) override;
+    virtual void Step( StrategyOutput &output) override;
+    virtual void Init( const StrategyInput &input) override;
+    virtual void Clear() override;
 
     StrategyKinodynamicMultiLevel();
 

@@ -10,12 +10,12 @@ namespace ot = ompl::tools;
 
 class StrategyGeometricMultiLevel: public Strategy{
   public:
+    StrategyGeometricMultiLevel() = default;
+
     virtual void Plan( StrategyOutput &output) override;
     virtual void Step( StrategyOutput &output) override;
     virtual void Init( const StrategyInput &input) override;
     virtual void Clear() override;
-
-    StrategyGeometricMultiLevel();
 
     ob::PlannerPtr GetPlanner(std::string algorithm,
         std::vector<ob::SpaceInformationPtr> si_vec, 

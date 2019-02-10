@@ -1,17 +1,17 @@
-#include "planner/cspace/cspace_kinodynamic.h"
+#include "planner/cspace/cspace_kinodynamic_SE2.h"
 #include "planner/cspace/integrator/tangentbundle.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
-#include <ompl/base/spaces/SE3StateSpace.h>
+#include <ompl/base/spaces/SE2StateSpace.h>
 
-KinodynamicCSpaceOMPL::KinodynamicCSpaceOMPL(RobotWorld *world_, int robot_idx):
-  GeometricCSpaceOMPL(world_, robot_idx)
+KinodynamicCSpaceOMPLSE2::KinodynamicCSpaceOMPLSE2(RobotWorld *world_, int robot_idx):
+  KinodynamicCSpaceOMPL(world_, robot_idx)
 {
 }
 
-void KinodynamicCSpaceOMPL::print() const
+void KinodynamicCSpaceOMPLSE2::print() const
 {
   ob::CompoundStateSpace *cspace = space->as<ob::CompoundStateSpace>();
-  ob::SE3StateSpace *cspaceSE3 = cspace->as<ob::SE3StateSpace>(0);
+  ob::SE2StateSpace *cspaceSE2 = cspace->as<ob::SE2StateSpace>(0);
 
   ob::RealVectorStateSpace *cspaceTM = nullptr;
 
@@ -22,21 +22,21 @@ void KinodynamicCSpaceOMPL::print() const
   }
 
 //################################################################################
-  std::cout << "Configuration Space M = SE(3) x R^" << Nompl << std::endl;
-  std::cout << "Tangent Bundle      X = TM = M x R^{6+" << Nompl << "}" << std::endl;
+  std::cout << "Configuration Space M = SE(2) x R^" << Nompl << std::endl;
+  std::cout << "Tangent Bundle      X = TM = M x R^{3+" << Nompl << "}" << std::endl;
 
-  const ob::RealVectorBounds bounds = cspaceSE3->getBounds();
-  std::vector<double> se3min = bounds.low;
-  std::vector<double> se3max = bounds.high;
-  std::cout << "SE(3) bounds min     : ";
-  for(uint i = 0; i < se3min.size(); i++){
-    std::cout << " " << se3min.at(i);
+  const ob::RealVectorBounds bounds = cspaceSE2->getBounds();
+  std::vector<double> se2min = bounds.low;
+  std::vector<double> se2max = bounds.high;
+  std::cout << "SE(2) bounds min     : ";
+  for(uint i = 0; i < se2min.size(); i++){
+    std::cout << " " << se2min.at(i);
   }
   std::cout << std::endl;
 
-  std::cout << "SE(3) bounds max     : ";
-  for(uint i = 0; i < se3max.size(); i++){
-    std::cout << " " << se3max.at(i);
+  std::cout << "SE(2) bounds max     : ";
+  for(uint i = 0; i < se2max.size(); i++){
+    std::cout << " " << se2max.at(i);
   }
   std::cout << std::endl;
 
@@ -58,30 +58,30 @@ void KinodynamicCSpaceOMPL::print() const
 
 }
 
-void KinodynamicCSpaceOMPL::initSpace()
+void KinodynamicCSpaceOMPLSE2::initSpace()
 {
   //###########################################################################
   // Create OMPL state space
-  //   Create an SE(3) x R^n space + a R^{6+N} space
+  //   Create an SE(2) x R^n space + a R^{6+N} space
   //###########################################################################
   if(!(robot->joints[0].type==RobotJoint::Floating))
   {
-    std::cout << "only supports robots with a configuration space equal to SE(3) x R^n" << std::endl;
+    std::cout << "only supports robots with a configuration space equal to SE(2) x R^n" << std::endl;
     exit(0);
   }
 
-  ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());
+  ob::StateSpacePtr SE2(std::make_shared<ob::SE2StateSpace>());
 
-  ob::StateSpacePtr TM(std::make_shared<ob::RealVectorStateSpace>(6+Nompl));
+  ob::StateSpacePtr TM(std::make_shared<ob::RealVectorStateSpace>(3+Nompl));
 
   if(Nompl>0){
     ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(Nompl));
-    space = SE3 + Rn + TM;
+    space = SE2 + Rn + TM;
   }else{
-    space = SE3 + TM;
+    space = SE2 + TM;
   }
 
-  ob::SE3StateSpace *cspaceSE3 = space->as<ob::CompoundStateSpace>()->as<ob::SE3StateSpace>(0);
+  ob::SE2StateSpace *cspaceSE2 = space->as<ob::CompoundStateSpace>()->as<ob::SE2StateSpace>(0);
 
   ob::RealVectorStateSpace *cspaceTM;
   ob::RealVectorStateSpace *cspaceRN = nullptr;
@@ -100,23 +100,18 @@ void KinodynamicCSpaceOMPL::initSpace()
   minimum = robot->qMin;
   maximum = robot->qMax;
 
-  //assert(minimum.size() == 6+N);
-  //assert(maximum.size() == 6+N);
+  vector<double> lowSE2;
+  lowSE2.push_back(minimum.at(0));
+  lowSE2.push_back(minimum.at(1));
+  vector<double> highSE2;
+  highSE2.push_back(maximum.at(0));
+  highSE2.push_back(maximum.at(1));
 
-  vector<double> lowSE3;
-  lowSE3.push_back(minimum.at(0));
-  lowSE3.push_back(minimum.at(1));
-  lowSE3.push_back(minimum.at(2));
-  vector<double> highSE3;
-  highSE3.push_back(maximum.at(0));
-  highSE3.push_back(maximum.at(1));
-  highSE3.push_back(maximum.at(2));
-
-  ob::RealVectorBounds boundsSE3(3);
-  boundsSE3.low = lowSE3;
-  boundsSE3.high = highSE3;
-  boundsSE3.check();
-  cspaceSE3->setBounds(boundsSE3);
+  ob::RealVectorBounds boundsSE2(3);
+  boundsSE2.low = lowSE2;
+  boundsSE2.high = highSE2;
+  boundsSE2.check();
+  cspaceSE2->setBounds(boundsSE2);
 
   if(cspaceRN!=nullptr)
   {
@@ -147,17 +142,21 @@ void KinodynamicCSpaceOMPL::initSpace()
   assert(vMax.size() == 6+Nklampt);
 
   vector<double> lowTM, highTM;
-  for(uint i = 0; i < 6; i++){
-    lowTM.push_back(vMin.at(i));
-    highTM.push_back(vMax.at(i));
-  }
+  //Ignore all except x,y,yaw
+  lowTM.push_back(vMin.at(0));
+  highTM.push_back(vMax.at(0));
+  lowTM.push_back(vMin.at(1));
+  highTM.push_back(vMax.at(1));
+  lowTM.push_back(vMin.at(3));
+  highTM.push_back(vMax.at(3));
+
   for(uint i = 6; i < 6+Nompl; i++){
     uint idx = ompl_to_klampt.at(i);
     lowTM.push_back(vMin.at(idx));
     highTM.push_back(vMax.at(idx));
   }
 
-  ob::RealVectorBounds boundsTM(6+Nompl);
+  ob::RealVectorBounds boundsTM(3+Nompl);
   boundsTM.low = lowTM;
   boundsTM.high = highTM;
   boundsTM.check();
@@ -168,8 +167,8 @@ void KinodynamicCSpaceOMPL::initSpace()
 
 }
 
-void KinodynamicCSpaceOMPL::initControlSpace(){
-  uint NdimControl = 6 + Nompl;
+void KinodynamicCSpaceOMPLSE2::initControlSpace(){
+  uint NdimControl = 3 + Nompl;
   control_space = std::make_shared<oc::RealVectorControlSpace>(space, NdimControl+1);
 
   Vector torques = robot->torqueMax;
@@ -181,7 +180,7 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
   cbounds.setLow(NdimControl,input.timestep_min);//propagation step size
   cbounds.setHigh(NdimControl,input.timestep_max);
 
-  for(uint i = 0; i < 6; i++){
+  for(uint i = 0; i < 3; i++){
     cbounds.setLow(i,input.uMin(i));
     cbounds.setHigh(i,input.uMax(i));
   }
@@ -190,14 +189,17 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
 }
 
 
-ob::ScopedState<> KinodynamicCSpaceOMPL::ConfigVelocityToOMPLState(const Config &q, const Config &dq)
+ob::ScopedState<> KinodynamicCSpaceOMPLSE2::ConfigVelocityToOMPLState(const Config &q, const Config &dq)
 {
+  std::cout << std::string(80, '-') << std::endl;
+  si->printSettings();
+  std::cout << std::string(80, '-') << std::endl;
   ob::ScopedState<> qompl(space);
   ConfigVelocityToOMPLState(q, dq, qompl.get());
   return qompl;
 }
 
-void KinodynamicCSpaceOMPL::ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl)
+void KinodynamicCSpaceOMPLSE2::ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl)
 {
   ConfigToOMPLState(q, qompl);
   ob::RealVectorStateSpace::StateType *qomplTMSpace;
@@ -218,19 +220,17 @@ void KinodynamicCSpaceOMPL::ConfigVelocityToOMPLState(const Config &q, const Con
   }
 }
 
-void KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q, ob::State *qompl)
+void KinodynamicCSpaceOMPLSE2::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
-  ob::SE3StateSpace::StateType *qomplSE3;
-  ob::SO3StateSpace::StateType *qomplSO3;
+  ob::SE2StateSpace::StateType *qomplSE2;
   ob::RealVectorStateSpace::StateType *qomplRnSpace = nullptr;
   ob::RealVectorStateSpace::StateType *qomplTMSpace;
 
   //either we have
-  //[SE3][RN]    OR   [ SE3]
+  //[SE2][RN]    OR   [ SE2]
   //[  TM   ]         [ TM ]
   //
-  qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-  qomplSO3 = &qomplSE3->rotation();
+  qomplSE2 = qompl->as<ob::CompoundState>()->as<ob::SE2StateSpace::StateType>(0);
   if(Nompl>0){
     qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
     qomplTMSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
@@ -239,8 +239,9 @@ void KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q, ob::State *qompl)
     qomplTMSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
   }
 
-  qomplSE3->setXYZ(q(0),q(1),q(2));
-  OMPLSO3StateSpaceFromEulerXYZ(q(3),q(4),q(5), qomplSO3);
+  qomplSE2->setX(q(0));
+  qomplSE2->setY(q(1));
+  qomplSE2->setYaw(q(3));
 
   if(Nompl>0){
     double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
@@ -257,7 +258,7 @@ void KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q, ob::State *qompl)
   }
 }
 
-Config KinodynamicCSpaceOMPL::OMPLStateToVelocity(const ob::State *qompl){
+Config KinodynamicCSpaceOMPLSE2::OMPLStateToVelocity(const ob::State *qompl){
   const ob::RealVectorStateSpace::StateType *qomplTMState;
   if(Nompl>0){
     qomplTMState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
@@ -278,31 +279,29 @@ Config KinodynamicCSpaceOMPL::OMPLStateToVelocity(const ob::State *qompl){
   return dq;
 }
 
-Config KinodynamicCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
+Config KinodynamicCSpaceOMPLSE2::OMPLStateToConfig(const ob::State *qompl){
+  const ob::SE2StateSpace::StateType *qomplSE2 = qompl->as<ob::CompoundState>()->as<ob::SE2StateSpace::StateType>(0);
+
+  Config q;
+  q.resize(6+Nklampt);
+  q.setZero();
+
+  q(0) = qomplSE2->getX();
+  q(1) = qomplSE2->getY();
+  q(3) = qomplSE2->getYaw();
+
   if(Nompl>0){
-    const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
     const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-    return GeometricCSpaceOMPL::OMPLStateToConfig(qomplSE3, qomplRnState);
-  }else{
-    const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-    Config q = GeometricCSpaceOMPL::OMPLStateToConfig(qomplSE3, NULL);
-    return q;
+    for(uint i = 0; i < Nompl; i++){
+      uint idx = ompl_to_klampt.at(i);
+      q(idx) = qomplRnState->values[i];
+    }
   }
+  return q;
 }
 
-const oc::StatePropagatorPtr KinodynamicCSpaceOMPL::StatePropagatorPtr(oc::SpaceInformationPtr si)
+const oc::StatePropagatorPtr KinodynamicCSpaceOMPLSE2::StatePropagatorPtr(oc::SpaceInformationPtr si)
 {
   return std::make_shared<TangentBundleIntegrator>(si, this);
 }
 
-//#############################################################################
-ob::SpaceInformationPtr KinodynamicCSpaceOMPL::SpaceInformationPtr(){
-  if(si==nullptr){
-    si = std::make_shared<oc::SpaceInformation>(space, control_space);
-    const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr(si);
-    si->setStateValidityChecker(checker);
-    const oc::StatePropagatorPtr integrator = StatePropagatorPtr(static_pointer_cast<oc::SpaceInformation>(si));
-    static_pointer_cast<oc::SpaceInformation>(si)->setStatePropagator(integrator);
-  }
-  return si;
-}

@@ -16,7 +16,7 @@ class Strategy{
     bool IsInitialized();
 
   protected:
-    Strategy();
+    Strategy() = default;
     void setStateSampler(std::string sampler, ob::SpaceInformationPtr si);
 
     bool isInitialized{false};

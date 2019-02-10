@@ -1,6 +1,8 @@
 #include "planner/planner.h"
 #include "planner/strategy/strategy_input.h"
 #include "planner/strategy/strategy_output.h"
+#include "planner/strategy/strategy_geometric.h"
+#include "planner/strategy/strategy_kinodynamic.h"
 #include "planner/cspace/cspace_factory.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include "gui/drawMotionPlanner.h"
@@ -19,6 +21,12 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   current_level_node = 0;
   current_path.clear();
   this->world->InitCollisions();
+  if(input.kinodynamic){
+    strategy = std::make_shared<StrategyKinodynamicMultiLevel>();
+  }else{
+    strategy = std::make_shared<StrategyGeometricMultiLevel>();
+  }
+
   CreateHierarchy();
 }
 std::string MotionPlanner::getName() const{
@@ -43,6 +51,10 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
       cspace_level = factory.MakeGeometricCSpaceSE2(world, robot_inner_idx);
     }else if(type=="SE3RN"){
       cspace_level = factory.MakeGeometricCSpace(world, robot_inner_idx);
+    }else if(type=="TSE2"){
+      cspace_level = factory.MakeKinodynamicCSpaceSE2(world, robot_inner_idx);
+    }else if(type=="TSE3"){
+      cspace_level = factory.MakeKinodynamicCSpace(world, robot_inner_idx);
     }else{
       std::cout << "Type " << type << " not recognized" << std::endl;
       exit(0);
@@ -167,7 +179,7 @@ void MotionPlanner::Clear()
   current_level_node = 0;
   current_path.clear();
 
-  strategy.Clear();
+  strategy->Clear();
   viewHierarchy.Clear();
 }
 
@@ -179,16 +191,16 @@ void MotionPlanner::Step()
   current_path.clear();
   viewHierarchy.Clear();
 
-  if(!strategy.IsInitialized()){
+  if(!strategy->IsInitialized()){
     StrategyInput strategy_input = input.GetStrategyInput();
     strategy_input.cspace_levels = cspace_levels;
     strategy_input.cspace = cspace_levels.back();
     strategy_input.world = world;
-    strategy.Init(strategy_input);
+    strategy->Init(strategy_input);
   }
 
   StrategyOutput output(cspace_levels.back());
-  strategy.Step(output);
+  strategy->Step(output);
   //std::cout << output << std::endl;
   output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
 }
@@ -199,7 +211,7 @@ void MotionPlanner::StepOneLevel()
     return AdvanceUntilSolution();
   }
 
-  if(!strategy.IsInitialized()){
+  if(!strategy->IsInitialized()){
     current_level = 0;
     current_level_node = 0;
     current_path.clear();
@@ -208,7 +220,7 @@ void MotionPlanner::StepOneLevel()
     strategy_input.cspace_levels = cspace_levels;
     strategy_input.cspace = cspace_levels.back();
     strategy_input.world = world;
-    strategy.Init(strategy_input);
+    strategy->Init(strategy_input);
   }
 
   StrategyOutput output(cspace_levels.back());
@@ -216,7 +228,7 @@ void MotionPlanner::StepOneLevel()
   uint numberOfSolutionPathsCurrentLevel = 0;
   while(numberOfSolutionPathsCurrentLevel < 1)
   {
-    strategy.Step(output);
+    strategy->Step(output);
     output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
     numberOfSolutionPathsCurrentLevel = hierarchy->NumberNodesOnLevel(current_level+2);
   }
@@ -230,19 +242,19 @@ void MotionPlanner::AdvanceUntilSolution()
   current_path.clear();
   viewHierarchy.Clear();
 
-  if(!strategy.IsInitialized()){
-    std::cout << "init strategy: " << cspace_levels.size() << std::endl;
+  if(!strategy->IsInitialized()){
+    std::cout << "init strategy: with " << cspace_levels.size() << " cspace levels."<< std::endl;
     StrategyInput strategy_input = input.GetStrategyInput();
     strategy_input.cspace_levels = cspace_levels;
     strategy_input.cspace = cspace_levels.back();
     strategy_input.world = world;
-    strategy.Init(strategy_input);
+    strategy->Init(strategy_input);
   }else{
-    strategy.Clear();
+    strategy->Clear();
   }
 
   StrategyOutput output(cspace_levels.back());
-  strategy.Plan(output);
+  strategy->Plan(output);
   std::cout << output << std::endl;
   output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
 }

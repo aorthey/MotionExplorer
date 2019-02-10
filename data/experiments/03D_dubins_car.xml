@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="car" file="../robots/dubinscar.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="cylinder_inner" file="../robots/dubinscar_capsule_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="cylinder_outer" file="../robots/dubinscar_capsule_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="dubins_car" file="../robots/dubinscar.urdf"/>
+  <robot name="disk_inner" file="../robots/dubinscar_capsule_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="disk_outer" file="../robots/dubinscar_capsule_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
 <!--
   <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="3 2 0" rotateRPY="0 0 0"/>
@@ -16,16 +16,24 @@
   <plannerinput>
 
     <qinit  config="15  +2.5 +2.5 +0.0 -1.47 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
+    <dqinit config="15 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  "/>
     <qgoal  config="15  -3.0 -2.0 +0.0 -1.8 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
-    <se3min config="6  -4.0 -4.0 -1.0 -3.141593 -1.57 -3.141593"/>
-    <se3max config="6  +4.0 +4.0 +1.0 +3.141593 +1.57 +3.141593"/>
+    <dqgoal config="15 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0  "/>
+
+    <se3min config="6  -4.0 -4.0 -0.0 -3.141593 0 0"/>
+    <se3max config="6  +4.0 +4.0 +0.0 +3.141593 0 0"/>
+
+    <control_max config="6  +1 0 0 +0.1 0 0"/>
+    <control_min config="6  +1 0 0 -0.1 0 0"/>
+
     <freeFloating>1</freeFloating>
     <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <kinodynamic>1</kinodynamic>
     <pathSpeed>10</pathSpeed>
 
     <hierarchy>
-      <level inner_index="1" cspace_constant="1" type="R2"/>
-      <level inner_index="0" cspace_constant="0.532623641291" type="SE2"/>
+      <!-- <level inner_index="1" cspace_constant="1" type="R2"/> -->
+      <level inner_index="0" cspace_constant="0.532623641291" type="TSE2"/>
     </hierarchy>
 
   </plannerinput>
