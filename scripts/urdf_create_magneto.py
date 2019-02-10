@@ -51,22 +51,22 @@ def createMagneto(robot_name, foot_radius, leg1_length, leg2_length, leg3_length
 
   hstr  = createRotatedCylinder("foot", 0, 0, 0, 1.57, 0, 0, foot_radius, foot_length)
   hstr += createCylinder("leg1", foot_radius+leg1_length/2, 0, 0, leg_radius, leg1_length)
-  hstr += createRigidJoint("joint_"+"foot"+"_"+"leg1", "foot", "leg1")
+  hstr += createRigidJoint( "foot", "leg1")
 
   hstr += createRotatedCylinder("joint1", foot_radius+leg1_length+joint_radius, 0, 0, 1.57, 0, 0, joint_radius, joint_length)
-  hstr += createRigidJoint("joint_"+"joint1"+"_"+"leg1", "leg1", "joint1")
+  hstr += createRigidJoint( "leg1", "joint1")
 
   hstr += createCylinder("leg2", leg2_length/2+joint_radius, 0, 0, leg_radius, leg2_length)
   hstr += createRevoluteJointY("joint_"+"leg2"+"_"+"joint1","joint1", "leg2",foot_radius+leg1_length+joint_radius,0,0)
 
   hstr += createRotatedCylinder("joint2", leg2_length+2*joint_radius, 0, 0, 1.57, 0, 0, joint_radius, joint_length)
-  hstr += createRigidJoint("joint_"+"joint2"+"_"+"leg2", "leg2", "joint2")
+  hstr += createRigidJoint( "leg2", "joint2")
 
   hstr += createCylinder("leg3", leg3_length/2+joint_radius, 0, 0, leg_radius, leg3_length)
   hstr += createRevoluteJointY("joint_"+"leg3"+"_"+"joint2","joint2", "leg3",leg2_length+2*joint_radius,0,0)
 
   hstr += createRotatedCylinder("foot2", leg3_length+joint_radius+foot_radius, 0, 0, 1.57, 0, 0, foot_radius, foot_length)
-  hstr += createRigidJoint("joint_"+"foot2"+"_"+"leg3", "leg3", "foot2")
+  hstr += createRigidJoint( "leg3", "foot2")
 
   f.write(hstr)
   f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')

@@ -45,13 +45,13 @@ def GetXMLString(robot_name, with_lid=True):
         0, 
         r_body, w_lid)
 
-  hstr += createRigidJoint("joint_"+"b1"+"_"+"b2", "body1", "body2")
-  hstr += createRigidJoint("joint_"+"b1"+"_"+"connector1", "body1", "connector1")
-  hstr += createRigidJoint("joint_"+"b1"+"_"+"connector2", "body1", "connector2")
+  hstr += createRigidJoint( "body1", "body2")
+  hstr += createRigidJoint( "body1", "connector1")
+  hstr += createRigidJoint( "body1", "connector2")
   hstr += createRevoluteJointY("joint_"+"connector1"+"_"+"wing1", "connector1", "wing1")
   hstr += createRevoluteJointY("joint_"+"connector2"+"_"+"wing2", "connector2", "wing2")
   if with_lid:
-    hstr += createRigidJoint("joint_"+"b1"+"_"+"lid_hinge1", "body1", "lid_hinge1")
+    hstr += createRigidJoint( "body1", "lid_hinge1")
     hstr += createRevoluteJointY("joint_"+"lid_hinge1"+"_"+"lid1", "lid_hinge1",
     "lid1", x=l_body/2.0, z=r_body, lowerLimit=-2.0, upperLimit=0)
   hstr += '  <klampt package_root="../../.." default_acc_max="4" >\n'

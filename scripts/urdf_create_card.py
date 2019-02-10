@@ -18,7 +18,7 @@ f.write('<robot name="'+robot_name+'">\n')
 
 hstr   = createCuboid("base", 0,                            0, 0,                         thicknessx, thicknessy, thicknessz)
 hstr  += createCylinder("head"  ,0, 0, thicknessz/2, thicknessy/2, thicknessx)
-hstr  += createRigidJoint("joint_"+"head"+"_"+"base", "head", "base")
+hstr  += createRigidJoint("head", "base")
 
 f.write(hstr)
 f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')

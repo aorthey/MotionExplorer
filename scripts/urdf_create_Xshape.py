@@ -23,10 +23,10 @@ hstr += createCuboid("link2", 0,                            0, L1/2+thicknessx/2
 hstr += createCuboid("link3", 0,                            0, -L1/2-thicknessx/2-spacing,thicknessx, thicknessy, L1)
 hstr += createCuboid("link4", L1/2+thicknessx/2+spacing,    0, 0,                         L1,         thicknessy, thicknessx)
 
-hstr += createRigidJoint("joint_"+"l0"+"_"+"l1", "link0", "link1")
-hstr += createRigidJoint("joint_"+"l0"+"_"+"l2", "link0", "link2")
-hstr += createRigidJoint("joint_"+"l0"+"_"+"l3", "link0", "link3")
-hstr += createRigidJoint("joint_"+"l0"+"_"+"l4", "link0", "link4")
+hstr += createRigidJoint( "link0", "link1")
+hstr += createRigidJoint( "link0", "link2")
+hstr += createRigidJoint( "link0", "link3")
+hstr += createRigidJoint( "link0", "link4")
 
 f.write(hstr)
 f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')

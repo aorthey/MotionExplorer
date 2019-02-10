@@ -132,7 +132,8 @@ def createSphere(lname,x,y,z,radius,PHYSICAL=True):
   s+='</link>\n\n'
   return s
 
-def createRigidJoint(jname, parentname, childname, x=0, y=0, z=0):
+def createRigidJoint(parentname, childname, x=0, y=0, z=0):
+  jname = "joint_"+parentname+"_"+childname
   s= ''
   s+='<joint name="'+jname+'" type="fixed">\n'
   s+='  <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'

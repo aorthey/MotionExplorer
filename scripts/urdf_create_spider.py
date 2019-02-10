@@ -36,10 +36,10 @@ def createHead(headname):
 
   hstrs = createSphere(headname,0,0,0,headradius)
   hstrs += createRotatedCylinder(upperhead,0,0,headradius+length/2,0,0,1.57,0.3*length,length+0.1)
-  hstrs += createRigidJoint("joint_"+headname+"_"+upperhead, upperhead, headname)
+  hstrs += createRigidJoint( upperhead, headname)
 
   hstrs += createSphere(tophead,0,0,headradius+length+topradius,topradius)
-  hstrs += createRigidJoint("joint_"+upperhead+"_"+tophead, tophead, upperhead)
+  hstrs += createRigidJoint( tophead, upperhead)
   return hstrs
 
 def createBody(headname):
@@ -61,7 +61,7 @@ def createBody(headname):
     shouldername = headname+'_sphere_'+str(k)
 
     body+= createSphere(shouldername,x,y,z,jointradius)
-    body+= createRigidJoint(shouldername+'_fixed', headname, shouldername)
+    body+= createRigidJoint( headname, shouldername)
 
     leg1 = 'leg_'+str(k)+'_link0'
 
@@ -76,7 +76,7 @@ def createBody(headname):
     x = (leglength1+2*jointradius)*cos(angle)
     y = (leglength1+2*jointradius)*sin(angle)
     body+= createSphere(leg1+'_sphere',x,y,z,jointradius)
-    body+= createRigidJoint(leg1+'_fixed', leg1, leg1+'_sphere')
+    body+= createRigidJoint( leg1, leg1+'_sphere')
 
     leg2 = 'leg_'+str(k)+'_link1'
 
@@ -85,7 +85,7 @@ def createBody(headname):
     body+= createRotatedCylinder(leg2,0,0,z-leglength2/2-jointradius,0,0,angle,legradius,leglength2-0.01) 
 
     body+= createSphere(leg2+'_sphere',0,0,z-leglength2-2*jointradius,jointradius)
-    body+= createRigidJoint(leg2+'_fixed', leg2, leg2+'_sphere')
+    body+= createRigidJoint( leg2, leg2+'_sphere')
 
   return body
 

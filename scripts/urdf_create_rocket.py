@@ -21,11 +21,11 @@ def GetXMLString(robot_name):
   hstr  += createSphere("s_left" , l_side/2-d, -r_mid-r_side, 0, r_side)
   hstr  += createSphere("s_right" , l_side/2-d, +r_mid+r_side, 0, r_side)
 
-  hstr  += createRigidJoint("joint_"+"mid"+"_"+"s_mid", "mid", "s_mid")
-  hstr  += createRigidJoint("joint_"+"mid"+"_"+"left", "mid", "left")
-  hstr  += createRigidJoint("joint_"+"mid"+"_"+"right", "mid", "right")
-  hstr  += createRigidJoint("joint_"+"left"+"_"+"s_left", "left", "s_left")
-  hstr  += createRigidJoint("joint_"+"right"+"_"+"s_right", "right", "s_right")
+  hstr  += createRigidJoint("mid", "s_mid")
+  hstr  += createRigidJoint("mid", "left")
+  hstr  += createRigidJoint("mid", "right")
+  hstr  += createRigidJoint("left", "s_left")
+  hstr  += createRigidJoint("right", "s_right")
   hstr += '  <klampt package_root="../../.." default_acc_max="4" >\n'
   hstr += '  </klampt>\n'
   hstr += '</robot>'

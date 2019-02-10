@@ -44,7 +44,7 @@ for k in range(0,len(robot_names)):
   def createHead(headname):
     hstrs = createSphere("eye",0,0,0,headradius)
     hstrc = createCylinder(headname,-headradius/2,0,0,headradius,headradius)
-    hstrj = createRigidJoint("joint_eye_"+headname,"eye",headname)
+    hstrj = createRigidJoint("eye",headname)
     return hstrs+hstrc+hstrj
 
   def attachBranchSegment(parentlinkname, linkname, x, y, z):
@@ -53,7 +53,7 @@ for k in range(0,len(robot_names)):
     sbl1 = createCylinder(linkname1,-length/2-sRadius,0,0,radius_cylinder,length) 
     sbj1 = createSphericalJoint(parentlinkname+'_'+linkname+'_joint_revolute', parentlinkname,linkname1, x, y, z, lowerLimit=lowerLimit,upperLimit=upperLimit) 
     sbl2 = createSphere(linkname2,-length-2*sRadius,0,0,0.95*sRadius)
-    sbj2 = createRigidJoint(linkname+'_fixed', linkname1, linkname2,0,0,0)
+    sbj2 = createRigidJoint(0,0)
     return sbl1+sbj1+sbl2+sbj2
 
   def createBranchSegment(parentlinkname, linkname, x, y, z):
@@ -61,13 +61,13 @@ for k in range(0,len(robot_names)):
     linkname1 = linkname+'_cylinder'
     linkname2 = linkname
     # sbl1 = createCylinder(linkname1,-length/2,0,0,radius_cylinder,length) 
-    # sbj1 = createRigidJoint(parentlinkname+'_'+linkname+'_joint', parentlinkname,linkname1, x, y, z) 
+    # sbj1 = createRigidJoint( y, z) 
     # sbl2 = createSphere(linkname2,-length-sRadius,0,0,0.95*sRadius)
-    # sbj2 = createRigidJoint(linkname+'_fixed', linkname1, linkname2, 0, 0, 0)
+    # sbj2 = createRigidJoint( 0, 0)
     sbl1 = createCylinder(linkname1,-stublength/2,0,0,radius_cylinder,stublength) 
-    sbj1 = createRigidJoint(parentlinkname+'_'+linkname+'_joint', parentlinkname,linkname1, x, y, z) 
+    sbj1 = createRigidJoint( y, z) 
     sbl2 = createSphere(linkname2,-stublength-sRadius,0,0,0.95*sRadius)
-    sbj2 = createRigidJoint(linkname+'_fixed', linkname1, linkname2, 0, 0, 0)
+    sbj2 = createRigidJoint( 0, 0)
     return sbc+sbl1+sbj1+sbl2+sbj2
 
   def createBody(headname):
