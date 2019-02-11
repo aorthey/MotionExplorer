@@ -26,12 +26,12 @@
     <pathSpeed>3</pathSpeed>   <!-- <1: slower, 1: default, >1: faster -->
 
     <freeFloating>0</freeFloating>
-    <maxplanningtime>15</maxplanningtime>
+    <maxplanningtime>5</maxplanningtime>
     <epsilongoalregion>0.05</epsilongoalregion>
 
     <hierarchy>
-      <level inner_index="5" outer_index="5" type="R5"/>
-      <level inner_index="0" outer_index="0" type="R7"/>
+      <level inner_index="4" outer_index="4" cspace_constant="1" type="R4"/>
+      <level inner_index="0" outer_index="0" cspace_constant="1" type="R7"/>
     </hierarchy>
 
   </plannerinput>

@@ -20,8 +20,8 @@ void KinodynamicCSpaceOMPL::print() const
   }else{
     cspaceTM = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
   }
-
 //################################################################################
+  std::cout << std::endl;
   std::cout << "Configuration Space M = SE(3) x R^" << Nompl << std::endl;
   std::cout << "Tangent Bundle      X = TM = M x R^{6+" << Nompl << "}" << std::endl;
 
@@ -54,8 +54,9 @@ void KinodynamicCSpaceOMPL::print() const
     std::cout << " " << max.at(i);
   }
   std::cout << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
+  control_space->printSettings(std::cout);
 
+  std::cout << std::string(80, '-') << std::endl;
 }
 
 void KinodynamicCSpaceOMPL::initSpace()
@@ -297,8 +298,8 @@ const oc::StatePropagatorPtr KinodynamicCSpaceOMPL::StatePropagatorPtr(oc::Space
 
 //#############################################################################
 ob::SpaceInformationPtr KinodynamicCSpaceOMPL::SpaceInformationPtr(){
-  if(si==nullptr){
-    si = std::make_shared<oc::SpaceInformation>(space, control_space);
+  if(!si){
+    si = std::make_shared<oc::SpaceInformation>(SpacePtr(), ControlSpacePtr());
     const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr(si);
     si->setStateValidityChecker(checker);
     const oc::StatePropagatorPtr integrator = StatePropagatorPtr(static_pointer_cast<oc::SpaceInformation>(si));

@@ -102,9 +102,9 @@ class CSpaceOMPL
     std::vector<int> klampt_to_ompl;
 
     ob::StateValidityCheckerPtr validity_checker;
-    ob::SpaceInformationPtr si;
-    ob::StateSpacePtr space;
-    oc::RealVectorControlSpacePtr control_space;
+    ob::SpaceInformationPtr si{nullptr};
+    ob::StateSpacePtr space{nullptr};
+    oc::RealVectorControlSpacePtr control_space{nullptr};
 
     Robot *robot{nullptr};
     CSpaceKlampt *klampt_cspace{nullptr};

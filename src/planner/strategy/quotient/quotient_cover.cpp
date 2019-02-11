@@ -605,13 +605,16 @@ bool QuotientCover::ComputeNeighborhood(Configuration *q, bool verbose)
       q->SetOuterRadius(DistanceOuterRobotToObstacle(q->state));
     }
 
-    q->SetRadius(DistanceInnerRobotToObstacle(q->state));
+    double d = DistanceInnerRobotToObstacle(q->state);
+    q->SetRadius(d);
     if(q->GetRadius()<=minimum_neighborhood_radius){
-      if(verbose) std::cout << "[ComputeNeighborhood] State Rejected: Radius Too Small (radius="<< q->GetRadius() << ", minimum="
-       << minimum_neighborhood_radius << ")" << std::endl;
-      q->Remove(Q1);
-      q=nullptr;
-      return false;
+      if(verbose) std::cout << "[ComputeNeighborhood] State Rejected: Radius Too Small (radius="<< q->GetRadius() 
+        << ", minimum=" << minimum_neighborhood_radius << ")" << std::endl;
+      q->SetRadius(minimum_neighborhood_radius);
+      if(verbose) std::cout << "[ComputeNeighborhood] Set Radius to Minimal Radius (radius="<< q->GetRadius() << std::endl;
+      // q->Remove(Q1);
+      // q=nullptr;
+      // return false;
     }
   }else{
     if(verbose) std::cout << "[ComputeNeighborhood] State Rejected: Infeasible" << std::endl;

@@ -6,6 +6,7 @@
 #include "util.h"
 #include "elements/plannerdata_vertex_annotated.h"
 
+#include "ompl/control/planners/rrt/kRRT.h"
 #include <ompl/control/planners/rrt/RRT.h>
 #include <ompl/control/planners/est/EST.h>
 #include <ompl/control/planners/pdst/PDST.h>
@@ -61,6 +62,8 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
 
   if(algorithm=="ompl:dynamic:rrt"){
     planner = std::make_shared<oc::RRT>(si);
+  }else if(algorithm=="ompl:dynamic:krrt"){
+    planner = std::make_shared<oc::kRRT>(si);
   }else if(algorithm=="ompl:dynamic:est"){
     planner = std::make_shared<oc::EST>(si);
   }else if(algorithm=="ompl:dynamic:sst"){
@@ -86,12 +89,12 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
 
   for(uint k = 0; k < input.cspace_levels.size(); k++){
     KinodynamicCSpaceOMPL* cspace_levelk = dynamic_cast<KinodynamicCSpaceOMPL*>(input.cspace_levels.at(k));
-    //CSpaceOMPL* cspace_levelk = input.cspace_levels.at(k);
-    oc::SpaceInformationPtr sik = static_pointer_cast<oc::SpaceInformation>(cspace_levelk->SpaceInformationPtr());
-    setStateSampler(input.name_sampler, sik);
 
-    ob::StateSpacePtr spacek = sik->getStateSpace();
-    spacek->registerProjection("SE3", ob::ProjectionEvaluatorPtr(new SE3Project0r(spacek)));
+    oc::SpaceInformationPtr sik = static_pointer_cast<oc::SpaceInformation>(cspace_levelk->SpaceInformationPtr());
+    sik->setMinMaxControlDuration(0.01, 0.1);
+    sik->setPropagationStepSize(1);
+
+    setStateSampler(input.name_sampler, sik);
 
     ob::ScopedState<> startk = cspace_levelk->ConfigVelocityToOMPLState(input.q_init, input.dq_init);
     ob::ScopedState<> goalk  = cspace_levelk->ConfigVelocityToOMPLState(input.q_goal, input.dq_goal);
@@ -109,6 +112,12 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
     si_vec.push_back(sik);
     pdef_vec.push_back(pdefk);
   }
+
+  ob::StateSpacePtr spacek = si_vec.back()->getStateSpace();
+  //spacek->registerProjection("SE3", ob::ProjectionEvaluatorPtr(new SE3Project0r(spacek)));
+  //const oc::SpaceInformationPtr si = static_pointer_cast<oc::SpaceInformation>(si_vec.back());
+  spacek->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(spacek)));
+
   max_planning_time = input.max_planning_time;
 
   //###########################################################################

@@ -18,9 +18,7 @@ class LieGroupIntegrator
 
   public:
     //LieGroupIntegrator(oc::SpaceInformationPtr si): oc::StatePropagator(si.get())
-    LieGroupIntegrator()
-    {
-    };
+    LieGroupIntegrator() = default;
     //integration matrix elements
     Matrix4 Integrate(const Math3D::Matrix4& p0, const Math3D::Matrix4& dp0, double dt);
 

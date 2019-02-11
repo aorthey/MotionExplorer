@@ -148,6 +148,7 @@ void PlannerDataVertexAnnotated::setState(ob::State *s)
 }
 void PlannerDataVertexAnnotated::DrawGL(GUIState& state)
 {
+  std::cout << "DRAW OPENSET" << std::endl;
   if(openset != nullptr) openset->DrawGL(state);
 }
 

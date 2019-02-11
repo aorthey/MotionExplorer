@@ -100,15 +100,17 @@ RobotWorld* CSpaceOMPL::GetWorldPtr(){
 CSpace* CSpaceOMPL::GetCSpaceKlamptPtr(){
   return klampt_cspace;
 }
+
 const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr()
 {
   if(!validity_checker){
-    si = std::make_shared<ob::SpaceInformation>(SpacePtr());
-    validity_checker = StateValidityCheckerPtr(si);
-    si->setStateValidityChecker(validity_checker);
+    si = SpaceInformationPtr();
+    //validity_checker = StateValidityCheckerPtr(si);
+    //si->setStateValidityChecker(validity_checker);
   }
   return validity_checker;
 }
+
 const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr(ob::SpaceInformationPtr si)
 {
   if(enableSufficiency)

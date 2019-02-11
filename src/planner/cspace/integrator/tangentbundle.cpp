@@ -1,5 +1,6 @@
 #include "planner/cspace/integrator/tangentbundle.h"
 #include "planner/cspace/cspace_kinodynamic.h"
+#include "planner/cspace/integrator/liegroupintegrator.h"
 
 Matrix3 GetTotalInertiaAtPoint(const Robot *robot, const Vector3 &p)
 {
@@ -61,6 +62,8 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   uSE3(3) = ucontrol[3];
   uSE3(4) = ucontrol[4];
   uSE3(5) = ucontrol[5];
+
+  std::cout << uSE3 << std::endl;
 
   //###########################################################################
   //(2) integrate from (q0,dq0) to (q1,dq1);

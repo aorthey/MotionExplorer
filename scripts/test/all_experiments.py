@@ -41,5 +41,5 @@ Execute("02D_disk_narrow.xml", 5, 1.0)
 Execute("02D_disk_decomposed.xml", 5, 1.0)
 Execute("03D_corner.xml", 5, 0.5)
 Execute("03D_misleading.xml", 5, 0.5)
-Execute("03D_nonsimple.xml", 5, 2.0)
+Execute("03D_nonsimple.xml", 5, 1.0)
 print '#'*80

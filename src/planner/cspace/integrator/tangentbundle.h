@@ -6,7 +6,6 @@
 #include <KrisLibrary/math/diffeq.h>
 #include <Planning/RobotCSpace.h>
 #include <vector>
-#include "planner/cspace/integrator/liegroupintegrator.h"
 #include "planner/cspace/cspace.h"
 
 using namespace Math3D;

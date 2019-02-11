@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 PROJECT( Orthoklampt )
-SET(ORTHOKLAMPT_SUBDIRS algorithms controller elements gui planner)
+SET(ORTHOKLAMPT_SUBDIRS algorithms controller elements gui planner ompl)
 
 set(ORTHOKLAMPT_MAJOR_VERSION 0)
 set(ORTHOKLAMPT_MINOR_VERSION 2)

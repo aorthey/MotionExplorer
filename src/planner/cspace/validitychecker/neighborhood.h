@@ -18,5 +18,5 @@ struct Neighborhood
     double WorkspaceDistanceToConfigurationSpaceDistance(double d);
 
   private:
-    double c{0.0};
+    double c{1.0};
 };
