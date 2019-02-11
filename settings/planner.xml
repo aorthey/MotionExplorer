@@ -1,8 +1,8 @@
 <!-- Default Planner Settings -->
 <planner>
 
-  <algorithm dynamic="1" name="ompl:dynamic:kpiece"/>
   <algorithm dynamic="1" name="ompl:dynamic:krrt"/>
+  <algorithm dynamic="1" name="ompl:dynamic:kpiece"/>
   <algorithm dynamic="1" name="ompl:dynamic:rrt"/>
   <algorithm dynamic="1" name="ompl:dynamic:est"/>
   <algorithm dynamic="1" name="ompl:dynamic:sst"/>

@@ -1,5 +1,5 @@
 #include "planner/cspace/cspace_kinodynamic_SE2.h"
-#include "planner/cspace/integrator/tangentbundle.h"
+#include "planner/cspace/integrator/integrator_SE2.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SE2StateSpace.h>
 
@@ -107,7 +107,7 @@ void KinodynamicCSpaceOMPLSE2::initSpace()
   highSE2.push_back(maximum.at(0));
   highSE2.push_back(maximum.at(1));
 
-  ob::RealVectorBounds boundsSE2(3);
+  ob::RealVectorBounds boundsSE2(2);
   boundsSE2.low = lowSE2;
   boundsSE2.high = highSE2;
   boundsSE2.check();
@@ -150,7 +150,7 @@ void KinodynamicCSpaceOMPLSE2::initSpace()
   lowTM.push_back(vMin.at(3));
   highTM.push_back(vMax.at(3));
 
-  for(uint i = 6; i < 6+Nompl; i++){
+  for(uint i = 3; i < 3+Nompl; i++){
     uint idx = ompl_to_klampt.at(i);
     lowTM.push_back(vMin.at(idx));
     highTM.push_back(vMax.at(idx));
@@ -168,7 +168,7 @@ void KinodynamicCSpaceOMPLSE2::initSpace()
 }
 
 void KinodynamicCSpaceOMPLSE2::initControlSpace(){
-  uint NdimControl = 3 + Nompl;
+  uint NdimControl = 6 + Nompl;
   control_space = std::make_shared<oc::RealVectorControlSpace>(space, NdimControl+1);
 
   Vector torques = robot->torqueMax;
@@ -180,7 +180,7 @@ void KinodynamicCSpaceOMPLSE2::initControlSpace(){
   cbounds.setLow(NdimControl,input.timestep_min);//propagation step size
   cbounds.setHigh(NdimControl,input.timestep_max);
 
-  for(uint i = 0; i < 3; i++){
+  for(uint i = 0; i < 6; i++){
     cbounds.setLow(i,input.uMin(i));
     cbounds.setHigh(i,input.uMax(i));
   }
@@ -210,7 +210,7 @@ void KinodynamicCSpaceOMPLSE2::ConfigVelocityToOMPLState(const Config &q, const 
   }
 
   double* qomplTM = static_cast<ob::RealVectorStateSpace::StateType*>(qomplTMSpace)->values;
-  for(uint i = 0; i < 6; i++){
+  for(uint i = 0; i < 3; i++){
     qomplTM[i]=dq(i);
   }
   for(uint i = 0; i < Nklampt; i++){
@@ -253,7 +253,7 @@ void KinodynamicCSpaceOMPLSE2::ConfigToOMPLState(const Config &q, ob::State *qom
   }
 
   double* qomplTM = static_cast<ob::RealVectorStateSpace::StateType*>(qomplTMSpace)->values;
-  for(uint i = 0; i < (6+Nompl); i++){
+  for(uint i = 0; i < (3+Nompl); i++){
     qomplTM[i]=0.0;
   }
 }
@@ -269,9 +269,9 @@ Config KinodynamicCSpaceOMPLSE2::OMPLStateToVelocity(const ob::State *qompl){
   dq.resize(6+Nklampt);
   dq.setZero();
 
-  for(uint i = 0; i < 6; i++){
-    dq(i) = qomplTMState->values[i];
-  }
+  dq(0) = qomplTMState->values[0];
+  dq(1) = qomplTMState->values[1];
+  dq(3) = qomplTMState->values[3];
   for(uint i = 0; i < Nompl; i++){
     uint idx = ompl_to_klampt.at(i);
     dq(idx) = qomplTMState->values[i];
@@ -302,6 +302,6 @@ Config KinodynamicCSpaceOMPLSE2::OMPLStateToConfig(const ob::State *qompl){
 
 const oc::StatePropagatorPtr KinodynamicCSpaceOMPLSE2::StatePropagatorPtr(oc::SpaceInformationPtr si)
 {
-  return std::make_shared<TangentBundleIntegrator>(si, this);
+  return std::make_shared<IntegratorSE2>(si, this);
 }
 
