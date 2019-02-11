@@ -1,6 +1,5 @@
 #pragma once
 #include "planner/strategy/strategy.h"
-#include <omplapp/apps/SE3RigidBodyPlanning.h>
 #include <omplapp/config.h>
 
 namespace ob = ompl::base;

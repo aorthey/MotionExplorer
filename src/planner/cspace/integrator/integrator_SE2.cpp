@@ -41,8 +41,6 @@ void IntegratorSE2::propagate(const ob::State *state, const oc::Control* control
   uSE3(4) = 0;
   uSE3(5) = 0;
 
-  //std::cout << uSE3 << std::endl;
-
   //###########################################################################
   //(2) integrate from (q0,dq0) to (q1,dq1);
   //###########################################################################
