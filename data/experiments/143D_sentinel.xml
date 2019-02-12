@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<world>
+
+
+  <robot name="sentinel" file="/home/aorthey/git/orthoklampt/data/robots/sentinel_complete.urdf" translation="0 0 0" rotateRPY="0 0 0" config="143 
+   0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
+  <!--
+  -->
+  <!-- <rigidObject name="tunnel" file="/home/aorthey/git/orthoklampt/data/terrains/turbine/turbine.tri" translation="0 0 0" rotateRPY="0 0 0"/> -->
+
+</world>
