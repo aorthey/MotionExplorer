@@ -820,7 +820,7 @@ void QuotientCover::ProjectConfigurationOntoNeighborhoodBoundary(const Configura
   GetMetric()->Interpolate(q_center, q_projected, step_size, q_projected);
 }
 
-QuotientCover::Configuration* QuotientCover::NearestConfigurationOnBoundary(Configuration *q_center, const Configuration* q_outside)
+QuotientCover::Configuration* QuotientCover::NearestConfigurationOnBoundary(const Configuration *q_center, const Configuration* q_outside)
 {
   Configuration *q_projected = new Configuration(Q1);
   GetMetric()->Interpolate(q_center, q_outside, q_projected);

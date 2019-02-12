@@ -197,7 +197,7 @@ namespace ompl
       virtual double GetImportance() const override;
 
       void ProjectConfigurationOntoNeighborhoodBoundary(const Configuration *q_center, Configuration* q_projected);
-      Configuration* NearestConfigurationOnBoundary(Configuration *q_center, const Configuration* q_outside);
+      Configuration* NearestConfigurationOnBoundary(const Configuration *q_center, const Configuration* q_outside);
       Configuration* GetOutwardPointingConfiguration(Configuration *q);
 
       void Init();
