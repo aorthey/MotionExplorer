@@ -18,6 +18,7 @@ namespace ompl
         virtual bool Towards(og::QuotientCover::Configuration *q_from, og::QuotientCover::Configuration *q_to) override;
         virtual bool ExpandOutside(og::QuotientCover::Configuration *q_from) override;
         virtual bool ExpandRandom(og::QuotientCover::Configuration *q_from) override;
+        virtual bool ExpandVoronoi() override;
 
       private:
         bool ChooseBestDirection(const std::vector<og::QuotientCover::Configuration*> &q_children, bool addBestToPriorityQueue = false);

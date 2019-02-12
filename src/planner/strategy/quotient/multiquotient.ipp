@@ -108,7 +108,7 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
       if(DEBUG){
         // std::cout << std::string(80, '#') << std::endl;
         // std::cout << "could not find a solution on level " << k << std::endl;
-        // std::cout << std::string(80, '#') << std::endl;
+        std::cout << std::string(80, '#') << std::endl;
         for(uint i = 0; i < k+1; i++){
           std::cout << *quotientSpaces.at(i) << std::endl;
         }

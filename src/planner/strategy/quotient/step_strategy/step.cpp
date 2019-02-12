@@ -26,13 +26,10 @@ bool StepStrategy::ExpandRandom(QuotientCover::Configuration *q_from)
   quotient_cover_queue->GetQ1SamplerPtr()->sampleUniformNear(q_next->state, q_from->state, q_from->GetRadius());
   double d = quotient_cover_queue->GetMetric()->DistanceConfigurationConfiguration(q_next, q_from);
   quotient_cover_queue->GetQ1()->getStateSpace()->interpolate(q_from->state, q_next->state, q_from->GetRadius()/d, q_next->state);
-
-  //q_next->parent_neighbor = q_from;
   //############################################################################
 
   if(quotient_cover_queue->ComputeNeighborhood(q_next)){
     quotient_cover_queue->AddConfigurationToCover(q_next);
-    //quotient_cover_queue->AddConfigurationToPriorityQueue(q_k);
     return true;
   }
   return false;

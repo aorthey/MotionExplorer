@@ -114,7 +114,6 @@ typedef Tree<ob::PlannerDataPtr> PTree;
 
 void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std::vector<CSpaceOMPL*> cspace_levels)
 {
-  //std::cout << "Current children: " << current->children.size() << std::endl;
 
   if(current->content != nullptr)
   {
@@ -137,11 +136,7 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
         }
         exit(0);
       }
-      std::cout << "added " << pdi->numVertices() << " unannotated vertices." << std::endl;
     }else{
-      std::cout << std::string(80, '#') << std::endl;
-      std::cout << "added " << pdi->numVertices() << " annotated vertices." << std::endl;
-      std::cout << std::string(80, '#') << std::endl;
       std::vector<int> path = v->GetPath();
       uint level = v->GetLevel();
 
@@ -163,7 +158,6 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
     return;
   }
   for(uint k = 0; k < current->children.size(); k++){
-    //std::cout << "Selecting child: " << k << "/" << current->children.size()-1 << std::endl;
     RecurseTraverseTree(current->children.at(k), hierarchy, cspace_levels);
   }
 }

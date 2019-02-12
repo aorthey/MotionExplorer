@@ -201,7 +201,6 @@ void MotionPlanner::Step()
 
   StrategyOutput output(cspace_levels.back());
   strategy->Step(output);
-  //std::cout << output << std::endl;
   output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
 }
 void MotionPlanner::StepOneLevel()
