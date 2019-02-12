@@ -1,7 +1,7 @@
 #pragma once
 #include "algorithms/lemon_interface.h"
 #include "planner/cspace/cspace.h"
-#include "elements/swath_volume.h"
+//#include "elements/swath_volume.h"
 #include "elements/path_pwl.h"
 #include "gui/gui_state.h"
 
@@ -57,7 +57,6 @@ class Roadmap{
     ob::PlannerDataPtr pd{nullptr};
     CSpaceOMPL *cspace{nullptr};
     CSpaceOMPL *quotient_space{nullptr};
-    SwathVolume *swv{nullptr};
     PathPiecewiseLinear *path_ompl{nullptr};
 
     std::vector<Vector3> shortest_path;

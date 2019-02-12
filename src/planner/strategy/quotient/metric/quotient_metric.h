@@ -33,8 +33,10 @@ namespace ompl
         //############################################################################
         virtual void Interpolate(const Configuration *q_from, const Configuration *q_to, const double step, Configuration* q_interp);
         virtual void Interpolate(const Configuration *q_from, const Configuration *q_to, Configuration* q_interp);
-
         void Interpolate(const Configuration *q_from, Configuration *q_to);
+
+        void InterpolateQ1(const Configuration *q_from, Configuration *q_to);
+        void InterpolateQ1(const Configuration *q_from, const Configuration *q_to, Configuration* q_out);
         void InterpolateQ1(const Configuration *q_from, const Configuration *q_to, const double step, Configuration* q_interp);
 
 

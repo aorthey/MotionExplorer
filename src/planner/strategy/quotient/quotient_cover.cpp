@@ -374,12 +374,17 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
   if(!q->isStart && Ne<=0){
 
     std::cout << "Detected no neighbors. This is usually a problem of the Interpolate() function, which has probably interpolated to a configuration which lies OUTSIDE of our cover (i.e. we went outside of the neighborhood we started with)." << std::endl;
+    std::cout << std::string(80, '-') << std::endl;
+    std::cout << "Trying to add the following Configuration:" << std::endl;
     Print(q, false);
+    std::cout << std::string(80, '-') << std::endl;
     OMPL_ERROR("No Neighbors -- Cannot add to cover (Needs to be one single connected component)");
+
     std::cout << "NearestK found " << neighbors.size() << " neighbors." << std::endl;
     Configuration *qn = nearest_neighborhood->nearest(q);
     std::cout << "Distance to nearest NBH: " << GetMetric()->DistanceNeighborhoodNeighborhood(q, qn) << std::endl;
     std::cout << "Distance to nearest Config: " << GetMetric()->DistanceConfigurationConfiguration(q, qn) << std::endl;
+    Print(qn, false);
     for(uint k = 0; k < neighbors.size(); k++){
       Configuration *qk = neighbors.at(k);
       std::cout << "NEIGHBOR " << k << "/" << neighbors.size()<< ":";
@@ -394,8 +399,9 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
           std::cout << "Edge not added because distnace of NBHs is: " << dqqk << ", distance of configs is: " << dqk;
         }
       }
+      std::cout << "" << std::endl;
       Print(qk, false);
-      std::cout << "|" << std::endl;
+      std::cout << std::string(80, '-') << std::endl;
 
     }
     exit(0);

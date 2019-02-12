@@ -1,6 +1,6 @@
 #pragma once
 #include "elements/swept_volume.h"
-#include "elements/swath_volume.h"
+//#include "elements/swath_volume.h"
 
 class PlannerOutput{
 
@@ -28,9 +28,6 @@ class PlannerOutput{
 
     bool success;
 
-    SweptVolume *sv;
-    SwathVolume *swv;
-    
     Robot *robot;
     std::vector< std::vector< Config >>  paths;
 

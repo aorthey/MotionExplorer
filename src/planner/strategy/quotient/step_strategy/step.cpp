@@ -46,12 +46,7 @@ bool StepStrategy::ExpandVoronoi()
   quotient_cover_queue->SampleUniform(q_random);
 
   Configuration *q_nearest = quotient_cover_queue->NearestNeighborhood(q_random);
-  quotient_cover_queue->Print(q_random, false);
-  quotient_cover_queue->Print(q_nearest, false);
-
-  double d = quotient_cover_queue->GetMetric()->DistanceQ1(q_nearest, q_random);
-
-  Q1->getStateSpace()->interpolate(q_nearest->state, q_random->state, q_nearest->GetRadius()/d, q_random->state);
+  quotient_cover_queue->GetMetric()->InterpolateQ1(q_nearest, q_random);
 
   if(quotient_cover_queue->ComputeNeighborhood(q_random)){
     quotient_cover_queue->AddConfigurationToCover(q_random);
