@@ -110,7 +110,7 @@ void QuotientCover::SetMetric(const std::string& s_metric)
 
 void QuotientCover::setup(void)
 {
-  if(metric==nullptr){
+  if(GetMetric()==nullptr){
     SetMetric("euclidean");
   }
   BaseT::setup();
@@ -348,7 +348,12 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
     Configuration *qk = neighbors.at(k);
     if(!IsNeighborhoodInsideNeighborhood(qk, q))
     {
-      const double dqqk = metric->DistanceNeighborhoodNeighborhood(qk, q);
+      //We operate here completely on Q1. Why? Because if we would use another
+      //metric, like shortest path, we might erroneously declare two
+      //configurations are disjoint (because we might not have a direct edge on
+      //the cover). However, the neighborhoods are actually overlapping in Q1,
+      //so we should measure their distance directly in Q1!
+      const double dqqk = GetMetric()->DistanceNeighborhoodNeighborhoodQ1(qk, q);
       if(dqqk < 1e-10){
         AddEdge(q, qk);
       }else{
@@ -369,27 +374,27 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCover(Configuration *q)
   if(!q->isStart && Ne<=0){
 
     std::cout << "Detected no neighbors. This is usually a problem of the Interpolate() function, which has probably interpolated to a configuration which lies OUTSIDE of our cover (i.e. we went outside of the neighborhood we started with)." << std::endl;
-    QuotientCover::Print(q, false);
+    Print(q, false);
     OMPL_ERROR("No Neighbors -- Cannot add to cover (Needs to be one single connected component)");
     std::cout << "NearestK found " << neighbors.size() << " neighbors." << std::endl;
     Configuration *qn = nearest_neighborhood->nearest(q);
-    std::cout << "Distance to nearest NBH: " << metric->DistanceNeighborhoodNeighborhood(q, qn) << std::endl;
-    std::cout << "Distance to nearest Config: " << metric->DistanceConfigurationConfiguration(q, qn) << std::endl;
+    std::cout << "Distance to nearest NBH: " << GetMetric()->DistanceNeighborhoodNeighborhood(q, qn) << std::endl;
+    std::cout << "Distance to nearest Config: " << GetMetric()->DistanceConfigurationConfiguration(q, qn) << std::endl;
     for(uint k = 0; k < neighbors.size(); k++){
       Configuration *qk = neighbors.at(k);
       std::cout << "NEIGHBOR " << k << "/" << neighbors.size()<< ":";
       if(IsNeighborhoodInsideNeighborhood(qk, q)){
         std::cout << "is inside current NBH (and has been flagged for removal)";
       }else{
-        const double dqqk = metric->DistanceNeighborhoodNeighborhood(qk, q);
-        const double dqk = metric->DistanceConfigurationConfiguration(qk, q);
+        const double dqqk = GetMetric()->DistanceNeighborhoodNeighborhood(qk, q);
+        const double dqk = GetMetric()->DistanceConfigurationConfiguration(qk, q);
         if(dqqk < 1e-10){
           std::cout << "OK (added edge)";
-          AddEdge(q, qk);
         }else{
           std::cout << "Edge not added because distnace of NBHs is: " << dqqk << ", distance of configs is: " << dqk;
         }
       }
+      Print(qk, false);
       std::cout << "|" << std::endl;
 
     }
@@ -412,11 +417,11 @@ QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Con
   Configuration *q_inward_to_outward = new Configuration(GetQ1(), q_center->GetInwardPointingConfiguration());
 
   double radius = q_center->GetRadius();
-  double distance_center_inward = metric->DistanceQ1(q_inward_to_outward, q_center);
+  double distance_center_inward = GetMetric()->DistanceQ1(q_inward_to_outward, q_center);
   double step = (radius+distance_center_inward)/distance_center_inward;
 
   //Make sure that this stops at the boundary 
-  metric->InterpolateQ1(q_inward_to_outward, q_center, step, q_inward_to_outward);
+  GetMetric()->InterpolateQ1(q_inward_to_outward, q_center, step, q_inward_to_outward);
 
   if(ComputeNeighborhood(q_inward_to_outward)){
     return q_inward_to_outward;
@@ -427,7 +432,7 @@ QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Con
 
 void QuotientCover::AddEdge(Configuration *q_from, Configuration *q_to)
 {
-  double d = metric->DistanceQ1(q_from, q_to);
+  double d = GetMetric()->DistanceQ1(q_from, q_to);
   EdgeInternalState properties(d);
   Vertex v_from = get(normalizedIndexToVertex, q_from->index);
   Vertex v_to = get(normalizedIndexToVertex, q_to->index);
@@ -493,7 +498,7 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCoverGraph(Configuration 
   //(3) add to PDF
   //###########################################################################
   AddConfigurationToPDF(q);
-  q->goal_distance = metric->DistanceConfigurationConfiguration(q, q_goal);
+  q->goal_distance = GetMetric()->DistanceConfigurationConfiguration(q, q_goal);
 
   return v;
 }
@@ -628,7 +633,7 @@ bool QuotientCover::ComputeNeighborhood(Configuration *q, bool verbose)
 
 bool QuotientCover::IsConfigurationInsideNeighborhood(Configuration *q, Configuration *qn)
 {
-  return (metric->DistanceConfigurationNeighborhood(q, qn) <= 1e-10);
+  return (GetMetric()->DistanceConfigurationNeighborhood(q, qn) <= 1e-10);
 }
 
 bool QuotientCover::IsConfigurationInsideCover(Configuration *q)
@@ -696,14 +701,14 @@ QuotientCover::Configuration* QuotientCover::SampleNeighborhoodBoundary(Configur
   Configuration *q_next = new Configuration(GetQ1());
 
   GetQ1SamplerPtr()->sampleUniformNear(q_next->state, q_center->state, q_center->GetRadius());
-  double d = metric->DistanceConfigurationConfiguration(q_next, q_center);
+  double d = GetMetric()->DistanceConfigurationConfiguration(q_next, q_center);
 
   while(d < 1e-10){
     GetQ1SamplerPtr()->sampleUniformNear(q_next->state, q_center->state, q_center->GetRadius());
-    d = metric->DistanceConfigurationConfiguration(q_next, q_center);
+    d = GetMetric()->DistanceConfigurationConfiguration(q_next, q_center);
   }
 
-  metric->InterpolateQ1(q_center, q_next, radius/d, q_next);
+  GetMetric()->InterpolateQ1(q_center, q_next, radius/d, q_next);
 
   return q_next;
 }
@@ -750,7 +755,7 @@ QuotientCover::Configuration* QuotientCover::SampleNeighborhoodBoundaryUniformNe
 
 bool QuotientCover::IsNeighborhoodInsideNeighborhood(Configuration *lhs, Configuration *rhs)
 {
-  double distance_centers = metric->DistanceConfigurationConfiguration(lhs, rhs);
+  double distance_centers = GetMetric()->DistanceConfigurationConfiguration(lhs, rhs);
   double radius_rhs = rhs->GetRadius();
   double radius_lhs = lhs->GetRadius();
   if(radius_rhs < minimum_neighborhood_radius || radius_lhs < minimum_neighborhood_radius)
@@ -773,7 +778,7 @@ void QuotientCover::RewireConfiguration(Configuration *q)
 
   nearest_neighborhood->nearestK(q, K, neighbors);
   Configuration *qn = neighbors.at(K-1);
-  double dn = metric->DistanceNeighborhoodNeighborhood(q, qn);
+  double dn = GetMetric()->DistanceNeighborhoodNeighborhood(q, qn);
   if(dn <= 1e-10){
     AddEdge(q, qn);
   }
@@ -781,7 +786,7 @@ void QuotientCover::RewireConfiguration(Configuration *q)
 
 // void QuotientCover::CheckConfigurationIsOnBoundary(Configuration *q_boundary, Configuration *q)
 // {
-//   double d_outcome = metric->DistanceConfigurationConfiguration(q_boundary, q);
+//   double d_outcome = GetMetric()->DistanceConfigurationConfiguration(q_boundary, q);
 //   if(fabs(d_outcome - q->GetRadius())>1e-10)
 //   {
 //     std::cout << "Point not on boundary!" << std::endl;
@@ -804,15 +809,15 @@ QuotientCover::Configuration* QuotientCover::NearestConfiguration(const Configur
 
 void QuotientCover::ProjectConfigurationOntoNeighborhoodBoundary(const Configuration *q_center, Configuration* q_projected)
 {
-  const double d_center_to_proj = metric->DistanceConfigurationConfiguration(q_center, q_projected);
+  const double d_center_to_proj = GetMetric()->DistanceConfigurationConfiguration(q_center, q_projected);
   double step_size = q_center->GetRadius()/d_center_to_proj;
-  metric->Interpolate(q_center, q_projected, step_size, q_projected);
+  GetMetric()->Interpolate(q_center, q_projected, step_size, q_projected);
 }
 
 QuotientCover::Configuration* QuotientCover::NearestConfigurationOnBoundary(Configuration *q_center, const Configuration* q_outside)
 {
   Configuration *q_projected = new Configuration(Q1);
-  metric->Interpolate(q_center, q_outside, q_projected);
+  GetMetric()->Interpolate(q_center, q_outside, q_projected);
 
   if(ComputeNeighborhood(q_projected)){
     return q_projected;
@@ -826,7 +831,7 @@ bool QuotientCover::GetSolution(ob::PathPtr &solution)
 {
   if(!isConnected){
     Configuration* qn = NearestNeighborhood(q_goal);
-    double d_goal = metric->DistanceNeighborhoodNeighborhood(qn, q_goal);
+    double d_goal = GetMetric()->DistanceNeighborhoodNeighborhood(qn, q_goal);
     if(d_goal < 1e-10){
       v_goal = AddConfigurationToCover(q_goal);
       AddEdge(q_goal, qn);
@@ -950,7 +955,7 @@ std::vector<QuotientCover::Vertex> QuotientCover::GetCoverPath(const Vertex& v_s
     boost::astar_search(graph, v_source,
                     [this, v_sink](const Vertex &v)
                     {
-                        return ob::Cost(metric->DistanceConfigurationConfiguration(graph[v], graph[v_sink]));
+                        return ob::Cost(GetMetric()->DistanceConfigurationConfiguration(graph[v], graph[v_sink]));
                     },
                       predecessor_map(predecessor)
                       .weight_map(weight)

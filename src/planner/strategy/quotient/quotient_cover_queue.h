@@ -24,6 +24,14 @@ namespace ompl
     {
       typedef og::QuotientCover BaseT;
 
+      //compiler lookup just finds the lowest class in which Print is defined,
+      //and then considers all the overload types in that class. If there is an
+      //overloaded function of the same name in a class further up, it will be
+      //ignored. We need to manually tell the compiler here to include them in
+      //the search.
+    public:
+      using QuotientCover::Print; 
+
     public:
       const uint verbose{0};
       QuotientCoverQueue(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);

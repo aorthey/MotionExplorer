@@ -33,6 +33,19 @@ double QuotientMetric::DistanceConfigurationNeighborhood(const Configuration *q_
   return std::max(d - d_to, 0.0);
 }
 
+double QuotientMetric::DistanceConfigurationConfigurationQ1(const Configuration *q_from, const Configuration *q_to)
+{
+  return DistanceQ1(q_from, q_to);
+}
+double QuotientMetric::DistanceNeighborhoodNeighborhoodQ1(const Configuration *q_from, const Configuration *q_to)
+{
+  double d = DistanceQ1(q_from, q_to);
+  double d_from = q_from->GetRadius();
+  double d_to = q_to->GetRadius();
+  double d_open_neighborhood_distance = (double)std::fmax(d - d_from - d_to, 0.0); 
+  return d_open_neighborhood_distance;
+}
+
 double QuotientMetric::DistanceNeighborhoodNeighborhood(const Configuration *q_from, const Configuration *q_to)
 {
   double d_from = q_from->GetRadius();
@@ -53,7 +66,7 @@ double QuotientMetric::DistanceNeighborhoodNeighborhood(const Configuration *q_f
     exit(1);
   }
 
-  double d_open_neighborhood_distance = (double)std::max(d - d_from - d_to, 0.0); 
+  double d_open_neighborhood_distance = (double)std::fmax(d - d_from - d_to, 0.0); 
   return d_open_neighborhood_distance;
 }
 double QuotientMetric::DistanceConfigurationConfiguration(const Configuration *q_from, const Configuration *q_to) 

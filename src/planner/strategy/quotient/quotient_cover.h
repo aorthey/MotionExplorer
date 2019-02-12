@@ -108,6 +108,8 @@ namespace ompl
           ob::Cost cost{+dInf};
           bool isSufficient{false};
       };
+      virtual void Print(std::ostream& out) const override;
+      void Print(const Configuration *q, bool stopOnError=true) const;
     private:
 
       struct GraphBundle{
@@ -126,6 +128,7 @@ namespace ompl
          GraphBundle
        > Graph;
       friend std::ostream& operator<< (std::ostream& out, const Graph& graph);
+
 
     protected:
       typedef boost::graph_traits<Graph> BGT;
@@ -251,8 +254,6 @@ namespace ompl
       const NearestNeighborsPtr& GetNearestNeighborsCover() const;
       const NearestNeighborsPtr& GetNearestNeighborsVertex() const;
 
-      virtual void Print(std::ostream& out) const override;
-      virtual void Print(const Configuration *q, bool stopOnError=true) const;
 
     };
   }

@@ -29,8 +29,8 @@
     <maxplanningtime>1</maxplanningtime>
 
     <hierarchy>
-      <level inner_index="5" outer_index="4" cspace_constant="1" type="R3"/>
-      <level inner_index="3" outer_index="4" cspace_constant="1" type="R3"/>
+      <level inner_index="5" outer_index="5" cspace_constant="1" type="R3"/>
+      <level inner_index="3" outer_index="3" cspace_constant="1" type="R3"/>
       <level inner_index="0" cspace_constant="0.512159005656" type="SE3"/>
     </hierarchy>
 

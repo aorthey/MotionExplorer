@@ -22,6 +22,9 @@ namespace ompl
         double DistanceConfigurationNeighborhood(const Configuration *q_from, const Configuration *q_to);
         double DistanceNeighborhoodNeighborhood(const Configuration *q_from, const Configuration *q_to);
 
+        double DistanceConfigurationConfigurationQ1(const Configuration *q_from, const Configuration *q_to);
+        double DistanceNeighborhoodNeighborhoodQ1(const Configuration *q_from, const Configuration *q_to);
+
         double DistanceQ1(const Configuration *q_from, const Configuration *q_to);
         double DistanceX1(const Configuration *q_from, const Configuration *q_to);
 

@@ -67,13 +67,13 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
     Configuration* q_nearest = PriorityQueueNearestToGoal_Top();
     if(q_nearest == nullptr) return;
 
-    //std::cout << "GOTO GOAL" << std::endl;
+    std::cout << "GOTO GOAL" << std::endl;
     q_nearest->number_attempted_expansions++;
     progressMadeTowardsGoal = step_strategy->Towards(q_nearest, GetGoalConfiguration());
   }else{
-    //std::cout << "EXPAND RNADOM" << std::endl;
     Configuration* q = PriorityQueueCandidate_PopTop();
     if(q!=nullptr){
+      std::cout << "EXPAND OUTSIDE" << std::endl;
       //############################################################################
       //STATE2: ExtendFreeSpace Strategy (Active Node Expansion)
       //############################################################################
@@ -82,11 +82,13 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
       }
       step_strategy->ExpandOutside(q);
     }else{
+      std::cout << "EXPAND VORONOI" << std::endl;
       //############################################################################
       //STATE3: FindNewWays (Passive Node Expansion)
       //############################################################################
-      q = pdf_connectivity_configurations.sample(rng_.uniform01());
-      step_strategy->ExpandRandom(q);
+      //q = pdf_connectivity_configurations.sample(rng_.uniform01());
+      //step_strategy->ExpandRandom(q);
+      step_strategy->ExpandVoronoi();
     }
   }
 }

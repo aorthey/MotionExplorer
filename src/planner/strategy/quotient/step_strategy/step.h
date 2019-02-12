@@ -27,10 +27,10 @@ namespace ompl
 
         virtual bool ExpandOutside(og::QuotientCover::Configuration *q_from);
         virtual bool ExpandRandom(og::QuotientCover::Configuration *q_from);
+        virtual bool ExpandVoronoi();
 
       protected:
         og::QuotientCoverQueue *quotient_cover_queue;
-        og::QuotientMetric *metric;
     };
   }
 }

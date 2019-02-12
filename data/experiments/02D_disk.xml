@@ -2,7 +2,7 @@
 
 <world>
 
-  <robot name="disk" file="../robots/cylinder_anti_voronoi_bias.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="disk" file="../robots/planar/disk.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
   <terrain name="O1" file="../terrains/2droom/2droom_anti_voronoi_bias.tri" translation="0 0 0" rotateRPY="0 0 1.57">
      <display color="0.8 0.8 0.8 0.5" texture="checker" texture_projection="z"/>
@@ -16,7 +16,6 @@
     <se3max config="6  +8.0 +8.0 +0.0 +3.141593 +1.57 +3.141593"/>
     <freeFloating>1</freeFloating>
     <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
-
     <hierarchy>
       <level inner_index="0" cspace_constant="1" type="R2"/>
     </hierarchy>
