@@ -19,7 +19,6 @@ namespace ompl
     //other strategies can use this as a central points of information to aid
     //their choice of the best cover region to expand
 
-    OMPL_CLASS_FORWARD(StepStrategy);
     class QuotientCoverQueue: public og::QuotientCover
     {
       typedef og::QuotientCover BaseT;
@@ -46,11 +45,6 @@ namespace ompl
       void AddConfigurationToPriorityQueue(Configuration *q);
       void PrintQueue(int n_head = std::numeric_limits<int>::infinity()); //print the first n items
 
-    protected:
-
-      StepStrategyPtr step_strategy;
-
-      uint NUMBER_OF_EXPANSION_SAMPLES{0};
       const double shortestPathBias{1.0};
 
       Configuration* PriorityQueueNearestToGoal_Top();

@@ -2,8 +2,6 @@
 #include "quotient_cover_queue.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
-#include "planner/strategy/quotient/step_strategy/step_straight.h"
-#include "planner/strategy/quotient/step_strategy/step_adaptive.h"
 #include <limits>
 #include <boost/graph/astar_search.hpp>
 #include <boost/graph/incremental_components.hpp>
@@ -17,7 +15,6 @@ using namespace ompl::geometric;
 
 QuotientCoverQueue::QuotientCoverQueue(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
-  step_strategy = std::make_shared<StepStrategyAdaptive>(this);
 }
 // ">" operator: smallest value is top in queue
 // "<" operator: largest value is top in queue (default)
@@ -47,8 +44,12 @@ bool QuotientCoverQueue::CmpGoalDistancePtrs::operator()(const Configuration* lh
 {
    return lhs->GetGoalDistance() > rhs->GetGoalDistance();
 }
+
 QuotientCover::Configuration* QuotientCoverQueue::PriorityQueueNearestToGoal_Top()
 {
+  if(configurations_sorted_by_nearest_to_goal.empty()){
+    std::cout << "QUEUE IS EMPTY" << std::endl;
+  }
   Configuration *q_nearest = configurations_sorted_by_nearest_to_goal.top();
   while(q_nearest->index < 0 && !configurations_sorted_by_nearest_to_goal.empty()){
     configurations_sorted_by_nearest_to_goal.pop();
@@ -94,7 +95,6 @@ void QuotientCoverQueue::clear()
     configurations_sorted_by_nearest_to_goal.pop();
   }
   nearest_to_goal_has_changed = true;
-  NUMBER_OF_EXPANSION_SAMPLES = (Q1->getStateDimension()+1)*1;
 }
 
 QuotientCover::Vertex QuotientCoverQueue::AddConfigurationToCover(Configuration *q)

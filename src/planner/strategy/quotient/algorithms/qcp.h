@@ -10,6 +10,7 @@ namespace ompl
   {
 
     //QCP: Quotient-space Cover Planner
+    OMPL_CLASS_FORWARD(CoverExpansionStrategy);
     class QCP: public og::QuotientCoverQueue
     {
       typedef og::QuotientCoverQueue BaseT;
@@ -36,6 +37,11 @@ namespace ompl
       //TODO: remove adaptive goal bias, replace by percentage of checking while
       const double rewireBias{0.1}; //when solution has been found, this bias trades off exploration vs exploitation
       bool progressMadeTowardsGoal{true};
+
+      CoverExpansionStrategyPtr expansion_strategy_goal;
+      CoverExpansionStrategyPtr expansion_strategy_outwards;
+      CoverExpansionStrategyPtr expansion_strategy_random_voronoi;
+      CoverExpansionStrategyPtr expansion_strategy_random_boundary;
 
       //PDF which assigns a value to each configuration, depending on its connectivity
       PDF pdf_connectivity_configurations;

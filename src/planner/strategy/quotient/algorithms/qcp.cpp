@@ -2,7 +2,7 @@
 #include "gui/common.h"
 #include "qcp.h"
 #include "planner/strategy/quotient/metric/quotient_metric.h"
-#include "planner/strategy/quotient/step_strategy/step.h"
+#include "planner/strategy/quotient/cover_expansion_strategy/expansion_goal.h"
 
 using namespace ompl::geometric;
 
@@ -14,6 +14,10 @@ QCP::QCP(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, pare
   setName("QCP"+std::to_string(id));
   progressMadeTowardsGoal = true;
   SetMetric("shortestpath");
+  expansion_strategy_goal = std::make_shared<CoverExpansionStrategyGoal>(this);
+  // expansion_strategy_outwards;
+  // expansion_strategy_random_voronoi;
+  // expansion_strategy_random_boundary;
 }
 
 void QCP::setup()
@@ -64,32 +68,35 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
     //############################################################################
     //STATE1: GoalOriented Strategy
     //############################################################################
-    Configuration* q_nearest = PriorityQueueNearestToGoal_Top();
-    if(q_nearest == nullptr) return;
+    progressMadeTowardsGoal = (expansion_strategy_goal->Step() > 0);
+    // Configuration* q_nearest = PriorityQueueNearestToGoal_Top();
+    // if(q_nearest == nullptr) return;
 
-    std::cout << "GOTO GOAL" << std::endl;
-    q_nearest->number_attempted_expansions++;
-    progressMadeTowardsGoal = step_strategy->Towards(q_nearest, GetGoalConfiguration());
+    // std::cout << "GOTO GOAL" << std::endl;
+    // q_nearest->number_attempted_expansions++;
+    // progressMadeTowardsGoal = step_strategy->Towards(q_nearest, GetGoalConfiguration());
   }else{
-    Configuration* q = PriorityQueueCandidate_PopTop();
-    if(q!=nullptr){
-      std::cout << "EXPAND OUTSIDE" << std::endl;
-      //############################################################################
-      //STATE2: ExtendFreeSpace Strategy (Active Node Expansion)
-      //############################################################################
-      if(q->index < 0){
-        AddConfigurationToCover(q);
-      }
-      step_strategy->ExpandOutside(q);
-    }else{
-      std::cout << "EXPAND VORONOI" << std::endl;
-      //############################################################################
-      //STATE3: FindNewWays (Passive Node Expansion)
-      //############################################################################
-      //q = pdf_connectivity_configurations.sample(rng_.uniform01());
-      //step_strategy->ExpandRandom(q);
-      step_strategy->ExpandVoronoi();
-    }
+    std::cout << "NYI" << std::endl;
+    exit(0);
+    //Configuration* q = PriorityQueueCandidate_PopTop();
+    //if(q!=nullptr){
+    //  std::cout << "EXPAND OUTSIDE" << std::endl;
+    //  //############################################################################
+    //  //STATE2: ExtendFreeSpace Strategy (Active Node Expansion)
+    //  //############################################################################
+    //  if(q->index < 0){
+    //    AddConfigurationToCover(q);
+    //  }
+    //  step_strategy->ExpandOutside(q);
+    //}else{
+    //  std::cout << "EXPAND VORONOI" << std::endl;
+    //  //############################################################################
+    //  //STATE3: FindNewWays (Passive Node Expansion)
+    //  //############################################################################
+    //  //q = pdf_connectivity_configurations.sample(rng_.uniform01());
+    //  //step_strategy->ExpandRandom(q);
+    //  step_strategy->ExpandVoronoi();
+    //}
   }
 }
 
@@ -100,8 +107,8 @@ void QCP::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
     RewireCover(ptc);
   }else{
     Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
-    step_strategy->ExpandOutside(q);
-    //step_strategy->ExpandRandom(q);
+    std::cout << "NYI" << std::endl;
+    //step_strategy->ExpandOutside(q);
     pdf_connectivity_configurations.update(static_cast<PDF_Element*>(q->GetConnectivityPDFElement()), ValueConnectivity(q));
   }
 }
