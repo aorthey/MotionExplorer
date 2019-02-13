@@ -1,5 +1,5 @@
 #pragma once
-#include "planner/strategy/quotient/quotient_graph.h"
+#include "planner/strategy/quotientgraph/quotient_graph.h"
 #include <ompl/datastructures/PDF.h>
 
 

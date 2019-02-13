@@ -1,6 +1,6 @@
 #pragma once
 
-#include "quotient.h"
+#include "planner/strategy/quotient/quotient.h"
 #include "planner/cspace/cover/open_set.h"
 #include <stack>
 #include <ompl/geometric/planners/PlannerIncludes.h>
@@ -48,14 +48,9 @@ namespace ompl
               associated_target = vis.associated_target;
               associated_source = vis.associated_source;
               associated_t = vis.associated_t;
-              open_neighborhood_distance = vis.open_neighborhood_distance;
-              open_neighborhood = vis.open_neighborhood;
 
-              innerApproximationDistance = vis.innerApproximationDistance;
-              outerApproximationDistance = vis.outerApproximationDistance;
               start = vis.start;
               goal = vis.goal;
-              isSufficient = vis.isSufficient;
               isFeasible = vis.isFeasible;
             }
             ob::State *state{nullptr};
@@ -66,14 +61,9 @@ namespace ompl
             unsigned long int associated_target{0};
             unsigned long int associated_source{0};
             double associated_t{-1};
-            double open_neighborhood_distance{0.0};
-            cover::OpenSet *open_neighborhood{nullptr};
 
-            double innerApproximationDistance{0.0};
-            double outerApproximationDistance{0.0};
             bool start{false};
             bool goal{false};
-            bool isSufficient{false};
             bool isFeasible{false};
         };
 
@@ -86,7 +76,6 @@ namespace ompl
             {
               cost = eis.cost;
               original_cost = eis.original_cost;
-              isSufficient = eis.isSufficient;
             }
             void setWeight(double d){
               cost = ob::Cost(d);
@@ -100,7 +89,6 @@ namespace ompl
           private:
             ob::Cost cost{+dInf};
             ob::Cost original_cost{+dInf};
-            bool isSufficient{false};
         };
 
         typedef boost::adjacency_list<

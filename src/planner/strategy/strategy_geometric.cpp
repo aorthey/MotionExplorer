@@ -5,12 +5,9 @@
 #include "planner/benchmark/benchmark_output.h"
 
 #include "planner/strategy/quotient/multiquotient.h"
-#include "planner/strategy/quotient/algorithms/qmp_connect.h"
-#include "planner/strategy/quotient/algorithms/qmp.h"
-
+#include "planner/strategy/quotientgraph/algorithms/qmp_connect.h"
+#include "planner/strategy/quotientgraph/algorithms/qmp.h"
 #include "planner/strategy/quotientchart/multichart.h"
-//#include "planner/strategy/quotientchart/algorithms/qng2.h"
-//#include "planner/strategy/quotient/algorithms/qng.h"
 #include "planner/strategy/quotient/algorithms/qcp.h"
 #include "planner/strategy/quotient/algorithms/qsampler.h"
 
