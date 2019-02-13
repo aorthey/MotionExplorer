@@ -3,6 +3,9 @@
 #include "qcp.h"
 #include "planner/strategy/quotient/metric/quotient_metric.h"
 #include "planner/strategy/quotient/cover_expansion_strategy/expansion_goal.h"
+#include "planner/strategy/quotient/cover_expansion_strategy/expansion_outwards.h"
+#include "planner/strategy/quotient/cover_expansion_strategy/expansion_random_voronoi.h"
+#include "planner/strategy/quotient/cover_expansion_strategy/expansion_random_boundary.h"
 
 using namespace ompl::geometric;
 
@@ -15,9 +18,9 @@ QCP::QCP(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, pare
   progressMadeTowardsGoal = true;
   SetMetric("shortestpath");
   expansion_strategy_goal = std::make_shared<CoverExpansionStrategyGoal>(this);
-  // expansion_strategy_outwards;
-  // expansion_strategy_random_voronoi;
-  // expansion_strategy_random_boundary;
+  expansion_strategy_outwards = std::make_shared<CoverExpansionStrategyOutwards>(this);
+  expansion_strategy_random_voronoi = std::make_shared<CoverExpansionStrategyRandomVoronoi>(this);
+  expansion_strategy_random_boundary = std::make_shared<CoverExpansionStrategyRandomBoundary>(this);
 }
 
 void QCP::setup()
@@ -27,7 +30,6 @@ void QCP::setup()
 
 void QCP::clear()
 {
-  pdf_connectivity_configurations.clear();
   progressMadeTowardsGoal = true;
   BaseT::clear();
 }
@@ -43,21 +45,13 @@ void QCP::Grow(double t)
     Init();
     AddConfigurationToPriorityQueue(GetStartConfiguration());
   }
-
   if(saturated) return;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
 
-  int N = boost::num_edges(graph);
   if(!hasSolution){
     GrowWithoutSolution(ptc);
   }else{
     GrowWithSolution(ptc);
-  }
-  //DEBUG
-  int M = boost::num_edges(graph);
-  if( abs(N-M) > 100 ){
-    std::cout << "increase of edges from " << N << " to " << M << std::endl;
-    //exit(0);
   }
 }
 
@@ -65,38 +59,13 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
 {
   if(NearestToGoalHasChanged() || progressMadeTowardsGoal)
   {
-    //############################################################################
-    //STATE1: GoalOriented Strategy
-    //############################################################################
     progressMadeTowardsGoal = (expansion_strategy_goal->Step() > 0);
-    // Configuration* q_nearest = PriorityQueueNearestToGoal_Top();
-    // if(q_nearest == nullptr) return;
-
-    // std::cout << "GOTO GOAL" << std::endl;
-    // q_nearest->number_attempted_expansions++;
-    // progressMadeTowardsGoal = step_strategy->Towards(q_nearest, GetGoalConfiguration());
   }else{
-    std::cout << "NYI" << std::endl;
-    exit(0);
-    //Configuration* q = PriorityQueueCandidate_PopTop();
-    //if(q!=nullptr){
-    //  std::cout << "EXPAND OUTSIDE" << std::endl;
-    //  //############################################################################
-    //  //STATE2: ExtendFreeSpace Strategy (Active Node Expansion)
-    //  //############################################################################
-    //  if(q->index < 0){
-    //    AddConfigurationToCover(q);
-    //  }
-    //  step_strategy->ExpandOutside(q);
-    //}else{
-    //  std::cout << "EXPAND VORONOI" << std::endl;
-    //  //############################################################################
-    //  //STATE3: FindNewWays (Passive Node Expansion)
-    //  //############################################################################
-    //  //q = pdf_connectivity_configurations.sample(rng_.uniform01());
-    //  //step_strategy->ExpandRandom(q);
-    //  step_strategy->ExpandVoronoi();
-    //}
+    if(PriorityQueueCandidate_IsEmpty()){
+      expansion_strategy_random_voronoi->Step();
+    }else{
+      expansion_strategy_outwards->Step();
+    }
   }
 }
 
@@ -106,10 +75,7 @@ void QCP::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
   if(r <= rewireBias){
     RewireCover(ptc);
   }else{
-    Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
-    std::cout << "NYI" << std::endl;
-    //step_strategy->ExpandOutside(q);
-    pdf_connectivity_configurations.update(static_cast<PDF_Element*>(q->GetConnectivityPDFElement()), ValueConnectivity(q));
+    expansion_strategy_random_boundary->Step();
   }
 }
 
@@ -117,20 +83,10 @@ void QCP::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
 // Misc Functions
 //############################################################################
 
-double QCP::ValueConnectivity(Configuration *q)
-{
-  //Vertex v = get(indexToVertex, q->index);
-  //QuotientCover::Print(q, false);
-  double d_alpha = q->number_attempted_expansions;
-  //double d_alpha = boost::degree(v, graph)+1;
-  //double d_connectivity = q->GetRadius()/d_alpha;
-  double d_connectivity = 1.0/(d_alpha+1);
-  return d_connectivity;
-}
-
 void QCP::RewireCover(ob::PlannerTerminationCondition &ptc)
 {
-  Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
+  //Configuration *q = pdf_connectivity_configurations.sample(rng_.uniform01());
+  Configuration *q = GetConfigurationLowConnectivity();
 
   //find all vertices which intersect NBH, then check if they have an edge in
   //common. Then add one if they don't.
@@ -152,34 +108,16 @@ void QCP::RewireCover(ob::PlannerTerminationCondition &ptc)
   std::vector<Configuration*> neighbors;
   Vertex v = get(normalizedIndexToVertex, q->index);
   uint K = boost::degree(v, graph)+1;
-  nearest_neighborhood->nearestK(q, K, neighbors);
+  nearest_neighborhood->nearestK(const_cast<Configuration*>(q), K, neighbors);
 
   if(neighbors.size()>=K){
     Configuration *qn = neighbors.at(K-1);
     double dn = GetMetric()->DistanceNeighborhoodNeighborhood(q, qn);
     if(dn <= 1e-10){
       AddEdge(q, qn);
-      pdf_connectivity_configurations.update(static_cast<PDF_Element*>(qn->GetConnectivityPDFElement()), ValueConnectivity(qn));
-      pdf_connectivity_configurations.update(static_cast<PDF_Element*>(q->GetConnectivityPDFElement()), ValueConnectivity(q));
     }
   }
 }
-
-QuotientCover::Vertex QCP::AddConfigurationToCover(Configuration *q)
-{
-  QuotientCover::Vertex v = BaseT::AddConfigurationToCover(q);
-
-  PDF_Element *q_element = pdf_connectivity_configurations.add(q, ValueConnectivity(q));
-  q->SetConnectivityPDFElement(q_element);
-
-  return v;
-}
-void QCP::RemoveConfigurationFromCover(Configuration *q)
-{
-  pdf_connectivity_configurations.remove(static_cast<PDF_Element*>(q->GetConnectivityPDFElement()));
-  BaseT::RemoveConfigurationFromCover(q);
-}
-
 
 double QCP::GetImportance() const
 {

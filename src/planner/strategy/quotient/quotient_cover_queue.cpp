@@ -58,6 +58,10 @@ QuotientCover::Configuration* QuotientCoverQueue::PriorityQueueNearestToGoal_Top
   return q_nearest;
 }
 
+bool QuotientCoverQueue::PriorityQueueCandidate_IsEmpty()
+{
+  return configurations_sorted_by_nearest_to_goal.empty();
+}
 QuotientCover::Configuration* QuotientCoverQueue::PriorityQueueCandidate_PopTop()
 {
   Configuration *q = nullptr;
@@ -94,14 +98,23 @@ void QuotientCoverQueue::clear()
   {
     configurations_sorted_by_nearest_to_goal.pop();
   }
+  pdf_configurations_connectivity.clear();
   nearest_to_goal_has_changed = true;
 }
 
-QuotientCover::Vertex QuotientCoverQueue::AddConfigurationToCover(Configuration *q)
+void QuotientCoverQueue::AddEdge(Configuration *q_from, Configuration *q_to)
 {
-  Vertex v = BaseT::AddConfigurationToCover(q);
+  BaseT::AddEdge(q_from, q_to);
+  PDFConnectivityUpdate(q_from);
+  PDFConnectivityUpdate(q_to);
+}
+
+QuotientCover::Vertex QuotientCoverQueue::AddConfigurationToCoverGraph(Configuration *q)
+{
+  Vertex v = BaseT::AddConfigurationToCoverGraph(q);
   priority_queue_member_configurations.push(q);
 
+  PDFConnectivityAdd(q);
 
   configurations_sorted_by_nearest_to_goal.push(q);
   if(q == configurations_sorted_by_nearest_to_goal.top()){
@@ -109,6 +122,11 @@ QuotientCover::Vertex QuotientCoverQueue::AddConfigurationToCover(Configuration 
   }
 
   return v;
+}
+void QuotientCoverQueue::RemoveConfigurationFromCover(Configuration *q)
+{
+  PDFConnectivityRemove(q);
+  BaseT::RemoveConfigurationFromCover(q);
 }
 
 bool QuotientCoverQueue::NearestToGoalHasChanged()
@@ -139,54 +157,45 @@ void QuotientCoverQueue::PrintQueue(int n_head)
   }
 }
 
-void QuotientCoverQueue::AddConfigurationToPDF(Configuration *q)
-{
-  PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
-  q->SetPDFElement(q_element);
-
-  if(!q->isSufficientFeasible){
-    //all necessary elements are equal
-    PDF_Element *q_necessary_element = pdf_necessary_configurations.add(q, 1);
-    q->SetNecessaryPDFElement(q_necessary_element);
-  }
-}
-
 void QuotientCoverQueue::Print(std::ostream& out) const
 {
   BaseT::Print(out);
   out << std::endl << " |------ [Queue] has " << priority_queue_candidate_configurations.size() << " configurations left in priority queue.";
 }
 
-//QuotientCoverQueue::Configuration* QuotientCoverQueue::SampleCoverBoundary(){
-//  Configuration *q_random;
-//  if(!hasSolution){
-//    //phase1 sampling: solution has not been found
-//    q_random = BaseT::SampleCoverBoundary("voronoi");
-//  }else{
-//    //phase2 sampling: grow solution and associated roadmap
-//    std::cout << "Phase2 (hasSolution) sampler NYI"<< std::endl;
-//    exit(0);
-//  }
-//  return q_random;
-//}
-// QuotientCoverQueue::Configuration* QuotientCoverQueue::SampleUniformQuotientCover(ob::State *state) 
-// {
-//   double r = rng_.uniform01();
-//   Configuration *q_coset = nullptr;
-//   if(r<shortestPathBias)
-//   {
-//     if(shortest_path_start_goal_necessary_vertices.empty())
-//     {
-//       std::cout << "[WARNING] shortest path does not have any necessary vertices! -- should be detected on CS" << std::endl;
-//       exit(0);
-//     }
-//     int k = rng_.uniformInt(0, shortest_path_start_goal_necessary_vertices.size()-1);
-//     const Vertex vk = shortest_path_start_goal_necessary_vertices.at(k);
-//     q_coset = graph[vk];
-//     Q1_sampler->sampleUniformNear(state, q_coset->state, q_coset->GetRadius());
-//   }else{
-//     q_coset = pdf_necessary_configurations.sample(rng_.uniform01());
-//     Q1_sampler->sampleUniformNear(state, q_coset->state, q_coset->GetRadius());
-//   }
-//   return q_coset;
-// }
+void QuotientCoverQueue::PDFConnectivityUpdate(Configuration *q)
+{
+  std::cout << "Connectivity Update" << std::endl;
+  Print(q, false);
+  std::cout << ValueConnectivity(q) << std::endl; 
+  if(q->GetConnectivityPDFElement()==nullptr){
+    std::cout << "NO ELEM EXISTS" << std::endl;
+  }
+  pdf_configurations_connectivity.update(static_cast<PDF_Element*>(q->GetConnectivityPDFElement()), ValueConnectivity(q));
+}
+void QuotientCoverQueue::PDFConnectivityAdd(Configuration *q)
+{
+  std::cout << "Adding :" << std::endl;
+  Print(q, false);
+  PDF_Element *q_element = pdf_configurations_connectivity.add(q, ValueConnectivity(q));
+  q->SetConnectivityPDFElement(q_element);
+}
+void QuotientCoverQueue::PDFConnectivityRemove(Configuration *q)
+{
+  pdf_configurations_connectivity.remove(static_cast<PDF_Element*>(q->GetConnectivityPDFElement()));
+}
+
+double QuotientCoverQueue::ValueConnectivity(Configuration *q)
+{
+  //Vertex v = get(indexToVertex, q->index);
+  //QuotientCover::Print(q, false);
+  double d_alpha = q->number_attempted_expansions;
+  //double d_alpha = boost::degree(v, graph)+1;
+  //double d_connectivity = q->GetRadius()/d_alpha;
+  double d_connectivity = 1.0/(d_alpha+1);
+  return d_connectivity;
+}
+QuotientCover::Configuration* QuotientCoverQueue::GetConfigurationLowConnectivity()
+{
+  return pdf_configurations_connectivity.sample(rng_.uniform01());
+}

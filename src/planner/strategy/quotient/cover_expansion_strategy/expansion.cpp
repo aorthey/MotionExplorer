@@ -93,7 +93,7 @@ bool CoverExpansionStrategy::Towards(QuotientCover::Configuration *q_from, Quoti
   }
 }
 
-bool CoverExpansionStrategy::ExpandTowardsSteepestAscentDirectionFromInitialDirection(QuotientCover::Configuration *q_from, QuotientCover::Configuration *q_initial)
+bool CoverExpansionStrategy::ExpandTowardsSteepestAscentDirectionFromInitialDirection(const QuotientCover::Configuration *q_from, QuotientCover::Configuration *q_initial)
 {
   const double radius_from = q_from->GetRadius();
   double radius_sampling = 0.1*q_from->GetRadius();

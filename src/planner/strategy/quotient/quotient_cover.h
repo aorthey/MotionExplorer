@@ -66,15 +66,16 @@ namespace ompl
           uint number_of_neighbors{0}; //counter for incremental computation of riemannian center of mass (RCoM)
 
           bool isSufficientFeasible{false};
-          void *pdf_element;
-          void *pdf_necessary_element;
-          void *pdf_connectivity_element;
 
           bool isStart{false};
           bool isGoal{false};
 
           normalized_index_type index{-1}; //in [0,num_vertices(graph)]
 
+        private:
+          void *pdf_element;
+          void *pdf_necessary_element;
+          void *pdf_connectivity_element;
           //#####################################################################
           //Neighborhood Computations
           //#####################################################################
@@ -166,10 +167,9 @@ namespace ompl
       //#######################################################################
       virtual Vertex AddConfigurationToCover(Configuration *q);
       virtual Vertex AddConfigurationToCoverGraph(Configuration *q);
-      virtual void AddConfigurationToPDF(Configuration *q);
       virtual void RemoveConfigurationFromCover(Configuration *q);
 
-      void AddEdge(Configuration *q_from, Configuration *q_to);
+      virtual void AddEdge(Configuration *q_from, Configuration *q_to);
       bool EdgeExists(Configuration *q_from, Configuration *q_to);
       int GetNumberOfEdges(Configuration *q);
 
@@ -186,8 +186,8 @@ namespace ompl
       void SampleGoal(Configuration*);
       void SampleUniform(Configuration*);
       virtual void SampleUniformQuotientCover(ob::State *state);
-      Configuration* SampleNeighborhoodBoundary(Configuration *q);
-      Configuration* SampleNeighborhoodBoundaryUniformNear(Configuration *q_center, const Configuration* q_near, const double radius);
+      Configuration* SampleNeighborhoodBoundary(const Configuration *q);
+      Configuration* SampleNeighborhoodBoundaryUniformNear(const Configuration *q_center, const Configuration* q_near, const double radius);
 
       //#######################################################################
       //Misc
@@ -229,8 +229,6 @@ namespace ompl
       Graph graph;
       NearestNeighborsPtr nearest_neighborhood{nullptr};
       NearestNeighborsPtr nearest_configuration{nullptr};
-      PDF pdf_necessary_configurations;
-      PDF pdf_all_configurations;
       std::vector<Vertex> shortest_path_start_goal;
       std::vector<Vertex> shortest_path_start_goal_necessary_vertices;
 
@@ -241,6 +239,7 @@ namespace ompl
       QuotientMetricPtr metric{nullptr};
       Vertex v_start;
       Vertex v_goal;
+      PDF pdf_configurations_radius;
 
     public:
 
@@ -249,8 +248,6 @@ namespace ompl
 
       Configuration* GetStartConfiguration() const;
       Configuration* GetGoalConfiguration() const;
-      const PDF& GetPDFNecessaryConfigurations() const;
-      const PDF& GetPDFAllConfigurations() const;
       const NearestNeighborsPtr& GetNearestNeighborsCover() const;
       const NearestNeighborsPtr& GetNearestNeighborsVertex() const;
 

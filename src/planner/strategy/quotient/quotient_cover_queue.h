@@ -39,8 +39,10 @@ namespace ompl
       void setup() override;
       virtual void Print(std::ostream& out) const override;
 
-      virtual void AddConfigurationToPDF(Configuration *q) override;
-      virtual Vertex AddConfigurationToCover(Configuration *q) override;
+      //virtual Vertex AddConfigurationToCover(Configuration *q) override;
+      virtual Vertex AddConfigurationToCoverGraph(Configuration *q) override;
+      virtual void RemoveConfigurationFromCover(Configuration *q) override;
+      virtual void AddEdge(Configuration *q_from, Configuration *q_to) override;
 
       void AddConfigurationToPriorityQueue(Configuration *q);
       void PrintQueue(int n_head = std::numeric_limits<int>::infinity()); //print the first n items
@@ -49,10 +51,19 @@ namespace ompl
 
       Configuration* PriorityQueueNearestToGoal_Top();
       Configuration* PriorityQueueCandidate_PopTop();
+      bool PriorityQueueCandidate_IsEmpty();
+
+      Configuration* GetConfigurationLowConnectivity();
+      void PDFConnectivityAdd(Configuration *q);
+      void PDFConnectivityRemove(Configuration *q);
+      void PDFConnectivityUpdate(Configuration *q);
 
       bool NearestToGoalHasChanged();
 
     private:
+      PDF pdf_configurations_connectivity;
+      double ValueConnectivity(Configuration *q);
+
       //Two Priorityqueues:
       // PriorityQueue Candidates: Nodes which have a computed neighborhood, but
       // have not been added yet. They can be thought of as (soon-to-be)

@@ -171,7 +171,7 @@ void QuotientCover::Test()
   //TEST0: Add/Delete mockup start element
   //#########################################################################
   Configuration *q = new Configuration(Q1);
-  q->openNeighborhoodRadius = 0.5;
+  q->SetRadius(0.5);
   q->isStart = true;
   AddConfigurationToCover(q);
   RemoveConfigurationFromCover(q);
@@ -179,7 +179,7 @@ void QuotientCover::Test()
   //TEST1: Delete last element
   //#########################################################################
   Configuration *q1 = new Configuration(Q1);
-  q1->openNeighborhoodRadius = 0.5;
+  q1->SetRadius(0.5);
   AddConfigurationToCover(q1);
   RemoveConfigurationFromCover(q1);
 
@@ -188,8 +188,8 @@ void QuotientCover::Test()
   //#########################################################################
   Configuration *q2 = new Configuration(Q1);
   Configuration *q3 = new Configuration(Q1);
-  q2->openNeighborhoodRadius = 0.5;
-  q3->openNeighborhoodRadius = 0.5;
+  q2->SetRadius(0.5);
+  q3->SetRadius(0.5);
 
   AddConfigurationToCover(q2);
   AddConfigurationToCover(q3);
@@ -275,8 +275,7 @@ void QuotientCover::clear()
   graph.clear();
 
   //PDF
-  pdf_necessary_configurations.clear();
-  pdf_all_configurations.clear();
+  pdf_configurations_radius.clear();
 
   //index maps
   vertexToNormalizedIndexStdMap.clear();
@@ -458,16 +457,6 @@ bool QuotientCover::EdgeExists(Configuration *q_from, Configuration *q_to)
   return boost::edge(v_from, v_to, graph).second;
 }
 
-void QuotientCover::AddConfigurationToPDF(Configuration *q)
-{
-  PDF_Element *q_element = pdf_all_configurations.add(q, q->GetImportance());
-  q->SetPDFElement(q_element);
-  if(!q->isSufficientFeasible){
-    PDF_Element *q_necessary_element = pdf_necessary_configurations.add(q, q->GetRadius());
-    q->SetNecessaryPDFElement(q_necessary_element);
-  }
-}
-
 QuotientCover::Vertex QuotientCover::AddConfigurationToCoverGraph(Configuration *q)
 {
   if(q->GetRadius()<minimum_neighborhood_radius)
@@ -503,7 +492,12 @@ QuotientCover::Vertex QuotientCover::AddConfigurationToCoverGraph(Configuration 
   //###########################################################################
   //(3) add to PDF
   //###########################################################################
-  AddConfigurationToPDF(q);
+  PDF_Element *q_element = pdf_configurations_radius.add(q, q->GetImportance());
+  q->SetPDFElement(q_element);
+  // if(!q->isSufficientFeasible){
+  //   PDF_Element *q_necessary_element = pdf_necessary_configurations.add(q, q->GetRadius());
+  //   q->SetNecessaryPDFElement(q_necessary_element);
+  // }
   q->goal_distance = GetMetric()->DistanceConfigurationConfiguration(q, q_goal);
 
   return v;
@@ -521,10 +515,10 @@ void QuotientCover::RemoveConfigurationFromCover(Configuration *q)
   //###########################################################################
   //(1) Remove from PDF
   //###########################################################################
-  pdf_all_configurations.remove(static_cast<PDF_Element*>(q->GetPDFElement()));
-  if(!q->isSufficientFeasible){
-    pdf_necessary_configurations.remove(static_cast<PDF_Element*>(q->GetNecessaryPDFElement()));
-  }
+  pdf_configurations_radius.remove(static_cast<PDF_Element*>(q->GetPDFElement()));
+  // if(!q->isSufficientFeasible){
+  //   pdf_necessary_configurations.remove(static_cast<PDF_Element*>(q->GetNecessaryPDFElement()));
+  // }
 
   //###########################################################################
   //(2) Remove from nearest neighbors structure
@@ -690,7 +684,7 @@ void QuotientCover::SampleUniform(Configuration *q)
   }
 }
 
-QuotientCover::Configuration* QuotientCover::SampleNeighborhoodBoundary(Configuration *q_center)
+QuotientCover::Configuration* QuotientCover::SampleNeighborhoodBoundary(const Configuration *q_center)
 {
   const double radius = q_center->GetRadius();
   if(radius < minimum_neighborhood_radius){
@@ -721,7 +715,7 @@ QuotientCover::Configuration* QuotientCover::SampleNeighborhoodBoundary(Configur
 
 void QuotientCover::SampleUniformQuotientCover(ob::State *state_random) 
 {
-  Configuration *q_coset = pdf_all_configurations.sample(rng_.uniform01());
+  Configuration *q_coset = pdf_configurations_radius.sample(rng_.uniform01());
 
   Q1_sampler->sampleUniformNear(state_random, q_coset->state, q_coset->GetRadius());
   //if(q_coset->isSufficientFeasible)
@@ -739,7 +733,7 @@ void QuotientCover::SampleUniformQuotientCover(ob::State *state_random)
   double d = Q1->distance(q_coset->state, state_random);
   Q1->getStateSpace()->interpolate(q_coset->state, state_random, q_coset->GetRadius()/d, state_random);
 }
-QuotientCover::Configuration* QuotientCover::SampleNeighborhoodBoundaryUniformNear(Configuration *q_center, const Configuration* q_near, const double radius)
+QuotientCover::Configuration* QuotientCover::SampleNeighborhoodBoundaryUniformNear(const Configuration *q_center, const Configuration* q_near, const double radius)
 {
   Configuration *q_next = new Configuration(Q1);
 
@@ -893,14 +887,6 @@ QuotientCover::Configuration* QuotientCover::GetStartConfiguration() const
 QuotientCover::Configuration* QuotientCover::GetGoalConfiguration() const
 {
   return q_goal;
-}
-const QuotientCover::PDF& QuotientCover::GetPDFNecessaryConfigurations() const
-{
-  return pdf_necessary_configurations;
-}
-const QuotientCover::PDF& QuotientCover::GetPDFAllConfigurations() const
-{
-  return pdf_all_configurations;
 }
 const QuotientCover::NearestNeighborsPtr& QuotientCover::GetNearestNeighborsCover() const
 {

@@ -33,7 +33,7 @@ namespace ompl
         //return bool: if we successfully stepped or not
         bool TowardsStraightLine(QuotientCover::Configuration *q_from, QuotientCover::Configuration *q_to);
         bool Towards(QuotientCover::Configuration *q_from, QuotientCover::Configuration *q_to);
-        bool ExpandTowardsSteepestAscentDirectionFromInitialDirection(QuotientCover::Configuration *q_from, QuotientCover::Configuration *q_initial);
+        bool ExpandTowardsSteepestAscentDirectionFromInitialDirection(const QuotientCover::Configuration *q_from, QuotientCover::Configuration *q_initial);
         bool ChooseBestDirectionOnlyAddBestToQueue(const std::vector<QuotientCover::Configuration*> &q_children);
         bool ChooseBestDirection(const std::vector<QuotientCover::Configuration*> &q_children, bool addBestToPriorityQueue);
         uint GetLargestNeighborhoodIndexOutsideCover(const std::vector<QuotientCover::Configuration*> &q_children);

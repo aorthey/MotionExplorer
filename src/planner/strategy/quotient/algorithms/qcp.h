@@ -30,8 +30,6 @@ namespace ompl
       virtual double GetImportance() const override;
 
       void RewireCover(ob::PlannerTerminationCondition &ptc);
-      virtual Vertex AddConfigurationToCover(Configuration *q) override;
-      virtual void RemoveConfigurationFromCover(Configuration *q) override;
 
     private:
       //TODO: remove adaptive goal bias, replace by percentage of checking while
@@ -42,10 +40,6 @@ namespace ompl
       CoverExpansionStrategyPtr expansion_strategy_outwards;
       CoverExpansionStrategyPtr expansion_strategy_random_voronoi;
       CoverExpansionStrategyPtr expansion_strategy_random_boundary;
-
-      //PDF which assigns a value to each configuration, depending on its connectivity
-      PDF pdf_connectivity_configurations;
-      double ValueConnectivity(Configuration *q);
     };
   }
 }
