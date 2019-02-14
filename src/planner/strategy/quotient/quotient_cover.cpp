@@ -20,6 +20,9 @@
 #include <ompl/datastructures/NearestNeighborsLinear.h>
 #include <ompl/datastructures/NearestNeighborsSqrtApprox.h>
 #include <flann/algorithms/autotuned_index.h>
+#include <ompl/geometric/PathGeometric.h>
+#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
+
  
 #if OMPL_HAVE_FLANN == 0
 #error FLANN is not available. Please use a different NearestNeighbors data structure.
@@ -747,6 +750,11 @@ QuotientCover::Configuration* QuotientCover::SampleNeighborhoodBoundaryUniformNe
   }else{
     return nullptr;
   }
+}
+
+QuotientCover::Configuration* QuotientCover::SampleConfigurationLargestNeighborhood()
+{
+  return pdf_configurations_radius.sample(rng_.uniform01());
 }
 
 //#############################################################################

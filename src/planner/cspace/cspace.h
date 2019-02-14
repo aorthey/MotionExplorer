@@ -5,22 +5,15 @@
 #include <ompl/base/spaces/SO3StateSpace.h>
 #include <ompl/base/ScopedState.h>
 #include <ompl/base/StateSpace.h>
-#include <ompl/base/PlannerData.h>
-#include <ompl/base/PlannerDataGraph.h>
-#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
-#include <ompl/tools/benchmark/Benchmark.h>
-
-#include <ompl/geometric/SimpleSetup.h>
-#include <ompl/geometric/PathGeometric.h>
-
-#include <ompl/control/SimpleSetup.h>
+// #include <ompl/base/PlannerData.h>
+// #include <ompl/base/PlannerDataGraph.h>
+//#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 #include <ompl/control/SpaceInformation.h>
 #include <ompl/control/spaces/RealVectorControlSpace.h>
 #include <Planning/RobotCSpace.h>
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;
-namespace og = ompl::geometric;
 
 namespace ompl{
   namespace control{

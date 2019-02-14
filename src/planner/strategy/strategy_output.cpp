@@ -2,6 +2,7 @@
 #include "elements/plannerdata_vertex_annotated.h"
 #include "elements/tree.h"
 #include "common.h"
+#include <ompl/control/PathControl.h>
 
 StrategyOutput::StrategyOutput(CSpaceOMPL *cspace_):
   cspace(cspace_)
@@ -125,8 +126,8 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
     if(v==nullptr)
     {
       roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.back());
-      std::vector<int> path;
-      hierarchy->AddNode( roadmap_k, path);
+      std::vector<int> hindex;
+      hierarchy->AddNode( roadmap_k, hindex);
       if(current->children.size()>0)
       {
         if(pdi->numVertices()>0){

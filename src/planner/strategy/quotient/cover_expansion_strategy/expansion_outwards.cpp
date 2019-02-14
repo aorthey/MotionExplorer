@@ -13,7 +13,10 @@ double CoverExpansionStrategyOutwards::Step()
 {
   std::cout << "STEP OUTWARDS" << std::endl;
   Configuration* q = quotient_cover_queue->PriorityQueueCandidate_PopTop();
-  if(q==nullptr) return -1;
+  if(q==nullptr){
+    //no single-connected neighborhoods. Choose based on largest
+    q = quotient_cover_queue->SampleConfigurationLargestNeighborhood();
+  }
   if(q->index < 0){
     quotient_cover_queue->AddConfigurationToCover(q);
   }

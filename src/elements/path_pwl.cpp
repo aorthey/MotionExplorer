@@ -5,13 +5,8 @@
 #include <iostream>
 #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/base/StateSpace.h>
-//using namespace std;
-
-PathPiecewiseLinear::PathPiecewiseLinear()
-{
-  std::cout << "needs conversion to OMPL" << std::endl;
-  exit(0);
-}
+#include <ompl/geometric/PathGeometric.h>
+#include <ompl/control/PathControl.h>
 
 PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
   cspace(cspace_)

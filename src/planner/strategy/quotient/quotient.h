@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ompl/base/Planner.h>
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
+#include <ompl/base/Planner.h>
 
 namespace ob = ompl::base;
 

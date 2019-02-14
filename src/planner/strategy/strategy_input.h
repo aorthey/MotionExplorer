@@ -7,7 +7,6 @@
 #include <ompl/base/SpaceInformation.h>
 
 namespace ob = ompl::base;
-namespace og = ompl::geometric;
 
 struct StrategyInput{
   Config q_init;

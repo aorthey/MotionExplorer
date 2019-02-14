@@ -20,6 +20,7 @@ class Roadmap{
 
     //void CreateFromPlannerData(const ob::PlannerDataPtr pd, CSpaceOMPL* cspace_);
     PathPiecewiseLinear* GetShortestPath();
+    void SetShortestPathOMPL(ob::PathPtr&);
 
     virtual void DrawGL(GUIState&);
 

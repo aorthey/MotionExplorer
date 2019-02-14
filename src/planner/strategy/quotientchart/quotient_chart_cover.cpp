@@ -10,6 +10,8 @@
 #include <boost/property_map/transform_value_property_map.hpp>
 #include <boost/foreach.hpp>
 #include <boost/graph/graphviz.hpp>
+#include <ompl/geometric/PathGeometric.h>
+#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 
 #define foreach BOOST_FOREACH
 

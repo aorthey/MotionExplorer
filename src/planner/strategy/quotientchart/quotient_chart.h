@@ -10,7 +10,7 @@ namespace ompl
   {
     class QuotientChart: public Quotient
     {
-        typedef og::Quotient BaseT;
+        typedef Quotient BaseT;
       public:
         QuotientChart(const ob::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
 

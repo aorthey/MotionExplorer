@@ -1,8 +1,6 @@
 #include "planner/strategy/strategy_kinodynamic.h"
 #include "planner/cspace/cspace_kinodynamic.h"
 #include "planner/benchmark/benchmark_input.h"
-//#include "planner/strategy/ompl_remastered/kRRT.h"
-
 #include "util.h"
 #include "elements/plannerdata_vertex_annotated.h"
 
@@ -13,14 +11,15 @@
 #include <ompl/control/planners/sst/SST.h>
 #include <ompl/control/planners/kpiece/KPIECE1.h>
 #include <ompl/control/planners/ltl/LTLPlanner.h>
-// #include <ompl/control/planners/syclop/SyclopEST.h>
-// #include <ompl/control/planners/syclop/Syclop.h>
-// #include <ompl/control/planners/syclop/SyclopRRT.h>
 
 #include <ompl/control/PlannerData.h>
 #include <ompl/control/SimpleSetup.h>
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/util/Time.h>
+#include <ompl/tools/benchmark/Benchmark.h>
+#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
+
+namespace ot = ompl::tools;
 
 static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)
 {

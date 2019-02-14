@@ -5,6 +5,7 @@
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <boost/pending/disjoint_sets.hpp>
+#include <boost/graph/adjacency_list.hpp>
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
@@ -188,6 +189,7 @@ namespace ompl
       virtual void SampleUniformQuotientCover(ob::State *state);
       Configuration* SampleNeighborhoodBoundary(const Configuration *q);
       Configuration* SampleNeighborhoodBoundaryUniformNear(const Configuration *q_center, const Configuration* q_near, const double radius);
+      Configuration* SampleConfigurationLargestNeighborhood();
 
       //#######################################################################
       //Misc

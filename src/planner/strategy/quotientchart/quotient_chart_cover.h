@@ -5,6 +5,7 @@
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <boost/pending/disjoint_sets.hpp>
+#include <boost/graph/adjacency_list.hpp>
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;

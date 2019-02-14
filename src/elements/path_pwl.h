@@ -21,7 +21,7 @@ class RobotController;
 class PathPiecewiseLinear
 {
   public:
-    PathPiecewiseLinear();
+    PathPiecewiseLinear() = delete;
     PathPiecewiseLinear(CSpaceOMPL *cspace);
     PathPiecewiseLinear(ob::PathPtr p, CSpaceOMPL *cspace, CSpaceOMPL *quotient_space);
 

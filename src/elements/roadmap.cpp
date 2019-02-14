@@ -37,6 +37,9 @@ uint Roadmap::numVertices()
   return pd->numVertices();
 }
 
+void Roadmap::SetShortestPathOMPL(ob::PathPtr& path_ompl_ptr){
+  path_ompl = new PathPiecewiseLinear(path_ompl_ptr, cspace, quotient_space);
+}
 PathPiecewiseLinear* Roadmap::GetShortestPath(){
   if(path_ompl==nullptr)
   {

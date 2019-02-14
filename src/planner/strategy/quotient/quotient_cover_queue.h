@@ -16,7 +16,7 @@ namespace ompl
 
     //@TODO: Rename to QuotientCoverAnalyzer, and put all the analysis tools in this class 
     //(nearest to goal, largest radius, least connection), and keep track of them here. All
-    //other strategies can use this as a central points of information to aid
+    //other strategies can use this as central points of information to aid
     //their choice of the best cover region to expand
 
     class QuotientCoverQueue: public og::QuotientCover

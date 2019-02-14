@@ -3,10 +3,10 @@
 #include <ompl/geometric/planners/prm/ConnectionStrategy.h>
 #include <boost/foreach.hpp>
 
-using namespace og;
+using namespace ompl::geometric;
 #define foreach BOOST_FOREACH
 
-QuotientChart::QuotientChart(const ob::SpaceInformationPtr &si, og::Quotient *parent_)
+QuotientChart::QuotientChart(const ob::SpaceInformationPtr &si, Quotient *parent_)
   : BaseT(si, parent_)
 {
   UpdateChartPath();
@@ -57,11 +57,11 @@ void QuotientChart::UpdateChartPath()
 {
   chartPath.clear();
   chartPath.push_back(chartHorizontalIndex);
-  og::QuotientChart *parent = static_cast<og::QuotientChart*>(GetParent());
+  QuotientChart *parent = static_cast<QuotientChart*>(GetParent());
   while(parent!=nullptr)
   {
     chartPath.push_back(parent->GetChartHorizontalIndex());
-    parent = static_cast<og::QuotientChart*>(parent->GetParent());
+    parent = static_cast<QuotientChart*>(parent->GetParent());
   }
   std::reverse(std::begin(chartPath), std::end(chartPath));
 }
