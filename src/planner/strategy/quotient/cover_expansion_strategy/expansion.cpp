@@ -10,41 +10,6 @@ CoverExpansionStrategy::CoverExpansionStrategy(QuotientCoverQueue *quotient_cove
 {
 }
 
-//bool StepStrategy::ExpandRandom(QuotientCover::Configuration *q_from)
-//{
-//  // q_from --------- q_next on boundary of NBH of q_from
-//  //
-//  Configuration *q_next = quotient_cover_queue->SampleNeighborhoodBoundary(q_from);
-
-//  quotient_cover_queue->GetQ1SamplerPtr()->sampleUniformNear(q_next->state, q_from->state, q_from->GetRadius());
-//  double d = quotient_cover_queue->GetMetric()->DistanceConfigurationConfiguration(q_next, q_from);
-//  quotient_cover_queue->GetQ1()->getStateSpace()->interpolate(q_from->state, q_next->state, q_from->GetRadius()/d, q_next->state);
-//  //############################################################################
-
-//  if(quotient_cover_queue->ComputeNeighborhood(q_next)){
-//    quotient_cover_queue->AddConfigurationToCover(q_next);
-//    return true;
-//  }
-//  return false;
-//}
-//bool StepStrategy::ExpandVoronoi()
-//{
-//  // q_from --------- q_next on boundary of NBH of q_from
-//  //
-//  const ob::SpaceInformationPtr &Q1 = quotient_cover_queue->GetQ1();
-//  Configuration *q_random = new Configuration(Q1);
-//  quotient_cover_queue->SampleUniform(q_random);
-
-//  Configuration *q_nearest = quotient_cover_queue->NearestNeighborhood(q_random);
-//  quotient_cover_queue->GetMetric()->InterpolateQ1(q_nearest, q_random);
-
-//  if(quotient_cover_queue->ComputeNeighborhood(q_random)){
-//    quotient_cover_queue->AddConfigurationToCover(q_random);
-//    return true;
-//  }
-//  return false;
-//}
-
 bool CoverExpansionStrategy::TowardsStraightLine(QuotientCover::Configuration *q_from, QuotientCover::Configuration *q_to)
 {
   const double distanceFromTo = quotient_cover_queue->GetMetric()->DistanceNeighborhoodNeighborhood(q_from, q_to);
@@ -58,6 +23,7 @@ bool CoverExpansionStrategy::TowardsStraightLine(QuotientCover::Configuration *q
 
   if(quotient_cover_queue->ComputeNeighborhood(q_proj)){
     quotient_cover_queue->AddConfigurationToCover(q_proj);
+    q_last_expanded = q_proj;
     return true;
   }
 
@@ -138,6 +104,7 @@ bool CoverExpansionStrategy::ExpandTowardsSteepestAscentDirectionFromInitialDire
   if(radius_last>0){
     quotient_cover_queue->AddConfigurationToCover(q_last);
     quotient_cover_queue->AddConfigurationToPriorityQueue(q_last);
+    q_last_expanded = q_last;
     return true;
   }else{
     return false;
@@ -145,83 +112,84 @@ bool CoverExpansionStrategy::ExpandTowardsSteepestAscentDirectionFromInitialDire
 
 }
 
-bool CoverExpansionStrategy::ChooseBestDirectionOnlyAddBestToQueue(const std::vector<Configuration*> &q_children)
-{
-  if(q_children.empty()){
-    return false;
-  }
+// bool CoverExpansionStrategy::ChooseBestDirectionOnlyAddBestToQueue(const std::vector<Configuration*> &q_children)
+// {
+//   if(q_children.empty()){
+//     return false;
+//   }
 
-  uint idx_best = GetLargestNeighborhoodIndex(q_children);
-  Configuration *q_best = q_children.at(idx_best);
-  quotient_cover_queue->AddConfigurationToCover(q_best);
-  quotient_cover_queue->AddConfigurationToPriorityQueue(q_best);
-  return true;
-}
-bool CoverExpansionStrategy::ChooseBestDirection(const std::vector<Configuration*> &q_children, bool addBestToPriorityQueue)
-{
-  if(q_children.empty()){
-    return false;
-  }
+//   uint idx_best = GetLargestNeighborhoodIndex(q_children);
+//   Configuration *q_best = q_children.at(idx_best);
+//   quotient_cover_queue->AddConfigurationToCover(q_best);
+//   quotient_cover_queue->AddConfigurationToPriorityQueue(q_best);
+//   q_last_expanded = q_best;
+//   return true;
+// }
+//bool CoverExpansionStrategy::ChooseBestDirection(const std::vector<Configuration*> &q_children, bool addBestToPriorityQueue)
+//{
+//  if(q_children.empty()){
+//    return false;
+//  }
 
-  uint idx_best = GetLargestNeighborhoodIndex(q_children);
-  Configuration *q_best = q_children.at(idx_best);
+//  uint idx_best = GetLargestNeighborhoodIndex(q_children);
+//  Configuration *q_best = q_children.at(idx_best);
 
-  if(verbose>1) std::cout << "COVER add NBH with radius " << q_best->GetRadius() << std::endl;
-  quotient_cover_queue->AddConfigurationToCover(q_best);
+//  if(verbose>1) std::cout << "COVER add NBH with radius " << q_best->GetRadius() << std::endl;
+//  quotient_cover_queue->AddConfigurationToCover(q_best);
 
-  //add the smaller children to the priority_configurations to be extended at
-  //a later stage if required
-  for(uint k = 0; k < q_children.size(); k++)
-  {
-    Configuration *q_k = q_children.at(k);
-    if(addBestToPriorityQueue){
-      quotient_cover_queue->AddConfigurationToPriorityQueue(q_k);
-    }else{
-      if(k!=idx_best){
-        quotient_cover_queue->AddConfigurationToPriorityQueue(q_k);
-      }
-    }
-  }
-  return true;
-}
+//  //add the smaller children to the priority_configurations to be extended at
+//  //a later stage if required
+//  for(uint k = 0; k < q_children.size(); k++)
+//  {
+//    Configuration *q_k = q_children.at(k);
+//    if(addBestToPriorityQueue){
+//      quotient_cover_queue->AddConfigurationToPriorityQueue(q_k);
+//    }else{
+//      if(k!=idx_best){
+//        quotient_cover_queue->AddConfigurationToPriorityQueue(q_k);
+//      }
+//    }
+//  }
+//  return true;
+//}
 
-uint CoverExpansionStrategy::GetLargestNeighborhoodIndexOutsideCover(const std::vector<QuotientCover::Configuration*> &q_children)
-{
-  double radius_best = 0;
-  uint idx_best = 0;
-  for(uint k = 0; k < q_children.size(); k++)
-  {
-    Configuration *q_k = q_children.at(k);
-    double r = q_k->GetRadius();
-    if(r > radius_best)
-    {
-      radius_best = r;
-      idx_best = k;
-    }
-  }
-  return idx_best;
-}
+// uint CoverExpansionStrategy::GetLargestNeighborhoodIndexOutsideCover(const std::vector<QuotientCover::Configuration*> &q_children)
+// {
+//   double radius_best = 0;
+//   uint idx_best = 0;
+//   for(uint k = 0; k < q_children.size(); k++)
+//   {
+//     Configuration *q_k = q_children.at(k);
+//     double r = q_k->GetRadius();
+//     if(r > radius_best)
+//     {
+//       radius_best = r;
+//       idx_best = k;
+//     }
+//   }
+//   return idx_best;
+// }
 
-uint CoverExpansionStrategy::GetLargestNeighborhoodIndex(const std::vector<QuotientCover::Configuration*> &q_children)
-{
-  double radius_best = 0;
-  uint idx_best = 0;
-  for(uint k = 0; k < q_children.size(); k++)
-  {
-    Configuration *q_k = q_children.at(k);
-    double r = q_k->GetRadius();
-    if(r > radius_best)
-    {
-      radius_best = r;
-      idx_best = k;
-    }
-  }
-  return idx_best;
-}
+// uint CoverExpansionStrategy::GetLargestNeighborhoodIndex(const std::vector<QuotientCover::Configuration*> &q_children)
+// {
+//   double radius_best = 0;
+//   uint idx_best = 0;
+//   for(uint k = 0; k < q_children.size(); k++)
+//   {
+//     Configuration *q_k = q_children.at(k);
+//     double r = q_k->GetRadius();
+//     if(r > radius_best)
+//     {
+//       radius_best = r;
+//       idx_best = k;
+//     }
+//   }
+//   return idx_best;
+// }
 
 
-bool CoverExpansionStrategy::ConfigurationHasNeighborhoodLargerThan(QuotientCover::Configuration *q, double radius)
-{
-  return (q->GetRadius() >= radius);
-}
+// bool CoverExpansionStrategy::ConfigurationHasNeighborhoodLargerThan(QuotientCover::Configuration *q, double radius)
+// {
+//   return (q->GetRadius() >= radius);
+// }
 

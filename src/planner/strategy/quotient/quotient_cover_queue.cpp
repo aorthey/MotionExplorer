@@ -165,18 +165,19 @@ void QuotientCoverQueue::Print(std::ostream& out) const
 
 void QuotientCoverQueue::PDFConnectivityUpdate(Configuration *q)
 {
-  std::cout << "Connectivity Update" << std::endl;
-  Print(q, false);
-  std::cout << ValueConnectivity(q) << std::endl; 
   if(q->GetConnectivityPDFElement()==nullptr){
-    std::cout << "NO ELEM EXISTS" << std::endl;
+    std::cout << std::string(80, '#') << std::endl;
+    std::cout << "Trying to update the PDF element for connectivity." << std::endl;
+    std::cout << "But does not exist. Configuration:" << std::endl;
+    Print(q, false);
+    std::cout << "Value Connectivity: " << ValueConnectivity(q) << std::endl; 
+    std::cout << std::string(80, '#') << std::endl;
+    exit(0);
   }
   pdf_configurations_connectivity.update(static_cast<PDF_Element*>(q->GetConnectivityPDFElement()), ValueConnectivity(q));
 }
 void QuotientCoverQueue::PDFConnectivityAdd(Configuration *q)
 {
-  std::cout << "Adding :" << std::endl;
-  Print(q, false);
   PDF_Element *q_element = pdf_configurations_connectivity.add(q, ValueConnectivity(q));
   q->SetConnectivityPDFElement(q_element);
 }

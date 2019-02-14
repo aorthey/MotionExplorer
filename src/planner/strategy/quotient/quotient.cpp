@@ -32,25 +32,27 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_):
     //X1 = Q1 / Q0
     const StateSpacePtr X1_space = ComputeQuotientSpace(Q1_space, Q0_space);
 
-    X1 = std::make_shared<SpaceInformation>(X1_space);
-    X1_sampler = X1->allocStateSampler();
-
-    if(Q0_space->getDimension()+X1_space->getDimension() != Q1_space->getDimension()){
-      std::cout << "quotient of state spaces got dimensions wrong." << std::endl;
-      exit(0);
-    }
-    if(verbose>0) std::cout << "Q0 dimension : " << Q0_space->getDimension() << " measure: " << Q0_space->getMeasure() << std::endl;
-    if(verbose>0) std::cout << "X1 dimension : " << X1_space->getDimension() << " measure: " << X1_space->getMeasure() << std::endl;
-    if(verbose>0) std::cout << "Q1 dimension : " << Q1_space->getDimension() << " measure: " << Q1_space->getMeasure() << std::endl;
-    if((Q0_space->getMeasure()<=0) ||
-       (X1_space->getMeasure()<=0) ||
-       (Q1_space->getMeasure()<=0)){
-      std::cout << "zero-measure quotient space detected. abort." << std::endl;
-      exit(0);
-    }
-    if (!X1_sampler){
+    if(X1_space != nullptr){
+      X1 = std::make_shared<SpaceInformation>(X1_space);
       X1_sampler = X1->allocStateSampler();
+      if(Q0_space->getDimension()+X1_space->getDimension() != Q1_space->getDimension()){
+        std::cout << "quotient of state spaces got dimensions wrong." << std::endl;
+        exit(0);
+      }
+      if(verbose>0) std::cout << "Q0 dimension : " << Q0_space->getDimension() << " measure: " << Q0_space->getMeasure() << std::endl;
+      if(verbose>0) std::cout << "X1 dimension : " << X1_space->getDimension() << " measure: " << X1_space->getMeasure() << std::endl;
+      if(verbose>0) std::cout << "Q1 dimension : " << Q1_space->getDimension() << " measure: " << Q1_space->getMeasure() << std::endl;
+      if((Q0_space->getMeasure()<=0) ||
+         (X1_space->getMeasure()<=0) ||
+         (Q1_space->getMeasure()<=0)){
+        std::cout << "zero-measure quotient space detected. abort." << std::endl;
+        exit(0);
+      }
+      if (!X1_sampler){
+        X1_sampler = X1->allocStateSampler();
+      }
     }
+
   }
 
   if (!Q1_valid_sampler){
@@ -132,7 +134,7 @@ void Quotient::clear()
   BaseT::clear();
   hasSolution = false;
   firstRun = true;
-  if(parent==nullptr) X1_sampler.reset();
+  if(parent==nullptr && X1_dimension>0) X1_sampler.reset();
   if(verbose>0) std::cout << "CLEAR QUOTIENTSPACE " << id << std::endl;
 }
 
@@ -171,11 +173,15 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const
         uint n = Q1->getDimension();
         if( Q0->getType() == base::STATE_SPACE_REAL_VECTOR ){
           uint m = Q0->getDimension();
-          if(n>=m && m>0){
+          if(n>m && m>0){
             type = RN_RM;
           }else{
-            std::cout << "not allowed: dimensionality needs to be monotonically increasing. we need n>=m>0, but have " << n << ">=" << m << ">0" << std::endl;
-            exit(0);
+            if(n==m){
+              type = IDENTITY_SPACE;
+            }else{
+              std::cout << "not allowed: dimensionality needs to be monotonically increasing. we need n>=m>0, but have " << n << ">=" << m << ">0" << std::endl;
+              exit(0);
+            }
           }
         }else{
           std::cout << "Q1 is R^"<<n <<" but state " << Q0->getType() << " is not handled." << std::endl;
@@ -273,11 +279,16 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const
 
     }
 
-    StateSpacePtr X1;
+    StateSpacePtr X1{nullptr};
     Q1_dimension = Q1->getDimension();
     Q0_dimension = Q0->getDimension();
 
     switch (type) {
+      case IDENTITY_SPACE:
+        {
+          X1_dimension = 0;
+          break;
+        }
       case RN_RM:
         {
           uint N = Q1_dimension - Q0_dimension;
@@ -298,11 +309,13 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const
         }
       case SE2_R2:
         {
+          X1_dimension = 1;
           X1 = std::make_shared<ob::SO2StateSpace>();
           break;
         }
       case SE3_R3:
         {
+          X1_dimension = 3;
           X1 = std::make_shared<ob::SO3StateSpace>();
           break;
         }
@@ -380,6 +393,11 @@ void Quotient::MergeStates(const ob::State *qQ0, const ob::State *qX1, ob::State
   const StateSpacePtr Q0_space = parent->getSpaceInformation()->getStateSpace();
 
   switch (type) {
+    case IDENTITY_SPACE:
+      {
+        std::cout << "Cannot merge states for Identity space" << std::endl;
+        exit(0);
+      }
     case RN_RM:
       {
         ob::RealVectorStateSpace::StateType *sQ1 = qQ1->as<RealVectorStateSpace::StateType>();
@@ -498,8 +516,8 @@ void Quotient::MergeStates(const ob::State *qQ0, const ob::State *qX1, ob::State
       }
     default:
       {
-        std::cout << "cannot merge states" << std::endl;
         std::cout << "type : " << type << " not implemented." << std::endl;
+        OMPL_ERROR("cannot merge states");
         exit(0);
       }
 
@@ -582,7 +600,8 @@ void Quotient::ProjectX1Subspace( const ob::State* q, ob::State* qX1 ) const
       }
     default:
       {
-        std::cout << "cannot merge states" << std::endl;
+        std::cout << "type : " << type << " not implemented." << std::endl;
+        OMPL_ERROR("cannot project onto X1");
         exit(0);
       }
 
@@ -593,6 +612,12 @@ void Quotient::ProjectQ0Subspace( const ob::State* q, ob::State* qQ0 ) const
 {
 
   switch(type){
+    case IDENTITY_SPACE:
+      {
+        //Identity function
+        Q1->getStateSpace()->copyState(qQ0, q);
+        break;
+      }
     case RN_RM:
       {
         const ob::RealVectorStateSpace::StateType *sQ1 = q->as<RealVectorStateSpace::StateType>();
@@ -675,8 +700,9 @@ void Quotient::ProjectQ0Subspace( const ob::State* q, ob::State* qQ0 ) const
       }
     default:
       {
-        std::cout << "cannot merge states" << std::endl;
-        exit(0);
+        std::cout << "type : " << type << " not implemented." << std::endl;
+        OMPL_ERROR("cannot project onto Q0");
+        exit(1);
       }
 
   }
@@ -787,6 +813,11 @@ void Quotient::Print(std::ostream& out) const
   }else{
     out << "X" << sublevel << "=Q" << sublevel << ": ";
     switch (type) {
+      case Quotient::IDENTITY_SPACE:
+        {
+          out << "R^"<< Q0_dimension << " | Q" << level+1 << ": R^" << Q1_dimension;
+          break;
+        }
       case Quotient::RN_RM:
         {
           out << "R^"<< Q0_dimension << " | Q" << level+1 << ": R^" << Q1_dimension << " | X" << level+1 << ": R^" << Q1_dimension-Q0_dimension;

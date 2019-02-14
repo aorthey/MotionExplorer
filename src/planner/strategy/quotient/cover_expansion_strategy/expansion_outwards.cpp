@@ -11,7 +11,6 @@ CoverExpansionStrategyOutwards::CoverExpansionStrategyOutwards(og::QuotientCover
 }
 double CoverExpansionStrategyOutwards::Step()
 {
-  std::cout << "STEP OUTWARDS" << std::endl;
   Configuration* q = quotient_cover_queue->PriorityQueueCandidate_PopTop();
   if(q==nullptr){
     //no single-connected neighborhoods. Choose based on largest

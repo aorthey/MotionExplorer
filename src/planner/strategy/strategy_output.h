@@ -1,6 +1,7 @@
 #pragma once
 #include "elements/path_pwl.h"
 #include "elements/hierarchical_roadmap.h"
+#include "planner/cspace/cspace.h"
 #include <omplapp/config.h>
 #include <ompl/base/PlannerData.h>
 #include <ompl/base/ProblemDefinition.h>

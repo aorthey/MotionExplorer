@@ -3,6 +3,7 @@
 #include "qcp.h"
 #include "planner/strategy/quotient/metric/quotient_metric.h"
 #include "planner/strategy/quotient/cover_expansion_strategy/expansion_goal.h"
+#include "planner/strategy/quotient/cover_expansion_strategy/expansion_cache_goal.h"
 #include "planner/strategy/quotient/cover_expansion_strategy/expansion_outwards.h"
 #include "planner/strategy/quotient/cover_expansion_strategy/expansion_random_voronoi.h"
 #include "planner/strategy/quotient/cover_expansion_strategy/expansion_random_boundary.h"
@@ -17,6 +18,7 @@ QCP::QCP(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, pare
   setName("QCP"+std::to_string(id));
   progressMadeTowardsGoal = true;
   SetMetric("shortestpath");
+  //expansion_strategy_goal = std::make_shared<CoverExpansionStrategyCacheGoal>(this);
   expansion_strategy_goal = std::make_shared<CoverExpansionStrategyGoal>(this);
   expansion_strategy_outwards = std::make_shared<CoverExpansionStrategyOutwards>(this);
   expansion_strategy_random_voronoi = std::make_shared<CoverExpansionStrategyRandomVoronoi>(this);

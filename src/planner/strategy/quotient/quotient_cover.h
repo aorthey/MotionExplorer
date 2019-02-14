@@ -2,7 +2,7 @@
 #include "quotient.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include <ompl/datastructures/PDF.h>
-#include <ompl/tools/config/SelfConfig.h>
+//#include <ompl/tools/config/SelfConfig.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <boost/pending/disjoint_sets.hpp>
 #include <boost/graph/adjacency_list.hpp>

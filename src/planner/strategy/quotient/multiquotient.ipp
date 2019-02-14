@@ -182,19 +182,22 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const
 
       for(uint m = k+1; m < quotientSpaces.size(); m++){
         og::Quotient *Qm = quotientSpaces.at(m);
-        ob::State *s_X1 = Qm->GetX1()->allocState();
-        ob::State *s_Q1 = Qm->getSpaceInformation()->allocState();
-        if(Qm->GetX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO3) {
-          static_cast<ob::SO3StateSpace::StateType*>(s_X1)->setIdentity();
+
+        if(Qm->GetX1() != nullptr){
+          ob::State *s_X1 = Qm->GetX1()->allocState();
+          ob::State *s_Q1 = Qm->getSpaceInformation()->allocState();
+          if(Qm->GetX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO3) {
+            static_cast<ob::SO3StateSpace::StateType*>(s_X1)->setIdentity();
+          }
+          if(Qm->GetX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO2) {
+            static_cast<ob::SO2StateSpace::StateType*>(s_X1)->setIdentity();
+          }
+          //Qm->SampleX1(s_X1);
+          Qm->MergeStates(s_Q0, s_X1, s_Q1);
+          quotientSpaces.at(m-1)->getSpaceInformation()->freeState(s_Q0);
+          Qm->GetX1()->freeState(s_X1);
+          s_Q0 = s_Q1;
         }
-        if(Qm->GetX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO2) {
-          static_cast<ob::SO2StateSpace::StateType*>(s_X1)->setIdentity();
-        }
-        //Qm->SampleX1(s_X1);
-        Qm->MergeStates(s_Q0, s_X1, s_Q1);
-        quotientSpaces.at(m-1)->getSpaceInformation()->freeState(s_Q0);
-        Qm->GetX1()->freeState(s_X1);
-        s_Q0 = s_Q1;
       }
       v.setState(s_Q0);
       ctr++;

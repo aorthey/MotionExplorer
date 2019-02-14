@@ -26,8 +26,8 @@ namespace ompl
         virtual void Interpolate(const Configuration *q_from, const Configuration *q_to, const double step, Configuration* q_interp) override;
         virtual void Interpolate(const Configuration *q_from, const Configuration *q_to, Configuration *q_interp) override;
 
-      protected:
-        std::vector<const QuotientCover::Configuration*> GetInterpolationPath(const Configuration *q_from, const Configuration *q_to);
+        std::vector<const Configuration*> GetInterpolationPath(const Configuration *q_from, const Configuration *q_to);
+        uint InterpolateAlongPath(const Configuration *q_from, std::vector<const Configuration*> path, const double step_size, Configuration *q_interp);
 
 
     };

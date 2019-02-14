@@ -11,7 +11,6 @@ CoverExpansionStrategyGoal::CoverExpansionStrategyGoal(og::QuotientCoverQueue* q
 }
 double CoverExpansionStrategyGoal::Step()
 {
-  std::cout << "GOTO GOAL" << std::endl;
   Configuration* q_nearest = quotient_cover_queue->PriorityQueueNearestToGoal_Top();
   if(q_nearest == nullptr) return -1;
   q_nearest->number_attempted_expansions++;

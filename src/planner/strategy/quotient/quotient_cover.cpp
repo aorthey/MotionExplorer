@@ -19,6 +19,7 @@
 #include <ompl/datastructures/NearestNeighborsFLANN.h>
 #include <ompl/datastructures/NearestNeighborsLinear.h>
 #include <ompl/datastructures/NearestNeighborsSqrtApprox.h>
+#include <ompl/tools/config/SelfConfig.h>
 #include <flann/algorithms/autotuned_index.h>
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
