@@ -771,18 +771,19 @@ bool Quotient::Sample(ob::State *q_random)
   if(parent == nullptr){
     return Q1_valid_sampler->sample(q_random);
   }else{
-    //Adjusted sampling function: Sampling in G0 x X1
-    ob::SpaceInformationPtr Q0 = parent->GetQ1(); //Q0 is Q1 of parent!
-    base::State *s_X1 = X1->allocState();
-    base::State *s_Q0 = Q0->allocState();
-
-    X1_sampler->sampleUniform(s_X1);
-    parent->SampleQuotient(s_Q0);
-    MergeStates(s_Q0, s_X1, q_random);
-
-    X1->freeState(s_X1);
-    Q0->freeState(s_Q0);
-
+    if(X1_dimension>0)
+    {
+      //Adjusted sampling function: Sampling in G0 x X1
+      base::State *s_Q0 = Q0->allocState();
+      base::State *s_X1 = X1->allocState();
+      X1_sampler->sampleUniform(s_X1);
+      parent->SampleQuotient(s_Q0);
+      MergeStates(s_Q0, s_X1, q_random);
+      X1->freeState(s_X1);
+      Q0->freeState(s_Q0);
+    }else{
+      parent->SampleQuotient(q_random);
+    }
     return Q1->isValid(q_random);
   }
 }

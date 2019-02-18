@@ -33,6 +33,10 @@ void QCP::setup()
 void QCP::clear()
 {
   progressMadeTowardsGoal = true;
+  expansion_strategy_goal->Clear();
+  expansion_strategy_outwards->Clear();
+  expansion_strategy_random_boundary->Clear();
+  expansion_strategy_random_voronoi->Clear();
   BaseT::clear();
 }
 

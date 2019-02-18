@@ -15,6 +15,7 @@ namespace ompl
       public:
         CoverExpansionStrategy() = delete;
         CoverExpansionStrategy(QuotientCoverQueue*);
+        virtual void Clear();
 
         //Step
         //Returns:
@@ -28,7 +29,7 @@ namespace ompl
 
       protected:
         QuotientCoverQueue *quotient_cover_queue;
-        Configuration *q_last_expanded;
+        Configuration *q_last_expanded{nullptr};
 
         //Towards: Start at configuration q_from, and move a step into the
         //direction of q_to. This step can be made straight, or it can deviate

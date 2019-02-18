@@ -9,6 +9,10 @@ CoverExpansionStrategy::CoverExpansionStrategy(QuotientCoverQueue *quotient_cove
   quotient_cover_queue(quotient_cover_queue_)
 {
 }
+void CoverExpansionStrategy::Clear()
+{
+  q_last_expanded = nullptr;
+}
 
 bool CoverExpansionStrategy::TowardsStraightLine(QuotientCover::Configuration *q_from, QuotientCover::Configuration *q_to)
 {
@@ -85,6 +89,7 @@ bool CoverExpansionStrategy::ExpandTowardsSteepestAscentDirectionFromInitialDire
     if(radius_last >= radius_from){
       quotient_cover_queue->AddConfigurationToCover(q_last);
       quotient_cover_queue->AddConfigurationToPriorityQueue(q_last);
+      q_last_expanded = q_last;
       return true;
     }else{
       q_next = quotient_cover_queue->SampleNeighborhoodBoundaryUniformNear(q_from, q_last, radius_sampling);

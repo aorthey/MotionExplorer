@@ -678,13 +678,17 @@ void QuotientCover::SampleUniform(Configuration *q)
   if(parent == nullptr){
     Q1_sampler->sampleUniform(q->state);
   }else{
-    ob::State *stateX1 = X1->allocState();
-    ob::State *stateQ0 = Q0->allocState();
-    X1_sampler->sampleUniform(stateX1);
-    static_cast<og::QuotientCover*>(parent)->SampleUniformQuotientCover(stateQ0);
-    MergeStates(stateQ0, stateX1, q->state);
-    X1->freeState(stateX1);
-    Q0->freeState(stateQ0);
+    if(X1_dimension>0){
+      ob::State *stateX1 = X1->allocState();
+      ob::State *stateQ0 = Q0->allocState();
+      X1_sampler->sampleUniform(stateX1);
+      static_cast<og::QuotientCover*>(parent)->SampleUniformQuotientCover(stateQ0);
+      MergeStates(stateQ0, stateX1, q->state);
+      X1->freeState(stateX1);
+      Q0->freeState(stateQ0);
+    }else{
+      static_cast<og::QuotientCover*>(parent)->SampleUniformQuotientCover(q->state);
+    }
   }
 }
 

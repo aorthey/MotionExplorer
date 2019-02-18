@@ -51,6 +51,7 @@ uint QuotientMetricShortestPath::InterpolateAlongPath(const Configuration *q_fro
 
   //NOTE: We only need to find the single Configuration at distance step_size
 
+  //std::cout << "interpolate between config " << ctr-1 << " and " << ctr << " along path." << std::endl;
   const Configuration *q_next = path.at(ctr);
   const Configuration *q_last = path.at(ctr-1);
 
@@ -68,7 +69,22 @@ uint QuotientMetricShortestPath::InterpolateAlongPath(const Configuration *q_fro
 
   //SANITY CHECK
   double dfp = DistanceQ1(q_from, q_interp);
+  double d_m_last = DistanceQ1(q_interp, q_last);
+  double d_m_next = DistanceQ1(q_interp, q_next);
+  double d_last_next = DistanceQ1(q_last, q_next);
+
+  // std::cout << "milestone distance to first: " << dfp << " (radius="<<q_from->GetRadius()<<")" << std::endl;
+  // std::cout << "milestone distance to q_last: " << DistanceQ1(q_interp, q_last) << std::endl;
+  // std::cout << "milestone distance to q_next: " << DistanceQ1(q_interp, q_next) << std::endl;
+  // std::cout << "q_last    distance to q_next: " << DistanceQ1(q_last, q_next) << std::endl;
+  if( (d_m_last + d_m_next) < d_last_next-1e-5 ){
+    std::cout << "TRIANGLE INEQ not OK" << std::endl;
+    std::cout << "d_m_last+d_m_next = " << d_m_last + d_m_next << " < " << d_last_next << std::endl;
+    exit(0);
+  }
+
   if(fabs(dfp-q_from->GetRadius()) > 1e-10){
+    std::cout << "needs adjust" << std::endl;
     //Project onto NBH
     double step_size = q_from->GetRadius()/dfp;
     InterpolateQ1(q_from, q_interp, step_size, q_interp);

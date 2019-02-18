@@ -290,7 +290,7 @@
   <property name="draw_path" enabled="1"/>
   <property name="draw_path_unsmoothed" enabled="1"/>
   <property name="draw_path_autofocus" enabled="0"/>
-  <property name="draw_axes" enabled="0"/>
+  <property name="draw_axes" enabled="1"/>
   <property name="draw_robot_zero_position" enabled="1"/>
   <property name="draw_controller_driver" enabled="1"/>
   <property name="draw_text_robot_info" enabled="1"/>

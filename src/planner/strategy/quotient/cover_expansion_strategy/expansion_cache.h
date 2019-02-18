@@ -12,10 +12,12 @@ namespace ompl
     typedef QuotientCover::Configuration Configuration;
     class CoverExpansionStrategyCache: public CoverExpansionStrategy
     {
+      typedef CoverExpansionStrategy BaseT;
       public:
         CoverExpansionStrategyCache() = delete;
         CoverExpansionStrategyCache(QuotientCoverQueue*);
         virtual double Step() = 0;
+        void Clear() override;
 
       protected:
         //compute shortest path once, then walk along it. This makes the
@@ -25,7 +27,7 @@ namespace ompl
 
         typedef std::vector<const Configuration*> ConfigurationPath;
         ConfigurationPath cached_path;
-        Configuration *q_source;
+        Configuration *q_source{nullptr};
 
         //Follow path for path.at(0)->GetRadius() to reach milestone. Then remove all
         //configurations before milestone on path. Finally add milestone as the
