@@ -82,9 +82,16 @@ void Roadmap::DrawShortestPath(GUIState &state)
     glPushMatrix();
     glLineWidth(widthPath);
     setColor(cPath);
+
+    ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
+
     for(uint k = 0; k < q.size()-1; k++){
       Vector3 v1 = q.at(k);
       Vector3 v2 = q.at(k+1);
+      double offset = +0.05;
+      if(quotient_space->GetDimensionality()<=2 || si->getStateSpace()->getType()==ob::STATE_SPACE_SE2){
+        v1[2]+=offset;v2[2]+=offset;
+      }
       drawLineSegment(v1,v2);
     }
     glPopMatrix();

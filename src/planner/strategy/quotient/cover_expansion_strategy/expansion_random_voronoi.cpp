@@ -11,7 +11,6 @@ CoverExpansionStrategyRandomVoronoi::CoverExpansionStrategyRandomVoronoi(og::Quo
 }
 double CoverExpansionStrategyRandomVoronoi::Step()
 {
-  std::cout << "STEP RANDOM VORONOI" << std::endl;
   const ob::SpaceInformationPtr &Q1 = quotient_cover_queue->GetQ1();
   Configuration *q_random = new Configuration(Q1);
   quotient_cover_queue->SampleUniform(q_random);

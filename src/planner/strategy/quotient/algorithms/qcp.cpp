@@ -86,7 +86,12 @@ void QCP::GrowWithSolution(ob::PlannerTerminationCondition &ptc)
   if(r <= rewireBias){
     RewireCover(ptc);
   }else{
-    expansion_strategy_random_boundary->Step();
+    double r = rng_.uniform01();
+    if(r<0.5){
+      expansion_strategy_random_boundary->Step();
+    }else{
+      expansion_strategy_random_voronoi->Step();
+    }
   }
 }
 
