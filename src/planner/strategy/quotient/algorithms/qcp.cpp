@@ -17,9 +17,10 @@ QCP::QCP(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, pare
 {
   setName("QCP"+std::to_string(id));
   progressMadeTowardsGoal = true;
-  SetMetric("shortestpath");
-  //expansion_strategy_goal = std::make_shared<CoverExpansionStrategyCacheGoal>(this);
-  expansion_strategy_goal = std::make_shared<CoverExpansionStrategyGoal>(this);
+  SetMetric("shortestpath_simplified");
+  //SetMetric("euclidean");
+  expansion_strategy_goal = std::make_shared<CoverExpansionStrategyCacheGoal>(this);
+  //expansion_strategy_goal = std::make_shared<CoverExpansionStrategyGoal>(this);
   expansion_strategy_outwards = std::make_shared<CoverExpansionStrategyOutwards>(this);
   expansion_strategy_random_voronoi = std::make_shared<CoverExpansionStrategyRandomVoronoi>(this);
   expansion_strategy_random_boundary = std::make_shared<CoverExpansionStrategyRandomBoundary>(this);
@@ -65,7 +66,11 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
 {
   if(NearestToGoalHasChanged() || progressMadeTowardsGoal)
   {
+    //std::cout << std::string(80, '%') << std::endl;
     progressMadeTowardsGoal = (expansion_strategy_goal->Step() > 0);
+    if(!progressMadeTowardsGoal){
+      expansion_strategy_goal->Clear();
+    }
   }else{
     if(PriorityQueueCandidate_IsEmpty()){
       expansion_strategy_random_voronoi->Step();

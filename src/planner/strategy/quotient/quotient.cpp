@@ -151,7 +151,7 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const
 
     //Cases we can handle:
     // ---- non-compound:
-    // (1) Q1 Rn       , Q0 Rm       , 0<m<n   => X1 = R(n-m)
+    // (1) Q1 Rn       , Q0 Rm       , 0<m<=n  => X1 = R(n-m) \union {0}
     // ---- compound:
     // (2) Q1 SE2      , Q0 R2                 => X1 = SO2
     // (3) Q1 SE3      , Q0 R3                 => X1 = SO3
@@ -179,7 +179,7 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const
             if(n==m){
               type = IDENTITY_SPACE;
             }else{
-              std::cout << "not allowed: dimensionality needs to be monotonically increasing. we need n>=m>0, but have " << n << ">=" << m << ">0" << std::endl;
+              std::cout << "Not allowed: dimensionality needs to be monotonically increasing. we need n>=m>0, but have " << n << ">=" << m << ">0" << std::endl;
               exit(0);
             }
           }
@@ -258,7 +258,7 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const
                   if(m<n && m>0){
                     type = SE3RN_SE3RM;
                   }else{
-                    std::cout << "not allowed: we need n>m>0, but have " << n << ">" << m << ">0" << std::endl;
+                    std::cout << "Not allowed: we need n>m>0, but have " << n << ">" << m << ">0" << std::endl;
                     exit(0);
                   }
                 }
@@ -516,7 +516,7 @@ void Quotient::MergeStates(const ob::State *qQ0, const ob::State *qX1, ob::State
       }
     default:
       {
-        std::cout << "type : " << type << " not implemented." << std::endl;
+        std::cout << "Type : " << type << " not implemented." << std::endl;
         OMPL_ERROR("cannot merge states");
         exit(0);
       }
@@ -600,7 +600,7 @@ void Quotient::ProjectX1Subspace( const ob::State* q, ob::State* qX1 ) const
       }
     default:
       {
-        std::cout << "type : " << type << " not implemented." << std::endl;
+        std::cout << "Type : " << type << " not implemented." << std::endl;
         OMPL_ERROR("cannot project onto X1");
         exit(0);
       }
@@ -700,7 +700,7 @@ void Quotient::ProjectQ0Subspace( const ob::State* q, ob::State* qQ0 ) const
       }
     default:
       {
-        std::cout << "type : " << type << " not implemented." << std::endl;
+        std::cout << "Type : " << type << " not implemented." << std::endl;
         OMPL_ERROR("cannot project onto Q0");
         exit(1);
       }
@@ -719,6 +719,18 @@ const ob::SpaceInformationPtr& Quotient::GetQ1() const
 const ob::SpaceInformationPtr& Quotient::GetQ0() const
 {
   return Q0;
+}
+const uint Quotient::GetX1Dimension() const
+{
+  return X1_dimension;
+}
+const uint Quotient::GetQ1Dimension() const
+{
+  return Q1_dimension;
+}
+const uint Quotient::GetQ0Dimension() const
+{
+  return Q0_dimension;
 }
 const ob::StateSamplerPtr& Quotient::GetX1SamplerPtr() const
 {
@@ -859,9 +871,5 @@ namespace ompl{
       quotient_.Print(out);
       return out;
     }
-    // std::ostream& operator<< (std::ostream& out, const Quotient* quotient_){
-    //   quotient_->Print(out);
-    //   return out;
-    // }
   }
 }

@@ -17,6 +17,7 @@ double CoverExpansionStrategyOutwards::Step()
     q = quotient_cover_queue->SampleConfigurationLargestNeighborhood();
   }
   if(q->index < 0){
+    //add to cover if not yet done
     quotient_cover_queue->AddConfigurationToCover(q);
   }
   Configuration* q_outward = quotient_cover_queue->GetOutwardPointingConfiguration(q);

@@ -64,6 +64,10 @@ namespace ompl
         const ob::SpaceInformationPtr &GetQ1() const;
         const ob::SpaceInformationPtr &GetQ0() const;
 
+        const uint GetX1Dimension() const;
+        const uint GetQ1Dimension() const;
+        const uint GetQ0Dimension() const;
+
         const ob::StateSamplerPtr &GetX1SamplerPtr() const;
         const ob::StateSamplerPtr &GetQ1SamplerPtr() const;
 
@@ -77,6 +81,7 @@ namespace ompl
 
         friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::Quotient& qtnt);
         virtual void Print(std::ostream& out) const;
+
 
         //Quotient Space Projection Operators
         //  ProjectX1Subspace: Q0 \times X1 \rightarrow X1

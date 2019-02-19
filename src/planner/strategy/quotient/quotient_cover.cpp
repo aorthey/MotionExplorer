@@ -2,6 +2,7 @@
 #include "quotient_cover.h"
 #include "metric/quotient_metric.h"
 #include "metric/quotient_metric_shortest_path.h"
+#include "metric/quotient_metric_shortest_path_simplified.h"
 
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
@@ -106,6 +107,8 @@ void QuotientCover::SetMetric(const std::string& s_metric)
     metric = std::make_shared<QuotientMetric>(this);
   }else if(s_metric == "shortestpath"){
     metric = std::make_shared<QuotientMetricShortestPath>(this);
+  }else if(s_metric == "shortestpath_simplified"){
+    metric = std::make_shared<QuotientMetricShortestPathSimplified>(this);
   }else{
     std::cout << "Metric is not known: " << s_metric << std::endl;
     exit(0);
@@ -822,9 +825,9 @@ QuotientCover::Configuration* QuotientCover::NearestConfiguration(const Configur
 
 void QuotientCover::ProjectConfigurationOntoNeighborhoodBoundary(const Configuration *q_center, Configuration* q_projected)
 {
-  const double d_center_to_proj = GetMetric()->DistanceConfigurationConfiguration(q_center, q_projected);
+  const double d_center_to_proj = GetMetric()->DistanceConfigurationConfigurationQ1(q_center, q_projected);
   double step_size = q_center->GetRadius()/d_center_to_proj;
-  GetMetric()->Interpolate(q_center, q_projected, step_size, q_projected);
+  GetMetric()->InterpolateQ1(q_center, q_projected, step_size, q_projected);
 }
 
 QuotientCover::Configuration* QuotientCover::NearestConfigurationOnBoundary(const Configuration *q_center, const Configuration* q_outside)

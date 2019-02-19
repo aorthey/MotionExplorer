@@ -15,6 +15,8 @@ namespace ompl
         CoverExpansionStrategyCacheGoal() = delete;
         CoverExpansionStrategyCacheGoal(QuotientCoverQueue*);
         virtual double Step() override;
+      protected:
+        bool progressMadeTowardsGoal{false};
     };
   }
 }

@@ -13,6 +13,7 @@ namespace ompl
     class CoverExpansionStrategyCache: public CoverExpansionStrategy
     {
       typedef CoverExpansionStrategy BaseT;
+      const uint verbose{0};
       public:
         CoverExpansionStrategyCache() = delete;
         CoverExpansionStrategyCache(QuotientCoverQueue*);
@@ -28,11 +29,13 @@ namespace ompl
         typedef std::vector<const Configuration*> ConfigurationPath;
         ConfigurationPath cached_path;
         Configuration *q_source{nullptr};
+        Configuration *q_milestone{nullptr};
+        double distance_next_milestone{.0};
 
         //Follow path for path.at(0)->GetRadius() to reach milestone. Then remove all
         //configurations before milestone on path. Finally add milestone as the
         //first element of path, and return. Path will be changed.
-        void RollUpPath(ConfigurationPath &path);
+        void RollUpPath();
         
      };
   }

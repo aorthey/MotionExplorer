@@ -35,9 +35,15 @@ namespace ompl
         //direction of q_to. This step can be made straight, or it can deviate
         //because of adjacent obstacles
         //return bool: if we successfully stepped or not
-        bool TowardsStraightLine(QuotientCover::Configuration *q_from, QuotientCover::Configuration *q_to);
+        bool TowardsStraightLine(Configuration *q_from, Configuration *q_to);
+
+        //Move from q_from to another point q_to in the configuration space
         bool Towards(QuotientCover::Configuration *q_from, QuotientCover::Configuration *q_to);
-        bool ExpandTowardsSteepestAscentDirectionFromInitialDirection(const QuotientCover::Configuration *q_from, QuotientCover::Configuration *q_initial);
+        //Move from q_from to another point q_to which lies ON the boundary of
+        //the neighborhood of q_from
+        bool TowardsBoundaryPoint(Configuration*, Configuration*);
+
+        bool ExpandTowardsSteepestAscentDirectionFromInitialDirection(const Configuration *q_from, Configuration *q_initial);
     };
   }
 }

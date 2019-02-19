@@ -98,6 +98,13 @@ void Roadmap::DrawPlannerData(GUIState &state)
   glEnable(GL_BLEND); 
   glDisable(GL_LIGHTING);
   glDisable(GL_CULL_FACE);
+  if(state("draw_roadmap_volume")){
+    if(state("draw_roadmap_volume_wired")){
+      wiredNeighborhood = true;
+    }else{
+      wiredNeighborhood = false;
+    }
+  }
   for(uint vidx = 0; vidx < pd->numVertices(); vidx++)
   {
     glPointSize(sizeVertex);
@@ -157,9 +164,6 @@ void Roadmap::DrawPlannerData(GUIState &state)
         }
 
         ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
-
-        // if( si->getType() == base::STATE_SPACE_SE2 ){
-        // }
 
         if(quotient_space->GetDimensionality()<=2 || si->getStateSpace()->getType()==ob::STATE_SPACE_SE2){
           Vector3 q2(0,0,1);

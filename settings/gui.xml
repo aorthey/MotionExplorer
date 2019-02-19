@@ -213,7 +213,7 @@
     <active>1</active>
   </checkbox>
   <checkbox>
-    <name>draw_roadmap_infeasible_vertices</name>
+    <name>draw_roadmap_volume_wired</name>
     <key>5</key>
     <active>1</active>
   </checkbox>
