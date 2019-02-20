@@ -3,7 +3,7 @@
 <world>
 
 
-  <robot name="sentinel" file="/home/aorthey/git/orthoklampt/data/robots/sentinel_complete.urdf" translation="0 0 0" rotateRPY="0 0 0" config="143 
+  <robot name="sentinel" file="/home/aorthey/git/orthoklampt/data/robots/sentinel.urdf" translation="0 0 0" rotateRPY="0 0 0" config="143 
    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
   <!--
   -->

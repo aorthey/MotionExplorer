@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
-<robot name="sentinel">
+<robot name="sentinel_pipedreamin_complete">
 <link name="eye">
   <inertial>
-  <mass value="0.05"/>
-  <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
+   <mass value="1"/>
+   <inertia ixx="0.004" ixy="0" ixz="0" iyy="0.004" iyz="0" izz="0.004"/>
   </inertial>
   <collision>
     <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -21,8 +21,8 @@
 
  <link name="head">
   <inertial>
-    <mass value="0.05"/>
-    <inertia ixx="0.005" ixy="0.001" ixz="0" iyy="0.006" iyz="0" izz="0.007"/>
+    <mass value="1"/>
+    <inertia ixx="0.00333333333333" ixy="0" ixz="0" iyy="0.00333333333333" iyz="0" izz="0.0025"/>
   </inertial>
   <visual>
     <origin rpy="0 1.57 0" xyz="-0.05 0 0"/>
@@ -42,6 +42,3670 @@
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="eye"/>
   <child link="head"/>
+</joint>
+
+<!--############################################################################
+branch_00
+##############################################################################-->
+ <link name="branch_00_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.000129296875" ixy="0" ixz="0" iyy="0.000129296875" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_head_branch_00_cylinder" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.1 0.07 0.0"/>
+  <parent link="head"/>
+  <child link="branch_00_cylinder"/>
+</joint>
+
+<link name="branch_00">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_00_cylinder_branch_00" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_00_cylinder"/>
+  <child link="branch_00"/>
+</joint>
+
+ <link name="branch_01_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_00_branch_01_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+  <parent link="branch_00"/>
+  <child link="branch_00_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_00_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_00_branch_01_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_00_spherical_joint_link"/>
+  <child link="branch_01_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_01">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_01_cylinder_branch_01" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_01_cylinder"/>
+  <child link="branch_01"/>
+</joint>
+
+ <link name="branch_02_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_01_branch_02_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_01"/>
+  <child link="branch_01_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_01_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_01_branch_02_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_01_spherical_joint_link"/>
+  <child link="branch_02_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_02">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_02_cylinder_branch_02" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_02_cylinder"/>
+  <child link="branch_02"/>
+</joint>
+
+ <link name="branch_03_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_02_branch_03_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_02"/>
+  <child link="branch_02_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_02_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_02_branch_03_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_02_spherical_joint_link"/>
+  <child link="branch_03_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_03">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_03_cylinder_branch_03" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_03_cylinder"/>
+  <child link="branch_03"/>
+</joint>
+
+ <link name="branch_04_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_03_branch_04_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_03"/>
+  <child link="branch_03_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_03_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_03_branch_04_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_03_spherical_joint_link"/>
+  <child link="branch_04_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_04">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_04_cylinder_branch_04" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_04_cylinder"/>
+  <child link="branch_04"/>
+</joint>
+
+ <link name="branch_05_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_04_branch_05_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_04"/>
+  <child link="branch_04_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_04_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_04_branch_05_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_04_spherical_joint_link"/>
+  <child link="branch_05_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_05">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_05_cylinder_branch_05" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_05_cylinder"/>
+  <child link="branch_05"/>
+</joint>
+
+<!--############################################################################
+branch_10
+##############################################################################-->
+ <link name="branch_10_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.000129296875" ixy="0" ixz="0" iyy="0.000129296875" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_head_branch_10_cylinder" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.1 0.0494974746831 0.0494974746831"/>
+  <parent link="head"/>
+  <child link="branch_10_cylinder"/>
+</joint>
+
+<link name="branch_10">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_10_cylinder_branch_10" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_10_cylinder"/>
+  <child link="branch_10"/>
+</joint>
+
+ <link name="branch_11_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_10_branch_11_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+  <parent link="branch_10"/>
+  <child link="branch_10_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_10_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_10_branch_11_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_10_spherical_joint_link"/>
+  <child link="branch_11_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_11">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_11_cylinder_branch_11" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_11_cylinder"/>
+  <child link="branch_11"/>
+</joint>
+
+ <link name="branch_12_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_11_branch_12_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_11"/>
+  <child link="branch_11_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_11_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_11_branch_12_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_11_spherical_joint_link"/>
+  <child link="branch_12_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_12">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_12_cylinder_branch_12" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_12_cylinder"/>
+  <child link="branch_12"/>
+</joint>
+
+ <link name="branch_13_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_12_branch_13_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_12"/>
+  <child link="branch_12_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_12_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_12_branch_13_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_12_spherical_joint_link"/>
+  <child link="branch_13_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_13">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_13_cylinder_branch_13" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_13_cylinder"/>
+  <child link="branch_13"/>
+</joint>
+
+ <link name="branch_14_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_13_branch_14_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_13"/>
+  <child link="branch_13_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_13_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_13_branch_14_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_13_spherical_joint_link"/>
+  <child link="branch_14_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_14">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_14_cylinder_branch_14" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_14_cylinder"/>
+  <child link="branch_14"/>
+</joint>
+
+ <link name="branch_15_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_14_branch_15_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_14"/>
+  <child link="branch_14_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_14_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_14_branch_15_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_14_spherical_joint_link"/>
+  <child link="branch_15_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_15">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_15_cylinder_branch_15" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_15_cylinder"/>
+  <child link="branch_15"/>
+</joint>
+
+<!--############################################################################
+branch_20
+##############################################################################-->
+ <link name="branch_20_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.000129296875" ixy="0" ixz="0" iyy="0.000129296875" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_head_branch_20_cylinder" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.1 4.28626379702e-18 0.07"/>
+  <parent link="head"/>
+  <child link="branch_20_cylinder"/>
+</joint>
+
+<link name="branch_20">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_20_cylinder_branch_20" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_20_cylinder"/>
+  <child link="branch_20"/>
+</joint>
+
+ <link name="branch_21_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_20_branch_21_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+  <parent link="branch_20"/>
+  <child link="branch_20_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_20_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_20_branch_21_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_20_spherical_joint_link"/>
+  <child link="branch_21_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_21">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_21_cylinder_branch_21" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_21_cylinder"/>
+  <child link="branch_21"/>
+</joint>
+
+ <link name="branch_22_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_21_branch_22_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_21"/>
+  <child link="branch_21_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_21_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_21_branch_22_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_21_spherical_joint_link"/>
+  <child link="branch_22_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_22">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_22_cylinder_branch_22" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_22_cylinder"/>
+  <child link="branch_22"/>
+</joint>
+
+ <link name="branch_23_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_22_branch_23_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_22"/>
+  <child link="branch_22_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_22_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_22_branch_23_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_22_spherical_joint_link"/>
+  <child link="branch_23_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_23">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_23_cylinder_branch_23" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_23_cylinder"/>
+  <child link="branch_23"/>
+</joint>
+
+ <link name="branch_24_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_23_branch_24_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_23"/>
+  <child link="branch_23_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_23_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_23_branch_24_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_23_spherical_joint_link"/>
+  <child link="branch_24_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_24">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_24_cylinder_branch_24" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_24_cylinder"/>
+  <child link="branch_24"/>
+</joint>
+
+ <link name="branch_25_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_24_branch_25_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_24"/>
+  <child link="branch_24_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_24_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_24_branch_25_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_24_spherical_joint_link"/>
+  <child link="branch_25_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_25">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_25_cylinder_branch_25" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_25_cylinder"/>
+  <child link="branch_25"/>
+</joint>
+
+<!--############################################################################
+branch_30
+##############################################################################-->
+ <link name="branch_30_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.000129296875" ixy="0" ixz="0" iyy="0.000129296875" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_head_branch_30_cylinder" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.1 -0.0494974746831 0.0494974746831"/>
+  <parent link="head"/>
+  <child link="branch_30_cylinder"/>
+</joint>
+
+<link name="branch_30">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_30_cylinder_branch_30" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_30_cylinder"/>
+  <child link="branch_30"/>
+</joint>
+
+ <link name="branch_31_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_30_branch_31_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+  <parent link="branch_30"/>
+  <child link="branch_30_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_30_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_30_branch_31_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_30_spherical_joint_link"/>
+  <child link="branch_31_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_31">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_31_cylinder_branch_31" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_31_cylinder"/>
+  <child link="branch_31"/>
+</joint>
+
+ <link name="branch_32_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_31_branch_32_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_31"/>
+  <child link="branch_31_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_31_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_31_branch_32_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_31_spherical_joint_link"/>
+  <child link="branch_32_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_32">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_32_cylinder_branch_32" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_32_cylinder"/>
+  <child link="branch_32"/>
+</joint>
+
+ <link name="branch_33_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_32_branch_33_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_32"/>
+  <child link="branch_32_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_32_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_32_branch_33_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_32_spherical_joint_link"/>
+  <child link="branch_33_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_33">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_33_cylinder_branch_33" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_33_cylinder"/>
+  <child link="branch_33"/>
+</joint>
+
+ <link name="branch_34_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_33_branch_34_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_33"/>
+  <child link="branch_33_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_33_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_33_branch_34_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_33_spherical_joint_link"/>
+  <child link="branch_34_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_34">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_34_cylinder_branch_34" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_34_cylinder"/>
+  <child link="branch_34"/>
+</joint>
+
+ <link name="branch_35_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_34_branch_35_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_34"/>
+  <child link="branch_34_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_34_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_34_branch_35_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_34_spherical_joint_link"/>
+  <child link="branch_35_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_35">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_35_cylinder_branch_35" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_35_cylinder"/>
+  <child link="branch_35"/>
+</joint>
+
+<!--############################################################################
+branch_40
+##############################################################################-->
+ <link name="branch_40_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.000129296875" ixy="0" ixz="0" iyy="0.000129296875" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_head_branch_40_cylinder" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.1 -0.07 8.57252759403e-18"/>
+  <parent link="head"/>
+  <child link="branch_40_cylinder"/>
+</joint>
+
+<link name="branch_40">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_40_cylinder_branch_40" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_40_cylinder"/>
+  <child link="branch_40"/>
+</joint>
+
+ <link name="branch_41_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_40_branch_41_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+  <parent link="branch_40"/>
+  <child link="branch_40_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_40_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_40_branch_41_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_40_spherical_joint_link"/>
+  <child link="branch_41_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_41">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_41_cylinder_branch_41" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_41_cylinder"/>
+  <child link="branch_41"/>
+</joint>
+
+ <link name="branch_42_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_41_branch_42_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_41"/>
+  <child link="branch_41_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_41_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_41_branch_42_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_41_spherical_joint_link"/>
+  <child link="branch_42_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_42">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_42_cylinder_branch_42" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_42_cylinder"/>
+  <child link="branch_42"/>
+</joint>
+
+ <link name="branch_43_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_42_branch_43_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_42"/>
+  <child link="branch_42_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_42_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_42_branch_43_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_42_spherical_joint_link"/>
+  <child link="branch_43_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_43">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_43_cylinder_branch_43" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_43_cylinder"/>
+  <child link="branch_43"/>
+</joint>
+
+ <link name="branch_44_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_43_branch_44_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_43"/>
+  <child link="branch_43_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_43_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_43_branch_44_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_43_spherical_joint_link"/>
+  <child link="branch_44_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_44">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_44_cylinder_branch_44" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_44_cylinder"/>
+  <child link="branch_44"/>
+</joint>
+
+ <link name="branch_45_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_44_branch_45_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_44"/>
+  <child link="branch_44_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_44_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_44_branch_45_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_44_spherical_joint_link"/>
+  <child link="branch_45_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_45">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_45_cylinder_branch_45" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_45_cylinder"/>
+  <child link="branch_45"/>
+</joint>
+
+<!--############################################################################
+branch_50
+##############################################################################-->
+ <link name="branch_50_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.000129296875" ixy="0" ixz="0" iyy="0.000129296875" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_head_branch_50_cylinder" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.1 -0.0494974746831 -0.0494974746831"/>
+  <parent link="head"/>
+  <child link="branch_50_cylinder"/>
+</joint>
+
+<link name="branch_50">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_50_cylinder_branch_50" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_50_cylinder"/>
+  <child link="branch_50"/>
+</joint>
+
+ <link name="branch_51_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_50_branch_51_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+  <parent link="branch_50"/>
+  <child link="branch_50_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_50_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_50_branch_51_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_50_spherical_joint_link"/>
+  <child link="branch_51_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_51">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_51_cylinder_branch_51" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_51_cylinder"/>
+  <child link="branch_51"/>
+</joint>
+
+ <link name="branch_52_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_51_branch_52_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_51"/>
+  <child link="branch_51_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_51_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_51_branch_52_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_51_spherical_joint_link"/>
+  <child link="branch_52_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_52">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_52_cylinder_branch_52" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_52_cylinder"/>
+  <child link="branch_52"/>
+</joint>
+
+ <link name="branch_53_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_52_branch_53_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_52"/>
+  <child link="branch_52_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_52_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_52_branch_53_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_52_spherical_joint_link"/>
+  <child link="branch_53_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_53">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_53_cylinder_branch_53" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_53_cylinder"/>
+  <child link="branch_53"/>
+</joint>
+
+ <link name="branch_54_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_53_branch_54_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_53"/>
+  <child link="branch_53_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_53_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_53_branch_54_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_53_spherical_joint_link"/>
+  <child link="branch_54_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_54">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_54_cylinder_branch_54" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_54_cylinder"/>
+  <child link="branch_54"/>
+</joint>
+
+ <link name="branch_55_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_54_branch_55_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_54"/>
+  <child link="branch_54_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_54_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_54_branch_55_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_54_spherical_joint_link"/>
+  <child link="branch_55_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_55">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_55_cylinder_branch_55" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_55_cylinder"/>
+  <child link="branch_55"/>
+</joint>
+
+<!--############################################################################
+branch_60
+##############################################################################-->
+ <link name="branch_60_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.000129296875" ixy="0" ixz="0" iyy="0.000129296875" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_head_branch_60_cylinder" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.1 -1.2858791391e-17 -0.07"/>
+  <parent link="head"/>
+  <child link="branch_60_cylinder"/>
+</joint>
+
+<link name="branch_60">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_60_cylinder_branch_60" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_60_cylinder"/>
+  <child link="branch_60"/>
+</joint>
+
+ <link name="branch_61_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_60_branch_61_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+  <parent link="branch_60"/>
+  <child link="branch_60_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_60_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_60_branch_61_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_60_spherical_joint_link"/>
+  <child link="branch_61_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_61">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_61_cylinder_branch_61" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_61_cylinder"/>
+  <child link="branch_61"/>
+</joint>
+
+ <link name="branch_62_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_61_branch_62_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_61"/>
+  <child link="branch_61_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_61_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_61_branch_62_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_61_spherical_joint_link"/>
+  <child link="branch_62_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_62">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_62_cylinder_branch_62" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_62_cylinder"/>
+  <child link="branch_62"/>
+</joint>
+
+ <link name="branch_63_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_62_branch_63_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_62"/>
+  <child link="branch_62_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_62_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_62_branch_63_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_62_spherical_joint_link"/>
+  <child link="branch_63_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_63">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_63_cylinder_branch_63" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_63_cylinder"/>
+  <child link="branch_63"/>
+</joint>
+
+ <link name="branch_64_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_63_branch_64_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_63"/>
+  <child link="branch_63_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_63_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_63_branch_64_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_63_spherical_joint_link"/>
+  <child link="branch_64_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_64">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_64_cylinder_branch_64" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_64_cylinder"/>
+  <child link="branch_64"/>
+</joint>
+
+ <link name="branch_65_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_64_branch_65_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_64"/>
+  <child link="branch_64_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_64_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_64_branch_65_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_64_spherical_joint_link"/>
+  <child link="branch_65_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_65">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_65_cylinder_branch_65" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_65_cylinder"/>
+  <child link="branch_65"/>
+</joint>
+
+<!--############################################################################
+branch_70
+##############################################################################-->
+ <link name="branch_70_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.000129296875" ixy="0" ixz="0" iyy="0.000129296875" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.009375 0 0"/>
+    <geometry>
+      <cylinder length="0.01875" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_head_branch_70_cylinder" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.1 0.0494974746831 -0.0494974746831"/>
+  <parent link="head"/>
+  <child link="branch_70_cylinder"/>
+</joint>
+
+<link name="branch_70">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_70_cylinder_branch_70" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_70_cylinder"/>
+  <child link="branch_70"/>
+</joint>
+
+ <link name="branch_71_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_70_branch_71_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
+  <parent link="branch_70"/>
+  <child link="branch_70_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_70_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_70_branch_71_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_70_spherical_joint_link"/>
+  <child link="branch_71_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_71">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_71_cylinder_branch_71" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_71_cylinder"/>
+  <child link="branch_71"/>
+</joint>
+
+ <link name="branch_72_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_71_branch_72_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_71"/>
+  <child link="branch_71_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_71_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_71_branch_72_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_71_spherical_joint_link"/>
+  <child link="branch_72_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_72">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_72_cylinder_branch_72" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_72_cylinder"/>
+  <child link="branch_72"/>
+</joint>
+
+ <link name="branch_73_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_72_branch_73_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_72"/>
+  <child link="branch_72_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_72_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_72_branch_73_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_72_spherical_joint_link"/>
+  <child link="branch_73_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_73">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_73_cylinder_branch_73" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_73_cylinder"/>
+  <child link="branch_73"/>
+</joint>
+
+ <link name="branch_74_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_73_branch_74_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_73"/>
+  <child link="branch_73_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_73_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_73_branch_74_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_73_spherical_joint_link"/>
+  <child link="branch_74_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_74">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_74_cylinder_branch_74" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_74_cylinder"/>
+  <child link="branch_74"/>
+</joint>
+
+ <link name="branch_75_cylinder">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.001975" ixy="0" ixz="0" iyy="0.001975" iyz="0" izz="0.0001"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.095 0 0"/>
+    <geometry>
+      <cylinder length="0.15" radius="0.02"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="branch_74_branch_75_joint_revolute_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+  <parent link="branch_74"/>
+  <child link="branch_74_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_74_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-07" ixy="0" ixz="0" iyy="4e-07" iyz="0" izz="4e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="branch_74_branch_75_joint_revolute_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_74_spherical_joint_link"/>
+  <child link="branch_75_cylinder"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57079632679" upper="1.57079632679" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="branch_75">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.0001444" ixy="0" ixz="0" iyy="0.0001444" iyz="0" izz="0.0001444"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.19 0 0"/>
+    <geometry>
+      <sphere radius="0.019"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_branch_75_cylinder_branch_75" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="branch_75_cylinder"/>
+  <child link="branch_75"/>
 </joint>
 
   <klampt package_root="../../.." default_acc_max="4" >

@@ -8,12 +8,12 @@
 
 <world>
 
-   <robot name="DoubleLshape" file="../robots/DoubleLshape.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-   <robot name="capsule_inner" file="../robots/DoubleLshape_capsule_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-   <robot name="capsule_outer" file="../robots/DoubleLshape_capsule_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-   <robot name="sphere_inner" file="../robots/DoubleLshape_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-   <robot name="sphere_outer" file="../robots/DoubleLshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-   <robot name="point_inner" file="../robots/DoubleLshape_point_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="DoubleLshape" file="../robots/Lshape/DoubleLshape.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="capsule_inner" file="../robots/Lshape/DoubleLshape_capsule_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="capsule_outer" file="../robots/Lshape/DoubleLshape_capsule_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="sphere_inner" file="../robots/Lshape/DoubleLshape_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="sphere_outer" file="../robots/Lshape/DoubleLshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="point_inner" file="../robots/Lshape/DoubleLshape_point_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
    <terrain name="doublelshape.tri" file="../terrains/DoubleLshape_large.tri" translation="0 0 0"/>
   <!-- <terrain name="O1" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/> -->

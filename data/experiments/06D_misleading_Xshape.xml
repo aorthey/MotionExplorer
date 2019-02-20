@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <world>
 
-  <robot name="Xshape" file="../robots/Xshape.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="capsule_inner" file="../robots/Xshape_capsule_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="capsule_outer" file="../robots/Xshape_capsule_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="sphere_inner" file="../robots/Xshape_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="sphere_outer" file="../robots/Xshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="Xshape" file="../robots/Xshape/Xshape.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="capsule_inner" file="../robots/Xshape/Xshape_capsule_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="capsule_outer" file="../robots/Xshape/Xshape_capsule_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="sphere_inner" file="../robots/Xshape/Xshape_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="sphere_outer" file="../robots/Xshape/Xshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
   <terrain  name="cubes" file="../terrains/Lshape2.tri" translation="0 0 -0.1" rotateRPY="0 0 0"/>
 

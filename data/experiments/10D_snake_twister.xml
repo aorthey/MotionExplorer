@@ -1,10 +1,12 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="snake" file="../robots/snake.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="snake_sphere_inner" file="../robots/snake_sphere_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="snake_sphere_outer" file="../robots/snake_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <rigidObject  name="twister/twister.tri" file="../terrains/twister/twister.tri" translation="0 0 0"/>
+  <robot name="snake" file="../robots/snake/snake.urdf"/>
+  <robot name="snake_sphere_inner" file="../robots/snake/snake_sphere_inner.urdf"/>
+  <robot name="snake_sphere_outer" file="../robots/snake/snake_sphere_outer.urdf"/>
+  <robot name="snake_one_link_inner" file="../robots/snake/snake_onelink_inner.urdf"/>
+
+  <terrain  name="twister/twister.tri" file="../terrains/twister/twister.tri"/>
 
   <plannerinput>
 
@@ -15,8 +17,11 @@
     <qgoal config="14  +2.1 +0.7 0 0 0 0 0 0 0 0 0 0 0 0"/>
 
     <freeFloating>1</freeFloating>
+    <maxplanningtime>3</maxplanningtime>
+
     <hierarchy>
-      <level inner_index="1" outer_index="2" type="R3"/>
+      <level inner_index="1" cspace_constant="1" type="R3"/>
+      <level inner_index="3" type="SE3"/>
       <level inner_index="0" type="SE3RN"/>
     </hierarchy>
 

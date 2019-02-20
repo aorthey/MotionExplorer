@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot name="Lshape/DoubleLshape_point_inner">
+<link name="body">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4e-05" ixy="0" ixz="0" iyy="4e-05" iyz="0" izz="4e-05"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.01"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.01"/>
+    </geometry>
+  </visual>
+</link>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>
