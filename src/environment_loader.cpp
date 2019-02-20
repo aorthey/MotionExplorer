@@ -19,6 +19,12 @@ PlannerBackendPtr EnvironmentLoader::GetBackendPtr(){
   return _backend;
 }
 
+void EnvironmentLoader::RenameExec(int argc, char** argv, const std::string &s)
+{
+  //std::string replacement_str = "quotient-standalone";
+  strncpy(argv[0], s.c_str(), strlen(argv[0]));
+  for(int i = 1; i < argc; i++) memset(argv[i], 0, strlen(argv[i]));
+}
 EnvironmentLoader EnvironmentLoader::from_args(int argc, char** argv){
   std::string exec = argv[0];
   std::string file;

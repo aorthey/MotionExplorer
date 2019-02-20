@@ -26,6 +26,7 @@ class EnvironmentLoader{
     Robot* GetRobotPtr();
     PlannerBackendPtr GetBackendPtr();
     PlannerMultiInput GetPlannerInput();
+    void RenameExec(int argc, char** argv, const std::string &s);
 
     void LoadController(Robot *robot, const PlannerInput &pin);
 

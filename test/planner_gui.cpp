@@ -6,10 +6,7 @@ int main(int argc, char **argv) {
 
   EnvironmentLoader env = EnvironmentLoader::from_args(argc, argv);
 
-  //std::string replacement_str = std::string(80,'#');
-  std::string replacement_str = "quotient";
-  strncpy(argv[0], replacement_str.c_str(), strlen(argv[0]));
-  for(int i = 1; i < argc; i++) memset(argv[i], 0, strlen(argv[i]));
+  env.RenameExec(argc, argv, "quotient-gui");
 
   PlannerMultiInput in = env.GetPlannerInput();
 

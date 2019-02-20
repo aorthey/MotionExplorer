@@ -5,6 +5,8 @@ import sys
 import numpy as np
 import mmap
 
+## Test several environments using the planner which is first defined in
+## planner.xml
 
 dir_name = "/home/aorthey/git/orthoklampt/build/"
 
@@ -22,6 +24,9 @@ def Execute(name, N):
     print re_match
     sys.exit(0)
 
+  # print fname,max_time
+  # return
+
   for i in range(0,N):
     try:
       out = subprocess.check_output("./planner_standalone "+fname,cwd=dir_name, shell=True, stderr=open(os.devnull, 'wb'))
@@ -35,7 +40,7 @@ def Execute(name, N):
       t = float(m.group(2))
       times.append(t)
   times = np.array(times)
-  sN = len(times[times < max_time])
+  sN = len(times[times <= max_time])
   if sN < N:
     sys.stdout.write('*FAILED |')
   else:
@@ -44,16 +49,15 @@ def Execute(name, N):
   print name,":",sN,"/",N," successful. Times: (Average:",np.mean(times), "Worst:",np.max(times), "Max:", max_time,")"
   return [sN>=N,sN,N,np.mean(times)]
 
-
-
 print '#'*80
 print "Test of 2D Rigid Bodies"
 print '#'*80
-Execute("02D_disk.xml", 5)
-Execute("02D_disk_bugtrap.xml", 5)
-Execute("02D_disk_narrow.xml", 5)
-Execute("02D_disk_decomposed.xml", 5)
-Execute("03D_corner.xml", 5)
-Execute("03D_misleading.xml", 5)
-Execute("03D_nonsimple.xml", 5)
+N = 10
+Execute("02D_disk.xml", N)
+Execute("02D_disk_bugtrap.xml", N)
+Execute("02D_disk_narrow.xml", N)
+Execute("02D_disk_decomposed.xml", N)
+Execute("03D_corner.xml", N)
+Execute("03D_misleading.xml", N)
+Execute("03D_nonsimple.xml", N)
 print '#'*80
