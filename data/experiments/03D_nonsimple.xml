@@ -2,9 +2,9 @@
 
 <world>
 
-  <robot name="Lshape" file="../robots/PlanarRectangle.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="disk_inner" file="../robots/PlanarRectangle_cylinder_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="disk_outer" file="../robots/PlanarRectangle_cylinder_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="Lshape" file="../robots/planar/PlanarRectangle.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="disk_inner" file="../robots/planar/PlanarRectangle_cylinder_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="disk_outer" file="../robots/planar/PlanarRectangle_cylinder_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
 <!--
   <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="3 2 0" rotateRPY="0 0 0"/>
@@ -24,7 +24,7 @@
     <maxplanningtime>1</maxplanningtime>
 
     <hierarchy>
-      <level inner_index="1" outer_index="2" cspace_constant="1" type="R2"/>
+      <level inner_index="1" cspace_constant="1" type="R2"/>
       <level inner_index="0" cspace_constant="0.532623641291" type="SE2"/>
     </hierarchy>
 

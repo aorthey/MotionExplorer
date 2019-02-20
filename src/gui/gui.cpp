@@ -463,15 +463,6 @@ bool GLUIForceFieldGUI::Initialize()
       spinner->set_float_val(v->value);
       spinner->set_float_limits(v->min, v->max);
       AddControl(spinner,v->name.c_str());
-      //checkbox->set_int_val(v->active);
-      // GLUI_Translation *GLUI::add_translation_to_panel( 
-      //       GLUI_Panel *panel, const char *name, 
-      //         int trans_type, float *value_ptr,
-      //           int id, GLUI_CB callback 
-      //             )
-      // {
-          //return new GLUI_Translation(panel, name, trans_type, value_ptr, id, callback);
-
     }else{
       std::cout << std::string(80, '#') << std::endl;
       std::cout << "variable type: " << v->type << " unknown." << std::endl;

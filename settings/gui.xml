@@ -243,7 +243,7 @@
   <hotkey>
     <name>planner_draw_start_goal_configuration_sufficient</name>
     <key>M</key>
-    <active>1</active>
+    <active>0</active>
   </hotkey>
   <hotkey>
     <name>planner_draw_start_goal_configuration_necessary</name>
