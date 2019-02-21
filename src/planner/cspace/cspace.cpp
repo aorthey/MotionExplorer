@@ -194,14 +194,19 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
     Vector3 qq;
     Vector3 zero; zero.setZero();
     int lastLink = robot->links.size()-1;
+
     robot->GetWorldPosition(zero, lastLink, qq);
-    //std::cout << qq << "," << robot->name << " links " << robot->links.size() << std::endl;
+    ////Get LastLink Geometry! plus axis of revolution
+    //std::cout << q << "-->" << qq << "," << robot->name << " links " << robot->links.size() << std::endl;
+    //std::cout << robot->LinkName(lastLink) << std::endl;
+    //for(uint k = 0; k < robot->links.size(); k++){
+    //  std::cout << std::string(80, '-') << std::endl;
+    //  std::cout << robot->links[k].T_World << std::endl;
+    //}
 
     x = qq[0];
     y = qq[1];
     z = qq[2];
-
-
 
   }else{
     std::cout << "cspace:getXYZ: cannot deal with space type" << space_first_subspace->getType() << std::endl;

@@ -43,7 +43,7 @@ def attachBranchSegment(parentlinkname, linkname, x, y, z):
   linkname1 = linkname+'_cylinder'
   linkname2 = linkname
   sbl1 = createCylinder(linkname1,-length/2-sRadius,0,0,radius_cylinder,length) 
-  sbj1 = createSphericalJoint(parentlinkname+'_'+linkname+'_joint_revolute', parentlinkname,linkname1, x, y, z, -limit, limit) 
+  sbj1 = createSphericalJoint(parentlinkname,linkname1, x, y, z, -limit, limit) 
   sbl2 = createSphere(linkname2,-length-2*sRadius,0,0,0.95*sRadius)
   sbj2 = createRigidJoint(linkname1, linkname2, 0,0,0)
   return sbl1+sbj1+sbl2+sbj2

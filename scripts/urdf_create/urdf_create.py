@@ -133,7 +133,7 @@ def createSphere(lname,x,y,z,radius,PHYSICAL=True):
   return s
 
 def createRigidJoint(parentname, childname, x=0, y=0, z=0):
-  jname = "joint_"+parentname+"_"+childname
+  jname = "joint_fixed_"+parentname+"_"+childname
   s= ''
   s+='<joint name="'+jname+'" type="fixed">\n'
   s+='  <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
@@ -149,17 +149,18 @@ def commentNewBranch(bname):
   s+='-->\n'
   return s
 
-def createRevoluteJoint(jname, parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
-  return createRevoluteJointXYZ(jname, parentname, childname, 0, 0, 1, x, y, z, lowerLimit, upperLimit)
+def createRevoluteJoint(parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
+  return createRevoluteJointXYZ(parentname, childname, 0, 0, 1, x, y, z, lowerLimit, upperLimit)
 
-def createRevoluteJointZ(jname, parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
-  return createRevoluteJointXYZ(jname, parentname, childname, 0, 0, 1, x, y, z, lowerLimit, upperLimit)
-def createRevoluteJointY(jname, parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
-  return createRevoluteJointXYZ(jname, parentname, childname, 0, 1, 0, x, y, z, lowerLimit, upperLimit)
-def createRevoluteJointX(jname, parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
-  return createRevoluteJointXYZ(jname, parentname, childname, 1, 0, 0, x, y, z, lowerLimit, upperLimit)
+def createRevoluteJointZ(parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
+  return createRevoluteJointXYZ(parentname, childname, 0, 0, 1, x, y, z, lowerLimit, upperLimit)
+def createRevoluteJointY(parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
+  return createRevoluteJointXYZ(parentname, childname, 0, 1, 0, x, y, z, lowerLimit, upperLimit)
+def createRevoluteJointX(parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
+  return createRevoluteJointXYZ(parentname, childname, 1, 0, 0, x, y, z, lowerLimit, upperLimit)
 
-def createRevoluteJointRPY_XYZ(jname, parentname, childname, r, p, yaw, ex, ey, ez, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
+def createRevoluteJointRPY_XYZ(parentname, childname, r, p, yaw, ex, ey, ez, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
+  jname = "joint_revolute_"+parentname+"_"+childname
   s= ''
   s+='<joint name="'+jname+'_Z" type="revolute">\n'
   s+='  <origin rpy="'+str(r)+' '+str(p)+' '+str(yaw)+'" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
@@ -170,7 +171,8 @@ def createRevoluteJointRPY_XYZ(jname, parentname, childname, r, p, yaw, ex, ey, 
   s+='  <limit lower="'+str(lowerLimit)+'" upper="'+str(upperLimit)+'" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'
   return s
-def createRevoluteJointXYZ(jname, parentname, childname, ex, ey, ez, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
+def createRevoluteJointXYZ(parentname, childname, ex, ey, ez, x=0, y=0, z=0, lowerLimit=-1.57, upperLimit=1.57):
+  jname = "joint_revolute_"+parentname+"_"+childname
   s= ''
   s+='<joint name="'+jname+'_Z" type="revolute">\n'
   s+='  <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
@@ -182,7 +184,8 @@ def createRevoluteJointXYZ(jname, parentname, childname, ex, ey, ez, x=0, y=0, z
   s+='</joint>\n\n'
   return s
 
-def createSphericalJoint(jname, parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57,upperLimit=1.57):
+def createSphericalJoint(parentname, childname, x=0, y=0, z=0, lowerLimit=-1.57,upperLimit=1.57):
+  jname = "joint_spherical_"+parentname+"_"+childname
   tmpname = parentname+"_spherical_joint_link"
   s= ''
   s+='<joint name="'+jname+'_Z" type="revolute">\n'

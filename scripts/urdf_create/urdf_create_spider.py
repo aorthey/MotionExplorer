@@ -61,7 +61,7 @@ def createBody(headname):
 
     x = (headradius+jointradius)*cos(angle)
     y = (headradius+jointradius)*sin(angle)
-    body+= createSphericalJoint(leg1+'_spherical', shouldername, leg1,x,y,z,lowerLimit, upperLimit)
+    body+= createSphericalJoint(shouldername, leg1,x,y,z,lowerLimit, upperLimit)
 
     x = (leglength1/2+jointradius)*cos(angle)
     y = (leglength1/2+jointradius)*sin(angle)
@@ -74,7 +74,7 @@ def createBody(headname):
 
     leg2 = 'leg_'+str(k)+'_link1'
 
-    body+= createSphericalJoint(leg2+'_spherical', leg1+'_sphere', leg2, x,y,z,lowerLimit, upperLimit)
+    body+= createSphericalJoint(leg1+'_sphere', leg2, x,y,z,lowerLimit, upperLimit)
 
     body+= createRotatedCylinder(leg2,0,0,z-leglength2/2-jointradius,0,0,angle,legradius,leglength2-0.01) 
 
