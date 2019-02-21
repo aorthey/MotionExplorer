@@ -153,8 +153,8 @@ double PathPiecewiseLinear::GetLength() const{
 
 Vector3 PathPiecewiseLinear::EvalVec3(const double t) const{
   Config q = Eval(t);
-  ob::ScopedState<> s = cspace->ConfigToOMPLState(q);
-  Vector3 v = cspace->getXYZ(s.get());
+  ob::ScopedState<> s = quotient_space->ConfigToOMPLState(q);
+  Vector3 v = quotient_space->getXYZ(s.get());
   return v;
 }
 
@@ -347,8 +347,8 @@ void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
   for(uint i = 0; i < states.size()-1; i++){
     ob::State* c1 = states.at(i);
     ob::State* c2 = states.at(i+1);
-    Vector3 q1 = cspace->getXYZ(c1);
-    Vector3 q2 = cspace->getXYZ(c2);
+    Vector3 q1 = quotient_space->getXYZ(c1);
+    Vector3 q2 = quotient_space->getXYZ(c2);
     GLDraw::drawPoint(q1);
     GLDraw::drawLineSegment(q1, q2);
   }
@@ -388,7 +388,7 @@ void PathPiecewiseLinear::DrawGL(GUIState& state)
       for(uint k = 0; k < Nmilestones; k++){
         q.push_back( Eval(k*tmin) );
       }
-      sv = new SweptVolume(cspace->GetRobotPtr(), q, Nmilestones);
+      sv = new SweptVolume(quotient_space->GetRobotPtr(), q, Nmilestones);
     }
     sv->DrawGL(state);
   }

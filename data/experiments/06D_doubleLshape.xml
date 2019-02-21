@@ -15,6 +15,7 @@
   <robot name="sphere_outer" file="../robots/Lshape/DoubleLshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
   <robot name="point_inner" file="../robots/Lshape/DoubleLshape_point_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
+  <robot name="rocket" file="../robots/rocket.urdf"/>
    <terrain name="doublelshape.tri" file="../terrains/DoubleLshape_large.tri" translation="0 0 0"/>
   <!-- <terrain name="O1" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/> -->
 

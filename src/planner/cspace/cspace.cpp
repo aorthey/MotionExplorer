@@ -188,16 +188,20 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
     //fixed base robot: visualize last link
 
     Config q = OMPLStateToConfig(s);
+    //std::cout << q << std::endl;
     robot->UpdateConfig(q);
     robot->UpdateGeometry();
     Vector3 qq;
     Vector3 zero; zero.setZero();
     int lastLink = robot->links.size()-1;
     robot->GetWorldPosition(zero, lastLink, qq);
+    //std::cout << qq << "," << robot->name << " links " << robot->links.size() << std::endl;
 
     x = qq[0];
     y = qq[1];
     z = qq[2];
+
+
 
   }else{
     std::cout << "cspace:getXYZ: cannot deal with space type" << space_first_subspace->getType() << std::endl;

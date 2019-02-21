@@ -177,8 +177,8 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const
       v.SetPath( std::vector<int>(k+1));
       v.SetMaxLevel(K);
 
-      const ob::State *s_V = v.getState();
-      ob::State *s_Q0 = Qk->getSpaceInformation()->cloneState(s_V);
+      ob::State *s_lift = Qk->getSpaceInformation()->cloneState(v.getState());
+      v.setQuotientState(s_lift);
 
       for(uint m = k+1; m < quotientSpaces.size(); m++){
         og::Quotient *Qm = quotientSpaces.at(m);
@@ -192,14 +192,14 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const
           if(Qm->GetX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO2) {
             static_cast<ob::SO2StateSpace::StateType*>(s_X1)->setIdentity();
           }
-          //Qm->SampleX1(s_X1);
-          Qm->MergeStates(s_Q0, s_X1, s_Q1);
-          quotientSpaces.at(m-1)->getSpaceInformation()->freeState(s_Q0);
+          Qm->MergeStates(s_lift, s_X1, s_Q1);
+          s_lift = Qm->getSpaceInformation()->cloneState(s_Q1);
+
           Qm->GetX1()->freeState(s_X1);
-          s_Q0 = s_Q1;
+          Qm->GetQ1()->freeState(s_Q1);
         }
       }
-      v.setState(s_Q0);
+      v.setState(s_lift);
       ctr++;
     }
     Nvertices = data.numVertices();

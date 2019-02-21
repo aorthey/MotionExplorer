@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import subprocess
 import os
 import re
@@ -23,9 +24,6 @@ def Execute(name, N):
     print "Could not find maxplanningtime in file",fname
     print re_match
     sys.exit(0)
-
-  # print fname,max_time
-  # return
 
   for i in range(0,N):
     try:

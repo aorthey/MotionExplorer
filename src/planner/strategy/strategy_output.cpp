@@ -142,7 +142,7 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
       uint level = v->GetLevel();
 
       roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.at(level));
-      //std::cout << "level " << path << " : " << pdi->numVertices() << " | " << pdi->numEdges() << std::endl;
+      std::cout << "level " << level << "," << path << " : " << pdi->numVertices() << " | " << pdi->numEdges() << std::endl;
       while(!hierarchy->NodeExists(path)){
         std::vector<int> ppath(path.begin(), path.end()-1);
         hierarchy->AddNode( roadmap_k, ppath);

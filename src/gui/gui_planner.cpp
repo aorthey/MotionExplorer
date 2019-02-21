@@ -178,6 +178,7 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     Robot *robot = world->robots[active_robot];
     std::string rname = robot->name;
     std::string fname = "../data/viewport/robot_"+rname+".viewport";
+    std::cout << "Load: " << fname << std::endl;
     BaseT::OnCommand("load_view",fname.c_str());
   }else return BaseT::OnCommand(cmd,args);
 

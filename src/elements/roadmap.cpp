@@ -47,20 +47,21 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
 
     LemonInterface lemon(pd);
     std::vector<Vertex> pred = lemon.GetShortestPath();
-    // std::cout << std::string(80, '*') << std::endl;
-    // std::cout << std::string(80, '*') << std::endl;
-    // std::cout << "LEMON PATH" << std::endl;
-    // std::cout << std::string(80, '*') << std::endl;
-    // std::cout << std::string(80, '*') << std::endl;
-    // std::cout << pred.size() << std::endl;
-    og::PathGeometric *gpath = new og::PathGeometric(cspace->SpaceInformationPtr()); 
+    og::PathGeometric *gpath = new og::PathGeometric(quotient_space->SpaceInformationPtr()); 
     shortest_path.clear();
+
     for(uint i = 0; i < pred.size(); i++)
     {
       Vertex pi = pred.at(i);
-      const ob::State *s = pd->getVertex(pi).getState();
+      PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(pi));
+      const ob::State *s;
+      if(v==nullptr){
+        s = pd->getVertex(pi).getState();
+      }else{
+        s = v->getQuotientState();
+      }
       gpath->append(s);
-      Vector3 q = cspace->getXYZ(s);
+      Vector3 q = quotient_space->getXYZ(s);
       shortest_path.push_back(q);
     }
     if(pred.size()>0){
@@ -83,13 +84,12 @@ void Roadmap::DrawShortestPath(GUIState &state)
     glLineWidth(widthPath);
     setColor(cPath);
 
-    ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
-
     for(uint k = 0; k < q.size()-1; k++){
       Vector3 v1 = q.at(k);
       Vector3 v2 = q.at(k+1);
-      double offset = +0.05;
-      if(quotient_space->GetDimensionality()<=2 || si->getStateSpace()->getType()==ob::STATE_SPACE_SE2){
+      if(quotient_space->GetDimensionality()<=2 || 
+          quotient_space->SpaceInformationPtr()->getStateSpace()->getType()==ob::STATE_SPACE_SE2){
+        double offset = +0.05;
         v1[2]+=offset;v2[2]+=offset;
       }
       drawLineSegment(v1,v2);
@@ -112,6 +112,8 @@ void Roadmap::DrawPlannerData(GUIState &state)
       wiredNeighborhood = false;
     }
   }
+
+  std::cout << *quotient_space << std::endl;
   for(uint vidx = 0; vidx < pd->numVertices(); vidx++)
   {
     glPointSize(sizeVertex);
@@ -123,9 +125,19 @@ void Roadmap::DrawPlannerData(GUIState &state)
     Vector3 q = cspace->getXYZ(vd->getState());
 
     PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+    // std::cout << std::string(80, '-') << std::endl;
+    // cspace->SpaceInformationPtr()->printState(v->getState());
+    // quotient_space->SpaceInformationPtr()->printState(v->getQuotientState());
 
     if(v!=nullptr)
     {
+      q = quotient_space->getXYZ(v->getQuotientState());
+      //quotient_space->SpaceInformationPtr()->printState(v->getQuotientState());
+      // quotient_space->SpaceInformationPtr()->printSettings();
+      // cspace->SpaceInformationPtr()->printState(v->getQuotientState());
+      // quotient_space->SpaceInformationPtr()->printState(v->getQuotientState());
+      //q = quotient_space->getXYZ(v->getState());
+      //std::cout << q << std::endl;
       if(v->GetComponent()==0){
         setColor(cVertex);
       }else if(v->GetComponent()==1){
@@ -204,8 +216,8 @@ void Roadmap::DrawPlannerData(GUIState &state)
       for(uint j = 0; j < edgeList.size(); j++){
         ob::PlannerDataVertex *w = &pd->getVertex(edgeList.at(j));
         PlannerDataVertexAnnotated *wa = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
-        Vector3 v1 = cspace->getXYZ(v->getState());
-        Vector3 v2 = cspace->getXYZ(w->getState());
+        Vector3 v1 = quotient_space->getXYZ(v->getState());
+        Vector3 v2 = quotient_space->getXYZ(w->getState());
         if(va==nullptr || wa==nullptr){
           drawLineSegment(v1,v2);
         }else{
@@ -240,7 +252,7 @@ void Roadmap::DrawPlannerData(GUIState &state)
         std::vector<Vector3> pvec;
         for(uint k = 0; k < K; k++){
           ob::PlannerDataVertex *vk = &pd->getVertex(svertices.at(k));
-          Vector3 p = cspace->getXYZ(vk->getState());
+          Vector3 p = quotient_space->getXYZ(vk->getState());
           pvec.push_back(p);
         }
         switch (pvec.size()) {

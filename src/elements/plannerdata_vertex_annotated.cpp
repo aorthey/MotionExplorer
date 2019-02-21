@@ -21,6 +21,8 @@ PlannerDataVertexAnnotated::PlannerDataVertexAnnotated (const PlannerDataVertexA
   simplicial_complex_local = rhs.GetComplex();
   infeasible = rhs.IsInfeasible();
   feasibility_t = rhs.GetFeasibility();
+
+  state_quotient_space = rhs.getQuotientState();
 }
 
 void PlannerDataVertexAnnotated::SetInfeasible()
@@ -141,6 +143,14 @@ uint PlannerDataVertexAnnotated::GetMaxPathClass() const
 const ob::State *PlannerDataVertexAnnotated::getState() const 
 {
   return state_;
+}
+const ob::State *PlannerDataVertexAnnotated::getQuotientState() const
+{
+  return state_quotient_space;
+}
+void PlannerDataVertexAnnotated::setQuotientState(const ob::State *s)
+{
+  state_quotient_space = s;
 }
 void PlannerDataVertexAnnotated::setState(ob::State *s)
 {

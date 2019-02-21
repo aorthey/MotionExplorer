@@ -1,40 +1,34 @@
 <?xml version="1.0"?>
 <world>
   <robot name="rocket" file="../robots/rocket.urdf"/>
-  <terrain name="startramp" file="../terrains/rocket_ramp.tri" translation="0 0 0" rotateRPY="0 0 1.57">
-     <display color="0.8 0.8 0.8 0.5" texture="checker" texture_projection="z"/> 
-  </terrain>
+  <!-- <terrain name="startramp" file="../terrains/rocket_ramp.tri" translation="0 0 0" rotateRPY="0 0 1.57"> -->
+  <!--    <display color="0.8 0.8 0.8 0.5" texture="checker" texture_projection="z"/> --> 
+  <!-- </terrain> -->
 
-  <forcefield>
-    <!-- <radial source="2 -2 1" power="-5" radius="3" color="1 0 1"/> -->
-    <!-- <radial source="1 1 1" power="-5" radius="3" color="1 0 1"/> -->
-    <!-- <drag viscosity="1.5" color="1 0 1"/> -->
-    <!-- <uniform force="0 0 -0.71" color="1 0 0"/> -->
-  </forcefield>
+  <!-- <terrain name="startramp" file="../terrains/rocket_ramp.tri" translation="0 0 0" rotateRPY="0 0 1.57"/> -->
+  <!-- <plannerinput> -->
 
-  <plannerinput>
+  <!--   <qinit config="11 +1.0 -0.0 +1.0 +0.0 -1.57 0.0 0 0 0 0 0"/> -->
+  <!--   <1!-- <dqinit config="11 0 0 0 0 0 0 0 0 0 0 0"/> --1> -->
+  <!--   <qgoal config="11 +2.0 +0.0 +8.0 +0.0 -1.17 0.0 0 0 0 0 0"/> -->
+  <!--   <1!-- <dqgoal config="11 0 0 +1 0 0 0 0 0 0 0 0"/> --1> -->
 
-    <qinit config="11 +1.0 -0.0 +1.0 +0.0 -1.57 0.0 0 0 0 0 0"/>
-    <dqinit config="11 0 0 0 0 0 0 0 0 0 0 0"/>
-    <qgoal config="11 +2.0 +0.0 +8.0 +0.0 -1.17 0.0 0 0 0 0 0"/>
-    <dqgoal config="11 0 0 +1 0 0 0 0 0 0 0 0"/>
+  <!--   <se3max config="6  +4 +4 +10 +3.141593 +1.57 +3.141593"/> -->
+  <!--   <se3min config="6  -4 -4 +0 -3.141593 -1.57 -3.141593"/> -->
 
-    <se3max config="6  +4 +4 +10 +3.141593 +1.57 +3.141593"/>
-    <se3min config="6  -4 -4 +0 -3.141593 -1.57 -3.141593"/>
+  <!--   <1!-- <control_max config="6  +5 0 0 0 +0.1 +0.1"/> --1> -->
+  <!--   <1!-- <control_min config="6  +0 0 0 0 -0.1 -0.1"/> --1> -->
+  <!--   <1!-- <kinodynamic>1</kinodynamic> --1> -->
 
-    <control_max config="6  +5 0 0 0 +0.1 +0.1"/>
-    <control_min config="6  +0 0 0 0 -0.1 -0.1"/>
+  <!--   <maxplanningtime>0.1</maxplanningtime> -->
+  <!--   <epsilongoalregion>0.1</epsilongoalregion> --> 
 
-    <maxplanningtime>0.1</maxplanningtime>
-    <epsilongoalregion>0.1</epsilongoalregion> 
+  <!--   <smoothPath>0</smoothPath> -->
+  <!--   <freeFloating>1</freeFloating> -->
 
-    <smoothPath>0</smoothPath>
-    <freeFloating>1</freeFloating>
-    <kinodynamic>1</kinodynamic>
+  <!--   <hierarchy> -->
+  <!--     <level inner_index="0" cspace_constant="1" type="SE3"/> -->
+  <!--   </hierarchy> -->
 
-    <hierarchy>
-      <level inner_index="0" cspace_constant="1" type="TSE3"/>
-    </hierarchy>
-
-  </plannerinput>
+  <!-- </plannerinput> -->
 </world>

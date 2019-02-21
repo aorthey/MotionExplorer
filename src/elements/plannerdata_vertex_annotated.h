@@ -49,7 +49,9 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
     std::vector<std::vector<long unsigned int>> GetComplex() const;
 
     void setState(ob::State *s);
+    void setQuotientState(const ob::State *s);
     virtual const ob::State *getState() const override;
+    virtual const ob::State *getQuotientState() const;
 
     virtual bool operator==(const PlannerDataVertex &rhs) const override
     {
@@ -77,7 +79,9 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
     std::vector<std::vector<long unsigned int>> simplicial_complex_local;
 
     uint component{99};
+    const ob::State *state_quotient_space{nullptr};
 
+  //If new elements are added, you need to update the clone/getstate functions!
     enum ComponentType{START_COMPONENT, GOAL_COMPONENT, OUTLIER_COMPONENT, UNKNOWN};
     ComponentType component_t;
     FeasibilityType feasibility_t;
