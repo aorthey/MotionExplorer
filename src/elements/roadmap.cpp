@@ -113,7 +113,6 @@ void Roadmap::DrawPlannerData(GUIState &state)
     }
   }
 
-  std::cout << *quotient_space << std::endl;
   for(uint vidx = 0; vidx < pd->numVertices(); vidx++)
   {
     glPointSize(sizeVertex);

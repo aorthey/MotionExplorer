@@ -195,14 +195,18 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
     Vector3 zero; zero.setZero();
     int lastLink = robot->links.size()-1;
 
+    //NOTE: the world position is zero exactly at the point where link is
+    //attached using a joint to the whole linkage. Check where your last fixed
+    //joint is positioned, before questioning the validity of this method
     robot->GetWorldPosition(zero, lastLink, qq);
+
     ////Get LastLink Geometry! plus axis of revolution
-    //std::cout << q << "-->" << qq << "," << robot->name << " links " << robot->links.size() << std::endl;
-    //std::cout << robot->LinkName(lastLink) << std::endl;
-    //for(uint k = 0; k < robot->links.size(); k++){
-    //  std::cout << std::string(80, '-') << std::endl;
-    //  std::cout << robot->links[k].T_World << std::endl;
-    //}
+    // std::cout << q << "-->" << qq << "," << robot->name << " links " << robot->links.size() << std::endl;
+    // for(uint k = 0; k < robot->links.size(); k++){
+    //   std::cout << std::string(80, '-') << std::endl;
+    //   std::cout << robot->links[k].T_World << std::endl;
+    //   std::cout << robot->LinkName(k) << std::endl;
+    // }
 
     x = qq[0];
     y = qq[1];
