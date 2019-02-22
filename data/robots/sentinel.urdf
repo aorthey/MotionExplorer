@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="sentinel_pipedreamin_complete">
+<robot name="sentinel">
 <link name="eye">
   <inertial>
    <mass value="1"/>
@@ -38,7 +38,7 @@
   </collision>
  </link>
 
-<joint name="joint_eye_head" type="fixed">
+<joint name="joint_fixed_eye_head" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="eye"/>
   <child link="head"/>
@@ -66,7 +66,7 @@ branch_00
   </collision>
  </link>
 
-<joint name="joint_head_branch_00_cylinder" type="fixed">
+<joint name="joint_fixed_head_branch_00_cylinder" type="fixed">
   <origin rpy="0 0 0" xyz="-0.1 0.07 0.0"/>
   <parent link="head"/>
   <child link="branch_00_cylinder"/>
@@ -91,7 +91,7 @@ branch_00
   </visual>
 </link>
 
-<joint name="joint_branch_00_cylinder_branch_00" type="fixed">
+<joint name="joint_fixed_branch_00_cylinder_branch_00" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_00_cylinder"/>
   <child link="branch_00"/>
@@ -116,7 +116,7 @@ branch_00
   </collision>
  </link>
 
-<joint name="branch_00_branch_01_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_00_branch_01_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
   <parent link="branch_00"/>
   <child link="branch_00_spherical_joint_link"/>
@@ -144,7 +144,7 @@ branch_00
   </visual>
 </link>
 
-<joint name="branch_00_branch_01_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_00_branch_01_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_00_spherical_joint_link"/>
   <child link="branch_01_cylinder"/>
@@ -172,7 +172,7 @@ branch_00
   </visual>
 </link>
 
-<joint name="joint_branch_01_cylinder_branch_01" type="fixed">
+<joint name="joint_fixed_branch_01_cylinder_branch_01" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_01_cylinder"/>
   <child link="branch_01"/>
@@ -197,7 +197,7 @@ branch_00
   </collision>
  </link>
 
-<joint name="branch_01_branch_02_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_01_branch_02_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_01"/>
   <child link="branch_01_spherical_joint_link"/>
@@ -225,7 +225,7 @@ branch_00
   </visual>
 </link>
 
-<joint name="branch_01_branch_02_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_01_branch_02_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_01_spherical_joint_link"/>
   <child link="branch_02_cylinder"/>
@@ -253,7 +253,7 @@ branch_00
   </visual>
 </link>
 
-<joint name="joint_branch_02_cylinder_branch_02" type="fixed">
+<joint name="joint_fixed_branch_02_cylinder_branch_02" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_02_cylinder"/>
   <child link="branch_02"/>
@@ -278,7 +278,7 @@ branch_00
   </collision>
  </link>
 
-<joint name="branch_02_branch_03_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_02_branch_03_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_02"/>
   <child link="branch_02_spherical_joint_link"/>
@@ -306,7 +306,7 @@ branch_00
   </visual>
 </link>
 
-<joint name="branch_02_branch_03_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_02_branch_03_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_02_spherical_joint_link"/>
   <child link="branch_03_cylinder"/>
@@ -334,7 +334,7 @@ branch_00
   </visual>
 </link>
 
-<joint name="joint_branch_03_cylinder_branch_03" type="fixed">
+<joint name="joint_fixed_branch_03_cylinder_branch_03" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_03_cylinder"/>
   <child link="branch_03"/>
@@ -359,7 +359,7 @@ branch_00
   </collision>
  </link>
 
-<joint name="branch_03_branch_04_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_03_branch_04_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_03"/>
   <child link="branch_03_spherical_joint_link"/>
@@ -387,7 +387,7 @@ branch_00
   </visual>
 </link>
 
-<joint name="branch_03_branch_04_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_03_branch_04_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_03_spherical_joint_link"/>
   <child link="branch_04_cylinder"/>
@@ -415,7 +415,7 @@ branch_00
   </visual>
 </link>
 
-<joint name="joint_branch_04_cylinder_branch_04" type="fixed">
+<joint name="joint_fixed_branch_04_cylinder_branch_04" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_04_cylinder"/>
   <child link="branch_04"/>
@@ -440,7 +440,7 @@ branch_00
   </collision>
  </link>
 
-<joint name="branch_04_branch_05_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_04_branch_05_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_04"/>
   <child link="branch_04_spherical_joint_link"/>
@@ -468,7 +468,7 @@ branch_00
   </visual>
 </link>
 
-<joint name="branch_04_branch_05_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_04_branch_05_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_04_spherical_joint_link"/>
   <child link="branch_05_cylinder"/>
@@ -496,7 +496,7 @@ branch_00
   </visual>
 </link>
 
-<joint name="joint_branch_05_cylinder_branch_05" type="fixed">
+<joint name="joint_fixed_branch_05_cylinder_branch_05" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_05_cylinder"/>
   <child link="branch_05"/>
@@ -524,7 +524,7 @@ branch_10
   </collision>
  </link>
 
-<joint name="joint_head_branch_10_cylinder" type="fixed">
+<joint name="joint_fixed_head_branch_10_cylinder" type="fixed">
   <origin rpy="0 0 0" xyz="-0.1 0.0494974746831 0.0494974746831"/>
   <parent link="head"/>
   <child link="branch_10_cylinder"/>
@@ -549,7 +549,7 @@ branch_10
   </visual>
 </link>
 
-<joint name="joint_branch_10_cylinder_branch_10" type="fixed">
+<joint name="joint_fixed_branch_10_cylinder_branch_10" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_10_cylinder"/>
   <child link="branch_10"/>
@@ -574,7 +574,7 @@ branch_10
   </collision>
  </link>
 
-<joint name="branch_10_branch_11_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_10_branch_11_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
   <parent link="branch_10"/>
   <child link="branch_10_spherical_joint_link"/>
@@ -602,7 +602,7 @@ branch_10
   </visual>
 </link>
 
-<joint name="branch_10_branch_11_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_10_branch_11_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_10_spherical_joint_link"/>
   <child link="branch_11_cylinder"/>
@@ -630,7 +630,7 @@ branch_10
   </visual>
 </link>
 
-<joint name="joint_branch_11_cylinder_branch_11" type="fixed">
+<joint name="joint_fixed_branch_11_cylinder_branch_11" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_11_cylinder"/>
   <child link="branch_11"/>
@@ -655,7 +655,7 @@ branch_10
   </collision>
  </link>
 
-<joint name="branch_11_branch_12_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_11_branch_12_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_11"/>
   <child link="branch_11_spherical_joint_link"/>
@@ -683,7 +683,7 @@ branch_10
   </visual>
 </link>
 
-<joint name="branch_11_branch_12_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_11_branch_12_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_11_spherical_joint_link"/>
   <child link="branch_12_cylinder"/>
@@ -711,7 +711,7 @@ branch_10
   </visual>
 </link>
 
-<joint name="joint_branch_12_cylinder_branch_12" type="fixed">
+<joint name="joint_fixed_branch_12_cylinder_branch_12" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_12_cylinder"/>
   <child link="branch_12"/>
@@ -736,7 +736,7 @@ branch_10
   </collision>
  </link>
 
-<joint name="branch_12_branch_13_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_12_branch_13_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_12"/>
   <child link="branch_12_spherical_joint_link"/>
@@ -764,7 +764,7 @@ branch_10
   </visual>
 </link>
 
-<joint name="branch_12_branch_13_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_12_branch_13_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_12_spherical_joint_link"/>
   <child link="branch_13_cylinder"/>
@@ -792,7 +792,7 @@ branch_10
   </visual>
 </link>
 
-<joint name="joint_branch_13_cylinder_branch_13" type="fixed">
+<joint name="joint_fixed_branch_13_cylinder_branch_13" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_13_cylinder"/>
   <child link="branch_13"/>
@@ -817,7 +817,7 @@ branch_10
   </collision>
  </link>
 
-<joint name="branch_13_branch_14_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_13_branch_14_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_13"/>
   <child link="branch_13_spherical_joint_link"/>
@@ -845,7 +845,7 @@ branch_10
   </visual>
 </link>
 
-<joint name="branch_13_branch_14_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_13_branch_14_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_13_spherical_joint_link"/>
   <child link="branch_14_cylinder"/>
@@ -873,7 +873,7 @@ branch_10
   </visual>
 </link>
 
-<joint name="joint_branch_14_cylinder_branch_14" type="fixed">
+<joint name="joint_fixed_branch_14_cylinder_branch_14" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_14_cylinder"/>
   <child link="branch_14"/>
@@ -898,7 +898,7 @@ branch_10
   </collision>
  </link>
 
-<joint name="branch_14_branch_15_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_14_branch_15_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_14"/>
   <child link="branch_14_spherical_joint_link"/>
@@ -926,7 +926,7 @@ branch_10
   </visual>
 </link>
 
-<joint name="branch_14_branch_15_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_14_branch_15_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_14_spherical_joint_link"/>
   <child link="branch_15_cylinder"/>
@@ -954,7 +954,7 @@ branch_10
   </visual>
 </link>
 
-<joint name="joint_branch_15_cylinder_branch_15" type="fixed">
+<joint name="joint_fixed_branch_15_cylinder_branch_15" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_15_cylinder"/>
   <child link="branch_15"/>
@@ -982,7 +982,7 @@ branch_20
   </collision>
  </link>
 
-<joint name="joint_head_branch_20_cylinder" type="fixed">
+<joint name="joint_fixed_head_branch_20_cylinder" type="fixed">
   <origin rpy="0 0 0" xyz="-0.1 4.28626379702e-18 0.07"/>
   <parent link="head"/>
   <child link="branch_20_cylinder"/>
@@ -1007,7 +1007,7 @@ branch_20
   </visual>
 </link>
 
-<joint name="joint_branch_20_cylinder_branch_20" type="fixed">
+<joint name="joint_fixed_branch_20_cylinder_branch_20" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_20_cylinder"/>
   <child link="branch_20"/>
@@ -1032,7 +1032,7 @@ branch_20
   </collision>
  </link>
 
-<joint name="branch_20_branch_21_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_20_branch_21_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
   <parent link="branch_20"/>
   <child link="branch_20_spherical_joint_link"/>
@@ -1060,7 +1060,7 @@ branch_20
   </visual>
 </link>
 
-<joint name="branch_20_branch_21_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_20_branch_21_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_20_spherical_joint_link"/>
   <child link="branch_21_cylinder"/>
@@ -1088,7 +1088,7 @@ branch_20
   </visual>
 </link>
 
-<joint name="joint_branch_21_cylinder_branch_21" type="fixed">
+<joint name="joint_fixed_branch_21_cylinder_branch_21" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_21_cylinder"/>
   <child link="branch_21"/>
@@ -1113,7 +1113,7 @@ branch_20
   </collision>
  </link>
 
-<joint name="branch_21_branch_22_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_21_branch_22_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_21"/>
   <child link="branch_21_spherical_joint_link"/>
@@ -1141,7 +1141,7 @@ branch_20
   </visual>
 </link>
 
-<joint name="branch_21_branch_22_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_21_branch_22_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_21_spherical_joint_link"/>
   <child link="branch_22_cylinder"/>
@@ -1169,7 +1169,7 @@ branch_20
   </visual>
 </link>
 
-<joint name="joint_branch_22_cylinder_branch_22" type="fixed">
+<joint name="joint_fixed_branch_22_cylinder_branch_22" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_22_cylinder"/>
   <child link="branch_22"/>
@@ -1194,7 +1194,7 @@ branch_20
   </collision>
  </link>
 
-<joint name="branch_22_branch_23_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_22_branch_23_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_22"/>
   <child link="branch_22_spherical_joint_link"/>
@@ -1222,7 +1222,7 @@ branch_20
   </visual>
 </link>
 
-<joint name="branch_22_branch_23_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_22_branch_23_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_22_spherical_joint_link"/>
   <child link="branch_23_cylinder"/>
@@ -1250,7 +1250,7 @@ branch_20
   </visual>
 </link>
 
-<joint name="joint_branch_23_cylinder_branch_23" type="fixed">
+<joint name="joint_fixed_branch_23_cylinder_branch_23" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_23_cylinder"/>
   <child link="branch_23"/>
@@ -1275,7 +1275,7 @@ branch_20
   </collision>
  </link>
 
-<joint name="branch_23_branch_24_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_23_branch_24_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_23"/>
   <child link="branch_23_spherical_joint_link"/>
@@ -1303,7 +1303,7 @@ branch_20
   </visual>
 </link>
 
-<joint name="branch_23_branch_24_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_23_branch_24_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_23_spherical_joint_link"/>
   <child link="branch_24_cylinder"/>
@@ -1331,7 +1331,7 @@ branch_20
   </visual>
 </link>
 
-<joint name="joint_branch_24_cylinder_branch_24" type="fixed">
+<joint name="joint_fixed_branch_24_cylinder_branch_24" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_24_cylinder"/>
   <child link="branch_24"/>
@@ -1356,7 +1356,7 @@ branch_20
   </collision>
  </link>
 
-<joint name="branch_24_branch_25_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_24_branch_25_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_24"/>
   <child link="branch_24_spherical_joint_link"/>
@@ -1384,7 +1384,7 @@ branch_20
   </visual>
 </link>
 
-<joint name="branch_24_branch_25_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_24_branch_25_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_24_spherical_joint_link"/>
   <child link="branch_25_cylinder"/>
@@ -1412,7 +1412,7 @@ branch_20
   </visual>
 </link>
 
-<joint name="joint_branch_25_cylinder_branch_25" type="fixed">
+<joint name="joint_fixed_branch_25_cylinder_branch_25" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_25_cylinder"/>
   <child link="branch_25"/>
@@ -1440,7 +1440,7 @@ branch_30
   </collision>
  </link>
 
-<joint name="joint_head_branch_30_cylinder" type="fixed">
+<joint name="joint_fixed_head_branch_30_cylinder" type="fixed">
   <origin rpy="0 0 0" xyz="-0.1 -0.0494974746831 0.0494974746831"/>
   <parent link="head"/>
   <child link="branch_30_cylinder"/>
@@ -1465,7 +1465,7 @@ branch_30
   </visual>
 </link>
 
-<joint name="joint_branch_30_cylinder_branch_30" type="fixed">
+<joint name="joint_fixed_branch_30_cylinder_branch_30" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_30_cylinder"/>
   <child link="branch_30"/>
@@ -1490,7 +1490,7 @@ branch_30
   </collision>
  </link>
 
-<joint name="branch_30_branch_31_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_30_branch_31_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
   <parent link="branch_30"/>
   <child link="branch_30_spherical_joint_link"/>
@@ -1518,7 +1518,7 @@ branch_30
   </visual>
 </link>
 
-<joint name="branch_30_branch_31_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_30_branch_31_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_30_spherical_joint_link"/>
   <child link="branch_31_cylinder"/>
@@ -1546,7 +1546,7 @@ branch_30
   </visual>
 </link>
 
-<joint name="joint_branch_31_cylinder_branch_31" type="fixed">
+<joint name="joint_fixed_branch_31_cylinder_branch_31" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_31_cylinder"/>
   <child link="branch_31"/>
@@ -1571,7 +1571,7 @@ branch_30
   </collision>
  </link>
 
-<joint name="branch_31_branch_32_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_31_branch_32_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_31"/>
   <child link="branch_31_spherical_joint_link"/>
@@ -1599,7 +1599,7 @@ branch_30
   </visual>
 </link>
 
-<joint name="branch_31_branch_32_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_31_branch_32_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_31_spherical_joint_link"/>
   <child link="branch_32_cylinder"/>
@@ -1627,7 +1627,7 @@ branch_30
   </visual>
 </link>
 
-<joint name="joint_branch_32_cylinder_branch_32" type="fixed">
+<joint name="joint_fixed_branch_32_cylinder_branch_32" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_32_cylinder"/>
   <child link="branch_32"/>
@@ -1652,7 +1652,7 @@ branch_30
   </collision>
  </link>
 
-<joint name="branch_32_branch_33_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_32_branch_33_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_32"/>
   <child link="branch_32_spherical_joint_link"/>
@@ -1680,7 +1680,7 @@ branch_30
   </visual>
 </link>
 
-<joint name="branch_32_branch_33_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_32_branch_33_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_32_spherical_joint_link"/>
   <child link="branch_33_cylinder"/>
@@ -1708,7 +1708,7 @@ branch_30
   </visual>
 </link>
 
-<joint name="joint_branch_33_cylinder_branch_33" type="fixed">
+<joint name="joint_fixed_branch_33_cylinder_branch_33" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_33_cylinder"/>
   <child link="branch_33"/>
@@ -1733,7 +1733,7 @@ branch_30
   </collision>
  </link>
 
-<joint name="branch_33_branch_34_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_33_branch_34_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_33"/>
   <child link="branch_33_spherical_joint_link"/>
@@ -1761,7 +1761,7 @@ branch_30
   </visual>
 </link>
 
-<joint name="branch_33_branch_34_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_33_branch_34_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_33_spherical_joint_link"/>
   <child link="branch_34_cylinder"/>
@@ -1789,7 +1789,7 @@ branch_30
   </visual>
 </link>
 
-<joint name="joint_branch_34_cylinder_branch_34" type="fixed">
+<joint name="joint_fixed_branch_34_cylinder_branch_34" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_34_cylinder"/>
   <child link="branch_34"/>
@@ -1814,7 +1814,7 @@ branch_30
   </collision>
  </link>
 
-<joint name="branch_34_branch_35_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_34_branch_35_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_34"/>
   <child link="branch_34_spherical_joint_link"/>
@@ -1842,7 +1842,7 @@ branch_30
   </visual>
 </link>
 
-<joint name="branch_34_branch_35_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_34_branch_35_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_34_spherical_joint_link"/>
   <child link="branch_35_cylinder"/>
@@ -1870,7 +1870,7 @@ branch_30
   </visual>
 </link>
 
-<joint name="joint_branch_35_cylinder_branch_35" type="fixed">
+<joint name="joint_fixed_branch_35_cylinder_branch_35" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_35_cylinder"/>
   <child link="branch_35"/>
@@ -1898,7 +1898,7 @@ branch_40
   </collision>
  </link>
 
-<joint name="joint_head_branch_40_cylinder" type="fixed">
+<joint name="joint_fixed_head_branch_40_cylinder" type="fixed">
   <origin rpy="0 0 0" xyz="-0.1 -0.07 8.57252759403e-18"/>
   <parent link="head"/>
   <child link="branch_40_cylinder"/>
@@ -1923,7 +1923,7 @@ branch_40
   </visual>
 </link>
 
-<joint name="joint_branch_40_cylinder_branch_40" type="fixed">
+<joint name="joint_fixed_branch_40_cylinder_branch_40" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_40_cylinder"/>
   <child link="branch_40"/>
@@ -1948,7 +1948,7 @@ branch_40
   </collision>
  </link>
 
-<joint name="branch_40_branch_41_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_40_branch_41_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
   <parent link="branch_40"/>
   <child link="branch_40_spherical_joint_link"/>
@@ -1976,7 +1976,7 @@ branch_40
   </visual>
 </link>
 
-<joint name="branch_40_branch_41_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_40_branch_41_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_40_spherical_joint_link"/>
   <child link="branch_41_cylinder"/>
@@ -2004,7 +2004,7 @@ branch_40
   </visual>
 </link>
 
-<joint name="joint_branch_41_cylinder_branch_41" type="fixed">
+<joint name="joint_fixed_branch_41_cylinder_branch_41" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_41_cylinder"/>
   <child link="branch_41"/>
@@ -2029,7 +2029,7 @@ branch_40
   </collision>
  </link>
 
-<joint name="branch_41_branch_42_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_41_branch_42_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_41"/>
   <child link="branch_41_spherical_joint_link"/>
@@ -2057,7 +2057,7 @@ branch_40
   </visual>
 </link>
 
-<joint name="branch_41_branch_42_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_41_branch_42_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_41_spherical_joint_link"/>
   <child link="branch_42_cylinder"/>
@@ -2085,7 +2085,7 @@ branch_40
   </visual>
 </link>
 
-<joint name="joint_branch_42_cylinder_branch_42" type="fixed">
+<joint name="joint_fixed_branch_42_cylinder_branch_42" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_42_cylinder"/>
   <child link="branch_42"/>
@@ -2110,7 +2110,7 @@ branch_40
   </collision>
  </link>
 
-<joint name="branch_42_branch_43_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_42_branch_43_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_42"/>
   <child link="branch_42_spherical_joint_link"/>
@@ -2138,7 +2138,7 @@ branch_40
   </visual>
 </link>
 
-<joint name="branch_42_branch_43_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_42_branch_43_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_42_spherical_joint_link"/>
   <child link="branch_43_cylinder"/>
@@ -2166,7 +2166,7 @@ branch_40
   </visual>
 </link>
 
-<joint name="joint_branch_43_cylinder_branch_43" type="fixed">
+<joint name="joint_fixed_branch_43_cylinder_branch_43" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_43_cylinder"/>
   <child link="branch_43"/>
@@ -2191,7 +2191,7 @@ branch_40
   </collision>
  </link>
 
-<joint name="branch_43_branch_44_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_43_branch_44_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_43"/>
   <child link="branch_43_spherical_joint_link"/>
@@ -2219,7 +2219,7 @@ branch_40
   </visual>
 </link>
 
-<joint name="branch_43_branch_44_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_43_branch_44_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_43_spherical_joint_link"/>
   <child link="branch_44_cylinder"/>
@@ -2247,7 +2247,7 @@ branch_40
   </visual>
 </link>
 
-<joint name="joint_branch_44_cylinder_branch_44" type="fixed">
+<joint name="joint_fixed_branch_44_cylinder_branch_44" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_44_cylinder"/>
   <child link="branch_44"/>
@@ -2272,7 +2272,7 @@ branch_40
   </collision>
  </link>
 
-<joint name="branch_44_branch_45_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_44_branch_45_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_44"/>
   <child link="branch_44_spherical_joint_link"/>
@@ -2300,7 +2300,7 @@ branch_40
   </visual>
 </link>
 
-<joint name="branch_44_branch_45_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_44_branch_45_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_44_spherical_joint_link"/>
   <child link="branch_45_cylinder"/>
@@ -2328,7 +2328,7 @@ branch_40
   </visual>
 </link>
 
-<joint name="joint_branch_45_cylinder_branch_45" type="fixed">
+<joint name="joint_fixed_branch_45_cylinder_branch_45" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_45_cylinder"/>
   <child link="branch_45"/>
@@ -2356,7 +2356,7 @@ branch_50
   </collision>
  </link>
 
-<joint name="joint_head_branch_50_cylinder" type="fixed">
+<joint name="joint_fixed_head_branch_50_cylinder" type="fixed">
   <origin rpy="0 0 0" xyz="-0.1 -0.0494974746831 -0.0494974746831"/>
   <parent link="head"/>
   <child link="branch_50_cylinder"/>
@@ -2381,7 +2381,7 @@ branch_50
   </visual>
 </link>
 
-<joint name="joint_branch_50_cylinder_branch_50" type="fixed">
+<joint name="joint_fixed_branch_50_cylinder_branch_50" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_50_cylinder"/>
   <child link="branch_50"/>
@@ -2406,7 +2406,7 @@ branch_50
   </collision>
  </link>
 
-<joint name="branch_50_branch_51_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_50_branch_51_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
   <parent link="branch_50"/>
   <child link="branch_50_spherical_joint_link"/>
@@ -2434,7 +2434,7 @@ branch_50
   </visual>
 </link>
 
-<joint name="branch_50_branch_51_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_50_branch_51_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_50_spherical_joint_link"/>
   <child link="branch_51_cylinder"/>
@@ -2462,7 +2462,7 @@ branch_50
   </visual>
 </link>
 
-<joint name="joint_branch_51_cylinder_branch_51" type="fixed">
+<joint name="joint_fixed_branch_51_cylinder_branch_51" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_51_cylinder"/>
   <child link="branch_51"/>
@@ -2487,7 +2487,7 @@ branch_50
   </collision>
  </link>
 
-<joint name="branch_51_branch_52_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_51_branch_52_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_51"/>
   <child link="branch_51_spherical_joint_link"/>
@@ -2515,7 +2515,7 @@ branch_50
   </visual>
 </link>
 
-<joint name="branch_51_branch_52_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_51_branch_52_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_51_spherical_joint_link"/>
   <child link="branch_52_cylinder"/>
@@ -2543,7 +2543,7 @@ branch_50
   </visual>
 </link>
 
-<joint name="joint_branch_52_cylinder_branch_52" type="fixed">
+<joint name="joint_fixed_branch_52_cylinder_branch_52" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_52_cylinder"/>
   <child link="branch_52"/>
@@ -2568,7 +2568,7 @@ branch_50
   </collision>
  </link>
 
-<joint name="branch_52_branch_53_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_52_branch_53_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_52"/>
   <child link="branch_52_spherical_joint_link"/>
@@ -2596,7 +2596,7 @@ branch_50
   </visual>
 </link>
 
-<joint name="branch_52_branch_53_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_52_branch_53_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_52_spherical_joint_link"/>
   <child link="branch_53_cylinder"/>
@@ -2624,7 +2624,7 @@ branch_50
   </visual>
 </link>
 
-<joint name="joint_branch_53_cylinder_branch_53" type="fixed">
+<joint name="joint_fixed_branch_53_cylinder_branch_53" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_53_cylinder"/>
   <child link="branch_53"/>
@@ -2649,7 +2649,7 @@ branch_50
   </collision>
  </link>
 
-<joint name="branch_53_branch_54_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_53_branch_54_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_53"/>
   <child link="branch_53_spherical_joint_link"/>
@@ -2677,7 +2677,7 @@ branch_50
   </visual>
 </link>
 
-<joint name="branch_53_branch_54_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_53_branch_54_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_53_spherical_joint_link"/>
   <child link="branch_54_cylinder"/>
@@ -2705,7 +2705,7 @@ branch_50
   </visual>
 </link>
 
-<joint name="joint_branch_54_cylinder_branch_54" type="fixed">
+<joint name="joint_fixed_branch_54_cylinder_branch_54" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_54_cylinder"/>
   <child link="branch_54"/>
@@ -2730,7 +2730,7 @@ branch_50
   </collision>
  </link>
 
-<joint name="branch_54_branch_55_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_54_branch_55_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_54"/>
   <child link="branch_54_spherical_joint_link"/>
@@ -2758,7 +2758,7 @@ branch_50
   </visual>
 </link>
 
-<joint name="branch_54_branch_55_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_54_branch_55_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_54_spherical_joint_link"/>
   <child link="branch_55_cylinder"/>
@@ -2786,7 +2786,7 @@ branch_50
   </visual>
 </link>
 
-<joint name="joint_branch_55_cylinder_branch_55" type="fixed">
+<joint name="joint_fixed_branch_55_cylinder_branch_55" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_55_cylinder"/>
   <child link="branch_55"/>
@@ -2814,7 +2814,7 @@ branch_60
   </collision>
  </link>
 
-<joint name="joint_head_branch_60_cylinder" type="fixed">
+<joint name="joint_fixed_head_branch_60_cylinder" type="fixed">
   <origin rpy="0 0 0" xyz="-0.1 -1.2858791391e-17 -0.07"/>
   <parent link="head"/>
   <child link="branch_60_cylinder"/>
@@ -2839,7 +2839,7 @@ branch_60
   </visual>
 </link>
 
-<joint name="joint_branch_60_cylinder_branch_60" type="fixed">
+<joint name="joint_fixed_branch_60_cylinder_branch_60" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_60_cylinder"/>
   <child link="branch_60"/>
@@ -2864,7 +2864,7 @@ branch_60
   </collision>
  </link>
 
-<joint name="branch_60_branch_61_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_60_branch_61_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
   <parent link="branch_60"/>
   <child link="branch_60_spherical_joint_link"/>
@@ -2892,7 +2892,7 @@ branch_60
   </visual>
 </link>
 
-<joint name="branch_60_branch_61_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_60_branch_61_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_60_spherical_joint_link"/>
   <child link="branch_61_cylinder"/>
@@ -2920,7 +2920,7 @@ branch_60
   </visual>
 </link>
 
-<joint name="joint_branch_61_cylinder_branch_61" type="fixed">
+<joint name="joint_fixed_branch_61_cylinder_branch_61" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_61_cylinder"/>
   <child link="branch_61"/>
@@ -2945,7 +2945,7 @@ branch_60
   </collision>
  </link>
 
-<joint name="branch_61_branch_62_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_61_branch_62_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_61"/>
   <child link="branch_61_spherical_joint_link"/>
@@ -2973,7 +2973,7 @@ branch_60
   </visual>
 </link>
 
-<joint name="branch_61_branch_62_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_61_branch_62_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_61_spherical_joint_link"/>
   <child link="branch_62_cylinder"/>
@@ -3001,7 +3001,7 @@ branch_60
   </visual>
 </link>
 
-<joint name="joint_branch_62_cylinder_branch_62" type="fixed">
+<joint name="joint_fixed_branch_62_cylinder_branch_62" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_62_cylinder"/>
   <child link="branch_62"/>
@@ -3026,7 +3026,7 @@ branch_60
   </collision>
  </link>
 
-<joint name="branch_62_branch_63_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_62_branch_63_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_62"/>
   <child link="branch_62_spherical_joint_link"/>
@@ -3054,7 +3054,7 @@ branch_60
   </visual>
 </link>
 
-<joint name="branch_62_branch_63_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_62_branch_63_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_62_spherical_joint_link"/>
   <child link="branch_63_cylinder"/>
@@ -3082,7 +3082,7 @@ branch_60
   </visual>
 </link>
 
-<joint name="joint_branch_63_cylinder_branch_63" type="fixed">
+<joint name="joint_fixed_branch_63_cylinder_branch_63" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_63_cylinder"/>
   <child link="branch_63"/>
@@ -3107,7 +3107,7 @@ branch_60
   </collision>
  </link>
 
-<joint name="branch_63_branch_64_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_63_branch_64_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_63"/>
   <child link="branch_63_spherical_joint_link"/>
@@ -3135,7 +3135,7 @@ branch_60
   </visual>
 </link>
 
-<joint name="branch_63_branch_64_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_63_branch_64_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_63_spherical_joint_link"/>
   <child link="branch_64_cylinder"/>
@@ -3163,7 +3163,7 @@ branch_60
   </visual>
 </link>
 
-<joint name="joint_branch_64_cylinder_branch_64" type="fixed">
+<joint name="joint_fixed_branch_64_cylinder_branch_64" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_64_cylinder"/>
   <child link="branch_64"/>
@@ -3188,7 +3188,7 @@ branch_60
   </collision>
  </link>
 
-<joint name="branch_64_branch_65_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_64_branch_65_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_64"/>
   <child link="branch_64_spherical_joint_link"/>
@@ -3216,7 +3216,7 @@ branch_60
   </visual>
 </link>
 
-<joint name="branch_64_branch_65_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_64_branch_65_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_64_spherical_joint_link"/>
   <child link="branch_65_cylinder"/>
@@ -3244,7 +3244,7 @@ branch_60
   </visual>
 </link>
 
-<joint name="joint_branch_65_cylinder_branch_65" type="fixed">
+<joint name="joint_fixed_branch_65_cylinder_branch_65" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_65_cylinder"/>
   <child link="branch_65"/>
@@ -3272,7 +3272,7 @@ branch_70
   </collision>
  </link>
 
-<joint name="joint_head_branch_70_cylinder" type="fixed">
+<joint name="joint_fixed_head_branch_70_cylinder" type="fixed">
   <origin rpy="0 0 0" xyz="-0.1 0.0494974746831 -0.0494974746831"/>
   <parent link="head"/>
   <child link="branch_70_cylinder"/>
@@ -3297,7 +3297,7 @@ branch_70
   </visual>
 </link>
 
-<joint name="joint_branch_70_cylinder_branch_70" type="fixed">
+<joint name="joint_fixed_branch_70_cylinder_branch_70" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_70_cylinder"/>
   <child link="branch_70"/>
@@ -3322,7 +3322,7 @@ branch_70
   </collision>
  </link>
 
-<joint name="branch_70_branch_71_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_70_branch_71_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.03875 0 0"/>
   <parent link="branch_70"/>
   <child link="branch_70_spherical_joint_link"/>
@@ -3350,7 +3350,7 @@ branch_70
   </visual>
 </link>
 
-<joint name="branch_70_branch_71_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_70_branch_71_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_70_spherical_joint_link"/>
   <child link="branch_71_cylinder"/>
@@ -3378,7 +3378,7 @@ branch_70
   </visual>
 </link>
 
-<joint name="joint_branch_71_cylinder_branch_71" type="fixed">
+<joint name="joint_fixed_branch_71_cylinder_branch_71" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_71_cylinder"/>
   <child link="branch_71"/>
@@ -3403,7 +3403,7 @@ branch_70
   </collision>
  </link>
 
-<joint name="branch_71_branch_72_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_71_branch_72_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_71"/>
   <child link="branch_71_spherical_joint_link"/>
@@ -3431,7 +3431,7 @@ branch_70
   </visual>
 </link>
 
-<joint name="branch_71_branch_72_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_71_branch_72_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_71_spherical_joint_link"/>
   <child link="branch_72_cylinder"/>
@@ -3459,7 +3459,7 @@ branch_70
   </visual>
 </link>
 
-<joint name="joint_branch_72_cylinder_branch_72" type="fixed">
+<joint name="joint_fixed_branch_72_cylinder_branch_72" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_72_cylinder"/>
   <child link="branch_72"/>
@@ -3484,7 +3484,7 @@ branch_70
   </collision>
  </link>
 
-<joint name="branch_72_branch_73_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_72_branch_73_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_72"/>
   <child link="branch_72_spherical_joint_link"/>
@@ -3512,7 +3512,7 @@ branch_70
   </visual>
 </link>
 
-<joint name="branch_72_branch_73_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_72_branch_73_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_72_spherical_joint_link"/>
   <child link="branch_73_cylinder"/>
@@ -3540,7 +3540,7 @@ branch_70
   </visual>
 </link>
 
-<joint name="joint_branch_73_cylinder_branch_73" type="fixed">
+<joint name="joint_fixed_branch_73_cylinder_branch_73" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_73_cylinder"/>
   <child link="branch_73"/>
@@ -3565,7 +3565,7 @@ branch_70
   </collision>
  </link>
 
-<joint name="branch_73_branch_74_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_73_branch_74_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_73"/>
   <child link="branch_73_spherical_joint_link"/>
@@ -3593,7 +3593,7 @@ branch_70
   </visual>
 </link>
 
-<joint name="branch_73_branch_74_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_73_branch_74_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_73_spherical_joint_link"/>
   <child link="branch_74_cylinder"/>
@@ -3621,7 +3621,7 @@ branch_70
   </visual>
 </link>
 
-<joint name="joint_branch_74_cylinder_branch_74" type="fixed">
+<joint name="joint_fixed_branch_74_cylinder_branch_74" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_74_cylinder"/>
   <child link="branch_74"/>
@@ -3646,7 +3646,7 @@ branch_70
   </collision>
  </link>
 
-<joint name="branch_74_branch_75_joint_revolute_Z" type="revolute">
+<joint name="joint_spherical_branch_74_branch_75_cylinder_Z" type="revolute">
   <origin rpy="0 0 0" xyz="-0.19 0 0"/>
   <parent link="branch_74"/>
   <child link="branch_74_spherical_joint_link"/>
@@ -3674,7 +3674,7 @@ branch_70
   </visual>
 </link>
 
-<joint name="branch_74_branch_75_joint_revolute_Y" type="revolute">
+<joint name="joint_spherical_branch_74_branch_75_cylinder_Y" type="revolute">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_74_spherical_joint_link"/>
   <child link="branch_75_cylinder"/>
@@ -3702,7 +3702,7 @@ branch_70
   </visual>
 </link>
 
-<joint name="joint_branch_75_cylinder_branch_75" type="fixed">
+<joint name="joint_fixed_branch_75_cylinder_branch_75" type="fixed">
   <origin rpy="0 0 0" xyz="0 0 0"/>
   <parent link="branch_75_cylinder"/>
   <child link="branch_75"/>

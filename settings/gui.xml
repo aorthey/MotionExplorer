@@ -299,7 +299,6 @@
   <property name="planner_draw_start_configuration" enabled="1"/>
   <!-- <property name="planner_draw_goal_configuration" enabled="1"/> -->
   <property name="draw_path" enabled="1"/>
-  <property name="draw_axes" enabled="0"/>
 
   <property name="draw_path_unsmoothed" enabled="1"/>
   <property name="draw_robot_zero_position" enabled="1"/>

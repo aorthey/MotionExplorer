@@ -128,6 +128,15 @@ void Info::operator()(Robot *robot){
                                       << vL << "<=  dq <=" << vU << " | "
                                       << aL << "<= ddq <=" << aU << std::endl;
   }
+  std::cout << "Current Config Invalidations" << std::endl;
+  for(int i = 0; i < robot->qMin.size(); i++){
+    double qL = robot->qMin[i];
+    double qU = robot->qMax[i];
+    double q = robot->q[i];
+    if(q < qL || q > qU){
+    std::cout << "ERROR: #q= [" << i << "] " << qL << "<= " << q << " <=" << qU << std::endl;
+    }
+  }
 
 }
 

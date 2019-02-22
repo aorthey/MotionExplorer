@@ -9,29 +9,13 @@ radius = 0.01
 radius_cylinder = 0.02
 sphere_scale = 2
 headradius = 0.1
-Nsegments = 6
-Nbranches = 8
+# Nsegments = 6
+# Nbranches = 8
 aperture = 0.4 ## aperture of bouquet of branches
 limit = pi/2
-name = 'sentinel_pipedreamin_complete'
-#env_name = 'tunnel/tunnel_branch2.tri'
-env_name = 'pipes/pipedreamin.tri'
 
 sRadius = sphere_scale*radius
 config = ''
-#folder=''
-# fname = folder+name+'.urdf'
-# pathname = os.path.dirname(os.path.realpath(__file__))+'/../../data/'
-# pathname = os.path.abspath(pathname)+'/'
-# fname = pathname + fname
-# xmlname = pathname + xmlname
-robot_name = 'sentinel'
-fname = getPathname(robot_name)
-
-f = open(fname,'w')
-
-f.write('<?xml version="1.0"?>\n')
-f.write('<robot name="'+name+'">\n')
 
 def createHead(headname):
   hstrs = createSphere("eye",0,0,0,headradius)
@@ -62,7 +46,7 @@ def createBranchSegment(parentlinkname, linkname, x, y, z):
   sbj2 = createRigidJoint( linkname1, linkname2, 0, 0, 0)
   return sbc+sbl1+sbj1+sbl2+sbj2
 
-def createBranch(headname, branchname,x,y,z):
+def createBranch(headname, branchname,x,y,z, Nsegments):
   s = createBranchSegment(headname,branchname+str(0),x,y,z)
   for i in range(1,Nsegments):
     if i==1:
@@ -71,7 +55,7 @@ def createBranch(headname, branchname,x,y,z):
       s+= attachBranchSegment(branchname+str(i-1),branchname+str(i),-length-2*sRadius,0,0)
   return s
 
-def createBranchBundle(headname):
+def createBranchBundle(headname, Nsegments, Nbranches):
   s=''
   tt = headradius / max(radius, sphere_scale*radius)
   if tt < 2.0:
@@ -82,7 +66,7 @@ def createBranchBundle(headname):
   for i in range(0,Nbranches):
     y = scale*headradius*cos(i*2*pi/Nbranches)
     z = scale*headradius*sin(i*2*pi/Nbranches)
-    s+=createBranch("head","branch_"+str(i),-headradius,y,z)
+    s+=createBranch("head","branch_"+str(i),-headradius,y,z, Nsegments)
 
   ## CSpace structure:
   ## SE(3) ~ R^6 (local chart) 
@@ -95,7 +79,6 @@ def createBranchBundle(headname):
   print "config=\""+str(Njoints)+" "+" 0"*Njoints+"\""
 
   print "[arms open config]"
-
   global config
   config = str("config=\"")
 
@@ -130,54 +113,26 @@ def createBranchBundle(headname):
   config+= "\""
   print config
   return s
+def CreateSentinelRobot( robot_name, Nsegments, Nbranches):
+  fname = getPathname(robot_name)
+  f = open(fname,'w')
+  f.write('<?xml version="1.0"?>\n')
+  f.write('<robot name="'+robot_name+'">\n')
+  headname = "head"
+  f.write(createHead(headname))
+  if Nsegments > 0:
+    f.write(createBranchBundle(headname, Nsegments, Nbranches))
+  f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
+  f.write('  </klampt>\n')
+  f.write('</robot>')
+  f.close()
 
-headname = "head"
-f.write(createHead(headname))
-f.write(createBranchBundle(headname))
-#f.write('  <klampt package_root="../.." flip_yz="1" use_vis_geom="1">\n')
-f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
-#f.write('    <noselfcollision pairs="head eye"/>\n')
-#branch_00_spherical_joint_link
-#f.write('    <link name="branch_00_spherical_joint_link" physical="0" />\n')
-#f.write('    <noselfcollision pairs="eye branch_00"/>\n')
-#f.write('    <noselfcollision pairs="eye branch_00_cylinder"/>\n')
-f.write('  </klampt>\n')
-f.write('</robot>')
-f.close()
+  print "\nCreated new file >>",
+  print fname
 
-print "\nCreated new file >>",
-print fname
 
-# f = open(xmlname,'w')
-# f.write('<?xml version="1.0"?>\n\n')
-# f.write('<world>\n')
+robot_name = 'sentinel'
+CreateSentinelRobot(robot_name, Nsegments=6, Nbranches=8)
+robot_name = 'sentinel_head'
+CreateSentinelRobot(robot_name, Nsegments=0, Nbranches=0)
 
-# robotstr  = '  <robot name=\"'+name+'\"'
-# robotstr += ' file="'+str(fname)+'"'
-# robotstr += ' translation="0 0 0"'
-# robotstr += ' rotateRPY="0 0 0"'
-# robotstr += ' '+config+'/>\n\n'
-# f.write(robotstr)
-
-# kappa = (2*sin(limit))/(length*Nsegments)
-# cmmntstr = '  <!-- Irreducible Curvature kappa ='+str(kappa)+' -->\n\n'
-# f.write(cmmntstr)
-
-# terrainstr  = '  <rigidObject '
-# terrainstr += ' name=\"'+str(env_name)+'\"'
-# terrainstr += ' file=\"/home/aorthey/git/orthoklampt/data/terrains/'+str(env_name)+'\"'
-# terrainstr += ' translation="0 0 0"/>\n\n'
-# f.write(terrainstr)
-
-# ctrlstr  = '  <simulation>\n'
-# ctrlstr += '    <globals maxContacts="20" />\n'
-# ctrlstr += '    <robot index="0">\n'
-# ctrlstr += '      <controller type="PolynomialPathController" />\n'
-# ctrlstr += '    </robot>\n'
-# ctrlstr += '  </simulation>\n\n'
-# f.write(ctrlstr)
-# f.write('</world>')
-# f.close()
-
-# print "\nCreated new file >>",
-# print xmlname
