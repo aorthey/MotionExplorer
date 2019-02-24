@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot name="snake/snake_sphere_inner">
+<robot name="snake/snake_0_segments_sphere_inner">
 <link name="body">
   <inertial>
    <mass value="1"/>

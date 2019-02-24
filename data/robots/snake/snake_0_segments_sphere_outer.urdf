@@ -1,20 +1,20 @@
 <?xml version="1.0"?>
-<robot name="snake/snake_sphere_outer">
+<robot name="snake/snake_0_segments_sphere_outer">
 <link name="body">
   <inertial>
    <mass value="1"/>
-   <inertia ixx="0.324" ixy="0" ixz="0" iyy="0.324" iyz="0" izz="0.324"/>
+   <inertia ixx="0.01152" ixy="0" ixz="0" iyy="0.01152" iyz="0" izz="0.01152"/>
   </inertial>
   <collision>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-      <sphere radius="0.9"/>
+      <sphere radius="0.169705627485"/>
     </geometry>
   </collision>
   <visual>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-      <sphere radius="0.9"/>
+      <sphere radius="0.169705627485"/>
     </geometry>
   </visual>
 </link>

@@ -153,16 +153,16 @@
     <descr>Print Robot</descr>
     <key>i</key>
   </hotkey>
-  <!-- <hotkey> -->
-  <!--   <name>draw_robot_previous</name> -->
-  <!--   <descr>Draw Previous Robot</descr> -->
-  <!--   <key>N</key> -->
-  <!-- </hotkey> -->
-  <!-- <hotkey> -->
-  <!--   <name>draw_robot_next</name> -->
-  <!--   <descr>Draw Next Robot</descr> -->
-  <!--   <key>M</key> -->
-  <!-- </hotkey> -->
+  <hotkey>
+    <name>draw_robot_previous</name>
+    <descr>Draw Previous Robot</descr>
+    <key>N</key>
+  </hotkey>
+  <hotkey>
+    <name>draw_robot_next</name>
+    <descr>Draw Next Robot</descr>
+    <key>M</key>
+  </hotkey>
 
   <slider>
     <name>path_speed</name>

@@ -5,7 +5,7 @@ from math import cos,sin,pi,atan2
 from urdf_create import *
 from urdf_create_primitives import *
 
-robot_name = 'snake/snake'
+#number of segments of snake INCLUDING head segment
 Nsegments = 3
 
 headradius = 0.12
@@ -20,98 +20,48 @@ upperLimit=limit
 radius_cylinder = headradius
 
 sRadius = 2*radius
-fname = getPathname(robot_name)
+epsilon_gap = 1e-5
 
-def createHead(headname):
-  hstrs = createSphere("eye",0,0,0,headradius)
-  hstrc = createCylinder(headname,-headradius/2,0,0,headradius,headradius)
-  hstrj = createRigidJoint("eye",headname)
-  return hstrs+hstrc+hstrj
+def createHead(branchname):
+  linkname1 = "eye"
+  hstr = createSphere(linkname1, 0, 0, 0, headradius)
+  hstr+= createCylinder(branchname, 0, 0, 0, radius=headradius,length=headradius)
+  hstr+= createRigidJoint(linkname1, branchname, -0.5*headradius, 0, 0)
+  return hstr
 
-def attachBranchSegment(parentlinkname, linkname, x, y, z, lastSegment=False):
-  linkname1 = linkname+'_cylinder'
-  linkname2 = linkname
-  sbl1 = createCylinder(linkname1,-length/2-sRadius,0,0,radius_cylinder,length) 
-  sbj1 = createSphericalJoint(parentlinkname,linkname1, x, y, z, lowerLimit=lowerLimit,upperLimit=upperLimit) 
-  if lastSegment:
-    return sbl1+sbj1
-  sbl2 = createSphere(linkname2,-length-2*sRadius,0,0,0.95*sRadius)
-  sbj2 = createRigidJoint(linkname1, linkname2, 0, 0,0)
-  return sbl1+sbj1+sbl2+sbj2
+def attachBranchSegment(parentlinkname, linkname, xoffset):
+  jlinkname = linkname+'_joint_link'
+  hstr = createSphere(jlinkname,0,0,0,sRadius)
+  hstr+= createRigidJoint(parentlinkname, jlinkname, xoffset, 0, 0)
+  hstr+= createSphericalJoint(jlinkname,linkname, 0, 0, 0, lowerLimit=lowerLimit,upperLimit=upperLimit) 
+  hstr+= createCylinder(linkname,-0.5*length-sRadius-epsilon_gap,0,0,radius = radius_cylinder,length=length) 
+  return hstr
 
-def createBranchSegment(parentlinkname, linkname, x, y, z):
-  sbc = commentNewBranch(linkname) 
-  linkname1 = linkname+'_cylinder'
-  linkname2 = linkname
-  sbl1 = createCylinder(linkname1,-stublength/2,0,0,radius_cylinder,stublength) 
-  sbj1 = createRigidJoint( parentlinkname, linkname1, x, y, z) 
-  sbl2 = createSphere(linkname2,-stublength-sRadius,0,0,0.95*sRadius)
-  sbj2 = createRigidJoint( linkname1, linkname2, 0, 0, 0)
-  return sbc+sbl1+sbj1+sbl2+sbj2
-
-def createBody(headname, segments):
-  s=''
+def GetNsegmentString(Nsegments):
   branchname = "body"
-  s += createBranchSegment(headname,branchname+str(0),-headradius-0.01,0,0)
-  for i in range(1,segments-1):
-    if i==1:
-      s+= attachBranchSegment(branchname+str(i-1),branchname+str(i),-stublength-sRadius,0,0)
-    else:
-      s+= attachBranchSegment(branchname+str(i-1),branchname+str(i),-length-2*sRadius,0,0)
-
-  if segments>2:
-    s+= attachBranchSegment(branchname+str(segments-2),branchname+str(segments-1),-length-2*sRadius,0,0,True)
-  else:
-    s+= attachBranchSegment(branchname+str(segments-2),branchname+str(segments-1),-stublength-sRadius,0,0,True)
-
-  Njoints = 6 + 1 + 2*(segments-1) + (1+segments)
-
-  print "[default position config]"
-  global config
-  config = "config=\""+str(Njoints)+" "+" 0"*Njoints+"\""
-  print config
-
-
+  s = createHead(branchname+str(0))
+  xoffset = -(0.5*headradius+sRadius + epsilon_gap)
+  for i in range(0,Nsegments-1):
+    s+= attachBranchSegment(branchname+str(i),branchname+str(i+1), xoffset)
+    xoffset = -(length + 2*sRadius + epsilon_gap)
   return s
 
+def CreateRobotNsegments(robot_name, Nsegments):
+  fname = getPathname(robot_name)
+  f = open(fname,'w')
+  f.write('<?xml version="1.0"?>\n')
+  f.write('<robot name="'+robot_name+'">\n')
+  f.write(GetNsegmentString(Nsegments))
+  f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
+  f.write('  </klampt>\n')
+  f.write('</robot>')
+  f.close()
+  print "\nCreated new file >>",fname
 
-f = open(fname,'w')
-f.write('<?xml version="1.0"?>\n')
-f.write('<robot name="'+robot_name+'">\n')
-f.write(createHead("head"))
-f.write(createBody("head",Nsegments))
-f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
-f.write('  </klampt>\n')
-f.write('</robot>')
-f.close()
-print "\nCreated new file >>",fname
+robot_name = 'snake/snake'
+for i in range(0,Nsegments):
+  CreateRobotNsegments(robot_name+"_"+str(i)+"_segments", i+1)
 
-
-robot_name_head = robot_name + "_head_inner"
-fname = getPathname(robot_name_head)
-
-f = open(fname,'w')
-f.write('<?xml version="1.0"?>\n')
-f.write('<robot name="'+robot_name_head+'">\n')
-f.write(createHead("head"))
-f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
-f.write('  </klampt>\n')
-f.write('</robot>')
-f.close()
-print "\nCreated new file >>",fname
-
-robot_name_onelink = robot_name + "_onelink_inner"
-fname = getPathname(robot_name_onelink)
-f = open(fname,'w')
-f.write('<?xml version="1.0"?>\n')
-f.write('<robot name="'+robot_name_onelink+'">\n')
-f.write(createHead("head"))
-f.write(createBody("head",Nsegments-1))
-f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
-f.write('  </klampt>\n')
-f.write('</robot>')
-f.close()
-print "\nCreated new file >>",fname
-### create nested robots
-CreateSphereRobot(robot_name + "_sphere_inner", headradius)
-CreateSphereRobot(robot_name + "_sphere_outer", Nsegments*length)
+CreateSphereRobot(robot_name + "_0_segments_sphere_inner", headradius)
+CreateSphereRobot(robot_name + "_0_segments_sphere_outer", np.sqrt(2)*headradius)
+CreateSphereRobot(robot_name + "_"+str(Nsegments-1)+"_segments_sphere_outer", (Nsegments-1)*length+(Nsegments-1)*2*sRadius+headradius)

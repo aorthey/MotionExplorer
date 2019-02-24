@@ -17,3 +17,4 @@ print "03D_misleading (PlanarLshape)    :",SpecialEuclideanNeighborhood(1.589024
 print "03D_nonsimple (PlanarRectangle)  :",SpecialEuclideanNeighborhood(1.05948)
 print "06D_misleading_Xshape            :",SpecialEuclideanNeighborhood(1.70073513517)
 print "06D_doubleLshape                 :",SpecialEuclideanNeighborhood(1.677)
+print "10D_snake (the SE(3) part)       :",SpecialEuclideanNeighborhood(0.169705627485)
