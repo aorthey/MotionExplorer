@@ -124,19 +124,10 @@ void Roadmap::DrawPlannerData(GUIState &state)
     Vector3 q = cspace->getXYZ(vd->getState());
 
     PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
-    // std::cout << std::string(80, '-') << std::endl;
-    // cspace->SpaceInformationPtr()->printState(v->getState());
-    // quotient_space->SpaceInformationPtr()->printState(v->getQuotientState());
 
     if(v!=nullptr)
     {
       q = quotient_space->getXYZ(v->getQuotientState());
-      //quotient_space->SpaceInformationPtr()->printState(v->getQuotientState());
-      // quotient_space->SpaceInformationPtr()->printSettings();
-      // cspace->SpaceInformationPtr()->printState(v->getQuotientState());
-      // quotient_space->SpaceInformationPtr()->printState(v->getQuotientState());
-      //q = quotient_space->getXYZ(v->getState());
-      //std::cout << q << std::endl;
       if(v->GetComponent()==0){
         setColor(cVertex);
       }else if(v->GetComponent()==1){
@@ -206,29 +197,29 @@ void Roadmap::DrawPlannerData(GUIState &state)
     glPushMatrix();
     glLineWidth(widthEdge);
     setColor(cEdge);
+    std::cout << "drawing " << pd->numEdges() << " EDGES" << std::endl;
     for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
       ob::PlannerDataVertex *v = &pd->getVertex(vidx);
-      PlannerDataVertexAnnotated *va = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+      Vector3 v1 = quotient_space->getXYZ(v->getState());
+      //PlannerDataVertexAnnotated *va = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
 
+      v1[2] += 0.1;
       std::vector<uint> edgeList;
       pd->getEdges(vidx, edgeList);
       for(uint j = 0; j < edgeList.size(); j++){
         ob::PlannerDataVertex *w = &pd->getVertex(edgeList.at(j));
-        PlannerDataVertexAnnotated *wa = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
-        Vector3 v1 = quotient_space->getXYZ(v->getState());
+        //PlannerDataVertexAnnotated *wa = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
         Vector3 v2 = quotient_space->getXYZ(w->getState());
-        if(va==nullptr || wa==nullptr){
-          drawLineSegment(v1,v2);
-        }else{
-          if(va->GetComponent()==0 || wa->GetComponent()==0){
-            setColor(cEdge);
-          }else if(va->GetComponent()==1 || wa->GetComponent()==1){
-            setColor(cVertexComponentGoal);
-          }else{
-            setColor(cVertexComponentOut);
-          }
-          drawLineSegment(v1,v2);
-        }
+        // if(va!=nullptr && wa!=nullptr){
+        //   if(va->GetComponent()==0 || wa->GetComponent()==0){
+        //     setColor(cEdge);
+        //   }else if(va->GetComponent()==1 || wa->GetComponent()==1){
+        //     setColor(cVertexComponentGoal);
+        //   }else{
+        //     setColor(cVertexComponentOut);
+        //   }
+        // }
+        drawLineSegment(v1,v2);
       }
     }
     glPopMatrix();
