@@ -172,6 +172,7 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="save_view"){
     Robot *robot = world->robots[active_robot];
     std::string rname = robot->name;
+    std::cout << rname << std::endl;
     std::string fname = "../data/viewport/robot_"+rname+".viewport";
     BaseT::OnCommand("save_view",fname.c_str());
   }else if(cmd=="load_view" || cmd=="reset_view"){

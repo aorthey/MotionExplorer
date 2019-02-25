@@ -29,8 +29,6 @@ plt.plot(dprime*np.cos(t),dprime*np.sin(t),'--b')
 dprime = np.min((d/r1,d/r2))/np.sqrt(2)
 plt.plot(dprime*np.cos(t),dprime*np.sin(t),'--b')
 
-#k1 = d/r1
-#k2 = d/r2
 k1 = 1.0/r1
 k2 = 1.0/r2
 ddprime = d*k2*np.cos(np.pi/2-np.arctan(k1/k2))

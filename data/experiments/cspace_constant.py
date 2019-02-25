@@ -3,6 +3,10 @@ import numpy as np
 # constant is computed by taking the largest sphere around the robot (rmax), and
 # then computing how the inscribed ball changes
 
+# The neighborhood as defined by Quinlan_1994 is actually an L1 neighborhood,
+# i.e. it is diamond-shaped. We search here for the largest inscribed ball in
+# this neighborhood.
+
 def SpecialEuclideanNeighborhood(rmax):
   r1 = 1
   r2 = rmax

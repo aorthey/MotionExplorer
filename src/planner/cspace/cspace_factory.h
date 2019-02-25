@@ -5,6 +5,7 @@
 #include "planner/cspace/cspace_kinodynamic_SE2.h"
 #include "planner/cspace/cspace_geometric_RN.h"
 #include "planner/cspace/cspace_geometric_SE2.h"
+#include "planner/cspace/cspace_geometric_SE2RN.h"
 #include "planner/cspace/cspace_geometric_R3S2.h"
 #include "planner/cspace/cspace_geometric_fixedbase.h"
 #include "planner/cspace/cspace_input.h"
@@ -41,6 +42,14 @@ class CSpaceFactory{
     // CSpace  SE(3)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE3( RobotWorld *world, int robot_idx){
       return MakeGeometricCSpace(world, robot_idx);
+    }
+    // CSpace  SE(2) x R^(N)
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE2RN( RobotWorld *world, int robot_idx){
+      //return MakeGeometricCSpaceSE2RN(world, robot_idx);
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLSE2RN(world, robot_idx);
+      cspace->SetCSpaceInput(input);
+      cspace->Init();
+      return cspace;
     }
     // CSpace  R^3 \times S1 \times S1
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceR3S2( RobotWorld *world, int robot_idx){

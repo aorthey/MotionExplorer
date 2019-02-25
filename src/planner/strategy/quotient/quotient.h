@@ -40,7 +40,7 @@ namespace ompl
     class Quotient: public ob::Planner
     {
       typedef ob::Planner BaseT;
-      enum QuotientSpaceType{ UNKNOWN, IDENTITY_SPACE, ATOMIC_RN, RN_RM, SE2_R2, SE3_R3, SE3RN_R3, SE3RN_SE3, SE3RN_SE3RM };
+      enum QuotientSpaceType{ UNKNOWN, IDENTITY_SPACE, ATOMIC_RN, RN_RM, SE2_R2, SE2RN_SE2, SE2RN_SE2RM, SE3_R3, SE3RN_R3, SE3RN_SE3, SE3RN_SE3RM };
 
       public:
         const uint verbose{0};
@@ -92,6 +92,7 @@ namespace ompl
       protected:
 
         const ob::StateSpacePtr ComputeQuotientSpace(const ob::StateSpacePtr Q1, const ob::StateSpacePtr Q0);
+        QuotientSpaceType IdentifyQuotientSpaceType(const ob::StateSpacePtr Q1, const ob::StateSpacePtr Q0);
 
         ob::SpaceInformationPtr Q1;
         ob::SpaceInformationPtr Q0;

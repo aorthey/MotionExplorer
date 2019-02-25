@@ -49,6 +49,8 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
       cspace_level = factory.MakeGeometricCSpaceSE3(world, robot_inner_idx);
     }else if(type=="SE2"){
       cspace_level = factory.MakeGeometricCSpaceSE2(world, robot_inner_idx);
+    }else if(type=="SE2RN"){
+      cspace_level = factory.MakeGeometricCSpaceSE2RN(world, robot_inner_idx);
     }else if(type=="SE3RN"){
       cspace_level = factory.MakeGeometricCSpace(world, robot_inner_idx);
     }else if(type=="TSE2"){

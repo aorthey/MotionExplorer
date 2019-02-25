@@ -140,130 +140,272 @@ void Quotient::clear()
 
 const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const StateSpacePtr Q0)
 {
-    //STATE_SPACE_UNKNOWN = 0,
-    //STATE_SPACE_REAL_VECTOR = 1,
-    //STATE_SPACE_SO2 = 2,
-    //STATE_SPACE_SO3 = 3,
-    //STATE_SPACE_SE2 = 4,
-    //STATE_SPACE_SE3 = 5,
-    //STATE_SPACE_TIME = 6,
-    //STATE_SPACE_DISCRETE = 7,
+  type = IdentifyQuotientSpaceType(Q1, Q0);
 
-    //Cases we can handle:
-    // ---- non-compound:
-    // (1) Q1 Rn       , Q0 Rm       , 0<m<=n  => X1 = R(n-m) \union {0}
-    // ---- compound:
-    // (2) Q1 SE2      , Q0 R2                 => X1 = SO2
-    // (3) Q1 SE3      , Q0 R3                 => X1 = SO3
-    // (4) Q1 SE3xRn   , Q0 SE3                => X1 = Rn
-    // (5) Q1 SE3xRn   , Q0 R3                 => X1 = SO3xRn
-    // (6) Q1 SE3xRn   , Q0 SE3xRm   , 0<m<n   => X1 = R(n-m)
+  StateSpacePtr X1{nullptr};
+  Q1_dimension = Q1->getDimension();
+  Q0_dimension = Q0->getDimension();
+
+  switch (type) {
+    case IDENTITY_SPACE:
+      {
+        X1_dimension = 0;
+        break;
+      }
+    case RN_RM:
+      {
+        uint N = Q1_dimension - Q0_dimension;
+        X1 = std::make_shared<ob::RealVectorStateSpace>(N);
+        X1_dimension = N;
+
+        RealVectorBounds Q1_bounds = static_pointer_cast<ob::RealVectorStateSpace>(Q1)->getBounds();
+        std::vector<double> low; low.resize(N);
+        std::vector<double> high; high.resize(N);
+        RealVectorBounds X1_bounds(N);
+        for(uint k = 0; k < N; k++){
+          X1_bounds.setLow(k, Q1_bounds.low.at(k+Q0_dimension));
+          X1_bounds.setHigh(k, Q1_bounds.high.at(k+Q0_dimension));
+        }
+        static_pointer_cast<ob::RealVectorStateSpace>(X1)->setBounds(X1_bounds);
+
+        break;
+      }
+    case SE2_R2:
+      {
+        X1_dimension = 1;
+        X1 = std::make_shared<ob::SO2StateSpace>();
+        break;
+      }
+    case SE3_R3:
+      {
+        X1_dimension = 3;
+        X1 = std::make_shared<ob::SO3StateSpace>();
+        break;
+      }
+    case SE2RN_SE2: case SE3RN_SE3:
+      {
+        ob::CompoundStateSpace *Q1_compound = Q1->as<ob::CompoundStateSpace>();
+        const std::vector<StateSpacePtr> Q1_decomposed = Q1_compound->getSubspaces();
+
+        X1_dimension = Q1_decomposed.at(1)->getDimension();
+
+        X1 = std::make_shared<ob::RealVectorStateSpace>(X1_dimension);
+        static_pointer_cast<ob::RealVectorStateSpace>(X1)->setBounds( static_pointer_cast<ob::RealVectorStateSpace>(Q1_decomposed.at(1))->getBounds() );
+
+        break;
+      }
+    case SE3RN_R3:
+      {
+        ob::CompoundStateSpace *Q1_compound = Q1->as<ob::CompoundStateSpace>();
+        const std::vector<StateSpacePtr> Q1_decomposed = Q1_compound->getSubspaces();
+        const std::vector<StateSpacePtr> Q1_SE3_decomposed = Q1_decomposed.at(0)->as<ob::CompoundStateSpace>()->getSubspaces();
+
+        //const ob::SE3StateSpace *Q1_SE3 = Q1_SE3_decomposed.at(0)->as<ob::SE3StateSpace>();
+        //const ob::SO3StateSpace *Q1_SO3 = Q1_SE3_decomposed.at(1)->as<ob::SO3StateSpace>();
+        const ob::RealVectorStateSpace *Q1_RN = Q1_decomposed.at(1)->as<ob::RealVectorStateSpace>();
+        uint N = Q1_RN->getDimension();
+
+        ob::StateSpacePtr SO3(new ob::SO3StateSpace());
+        ob::StateSpacePtr RN(new ob::RealVectorStateSpace(N));
+        RN->as<ob::RealVectorStateSpace>()->setBounds( Q1_RN->getBounds() );
+
+        X1 = SO3 + RN;
+        X1_dimension = 3+N;
+        break;
+      }
+    case SE2RN_SE2RM: case SE3RN_SE3RM:
+      {
+        ob::CompoundStateSpace *Q1_compound = Q1->as<ob::CompoundStateSpace>();
+        const std::vector<StateSpacePtr> Q1_decomposed = Q1_compound->getSubspaces();
+        ob::CompoundStateSpace *Q0_compound = Q0->as<ob::CompoundStateSpace>();
+        const std::vector<StateSpacePtr> Q0_decomposed = Q0_compound->getSubspaces();
+
+        uint N = Q1_decomposed.at(1)->getDimension();
+        uint M = Q0_decomposed.at(1)->getDimension();
+        X1_dimension = N-M;
+        X1 = std::make_shared<ob::RealVectorStateSpace>(X1_dimension);
+
+        RealVectorBounds Q1_bounds = static_pointer_cast<ob::RealVectorStateSpace>(Q1_decomposed.at(1))->getBounds();
+        std::vector<double> low; low.resize(X1_dimension);
+        std::vector<double> high; high.resize(X1_dimension);
+        RealVectorBounds X1_bounds(X1_dimension);
+        for(uint k = 0; k < X1_dimension; k++){
+          X1_bounds.setLow(k, Q1_bounds.low.at(k+M));
+          X1_bounds.setHigh(k, Q1_bounds.high.at(k+M));
+        }
+        static_pointer_cast<ob::RealVectorStateSpace>(X1)->setBounds(X1_bounds);
+        break;
+      }
+    default:
+      {
+        std::cout << "unknown type: " << type << std::endl;
+        exit(0);
+      }
+
+  }
+  return X1;
+
+}
+
+Quotient::QuotientSpaceType Quotient::IdentifyQuotientSpaceType(const StateSpacePtr Q1, const StateSpacePtr Q0)
+{
+  //STATE_SPACE_UNKNOWN = 0,
+  //STATE_SPACE_REAL_VECTOR = 1,
+  //STATE_SPACE_SO2 = 2,
+  //STATE_SPACE_SO3 = 3,
+  //STATE_SPACE_SE2 = 4,
+  //STATE_SPACE_SE3 = 5,
+  //STATE_SPACE_TIME = 6,
+  //STATE_SPACE_DISCRETE = 7,
+
+  //Cases we can handle:
+  // ---- non-compound:
+  // (1) Q1 Rn       , Q0 Rm       , 0<m<=n  => X1 = R(n-m) \union {0}
+  // ---- compound:
+  // (2) Q1 SE2      , Q0 R2                 => X1 = SO2
+  // (3) Q1 SE3      , Q0 R3                 => X1 = SO3
+  // (4) Q1 SE3xRn   , Q0 SE3                => X1 = Rn
+  // (5) Q1 SE3xRn   , Q0 R3                 => X1 = SO3xRn
+  // (6) Q1 SE3xRn   , Q0 SE3xRm   , 0<m<n   => X1 = R(n-m)
+  //
+  // (7) Q1 SE2xRn   , Q0 SE2                => X1 = Rn
+  // (8) Q1 SE2xRn   , Q0 SE2xRm   , 0<m<n   => X1 = R(n-m)
+  //
+  // Cases not yet implemented
+  ///// Q1 SE3      , Q0 R3xSO2xSO2         =>X1 = SO2
+  ///// Q1 R3xS1xS1 , Q0 R3                 =>X1 = SO2xSO2
+
+  if(!Q1->isCompound()){
+    ///##############################################################################/
+    //------------------ non-compound cases:
+    ///##############################################################################/
     //
-    // Cases not yet implemented
-    ///// Q1 SE3      , Q0 R3xSO2xSO2         =>X1 = SO2
-    ///// Q1 R3xS1xS1 , Q0 R3                 =>X1 = SO2xSO2
-
-    if(!Q1->isCompound()){
-      ///##############################################################################/
-      //------------------ non-compound cases:
-      ///##############################################################################/
-      //
-      //------------------ (1) Q1 = Rn, Q0 = Rm, 0<m<n, X1 = R(n-m)
-      if( Q1->getType() == base::STATE_SPACE_REAL_VECTOR ){
-        uint n = Q1->getDimension();
-        if( Q0->getType() == base::STATE_SPACE_REAL_VECTOR ){
-          uint m = Q0->getDimension();
-          if(n>m && m>0){
-            type = RN_RM;
+    //------------------ (1) Q1 = Rn, Q0 = Rm, 0<m<n, X1 = R(n-m)
+    if( Q1->getType() == base::STATE_SPACE_REAL_VECTOR ){
+      uint n = Q1->getDimension();
+      if( Q0->getType() == base::STATE_SPACE_REAL_VECTOR ){
+        uint m = Q0->getDimension();
+        if(n>m && m>0){
+          type = RN_RM;
+        }else{
+          if(n==m){
+            type = IDENTITY_SPACE;
           }else{
-            if(n==m){
-              type = IDENTITY_SPACE;
+            std::cout << "Not allowed: dimensionality needs to be monotonically increasing. we need n>=m>0, but have " << n << ">=" << m << ">0" << std::endl;
+            exit(0);
+          }
+        }
+      }else{
+        std::cout << "Q1 is R^"<<n <<" but state " << Q0->getType() << " is not handled." << std::endl;
+        exit(0);
+      }
+    }else{
+      std::cout << "Q1 is non-compound state, but state " << Q1->getType() << " is not handled." << std::endl;
+      exit(0);
+    }
+  }else{
+    ///##############################################################################/
+    //------------------ compound cases:
+    ///##############################################################################/
+    //
+    //------------------ (2) Q1 = SE2, Q0 = R2, X1 = SO2
+    ///##############################################################################/
+    if( Q1->getType() == base::STATE_SPACE_SE2 ){
+      if( Q0->getType() == base::STATE_SPACE_REAL_VECTOR){
+        if( Q0->getDimension() == 2){
+          type = SE2_R2;
+        }else{
+          std::cout << "Q1 is SE2 but state " << Q0->getType() << " is of dimension " << Q0->getDimension() << std::endl;
+          exit(0);
+        }
+      }else{
+        std::cout << "Q1 is SE2 but state " << Q0->getType() << " is not handled." << std::endl;
+        exit(0);
+      }
+    }
+    //------------------ (3) Q1 = SE3, Q0 = R3, X1 = SO3
+    ///##############################################################################/
+    else if( Q1->getType() == base::STATE_SPACE_SE3 ){
+      if( Q0->getType() == base::STATE_SPACE_REAL_VECTOR){
+        if( Q0->getDimension() == 3){
+          type = SE3_R3;
+        }else{
+          std::cout << "Q1 is SE3 but state " << Q0->getType() << " is of dimension " << Q0->getDimension() << std::endl;
+          exit(0);
+        }
+      }else{
+        std::cout << "Q1 is SE3 but state " << Q0->getType() << " is not handled." << std::endl;
+        exit(0);
+      }
+    }
+    //------------------ Q1 = SE3xRN
+    ///##############################################################################/
+    else{
+      ob::CompoundStateSpace *Q1_compound = Q1->as<ob::CompoundStateSpace>();
+      const std::vector<StateSpacePtr> Q1_decomposed = Q1_compound->getSubspaces();
+      uint Q1_subspaces = Q1_decomposed.size();
+      if(Q1_subspaces == 2){
+        if(Q1_decomposed.at(0)->getType() == base::STATE_SPACE_SE3
+            && Q1_decomposed.at(1)->getType() == base::STATE_SPACE_REAL_VECTOR){
+
+          uint n = Q1_decomposed.at(1)->getDimension();
+          if( Q0->getType() == base::STATE_SPACE_SE3 ){
+          //------------------ (4) Q1 = SE3xRn, Q0 = SE3, X1 = Rn
+          ///##############################################################################/
+            type = SE3RN_SE3;
+          }else if(Q0->getType() == base::STATE_SPACE_REAL_VECTOR){
+          //------------------ (5) Q1 = SE3xRn, Q0 = R3, X1 = SO3xRN
+          ///##############################################################################/
+            type = SE3RN_R3;
+          }else{
+          //------------------ (6) Q1 = SE3xRn, Q0 = SE3xRm, X1 = R(n-m)
+          ///##############################################################################/
+            ob::CompoundStateSpace *Q0_compound = Q0->as<ob::CompoundStateSpace>();
+            const std::vector<StateSpacePtr> Q0_decomposed = Q0_compound->getSubspaces();
+            uint Q0_subspaces = Q0_decomposed.size();
+            if(Q0_subspaces==2){
+              if(Q1_decomposed.at(0)->getType() == base::STATE_SPACE_SE3
+                  && Q1_decomposed.at(1)->getType() == base::STATE_SPACE_REAL_VECTOR){
+                uint m = Q0_decomposed.at(1)->getDimension();
+                if(m<n && m>0){
+                  type = SE3RN_SE3RM;
+                }else{
+                  std::cout << "Not allowed: we need n>m>0, but have " << n << ">" << m << ">0" << std::endl;
+                  exit(0);
+                }
+              }
             }else{
-              std::cout << "Not allowed: dimensionality needs to be monotonically increasing. we need n>=m>0, but have " << n << ">=" << m << ">0" << std::endl;
+              std::cout << "State compound with " << Q0_subspaces << " not handled."<< std::endl;
               exit(0);
             }
           }
         }else{
-          std::cout << "Q1 is R^"<<n <<" but state " << Q0->getType() << " is not handled." << std::endl;
-          exit(0);
-        }
-      }else{
-        std::cout << "Q1 is non-compound state, but state " << Q1->getType() << " is not handled." << std::endl;
-        exit(0);
-      }
-    }else{
-      ///##############################################################################/
-      //------------------ compound cases:
-      ///##############################################################################/
-      //
-      //------------------ (2) Q1 = SE2, Q0 = R2, X1 = SO2
-      ///##############################################################################/
-      if( Q1->getType() == base::STATE_SPACE_SE2 ){
-        if( Q0->getType() == base::STATE_SPACE_REAL_VECTOR){
-          if( Q0->getDimension() == 2){
-            type = SE2_R2;
-          }else{
-            std::cout << "Q1 is SE2 but state " << Q0->getType() << " is of dimension " << Q0->getDimension() << std::endl;
-            exit(0);
-          }
-        }else{
-          std::cout << "Q1 is SE2 but state " << Q0->getType() << " is not handled." << std::endl;
-          exit(0);
-        }
-      }
-      //------------------ (3) Q1 = SE3, Q0 = R3, X1 = SO3
-      ///##############################################################################/
-      else if( Q1->getType() == base::STATE_SPACE_SE3 ){
-        if( Q0->getType() == base::STATE_SPACE_REAL_VECTOR){
-          if( Q0->getDimension() == 3){
-            type = SE3_R3;
-          }else{
-            std::cout << "Q1 is SE3 but state " << Q0->getType() << " is of dimension " << Q0->getDimension() << std::endl;
-            exit(0);
-          }
-        }else{
-          std::cout << "Q1 is SE3 but state " << Q0->getType() << " is not handled." << std::endl;
-          exit(0);
-        }
-      }
-      //------------------ Q1 = SE3xRN
-      ///##############################################################################/
-      else{
-        ob::CompoundStateSpace *Q1_compound = Q1->as<ob::CompoundStateSpace>();
-        const std::vector<StateSpacePtr> Q1_decomposed = Q1_compound->getSubspaces();
-        uint Q1_subspaces = Q1_decomposed.size();
-        if(Q1_subspaces == 2){
-          if(Q1_decomposed.at(0)->getType() == base::STATE_SPACE_SE3
+          if(Q1_decomposed.at(0)->getType() == base::STATE_SPACE_SE2
               && Q1_decomposed.at(1)->getType() == base::STATE_SPACE_REAL_VECTOR){
-
             uint n = Q1_decomposed.at(1)->getDimension();
-            if( Q0->getType() == base::STATE_SPACE_SE3 ){
-            //------------------ (4) Q1 = SE3xRn, Q0 = SE3, X1 = Rn
+            if( Q0->getType() == base::STATE_SPACE_SE2 ){
+            //------------------ (7) Q1 = SE2xRn, Q0 = SE2, X1 = Rn
             ///##############################################################################/
-              type = SE3RN_SE3;
-            }else if(Q0->getType() == base::STATE_SPACE_REAL_VECTOR){
-            //------------------ (5) Q1 = SE3xRn, Q0 = R3, X1 = SO3xRN
-            ///##############################################################################/
-              type = SE3RN_R3;
+              type = SE2RN_SE2;
             }else{
-            //------------------ (6) Q1 = SE3xRn, Q0 = SE3xRm, X1 = R(n-m)
+            //------------------ (8) Q1 = SE2xRn, Q0 = SE2xRm, X1 = R(n-m)
             ///##############################################################################/
               ob::CompoundStateSpace *Q0_compound = Q0->as<ob::CompoundStateSpace>();
               const std::vector<StateSpacePtr> Q0_decomposed = Q0_compound->getSubspaces();
               uint Q0_subspaces = Q0_decomposed.size();
               if(Q0_subspaces==2){
-                if(Q1_decomposed.at(0)->getType() == base::STATE_SPACE_SE3
+                if(Q1_decomposed.at(0)->getType() == base::STATE_SPACE_SE2
                     && Q1_decomposed.at(1)->getType() == base::STATE_SPACE_REAL_VECTOR){
                   uint m = Q0_decomposed.at(1)->getDimension();
                   if(m<n && m>0){
-                    type = SE3RN_SE3RM;
+                    type = SE2RN_SE2RM;
                   }else{
-                    std::cout << "Not allowed: we need n>m>0, but have " << n << ">" << m << ">0" << std::endl;
+                    std::cout << "SE2RN to SE2RM: Not allowed: we need n>m>0, but have " << n << ">" << m << ">0" << std::endl;
                     exit(0);
                   }
                 }
               }else{
-                std::cout << "State compound with " << Q0_subspaces << " not handled."<< std::endl;
+                std::cout << "SE2RN to SE2RM: QO is compound with " << Q0_subspaces << " subspaces, but we only handle 2."<< std::endl;
                 exit(0);
               }
             }
@@ -271,117 +413,15 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const
             std::cout << "State compound " <<  Q1_decomposed.at(0)->getType() << " and " <<  Q1_decomposed.at(1)->getType() << " not recognized."<< std::endl;
             exit(0);
           }
-        }else{
-          std::cout << "Q1 has " << Q1_subspaces << " but we only support 2." << std::endl;
-          exit(0);
         }
+      }else{
+        std::cout << "Q1 has " << Q1_subspaces << " OMPL subspaces, but we only support 2." << std::endl;
+        exit(0);
       }
-
     }
 
-    StateSpacePtr X1{nullptr};
-    Q1_dimension = Q1->getDimension();
-    Q0_dimension = Q0->getDimension();
-
-    switch (type) {
-      case IDENTITY_SPACE:
-        {
-          X1_dimension = 0;
-          break;
-        }
-      case RN_RM:
-        {
-          uint N = Q1_dimension - Q0_dimension;
-          X1 = std::make_shared<ob::RealVectorStateSpace>(N);
-          X1_dimension = N;
-
-          RealVectorBounds Q1_bounds = static_pointer_cast<ob::RealVectorStateSpace>(Q1)->getBounds();
-          std::vector<double> low; low.resize(N);
-          std::vector<double> high; high.resize(N);
-          RealVectorBounds X1_bounds(N);
-          for(uint k = 0; k < N; k++){
-            X1_bounds.setLow(k, Q1_bounds.low.at(k+Q0_dimension));
-            X1_bounds.setHigh(k, Q1_bounds.high.at(k+Q0_dimension));
-          }
-          static_pointer_cast<ob::RealVectorStateSpace>(X1)->setBounds(X1_bounds);
-
-          break;
-        }
-      case SE2_R2:
-        {
-          X1_dimension = 1;
-          X1 = std::make_shared<ob::SO2StateSpace>();
-          break;
-        }
-      case SE3_R3:
-        {
-          X1_dimension = 3;
-          X1 = std::make_shared<ob::SO3StateSpace>();
-          break;
-        }
-      case SE3RN_SE3:
-        {
-          ob::CompoundStateSpace *Q1_compound = Q1->as<ob::CompoundStateSpace>();
-          const std::vector<StateSpacePtr> Q1_decomposed = Q1_compound->getSubspaces();
-
-          X1_dimension = Q1_decomposed.at(1)->getDimension();
-
-          X1 = std::make_shared<ob::RealVectorStateSpace>(X1_dimension);
-          static_pointer_cast<ob::RealVectorStateSpace>(X1)->setBounds( static_pointer_cast<ob::RealVectorStateSpace>(Q1_decomposed.at(1))->getBounds() );
-
-          break;
-        }
-      case SE3RN_R3:
-        {
-          ob::CompoundStateSpace *Q1_compound = Q1->as<ob::CompoundStateSpace>();
-          const std::vector<StateSpacePtr> Q1_decomposed = Q1_compound->getSubspaces();
-          const std::vector<StateSpacePtr> Q1_SE3_decomposed = Q1_decomposed.at(0)->as<ob::CompoundStateSpace>()->getSubspaces();
-
-          //const ob::SE3StateSpace *Q1_SE3 = Q1_SE3_decomposed.at(0)->as<ob::SE3StateSpace>();
-          //const ob::SO3StateSpace *Q1_SO3 = Q1_SE3_decomposed.at(1)->as<ob::SO3StateSpace>();
-          const ob::RealVectorStateSpace *Q1_RN = Q1_decomposed.at(1)->as<ob::RealVectorStateSpace>();
-          uint N = Q1_RN->getDimension();
-
-          ob::StateSpacePtr SO3(new ob::SO3StateSpace());
-          ob::StateSpacePtr RN(new ob::RealVectorStateSpace(N));
-          RN->as<ob::RealVectorStateSpace>()->setBounds( Q1_RN->getBounds() );
-
-          X1 = SO3 + RN;
-          X1_dimension = 3+N;
-          break;
-        }
-      case SE3RN_SE3RM:
-        {
-          ob::CompoundStateSpace *Q1_compound = Q1->as<ob::CompoundStateSpace>();
-          const std::vector<StateSpacePtr> Q1_decomposed = Q1_compound->getSubspaces();
-          ob::CompoundStateSpace *Q0_compound = Q0->as<ob::CompoundStateSpace>();
-          const std::vector<StateSpacePtr> Q0_decomposed = Q0_compound->getSubspaces();
-
-          uint N = Q1_decomposed.at(1)->getDimension();
-          uint M = Q0_decomposed.at(1)->getDimension();
-          X1_dimension = N-M;
-          X1 = std::make_shared<ob::RealVectorStateSpace>(X1_dimension);
-
-          RealVectorBounds Q1_bounds = static_pointer_cast<ob::RealVectorStateSpace>(Q1_decomposed.at(1))->getBounds();
-          std::vector<double> low; low.resize(X1_dimension);
-          std::vector<double> high; high.resize(X1_dimension);
-          RealVectorBounds X1_bounds(X1_dimension);
-          for(uint k = 0; k < X1_dimension; k++){
-            X1_bounds.setLow(k, Q1_bounds.low.at(k+M));
-            X1_bounds.setHigh(k, Q1_bounds.high.at(k+M));
-          }
-          static_pointer_cast<ob::RealVectorStateSpace>(X1)->setBounds(X1_bounds);
-          break;
-        }
-      default:
-        {
-          std::cout << "unknown type: " << type << std::endl;
-          exit(0);
-        }
-
-    }
-    return X1;
-
+  }
+  return type;
 }
 
 void Quotient::MergeStates(const ob::State *qQ0, const ob::State *qX1, ob::State *qQ1) const
@@ -460,6 +500,49 @@ void Quotient::MergeStates(const ob::State *qQ0, const ob::State *qX1, ob::State
           sQ1_RN->values[k] = sX1_RN->values[k];
         }
 
+        break;
+      }
+    case SE2RN_SE2:
+      {
+        ob::SE2StateSpace::StateType *sQ1_SE2 = qQ1->as<ob::CompoundState>()->as<SE2StateSpace::StateType>(0);
+        ob::RealVectorStateSpace::StateType *sQ1_RN = qQ1->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
+
+        const ob::SE2StateSpace::StateType *sQ0 = qQ0->as<SE2StateSpace::StateType>();
+        const ob::RealVectorStateSpace::StateType *sX1 = qX1->as<RealVectorStateSpace::StateType>();
+
+        sQ1_SE2->setX( sQ0->getX());
+        sQ1_SE2->setY( sQ0->getY());
+        sQ1_SE2->setYaw( sQ0->getYaw());
+
+        for(uint k = 0; k < X1_dimension; k++){
+          sQ1_RN->values[k] = sX1->values[k];
+        }
+        break;
+      }
+    case SE2RN_SE2RM:{
+        ob::SE2StateSpace::StateType *sQ1_SE2 = qQ1->as<ob::CompoundState>()->as<SE2StateSpace::StateType>(0);
+        ob::RealVectorStateSpace::StateType *sQ1_RN = qQ1->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
+
+        const ob::SE2StateSpace::StateType *sQ0_SE2 = qQ0->as<ob::CompoundState>()->as<SE2StateSpace::StateType>(0);
+        const ob::RealVectorStateSpace::StateType *sQ0_RM = qQ0->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
+
+        const ob::RealVectorStateSpace::StateType *sX1 = qX1->as<RealVectorStateSpace::StateType>();
+
+        sQ1_SE2->setX( sQ0_SE2->getX());
+        sQ1_SE2->setY( sQ0_SE2->getY());
+        sQ1_SE2->setYaw( sQ0_SE2->getYaw());
+
+        //[X Y YAW] [1...M-1][M...N-1]
+        //SE2       RN
+        uint M = Q1_dimension-X1_dimension-3;
+        uint N = X1_dimension;
+
+        for(uint k = 0; k < M; k++){
+          sQ1_RN->values[k] = sQ0_RM->values[k];
+        }
+        for(uint k = M; k < M+N; k++){
+          sQ1_RN->values[k] = sX1->values[k-M];
+        }
         break;
       }
     case SE3RN_SE3:
@@ -576,7 +659,18 @@ void Quotient::ProjectX1Subspace( const ob::State* q, ob::State* qX1 ) const
 
         break;
       }
-    case SE3RN_SE3:
+    case SE2RN_SE2RM:{
+        const ob::RealVectorStateSpace::StateType *sQ1_RN = q->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
+
+        const ob::RealVectorStateSpace::StateType *sX1 = qX1->as<RealVectorStateSpace::StateType>();
+
+        uint N = Q1_dimension - X1_dimension - 3;
+        for(uint k = N; k < Q1_dimension-3; k++){
+          sX1->values[k-N] = sQ1_RN->values[k];
+        }
+        break;
+      }
+    case SE2RN_SE2: case SE3RN_SE3:
       {
         const ob::RealVectorStateSpace::StateType *sQ1_RN = q->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
         ob::RealVectorStateSpace::StateType *sX1 = qX1->as<RealVectorStateSpace::StateType>();
@@ -636,6 +730,34 @@ void Quotient::ProjectQ0Subspace( const ob::State* q, ob::State* qQ0 ) const
         sQ0->values[1] = sQ1->getY();
         break;
       }
+    case SE2RN_SE2:
+      {
+        const ob::SE2StateSpace::StateType *sQ1_SE2 = q->as<ob::CompoundState>()->as<SE2StateSpace::StateType>(0);
+        ob::SE2StateSpace::StateType *sQ0_SE2 = qQ0->as<SE2StateSpace::StateType>();
+
+        sQ0_SE2->setX( sQ1_SE2->getX());
+        sQ0_SE2->setY( sQ1_SE2->getY());
+        sQ0_SE2->setYaw( sQ1_SE2->getYaw());
+
+        break;
+      }
+    case SE2RN_SE2RM:
+      {
+        const ob::SE2StateSpace::StateType *sQ1_SE2 = q->as<ob::CompoundState>()->as<SE2StateSpace::StateType>(0);
+        const ob::RealVectorStateSpace::StateType *sQ1_RN = q->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
+
+        ob::SE2StateSpace::StateType *sQ0_SE2 = qQ0->as<ob::CompoundState>()->as<SE2StateSpace::StateType>(0);
+        ob::RealVectorStateSpace::StateType *sQ0_RN = qQ0->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
+
+        sQ0_SE2->setX( sQ1_SE2->getX());
+        sQ0_SE2->setY( sQ1_SE2->getY());
+        sQ0_SE2->setYaw( sQ1_SE2->getYaw());
+
+        for(uint k = 0; k < Q0_dimension-3; k++){
+          sQ0_RN->values[k] = sQ1_RN->values[k];
+        }
+        break;
+      }
     case SE3_R3:
       {
         const ob::SE3StateSpace::StateType *sQ1 = q->as<SE3StateSpace::StateType>();
@@ -650,9 +772,6 @@ void Quotient::ProjectQ0Subspace( const ob::State* q, ob::State* qQ0 ) const
     case SE3RN_R3:
       {
         const ob::SE3StateSpace::StateType *sQ1_SE3 = q->as<ob::CompoundState>()->as<SE3StateSpace::StateType>(0);
-        //const ob::SO3StateSpace::StateType *sQ1_SO3 = &sQ1_SE3->rotation();
-        //const ob::RealVectorStateSpace::StateType *sQ1_RN = q->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
-
         ob::RealVectorStateSpace::StateType *sQ0 = qQ0->as<RealVectorStateSpace::StateType>();
 
         sQ0->values[0] = sQ1_SE3->getX();
@@ -846,9 +965,19 @@ void Quotient::Print(std::ostream& out) const
           out << "R^3 | Q" << level+1 << ": SE(3) | X" << level+1 << ": SO(3)";
           break;
         }
+      case Quotient::SE2RN_SE2:
+        {
+          out << "SE(2) | Q" << level+1 << ": SE(2)xR^" << X1_dimension << " | X" << level+1 << ": R^" << X1_dimension;
+          break;
+        }
       case Quotient::SE3RN_SE3:
         {
           out << "SE(3) | Q" << level+1 << ": SE(3)xR^" << X1_dimension << " | X" << level+1 << ": R^" << X1_dimension;
+          break;
+        }
+      case Quotient::SE2RN_SE2RM:
+        {
+          out << "SE(2)xR^" << Q0_dimension-3 << " | Q" << level+1 << ": SE(2)xR^"<<Q1_dimension-3 << " | X" << level+1 << ": R^" << X1_dimension;
           break;
         }
       case Quotient::SE3RN_SE3RM:
