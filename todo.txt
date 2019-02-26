@@ -682,3 +682,5 @@ of pseudo metric?)
 
 [ ] REPLACE SO2 WITH SO2INTERPOLATE
 [ ] COMPUTE NBH OF BXTR
+
+[ ] On higher levels, the edges are not displayed

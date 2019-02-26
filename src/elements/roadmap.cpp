@@ -197,28 +197,30 @@ void Roadmap::DrawPlannerData(GUIState &state)
     glPushMatrix();
     glLineWidth(widthEdge);
     setColor(cEdge);
-    std::cout << "drawing " << pd->numEdges() << " EDGES" << std::endl;
     for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
       ob::PlannerDataVertex *v = &pd->getVertex(vidx);
-      Vector3 v1 = quotient_space->getXYZ(v->getState());
-      //PlannerDataVertexAnnotated *va = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+      Vector3 v1 = cspace->getXYZ(v->getState());
 
-      v1[2] += 0.1;
+      PlannerDataVertexAnnotated *va = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+      if(va!=nullptr) v1 = quotient_space->getXYZ(va->getQuotientState());
+
       std::vector<uint> edgeList;
       pd->getEdges(vidx, edgeList);
       for(uint j = 0; j < edgeList.size(); j++){
         ob::PlannerDataVertex *w = &pd->getVertex(edgeList.at(j));
-        //PlannerDataVertexAnnotated *wa = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
-        Vector3 v2 = quotient_space->getXYZ(w->getState());
-        // if(va!=nullptr && wa!=nullptr){
-        //   if(va->GetComponent()==0 || wa->GetComponent()==0){
-        //     setColor(cEdge);
-        //   }else if(va->GetComponent()==1 || wa->GetComponent()==1){
-        //     setColor(cVertexComponentGoal);
-        //   }else{
-        //     setColor(cVertexComponentOut);
-        //   }
-        // }
+        Vector3 v2 = cspace->getXYZ(w->getState());
+
+        PlannerDataVertexAnnotated *wa = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
+        if(wa!=nullptr) v2 = quotient_space->getXYZ(wa->getQuotientState());
+        if(va!=nullptr && wa!=nullptr){
+          if(va->GetComponent()==0 || wa->GetComponent()==0){
+            setColor(cEdge);
+          }else if(va->GetComponent()==1 || wa->GetComponent()==1){
+            setColor(cVertexComponentGoal);
+          }else{
+            setColor(cVertexComponentOut);
+          }
+        }
         drawLineSegment(v1,v2);
       }
     }
