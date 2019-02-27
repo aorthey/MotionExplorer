@@ -42,6 +42,8 @@ namespace ompl
           ~Configuration();
           double GetRadius() const;
           void SetRadius(double radius);
+          uint GetNumberOfNeighbors() const;
+
           void SetOuterRadius(double radius);
           void Remove(const base::SpaceInformationPtr &si);
           void Clear();
@@ -64,7 +66,6 @@ namespace ompl
 
           base::State *state{nullptr};
           base::State *riemannian_center_of_mass{nullptr}; //geometric mean constrained to neighborhood boundary
-          uint number_of_neighbors{0}; //counter for incremental computation of riemannian center of mass (RCoM)
 
           bool isSufficientFeasible{false};
 
@@ -74,6 +75,7 @@ namespace ompl
           normalized_index_type index{-1}; //in [0,num_vertices(graph)]
 
         private:
+          uint number_of_neighbors{0}; //counter for incremental computation of riemannian center of mass (RCoM)
           void *pdf_element;
           void *pdf_necessary_element;
           void *pdf_connectivity_element;

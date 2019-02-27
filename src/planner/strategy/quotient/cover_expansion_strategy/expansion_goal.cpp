@@ -11,10 +11,20 @@ CoverExpansionStrategyGoal::CoverExpansionStrategyGoal(og::QuotientCoverQueue* q
 }
 double CoverExpansionStrategyGoal::Step()
 {
-  Configuration* q_nearest = quotient_cover_queue->PriorityQueueNearestToGoal_Top();
-  if(q_nearest == nullptr) return -1;
-  q_nearest->number_attempted_expansions++;
-  bool progressMadeTowardsGoal = Towards(q_nearest, quotient_cover_queue->GetGoalConfiguration());
+  if(q_target == nullptr){
+    q_target = quotient_cover_queue->PriorityQueueNearestToGoal_Top();
+    if(q_target == nullptr) return -1;
+  }
+  quotient_cover_queue->Print(q_target, false);
+  q_target->number_attempted_expansions++;
+  bool progressMadeTowardsGoal = Towards(q_target, quotient_cover_queue->GetGoalConfiguration());
+  q_target = q_last_expanded;
   if(progressMadeTowardsGoal) return 1;
   else return -1;
+}
+
+void CoverExpansionStrategyGoal::Clear()
+{
+  BaseT::Clear();
+  q_target = nullptr;
 }

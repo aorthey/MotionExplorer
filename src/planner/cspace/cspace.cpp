@@ -173,11 +173,11 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
     z = qomplSE3->getZ();
 
   }else if(space_first_subspace->getType() == ob::STATE_SPACE_SE2){
-    const ob::SE2StateSpace::StateType *qomplSE2;
+    const ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2;
     if(space->getType()==ob::STATE_SPACE_SE2){
-      qomplSE2 = s->as<ob::SE2StateSpace::StateType>();
+      qomplSE2 = s->as<ob::SE2StateSpaceFullInterpolate::StateType>();
     }else{
-      qomplSE2 = s->as<ob::CompoundState>()->as<ob::SE2StateSpace::StateType>(0);
+      qomplSE2 = s->as<ob::CompoundState>()->as<ob::SE2StateSpaceFullInterpolate::StateType>(0);
     }
     x = qomplSE2->getX();
     y = qomplSE2->getY();

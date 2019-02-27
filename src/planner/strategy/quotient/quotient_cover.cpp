@@ -434,6 +434,8 @@ QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Con
 
   //Make sure that this stops at the boundary 
   GetMetric()->InterpolateQ1(q_inward_to_outward, q_center, step, q_inward_to_outward);
+  Print(q_center, false);
+  Print(q_inward_to_outward, false);
 
   if(ComputeNeighborhood(q_inward_to_outward)){
     return q_inward_to_outward;
@@ -453,8 +455,6 @@ void QuotientCover::AddEdge(Configuration *q_from, Configuration *q_to)
   q_from->UpdateRiemannianCenterOfMass(this, q_to);
   q_to->UpdateRiemannianCenterOfMass(this, q_from);
 
-  q_from->number_of_neighbors++;
-  q_to->number_of_neighbors++;
 }
 
 bool QuotientCover::EdgeExists(Configuration *q_from, Configuration *q_to)
@@ -1077,7 +1077,7 @@ void QuotientCover::Print(const Configuration *q, bool stopOnError) const
   std::cout << " | index: " << q->index;
   std::cout << " | radius: " << q->GetRadius();
   std::cout << " | distance goal: " << q->GetGoalDistance();
-  std::cout << " | neighbors : " << (q->number_of_neighbors) << std::endl;
+  std::cout << " | neighbors : " << q->GetNumberOfNeighbors() << std::endl;
   std::cout << (q->isGoal?" | GOAL STATE":"") << (q->isStart?" | START STATE":"") << std::endl;
   if(!stopOnError) return;
   if(q->index < 0)

@@ -60,7 +60,7 @@ void PathPiecewiseLinear::SendToController(SmartPointer<RobotController> control
   
   std::vector<oc::Control*> controls = cpath.getControls();
 
-  uint N = cspace->GetControlDimensionality();
+  uint N = quotient_space->GetControlDimensionality();
   for(uint k = 0; k < controls.size(); k++){
     const oc::RealVectorControlSpace::ControlType *Rctrl = controls.at(k)->as<oc::RealVectorControlSpace::ControlType>();
     stringstream qstr;
@@ -175,13 +175,13 @@ Config PathPiecewiseLinear::Eval(const double t) const{
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
   std::vector<ob::State *> states = gpath.getStates();
 
-  ob::SpaceInformationPtr si = cspace->SpaceInformationPtr();
+  ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
   if(t<=0){
-    return cspace->OMPLStateToConfig(states.front());
+    return quotient_space->OMPLStateToConfig(states.front());
   }
   if(t>=length){
-    return cspace->OMPLStateToConfig(states.back());
+    return quotient_space->OMPLStateToConfig(states.back());
   }
 
   double Tcum = 0;
@@ -197,7 +197,7 @@ Config PathPiecewiseLinear::Eval(const double t) const{
       ob::State* s2 = states.at(i+1);
       ob::State* sm = si->allocState();
       si->getStateSpace()->interpolate(s1,s2,tloc,sm);
-      Config q = cspace->OMPLStateToConfig(sm);
+      Config q = quotient_space->OMPLStateToConfig(sm);
       si->freeState(sm);
       return q;
     }
@@ -215,7 +215,7 @@ Config PathPiecewiseLinear::Eval(const double t) const{
   }
 
   if(t>=Tcum){
-    return cspace->OMPLStateToConfig(states.back());
+    return quotient_space->OMPLStateToConfig(states.back());
   }
 
   std::cout << "Eval could not find point for value " << t << std::endl;
@@ -223,19 +223,19 @@ Config PathPiecewiseLinear::Eval(const double t) const{
 
 }
 Config PathPiecewiseLinear::EvalVelocity(const double t) const{
-  if(!cspace->isDynamic()) 
+  if(!quotient_space->isDynamic()) 
   {
-    Config dq = cspace->GetRobotPtr()->dq;
+    Config dq = quotient_space->GetRobotPtr()->dq;
     dq.setZero();
     return dq;
   }
 
-  KinodynamicCSpaceOMPL *kspace = static_cast<KinodynamicCSpaceOMPL*>(cspace);
+  KinodynamicCSpaceOMPL *kspace = static_cast<KinodynamicCSpaceOMPL*>(quotient_space);
 
   oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
   std::vector<ob::State *> states = cpath.getStates();
 
-  ob::SpaceInformationPtr si = cspace->SpaceInformationPtr();
+  ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
   if(t<=0){
     return kspace->OMPLStateToVelocity(states.front());

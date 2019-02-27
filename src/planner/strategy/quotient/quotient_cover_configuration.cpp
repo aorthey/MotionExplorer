@@ -91,6 +91,10 @@ ob::State* QuotientCover::Configuration::GetInwardPointingConfiguration() const
 {
   return riemannian_center_of_mass;
 }
+uint QuotientCover::Configuration::GetNumberOfNeighbors() const
+{
+  return number_of_neighbors;
+}
 
 
 //The riemannian center of mass (RCoM) is the geometric mean of all neighbors
@@ -120,8 +124,12 @@ ob::State* QuotientCover::Configuration::GetInwardPointingConfiguration() const
 void QuotientCover::Configuration::UpdateRiemannianCenterOfMass(og::QuotientCover *quotient_cover, Configuration* q_new)
 {
   //Case1: There is only a single neighbor => RCoM = neighbor
+  double d = 0;
+  const ob::StateSpacePtr& Q1 = quotient_cover->GetQ1()->getStateSpace();
+
   if(number_of_neighbors == 0){
     riemannian_center_of_mass = quotient_cover->GetQ1()->cloneState(q_new->state); //clone=alloc+copy=colloc
+    d = Q1->distance(this->state, riemannian_center_of_mass);
   }else{
     //Case2: Multiple neighbors, update RCoM by moving along the
     //geodesic between RCoM and q_to. If the total distance between RCoM
@@ -130,11 +138,9 @@ void QuotientCover::Configuration::UpdateRiemannianCenterOfMass(og::QuotientCove
     //@TODO just walk through ambient space for now. Not sure how to get the
     //geodesic from here
 
-    const ob::StateSpacePtr& Q1 = quotient_cover->GetQ1()->getStateSpace();
 
     Q1->interpolate(riemannian_center_of_mass, q_new->state, (1.0/(number_of_neighbors+1)), riemannian_center_of_mass );
     //Project onto NBH
-    double d = 0;//Q1->distance(this->state, riemannian_center_of_mass);
     while((d = Q1->distance(this->state, riemannian_center_of_mass)) < 1e-5){
       //If RCoM lies close to center, this means that the old RCoM and the new
       //state lie opposite to each other on the neighborhood, they are
@@ -150,15 +156,13 @@ void QuotientCover::Configuration::UpdateRiemannianCenterOfMass(og::QuotientCove
       //q_new->state. It is not clear how we can do that in OMPL. Can we somehow
       //work around here?
 
-      //std::cout << "[WARNING]: Riemannian Center of Mass conincides with center" << std::endl;
+      std::cout << "[WARNING]: Riemannian Center of Mass conincides with center" << std::endl;
       quotient_cover->GetQ1SamplerPtr()->sampleUniformNear(riemannian_center_of_mass, this->state, this->GetRadius());
-
-      //Update distance
-      //d = Q1->distance(this->state, riemannian_center_of_mass);
     }
-    //Project RCoM onto boundary
-    Q1->interpolate( this->state, riemannian_center_of_mass, GetRadius()/d, riemannian_center_of_mass);
   }
+  Q1->interpolate( this->state, riemannian_center_of_mass, GetRadius()/d, riemannian_center_of_mass);
+
+  number_of_neighbors++;
 }
 
 namespace ompl{

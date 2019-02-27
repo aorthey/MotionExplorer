@@ -19,8 +19,8 @@ QCP::QCP(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, pare
   progressMadeTowardsGoal = true;
   SetMetric("shortestpath_simplified");
   //SetMetric("euclidean");
-  expansion_strategy_goal = std::make_shared<CoverExpansionStrategyCacheGoal>(this);
-  //expansion_strategy_goal = std::make_shared<CoverExpansionStrategyGoal>(this);
+  //expansion_strategy_goal = std::make_shared<CoverExpansionStrategyCacheGoal>(this);
+  expansion_strategy_goal = std::make_shared<CoverExpansionStrategyGoal>(this);
   expansion_strategy_outwards = std::make_shared<CoverExpansionStrategyOutwards>(this);
   expansion_strategy_random_voronoi = std::make_shared<CoverExpansionStrategyRandomVoronoi>(this);
   expansion_strategy_random_boundary = std::make_shared<CoverExpansionStrategyRandomBoundary>(this);
@@ -70,6 +70,7 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
     std::cout << "STEP TOWARDS GOAL" << std::endl;
     progressMadeTowardsGoal = (expansion_strategy_goal->Step() > 0);
     if(!progressMadeTowardsGoal){
+      std::cout << "NO PROGRESS" << std::endl;
       expansion_strategy_goal->Clear();
     }
   }else{
