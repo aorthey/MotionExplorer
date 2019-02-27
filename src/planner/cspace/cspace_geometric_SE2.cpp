@@ -1,6 +1,6 @@
 #include "planner/cspace/cspace_geometric_SE2.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
-#include <ompl/base/spaces/SE2StateSpace.h>
+#include "ompl/base/spaces/SE2StateSpaceFullInterpolate.h"
 
 GeometricCSpaceOMPLSE2::GeometricCSpaceOMPLSE2(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)
@@ -11,9 +11,9 @@ void GeometricCSpaceOMPLSE2::initSpace()
 {
   //std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: SE(2)" << std::endl;
 
-  ob::StateSpacePtr SE2 = (std::make_shared<ob::SE2StateSpace>());
+  ob::StateSpacePtr SE2 = (std::make_shared<ob::SE2StateSpaceFullInterpolate>());
   this->space = SE2;
-  ob::SE2StateSpace *cspace = this->space->as<ob::SE2StateSpace>();
+  ob::SE2StateSpaceFullInterpolate *cspace = this->space->as<ob::SE2StateSpaceFullInterpolate>();
 
   std::vector<double> minimum, maximum;
   minimum = robot->qMin;
@@ -36,7 +36,7 @@ void GeometricCSpaceOMPLSE2::initSpace()
 
 void GeometricCSpaceOMPLSE2::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
-  ob::SE2StateSpace::StateType *qomplSE2 = qompl->as<ob::SE2StateSpace::StateType>();
+  ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2 = qompl->as<ob::SE2StateSpaceFullInterpolate::StateType>();
 
   qomplSE2->setXY(q(0),q(1));
   qomplSE2->setYaw(q(3));
@@ -45,7 +45,7 @@ void GeometricCSpaceOMPLSE2::ConfigToOMPLState(const Config &q, ob::State *qompl
 
 Config GeometricCSpaceOMPLSE2::OMPLStateToConfig(const ob::State *qompl){
 
-  const ob::SE2StateSpace::StateType *qomplSE2 = qompl->as<ob::SE2StateSpace::StateType>();
+  const ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2 = qompl->as<ob::SE2StateSpaceFullInterpolate::StateType>();
 
   Config q;q.resize(robot->q.size());q.setZero();
   q(0)=qomplSE2->getX();
@@ -63,7 +63,7 @@ void GeometricCSpaceOMPLSE2::print() const
   std::cout << "Robot \"" << robot->name << "\":" << std::endl;
   std::cout << "Dimensionality Space            : " << 3 << std::endl;
 
-  ob::SE2StateSpace *cspace = this->space->as<ob::SE2StateSpace>();
+  ob::SE2StateSpaceFullInterpolate *cspace = this->space->as<ob::SE2StateSpaceFullInterpolate>();
 
   const ob::RealVectorBounds bounds = cspace->getBounds();
   std::vector<double> min = bounds.low;

@@ -2,10 +2,10 @@
 #include "planner/cspace/cspace.h"
 
 #include <ompl/base/goals/GoalSampleableRegion.h>
-#include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/SO3StateSpace.h>
-#include <ompl/base/spaces/SE2StateSpace.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
+#include "ompl/base/spaces/SE2StateSpaceFullInterpolate.h"
+#include "ompl/base/spaces/SO2StateSpaceFullInterpolate.h"
 
 using namespace ompl::geometric;
 using namespace ompl::base;
@@ -173,7 +173,7 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const
     case SE2_R2:
       {
         X1_dimension = 1;
-        X1 = std::make_shared<ob::SO2StateSpace>();
+        X1 = std::make_shared<ob::SO2StateSpaceFullInterpolate>();
         break;
       }
     case SE3_R3:
@@ -454,9 +454,9 @@ void Quotient::MergeStates(const ob::State *qQ0, const ob::State *qX1, ob::State
       }
     case SE2_R2:
       {
-        ob::SE2StateSpace::StateType *sQ1 = qQ1->as<SE2StateSpace::StateType>();
+        ob::SE2StateSpaceFullInterpolate::StateType *sQ1 = qQ1->as<SE2StateSpaceFullInterpolate::StateType>();
         const ob::RealVectorStateSpace::StateType *sQ0 = qQ0->as<RealVectorStateSpace::StateType>();
-        const ob::SO2StateSpace::StateType *sX1 = qX1->as<SO2StateSpace::StateType>();
+        const ob::SO2StateSpaceFullInterpolate::StateType *sX1 = qX1->as<SO2StateSpaceFullInterpolate::StateType>();
 
         sQ1->setXY( sQ0->values[0], sQ0->values[1] );
         sQ1->setYaw( sX1->value );
@@ -504,10 +504,10 @@ void Quotient::MergeStates(const ob::State *qQ0, const ob::State *qX1, ob::State
       }
     case SE2RN_SE2:
       {
-        ob::SE2StateSpace::StateType *sQ1_SE2 = qQ1->as<ob::CompoundState>()->as<SE2StateSpace::StateType>(0);
+        ob::SE2StateSpaceFullInterpolate::StateType *sQ1_SE2 = qQ1->as<ob::CompoundState>()->as<SE2StateSpaceFullInterpolate::StateType>(0);
         ob::RealVectorStateSpace::StateType *sQ1_RN = qQ1->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
 
-        const ob::SE2StateSpace::StateType *sQ0 = qQ0->as<SE2StateSpace::StateType>();
+        const ob::SE2StateSpaceFullInterpolate::StateType *sQ0 = qQ0->as<SE2StateSpaceFullInterpolate::StateType>();
         const ob::RealVectorStateSpace::StateType *sX1 = qX1->as<RealVectorStateSpace::StateType>();
 
         sQ1_SE2->setX( sQ0->getX());
@@ -520,10 +520,10 @@ void Quotient::MergeStates(const ob::State *qQ0, const ob::State *qX1, ob::State
         break;
       }
     case SE2RN_SE2RM:{
-        ob::SE2StateSpace::StateType *sQ1_SE2 = qQ1->as<ob::CompoundState>()->as<SE2StateSpace::StateType>(0);
+        ob::SE2StateSpaceFullInterpolate::StateType *sQ1_SE2 = qQ1->as<ob::CompoundState>()->as<SE2StateSpaceFullInterpolate::StateType>(0);
         ob::RealVectorStateSpace::StateType *sQ1_RN = qQ1->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
 
-        const ob::SE2StateSpace::StateType *sQ0_SE2 = qQ0->as<ob::CompoundState>()->as<SE2StateSpace::StateType>(0);
+        const ob::SE2StateSpaceFullInterpolate::StateType *sQ0_SE2 = qQ0->as<ob::CompoundState>()->as<SE2StateSpaceFullInterpolate::StateType>(0);
         const ob::RealVectorStateSpace::StateType *sQ0_RM = qQ0->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
 
         const ob::RealVectorStateSpace::StateType *sX1 = qX1->as<RealVectorStateSpace::StateType>();
@@ -621,8 +621,8 @@ void Quotient::ProjectX1Subspace( const ob::State* q, ob::State* qX1 ) const
       }
     case SE2_R2:
       {
-        const ob::SE2StateSpace::StateType *sQ1 = q->as<SE2StateSpace::StateType>();
-        ob::SO2StateSpace::StateType *sX1 = qX1->as<SO2StateSpace::StateType>();
+        const ob::SE2StateSpaceFullInterpolate::StateType *sQ1 = q->as<SE2StateSpaceFullInterpolate::StateType>();
+        ob::SO2StateSpaceFullInterpolate::StateType *sX1 = qX1->as<SO2StateSpaceFullInterpolate::StateType>();
         sX1->value = sQ1->getYaw();
         break;
       }
@@ -724,7 +724,7 @@ void Quotient::ProjectQ0Subspace( const ob::State* q, ob::State* qQ0 ) const
       }
     case SE2_R2:
       {
-        const ob::SE2StateSpace::StateType *sQ1 = q->as<SE2StateSpace::StateType>();
+        const ob::SE2StateSpaceFullInterpolate::StateType *sQ1 = q->as<SE2StateSpaceFullInterpolate::StateType>();
         ob::RealVectorStateSpace::StateType *sQ0 = qQ0->as<RealVectorStateSpace::StateType>();
         sQ0->values[0] = sQ1->getX();
         sQ0->values[1] = sQ1->getY();
@@ -732,8 +732,8 @@ void Quotient::ProjectQ0Subspace( const ob::State* q, ob::State* qQ0 ) const
       }
     case SE2RN_SE2:
       {
-        const ob::SE2StateSpace::StateType *sQ1_SE2 = q->as<ob::CompoundState>()->as<SE2StateSpace::StateType>(0);
-        ob::SE2StateSpace::StateType *sQ0_SE2 = qQ0->as<SE2StateSpace::StateType>();
+        const ob::SE2StateSpaceFullInterpolate::StateType *sQ1_SE2 = q->as<ob::CompoundState>()->as<SE2StateSpaceFullInterpolate::StateType>(0);
+        ob::SE2StateSpaceFullInterpolate::StateType *sQ0_SE2 = qQ0->as<SE2StateSpaceFullInterpolate::StateType>();
 
         sQ0_SE2->setX( sQ1_SE2->getX());
         sQ0_SE2->setY( sQ1_SE2->getY());
@@ -743,10 +743,10 @@ void Quotient::ProjectQ0Subspace( const ob::State* q, ob::State* qQ0 ) const
       }
     case SE2RN_SE2RM:
       {
-        const ob::SE2StateSpace::StateType *sQ1_SE2 = q->as<ob::CompoundState>()->as<SE2StateSpace::StateType>(0);
+        const ob::SE2StateSpaceFullInterpolate::StateType *sQ1_SE2 = q->as<ob::CompoundState>()->as<SE2StateSpaceFullInterpolate::StateType>(0);
         const ob::RealVectorStateSpace::StateType *sQ1_RN = q->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
 
-        ob::SE2StateSpace::StateType *sQ0_SE2 = qQ0->as<ob::CompoundState>()->as<SE2StateSpace::StateType>(0);
+        ob::SE2StateSpaceFullInterpolate::StateType *sQ0_SE2 = qQ0->as<ob::CompoundState>()->as<SE2StateSpaceFullInterpolate::StateType>(0);
         ob::RealVectorStateSpace::StateType *sQ0_RN = qQ0->as<ob::CompoundState>()->as<RealVectorStateSpace::StateType>(1);
 
         sQ0_SE2->setX( sQ1_SE2->getX());

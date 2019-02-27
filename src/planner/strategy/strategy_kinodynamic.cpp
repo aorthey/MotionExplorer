@@ -113,7 +113,8 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
   }
 
   ob::StateSpacePtr spacek = si_vec.back()->getStateSpace();
-  spacek->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(spacek)));
+  //spacek->registerDefaultProjections();
+  //spacek->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(spacek)));
 
   max_planning_time = input.max_planning_time;
 
