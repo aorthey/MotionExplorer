@@ -44,6 +44,7 @@ class PathPiecewiseLinear
 
     void DrawGL(GUIState& state);
     void DrawGL(GUIState& state, double t);
+    bool draw_planar{false};
 
     bool Load(const char *fn);
     bool Load(TiXmlElement* node);

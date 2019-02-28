@@ -48,6 +48,7 @@ class Roadmap{
 
     uint numEdges();
     uint numVertices();
+    Vector3 GetXYZFromState(ob::State *s);
 
   private:
 
@@ -61,5 +62,6 @@ class Roadmap{
     PathPiecewiseLinear *path_ompl{nullptr};
 
     std::vector<Vector3> shortest_path;
+    bool draw_planar{false};
 };
 typedef std::shared_ptr<Roadmap> RoadmapPtr;

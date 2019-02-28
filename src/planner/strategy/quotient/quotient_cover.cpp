@@ -434,8 +434,6 @@ QuotientCover::Configuration* QuotientCover::GetOutwardPointingConfiguration(Con
 
   //Make sure that this stops at the boundary 
   GetMetric()->InterpolateQ1(q_inward_to_outward, q_center, step, q_inward_to_outward);
-  Print(q_center, false);
-  Print(q_inward_to_outward, false);
 
   if(ComputeNeighborhood(q_inward_to_outward)){
     return q_inward_to_outward;
@@ -799,20 +797,6 @@ void QuotientCover::RewireConfiguration(Configuration *q)
     AddEdge(q, qn);
   }
 }
-
-// void QuotientCover::CheckConfigurationIsOnBoundary(Configuration *q_boundary, Configuration *q)
-// {
-//   double d_outcome = GetMetric()->DistanceConfigurationConfiguration(q_boundary, q);
-//   if(fabs(d_outcome - q->GetRadius())>1e-10)
-//   {
-//     std::cout << "Point not on boundary!" << std::endl;
-//     QuotientCover::Print(q, false);
-//     QuotientCover::Print(q_boundary, false);
-//     std::cout << "radius neighborhood: " << q->GetRadius() << std::endl;
-//     std::cout << "dist to point: " << d_outcome << std::endl;
-//     exit(1);
-//   }
-// }
 
 QuotientCover::Configuration* QuotientCover::NearestNeighborhood(const Configuration *q) const
 {

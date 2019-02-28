@@ -15,7 +15,6 @@ double CoverExpansionStrategyGoal::Step()
     q_target = quotient_cover_queue->PriorityQueueNearestToGoal_Top();
     if(q_target == nullptr) return -1;
   }
-  quotient_cover_queue->Print(q_target, false);
   q_target->number_attempted_expansions++;
   bool progressMadeTowardsGoal = Towards(q_target, quotient_cover_queue->GetGoalConfiguration());
   q_target = q_last_expanded;

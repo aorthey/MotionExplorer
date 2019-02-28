@@ -62,6 +62,7 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
       }
       gpath->append(s);
       Vector3 q = quotient_space->getXYZ(s);
+      if(draw_planar) q[2] = 0.0;
       shortest_path.push_back(q);
     }
     if(pred.size()>0){
@@ -122,12 +123,14 @@ void Roadmap::DrawPlannerData(GUIState &state)
 
     ob::PlannerDataVertex *vd = &pd->getVertex(vidx);
     Vector3 q = cspace->getXYZ(vd->getState());
+    if(draw_planar) q[2] = 0.0;
 
     PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
 
     if(v!=nullptr)
     {
       q = quotient_space->getXYZ(v->getQuotientState());
+      if(draw_planar) q[2] = 0.0;
       if(v->GetComponent()==0){
         setColor(cVertex);
       }else if(v->GetComponent()==1){
@@ -172,9 +175,9 @@ void Roadmap::DrawPlannerData(GUIState &state)
           setColor(cNeighborhoodVolume);
         }
 
-        ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
+        //Drawing Neighborhood
 
-        if(quotient_space->GetDimensionality()<=2 || si->getStateSpace()->getType()==ob::STATE_SPACE_SE2){
+        if(draw_planar){
           Vector3 q2(0,0,1);
           (wiredNeighborhood?drawWireCircle(q2, d):drawCircle(q2,d));
         }else{
@@ -200,18 +203,22 @@ void Roadmap::DrawPlannerData(GUIState &state)
     for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
       ob::PlannerDataVertex *v = &pd->getVertex(vidx);
       Vector3 v1 = cspace->getXYZ(v->getState());
+      if(draw_planar) v1[2] = 0.0;
 
       PlannerDataVertexAnnotated *va = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
       if(va!=nullptr) v1 = quotient_space->getXYZ(va->getQuotientState());
+      if(draw_planar) v1[2] = 0.0;
 
       std::vector<uint> edgeList;
       pd->getEdges(vidx, edgeList);
       for(uint j = 0; j < edgeList.size(); j++){
         ob::PlannerDataVertex *w = &pd->getVertex(edgeList.at(j));
         Vector3 v2 = cspace->getXYZ(w->getState());
+        if(draw_planar) v2[2] = 0.0;
 
         PlannerDataVertexAnnotated *wa = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
         if(wa!=nullptr) v2 = quotient_space->getXYZ(wa->getQuotientState());
+        if(draw_planar) v2[2] = 0.0;
         if(va!=nullptr && wa!=nullptr){
           if(va->GetComponent()==0 || wa->GetComponent()==0){
             setColor(cEdge);
@@ -245,6 +252,7 @@ void Roadmap::DrawPlannerData(GUIState &state)
         for(uint k = 0; k < K; k++){
           ob::PlannerDataVertex *vk = &pd->getVertex(svertices.at(k));
           Vector3 p = quotient_space->getXYZ(vk->getState());
+          if(draw_planar) p[2] = 0.0;
           pvec.push_back(p);
         }
         switch (pvec.size()) {
@@ -285,6 +293,13 @@ void Roadmap::DrawPlannerData(GUIState &state)
 
 void Roadmap::DrawGL(GUIState& state)
 {
+  if(quotient_space != nullptr)
+  {
+    int type = quotient_space->SpaceInformationPtr()->getStateSpace()->getType();
+    draw_planar = (quotient_space->GetDimensionality()<=2);
+    draw_planar = draw_planar || ((type==ob::STATE_SPACE_SE2) && !state("planner_draw_spatial_representation_of_SE2"));
+  }
+
   if(pd!=nullptr) DrawPlannerData(state);
   if(state("draw_roadmap_shortest_path")){
     DrawShortestPath(state);

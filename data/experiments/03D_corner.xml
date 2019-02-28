@@ -11,13 +11,13 @@
   <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
   <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="-2.8 0 0" rotateRPY="0 0 0.78"/>
 -->
-  <!-- <rigidObject name="O1" file="../terrains/2droom/2droom_corner.tri" translation="0 0 0" rotateRPY="0 0 1.57"/> -->
-  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="-2.8 0 0" rotateRPY="0 0 1.57"/>
+  <rigidObject name="O1" file="../terrains/2droom/2droom_corner.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
+  <!-- <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="-2.8 0 0" rotateRPY="0 0 1.57"/> -->
 
   <plannerinput>
 
-    <qinit  config="8  +1.0 +3.0 +0.0 -1.47 +0 +0.0 +0.0 0.0"/>
-    <qgoal  config="8  -1.0 -2.0 +0.0 -1.8 +0 +0.0 +0.0 0.0"/>
+    <qinit  config="8  +2.0 +3.0 +0.0 -1.47 +0 +0.0 +0.0 0.0"/>
+    <qgoal  config="8  -2.0 -2.0 +0.0 -1.8 +0 +0.0 +0.0 0.0"/>
     <se3min config="6  -4.0 -4.0 -1.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +4.0 +4.0 +1.0 +3.141593 +1.57 +3.141593"/>
     <freeFloating>1</freeFloating>

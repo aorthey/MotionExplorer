@@ -181,8 +181,8 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
     }
     x = qomplSE2->getX();
     y = qomplSE2->getY();
-    z = 0.0;//qomplSE2->getYaw();
-    if(z<0) z+= M_PI;
+    z = qomplSE2->getYaw();
+    //if(z<0) z+= M_PI;
 
   }else if(space_first_subspace->getType() == ob::STATE_SPACE_REAL_VECTOR){
     //fixed base robot: visualize last link
@@ -199,14 +199,6 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
     //attached using a joint to the whole linkage. Check where your last fixed
     //joint is positioned, before questioning the validity of this method
     robot->GetWorldPosition(zero, lastLink, qq);
-
-    ////Get LastLink Geometry! plus axis of revolution
-    // std::cout << q << "-->" << qq << "," << robot->name << " links " << robot->links.size() << std::endl;
-    // for(uint k = 0; k < robot->links.size(); k++){
-    //   std::cout << std::string(80, '-') << std::endl;
-    //   std::cout << robot->links[k].T_World << std::endl;
-    //   std::cout << robot->LinkName(k) << std::endl;
-    // }
 
     x = qq[0];
     y = qq[1];

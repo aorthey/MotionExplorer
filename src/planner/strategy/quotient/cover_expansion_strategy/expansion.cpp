@@ -38,10 +38,6 @@ bool CoverExpansionStrategy::TowardsStraightLine(QuotientCover::Configuration *q
 bool CoverExpansionStrategy::TowardsBoundaryPoint(QuotientCover::Configuration *q_from, QuotientCover::Configuration *q_boundary_point)
 {
   //ompl::time::point t1 = ompl::time::now();
-
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "TOWARDS PROJECTED POINT" << std::endl;
-
   Configuration* q_outward = quotient_cover_queue->GetOutwardPointingConfiguration(q_from);
 
   //ompl::time::point t2 = ompl::time::now();
@@ -49,8 +45,8 @@ bool CoverExpansionStrategy::TowardsBoundaryPoint(QuotientCover::Configuration *
   double r_outward = 0;
   if(q_boundary_point != nullptr) r_boundary = q_boundary_point->GetRadius();
   if(q_outward != nullptr) r_outward = q_outward->GetRadius();
-  std::cout << "r_outward = " << r_outward << std::endl;
-  std::cout << "r_projected = " << r_boundary << std::endl;
+  // std::cout << "r_outward = " << r_outward << std::endl;
+  // std::cout << "r_projected = " << r_boundary << std::endl;
 
   bool progress = false;
   if(r_boundary <= 0 && r_outward <= 0){

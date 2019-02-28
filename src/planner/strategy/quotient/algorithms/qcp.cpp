@@ -66,11 +66,9 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
 {
   if(NearestToGoalHasChanged() || progressMadeTowardsGoal)
   {
-    //std::cout << std::string(80, '%') << std::endl;
     std::cout << "STEP TOWARDS GOAL" << std::endl;
     progressMadeTowardsGoal = (expansion_strategy_goal->Step() > 0);
     if(!progressMadeTowardsGoal){
-      std::cout << "NO PROGRESS" << std::endl;
       expansion_strategy_goal->Clear();
     }
   }else{

@@ -45,7 +45,6 @@ void QuotientMetricShortestPath::Interpolate(const Configuration *q_from, const 
 }
 std::vector<const QuotientCover::Configuration*> QuotientMetricShortestPath::GetInterpolationPath(const Configuration *q_from, const Configuration *q_to)
 {
-  std::cout << "Interpolate Shortest Path" << std::endl;
   std::vector<const Configuration*> path_Q1;
 
   og::QuotientCover *parent_chart = dynamic_cast<og::QuotientCover*>(quotient_cover->GetParent());
@@ -192,17 +191,16 @@ uint QuotientMetricShortestPath::InterpolateAlongPath(const Configuration *q_fro
   //}
 
   if(fabs(dfp-q_from->GetRadius()) > 1e-10){
-    std::cout << "needs adjust" << std::endl;
     //Project onto NBH
     double step_size = q_from->GetRadius()/dfp;
     InterpolateQ1(q_from, q_interp, step_size, q_interp);
-    if(fabs(DistanceQ1(q_from, q_interp)-q_from->GetRadius()) > 1e-10){
+    if(fabs(DistanceQ1(q_from, q_interp)-q_from->GetRadius()) > 1e-5){
       std::cout << "Interpolated outside cover" << std::endl;
       quotient_cover->QuotientCover::Print(q_from, false);
       quotient_cover->QuotientCover::Print(q_interp, false);
-      std::cout << "desired step size: " << step_size << std::endl;
-      std::cout << "actual step size : " << dfp << std::endl;
-      std::cout << "radius NBH       : " << q_from->GetRadius() << std::endl;
+      std::cout << "radius NBH           : " << q_from->GetRadius() << std::endl;
+      std::cout << "dist q_from-q_interp : " << DistanceQ1(q_from, q_interp) << std::endl;
+      std::cout << "actual difference    : " << fabs(DistanceQ1(q_from, q_interp)-q_from->GetRadius()) << std::endl;
       std::cout << "path size: " << path.size() << std::endl;
       std::cout << "ctr size: " << ctr << std::endl;
       std::cout << "dist q_from-q_last   : " << DistanceQ1(q_from, q_last) << std::endl;

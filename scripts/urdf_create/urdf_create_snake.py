@@ -61,7 +61,8 @@ def CreateRobotNsegments(robot_name, Nsegments):
 robot_name = 'snake/snake'
 for i in range(0,Nsegments):
   CreateRobotNsegments(robot_name+"_"+str(i)+"_segments", i+1)
+  if i>0:
+    CreateSphereRobot(robot_name + "_"+str(i)+"_segments_sphere_outer", i*length+i*2*sRadius+headradius)
 
 CreateSphereRobot(robot_name + "_0_segments_sphere_inner", headradius)
 CreateSphereRobot(robot_name + "_0_segments_sphere_outer", np.sqrt(2)*headradius)
-CreateSphereRobot(robot_name + "_"+str(Nsegments-1)+"_segments_sphere_outer", (Nsegments-1)*length+(Nsegments-1)*2*sRadius+headradius)

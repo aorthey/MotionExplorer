@@ -367,6 +367,13 @@ void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
 
 void PathPiecewiseLinear::DrawGL(GUIState& state)
 {
+  if(quotient_space != nullptr)
+  {
+    draw_planar = (quotient_space->GetDimensionality()<=2);
+    int type = quotient_space->SpaceInformationPtr()->getStateSpace()->getType();
+    draw_planar = draw_planar || ((type==ob::STATE_SPACE_SE2) && !state("planner_draw_spatial_representation_of_SE2"));
+  }
+
   if(state("draw_path")){
     //if(path==nullptr) return;
     cLine = cSmoothed;
