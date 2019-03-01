@@ -918,10 +918,6 @@ bool Quotient::Sample(ob::State *q_random)
     return Q1->isValid(q_random);
   }
 }
-bool Quotient::SampleQuotient(ob::State *state)
-{
-  return Q1_valid_sampler->sample(state);
-}
 
 double Quotient::GetImportance() const
 {

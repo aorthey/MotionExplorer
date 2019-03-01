@@ -65,9 +65,7 @@ def CreateRobotNsegments(robot_name, Nsegments):
 
 robot_name = 'snake/snake_planar'
 for i in range(0,Nsegments):
-  CreateRobotNsegments(robot_name+"_"+str(i)+"_segments", i+1)
-
-CreateCylinderRobot(robot_name + "_disk_inner", head_radius, thickness_Z, 1.57)
-# CreateSphereRobot(robot_name + "_0_segments_sphere_inner", headradius)
-# CreateSphereRobot(robot_name + "_0_segments_sphere_outer", np.sqrt(2)*headradius)
-# CreateSphereRobot(robot_name + "_"+str(Nsegments-1)+"_segments_sphere_outer", (Nsegments-1)*length+(Nsegments-1)*2*sRadius+headradius)
+  ri_name = robot_name+"_"+str(i)+"_segments"
+  CreateRobotNsegments(ri_name, i+1)
+  rmax = head_radius + i*(2*segment_joint_radius+segment_length)
+  CreateCylinderRobot(ri_name + "_disk_inner", rmax, thickness_Z, 1.57)

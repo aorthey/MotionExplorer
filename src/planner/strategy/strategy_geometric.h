@@ -32,5 +32,9 @@ class StrategyGeometricMultiLevel: public Strategy{
     ob::PlannerPtr GetSharedMultiQuotientPtr( 
         std::vector<ob::SpaceInformationPtr> si_vec, 
         std::vector<ob::ProblemDefinitionPtr> pdef_vec);
+    template<class T_Algorithm, class T_Algorithm_Two>
+    ob::PlannerPtr GetSharedMultiQuotientPtr( 
+        std::vector<ob::SpaceInformationPtr> si_vec, 
+        std::vector<ob::ProblemDefinitionPtr> pdef_vec);
 };
 

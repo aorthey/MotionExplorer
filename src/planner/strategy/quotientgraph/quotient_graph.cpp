@@ -19,6 +19,7 @@
 
 #define foreach BOOST_FOREACH
 using namespace og;
+typedef QuotientGraph::Configuration Configuration;
 
 namespace ompl
 {
@@ -47,16 +48,16 @@ QuotientGraph::QuotientGraph(const ob::SpaceInformationPtr &si, Quotient *parent
 }
 
 void QuotientGraph::setup(){
-  if (!nn_){
-    nn_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Vertex>(this));
-    nn_->setDistanceFunction([this](const Vertex a, const Vertex b)
+  if (!nearest_datastructure){
+    nearest_datastructure.reset(tools::SelfConfig::getDefaultNearestNeighbors<const Configuration*>(this));
+    nearest_datastructure->setDistanceFunction([this](const Configuration *a, const Configuration *b)
                              {
                                return Distance(a, b);
                              });
   }
-  if (!connectionStrategy_){
-    connectionStrategy_ = KStrategy<Vertex>(magic::DEFAULT_NEAREST_NEIGHBORS, nn_);
-  }
+  // if (!connectionStrategy_){
+  //   connectionStrategy_ = KStrategy<const Configuration*>(magic::DEFAULT_NEAREST_NEIGHBORS, nearest_datastructure);
+  // }
 
   if (pdef_){
     BaseT::setup();
@@ -76,15 +77,21 @@ void QuotientGraph::setup(){
 QuotientGraph::~QuotientGraph(){
   si_->freeStates(xstates);
   G.clear();
-  if (nn_){
-    nn_->clear();
+  if (nearest_datastructure){
+    nearest_datastructure->clear();
   }
 }
+QuotientGraph::Configuration::Configuration(const base::SpaceInformationPtr &si): 
+  state(si->allocState())
+{}
+QuotientGraph::Configuration::Configuration(const base::SpaceInformationPtr &si, const ob::State *state_): 
+  state(si->cloneState(state_))
+{}
 
 void QuotientGraph::ClearVertices()
 {
   foreach (Vertex v, boost::vertices(G)){
-    si_->freeState(G[v].state);
+    si_->freeState(G[v]->state);
   }
 }
 void QuotientGraph::clear()
@@ -93,8 +100,8 @@ void QuotientGraph::clear()
 
   ClearVertices();
   G.clear();
-  if(nn_){
-    nn_->clear();
+  if(nearest_datastructure){
+    nearest_datastructure->clear();
   }
   clearQuery();
   iterations_ = 0;
@@ -108,8 +115,6 @@ void QuotientGraph::clear()
 
 void QuotientGraph::clearQuery()
 {
-  startM_.clear();
-  goalM_.clear();
   pis_.restart();
 }
 
@@ -133,38 +138,29 @@ void QuotientGraph::Init()
 
   if(const ob::State *st = pis_.nextStart()){
     if (st != nullptr){
-      startM_.push_back(addMilestone(si_->cloneState(st)));
-      G[startM_.back()].start = true;
+      q_start = new Configuration(Q1, st);
+      q_start->isStart = true;
+      v_start = AddConfiguration(q_start);
     }
   }
-  if (startM_.empty()){
+  if (q_start == nullptr){
     OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
     exit(0);
   }
 
   if(const ob::State *st = pis_.nextGoal()){
     if (st != nullptr){
-      goalM_.push_back(addMilestone(si_->cloneState(st)));
-      G[goalM_.back()].goal = true;
+      q_goal = new Configuration(Q1, st);
+      q_goal->isGoal = true;
+      //v_goal = AddConfiguration(q_goal);
     }
   }
-  if (goalM_.empty()){
+  if (q_goal == nullptr){
     OMPL_ERROR("%s: There are no valid goal states!", getName().c_str());
     exit(0);
   }
   //unsigned long int nrStartStates = boost::num_vertices(G);
   //OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nrStartStates);
-}
-
-void QuotientGraph::Grow(double t){
-  if(firstRun){
-    Init();
-    firstRun = false;
-  }
-  double T_grow = (2.0/3.0)*t;
-  growRoadmap(ob::timedPlannerTerminationCondition(T_grow), xstates[0]);
-  double T_expand = (1.0/3.0)*t;
-  expandRoadmap( ob::timedPlannerTerminationCondition(T_expand), xstates);
 }
 
 void QuotientGraph::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState)
@@ -182,7 +178,10 @@ void QuotientGraph::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::
         attempts++;
       } while (attempts < magic::FIND_VALID_STATE_ATTEMPTS_WITHOUT_TERMINATION_CHECK && !found);
     }
-    if (found) addMilestone(si_->cloneState(workState));
+    if (found){
+      Configuration *q_new = new Configuration(Q1, workState);
+      AddConfiguration(q_new);//si_->cloneState(workState));
+    }
   }
 }
 
@@ -198,9 +197,9 @@ void QuotientGraph::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
 
   foreach (Vertex v, boost::vertices(G))
   {
-    const unsigned long int t = G[v].total_connection_attempts;
+    const unsigned long int t = G[v]->total_connection_attempts;
     if(t!=0){
-      double d = ((double)(t - G[v].successful_connection_attempts) / (double)t);
+      double d = ((double)(t - G[v]->successful_connection_attempts) / (double)t);
       pdf.add(v, d);
     }
   }
@@ -226,28 +225,45 @@ bool QuotientGraph::sameComponent(Vertex m1, Vertex m2)
   return boost::same_component(m1, m2, disjointSets_);
 }
 
-QuotientGraph::Vertex QuotientGraph::addMilestone(ob::State *state)
+const QuotientGraph::Configuration* QuotientGraph::Nearest(const Configuration* q) const
 {
-  Vertex m = CreateNewVertex(state);
-  ConnectVertexToNeighbors(m);
+  return nearest_datastructure->nearest(const_cast<Configuration*>(q));
+}
+
+QuotientGraph::Vertex QuotientGraph::AddConfiguration(Configuration *q)
+{
+  Vertex m = boost::add_vertex(q, G);
+  G[m]->total_connection_attempts = 1;
+  G[m]->successful_connection_attempts = 0;
+  disjointSets_.make_set(m);
+  //ConnectVertexToNeighbors(m);
+  nearest_datastructure->add(q);
+  q->index = m;
   return m;
+
+}
+uint QuotientGraph::GetNumberOfVertices() const{
+  return num_vertices(G);
+}
+uint QuotientGraph::GetNumberOfEdges() const{
+  return num_edges(G);
 }
 
-void QuotientGraph::ConnectVertexToNeighbors(Vertex m)
-{
-  const std::vector<Vertex> &neighbors = connectionStrategy_(m);
+// void QuotientGraph::ConnectVertexToNeighbors(Vertex m)
+// {
+//   const std::vector<Configuration*> &neighbors = connectionStrategy_(m);
 
-  foreach (Vertex n, neighbors)
-  {
-    G[m].total_connection_attempts++;
-    G[n].total_connection_attempts++;
-    if(Connect(m,n)){
-      G[m].successful_connection_attempts++;
-      G[n].successful_connection_attempts++;
-    }
-  }
-  nn_->add(m);
-}
+//   foreach (Vertex n, neighbors)
+//   {
+//     G[m]->total_connection_attempts++;
+//     G[n]->total_connection_attempts++;
+//     if(Connect(m,n)){
+//       G[m]->successful_connection_attempts++;
+//       G[n]->successful_connection_attempts++;
+//     }
+//   }
+//   nearest_datastructure->add(m);
+// }
 
 const og::QuotientGraph::Graph& QuotientGraph::GetGraph() const
 {
@@ -255,70 +271,56 @@ const og::QuotientGraph::Graph& QuotientGraph::GetGraph() const
 }
 const og::QuotientGraph::RoadmapNeighborsPtr& QuotientGraph::GetRoadmapNeighborsPtr() const
 {
-  return nn_;
+  return nearest_datastructure;
 }
-const og::QuotientGraph::ConnectionStrategy& QuotientGraph::GetConnectionStrategy() const
-{
-  return connectionStrategy_;
-}
-
-QuotientGraph::Vertex QuotientGraph::CreateNewVertex(ob::State *state)
-{
-  Vertex m = boost::add_vertex(G);
-  G[m].state = si_->cloneState(state);
-  G[m].total_connection_attempts = 1;
-  G[m].successful_connection_attempts = 0;
-  disjointSets_.make_set(m);
-  return m;
-}
-
+// const og::QuotientGraph::ConnectionStrategy& QuotientGraph::GetConnectionStrategy() const
+// {
+//   return connectionStrategy_;
+// }
 
 ob::Cost QuotientGraph::costHeuristic(Vertex u, Vertex v) const
 {
-  return opt_->motionCostHeuristic(G[u].state, G[v].state);
+  return opt_->motionCostHeuristic(G[u]->state, G[v]->state);
 }
 
-uint QuotientGraph::GetNumberOfVertices() const{
-  return num_vertices(G);
-}
-
-uint QuotientGraph::GetNumberOfEdges() const{
-  return num_edges(G);
-}
 
 template <template <typename T> class NN>
 void QuotientGraph::setNearestNeighbors()
 {
-  if (nn_ && nn_->size() == 0)
+  if (nearest_datastructure && nearest_datastructure->size() == 0)
       OMPL_WARN("Calling setNearestNeighbors will clear all states.");
   clear();
-  nn_ = std::make_shared<NN<Vertex>>();
-  connectionStrategy_ = ConnectionStrategy();
+  nearest_datastructure = std::make_shared<NN<ob::State*>>();
+  //connectionStrategy_ = ConnectionStrategy();
   if(!isSetup()){
     setup();
   }
 }
 
-double QuotientGraph::Distance(const Vertex a, const Vertex b) const
+double QuotientGraph::Distance(const Configuration* a, const Configuration* b) const
 {
-  return si_->distance(G[a].state, G[b].state);
+  return si_->distance(a->state, b->state);
 }
 
 bool QuotientGraph::Connect(const Vertex a, const Vertex b){
-  if (si_->checkMotion(G[a].state, G[b].state))
+  if (si_->checkMotion(G[a]->state, G[b]->state))
   {
-    ob::Cost weight = opt_->motionCost(G[a].state, G[b].state);
-    EdgeInternalState properties(weight);
-    boost::add_edge(a, b, properties, G);
-    uniteComponents(a, b);
+    AddEdge(a, b);
     return true;
   }
   return false;
 }
+void QuotientGraph::AddEdge(const Vertex a, const Vertex b)
+{
+  ob::Cost weight = opt_->motionCost(G[a]->state, G[b]->state);
+  EdgeInternalState properties(weight);
+  boost::add_edge(a, b, properties, G);
+  uniteComponents(a, b);
+}
 
 void QuotientGraph::RandomWalk(const Vertex &v)
 {
-  const ob::State *s_prev = G[v].state;
+  const ob::State *s_prev = G[v]->state;
 
   Vertex v_prev = v;
 
@@ -342,15 +344,16 @@ void QuotientGraph::RandomWalk(const Vertex &v)
     //roadmap, connect it to the s_prev state
     if(lastValid.second > std::numeric_limits<double>::epsilon())
     {
-      Vertex v_next = CreateNewVertex(lastValid.first);
+      Configuration *q_last_valid = new Configuration(Q1, lastValid.first);
+      Vertex v_next = AddConfiguration(q_last_valid);
 
-      EdgeInternalState properties(opt_->motionCost(G[v_prev].state, G[v_next].state));
+      EdgeInternalState properties(opt_->motionCost(G[v_prev]->state, G[v_next]->state));
       boost::add_edge(v_prev, v_next, properties, G);
       uniteComponents(v_prev, v_next);
-      nn_->add(v_next);
+      nearest_datastructure->add(G[v_next]);
 
       v_prev = v_next;
-      s_prev = G[v_next].state;
+      s_prev = G[v_next]->state;
       ctr++;
     }
   }
@@ -363,30 +366,24 @@ double QuotientGraph::GetGraphLength() const{
 bool QuotientGraph::GetSolution(ob::PathPtr &solution)
 {
   if(hasSolution){
-    solution_path = GetPath(startM_.back(), goalM_.back());
+    solution_path = GetPath(v_start, v_goal);
     startGoalVertexPath_ = shortestVertexPath_;
     solution = solution_path;
     return true;
   }else{
     ob::Goal *g = pdef_->getGoal().get();
     bestCost_ = ob::Cost(+dInf);
-    foreach (Vertex start, startM_)
-    {
-      foreach (Vertex goal, goalM_)
-      {
-        bool same_component = sameComponent(start, goal);
+    bool same_component = sameComponent(v_start, v_goal);
 
-        if (same_component && g->isStartGoalPairValid(G[goal].state, G[start].state))
-        {
-          solution_path = GetPath(start, goal);
-          if (solution_path)
-          {
-            solution = solution_path;
-            hasSolution = true;
-            startGoalVertexPath_ = shortestVertexPath_;
-            return true;
-          }
-        }
+    if (same_component && g->isStartGoalPairValid(G[v_goal]->state, G[v_start]->state))
+    {
+      solution_path = GetPath(v_start, v_goal);
+      if (solution_path)
+      {
+        solution = solution_path;
+        hasSolution = true;
+        startGoalVertexPath_ = shortestVertexPath_;
+        return true;
       }
     }
   }
@@ -428,13 +425,13 @@ ob::PathPtr QuotientGraph::GetPath(const Vertex &start, const Vertex &goal)
 
   std::vector<Vertex> vpath;
   for (Vertex pos = goal; prev[pos] != pos; pos = prev[pos]){
-    G[pos].on_shortest_path = true;
+    G[pos]->on_shortest_path = true;
     vpath.push_back(pos);
-    p->append(G[pos].state);
+    p->append(G[pos]->state);
   }
-  G[start].on_shortest_path = true;
+  G[start]->on_shortest_path = true;
   vpath.push_back(start);
-  p->append(G[start].state);
+  p->append(G[start]->state);
 
   shortestVertexPath_.clear();
   shortestVertexPath_.insert( shortestVertexPath_.begin(), vpath.rbegin(), vpath.rend() );
@@ -444,35 +441,22 @@ ob::PathPtr QuotientGraph::GetPath(const Vertex &start, const Vertex &goal)
 }
 bool QuotientGraph::InsideStartComponent(Vertex v)
 {
-  return sameComponent(v, startM_.at(0));
+  return sameComponent(v, v_start);
 }
 bool QuotientGraph::InsideStartComponent(Edge e)
 {
-  return sameComponent(startM_.at(0), boost::source(e,G));
+  return sameComponent(v_start, boost::source(e,G));
 }
 
 void QuotientGraph::getPlannerData(ob::PlannerData &data) const
 {
-  //in case we havent found a solution, there will be at 
-  //least two connected components which we like to color differently
+  uint startComponent = const_cast<QuotientGraph *>(this)->disjointSets_.find_set(v_start);
+  uint goalComponent = const_cast<QuotientGraph *>(this)->disjointSets_.find_set(v_goal);
 
-  uint startComponent = 0;//const_cast<QuotientGraph *>(this)->disjointSets_.find_set(startM_.at(0));
-  uint goalComponent = 1;//const_cast<QuotientGraph *>(this)->disjointSets_.find_set(goalM_.at(0));
-  for (unsigned long i : startM_)
-  {
-    startComponent = const_cast<QuotientGraph *>(this)->disjointSets_.find_set(i);
-    PlannerDataVertexAnnotated pstart(G[i].state, startComponent);
-    pstart.SetComponent(0);
-    data.addStartVertex(pstart);
-
-  }
-
-  for (unsigned long i : goalM_)
-  {
-    PlannerDataVertexAnnotated pgoal(G[i].state, const_cast<QuotientGraph *>(this)->disjointSets_.find_set(i));
-    pgoal.SetComponent(1);
-    data.addGoalVertex(pgoal);
-  }
+  PlannerDataVertexAnnotated pstart(G[v_start]->state, startComponent);
+  data.addStartVertex(pstart);
+  PlannerDataVertexAnnotated pgoal(G[v_goal]->state, goalComponent);
+  data.addGoalVertex(pgoal);
 
   std::cout << "vertices " << GetNumberOfVertices() << " edges " << GetNumberOfEdges() << std::endl;
   uint ctr = 0;
@@ -481,8 +465,8 @@ void QuotientGraph::getPlannerData(ob::PlannerData &data) const
     const Vertex v1 = boost::source(e, G);
     const Vertex v2 = boost::target(e, G);
 
-    PlannerDataVertexAnnotated p1(G[v1].state);
-    PlannerDataVertexAnnotated p2(G[v2].state);
+    PlannerDataVertexAnnotated p1(G[v1]->state);
+    PlannerDataVertexAnnotated p2(G[v2]->state);
 
     uint vi1 = data.addVertex(p1);
     uint vi2 = data.addVertex(p2);
@@ -511,7 +495,7 @@ bool QuotientGraph::SampleQuotient(ob::State *q_random_graph)
   if(num_edges(G) == 0) return false;
 
   Edge e = boost::random_edge(G, rng_boost);
-  while(!sameComponent(boost::source(e, G), startM_.at(0)))
+  while(!sameComponent(boost::source(e, G), v_start))
   {
     e = boost::random_edge(G, rng_boost);
   }
@@ -520,8 +504,8 @@ bool QuotientGraph::SampleQuotient(ob::State *q_random_graph)
 
   const Vertex v1 = boost::source(e, G);
   const Vertex v2 = boost::target(e, G);
-  const ob::State *from = G[v1].state;
-  const ob::State *to = G[v2].state;
+  const ob::State *from = G[v1]->state;
+  const ob::State *to = G[v2]->state;
 
   Q1->getStateSpace()->interpolate(from, to, s, q_random_graph);
   return true;
@@ -532,3 +516,7 @@ void QuotientGraph::Print(std::ostream& out) const
   out << "[QuotientGraph has " << GetNumberOfVertices() << " vertices and " << GetNumberOfEdges() << " edges.]" << std::endl;
 }
 
+void QuotientGraph::PrintConfiguration(const Configuration* q) const
+{
+  Q1->printState(q->state);
+}

@@ -15,28 +15,27 @@ namespace ompl
   }
   namespace geometric
   {
-    //QMP: Quotient-space roadMap Planner
-    class QMP: public og::QuotientGraph{
+    //QRRT: Quotient-space roadMap Planner
+    class QRRT: public og::QuotientGraph{
 
       typedef og::QuotientGraph BaseT;
       public:
 
-        QMP(const ob::SpaceInformationPtr &si, Quotient *parent_);
-        virtual ~QMP() override;
-
-        void Grow(double t) override;
+        QRRT(const ob::SpaceInformationPtr &si, Quotient *parent_);
+        virtual ~QRRT() override;
+        virtual void Grow(double t) override;
         virtual bool GetSolution(ob::PathPtr &solution) override;
+
       protected:
 
-        double epsilon{0.05}; //graph thickening
-        double percentageSamplesOnShortestPath{1.0};
-        double goalBias_{0.1};
+        double maxDistance{4.5};
+        double epsilon{0.05};
+        double goalBias_{0.05};
         PDF<Vertex> vpdf;
-
         PDF<Edge> pdf_edges_on_shortest_path;
+        Configuration *q_random{nullptr};
 
         virtual bool SampleQuotient(ob::State*) override;
-        uint samplesOnShortestPath{0};
 
     };
 

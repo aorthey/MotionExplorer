@@ -25,6 +25,16 @@ QMP::~QMP()
   samplesOnShortestPath = 0;
 }
 
+void QMP::Grow(double t){
+  if(firstRun){
+    Init();
+    firstRun = false;
+  }
+  double T_grow = (2.0/3.0)*t;
+  growRoadmap(ob::timedPlannerTerminationCondition(T_grow), xstates[0]);
+  double T_expand = (1.0/3.0)*t;
+  expandRoadmap( ob::timedPlannerTerminationCondition(T_expand), xstates);
+}
 bool QMP::GetSolution(ob::PathPtr &solution)
 {
   if(BaseT::GetSolution(solution)){
@@ -49,7 +59,7 @@ bool QMP::SampleQuotient(ob::State *q_random_graph)
     e = pdf_edges_on_shortest_path.sample(rng_.uniform01());
   }else{
     e = boost::random_edge(G, rng_boost);
-    while(!sameComponent(boost::source(e, G), startM_.at(0)))
+    while(!sameComponent(boost::source(e, G), v_start))
     {
       e = boost::random_edge(G, rng_boost);
     }
@@ -59,8 +69,8 @@ bool QMP::SampleQuotient(ob::State *q_random_graph)
 
   const Vertex v1 = boost::source(e, G);
   const Vertex v2 = boost::target(e, G);
-  const ob::State *from = G[v1].state;
-  const ob::State *to = G[v2].state;
+  const ob::State *from = G[v1]->state;
+  const ob::State *to = G[v2]->state;
 
   Q1->getStateSpace()->interpolate(from, to, s, q_random_graph);
   //Q1_sampler->sampleGaussian(q_random_graph, q_random_graph, epsilon);

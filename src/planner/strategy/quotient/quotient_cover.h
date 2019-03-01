@@ -188,10 +188,12 @@ namespace ompl
 
       void SampleGoal(Configuration*);
       void SampleUniform(Configuration*);
-      virtual void SampleUniformQuotientCover(ob::State *state);
+      //virtual void SampleUniformQuotientCover(ob::State *state);
       Configuration* SampleNeighborhoodBoundary(const Configuration *q);
       Configuration* SampleNeighborhoodBoundaryUniformNear(const Configuration *q_center, const Configuration* q_near, const double radius);
       Configuration* SampleConfigurationLargestNeighborhood();
+
+      virtual bool SampleQuotient(ob::State *q_random) override;
 
       //#######################################################################
       //Misc

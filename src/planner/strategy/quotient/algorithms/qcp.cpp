@@ -72,11 +72,13 @@ void QCP::GrowWithoutSolution(ob::PlannerTerminationCondition &ptc)
       expansion_strategy_goal->Clear();
     }
   }else{
-    if(PriorityQueueCandidate_IsEmpty()){
-      expansion_strategy_random_voronoi->Step();
-    }else{
-      expansion_strategy_outwards->Step();
-    }
+    expansion_strategy_random_voronoi->Step();
+
+    // if(PriorityQueueCandidate_IsEmpty()){
+    //   expansion_strategy_random_voronoi->Step();
+    // }else{
+    //   expansion_strategy_outwards->Step();
+    // }
   }
 }
 

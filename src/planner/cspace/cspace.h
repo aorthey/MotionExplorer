@@ -47,6 +47,8 @@ class CSpaceOMPL
     const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
     Vector3 getXYZ(const ob::State*);
 
+    bool IsPlanar();
+
     void SetCSpaceInput(const CSpaceInput &input_);
     uint GetDimensionality() const;
     uint GetKlamptDimensionality() const;
@@ -69,6 +71,7 @@ class CSpaceOMPL
     virtual void print(std::ostream& out) const;
 
     void SetSufficient(const uint robot_outer_idx);
+    ob::StateSpacePtr GetFirstSubspace();
 
   protected:
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);

@@ -22,8 +22,8 @@ namespace ompl
 
       void clear() override;
       void setup() override;
-
       virtual void Grow(double t) override;
+
       void GrowWithSolution(ob::PlannerTerminationCondition &ptc);
       void GrowWithoutSolution(ob::PlannerTerminationCondition &ptc);
 

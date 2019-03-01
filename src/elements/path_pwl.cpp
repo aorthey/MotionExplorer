@@ -155,6 +155,7 @@ Vector3 PathPiecewiseLinear::EvalVec3(const double t) const{
   Config q = Eval(t);
   ob::ScopedState<> s = quotient_space->ConfigToOMPLState(q);
   Vector3 v = quotient_space->getXYZ(s.get());
+  if(draw_planar) v[2] = 0.0;
   return v;
 }
 
@@ -349,6 +350,9 @@ void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
     ob::State* c2 = states.at(i+1);
     Vector3 q1 = quotient_space->getXYZ(c1);
     Vector3 q2 = quotient_space->getXYZ(c2);
+    if(draw_planar){
+      q1[2] = 0.0; q2[2] = 0.0;
+    }
     GLDraw::drawPoint(q1);
     GLDraw::drawLineSegment(q1, q2);
   }
@@ -369,9 +373,10 @@ void PathPiecewiseLinear::DrawGL(GUIState& state)
 {
   if(quotient_space != nullptr)
   {
-    draw_planar = (quotient_space->GetDimensionality()<=2);
-    int type = quotient_space->SpaceInformationPtr()->getStateSpace()->getType();
-    draw_planar = draw_planar || ((type==ob::STATE_SPACE_SE2) && !state("planner_draw_spatial_representation_of_SE2"));
+    draw_planar = (quotient_space->IsPlanar());
+    if(draw_planar && (quotient_space->GetFirstSubspace()->getType()==ob::STATE_SPACE_SE2) && state("planner_draw_spatial_representation_of_SE2")){
+      draw_planar = false;
+    }
   }
 
   if(state("draw_path")){

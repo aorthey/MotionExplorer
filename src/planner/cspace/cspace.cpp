@@ -139,20 +139,24 @@ bool CSpaceOMPL::isFixedBase(){
 bool CSpaceOMPL::isFreeFloating(){
   return !fixedBase;
 }
+bool CSpaceOMPL::IsPlanar(){
+  if(GetDimensionality()<=2) return true;
 
-Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
-  double x = 0;
-  double y = 0;
-  double z = 0;
+  ob::StateSpacePtr space_first_subspace = GetFirstSubspace();
+  bool is_planar = (space_first_subspace->getType() == ob::STATE_SPACE_SE2);
+  // std::cout << "IsPlanar:" << (is_planar?"Yes":"No") << std::endl;
+  return is_planar;
+}
 
+ob::StateSpacePtr CSpaceOMPL::GetFirstSubspace()
+{
   ob::StateSpacePtr space_first_subspace;
-
   //extract first component subspace
   if(!space->isCompound()){
     space_first_subspace = space;
   }else{
     if( (space->getType() == ob::STATE_SPACE_SE2) ||
-        (space->getType() == ob::STATE_SPACE_SE2)){
+        (space->getType() == ob::STATE_SPACE_SE3)){
       space_first_subspace = space;
     }else{
       ob::CompoundStateSpace *M1_compound = space->as<ob::CompoundStateSpace>();
@@ -160,6 +164,15 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
       space_first_subspace = decomposed.front();
     }
   }
+  return space_first_subspace;
+}
+
+Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
+  double x = 0;
+  double y = 0;
+  double z = 0;
+
+  ob::StateSpacePtr space_first_subspace = GetFirstSubspace();
 
   if(space_first_subspace->getType() == ob::STATE_SPACE_SE3){
     const ob::SE3StateSpace::StateType *qomplSE3;

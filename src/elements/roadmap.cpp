@@ -295,9 +295,10 @@ void Roadmap::DrawGL(GUIState& state)
 {
   if(quotient_space != nullptr)
   {
-    int type = quotient_space->SpaceInformationPtr()->getStateSpace()->getType();
-    draw_planar = (quotient_space->GetDimensionality()<=2);
-    draw_planar = draw_planar || ((type==ob::STATE_SPACE_SE2) && !state("planner_draw_spatial_representation_of_SE2"));
+    draw_planar = (quotient_space->IsPlanar());
+    if(draw_planar && (quotient_space->GetFirstSubspace()->getType()==ob::STATE_SPACE_SE2) && state("planner_draw_spatial_representation_of_SE2")){
+      draw_planar = false;
+    }
   }
 
   if(pd!=nullptr) DrawPlannerData(state);

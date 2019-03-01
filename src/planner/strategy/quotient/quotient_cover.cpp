@@ -676,21 +676,22 @@ void QuotientCover::SampleGoal(Configuration *q)
 
 void QuotientCover::SampleUniform(Configuration *q)
 {
-  if(parent == nullptr){
-    Q1_sampler->sampleUniform(q->state);
-  }else{
-    if(X1_dimension>0){
-      ob::State *stateX1 = X1->allocState();
-      ob::State *stateQ0 = Q0->allocState();
-      X1_sampler->sampleUniform(stateX1);
-      static_cast<og::QuotientCover*>(parent)->SampleUniformQuotientCover(stateQ0);
-      MergeStates(stateQ0, stateX1, q->state);
-      X1->freeState(stateX1);
-      Q0->freeState(stateQ0);
-    }else{
-      static_cast<og::QuotientCover*>(parent)->SampleUniformQuotientCover(q->state);
-    }
-  }
+  Sample(q->state);
+  // if(parent == nullptr){
+  //   Q1_sampler->sampleUniform(q->state);
+  // }else{
+  //   if(X1_dimension>0){
+  //     ob::State *stateX1 = X1->allocState();
+  //     ob::State *stateQ0 = Q0->allocState();
+  //     X1_sampler->sampleUniform(stateX1);
+  //     static_cast<og::QuotientCover*>(parent)->SampleUniformQuotientCover(stateQ0);
+  //     MergeStates(stateQ0, stateX1, q->state);
+  //     X1->freeState(stateX1);
+  //     Q0->freeState(stateQ0);
+  //   }else{
+  //     static_cast<og::QuotientCover*>(parent)->SampleUniformQuotientCover(q->state);
+  //   }
+  // }
 }
 
 QuotientCover::Configuration* QuotientCover::SampleNeighborhoodBoundary(const Configuration *q_center)
@@ -722,26 +723,13 @@ QuotientCover::Configuration* QuotientCover::SampleNeighborhoodBoundary(const Co
   return q_next;
 }
 
-void QuotientCover::SampleUniformQuotientCover(ob::State *state_random) 
+bool QuotientCover::SampleQuotient(ob::State *q_random)
 {
   Configuration *q_coset = pdf_configurations_radius.sample(rng_.uniform01());
-
-  Q1_sampler->sampleUniformNear(state_random, q_coset->state, q_coset->GetRadius());
-  //if(q_coset->isSufficientFeasible)
-  //{
-  //  //project onto a random shell outside of sufficient neighborhood
-  //  double r_necessary = q_coset->GetRadius();
-  //  double r_sufficient = q_coset->openNeighborhoodOuterRadius;
-  //  double r_01 = rng_.uniform01();
-  //  double r_shell = r_sufficient + r_01*(r_necessary - r_sufficient);
-  //  double d = Q1->distance(q_coset->state, state);
-  //  Q1->getStateSpace()->interpolate(q_coset->state, state, r_shell/d, state);
-  //}
-
-  //Project sampled state onto the boundary!
-  double d = Q1->distance(q_coset->state, state_random);
-  Q1->getStateSpace()->interpolate(q_coset->state, state_random, q_coset->GetRadius()/d, state_random);
+  Q1_sampler->sampleUniformNear(q_random, q_coset->state, q_coset->GetRadius());
+  return true;
 }
+
 QuotientCover::Configuration* QuotientCover::SampleNeighborhoodBoundaryUniformNear(const Configuration *q_center, const Configuration* q_near, const double radius)
 {
   Configuration *q_next = new Configuration(Q1);

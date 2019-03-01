@@ -34,25 +34,13 @@ namespace ompl
 
         typedef og::Quotient BaseT;
       public:
+        typedef int normalized_index_type;
 
-        class VertexInternalState{
+        class Configuration{
           public:
-            VertexInternalState() = default;
-            VertexInternalState(const VertexInternalState &vis)
-            {
-              state = vis.state;
-              total_connection_attempts = vis.total_connection_attempts;
-              successful_connection_attempts = vis.successful_connection_attempts;
-              on_shortest_path = vis.on_shortest_path;
-
-              associated_target = vis.associated_target;
-              associated_source = vis.associated_source;
-              associated_t = vis.associated_t;
-
-              start = vis.start;
-              goal = vis.goal;
-              isFeasible = vis.isFeasible;
-            }
+            Configuration() = delete;
+            Configuration(const ob::SpaceInformationPtr &si);
+            Configuration(const ob::SpaceInformationPtr &si, const ob::State *state_);
             ob::State *state{nullptr};
             uint total_connection_attempts{0};
             uint successful_connection_attempts{0};
@@ -62,9 +50,11 @@ namespace ompl
             unsigned long int associated_source{0};
             double associated_t{-1};
 
-            bool start{false};
-            bool goal{false};
+            bool isStart{false};
+            bool isGoal{false};
             bool isFeasible{false};
+
+            normalized_index_type index{-1}; //in [0,num_vertices(graph)]
         };
 
         class EdgeInternalState{
@@ -91,12 +81,16 @@ namespace ompl
             ob::Cost original_cost{+dInf};
         };
 
+        struct GraphBundle{
+          std::string name{"quotient_graph"};
+        };
         typedef boost::adjacency_list<
            boost::vecS, 
            boost::vecS, 
            boost::undirectedS,
-           VertexInternalState,
-           EdgeInternalState
+           Configuration*,
+           EdgeInternalState,
+           GraphBundle
          > Graph;
 
         typedef boost::graph_traits<Graph> BGT;
@@ -107,8 +101,8 @@ namespace ompl
         typedef BGT::out_edge_iterator OEIterator;
         typedef Vertex* VertexParent;
         typedef VertexIndex* VertexRank;
-        typedef std::shared_ptr<NearestNeighbors<Vertex>> RoadmapNeighborsPtr;
-        typedef std::function<const std::vector<Vertex> &(const Vertex)> ConnectionStrategy;
+        typedef std::shared_ptr<NearestNeighbors<const Configuration*>> RoadmapNeighborsPtr;
+        //typedef std::function<const std::vector<Configuration*> &(const Configuration*)> ConnectionStrategy;
 
       public:
 
@@ -118,9 +112,7 @@ namespace ompl
         virtual uint GetNumberOfVertices() const;
         virtual uint GetNumberOfEdges() const;
 
-        ob::PathPtr GetSolutionPath();
-
-        virtual void Grow(double t);
+        virtual void Grow(double t) = 0;
         virtual bool SampleQuotient(ob::State*) override;
         virtual bool GetSolution(ob::PathPtr &solution) override;
         virtual void getPlannerData(ob::PlannerData &data) const override;
@@ -132,7 +124,6 @@ namespace ompl
         void clearQuery();
         virtual void ClearVertices();
 
-
         template <template <typename T> class NN>
         void setNearestNeighbors();
 
@@ -141,7 +132,7 @@ namespace ompl
 
         bool InsideStartComponent(Vertex v);
         bool InsideStartComponent(Edge e);
-
+        const Configuration* Nearest(const Configuration *s) const;
 
         std::map<Vertex, VertexRank> vrank;
         std::map<Vertex, Vertex> vparent;
@@ -149,25 +140,29 @@ namespace ompl
           disjointSets_{boost::make_assoc_property_map(vrank), boost::make_assoc_property_map(vparent)};
 
         ob::Cost bestCost_{+dInf};
-        std::vector<Vertex> startM_;
-        std::vector<Vertex> goalM_;
+        Configuration *q_start;
+        Configuration *q_goal;
+        Vertex v_start;
+        Vertex v_goal;
         std::vector<Vertex> shortestVertexPath_;
         std::vector<Vertex> startGoalVertexPath_;
 
         const Graph& GetGraph() const;
         double GetGraphLength() const;
         const RoadmapNeighborsPtr& GetRoadmapNeighborsPtr() const;
-        const ConnectionStrategy& GetConnectionStrategy() const;
+        //const ConnectionStrategy& GetConnectionStrategy() const;
 
         virtual void Print(std::ostream& out) const override;
+        void PrintConfiguration(const Configuration*) const;
     protected:
 
-        virtual double Distance(const Vertex a, const Vertex b) const; // standard si->distance
+        virtual double Distance(const Configuration* a, const Configuration* b) const; // standard si->distance
         virtual bool Connect(const Vertex a, const Vertex b);
-        virtual Vertex addMilestone(ob::State *state);
 
-        virtual Vertex CreateNewVertex(ob::State *state);
-        virtual void ConnectVertexToNeighbors(Vertex m);
+        virtual Vertex AddConfiguration(Configuration *q);
+        void AddEdge(const Vertex a, const Vertex b);
+
+        //virtual void ConnectVertexToNeighbors(Vertex m);
         ob::Cost costHeuristic(Vertex u, Vertex v) const;
 
         virtual void growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState);
@@ -176,8 +171,8 @@ namespace ompl
         virtual void RandomWalk(const Vertex &v);
 
         std::vector<ob::State *> xstates;
-        RoadmapNeighborsPtr nn_;
-        ConnectionStrategy connectionStrategy_;
+        RoadmapNeighborsPtr nearest_datastructure;
+        //ConnectionStrategy connectionStrategy_;
         Graph G;
         ob::PathPtr solution_path;
         bool addedNewSolution_{false};

@@ -49,8 +49,8 @@ namespace ompl
 
         virtual void Grow(double t) = 0;
         virtual bool GetSolution(ob::PathPtr &solution) = 0;
+        virtual bool SampleQuotient(ob::State *q_random) = 0;
 
-        virtual bool SampleQuotient(ob::State *q_random);
         virtual bool Sample(ob::State *q_random);
         virtual bool HasSolution();
         virtual void clear() override;

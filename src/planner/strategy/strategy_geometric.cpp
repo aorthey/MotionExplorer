@@ -5,8 +5,10 @@
 #include "planner/benchmark/benchmark_output.h"
 
 #include "planner/strategy/quotient/multiquotient.h"
-#include "planner/strategy/quotientgraph/algorithms/qmp_connect.h"
+//#include "planner/strategy/quotientgraph/algorithms/qmp_connect.h"
 #include "planner/strategy/quotientgraph/algorithms/qmp.h"
+//#include "planner/strategy/quotientgraph/algorithms/q_prm.h"
+#include "planner/strategy/quotientgraph/algorithms/q_rrt.h"
 #include "planner/strategy/quotientchart/multichart.h"
 #include "planner/strategy/quotient/algorithms/qcp.h"
 #include "planner/strategy/quotient/algorithms/qsampler.h"
@@ -131,16 +133,21 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){
     std::cout << "Planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
     exit(0);
-  }
-  else if(algorithm=="hierarchy:qmp_connect"){
-    planner = GetSharedMultiQuotientPtr<og::QMPConnect>(si_vec, pdef_vec);
-    planner->setName("QMPConnect");
+  // }else if(algorithm=="hierarchy:qmp_connect"){
+  //   planner = GetSharedMultiQuotientPtr<og::QMPConnect>(si_vec, pdef_vec);
+  //   planner->setName("QMPConnect");
   }else if(algorithm=="hierarchy:qmp"){
     planner = GetSharedMultiQuotientPtr<og::QMP>(si_vec, pdef_vec);
     planner->setName("QMP");
   }else if(algorithm=="hierarchy:qcp"){
     planner = GetSharedMultiQuotientPtr<og::QCP>(si_vec, pdef_vec);
     planner->setName("QCP");
+  // }else if(algorithm=="hierarchy:q_prm"){
+  //   planner = GetSharedMultiQuotientPtr<og::QPRM>(si_vec, pdef_vec);
+  //   planner->setName("Q_PRM");
+  }else if(algorithm=="hierarchy:q_rrt"){
+    planner = GetSharedMultiQuotientPtr<og::QRRT>(si_vec, pdef_vec);
+    planner->setName("Q_RRT");
   }else if(algorithm=="hierarchy:sampler"){
     planner = GetSharedMultiQuotientPtr<og::QSampler>(si_vec, pdef_vec);
     planner->setName("QSampler");
@@ -170,6 +177,16 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiQuotientPtr(
     std::vector<ob::ProblemDefinitionPtr> pdef_vec)
 {
   typedef og::MultiQuotient<T_Algorithm> MultiQuotient;
+  ob::PlannerPtr planner = std::make_shared<MultiQuotient>(si_vec);
+  static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
+  return planner;
+}
+template<typename T_Algorithm, typename T_Algorithm_Two> 
+ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiQuotientPtr( 
+    std::vector<ob::SpaceInformationPtr> si_vec, 
+    std::vector<ob::ProblemDefinitionPtr> pdef_vec)
+{
+  typedef og::MultiQuotient<T_Algorithm, T_Algorithm_Two> MultiQuotient;
   ob::PlannerPtr planner = std::make_shared<MultiQuotient>(si_vec);
   static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(pdef_vec);
   return planner;
