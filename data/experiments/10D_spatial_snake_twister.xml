@@ -6,8 +6,8 @@
   <robot name="snake0" file="../robots/snake/snake_0_segments.urdf"/>
 
   <robot name="snake3" file="../robots/snake/snake_0_segments_sphere_inner.urdf"/>
-  <robot name="snake4" file="../robots/snake/snake_0_segments_sphere_outer.urdf"/>
-  <robot name="snake4" file="../robots/snake/snake_2_segments_sphere_outer.urdf"/>
+  <!-- <robot name="snake4" file="../robots/snake/snake_0_segments_sphere_outer.urdf"/> -->
+  <!-- <robot name="snake4" file="../robots/snake/snake_2_segments_sphere_outer.urdf"/> -->
 
   <terrain  name="twister/twister.tri" file="../terrains/twister/twister.tri"/>
 
@@ -20,7 +20,7 @@
     <qgoal config="13  +2.1 +0.7 0 0 0 0 0 0 0 0 0 0 0"/>
 
     <freeFloating>1</freeFloating>
-    <maxplanningtime>5</maxplanningtime>
+    <maxplanningtime>30</maxplanningtime>
 
     <hierarchy>
       <level inner_index="3" cspace_constant="1" type="R3"/>

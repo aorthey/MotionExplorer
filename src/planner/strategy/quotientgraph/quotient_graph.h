@@ -155,7 +155,7 @@ namespace ompl
     protected:
 
         virtual double Distance(const Configuration* a, const Configuration* b) const; // standard si->distance
-        virtual bool Connect(const Vertex a, const Vertex b);
+        //virtual bool Connect(const Vertex a, const Vertex b);
 
         virtual Vertex AddConfiguration(Configuration *q);
         void AddEdge(const Vertex a, const Vertex b);

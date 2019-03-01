@@ -3,18 +3,18 @@
 <link name="eye">
   <inertial>
    <mass value="1"/>
-   <inertia ixx="0.00576" ixy="0" ixz="0" iyy="0.00576" iyz="0" izz="0.00576"/>
+   <inertia ixx="0.004" ixy="0" ixz="0" iyy="0.004" iyz="0" izz="0.004"/>
   </inertial>
   <collision>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-      <sphere radius="0.12"/>
+      <sphere radius="0.1"/>
     </geometry>
   </collision>
   <visual>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-      <sphere radius="0.12"/>
+      <sphere radius="0.1"/>
     </geometry>
   </visual>
 </link>
@@ -22,24 +22,24 @@
  <link name="body0">
   <inertial>
     <mass value="1"/>
-    <inertia ixx="0.0048" ixy="0" ixz="0" iyy="0.0048" iyz="0" izz="0.0036"/>
+    <inertia ixx="0.00333333333333" ixy="0" ixz="0" iyy="0.00333333333333" iyz="0" izz="0.0025"/>
   </inertial>
   <visual>
     <origin rpy="0 1.57 0" xyz="0 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.12"/>
+      <cylinder length="0.1" radius="0.1"/>
     </geometry>
   </visual>
   <collision>
     <origin rpy="0 1.57 0" xyz="0 0 0"/>
     <geometry>
-      <cylinder length="0.12" radius="0.12"/>
+      <cylinder length="0.1" radius="0.1"/>
     </geometry>
   </collision>
  </link>
 
 <joint name="joint_fixed_eye_body0" type="fixed">
-  <origin rpy="0 0 0" xyz="-0.06 0 0"/>
+  <origin rpy="0 0 0" xyz="-0.05 0 0"/>
   <parent link="eye"/>
   <child link="body0"/>
 </joint>
@@ -47,18 +47,18 @@
 <link name="body1_joint_link">
   <inertial>
    <mass value="1"/>
-   <inertia ixx="0.00144" ixy="0" ixz="0" iyy="0.00144" iyz="0" izz="0.00144"/>
+   <inertia ixx="0.00196" ixy="0" ixz="0" iyy="0.00196" iyz="0" izz="0.00196"/>
   </inertial>
   <collision>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-      <sphere radius="0.06"/>
+      <sphere radius="0.07"/>
     </geometry>
   </collision>
   <visual>
     <origin rpy="0 0 0" xyz="0 0 0"/>
     <geometry>
-      <sphere radius="0.06"/>
+      <sphere radius="0.07"/>
     </geometry>
   </visual>
 </link>
@@ -75,7 +75,7 @@
   <child link="body1_joint_link_spherical_joint_link"/>
   <axis xyz="0 0 1"/>
   <dynamics damping="0.01" friction="0.5"/>
-  <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
+  <limit lower="-1.1780972451" upper="1.1780972451" effort="0.01" velocity="100"/>
 </joint>
 
 <link name="body1_joint_link_spherical_joint_link" physical="0">
@@ -103,24 +103,24 @@
   <child link="body1"/>
   <axis xyz="0 1 0"/>
   <dynamics damping="0.01" friction="0.5"/>
-  <limit lower="-0.785398163397" upper="0.785398163397" effort="0.01" velocity="100"/>
+  <limit lower="-1.1780972451" upper="1.1780972451" effort="0.01" velocity="100"/>
 </joint>
 
  <link name="body1">
   <inertial>
     <mass value="1"/>
-    <inertia ixx="0.0111" ixy="0" ixz="0" iyy="0.0111" iyz="0" izz="0.0036"/>
+    <inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.0025"/>
   </inertial>
   <visual>
-    <origin rpy="0 1.57 0" xyz="-0.21001 0 0"/>
+    <origin rpy="0 1.57 0" xyz="-0.22001 0 0"/>
     <geometry>
-      <cylinder length="0.3" radius="0.12"/>
+      <cylinder length="0.3" radius="0.1"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 1.57 0" xyz="-0.21001 0 0"/>
+    <origin rpy="0 1.57 0" xyz="-0.22001 0 0"/>
     <geometry>
-      <cylinder length="0.3" radius="0.12"/>
+      <cylinder length="0.3" radius="0.1"/>
     </geometry>
   </collision>
  </link>

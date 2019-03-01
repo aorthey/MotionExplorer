@@ -300,14 +300,14 @@ double QuotientGraph::Distance(const Configuration* a, const Configuration* b) c
   return si_->distance(a->state, b->state);
 }
 
-bool QuotientGraph::Connect(const Vertex a, const Vertex b){
-  if (si_->checkMotion(G[a]->state, G[b]->state))
-  {
-    AddEdge(a, b);
-    return true;
-  }
-  return false;
-}
+// bool QuotientGraph::Connect(const Vertex a, const Vertex b){
+//   if (si_->checkMotion(G[a]->state, G[b]->state))
+//   {
+//     AddEdge(a, b);
+//     return true;
+//   }
+//   return false;
+// }
 void QuotientGraph::AddEdge(const Vertex a, const Vertex b)
 {
   ob::Cost weight = opt_->motionCost(G[a]->state, G[b]->state);

@@ -29,8 +29,8 @@ namespace ompl
 
       protected:
 
-        double maxDistance{4.5};
-        double epsilon{0.05};
+        double maxDistance{1.0};
+        double epsilon{0.0};
         double goalBias_{0.05};
         PDF<Vertex> vpdf;
         PDF<Edge> pdf_edges_on_shortest_path;
