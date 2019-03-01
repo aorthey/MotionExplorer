@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot name="snake/snake_planar_2_segments_disk_inner">
+ <link name="body">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.240933333333" ixy="0" ixz="0" iyy="0.240933333333" iyz="0" izz="0.2401"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.98"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.98"/>
+    </geometry>
+  </collision>
+ </link>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>
