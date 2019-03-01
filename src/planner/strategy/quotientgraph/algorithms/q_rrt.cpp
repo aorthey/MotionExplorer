@@ -29,9 +29,10 @@ bool QRRT::GetSolution(ob::PathPtr &solution)
   if(hasSolution){
     return BaseT::GetSolution(solution);
   }else{
+    if(firstRun) return false;
     const Configuration *q_nearest = Nearest(q_goal);
     double d = Q1->distance(q_nearest->state, q_goal->state);
-    if(d < epsilon)
+    if(d < 0.01)
     {
       v_goal = AddConfiguration(q_goal);
       AddEdge(q_nearest->index, v_goal);
@@ -69,6 +70,10 @@ void QRRT::Grow(double t){
     Vertex v_next = AddConfiguration(q_next);
     AddEdge(q_nearest->index, v_next);
   }
+}
+
+double QRRT::GetImportance() const{
+  return Quotient::GetImportance();
 }
 
 bool QRRT::SampleQuotient(ob::State *q_random_graph)

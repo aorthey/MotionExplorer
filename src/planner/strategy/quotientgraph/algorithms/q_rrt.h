@@ -25,6 +25,7 @@ namespace ompl
         virtual ~QRRT() override;
         virtual void Grow(double t) override;
         virtual bool GetSolution(ob::PathPtr &solution) override;
+        double GetImportance() const override;
 
       protected:
 

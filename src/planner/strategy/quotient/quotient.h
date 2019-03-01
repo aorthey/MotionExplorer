@@ -112,6 +112,7 @@ namespace ompl
         static uint counter;
         uint id;
         uint level{0};
+        uint totalNumberOfSamples{0};
 
         bool hasSolution{false};
         bool firstRun{true};
@@ -126,6 +127,7 @@ namespace ompl
         double DistanceOuterRobotToObstacle(ob::State *state);
         double DistanceInnerRobotToObstacle(ob::State *state);
         double DistanceRobotToObstacle(ob::State *state);
+
     };
   }
 }

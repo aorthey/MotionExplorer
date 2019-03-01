@@ -130,8 +130,6 @@ namespace ompl
         virtual void uniteComponents(Vertex m1, Vertex m2);
         bool sameComponent(Vertex m1, Vertex m2);
 
-        bool InsideStartComponent(Vertex v);
-        bool InsideStartComponent(Edge e);
         const Configuration* Nearest(const Configuration *s) const;
 
         std::map<Vertex, VertexRank> vrank;
@@ -182,7 +180,6 @@ namespace ompl
         RNGType rng_boost;
 
         double graphLength{0.0};
-        uint totalNumberOfSamples{0};
 
     };
   };

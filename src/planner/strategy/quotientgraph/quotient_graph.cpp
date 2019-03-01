@@ -118,14 +118,12 @@ void QuotientGraph::clearQuery()
   pis_.restart();
 }
 
-//@TODO: this were the settings we used for IROS'18. While they worked well in
-//our examples, there is no good reason why we used this particular formula.
-//Needs revision.
+////@TODO: this were the settings we used for IROS'18. While they worked well in
+////our examples, there is no good reason why we used this particular formula.
+////Needs revision.
 double QuotientGraph::GetImportance() const{
-  double N = (double)totalNumberOfSamples;
-  //return /((double)si_->getSpaceMeasure());
+  double N = (double)GetNumberOfVertices();
   return 1.0/(N+1);
-    //return N/(parent->GetGraphLength()*X1->getSpaceMeasure());
 }
 
 void QuotientGraph::Init()
@@ -439,19 +437,15 @@ ob::PathPtr QuotientGraph::GetPath(const Vertex &start, const Vertex &goal)
 
   return p;
 }
-bool QuotientGraph::InsideStartComponent(Vertex v)
-{
-  return sameComponent(v, v_start);
-}
-bool QuotientGraph::InsideStartComponent(Edge e)
-{
-  return sameComponent(v_start, boost::source(e,G));
-}
 
 void QuotientGraph::getPlannerData(ob::PlannerData &data) const
 {
-  uint startComponent = const_cast<QuotientGraph *>(this)->disjointSets_.find_set(v_start);
-  uint goalComponent = const_cast<QuotientGraph *>(this)->disjointSets_.find_set(v_goal);
+  // uint startComponent = const_cast<QuotientGraph *>(this)->disjointSets_.find_set(v_start);
+  // uint goalComponent = const_cast<QuotientGraph *>(this)->disjointSets_.find_set(v_goal);
+  uint startComponent = 0;
+  uint goalComponent = 1;
+
+  if(hasSolution) goalComponent = 0;
 
   PlannerDataVertexAnnotated pstart(G[v_start]->state, startComponent);
   data.addStartVertex(pstart);
@@ -490,6 +484,7 @@ void QuotientGraph::getPlannerData(ob::PlannerData &data) const
     }
   }
 }
+
 bool QuotientGraph::SampleQuotient(ob::State *q_random_graph)
 {
   if(num_edges(G) == 0) return false;
@@ -513,7 +508,7 @@ bool QuotientGraph::SampleQuotient(ob::State *q_random_graph)
 void QuotientGraph::Print(std::ostream& out) const
 {
   BaseT::Print(out);
-  out << "[QuotientGraph has " << GetNumberOfVertices() << " vertices and " << GetNumberOfEdges() << " edges.]" << std::endl;
+  out << std::endl << " --[QuotientGraph has " << GetNumberOfVertices() << " vertices and " << GetNumberOfEdges() << " edges.]" << std::endl;
 }
 
 void QuotientGraph::PrintConfiguration(const Configuration* q) const

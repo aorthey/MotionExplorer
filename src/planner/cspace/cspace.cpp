@@ -176,10 +176,11 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
 
   if(space_first_subspace->getType() == ob::STATE_SPACE_SE3){
     const ob::SE3StateSpace::StateType *qomplSE3;
-    if(space->isCompound()){
-      qomplSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-    }else{
+    if(space->getType() == ob::STATE_SPACE_SE3){
       qomplSE3 = s->as<ob::SE3StateSpace::StateType>();
+    }else{
+      //consists of SE(3)xSOMETHING
+      qomplSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
     }
     x = qomplSE3->getX();
     y = qomplSE3->getY();

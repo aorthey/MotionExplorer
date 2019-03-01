@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="snake_planar3" file="../robots/snake/snake_planar_9_segments.urdf"/>
+  <robot name="snake_planar3" file="../robots/snake/snake_planar_7_segments.urdf"/>
   <robot name="snake_planar2" file="../robots/snake/snake_planar_2_segments.urdf"/>
   <robot name="snake_planar1" file="../robots/snake/snake_planar_1_segments.urdf"/>
   <robot name="snake_planar0" file="../robots/snake/snake_planar_0_segments.urdf"/>
@@ -14,18 +14,20 @@
     <se3min config="6  -6 -2.0 -0.1 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +6 +4.0 +0.1 +3.141593 +1.57 +3.141593"/>
 
-    <qinit config="25  +0.2 -1.0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
-    <qgoal config="25  +1.3 +2.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+    <!-- <qinit config="25  +0.2 -1.0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/> -->
+    <!-- <qgoal config="25  +1.3 +2.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/> -->
+    <qinit config="21  +0.2 -1.0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
+    <qgoal config="21  +1.3 +2.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
 
     <freeFloating>1</freeFloating>
-    <maxplanningtime>1</maxplanningtime>
+    <maxplanningtime>10</maxplanningtime>
 
     <hierarchy>
       <level inner_index="4" cspace_constant="1" type="R2"/>
       <level inner_index="3" cspace_constant="0.995" type="SE2"/>
       <level inner_index="2" cspace_constant="0.879905" type="SE2RN"/>
-      <!-- <level inner_index="1" type="SE2RN"/> -->
-      <!-- <level inner_index="0" type="SE2RN"/> -->
+      <level inner_index="1" type="SE2RN"/>
+      <level inner_index="0" type="SE2RN"/>
       <!-- <level inner_index="1" cspace_constant="0.506857280846" type="SE3RN"/> -->
       <!-- <level inner_index="0" cspace_constant="0.506857280846" type="SE3RN"/> -->
     </hierarchy>

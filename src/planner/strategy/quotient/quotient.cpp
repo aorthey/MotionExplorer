@@ -899,6 +899,7 @@ Quotient::QuotientSpaceType Quotient::GetType() const
 
 bool Quotient::Sample(ob::State *q_random)
 {
+  totalNumberOfSamples++;
   if(parent == nullptr){
     return Q1_valid_sampler->sample(q_random);
   }else{
@@ -921,7 +922,8 @@ bool Quotient::Sample(ob::State *q_random)
 
 double Quotient::GetImportance() const
 {
-  return 0;
+  double N = (double)totalNumberOfSamples;
+  return 1.0/(N+1);
 }
 void Quotient::Print(std::ostream& out) const
 {
