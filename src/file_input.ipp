@@ -34,7 +34,8 @@ TiXmlElement* FindSubNode(TiXmlElement* node, const char *name){
   return NULL;
 }
 
-TiXmlElement* FindFirstSubNode(TiXmlElement* node, const char *name){
+TiXmlElement* FindFirstSubNode(TiXmlElement* node, const char *name)
+{
   return FindSubNode(node, name);
 }
 
@@ -50,6 +51,17 @@ TiXmlElement* FindNextSiblingNode(TiXmlElement* node, const char *name){
     }
   }
   return NULL;
+}
+
+int CountNumberOfSubNodes(TiXmlElement* parent, const char *name)
+{
+  TiXmlElement* node = FindFirstSubNode(parent, name);
+  int ctr = 0;
+  while(node != NULL){
+    ctr++;
+    node = FindNextSiblingNode(node);
+  }
+  return ctr;
 }
 
 bool ExistStreamAttribute(TiXmlElement* node, const char *name){

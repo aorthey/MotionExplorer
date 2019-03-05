@@ -155,12 +155,10 @@ namespace ompl
     protected:
 
         virtual double Distance(const Configuration* a, const Configuration* b) const; // standard si->distance
-        //virtual bool Connect(const Vertex a, const Vertex b);
 
         virtual Vertex AddConfiguration(Configuration *q);
         void AddEdge(const Vertex a, const Vertex b);
 
-        //virtual void ConnectVertexToNeighbors(Vertex m);
         ob::Cost costHeuristic(Vertex u, Vertex v) const;
 
         virtual void growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState);

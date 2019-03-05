@@ -118,9 +118,6 @@ void QuotientGraph::clearQuery()
   pis_.restart();
 }
 
-////@TODO: this were the settings we used for IROS'18. While they worked well in
-////our examples, there is no good reason why we used this particular formula.
-////Needs revision.
 double QuotientGraph::GetImportance() const{
   double N = (double)GetNumberOfVertices();
   return 1.0/(N+1);
@@ -445,12 +442,14 @@ void QuotientGraph::getPlannerData(ob::PlannerData &data) const
   uint startComponent = 0;
   uint goalComponent = 1;
 
-  if(hasSolution) goalComponent = 0;
 
   PlannerDataVertexAnnotated pstart(G[v_start]->state, startComponent);
   data.addStartVertex(pstart);
-  PlannerDataVertexAnnotated pgoal(G[v_goal]->state, goalComponent);
-  data.addGoalVertex(pgoal);
+  if(hasSolution){
+    goalComponent = 0;
+    PlannerDataVertexAnnotated pgoal(G[v_goal]->state, goalComponent);
+    data.addGoalVertex(pgoal);
+  }
 
   std::cout << "vertices " << GetNumberOfVertices() << " edges " << GetNumberOfEdges() << std::endl;
   uint ctr = 0;

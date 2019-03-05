@@ -15,7 +15,7 @@ namespace ompl
   }
   namespace geometric
   {
-    //QRRT: Quotient-space roadMap Planner
+    //QRRT: Quotient-Space Rapidly Exploring Random Tree Algorithm
     class QRRT: public og::QuotientGraph{
 
       typedef og::QuotientGraph BaseT;
@@ -27,13 +27,20 @@ namespace ompl
         virtual bool GetSolution(ob::PathPtr &solution) override;
         double GetImportance() const override;
 
+        virtual void setup() override;
+        virtual void clear() override;
+
+        void setGoalBias(double goalBias);
+        double getGoalBias() const;
+        void setRange(double distance);
+        double getRange() const;
+
       protected:
 
-        double maxDistance{1.0};
-        double epsilon{0.0};
-        double goalBias_{0.05};
-        PDF<Vertex> vpdf;
-        PDF<Edge> pdf_edges_on_shortest_path;
+        double maxDistance{.0};
+        double goalBias{.1};
+        double epsilon{.0};
+
         Configuration *q_random{nullptr};
 
         virtual bool SampleQuotient(ob::State*) override;

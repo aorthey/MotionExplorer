@@ -12,6 +12,7 @@ inline TiXmlElement* FindNextSiblingNode(TiXmlElement* node, const char *name);
 inline TiXmlElement* FindNextSiblingNode(TiXmlElement* node);
 inline bool ExistStreamAttribute(TiXmlElement* node, const char *name);
 inline std::stringstream GetStreamAttributeConfig(TiXmlElement* node, const char *name);
+inline int CountNumberOfSubNodes(TiXmlElement* parent, const char *name);
 
 
 template<typename T> 

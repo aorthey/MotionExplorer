@@ -21,6 +21,7 @@
 
     <freeFloating>1</freeFloating>
     <maxplanningtime>10</maxplanningtime>
+    <pathSpeed>12</pathSpeed>
 
     <hierarchy>
       <level inner_index="4" cspace_constant="1" type="R2"/>

@@ -2,6 +2,7 @@
 #include "common.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
+#include <ompl/tools/config/SelfConfig.h>
 #include <ompl/datastructures/PDF.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 #include <ompl/base/goals/GoalSampleableRegion.h>
@@ -18,10 +19,46 @@ QRRT::QRRT(const ob::SpaceInformationPtr &si, Quotient *parent_ ):
   BaseT(si, parent_)
 {
   setName("QRRT"+std::to_string(id));
+  Planner::declareParam<double>("range", this, &QRRT::setRange, &QRRT::getRange, "0.:1.:10000.");
+  Planner::declareParam<double>("goal_bias", this, &QRRT::setGoalBias, &QRRT::getGoalBias, "0.:.05:1.");
 }
 
 QRRT::~QRRT()
 {
+}
+
+void QRRT::setGoalBias(double goalBias_)
+{
+  goalBias = goalBias_;
+}
+double QRRT::getGoalBias() const
+{
+  return goalBias;
+}
+void QRRT::setRange(double maxDistance_)
+{
+  maxDistance = maxDistance_;
+}
+double QRRT::getRange() const
+{
+  return maxDistance;
+}
+
+void QRRT::setup()
+{
+  BaseT::setup();
+  ompl::tools::SelfConfig sc(Q1, getName());
+  sc.configurePlannerRange(maxDistance);
+
+  // const double base = 2;
+  // const double normalizer = powf(base, level);
+  epsilon = 0.05;///normalizer;//Q1->getSpaceMeasure()*0.1;
+  std::cout << "epsilon: " << epsilon << std::endl;
+}
+void QRRT::clear()
+{
+  BaseT::clear();
+  delete q_random;
 }
 
 bool QRRT::GetSolution(ob::PathPtr &solution)
@@ -51,11 +88,15 @@ void QRRT::Grow(double t){
     q_random = new Configuration(Q1);
   }
 
-  double s = rng_.uniform01();
-  if(s < goalBias_){
-    Q1->copyState(q_random->state, q_goal->state);
-  }else{
+  if(hasSolution){
     Sample(q_random->state);
+  }else{
+    double s = rng_.uniform01();
+    if(s < goalBias){
+      Q1->copyState(q_random->state, q_goal->state);
+    }else{
+      Sample(q_random->state);
+    }
   }
 
   const Configuration *q_nearest = Nearest(q_random);
@@ -73,13 +114,40 @@ void QRRT::Grow(double t){
 }
 
 double QRRT::GetImportance() const{
-  return Quotient::GetImportance();
+  //Should depend on
+  // (1) level : The higher the level, the more importance
+  // (2) total samples: the more we already sampled, the less important it
+  // becomes
+  // (3) has solution: if it already has a solution, we should explore less
+  // (only when nothing happens on other levels)
+  // (4) vertices: the more vertices we have, the less important (let other
+  // levels also explore)
+  //
+  //
+  //  exponentially more samples on level i. Should depend on ALL levels.
+  const double base = 2;
+  const double normalizer = powf(base, level);
+  //std::cout << "normalizer: " << level << " " << normalizer << std::endl;
+  double N = (double)GetNumberOfVertices()/normalizer;
+  return 1.0/(N+1);
+
+  // if(parent==nullptr){
+  //   double N = (double)totalNumberOfSamples;
+  //   return 1.0/(N+1);
+  // }else{
+  //   double dp = parent->GetImportance();
+  //   uint vp = parent->GetNumberOfVertices();
+  //   uint v = GetNumberOfVertices();
+  //   if(vp > v) return dp+1;
+  //   else return dp;
+  //   return dp+1;
+  // }
 }
 
 bool QRRT::SampleQuotient(ob::State *q_random_graph)
 {
   const Vertex v = boost::random_vertex(G, rng_boost);
   Q1->getStateSpace()->copyState(q_random_graph, G[v]->state);
-  Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
+  if(epsilon > 0) Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
   return true;
 }

@@ -12,11 +12,12 @@
   </benchmark>
 
   <benchmark name="minimal">
-    <algorithm name="hierarchy:qng_goal_directed"/>
+    <algorithm name="hierarchy:q_rrt"/>
     <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:rrt"/>
     <algorithm name="ompl:kpiece"/>
-    <maxplanningtime>2</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>3</runcount> <!-- number of runs per algorithm --> 
+    <maxplanningtime>10</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>10</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 

@@ -74,7 +74,7 @@ linkage_creator.CreateNdofLinkage(robot_name, 2, build_endeffector=True)
 robot_name = 'planar_manipulator/2dof_manip_1dof_inner'
 linkage_creator.CreateNdofLinkage(robot_name, 1)
 
-N = {3,5,7,9,11,13}
+N = {3,4,5,6,7,8,9,10,11,12,13,14}
 for n in N:
   robot_name = 'planar_manipulator/'+str(n)+'dof_manip'
   linkage_creator.CreateNdofLinkage(robot_name, n)

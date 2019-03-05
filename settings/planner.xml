@@ -11,12 +11,13 @@
 
   <!-- <algorithm name="hierarchy:sampler"/> -->
   <algorithm name="hierarchy:q_rrt"/>
-  <algorithm name="hierarchy:q_prm"/>
-  <algorithm name="hierarchy:qcp"/>
-  <algorithm name="hierarchy:qmp"/>
-  <algorithm name="hierarchy:qmp_connect"/>
+  <!-- <algorithm name="hierarchy:q_prm"/> -->
+  <!-- <algorithm name="hierarchy:qcp"/> -->
+  <!-- <algorithm name="hierarchy:qmp"/> -->
+  <!-- <algorithm name="hierarchy:qmp_connect"/> -->
   <algorithm name="ompl:rrt"/>
-  <!-- <algorithm name="benchmark:minimal"/> -->
+  <algorithm name="ompl:rrtconnect"/>
+  <algorithm name="benchmark:minimal"/>
   <!-- <algorithm name="benchmark:best_geometric"/> -->
   <!-- <algorithm name="ompl:prm"/> -->
 

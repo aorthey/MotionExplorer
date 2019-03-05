@@ -33,7 +33,9 @@ def Execute(name, N):
     m = re.search(r'(planner time.*:).*(\d+\.\d+)',out)
 
     if m is None:
-      times.append(max_time)
+      print "Could not find planner times. \nOutput Message:"
+      print out
+      sys.exit(0)
     else:
       t = float(m.group(2))
       times.append(t)

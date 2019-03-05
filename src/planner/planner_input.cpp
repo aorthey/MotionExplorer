@@ -49,15 +49,19 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
 
   bool kinodynamic = GetSubNodeTextDefault<int>(node_plannerinput, "kinodynamic", false);
   std::vector<std::string> algorithms = GetAlgorithms(kinodynamic);
+  int i_hierarchy = CountNumberOfSubNodes(node_plannerinput, "hierarchy");
 
-  for(uint k = 0; k < algorithms.size(); k++){
+  for(uint k_algorithm = 0; k_algorithm < algorithms.size(); k_algorithm++){
+    for(uint k_hierarchy = 0; k_hierarchy < (uint)i_hierarchy; k_hierarchy++){
+      PlannerInput* input = new PlannerInput();
 
-    PlannerInput* input = new PlannerInput();
-    if(!input->Load(node_plannerinput)) return false;
+      if(!input->Load(node_plannerinput, (k_hierarchy))) return false;
 
-    input->name_algorithm = algorithms.at(k);
-    inputs.push_back(input);
+      input->name_algorithm = algorithms.at(k_algorithm);
+      inputs.push_back(input);
+    }
   }
+
 
   return true;
 }
@@ -82,7 +86,7 @@ void PlannerInput::SetDefault()
   name_sampler = GetSubNodeAttribute<std::string>(node, "sampler", "name");
 }
 
-bool PlannerInput::Load(TiXmlElement *node)
+bool PlannerInput::Load(TiXmlElement *node, int hierarchy)
 {
   SetDefault();
   CheckNodeName(node, "plannerinput");
@@ -119,7 +123,20 @@ bool PlannerInput::Load(TiXmlElement *node)
   se3min = GetSubNodeAttributeDefault<Config>(node, "se3min", "config", se3min);
   se3max = GetSubNodeAttributeDefault<Config>(node, "se3max", "config", se3max);
 
+  ExtractHierarchy(node, hierarchy);
+
+  return true;
+}
+
+void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy)
+{
+  int ctr = 0;
   TiXmlElement* node_hierarchy = FindSubNode(node, "hierarchy");
+  while(ctr < hierarchy){
+    std::cout << node_hierarchy->Value() << std::endl;
+    node_hierarchy = FindNextSiblingNode(node_hierarchy);
+    ctr++;
+  }
   uint level = 0;
 
   if(node_hierarchy){
@@ -152,7 +169,6 @@ bool PlannerInput::Load(TiXmlElement *node)
     layers.push_back(layer);
   }
 
-  return true;
 }
 
 const CSpaceInput& PlannerInput::GetCSpaceInput()

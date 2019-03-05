@@ -54,8 +54,9 @@ class PlannerInput{
     std::vector<Layer> layers;
 
     bool Load(const char* file);
-    bool Load(TiXmlElement *node);
+    bool Load(TiXmlElement *node, int hierarchy = 0);
     void SetDefault();
+    void ExtractHierarchy(TiXmlElement *node, int hierarchy);
     const CSpaceInput& GetCSpaceInput();
     const StrategyInput& GetStrategyInput();
 
