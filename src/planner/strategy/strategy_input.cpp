@@ -2,7 +2,7 @@
 
 ob::GoalPtr StrategyInput::GetGoalPtr(ob::SpaceInformationPtr si) const{
   auto gs(std::make_shared<ob::GoalState>(si));
-  ob::ScopedState<> goal  = cspace->ConfigToOMPLState(q_goal);
+  ob::ScopedState<> goal  = cspace_levels.back()->ConfigToOMPLState(q_goal);
   gs->setState(goal);
   gs->setThreshold(epsilon_goalregion);
   return gs;

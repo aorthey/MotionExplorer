@@ -192,7 +192,6 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiQuotientPtr(
   return planner;
 }
 
-#include <ompl/base/samplers/UniformValidStateSampler.h>
 void StrategyGeometricMultiLevel::Init( const StrategyInput &input )
 {
   std::string algorithm = input.name_algorithm;

@@ -81,9 +81,7 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
 
 void MotionPlanner::CreateHierarchy()
 {
-
   hierarchy = std::make_shared<HierarchicalRoadmap>();
-  std::vector<int> idxs = input.robot_idxs;
   std::string algorithm = input.name_algorithm;
 
   WorldPlannerSettings worldsettings;
@@ -92,13 +90,14 @@ void MotionPlanner::CreateHierarchy()
   //#########################################################################
   //For each level, compute the inputs/cspaces for each robot
   //#########################################################################
+  std::vector<Layer> layers = input.stratification.at(0).layers;
   if(util::StartsWith(algorithm, "hierarchy") || util::StartsWith(algorithm, "benchmark")){
-    for(uint k = 0; k < input.layers.size(); k++){
+    for(uint k = 0; k < layers.size(); k++){
       //#########################################################################
       //LEVEL k: get robots and compute init/goal
       //#########################################################################
-      int ii = input.layers.at(k).inner_index;
-      int io = input.layers.at(k).outer_index;
+      int ii = layers.at(k).inner_index;
+      int io = layers.at(k).outer_index;
       Robot* ri = world->robots[ii];
       Robot* ro = world->robots[io];
 
@@ -119,9 +118,9 @@ void MotionPlanner::CreateHierarchy()
       //#########################################################################
       //LEVEL k: given robot k, compute its cspace (free float vs fixed base)
       //#########################################################################
-      std::string type = input.layers.at(k).type;
+      std::string type = layers.at(k).type;
       CSpaceOMPL *cspace_level_k = ComputeCSpace(type, ii, io);
-      dynamic_pointer_cast<OMPLValidityChecker>(cspace_level_k->StateValidityCheckerPtr())->SetNeighborhood(input.layers.at(k).cspace_constant);
+      dynamic_pointer_cast<OMPLValidityChecker>(cspace_level_k->StateValidityCheckerPtr())->SetNeighborhood(layers.at(k).cspace_constant);
 
       cspace_levels.push_back( cspace_level_k );
 
@@ -145,7 +144,7 @@ void MotionPlanner::CreateHierarchy()
   }else{
     //shallow algorithm (use last robot in hierarchy)
 
-    int robot_idx = input.layers.back().inner_index;
+    int robot_idx = layers.back().inner_index;
     Robot* robot = world->robots[robot_idx];
     if(robot==nullptr){
       std::cout << "Robot " << robot_idx << " does not exist." << std::endl;
@@ -157,9 +156,9 @@ void MotionPlanner::CreateHierarchy()
     Config dqi = input.dq_init; dqi.resize(robot->dq.size());
     Config dqg = input.dq_goal; dqg.resize(robot->dq.size());
 
-    std::string type = input.layers.back().type;
+    std::string type = layers.back().type;
     CSpaceOMPL *cspace_level = ComputeCSpace(type, robot_idx);
-    dynamic_pointer_cast<OMPLValidityChecker>(cspace_level->StateValidityCheckerPtr())->SetNeighborhood(input.layers.back().cspace_constant);
+    dynamic_pointer_cast<OMPLValidityChecker>(cspace_level->StateValidityCheckerPtr())->SetNeighborhood(layers.back().cspace_constant);
     cspace_levels.push_back( cspace_level );
 
     //two levels, so we can collapse the roadmap 
@@ -196,7 +195,6 @@ void MotionPlanner::Step()
   if(!strategy->IsInitialized()){
     StrategyInput strategy_input = input.GetStrategyInput();
     strategy_input.cspace_levels = cspace_levels;
-    strategy_input.cspace = cspace_levels.back();
     strategy_input.world = world;
     strategy->Init(strategy_input);
   }
@@ -219,7 +217,6 @@ void MotionPlanner::StepOneLevel()
     viewHierarchy.Clear();
     StrategyInput strategy_input = input.GetStrategyInput();
     strategy_input.cspace_levels = cspace_levels;
-    strategy_input.cspace = cspace_levels.back();
     strategy_input.world = world;
     strategy->Init(strategy_input);
   }
@@ -247,7 +244,6 @@ void MotionPlanner::AdvanceUntilSolution()
     std::cout << "init strategy: with " << cspace_levels.size() << " cspace levels."<< std::endl;
     StrategyInput strategy_input = input.GetStrategyInput();
     strategy_input.cspace_levels = cspace_levels;
-    strategy_input.cspace = cspace_levels.back();
     strategy_input.world = world;
     strategy->Init(strategy_input);
   }else{

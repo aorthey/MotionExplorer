@@ -15,8 +15,8 @@
   <!-- <algorithm name="hierarchy:qcp"/> -->
   <!-- <algorithm name="hierarchy:qmp"/> -->
   <!-- <algorithm name="hierarchy:qmp_connect"/> -->
-  <algorithm name="ompl:rrt"/>
-  <algorithm name="ompl:rrtconnect"/>
+  <!-- <algorithm name="ompl:rrt"/> -->
+  <!-- <algorithm name="ompl:rrtconnect"/> -->
   <algorithm name="benchmark:minimal"/>
   <!-- <algorithm name="benchmark:best_geometric"/> -->
   <!-- <algorithm name="ompl:prm"/> -->

@@ -13,6 +13,10 @@ struct Layer{
   std::string type;
 };
 
+struct Stratification{
+  std::vector<Layer> layers;
+};
+
 class CSpaceInput;
 class StrategyInput;
 
@@ -50,13 +54,13 @@ class PlannerInput{
     Config uMax;
 
     //input for hierarchical planner methods
-    std::vector<int> robot_idxs;
-    std::vector<Layer> layers;
+    //std::vector<Layer> layers;
+    std::vector<Stratification> stratifications;
 
     bool Load(const char* file);
     bool Load(TiXmlElement *node, int hierarchy = 0);
     void SetDefault();
-    void ExtractHierarchy(TiXmlElement *node, int hierarchy);
+    void ExtractHierarchy(TiXmlElement *node, int hierarchy_index);
     const CSpaceInput& GetCSpaceInput();
     const StrategyInput& GetStrategyInput();
 

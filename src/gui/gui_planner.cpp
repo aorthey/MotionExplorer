@@ -430,9 +430,10 @@ void PlannerBackend::RenderScreen(){
     line_y_offset += line_y_offset_stepsize;
 
     for(uint k = 0; k < planners.size(); k++){
+      uint plvl = planners.at(k)->GetInput().layers.size();
       line = "               ";
       if(k==active_planner) line += "[";
-      line += planners.at(k)->getName() + " ";
+      line += planners.at(k)->getName() + " " + "(" + std::to_string(plvl) + " levels)";
       if(k==active_planner) line += "]";
 
       DrawText(line_x_pos,line_y_offset,line);

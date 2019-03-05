@@ -18,7 +18,6 @@ struct StrategyInput{
   std::string environment_name;
   double max_planning_time;
   double epsilon_goalregion;
-  CSpaceOMPL *cspace;
 
   //for multilevel planners
   std::vector<CSpaceOMPL*> cspace_levels;

@@ -52,17 +52,29 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
   int i_hierarchy = CountNumberOfSubNodes(node_plannerinput, "hierarchy");
 
   for(uint k_algorithm = 0; k_algorithm < algorithms.size(); k_algorithm++){
-    for(uint k_hierarchy = 0; k_hierarchy < (uint)i_hierarchy; k_hierarchy++){
+    std::string name_algorithm = algorithms.at(k_algorithm);
+    if(util::StartsWith(name_algorithm, "benchmark")){
       PlannerInput* input = new PlannerInput();
-
-      if(!input->Load(node_plannerinput, (k_hierarchy))) return false;
-
       input->name_algorithm = algorithms.at(k_algorithm);
+      if(!input->Load(node_plannerinput)) return false;
+
+      for(uint k_hierarchy = 0; k_hierarchy < (uint)i_hierarchy; k_hierarchy++){
+        ExtractHierarchy(node_plannerinput, k_hierarchy);
+      }
       inputs.push_back(input);
+    }else{
+      for(uint k_hierarchy = 0; k_hierarchy < (uint)i_hierarchy; k_hierarchy++){
+
+        PlannerInput* input = new PlannerInput();
+        input->name_algorithm = algorithms.at(k_algorithm);
+
+        if(!input->Load(node_plannerinput)) return false;
+        ExtractHierarchy(node, k_hierarchy);
+
+        inputs.push_back(input);
+      }
     }
   }
-
-
   return true;
 }
 
@@ -86,7 +98,7 @@ void PlannerInput::SetDefault()
   name_sampler = GetSubNodeAttribute<std::string>(node, "sampler", "name");
 }
 
-bool PlannerInput::Load(TiXmlElement *node, int hierarchy)
+bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
 {
   SetDefault();
   CheckNodeName(node, "plannerinput");
@@ -123,26 +135,24 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy)
   se3min = GetSubNodeAttributeDefault<Config>(node, "se3min", "config", se3min);
   se3max = GetSubNodeAttributeDefault<Config>(node, "se3max", "config", se3max);
 
-  ExtractHierarchy(node, hierarchy);
-
   return true;
 }
 
-void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy)
+void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy_index)
 {
   int ctr = 0;
   TiXmlElement* node_hierarchy = FindSubNode(node, "hierarchy");
-  while(ctr < hierarchy){
+  while(ctr < hierarchy_index){
     std::cout << node_hierarchy->Value() << std::endl;
     node_hierarchy = FindNextSiblingNode(node_hierarchy);
     ctr++;
   }
   uint level = 0;
+  Stratification stratification;
 
   if(node_hierarchy){
     TiXmlElement* lindex = FindFirstSubNode(node_hierarchy, "level");
-    robot_idxs.clear();
-    layers.clear();
+    //layers.clear();
     while(lindex!=NULL){
       Layer layer;
 
@@ -153,8 +163,7 @@ void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy)
 
       layer.type = GetAttribute<std::string>(lindex, "type");
 
-      robot_idxs.push_back(layer.inner_index);
-      layers.push_back(layer);
+      stratification.layers.push_back(layer);
 
       lindex = FindNextSiblingNode(lindex);
     }
@@ -165,9 +174,9 @@ void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy)
     layer.inner_index = 0;
     layer.outer_index = 0;
     layer.type = "SE3RN";
-    robot_idxs.push_back(layer.inner_index);
-    layers.push_back(layer);
+    stratification.layers.push_back(layer);
   }
+  stratifications.push_back(stratification);
 
 }
 
@@ -222,9 +231,6 @@ std::ostream& operator<< (std::ostream& out, const PlannerInput& pin)
   out << "epsilon_goalregion : " << pin.epsilon_goalregion << std::endl;
   out << "robot              : " << pin.robot_idx << std::endl;
   out << "robot indices      : ";
-  for(uint k = 0; k < pin.robot_idxs.size(); k++){
-    out << " " << pin.robot_idxs.at(k);
-  }
   out << "environment        : " << pin.environment_name << std::endl;
   out << std::endl;
   out << std::string(80, '-') << std::endl;
