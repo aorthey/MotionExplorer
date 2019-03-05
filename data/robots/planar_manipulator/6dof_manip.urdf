@@ -1,0 +1,342 @@
+<?xml version="1.0"?>
+<robot name="planar_manipulator/6dof_manip">
+ <link name="jlink0">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0108333333333" ixy="0" ixz="0" iyy="0.0108333333333" iyz="0" izz="0.01"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.2"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.2"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="link0">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0141666666667" ixy="0" ixz="0" iyy="0.200833333333" iyz="0" izz="0.188333333333"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0.95 0"/>
+    <geometry>
+      <box size="0.4 1.5 0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0.95 0"/>
+    <geometry>
+      <box size="0.4 1.5 0.1"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_jlink0_link0_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="jlink0"/>
+  <child link="link0"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-3.14" upper="3.14" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="jlink1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0108333333333" ixy="0" ixz="0" iyy="0.0108333333333" iyz="0" izz="0.01"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.2"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.2"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_link0_jlink1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 1.9 0"/>
+  <parent link="link0"/>
+  <child link="jlink1"/>
+</joint>
+
+ <link name="link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0141666666667" ixy="0" ixz="0" iyy="0.200833333333" iyz="0" izz="0.188333333333"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0.95 0"/>
+    <geometry>
+      <box size="0.4 1.5 0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0.95 0"/>
+    <geometry>
+      <box size="0.4 1.5 0.1"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_jlink1_link1_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="jlink1"/>
+  <child link="link1"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-3.14" upper="3.14" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="jlink2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0108333333333" ixy="0" ixz="0" iyy="0.0108333333333" iyz="0" izz="0.01"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.2"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.2"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_link1_jlink2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 1.9 0"/>
+  <parent link="link1"/>
+  <child link="jlink2"/>
+</joint>
+
+ <link name="link2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0141666666667" ixy="0" ixz="0" iyy="0.200833333333" iyz="0" izz="0.188333333333"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0.95 0"/>
+    <geometry>
+      <box size="0.4 1.5 0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0.95 0"/>
+    <geometry>
+      <box size="0.4 1.5 0.1"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_jlink2_link2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="jlink2"/>
+  <child link="link2"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-3.14" upper="3.14" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="jlink3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0108333333333" ixy="0" ixz="0" iyy="0.0108333333333" iyz="0" izz="0.01"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.2"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.2"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_link2_jlink3" type="fixed">
+  <origin rpy="0 0 0" xyz="0 1.9 0"/>
+  <parent link="link2"/>
+  <child link="jlink3"/>
+</joint>
+
+ <link name="link3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0141666666667" ixy="0" ixz="0" iyy="0.200833333333" iyz="0" izz="0.188333333333"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0.95 0"/>
+    <geometry>
+      <box size="0.4 1.5 0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0.95 0"/>
+    <geometry>
+      <box size="0.4 1.5 0.1"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_jlink3_link3_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="jlink3"/>
+  <child link="link3"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-3.14" upper="3.14" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="jlink4">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0108333333333" ixy="0" ixz="0" iyy="0.0108333333333" iyz="0" izz="0.01"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.2"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.2"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_link3_jlink4" type="fixed">
+  <origin rpy="0 0 0" xyz="0 1.9 0"/>
+  <parent link="link3"/>
+  <child link="jlink4"/>
+</joint>
+
+ <link name="link4">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0141666666667" ixy="0" ixz="0" iyy="0.200833333333" iyz="0" izz="0.188333333333"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0.95 0"/>
+    <geometry>
+      <box size="0.4 1.5 0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0.95 0"/>
+    <geometry>
+      <box size="0.4 1.5 0.1"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_jlink4_link4_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="jlink4"/>
+  <child link="link4"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-3.14" upper="3.14" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="jlink5">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0108333333333" ixy="0" ixz="0" iyy="0.0108333333333" iyz="0" izz="0.01"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.2"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.2"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_link4_jlink5" type="fixed">
+  <origin rpy="0 0 0" xyz="0 1.9 0"/>
+  <parent link="link4"/>
+  <child link="jlink5"/>
+</joint>
+
+ <link name="link5">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0141666666667" ixy="0" ixz="0" iyy="0.200833333333" iyz="0" izz="0.188333333333"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0.95 0"/>
+    <geometry>
+      <box size="0.4 1.5 0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0.95 0"/>
+    <geometry>
+      <box size="0.4 1.5 0.1"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_jlink5_link5_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="jlink5"/>
+  <child link="link5"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-3.14" upper="3.14" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="jlink6">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0108333333333" ixy="0" ixz="0" iyy="0.0108333333333" iyz="0" izz="0.01"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.2"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.2"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_link5_jlink6" type="fixed">
+  <origin rpy="0 0 0" xyz="0 1.9 0"/>
+  <parent link="link5"/>
+  <child link="jlink6"/>
+</joint>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>
