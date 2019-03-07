@@ -112,8 +112,9 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       simrobot->SetVelocities(dq_init);
 
       //set other nested robots
-      for(uint k = 0; k < pin.inputs.at(0)->layers.size(); k++){
-        uint ik = pin.inputs.at(0)->layers.at(k).inner_index;
+      Stratification stratification = pin.inputs.at(0)->stratifications.front();
+      for(uint k = 0; k < stratification.layers.size(); k++){
+        uint ik = stratification.layers.at(k).inner_index;
         if(ik>=world.robots.size()){
           std::cout << std::string(80, '>') << std::endl;
           std::cout << ">>> [ERROR] Robot with idx " << ik << " does not exists." << std::endl;

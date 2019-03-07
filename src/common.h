@@ -3,14 +3,21 @@
 #include <map>
 #include <ostream>
 
+template<typename T>
+T* ptr(T& obj){ return &obj; }
+
+template<typename T>
+T* ptr(T* obj) { return obj; }
+
 template<typename T> 
 std::ostream& operator<< (std::ostream& out, const std::vector<T> &v){
-  //out << "[" << v.size() << "]"<< " ";
   for(uint k = 0; k < v.size(); k++){
-    out << v.at(k) << (k<v.size()-1?" ":"");
+    out << *ptr(v.at(k));
+    out << (k<v.size()-1?" ":"");
   }
   return out;
 }
+
 template<typename T, typename TT> 
 std::ostream& operator<< (std::ostream& out, const std::map<T,TT> &t_map){
   //out << "map[" << v.size() << "]"<< " ";

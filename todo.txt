@@ -684,3 +684,5 @@ of pseudo metric?)
 [ ] COMPUTE NBH OF BXTR
 
 [ ] Benchmark different stratifications
+[ ] Make it OMPL compatible
+[ ] Remove any Klampt reference from Strategy, isolate klampt

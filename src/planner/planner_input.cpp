@@ -1,4 +1,5 @@
 #include "util.h"
+#include "common.h"
 #include "planner/planner_input.h"
 #include "cspace/cspace_input.h"
 #include "planner/strategy/strategy_input.h"
@@ -49,17 +50,19 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
 
   bool kinodynamic = GetSubNodeTextDefault<int>(node_plannerinput, "kinodynamic", false);
   std::vector<std::string> algorithms = GetAlgorithms(kinodynamic);
-  int i_hierarchy = CountNumberOfSubNodes(node_plannerinput, "hierarchy");
+  const int i_hierarchy = CountNumberOfSubNodes(node_plannerinput, "hierarchy");
 
   for(uint k_algorithm = 0; k_algorithm < algorithms.size(); k_algorithm++){
     std::string name_algorithm = algorithms.at(k_algorithm);
+    std::cout << name_algorithm << std::endl;
     if(util::StartsWith(name_algorithm, "benchmark")){
       PlannerInput* input = new PlannerInput();
       input->name_algorithm = algorithms.at(k_algorithm);
       if(!input->Load(node_plannerinput)) return false;
 
       for(uint k_hierarchy = 0; k_hierarchy < (uint)i_hierarchy; k_hierarchy++){
-        ExtractHierarchy(node_plannerinput, k_hierarchy);
+        std::cout << "hierarchy: " << k_hierarchy << std::endl;
+        input->ExtractHierarchy(node_plannerinput, k_hierarchy);
       }
       inputs.push_back(input);
     }else{
@@ -69,12 +72,16 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
         input->name_algorithm = algorithms.at(k_algorithm);
 
         if(!input->Load(node_plannerinput)) return false;
-        ExtractHierarchy(node, k_hierarchy);
+        input->ExtractHierarchy(node_plannerinput, k_hierarchy);
 
         inputs.push_back(input);
       }
     }
   }
+  for(uint k = 0; k < inputs.size(); k++){
+    std::cout << *(inputs.at(k)) << std::endl;
+  }
+  // exit(0);
   return true;
 }
 
@@ -230,8 +237,12 @@ std::ostream& operator<< (std::ostream& out, const PlannerInput& pin)
   out << "max planning time  : " << pin.max_planning_time << " (seconds)" << std::endl;
   out << "epsilon_goalregion : " << pin.epsilon_goalregion << std::endl;
   out << "robot              : " << pin.robot_idx << std::endl;
-  out << "robot indices      : ";
   out << "environment        : " << pin.environment_name << std::endl;
+  out << "stratifications    : " << pin.stratifications.size() << std::endl;
+  for(uint k = 0; k < pin.stratifications.size(); k++){
+    int nr_of_layers = pin.stratifications.at(k).layers.size();
+    out << " - strat " << k << " has " << nr_of_layers << " layers." << std::endl;
+  }
   out << std::endl;
   out << std::string(80, '-') << std::endl;
   return out;

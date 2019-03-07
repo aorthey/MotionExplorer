@@ -16,6 +16,7 @@ namespace ompl
 
       public:
         MultiQuotient(std::vector<ob::SpaceInformationPtr> &si_vec, std::string type = "QuotientPlanner");
+        void setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_vec_);
 
         virtual ~MultiQuotient() override;
 
@@ -24,7 +25,6 @@ namespace ompl
         void setup() override;
         void clear() override;
         void setProblemDefinition(const ob::ProblemDefinitionPtr &pdef) override;
-        void setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_vec_);
 
       protected:
         std::vector<base::PathPtr> solutions;

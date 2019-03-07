@@ -70,11 +70,17 @@ class MotionPlanner{
 
     RobotWorld *world;
     std::vector<CSpaceOMPL*> cspace_levels;
+    //benchmark only
+    std::vector<std::vector<CSpaceOMPL*>> cspace_stratifications;
+
+    void InitStrategy();
+
     PlannerInput input;
     ViewHierarchy viewHierarchy;
     StrategyPtr strategy; //the actual algorithm implementation
 
     PathPiecewiseLinear *pwl;
     CSpaceOMPL* ComputeCSpace(const std::string type, const uint robot_inner_index, const uint robot_outer_index = 0);
+    CSpaceOMPL* ComputeCSpaceLayer(const Layer &layer);
 };
 

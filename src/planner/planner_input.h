@@ -53,8 +53,6 @@ class PlannerInput{
     Config uMin;
     Config uMax;
 
-    //input for hierarchical planner methods
-    //std::vector<Layer> layers;
     std::vector<Stratification> stratifications;
 
     bool Load(const char* file);

@@ -79,6 +79,34 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
   return cspace_level;
 }
 
+CSpaceOMPL* MotionPlanner::ComputeCSpaceLayer(const Layer &layer){
+  int ii = layer.inner_index;
+  int io = layer.outer_index;
+  Robot* ri = world->robots[ii];
+  Robot* ro = world->robots[io];
+
+  if(ri==nullptr){
+    std::cout << "Robot " << ii << " does not exist." << std::endl;
+    exit(0);
+  }
+  if(ro==nullptr){
+    std::cout << "Robot " << io << " does not exist." << std::endl;
+    exit(0);
+  }
+
+  Config qi = input.q_init; qi.resize(ri->q.size());
+  Config qg = input.q_goal; qg.resize(ri->q.size());
+  Config dqi = input.dq_init; dqi.resize(ri->dq.size());
+  Config dqg = input.dq_goal; dqg.resize(ri->dq.size());
+
+  //#########################################################################
+  //LEVEL k: given robot k, compute its cspace (free float vs fixed base)
+  //#########################################################################
+  std::string type = layer.type;
+  CSpaceOMPL *cspace_layer = ComputeCSpace(type, ii, io);
+  dynamic_pointer_cast<OMPLValidityChecker>(cspace_layer->StateValidityCheckerPtr())->SetNeighborhood(layer.cspace_constant);
+  return cspace_layer;
+}
 void MotionPlanner::CreateHierarchy()
 {
   hierarchy = std::make_shared<HierarchicalRoadmap>();
@@ -90,40 +118,18 @@ void MotionPlanner::CreateHierarchy()
   //#########################################################################
   //For each level, compute the inputs/cspaces for each robot
   //#########################################################################
-  std::vector<Layer> layers = input.stratification.at(0).layers;
-  if(util::StartsWith(algorithm, "hierarchy") || util::StartsWith(algorithm, "benchmark")){
+  if(util::StartsWith(algorithm, "hierarchy")){
+    std::vector<Layer> layers = input.stratifications.front().layers;
     for(uint k = 0; k < layers.size(); k++){
-      //#########################################################################
-      //LEVEL k: get robots and compute init/goal
-      //#########################################################################
-      int ii = layers.at(k).inner_index;
-      int io = layers.at(k).outer_index;
-      Robot* ri = world->robots[ii];
-      Robot* ro = world->robots[io];
 
-      if(ri==nullptr){
-        std::cout << "Robot " << ii << " does not exist." << std::endl;
-        exit(0);
-      }
-      if(ro==nullptr){
-        std::cout << "Robot " << io << " does not exist." << std::endl;
-        exit(0);
-      }
-
-      Config qi = input.q_init; qi.resize(ri->q.size());
-      Config qg = input.q_goal; qg.resize(ri->q.size());
-      Config dqi = input.dq_init; dqi.resize(ri->dq.size());
-      Config dqg = input.dq_goal; dqg.resize(ri->dq.size());
-
-      //#########################################################################
-      //LEVEL k: given robot k, compute its cspace (free float vs fixed base)
-      //#########################################################################
-      std::string type = layers.at(k).type;
-      CSpaceOMPL *cspace_level_k = ComputeCSpace(type, ii, io);
-      dynamic_pointer_cast<OMPLValidityChecker>(cspace_level_k->StateValidityCheckerPtr())->SetNeighborhood(layers.at(k).cspace_constant);
-
+      CSpaceOMPL *cspace_level_k = ComputeCSpaceLayer(layers.at(k));
       cspace_levels.push_back( cspace_level_k );
 
+      int io = layers.at(k).outer_index;
+      int ii = layers.at(k).inner_index;
+      uint N = cspace_level_k->GetRobotPtr()->q.size();
+      Config qi = input.q_init; qi.resize(N);
+      Config qg = input.q_goal; qg.resize(N);
       if(k==0){
         //add a root node
         hierarchy->AddLevel( ii, io, qi, qg);
@@ -139,37 +145,45 @@ void MotionPlanner::CreateHierarchy()
       hierarchy->AddNode( std::make_shared<Roadmap>(), path ); 
       path.push_back(0);
     }
-
-    //std::cout << hierarchy.get() << std::endl;
   }else{
     //shallow algorithm (use last robot in hierarchy)
-
-    int robot_idx = layers.back().inner_index;
-    Robot* robot = world->robots[robot_idx];
-    if(robot==nullptr){
-      std::cout << "Robot " << robot_idx << " does not exist." << std::endl;
-      exit(0);
-    }
-
-    Config qi = input.q_init; qi.resize(robot->q.size());
-    Config qg = input.q_goal; qg.resize(robot->q.size());
-    Config dqi = input.dq_init; dqi.resize(robot->dq.size());
-    Config dqg = input.dq_goal; dqg.resize(robot->dq.size());
-
-    std::string type = layers.back().type;
-    CSpaceOMPL *cspace_level = ComputeCSpace(type, robot_idx);
-    dynamic_pointer_cast<OMPLValidityChecker>(cspace_level->StateValidityCheckerPtr())->SetNeighborhood(layers.back().cspace_constant);
-    cspace_levels.push_back( cspace_level );
+    Layer layer = input.stratifications.front().layers.back();
+    CSpaceOMPL *cspace = ComputeCSpaceLayer(layer);
+    cspace_levels.push_back(cspace);
 
     //two levels, so we can collapse the roadmap 
-    hierarchy->AddLevel( robot_idx, robot_idx, qi, qg);
-    hierarchy->AddLevel( robot_idx, robot_idx, qi, qg);
+    uint N = cspace->GetRobotPtr()->q.size();
+    Config qi = input.q_init; qi.resize(N);
+    Config qg = input.q_goal; qg.resize(N);
+    int ri = cspace->GetRobotIndex();
+    hierarchy->AddLevel(ri, ri, qi, qg);
+    hierarchy->AddLevel(ri, ri, qi, qg);
 
     hierarchy->AddRootNode( std::make_shared<Roadmap>() ); 
     std::vector<int> path;
     hierarchy->AddNode( std::make_shared<Roadmap>(), path ); 
   }
 
+  if(util::StartsWith(algorithm, "benchmark")){
+    if(input.stratifications.empty()){
+      OMPL_INFORM("Benchmark has no stratifications");
+      return;
+    }
+    Layer last_layer = input.stratifications.at(0).layers.back();
+    CSpaceOMPL *cspace_ambient = ComputeCSpaceLayer(last_layer);
+
+    for(uint k = 0; k < input.stratifications.size(); k++){
+      std::vector<Layer> layers = input.stratifications.at(k).layers;
+      std::vector<CSpaceOMPL*> cspace_strat_k;
+      for(uint j = 0; j < layers.size()-1; j++){
+        CSpaceOMPL *cspace_strat_k_level_j = ComputeCSpaceLayer(layers.at(j));
+        cspace_strat_k.push_back( cspace_strat_k_level_j );
+      }
+      //every stratification shares the same ambient space
+      cspace_strat_k.push_back(cspace_ambient);
+      cspace_stratifications.push_back(cspace_strat_k);
+    }
+  }
 }
 
 void MotionPlanner::Clear()
@@ -184,6 +198,13 @@ void MotionPlanner::Clear()
   viewHierarchy.Clear();
 }
 
+void MotionPlanner::InitStrategy()
+{
+  StrategyInput strategy_input = input.GetStrategyInput();
+  strategy_input.cspace_levels = cspace_levels;
+  strategy_input.cspace_stratifications = cspace_stratifications;
+  strategy->Init(strategy_input);
+}
 void MotionPlanner::Step()
 {
   if(!active) return;
@@ -193,10 +214,7 @@ void MotionPlanner::Step()
   viewHierarchy.Clear();
 
   if(!strategy->IsInitialized()){
-    StrategyInput strategy_input = input.GetStrategyInput();
-    strategy_input.cspace_levels = cspace_levels;
-    strategy_input.world = world;
-    strategy->Init(strategy_input);
+    InitStrategy();
   }
 
   StrategyOutput output(cspace_levels.back());
@@ -215,10 +233,7 @@ void MotionPlanner::StepOneLevel()
     current_level_node = 0;
     current_path.clear();
     viewHierarchy.Clear();
-    StrategyInput strategy_input = input.GetStrategyInput();
-    strategy_input.cspace_levels = cspace_levels;
-    strategy_input.world = world;
-    strategy->Init(strategy_input);
+    InitStrategy();
   }
 
   StrategyOutput output(cspace_levels.back());
@@ -241,11 +256,7 @@ void MotionPlanner::AdvanceUntilSolution()
   viewHierarchy.Clear();
 
   if(!strategy->IsInitialized()){
-    std::cout << "init strategy: with " << cspace_levels.size() << " cspace levels."<< std::endl;
-    StrategyInput strategy_input = input.GetStrategyInput();
-    strategy_input.cspace_levels = cspace_levels;
-    strategy_input.world = world;
-    strategy->Init(strategy_input);
+    InitStrategy();
   }else{
     strategy->Clear();
   }
@@ -395,7 +406,6 @@ bool MotionPlanner::isHierarchical(){
   return false;
 }
 
-
 void MotionPlanner::DrawGLScreen(double x_, double y_){
   if(!active) return;
   if(isHierarchical()){
@@ -411,17 +421,16 @@ PathPiecewiseLinear* MotionPlanner::GetPath(){
   pwl = Rcurrent->GetShortestPath();
   return pwl;
 }
+
 void MotionPlanner::DrawGL(GUIState& state){
   if(!active) return;
 
-  //uint N = hierarchy->NumberNodesOnLevel(current_level);
   Rcurrent = hierarchy->GetNodeContent(current_path);
   Rcurrent->DrawGL(state);
   if(pwl) pwl->DrawGL(state);
 
   uint ridx = hierarchy->GetRobotIdx(current_level);
   Robot* robot = world->robots[ridx];
-
 
   uint inner_outer_approximation_level = (current_level>0?current_level-1:current_level);
   uint robot_outer_idx = hierarchy->GetOuterRobotIdx(inner_outer_approximation_level);

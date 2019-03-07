@@ -7,6 +7,17 @@ namespace oc = ompl::control;
 namespace og = ompl::geometric;
 namespace oa = ompl::app;
 
+struct OMPLGeometricStratification{
+  std::vector<ob::SpaceInformationPtr> si_vec;
+  std::vector<ob::ProblemDefinitionPtr> pdef_vec;
+  OMPLGeometricStratification( std::vector<ob::SpaceInformationPtr> si_vec_, std::vector<ob::ProblemDefinitionPtr> pdef_vec_):
+    si_vec(si_vec_), pdef_vec(pdef_vec_)
+  {
+  }
+};
+
+typedef std::shared_ptr<OMPLGeometricStratification> OMPLGeometricStratificationPtr;
+
 class StrategyGeometricMultiLevel: public Strategy{
   public:
     StrategyGeometricMultiLevel() = default;
@@ -17,24 +28,20 @@ class StrategyGeometricMultiLevel: public Strategy{
     virtual void Clear() override;
 
     ob::PlannerPtr GetPlanner(std::string algorithm,
-        std::vector<ob::SpaceInformationPtr> si_vec, 
-        std::vector<ob::ProblemDefinitionPtr> pdef_vec);
-    void RunBenchmark(
-        const StrategyInput& input,
-        std::vector<ob::SpaceInformationPtr> si_vec, 
-        std::vector<ob::ProblemDefinitionPtr> pdef_vec);
+        OMPLGeometricStratificationPtr stratification);
+
+    void RunBenchmark(const StrategyInput& input);
+    OMPLGeometricStratificationPtr OMPLGeometricStratificationFromCSpaceStratification
+    (const StrategyInput &input, std::vector<CSpaceOMPL*> cspace_levels );
 
     template<class T_Algorithm>
     ob::PlannerPtr GetSharedMultiChartPtr( 
-        std::vector<ob::SpaceInformationPtr> si_vec, 
-        std::vector<ob::ProblemDefinitionPtr> pdef_vec);
+        OMPLGeometricStratificationPtr stratification);
     template<class T_Algorithm>
     ob::PlannerPtr GetSharedMultiQuotientPtr( 
-        std::vector<ob::SpaceInformationPtr> si_vec, 
-        std::vector<ob::ProblemDefinitionPtr> pdef_vec);
+        OMPLGeometricStratificationPtr stratification);
     template<class T_Algorithm, class T_Algorithm_Two>
     ob::PlannerPtr GetSharedMultiQuotientPtr( 
-        std::vector<ob::SpaceInformationPtr> si_vec, 
-        std::vector<ob::ProblemDefinitionPtr> pdef_vec);
+        OMPLGeometricStratificationPtr stratification);
 };
 

@@ -19,10 +19,8 @@ struct StrategyInput{
   double max_planning_time;
   double epsilon_goalregion;
 
-  //for multilevel planners
   std::vector<CSpaceOMPL*> cspace_levels;
-
-  RobotWorld *world;
+  std::vector<std::vector<CSpaceOMPL*>> cspace_stratifications;
 
   virtual ob::GoalPtr GetGoalPtr(ob::SpaceInformationPtr si) const;
 
