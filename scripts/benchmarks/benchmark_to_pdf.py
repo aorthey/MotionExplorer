@@ -14,7 +14,6 @@ def XMLtoPDF(fname):
   ###################################################################################
   doc = parse(fname)
   name = doc.getElementsByTagName("name")[0]
-  print name
 
   planners = doc.getElementsByTagName("planner")
   nr_planners = int(doc.getElementsByTagName("number_of_planners")[0].firstChild.data)
@@ -30,10 +29,10 @@ def XMLtoPDF(fname):
   p_ctr = 0
   for planner in planners:
     name = planner.getElementsByTagName("name")[0].firstChild.data
-    print "name:", name
     vnames.append(name)
     runs = planner.getElementsByTagName("run")
     c_ctr = 0
+    runtimes = []
     for run in runs:
       sid = run.getAttribute("number")
       time = run.getElementsByTagName("time")[0].firstChild.data
@@ -44,6 +43,7 @@ def XMLtoPDF(fname):
       vnodes[c_ctr,p_ctr] = nodes
       vsuccess[c_ctr,p_ctr] = success
       c_ctr=c_ctr+1
+    print "name:", name, " time: ", np.mean(vtimes[:,p_ctr])
     p_ctr=p_ctr+1
 
   #print vnodes
@@ -63,11 +63,13 @@ def XMLtoPDF(fname):
   if vtimes.shape[0]<=1:
     vtimes = np.vstack((vtimes,vtimes))
 
+  means = np.mean(vtimes,axis=0)
   plt.boxplot(vtimes, notch=0, sym='k+', vert=1, whis=1.5)
 
   plannerLabelRotation=80
   xtickNames = plt.setp(ax,xticklabels=vnames)
   plt.setp(xtickNames, rotation=plannerLabelRotation)
+  #plt.plot(means,'xr')
 
   ###################################################################################
   #max lowest mean value be visualized as bold
@@ -96,7 +98,7 @@ def XMLtoPDF(fname):
   ax.text(0.85, 0.9, txt, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
   ax.axhline(timelimit,color='k',linestyle='--')
 
-  plt.tight_layout()
+  #plt.tight_layout()
   pp.savefig(plt.gcf())
   pp.close()
 
@@ -110,7 +112,6 @@ if __name__ == '__main__':
     for fname in sys.argv[1:]:
       XMLtoPDF(fname)
   else:
-    fname = "../../data/benchmarks/02D_disk_2018_09_28_14:06:26.xml"
-    fname = "../../data/benchmarks/02D_disk_2018_09_28_14:17:30.xml"
+    fname = "../../data/benchmarks/last.xml"
     XMLtoPDF(fname)
 
