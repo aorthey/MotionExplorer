@@ -1,0 +1,603 @@
+#include "common.h"
+#include "qmp_connect.h"
+#include "planner/cspace/cspace.h"
+
+#include <ompl/datastructures/PDF.h>
+#include <boost/foreach.hpp>
+#include <boost/graph/graphviz.hpp>
+#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
+#include <ompl/base/goals/GoalSampleableRegion.h>
+#include <ompl/base/PlannerDataGraph.h>
+#include <ompl/tools/config/SelfConfig.h>
+#include <ompl/tools/config/MagicConstants.h>
+#include <ompl/geometric/planners/prm/ConnectionStrategy.h>
+
+using namespace og;
+using namespace ob;
+
+#define foreach BOOST_FOREACH
+namespace ompl
+{
+  namespace magic
+  {
+    static const unsigned int MAX_RANDOM_BOUNCE_STEPS = 5;
+  }
+}
+
+QMPConnect::QMPConnect(const ob::SpaceInformationPtr &si, Quotient *parent_ ):
+  QMP(si, parent_)
+{
+  setName("QMPConnect"+to_string(id));
+}
+
+QMPConnect::~QMPConnect(){
+}
+
+void QMPConnect::clear(){
+  QMP::clear();
+  lastSourceVertexSampled = -1;
+  lastTargetVertexSampled = -1;
+  lastTSampled = -1;
+  isSampled = false;
+  samplesOnShortestPath = 0;
+}
+
+void QMPConnect::setup()
+{
+  BaseT::setup();
+
+  if(setup_)
+  {
+    og::QMPConnect *quotient_parent = static_cast<og::QMPConnect*>(parent);
+    if(quotient_parent==nullptr){
+    }else{
+      G[v_start].associated_source = quotient_parent->v_start;
+      G[v_start].associated_target = quotient_parent->v_start;
+      G[v_start].associated_t = 0;
+      G[v_goal].associated_source = quotient_parent->v_goal;
+      G[v_goal].associated_target = quotient_parent->v_goal;
+      G[v_goal].associated_t = 0;
+    }
+  }
+}
+
+QuotientGraph::Vertex QMPConnect::CreateNewVertex(ob::State *state)
+{
+  Vertex m = BaseT::CreateNewVertex(state);
+  og::QMPConnect *quotient_parent = static_cast<og::QMPConnect*>(parent);
+  if(quotient_parent != nullptr && quotient_parent->isSampled){
+    G[m].associated_source = quotient_parent->lastSourceVertexSampled;
+    G[m].associated_target = quotient_parent->lastTargetVertexSampled;
+    G[m].associated_t = quotient_parent->lastTSampled;
+  }
+  return m;
+}
+bool QMPConnect::Sample(ob::State *q_random)
+{
+  totalNumberOfSamples++;
+  if(parent == nullptr){
+    //return Q1_valid_sampler->sample(q_random);
+    if(!hasSolution && rng_.uniform01() < goalBias_){
+      q_random = Q1->cloneState(G[v_goal].state);//stateProperty_[goalM_.at(0)]);
+      //goal->sampleGoal(q_random);
+    }else{
+      Q1_valid_sampler->sample(q_random);
+    }
+  }else{
+    //Adjusted sampling function: Sampling in G0 x X1
+    if(!hasSolution && rng_.uniform01() < goalBias_){
+      //goal->sampleGoal(q_random);
+      q_random = Q1->cloneState(G[v_goal].state);//stateProperty_[goalM_.at(0)]);
+    }else{
+      ob::SpaceInformationPtr Q0 = parent->getSpaceInformation();
+      base::State *s_X1 = X1->allocState();
+      base::State *s_Q0 = Q0->allocState();
+
+      X1_sampler->sampleUniform(s_X1);
+      parent->SampleQuotient(s_Q0);
+      MergeStates(s_Q0, s_X1, q_random);
+
+      X1->freeState(s_X1);
+      Q0->freeState(s_Q0);
+    }
+  }
+  return Q1->isValid(q_random);
+}
+
+// bool QMPConnect::SampleQuotient(ob::State *q_random_graph)
+// {
+//   PDF<Edge> pdf = GetEdgePDF();
+
+//   Edge e = pdf.sample(rng_.uniform01());
+//   double t = rng_.uniform01();
+
+//   const Vertex v1 = boost::source(e, G);
+//   const Vertex v2 = boost::target(e, G);
+//   const ob::State *from = G[v1].state;//G[v1].state;
+//   const ob::State *to = G[v2].state;//G[v2].state;
+
+//   Q1->getStateSpace()->interpolate(from, to, t, q_random_graph);
+
+//   if(epsilon>0) Q1_sampler->sampleGaussian(q_random_graph, q_random_graph, epsilon);
+//   //if(epsilon>0) Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
+
+//   lastSourceVertexSampled = v1;
+//   lastTargetVertexSampled = v2;
+//   lastTSampled = t;
+//   isSampled = true;
+//   return true;
+// }
+
+double QMPConnect::Distance(const Vertex a, const Vertex b) const
+{
+  if(parent == nullptr){
+    return si_->distance(G[a].state, G[b].state);
+  }else{
+
+    og::QMPConnect *quotient_parent = dynamic_cast<og::QMPConnect*>(parent);
+    if(!quotient_parent->isSampled) return si_->distance(G[a].state, G[b].state);
+
+    ob::PathPtr Q1_path = InterpolateQ1GraphConstraint(a, b);
+    double d = +dInf;
+    if(Q1_path){
+      d = Q1_path->length();
+    }
+    return d;
+  }
+}
+
+bool QMPConnect::Connect(const Vertex a, const Vertex b){
+
+  if(parent==nullptr){
+    return QMP::Connect(a,b);
+  }else{
+    og::QMPConnect *quotient_parent = static_cast<og::QMPConnect*>(parent);
+
+    ob::PathPtr sol = InterpolateQ1GraphConstraint(a,b);
+    if(!sol){
+      return false;
+    }
+
+    og::PathGeometric path = static_cast<og::PathGeometric&>(*sol);
+    std::vector<ob::State *> spathQ1 = path.getStates();
+    std::vector<Vertex> vpathQ0 = quotient_parent->shortestVertexPath_;
+
+    Vertex v_prevQ1 = a;
+    ob::State *s_prevQ1 = spathQ1.at(0);
+
+    for(uint k = 1; k < spathQ1.size(); k++){
+      if(!si_->isValid(spathQ1.at(k-1))) return false;
+      if(!si_->checkMotion(spathQ1.at(k-1),spathQ1.at(k))) return false;
+
+      Vertex v_nextQ1;
+      if(k==spathQ1.size()-1){
+        v_nextQ1 = b;
+      }else{
+        v_nextQ1 = CreateNewVertex(spathQ1.at(k));
+        G[v_nextQ1].associated_source = vpathQ0.at(k);
+        G[v_nextQ1].associated_target = vpathQ0.at(k);
+        G[v_nextQ1].associated_t = 0;
+        nearest_datastructure->add(v_nextQ1);
+        totalNumberOfSamples++;
+      }
+
+      double dk = Q1->distance(s_prevQ1, spathQ1.at(k));
+      boost::add_edge(v_prevQ1, v_nextQ1, EdgeInternalState(ob::Cost(dk)), G);
+      uniteComponents(v_prevQ1, v_nextQ1);
+      v_prevQ1 = v_nextQ1;
+      s_prevQ1 = spathQ1.at(k);
+    }
+
+    return true;
+
+  }
+}
+
+
+//@brief qa,qb \in Q1. vsa,vsb,vta,vtb are vertices on G0
+//the resulting path is an interpolation in Q1, such that each point lies in the
+//slice of the graph G0
+
+ob::PathPtr QMPConnect::InterpolateQ1GraphConstraint( const Vertex a, const Vertex b) const
+{
+  og::QMPConnect *quotient_parent = dynamic_cast<og::QMPConnect*>(parent);
+  ob::State* sa = G[a].state;
+  ob::State* sb = G[b].state;
+
+  ob::State* saX1 = X1->allocState();
+  ob::State* sbX1 = X1->allocState();
+  ProjectX1Subspace(sa, saX1);
+  ProjectX1Subspace(sb, sbX1);
+
+  ob::State* saQ0 = Q0->allocState();
+  ob::State* sbQ0 = Q0->allocState();
+
+  ProjectQ0Subspace(sa, saQ0);
+  ProjectQ0Subspace(sb, sbQ0);
+
+  const Vertex asQ0 = G[a].associated_source;
+  const Vertex atQ0 = G[a].associated_target;
+
+  const Vertex bsQ0 = G[b].associated_source;
+  const Vertex btQ0 = G[b].associated_target;
+
+  //std::cout << "associated vertices: " << asQ0 << "," << atQ0 << "|" << bsQ0 << "," << btQ0 << "." << std::endl;
+  ob::PathPtr Q0_path = quotient_parent->GetShortestPathOffsetVertices( saQ0, sbQ0, asQ0, bsQ0, atQ0, btQ0);
+
+  if(!Q0_path) return nullptr;
+
+  double D = Q0_path->length();
+  if(D>=dInf){
+    std::cout << D << std::endl;
+    exit(0);
+  }
+  //Note: shortestVertexPath_ contains all vertices along shortest path
+
+  //###########################################################################
+  //interpolate along shortestvertexpath_
+  //###########################################################################
+
+  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*Q0_path);
+  std::vector<ob::State *> Q0_spath = gpath.getStates();
+
+  //#########################################################################
+  // move along vertices of Q0 and create new milestones on Q1
+  //#########################################################################
+
+  auto Q1_path = std::make_shared<PathGeometric>(Q1);
+
+  Q1_path->append(sa);
+
+  double d_graph_distance = 0.0;
+
+  for(uint i = 1; i < Q0_spath.size(); i++)
+  {
+    ob::State *s_prevQ0 = Q0_spath.at(i-1);
+    ob::State *s_nextQ0 = Q0_spath.at(i);
+
+    d_graph_distance += Q0->distance(s_prevQ0, s_nextQ0);
+
+    ob::State* s_nextX1 = X1->allocState();
+    X1->getStateSpace()->interpolate(saX1, sbX1, d_graph_distance/D,s_nextX1);
+
+    ob::State *s_nextQ1 = Q1->allocState();
+    MergeStates(s_nextQ0, s_nextX1, s_nextQ1);
+    X1->freeState(s_nextX1);
+
+    Q1_path->append(s_nextQ1);
+  }
+
+  Q0->freeState(saQ0);
+  Q0->freeState(sbQ0);
+  X1->freeState(saX1);
+  X1->freeState(sbX1);
+
+  return Q1_path;
+}
+
+ob::PathPtr QMPConnect::GetShortestPathOffsetVertices(const ob::State *qa, const ob::State *qb, 
+  const Vertex vsa, const Vertex vsb, const Vertex vta, const Vertex vtb)
+{
+  //###########################################################################
+  //construct modified graph
+  //###########################################################################
+  Vertex va;
+  Vertex vb;
+
+
+  // Input: two edges ea=(vsa --- vta)   and    eb=(vsb --- vtb)
+  // 
+  //  Four cases:
+  //  (1) vsa=vta               :  (vsa) and (vsb --- vtb)
+  //  (2) vsb=vtb               :  (vsa --- vta) and (vsb)
+  //  (3) vsa=vta and vsb=vtb   :  (vsa) and (vsb)
+  //  (4) vsa!=vta and vsb!=vtb :  (vsa --- vta) and (vsb --- vtb)
+  //
+
+  //  Case(4): check if ea==eb
+  if(vsa!=vta && vsb!=vtb){
+    const Edge ea = boost::edge(vsa,vta,G).first;
+    const Edge eb = boost::edge(vsb,vtb,G).first;
+    if(ea==eb){
+      ob::PathPtr path = std::make_shared<og::PathGeometric>(si_, qa, qb);
+      shortestVertexPath_.clear();
+      shortestVertexPath_.push_back(vsa);
+      shortestVertexPath_.push_back(vta);
+      return path;
+    }
+  }
+  //  Case(1): check if vsb=vsa or vsb=vta
+  //  Case(2): check if vsa=vsb or vsa=vtb
+  if(vsa==vta){
+    if(vsa==vsb){
+      ob::PathPtr path = std::make_shared<og::PathGeometric>(si_, qa, qb);
+      shortestVertexPath_.clear();
+      shortestVertexPath_.push_back(vsa);
+      shortestVertexPath_.push_back(vtb);
+      return path;
+    }else if(vsa==vtb){
+      ob::PathPtr path = std::make_shared<og::PathGeometric>(si_, qa, qb);
+      shortestVertexPath_.clear();
+      shortestVertexPath_.push_back(vsa);
+      shortestVertexPath_.push_back(vsb);
+      return path;
+    }
+  }
+  if(vsb==vtb){
+    if(vsb==vsa){
+      ob::PathPtr path = std::make_shared<og::PathGeometric>(si_, qa, qb);
+      shortestVertexPath_.clear();
+      shortestVertexPath_.push_back(vta);
+      shortestVertexPath_.push_back(vsb);
+      return path;
+    }else if(vsb==vta){
+      ob::PathPtr path = std::make_shared<og::PathGeometric>(si_, qa, qb);
+      shortestVertexPath_.clear();
+      shortestVertexPath_.push_back(vsa);
+      shortestVertexPath_.push_back(vsb);
+      return path;
+    }
+  }
+
+  //  Check cases:
+  // (1) isAonEdge  && !isBonEdge
+  // (2) !isAonEdge && isBonEdge
+  // (3) !isAonEdge && !isBonEdge
+  // (4) isAonEdge  && isBonEdge
+
+  bool isAonEdge = true;
+  bool isBonEdge = true;
+  if(vsa==vta) isAonEdge = false;
+  if(vsb==vtb) isBonEdge = false;
+
+  ob::Cost dsa,dta,dsb,dtb;
+
+  if(isAonEdge){
+    boost::remove_edge(vsa, vta, G);
+    va = boost::add_vertex(G);
+    G[va].state = si_->cloneState(qa);
+
+    dsa = opt_->motionCost(G[vsa].state, G[va].state);
+    dta = opt_->motionCost(G[va].state, G[vta].state);
+    boost::add_edge(vsa, va, EdgeInternalState(dsa), G);
+    boost::add_edge(va, vta, EdgeInternalState(dta), G);
+
+  }else{
+    va = vsa;
+    G[va].state = si_->cloneState(qa);
+  }
+
+  if(isBonEdge){
+    boost::remove_edge(vsb, vtb, G);
+    vb = boost::add_vertex(G);
+    G[vb].state = si_->cloneState(qb);
+
+    dsb = opt_->motionCost(G[vsb].state, G[vb].state);
+    dtb = opt_->motionCost(G[vb].state, G[vtb].state);
+    boost::add_edge(vsb, vb, EdgeInternalState(dsb), G);
+    boost::add_edge(vb, vtb, EdgeInternalState(dtb), G);
+  }else{
+    vb = vsb;
+    G[vb].state = si_->cloneState(qb);
+  }
+
+  //###########################################################################
+  //search in modified graph
+  //###########################################################################
+
+  bool same_component = sameComponent(va, vb);
+  ob::PathPtr path = nullptr;
+  if(same_component){
+    //std::cout << "ConstructSolution: " << va << "<->" << vb << std::endl;
+    path = GetPath(va, vb);
+  }else{
+    std::cout << "WARNING:" << va << " and " << vb << " are not in same component" << std::endl;
+  }
+
+  //###########################################################################
+  //return to former graph
+  //###########################################################################
+
+  if(isBonEdge){
+    boost::remove_edge(vsb, vb, G);
+    boost::remove_edge(vb, vtb, G);
+    si_->freeState(G[vb].state);
+
+    boost::clear_vertex(vb, G);
+    boost::remove_vertex(vb, G);
+
+    ob::Cost db = opt_->motionCost(G[vsb].state, G[vtb].state);
+    boost::add_edge(vsb, vtb, EdgeInternalState(db), G);
+    uniteComponents(vsb, vtb);
+  }
+  if(isAonEdge){
+    boost::remove_edge(vsa, va, G);
+    boost::remove_edge(va, vta, G);
+    si_->freeState(G[va].state);
+
+    boost::clear_vertex(va, G);
+    boost::remove_vertex(va, G);
+
+    ob::Cost da = opt_->motionCost(G[vsa].state, G[vta].state);
+    boost::add_edge(vsa, vta, EdgeInternalState(da), G);
+    uniteComponents(vsa, vta);
+  }
+
+  return path;
+}
+
+
+void QMPConnect::RandomWalk(const Vertex &v) 
+{
+  const bool DEBUG = false;
+
+  og::QMPConnect *quotient_parent = static_cast<og::QMPConnect*>(parent);
+  if(parent == nullptr){
+    return QMP::RandomWalk(v);
+  }
+
+  Vertex v_first = v;
+
+  uint steps = magic::MAX_RANDOM_BOUNCE_STEPS;
+  for (uint i = 0; i < steps; ++i)
+  {
+    //#########################################################################
+    //Sample s_last uniformly from G_{k-1} \times C_k
+    //#########################################################################
+
+    ob::State *s_last = xstates[0];
+
+    base::State *s_last_X1 = X1->allocState();
+    base::State *s_last_Q0 = Q0->allocState();
+
+    X1_sampler->sampleUniform(s_last_X1);
+    parent->SampleQuotient(s_last_Q0);
+
+    MergeStates(s_last_Q0, s_last_X1, s_last);
+
+    Q0->freeState(s_last_Q0);
+    X1->freeState(s_last_X1);
+
+    if(!Q1->isValid(s_last)) continue;
+
+    //#########################################################################
+    //compute interpolation between s_prev and s_last on G_{k-1}
+    // the resulting datastructures are
+    //
+    // std::vector<Vertex> vpath
+    // std::vector<ob::State *> spath
+    //#########################################################################
+
+    Vertex v_last = AddConfiguration(s_last);
+
+    ob::PathPtr solQ1 = InterpolateQ1GraphConstraint(v_first, v_last);
+    if(!solQ1){
+      std::cout << "no path towards sampled configuration" << std::endl;
+      exit(0);
+    }
+
+    og::PathGeometric pathQ1 = static_cast<og::PathGeometric&>(*solQ1);
+
+    std::vector<ob::State *> spathQ1 = pathQ1.getStates();
+    std::vector<Vertex> vpathQ0 = quotient_parent->shortestVertexPath_;
+
+    if(DEBUG){
+      std::cout << std::string(80, '-') << std::endl;
+      std::cout << "start edge " << G[v_first].associated_source << "<->" 
+        << G[v_first].associated_target <<
+        " (" << G[v_first].associated_t << ")" 
+        << std::endl;
+
+      for(uint k = 1; k < vpathQ0.size(); k++){
+        std::cout << "edge " << vpathQ0.at(k-1) << "<->"<< vpathQ0.at(k) << std::endl;
+      }
+
+      std::cout << "goal edge " << G[v_last].associated_source << "<->" 
+        << G[v_last].associated_target << " (" 
+        << G[v_last].associated_t << ")" << std::endl;
+    }
+
+    //#########################################################################
+    //move along sol/shortestvertexpath_ until infeasible or target reached.
+    //#########################################################################
+
+    Vertex v_prevQ1 = v_first;
+
+    for(uint k = 1; k < spathQ1.size(); k++){
+
+      std::pair<ob::State *, double> lastValid;
+      lastValid.first = spathQ1.at(k);
+
+      if(DEBUG) std::cout << "edge " << vpathQ0.at(k-1) << "<->"<< vpathQ0.at(k) << std::endl;
+
+      if(!si_->isValid(spathQ1.at(k-1))){
+        break;
+      }
+      if(!si_->checkMotion(spathQ1.at(k-1),spathQ1.at(k), lastValid)){
+        if(lastValid.second < std::numeric_limits<double>::epsilon()){
+          break;
+        }else{
+          Vertex v_nextQ1 = CreateNewVertex(lastValid.first);
+          if(DEBUG) std::cout << "progress: " <<lastValid.second << std::endl;
+          if(k==1){
+
+            if(DEBUG) std::cout << "first" << std::endl;
+            Vertex vQ0 = G[v_first].associated_source;
+
+            double T1 = G[v_first].associated_t;
+            double T2 = lastValid.second;
+
+            if(vQ0 == vpathQ0.at(1)){
+              vQ0 = G[v_first].associated_target;
+              G[v_nextQ1].associated_t=T1-(T2*T1);
+            }else{
+              G[v_nextQ1].associated_t=T1+T2*(1-T1);
+            }
+
+            G[v_nextQ1].associated_source=vQ0;
+            G[v_nextQ1].associated_target=vpathQ0.at(k);
+
+
+          }else{
+            if(k>=spathQ1.size()-1){
+              //vpathQ0(size-2) is the last graph vertex, vpathQ0(size-1) is the
+              //vertex which we have deleted again.
+              if(DEBUG) std::cout << "last" << std::endl;
+              Vertex vQ0 = G[v_last].associated_target;
+              double T1 = G[v_last].associated_t;
+              double T2 = lastValid.second;
+              if(vQ0 == vpathQ0.at(vpathQ0.size()-2)){
+                vQ0 = G[v_last].associated_source;
+                G[v_nextQ1].associated_t=T1+(1-T2)*(1-T1);
+              }else{
+                G[v_nextQ1].associated_t=T1*T2;
+              }
+              G[v_nextQ1].associated_source=vpathQ0.at(vpathQ0.size()-2);
+              G[v_nextQ1].associated_target=vQ0;
+
+              //double dv = Q0->distance(quotient_parent->G[vQ0].state, quotient_parent->stateProperty_[vpathQ0.at(k)]);
+            }else{
+              if(DEBUG) std::cout << "in between" << std::endl;
+
+              G[v_nextQ1].associated_source=vpathQ0.at(k-1);
+              G[v_nextQ1].associated_target=vpathQ0.at(k);
+              G[v_nextQ1].associated_t=lastValid.second;
+            }
+          }
+          if(DEBUG){
+            std::cout << "new vertex associated edges: " 
+            << G[v_nextQ1].associated_source << "<->"
+            << G[v_nextQ1].associated_target << " ("
+            << G[v_nextQ1].associated_t << ")"
+            << std::endl;
+          }
+
+          double dk = Q1->distance(spathQ1.at(k), G[v_nextQ1].state);
+          boost::add_edge(v_prevQ1, v_nextQ1, EdgeInternalState(ob::Cost(dk)), G);
+          uniteComponents(v_prevQ1, v_nextQ1);
+          nearest_datastructure->add(v_nextQ1);
+        }
+        break;
+      }
+
+      if(DEBUG) std::cout << "feasible" << std::endl;
+      Vertex v_nextQ1;
+      if(k<spathQ1.size()-1){
+        v_nextQ1 = CreateNewVertex(spathQ1.at(k));
+        G[v_nextQ1].associated_source=vpathQ0.at(k);
+        G[v_nextQ1].associated_target=vpathQ0.at(k);
+        G[v_nextQ1].associated_t=0;
+        nearest_datastructure->add(v_nextQ1);
+        totalNumberOfSamples++;
+      }else{
+        v_nextQ1 = v_last;
+      }
+
+      double dk = Q1->distance(spathQ1.at(k-1),spathQ1.at(k));
+      boost::add_edge(v_prevQ1, v_nextQ1, EdgeInternalState(ob::Cost(dk)), G);
+      uniteComponents(v_prevQ1, v_nextQ1);
+      v_prevQ1 = v_nextQ1;
+    }
+
+  }
+}

@@ -1,0 +1,57 @@
+#include "q_prm.h"
+#include "common.h"
+#include "planner/cspace/validitychecker/validity_checker_ompl.h"
+
+#include <ompl/datastructures/PDF.h>
+#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
+#include <ompl/base/goals/GoalSampleableRegion.h>
+#include <ompl/base/spaces/SO2StateSpace.h>
+#include <ompl/base/spaces/SO3StateSpace.h>
+#include <boost/foreach.hpp>
+#include <boost/graph/graphviz.hpp>
+
+using namespace og;
+using namespace ob;
+#define foreach BOOST_FOREACH
+
+QPRM::QPRM(const ob::SpaceInformationPtr &si, Quotient *parent_ ):
+  BaseT(si, parent_)
+{
+  setName("QPRM"+std::to_string(id));
+}
+
+QPRM::~QPRM()
+{
+  samplesOnShortestPath = 0;
+}
+
+void QPRM::Grow(double t){
+  if(firstRun){
+    Init();
+    firstRun = false;
+  }
+  double T_grow = (2.0/3.0)*t;
+  growRoadmap(ob::timedPlannerTerminationCondition(T_grow), xstates[0]);
+  double T_expand = (1.0/3.0)*t;
+  expandRoadmap( ob::timedPlannerTerminationCondition(T_expand), xstates);
+}
+bool QPRM::GetSolution(ob::PathPtr &solution)
+{
+  if(BaseT::GetSolution(solution)){
+    for(uint k = 0; k < startGoalVertexPath_.size()-1; k++){
+      Vertex v1 = startGoalVertexPath_.at(k);
+      Vertex v2 = startGoalVertexPath_.at(k+1);
+      Edge ek = boost::edge(v1,v2,G).first;
+      pdf_edges_on_shortest_path.add(ek, G[ek].getCost().value());
+    }
+  }
+  return hasSolution;
+}
+
+bool QPRM::SampleQuotient(ob::State *q_random_graph)
+{
+  const Vertex v = boost::random_vertex(G, rng_boost);
+  Q1->getStateSpace()->copyState(q_random_graph, G[v].state);
+  Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
+  return true;
+}
