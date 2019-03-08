@@ -135,6 +135,7 @@ void Quotient::clear()
   hasSolution = false;
   firstRun = true;
   if(parent==nullptr && X1_dimension>0) X1_sampler.reset();
+  //Q1_sampler.reset();
   if(verbose>0) std::cout << "CLEAR QUOTIENTSPACE " << id << std::endl;
 }
 
@@ -868,6 +869,10 @@ bool Quotient::HasSolution()
   }
   return hasSolution;
 }
+uint Quotient::GetTotalNumberOfSamples() const
+{
+  return totalNumberOfSamples;
+}
 Quotient* Quotient::GetParent() const
 {
   return parent;
@@ -901,7 +906,9 @@ bool Quotient::Sample(ob::State *q_random)
 {
   totalNumberOfSamples++;
   if(parent == nullptr){
-    return Q1_valid_sampler->sample(q_random);
+    //return Q1_valid_sampler->sample(q_random);
+    Q1_sampler->sampleUniform(q_random);
+    return Q1->isValid(q_random);
   }else{
     if(X1_dimension>0)
     {

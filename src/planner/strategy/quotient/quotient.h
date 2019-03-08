@@ -79,6 +79,7 @@ namespace ompl
         void SetChild(Quotient *child_);
         void SetParent(Quotient *parent_);
 
+        uint GetTotalNumberOfSamples() const;
         friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::Quotient& qtnt);
         virtual void Print(std::ostream& out) const;
 

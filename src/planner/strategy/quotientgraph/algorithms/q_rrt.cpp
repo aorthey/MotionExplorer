@@ -21,10 +21,12 @@ QRRT::QRRT(const ob::SpaceInformationPtr &si, Quotient *parent_ ):
   setName("QRRT"+std::to_string(id));
   Planner::declareParam<double>("range", this, &QRRT::setRange, &QRRT::getRange, "0.:1.:10000.");
   Planner::declareParam<double>("goal_bias", this, &QRRT::setGoalBias, &QRRT::getGoalBias, "0.:.05:1.");
+  q_random = new Configuration(Q1);
 }
 
 QRRT::~QRRT()
 {
+  DeleteConfiguration(q_random);
 }
 
 void QRRT::setGoalBias(double goalBias_)
@@ -53,12 +55,10 @@ void QRRT::setup()
   // const double base = 2;
   // const double normalizer = powf(base, level);
   epsilon = 0.05;///normalizer;//Q1->getSpaceMeasure()*0.1;
-  std::cout << "epsilon: " << epsilon << std::endl;
 }
 void QRRT::clear()
 {
   BaseT::clear();
-  delete q_random;
 }
 
 bool QRRT::GetSolution(ob::PathPtr &solution)
@@ -85,15 +85,16 @@ void QRRT::Grow(double t){
   if(firstRun){
     Init();
     firstRun = false;
-    q_random = new Configuration(Q1);
   }
 
   if(hasSolution){
+    totalNumberOfSamples++;
     Sample(q_random->state);
   }else{
     double s = rng_.uniform01();
     if(s < goalBias){
       Q1->copyState(q_random->state, q_goal->state);
+      totalNumberOfSamples++;
     }else{
       Sample(q_random->state);
     }
@@ -110,6 +111,8 @@ void QRRT::Grow(double t){
   {
     Vertex v_next = AddConfiguration(q_next);
     AddEdge(q_nearest->index, v_next);
+  }else{
+    DeleteConfiguration(q_next);
   }
 }
 

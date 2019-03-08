@@ -49,7 +49,7 @@ QuotientGraph::QuotientGraph(const ob::SpaceInformationPtr &si, Quotient *parent
 
 void QuotientGraph::setup(){
   if (!nearest_datastructure){
-    nearest_datastructure.reset(tools::SelfConfig::getDefaultNearestNeighbors<const Configuration*>(this));
+    nearest_datastructure.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration*>(this));
     nearest_datastructure->setDistanceFunction([this](const Configuration *a, const Configuration *b)
                              {
                                return Distance(a, b);
@@ -75,11 +75,8 @@ void QuotientGraph::setup(){
 }
 
 QuotientGraph::~QuotientGraph(){
+  clear();
   si_->freeStates(xstates);
-  G.clear();
-  if (nearest_datastructure){
-    nearest_datastructure->clear();
-  }
 }
 QuotientGraph::Configuration::Configuration(const base::SpaceInformationPtr &si): 
   state(si->allocState())
@@ -88,21 +85,36 @@ QuotientGraph::Configuration::Configuration(const base::SpaceInformationPtr &si,
   state(si->cloneState(state_))
 {}
 
-void QuotientGraph::ClearVertices()
+void QuotientGraph::DeleteConfiguration(Configuration *q)
 {
-  foreach (Vertex v, boost::vertices(G)){
-    si_->freeState(G[v]->state);
+  if (q != nullptr){
+    if (q->state != nullptr){
+      Q1->freeState(q->state);
+    }
+    delete q;
+    q = nullptr;
   }
 }
-void QuotientGraph::clear()
+void QuotientGraph::ClearVertices()
 {
-  Quotient::clear();
-
-  ClearVertices();
-  G.clear();
-  if(nearest_datastructure){
+  if (nearest_datastructure)
+  {
+    std::vector<Configuration*> configs;
+    nearest_datastructure->list(configs);
+    for (auto &config : configs)
+    {
+        DeleteConfiguration(config);
+    }
     nearest_datastructure->clear();
   }
+  G.clear();
+}
+
+void QuotientGraph::clear()
+{
+  BaseT::clear();
+
+  ClearVertices();
   clearQuery();
   iterations_ = 0;
   totalNumberOfSamples = 0;
@@ -147,7 +159,6 @@ void QuotientGraph::Init()
     if (st != nullptr){
       q_goal = new Configuration(Q1, st);
       q_goal->isGoal = true;
-      //v_goal = AddConfiguration(q_goal);
     }
   }
   if (q_goal == nullptr){
@@ -158,57 +169,57 @@ void QuotientGraph::Init()
   //OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nrStartStates);
 }
 
-void QuotientGraph::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState)
-{
-  while (!ptc)
-  {
-    iterations_++;
-    bool found = false;
-    while (!found && !ptc)
-    {
-      unsigned int attempts = 0;
-      do
-      {
-        found = Sample(workState);
-        attempts++;
-      } while (attempts < magic::FIND_VALID_STATE_ATTEMPTS_WITHOUT_TERMINATION_CHECK && !found);
-    }
-    if (found){
-      Configuration *q_new = new Configuration(Q1, workState);
-      AddConfiguration(q_new);//si_->cloneState(workState));
-    }
-  }
-}
+// void QuotientGraph::growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState)
+// {
+//   while (!ptc)
+//   {
+//     iterations_++;
+//     bool found = false;
+//     while (!found && !ptc)
+//     {
+//       unsigned int attempts = 0;
+//       do
+//       {
+//         found = Sample(workState);
+//         attempts++;
+//       } while (attempts < magic::FIND_VALID_STATE_ATTEMPTS_WITHOUT_TERMINATION_CHECK && !found);
+//     }
+//     if (found){
+//       Configuration *q_new = new Configuration(Q1, workState);
+//       AddConfiguration(q_new);//si_->cloneState(workState));
+//     }
+//   }
+// }
 
-void QuotientGraph::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
-                                         std::vector<ob::State *> &workStates)
-{
-  PDF<Vertex> pdf;
-  //find all nodes which have been tried to expand often (frontier nodes), but
-  //which have not been successfully expanded (boundary nodes). In that case the
-  //vertex has a large voronoi bias but has been stuck. The proposed solution
-  //here starts at the vertex, and does a random walk (randombouncemotion), to
-  //try to get unstuck.
+//void QuotientGraph::expandRoadmap(const ob::PlannerTerminationCondition &ptc,
+//                                         std::vector<ob::State *> &workStates)
+//{
+//  PDF<Vertex> pdf;
+//  //find all nodes which have been tried to expand often (frontier nodes), but
+//  //which have not been successfully expanded (boundary nodes). In that case the
+//  //vertex has a large voronoi bias but has been stuck. The proposed solution
+//  //here starts at the vertex, and does a random walk (randombouncemotion), to
+//  //try to get unstuck.
 
-  foreach (Vertex v, boost::vertices(G))
-  {
-    const unsigned long int t = G[v]->total_connection_attempts;
-    if(t!=0){
-      double d = ((double)(t - G[v]->successful_connection_attempts) / (double)t);
-      pdf.add(v, d);
-    }
-  }
+//  foreach (Vertex v, boost::vertices(G))
+//  {
+//    const unsigned long int t = G[v]->total_connection_attempts;
+//    if(t!=0){
+//      double d = ((double)(t - G[v]->successful_connection_attempts) / (double)t);
+//      pdf.add(v, d);
+//    }
+//  }
 
-  if (pdf.empty())
-    return;
+//  if (pdf.empty())
+//    return;
 
-  while (!ptc)
-  {
-    iterations_++;
-    Vertex v = pdf.sample(rng_.uniform01());
-    RandomWalk(v);
-  }
-}
+//  while (!ptc)
+//  {
+//    iterations_++;
+//    Vertex v = pdf.sample(rng_.uniform01());
+//    RandomWalk(v);
+//  }
+//}
 
 void QuotientGraph::uniteComponents(Vertex m1, Vertex m2)
 {
@@ -313,46 +324,46 @@ void QuotientGraph::AddEdge(const Vertex a, const Vertex b)
   uniteComponents(a, b);
 }
 
-void QuotientGraph::RandomWalk(const Vertex &v)
-{
-  const ob::State *s_prev = G[v]->state;
+//void QuotientGraph::RandomWalk(const Vertex &v)
+//{
+//  const ob::State *s_prev = G[v]->state;
 
-  Vertex v_prev = v;
+//  Vertex v_prev = v;
 
-  uint ctr = 0;
-  for (uint i = 0; i < magic::MAX_RANDOM_BOUNCE_STEPS; ++i)
-  {
-    ob::State *s_next = xstates[ctr];
-    Q1_sampler->sampleUniform(s_next);
+//  uint ctr = 0;
+//  for (uint i = 0; i < magic::MAX_RANDOM_BOUNCE_STEPS; ++i)
+//  {
+//    ob::State *s_next = xstates[ctr];
+//    Q1_sampler->sampleUniform(s_next);
 
-    std::pair<ob::State *, double> lastValid;
-    lastValid.first = s_next;
+//    std::pair<ob::State *, double> lastValid;
+//    lastValid.first = s_next;
 
-    //check if motion is valid: s_prev -------- s_next
-    //s_prev ------ lastValid ----------------s_next
-    if(!si_->isValid(s_prev)){
-      continue;
-    }
-    si_->checkMotion(s_prev, s_next, lastValid);
+//    //check if motion is valid: s_prev -------- s_next
+//    //s_prev ------ lastValid ----------------s_next
+//    if(!si_->isValid(s_prev)){
+//      continue;
+//    }
+//    si_->checkMotion(s_prev, s_next, lastValid);
 
-    //if we made progress towards s_next, then add the last valid state to our
-    //roadmap, connect it to the s_prev state
-    if(lastValid.second > std::numeric_limits<double>::epsilon())
-    {
-      Configuration *q_last_valid = new Configuration(Q1, lastValid.first);
-      Vertex v_next = AddConfiguration(q_last_valid);
+//    //if we made progress towards s_next, then add the last valid state to our
+//    //roadmap, connect it to the s_prev state
+//    if(lastValid.second > std::numeric_limits<double>::epsilon())
+//    {
+//      Configuration *q_last_valid = new Configuration(Q1, lastValid.first);
+//      Vertex v_next = AddConfiguration(q_last_valid);
 
-      EdgeInternalState properties(opt_->motionCost(G[v_prev]->state, G[v_next]->state));
-      boost::add_edge(v_prev, v_next, properties, G);
-      uniteComponents(v_prev, v_next);
-      nearest_datastructure->add(G[v_next]);
+//      EdgeInternalState properties(opt_->motionCost(G[v_prev]->state, G[v_next]->state));
+//      boost::add_edge(v_prev, v_next, properties, G);
+//      uniteComponents(v_prev, v_next);
+//      nearest_datastructure->add(G[v_next]);
 
-      v_prev = v_next;
-      s_prev = G[v_next]->state;
-      ctr++;
-    }
-  }
-}
+//      v_prev = v_next;
+//      s_prev = G[v_next]->state;
+//      ctr++;
+//    }
+//  }
+//}
 
 double QuotientGraph::GetGraphLength() const{
   return graphLength;

@@ -24,7 +24,41 @@ MultiQuotient<T,Tlast>::MultiQuotient(std::vector<ob::SpaceInformationPtr> &si_v
     }
     quotientSpaces.back()->SetLevel(k);
   }
-  std::cout << "Created hierarchy with " << si_vec.size() << " levels." << std::endl;
+  if(DEBUG) std::cout << "Created hierarchy with " << si_vec.size() << " levels." << std::endl;
+}
+
+template <class T, class Tlast>
+int MultiQuotient<T,Tlast>::GetLevels()
+{
+  return quotientSpaces.size();
+}
+template <class T, class Tlast>
+std::vector<int> MultiQuotient<T,Tlast>::GetNodes()
+{
+  uint N = quotientSpaces.size();
+  std::vector<int> nodesPerLevel;
+  for(uint k = 0; k < N; k++){
+    uint Nk = quotientSpaces.at(k)->GetTotalNumberOfSamples();
+    //plus two nodes for start and goal configuration
+    nodesPerLevel.push_back(Nk+2);
+  }
+  return nodesPerLevel;
+}
+template <class T, class Tlast>
+std::vector<int> MultiQuotient<T,Tlast>::GetFeasibleNodes()
+{
+  std::vector<int> feasibleNodesPerLevel;
+  ob::PlannerData data(si_);
+  uint Nvertices = 0;
+
+  uint K = min(solutions.size()+1,quotientSpaces.size());
+  for(uint k = 0; k < K; k++){
+    og::Quotient *Qk = quotientSpaces.at(k);
+    Qk->getPlannerData(data);
+    feasibleNodesPerLevel.push_back(data.numVertices()-Nvertices);
+    Nvertices = data.numVertices();
+  }
+  return feasibleNodesPerLevel;
 }
 
 template <class T, class Tlast>
@@ -66,7 +100,6 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
   
   static const double T_GROW = 0.01; //time to grow before Checking if solution exists
 
-  const bool DEBUG = true;
   ompl::time::point t_start = ompl::time::now();
 
   for(uint k = currentQuotientLevel; k < quotientSpaces.size(); k++){

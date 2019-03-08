@@ -60,8 +60,18 @@ bool BenchmarkOutput::Save(const char* file_)
   doc.LinkEndChild(node);
   doc.SaveFile(file.c_str());
   std::cout << "Benchmark saved to " << file << std::endl;
-  //std::ifstream f(file);
-  //if (f.is_open()) std::cout << f.rdbuf();
+
+  //Copy XML to "last.xml" for better access to last written xml
+  boost::filesystem::path p(file);
+  boost::filesystem::path dir = p.parent_path();
+  std::ifstream src(file, std::ios::binary);
+
+  std::string file_copy = dir.string()+"/last.xml";
+  std::cout << dir.string() << std::endl;
+  std::cout << file_copy << std::endl;
+  std::ofstream dst(file_copy, std::ios::binary);
+  dst << src.rdbuf();
+  std::cout << "Benchmark copied to " << file_copy << std::endl;
   return true;
 }
 void BenchmarkOutput::PrintPDF()
@@ -105,6 +115,20 @@ bool BenchmarkOutput::Save(TiXmlElement *node)
       AddSubNode(runnode, "time", std::min(time, experiment.maxTime));
       AddSubNode(runnode, "memory", run["memory REAL"]);
       AddSubNode(runnode, "nodes", run["graph states INTEGER"]);
+      std::string sstrat = "stratification levels INTEGER";
+      if(run.find(sstrat) != run.end()){
+        AddSubNode(runnode, "levels", run[sstrat]);
+        uint levels = boost::lexical_cast<uint>(run[sstrat]);
+        TiXmlElement nodes_per_levels_node("sampled_nodes_per_level");
+        for(uint k = 0; k < levels; k++){
+          std::string kstrat = "stratification level"+to_string(k)+" nodes INTEGER";
+          AddSubNode(nodes_per_levels_node, "nodes", run[kstrat]);
+          std::string fkstrat = "stratification level"+to_string(k)+" feasible nodes INTEGER";
+          AddSubNode(nodes_per_levels_node, "feasible_nodes", run[fkstrat]);
+        }
+        runnode.InsertEndChild(nodes_per_levels_node);
+      }
+
       if(time < experiment.maxTime){
         AddSubNode(runnode, "success", 1);
       }else{

@@ -56,7 +56,7 @@ def XMLtoPDF(fname):
   fig = plt.figure(0)
   ax = fig.gca()
   fig.patch.set_facecolor('white')
-  ax.set_xlabel('Motion Planning Algorithm')
+  ax.set_xlabel('Algorithm')
   ax.set_ylim([0,timelimit+0.15*timelimit]);
   ax.set_ylabel('Time (s)')
 
@@ -95,7 +95,6 @@ def XMLtoPDF(fname):
     txt = "timelimit=%3.0f"%timelimit+"s"
   ax.text(0.85, 0.9, txt, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
   ax.axhline(timelimit,color='k',linestyle='--')
-
 
   plt.tight_layout()
   pp.savefig(plt.gcf())

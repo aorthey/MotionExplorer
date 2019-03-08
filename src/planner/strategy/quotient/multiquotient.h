@@ -15,6 +15,7 @@ namespace ompl
         static_assert(std::is_base_of<og::Quotient, Tlast>::value, "Template must inherit from Quotient");
 
       public:
+        const bool DEBUG{false};
         MultiQuotient(std::vector<ob::SpaceInformationPtr> &si_vec, std::string type = "QuotientPlanner");
         void setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_vec_);
 
@@ -25,6 +26,10 @@ namespace ompl
         void setup() override;
         void clear() override;
         void setProblemDefinition(const ob::ProblemDefinitionPtr &pdef) override;
+        int GetLevels();
+
+        std::vector<int> GetFeasibleNodes();
+        std::vector<int> GetNodes();
 
       protected:
         std::vector<base::PathPtr> solutions;

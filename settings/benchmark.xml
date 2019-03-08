@@ -12,14 +12,14 @@
   </benchmark>
 
   <benchmark name="minimal">
-    <algorithm name="hierarchy:q_rrt"/>
-    <algorithm name="ompl:rrtconnect"/>
     <algorithm name="ompl:rrt"/>
-    <algorithm name="ompl:fmt"/>
+    <algorithm name="hierarchy:q_rrt"/>
+    <!-- <algorithm name="ompl:rrtconnect"/> -->
+    <!-- <algorithm name="ompl:fmt"/> -->
     <!-- <algorithm name="ompl:kpiece"/> -->
-    <maxplanningtime>30</maxplanningtime> <!-- runtime in (s) --> 
+    <maxplanningtime>10</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>10</runcount> <!-- number of runs per algorithm --> 
-    <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
+    <maxmemory>1000000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 
   <!-- complete benchmark of all planners -->

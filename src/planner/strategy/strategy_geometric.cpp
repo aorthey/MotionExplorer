@@ -6,7 +6,7 @@
 
 #include "planner/strategy/quotient/multiquotient.h"
 //#include "planner/strategy/quotientgraph/algorithms/qmp_connect.h"
-#include "planner/strategy/quotientgraph/algorithms/qmp.h"
+//#include "planner/strategy/quotientgraph/algorithms/qmp.h"
 //#include "planner/strategy/quotientgraph/algorithms/q_prm.h"
 #include "planner/strategy/quotientgraph/algorithms/q_rrt.h"
 #include "planner/strategy/quotientchart/multichart.h"
@@ -80,6 +80,23 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   uint states = boost::lexical_cast<int>(run["graph states INTEGER"]);
   double time = boost::lexical_cast<double>(run["time REAL"]);
   double memory = boost::lexical_cast<double>(run["memory REAL"]);
+  //uint states = boost::lexical_cast<int>(run["sampled states INTEGER"]);
+
+
+  typedef og::MultiQuotient<og::QRRT> MultiQuotient;
+  std::shared_ptr<MultiQuotient> qplanner = dynamic_pointer_cast<MultiQuotient>(planner);
+  if(qplanner != nullptr){
+    uint N = qplanner->GetLevels();
+    std::vector<int> nodes = qplanner->GetNodes();
+    std::vector<int> fnodes = qplanner->GetFeasibleNodes();
+    run["stratification levels INTEGER"] = to_string(N);
+    for(uint k = 0; k < N; k++){
+      std::string strk = "stratification level"+to_string(k)+" nodes INTEGER";
+      run[strk] = to_string(nodes.at(k));
+      std::string strkf = "stratification level"+to_string(k)+" feasible nodes INTEGER";
+      run[strkf] = to_string(fnodes.at(k));
+    }
+  }
 
   std::cout << "Run " << pid << " [" << planner->getName() << "] " << (solved?"solved":"no solution") << "(time: "<< time << ", states: " << states << ", memory: " << memory << ")" << std::endl;
   std::cout << std::string(80, '-') << std::endl;
@@ -133,9 +150,9 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){
     std::cout << "Planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
     exit(0);
-  }else if(algorithm=="hierarchy:qmp"){
-    planner = GetSharedMultiQuotientPtr<og::QMP>(stratification);
-    planner->setName("QMP");
+  // }else if(algorithm=="hierarchy:qmp"){
+  //   planner = GetSharedMultiQuotientPtr<og::QMP>(stratification);
+  //   planner->setName("QMP");
   }else if(algorithm=="hierarchy:qcp"){
     planner = GetSharedMultiQuotientPtr<og::QCP>(stratification);
     planner->setName("QCP");
@@ -325,19 +342,28 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
 
     if(util::StartsWith(name_algorithm, "hierarchy")){
       for(uint i = 0; i < stratifications.size(); i++){
-        uint N = stratifications.at(i)->si_vec.size();
+        //uint N = stratifications.at(i)->si_vec.size();
         //std::cout << "adding algorithm " << name_algorithm << " with " << N << " layers."<< std::endl;
         ob::PlannerPtr planner_k_i = GetPlanner(binput.algorithms.at(k), stratifications.at(i));
-        std::string name_algorithm_strat = planner_k_i->getName()+"_("+std::to_string(N)+"_LYR";
-        name_algorithm_strat += (N>1?"S)":")");
+        std::string name_algorithm_strat = planner_k_i->getName()+"_(";
+
+        std::vector<ob::SpaceInformationPtr> si_vec_k = stratifications.at(i)->si_vec;
+        for(uint j = 0; j < si_vec_k.size(); j++){
+          uint Nj = si_vec_k.at(j)->getStateDimension();
+          name_algorithm_strat += std::to_string(Nj);
+        }
+        name_algorithm_strat += ")";
+
+        // std::string name_algorithm_strat = planner_k_i->getName()+"_("+std::to_string(N)+"_LYR";
+        // name_algorithm_strat += (N>1?"S)":")");
         planner_k_i->setName(name_algorithm_strat);
+        std::cout << planner_k_i->getName() << std::endl;
         benchmark.addPlanner(planner_k_i);
       }
     }else{
       benchmark.addPlanner(GetPlanner(binput.algorithms.at(k), stratifications.at(0)));
     }
   }
-
 
   CSpaceOMPL *cspace = input.cspace_levels.back();
   ob::ScopedState<> start = cspace->ConfigToOMPLState(input.q_init);

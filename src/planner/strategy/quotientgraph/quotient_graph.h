@@ -101,7 +101,7 @@ namespace ompl
         typedef BGT::out_edge_iterator OEIterator;
         typedef Vertex* VertexParent;
         typedef VertexIndex* VertexRank;
-        typedef std::shared_ptr<NearestNeighbors<const Configuration*>> RoadmapNeighborsPtr;
+        typedef std::shared_ptr<NearestNeighbors<Configuration*>> RoadmapNeighborsPtr;
         //typedef std::function<const std::vector<Configuration*> &(const Configuration*)> ConnectionStrategy;
 
       public:
@@ -123,6 +123,7 @@ namespace ompl
         virtual void clear() override;
         void clearQuery();
         virtual void ClearVertices();
+        void DeleteConfiguration(Configuration *q);
 
         template <template <typename T> class NN>
         void setNearestNeighbors();
@@ -161,10 +162,11 @@ namespace ompl
 
         ob::Cost costHeuristic(Vertex u, Vertex v) const;
 
-        virtual void growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState);
-        virtual void expandRoadmap(const ob::PlannerTerminationCondition &ptc, std::vector<ob::State *> &workStates);
+        //virtual void growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState);
+        //virtual void expandRoadmap(const ob::PlannerTerminationCondition &ptc, std::vector<ob::State *> &workStates);
+        //virtual void RandomWalk(const Vertex &v);
+
         ob::PathPtr GetPath(const Vertex &start, const Vertex &goal);
-        virtual void RandomWalk(const Vertex &v);
 
         std::vector<ob::State *> xstates;
         RoadmapNeighborsPtr nearest_datastructure;

@@ -683,6 +683,9 @@ of pseudo metric?)
 [ ] REPLACE SO2 WITH SO2INTERPOLATE
 [ ] COMPUTE NBH OF BXTR
 
-[ ] Benchmark different stratifications
+[x] Benchmark different stratifications
+[ ] BUG: why is the terrain not used in hierarchy
 [ ] Make it OMPL compatible
 [ ] Remove any Klampt reference from Strategy, isolate klampt
+
+[ ] Memory Leak

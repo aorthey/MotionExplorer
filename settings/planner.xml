@@ -11,6 +11,7 @@
 
   <!-- <algorithm name="hierarchy:sampler"/> -->
   <algorithm name="benchmark:minimal"/>
+  <algorithm name="ompl:rrt"/>
   <algorithm name="hierarchy:q_rrt"/>
   <!-- <algorithm name="hierarchy:q_prm"/> -->
   <!-- <algorithm name="hierarchy:qcp"/> -->

@@ -179,7 +179,20 @@ void MotionPlanner::CreateHierarchy()
         CSpaceOMPL *cspace_strat_k_level_j = ComputeCSpaceLayer(layers.at(j));
         cspace_strat_k.push_back( cspace_strat_k_level_j );
       }
-      //every stratification shares the same ambient space
+      //DEBUG
+      //############################################################################
+      CSpaceOMPL *cspace_strat_k_last_level = ComputeCSpaceLayer(layers.back());
+      uint N_kl = cspace_strat_k_last_level->GetDimensionality();
+      uint N_a = cspace_ambient->GetDimensionality();
+      if(N_kl != N_a){
+        std::cout << "For benchmark we require ALL hierarchies to share the same ambient space." << std::endl;
+        std::cout << "Please make sure every hierarchy has the same last entry" << std::endl;
+        std::cout << "However, stratification " << k << " has Dimensionality " << N_kl << std::endl;
+        std::cout << "While stratification 0 has Dimensionality " << N_a << std::endl;
+        exit(0);
+      }
+      //############################################################################
+      //every stratification must share the same ambient space
       cspace_strat_k.push_back(cspace_ambient);
       cspace_stratifications.push_back(cspace_strat_k);
     }

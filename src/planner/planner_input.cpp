@@ -66,7 +66,11 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
       }
       inputs.push_back(input);
     }else{
-      for(uint k_hierarchy = 0; k_hierarchy < (uint)i_hierarchy; k_hierarchy++){
+      uint number_of_hierarchies = 1;
+      if(util::StartsWith(name_algorithm, "hierarchy")){
+        number_of_hierarchies = i_hierarchy;
+      }
+      for(uint k_hierarchy = 0; k_hierarchy < number_of_hierarchies; k_hierarchy++){
 
         PlannerInput* input = new PlannerInput();
         input->name_algorithm = algorithms.at(k_algorithm);
