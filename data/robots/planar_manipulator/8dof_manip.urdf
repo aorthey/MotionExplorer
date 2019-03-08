@@ -418,29 +418,54 @@
   <limit lower="-3.14" upper="3.14" effort="0.01" velocity="100"/>
 </joint>
 
- <link name="jlink8">
+ <link name="endeffectorL">
   <inertial>
     <mass value="1"/>
-    <inertia ixx="0.0108333333333" ixy="0" ixz="0" iyy="0.0108333333333" iyz="0" izz="0.01"/>
+    <inertia ixx="0.00166666666667" ixy="0" ixz="0" iyy="0.0141666666667" iyz="0" izz="0.0141666666667"/>
   </inertial>
   <visual>
-    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.25 0.1 0"/>
     <geometry>
-      <cylinder length="0.1" radius="0.2"/>
+      <box size="0.1 0.4 0.1"/>
     </geometry>
   </visual>
   <collision>
-    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <origin rpy="0 0 0" xyz="-0.25 0.1 0"/>
     <geometry>
-      <cylinder length="0.1" radius="0.2"/>
+      <box size="0.1 0.4 0.1"/>
     </geometry>
   </collision>
  </link>
 
-<joint name="joint_fixed_link7_jlink8" type="fixed">
-  <origin rpy="0 0 0" xyz="0 1.9 0"/>
+ <link name="endeffectorR">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.00166666666667" ixy="0" ixz="0" iyy="0.0141666666667" iyz="0" izz="0.0141666666667"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.25 0.1 0"/>
+    <geometry>
+      <box size="0.1 0.4 0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.25 0.1 0"/>
+    <geometry>
+      <box size="0.1 0.4 0.1"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_link7_endeffectorL" type="fixed">
+  <origin rpy="0 0 0" xyz="0 1.7 0"/>
   <parent link="link7"/>
-  <child link="jlink8"/>
+  <child link="endeffectorL"/>
+</joint>
+
+<joint name="joint_fixed_link7_endeffectorR" type="fixed">
+  <origin rpy="0 0 0" xyz="0 1.7 0"/>
+  <parent link="link7"/>
+  <child link="endeffectorR"/>
 </joint>
 
   <klampt package_root="../../.." default_acc_max="4" >
