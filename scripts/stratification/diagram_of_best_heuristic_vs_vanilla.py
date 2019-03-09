@@ -21,7 +21,6 @@ number_of_strata = 8
 ###################################################################################
 doc = parse(fname)
 name = doc.getElementsByTagName("name")[0]
-print name
 
 planners = doc.getElementsByTagName("planner")
 nr_planners = int(doc.getElementsByTagName("number_of_planners")[0].firstChild.data)
@@ -37,6 +36,8 @@ vnames = []
 percentages=[]
 vtimes = np.zeros((runcount,nr_planners))
 p_ctr = 0
+times_per_level = np.zeros((number_of_strata,nr_planners))
+
 for planner in planners:
   name = planner.getElementsByTagName("name")[0].firstChild.data
   print "name:", name
@@ -51,6 +52,7 @@ for planner in planners:
     Ln = np.array(list(m.group(2)), dtype=int)
     for l in Ln:
       A[l-1,:] = l
+    Nstrata = Ln[-1]
 
     runs = planner.getElementsByTagName("run")
     Aruns = np.full((number_of_strata,idxs),0,dtype=object)
@@ -58,6 +60,7 @@ for planner in planners:
       sid = run.getAttribute("number")
       nodes = run.getElementsByTagName("nodes")[0].firstChild.data
       time = run.getElementsByTagName("time")[0].firstChild.data
+      times_per_level[Nstrata-1,p_ctr] = time
       if run.getElementsByTagName("levels"):
         levels = int(run.getElementsByTagName("levels")[0].firstChild.data)
         snodes = run.getElementsByTagName("sampled_nodes_per_level")[0]
@@ -87,51 +90,30 @@ for planner in planners:
 
     percentages.append(float(np.sum(Aruns[:,2]))/float(np.sum(Aruns[:,1])))
 
-  # else:
-  #   runs = planner.getElementsByTagName("run")
-  #   feasibleNodes = []
-  #   for run in runs:
-  #     sid = run.getAttribute("number")
-  #     nodes = run.getElementsByTagName("nodes")[0].firstChild.data
-  #     time = run.getElementsByTagName("time")[0].firstChild.data
-  #     feasibleNodes.append(nodes)
-  #     vtimes[c_ctr,p_ctr] = time
-
-  #   feasibleNodes = np.array(feasibleNodes)
-
   p_ctr=p_ctr+1
 
-vtimes = vtimes[:,~np.all(vtimes==0,axis=0)]
-times = np.mean(vtimes,axis=0)
-percentages = np.array(percentages)
-yL = np.max(percentages)
+#vtimes = vtimes[:,~np.all(vtimes==0,axis=0)]
+#times = np.mean(vtimes,axis=0)
+
+times_mean = np.mean(times_per_level,axis=1)
+times_min = np.min(times_per_level,axis=1)
+times_max = np.max(times_per_level,axis=1)
 
 fig = plt.figure(0)
 fig.patch.set_facecolor('white')
-plt.title('Feasibility vs. Time per Algorithm')
+plt.title('Time per DoF')
+# axcolor='#ffffff'
+ax = fig.gca()
+ax.set_xlabel('Degrees of Freedom')
+ax.set_ylabel('Time (s)')
 
-ax1color='#ffffff'
-ax2color='tab:red'
+startD = 3
+I = np.arange(startD,len(times_mean)+1)
 
-ax1 = fig.gca()
-ax1.set_ylabel('Percentage of Feasible Samples')
-ax1.set_xlabel('Algorithm')
-ax1.axhline(yL,color='k',linestyle='--',alpha=0.2)
-ax1.plot(percentages,'-ok')
+plt.plot(I,times_mean[startD-1:],'-k')
+plt.plot(I,times_max[startD-1:],'-r')
+plt.plot(I,times_min[startD-1:],'-g')
 
-ax1.set_ylim([0,0.5])
-ax1.xaxis.set_ticks(np.arange(0, len(percentages)))
-plannerLabelRotation=80
-xtickNames = plt.setp(ax1,xticklabels=vnames)
-plt.setp(xtickNames, rotation=plannerLabelRotation)
-
-ax2 = ax1.twinx()
-ax2.set_ylabel('Time (s)', color=ax2color)
-ax2.tick_params(axis='y', labelcolor=ax2color)
-ax2.plot(times,'-o',color=ax2color)
-
-
-plt.tight_layout()
 pp.savefig(plt.gcf())
 pp.close()
 plt.show()

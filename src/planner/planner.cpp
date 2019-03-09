@@ -170,30 +170,30 @@ void MotionPlanner::CreateHierarchy()
       return;
     }
     Layer last_layer = input.stratifications.at(0).layers.back();
-    CSpaceOMPL *cspace_ambient = ComputeCSpaceLayer(last_layer);
+    // CSpaceOMPL *cspace_ambient = ComputeCSpaceLayer(last_layer);
 
     for(uint k = 0; k < input.stratifications.size(); k++){
       std::vector<Layer> layers = input.stratifications.at(k).layers;
       std::vector<CSpaceOMPL*> cspace_strat_k;
-      for(uint j = 0; j < layers.size()-1; j++){
+      for(uint j = 0; j < layers.size(); j++){
         CSpaceOMPL *cspace_strat_k_level_j = ComputeCSpaceLayer(layers.at(j));
         cspace_strat_k.push_back( cspace_strat_k_level_j );
       }
       //DEBUG
       //############################################################################
-      CSpaceOMPL *cspace_strat_k_last_level = ComputeCSpaceLayer(layers.back());
-      uint N_kl = cspace_strat_k_last_level->GetDimensionality();
-      uint N_a = cspace_ambient->GetDimensionality();
-      if(N_kl != N_a){
-        std::cout << "For benchmark we require ALL hierarchies to share the same ambient space." << std::endl;
-        std::cout << "Please make sure every hierarchy has the same last entry" << std::endl;
-        std::cout << "However, stratification " << k << " has Dimensionality " << N_kl << std::endl;
-        std::cout << "While stratification 0 has Dimensionality " << N_a << std::endl;
-        exit(0);
-      }
+      // CSpaceOMPL *cspace_strat_k_last_level = ComputeCSpaceLayer(layers.back());
+      // uint N_kl = cspace_strat_k_last_level->GetDimensionality();
+      // uint N_a = cspace_ambient->GetDimensionality();
+      // if(N_kl != N_a){
+      //   OMPL_INFORM("For benchmark we require ALL hierarchies to share the same ambient space.");
+      //   std::cout << "Please make sure every hierarchy has the same last entry" << std::endl;
+      //   std::cout << "However, stratification " << k << " has Dimensionality " << N_kl << std::endl;
+      //   std::cout << "While stratification 0 has Dimensionality " << N_a << std::endl;
+      //   exit(0);
+      // }
       //############################################################################
       //every stratification must share the same ambient space
-      cspace_strat_k.push_back(cspace_ambient);
+      //cspace_strat_k.push_back(cspace_ambient);
       cspace_stratifications.push_back(cspace_strat_k);
     }
   }

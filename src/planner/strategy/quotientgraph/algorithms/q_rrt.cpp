@@ -51,10 +51,9 @@ void QRRT::setup()
   BaseT::setup();
   ompl::tools::SelfConfig sc(Q1, getName());
   sc.configurePlannerRange(maxDistance);
-
-  // const double base = 2;
-  // const double normalizer = powf(base, level);
-  epsilon = 0.05;///normalizer;//Q1->getSpaceMeasure()*0.1;
+  const double base = 2;
+  const double normalizer = powf(base, level);
+  epsilon = 0.1/normalizer;
 }
 void QRRT::clear()
 {
@@ -113,6 +112,7 @@ void QRRT::Grow(double t){
     AddEdge(q_nearest->index, v_next);
   }else{
     DeleteConfiguration(q_next);
+    //percentage_feasible_samples = (float)numVertices()/(float)totalNumberOfSamples;
   }
 }
 
@@ -130,21 +130,8 @@ double QRRT::GetImportance() const{
   //  exponentially more samples on level i. Should depend on ALL levels.
   const double base = 2;
   const double normalizer = powf(base, level);
-  //std::cout << "normalizer: " << level << " " << normalizer << std::endl;
   double N = (double)GetNumberOfVertices()/normalizer;
   return 1.0/(N+1);
-
-  // if(parent==nullptr){
-  //   double N = (double)totalNumberOfSamples;
-  //   return 1.0/(N+1);
-  // }else{
-  //   double dp = parent->GetImportance();
-  //   uint vp = parent->GetNumberOfVertices();
-  //   uint v = GetNumberOfVertices();
-  //   if(vp > v) return dp+1;
-  //   else return dp;
-  //   return dp+1;
-  // }
 }
 
 bool QRRT::SampleQuotient(ob::State *q_random_graph)

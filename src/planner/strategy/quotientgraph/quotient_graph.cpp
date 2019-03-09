@@ -453,7 +453,6 @@ void QuotientGraph::getPlannerData(ob::PlannerData &data) const
   uint startComponent = 0;
   uint goalComponent = 1;
 
-
   PlannerDataVertexAnnotated pstart(G[v_start]->state, startComponent);
   data.addStartVertex(pstart);
   if(hasSolution){
@@ -462,7 +461,7 @@ void QuotientGraph::getPlannerData(ob::PlannerData &data) const
     data.addGoalVertex(pgoal);
   }
 
-  std::cout << "vertices " << GetNumberOfVertices() << " edges " << GetNumberOfEdges() << std::endl;
+  //std::cout << "vertices " << GetNumberOfVertices() << " edges " << GetNumberOfEdges() << std::endl;
   uint ctr = 0;
   foreach (const Edge e, boost::edges(G))
   {

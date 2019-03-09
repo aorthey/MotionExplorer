@@ -24,20 +24,20 @@ MultiQuotient<T,Tlast>::MultiQuotient(std::vector<ob::SpaceInformationPtr> &si_v
     }
     quotientSpaces.back()->SetLevel(k);
   }
+  stopAtLevel = quotientSpaces.size();
   if(DEBUG) std::cout << "Created hierarchy with " << si_vec.size() << " levels." << std::endl;
 }
 
 template <class T, class Tlast>
 int MultiQuotient<T,Tlast>::GetLevels()
 {
-  return quotientSpaces.size();
+  return stopAtLevel;
 }
 template <class T, class Tlast>
 std::vector<int> MultiQuotient<T,Tlast>::GetNodes()
 {
-  uint N = quotientSpaces.size();
   std::vector<int> nodesPerLevel;
-  for(uint k = 0; k < N; k++){
+  for(uint k = 0; k < stopAtLevel; k++){
     uint Nk = quotientSpaces.at(k)->GetTotalNumberOfSamples();
     //plus two nodes for start and goal configuration
     nodesPerLevel.push_back(Nk+2);
@@ -52,6 +52,7 @@ std::vector<int> MultiQuotient<T,Tlast>::GetFeasibleNodes()
   uint Nvertices = 0;
 
   uint K = min(solutions.size()+1,quotientSpaces.size());
+  K = min(K, stopAtLevel);
   for(uint k = 0; k < K; k++){
     og::Quotient *Qk = quotientSpaces.at(k);
     Qk->getPlannerData(data);
@@ -69,17 +70,28 @@ template <class T, class Tlast>
 void MultiQuotient<T,Tlast>::setup(){
 
   Planner::setup();
-  for(uint k = 0; k < quotientSpaces.size(); k++){
+  for(uint k = 0; k < stopAtLevel; k++){
     quotientSpaces.at(k)->setup();
   }
   currentQuotientLevel = 0;
 }
 
 template <class T, class Tlast>
+void MultiQuotient<T,Tlast>::SetStopLevel(uint level_)
+{
+  if(level_ > quotientSpaces.size()){
+    stopAtLevel = quotientSpaces.size();
+  }else{
+    stopAtLevel = level_;
+  }
+  std::cout << "new stop level: " << stopAtLevel << " from " << quotientSpaces.size() << std::endl;
+}
+
+template <class T, class Tlast>
 void MultiQuotient<T,Tlast>::clear(){
   Planner::clear();
 
-  for(uint k = 0; k < quotientSpaces.size(); k++){
+  for(uint k = 0; k < stopAtLevel; k++){
     quotientSpaces.at(k)->clear();
   }
   currentQuotientLevel = 0;
@@ -102,7 +114,8 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
 
   ompl::time::point t_start = ompl::time::now();
 
-  for(uint k = currentQuotientLevel; k < quotientSpaces.size(); k++){
+  std::cout << "MultiQuotient: " << currentQuotientLevel << " to " << stopAtLevel << std::endl;
+  for(uint k = currentQuotientLevel; k < stopAtLevel; k++){
     foundKLevelSolution = false;
 
     if(Q.size()<=currentQuotientLevel) Q.push(quotientSpaces.at(k));
@@ -129,9 +142,6 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
         }
         foundKLevelSolution = true;
         currentQuotientLevel = k+1;
-        // if(currentQuotientLevel < quotientSpaces.size()-1){
-        //   quotientSpaces.at(k+1)->clear();
-        // }
       }
       Q.push(jQuotient);
     }
@@ -156,7 +166,7 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
   }
 
   base::PathPtr sol;
-  if(quotientSpaces.back()->GetSolution(sol))
+  if(quotientSpaces.at(currentQuotientLevel-1)->GetSolution(sol))
   {
     base::PlannerSolution psol(sol);
     psol.setPlannerName(getName());
@@ -196,6 +206,7 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const
   }
 
   uint K = min(solutions.size()+1,quotientSpaces.size());
+  K = min(K, stopAtLevel);
 
   for(uint k = 0; k < K; k++){
     og::Quotient *Qk = quotientSpaces.at(k);

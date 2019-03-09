@@ -30,6 +30,7 @@ namespace ompl
 
         std::vector<int> GetFeasibleNodes();
         std::vector<int> GetNodes();
+        void SetStopLevel(uint level_);
 
       protected:
         std::vector<base::PathPtr> solutions;
@@ -37,6 +38,7 @@ namespace ompl
 
         bool foundKLevelSolution{false};
         uint currentQuotientLevel{0};
+        uint stopAtLevel;
 
         std::vector<ob::SpaceInformationPtr> si_vec;
         std::vector<ob::ProblemDefinitionPtr> pdef_vec;

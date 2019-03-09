@@ -54,14 +54,12 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
 
   for(uint k_algorithm = 0; k_algorithm < algorithms.size(); k_algorithm++){
     std::string name_algorithm = algorithms.at(k_algorithm);
-    std::cout << name_algorithm << std::endl;
     if(util::StartsWith(name_algorithm, "benchmark")){
       PlannerInput* input = new PlannerInput();
       input->name_algorithm = algorithms.at(k_algorithm);
       if(!input->Load(node_plannerinput)) return false;
 
       for(uint k_hierarchy = 0; k_hierarchy < (uint)i_hierarchy; k_hierarchy++){
-        std::cout << "hierarchy: " << k_hierarchy << std::endl;
         input->ExtractHierarchy(node_plannerinput, k_hierarchy);
       }
       inputs.push_back(input);
@@ -82,9 +80,9 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
       }
     }
   }
-  for(uint k = 0; k < inputs.size(); k++){
-    std::cout << *(inputs.at(k)) << std::endl;
-  }
+  // for(uint k = 0; k < inputs.size(); k++){
+  //   std::cout << *(inputs.at(k)) << std::endl;
+  // }
   // exit(0);
   return true;
 }
@@ -154,7 +152,6 @@ void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy_index)
   int ctr = 0;
   TiXmlElement* node_hierarchy = FindSubNode(node, "hierarchy");
   while(ctr < hierarchy_index){
-    std::cout << node_hierarchy->Value() << std::endl;
     node_hierarchy = FindNextSiblingNode(node_hierarchy);
     ctr++;
   }

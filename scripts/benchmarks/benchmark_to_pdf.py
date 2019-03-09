@@ -69,7 +69,6 @@ def XMLtoPDF(fname):
   plannerLabelRotation=80
   xtickNames = plt.setp(ax,xticklabels=vnames)
   plt.setp(xtickNames, rotation=plannerLabelRotation)
-  #plt.plot(means,'xr')
 
   ###################################################################################
   #max lowest mean value be visualized as bold

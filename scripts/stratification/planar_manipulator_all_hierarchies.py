@@ -17,10 +17,3 @@ for k in range(1,N):
       PrintHierarchy(subset)
 
 PrintHierarchy([])
-    # <hierarchy>
-    #   <level inner_index="1" type="R1"/>
-    #   <level inner_index="2" type="R2"/>
-    #   <level inner_index="3" type="R3"/>
-    #   <level inner_index="4" type="R4"/>
-    #   <level inner_index="0" type="R5"/>
-    # </hierarchy>

@@ -82,7 +82,6 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   double memory = boost::lexical_cast<double>(run["memory REAL"]);
   //uint states = boost::lexical_cast<int>(run["sampled states INTEGER"]);
 
-
   typedef og::MultiQuotient<og::QRRT> MultiQuotient;
   std::shared_ptr<MultiQuotient> qplanner = dynamic_pointer_cast<MultiQuotient>(planner);
   if(qplanner != nullptr){
@@ -90,11 +89,12 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
     std::vector<int> nodes = qplanner->GetNodes();
     std::vector<int> fnodes = qplanner->GetFeasibleNodes();
     run["stratification levels INTEGER"] = to_string(N);
-    for(uint k = 0; k < N; k++){
+    for(uint k = 0; k < nodes.size(); k++){
       std::string strk = "stratification level"+to_string(k)+" nodes INTEGER";
       run[strk] = to_string(nodes.at(k));
       std::string strkf = "stratification level"+to_string(k)+" feasible nodes INTEGER";
-      run[strkf] = to_string(fnodes.at(k));
+      if(k<fnodes.size()) run[strkf] = to_string(fnodes.at(k));
+      else run[strkf] = to_string(0);
     }
   }
 
@@ -325,8 +325,21 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
     OMPL_INFORM("No stratifications specified. No algorithm is run");
     return;
   }
-  const ob::SpaceInformationPtr si = stratifications.at(0)->si_vec.back();
-  const ob::ProblemDefinitionPtr pdef = stratifications.at(0)->pdef_vec.back();
+  uint k_largest_ambient_space = 0;
+  uint largest_ambient_space_dimension = 0;
+  for(uint k = 0; k < stratifications.size(); k++){
+    const ob::SpaceInformationPtr sik = stratifications.at(k)->si_vec.back();
+    uint dk = sik->getStateDimension();
+    if(dk > largest_ambient_space_dimension){
+      k_largest_ambient_space = k;
+      largest_ambient_space_dimension = dk;
+    }
+  }
+
+  std::cout << "Largest Ambient Space Dimension for Benchmark:" << largest_ambient_space_dimension << std::endl;
+  const ob::SpaceInformationPtr si = stratifications.at(k_largest_ambient_space)->si_vec.back();
+  const ob::ProblemDefinitionPtr pdef = stratifications.at(k_largest_ambient_space)->pdef_vec.back();
+
 
   std::string environment_name = util::GetFileBasename(input.environment_name);
   std::string file_benchmark = environment_name+"_"+util::GetCurrentDateTimeString();
@@ -342,22 +355,50 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
 
     if(util::StartsWith(name_algorithm, "hierarchy")){
       for(uint i = 0; i < stratifications.size(); i++){
-        //uint N = stratifications.at(i)->si_vec.size();
-        //std::cout << "adding algorithm " << name_algorithm << " with " << N << " layers."<< std::endl;
+        const ob::SpaceInformationPtr sii = stratifications.at(i)->si_vec.back();
+        uint di = sii->getStateDimension();
+        bool shortStratification = (di < largest_ambient_space_dimension);
+        if(shortStratification){
+          std::cout << "algorithm " << name_algorithm << " is too short." << std::endl;
+          stratifications.at(i)->si_vec.push_back(si);
+          stratifications.at(i)->pdef_vec.push_back(pdef);
+        }else{
+          if(i != k_largest_ambient_space){
+            //found another stratification with maximum ambient space. we need
+            //to swap  its last space out and swap the chosen one in. (otherwise
+            //OMPL will claim that those two spaces are different)
+            stratifications.at(i)->si_vec.erase(stratifications.at(i)->si_vec.end()-1);
+            stratifications.at(i)->si_vec.push_back(si);
+          }
+
+        }
         ob::PlannerPtr planner_k_i = GetPlanner(binput.algorithms.at(k), stratifications.at(i));
+        if(shortStratification){
+          typedef og::MultiQuotient<og::QRRT> MultiQuotient;
+          std::shared_ptr<MultiQuotient> qplanner = dynamic_pointer_cast<MultiQuotient>(planner_k_i);
+          if(qplanner != nullptr){
+            qplanner->SetStopLevel(stratifications.at(i)->si_vec.size()-1);
+          }else{
+            std::cout << "Detected " << di << "/" << largest_ambient_space_dimension << " dimensions." << std::endl;
+            std::cout << "at algorithm: " << name_algorithm << std::endl;
+            std::cout << "failed to cast" << std::endl;
+            OMPL_INFORM("Could not cast algorithm");
+            exit(0);
+          }
+        }
+
         std::string name_algorithm_strat = planner_k_i->getName()+"_(";
 
         std::vector<ob::SpaceInformationPtr> si_vec_k = stratifications.at(i)->si_vec;
         for(uint j = 0; j < si_vec_k.size(); j++){
+          if(j>=si_vec_k.size()-1 && shortStratification) break;
           uint Nj = si_vec_k.at(j)->getStateDimension();
           name_algorithm_strat += std::to_string(Nj);
         }
         name_algorithm_strat += ")";
 
-        // std::string name_algorithm_strat = planner_k_i->getName()+"_("+std::to_string(N)+"_LYR";
-        // name_algorithm_strat += (N>1?"S)":")");
         planner_k_i->setName(name_algorithm_strat);
-        std::cout << planner_k_i->getName() << std::endl;
+        std::cout << "adding planner with ambient space " << si_vec_k.back()->getStateDimension() << std::endl;
         benchmark.addPlanner(planner_k_i);
       }
     }else{
