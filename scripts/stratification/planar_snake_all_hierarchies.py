@@ -17,7 +17,7 @@ def PrintLevel(t):
   elif t==3:
     print lprefix+"<level inner_index=\"%d\" type=\"SE2\"/>"%(t)
   elif t==4:
-    print lprefix+"<level inner_index=\"%d\" type=\"SE2\"/>"%(t)
+    print lprefix+"<level inner_index=\"%d\" type=\"SE2RN\"/>"%(t)
   elif t==5:
     print lprefix+"<level inner_index=\"0\" type=\"SE2RN\"/>"
 
