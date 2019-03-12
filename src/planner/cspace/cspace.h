@@ -33,7 +33,7 @@ class CSpaceOMPL
 
     CSpaceOMPL(RobotWorld *world_, int robot_idx_);
 
-    virtual void Init();
+    void Init();
     virtual ob::SpaceInformationPtr SpaceInformationPtr();
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) = 0;

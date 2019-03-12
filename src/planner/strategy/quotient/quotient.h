@@ -43,7 +43,6 @@ namespace ompl
       enum QuotientSpaceType{ UNKNOWN, IDENTITY_SPACE, ATOMIC_RN, RN_RM, SE2_R2, SE2RN_SE2, SE2RN_SE2RM, SE3_R3, SE3RN_R3, SE3RN_SE3, SE3RN_SE3RM };
 
       public:
-        const uint verbose{0};
         Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
         ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override final; //final prevents subclasses to override
 
@@ -67,6 +66,7 @@ namespace ompl
         const uint GetX1Dimension() const;
         const uint GetQ1Dimension() const;
         const uint GetQ0Dimension() const;
+        const uint GetDimension() const;
 
         const ob::StateSamplerPtr &GetX1SamplerPtr() const;
         const ob::StateSamplerPtr &GetQ1SamplerPtr() const;
@@ -90,14 +90,15 @@ namespace ompl
         void ProjectX1Subspace( const ob::State* q, ob::State* qX1 ) const;
         void ProjectQ0Subspace( const ob::State* q, ob::State* qQ0 ) const;
 
+        void CheckSpaceHasFiniteMeasure(const ob::StateSpacePtr space) const;
       protected:
 
         const ob::StateSpacePtr ComputeQuotientSpace(const ob::StateSpacePtr Q1, const ob::StateSpacePtr Q0);
         QuotientSpaceType IdentifyQuotientSpaceType(const ob::StateSpacePtr Q1, const ob::StateSpacePtr Q0);
 
-        ob::SpaceInformationPtr Q1;
-        ob::SpaceInformationPtr Q0;
-        ob::SpaceInformationPtr X1;
+        ob::SpaceInformationPtr Q1{nullptr};
+        ob::SpaceInformationPtr Q0{nullptr};
+        ob::SpaceInformationPtr X1{nullptr};
 
         ob::StateSamplerPtr X1_sampler;
         ob::StateSamplerPtr Q1_sampler;
@@ -106,9 +107,9 @@ namespace ompl
         ob::OptimizationObjectivePtr opt_;
 
         QuotientSpaceType type;
-        uint Q1_dimension;
-        uint Q0_dimension;
-        uint X1_dimension;
+        uint Q1_dimension{0};
+        uint Q0_dimension{0};
+        uint X1_dimension{0};
 
         static uint counter;
         uint id;

@@ -84,6 +84,7 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
   //   std::cout << *(inputs.at(k)) << std::endl;
   // }
   // exit(0);
+
   return true;
 }
 

@@ -71,6 +71,39 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
     }
 
     if(pin.Load(file_name.c_str())){
+      for(uint k = 0; k < pin.inputs.size(); k++){
+        PlannerInput *pkin = pin.inputs.at(k);
+        for(uint j = 0; j < pkin->stratifications.size(); j++){
+          Stratification stratification = pkin->stratifications.at(j);
+          for(uint i = 0; i < stratification.layers.size(); i++){
+            Layer layer = stratification.layers.at(i);
+            uint ri = layer.inner_index;
+            uint ro = layer.outer_index;
+            if(ri>=world.robots.size()){
+              std::cout << std::string(80, '>') << std::endl;
+              std::cout << ">>> [ERROR] Robot with idx " << ri << " does not exists." << std::endl;
+              std::cout << std::string(80, '>') << std::endl;
+              exit(1);
+            }
+            if(ro>=world.robots.size()){
+              std::cout << std::string(80, '>') << std::endl;
+              std::cout << ">>> [ERROR] Robot with idx " << ro << " does not exists." << std::endl;
+              std::cout << std::string(80, '>') << std::endl;
+              exit(1);
+            }
+
+            Robot *rk= world.robots.at(ri);
+            Robot *rko= world.robots.at(ro);
+            for(int i = 0; i < 6; i++){
+              rk->qMin[i] = pkin->se3min[i];
+              rk->qMax[i] = pkin->se3max[i];
+              rko->qMin[i] = pkin->se3min[i];
+              rko->qMax[i] = pkin->se3max[i];
+            }
+          }
+        }
+
+      }
 
       uint ridx = pin.inputs.at(0)->robot_idx;
       Robot *robot = world.robots[ridx];
@@ -78,10 +111,10 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       Vector q_goal = pin.inputs.at(0)->q_goal;
       Vector dq_init = pin.inputs.at(0)->dq_init;
 
-      for(int i = 0; i < 6; i++){
-        robot->qMin[i] = pin.inputs.at(0)->se3min[i];
-        robot->qMax[i] = pin.inputs.at(0)->se3max[i];
-      }
+      // for(int i = 0; i < 6; i++){
+      //   robot->qMin[i] = pin.inputs.at(0)->se3min[i];
+      //   robot->qMax[i] = pin.inputs.at(0)->se3max[i];
+      // }
 
       pin.inputs.at(0)->qMin = robot->qMin;
       pin.inputs.at(0)->qMax = robot->qMax;
@@ -110,23 +143,6 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       ODERobot *simrobot = _backend->sim.odesim.robot(ridx);
       simrobot->SetConfig(q_init);
       simrobot->SetVelocities(dq_init);
-
-      //set other nested robots
-      Stratification stratification = pin.inputs.at(0)->stratifications.front();
-      for(uint k = 0; k < stratification.layers.size(); k++){
-        uint ik = stratification.layers.at(k).inner_index;
-        if(ik>=world.robots.size()){
-          std::cout << std::string(80, '>') << std::endl;
-          std::cout << ">>> [ERROR] Robot with idx " << ik << " does not exists." << std::endl;
-          std::cout << std::string(80, '>') << std::endl;
-          exit(1);
-        }
-        Robot *rk= world.robots.at(ik);
-        for(int i = 0; i < 6; i++){
-          rk->qMin[i] = pin.inputs.at(0)->se3min[i];
-          rk->qMax[i] = pin.inputs.at(0)->se3max[i];
-        }
-      }
 
       if(pin.inputs.at(0)->kinodynamic){
         LoadController(robot, *pin.inputs.at(0));

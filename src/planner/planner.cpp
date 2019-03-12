@@ -123,6 +123,7 @@ void MotionPlanner::CreateHierarchy()
     for(uint k = 0; k < layers.size(); k++){
 
       CSpaceOMPL *cspace_level_k = ComputeCSpaceLayer(layers.at(k));
+      //std::cout << *cspace_level_k << std::endl;
       cspace_levels.push_back( cspace_level_k );
 
       int io = layers.at(k).outer_index;

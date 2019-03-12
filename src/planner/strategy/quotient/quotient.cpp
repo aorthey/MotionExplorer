@@ -10,9 +10,10 @@
 using namespace ompl::geometric;
 using namespace ompl::base;
 
+const uint verbose{0};
 
 Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_):
-  ob::Planner(si,"QuotientSpace"), Q1(si), Q0(si), parent(parent_)
+  ob::Planner(si,"QuotientSpace"), Q1(si), parent(parent_)
 {
   id = counter++;
 
@@ -27,7 +28,7 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_):
     type = ATOMIC_RN;
   }else{
     Q0 = parent->getSpaceInformation();
-    const StateSpacePtr Q0_space = parent->getSpaceInformation()->getStateSpace();
+    const StateSpacePtr Q0_space = Q0->getStateSpace();
 
     //X1 = Q1 / Q0
     const StateSpacePtr X1_space = ComputeQuotientSpace(Q1_space, Q0_space);
@@ -51,9 +52,14 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_):
       if (!X1_sampler){
         X1_sampler = X1->allocStateSampler();
       }
+      CheckSpaceHasFiniteMeasure(X1_space);
+    }else{
+      if(verbose>0) std::cout << "Q0 dimension : " << Q0_space->getDimension() << " measure: " << Q0_space->getMeasure() << std::endl;
+      if(verbose>0) std::cout << "Q1 dimension : " << Q1_space->getDimension() << " measure: " << Q1_space->getMeasure() << std::endl;
     }
-
+    CheckSpaceHasFiniteMeasure(Q0_space);
   }
+  CheckSpaceHasFiniteMeasure(Q1_space);
 
   if (!Q1_valid_sampler){
     Q1_valid_sampler = Q1->allocValidStateSampler();
@@ -73,6 +79,19 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_):
     }
   }else{
     checkOuterRobot = true;
+  }
+}
+
+void Quotient::CheckSpaceHasFiniteMeasure(const ob::StateSpacePtr space) const
+{
+  if(space->getMeasure() >= std::numeric_limits<double>::infinity()){
+    OMPL_ERROR("space has no bounds");
+    std::cout << "Q0 measure: " << Q0->getStateSpace()->getMeasure() << std::endl;
+    std::cout << "Q1 measure: " << Q1->getStateSpace()->getMeasure() << std::endl;
+    if(X1!=nullptr){
+      std::cout << "X1 measure: " << X1->getStateSpace()->getMeasure() << std::endl;
+    }
+    exit(0);
   }
 }
 
@@ -146,6 +165,13 @@ const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const
   StateSpacePtr X1{nullptr};
   Q1_dimension = Q1->getDimension();
   Q0_dimension = Q0->getDimension();
+
+  if(Q0_dimension == 0 || Q1_dimension == 0){
+    OMPL_ERROR("Detected zero-dimensional quotient space.");
+    std::cout << "Q1 has dimension " << Q1_dimension << std::endl;
+    std::cout << "Q0 has dimension " << Q0_dimension << std::endl;
+    exit(0);
+  }
 
   switch (type) {
     case IDENTITY_SPACE:
@@ -289,7 +315,7 @@ Quotient::QuotientSpaceType Quotient::IdentifyQuotientSpaceType(const StateSpace
         if(n>m && m>0){
           type = RN_RM;
         }else{
-          if(n==m){
+          if(n==m && m>0){
             type = IDENTITY_SPACE;
           }else{
             std::cout << "Not allowed: dimensionality needs to be monotonically increasing. we need n>=m>0, but have " << n << ">=" << m << ">0" << std::endl;
@@ -297,11 +323,11 @@ Quotient::QuotientSpaceType Quotient::IdentifyQuotientSpaceType(const StateSpace
           }
         }
       }else{
-        std::cout << "Q1 is R^"<<n <<" but state " << Q0->getType() << " is not handled." << std::endl;
+        std::cout << "Q1 is R^"<<n <<" but Q0 type " << Q0->getType() << " is not handled." << std::endl;
         exit(0);
       }
     }else{
-      std::cout << "Q1 is non-compound state, but state " << Q1->getType() << " is not handled." << std::endl;
+      std::cout << "Q1 is non-compound state, but Q0 type " << Q1->getType() << " is not handled." << std::endl;
       exit(0);
     }
   }else{
@@ -316,11 +342,11 @@ Quotient::QuotientSpaceType Quotient::IdentifyQuotientSpaceType(const StateSpace
         if( Q0->getDimension() == 2){
           type = SE2_R2;
         }else{
-          std::cout << "Q1 is SE2 but state " << Q0->getType() << " is of dimension " << Q0->getDimension() << std::endl;
+          std::cout << "Q1 is SE2 but Q0 type " << Q0->getType() << " is of dimension " << Q0->getDimension() << std::endl;
           exit(0);
         }
       }else{
-        std::cout << "Q1 is SE2 but state " << Q0->getType() << " is not handled." << std::endl;
+        std::cout << "Q1 is SE2 but Q0 type " << Q0->getType() << " is not handled." << std::endl;
         exit(0);
       }
     }
@@ -331,11 +357,11 @@ Quotient::QuotientSpaceType Quotient::IdentifyQuotientSpaceType(const StateSpace
         if( Q0->getDimension() == 3){
           type = SE3_R3;
         }else{
-          std::cout << "Q1 is SE3 but state " << Q0->getType() << " is of dimension " << Q0->getDimension() << std::endl;
+          std::cout << "Q1 is SE3 but Q0 type " << Q0->getType() << " is of dimension " << Q0->getDimension() << std::endl;
           exit(0);
         }
       }else{
-        std::cout << "Q1 is SE3 but state " << Q0->getType() << " is not handled." << std::endl;
+        std::cout << "Q1 is SE3 but Q0 type " << Q0->getType() << " is not handled." << std::endl;
         exit(0);
       }
     }
@@ -847,6 +873,10 @@ const uint Quotient::GetX1Dimension() const
 const uint Quotient::GetQ1Dimension() const
 {
   return Q1_dimension;
+}
+const uint Quotient::GetDimension() const
+{
+  return GetQ1Dimension();
 }
 const uint Quotient::GetQ0Dimension() const
 {
