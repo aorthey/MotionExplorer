@@ -406,7 +406,9 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
     }
   }
 
-  CSpaceOMPL *cspace = input.cspace_levels.back();
+  //CSpaceOMPL *cspace = input.cspace_levels.back();
+  CSpaceOMPL *cspace = input.cspace_stratifications.at(k_largest_ambient_space).back();
+
   ob::ScopedState<> start = cspace->ConfigToOMPLState(input.q_init);
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(input.q_goal);
   ss.setStartAndGoalStates(start, goal, input.epsilon_goalregion);
@@ -421,6 +423,8 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   req.maxTime = binput.maxPlanningTime;
   req.maxMem = binput.maxMemory;
   req.runCount = binput.runCount;
+  req.useThreads = false;
+  req.simplify = false;
   req.displayProgress = true;
 
   benchmark.setPostRunEvent(std::bind(&PostRunEvent, std::placeholders::_1, std::placeholders::_2));
@@ -430,7 +434,10 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   //############################################################################
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "BENCHMARKING" << std::endl;
-  double worst_case_time_estimate_in_seconds = binput.algorithms.size()*binput.runCount*binput.maxPlanningTime;
+
+  uint Nalgorithms = benchmark.getRecordedExperimentData().size();
+
+  double worst_case_time_estimate_in_seconds = Nalgorithms*binput.runCount*binput.maxPlanningTime;
   double worst_case_time_estimate_in_minutes = worst_case_time_estimate_in_seconds/60.0;
   double worst_case_time_estimate_in_hours = worst_case_time_estimate_in_minutes/60.0;
   std::cout << "Worst-case time requirement: ";

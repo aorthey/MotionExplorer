@@ -100,6 +100,12 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
               rko->qMin[i] = pkin->se3min[i];
               rko->qMax[i] = pkin->se3max[i];
             }
+            // rk->q = pkin->q_init;
+            // rk->dq = pkin->dq_init;
+            // rk->UpdateFrames();
+            // rko->q = pkin->q_init;
+            // rko->dq = pkin->dq_init;
+            // rko->UpdateFrames();
           }
         }
 
@@ -116,8 +122,8 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       //   robot->qMax[i] = pin.inputs.at(0)->se3max[i];
       // }
 
-      pin.inputs.at(0)->qMin = robot->qMin;
-      pin.inputs.at(0)->qMax = robot->qMax;
+      // pin.inputs.at(0)->qMin = robot->qMin;
+      // pin.inputs.at(0)->qMax = robot->qMax;
       uint N = robot->q.size();
 
       uint Ni = pin.inputs.at(0)->q_init.size();
