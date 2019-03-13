@@ -51,9 +51,11 @@ void QRRT::setup()
   BaseT::setup();
   ompl::tools::SelfConfig sc(Q1, getName());
   sc.configurePlannerRange(maxDistance);
-  const double base = 2;
-  const double normalizer = powf(base, level);
-  epsilon = 0.1/normalizer;
+  //const double base = 2;
+  //const double normalizer = powf(base, level);
+  //epsilon = 0.1/normalizer;
+
+  goal = pdef_->getGoal().get();
 }
 void QRRT::clear()
 {
@@ -66,15 +68,25 @@ bool QRRT::GetSolution(ob::PathPtr &solution)
     return BaseT::GetSolution(solution);
   }else{
     if(firstRun) return false;
+
     const Configuration *q_nearest = Nearest(q_goal);
-    double d = Q1->distance(q_nearest->state, q_goal->state);
-    if(d < 0.01)
+    //double d = Q1->distance(q_nearest->state, q_goal->state);
+    double dist = 0.0;
+    bool satisfied = goal->isSatisfied(q_nearest->state, &dist);
+    if(satisfied)
     {
       v_goal = AddConfiguration(q_goal);
       AddEdge(q_nearest->index, v_goal);
       solution_path = GetPath(v_start, v_goal);
       hasSolution = true;
-    } 
+    }
+    // if(d < 0.01)
+    // {
+    //   v_goal = AddConfiguration(q_goal);
+    //   AddEdge(q_nearest->index, v_goal);
+    //   solution_path = GetPath(v_start, v_goal);
+    //   hasSolution = true;
+    // } 
   }
   return hasSolution;
 }
@@ -138,6 +150,6 @@ bool QRRT::SampleQuotient(ob::State *q_random_graph)
 {
   const Vertex v = boost::random_vertex(G, rng_boost);
   Q1->getStateSpace()->copyState(q_random_graph, G[v]->state);
-  if(epsilon > 0) Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
+  //if(epsilon > 0) Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
   return true;
 }

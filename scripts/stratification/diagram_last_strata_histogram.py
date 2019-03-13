@@ -18,7 +18,6 @@ fname_base, fname_ext = os.path.splitext(fname)
 fname_pdf = fname_base + "_last_strata_histogram.pdf"
 pp = PdfPages(fname_pdf)
 
-number_of_strata = 8
 ###################################################################################
 #GET DATA
 ###################################################################################
@@ -27,6 +26,7 @@ name = doc.getElementsByTagName("name")[0]
 
 planners = doc.getElementsByTagName("planner")
 nr_planners = int(doc.getElementsByTagName("number_of_planners")[0].firstChild.data)
+number_of_strata = int(doc.getElementsByTagName("max_levels")[0].firstChild.data)
 runcount = int(doc.getElementsByTagName("run_count")[0].firstChild.data)
 timelimit = float(doc.getElementsByTagName("max_time")[0].firstChild.data)
 print "planners:",nr_planners," runs:",runcount

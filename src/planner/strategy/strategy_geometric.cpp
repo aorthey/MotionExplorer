@@ -435,7 +435,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "BENCHMARKING" << std::endl;
 
-  uint Nalgorithms = benchmark.getRecordedExperimentData().size();
+  uint Nalgorithms = benchmark.getRecordedExperimentData().planners.size();
 
   double worst_case_time_estimate_in_seconds = Nalgorithms*binput.runCount*binput.maxPlanningTime;
   double worst_case_time_estimate_in_minutes = worst_case_time_estimate_in_seconds/60.0;

@@ -13,19 +13,21 @@ import sys
 
 fname = '../../data/benchmarks/last.xml'
 #fname = '../../data/benchmarks/planar_manip_255_decompositions.xml'
-fname_base, fname_ext = os.path.splitext(fname)
-fname_pdf = fname_base + "_runtimes.pdf"
-pp = PdfPages(fname_pdf)
-
-number_of_strata = 8
+# fname = '../../data/benchmarks/15D_planar_manipulator_different_dimensions_2019_03_08_18:34:35.xml'
+START_AT_BEGINNING = False
+EXTRAPOLATED_PTS = 1
 ###################################################################################
 #GET DATA
 ###################################################################################
 doc = parse(fname)
-name = doc.getElementsByTagName("name")[0]
+name = doc.getElementsByTagName("name")[0].firstChild.data
+fname_dir = os.path.dirname(fname)
+fname_pdf = fname_dir + "/" + name + "_runtimes.pdf"
+pp = PdfPages(fname_pdf)
 
 planners = doc.getElementsByTagName("planner")
 nr_planners = int(doc.getElementsByTagName("number_of_planners")[0].firstChild.data)
+number_of_strata = int(doc.getElementsByTagName("max_levels")[0].firstChild.data)
 runcount = int(doc.getElementsByTagName("run_count")[0].firstChild.data)
 timelimit = float(doc.getElementsByTagName("max_time")[0].firstChild.data)
 print "planners:",nr_planners," runs:",runcount
@@ -68,7 +70,14 @@ for planner in planners:
 
   p_ctr=p_ctr+1
 
+##replace 0 with NaN
 times_per_strata = np.where(times_per_strata!=0,times_per_strata,np.nan)
+
+times_vanilla = np.array(times_vanilla)
+##remove rows with all NaNs
+times_vanilla = times_vanilla[~np.isnan(times_per_strata).all(axis=1)]
+times_per_strata = times_per_strata[~np.isnan(times_per_strata).all(axis=1)]
+print times_per_strata
 
 ###################################################################################
 #Display DATA
@@ -76,7 +85,6 @@ times_per_strata = np.where(times_per_strata!=0,times_per_strata,np.nan)
 times_mean = np.nanmean(times_per_strata,axis=1)
 times_min = np.nanmin(times_per_strata,axis=1)
 times_max = np.nanmax(times_per_strata,axis=1)
-times_vanilla = np.array(times_vanilla)
 p_min = np.nanargmin(times_per_strata,axis=1)
 p_max = np.nanargmax(times_per_strata,axis=1)
 vnames = np.array(vnames)
@@ -97,15 +105,23 @@ plt.title('Time per DoF (Runs: %d, Maxtime: %.0fs)'%(runcount,timelimit))
 ax.set_xlabel('Degrees of Freedom')
 ax.set_ylabel('Time (s)')
 
-startD = 5
-I = np.arange(startD,len(times_per_strata)+1)
-times_vanilla = times_vanilla[startD-1:]
-times_max = times_max[startD-1:]
-times_min = times_min[startD-1:]
-times_mean = times_mean[startD-1:]
+##find StartD
+startD = 0
+while abs(times_max[startD]-times_min[startD])<1e-1:
+  startD=startD+1
 
-EXTRAPOLATED_PTS = 1
-T = np.arange(startD, len(times_per_strata)+1+EXTRAPOLATED_PTS)
+print "StartD: ",startD
+
+if START_AT_BEGINNING:
+  startD = 0
+
+I = np.arange(startD,len(times_per_strata))
+times_vanilla = times_vanilla[startD:]
+times_max = times_max[startD:]
+times_min = times_min[startD:]
+times_mean = times_mean[startD:]
+
+T = np.arange(startD, len(times_per_strata)+EXTRAPOLATED_PTS)
 
 f_vanilla_extrapolate = interpolate.interp1d(I, times_vanilla.flatten(), fill_value="extrapolate")
 f_mean_extrapolate = interpolate.interp1d(I, times_mean.flatten(), fill_value="extrapolate")

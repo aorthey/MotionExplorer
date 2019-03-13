@@ -14,7 +14,6 @@ fname_base, fname_ext = os.path.splitext(fname)
 fname_pdf = fname_base + ".pdf"
 pp = PdfPages(fname_pdf)
 
-number_of_strata = 8
 
 ###################################################################################
 #GET DATA
@@ -27,6 +26,7 @@ planners = doc.getElementsByTagName("planner")
 nr_planners = int(doc.getElementsByTagName("number_of_planners")[0].firstChild.data)
 runcount = int(doc.getElementsByTagName("run_count")[0].firstChild.data)
 timelimit = float(doc.getElementsByTagName("max_time")[0].firstChild.data)
+number_of_strata = int(doc.getElementsByTagName("max_levels")[0].firstChild.data)
 print "planners:",nr_planners," runs:",runcount
 
 vtimes = np.zeros((runcount,nr_planners))
@@ -44,6 +44,8 @@ for planner in planners:
   m = p.match(name)
 
   idxs = 4
+  ##A contains for each strata its levels, the number of nodes per level, and
+  ## the number of feasible nodes
   A = np.zeros((number_of_strata,idxs))
   c_ctr = 0
   if m:
@@ -86,18 +88,6 @@ for planner in planners:
         Aruns[k,3] = float(Aruns[k,2])/float(Aruns[k,1])
 
     percentages.append(float(np.sum(Aruns[:,2]))/float(np.sum(Aruns[:,1])))
-
-  # else:
-  #   runs = planner.getElementsByTagName("run")
-  #   feasibleNodes = []
-  #   for run in runs:
-  #     sid = run.getAttribute("number")
-  #     nodes = run.getElementsByTagName("nodes")[0].firstChild.data
-  #     time = run.getElementsByTagName("time")[0].firstChild.data
-  #     feasibleNodes.append(nodes)
-  #     vtimes[c_ctr,p_ctr] = time
-
-  #   feasibleNodes = np.array(feasibleNodes)
 
   p_ctr=p_ctr+1
 

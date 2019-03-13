@@ -46,9 +46,6 @@
 BenchmarkOutput::BenchmarkOutput(const ot::Benchmark::CompleteExperiment& experiment_):
   experiment(experiment_)
 {
-
-
-
 }
 
 bool BenchmarkOutput::Save(const char* file_)
@@ -99,6 +96,7 @@ bool BenchmarkOutput::Save(TiXmlElement *node)
   AddSubNode(*node, "max_memory", experiment.maxMem);
   AddSubNode(*node, "number_of_planners", experiment.planners.size());
 
+  uint max_nr_of_layers = 0;
   for(uint k = 0; k < experiment.planners.size(); k++){
     TiXmlElement pknode("planner");
     ot::Benchmark::PlannerExperiment planner_experiment = experiment.planners.at(k);
@@ -119,6 +117,7 @@ bool BenchmarkOutput::Save(TiXmlElement *node)
       if(run.find(sstrat) != run.end()){
         AddSubNode(runnode, "levels", run[sstrat]);
         uint levels = boost::lexical_cast<uint>(run[sstrat]);
+        if(levels > max_nr_of_layers) max_nr_of_layers = levels;
         TiXmlElement nodes_per_levels_node("sampled_nodes_per_level");
         for(uint k = 0; k < levels; k++){
           std::string kstrat = "stratification level"+to_string(k)+" nodes INTEGER";
@@ -138,6 +137,7 @@ bool BenchmarkOutput::Save(TiXmlElement *node)
     }
     node->InsertEndChild(pknode);
   }
+  AddSubNodeBeginning(*node, "max_levels", max_nr_of_layers);
 
   return true;
 }

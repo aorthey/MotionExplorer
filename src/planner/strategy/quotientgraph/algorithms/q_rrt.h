@@ -41,6 +41,7 @@ namespace ompl
         double goalBias{.1};
         double epsilon{.0};
 
+        ob::Goal *goal;
         Configuration *q_random{nullptr};
 
         virtual bool SampleQuotient(ob::State*) override;

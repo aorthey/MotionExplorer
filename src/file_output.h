@@ -7,9 +7,9 @@
 //ELEMENT, THEN GOING UPWARDS. 
 //
 // Example:
-// TiXmlElement root();
-// TiXmlElement subnode();
-// TiXmlElement subsubnode();
+// TiXmlElement root;
+// TiXmlElement subnode;
+// TiXmlElement subsubnode;
 // 
 // WORKS:
 // AddSubNode(subnode, "name", "sub");
@@ -17,12 +17,15 @@
 //
 
 inline TiXmlElement* CreateRootNodeInDocument(TiXmlDocument& doc, const char *name = "default");
-inline TiXmlElement* CreateSubNode(TiXmlElement& parent_node, const char *name = "default");
 
 inline void AddComment(TiXmlElement& node, const char *str = "");
 
 template <typename T>
+inline TiXmlElement CreateSubNode(const char *name, T _val);
+template <typename T>
 inline void AddSubNode(TiXmlElement& node, const char *name, T _val);
+template <typename T>
+inline void AddSubNodeBeginning(TiXmlElement& node, const char *name, T _val);
 
 template <typename T>
 inline void AddSubNodeVector(TiXmlElement& node, const char *name, std::vector<T> _val);
