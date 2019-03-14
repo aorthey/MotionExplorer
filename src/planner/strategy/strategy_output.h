@@ -43,8 +43,6 @@ struct StrategyOutput{
 
     std::vector<Config> PathGeometricToConfigPath(og::PathGeometric &path);
 
-    //std::vector<std::vector<Config>> solution_paths;
-
     std::vector<Config> shortest_path;
 
     ob::PlannerDataPtr pd;

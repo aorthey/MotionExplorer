@@ -1,5 +1,4 @@
 #pragma once
-#include "planner/planner_output.h"
 #include "elements/swept_volume.h"
 #include "elements/wrench_field.h"
 #include "controller/controller.h"
