@@ -99,6 +99,7 @@ void QRRT::Grow(double t){
   }
 
   if(hasSolution){
+    //No Goal Biasing if we already found a solution on this quotient space
     totalNumberOfSamples++;
     Sample(q_random->state);
   }else{
@@ -113,18 +114,15 @@ void QRRT::Grow(double t){
 
   const Configuration *q_nearest = Nearest(q_random);
   double d = Q1->distance(q_nearest->state, q_random->state);
-  Configuration *q_next = new Configuration(Q1, q_random->state);
   if(d > maxDistance){
-    Q1->getStateSpace()->interpolate(q_nearest->state, q_random->state, maxDistance / d, q_next->state);
+    Q1->getStateSpace()->interpolate(q_nearest->state, q_random->state, maxDistance / d, q_random->state);
   }
 
-  if(Q1->checkMotion(q_nearest->state, q_next->state))
+  if(Q1->checkMotion(q_nearest->state, q_random->state))
   {
+    Configuration *q_next = new Configuration(Q1, q_random->state);
     Vertex v_next = AddConfiguration(q_next);
     AddEdge(q_nearest->index, v_next);
-  }else{
-    DeleteConfiguration(q_next);
-    //percentage_feasible_samples = (float)numVertices()/(float)totalNumberOfSamples;
   }
 }
 
@@ -148,8 +146,22 @@ double QRRT::GetImportance() const{
 
 bool QRRT::SampleQuotient(ob::State *q_random_graph)
 {
+  //VERTEX SAMPLING
   const Vertex v = boost::random_vertex(G, rng_boost);
   Q1->getStateSpace()->copyState(q_random_graph, G[v]->state);
   //if(epsilon > 0) Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
+
+  //EDGE SAMPLING (biased towards highly connected vertices, which might be a
+  //good thing)
+  // if(num_edges(G) == 0) return false;
+
+  // Edge e = boost::random_edge(G, rng_boost);
+  // double s = rng_.uniform01();
+  // const Vertex v1 = boost::source(e, G);
+  // const Vertex v2 = boost::target(e, G);
+  // const ob::State *from = G[v1]->state;
+  // const ob::State *to = G[v2]->state;
+
+  // Q1->getStateSpace()->interpolate(from, to, s, q_random_graph);
   return true;
 }

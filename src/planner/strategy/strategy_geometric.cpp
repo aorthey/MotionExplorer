@@ -88,13 +88,15 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
     uint N = qplanner->GetLevels();
     std::vector<int> nodes = qplanner->GetNodes();
     std::vector<int> fnodes = qplanner->GetFeasibleNodes();
+    std::vector<int> dimensions = qplanner->GetDimensionsPerLevel();
     run["stratification levels INTEGER"] = to_string(N);
     for(uint k = 0; k < nodes.size(); k++){
+      std::string strd = "stratification level"+to_string(k)+" dimension INTEGER";
+      run[strd] = to_string(dimensions.at(k));
       std::string strk = "stratification level"+to_string(k)+" nodes INTEGER";
       run[strk] = to_string(nodes.at(k));
       std::string strkf = "stratification level"+to_string(k)+" feasible nodes INTEGER";
-      if(k<fnodes.size()) run[strkf] = to_string(fnodes.at(k));
-      else run[strkf] = to_string(0);
+      run[strkf] = to_string(fnodes.at(k));
     }
   }
 

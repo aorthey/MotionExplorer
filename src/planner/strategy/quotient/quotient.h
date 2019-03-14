@@ -44,6 +44,7 @@ namespace ompl
 
       public:
         Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
+        ~Quotient();
         ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override final; //final prevents subclasses to override
 
         virtual void Grow(double t) = 0;
@@ -105,6 +106,9 @@ namespace ompl
         ob::ValidStateSamplerPtr Q1_valid_sampler;
 
         ob::OptimizationObjectivePtr opt_;
+
+        base::State *s_Q0_tmp{nullptr};
+        base::State *s_X1_tmp{nullptr};
 
         QuotientSpaceType type;
         uint Q1_dimension{0};

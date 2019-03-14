@@ -30,6 +30,7 @@ namespace ompl
 
         std::vector<int> GetFeasibleNodes();
         std::vector<int> GetNodes();
+        std::vector<int> GetDimensionsPerLevel();
         void SetStopLevel(uint level_);
 
       protected:

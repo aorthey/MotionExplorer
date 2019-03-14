@@ -81,6 +81,36 @@ Quotient::Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_):
     checkOuterRobot = true;
   }
 }
+Quotient::~Quotient()
+{
+  if(parent!=nullptr){
+    if(s_Q0_tmp) Q0->freeState(s_Q0_tmp);
+    if(X1 && s_X1_tmp) X1->freeState(s_X1_tmp);
+  }
+}
+
+void Quotient::setup()
+{
+  BaseT::setup();
+  hasSolution = false;
+  firstRun = true;
+  if(parent!=nullptr)
+  {
+    s_Q0_tmp = Q0->allocState();
+    if(X1_dimension>0) s_X1_tmp = X1->allocState();
+  }
+  if(verbose>0) std::cout << "SETUP QUOTIENTSPACE " << id << std::endl;
+}
+void Quotient::clear()
+{
+  BaseT::clear();
+  hasSolution = false;
+  firstRun = true;
+  if(parent==nullptr && X1_dimension>0) X1_sampler.reset();
+  //Q1_sampler.reset();
+  if(verbose>0) std::cout << "CLEAR QUOTIENTSPACE " << id << std::endl;
+}
+
 
 void Quotient::CheckSpaceHasFiniteMeasure(const ob::StateSpacePtr space) const
 {
@@ -140,24 +170,6 @@ void Quotient::resetCounter()
 {
   Quotient::counter = 0;
 }
-
-void Quotient::setup()
-{
-  BaseT::setup();
-  hasSolution = false;
-  firstRun = true;
-  if(verbose>0) std::cout << "SETUP QUOTIENTSPACE " << id << std::endl;
-}
-void Quotient::clear()
-{
-  BaseT::clear();
-  hasSolution = false;
-  firstRun = true;
-  if(parent==nullptr && X1_dimension>0) X1_sampler.reset();
-  //Q1_sampler.reset();
-  if(verbose>0) std::cout << "CLEAR QUOTIENTSPACE " << id << std::endl;
-}
-
 const StateSpacePtr Quotient::ComputeQuotientSpace(const StateSpacePtr Q1, const StateSpacePtr Q0)
 {
   type = IdentifyQuotientSpaceType(Q1, Q0);
@@ -945,7 +957,7 @@ const uint Quotient::GetX1Dimension() const
 }
 const uint Quotient::GetQ1Dimension() const
 {
-  return Q1_dimension;
+  return Q1->getStateDimension();
 }
 const uint Quotient::GetDimension() const
 {
@@ -1016,13 +1028,13 @@ bool Quotient::Sample(ob::State *q_random)
     if(X1_dimension>0)
     {
       //Adjusted sampling function: Sampling in G0 x X1
-      base::State *s_Q0 = Q0->allocState();
-      base::State *s_X1 = X1->allocState();
-      X1_sampler->sampleUniform(s_X1);
-      parent->SampleQuotient(s_Q0);
-      MergeStates(s_Q0, s_X1, q_random);
-      X1->freeState(s_X1);
-      Q0->freeState(s_Q0);
+      //base::State *s_Q0 = Q0->allocState();
+      //base::State *s_X1 = X1->allocState();
+      X1_sampler->sampleUniform(s_X1_tmp);
+      parent->SampleQuotient(s_Q0_tmp);
+      MergeStates(s_Q0_tmp, s_X1_tmp, q_random);
+      //X1->freeState(s_X1);
+      //Q0->freeState(s_Q0);
     }else{
       parent->SampleQuotient(q_random);
     }

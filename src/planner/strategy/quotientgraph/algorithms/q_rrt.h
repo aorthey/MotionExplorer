@@ -38,7 +38,7 @@ namespace ompl
       protected:
 
         double maxDistance{.0};
-        double goalBias{.1};
+        double goalBias{.05};
         double epsilon{.0};
 
         ob::Goal *goal;

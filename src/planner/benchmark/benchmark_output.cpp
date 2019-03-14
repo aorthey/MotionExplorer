@@ -90,13 +90,13 @@ void BenchmarkOutput::PrintPDF()
 bool BenchmarkOutput::Save(TiXmlElement *node)
 {
   node->SetValue("benchmark");
-  AddSubNode(*node, "name", experiment.name);
   AddSubNode(*node, "run_count", experiment.runCount);
   AddSubNode(*node, "max_time", experiment.maxTime);
   AddSubNode(*node, "max_memory", experiment.maxMem);
   AddSubNode(*node, "number_of_planners", experiment.planners.size());
 
   uint max_nr_of_layers = 0;
+  std::vector<int> dimensionsPerLevel;
   for(uint k = 0; k < experiment.planners.size(); k++){
     TiXmlElement pknode("planner");
     ot::Benchmark::PlannerExperiment planner_experiment = experiment.planners.at(k);
@@ -115,17 +115,30 @@ bool BenchmarkOutput::Save(TiXmlElement *node)
       AddSubNode(runnode, "nodes", run["graph states INTEGER"]);
       std::string sstrat = "stratification levels INTEGER";
       if(run.find(sstrat) != run.end()){
-        AddSubNode(runnode, "levels", run[sstrat]);
+        //AddSubNode(runnode, "levels", run[sstrat]);
+        TiXmlElement all_levels_node("levels");
+        AddSubNode(all_levels_node, "number", run[sstrat]);
+
         uint levels = boost::lexical_cast<uint>(run[sstrat]);
         if(levels > max_nr_of_layers) max_nr_of_layers = levels;
-        TiXmlElement nodes_per_levels_node("sampled_nodes_per_level");
+
         for(uint k = 0; k < levels; k++){
+          TiXmlElement level_node("level");
+
           std::string kstrat = "stratification level"+to_string(k)+" nodes INTEGER";
-          AddSubNode(nodes_per_levels_node, "nodes", run[kstrat]);
+          AddSubNode(level_node, "nodes", run[kstrat]);
+
           std::string fkstrat = "stratification level"+to_string(k)+" feasible nodes INTEGER";
-          AddSubNode(nodes_per_levels_node, "feasible_nodes", run[fkstrat]);
+          AddSubNode(level_node, "feasible_nodes", run[fkstrat]);
+
+          std::string dstrat = "stratification level"+to_string(k)+" dimension INTEGER";
+          AddSubNode(level_node, "dimension", run[dstrat]);
+          uint level_dimension = std::stoi(run[dstrat]);
+
+          dimensionsPerLevel.push_back(level_dimension);
+          all_levels_node.InsertEndChild(level_node);
         }
-        runnode.InsertEndChild(nodes_per_levels_node);
+        runnode.InsertEndChild(all_levels_node);
       }
 
       if(time < experiment.maxTime){
@@ -137,7 +150,18 @@ bool BenchmarkOutput::Save(TiXmlElement *node)
     }
     node->InsertEndChild(pknode);
   }
-  AddSubNodeBeginning(*node, "max_levels", max_nr_of_layers);
+  std::sort(dimensionsPerLevel.begin(), dimensionsPerLevel.end());
+  dimensionsPerLevel.erase( std::unique( dimensionsPerLevel.begin(), dimensionsPerLevel.end() ), dimensionsPerLevel.end() );
+
+  TiXmlElement lnode("levels");
+  for(uint k = 0; k < dimensionsPerLevel.size(); k++){
+    AddSubNode(lnode, "dimension", dimensionsPerLevel.at(k));
+  }
+  TiXmlNode *fc = node->FirstChild();
+  node->InsertBeforeChild(fc, lnode);
+
+  AddSubNodeBeginning(*node, "number_levels", max_nr_of_layers);
+  AddSubNodeBeginning(*node, "name", experiment.name);
 
   return true;
 }

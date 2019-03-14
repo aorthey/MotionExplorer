@@ -241,7 +241,7 @@ QuotientGraph::Vertex QuotientGraph::AddConfiguration(Configuration *q)
   Vertex m = boost::add_vertex(q, G);
   G[m]->total_connection_attempts = 1;
   G[m]->successful_connection_attempts = 0;
-  disjointSets_.make_set(m);
+  //disjointSets_.make_set(m);
   //ConnectVertexToNeighbors(m);
   nearest_datastructure->add(q);
   q->index = m;
@@ -496,6 +496,7 @@ void QuotientGraph::getPlannerData(ob::PlannerData &data) const
 
 bool QuotientGraph::SampleQuotient(ob::State *q_random_graph)
 {
+  //RANDOM EDGE SAMPLING
   if(num_edges(G) == 0) return false;
 
   Edge e = boost::random_edge(G, rng_boost);

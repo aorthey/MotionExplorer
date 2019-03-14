@@ -688,4 +688,13 @@ of pseudo metric?)
 [ ] Make it OMPL compatible
 [ ] Remove any Klampt reference from Strategy, isolate klampt
 
-[ ] Memory Leak
+[x] Memory Leak
+
+
+Make benchmark pretty
+
+Dimension can have different names, how to handle them?
+
+
+
+
