@@ -107,7 +107,6 @@ void Quotient::clear()
   hasSolution = false;
   firstRun = true;
   if(parent==nullptr && X1_dimension>0) X1_sampler.reset();
-  //Q1_sampler.reset();
   if(verbose>0) std::cout << "CLEAR QUOTIENTSPACE " << id << std::endl;
 }
 
@@ -1028,13 +1027,9 @@ bool Quotient::Sample(ob::State *q_random)
     if(X1_dimension>0)
     {
       //Adjusted sampling function: Sampling in G0 x X1
-      //base::State *s_Q0 = Q0->allocState();
-      //base::State *s_X1 = X1->allocState();
       X1_sampler->sampleUniform(s_X1_tmp);
       parent->SampleQuotient(s_Q0_tmp);
       MergeStates(s_Q0_tmp, s_X1_tmp, q_random);
-      //X1->freeState(s_X1);
-      //Q0->freeState(s_Q0);
     }else{
       parent->SampleQuotient(q_random);
     }

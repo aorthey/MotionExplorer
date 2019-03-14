@@ -68,9 +68,7 @@ bool QRRT::GetSolution(ob::PathPtr &solution)
     return BaseT::GetSolution(solution);
   }else{
     if(firstRun) return false;
-
     const Configuration *q_nearest = Nearest(q_goal);
-    //double d = Q1->distance(q_nearest->state, q_goal->state);
     double dist = 0.0;
     bool satisfied = goal->isSatisfied(q_nearest->state, &dist);
     if(satisfied)
@@ -80,13 +78,6 @@ bool QRRT::GetSolution(ob::PathPtr &solution)
       solution_path = GetPath(v_start, v_goal);
       hasSolution = true;
     }
-    // if(d < 0.01)
-    // {
-    //   v_goal = AddConfiguration(q_goal);
-    //   AddEdge(q_nearest->index, v_goal);
-    //   solution_path = GetPath(v_start, v_goal);
-    //   hasSolution = true;
-    // } 
   }
   return hasSolution;
 }
