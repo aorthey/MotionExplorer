@@ -13,7 +13,8 @@ from ParseBenchmarkFile import *
 fname = '../../data/benchmarks/last.xml'
 benchmark = BenchmarkAnalytica(fname)
 
-START_AT_BEGINNING = False
+START_AT_BEGINNING = True
+EPSILON_IGNORE = 1e-1
 EXTRAPOLATED_PTS = 1
 pp = PdfPages(benchmark.fname_pdf)
 
@@ -35,7 +36,7 @@ ax.set_ylabel('Time (s)')
 
 ##find StartD
 startD = 0
-while abs(times_max[startD]-times_min[startD])<1e-1:
+while abs(times_max[startD]-times_min[startD])<EPSILON_IGNORE:
   startD=startD+1
 
 print "StartD: ",startD
@@ -47,14 +48,16 @@ times_vanilla = times_vanilla[startD:]
 times_mean = times_mean[startD:]
 times_min = times_min[startD:]
 times_max = times_max[startD:]
-I = np.arange(startD,len(times_vanilla)+startD)
+I = np.arange(1+startD,1+len(times_vanilla)+startD)
 
-T = np.arange(startD, len(times_vanilla)+EXTRAPOLATED_PTS)
+T = np.arange(1+startD, 1+startD+len(times_vanilla)+EXTRAPOLATED_PTS)
 
-f_vanilla_extrapolate = interpolate.interp1d(I, times_vanilla.flatten(), fill_value="extrapolate")
-f_mean_extrapolate = interpolate.interp1d(I, times_mean.flatten(), fill_value="extrapolate")
-f_min_extrapolate = interpolate.interp1d(I, times_min.flatten(), fill_value="extrapolate")
-f_max_extrapolate = interpolate.interp1d(I, times_max.flatten(), fill_value="extrapolate")
+interp_type = 'quadratic'
+f_vanilla_extrapolate = interpolate.interp1d(I, times_vanilla.flatten(), fill_value="extrapolate", kind=interp_type)
+f_mean_extrapolate = interpolate.interp1d(I, times_mean.flatten(), fill_value="extrapolate", kind=interp_type)
+f_min_extrapolate = interpolate.interp1d(I, times_min.flatten(), fill_value="extrapolate", kind=interp_type)
+f_max_extrapolate = interpolate.interp1d(I, times_max.flatten(), fill_value="extrapolate", kind=interp_type)
+
 times_vanilla_extrapolate = f_vanilla_extrapolate(T)
 times_mean_extrapolate = f_mean_extrapolate(T)
 times_min_extrapolate = f_min_extrapolate(T)

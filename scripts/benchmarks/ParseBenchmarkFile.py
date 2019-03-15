@@ -35,6 +35,17 @@ class PlannerResults:
 
     self.AddRuns(xml)
 
+  def GetAveragePercentageOfFeasibleNodesPerLevel(self):
+    A =  np.true_divide(self.run_feasible_nodes_per_level, self.run_nodes_per_level)
+    M = np.mean(A, axis=0)
+    return M
+
+  def GetAverageNodesPerLevel(self):
+    return np.mean(self.run_nodes_per_level,axis=0)
+
+  def GetAverageFeasibleNodesPerLevel(self):
+    return np.mean(self.run_feasible_nodes_per_level,axis=0)
+
   def GetLargestDimension(self):
     return self.dimensions_per_level[-1]
 
@@ -50,13 +61,12 @@ class PlannerResults:
           if rchild.tag == "time":
             self.run_time[run_ctr] = float(rchild.text)
           if rchild.tag == "levels":
-            for level in rchild:
-              level_ctr = 0
+            for level_idx, level in enumerate(rchild):
               for lchild in level:
                 if lchild.tag == "nodes":
-                  self.run_nodes_per_level[run_ctr, level_ctr] = float(lchild.text)
+                  self.run_nodes_per_level[run_ctr, level_idx] = float(lchild.text)
                 if lchild.tag == "feasible_nodes":
-                  self.run_feasible_nodes_per_level[run_ctr, level_ctr] = float(lchild.text)
+                  self.run_feasible_nodes_per_level[run_ctr, level_idx] = float(lchild.text)
 
 
   def __repr__(self):
@@ -102,7 +112,8 @@ class BenchmarkAnalytica:
     self.planners = []
     self.fname = fname
     fname_dir = os.path.dirname(fname)
-    self.fname_pdf = fname_dir + "/" + fname + "_runtimes.pdf"
+    fname_file_wo_ext = os.path.splitext(fname)[0]
+    self.fname_pdf = fname_dir + "/" + fname_file_wo_ext + "_runtimes.pdf"
 
     xml = ET.parse(self.fname)
     benchmark = xml.getroot()
@@ -160,17 +171,61 @@ class BenchmarkAnalytica:
     planners_per_dim = np.where(planners_per_dim!=0,planners_per_dim,np.nan)
     return planners_per_dim
 
+  def ClipNonLargestDimensionPlanners(self):
+    largestDim = self.dimensions_per_level[-1]
+    Nplanners = len(self.planners)
+    self.planners = [p for p in self.planners if p.GetLargestDimension()==largestDim]
+    self.number_of_planners = len(self.planners)
+    self.number_of_levels = 1
+    self.dimensions_per_level = self.dimensions_per_level[-1]
+    print "Clipped nr planners from",Nplanners,"down to",self.number_of_planners
+
+  def GetPercentageOfFeasibleNodesPerPlannerPerDimensionalityMatrix(self):
+    planners_per_dim = np.zeros((self.number_of_levels, self.number_of_planners))
+    pctr=0
+    for planner in self.planners:
+      idx = self.DimensionToIndex(planner.GetLargestDimension())
+      p = planner.GetAveragePercentageOfFeasibleNodesPerLevel()
+      p = np.where(p!=0,p,np.nan)
+      planners_per_dim[idx,pctr]=np.nanmean(p)
+      pctr=pctr+1
+    return planners_per_dim
+
+  def GetPercentageOfFeasibleNodesPerPlannerPerDimensionalityMatrixLastLevel(self):
+    planners_per_dim = np.zeros((self.number_of_levels, self.number_of_planners))
+    pctr=0
+    for planner in self.planners:
+      idx = self.DimensionToIndex(planner.GetLargestDimension())
+      N =  float(planner.GetAverageNodesPerLevel()[-1])
+      Nf = float(planner.GetAverageFeasibleNodesPerLevel()[-1])
+      if N>0: 
+        planners_per_dim[idx,pctr]=Nf/N
+      pctr=pctr+1
+    return planners_per_dim
+
+  def GetPercentageOfFeasibleNodesPerPlanner(self):
+    P = self.GetPercentageOfFeasibleNodesPerPlannerPerDimensionalityMatrix()
+    return np.nanmin(P,axis=0)
+
+  def GetPercentageOfFeasibleNodesPerPlannerLastLevel(self):
+    P = self.GetPercentageOfFeasibleNodesPerPlannerPerDimensionalityMatrixLastLevel()
+    return np.nanmin(P,axis=0)
+
+  def GetTimePerPlanner(self):
+    T = self.GetAverageTimePerPlannerPerDimensionalityMatrix()
+    return np.nanmin(T, axis=0)
+
   def TimeAveragePerDimensionality(self):
-    P = self.GetAverageTimePerPlannerPerDimensionalityMatrix()
-    return np.nanmean(P, axis=1)
+    T = self.GetAverageTimePerPlannerPerDimensionalityMatrix()
+    return np.nanmean(T, axis=1)
 
   def TimeMaxPerDimensionality(self):
-    P = self.GetAverageTimePerPlannerPerDimensionalityMatrix()
-    return np.nanmax(P, axis=1)
+    T = self.GetAverageTimePerPlannerPerDimensionalityMatrix()
+    return np.nanmax(T, axis=1)
 
   def TimeMinPerDimensionality(self):
-    P = self.GetAverageTimePerPlannerPerDimensionalityMatrix()
-    return np.nanmin(P, axis=1)
+    T = self.GetAverageTimePerPlannerPerDimensionalityMatrix()
+    return np.nanmin(T, axis=1)
 
   def TimeAveragePerSingleDimensionalityAlgorithm(self):
     planners_per_dim = np.zeros(self.number_of_levels)
@@ -198,4 +253,3 @@ if __name__ == '__main__':
   benchmark = BenchmarkAnalytica(fname)
   print benchmark.AverageTimePerPlanner()
   print benchmark.PlannerNames()
-  print benchmark.AverageTimePerDimensionality()

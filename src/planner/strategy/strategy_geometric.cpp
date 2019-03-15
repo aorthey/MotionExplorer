@@ -352,6 +352,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   og::SimpleSetup ss(si);
   ot::Benchmark benchmark(ss, environment_name);
 
+  uint planner_ctr = 0;
   for(uint k = 0; k < binput.algorithms.size(); k++){
     std::string name_algorithm = binput.algorithms.at(k);
 
@@ -402,9 +403,11 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
         planner_k_i->setName(name_algorithm_strat);
         std::cout << "adding planner with ambient space " << si_vec_k.back()->getStateDimension() << std::endl;
         benchmark.addPlanner(planner_k_i);
+        planner_ctr++;
       }
     }else{
       benchmark.addPlanner(GetPlanner(binput.algorithms.at(k), stratifications.at(0)));
+      planner_ctr++;
     }
   }
 
@@ -437,9 +440,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "BENCHMARKING" << std::endl;
 
-  uint Nalgorithms = benchmark.getRecordedExperimentData().planners.size();
-
-  double worst_case_time_estimate_in_seconds = Nalgorithms*binput.runCount*binput.maxPlanningTime;
+  double worst_case_time_estimate_in_seconds = planner_ctr*binput.runCount*binput.maxPlanningTime;
   double worst_case_time_estimate_in_minutes = worst_case_time_estimate_in_seconds/60.0;
   double worst_case_time_estimate_in_hours = worst_case_time_estimate_in_minutes/60.0;
   std::cout << "Worst-case time requirement: ";
