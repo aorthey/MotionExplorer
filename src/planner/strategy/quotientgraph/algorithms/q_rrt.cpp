@@ -67,21 +67,9 @@ bool QRRT::GetSolution(ob::PathPtr &solution)
   if(hasSolution){
     return BaseT::GetSolution(solution);
   }else{
-    if(firstRun) return false;
-    const Configuration *q_nearest = Nearest(q_goal);
-    double dist = 0.0;
-    bool satisfied = goal->isSatisfied(q_nearest->state, &dist);
-    if(satisfied)
-    {
-      v_goal = AddConfiguration(q_goal);
-      AddEdge(q_nearest->index, v_goal);
-      solution_path = GetPath(v_start, v_goal);
-      hasSolution = true;
-    }
+    return false;
   }
-  return hasSolution;
 }
-
 
 void QRRT::Grow(double t){
   if(firstRun){
@@ -114,6 +102,17 @@ void QRRT::Grow(double t){
     Configuration *q_next = new Configuration(Q1, q_random->state);
     Vertex v_next = AddConfiguration(q_next);
     AddEdge(q_nearest->index, v_next);
+
+    //const Configuration *q_nearest = Nearest(q_goal);
+    double dist = 0.0;
+    bool satisfied = goal->isSatisfied(q_next->state, &dist);
+    if(satisfied)
+    {
+      v_goal = AddConfiguration(q_goal);
+      AddEdge(q_nearest->index, v_goal);
+      //solution_path = GetPath(v_start, v_goal);
+      hasSolution = true;
+    }
   }
 }
 
@@ -127,27 +126,46 @@ double QRRT::GetImportance() const{
   // (4) vertices: the more vertices we have, the less important (let other
   // levels also explore)
   //
-  //
-  //  exponentially more samples on level i. Should depend on ALL levels.
+  //exponentially more samples on level i. Should depend on ALL levels.
   const double base = 2;
   const double normalizer = powf(base, level);
   double N = (double)GetNumberOfVertices()/normalizer;
   return 1.0/(N+1);
 }
 
+bool QRRT::Sample(ob::State *q_random)
+{
+  totalNumberOfSamples++;
+  if(parent == nullptr){
+    Q1_sampler->sampleUniform(q_random);
+  }else{
+    if(X1_dimension>0)
+    {
+      X1_sampler->sampleUniform(s_X1_tmp);
+      parent->SampleQuotient(s_Q0_tmp);
+      MergeStates(s_Q0_tmp, s_X1_tmp, q_random);
+    }else{
+      parent->SampleQuotient(q_random);
+    }
+  }
+  return true;
+}
+
 bool QRRT::SampleQuotient(ob::State *q_random_graph)
 {
-  //VERTEX SAMPLING
+  ////VERTEX SAMPLING
   const Vertex v = boost::random_vertex(G, rng_boost);
   Q1->getStateSpace()->copyState(q_random_graph, G[v]->state);
+
   //if(epsilon > 0) Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
-
-  //EDGE SAMPLING (biased towards highly connected vertices, which might be a
-  //good thing)
-  // if(num_edges(G) == 0) return false;
-
   // Edge e = boost::random_edge(G, rng_boost);
+  // while(!sameComponent(boost::source(e, G), v_start))
+  // {
+  //   e = boost::random_edge(G, rng_boost);
+  // }
+
   // double s = rng_.uniform01();
+
   // const Vertex v1 = boost::source(e, G);
   // const Vertex v2 = boost::target(e, G);
   // const ob::State *from = G[v1]->state;

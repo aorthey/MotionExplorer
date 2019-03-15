@@ -132,7 +132,6 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
 
   ompl::time::point t_start = ompl::time::now();
 
-  std::cout << "MultiQuotient: " << currentQuotientLevel << " to " << stopAtLevel << std::endl;
   for(uint k = currentQuotientLevel; k < stopAtLevel; k++){
     foundKLevelSolution = false;
 
@@ -209,7 +208,6 @@ void MultiQuotient<T,Tlast>::setProblemDefinition(std::vector<ob::ProblemDefinit
 template <class T, class Tlast>
 void MultiQuotient<T,Tlast>::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
 {
-  //ob::ProblemDefinitionPtr pp = pdef.back();
   this->Planner::setProblemDefinition(pdef);
 }
 
