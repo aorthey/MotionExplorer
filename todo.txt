@@ -695,6 +695,5 @@ Make benchmark pretty
 
 Dimension can have different names, how to handle them?
 
-
-
+[ ] bidirect, or even multiple, depending on the underlying space
 

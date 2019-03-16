@@ -103,7 +103,7 @@ void QuotientGraph::ClearVertices()
     nearest_datastructure->list(configs);
     for (auto &config : configs)
     {
-        DeleteConfiguration(config);
+      DeleteConfiguration(config);
     }
     nearest_datastructure->clear();
   }

@@ -19,7 +19,7 @@
     <qgoal config="13  +2.1 +0.7 0 0 0 0 0 0 0 0 0 0 0"/>
 
     <freeFloating>1</freeFloating>
-    <maxplanningtime>5</maxplanningtime>
+    <maxplanningtime>2</maxplanningtime>
 
     <!-- <hierarchy> -->
     <!--   <level inner_index="3" cspace_constant="1" type="R3"/> -->

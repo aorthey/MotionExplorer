@@ -10,7 +10,15 @@ import os
 import sys
 from ParseBenchmarkFile import *
 
+fname = '../../data/benchmarks/10D_spatial_snake_twister_stratification_2019_03_15_17:30:20.xml'
+fname = '../../data/benchmarks/07D_kuka_windshield_stratifications_2019_03_15_17:30:53.xml'
+fname = '../../data/benchmarks/11D_planar_snake_twister_different_hierarchies_2019_03_15_17:32:53.xml'
+
+fname = '../../data/benchmarks/10D_spatial_snake_twister_stratification_2019_03_15_17:35:08.xml'
+fname = '../../data/benchmarks/07D_kuka_windshield_stratifications_2019_03_15_19:20:51.xml'
+fname = '../../data/benchmarks/11D_planar_snake_twister_different_hierarchies_2019_03_16_00:34:42.xml'
 fname = '../../data/benchmarks/last.xml'
+
 benchmark = BenchmarkAnalytica(fname)
 
 START_AT_BEGINNING = True
@@ -36,13 +44,12 @@ ax.set_ylabel('Time (s)')
 
 ##find StartD
 startD = 0
-while abs(times_max[startD]-times_min[startD])<EPSILON_IGNORE:
-  startD=startD+1
 
-print "StartD: ",startD
+if not START_AT_BEGINNING:
+  while abs(times_max[startD]-times_min[startD])<EPSILON_IGNORE:
+    startD=startD+1
 
-if START_AT_BEGINNING:
-  startD = 0
+  print "StartD: ",startD
 
 times_vanilla = times_vanilla[startD:]
 times_mean = times_mean[startD:]

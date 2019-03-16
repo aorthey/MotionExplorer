@@ -10,8 +10,8 @@
   <algorithm dynamic="1" name="benchmark:all_dynamic"/>
 
   <!-- <algorithm name="hierarchy:sampler"/> -->
-  <algorithm name="hierarchy:q_rrt"/>
   <algorithm name="benchmark:minimal"/>
+  <algorithm name="hierarchy:q_rrt"/>
   <algorithm name="ompl:rrt"/>
   <!-- <algorithm name="ompl:rrt"/> -->
   <!-- <algorithm name="hierarchy:q_prm"/> -->

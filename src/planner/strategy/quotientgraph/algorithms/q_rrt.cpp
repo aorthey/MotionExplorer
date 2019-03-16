@@ -20,7 +20,7 @@ QRRT::QRRT(const ob::SpaceInformationPtr &si, Quotient *parent_ ):
 {
   setName("QRRT"+std::to_string(id));
   Planner::declareParam<double>("range", this, &QRRT::setRange, &QRRT::getRange, "0.:1.:10000.");
-  Planner::declareParam<double>("goal_bias", this, &QRRT::setGoalBias, &QRRT::getGoalBias, "0.:.05:1.");
+  Planner::declareParam<double>("goal_bias", this, &QRRT::setGoalBias, &QRRT::getGoalBias, "0.:.1:1.");
   q_random = new Configuration(Q1);
 }
 
@@ -65,7 +65,11 @@ void QRRT::clear()
 bool QRRT::GetSolution(ob::PathPtr &solution)
 {
   if(hasSolution){
-    return BaseT::GetSolution(solution);
+    bool baset_sol = BaseT::GetSolution(solution);
+    if(baset_sol){
+      shortestPathVertices = shortestVertexPath_;
+    }
+    return baset_sol;
   }else{
     return false;
   }
@@ -101,17 +105,20 @@ void QRRT::Grow(double t){
   {
     Configuration *q_next = new Configuration(Q1, q_random->state);
     Vertex v_next = AddConfiguration(q_next);
-    AddEdge(q_nearest->index, v_next);
+    if(!hasSolution){
+      //only add edge if no solution exists
+      AddEdge(q_nearest->index, v_next);
 
-    //const Configuration *q_nearest = Nearest(q_goal);
-    double dist = 0.0;
-    bool satisfied = goal->isSatisfied(q_next->state, &dist);
-    if(satisfied)
-    {
-      v_goal = AddConfiguration(q_goal);
-      AddEdge(q_nearest->index, v_goal);
-      //solution_path = GetPath(v_start, v_goal);
-      hasSolution = true;
+      //const Configuration *q_nearest = Nearest(q_goal);
+      double dist = 0.0;
+      bool satisfied = goal->isSatisfied(q_next->state, &dist);
+      if(satisfied)
+      {
+        v_goal = AddConfiguration(q_goal);
+        AddEdge(q_nearest->index, v_goal);
+        //solution_path = GetPath(v_start, v_goal);
+        hasSolution = true;
+      }
     }
   }
 }
@@ -127,9 +134,10 @@ double QRRT::GetImportance() const{
   // levels also explore)
   //
   //exponentially more samples on level i. Should depend on ALL levels.
-  const double base = 2;
-  const double normalizer = powf(base, level);
-  double N = (double)GetNumberOfVertices()/normalizer;
+  // const double base = 2;
+  // const double normalizer = powf(base, level);
+  //double N = (double)GetNumberOfVertices()/normalizer;
+  double N = (double)GetNumberOfVertices();
   return 1.0/(N+1);
 }
 
@@ -153,24 +161,18 @@ bool QRRT::Sample(ob::State *q_random)
 
 bool QRRT::SampleQuotient(ob::State *q_random_graph)
 {
-  ////VERTEX SAMPLING
   const Vertex v = boost::random_vertex(G, rng_boost);
   Q1->getStateSpace()->copyState(q_random_graph, G[v]->state);
-
-  //if(epsilon > 0) Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
-  // Edge e = boost::random_edge(G, rng_boost);
-  // while(!sameComponent(boost::source(e, G), v_start))
-  // {
-  //   e = boost::random_edge(G, rng_boost);
-  // }
-
+  ////VERTEX SAMPLING
   // double s = rng_.uniform01();
-
-  // const Vertex v1 = boost::source(e, G);
-  // const Vertex v2 = boost::target(e, G);
-  // const ob::State *from = G[v1]->state;
-  // const ob::State *to = G[v2]->state;
-
-  // Q1->getStateSpace()->interpolate(from, to, s, q_random_graph);
+  // if(s<shortestPathBias){
+  //   uint k = rng_.uniformInt(0, shortestPathVertices.size()-1);
+  //   ob::State *s = G[shortestPathVertices.at(k)]->state;
+  //   Q1->getStateSpace()->copyState(q_random_graph, s);
+  // }else{
+  //   const Vertex v = boost::random_vertex(G, rng_boost);
+  //   Q1->getStateSpace()->copyState(q_random_graph, G[v]->state);
+  // }
+  //if(epsilon > 0) Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
   return true;
 }

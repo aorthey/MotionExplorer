@@ -15,7 +15,6 @@
   <robot name="sphere_outer" file="../robots/Lshape/DoubleLshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
   <robot name="point_inner" file="../robots/Lshape/DoubleLshape_point_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <robot name="rocket" file="../robots/rocket.urdf"/>
    <terrain name="doublelshape.tri" file="../terrains/DoubleLshape_large.tri" translation="0 0 0"/>
   <!-- <terrain name="O1" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/> -->
 
@@ -27,12 +26,14 @@
     <se3max config="6  +6 +10 +10 +3.141593 +1.57 +3.141593"/>
 
     <freeFloating>1</freeFloating>
-    <maxplanningtime>1</maxplanningtime>
+    <maxplanningtime>5</maxplanningtime>
 
     <hierarchy>
-      <level inner_index="5" outer_index="5" cspace_constant="1" type="R3"/>
-      <level inner_index="3" outer_index="3" cspace_constant="1" type="R3"/>
-      <level inner_index="0" cspace_constant="0.512159005656" type="SE3"/>
+      <!-- <level inner_index="5" outer_index="5" cspace_constant="1" type="R3"/> -->
+      <!-- <level inner_index="3" outer_index="3" cspace_constant="1" type="R3"/> -->
+      <!-- <level inner_index="0" cspace_constant="0.512159005656" type="SE3"/> -->
+      <level inner_index="3" type="R3"/>
+      <level inner_index="0" type="SE3"/>
     </hierarchy>
 
   </plannerinput>

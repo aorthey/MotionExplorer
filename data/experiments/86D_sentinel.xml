@@ -20,11 +20,11 @@
     <se3min config="6  -4 -1.5 -1.5 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +4 +1.5 +1.5 +3.141593 +1.57 +3.141593"/>
     <epsilongoalregion>0.1</epsilongoalregion>
-    <maxplanningtime>0.5</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>5</maxplanningtime>      <!-- runtime in (s) --> 
     <freeFloating>1</freeFloating>
 
     <hierarchy>
-      <level inner_index="1" type="SE3"/>
+        <level inner_index="1" type="SE3"/>
         <level inner_index="0" type="SE3RN"/>
     </hierarchy>
 

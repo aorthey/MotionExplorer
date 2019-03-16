@@ -109,7 +109,7 @@ template <class T, class Tlast>
 void MultiQuotient<T,Tlast>::clear(){
   Planner::clear();
 
-  for(uint k = 0; k < stopAtLevel; k++){
+  for(uint k = 0; k < quotientSpaces.size(); k++){
     quotientSpaces.at(k)->clear();
   }
   currentQuotientLevel = 0;

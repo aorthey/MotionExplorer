@@ -462,6 +462,6 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   //BenchmarkFileToPNG(file_benchmark);
   BenchmarkOutput boutput(benchmark.getRecordedExperimentData());
   boutput.Save(xml_file.c_str());
-  boutput.PrintPDF();
+  //boutput.PrintPDF();
 }
 
