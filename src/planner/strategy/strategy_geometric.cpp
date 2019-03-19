@@ -68,6 +68,8 @@ static ob::OptimizationObjectivePtr GetOptimizationObjective(const ob::SpaceInfo
   return ob::OptimizationObjectivePtr(opt);
 }
 
+static uint all_runs{0};
+
 void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &run)
 {
   static uint pid = 0;
@@ -83,6 +85,7 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   //uint states = boost::lexical_cast<int>(run["sampled states INTEGER"]);
 
   typedef og::MultiQuotient<og::QRRT> MultiQuotient;
+  std::cout << run << std::endl;
   std::shared_ptr<MultiQuotient> qplanner = dynamic_pointer_cast<MultiQuotient>(planner);
   if(qplanner != nullptr){
     uint N = qplanner->GetLevels();
@@ -109,7 +112,7 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
     run[strkf] = to_string(states);
   }
 
-  std::cout << "Run " << pid << " [" << planner->getName() << "] " << (solved?"solved":"no solution") << "(time: "<< time << ", states: " << states << ", memory: " << memory << ")" << std::endl;
+  std::cout << "Run " << pid << "/" << all_runs << " [" << planner->getName() << "] " << (solved?"solved":"no solution") << "(time: "<< time << ", states: " << states << ", memory: " << memory << ")" << std::endl;
   std::cout << std::string(80, '-') << std::endl;
   pid++;
 
@@ -453,6 +456,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   double worst_case_time_estimate_in_seconds = planner_ctr*binput.runCount*binput.maxPlanningTime;
   double worst_case_time_estimate_in_minutes = worst_case_time_estimate_in_seconds/60.0;
   double worst_case_time_estimate_in_hours = worst_case_time_estimate_in_minutes/60.0;
+  all_runs = planner_ctr * binput.runCount;
   std::cout << "Number of Runs             : " << planner_ctr * binput.runCount << std::endl;
   std::cout << "Worst-case time requirement: ";
   if(worst_case_time_estimate_in_hours < 1){
