@@ -98,6 +98,15 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
       std::string strkf = "stratification level"+to_string(k)+" feasible nodes INTEGER";
       run[strkf] = to_string(fnodes.at(k));
     }
+  }else{
+    uint N = si->getStateDimension();
+    run["stratification levels INTEGER"] = to_string(1);
+    std::string strd = "stratification level"+to_string(0)+" dimension INTEGER";
+    run[strd] = to_string(N);
+    std::string strk = "stratification level"+to_string(0)+" nodes INTEGER";
+    run[strk] = to_string(states);
+    std::string strkf = "stratification level"+to_string(0)+" feasible nodes INTEGER";
+    run[strkf] = to_string(states);
   }
 
   std::cout << "Run " << pid << " [" << planner->getName() << "] " << (solved?"solved":"no solution") << "(time: "<< time << ", states: " << states << ", memory: " << memory << ")" << std::endl;
@@ -230,6 +239,7 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
   OMPLGeometricStratificationPtr stratification = std::make_shared<OMPLGeometricStratification>(si_vec, pdef_vec);
   return stratification;
 }
+
 void StrategyGeometricMultiLevel::Init( const StrategyInput &input )
 {
   std::string algorithm = input.name_algorithm;
@@ -443,6 +453,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   double worst_case_time_estimate_in_seconds = planner_ctr*binput.runCount*binput.maxPlanningTime;
   double worst_case_time_estimate_in_minutes = worst_case_time_estimate_in_seconds/60.0;
   double worst_case_time_estimate_in_hours = worst_case_time_estimate_in_minutes/60.0;
+  std::cout << "Number of Runs             : " << planner_ctr * binput.runCount << std::endl;
   std::cout << "Worst-case time requirement: ";
   if(worst_case_time_estimate_in_hours < 1){
     if(worst_case_time_estimate_in_minutes < 1){

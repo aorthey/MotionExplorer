@@ -3,6 +3,7 @@ from xml.etree import ElementTree as ET
 import os
 import sys
 import numpy as np
+from tabulate import tabulate
 
 class PlannerResults:
   name = ""
@@ -139,6 +140,11 @@ class BenchmarkAnalytica:
       if child.tag == "planner":
         self.AddPlanner(PlannerResults(child, self.runcount))
 
+    self.P = [(p.name,p.AverageTime()) for p in self.planners]
+    self.P = sorted(self.P, key = lambda x: x[1])
+    print tabulate(self.P, headers=['Planner Name', 'RunTime(s)'])
+
+
   ###ANALYTICS
   def PlannerNames(self):
     names = []
@@ -213,19 +219,23 @@ class BenchmarkAnalytica:
 
   def GetTimePerPlanner(self):
     T = self.GetAverageTimePerPlannerPerDimensionalityMatrix()
-    return np.nanmin(T, axis=0)
+    Tm = np.nanmin(T, axis=0)
+    return Tm[~np.isnan(Tm)]
 
   def TimeAveragePerDimensionality(self):
     T = self.GetAverageTimePerPlannerPerDimensionalityMatrix()
-    return np.nanmean(T, axis=1)
+    Tm = np.nanmean(T, axis=1)
+    return Tm[~np.isnan(Tm)]
 
   def TimeMaxPerDimensionality(self):
     T = self.GetAverageTimePerPlannerPerDimensionalityMatrix()
-    return np.nanmax(T, axis=1)
+    Tm = np.nanmax(T, axis=1)
+    return Tm[~np.isnan(Tm)]
 
   def TimeMinPerDimensionality(self):
     T = self.GetAverageTimePerPlannerPerDimensionalityMatrix()
-    return np.nanmin(T, axis=1)
+    Tm = np.nanmin(T, axis=1)
+    return Tm[~np.isnan(Tm)]
 
   def TimeAveragePerSingleDimensionalityAlgorithm(self):
     planners_per_dim = np.zeros(self.number_of_levels)
@@ -235,7 +245,7 @@ class BenchmarkAnalytica:
         idx = self.DimensionToIndex(planner.GetLargestDimension())
         planners_per_dim[idx]=planner.AverageTime()
     planners_per_dim = np.where(planners_per_dim!=0,planners_per_dim,np.nan)
-    return planners_per_dim
+    return planners_per_dim[~np.isnan(planners_per_dim)]
 
   def GroupPlannersByDimensionality(self):
     planners_per_dim = np.zeros((self.number_of_levels, self.number_of_planners))
@@ -251,5 +261,3 @@ class BenchmarkAnalytica:
 if __name__ == '__main__':
   fname = "../../data/benchmarks/last.xml"
   benchmark = BenchmarkAnalytica(fname)
-  print benchmark.AverageTimePerPlanner()
-  print benchmark.PlannerNames()

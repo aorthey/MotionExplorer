@@ -3,7 +3,7 @@ import scipy.special as sy
 import numpy as np
 import itertools as it
 
-N = {1,2,3,4,5}
+N = [1,2,3,4,5,6]
 ctr = 0
 
 prefix="  "
@@ -14,7 +14,7 @@ def PrintLevel(t):
     print lprefix+"<level inner_index=\"%d\" type=\"R2\"/>"%(t)
   elif t==2:
     print lprefix+"<level inner_index=\"%d\" type=\"SE2\"/>"%(t)
-  elif t==5:
+  elif t==N[-1]:
     print lprefix+"<level inner_index=\"0\" type=\"SE2RN\"/>"
   else:
     print lprefix+"<level inner_index=\"%d\" type=\"SE2RN\"/>"%(t)

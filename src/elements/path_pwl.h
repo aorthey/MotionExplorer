@@ -38,8 +38,6 @@ class PathPiecewiseLinear
 
     GLColor cVertex{magenta}, cLine{magenta};
     GLColor cSmoothed{magenta}, cUnsmoothed{red};
-    double linewidth{10};
-    double ptsize{10};
     virtual void DrawGLPathPtr(ob::PathPtr);
 
     void DrawGL(GUIState& state);

@@ -17,7 +17,6 @@ benchmark = BenchmarkAnalytica(fname)
 benchmark.ClipNonLargestDimensionPlanners()
 
 percentages = benchmark.GetPercentageOfFeasibleNodesPerPlanner()
-# percentages = benchmark.GetPercentageOfFeasibleNodesPerPlannerLastLevel()
 times = benchmark.GetTimePerPlanner()
 
 sorted_times_idx = np.argsort(times)

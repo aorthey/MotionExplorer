@@ -8,6 +8,9 @@
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/control/PathControl.h>
 
+double linewidth{20};
+double ptsize{10};
+
 PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
   cspace(cspace_)
 {

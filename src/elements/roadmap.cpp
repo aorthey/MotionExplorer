@@ -8,6 +8,10 @@ using namespace GLDraw;
 using Graph = ob::PlannerData::Graph;
 using Vertex = Graph::Vertex;
 
+double sizeVertex{10};
+double widthEdge{5};
+double widthPath{25};
+
 Roadmap::Roadmap()
 {
 }
@@ -91,7 +95,7 @@ void Roadmap::DrawShortestPath(GUIState &state)
       if(quotient_space->GetDimensionality()<=2 || 
           quotient_space->SpaceInformationPtr()->getStateSpace()->getType()==ob::STATE_SPACE_SE2){
         double offset = +0.05;
-        v1[2]+=offset;v2[2]+=offset;
+        v1[2]=offset;v2[2]=offset;
       }
       drawLineSegment(v1,v2);
     }

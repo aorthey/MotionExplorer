@@ -274,11 +274,13 @@ void MotionPlanner::AdvanceUntilSolution()
   }else{
     strategy->Clear();
   }
+  if(!util::StartsWith(input.name_algorithm,"benchmark")){
+    StrategyOutput output(cspace_levels.back());
+    strategy->Plan(output);
+    std::cout << output << std::endl;
+    output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
+  }
 
-  StrategyOutput output(cspace_levels.back());
-  strategy->Plan(output);
-  std::cout << output << std::endl;
-  output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
 }
 
 PlannerInput& MotionPlanner::GetInput(){
