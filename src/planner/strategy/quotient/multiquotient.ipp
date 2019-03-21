@@ -39,11 +39,21 @@ std::vector<int> MultiQuotient<T,Tlast>::GetNodes()
   std::vector<int> nodesPerLevel;
   for(uint k = 0; k < stopAtLevel; k++){
     uint Nk = quotientSpaces.at(k)->GetTotalNumberOfSamples();
-    //plus two nodes for start and goal configuration
-    nodesPerLevel.push_back(Nk+2);
+    nodesPerLevel.push_back(Nk);
   }
   return nodesPerLevel;
 }
+template <class T, class Tlast>
+std::vector<int> MultiQuotient<T,Tlast>::GetFeasibleNodes()
+{
+  std::vector<int> feasibleNodesPerLevel;
+  for(uint k = 0; k < quotientSpaces.size(); k++){
+    uint Nk = quotientSpaces.at(k)->GetTotalNumberOfFeasibleSamples();
+    feasibleNodesPerLevel.push_back(Nk);
+  }
+  return feasibleNodesPerLevel;
+}
+
 
 template <class T, class Tlast>
 std::vector<int> MultiQuotient<T,Tlast>::GetDimensionsPerLevel()
@@ -56,29 +66,6 @@ std::vector<int> MultiQuotient<T,Tlast>::GetDimensionsPerLevel()
   return dimensionsPerLevel;
 }
 
-
-template <class T, class Tlast>
-std::vector<int> MultiQuotient<T,Tlast>::GetFeasibleNodes()
-{
-  std::vector<int> feasibleNodesPerLevel;
-  ob::PlannerData data(si_);
-  uint Nvertices = 0;
-
-  uint K = min(solutions.size()+1,quotientSpaces.size());
-  K = min(K, stopAtLevel);
-
-  for(uint k = 0; k < quotientSpaces.size(); k++){
-    og::Quotient *Qk = quotientSpaces.at(k);
-    if(k<K){
-      Qk->getPlannerData(data);
-      feasibleNodesPerLevel.push_back(data.numVertices()-Nvertices);
-      Nvertices = data.numVertices();
-    }else{
-      feasibleNodesPerLevel.push_back(0);
-    }
-  }
-  return feasibleNodesPerLevel;
-}
 
 template <class T, class Tlast>
 MultiQuotient<T,Tlast>::~MultiQuotient(){

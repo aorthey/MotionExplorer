@@ -83,13 +83,11 @@ void QRRT::Grow(double t){
 
   if(hasSolution){
     //No Goal Biasing if we already found a solution on this quotient space
-    totalNumberOfSamples++;
     Sample(q_random->state);
   }else{
     double s = rng_.uniform01();
     if(s < goalBias){
       Q1->copyState(q_random->state, q_goal->state);
-      totalNumberOfSamples++;
     }else{
       Sample(q_random->state);
     }
@@ -101,8 +99,10 @@ void QRRT::Grow(double t){
     Q1->getStateSpace()->interpolate(q_nearest->state, q_random->state, maxDistance / d, q_random->state);
   }
 
+  totalNumberOfSamples++;
   if(Q1->checkMotion(q_nearest->state, q_random->state))
   {
+    totalNumberOfFeasibleSamples++;
     Configuration *q_next = new Configuration(Q1, q_random->state);
     Vertex v_next = AddConfiguration(q_next);
     if(!hasSolution){
@@ -141,9 +141,9 @@ double QRRT::GetImportance() const{
   return 1.0/(N+1);
 }
 
+//Make it faster by removing the valid check
 bool QRRT::Sample(ob::State *q_random)
 {
-  totalNumberOfSamples++;
   if(parent == nullptr){
     Q1_sampler->sampleUniform(q_random);
   }else{
@@ -163,16 +163,5 @@ bool QRRT::SampleQuotient(ob::State *q_random_graph)
 {
   const Vertex v = boost::random_vertex(G, rng_boost);
   Q1->getStateSpace()->copyState(q_random_graph, G[v]->state);
-  ////VERTEX SAMPLING
-  // double s = rng_.uniform01();
-  // if(s<shortestPathBias){
-  //   uint k = rng_.uniformInt(0, shortestPathVertices.size()-1);
-  //   ob::State *s = G[shortestPathVertices.at(k)]->state;
-  //   Q1->getStateSpace()->copyState(q_random_graph, s);
-  // }else{
-  //   const Vertex v = boost::random_vertex(G, rng_boost);
-  //   Q1->getStateSpace()->copyState(q_random_graph, G[v]->state);
-  // }
-  //if(epsilon > 0) Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, epsilon);
   return true;
 }

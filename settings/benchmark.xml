@@ -14,17 +14,7 @@
   <benchmark name="minimal">
     <!-- <algorithm name="ompl:rrt"/> -->
     <algorithm name="hierarchy:q_rrt"/>
-    <!-- <algorithm name="ompl:rrtconnect"/> -->
-    <!-- <algorithm name="ompl:fmt"/> -->
-    <!-- <algorithm name="ompl:kpiece"/> -->
     <maxplanningtime>300</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>10</runcount> <!-- number of runs per algorithm --> 
-    <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
-  </benchmark>
-  <benchmark name="test">
-    <!-- <algorithm name="ompl:rrt"/> -->
-    <algorithm name="hierarchy:q_rrt"/>
-    <maxplanningtime>1</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>10</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>

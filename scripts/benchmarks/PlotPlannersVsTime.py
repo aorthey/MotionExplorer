@@ -17,7 +17,7 @@ import os
 import sys
 from ParseBenchmarkFile import *
 
-def PlannersPerTimeHistogram(fname, show=False, MARK_BEST=True, MARK_WORST=False):
+def PlotPlannersVsTime(fname, show=False, MARK_BEST=True, MARK_WORST=False):
   benchmark = BenchmarkAnalytica(fname)
   fname_base, fname_ext = os.path.splitext(fname)
   fname_pdf = fname_base + "_last_strata_histogram.pdf"
@@ -109,4 +109,4 @@ def PlannersPerTimeHistogram(fname, show=False, MARK_BEST=True, MARK_WORST=False
 
 if __name__ == '__main__':
   fname = '../../data/benchmarks/last.xml'
-  PlannersPerTimeHistogram(fname, show=True)
+  PlotPlannersVsTime(fname, show=True)

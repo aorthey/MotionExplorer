@@ -81,9 +81,9 @@ namespace ompl
         void SetParent(Quotient *parent_);
 
         uint GetTotalNumberOfSamples() const;
+        uint GetTotalNumberOfFeasibleSamples() const;
         friend std::ostream& operator<< (std::ostream& out, const ompl::geometric::Quotient& qtnt);
         virtual void Print(std::ostream& out) const;
-
 
         //Quotient Space Projection Operators
         //  ProjectX1Subspace: Q0 \times X1 \rightarrow X1
@@ -118,7 +118,6 @@ namespace ompl
         static uint counter;
         uint id;
         uint level{0};
-        uint totalNumberOfSamples{0};
 
         bool hasSolution{false};
         bool firstRun{true};
@@ -134,8 +133,9 @@ namespace ompl
         double DistanceInnerRobotToObstacle(ob::State *state);
         double DistanceRobotToObstacle(ob::State *state);
 
+        uint totalNumberOfSamples{0};
+        uint totalNumberOfFeasibleSamples{0};
+
     };
   }
 }
-
-

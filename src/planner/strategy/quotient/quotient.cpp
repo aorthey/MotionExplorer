@@ -104,6 +104,9 @@ void Quotient::setup()
 void Quotient::clear()
 {
   BaseT::clear();
+  totalNumberOfSamples = 0;
+  totalNumberOfFeasibleSamples = 0;
+
   hasSolution = false;
   firstRun = true;
   if(parent==nullptr && X1_dimension>0) X1_sampler.reset();
@@ -987,6 +990,10 @@ uint Quotient::GetTotalNumberOfSamples() const
 {
   return totalNumberOfSamples;
 }
+uint Quotient::GetTotalNumberOfFeasibleSamples() const
+{
+  return totalNumberOfFeasibleSamples;
+}
 Quotient* Quotient::GetParent() const
 {
   return parent;
@@ -1018,11 +1025,11 @@ Quotient::QuotientSpaceType Quotient::GetType() const
 
 bool Quotient::Sample(ob::State *q_random)
 {
-  totalNumberOfSamples++;
+  bool valid = false;
   if(parent == nullptr){
     //return Q1_valid_sampler->sample(q_random);
     Q1_sampler->sampleUniform(q_random);
-    return Q1->isValid(q_random);
+    valid = Q1->isValid(q_random);
   }else{
     if(X1_dimension>0)
     {
@@ -1033,8 +1040,14 @@ bool Quotient::Sample(ob::State *q_random)
     }else{
       parent->SampleQuotient(q_random);
     }
-    return Q1->isValid(q_random);
+    valid = Q1->isValid(q_random);
   }
+  totalNumberOfSamples++;
+  if(valid){
+    totalNumberOfFeasibleSamples++;
+  }
+
+  return valid;
 }
 
 double Quotient::GetImportance() const

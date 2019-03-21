@@ -10,10 +10,13 @@ import os
 import sys
 from ParseBenchmarkFile import *
 
-def TimePerDimension(fname, show=False, START_AT_BEGINNING=False, EXTRAPOLATED_PTS=1):
+def PlotTimeVsDimension(fname, show=False, START_AT_BEGINNING=False, EXTRAPOLATED_PTS=1, REMOVE_PTS_START = 0, REMOVE_PTS_END = 0):
   benchmark = BenchmarkAnalytica(fname)
+
+  fname_base, fname_ext = os.path.splitext(fname)
+  fname_pdf = fname_base + "_time_vs_dimension.pdf"
   EPSILON_IGNORE = 1e-1
-  pp = PdfPages(benchmark.fname_pdf)
+  pp = PdfPages(fname_pdf)
 
   times_vanilla = benchmark.TimeAveragePerSingleDimensionalityAlgorithm()
   times_mean = benchmark.TimeAveragePerDimensionality()
@@ -40,18 +43,23 @@ def TimePerDimension(fname, show=False, START_AT_BEGINNING=False, EXTRAPOLATED_P
 
     print "StartD: ",startD
 
+  startD = startD + REMOVE_PTS_START
+  if startD == len(times_min):
+    startD = len(times_min)-1
+
+  endD = len(times_min) - REMOVE_PTS_END
+
   DIMS = benchmark.dimensions_per_level
 
   while len(DIMS) > len(times_min):
     DIMS = DIMS[1:]
 
-  times_vanilla = times_vanilla[startD:]
-  times_mean = times_mean[startD:]
-  times_min = times_min[startD:]
-  times_max = times_max[startD:]
+  times_vanilla = times_vanilla[startD:endD]
+  times_mean = times_mean[startD:endD]
+  times_min = times_min[startD:endD]
+  times_max = times_max[startD:endD]
 
-
-  I = np.array(DIMS[startD:]).flatten()
+  I = np.array(DIMS[startD:endD]).flatten()
   T = np.append(I,DIMS[-1]+EXTRAPOLATED_PTS)
   print I
   print times_vanilla.flatten()
@@ -89,6 +97,9 @@ def TimePerDimension(fname, show=False, START_AT_BEGINNING=False, EXTRAPOLATED_P
     plt.plot(T,times_max_extrapolate,'--',color='k')
     plt.plot(T,times_mean_extrapolate,'--',color='k')
     ax.fill_between(T, times_min_extrapolate, times_max_extrapolate, facecolor='0.9')
+  else:
+    ax.fill_between(I, times_min, times_max, facecolor='0.9')
+
 
   #### LEGEND
   legend = ax.legend(loc='upper left', shadow=True)
@@ -109,5 +120,5 @@ def TimePerDimension(fname, show=False, START_AT_BEGINNING=False, EXTRAPOLATED_P
 
 if __name__ == '__main__':
   fname = '../../data/benchmarks/last.xml'
-  TimePerDimension(fname, show=True, START_AT_BEGINNING=True)
+  PlotTimeVsDimension(fname, show=True, START_AT_BEGINNING=False)
 

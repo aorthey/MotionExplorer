@@ -85,7 +85,6 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   //uint states = boost::lexical_cast<int>(run["sampled states INTEGER"]);
 
   typedef og::MultiQuotient<og::QRRT> MultiQuotient;
-  std::cout << run << std::endl;
   std::shared_ptr<MultiQuotient> qplanner = dynamic_pointer_cast<MultiQuotient>(planner);
   if(qplanner != nullptr){
     uint N = qplanner->GetLevels();

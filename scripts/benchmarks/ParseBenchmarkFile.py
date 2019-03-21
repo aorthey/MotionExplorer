@@ -41,6 +41,9 @@ class PlannerResults:
     M = np.mean(A, axis=0)
     return M
 
+  def GetAveragePercentageOfFeasibleNodes(self):
+    return np.mean(self.GetAveragePercentageOfFeasibleNodesPerLevel())
+
   def GetAverageNodesPerLevel(self):
     return np.mean(self.run_nodes_per_level,axis=0)
 
@@ -49,6 +52,9 @@ class PlannerResults:
 
   def GetLargestDimension(self):
     return self.dimensions_per_level[-1]
+
+  def GetNumberSubspaces(self):
+    return len(self.dimensions_per_level)
 
   def AverageTime(self):
     t =  np.mean(self.run_time)
@@ -135,15 +141,22 @@ class BenchmarkAnalytica:
         for d in child:
           self.dimensions_per_level.append(int(d.text))
         self.dimensions_per_level = np.array(self.dimensions_per_level)
+        print self.dimensions_per_level
 
     for child in benchmark:
       if child.tag == "planner":
         self.AddPlanner(PlannerResults(child, self.runcount))
 
-    self.P = [(p.name,p.AverageTime()) for p in self.planners]
-    self.P = sorted(self.P, key = lambda x: x[1])
-    print tabulate(self.P, headers=['Planner Name', 'RunTime(s)'])
+    self.PrintPlanners()
 
+  def PrintPlanners(self):
+    self.P = [(p.name,p.AverageTime(), \
+      np.sum(p.run_nodes_per_level), \
+      np.sum(p.run_feasible_nodes_per_level), \
+      float(np.sum(p.run_feasible_nodes_per_level))/float(np.sum(p.run_nodes_per_level)) \
+      ) for p in self.planners]
+    self.P = sorted(self.P, key = lambda x: x[1])
+    print tabulate(self.P, headers=['Planner Name', 'RunTime(s)', 'TotalNodes', 'TotalFeasibleNodes','PercentageFeasibleNodes'])
 
   ###ANALYTICS
   def PlannerNames(self):
@@ -185,6 +198,7 @@ class BenchmarkAnalytica:
     self.number_of_levels = 1
     self.dimensions_per_level = self.dimensions_per_level[-1]
     print "Clipped nr planners from",Nplanners,"down to",self.number_of_planners
+    self.PrintPlanners()
 
   def GetPercentageOfFeasibleNodesPerPlannerPerDimensionalityMatrix(self):
     planners_per_dim = np.zeros((self.number_of_levels, self.number_of_planners))
@@ -206,6 +220,18 @@ class BenchmarkAnalytica:
       Nf = float(planner.GetAverageFeasibleNodesPerLevel()[-1])
       if N>0: 
         planners_per_dim[idx,pctr]=Nf/N
+      pctr=pctr+1
+    return planners_per_dim
+
+  def GetPercentageOfFeasibleNodesPerPlannerAll(self):
+    planners_per_dim = np.zeros((self.number_of_planners))
+    pctr=0
+    for planner in self.planners:
+      idx = self.DimensionToIndex(planner.GetLargestDimension())
+      N = float(np.sum(planner.run_nodes_per_level))
+      Nf = float(np.sum(planner.run_feasible_nodes_per_level))
+      if N>0: 
+        planners_per_dim[pctr]=Nf/N
       pctr=pctr+1
     return planners_per_dim
 
@@ -259,5 +285,4 @@ class BenchmarkAnalytica:
 
 
 if __name__ == '__main__':
-  fname = "../../data/benchmarks/last.xml"
-  benchmark = BenchmarkAnalytica(fname)
+  benchmark = BenchmarkAnalytica()

@@ -44,7 +44,6 @@ QuotientGraph::QuotientGraph(const ob::SpaceInformationPtr &si, Quotient *parent
 
   xstates.resize(magic::MAX_RANDOM_BOUNCE_STEPS);
   si_->allocStates(xstates);
-  totalNumberOfSamples = 0;
 }
 
 void QuotientGraph::setup(){
@@ -117,7 +116,6 @@ void QuotientGraph::clear()
   ClearVertices();
   clearQuery();
   iterations_ = 0;
-  totalNumberOfSamples = 0;
   graphLength = 0;
   bestCost_ = ob::Cost(dInf);
   setup_ = false;
