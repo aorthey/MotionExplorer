@@ -109,7 +109,6 @@ void QRRT::Grow(double t){
       //only add edge if no solution exists
       AddEdge(q_nearest->index, v_next);
 
-      //const Configuration *q_nearest = Nearest(q_goal);
       double dist = 0.0;
       bool satisfied = goal->isSatisfied(q_next->state, &dist);
       if(satisfied)

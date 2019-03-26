@@ -205,6 +205,9 @@ namespace GLDraw{
     robot->UpdateConfig(qq);
     for(uint j=0;j<robot->links.size();j++) {
       if(robot->IsGeometryEmpty(j)) continue;
+      //############################################################################
+      //ORIGINAL CODE SEGMENTS
+      //############################################################################
       Matrix4 mat = robot->links[j].T_World;
       glPushMatrix();
       glMultMatrix(mat);
@@ -213,6 +216,74 @@ namespace GLDraw{
       a.SetColor(color);
       a.DrawGL();
       glPopMatrix();
+      //############################################################################
+      //SOME ADVENTURES WITH THE STENCIL BUFFER
+      //############################################################################
+      //Matrix4 mat = robot->links[j].T_World;
+      ////glScalef(scale, scale, scale);
+      //GLDraw::GeometryAppearance& a = *robot->geomManagers[j].Appearance();
+
+
+      // glClearStencil(0);
+      // glClear(GL_STENCIL_BUFFER_BIT);
+
+      // glEnable(GL_DEPTH_TEST);
+      // glEnable(GL_STENCIL_TEST);
+      // glStencilFunc(GL_ALWAYS, 1, -1);
+      // glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+      // a.drawFaces = false;
+      // a.drawEdges = true;
+      // a.drawVertices = false;
+      // a.DrawGL();
+
+      // glEnable(GL_POLYGON_OFFSET_FILL);
+
+      // a.SetColor(color);
+      // a.drawFaces = true;
+      // a.drawEdges = false;
+      // a.drawVertices = false;
+      // glStencilFunc(GL_NOTEQUAL, 1, -1);
+      // glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+      // glLineWidth(2);
+      // glPolygonMode(GL_FRONT, GL_LINE);
+
+      // a.DrawGL();
+      // glDisable(GL_POLYGON_OFFSET_FILL);
+ 
+        //glPushMatrix();
+        //glMultMatrix(mat);
+
+        //glEnable(GL_STENCIL_TEST); //enable stencil buffer
+        //glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+        //glClear(GL_STENCIL_BUFFER_BIT); //clear stencil buffer
+
+
+        //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        //glStencilFunc(GL_ALWAYS, 1, 0xFF); //all rendered pixels to stencil buffer
+        //glStencilMask(0xFF); //enable writing to stencil buffer
+        //glDepthMask(GL_FALSE); // Don't write to depth buffer
+
+        //a.drawFaces = true;
+        //a.lightFaces = false;
+        //a.DrawGL();
+
+        //glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        //glStencilMask(0x00); //disable writing to stencil buffer
+
+        //glDisable(GL_DEPTH_TEST); 
+        ////glScalef(0.9, 0.9, 0.9);
+        ////a.SetColor(GLColor(0.2,0.2,0.2));
+        //a.drawFaces = false;
+        //a.DrawGL();
+        //glStencilMask(0xFF); //enable writing to stencil buffer
+        //glEnable(GL_DEPTH_TEST);
+
+        //glDisable(GL_STENCIL_TEST);
+
+        //glPopMatrix();
+ 
+
+
     }
   }
 

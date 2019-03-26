@@ -38,6 +38,7 @@ class PlannerResults:
 
   def GetAveragePercentageOfFeasibleNodesPerLevel(self):
     A =  np.true_divide(self.run_feasible_nodes_per_level, self.run_nodes_per_level)
+    A = np.nan_to_num(A)
     M = np.mean(A, axis=0)
     return M
 
@@ -46,6 +47,9 @@ class PlannerResults:
 
   def GetAverageNodesPerLevel(self):
     return np.mean(self.run_nodes_per_level,axis=0)
+
+  def GetNodesPerRun(self):
+    return np.sum(self.run_nodes_per_level,axis=1)
 
   def GetAverageFeasibleNodesPerLevel(self):
     return np.mean(self.run_feasible_nodes_per_level,axis=0)
@@ -99,7 +103,7 @@ class BenchmarkAnalytica:
 
   def __repr__(self):
     rstr = ""
-    rstr = rstr + "planners:" + str(self.nr_planners) 
+    rstr = rstr + "planners:" + str(len(self.planners))
     rstr = rstr + " runs:" + str(self.runcount) + "\n"
     rstr = rstr + str(self.dimensions_per_level) + "\n"
     for p in self.planners:
@@ -151,12 +155,13 @@ class BenchmarkAnalytica:
 
   def PrintPlanners(self):
     self.P = [(p.name,p.AverageTime(), \
-      np.sum(p.run_nodes_per_level), \
+        p.run_time,\
+      p.run_nodes_per_level, \
       np.sum(p.run_feasible_nodes_per_level), \
       float(np.sum(p.run_feasible_nodes_per_level))/float(np.sum(p.run_nodes_per_level)) \
       ) for p in self.planners]
     self.P = sorted(self.P, key = lambda x: x[1])
-    print tabulate(self.P, headers=['Planner Name', 'RunTime(s)', 'TotalNodes', 'TotalFeasibleNodes','PercentageFeasibleNodes'])
+    print tabulate(self.P, headers=['Planner Name', 'AverageTime(s)','RunTime(s)', 'TotalNodes', 'TotalFeasibleNodes','PercentageFeasibleNodes'])
 
   ###ANALYTICS
   def PlannerNames(self):
@@ -228,8 +233,8 @@ class BenchmarkAnalytica:
     pctr=0
     for planner in self.planners:
       idx = self.DimensionToIndex(planner.GetLargestDimension())
-      N = float(np.sum(planner.run_nodes_per_level))
-      Nf = float(np.sum(planner.run_feasible_nodes_per_level))
+      N = float(np.sum(planner.GetAverageNodesPerLevel()))
+      Nf = float(np.sum(planner.GetAverageFeasibleNodesPerLevel()))
       if N>0: 
         planners_per_dim[pctr]=Nf/N
       pctr=pctr+1

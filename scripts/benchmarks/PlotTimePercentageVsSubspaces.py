@@ -32,13 +32,26 @@ def PlotPercentageVsSubspace(fname = '../../data/benchmarks/last.xml'):
   D = benchmark.dimensions_per_level
   plt.title(benchmark.benchmark_name+"(Dimensionality: "+str(D)+"dof)")
 
-
   X = [p[0] for p in P]
   Y = [p[1] for p in P]
 
-  ax.scatter(X,Y)
+  Z = np.array([(p[0],p[1]) for p in P])
+  print np.split(Z, X)
 
-  ax.set_ylabel('Percentage of Feasible Samples')
+  V = np.split(Z, np.argwhere(np.diff(X) != 0)[:,0] + 1)
+
+  H = []
+  for v in V:
+    H.append((int(v[0,0]),np.mean(v[:,1])))
+
+  H = np.array(H)
+  H = np.sort(H,axis=0)
+  print H
+  plt.plot(H[:,0],H[:,1],'-ok')
+
+  ax.scatter(X,Y, c='k',marker='o')
+
+  ax.set_ylabel('Percentage of Successful Connections')
   ax.set_xlabel('Number Subspaces')
 
   #Force Integer Labels
@@ -86,4 +99,5 @@ def PlotTimePercentageVsSubspace(fname = '../../data/benchmarks/last.xml'):
   plt.close()
 
 if __name__ == '__main__':
-  PlotTimePercentageVsSubspace()
+  ##PlotTimePercentageVsSubspace()
+  PlotPercentageVsSubspace()

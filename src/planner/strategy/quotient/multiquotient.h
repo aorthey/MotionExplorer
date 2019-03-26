@@ -26,11 +26,11 @@ namespace ompl
         void setup() override;
         void clear() override;
         void setProblemDefinition(const ob::ProblemDefinitionPtr &pdef) override;
-        int GetLevels();
 
-        std::vector<int> GetFeasibleNodes();
-        std::vector<int> GetNodes();
-        std::vector<int> GetDimensionsPerLevel();
+        int GetLevels() const;
+        std::vector<int> GetFeasibleNodes() const;
+        std::vector<int> GetNodes() const;
+        std::vector<int> GetDimensionsPerLevel() const;
         void SetStopLevel(uint level_);
 
       protected:
