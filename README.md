@@ -41,7 +41,7 @@ For Ubuntu 16.04 and 18.04 (assumes that you have a github account and added you
       
 <b>On Ubuntu 16.04</b>
 
-      sudo apt-get install libboost1.55-all-dev
+      sudo apt-get install libboost1.58-all-dev
 
 <b>On Ubuntu 18.04</b>
 
