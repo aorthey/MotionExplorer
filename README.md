@@ -31,17 +31,28 @@ Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.prat
   <li> Boost 1.55 or later
 </ul>
 
-<h3>Ubuntu 16.04</h3>
+<h3>Install</h3>
+For Ubuntu 16.04 and 18.04 (assumes that you have a github account and added your ssh key to github)
+
+<ol>
+  <li> Install Dependencies <b>Ubuntu 16.04 and 18.04</b>
+
+      sudo apt-get install g++-5 cmake git libboost-system-dev libboost-thread-dev freeglut3 freeglut3-dev libglpk-dev python-dev python-opengl libxmu-dev libxi-dev libqt4-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev libqhull-dev
+      
+<b>On Ubuntu 16.04</b>
 
       sudo apt-get install libboost1.55-all-dev
 
-<h3>Ubuntu 18.04</h3>
+<b>On Ubuntu 18.04</b>
 
       sudo apt-get install libboost1.65-all-dev
-
-<h3>Install Klampt 0.6 (all Ubuntu versions)</h3>
-
-      sudo apt-get install g++-5 cmake git libboost-system-dev libboost-thread-dev freeglut3 freeglut3-dev libglpk-dev python-dev python-opengl libxmu-dev libxi-dev libqt4-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev libqhull-dev
+            
+<li> Install OMPL (use install script on http://ompl.kavrakilab.org/download.html)
+ <li> Install Klampt 0.6 (all Ubuntu versions)
+  
+      cd ~
+      mkdir -p git
+      cd git
       git clone git@github.com:aorthey/Klampt.git
       cd Klampt/Library
       make unpack-deps
@@ -52,13 +63,17 @@ Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.prat
       cmake .
       make
 
-<h1>Install</h1>
+<li>Install Software
 
+      cd ~/git
+      git clone git@github.com:aorthey/orthoklampt.git
       mkdir build
       cd build
       cmake ..
       make -j10
-      ./planner_hierarchy ../data/experiments/06D_doubleLshape.xml
+      ./planner_gui ../data/experiments/15D_planar_manipulator.xml
+</ol>
+
 
 <h1>Use</h1>
 
