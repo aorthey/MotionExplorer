@@ -119,7 +119,7 @@ class BenchmarkAnalytica:
   def AddPlanner(self, presult ):
     self.planners.append(presult)
 
-  def __init__(self, fname = "../../data/benchmarks/last.xml"):
+  def __init__(self, fname = "../../data/benchmarks/last.xml", verbose=False):
     self.planners = []
     self.fname = fname
     fname_dir = os.path.dirname(fname)
@@ -151,7 +151,8 @@ class BenchmarkAnalytica:
       if child.tag == "planner":
         self.AddPlanner(PlannerResults(child, self.runcount))
 
-    self.PrintPlanners()
+    if verbose:
+      self.PrintPlanners()
 
   def PrintPlanners(self):
     self.P = [(p.name,p.AverageTime(), \
