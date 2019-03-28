@@ -20,8 +20,9 @@ Open Motion Planning Library (OMPL): http://ompl.kavrakilab.org/
 
 Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.pratt.duke.edu/klampt/
 
+<h1>Install</h1>
 
-<h1>Dependencies</h1>
+<h3>Dependencies</h3>
 
 <ul>
   <li> OMPL 1.4.0
@@ -31,7 +32,6 @@ Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.prat
   <li> Boost 1.55 or later
 </ul>
 
-<h3>Install</h3>
 For Ubuntu 16.04 and 18.04 (assumes that you have a github account and added your ssh key to github)
 
 <ol>
