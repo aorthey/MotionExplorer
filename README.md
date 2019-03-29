@@ -29,6 +29,7 @@ Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.prat
   <li> Klampt 0.6 (modified version github.com/aorthey/Klampt and
   github.com/aorthey/KrisLibrary)
   <li> Eigen 3.3
+  <li> Lemon
   <li> Boost 1.55 or later
 </ul>
 
@@ -70,6 +71,19 @@ For Ubuntu 16.04 and 18.04 (assumes that you have a github account and added you
       cd ..
       cmake .
       make -j$(nproc)
+      sudo make install
+ <li> Install Lemon (Graph Library)
+  
+      cd ~
+      mkdir -p git
+      cd git  
+      wget http://lemon.cs.elte.hu/pub/sources/lemon-1.3.1.tar.gz
+      tar xfv lemon-1.3.1.tar.gz 
+      cd lemon-1.3.1/
+      mkdir build
+      cd build/
+      cmake ..
+      make
       sudo make install
 
 <li>Install Software
