@@ -3,10 +3,12 @@
 <world>
 
 
-  <robot name="sentinel" file="/home/aorthey/git/orthoklampt/data/deprecated/sentinel_complete.urdf" translation="0 0 0" rotateRPY="0 0 0" config="143 
+  <robot name="sentinel" file="../deprecated/sentinel_complete.urdf" translation="0 0 0" rotateRPY="0 0 0" config="143 
+  <robot name="sentinel" file="../deprecated/sentinel_complete.urdf" translation="0 0 0" rotateRPY="0 0 0" config="143 
    0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
   <!--
   -->
-  <rigidObject name="tunnel" file="/home/aorthey/git/orthoklampt/data/terrains/turbine/turbine.tri" translation="0 0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="tunnel" file="../terrains/turbine/turbine.tri" translation="0 0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="tunnel" file="../terrains/turbine/turbine.tri" translation="0 0 0" rotateRPY="0 0 0"/>
 
 </world>

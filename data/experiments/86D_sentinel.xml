@@ -3,11 +3,14 @@
 <world>
 
 
-  <robot name="sentinel" file="/home/aorthey/git/orthoklampt/data/robots/sentinel.urdf"/>
-  <robot name="sentinel_head" file="/home/aorthey/git/orthoklampt/data/robots/sentinel_head.urdf"/>
+  <robot name="sentinel" file="../robots/sentinel.urdf"/>
+  <robot name="sentinel" file="../robots/sentinel.urdf"/>
+  <robot name="sentinel_head" file="../robots/sentinel_head.urdf"/>
+  <robot name="sentinel_head" file="../robots/sentinel_head.urdf"/>
   <!--
   -->
-  <rigidObject name="tunnel" file="/home/aorthey/git/orthoklampt/data/terrains/turbine/turbine.tri" translation="0 0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="tunnel" file="../terrains/turbine/turbine.tri" translation="0 0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="tunnel" file="../terrains/turbine/turbine.tri" translation="0 0 0" rotateRPY="0 0 0"/>
 
       <level inner_index="4" type="R7"/>
 

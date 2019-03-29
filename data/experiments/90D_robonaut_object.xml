@@ -1,35 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <world>
 
+  <robot name="hubo" file="../../../Klampt/data/robots/robonaut2.rob" translation="0.5 -1 0" rotation="0.5 0.5 0 -0.5 0.5 0 0 0 1"/>
   <!--
-  <robot name="hubo" file="/home/aorthey/git/Klampt/data/robots/pr2.rob" />
-  <robot name="hubo" file="/home/aorthey/git/Klampt/data/robots/robonaut2.rob" translation="0.5 -1 0" rotation="0.5 0.5 0 -0.5 0.5 0 0 0 1"/>
+  <robot name="hubo" file="../../../Klampt/data/robots/pr2.rob" />
+  <robot name="hubo" file="../../../Klampt/data/robots/pr2.rob" />
+  <robot name="hubo" file="../../../Klampt/data/robots/robonaut2.rob" translation="0.5 -1 0" rotation="0.5 0.5 0 -0.5 0.5 0 0 0 1"/>
   -->
-  <!-- ************************************************************************* -->
-  <!-- ************************************************************************* -->
-  <robot name="robonaut" file="/home/aorthey/git/Klampt/data/robots/robonaut2.rob" translation="0.5 -1 0" rotateRPY="0 0 3.14" />
 
-  <terrain file="/home/aorthey/git/Klampt/data/terrains/plane.tri" translation="0 0 0"/>
 
-  <terrain file="/home/aorthey/git/Klampt/data/terrains/cube.tri" scale="0.1 0.1 0.1" translation="0.5 0.0 0.81">
-   <display color="0.8 0.8 0.8"/>
-  </terrain>
+  <!-- <robot name="robonaut" file="../../../Klampt/data/robots/robonaut2.rob" translation="0.5 -1 0" rotateRPY="0 0 3.14" /> -->
+  <!-- <robot name="robonaut" file="../../../Klampt/data/robots/robonaut2.rob" translation="0.5 -1 0" rotateRPY="0 0 3.14" /> -->
+
+  <terrain file="../../../Klampt/data/terrains/plane.tri" translation="0 0 0"/>
+  <!-- <terrain name="cube" file="../terrains/cuboid.tri" scale="0.1 0.1 0.1" translation="0.5 0.0 0.81"/> -->
+
+  <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.1 0.1 0.1" translation="0.5 0.0 0.81"/>
+  <!--  <display color="0.8 0.8 0.8"/> -->
+  <!-- </terrain> -->
   <!-- ************************************************************************* -->
   <!-- the table -->
   <!-- ************************************************************************* -->
-  <terrain file="/home/aorthey/git/Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.3 0.25 0.01">
+  <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.3 0.25 0.01">
    <display color="0.4 0.3 0.2"/>
   </terrain>
-  <terrain file="/home/aorthey/git/Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.3 -0.25 0.01">
+  <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.3 -0.25 0.01">
      <display color="0.4 0.3 0.2"/>
   </terrain>
-  <terrain file="/home/aorthey/git/Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.8 0.25 0.01">
+  <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.8 0.25 0.01">
      <display color="0.4 0.3 0.2"/>
   </terrain>
-  <terrain file="/home/aorthey/git/Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.8 -0.25 0.01">
+  <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.8 -0.25 0.01">
      <display color="0.4 0.3 0.2"/>
   </terrain>
-  <terrain file="/home/aorthey/git/Klampt/data/terrains/cube.tri" scale="0.6 0.6 0.02" translation="0.275 -0.275 0.81">
+  <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.6 0.6 0.02" translation="0.275 -0.275 0.81">
      <display color="0.4 0.3 0.2"/>
   </terrain>
   <!-- ************************************************************************* -->
@@ -53,12 +57,12 @@
 
   </plannerinput>
 
-  <simulation>
-    <globals maxContacts="20" />
-    <robot index="0">
-       <controller type="PolynomialPathController" />
-    </robot>
-  </simulation>
+  <!-- <simulation>-->
+  <!--   <globals maxContacts="20" />-->
+  <!--   <robot index="0">-->
+  <!--      <controller type="PolynomialPathController" />-->
+  <!--   </robot>-->
+  <!-- </simulation>-->
 
 
 </world>

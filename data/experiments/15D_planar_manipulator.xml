@@ -18,14 +18,22 @@
   <robot name="13dof" file="../robots/planar_manipulator/13dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
   <robot name="14dof" file="../robots/planar_manipulator/14dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <rigidObject name="cylinder.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cylinder.tri" translation="-2 +2 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cylinder.tri" translation="-2.5 -2.5 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cylinder.tri" translation="1 -2.0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cylinder.tri" translation="5 5.0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cylinder.tri" translation="10 5.0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cylinder.tri" translation="-10 5.0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cylinder.tri" translation="-3 8.0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cylinder.tri" translation="+7 -8.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-2 +2 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-2 +2 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-2.5 -2.5 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-2.5 -2.5 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="1 -2.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="1 -2.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="5 5.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="5 5.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="10 5.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="10 5.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-10 5.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-10 5.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-3 8.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-3 8.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="+7 -8.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="+7 -8.0 0" rotateRPY="0 0 0"/>
   <plannerinput>
 
     <qinit  config="37  +0.0 +0.0 +0.0 0.0 0.0 0.0  +0.0 0 +0.5 0 +0.4 0 +0.7 0 +0.6 0 +0.4 0 +0.3 0 +0.4 0 +0.3 0 +0.3 0 +0.2 0 +0.4 0 +0.3 0 +0.3 0 0 0 0 "/>

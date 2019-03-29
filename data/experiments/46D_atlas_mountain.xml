@@ -4,11 +4,13 @@
 <world>
 
 
-  <robot name="atlas" file="/home/aorthey/git/orthoklampt/data/robots/atlas/atlas.urdf" translation="0 0 0" rotateRPY="0 0 0" config="46
+  <robot name="atlas" file="../robots/atlas/atlas.urdf" translation="0 0 0" rotateRPY="0 0 0" config="46
+  <robot name="atlas" file="../robots/atlas/atlas.urdf" translation="0 0 0" rotateRPY="0 0 0" config="46
     -2 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
   <!--
   -->
-  <terrain name="mountain" file="/home/aorthey/git/orthoklampt/data/terrains/mountain/ridge.tri" translation="0 0 0" rotateRPY="0 0 0">
+  <terrain name="mountain" file="../terrains/mountain/ridge.tri" translation="0 0 0" rotateRPY="0 0 0">
+  <terrain name="mountain" file="../terrains/mountain/ridge.tri" translation="0 0 0" rotateRPY="0 0 0">
    <display color="0.9 0.5 0.3"/>
   </terrain>
 

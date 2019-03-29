@@ -26,18 +26,25 @@
 -->
 
   <!--
-  <rigidObject   name="biolab" file="/home/aorthey/git/orthoklampt/data/terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
+  <rigidObject   name="biolab" file="../terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
+  <rigidObject   name="biolab" file="../terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
     <display color="0.7 0.7 0.7 0.5"/>
   </rigidObject>
-  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0.8 0 0.9" rotateRPY="0 0 0"/>
-  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0.8 0 -0.2" rotateRPY="0 0 0"/>
-  <rigidObject   name="biolab" file="/home/aorthey/git/orthoklampt/data/terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 0.9" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 0.9" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 -0.2" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 -0.2" rotateRPY="0 0 0"/>
+  <rigidObject   name="biolab" file="../terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
+  <rigidObject   name="biolab" file="../terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
     <display color="0.7 0.7 0.7 0.5"/>
   </rigidObject>
-  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0.8 0 0.9" rotateRPY="0 0 0"/>
-  <rigidObject name="cuboid.tri" file="/home/aorthey/git/orthoklampt/data/terrains/primitives/cuboid.tri" translation="0.8 0 -0.2" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 0.9" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 0.9" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 -0.2" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 -0.2" rotateRPY="0 0 0"/>
   -->
-  <terrain   name="biolab" file="/home/aorthey/git/orthoklampt/data/terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
+  <terrain   name="biolab" file="../terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
+  <terrain   name="biolab" file="../terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
     <display color="0.7 0.7 0.7 0.5"/>
   </terrain>
 

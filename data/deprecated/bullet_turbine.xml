@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="bullet" file="/home/aorthey/git/orthoklampt/data/bullet.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="bullet" file="../bullet.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="bullet" file="../bullet.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <terrain  name="turbine/turbine.tri" file="/home/aorthey/git/orthoklampt/data/terrains/turbine/turbine.tri" translation="0 0 0">
+  <terrain  name="turbine/turbine.tri" file="../terrains/turbine/turbine.tri" translation="0 0 0">
+  <terrain  name="turbine/turbine.tri" file="../terrains/turbine/turbine.tri" translation="0 0 0">
     <display color="0.7 0.7 0.7 0.5"/>
   </terrain>
 

@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="snake_irreducible" file="/home/aorthey/git/orthoklampt/data/snake_irreducible.urdf" translation="0 0 0" rotateRPY="0 0 0" config="18  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
+  <robot name="snake_irreducible" file="../snake_irreducible.urdf" translation="0 0 0" rotateRPY="0 0 0" config="18  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
+  <robot name="snake_irreducible" file="../snake_irreducible.urdf" translation="0 0 0" rotateRPY="0 0 0" config="18  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
 
   <!-- Irreducible Curvature kappa =1.76776695297 -->
 
-  <rigidObject  name="twister/twister.tri" file="/home/aorthey/git/orthoklampt/data/terrains/twister/twister.tri" translation="0 0 0"/>
+  <rigidObject  name="twister/twister.tri" file="../terrains/twister/twister.tri" translation="0 0 0"/>
+  <rigidObject  name="twister/twister.tri" file="../terrains/twister/twister.tri" translation="0 0 0"/>
 
   <plannersettings>
 

@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="snake" file="/home/aorthey/git/orthoklampt/data/robots/snake.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="snake" file="../robots/snake.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="snake" file="../robots/snake.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <terrain  name="pipin" file="/home/aorthey/git/orthoklampt/data/terrains/pipes/pipedreamin.tri" translation="0 0 0">
+  <terrain  name="pipin" file="../terrains/pipes/pipedreamin.tri" translation="0 0 0">
+  <terrain  name="pipin" file="../terrains/pipes/pipedreamin.tri" translation="0 0 0">
     <display color="0.7 0.7 0.7 0.5"/>
   </terrain>
 
