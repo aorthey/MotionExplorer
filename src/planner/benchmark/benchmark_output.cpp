@@ -1,6 +1,7 @@
 #include "benchmark_output.h"
 #include "util.h"
 #include <fstream>
+#include <boost/lexical_cast.hpp>
 
 // struct CompleteExperiment
 // {

@@ -18,6 +18,7 @@
 #include <ompl/util/Time.h>
 #include <ompl/tools/benchmark/Benchmark.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
+#include <boost/lexical_cast.hpp>
 
 namespace ot = ompl::tools;
 

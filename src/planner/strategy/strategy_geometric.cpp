@@ -53,6 +53,7 @@
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/util/Time.h>
+#include <boost/lexical_cast.hpp>
 
 static ob::OptimizationObjectivePtr GetOptimizationObjective(const ob::SpaceInformationPtr& si)
 {
