@@ -61,7 +61,8 @@ For Ubuntu 16.04 and 18.04 (assumes that you have a github account and added you
       make deps
       cd ..
       cmake .
-      make
+      make -j$(nproc)
+      sudo make install
 
 <li>Install Software
 
