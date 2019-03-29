@@ -8,6 +8,7 @@
 #include "gui/drawMotionPlanner.h"
 
 #include "util.h"
+#include <boost/lexical_cast.hpp>
 
 using namespace GLDraw;
 using namespace util;

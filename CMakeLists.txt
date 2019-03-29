@@ -33,8 +33,8 @@ MESSAGE($OMPL_VERSION)
 
 # find FLANN with pkg-config
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(FLANN REQUIRED flann)
-SET(DEPENDENCIES ${DEPENDENCIES} FLANN)
+#pkg_check_modules(FLANN REQUIRED flann)
+#SET(DEPENDENCIES ${DEPENDENCIES} FLANN)
 
 
 find_package(PkgConfig)

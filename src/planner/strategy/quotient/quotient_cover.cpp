@@ -17,19 +17,19 @@
 #include <boost/graph/graphviz.hpp>
 #include <ompl/datastructures/NearestNeighborsGNAT.h>
 #include <ompl/datastructures/NearestNeighborsGNATNoThreadSafety.h>
-#include <ompl/datastructures/NearestNeighborsFLANN.h>
+//#include <ompl/datastructures/NearestNeighborsFLANN.h>
+//#include <flann/algorithms/autotuned_index.h>
 #include <ompl/datastructures/NearestNeighborsLinear.h>
 #include <ompl/datastructures/NearestNeighborsSqrtApprox.h>
 #include <ompl/tools/config/SelfConfig.h>
-#include <flann/algorithms/autotuned_index.h>
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 
  
-#if OMPL_HAVE_FLANN == 0
-#error FLANN is not available. Please use a different NearestNeighbors data structure.
-#endif
-#include <flann/flann.hpp>
+// #if OMPL_HAVE_FLANN == 0
+// #error FLANN is not available. Please use a different NearestNeighbors data structure.
+// #endif
+// #include <flann/flann.hpp>
 
 
 #define foreach BOOST_FOREACH
@@ -49,53 +49,53 @@ const QuotientMetricPtr& QuotientCover::GetMetric()
   return metric;
 }
 
-//#############################################################################
-//SETUP
-//#############################################################################
-namespace ompl{
-  template <typename _T>
-  class FLANNConfigurationDistance
-  {
-  public:
-      using ElementType = QuotientCover::Configuration *;
-      using ResultType = double;
+////#############################################################################
+////SETUP
+////#############################################################################
+//namespace ompl{
+//  template <typename _T>
+//  class FLANNConfigurationDistance
+//  {
+//  public:
+//      using ElementType = QuotientCover::Configuration *;
+//      using ResultType = double;
 
-      FLANNConfigurationDistance(const typename NearestNeighbors<_T>::DistanceFunction &distFun) : distFun_(distFun)
-      {
-      }
+//      FLANNConfigurationDistance(const typename NearestNeighbors<_T>::DistanceFunction &distFun) : distFun_(distFun)
+//      {
+//      }
 
-      template <typename Iterator1, typename Iterator2>
-      ResultType operator()(Iterator1 a, Iterator2 b, size_t /*size*/, ResultType /*worst_dist*/ = -1) const
-      {
-          return distFun_(*a, *b);
-      }
+//      template <typename Iterator1, typename Iterator2>
+//      ResultType operator()(Iterator1 a, Iterator2 b, size_t /*size*/, ResultType /*worst_dist*/ = -1) const
+//      {
+//          return distFun_(*a, *b);
+//      }
 
-  protected:
-      const typename NearestNeighbors<_T>::DistanceFunction &distFun_;
-  };
+//  protected:
+//      const typename NearestNeighbors<_T>::DistanceFunction &distFun_;
+//  };
 
-  template <typename _T, typename _Dist = FLANNConfigurationDistance<_T>>
-  class NearestNeighborsFLANNConfigurationLinear : public NearestNeighborsFLANN<_T, _Dist>
-  {
-  public:
-      NearestNeighborsFLANNConfigurationLinear()
-        : NearestNeighborsFLANN<_T, _Dist>(std::shared_ptr<flann::LinearIndexParams>(new flann::LinearIndexParams()))
-      {
-      }
-  };
-  template <typename _T, typename _Dist = FLANNConfigurationDistance<_T>>
-  class NearestNeighborsFLANNConfigurationHierarchicalClustering : public NearestNeighborsFLANN<_T, _Dist>
-  {
-  public:
-      NearestNeighborsFLANNConfigurationHierarchicalClustering()
-        : NearestNeighborsFLANN<_T, _Dist>(std::shared_ptr<flann::HierarchicalClusteringIndexParams>(
-              new flann::HierarchicalClusteringIndexParams()))
-      {
-      }
+//  template <typename _T, typename _Dist = FLANNConfigurationDistance<_T>>
+//  class NearestNeighborsFLANNConfigurationLinear : public NearestNeighborsFLANN<_T, _Dist>
+//  {
+//  public:
+//      NearestNeighborsFLANNConfigurationLinear()
+//        : NearestNeighborsFLANN<_T, _Dist>(std::shared_ptr<flann::LinearIndexParams>(new flann::LinearIndexParams()))
+//      {
+//      }
+//  };
+//  template <typename _T, typename _Dist = FLANNConfigurationDistance<_T>>
+//  class NearestNeighborsFLANNConfigurationHierarchicalClustering : public NearestNeighborsFLANN<_T, _Dist>
+//  {
+//  public:
+//      NearestNeighborsFLANNConfigurationHierarchicalClustering()
+//        : NearestNeighborsFLANN<_T, _Dist>(std::shared_ptr<flann::HierarchicalClusteringIndexParams>(
+//              new flann::HierarchicalClusteringIndexParams()))
+//      {
+//      }
 
-  };
+//  };
 
-}
+//}
 
 void QuotientCover::SetMetric(const std::string& s_metric)
 {
@@ -123,12 +123,12 @@ void QuotientCover::setup(void)
   BaseT::setup();
   if (!nearest_neighborhood){
     //return new NearestNeighborsGNAT<_T>();
-    //nearest_neighborhood.reset(new NearestNeighborsGNAT<Configuration *>());
+    nearest_neighborhood.reset(new NearestNeighborsGNAT<Configuration *>());
     //nearest_neighborhood.reset(new NearestNeighborsGNATNoThreadSafety<Configuration *>());
     //nearest_neighborhood.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
     //nearest_neighborhood.reset(new NearestNeighborsSqrtApprox<Configuration *>());
     //nearest_neighborhood.reset(new NearestNeighborsLinear<Configuration *>()); 
-    nearest_neighborhood.reset(new NearestNeighborsFLANNConfigurationLinear<Configuration*>()); 
+    //nearest_neighborhood.reset(new NearestNeighborsFLANNConfigurationLinear<Configuration*>()); 
     //nearest_neighborhood.reset(new NearestNeighborsFLANNConfigurationHierarchicalClustering<Configuration*>()); 
     //nearest_neighborhood.reset(new NearestNeighborsFLANNHierarchicalClustering<Configuration *>()); 
     //nearest_neighborhood.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
