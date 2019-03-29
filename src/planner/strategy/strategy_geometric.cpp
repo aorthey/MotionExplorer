@@ -456,8 +456,11 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   double worst_case_time_estimate_in_minutes = worst_case_time_estimate_in_seconds/60.0;
   double worst_case_time_estimate_in_hours = worst_case_time_estimate_in_minutes/60.0;
   all_runs = planner_ctr * binput.runCount;
-  std::cout << "Number of Runs             : " << planner_ctr * binput.runCount << std::endl;
-  std::cout << "Worst-case time requirement: ";
+  std::cout << "Number of Planners           : " << planner_ctr << std::endl;
+  std::cout << "Number of Runs Per Planner   : " << binput.runCount << std::endl;
+  std::cout << "Time Per Run (s)             : " << binput.maxPlanningTime << std::endl;
+  std::cout << "Worst-case time requirement  : ";
+
   if(worst_case_time_estimate_in_hours < 1){
     if(worst_case_time_estimate_in_minutes < 1){
       std::cout << worst_case_time_estimate_in_seconds << "s" << std::endl;
