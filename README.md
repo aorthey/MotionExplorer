@@ -47,7 +47,15 @@ For Ubuntu 16.04 and 18.04 (assumes that you have a github account and added you
 
       sudo apt-get install libboost1.65-all-dev
             
-<li> Install OMPL (use install script on http://ompl.kavrakilab.org/download.html)
+<li> Install OMPL (see also http://ompl.kavrakilab.org/installation.html)
+  
+      cd ~
+      mkdir -p git
+      cd ~/git
+      wget http://ompl.kavrakilab.org/install-ompl-ubuntu.sh
+      chmod u+x install-ompl-ubuntu.sh
+      ./install-ompl-ubuntu.sh --app
+ 
  <li> Install Klampt 0.6 (all Ubuntu versions)
   
       cd ~
