@@ -71,8 +71,9 @@ For Ubuntu 16.04 and 18.04 (assumes that you have a github account and added you
       mkdir build
       cd build
       cmake ..
-      make -j10
+      make -j$(nproc)
       ./planner_gui ../data/experiments/15D_planar_manipulator.xml
+      
 </ol>
 
 
