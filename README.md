@@ -37,7 +37,7 @@ For Ubuntu 16.04 and 18.04 (assumes that you have a github account and added you
 <ol>
   <li> Install Dependencies <b>Ubuntu 16.04 and 18.04</b>
 
-      sudo apt-get install g++-5 cmake git libboost-system-dev libboost-thread-dev freeglut3 freeglut3-dev libglpk-dev python-dev python-opengl libxmu-dev libxi-dev libqt4-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev libqhull-dev
+      sudo apt-get install g++-5 cmake git libboost-system-dev libboost-thread-dev freeglut3 freeglut3-dev libglpk-dev python-dev python-opengl libxmu-dev libxi-dev libqt4-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev libqhull-dev python-setuptools
       
 <b>On Ubuntu 16.04</b>
 
@@ -68,6 +68,7 @@ For Ubuntu 16.04 and 18.04 (assumes that you have a github account and added you
 
       cd ~/git
       git clone git@github.com:aorthey/orthoklampt.git
+      cd orthoklampt
       mkdir build
       cd build
       cmake ..
