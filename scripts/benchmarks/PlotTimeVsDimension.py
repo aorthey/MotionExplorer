@@ -120,5 +120,7 @@ def PlotTimeVsDimension(fname, show=False, START_AT_BEGINNING=False, EXTRAPOLATE
 
 if __name__ == '__main__':
   fname = '../../data/benchmarks/last.xml'
+  fname = '../../data/benchmarks/15D_planar_manipulator_different_dimensions_2019_03_21_14:23:46.xml'
+  fname = '../../data/benchmarks/15D_planar_manipulator_different_dimensions_2019_03_21_14:23:46.xml'
   PlotTimeVsDimension(fname, show=True, START_AT_BEGINNING=False)
 

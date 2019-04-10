@@ -36,6 +36,7 @@ namespace ompl
         void setRange(double distance);
         double getRange() const;
 
+        Configuration *q_random{nullptr};
       protected:
 
         std::vector<Vertex> shortestPathVertices;
@@ -46,7 +47,6 @@ namespace ompl
         double epsilon{.0};
 
         ob::Goal *goal;
-        Configuration *q_random{nullptr};
 
         virtual bool SampleQuotient(ob::State*) override;
 

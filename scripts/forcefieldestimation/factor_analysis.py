@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from sklearn.decomposition import FastICA, PCA
+#from sklearn.decomposition import FastICA, PCA
 import sys
 import numpy as np
 from cvxpy import *
@@ -14,25 +14,12 @@ dt = 0.01
 Nth = 7
 
 ################################################################################
-################################################################################
-## uniform force
-Fu = np.array([0.2,0.3])
-
-## radial force
-frs = np.array([0.5,0.5])
-frp = -0.1
-
-################################################################################
 ### generate ground truth: Fx,Fy are the true forces which we need to estimate
 ################################################################################
 x = y = np.arange(L,U,dt)
 xx, yy = np.meshgrid(x, y)
 
-FUx,FUy = UniformForce(xx,yy,Fu)
-FRx,FRy = RadialForce(xx,yy,frs,frp)
-
-Fx = FUx + FRx
-Fy = FUy + FRy
+Fx, Fy = ComputeForceField(xx, yy)
 
 xr = np.reshape(xx,xx.shape[0]*xx.shape[1],[])
 yr = np.reshape(yy,yy.shape[0]*yy.shape[1],[])
@@ -48,7 +35,6 @@ Fsamples = np.dstack([xr[::Mth],yr[::Mth],Fxr[::Mth],Fyr[::Mth]])[0]
 ################################################################################
 #### 
 ################################################################################
-
 Phi = GetBasisFunctionsAtSamples( Fsamples )
 print Phi
 

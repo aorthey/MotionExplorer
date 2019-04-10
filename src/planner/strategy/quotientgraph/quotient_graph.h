@@ -6,6 +6,7 @@
 #include <ompl/geometric/planners/PlannerIncludes.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <ompl/base/Cost.h>
+#include <ompl/datastructures/PDF.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <KrisLibrary/math/infnan.h> //dInf, fInf, IsNaN(x)
 #include <boost/pending/disjoint_sets.hpp>
@@ -45,6 +46,16 @@ namespace ompl
             uint total_connection_attempts{0};
             uint successful_connection_attempts{0};
             bool on_shortest_path{false};
+
+            void *pdf_element;
+            void SetPDFElement(void *element_)
+            {
+              pdf_element = element_;
+            }
+            void* GetPDFElement()
+            {
+              return pdf_element;
+            }
 
             unsigned long int associated_target{0};
             unsigned long int associated_source{0};
@@ -103,6 +114,8 @@ namespace ompl
         typedef VertexIndex* VertexRank;
         typedef std::shared_ptr<NearestNeighbors<Configuration*>> RoadmapNeighborsPtr;
         //typedef std::function<const std::vector<Configuration*> &(const Configuration*)> ConnectionStrategy;
+        typedef ompl::PDF<Configuration*> PDF;
+        typedef PDF::Element PDF_Element;
 
       public:
 

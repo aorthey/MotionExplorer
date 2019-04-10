@@ -3,11 +3,9 @@
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
 #include <ompl/tools/config/SelfConfig.h>
-#include <ompl/datastructures/PDF.h>
-#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
-#include <ompl/base/goals/GoalSampleableRegion.h>
-#include <ompl/base/spaces/SO2StateSpace.h>
-#include <ompl/base/spaces/SO3StateSpace.h>
+//#include <ompl/datastructures/PDF.h>
+//#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
+//#include <ompl/base/goals/GoalSampleableRegion.h>
 #include <boost/foreach.hpp>
 #include <boost/graph/graphviz.hpp>
 

@@ -72,6 +72,7 @@ For Ubuntu 16.04 and 18.04 (assumes that you have a github account and added you
       cmake .
       make -j$(nproc)
       sudo make install
+
  <li> Install Lemon (Graph Library)
   
       cd ~
