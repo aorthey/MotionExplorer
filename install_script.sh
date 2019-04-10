@@ -13,7 +13,6 @@ fi
 
 echo "Installing dependencies"
 
-sudo apt-get install -qq g++-5 cmake git libboost-system-dev libboost-thread-dev freeglut3 freeglut3-dev libglpk-dev python-dev python-opengl libxmu-dev libxi-dev libqt4-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev libqhull-dev python-setuptools
 
 if [ $ubuntu_version == "1604" ];then
   sudo apt-get install -qq libboost1.58-all-dev
@@ -23,12 +22,26 @@ else
   return 0
 fi
 
+sudo apt-get install -qq g++-5 cmake git freeglut3 freeglut3-dev libglpk-dev 
+sudo apt-get install -qq libxmu-dev libxi-dev libqt4-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev libqhull-dev 
+sudo apt-get install -qq python-dev python-opengl python-setuptools pypy
+pip install --upgrade pip
+
 cd ~
 mkdir -p git
 cd ~/git
 git clone git@github.com:aorthey/orthoklampt.git
 cd orthoklampt
 mkdir libs
+
+echo "***********************************************************************"
+echo "Installing OMPL (Planning Library)"
+echo "***********************************************************************"
+cd ~/git/orthoklampt/libs/
+wget http://ompl.kavrakilab.org/install-ompl-ubuntu.sh
+chmod u+x install-ompl-ubuntu.sh
+./install-ompl-ubuntu.sh --app
+
 
 echo "***********************************************************************"
 echo "Installing LEMON (Graph Library)"
@@ -59,18 +72,10 @@ make -j$(nproc)
 sudo make install
 
 echo "***********************************************************************"
-echo "Installing OMPL (Planning Library)"
+echo "Installing Orthoklampt"
 echo "***********************************************************************"
 cd ~/git/orthoklampt/libs/
-wget http://ompl.kavrakilab.org/install-ompl-ubuntu.sh
-chmod u+x install-ompl-ubuntu.sh
-./install-ompl-ubuntu.sh --app
-
-echo "***********************************************************************"
-echo "Installing OMPL (Planning Library)"
-echo "***********************************************************************"
-cd ~/git/orthoklampt/libs/
-mkdir build
+mkdir -p build
 cd build
 cmake ..
 make -j$(nproc)
