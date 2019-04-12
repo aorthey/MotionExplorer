@@ -34,9 +34,9 @@ int main(int argc,const char** argv)
   using namespace boost;
 
   Graph G;
-  VertexInternalState *u = new VertexInternalState(0);
-  u->name = "A";
-  add_vertex(*u, G);
+  VertexInternalState u(0);
+  u.name = "A";
+  add_vertex(u, G);
 
   return 0;
 }

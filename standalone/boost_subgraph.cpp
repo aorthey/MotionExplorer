@@ -1,119 +1,64 @@
+#include <iostream>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/subgraph.hpp>
+#include <boost/graph/graph_utility.hpp>
 #include <boost/foreach.hpp>
-#include <iostream>
+#include <boost/graph/astar_search.hpp>
 
-/// adventures using bundled properties with subgraphs. works only for vertices
-//so far. Tried to apply patches #10709 and #10708 from boost bugtracking:
-//https://svn.boost.org/trac10/attachment/ticket/10708/
-//https://svn.boost.org/trac10/attachment/ticket/10709/
 //
-// #10709: could not apply completely, because it says overload not allowed (?)
-// #10708: partial application, needs some change in function add_vertex(), but
-// function is not virtual
-
-namespace boost{
-  template <typename Graph>
-  class bundled_subgraph: public boost::subgraph<Graph>{
-
-    public:
-      typename graph::detail::bundled_result<Graph, graph_bundle_t>::type const&
-      operator[](graph_bundle_t x) const
-      { return boost::subgraph<Graph>::m_graph[x]; }
-
-      // ORIGINAL PATCH #10709
-      // typename graph::detail::bundled_result<Graph, graph_bundle_t>::type&
-      // operator[](graph_bundle_t x) const
-      // { return m_graph[x]; }
-      // typename graph::detail::bundled_result<Graph, graph_bundle_t>::type const&
-      // operator[](graph_bundle_t x) const
-      // { return m_graph[x]; }
-  };
-  namespace detail {
-    template <typename G>
-    typename subgraph<G>::vertex_descriptor
-    add_vertex_recur_up(const typename G::vertex_property_type& p, 
-          subgraph<G>& g)
-    {
-        typename subgraph<G>::vertex_descriptor u_local, u_global;
-        if (g.is_root()) {
-            //u_global = add_vertex(g.m_graph);
-            u_global = add_vertex(p, g.m_graph);
-            g.m_global_vertex.push_back(u_global);
-        } else {
-            //u_global = add_vertex_recur_up(*g.m_parent);
-            u_global = add_vertex_recur_up(p, *g.m_parent);
-            u_local = add_vertex(g.m_graph);
-            g.m_global_vertex.push_back(u_global);
-            g.m_local_vertex[u_global] = u_local;
-        }
-        return u_global;
-    }
-  } // namespace detail
-
-  template <typename G>
-  typename subgraph<G>::vertex_descriptor
-  add_vertex(const typename G::vertex_property_type& p, subgraph<G>& g)
-  {
-    typename subgraph<G>::vertex_descriptor  u_local, u_global;
-    u_global = detail::add_vertex_recur_up(p, g);
-    u_local = g.global_to_local(u_global);
-    return u_local;
-  }
-};
-
+//Working Example of two overlapping bundled subgraphs
+//
+// The graphs created look like
+//
+//G0:                                         |
+//    A -- B -- C                             |
+//   /           \                            |
+// xI             xG                          |
+//  \            /                            |
+//   E -------- F                             |
+//                                            |
+//G1 \subset G0:                              |
+//                                            |
+//    A -- B -- C                             |
+//   /           \                            |
+// xI             xG                          |
+//                                            |
+//G2 \subset G0:                              |
+//                                            |
+// xI             xG                          |
+//  \            /                            |
+//   E -------- F                             |
 
 struct VertexInternalState
 {
-  int index;
+  int index{0};
   std::string name;
 }; 
 
 struct EdgeInternalState
 {
-  bool visted;
-  double weight;
+  bool visted{false};
+  double weight{1.0};
   std::string name;
+  double getCost(){
+    return weight;
+  }
 };
 
-//not a valid subgraph: does not have edge index
-typedef boost::adjacency_list<
-  boost::vecS, 
-  boost::vecS, 
-  boost::undirectedS,
-  VertexInternalState,
-  EdgeInternalState
-> GraphA;
+using containerS = boost::vecS;
+typedef boost::subgraph<
+  boost::adjacency_list<
+    containerS,
+    containerS, 
+    boost::undirectedS,
+    boost::property<boost::vertex_index_t, int, VertexInternalState>,
+    boost::property<boost::edge_index_t, int, EdgeInternalState>
+    >
+>SubGraph;
 
-//valid
-typedef boost::adjacency_list<
-  boost::vecS, 
-  boost::vecS, 
-  boost::undirectedS, 
-  VertexInternalState, 
-  boost::property<boost::edge_index_t,int, EdgeInternalState> 
-> GraphB;
-
-//valid
-typedef boost::adjacency_list<
-  boost::setS, 
-  boost::setS, 
-  boost::directedS, 
-  VertexInternalState, 
-  boost::property<boost::edge_index_t,int, EdgeInternalState> 
-> GraphC;
-
-//#############################################################################
-typedef GraphB Graph;
-//#############################################################################
-
-typedef boost::bundled_subgraph<Graph> SubGraph;
-typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
-typedef boost::graph_traits<Graph>::edge_descriptor Edge;
-//typedef BGT::vertices_size_type VertexIndex;
-//typedef BGT::in_edge_iterator IEIterator;
-//typedef BGT::out_edge_iterator OEIterator;
+typedef boost::graph_traits<SubGraph>::vertex_descriptor Vertex;
+typedef boost::graph_traits<SubGraph>::edge_descriptor Edge;
 
 void PrintGraph(const SubGraph &G)
 {
@@ -121,56 +66,69 @@ void PrintGraph(const SubGraph &G)
   std::cout << "Graph " << std::endl;
   BOOST_FOREACH(const Vertex v, boost::vertices(G))
   {
-    VertexInternalState vi = get(boost::vertex_bundle, G)[v];
-    std::cout << "vertex " << vi.index << " " << vi.name << std::endl;
+    std::cout << "vertex: idx " << G[v].index << " name " << G[v].name << std::endl;
   }
-  // BOOST_FOREACH(const Edge e, boost::edges(G))
-  // {
-  //   const Vertex u = boost::source(e,G);
-  //   const Vertex v = boost::target(e,G);
-  //   std::cout << "edge " << G[u].name << "-" << G[v].name << " (" << G[e].name << ")" << std::endl;
-  // }
+  BOOST_FOREACH(const Edge e, boost::edges(G))
+  {
+    const Vertex u = boost::source(e,G);
+    const Vertex v = boost::target(e,G);
+    std::cout << "edge " << G[u].name << "-" << G[v].name 
+      << " (" << G[e].name << ", " << G[e].weight << ")" << std::endl;
+  }
   std::cout << std::string(80, '-') << std::endl;
-  std::cout << "vertices: " << boost::num_vertices(G) << " edges: " << boost::num_edges(G) << std::endl;
+  std::cout << "vertices: " << boost::num_vertices(G) 
+    << " edges: " << boost::num_edges(G) << std::endl;
 }
 
+Vertex AddVertex(SubGraph &G, std::string name)
+{
+  Vertex v = add_vertex(G);
+  G[v].index = 0;
+  G[v].name = name;
+  return v;
+}
+Edge AddEdge(SubGraph &G, const Vertex v, const Vertex w, std::string name = "")
+{
+  std::pair<Edge, bool> result = add_edge(v, w, G);
+  G[result.first].name = name;
+  return result.first;
+}
 int main(int argc,const char** argv)
 {
-  using namespace boost;
+  SubGraph G0;
+  SubGraph& G1 = G0.create_subgraph();
+  SubGraph& G2 = G0.create_subgraph();
 
-  SubGraph G;
-  VertexInternalState u;
-  u.index = 0;
-  u.name = "A";
-  VertexInternalState v;
-  v.index = 0;
-  v.name = "B";
-  VertexInternalState w;
-  w.index = 0;
-  w.name = "C";
-  add_vertex(u, G);
-  add_vertex(v, G);
-  add_vertex(w, G);
+  //double insertion into G1,G2
+  const Vertex vI = AddVertex(G1, "xI");
+  add_vertex(vI, G2);
+  const Vertex vG = AddVertex(G1, "xG");
+  add_vertex(vG, G2);
 
-  //// Vertex w = add_vertex(G);
-  //// G[w].index = 2;
-  //// G[w].name = "C";
 
-  // EdgeInternalState e1;
-  // e1.weight = 1.0;
-  // e1.visted = false;
-  // e1.name = "MainStreet";
-  // add_edge(u, v, e1, G);
+  //single insertion into G1
+  const Vertex v1 = AddVertex(G1, "A");
+  const Vertex v2 = AddVertex(G1, "B");
+  const Vertex v3 = AddVertex(G1, "C");
+  AddEdge(G1, vI, v1);
+  AddEdge(G1, v1, v2);
+  AddEdge(G1, v2, v3);
+  AddEdge(G1, v3, vG);
 
-  //// EdgeInternalState e2;
-  //// e2.weight = 1.0;
-  //// e2.visted = false;
-  //// e2.name = "SecondStreet";
-  //// add_edge(v, w, e2, G);
+  //single insertion into G2
+  const Vertex v4 = AddVertex(G2, "E");
+  const Vertex v5 = AddVertex(G2, "F");
+  AddEdge(G2, vI, v4);
+  AddEdge(G2, v4, v5);
+  AddEdge(G2, v5, vG);
 
-  ////PrintGraph(G);
+  //insert edge into G1 and G2 (works because both vertices are each in G1 and
+  //G2)
+  AddEdge(G0, vI, vG);
 
-  ////Graph& G1 = G.create_subgraph();
-  PrintGraph(G);
+  PrintGraph(G0);
+  PrintGraph(G1);
+  PrintGraph(G2);
+
   return 0;
 }

@@ -11,6 +11,7 @@
 #include "planner/strategy/quotientgraph/algorithms/q_rrt.h"
 // #include "planner/strategy/quotientgraph/algorithms/q_rrt_connect.h"
 #include "planner/strategy/quotientchart/multichart.h"
+#include "planner/strategy/quotientchart/algorithms/decomposition_planner.h"
 #include "planner/strategy/quotient/algorithms/qcp.h"
 #include "planner/strategy/quotient/algorithms/qsampler.h"
 
@@ -165,9 +166,9 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){
     std::cout << "Planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
     exit(0);
-  // }else if(algorithm=="hierarchy:qmp"){
-  //   planner = GetSharedMultiQuotientPtr<og::QMP>(stratification);
-  //   planner->setName("QMP");
+  }else if(algorithm=="hierarchy:decomposition_planner"){
+    planner = GetSharedMultiChartPtr<og::DecompositionPlanner>(stratification);
+    planner->setName("DecompositionPlanner");
   }else if(algorithm=="hierarchy:qcp"){
     planner = GetSharedMultiQuotientPtr<og::QCP>(stratification);
     planner->setName("QCP");

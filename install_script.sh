@@ -1,6 +1,9 @@
 #!/bin/bash
 
 INSTALL_DIR="~/git/orthoklampt/"
+echo "***********************************************************************"
+echo "Install Directory: ${INSTALL_DIR}"
+echo "***********************************************************************"
 
 ubuntu_version=`lsb_release -rs | sed 's/\.//'`
 if [ $ubuntu_version == "1604" ];then
@@ -15,7 +18,6 @@ fi
 
 echo "Installing dependencies"
 
-
 if [ $ubuntu_version == "1604" ];then
   sudo apt-get install -qq libboost1.58-all-dev
 elif [ $ubuntu_version == "1804" ];then
@@ -23,7 +25,6 @@ elif [ $ubuntu_version == "1804" ];then
 else
   return 0
 fi
-
 
 sudo apt-get install -qq g++-5 cmake git freeglut3 freeglut3-dev libglpk-dev 
 sudo apt-get install -qq libxmu-dev libxi-dev libqt4-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev libqhull-dev 

@@ -1,5 +1,12 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+
+###############################################################################
+#CHANGE HERE FOR CORRECT KLAMPT DIRECTORY
+###############################################################################
 SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/Klampt/")
+#SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../Klampt/")
+
+SET(DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/")
 
 PROJECT( Orthoklampt )
 SET(ORTHOKLAMPT_SUBDIRS algorithms controller elements gui planner ompl)
@@ -13,7 +20,6 @@ set(ORTHOKLAMPT_VERSION ${ORTHOKLAMPT_MAJOR_VERSION}.${ORTHOKLAMPT_MINOR_VERSION
 execute_process(COMMAND whoami OUTPUT_VARIABLE current_user OUTPUT_STRIP_TRAILING_WHITESPACE)
 MESSAGE("USER: ${current_user}")
 
-SET(DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/")
 IF(EXISTS ${KLAMPT_ROOT})
   MESSAGE("FOUND KLAMPT AT: ${KLAMPT_ROOT}")
 ELSE()
