@@ -14,7 +14,7 @@ def Fpoly(x,K):
   return np.array(map(lambda e: map(lambda x: pow(x,e), x),np.arange(0,K)))
 
 N_dimension = 2
-M_samples = 50
+M_samples = 20
 K_basis_functions = 20
 
 ################################################################################
@@ -49,12 +49,13 @@ def GetForceAt(X):
   x_direction = np.array([0.07,-0.02])
   F += GetUniformForceAt(X, x_direction)
 
+
   return F
 
 for k in range(0,M_samples):
   s = s.reshape(2,-1)
   sF = GetForceAt(s)
-  sF += np.random.normal(sF,0.1)
+  sF += np.random.normal(sF,0.001)
   S.append(s[:,0])
   Y_force.append(sF)
   s = np.random.normal(s,0.05)
@@ -134,8 +135,8 @@ pages = convert_from_path(fname_pdf)
 for page in pages:
   page.save(fname_pdf+'.png', 'PNG')
 plt.show()
-plt.close()
-
+print "EXIT"
+#plt.close()
 
 ################################################################################
 ########### SHOW distribution of weights on functional space

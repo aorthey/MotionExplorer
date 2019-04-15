@@ -15,7 +15,7 @@ def Fpoly(x,K):
   return np.array(map(lambda e: map(lambda x: pow(x,e), x),np.arange(0,K)))
 
 N_dimension = 3
-M_samples = 10
+M_samples = 30
 K_basis_functions = 10
 s = np.array([0.5,0.5,0.5])
 

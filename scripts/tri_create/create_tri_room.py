@@ -2,6 +2,7 @@ import numpy as np
 from shutil import copyfile
 import subprocess
 from tri_primitives import MetaMesh
+import os, sys, re
 
 def CreateTriRoom(alpha):
   mesh = MetaMesh()
@@ -42,7 +43,6 @@ def CreateTriRoom(alpha):
 
   #output, error = process.communicate()
 
-import os, sys, re
 print os.path.dirname(os.path.abspath(__file__))
 path = os.getcwd()
 

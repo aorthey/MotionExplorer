@@ -15,7 +15,7 @@
     <se3min config="6  -8.0 -8.0 -0.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +8.0 +8.0 +0.0 +3.141593 +1.57 +3.141593"/>
     <freeFloating>1</freeFloating>
-    <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>0.5</maxplanningtime>      <!-- runtime in (s) --> 
     <hierarchy>
       <level inner_index="0" cspace_constant="1" type="R2"/>
     </hierarchy>

@@ -234,14 +234,21 @@ void MultiChart<T>::getPlannerData(ob::PlannerData &data) const
   for(uint vidx = 0; vidx < data.numVertices(); vidx++)
   {
     PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
-    v.SetMaxLevel(levels);
     uint k = v.GetLevel();
+    v.SetLevel(k);
+    v.SetPath( std::vector<int>(k+1));
+    v.SetMaxLevel(levels);
+
+    og::QuotientChart *Qk = quotientCharts.at(k);
+    //ob::SpaceInformationPtr *si_k = si_vec.at(k);
 
     // std::cout << data.vertexIndex(v) << " vertex " << vidx << "/" << data.numVertices() << std::endl;
     // std::cout << v.GetOpenNeighborhoodDistance() << std::endl;
     // si_vec.at(k)->printState(v.getState());
-    const ob::State *s_V = v.getState();
-    ob::State *s_Q0 = si_vec.at(k)->cloneState(s_V);
+    //const ob::State *s_V = v.getState();
+    //ob::State *s_lift = si_k->cloneState(s_V);
+    ob::State *s_lift = Qk->getSpaceInformation()->cloneState(v.getState());
+    v.setQuotientState(s_lift);
 
     for(uint m = k+1; m < levels; m++){
       og::QuotientChart *Qm = quotientCharts.at(m);
@@ -253,12 +260,16 @@ void MultiChart<T>::getPlannerData(ob::PlannerData &data) const
       if(Qm->GetX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO2) {
         static_cast<ob::SO2StateSpace::StateType*>(s_X1)->setIdentity();
       }
-      Qm->MergeStates(s_Q0, s_X1, s_Q1);
-      quotientCharts.at(m-1)->getSpaceInformation()->freeState(s_Q0);
+      Qm->MergeStates(s_lift, s_X1, s_Q1);
+      s_lift = Qm->getSpaceInformation()->cloneState(s_Q1);
+
       Qm->GetX1()->freeState(s_X1);
-      s_Q0 = s_Q1;
+      Qm->GetQ1()->freeState(s_Q1);
+      // quotientCharts.at(m-1)->getSpaceInformation()->freeState(s_Q0);
+      // Qm->GetX1()->freeState(s_X1);
+      // s_Q0 = s_Q1;
     }
-    v.setState(s_Q0);
+    v.setState(s_lift);
   }
 
 }

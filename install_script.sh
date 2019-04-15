@@ -28,8 +28,20 @@ fi
 
 sudo apt-get install -qq g++-5 cmake git freeglut3 freeglut3-dev libglpk-dev 
 sudo apt-get install -qq libxmu-dev libxi-dev libqt4-dev libeigen3-dev libassimp-dev libflann-dev liburdfdom-tools libccd-dev libqhull-dev 
-sudo apt-get install -qq python-dev python-opengl python-setuptools pypy
-pip install --upgrade pip
+sudo apt-get install -qq python-dev python-opengl python-setuptools pypy python-tk
+sudo apt-get install -qq xclip openctm-tools
+
+echo "***********************************************************************"
+echo "Installing Libraries for Python"
+echo "***********************************************************************"
+pip install --user --upgrade pip
+pip install --user matplotlib
+pip install --user scipy
+pip install --user cvxpy
+pip install --user pdf2image
+pip install --user openmesh
+pip install --user trimesh
+
 
 cd ~
 mkdir -p git
@@ -37,6 +49,8 @@ cd ~/git
 git clone git@github.com:aorthey/orthoklampt.git
 cd orthoklampt
 mkdir libs
+
+sudo cp scripts/converter* /usr/bin/
 
 echo "***********************************************************************"
 echo "Installing OMPL (Planning Library)"
@@ -84,3 +98,5 @@ cd build
 cmake ..
 make -j$(nproc)
 ./planner_gui ../data/experiments/15D_planar_manipulator.xml
+
+

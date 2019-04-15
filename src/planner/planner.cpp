@@ -322,6 +322,7 @@ void MotionPlanner::ExpandFull(){
   }
   UpdateHierarchy();
 }
+
 //folder-like operations on hierarchical roadmap
 void MotionPlanner::Expand(){
   if(!active) return;

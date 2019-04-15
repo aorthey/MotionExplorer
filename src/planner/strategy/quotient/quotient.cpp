@@ -1023,6 +1023,12 @@ Quotient::QuotientSpaceType Quotient::GetType() const
   return type;
 }
 
+bool Quotient::SampleQuotient(ob::State *q_random)
+{
+  Q1_sampler->sampleUniform(q_random);
+  return true;
+}
+
 bool Quotient::Sample(ob::State *q_random)
 {
   bool valid = false;

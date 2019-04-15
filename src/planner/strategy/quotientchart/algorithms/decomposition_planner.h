@@ -1,5 +1,7 @@
 #pragma once
 #include "planner/strategy/quotientchart/quotient_chart_cover.h"
+#include "planner/strategy/quotientchart/quotient_chart.h"
+#include "planner/strategy/quotientgraph/quotient_graph.h"
 #include <ompl/datastructures/PDF.h>
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/datastructures/NearestNeighbors.h>
