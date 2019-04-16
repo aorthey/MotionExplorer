@@ -38,6 +38,7 @@ struct VertexInternalState
 
 struct EdgeInternalState
 {
+  int index{0};
   bool visted{false};
   double weight{1.0};
   std::string name;
@@ -73,7 +74,7 @@ void PrintGraph(const SubGraph &G)
     const Vertex u = boost::source(e,G);
     const Vertex v = boost::target(e,G);
     std::cout << "edge " << G[u].name << "-" << G[v].name 
-      << " (" << G[e].name << ", " << G[e].weight << ")" << std::endl;
+      << " (" << G[e].index << ", " << G[e].weight << ")" << std::endl;
   }
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "vertices: " << boost::num_vertices(G) 
@@ -82,15 +83,18 @@ void PrintGraph(const SubGraph &G)
 
 Vertex AddVertex(SubGraph &G, std::string name)
 {
+  static int idx = 0;
   Vertex v = add_vertex(G);
-  G[v].index = 0;
+  G[v].index = idx++;
   G[v].name = name;
   return v;
 }
 Edge AddEdge(SubGraph &G, const Vertex v, const Vertex w, std::string name = "")
 {
+  static int idx = 0;
   std::pair<Edge, bool> result = add_edge(v, w, G);
   G[result.first].name = name;
+  G[result.first].index = idx++;
   return result.first;
 }
 int main(int argc,const char** argv)
@@ -123,7 +127,8 @@ int main(int argc,const char** argv)
   AddEdge(G2, v5, vG);
 
   //insert edge into G1 and G2 (works because both vertices are each in G1 and
-  //G2)
+  //G2) --- but we should probably not do it, because can never be sure that it
+  //will insert an edge into every graph
   AddEdge(G0, vI, vG);
 
   PrintGraph(G0);
