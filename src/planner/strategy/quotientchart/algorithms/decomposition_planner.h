@@ -1,6 +1,5 @@
 #pragma once
-#include "planner/strategy/quotientchart/quotient_chart_cover.h"
-#include "planner/strategy/quotientchart/quotient_chart.h"
+#include "planner/strategy/quotientchart/quotient_chart_subgraph.h"
 #include "planner/strategy/quotientgraph/quotient_graph.h"
 #include <ompl/datastructures/PDF.h>
 #include <ompl/tools/config/SelfConfig.h>
@@ -15,14 +14,17 @@ namespace ompl
 {
   namespace geometric
   {
-    class DecompositionPlanner: public og::QuotientChartCover
+    class DecompositionPlanner: public og::QuotientChartSubGraph
     {
-      typedef og::QuotientChartCover BaseT;
+      typedef og::QuotientChartSubGraph BaseT;
     public:
 
       DecompositionPlanner(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~DecompositionPlanner(void);
       virtual void Grow(double t) override;
+      virtual void getPlannerDataAnnotated(ob::PlannerData &data) const;
+      PlannerDataVertexAnnotated getAnnotatedVertex(const Vertex &v) const;
+
       virtual void setup() override;
       virtual void clear() override;
     };

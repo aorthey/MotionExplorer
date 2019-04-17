@@ -41,7 +41,7 @@ namespace ompl
         //they could be "all visible vertices from path" and "not homotopic".
         //This is left for subclasses to implement.
 
-        virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) = 0;
+        //virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) = 0;
         virtual void getPlannerData(ob::PlannerData &data) const override;
         virtual void Print(std::ostream& out) const override;
       protected:

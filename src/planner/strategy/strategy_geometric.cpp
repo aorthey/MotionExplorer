@@ -12,7 +12,7 @@
 // #include "planner/strategy/quotientgraph/algorithms/q_rrt_connect.h"
 #include "planner/strategy/quotientchart/multichart.h"
 #include "planner/strategy/quotientchart/algorithms/decomposition_planner.h"
-#include "planner/strategy/quotientchart/algorithms/qng2.h"
+// #include "planner/strategy/quotientchart/algorithms/qng2.h"
 #include "planner/strategy/quotient/algorithms/qcp.h"
 #include "planner/strategy/quotient/algorithms/qsampler.h"
 
@@ -171,9 +171,9 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     planner = GetSharedMultiChartPtr<og::DecompositionPlanner>(stratification);
     planner->setName("DecompositionPlanner");
 
-  }else if(algorithm=="hierarchy:qng"){
-    planner = GetSharedMultiChartPtr<og::QNG2>(stratification);
-    planner->setName("QNG2");
+  // }else if(algorithm=="hierarchy:qng"){
+  //   planner = GetSharedMultiChartPtr<og::QNG2>(stratification);
+  //   planner->setName("QNG2");
 
   }else if(algorithm=="hierarchy:qcp"){
     planner = GetSharedMultiQuotientPtr<og::QCP>(stratification);

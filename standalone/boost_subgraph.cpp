@@ -46,6 +46,9 @@ struct EdgeInternalState
     return weight;
   }
 };
+struct GraphBundle{
+  std::string name{"boost_subgraph"};
+};
 
 using containerS = boost::vecS;
 typedef boost::subgraph<
@@ -54,31 +57,34 @@ typedef boost::subgraph<
     containerS, 
     boost::undirectedS,
     boost::property<boost::vertex_index_t, int, VertexInternalState>,
-    boost::property<boost::edge_index_t, int, EdgeInternalState>
+    boost::property<boost::edge_index_t, int, EdgeInternalState>,
+    GraphBundle
     >
 >SubGraph;
 
 typedef boost::graph_traits<SubGraph>::vertex_descriptor Vertex;
 typedef boost::graph_traits<SubGraph>::edge_descriptor Edge;
 
-void PrintGraph(const SubGraph &G)
+std::ostream& operator<< (std::ostream& out, const SubGraph& G) 
 {
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Graph " << std::endl;
+  out << std::string(80, '-') << std::endl;
+  //out << "Graph " << G[boost::graph_bundle] << std::endl; 
+
   BOOST_FOREACH(const Vertex v, boost::vertices(G))
   {
-    std::cout << "vertex: idx " << G[v].index << " name " << G[v].name << std::endl;
+    out << "vertex: idx " << G[v].index << " name " << G[v].name << std::endl;
   }
   BOOST_FOREACH(const Edge e, boost::edges(G))
   {
     const Vertex u = boost::source(e,G);
     const Vertex v = boost::target(e,G);
-    std::cout << "edge " << G[u].name << "-" << G[v].name 
+    out << "edge " << G[u].name << "-" << G[v].name 
       << " (" << G[e].index << ", " << G[e].weight << ")" << std::endl;
   }
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "vertices: " << boost::num_vertices(G) 
+  out << std::string(80, '-') << std::endl;
+  out << "vertices: " << boost::num_vertices(G) 
     << " edges: " << boost::num_edges(G) << std::endl;
+  return out;
 }
 
 Vertex AddVertex(SubGraph &G, std::string name)
@@ -102,6 +108,9 @@ int main(int argc,const char** argv)
   SubGraph G0;
   SubGraph& G1 = G0.create_subgraph();
   SubGraph& G2 = G0.create_subgraph();
+  // G0[boost::graph_bundle].name = "G0";
+  // G1[boost::graph_bundle].name = "G1";
+  // G2[boost::graph_bundle].name = "G2";
 
   //double insertion into G1,G2
   const Vertex vI = AddVertex(G1, "xI");
@@ -131,9 +140,9 @@ int main(int argc,const char** argv)
   //will insert an edge into every graph
   AddEdge(G0, vI, vG);
 
-  PrintGraph(G0);
-  PrintGraph(G1);
-  PrintGraph(G2);
+  std::cout << G0 << std::endl;
+  std::cout << G1 << std::endl;
+  std::cout << G2 << std::endl;
 
   return 0;
 }

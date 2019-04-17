@@ -33,9 +33,27 @@ namespace ompl
         void setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_vec_);
 
       protected:
+        struct CmpQuotientChartPtrs
+        {
+          // ">" operator: smallest value is top in queue
+          // "<" operator: largest value is top in queue (default)
+          bool operator()(const og::QuotientChart* lhs, const og::QuotientChart* rhs) const
+          {
+             return lhs->GetImportance() < rhs->GetImportance();
+          }
+        };
+        typedef std::priority_queue<og::QuotientChart*, 
+                std::vector<og::QuotientChart*>, 
+                CmpQuotientChartPtrs> QuotientChartPriorityQueue;
+        QuotientChartPriorityQueue Q;
+
+        uint iter{0};
+          
+        og::QuotientChart* root_chart{nullptr};
+        og::QuotientChart* current_chart{nullptr};
+
         std::vector<base::PathPtr> solutions;
 
-        og::QuotientChart* root_chart{nullptr};
         std::vector<og::QuotientChart*> quotientCharts; //only used to project lower level ob::states into the configuration space (TODO: make this more efficient)
 
         //std::vector<uint> current_chart;
