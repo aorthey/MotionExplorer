@@ -22,11 +22,16 @@ namespace ompl
       DecompositionPlanner(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~DecompositionPlanner(void);
       virtual void Grow(double t) override;
-      virtual void getPlannerDataAnnotated(ob::PlannerData &data) const;
-      PlannerDataVertexAnnotated getAnnotatedVertex(const Vertex &v) const;
 
       virtual void setup() override;
       virtual void clear() override;
+    protected:
+      uint numberOfComponents;
+
+      double maxDistance{.0};
+      double goalBias{.05};
+      Configuration *q_random{nullptr};
+      ob::Goal *goal;
     };
   }
 }

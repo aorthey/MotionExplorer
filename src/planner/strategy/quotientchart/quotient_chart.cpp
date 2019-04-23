@@ -66,13 +66,11 @@ void QuotientChart::UpdateChartPath()
   std::reverse(std::begin(chartPath), std::end(chartPath));
 }
 
-bool QuotientChart::FoundNewPath()
+bool QuotientChart::FoundNewComponent()
 {
-  ob::PathPtr sol;
-  if(!hasSolution){
-    hasSolution = GetSolution(sol);
-    if(hasSolution) chartNumberOfComponents++;
-    return hasSolution;
+  if(chartNumberOfComponents<=0 && hasSolution){
+    chartNumberOfComponents++;
+    return true;
   }else{
     return false;
   }
@@ -106,6 +104,7 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
   getPlannerDataAnnotated(data);
   std::cout << std::string(80, '-') << std::endl;
   std::cout << *this << std::endl;
+  std::cout << data.numVertices() << std::endl;
   for(uint i = 0; i < chartSiblings.size(); i++){
     chartSiblings.at(i)->getPlannerData(data);
   }

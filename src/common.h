@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <map>
-#include <ostream>
+#include <iostream>
 
 template<typename T>
 T* ptr(T& obj){ return &obj; }

@@ -132,8 +132,8 @@ ob::PlannerStatus MultiQuotient<T,Tlast>::solve(const base::PlannerTerminationCo
       og::Quotient* jQuotient = Q.top();
       Q.pop();
       jQuotient->Grow(T_GROW);
-      bool hasSolution = quotientSpaces.at(k)->HasSolution();
 
+      bool hasSolution = quotientSpaces.at(k)->HasSolution();
       if(hasSolution){
         base::PathPtr sol_k;
         quotientSpaces.at(k)->GetSolution(sol_k);

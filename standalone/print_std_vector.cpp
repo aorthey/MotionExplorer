@@ -24,7 +24,9 @@ T * ptr(T * obj) { return obj; } //obj is already pointer, return it!
 template<typename T> 
 std::ostream& operator<< (std::ostream& out, const std::vector<T> &v){
   const bool T_is_ptr = boost::is_pointer<T>::value;
+  std::cout << std::string(80, '-') << std::endl;
   std::cout << (T_is_ptr?"IsPointer":"NotAPointer") << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
   for(uint k = 0; k < v.size(); k++){
     out << *ptr(v.at(k));
     out << (k<v.size()-1?" ":"");
@@ -34,6 +36,7 @@ std::ostream& operator<< (std::ostream& out, const std::vector<T> &v){
 
 struct MyDouble{
   double d;
+  MyDouble(double d_): d(d_){};
   friend std::ostream& operator<< (std::ostream& out, const MyDouble &md)
   {
     out << "[" << md.d << "]";
@@ -43,20 +46,18 @@ struct MyDouble{
 
 int main(int argc,const char** argv)
 {
-  std::vector<double> A;
-  double dstep = 0.01;
-  for(double d = 0; d < 0.1; d+=dstep){
-    A.push_back(d);
-  }
+  //A is double vector, B is MyDouble* vector, C is int vector
 
+  std::vector<double> A{0.01,0.8,0.1,0.13,13.5};
   std::vector<MyDouble*> B;
-  for(double d = 0; d < 0.1; d+=dstep){
-    MyDouble *md = new MyDouble();
-    md->d = d;
-    B.push_back(md);
+  for(double d = 0; d < 0.1; d+=0.01){
+    B.push_back(new MyDouble(d));
   }
+  std::vector<int> C{0,1,3,2};
+
   std::cout << A << std::endl;
   std::cout << B << std::endl;
+  std::cout << C << std::endl;
 
 
   return 0;

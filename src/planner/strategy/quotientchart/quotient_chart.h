@@ -17,7 +17,7 @@ namespace ompl
         virtual void Grow(double t) = 0;
         virtual void getPlannerDataAnnotated(ob::PlannerData &data) const = 0;
 
-        bool FoundNewPath();
+        bool FoundNewComponent();
 
         virtual void setup() override;
         virtual void clear() override;
@@ -35,13 +35,14 @@ namespace ompl
         void DeleteSubCharts();
 
         virtual bool IsSaturated() const;
+
         //@brief: assume that there are K different solution paths on the graph. 
         //Extract the k-th solution path, plus all surrounding vertices.
         //"Surrounding" and "different" are implementation specific, for example
         //they could be "all visible vertices from path" and "not homotopic".
         //This is left for subclasses to implement.
+        virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) = 0;
 
-        //virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) = 0;
         virtual void getPlannerData(ob::PlannerData &data) const override;
         virtual void Print(std::ostream& out) const override;
       protected:

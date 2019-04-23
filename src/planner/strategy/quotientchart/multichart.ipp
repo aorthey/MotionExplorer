@@ -1,9 +1,11 @@
+#include "common.h"
 #include "multichart.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/SO3StateSpace.h>
 #include <ompl/util/Time.h>
 #include <queue>
+#include "common.h"
 
 using namespace og;
 
@@ -25,14 +27,6 @@ MultiChart<T>::MultiChart(std::vector<ob::SpaceInformationPtr> &si_vec_, std::st
     T* chart_k = new T(si_vec.at(k), parent);
     quotientCharts.push_back(chart_k);
   }
-
-  //for(uint k = 0; k < si_vec.size(); k++){
-  //  og::QuotientChart* parent = nullptr;
-  //  if(k>0) parent = quotientCharts.back();
-  //  T* ss = new T(si_vec.at(k), parent);
-  //  quotientCharts.push_back(ss);
-  //}
-
   //have a copy of each quotient-space, needed to cast down states at the end
 }
 
@@ -80,9 +74,9 @@ void MultiChart<T>::clear(){
   std::cout << si_vec.at(0)->getStateValidityChecker()->getSpecs().hasValidDirectionComputation << std::endl;
 
   std::cout << "FINISHED CLEARING MULTICHART" << std::endl;
-  //for(uint k = 0; k < quotientCharts.size(); k++){
-  //  quotientCharts.at(k)->clear();
-  //}
+  for(uint k = 0; k < quotientCharts.size(); k++){
+    quotientCharts.at(k)->clear();
+  }
 }
 
 
@@ -100,7 +94,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
   //as in the quotientspace approach. All other charts are set to zero.
 
   ompl::time::point t_start = ompl::time::now();
-
   std::cout << "MULTICHART Iteration " << iter++ << std::endl;
 
   while(!ptcOrSolutionFound)
@@ -109,77 +102,85 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
     og::QuotientChart* jChart = Q.top();
     Q.pop();
     jChart->Grow(T_GROW);
-    Q.push(jChart);
 
-    //if(current_chart->FoundNewPath()){
-    //  uint k = current_chart->GetLevel();
-    //  double t_k_end = ompl::time::seconds(ompl::time::now() - t_start);
+    //std::vector<int> jpath = jChart->GetChartPath();
+    // std::vector<int> jpath{3,1,4};
+    // std::cout << jpath << std::endl;
+    //std::cout << *jChart << std::endl;
 
-    //  std::cout << std::string(80, '#') << std::endl;
-    //  std::cout << "Found Path on Level " << k+1 << "/" << levels << " after " << t_k_end << " seconds." << std::endl;
-    //  std::cout << std::string(80, '-') << std::endl;
-    //  std::cout << *current_chart << std::endl;
-    //  std::cout << std::string(80, '#') << std::endl;
-
-    //  if(k == levels-1){
-    //    found_path_on_last_level = true;
-
-    //    //add solution
-    //    base::PathPtr sol;
-    //    current_chart->GetSolution(sol);
-    //    base::PlannerSolution psol(sol);
-    //    psol.setPlannerName(getName());
-    //    pdef_->addSolutionPath(psol);
-
-    //    Q.push(jChart);
-    //  }else{
-    //    //not yet reached maximal level. create a new sibling chart (containing
-    //    //the solution path plus associated vertices), and create
-    //    //a child of the sibling (the nullspace of the solution path plus its
-    //    //associated vertices on the next quotientchart).
-    //    //#####################################################################
-    //    //Local Chart (containing path plus neighborhood)
-    //    //#####################################################################
-
-    //    og::QuotientChart *local = new T(si_vec.at(k), dynamic_cast<T*>(current_chart->GetParent()));
-    //    local->setProblemDefinition(pdef_vec.at(k));
-    //    local->CopyChartFromSibling(current_chart, current_chart->GetChartNumberOfComponents()-1);
-    //    local->SetLevel(k);
-    //    local->SetChartHorizontalIndex(current_chart->GetChartNumberOfComponents());
-
-    //    current_chart->AddChartSibling(local);
-
-    //    //#####################################################################
-    //    //Global Chart (contains the whole quotient pointed to by the local chart)
-    //    //#####################################################################
-    //    og::QuotientChart *global = new T(si_vec.at(k+1), local);
-    //    global->setProblemDefinition(pdef_vec.at(k+1));
-    //    global->setup();
-    //    global->SetLevel(k+1);
-
-    //    //DFS approach: forget about the current node, just take its sibling and
-    //    //work on that pathway. We can backtrack later by going through the
-    //    //parent/sibling pointers
-    //    while( !Q.empty() ) Q.pop();
-
-    //    og::QuotientChart *levels_to_be_added = global;
-    //    //while(levels_to_be_added!=nullptr)
-    //    //{
-    //    //  Q.push(levels_to_be_added);
-    //    //  levels_to_be_added = dynamic_cast<og::QuotientChart*>(levels_to_be_added->GetParent());
-    //    //}
-    //    Q.push(levels_to_be_added);
-
-    //    //Qleaves.push_back(global);
-    //    //note that Q contains only the latest added node, while Qleaves
-    //    //contains all. 
-    //    current_chart = global;
-
-
-    //  }
-    //}else{
-      // Q.push(jChart);
+    // if(jChart==current_chart){
+    //   bool hasSolution = current_chart->HasSolution(); 
+    //   if(hasSolution){
+    //     base::PathPtr sol_k;
+    //     current_chart->GetSolution(sol_k);
+    //     solutions.push_back(sol_k);
+    //     found_path_on_last_level = true;
+    //   }
     // }
+
+    if(jChart->FoundNewComponent()){
+      uint k = jChart->GetLevel();
+      std::cout << "Found Path on level " << k << std::endl;
+
+      if(k == levels-1){
+        found_path_on_last_level = true;
+
+        //add solution
+        base::PathPtr sol;
+        current_chart->GetSolution(sol);
+        base::PlannerSolution psol(sol);
+        psol.setPlannerName(getName());
+        pdef_->addSolutionPath(psol);
+
+        Q.push(jChart);
+      }else{
+        //not yet reached maximal level. create a new sibling chart (containing
+        //the solution path plus associated vertices), and create
+        //a child of the sibling (the nullspace of the solution path plus its
+        //associated vertices on the next quotientchart).
+        //#####################################################################
+        //Local Chart (containing path plus neighborhood)
+        //#####################################################################
+
+        og::QuotientChart *local = new T(si_vec.at(k), dynamic_cast<T*>(current_chart->GetParent()));
+        local->setProblemDefinition(pdef_vec.at(k));
+        local->CopyChartFromSibling(current_chart, current_chart->GetChartNumberOfComponents()-1);
+        local->SetLevel(k);
+        local->SetChartHorizontalIndex(current_chart->GetChartNumberOfComponents());
+
+        jChart->AddChartSibling(local);
+
+        //#####################################################################
+        //Global Chart (contains the whole quotient pointed to by the local chart)
+        //#####################################################################
+        og::QuotientChart *global = new T(si_vec.at(k+1), local);
+        global->setProblemDefinition(pdef_vec.at(k+1));
+        global->setup();
+        global->SetLevel(k+1);
+
+        //DFS approach: forget about the current node, just take its sibling and
+        //work on that pathway. We can backtrack later by going through the
+        //parent/sibling pointers
+        while( !Q.empty() ) Q.pop();
+
+        og::QuotientChart *levels_to_be_added = global;
+        //while(levels_to_be_added!=nullptr)
+        //{
+        //  Q.push(levels_to_be_added);
+        //  levels_to_be_added = dynamic_cast<og::QuotientChart*>(levels_to_be_added->GetParent());
+        //}
+        Q.push(levels_to_be_added);
+
+        //Qleaves.push_back(global);
+        //note that Q contains only the latest added node, while Qleaves
+        //contains all. 
+        current_chart = global;
+
+
+      }
+    }else{
+      Q.push(jChart);
+    }
   }
 
   while(!Q.empty()) Q.pop();
@@ -217,7 +218,10 @@ void MultiChart<T>::getPlannerData(ob::PlannerData &data) const
     PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
     uint k = v.GetLevel();
     v.SetLevel(k);
-    v.SetPath( std::vector<int>(k+1));
+    v.SetPath(v.GetPath());
+
+    //v.SetPath( std::vector<int>(k+1));
+
     v.SetMaxLevel(levels);
 
     og::QuotientChart *Qk = quotientCharts.at(k);
