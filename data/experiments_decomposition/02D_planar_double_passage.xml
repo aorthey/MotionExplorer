@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="snake_planar0" file="../robots/snake/snake_planar_0_segments_disk_inner.urdf"/>
+
+  <terrain name="O1" file="../terrains/narrow_passage/narrow_passage_double_passage.tri"/>
+
+  <plannerinput>
+
+    <se3min config="6  -3 -1.5 -0.1 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +3 +1.5 +0.1 +3.141593 +1.57 +3.141593"/>
+
+    <qinit config="6  -2.0 0 0 0 0 0 "/>
+    <qgoal config="6  +2.0 0 0 0 0 0 "/>
+
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>0.1</maxplanningtime>
+    <pathSpeed>12</pathSpeed>
+
+    <hierarchy>
+      <level inner_index="0" type="R2"/>
+    </hierarchy>
+
+  </plannerinput>
+</world>
