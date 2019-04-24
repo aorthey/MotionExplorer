@@ -104,7 +104,7 @@ void QuotientChart::getPlannerData(ob::PlannerData &data) const
   getPlannerDataAnnotated(data);
   std::cout << std::string(80, '-') << std::endl;
   std::cout << *this << std::endl;
-  std::cout << data.numVertices() << std::endl;
+  std::cout << data.numVertices() << "," << data.numEdges() << std::endl;
   for(uint i = 0; i < chartSiblings.size(); i++){
     chartSiblings.at(i)->getPlannerData(data);
   }

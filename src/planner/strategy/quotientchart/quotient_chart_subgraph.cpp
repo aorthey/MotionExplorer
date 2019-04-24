@@ -89,6 +89,13 @@ void QuotientChartSubGraph::Init()
 void QuotientChartSubGraph::clear()
 {
   BaseT::clear();
+  if(nearest_configuration) nearest_configuration->clear();
+
+  for(auto it = graph.m_children.begin(); it != graph.m_children.end(); it++)
+  {
+    (*it)->m_graph.clear();
+  }
+  graph.m_graph.clear();
 }
 QuotientChartSubGraph::Configuration::Configuration(const base::SpaceInformationPtr &si): 
   state(si->allocState())
@@ -292,25 +299,66 @@ PlannerDataVertexAnnotated QuotientChartSubGraph::getAnnotatedVertex(const Verte
 
 void QuotientChartSubGraph::getPlannerDataAnnotated(base::PlannerData &data) const
 {
+  // PlannerDataVertexAnnotated pstart = getAnnotatedVertex(v_start);
+  // data.addStartVertex(pstart);
+
+  // if(hasSolution){
+  //   PlannerDataVertexAnnotated pgoal = getAnnotatedVertex(v_goal);
+  //   data.addGoalVertex(pgoal);
+  // }
+
+  // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << getName() << std::endl;
+  // std::cout << data.numVertices() << "," << data.numEdges() << std::endl;
+
+  std::map<const uint, const ob::State*> indexToStates;
+
+  // {
+  //   PlannerDataVertexAnnotated p = getAnnotatedVertex(v);
+  //   if(graph[v]->isStart) data.addStartVertex(p);
+  //   else if(graph[v]->isGoal) data.addGoalVertex(p);
+  //   else data.addVertex(p);
+  // }
+
+  // foreach (const Edge e, boost::edges(graph))
+  // {
+  //   const Vertex v1 = boost::source(e, graph);
+  //   const Vertex v2 = boost::target(e, graph);
+  //   // const ob::State *s1 = graph[v1]->state;
+  //   // const ob::State *s2 = graph[v2]->state;
+  //   // PlannerDataVertexAnnotated p1(s1);
+  //   // PlannerDataVertexAnnotated p2(s2);
+  //   // data.addEdge(p1,p2);
+  //   data.addEdge(v1,v2);
+  // }
+  // std::cout << data.numVertices() << "," << data.numEdges() << std::endl;
   PlannerDataVertexAnnotated pstart = getAnnotatedVertex(v_start);
+  indexToStates[graph[v_start]->index] = pstart.getState();
   data.addStartVertex(pstart);
 
   if(hasSolution){
     PlannerDataVertexAnnotated pgoal = getAnnotatedVertex(v_goal);
+    indexToStates[graph[v_goal]->index] = pgoal.getState();
     data.addGoalVertex(pgoal);
   }
 
+  //TODO: goal and start are added two times if chart is local
   foreach( const Vertex v, boost::vertices(graph))
   {
-    PlannerDataVertexAnnotated p = getAnnotatedVertex(v);
-    data.addVertex(p);
+    if(indexToStates.find(graph[v]->index) == indexToStates.end()) {
+      PlannerDataVertexAnnotated p = getAnnotatedVertex(v);
+      indexToStates[graph[v]->index] = p.getState();
+      data.addVertex(p);
+    }
+    //otherwise vertex is a goal or start vertex and has already been added
   }
   foreach (const Edge e, boost::edges(graph))
   {
     const Vertex v1 = boost::source(e, graph);
     const Vertex v2 = boost::target(e, graph);
-    const ob::State *s1 = graph[v1]->state;
-    const ob::State *s2 = graph[v2]->state;
+
+    const ob::State *s1 = indexToStates[graph[v1]->index];
+    const ob::State *s2 = indexToStates[graph[v2]->index];
     PlannerDataVertexAnnotated p1(s1);
     PlannerDataVertexAnnotated p2(s2);
     data.addEdge(p1,p2);

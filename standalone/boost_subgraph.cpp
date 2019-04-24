@@ -118,7 +118,6 @@ int main(int argc,const char** argv)
   const Vertex vG = AddVertex(G1, "xG");
   add_vertex(vG, G2);
 
-
   //single insertion into G1
   const Vertex v1 = AddVertex(G1, "A");
   const Vertex v2 = AddVertex(G1, "B");
@@ -144,5 +143,17 @@ int main(int argc,const char** argv)
   std::cout << G1 << std::endl;
   std::cout << G2 << std::endl;
 
+  std::cout << std::string(80, '*') << std::endl;
+  std::cout << "Delete root graph and its subgraphs" << std::endl;
+  std::cout << std::string(80, '*') << std::endl;
+  for(auto it = G0.m_children.begin(); it != G0.m_children.end(); it++)
+  {
+    (*it)->m_graph.clear();
+  }
+  G0.m_graph.clear();
+
+  std::cout << G0 << std::endl;
+  std::cout << G1 << std::endl;
+  std::cout << G2 << std::endl;
   return 0;
 }

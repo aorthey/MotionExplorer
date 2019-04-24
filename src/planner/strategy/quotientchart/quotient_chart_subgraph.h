@@ -51,6 +51,10 @@ namespace ompl
           {
             return pdf_element;
           }
+          void Remove(const base::SpaceInformationPtr &si)
+          {
+            if(state) si->freeState(state);
+          }
 
           unsigned long int associated_target{0};
           unsigned long int associated_source{0};

@@ -18,7 +18,7 @@ MultiChart<T>::MultiChart(std::vector<ob::SpaceInformationPtr> &si_vec_, std::st
   levels = si_vec.size();
   root_chart = new T(si_vec.at(0), nullptr);
   root_chart->SetLevel(0);
-  Q.push(root_chart);
+
   current_chart = root_chart;
 
   for(uint k = 0; k < si_vec.size(); k++){
@@ -40,6 +40,7 @@ void MultiChart<T>::setup(){
   if(pdef_){
     std::cout << "SETUP MULTICHART" << std::endl;
 
+    Q.push(root_chart);
     root_chart->setProblemDefinition(pdef_vec.at(0));
     root_chart->setup();
 
@@ -58,25 +59,26 @@ void MultiChart<T>::clear(){
   std::cout << "CLEAR MULTICHART" << std::endl;
 
   found_path_on_last_level = false;
-  saturated_levels = false;
 
   solutions.clear();
   pdef_->clearSolutionPaths();
   for(uint k = 0; k < pdef_vec.size(); k++){
     pdef_vec.at(k)->clearSolutionPaths();
   }
-
-
-  if(root_chart) root_chart->clear();
-  root_chart->setProblemDefinition(pdef_vec.at(0));
-  dynamic_cast<QuotientChart*>(root_chart)->DeleteSubCharts();
-
-  std::cout << si_vec.at(0)->getStateValidityChecker()->getSpecs().hasValidDirectionComputation << std::endl;
-
-  std::cout << "FINISHED CLEARING MULTICHART" << std::endl;
   for(uint k = 0; k < quotientCharts.size(); k++){
     quotientCharts.at(k)->clear();
   }
+
+  iter = 0;
+
+  while(!Q.empty()) Q.pop();
+
+  if(root_chart){
+    root_chart->clear();
+    root_chart->DeleteSubCharts();
+    Q.push(root_chart);
+  }
+  std::cout << "FINISHED CLEARING MULTICHART" << std::endl;
 }
 
 
