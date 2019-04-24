@@ -20,6 +20,7 @@ using namespace ompl::geometric;
 QuotientChartSubGraph::QuotientChartSubGraph(const base::SpaceInformationPtr &si, Quotient *parent ): BaseT(si, parent)
 {
   setName("QuotientChartSubGraph"+std::to_string(id));
+  q_random = new Configuration(Q1);
 }
 
 QuotientChartSubGraph::~QuotientChartSubGraph(void)
@@ -37,6 +38,10 @@ double QuotientChartSubGraph::Distance(const Configuration* a, const Configurati
 void QuotientChartSubGraph::setup(void)
 {
   BaseT::setup();
+  goal = pdef_->getGoal().get();
+  ompl::tools::SelfConfig sc(Q1, getName());
+  sc.configurePlannerRange(maxDistance);
+
   if (!nearest_configuration){
     nearest_configuration.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration *>(this));
     nearest_configuration->setDistanceFunction([this](const Configuration *a, const Configuration *b)
@@ -90,13 +95,68 @@ void QuotientChartSubGraph::clear()
 {
   BaseT::clear();
   if(nearest_configuration) nearest_configuration->clear();
-
-  // for(auto it = graph.m_children.begin(); it != graph.m_children.end(); it++)
-  // {
-  //   (*it)->m_graph.clear();
-  // }
   graph.m_graph.clear();
 }
+void QuotientChartSubGraph::Rewire()
+{
+  Vertex v = boost::random_vertex(graph, rng_boost);
+  Configuration *q = graph[v];
+
+  std::vector<Configuration*> neighbors;
+  //Vertex v = get(normalizedIndexToVertex, q->index);
+  uint Nv = boost::degree(v, graph);
+  uint K = Nv+2;
+  nearest_configuration->nearestK(const_cast<Configuration*>(q), K, neighbors);
+
+  for(uint k = Nv+1; k < neighbors.size(); k++){
+    Configuration *qn = neighbors.at(k);
+    if(Q1->checkMotion(q->state, qn->state))
+    {
+      AddEdge(q, qn);
+    }
+  }
+}
+void QuotientChartSubGraph::ExtendGraphOneStep()
+{
+  if(hasSolution){
+    //No Goal Biasing if we already found a solution on this quotient space
+    Sample(q_random->state);
+  }else{
+    double s = rng_.uniform01();
+    if(s < goalBias){
+      Q1->copyState(q_random->state, s_goal);
+    }else{
+      Sample(q_random->state);
+    }
+  }
+
+  Configuration *q_nearest = Nearest(q_random);
+
+  double d = Q1->distance(q_nearest->state, q_random->state);
+  if(d > maxDistance){
+    Q1->getStateSpace()->interpolate(q_nearest->state, q_random->state, maxDistance / d, q_random->state);
+  }
+
+  if(Q1->checkMotion(q_nearest->state, q_random->state))
+  {
+    Vertex v = AddConfiguration(q_random->state);
+    Configuration *q_next = graph[v];
+
+    AddEdge(q_nearest, q_next);
+
+    if(!hasSolution){
+      double dist = 0.0;
+      bool satisfied = goal->isSatisfied(q_next->state, &dist);
+      if(satisfied)
+      {
+        v_goal = AddConfiguration(s_goal);
+        AddEdge(q_nearest, graph[v_goal]);
+        hasSolution = true;
+      }
+    }
+  }
+}
+
 
 QuotientChartSubGraph::Configuration::Configuration(const base::SpaceInformationPtr &si): 
   state(si->allocState())
@@ -376,7 +436,6 @@ QuotientChartSubGraph::SubGraph& QuotientChartSubGraph::GetSubGraphComponent( ui
 
   foreach( const Vertex v, boost::vertices(graph))
   {
-    //Configuration *q = graph[v];
     boost::add_vertex(v, *subgraph);
   }
   return *subgraph;

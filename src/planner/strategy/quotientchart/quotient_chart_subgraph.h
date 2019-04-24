@@ -168,10 +168,16 @@ namespace ompl
       void PrintConfiguration(const Configuration*) const;
 
       virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
+      void ExtendGraphOneStep();
   protected:
 
       virtual double Distance(const Configuration* a, const Configuration* b) const; // standard si->distance
       bool isConnected{false};
+      ob::Goal *goal;
+
+      double maxDistance{.0};
+      double goalBias{.05};
+      Configuration *q_random{nullptr};
 
       virtual Vertex AddConfiguration(const ob::State *s);
       std::vector<Vertex> shortest_path_start_goal;
@@ -184,6 +190,7 @@ namespace ompl
       //virtual void RandomWalk(const Vertex &v);
 
       ob::PathPtr GetPath(const Vertex &start, const Vertex &goal);
+      void Rewire();
 
       std::vector<ob::State *> xstates;
       RoadmapNeighborsPtr nearest_configuration;

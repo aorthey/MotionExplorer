@@ -77,6 +77,7 @@ void MultiChart<T>::clear(){
     root_chart->clear();
     root_chart->DeleteSubCharts();
     Q.push(root_chart);
+    root_chart->SetLevel(0);
   }
   std::cout << "FINISHED CLEARING MULTICHART" << std::endl;
 }
@@ -91,6 +92,7 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
   base::PlannerTerminationCondition ptcOrSolutionFound([this, &ptc]
                                  { return ptc || found_path_on_last_level; });
 
+  found_path_on_last_level = false;
   //each chart has an associated importance weight. If we operate on a certain
   //path [i,j,k], then the charts Q_i, Q_ij and Q_ijk have the usual importance
   //as in the quotientspace approach. All other charts are set to zero.
@@ -104,21 +106,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
     og::QuotientChart* jChart = Q.top();
     Q.pop();
     jChart->Grow(T_GROW);
-
-    //std::vector<int> jpath = jChart->GetChartPath();
-    // std::vector<int> jpath{3,1,4};
-    // std::cout << jpath << std::endl;
-    //std::cout << *jChart << std::endl;
-
-    // if(jChart==current_chart){
-    //   bool hasSolution = current_chart->HasSolution(); 
-    //   if(hasSolution){
-    //     base::PathPtr sol_k;
-    //     current_chart->GetSolution(sol_k);
-    //     solutions.push_back(sol_k);
-    //     found_path_on_last_level = true;
-    //   }
-    // }
 
     if(jChart->FoundNewComponent()){
       uint k = jChart->GetLevel();
@@ -144,11 +131,11 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
         //Local Chart (containing path plus neighborhood)
         //#####################################################################
 
-        og::QuotientChart *local = new T(si_vec.at(k), dynamic_cast<T*>(current_chart->GetParent()));
+        og::QuotientChart *local = new T(si_vec.at(k), dynamic_cast<T*>(jChart->GetParent()));
         local->setProblemDefinition(pdef_vec.at(k));
-        local->CopyChartFromSibling(current_chart, current_chart->GetChartNumberOfComponents()-1);
+        local->CopyChartFromSibling(jChart, jChart->GetChartNumberOfComponents()-1);
         local->SetLevel(k);
-        local->SetChartHorizontalIndex(current_chart->GetChartNumberOfComponents());
+        local->SetChartHorizontalIndex(jChart->GetChartNumberOfComponents());
 
         jChart->AddChartSibling(local);
 
@@ -172,10 +159,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
         //  levels_to_be_added = dynamic_cast<og::QuotientChart*>(levels_to_be_added->GetParent());
         //}
         Q.push(levels_to_be_added);
-
-        //Qleaves.push_back(global);
-        //note that Q contains only the latest added node, while Qleaves
-        //contains all. 
         current_chart = global;
 
 

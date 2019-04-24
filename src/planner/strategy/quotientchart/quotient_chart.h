@@ -17,7 +17,7 @@ namespace ompl
         virtual void Grow(double t) = 0;
         virtual void getPlannerDataAnnotated(ob::PlannerData &data) const = 0;
 
-        bool FoundNewComponent();
+        virtual bool FoundNewComponent();
 
         virtual void setup() override;
         virtual void clear() override;
