@@ -91,12 +91,13 @@ void QuotientChartSubGraph::clear()
   BaseT::clear();
   if(nearest_configuration) nearest_configuration->clear();
 
-  for(auto it = graph.m_children.begin(); it != graph.m_children.end(); it++)
-  {
-    (*it)->m_graph.clear();
-  }
+  // for(auto it = graph.m_children.begin(); it != graph.m_children.end(); it++)
+  // {
+  //   (*it)->m_graph.clear();
+  // }
   graph.m_graph.clear();
 }
+
 QuotientChartSubGraph::Configuration::Configuration(const base::SpaceInformationPtr &si): 
   state(si->allocState())
 {}
