@@ -24,6 +24,8 @@ namespace ompl
       virtual void Grow(double t) override;
       virtual bool FoundNewComponent() override;
 
+      virtual SubGraph& GetSubGraphComponent(uint k_component);
+
       virtual void setup() override;
       virtual void clear() override;
     protected:

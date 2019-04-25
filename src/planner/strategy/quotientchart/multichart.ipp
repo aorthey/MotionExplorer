@@ -99,6 +99,7 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
 
   ompl::time::point t_start = ompl::time::now();
   std::cout << "MULTICHART Iteration " << iter++ << std::endl;
+  std::cout << "Q.size()=" << Q.size() << std::endl;
 
   while(!ptcOrSolutionFound)
   {
@@ -167,8 +168,9 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
       Q.push(jChart);
     }
   }
+  std::cout << "Q.size()=" << Q.size() << std::endl;
 
-  while(!Q.empty()) Q.pop();
+  //while(!Q.empty()) Q.pop();
   return (found_path_on_last_level? ob::PlannerStatus::EXACT_SOLUTION : ob::PlannerStatus::TIMEOUT);
 }
 

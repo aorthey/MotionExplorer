@@ -322,6 +322,7 @@ std::vector<QuotientChartSubGraph::Vertex> QuotientChartSubGraph::GetPathOnGraph
     for(Vertex v = v_sink;; v = prev[graph[v]->index])
     {
       path.push_back(v);
+      shortestVertexPath_.push_back(v);
       if(graph[prev[graph[v]->index]]->index == graph[v]->index)
         break;
     }

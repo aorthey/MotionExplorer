@@ -158,7 +158,7 @@ namespace ompl
       PlannerDataVertexAnnotated getAnnotatedVertex(const Vertex &v) const;
 
       const SubGraph& GetGraph() const;
-      SubGraph& GetSubGraphComponent(uint k_component);
+      virtual SubGraph& GetSubGraphComponent(uint k_component);
 
       double GetGraphLength() const;
       const RoadmapNeighborsPtr& GetRoadmapNeighborsPtr() const;

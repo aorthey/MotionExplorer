@@ -55,3 +55,18 @@ bool DecompositionPlanner::FoundNewComponent()
     return false;
   }
 }
+
+QuotientChartSubGraph::SubGraph& DecompositionPlanner::GetSubGraphComponent( uint k_component )
+{
+  //SubGraph s1 = graph.create_subgraph();
+  //boost::add_vertex(v_start, s1);
+
+  SubGraph *subgraph = new SubGraph();
+  *subgraph = graph.create_subgraph();
+
+  foreach( const Vertex v, boost::vertices(graph))
+  {
+    boost::add_vertex(v, *subgraph);
+  }
+  return *subgraph;
+}
