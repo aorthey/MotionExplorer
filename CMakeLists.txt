@@ -1,10 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-###############################################################################
-#CHANGE HERE FOR CORRECT KLAMPT DIRECTORY
-###############################################################################
-#SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/Klampt/")
-SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../Klampt/")
+LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
+INCLUDE(CMakeColors)
 
 SET(DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/")
 
@@ -20,6 +17,12 @@ set(ORTHOKLAMPT_VERSION ${ORTHOKLAMPT_MAJOR_VERSION}.${ORTHOKLAMPT_MINOR_VERSION
 execute_process(COMMAND whoami OUTPUT_VARIABLE current_user OUTPUT_STRIP_TRAILING_WHITESPACE)
 MESSAGE("USER: ${current_user}")
 
+###############################################################################
+#CHANGE HERE FOR CORRECT KLAMPT DIRECTORY
+###############################################################################
+SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../Klampt/")
+LIST(APPEND CMAKE_MODULE_PATH "${KLAMPT_ROOT}/CMakeModules")
+#SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/Klampt/")
 IF(EXISTS ${KLAMPT_ROOT})
   MESSAGE("FOUND KLAMPT AT: ${KLAMPT_ROOT}")
 ELSE()
@@ -27,9 +30,6 @@ ELSE()
 ENDIF()
 
 
-LIST(APPEND CMAKE_MODULE_PATH "${KLAMPT_ROOT}/CMakeModules")
-LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMakeModules")
-INCLUDE(CMakeColors)
 MESSAGE(COLOR_WHITE ${DEPENDENCIES})
 set(CMAKE_C_COMPILER "gcc-5")
 set(CMAKE_CXX_COMPILER "g++-5")
@@ -38,6 +38,9 @@ SET(CMAKE_BUILD_TYPE Debug)
 ###############################################################################
 MESSAGE("${CMAKE_MODULE_PATH}")
 ###############################################################################
+FIND_PACKAGE(Klampt REQUIRED)
+SET(DEPENDENCIES ${DEPENDENCIES} KLAMPT)
+
 FIND_PACKAGE(ompl 1.4.0 REQUIRED)
 SET(DEPENDENCIES ${DEPENDENCIES} OMPL)
 MESSAGE($OMPL_VERSION)
@@ -54,9 +57,6 @@ find_package(PkgConfig)
 pkg_search_module(Eigen3 3.3 REQUIRED eigen3)
 SET(DEPENDENCIES ${DEPENDENCIES} Eigen3)
 #INCLUDE_DIRECTORIES(SYSTEM ${Eigen3_INCLUDE_DIRS})
-
-FIND_PACKAGE(Klampt REQUIRED)
-SET(DEPENDENCIES ${DEPENDENCIES} KLAMPT)
 
 FIND_PACKAGE(Boost 1.55.0 REQUIRED COMPONENTS filesystem thread serialization system)
 SET(DEPENDENCIES ${DEPENDENCIES} Boost)

@@ -99,7 +99,7 @@ namespace ompl
          boost::property<boost::vertex_index_t, int, Configuration*>,
          boost::property<boost::edge_index_t, int, EdgeInternalState>
         >
-       > SubGraph;
+       >SubGraph;
 
       typedef boost::graph_traits<SubGraph> BGT;
       typedef BGT::vertex_descriptor Vertex;
