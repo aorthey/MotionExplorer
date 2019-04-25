@@ -3,8 +3,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 ###############################################################################
 #CHANGE HERE FOR CORRECT KLAMPT DIRECTORY
 ###############################################################################
-SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/Klampt/")
-#SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../Klampt/")
+#SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/Klampt/")
+SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../Klampt/")
 
 SET(DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/")
 
