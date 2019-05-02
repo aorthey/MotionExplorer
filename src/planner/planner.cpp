@@ -260,7 +260,6 @@ void MotionPlanner::StepOneLevel()
     output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
     numberOfSolutionPathsCurrentLevel = hierarchy->NumberNodesOnLevel(current_level+2);
   }
-  std::cout << output << std::endl;
 }
 void MotionPlanner::AdvanceUntilSolution()
 {
@@ -278,7 +277,6 @@ void MotionPlanner::AdvanceUntilSolution()
   if(!util::StartsWith(input.name_algorithm,"benchmark")){
     StrategyOutput output(cspace_levels.back());
     strategy->Plan(output);
-    std::cout << output << std::endl;
     output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
   }
 

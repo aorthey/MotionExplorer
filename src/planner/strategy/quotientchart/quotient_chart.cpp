@@ -25,6 +25,7 @@ void QuotientChart::clear()
   }
   isLocalChart = false;
   chartNumberOfComponents = 0;
+  chartNumberOfComponentsLastIteration = 0;
 }
 
 void QuotientChart::DeleteSubCharts()
@@ -102,9 +103,8 @@ bool QuotientChart::IsSaturated() const
 void QuotientChart::getPlannerData(ob::PlannerData &data) const
 {
   getPlannerDataAnnotated(data);
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << *this << std::endl;
-  std::cout << data.numVertices() << "," << data.numEdges() << std::endl;
+  // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << *this << std::endl;
   for(uint i = 0; i < chartSiblings.size(); i++){
     chartSiblings.at(i)->getPlannerData(data);
   }

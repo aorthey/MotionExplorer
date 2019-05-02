@@ -50,6 +50,7 @@ namespace ompl
         std::vector<int> chartPath;
         uint chartHorizontalIndex{0};
         uint chartNumberOfComponents{0};
+        uint chartNumberOfComponentsLastIteration{0};
         bool isLocalChart{false}; //local: a refinement chart around a given path, global: a chart exploring the whole quotient-space
         std::vector<QuotientChart*> chartSiblings;
     };

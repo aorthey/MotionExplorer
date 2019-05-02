@@ -21,15 +21,7 @@ namespace ompl
 
       DecompositionPlanner(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~DecompositionPlanner(void);
-      virtual void Grow(double t) override;
-      virtual bool FoundNewComponent() override;
-
-      virtual SubGraph& GetSubGraphComponent(uint k_component);
-
-      virtual void setup() override;
-      virtual void clear() override;
-    protected:
-      uint numberOfComponents{0};
+      virtual std::vector<int> VertexBelongsToComponents(const SubGraph &G, const Vertex &v, int K) override;
     };
   }
 }

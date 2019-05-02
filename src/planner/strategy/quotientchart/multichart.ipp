@@ -38,7 +38,6 @@ template <class T>
 void MultiChart<T>::setup(){
   if(!setup_) BaseT::setup();
   if(pdef_){
-    std::cout << "SETUP MULTICHART" << std::endl;
 
     Q.push(root_chart);
     root_chart->setProblemDefinition(pdef_vec.at(0));
@@ -56,7 +55,6 @@ void MultiChart<T>::setup(){
 template <class T>
 void MultiChart<T>::clear(){
   BaseT::clear();
-  std::cout << "CLEAR MULTICHART" << std::endl;
 
   found_path_on_last_level = false;
 
@@ -79,7 +77,6 @@ void MultiChart<T>::clear(){
     Q.push(root_chart);
     root_chart->SetLevel(0);
   }
-  std::cout << "FINISHED CLEARING MULTICHART" << std::endl;
 }
 
 
@@ -98,8 +95,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
   //as in the quotientspace approach. All other charts are set to zero.
 
   ompl::time::point t_start = ompl::time::now();
-  std::cout << "MULTICHART Iteration " << iter++ << std::endl;
-  std::cout << "Q.size()=" << Q.size() << std::endl;
 
   while(!ptcOrSolutionFound)
   {
@@ -110,24 +105,34 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
 
     if(jChart->FoundNewComponent()){
       uint k = jChart->GetLevel();
-      std::cout << "Found Path on level " << k << std::endl;
 
       if(k == levels-1){
-        found_path_on_last_level = true;
+        //found_path_on_last_level = true;
+        ////add solution
+        //base::PathPtr sol;
+        //current_chart->GetSolution(sol);
+        //base::PlannerSolution psol(sol);
+        //psol.setPlannerName(getName());
+        //pdef_->addSolutionPath(psol);
+        //Q.push(jChart);
 
-        //add solution
-        base::PathPtr sol;
-        current_chart->GetSolution(sol);
-        base::PlannerSolution psol(sol);
-        psol.setPlannerName(getName());
-        pdef_->addSolutionPath(psol);
+        og::QuotientChart *local = new T(si_vec.at(k), dynamic_cast<T*>(jChart->GetParent()));
+        local->setProblemDefinition(pdef_vec.at(k));
+        local->CopyChartFromSibling(jChart, jChart->GetChartNumberOfComponents()-1);
+        local->SetLevel(k);
+        local->SetChartHorizontalIndex(jChart->GetChartNumberOfComponents());
+        local->setup();
+        jChart->AddChartSibling(local);
 
         Q.push(jChart);
+
       }else{
+
         //not yet reached maximal level. create a new sibling chart (containing
         //the solution path plus associated vertices), and create
         //a child of the sibling (the nullspace of the solution path plus its
         //associated vertices on the next quotientchart).
+
         //#####################################################################
         //Local Chart (containing path plus neighborhood)
         //#####################################################################
@@ -154,11 +159,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
         while( !Q.empty() ) Q.pop();
 
         og::QuotientChart *levels_to_be_added = global;
-        //while(levels_to_be_added!=nullptr)
-        //{
-        //  Q.push(levels_to_be_added);
-        //  levels_to_be_added = dynamic_cast<og::QuotientChart*>(levels_to_be_added->GetParent());
-        //}
         Q.push(levels_to_be_added);
         current_chart = global;
 
@@ -168,7 +168,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
       Q.push(jChart);
     }
   }
-  std::cout << "Q.size()=" << Q.size() << std::endl;
 
   //while(!Q.empty()) Q.pop();
   return (found_path_on_last_level? ob::PlannerStatus::EXACT_SOLUTION : ob::PlannerStatus::TIMEOUT);
@@ -214,8 +213,6 @@ void MultiChart<T>::getPlannerData(ob::PlannerData &data) const
     og::QuotientChart *Qk = quotientCharts.at(k);
     //ob::SpaceInformationPtr *si_k = si_vec.at(k);
 
-    // std::cout << data.vertexIndex(v) << " vertex " << vidx << "/" << data.numVertices() << std::endl;
-    // std::cout << v.GetOpenNeighborhoodDistance() << std::endl;
     // si_vec.at(k)->printState(v.getState());
     //const ob::State *s_V = v.getState();
     //ob::State *s_lift = si_k->cloneState(s_V);

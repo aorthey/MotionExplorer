@@ -41,6 +41,7 @@ namespace ompl
           uint total_connection_attempts{0};
           uint successful_connection_attempts{0};
           bool on_shortest_path{false};
+          std::vector<int> components;
 
           void *pdf_element;
           void SetPDFElement(void *element_)
@@ -54,6 +55,10 @@ namespace ompl
           void Remove(const base::SpaceInformationPtr &si)
           {
             if(state) si->freeState(state);
+          }
+          bool IsMemberOf(int k)
+          {
+            return std::find(components.begin(), components.end(), k) != components.end();
           }
 
           unsigned long int associated_target{0};
@@ -120,7 +125,6 @@ namespace ompl
       virtual uint GetNumberOfVertices() const;
       virtual uint GetNumberOfEdges() const;
 
-      virtual void Grow(double t) = 0;
       //virtual bool SampleQuotient(ob::State*) override;
       virtual bool GetSolution(ob::PathPtr &solution) override;
 
@@ -139,6 +143,12 @@ namespace ompl
         GetPathOnGraph(const Configuration *q_source, const Configuration *q_sink);
       std::vector<QuotientChartSubGraph::Vertex> 
         GetPathOnGraph(const Vertex& v_source, const Vertex& v_sink);
+      std::vector<QuotientChartSubGraph::Vertex> 
+        GetPathOnGraph(const Vertex& v_source, const Vertex& v_intermediate, const Vertex& v_sink);
+
+      virtual std::vector<int> VertexBelongsToComponents(const SubGraph &G, const Vertex &v, int K);
+      virtual bool FoundNewComponent() override;
+
 
       // std::map<Vertex, VertexRank> vrank;
       // std::map<Vertex, Vertex> vparent;
@@ -158,7 +168,7 @@ namespace ompl
       PlannerDataVertexAnnotated getAnnotatedVertex(const Vertex &v) const;
 
       const SubGraph& GetGraph() const;
-      virtual SubGraph& GetSubGraphComponent(uint k_component);
+      virtual SubGraph& GetSubGraphComponent(int k_component);
 
       double GetGraphLength() const;
       const RoadmapNeighborsPtr& GetRoadmapNeighborsPtr() const;
@@ -169,6 +179,7 @@ namespace ompl
 
       virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
       void ExtendGraphOneStep();
+      virtual void Grow(double t) override;
   protected:
 
       virtual double Distance(const Configuration* a, const Configuration* b) const; // standard si->distance
@@ -184,6 +195,7 @@ namespace ompl
       virtual Edge AddEdge(const Configuration *a, const Configuration *b);
 
       ob::Cost costHeuristic(Vertex u, Vertex v) const;
+
 
       //virtual void growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState);
       //virtual void expandRoadmap(const ob::PlannerTerminationCondition &ptc, std::vector<ob::State *> &workStates);

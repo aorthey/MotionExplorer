@@ -23,50 +23,20 @@ DecompositionPlanner::~DecompositionPlanner(void)
 {
 }
 
-void DecompositionPlanner::clear()
+std::vector<int> DecompositionPlanner::VertexBelongsToComponents(const SubGraph &G, const Vertex &v, int K)
 {
-  BaseT::clear();
+  //return an int in [0,K-1] if v does belong to any of the K components
+  //return -1 if Vertex does not belong to any component
+
+  //Configuration *q = G[v];
+  //q->components;
+
+  //typedef std::vector<Vertex> Path;
+  //Path p_start_goal = GetPathOnGraph(v_start, v_goal);
+  //std::cout << "PATH:" << p_start_goal << std::endl;
+
+  std::vector<int> components;
+  if(K>0) components.push_back(0);
+  return components;
 }
 
-void DecompositionPlanner::setup(void)
-{
-  BaseT::setup();
-}
-
-void DecompositionPlanner::Grow(double t)
-{
-  if(firstRun){
-    Init();
-    firstRun=false;
-  }
-
-  ExtendGraphOneStep();
-  if(hasSolution){
-    Rewire();
-  }
-}
-
-bool DecompositionPlanner::FoundNewComponent()
-{
-  if(chartNumberOfComponents<=0 && hasSolution){
-    chartNumberOfComponents++;
-    return true;
-  }else{
-    return false;
-  }
-}
-
-QuotientChartSubGraph::SubGraph& DecompositionPlanner::GetSubGraphComponent( uint k_component )
-{
-  //SubGraph s1 = graph.create_subgraph();
-  //boost::add_vertex(v_start, s1);
-
-  SubGraph *subgraph = new SubGraph();
-  *subgraph = graph.create_subgraph();
-
-  foreach( const Vertex v, boost::vertices(graph))
-  {
-    boost::add_vertex(v, *subgraph);
-  }
-  return *subgraph;
-}

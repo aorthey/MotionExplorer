@@ -20,9 +20,10 @@ MESSAGE("USER: ${current_user}")
 ###############################################################################
 #CHANGE HERE FOR CORRECT KLAMPT DIRECTORY
 ###############################################################################
-SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../Klampt/")
+#SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../Klampt/")
+SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/Klampt/")
+
 LIST(APPEND CMAKE_MODULE_PATH "${KLAMPT_ROOT}/CMakeModules")
-#SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/Klampt/")
 IF(EXISTS ${KLAMPT_ROOT})
   MESSAGE("FOUND KLAMPT AT: ${KLAMPT_ROOT}")
 ELSE()
