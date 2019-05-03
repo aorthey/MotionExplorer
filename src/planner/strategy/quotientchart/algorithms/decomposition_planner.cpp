@@ -26,14 +26,32 @@ DecompositionPlanner::~DecompositionPlanner(void)
 std::vector<int> DecompositionPlanner::VertexBelongsToComponents(const SubGraph &G, const Vertex &v, int K)
 {
   //return an int in [0,K-1] if v does belong to any of the K components
-  //return -1 if Vertex does not belong to any component
-
-  //Configuration *q = G[v];
-  //q->components;
 
   //typedef std::vector<Vertex> Path;
   //Path p_start_goal = GetPathOnGraph(v_start, v_goal);
+  //Path p = GetPathOnGraph(v_start, v, v_goal);
   //std::cout << "PATH:" << p_start_goal << std::endl;
+
+  //Configuration *q = G[v];
+  //ob::State *s1 = q->state;
+
+  ////Iterate through graph
+  //foreach( const Vertex vg, boost::vertices(G))
+  //{
+  //  Configuration *q = G[vg];
+  //  ob::State *s2 = q->state;
+  //  bool b = si_->checkMotion(s1,s2);
+  //  std::cout << b << std::endl;
+  //}
+
+  //for(uint i = 0; i < p_start_goal.size(); i++){
+  //  Configuration *q = G[p_start_goal.at(i)];
+  //  ob::State *si = q->state;
+  //  bool b = si_->checkMotion(s1,si);
+  //  ob::State *s_interpolated = si_->allocState();
+  //  si_->interpolate(s1, si, 0.5, s_interpolated);
+  //  std::cout << b << std::endl;
+  //}
 
   std::vector<int> components;
   if(K>0) components.push_back(0);
