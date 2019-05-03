@@ -25,33 +25,41 @@ DecompositionPlanner::~DecompositionPlanner(void)
 
 std::vector<int> DecompositionPlanner::VertexBelongsToComponents(const SubGraph &G, const Vertex &v, int K)
 {
-  //return an int in [0,K-1] if v does belong to any of the K components
 
+  //############################################################################
+  //Some Useful Function for PathVisibility Computation:
+  //############################################################################
   //typedef std::vector<Vertex> Path;
-  //Path p_start_goal = GetPathOnGraph(v_start, v_goal);
-  //Path p = GetPathOnGraph(v_start, v, v_goal);
-  //std::cout << "PATH:" << p_start_goal << std::endl;
+  ////(0) How to get start and goal states
+  //ob::State *s_start = G[v_start]->state;
+  //ob::State *s_goal = G[v_goal]->state;
 
-  //Configuration *q = G[v];
-  //ob::State *s1 = q->state;
+  ////(1) How to get an ompl::base::State* from the vertex v
+  //ob::State *sv = G[v]->state;
 
-  ////Iterate through graph
+  ////(2) How to interpolate between two states
+  //ob::State *s_interpolated = si_->allocState();
+  //si_->getStateSpace()->interpolate(s_start, s_goal, 0.5, s_interpolated);
+
+  ////(2) How to Iterate through subgraph G
   //foreach( const Vertex vg, boost::vertices(G))
   //{
-  //  Configuration *q = G[vg];
-  //  ob::State *s2 = q->state;
-  //  bool b = si_->checkMotion(s1,s2);
-  //  std::cout << b << std::endl;
+  //  ob::State *sg = G[vg]->state;
+  //  si_->getStateSpace()->interpolate(sv, sg, 0.2, s_interpolated);
   //}
 
-  //for(uint i = 0; i < p_start_goal.size(); i++){
-  //  Configuration *q = G[p_start_goal.at(i)];
-  //  ob::State *si = q->state;
-  //  bool b = si_->checkMotion(s1,si);
-  //  ob::State *s_interpolated = si_->allocState();
-  //  si_->interpolate(s1, si, 0.5, s_interpolated);
-  //  std::cout << b << std::endl;
+  ////(3) How to get shortest path
+  ////  v_start and v_goal are start and goal vertex (from quotientchartsubgraph)
+  //Path p_start_goal = GetPathOnGraph(v_start, v_goal);
+  //Path p_v = GetPathOnGraph(v_start, v, v_goal);
+
+  ////(4) How to check if linear path between two states is feasible
+  //if(si_->checkMotion(s_start,s_goal))
+  //{
+  //  std::cout << "Feasible Path exists between states" << G[v_start] << " and " << G[v_goal] << std::endl;
   //}
+  //############################################################################
+
 
   std::vector<int> components;
   if(K>0) components.push_back(0);
