@@ -261,6 +261,11 @@
     <mechanicalReduction>1.0</mechanicalReduction>
   </transmission>
 
+  <joint name="kuka_flanch_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0.03"/>
+    <parent link="kuka_arm_7_link"/>
+    <child link="kuka_arm_7_flanch"/>
+  </joint>
   <link name="kuka_arm_7_flanch">
     <inertial>
       <mass value="2.0"/>
@@ -272,7 +277,6 @@
       <geometry>
         <box size="0.5 0.8 0.01"/>
       </geometry>
-      <material name="Grey"/>
     </visual>
     <collision>
       <origin rpy="0 0 3.14159265359" xyz="0 0 0"/>
@@ -281,12 +285,12 @@
       </geometry>
     </collision>
   </link>
-  <joint name="kuka_flanch_joint" type="fixed">
-    <origin rpy="0 0 0" xyz="0 0 0.03"/>
-    <parent link="kuka_arm_7_link"/>
-    <child link="kuka_arm_7_flanch"/>
-  </joint>
-  <klampt package_root="../../../.." default_acc_max="4" fixed_root_link="1"  >
+  <transmission name="kuka_arm_7_trans" type="pr2_mechanism_model/SimpleTransmission">
+    <actuator name="kuka_arm_7_motor"/>
+    <joint name="kuka_flanch_joint"/>
+    <mechanicalReduction>1.0</mechanicalReduction>
+  </transmission>
+  <klampt package_root="../../../libs/Klampt/" default_acc_max="4" fixed_root_link="1"  >
   </klampt>
 </robot>
 

@@ -16,7 +16,7 @@ import sys
 def PlotCostVsSubspace(fname = '../../data/benchmarks/last.xml'):
   fname_base, fname_ext = os.path.splitext(fname)
   fname_pdf = fname_base + "_cost_vs_subspaces.pdf"
-  print fname_pdf
+  print(fname_pdf)
   pp = PdfPages(fname_pdf) 
   benchmark = BenchmarkAnalytica(fname)
   benchmark.ClipNonLargestDimensionPlanners()
@@ -26,9 +26,10 @@ def PlotCostVsSubspace(fname = '../../data/benchmarks/last.xml'):
   #p.AverageTime()/np.sum(p.GetAverageNodesPerLevel())
 
   P = [(p.name, float(np.sum(p.run_nodes_per_level[:,-1]))/float(np.sum(p.run_time)), p.GetNumberSubspaces()) for p in benchmark.planners]
-  print benchmark.planners[0].run_nodes_per_level
+  print(benchmark.planners[0].run_nodes_per_level)
   P_sorted_subspace = sorted(P, key = lambda x: x[0])
-  print tabulate(P_sorted_subspace, headers=['Name','NodesPerTime','Subspaces'])
+  print(tabulate([P_sorted_subspace],
+      headers=['Name','NodesPerTime','Subspaces']))
 
 
   fig = plt.figure(0)

@@ -10,11 +10,11 @@ import os
 import sys
 from ParseBenchmarkFile import *
 
-def PlotTimeVsDimension(fname, show=False, START_AT_BEGINNING=False, EXTRAPOLATED_PTS=1, REMOVE_PTS_START = 0, REMOVE_PTS_END = 0):
+def PlotTimeVsDimension(fname, suffix="", show=False, START_AT_BEGINNING=False, EXTRAPOLATED_PTS=1, REMOVE_PTS_START = 0, REMOVE_PTS_END = 0):
   benchmark = BenchmarkAnalytica(fname)
 
   fname_base, fname_ext = os.path.splitext(fname)
-  fname_pdf = fname_base + "_time_vs_dimension.pdf"
+  fname_pdf = fname_base + "_time_vs_dimension"+suffix+".pdf"
   EPSILON_IGNORE = 1e-1
   pp = PdfPages(fname_pdf)
 
@@ -22,6 +22,8 @@ def PlotTimeVsDimension(fname, show=False, START_AT_BEGINNING=False, EXTRAPOLATE
   times_mean = benchmark.TimeAveragePerDimensionality()
   times_min = benchmark.TimeMinPerDimensionality()
   times_max = benchmark.TimeMaxPerDimensionality()
+
+  print(times_min)
 
   fig = plt.figure(0)
   ax = fig.add_subplot(111)
@@ -41,7 +43,7 @@ def PlotTimeVsDimension(fname, show=False, START_AT_BEGINNING=False, EXTRAPOLATE
     while abs(times_max[startD]-times_min[startD])<EPSILON_IGNORE:
       startD=startD+1
 
-    print "StartD: ",startD
+    print("StartD: ",startD)
 
   startD = startD + REMOVE_PTS_START
   if startD == len(times_min):
@@ -61,8 +63,8 @@ def PlotTimeVsDimension(fname, show=False, START_AT_BEGINNING=False, EXTRAPOLATE
 
   I = np.array(DIMS[startD:endD]).flatten()
   T = np.append(I,DIMS[-1]+EXTRAPOLATED_PTS)
-  print I
-  print times_vanilla.flatten()
+  print(I)
+  print(times_vanilla.flatten())
 
   interp_type = 'quadratic'
   if len(I)>1:
@@ -81,11 +83,11 @@ def PlotTimeVsDimension(fname, show=False, START_AT_BEGINNING=False, EXTRAPOLATE
 
 
   ms = 10
-  rrt_label = "QRRT_("+str(DIMS[-1])+") Trivial Stratification"
+  rrt_label = "RRT [QRRT (Trivial)]"
   plt.plot(I,times_vanilla,'x-',color='k', markersize=2*ms, label=rrt_label)
-  plt.plot(I,times_max,'o-',color='k', markersize=ms, label="QRRT (Max Time Heuristic)")
-  plt.plot(I,times_mean,'v-',color='k', markersize=ms, label="QRRT (Mean Time Heuristics)")
-  plt.plot(I,times_min,'s-',color='k', markersize=ms, label="QRRT (Min Time Heuristic)")
+  plt.plot(I,times_max,'o-',color='k', markersize=ms, label="QRRT (Max)")
+  plt.plot(I,times_mean,'v-',color='k', markersize=ms, label="QRRT (Mean)")
+  plt.plot(I,times_min,'s-',color='k', markersize=ms, label="QRRT (Min)")
 
   #bestNames = vnames[p_min]
   #ax.annotate(bestNames[-1], xy=(I[-1], -1))
@@ -119,8 +121,6 @@ def PlotTimeVsDimension(fname, show=False, START_AT_BEGINNING=False, EXTRAPOLATE
   del benchmark
 
 if __name__ == '__main__':
-  fname = '../../data/benchmarks/last.xml'
-  fname = '../../data/benchmarks/15D_planar_manipulator_different_dimensions_2019_03_21_14:23:46.xml'
-  fname = '../../data/benchmarks/15D_planar_manipulator_different_dimensions_2019_03_21_14:23:46.xml'
+  fname = '../../data/benchmarks/15D_planar_manipulator_different_dimensions_2019_03_16_14:55:09.xml'
   PlotTimeVsDimension(fname, show=True, START_AT_BEGINNING=False)
 

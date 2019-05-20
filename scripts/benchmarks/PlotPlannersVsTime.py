@@ -5,6 +5,8 @@ from matplotlib.ticker import MaxNLocator
 from scipy.stats import norm
 import matplotlib.mlab as mlab
 import scipy.special as sy
+from matplotlib.ticker import MaxNLocator
+
 
 from scipy.optimize import curve_fit
 from scipy.misc import factorial
@@ -17,7 +19,7 @@ import os
 import sys
 from ParseBenchmarkFile import *
 
-def PlotPlannersVsTime(fname, show=False, MARK_BEST=True, MARK_WORST=False):
+def PlotPlannersVsTime(fname, show=False, MARK_BEST=False, MARK_WORST=False, MARK_TRIVIAL=True):
   benchmark = BenchmarkAnalytica(fname)
   fname_base, fname_ext = os.path.splitext(fname)
   fname_pdf = fname_base + "_last_strata_histogram.pdf"
@@ -27,6 +29,15 @@ def PlotPlannersVsTime(fname, show=False, MARK_BEST=True, MARK_WORST=False):
 
   times_last_dof = benchmark.GetAverageTimePerPlannerPerDimensionalityMatrix()
   times_last_dof = times_last_dof[-1,:]
+
+  time_trivial = 0
+  index_trivial = 0
+  for i in range(0,len(benchmark.planners)):
+    if len(benchmark.planners[i].dimensions_per_level)==1:
+      time_trivial = times_last_dof[i]
+      index_trivial = i
+
+
   t_min = float(np.nanmin(times_last_dof))
   t_max = float(np.nanmax(times_last_dof))
   p_min = np.nanargmin(times_last_dof,axis=0)
@@ -85,7 +96,7 @@ def PlotPlannersVsTime(fname, show=False, MARK_BEST=True, MARK_WORST=False):
 
   if MARK_WORST:
     vx = t_max - 0.5*len_bin
-    tx = t_min + 0.9*(t_max-t_min)
+    tx = t_min + 0.7*(t_max-t_min)
     ax.annotate(benchmark.planners[p_max].name, xytext=(tx,ty),
         arrowprops=dict(arrowstyle="->"), xy=(vx, vy_worst))
   
@@ -95,7 +106,23 @@ def PlotPlannersVsTime(fname, show=False, MARK_BEST=True, MARK_WORST=False):
     ax.annotate(benchmark.planners[p_min].name, xytext=(tx,ty),
         arrowprops=dict(arrowstyle="->"), xy=(vx, vy_best))
 
+  if MARK_TRIVIAL:
+    #find number of bin
+    bin_idx = len(np.argwhere(bins <= time_trivial))-1
+
+    if bin_idx >= len(n):
+      vy = n[-1]
+    else:
+      vy = n[bin_idx]
+
+    len_bin = ((t_max-t_min)/(nr_bins+1))
+    vx = t_min + (bin_idx+0.5)*len_bin
+    tx = t_min + 0.5*(t_max-t_min)
+    ax.annotate(benchmark.planners[index_trivial].name, xytext=(tx,ty),
+        arrowprops=dict(arrowstyle="->"), xy=(vx, vy))
+
   ax.set_xlabel('Time (s)')
+  ax.yaxis.set_major_locator(MaxNLocator(integer=True))
 
   number_dofs = benchmark.dimensions_per_level[-1]
   #plt.title(r'$\mathrm{Histogram\ of\ Heuristic\ Runtime\ with\ %d\ DoFs:}\ \mu=%.3fs,\ \sigma=%.3fs$' %(number_dofs, mu, sigma))

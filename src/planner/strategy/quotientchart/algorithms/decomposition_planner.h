@@ -21,7 +21,7 @@ namespace ompl
 
       DecompositionPlanner(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~DecompositionPlanner(void);
-      virtual std::vector<int> VertexBelongsToComponents(const SubGraph &G, const Vertex &v, int K) override;
+      virtual bool IsPathVisible(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2) override;
     };
   }
 }

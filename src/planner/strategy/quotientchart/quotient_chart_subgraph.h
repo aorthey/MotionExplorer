@@ -146,7 +146,7 @@ namespace ompl
       std::vector<QuotientChartSubGraph::Vertex> 
         GetPathOnGraph(const Vertex& v_source, const Vertex& v_intermediate, const Vertex& v_sink);
 
-      virtual std::vector<int> VertexBelongsToComponents(const SubGraph &G, const Vertex &v, int K);
+      virtual std::vector<int> VertexBelongsToComponents(const Vertex &v);
       virtual bool FoundNewComponent() override;
 
 
@@ -180,6 +180,8 @@ namespace ompl
       virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
       void ExtendGraphOneStep();
       virtual void Grow(double t) override;
+      std::vector<ob::State*> PathToStates(std::vector<Vertex> &path);
+      virtual bool IsPathVisible(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2);
   protected:
 
       virtual double Distance(const Configuration* a, const Configuration* b) const; // standard si->distance
@@ -203,6 +205,7 @@ namespace ompl
 
       ob::PathPtr GetPath(const Vertex &start, const Vertex &goal);
       void Rewire();
+      void Rewire(Vertex &v);
 
       std::vector<ob::State *> xstates;
       RoadmapNeighborsPtr nearest_configuration;

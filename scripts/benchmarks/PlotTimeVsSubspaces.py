@@ -16,14 +16,14 @@ import sys
 def PlotTimeVsSubspace(fname = '../../data/benchmarks/last.xml'):
   fname_base, fname_ext = os.path.splitext(fname)
   fname_pdf = fname_base + "_time_vs_subspaces.pdf"
-  print fname_pdf
+  print(fname_pdf)
   pp = PdfPages(fname_pdf) 
   benchmark = BenchmarkAnalytica(fname)
   benchmark.ClipNonLargestDimensionPlanners()
 
   P = [(p.GetNumberSubspaces(),p.GetAveragePercentageOfFeasibleNodes(),p.AverageTime(),p.name) for p in benchmark.planners]
   P_sorted_subspace = sorted(P, key = lambda x: x[0])
-  print tabulate(P_sorted_subspace, headers=['Subspaces','PercentageFeasible','Times','Planner Name'])
+  print(tabulate([P_sorted_subspace], headers=['Subspaces','PercentageFeasible','Times','Planner Name']))
 
   fig = plt.figure()
 

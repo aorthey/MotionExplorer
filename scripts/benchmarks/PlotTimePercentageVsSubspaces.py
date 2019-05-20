@@ -21,7 +21,7 @@ def PlotPercentageVsSubspace(fname = '../../data/benchmarks/last.xml'):
 
   P = [(p.GetNumberSubspaces(),p.GetAveragePercentageOfFeasibleNodes(),p.AverageTime(),p.name) for p in benchmark.planners]
   P_sorted_subspace = sorted(P, key = lambda x: x[0])
-  print tabulate(P_sorted_subspace, headers=['Subspaces','PercentageFeasible','Times','Planner Name'])
+  print(tabulate([P_sorted_subspace], headers=['Subspaces','PercentageFeasible','Times','Planner Name']))
 
   fig = plt.figure()
 
@@ -36,7 +36,7 @@ def PlotPercentageVsSubspace(fname = '../../data/benchmarks/last.xml'):
   Y = [p[1] for p in P]
 
   Z = np.array([(p[0],p[1]) for p in P])
-  print np.split(Z, X)
+  print(np.split(Z, X))
 
   V = np.split(Z, np.argwhere(np.diff(X) != 0)[:,0] + 1)
 
@@ -46,7 +46,7 @@ def PlotPercentageVsSubspace(fname = '../../data/benchmarks/last.xml'):
 
   H = np.array(H)
   H = np.sort(H,axis=0)
-  print H
+  print(H)
   plt.plot(H[:,0],H[:,1],'-ok')
 
   ax.scatter(X,Y, c='k',marker='o')
@@ -72,7 +72,7 @@ def PlotTimePercentageVsSubspace(fname = '../../data/benchmarks/last.xml'):
 
   P = [(p.GetNumberSubspaces(),p.GetAveragePercentageOfFeasibleNodes(),p.AverageTime(),p.name) for p in benchmark.planners]
   P_sorted_subspace = sorted(P, key = lambda x: x[0])
-  print tabulate(P_sorted_subspace, headers=['Subspaces','PercentageFeasible','Times','Planner Name'])
+  print(tabulate([P_sorted_subspace], headers=['Subspaces','PercentageFeasible','Times','Planner Name']))
   X = [p[0] for p in P]
   Y_percentage = [p[1] for p in P]
   Y_time = [p[2] for p in P]

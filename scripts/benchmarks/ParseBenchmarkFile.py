@@ -15,6 +15,12 @@ class PlannerResults:
   run_feasible_nodes_per_level = []
   run_time = []
 
+  def __del__(self):
+    del self.run_time
+    del self.run_nodes_per_level
+    del self.run_feasible_nodes_per_level
+    self.dimensions_per_level = None
+
   def __init__(self, xml, runcount):
     self.dimensions_per_level = []
     for child in xml:
@@ -26,6 +32,8 @@ class PlannerResults:
         for d in child:
           self.dimensions_per_level.append(int(d.text))
         self.dimensions_per_level = np.array(self.dimensions_per_level).flatten()
+        if len(self.dimensions_per_level)==1:
+          self.name = "QRRT (Trivial)"
 
     self.runcount = runcount
     self.levels = len(self.dimensions_per_level)
@@ -101,6 +109,14 @@ class BenchmarkAnalytica:
   number_of_planners = 0
   dimensions_per_level = []
 
+  def __del__(self):
+    self.number_of_levels = 0
+    self.number_of_planners = 0
+    self.timelimit = 0
+    self.runcount = 0
+    self.planners.clear()
+    self.dimensions_per_level = []
+
   def __repr__(self):
     rstr = ""
     rstr = rstr + "planners:" + str(len(self.planners))
@@ -120,6 +136,7 @@ class BenchmarkAnalytica:
     self.planners.append(presult)
 
   def __init__(self, fname = "../../data/benchmarks/last.xml", verbose=False):
+    self.dimensions_per_level = []
     self.planners = []
     self.fname = fname
     fname_dir = os.path.dirname(fname)
@@ -145,7 +162,7 @@ class BenchmarkAnalytica:
         for d in child:
           self.dimensions_per_level.append(int(d.text))
         self.dimensions_per_level = np.array(self.dimensions_per_level)
-        print self.dimensions_per_level
+        print("dimensions:",self.dimensions_per_level)
 
     for child in benchmark:
       if child.tag == "planner":
@@ -162,7 +179,7 @@ class BenchmarkAnalytica:
       float(np.sum(p.run_feasible_nodes_per_level))/float(np.sum(p.run_nodes_per_level)) \
       ) for p in self.planners]
     self.P = sorted(self.P, key = lambda x: x[1])
-    print tabulate(self.P, headers=['Planner Name', 'AverageTime(s)','RunTime(s)', 'TotalNodes', 'TotalFeasibleNodes','PercentageFeasibleNodes'])
+    print(tabulate(self.P, headers=['Planner Name', 'AverageTime(s)','RunTime(s)', 'TotalNodes', 'TotalFeasibleNodes','PercentageFeasibleNodes']))
 
   ###ANALYTICS
   def PlannerNames(self):
@@ -203,7 +220,7 @@ class BenchmarkAnalytica:
     self.number_of_planners = len(self.planners)
     self.number_of_levels = 1
     self.dimensions_per_level = self.dimensions_per_level[-1]
-    print "Clipped nr planners from",Nplanners,"down to",self.number_of_planners
+    print("Clipped nr planners from",Nplanners,"down to",self.number_of_planners)
     self.PrintPlanners()
 
   def GetPercentageOfFeasibleNodesPerPlannerPerDimensionalityMatrix(self):
@@ -286,7 +303,7 @@ class BenchmarkAnalytica:
       idx = self.DimensionToIndex(planner.GetLargestDimension())
       planners_per_dim[idx,pctr]=planner.AverageTime()
       pctr=pctr+1
-    print planners_per_dim
+    print(planners_per_dim)
 
 
 

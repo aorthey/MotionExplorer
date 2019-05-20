@@ -91,17 +91,17 @@ void QuotientChartSubGraph::Init()
   }
   OMPL_INFORM("%s: ready with %lu states already in datastructure", getName().c_str(), nearest_configuration->size());
 }
+
 void QuotientChartSubGraph::clear()
 {
   BaseT::clear();
   if(nearest_configuration) nearest_configuration->clear();
   graph.m_graph.clear();
 }
-void QuotientChartSubGraph::Rewire()
-{
-  Vertex v = boost::random_vertex(graph, rng_boost);
-  Configuration *q = graph[v];
 
+void QuotientChartSubGraph::Rewire(Vertex &v)
+{
+  Configuration *q = graph[v];
   std::vector<Configuration*> neighbors;
   //Vertex v = get(normalizedIndexToVertex, q->index);
   uint Nv = boost::degree(v, graph);
@@ -115,6 +115,12 @@ void QuotientChartSubGraph::Rewire()
       AddEdge(q, qn);
     }
   }
+}
+
+void QuotientChartSubGraph::Rewire()
+{
+  Vertex v = boost::random_vertex(graph, rng_boost);
+  return Rewire(v);
 }
 void QuotientChartSubGraph::ExtendGraphOneStep()
 {
@@ -490,9 +496,11 @@ QuotientChartSubGraph::Vertex QuotientChartSubGraph::AddConfiguration(const ob::
   Vertex v = boost::add_vertex(graph);
   graph[v] = q;
   q->index = v;
+  nearest_configuration->add(q);
 
   if(hasSolution){
-    q->components = VertexBelongsToComponents(graph, v, chartNumberOfComponents);
+    Rewire(v);
+    q->components = VertexBelongsToComponents(v);
     if(q->components.empty()){
       //new component
       q->components.push_back(chartNumberOfComponents);
@@ -507,8 +515,6 @@ QuotientChartSubGraph::Vertex QuotientChartSubGraph::AddConfiguration(const ob::
   }else{
     q->components.push_back(0);
   }
-  
-  nearest_configuration->add(q);
   return v;
 }
 bool QuotientChartSubGraph::FoundNewComponent()
@@ -522,11 +528,47 @@ bool QuotientChartSubGraph::FoundNewComponent()
     return false;
   }
 }
-std::vector<int> QuotientChartSubGraph::VertexBelongsToComponents(const SubGraph &G, const Vertex &v, int K)
+
+std::vector<ob::State*> QuotientChartSubGraph::PathToStates(std::vector<Vertex> &path)
 {
-  //return an int in [0,K-1] if v does belong to any of the K components
-  //return -1 if Vertex does not belong to any component
-  std::vector<int> components;
-  if(K>0) components.push_back(0);
-  return components;
+  std::vector<ob::State*> spath;
+  for(uint k = 0; k < path.size(); k++){
+    ob::State *sk = graph[path.at(k)]->state;
+    spath.push_back(sk);
+  }
+  return spath;
 }
+
+std::vector<int> QuotientChartSubGraph::VertexBelongsToComponents(const Vertex &v)
+{
+  typedef std::vector<Vertex> Path;
+  Path p_v = GetPathOnGraph(v_start, v, v_goal);
+  std::vector<ob::State*> s_new = PathToStates(p_v);
+
+  std::vector<int> components;
+  for(uint k = 0; k < chartSiblings.size(); k++){
+    QuotientChartSubGraph *sibling = dynamic_cast<QuotientChartSubGraph*>(chartSiblings.at(k));
+    Path p_start_goal = sibling->GetPathOnGraph(v_start, v_goal);
+    if(!p_start_goal.empty()){
+      std::vector<ob::State*> sk = PathToStates(p_start_goal);
+      if(IsPathVisible(s_new,sk)){
+        components.push_back(k);
+      }
+    }
+  }
+  if(components.empty()){
+    graph[v_start]->components.push_back(chartNumberOfComponents);
+    graph[v_goal]->components.push_back(chartNumberOfComponents);
+    for(uint k = 0; k < p_v.size(); k++){
+      graph[p_v.at(k)]->components.push_back(chartNumberOfComponents);
+    }
+  }
+
+  return components;
+
+}
+bool QuotientChartSubGraph::IsPathVisible(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2)
+{
+  return true;
+}
+

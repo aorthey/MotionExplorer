@@ -19,7 +19,7 @@ def XMLtoPDF(fname):
   nr_planners = int(doc.getElementsByTagName("number_of_planners")[0].firstChild.data)
   runcount = int(doc.getElementsByTagName("run_count")[0].firstChild.data)
   timelimit = float(doc.getElementsByTagName("max_time")[0].firstChild.data)
-  print "planners:",nr_planners," runs:",runcount
+  print ("planners:",nr_planners," runs:",runcount)
 
   vtimes = np.zeros((runcount,nr_planners))
   vnodes = np.zeros((runcount,nr_planners))
@@ -43,7 +43,7 @@ def XMLtoPDF(fname):
       vnodes[c_ctr,p_ctr] = nodes
       vsuccess[c_ctr,p_ctr] = success
       c_ctr=c_ctr+1
-    print "name:", name, " time: ", np.mean(vtimes[:,p_ctr])
+    print ("name:", name, " time: ", np.mean(vtimes[:,p_ctr]))
     p_ctr=p_ctr+1
 
   #print vnodes
@@ -89,7 +89,7 @@ def XMLtoPDF(fname):
   ###################################################################################
   txt = "runcount=%3.0d"%runcount
   ax.text(0.85, 0.95, txt, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
-  print timelimit
+  print(timelimit)
   if timelimit < 1:
     txt = "timelimit=%3.1f"%timelimit+"s"
   else:
