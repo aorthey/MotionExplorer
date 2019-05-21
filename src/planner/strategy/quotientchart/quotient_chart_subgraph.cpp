@@ -122,6 +122,7 @@ void QuotientChartSubGraph::Rewire()
   Vertex v = boost::random_vertex(graph, rng_boost);
   return Rewire(v);
 }
+
 void QuotientChartSubGraph::ExtendGraphOneStep()
 {
   if(hasSolution){
@@ -287,21 +288,23 @@ std::vector<QuotientChartSubGraph::Vertex>
 std::vector<QuotientChartSubGraph::Vertex> QuotientChartSubGraph::GetPathOnGraph(const Vertex& v_source, const Vertex& v_sink)
 {
   std::vector<Vertex> path;
-  std::vector<Vertex> prev(boost::num_vertices(graph));
   auto weight = boost::make_transform_value_property_map(std::mem_fn(&EdgeInternalState::getCost), get(boost::edge_bundle, graph));
-  //auto predecessor = boost::make_iterator_property_map(prev.begin(), vertexToIndex);
 
-  //check that vertices exists in graph
+  std::vector<Vertex> prev(boost::num_vertices(graph));
+  auto predecessor = boost::make_iterator_property_map(prev.begin(), vertexToIndex);
 
   try{
+    //boost::astar_search_tree(graph, v_source,
     boost::astar_search(graph, v_source,
                     [this, v_sink](const Vertex &v)
                     {
                         return ob::Cost(Distance(graph[v], graph[v_sink]));
                     },
-                    boost::predecessor_map(&prev[0])
+                    //boost::predecessor_map(&prev[0])
+                    boost::predecessor_map(predecessor)
                       .weight_map(weight)
                       .visitor(astar_goal_visitor<Vertex>(v_sink))
+                      .vertex_index_map(vertexToIndex)
                       .distance_compare([this](EdgeInternalState c1, EdgeInternalState c2)
                                         {
                                             return opt_->isCostBetterThan(c1.getCost(), c2.getCost());
@@ -314,14 +317,38 @@ std::vector<QuotientChartSubGraph::Vertex> QuotientChartSubGraph::GetPathOnGraph
                       .distance_zero(opt_->identityCost())
                     );
   }catch(found_goal fg){
-    for(Vertex v = v_sink;; v = prev[graph[v]->index])
+    // for(Vertex v = v_sink;; v = prev[graph[v]->index])
+    // {
+    //   path.push_back(v);
+    //   shortestVertexPath_.push_back(v);
+    //   if(graph[prev[graph[v]->index]]->index == graph[v]->index)
+    //     break;
+    // }
+    // std::reverse(path.begin(), path.end());
+    for(Vertex v = v_sink;; v = prev[get(vertexToIndex, v)])
     {
       path.push_back(v);
-      shortestVertexPath_.push_back(v);
-      if(graph[prev[graph[v]->index]]->index == graph[v]->index)
-        break;
+      Vertex p = prev[get(vertexToIndex, v)];
+      if(get(vertexToIndex, p) == get(vertexToIndex, v)) break;
+      // if(verbose>3)std::cout << std::string(80, '-') << std::endl;
+      // if(verbose>3)std::cout << "v:" << graph[v]->index << std::endl;
+      // if(verbose>3)std::cout << "idx:" << get(vertexToIndex, v) << std::endl;
+      // if(graph[prev[get(vertexToIndex, v)]]->index == graph[v]->index)
+      //   break;
     }
     std::reverse(path.begin(), path.end());
+    // for(uint k = 0; k < path.size(); k++){
+    //   Vertex v = path.at(k);
+    //   std::cout << v << " " << get(vertexToIndex, v) << std::endl;
+    // }
+  }
+  if(path.empty()){
+    std::cout << "Empty path" << std::endl;
+    std::cout << "From" << std::endl;
+    Q1->printState(graph[v_source]->state);
+    std::cout << "To" << std::endl;
+    Q1->printState(graph[v_sink]->state);
+    exit(0);
   }
   return path;
 }
@@ -363,10 +390,6 @@ void QuotientChartSubGraph::getPlannerDataAnnotated(base::PlannerData &data) con
   //   PlannerDataVertexAnnotated pgoal = getAnnotatedVertex(v_goal);
   //   data.addGoalVertex(pgoal);
   // }
-
-  // std::cout << std::string(80, '-') << std::endl;
-  // std::cout << getName() << std::endl;
-  // std::cout << data.numVertices() << "," << data.numEdges() << std::endl;
 
   std::map<const uint, const ob::State*> indexToStates;
 
@@ -435,23 +458,26 @@ void QuotientChartSubGraph::Grow(double t)
 }
 QuotientChartSubGraph::SubGraph& QuotientChartSubGraph::GetSubGraphComponent( int k_component )
 {
-  //SubGraph s1 = graph.create_subgraph();
-  //boost::add_vertex(v_start, s1);
-
-  std::cout << "Get Subgraph component " << k_component << "/" << chartNumberOfComponents << std::endl;
+  //std::cout << "Get Subgraph component " << k_component << "/" << chartNumberOfComponents << std::endl;
   SubGraph *subgraph = new SubGraph();
   *subgraph = graph.create_subgraph();
 
+  std::vector<const Vertex*> vertices_to_copy;
   foreach( const Vertex v, boost::vertices(graph))
   {
     Configuration *q = graph[v];
-    if(q->isGoal || 
-        q->isStart || 
-        (q->IsMemberOf(k_component))){
+    if(q->IsMemberOf(k_component)){
       boost::add_vertex(v, *subgraph);
     }
   }
-  std::cout << "Created Subgraph with " << boost::num_vertices(*subgraph) << " vertices." << std::endl;
+
+  // std::cout << "Created Subgraph with " 
+  //   << boost::num_vertices(*subgraph) << " vertices and " 
+  //   << boost::num_edges(*subgraph) << " edges." << std::endl;
+  // std::cout << "From Original Graph with " 
+  //   << boost::num_vertices(graph) << " vertices and " 
+  //   << boost::num_edges(graph) << " edges." << std::endl;
+
   return *subgraph;
 }
 
@@ -459,12 +485,38 @@ void QuotientChartSubGraph::CopyChartFromSibling( QuotientChart *sibling_chart, 
 {
   QuotientChartSubGraph *sibling = dynamic_cast<QuotientChartSubGraph*>(sibling_chart);
   //Get k-th subgraph
-  graph = sibling->GetSubGraphComponent(k);
+  this->graph = sibling->GetSubGraphComponent(k);
 
-  v_start = sibling->v_start;
-  v_goal = sibling->v_goal;
+  opt_ = sibling->GetOptimizationObjectivePtr();
+
+  //adjust vertex to index
+  index_ctr = 0;
+  foreach( const Vertex v, boost::vertices(graph))
+  {
+    put(vertexToIndex, v, index_ctr);
+    put(indexToVertex, index_ctr, v);
+    index_ctr++;
+    if((uint)graph[v]->index == sibling->v_goal){
+      v_goal = v;
+      std::cout << "goal:" << v << std::endl;
+    }
+    if((uint)graph[v]->index == sibling->v_start){
+      v_start = v;
+      std::cout << "start:" << v << std::endl;
+    }
+  }
   q_start = graph[v_start];
   q_goal = graph[v_goal];
+
+  // std::cout << "Test Graph Search" << std::endl;
+  // std::cout << "parent" << std::endl;
+  // sibling->GetPathOnGraph(sibling->v_start, sibling->v_goal);
+  // std::cout << "child" << std::endl;
+
+  // PrintGraph();
+
+  // GetPathOnGraph(v_start, v_goal);
+  // std::cout << "DONE" << std::endl;
 }
 
 QuotientChartSubGraph::Edge QuotientChartSubGraph::AddEdge(const Configuration *q_from, const Configuration *q_to)
@@ -476,26 +528,37 @@ QuotientChartSubGraph::Edge QuotientChartSubGraph::AddEdge(const Configuration *
   double d = Distance(q_from, q_to);
   graph[result.first].setWeight(d);
 
-  for(uint k = 0; k < chartSiblings.size(); k++){
-    if(graph[v_from]->IsMemberOf(k) &&
-        graph[v_to]->IsMemberOf(k)){
-      QuotientChartSubGraph *qSibling = dynamic_cast<QuotientChartSubGraph*>(chartSiblings.at(k));
-      boost::add_edge(v_from, v_to, qSibling->graph);
-    }
-  }
+  // for(uint k = 0; k < chartSiblings.size(); k++){
+  //   if(graph[v_from]->IsMemberOf(k) &&
+  //       graph[v_to]->IsMemberOf(k)){
+  //     QuotientChartSubGraph *qSibling = dynamic_cast<QuotientChartSubGraph*>(chartSiblings.at(k));
+  //     boost::add_vertex(v_to, qSibling->graph);
+  //     boost::add_vertex(v_from, qSibling->graph);
+  //     boost::add_edge(v_from, v_to, qSibling->graph);
+  //   }
+  // }
 
 
   return result.first;
 }
 
+
+void QuotientChartSubGraph::UpdateIndex(const Vertex v)
+{
+  put(vertexToIndex, v, index_ctr);
+  put(indexToVertex, index_ctr, v);
+  index_ctr++;
+}
+
 QuotientChartSubGraph::Vertex QuotientChartSubGraph::AddConfiguration(const ob::State *s)
 {
-
   Configuration *q = new Configuration(si_, s);
 
   Vertex v = boost::add_vertex(graph);
   graph[v] = q;
-  q->index = v;
+  q->index = index_ctr;
+  UpdateIndex(v);
+
   nearest_configuration->add(q);
 
   if(hasSolution){
@@ -503,14 +566,14 @@ QuotientChartSubGraph::Vertex QuotientChartSubGraph::AddConfiguration(const ob::
     q->components = VertexBelongsToComponents(v);
     if(q->components.empty()){
       //new component
-      q->components.push_back(chartNumberOfComponents);
       chartNumberOfComponents++;
-    }
-    for(uint k = 0; k < chartSiblings.size(); k++){
-      if(q->IsMemberOf(k)){
-        QuotientChartSubGraph *qSibling = dynamic_cast<QuotientChartSubGraph*>(chartSiblings.at(k));
-        boost::add_vertex(v, qSibling->graph);
+    }else{
+      for(uint k = 0; k < q->components.size(); k++){
+        uint component = q->components.at(k);
+        QuotientChartSubGraph *sibling = dynamic_cast<QuotientChartSubGraph*>(chartSiblings.at(component));
+        sibling->UpdateIndex(v);
       }
+
     }
   }else{
     q->components.push_back(0);
@@ -542,25 +605,25 @@ std::vector<ob::State*> QuotientChartSubGraph::PathToStates(std::vector<Vertex> 
 std::vector<int> QuotientChartSubGraph::VertexBelongsToComponents(const Vertex &v)
 {
   typedef std::vector<Vertex> Path;
-  Path p_v = GetPathOnGraph(v_start, v, v_goal);
-  std::vector<ob::State*> s_new = PathToStates(p_v);
+  Path p_new = GetPathOnGraph(v_start, v, v_goal);
+  std::vector<ob::State*> s_new = PathToStates(p_new);
 
   std::vector<int> components;
   for(uint k = 0; k < chartSiblings.size(); k++){
     QuotientChartSubGraph *sibling = dynamic_cast<QuotientChartSubGraph*>(chartSiblings.at(k));
-    Path p_start_goal = sibling->GetPathOnGraph(v_start, v_goal);
+    Path p_start_goal = sibling->GetPathOnGraph(sibling->v_start, sibling->v_goal);
+
     if(!p_start_goal.empty()){
-      std::vector<ob::State*> sk = PathToStates(p_start_goal);
+      std::vector<ob::State*> sk = sibling->PathToStates(p_start_goal);
       if(IsPathVisible(s_new,sk)){
         components.push_back(k);
       }
     }
   }
   if(components.empty()){
-    graph[v_start]->components.push_back(chartNumberOfComponents);
-    graph[v_goal]->components.push_back(chartNumberOfComponents);
-    for(uint k = 0; k < p_v.size(); k++){
-      graph[p_v.at(k)]->components.push_back(chartNumberOfComponents);
+    //new component
+    for(uint k = 0; k < p_new.size(); k++){
+      graph[p_new.at(k)]->components.push_back(chartNumberOfComponents);
     }
   }
 
@@ -572,3 +635,29 @@ bool QuotientChartSubGraph::IsPathVisible(std::vector<ob::State*> &s1, std::vect
   return true;
 }
 
+void QuotientChartSubGraph::PrintGraph() const
+{
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "Graph with " << boost::num_vertices(graph) << " vertices and " << boost::num_edges(graph) << " edges." << std::endl;
+  foreach( const Vertex v, boost::vertices(graph))
+  {
+    std::cout << "vertex "
+      << get(vertexToIndex, v)
+      << " (intrnl " << graph[v]->index << ")"
+      << std::endl;
+    Q1->printState(graph[v]->state);
+  }
+  foreach (const Edge e, boost::edges(graph))
+  {
+    const Vertex v1 = boost::source(e, graph);
+    const Vertex v2 = boost::target(e, graph);
+    std::cout << "edge from "
+      << get(vertexToIndex, v1)
+      << " (intrnl " << graph[v1]->index << ")"
+      << " to "
+      << get(vertexToIndex, v2)
+      << " (intrnl " << graph[v2]->index << ")"
+      << std::endl;
+  }
+  std::cout << std::string(80, '-') << std::endl;
+}

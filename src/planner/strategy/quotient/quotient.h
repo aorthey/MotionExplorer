@@ -92,6 +92,8 @@ namespace ompl
         void ProjectQ0Subspace( const ob::State* q, ob::State* qQ0 ) const;
 
         void CheckSpaceHasFiniteMeasure(const ob::StateSpacePtr space) const;
+
+        ob::OptimizationObjectivePtr GetOptimizationObjectivePtr() const;
       protected:
 
         const ob::StateSpacePtr ComputeQuotientSpace(const ob::StateSpacePtr Q1, const ob::StateSpacePtr Q0);

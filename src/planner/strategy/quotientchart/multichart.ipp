@@ -122,8 +122,8 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
         local->SetLevel(k);
         local->SetChartHorizontalIndex(jChart->GetChartNumberOfComponents());
         local->setup();
-        jChart->AddChartSibling(local);
 
+        jChart->AddChartSibling(local);
         Q.push(jChart);
 
       }else{
@@ -161,15 +161,12 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
         og::QuotientChart *levels_to_be_added = global;
         Q.push(levels_to_be_added);
         current_chart = global;
-
-
       }
     }else{
       Q.push(jChart);
     }
   }
 
-  //while(!Q.empty()) Q.pop();
   return (found_path_on_last_level? ob::PlannerStatus::EXACT_SOLUTION : ob::PlannerStatus::TIMEOUT);
 }
 

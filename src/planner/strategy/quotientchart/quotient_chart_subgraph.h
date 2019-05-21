@@ -91,6 +91,11 @@ namespace ompl
           void setOriginalWeight(){
             cost = original_cost;
           }
+          std::vector<int> components;
+          bool IsMemberOf(int k)
+          {
+            return std::find(components.begin(), components.end(), k) != components.end();
+          }
         private:
           ob::Cost cost{+dInf};
           ob::Cost original_cost{+dInf};
@@ -101,7 +106,8 @@ namespace ompl
          boost::vecS, 
          boost::vecS, 
          boost::undirectedS,
-         boost::property<boost::vertex_index_t, int, Configuration*>,
+         //boost::property<boost::vertex_index_t, int, Configuration*>,
+         Configuration*,
          boost::property<boost::edge_index_t, int, EdgeInternalState>
         >
        >SubGraph;
@@ -120,8 +126,21 @@ namespace ompl
       typedef ompl::PDF<Configuration*> PDF;
       typedef PDF::Element PDF_Element;
 
+      //Vertex to Index
+      typedef std::map<typename BGT::vertex_descriptor, normalized_index_type> VertexToIndexMap;
+      VertexToIndexMap vertexToIndexStdMap;
+      boost::associative_property_map<VertexToIndexMap> vertexToIndex{vertexToIndexStdMap};
+
+      //Index to Vertex
+      typedef std::map<normalized_index_type, typename BGT::vertex_descriptor> IndexToVertexMap;
+      IndexToVertexMap indexToVertexStdMap;
+      boost::associative_property_map<IndexToVertexMap> indexToVertex{indexToVertexStdMap};
+
+      normalized_index_type index_ctr{0};
+
     public:
 
+      void UpdateIndex(const Vertex v);
       virtual uint GetNumberOfVertices() const;
       virtual uint GetNumberOfEdges() const;
 
@@ -135,9 +154,6 @@ namespace ompl
       template <template <typename T> class NN>
       void setNearestNeighbors();
 
-      //virtual void uniteComponents(Vertex m1, Vertex m2);
-      //bool sameComponent(Vertex m1, Vertex m2);
-
       Configuration* Nearest(Configuration *q) const;
       std::vector<const QuotientChartSubGraph::Configuration*> 
         GetPathOnGraph(const Configuration *q_source, const Configuration *q_sink);
@@ -148,7 +164,6 @@ namespace ompl
 
       virtual std::vector<int> VertexBelongsToComponents(const Vertex &v);
       virtual bool FoundNewComponent() override;
-
 
       // std::map<Vertex, VertexRank> vrank;
       // std::map<Vertex, Vertex> vparent;
@@ -172,10 +187,10 @@ namespace ompl
 
       double GetGraphLength() const;
       const RoadmapNeighborsPtr& GetRoadmapNeighborsPtr() const;
-      //const ConnectionStrategy& GetConnectionStrategy() const;
 
       virtual void Print(std::ostream& out) const override;
       void PrintConfiguration(const Configuration*) const;
+      void PrintGraph() const;
 
       virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
       void ExtendGraphOneStep();
@@ -198,18 +213,12 @@ namespace ompl
 
       ob::Cost costHeuristic(Vertex u, Vertex v) const;
 
-
-      //virtual void growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState);
-      //virtual void expandRoadmap(const ob::PlannerTerminationCondition &ptc, std::vector<ob::State *> &workStates);
-      //virtual void RandomWalk(const Vertex &v);
-
       ob::PathPtr GetPath(const Vertex &start, const Vertex &goal);
       void Rewire();
       void Rewire(Vertex &v);
 
       std::vector<ob::State *> xstates;
       RoadmapNeighborsPtr nearest_configuration;
-      //ConnectionStrategy connectionStrategy_;
       SubGraph graph;
       ob::PathPtr solution_path;
       bool addedNewSolution_{false};

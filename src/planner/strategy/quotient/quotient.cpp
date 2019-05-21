@@ -1022,6 +1022,10 @@ Quotient::QuotientSpaceType Quotient::GetType() const
 {
   return type;
 }
+ob::OptimizationObjectivePtr Quotient::GetOptimizationObjectivePtr() const
+{
+  return opt_;
+}
 
 bool Quotient::SampleQuotient(ob::State *q_random)
 {
