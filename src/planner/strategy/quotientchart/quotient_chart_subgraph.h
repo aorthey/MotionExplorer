@@ -200,24 +200,23 @@ namespace ompl
   protected:
 
       virtual double Distance(const Configuration* a, const Configuration* b) const; // standard si->distance
-      bool isConnected{false};
-      ob::Goal *goal;
-
-      double maxDistance{.0};
-      double goalBias{.05};
-      Configuration *q_random{nullptr};
-
       virtual Vertex AddConfiguration(const ob::State *s);
       std::vector<Vertex> shortest_path_start_goal;
       virtual Edge AddEdge(const Configuration *a, const Configuration *b);
 
       ob::Cost costHeuristic(Vertex u, Vertex v) const;
+      std::vector<ob::State*> GetShortestPath();
 
       ob::PathPtr GetPath(const Vertex &start, const Vertex &goal);
       void Rewire();
       void Rewire(Vertex &v);
+      bool isConnected{false};
 
-      std::vector<ob::State *> xstates;
+      ob::Goal *goal;
+      double maxDistance{.0};
+      double goalBias{.05};
+      Configuration *q_random{nullptr};
+
       RoadmapNeighborsPtr nearest_configuration;
       SubGraph graph;
       ob::PathPtr solution_path;

@@ -36,7 +36,6 @@ bool DecompositionPlanner::IsPathVisible(std::vector<ob::State*> &s1, std::vecto
   return connectionPossible;
 }
 
-
 //############################################################################
 //Some Useful Function for PathVisibility Computation:
 //############################################################################

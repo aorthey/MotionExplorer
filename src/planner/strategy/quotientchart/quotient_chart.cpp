@@ -19,13 +19,17 @@ void QuotientChart::setup()
 
 void QuotientChart::clear() 
 {
+  std::cout << "Clear Chart " << chartPath << std::endl;
   BaseT::clear();
   for(uint k = 0; k < chartSiblings.size(); k++){
     chartSiblings.at(k)->clear();
   }
+  chartSiblings.clear();
   isLocalChart = false;
   chartNumberOfComponents = 0;
   chartNumberOfComponentsLastIteration = 0;
+
+  UpdateChartPath();
 }
 
 void QuotientChart::DeleteSubCharts()

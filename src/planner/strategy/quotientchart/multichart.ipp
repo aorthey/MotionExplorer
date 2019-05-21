@@ -54,6 +54,7 @@ void MultiChart<T>::setup(){
 
 template <class T>
 void MultiChart<T>::clear(){
+  std::cout << "Clear Multichart" << std::endl;
   BaseT::clear();
 
   found_path_on_last_level = false;
@@ -69,13 +70,20 @@ void MultiChart<T>::clear(){
 
   iter = 0;
 
-  while(!Q.empty()) Q.pop();
+  while(!Q.empty())
+  {
+    // og::QuotientChart* c = Q.top();
+    // c->clear();
+    // c->DeleteSubCharts();
+    Q.pop();
+  }
 
   if(root_chart){
     root_chart->clear();
     root_chart->DeleteSubCharts();
-    Q.push(root_chart);
     root_chart->SetLevel(0);
+    current_chart = root_chart;
+    //Q.push(root_chart);
   }
 }
 
@@ -116,6 +124,7 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
         //pdef_->addSolutionPath(psol);
         //Q.push(jChart);
 
+        std::cout << "Found new path" << std::endl;
         og::QuotientChart *local = new T(si_vec.at(k), dynamic_cast<T*>(jChart->GetParent()));
         local->setProblemDefinition(pdef_vec.at(k));
         local->CopyChartFromSibling(jChart, jChart->GetChartNumberOfComponents()-1);
