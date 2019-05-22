@@ -107,14 +107,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
       uint k = jChart->GetLevel();
 
       if(k == levels-1){
-        //found_path_on_last_level = true;
-        ////add solution
-        //base::PathPtr sol;
-        //current_chart->GetSolution(sol);
-        //base::PlannerSolution psol(sol);
-        //psol.setPlannerName(getName());
-        //pdef_->addSolutionPath(psol);
-        //Q.push(jChart);
 
         og::QuotientChart *local = new T(si_vec.at(k), dynamic_cast<T*>(jChart->GetParent()));
         local->setProblemDefinition(pdef_vec.at(k));
@@ -142,7 +134,6 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
         local->CopyChartFromSibling(jChart, jChart->GetChartNumberOfComponents()-1);
         local->SetLevel(k);
         local->SetChartHorizontalIndex(jChart->GetChartNumberOfComponents());
-
         jChart->AddChartSibling(local);
 
         //#####################################################################
@@ -156,10 +147,12 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
         //DFS approach: forget about the current node, just take its sibling and
         //work on that pathway. We can backtrack later by going through the
         //parent/sibling pointers
-        while( !Q.empty() ) Q.pop();
+        //while( !Q.empty() ) Q.pop();
 
-        og::QuotientChart *levels_to_be_added = global;
-        Q.push(levels_to_be_added);
+        //og::QuotientChart *levels_to_be_added = global;
+
+        Q.push(jChart);
+        Q.push(global);
         current_chart = global;
       }
     }else{
