@@ -176,15 +176,10 @@ namespace ompl
 
         ob::Cost costHeuristic(Vertex u, Vertex v) const;
 
-        //virtual void growRoadmap(const ob::PlannerTerminationCondition &ptc, ob::State *workState);
-        //virtual void expandRoadmap(const ob::PlannerTerminationCondition &ptc, std::vector<ob::State *> &workStates);
-        //virtual void RandomWalk(const Vertex &v);
-
         ob::PathPtr GetPath(const Vertex &start, const Vertex &goal);
 
         std::vector<ob::State *> xstates;
         RoadmapNeighborsPtr nearest_datastructure;
-        //ConnectionStrategy connectionStrategy_;
         Graph G;
         ob::PathPtr solution_path;
         bool addedNewSolution_{false};

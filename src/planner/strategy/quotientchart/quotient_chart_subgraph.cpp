@@ -21,7 +21,6 @@ QuotientChartSubGraph::QuotientChartSubGraph(const base::SpaceInformationPtr &si
 {
   setName("QuotientChartSubGraph"+std::to_string(id));
   q_random = new Configuration(Q1);
-  std::cout << "new subgraph" << std::endl;
 }
 
 QuotientChartSubGraph::~QuotientChartSubGraph(void)
@@ -95,7 +94,6 @@ void QuotientChartSubGraph::Init()
 
 void QuotientChartSubGraph::clear()
 {
-  std::cout << "Clear SubGraph " << chartPath << std::endl;
   BaseT::clear();
   if(nearest_configuration) nearest_configuration->clear();
 
@@ -115,7 +113,7 @@ void QuotientChartSubGraph::clear()
   indexToVertexStdMap.clear();
   shortestVertexPath_.clear();
   startGoalVertexPath_.clear();
-  std::cout << "subgraph has " << boost::num_vertices(graph) << " vertices." << std::endl;
+  index_ctr = 0;
 }
 
 void QuotientChartSubGraph::Rewire(Vertex &v)
@@ -165,7 +163,7 @@ void QuotientChartSubGraph::ExtendGraphOneStep()
 
   if(Q1->checkMotion(q_nearest->state, q_random->state))
   {
-    Vertex v = AddConfiguration(q_random->state);
+      Vertex v = AddConfiguration(q_random->state);
     Configuration *q_next = graph[v];
 
     AddEdge(q_nearest, q_next);
@@ -469,7 +467,6 @@ void QuotientChartSubGraph::Grow(double t)
     Init();
     firstRun=false;
   }
-
   ExtendGraphOneStep();
   if(hasSolution){
     Rewire();

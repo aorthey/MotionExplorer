@@ -23,4 +23,3 @@ data/robots/atlas/
 data/robots/kuka_shadowhand/
 data/robots/baxter_description/
 data/experiments/11D_planar_snake_0_*
-CMakeLists.txt

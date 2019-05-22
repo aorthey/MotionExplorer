@@ -19,7 +19,6 @@ void QuotientChart::setup()
 
 void QuotientChart::clear() 
 {
-  std::cout << "Clear Chart " << chartPath << std::endl;
   BaseT::clear();
   for(uint k = 0; k < chartSiblings.size(); k++){
     chartSiblings.at(k)->clear();
