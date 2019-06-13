@@ -10,10 +10,10 @@
   <algorithm dynamic="1" name="benchmark:all_dynamic"/>
 
   <!-- <algorithm name="hierarchy:sampler"/> -->
-  <algorithm name="hierarchy:decomposition_planner"/>
+  <!-- <algorithm name="hierarchy:decomposition_planner"/> -->
   <algorithm name="hierarchy:q_rrt"/>
-  <algorithm name="benchmark:minimal"/>
-  <algorithm name="ompl:rrt"/>
+  <!-- <algorithm name="benchmark:minimal"/> -->
+  <!-- <algorithm name="ompl:rrt"/> -->
   <!-- <algorithm name="hierarchy:q_prm"/> -->
   <!-- <algorithm name="hierarchy:qcp"/> -->
   <!-- <algorithm name="hierarchy:qmp"/> -->
