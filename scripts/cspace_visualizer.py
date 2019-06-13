@@ -82,12 +82,16 @@ def plotCSpaceDelaunay(PX,PT, maximumEdgeLength = 0.25, continuous=True):
 
   ax.tick_params(axis='both', which='major', pad=15)
 
-def plotCSpaceDelaunayGrey(P1,P2,maximumEdgeLength=0.25):
+def plotCSpaceDelaunayGrey(P1,P2,maximumEdgeLength=0.2, shade=0.8):
   points2D=np.vstack([P1,P2]).T
   tri = Delaunay(points2D)
+  print "Delaunay"
   print tri.simplices.shape, '\n', tri.simplices[0]
 
-  triangles = np.array((tri.simplices[0]))
+  #triangles = np.array((tri.simplices[0]))
+  #print tri.simplices[0].shape
+  triangles = np.empty((0,3),dtype=int)
+
   for i in range(0, tri.simplices.shape[0]):
     simplex = tri.simplices[i]
     x = tri.points[simplex[0]]
@@ -99,13 +103,11 @@ def plotCSpaceDelaunayGrey(P1,P2,maximumEdgeLength=0.25):
     max_edge = max([d0, d1, d2])
     if max_edge <= maximumEdgeLength:
       triangles = np.vstack((triangles, simplex))
-
-  print triangles.shape
-  #cx = np.sum(P1[triangles],axis=1)/3.0
-  #ct = np.sum(P2[triangles],axis=1)/3.0
+      # print triangles
+      # sys.exit(0)
 
   zFaces = np.ones(triangles.shape[0])
-  cmap = colors.LinearSegmentedColormap.from_list("", [(0.8,0.8,0.8),"grey","grey"])
+  cmap = colors.LinearSegmentedColormap.from_list("", [(shade,shade,shade),"grey","grey"])
   plt.tripcolor(P1, P2, triangles, cmap=cmap, facecolors=zFaces,edgecolors='none')
 
 def plotCSpaceDelaunay3D(P1,P2,maximumEdgeLength=0.25):
