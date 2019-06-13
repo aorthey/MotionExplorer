@@ -198,7 +198,8 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
     z = qomplSE2->getYaw();
     //if(z<0) z+= M_PI;
 
-  }else if(space_first_subspace->getType() == ob::STATE_SPACE_REAL_VECTOR){
+  }else if((space_first_subspace->getType() == ob::STATE_SPACE_REAL_VECTOR)
+   || (space_first_subspace->getType() == ob::STATE_SPACE_SO2)) {
     //fixed base robot: visualize last link
 
     Config q = OMPLStateToConfig(s);
@@ -217,6 +218,8 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
     x = qq[0];
     y = qq[1];
     z = qq[2];
+
+
 
   }else{
     std::cout << "cspace:getXYZ: cannot deal with space type" << space_first_subspace->getType() << std::endl;

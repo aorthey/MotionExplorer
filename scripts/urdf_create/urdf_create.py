@@ -59,6 +59,33 @@ def createCuboid(lname,x,y,z,l,w,h,COLLISION_ENABLED=True):
     s+= ' </link>\n\n'
   return s
 
+def createRotatedCuboid(lname,x,y,z,l,w,h,r,p,yaw,COLLISION_ENABLED=True):
+  Ixx = mass*(1.0/12.0)*(h*h + l*l)
+  Iyy = mass*(1.0/12.0)*(w*w + l*l)
+  Izz = mass*(1.0/12.0)*(w*w + h*h)
+  s= ' <link name="'+lname+'">\n'
+  s+= '  <inertial>\n'
+  s+= '    <mass value="'+str(mass)+'"/>\n'
+  s+= '    <inertia ixx="'+str(Ixx)+'" ixy="0" ixz="0" iyy="'+str(Iyy)+'" iyz="0" izz="'+str(Izz)+'"/>\n'
+  s+= '  </inertial>\n'
+  s+= '  <visual>\n'
+  # s+= '    <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
+  s+= '    <origin rpy="'+str(r)+' '+str(p)+' '+str(yaw)+'" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
+  s+= '    <geometry>\n'
+  s+= '      <box size="'+str(l)+' '+str(w)+' '+str(h)+'"/>\n'
+  s+= '    </geometry>\n'
+  s+= '  </visual>\n'
+  if COLLISION_ENABLED:
+    s+= '  <collision>\n'
+    # s+= '    <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
+    s+= '    <origin rpy="'+str(r)+' '+str(p)+' '+str(yaw)+'" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
+    s+= '    <geometry>\n'
+    s+= '      <box size="'+str(l)+' '+str(w)+' '+str(h)+'"/>\n'
+    s+= '    </geometry>\n'
+    s+= '  </collision>\n'
+    s+= ' </link>\n\n'
+  return s
+
 def createCylinder(lname,x,y,z,radius,length,COLLISION_ENABLED=True):
   Ixx = Iyy = (1.0/12.0)*mass*length*length + (1.0/4.0)*mass*radius*radius
   Izz = (1.0/4.0)*mass*radius*radius
@@ -139,6 +166,17 @@ def createRigidJoint(parentname, childname, x=0, y=0, z=0):
   s+='  <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
   s+='  <parent link="'+parentname+'"/>\n'
   s+='  <child link="'+childname+'"/>\n'
+  s+='</joint>\n\n'
+  return s
+
+def createPrismaticJoint(parentname, childname, x=0, y=0, z=0, lowerLimit=0, upperLimit=1):
+  jname = "joint_prismatic_"+parentname+"_"+childname
+  s= ''
+  s+='<joint name="'+jname+'" type="prismatic">\n'
+  s+='  <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
+  s+='  <parent link="'+parentname+'"/>\n'
+  s+='  <child link="'+childname+'"/>\n'
+  s+='  <limit lower="'+str(lowerLimit)+'" upper="'+str(upperLimit)+'" effort="'+str(effort)+'" velocity="'+str(velocity)+'"/>\n'
   s+='</joint>\n\n'
   return s
 

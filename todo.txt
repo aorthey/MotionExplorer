@@ -680,20 +680,13 @@ of pseudo metric?)
 
 [ ] Still problem when removing a vertex 
 [x] On higher levels, the edges are not displayed
-[ ] REPLACE SO2 WITH SO2INTERPOLATE
+[x] REPLACE SO2 WITH SO2INTERPOLATE
 [ ] COMPUTE NBH OF BXTR
-
 [x] Benchmark different stratifications
 [ ] BUG: why is the terrain not used in hierarchy
 [ ] Make it OMPL compatible
 [ ] Remove any Klampt reference from Strategy, isolate klampt
-
 [x] Memory Leak
 
 
-Make benchmark pretty
-
-Dimension can have different names, how to handle them?
-
-[ ] bidirect, or even multiple, depending on the underlying space
-[ ] Why do we perform worse than StratZero?
+[ ] spawn object, let if fall down

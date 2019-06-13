@@ -63,15 +63,20 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
       exit(0);
     }
   }else{
-    if(type.substr(0,1) != "R"){
+    if(type.substr(0,1) == "R"){
+      std::string str_dimension = type.substr(1);
+      int N = boost::lexical_cast<int>(str_dimension);
+      cspace_level = factory.MakeGeometricCSpaceFixedBase(world, robot_inner_idx, N);
+    }else if(type=="S1"){
+      cspace_level = factory.MakeGeometricCSpaceSO2(world, robot_inner_idx);
+    // }else if(type.substr(0,3) == "S1R"){
+    //   cspace_level = factory.MakeGeometricCSpaceSO2RN(world, robot_inner_idx);
+    }else{
       std::cout << type.substr(0) << std::endl;
-      std::cout << "fixed robots needs to have configuration space RN, but has " << type << std::endl;
+      std::cout << "fixed robots needs to have configuration space RN or SN, but has " << type << std::endl;
       exit(0);
     }
 
-    std::string str_dimension = type.substr(1);
-    int N = boost::lexical_cast<int>(str_dimension);
-    cspace_level = factory.MakeGeometricCSpaceFixedBase(world, robot_inner_idx, N);
 
   }
   if(robot_inner_idx != robot_outer_idx){

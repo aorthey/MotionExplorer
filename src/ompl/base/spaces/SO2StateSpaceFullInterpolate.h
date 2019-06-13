@@ -11,6 +11,9 @@ namespace ompl
         {
 
           public:
+            //Required to extrapolate into a certain direction (used in
+            //quotientchart to extrapolate from a center to the boundary of a
+            //neighborhood set)
             void interpolate(const State *from, const State *to, const double t, State *state) const override
             {
                 const double &pi = boost::math::constants::pi<double>();

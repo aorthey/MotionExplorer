@@ -15,7 +15,7 @@ def CreateSphereRobot(robot_name, radius):
   f.write('  </klampt>\n')
   f.write('</robot>')
   f.close()
-  print "\nCreated new file >>",fname,"[sphere robot radius=",radius,"]"
+  print("\nCreated new file >>",fname,"[sphere robot radius=",radius,"]")
 
 def CreateCylinderRobot(robot_name, radius, length, yaw=0):
   fname = getPathname(robot_name)
@@ -30,5 +30,5 @@ def CreateCylinderRobot(robot_name, radius, length, yaw=0):
   f.write('  </klampt>\n')
   f.write('</robot>')
   f.close()
-  print "\nCreated new file >>",fname,"[cylinder robot radius=",radius," length=",length,"]"
+  print("\nCreated new file >>",fname,"[cylinder robot radius=",radius," length=",length,"]")
 
