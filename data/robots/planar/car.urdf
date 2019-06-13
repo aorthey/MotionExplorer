@@ -1,0 +1,249 @@
+<?xml version="1.0"?>
+<robot name="planar/car">
+ <link name="chassi">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.01416666666666667" ixy="0" ixz="0" iyy="0.01666666666666667" iyz="0" izz="0.0041666666666666675"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <box size="0.4 0.2 0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <box size="0.4 0.2 0.1"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="wheel1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0017333333333333341" ixy="0" ixz="0" iyy="0.0017333333333333341" iyz="0" izz="0.0016000000000000007"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 1.57" xyz="-0.16000000000000003 0.13 0"/>
+    <geometry>
+      <cylinder length="0.04000000000000001" radius="0.08000000000000002"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 1.57" xyz="-0.16000000000000003 0.13 0"/>
+    <geometry>
+      <cylinder length="0.04000000000000001" radius="0.08000000000000002"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="wheel2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0017333333333333341" ixy="0" ixz="0" iyy="0.0017333333333333341" iyz="0" izz="0.0016000000000000007"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 1.57" xyz="-0.16000000000000003 -0.13 0"/>
+    <geometry>
+      <cylinder length="0.04000000000000001" radius="0.08000000000000002"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 1.57" xyz="-0.16000000000000003 -0.13 0"/>
+    <geometry>
+      <cylinder length="0.04000000000000001" radius="0.08000000000000002"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="wheel3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0017333333333333341" ixy="0" ixz="0" iyy="0.0017333333333333341" iyz="0" izz="0.0016000000000000007"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 1.57" xyz="0.16000000000000003 0.13 0"/>
+    <geometry>
+      <cylinder length="0.04000000000000001" radius="0.08000000000000002"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 1.57" xyz="0.16000000000000003 0.13 0"/>
+    <geometry>
+      <cylinder length="0.04000000000000001" radius="0.08000000000000002"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="wheel4">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0017333333333333341" ixy="0" ixz="0" iyy="0.0017333333333333341" iyz="0" izz="0.0016000000000000007"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 1.57" xyz="0.16000000000000003 -0.13 0"/>
+    <geometry>
+      <cylinder length="0.04000000000000001" radius="0.08000000000000002"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 1.57" xyz="0.16000000000000003 -0.13 0"/>
+    <geometry>
+      <cylinder length="0.04000000000000001" radius="0.08000000000000002"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="frontspoiler">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0025" ixy="0" ixz="0" iyy="0.00333333333333" iyz="0" izz="0.0025"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0.785" xyz="0.2 0 0"/>
+    <geometry>
+      <box size="0.141421356237 0.141421356237 0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0.785" xyz="0.2 0 0"/>
+    <geometry>
+      <box size="0.141421356237 0.141421356237 0.1"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="axis1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.00010833333333333334" ixy="0" ixz="0" iyy="4.166666666666667e-05" iyz="0" izz="8.333333333333332e-05"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.16000000000000003 0.10400000000000001 0"/>
+    <geometry>
+      <box size="0.020000000000000004 0.009999999999999995 0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.16000000000000003 0.10400000000000001 0"/>
+    <geometry>
+      <box size="0.020000000000000004 0.009999999999999995 0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="axis2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.00010833333333333334" ixy="0" ixz="0" iyy="4.166666666666667e-05" iyz="0" izz="8.333333333333332e-05"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.16000000000000003 0.10400000000000001 0"/>
+    <geometry>
+      <box size="0.020000000000000004 0.009999999999999995 0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.16000000000000003 0.10400000000000001 0"/>
+    <geometry>
+      <box size="0.020000000000000004 0.009999999999999995 0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="axis3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.00010833333333333334" ixy="0" ixz="0" iyy="4.166666666666667e-05" iyz="0" izz="8.333333333333332e-05"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.16000000000000003 -0.10400000000000001 0"/>
+    <geometry>
+      <box size="0.020000000000000004 0.009999999999999995 0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.16000000000000003 -0.10400000000000001 0"/>
+    <geometry>
+      <box size="0.020000000000000004 0.009999999999999995 0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="axis4">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.00010833333333333334" ixy="0" ixz="0" iyy="4.166666666666667e-05" iyz="0" izz="8.333333333333332e-05"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.16000000000000003 -0.10400000000000001 0"/>
+    <geometry>
+      <box size="0.020000000000000004 0.009999999999999995 0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.16000000000000003 -0.10400000000000001 0"/>
+    <geometry>
+      <box size="0.020000000000000004 0.009999999999999995 0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_chassi_wheel1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="chassi"/>
+  <child link="wheel1"/>
+</joint>
+
+<joint name="joint_fixed_chassi_wheel2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="chassi"/>
+  <child link="wheel2"/>
+</joint>
+
+<joint name="joint_fixed_chassi_wheel3" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="chassi"/>
+  <child link="wheel3"/>
+</joint>
+
+<joint name="joint_fixed_chassi_wheel4" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="chassi"/>
+  <child link="wheel4"/>
+</joint>
+
+<joint name="joint_fixed_chassi_frontspoiler" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="chassi"/>
+  <child link="frontspoiler"/>
+</joint>
+
+<joint name="joint_fixed_chassi_axis1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="chassi"/>
+  <child link="axis1"/>
+</joint>
+
+<joint name="joint_fixed_chassi_axis2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="chassi"/>
+  <child link="axis2"/>
+</joint>
+
+<joint name="joint_fixed_chassi_axis3" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="chassi"/>
+  <child link="axis3"/>
+</joint>
+
+<joint name="joint_fixed_chassi_axis4" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="chassi"/>
+  <child link="axis4"/>
+</joint>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>
