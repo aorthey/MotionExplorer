@@ -15,6 +15,7 @@
 // #include "planner/strategy/quotientchart/algorithms/qng2.h"
 #include "planner/strategy/quotient/algorithms/qcp.h"
 #include "planner/strategy/quotient/algorithms/qsampler.h"
+#include "planner/strategy/quotient/algorithms/q_neighborhood_sampler.h"
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -184,6 +185,9 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   // }else if(algorithm=="hierarchy:q_rrt_connect"){
   //   planner = GetSharedMultiQuotientPtr<og::QRRTConnect>(stratification);
   //   planner->setName("QRRTConnect");
+  }else if(algorithm=="hierarchy:neighborhood_sampler"){
+    planner = GetSharedMultiQuotientPtr<og::QNeighborhoodSampler>(stratification);
+    planner->setName("QNeighborhoodSampler");
   }else if(algorithm=="hierarchy:sampler"){
     planner = GetSharedMultiQuotientPtr<og::QSampler>(stratification);
     planner->setName("QSampler");

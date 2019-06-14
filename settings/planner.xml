@@ -9,7 +9,7 @@
   <algorithm dynamic="1" name="ompl:dynamic:pdst"/>
   <algorithm dynamic="1" name="benchmark:all_dynamic"/>
 
-  <!-- <algorithm name="hierarchy:sampler"/> -->
+  <algorithm name="hierarchy:sampler"/>
   <!-- <algorithm name="hierarchy:decomposition_planner"/> -->
   <algorithm name="hierarchy:q_rrt"/>
   <!-- <algorithm name="benchmark:minimal"/> -->

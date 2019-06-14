@@ -118,6 +118,7 @@ void PathPiecewiseLinear::Smooth(){
 
   og::PathSimplifier shortcutter(gpath.getSpaceInformation());
   shortcutter.simplifyMax(gpath);
+  shortcutter.smoothBSpline(gpath);
 
   length = gpath.length();
   std::vector<ob::State *> states = gpath.getStates();

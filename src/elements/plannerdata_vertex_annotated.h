@@ -39,6 +39,7 @@ class PlannerDataVertexAnnotated: public ob::PlannerDataVertex
     uint GetPathClass() const;
 
     void SetInfeasible();
+    void SetFeasible();
     bool IsInfeasible() const;
 
     void SetMaxPathClass(uint level_);

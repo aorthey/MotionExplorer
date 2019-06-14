@@ -216,12 +216,9 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const
   int fn_sum = 0;
   int n_sum = 0;
   for(uint k = 0; k < fn.size(); k++){
-    std::cout << fn.at(k) << "/" << n.at(k) << std::endl;
     fn_sum += fn.at(k);
     n_sum += n.at(k);
   }
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << fn_sum << "/" << n_sum << std::endl;
 
   for(uint k = 0; k < K; k++){
     og::Quotient *Qk = quotientSpaces.at(k);

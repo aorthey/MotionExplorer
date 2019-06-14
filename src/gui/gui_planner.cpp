@@ -150,11 +150,13 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
 
   }else if(cmd=="save_current_path"){
     //state("save_current_path").activate();
+    path = planners.at(active_planner)->GetPath();
     if(path)
     {
-      std::string fn = "mypath.xml";
-      path->Save(fn.c_str());
-      std::cout << "save current path to : " << fn << std::endl;
+      std::string rname = planners.at(active_planner)->GetInput().environment_name;
+      std::string fname = "../data/samples/path_"+rname;
+      path->Save(fname.c_str());
+      std::cout << "save current path to : " << fname << std::endl;
     }else{
       std::cout << "cannot save non-existing path." << std::endl;
     }

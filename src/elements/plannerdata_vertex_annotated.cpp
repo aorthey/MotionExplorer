@@ -27,7 +27,13 @@ PlannerDataVertexAnnotated::PlannerDataVertexAnnotated (const PlannerDataVertexA
 
 void PlannerDataVertexAnnotated::SetInfeasible()
 {
+  SetFeasibility(FeasibilityType::INFEASIBLE);
   infeasible=true;
+}
+void PlannerDataVertexAnnotated::SetFeasible()
+{
+  SetFeasibility(FeasibilityType::FEASIBLE);
+  infeasible=false;
 }
 bool PlannerDataVertexAnnotated::IsInfeasible() const
 {

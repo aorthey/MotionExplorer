@@ -341,23 +341,23 @@ bool Roadmap::Save(TiXmlElement *node)
       PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
       if(v==nullptr){
         subnode->SetAttribute("feasible", "unknown");
-        subnode->SetAttribute("sufficient", "unknown");
+        // subnode->SetAttribute("sufficient", "unknown");
       }else{
         using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
         FeasibilityType feasibility_t = v->GetFeasibility();
         if(feasibility_t == FeasibilityType::INFEASIBLE){
           subnode->SetAttribute("feasible", "no");
-          subnode->SetAttribute("sufficient", "no");
+          // subnode->SetAttribute("sufficient", "no");
         }else{
           subnode->SetAttribute("feasible", "yes");
-          if(feasibility_t == FeasibilityType::SUFFICIENT_FEASIBLE){
-            subnode->SetAttribute("sufficient", "yes");
-          }else{
-            subnode->SetAttribute("sufficient", "no");
-          }
+          // if(feasibility_t == FeasibilityType::SUFFICIENT_FEASIBLE){
+          //   subnode->SetAttribute("sufficient", "yes");
+          // }else{
+          //   subnode->SetAttribute("sufficient", "no");
+          // }
         }
-        double d = v->GetOpenNeighborhoodDistance();
-        subnode->SetDoubleAttribute("open_ball_radius", d);
+        // double d = v->GetOpenNeighborhoodDistance();
+        // subnode->SetDoubleAttribute("open_ball_radius", d);
       }
       node->InsertEndChild(*subnode);
     }
