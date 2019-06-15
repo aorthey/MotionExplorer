@@ -19,12 +19,6 @@ def DistPointLine(x1,y1, x2,y2, x3,y3): # x3,y3 is the point
     dx = x - x3
     dy = y - y3
 
-    # Note: If the actual distance does not matter,
-    # if you only want to compare what this function
-    # returns to other results of this function, you
-    # can just return the squared distance instead
-    # (i.e. remove the sqrt) to gain a little performance
-
     dist = math.sqrt(dx*dx + dy*dy)
 
     return dist

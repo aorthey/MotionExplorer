@@ -10,7 +10,7 @@ c1 = (0.9,0.9,0.9)
 c2 = (0.7,0.7,0.7)
 c3 = (0.5,0.5,0.5)
 
-N = 500
+N = 150
 q1 = np.linspace(-np.pi,np.pi,N)
 q2 = np.linspace(-np.pi,np.pi,N)
 P1 = []
@@ -48,8 +48,6 @@ y1loc= (p1[0]-offset,-offset)
 y2loc= (p3[0]-offset,-offset)
 fiber1loc= (p1[0]-1.6,1.5)
 fiber2loc= (p3[0]-1.6,1.5)
-# fiber1loc= (p1[0]-0.6,-1.5)
-# fiber2loc= (p3[0]-0.6,-1.5)
 ############################################################
 fig = plt.figure(0)
 fig.patch.set_facecolor('white')
@@ -106,13 +104,9 @@ ax.tick_params(axis='both', which='major', pad=10, labelsize=0.8*font_size)
 lim=3.14
 plt.axis([-lim,lim,-lim,lim])
 
-# ax.annotate(r'y_1', y1loc)
-# ax.annotate(r'y_2', y2loc)
 plt.plot(p1[0],0,'o',color='black',markersize=10)
 plt.plot(p3[0],0,'o',color='black',markersize=10)
 
-# ax.annotate(r'x_1', x1loc)
-# ax.annotate(r'x_2', x2loc)
 plt.plot(p1[0],p1[1],'o',color='black',markersize=10)
 plt.plot(p3[0],p3[1],'o',color='black',markersize=10)
 
@@ -121,8 +115,6 @@ ax.yaxis.set_major_locator(MaxNLocator(integer=True))
 
 f1 = ax.annotate(r'\pi^{-1}(y_1)', fiber1loc, rotation=1.57)
 f2 = ax.annotate(r'\pi^{-1}(y_2)', fiber2loc, rotation=1.57)
-# f1.set_rotation(90)
-# f2.set_rotation(90)
 plt.axvline(p1[0], color='k', linestyle='solid', linewidth=2)
 plt.axvline(p3[0], color='k', linestyle='solid', linewidth=2)
 plt.axhline(0, color='k', linewidth=1)

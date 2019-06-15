@@ -40,27 +40,27 @@ p3 = np.array([2.5,-1.2])
 symbol='x'
 
 ###########################################################
-# fig = plt.figure(0)
-# fig.patch.set_facecolor('white')
-# ax = fig.gca()
-# ax.set_xlabel(r'x',fontsize=font_size)
-# ax.set_ylabel(r'y',rotation=1.57,fontsize=font_size)
-# ax.tick_params(axis='both', which='major', pad=15)
-# lim=1.1
-# plt.axis([-lim,lim,-lim,lim])
+fig = plt.figure(0)
+fig.patch.set_facecolor('white')
+ax = fig.gca()
+ax.set_xlabel(r'x',fontsize=font_size)
+ax.set_ylabel(r'y',rotation=1.57,fontsize=font_size)
+ax.tick_params(axis='both', which='major', pad=15)
+lim=1.1
+plt.axis([-lim,lim,-lim,lim])
 
-# dof.GRAY = c1
-# dof.plot2DOFAtConfig(ax,p1)
-# dof.GRAY = c2
-# dof.plot2DOFAtConfig(ax,p2)
-# dof.GRAY = c3
-# dof.plot2DOFAtConfig(ax,p3)
+dof.GRAY = c1
+dof.plot2DOFAtConfig(ax,p1)
+dof.GRAY = c2
+dof.plot2DOFAtConfig(ax,p2)
+dof.GRAY = c3
+dof.plot2DOFAtConfig(ax,p3)
 
-# ax.annotate(r''+symbol+'_1', (GetWorldPositions(p1)[2,0],GetWorldPositions(p1)[2,1]+offset))
-# ax.annotate(r''+symbol+'_2', (GetWorldPositions(p2)[2,0]-offset,GetWorldPositions(p2)[2,1]+offset))
-# ax.annotate(r''+symbol+'_3', (GetWorldPositions(p3)[2,0],GetWorldPositions(p3)[2,1]+offset))
-# plotObstacles(ax)
-# plt.savefig("2dof_workspace_M1.png", bbox_inches='tight')
+ax.annotate(r''+symbol+'_1', (GetWorldPositions(p1)[2,0],GetWorldPositions(p1)[2,1]+offset))
+ax.annotate(r''+symbol+'_2', (GetWorldPositions(p2)[2,0]-offset,GetWorldPositions(p2)[2,1]+offset))
+ax.annotate(r''+symbol+'_3', (GetWorldPositions(p3)[2,0],GetWorldPositions(p3)[2,1]+offset))
+plotObstacles(ax)
+plt.savefig("2dof_workspace_M1.png", bbox_inches='tight')
 
 ############################################################
 fig = plt.figure(1)
