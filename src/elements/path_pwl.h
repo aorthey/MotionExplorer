@@ -55,6 +55,7 @@ class PathPiecewiseLinear
   protected:
     double length{0};
     std::vector<double> interLength;//interLength(i) length towards next milestone point from q(i)
+    bool isSmooth{false};
 
     SweptVolume *sv{nullptr};
     CSpaceOMPL *cspace{nullptr};

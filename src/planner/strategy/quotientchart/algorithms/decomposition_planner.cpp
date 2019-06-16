@@ -43,8 +43,8 @@ pathPathValidityChecker(const ob::SpaceInformationPtr &si_, const ob::SpaceInfor
   length2_ = 0;
   computePathLength(s1_, d1_, length1_);
   computePathLength(s2_, d2_, length2_);
-  std::cout << "s1path: " << s1.size() << std::endl;
-  std::cout << "s2path: " << s2.size() << std::endl;
+  // std::cout << "s1path: " << s1.size() << std::endl;
+  // std::cout << "s2path: " << s2.size() << std::endl;
 }
 
   virtual bool isValid(const ob::State *state) const
@@ -77,16 +77,16 @@ pathPathValidityChecker(const ob::SpaceInformationPtr &si_, const ob::SpaceInfor
   //creates a new state at exactly the given position within the given path
   void createStateAt(const std::vector<ob::State*> &path, const double &pathLength, const std::vector<double> &distances, const double newPosition, ob::State* s_interpolate) const {
     if(distances.size() > 1) {
-      std::cout << newPosition << std::endl;
+      // std::cout << newPosition << std::endl;
       uint idx = 0;
       for(uint i = 0; i < distances.size(); i++) {
-        std::cout << i << ":" << distances.at(i) << ">" << newPosition << std::endl;
+        // std::cout << i << ":" << distances.at(i) << ">" << newPosition << std::endl;
         if (distances.at(i) > newPosition) {
           idx = i-1;
           break;
         }
       }
-      std::cout << idx << std::endl;
+      // std::cout << idx << std::endl;
 
       //line fraction gives the portion of where to interpolate between state i and i+1
       if (idx < distances.size() - 1) {
@@ -94,7 +94,7 @@ pathPathValidityChecker(const ob::SpaceInformationPtr &si_, const ob::SpaceInfor
         if (lineFraction != 0) {
           si_->getStateSpace()->interpolate(path.at(idx), path.at(idx+1), lineFraction, s_interpolate);
         } else {
-          std::cout << "first" << std::endl;
+          // std::cout << "first" << std::endl;
           s_interpolate = path.at(idx);
         }
       } else if (idx == distances.size() - 1) {

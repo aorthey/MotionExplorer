@@ -112,26 +112,29 @@ void PathPiecewiseLinear::SendToController(SmartPointer<RobotController> control
 
 void PathPiecewiseLinear::Smooth(){
   if(path == nullptr) return;
+  if(!isSmooth){
 
-  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-  std::vector<ob::State *> statesB = gpath.getStates();
+    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+    std::vector<ob::State *> statesB = gpath.getStates();
 
-  og::PathSimplifier shortcutter(gpath.getSpaceInformation());
-  shortcutter.simplifyMax(gpath);
-  shortcutter.smoothBSpline(gpath);
+    og::PathSimplifier shortcutter(gpath.getSpaceInformation());
+    shortcutter.simplifyMax(gpath);
+    shortcutter.smoothBSpline(gpath);
 
-  length = gpath.length();
-  std::vector<ob::State *> states = gpath.getStates();
+    length = gpath.length();
+    std::vector<ob::State *> states = gpath.getStates();
 
-  interLength.clear();
-  for(uint k = 1; k < states.size(); k++){
-    ob::State *s0 = states.at(k-1);
-    ob::State *s1 = states.at(k);
-    interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
+    interLength.clear();
+    for(uint k = 1; k < states.size(); k++){
+      ob::State *s0 = states.at(k-1);
+      ob::State *s1 = states.at(k);
+      interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
+    }
+
+    path = std::make_shared<og::PathGeometric>(gpath);
+    std::cout << "Path smoothed (states: " << statesB.size() << " -> " << states.size() << ")" << std::endl;
+    isSmooth = true;
   }
-
-  path = std::make_shared<og::PathGeometric>(gpath);
-  std::cout << "Path smoothed (states: " << statesB.size() << " -> " << states.size() << ")" << std::endl;
 
   //gpath update is not saved in path!
 }

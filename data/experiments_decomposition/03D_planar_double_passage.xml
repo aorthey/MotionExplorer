@@ -10,20 +10,21 @@
 
   <plannerinput>
 
-    <se3min config="6  -3 -1.5 -0.1 -3.141593 -1.57 -3.141593"/>
-    <se3max config="6  +3 +1.5 +0.1 +3.141593 +1.57 +3.141593"/>
-
     <qinit  config="15  -2 +0 +0.0 0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
     <dqinit config="15 0.1 0 0 0 0 0 0 0 0 0 0 0 0 0 0  "/>
     <qgoal  config="15  +2 -0 +0.0 0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
     <dqgoal config="15 0.1 0 0 0 0 0 0 0 0 0 0 0 0 0 0  "/>
 
+    <se3min config="6  -2.8 -1.0 -0.1 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +2.8 +1.0 +0.1 +3.141593 +1.57 +3.141593"/>
+
     <freeFloating>1</freeFloating>
-    <maxplanningtime>0.1</maxplanningtime>
+    <maxplanningtime>1</maxplanningtime>
     <pathSpeed>12</pathSpeed>
+    <smoothPath>1</smoothPath>
 
     <hierarchy>
-      <level inner_index="1" type="R2"/>
+      <!-- <level inner_index="1" type="R2"/> -->
       <level inner_index="0" type="SE2"/>
     </hierarchy>
 
