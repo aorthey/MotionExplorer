@@ -110,8 +110,8 @@ public:
 
 bool DecompositionPlanner::IsPathVisible(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2)
 {
-	float max__planning_time_path_path = 0.1;
-	float epsilon_goalregion = 0.01;
+  float max__planning_time_path_path = 0.1;
+  float epsilon_goalregion = 0.01;
 
   ompl::msg::setLogLevel(ompl::msg::LOG_NONE);
   ob::RealVectorBounds bounds(2);

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="snake_planar0" file="../robots/snake/snake_planar_0_segments_disk_inner.urdf"/>
+  <robot name="disk" file="../robots/planar/car_capsule_inner.urdf"/>
 
   <terrain name="O1" file="../terrains/narrow_passage/narrow_passage_double_passage.tri"/>
 
@@ -14,7 +14,7 @@
     <qgoal config="6  +2.0 0 0 0 0 0 "/>
 
     <freeFloating>1</freeFloating>
-    <maxplanningtime>0.02</maxplanningtime>
+    <maxplanningtime>0.1</maxplanningtime>
     <pathSpeed>12</pathSpeed>
 
     <hierarchy>

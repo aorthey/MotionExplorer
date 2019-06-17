@@ -400,8 +400,6 @@ PlannerDataVertexAnnotated QuotientChartSubGraph::getAnnotatedVertex(const Verte
 
 void QuotientChartSubGraph::getPlannerDataAnnotated(base::PlannerData &data) const
 {
-  // PlannerDataVertexAnnotated pstart = getAnnotatedVertex(v_start);
-  // data.addStartVertex(pstart);
 
   // if(hasSolution){
   //   PlannerDataVertexAnnotated pgoal = getAnnotatedVertex(v_goal);
@@ -410,25 +408,6 @@ void QuotientChartSubGraph::getPlannerDataAnnotated(base::PlannerData &data) con
 
   std::map<const uint, const ob::State*> indexToStates;
 
-  // {
-  //   PlannerDataVertexAnnotated p = getAnnotatedVertex(v);
-  //   if(graph[v]->isStart) data.addStartVertex(p);
-  //   else if(graph[v]->isGoal) data.addGoalVertex(p);
-  //   else data.addVertex(p);
-  // }
-
-  // foreach (const Edge e, boost::edges(graph))
-  // {
-  //   const Vertex v1 = boost::source(e, graph);
-  //   const Vertex v2 = boost::target(e, graph);
-  //   // const ob::State *s1 = graph[v1]->state;
-  //   // const ob::State *s2 = graph[v2]->state;
-  //   // PlannerDataVertexAnnotated p1(s1);
-  //   // PlannerDataVertexAnnotated p2(s2);
-  //   // data.addEdge(p1,p2);
-  //   data.addEdge(v1,v2);
-  // }
-  // std::cout << data.numVertices() << "," << data.numEdges() << std::endl;
   PlannerDataVertexAnnotated pstart = getAnnotatedVertex(v_start);
   indexToStates[graph[v_start]->index] = pstart.getState();
   data.addStartVertex(pstart);
