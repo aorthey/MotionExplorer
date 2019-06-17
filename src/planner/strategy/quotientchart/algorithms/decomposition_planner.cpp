@@ -45,14 +45,6 @@ public:
 
     computePathLength(path1_, path1_distances_, path1_length_);
     computePathLength(path2_, path2_distances_, path2_length_);
-    if(path1_.size() != (path1_distances_.size()+1)){
-      std::cout << "Path1: " << path1_.size() << " distances:" << path1_distances_.size() << std::endl;
-      exit(0);
-    }
-    if(path2_.size() != (path2_distances_.size()+1)){
-      std::cout << "Path2: " << path2_.size() << " distances:" << path2_distances_.size() << std::endl;
-      exit(0);
-    }
   }
 
   virtual bool isValid(const ob::State *state) const
@@ -93,13 +85,6 @@ public:
       }
     }
 
-    if(idx<0){
-      std::cout << "ERROR" << std::endl;
-      std::cout << newPosition << std::endl;
-      std::cout << distances << std::endl;
-      exit(0);
-    }
-
     double distanceIdxIdxNext = distances.at(idx);
     if(idx > 0) distanceIdxIdxNext -= distances.at(idx-1);
 
@@ -125,7 +110,7 @@ public:
 
 bool DecompositionPlanner::IsPathVisible(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2)
 {
-	float max__planning_time_path_path = 0.5;
+	float max__planning_time_path_path = 0.1;
 	float epsilon_goalregion = 0.01;
 
   ompl::msg::setLogLevel(ompl::msg::LOG_NONE);
