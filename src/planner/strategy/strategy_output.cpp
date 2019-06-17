@@ -152,7 +152,7 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
     std::string rname = cspace_levels.back()->GetRobotPtr()->name;
     std::string fname = "../data/samples/cspace_robot_"+rname+".samples";
     roadmap_k->Save(fname.c_str());
-    std::cout << "Wrote samples to " << fname << std::endl;
+    // std::cout << "Wrote samples to " << fname << std::endl;
   }
 
   if(current->children.size() == 0)
