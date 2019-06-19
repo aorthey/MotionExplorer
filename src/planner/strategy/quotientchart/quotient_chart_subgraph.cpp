@@ -182,7 +182,6 @@ void QuotientChartSubGraph::ExtendGraphOneStep()
   }
 }
 
-
 QuotientChartSubGraph::Configuration::Configuration(const base::SpaceInformationPtr &si): 
   state(si->allocState())
 {}
@@ -406,27 +405,33 @@ void QuotientChartSubGraph::getPlannerDataAnnotated(base::PlannerData &data) con
   //   data.addGoalVertex(pgoal);
   // }
 
+  std::cout << "getPlannerData" << getName() << std::endl;
+  std::cout << v_start << std::endl;
+
   std::map<const uint, const ob::State*> indexToStates;
 
-  PlannerDataVertexAnnotated pstart = getAnnotatedVertex(v_start);
-  indexToStates[graph[v_start]->index] = pstart.getState();
-  data.addStartVertex(pstart);
+  // PlannerDataVertexAnnotated pstart = getAnnotatedVertex(v_start);
+  // indexToStates[graph[v_start]->index] = pstart.getState();
+  // data.addStartVertex(pstart);
 
-  if(hasSolution){
-    PlannerDataVertexAnnotated pgoal = getAnnotatedVertex(v_goal);
-    indexToStates[graph[v_goal]->index] = pgoal.getState();
-    data.addGoalVertex(pgoal);
-  }
+  // if(hasSolution){
+  //   PlannerDataVertexAnnotated pgoal = getAnnotatedVertex(v_goal);
+  //   indexToStates[graph[v_goal]->index] = pgoal.getState();
+  //   data.addGoalVertex(pgoal);
+  // }
 
   //TODO: goal and start are added two times if chart is local
   foreach( const Vertex v, boost::vertices(graph))
   {
-    if(indexToStates.find(graph[v]->index) == indexToStates.end()) {
-      PlannerDataVertexAnnotated p = getAnnotatedVertex(v);
-      indexToStates[graph[v]->index] = p.getState();
+    PlannerDataVertexAnnotated p = getAnnotatedVertex(v);
+    indexToStates[graph[v]->index] = p.getState();
+    if(graph[v]->isStart){
+      data.addStartVertex(p);
+    }else if(graph[v]->isGoal){
+      data.addGoalVertex(p);
+    }else{
       data.addVertex(p);
     }
-    //otherwise vertex is a goal or start vertex and has already been added
   }
   foreach (const Edge e, boost::edges(graph))
   {
@@ -477,6 +482,7 @@ QuotientChartSubGraph::SubGraph& QuotientChartSubGraph::GetSubGraphComponent( in
 
 void QuotientChartSubGraph::CopyChartFromSibling( QuotientChart *sibling_chart, uint k )
 {
+  std::cout << "CopyChartFromSibling" << getName() << std::endl;
   QuotientChartSubGraph *sibling = dynamic_cast<QuotientChartSubGraph*>(sibling_chart);
   //Get k-th subgraph
   this->graph = sibling->GetSubGraphComponent(k);
@@ -606,11 +612,12 @@ std::vector<int> QuotientChartSubGraph::VertexBelongsToComponents(const Vertex &
   }
 
   return components;
-
 }
+
 bool QuotientChartSubGraph::IsPathVisible(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2)
 {
   //no splitting
+  OMPL_INFORM("No splitting");
   return true;
 }
 

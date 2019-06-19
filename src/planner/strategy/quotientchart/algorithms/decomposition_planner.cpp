@@ -60,7 +60,8 @@ public:
   //computes the distance between each two adjacent states in the path and the overall path-length
   //saves the accumulated (!) distance (distance from start to the point at this index) for each point in the stateDistances vector
   //computes the overall pathLength which is equal to the last entry of stateDistances
-  void computePathLength(const std::vector<ob::State*> &path, std::vector<double> &stateDistances, double &pathLength) {
+  void computePathLength(const std::vector<ob::State*> &path, std::vector<double> &stateDistances, double &pathLength) 
+  {
     pathLength = 0;
     if (path.size() > 1) {
       for (uint i = 0; i < path.size() - 1; i++) {
