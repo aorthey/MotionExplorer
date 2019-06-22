@@ -688,9 +688,6 @@ of pseudo metric?)
 [ ] Remove any Klampt reference from Strategy, isolate klampt
 [x] Memory Leak
 
-
-[ ] spawn object, let if fall down
-
 Problems for decomposition
 [ ] PathClasses contain additional vertices not belonging to path.
 [ ] With more layers, we might get empty path classes.
