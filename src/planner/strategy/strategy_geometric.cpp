@@ -5,6 +5,9 @@
 #include "planner/benchmark/benchmark_output.h"
 
 #include "planner/strategy/quotient/multiquotient.h"
+#include "planner/strategy/explorer/Explorer.h"
+#include "planner/strategy/explorer/QuotientTopology.h"
+#include "planner/strategy/explorer/QuotientTopologySparse.h"
 //#include "planner/strategy/quotientgraph/algorithms/qmp_connect.h"
 //#include "planner/strategy/quotientgraph/algorithms/qmp.h"
 //#include "planner/strategy/quotientgraph/algorithms/q_prm.h"
@@ -172,29 +175,33 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     planner = GetSharedMultiChartPtr<og::DecompositionPlanner>(stratification);
     planner->setName("DecompositionPlanner");
 
-  // }else if(algorithm=="hierarchy:qng"){
-  //   planner = GetSharedMultiChartPtr<og::QNG2>(stratification);
-  //   planner->setName("QNG2");
-
   }else if(algorithm=="hierarchy:qcp"){
     planner = GetSharedMultiQuotientPtr<og::QCP>(stratification);
     planner->setName("QCP");
+
   }else if(algorithm=="hierarchy:q_rrt"){
     planner = GetSharedMultiQuotientPtr<og::QRRT>(stratification);
-    planner->setName("QRRT");
-  // }else if(algorithm=="hierarchy:q_rrt_connect"){
-  //   planner = GetSharedMultiQuotientPtr<og::QRRTConnect>(stratification);
-  //   planner->setName("QRRTConnect");
+    planner->setName("MotionExplorer");
+
+  }else if(algorithm=="hierarchy:explorer"){
+    typedef og::MotionExplorer<og::QuotientTopologySparse> MotionExplorer;
+    planner = std::make_shared<MotionExplorer>(stratification->si_vec);
+    static_pointer_cast<MotionExplorer>(planner)->setProblemDefinition(stratification->pdef_vec);
+    planner->setName("MotionExplorer");
+
   }else if(algorithm=="hierarchy:neighborhood_sampler"){
     planner = GetSharedMultiQuotientPtr<og::QNeighborhoodSampler>(stratification);
     planner->setName("QNeighborhoodSampler");
+
   }else if(algorithm=="hierarchy:sampler"){
     planner = GetSharedMultiQuotientPtr<og::QSampler>(stratification);
     planner->setName("QSampler");
+
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);
   }
+  std::cout << "Planner algorithm " << planner->getName() << " initialized." << std::endl;
   planner->setProblemDefinition(pdef);
   return planner;
 
@@ -282,6 +289,7 @@ void StrategyGeometricMultiLevel::Step(StrategyOutput &output)
   ob::PlannerTerminationCondition ptc(itc);
 
   ompl::time::point start = ompl::time::now();
+  std::cout << "Step" << std::endl;
   planner->solve(ptc);
   output.planner_time = ompl::time::seconds(ompl::time::now() - start);
   output.max_planner_time = max_planning_time;

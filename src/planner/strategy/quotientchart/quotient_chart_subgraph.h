@@ -165,11 +165,6 @@ namespace ompl
       virtual std::vector<int> VertexBelongsToComponents(const Vertex &v);
       virtual bool FoundNewComponent() override;
 
-      // std::map<Vertex, VertexRank> vrank;
-      // std::map<Vertex, Vertex> vparent;
-      // boost::disjoint_sets<boost::associative_property_map<std::map<Vertex, VertexRank> >, boost::associative_property_map<std::map<Vertex, Vertex> > > 
-      //   disjointSets_{boost::make_assoc_property_map(vrank), boost::make_assoc_property_map(vparent)};
-
       ob::Cost bestCost_{+dInf};
       Configuration *q_start;
       Configuration *q_goal;

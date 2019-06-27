@@ -57,8 +57,8 @@ typedef boost::subgraph<
     containerS,
     containerS, 
     boost::undirectedS,
-    //boost::property<boost::vertex_index_t, int, VertexInternalState>,
-    VertexInternalState,
+    boost::property<boost::vertex_index_t, int, VertexInternalState>,
+    // VertexInternalState,
     boost::property<boost::edge_index_t, int, EdgeInternalState>
     //Graphbundle currently NOT supported by boost::subgraph
     >
@@ -81,7 +81,7 @@ std::ostream& operator<< (std::ostream& out, const SubGraph& G)
     const Vertex u = boost::source(e,G);
     const Vertex v = boost::target(e,G);
     out << "edge " << G[u].name << "-" << G[v].name 
-      << " (" << G[e].index << ", " << G[e].weight << ")" << std::endl;
+      << " (idx=" << G[e].index << ", weight=" << G[e].weight << ")" << std::endl;
   }
   if(boost::num_vertices(G) > 0){
     out << std::string(80, '-') << std::endl;
@@ -101,6 +101,21 @@ Vertex AddVertex(SubGraph &G, std::string name)
   G[v].name = name;
   return v;
 }
+void DeleteVertex(SubGraph &G, Vertex v)
+{
+  //need to go manual, remove_vertex NYI in boost 1.70
+
+  while (true) {
+    typedef typename SubGraph::out_edge_iterator oei_type;
+    std::pair<oei_type, oei_type> p = out_edges(v, G);
+    if (p.first == p.second) break;
+    remove_edge(*p.first,  G.m_graph);
+  }
+  std::cout << "Delete " << G[v].name << std::endl;
+  remove_vertex(v, G.m_graph);
+
+  //need to remake the idx's
+}
 
 Edge AddEdge(SubGraph &G, const Vertex v, const Vertex w, std::string name = "")
 {
@@ -118,55 +133,34 @@ int main(int argc,const char** argv)
 {
   SubGraph G0;
   SubGraph& G1 = G0.create_subgraph();
-  SubGraph& G2 = G0.create_subgraph();
   //   G0                           |
-  //  /  \                          |
-  // G1  G2                         |
+  //  /                             |
+  // G1
 
   //(1) Insert into G1 (inserts automatically into G0)
   const Vertex vI = AddVertex(G1, "xI");
-  const Vertex vG = AddVertex(G1, "xG");
 
-  //(2) Later, we like to insert the same vertices also to G2
-  add_vertex(vI, G2);
-  add_vertex(vG, G2);
+  AddVertex(G0, "0");
 
-  //(3) Let us add some subgraph structure to G1 (automatically added to G0)
+  //(2) Let us add some subgraph structure to G1 (automatically added to G0)
   const Vertex v1 = AddVertex(G1, "A");
   const Vertex v2 = AddVertex(G1, "B");
   const Vertex v3 = AddVertex(G1, "C");
+  const Vertex v4 = AddVertex(G1, "D");
   AddEdge(G1, vI, v1);
   AddEdge(G1, v1, v2);
   AddEdge(G1, v2, v3);
-  AddEdge(G1, v3, vG);
-
-  //(4) Let us add some subgraph structure to G2 (automatically added to G0)
-  const Vertex v4 = AddVertex(G2, "E");
-  const Vertex v5 = AddVertex(G2, "F");
-  AddEdge(G2, vI, v4);
-  AddEdge(G2, v4, v5);
-  AddEdge(G2, v5, vG);
-
-  //(5) insert edge into G1 and G2 (works because both vertices are each in G1 and
-  //G2) --- but we should probably not do it, because can never be sure that it
-  //will insert an edge into every graph
-  AddEdge(G0, vI, vG);
+  AddEdge(G1, v3, v4);
 
   std::cout << G0 << std::endl;
   std::cout << G1 << std::endl;
-  std::cout << G2 << std::endl;
 
   std::cout << std::string(80, '*') << std::endl;
-  std::cout << "Delete root graph and its subgraphs" << std::endl;
+  std::cout << "Delete vertex" << std::endl;
   std::cout << std::string(80, '*') << std::endl;
-  for(auto it = G0.m_children.begin(); it != G0.m_children.end(); it++)
-  {
-    (*it)->m_graph.clear();
-  }
-  G0.m_graph.clear();
+  DeleteVertex(G1, v2);
 
   std::cout << G0 << std::endl;
   std::cout << G1 << std::endl;
-  std::cout << G2 << std::endl;
   return 0;
 }

@@ -47,7 +47,7 @@ namespace ompl
         ~Quotient();
         ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override final; //final prevents subclasses to override
 
-        virtual void Grow(double t) = 0;
+        virtual void Grow(double t = 0) = 0;
         virtual bool GetSolution(ob::PathPtr &solution) = 0;
         virtual bool SampleQuotient(ob::State *q_random);
 

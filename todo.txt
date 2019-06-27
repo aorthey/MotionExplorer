@@ -670,7 +670,6 @@ Experiments for paper:
 [ ] What is not working:
  [ ] Interpolate (QuotientCover.cpp:1055)
 
-
 [x] Outsource interpolate
 [x] Comment out all interpolate, move to metric, and implement
 EuclideaMEtricInterpolation
@@ -691,3 +690,7 @@ of pseudo metric?)
 Problems for decomposition
 [ ] PathClasses contain additional vertices not belonging to path.
 [ ] With more layers, we might get empty path classes.
+
+[ ] Explorer will handle N spaces. On each space we have N_k solutions. 
+[ ] Input: A selection.
+

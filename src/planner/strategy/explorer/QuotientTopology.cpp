@@ -1,66 +1,54 @@
-#include "q_rrt.h"
-#include "common.h"
-#include "planner/cspace/validitychecker/validity_checker_ompl.h"
-
+#include "QuotientTopology.h"
 #include <ompl/tools/config/SelfConfig.h>
-//#include <ompl/datastructures/PDF.h>
-//#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
-//#include <ompl/base/goals/GoalSampleableRegion.h>
-#include <boost/foreach.hpp>
-#include <boost/graph/graphviz.hpp>
 
 using namespace og;
 using namespace ob;
 #define foreach BOOST_FOREACH
 
-QRRT::QRRT(const ob::SpaceInformationPtr &si, Quotient *parent_ ):
+QuotientTopology::QuotientTopology(const ob::SpaceInformationPtr &si, Quotient *parent_ ):
   BaseT(si, parent_)
 {
-  setName("QRRT"+std::to_string(id));
-  Planner::declareParam<double>("range", this, &QRRT::setRange, &QRRT::getRange, "0.:1.:10000.");
-  Planner::declareParam<double>("goal_bias", this, &QRRT::setGoalBias, &QRRT::getGoalBias, "0.:.1:1.");
+  setName("QuotientTopology"+std::to_string(id));
+  Planner::declareParam<double>("range", this, &QuotientTopology::setRange, &QuotientTopology::getRange, "0.:1.:10000.");
+  Planner::declareParam<double>("goal_bias", this, &QuotientTopology::setGoalBias, &QuotientTopology::getGoalBias, "0.:.1:1.");
   q_random = new Configuration(Q1);
 }
 
-QRRT::~QRRT()
+QuotientTopology::~QuotientTopology()
 {
   DeleteConfiguration(q_random);
 }
 
-void QRRT::setGoalBias(double goalBias_)
+void QuotientTopology::setGoalBias(double goalBias_)
 {
   goalBias = goalBias_;
 }
-double QRRT::getGoalBias() const
+double QuotientTopology::getGoalBias() const
 {
   return goalBias;
 }
-void QRRT::setRange(double maxDistance_)
+void QuotientTopology::setRange(double maxDistance_)
 {
   maxDistance = maxDistance_;
 }
-double QRRT::getRange() const
+double QuotientTopology::getRange() const
 {
   return maxDistance;
 }
 
-void QRRT::setup()
+void QuotientTopology::setup()
 {
   BaseT::setup();
   ompl::tools::SelfConfig sc(Q1, getName());
   sc.configurePlannerRange(maxDistance);
-  //const double base = 2;
-  //const double normalizer = powf(base, level);
-  //epsilon = 0.1/normalizer;
-
   goal = pdef_->getGoal().get();
 }
-void QRRT::clear()
+void QuotientTopology::clear()
 {
   BaseT::clear();
 }
 
-bool QRRT::GetSolution(ob::PathPtr &solution)
+bool QuotientTopology::GetSolution(ob::PathPtr &solution)
 {
   if(hasSolution){
     bool baset_sol = BaseT::GetSolution(solution);
@@ -73,13 +61,12 @@ bool QRRT::GetSolution(ob::PathPtr &solution)
   }
 }
 
-void QRRT::Grow(double t){
+void QuotientTopology::Grow(double t){
   if(firstRun){
     Init();
     firstRun = false;
   }
 
-  std::cout << "QRRT: Step" << std::endl;
   if(hasSolution){
     //No Goal Biasing if we already found a solution on this quotient space
     Sample(q_random->state);
@@ -103,46 +90,31 @@ void QRRT::Grow(double t){
   {
     totalNumberOfFeasibleSamples++;
     Configuration *q_next = new Configuration(Q1, q_random->state);
-    Vertex v_next = AddConfiguration(q_next);
-    std::cout << "QRRT: AddConfig" << std::endl;
-    if(!hasSolution){
-      //only add edge if no solution exists
-      std::cout << "QRRT: AddEdge" << std::endl;
-      AddEdge(q_nearest->index, v_next);
+    v_last_added = AddConfiguration(q_next);
+    AddEdge(q_nearest->index, v_last_added);
 
-      double dist = 0.0;
+    double dist = 0.0;
+    if(!hasSolution){
       bool satisfied = goal->isSatisfied(q_next->state, &dist);
       if(satisfied)
       {
         v_goal = AddConfiguration(q_goal);
         AddEdge(q_nearest->index, v_goal);
-        //solution_path = GetPath(v_start, v_goal);
         hasSolution = true;
       }
+    }else{
+      Rewire(v_last_added);
     }
   }
 }
 
-double QRRT::GetImportance() const{
-  //Should depend on
-  // (1) level : The higher the level, the more importance
-  // (2) total samples: the more we already sampled, the less important it
-  // becomes
-  // (3) has solution: if it already has a solution, we should explore less
-  // (only when nothing happens on other levels)
-  // (4) vertices: the more vertices we have, the less important (let other
-  // levels also explore)
-  //
-  //exponentially more samples on level i. Should depend on ALL levels.
-  // const double base = 2;
-  // const double normalizer = powf(base, level);
-  //double N = (double)GetNumberOfVertices()/normalizer;
+double QuotientTopology::GetImportance() const{
   double N = (double)GetNumberOfVertices();
   return 1.0/(N+1);
 }
 
 //Make it faster by removing the valid check
-bool QRRT::Sample(ob::State *q_random)
+bool QuotientTopology::Sample(ob::State *q_random)
 {
   if(parent == nullptr){
     Q1_sampler->sampleUniform(q_random);
@@ -159,7 +131,7 @@ bool QRRT::Sample(ob::State *q_random)
   return true;
 }
 
-bool QRRT::SampleQuotient(ob::State *q_random_graph)
+bool QuotientTopology::SampleQuotient(ob::State *q_random_graph)
 {
   const Vertex v = boost::random_vertex(G, rng_boost);
   Q1->getStateSpace()->copyState(q_random_graph, G[v]->state);

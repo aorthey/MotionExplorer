@@ -227,6 +227,7 @@ void MotionPlanner::InitStrategy()
   strategy_input.cspace_stratifications = cspace_stratifications;
   strategy->Init(strategy_input);
 }
+
 void MotionPlanner::Step()
 {
   if(!active) return;
@@ -243,6 +244,7 @@ void MotionPlanner::Step()
   strategy->Step(output);
   output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
 }
+
 void MotionPlanner::StepOneLevel()
 {
   if(!active) return;
@@ -268,6 +270,7 @@ void MotionPlanner::StepOneLevel()
     numberOfSolutionPathsCurrentLevel = hierarchy->NumberNodesOnLevel(current_level+2);
   }
 }
+
 void MotionPlanner::AdvanceUntilSolution()
 {
   if(!active) return;

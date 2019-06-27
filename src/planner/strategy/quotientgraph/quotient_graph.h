@@ -95,14 +95,14 @@ namespace ompl
         struct GraphBundle{
           std::string name{"quotient_graph"};
         };
-        typedef boost::adjacency_list<
+        using Graph = boost::adjacency_list<
            boost::vecS, 
            boost::vecS, 
            boost::undirectedS,
            Configuration*,
            EdgeInternalState,
            GraphBundle
-         > Graph;
+         >;
 
         typedef boost::graph_traits<Graph> BGT;
         typedef BGT::vertex_descriptor Vertex;
@@ -131,13 +131,13 @@ namespace ompl
 
         virtual void getPlannerData(ob::PlannerData &data) const override;
         virtual double GetImportance() const override;
-        void Init();
+        virtual void Init();
 
         virtual void setup() override;
         virtual void clear() override;
         void clearQuery();
         virtual void ClearVertices();
-        void DeleteConfiguration(Configuration *q);
+        virtual void DeleteConfiguration(Configuration *q);
 
         template <template <typename T> class NN>
         void setNearestNeighbors();
