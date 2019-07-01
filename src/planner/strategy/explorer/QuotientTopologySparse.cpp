@@ -75,14 +75,14 @@ void QuotientTopologySparse::Grow(double t)
 
     BaseT::Grow(t);
 
-    Configuration *q_last = graphDense_[v_last_added];
+    // Configuration *q_last = graphDense_[v_last_added];
 
-    findGraphNeighbors(q_last, graphNeighborhood, visibleNeighborhood);
+    // findGraphNeighbors(q_last, graphNeighborhood, visibleNeighborhood);
 
-    if (checkAddCoverage(q_last->state, visibleNeighborhood))
-    {
-        addGuard(si_->cloneState(q_last->state), COVERAGE);
-    }
+    // if (checkAddCoverage(q_last->state, visibleNeighborhood))
+    // {
+    //     addGuard(si_->cloneState(q_last->state), COVERAGE);
+    // }
 
     // {
     //     if (!checkAddConnectivity(qNew, visibleNeighborhood))

@@ -79,7 +79,7 @@ void QRRT::Grow(double t){
     firstRun = false;
   }
 
-  std::cout << "QRRT: Step" << std::endl;
+  // std::cout << "QRRT: Step" << std::endl;
   if(hasSolution){
     //No Goal Biasing if we already found a solution on this quotient space
     Sample(q_random->state);
@@ -104,10 +104,10 @@ void QRRT::Grow(double t){
     totalNumberOfFeasibleSamples++;
     Configuration *q_next = new Configuration(Q1, q_random->state);
     Vertex v_next = AddConfiguration(q_next);
-    std::cout << "QRRT: AddConfig" << std::endl;
+    // std::cout << "QRRT: AddConfig" << std::endl;
     if(!hasSolution){
       //only add edge if no solution exists
-      std::cout << "QRRT: AddEdge" << std::endl;
+      // std::cout << "QRRT: AddEdge" << std::endl;
       AddEdge(q_nearest->index, v_next);
 
       double dist = 0.0;
