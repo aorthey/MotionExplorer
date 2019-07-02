@@ -94,7 +94,7 @@ void QuotientTopology::Grow(double t){
       bool satisfied = goal->isSatisfied(q_next->state, &dist);
       if(satisfied)
       {
-        v_goal = AddConfiguration(q_goal);
+        v_goal = AddConfiguration(q_goal, true);
         AddEdge(q_nearest, q_goal);
         hasSolution = true;
       }

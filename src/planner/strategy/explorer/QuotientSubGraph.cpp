@@ -15,9 +15,11 @@ QuotientSubGraph::QuotientSubGraph(const ob::SpaceInformationPtr &si, Quotient *
 {
   graphSparse_ = graphDense_.create_subgraph();
   setName("QuotientSubGraph");
-  specs_.recognizedGoal = ob::GOAL_SAMPLEABLE_REGION;
-  specs_.approximateSolutions = false;
-  specs_.optimizingPaths = false;
+  // specs_.recognizedGoal = ob::GOAL_SAMPLEABLE_REGION;
+  // specs_.approximateSolutions = false;
+  // specs_.optimizingPaths = false;
+  Planner::declareParam<double>("sparse_delta_fraction", this, &QuotientSubGraph::setSparseDeltaFraction,
+                                &QuotientSubGraph::getSparseDeltaFraction, "0.0:0.01:1.0");
 
   if (!isSetup())
   {
@@ -65,6 +67,8 @@ void QuotientSubGraph::setup()
                                return Distance(a, b);
                              });
   }
+  double maxExt = si_->getMaximumExtent();
+  sparseDelta_ = sparseDeltaFraction_ * maxExt;
   if (pdef_){
     BaseT::setup();
     if (pdef_->hasOptimizationObjective()){
@@ -79,25 +83,27 @@ void QuotientSubGraph::setup()
     setup_ = false;
   }
 }
+
 void QuotientSubGraph::clear()
 {
   BaseT::clear();
-  if(nearestDense_) nearestDense_->clear();
-  if(nearestSparse_) nearestSparse_->clear();
 
-  foreach (Vertex v, boost::vertices(graphDense_)){
-    graphDense_[v]->Remove(Q1);
-  }
-
+  // foreach (Vertex v, boost::vertices(graphDense_)){
+  //   graphDense_[v]->Remove(Q1);
+  // }
   for(auto it = graphDense_.m_children.begin(); it != graphDense_.m_children.end(); it++)
   {
     (*it)->m_graph.clear();
   }
   graphDense_.m_graph.clear();
+  graphSparse_.m_graph.clear();
 
+  if(nearestDense_) nearestDense_->clear();
+  if(nearestSparse_) nearestSparse_->clear();
   vertexToIndexStdMap.clear();
   indexToVertexStdMap.clear();
   index_ctr = 0;
+  firstRun = true;
 }
 
 const QuotientSubGraph::Configuration* QuotientSubGraph::Nearest(const Configuration* q) const
@@ -105,7 +111,7 @@ const QuotientSubGraph::Configuration* QuotientSubGraph::Nearest(const Configura
   return nearestDense_->nearest(const_cast<Configuration*>(q));
 }
 
-QuotientSubGraph::Vertex QuotientSubGraph::AddConfiguration(Configuration *q)
+QuotientSubGraph::Vertex QuotientSubGraph::AddConfiguration(Configuration *q, bool force_add_to_sparse)
 {
   Vertex v = boost::add_vertex(graphDense_);
   graphDense_[v] = q;
@@ -115,14 +121,42 @@ QuotientSubGraph::Vertex QuotientSubGraph::AddConfiguration(Configuration *q)
   put(indexToVertex, index_ctr, v);
   index_ctr++;
 
-  AddConfigurationConditionalSparse(v);
+  if(force_add_to_sparse){
+    AddConfigurationSparse(v);
+  }else{
+    AddConfigurationConditionalSparse(v);
+  }
   return v;
 }
 
 void QuotientSubGraph::AddConfigurationConditionalSparse(const Vertex &v)
 {
-  const Vertex vl = add_vertex(graphDense_.global_to_local(v), graphSparse_);
-  nearestSparse_->add(graphSparse_[vl]);
+  std::vector<Configuration*> graphNeighborhood;
+  std::vector<Configuration*> visibleNeighborhood;
+  Configuration *q = graphDense_[v];
+  findGraphNeighbors(q, graphNeighborhood, visibleNeighborhood);
+
+  if(visibleNeighborhood.empty())
+  {
+    AddConfigurationSparse(v);
+  }
+
+}
+void QuotientSubGraph::AddConfigurationSparse(const Vertex &v)
+{
+    const Vertex vl = add_vertex(graphDense_.global_to_local(v), graphSparse_);
+    nearestSparse_->add(graphSparse_[vl]);
+}
+
+void QuotientSubGraph::findGraphNeighbors(Configuration *q, std::vector<Configuration*> &graphNeighborhood,
+                                                   std::vector<Configuration*> &visibleNeighborhood)
+{
+    visibleNeighborhood.clear();
+    nearestSparse_->nearestR(q, sparseDelta_, graphNeighborhood);
+
+    for (Configuration* qn : graphNeighborhood)
+        if (Q1->checkMotion(q->state, qn->state))
+            visibleNeighborhood.push_back(qn);
 }
 
 
@@ -296,6 +330,7 @@ void QuotientSubGraph::Init()
     if (st != nullptr){
       q_goal = new Configuration(Q1, st);
       q_goal->isGoal = true;
+      v_goal = AddConfiguration(q_goal);
     }
   }
   if (q_goal == nullptr){
@@ -331,14 +366,14 @@ void QuotientSubGraph::getPlannerData(ob::PlannerData &data) const
 {
   BaseT::getPlannerData(data);
 
-  const SubGraph &graph = graphDense_;
+  const SubGraph &graph = graphSparse_;
 
+  // Vertex v_start = graphDense_.global_to_local(v_start);
   PlannerDataVertexAnnotated pstart(graph[v_start]->state);
   data.addStartVertex(pstart);
-  if(hasSolution){
-    PlannerDataVertexAnnotated pgoal(graph[v_goal]->state);
-    data.addGoalVertex(pgoal);
-  }
+
+  // PlannerDataVertexAnnotated pgoal(graph[v_goal]->state);
+  // data.addGoalVertex(pgoal);
 
   foreach (const Vertex v, boost::vertices(graph))
   {

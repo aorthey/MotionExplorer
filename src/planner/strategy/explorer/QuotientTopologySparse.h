@@ -168,8 +168,6 @@ namespace ompl
         /** \brief Check that the query vertex is initialized (used for internal nearest neighbor searches) */
         void checkQueryStateInitialization();
 
-        /** \brief Checks to see if the sample needs to be added to ensure coverage of the space */
-        bool checkAddCoverage(const base::State *qNew, std::vector<Configuration*> &visibleNeighborhood);
         virtual void Init();
 
         // /** \brief Checks to see if the sample needs to be added to ensure connectivity */
@@ -183,8 +181,6 @@ namespace ompl
         // /** \brief Checks vertex v for short paths through its region and adds when appropriate. */
         // bool checkAddPath(Vertex v);
 
-        void findGraphNeighbors(Configuration *q, std::vector<Configuration*> &graphNeighborhood,
-                                std::vector<Configuration*> &visibleNeighborhood);
 
         // /** \brief Approaches the graph from a given vertex */
         // void approachGraph(Vertex v);
@@ -218,10 +214,6 @@ namespace ompl
         // /** \brief When a new guard is added at state st, finds all guards who must abandon their interface
         //  * information and deletes that information */
         // void abandonLists(base::State *st);
-
-        /** \brief Construct a guard for a given state (\e state) and store it in the nearest neighbors data
-         * structure */
-        Vertex addGuard(base::State *state, GuardType type);
 
         // /** \brief Connect two guards in the roadmap */
         // void connectGuards(Vertex v, Vertex vp);

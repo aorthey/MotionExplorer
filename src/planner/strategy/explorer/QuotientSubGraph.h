@@ -29,17 +29,6 @@ namespace ompl
             Configuration(const ob::SpaceInformationPtr &si);
             Configuration(const ob::SpaceInformationPtr &si, const ob::State *state_);
             ob::State *state{nullptr};
-            bool on_shortest_path{false};
-
-            void *pdf_element;
-            void SetPDFElement(void *element_)
-            {
-              pdf_element = element_;
-            }
-            void* GetPDFElement()
-            {
-              return pdf_element;
-            }
             void Remove(const base::SpaceInformationPtr &si)
             {
               if(state) si->freeState(state);
@@ -106,8 +95,10 @@ namespace ompl
         virtual bool Sample(ob::State *q_random) override;
 
         virtual void DeleteConfiguration(Configuration *q);
-        virtual Vertex AddConfiguration(Configuration *q);
+        virtual Vertex AddConfiguration(Configuration *q, bool force_add_to_sparse=false);
         void AddConfigurationConditionalSparse(const Vertex &v);
+        void AddConfigurationSparse(const Vertex &v);
+
         void AddEdge(const Configuration* q1, const Configuration* q2);
         virtual double Distance(const Configuration* a, const Configuration* b) const; // standard si->distance
 
@@ -131,7 +122,22 @@ namespace ompl
 
         normalized_index_type index_ctr{0};
 
+        //Copied from SPARS
+        void findGraphNeighbors(Configuration *q, std::vector<Configuration*> &graphNeighborhood,
+                                std::vector<Configuration*> &visibleNeighborhood);
+        bool checkAddCoverage(const base::State *qNew, std::vector<Configuration*> &visibleNeighborhood);
     protected:
+        double sparseDelta_{0.};
+        double sparseDeltaFraction_{.25};
+
+        void setSparseDeltaFraction(double D)
+        {
+            sparseDeltaFraction_ = D;
+        }
+        double getSparseDeltaFraction() const
+        {
+            return sparseDeltaFraction_;
+        }
 
         SubGraph graphSparse_;
         SubGraph graphDense_;

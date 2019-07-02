@@ -95,16 +95,6 @@ void QuotientTopologySparse::Grow(double t)
     // }
 }
 
-bool QuotientTopologySparse::checkAddCoverage(const base::State *qNew, std::vector<Configuration*> &visibleNeighborhood)
-{
-  return visibleNeighborhood.empty();
-    // if (!visibleNeighborhood.empty())
-    //     return false;
-    // // No free paths means we add for coverage
-    // addGuard(si_->cloneState(qNew), COVERAGE);
-    // return true;
-}
-
 // bool QuotientTopologySparse::checkAddConnectivity(const base::State *qNew, std::vector<Vertex> &visibleNeighborhood)
 // {
 //     std::vector<Vertex> links;
@@ -261,17 +251,6 @@ bool QuotientTopologySparse::checkAddCoverage(const base::State *qNew, std::vect
 // {
 //     consecutiveFailures_ = 0;
 // }
-
-void QuotientTopologySparse::findGraphNeighbors(Configuration *q, std::vector<Configuration*> &graphNeighborhood,
-                                                   std::vector<Configuration*> &visibleNeighborhood)
-{
-    visibleNeighborhood.clear();
-    nearestSparse_->nearestR(q, sparseDelta_, graphNeighborhood);
-
-    for (Configuration* qn : graphNeighborhood)
-        if (si_->checkMotion(q->state, qn->state))
-            visibleNeighborhood.push_back(qn);
-}
 
 // void QuotientTopologySparse::approachGraph(Vertex v)
 // {
@@ -465,21 +444,6 @@ void QuotientTopologySparse::findGraphNeighbors(Configuration *q, std::vector<Co
 //             interfaceDataProperty_[v][r].clear(si_);
 //     }
 // }
-
-QuotientTopologySparse::Vertex QuotientTopologySparse::addGuard(base::State *state, GuardType type)
-{
-    Configuration* q_guard = new Configuration(Q1, state);
-    Vertex v_guard = AddConfiguration(q_guard);
-
-//     G[v_guard]->colorProperty = type;
-
-//     abandonLists(state);
-
-//     disjointSets_.make_set(m);
-//     nn_->add(m);
-
-    return v_guard;
-}
 
 // void QuotientTopologySparse::connectGuards(Vertex v, Vertex vp)
 // {
