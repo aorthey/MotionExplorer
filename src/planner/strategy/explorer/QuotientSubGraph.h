@@ -1,6 +1,7 @@
 #pragma once
 
 #include "planner/strategy/quotientgraph/quotient_graph.h"
+#include <boost/graph/subgraph.hpp>
 
 namespace ob = ompl::base;
 namespace og = ompl::geometric;
@@ -46,6 +47,11 @@ namespace ompl
 
         virtual void DeleteConfiguration(Configuration *q) override;
         virtual Vertex AddConfiguration(Configuration *q) override;
+        void AddConfigurationConditionalSparse(const Vertex &v);
+        void AddEdge(const Configuration* q1, const Configuration* q2);
+
+        virtual void setup() override;
+        virtual void clear() override;
 
     protected:
 

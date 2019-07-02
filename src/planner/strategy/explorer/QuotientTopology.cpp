@@ -91,7 +91,7 @@ void QuotientTopology::Grow(double t){
     totalNumberOfFeasibleSamples++;
     Configuration *q_next = new Configuration(Q1, q_random->state);
     v_last_added = AddConfiguration(q_next);
-    AddEdge(q_nearest->index, v_last_added);
+    AddEdge(q_nearest, graphDense_[v_last_added]);
 
     double dist = 0.0;
     if(!hasSolution){
@@ -99,7 +99,7 @@ void QuotientTopology::Grow(double t){
       if(satisfied)
       {
         v_goal = AddConfiguration(q_goal);
-        AddEdge(q_nearest->index, v_goal);
+        AddEdge(q_nearest, q_goal);
         hasSolution = true;
       }
     }else{

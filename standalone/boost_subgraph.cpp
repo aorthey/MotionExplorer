@@ -101,6 +101,10 @@ Vertex AddVertex(SubGraph &G, std::string name)
   G[v].name = name;
   return v;
 }
+Vertex AddVertexFromSubGraphToSubGraph(const Vertex &v, SubGraph &G1, SubGraph &G2)
+{
+  return add_vertex(G1.local_to_global(v), G2);
+}
 
 Edge AddEdge(SubGraph &G, const Vertex v, const Vertex w, std::string name = "")
 {
@@ -124,12 +128,16 @@ int main(int argc,const char** argv)
   // G1  G2                         |
 
   //(1) Insert into G1 (inserts automatically into G0)
+  const Vertex v0 = AddVertex(G0, "[NULL]");
   const Vertex vI = AddVertex(G1, "xI");
   const Vertex vG = AddVertex(G1, "xG");
 
   //(2) Later, we like to insert the same vertices also to G2
-  add_vertex(vI, G2);
-  add_vertex(vG, G2);
+  AddVertexFromSubGraphToSubGraph(vI, G1, G2);
+  AddVertexFromSubGraphToSubGraph(vG, G1, G2);
+
+  // add_vertex(G0.global_to_local(v0), G1);
+  add_vertex(v0, G1);
 
   //(3) Let us add some subgraph structure to G1 (automatically added to G0)
   const Vertex v1 = AddVertex(G1, "A");
@@ -147,10 +155,12 @@ int main(int argc,const char** argv)
   AddEdge(G2, v4, v5);
   AddEdge(G2, v5, vG);
 
+
   //(5) insert edge into G1 and G2 (works because both vertices are each in G1 and
   //G2) --- but we should probably not do it, because can never be sure that it
   //will insert an edge into every graph
-  AddEdge(G0, vI, vG);
+  // AddEdge(G0, vI, vG);
+  AddEdge(G0, G1.local_to_global(vI), G1.local_to_global(vG));
 
   std::cout << G0 << std::endl;
   std::cout << G1 << std::endl;

@@ -13,7 +13,6 @@
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/random.hpp> 
-#include <boost/graph/subgraph.hpp>
 #include <boost/graph/properties.hpp>
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -139,8 +138,8 @@ namespace ompl
         virtual void ClearVertices();
         virtual void DeleteConfiguration(Configuration *q);
 
-        template <template <typename T> class NN>
-        void setNearestNeighbors();
+        // template <template <typename T> class NN>
+        // void setNearestNeighbors();
 
         virtual void uniteComponents(Vertex m1, Vertex m2);
         bool sameComponent(Vertex m1, Vertex m2);

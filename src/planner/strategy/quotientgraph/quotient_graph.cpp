@@ -54,9 +54,6 @@ void QuotientGraph::setup(){
                                return Distance(a, b);
                              });
   }
-  // if (!connectionStrategy_){
-  //   connectionStrategy_ = KStrategy<const Configuration*>(magic::DEFAULT_NEAREST_NEIGHBORS, nearest_datastructure);
-  // }
 
   if (pdef_){
     BaseT::setup();
@@ -288,18 +285,18 @@ ob::Cost QuotientGraph::costHeuristic(Vertex u, Vertex v) const
 }
 
 
-template <template <typename T> class NN>
-void QuotientGraph::setNearestNeighbors()
-{
-  if (nearest_datastructure && nearest_datastructure->size() == 0)
-      OMPL_WARN("Calling setNearestNeighbors will clear all states.");
-  clear();
-  nearest_datastructure = std::make_shared<NN<ob::State*>>();
-  //connectionStrategy_ = ConnectionStrategy();
-  if(!isSetup()){
-    setup();
-  }
-}
+//template <template <typename T> class NN>
+//void QuotientGraph::setNearestNeighbors()
+//{
+//  if (nearest_datastructure && nearest_datastructure->size() == 0)
+//      OMPL_WARN("Calling setNearestNeighbors will clear all states.");
+//  clear();
+//  nearest_datastructure = std::make_shared<NN<ob::State*>>();
+//  //connectionStrategy_ = ConnectionStrategy();
+//  if(!isSetup()){
+//    setup();
+//  }
+//}
 
 double QuotientGraph::Distance(const Configuration* a, const Configuration* b) const
 {
