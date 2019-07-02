@@ -127,9 +127,9 @@ namespace ompl
         virtual void Grow(double t) = 0;
         virtual bool SampleQuotient(ob::State*) override;
         virtual bool GetSolution(ob::PathPtr &solution) override;
-
         virtual void getPlannerData(ob::PlannerData &data) const override;
         virtual double GetImportance() const override;
+
         virtual void Init();
 
         virtual void setup() override;

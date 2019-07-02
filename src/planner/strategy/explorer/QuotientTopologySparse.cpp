@@ -43,25 +43,8 @@ void QuotientTopologySparse::setup()
 void QuotientTopologySparse::clear()
 {
     BaseT::clear();
-    iterations_ = 0;
-    bestCost_ = base::Cost(std::numeric_limits<double>::quiet_NaN());
-    freeMemory();
 }
 
-void QuotientTopologySparse::freeMemory()
-{
-    BaseT::clear();
-
-    foreach (Vertex v, boost::vertices(graphSparse_))
-    {
-        // foreach (InterfaceData &d, interfaceDataProperty_[v] | boost::adaptors::map_values)
-        //     d.clear(si_);
-        if (graphSparse_[v] != nullptr)
-            si_->freeState(graphSparse_[v]->state);
-        graphSparse_[v] = nullptr;
-    }
-    graphSparse_.m_graph.clear();
-}
 
 void QuotientTopologySparse::Init()
 {
@@ -544,15 +527,6 @@ QuotientTopologySparse::Vertex QuotientTopologySparse::addGuard(base::State *sta
 //             data.addVertex(base::PlannerDataVertex(graphSparse_[n], (int)colorProperty_[n]));
 // }
 
-void QuotientTopologySparse::getPlannerData(ob::PlannerData &data) const
-{
-  BaseT::getPlannerData(data);
-  foreach (const Vertex v, boost::vertices(graphSparse_))
-  {
-    PlannerDataVertexAnnotated p(G[v]->state);
-    data.addVertex(p);
-  }
-}
 ompl::base::Cost QuotientTopologySparse::costHeuristic(Vertex u, Vertex v) const
 {
     return opt_->motionCostHeuristic(graphSparse_[u]->state, graphSparse_[v]->state);

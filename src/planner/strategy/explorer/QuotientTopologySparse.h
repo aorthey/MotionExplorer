@@ -162,11 +162,8 @@ namespace ompl
         virtual void setup() override;
         virtual void clear() override;
 
-        void getPlannerData(base::PlannerData &data) const override;
 
     protected:
-        /** \brief Free all the memory allocated by the planner */
-        void freeMemory();
 
         /** \brief Check that the query vertex is initialized (used for internal nearest neighbor searches) */
         void checkQueryStateInitialization();

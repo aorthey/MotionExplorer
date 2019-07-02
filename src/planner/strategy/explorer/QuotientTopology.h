@@ -23,8 +23,6 @@ namespace ompl
         virtual ~QuotientTopology() override;
         virtual void Grow(double t) override;
         virtual bool GetSolution(ob::PathPtr &solution) override;
-        double GetImportance() const override;
-        virtual bool Sample(ob::State *q_random) override;
 
         virtual void setup() override;
         virtual void clear() override;
@@ -47,7 +45,6 @@ namespace ompl
 
         ob::Goal *goal;
 
-        virtual bool SampleQuotient(ob::State*) override;
 
     };
 

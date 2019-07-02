@@ -51,11 +51,7 @@ void QuotientTopology::clear()
 bool QuotientTopology::GetSolution(ob::PathPtr &solution)
 {
   if(hasSolution){
-    bool baset_sol = BaseT::GetSolution(solution);
-    if(baset_sol){
-      shortestPathVertices = shortestVertexPath_;
-    }
-    return baset_sol;
+    return BaseT::GetSolution(solution);
   }else{
     return false;
   }
@@ -103,37 +99,8 @@ void QuotientTopology::Grow(double t){
         hasSolution = true;
       }
     }else{
-      Rewire(v_last_added);
+      // Rewire(v_last_added);
     }
   }
 }
 
-double QuotientTopology::GetImportance() const{
-  double N = (double)GetNumberOfVertices();
-  return 1.0/(N+1);
-}
-
-//Make it faster by removing the valid check
-bool QuotientTopology::Sample(ob::State *q_random)
-{
-  if(parent == nullptr){
-    Q1_sampler->sampleUniform(q_random);
-  }else{
-    if(X1_dimension>0)
-    {
-      X1_sampler->sampleUniform(s_X1_tmp);
-      parent->SampleQuotient(s_Q0_tmp);
-      MergeStates(s_Q0_tmp, s_X1_tmp, q_random);
-    }else{
-      parent->SampleQuotient(q_random);
-    }
-  }
-  return true;
-}
-
-bool QuotientTopology::SampleQuotient(ob::State *q_random_graph)
-{
-  const Vertex v = boost::random_vertex(G, rng_boost);
-  Q1->getStateSpace()->copyState(q_random_graph, G[v]->state);
-  return true;
-}
