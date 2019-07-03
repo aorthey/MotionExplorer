@@ -7,7 +7,6 @@
 #include "planner/strategy/quotient/multiquotient.h"
 #include "planner/strategy/explorer/Explorer.h"
 #include "planner/strategy/explorer/QuotientTopology.h"
-#include "planner/strategy/explorer/QuotientTopologySparse.h"
 //#include "planner/strategy/quotientgraph/algorithms/qmp_connect.h"
 //#include "planner/strategy/quotientgraph/algorithms/qmp.h"
 //#include "planner/strategy/quotientgraph/algorithms/q_prm.h"
@@ -184,7 +183,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     planner->setName("MotionExplorer");
 
   }else if(algorithm=="hierarchy:explorer"){
-    typedef og::MotionExplorer<og::QuotientTopologySparse> MotionExplorer;
+    typedef og::MotionExplorer<og::QuotientTopology> MotionExplorer;
     planner = std::make_shared<MotionExplorer>(stratification->si_vec);
     static_pointer_cast<MotionExplorer>(planner)->setProblemDefinition(stratification->pdef_vec);
     planner->setName("MotionExplorer");

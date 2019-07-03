@@ -1,5 +1,6 @@
 #include "QuotientTopology.h"
 #include <ompl/tools/config/SelfConfig.h>
+#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 
 using namespace og;
 using namespace ob;
@@ -86,16 +87,16 @@ void QuotientTopology::Grow(double t){
   {
     totalNumberOfFeasibleSamples++;
     Configuration *q_next = new Configuration(Q1, q_random->state);
-    v_last_added = AddConfiguration(q_next);
-    AddEdge(q_nearest, graphDense_[v_last_added]);
+    Vertex v_next = AddConfiguration(q_next);
+    AddEdge(q_nearest->index, v_next);
 
     double dist = 0.0;
     if(!hasSolution){
       bool satisfied = goal->isSatisfied(q_next->state, &dist);
       if(satisfied)
       {
-        v_goal = AddConfiguration(q_goal, true);
-        AddEdge(q_nearest, q_goal);
+        v_goal = AddConfiguration(q_goal);
+        AddEdge(q_nearest->index, q_goal->index);
         hasSolution = true;
       }
     }else{

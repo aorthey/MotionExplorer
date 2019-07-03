@@ -1,5 +1,5 @@
 #pragma once
-#include "QuotientSubGraph.h"
+#include "QuotientGraphSparse.h"
 #include <ompl/datastructures/PDF.h>
 
 namespace ob = ompl::base;
@@ -14,9 +14,9 @@ namespace ompl
   namespace geometric
   {
     //QuotientTopology 
-    class QuotientTopology: public og::QuotientSubGraph{
+    class QuotientTopology: public og::QuotientGraphSparse{
 
-      typedef og::QuotientSubGraph BaseT;
+      typedef og::QuotientGraphSparse BaseT;
       public:
 
         QuotientTopology(const ob::SpaceInformationPtr &si, Quotient *parent_);
