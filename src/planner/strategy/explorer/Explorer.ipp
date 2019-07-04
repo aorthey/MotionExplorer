@@ -1,4 +1,5 @@
 #include "elements/plannerdata_vertex_annotated.h"
+#include "QuotientGraphSparse.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/SO3StateSpace.h>
 #include <ompl/util/Time.h>
@@ -117,6 +118,7 @@ void MotionExplorer<T>::getPlannerData(ob::PlannerData &data) const
     for (unsigned int k = 0; k < K; k++)
     {
         og::Quotient *Qk = quotientSpaces_.at(k);
+        static_cast<QuotientGraphSparse*>(Qk)->enumerateAllPaths();
         Qk->getPlannerData(data);
 
         // label all new vertices
@@ -125,7 +127,6 @@ void MotionExplorer<T>::getPlannerData(ob::PlannerData &data) const
         {
             PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated *>(&data.getVertex(vidx));
             v.SetLevel(k);
-            v.SetPath( std::vector<int>(k+1));
             v.SetMaxLevel(K);
 
             ob::State *s_lift = Qk->getSpaceInformation()->cloneState(v.getState());

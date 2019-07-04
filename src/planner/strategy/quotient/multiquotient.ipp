@@ -1,4 +1,5 @@
 #include "elements/plannerdata_vertex_annotated.h"
+#include "common.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/SO3StateSpace.h>
 #include <ompl/util/Time.h>
@@ -228,8 +229,6 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const
     uint ctr = 0;
     for(uint vidx = Nvertices; vidx < data.numVertices(); vidx++){
       PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
-      v.SetLevel(k);
-      v.SetPath( std::vector<int>(k+1));
       v.SetMaxLevel(K);
 
       ob::State *s_lift = Qk->getSpaceInformation()->cloneState(v.getState());

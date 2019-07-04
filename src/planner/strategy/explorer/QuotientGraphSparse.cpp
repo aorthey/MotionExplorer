@@ -1,4 +1,5 @@
 #include "QuotientGraphSparse.h"
+#include "common.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/geometric/PathGeometric.h>
@@ -62,22 +63,23 @@ void QuotientGraphSparse::clear()
 void QuotientGraphSparse::Init()
 {
   BaseT::Init();
+  v_goal = AddConfiguration(q_goal);
 }
 
 QuotientGraphSparse::Vertex QuotientGraphSparse::AddConfiguration(Configuration *q)
 {
   Vertex v = BaseT::AddConfiguration(q);
 
-  std::vector<Configuration*> graphNeighborhood;
-  std::vector<Configuration*> visibleNeighborhood;
   findGraphNeighbors(q, graphNeighborhood, visibleNeighborhood);
 
   if(visibleNeighborhood.empty())
   {
     AddConfigurationSparse(q);
-  }else if(checkAddConnectivity(q, visibleNeighborhood)){
   }else{
-
+    if(!checkAddConnectivity(q, visibleNeighborhood)){
+      if (!checkAddInterface(q, graphNeighborhood, visibleNeighborhood)){
+      }
+    }
   }
 
   return v;
@@ -105,8 +107,6 @@ void QuotientGraphSparse::findGraphNeighbors(Configuration *q, std::vector<Confi
 }
 void QuotientGraphSparse::AddEdgeSparse(const Vertex a, const Vertex b)
 {
-  Q1->printState(graphSparse_[a]->state);
-  Q1->printState(graphSparse_[b]->state);
   ob::Cost weight = opt_->motionCost(graphSparse_[a]->state, graphSparse_[b]->state);
   EdgeInternalState properties(weight);
   boost::add_edge(a, b, properties, graphSparse_);
@@ -152,6 +152,41 @@ bool QuotientGraphSparse::checkAddConnectivity(Configuration* q, std::vector<Con
     }
     return false;
 }
+bool QuotientGraphSparse::checkAddInterface(Configuration *q,
+    std::vector<Configuration*> &graphNeighborhood, 
+    std::vector<Configuration*> &visibleNeighborhood)
+{
+    // If we have more than 1 or 0 neighbors
+    if (visibleNeighborhood.size() > 1)
+    {
+        Configuration *qn0 = graphNeighborhood[0];
+        Configuration *qn1 = graphNeighborhood[1];
+        Configuration *qv0 = visibleNeighborhood[0];
+        Configuration *qv1 = visibleNeighborhood[1];
+
+        if (qn0 == qv0 && qn1 == qv1){
+            // If our two closest neighbors don't share an edge
+            if (!boost::edge(qv0->index, qv1->index, graphSparse_).second)
+            {
+                // If they can be directly connected
+                if (si_->checkMotion(qv0->state, qv1->state))
+                {
+                    AddEdgeSparse(qv0->index, qv1->index);
+                }else{
+                  // Add the new node to the graph, to bridge the interface
+                  // Vertex v = addGuard(si_->cloneState(qNew), INTERFACE);
+                  Vertex v = AddConfigurationSparse(q);
+                  AddEdgeSparse(v, qv0->index);
+                  AddEdgeSparse(v, qv1->index);
+                }
+                // Report success
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 
 
 //############################################################################
@@ -179,11 +214,77 @@ void QuotientGraphSparse::Rewire()
   Vertex v = boost::random_vertex(G, rng_boost);
   return Rewire(v);
 }
+
+
+
+// A recursive function to print all paths from 'u' to 'd'.
+// visited[] keeps track of vertices in current path.
+// path[] stores actual vertices and path_index is current
+// index in path[]
+void QuotientGraphSparse::printAllPathsUtil(Vertex u, Vertex d, bool visited[],
+                            int path[], int &path_index) 
+{
+    // Mark the current node and store it in path[]
+    visited[u] = true;
+    path[path_index] = u;
+    path_index++;
+
+    // If current vertex is same as destination, then print
+    // current path[]
+    if (u == d)
+    {
+        std::vector<Vertex> pp;
+        for (int i = 0; i<path_index; i++){
+            pp.push_back(path[i]);
+            cout << path[i] << " ";
+        }
+        pathStack_.push_back(pp);
+        cout << endl;
+
+    }
+    else // If current vertex is not destination
+    {
+        // Recur for all the vertices adjacent to current vertex
+        OEIterator ei, ei_end;
+        for (boost::tie(ei, ei_end) = boost::out_edges(u, graphSparse_); ei != ei_end; ++ei) {
+          Vertex source = boost::source ( *ei, graphSparse_ );
+          Vertex target = boost::target ( *ei, graphSparse_ );
+          Vertex vnext = (source==u? target: source);
+          if (!visited[vnext]){
+              printAllPathsUtil(vnext, d, visited, path, path_index);
+          }
+        }
+        // for (i = adj[u].begin(); i != adj[u].end(); ++i)
+        //     if (!visited[*i])
+        //         printAllPathsUtil(*i, d, visited, path, path_index);
+    }
+
+    // Remove current vertex from path[] and mark it as unvisited
+    path_index--;
+    visited[u] = false;
+}
+
+
+void QuotientGraphSparse::enumerateAllPaths() 
+{
+    int V = boost::num_vertices(graphSparse_);
+    bool *visited = new bool[V];
+
+    int *path = new int[V];
+    int path_index = 0; // Initialize path[] as empty
+
+    for (int i = 0; i < V; i++)
+        visited[i] = false;
+
+    std::cout << "enumerate all paths" << std::endl;
+    printAllPathsUtil(v_start, v_goal, visited, path, path_index);
+}
+
 void QuotientGraphSparse::getPlannerData(ob::PlannerData &data) const
 {
-  // BaseT::getPlannerData(data);
 
   PlannerDataVertexAnnotated pstart(graphSparse_[v_start]->state);
+  pstart.SetPath(std::vector<int>{0});
   data.addStartVertex(pstart);
 
   // if(hasSolution){
@@ -193,9 +294,13 @@ void QuotientGraphSparse::getPlannerData(ob::PlannerData &data) const
 
   std::cout << "Sparse Graph has " << boost::num_vertices(graphSparse_) << " vertices and "
     << boost::num_edges(graphSparse_) << " edges." << std::endl;
+
   foreach (const Vertex v, boost::vertices(graphSparse_))
   {
     PlannerDataVertexAnnotated p(graphSparse_[v]->state);
+    p.SetLevel(level);
+    p.SetPath(std::vector<int>{0});
+
     data.addVertex(p);
   }
   foreach (const Edge e, boost::edges(graphSparse_))
@@ -207,5 +312,44 @@ void QuotientGraphSparse::getPlannerData(ob::PlannerData &data) const
     PlannerDataVertexAnnotated p2(graphSparse_[v2]->state);
 
     data.addEdge(p1,p2);
+  }
+
+  uint Nhead = 3; //head -nX (to display only X top paths)
+  uint Npathsize = pathStack_.size();
+  uint Npaths = std::min(Nhead, Npathsize);
+  std::cout << "start vertex: " << v_start << std::endl;
+  std::cout << "goal  vertex: " << v_goal  << std::endl;
+  std::cout << "Found " << Npaths << " paths." << std::endl;
+  for(uint i = 0; i < Npaths; i++){
+      std::vector<int> Vpath;
+      Vpath.push_back(i+1);
+      std::vector<Vertex> pathK = (*(pathStack_.rbegin()+i));
+      std::cout << "Path " << i << ">> " << pathK << std::endl;
+      for(uint k = 0; k < pathK.size()-1; k++){
+        Vertex v1 = pathK.at(k);
+        Vertex v2 = pathK.at(k+1);
+        PlannerDataVertexAnnotated p1(Q1->cloneState(graphSparse_[v1]->state));
+        p1.SetLevel(level);
+        p1.SetPath(Vpath);
+        if(graphSparse_[v1]->isStart){
+          data.addStartVertex(p1);
+        }else if(graphSparse_[v1]->isGoal){
+          data.addGoalVertex(p1);
+        }else{
+          data.addVertex(p1);
+        }
+
+        PlannerDataVertexAnnotated p2(Q1->cloneState(graphSparse_[v2]->state));
+        p2.SetLevel(level);
+        p2.SetPath(Vpath);
+        if(graphSparse_[v2]->isStart){
+          data.addStartVertex(p2);
+        }else if(graphSparse_[v2]->isGoal){
+          data.addGoalVertex(p2);
+        }else{
+          data.addVertex(p2);
+        }
+        data.addEdge(p1,p2);
+      }
   }
 }

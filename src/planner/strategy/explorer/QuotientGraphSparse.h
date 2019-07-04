@@ -41,9 +41,13 @@ namespace ompl
         void findGraphNeighbors(Configuration *q, std::vector<Configuration*> &graphNeighborhood,
                                 std::vector<Configuration*> &visibleNeighborhood);
         bool checkAddConnectivity(Configuration* q, std::vector<Configuration*> &visibleNeighborhood);
+        bool checkAddInterface(Configuration *q, std::vector<Configuration*> &graphNeighborhood, std::vector<Configuration*> &visibleNeighborhood);
 
         void Rewire(Vertex &v);
         void Rewire();
+        void printAllPathsUtil(Vertex u, Vertex d, bool visited[], int path[], int &path_index);
+        void enumerateAllPaths();
+
     protected:
         double sparseDelta_{0.};
         double sparseDeltaFraction_{.25};
@@ -56,9 +60,12 @@ namespace ompl
         {
             return sparseDeltaFraction_;
         }
+        std::vector< std::vector<Vertex>> pathStack_;
 
         Graph graphSparse_;
         RoadmapNeighborsPtr nearestSparse_;
+        std::vector<Configuration*> graphNeighborhood;
+        std::vector<Configuration*> visibleNeighborhood;
 
         // std::vector<Vertex> shortest_path_start_goal;
         // Configuration *q_start;

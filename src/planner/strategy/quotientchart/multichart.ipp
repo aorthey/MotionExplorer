@@ -196,8 +196,6 @@ void MultiChart<T>::getPlannerData(ob::PlannerData &data) const
     v.SetLevel(k);
     v.SetPath(v.GetPath());
 
-    //v.SetPath( std::vector<int>(k+1));
-
     v.SetMaxLevel(levels);
 
     og::QuotientChart *Qk = quotientCharts.at(k);
