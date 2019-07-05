@@ -490,8 +490,8 @@ void MotionPlanner::DrawGL(GUIState& state){
       Rcurrent->DrawGL(state);
       pwl = Rcurrent->GetShortestPath();
       if(pwl){
-        pwl->linewidth = 80;
-        pwl->ptsize = 8;
+        pwl->linewidth = 100;
+        pwl->ptsize = 10;
         pwl->cSmoothed = green;
         pwl->cUnsmoothed = green;
         pwl->cVertex = green;

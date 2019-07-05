@@ -187,6 +187,8 @@ void ForceFieldBackend::RenderWorld()
       }
     }
   }
+
+
   glDisable(GL_BLEND); 
   glEnable(GL_LIGHTING);
 

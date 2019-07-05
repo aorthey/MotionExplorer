@@ -286,55 +286,39 @@ Config PathPiecewiseLinear::EvalVelocity(const double t) const{
   std::cout << "Eval could not find point for value " << t << std::endl;
   throw;
 }
-  // if(!path){
-  //   std::cout << "Cannot Eval empty path" << std::endl;
-  //   exit(0);
-  // }
-  // og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-  // ob::SpaceInformationPtr si = cspace->SpaceInformationPtr();
-  // std::vector<ob::State *> states = gpath.getStates();
 
-  // if(t<=0) return cspace->OMPLStateToConfig(states.front());
-  // if(t>=length) return cspace->OMPLStateToConfig(states.back());
+// void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
+//   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*_path);
+//   ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+//   std::vector<ob::State *> states = gpath.getStates();
 
-  // double Tcum = 0;
+//   ob::StateSpacePtr space = si->getStateSpace();
 
-  // assert(interLength.size()==states.size()-1);
+//   glDisable(GL_LIGHTING);
+//   glEnable(GL_BLEND);
+//   glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+//   glEnable(GL_LINE_SMOOTH);
+//   glPushMatrix();
 
-  // for(uint i = 0; i < interLength.size(); i++){
-  //   double Tnext = interLength.at(i);
-  //   if((Tcum+Tnext)>=t){
-  //     //t \in [Lcum, Lcum+Lnext]
-  //     double tloc = (t-Tcum)/Tnext; //tloc \in [0,1]
-
-  //     ob::State* s1 = states.at(i);
-  //     ob::State* s2 = states.at(i+1);
-  //     ob::State* sm = si->allocState();
-  //     si->getStateSpace()->interpolate(s1,s2,tloc,sm);
-  //     Config qm = cspace->OMPLStateToConfig(sm);
-  //     si->freeState(sm);
-  //     return qm;
-  //   }
-  //   Tcum+=Tnext;
-  // }
-  // //rounding errors could lead to the fact that the cumulative length is not
-  // //exactly 1. If t is sufficiently close, we just return the last keyframe.
-  // double epsilon = 1e-10;
-  // if(length-Tcum > epsilon){
-  //   std::cout << "length of path is significantly different from " << length << std::endl;
-  //   std::cout << "length    : " << Tcum << "/" << length << std::endl;
-  //   std::cout << "difference: " << length-Tcum << " > " << epsilon << std::endl;
-  //   std::cout << "choosen t : " << t << std::endl;
-  //   throw;
-  // }
-
-  // if(t>=Tcum){
-  //   return cspace->OMPLStateToConfig(states.back());
-  // }
-
-  // std::cout << "Eval could not find point for value " << t << std::endl;
-  // throw;
-
+//   glPointSize(ptsize);
+//   glLineWidth(linewidth);
+//   cLine.setCurrentGL();
+//   for(uint i = 0; i < states.size()-1; i++){
+//     ob::State* c1 = states.at(i);
+//     ob::State* c2 = states.at(i+1);
+//     Vector3 q1 = quotient_space->getXYZ(c1);
+//     Vector3 q2 = quotient_space->getXYZ(c2);
+//     if(draw_planar){
+//       q1[2] = 0.0; q2[2] = 0.0;
+//     }
+//     GLDraw::drawPoint(q1);
+//     GLDraw::drawLineSegment(q1, q2);
+//   }
+//   glPopMatrix();
+//   glDisable(GL_BLEND);
+//   glEnable(GL_LIGHTING);
+//   glLineWidth(1);
+// }
 void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*_path);
   ob::SpaceInformationPtr si = gpath.getSpaceInformation();
@@ -344,11 +328,15 @@ void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
 
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND);
+  glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+  glEnable(GL_LINE_SMOOTH);
   glPushMatrix();
 
   glPointSize(ptsize);
   glLineWidth(linewidth);
   cLine.setCurrentGL();
+
+
   for(uint i = 0; i < states.size()-1; i++){
     ob::State* c1 = states.at(i);
     ob::State* c2 = states.at(i+1);
@@ -357,8 +345,51 @@ void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
     if(draw_planar){
       q1[2] = 0.0; q2[2] = 0.0;
     }
-    GLDraw::drawPoint(q1);
-    GLDraw::drawLineSegment(q1, q2);
+
+    const Vector3 dq = q2 - q1;
+    //choose some orthonormal vector
+    Vector3 dqn;
+    dqn[0] = dq[1];
+    dqn[1] = -dq[0];
+    dqn[2] = 0;
+    std::cout << dq << "," << dqn << std::endl;
+    dqn.inplaceNormalize();
+    dqn.inplaceMul(0.08);
+
+    glPushMatrix();
+    glTranslate(q1);
+    GLDraw::drawCylinder(dq, 0.08);
+    glPopMatrix();
+    // uint res=4;
+    // glBegin(GL_QUAD_STRIP);
+    // for(uint k = 0; k < res; k++)
+    // {
+    //   double a = k*2*M_PI/res;
+    //   Matrix3 R;
+    //   AngleAxisRotation Raa(a, dq);
+    //   Raa.getMatrix(R);
+
+    //   Vector3 qq1;
+    //   R.mulTranspose(dqn, qq1);
+    //   qq1 += q1;
+
+    //   Vector3 qq2 = qq1 + dq;
+
+    //   glVertex3f(qq1[0], qq1[1], qq1[2]);
+    //   glNormal3f(dqn[0], dqn[1], dqn[2]);
+    //   glVertex3f(qq2[0], qq2[1], qq2[2]);
+    //   glNormal3f(dqn[0], dqn[1], dqn[2]);
+    // }
+    // Vector3 qq1 = dqn + q1;
+    // Vector3 qq2 = dqn + q2;
+    // glVertex3f(qq1[0], qq1[1], qq1[2]);
+    // glNormal3f(dqn[0], dqn[1], dqn[2]);
+    // glVertex3f(qq2[0], qq2[1], qq2[2]);
+    // glNormal3f(dqn[0], dqn[1], dqn[2]);
+    // glEnd();
+
+    // GLDraw::drawPoint(q1);
+    // GLDraw::drawLineSegment(q1, q2);
   }
   glPopMatrix();
   glDisable(GL_BLEND);
