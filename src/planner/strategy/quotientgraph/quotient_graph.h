@@ -154,8 +154,8 @@ namespace ompl
         ob::Cost bestCost_{+dInf};
         Configuration *q_start;
         Configuration *q_goal;
-        Vertex v_start;
-        Vertex v_goal;
+        Vertex v_start{-1LU};
+        Vertex v_goal{-1LU};
         std::vector<Vertex> shortestVertexPath_;
         std::vector<Vertex> startGoalVertexPath_;
 

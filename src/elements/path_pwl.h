@@ -36,8 +36,11 @@ class PathPiecewiseLinear
     std::vector<double> GetLengthVector() const;
     double GetLength() const;
 
+    double linewidth{20};
+    double ptsize{10};
     GLColor cVertex{magenta}, cLine{magenta};
     GLColor cSmoothed{magenta}, cUnsmoothed{red};
+
     virtual void DrawGLPathPtr(ob::PathPtr);
 
     void DrawGL(GUIState& state);

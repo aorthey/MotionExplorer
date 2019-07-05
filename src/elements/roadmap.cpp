@@ -1,5 +1,6 @@
 #include "roadmap.h"
 #include "gui/common.h"
+#include "common.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <boost/graph/dijkstra_shortest_paths.hpp>
@@ -50,7 +51,17 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
     if(pd==nullptr) return nullptr;
 
     LemonInterface lemon(pd);
+
+    // const ob::State *s_start = pd->getStartVertex(0).getState();
+    // const ob::State *s_goal = pd->getGoalVertex(0).getState();
+
+    // ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
+    // si->printState(s_start);
+    // si->printState(s_goal);
+    // pd->printGraphviz();
+
     std::vector<Vertex> pred = lemon.GetShortestPath();
+
     og::PathGeometric *gpath = new og::PathGeometric(quotient_space->SpaceInformationPtr()); 
     shortest_path.clear();
 

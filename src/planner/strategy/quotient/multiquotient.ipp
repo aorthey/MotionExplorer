@@ -229,6 +229,7 @@ void MultiQuotient<T,Tlast>::getPlannerData(ob::PlannerData &data) const
     uint ctr = 0;
     for(uint vidx = Nvertices; vidx < data.numVertices(); vidx++){
       PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated*>(&data.getVertex(vidx));
+      v.SetLevel(k);
       v.SetMaxLevel(K);
 
       ob::State *s_lift = Qk->getSpaceInformation()->cloneState(v.getState());

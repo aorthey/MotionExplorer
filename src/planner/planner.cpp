@@ -451,9 +451,57 @@ PathPiecewiseLinear* MotionPlanner::GetPath(){
 void MotionPlanner::DrawGL(GUIState& state){
   if(!active) return;
 
-  Rcurrent = hierarchy->GetNodeContent(current_path);
-  Rcurrent->DrawGL(state);
-  if(pwl) pwl->DrawGL(state);
+  uint Nsiblings;
+  if(current_path.size()>1){
+    std::vector<int>::const_iterator first = current_path.begin();
+    std::vector<int>::const_iterator last = current_path.end()-1;
+    std::vector<int> current_parent_path(first, last);
+    Nsiblings = hierarchy->NumberChildren(current_parent_path);
+  }else{
+    Nsiblings = hierarchy->NumberNodesOnLevel(current_path.size());
+  }
+
+
+  if(current_path.size() > 0){
+      int last_node = current_path.back();
+
+      const GLColor magenta(1,0,1,0.6);
+      const GLColor magentalight(0.8,0,0.8,0.3);
+      std::cout << last_node << "/" << Nsiblings << std::endl;
+      for(uint k = 0; k < Nsiblings; k++){
+        if(k==(uint)last_node) continue;
+        current_path.back() = k;
+        Rcurrent = hierarchy->GetNodeContent(current_path);
+        Rcurrent->DrawGL(state);
+        PathPiecewiseLinear *pwlk = Rcurrent->GetShortestPath();
+        if(pwlk){
+          pwlk->linewidth = 10;
+          pwlk->ptsize = 8;
+          pwlk->cSmoothed = magenta;
+          pwlk->cUnsmoothed = magenta;
+          pwlk->cVertex = magenta;
+          pwlk->cLine = magenta;
+          pwlk->DrawGL(state);
+        }
+      }
+
+      current_path.back() = last_node;
+      Rcurrent = hierarchy->GetNodeContent(current_path);
+      Rcurrent->DrawGL(state);
+      pwl = Rcurrent->GetShortestPath();
+      if(pwl){
+        pwl->linewidth = 80;
+        pwl->ptsize = 8;
+        pwl->cSmoothed = green;
+        pwl->cUnsmoothed = green;
+        pwl->cVertex = green;
+        pwl->cLine = green;
+        pwl->DrawGL(state);
+      }
+  }else{
+    // std::cout << Nsiblings << std::endl;
+  }
+
 
   uint ridx = hierarchy->GetRobotIdx(current_level);
   Robot* robot = world->robots[ridx];

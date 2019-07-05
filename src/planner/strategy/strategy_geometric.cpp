@@ -180,8 +180,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
 
   }else if(algorithm=="hierarchy:q_rrt"){
     planner = GetSharedMultiQuotientPtr<og::QRRT>(stratification);
-    planner->setName("MotionExplorer");
-
+    planner->setName("QRRT");
   }else if(algorithm=="hierarchy:explorer"){
     typedef og::MotionExplorer<og::QuotientTopology> MotionExplorer;
     planner = std::make_shared<MotionExplorer>(stratification->si_vec);

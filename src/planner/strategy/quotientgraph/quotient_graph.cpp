@@ -85,7 +85,7 @@ void QuotientGraph::DeleteConfiguration(Configuration *q)
 {
   if (q != nullptr){
     if (q->state != nullptr){
-      Q1->freeState(q->state);
+     Q1->freeState(q->state);
     }
     delete q;
     q = nullptr;
@@ -447,12 +447,22 @@ void QuotientGraph::getPlannerData(ob::PlannerData &data) const
   // uint goalComponent = const_cast<QuotientGraph *>(this)->disjointSets_.find_set(v_goal);
   uint startComponent = 0;
   uint goalComponent = 1;
+  std::vector<int> NullPath;
+  NullPath.push_back(0);
+  for(uint k = 0; k < level; k++){
+    NullPath.push_back(0);
+  }
 
   PlannerDataVertexAnnotated pstart(G[v_start]->state, startComponent);
+  pstart.SetLevel(level);
+  pstart.SetPath(NullPath);
   data.addStartVertex(pstart);
+
   if(hasSolution){
     goalComponent = 0;
     PlannerDataVertexAnnotated pgoal(G[v_goal]->state, goalComponent);
+    pgoal.SetLevel(level);
+    pgoal.SetPath(NullPath);
     data.addGoalVertex(pgoal);
   }
 
@@ -464,7 +474,11 @@ void QuotientGraph::getPlannerData(ob::PlannerData &data) const
     const Vertex v2 = boost::target(e, G);
 
     PlannerDataVertexAnnotated p1(G[v1]->state);
+    p1.SetLevel(level);
+    p1.SetPath(NullPath);
     PlannerDataVertexAnnotated p2(G[v2]->state);
+    p2.SetLevel(level);
+    p2.SetPath(NullPath);
 
     uint vi1 = data.addVertex(p1);
     uint vi2 = data.addVertex(p2);

@@ -1,8 +1,10 @@
 #pragma once
 
 #include "planner/strategy/quotientgraph/quotient_graph.h"
+#include "planner/strategy/explorer/PathVisibilityChecker.h"
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <ompl/util/RandomNumbers.h>
+#include <ompl/geometric/PathGeometric.h>
 #include <boost/graph/subgraph.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/random.hpp> 
@@ -60,12 +62,22 @@ namespace ompl
         {
             return sparseDeltaFraction_;
         }
-        std::vector< std::vector<Vertex>> pathStack_;
+        std::vector<og::PathGeometric> pathStack_;
+
+        uint Nhead{3}; //head -nX (to display only X top paths)
+        std::vector<std::vector<ob::State*>> pathStackHead_;
+        void PrintPathStack();
 
         Graph graphSparse_;
         RoadmapNeighborsPtr nearestSparse_;
         std::vector<Configuration*> graphNeighborhood;
         std::vector<Configuration*> visibleNeighborhood;
+
+        Vertex v_start_sparse;
+        Vertex v_goal_sparse;
+
+        PathVisibilityChecker* pathVisibilityChecker_;
+        void AddPathToStack(std::vector<ob::State*> &path);
 
         // std::vector<Vertex> shortest_path_start_goal;
         // Configuration *q_start;

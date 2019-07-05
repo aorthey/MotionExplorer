@@ -11,10 +11,12 @@ T* ptr(T* obj) { return obj; }
 
 template<typename T> 
 std::ostream& operator<< (std::ostream& out, const std::vector<T> &v){
+  out << "[";
   for(uint k = 0; k < v.size(); k++){
     out << *ptr(v.at(k));
     out << (k<v.size()-1?" ":"");
   }
+  out << "]";
   return out;
 }
 

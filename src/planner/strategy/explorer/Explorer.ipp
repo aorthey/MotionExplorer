@@ -91,15 +91,7 @@ void MotionExplorer<T>::setProblemDefinition(std::vector<ob::ProblemDefinitionPt
 template <class T>
 void MotionExplorer<T>::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
 {
-    if (siVec_.size() == 1)
-    {
-        this->Planner::setProblemDefinition(pdef);
-    }
-    else
-    {
-        OMPL_ERROR("You need to provide a ProblemDefinitionPtr for each SpaceInformationPtr.");
-        exit(0);
-    }
+    this->Planner::setProblemDefinition(pdef);
 }
 
 template <class T>
