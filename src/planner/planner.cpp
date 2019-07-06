@@ -465,9 +465,7 @@ void MotionPlanner::DrawGL(GUIState& state){
   if(current_path.size() > 0){
       int last_node = current_path.back();
 
-      const GLColor magenta(1,0,1,0.6);
-      const GLColor magentalight(0.8,0,0.8,0.3);
-      std::cout << last_node << "/" << Nsiblings << std::endl;
+      const GLColor magenta(0.7,0,0.7,1);
       for(uint k = 0; k < Nsiblings; k++){
         if(k==(uint)last_node) continue;
         current_path.back() = k;
@@ -475,7 +473,7 @@ void MotionPlanner::DrawGL(GUIState& state){
         Rcurrent->DrawGL(state);
         PathPiecewiseLinear *pwlk = Rcurrent->GetShortestPath();
         if(pwlk){
-          pwlk->linewidth = 10;
+          pwlk->linewidth = 0.1;
           pwlk->ptsize = 8;
           pwlk->cSmoothed = magenta;
           pwlk->cUnsmoothed = magenta;
@@ -490,7 +488,7 @@ void MotionPlanner::DrawGL(GUIState& state){
       Rcurrent->DrawGL(state);
       pwl = Rcurrent->GetShortestPath();
       if(pwl){
-        pwl->linewidth = 100;
+        pwl->linewidth = 0.15;
         pwl->ptsize = 10;
         pwl->cSmoothed = green;
         pwl->cUnsmoothed = green;

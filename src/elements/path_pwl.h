@@ -59,6 +59,8 @@ class PathPiecewiseLinear
     double length{0};
     std::vector<double> interLength;//interLength(i) length towards next milestone point from q(i)
     bool isSmooth{false};
+    Vector3 Vector3FromState(ob::State *s);
+    void Draw2DArrow(Vector3 arrow_pos, Vector3 arrow_dir, double arrow_size_head, double arrow_size_length);
 
     SweptVolume *sv{nullptr};
     CSpaceOMPL *cspace{nullptr};
