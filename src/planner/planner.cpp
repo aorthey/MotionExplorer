@@ -461,7 +461,6 @@ void MotionPlanner::DrawGL(GUIState& state){
     Nsiblings = hierarchy->NumberNodesOnLevel(current_path.size());
   }
 
-
   if(current_path.size() > 0){
       int last_node = current_path.back();
 

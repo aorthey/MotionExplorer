@@ -422,10 +422,18 @@ void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
   glBegin(GL_QUAD_STRIP);
   std::vector<Vector3> path_left;
   std::vector<Vector3> path_right;
-  for(uint i = 0; i < states.size()-1; i++){
+  for(uint i = 0; i < states.size(); i++){
     Vector3 q1 = Vector3FromState(states.at(i));
-    Vector3 q2 = Vector3FromState(states.at(i+1));
-    const Vector3 dq = q2 - q1;
+    Vector3 dq;
+
+    if(i<states.size()-1){
+      Vector3 q2 = Vector3FromState(states.at(i+1));
+      dq = q2 - q1;
+    }else{
+      Vector3 q2 = Vector3FromState(states.at(i-1));
+      dq = q1 - q2;
+    }
+
     Vector3 dqn;
     dqn[0] = dq[1];
     dqn[1] = -dq[0];
@@ -440,18 +448,18 @@ void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
     AngleAxisRotation Rab(M_PI, dq);
     Rab.getMatrix(R1);
 
-    Vector3 qq2;
-    R0.mulTranspose(dqn, qq2);
+    Vector3 qq1;
+    R0.mulTranspose(dqn, qq1);
     glNormal3f(n[0], n[1], n[2]);
-    qq2 += q2;
-    glVertex3f(qq2[0], qq2[1], qq2[2]);
-    path_left.push_back(qq2);
+    qq1 += q1;
+    glVertex3f(qq1[0], qq1[1], qq1[2]);
+    path_left.push_back(qq1);
 
-    R1.mulTranspose(dqn, qq2);
+    R1.mulTranspose(dqn, qq1);
     glNormal3f(n[0], n[1], n[2]);
-    qq2 += q2;
-    glVertex3f(qq2[0], qq2[1], qq2[2]);
-    path_right.push_back(qq2);
+    qq1 += q1;
+    glVertex3f(qq1[0], qq1[1], qq1[2]);
+    path_right.push_back(qq1);
   }
   glEnd();
 
