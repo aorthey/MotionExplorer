@@ -287,38 +287,6 @@ Config PathPiecewiseLinear::EvalVelocity(const double t) const{
   throw;
 }
 
-// void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
-//   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*_path);
-//   ob::SpaceInformationPtr si = gpath.getSpaceInformation();
-//   std::vector<ob::State *> states = gpath.getStates();
-
-//   ob::StateSpacePtr space = si->getStateSpace();
-
-//   glDisable(GL_LIGHTING);
-//   glEnable(GL_BLEND);
-//   glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
-//   glEnable(GL_LINE_SMOOTH);
-//   glPushMatrix();
-
-//   glPointSize(ptsize);
-//   glLineWidth(linewidth);
-//   cLine.setCurrentGL();
-//   for(uint i = 0; i < states.size()-1; i++){
-//     ob::State* c1 = states.at(i);
-//     ob::State* c2 = states.at(i+1);
-//     Vector3 q1 = quotient_space->getXYZ(c1);
-//     Vector3 q2 = quotient_space->getXYZ(c2);
-//     if(draw_planar){
-//       q1[2] = 0.0; q2[2] = 0.0;
-//     }
-//     GLDraw::drawPoint(q1);
-//     GLDraw::drawLineSegment(q1, q2);
-//   }
-//   glPopMatrix();
-//   glDisable(GL_BLEND);
-//   glEnable(GL_LIGHTING);
-//   glLineWidth(1);
-// }
 Vector3 PathPiecewiseLinear::Vector3FromState(ob::State *s){
   Vector3 v = quotient_space->getXYZ(s);
   if(draw_planar){
@@ -392,7 +360,8 @@ Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos,
     qnext[2] = zmax;
     return qnext;
 }
-void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
+
+void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*_path);
   ob::SpaceInformationPtr si = gpath.getSpaceInformation();
   std::vector<ob::State *> states = gpath.getStates();
@@ -520,6 +489,22 @@ void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
   glPopMatrix();
   glEnable(GL_CULL_FACE);
 
+  if(state("draw_path_sweptvolume")){
+    double L = GetLength();
+    this->DrawGL(state, 0.5*L);
+  }
+
+    // double tmin = 0.05;
+    // double L = GetLength();
+    // uint Nmilestones = int(L/tmin);
+    // std::vector<Config> q;
+    // for(uint k = 0; k < Nmilestones; k++){
+    //   q.push_back( Eval(k*tmin) );
+    // }
+    //   sv = new SweptVolume(quotient_space->GetRobotPtr(), q, Nmilestones);
+    // }
+    // sv->DrawGL(state);
+
   //############################################################################
   //Reset openGL
   //############################################################################
@@ -538,7 +523,7 @@ void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
 {
   Config q = Eval(t);
   Robot* robot = quotient_space->GetRobotPtr();
-  GLDraw::drawRobotAtConfig(robot, q, grey);
+  GLDraw::drawRobotAtConfig(robot, q, cRobotVolume);
 }
 
 void PathPiecewiseLinear::DrawGL(GUIState& state)
@@ -554,28 +539,28 @@ void PathPiecewiseLinear::DrawGL(GUIState& state)
   if(state("draw_path")){
     //if(path==nullptr) return;
     cLine = cSmoothed;
-    DrawGLPathPtr(path);
+    DrawGLPathPtr(state, path);
   }
   if(state("draw_path_unsmoothed")) 
   {
     //if(path_raw==nullptr) return;
     cLine = cUnsmoothed;
-    DrawGLPathPtr(path_raw);
+    DrawGLPathPtr(state, path_raw);
   }
-  if(state("draw_path_sweptvolume")){
-    if(!path) return;
-    if(!sv){
-      double tmin = 0.05;
-      double L = GetLength();
-      uint Nmilestones = int(L/tmin);
-      std::vector<Config> q;
-      for(uint k = 0; k < Nmilestones; k++){
-        q.push_back( Eval(k*tmin) );
-      }
-      sv = new SweptVolume(quotient_space->GetRobotPtr(), q, Nmilestones);
-    }
-    sv->DrawGL(state);
-  }
+  // if(state("draw_path_sweptvolume")){
+  //   if(!path) return;
+  //   if(!sv){
+  //     double tmin = 0.05;
+  //     double L = GetLength();
+  //     uint Nmilestones = int(L/tmin);
+  //     std::vector<Config> q;
+  //     for(uint k = 0; k < Nmilestones; k++){
+  //       q.push_back( Eval(k*tmin) );
+  //     }
+  //     sv = new SweptVolume(quotient_space->GetRobotPtr(), q, Nmilestones);
+  //   }
+  //   sv->DrawGL(state);
+  // }
 }
 bool PathPiecewiseLinear::Load(const char* fn)
 {

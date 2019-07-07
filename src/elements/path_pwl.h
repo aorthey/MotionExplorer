@@ -41,11 +41,12 @@ class PathPiecewiseLinear
     double zOffset{0.0};
     GLColor cVertex{magenta}, cLine{magenta};
     GLColor cSmoothed{magenta}, cUnsmoothed{red};
+    GLColor cRobotVolume{grey};
 
-    virtual void DrawGLPathPtr(ob::PathPtr);
 
     void DrawGL(GUIState& state);
     void DrawGL(GUIState& state, double t);
+    void DrawGLPathPtr(GUIState& state, ob::PathPtr);
     bool draw_planar{false};
 
     bool Load(const char *fn);
