@@ -324,6 +324,7 @@ Vector3 PathPiecewiseLinear::Vector3FromState(ob::State *s){
   if(draw_planar){
     v[2] = 0.0;
   }
+  v[2] += zOffset;
   return v;
 }
 void PathPiecewiseLinear::Draw2DArrow(Vector3 arrow_pos, Vector3 arrow_dir, double arrow_size_head, double arrow_size_length)
@@ -364,6 +365,33 @@ void PathPiecewiseLinear::Draw2DArrow(Vector3 arrow_pos, Vector3 arrow_dir, doub
 
   glEnd();
 }
+
+Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos, 
+    std::vector<ob::State*> states, uint k_start_state, double arrow_size_length)
+{
+    uint m = k_start_state;
+    Vector3 qnext = Vector3FromState(states.at(m));
+    double zmax = qnext[2];
+    double d_tip_to_state_best = fabs( arrow_pos.distanceSquared(qnext) - arrow_size_length);
+
+    m = m+1;
+    qnext = Vector3FromState(states.at(m));
+    if(qnext[2] > zmax) zmax = qnext[2];
+    double d_tip_to_state_next = fabs( arrow_pos.distanceSquared(qnext) - arrow_size_length);
+
+    while(d_tip_to_state_next < d_tip_to_state_best){
+      d_tip_to_state_best = d_tip_to_state_next;
+
+      m = m+1;
+      qnext = Vector3FromState(states.at(m));
+      if(qnext[2] > zmax) zmax = qnext[2];
+      d_tip_to_state_next = fabs( arrow_pos.distanceSquared(qnext) - arrow_size_length);
+    }
+    m = m-1;
+    qnext = Vector3FromState(states.at(m));
+    qnext[2] = zmax;
+    return qnext;
+}
 void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*_path);
   ob::SpaceInformationPtr si = gpath.getSpaceInformation();
@@ -371,13 +399,16 @@ void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
 
   ob::StateSpacePtr space = si->getStateSpace();
 
+  //############################################################################
+  //Set openGL scene
+  //############################################################################
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND);
-  glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
   glEnable(GL_LINE_SMOOTH);
+  glDisable(GL_CULL_FACE);
 
   glPushMatrix();
-  glDisable(GL_CULL_FACE);
+  glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
   glPointSize(ptsize);
   cLine.setCurrentGL();
 
@@ -393,26 +424,25 @@ void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
   Vector3 arrow_pos, arrow_dir;
   double arrow_size_head = 2*linewidth;
   double arrow_size_length = 1.5*arrow_size_head;
+
   glLineWidth(arrow_size_head*10);
+  Vector3 qnext;
   if(states.size() == 2){
     Vector3 q1 = Vector3FromState(states.at(0));
-    Vector3 q2 = Vector3FromState(states.at(1));
-    arrow_pos = 0.5*(q2 - q1);
-    arrow_dir = q2 - q1;
+    qnext = Vector3FromState(states.at(1));
+    arrow_pos = 0.5*(qnext - q1);
   }else if(states.size()%2 == 0){
     uint m = 0.5*states.size();
     Vector3 q1 = Vector3FromState(states.at(m-1));
     Vector3 q2 = Vector3FromState(states.at(m));
     arrow_pos = q1 + 0.5*(q2 - q1);
-    arrow_dir = q2 - q1;
+    qnext = GetNearestStateToTipOfArrow(arrow_pos, states, m, arrow_size_length);
   }else{
     uint m = floor(0.5*states.size());
     arrow_pos = Vector3FromState(states.at(m));
-    //we have at least 3 vertices
-    Vector3 q1 = Vector3FromState(states.at(m-1));
-    Vector3 q2 = Vector3FromState(states.at(m+1));
-    arrow_dir = q2 - q1;
+    qnext = GetNearestStateToTipOfArrow(arrow_pos, states, m, arrow_size_length);
   }
+  arrow_dir = qnext - arrow_pos;
   arrow_dir.inplaceNormalize();
   arrow_dir.inplaceMul(arrow_size_length);
 
@@ -482,73 +512,26 @@ void PathPiecewiseLinear::DrawGLPathPtr(ob::PathPtr _path){
   cLine.setCurrentGL();
 
   //############################################################################
-  //Compute Arrow Position
+  //Draw Arrow at middle of path
   //############################################################################
   glPushMatrix();
-  glTranslatef(arrow_pos[0], arrow_pos[1], arrow_pos[2]+0.005);
+  glTranslatef(arrow_pos[0], arrow_pos[1], arrow_pos[2]+std::max(0.5*zOffset, 1e-3));
   Draw2DArrow(arrow_pos, arrow_dir, arrow_size_head, arrow_size_length);
   glPopMatrix();
-
   glEnable(GL_CULL_FACE);
 
-  // Vector3 q_last1;
-  // Vector3 q_last2;
-  //for(uint i = 0; i < states.size()-1; i++){
-  //  ob::State* c1 = states.at(i);
-  //  ob::State* c2 = states.at(i+1);
-  //  Vector3 q1 = quotient_space->getXYZ(c1);
-  //  Vector3 q2 = quotient_space->getXYZ(c2);
-  //  if(draw_planar){
-  //    q1[2] = 0.0; q2[2] = 0.0;
-  //  }
-
-  //  const Vector3 dq = q2 - q1;
-  //  ////choose some orthonormal vector
-  //  Vector3 dqn;
-  //  dqn[0] = dq[1];
-  //  dqn[1] = -dq[0];
-  //  dqn[2] = 0;
-  //  std::cout << dq << "," << dqn << std::endl;
-  //  dqn.inplaceNormalize();
-  //  dqn.inplaceMul(0.08);
-
-  //  // glPushMatrix();
-  //  // glTranslate(q1);
-  //  // GLDraw::drawCylinder(dq, 0.08);
-  //  // glPopMatrix();
-  //  // uint res=4;
-  //  // glBegin(GL_QUAD_STRIP);
-  //  // for(uint k = 0; k < res+1; k++)
-  //  // {
-  //  //   double a = k*2*M_PI/res;
-  //  //   Matrix3 R;
-  //  //   AngleAxisRotation Raa(a, dq);
-  //  //   Raa.getMatrix(R);
-
-  //  //   Vector3 qq1;
-  //  //   R.mulTranspose(dqn, qq1);
-  //  //   qq1 += q1;
-
-  //  //   Vector3 qq2 = qq1 + dq;
-
-  //  //   glVertex3f(qq1[0], qq1[1], qq1[2]);
-  //  //   glNormal3f(dqn[0], dqn[1], dqn[2]);
-  //  //   glVertex3f(qq2[0], qq2[1], qq2[2]);
-  //  //   glNormal3f(dqn[0], dqn[1], dqn[2]);
-  //  // }
-  //  // Vector3 qq1 = dqn + q1;
-  //  // Vector3 qq2 = dqn + q2;
-  //  // glVertex3f(qq1[0], qq1[1], qq1[2]);
-  //  // glNormal3f(dqn[0], dqn[1], dqn[2]);
-  //  // glVertex3f(qq2[0], qq2[1], qq2[2]);
-  //  // glNormal3f(dqn[0], dqn[1], dqn[2]);
-  //  // glEnd();
-
-  //}
+  //############################################################################
+  //Reset openGL
+  //############################################################################
   glPopMatrix();
+  glLineWidth(1);
+  glEnable(GL_CULL_FACE);
+  glDisable(GL_LINE_SMOOTH);
   glDisable(GL_BLEND);
   glEnable(GL_LIGHTING);
-  glLineWidth(1);
+  // glDisable(GL_BLEND);
+  // glEnable(GL_LIGHTING);
+
 }
 
 void PathPiecewiseLinear::DrawGL(GUIState& state, double t)

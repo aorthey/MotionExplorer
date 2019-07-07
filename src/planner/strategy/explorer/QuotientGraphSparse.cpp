@@ -197,6 +197,29 @@ bool QuotientGraphSparse::checkAddInterface(Configuration *q,
 }
 
 
+bool QuotientGraphSparse::SampleQuotient(ob::State *q_random_graph)
+{
+    if(pathStack_.size() > 0){
+      if(selectedPath >= 0 && selectedPath < (int)pathStack_.size()){
+        std::cout << "SampleQuotient along selected path " << selectedPath << std::endl;
+        og::PathGeometric path = pathStack_.at(selectedPath);
+        std::vector<ob::State*> states_along_path = path.getStates();
+        uint N = states_along_path.size();
+        int k = rng_.uniformInt(0, N-1);
+        ob::State *state = states_along_path.at(k);
+        Q1->getStateSpace()->copyState(q_random_graph, state);
+        //TODO: Add epsilon sampling around path?
+      }else{
+        OMPL_ERROR("Selected path is %d (have you selected a path?)");
+        exit(0);
+      }
+    }else{
+      //no solution path, we can just sample randomly
+        const Vertex v = boost::random_vertex(G, rng_boost);
+        Q1->getStateSpace()->copyState(q_random_graph, G[v]->state);
+    }
+    return true;
+}
 
 //############################################################################
 //############################################################################

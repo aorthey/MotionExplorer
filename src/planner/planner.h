@@ -40,6 +40,8 @@ class MotionPlanner{
     virtual void DrawGL(GUIState&);
     virtual void DrawGLScreen(double x_ =0.0, double y_=0.0);
 
+    virtual void setSelectedPath(std::vector<int> selectedPath);
+
     //planner will only be active if input exists and contains a valid algorithm
     bool isActive();
     void Print();

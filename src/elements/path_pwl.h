@@ -38,6 +38,7 @@ class PathPiecewiseLinear
 
     double linewidth{20};
     double ptsize{10};
+    double zOffset{0.0};
     GLColor cVertex{magenta}, cLine{magenta};
     GLColor cSmoothed{magenta}, cUnsmoothed{red};
 
@@ -61,6 +62,8 @@ class PathPiecewiseLinear
     bool isSmooth{false};
     Vector3 Vector3FromState(ob::State *s);
     void Draw2DArrow(Vector3 arrow_pos, Vector3 arrow_dir, double arrow_size_head, double arrow_size_length);
+    Vector3 GetNearestStateToTipOfArrow(Vector3 arrow_pos, 
+        std::vector<ob::State*> states, uint k_start_state, double arrow_size_length);
 
     SweptVolume *sv{nullptr};
     CSpaceOMPL *cspace{nullptr};

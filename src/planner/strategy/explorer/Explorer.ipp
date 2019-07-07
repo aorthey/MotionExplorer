@@ -57,6 +57,15 @@ void MotionExplorer<T>::clear()
     {
         pdefVec_.at(k)->clearSolutionPaths();
     }
+    selectedPath_.clear();
+}
+
+template <class T>
+void MotionExplorer<T>::setSelectedPath( std::vector<int> selectedPath){
+  selectedPath_ = selectedPath;
+  for(uint k = 0; k < selectedPath.size(); k++){
+    quotientSpaces_.at(k)->selectedPath = selectedPath.at(k);
+  }
 }
 
 template <class T>
@@ -64,7 +73,8 @@ ob::PlannerStatus MotionExplorer<T>::solve(const ob::PlannerTerminationCondition
 {
   while (!ptc())
   {
-    og::Quotient *jQuotient = quotientSpaces_.at(0);
+    uint K = selectedPath_.size();
+    og::Quotient *jQuotient = quotientSpaces_.at(K);
     jQuotient->Grow();
   }
 

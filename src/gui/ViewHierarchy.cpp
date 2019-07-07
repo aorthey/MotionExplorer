@@ -5,8 +5,10 @@ ViewHierarchy::ViewHierarchy():
   x(0),y(0),heightPerLevel(50),width(300),width_column1(30),width_column2(50),width_column3(width-width_column1-width_column2),drawBound(true),drawPlotArea(true)
 {
   textColor.set(0.1,0.1,0.1);
-  nodeColor.set(0.5,0.5,0.5);
-  boundColor.set(0.3,0.3,0.3);
+  nodeColor.set(0.8,0.8,0.8);
+  nodeSelectedColor.set(0.4,0.4,0.4);
+  nodeUnselectedColor.set(0.8,0.8,0.8);
+  boundColor.set(0.2,0.2,0.2);
   plotAreaColor.set(0.8,0.8,0.8,0.5);
 }
 void ViewHierarchy::PushLevel(int nodes, std::string robot_name){
@@ -101,11 +103,12 @@ void ViewHierarchy::DrawGL(){
   double yprev = y+heightPerLevel/2;
   double node_radius = heightPerLevel/3;
   double node_radius_unselected = node_radius - node_radius/4;
-  double node_radius_selected = node_radius - node_radius/8;
+  double node_radius_selected = node_radius;
 
   double xstep = node_radius*2.5;
 
-  DrawNode(xprev,yprev,node_radius_selected,0);
+  // nodeColor = nodeSelectedColor;
+  // DrawNode(xprev,yprev,node_radius_selected,0);
 
   for(uint k = 0; k < level_nodes.size(); k++){
     double yn = y+(k+1)*heightPerLevel+heightPerLevel/2;
@@ -116,6 +119,7 @@ void ViewHierarchy::DrawGL(){
     for(uint i = 0; i < nodes_on_level; i++){
       double xn = xprev + xstep*i;
       double r = (i==selected_node? node_radius_selected: node_radius_unselected);
+      nodeColor = (i==selected_node? nodeSelectedColor:nodeUnselectedColor);
       DrawNode(xn,yn,r,i);
       (i==selected_node? glLineWidth(10): glLineWidth(5));
       DrawLineFromNodeToNode(xprev,yprev,r,xn,yn,r);

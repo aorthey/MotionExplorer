@@ -50,6 +50,9 @@ namespace ompl
         void printAllPathsUtil(Vertex u, Vertex d, bool visited[], int path[], int &path_index);
         void enumerateAllPaths();
 
+        int selectedPath{-1}; //selected path to sample from (if children try to sample this space)
+        bool SampleQuotient(ob::State *q_random_graph) override;
+
     protected:
         double sparseDelta_{0.};
         double sparseDeltaFraction_{.25};
@@ -64,9 +67,10 @@ namespace ompl
         }
         std::vector<og::PathGeometric> pathStack_;
 
-        uint Nhead{3}; //head -nX (to display only X top paths)
+        uint Nhead{5}; //head -nX (to display only X top paths)
         std::vector<std::vector<ob::State*>> pathStackHead_;
         void PrintPathStack();
+
 
         Graph graphSparse_;
         RoadmapNeighborsPtr nearestSparse_;

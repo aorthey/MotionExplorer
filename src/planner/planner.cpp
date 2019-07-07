@@ -1,11 +1,13 @@
 #include "planner/planner.h"
 #include "planner/strategy/strategy_input.h"
+#include "planner/strategy/explorer/Explorer.h"
 #include "planner/strategy/strategy_output.h"
 #include "planner/strategy/strategy_geometric.h"
 #include "planner/strategy/strategy_kinodynamic.h"
 #include "planner/cspace/cspace_factory.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include "gui/drawMotionPlanner.h"
+#include "planner/strategy/explorer/QuotientTopology.h"
 
 #include "util.h"
 #include <boost/lexical_cast.hpp>
@@ -282,7 +284,7 @@ void MotionPlanner::AdvanceUntilSolution()
   if(!strategy->IsInitialized()){
     InitStrategy();
   }else{
-    strategy->Clear();
+    // strategy->Clear();
   }
   if(!util::StartsWith(input.name_algorithm,"benchmark")){
     StrategyOutput output(cspace_levels.back());
@@ -408,6 +410,17 @@ void MotionPlanner::UpdateHierarchy(){
     pwl->Smooth();
   }
   viewHierarchy.UpdateSelectionPath( current_path );
+  std::cout << "New Selection: " << current_path << std::endl;
+  setSelectedPath(current_path);
+}
+void MotionPlanner::setSelectedPath(std::vector<int> selectedPath)
+{
+    typedef og::MotionExplorer<og::QuotientTopology> MotionExplorer;
+    //can only be done with Explorer Planners
+    auto selectionPlanner = dynamic_pointer_cast<MotionExplorer>(strategy->GetPlannerPtr());
+    if(selectionPlanner != NULL){
+      selectionPlanner->setSelectedPath( selectedPath);
+    }
 }
 void MotionPlanner::Print()
 {
@@ -472,6 +485,7 @@ void MotionPlanner::DrawGL(GUIState& state){
         Rcurrent->DrawGL(state);
         PathPiecewiseLinear *pwlk = Rcurrent->GetShortestPath();
         if(pwlk){
+          pwlk->zOffset = 0.001;
           pwlk->linewidth = 0.1;
           pwlk->ptsize = 8;
           pwlk->cSmoothed = magenta;
@@ -487,6 +501,7 @@ void MotionPlanner::DrawGL(GUIState& state){
       Rcurrent->DrawGL(state);
       pwl = Rcurrent->GetShortestPath();
       if(pwl){
+        pwl->zOffset = 0.005;
         pwl->linewidth = 0.15;
         pwl->ptsize = 10;
         pwl->cSmoothed = green;

@@ -15,6 +15,8 @@ class Strategy{
 
     bool IsInitialized();
 
+    const ob::PlannerPtr GetPlannerPtr();
+
   protected:
     Strategy() = default;
     void setStateSampler(std::string sampler, ob::SpaceInformationPtr si);

@@ -32,6 +32,10 @@ ob::ValidStateSamplerPtr allocBridgeTestValidStateSampler(const ob::SpaceInforma
 {
   return std::make_shared<ob::BridgeTestValidStateSampler>(si);
 }
+const ob::PlannerPtr Strategy::GetPlannerPtr()
+{
+  return planner;
+}
 
 void Strategy::setStateSampler(std::string sampler, ob::SpaceInformationPtr si)
 {

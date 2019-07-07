@@ -1,6 +1,7 @@
 #ifndef OMPL_GEOMETRIC_PLANNERS_QUOTIENTSPACE_MotionExplorer_
 #define OMPL_GEOMETRIC_PLANNERS_QUOTIENTSPACE_MotionExplorer_
-#include "planner/strategy/quotient/quotient.h"
+// #include "planner/strategy/quotient/quotient.h"
+#include "QuotientGraphSparse.h"
 #include <type_traits>
 #include <queue>
 
@@ -14,7 +15,7 @@ namespace ompl
         template <class T>
         class MotionExplorer : public ob::Planner
         {
-            static_assert(std::is_base_of<og::Quotient, T>::value, "Template must inherit from Quotient");
+            static_assert(std::is_base_of<og::QuotientGraphSparse, T>::value, "Template must inherit from Quotient");
 
         public:
             const bool DEBUG{false};
@@ -34,18 +35,18 @@ namespace ompl
             void setup() override;
             void clear() override;
             void setProblemDefinition(const ob::ProblemDefinitionPtr &pdef) override;
+            void setSelectedPath( std::vector<int> selectedPath);
 
         protected:
             //std::vector<ob::PathPtr> solutions_;
 
-            std::vector<int> selection;
             bool topologicalPhaseShift;
 
             double pathBias{0.8}; //[0,1]
 
             /// Sequence of quotient-spaces
-            std::vector<og::Quotient *> quotientSpaces_;
-            std::vector<uint> currentPath;
+            std::vector<og::QuotientGraphSparse *> quotientSpaces_;
+            std::vector<int> selectedPath_;
 
             std::vector<ob::SpaceInformationPtr> siVec_;
             std::vector<ob::ProblemDefinitionPtr> pdefVec_;
