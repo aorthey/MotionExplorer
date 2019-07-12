@@ -66,6 +66,7 @@ namespace ompl
             return sparseDeltaFraction_;
         }
         std::vector<og::PathGeometric> pathStack_;
+        uint numberVertices{0};
 
         uint Nhead{5}; //head -nX (to display only X top paths)
         std::vector<std::vector<ob::State*>> pathStackHead_;
@@ -82,15 +83,6 @@ namespace ompl
 
         PathVisibilityChecker* pathVisibilityChecker_;
         void AddPathToStack(std::vector<ob::State*> &path);
-
-        // std::vector<Vertex> shortest_path_start_goal;
-        // Configuration *q_start;
-        // Configuration *q_goal;
-        // Vertex v_start;
-        // Vertex v_goal;
-        // RNG rng_;
-        // typedef boost::minstd_rand RNGType;
-        // RNGType rng_boost;
 
     };
   };

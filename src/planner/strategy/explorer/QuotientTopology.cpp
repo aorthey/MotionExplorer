@@ -99,8 +99,6 @@ void QuotientTopology::Grow(double t){
         AddEdge(q_nearest->index, q_goal->index);
         hasSolution = true;
       }
-    }else{
-      // Rewire(v_last_added);
     }
   }
 }

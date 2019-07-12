@@ -38,8 +38,6 @@ namespace ompl
             void setSelectedPath( std::vector<int> selectedPath);
 
         protected:
-            //std::vector<ob::PathPtr> solutions_;
-
             bool topologicalPhaseShift;
 
             double pathBias{0.8}; //[0,1]

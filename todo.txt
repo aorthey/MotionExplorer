@@ -692,5 +692,5 @@ Problems for decomposition
 [ ] With more layers, we might get empty path classes.
 
 [ ] Explorer will handle N spaces. On each space we have N_k solutions. 
-[ ] Input: A selection.
 
+[ ] 2nd layer

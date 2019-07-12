@@ -62,8 +62,11 @@ void MotionExplorer<T>::clear()
 
 template <class T>
 void MotionExplorer<T>::setSelectedPath( std::vector<int> selectedPath){
+  std::cout << "Set selected path to " << selectedPath << std::endl;
   selectedPath_ = selectedPath;
   for(uint k = 0; k < selectedPath.size(); k++){
+    //selected path implies path bias, which implies a sampling bias towards the
+    //selected path
     quotientSpaces_.at(k)->selectedPath = selectedPath.at(k);
   }
 }
@@ -74,6 +77,10 @@ ob::PlannerStatus MotionExplorer<T>::solve(const ob::PlannerTerminationCondition
   while (!ptc())
   {
     uint K = selectedPath_.size();
+    if(K>=quotientSpaces_.size()){
+      K = K-1;
+    }
+
     og::Quotient *jQuotient = quotientSpaces_.at(K);
     jQuotient->Grow();
   }
@@ -86,8 +93,7 @@ void MotionExplorer<T>::setProblemDefinition(std::vector<ob::ProblemDefinitionPt
 {
     if (siVec_.size() != pdef_.size())
     {
-        OMPL_ERROR("Number of ProblemDefinitionPtr is %d but we have %d SpaceInformationPtr.", pdef_.size(),
-                   siVec_.size());
+        OMPL_ERROR("Number of ProblemDefinitionPtr is %d but we have %d SpaceInformationPtr.", pdef_.size(), siVec_.size());
         exit(0);
     }
     pdefVec_ = pdef_;

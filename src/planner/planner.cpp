@@ -410,7 +410,6 @@ void MotionPlanner::UpdateHierarchy(){
     pwl->Smooth();
   }
   viewHierarchy.UpdateSelectionPath( current_path );
-  std::cout << "New Selection: " << current_path << std::endl;
   setSelectedPath(current_path);
 }
 void MotionPlanner::setSelectedPath(std::vector<int> selectedPath)

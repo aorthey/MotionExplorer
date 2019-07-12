@@ -201,20 +201,23 @@ bool QuotientGraphSparse::SampleQuotient(ob::State *q_random_graph)
 {
     if(pathStack_.size() > 0){
       if(selectedPath >= 0 && selectedPath < (int)pathStack_.size()){
-        std::cout << "SampleQuotient along selected path " << selectedPath << std::endl;
+        // std::cout << "SampleQuotient along selected path " << selectedPath 
+        //   << "/" << (int)pathStack_.size() << std::endl;
+
         og::PathGeometric path = pathStack_.at(selectedPath);
         std::vector<ob::State*> states_along_path = path.getStates();
         uint N = states_along_path.size();
         int k = rng_.uniformInt(0, N-1);
         ob::State *state = states_along_path.at(k);
         Q1->getStateSpace()->copyState(q_random_graph, state);
-        //TODO: Add epsilon sampling around path?
+
+        Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, 0.1);
       }else{
         OMPL_ERROR("Selected path is %d (have you selected a path?)");
         exit(0);
       }
     }else{
-      //no solution path, we can just sample randomly
+        //no solution path, we can just sample randomly
         const Vertex v = boost::random_vertex(G, rng_boost);
         Q1->getStateSpace()->copyState(q_random_graph, G[v]->state);
     }
@@ -337,17 +340,20 @@ void QuotientGraphSparse::PrintPathStack()
 
 void QuotientGraphSparse::enumerateAllPaths() 
 {
-    int V = boost::num_vertices(graphSparse_);
-    if(V<=0) return;
-    bool *visited = new bool[V];
+    if(boost::num_vertices(graphSparse_) <= numberVertices){
+        return;
+    }
+    numberVertices = boost::num_vertices(graphSparse_);
+    if(numberVertices<=0) return;
+    bool *visited = new bool[numberVertices];
     std::cout << "Finished planning. Enumerating solution classes" << std::endl;
     std::cout << "Sparse Graph has " << boost::num_vertices(graphSparse_) << " vertices and "
       << boost::num_edges(graphSparse_) << " edges." << std::endl;
 
-    int *path = new int[V];
+    int *path = new int[numberVertices];
     int path_index = 0; // Initialize path[] as empty
 
-    for (int i = 0; i < V; i++)
+    for (unsigned int i = 0; i < numberVertices; i++)
         visited[i] = false;
 
     printAllPathsUtil(v_start_sparse, v_goal_sparse, visited, path, path_index);

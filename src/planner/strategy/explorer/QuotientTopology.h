@@ -34,13 +34,9 @@ namespace ompl
 
         Configuration *q_random{nullptr};
       protected:
-        Vertex v_last_added;
-
-        std::vector<Vertex> shortestPathVertices;
 
         double maxDistance{.0};
         double goalBias{.05};
-        double shortestPathBias{.05};
         double epsilon{.0};
 
         ob::Goal *goal;
