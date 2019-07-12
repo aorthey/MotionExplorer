@@ -694,3 +694,4 @@ Problems for decomposition
 [ ] Explorer will handle N spaces. On each space we have N_k solutions. 
 
 [ ] 2nd layer
+[ ] jump directly to last selection, not going back

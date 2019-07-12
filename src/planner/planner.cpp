@@ -276,13 +276,13 @@ void MotionPlanner::StepOneLevel()
 void MotionPlanner::AdvanceUntilSolution()
 {
   if(!active) return;
-  current_level = 0;
-  current_level_node = 0;
-  current_path.clear();
-  viewHierarchy.Clear();
 
   if(!strategy->IsInitialized()){
     InitStrategy();
+    current_level = 0;
+    current_level_node = 0;
+    current_path.clear();
+    viewHierarchy.Clear();
   }else{
     // strategy->Clear();
   }
@@ -290,6 +290,9 @@ void MotionPlanner::AdvanceUntilSolution()
     StrategyOutput output(cspace_levels.back());
     strategy->Plan(output);
     output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
+  }
+  if(current_path.empty()){
+      ExpandFull();
   }
 
 }
@@ -412,6 +415,7 @@ void MotionPlanner::UpdateHierarchy(){
   viewHierarchy.UpdateSelectionPath( current_path );
   setSelectedPath(current_path);
 }
+
 void MotionPlanner::setSelectedPath(std::vector<int> selectedPath)
 {
     typedef og::MotionExplorer<og::QuotientTopology> MotionExplorer;
@@ -509,8 +513,7 @@ void MotionPlanner::DrawGL(GUIState& state){
         pwl->cUnsmoothed = green;
         pwl->cVertex = green;
         pwl->cLine = green;
-        pwl->cRobotVolume = green;
-        pwl->cRobotVolume[3] = 0.3;
+        pwl->cRobotVolume = GLColor(0.8,0.8,0.8,1);
         pwl->DrawGL(state);
       }
   }else{

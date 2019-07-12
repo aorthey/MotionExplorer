@@ -64,7 +64,7 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     hierarchy_change = true;
   }else if(cmd=="planner_advance_until_solution"){
     planners.at(active_planner)->AdvanceUntilSolution();
-    planners.at(active_planner)->ExpandFull();
+    // planners.at(active_planner)->ExpandFull();
     hierarchy_change = true;
   }else if(cmd=="next_planner"){
     if(active_planner<planners.size()-1) active_planner++;
