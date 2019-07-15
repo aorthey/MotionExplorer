@@ -317,9 +317,9 @@ void Roadmap::DrawGL(GUIState& state)
   }
 
   if(pd!=nullptr) DrawPlannerData(state);
-  if(state("draw_roadmap_shortest_path")){
-    DrawShortestPath(state);
-  }
+  // if(state("draw_roadmap_shortest_path")){
+  //   DrawShortestPath(state);
+  // }
 }
 
 bool Roadmap::Save(const char* fn)

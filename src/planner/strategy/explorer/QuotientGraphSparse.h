@@ -45,10 +45,13 @@ namespace ompl
         bool checkAddConnectivity(Configuration* q, std::vector<Configuration*> &visibleNeighborhood);
         bool checkAddInterface(Configuration *q, std::vector<Configuration*> &graphNeighborhood, std::vector<Configuration*> &visibleNeighborhood);
 
+
         void Rewire(Vertex &v);
         void Rewire();
         void printAllPathsUtil(Vertex u, Vertex d, bool visited[], int path[], int &path_index);
         void enumerateAllPaths();
+        void removeReducibleLoops();
+        void removeEdgeIfReductionLoop(const Edge &e);
 
         int selectedPath{-1}; //selected path to sample from (if children try to sample this space)
         bool SampleQuotient(ob::State *q_random_graph) override;

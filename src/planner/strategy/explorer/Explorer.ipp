@@ -122,15 +122,16 @@ void MotionExplorer<T>::getPlannerData(ob::PlannerData &data) const
     }
 
     unsigned int K = quotientSpaces_.size();
+    std::vector<uint> countVerticesPerQuotientSpace;
 
     for (unsigned int k = 0; k < K; k++)
     {
         og::Quotient *Qk = quotientSpaces_.at(k);
         static_cast<QuotientGraphSparse*>(Qk)->enumerateAllPaths();
         Qk->getPlannerData(data);
-
         // label all new vertices
         unsigned int ctr = 0;
+
         for (unsigned int vidx = Nvertices; vidx < data.numVertices(); vidx++)
         {
             PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated *>(&data.getVertex(vidx));
@@ -167,7 +168,15 @@ void MotionExplorer<T>::getPlannerData(ob::PlannerData &data) const
             ctr++;
         }
         Nvertices = data.numVertices();
+        countVerticesPerQuotientSpace.push_back(data.numVertices());
+
     }
-    std::cout << "Created PlannerData with " << data.numVertices() << " vertices." << std::endl;
+    std::cout << "Created PlannerData with " << data.numVertices() << " vertices ";
+    std::cout << "(";
+    for(uint k = 0; k < countVerticesPerQuotientSpace.size(); k++){
+       uint ck = countVerticesPerQuotientSpace.at(k);
+       std::cout << ck << (ck < countVerticesPerQuotientSpace.size()?", ":"");
+    }
+    std::cout << ")" << std::endl;
 }
 

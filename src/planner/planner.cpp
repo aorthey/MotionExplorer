@@ -487,7 +487,7 @@ void MotionPlanner::DrawGL(GUIState& state){
         Rcurrent = hierarchy->GetNodeContent(current_path);
         Rcurrent->DrawGL(state);
         PathPiecewiseLinear *pwlk = Rcurrent->GetShortestPath();
-        if(pwlk){
+        if(pwlk && state("draw_roadmap_shortest_path")){
           pwlk->zOffset = 0.001;
           pwlk->linewidth = 0.1;
           pwlk->ptsize = 8;
@@ -505,7 +505,7 @@ void MotionPlanner::DrawGL(GUIState& state){
       Rcurrent = hierarchy->GetNodeContent(current_path);
       Rcurrent->DrawGL(state);
       pwl = Rcurrent->GetShortestPath();
-      if(pwl){
+      if(pwl && state("draw_roadmap_shortest_path")){
         pwl->zOffset = 0.005;
         pwl->linewidth = 0.15;
         pwl->ptsize = 10;

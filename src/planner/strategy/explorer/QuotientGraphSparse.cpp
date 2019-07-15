@@ -81,6 +81,13 @@ QuotientGraphSparse::Vertex QuotientGraphSparse::AddConfiguration(Configuration 
 
   findGraphNeighbors(q, graphNeighborhood, visibleNeighborhood);
 
+  //Possible reasons for adding a node to sparse roadmap
+  //(1) VISIBLITY: Add Guard (when no one is visible) [Simeon 00]
+  //(2) CONNECTIVITY: Add Connectivity (when two disconnected components are visible) [Simeon 00]
+  //(3) INTERFACE: Add Interface (when a connected components get another useful cycle
+  //[Jaillet 09, Dobson 14, Nieuwenhausen 04]
+  //(4) OPTIMALITY: Optimality based [Dobson 14]
+
   if(visibleNeighborhood.empty())
   {
     AddConfigurationSparse(q);
@@ -338,15 +345,98 @@ void QuotientGraphSparse::PrintPathStack()
   }
 }
 
+void QuotientGraphSparse::removeEdgeIfReductionLoop(const Edge &e)
+{
+    const Vertex v1 = boost::source(e, graphSparse_);
+    const Vertex v2 = boost::target(e, graphSparse_);
+
+    //############################################################################
+    // (2) Get common neighbors of v1,v2
+    std::vector<Vertex> v1_neighbors;
+    std::vector<Vertex> v2_neighbors;
+    std::vector<Vertex> common_neighbors;
+
+    OEIterator edge_iter, edge_iter_end, next; 
+
+    boost::tie(edge_iter, edge_iter_end) = boost::out_edges(v1, graphSparse_);
+    for(next = edge_iter; edge_iter != edge_iter_end; edge_iter = next)
+    {
+        const Vertex v_target = boost::target(*edge_iter, graphSparse_);
+        if(v_target != v2) v1_neighbors.push_back(v_target);
+        ++next;
+    }
+    boost::tie(edge_iter, edge_iter_end) = boost::out_edges(v2, graphSparse_);
+    for(next = edge_iter; edge_iter != edge_iter_end; edge_iter = next)
+    {
+        const Vertex v_target = boost::target(*edge_iter, graphSparse_);
+        if(v_target != v1) v2_neighbors.push_back(v_target);
+        ++next;
+    }
+
+    for(uint k = 0; k < v1_neighbors.size(); k++){
+      for(uint j = 0; j < v2_neighbors.size(); j++){
+        const Vertex v1k = v1_neighbors.at(k);
+        const Vertex v2k = v2_neighbors.at(j);
+        if(v1k == v2k){
+            common_neighbors.push_back(v1k);
+        }
+      }
+    }
+
+    //rm duplicates
+    std::sort(common_neighbors.begin(), common_neighbors.end());
+    auto last = std::unique(common_neighbors.begin(), common_neighbors.end());
+    common_neighbors.erase(last, common_neighbors.end()); 
+
+    //############################################################################
+    //  (3) Check if face (v1, v2, v3) is feasible
+    for(uint k = 0; k < common_neighbors.size(); k++){
+        const Vertex v3 = common_neighbors.at(k);
+        std::vector<Vertex> vpath1;
+        vpath1.push_back(v1);
+        vpath1.push_back(v3);
+        vpath1.push_back(v2);
+        std::vector<Vertex> vpath2;
+        vpath2.push_back(v1);
+        vpath2.push_back(v2);
+        
+        if(pathVisibilityChecker_->IsPathVisible(vpath1, vpath2, graphSparse_)){
+          //RemoveEdge
+          std::cout << "Removing Edge " << v1 << "<->" << v2 << std::endl;
+          boost::remove_edge(v1, v2, graphSparse_);
+        }
+    }
+
+}
+void QuotientGraphSparse::removeReducibleLoops()
+{
+    
+    // Edge e = boost::random_edge(graphSparse_, rng_boost);
+    uint Mend = boost::num_edges(graphSparse_);
+    for(uint k = 0; k < Mend; k++){
+      Edge e = boost::random_edge(graphSparse_, rng_boost);
+      removeEdgeIfReductionLoop(e);
+    }
+
+}
 void QuotientGraphSparse::enumerateAllPaths() 
 {
+    //Check if we already enumerated all paths. If yes, then the number of
+    //vertices has not changed. 
     if(boost::num_vertices(graphSparse_) <= numberVertices){
         return;
     }
+    std::cout << "Finished planning. Enumerating solution classes" << std::endl;
+
+    //Remove Edges
+    //(1) REDUCIBLE: Removal of reducible loops [Schmitzberger 02]
+    std::cout << "Remove Reducible Loops." << std::endl;
+    removeReducibleLoops();
+
+    //############################################################################
     numberVertices = boost::num_vertices(graphSparse_);
     if(numberVertices<=0) return;
     bool *visited = new bool[numberVertices];
-    std::cout << "Finished planning. Enumerating solution classes" << std::endl;
     std::cout << "Sparse Graph has " << boost::num_vertices(graphSparse_) << " vertices and "
       << boost::num_edges(graphSparse_) << " edges." << std::endl;
 
@@ -407,14 +497,10 @@ void QuotientGraphSparse::getPlannerData(ob::PlannerData &data) const
   }
 
   if(hasSolution){
-    //TODO:
-    // - display path on different horizontal index
-    // - Fix Bug where non-subgraphs are added (after CLEAR command)
-    // -- (smooth them somehow simultaneously if a vertex belongs to multiple paths)
 
     for(uint i = 0; i < pathStackHead_.size(); i++){
         // Vpath.push_back(i);
-        NullPath.back() += i;
+        NullPath.back() = i;
 
         // Vertex v1 = pathK.at(0);
         const std::vector<ob::State*> states = pathStackHead_.at(i);
@@ -424,7 +510,6 @@ void QuotientGraphSparse::getPlannerData(ob::PlannerData &data) const
         data.addStartVertex(p1);
 
         for(uint k = 0; k < states.size()-1; k++){
-          // std::vec v2 = pathK.at(k+1);
 
           PlannerDataVertexAnnotated p2(states.at(k+1));//Q1->cloneState(graphSparse_[v2]->state));
           p2.SetLevel(level);

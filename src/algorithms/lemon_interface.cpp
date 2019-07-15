@@ -38,12 +38,12 @@ LemonInterface::LemonInterface( ob::PlannerDataPtr pd_ ):
     }
   }
 
-  if(!hasStart){
-    std::cout << "[LemonInterface] Couldn't find start node in graph!" << std::endl;
-  }
-  if(!hasGoal){
-    std::cout << "[LemonInterface] Couldn't find goal node in graph!" << std::endl;
-  }
+  // if(!hasStart){
+  //   std::cout << "[LemonInterface] Couldn't find start node in graph!" << std::endl;
+  // }
+  // if(!hasGoal){
+  //   std::cout << "[LemonInterface] Couldn't find goal node in graph!" << std::endl;
+  // }
 
 //#############################################################################
 // Extract edges and weight

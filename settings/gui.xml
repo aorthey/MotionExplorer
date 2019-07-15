@@ -64,7 +64,7 @@
   </checkbox>
   <checkbox>
     <name>draw_roadmap_shortest_path</name>
-    <active>0</active>
+    <active>1</active>
     <key>g</key>
   </checkbox>
 
