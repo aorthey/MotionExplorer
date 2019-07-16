@@ -113,7 +113,7 @@ bool PathVisibilityChecker::IsPathVisible(std::vector<QuotientGraph::Vertex> &v1
 
 bool PathVisibilityChecker::IsPathVisible(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2)
 {
-  float max__planning_time_path_path = 0.1;
+  float max__planning_time_path_path = 0.5;
   float epsilon_goalregion = 0.01;
 
   ompl::msg::setLogLevel(ompl::msg::LOG_NONE);

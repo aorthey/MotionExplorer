@@ -67,28 +67,31 @@ void MotionExplorer<T>::setSelectedPath( std::vector<int> selectedPath){
     //selected path implies path bias, which implies a sampling bias towards the
     //selected path
     quotientSpaces_.at(k)->selectedPath = selectedPath.at(k);
-    std::cout << "[SELECT PATH] QuotientSpace " << k << " set to " << selectedPath.at(k) << std::endl;
   }
+  std::cout << "[SELECTION CHANGE] QuotientSpaces set to " << selectedPath << std::endl;
 }
 
 template <class T>
 ob::PlannerStatus MotionExplorer<T>::solve(const ob::PlannerTerminationCondition &ptc)
 {
+  uint K = selectedPath_.size();
+  if(K>=quotientSpaces_.size()){
+    K = K-1;
+  }
+  og::QuotientGraphSparse *jQuotient = quotientSpaces_.at(K);
+
+  uint ctr = 0;
   while (!ptc())
   {
-    uint K = selectedPath_.size();
-    if(K>=quotientSpaces_.size()){
-      K = K-1;
-    }
-
-    og::QuotientGraphSparse *jQuotient = quotientSpaces_.at(K);
     // std::cout << "Growing QuotientSpace " << jQuotient->getName() << std::endl;
     uint M = jQuotient->getNumberOfPaths();
     jQuotient->Grow();
+    ctr++;
     uint Mg = jQuotient->getNumberOfPaths();
     //stop at topological phase shift
     if(Mg > M) return ob::PlannerStatus::APPROXIMATE_SOLUTION;
   }
+  std::cout << "Grow QS for " << ctr << " iters." << std::endl;
 
   return ob::PlannerStatus::TIMEOUT;
 }

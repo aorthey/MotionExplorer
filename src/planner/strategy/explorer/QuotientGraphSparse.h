@@ -77,9 +77,11 @@ namespace ompl
         std::vector<og::PathGeometric> pathStack_;
         uint numberVertices{0};
 
-        uint Nhead{6}; //head -nX (to display only X top paths)
+        uint Nhead{5}; //head -nX (to display only X top paths)
         std::vector<std::vector<ob::State*>> pathStackHead_;
         void PrintPathStack();
+
+        std::vector<int> GetSelectedPathIndex() const;
 
         virtual void uniteComponentsSparse(Vertex m1, Vertex m2);
         bool sameComponentSparse(Vertex m1, Vertex m2);

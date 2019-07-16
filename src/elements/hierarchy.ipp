@@ -206,14 +206,16 @@ Node<T>* Hierarchy<T>::GetNode( std::vector<int> path ){
 
   for(uint k = 0; k < path.size(); k++){
     if(path.at(k) >= (int)current->children.size()){
-      std::cout << "node " << path.at(k) << " does not exists on level " << k+1 << " in hierarchical tree" << std::endl;
+      std::cout << "node " << path.at(k) << " does not exists on level " << k << " in hierarchical tree" << std::endl;
       std::cout << "input : ";
       for(uint j = 0; j < path.size(); j++){
         std::cout << path.at(j) << " ";
       }
       std::cout << std::endl;
       std::cout << "number of nodes on current level: " <<current->children.size() << std::endl;
+      Print();
       exit(0);
+
     }
     current = current->children.at( path.at(k) );
   }

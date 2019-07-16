@@ -380,9 +380,6 @@ bool QuotientGraph::GetSolution(ob::PathPtr &solution)
       solution_path = GetPath(v_start, v_goal);
       if (solution_path)
       {
-        std::cout << std::string(80, '#') << std::endl;
-        std::cout << "Found Solution Path" << std::endl;
-        std::cout << std::string(80, '#') << std::endl;
         solution = solution_path;
         hasSolution = true;
         startGoalVertexPath_ = shortestVertexPath_;

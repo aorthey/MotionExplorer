@@ -139,9 +139,6 @@ namespace ompl
         virtual void ClearVertices();
         virtual void DeleteConfiguration(Configuration *q);
 
-        // template <template <typename T> class NN>
-        // void setNearestNeighbors();
-
         virtual void uniteComponents(Vertex m1, Vertex m2);
         bool sameComponent(Vertex m1, Vertex m2);
 
