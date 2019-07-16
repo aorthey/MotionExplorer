@@ -45,7 +45,7 @@ void QCP::clear()
 //############################################################################
 // Grow Functions
 //############################################################################
-void QCP::Grow(double t)
+void QCP::Grow()
 {
   if(firstRun){
     firstRun = false;
@@ -53,7 +53,7 @@ void QCP::Grow(double t)
     AddConfigurationToPriorityQueue(GetStartConfiguration());
   }
   if(saturated) return;
-  ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
+  ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(0.1) );
 
   if(!hasSolution){
     GrowWithoutSolution(ptc);

@@ -40,14 +40,17 @@ namespace ompl
     class Quotient: public ob::Planner
     {
       typedef ob::Planner BaseT;
-      enum QuotientSpaceType{ UNKNOWN, IDENTITY_SPACE, ATOMIC_RN, RN_RM, SE2_R2, SE2RN_R2, SE2RN_SE2, SO2RN_SO2, SE2RN_SE2RM, SE3_R3, SE3RN_R3, SE3RN_SE3, SE3RN_SE3RM };
+
+      enum QuotientSpaceType{ UNKNOWN, IDENTITY_SPACE, ATOMIC_RN, RN_RM, SE2_R2,
+        SE2RN_R2, SE2RN_SE2, SO2RN_SO2, SE2RN_SE2RM, SE3_R3, SE3RN_R3,
+        SE3RN_SE3, SE3RN_SE3RM };
 
       public:
         Quotient(const ob::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
         ~Quotient();
         ob::PlannerStatus solve(const ob::PlannerTerminationCondition &ptc) override final; //final prevents subclasses to override
 
-        virtual void Grow(double t = 0) = 0;
+        virtual void Grow() = 0;
         virtual bool GetSolution(ob::PathPtr &solution) = 0;
         virtual bool SampleQuotient(ob::State *q_random);
 

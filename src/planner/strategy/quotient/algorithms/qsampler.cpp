@@ -19,7 +19,7 @@ QSampler::QSampler(const base::SpaceInformationPtr &si, Quotient *parent ): Base
 //############################################################################
 // Grow Functions
 //############################################################################
-void QSampler::Grow(double t)
+void QSampler::Grow()
 {
   if(firstRun){
     if(const ob::State *st = pis_.nextStart()){

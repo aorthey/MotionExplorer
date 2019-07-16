@@ -22,7 +22,7 @@ namespace ompl
       virtual bool GetSolution(ob::PathPtr &solution) override;
       virtual void getPlannerData(ob::PlannerData &data) const override;
 
-      virtual void Grow(double t) override;
+      virtual void Grow() override;
     };
   }
 }

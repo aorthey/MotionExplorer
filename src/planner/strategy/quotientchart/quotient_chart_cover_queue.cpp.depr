@@ -43,7 +43,7 @@ void QuotientChartCoverQueue::clear()
   firstRun = true;
 }
 
-void QuotientChartCoverQueue::Grow(double t)
+void QuotientChartCoverQueue::Grow()
 {
   if(saturated) return;
 

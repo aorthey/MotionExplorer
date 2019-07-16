@@ -14,7 +14,7 @@ namespace ompl
       public:
         QuotientChart(const ob::SpaceInformationPtr &si, Quotient *parent_ = nullptr);
 
-        virtual void Grow(double t) = 0;
+        virtual void Grow() = 0;
         virtual void getPlannerDataAnnotated(ob::PlannerData &data) const = 0;
 
         virtual bool FoundNewComponent();

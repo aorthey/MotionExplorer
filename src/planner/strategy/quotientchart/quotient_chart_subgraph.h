@@ -189,7 +189,7 @@ namespace ompl
 
       virtual void CopyChartFromSibling( QuotientChart *sibling, uint k ) override;
       void ExtendGraphOneStep();
-      virtual void Grow(double t) override;
+      virtual void Grow() override;
       std::vector<ob::State*> PathToStates(std::vector<Vertex> &path);
       virtual bool IsPathVisible(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2);
   protected:

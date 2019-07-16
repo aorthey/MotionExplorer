@@ -23,7 +23,7 @@ namespace ompl
 
         QRRT(const ob::SpaceInformationPtr &si, Quotient *parent_);
         virtual ~QRRT() override;
-        virtual void Grow(double t) override;
+        virtual void Grow() override;
         virtual bool GetSolution(ob::PathPtr &solution) override;
         double GetImportance() const override;
         virtual bool Sample(ob::State *q_random) override;

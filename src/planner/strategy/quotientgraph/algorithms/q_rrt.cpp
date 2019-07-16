@@ -73,7 +73,7 @@ bool QRRT::GetSolution(ob::PathPtr &solution)
   }
 }
 
-void QRRT::Grow(double t){
+void QRRT::Grow(){
   if(firstRun){
     Init();
     firstRun = false;

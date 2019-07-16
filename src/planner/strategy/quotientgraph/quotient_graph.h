@@ -107,6 +107,7 @@ namespace ompl
         typedef BGT::vertex_descriptor Vertex;
         typedef BGT::edge_descriptor Edge;
         typedef BGT::vertices_size_type VertexIndex;
+        typedef BGT::edge_iterator EIterator;
         typedef BGT::in_edge_iterator IEIterator;
         typedef BGT::out_edge_iterator OEIterator;
         typedef Vertex* VertexParent;
@@ -124,7 +125,7 @@ namespace ompl
         virtual uint GetNumberOfVertices() const;
         virtual uint GetNumberOfEdges() const;
 
-        virtual void Grow(double t) = 0;
+        virtual void Grow() = 0;
         virtual bool SampleQuotient(ob::State*) override;
         virtual bool GetSolution(ob::PathPtr &solution) override;
         virtual void getPlannerData(ob::PlannerData &data) const override;

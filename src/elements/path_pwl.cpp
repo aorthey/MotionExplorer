@@ -489,7 +489,7 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
   glPopMatrix();
   glEnable(GL_CULL_FACE);
 
-  if(state("draw_path_sweptvolume")){
+  if(drawSweptVolume && state("draw_path_sweptvolume")){
     double L = GetLength();
     this->DrawGL(state, 0.5*L);
   }

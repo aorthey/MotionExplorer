@@ -26,12 +26,12 @@ void QRRTConnect::clear()
   vpdf.clear();
   q_last_added = nullptr;
 }
-void QRRTConnect::Grow(double t)
+void QRRTConnect::Grow()
 {
-  if(parent == nullptr) BaseT::Grow(t);
+  if(parent == nullptr) BaseT::Grow();
   else{
     uint Nvertices_before = GetNumberOfVertices();
-    BaseT::Grow(t);
+    BaseT::Grow();
     uint Nvertices_after = GetNumberOfVertices();
 
     ////Update PDF of sampled point on qspace

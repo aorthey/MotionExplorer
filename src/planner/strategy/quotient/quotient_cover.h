@@ -198,7 +198,7 @@ namespace ompl
       //#######################################################################
       //Misc
       //#######################################################################
-      virtual void Grow(double t) override = 0;
+      virtual void Grow() override = 0;
       virtual bool GetSolution(ob::PathPtr &solution) override;
       virtual double GetImportance() const override;
 

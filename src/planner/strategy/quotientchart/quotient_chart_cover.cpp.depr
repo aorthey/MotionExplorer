@@ -479,7 +479,7 @@ double QuotientChartCover::GetImportance() const
   return 1.0/((totalVolumeOfCover/Q1->getStateSpace()->getMeasure())+1);
 }
 
-void QuotientChartCover::Grow(double t)
+void QuotientChartCover::Grow()
 {
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(t) );
   //#########################################################################

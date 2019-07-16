@@ -21,7 +21,7 @@ namespace ompl
 
       virtual bool GetSolution(ob::PathPtr &solution) override;
 
-      virtual void Grow(double t) override;
+      virtual void Grow() override;
     };
   }
 }

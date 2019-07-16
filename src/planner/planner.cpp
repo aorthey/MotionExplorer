@@ -495,8 +495,7 @@ void MotionPlanner::DrawGL(GUIState& state){
           pwlk->cUnsmoothed = magenta;
           pwlk->cVertex = magenta;
           pwlk->cLine = magenta;
-          pwlk->cRobotVolume = magenta;
-          pwlk->cRobotVolume[3] = 0.1;
+          pwlk->drawSweptVolume = false;
           pwlk->DrawGL(state);
         }
       }
@@ -514,6 +513,7 @@ void MotionPlanner::DrawGL(GUIState& state){
         pwl->cVertex = green;
         pwl->cLine = green;
         pwl->cRobotVolume = GLColor(0.8,0.8,0.8,1);
+        pwl->drawSweptVolume = true;
         pwl->DrawGL(state);
       }
   }else{

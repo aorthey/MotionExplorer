@@ -15,7 +15,7 @@ QNeighborhoodSampler::QNeighborhoodSampler(const base::SpaceInformationPtr &si, 
 //############################################################################
 // Grow Functions
 //############################################################################
-void QNeighborhoodSampler::Grow(double t)
+void QNeighborhoodSampler::Grow()
 {
   if(firstRun){
     firstRun = false;

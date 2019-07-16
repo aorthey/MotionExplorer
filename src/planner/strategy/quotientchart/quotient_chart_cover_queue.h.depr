@@ -23,7 +23,7 @@ namespace ompl
 
       QuotientChartCoverQueue(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
       ~QuotientChartCoverQueue(void);
-      virtual void Grow(double t) override;
+      virtual void Grow() override;
       void clear() override;
       void setup() override;
       virtual std::vector<Configuration*> ExpandNeighborhood(Configuration*, const int) = 0;

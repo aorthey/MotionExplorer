@@ -21,7 +21,7 @@ namespace ompl
 
         QuotientTopology(const ob::SpaceInformationPtr &si, Quotient *parent_);
         virtual ~QuotientTopology() override;
-        virtual void Grow(double t) override;
+        virtual void Grow() override;
         virtual bool GetSolution(ob::PathPtr &solution) override;
 
         virtual void setup() override;

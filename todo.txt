@@ -677,22 +677,13 @@ EuclideaMEtricInterpolation
 [ ] Why is NearestK not working correctly? (because of pseudo metric?) (because
 of pseudo metric?)
 
-[ ] Still problem when removing a vertex 
-[x] On higher levels, the edges are not displayed
-[x] REPLACE SO2 WITH SO2INTERPOLATE
-[ ] COMPUTE NBH OF BXTR
-[x] Benchmark different stratifications
-[ ] BUG: why is the terrain not used in hierarchy
-[ ] Make it OMPL compatible
-[ ] Remove any Klampt reference from Strategy, isolate klampt
-[x] Memory Leak
-
 Problems for decomposition
-[ ] PathClasses contain additional vertices not belonging to path.
+[x] PathClasses contain additional vertices not belonging to path.
 [ ] With more layers, we might get empty path classes.
-
-[ ] Explorer will handle N spaces. On each space we have N_k solutions. 
-
 [ ] 2nd layer
 [ ] jump directly to last selection, not going back
 [ ] tighten roadmap
+[ ] connect subroadmaps on cspace
+[ ] better way to do DFS path enumeration
+[ ] Fix enumerating path when no solution has been found
+[ ] Fix display when paths found on CS

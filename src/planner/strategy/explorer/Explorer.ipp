@@ -62,12 +62,12 @@ void MotionExplorer<T>::clear()
 
 template <class T>
 void MotionExplorer<T>::setSelectedPath( std::vector<int> selectedPath){
-  std::cout << "Set selected path to " << selectedPath << std::endl;
   selectedPath_ = selectedPath;
   for(uint k = 0; k < selectedPath.size(); k++){
     //selected path implies path bias, which implies a sampling bias towards the
     //selected path
     quotientSpaces_.at(k)->selectedPath = selectedPath.at(k);
+    std::cout << "[SELECT PATH] QuotientSpace " << k << " set to " << selectedPath.at(k) << std::endl;
   }
 }
 
@@ -81,8 +81,13 @@ ob::PlannerStatus MotionExplorer<T>::solve(const ob::PlannerTerminationCondition
       K = K-1;
     }
 
-    og::Quotient *jQuotient = quotientSpaces_.at(K);
+    og::QuotientGraphSparse *jQuotient = quotientSpaces_.at(K);
+    // std::cout << "Growing QuotientSpace " << jQuotient->getName() << std::endl;
+    uint M = jQuotient->getNumberOfPaths();
     jQuotient->Grow();
+    uint Mg = jQuotient->getNumberOfPaths();
+    //stop at topological phase shift
+    if(Mg > M) return ob::PlannerStatus::APPROXIMATE_SOLUTION;
   }
 
   return ob::PlannerStatus::TIMEOUT;
@@ -167,15 +172,15 @@ void MotionExplorer<T>::getPlannerData(ob::PlannerData &data) const
             v.setState(s_lift);
             ctr++;
         }
+        countVerticesPerQuotientSpace.push_back(data.numVertices() - Nvertices);
         Nvertices = data.numVertices();
-        countVerticesPerQuotientSpace.push_back(data.numVertices());
 
     }
     std::cout << "Created PlannerData with " << data.numVertices() << " vertices ";
     std::cout << "(";
     for(uint k = 0; k < countVerticesPerQuotientSpace.size(); k++){
        uint ck = countVerticesPerQuotientSpace.at(k);
-       std::cout << ck << (ck < countVerticesPerQuotientSpace.size()?", ":"");
+       std::cout << ck << (k < countVerticesPerQuotientSpace.size()-1?", ":"");
     }
     std::cout << ")" << std::endl;
 }

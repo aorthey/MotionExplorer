@@ -445,7 +445,7 @@ void QuotientChartSubGraph::getPlannerDataAnnotated(base::PlannerData &data) con
     data.addEdge(p1,p2);
   }
 }
-void QuotientChartSubGraph::Grow(double t)
+void QuotientChartSubGraph::Grow()
 {
   if(firstRun){
     Init();

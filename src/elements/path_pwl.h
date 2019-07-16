@@ -43,6 +43,7 @@ class PathPiecewiseLinear
     GLColor cSmoothed{magenta}, cUnsmoothed{red};
     GLColor cRobotVolume{grey};
 
+    bool drawSweptVolume{true};
 
     void DrawGL(GUIState& state);
     void DrawGL(GUIState& state, double t);

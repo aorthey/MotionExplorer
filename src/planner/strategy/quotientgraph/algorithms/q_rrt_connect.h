@@ -23,7 +23,7 @@ namespace ompl
         QRRTConnect(const ob::SpaceInformationPtr &si, Quotient *parent_);
         virtual bool Sample(ob::State *q_random) override;
         PDF vpdf;
-        virtual void Grow(double t) override;
+        virtual void Grow() override;
         virtual Vertex AddConfiguration(Configuration *q) override;
         virtual void clear() override;
 

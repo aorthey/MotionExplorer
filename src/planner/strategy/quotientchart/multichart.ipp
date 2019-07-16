@@ -101,7 +101,7 @@ ob::PlannerStatus MultiChart<T>::solve(const base::PlannerTerminationCondition &
     //growing the charts occurs in the path below current_chart.
     og::QuotientChart* jChart = Q.top();
     Q.pop();
-    jChart->Grow(T_GROW);
+    jChart->Grow();
 
     if(jChart->FoundNewComponent()){
       uint k = jChart->GetLevel();
