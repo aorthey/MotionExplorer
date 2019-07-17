@@ -3,6 +3,7 @@
 #include "elements/tree.h"
 #include "common.h"
 #include <ompl/control/PathControl.h>
+#include <ompl/geometric/PathSimplifier.h>
 
 StrategyOutput::StrategyOutput(CSpaceOMPL *cspace_):
   cspace(cspace_)

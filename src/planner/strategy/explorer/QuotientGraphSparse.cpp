@@ -4,6 +4,7 @@
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/geometric/PathSimplifier.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
+#include <ompl/geometric/PathSimplifier.h>
 #include <boost/property_map/vector_property_map.hpp>
 #include <boost/property_map/transform_value_property_map.hpp>
 #include <boost/foreach.hpp>
@@ -270,18 +271,19 @@ bool QuotientGraphSparse::SampleQuotient(ob::State *q_random_graph)
 
 
         //Vertex Sampling
-        int k = rng_.uniformInt(0, N-1);
-        ob::State *state = states.at(k);
-        Q1->getStateSpace()->copyState(q_random_graph, state);
-        Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, 0.2);
+        // int k = rng_.uniformInt(0, N-1);
+        // ob::State *state = states.at(k);
+        // Q1->getStateSpace()->copyState(q_random_graph, state);
+        // Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, 0.2);
 
         //Edge Sampling
-        // int k = rng_.uniformInt(0, N-1);
-        // ob::State *s1 = states.at((k<N-1?:k:k-1));
-        // ob::State *s2 = states.at((k<N-1?:k+1:k));
-        // Q1->getStateSpace()->interpolate(s1, s2, r, q_random_graph);
+        uint k = rng_.uniformInt(0, N-1);
+        double r = rng_.uniform01();
+        ob::State *s1 = states.at((k<N-1)?k:k-1);
+        ob::State *s2 = states.at((k<N-1)?k+1:k);
+        Q1->getStateSpace()->interpolate(s1, s2, r, q_random_graph);
 
-        // Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, 0.1);
+        Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, 0.1);
 
 
       }else{

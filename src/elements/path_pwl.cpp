@@ -6,6 +6,7 @@
 #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/base/StateSpace.h>
 #include <ompl/geometric/PathGeometric.h>
+#include <ompl/geometric/PathSimplifier.h>
 #include <ompl/control/PathControl.h>
 
 PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):

@@ -523,6 +523,7 @@ bool QuotientGraph::SampleQuotient(ob::State *q_random_graph)
   Q1->getStateSpace()->interpolate(from, to, s, q_random_graph);
   return true;
 }
+
 void QuotientGraph::Print(std::ostream& out) const
 {
   BaseT::Print(out);
