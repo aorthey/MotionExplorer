@@ -20,6 +20,16 @@ namespace ompl
       bool IsPathVisible(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2);
     protected:
       ob::SpaceInformationPtr si_;
+    private:
+      void Test1();
+      void Test2();
+      std::vector<ob::State*> StatesFromVector( 
+          const std::vector<double> &sx, 
+          const std::vector<double> &sy);
+      std::vector<ob::State*> StatesFromVector( 
+          const std::vector<double> &sx, 
+          const std::vector<double> &sy, 
+          const std::vector<double> &st);
     };
   }
 }

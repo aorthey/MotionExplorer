@@ -1,5 +1,6 @@
 #include "QuotientGraphSparse.h"
 #include "common.h"
+#include "PathEnumerator.h"
 #include "elements/plannerdata_vertex_annotated.h"
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/geometric/PathSimplifier.h>
@@ -263,8 +264,8 @@ bool QuotientGraphSparse::SampleQuotient(ob::State *q_random_graph)
 {
     if(pathStack_.size() > 0){
       if(selectedPath >= 0 && selectedPath < (int)pathStack_.size()){
-        std::cout << "Sample " << getName() << " along selected path " << selectedPath 
-          << "/" << (int)pathStackHead_.size()-1 << std::endl;
+        // std::cout << "Sample " << getName() << " along selected path " << selectedPath 
+        //   << "/" << (int)pathStackHead_.size()-1 << std::endl;
 
         std::vector<ob::State*> states = pathStackHead_.at(selectedPath);
         uint N = states.size();
@@ -328,52 +329,6 @@ void QuotientGraphSparse::Rewire()
   return Rewire(v);
 }
 
-// A recursive function to print all paths from 'u' to 'd'.
-// visited[] keeps track of vertices in current path.
-// path[] stores actual vertices and path_index is current
-// index in path[]
-void QuotientGraphSparse::printAllPathsUtil(Vertex u, Vertex d, bool visited[],
-                            int path[], int &path_index) 
-{
-  //terminate if we have enough paths in stack
-    if(pathStack_.size() > Nhead) return;
-
-    // Mark the current node and store it in path[]
-    visited[u] = true;
-    path[path_index] = u;
-    path_index++;
-
-    // If current vertex is same as destination, then print
-    // current path[]
-    if (u == d)
-    {
-        std::vector<ob::State*> pp;
-        for (int i = 0; i<path_index; i++){
-            pp.push_back(graphSparse_[path[i]]->state);
-        }
-        AddPathToStack(pp);
-    }
-    else // If current vertex is not destination
-    {
-        // Recur for all the vertices adjacent to current vertex
-        OEIterator ei, ei_end;
-        for (boost::tie(ei, ei_end) = boost::out_edges(u, graphSparse_); ei != ei_end; ++ei) {
-          Vertex source = boost::source ( *ei, graphSparse_ );
-          Vertex target = boost::target ( *ei, graphSparse_ );
-          Vertex vnext = (source==u? target: source);
-          if (!visited[vnext]){
-              printAllPathsUtil(vnext, d, visited, path, path_index);
-          }
-        }
-        // for (i = adj[u].begin(); i != adj[u].end(); ++i)
-        //     if (!visited[*i])
-        //         printAllPathsUtil(*i, d, visited, path, path_index);
-    }
-
-    // Remove current vertex from path[] and mark it as unvisited
-    path_index--;
-    visited[u] = false;
-}
 
 void QuotientGraphSparse::AddPathToStack(std::vector<ob::State*> &path)
 {
@@ -387,11 +342,9 @@ void QuotientGraphSparse::AddPathToStack(std::vector<ob::State*> &path)
   shortcutter.reduceVertices(gpath);
   // shortcutter.shortcutPath(gpath);
 
-  // PrintPathStack();
-  if(pathStack_.empty()){
+  if(pathStack_.size() <= 0){
     pathStack_.push_back(gpath);
   }else{
-
     for(uint k = 0; k < pathStack_.size(); k++){
       og::PathGeometric& pathk = pathStack_.at(k);
       if(pathVisibilityChecker_->IsPathVisible(gpath.getStates(), pathk.getStates())){
@@ -400,7 +353,11 @@ void QuotientGraphSparse::AddPathToStack(std::vector<ob::State*> &path)
     }
     pathStack_.push_back(gpath);
   }
-  // PrintPathStack();
+  // std::cout << ">>Inserting new path." << std::endl;
+  // std::vector<ob::State*> sp = gpath.getStates();
+  // for(uint k = 0; k < sp.size(); k++){
+  //   Q1->printState(sp.at(k));
+  // }
 
 }
 void QuotientGraphSparse::PrintPathStack()
@@ -542,6 +499,69 @@ const std::vector<ob::State*> QuotientGraphSparse::getKthPath(uint k) const
 {
     return pathStackHead_.at(k);
 }
+
+// A recursive function to print all paths from 'u' to 'd'.
+// visited[] keeps track of vertices in current path.
+// path[] stores actual vertices and path_index is current
+// index in path[]
+void QuotientGraphSparse::printAllPathsUtil(
+		Vertex u, 
+		Vertex d, 
+		bool visited[], 
+		int path[], 
+		int &path_index) 
+{
+  //terminate if we have enough paths in stack
+    if(pathStack_.size() > Nhead) return;
+
+    // Mark the current node and store it in path[]
+    visited[u] = true;
+    path[path_index] = u;
+    path_index++;
+
+    // If current vertex is same as destination, then print
+    // current path[]
+    if (u == d)
+    {
+        std::vector<ob::State*> pp;
+        for (int i = 0; i<path_index; i++){
+            pp.push_back(graphSparse_[path[i]]->state);
+        }
+        AddPathToStack(pp);
+    }
+    else // If current vertex is not destination
+    {
+        // Recur for all the vertices adjacent to current vertex
+        OEIterator ei, ei_end;
+        for (boost::tie(ei, ei_end) = boost::out_edges(u, graphSparse_); ei != ei_end; ++ei) {
+          Vertex source = boost::source ( *ei, graphSparse_ );
+          Vertex target = boost::target ( *ei, graphSparse_ );
+          Vertex vnext = (source==u? target: source);
+          if (!visited[vnext]){
+              printAllPathsUtil(vnext, d, visited, path, path_index);
+							if(pathStack_.size() > Nhead) break;
+          }
+        }
+        // for (i = adj[u].begin(); i != adj[u].end(); ++i)
+        //     if (!visited[*i])
+        //         printAllPathsUtil(*i, d, visited, path, path_index);
+    }
+
+    // Remove current vertex from path[] and mark it as unvisited
+    path_index--;
+    visited[u] = false;
+}
+// void QuotientGraphSparse::GenerateShortestPaths(
+//     Vertex v_start, 
+//     Vertex v_goal, 
+//     Graph graph, 
+//     unsigned Nhead, 
+//     pathStackHead_)
+// {
+//         AddPathToStack(pp);
+// }
+
+
 void QuotientGraphSparse::enumerateAllPaths() 
 {
     if(!hasSolution) return;
@@ -552,13 +572,17 @@ void QuotientGraphSparse::enumerateAllPaths()
         return;
     }
 
+    // TestVisibilityChecker();
     std::cout << "Enumerating paths on " << getName() << std::endl;
 
     //Remove Edges
     //(1) REDUCIBLE: Removal of reducible loops [Schmitzberger 02]
     removeReducibleLoops();
-
     //############################################################################
+
+    PathEnumerator pe(v_start_sparse, v_goal_sparse, graphSparse_);
+    pe.ComputePaths();
+
     numberVertices = boost::num_vertices(graphSparse_);
     if(numberVertices<=0) return;
     bool *visited = new bool[numberVertices];
@@ -572,15 +596,19 @@ void QuotientGraphSparse::enumerateAllPaths()
         visited[i] = false;
 
     printAllPathsUtil(v_start_sparse, v_goal_sparse, visited, path, path_index);
+    //############################################################################
 
     uint Npathsize = pathStack_.size();
     uint Npaths = std::min(Nhead, Npathsize);
+
     pathStackHead_.clear();
     for(uint k = 0; k < Npaths; k++){
-        og::PathGeometric& pathK = (*(pathStack_.rbegin()+k));
+        //og::PathGeometric& pathK = (*(pathStack_.rbegin()+k));
+        og::PathGeometric& pathK = pathStack_.at(k);//*(pathStack_.rbegin()+k));
         pathStackHead_.push_back(pathK.getStates());
     }
     std::cout << "Found " << pathStackHead_.size() << " path classes." << std::endl;
+    std::cout << std::string(80, '-') << std::endl;
 }
 
 void QuotientGraphSparse::getPlannerDataRoadmap(ob::PlannerData &data, std::vector<int> pathIdx) const

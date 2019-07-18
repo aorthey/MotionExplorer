@@ -38,6 +38,7 @@ namespace ompl
         // void AddEdge(const Configuration* q1, const Configuration* q2);
         virtual void setup() override;
         virtual void clear() override;
+        void TestVisibilityChecker();
 
         virtual void Init();
         //Copied from SPARS

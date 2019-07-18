@@ -291,9 +291,11 @@ void MotionPlanner::AdvanceUntilSolution()
     strategy->Plan(output);
     output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
   }
-  if(current_path.empty()){
-      ExpandFull();
-  }
+
+  //TODO: quick hack to refresh hierarchical display
+  Collapse();
+  Expand();
+  Expand();
 
 }
 

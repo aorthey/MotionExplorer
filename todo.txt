@@ -679,8 +679,6 @@ of pseudo metric?)
 
 Problems for decomposition
 [x] PathClasses contain additional vertices not belonging to path.
-[ ] With more layers, we might get empty path classes.
-[ ] 2nd layer
 [ ] jump directly to last selection, not going back
 [ ] tighten roadmap
 [ ] connect subroadmaps on cspace

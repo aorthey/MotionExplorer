@@ -282,7 +282,6 @@ void StrategyGeometricMultiLevel::Step(StrategyOutput &output)
   ob::PlannerTerminationCondition ptc(itc);
 
   ompl::time::point start = ompl::time::now();
-  std::cout << "Step" << std::endl;
   planner->solve(ptc);
   output.planner_time = ompl::time::seconds(ompl::time::now() - start);
   output.max_planner_time = max_planning_time;
