@@ -47,8 +47,10 @@ PathVisibilityChecker::~PathVisibilityChecker(void)
 class pathPathValidityChecker : public ob::StateValidityChecker
 {
 public:
-  pathPathValidityChecker(const ob::SpaceInformationPtr &si, const ob::SpaceInformationPtr &si_local, std::vector<ob::State*> s1, std::vector<ob::State*> s2) : ob::StateValidityChecker(si), si_local_(si_local), path1_(s1), path2_(s2)
+  pathPathValidityChecker(const ob::SpaceInformationPtr &si, const ob::SpaceInformationPtr &si_local, std::vector<ob::State*> s1, std::vector<ob::State*> s2) : ob::StateValidityChecker(si), si_local_(si_local)
   {
+    path1_ = s1;
+    path2_ = s2;
     path1_length_ = 0;
     path2_length_ = 0;
     path1_interp_state_ = si_->allocState();
@@ -58,8 +60,8 @@ public:
 
     computePathLength(path1_, path1_distances_, path1_length_);
     computePathLength(path2_, path2_distances_, path2_length_);
-    std::cout << "Path1 length: " << path1_length_ << std::endl;
-    std::cout << "Path2 length: " << path2_length_ << std::endl;
+    // std::cout << "Path1 length: " << path1_length_ << std::endl;
+    // std::cout << "Path2 length: " << path2_length_ << std::endl;
   }
   virtual ~pathPathValidityChecker(){
       si_->freeState(path1_interp_state_);
@@ -199,14 +201,14 @@ bool PathVisibilityChecker::CheckValidity(const std::vector<ob::State*> &s)
     ob::State *sk = s.at(k);
     ob::State *skk = s.at(k+1);
     std::pair<ob::State *, double> lastValid;
-    bool val = si_->checkMotion(sk, skk, lastValid);
+    si_->checkMotion(sk, skk, lastValid);
     // bool val = si_->getStateValidityChecker()->isValid(sk);
     // double dk = si_->getStateValidityChecker()->clearance(sk);
-    if(!val){
-      std::cout << "Last Valid:" << std::endl;
-      si_->printState(lastValid.first);
-      return false;
-    }
+    // if(!val){
+    //   std::cout << "Last Valid:" << std::endl;
+    //   si_->printState(lastValid.first);
+    //   return false;
+    // }
       // OMPL_ERROR("State is invalid!");
       // si_->printState(sk);
       // std::cout << std::string(80, '-') << std::endl;
@@ -219,14 +221,13 @@ bool PathVisibilityChecker::CheckValidity(const std::vector<ob::State*> &s)
       // exit(0);
     // }
   }
-std::cout << "Validity Check OK" << std::endl;
-return true;
+  return true;
 }
 
 bool PathVisibilityChecker::IsPathVisible(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2)
 {
-  if(!CheckValidity(s1)) return false;
-  if(!CheckValidity(s2)) return false;
+  // if(!CheckValidity(s1)) return false;
+  // if(!CheckValidity(s2)) return false;
 
   const float max__planning_time_path_path = 0.3;
   const float epsilon_goalregion = 0.01;
@@ -274,9 +275,9 @@ bool PathVisibilityChecker::IsPathVisible(std::vector<ob::State*> &s1, std::vect
   linear_homotopy_planner->getPlannerData(*pd);
   pd->decoupleFromPlanner();
   // pd->printGraphviz(std::cout);
-  std::cout << pd->numVertices() << std::endl;
-  std::cout << pd->numStartVertices() << std::endl;
-  std::cout << pd->numGoalVertices() << std::endl;
+  // std::cout << pd->numVertices() << std::endl;
+  // std::cout << pd->numStartVertices() << std::endl;
+  // std::cout << pd->numGoalVertices() << std::endl;
   if(!solved)
   {
     std::cout << "Failed Deforming" << std::endl;

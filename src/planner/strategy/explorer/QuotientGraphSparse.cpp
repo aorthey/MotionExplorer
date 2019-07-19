@@ -6,7 +6,6 @@
 #include <ompl/geometric/PathSimplifier.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 #include <ompl/geometric/PathSimplifier.h>
-#include <ompl/base/GenericParam.h>
 
 #include <boost/property_map/vector_property_map.hpp>
 #include <boost/property_map/transform_value_property_map.hpp>
@@ -25,20 +24,34 @@ QuotientGraphSparse::QuotientGraphSparse(const ob::SpaceInformationPtr &si, Quot
   // specs_.optimizingPaths = false;
   Planner::declareParam<double>("sparse_delta_fraction", this, &QuotientGraphSparse::setSparseDeltaFraction,
                                 &QuotientGraphSparse::getSparseDeltaFraction, "0.0:0.01:1.0");
-
   pathVisibilityChecker_ = new PathVisibilityChecker(Q1);
-  pathVisibilityChecker_->Test3(0);
-  std::cout << std::string(80, '-') << std::endl;
-  // Q1->setup();
-  ob::ParamSet p1 = Q1->getStateSpace()->params();
-  Q1->getStateSpace()->setup();
-  ob::ParamSet p2 = Q1->getStateSpace()->params();
-  p1.print(std::cout);
-  std::cout << std::string(80, '-') << std::endl;
-  p2.print(std::cout);
-  std::cout << std::string(80, '-') << std::endl;
-  pathVisibilityChecker_->Test3(1);
-  exit(0);
+
+  // ob::StateSpacePtr space = Q1->getStateSpace();
+
+  // std::cout << std::string(80, '-') << std::endl;
+  // std::cout << "BEFORE:" << space->getLongestValidSegmentFraction() << std::endl;
+  // std::cout << "BEFORE:" << space->getLongestValidSegmentLength() << std::endl;
+  // std::cout << "BEFORE:" << space->getMaximumExtent() << std::endl;
+  // std::cout << "BEFORE:" << space->getValidSegmentCountFactor() << std::endl;
+
+
+// //   std::cout << std::string(80, '-') << std::endl;
+// //   space->printSettings(std::cout);
+// //   std::cout << space->getMaximumExtent() << std::endl;
+// //   std::cout << std::string(80, '-') << std::endl;
+
+  // space->setup();
+  // std::cout << "AFTER:" << space->getLongestValidSegmentFraction() << std::endl;
+  // std::cout << "AFTER:" << space->getLongestValidSegmentLength() << std::endl;
+  // std::cout << "AFTER:" << space->getMaximumExtent() << std::endl;
+  // std::cout << "AFTER:" << space->getValidSegmentCountFactor() << std::endl;
+
+  // // std::cout << space->getMaximumExtent() << std::endl;
+  // // Q1->getStateSpace()->printSettings(std::cout);
+  // // std::cout << std::string(80, '-') << std::endl;
+
+
+  // exit(0);
 
   if (!isSetup())
   {
@@ -75,7 +88,6 @@ void QuotientGraphSparse::setup()
 
 void QuotientGraphSparse::clear()
 {
-  pathVisibilityChecker_->Test3(2);
   BaseT::clear();
 
   if (nearestSparse_)
@@ -98,7 +110,6 @@ void QuotientGraphSparse::clear()
 
   pathStackHead_.clear();
   pathStack_.clear();
-  pathVisibilityChecker_->Test3(4);
 }
 
 void QuotientGraphSparse::Init()
@@ -595,7 +606,6 @@ void QuotientGraphSparse::enumerateAllPaths()
 
     // TestVisibilityChecker();
     std::cout << "Enumerating paths on " << getName() << std::endl;
-    exit(0);
 
     //Remove Edges
     //(1) REDUCIBLE: Removal of reducible loops [Schmitzberger 02]
