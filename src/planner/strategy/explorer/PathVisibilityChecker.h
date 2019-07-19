@@ -25,6 +25,7 @@ namespace ompl
       void Test3(int F=0);
     protected:
       ob::SpaceInformationPtr si_;
+      ob::State *lastValidState;
     private:
       std::vector<ob::State*> StatesFromVector( 
           const std::vector<double> &sx, 

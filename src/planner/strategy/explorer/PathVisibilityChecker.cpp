@@ -38,6 +38,7 @@ PathVisibilityChecker::PathVisibilityChecker(const base::SpaceInformationPtr &si
   // }
   // Test3();
   // exit(0);
+  lastValidState = si_->allocState();
 }
 
 PathVisibilityChecker::~PathVisibilityChecker(void)
@@ -200,34 +201,19 @@ bool PathVisibilityChecker::CheckValidity(const std::vector<ob::State*> &s)
   for(uint k = 0; k < s.size()-1; k++){
     ob::State *sk = s.at(k);
     ob::State *skk = s.at(k+1);
-    std::pair<ob::State *, double> lastValid;
-    si_->checkMotion(sk, skk, lastValid);
-    // bool val = si_->getStateValidityChecker()->isValid(sk);
-    // double dk = si_->getStateValidityChecker()->clearance(sk);
-    // if(!val){
-    //   std::cout << "Last Valid:" << std::endl;
-    //   si_->printState(lastValid.first);
-    //   return false;
-    // }
-      // OMPL_ERROR("State is invalid!");
-      // si_->printState(sk);
-      // std::cout << std::string(80, '-') << std::endl;
-      // std::cout << "COMPLETE PATH:" << std::endl;
-      // for(uint i = 0; i < s.size(); i++){
-      //   ob::State *si = s.at(i);
-      //   si_->printState(si);
-      // }
-      // std::cout << std::string(80, '-') << std::endl;
-      // exit(0);
-    // }
+    // std::pair<ob::State *, double> lastValid;
+    // lastValid.first = lastValidState;
+    // bool val = si_->checkMotion(sk, skk, lastValid);
+    bool val = si_->checkMotion(sk, skk);
+    if(!val) return false;
   }
   return true;
 }
 
 bool PathVisibilityChecker::IsPathVisible(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2)
 {
-  // if(!CheckValidity(s1)) return false;
-  // if(!CheckValidity(s2)) return false;
+  if(!CheckValidity(s1)) return false;
+  if(!CheckValidity(s2)) return false;
 
   const float max__planning_time_path_path = 0.3;
   const float epsilon_goalregion = 0.01;
@@ -254,7 +240,6 @@ bool PathVisibilityChecker::IsPathVisible(std::vector<ob::State*> &s1, std::vect
   ss.setStateValidityChecker( std::make_shared<pathPathValidityChecker>(si_, si_local,  s1, s2) );
   ob::PlannerPtr linear_homotopy_planner = std::make_shared<og::RRT>(si_local);
   // static_pointer_cast<og::RRTConnect>(linear_homotopy_planner)->clear();
-
 
   ss.setStartAndGoalStates(start, goal, epsilon_goalregion);
   ss.setPlanner(linear_homotopy_planner);
