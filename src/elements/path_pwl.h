@@ -27,6 +27,7 @@ class PathPiecewiseLinear
 
     Config Eval(const double t) const;
     Config EvalVelocity(const double t) const;
+    Vector EvalVelocityVec3(const double t) const;
     Vector3 EvalVec3(const double t) const;
     Config EvalMilestone(const int k) const;
 
@@ -42,8 +43,10 @@ class PathPiecewiseLinear
     GLColor cVertex{magenta}, cLine{magenta};
     GLColor cSmoothed{magenta}, cUnsmoothed{red};
     GLColor cRobotVolume{grey};
+    GLColor cCross{green};
 
     bool drawSweptVolume{true};
+    bool drawCross{true};
 
     void DrawGL(GUIState& state);
     void DrawGL(GUIState& state, double t);
@@ -66,6 +69,10 @@ class PathPiecewiseLinear
     void Draw2DArrow(Vector3 arrow_pos, Vector3 arrow_dir, double arrow_size_head, double arrow_size_length);
     Vector3 GetNearestStateToTipOfArrow(Vector3 arrow_pos, 
         std::vector<ob::State*> states, uint k_start_state, double arrow_size_length);
+
+    void DrawGLRibbon(const std::vector<ob::State*> &states);
+    void DrawGLArrowMiddleOfPath(const std::vector<ob::State*> &states);
+    void DrawGLCross(const std::vector<ob::State*> &states);
 
     SweptVolume *sv{nullptr};
     CSpaceOMPL *cspace{nullptr};

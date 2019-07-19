@@ -102,7 +102,7 @@ namespace ompl
         Vertex v_start_sparse;
         Vertex v_goal_sparse;
 
-        PathVisibilityChecker* pathVisibilityChecker_;
+        PathVisibilityChecker* pathVisibilityChecker_{nullptr};
         void AddPathToStack(std::vector<ob::State*> &path);
 
     };

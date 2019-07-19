@@ -6,6 +6,8 @@
 #include <ompl/geometric/PathSimplifier.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 #include <ompl/geometric/PathSimplifier.h>
+#include <ompl/base/GenericParam.h>
+
 #include <boost/property_map/vector_property_map.hpp>
 #include <boost/property_map/transform_value_property_map.hpp>
 #include <boost/foreach.hpp>
@@ -25,6 +27,18 @@ QuotientGraphSparse::QuotientGraphSparse(const ob::SpaceInformationPtr &si, Quot
                                 &QuotientGraphSparse::getSparseDeltaFraction, "0.0:0.01:1.0");
 
   pathVisibilityChecker_ = new PathVisibilityChecker(Q1);
+  pathVisibilityChecker_->Test3(0);
+  std::cout << std::string(80, '-') << std::endl;
+  // Q1->setup();
+  ob::ParamSet p1 = Q1->getStateSpace()->params();
+  Q1->getStateSpace()->setup();
+  ob::ParamSet p2 = Q1->getStateSpace()->params();
+  p1.print(std::cout);
+  std::cout << std::string(80, '-') << std::endl;
+  p2.print(std::cout);
+  std::cout << std::string(80, '-') << std::endl;
+  pathVisibilityChecker_->Test3(1);
+  exit(0);
 
   if (!isSetup())
   {
@@ -44,6 +58,7 @@ void QuotientGraphSparse::DeleteConfiguration(Configuration *q)
 
 void QuotientGraphSparse::setup()
 {
+
   BaseT::setup();
   if (!nearestSparse_){
     nearestSparse_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration*>(this));
@@ -52,13 +67,15 @@ void QuotientGraphSparse::setup()
                                return Distance(a, b);
                              });
   }
-  double maxExt = si_->getMaximumExtent();
-  sparseDelta_ = sparseDeltaFraction_ * maxExt;
-  std::cout << "Sparse delta=" << sparseDelta_ << std::endl;
+
+  // double maxExt = si_->getMaximumExtent();
+  // sparseDelta_ = sparseDeltaFraction_ * maxExt;
+  sparseDelta_ = 1.5;
 }
 
 void QuotientGraphSparse::clear()
 {
+  pathVisibilityChecker_->Test3(2);
   BaseT::clear();
 
   if (nearestSparse_)
@@ -81,6 +98,7 @@ void QuotientGraphSparse::clear()
 
   pathStackHead_.clear();
   pathStack_.clear();
+  pathVisibilityChecker_->Test3(4);
 }
 
 void QuotientGraphSparse::Init()
@@ -345,6 +363,9 @@ void QuotientGraphSparse::AddPathToStack(std::vector<ob::State*> &path)
   if(pathStack_.size() <= 0){
     pathStack_.push_back(gpath);
   }else{
+    if(!pathVisibilityChecker_->CheckValidity(gpath.getStates())){
+      return;
+    }
     for(uint k = 0; k < pathStack_.size(); k++){
       og::PathGeometric& pathk = pathStack_.at(k);
       if(pathVisibilityChecker_->IsPathVisible(gpath.getStates(), pathk.getStates())){
@@ -574,14 +595,15 @@ void QuotientGraphSparse::enumerateAllPaths()
 
     // TestVisibilityChecker();
     std::cout << "Enumerating paths on " << getName() << std::endl;
+    exit(0);
 
     //Remove Edges
     //(1) REDUCIBLE: Removal of reducible loops [Schmitzberger 02]
     removeReducibleLoops();
     //############################################################################
 
-    PathEnumerator pe(v_start_sparse, v_goal_sparse, graphSparse_);
-    pe.ComputePaths();
+    // PathEnumerator pe(v_start_sparse, v_goal_sparse, graphSparse_);
+    // pe.ComputePaths();
 
     numberVertices = boost::num_vertices(graphSparse_);
     if(numberVertices<=0) return;
@@ -609,6 +631,9 @@ void QuotientGraphSparse::enumerateAllPaths()
     }
     std::cout << "Found " << pathStackHead_.size() << " path classes." << std::endl;
     std::cout << std::string(80, '-') << std::endl;
+
+
+
 }
 
 void QuotientGraphSparse::getPlannerDataRoadmap(ob::PlannerData &data, std::vector<int> pathIdx) const

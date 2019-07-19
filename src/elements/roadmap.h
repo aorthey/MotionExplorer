@@ -27,19 +27,19 @@ class Roadmap{
     bool Save(const char* fn);
     bool Save(TiXmlElement *node);
 
-    GLDraw::GLColor cVertex{lightgreen};
+    GLDraw::GLColor cVertex{lightGreen};
     GLDraw::GLColor cVertexStart{green};
     GLDraw::GLColor cVertexGoal{red};
-    GLDraw::GLColor cEdge{lightgreen};
-    GLDraw::GLColor cPath{darkmagenta};
+    GLDraw::GLColor cEdge{lightGreen};
+    GLDraw::GLColor cPath{darkMagenta};
     GLDraw::GLColor cComplex{magenta};
-    GLDraw::GLColor cComplexQuad{lightblue};
+    GLDraw::GLColor cComplexQuad{lightBlue};
 
     GLDraw::GLColor cVertexComponentOut{gray}; //a vertex not in the same component as the designated start vertex
     GLDraw::GLColor cVertexComponentGoal{cyan}; //goal component vertex
-    GLDraw::GLColor cNeighborhoodVolume{lightgreen};
-    GLDraw::GLColor cNeighborhoodVolumeInfeasible{lightred}; 
-    GLDraw::GLColor cNeighborhoodVolumeSufficient{lightmagenta}; 
+    GLDraw::GLColor cNeighborhoodVolume{lightGreen};
+    GLDraw::GLColor cNeighborhoodVolumeInfeasible{lightRed}; 
+    GLDraw::GLColor cNeighborhoodVolumeSufficient{lightMagenta}; 
 
     bool wiredNeighborhood{true};
 

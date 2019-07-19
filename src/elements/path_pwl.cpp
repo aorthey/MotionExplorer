@@ -80,33 +80,6 @@ void PathPiecewiseLinear::SendToController(SmartPointer<RobotController> control
   }
 
 }
-// -void MotionPlanner::SendCommandStringController(string cmd, string arg)
-// -{
-// -  if(!_sim->robotControllers[_icontroller]->SendCommand(cmd,arg)) {
-// -    std::cout << std::string(80, '-') << std::endl;
-// -    std::cout << "ERROR in controller commander" << std::endl;
-// -    std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
-// -    std::cout << std::string(80, '-') << std::endl;
-// -    throw "Controller command not supported!";
- // }
-// -bool MotionPlanner::SendToController()
-// -{
-// -  if(!_isSolved){ return false; }
- 
-// -  double dstep = 0.1;
-// -  Config q;
-// -  Config dq;
-// -  for(int i = 0; i < _keyframes.size()-1; i++){
-// -    //_path.Evaluate(d, q, dq);
-// -    q = _keyframes.at(i);
-// -    Config q2 = _keyframes.at(i+1);
-// -    double dt = 1.0/_keyframes.size();
-// -    dq = (q-q2)/dt;
-// -    stringstream qstr;
-// -    qstr<<q<<dq;
-// -    string cmd( (i<=0)?("set_qv"):("append_qv") );
-// -    SendCommandStringController(cmd,qstr.str());
-
 
 void PathPiecewiseLinear::Smooth(){
   if(path == nullptr) return;
@@ -362,60 +335,8 @@ Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos,
     return qnext;
 }
 
-void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
-  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*_path);
-  ob::SpaceInformationPtr si = gpath.getSpaceInformation();
-  std::vector<ob::State *> states = gpath.getStates();
-
-  ob::StateSpacePtr space = si->getStateSpace();
-
-  //############################################################################
-  //Set openGL scene
-  //############################################################################
-  glDisable(GL_LIGHTING);
-  glEnable(GL_BLEND);
-  glEnable(GL_LINE_SMOOTH);
-  glDisable(GL_CULL_FACE);
-
-  glPushMatrix();
-  glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
-  glPointSize(ptsize);
-  cLine.setCurrentGL();
-
-  //############################################################################
-  //Compute Arrow Position
-  //############################################################################
-  if(states.size() < 2){
-    std::cout << "Path has " << states.size() << " states." << std::endl;
-    std::cout << "Cannot draw arrow." << std::endl;
-    exit(0);
-  }
-
-  Vector3 arrow_pos, arrow_dir;
-  double arrow_size_head = 2*linewidth;
-  double arrow_size_length = 1.5*arrow_size_head;
-
-  glLineWidth(arrow_size_head*10);
-  Vector3 qnext;
-  if(states.size() == 2){
-    Vector3 q1 = Vector3FromState(states.at(0));
-    qnext = Vector3FromState(states.at(1));
-    arrow_pos = 0.5*(qnext - q1);
-  }else if(states.size()%2 == 0){
-    uint m = 0.5*states.size();
-    Vector3 q1 = Vector3FromState(states.at(m-1));
-    Vector3 q2 = Vector3FromState(states.at(m));
-    arrow_pos = q1 + 0.5*(q2 - q1);
-    qnext = GetNearestStateToTipOfArrow(arrow_pos, states, m, arrow_size_length);
-  }else{
-    uint m = floor(0.5*states.size());
-    arrow_pos = Vector3FromState(states.at(m));
-    qnext = GetNearestStateToTipOfArrow(arrow_pos, states, m, arrow_size_length);
-  }
-  arrow_dir = qnext - arrow_pos;
-  arrow_dir.inplaceNormalize();
-  arrow_dir.inplaceMul(arrow_size_length);
-
+void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
+{
   //############################################################################
   //Draws a tron-like line strip
   //############################################################################
@@ -480,6 +401,37 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
   }
   glEnd();
   cLine.setCurrentGL();
+}
+
+
+void PathPiecewiseLinear::DrawGLArrowMiddleOfPath( const std::vector<ob::State*> &states)
+{
+  if(states.size() < 2) return;
+
+  Vector3 arrow_pos, arrow_dir;
+  double arrow_size_head = 2*linewidth;
+  double arrow_size_length = 1.5*arrow_size_head;
+
+  glLineWidth(arrow_size_head*10);
+  Vector3 qnext;
+  if(states.size() == 2){
+    Vector3 q1 = Vector3FromState(states.at(0));
+    qnext = Vector3FromState(states.at(1));
+    arrow_pos = 0.5*(qnext - q1);
+  }else if(states.size()%2 == 0){
+    uint m = 0.5*states.size();
+    Vector3 q1 = Vector3FromState(states.at(m-1));
+    Vector3 q2 = Vector3FromState(states.at(m));
+    arrow_pos = q1 + 0.5*(q2 - q1);
+    qnext = GetNearestStateToTipOfArrow(arrow_pos, states, m, arrow_size_length);
+  }else{
+    uint m = floor(0.5*states.size());
+    arrow_pos = Vector3FromState(states.at(m));
+    qnext = GetNearestStateToTipOfArrow(arrow_pos, states, m, arrow_size_length);
+  }
+  arrow_dir = qnext - arrow_pos;
+  arrow_dir.inplaceNormalize();
+  arrow_dir.inplaceMul(arrow_size_length);
 
   //############################################################################
   //Draw Arrow at middle of path
@@ -488,35 +440,105 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
   glTranslatef(arrow_pos[0], arrow_pos[1], arrow_pos[2]+std::max(0.5*zOffset, 1e-3));
   Draw2DArrow(arrow_pos, arrow_dir, arrow_size_head, arrow_size_length);
   glPopMatrix();
-  glEnable(GL_CULL_FACE);
+}
+
+void PathPiecewiseLinear::DrawGLCross( const std::vector<ob::State*> &states)
+{
+  if(states.size() < 2) return;
+
+  Vector3 ez(0,0,1);
+
+  Vector3 pos = EvalVec3(0.3*GetLength());
+
+  //############################################################################
+  //Draw Cross at pos
+  //############################################################################
+  double radius = 1.1*linewidth;
+
+  double barWidth = 0.2*radius;
+  double barLength = 0.8*radius;
+  double cylinderHeight = 0.05;
+
+  double barOffset = cylinderHeight + std::max(0.5*zOffset, 1e-3);
+  Vector3 b1(pos[0]+barLength,pos[1]-barWidth,pos[2]+barOffset);
+  Vector3 b2(pos[0]+barLength,pos[1]+barWidth,pos[2]+barOffset);
+  Vector3 b3(pos[0]-barLength,pos[1]-barWidth,pos[2]+barOffset);
+  Vector3 b4(pos[0]-barLength,pos[1]+barWidth,pos[2]+barOffset);
+
+  Vector3 c1(pos[0]+barWidth,pos[1]-barLength,pos[2]+barOffset);
+  Vector3 c2(pos[0]+barWidth,pos[1]+barLength,pos[2]+barOffset);
+  Vector3 c3(pos[0]-barWidth,pos[1]-barLength,pos[2]+barOffset);
+  Vector3 c4(pos[0]-barWidth,pos[1]+barLength,pos[2]+barOffset);
+
+  white.setCurrentGL();
+  glBegin(GL_TRIANGLES);
+  glNormal3v(ez);
+  glVertex3v(b1);
+  glVertex3v(b2);
+  glVertex3v(b3);
+
+  glNormal3v(ez);
+  glVertex3v(b2);
+  glVertex3v(b3);
+  glVertex3v(b4);
+
+  glNormal3v(ez);
+  glVertex3v(c1);
+  glVertex3v(c2);
+  glVertex3v(c3);
+
+  glNormal3v(ez);
+  glVertex3v(c2);
+  glVertex3v(c3);
+  glVertex3v(c4);
+  glEnd();
+
+  cCross.setCurrentGL();
+  glPushMatrix();
+  glTranslatef(pos[0], pos[1], pos[2]);
+  drawCylinder(cylinderHeight*ez, radius);
+
+  glLineWidth(5);
+  black.setCurrentGL();
+  drawWireCircle(ez, radius);
+
+  glPopMatrix();
+}
+
+void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
+  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*_path);
+  ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+  std::vector<ob::State *> states = gpath.getStates();
+
+  ob::StateSpacePtr space = si->getStateSpace();
+
+  //############################################################################
+  //Set openGL scene
+  //############################################################################
+  glDisable(GL_LIGHTING);
+  glEnable(GL_BLEND);
+  glEnable(GL_LINE_SMOOTH);
+  glDisable(GL_CULL_FACE);
+  cLine.setCurrentGL();
+
+  //############################################################################
+  DrawGLRibbon(states);
+  DrawGLArrowMiddleOfPath(states);
+  if(drawCross) DrawGLCross(states);
 
   if(drawSweptVolume && state("draw_path_sweptvolume")){
     double L = GetLength();
     this->DrawGL(state, 0.5*L);
   }
 
-    // double tmin = 0.05;
-    // double L = GetLength();
-    // uint Nmilestones = int(L/tmin);
-    // std::vector<Config> q;
-    // for(uint k = 0; k < Nmilestones; k++){
-    //   q.push_back( Eval(k*tmin) );
-    // }
-    //   sv = new SweptVolume(quotient_space->GetRobotPtr(), q, Nmilestones);
-    // }
-    // sv->DrawGL(state);
-
   //############################################################################
   //Reset openGL
   //############################################################################
-  glPopMatrix();
   glLineWidth(1);
   glEnable(GL_CULL_FACE);
   glDisable(GL_LINE_SMOOTH);
   glDisable(GL_BLEND);
   glEnable(GL_LIGHTING);
-  // glDisable(GL_BLEND);
-  // glEnable(GL_LIGHTING);
 
 }
 

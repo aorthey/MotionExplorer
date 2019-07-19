@@ -481,23 +481,39 @@ void MotionPlanner::DrawGL(GUIState& state){
 
   if(current_path.size() > 0){
       int last_node = current_path.back();
-
       const GLColor magenta(0.7,0,0.7,1);
+
+      const GLColor pathSelectedExecutable = green;
+      const GLColor pathSelectedNonExec = orange;
+      const GLColor pathSelectedNonExecChildren = green;
+      const GLColor pathNotSelected = lightOrange;
+      const GLColor pathNotSelectedChildren = lightGreen;
+
       for(uint k = 0; k < Nsiblings; k++){
         if(k==(uint)last_node) continue;
         current_path.back() = k;
         Rcurrent = hierarchy->GetNodeContent(current_path);
         Rcurrent->DrawGL(state);
         PathPiecewiseLinear *pwlk = Rcurrent->GetShortestPath();
+        bool hasChildren = hierarchy->HasChildren(current_path);
         if(pwlk && state("draw_roadmap_shortest_path")){
           pwlk->zOffset = 0.001;
           pwlk->linewidth = 0.1;
           pwlk->ptsize = 8;
-          pwlk->cSmoothed = magenta;
-          pwlk->cUnsmoothed = magenta;
-          pwlk->cVertex = magenta;
-          pwlk->cLine = magenta;
+          if(hasChildren){
+              pwlk->cSmoothed = pathNotSelected;
+              pwlk->cUnsmoothed = pathNotSelected;
+              pwlk->cVertex = pathNotSelected;
+              pwlk->cLine = pathNotSelected;
+          }else{
+              pwlk->cSmoothed = pathNotSelectedChildren;
+              pwlk->cUnsmoothed = pathNotSelectedChildren;
+              pwlk->cVertex = pathNotSelectedChildren;
+              pwlk->cLine = pathNotSelectedChildren;
+
+          }
           pwlk->drawSweptVolume = false;
+          pwlk->drawCross = false;
           pwlk->DrawGL(state);
         }
       }
@@ -510,12 +526,35 @@ void MotionPlanner::DrawGL(GUIState& state){
         pwl->zOffset = 0.005;
         pwl->linewidth = 0.15;
         pwl->ptsize = 10;
-        pwl->cSmoothed = green;
-        pwl->cUnsmoothed = green;
-        pwl->cVertex = green;
-        pwl->cLine = green;
+
+
         pwl->cRobotVolume = GLColor(0.8,0.8,0.8,1);
         pwl->drawSweptVolume = true;
+        unsigned maxLevels = hierarchy->NumberLevels();
+        unsigned curLevel = hierarchy->GetNode(current_path)->level;
+        bool hasChildren = hierarchy->HasChildren(current_path);
+        if(curLevel < maxLevels-1){
+            pwl->drawCross = true;
+            if(hasChildren){
+                pwl->cCross = pathSelectedNonExecChildren;
+                pwl->cSmoothed = pathSelectedNonExecChildren;
+                pwl->cUnsmoothed = pathSelectedNonExecChildren;
+                pwl->cVertex = pathSelectedNonExecChildren;
+                pwl->cLine = pathSelectedNonExecChildren;
+            }else{
+                pwl->cCross = pathSelectedNonExec;
+                pwl->cSmoothed = pathSelectedNonExec;
+                pwl->cUnsmoothed = pathSelectedNonExec;
+                pwl->cVertex = pathSelectedNonExec;
+                pwl->cLine = pathSelectedNonExec;
+            }
+        }else{
+            pwl->drawCross = false;
+            pwl->cSmoothed = pathSelectedExecutable;
+            pwl->cUnsmoothed = pathSelectedExecutable;
+            pwl->cVertex = pathSelectedExecutable;
+            pwl->cLine = pathSelectedExecutable;
+        }
         pwl->DrawGL(state);
       }
   }else{

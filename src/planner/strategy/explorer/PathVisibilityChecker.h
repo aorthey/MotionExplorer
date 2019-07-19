@@ -18,14 +18,20 @@ namespace ompl
       // bool IsPathVisible(std::vector<QuotientGraph::Vertex> &v1, std::vector<QuotientGraph::Vertex> &v2);
       bool IsPathVisible(std::vector<QuotientGraph::Vertex> &v1, std::vector<QuotientGraph::Vertex> &v2, QuotientGraph::Graph &graph);
       bool IsPathVisible(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2);
+      bool CheckValidity(const std::vector<ob::State*> &s);
+
+      void Test1();
+      void Test2();
+      void Test3(int F=0);
     protected:
       ob::SpaceInformationPtr si_;
     private:
-      void Test1();
-      void Test2();
       std::vector<ob::State*> StatesFromVector( 
           const std::vector<double> &sx, 
           const std::vector<double> &sy);
+      std::vector<ob::State*> StatesFromVectorSO2R1( 
+          const std::vector<double> &st, 
+          const std::vector<double> &sx);
       std::vector<ob::State*> StatesFromVector( 
           const std::vector<double> &sx, 
           const std::vector<double> &sy, 
