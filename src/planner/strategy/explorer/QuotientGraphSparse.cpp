@@ -24,8 +24,6 @@ QuotientGraphSparse::QuotientGraphSparse(const ob::SpaceInformationPtr &si, Quot
   // specs_.optimizingPaths = false;
   Planner::declareParam<double>("sparse_delta_fraction", this, &QuotientGraphSparse::setSparseDeltaFraction,
                                 &QuotientGraphSparse::getSparseDeltaFraction, "0.0:0.01:1.0");
-  pathVisibilityChecker_ = new PathVisibilityChecker(Q1);
-
   // ob::StateSpacePtr space = Q1->getStateSpace();
 
   // std::cout << std::string(80, '-') << std::endl;
@@ -57,6 +55,8 @@ QuotientGraphSparse::QuotientGraphSparse(const ob::SpaceInformationPtr &si, Quot
   {
     setup();
   }
+  pathVisibilityChecker_ = new PathVisibilityChecker(Q1);
+
 }
 
 QuotientGraphSparse::~QuotientGraphSparse()
@@ -368,15 +368,16 @@ void QuotientGraphSparse::AddPathToStack(std::vector<ob::State*> &path)
   og::PathSimplifier shortcutter(Q1);
   shortcutter.simplifyMax(gpath);
   shortcutter.smoothBSpline(gpath);
-  shortcutter.reduceVertices(gpath);
+  // shortcutter.reduceVertices(gpath);
   // shortcutter.shortcutPath(gpath);
+
+  if(!pathVisibilityChecker_->CheckValidity(gpath.getStates())){
+    return;
+  }
 
   if(pathStack_.size() <= 0){
     pathStack_.push_back(gpath);
   }else{
-    if(!pathVisibilityChecker_->CheckValidity(gpath.getStates())){
-      return;
-    }
     for(uint k = 0; k < pathStack_.size(); k++){
       og::PathGeometric& pathk = pathStack_.at(k);
       if(pathVisibilityChecker_->IsPathVisible(gpath.getStates(), pathk.getStates())){
@@ -666,6 +667,7 @@ void QuotientGraphSparse::getPlannerDataRoadmap(ob::PlannerData &data, std::vect
     data.addEdge(p1,p2);
   }
 }
+
 std::vector<int> QuotientGraphSparse::GetSelectedPathIndex() const
 {
     std::vector<int> CurPath;
@@ -680,6 +682,7 @@ std::vector<int> QuotientGraphSparse::GetSelectedPathIndex() const
     std::cout << "Path Index " << CurPath << std::endl;
     return CurPath;
 }
+
 void QuotientGraphSparse::getPlannerData(ob::PlannerData &data) const
 {
   if(hasSolution){
@@ -692,23 +695,23 @@ void QuotientGraphSparse::getPlannerData(ob::PlannerData &data) const
           idxPathI.push_back(i);
           std::cout << "PathIndex" << i << ": " << idxPathI << std::endl;
 
-          PlannerDataVertexAnnotated p1(states.at(0));
-          p1.SetLevel(level);
-          p1.SetPath(idxPathI);
-          data.addStartVertex(p1);
+          PlannerDataVertexAnnotated *p1 = new PlannerDataVertexAnnotated(states.at(0));
+          p1->SetLevel(level);
+          p1->SetPath(idxPathI);
+          data.addStartVertex(*p1);
 
           for(uint k = 0; k < states.size()-1; k++){
 
-            PlannerDataVertexAnnotated p2(states.at(k+1));//Q1->cloneState(graphSparse_[v2]->state));
-            p2.SetLevel(level);
-            p2.SetPath(idxPathI);
+            PlannerDataVertexAnnotated *p2 = new PlannerDataVertexAnnotated(states.at(k+1));//Q1->cloneState(graphSparse_[v2]->state));
+            p2->SetLevel(level);
+            p2->SetPath(idxPathI);
 
             if(k==states.size()-2){
-              data.addGoalVertex(p2);
+              data.addGoalVertex(*p2);
             }else{
-              data.addVertex(p2);
+              data.addVertex(*p2);
             }
-            data.addEdge(p1,p2);
+            data.addEdge(*p1,*p2);
 
             p1 = p2;
           }

@@ -84,6 +84,10 @@ public:
     //############################################################################
     // CheckValidityExitOnFalse(path1_interp_state_);
     // CheckValidityExitOnFalse(path2_interp_state_);
+    //This means we have an edge which intersects an obstacle for less than
+    //discretization step distance. We like to ignore that for now.
+    if(!si_->getStateValidityChecker()->isValid(path1_interp_state_)) return true;
+    if(!si_->getStateValidityChecker()->isValid(path2_interp_state_)) return true;
 
 
     bool visible = si_->checkMotion(path1_interp_state_, path2_interp_state_);
@@ -117,15 +121,19 @@ public:
   {
       bool val = si_->getStateValidityChecker()->isValid(s);
       if(!val){
+          ompl::msg::setLogLevel(ompl::msg::LOG_DEV2);
           OMPL_ERROR("State is invalid!");
           si_->printState(s);
-          // for(uint k = 0; k < path1_.size(); k++){
-          //     si_->printState(path1_.at(k));
-          // }
-          // for(uint k = 0; k < path2_.size(); k++){
-          //     si_->printState(path2_.at(k));
-          // }
-          // exit(0);
+          std::cout << std::string(80, '-') << std::endl;
+          for(uint k = 0; k < path1_.size(); k++){
+              si_->printState(path1_.at(k));
+          }
+          for(uint k = 0; k < path2_.size(); k++){
+              si_->printState(path2_.at(k));
+          }
+          // std::cout << "Path1: " << (this->CheckValidity(path1_)?"VALIDPATH":"INVALID") << std::endl;
+          // std::cout << "Path2: " << (this->CheckValidity(path2_)?"VALIDPATH":"INVALID") << std::endl;
+          exit(0);
       }
   }
 
@@ -218,7 +226,8 @@ bool PathVisibilityChecker::IsPathVisible(std::vector<ob::State*> &s1, std::vect
   const float max__planning_time_path_path = 0.3;
   const float epsilon_goalregion = 0.01;
 
-  ompl::msg::setLogLevel(ompl::msg::LOG_DEV2);
+  // ompl::msg::setLogLevel(ompl::msg::LOG_DEV2);
+  ompl::msg::setLogLevel(ompl::msg::LOG_NONE);
 
   ob::RealVectorBounds bounds(2);
   bounds.setLow(0);
@@ -256,21 +265,21 @@ bool PathVisibilityChecker::IsPathVisible(std::vector<ob::State*> &s1, std::vect
   //############################################################################
   //DEBUG
   //############################################################################
-  ob::PlannerDataPtr pd( new ob::PlannerData(si_local) );
-  linear_homotopy_planner->getPlannerData(*pd);
-  pd->decoupleFromPlanner();
+  // ob::PlannerDataPtr pd( new ob::PlannerData(si_local) );
+  // linear_homotopy_planner->getPlannerData(*pd);
+  // pd->decoupleFromPlanner();
   // pd->printGraphviz(std::cout);
   // std::cout << pd->numVertices() << std::endl;
   // std::cout << pd->numStartVertices() << std::endl;
   // std::cout << pd->numGoalVertices() << std::endl;
-  if(!solved)
-  {
-    std::cout << "Failed Deforming" << std::endl;
-  }else{
-  // for(uint k = 0; k < pd->numVertices(); k++){
-  //   si_local->printState(pd->getVertex(k).getState());
+  // if(!solved)
+  // {
+  //   std::cout << "Failed Deforming" << std::endl;
+  // }else{
+  // // for(uint k = 0; k < pd->numVertices(); k++){
+  // //   si_local->printState(pd->getVertex(k).getState());
+  // // }
   // }
-  }
   //############################################################################
 
 

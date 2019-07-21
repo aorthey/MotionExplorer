@@ -484,8 +484,10 @@ void MotionPlanner::DrawGL(GUIState& state){
       const GLColor magenta(0.7,0,0.7,1);
 
       const GLColor pathSelectedExecutable = green;
+
       const GLColor pathSelectedNonExec = orange;
       const GLColor pathSelectedNonExecChildren = green;
+
       const GLColor pathNotSelected = lightOrange;
       const GLColor pathNotSelectedChildren = lightGreen;
 
@@ -500,7 +502,7 @@ void MotionPlanner::DrawGL(GUIState& state){
           pwlk->zOffset = 0.001;
           pwlk->linewidth = 0.1;
           pwlk->ptsize = 8;
-          if(hasChildren){
+          if(!hasChildren){
               pwlk->cSmoothed = pathNotSelected;
               pwlk->cUnsmoothed = pathNotSelected;
               pwlk->cVertex = pathNotSelected;

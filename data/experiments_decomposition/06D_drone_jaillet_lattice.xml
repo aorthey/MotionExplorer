@@ -3,7 +3,7 @@
 <world>
 
   <robot name="drone" file="../robots/drone/dddk.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="drone_sphere" file="../robots/sphere.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="drone_sphere" file="../robots/drone/dddk_inner_sphere.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
   <rigidObject name="lattice" file="../terrains/jailletgrill.tri" translation="+0 +0 0" rotateRPY="0 0 0"/>
 

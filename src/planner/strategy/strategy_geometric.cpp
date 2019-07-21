@@ -65,7 +65,7 @@ static ob::OptimizationObjectivePtr GetOptimizationObjective(const ob::SpaceInfo
   ob::OptimizationObjectivePtr lengthObj(new ob::PathLengthOptimizationObjective(si));
   ob::OptimizationObjectivePtr clearObj(new ob::MaximizeMinClearanceObjective(si));
   ob::MultiOptimizationObjective* opt = new ob::MultiOptimizationObjective(si);
-  opt->addObjective(lengthObj, 0.0);
+  opt->addObjective(lengthObj, 1.0);
   opt->addObjective(clearObj, 1.0);
   return ob::OptimizationObjectivePtr(opt);
 }
