@@ -1109,6 +1109,10 @@ void Quotient::Print(std::ostream& out) const
       out << "SE(2)";
     }else if( Q1->getStateSpace()->getType() == ob::STATE_SPACE_SE3 ){
       out << "SE(3)";
+    }else if( Q1->getStateSpace()->getType() == ob::STATE_SPACE_SO2 ){
+      out << "SO(2)";
+    }else if( Q1->getStateSpace()->getType() == ob::STATE_SPACE_SO3 ){
+      out << "SO(3)";
     }else if( Q1->getStateSpace()->getType() == ob::STATE_SPACE_REAL_VECTOR ){
       out << "R^" << Q1->getStateDimension();
     }else{
@@ -1168,7 +1172,7 @@ void Quotient::Print(std::ostream& out) const
        }
     }
   }
-  out << " [Importance:" << GetImportance() << "]";
+  out << " [Importance:" << GetImportance() << ", Measure:" << Q1->getStateSpace()->getMeasure() << "]";
 }
 
 namespace ompl{

@@ -5,7 +5,7 @@
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/geometric/PathSimplifier.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
-#include <ompl/geometric/PathSimplifier.h>
+#include <ompl/base/objectives/MaximizeMinClearanceObjective.h>
 
 #include <boost/property_map/vector_property_map.hpp>
 #include <boost/property_map/transform_value_property_map.hpp>
@@ -81,9 +81,12 @@ void QuotientGraphSparse::setup()
                              });
   }
 
-  // double maxExt = si_->getMaximumExtent();
-  // sparseDelta_ = sparseDeltaFraction_ * maxExt;
-  sparseDelta_ = 1.5;
+   //Max 0.2, otherwise the circle would not work?
+  // assert(sparseDeltaFraction_ <= 0.2);
+
+  double maxExt = si_->getMaximumExtent();
+  sparseDelta_ = sparseDeltaFraction_ * maxExt;
+
 }
 
 void QuotientGraphSparse::clear()
@@ -365,13 +368,49 @@ void QuotientGraphSparse::AddPathToStack(std::vector<ob::State*> &path)
   for(uint k = 0; k < path.size(); k++){
     gpath.append(path.at(k));
   }
-  og::PathSimplifier shortcutter(Q1);
-  shortcutter.simplifyMax(gpath);
-  shortcutter.smoothBSpline(gpath);
-  // shortcutter.reduceVertices(gpath);
-  // shortcutter.shortcutPath(gpath);
 
+  ob::OptimizationObjectivePtr lengthObj(new ob::PathLengthOptimizationObjective(Q1));
+  ob::OptimizationObjectivePtr clearObj(new ob::MaximizeMinClearanceObjective(Q1));
+  ob::MultiOptimizationObjective* multiObj = new ob::MultiOptimizationObjective(Q1);
+
+  multiObj->addObjective(lengthObj, 1.0);
+  multiObj->addObjective(clearObj, 1.0);
+  ob::OptimizationObjectivePtr pathObj(multiObj);
+
+  std::cout << "PATH" << std::endl;
+  for(uint k = 0; k < path.size(); k++){
+    ob::State *sk = path.at(k);
+    Q1->printState(sk);
+  }
+  og::PathSimplifier shortcutter(Q1, ob::GoalPtr(), pathObj);
+
+  //make sure that we have enough vertices so that the right path class is
+  //visualized (problems with S1)
+
+  if(Q1->getStateSpace()->getType() == ob::STATE_SPACE_SO2)
+  {
+    // shortcutter.smoothBSpline(gpath, 1);
+    gpath.interpolate();
+    // shortcutter.reduceVertices(gpath, 0, 0, 0.5);
+  }else{
+
+    shortcutter.simplifyMax(gpath);
+    // shortcutter.smoothBSpline(gpath);
+    // gpath.interpolate();
+    // gpath.subdivide();
+    // shortcutter.reduceVertices(gpath, 0, 0, 0.5);
+    // shortcutter.shortcutPath(gpath, 5, 0, sparseDelta_);
+  }
+
+  std::vector<ob::State*> gstates = gpath.getStates();
+  for(uint k = 0; k < gstates.size(); k++){
+    ob::State *sk = gstates.at(k);
+    Q1->printState(sk);
+  }
+
+  std::cout << "Check path to be in stack: " << path.size() << std::endl;
   if(!pathVisibilityChecker_->CheckValidity(gpath.getStates())){
+    std::cout << "REJECTED (Infeasible)" << std::endl;
     return;
   }
 
@@ -381,11 +420,13 @@ void QuotientGraphSparse::AddPathToStack(std::vector<ob::State*> &path)
     for(uint k = 0; k < pathStack_.size(); k++){
       og::PathGeometric& pathk = pathStack_.at(k);
       if(pathVisibilityChecker_->IsPathVisible(gpath.getStates(), pathk.getStates())){
+        std::cout << "REJECTED (Equal to path " << k << ")" << std::endl;
         return;
       }
     }
     pathStack_.push_back(gpath);
   }
+  std::cout << "Added to stack" << std::endl;
   // std::cout << ">>Inserting new path." << std::endl;
   // std::vector<ob::State*> sp = gpath.getStates();
   // for(uint k = 0; k < sp.size(); k++){

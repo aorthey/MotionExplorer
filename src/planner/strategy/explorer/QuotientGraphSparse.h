@@ -65,7 +65,8 @@ namespace ompl
 
     protected:
         double sparseDelta_{0.};
-        double sparseDeltaFraction_{.25};
+        double sparseDeltaFraction_{0.3};
+
 
         void setSparseDeltaFraction(double D)
         {

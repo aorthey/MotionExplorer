@@ -54,6 +54,9 @@ public:
     path2_ = s2;
     path1_length_ = 0;
     path2_length_ = 0;
+
+
+
     path1_interp_state_ = si_->allocState();
     path2_interp_state_ = si_->allocState();
     path1_distances_.clear();
@@ -82,8 +85,8 @@ public:
     //############################################################################
     //DEBUG
     //############################################################################
-    // CheckValidityExitOnFalse(path1_interp_state_);
-    // CheckValidityExitOnFalse(path2_interp_state_);
+    CheckValidityExitOnFalse(path1_interp_state_);
+    CheckValidityExitOnFalse(path2_interp_state_);
     //This means we have an edge which intersects an obstacle for less than
     //discretization step distance. We like to ignore that for now.
     if(!si_->getStateValidityChecker()->isValid(path1_interp_state_)) return true;
@@ -122,18 +125,18 @@ public:
       bool val = si_->getStateValidityChecker()->isValid(s);
       if(!val){
           ompl::msg::setLogLevel(ompl::msg::LOG_DEV2);
-          OMPL_ERROR("State is invalid!");
-          si_->printState(s);
-          std::cout << std::string(80, '-') << std::endl;
-          for(uint k = 0; k < path1_.size(); k++){
-              si_->printState(path1_.at(k));
-          }
-          for(uint k = 0; k < path2_.size(); k++){
-              si_->printState(path2_.at(k));
-          }
-          // std::cout << "Path1: " << (this->CheckValidity(path1_)?"VALIDPATH":"INVALID") << std::endl;
-          // std::cout << "Path2: " << (this->CheckValidity(path2_)?"VALIDPATH":"INVALID") << std::endl;
-          exit(0);
+          OMPL_WARN("State is invalid!");
+          // si_->printState(s);
+          // std::cout << std::string(80, '-') << std::endl;
+          // for(uint k = 0; k < path1_.size(); k++){
+          //     si_->printState(path1_.at(k));
+          // }
+          // for(uint k = 0; k < path2_.size(); k++){
+          //     si_->printState(path2_.at(k));
+          // }
+          // // std::cout << "Path1: " << (this->CheckValidity(path1_)?"VALIDPATH":"INVALID") << std::endl;
+          // // std::cout << "Path2: " << (this->CheckValidity(path2_)?"VALIDPATH":"INVALID") << std::endl;
+          // exit(0);
       }
   }
 
@@ -218,10 +221,66 @@ bool PathVisibilityChecker::CheckValidity(const std::vector<ob::State*> &s)
   return true;
 }
 
+/// \brief The Visibility Check here is always true on SO2, but if one path goes
+//clockwise and the other counterclockwise, we would like to say they are
+//invisible. Our strategy here is to compute the midpoint s_interp of the shortest
+//segment on the circle between start and goal configuration. 
+//For a path with at least three configurations along the shortest
+//segment, there will be some state s1_next which has a distance d1 from
+//s_interp which is smaller than 0.5*d, the distance between start and goal
+//config (along shortest segment). For a path going the other way around the
+//circle, there will not be such a state. I.e. the nearest state will have a
+//distance greater equal 0.5*d.
+//
+//This assumes that paths are always shortest.
+
+bool PathVisibilityChecker::IsPathVisibleSO2(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2)
+{
+    og::PathGeometric p1(si_);
+    for(uint k = 0; k < s1.size(); k++) p1.append(s1.at(k));
+    og::PathGeometric p2(si_);
+    for(uint k = 0; k < s2.size(); k++) p2.append(s2.at(k));
+
+    //Assumption: Paths are shortest segment
+    assert( p1.length() + p2.length() <= (1e-3 + si_->getStateSpace()->getMeasure()));
+
+    ob::State *s_interp = si_->allocState();
+    si_->getStateSpace()->interpolate(s1.front(), s1.back(), 0.5, s_interp);
+
+    ob::State *s1_next = p1.getStates().at(p1.getClosestIndex(s_interp));
+    ob::State *s2_next = p2.getStates().at(p2.getClosestIndex(s_interp));
+
+    double d1 = si_->distance(s1_next, s_interp);
+    double d2 = si_->distance(s2_next, s_interp);
+    double d = 0.5*si_->distance(s1.front(), s1.back());
+
+    bool valid = false;
+    valid = ((d1 < d) && (d2 < d)) || ((d1 >= d) && (d2 >= d));
+
+    si_->freeState(s_interp);
+    return valid;
+}
 bool PathVisibilityChecker::IsPathVisible(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2)
 {
+
+  //Assert Non-empty paths
+  assert(s1.size()>0);
+  assert(s2.size()>0);
+
+  //Assert Same start and end point
+  assert( si_->distance(s1.front(), s2.front()) < 1e-3);
+  assert( si_->distance(s1.back(), s2.back()) < 1e-3);
+
+  //Paths need to be feasible
   if(!CheckValidity(s1)) return false;
   if(!CheckValidity(s2)) return false;
+
+  //Handle edge case of SO(2)
+  if(si_->getStateSpace()->getType() == ob::STATE_SPACE_SO2)
+  {
+    return IsPathVisibleSO2(s1, s2);
+  }
+
 
   const float max__planning_time_path_path = 0.3;
   const float epsilon_goalregion = 0.01;

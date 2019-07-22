@@ -18,6 +18,7 @@ namespace ompl
       // bool IsPathVisible(std::vector<QuotientGraph::Vertex> &v1, std::vector<QuotientGraph::Vertex> &v2);
       bool IsPathVisible(std::vector<QuotientGraph::Vertex> &v1, std::vector<QuotientGraph::Vertex> &v2, QuotientGraph::Graph &graph);
       bool IsPathVisible(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2);
+      bool IsPathVisibleSO2(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2);
       bool CheckValidity(const std::vector<ob::State*> &s);
 
       void Test1();

@@ -79,6 +79,7 @@ ob::PlannerStatus MotionExplorer<T>::solve(const ob::PlannerTerminationCondition
     K = K-1;
   }
   og::QuotientGraphSparse *jQuotient = quotientSpaces_.at(K);
+  std::cout << *jQuotient << std::endl;
 
   uint ctr = 0;
   uint M = jQuotient->getNumberOfPaths();
@@ -93,7 +94,7 @@ ob::PlannerStatus MotionExplorer<T>::solve(const ob::PlannerTerminationCondition
     //stop at topological phase shift
     if(Mg > M) return ob::PlannerStatus::APPROXIMATE_SOLUTION;
   }
-  std::cout << "Grow QS for " << ctr << " iters. Changed #paths from " << M << " to " << Mg << std::endl;
+  std::cout << "Grow QuotientSpace " << jQuotient->getName() << " for " << ctr << " iters. Changed #paths from " << M << " to " << Mg << std::endl;
 
   return ob::PlannerStatus::TIMEOUT;
 }
