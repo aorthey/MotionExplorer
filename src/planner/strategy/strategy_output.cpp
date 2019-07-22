@@ -208,16 +208,11 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
       tree_vertices[path]++;
 
       if(pd->isStartVertex(i)){
-        pdi->addStartVertex(*v);
+          pdi->addStartVertex(*v);
       }else if(pd->isGoalVertex(i)){
-        pdi->addGoalVertex(*v);
+          pdi->addGoalVertex(*v);
       }else{
-        try {
-            pdi->addVertex(*v);
-        } catch (const std::exception &e) {
-            std::cout << "Could not add vertex" << std::endl;
-            continue;
-        }
+          pdi->addVertex(*v);
       }
 
       std::vector<uint> edgeList;

@@ -9,7 +9,7 @@ class Strategy{
     virtual void Plan( StrategyOutput &output) = 0;
     virtual void Step( StrategyOutput &output) = 0;
     virtual void Init( const StrategyInput &input) = 0;
-    virtual void Clear() = 0;
+    virtual void Clear();
 
     void BenchmarkFileToPNG(const std::string&);
 

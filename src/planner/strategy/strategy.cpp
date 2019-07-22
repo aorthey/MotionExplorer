@@ -37,6 +37,10 @@ const ob::PlannerPtr Strategy::GetPlannerPtr()
   return planner;
 }
 
+void Strategy::Clear()
+{
+  isInitialized = false;
+}
 void Strategy::setStateSampler(std::string sampler, ob::SpaceInformationPtr si)
 {
   ob::ValidStateSamplerAllocator allocator;

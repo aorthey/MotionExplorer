@@ -242,7 +242,7 @@ bool PathVisibilityChecker::IsPathVisibleSO2(std::vector<ob::State*> &s1, std::v
     for(uint k = 0; k < s2.size(); k++) p2.append(s2.at(k));
 
     //Assumption: Paths are shortest segment
-    assert( p1.length() + p2.length() <= (1e-3 + si_->getStateSpace()->getMeasure()));
+    // assert( p1.length() + p2.length() <= (1e-3 + si_->getStateSpace()->getMeasure()));
 
     ob::State *s_interp = si_->allocState();
     si_->getStateSpace()->interpolate(s1.front(), s1.back(), 0.5, s_interp);

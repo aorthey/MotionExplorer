@@ -110,6 +110,9 @@ void QuotientGraphSparse::clear()
   visibleNeighborhood.clear();
   vrankSparse.clear();
   vparentSparse.clear();
+  numberVertices = 0;
+  v_start_sparse = -1;
+  v_goal_sparse = -1;
 
   pathStackHead_.clear();
   pathStack_.clear();
@@ -340,11 +343,11 @@ unsigned int QuotientGraphSparse::getNumberOfPaths() const
 
 void QuotientGraphSparse::Rewire(Vertex &v)
 {
-  Configuration *q = G[v];
+  Configuration *q = graphSparse_[v];
   std::vector<Configuration*> neighbors;
-  uint Nv = boost::degree(v, G);
+  uint Nv = boost::degree(v, graphSparse_);
   uint K = Nv+2;
-  nearest_datastructure->nearestK(const_cast<Configuration*>(q), K, neighbors);
+  nearestSparse_->nearestK(const_cast<Configuration*>(q), K, neighbors);
 
   for(uint k = Nv+1; k < neighbors.size(); k++){
     Configuration *qn = neighbors.at(k);
@@ -357,7 +360,7 @@ void QuotientGraphSparse::Rewire(Vertex &v)
 
 void QuotientGraphSparse::Rewire()
 {
-  Vertex v = boost::random_vertex(G, rng_boost);
+  Vertex v = boost::random_vertex(graphSparse_, rng_boost);
   return Rewire(v);
 }
 
@@ -377,11 +380,11 @@ void QuotientGraphSparse::AddPathToStack(std::vector<ob::State*> &path)
   multiObj->addObjective(clearObj, 1.0);
   ob::OptimizationObjectivePtr pathObj(multiObj);
 
-  std::cout << "PATH" << std::endl;
-  for(uint k = 0; k < path.size(); k++){
-    ob::State *sk = path.at(k);
-    Q1->printState(sk);
-  }
+  // std::cout << "PATH" << std::endl;
+  // for(uint k = 0; k < path.size(); k++){
+  //   ob::State *sk = path.at(k);
+  //   Q1->printState(sk);
+  // }
   og::PathSimplifier shortcutter(Q1, ob::GoalPtr(), pathObj);
 
   //make sure that we have enough vertices so that the right path class is

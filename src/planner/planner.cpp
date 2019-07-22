@@ -220,6 +220,11 @@ void MotionPlanner::Clear()
 
   strategy->Clear();
   viewHierarchy.Clear();
+  // std::cout << "PATH" << std::endl;
+  // for(uint k = 0; k < path.size(); k++){
+  //   ob::State *sk = path.at(k);
+  //   Q1->printState(sk);
+  // }
 }
 
 void MotionPlanner::InitStrategy()
