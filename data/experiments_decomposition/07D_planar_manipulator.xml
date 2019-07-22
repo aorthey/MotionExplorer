@@ -2,7 +2,7 @@
 
 <world>
 
-  <robot name="5dof" file="../robots/planar_manipulator/5dof_manip.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="7dof" file="../robots/planar_manipulator/7dof_manip.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
   <robot name="1dof" file="../robots/planar_manipulator/1dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
   <robot name="2dof" file="../robots/planar_manipulator/2dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
   <robot name="3dof" file="../robots/planar_manipulator/3dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
@@ -21,8 +21,8 @@
 
   <plannerinput>
 
-    <qinit  config="17  +0.0 +0.0 +0.0 0.0 0.0 0.0  +0.0 0 +0.5 0 +0.4 0 +0.7 0 +0.6 0 +0.4 0"/>
-    <qgoal  config="17  +0.0 +0.0 +0.0 0.0 0.0 0.0  -1.2 0 -0.5 0 -0.2 0 +0.2 0 +0.2 0 +0.5 0"/>
+    <qinit  config="21  +0.0 +0.0 +0.0 0.0 0.0 0.0  +0.0 0 +0.5 0 +0.4 0 +0.7 0 +0.6 0 +0.4 0 0 0 0"/>
+    <qgoal  config="21  +0.0 +0.0 +0.0 0.0 0.0 0.0  -1.2 0 -0.5 0 -0.2 0 +0.2 0 +0.2 0 +0.5 0 0 0 0"/>
     <epsilongoalregion>0.1</epsilongoalregion>
     <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
     <pathSpeed>10</pathSpeed>
@@ -47,7 +47,7 @@
     <hierarchy>
       <level inner_index="2" type="R2"/>
       <level inner_index="4" type="R4"/>
-      <level inner_index="0" type="R5"/>
+      <level inner_index="0" type="R7"/>
     </hierarchy>
 
   </plannerinput>

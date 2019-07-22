@@ -8,6 +8,8 @@
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/geometric/PathSimplifier.h>
 #include <ompl/control/PathControl.h>
+#include <boost/math/constants/constants.hpp>
+
 
 PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
   cspace(cspace_)
@@ -505,6 +507,58 @@ void PathPiecewiseLinear::DrawGLCross( const std::vector<ob::State*> &states)
   glPopMatrix();
 }
 
+std::vector<double> PathPiecewiseLinear::GetHighCurvatureConfigurations() 
+{
+    std::vector<double> pathPts;
+
+    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+    ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+    std::vector<ob::State *> states = gpath.getStates();
+    // double L = GetLength();
+    // this->DrawGL(state, 0.5*L);
+    double s = 0;
+    if (states.size() > 2)
+    {
+        double a = si->distance(states[0], states[1]);
+        s += a;
+        for (unsigned int i = 2; i < states.size(); ++i)
+        {
+            // view the path as a sequence of segments, and look at the triangles it forms:
+            //          s1
+            //          /\          s4
+            //      a  /  \ b       |
+            //        /    \        |
+            //       /......\_______|
+            //     s0    c   s2     s3
+            //
+            // use Pythagoras generalized theorem to find the cos of the angle between segments a and b
+            double b = si->distance(states[i - 1], states[i]);
+            double c = si->distance(states[i - 2], states[i]);
+            double acosValue = (a * a + b * b - c * c) / (2.0 * a * b);
+
+            if (acosValue > -1.0 && acosValue < 1.0)
+            {
+                // the smoothness is actually the outside angle of the one we compute
+                double angle = (boost::math::constants::pi<double>() - acos(acosValue));
+
+                // and we normalize by the length of the segments
+                double k = 2.0 * angle / (a + b);
+                double smoothness = k*k;
+                if(smoothness > 1e-3){
+                    pathPts.push_back(a);
+                }
+            }
+            a = b;
+        }
+
+    }else{
+        //no extremal values, just take midpoint
+        pathPts.push_back(0.5*length);
+    }
+    return pathPts;
+}
+
+
 void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*_path);
   ob::SpaceInformationPtr si = gpath.getSpaceInformation();
@@ -527,8 +581,13 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
   if(drawCross) DrawGLCross(states);
 
   if(drawSweptVolume && state("draw_path_sweptvolume")){
-    double L = GetLength();
-    this->DrawGL(state, 0.5*L);
+    // double L = GetLength();
+    std::vector<double> cP = GetHighCurvatureConfigurations();
+    for(uint k = 0; k < cP.size(); k++){
+        this->DrawGL(state, cP.at(k));
+    }
+
+    //TODO: make it at high-curvature points
   }
 
   //############################################################################

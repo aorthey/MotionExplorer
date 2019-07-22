@@ -142,7 +142,11 @@ void QuotientGraphSparse::Init()
       q_goal->isGoal = true;
       v_goal = AddConfiguration(q_goal);
 
-      assert(boost::num_vertices(graphSparse_)==2);
+      if(boost::num_vertices(graphSparse_)<2)
+      {
+        //Make sure q_goal is added, even if visible from q_start
+          AddConfigurationSparse(q_goal);
+      }
       v_goal_sparse = graphSparse_[1]->index;
       graphSparse_[v_goal_sparse]->isGoal = true;
     }
@@ -392,9 +396,7 @@ void QuotientGraphSparse::AddPathToStack(std::vector<ob::State*> &path)
 
   if(Q1->getStateSpace()->getType() == ob::STATE_SPACE_SO2)
   {
-    // shortcutter.smoothBSpline(gpath, 1);
     gpath.interpolate();
-    // shortcutter.reduceVertices(gpath, 0, 0, 0.5);
   }else{
 
     shortcutter.simplifyMax(gpath);
@@ -405,11 +407,11 @@ void QuotientGraphSparse::AddPathToStack(std::vector<ob::State*> &path)
     // shortcutter.shortcutPath(gpath, 5, 0, sparseDelta_);
   }
 
-  std::vector<ob::State*> gstates = gpath.getStates();
-  for(uint k = 0; k < gstates.size(); k++){
-    ob::State *sk = gstates.at(k);
-    Q1->printState(sk);
-  }
+  // std::vector<ob::State*> gstates = gpath.getStates();
+  // for(uint k = 0; k < gstates.size(); k++){
+  //   ob::State *sk = gstates.at(k);
+  //   Q1->printState(sk);
+  // }
 
   std::cout << "Check path to be in stack: " << path.size() << std::endl;
   if(!pathVisibilityChecker_->CheckValidity(gpath.getStates())){

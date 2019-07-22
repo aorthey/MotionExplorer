@@ -52,6 +52,7 @@ class PathPiecewiseLinear
     void DrawGL(GUIState& state, double t);
     void DrawGLPathPtr(GUIState& state, ob::PathPtr);
     bool draw_planar{false};
+    std::vector<double> GetHighCurvatureConfigurations();
 
     bool Load(const char *fn);
     bool Load(TiXmlElement* node);

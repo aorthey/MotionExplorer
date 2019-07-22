@@ -173,6 +173,12 @@ public:
     if(idx > 0) distanceIdxIdxNext -= distances.at(idx-1);
 
     double lineFraction = (distances.at(idx) - newPosition)/distanceIdxIdxNext;
+    if(lineFraction < 0 || lineFraction > 1)
+    {
+      OMPL_ERROR("lineFraction: %f. length: %f, newPos: %f, distanceNext: %f, distanceCur: %f",
+          lineFraction, pathLength, newPosition, distanceIdxIdxNext, distances.at(idx));
+      exit(0);
+    }
     assert( lineFraction >= 0);
     assert( lineFraction <= 1);
 
@@ -262,6 +268,7 @@ bool PathVisibilityChecker::IsPathVisibleSO2(std::vector<ob::State*> &s1, std::v
 }
 bool PathVisibilityChecker::IsPathVisible(std::vector<ob::State*> &s1, std::vector<ob::State*> &s2)
 {
+  ompl::msg::setLogLevel(ompl::msg::LOG_NONE);
 
   //Assert Non-empty paths
   assert(s1.size()>0);
@@ -286,7 +293,6 @@ bool PathVisibilityChecker::IsPathVisible(std::vector<ob::State*> &s1, std::vect
   const float epsilon_goalregion = 0.01;
 
   // ompl::msg::setLogLevel(ompl::msg::LOG_DEV2);
-  ompl::msg::setLogLevel(ompl::msg::LOG_NONE);
 
   ob::RealVectorBounds bounds(2);
   bounds.setLow(0);
