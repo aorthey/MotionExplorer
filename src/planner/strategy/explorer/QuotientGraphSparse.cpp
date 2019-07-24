@@ -657,6 +657,10 @@ void QuotientGraphSparse::enumerateAllPaths()
 
 
 
+    //TODO: update internally QuotientSpace hierarchy. Create new QuotientSpaces
+    //for each path.
+
+
 }
 
 void QuotientGraphSparse::getPlannerDataRoadmap(ob::PlannerData &data, std::vector<int> pathIdx) const
@@ -704,7 +708,6 @@ void QuotientGraphSparse::getPlannerData(ob::PlannerData &data) const
           idxPathI.clear();
           getPathIndices(states, idxPathI);
           idxPathI.push_back(i);
-          std::cout << idxPathI.at(0) << std::endl;
 
           ob::PlannerDataVertexAnnotated *p1 = new ob::PlannerDataVertexAnnotated(states.at(0));
           p1->setLevel(level_);

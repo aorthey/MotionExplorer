@@ -192,7 +192,6 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
         exit(0);
       }
       std::vector<int> path = v->getPath();
-      std::cout << path << std::endl;
 
       PTree *current = root;
 

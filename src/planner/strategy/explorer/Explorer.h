@@ -21,7 +21,7 @@ namespace ompl
 
             MotionExplorer(std::vector<ob::SpaceInformationPtr> &si_vec, std::string type = "MotionExplorer");
 
-            void setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_vec_);
+            // void setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_vec_);
 
             virtual ~MotionExplorer() override;
 
@@ -43,10 +43,11 @@ namespace ompl
 
             /// Sequence of quotient-spaces
             std::vector<og::QuotientGraphSparse *> quotientSpaces_;
+            og::QuotientGraphSparse *root{nullptr};
+            og::QuotientGraphSparse *current{nullptr};
             std::vector<int> selectedPath_;
 
             std::vector<ob::SpaceInformationPtr> siVec_;
-            std::vector<ob::ProblemDefinitionPtr> pdefVec_;
         };
     }
 }

@@ -179,7 +179,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   }else if(algorithm=="hierarchy:explorer"){
     typedef og::MotionExplorer<og::QuotientTopology> MotionExplorer;
     planner = std::make_shared<MotionExplorer>(stratification->si_vec);
-    static_pointer_cast<MotionExplorer>(planner)->setProblemDefinition(stratification->pdef_vec);
+    // static_pointer_cast<MotionExplorer>(planner)->setProblemDefinition(stratification->pdef_vec);
     planner->setName("MotionExplorer");
 
   // }else if(algorithm=="hierarchy:neighborhood_sampler"){

@@ -12,6 +12,7 @@ QuotientTopology::QuotientTopology(const ob::SpaceInformationPtr &si, QuotientSp
   setName("QuotientSpaceTopology"+std::to_string(id_));
   Planner::declareParam<double>("range", this, &QuotientTopology::setRange, &QuotientTopology::getRange, "0.:1.:10000.");
   Planner::declareParam<double>("goal_bias", this, &QuotientTopology::setGoalBias, &QuotientTopology::getGoalBias, "0.:.1:1.");
+
   q_random = new Configuration(Q1);
 }
 
@@ -40,6 +41,7 @@ double QuotientTopology::getRange() const
 void QuotientTopology::setup()
 {
   BaseT::setup();
+  Q1->printSettings();
   ompl::tools::SelfConfig sc(Q1, getName());
   sc.configurePlannerRange(maxDistance);
   goal = pdef_->getGoal().get();

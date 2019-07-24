@@ -3,6 +3,7 @@
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/SO3StateSpace.h>
 #include <ompl/util/Time.h>
+#include <ompl/base/goals/GoalSampleableRegion.h>
 #include <queue>
 
 using namespace og;
@@ -23,8 +24,11 @@ MotionExplorer<T>::MotionExplorer(std::vector<ob::SpaceInformationPtr> &siVec, s
         quotientSpaces_.push_back(ss);
         quotientSpaces_.back()->setLevel(k);
     }
-    if (DEBUG)
-        std::cout << "Created hierarchy with " << siVec_.size() << " levels." << std::endl;
+    root = quotientSpaces_.front();
+    current = root;
+
+    OMPL_DEVMSG1("Created hierarchy with %d leves.", siVec_.size());
+    std::cout << quotientSpaces_.size() << std::endl;
 }
 
 template <class T>
@@ -53,10 +57,6 @@ void MotionExplorer<T>::clear()
     }
 
     pdef_->clearSolutionPaths();
-    for (unsigned int k = 0; k < pdefVec_.size(); k++)
-    {
-        pdefVec_.at(k)->clearSolutionPaths();
-    }
     selectedPath_.clear();
 }
 
@@ -105,25 +105,41 @@ ob::PlannerStatus MotionExplorer<T>::solve(const ob::PlannerTerminationCondition
 }
 
 template <class T>
-void MotionExplorer<T>::setProblemDefinition(std::vector<ob::ProblemDefinitionPtr> &pdef_)
-{
-    if (siVec_.size() != pdef_.size())
-    {
-        OMPL_ERROR("Number of ProblemDefinitionPtr is %d but we have %d SpaceInformationPtr.", pdef_.size(), siVec_.size());
-        exit(0);
-    }
-    pdefVec_ = pdef_;
-    ob::Planner::setProblemDefinition(pdefVec_.back());
-    for (unsigned int k = 0; k < pdefVec_.size(); k++)
-    {
-        quotientSpaces_.at(k)->setProblemDefinition(pdefVec_.at(k));
-    }
-}
-
-template <class T>
 void MotionExplorer<T>::setProblemDefinition(const ob::ProblemDefinitionPtr &pdef)
 {
     this->Planner::setProblemDefinition(pdef);
+
+    //Compute projection of qInit and qGoal onto QuotientSpaces
+    ob::Goal *goal = pdef_->getGoal().get();
+    ob::GoalState *goalRegion = dynamic_cast<base::GoalState *>(goal);
+    double epsilon = goalRegion->getThreshold();
+    assert(quotientSpaces_.size() == siVec_.size());
+
+    ob::State *sInit = pdef->getStartState(0);
+    ob::State *sGoal = goalRegion->getState();
+
+    OMPL_DEVMSG1("Projecting start and goal onto QuotientSpaces.");
+
+    quotientSpaces_.back()->setProblemDefinition(pdef);
+    for (unsigned int k = siVec_.size()-1; k > 0 ; k--)
+    {
+        og::QuotientGraphSparse *quotientParent = quotientSpaces_.at(k);
+        og::QuotientGraphSparse *quotientChild = quotientSpaces_.at(k-1);
+        ob::SpaceInformationPtr sik = quotientChild->getSpaceInformation();
+        ob::ProblemDefinitionPtr pdefk = std::make_shared<base::ProblemDefinition>(sik);
+
+        ob::State *sInitK = sik->allocState();
+        ob::State *sGoalK = sik->allocState();
+
+        quotientParent->projectQ0Subspace(sInit, sInitK);
+        quotientParent->projectQ0Subspace(sGoal, sGoalK);
+
+        pdefk->setStartAndGoalStates(sInitK, sGoalK, epsilon);
+        quotientChild->setProblemDefinition(pdefk);
+
+        sInit = sInitK;
+        sGoal = sGoalK;
+    }
 }
 
 template <class T>
