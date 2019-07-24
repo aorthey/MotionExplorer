@@ -19,10 +19,10 @@ namespace ompl
       typedef og::QuotientGraphSparse BaseT;
       public:
 
-        QuotientTopology(const ob::SpaceInformationPtr &si, Quotient *parent_);
+        QuotientTopology(const ob::SpaceInformationPtr &si, QuotientSpace *parent_);
         virtual ~QuotientTopology() override;
-        virtual void Grow() override;
-        virtual bool GetSolution(ob::PathPtr &solution) override;
+        virtual void grow() override;
+        virtual bool getSolution(ob::PathPtr &solution) override;
 
         virtual void setup() override;
         virtual void clear() override;

@@ -1,6 +1,5 @@
 #ifndef OMPL_GEOMETRIC_PLANNERS_QUOTIENTSPACE_MotionExplorer_
 #define OMPL_GEOMETRIC_PLANNERS_QUOTIENTSPACE_MotionExplorer_
-// #include "planner/strategy/quotient/quotient.h"
 #include "QuotientGraphSparse.h"
 #include <type_traits>
 #include <queue>

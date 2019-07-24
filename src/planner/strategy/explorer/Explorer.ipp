@@ -1,5 +1,5 @@
-#include "elements/plannerdata_vertex_annotated.h"
 #include "QuotientGraphSparse.h"
+#include <ompl/geometric/planners/quotientspace/PlannerDataVertexAnnotated.h>
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/SO3StateSpace.h>
 #include <ompl/util/Time.h>
@@ -15,13 +15,13 @@ MotionExplorer<T>::MotionExplorer(std::vector<ob::SpaceInformationPtr> &siVec, s
     T::resetCounter();
     for (unsigned int k = 0; k < siVec_.size(); k++)
     {
-        og::Quotient *parent = nullptr;
+        og::QuotientSpace *parent = nullptr;
         if (k > 0)
             parent = quotientSpaces_.back();
 
         T *ss = new T(siVec_.at(k), parent);
         quotientSpaces_.push_back(ss);
-        quotientSpaces_.back()->SetLevel(k);
+        quotientSpaces_.back()->setLevel(k);
     }
     if (DEBUG)
         std::cout << "Created hierarchy with " << siVec_.size() << " levels." << std::endl;
@@ -68,7 +68,12 @@ void MotionExplorer<T>::setSelectedPath( std::vector<int> selectedPath){
     //selected path
     quotientSpaces_.at(k)->selectedPath = selectedPath.at(k);
   }
-  std::cout << "[SELECTION CHANGE] QuotientSpaces set to " << selectedPath << std::endl;
+  std::cout << "[SELECTION CHANGE] QuotientSpaces set to [";
+  for(uint k = 0; k < selectedPath.size(); k++){
+    int sk = selectedPath.at(k);
+    std::cout << sk << " ";
+  }
+  std::cout << "]" << std::endl;
 }
 
 template <class T>
@@ -88,7 +93,7 @@ ob::PlannerStatus MotionExplorer<T>::solve(const ob::PlannerTerminationCondition
   while (!ptc())
   {
     // std::cout << "Growing QuotientSpace " << jQuotient->getName() << std::endl;
-    jQuotient->Grow();
+    jQuotient->grow();
     ctr++;
     Mg = jQuotient->getNumberOfPaths();
     //stop at topological phase shift
@@ -137,7 +142,7 @@ void MotionExplorer<T>::getPlannerData(ob::PlannerData &data) const
 
     for (unsigned int k = 0; k < K; k++)
     {
-        og::Quotient *Qk = quotientSpaces_.at(k);
+        og::QuotientSpace *Qk = quotientSpaces_.at(k);
         static_cast<QuotientGraphSparse*>(Qk)->enumerateAllPaths();
         Qk->getPlannerData(data);
         // label all new vertices
@@ -145,34 +150,34 @@ void MotionExplorer<T>::getPlannerData(ob::PlannerData &data) const
 
         for (unsigned int vidx = Nvertices; vidx < data.numVertices(); vidx++)
         {
-            PlannerDataVertexAnnotated &v = *static_cast<PlannerDataVertexAnnotated *>(&data.getVertex(vidx));
-            v.SetLevel(k);
-            v.SetMaxLevel(K);
+          ob::PlannerDataVertexAnnotated &v = *static_cast<ob::PlannerDataVertexAnnotated *>(&data.getVertex(vidx));
+            v.setLevel(k);
+            v.setMaxLevel(K);
 
             ob::State *s_lift = Qk->getSpaceInformation()->cloneState(v.getState());
             v.setQuotientState(s_lift);
 
             for (unsigned int m = k + 1; m < quotientSpaces_.size(); m++)
             {
-                og::Quotient *Qm = quotientSpaces_.at(m);
+                og::QuotientSpace *Qm = quotientSpaces_.at(m);
 
-                if (Qm->GetX1() != nullptr)
+                if (Qm->getX1() != nullptr)
                 {
-                    ob::State *s_X1 = Qm->GetX1()->allocState();
+                    ob::State *s_X1 = Qm->getX1()->allocState();
                     ob::State *s_Q1 = Qm->getSpaceInformation()->allocState();
-                    if (Qm->GetX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO3)
+                    if (Qm->getX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO3)
                     {
                         static_cast<ob::SO3StateSpace::StateType *>(s_X1)->setIdentity();
                     }
-                    if (Qm->GetX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO2)
+                    if (Qm->getX1()->getStateSpace()->getType() == ob::STATE_SPACE_SO2)
                     {
                         static_cast<ob::SO2StateSpace::StateType *>(s_X1)->setIdentity();
                     }
-                    Qm->MergeStates(s_lift, s_X1, s_Q1);
+                    Qm->mergeStates(s_lift, s_X1, s_Q1);
                     s_lift = Qm->getSpaceInformation()->cloneState(s_Q1);
 
-                    Qm->GetX1()->freeState(s_X1);
-                    Qm->GetQ1()->freeState(s_Q1);
+                    Qm->getX1()->freeState(s_X1);
+                    Qm->getQ1()->freeState(s_Q1);
                 }
             }
             v.setState(s_lift);

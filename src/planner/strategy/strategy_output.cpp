@@ -1,5 +1,5 @@
 #include "planner/strategy/strategy_output.h"
-#include "elements/plannerdata_vertex_annotated.h"
+#include <ompl/geometric/planners/quotientspace/PlannerDataVertexAnnotated.h>
 #include "elements/tree.h"
 #include "common.h"
 #include <ompl/control/PathControl.h>
@@ -122,7 +122,7 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
     ob::PlannerDataPtr pdi = current->content;
     pdi->decoupleFromPlanner();
 
-    PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pdi->getVertex(0));
+    ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pdi->getVertex(0));
     RoadmapPtr roadmap_k = nullptr;
     if(v==nullptr)
     {
@@ -139,8 +139,8 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
         exit(0);
       }
     }else{
-      std::vector<int> path = v->GetPath();
-      uint level = v->GetLevel();
+      std::vector<int> path = v->getPath();
+      uint level = v->getLevel();
 
       roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.at(level));
       //std::cout << "level " << level << "," << path << " : " << pdi->numVertices() << " | " << pdi->numEdges() << std::endl;
@@ -175,7 +175,7 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
     return;
   }
 
-  PlannerDataVertexAnnotated *v0 = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(0));
+  ob::PlannerDataVertexAnnotated *v0 = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(0));
 
   PTree *root = new PTree(nullptr);
 
@@ -185,13 +185,14 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
     std::map<std::vector<int>, int> tree_vertices;
 
     for(uint i = 0; i < pd->numVertices(); i++){
-      PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(i));
+      ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(i));
       if(v==nullptr)
       {
         std::cout << "ERROR: vertex is not annotated." << std::endl;
         exit(0);
       }
-      std::vector<int> path = v->GetPath();
+      std::vector<int> path = v->getPath();
+      std::cout << path << std::endl;
 
       PTree *current = root;
 
@@ -219,7 +220,7 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
       pd->getEdges(i, edgeList);
 
       for(uint j = 0; j < edgeList.size(); j++){
-        PlannerDataVertexAnnotated *w = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
+        ob::PlannerDataVertexAnnotated *w = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
         pdi->addVertex(*w);
         uint vi = pdi->vertexIndex(*v);
         uint wi = pdi->vertexIndex(*w);

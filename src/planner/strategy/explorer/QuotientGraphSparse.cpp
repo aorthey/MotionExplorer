@@ -1,7 +1,5 @@
 #include "QuotientGraphSparse.h"
-#include "common.h"
-#include "PathEnumerator.h"
-#include "elements/plannerdata_vertex_annotated.h"
+#include <ompl/geometric/planners/quotientspace/PlannerDataVertexAnnotated.h>
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/geometric/PathSimplifier.h>
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
@@ -15,58 +13,27 @@
 using namespace og;
 #define foreach BOOST_FOREACH
 
-QuotientGraphSparse::QuotientGraphSparse(const ob::SpaceInformationPtr &si, Quotient *parent):
+QuotientGraphSparse::QuotientGraphSparse(const ob::SpaceInformationPtr &si, QuotientSpace *parent):
   BaseT(si, parent)
 {
   setName("QuotientGraphSparse");
-  // specs_.recognizedGoal = ob::GOAL_SAMPLEABLE_REGION;
-  // specs_.approximateSolutions = false;
-  // specs_.optimizingPaths = false;
   Planner::declareParam<double>("sparse_delta_fraction", this, &QuotientGraphSparse::setSparseDeltaFraction,
                                 &QuotientGraphSparse::getSparseDeltaFraction, "0.0:0.01:1.0");
-  // ob::StateSpacePtr space = Q1->getStateSpace();
-
-  // std::cout << std::string(80, '-') << std::endl;
-  // std::cout << "BEFORE:" << space->getLongestValidSegmentFraction() << std::endl;
-  // std::cout << "BEFORE:" << space->getLongestValidSegmentLength() << std::endl;
-  // std::cout << "BEFORE:" << space->getMaximumExtent() << std::endl;
-  // std::cout << "BEFORE:" << space->getValidSegmentCountFactor() << std::endl;
-
-
-// //   std::cout << std::string(80, '-') << std::endl;
-// //   space->printSettings(std::cout);
-// //   std::cout << space->getMaximumExtent() << std::endl;
-// //   std::cout << std::string(80, '-') << std::endl;
-
-  // space->setup();
-  // std::cout << "AFTER:" << space->getLongestValidSegmentFraction() << std::endl;
-  // std::cout << "AFTER:" << space->getLongestValidSegmentLength() << std::endl;
-  // std::cout << "AFTER:" << space->getMaximumExtent() << std::endl;
-  // std::cout << "AFTER:" << space->getValidSegmentCountFactor() << std::endl;
-
-  // // std::cout << space->getMaximumExtent() << std::endl;
-  // // Q1->getStateSpace()->printSettings(std::cout);
-  // // std::cout << std::string(80, '-') << std::endl;
-
-
-  // exit(0);
 
   if (!isSetup())
   {
     setup();
   }
   pathVisibilityChecker_ = new PathVisibilityChecker(Q1);
-
 }
 
 QuotientGraphSparse::~QuotientGraphSparse()
 {
 }
 
-
-void QuotientGraphSparse::DeleteConfiguration(Configuration *q)
+void QuotientGraphSparse::deleteConfiguration(Configuration *q)
 {
-  BaseT::DeleteConfiguration(q);
+  BaseT::deleteConfiguration(q);
 }
 
 void QuotientGraphSparse::setup()
@@ -77,7 +44,7 @@ void QuotientGraphSparse::setup()
     nearestSparse_.reset(tools::SelfConfig::getDefaultNearestNeighbors<Configuration*>(this));
     nearestSparse_->setDistanceFunction([this](const Configuration *a, const Configuration *b)
                              {
-                               return Distance(a, b);
+                               return distance(a, b);
                              });
   }
 
@@ -99,7 +66,7 @@ void QuotientGraphSparse::clear()
     nearestSparse_->list(configs);
     for (auto &config : configs)
     {
-      DeleteConfiguration(config);
+      deleteConfiguration(config);
     }
     nearestSparse_->clear();
   }
@@ -122,36 +89,36 @@ void QuotientGraphSparse::Init()
 {
   if(const ob::State *st = pis_.nextStart()){
     if (st != nullptr){
-      q_start = new Configuration(Q1, st);
-      q_start->isStart = true;
-      v_start = AddConfiguration(q_start);
+      qStart_ = new Configuration(Q1, st);
+      qStart_->isStart = true;
+      vStart_ = addConfiguration(qStart_);
 
       assert(boost::num_vertices(graphSparse_)==1);
       v_start_sparse = graphSparse_[0]->index;
       graphSparse_[v_start_sparse]->isStart = true;
     }
   }
-  if (q_start == nullptr){
+  if (qStart_ == nullptr){
     OMPL_ERROR("%s: There are no valid initial states!", getName().c_str());
     exit(0);
   }
 
   if(const ob::State *st = pis_.nextGoal()){
     if (st != nullptr){
-      q_goal = new Configuration(Q1, st);
-      q_goal->isGoal = true;
-      v_goal = AddConfiguration(q_goal);
+      qGoal_ = new Configuration(Q1, st);
+      qGoal_->isGoal = true;
+      vGoal_ = addConfiguration(qGoal_);
 
       if(boost::num_vertices(graphSparse_)<2)
       {
         //Make sure q_goal is added, even if visible from q_start
-          AddConfigurationSparse(q_goal);
+          addConfigurationSparse(qGoal_);
       }
       v_goal_sparse = graphSparse_[1]->index;
       graphSparse_[v_goal_sparse]->isGoal = true;
     }
   }
-  if (q_goal == nullptr){
+  if (qGoal_ == nullptr){
     OMPL_ERROR("%s: There are no valid goal states!", getName().c_str());
     exit(0);
   }
@@ -160,9 +127,9 @@ void QuotientGraphSparse::Init()
   // std::cout << "start component:" << startComponent << "| goalComponent:" << goalComponent << std::endl;
 }
 
-QuotientGraphSparse::Vertex QuotientGraphSparse::AddConfiguration(Configuration *q)
+QuotientGraphSparse::Vertex QuotientGraphSparse::addConfiguration(Configuration *q)
 {
-  Vertex v = BaseT::AddConfiguration(q);
+  Vertex v = BaseT::addConfiguration(q);
 
   findGraphNeighbors(q, graphNeighborhood, visibleNeighborhood);
 
@@ -175,7 +142,7 @@ QuotientGraphSparse::Vertex QuotientGraphSparse::AddConfiguration(Configuration 
 
   if(visibleNeighborhood.empty())
   {
-    AddConfigurationSparse(q);
+    addConfigurationSparse(q);
   }else{
     if(!checkAddConnectivity(q, visibleNeighborhood)){
       if (!checkAddInterface(q, graphNeighborhood, visibleNeighborhood)){
@@ -195,7 +162,7 @@ bool QuotientGraphSparse::sameComponentSparse(Vertex m1, Vertex m2)
   return boost::same_component(m1, m2, disjointSetsSparse_);
 }
 
-QuotientGraphSparse::Vertex QuotientGraphSparse::AddConfigurationSparse(Configuration *q)
+QuotientGraphSparse::Vertex QuotientGraphSparse::addConfigurationSparse(Configuration *q)
 {
     Configuration *ql = new Configuration(Q1, q->state);
     const Vertex vl = add_vertex(ql, graphSparse_);
@@ -216,7 +183,7 @@ void QuotientGraphSparse::findGraphNeighbors(Configuration *q, std::vector<Confi
             visibleNeighborhood.push_back(qn);
 }
 
-void QuotientGraphSparse::AddEdgeSparse(const Vertex a, const Vertex b)
+void QuotientGraphSparse::addEdgeSparse(const Vertex a, const Vertex b)
 {
   ob::Cost weight = opt_->motionCost(graphSparse_[a]->state, graphSparse_[b]->state);
   EdgeInternalState properties(weight);
@@ -246,7 +213,7 @@ bool QuotientGraphSparse::checkAddConnectivity(Configuration* q, std::vector<Con
 
         if (!links.empty())
         {
-            Vertex v = AddConfigurationSparse(q);
+            Vertex v = addConfigurationSparse(q);
 
             for (Vertex link : links){
                 // If there's no edge
@@ -254,7 +221,7 @@ bool QuotientGraphSparse::checkAddConnectivity(Configuration* q, std::vector<Con
                     // And the components haven't been united by previous links
                     if (!sameComponentSparse(link, v)){
                         // connectGuards(g, link);
-                        AddEdgeSparse(v, link);
+                        addEdgeSparse(v, link);
                     }
                 }
             }
@@ -282,13 +249,13 @@ bool QuotientGraphSparse::checkAddInterface(Configuration *q,
                 // If they can be directly connected
                 if (si_->checkMotion(qv0->state, qv1->state))
                 {
-                    AddEdgeSparse(qv0->index, qv1->index);
+                    addEdgeSparse(qv0->index, qv1->index);
                 }else{
                   // Add the new node to the graph, to bridge the interface
                   // Vertex v = addGuard(si_->cloneState(qNew), INTERFACE);
-                  Vertex v = AddConfigurationSparse(q);
-                  AddEdgeSparse(v, qv0->index);
-                  AddEdgeSparse(v, qv1->index);
+                  Vertex v = addConfigurationSparse(q);
+                  addEdgeSparse(v, qv0->index);
+                  addEdgeSparse(v, qv1->index);
                 }
                 // Report success
                 return true;
@@ -299,7 +266,7 @@ bool QuotientGraphSparse::checkAddInterface(Configuration *q,
 }
 
 
-bool QuotientGraphSparse::SampleQuotient(ob::State *q_random_graph)
+bool QuotientGraphSparse::sampleQuotient(ob::State *q_random_graph)
 {
     if(pathStack_.size() > 0){
       if(selectedPath >= 0 && selectedPath < (int)pathStack_.size()){
@@ -323,7 +290,7 @@ bool QuotientGraphSparse::SampleQuotient(ob::State *q_random_graph)
         ob::State *s2 = states.at((k<N-1)?k+1:k);
         Q1->getStateSpace()->interpolate(s1, s2, r, q_random_graph);
 
-        Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, 0.1);
+        Q1_sampler_->sampleUniformNear(q_random_graph, q_random_graph, 0.1);
 
 
       }else{
@@ -332,8 +299,8 @@ bool QuotientGraphSparse::SampleQuotient(ob::State *q_random_graph)
       }
     }else{
         //no solution path, we can just sample randomly
-        const Vertex v = boost::random_vertex(G, rng_boost);
-        Q1->getStateSpace()->copyState(q_random_graph, G[v]->state);
+        const Vertex v = boost::random_vertex(graph_, rng_boost);
+        Q1->getStateSpace()->copyState(q_random_graph, graph_[v]->state);
     }
     return true;
 }
@@ -357,7 +324,7 @@ void QuotientGraphSparse::Rewire(Vertex &v)
     Configuration *qn = neighbors.at(k);
     if(Q1->checkMotion(q->state, qn->state))
     {
-      AddEdge(q->index, qn->index);
+      addEdge(q->index, qn->index);
     }
   }
 }
@@ -527,10 +494,10 @@ void QuotientGraphSparse::removeReducibleLoops()
     }
 }
 
-void QuotientGraphSparse::GetPathIndices(const std::vector<ob::State*> &states, std::vector<int> &idxPath) const
+void QuotientGraphSparse::getPathIndices(const std::vector<ob::State*> &states, std::vector<int> &idxPath) const
 {
 
-  if(parent == nullptr){
+  if(parent_ == nullptr){
     // idxPath.push_back(0);
     return;
   }else{
@@ -539,11 +506,11 @@ void QuotientGraphSparse::GetPathIndices(const std::vector<ob::State*> &states, 
     for(uint k = 0; k < states.size(); k++){
       ob::State *qk = states.at(k);
       ob::State *qkProjected = Q0->allocState();
-      ProjectQ0Subspace(qk, qkProjected);
+      projectQ0Subspace(qk, qkProjected);
       pathcur.push_back(qkProjected);
     }
     //Check which path can be deformed into QS path
-    QuotientGraphSparse *quotient = static_cast<QuotientGraphSparse*>(parent);
+    QuotientGraphSparse *quotient = static_cast<QuotientGraphSparse*>(parent_);
     uint K = quotient->getNumberOfPaths();
     assert(K>0);
 
@@ -553,14 +520,13 @@ void QuotientGraphSparse::GetPathIndices(const std::vector<ob::State*> &states, 
       bool visible = quotient->getPathVisibilityChecker()->IsPathVisible(pathcur, pathk);
       if(visible){
         idxPath.push_back(k);
-        quotient->GetPathIndices(pathcur, idxPath);
+        quotient->getPathIndices(pathcur, idxPath);
         success = true;
         break;
       }
     }
     if(!success){
-      //found new path
-      std::cout << "Could not find projected path on QuotientSpace" << std::endl;
+      OMPL_ERROR("Could not find projected path on QuotientSpace.");
       exit(0);
     }
     //free all states
@@ -643,7 +609,7 @@ void QuotientGraphSparse::printAllPathsUtil(
 
 void QuotientGraphSparse::enumerateAllPaths() 
 {
-    if(!hasSolution) return;
+    if(!hasSolution_) return;
 
     //Check if we already enumerated all paths. If yes, then the number of
     //vertices has not changed. 
@@ -697,9 +663,9 @@ void QuotientGraphSparse::getPlannerDataRoadmap(ob::PlannerData &data, std::vect
 {
   foreach (const Vertex v, boost::vertices(graphSparse_))
   {
-    PlannerDataVertexAnnotated p(graphSparse_[v]->state);
-    p.SetLevel(level);
-    p.SetPath(pathIdx);
+    ob::PlannerDataVertexAnnotated p(graphSparse_[v]->state);
+    p.setLevel(level_);
+    p.setPath(pathIdx);
     data.addVertex(p);
   }
   foreach (const Edge e, boost::edges(graphSparse_))
@@ -707,8 +673,8 @@ void QuotientGraphSparse::getPlannerDataRoadmap(ob::PlannerData &data, std::vect
     const Vertex v1 = boost::source(e, graphSparse_);
     const Vertex v2 = boost::target(e, graphSparse_);
 
-    PlannerDataVertexAnnotated p1(graphSparse_[v1]->state);
-    PlannerDataVertexAnnotated p2(graphSparse_[v2]->state);
+    ob::PlannerDataVertexAnnotated p1(graphSparse_[v1]->state);
+    ob::PlannerDataVertexAnnotated p2(graphSparse_[v2]->state);
 
     data.addEdge(p1,p2);
   }
@@ -717,40 +683,39 @@ void QuotientGraphSparse::getPlannerDataRoadmap(ob::PlannerData &data, std::vect
 std::vector<int> QuotientGraphSparse::GetSelectedPathIndex() const
 {
     std::vector<int> CurPath;
-    QuotientGraphSparse *pparent = static_cast<QuotientGraphSparse*>(parent);
+    QuotientGraphSparse *pparent = static_cast<QuotientGraphSparse*>(parent_);
     while(pparent!=nullptr){
       CurPath.push_back(pparent->selectedPath);
-      pparent = static_cast<QuotientGraphSparse*>(pparent->parent);
+      pparent = static_cast<QuotientGraphSparse*>(pparent->parent_);
     }
     if(selectedPath < 0) CurPath.push_back(0);
     else CurPath.push_back(selectedPath);
 
-    std::cout << "Path Index " << CurPath << std::endl;
     return CurPath;
 }
 
 void QuotientGraphSparse::getPlannerData(ob::PlannerData &data) const
 {
-  if(hasSolution){
+  if(hasSolution_){
       std::vector<int> idxPathI;
       for(uint i = 0; i < pathStackHead_.size(); i++){
           const std::vector<ob::State*> states = pathStackHead_.at(i);
 
           idxPathI.clear();
-          GetPathIndices(states, idxPathI);
+          getPathIndices(states, idxPathI);
           idxPathI.push_back(i);
-          std::cout << "PathIndex" << i << ": " << idxPathI << std::endl;
+          std::cout << idxPathI.at(0) << std::endl;
 
-          PlannerDataVertexAnnotated *p1 = new PlannerDataVertexAnnotated(states.at(0));
-          p1->SetLevel(level);
-          p1->SetPath(idxPathI);
+          ob::PlannerDataVertexAnnotated *p1 = new ob::PlannerDataVertexAnnotated(states.at(0));
+          p1->setLevel(level_);
+          p1->setPath(idxPathI);
           data.addStartVertex(*p1);
 
           for(uint k = 0; k < states.size()-1; k++){
 
-            PlannerDataVertexAnnotated *p2 = new PlannerDataVertexAnnotated(states.at(k+1));//Q1->cloneState(graphSparse_[v2]->state));
-            p2->SetLevel(level);
-            p2->SetPath(idxPathI);
+            ob::PlannerDataVertexAnnotated *p2 = new ob::PlannerDataVertexAnnotated(states.at(k+1));//Q1->cloneState(graphSparse_[v2]->state));
+            p2->setLevel(level_);
+            p2->setPath(idxPathI);
 
             if(k==states.size()-2){
               data.addGoalVertex(*p2);

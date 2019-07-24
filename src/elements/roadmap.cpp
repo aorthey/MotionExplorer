@@ -1,7 +1,7 @@
 #include "roadmap.h"
 #include "gui/common.h"
 #include "common.h"
-#include "elements/plannerdata_vertex_annotated.h"
+#include <ompl/geometric/planners/quotientspace/PlannerDataVertexAnnotated.h>
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 
@@ -68,7 +68,7 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
     for(uint i = 0; i < pred.size(); i++)
     {
       Vertex pi = pred.at(i);
-      PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(pi));
+      ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(pi));
       const ob::State *s;
       if(v==nullptr){
         s = pd->getVertex(pi).getState();
@@ -140,15 +140,15 @@ void Roadmap::DrawPlannerData(GUIState &state)
     Vector3 q = cspace->getXYZ(vd->getState());
     if(draw_planar) q[2] = 0.0;
 
-    PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+    ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
 
     if(v!=nullptr)
     {
       q = quotient_space->getXYZ(v->getQuotientState());
       if(draw_planar) q[2] = 0.0;
-      if(v->GetComponent()==0){
+      if(v->getComponent()==0){
         setColor(cVertex);
-      }else if(v->GetComponent()==1){
+      }else if(v->getComponent()==1){
         setColor(cVertexComponentGoal);
       }else{
         setColor(cVertexComponentOut);
@@ -165,40 +165,41 @@ void Roadmap::DrawPlannerData(GUIState &state)
         }
       }
 
-      double d = v->GetOpenNeighborhoodDistance();
+      // double d = v->GetOpenNeighborhoodDistance();
 
       if(state("draw_roadmap_vertices")){
-        if(!v->IsInfeasible()){
+        // if(!v->IsInfeasible()){
           drawPoint(q);
-        }
+        // }
       }
-      if(state("draw_roadmap_infeasible_vertices"))
-      {
-        if(v->IsInfeasible()){
-          setColor(red);
-          drawPoint(q);
-        }
-      }
-      if(state("draw_roadmap_volume")){
-        glTranslate(q);
+      // if(state("draw_roadmap_infeasible_vertices"))
+      // {
+      //   // if(v->IsInfeasible()){
+      //     setColor(red);
+      //     drawPoint(q);
+      //   // }
+      // }
 
-        using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
-        FeasibilityType feasibility_t = v->GetFeasibility();
-        if(feasibility_t == FeasibilityType::SUFFICIENT_FEASIBLE){
-          setColor(cNeighborhoodVolumeSufficient);
-        }else{
-          setColor(cNeighborhoodVolume);
-        }
+      //if(state("draw_roadmap_volume")){
+      //  glTranslate(q);
 
-        //Drawing Neighborhood
+      //  // using FeasibilityType = ob::PlannerDataVertexAnnotated::FeasibilityType;
+      //  // FeasibilityType feasibility_t = v->GetFeasibility();
+      //  // if(feasibility_t == FeasibilityType::SUFFICIENT_FEASIBLE){
+      //  //   setColor(cNeighborhoodVolumeSufficient);
+      //  // }else{
+      //  //   setColor(cNeighborhoodVolume);
+      //  // }
 
-        if(draw_planar){
-          Vector3 q2(0,0,1);
-          (wiredNeighborhood?drawWireCircle(q2, d):drawCircle(q2,d));
-        }else{
-          (wiredNeighborhood?drawWireSphere(d, 16):drawSphere(d, 16, 8));
-        }
-      }
+      //  //Drawing Neighborhood
+
+      //  if(draw_planar){
+      //    Vector3 q2(0,0,1);
+      //    (wiredNeighborhood?drawWireCircle(q2, d):drawCircle(q2,d));
+      //  }else{
+      //    (wiredNeighborhood?drawWireSphere(d, 16):drawSphere(d, 16, 8));
+      //  }
+      //}
 
 
     }else{
@@ -220,7 +221,7 @@ void Roadmap::DrawPlannerData(GUIState &state)
       Vector3 v1 = cspace->getXYZ(v->getState());
       if(draw_planar) v1[2] = 0.0;
 
-      PlannerDataVertexAnnotated *va = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+      ob::PlannerDataVertexAnnotated *va = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
       if(va!=nullptr) v1 = quotient_space->getXYZ(va->getQuotientState());
       if(draw_planar) v1[2] = 0.0;
 
@@ -231,13 +232,13 @@ void Roadmap::DrawPlannerData(GUIState &state)
         Vector3 v2 = cspace->getXYZ(w->getState());
         if(draw_planar) v2[2] = 0.0;
 
-        PlannerDataVertexAnnotated *wa = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
+        ob::PlannerDataVertexAnnotated *wa = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
         if(wa!=nullptr) v2 = quotient_space->getXYZ(wa->getQuotientState());
         if(draw_planar) v2[2] = 0.0;
         if(va!=nullptr && wa!=nullptr){
-          if(va->GetComponent()==0 || wa->GetComponent()==0){
+          if(va->getComponent()==0 || wa->getComponent()==0){
             setColor(cEdge);
-          }else if(va->GetComponent()==1 || wa->GetComponent()==1){
+          }else if(va->getComponent()==1 || wa->getComponent()==1){
             setColor(cVertexComponentGoal);
           }else{
             setColor(cVertexComponentOut);
@@ -248,59 +249,59 @@ void Roadmap::DrawPlannerData(GUIState &state)
     }
     glPopMatrix();
   }
-  if(state("draw_roadmap_complex")){
-    glPushMatrix();
-    glLineWidth(widthEdge);
-    setColor(cComplex);
-    for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
+  //if(state("draw_roadmap_complex")){
+  //  glPushMatrix();
+  //  glLineWidth(widthEdge);
+  //  setColor(cComplex);
+  //  for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
 
-      PlannerDataVertexAnnotated *v1a = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
-      if(v1a==nullptr) break;
-      std::vector<std::vector<long unsigned int>> simplices = v1a->GetComplex();
-      //if(simplices.size()>0) std::cout << "vertex " << vidx << " has " << simplices.size() << " simplices." << std::endl;
+  //    ob::PlannerDataVertexAnnotated *v1a = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+  //    if(v1a==nullptr) break;
+  //    std::vector<std::vector<long unsigned int>> simplices = v1a->getComplex();
+  //    //if(simplices.size()>0) std::cout << "vertex " << vidx << " has " << simplices.size() << " simplices." << std::endl;
 
-      for(uint i = 0; i < simplices.size(); i++){
-        const std::vector<long unsigned int>& svertices = simplices.at(i);
+  //    for(uint i = 0; i < simplices.size(); i++){
+  //      const std::vector<long unsigned int>& svertices = simplices.at(i);
 
-        uint K = svertices.size();
-        std::vector<Vector3> pvec;
-        for(uint k = 0; k < K; k++){
-          ob::PlannerDataVertex *vk = &pd->getVertex(svertices.at(k));
-          Vector3 p = quotient_space->getXYZ(vk->getState());
-          if(draw_planar) p[2] = 0.0;
-          pvec.push_back(p);
-        }
-        switch (pvec.size()) {
-          case 2:
-            {
-              drawLineSegment(pvec.at(0), pvec.at(1));
-              break;
-            }
-          case 3:
-            {
-              setColor(cComplex);
-              drawTriangle(pvec.at(0), pvec.at(1), pvec.at(2));
-              break;
-            }
-          case 4:
-            {
-              setColor(cComplexQuad);
-              drawQuad(pvec.at(0), pvec.at(1), pvec.at(2), pvec.at(3));
-              break;
-            }
-          default:
-            {
-              //std::cout << "cannot visualize simplex of dimensionality " << K << std::endl;
-              break;
-            }
+  //      uint K = svertices.size();
+  //      std::vector<Vector3> pvec;
+  //      for(uint k = 0; k < K; k++){
+  //        ob::PlannerDataVertex *vk = &pd->getVertex(svertices.at(k));
+  //        Vector3 p = quotient_space->getXYZ(vk->getState());
+  //        if(draw_planar) p[2] = 0.0;
+  //        pvec.push_back(p);
+  //      }
+  //      switch (pvec.size()) {
+  //        case 2:
+  //          {
+  //            drawLineSegment(pvec.at(0), pvec.at(1));
+  //            break;
+  //          }
+  //        case 3:
+  //          {
+  //            setColor(cComplex);
+  //            drawTriangle(pvec.at(0), pvec.at(1), pvec.at(2));
+  //            break;
+  //          }
+  //        case 4:
+  //          {
+  //            setColor(cComplexQuad);
+  //            drawQuad(pvec.at(0), pvec.at(1), pvec.at(2), pvec.at(3));
+  //            break;
+  //          }
+  //        default:
+  //          {
+  //            //std::cout << "cannot visualize simplex of dimensionality " << K << std::endl;
+  //            break;
+  //          }
                    
-        }
+  //      }
 
-      }
+  //    }
 
-    }
-    glPopMatrix();
-  }
+  //  }
+  //  glPopMatrix();
+  //}
   glEnable(GL_CULL_FACE);
   glEnable(GL_LIGHTING);
   glDisable(GL_BLEND); 
@@ -349,27 +350,30 @@ bool Roadmap::Save(TiXmlElement *node)
       space->copyToReals(state_serialized, vd->getState());
       TiXmlElement *subnode = ReturnSubNodeVector(*node, "state", state_serialized);
 
-      PlannerDataVertexAnnotated *v = dynamic_cast<PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+      ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
       if(v==nullptr){
-        subnode->SetAttribute("feasible", "unknown");
-        // subnode->SetAttribute("sufficient", "unknown");
-      }else{
-        using FeasibilityType = PlannerDataVertexAnnotated::FeasibilityType;
-        FeasibilityType feasibility_t = v->GetFeasibility();
-        if(feasibility_t == FeasibilityType::INFEASIBLE){
-          subnode->SetAttribute("feasible", "no");
-          // subnode->SetAttribute("sufficient", "no");
-        }else{
-          subnode->SetAttribute("feasible", "yes");
-          // if(feasibility_t == FeasibilityType::SUFFICIENT_FEASIBLE){
-          //   subnode->SetAttribute("sufficient", "yes");
-          // }else{
-          //   subnode->SetAttribute("sufficient", "no");
-          // }
-        }
-        // double d = v->GetOpenNeighborhoodDistance();
-        // subnode->SetDoubleAttribute("open_ball_radius", d);
+          subnode->SetAttribute("feasible", "unknown");
       }
+      // if(v==nullptr){
+      //   subnode->SetAttribute("feasible", "unknown");
+      //   // subnode->SetAttribute("sufficient", "unknown");
+      // }else{
+      //   using FeasibilityType = ob::PlannerDataVertexAnnotated::FeasibilityType;
+      //   FeasibilityType feasibility_t = v->GetFeasibility();
+      //   if(feasibility_t == FeasibilityType::INFEASIBLE){
+      //     subnode->SetAttribute("feasible", "no");
+      //     // subnode->SetAttribute("sufficient", "no");
+      //   }else{
+      //     subnode->SetAttribute("feasible", "yes");
+      //     // if(feasibility_t == FeasibilityType::SUFFICIENT_FEASIBLE){
+      //     //   subnode->SetAttribute("sufficient", "yes");
+      //     // }else{
+      //     //   subnode->SetAttribute("sufficient", "no");
+      //     // }
+      //   }
+      //   // double d = v->GetOpenNeighborhoodDistance();
+      //   // subnode->SetDoubleAttribute("open_ball_radius", d);
+      // }
       node->InsertEndChild(*subnode);
     }
 

@@ -20,7 +20,7 @@
 
     <hierarchy>
       <level inner_index="1" type="S1"/>
-      <level inner_index="0" type="S1R1"/>
+      <!-- <level inner_index="0" type="S1R1"/> -->
       <!-- <level inner_index="0" type="R2"/> -->
     </hierarchy>
 

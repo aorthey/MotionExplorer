@@ -11,8 +11,7 @@
 
   <!-- <algorithm name="hierarchy:sampler"/> -->
   <algorithm name="hierarchy:explorer"/>
-  <algorithm name="hierarchy:decomposition_planner"/>
-  <algorithm name="hierarchy:q_rrt"/>
+  <!-- <algorithm name="hierarchy:q_rrt"/> -->
   <!-- <algorithm name="benchmark:minimal"/> -->
   <!-- <algorithm name="ompl:rrt"/> -->
   <!-- <algorithm name="hierarchy:q_prm"/> -->

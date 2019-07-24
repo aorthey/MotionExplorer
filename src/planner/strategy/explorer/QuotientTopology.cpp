@@ -6,10 +6,10 @@ using namespace og;
 using namespace ob;
 #define foreach BOOST_FOREACH
 
-QuotientTopology::QuotientTopology(const ob::SpaceInformationPtr &si, Quotient *parent_ ):
+QuotientTopology::QuotientTopology(const ob::SpaceInformationPtr &si, QuotientSpace *parent_ ):
   BaseT(si, parent_)
 {
-  setName("QuotientTopology"+std::to_string(id));
+  setName("QuotientSpaceTopology"+std::to_string(id_));
   Planner::declareParam<double>("range", this, &QuotientTopology::setRange, &QuotientTopology::getRange, "0.:1.:10000.");
   Planner::declareParam<double>("goal_bias", this, &QuotientTopology::setGoalBias, &QuotientTopology::getGoalBias, "0.:.1:1.");
   q_random = new Configuration(Q1);
@@ -17,7 +17,7 @@ QuotientTopology::QuotientTopology(const ob::SpaceInformationPtr &si, Quotient *
 
 QuotientTopology::~QuotientTopology()
 {
-  DeleteConfiguration(q_random);
+  deleteConfiguration(q_random);
 }
 
 void QuotientTopology::setGoalBias(double goalBias_)
@@ -49,52 +49,52 @@ void QuotientTopology::clear()
   BaseT::clear();
 }
 
-bool QuotientTopology::GetSolution(ob::PathPtr &solution)
+bool QuotientTopology::getSolution(ob::PathPtr &solution)
 {
-  if(hasSolution){
-    return BaseT::GetSolution(solution);
+  if(hasSolution_){
+    return BaseT::getSolution(solution);
   }else{
     return false;
   }
 }
 
-void QuotientTopology::Grow(){
-  if(firstRun){
+void QuotientTopology::grow(){
+  if(firstRun_){
     Init();
-    firstRun = false;
+    firstRun_ = false;
   }
 
-  if(hasSolution){
+  if(hasSolution_){
     //No Goal Biasing if we already found a solution on this quotient space
-    Sample(q_random->state);
+    sample(q_random->state);
   }else{
     double s = rng_.uniform01();
     if(s < goalBias){
-      Q1->copyState(q_random->state, q_goal->state);
+      Q1->copyState(q_random->state, qGoal_->state);
     }else{
-      Sample(q_random->state);
+      sample(q_random->state);
     }
   }
 
-  const Configuration *q_nearest = Nearest(q_random);
+  const Configuration *q_nearest = nearest(q_random);
   double d = Q1->distance(q_nearest->state, q_random->state);
   if(d > maxDistance){
     Q1->getStateSpace()->interpolate(q_nearest->state, q_random->state, maxDistance / d, q_random->state);
   }
 
-  totalNumberOfSamples++;
+  totalNumberOfSamples_++;
   if(Q1->checkMotion(q_nearest->state, q_random->state))
   {
-    totalNumberOfFeasibleSamples++;
+    totalNumberOfFeasibleSamples_++;
     Configuration *q_next = new Configuration(Q1, q_random->state);
-    Vertex v_next = AddConfiguration(q_next);
-    AddEdge(q_nearest->index, v_next);
+    Vertex v_next = addConfiguration(q_next);
+    addEdge(q_nearest->index, v_next);
 
-    if(!hasSolution){
+    if(!hasSolution_){
       bool satisfied = sameComponentSparse(v_start_sparse, v_goal_sparse);
       if(satisfied)
       {
-        hasSolution = true;
+        hasSolution_ = true;
         // std::cout << std::string(80, '*') << std::endl;
         // std::cout << getName() << " Found Solution " << std::endl;
         // std::cout << std::string(80, '*') << std::endl;

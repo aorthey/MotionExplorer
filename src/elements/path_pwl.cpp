@@ -516,13 +516,15 @@ std::vector<double> PathPiecewiseLinear::GetHighCurvatureConfigurations()
     std::vector<ob::State *> states = gpath.getStates();
     // double L = GetLength();
     // this->DrawGL(state, 0.5*L);
+    // std::cout << "High Curvature Configs" << std::endl;
     double s = 0;
     if (states.size() > 2)
     {
         double a = si->distance(states[0], states[1]);
-        s += a;
+        // bool lastStatesWasAdded = false;
         for (unsigned int i = 2; i < states.size(); ++i)
         {
+            s += a;
             // view the path as a sequence of segments, and look at the triangles it forms:
             //          s1
             //          /\          s4
@@ -544,11 +546,22 @@ std::vector<double> PathPiecewiseLinear::GetHighCurvatureConfigurations()
                 // and we normalize by the length of the segments
                 double k = 2.0 * angle / (a + b);
                 double smoothness = k*k;
+
+                // std::cout << s << ":" << smoothness;
                 if(smoothness > 1e-3){
-                    pathPts.push_back(a);
+                    // std::cout << "*" << std::endl;
+                    pathPts.push_back(s);
+                }else{
+                    // lastStatesWasAdded = false;
+                    // std::cout << "" << std::endl;
                 }
             }
             a = b;
+        }
+        if(pathPts.size() <= 0)
+        {
+            //always have at least one configuration midway displayed
+            pathPts.push_back(0.5*length);
         }
 
     }else{
@@ -557,7 +570,6 @@ std::vector<double> PathPiecewiseLinear::GetHighCurvatureConfigurations()
     }
     return pathPts;
 }
-
 
 void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*_path);
@@ -581,13 +593,14 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
   if(drawCross) DrawGLCross(states);
 
   if(drawSweptVolume && state("draw_path_sweptvolume")){
-    // double L = GetLength();
-    std::vector<double> cP = GetHighCurvatureConfigurations();
-    for(uint k = 0; k < cP.size(); k++){
-        this->DrawGL(state, cP.at(k));
-    }
-
+    double L = GetLength();
+    this->DrawGL(state, 0.5*L);
     //TODO: make it at high-curvature points
+    // std::vector<double> cP = GetHighCurvatureConfigurations();
+    // for(uint k = 0; k < cP.size(); k++){
+    //     this->DrawGL(state, cP.at(k));
+    // }
+
   }
 
   //############################################################################

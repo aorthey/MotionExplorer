@@ -685,3 +685,6 @@ Problems for decomposition
 [ ] better way to do DFS path enumeration
 [ ] Fix enumerating path when no solution has been found
 [ ] Fix display when paths found on CS
+
+[ ] Compute pdef internally (why require that all pdefs are defined
+externally? That is not their responsibility and could lead to mistakes)

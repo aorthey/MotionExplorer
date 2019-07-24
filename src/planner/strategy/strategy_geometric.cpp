@@ -1,18 +1,18 @@
 #include "util.h"
-#include "elements/plannerdata_vertex_annotated.h"
+#include <ompl/geometric/planners/quotientspace/PlannerDataVertexAnnotated.h>
 #include "planner/strategy/strategy_geometric.h"
 #include "planner/benchmark/benchmark_input.h"
 #include "planner/benchmark/benchmark_output.h"
 
-#include "planner/strategy/quotient/multiquotient.h"
+// #include "planner/strategy/quotient/multiquotient.h"
 #include "planner/strategy/explorer/Explorer.h"
 #include "planner/strategy/explorer/QuotientTopology.h"
-#include "planner/strategy/quotientgraph/algorithms/q_rrt.h"
-#include "planner/strategy/quotientchart/multichart.h"
-#include "planner/strategy/quotientchart/algorithms/decomposition_planner.h"
-#include "planner/strategy/quotient/algorithms/qcp.h"
-#include "planner/strategy/quotient/algorithms/qsampler.h"
-#include "planner/strategy/quotient/algorithms/q_neighborhood_sampler.h"
+// #include "planner/strategy/quotientgraph/algorithms/q_rrt.h"
+// #include "planner/strategy/quotientchart/multichart.h"
+// #include "planner/strategy/quotientchart/algorithms/decomposition_planner.h"
+// #include "planner/strategy/quotient/algorithms/qcp.h"
+// #include "planner/strategy/quotient/algorithms/qsampler.h"
+// #include "planner/strategy/quotient/algorithms/q_neighborhood_sampler.h"
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -31,7 +31,7 @@
 #include <ompl/geometric/planners/prm/LazyPRM.h>
 #include <ompl/geometric/planners/prm/LazyPRMstar.h>
 #include <ompl/geometric/planners/prm/SPARS.h>
-#include <ompl/geometric/planners/prm/SPARStwo.h>
+// #include <ompl/geometric/planners/prm/SPARStwo.h>
 #include <ompl/geometric/planners/kpiece/KPIECE1.h>
 #include <ompl/geometric/planners/kpiece/BKPIECE1.h>
 #include <ompl/geometric/planners/kpiece/LBKPIECE1.h>
@@ -86,23 +86,23 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   double memory = boost::lexical_cast<double>(run["memory REAL"]);
   //uint states = boost::lexical_cast<int>(run["sampled states INTEGER"]);
 
-  typedef og::MultiQuotient<og::QRRT> MultiQuotient;
-  std::shared_ptr<MultiQuotient> qplanner = dynamic_pointer_cast<MultiQuotient>(planner);
-  if(qplanner != nullptr){
-    uint N = qplanner->GetLevels();
-    std::vector<int> nodes = qplanner->GetNodes();
-    std::vector<int> fnodes = qplanner->GetFeasibleNodes();
-    std::vector<int> dimensions = qplanner->GetDimensionsPerLevel();
-    run["stratification levels INTEGER"] = to_string(N);
-    for(uint k = 0; k < nodes.size(); k++){
-      std::string strd = "stratification level"+to_string(k)+" dimension INTEGER";
-      run[strd] = to_string(dimensions.at(k));
-      std::string strk = "stratification level"+to_string(k)+" nodes INTEGER";
-      run[strk] = to_string(nodes.at(k));
-      std::string strkf = "stratification level"+to_string(k)+" feasible nodes INTEGER";
-      run[strkf] = to_string(fnodes.at(k));
-    }
-  }else{
+  // typedef og::MultiQuotient<og::QRRT> MultiQuotient;
+  // std::shared_ptr<MultiQuotient> qplanner = dynamic_pointer_cast<MultiQuotient>(planner);
+  // if(qplanner != nullptr){
+  //   uint N = qplanner->GetLevels();
+  //   std::vector<int> nodes = qplanner->GetNodes();
+  //   std::vector<int> fnodes = qplanner->GetFeasibleNodes();
+  //   std::vector<int> dimensions = qplanner->GetDimensionsPerLevel();
+  //   run["stratification levels INTEGER"] = to_string(N);
+  //   for(uint k = 0; k < nodes.size(); k++){
+  //     std::string strd = "stratification level"+to_string(k)+" dimension INTEGER";
+  //     run[strd] = to_string(dimensions.at(k));
+  //     std::string strk = "stratification level"+to_string(k)+" nodes INTEGER";
+  //     run[strk] = to_string(nodes.at(k));
+  //     std::string strkf = "stratification level"+to_string(k)+" feasible nodes INTEGER";
+  //     run[strkf] = to_string(fnodes.at(k));
+  //   }
+  // }else{
     uint N = si->getStateDimension();
     run["stratification levels INTEGER"] = to_string(1);
     std::string strd = "stratification level"+to_string(0)+" dimension INTEGER";
@@ -111,7 +111,7 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
     run[strk] = to_string(states);
     std::string strkf = "stratification level"+to_string(0)+" feasible nodes INTEGER";
     run[strkf] = to_string(states);
-  }
+  // }
 
   std::cout << "Run " << pid << "/" << all_runs << " [" << planner->getName() << "] " << (solved?"solved":"no solution") << "(time: "<< time << ", states: " << states << ", memory: " << memory << ")" << std::endl;
   std::cout << std::string(80, '-') << std::endl;
@@ -143,7 +143,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:lazyprm") planner = std::make_shared<og::LazyPRM>(si);
   else if(algorithm=="ompl:lazyprmstar") planner = std::make_shared<og::LazyPRMstar>(si);
   else if(algorithm=="ompl:spars") planner = std::make_shared<og::SPARS>(si);
-  else if(algorithm=="ompl:spars2") planner = std::make_shared<og::SPARStwo>(si);
+  // else if(algorithm=="ompl:spars2") planner = std::make_shared<og::SPARStwo>(si);
 
   else if(algorithm=="ompl:cforest") planner = std::make_shared<og::CForest>(si);
   else if(algorithm=="ompl:sst") planner = std::make_shared<og::SST>(si);
@@ -165,30 +165,30 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){
     std::cout << "Planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
     exit(0);
-  }else if(algorithm=="hierarchy:decomposition_planner"){
-    planner = GetSharedMultiChartPtr<og::DecompositionPlanner>(stratification);
-    planner->setName("DecompositionPlanner");
+  // }else if(algorithm=="hierarchy:decomposition_planner"){
+  //   planner = GetSharedMultiChartPtr<og::DecompositionPlanner>(stratification);
+  //   planner->setName("DecompositionPlanner");
 
-  }else if(algorithm=="hierarchy:qcp"){
-    planner = GetSharedMultiQuotientPtr<og::QCP>(stratification);
-    planner->setName("QCP");
+  // }else if(algorithm=="hierarchy:qcp"){
+  //   planner = GetSharedMultiQuotientPtr<og::QCP>(stratification);
+  //   planner->setName("QCP");
 
-  }else if(algorithm=="hierarchy:q_rrt"){
-    planner = GetSharedMultiQuotientPtr<og::QRRT>(stratification);
-    planner->setName("QRRT");
+  // }else if(algorithm=="hierarchy:q_rrt"){
+  //   planner = GetSharedMultiQuotientPtr<og::QRRT>(stratification);
+  //   planner->setName("QRRT");
   }else if(algorithm=="hierarchy:explorer"){
     typedef og::MotionExplorer<og::QuotientTopology> MotionExplorer;
     planner = std::make_shared<MotionExplorer>(stratification->si_vec);
     static_pointer_cast<MotionExplorer>(planner)->setProblemDefinition(stratification->pdef_vec);
     planner->setName("MotionExplorer");
 
-  }else if(algorithm=="hierarchy:neighborhood_sampler"){
-    planner = GetSharedMultiQuotientPtr<og::QNeighborhoodSampler>(stratification);
-    planner->setName("QNeighborhoodSampler");
+  // }else if(algorithm=="hierarchy:neighborhood_sampler"){
+  //   planner = GetSharedMultiQuotientPtr<og::QNeighborhoodSampler>(stratification);
+  //   planner->setName("QNeighborhoodSampler");
 
-  }else if(algorithm=="hierarchy:sampler"){
-    planner = GetSharedMultiQuotientPtr<og::QSampler>(stratification);
-    planner->setName("QSampler");
+  // }else if(algorithm=="hierarchy:sampler"){
+  //   planner = GetSharedMultiQuotientPtr<og::QSampler>(stratification);
+  //   planner->setName("QSampler");
 
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
@@ -200,34 +200,34 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
 
 }
 
-template<typename T_Algorithm> 
-ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiChartPtr( 
-  OMPLGeometricStratificationPtr stratification)
-{
-  typedef og::MultiChart<T_Algorithm> MultiChart;
-  ob::PlannerPtr planner = std::make_shared<MultiChart>(stratification->si_vec);
-  static_pointer_cast<MultiChart>(planner)->setProblemDefinition(stratification->pdef_vec);
-  return planner;
-}
+// template<typename T_Algorithm> 
+// ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiChartPtr( 
+//   OMPLGeometricStratificationPtr stratification)
+// {
+//   typedef og::MultiChart<T_Algorithm> MultiChart;
+//   ob::PlannerPtr planner = std::make_shared<MultiChart>(stratification->si_vec);
+//   static_pointer_cast<MultiChart>(planner)->setProblemDefinition(stratification->pdef_vec);
+//   return planner;
+// }
 
-template<typename T_Algorithm> 
-ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiQuotientPtr( 
-  OMPLGeometricStratificationPtr stratification)
-{
-  typedef og::MultiQuotient<T_Algorithm> MultiQuotient;
-  ob::PlannerPtr planner = std::make_shared<MultiQuotient>(stratification->si_vec);
-  static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(stratification->pdef_vec);
-  return planner;
-}
-template<typename T_Algorithm, typename T_Algorithm_Two> 
-ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiQuotientPtr( 
-  OMPLGeometricStratificationPtr stratification)
-{
-  typedef og::MultiQuotient<T_Algorithm, T_Algorithm_Two> MultiQuotient;
-  ob::PlannerPtr planner = std::make_shared<MultiQuotient>(stratification->si_vec);
-  static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(stratification->pdef_vec);
-  return planner;
-}
+// template<typename T_Algorithm> 
+// ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiQuotientPtr( 
+//   OMPLGeometricStratificationPtr stratification)
+// {
+//   typedef og::MultiQuotient<T_Algorithm> MultiQuotient;
+//   ob::PlannerPtr planner = std::make_shared<MultiQuotient>(stratification->si_vec);
+//   static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(stratification->pdef_vec);
+//   return planner;
+// }
+// template<typename T_Algorithm, typename T_Algorithm_Two> 
+// ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiQuotientPtr( 
+//   OMPLGeometricStratificationPtr stratification)
+// {
+//   typedef og::MultiQuotient<T_Algorithm, T_Algorithm_Two> MultiQuotient;
+//   ob::PlannerPtr planner = std::make_shared<MultiQuotient>(stratification->si_vec);
+//   static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(stratification->pdef_vec);
+//   return planner;
+// }
 
 OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratificationFromCSpaceStratification
 (const StrategyInput &input, std::vector<CSpaceOMPL*> cspace_levels )
@@ -404,19 +404,19 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
 
         }
         ob::PlannerPtr planner_k_i = GetPlanner(binput.algorithms.at(k), stratifications.at(i));
-        if(shortStratification){
-          typedef og::MultiQuotient<og::QRRT> MultiQuotient;
-          std::shared_ptr<MultiQuotient> qplanner = dynamic_pointer_cast<MultiQuotient>(planner_k_i);
-          if(qplanner != nullptr){
-            qplanner->SetStopLevel(stratifications.at(i)->si_vec.size()-1);
-          }else{
-            std::cout << "Detected " << di << "/" << largest_ambient_space_dimension << " dimensions." << std::endl;
-            std::cout << "at algorithm: " << name_algorithm << std::endl;
-            std::cout << "failed to cast" << std::endl;
-            OMPL_INFORM("Could not cast algorithm");
-            exit(0);
-          }
-        }
+        // if(shortStratification){
+        //   typedef og::MultiQuotient<og::QRRT> MultiQuotient;
+        //   std::shared_ptr<MultiQuotient> qplanner = dynamic_pointer_cast<MultiQuotient>(planner_k_i);
+        //   if(qplanner != nullptr){
+        //     qplanner->SetStopLevel(stratifications.at(i)->si_vec.size()-1);
+        //   }else{
+        //     std::cout << "Detected " << di << "/" << largest_ambient_space_dimension << " dimensions." << std::endl;
+        //     std::cout << "at algorithm: " << name_algorithm << std::endl;
+        //     std::cout << "failed to cast" << std::endl;
+        //     OMPL_INFORM("Could not cast algorithm");
+        //     exit(0);
+        //   }
+        // }
 
         std::string name_algorithm_strat = planner_k_i->getName()+"_(";
 

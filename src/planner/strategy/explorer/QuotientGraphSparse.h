@@ -1,7 +1,7 @@
 #pragma once
 
-#include "planner/strategy/quotientgraph/quotient_graph.h"
-#include "planner/strategy/explorer/PathVisibilityChecker.h"
+#include "PathVisibilityChecker.h"
+#include <ompl/geometric/planners/quotientspace/QuotientSpaceGraph.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <ompl/util/RandomNumbers.h>
 #include <ompl/geometric/PathGeometric.h>
@@ -18,22 +18,22 @@ namespace ompl
 {
   namespace geometric
   {
-    class QuotientGraphSparse: public og::QuotientGraph{
+    class QuotientGraphSparse: public og::QuotientSpaceGraph{
 
-        typedef og::QuotientGraph BaseT;
+        typedef og::QuotientSpaceGraph BaseT;
       public:
 
-        QuotientGraphSparse(const ob::SpaceInformationPtr &si, Quotient *parent = nullptr);
+        QuotientGraphSparse(const ob::SpaceInformationPtr &si, QuotientSpace *parent = nullptr);
         virtual ~QuotientGraphSparse() override;
 
-        virtual void Grow() = 0;
+        virtual void grow() = 0;
         virtual void getPlannerData(ob::PlannerData &data) const override;
         void getPlannerDataRoadmap(ob::PlannerData &data, std::vector<int> pathIdx) const;
 
-        virtual void DeleteConfiguration(Configuration *q);
-        virtual Vertex AddConfiguration(Configuration *q) override;
-        Vertex AddConfigurationSparse(Configuration *q);
-        void AddEdgeSparse(const Vertex a, const Vertex b);
+        virtual void deleteConfiguration(Configuration *q);
+        virtual Vertex addConfiguration(Configuration *q) override;
+        Vertex addConfigurationSparse(Configuration *q);
+        void addEdgeSparse(const Vertex a, const Vertex b);
 
         // void AddEdge(const Configuration* q1, const Configuration* q2);
         virtual void setup() override;
@@ -56,10 +56,10 @@ namespace ompl
         void removeEdgeIfReductionLoop(const Edge &e);
         unsigned int getNumberOfPaths() const;
         const std::vector<ob::State*> getKthPath(uint k) const;
-        void GetPathIndices(const std::vector<ob::State*> &states, std::vector<int> &idxPath) const;
+        void getPathIndices(const std::vector<ob::State*> &states, std::vector<int> &idxPath) const;
 
         int selectedPath{-1}; //selected path to sample from (if children try to sample this space)
-        bool SampleQuotient(ob::State *q_random_graph) override;
+        bool sampleQuotient(ob::State *q_random_graph) override;
 
         PathVisibilityChecker* getPathVisibilityChecker();
 
