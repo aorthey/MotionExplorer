@@ -276,13 +276,14 @@ bool QuotientGraphSparse::sampleQuotient(ob::State *q_random_graph)
         std::vector<ob::State*> states = pathStackHead_.at(selectedPath);
         uint N = states.size();
 
-
+        //############################################################################
         //Vertex Sampling
         // int k = rng_.uniformInt(0, N-1);
         // ob::State *state = states.at(k);
         // Q1->getStateSpace()->copyState(q_random_graph, state);
         // Q1_sampler->sampleUniformNear(q_random_graph, q_random_graph, 0.2);
 
+        //############################################################################
         //Edge Sampling
         uint k = rng_.uniformInt(0, N-1);
         double r = rng_.uniform01();
@@ -587,25 +588,12 @@ void QuotientGraphSparse::printAllPathsUtil(
 							if(pathStack_.size() > Nhead) break;
           }
         }
-        // for (i = adj[u].begin(); i != adj[u].end(); ++i)
-        //     if (!visited[*i])
-        //         printAllPathsUtil(*i, d, visited, path, path_index);
     }
 
     // Remove current vertex from path[] and mark it as unvisited
     path_index--;
     visited[u] = false;
 }
-// void QuotientGraphSparse::GenerateShortestPaths(
-//     Vertex v_start, 
-//     Vertex v_goal, 
-//     Graph graph, 
-//     unsigned Nhead, 
-//     pathStackHead_)
-// {
-//         AddPathToStack(pp);
-// }
-
 
 void QuotientGraphSparse::enumerateAllPaths() 
 {
@@ -655,12 +643,8 @@ void QuotientGraphSparse::enumerateAllPaths()
     std::cout << "Found " << pathStackHead_.size() << " path classes." << std::endl;
     std::cout << std::string(80, '-') << std::endl;
 
-
-
     //TODO: update internally QuotientSpace hierarchy. Create new QuotientSpaces
     //for each path.
-
-
 }
 
 void QuotientGraphSparse::getPlannerDataRoadmap(ob::PlannerData &data, std::vector<int> pathIdx) const

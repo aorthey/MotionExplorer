@@ -298,9 +298,9 @@ void MotionPlanner::AdvanceUntilSolution()
   }
 
   //TODO: quick hack to refresh hierarchical display
-  Collapse();
+  // Collapse();
   Expand();
-  Expand();
+  // Expand();
 
 }
 
