@@ -27,10 +27,10 @@ class Roadmap{
     bool Save(const char* fn);
     bool Save(TiXmlElement *node);
 
-    GLDraw::GLColor cVertex{lightGreen};
+    GLDraw::GLColor cEdge{grey};
+    GLDraw::GLColor cVertex{grey};
     GLDraw::GLColor cVertexStart{green};
     GLDraw::GLColor cVertexGoal{red};
-    GLDraw::GLColor cEdge{lightGreen};
     GLDraw::GLColor cPath{darkMagenta};
     GLDraw::GLColor cComplex{magenta};
     GLDraw::GLColor cComplexQuad{lightBlue};
