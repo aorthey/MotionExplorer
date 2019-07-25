@@ -679,12 +679,18 @@ of pseudo metric?)
 
 Problems for decomposition
 [x] PathClasses contain additional vertices not belonging to path.
-[ ] jump directly to last selection, not going back
+[x] jump directly to last selection, not going back
 [ ] tighten roadmap
 [ ] connect subroadmaps on cspace
 [ ] better way to do DFS path enumeration
 [ ] Fix enumerating path when no solution has been found
 [ ] Fix display when paths found on CS
 
-[ ] Compute pdef internally (why require that all pdefs are defined
+[x] Compute pdef internally (why require that all pdefs are defined
 externally? That is not their responsibility and could lead to mistakes)
+
+[ ] move the whole explorer to ompl
+[ ] One class per selectable path (only grow in its shadow)
+[ ] Path Equivalence in Car scenario is screwed up
+[ ] In car scenario, Hierarchy visualizer shows only one found path, but 5 were found. This is
+contrary to manip scenario!?

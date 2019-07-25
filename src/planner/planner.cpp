@@ -1,13 +1,13 @@
 #include "planner/planner.h"
 #include "planner/strategy/strategy_input.h"
-#include "planner/strategy/explorer/Explorer.h"
 #include "planner/strategy/strategy_output.h"
 #include "planner/strategy/strategy_geometric.h"
 #include "planner/strategy/strategy_kinodynamic.h"
 #include "planner/cspace/cspace_factory.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include "gui/drawMotionPlanner.h"
-#include "planner/strategy/explorer/QuotientTopology.h"
+#include <ompl/geometric/planners/explorer/QuotientTopology.h>
+#include <ompl/geometric/planners/explorer/Explorer.h>
 
 #include "util.h"
 #include <boost/lexical_cast.hpp>

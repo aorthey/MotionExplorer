@@ -1,12 +1,12 @@
 #include "util.h"
-#include <ompl/geometric/planners/quotientspace/PlannerDataVertexAnnotated.h>
 #include "planner/strategy/strategy_geometric.h"
 #include "planner/benchmark/benchmark_input.h"
 #include "planner/benchmark/benchmark_output.h"
 
 // #include "planner/strategy/quotient/multiquotient.h"
-#include "planner/strategy/explorer/Explorer.h"
-#include "planner/strategy/explorer/QuotientTopology.h"
+#include <ompl/geometric/planners/explorer/QuotientTopology.h>
+#include <ompl/geometric/planners/explorer/Explorer.h>
+#include <ompl/geometric/planners/quotientspace/PlannerDataVertexAnnotated.h>
 // #include "planner/strategy/quotientgraph/algorithms/q_rrt.h"
 // #include "planner/strategy/quotientchart/multichart.h"
 // #include "planner/strategy/quotientchart/algorithms/decomposition_planner.h"
