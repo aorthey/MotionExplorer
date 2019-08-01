@@ -694,3 +694,8 @@ externally? That is not their responsibility and could lead to mistakes)
 [ ] Path Equivalence in Car scenario is screwed up
 [ ] In car scenario, Hierarchy visualizer shows only one found path, but 5 were found. This is
 contrary to manip scenario!?
+
+[ ] differentiate between solutions on S1R1 (if starting on that level). Problem
+would disappear if S1 would be the uppermost level.
+
+[ ] QMP to OMPL

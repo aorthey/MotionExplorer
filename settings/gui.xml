@@ -149,10 +149,11 @@
     <key>S</key>
   </hotkey>
   <hotkey>
-    <name>print_robot_info</name>
+    <name>print_config</name>
     <descr>Print Robot</descr>
     <key>i</key>
   </hotkey>
+
   <hotkey>
     <name>draw_robot_previous</name>
     <descr>Draw Previous Robot</descr>
@@ -318,6 +319,7 @@
   <property name="draw_cover_active_faces" enabled="0"/>
   <property name="draw_cover_ellipsoid" enabled="1"/>
   <property name="load_view_from_file" enabled="1"/>
+  <property name="solution_path_annotated" enabled="0"/>
 
   <property name="draw_planner_surface_normals" enabled="0"/>
 </gui>
