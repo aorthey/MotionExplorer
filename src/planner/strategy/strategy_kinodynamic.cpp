@@ -2,7 +2,7 @@
 #include "planner/cspace/cspace_kinodynamic.h"
 #include "planner/benchmark/benchmark_input.h"
 #include "util.h"
-#include <ompl/geometric/planners/quotientspace/PlannerDataVertexAnnotated.h>
+#include <ompl/geometric/planners/quotientspace/datastructures/PlannerDataVertexAnnotated.h>
 
 #include "ompl/control/planners/rrt/kRRT.h"
 #include <ompl/control/planners/rrt/RRT.h>

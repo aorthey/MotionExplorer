@@ -1,5 +1,5 @@
 #include "planner/strategy/strategy_output.h"
-#include <ompl/geometric/planners/quotientspace/PlannerDataVertexAnnotated.h>
+#include <ompl/geometric/planners/quotientspace/datastructures/PlannerDataVertexAnnotated.h>
 #include "elements/tree.h"
 #include "common.h"
 #include <ompl/control/PathControl.h>
