@@ -3,16 +3,8 @@
 #include "planner/benchmark/benchmark_input.h"
 #include "planner/benchmark/benchmark_output.h"
 
-// #include "planner/strategy/quotient/multiquotient.h"
-#include <ompl/geometric/planners/explorer/QuotientTopology.h>
 #include <ompl/geometric/planners/explorer/Explorer.h>
-#include <ompl/geometric/planners/quotientspace/PlannerDataVertexAnnotated.h>
-// #include "planner/strategy/quotientgraph/algorithms/q_rrt.h"
-// #include "planner/strategy/quotientchart/multichart.h"
-// #include "planner/strategy/quotientchart/algorithms/decomposition_planner.h"
-// #include "planner/strategy/quotient/algorithms/qcp.h"
-// #include "planner/strategy/quotient/algorithms/qsampler.h"
-// #include "planner/strategy/quotient/algorithms/q_neighborhood_sampler.h"
+#include <ompl/geometric/planners/quotientspace/QRRT.h>
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -124,6 +116,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
 {
   ob::PlannerPtr planner;
   const ob::SpaceInformationPtr si = stratification->si_vec.back();
+  std::vector<ob::SpaceInformationPtr> siVec = stratification->si_vec;
   const ob::ProblemDefinitionPtr pdef = stratification->pdef_vec.back();
 
   if(algorithm=="ompl:rrt") planner = std::make_shared<og::RRT>(si);
@@ -158,36 +151,14 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:sbl") planner = std::make_shared<og::SBL>(si);
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
-  else if(algorithm=="ompl:bitstar"){
-    std::cout << "Planner " << algorithm << " returns seg-fault. Removed." << std::endl;
-    exit(0);
-  }
+  else if(algorithm=="hierarchy:q_rrt") planner = std::make_shared<og::QRRT>(siVec);
+  else if(algorithm=="hierarchy:explorer") planner = std::make_shared<og::MotionExplorer>(siVec);
+
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){
     std::cout << "Planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
     exit(0);
-  // }else if(algorithm=="hierarchy:decomposition_planner"){
-  //   planner = GetSharedMultiChartPtr<og::DecompositionPlanner>(stratification);
-  //   planner->setName("DecompositionPlanner");
-
-  // }else if(algorithm=="hierarchy:qcp"){
-  //   planner = GetSharedMultiQuotientPtr<og::QCP>(stratification);
-  //   planner->setName("QCP");
-
-  // }else if(algorithm=="hierarchy:q_rrt"){
-  //   planner = GetSharedMultiQuotientPtr<og::QRRT>(stratification);
-  //   planner->setName("QRRT");
-  }else if(algorithm=="hierarchy:explorer"){
-    typedef og::MotionExplorer<og::QuotientTopology> MotionExplorer;
-    planner = std::make_shared<MotionExplorer>(stratification->si_vec);
-    // planner = std::make_shared<MotionExplorer>(si);
-  // }else if(algorithm=="hierarchy:neighborhood_sampler"){
-  //   planner = GetSharedMultiQuotientPtr<og::QNeighborhoodSampler>(stratification);
-  //   planner->setName("QNeighborhoodSampler");
-
-  // }else if(algorithm=="hierarchy:sampler"){
-  //   planner = GetSharedMultiQuotientPtr<og::QSampler>(stratification);
-  //   planner->setName("QSampler");
-  }else{
+  }
+  else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);
   }

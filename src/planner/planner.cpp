@@ -6,7 +6,6 @@
 #include "planner/cspace/cspace_factory.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include "gui/drawMotionPlanner.h"
-#include <ompl/geometric/planners/explorer/QuotientTopology.h>
 #include <ompl/geometric/planners/explorer/Explorer.h>
 
 #include "util.h"
@@ -425,9 +424,8 @@ void MotionPlanner::UpdateHierarchy(){
 
 void MotionPlanner::setSelectedPath(std::vector<int> selectedPath)
 {
-    typedef og::MotionExplorer<og::QuotientTopology> MotionExplorer;
     //can only be done with Explorer Planners
-    auto selectionPlanner = dynamic_pointer_cast<MotionExplorer>(strategy->GetPlannerPtr());
+    auto selectionPlanner = dynamic_pointer_cast<og::MotionExplorer>(strategy->GetPlannerPtr());
     if(selectionPlanner != NULL){
       selectionPlanner->setSelectedPath( selectedPath);
     }

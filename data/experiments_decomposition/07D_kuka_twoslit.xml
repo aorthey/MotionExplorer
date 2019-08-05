@@ -28,7 +28,7 @@
 
     <freeFloating>0</freeFloating>
     <maxplanningtime>0.2</maxplanningtime>
-    <epsilongoalregion>0.01</epsilongoalregion>
+    <epsilongoalregion>0.1</epsilongoalregion>
 
     <hierarchy>
       <!-- <level inner_index="1" type="R1"/> -->
