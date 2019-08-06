@@ -1,7 +1,6 @@
 #pragma once
 #include "algorithms/lemon_interface.h"
 #include "planner/cspace/cspace.h"
-//#include "elements/swath_volume.h"
 #include "elements/path_pwl.h"
 #include "gui/gui_state.h"
 
