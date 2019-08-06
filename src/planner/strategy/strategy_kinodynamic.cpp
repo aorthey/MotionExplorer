@@ -139,10 +139,10 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
   //###########################################################################
   // choose planner
   //###########################################################################
-    // const oc::SpaceInformationPtr si = static_pointer_cast<oc::SpaceInformation>(si_vec.back());
-    // si->setMinMaxControlDuration(0.01, 0.1);
-    // si->setPropagationStepSize(1);
-    //si->getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(si->getStateSpace())));
+  // const oc::SpaceInformationPtr si = static_pointer_cast<oc::SpaceInformation>(planner->getSpaceInformation());
+  // si->setMinMaxControlDuration(0.01, 0.1);
+  // si->setPropagationStepSize(1);
+  // si->getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(si->getStateSpace())));
 
     // ob::PlannerPtr planner = GetPlanner(algorithm, si_vec, pdef_vec);
     // planner->setup();
