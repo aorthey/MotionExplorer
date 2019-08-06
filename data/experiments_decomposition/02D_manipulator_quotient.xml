@@ -17,6 +17,7 @@
     <maxplanningtime>0.2</maxplanningtime>      <!-- runtime in (s) --> 
     <smoothPath>0</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
     <pathSpeed>15</pathSpeed>
+    <pathWidth>0.2</pathWidth>
 
     <hierarchy>
       <level inner_index="1" type="S1"/>

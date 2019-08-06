@@ -502,7 +502,7 @@ void MotionPlanner::DrawGL(GUIState& state){
         bool hasChildren = hierarchy->HasChildren(current_path);
         if(pwlk && state("draw_roadmap_shortest_path")){
           pwlk->zOffset = 0.001;
-          pwlk->linewidth = 0.1;
+          pwlk->linewidth = 0.7*input.pathWidth;
           pwlk->ptsize = 8;
           if(!hasChildren){
               pwlk->setColor(colorPathNotSelected);
@@ -522,7 +522,7 @@ void MotionPlanner::DrawGL(GUIState& state){
       pwl = Rcurrent->GetShortestPath();
       if(pwl && state("draw_roadmap_shortest_path")){
         pwl->zOffset = 0.005;
-        pwl->linewidth = 0.15;
+        pwl->linewidth = input.pathWidth;
         pwl->ptsize = 10;
 
 

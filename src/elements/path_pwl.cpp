@@ -609,10 +609,6 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
   cLine.setCurrentGL();
 
   //############################################################################
-  if(!state("solution_path_annotated"))
-  {
-      linewidth = 0.001;
-  }
   DrawGLRibbon(states);
   DrawGLArrowMiddleOfPath(states);
   if(drawCross) DrawGLCross(states);
