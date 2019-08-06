@@ -3,7 +3,7 @@
 #include "planner/benchmark/benchmark_input.h"
 #include "planner/benchmark/benchmark_output.h"
 
-#include <ompl/geometric/planners/explorer/Explorer.h>
+#include <ompl/geometric/planners/quotientspace/Explorer.h>
 #include <ompl/geometric/planners/quotientspace/QRRT.h>
 
 #include <ompl/geometric/planners/rrt/RRT.h>

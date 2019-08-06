@@ -191,6 +191,7 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
         std::cout << "ERROR: vertex is not annotated." << std::endl;
         exit(0);
       }
+
       std::vector<int> path = v->getPath();
 
       PTree *current = root;
@@ -203,10 +204,12 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
         }
         current = current->children.at(path.at(k));
       }
+
       ob::PlannerDataPtr pdi = current->content;
 
       tree_vertices[path]++;
 
+      //if error occurs here, then the getPath method does not return right path
       if(pd->isStartVertex(i)){
           pdi->addStartVertex(*v);
       }else if(pd->isGoalVertex(i)){

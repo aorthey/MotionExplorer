@@ -25,7 +25,7 @@
     <qgoal  config="21  +0.0 +0.0 +0.0 0.0 0.0 0.0  -1.2 0 -0.5 0 -0.2 0 +0.2 0 +0.2 0 +0.5 0 0 0 0"/>
     <epsilongoalregion>0.1</epsilongoalregion>
     <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
-    <pathSpeed>10</pathSpeed>
+    <pathSpeed>8</pathSpeed>
     <!-- <smoothPath>1</smoothPath> -->
 
     <!-- <hierarchy> -->
