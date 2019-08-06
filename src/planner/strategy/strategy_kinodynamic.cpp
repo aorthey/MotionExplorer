@@ -3,6 +3,8 @@
 #include "planner/benchmark/benchmark_input.h"
 #include "util.h"
 #include <ompl/geometric/planners/quotientspace/datastructures/PlannerDataVertexAnnotated.h>
+#include <ompl/geometric/planners/explorer/Explorer.h>
+#include <ompl/geometric/planners/quotientspace/QRRT.h>
 
 #include "ompl/control/planners/rrt/kRRT.h"
 #include <ompl/control/planners/rrt/RRT.h>
@@ -25,7 +27,7 @@ namespace ot = ompl::tools;
 static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)
 {
   ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
-  obj->setCostThreshold(ob::Cost(dInf));
+  obj->setCostThreshold(ob::Cost(ob::dInf));
   return obj;
 }
 
@@ -72,6 +74,8 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
     planner = std::make_shared<oc::PDST>(si);
   }else if(algorithm=="ompl:dynamic:kpiece"){
     planner = std::make_shared<oc::KPIECE1>(si);
+  // }else if(algorithm=="hierarchy:explorer"){
+  //   planner = std::make_shared<og::MotionExplorer>(si);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);
