@@ -2,6 +2,7 @@
 
 <world>
   <robot name="dubins_car" file="../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="dubins_car" file="../robots/dubinscar/dubinscar.urdf"/>
   <robot name="disk_inner" file="../robots/dubinscar/dubinscar_capsule_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
   <robot name="disk_outer" file="../robots/dubinscar/dubinscar_capsule_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
@@ -34,8 +35,9 @@
     <pathSpeed>10</pathSpeed>
 
     <hierarchy>
-      <!-- <level inner_index="1" cspace_constant="1" type="R2"/> -->
-      <level inner_index="0" cspace_constant="0.532623641291" type="TSE2"/>
+      <level inner_index="2" type="R2"/>
+      <level inner_index="1" type="SE2"/>
+      <level inner_index="0" type="TSE2"/>
     </hierarchy>
 
   </plannerinput>

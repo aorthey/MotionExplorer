@@ -45,6 +45,7 @@ class PathPiecewiseLinear
     GLColor cRobotVolume{grey};
     GLColor cCross{green};
 
+    void setColor(const GLColor &color);
     bool drawSweptVolume{true};
     bool drawCross{true};
 

@@ -486,13 +486,12 @@ void MotionPlanner::DrawGL(GUIState& state){
       int last_node = current_path.back();
       const GLColor magenta(0.7,0,0.7,1);
 
-      const GLColor pathSelectedExecutable = green;
+      const GLColor colorPathSelectedExecutable = green;
+      const GLColor colorPathSelectedNonExec = magenta;
+      const GLColor colorPathSelectedNonExecChildren = green;
 
-      const GLColor pathSelectedNonExec = orange;
-      const GLColor pathSelectedNonExecChildren = green;
-
-      const GLColor pathNotSelected = lightOrange;
-      const GLColor pathNotSelectedChildren = lightGreen;
+      const GLColor colorPathNotSelected = lightMagenta;
+      const GLColor colorPathNotSelectedChildren = lightGreen;
 
       for(uint k = 0; k < Nsiblings; k++){
         if(k==(uint)last_node) continue;
@@ -506,15 +505,9 @@ void MotionPlanner::DrawGL(GUIState& state){
           pwlk->linewidth = 0.1;
           pwlk->ptsize = 8;
           if(!hasChildren){
-              pwlk->cSmoothed = pathNotSelected;
-              pwlk->cUnsmoothed = pathNotSelected;
-              pwlk->cVertex = pathNotSelected;
-              pwlk->cLine = pathNotSelected;
+              pwlk->setColor(colorPathNotSelected);
           }else{
-              pwlk->cSmoothed = pathNotSelectedChildren;
-              pwlk->cUnsmoothed = pathNotSelectedChildren;
-              pwlk->cVertex = pathNotSelectedChildren;
-              pwlk->cLine = pathNotSelectedChildren;
+              pwlk->setColor(colorPathNotSelectedChildren);
 
           }
           pwlk->drawSweptVolume = false;
@@ -541,31 +534,19 @@ void MotionPlanner::DrawGL(GUIState& state){
         if(curLevel < maxLevels-1){
             pwl->drawCross = true;
             if(hasChildren){
-                pwl->cCross = pathSelectedNonExecChildren;
-                pwl->cSmoothed = pathSelectedNonExecChildren;
-                pwl->cUnsmoothed = pathSelectedNonExecChildren;
-                pwl->cVertex = pathSelectedNonExecChildren;
-                pwl->cLine = pathSelectedNonExecChildren;
+                pwl->cCross = colorPathSelectedNonExecChildren;
+                pwl->setColor(colorPathSelectedNonExecChildren);
             }else{
-                pwl->cCross = pathSelectedNonExec;
-                pwl->cSmoothed = pathSelectedNonExec;
-                pwl->cUnsmoothed = pathSelectedNonExec;
-                pwl->cVertex = pathSelectedNonExec;
-                pwl->cLine = pathSelectedNonExec;
+                pwl->cCross = colorPathSelectedNonExec;
+                pwl->setColor(colorPathSelectedNonExec);
             }
         }else{
             pwl->drawCross = false;
-            pwl->cSmoothed = pathSelectedExecutable;
-            pwl->cUnsmoothed = pathSelectedExecutable;
-            pwl->cVertex = pathSelectedExecutable;
-            pwl->cLine = pathSelectedExecutable;
+            pwl->setColor(colorPathSelectedExecutable);
         }
         pwl->DrawGL(state);
       }
-  }else{
-    // std::cout << Nsiblings << std::endl;
   }
-
 
   uint ridx = hierarchy->GetRobotIdx(current_level);
   Robot* robot = world->robots[ridx];

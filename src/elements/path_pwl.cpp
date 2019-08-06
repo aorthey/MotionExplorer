@@ -83,6 +83,14 @@ void PathPiecewiseLinear::SendToController(SmartPointer<RobotController> control
 
 }
 
+void PathPiecewiseLinear::setColor(const GLColor &color)
+{
+    this->cSmoothed = color;
+    this->cUnsmoothed = color;
+    this->cVertex = color;
+    this->cLine = color;
+}
+
 void PathPiecewiseLinear::Smooth(){
   if(path == nullptr) return;
   if(!isSmooth){

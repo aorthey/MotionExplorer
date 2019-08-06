@@ -72,7 +72,6 @@ class MotionPlanner{
 
     RobotWorld *world;
     std::vector<CSpaceOMPL*> cspace_levels;
-    //benchmark only
     std::vector<std::vector<CSpaceOMPL*>> cspace_stratifications;
 
     void InitStrategy();
