@@ -551,35 +551,27 @@ void MotionPlanner::DrawGL(GUIState& state){
   uint ridx = hierarchy->GetRobotIdx(current_level);
   Robot* robot = world->robots[ridx];
 
-  uint inner_outer_approximation_level = (current_level>0?current_level-1:current_level);
-  uint robot_outer_idx = hierarchy->GetOuterRobotIdx(inner_outer_approximation_level);
-  uint robot_inner_idx = hierarchy->GetInnerRobotIdx(inner_outer_approximation_level);
-  Robot* robot_outer = world->robots[robot_outer_idx];
-  Robot* robot_inner = world->robots[robot_inner_idx];
+  unsigned maxLevel = hierarchy->NumberLevels()-1;
+  uint ridx_outer = hierarchy->GetRobotIdx(maxLevel);
+  Robot* robot_outer = world->robots[ridx_outer];
 
   const Config qi = hierarchy->GetInitConfig(current_level);
   const Config qg = hierarchy->GetGoalConfig(current_level);
+  const Config qiOuter = hierarchy->GetInitConfig(maxLevel);
+  const Config qgOuter = hierarchy->GetGoalConfig(maxLevel);
 
   const GLColor ultralightred_sufficient(0.8,0,0,0.3);
-  const GLColor ultralightred_necessary(0.3,0.1,0.1,0.5);
   const GLColor ultralightgreen_sufficient(0,0.5,0,0.2);
-  const GLColor ultralightgreen_necessary(0,0.3,0,0.3);
   if(state("planner_draw_start_configuration")){
     GLDraw::drawRobotAtConfig(robot, qi, green);
     if(state("planner_draw_start_goal_configuration_sufficient")){
-      GLDraw::drawRobotAtConfig(robot_outer, qi, ultralightgreen_sufficient);
-    }
-    if(state("planner_draw_start_goal_configuration_necessary")){
-      GLDraw::drawRobotAtConfig(robot_inner, qi, ultralightgreen_necessary);
+      GLDraw::drawRobotAtConfig(robot_outer, qiOuter, ultralightgreen_sufficient);
     }
   }
   if(state("planner_draw_goal_configuration")){
     GLDraw::drawRobotAtConfig(robot, qg, red);
     if(state("planner_draw_start_goal_configuration_sufficient")){
-      GLDraw::drawRobotAtConfig(robot_outer, qg, ultralightred_sufficient);
-    }
-    if(state("planner_draw_start_goal_configuration_necessary")){
-      GLDraw::drawRobotAtConfig(robot_inner, qg, ultralightred_necessary);
+      GLDraw::drawRobotAtConfig(robot_outer, qgOuter, ultralightred_sufficient);
     }
   }
 

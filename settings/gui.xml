@@ -247,17 +247,6 @@
     <key>I</key>
   </hotkey>
 
-  <hotkey>
-    <name>planner_draw_start_goal_configuration_sufficient</name>
-    <key>M</key>
-    <active>0</active>
-  </hotkey>
-  <hotkey>
-    <name>planner_draw_start_goal_configuration_necessary</name>
-    <key>N</key>
-    <active>1</active>
-  </hotkey>
-
 
   <button>
     <name>planner_draw_spatial_representation_of_SE2</name>
@@ -322,4 +311,7 @@
   <property name="solution_path_annotated" enabled="1"/>
 
   <property name="draw_planner_surface_normals" enabled="0"/>
+  <property name="planner_draw_start_goal_configuration_sufficient" enabled="1"/>
+  <property name="planner_draw_start_goal_configuration_necessary" enabled="1"/>
+
 </gui>
