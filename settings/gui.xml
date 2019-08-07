@@ -153,6 +153,10 @@
     <descr>Print Robot</descr>
     <key>i</key>
   </hotkey>
+  <hotkey>
+    <name>print_robot_info</name>
+    <key>P</key>
+  </hotkey>
 
   <hotkey>
     <name>draw_robot_previous</name>
@@ -280,11 +284,6 @@
     <descr>Load Current Path</descr>
     <key>9</key>
   </button>
-
-  <!-- <hotkey> -->
-  <!--   <name>next_mode</name> -->
-  <!--   <key>q</key> -->
-  <!-- </hotkey> -->
 
   <!-- <hotkey> -->
   <!--   <name>draw_cover_single_open_set</name> -->

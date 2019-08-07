@@ -79,9 +79,10 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
       std::cout << "fixed robots needs to have configuration space RN or SN, but has " << type << std::endl;
       exit(0);
     }
-
-
   }
+  std::cout << "Create QuotientSpace with dimensionality " << cspace_level->GetDimensionality() << "[OMPL] and " 
+    << cspace_level->GetKlamptDimensionality() << "[Klampt]." << std::endl;
+
   if(robot_inner_idx != robot_outer_idx){
     cspace_level->SetSufficient(robot_outer_idx);
   }

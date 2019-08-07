@@ -352,7 +352,6 @@ Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos,
     if(m >= Mmax){
         m = Mmax;
     }
-    std::cout << m << "/" << states.size() << std::endl;
     qnext = Vector3FromState(states.at(m));
     qnext[2] = zmax;
     return qnext;
