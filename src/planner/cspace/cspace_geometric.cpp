@@ -4,6 +4,10 @@ GeometricCSpaceOMPL::GeometricCSpaceOMPL(RobotWorld *world_, int robot_idx):
   CSpaceOMPL(world_, robot_idx)
 {
 }
+bool GeometricCSpaceOMPL::isDynamic() const
+{
+  return false;
+}
 
 void GeometricCSpaceOMPL::initSpace()
 {

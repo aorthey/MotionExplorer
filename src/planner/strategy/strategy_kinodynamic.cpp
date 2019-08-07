@@ -55,12 +55,13 @@ StrategyKinodynamicMultiLevel::StrategyKinodynamicMultiLevel()
 }
 
 ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
-    std::vector<oc::SpaceInformationPtr> si_vec, 
+    std::vector<ob::SpaceInformationPtr> si_vec, 
     std::vector<ob::ProblemDefinitionPtr> pdef_vec)
 
 {
   ob::PlannerPtr planner;
-  const oc::SpaceInformationPtr si = si_vec.back();
+  //assume last cspace is dynamic
+  const oc::SpaceInformationPtr si = static_pointer_cast<oc::SpaceInformation>(si_vec.back());
 
   if(algorithm=="ompl:dynamic:rrt"){
     planner = std::make_shared<oc::RRT>(si);
@@ -74,8 +75,8 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
     planner = std::make_shared<oc::PDST>(si);
   }else if(algorithm=="ompl:dynamic:kpiece"){
     planner = std::make_shared<oc::KPIECE1>(si);
-  // }else if(algorithm=="hierarchy:explorer"){
-  //   planner = std::make_shared<og::MotionExplorer>(si);
+  }else if(algorithm=="hierarchy:explorer"){
+    planner = std::make_shared<og::MotionExplorer>(si_vec);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     exit(0);
@@ -88,22 +89,37 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
 {
   std::string algorithm = input.name_algorithm;
 
-  std::vector<oc::SpaceInformationPtr> si_vec; 
+  std::vector<ob::SpaceInformationPtr> si_vec; 
   std::vector<ob::ProblemDefinitionPtr> pdef_vec; 
 
   for(uint k = 0; k < input.cspace_levels.size(); k++){
-    KinodynamicCSpaceOMPL* cspace_levelk = dynamic_cast<KinodynamicCSpaceOMPL*>(input.cspace_levels.at(k));
+    CSpaceOMPL* cspace_levelk = input.cspace_levels.at(k);
+    bool dynamic = cspace_levelk->isDynamic();
+    ob::SpaceInformationPtr sik = cspace_levelk->SpaceInformationPtr();
 
-    oc::SpaceInformationPtr sik = static_pointer_cast<oc::SpaceInformation>(cspace_levelk->SpaceInformationPtr());
-    sik->setMinMaxControlDuration(0.01, 0.1);
-    sik->setPropagationStepSize(1);
+    ob::ScopedState<> startk(sik);
+    ob::ScopedState<> goalk(sik);
+    if(dynamic){
 
+      KinodynamicCSpaceOMPL* cspace_dynamic = dynamic_cast<KinodynamicCSpaceOMPL*>(cspace_levelk);
+      if(cspace_dynamic==nullptr)
+      {
+        std::cout << "ERROR: not dynamic even though declared dynamic" << std::endl;
+        std::cout << *cspace_levelk << std::endl;
+        exit(0);
+      }
+
+      oc::SpaceInformationPtr sik_dynamic = static_pointer_cast<oc::SpaceInformation>(sik);
+      sik_dynamic->setMinMaxControlDuration(0.01, 0.1);
+      sik_dynamic->setPropagationStepSize(1);
+
+      startk = cspace_dynamic->ConfigVelocityToOMPLState(input.q_init, input.dq_init);
+      goalk  = cspace_dynamic->ConfigVelocityToOMPLState(input.q_goal, input.dq_goal);
+    }else{
+      startk = cspace_levelk->ConfigToOMPLState(input.q_init);
+      goalk  = cspace_levelk->ConfigToOMPLState(input.q_goal);
+    }
     setStateSampler(input.name_sampler, sik);
-
-    ob::ScopedState<> startk = cspace_levelk->ConfigVelocityToOMPLState(input.q_init, input.dq_init);
-    ob::ScopedState<> goalk  = cspace_levelk->ConfigVelocityToOMPLState(input.q_goal, input.dq_goal);
-
-    std::cout << *cspace_levelk << std::endl;
 
     ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
     pdefk->addStartState(startk);
@@ -173,74 +189,4 @@ void StrategyKinodynamicMultiLevel::Step(StrategyOutput &output)
 {
   OMPL_ERROR("NYI");
   exit(0);
-  //ob::IterationTerminationCondition itc(1);
-  //ob::PlannerTerminationCondition ptc(itc);
-
-  //ompl::time::point start = ompl::time::now();
-  //planner->solve(ptc);
-  //output.planner_time = ompl::time::seconds(ompl::time::now() - start);
-  //output.max_planner_time = max_planning_time;
-
-  ////###########################################################################
-  //ob::PlannerDataPtr pd( new ob::PlannerData(planner->getSpaceInformation()) );
-  //planner->getPlannerData(*pd);
-  //output.SetPlannerData(pd);
-  //ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
-  //output.SetProblemDefinition(pdef);
 }
-//void StrategyKinodynamicMultiLevel::RunBenchmark(
-//    const StrategyInput& input,
-//    std::vector<oc::SpaceInformationPtr> si_vec, 
-//    std::vector<ob::ProblemDefinitionPtr> pdef_vec)
-//{
-//  std::cout << input.name_algorithm << std::endl;
-//  BenchmarkInput binput(input.name_algorithm);
-
-//  const oc::SpaceInformationPtr si = static_pointer_cast<oc::SpaceInformation>(si_vec.back());
-//  std::string file_benchmark = "benchmark_kinodynamic_"+util::GetCurrentDateTimeString();
-//  oc::SimpleSetup ss(si);
-//  ot::Benchmark benchmark(ss, "Benchmark");
-
-//  for(uint k = 0; k < binput.algorithms.size(); k++){
-//    if(util::StartsWith(binput.algorithms.at(k), "syclop"))
-//    {
-//      // ob::PlannerPtr planner = GetPlanner(binput.algorithms.at(k), si_vec, pdef_vec);
-//      // GridDecomposition(20, 3, const base::RealVectorBounds &b);
-//      std::cout << "cannot handle syclop" << std::endl;
-//      exit(0);
-//    }else{
-//      benchmark.addPlanner(GetPlanner(binput.algorithms.at(k), si_vec, pdef_vec));
-//    }
-//  }
-
-
-
-//  ob::ProblemDefinitionPtr pdef = pdef_vec.back();
-
-//  CSpaceOMPL *cspace = input.cspace_levels.back();
-//  ob::ScopedState<> start = cspace->ConfigToOMPLState(input.q_init);
-//  ob::ScopedState<> goal  = cspace->ConfigToOMPLState(input.q_goal);
-//  ss.setStartAndGoalStates(start,goal,input.epsilon_goalregion);
-
-//  //ss.getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
-//  ss.setup();
-
-//  pdef->setOptimizationObjective( getThresholdPathLengthObj(si) );
-
-//  ot::Benchmark::Request req;
-//  req.maxTime = binput.maxPlanningTime;
-//  req.maxMem = binput.maxMemory;
-//  req.runCount = binput.runCount;
-//  req.displayProgress = true;
-
-//  benchmark.setPostRunEvent(std::bind(&PostRunEventKinodynamic, std::placeholders::_1, std::placeholders::_2));
-//  benchmark.benchmark(req);
-
-//  std::string res = file_benchmark+".log";
-//  std::string cmd;
-
-//  benchmark.saveResultsToFile(res.c_str());
-
-//  BenchmarkFileToPNG(file_benchmark);
-//}
-

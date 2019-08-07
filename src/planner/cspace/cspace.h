@@ -63,7 +63,7 @@ class CSpaceOMPL
     std::vector<double> EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
     void OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSpace::StateType *q );
 
-    bool isDynamic();
+    virtual bool isDynamic() const = 0;
     bool isFixedBase();
     bool isFreeFloating();
 
@@ -82,7 +82,6 @@ class CSpaceOMPL
     uint Nklampt;
     uint Nompl;
     bool fixedBase{false};
-    bool kinodynamic{false};
     bool enableSufficiency{false};
 
     //klampt:

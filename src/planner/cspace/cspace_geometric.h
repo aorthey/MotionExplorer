@@ -18,5 +18,6 @@ class GeometricCSpaceOMPL: public CSpaceOMPL
     Config OMPLStateToConfig(const ob::SE3StateSpace::StateType *qomplSE3, const ob::RealVectorStateSpace::StateType *qomplRnState);
 
     virtual void print() const override;
+    virtual bool isDynamic() const override;
 };
 

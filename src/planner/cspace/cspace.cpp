@@ -88,7 +88,6 @@ uint CSpaceOMPL::GetControlDimensionality() const{
 }
 void CSpaceOMPL::SetCSpaceInput(const CSpaceInput &input_){
   input = input_;
-  kinodynamic = input.kinodynamic;
   fixedBase = input.fixedBase;
 }
 Robot* CSpaceOMPL::GetRobotPtr(){
@@ -130,9 +129,6 @@ void CSpaceOMPL::SetSufficient(const uint robot_idx_outer_){
   }
 }
 
-bool CSpaceOMPL::isDynamic(){
-  return kinodynamic;
-}
 bool CSpaceOMPL::isFixedBase(){
   return fixedBase;
 }

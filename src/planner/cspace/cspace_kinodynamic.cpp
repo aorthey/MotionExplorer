@@ -59,6 +59,10 @@ void KinodynamicCSpaceOMPL::print() const
   std::cout << std::string(80, '-') << std::endl;
 }
 
+bool KinodynamicCSpaceOMPL::isDynamic() const
+{
+  return true;
+}
 void KinodynamicCSpaceOMPL::initSpace()
 {
   //###########################################################################

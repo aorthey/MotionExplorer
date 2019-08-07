@@ -25,6 +25,7 @@ class KinodynamicCSpaceOMPL: public GeometricCSpaceOMPL
     virtual Config OMPLStateToVelocity(const ob::State *qompl);
 
     virtual ob::SpaceInformationPtr SpaceInformationPtr() override;
+    virtual bool isDynamic() const override;
 
 };
 
