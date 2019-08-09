@@ -122,20 +122,28 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
     ob::PlannerDataPtr pdi = current->content;
     pdi->decoupleFromPlanner();
 
+    unsigned N = pdi->numVertices();
+    if(N <= 0) return;
+
     ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pdi->getVertex(0));
     RoadmapPtr roadmap_k = nullptr;
     if(v==nullptr)
     {
+      std::cout << "Could not cast vertex to Annotated." << std::endl;
+      std::cout << "Number of vertices: " << pdi->numVertices() << std::endl;
+      pdi->getSpaceInformation()->printState(pdi->getVertex(0).getState());
+
       roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.back());
       std::vector<int> hindex;
       hierarchy->AddNode( roadmap_k, hindex);
       if(current->children.size()>0)
       {
-        if(pdi->numVertices()>0){
-          std::cout << "ERROR: tried to add " << pdi->numVertices() << " unannotated vertices with a hierarchy of multiple layers." << std::endl;
+        if(N>0){
+          std::cout << "ERROR: tried to add " << N << " unannotated vertices with a hierarchy of multiple layers." << std::endl;
         }else{
           OMPL_ERROR("ERROR: tried to create roadmap with zero vertices.");
         }
+        OMPL_ERROR("ERROR");
         exit(0);
       }
     }else{
@@ -165,11 +173,8 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
   }
 }
 
-
 void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, std::vector<CSpaceOMPL*> cspace_levels)
 {
-  //uint N = hierarchy->NumberLevels()-1;
-  //assert(N == cspace_levels.size());
   if(!pd){
     std::cout << "planner data not set." << std::endl;
     return;
@@ -186,10 +191,10 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
 
     for(uint i = 0; i < pd->numVertices(); i++){
       ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(i));
-      if(v==nullptr)
+      if( v == nullptr)
       {
-        std::cout << "ERROR: vertex is not annotated." << std::endl;
-        exit(0);
+          OMPL_ERROR("Vertex %d/%d is not annotated.", i, pd->numVertices());
+          exit(0);
       }
 
       std::vector<int> path = v->getPath();

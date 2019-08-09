@@ -17,6 +17,7 @@
     <epsilongoalregion>0.1</epsilongoalregion>
     <maxplanningtime>0.3</maxplanningtime>      <!-- runtime in (s) --> 
     <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
+    <pathWidth>0.1</pathWidth>
 
     <hierarchy>
       <level inner_index="1" type="R3"/>

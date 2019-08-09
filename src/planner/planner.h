@@ -54,7 +54,6 @@ class MotionPlanner{
 
   protected:
     MotionPlanner() = delete;
-    void RaiseError();
 
     //position in hierarchy
     uint current_level; //vertical level in hierarchy (tree)

@@ -127,8 +127,6 @@ void SweptVolume::AddKeyframe(Config &q ){
         }
       }
     }
-
-    if(!projectJointLimits) exit(0);
   }
   _robot->UpdateConfig(q);
 

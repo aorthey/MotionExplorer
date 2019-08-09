@@ -304,11 +304,6 @@ PlannerInput& MotionPlanner::GetInput(){
 bool MotionPlanner::isActive(){
   return active;
 }
-void MotionPlanner::RaiseError(){
-  std::cout << "Error Motion Planner\n" << std::endl;
-  std::cout << input << std::endl;
-  exit(1);
-}
 
 void MotionPlanner::ExpandFull(){
   if(!active) return;
