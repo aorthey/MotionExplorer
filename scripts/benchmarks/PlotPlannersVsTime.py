@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+from import_matplotlib import *
 from matplotlib.patches import Rectangle
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.ticker import MaxNLocator
@@ -7,10 +7,8 @@ import matplotlib.mlab as mlab
 import scipy.special as sy
 from matplotlib.ticker import MaxNLocator
 
-
 from scipy.optimize import curve_fit
 from scipy.misc import factorial
-
 
 from scipy import interpolate
 

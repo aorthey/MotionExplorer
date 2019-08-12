@@ -8,9 +8,6 @@ from PlotCostVsSubspace import *
 
 import glob, os, re
 
-dir_xml = "../../data/benchmarks/narrow_passage_03_26/"
-dir_xml = "../../data/benchmarks/narrow_passage/"
-
 dir_xml = "../../data/benchmarks/narrow_passage_04_01/"
 IDX_FROM_TO = [8,14]
 
@@ -20,6 +17,7 @@ IDX_FROM_TO = [None,None]
 os.chdir(dir_xml)
 fname_base = os.path.basename(dir_xml)
 fname_pdf = fname_base + "_cost_vs_subspaces.pdf"
+print(fname_pdf)
 alpha_vec = []
 
 Nxml = len(glob.glob("*.xml"))
@@ -41,7 +39,7 @@ for fname in sorted(glob.glob("*.xml")):
   benchmark = BenchmarkAnalytica(fname)
   N = benchmark.runcount
   T_max = benchmark.timelimit
-  Dk = dict([(p.name, p.AverageTime()) for p in benchmark.planners])
+  Dk = dict([(p.name, (p.AverageTime(), p.TimeVariance())) for p in benchmark.planners])
   D.append(Dk)
 
 
@@ -50,6 +48,7 @@ name_vec = []
 
 D0 = D[0]
 timePerAlpha = np.zeros((len(D0),len(D)))
+varPerAlpha = np.zeros((len(D0),len(D)))
 
 for idx, planner in enumerate(D0):
   print planner
@@ -59,7 +58,10 @@ for idx, planner in enumerate(D0):
     for i in d:
       if planner == i:
         print i,d[i]
-        timePerAlpha[idx,a] = d[i]
+        time = d[i][0]
+        var = d[i][1]
+        timePerAlpha[idx,a] = time
+        varPerAlpha[idx,a] = var
         a = a+1
 
 fig = plt.figure(0)
@@ -77,11 +79,15 @@ items_to_display = slice(IDX_FROM_TO[0],IDX_FROM_TO[1])
 
 alpha_vec = np.flip(alpha_vec, 0)
 timePerAlpha = np.flip(timePerAlpha, 1)
+varPerAlpha = np.flip(varPerAlpha, 1)
 alpha_vec = alpha_vec[items_to_display]
 timePerAlpha = timePerAlpha[:,items_to_display]
+varPerAlpha = varPerAlpha[:,items_to_display]
 
-for idx, time in enumerate(timePerAlpha):
-  if name_vec[idx]=="QRRT_(4)":
+# for idx, time in enumerate(timePerAlpha):
+for idx, (time, var) in enumerate(zip(timePerAlpha, varPerAlpha)):
+  name_vec[idx] = name_vec[idx].replace('_',' ')
+  if name_vec[idx]=="QRRT (Trivial)":
     plt.plot(alpha_vec, time, '-ok', label=name_vec[idx], lw=2)
   else:
     plt.plot(alpha_vec, time, '-x', label=name_vec[idx])

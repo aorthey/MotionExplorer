@@ -1,6 +1,8 @@
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 
 import matplotlib.pyplot as plt
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
 from matplotlib.patches import Rectangle
 from matplotlib.backends.backend_pdf import PdfPages
 import scipy.special as sy

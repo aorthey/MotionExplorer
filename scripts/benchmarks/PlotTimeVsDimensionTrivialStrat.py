@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
 from matplotlib.patches import Rectangle
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.ticker import MaxNLocator

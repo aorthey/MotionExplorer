@@ -6,7 +6,7 @@
 #include "planner/cspace/cspace_factory.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include "gui/drawMotionPlanner.h"
-#include <ompl/geometric/planners/explorer/Explorer.h>
+#include <ompl/geometric/planners/quotientspace/Explorer.h>
 
 #include "util.h"
 #include <boost/lexical_cast.hpp>

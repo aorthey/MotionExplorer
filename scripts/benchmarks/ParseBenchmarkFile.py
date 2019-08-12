@@ -71,6 +71,9 @@ class PlannerResults:
   def AverageTime(self):
     t =  np.mean(self.run_time)
     return t
+  def TimeVariance(self):
+    t =  np.std(self.run_time)
+    return t
 
   def AddRuns(self, xml):
     for child in xml:
