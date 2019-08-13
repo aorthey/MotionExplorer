@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="dubins_car" file="../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="dubins_car" file="../robots/dubinscar/dubinscar.urdf"/>
+
+  <plannerinput>
+
+    <qinit  config="15  -2 0.0 +0.0 -3.14 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
+    <dqinit config="15  +0.1 0 0 0 0 0 0 0 0 0 0 0 0 0 0  "/>
+    <qgoal  config="15  +2 0.0 +0.0 +0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
+    <dqgoal config="15  +0.1 0 0 0 0 0 0 0 0 0 0 0 0 0 0  "/>
+
+    <se3min config="6  -4.0 -3.0 -0.0 -3.141593 0 0"/>
+    <se3max config="6  +4.0 +3.0 +0.0 +3.141593 0 0"/>
+
+    <control_min config="6  0 0 0 -2 0 0"/>
+    <control_max config="6  0 0 0 +2 0 0"/>
+
+    <freeFloating>1</freeFloating>
+    <kinodynamic>1</kinodynamic>
+    <timestep min="0.01" max="0.1"/>
+
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>0.01</epsilongoalregion>
+    <pathSpeed>10</pathSpeed>
+
+    <hierarchy>
+      <!-- <level inner_index="2" type="R2"/> -->
+      <level inner_index="1" type="SE2"/>
+      <level inner_index="0" type="TSE2"/>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>
