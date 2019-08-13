@@ -12,7 +12,6 @@ set(ORTHOKLAMPT_MAJOR_VERSION 0)
 set(ORTHOKLAMPT_MINOR_VERSION 2)
 set(ORTHOKLAMPT_PATCH_VERSION 0)
 set(ORTHOKLAMPT_VERSION ${ORTHOKLAMPT_MAJOR_VERSION}.${ORTHOKLAMPT_MINOR_VERSION}.${ORTHOKLAMPT_PATCH_VERSION})
-#set (CMAKE_CXX_STANDARD 11)
 
 execute_process(COMMAND whoami OUTPUT_VARIABLE current_user OUTPUT_STRIP_TRAILING_WHITESPACE)
 MESSAGE("USER: ${current_user}")
@@ -20,7 +19,7 @@ MESSAGE("USER: ${current_user}")
 ###############################################################################
 #CHANGE HERE FOR CORRECT KLAMPT DIRECTORY
 ###############################################################################
-SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../Klampt/")
+SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../Klampt-0.8/")
 #SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/Klampt/")
 
 LIST(APPEND CMAKE_MODULE_PATH "${KLAMPT_ROOT}/CMakeModules")

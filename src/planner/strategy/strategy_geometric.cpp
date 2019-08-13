@@ -50,10 +50,6 @@
 
 static ob::OptimizationObjectivePtr GetOptimizationObjective(const ob::SpaceInformationPtr& si)
 {
-  ////path length
-  //ob::OptimizationObjectivePtr obj(new ob::PathLengthOptimizationObjective(si));
-  //obj->setCostThreshold(ob::Cost(dInf));
-  //return obj;
   ob::OptimizationObjectivePtr lengthObj(new ob::PathLengthOptimizationObjective(si));
   ob::OptimizationObjectivePtr clearObj(new ob::MaximizeMinClearanceObjective(si));
   ob::MultiOptimizationObjective* opt = new ob::MultiOptimizationObjective(si);

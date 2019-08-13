@@ -1,7 +1,6 @@
 <!-- Default Planner Settings -->
 <planner>
 
-  <!-- <algorithm dynamic="1" name="ompl:dynamic:krrt"/> -->
   <algorithm dynamic="1" name="ompl:dynamic:rrt"/>
   <algorithm dynamic="1" name="hierarchy:explorer"/>
   <!-- <algorithm dynamic="1" name="ompl:dynamic:est"/> -->

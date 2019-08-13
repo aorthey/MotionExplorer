@@ -1,3 +1,4 @@
+#include "common.h"
 #include "planner/cspace/cspace_kinodynamic_SE2.h"
 #include "planner/cspace/integrator/integrator_SE2.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
@@ -271,7 +272,7 @@ Config KinodynamicCSpaceOMPLSE2::OMPLStateToVelocity(const ob::State *qompl){
 
   dq(0) = qomplTMState->values[0];
   dq(1) = qomplTMState->values[1];
-  dq(3) = qomplTMState->values[3];
+  dq(3) = qomplTMState->values[2];
   for(uint i = 0; i < Nompl; i++){
     uint idx = ompl_to_klampt.at(i);
     dq(idx) = qomplTMState->values[i];

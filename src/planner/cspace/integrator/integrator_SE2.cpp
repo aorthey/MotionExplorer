@@ -16,7 +16,6 @@
 // is the step size parameter (some algorithms are sensitive to the stepsize,
 // so it is advantageous to change it, adapt it on the fly or even include it
 // into some optimization routine)
-//
 void IntegratorSE2::propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
 {
   //(1) convert state to (q0,dq0,ddq0,u)
@@ -28,6 +27,7 @@ void IntegratorSE2::propagate(const ob::State *state, const oc::Control* control
   //###########################################################################
   Config q0 = cspace->OMPLStateToConfig(state);
   Config dq0 = cspace->OMPLStateToVelocity(state);
+  si_->printState(state);
 
   const double *ucontrol = control->as<oc::RealVectorControlSpace::ControlType>()->values;
 
@@ -40,6 +40,7 @@ void IntegratorSE2::propagate(const ob::State *state, const oc::Control* control
   uSE3(3) = ucontrol[3];
   uSE3(4) = 0;
   uSE3(5) = 0;
+
 
   //###########################################################################
   //(2) integrate from (q0,dq0) to (q1,dq1);
@@ -59,6 +60,11 @@ void IntegratorSE2::propagate(const ob::State *state, const oc::Control* control
   for(int i = 0; i < uSE3.size(); i++){
     dq1(i) = dq0(i) + dt*uSE3(i);
   }
+
+  std::cout << "Propagate step size:" << dt << std::endl;
+  std::cout << uSE3 << std::endl;
+  std::cout << dq0 << std::endl;
+  std::cout << dq1 << std::endl;
 
   LieGroupIntegrator integrator;
   Matrix4 q0_SE3 = integrator.StateToSE3(q0);

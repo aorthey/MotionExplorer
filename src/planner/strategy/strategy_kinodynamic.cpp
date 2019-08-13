@@ -6,7 +6,6 @@
 #include <ompl/geometric/planners/quotientspace/Explorer.h>
 #include <ompl/geometric/planners/quotientspace/QRRT.h>
 
-#include "ompl/control/planners/rrt/kRRT.h"
 #include <ompl/control/planners/rrt/RRT.h>
 #include <ompl/control/planners/est/EST.h>
 #include <ompl/control/planners/pdst/PDST.h>
@@ -65,8 +64,6 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
 
   if(algorithm=="ompl:dynamic:rrt"){
     planner = std::make_shared<oc::RRT>(si);
-  }else if(algorithm=="ompl:dynamic:krrt"){
-    planner = std::make_shared<oc::kRRT>(si);
   }else if(algorithm=="ompl:dynamic:est"){
     planner = std::make_shared<oc::EST>(si);
   }else if(algorithm=="ompl:dynamic:sst"){
