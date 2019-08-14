@@ -23,7 +23,7 @@
 #include <ompl/geometric/planners/prm/LazyPRM.h>
 #include <ompl/geometric/planners/prm/LazyPRMstar.h>
 #include <ompl/geometric/planners/prm/SPARS.h>
-// #include <ompl/geometric/planners/prm/SPARStwo.h>
+// #include <ompl/geometric/planners/prm/SPARStwo.h> //requires C++14
 #include <ompl/geometric/planners/kpiece/KPIECE1.h>
 #include <ompl/geometric/planners/kpiece/BKPIECE1.h>
 #include <ompl/geometric/planners/kpiece/LBKPIECE1.h>
@@ -72,34 +72,15 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   uint states = boost::lexical_cast<int>(run["graph states INTEGER"]);
   double time = boost::lexical_cast<double>(run["time REAL"]);
   double memory = boost::lexical_cast<double>(run["memory REAL"]);
-  //uint states = boost::lexical_cast<int>(run["sampled states INTEGER"]);
 
-  // typedef og::MultiQuotient<og::QRRT> MultiQuotient;
-  // std::shared_ptr<MultiQuotient> qplanner = dynamic_pointer_cast<MultiQuotient>(planner);
-  // if(qplanner != nullptr){
-  //   uint N = qplanner->GetLevels();
-  //   std::vector<int> nodes = qplanner->GetNodes();
-  //   std::vector<int> fnodes = qplanner->GetFeasibleNodes();
-  //   std::vector<int> dimensions = qplanner->GetDimensionsPerLevel();
-  //   run["stratification levels INTEGER"] = to_string(N);
-  //   for(uint k = 0; k < nodes.size(); k++){
-  //     std::string strd = "stratification level"+to_string(k)+" dimension INTEGER";
-  //     run[strd] = to_string(dimensions.at(k));
-  //     std::string strk = "stratification level"+to_string(k)+" nodes INTEGER";
-  //     run[strk] = to_string(nodes.at(k));
-  //     std::string strkf = "stratification level"+to_string(k)+" feasible nodes INTEGER";
-  //     run[strkf] = to_string(fnodes.at(k));
-  //   }
-  // }else{
-    uint N = si->getStateDimension();
-    run["stratification levels INTEGER"] = to_string(1);
-    std::string strd = "stratification level"+to_string(0)+" dimension INTEGER";
-    run[strd] = to_string(N);
-    std::string strk = "stratification level"+to_string(0)+" nodes INTEGER";
-    run[strk] = to_string(states);
-    std::string strkf = "stratification level"+to_string(0)+" feasible nodes INTEGER";
-    run[strkf] = to_string(states);
-  // }
+  uint N = si->getStateDimension();
+  run["stratification levels INTEGER"] = to_string(1);
+  std::string strd = "stratification level"+to_string(0)+" dimension INTEGER";
+  run[strd] = to_string(N);
+  std::string strk = "stratification level"+to_string(0)+" nodes INTEGER";
+  run[strk] = to_string(states);
+  std::string strkf = "stratification level"+to_string(0)+" feasible nodes INTEGER";
+  run[strkf] = to_string(states);
 
   std::cout << "Run " << pid << "/" << all_runs << " [" << planner->getName() << "] " << (solved?"solved":"no solution") << "(time: "<< time << ", states: " << states << ", memory: " << memory << ")" << std::endl;
   std::cout << std::string(80, '-') << std::endl;

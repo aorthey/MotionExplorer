@@ -3,8 +3,7 @@
 <world>
   <robot name="dubins_car" file="../robots/dubinscar/dubinscar.urdf"/>
   <robot name="dubins_car" file="../robots/dubinscar/dubinscar.urdf"/>
-  <robot name="disk_inner" file="../robots/dubinscar/dubinscar_capsule_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="disk_outer" file="../robots/dubinscar/dubinscar_capsule_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="disk_inner" file="../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
 
 <!--
   <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="3 2 0" rotateRPY="0 0 0"/>
