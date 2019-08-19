@@ -22,14 +22,14 @@
     <kinodynamic>1</kinodynamic>
     <timestep min="0.01" max="0.1"/>
 
-    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>0.2</maxplanningtime>      <!-- runtime in (s) --> 
     <epsilongoalregion>0.01</epsilongoalregion>
     <pathSpeed>10</pathSpeed>
 
     <hierarchy>
-      <level inner_index="2" type="R2"/>
+      <!-- <level inner_index="2" type="R2"/> -->
       <level inner_index="1" type="SE2"/>
-      <!-- <level inner_index="0" type="TSE2"/> -->
+      <level inner_index="0" type="TSE2"/>
     </hierarchy>
 
   </plannerinput>

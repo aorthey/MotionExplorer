@@ -1,8 +1,8 @@
 <!-- Default Planner Settings -->
 <planner>
 
-  <algorithm dynamic="1" name="ompl:dynamic:rrt"/>
   <algorithm dynamic="1" name="hierarchy:explorer"/>
+  <algorithm dynamic="1" name="ompl:dynamic:rrt"/>
   <!-- <algorithm dynamic="1" name="ompl:dynamic:est"/> -->
   <!-- <algorithm dynamic="1" name="ompl:dynamic:sst"/> -->
   <!-- <algorithm dynamic="1" name="ompl:dynamic:pdst"/> -->

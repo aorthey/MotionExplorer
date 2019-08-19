@@ -19,7 +19,7 @@ MESSAGE("USER: ${current_user}")
 ###############################################################################
 #CHANGE HERE FOR CORRECT KLAMPT DIRECTORY
 ###############################################################################
-SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../Klampt-0.8/")
+SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../Klampt/")
 #SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/Klampt/")
 
 LIST(APPEND CMAKE_MODULE_PATH "${KLAMPT_ROOT}/CMakeModules")
