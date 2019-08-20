@@ -470,7 +470,7 @@ bool GLUIForceFieldGUI::Initialize()
       std::cout << "variable type: " << v->type << " unknown." << std::endl;
       std::cout << "variable " << v->name << " ("<<v->descr << ")" << std::endl;
       std::cout << std::string(80, '#') << std::endl;
-      exit(0);
+      throw "Unknown Variable";
     }
   }
   UpdateGUI();
