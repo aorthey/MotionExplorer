@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="car" file="../robots/planar/car.urdf"/>
+  <robot name="disk" file="../robots/planar/car_capsule_inner.urdf"/>
+  <terrain name="maze" file="../terrains/ompl/2D/Maze_planar_env.dae" translate="0 0 0" scale="0.1 0.1 0.1">
+     <display color="0.8 0.8 0.8"/>
+  </terrain>
+
+  <plannerinput>
+    <qinit  config="15  -4.5 -3 +0.0 1.27 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
+    <qgoal  config="15  +4.5 -0 +0.0 0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
+    <se3min config="6  -5 -5.0 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +5 +5.0 +0.5 +3.141593 +1.57 +3.141593"/>
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>0.5</maxplanningtime>
+    <pathSpeed>12</pathSpeed>
+    <smoothPath>1</smoothPath>
+    <pathWidth>0.1</pathWidth>
+
+    <hierarchy>
+      <level inner_index="1" type="R2"/>
+      <level inner_index="0" type="SE2"/>
+    </hierarchy>
+  </plannerinput>
+</world>

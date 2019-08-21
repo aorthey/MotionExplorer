@@ -26,6 +26,7 @@ class PlannerBackend : public ForceFieldBackend
     virtual void RenderWorld();
     virtual void RenderScreen();
     virtual bool OnIdle();
+    std::string getRobotEnvironmentString();
     void CenterCameraOn(const Vector3& v);
 
     uint draw_cover_active_open_set{0};

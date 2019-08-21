@@ -173,15 +173,11 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     //   std::cout << "load current path from : " << fn << std::endl;
     // }
   }else if(cmd=="save_view"){
-    Robot *robot = world->robots[active_robot];
-    std::string rname = robot->name;
-    std::cout << rname << std::endl;
-    std::string fname = "../data/viewport/robot_"+rname+".viewport";
+    std::string fname = "../data/viewport/"+getRobotEnvironmentString()+".viewport";
+    std::cout << "Save: " << fname << std::endl;
     BaseT::OnCommand("save_view",fname.c_str());
   }else if(cmd=="load_view" || cmd=="reset_view"){
-    Robot *robot = world->robots[active_robot];
-    std::string rname = robot->name;
-    std::string fname = "../data/viewport/robot_"+rname+".viewport";
+    std::string fname = "../data/viewport/"+getRobotEnvironmentString()+".viewport";
     std::cout << "Load: " << fname << std::endl;
     BaseT::OnCommand("load_view",fname.c_str());
   }else return BaseT::OnCommand(cmd,args);
@@ -196,6 +192,23 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
 
   SendRefresh();
   return true;
+}
+
+std::string PlannerBackend::getRobotEnvironmentString()
+{
+    std::string rname, tname;
+
+    if(world->robots.size()>0){
+        rname = world->robots[active_robot]->name;
+    }
+    if(world->terrains.size()>0){
+        tname = world->terrains[0]->name;
+    }else{
+      if(world->rigidObjects.size()>0){
+          tname = world->rigidObjects[0]->name;
+      }
+    }
+    return rname+"_"+tname;
 }
 void PlannerBackend::CenterCameraOn(const Vector3& v){
   //Vector3 bmin = v-epsilon;
