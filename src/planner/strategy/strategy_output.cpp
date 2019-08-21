@@ -129,9 +129,9 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
     RoadmapPtr roadmap_k = nullptr;
     if(v==nullptr)
     {
-      std::cout << "Could not cast vertex to Annotated." << std::endl;
-      std::cout << "Number of vertices: " << pdi->numVertices() << std::endl;
-      pdi->getSpaceInformation()->printState(pdi->getVertex(0).getState());
+      // std::cout << "Could not cast vertex to Annotated." << std::endl;
+      // std::cout << "Number of vertices: " << pdi->numVertices() << std::endl;
+      // pdi->getSpaceInformation()->printState(pdi->getVertex(0).getState());
 
       roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.back());
       std::vector<int> hindex;

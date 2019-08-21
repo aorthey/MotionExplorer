@@ -27,7 +27,6 @@ void IntegratorSE2::propagate(const ob::State *state, const oc::Control* control
   //###########################################################################
   Config q0 = cspace->OMPLStateToConfig(state);
   Config dq0 = cspace->OMPLStateToVelocity(state);
-  si_->printState(state);
 
   const double *ucontrol = control->as<oc::RealVectorControlSpace::ControlType>()->values;
 
@@ -60,11 +59,6 @@ void IntegratorSE2::propagate(const ob::State *state, const oc::Control* control
   for(int i = 0; i < uSE3.size(); i++){
     dq1(i) = dq0(i) + dt*uSE3(i);
   }
-
-  std::cout << "Propagate step size:" << dt << std::endl;
-  std::cout << uSE3 << std::endl;
-  std::cout << dq0 << std::endl;
-  std::cout << dq1 << std::endl;
 
   LieGroupIntegrator integrator;
   Matrix4 q0_SE3 = integrator.StateToSE3(q0);

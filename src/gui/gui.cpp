@@ -38,6 +38,7 @@ bool ForceFieldBackend::OnIdle()
   bool res=BaseT::OnIdle();
 
   if(simulate) {
+    drawTime = 1;
     sim.odesim.SetGravity(Vector3(0,0,0));
     ODERobot *simrobot = sim.odesim.robot(active_robot);
     uint Nlinks = simrobot->robot.links.size();
@@ -127,6 +128,7 @@ void ForceFieldBackend::Start()
 void ForceFieldBackend::RenderWorld()
 {
   DEBUG_GL_ERRORS()
+  drawTime = 0;
   BaseT::RenderWorld();
 
   glDisable(GL_LIGHTING);
