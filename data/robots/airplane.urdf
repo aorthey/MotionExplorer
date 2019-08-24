@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<robot name="airplane">
+  <link name="planeLink">
+  <contact>
+      <lateral_friction value="1"/>
+  </contact>
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+       <mass value="10"/>
+       <inertia ixx="10" ixy="1" ixz="1" iyy="10" iyz="1" izz="10"/>
+    </inertial>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="airplane.dae" scale="0.5 0.5 0.5"/>
+      </geometry>
+       <material name="grey">
+        <color rgba="0.5 0.5 0.5 0.5"/>
+      </material>
+    </visual>
+  </link>
+</robot>

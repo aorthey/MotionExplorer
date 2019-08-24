@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+
+<world>
+<!--  <robot name="dubins_car" file="../robots/dubinscar/dubinscar.urdf" rotateRPY="0 0 0"/>
+  <robot name="dubins_car" file="../robots/dubinscar/dubinscar.urdf" rotateRPY="0 0 0"/>  -->
+  <robot name="airplane" file="../robots/airplane.urdf"/>
+  <robot name="airplane" file="../robots/airplane.urdf"/>
+<!--  <robot name="disk" file="../robots/planar/car_capsule_inner.urdf"/> -->
+ <!-- <robot name="disk_inner" file="../robots/dubinscar/dubinscar_capsule_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="disk_outer" file="../robots/dubinscar/dubinscar_capsule_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/> -->
+
+<!--
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="3 2 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="-2.8 0 0" rotateRPY="0 0 0.78"/>
+-->
+  <!-- <rigidObject name="O1" file="../terrains/2droom/2droom_corner.tri" translation="0 0 0" rotateRPY="0 0 1.57"/> -->
+ <!-- <rigidObject name="O1" file="../terrains/2droom/2droom_scurve.tri" translation="0 0 0" rotateRPY="0 0 1.57"/> -->
+  <!-- <terrain name ="01" file="../terrains/narrow_passage/narrow_passage_double_passage.tri"/> -->
+
+  <!-- <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="-2 0.75 0" rotateRPY="0 0 1.57"/>
+     <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="-2 0 0" rotateRPY="0 0 1.57"/>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="-2 -0.75 0" rotateRPY="0 0 1.57"/> -->
+
+  <plannerinput>
+
+    <qinit  config="6  -5 0 +0.0 3.141592 0 0"/>
+    <dqinit config="6 0.1 0 0 0.3 0 0 "/>
+    <qgoal  config="6  +2 0 +0.0 0 +0 +0.0 "/>
+    <dqgoal config="6 0.1 0 0 0.3 0 0 "/>
+
+    <se3min config="6  -100.0 -50.0 0.0 -3.141593 0 0"/>
+    <se3max config="6  +100.0 +50.0 +0.0 +3.141593 0 0"/>
+
+    <control_min config="6  0 0 0 -3 0 0"/>
+    <control_max config="6  0 0 0 3 0 0"/>
+
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>2</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>0.01</epsilongoalregion>
+    <kinodynamic>1</kinodynamic>
+    <pathSpeed>10</pathSpeed>
+
+    <hierarchy>
+      <!-- <level inner_index="1" cspace_constant="1" type="R2"/> 
+      <level inner_index="0" cspace_constant="0.532623641291" type="TSE2"/> -->
+  <!--    <level inner_index="1" type = "R2"/>   -->
+      <level inner_index="1" type = "SE2"/>
+
+      <level inner_index="0" type = "TSE2"/>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>
