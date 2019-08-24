@@ -107,8 +107,10 @@ void ViewHierarchy::DrawGL(){
 
   double xstep = node_radius*2.5;
 
-  // nodeColor = nodeSelectedColor;
-  // DrawNode(xprev,yprev,node_radius_selected,0);
+  nodeColor = nodeUnselectedColor;
+  std::string emptySet; emptySet = "#";
+
+  DrawNode(xprev, yprev, node_radius_selected, emptySet);
 
   for(uint k = 0; k < level_nodes.size(); k++){
     double yn = y+(k+1)*heightPerLevel+heightPerLevel/2;
@@ -157,6 +159,10 @@ void ViewHierarchy::DrawGL(){
 
 void ViewHierarchy::DrawNode( double x, double y, double radius, int number)
 {
+    DrawNode( x, y, radius, std::to_string(number));
+}
+void ViewHierarchy::DrawNode( double x, double y, double radius, std::string nstr)
+{
 
   int numIncrements = 16;
   nodeColor.setCurrentGL();
@@ -182,13 +188,14 @@ void ViewHierarchy::DrawNode( double x, double y, double radius, int number)
   textColor.setCurrentGL();
   char buf[64];
   void* font=GLUT_BITMAP_HELVETICA_18;
-  sprintf(buf,"%d\n",number);
-  if(number<10){
-    glRasterPos2d(x-5,y+5);
-  }else{
-    glRasterPos2d(x-10,y+5);
-  }
+  sprintf(buf,"%s\n", nstr.c_str());
+  glRasterPos2d(x-5,y+5);  // if(number<10){
+  //   glRasterPos2d(x-5,y+5);
+  // }else{
+  //   glRasterPos2d(x-10,y+5);
+  // }
   glutBitmapString(font,buf);
+
 
 }
 void ViewHierarchy::DrawLineFromNodeToNode(double x1, double y1, double n1, double x2, double y2, double n2){

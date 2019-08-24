@@ -214,10 +214,10 @@ void ForceFieldBackend::RenderScreen(){
   
   BaseT::RenderScreen();
 
+  line_x_pos = 10;
+  line_y_offset = 20;
+  line_y_offset_stepsize = 20;
   if(state("draw_text_robot_info")){
-    line_x_pos = 20;
-    line_y_offset = 60;
-    line_y_offset_stepsize = 20;
 
     std::string line;
 
