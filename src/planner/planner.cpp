@@ -342,6 +342,8 @@ void MotionPlanner::Expand(){
       current_level++;
       current_level_node=hierarchy->NumberChildren(current_path)-1;
       current_path.push_back(current_level_node);
+    }else{
+      AdvanceUntilSolution();
     }
   }
   UpdateHierarchy();
