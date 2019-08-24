@@ -342,6 +342,8 @@ void MotionPlanner::Expand(){
       current_level++;
       current_level_node=hierarchy->NumberChildren(current_path)-1;
       current_path.push_back(current_level_node);
+    }else{
+      AdvanceUntilSolution();
     }
   }
   UpdateHierarchy();
@@ -493,6 +495,7 @@ void MotionPlanner::DrawGL(GUIState& state){
         if(pwlk && state("draw_roadmap_shortest_path")){
           pwlk->zOffset = 0.001;
           pwlk->linewidth = 0.7*input.pathWidth;
+          pwlk->widthBorder= 0.7*input.pathBorderWidth;
           pwlk->ptsize = 8;
           if(!hasChildren){
               pwlk->setColor(colorPathNotSelected);
@@ -513,6 +516,7 @@ void MotionPlanner::DrawGL(GUIState& state){
       if(pwl && state("draw_roadmap_shortest_path")){
         pwl->zOffset = 0.005;
         pwl->linewidth = input.pathWidth;
+        pwl->widthBorder= input.pathBorderWidth;
         pwl->ptsize = 10;
 
 

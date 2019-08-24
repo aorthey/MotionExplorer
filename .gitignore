@@ -1,5 +1,6 @@
 .*
 !.gitignore
+*.viewport
 *.pyc
 *.npy
 *.xacro

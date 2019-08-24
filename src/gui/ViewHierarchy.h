@@ -35,7 +35,8 @@ class ViewHierarchy
   bool drawBound,drawPlotArea;
   GLDraw::GLColor boundColor, plotAreaColor, textColor, nodeColor, nodeSelectedColor, nodeUnselectedColor;
 
-  void DrawNode( double x, double y, double radius, int number=0);
+  void DrawNode( double x, double y, double radius, int number = 0);
+  void DrawNode( double x, double y, double radius, std::string nstr);
   void DrawLineFromNodeToNode(double x1, double y1, double n1, double x2, double y2, double n2);
 
  private:

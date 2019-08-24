@@ -265,7 +265,7 @@ void StrategyGeometricMultiLevel::Step(StrategyOutput &output)
 
 void StrategyGeometricMultiLevel::Clear()
 {
-  planner->clear();
+  if(isInitialized) planner->clear();
 }
 void StrategyGeometricMultiLevel::Plan(StrategyOutput &output)
 {

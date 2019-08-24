@@ -38,6 +38,7 @@ class PathPiecewiseLinear
     double GetLength() const;
 
     double linewidth{20};
+    double widthBorder{0.1};
     double ptsize{10};
     double zOffset{0.0};
     GLColor cVertex{magenta}, cLine{magenta};

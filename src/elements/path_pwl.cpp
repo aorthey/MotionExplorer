@@ -409,7 +409,20 @@ void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
   //############################################################################
   //Draws a border around quad strip
   //############################################################################
+  // GLfloat sizes[2];  // Store supported line width range
+  // GLfloat step;     // Store supported line width increments
+
+
+  // glGetFloatv(GL_LINE_WIDTH_RANGE,sizes);
+  // glGetFloatv(GL_LINE_WIDTH_GRANULARITY,&step);
+  // std::cout << step << std::endl;
+  // std::cout << sizes[0] << std::endl;
+  // std::cout << sizes[1] << std::endl;
+  // exit(0);
+
+
   black.setCurrentGL();
+  glLineWidth(widthBorder);
   glBegin(GL_LINE_STRIP);
   for(uint k = 0; k < path_left.size(); k++){
     Vector3 v = path_left.at(k);
@@ -520,7 +533,7 @@ void PathPiecewiseLinear::DrawGLCross( const std::vector<ob::State*> &states)
   glTranslatef(pos[0], pos[1], pos[2]);
   drawCylinder(cylinderHeight*ez, radius);
 
-  glLineWidth(5);
+  glLineWidth(widthBorder);
   black.setCurrentGL();
   drawWireCircle(ez, radius);
 

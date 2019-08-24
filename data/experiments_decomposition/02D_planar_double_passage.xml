@@ -16,6 +16,8 @@
     <freeFloating>1</freeFloating>
     <maxplanningtime>0.1</maxplanningtime>
     <pathSpeed>12</pathSpeed>
+    <pathWidth>0.1</pathWidth>
+    <pathBorderWidth>3</pathBorderWidth>
 
     <hierarchy>
       <level inner_index="0" type="R2"/>

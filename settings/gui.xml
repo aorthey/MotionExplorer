@@ -205,27 +205,12 @@
   <checkbox>
     <name>draw_roadmap_vertices</name>
     <key>1</key>
-    <active>1</active>
+    <active>0</active>
   </checkbox>
   <checkbox>
     <name>draw_roadmap_edges</name>
     <key>2</key>
-    <active>1</active>
-  </checkbox>
-  <checkbox>
-    <name>draw_roadmap_complex</name>
-    <key>3</key>
-    <active>1</active>
-  </checkbox>
-  <checkbox>
-    <name>draw_roadmap_volume</name>
-    <key>4</key>
-    <active>1</active>
-  </checkbox>
-  <checkbox>
-    <name>draw_roadmap_volume_wired</name>
-    <key>5</key>
-    <active>1</active>
+    <active>0</active>
   </checkbox>
   <checkbox>
     <name>draw_path_autofocus</name>
@@ -289,6 +274,11 @@
   <!--   <name>draw_cover_single_open_set</name> -->
   <!--   <key>z</key> -->
   <!-- </hotkey> -->
+  <hotkey>
+    <name>draw_planner_minima_tree</name>
+    <key>3</key>
+    <active>1</active>
+  </hotkey>
 
   <property name="planner_draw_start_configuration" enabled="1"/>
   <!-- <property name="planner_draw_goal_configuration" enabled="1"/> -->
@@ -297,15 +287,15 @@
 
   <property name="draw_robot_zero_position" enabled="1"/>
   <property name="draw_controller_driver" enabled="1"/>
-  <property name="draw_text_robot_info" enabled="1"/>
-  <property name="draw_text_planner" enabled="1"/>
+  <property name="draw_text_robot_info" enabled="0"/>
+  <property name="draw_planner_text" enabled="0"/>
 
-  <property name="draw_cover_geometric_center" enabled="1"/>
-  <property name="draw_cover_vertices" enabled="1"/>
-  <property name="draw_cover_edges" enabled="1"/>
-  <property name="draw_cover_faces" enabled="0"/>
-  <property name="draw_cover_active_faces" enabled="0"/>
-  <property name="draw_cover_ellipsoid" enabled="1"/>
+  <!-- <property name="draw_cover_geometric_center" enabled="1"/> -->
+  <!-- <property name="draw_cover_vertices" enabled="1"/> -->
+  <!-- <property name="draw_cover_edges" enabled="1"/> -->
+  <!-- <property name="draw_cover_faces" enabled="0"/> -->
+  <!-- <property name="draw_cover_active_faces" enabled="0"/> -->
+  <!-- <property name="draw_cover_ellipsoid" enabled="1"/> -->
   <property name="load_view_from_file" enabled="1"/>
 
   <property name="draw_planner_surface_normals" enabled="0"/>

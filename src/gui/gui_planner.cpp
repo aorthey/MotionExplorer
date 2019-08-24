@@ -38,20 +38,26 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
 
   stringstream ss(args);
   bool hierarchy_change = false;
+  last_command = "";
   if(cmd=="hierarchy_next"){
     planners.at(active_planner)->Next();
     hierarchy_change = true;
+    last_command = "Right";
   }else if(cmd=="hierarchy_previous"){
     planners.at(active_planner)->Previous();
     hierarchy_change = true;
+    last_command = "Left";
   }else if(cmd=="hierarchy_down"){
     planners.at(active_planner)->Expand();
     hierarchy_change = true;
+    last_command = "Down";
   }else if(cmd=="hierarchy_up"){
     planners.at(active_planner)->Collapse();
     hierarchy_change = true;
+    last_command = "Up";
   }else if(cmd=="benchmark"){
   }else if(cmd=="planner_step"){
+    last_command = "Step";
     planners.at(active_planner)->Step();
     planners.at(active_planner)->ExpandFull();
   }else if(cmd=="planner_step_one_level"){
@@ -59,10 +65,11 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     planners.at(active_planner)->Expand();
     hierarchy_change = true;
   }else if(cmd=="planner_clear"){
-    std::cout << "CLEAR PLanner" << std::endl;
+    last_command = "Clear";
     planners.at(active_planner)->Clear();
     hierarchy_change = true;
   }else if(cmd=="planner_advance_until_solution"){
+    last_command = "Plan";
     planners.at(active_planner)->AdvanceUntilSolution();
     // planners.at(active_planner)->ExpandFull();
     hierarchy_change = true;
@@ -105,8 +112,9 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     std::cout << "Decreased path speed to " << v.value << std::endl;
   }else if(cmd=="draw_text"){
     state("draw_text_robot_info").toggle();
-    state("draw_text_planner").toggle();
+    state("draw_planner_text").toggle();
   }else if(cmd=="draw_play_path"){
+    last_command = "Execute";
     state("draw_play_path").toggle();
     simulate = 0;
     if(state("draw_play_path")){
@@ -173,15 +181,13 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     //   std::cout << "load current path from : " << fn << std::endl;
     // }
   }else if(cmd=="save_view"){
-    Robot *robot = world->robots[active_robot];
-    std::string rname = robot->name;
-    std::cout << rname << std::endl;
-    std::string fname = "../data/viewport/robot_"+rname+".viewport";
+    last_command = "SaveView";
+    std::string fname = "../data/viewport/"+getRobotEnvironmentString()+".viewport";
+    std::cout << "Save: " << fname << std::endl;
     BaseT::OnCommand("save_view",fname.c_str());
   }else if(cmd=="load_view" || cmd=="reset_view"){
-    Robot *robot = world->robots[active_robot];
-    std::string rname = robot->name;
-    std::string fname = "../data/viewport/robot_"+rname+".viewport";
+    last_command = "LoadView";
+    std::string fname = "../data/viewport/"+getRobotEnvironmentString()+".viewport";
     std::cout << "Load: " << fname << std::endl;
     BaseT::OnCommand("load_view",fname.c_str());
   }else return BaseT::OnCommand(cmd,args);
@@ -197,9 +203,24 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   SendRefresh();
   return true;
 }
+
+std::string PlannerBackend::getRobotEnvironmentString()
+{
+    std::string rname, tname;
+
+    if(world->robots.size()>0){
+        rname = world->robots[active_robot]->name;
+    }
+    if(world->terrains.size()>0){
+        tname = world->terrains[0]->name;
+    }else{
+      if(world->rigidObjects.size()>0){
+          tname = world->rigidObjects[0]->name;
+      }
+    }
+    return rname+"_"+tname;
+}
 void PlannerBackend::CenterCameraOn(const Vector3& v){
-  //Vector3 bmin = v-epsilon;
-  //Vector3 bmax = v-epsilon;
   Math3D::AABB3D box(v,v);
   GLNavigationBackend::CenterCameraOn(box);
 }
@@ -424,9 +445,77 @@ void PlannerBackend::RenderWorld(){
  // GLDraw::drawSphere(0.05,16,16);
 
  // glEnable(GL_LIGHTING);
+void DrawGLRoundedCorner(int x, int y, double sa, double arc, float r) {
+    // centre of the arc, for clockwise sense
+    float cent_x = x;// + r * cos(sa + 0.5*Pi);
+    float cent_y = y;// + r * sin(sa + 0.5*Pi);
+    // glVertex2f(cent_x, cent_y);
+
+    // build up piecemeal including end of the arc
+    int n = ceil(16 * (arc / (2*Pi)));
+    for (int i = 0; i <= n; i++) {
+        double ang = sa + (arc-sa) * (double)i  / (double)n;
+        float next_x = cent_x + r * cos(ang);
+        float next_y = cent_y - r * sin(ang);
+        glVertex2f(next_x, next_y);
+    }
+}
+void PlannerBackend::RenderCommand(const std::string &cmd)
+{
+    double radius = 60;
+    double y = viewport.h - 100;
+    double x = line_x_pos + 1.5*radius;
+
+    // int numIncrements = 16;
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+
+    GLDraw::GLColor boundColor, textColor, nodeColor;
+    textColor.set(0.1,0.1,0.1);
+    nodeColor.set(0.8,0.8,0.8,0.5);
+    boundColor.set(0.2,0.2,0.2,0.5);
+    
+    //############################################################################
+		nodeColor.setCurrentGL();
+    double dx = 0.2*radius;
+    double dr = radius-dx;
+    glBegin(GL_POLYGON);
+    DrawGLRoundedCorner(x-dr, y-dr, Pi/2  , Pi    , dx);
+    DrawGLRoundedCorner(x-dr, y+dr, Pi, 3*Pi/2  , dx);
+    DrawGLRoundedCorner(x+dr, y+dr, 3*Pi/2 , 2*Pi, dx);
+    DrawGLRoundedCorner(x+dr, y-dr, 0     , Pi/2  , dx);
+    glEnd();
+
+		boundColor.setCurrentGL();
+    glBegin(GL_LINE_LOOP);
+    DrawGLRoundedCorner(x-dr, y-dr, Pi/2  , Pi    , dx);
+    DrawGLRoundedCorner(x-dr, y+dr, Pi, 3*Pi/2  , dx);
+    DrawGLRoundedCorner(x+dr, y+dr, 3*Pi/2 , 2*Pi, dx);
+    DrawGLRoundedCorner(x+dr, y-dr, 0     , Pi/2  , dx);
+    glEnd();
+
+    textColor.setCurrentGL();
+    char buf[64];
+    void* font=GLUT_BITMAP_HELVETICA_18;
+    sprintf(buf,"%s\n", cmd.c_str());
+    std::cout << x << "," << y << std::endl;
+
+    unsigned Ls = cmd.size();
+    double offset = 0.5*Ls*10;
+
+    glRasterPos2d(x-offset,y); 
+    glutBitmapString(font,buf);
+    glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+
+}
+
 void PlannerBackend::RenderScreen(){
   BaseT::RenderScreen();
-  if(state("draw_text_planner")){
+  if(state("draw_planner_text")){
     std::string line;
     line = "Planners       : ";
     DrawText(line_x_pos,line_y_offset,line);
@@ -450,9 +539,19 @@ void PlannerBackend::RenderScreen(){
       line_y_offset += line_y_offset_stepsize;
     }
 
+  }
+  if(state("draw_planner_minima_tree")){
+    std::string line = "Local Minima Tree";
+    DrawText(line_x_pos,line_y_offset,line);
+    line_y_offset += line_y_offset_stepsize;
+
     if(planners.size()>0){
       planners.at(active_planner)->DrawGLScreen(line_x_pos, line_y_offset);
+      line_y_offset += line_y_offset_stepsize;
     }
+  }
+  if(last_command!="" ){
+      RenderCommand(last_command);
   }
 }
 

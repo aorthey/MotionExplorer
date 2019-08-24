@@ -49,6 +49,7 @@ class PlannerInput{
     bool smoothPath{false};
     double pathSpeed{1};
     double pathWidth{1};
+    double pathBorderWidth{0.01};
 
     bool kinodynamic{false};
     Config uMin;
