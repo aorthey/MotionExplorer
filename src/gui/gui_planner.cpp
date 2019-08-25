@@ -500,7 +500,6 @@ void PlannerBackend::RenderCommand(const std::string &cmd)
     char buf[64];
     void* font=GLUT_BITMAP_HELVETICA_18;
     sprintf(buf,"%s\n", cmd.c_str());
-    std::cout << x << "," << y << std::endl;
 
     unsigned Ls = cmd.size();
     double offset = 0.5*Ls*10;
@@ -545,9 +544,20 @@ void PlannerBackend::RenderScreen(){
     DrawText(line_x_pos,line_y_offset,line);
     line_y_offset += line_y_offset_stepsize;
 
+
     if(planners.size()>0){
+      //display time
+      double time = planners.at(active_planner)->getLastIterationTime();
+      std::stringstream timeStream;
+      timeStream << std::fixed << std::setprecision(2) << time;
+      std::string line = "Construction Time: ";
+      line += timeStream.str()+"s";
+      DrawText(line_x_pos,line_y_offset,line);
+      line_y_offset += line_y_offset_stepsize;
+      //display local-minima tree
       planners.at(active_planner)->DrawGLScreen(line_x_pos, line_y_offset);
       line_y_offset += line_y_offset_stepsize;
+
     }
   }
   if(last_command!="" ){

@@ -9,6 +9,7 @@
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 #include <Modeling/World.h> //RobotWorld
 #include <Planning/RobotCSpace.h> //SingleRobotCSpace
+#include <ompl/util/Time.h>
 #include <tinyxml.h>
 #include <vector>
 #include <memory>
@@ -52,8 +53,17 @@ class MotionPlanner{
 
     friend std::ostream& operator<< (std::ostream& out, const MotionPlanner& planner);
 
+    double getLastIterationTime();
   protected:
     MotionPlanner() = delete;
+
+    //time required to execute the last action
+    ompl::time::point timePointStart;
+    ompl::time::point timePointEnd;
+    void resetTime();
+    double getTime();
+
+    double time{0};
 
     //position in hierarchy
     uint current_level; //vertical level in hierarchy (tree)

@@ -14,7 +14,7 @@
     <maxplanningtime>180</maxplanningtime>
     <pathSpeed>10</pathSpeed>
     <pathWidth>0.2</pathWidth>
-    <smoothPath>1</smoothPath>
+    <smoothPath>0</smoothPath>
 
     <hierarchy>
       <!-- <level inner_index="1" type="R2"/> -->

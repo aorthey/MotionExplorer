@@ -6,13 +6,12 @@
 #include "planner/cspace/cspace_factory.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include "gui/drawMotionPlanner.h"
+#include "util.h"
 #include <ompl/geometric/planners/quotientspace/Explorer.h>
 
-#include "util.h"
 #include <boost/lexical_cast.hpp>
 
 using namespace GLDraw;
-using namespace util;
 
 MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   world(world_), input(input_)
@@ -28,6 +27,7 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   }else{
     strategy = std::make_shared<StrategyGeometricMultiLevel>();
   }
+  timePointStart = ompl::time::now();
 
   CreateHierarchy();
 }
@@ -242,7 +242,9 @@ void MotionPlanner::Step()
   }
 
   StrategyOutput output(cspace_levels.back());
+  resetTime();
   strategy->Step(output);
+  time = getTime();
   output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
 }
 
@@ -264,12 +266,14 @@ void MotionPlanner::StepOneLevel()
   StrategyOutput output(cspace_levels.back());
 
   uint numberOfSolutionPathsCurrentLevel = 0;
+  resetTime();
   while(numberOfSolutionPathsCurrentLevel < 1)
   {
     strategy->Step(output);
     output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
     numberOfSolutionPathsCurrentLevel = hierarchy->NumberNodesOnLevel(current_level+2);
   }
+  time = getTime();
 }
 
 void MotionPlanner::AdvanceUntilSolution()
@@ -285,17 +289,15 @@ void MotionPlanner::AdvanceUntilSolution()
   }else{
     // strategy->Clear();
   }
+  resetTime();
   if(!util::StartsWith(input.name_algorithm,"benchmark")){
     StrategyOutput output(cspace_levels.back());
     strategy->Plan(output);
     output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
   }
+  time = getTime();
 
-  //TODO: quick hack to refresh hierarchical display
-  // Collapse();
   Expand();
-  // Expand();
-
 }
 
 PlannerInput& MotionPlanner::GetInput(){
@@ -570,6 +572,25 @@ void MotionPlanner::DrawGL(GUIState& state){
   }
 
 }
+void MotionPlanner::resetTime()
+{
+  timePointStart = ompl::time::now();
+}
+
+double MotionPlanner::getTime()
+{
+  timePointEnd = ompl::time::now();
+  ompl::time::duration timeDuration = timePointEnd - timePointStart;
+  return ompl::time::seconds(timeDuration);
+}
+
+double MotionPlanner::getLastIterationTime()
+{
+  // int timeInt = (int)time*100.0;
+  // time = ((double)timeInt/100.0);
+  return time;
+}
+
 std::ostream& operator<< (std::ostream& out, const MotionPlanner& planner){
   out << std::string(80, '-') << std::endl;
   out << " Planner: " << std::endl;

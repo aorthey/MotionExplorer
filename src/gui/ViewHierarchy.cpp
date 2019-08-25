@@ -59,7 +59,28 @@ void ViewHierarchy::Clear()
 }
 
 void ViewHierarchy::DrawGL(){
+
+  double xprev = x+width_column1+width_column2+0.5*width_column2;
+  double yprev = y+heightPerLevel/2;
+  double node_radius = heightPerLevel/3;
+  double xstep = node_radius*2.5;
+  double node_radius_unselected = node_radius - node_radius/4;
+  double node_radius_selected = node_radius;
+
   double height = heightPerLevel * (GetLevel()+1);
+
+  int maxNodes = 1;
+  int addNodes = 0;
+  for(uint k = 0; k < level_nodes.size(); k++){
+    std::vector<int> selected_path;
+    int nk = level_nodes.at(k) + addNodes;
+    if(nk > maxNodes) maxNodes = nk;
+    if(k < selected_path.size()){
+      addNodes += selected_path.at(k);
+    }
+  }
+  double width = xprev + maxNodes * xstep;
+  width_column3 = width-width_column1-width_column2;
 
   glDisable(GL_LIGHTING);
   glDisable(GL_DEPTH_TEST);
@@ -98,14 +119,6 @@ void ViewHierarchy::DrawGL(){
     glEnd();
   }
 
-
-  double xprev = x+width_column1+width_column2+width_column2;
-  double yprev = y+heightPerLevel/2;
-  double node_radius = heightPerLevel/3;
-  double node_radius_unselected = node_radius - node_radius/4;
-  double node_radius_selected = node_radius;
-
-  double xstep = node_radius*2.5;
 
   nodeColor = nodeUnselectedColor;
   std::string emptySet; emptySet = "#";

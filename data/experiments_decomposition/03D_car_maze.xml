@@ -13,7 +13,7 @@
     <se3min config="6  -5 -5.0 -0.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +5 +5.0 +0.5 +3.141593 +1.57 +3.141593"/>
     <freeFloating>1</freeFloating>
-    <maxplanningtime>0.5</maxplanningtime>
+    <maxplanningtime>2</maxplanningtime>
     <pathSpeed>12</pathSpeed>
     <smoothPath>1</smoothPath>
     <pathWidth>0.1</pathWidth>
