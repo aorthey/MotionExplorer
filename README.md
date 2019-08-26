@@ -1,4 +1,4 @@
-<h1>Orthoklampt</h1>
+<h1>MotionPlanningExplorerGUI</h1>
 
 An experimental motion planning framework, in which new planning algorithms can
 quickly be developed and be benchmarked against other algorithms. As input we use
