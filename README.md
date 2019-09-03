@@ -1,4 +1,4 @@
-<h1>Orthoklampt</h1>
+<h1>MotionPlanningExplorerGUI</h1>
 
 An experimental motion planning framework, in which new planning algorithms can
 quickly be developed and be benchmarked against other algorithms. As input we use
@@ -25,8 +25,8 @@ Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.prat
 <h3>Dependencies</h3>
 
 <ul>
-  <li> OMPL 1.4.0
-  <li> Klampt 0.6 (modified version github.com/aorthey/Klampt and
+  <li> OMPL 1.5.0 (modified version github.com/aorthey/ompl)
+  <li> Klampt 0.8 (modified version github.com/aorthey/Klampt and
   github.com/aorthey/KrisLibrary)
   <li> Eigen 3.3
   <li> Lemon
