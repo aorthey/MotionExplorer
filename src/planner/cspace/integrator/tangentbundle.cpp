@@ -63,8 +63,6 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   uSE3(4) = ucontrol[4];
   uSE3(5) = ucontrol[5];
 
-  std::cout << uSE3 << std::endl;
-
   //###########################################################################
   //(2) integrate from (q0,dq0) to (q1,dq1);
   //###########################################################################

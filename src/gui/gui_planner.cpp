@@ -560,7 +560,7 @@ void PlannerBackend::RenderScreen(){
 
     }
   }
-  if(last_command!="" ){
+  if(state("draw_planner_last_command") && last_command!=""){
       RenderCommand(last_command);
   }
 }

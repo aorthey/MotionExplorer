@@ -42,4 +42,4 @@ def CreateTriRoomDoublePassage(alpha):
   fname = "narrow_passage_double_passage.off"
   mesh.write(fname)
 
-CreateTriRoomDoublePassage(0.15)
+CreateTriRoomDoublePassage(0.35)

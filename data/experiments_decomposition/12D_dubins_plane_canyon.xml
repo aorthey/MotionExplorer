@@ -4,23 +4,20 @@
   <robot name="airplane" file="../robots/airplane.urdf"/>
   <robot name="airplane_inner_sphere" file="../robots/airplane_inner_sphere.urdf"/>
 
-  <rigidObject name="canyon" file="../terrains/canyon_easy_bridge_small_2.stl" translation="0 0 0"/>
+  <rigidObject name="canyon" file="../terrains/canyon_bridge.stl" translation="0 0 0"/>
 
   <plannerinput>
 
-    <qinit  config="6  -22 4 +6.0 -1.57 3.14 3.14"/>
-    <dqinit config="6 0.1 0 0 0 0 0 "/>
-    <qgoal  config="6  4 4 +6.0 -1.57 3.14 3.14"/>
-    <dqgoal config="6 0.1 0 0 0 0 0 "/>
+    <qinit  config="6  -22 +4 +6.0 0 0 0"/>
+    <dqinit config="6 0.5 0 0 0 0 0 "/>
+    <qgoal  config="6  +4 +4 +6.0 0 0 0"/>
+    <dqgoal config="6 0.5 0 0 0 0 0 "/>
 
     <se3min config="6  -25.0 0.0 -0.0 -3.141593 0 0"/>
     <se3max config="6  +7.0 +7.0 +9.0 +3.141593 0 0"/>
 
-    <!--<control_min config="6  0 -5 0 -2 -20 -0"/>
-    <control_max config="6  0 5 0 2 20 0"/> -->
-
-    <control_min config="6  0 -0.1 0 0 0 -0"/>
-    <control_max config="6  0 0.1 0 0 0 0"/>
+    <control_min config="6  0 0 0 -0.1 -0.1 0"/>
+    <control_max config="6  0 0 0 +0.1 +0.1 0"/>
 
     <freeFloating>1</freeFloating>
     <maxplanningtime>2</maxplanningtime>      <!-- runtime in (s) --> 
@@ -32,7 +29,7 @@
     <hierarchy>
       <level inner_index="1" type = "R3"/>
       <level inner_index="0" type = "SE3"/>
-      <!--<level inner_index="0" type = "TSE3"/>-->
+      <level inner_index="0" type = "TSE3"/>
     </hierarchy>
 
   </plannerinput>

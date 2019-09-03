@@ -5,18 +5,18 @@
       <lateral_friction value="1"/>
   </contact>
     <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="0 0 1.57" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="airplane_small.stl" scale="1 1 1"/>
+        <mesh filename="airplane_small.stl"/>
       </geometry>
        <material name="grey">
         <color rgba="0.5 0.5 0.5 0.5"/>
       </material>
     </collision>
     <visual>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <origin rpy="0 0 1.57" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="airplane_small.stl" scale="1 1 1"/>
+        <mesh filename="airplane_small.stl"/>
       </geometry>
        <material name="grey">
         <color rgba="0.5 0.5 0.5 0.5"/>

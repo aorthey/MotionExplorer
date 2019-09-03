@@ -27,6 +27,7 @@
     <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
     <pathSpeed>8</pathSpeed>
     <freeFloating>1</freeFloating>
+    <smoothPath>1</smoothPath>
     <hierarchy>
       <level inner_index="4" type="R2"/>
       <level inner_index="1" type="SE2"/>
