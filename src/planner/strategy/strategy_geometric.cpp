@@ -128,7 +128,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:sbl") planner = std::make_shared<og::SBL>(si);
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
-  else if(algorithm=="hierarchy:q_rrt") planner = std::make_shared<og::QRRT>(siVec);
+  else if(algorithm=="hierarchy:qrrt") planner = std::make_shared<og::QRRT>(siVec);
   else if(algorithm=="hierarchy:explorer") planner = std::make_shared<og::MotionExplorer>(siVec);
 
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){

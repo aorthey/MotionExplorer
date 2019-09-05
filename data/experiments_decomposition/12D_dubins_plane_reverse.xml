@@ -16,17 +16,18 @@
     <se3min config="6  -5.0 -5.0 -3.0 -3.141593 0 0"/>
     <se3max config="6  +5.0 +5.0 +3.0 +3.141593 0 0"/>
 
-    <control_min config="6  0 0 0 -0.1 -0.1 0"/>
-    <control_max config="6  0 0 0 +0.1 +0.1 0"/>
+    <control_min config="6  0 0 0 -0.1 -0.0 0"/>
+    <control_max config="6  0 0 0 +0.1 +0.0 0"/>
+    <timestep min="0.01" max="0.05"/>
 
     <freeFloating>1</freeFloating>
     <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
     <epsilongoalregion>0.01</epsilongoalregion>
     <kinodynamic>1</kinodynamic>
-    <pathSpeed>10</pathSpeed>
+    <pathSpeed>4</pathSpeed>
 
     <hierarchy>
-      <!-- <level inner_index="1" type = "SE3"/> -->
+      <level inner_index="1" type = "SE3"/>
       <level inner_index="0" type = "TSE3"/>
     </hierarchy>
 

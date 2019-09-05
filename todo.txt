@@ -699,3 +699,23 @@ contrary to manip scenario!?
 would disappear if S1 would be the uppermost level.
 
 [ ] QMP to OMPL
+
+-- It does not have to be optimal. We just need to generate paths. But then how
+can we actually improve the path length? Is there some dynamic path improver?
+-- Alternative 1: Just compute ONE path. I.e. use some optimal path planner.
+-- Alternative 2: Compute a sparse graph, then sample paths on it. Problem: This
+will be highly irregular, and will not return the same paths after restarting.
+-- Alternative 3: Implement some deformation algorithm (?)
+
+-- It should still be possible to obtain a sparse roadmap. If we sample several
+paths, we could check if two are visible, and then always choose the shorter of
+the two to add. If a path is found which is shorter, we replace the path.
+
+-- Main Problem: There is no path deformation algorithm for kinodynamic
+problems. Why? Because it requires knowledge about reachability. But that is not
+included in the propagate method. 
+-- 
+
+
+
+

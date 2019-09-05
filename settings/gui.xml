@@ -210,7 +210,7 @@
   <checkbox>
     <name>draw_roadmap_edges</name>
     <key>2</key>
-    <active>0</active>
+    <active>1</active>
   </checkbox>
   <checkbox>
     <name>draw_path_autofocus</name>
