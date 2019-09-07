@@ -27,8 +27,8 @@
     <pathSpeed>10</pathSpeed>
 
     <hierarchy>
-      <!-- <level inner_index="2" type="R2"/> -->
-      <!-- <level inner_index="1" type="SE2"/> -->
+      <level inner_index="2" type="R2"/>
+      <level inner_index="1" type="SE2"/>
       <level inner_index="0" type="TSE2"/>
     </hierarchy>
 
