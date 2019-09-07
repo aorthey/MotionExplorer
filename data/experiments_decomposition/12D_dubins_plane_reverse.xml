@@ -21,7 +21,7 @@
     <timestep min="0.01" max="0.05"/>
 
     <freeFloating>1</freeFloating>
-    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>2</maxplanningtime>      <!-- runtime in (s) --> 
     <epsilongoalregion>0.01</epsilongoalregion>
     <kinodynamic>1</kinodynamic>
     <pathSpeed>4</pathSpeed>
