@@ -441,7 +441,9 @@ bool GLUIForceFieldGUI::Initialize()
   ForceFieldBackend* _backend = static_cast<ForceFieldBackend*>(backend);
   GUIState* state = &_backend->state;
 
-  panel = glui->add_rollout("<ForceField>");
+  bool showDisplay = (*state)("display_panel");
+
+  if(showDisplay) panel = glui->add_rollout("<ForceField>");
   for (auto it = state->variables.begin(); it != state->variables.end(); ++it) {
     GUIVariable* v = it->second;
     std::string descr = v->descr;
@@ -450,23 +452,29 @@ bool GLUIForceFieldGUI::Initialize()
       descr += " [ " + v->key + " ] ";
     }
     if(v->type == GUIVariable::Type::CHECKBOX){
-      checkbox = glui->add_checkbox_to_panel(panel, descr.c_str());
-      AddControl(checkbox,v->name.c_str());
-      checkbox->set_int_val(v->active);
+      if(showDisplay){
+        checkbox = glui->add_checkbox_to_panel(panel, descr.c_str());
+        AddControl(checkbox,v->name.c_str());
+        checkbox->set_int_val(v->active);
+      }
     }else if(v->type == GUIVariable::Type::BUTTON){
       //checkbox = glui->add_checkbox_to_panel(panel, descr.c_str());
+      if(showDisplay){
       button = glui->add_button_to_panel(panel, descr.c_str());
       AddControl(button,v->name.c_str());
       AddButton(v->name.c_str());
+      }
     }else if(v->type == GUIVariable::Type::HOTKEY){
       //no graphical representation for hotkey
     }else if(v->type == GUIVariable::Type::PROPERTY){
       //no graphical representation for property
     }else if(v->type == GUIVariable::Type::SLIDER){
+      if(showDisplay){
       spinner = glui->add_spinner_to_panel(panel, descr.c_str(), GLUI_SPINNER_FLOAT);
       spinner->set_float_val(v->value);
       spinner->set_float_limits(v->min, v->max);
       AddControl(spinner,v->name.c_str());
+      }
     }else{
       std::cout << std::string(80, '#') << std::endl;
       std::cout << "variable type: " << v->type << " unknown." << std::endl;

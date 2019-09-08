@@ -298,6 +298,7 @@
   <!-- <property name="draw_cover_active_faces" enabled="0"/> -->
   <!-- <property name="draw_cover_ellipsoid" enabled="1"/> -->
   <property name="load_view_from_file" enabled="1"/>
+  <property name="display_panel" enabled="0"/>
 
   <property name="draw_planner_surface_normals" enabled="0"/>
   <property name="planner_draw_start_goal_configuration_sufficient" enabled="1"/>
