@@ -16,7 +16,7 @@ OpenSet::~OpenSet()
 bool OpenSet::IsSubsetOf(const cover::OpenSet *rhs, double tolerance) const
 {
   std::cout << "NYI" << std::endl;
-  exit(0);
+  throw "NYI";
 }
 
 const ob::State* OpenSet::GetCenter() const

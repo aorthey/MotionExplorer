@@ -144,7 +144,7 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
           OMPL_ERROR("ERROR: tried to create roadmap with zero vertices.");
         }
         OMPL_ERROR("ERROR");
-        exit(0);
+        throw "Roadmap error.";
       }
     }else{
       std::vector<int> path = v->getPath();
@@ -194,7 +194,7 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
       if( v == nullptr)
       {
           OMPL_ERROR("Vertex %d/%d is not annotated.", i, pd->numVertices());
-          exit(0);
+          throw "Vertex not annotated error.";
       }
 
       std::vector<int> path = v->getPath();

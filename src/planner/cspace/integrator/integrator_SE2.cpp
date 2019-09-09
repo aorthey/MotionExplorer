@@ -50,7 +50,7 @@ void IntegratorSE2::propagate(const ob::State *state, const oc::Control* control
   //Real dt2 = 0.5*dt*dt;
   if(dt<0){
     std::cout << "propagation step size is negative:"<<dt << std::endl;
-    exit(0);
+    throw "Negative prop step size.";
   }
 
   Config q1(q0);

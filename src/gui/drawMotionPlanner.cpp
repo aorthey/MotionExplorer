@@ -464,7 +464,7 @@ namespace GLDraw{
             }
             if(axes.size()>3){
               std::cout << "more than three axes for Ellipsoid. Something is wrong" << std::endl;
-              exit(0);
+              throw "Ellipsoid has more than 3 axes";
             }
             if(axes.size()<3){
               std::cout << "Warning: ellipsoid is singular" << std::endl;

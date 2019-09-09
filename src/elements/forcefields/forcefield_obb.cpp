@@ -13,7 +13,7 @@ OrientedBoundingBoxForceField::OrientedBoundingBoxForceField(double _power, Vect
   for(uint k = 0; k < 3; k++){
     if(extension[k] < 0){
       std::cout << "[OrientedBoundingBoxForceField] extension needs to be non-negative. But it is " << extension << std::endl;
-      exit(1);
+      throw "Negative box extension.";
     }
   }
   Vector3 ex(1,0,0);
@@ -32,7 +32,7 @@ OrientedBoundingBoxForceField::OrientedBoundingBoxForceField(double _power, Vect
     std::cout << "R*ex: " << R << std::endl;
     std::cout << "direction: " << _direction << std::endl;
     std::cout << "ndirection: " << normdir << std::endl;
-    exit(0);
+    throw "Rotation error.";
   }
   //std::cout << R << std::endl;
 

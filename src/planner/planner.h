@@ -28,6 +28,7 @@ class MotionPlanner{
 
     //folder-like operations on hierarchical roadmap
     virtual void ExpandFull();
+    virtual void ExpandSimple();
     virtual void Expand();
     virtual void Collapse();
     virtual void Next();

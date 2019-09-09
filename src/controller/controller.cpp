@@ -169,7 +169,7 @@ void ContactStabilityController::SetWrenchCommand(const Vector& wrenches)
 {
   if((uint)wrenches.size()!=robot.drivers.size()) {
     std::cout << "wrenches are size " << wrenches.size() << " but drivers are size " << robot.drivers.size() << std::endl;
-    exit(0);
+    throw "Invalid size";
   }
 
   Vector T_wrenches(wrenches); T_wrenches.setZero();

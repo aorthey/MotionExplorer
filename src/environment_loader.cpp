@@ -34,7 +34,7 @@ EnvironmentLoader EnvironmentLoader::from_args(int argc, char** argv){
     all_args.assign(argv + 1, argv + argc);
   }else{
     std::cout << "Usage: <xml world file>" << std::endl;
-    exit(0);
+    throw "Invalid name";
   }
   file = util::GetExecFilePath()+"/"+file;
   return EnvironmentLoader(file.c_str());
@@ -56,7 +56,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
     std::cout << "XML file does not exists or corrupted: "<< file_name << std::endl;
     std::cout << std::endl;
     std::cout << std::string(80, '-') << std::endl;
-    exit(0);
+    throw "Invalid name";
   }
 
   uint Nrobots = world.robots.size();
@@ -83,13 +83,13 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
               std::cout << std::string(80, '>') << std::endl;
               std::cout << ">>> [ERROR] Robot with idx " << ri << " does not exists." << std::endl;
               std::cout << std::string(80, '>') << std::endl;
-              exit(1);
+              throw "Invalid robot idx.";
             }
             if(ro>=world.robots.size()){
               std::cout << std::string(80, '>') << std::endl;
               std::cout << ">>> [ERROR] Robot with idx " << ro << " does not exists." << std::endl;
               std::cout << std::string(80, '>') << std::endl;
-              exit(1);
+              throw "Invalid robot idx.";
             }
 
             Robot *rk= world.robots.at(ri);
@@ -132,13 +132,13 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
         std::cout << std::string(80, '#') << std::endl;
         std::cout << "q_init has " << Ni << " dofs, but robot " << robot->name << " expects " << N << " dofs." << std::endl;
         std::cout << std::string(80, '#') << std::endl;
-        exit(1);
+        throw "Invalid dofs.";
       }
       if(Ng!=N){
         std::cout << std::string(80, '#') << std::endl;
         std::cout << "q_goal has " << Ng << " dofs, but robot " << robot->name << " expects " << N << " dofs." << std::endl;
         std::cout << std::string(80, '#') << std::endl;
-        exit(1);
+        throw "Invalid dofs.";
       }
 
       robot->q = q_init;

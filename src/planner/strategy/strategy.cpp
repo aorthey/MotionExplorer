@@ -58,7 +58,7 @@ void Strategy::setStateSampler(std::string sampler, ob::SpaceInformationPtr si)
     allocator = allocBridgeTestValidStateSampler;
   }else{
     std::cout << "Sampler  " << sampler << " is unknown." << std::endl;
-    exit(0);
+    throw "Sampler unknown.";
   }
   si->clearValidStateSamplerAllocator();
   si->setValidStateSamplerAllocator(allocator);

@@ -149,7 +149,7 @@ Vector3 PathPiecewiseLinear::EvalVec3(const double t) const{
 
 Config PathPiecewiseLinear::EvalMilestone(const int k) const{
   std::cout << "NYI" << std::endl;
-  exit(0);
+  throw "NYI";
   //if(k<0) return keyframes.front();
   //if(k>Nkeyframes) return keyframes.back();
   //return keyframes.at(k);
@@ -158,7 +158,7 @@ Config PathPiecewiseLinear::EvalMilestone(const int k) const{
 Config PathPiecewiseLinear::Eval(const double t) const{
   if(!path){
     std::cout << "Cannot Eval empty path" << std::endl;
-    exit(0);
+    throw "Empty path";
   }
 
   og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
@@ -418,7 +418,6 @@ void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
   // std::cout << step << std::endl;
   // std::cout << sizes[0] << std::endl;
   // std::cout << sizes[1] << std::endl;
-  // exit(0);
 
 
   black.setCurrentGL();

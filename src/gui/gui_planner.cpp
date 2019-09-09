@@ -14,7 +14,6 @@ void PlannerBackend::AddPlannerInput(PlannerMultiInput& _in){
     // std::cout << *_in.inputs.at(k) << std::endl;
     planners.push_back( new MotionPlanner(world, *_in.inputs.at(k)) );
   }
-  // exit(0);
 }
 
 void PlannerBackend::Start(){

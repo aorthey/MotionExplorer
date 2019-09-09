@@ -35,7 +35,7 @@ void ViewHierarchy::UpdateSelectionPath( std::vector<int> path ){
     for(uint k = 0; k < selected_path.size(); k++){
       std::cout << "  node " << selected_path.at(k) << std::endl;
     }
-    exit(1);
+    throw "Error selection path.";
   }
 }
 void ViewHierarchy::PopLevel()

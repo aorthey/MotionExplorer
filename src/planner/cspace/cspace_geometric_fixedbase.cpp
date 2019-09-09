@@ -41,7 +41,7 @@ void GeometricCSpaceOMPLFixedBase::initSpace()
 
   if(Nompl<=0){
     std::cout << "Fixed Base robot needs to have at least one actuated joint." << std::endl;
-    exit(0);
+    throw "No actuated joints.";
   }
 
   ob::StateSpacePtr RN = (std::make_shared<ob::RealVectorStateSpace>(Nompl));

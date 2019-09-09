@@ -72,7 +72,7 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   Real dt2 = 0.5*dt*dt;
   if(dt<0){
     std::cout << "propagation step size is negative:"<<dt << std::endl;
-    exit(0);
+    throw "Negative prop step size.";
   }
 
   Config q1(q0);
@@ -120,7 +120,7 @@ void TangentBundleIntegrator::propagate_deprecated(const ob::State *state, const
   //double dt2 = 0.5*dt*dt;
   if(dt<0){
     std::cout << "propagation step size is negative:"<<dt << std::endl;
-    exit(0);
+    throw "Negative prop step size.";
   }
 
   //###########################################################################
@@ -154,7 +154,6 @@ void TangentBundleIntegrator::propagate_deprecated(const ob::State *state, const
   // Real dt = ucontrol[N-1];
   // if(dt<0){
   //   std::cout << "propagation step size is negative:"<<dt << std::endl;
-  //   exit(0);
   // }
 
   // LieGroupIntegrator integrator;

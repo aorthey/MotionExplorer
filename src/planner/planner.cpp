@@ -61,7 +61,7 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
       cspace_level = factory.MakeKinodynamicCSpace(world, robot_inner_idx);
     }else{
       std::cout << "Type " << type << " not recognized" << std::endl;
-      exit(0);
+      throw "Unrecognized type.";
     }
   }else{
     if(type.substr(0,1) == "R"){
@@ -77,7 +77,7 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
     }else{
       std::cout << type.substr(0) << std::endl;
       std::cout << "fixed robots needs to have configuration space RN or SN, but has " << type << std::endl;
-      exit(0);
+      throw "Wrong Configuration Space.";
     }
   }
   std::cout << "Create QuotientSpace with dimensionality " << cspace_level->GetDimensionality() << "[OMPL] and " 
@@ -97,11 +97,11 @@ CSpaceOMPL* MotionPlanner::ComputeCSpaceLayer(const Layer &layer){
 
   if(ri==nullptr){
     std::cout << "Robot " << ii << " does not exist." << std::endl;
-    exit(0);
+    throw "Robot non-existent.";
   }
   if(ro==nullptr){
     std::cout << "Robot " << io << " does not exist." << std::endl;
-    exit(0);
+    throw "Robot non-existent.";
   }
 
   Config qi = input.q_init; qi.resize(ri->q.size());
@@ -199,7 +199,6 @@ void MotionPlanner::CreateHierarchy()
       //   std::cout << "Please make sure every hierarchy has the same last entry" << std::endl;
       //   std::cout << "However, stratification " << k << " has Dimensionality " << N_kl << std::endl;
       //   std::cout << "While stratification 0 has Dimensionality " << N_a << std::endl;
-      //   exit(0);
       // }
       //############################################################################
       //every stratification must share the same ambient space
@@ -297,7 +296,7 @@ void MotionPlanner::AdvanceUntilSolution()
   }
   time = getTime();
 
-  Expand();
+  ExpandSimple();
 }
 
 PlannerInput& MotionPlanner::GetInput(){
@@ -346,6 +345,24 @@ void MotionPlanner::Expand(){
       current_path.push_back(current_level_node);
     }else{
       AdvanceUntilSolution();
+    }
+  }
+  UpdateHierarchy();
+}
+void MotionPlanner::ExpandSimple(){
+  if(!active) return;
+
+  uint Nmax=hierarchy->NumberLevels();
+  std::cout << "ExpandSimple" << std::endl;
+  std::cout << "CUrrent path:" << current_path << std::endl;
+  if(current_level<Nmax-1)
+  {
+    std::cout << (hierarchy->HasChildren(current_path)?"HasChildren":"NoChildren") << std::endl;
+    if(hierarchy->HasChildren(current_path))
+    {
+      current_level++;
+      current_level_node=hierarchy->NumberChildren(current_path)-1;
+      current_path.push_back(current_level_node);
     }
   }
   UpdateHierarchy();

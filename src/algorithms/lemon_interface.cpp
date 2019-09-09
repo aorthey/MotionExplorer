@@ -34,7 +34,7 @@ LemonInterface::LemonInterface( ob::PlannerDataPtr pd_ ):
 
     if(pd->getVertex(k)==ob::PlannerData::NO_VERTEX){
       std::cout << "vertex " << k << " does not exists" << std::endl;
-      exit(0);
+      throw "Vertex not existent.";
     }
   }
 

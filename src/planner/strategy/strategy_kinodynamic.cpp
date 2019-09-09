@@ -76,7 +76,7 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
     planner = std::make_shared<og::MotionExplorer>(si_vec);
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
-    exit(0);
+    throw "Planner unknown.";
   }
   planner->setProblemDefinition(pdef_vec.back());
   return planner;
@@ -103,7 +103,7 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
       {
         std::cout << "ERROR: not dynamic even though declared dynamic" << std::endl;
         std::cout << *cspace_levelk << std::endl;
-        exit(0);
+        throw "Not dynamic.";
       }
 
       oc::SpaceInformationPtr sik_dynamic = static_pointer_cast<oc::SpaceInformation>(sik);
@@ -141,7 +141,7 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
   if(util::StartsWith(algorithm,"benchmark")){
     //No Init, directly execute benchmark
     std::cout << "NYI" << std::endl;
-    exit(0);
+    throw "NYI";
   }else{
     planner = GetPlanner(algorithm, si_vec, pdef_vec);
     planner->setup();
@@ -185,5 +185,5 @@ void StrategyKinodynamicMultiLevel::Clear()
 void StrategyKinodynamicMultiLevel::Step(StrategyOutput &output)
 {
   OMPL_ERROR("NYI");
-  exit(0);
+  throw "NYI";
 }

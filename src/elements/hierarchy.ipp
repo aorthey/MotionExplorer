@@ -8,7 +8,7 @@ template <class T>
 void Hierarchy<T>::CheckLevel( uint level ){
   if(level>=level_robot_inner_idx.size()){
     std::cout << "level " << level << " does not exists" << std::endl;
-    exit(1);
+    throw "Level not existent.";
   }
 }
 template <class T>
@@ -185,7 +185,6 @@ bool Hierarchy<T>::NodeExists( const std::vector<int> &path)
       //}
       //std::cout << std::endl;
       //std::cout << "number of nodes on current level: " <<current->children.size() << std::endl;
-      //exit(0);
       return false;
     }
     current = current->children.at( path.at(k) );
@@ -214,7 +213,7 @@ Node<T>* Hierarchy<T>::GetNode( std::vector<int> path ){
       std::cout << std::endl;
       std::cout << "number of nodes on current level: " <<current->children.size() << std::endl;
       Print();
-      exit(0);
+      throw "Node does not exists.";
 
     }
     current = current->children.at( path.at(k) );

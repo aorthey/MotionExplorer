@@ -160,7 +160,7 @@ T GetSubNodeText(TiXmlElement* node, const char *name)
   TiXmlElement* subnode = FindSubNode(node, name);
   if(!subnode){
     std::cout << "[ERROR] Subnode: " << name << " has not been found." << std::endl;
-    exit(0);
+    throw "Unknown subnode.";
   }
   T _val;
   GetStreamText(subnode) >> _val;
@@ -183,7 +183,7 @@ inline T GetSubNodeAttribute(TiXmlElement* node, const char *name, const char *a
   TiXmlElement* subnode = FindSubNode(node, name);
   if(!subnode){
     std::cout << "[ERROR] Subnode: " << name << " has not been found." << std::endl;
-    exit(0);
+    throw "Unknown subnode.";
   }
 
   T _val;
@@ -208,7 +208,7 @@ inline T GetAttribute(TiXmlElement* node, const char *attribute)
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "[ERROR] Attribute:" << attribute << " does not exist." << std::endl;
     std::cout << std::string(80, '-') << std::endl;
-    exit(0);
+    throw "Unknown attribute.";
   }
   T _val;
   GetStreamAttribute(node, attribute) >> _val;

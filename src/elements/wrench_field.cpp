@@ -74,7 +74,7 @@ bool WrenchField::Load(TiXmlElement *node)
     double viscosity = GetAttribute<double>(forcedrag, "viscosity");
     if(viscosity==0){
       std::cout << "viscosity needs to be non-zero." << std::endl;
-      exit(1);
+      throw "Invalid viscosity.";
     }
     ForceFieldPtr fd(new DragForceField(viscosity));
     forcefields.push_back(fd);

@@ -72,7 +72,7 @@ void KinodynamicCSpaceOMPL::initSpace()
   if(!(robot->joints[0].type==RobotJoint::Floating))
   {
     std::cout << "only supports robots with a configuration space equal to SE(3) x R^n" << std::endl;
-    exit(0);
+    throw "Unsupported robot.";
   }
 
   ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());

@@ -18,7 +18,7 @@ void GeometricCSpaceOMPL::initSpace()
   if(!(robot->joints[0].type==RobotJoint::Floating))
   {
     std::cout << "[MotionPlanner] only supports robots with a configuration space equal to SE(3) x R^n" << std::endl;
-    exit(0);
+    throw "Unsupported robot.";
   }
 
   ob::StateSpacePtr SE3(std::make_shared<ob::SE3StateSpace>());
@@ -166,7 +166,7 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType
     std::cout << qomplSO3->y << std::endl;
     std::cout << qomplSO3->z << std::endl;
     std::cout << qomplSO3->w << std::endl;
-    exit(0);
+    throw "SO3 element is NaN.";
   }
 
   std::vector<double> rxyz = EulerXYZFromOMPLSO3StateSpace(qomplSO3);
@@ -195,5 +195,5 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
 const oc::StatePropagatorPtr GeometricCSpaceOMPL::StatePropagatorPtr(oc::SpaceInformationPtr si)
 {
   OMPL_ERROR("GeometricCspace has no StatePropagatorPtr");
-  exit(0);
+  throw "No StatePropagatorPtr.";
 }

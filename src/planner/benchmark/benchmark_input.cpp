@@ -7,7 +7,7 @@ BenchmarkInput::BenchmarkInput(std::string name_):
   std::string bmdef = util::GetDataFolder()+"/../settings/benchmark.xml";
   if(!Load(bmdef.c_str())){
     std::cout << "Could not load benchmark " << name << "." << std::endl;
-    exit(1);
+    throw "Invalid name";
   }
 }
 

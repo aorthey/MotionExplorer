@@ -133,11 +133,11 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
 
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){
     std::cout << "Planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
-    exit(0);
+    throw "Invalid planner.";
   }
   else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
-    exit(0);
+    throw "Invalid planner.";
   }
   std::cout << "Planner algorithm " << planner->getName() << " initialized." << std::endl;
   planner->setProblemDefinition(pdef);
@@ -359,7 +359,6 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
         //     std::cout << "at algorithm: " << name_algorithm << std::endl;
         //     std::cout << "failed to cast" << std::endl;
         //     OMPL_INFORM("Could not cast algorithm");
-        //     exit(0);
         //   }
         // }
 

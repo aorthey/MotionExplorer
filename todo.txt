@@ -716,6 +716,16 @@ problems. Why? Because it requires knowledge about reachability. But that is not
 included in the propagate method. 
 -- 
 
+Video:
 
+Working well:
+-- 02D_manipulator.xml
+-- 03D_car_two_slit.xml
+-- 06D_drone_forest.xml
+-- 07D_kuka.xml
 
+Problematic
+-- 34D_PR2.xml (seems oK)
+-- 12D_dubins_airplane.xml (problems finding some dynamic path)
 
+Dubins airplane: Easier environment?

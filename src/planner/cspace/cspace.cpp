@@ -218,7 +218,7 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
   }else{
     std::cout << "cspace:getXYZ: cannot deal with space type" << space_first_subspace->getType() << std::endl;
     std::cout << "please check ompl/base/StateSpaceTypes.h" << std::endl;
-    exit(0);
+    throw "Invalid space type.";
   }
   Vector3 q(x,y,z);
   return q;
@@ -257,8 +257,7 @@ std::vector<double> CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( const ob::SO3Stat
     std::cout << ca << std::endl;
 
     std::cout << "QuaternionRotation to EulerAngle not valid" << std::endl;
-    exit(0);
-
+    throw "Invalid quaternion element.";
   }
 
   double rx = R[2];

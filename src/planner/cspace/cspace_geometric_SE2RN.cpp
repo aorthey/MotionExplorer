@@ -16,7 +16,7 @@ void GeometricCSpaceOMPLSE2RN::initSpace()
   if(!(robot->joints[0].type==RobotJoint::Floating))
   {
     std::cout << "[MotionPlanner] only supports robots with a configuration space equal to SE(2) x R^n" << std::endl;
-    exit(0);
+    throw "Invalid robot";
   }
 
   ob::StateSpacePtr SE2(std::make_shared<ob::SE2StateSpaceFullInterpolate>());
