@@ -412,13 +412,11 @@ void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
   // GLfloat sizes[2];  // Store supported line width range
   // GLfloat step;     // Store supported line width increments
 
-
   // glGetFloatv(GL_LINE_WIDTH_RANGE,sizes);
   // glGetFloatv(GL_LINE_WIDTH_GRANULARITY,&step);
   // std::cout << step << std::endl;
   // std::cout << sizes[0] << std::endl;
   // std::cout << sizes[1] << std::endl;
-
 
   black.setCurrentGL();
   glLineWidth(widthBorder);
