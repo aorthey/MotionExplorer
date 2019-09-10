@@ -1,17 +1,17 @@
 <!-- Default Planner Settings -->
 <planner>
 
-  <algorithm dynamic="1" name="hierarchy:explorer"/>
   <algorithm dynamic="1" name="ompl:dynamic:rrt"/>
+  <algorithm dynamic="1" name="hierarchy:explorer"/>
   <!-- <algorithm dynamic="1" name="ompl:dynamic:est"/> -->
   <!-- <algorithm dynamic="1" name="ompl:dynamic:sst"/> -->
   <!-- <algorithm dynamic="1" name="ompl:dynamic:pdst"/> -->
   <!-- <algorithm dynamic="1" name="benchmark:all_dynamic"/> -->
 
   <!-- <algorithm name="hierarchy:sampler"/> -->
+  <algorithm name="ompl:rrt"/>
   <algorithm name="hierarchy:explorer"/>
   <algorithm name="hierarchy:qrrt"/>
-  <algorithm name="ompl:rrt"/>
   <!-- <algorithm name="benchmark:minimal"/> -->
   <!-- <algorithm name="ompl:rrt"/> -->
   <!-- <algorithm name="ompl:rrtconnect"/> -->

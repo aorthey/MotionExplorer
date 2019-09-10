@@ -16,7 +16,7 @@
     <epsilongoalregion>0.05</epsilongoalregion>
     <maxplanningtime>0.5</maxplanningtime>      <!-- runtime in (s) --> 
     <smoothPath>0</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
-    <pathSpeed>15</pathSpeed>
+    <pathSpeed>9</pathSpeed>
     <pathWidth>0.2</pathWidth>
 
     <hierarchy>

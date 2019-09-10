@@ -24,10 +24,10 @@
     <se3max config="6  +4 +4 0 +3.141593 0 0"/>
 
     <epsilongoalregion>0.1</epsilongoalregion>
-    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>10</maxplanningtime>      <!-- runtime in (s) --> 
     <pathSpeed>8</pathSpeed>
     <freeFloating>1</freeFloating>
-    <smoothPath>0</smoothPath>
+    <smoothPath>1</smoothPath>
     <hierarchy>
       <level inner_index="4" type="R2"/>
       <!-- <level inner_index="1" type="SE2"/> -->
