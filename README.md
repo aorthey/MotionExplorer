@@ -3,12 +3,14 @@
 Visualize Local Minima using a local minima tree. 
 
 As input we use
-robots (in .urdf files), environments (in .tri files), and worlds (in .xml
+robots (in .urdf files), environments (in .tri or .stl files), and worlds (in .xml
 files). 
 
-Open Motion Planning Library (OMPL): http://ompl.kavrakilab.org/
+This framework combines two existing frameworks (OMPL [1] and Klamp't [2]) and adds local-minima visualization plus easier control through vim-like shortcuts.
 
-Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.pratt.duke.edu/klampt/
+[1] Open Motion Planning Library (OMPL): http://ompl.kavrakilab.org/
+
+[2] Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.pratt.duke.edu/klampt/
 
 <h1>Install</h1>
 
