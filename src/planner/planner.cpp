@@ -293,6 +293,7 @@ void MotionPlanner::AdvanceUntilSolution()
     StrategyOutput output(cspace_levels.back());
     strategy->Plan(output);
     output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
+    // std::cout << output << std::endl;
   }
   time = getTime();
 
@@ -353,11 +354,9 @@ void MotionPlanner::ExpandSimple(){
   if(!active) return;
 
   uint Nmax=hierarchy->NumberLevels();
-  std::cout << "ExpandSimple" << std::endl;
-  std::cout << "CUrrent path:" << current_path << std::endl;
   if(current_level<Nmax-1)
   {
-    std::cout << (hierarchy->HasChildren(current_path)?"HasChildren":"NoChildren") << std::endl;
+    // std::cout << (hierarchy->HasChildren(current_path)?"HasChildren":"NoChildren") << std::endl;
     if(hierarchy->HasChildren(current_path))
     {
       current_level++;
@@ -438,7 +437,7 @@ void MotionPlanner::setSelectedPath(std::vector<int> selectedPath)
     //can only be done with Explorer Planners
     auto selectionPlanner = dynamic_pointer_cast<og::MotionExplorer>(strategy->GetPlannerPtr());
     if(selectionPlanner != NULL){
-      selectionPlanner->setSelectedPath( selectedPath);
+      selectionPlanner->setSelectedPath( selectedPath );
     }
 }
 void MotionPlanner::Print()
