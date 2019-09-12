@@ -1,24 +1,16 @@
 <h1>MotionPlanningExplorerGUI</h1>
 
-An experimental motion planning framework, in which new planning algorithms can
-quickly be developed and be benchmarked against other algorithms. As input we use
-robots (in .urdf files), environments (in .tri files), and worlds (in .xml
+Visualize Local Minima using a local minima tree. 
+
+As input we use
+robots (in .urdf files), environments (in .tri or .stl files), and worlds (in .xml
 files). 
 
-The framework can fully be controlled by using hotkeys (in a vim-like fashion),
-so that we can quickly test out new algorithm, either by letting them run until
-a solution is found, or by letting them run for a single iteration.
+This framework combines two existing frameworks (OMPL [1] and Klamp't [2]) and adds local-minima visualization plus easier control through vim-like shortcuts.
 
-The framework is build upon two open-source projects: First the open motion
-planning library (OMPL), developed at Rice University, which provides implementations of many planning
-algorithms. Second, the Klamp't library, developed at Duke University, which
-provides a dynamical simulator, especially known for its realistic contact-point computations. 
+[1] Open Motion Planning Library (OMPL): http://ompl.kavrakilab.org/
 
-More about those projects you can find here:
-
-Open Motion Planning Library (OMPL): http://ompl.kavrakilab.org/
-
-Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.pratt.duke.edu/klampt/
+[2] Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.pratt.duke.edu/klampt/
 
 <h1>Install</h1>
 
@@ -37,9 +29,21 @@ Kris' Locomotion and Manipulation Planning Toolbox (Klamp't): http://motion.prat
   <li> Install Script for Ubuntu 16.04 and 18.04
 
     ./install_script.sh
+    cd build
+    make planner_gui
 </ol>
 
 <h1>Use</h1>
+
+Example run:
+
+<ol>
+  <li> 02D_manipulator
+    
+    cd /build
+    ./planner_gui ../data/experiments_ICRA2020/02D_manipulator.xml
+    
+</ol>
 
 GUI uses hotkeys which are defined and can be modified in settings/gui.xml
 
