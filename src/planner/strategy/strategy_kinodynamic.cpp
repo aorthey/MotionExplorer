@@ -157,6 +157,7 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
   // choose planner
   //###########################################################################
   // const oc::SpaceInformationPtr si = static_pointer_cast<oc::SpaceInformation>(planner->getSpaceInformation());
+  // si->getStateSpace()->registerProjections();
   // si->setMinMaxControlDuration(0.01, 0.1);
   // si->setPropagationStepSize(1);
   // si->getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(si->getStateSpace())));
@@ -164,8 +165,14 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
     // ob::PlannerPtr planner = GetPlanner(algorithm, si_vec, pdef_vec);
     // planner->setup();
 
+
     // double max_planning_time= input.max_planning_time;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
+
+  double minimalCostAcceptable = 5;
+  planner->getProblemDefinition()->getOptimizationObjective()->setCostThreshold(ob::Cost(minimalCostAcceptable));
+  std::cout << planner->getProblemDefinition()->getOptimizationObjective()->getCostThreshold() << std::endl;
+
 
   ompl::time::point start = ompl::time::now();
   planner->solve(ptc);
@@ -175,6 +182,12 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
   //###########################################################################
   ob::PlannerDataPtr pd( new ob::PlannerData(planner->getSpaceInformation()) );
   planner->getPlannerData(*pd);
+  unsigned int N = planner->getProblemDefinition()->getSolutionCount();
+  if(N>0){
+      ob::PlannerSolution solution = planner->getProblemDefinition()->getSolutions().at(0);
+      pd->path_ = solution.path_;
+  }
+
   output.SetPlannerData(pd);
   output.SetProblemDefinition(planner->getProblemDefinition());
 }
