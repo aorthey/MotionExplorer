@@ -18,10 +18,10 @@
 
     <control_min config="6  0 0 0 -0.1 -0.0 -0.0"/>
     <control_max config="6  0 0 0 +0.1 +0.0 +0.0"/>
-    <timestep min="0.001" max="0.1"/>
+    <timestep min="0.01" max="0.1"/>
 
     <freeFloating>1</freeFloating>
-    <maxplanningtime>10</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
     <epsilongoalregion>1</epsilongoalregion>
     <kinodynamic>1</kinodynamic>
     <pathSpeed>4</pathSpeed>
