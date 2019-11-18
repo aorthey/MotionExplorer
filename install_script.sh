@@ -46,8 +46,8 @@ pip install --user trimesh
 cd ~
 mkdir -p git
 cd ~/git
-git clone git@github.com:aorthey/orthoklampt.git
-cd orthoklampt
+git clone git@github.com:aorthey/MotionPlanningExplorerGUI.git
+cd MotionPlanningExplorerGUI
 mkdir libs
 
 sudo cp scripts/converter* /usr/bin/
@@ -56,9 +56,16 @@ echo "***********************************************************************"
 echo "Installing OMPL (Planning Library)"
 echo "***********************************************************************"
 cd ${INSTALL_DIR}/libs/
-wget http://ompl.kavrakilab.org/install-ompl-ubuntu.sh
-chmod u+x install-ompl-ubuntu.sh
-./install-ompl-ubuntu.sh --app
+git clone git@github.com:aorthey/ompl.git
+cd ompl
+mkdir build
+cd build/
+cmake ..
+make -j$(nproc)
+sudo make install
+# wget http://ompl.kavrakilab.org/install-ompl-ubuntu.sh
+# chmod u+x install-ompl-ubuntu.sh
+# ./install-ompl-ubuntu.sh --app
 
 
 echo "***********************************************************************"
