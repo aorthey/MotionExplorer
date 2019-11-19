@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INSTALL_DIR="~/git/orthoklampt/"
+INSTALL_DIR="~/git/MotionPlanningExplorerGUI/"
 echo "***********************************************************************"
 echo "Install Directory: ${INSTALL_DIR}"
 echo "***********************************************************************"
@@ -41,7 +41,6 @@ pip install --user cvxpy
 pip install --user pdf2image
 pip install --user openmesh
 pip install --user trimesh
-
 
 cd ~
 mkdir -p git
@@ -97,7 +96,7 @@ make -j$(nproc)
 sudo make install
 
 echo "***********************************************************************"
-echo "Installing Orthoklampt"
+echo "Installing MotionPlanningExplorerGUI"
 echo "***********************************************************************"
 cd ${INSTALL_DIR}
 mkdir -p build
@@ -105,5 +104,3 @@ cd build
 cmake ..
 make -j$(nproc)
 ./planner_gui ../data/experiments/15D_planar_manipulator.xml
-
-
