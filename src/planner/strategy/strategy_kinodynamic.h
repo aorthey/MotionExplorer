@@ -5,7 +5,6 @@
 namespace ob = ompl::base;
 namespace oc = ompl::control;
 namespace og = ompl::geometric;
-namespace oa = ompl::app;
 
 class StrategyKinodynamicMultiLevel: public Strategy{
   public:

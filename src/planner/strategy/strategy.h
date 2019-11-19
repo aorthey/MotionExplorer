@@ -1,7 +1,7 @@
 #pragma once
 #include "planner/strategy/strategy_input.h"
 #include "planner/strategy/strategy_output.h"
-#include <omplapp/apps/SE3RigidBodyPlanning.h>
+// #include <omplapp/apps/SE3RigidBodyPlanning.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
 
 class Strategy{

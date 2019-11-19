@@ -5,7 +5,6 @@
 namespace ob = ompl::base;
 namespace oc = ompl::control;
 namespace og = ompl::geometric;
-namespace oa = ompl::app;
 
 struct OMPLGeometricStratification{
   std::vector<ob::SpaceInformationPtr> si_vec;
