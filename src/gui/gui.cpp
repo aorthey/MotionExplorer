@@ -170,7 +170,6 @@ void ForceFieldBackend::RenderWorld()
       // robot->UpdateGeometry();
       // sim.odesim.robot(i)->SetConfig(q);
 
-      //std::cout << robot->name << " selfcollisions:" << robot->SelfCollision() << std::endl;
       for(size_t j=0;j<robot->links.size();j++) {
         if(robot->IsGeometryEmpty(j)) continue;
 
@@ -415,6 +414,7 @@ bool ForceFieldBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="print_robot_info"){
     Info info;
     info(world->robots[0]);
+
   }else{
     bool base_result = BaseT::OnCommand(cmd,args);
     if(!base_result){

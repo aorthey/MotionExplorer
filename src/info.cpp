@@ -1,4 +1,6 @@
 #include "info.h"
+#include <KrisLibrary/geometry/AnyGeometry.h>
+
 
 Info::Info()
 {
@@ -135,6 +137,16 @@ void Info::operator()(Robot *robot){
     double q = robot->q[i];
     if(q < qL || q > qU){
     std::cout << "ERROR: #q= [" << i << "] " << qL << "<= " << q << " <=" << qU << std::endl;
+    }
+  }
+  if(robot->SelfCollision()){
+    for(int j = 0; j < robot->selfCollisions.numRows(); j++){
+      for(int k = j+1; k < robot->selfCollisions.numCols(); k++){
+        AnyCollisionQuery* cq = robot->selfCollisions(j,k);
+        if(cq && cq->Collide()){
+          std::cout << "ERROR (Self Collision): " << linkNames.at(j) << " <-> " << linkNames.at(k) << std::endl;
+        }
+      }
     }
   }
 
