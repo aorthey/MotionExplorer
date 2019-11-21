@@ -10,18 +10,29 @@ if [ $ubuntu_version == "1604" ];then
   echo "Install script Ubuntu 16.04"
 elif [ $ubuntu_version == "1804" ];then
   echo "Install script Ubuntu 18.04"
+elif [ $ubuntu_version == "1910" ];then
+  echo "Install script Ubuntu 19.10"
 else
   echo "This install script is for Ubuntu {16,18}.04"
   echo "but version is $ubuntu_version"
   return 0
 fi
 
+echo "If install directory is not correct, please change it in the script before
+continuing."
+read -p "Press [enter] to continue"
+
+mkdir -p ${INSTALL_DIR}
+cd ${INSTALL_DIR}
 echo "Installing dependencies"
 
 if [ $ubuntu_version == "1604" ];then
   sudo apt-get install -qq libboost1.58-all-dev
 elif [ $ubuntu_version == "1804" ];then
   sudo apt-get install -qq libboost1.65-all-dev
+elif [ $ubuntu_version == "1910" ];then
+    sudo apt-get install -qq libboost1.67-all-dev
+    sudo apt-get install -qq g++
 else
   return 0
 fi
@@ -42,20 +53,14 @@ pip install --user pdf2image
 pip install --user openmesh
 pip install --user trimesh
 
-cd ~
-mkdir -p git
-cd ~/git
-git clone git@github.com:aorthey/MotionPlanningExplorerGUI.git
-cd MotionPlanningExplorerGUI
-mkdir libs
-
+mkdir -p ${INSTALL_DIR}/libs
 sudo cp scripts/converter* /usr/bin/
 
 echo "***********************************************************************"
 echo "Installing OMPL (Planning Library)"
 echo "***********************************************************************"
 cd ${INSTALL_DIR}/libs/
-git clone git@github.com:aorthey/ompl.git
+git clone https://github.com/aorthey/ompl.git
 cd ompl
 mkdir build
 cd build/
@@ -85,11 +90,12 @@ echo "***********************************************************************"
 echo "Installing KLAMPT (Dynamical Simulator)"
 echo "***********************************************************************"
 cd ${INSTALL_DIR}/libs/
-git clone git@github.com:aorthey/Klampt.git
+git clone https://github.com/aorthey/Klampt.git
 cd Klampt/Library
 make unpack-deps
 rm -rf KrisLibrary
-git clone git@github.com:aorthey/KrisLibrary.git
+#git clone git@github.com:aorthey/KrisLibrary.git
+git clone https://github.com/aorthey/KrisLibrary.git
 make deps
 cd ..
 cmake .
