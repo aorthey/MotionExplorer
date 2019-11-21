@@ -19,7 +19,6 @@ MESSAGE("USER: ${current_user}")
 ###############################################################################
 #CHANGE HERE FOR CORRECT KLAMPT DIRECTORY
 ###############################################################################
-#SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../Klampt/")
 SET(KLAMPT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/libs/Klampt/")
 
 LIST(APPEND CMAKE_MODULE_PATH "${KLAMPT_ROOT}/CMakeModules")
@@ -31,8 +30,8 @@ ENDIF()
 
 
 MESSAGE(COLOR_WHITE ${DEPENDENCIES})
-set(CMAKE_C_COMPILER "gcc-5")
-set(CMAKE_CXX_COMPILER "g++-5")
+set(CMAKE_C_COMPILER "gcc")
+set(CMAKE_CXX_COMPILER "g++")
 SET(CMAKE_BUILD_TYPE Debug)
 
 ###############################################################################

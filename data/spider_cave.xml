@@ -1,19 +1,12 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot index="0" name="spider" file="spider.urdf" translation="0 0 0" rotateRPY="0 0 0" config="29 -1.49055 -0.343221 1.44064 6.23411 -0.00884473 6.1431 0.000134763 1.20206e-320 6.95335e-310 0.00736376 -0.0590389 0 0.128255 0.135814 0.158241 0 0.00368315 -0.125626 0 -9.46818e-08 -0.00153995 6.95335e-310 0 -0.289195 0.1614 -0.303214 0.000705835 0.0344819 0 "/>
-  <robot index="0" name="spider" file="spider.urdf" translation="0 0 0" rotateRPY="0 0 0" config="29 -1.49055 -0.343221 1.44064 6.23411 -0.00884473 6.1431 0.000134763 1.20206e-320 6.95335e-310 0.00736376 -0.0590389 0 0.128255 0.135814 0.158241 0 0.00368315 -0.125626 0 -9.46818e-08 -0.00153995 6.95335e-310 0 -0.289195 0.1614 -0.303214 0.000705835 0.0344819 0 "/>
+  <robot index="0" name="spider" file="robots/spider/spider.urdf" translation="0 0 0" rotateRPY="0 0 0" config="29 -1.49055 -0.343221 1.44064 6.23411 -0.00884473 6.1431 0.000134763 1.20206e-320 6.95335e-310 0.00736376 -0.0590389 0 0.128255 0.135814 0.158241 0 0.00368315 -0.125626 0 -9.46818e-08 -0.00153995 6.95335e-310 0 -0.289195 0.1614 -0.303214 0.000705835 0.0344819 0 "/>
 
 
-  <robot name="sphere_inner" file="sphere_inner.urdf" config="6 -100 0 -10 0 0 0"/>
-  <robot name="sphere_inner" file="sphere_inner.urdf" config="6 -100 0 -10 0 0 0"/>
-  <robot name="sphere_outer" file="sphere_outer.urdf" config="6 -100 0 -10 0 0 0"/>
-  <robot name="sphere_outer" file="sphere_outer.urdf" config="6 -100 0 -10 0 0 0"/>
-
-  <terrain  name="mountain/ridge.tri" file="terrains/cave/cave.tri" translation="0 0 0">
-  <terrain  name="mountain/ridge.tri" file="terrains/cave/cave.tri" translation="0 0 0">
-   <display color="0.9 0.5 0.1"/>
-  </terrain> 
+  <!-- <terrain  name="mountain/ridge.tri" file="terrains/cave/cave.tri" translation="0 0 0"> -->
+  <!--  <display color="0.9 0.5 0.1"/> -->
+  <!-- </terrain> --> 
 
   <forcefield>
     <uniform force="0 0 -1.62" color="1 0 0"/>

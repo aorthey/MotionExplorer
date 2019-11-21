@@ -65,7 +65,7 @@
   <checkbox>
     <name>draw_roadmap_shortest_path</name>
     <active>1</active>
-    <key>g</key>
+    <key>3</key>
   </checkbox>
 
   <checkbox>
@@ -233,7 +233,7 @@
 
   <hotkey>
     <name>draw_text</name>
-    <key>I</key>
+    <key>5</key>
   </hotkey>
 
 
@@ -270,13 +270,9 @@
     <key>9</key>
   </button>
 
-  <!-- <hotkey> -->
-  <!--   <name>draw_cover_single_open_set</name> -->
-  <!--   <key>z</key> -->
-  <!-- </hotkey> -->
   <hotkey>
     <name>draw_planner_minima_tree</name>
-    <key>3</key>
+    <key>4</key>
     <active>1</active>
   </hotkey>
 

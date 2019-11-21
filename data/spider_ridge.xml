@@ -1,10 +1,8 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="spider" file="spider.urdf" translation="0 0 0" rotateRPY="0 0 0" config="29  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
-  <robot name="spider" file="spider.urdf" translation="0 0 0" rotateRPY="0 0 0" config="29  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
+  <robot name="spider" file="robots/spider/spider.urdf" translation="0 0 0" rotateRPY="0 0 0" config="29  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
 
-  <terrain  name="mountain/ridge.tri" file="terrains/mountain/ridge.tri" translation="0 0 0">
   <terrain  name="mountain/ridge.tri" file="terrains/mountain/ridge.tri" translation="0 0 0">
    <display color="0.9 0.5 0.1"/>
   </terrain> 
@@ -16,6 +14,12 @@
     <se3max config="6  6 6 16 3.141592 1.57 3.14"/>
 
     <freeFloating>1</freeFloating>
+    <hierarchy>
+      <level inner_index="0" type="SE3RN"/>
+    </hierarchy>
   </plannerinput>
 
+  <forcefield>
+    <uniform force="0 0 -1.62" color="1 0 0"/>
+  </forcefield>
 </world>
