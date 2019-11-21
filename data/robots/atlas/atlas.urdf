@@ -1147,6 +1147,8 @@
   </joint>
 
   <klampt package_root="../../../libs/" default_acc_max="4" fixed_root_link="0" flip_yz="1" use_vis_geom="1" >
+    <noselfcollision pairs="l_uleg r_uleg" />
+    <noselfcollision group1="pelvis" group2="mtorso l_lglut l_uleg r_lglut r_uleg"/>
   </klampt>
 </robot>
 
