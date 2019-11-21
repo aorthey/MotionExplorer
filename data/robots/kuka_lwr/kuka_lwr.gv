@@ -1,0 +1,26 @@
+digraph G {
+node [shape=box];
+"body" [label="body"];
+"calib_kuka_arm_base_link" [label="calib_kuka_arm_base_link"];
+"kuka_arm_1_link" [label="kuka_arm_1_link"];
+"kuka_arm_2_link" [label="kuka_arm_2_link"];
+"kuka_arm_3_link" [label="kuka_arm_3_link"];
+"kuka_arm_4_link" [label="kuka_arm_4_link"];
+"kuka_arm_5_link" [label="kuka_arm_5_link"];
+"kuka_arm_6_link" [label="kuka_arm_6_link"];
+node [shape=ellipse, color=blue, fontcolor=blue];
+"body" -> "kuka_arm_base_joint" [label="xyz: 0 0 0.11 \nrpy: 0 -0 0"]
+"kuka_arm_base_joint" -> "calib_kuka_arm_base_link"
+"calib_kuka_arm_base_link" -> "kuka_arm_0_joint" [label="xyz: 0 0 0.11 \nrpy: 0 -0 0"]
+"kuka_arm_0_joint" -> "kuka_arm_1_link"
+"kuka_arm_1_link" -> "kuka_arm_1_joint" [label="xyz: 0 0 0.2 \nrpy: 0 -0 0"]
+"kuka_arm_1_joint" -> "kuka_arm_2_link"
+"kuka_arm_2_link" -> "kuka_arm_2_joint" [label="xyz: 0 0 0.2 \nrpy: 0 -0 0"]
+"kuka_arm_2_joint" -> "kuka_arm_3_link"
+"kuka_arm_3_link" -> "kuka_arm_3_joint" [label="xyz: 0 0 0.2 \nrpy: 0 -0 0"]
+"kuka_arm_3_joint" -> "kuka_arm_4_link"
+"kuka_arm_4_link" -> "kuka_arm_4_joint" [label="xyz: 0 0 0.2 \nrpy: 0 -0 0"]
+"kuka_arm_4_joint" -> "kuka_arm_5_link"
+"kuka_arm_5_link" -> "kuka_arm_5_joint" [label="xyz: 0 0 0.19 \nrpy: 0 -0 0"]
+"kuka_arm_5_joint" -> "kuka_arm_6_link"
+}

@@ -689,7 +689,7 @@ Problems for decomposition
 [x] Compute pdef internally (why require that all pdefs are defined
 externally? That is not their responsibility and could lead to mistakes)
 
-[ ] move the whole explorer to ompl
+[x] move the whole explorer to ompl
 [ ] One class per selectable path (only grow in its shadow)
 [ ] Path Equivalence in Car scenario is screwed up
 [ ] In car scenario, Hierarchy visualizer shows only one found path, but 5 were found. This is
@@ -699,20 +699,6 @@ contrary to manip scenario!?
 would disappear if S1 would be the uppermost level.
 
 [ ] QMP to OMPL
-
-Video:
-
-Working well:
--- 02D_manipulator.xml
--- 03D_car_two_slit.xml
--- 06D_drone_forest.xml
--- 07D_kuka.xml
-
-Problematic
--- 34D_PR2.xml (seems oK)
--- 12D_dubins_airplane.xml (problems finding some dynamic path)
-
-Dubins airplane: Easier environment?
-[ ] Not working if solution path has exactly TWO vertices. (because
-enumeratePath messes this case up. See printAllPathsUtil)
-
+[ ] QMP* to OMPL
+[ ] QRRT* to OMPL
+[ ] Remove lemon

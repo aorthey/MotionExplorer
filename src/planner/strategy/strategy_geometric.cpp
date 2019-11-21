@@ -279,6 +279,11 @@ void StrategyGeometricMultiLevel::Plan(StrategyOutput &output)
 
   ob::PlannerDataPtr pd( new ob::PlannerData(planner->getSpaceInformation()) );
   planner->getPlannerData(*pd);
+  unsigned int N = planner->getProblemDefinition()->getSolutionCount();
+  if(N>0){
+      ob::PlannerSolution solution = planner->getProblemDefinition()->getSolutions().at(0);
+      pd->path_ = solution.path_;
+  }
   output.SetPlannerData(pd);
   ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
   output.SetProblemDefinition(pdef);

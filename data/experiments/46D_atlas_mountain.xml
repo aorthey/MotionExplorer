@@ -26,5 +26,11 @@
     </hierarchy>
 
   </plannerinput>
+  <simulation>
+    <globals maxContacts="20" />
+    <robot index="0">
+       <controller type="PolynomialPathController" />
+    </robot>
+  </simulation>
 
 </world>

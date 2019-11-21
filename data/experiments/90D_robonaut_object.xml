@@ -2,18 +2,6 @@
 <world>
 
   <robot name="hubo" file="../../../Klampt/data/robots/robonaut2.rob" translation="0.5 -1 0" rotation="0.5 0.5 0 -0.5 0.5 0 0 0 1"/>
-  <!--
-  <robot name="hubo" file="../../../Klampt/data/robots/pr2.rob" />
-  <robot name="hubo" file="../../../Klampt/data/robots/pr2.rob" />
-  <robot name="hubo" file="../../../Klampt/data/robots/robonaut2.rob" translation="0.5 -1 0" rotation="0.5 0.5 0 -0.5 0.5 0 0 0 1"/>
-  -->
-
-
-  <!-- <robot name="robonaut" file="../../../Klampt/data/robots/robonaut2.rob" translation="0.5 -1 0" rotateRPY="0 0 3.14" /> -->
-  <!-- <robot name="robonaut" file="../../../Klampt/data/robots/robonaut2.rob" translation="0.5 -1 0" rotateRPY="0 0 3.14" /> -->
-
-  <terrain file="../../../Klampt/data/terrains/plane.tri" translation="0 0 0"/>
-  <!-- <terrain name="cube" file="../terrains/cuboid.tri" scale="0.1 0.1 0.1" translation="0.5 0.0 0.81"/> -->
 
   <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.1 0.1 0.1" translation="0.5 0.0 0.81"/>
   <!--  <display color="0.8 0.8 0.8"/> -->

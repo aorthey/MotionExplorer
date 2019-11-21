@@ -20,11 +20,14 @@
     <se3min config="6  -4.0 -4.0 -1.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +4.0 +4.0 +1.0 +3.141593 +1.57 +3.141593"/>
     <freeFloating>1</freeFloating>
-    <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <!-- <freeFloating>1</freeFloating> -->
+    <smoothPath>1</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
+    <pathSpeed>8</pathSpeed>                    <!-- <1: slower, 1: default, >1: faster -->
 
     <hierarchy>
-      <level inner_index="1" cspace_constant="1" type="R2"/>
-      <level inner_index="0" cspace_constant="0.532623641291" type="SE2"/>
+      <level inner_index="1" type="R2"/>
+      <level inner_index="0" type="SE2"/>
     </hierarchy>
 
   </plannerinput>

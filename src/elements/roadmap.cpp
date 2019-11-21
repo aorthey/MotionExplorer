@@ -50,41 +50,41 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
   {
     if(pd==nullptr) return nullptr;
 
-    LemonInterface lemon(pd);
+    if(pd->path_){
+      path_ompl = new PathPiecewiseLinear(pd->path_, cspace, quotient_space);
+    }else{
+      LemonInterface lemon(pd);
 
-    // const ob::State *s_start = pd->getStartVertex(0).getState();
-    // const ob::State *s_goal = pd->getGoalVertex(0).getState();
+      ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
-    // ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
-    // si->printState(s_start);
-    // si->printState(s_goal);
-    // pd->printGraphviz();
+      std::vector<Vertex> pred = lemon.GetShortestPath();
 
-    std::vector<Vertex> pred = lemon.GetShortestPath();
+      og::PathGeometric *gpath = new og::PathGeometric(quotient_space->SpaceInformationPtr()); 
+      shortest_path.clear();
 
-    og::PathGeometric *gpath = new og::PathGeometric(quotient_space->SpaceInformationPtr()); 
-    shortest_path.clear();
-
-    for(uint i = 0; i < pred.size(); i++)
-    {
-      Vertex pi = pred.at(i);
-      ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(pi));
-      const ob::State *s;
-      if(v==nullptr){
-        s = pd->getVertex(pi).getState();
-      }else{
-        s = v->getQuotientState();
+      for(uint i = 0; i < pred.size(); i++)
+      {
+        Vertex pi = pred.at(i);
+        ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(pi));
+        const ob::State *s;
+        if(v==nullptr){
+          s = pd->getVertex(pi).getState();
+        }else{
+          s = v->getQuotientState();
+        }
+        gpath->append(s);
+        Vector3 q = quotient_space->getXYZ(s);
+        if(draw_planar) q[2] = 0.0;
+        shortest_path.push_back(q);
       }
-      gpath->append(s);
-      Vector3 q = quotient_space->getXYZ(s);
-      if(draw_planar) q[2] = 0.0;
-      shortest_path.push_back(q);
+      if(pred.size()>0){
+        gpath->interpolate();
+        ob::PathPtr path_ompl_ptr(gpath);
+        path_ompl = new PathPiecewiseLinear(path_ompl_ptr, cspace, quotient_space);
+      }
+      return nullptr;
     }
-    if(pred.size()>0){
-      gpath->interpolate();
-      ob::PathPtr path_ompl_ptr(gpath);
-      path_ompl = new PathPiecewiseLinear(path_ompl_ptr, cspace, quotient_space);
-    }
+
   }
   return path_ompl;
 }
