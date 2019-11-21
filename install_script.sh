@@ -1,6 +1,6 @@
 #!/bin/bash
 
-INSTALL_DIR="~/git/MotionPlanningExplorerGUI/"
+INSTALL_DIR="~/git"
 echo "***********************************************************************"
 echo "Install Directory: ${INSTALL_DIR}"
 echo "***********************************************************************"
@@ -79,6 +79,7 @@ cd build/
 cmake ..
 make -j$(nproc)
 sudo make install
+
 
 echo "***********************************************************************"
 echo "Installing KLAMPT (Dynamical Simulator)"
