@@ -25,23 +25,24 @@ This framework combines two existing frameworks (OMPL [1] and Klamp't [2]) and a
   <li> Boost 1.55 or later
 </ul>
 
+Please make sure you have a github.com account AND ssh access from your workstation. See information here: https://help.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh
 <ol>
-  <li> Install Script for Ubuntu 16.04 and 18.04
-
+  <li> Install Script for Ubuntu 16.04 and 18.04 (requires SSH access)
+    
+    git clone git@github.com:aorthey/MotionPlanningExplorerGUI.git
+    cd MotionPlanningExplorerGUI
     ./install_script.sh
-    cd build
-    make planner_gui
+    
 </ol>
 
 <h1>Use</h1>
 
-Example run:
+Examples
 
 <ol>
   <li> 02D_manipulator
     
-    cd /build
-    ./planner_gui ../data/experiments_ICRA2020/02D_manipulator.xml
+    ./planner_gui ../data/experiments/02D_manipulator.xml
     
 </ol>
 
