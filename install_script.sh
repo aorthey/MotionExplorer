@@ -56,7 +56,7 @@ sudo apt-get install -qq python-dev python-opengl python-setuptools pypy python-
 sudo apt-get install -qq xclip openctm-tools
 
 echo "***********************************************************************"
-echo "Installing Libraries for Python"
+echo "Installing Libraries for Python (Optional)"
 echo "***********************************************************************"
 pip install --user --upgrade pip
 pip install --user matplotlib
@@ -83,7 +83,6 @@ sudo make install
 # wget http://ompl.kavrakilab.org/install-ompl-ubuntu.sh
 # chmod u+x install-ompl-ubuntu.sh
 # ./install-ompl-ubuntu.sh --app
-
 
 echo "***********************************************************************"
 echo "Installing LEMON (Graph Library)"
@@ -121,5 +120,5 @@ cd ${INSTALL_DIR}
 mkdir -p build
 cd build
 cmake ..
-make -j$(nproc)
+make -j$(nproc) planner_gui
 ./planner_gui ../data/experiments/15D_planar_manipulator.xml
