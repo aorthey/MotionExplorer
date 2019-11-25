@@ -40,6 +40,8 @@ class CSpaceOMPL
     virtual void print() const = 0;
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) = 0;
     virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
+    virtual double GetTime(const ob::State *qompl);
+    virtual bool isTimeDependent();
 
     Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
     ob::ScopedState<> ConfigToOMPLState(const Config &q);

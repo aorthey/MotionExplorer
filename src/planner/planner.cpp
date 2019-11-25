@@ -59,8 +59,12 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
       cspace_level = factory.MakeKinodynamicCSpaceSE2(world, robot_inner_idx);
     }else if(type=="TSE3"){
       cspace_level = factory.MakeKinodynamicCSpace(world, robot_inner_idx);
+    }else if(type=="R2T") {
+      cspace_level = factory.MakeGeometricCSpaceRNTime(world, robot_inner_idx, 2);
     }else{
+      std::cout << std::string(80, '#') << std::endl;
       std::cout << "Type " << type << " not recognized" << std::endl;
+      std::cout << std::string(80, '#') << std::endl;
       throw "Unrecognized type.";
     }
   }else{

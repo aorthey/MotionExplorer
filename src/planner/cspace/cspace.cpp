@@ -58,6 +58,16 @@ void CSpaceOMPL::Init()
   this->initSpace();
 }
 
+bool CSpaceOMPL::isTimeDependent()
+{
+  return false;
+}
+
+double CSpaceOMPL::GetTime(const ob::State *qompl)
+{
+  return 0;
+}
+
 ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
   if(!si){
     si = std::make_shared<ob::SpaceInformation>(SpacePtr());
