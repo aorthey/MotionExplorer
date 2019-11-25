@@ -491,11 +491,3 @@ and set a Command Class:
   RobotSensors sensors;
 
 We need to reinit this one after changing the driver!
-
-
-
-
-
-
-
-
