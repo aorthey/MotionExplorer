@@ -1,9 +1,22 @@
 #!/bin/bash
 
-INSTALL_DIR="~/git"
+INSTALL_DIR=`pwd`
 echo "***********************************************************************"
 echo "Install Directory: ${INSTALL_DIR}"
 echo "***********************************************************************"
+
+#REQUIREMENT: 
+# -- github.com account
+# -- SSH access at github.com
+
+ssh -q -T git@github.com
+if [ $? -eq 255 ];then
+  echo "########################################################################"
+  echo "ERROR: SSH not added to GITHUB."
+  echo "ERROR: https://help.github.com/en/enterprise/2.15/user/articles/adding-a-new-ssh-key-to-your-github-account"
+  echo "########################################################################"
+  exit 0
+fi
 
 ubuntu_version=`lsb_release -rs | sed 's/\.//'`
 if [ $ubuntu_version == "1604" ];then
@@ -15,7 +28,7 @@ elif [ $ubuntu_version == "1910" ];then
 else
   echo "This install script is for Ubuntu {16,18}.04"
   echo "but version is $ubuntu_version"
-  return 0
+  exit 0
 fi
 
 echo "If install directory is not correct, please change it in the script before
@@ -34,7 +47,7 @@ elif [ $ubuntu_version == "1910" ];then
     sudo apt-get install -qq libboost1.67-all-dev
     sudo apt-get install -qq g++
 else
-  return 0
+  exit 0
 fi
 
 sudo apt-get install -qq g++-5 cmake git freeglut3 freeglut3-dev libglpk-dev 
@@ -60,7 +73,7 @@ echo "***********************************************************************"
 echo "Installing OMPL (Planning Library)"
 echo "***********************************************************************"
 cd ${INSTALL_DIR}/libs/
-git clone https://github.com/aorthey/ompl.git
+git clone git@github.com:aorthey/ompl.git
 cd ompl
 mkdir build
 cd build/
@@ -90,12 +103,11 @@ echo "***********************************************************************"
 echo "Installing KLAMPT (Dynamical Simulator)"
 echo "***********************************************************************"
 cd ${INSTALL_DIR}/libs/
-git clone https://github.com/aorthey/Klampt.git
+git clone git@github.com:aorthey/Klampt.git
 cd Klampt/Library
 make unpack-deps
 rm -rf KrisLibrary
-#git clone git@github.com:aorthey/KrisLibrary.git
-git clone https://github.com/aorthey/KrisLibrary.git
+git clone git@github.com:aorthey/KrisLibrary.git
 make deps
 cd ..
 cmake .
