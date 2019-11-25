@@ -28,7 +28,9 @@ This framework combines two existing frameworks (OMPL [1] and Klamp't [2]) and a
 Please make sure you have a github.com account AND ssh access from your workstation. See information here: https://help.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh
 <ol>
   <li> Install Script for Ubuntu 16.04 and 18.04 (requires SSH access)
-
+    
+    git clone git@github.com:aorthey/MotionPlanningExplorerGUI.git
+    cd MotionPlanningExplorerGUI
     ./install_script.sh
     cd build
     make planner_gui
