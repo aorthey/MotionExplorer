@@ -40,6 +40,7 @@ class PlannerInput{
     std::string name_algorithm;
     std::string name_sampler;
     std::string environment_name;
+    std::string name_loadPath;
 
     double epsilon_goalregion;
     double max_planning_time;
@@ -75,6 +76,8 @@ struct PlannerMultiInput{
   std::vector<PlannerInput*> inputs;
   bool Load(const char* file);
   bool Load(TiXmlElement *node);
-  std::vector<std::string> GetAlgorithms(bool kinodynamic);
+  std::vector<std::string> GetAlgorithms(TiXmlElement *node, bool kinodynamic);
+  std::vector<std::string> GetAlgorithmsDefault(bool kinodynamic);
+  std::vector<std::string> GetAlgorithmsCustom(TiXmlElement *node, bool kinodynamic);
 };
 

@@ -18,7 +18,6 @@ inline int CountNumberOfSubNodes(TiXmlElement* parent, const char *name);
 template<typename T> 
 inline std::vector<T> GetNodeVector(TiXmlElement* node);
 
-
 inline std::stringstream GetStreamText(TiXmlElement* node);
 template<typename T> 
 inline std::stringstream GetStreamTextDefault(TiXmlElement* node, T default_value);

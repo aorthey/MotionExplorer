@@ -18,14 +18,8 @@ bool PlannerMultiInput::Load(const char* file){
   return (inputs.size()>0);
 }
 
-std::vector<std::string> PlannerMultiInput::GetAlgorithms(bool kinodynamic)
+std::vector<std::string> PlannerMultiInput::GetAlgorithms(TiXmlElement *node, bool kinodynamic)
 {
-  std::string pidef = util::GetDataFolder()+"/../settings/planner.xml";
-  TiXmlDocument doc(pidef);
-  TiXmlElement *node = GetRootNodeFromDocument(doc);
-
-  CheckNodeName(node, "planner");
-
   TiXmlElement* node_algorithm = FindFirstSubNode(node, "algorithm");
   std::vector<std::string> algorithms;
   while(node_algorithm){
@@ -38,6 +32,20 @@ std::vector<std::string> PlannerMultiInput::GetAlgorithms(bool kinodynamic)
   }
   return algorithms;
 }
+std::vector<std::string> PlannerMultiInput::GetAlgorithmsDefault(bool kinodynamic)
+{
+  std::string pidef = util::GetDataFolder()+"/../settings/planner.xml";
+  TiXmlDocument doc(pidef);
+  TiXmlElement *node = GetRootNodeFromDocument(doc);
+
+  CheckNodeName(node, "planner");
+  return GetAlgorithms(node, kinodynamic);
+}
+std::vector<std::string> PlannerMultiInput::GetAlgorithmsCustom(TiXmlElement *node, bool kinodynamic)
+{
+  CheckNodeName(node, "plannerinput");
+  return GetAlgorithms(node, kinodynamic);
+}
 
 bool PlannerMultiInput::Load(TiXmlElement *node){
   CheckNodeName(node, "world");
@@ -49,8 +57,20 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
   }
 
   bool kinodynamic = GetSubNodeTextDefault<int>(node_plannerinput, "kinodynamic", false);
-  std::vector<std::string> algorithms = GetAlgorithms(kinodynamic);
+
+  TiXmlElement* node_algorithms = FindSubNode(node_plannerinput, "algorithm");
+  bool hasCustomAlgorithms = (node_algorithms != nullptr);
+  
+  std::vector<std::string> algorithms;
+
+  if(hasCustomAlgorithms){
+      algorithms = GetAlgorithmsCustom(node_plannerinput, kinodynamic);
+  }else{
+      algorithms = GetAlgorithmsDefault(kinodynamic);
+  }
   const int i_hierarchy = CountNumberOfSubNodes(node_plannerinput, "hierarchy");
+
+
 
   for(uint k_algorithm = 0; k_algorithm < algorithms.size(); k_algorithm++){
     std::string name_algorithm = algorithms.at(k_algorithm);
@@ -125,6 +145,7 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
   smoothPath = GetSubNodeTextDefault(node, "smoothPath", smoothPath);
   name_sampler = GetSubNodeAttributeDefault<std::string>(node, "sampler", "name", name_sampler);
   kinodynamic = GetSubNodeTextDefault(node, "kinodynamic", kinodynamic);
+  name_loadPath = GetSubNodeAttributeDefault<std::string>(node, "loadPath", "file", name_loadPath);
   if(kinodynamic)
   {
     uMin = GetSubNodeAttribute<Config>(node, "control_min", "config");
@@ -162,7 +183,7 @@ void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy_index)
   if(node_hierarchy){
     TiXmlElement* lindex = FindFirstSubNode(node_hierarchy, "level");
     //layers.clear();
-    while(lindex!=NULL){
+    while(lindex!=nullptr){
       Layer layer;
 
       layer.level = level++;
@@ -208,6 +229,7 @@ const StrategyInput& PlannerInput::GetStrategyInput()
   sin->dq_init = dq_init;
   sin->dq_goal = dq_goal;
   sin->name_sampler = name_sampler;
+  sin->name_loadPath = name_loadPath;
   sin->name_algorithm = name_algorithm;
   sin->epsilon_goalregion = epsilon_goalregion;
   sin->max_planning_time = max_planning_time;
@@ -235,6 +257,7 @@ std::ostream& operator<< (std::ostream& out, const PlannerInput& pin)
   out << "SE3_max            : " << pin.se3max << std::endl;
   out << "algorithm          : " << pin.name_algorithm << std::endl;
   out << "sampler            : " << pin.name_sampler << std::endl;
+  out << "loadPath           : " << pin.name_loadPath << std::endl;
   out << "discr timestep     : [" << pin.timestep_min << "," << pin.timestep_max << "]" << std::endl;
   out << "max planning time  : " << pin.max_planning_time << " (seconds)" << std::endl;
   out << "epsilon_goalregion : " << pin.epsilon_goalregion << std::endl;

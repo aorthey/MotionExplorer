@@ -5,6 +5,8 @@
 #include <ompl/geometric/planners/quotientspace/datastructures/PlannerDataVertexAnnotated.h>
 #include <ompl/geometric/planners/quotientspace/Explorer.h>
 #include <ompl/geometric/planners/quotientspace/QRRT.h>
+#include <ompl/geometric/planners/quotientspace/Optimizer.h>
+#include <ompl/geometric/PathGeometric.h>
 
 #include <ompl/control/planners/rrt/RRT.h>
 #include <ompl/control/planners/est/EST.h>
@@ -55,8 +57,8 @@ StrategyKinodynamicMultiLevel::StrategyKinodynamicMultiLevel()
 
 ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
     std::vector<ob::SpaceInformationPtr> si_vec, 
-    std::vector<ob::ProblemDefinitionPtr> pdef_vec)
-
+    std::vector<ob::ProblemDefinitionPtr> pdef_vec,
+    const StrategyInput& input)
 {
   ob::PlannerPtr planner;
   //assume last cspace is dynamic
@@ -74,6 +76,15 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
     planner = std::make_shared<oc::KPIECE1>(si);
   }else if(algorithm=="hierarchy:explorer"){
     planner = std::make_shared<og::MotionExplorer>(si_vec);
+  }else if(algorithm=="optimizer"){
+    si->setup();
+    ob::PathPtr tmp = std::make_shared<og::PathGeometric>(si);
+    CSpaceOMPL* cspace = input.cspace_levels.back();
+    PathPiecewiseLinear *path = new PathPiecewiseLinear(tmp, cspace, cspace);
+    std::string fpath = input.name_loadPath;
+    path->Load(fpath.c_str());
+    std::cout << "load current path from : " << fpath << std::endl;
+    planner = std::make_shared<og::Optimizer>(si, path->GetOMPLPath());
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     throw "Planner unknown.";
@@ -143,7 +154,7 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
     std::cout << "NYI" << std::endl;
     throw "NYI";
   }else{
-    planner = GetPlanner(algorithm, si_vec, pdef_vec);
+    planner = GetPlanner(algorithm, si_vec, pdef_vec, input);
     planner->setup();
     planner->clear();
     isInitialized = true;
@@ -182,6 +193,7 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
   //###########################################################################
   ob::PlannerDataPtr pd( new ob::PlannerData(planner->getSpaceInformation()) );
   planner->getPlannerData(*pd);
+
   unsigned int N = planner->getProblemDefinition()->getSolutionCount();
   if(N>0){
       ob::PlannerSolution solution = planner->getProblemDefinition()->getSolutions().at(0);

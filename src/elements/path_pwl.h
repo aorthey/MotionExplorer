@@ -25,6 +25,8 @@ class PathPiecewiseLinear
     PathPiecewiseLinear(CSpaceOMPL *cspace);
     PathPiecewiseLinear(ob::PathPtr p, CSpaceOMPL *cspace, CSpaceOMPL *quotient_space);
 
+    ob::PathPtr GetOMPLPath() const;
+
     Config Eval(const double t) const;
     Config EvalVelocity(const double t) const;
     Vector EvalVelocityVec3(const double t) const;

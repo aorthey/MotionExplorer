@@ -20,18 +20,18 @@ TiXmlElement* GetRootNodeFromDocument(TiXmlDocument& doc)
   }else{
     std::cout << doc.ErrorDesc() << std::endl;
   }
-  return NULL;
+  return nullptr;
 }
 
 TiXmlElement* FindSubNode(TiXmlElement* node, const char *name){
-  if(!node) return NULL;
+  if(!node) return nullptr;
   TiXmlElement* e=node->FirstChildElement();
-  while(e != NULL) 
+  while(e != nullptr) 
   {
     if(0==strcmp(e->Value(),name)) return e; 
     e = e->NextSiblingElement();
   }
-  return NULL;
+  return nullptr;
 }
 
 TiXmlElement* FindFirstSubNode(TiXmlElement* node, const char *name)
@@ -43,21 +43,21 @@ TiXmlElement* FindNextSiblingNode(TiXmlElement* node){
   return FindNextSiblingNode(node, node->Value());
 }
 TiXmlElement* FindNextSiblingNode(TiXmlElement* node, const char *name){
-  while(node != NULL) 
+  while(node != nullptr) 
   {
     node = node->NextSiblingElement();
-    if(node!=NULL){
+    if(node!=nullptr){
       if(0==strcmp(node->Value(),name)) return node; 
     }
   }
-  return NULL;
+  return nullptr;
 }
 
 int CountNumberOfSubNodes(TiXmlElement* parent, const char *name)
 {
   TiXmlElement* node = FindFirstSubNode(parent, name);
   int ctr = 0;
-  while(node != NULL){
+  while(node != nullptr){
     ctr++;
     node = FindNextSiblingNode(node);
   }

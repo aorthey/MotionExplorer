@@ -161,21 +161,21 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     if(path)
     {
       std::string rname = planners.at(active_planner)->GetInput().environment_name;
-      std::string fname = "../data/samples/path_"+rname;
+      std::string fname = "../data/paths/path_"+rname;
       path->Save(fname.c_str());
       std::cout << "save current path to : " << fname << std::endl;
     }else{
       std::cout << "cannot save non-existing path." << std::endl;
     }
   }else if(cmd=="load_current_path"){
-    std::cout << "load_current_path: NYI" << std::endl;
-    // if(!path)
+    // MotionPlanner* planner = planners.at(active_planner); // std::string fn = planner->GetInput().name_loadPath;
+    // std::cout << "Try to load path current path from : " << fn << std::endl;
+    // path = planner->GetPath();
+    // // if(!path)
+    // // {
+    // //   path = new PathPiecewiseLinear();
+    // // }
     // {
-    //   MotionPlanner* planner = planners.at(active_planner);
-    //   path = new PathPiecewiseLinear();
-    // }
-    // {
-    //   std::string fn = "mypath.xml";
     //   path->Load(fn.c_str());
     //   std::cout << "load current path from : " << fn << std::endl;
     // }

@@ -25,7 +25,8 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
     length = gpath.length();
     std::vector<ob::State *> states = gpath.getStates();
 
-    for(uint k = 0; k < states.size()-1; k++){
+    uint Nstates = std::max(0,(int)states.size()-1);
+    for(uint k = 0; k < Nstates; k++){
       ob::State *s0 = states.at(k);
       ob::State *s1 = states.at(k+1);
       interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
@@ -46,6 +47,10 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
 
     path = std::make_shared<oc::PathControl>(cpath);
   }
+}
+ob::PathPtr PathPiecewiseLinear::GetOMPLPath() const
+{
+  return path;
 }
 
 void PathPiecewiseLinear::SendToController(SmartPointer<RobotController> controller)
@@ -702,7 +707,7 @@ bool PathPiecewiseLinear::Load(TiXmlElement *node)
   interLength.clear();
 
   TiXmlElement* node_il = FindFirstSubNode(node, "interlength");
-  while(node_il!=NULL){
+  while(node_il!=nullptr){
     double tmp;
     GetStreamText(node_il) >> tmp;
     interLength.push_back(tmp);
@@ -715,7 +720,7 @@ bool PathPiecewiseLinear::Load(TiXmlElement *node)
     ob::StateSpacePtr space = si->getStateSpace();
     gpath.clear();
     TiXmlElement* node_state = FindFirstSubNode(node, "state");
-    while(node_state!=NULL){
+    while(node_state!=nullptr){
       std::vector<double> tmp = GetNodeVector<double>(node_state);
       ob::State *state = si->allocState();
       space->copyFromReals(state, tmp);
@@ -730,7 +735,7 @@ bool PathPiecewiseLinear::Load(TiXmlElement *node)
     ob::StateSpacePtr space = si->getStateSpace();
     gpath.clear();
     TiXmlElement* node_state = FindFirstSubNode(node, "rawstate");
-    while(node_state!=NULL){
+    while(node_state!=nullptr){
       std::vector<double> tmp = GetNodeVector<double>(node_state);
       ob::State *state = si->allocState();
       space->copyFromReals(state, tmp);

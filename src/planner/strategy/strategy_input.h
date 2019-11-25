@@ -16,6 +16,7 @@ struct StrategyInput{
   std::string name_algorithm;
   std::string name_sampler;
   std::string environment_name;
+  std::string name_loadPath;
   double max_planning_time;
   double epsilon_goalregion;
 
