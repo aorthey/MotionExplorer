@@ -32,20 +32,17 @@ Please make sure you have a github.com account AND ssh access from your workstat
     git clone git@github.com:aorthey/MotionPlanningExplorerGUI.git
     cd MotionPlanningExplorerGUI
     ./install_script.sh
-    cd build
-    make planner_gui
     
 </ol>
 
 <h1>Use</h1>
 
-Example run:
+Examples
 
 <ol>
   <li> 02D_manipulator
     
-    cd /build
-    ./planner_gui ../data/experiments_ICRA2020/02D_manipulator.xml
+    ./planner_gui ../data/experiments/02D_manipulator.xml
     
 </ol>
 
