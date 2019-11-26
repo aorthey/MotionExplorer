@@ -1,15 +1,16 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="dubins_car" file="../robots/dubinscar/dubinscar.urdf"/>
-  <robot name="dubins_car" file="../robots/dubinscar/dubinscar.urdf"/>
-  <robot name="disk_inner" file="../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="disk_inner" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
 
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="0 0 0" rotateRPY="0 0 0"/>
   <plannerinput>
 
-    <qinit  config="15  -1.5 0.0 +0.0 -3.14 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
+    <qinit  config="15  -3.5 0.0 +0.0 -0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
     <dqinit config="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0  "/>
-    <qgoal  config="15  +1.5 0.0 +0.0 +0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
+    <qgoal  config="15  +3.5 0.0 +0.0 +0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
     <dqgoal config="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0  "/>
 
     <se3min config="6  -4.0 -3.0 -0.0 -3.141593 0 0"/>

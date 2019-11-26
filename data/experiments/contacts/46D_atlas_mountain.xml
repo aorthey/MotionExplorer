@@ -4,17 +4,17 @@
 <world>
 
 
-  <robot name="atlas" file="../robots/atlas/atlas.urdf"/>
+  <robot name="atlas" file="../../robots/atlas/atlas.urdf"/>
 
   <!-- <terrain name="mountain" file="../terrains/mountain/ridge.tri" translation="0 0 0" rotateRPY="0 0 0"> -->
   <!--  <display color="0.9 0.5 0.3"/> -->
   <!-- </terrain> -->
-  <terrain file="../terrains/primitives/plane.tri"/>
+  <terrain file="../../terrains/primitives/plane.tri"/>
 
   <plannerinput>
 
     <qinit config="46      -0 0 0.96 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
-    <qgoal config="46      +1 0 0.96 1 0 0 0 0 0 0 -1 0 0.8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 -0.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+    <qgoal config="46      +3 0 0.96 1 0 0 0 0 0 0 -1 0 0.8 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 -0.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
 
     <freeFloating>1</freeFloating>
     <epsilongoalregion>0.1</epsilongoalregion>

@@ -2,8 +2,8 @@
 #include <KrisLibrary/GLdraw/GLColor.h>
 typedef GLDraw::GLColor GLColor;
 
-const GLColor red(1,0,0,1);
-const GLColor green(0,1,0,1);
+const GLColor red(0.6,0.1,0.1,1);
+const GLColor green(0.1,0.6,0.1,1);
 const GLColor blue(0,0,1,1);
 
 const GLColor yellow(1,1,0,1);
