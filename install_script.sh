@@ -121,4 +121,4 @@ mkdir -p build
 cd build
 cmake ..
 make -j$(nproc) planner_gui
-./planner_gui ../data/experiments/15D_planar_manipulator.xml
+./planner_gui ../data/experiments/02D_manipulator.xml
