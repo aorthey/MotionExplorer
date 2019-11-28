@@ -19,7 +19,7 @@ PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
 PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CSpaceOMPL *quotient_space_):
   cspace(cspace_), quotient_space(quotient_space_), path(p_), path_raw(p_)
 {
-  if(1){//!cspace->isDynamic()){
+  if(!cspace->isDynamic()){
     og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
 
     length = gpath.length();
@@ -32,7 +32,6 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
       interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
     }
 
-    path = std::make_shared<og::PathGeometric>(gpath);
   }else{
     oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
 
@@ -45,7 +44,6 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
       interLength.push_back(cpath.getSpaceInformation()->distance(s0,s1));
     }
 
-    path = std::make_shared<oc::PathControl>(cpath);
   }
 }
 ob::PathPtr PathPiecewiseLinear::GetOMPLPath() const
@@ -205,7 +203,8 @@ Config PathPiecewiseLinear::Eval(const double t) const{
     std::cout << "length    : " << Tcum << "/" << length << std::endl;
     std::cout << "difference: " << length-Tcum << " > " << epsilon << std::endl;
     std::cout << "choosen t : " << t << std::endl;
-    throw;
+    OMPL_ERROR("Length of path different from computed length.");
+    exit(0);
   }
 
   if(t>=Tcum){
