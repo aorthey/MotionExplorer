@@ -70,15 +70,14 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
   }
   const int i_hierarchy = CountNumberOfSubNodes(node_plannerinput, "hierarchy");
 
-
-
   for(uint k_algorithm = 0; k_algorithm < algorithms.size(); k_algorithm++){
     std::string name_algorithm = algorithms.at(k_algorithm);
-    if(util::StartsWith(name_algorithm, "benchmark")){
+    if(util::StartsWith(name_algorithm, "benchmark") || util::StartsWith(name_algorithm, "fiberoptimizer")){
       PlannerInput* input = new PlannerInput();
       input->name_algorithm = algorithms.at(k_algorithm);
       if(!input->Load(node_plannerinput)) return false;
 
+      std::cout << "HIERARCHIES:" << i_hierarchy << std::endl;
       for(uint k_hierarchy = 0; k_hierarchy < (uint)i_hierarchy; k_hierarchy++){
         input->ExtractHierarchy(node_plannerinput, k_hierarchy);
       }

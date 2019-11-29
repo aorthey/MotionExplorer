@@ -178,7 +178,9 @@ void MotionPlanner::CreateHierarchy()
     hierarchy->AddNode( std::make_shared<Roadmap>(), path ); 
   }
 
-  if(util::StartsWith(algorithm, "benchmark")){
+  if(util::StartsWith(algorithm, "benchmark") || 
+     util::StartsWith(algorithm, "fiberoptimizer") 
+     ){
     if(input.stratifications.empty()){
       OMPL_INFORM("Benchmark has no stratifications");
       return;

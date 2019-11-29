@@ -12,6 +12,7 @@
   <algorithm name="hierarchy:qrrt"/>
   <algorithm name="hierarchy:explorer"/>
   <algorithm name="ompl:rrt"/>
+  <algorithm name="fiberoptimizer:qrrt"/>
   <algorithm name="ompl:prm"/>
   <!-- <algorithm name="benchmark:minimal"/> -->
   <!-- <algorithm name="ompl:rrt"/> -->
