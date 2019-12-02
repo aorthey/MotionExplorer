@@ -211,27 +211,27 @@ void StrategyGeometricMultiLevel::Init( const StrategyInput &input )
   if(util::StartsWith(algorithm,"benchmark")){
     //No Init, directly execute benchmark
     RunBenchmark(input);
-  }else if (util::StartsWith(algorithm,"fiberoptimizer")){
-    std::vector<std::vector<ob::SpaceInformationPtr>> allFiberBundles;
-    for(uint k = 0; k < input.cspace_stratifications.size(); k++){
-      std::vector<CSpaceOMPL*> cspace_strat_k = input.cspace_stratifications.at(k);
-      OMPLGeometricStratificationPtr stratification = OMPLGeometricStratificationFromCSpaceStratification(input, cspace_strat_k);
-      //const ob::ProblemDefinitionPtr pdef = stratifications.at(0)->pdef_vec.back();
-      std::vector<ob::SpaceInformationPtr> siVec = stratification->si_vec;
-      allFiberBundles.push_back(siVec);
-      //const ob::ProblemDefinitionPtr pdef = stratification->pdef_vec.back();
-    }
-    // if(algorithm=="fiberoptimizer:qrrt"){
-    //   OMPLGeometricStratificationPtr stratification = 
-    //     OMPLGeometricStratificationFromCSpaceStratification(input, input.cspace_levels);
-    //   const ob::SpaceInformationPtr si = stratification->si_vec.back();
-    //   const ob::ProblemDefinitionPtr pdef = stratification->pdef_vec.back();
-    //   // planner = std::make_shared<og::FiberOP>(si, allFiberBundles);
-    //   planner->setProblemDefinition(pdef);
-    }else{
-      std::cout << algorithm << " not found." << std::endl;
-      exit(0);
-    }
+  //}else if (util::StartsWith(algorithm,"fiberoptimizer")){
+  //  std::vector<std::vector<ob::SpaceInformationPtr>> allFiberBundles;
+  //  for(uint k = 0; k < input.cspace_stratifications.size(); k++){
+  //    std::vector<CSpaceOMPL*> cspace_strat_k = input.cspace_stratifications.at(k);
+  //    OMPLGeometricStratificationPtr stratification = OMPLGeometricStratificationFromCSpaceStratification(input, cspace_strat_k);
+  //    //const ob::ProblemDefinitionPtr pdef = stratifications.at(0)->pdef_vec.back();
+  //    std::vector<ob::SpaceInformationPtr> siVec = stratification->si_vec;
+  //    allFiberBundles.push_back(siVec);
+  //    //const ob::ProblemDefinitionPtr pdef = stratification->pdef_vec.back();
+  //  }
+  //  // if(algorithm=="fiberoptimizer:qrrt"){
+  //  //   OMPLGeometricStratificationPtr stratification = 
+  //  //     OMPLGeometricStratificationFromCSpaceStratification(input, input.cspace_levels);
+  //  //   const ob::SpaceInformationPtr si = stratification->si_vec.back();
+  //  //   const ob::ProblemDefinitionPtr pdef = stratification->pdef_vec.back();
+  //  //   // planner = std::make_shared<og::FiberOP>(si, allFiberBundles);
+  //  //   planner->setProblemDefinition(pdef);
+  //  // }else{
+  //  //   std::cout << algorithm << " not found." << std::endl;
+  //  //   exit(0);
+  //  // }
   }else{
     OMPLGeometricStratificationPtr stratification = 
       OMPLGeometricStratificationFromCSpaceStratification(input, input.cspace_levels);
