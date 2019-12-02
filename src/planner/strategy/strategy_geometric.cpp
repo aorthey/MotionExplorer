@@ -5,7 +5,7 @@
 
 #include <ompl/geometric/planners/quotientspace/Explorer.h>
 #include <ompl/geometric/planners/quotientspace/QRRT.h>
-#include <ompl/geometric/planners/fiberbundle/FiberOP.h>
+// #include <ompl/geometric/planners/fiberbundle/FiberOP.h>
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -221,13 +221,13 @@ void StrategyGeometricMultiLevel::Init( const StrategyInput &input )
       allFiberBundles.push_back(siVec);
       //const ob::ProblemDefinitionPtr pdef = stratification->pdef_vec.back();
     }
-    if(algorithm=="fiberoptimizer:qrrt"){
-      OMPLGeometricStratificationPtr stratification = 
-        OMPLGeometricStratificationFromCSpaceStratification(input, input.cspace_levels);
-      const ob::SpaceInformationPtr si = stratification->si_vec.back();
-      const ob::ProblemDefinitionPtr pdef = stratification->pdef_vec.back();
-      planner = std::make_shared<og::FiberOP>(si, allFiberBundles);
-      planner->setProblemDefinition(pdef);
+    // if(algorithm=="fiberoptimizer:qrrt"){
+    //   OMPLGeometricStratificationPtr stratification = 
+    //     OMPLGeometricStratificationFromCSpaceStratification(input, input.cspace_levels);
+    //   const ob::SpaceInformationPtr si = stratification->si_vec.back();
+    //   const ob::ProblemDefinitionPtr pdef = stratification->pdef_vec.back();
+    //   // planner = std::make_shared<og::FiberOP>(si, allFiberBundles);
+    //   planner->setProblemDefinition(pdef);
     }else{
       std::cout << algorithm << " not found." << std::endl;
       exit(0);
