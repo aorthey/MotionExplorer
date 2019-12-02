@@ -19,7 +19,8 @@ PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
 PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CSpaceOMPL *quotient_space_):
   cspace(cspace_), quotient_space(quotient_space_), path(p_), path_raw(p_)
 {
-  if(!cspace->isDynamic()){
+  //if(!cspace->isDynamic()){
+  if(1){
     og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
 
     length = gpath.length();
