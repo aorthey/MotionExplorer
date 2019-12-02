@@ -212,7 +212,6 @@ void StrategyGeometricMultiLevel::Init( const StrategyInput &input )
     //No Init, directly execute benchmark
     RunBenchmark(input);
   }else if (util::StartsWith(algorithm,"fiberoptimizer")){
-    std::cout << input.cspace_stratifications.size() << " FIBERS."<< std::endl;
     std::vector<std::vector<ob::SpaceInformationPtr>> allFiberBundles;
     for(uint k = 0; k < input.cspace_stratifications.size(); k++){
       std::vector<CSpaceOMPL*> cspace_strat_k = input.cspace_stratifications.at(k);
