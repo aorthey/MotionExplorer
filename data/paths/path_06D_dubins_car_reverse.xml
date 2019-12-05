@@ -1,0 +1,210 @@
+<?xml version="1.0" ?>
+<path_piecewise_linear>
+    <length>11.3267</length>
+    <number_of_milestones>51</number_of_milestones>
+    <!--Interlength: Length between States-->
+    <interlength>0.282617</interlength>
+    <interlength>0.327822</interlength>
+    <interlength>0.369494</interlength>
+    <interlength>0.189693</interlength>
+    <interlength>0.341579</interlength>
+    <interlength>0.200197</interlength>
+    <interlength>0.210845</interlength>
+    <interlength>0.312997</interlength>
+    <interlength>0.281822</interlength>
+    <interlength>0.147643</interlength>
+    <interlength>0.327316</interlength>
+    <interlength>0.174232</interlength>
+    <interlength>0.180387</interlength>
+    <interlength>0.193787</interlength>
+    <interlength>0.118918</interlength>
+    <interlength>0.169768</interlength>
+    <interlength>0.341828</interlength>
+    <interlength>0.132964</interlength>
+    <interlength>0.277975</interlength>
+    <interlength>0.170722</interlength>
+    <interlength>0.44388</interlength>
+    <interlength>0.239195</interlength>
+    <interlength>0.147337</interlength>
+    <interlength>0.16155</interlength>
+    <interlength>0.20949</interlength>
+    <interlength>0.195017</interlength>
+    <interlength>0.475906</interlength>
+    <interlength>0.19344</interlength>
+    <interlength>0.245105</interlength>
+    <interlength>0.246773</interlength>
+    <interlength>0.120702</interlength>
+    <interlength>0.275819</interlength>
+    <interlength>0.290251</interlength>
+    <interlength>0.185205</interlength>
+    <interlength>0.147104</interlength>
+    <interlength>0.193253</interlength>
+    <interlength>0.205778</interlength>
+    <interlength>0.324787</interlength>
+    <interlength>0.0713634</interlength>
+    <interlength>0.19771</interlength>
+    <interlength>0.127668</interlength>
+    <interlength>0.1118</interlength>
+    <interlength>0.302524</interlength>
+    <interlength>0.296767</interlength>
+    <interlength>0.198226</interlength>
+    <interlength>0.21503</interlength>
+    <interlength>0.163515</interlength>
+    <interlength>0.143491</interlength>
+    <interlength>0.301988</interlength>
+    <interlength>0.14342</interlength>
+    <!--States: Sequence of Configurations in Bundle Space-->
+    <state>6  -1 0 3.14 0.3 0 0 </state>
+    <state>6  -1.20397 0.0020936 3.11523 0.3 0 -0.0662458 </state>
+    <state>6  -1.42194 0.015353 3.03798 0.3 0 -0.137076 </state>
+    <state>6  -1.64507 0.0528944 2.90248 0.3 0 -0.21255 </state>
+    <state>6  -1.763 0.0873861 2.81029 0.3 0 -0.233276 </state>
+    <state>6  -1.97123 0.17917 2.64658 0.3 0 -0.201109 </state>
+    <state>6  -2.08576 0.248065 2.55211 0.3 0 -0.220412 </state>
+    <state>6  -2.19895 0.33286 2.44394 0.3 0 -0.235745 </state>
+    <state>6  -2.35677 0.490791 2.2676 0.3 0 -0.237302 </state>
+    <state>6  -2.47116 0.6517 2.10935 0.3 0 -0.242577 </state>
+    <state>6  -2.51952 0.740819 2.02645 0.3 0 -0.24737 </state>
+    <state>6  -2.60022 0.954738 1.83614 0.3 0 -0.2509 </state>
+    <state>6  -2.62398 1.06205 1.74041 0.3 0 -0.267353 </state>
+    <state>6  -2.63763 1.17857 1.63372 0.3 0 -0.277084 </state>
+    <state>6  -2.63878 1.29758 1.52872 0.3 0 -0.254821 </state>
+    <state>6  -2.6332 1.37321 1.46602 0.3 0 -0.243083 </state>
+    <state>6  -2.61736 1.47858 1.37609 0.3 0 -0.261326 </state>
+    <state>6  -2.55051 1.69762 1.17169 0.3 0 -0.271942 </state>
+    <state>6  -2.51152 1.78031 1.08878 0.3 0 -0.272029 </state>
+    <state>6  -2.41429 1.93341 0.919967 0.3 0 -0.284231 </state>
+    <state>6  -2.35014 2.01011 0.830036 0.3 0 -0.258462 </state>
+    <state>6  -2.15772 2.17544 0.580417 0.3 0 -0.323843 </state>
+    <state>6  -2.03695 2.2428 0.439432 0.3 0 -0.293429 </state>
+    <state>6  -1.95581 2.27666 0.350489 0.3 0 -0.308375 </state>
+    <state>6  -1.85967 2.30635 0.249161 0.3 0 -0.298116 </state>
+    <state>6  -1.72284 2.33127 0.111226 0.3 0 -0.296665 </state>
+    <state>6  -1.60392 2.33771 -0.00178879 0.3 0 -0.277252 </state>
+    <state>6  -1.32763 2.30609 -0.211894 0.3 0 -0.184494 </state>
+    <state>6  -1.19642 2.27233 -0.290406 0.3 0 -0.165793 </state>
+    <state>6  -1.04685 2.21971 -0.38928 0.3 0 -0.202901 </state>
+    <state>6  -0.916764 2.15808 -0.499422 0.3 0 -0.250658 </state>
+    <state>6  -0.851843 2.1199 -0.564311 0.3 0 -0.263601 </state>
+    <state>6  -0.716586 2.02061 -0.698488 0.3 0 -0.222661 </state>
+    <state>6  -0.588405 1.89952 -0.809862 0.3 0 -0.164431 </state>
+    <state>6  -0.497233 1.79648 -0.882126 0.3 0 -0.152941 </state>
+    <state>6  -0.434706 1.71665 -0.929344 0.3 0 -0.130845 </state>
+    <state>6  -0.354279 1.60244 -0.983189 0.3 0 -0.104207 </state>
+    <state>6  -0.27562 1.47874 -1.02252 0.3 0 -0.0646838 </state>
+    <state>6  -0.136978 1.23792 -1.07085 0.3 0 -0.0419384 </state>
+    <state>6  -0.109588 1.18723 -1.08021 0.3 0 -0.0510011 </state>
+    <state>6  -0.0370588 1.04815 -1.09721 0.3 0 -0.0186428 </state>
+    <state>6  0.00893767 0.95816 -1.09797 0.3 0 0.00758286 </state>
+    <state>6  0.0492551 0.879833 -1.09195 0.3 0 0.0282761 </state>
+    <state>6  0.152109 0.690612 -1.04625 0.3 0 0.0925848 </state>
+    <state>6  0.262055 0.516448 -0.963563 0.3 0 0.142044 </state>
+    <state>6  0.346751 0.403309 -0.891209 0.3 0 0.162764 </state>
+    <state>6  0.437597 0.299835 -0.806803 0.3 0 0.197897 </state>
+    <state>6  0.511693 0.22783 -0.73402 0.3 0 0.2217 </state>
+    <state>6  0.585126 0.166242 -0.661184 0.3 0 0.232932 </state>
+    <state>6  0.760002 0.0520214 -0.494856 0.3 0 0.242882 </state>
+    <state>6  0.851134 0.00756413 -0.412941 0.3 0 0.241817 </state>
+    <!--Controls: Sequence of Controls applied inbetwen States-->
+    <control>7  0 0 0 -0.0974255 0 0 0.0679964 </control>
+    <control>7  0 0 0 -0.0972831 0 0 0.0910106 </control>
+    <control>7  0 0 0 -0.0999923 0 0 0.0943496 </control>
+    <control>7  0 0 0 -0.0505851 0 0 0.0819457 </control>
+    <control>7  0 0 0 0.0423606 0 0 0.0759371 </control>
+    <control>7  0 0 0 -0.0433101 0 0 0.0557115 </control>
+    <control>7  0 0 0 -0.0325109 0 0 0.0786072 </control>
+    <control>7  0 0 0 -0.00208913 0 0 0.0931514 </control>
+    <control>7  0 0 0 -0.00800671 0 0 0.073195 </control>
+    <control>7  0 0 0 -0.0141763 0 0 0.0338091 </control>
+    <control>7  0 0 0 -0.00462572 0 0 0.0848069 </control>
+    <control>7  0 0 0 -0.0448897 0 0 0.0916301 </control>
+    <control>7  0 0 0 -0.0248734 0 0 0.0391223 </control>
+    <control>7  0 0 0 0.0560921 0 0 0.0496141 </control>
+    <control>7  0 0 0 0.0464264 0 0 0.0421368 </control>
+    <control>7  0 0 0 -0.0513444 0 0 0.0355311 </control>
+    <control>7  0 0 0 -0.0138829 0 0 0.0955872 </control>
+    <control>7  0 0 0 -0.000283433 0 0 0.0508045 </control>
+    <control>7  0 0 0 -0.0201597 0 0 0.0756602 </control>
+    <control>7  0 0 0 0.0772926 0 0 0.0416753 </control>
+    <control>7  0 0 0 -0.0771157 0 0 0.0847832 </control>
+    <control>7  0 0 0 0.0659233 0 0 0.0922691 </control>
+    <control>7  0 0 0 -0.0509821 0 0 0.0977203 </control>
+    <control>7  0 0 0 0.0305746 0 0 0.0838911 </control>
+    <control>7  0 0 0 0.00312599 0 0 0.0515491 </control>
+    <control>7  0 0 0 0.0488756 0 0 0.0992993 </control>
+    <control>7  0 0 0 0.0998789 0 0 0.09287 </control>
+    <control>7  0 0 0 0.0414013 0 0 0.0645316 </control>
+    <control>7  0 0 0 -0.0701826 0 0 0.0755351 </control>
+    <control>7  0 0 0 -0.0994811 0 0 0.05334 </control>
+    <control>7  0 0 0 -0.0515453 0 0 0.0502189 </control>
+    <control>7  0 0 0 0.0731426 0 0 0.0932873 </control>
+    <control>7  0 0 0 0.0990179 0 0 0.0840117 </control>
+    <control>7  0 0 0 0.0250474 0 0 0.0917423 </control>
+    <control>7  0 0 0 0.0653674 0 0 0.0676061 </control>
+    <control>7  0 0 0 0.0572013 0 0 0.066528 </control>
+    <control>7  0 0 0 0.08088 0 0 0.0977319 </control>
+    <control>7  0 0 0 0.024554 0 0 0.0926343 </control>
+    <control>7  0 0 0 -0.0471847 0 0 0.0960344 </control>
+    <control>7  0 0 0 0.0618882 0 0 0.0746929 </control>
+    <control>7  0 0 0 0.0778496 0 0 0.0842191 </control>
+    <control>7  0 0 0 0.0704694 0 0 0.0734122 </control>
+    <control>7  0 0 0 0.0895718 0 0 0.0717956 </control>
+    <control>7  0 0 0 0.072019 0 0 0.0858432 </control>
+    <control>7  0 0 0 0.043974 0 0 0.0523553 </control>
+    <control>7  0 0 0 0.0765217 0 0 0.0918238 </control>
+    <control>7  0 0 0 0.0690997 0 0 0.0430595 </control>
+    <control>7  0 0 0 0.035152 0 0 0.0355043 </control>
+    <control>7  0 0 0 0.0142746 0 0 0.0995783 </control>
+    <control>7  0 0 0 -0.00314967 0 0 0.0375651 </control>
+    <!--Duration for each Control-->
+    <controlDuration>10</controlDuration>
+    <controlDuration>8</controlDuration>
+    <controlDuration>8</controlDuration>
+    <controlDuration>5</controlDuration>
+    <controlDuration>10</controlDuration>
+    <controlDuration>8</controlDuration>
+    <controlDuration>6</controlDuration>
+    <controlDuration>8</controlDuration>
+    <controlDuration>9</controlDuration>
+    <controlDuration>10</controlDuration>
+    <controlDuration>9</controlDuration>
+    <controlDuration>4</controlDuration>
+    <controlDuration>10</controlDuration>
+    <controlDuration>8</controlDuration>
+    <controlDuration>6</controlDuration>
+    <controlDuration>10</controlDuration>
+    <controlDuration>8</controlDuration>
+    <controlDuration>6</controlDuration>
+    <controlDuration>8</controlDuration>
+    <controlDuration>8</controlDuration>
+    <controlDuration>10</controlDuration>
+    <controlDuration>5</controlDuration>
+    <controlDuration>3</controlDuration>
+    <controlDuration>4</controlDuration>
+    <controlDuration>9</controlDuration>
+    <controlDuration>4</controlDuration>
+    <controlDuration>10</controlDuration>
+    <controlDuration>7</controlDuration>
+    <controlDuration>7</controlDuration>
+    <controlDuration>9</controlDuration>
+    <controlDuration>5</controlDuration>
+    <controlDuration>6</controlDuration>
+    <controlDuration>7</controlDuration>
+    <controlDuration>5</controlDuration>
+    <controlDuration>5</controlDuration>
+    <controlDuration>7</controlDuration>
+    <controlDuration>5</controlDuration>
+    <controlDuration>10</controlDuration>
+    <controlDuration>2</controlDuration>
+    <controlDuration>7</controlDuration>
+    <controlDuration>4</controlDuration>
+    <controlDuration>4</controlDuration>
+    <controlDuration>10</controlDuration>
+    <controlDuration>8</controlDuration>
+    <controlDuration>9</controlDuration>
+    <controlDuration>5</controlDuration>
+    <controlDuration>8</controlDuration>
+    <controlDuration>9</controlDuration>
+    <controlDuration>7</controlDuration>
+    <controlDuration>9</controlDuration>
+</path_piecewise_linear>
