@@ -78,7 +78,6 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
     planner = std::make_shared<og::MotionExplorer>(si_vec);
   }else if(algorithm=="optimizer"){
     si->setup();
-    // ob::PathPtr tmp = std::make_shared<oc::PathControl>(si);
     CSpaceOMPL* cspace = input.cspace_levels.back();
     PathPiecewiseLinear *path = new PathPiecewiseLinear(cspace);
     std::string fpath = input.name_loadPath;
