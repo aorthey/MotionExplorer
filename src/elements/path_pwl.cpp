@@ -10,38 +10,53 @@
 #include <ompl/control/PathControl.h>
 #include <boost/math/constants/constants.hpp>
 
+namespace oc = ompl::control;
 
 PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
-  cspace(cspace_)
+  cspace(cspace_), quotient_space(cspace_)
 {
+  SetDefaultPath();
+}
+void PathPiecewiseLinear::SetDefaultPath()
+{
+  ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
+  if(cspace->isDynamic()){
+    path = std::make_shared<oc::PathControl>(si);
+  }else{
+    path = std::make_shared<og::PathGeometric>(si);
+  }
 }
 
 PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CSpaceOMPL *quotient_space_):
   cspace(cspace_), quotient_space(quotient_space_), path(p_), path_raw(p_)
 {
-  if(!cspace->isDynamic()){
-    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-    length = gpath.length();
-    std::vector<ob::State *> states = gpath.getStates();
-
-    uint Nstates = std::max(0,(int)states.size()-1);
-    for(uint k = 0; k < Nstates; k++){
-      ob::State *s0 = states.at(k);
-      ob::State *s1 = states.at(k+1);
-      interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
-    }
-
+  if(p_ == nullptr){
+    SetDefaultPath();
   }else{
-    oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
-    std::vector<ob::State *> states = cpath.getStates();
+    if(!cspace->isDynamic()){
+      og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+      length = gpath.length();
+      std::vector<ob::State *> states = gpath.getStates();
 
-    uint Nstates = std::max(0,(int)states.size()-1);
-    for(uint k = 0; k < Nstates; k++){
-      ob::State *s0 = states.at(k);
-      ob::State *s1 = states.at(k+1);
-      double d = cpath.getSpaceInformation()->distance(s0,s1);
-      interLength.push_back(d);
-      length+=d;
+      uint Nstates = std::max(0,(int)states.size()-1);
+      for(uint k = 0; k < Nstates; k++){
+        ob::State *s0 = states.at(k);
+        ob::State *s1 = states.at(k+1);
+        interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
+      }
+
+    }else{
+      oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+      std::vector<ob::State *> states = cpath.getStates();
+
+      uint Nstates = std::max(0,(int)states.size()-1);
+      for(uint k = 0; k < Nstates; k++){
+        ob::State *s0 = states.at(k);
+        ob::State *s1 = states.at(k+1);
+        double d = cpath.getSpaceInformation()->distance(s0,s1);
+        interLength.push_back(d);
+        length+=d;
+      }
     }
   }
 }
@@ -704,6 +719,7 @@ void PathPiecewiseLinear::DrawGL(GUIState& state)
 bool PathPiecewiseLinear::Load(const char* fn)
 {
   TiXmlDocument doc(fn);
+  std::cout << "Loading from " << fn << std::endl;
   return Load(GetRootNodeFromDocument(doc));
 }
 bool PathPiecewiseLinear::Load(TiXmlElement *node)
@@ -723,35 +739,86 @@ bool PathPiecewiseLinear::Load(TiXmlElement *node)
     node_il = FindNextSiblingNode(node_il);
   }
 
-  {
-    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-    ob::SpaceInformationPtr si = gpath.getSpaceInformation();
-    ob::StateSpacePtr space = si->getStateSpace();
-    gpath.clear();
+  if(quotient_space->isDynamic()){
+
+    //############################################################################
+    oc::PathControl *cpath = static_cast<oc::PathControl*>(path.get());
+    oc::SpaceInformationPtr siC = 
+      dynamic_pointer_cast<oc::SpaceInformation>(cpath->getSpaceInformation());
+    ob::StateSpacePtr space = siC->getStateSpace();
+    cpath->clear();
+
+    std::vector<ob::State*> states;
     TiXmlElement* node_state = FindFirstSubNode(node, "state");
     while(node_state!=nullptr){
       std::vector<double> tmp = GetNodeVector<double>(node_state);
-      ob::State *state = si->allocState();
+      ob::State *state = siC->allocState();
       space->copyFromReals(state, tmp);
-      gpath.append(state);
+      states.push_back(state);
       node_state = FindNextSiblingNode(node_state);
     }
-    path = std::make_shared<og::PathGeometric>(gpath);
-  }
-  {
-    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path_raw);
-    ob::SpaceInformationPtr si = gpath.getSpaceInformation();
-    ob::StateSpacePtr space = si->getStateSpace();
-    gpath.clear();
-    TiXmlElement* node_state = FindFirstSubNode(node, "rawstate");
-    while(node_state!=nullptr){
-      std::vector<double> tmp = GetNodeVector<double>(node_state);
-      ob::State *state = si->allocState();
-      space->copyFromReals(state, tmp);
-      gpath.append(state);
-      node_state = FindNextSiblingNode(node_state);
+
+    //############################################################################
+    uint N = quotient_space->GetControlDimensionality();
+    std::vector<oc::Control*> controls;
+    TiXmlElement* node_ctrl = FindFirstSubNode(node, "control");
+    while(node_ctrl!=nullptr){
+      std::vector<double> tmp = GetNodeVector<double>(node_ctrl);
+      oc::RealVectorControlSpace::ControlType *control = 
+        static_cast<oc::RealVectorControlSpace::ControlType*>(siC->allocControl());
+      for(uint j = 0; j < N; j++){
+        control->values[j] = tmp.at(j);
+      }
+      controls.push_back(control);
+      node_ctrl = FindNextSiblingNode(node_ctrl);
     }
-    path_raw = std::make_shared<og::PathGeometric>(gpath);
+    //############################################################################
+    TiXmlElement* node_ctrl_duration = FindFirstSubNode(node, "controlDuration");
+    std::vector<double> controlDurations;
+    while(node_ctrl_duration!=nullptr){
+      std::stringstream ss = GetStreamText(node_ctrl_duration);
+      double _tmp;
+      ss >> _tmp;
+      controlDurations.push_back(_tmp);
+      node_ctrl_duration = FindNextSiblingNode(node_ctrl_duration);
+    }
+    //############################################################################
+    for(uint k = 0; k < controls.size(); k++){
+      cpath->append(states.at(k), controls.at(k), controlDurations.at(k));
+    }
+    cpath->append(states.back());
+    //############################################################################
+  }else{
+    {
+      og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+      ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+      ob::StateSpacePtr space = si->getStateSpace();
+      gpath.clear();
+      TiXmlElement* node_state = FindFirstSubNode(node, "state");
+      while(node_state!=nullptr){
+        std::vector<double> tmp = GetNodeVector<double>(node_state);
+        ob::State *state = si->allocState();
+        space->copyFromReals(state, tmp);
+        gpath.append(state);
+        node_state = FindNextSiblingNode(node_state);
+      }
+      path = std::make_shared<og::PathGeometric>(gpath);
+    }
+    {
+      og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path_raw);
+      ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+      ob::StateSpacePtr space = si->getStateSpace();
+      gpath.clear();
+      TiXmlElement* node_state = FindFirstSubNode(node, "rawstate");
+      while(node_state!=nullptr){
+        std::vector<double> tmp = GetNodeVector<double>(node_state);
+        ob::State *state = si->allocState();
+        space->copyFromReals(state, tmp);
+        gpath.append(state);
+        node_state = FindNextSiblingNode(node_state);
+      }
+      path_raw = std::make_shared<og::PathGeometric>(gpath);
+    }
   }
   return true;
 }
@@ -783,31 +850,71 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
     AddSubNode(*node, "interlength", interLength.at(k));
   }
 
-  {
-    AddComment(*node, "Smoothed States: Sequence of Configurations in Configuration Space");
+  if(quotient_space->isDynamic()){
+    AddComment(*node, "States: Sequence of Configurations in Bundle Space");
 
-    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-    ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+    oc::PathControl *cpath = static_cast<oc::PathControl*>(path.get());
+
+    ob::SpaceInformationPtr si = cpath->getSpaceInformation();
     ob::StateSpacePtr space = si->getStateSpace();
-    std::vector<ob::State *> states = gpath.getStates();
+
+    //############################################################################
+    std::vector<ob::State *> states = cpath->getStates();
     for(uint k = 0; k < states.size(); k++){
       std::vector<double> state_k_serialized;
       space->copyToReals(state_k_serialized, states.at(k));
       AddSubNodeVector(*node, "state", state_k_serialized);
     }
-  }
+    //############################################################################
+    uint N = quotient_space->GetControlDimensionality();
+    AddComment(*node, "Controls: Sequence of Controls applied inbetwen States");
 
-  {
-    AddComment(*node, "Raw States: Unsmoothed");
+    std::vector<oc::Control*> &controls = cpath->getControls();
+    for(uint k = 0; k < controls.size(); k++){
+      double *control = 
+        controls.at(k)->as<oc::RealVectorControlSpace::ControlType>()->values;
+      std::vector<double> control_k_serialized;
+      for(uint j = 0; j < N; j++){
+        control_k_serialized.push_back(control[j]);
+      }
+      AddSubNodeVector(*node, "control", control_k_serialized);
+    }
+    //############################################################################
+    AddComment(*node, "Duration for each Control");
+    std::vector<double> ctrlDurations = cpath->getControlDurations();
 
-    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path_raw);
-    ob::SpaceInformationPtr si = gpath.getSpaceInformation();
-    ob::StateSpacePtr space = si->getStateSpace();
-    std::vector<ob::State *> states = gpath.getStates();
-    for(uint k = 0; k < states.size(); k++){
-      std::vector<double> state_k_serialized;
-      space->copyToReals(state_k_serialized, states.at(k));
-      AddSubNodeVector(*node, "rawstate", state_k_serialized);
+    for(uint k = 0; k < ctrlDurations.size(); k++){
+      AddSubNode(*node, "controlDuration", ctrlDurations.at(k));
+    }
+
+
+  }else{
+    {
+      AddComment(*node, "Smoothed States: Sequence of Configurations in Configuration Space");
+
+      og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+      ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+      ob::StateSpacePtr space = si->getStateSpace();
+      std::vector<ob::State *> states = gpath.getStates();
+      for(uint k = 0; k < states.size(); k++){
+        std::vector<double> state_k_serialized;
+        space->copyToReals(state_k_serialized, states.at(k));
+        AddSubNodeVector(*node, "state", state_k_serialized);
+      }
+    }
+
+    {
+      AddComment(*node, "Raw States: Unsmoothed");
+
+      og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path_raw);
+      ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+      ob::StateSpacePtr space = si->getStateSpace();
+      std::vector<ob::State *> states = gpath.getStates();
+      for(uint k = 0; k < states.size(); k++){
+        std::vector<double> state_k_serialized;
+        space->copyToReals(state_k_serialized, states.at(k));
+        AddSubNodeVector(*node, "rawstate", state_k_serialized);
+      }
     }
   }
   return true;
