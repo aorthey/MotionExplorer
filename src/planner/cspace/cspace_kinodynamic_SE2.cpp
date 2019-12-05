@@ -208,9 +208,12 @@ void KinodynamicCSpaceOMPLSE2::ConfigVelocityToOMPLState(const Config &q, const 
   }
 
   double* qomplTM = static_cast<ob::RealVectorStateSpace::StateType*>(qomplTMSpace)->values;
-  for(uint i = 0; i < 3; i++){
-    qomplTM[i]=dq(i);
-  }
+  qomplTM[0]=dq(0);
+  qomplTM[1]=dq(1);
+  qomplTM[2]=dq(3);
+  // for(uint i = 0; i < 3; i++){
+  //   qomplTM[i]=dq(i);
+  // }
   for(uint i = 0; i < Nklampt; i++){
     int idx = klampt_to_ompl.at(i);
     if(idx<0) continue;

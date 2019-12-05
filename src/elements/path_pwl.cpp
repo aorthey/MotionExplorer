@@ -36,10 +36,17 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
     std::cout << "DYNAMIC PATH" << std::endl;
 
     oc::PathControl* cpath = static_cast<oc::PathControl*>(path.get());
-    length = cpath->length();
-    interLength = cpath->getControlDurations();
+    std::vector<ob::State *> states = cpath->getStates();
+    ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
-    std::cout << "DYNAMIC PATH NYI" << std::endl;
+    uint Nstates = std::max(0,(int)states.size()-1);
+    for(uint k = 0; k < Nstates; k++){
+      ob::State *s0 = states.at(k);
+      ob::State *s1 = states.at(k+1);
+      si->printState(s0);
+      interLength.push_back(cpath->getSpaceInformation()->distance(s0,s1));
+      length+=interLength.back();
+    }
   }
 }
 ob::PathPtr PathPiecewiseLinear::GetOMPLPath() const
@@ -188,8 +195,11 @@ Config PathPiecewiseLinear::Eval(const double t) const{
     if((Tcum+Tnext)>=t){
       //t \in [Lcum, Lcum+Lnext]
       double tloc = (t-Tcum)/Tnext; //tloc \in [0,1]
+      std::cout << tloc << std::endl;
       ob::State* s1 = states.at(i);
       ob::State* s2 = states.at(i+1);
+      si->printState(s1);
+      si->printState(s2);
       ob::State* sm = si->allocState();
       si->getStateSpace()->interpolate(s1,s2,tloc,sm);
       Config q = quotient_space->OMPLStateToConfig(sm);
