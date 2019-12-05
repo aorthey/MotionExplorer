@@ -28,6 +28,7 @@ class PathPiecewiseLinear
     ob::PathPtr GetOMPLPath() const;
 
     Config Eval(const double t) const;
+    Config EvalStates(std::vector<ob::State*> states, const double t) const;
     Config EvalVelocity(const double t) const;
     Vector EvalVelocityVec3(const double t) const;
     Vector3 EvalVec3(const double t) const;

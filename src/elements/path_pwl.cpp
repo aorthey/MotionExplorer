@@ -21,7 +21,6 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
 {
   if(!cspace->isDynamic()){
     og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-
     length = gpath.length();
     std::vector<ob::State *> states = gpath.getStates();
 
@@ -33,21 +32,17 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
     }
 
   }else{
-    std::cout << "DYNAMIC PATH" << std::endl;
-
-    oc::PathControl* cpath = static_cast<oc::PathControl*>(path.get());
-    std::vector<ob::State *> states = cpath->getStates();
-    ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
+    oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+    std::vector<ob::State *> states = cpath.getStates();
 
     uint Nstates = std::max(0,(int)states.size()-1);
     for(uint k = 0; k < Nstates; k++){
       ob::State *s0 = states.at(k);
       ob::State *s1 = states.at(k+1);
-      si->printState(s0);
-      interLength.push_back(cpath->getSpaceInformation()->distance(s0,s1));
-      length+=interLength.back();
+      double d = cpath.getSpaceInformation()->distance(s0,s1);
+      interLength.push_back(d);
+      length+=d;
     }
-    exit(0);
   }
 }
 ob::PathPtr PathPiecewiseLinear::GetOMPLPath() const
@@ -163,21 +158,7 @@ Config PathPiecewiseLinear::EvalMilestone(const int k) const{
   //return keyframes.at(k);
 }
 
-Config PathPiecewiseLinear::Eval(const double t) const{
-  if(!path){
-    std::cout << "Cannot Eval empty path" << std::endl;
-    throw "Empty path";
-  }
-
-  std::vector<ob::State *> states;
-  if(cspace->isDynamic()){
-    oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
-    states = cpath.getStates();
-  }else{
-    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-    states = gpath.getStates();
-  }
-
+Config PathPiecewiseLinear::EvalStates(std::vector<ob::State*> states, const double t) const{
   ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
   if(t<=0){
@@ -196,7 +177,6 @@ Config PathPiecewiseLinear::Eval(const double t) const{
     if((Tcum+Tnext)>=t){
       //t \in [Lcum, Lcum+Lnext]
       double tloc = (t-Tcum)/Tnext; //tloc \in [0,1]
-      std::cout << tloc << std::endl;
       ob::State* s1 = states.at(i);
       ob::State* s2 = states.at(i+1);
       ob::State* sm = si->allocState();
@@ -225,6 +205,24 @@ Config PathPiecewiseLinear::Eval(const double t) const{
 
   std::cout << "Eval could not find point for value " << t << std::endl;
   throw;
+
+}
+Config PathPiecewiseLinear::Eval(const double t) const{
+  if(!path){
+    std::cout << "Cannot Eval empty path" << std::endl;
+    throw "Empty path";
+  }
+
+  std::vector<ob::State *> states;
+  if(cspace->isDynamic()){
+    oc::PathControl *cpath = static_cast<oc::PathControl*>(path.get());
+    states = cpath->getStates();
+  }else{
+    og::PathGeometric *gpath = static_cast<og::PathGeometric*>(path.get());
+    states = gpath->getStates();
+    // return EvalStates(states, t);
+  }
+  return EvalStates(states, t);
 
 }
 Config PathPiecewiseLinear::EvalVelocity(const double t) const{
