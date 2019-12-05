@@ -5,7 +5,7 @@
 #include <ompl/geometric/planners/quotientspace/datastructures/PlannerDataVertexAnnotated.h>
 #include <ompl/geometric/planners/quotientspace/Explorer.h>
 #include <ompl/geometric/planners/quotientspace/QRRT.h>
-#include <ompl/geometric/planners/quotientspace/Optimizer.h>
+#include <ompl/control/optimizers/Optimizer.h>
 #include <ompl/geometric/PathGeometric.h>
 
 #include <ompl/control/planners/rrt/RRT.h>
@@ -84,7 +84,7 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
     std::string fpath = input.name_loadPath;
     path->Load(fpath.c_str());
     std::cout << "load current path from : " << fpath << std::endl;
-    planner = std::make_shared<og::Optimizer>(si, path->GetOMPLPath());
+    planner = std::make_shared<oc::Optimizer>(si, path->GetOMPLPath());
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     throw "Planner unknown.";

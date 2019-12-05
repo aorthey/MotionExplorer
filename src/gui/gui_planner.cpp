@@ -163,7 +163,8 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
       std::string rname = planners.at(active_planner)->GetInput().environment_name;
       std::string fname = "../data/paths/path_"+rname;
       path->Save(fname.c_str());
-      std::cout << "save current path to : " << fname << std::endl;
+      std::cout << "save current path (" << path->GetNumberOfMilestones() 
+        << " states) to : " << fname << std::endl;
     }else{
       std::cout << "cannot save non-existing path." << std::endl;
     }

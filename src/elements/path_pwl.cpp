@@ -19,8 +19,7 @@ PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
 PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CSpaceOMPL *quotient_space_):
   cspace(cspace_), quotient_space(quotient_space_), path(p_), path_raw(p_)
 {
-  //if(!cspace->isDynamic()){
-  if(1){
+  if(!cspace->isDynamic()){
     og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
 
     length = gpath.length();
@@ -34,17 +33,13 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
     }
 
   }else{
-    oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+    std::cout << "DYNAMIC PATH" << std::endl;
 
-    length = cpath.length();
-    std::vector<ob::State *> states = cpath.getStates();
+    oc::PathControl* cpath = static_cast<oc::PathControl*>(path.get());
+    length = cpath->length();
+    interLength = cpath->getControlDurations();
 
-    for(uint k = 0; k < states.size()-1; k++){
-      ob::State *s0 = states.at(k);
-      ob::State *s1 = states.at(k+1);
-      interLength.push_back(cpath.getSpaceInformation()->distance(s0,s1));
-    }
-
+    std::cout << "DYNAMIC PATH NYI" << std::endl;
   }
 }
 ob::PathPtr PathPiecewiseLinear::GetOMPLPath() const
@@ -97,6 +92,7 @@ void PathPiecewiseLinear::setColor(const GLColor &color)
 
 void PathPiecewiseLinear::Smooth(){
   if(path == nullptr) return;
+  if(cspace->isDynamic()) return;
   if(!isSmooth){
 
     og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
@@ -165,8 +161,14 @@ Config PathPiecewiseLinear::Eval(const double t) const{
     throw "Empty path";
   }
 
-  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-  std::vector<ob::State *> states = gpath.getStates();
+  std::vector<ob::State *> states;
+  if(cspace->isDynamic()){
+    oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+    states = cpath.getStates();
+  }else{
+    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+    states = gpath.getStates();
+  }
 
   ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
@@ -755,6 +757,11 @@ bool PathPiecewiseLinear::Save(const char* fn)
   doc.LinkEndChild(node);
   doc.SaveFile(fn);
   return true;
+}
+
+int PathPiecewiseLinear::GetNumberOfMilestones()
+{
+  return interLength.size()+1;
 }
 
 bool PathPiecewiseLinear::Save(TiXmlElement *node)

@@ -28,8 +28,8 @@
     <pathSpeed>10</pathSpeed>
 
     <loadPath file="../data/paths/path_06D_dubins_car.xml"/>
-    <algorithm dynamic="1" name="optimizer"/>
     <algorithm dynamic="1" name="ompl:dynamic:sst"/>
+    <algorithm dynamic="1" name="optimizer"/>
 
     <hierarchy>
       <level inner_index="0" type="TSE2"/>

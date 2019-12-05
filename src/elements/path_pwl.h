@@ -37,6 +37,7 @@ class PathPiecewiseLinear
     void Smooth();
 
     std::vector<double> GetLengthVector() const;
+    int GetNumberOfMilestones();
     double GetLength() const;
 
     double linewidth{20};
