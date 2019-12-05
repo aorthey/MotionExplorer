@@ -47,6 +47,7 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
       interLength.push_back(cpath->getSpaceInformation()->distance(s0,s1));
       length+=interLength.back();
     }
+    exit(0);
   }
 }
 ob::PathPtr PathPiecewiseLinear::GetOMPLPath() const
@@ -198,8 +199,6 @@ Config PathPiecewiseLinear::Eval(const double t) const{
       std::cout << tloc << std::endl;
       ob::State* s1 = states.at(i);
       ob::State* s2 = states.at(i+1);
-      si->printState(s1);
-      si->printState(s2);
       ob::State* sm = si->allocState();
       si->getStateSpace()->interpolate(s1,s2,tloc,sm);
       Config q = quotient_space->OMPLStateToConfig(sm);
