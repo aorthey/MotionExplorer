@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <Modeling/Paths.h>
+#include <Modeling/Terrain.h>
 #include <Modeling/MultiPath.h>
 #include <KrisLibrary/planning/Path.h>
 #include <KrisLibrary/planning/KinodynamicPath.h>
@@ -18,5 +19,6 @@ class Info
     void operator()(RobotWorld *world);
     void operator()(Robot *robot);
     void operator()(WorldSimulation *sim);
+    void operator()(const Terrain *terrain);
 };
 

@@ -90,7 +90,8 @@ class MotionPlanner{
     ViewHierarchy viewHierarchy;
     StrategyPtr strategy; //the actual algorithm implementation
 
-    PathPiecewiseLinear *pwl;
+    // \brief solution path of planner
+    PathPiecewiseLinear *pwl; 
     CSpaceOMPL* ComputeCSpace(const std::string type, const uint robot_inner_index, const uint robot_outer_index = 0);
     CSpaceOMPL* ComputeCSpaceLayer(const Layer &layer);
 };

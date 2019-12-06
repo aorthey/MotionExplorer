@@ -71,6 +71,16 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
     }
 
     if(pin.Load(file_name.c_str())){
+
+      //Adding triangle information to PlannerInput (to be used as constraint
+      //manifolds)
+      for(uint k = 0; k < world.terrains.size(); k++){
+        Terrain* terrain_k = world.terrains[k];
+        Info info;
+        info(terrain_k);
+      }
+      exit(0);
+
       for(uint k = 0; k < pin.inputs.size(); k++){
         PlannerInput *pkin = pin.inputs.at(k);
         for(uint j = 0; j < pkin->stratifications.size(); j++){

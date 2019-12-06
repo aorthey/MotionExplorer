@@ -192,3 +192,26 @@ void Info::operator()(WorldSimulation *sim){
   }
   std::cout << std::string(80, '-') << std::endl;
 }
+
+void Info::operator()(const Terrain *terrain)
+{
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "Terrain Mesh Info" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
+  const CollisionMesh mesh = terrain->geometry->TriangleMeshCollisionData();
+  std::cout << "Number Triangles : " << mesh.tris.size() << std::endl;
+  for(uint j = 0; j < mesh.tris.size(); j++){
+    Triangle3D tri;
+    mesh.GetTriangle(j, tri);
+    std::cout << "Triangle " << j << std::endl;
+    std::cout << "   normal   : " << tri.normal() << std::endl;
+    std::cout << "   vertex1  : " << tri.vertex(0) << std::endl;
+    std::cout << "   vertex2  : " << tri.vertex(1) << std::endl;
+    std::cout << "   vertex3  : " << tri.vertex(2) << std::endl;
+    std::cout << "   area     : " << tri.area() << std::endl;
+    Vector3 c;
+    std::cout << tri.barycentricCoords(c) << std::endl;
+
+
+  }
+}
