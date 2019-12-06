@@ -32,6 +32,7 @@
   <sampler name="uniform"/>            <!-- uniform|gaussian|minimum_clearance|maximum_clearance|obstacle_based|bridge_test -->
   <timestep min="0.01" max="0.1"/>
   <pathWidth>0.1</pathWidth>
+  <contactPlanner>1</contactPlanner>
   <pathBorderWidth>1</pathBorderWidth>
   <epsilongoalregion>0.01</epsilongoalregion>
   <freeFloating>0</freeFloating>

@@ -113,6 +113,7 @@ void PlannerInput::SetDefault()
 
   max_planning_time = GetSubNodeText<double>(node, "maxplanningtime");
   freeFloating = GetSubNodeText<int>(node, "freeFloating");
+  contactPlanner = GetSubNodeText<int>(node, "contactPlanner");
   timestep_min = GetSubNodeAttribute<double>(node, "timestep", "min");
   timestep_max = GetSubNodeAttribute<double>(node, "timestep", "max");
   max_planning_time = GetSubNodeText<double>(node, "maxplanningtime");
@@ -133,6 +134,7 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
   //optional arguments
 
   freeFloating = GetSubNodeTextDefault(node, "freeFloating", freeFloating);
+  contactPlanner = GetSubNodeTextDefault(node, "contactPlanner", contactPlanner);
   robot_idx = GetSubNodeTextDefault(node, "robot", 0);
   timestep_min = GetSubNodeAttributeDefault(node, "timestep", "min", timestep_min);
   timestep_max = GetSubNodeAttributeDefault(node, "timestep", "max", timestep_max);

@@ -2,6 +2,7 @@
 #include "file_io.h"
 #include <string>
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
+#include <KrisLibrary/math3d/Triangle3D.h>
 
 struct Layer{
   int level;
@@ -36,6 +37,9 @@ class PlannerInput{
 
     uint robot_idx;
     int freeFloating;
+    bool contactPlanner{false};
+
+    std::vector<Triangle3D> tris;
 
     std::string name_algorithm;
     std::string name_sampler;
@@ -74,6 +78,7 @@ class PlannerInput{
 /// @brief multiple plannerinputs (to use several algorithms inside GUI)
 struct PlannerMultiInput{
   std::vector<PlannerInput*> inputs;
+
   bool Load(const char* file);
   bool Load(TiXmlElement *node);
   std::vector<std::string> GetAlgorithms(TiXmlElement *node, bool kinodynamic);

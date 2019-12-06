@@ -74,15 +74,23 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 
       //Adding triangle information to PlannerInput (to be used as constraint
       //manifolds)
+      std::vector<Triangle3D> tris;
       for(uint k = 0; k < world.terrains.size(); k++){
         Terrain* terrain_k = world.terrains[k];
-        Info info;
-        info(terrain_k);
+        const CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();
+        for(uint j = 0; j < mesh.tris.size(); j++){
+          Triangle3D tri;
+          mesh.GetTriangle(j, tri);
+          tris.push_back(tri);
+        }
       }
-      exit(0);
+      std::cout << "Environment has " << tris.size() << " triangles to make contact." << std::endl;
 
       for(uint k = 0; k < pin.inputs.size(); k++){
         PlannerInput *pkin = pin.inputs.at(k);
+        if(pkin->contactPlanner){
+          pkin->tris = tris;
+        }
         for(uint j = 0; j < pkin->stratifications.size(); j++){
           Stratification stratification = pkin->stratifications.at(j);
           for(uint i = 0; i < stratification.layers.size(); i++){
