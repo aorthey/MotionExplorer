@@ -702,3 +702,7 @@ would disappear if S1 would be the uppermost level.
 [ ] QMP* to OMPL
 [ ] QRRT* to OMPL
 [ ] Remove lemon
+[ ] Rewrite to use Hierarchical PD
+
+
+

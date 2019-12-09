@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="airplane" file="../robots/airplane.urdf"/>
-  <robot name="airplane_inner_sphere" file="../robots/airplane_inner_sphere.urdf"/>
+  <robot name="airplane" file="../../robots/airplane.urdf"/>
+  <robot name="airplane_inner_sphere" file="../../robots/airplane_inner_sphere.urdf"/>
 
-  <rigidObject name="canyon" file="../terrains/buildings/tori.stl" translation="0 0 0"/>
+  <rigidObject name="canyon" file="../../terrains/buildings/tori.stl" translation="0 0 0"/>
 
   <plannerinput>
 
