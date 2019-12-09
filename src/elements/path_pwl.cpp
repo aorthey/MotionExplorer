@@ -20,7 +20,7 @@ PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
 void PathPiecewiseLinear::SetDefaultPath()
 {
   ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
-  if(cspace->isDynamic()){
+  if(quotient_space->isDynamic()){
     path = std::make_shared<oc::PathControl>(si);
   }else{
     path = std::make_shared<og::PathGeometric>(si);
@@ -33,7 +33,7 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
   if(p_ == nullptr){
     SetDefaultPath();
   }else{
-    if(!cspace->isDynamic()){
+    if(!quotient_space->isDynamic()){
       og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
       length = gpath.length();
       std::vector<ob::State *> states = gpath.getStates();
@@ -67,7 +67,7 @@ ob::PathPtr PathPiecewiseLinear::GetOMPLPath() const
 
 void PathPiecewiseLinear::SendToController(SmartPointer<RobotController> controller)
 {
-  if(!cspace->isDynamic()){
+  if(!quotient_space->isDynamic()){
     std::cout << "Path is not dynamic, cannot access torques" << std::endl;
     return;
   }
@@ -110,7 +110,7 @@ void PathPiecewiseLinear::setColor(const GLColor &color)
 
 void PathPiecewiseLinear::Smooth(){
   if(path == nullptr) return;
-  if(cspace->isDynamic()) return;
+  if(quotient_space->isDynamic()) return;
   if(!isSmooth){
 
     og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
@@ -229,7 +229,7 @@ Config PathPiecewiseLinear::Eval(const double t) const{
   }
 
   std::vector<ob::State *> states;
-  if(cspace->isDynamic()){
+  if(quotient_space->isDynamic()){
     oc::PathControl *cpath = static_cast<oc::PathControl*>(path.get());
     states = cpath->getStates();
   }else{
