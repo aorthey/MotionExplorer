@@ -78,6 +78,11 @@ Current important keys:
 
       [after planning] 
       u : start/stop moving robot along found path (if any)
+      1 : show roadmap vertices (default: off)
+      2 : show roadmap edges (default: off)
+      3 : show paths (default: on)
+      4 : display local-minima tree (default: on)
+      5 : display planning information (default: on)
       
 
 
