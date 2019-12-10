@@ -42,8 +42,6 @@
     <maxplanningtime>5</maxplanningtime>      <!-- runtime in (s) --> 
     <pathSpeed>10</pathSpeed>
     <!-- <smoothPath>1</smoothPath> -->
-    <algorithm name="fiberoptimizer:qrrt"/>
-    <!-- <algorithm name="hierarchy:qrrt"/> -->
 
     <hierarchy>
       <level inner_index="8" type="R8"/>

@@ -2,7 +2,7 @@
 
 using namespace Math3D;
 ViewHierarchy::ViewHierarchy():
-  x(0),y(0),heightPerLevel(50),width(300),width_column1(30),width_column2(50),width_column3(width-width_column1-width_column2),drawBound(true),drawPlotArea(true)
+  x(0),y(0),heightPerLevel(70),width(300),width_column1(30),width_column2(40),width_column3(width-width_column1-width_column2),drawBound(true),drawPlotArea(true)
 {
   textColor.set(0.1,0.1,0.1);
   nodeColor.set(0.8,0.8,0.8);
@@ -10,6 +10,7 @@ ViewHierarchy::ViewHierarchy():
   nodeUnselectedColor.set(0.8,0.8,0.8);
   boundColor.set(0.2,0.2,0.2);
   plotAreaColor.set(0.8,0.8,0.8,0.5);
+  node_radius = heightPerLevel/4.0;
 }
 void ViewHierarchy::PushLevel(int nodes, std::string robot_name){
   if(nodes>0){
@@ -60,27 +61,26 @@ void ViewHierarchy::Clear()
 
 void ViewHierarchy::DrawGL(){
 
-  double xprev = x+width_column1+width_column2+0.5*width_column2;
-  double yprev = y+heightPerLevel/2;
-  double node_radius = heightPerLevel/3;
-  double xstep = node_radius*2.5;
+  double xprev = x+width_column1+width_column2+1.5*node_radius;
+  double yprev = y+0.5*heightPerLevel;
+  double xstep = node_radius*3;
+  double ystep = heightPerLevel;
   double node_radius_unselected = node_radius - node_radius/4;
   double node_radius_selected = node_radius;
 
-  double height = heightPerLevel * (GetLevel()+1);
+  double height = ystep * (GetLevel()+1);
 
   int maxNodes = 1;
   int addNodes = 0;
   for(uint k = 0; k < level_nodes.size(); k++){
-    std::vector<int> selected_path;
     int nk = level_nodes.at(k) + addNodes;
     if(nk > maxNodes) maxNodes = nk;
-    if(k < selected_path.size()){
-      addNodes += selected_path.at(k);
-    }
+    addNodes += selected_path.at(k);
   }
-  double width = xprev + maxNodes * xstep;
-  width_column3 = width-width_column1-width_column2;
+
+  // double width = xprev + (maxNodes-1) * xstep + 1.5*node_radius - x;
+  width_column3 = maxNodes*xstep;
+  double width = width_column1 + width_column2 + width_column3;
 
   glDisable(GL_LIGHTING);
   glDisable(GL_DEPTH_TEST);
@@ -126,7 +126,7 @@ void ViewHierarchy::DrawGL(){
   DrawNode(xprev, yprev, node_radius_selected, emptySet);
 
   for(uint k = 0; k < level_nodes.size(); k++){
-    double yn = y+(k+1)*heightPerLevel+heightPerLevel/2;
+    double yn = y+(k+1)*heightPerLevel+0.5*heightPerLevel;
 
     uint nodes_on_level = level_nodes.at(k);
     uint selected_node = selected_path.at(k);
@@ -136,9 +136,9 @@ void ViewHierarchy::DrawGL(){
       double r = (i==selected_node? node_radius_selected: node_radius_unselected);
       nodeColor = (i==selected_node? nodeSelectedColor:nodeUnselectedColor);
       DrawNode(xn,yn,r,i);
-      (i==selected_node? glLineWidth(10): glLineWidth(5));
+      (i==selected_node? glLineWidth(4): glLineWidth(2));
       DrawLineFromNodeToNode(xprev,yprev,r,xn,yn,r);
-      glLineWidth(5);
+      glLineWidth(2);
     }
 
     xprev = xprev + xstep*selected_node;
@@ -211,12 +211,19 @@ void ViewHierarchy::DrawNode( double x, double y, double radius, std::string nst
 
 
 }
-void ViewHierarchy::DrawLineFromNodeToNode(double x1, double y1, double n1, double x2, double y2, double n2){
+void ViewHierarchy::DrawLineFromNodeToNode(double x1, double y1, double r1, double x2, double y2, double r2){
   Vector2 v(x2-x1,y2-y1);
   v = v/v.norm();
-  glBegin(GL_LINE_LOOP);
-  glVertex2i(x1+n1*v[0],y1+n1*v[1]);
-  glVertex2i(x2-n2*v[0],y2-n2*v[1]);
+  double x3 = x1;
+  double y3 = y1+r1;
+  double x4 = x2;
+  double y4 = y2-r2;
+  double y34 = y3 + 0.5*(y4-y3);
+  glBegin(GL_LINE_STRIP);
+  glVertex2i(x3, y3);
+  glVertex2i(x3, y34);
+  glVertex2i(x4, y34);
+  glVertex2i(x4, y4);
   glEnd();
 
 }
