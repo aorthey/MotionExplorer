@@ -1,4 +1,10 @@
 <h1>MotionPlanningExplorerGUI</h1>
+<p align="middle">
+  <img src="https://github.com/aorthey/MotionPlanningExplorerGUI/blob/master/data/images/airplane.png" width="280" />
+  <img src="https://github.com/aorthey/MotionPlanningExplorerGUI/blob/master/data/images/PR2.png" width="280" />
+  <img src="https://github.com/aorthey/MotionPlanningExplorerGUI/blob/master/data/images/drone.png" width="280" />
+</p>
+
 
 Visualize Local Minima using a local minima tree. 
 
