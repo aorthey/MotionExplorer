@@ -28,11 +28,11 @@
     <pathSpeed>10</pathSpeed>
 
     <kinodynamic>1</kinodynamic>
-    <algorithm name="hierarchy:explorer"/>
-    <!-- <algorithm dynamic="1" name="ompl:dynamic:sst"/> -->
+    <algorithm dynamic="1" name="ompl:dynamic:sst"/>
+    <algorithm dynamic="1" name="hierarchy:explorer"/>
 
     <hierarchy>
-      <level inner_index="2" type="R2"/>
+      <!-- <level inner_index="2" type="R2"/> -->
       <level inner_index="0" type="TSE2"/>
     </hierarchy>
 

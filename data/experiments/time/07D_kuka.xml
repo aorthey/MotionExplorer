@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<world>
+
+  <robot name="kuka_lwr" file="../../robots/kuka_lwr/kuka_5links.urdf"
+    config="12  0 0 0 0 0 -0.19 -0.00706 1.2308 1.4 1.3144 1.21294 1.5144 ">
+  </robot>
+  <robot name="kuka_lwr_1links" file="../../robots/kuka_lwr/kuka_1links.urdf"/>
+
+  <robot name="kuka_lwr_2links" file="../../robots/kuka_lwr/kuka_2links.urdf"
+    config="9  0 0 0 0 0 -0.19 -0.00706 1.2308 1.4">
+  </robot>
+  <robot name="kuka_lwr_3links" file="../../robots/kuka_lwr/kuka_3links.urdf"/>
+  <robot name="kuka_lwr_4links" file="../../robots/kuka_lwr/kuka_4links.urdf"/>
+  <robot name="kuka_lwr_5links" file="../../robots/kuka_lwr/kuka_5links.urdf"/>
+
+  <terrain name="factory" file="../../terrains/twoslit_factory.tri" translation="0 0 -0.01" rotateRPY="0 0 1.57">
+     <display color="0.8 0.8 0.8"/>
+  </terrain>
+  <plannerinput>
+    <!-- <qinit config="12  0 0 0 0 0 0 -0.00706 1.2308 1.4 1.3144 1.21294 1.5144 "/> -->
+    <!-- <qgoal config="12  0 0 0 0 0 0 -2.74706 1.1708 1.54 -0.76 -1.48 1.6544"/> -->
+    <qinit config="12  0 0 0 0 0 -0.19 -0.00706 1.2308 1.4 1.3144 1.21294 1.5144 "/>
+    <qgoal config="12  0 0 0 0 0.0 -.19 -2.74706 1.1708 1.54 -0.76 -1.48 1.6544"/>
+
+
+
+    <!-- 14  0 -0.298911 0 6.28319 -0 6.28319 -0.02 1.3 0.34 0.56 -0.17 1.6144 -0.26 0 --> 
+    <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
+    <smoothPath>1</smoothPath> <!-- 0: no smoothing, 1: smoothing      -->
+    <pathSpeed>9</pathSpeed>   <!-- <1: slower, 1: default, >1: faster -->
+    <pathWidth>0.03</pathWidth>
+
+    <freeFloating>0</freeFloating>
+    <maxplanningtime>0.2</maxplanningtime>
+    <epsilongoalregion>0.1</epsilongoalregion>
+
+    <hierarchy>
+      <!-- <level inner_index="1" type="R1"/> -->
+      <level inner_index="2" type="R3"/>
+      <!-- <level inner_index="3" type="R3"/> -->
+      <!-- <level inner_index="4" type="R4"/> -->
+      <!-- <level inner_index="5" type="R5"/> -->
+      <level inner_index="0" type="R7"/>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>
