@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="car" file="../robots/planar/car.urdf"/>
-  <robot name="disk" file="../robots/planar/car_capsule_inner.urdf"/>
-  <terrain name="O1" file="../terrains/narrow_passage/narrow_passage_icra_2020.tri">
+  <robot name="car" file="../../robots/planar/car.urdf"/>
+  <robot name="disk" file="../../robots/planar/car_capsule_inner.urdf"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/narrow_passage_icra_2020.tri">
      <display color="0.8 0.8 0.8"/>
   </terrain>
 

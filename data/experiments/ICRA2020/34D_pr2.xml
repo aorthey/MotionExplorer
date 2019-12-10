@@ -3,14 +3,14 @@
 <world>
 
   <!-- 2*(Arms(7dof)+Gripper(1dof)) + Head (3dof) + Spine (1dof) + Base (3dof) = 23 Dof-->
-  <robot name="pr2" file="../robots/PR2/pr2_34D.urdf"/>
+  <robot name="pr2" file="../../robots/PR2/pr2_34D.urdf"/>
 
-  <robot name="pr2_base_SE2" file="../robots/PR2/pr2_03D_base_SE2.urdf"/>
-  <robot name="pr2_noarms" file="../robots/PR2/pr2_07D_noarms.urdf"/>
-  <robot name="pr2_norightarm" file="../robots/PR2/pr2_20D_norightarm.urdf"/>
-  <robot name="pr2_disk" file="../robots/PR2/pr2_02D_disk.urdf"/>
+  <robot name="pr2_base_SE2" file="../../robots/PR2/pr2_03D_base_SE2.urdf"/>
+  <robot name="pr2_noarms" file="../../robots/PR2/pr2_07D_noarms.urdf"/>
+  <robot name="pr2_norightarm" file="../../robots/PR2/pr2_20D_norightarm.urdf"/>
+  <robot name="pr2_disk" file="../../robots/PR2/pr2_02D_disk.urdf"/>
 
-  <terrain name="plane" file="../terrains/3droom/room_w_table.tri" translation="0 0 0" rotateRPY="0 0 0">
+  <terrain name="plane" file="../../terrains/3droom/room_w_table.tri" translation="0 0 0" rotateRPY="0 0 0">
      <display color="0.6 0.6 0.6 1"/> 
   </terrain>
 

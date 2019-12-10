@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="snake_planar4" file="../robots/snake/snake_planar_4_segments.urdf"/>
-  <robot name="snake_planar_disk" file="../robots/snake/snake_planar_0_segments_disk_inner.urdf"/>
-  <robot name="snake_planar0" file="../robots/snake/snake_planar_0_segments.urdf"/>
-  <robot name="snake_planar1" file="../robots/snake/snake_planar_1_segments.urdf"/>
-  <robot name="snake_planar2" file="../robots/snake/snake_planar_2_segments.urdf"/>
-  <robot name="snake_planar3" file="../robots/snake/snake_planar_3_segments.urdf"/>
+  <robot name="snake_planar4" file="../../robots/snake/snake_planar_4_segments.urdf"/>
+  <robot name="snake_planar_disk" file="../../robots/snake/snake_planar_0_segments_disk_inner.urdf"/>
+  <robot name="snake_planar0" file="../../robots/snake/snake_planar_0_segments.urdf"/>
+  <robot name="snake_planar1" file="../../robots/snake/snake_planar_1_segments.urdf"/>
+  <robot name="snake_planar2" file="../../robots/snake/snake_planar_2_segments.urdf"/>
+  <robot name="snake_planar3" file="../../robots/snake/snake_planar_3_segments.urdf"/>
 
-  <terrain name="O1" file="../terrains/narrow_passage/narrow_passage_0_40.tri"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/narrow_passage_0_40.tri"/>
   <plannerinput>
 
     <se3min config="6  -3 -2.0 -0.1 -3.141593 -1.57 -3.141593"/>
