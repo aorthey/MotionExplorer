@@ -33,6 +33,8 @@ class ViewHierarchy
   int width_column3;
 
   double node_radius;
+  double node_radius_unselected;
+  double node_radius_selected;
 
   bool drawBound,drawPlotArea;
   GLDraw::GLColor boundColor, plotAreaColor, textColor, nodeColor, nodeSelectedColor, nodeUnselectedColor;
