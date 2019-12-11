@@ -173,13 +173,12 @@ ob::StateSpacePtr CSpaceOMPL::GetFirstSubspace()
   return space_first_subspace;
 }
 
-Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
-  double x = 0;
-  double y = 0;
-  double z = 0;
-
+Vector3 CSpaceOMPL::getXYZ_freeFloating_geometric(const ob::State *s)
+{
   ob::StateSpacePtr space_first_subspace = GetFirstSubspace();
-
+  double x = 0.0;
+  double y = 0.0;
+  double z = 0.0;
   if(space_first_subspace->getType() == ob::STATE_SPACE_SE3){
     const ob::SE3StateSpace::StateType *qomplSE3;
     if(space->getType() == ob::STATE_SPACE_SE3){
@@ -203,8 +202,77 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
     y = qomplSE2->getY();
     z = qomplSE2->getYaw();
     //if(z<0) z+= M_PI;
+  }else if(space_first_subspace->getType() == ob::STATE_SPACE_REAL_VECTOR){
+    const ob::RealVectorStateSpace::StateType *qomplRN;
+    if(space->getType() == ob::STATE_SPACE_REAL_VECTOR){
+      qomplRN = s->as<ob::RealVectorStateSpace::StateType>();
+    }else{
+      qomplRN = s->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+    }
+    x = qomplRN->values[0];
+    if(GetDimensionality()>1) y = qomplRN->values[1];
+    if(GetDimensionality()>2) z = qomplRN->values[2];
+  }else{
+    OMPL_ERROR("Cannot deal with space type %d.", space_first_subspace->getType());
+    throw "Invalid space type.";
+  }
+  Vector3 w(x,y,z);
+  return w;
+}
+Vector3 CSpaceOMPL::getXYZ_freeFloating_dynamic(const ob::State *s)
+{
+  ob::StateSpacePtr space_first_subspace = GetFirstSubspace();
+  double x = 0.0;
+  double y = 0.0;
+  double z = 0.0;
+  if(space_first_subspace->getType() == ob::STATE_SPACE_SE3){
+    const ob::SE3StateSpace::StateType *qomplSE3;
+    if(space->getType() == ob::STATE_SPACE_SE3){
+      qomplSE3 = s->as<ob::SE3StateSpace::StateType>();
+    }else{
+      //consists of SE(3)xSOMETHING
+      qomplSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+    }
+    x = qomplSE3->getX();
+    y = qomplSE3->getY();
+    z = qomplSE3->getZ();
 
-  }else if((space_first_subspace->getType() == ob::STATE_SPACE_REAL_VECTOR)
+  }else if(space_first_subspace->getType() == ob::STATE_SPACE_SE2){
+    const ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2;
+    if(space->getType()==ob::STATE_SPACE_SE2){
+      qomplSE2 = s->as<ob::SE2StateSpaceFullInterpolate::StateType>();
+    }else{
+      qomplSE2 = s->as<ob::CompoundState>()->as<ob::SE2StateSpaceFullInterpolate::StateType>(0);
+    }
+    x = qomplSE2->getX();
+    y = qomplSE2->getY();
+    z = qomplSE2->getYaw();
+    //if(z<0) z+= M_PI;
+  }else if(space_first_subspace->getType() == ob::STATE_SPACE_REAL_VECTOR){
+    const ob::RealVectorStateSpace::StateType *qomplRN;
+    if(space->getType() == ob::STATE_SPACE_REAL_VECTOR){
+      qomplRN = s->as<ob::RealVectorStateSpace::StateType>();
+    }else{
+      qomplRN = s->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+    }
+    x = qomplRN->values[0];
+    if(GetDimensionality()>1) y = qomplRN->values[1];
+    if(GetDimensionality()>2) z = qomplRN->values[2];
+  }else{
+    OMPL_ERROR("Cannot deal with space type %d.", space_first_subspace->getType());
+    throw "Invalid space type.";
+  }
+  Vector3 w(x,y,z);
+  return w;
+}
+
+Vector3 CSpaceOMPL::getXYZ_fixedBase(const ob::State *s)
+{
+  ob::StateSpacePtr space_first_subspace = GetFirstSubspace();
+  double x = 0.0;
+  double y = 0.0;
+  double z = 0.0;
+  if((space_first_subspace->getType() == ob::STATE_SPACE_REAL_VECTOR)
    || (space_first_subspace->getType() == ob::STATE_SPACE_SO2)) {
     //fixed base robot: visualize last link
 
@@ -226,12 +294,23 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
     z = qq[2];
 
   }else{
-    std::cout << "cspace:getXYZ: cannot deal with space type" << space_first_subspace->getType() << std::endl;
-    std::cout << "please check ompl/base/StateSpaceTypes.h" << std::endl;
+    OMPL_ERROR("Cannot deal with space type %d.", space_first_subspace->getType());
     throw "Invalid space type.";
   }
-  Vector3 q(x,y,z);
-  return q;
+  Vector3 w(x,y,z);
+  return w;
+}
+
+Vector3 CSpaceOMPL::getXYZ(const ob::State *s)
+{
+  if(isFreeFloating()){
+    if(!isDynamic()) return getXYZ_freeFloating_geometric(s);
+    else return getXYZ_freeFloating_dynamic(s);
+  }else{
+    //fixedBase
+    return getXYZ_fixedBase(s);
+  }
+
 }
 
 std::vector<double> CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q ){
@@ -324,6 +403,7 @@ void CSpaceOMPL::print(std::ostream& out) const
   std::cout << "Robot                    : " << robot->name << std::endl;
   std::cout << "Dimensionality (OMPL)    : " << GetDimensionality() << std::endl;
   std::cout << "Dimensionality (Klampt)  : " << robot->q.size() << std::endl;
+  std::cout << "Dynamical Space          : " << (isDynamic()?"Yes":"No") << std::endl;
   //space.space->printSettings(std::cout);
   std::cout << "OMPL Representation      : " << std::endl;
   space->diagram(std::cout << "   ");

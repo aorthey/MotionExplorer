@@ -706,3 +706,6 @@ would disappear if S1 would be the uppermost level.
 
 
 
+[ ] Fix PathControl issue in explorer (probably caused by casting everything
+into recursive tree structure -- which does not support control, or copies it in
+the wrong way)

@@ -631,9 +631,19 @@ std::vector<double> PathPiecewiseLinear::GetHighCurvatureConfigurations()
 }
 
 void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
-  og::PathGeometric gpath = static_cast<og::PathGeometric&>(*_path);
-  ob::SpaceInformationPtr si = gpath.getSpaceInformation();
-  std::vector<ob::State *> states = gpath.getStates();
+
+  std::vector<ob::State *> states;
+  if(quotient_space->isDynamic()){
+    oc::PathControl *cpath = static_cast<oc::PathControl*>(_path.get());
+    states = cpath->getStates();
+  }else{
+    og::PathGeometric *gpath = static_cast<og::PathGeometric*>(_path.get());
+    states = gpath->getStates();
+  }
+  ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
+  if(states.size() < 2){
+    return;
+  }
 
   ob::StateSpacePtr space = si->getStateSpace();
 

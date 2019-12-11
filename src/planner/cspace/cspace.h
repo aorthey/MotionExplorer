@@ -47,7 +47,13 @@ class CSpaceOMPL
     ob::ScopedState<> ConfigToOMPLState(const Config &q);
 
     const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
+
+    //function to display vertices/edges in the workspace (different from
+    //possible quotient-spaces)
     Vector3 getXYZ(const ob::State*);
+    Vector3 getXYZ_freeFloating_geometric(const ob::State *s);
+    Vector3 getXYZ_freeFloating_dynamic(const ob::State *s);
+    Vector3 getXYZ_fixedBase(const ob::State *s);
 
     bool IsPlanar();
 

@@ -185,6 +185,7 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
   PTree *root = new PTree(nullptr);
 
   if(v0==nullptr){
+    //means that we do not have annotated vertices (e.g. classical OMPL planner)
     root->children.push_back( new PTree(pd) );
   }else{
     std::map<std::vector<int>, int> tree_vertices;

@@ -3,6 +3,7 @@
 #include "gui/colors.h"
 #include "elements/swept_volume.h"
 #include <ompl/geometric/PathGeometric.h>
+#include <ompl/control/PathControl.h>
 #include <Library/KrisLibrary/math/vector.h>
 #include <Library/KrisLibrary/math3d/primitives.h>
 typedef Math::Vector Config;
