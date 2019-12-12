@@ -173,53 +173,7 @@ ob::StateSpacePtr CSpaceOMPL::GetFirstSubspace()
   return space_first_subspace;
 }
 
-Vector3 CSpaceOMPL::getXYZ_freeFloating_geometric(const ob::State *s)
-{
-  ob::StateSpacePtr space_first_subspace = GetFirstSubspace();
-  double x = 0.0;
-  double y = 0.0;
-  double z = 0.0;
-  if(space_first_subspace->getType() == ob::STATE_SPACE_SE3){
-    const ob::SE3StateSpace::StateType *qomplSE3;
-    if(space->getType() == ob::STATE_SPACE_SE3){
-      qomplSE3 = s->as<ob::SE3StateSpace::StateType>();
-    }else{
-      //consists of SE(3)xSOMETHING
-      qomplSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-    }
-    x = qomplSE3->getX();
-    y = qomplSE3->getY();
-    z = qomplSE3->getZ();
-
-  }else if(space_first_subspace->getType() == ob::STATE_SPACE_SE2){
-    const ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2;
-    if(space->getType()==ob::STATE_SPACE_SE2){
-      qomplSE2 = s->as<ob::SE2StateSpaceFullInterpolate::StateType>();
-    }else{
-      qomplSE2 = s->as<ob::CompoundState>()->as<ob::SE2StateSpaceFullInterpolate::StateType>(0);
-    }
-    x = qomplSE2->getX();
-    y = qomplSE2->getY();
-    z = qomplSE2->getYaw();
-    //if(z<0) z+= M_PI;
-  }else if(space_first_subspace->getType() == ob::STATE_SPACE_REAL_VECTOR){
-    const ob::RealVectorStateSpace::StateType *qomplRN;
-    if(space->getType() == ob::STATE_SPACE_REAL_VECTOR){
-      qomplRN = s->as<ob::RealVectorStateSpace::StateType>();
-    }else{
-      qomplRN = s->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
-    }
-    x = qomplRN->values[0];
-    if(GetDimensionality()>1) y = qomplRN->values[1];
-    if(GetDimensionality()>2) z = qomplRN->values[2];
-  }else{
-    OMPL_ERROR("Cannot deal with space type %d.", space_first_subspace->getType());
-    throw "Invalid space type.";
-  }
-  Vector3 w(x,y,z);
-  return w;
-}
-Vector3 CSpaceOMPL::getXYZ_freeFloating_dynamic(const ob::State *s)
+Vector3 CSpaceOMPL::getXYZ_freeFloating(const ob::State *s)
 {
   ob::StateSpacePtr space_first_subspace = GetFirstSubspace();
   double x = 0.0;
@@ -304,8 +258,7 @@ Vector3 CSpaceOMPL::getXYZ_fixedBase(const ob::State *s)
 Vector3 CSpaceOMPL::getXYZ(const ob::State *s)
 {
   if(isFreeFloating()){
-    if(!isDynamic()) return getXYZ_freeFloating_geometric(s);
-    else return getXYZ_freeFloating_dynamic(s);
+    return getXYZ_freeFloating(s);
   }else{
     //fixedBase
     return getXYZ_fixedBase(s);
