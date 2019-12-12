@@ -14,6 +14,14 @@ struct Layer{
   std::string type;
 };
 
+struct AgentInformation{
+  Config q_init;
+  Config q_goal;
+  int inner_index;
+  Config qMin;
+  Config qMax;
+};
+
 struct Stratification{
   std::vector<Layer> layers;
 };
@@ -32,10 +40,15 @@ class PlannerInput{
     Config qMin;
     Config qMax;
 
+    //multiagents
+    std::vector<AgentInformation> agent_information;
+
     Config se3min;
     Config se3max;
 
     uint robot_idx;
+
+    //contact-planning
     int freeFloating;
     bool contactPlanner{false};
 
@@ -57,6 +70,7 @@ class PlannerInput{
     double pathBorderWidth{0.01};
 
     bool kinodynamic{false};
+    bool multiAgent{false};
     Config uMin;
     Config uMax;
 
@@ -70,7 +84,9 @@ class PlannerInput{
     const StrategyInput& GetStrategyInput();
 
     friend std::ostream& operator<< (std::ostream& out, const PlannerInput& pin) ;
+
   private:
+
     CSpaceInput* cin;
     StrategyInput* sin;
 };

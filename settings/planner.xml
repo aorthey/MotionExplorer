@@ -37,4 +37,5 @@
   <epsilongoalregion>0.01</epsilongoalregion>
   <freeFloating>0</freeFloating>
   <kinodynamic>0</kinodynamic> 
+  <multiAgent>0</multiAgent> 
 </planner>

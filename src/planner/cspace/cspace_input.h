@@ -8,4 +8,5 @@ struct CSpaceInput{
   Config uMax;
   bool fixedBase{false};
   bool kinodynamic{false};
+  bool multiAgent{false};
 };

@@ -6,6 +6,9 @@
 #include <KrisLibrary/math/VectorTemplate.h>
 #include <boost/filesystem.hpp>
 
+//############################################################################
+//PlannerMultiInput
+//############################################################################
 bool PlannerMultiInput::Load(const char* file){
   TiXmlDocument doc(file);
   Load(GetRootNodeFromDocument(doc));
@@ -64,15 +67,15 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
   std::vector<std::string> algorithms;
 
   if(hasCustomAlgorithms){
-      algorithms = GetAlgorithmsCustom(node_plannerinput, kinodynamic);
+    algorithms = GetAlgorithmsCustom(node_plannerinput, kinodynamic);
   }else{
-      algorithms = GetAlgorithmsDefault(kinodynamic);
+    algorithms = GetAlgorithmsDefault(kinodynamic);
   }
   const int i_hierarchy = CountNumberOfSubNodes(node_plannerinput, "hierarchy");
 
   for(uint k_algorithm = 0; k_algorithm < algorithms.size(); k_algorithm++){
     std::string name_algorithm = algorithms.at(k_algorithm);
-    if(util::StartsWith(name_algorithm, "benchmark") || util::StartsWith(name_algorithm, "fiberoptimizer")){
+    if(util::StartsWith(name_algorithm, "benchmark") || util::StartsWith(name_algorithm, "optimizer")){
       PlannerInput* input = new PlannerInput();
       input->name_algorithm = algorithms.at(k_algorithm);
       if(!input->Load(node_plannerinput)) return false;
@@ -103,6 +106,9 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
   return true;
 }
 
+//############################################################################
+//PlannerInput
+//############################################################################
 void PlannerInput::SetDefault()
 {
   std::string pidef = util::GetDataFolder()+"/../settings/planner.xml";
@@ -123,6 +129,7 @@ void PlannerInput::SetDefault()
   pathBorderWidth = GetSubNodeText<double>(node, "pathBorderWidth");
   smoothPath = GetSubNodeText<int>(node, "smoothPath");
   kinodynamic = GetSubNodeText<int>(node, "kinodynamic");
+  multiAgent = GetSubNodeText<int>(node, "multiAgent");
   name_sampler = GetSubNodeAttribute<std::string>(node, "sampler", "name");
 }
 
@@ -146,15 +153,37 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
   smoothPath = GetSubNodeTextDefault(node, "smoothPath", smoothPath);
   name_sampler = GetSubNodeAttributeDefault<std::string>(node, "sampler", "name", name_sampler);
   kinodynamic = GetSubNodeTextDefault(node, "kinodynamic", kinodynamic);
+  multiAgent = GetSubNodeTextDefault(node, "multiAgent", multiAgent);
   name_loadPath = GetSubNodeAttributeDefault<std::string>(node, "loadPath", "file", name_loadPath);
   if(kinodynamic)
   {
     uMin = GetSubNodeAttribute<Config>(node, "control_min", "config");
     uMax = GetSubNodeAttribute<Config>(node, "control_max", "config");
   }
+  if(multiAgent)
+  {
+    TiXmlElement* node_qinit = FindFirstSubNode(node, "qinit");
+    while(node_qinit!=nullptr){
+      int nodeR = GetAttribute<int>(node_qinit, "robot");
+      Config qInitR = GetAttribute<Config>(node_qinit, "config");
+      node_qinit = FindNextSiblingNode(node_qinit);
+      q_inits.push_back(qInitR);
+      robot_idxs.push_back(nodeR);
+      std::cout << qInitR << std::endl;
+    }
+    exit(0);
+    TiXmlElement* node_qgoal = FindFirstSubNode(node, "qgoal");
+    while(node_qgoal!=nullptr){
+      int nodeR = GetAttribute<int>(node_qinit, "robot");
+      Config qGoalR = GetAttribute<Config>(node_qinit, "config");
+      node_qinit = FindNextSiblingNode(node_qinit);
+      q_goals.push_back(qGoalR);
+      robot_idxs.push_back(nodeR);
+      std::cout << qGoalR << std::endl;
+    }
+  }
 
   //necessary arguments
-
   q_init = GetSubNodeAttribute<Config>(node, "qinit", "config");
   q_goal = GetSubNodeAttribute<Config>(node, "qgoal", "config");
 
@@ -220,6 +249,7 @@ const CSpaceInput& PlannerInput::GetCSpaceInput()
   cin->uMin = uMin;
   cin->uMax = uMax;
   cin->kinodynamic = kinodynamic;
+  cin->multiAgent = multiAgent;
   return *cin;
 }
 const StrategyInput& PlannerInput::GetStrategyInput()
