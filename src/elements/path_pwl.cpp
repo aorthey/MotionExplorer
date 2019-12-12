@@ -166,7 +166,7 @@ Vector3 PathPiecewiseLinear::EvalVec3(const double t) const{
 }
 
 Config PathPiecewiseLinear::EvalMilestone(const int k) const{
-  std::cout << "NYI" << std::endl;
+  OMPL_ERROR("NYI");
   throw "NYI";
   //if(k<0) return keyframes.front();
   //if(k>Nkeyframes) return keyframes.back();
@@ -676,8 +676,7 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
 void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
 {
   Config q = Eval(t);
-  Robot* robot = quotient_space->GetRobotPtr();
-  GLDraw::drawRobotAtConfig(robot, q, cRobotVolume);
+  quotient_space->drawConfig(q, cRobotVolume);
 }
 
 void PathPiecewiseLinear::DrawGL(GUIState& state)

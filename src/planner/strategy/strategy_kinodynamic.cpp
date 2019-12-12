@@ -150,7 +150,7 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
 
   if(util::StartsWith(algorithm,"benchmark")){
     //No Init, directly execute benchmark
-    std::cout << "NYI" << std::endl;
+    OMPL_ERROR("NYI");
     throw "NYI";
   }else{
     planner = GetPlanner(algorithm, si_vec, pdef_vec, input);

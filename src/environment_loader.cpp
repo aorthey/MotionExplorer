@@ -129,50 +129,52 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 
       }
 
-      uint ridx = pin.inputs.at(0)->robot_idx;
-      Robot *robot = world.robots[ridx];
-      Vector q_init = pin.inputs.at(0)->q_init;
-      Vector q_goal = pin.inputs.at(0)->q_goal;
-      Vector dq_init = pin.inputs.at(0)->dq_init;
+      if(!pin.inputs.at(0)->multiAgent){
+        uint ridx = pin.inputs.at(0)->robot_idx;
+        Robot *robot = world.robots[ridx];
+        Vector q_init = pin.inputs.at(0)->q_init;
+        Vector q_goal = pin.inputs.at(0)->q_goal;
+        Vector dq_init = pin.inputs.at(0)->dq_init;
 
-      // for(int i = 0; i < 6; i++){
-      //   robot->qMin[i] = pin.inputs.at(0)->se3min[i];
-      //   robot->qMax[i] = pin.inputs.at(0)->se3max[i];
-      // }
+        // for(int i = 0; i < 6; i++){
+        //   robot->qMin[i] = pin.inputs.at(0)->se3min[i];
+        //   robot->qMax[i] = pin.inputs.at(0)->se3max[i];
+        // }
 
-      // pin.inputs.at(0)->qMin = robot->qMin;
-      // pin.inputs.at(0)->qMax = robot->qMax;
-      uint N = robot->q.size();
+        // pin.inputs.at(0)->qMin = robot->qMin;
+        // pin.inputs.at(0)->qMax = robot->qMax;
+        uint N = robot->q.size();
 
-      uint Ni = pin.inputs.at(0)->q_init.size();
-      uint Ng = pin.inputs.at(0)->q_goal.size();
-      if(Ni!=N){
-        std::cout << std::string(80, '#') << std::endl;
-        std::cout << "q_init has " << Ni << " dofs, but robot " << robot->name << " expects " << N << " dofs." << std::endl;
-        std::cout << std::string(80, '#') << std::endl;
-        throw "Invalid dofs.";
+        uint Ni = pin.inputs.at(0)->q_init.size();
+        uint Ng = pin.inputs.at(0)->q_goal.size();
+        if(Ni!=N){
+          std::cout << std::string(80, '#') << std::endl;
+          std::cout << "q_init has " << Ni << " dofs, but robot " << robot->name << " expects " << N << " dofs." << std::endl;
+          std::cout << std::string(80, '#') << std::endl;
+          throw "Invalid dofs.";
+        }
+        if(Ng!=N){
+          std::cout << std::string(80, '#') << std::endl;
+          std::cout << "q_goal has " << Ng << " dofs, but robot " << robot->name << " expects " << N << " dofs." << std::endl;
+          std::cout << std::string(80, '#') << std::endl;
+          throw "Invalid dofs.";
+        }
+
+        robot->q = q_init;
+        robot->dq = dq_init;
+        robot->UpdateFrames();
+
+        //set oderobot to planner start pos
+        ODERobot *simrobot = _backend->sim.odesim.robot(ridx);
+        simrobot->SetConfig(q_init);
+        simrobot->SetVelocities(dq_init);
+
+        if(pin.inputs.at(0)->kinodynamic){
+          LoadController(robot, *pin.inputs.at(0));
+          std::cout << "Loaded Controller for robot " << name_robot << std::endl;
+        }
+        util::SetSimulatedRobot(robot, _backend->sim, pin.inputs.at(0)->q_init, pin.inputs.at(0)->dq_init);
       }
-      if(Ng!=N){
-        std::cout << std::string(80, '#') << std::endl;
-        std::cout << "q_goal has " << Ng << " dofs, but robot " << robot->name << " expects " << N << " dofs." << std::endl;
-        std::cout << std::string(80, '#') << std::endl;
-        throw "Invalid dofs.";
-      }
-
-      robot->q = q_init;
-      robot->dq = dq_init;
-      robot->UpdateFrames();
-
-      //set oderobot to planner start pos
-      ODERobot *simrobot = _backend->sim.odesim.robot(ridx);
-      simrobot->SetConfig(q_init);
-      simrobot->SetVelocities(dq_init);
-
-      if(pin.inputs.at(0)->kinodynamic){
-        LoadController(robot, *pin.inputs.at(0));
-        std::cout << "Loaded Controller for robot " << name_robot << std::endl;
-      }
-      util::SetSimulatedRobot(robot, _backend->sim, pin.inputs.at(0)->q_init, pin.inputs.at(0)->dq_init);
     }else{
       std::cout << std::string(80, '-') << std::endl;
       std::cout << "No Planner Settings. No Planning" << std::endl;

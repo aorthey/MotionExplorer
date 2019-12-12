@@ -27,11 +27,10 @@ namespace ompl{
 
 class CSpaceOMPL
 {
-  friend class CSpaceOMPLDecorator;
-  friend class CSpaceOMPLDecoratorNecessarySufficient;
   public:
 
     CSpaceOMPL(RobotWorld *world_, int robot_idx_);
+    CSpaceOMPL(RobotWorld *world_, std::vector<int> robot_idxs);
 
     void Init();
     virtual ob::SpaceInformationPtr SpaceInformationPtr();
@@ -62,6 +61,8 @@ class CSpaceOMPL
     const ob::StateSpacePtr SpacePtr();
     const oc::RealVectorControlSpacePtr ControlSpacePtr();
 
+    void drawConfig(const Config &q, GLDraw::GLColor color=GLDraw::GLColor(1,0,0), double scale = 1.0);
+
     std::vector<double> EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
     void OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSpace::StateType *q );
 
@@ -85,6 +86,7 @@ class CSpaceOMPL
     uint Nompl;
     bool fixedBase{false};
     bool enableSufficiency{false};
+    bool multiAgent{false};
 
     //klampt:
     // SE(3) x R^Nklampt
@@ -107,6 +109,11 @@ class CSpaceOMPL
     CSpaceKlampt *klampt_cspace{nullptr};
     CSpaceKlampt *klampt_cspace_outer{nullptr};
     RobotWorld *world{nullptr};
+
+    //MultiAgent
+    std::vector<int> robot_idxs;
+    std::vector<Robot*> robots;
+    std::vector<CSpaceKlampt*> klampt_cspaces;
 
     WorldPlannerSettings worldsettings;
     int robot_idx{0};

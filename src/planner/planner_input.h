@@ -8,16 +8,23 @@ struct Layer{
   int level;
   int inner_index;
   int outer_index;
-  double cspace_constant;
-  Config q_init;
-  Config q_goal;
+  // double cspace_constant;
+  // Config q_init;
+  // Config q_goal;
   std::string type;
+
+  //multiagent
+  std::vector<int> ids;
+  std::vector<int> ptr_to_next_level_ids;
+  std::vector<std::string> types;
 };
 
 struct AgentInformation{
   Config q_init;
   Config q_goal;
-  int inner_index;
+  Config dq_init;
+  Config dq_goal;
+  int id;
   Config qMin;
   Config qMax;
 };
@@ -80,6 +87,7 @@ class PlannerInput{
     bool Load(TiXmlElement *node, int hierarchy = 0);
     void SetDefault();
     void ExtractHierarchy(TiXmlElement *node, int hierarchy_index);
+    void ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index);
     const CSpaceInput& GetCSpaceInput();
     const StrategyInput& GetStrategyInput();
 

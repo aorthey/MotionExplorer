@@ -71,7 +71,8 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
   }else{
     algorithms = GetAlgorithmsDefault(kinodynamic);
   }
-  const int i_hierarchy = CountNumberOfSubNodes(node_plannerinput, "hierarchy");
+
+  int i_hierarchy = CountNumberOfSubNodes(node_plannerinput, "hierarchy");
 
   for(uint k_algorithm = 0; k_algorithm < algorithms.size(); k_algorithm++){
     std::string name_algorithm = algorithms.at(k_algorithm);
@@ -80,9 +81,12 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
       input->name_algorithm = algorithms.at(k_algorithm);
       if(!input->Load(node_plannerinput)) return false;
 
-      std::cout << "HIERARCHIES:" << i_hierarchy << std::endl;
       for(uint k_hierarchy = 0; k_hierarchy < (uint)i_hierarchy; k_hierarchy++){
-        input->ExtractHierarchy(node_plannerinput, k_hierarchy);
+        if(input->multiAgent){
+          input->ExtractMultiHierarchy(node_plannerinput, k_hierarchy);
+        }else{
+          input->ExtractHierarchy(node_plannerinput, k_hierarchy);
+        }
       }
       inputs.push_back(input);
     }else{
@@ -96,7 +100,11 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
         input->name_algorithm = algorithms.at(k_algorithm);
 
         if(!input->Load(node_plannerinput)) return false;
-        input->ExtractHierarchy(node_plannerinput, k_hierarchy);
+        if(input->multiAgent){
+          input->ExtractMultiHierarchy(node_plannerinput, k_hierarchy);
+        }else{
+          input->ExtractHierarchy(node_plannerinput, k_hierarchy);
+        }
 
         inputs.push_back(input);
       }
@@ -162,34 +170,24 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
   }
   if(multiAgent)
   {
-    TiXmlElement* node_qinit = FindFirstSubNode(node, "qinit");
+    TiXmlElement* node_qinit = FindFirstSubNode(node, "agent");
     while(node_qinit!=nullptr){
-      int nodeR = GetAttribute<int>(node_qinit, "robot");
-      Config qInitR = GetAttribute<Config>(node_qinit, "config");
+      AgentInformation ai;
+      ai.id = GetAttribute<int>(node_qinit, "id");
+      ai.q_init = GetAttribute<Config>(node_qinit, "qinit");
+      ai.q_goal = GetAttribute<Config>(node_qinit, "qgoal");
+      agent_information.push_back(ai);
       node_qinit = FindNextSiblingNode(node_qinit);
-      q_inits.push_back(qInitR);
-      robot_idxs.push_back(nodeR);
-      std::cout << qInitR << std::endl;
     }
-    exit(0);
-    TiXmlElement* node_qgoal = FindFirstSubNode(node, "qgoal");
-    while(node_qgoal!=nullptr){
-      int nodeR = GetAttribute<int>(node_qinit, "robot");
-      Config qGoalR = GetAttribute<Config>(node_qinit, "config");
-      node_qinit = FindNextSiblingNode(node_qinit);
-      q_goals.push_back(qGoalR);
-      robot_idxs.push_back(nodeR);
-      std::cout << qGoalR << std::endl;
-    }
+  }else{
+    //necessary arguments
+    q_init = GetSubNodeAttribute<Config>(node, "qinit", "config");
+    q_goal = GetSubNodeAttribute<Config>(node, "qgoal", "config");
+
+    Config dq; dq.resize(q_init.size()); dq.setZero();
+    dq_init = GetSubNodeAttributeDefault<Config>(node, "dqinit", "config", dq);
+    dq_goal = GetSubNodeAttributeDefault<Config>(node, "dqgoal", "config", dq);
   }
-
-  //necessary arguments
-  q_init = GetSubNodeAttribute<Config>(node, "qinit", "config");
-  q_goal = GetSubNodeAttribute<Config>(node, "qgoal", "config");
-
-  Config dq; dq.resize(q_init.size()); dq.setZero();
-  dq_init = GetSubNodeAttributeDefault<Config>(node, "dqinit", "config", dq);
-  dq_goal = GetSubNodeAttributeDefault<Config>(node, "dqgoal", "config", dq);
 
   se3min.resize(6); se3min.setZero();
   se3max.resize(6); se3max.setZero();
@@ -219,9 +217,56 @@ void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy_index)
       layer.level = level++;
       layer.inner_index = GetAttribute<int>(lindex, "inner_index");
       layer.outer_index = GetAttributeDefault<int>(lindex, "outer_index", layer.inner_index);
-      layer.cspace_constant = GetAttributeDefault<double>(lindex, "cspace_constant", 0);
+      // layer.cspace_constant = GetAttributeDefault<double>(lindex, "cspace_constant", 0);
 
       layer.type = GetAttribute<std::string>(lindex, "type");
+
+      stratification.layers.push_back(layer);
+
+      lindex = FindNextSiblingNode(lindex);
+    }
+  }else{
+    std::cout << "[WARNING] Did not specify robot hierarchy. Assuming one layer SE3RN" << std::endl;
+    Layer layer;
+    layer.level = 0;
+    layer.inner_index = 0;
+    layer.outer_index = 0;
+    layer.type = "SE3RN";
+    stratification.layers.push_back(layer);
+  }
+  stratifications.push_back(stratification);
+
+}
+void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index)
+{
+  int ctr = 0;
+  TiXmlElement* node_hierarchy = FindSubNode(node, "multihierarchy");
+  while(ctr < hierarchy_index){
+    node_hierarchy = FindNextSiblingNode(node_hierarchy);
+    ctr++;
+  }
+  Stratification stratification;
+
+  if(node_hierarchy){
+    TiXmlElement* lindex = FindFirstSubNode(node_hierarchy, "level");
+    while(lindex!=nullptr){
+      Layer layer;
+      layer.level = GetAttribute<int>(lindex, "number");
+
+      TiXmlElement* ri = FindFirstSubNode(lindex, "robot");
+      while(ri!=nullptr){
+
+        int id = GetAttribute<int>(ri, "id");
+        layer.ids.push_back(id);
+
+        std::string type = GetAttribute<std::string>(ri, "type");
+        layer.types.push_back(type);
+
+        int sid = GetAttribute<int>(ri, "simplification_of_id");
+        layer.ptr_to_next_level_ids.push_back(sid);
+
+        ri = FindNextSiblingNode(ri);
+      }
 
       stratification.layers.push_back(layer);
 

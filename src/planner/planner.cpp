@@ -35,6 +35,11 @@ std::string MotionPlanner::getName() const{
   return input.name_algorithm;
 }
 
+CSpaceOMPL* MotionPlanner::ComputeMultiAgentCSpace(const Layer &layer){
+  OMPL_ERROR("NYI");
+  exit(0);
+}
+
 CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robot_inner_idx, const uint robot_outer_idx)
 {
   CSpaceFactory factory(input.GetCSpaceInput());
@@ -84,6 +89,8 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
       throw "Wrong Configuration Space.";
     }
   }
+
+
   std::cout << "Create QuotientSpace with dimensionality " << cspace_level->GetDimensionality() << "[OMPL] and " 
     << cspace_level->GetKlamptDimensionality() << "[Klampt]." << std::endl;
 
@@ -94,32 +101,29 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
 }
 
 CSpaceOMPL* MotionPlanner::ComputeCSpaceLayer(const Layer &layer){
-  int ii = layer.inner_index;
-  int io = layer.outer_index;
-  Robot* ri = world->robots[ii];
-  Robot* ro = world->robots[io];
 
-  if(ri==nullptr){
-    std::cout << "Robot " << ii << " does not exist." << std::endl;
-    throw "Robot non-existent.";
+  if(!input.multiAgent){
+    int ii = layer.inner_index;
+    int io = layer.outer_index;
+    Robot* ri = world->robots[ii];
+    Robot* ro = world->robots[io];
+
+    if(ri==nullptr){
+      std::cout << "Robot " << ii << " does not exist." << std::endl;
+      throw "Robot non-existent.";
+    }
+    if(ro==nullptr){
+      std::cout << "Robot " << io << " does not exist." << std::endl;
+      throw "Robot non-existent.";
+    }
+
+    std::string type = layer.type;
+    CSpaceOMPL *cspace_layer = ComputeCSpace(type, ii, io);
+    return cspace_layer;
+  }else{
+    CSpaceOMPL *cspace_layer = ComputeMultiAgentCSpace(layer);
+    return cspace_layer;
   }
-  if(ro==nullptr){
-    std::cout << "Robot " << io << " does not exist." << std::endl;
-    throw "Robot non-existent.";
-  }
-
-  Config qi = input.q_init; qi.resize(ri->q.size());
-  Config qg = input.q_goal; qg.resize(ri->q.size());
-  Config dqi = input.dq_init; dqi.resize(ri->dq.size());
-  Config dqg = input.dq_goal; dqg.resize(ri->dq.size());
-
-  //#########################################################################
-  //LEVEL k: given robot k, compute its cspace (free float vs fixed base)
-  //#########################################################################
-  std::string type = layer.type;
-  CSpaceOMPL *cspace_layer = ComputeCSpace(type, ii, io);
-  dynamic_pointer_cast<OMPLValidityChecker>(cspace_layer->StateValidityCheckerPtr())->SetNeighborhood(layer.cspace_constant);
-  return cspace_layer;
 }
 void MotionPlanner::CreateHierarchy()
 {
@@ -141,7 +145,7 @@ void MotionPlanner::CreateHierarchy()
 
       int io = layers.at(k).outer_index;
       int ii = layers.at(k).inner_index;
-      uint N = cspace_level_k->GetRobotPtr()->q.size();
+      uint N = cspace_level_k->GetKlamptDimensionality();
       Config qi = input.q_init; qi.resize(N);
       Config qg = input.q_goal; qg.resize(N);
       if(k==0){
@@ -179,7 +183,7 @@ void MotionPlanner::CreateHierarchy()
   }
 
   if(util::StartsWith(algorithm, "benchmark") || 
-     util::StartsWith(algorithm, "fiberoptimizer") 
+     util::StartsWith(algorithm, "optimizer") 
      ){
     if(input.stratifications.empty()){
       OMPL_INFORM("Benchmark has no stratifications");

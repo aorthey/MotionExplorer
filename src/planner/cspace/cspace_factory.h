@@ -46,6 +46,11 @@ class CSpaceFactory{
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE3( RobotWorld *world, int robot_idx){
       return MakeGeometricCSpace(world, robot_idx);
     }
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceMultiAgentSE2RN( 
+        RobotWorld *world, std::vector<int> ridxs){
+      OMPL_ERROR("NYI");
+      exit(0);
+    }
     // CSpace  SE(2) x R^(N)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE2RN( RobotWorld *world, int robot_idx){
       //return MakeGeometricCSpaceSE2RN(world, robot_idx);
