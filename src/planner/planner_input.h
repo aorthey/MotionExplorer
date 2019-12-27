@@ -14,9 +14,11 @@ struct Layer{
   std::string type;
 
   //multiagent
+  bool isMultiAgent{false};
   std::vector<int> ids;
   std::vector<int> ptr_to_next_level_ids;
   std::vector<std::string> types;
+  std::vector<int> freeFloating;
 };
 
 struct AgentInformation{

@@ -240,7 +240,7 @@ void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy_index)
 void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index)
 {
   int ctr = 0;
-  TiXmlElement* node_hierarchy = FindSubNode(node, "multihierarchy");
+  TiXmlElement* node_hierarchy = FindSubNode(node, "hierarchy");
   while(ctr < hierarchy_index){
     node_hierarchy = FindNextSiblingNode(node_hierarchy);
     ctr++;
@@ -249,9 +249,10 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
 
   if(node_hierarchy){
     TiXmlElement* lindex = FindFirstSubNode(node_hierarchy, "level");
+    int lctr = 0;
     while(lindex!=nullptr){
       Layer layer;
-      layer.level = GetAttribute<int>(lindex, "number");
+      layer.level = lctr++;
 
       TiXmlElement* ri = FindFirstSubNode(lindex, "robot");
       while(ri!=nullptr){
@@ -262,8 +263,11 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
         std::string type = GetAttribute<std::string>(ri, "type");
         layer.types.push_back(type);
 
-        int sid = GetAttribute<int>(ri, "simplification_of_id");
+        layer.freeFloating.push_back(GetAttributeDefault<int>(ri, "freeFloating", 1));
+
+        int sid = GetAttributeDefault<int>(ri, "simplification_of_id", 0);
         layer.ptr_to_next_level_ids.push_back(sid);
+        layer.isMultiAgent = true;
 
         ri = FindNextSiblingNode(ri);
       }

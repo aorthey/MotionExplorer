@@ -92,7 +92,7 @@ class MotionPlanner{
 
     // \brief solution path of planner
     PathPiecewiseLinear *pwl; 
-    CSpaceOMPL* ComputeCSpace(const std::string type, const uint robot_inner_index, const uint robot_outer_index = 0);
+    CSpaceOMPL* ComputeCSpace(const std::string type, const uint robot_index, bool freeFloating);
     CSpaceOMPL* ComputeMultiAgentCSpace(const Layer &layer);
     CSpaceOMPL* ComputeCSpaceLayer(const Layer &layer);
 };

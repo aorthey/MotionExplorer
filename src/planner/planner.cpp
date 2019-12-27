@@ -36,36 +36,47 @@ std::string MotionPlanner::getName() const{
 }
 
 CSpaceOMPL* MotionPlanner::ComputeMultiAgentCSpace(const Layer &layer){
+  CSpaceFactory factory(input.GetCSpaceInput());
+  std::vector<CSpaceOMPL*> cspace_levels;
+
+  for(uint k = 0; k < layer.ids.size(); k++){
+    int rk = layer.ids.at(k);
+    std::string type = layer.types.at(k);
+    bool freeFloating = layer.freeFloating.at(k);
+    CSpaceOMPL* cspace_level_k = ComputeCSpace(type, rk, freeFloating);
+    cspace_levels.push_back(cspace_level_k);
+  }
+
   OMPL_ERROR("NYI");
   exit(0);
 }
 
-CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robot_inner_idx, const uint robot_outer_idx)
+CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robot_idx, bool freeFloating)
 {
   CSpaceFactory factory(input.GetCSpaceInput());
 
   CSpaceOMPL* cspace_level;
-  if(input.freeFloating){
+  if(freeFloating){//input.freeFloating){
     if(type=="R2") {
-      cspace_level = factory.MakeGeometricCSpaceRN(world, robot_inner_idx, 2);
+      cspace_level = factory.MakeGeometricCSpaceRN(world, robot_idx, 2);
     }else if(type=="R3") {
-      cspace_level = factory.MakeGeometricCSpaceRN(world, robot_inner_idx, 3);
+      cspace_level = factory.MakeGeometricCSpaceRN(world, robot_idx, 3);
     }else if(type=="R3S2"){
-      cspace_level = factory.MakeGeometricCSpaceR3S2(world, robot_inner_idx);
+      cspace_level = factory.MakeGeometricCSpaceR3S2(world, robot_idx);
     }else if(type=="SE3"){
-      cspace_level = factory.MakeGeometricCSpaceSE3(world, robot_inner_idx);
+      cspace_level = factory.MakeGeometricCSpaceSE3(world, robot_idx);
     }else if(type=="SE2"){
-      cspace_level = factory.MakeGeometricCSpaceSE2(world, robot_inner_idx);
+      cspace_level = factory.MakeGeometricCSpaceSE2(world, robot_idx);
     }else if(type=="SE2RN"){
-      cspace_level = factory.MakeGeometricCSpaceSE2RN(world, robot_inner_idx);
+      cspace_level = factory.MakeGeometricCSpaceSE2RN(world, robot_idx);
     }else if(type=="SE3RN"){
-      cspace_level = factory.MakeGeometricCSpace(world, robot_inner_idx);
+      cspace_level = factory.MakeGeometricCSpace(world, robot_idx);
     }else if(type=="TSE2"){
-      cspace_level = factory.MakeKinodynamicCSpaceSE2(world, robot_inner_idx);
+      cspace_level = factory.MakeKinodynamicCSpaceSE2(world, robot_idx);
     }else if(type=="TSE3"){
-      cspace_level = factory.MakeKinodynamicCSpace(world, robot_inner_idx);
+      cspace_level = factory.MakeKinodynamicCSpace(world, robot_idx);
     }else if(type=="R2T") {
-      cspace_level = factory.MakeGeometricCSpaceRNTime(world, robot_inner_idx, 2);
+      cspace_level = factory.MakeGeometricCSpaceRNTime(world, robot_idx, 2);
     }else{
       std::cout << std::string(80, '#') << std::endl;
       std::cout << "Type " << type << " not recognized" << std::endl;
@@ -76,13 +87,13 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
     if(type.substr(0,1) == "R"){
       std::string str_dimension = type.substr(1);
       int N = boost::lexical_cast<int>(str_dimension);
-      cspace_level = factory.MakeGeometricCSpaceFixedBase(world, robot_inner_idx, N);
+      cspace_level = factory.MakeGeometricCSpaceFixedBase(world, robot_idx, N);
     }else if(type=="S1"){
-      cspace_level = factory.MakeGeometricCSpaceSO2(world, robot_inner_idx);
+      cspace_level = factory.MakeGeometricCSpaceSO2(world, robot_idx);
     }else if(type.substr(0,3) == "S1R"){
       std::string str_dimension = type.substr(3);
       int N = boost::lexical_cast<int>(str_dimension);
-      cspace_level = factory.MakeGeometricCSpaceSO2RN(world, robot_inner_idx, N);
+      cspace_level = factory.MakeGeometricCSpaceSO2RN(world, robot_idx, N);
     }else{
       std::cout << type.substr(0) << std::endl;
       std::cout << "fixed robots needs to have configuration space RN or SN, but has " << type << std::endl;
@@ -92,11 +103,8 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
 
 
   std::cout << "Create QuotientSpace with dimensionality " << cspace_level->GetDimensionality() << "[OMPL] and " 
-    << cspace_level->GetKlamptDimensionality() << "[Klampt]." << std::endl;
+    << cspace_level->GetKlamptDimensionality() << "[Klampt] (Robot Index " << cspace_level->GetRobotIndex() << ")." << std::endl;
 
-  if(robot_inner_idx != robot_outer_idx){
-    cspace_level->SetSufficient(robot_outer_idx);
-  }
   return cspace_level;
 }
 
@@ -118,7 +126,7 @@ CSpaceOMPL* MotionPlanner::ComputeCSpaceLayer(const Layer &layer){
     }
 
     std::string type = layer.type;
-    CSpaceOMPL *cspace_layer = ComputeCSpace(type, ii, io);
+    CSpaceOMPL *cspace_layer = ComputeCSpace(type, ii, input.freeFloating);
     return cspace_layer;
   }else{
     CSpaceOMPL *cspace_layer = ComputeMultiAgentCSpace(layer);

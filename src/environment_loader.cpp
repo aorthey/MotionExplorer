@@ -95,35 +95,57 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
           Stratification stratification = pkin->stratifications.at(j);
           for(uint i = 0; i < stratification.layers.size(); i++){
             Layer layer = stratification.layers.at(i);
-            uint ri = layer.inner_index;
-            uint ro = layer.outer_index;
-            if(ri>=world.robots.size()){
-              std::cout << std::string(80, '>') << std::endl;
-              std::cout << ">>> [ERROR] Robot with idx " << ri << " does not exists." << std::endl;
-              std::cout << std::string(80, '>') << std::endl;
-              throw "Invalid robot idx.";
-            }
-            if(ro>=world.robots.size()){
-              std::cout << std::string(80, '>') << std::endl;
-              std::cout << ">>> [ERROR] Robot with idx " << ro << " does not exists." << std::endl;
-              std::cout << std::string(80, '>') << std::endl;
-              throw "Invalid robot idx.";
-            }
+            if(!layer.isMultiAgent){
+              uint ri = layer.inner_index;
+              uint ro = layer.outer_index;
+              if(ri>=world.robots.size()){
+                std::cout << std::string(80, '>') << std::endl;
+                std::cout << ">>> [ERROR] Robot with idx " << ri << " does not exists." << std::endl;
+                std::cout << std::string(80, '>') << std::endl;
+                throw "Invalid robot idx.";
+              }
+              if(ro>=world.robots.size()){
+                std::cout << std::string(80, '>') << std::endl;
+                std::cout << ">>> [ERROR] Robot with idx " << ro << " does not exists." << std::endl;
+                std::cout << std::string(80, '>') << std::endl;
+                throw "Invalid robot idx.";
+              }
 
-            Robot *rk= world.robots.at(ri);
-            Robot *rko= world.robots.at(ro);
-            for(int i = 0; i < 6; i++){
-              rk->qMin[i] = pkin->se3min[i];
-              rk->qMax[i] = pkin->se3max[i];
-              rko->qMin[i] = pkin->se3min[i];
-              rko->qMax[i] = pkin->se3max[i];
+              Robot *rk= world.robots.at(ri);
+              Robot *rko= world.robots.at(ro);
+              for(int i = 0; i < 6; i++){
+                rk->qMin[i] = pkin->se3min[i];
+                rk->qMax[i] = pkin->se3max[i];
+                rko->qMin[i] = pkin->se3min[i];
+                rko->qMax[i] = pkin->se3max[i];
+              }
+              // rk->q = pkin->q_init;
+              // rk->dq = pkin->dq_init;
+              // rk->UpdateFrames();
+              // rko->q = pkin->q_init;
+              // rko->dq = pkin->dq_init;
+              // rko->UpdateFrames();
+            }else{
+              for(uint k = 0; k < layer.ids.size(); k++){
+                uint ri = layer.ids.at(k);
+                if(ri>=world.robots.size()){
+                  OMPL_ERROR("Robot with idx %d does not exists.",ri);
+                  throw "Invalid robot idx.";
+                }
+                Robot *rk= world.robots.at(ri);
+                for(int i = 0; i < 6; i++){
+                  rk->qMin[i] = pkin->se3min[i];
+                  rk->qMax[i] = pkin->se3max[i];
+                }
+              }
+              // rk->q = pkin->q_init;
+              // rk->dq = pkin->dq_init;
+              // rk->UpdateFrames();
+              // rko->q = pkin->q_init;
+              // rko->dq = pkin->dq_init;
+              // rko->UpdateFrames();
+
             }
-            // rk->q = pkin->q_init;
-            // rk->dq = pkin->dq_init;
-            // rk->UpdateFrames();
-            // rko->q = pkin->q_init;
-            // rko->dq = pkin->dq_init;
-            // rko->UpdateFrames();
           }
         }
 
