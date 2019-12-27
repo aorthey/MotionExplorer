@@ -44,53 +44,6 @@ CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx_):
   }
 }
 
-CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, std::vector<int> robot_idxs_):
-  si(nullptr), world(world_)
-{
-
-  worldsettings.InitializeDefault(*world);
-  std::vector<int> robot_idxs = robot_idxs_;
-
-  std::vector<Robot*> robots;
-
-  for(uint k = 0; k < robot_idxs.size(); k++){
-    int idx = robot_idxs.at(k);
-    Robot *robot = world->robots[idx];
-    robots.push_back(robot);
-    klampt_cspaces.push_back(new SingleRobotCSpace(*world, idx, &worldsettings));
-  }
-
-  OMPL_ERROR("NYI");
-  exit(0);
-  //Nklampt = robot->q.size() - 6;
-  ////check if the robot is SE(3) or if we need to add real vector space for joints
-  //if(Nklampt<=0){
-  //  Nompl = 0;
-  //}else{
-  //  //sometimes the joint space are only fixed joints. In that case OMPL
-  //  //complains that the real vector space is empty. We check here for that case
-  //  //and remove the real vector space
-  //  std::vector<double> minimum, maximum;
-  //  minimum = robot->qMin;
-  //  maximum = robot->qMax;
-  //  assert(minimum.size() == 6+Nklampt);
-  //  assert(maximum.size() == 6+Nklampt);
-
-  //  //prune dimensions which are smaller than epsilon (for ompl)
-  //  double epsilonSpacing=1e-10;
-  //  Nompl = 0;
-  //  for(uint i = 6; i < 6+Nklampt; i++){
-
-  //    if(abs(minimum.at(i)-maximum.at(i))>epsilonSpacing){
-  //      klampt_to_ompl.push_back(Nompl);
-  //      ompl_to_klampt.push_back(i);
-  //      Nompl++;
-  //    }else{
-  //      klampt_to_ompl.push_back(-1);
-  //    }
-  //  }
-  //}
-}
 
 Config CSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
   const ob::State* s = qompl.get();

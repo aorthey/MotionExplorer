@@ -30,7 +30,7 @@ class CSpaceOMPL
   public:
 
     CSpaceOMPL(RobotWorld *world_, int robot_idx_);
-    CSpaceOMPL(RobotWorld *world_, std::vector<int> robot_idxs);
+    // CSpaceOMPL(RobotWorld *world_, std::vector<int> robot_idxs);
 
     void Init();
     virtual ob::SpaceInformationPtr SpaceInformationPtr();
@@ -110,10 +110,10 @@ class CSpaceOMPL
     CSpaceKlampt *klampt_cspace_outer{nullptr};
     RobotWorld *world{nullptr};
 
-    //MultiAgent
-    std::vector<int> robot_idxs;
-    std::vector<Robot*> robots;
-    std::vector<CSpaceKlampt*> klampt_cspaces;
+    ////MultiAgent
+    //std::vector<int> robot_idxs;
+    //std::vector<Robot*> robots;
+    //std::vector<CSpaceKlampt*> klampt_cspaces;
 
     WorldPlannerSettings worldsettings;
     int robot_idx{0};
