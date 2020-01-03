@@ -458,10 +458,12 @@ void MotionPlanner::UpdateHierarchy(){
     if(current_level < L){
       viewHierarchy.PopLevel();
     }else{
-      uint idx = hierarchy->GetRobotIdx( current_level );
-      Robot *robot = world->robots[idx];
+        // uint idx = hierarchy->GetRobotIdx( current_level );
+        // Robot *robot = world->robots[idx];
+        // uint N = hierarchy->NumberNodesOnLevel(current_level);
+        // viewHierarchy.PushLevel(N, robot->name);
       uint N = hierarchy->NumberNodesOnLevel(current_level);
-      viewHierarchy.PushLevel(N, robot->name);
+      viewHierarchy.PushLevel(N, "");
     }
   }
   pwl = GetPath();

@@ -24,12 +24,14 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
     // void SetCSpaceInput(const CSpaceInput &input_);
     // CSpaceKlampt* GetCSpaceKlamptPtr();
 
-    // void drawConfig(const Config &q, GLDraw::GLColor color=GLDraw::GLColor(1,0,0), double scale = 1.0);
+    virtual void drawConfig(const Config &q, GLDraw::GLColor color=GLDraw::GLColor(1,0,0), double scale = 1.0) override;
 
     virtual bool isDynamic() const override;
     virtual void print(std::ostream& out) const override;
 
   protected:
+    std::vector<Config> splitConfig(const Config &q);
+
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) override;
     virtual void initSpace() override;
 
@@ -37,6 +39,10 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
 
     std::vector<int> Nklampts;
     std::vector<int> Nompls;
+
+    int subspaceCount{0};
+
+    //need to store how to split ob::State
 
 
 
