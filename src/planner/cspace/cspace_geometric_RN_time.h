@@ -7,7 +7,7 @@ class GeometricCSpaceOMPLRNTime: public GeometricCSpaceOMPL
     virtual void initSpace();
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
     virtual Config OMPLStateToConfig(const ob::State *qompl);
-    virtual void print() const override;
+    virtual void print(std::ostream& out = std::cout) const;
     virtual double GetTime(const ob::State *qompl) override;
     virtual bool isTimeDependent() override;
   protected:

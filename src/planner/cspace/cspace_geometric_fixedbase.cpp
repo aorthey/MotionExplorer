@@ -91,7 +91,7 @@ Config GeometricCSpaceOMPLFixedBase::OMPLStateToConfig(const ob::State *qompl){
   return q;
 
 }
-void GeometricCSpaceOMPLFixedBase::print() const
+void GeometricCSpaceOMPLFixedBase::print(std::ostream& out) const
 {
   std::cout << "Robot \"" << robot->name << "\":" << std::endl;
   std::cout << "Dimensionality Space            :" << GetDimensionality() << std::endl;

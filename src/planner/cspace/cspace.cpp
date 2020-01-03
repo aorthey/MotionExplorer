@@ -44,6 +44,11 @@ CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx_):
   }
 }
 
+std::string CSpaceOMPL::GetName()
+{
+  if(robot) return robot->name;
+  else return "unknown";
+}
 
 Config CSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
   const ob::State* s = qompl.get();
@@ -83,6 +88,9 @@ ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
 const ob::StateSpacePtr CSpaceOMPL::SpacePtr(){
   return space;
 }
+ob::StateSpacePtr CSpaceOMPL::SpacePtrNonConst(){
+  return space;
+}
 uint CSpaceOMPL::GetDimensionality() const{
   return space->getDimension();
 }
@@ -102,7 +110,6 @@ uint CSpaceOMPL::GetControlDimensionality() const{
 void CSpaceOMPL::SetCSpaceInput(const CSpaceInput &input_){
   input = input_;
   fixedBase = input.fixedBase;
-  multiAgent = input.multiAgent;
 }
 Robot* CSpaceOMPL::GetRobotPtr(){
   return robot;
@@ -239,19 +246,18 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
 }
 
 void CSpaceOMPL::drawConfig(const Config &q, GLColor color, double scale){
-  if(!multiAgent){
     GLDraw::drawRobotAtConfig(robot, q, color);
-  }else{
-    int Nstart = 0;
-    for(uint k = 0; k < robots.size(); k++){
-      int Nk = robots.at(k)->q.size();
-      Config qk; qk.resize(Nk); qk.setZero();
-      for(int j = Nstart; j < Nstart+Nk; j++){
-        qk[j-Nstart] = q[j];
-      }
-      GLDraw::drawRobotAtConfig(robots.at(k), qk, color);
-    }
-  }
+  // }else{
+  //   int Nstart = 0;
+  //   for(uint k = 0; k < robots.size(); k++){
+  //     int Nk = robots.at(k)->q.size();
+  //     Config qk; qk.resize(Nk); qk.setZero();
+  //     for(int j = Nstart; j < Nstart+Nk; j++){
+  //       qk[j-Nstart] = q[j];
+  //     }
+  //     GLDraw::drawRobotAtConfig(robots.at(k), qk, color);
+  //   }
+  // }
 }
 
 std::vector<double> CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q ){

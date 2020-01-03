@@ -158,7 +158,7 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
       }
       hierarchy->UpdateNode( roadmap_k, path);
     }
-    std::string rname = cspace_levels.back()->GetRobotPtr()->name;
+    std::string rname = cspace_levels.back()->GetName();//RobotPtr()->name;
     std::string fname = "../data/samples/cspace_robot_"+rname+".samples";
     roadmap_k->Save(fname.c_str());
     // std::cout << "Wrote samples to " << fname << std::endl;
@@ -253,7 +253,7 @@ std::ostream& operator<< (std::ostream& out, const StrategyOutput& so)
   out << std::string(80, '-') << std::endl;
   out << "Planning Output" << std::endl;
   out << std::string(80, '-') << std::endl;
-  out << " robot                : " << so.cspace->GetRobotPtr()->name << std::endl;
+  out << " robot                : " << so.cspace->GetName() << std::endl;
   if(so.pdef){
     out << " exact solution       : " << (so.pdef->hasExactSolution()? "Yes":"No")<< std::endl;
     out << " approximate solution : " << (so.pdef->hasApproximateSolution()? "Yes":"No")<< std::endl;

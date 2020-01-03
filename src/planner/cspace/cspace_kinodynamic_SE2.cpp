@@ -9,7 +9,7 @@ KinodynamicCSpaceOMPLSE2::KinodynamicCSpaceOMPLSE2(RobotWorld *world_, int robot
 {
 }
 
-void KinodynamicCSpaceOMPLSE2::print() const
+void KinodynamicCSpaceOMPLSE2::print(std::ostream& out) const
 {
   ob::CompoundStateSpace *cspace = space->as<ob::CompoundStateSpace>();
   ob::SE2StateSpaceFullInterpolate *cspaceSE2 = cspace->as<ob::SE2StateSpaceFullInterpolate>(0);

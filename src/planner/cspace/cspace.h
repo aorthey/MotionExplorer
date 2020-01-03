@@ -27,6 +27,7 @@ namespace ompl{
 
 class CSpaceOMPL
 {
+  friend class CSpaceOMPLMultiAgent;
   public:
 
     CSpaceOMPL(RobotWorld *world_, int robot_idx_);
@@ -36,7 +37,6 @@ class CSpaceOMPL
     virtual ob::SpaceInformationPtr SpaceInformationPtr();
 
     virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) = 0;
-    virtual void print() const = 0;
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) = 0;
     virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
     virtual double GetTime(const ob::State *qompl);
@@ -47,21 +47,22 @@ class CSpaceOMPL
 
     const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
     Vector3 getXYZ(const ob::State*);
-
     bool IsPlanar();
 
     void SetCSpaceInput(const CSpaceInput &input_);
     uint GetDimensionality() const;
-    uint GetKlamptDimensionality() const;
+    virtual uint GetKlamptDimensionality() const;
     uint GetControlDimensionality() const;
     Robot* GetRobotPtr();
+    std::string GetName();
     int GetRobotIndex() const;
     RobotWorld* GetWorldPtr();
     CSpaceKlampt* GetCSpaceKlamptPtr();
     const ob::StateSpacePtr SpacePtr();
+    ob::StateSpacePtr SpacePtrNonConst();
     const oc::RealVectorControlSpacePtr ControlSpacePtr();
 
-    void drawConfig(const Config &q, GLDraw::GLColor color=GLDraw::GLColor(1,0,0), double scale = 1.0);
+    virtual void drawConfig(const Config &q, GLDraw::GLColor color=GLDraw::GLColor(1,0,0), double scale = 1.0);
 
     std::vector<double> EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
     void OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSpace::StateType *q );
@@ -71,7 +72,7 @@ class CSpaceOMPL
     bool isFreeFloating();
 
     friend std::ostream& operator<< (std::ostream& out, const CSpaceOMPL& space);
-    virtual void print(std::ostream& out) const;
+    virtual void print(std::ostream& out = std::cout) const;
 
     void SetSufficient(const uint robot_outer_idx);
     ob::StateSpacePtr GetFirstSubspace();
@@ -86,7 +87,6 @@ class CSpaceOMPL
     uint Nompl;
     bool fixedBase{false};
     bool enableSufficiency{false};
-    bool multiAgent{false};
 
     //klampt:
     // SE(3) x R^Nklampt

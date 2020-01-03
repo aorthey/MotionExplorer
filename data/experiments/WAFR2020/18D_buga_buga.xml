@@ -12,15 +12,25 @@
 
   <plannerinput>
 
+    <!-- <agent --> 
+    <!--   id="0" --> 
+    <!--   qinit="13  2 -3 0 0 0 0 0 0 0 0 0 0 0 " -->
+    <!--   qgoal="13  0 +3 0 0 0 0 0 0 0 0 0 0 0 " -->
+    <!-- /> -->
     <agent 
-      id="0" 
-      qinit="6  0 -3 0 0 0 0"
+      id="1" 
+      qinit="6  2 -3 0 0 0 0"
       qgoal="6  0 +3 0 0 0 0"
     />
+    <!-- <agent --> 
+    <!--   id="2" --> 
+    <!--   qinit="13  -3 +3 0 0 0 0 0 0 0 0 0 0 0 " -->
+    <!--   qgoal="13  -3 -3 0 0 0 0 0 0 0 0 0 0 0 " -->
+    <!-- /> -->
     <agent 
-      id="2" 
-      qinit="6  0 +3 0 0 0 0"
-      qgoal="6  0 -3 0 0 0 0"
+      id="3" 
+      qinit="6  -3 +3 0 0 0 0"
+      qgoal="6  -3 -3 0 0 0 0"
     />
 
     <se3min config="6  -4 -4 0 -3.141593 0 0"/>
@@ -40,13 +50,17 @@
       <!--   <robot id="1" simplification_of_id="1" type="R2"/> -->
       <!-- </level> -->
       <level>
-        <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/>
-        <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/>
+        <robot id="1" freeFloating="1" type="R2"/>
+        <robot id="3" freeFloating="1" type="R2"/>
       </level>
-      <level>
-        <robot id="0" freeFloating="1" type="SE2RN"/>
-        <robot id="2" freeFloating="1" type="SE2RN"/>
-      </level>
+      <!-- <level> -->
+      <!--   <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/> -->
+      <!--   <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/> -->
+      <!-- </level> -->
+      <!-- <level> -->
+      <!--   <robot id="0" freeFloating="1" type="SE2RN"/> -->
+      <!--   <robot id="2" freeFloating="1" type="SE2RN"/> -->
+      <!-- </level> -->
     </hierarchy>
 
   </plannerinput>

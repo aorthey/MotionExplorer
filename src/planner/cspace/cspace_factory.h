@@ -1,6 +1,7 @@
 #pragma once
 #include "planner/cspace/cspace.h"
 #include "planner/cspace/cspace_geometric.h"
+#include "planner/cspace/cspace_multiagent.h"
 #include "planner/cspace/cspace_kinodynamic.h"
 #include "planner/cspace/cspace_kinodynamic_SE2.h"
 #include "planner/cspace/cspace_geometric_RN.h"
@@ -46,10 +47,12 @@ class CSpaceFactory{
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE3( RobotWorld *world, int robot_idx){
       return MakeGeometricCSpace(world, robot_idx);
     }
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceMultiAgentSE2RN( 
-        RobotWorld *world, std::vector<int> ridxs){
-      OMPL_ERROR("NYI");
-      exit(0);
+
+    virtual CSpaceOMPL* MakeGeometricCSpaceMultiAgent( std::vector<CSpaceOMPL*> cspaces){
+      CSpaceOMPLMultiAgent *cspace = new CSpaceOMPLMultiAgent(cspaces);
+      cspace->Init();
+      cspace->SetCSpaceInput(input);
+      return cspace;
     }
     // CSpace  SE(2) x R^(N)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE2RN( RobotWorld *world, int robot_idx){

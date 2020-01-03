@@ -81,7 +81,7 @@ void GeometricCSpaceOMPL::initSpace()
 
 }
 
-void GeometricCSpaceOMPL::print() const
+void GeometricCSpaceOMPL::print(std::ostream& out) const
 {
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "OMPL CSPACE" << std::endl;

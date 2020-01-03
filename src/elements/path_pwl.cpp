@@ -243,9 +243,11 @@ Config PathPiecewiseLinear::Eval(const double t) const{
 Config PathPiecewiseLinear::EvalVelocity(const double t) const{
   if(!quotient_space->isDynamic()) 
   {
-    Config dq = quotient_space->GetRobotPtr()->dq;
-    dq.setZero();
-    return dq;
+    OMPL_ERROR("Cannot eval velocity.");
+    throw "EvalVelocityError";
+    // Config dq = quotient_space->RobotPtr()->dq;
+    // dq.setZero();
+    // return dq;
   }
 
   KinodynamicCSpaceOMPL *kspace = static_cast<KinodynamicCSpaceOMPL*>(quotient_space);
@@ -700,20 +702,6 @@ void PathPiecewiseLinear::DrawGL(GUIState& state)
     cLine = cUnsmoothed;
     DrawGLPathPtr(state, path_raw);
   }
-  // if(state("draw_path_sweptvolume")){
-  //   if(!path) return;
-  //   if(!sv){
-  //     double tmin = 0.05;
-  //     double L = GetLength();
-  //     uint Nmilestones = int(L/tmin);
-  //     std::vector<Config> q;
-  //     for(uint k = 0; k < Nmilestones; k++){
-  //       q.push_back( Eval(k*tmin) );
-  //     }
-  //     sv = new SweptVolume(quotient_space->GetRobotPtr(), q, Nmilestones);
-  //   }
-  //   sv->DrawGL(state);
-  // }
 }
 bool PathPiecewiseLinear::Load(const char* fn)
 {

@@ -9,9 +9,6 @@ RobotWorld& EnvironmentLoader::GetWorld(){
 RobotWorld* EnvironmentLoader::GetWorldPtr(){
   return &world;
 }
-Robot* EnvironmentLoader::GetRobotPtr(){
-  return world.robots[0];
-}
 PlannerMultiInput EnvironmentLoader::GetPlannerInput(){
   return pin;
 }

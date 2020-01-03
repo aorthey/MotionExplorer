@@ -8,7 +8,7 @@ KinodynamicCSpaceOMPL::KinodynamicCSpaceOMPL(RobotWorld *world_, int robot_idx):
 {
 }
 
-void KinodynamicCSpaceOMPL::print() const
+void KinodynamicCSpaceOMPL::print(std::ostream& out) const
 {
   ob::CompoundStateSpace *cspace = space->as<ob::CompoundStateSpace>();
   ob::SE3StateSpace *cspaceSE3 = cspace->as<ob::SE3StateSpace>(0);

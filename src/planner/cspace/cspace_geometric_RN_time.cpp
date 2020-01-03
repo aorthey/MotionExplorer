@@ -74,7 +74,7 @@ double GeometricCSpaceOMPLRNTime::GetTime(const ob::State *qompl)
   return t;
 }
 
-void GeometricCSpaceOMPLRNTime::print() const
+void GeometricCSpaceOMPLRNTime::print(std::ostream& out) const
 {
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "OMPL CSPACE" << std::endl;

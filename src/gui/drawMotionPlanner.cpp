@@ -199,6 +199,19 @@ namespace GLDraw{
   }
 
 
+  void drawRobotsAtConfig(std::vector<Robot*> robots, const Config &q, GLColor color, double scale){
+    int ctr = 0;
+    for(uint k = 0; k < robots.size(); k++){
+      Robot *rk = robots.at(k);
+      uint N = rk->q.size();
+      Config qk; qk.resize(N);
+      for(uint j = 0; j < N; j++){
+        qk[j] = q[j+ctr];
+      }
+      drawRobotAtConfig(rk, qk, color, scale);
+      ctr += N;
+    }
+  }
   void drawRobotAtConfig(Robot *robot, const Config &q, GLColor color, double scale){
     glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);

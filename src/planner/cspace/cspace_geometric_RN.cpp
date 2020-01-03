@@ -52,7 +52,7 @@ Config GeometricCSpaceOMPLRN::OMPLStateToConfig(const ob::State *qompl){
   return q;
 
 }
-void GeometricCSpaceOMPLRN::print() const
+void GeometricCSpaceOMPLRN::print(std::ostream& out) const
 {
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "OMPL CSPACE" << std::endl;

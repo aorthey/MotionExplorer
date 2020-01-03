@@ -46,9 +46,8 @@ CSpaceOMPL* MotionPlanner::ComputeMultiAgentCSpace(const Layer &layer){
     CSpaceOMPL* cspace_level_k = ComputeCSpace(type, rk, freeFloating);
     cspace_levels.push_back(cspace_level_k);
   }
-
-  OMPL_ERROR("NYI");
-  exit(0);
+  CSpaceOMPL* cspace_level = factory.MakeGeometricCSpaceMultiAgent(cspace_levels);
+  return cspace_level;
 }
 
 CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robot_idx, bool freeFloating)
@@ -151,16 +150,40 @@ void MotionPlanner::CreateHierarchy()
       CSpaceOMPL *cspace_level_k = ComputeCSpaceLayer(layers.at(k));
       cspace_levels.push_back( cspace_level_k );
 
-      int io = layers.at(k).outer_index;
-      int ii = layers.at(k).inner_index;
-      uint N = cspace_level_k->GetKlamptDimensionality();
-      Config qi = input.q_init; qi.resize(N);
-      Config qg = input.q_goal; qg.resize(N);
-      if(k==0){
-        //add a root node
-        hierarchy->AddLevel( ii, io, qi, qg);
+      if(!layers.at(k).isMultiAgent){
+        int io = layers.at(k).outer_index;
+        int ii = layers.at(k).inner_index;
+        uint N = cspace_level_k->GetKlamptDimensionality();
+        Config qi = input.q_init; qi.resize(N);
+        Config qg = input.q_goal; qg.resize(N);
+        if(k==0){
+          //add a root node
+          hierarchy->AddLevel( ii, io, qi, qg);
+        }
+        hierarchy->AddLevel( ii, io, qi, qg); 
+      }else{
+        uint N = cspace_level_k->GetKlamptDimensionality();
+        Config qi; qi.resize(N);
+        Config qg; qg.resize(N);
+        int ctr = 0;
+        std::vector<int> ids;
+        for(uint j = 0; j < input.agent_information.size(); j++){
+          const AgentInformation &aj = input.agent_information.at(j);
+          ids.push_back(aj.id);
+
+          for(int i = 0; i < aj.q_init.size(); i++){
+            qi(i+ctr) = aj.q_init(i);
+            qg(i+ctr) = aj.q_goal(i);
+          }
+          ctr += aj.q_init.size();
+        }
+        if(k==0){
+          //add a root node
+          hierarchy->AddLevel( ids, qi, qg);
+        }
+        hierarchy->AddLevel( ids, qi, qg); 
+
       }
-      hierarchy->AddLevel( ii, io, qi, qg); 
     }
 
     //empty roadmap on the highest level (so that we can collapse the whole
@@ -198,7 +221,6 @@ void MotionPlanner::CreateHierarchy()
       return;
     }
     Layer last_layer = input.stratifications.at(0).layers.back();
-    // CSpaceOMPL *cspace_ambient = ComputeCSpaceLayer(last_layer);
 
     for(uint k = 0; k < input.stratifications.size(); k++){
       std::vector<Layer> layers = input.stratifications.at(k).layers;
@@ -578,12 +600,18 @@ void MotionPlanner::DrawGL(GUIState& state){
       }
   }
 
-  uint ridx = hierarchy->GetRobotIdx(current_level);
-  Robot* robot = world->robots[ridx];
-
   unsigned maxLevel = hierarchy->NumberLevels()-1;
-  uint ridx_outer = hierarchy->GetRobotIdx(maxLevel);
-  Robot* robot_outer = world->robots[ridx_outer];
+  std::vector<int> ridx = hierarchy->GetRobotIdxs(current_level);
+  std::vector<int> ridx_outer = hierarchy->GetRobotIdxs(maxLevel);
+
+  std::vector<Robot*> robots;
+  std::vector<Robot*> robots_outer;
+  for(uint k = 0; k < ridx.size(); k++){
+    robots.push_back( world->robots[ridx.at(k)] );
+  }
+  for(uint k = 0; k < ridx_outer.size(); k++){
+    robots_outer.push_back( world->robots[ridx_outer.at(k)] );
+  }
 
   const Config qi = hierarchy->GetInitConfig(current_level);
   const Config qg = hierarchy->GetGoalConfig(current_level);
@@ -593,15 +621,15 @@ void MotionPlanner::DrawGL(GUIState& state){
   const GLColor ultralightred_sufficient(0.8,0,0,0.3);
   const GLColor ultralightgreen_sufficient(0,0.5,0,0.2);
   if(state("planner_draw_start_configuration")){
-    GLDraw::drawRobotAtConfig(robot, qi, green);
+    GLDraw::drawRobotsAtConfig(robots, qi, green);
     if(state("planner_draw_start_goal_configuration_sufficient")){
-      GLDraw::drawRobotAtConfig(robot_outer, qiOuter, ultralightgreen_sufficient);
+      GLDraw::drawRobotsAtConfig(robots_outer, qiOuter, ultralightgreen_sufficient);
     }
   }
   if(state("planner_draw_goal_configuration")){
-    GLDraw::drawRobotAtConfig(robot, qg, red);
+    GLDraw::drawRobotsAtConfig(robots, qg, red);
     if(state("planner_draw_start_goal_configuration_sufficient")){
-      GLDraw::drawRobotAtConfig(robot_outer, qgOuter, ultralightred_sufficient);
+      GLDraw::drawRobotsAtConfig(robots_outer, qgOuter, ultralightred_sufficient);
     }
   }
 
