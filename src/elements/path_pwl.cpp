@@ -1,6 +1,7 @@
 #include "elements/path_pwl.h"
 #include "planner/cspace/cspace.h"
 #include "planner/cspace/cspace_kinodynamic.h"
+#include "planner/cspace/cspace_multiagent.h"
 #include "gui/drawMotionPlanner.h"
 #include <iostream>
 #include <ompl/base/spaces/SE3StateSpace.h>
@@ -9,6 +10,9 @@
 #include <ompl/geometric/PathSimplifier.h>
 #include <ompl/control/PathControl.h>
 #include <boost/math/constants/constants.hpp>
+#include <boost/foreach.hpp>
+
+#define foreach BOOST_FOREACH
 
 namespace oc = ompl::control;
 
@@ -310,6 +314,19 @@ Vector3 PathPiecewiseLinear::Vector3FromState(ob::State *s){
   v[2] += zOffset;
   return v;
 }
+
+Vector3 PathPiecewiseLinear::Vector3FromState(ob::State *s, int ridx){
+  if(!quotient_space->isMultiAgent()) return Vector3FromState(s);
+
+  Vector3 v = quotient_space->getXYZ(s, ridx);
+  if(draw_planar){
+    v[2] = 0.0;
+  }
+  v[2] += zOffset;
+  return v;
+}
+
+
 void PathPiecewiseLinear::Draw2DArrow(Vector3 arrow_pos, Vector3 arrow_dir, double arrow_size_head, double arrow_size_length)
 {
   Vector3 ez(0,0,1);
@@ -388,23 +405,20 @@ Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos,
     return qnext;
 }
 
-void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
+void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &states, int ridx)
 {
-  //############################################################################
-  //Draws a tron-like line strip
-  //############################################################################
   glBegin(GL_QUAD_STRIP);
   std::vector<Vector3> path_left;
   std::vector<Vector3> path_right;
   for(uint i = 0; i < states.size(); i++){
-    Vector3 q1 = Vector3FromState(states.at(i));
+    Vector3 q1 = Vector3FromState(states.at(i), ridx);
     Vector3 dq;
 
     if(i<states.size()-1){
-      Vector3 q2 = Vector3FromState(states.at(i+1));
+      Vector3 q2 = Vector3FromState(states.at(i+1), ridx);
       dq = q2 - q1;
     }else{
-      Vector3 q2 = Vector3FromState(states.at(i-1));
+      Vector3 q2 = Vector3FromState(states.at(i-1), ridx);
       dq = q1 - q2;
     }
 
@@ -464,6 +478,23 @@ void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
   }
   glEnd();
   cLine.setCurrentGL();
+}
+void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
+{
+  //############################################################################
+  //Draws a tron-like line strip
+  //############################################################################
+
+  if(quotient_space->isMultiAgent()){
+    CSpaceOMPLMultiAgent *cma = static_cast<CSpaceOMPLMultiAgent*>(quotient_space);
+    std::vector<int> idxs = cma->GetRobotIdxs();
+    foreach(int i, idxs)
+    {
+      DrawGLRibbonRobotIndex(states, i);
+    }
+  }else{
+    DrawGLRibbonRobotIndex(states, -1);
+  }
 }
 
 

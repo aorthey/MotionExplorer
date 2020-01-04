@@ -20,6 +20,21 @@ bool CSpaceOMPLMultiAgent::isDynamic() const
   return false;
 }
 
+bool CSpaceOMPLMultiAgent::isMultiAgent() const
+{
+  return true;
+}
+
+std::vector<int> CSpaceOMPLMultiAgent::GetRobotIdxs() const
+{
+  std::vector<int> idxs;
+  for(uint k = 0; k < cspaces_.size(); k++){
+    CSpaceOMPL *ck = cspaces_.at(k);
+    idxs.push_back(ck->GetRobotIndex());
+  }
+  return idxs;
+}
+
 void CSpaceOMPLMultiAgent::drawConfig(const Config &q, GLColor color, double scale){
   std::vector<Config> qks = splitConfig(q);
   for(uint k = 0; k < cspaces_.size(); k++){
@@ -87,6 +102,26 @@ std::vector<Config> CSpaceOMPLMultiAgent::splitConfig(const Config &q)
   }
   return qks;
 }
+
+Vector3 CSpaceOMPLMultiAgent::getXYZ(const ob::State *qompl, int ridx)
+{
+  std::vector<int> ridxs = GetRobotIdxs();
+  for(uint k = 0; k < ridxs.size(); k++){
+    if(ridx == ridxs.at(k)){
+      const ob::RealVectorStateSpace::StateType* qomplSubSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(k);
+      return cspaces_.at(k)->getXYZ(qomplSubSpace);
+    }
+  }
+  OMPL_ERROR("Could not find robot index %d.", ridx);
+  throw "NoIndex";
+}
+
+void CSpaceOMPLMultiAgent::ConfigToOMPLState(const Config &q, ob::State *qompl, int subspace)
+{
+  ob::RealVectorStateSpace::StateType* qkOMPL = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(subspace);
+  cspaces_.at(subspace)->ConfigToOMPLState(q, qkOMPL);
+}
+
 void CSpaceOMPLMultiAgent::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
   int ctr = 0;
@@ -102,22 +137,22 @@ void CSpaceOMPLMultiAgent::ConfigToOMPLState(const Config &q, ob::State *qompl)
   }
 
   for(int k = 0; k < subspaceCount; k++){
-    // space->as<ob::CompoundStateSpace>()->getSubspace(k);
-    ob::RealVectorStateSpace::StateType* qkOMPL = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(k);
-    cspaces_.at(k)->ConfigToOMPLState(qks.at(k), qkOMPL);
+    ConfigToOMPLState(qks.at(k), qompl, k);
   }
-  // std::cout << q << std::endl;
-  // si->printState(qompl);
+}
+Config CSpaceOMPLMultiAgent::OMPLStateToConfig(const ob::State *qompl, int subspace)
+{
+  const ob::RealVectorStateSpace::StateType* qkOMPL = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(subspace);
+  Config qk = cspaces_.at(subspace)->OMPLStateToConfig(qkOMPL);
+  return qk;
 }
 Config CSpaceOMPLMultiAgent::OMPLStateToConfig(const ob::State *qompl)
 {
-
   int ctr = 0;
   Config q; q.resize(Nklampt);
   for(int k = 0; k < subspaceCount; k++){
     // space->as<ob::CompoundStateSpace>()->getSubspace(k);
-    const ob::RealVectorStateSpace::StateType* qkOMPL = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(k);
-    Config qk = cspaces_.at(k)->OMPLStateToConfig(qkOMPL);
+    Config qk = OMPLStateToConfig(qompl, k);
     for(int j = 0; j < qk.size(); j++){
       q[j+ctr] = qk[j];
     }

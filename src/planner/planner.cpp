@@ -195,19 +195,40 @@ void MotionPlanner::CreateHierarchy()
       path.push_back(0);
     }
   }else{
-    //shallow algorithm (use last robot in hierarchy)
+
     Layer layer = input.stratifications.front().layers.back();
     CSpaceOMPL *cspace = ComputeCSpaceLayer(layer);
     cspace_levels.push_back(cspace);
+    if(!layer.isMultiAgent){
+      //shallow algorithm (use last robot in hierarchy)
+      //two levels, so we can collapse the roadmap 
+      uint N = cspace->GetRobotPtr()->q.size();
+      Config qi = input.q_init; qi.resize(N);
+      Config qg = input.q_goal; qg.resize(N);
+      int ri = cspace->GetRobotIndex();
+      hierarchy->AddLevel(ri, qi, qg);
+      hierarchy->AddLevel(ri, qi, qg);
 
-    //two levels, so we can collapse the roadmap 
-    uint N = cspace->GetRobotPtr()->q.size();
-    Config qi = input.q_init; qi.resize(N);
-    Config qg = input.q_goal; qg.resize(N);
-    int ri = cspace->GetRobotIndex();
-    hierarchy->AddLevel(ri, ri, qi, qg);
-    hierarchy->AddLevel(ri, ri, qi, qg);
+    }else{
+      uint N = cspace->GetKlamptDimensionality();
+      Config qi; qi.resize(N);
+      Config qg; qg.resize(N);
+      int ctr = 0;
+      std::vector<int> ids;
+      for(uint j = 0; j < input.agent_information.size(); j++){
+        const AgentInformation &aj = input.agent_information.at(j);
+        ids.push_back(aj.id);
 
+        for(int i = 0; i < aj.q_init.size(); i++){
+          qi(i+ctr) = aj.q_init(i);
+          qg(i+ctr) = aj.q_goal(i);
+        }
+        ctr += aj.q_init.size();
+      }
+      hierarchy->AddLevel( ids, qi, qg);
+      hierarchy->AddLevel( ids, qi, qg); 
+
+    }
     hierarchy->AddRootNode( std::make_shared<Roadmap>() ); 
     std::vector<int> path;
     hierarchy->AddNode( std::make_shared<Roadmap>(), path ); 

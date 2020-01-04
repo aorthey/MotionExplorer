@@ -12,7 +12,7 @@ CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx_):
 
   robot = world->robots[robot_idx];
   worldsettings.InitializeDefault(*world);
-  klampt_cspace = new SingleRobotCSpace(*world,robot_idx,&worldsettings);
+  klampt_cspace = new SingleRobotCSpace(*world, robot_idx, &worldsettings);
 
   Nklampt =  robot->q.size() - 6;
   //check if the robot is SE(3) or if we need to add real vector space for joints
@@ -48,6 +48,10 @@ std::string CSpaceOMPL::GetName()
 {
   if(robot) return robot->name;
   else return "unknown";
+}
+bool CSpaceOMPL::isMultiAgent() const
+{
+  return false;
 }
 
 Config CSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
@@ -182,6 +186,11 @@ ob::StateSpacePtr CSpaceOMPL::GetFirstSubspace()
     }
   }
   return space_first_subspace;
+}
+
+Vector3 CSpaceOMPL::getXYZ(const ob::State *s, int ridx)
+{
+  return getXYZ(s);
 }
 
 Vector3 CSpaceOMPL::getXYZ(const ob::State *s){

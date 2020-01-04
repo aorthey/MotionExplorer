@@ -5,6 +5,7 @@
 
   <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
   <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+  <robot name="kuka_disk3" file="../../robots/kuka_lwr/kuka_base.urdf"/>
 
   <terrain file="../../terrains/primitives/plane.tri">
      <display color="0.6 0.6 0.6 1"/> 
@@ -19,8 +20,8 @@
     <!-- /> -->
     <agent 
       id="1" 
-      qinit="6  2 -3 0 0 0 0"
-      qgoal="6  0 +3 0 0 0 0"
+      qinit="6  3 -3 0 0 0 0"
+      qgoal="6  3 +3 0 0 0 0"
     />
     <!-- <agent --> 
     <!--   id="2" --> 
@@ -29,12 +30,17 @@
     <!-- /> -->
     <agent 
       id="3" 
-      qinit="6  -3 +3 0 0 0 0"
-      qgoal="6  -3 -3 0 0 0 0"
+      qinit="6  0 -3 0 0 0 0"
+      qgoal="6  0 +3 0 0 0 0"
+    />
+    <agent 
+      id="4" 
+      qinit="6  -3 -3 0 0 0 0"
+      qgoal="6  -3 +3 0 0 0 0"
     />
 
-    <se3min config="6  -4 -4 0 -3.141593 0 0"/>
-    <se3max config="6  +4 +4 0 +3.141593 0 0"/>
+    <se3min config="6  -6 -4 0 -3.141593 0 0"/>
+    <se3max config="6  +5 +4 0 +3.141593 0 0"/>
 
     <epsilongoalregion>0.1</epsilongoalregion>
     <maxplanningtime>0.1</maxplanningtime>      <!-- runtime in (s) --> 
@@ -42,6 +48,7 @@
     <freeFloating>1</freeFloating>
     <smoothPath>0</smoothPath>
     <algorithm name="hierarchy:qrrt"/>
+    <algorithm name="ompl:rrt"/>
 
     <multiAgent>1</multiAgent>
 
@@ -52,6 +59,7 @@
       <level>
         <robot id="1" freeFloating="1" type="R2"/>
         <robot id="3" freeFloating="1" type="R2"/>
+        <robot id="4" freeFloating="1" type="R2"/>
       </level>
       <!-- <level> -->
       <!--   <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/> -->

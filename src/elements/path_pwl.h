@@ -74,11 +74,13 @@ class PathPiecewiseLinear
     std::vector<double> interLength;//interLength(i) length towards next milestone point from q(i)
     bool isSmooth{false};
     Vector3 Vector3FromState(ob::State *s);
+    Vector3 Vector3FromState(ob::State *s, int ridx);
     void Draw2DArrow(Vector3 arrow_pos, Vector3 arrow_dir, double arrow_size_head, double arrow_size_length);
     Vector3 GetNearestStateToTipOfArrow(Vector3 arrow_pos, 
         const std::vector<ob::State*> states, uint k_start_state, double arrow_size_length);
 
     void DrawGLRibbon(const std::vector<ob::State*> &states);
+    void DrawGLRibbonRobotIndex(const std::vector<ob::State*> &states, int ridx);
     void DrawGLArrowMiddleOfPath(const std::vector<ob::State*> &states);
     void DrawGLCross(const std::vector<ob::State*> &states);
 
