@@ -186,6 +186,7 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
     ob::SpaceInformationPtr sik = cspace_levelk->SpaceInformationPtr();
     setStateSampler(input.name_sampler, sik);
 
+    std::cout << input.q_init << std::endl;
     ob::ScopedState<> startk = cspace_levelk->ConfigToOMPLState(input.q_init);
     ob::ScopedState<> goalk  = cspace_levelk->ConfigToOMPLState(input.q_goal);
 

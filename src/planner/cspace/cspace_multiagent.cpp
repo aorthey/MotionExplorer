@@ -64,7 +64,7 @@ void CSpaceOMPLMultiAgent::initSpace()
   if(space->isCompound()){
     subspaceCount = space->as<ob::CompoundStateSpace>()->getSubspaceCount();
     if(subspaceCount != (int)cspaces_.size()){
-      OMPL_ERROR("Mismatch");
+      OMPL_ERROR("Mismatch (subspaces ompl: %d, subspaces klampt: %d)", subspaceCount, (int)cspaces_.size());
       throw "Mismatch";
     }
   }else{
@@ -75,8 +75,10 @@ void CSpaceOMPLMultiAgent::initSpace()
 }
 
 uint CSpaceOMPLMultiAgent::GetKlamptDimensionality() const{
-  std::cout << "Klampt DIM: " << Nklampt << std::endl;
   return Nklampt;
+}
+std::vector<int> CSpaceOMPLMultiAgent::GetKlamptDimensionalities() const{
+  return Nklampts;
 }
 
 void CSpaceOMPLMultiAgent::print(std::ostream& out) const

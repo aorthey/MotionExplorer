@@ -20,6 +20,7 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
     Config OMPLStateToConfig(const ob::State *qompl, int subspace);
 
     virtual uint GetKlamptDimensionality() const override;
+    std::vector<int> GetKlamptDimensionalities() const;
 
     // const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
     // Vector3 getXYZ(const ob::State*);

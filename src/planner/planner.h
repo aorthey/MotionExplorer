@@ -55,6 +55,7 @@ class MotionPlanner{
     friend std::ostream& operator<< (std::ostream& out, const MotionPlanner& planner);
 
     double getLastIterationTime();
+    void GetInitConfigMultiAgent(CSpaceOMPL *cspace, Config &qi, Config &qg);
   protected:
     MotionPlanner() = delete;
 
