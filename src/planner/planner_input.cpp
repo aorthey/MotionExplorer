@@ -181,18 +181,18 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
       node_qinit = FindNextSiblingNode(node_qinit);
       N += ai.q_init.size();
     }
-    q_init.resize(N);
-    q_goal.resize(N);
-    int ctr = 0;
-    for(uint k = 0; k < agent_information.size(); k++){
-      const AgentInformation &ak = agent_information.at(k);
-      int Nk = ak.q_init.size();
-      for(int j = 0; j < Nk; j++){
-        q_init[j+ctr] = ak.q_init[j];
-        q_goal[j+ctr] = ak.q_goal[j];
-      }
-      ctr += Nk;
-    }
+    // q_init.resize(N);
+    // q_goal.resize(N);
+    // int ctr = 0;
+    // for(uint k = 0; k < agent_information.size(); k++){
+    //   const AgentInformation &ak = agent_information.at(k);
+    //   int Nk = ak.q_init.size();
+    //   for(int j = 0; j < Nk; j++){
+    //     q_init[j+ctr] = ak.q_init[j];
+    //     q_goal[j+ctr] = ak.q_goal[j];
+    //   }
+    //   ctr += Nk;
+    // }
   }else{
     //necessary arguments
     q_init = GetSubNodeAttribute<Config>(node, "qinit", "config");

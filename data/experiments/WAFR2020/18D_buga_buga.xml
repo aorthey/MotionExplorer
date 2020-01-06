@@ -15,8 +15,8 @@
 
     <agent 
       id="0" 
-      qinit="13  2 -2 0 0 0 0 0.15 0 0 0 0 0 0 "
-      qgoal="13  2 +2 0 0 0 0 0.15 0 0 0 0 0 0 "
+      qinit="13  2 -2 0 0 0 0 0.8 0 0 0 0 0 0 "
+      qgoal="13  2 +2 0 0 0 0 -0.7 0 0 0 0 0 0 "
     />
     <agent 
       id="1" 
@@ -26,7 +26,7 @@
     <agent 
       id="2" 
       qinit="13  -2 +2 0 0 0 0 0.5 0 0 0 0 0 0 "
-      qgoal="13  -2 -2 0 0 0 0 0.5 0 0 0 0 0 0 "
+      qgoal="13  -2 -2 0 0 0 0 -0.5 0 0 0 0 0 0 "
     />
     <agent 
       id="3" 
@@ -66,6 +66,8 @@
       <!--   <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/> -->
       <!-- </level> -->
       <level>
+        <robot id="3" freeFloating="1" type="R2"/>
+        <robot id="1" freeFloating="1" type="R2"/>
         <robot id="0" freeFloating="1" type="SE2RN"/>
         <robot id="2" freeFloating="1" type="SE2RN"/>
       </level>
