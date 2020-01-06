@@ -19,5 +19,6 @@ class GeometricCSpaceOMPL: public CSpaceOMPL
 
     virtual void print(std::ostream& out = std::cout) const;
     virtual bool isDynamic() const override;
+    virtual Vector3 getXYZ(const ob::State*) override;
 };
 

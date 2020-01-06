@@ -79,3 +79,18 @@ void GeometricCSpaceOMPLRN::print(std::ostream& out) const
 
   std::cout << std::string(80, '-') << std::endl;
 }
+
+
+Vector3 GeometricCSpaceOMPLRN::getXYZ(const ob::State *s)
+{
+  const ob::RealVectorStateSpace::StateType *qomplRN = s->as<ob::RealVectorStateSpace::StateType>();
+
+  double x = qomplRN->values[0];
+  double y = 0;
+  double z = 0;
+
+  if(N>1) y = qomplRN->values[1];
+  if(N>2) z = qomplRN->values[2];
+  Vector3 q(x,y,z);
+  return q;
+}

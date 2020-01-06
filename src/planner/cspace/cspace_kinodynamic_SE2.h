@@ -17,5 +17,6 @@ class KinodynamicCSpaceOMPLSE2: public KinodynamicCSpaceOMPL
     virtual Config OMPLStateToConfig(const ob::State *qompl) override;
     virtual Config OMPLStateToVelocity(const ob::State *qompl) override;
 
+    virtual Vector3 getXYZ(const ob::State*) override;
 };
 

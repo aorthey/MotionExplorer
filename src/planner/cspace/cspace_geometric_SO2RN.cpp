@@ -93,7 +93,7 @@ void GeometricCSpaceOMPLSO2RN::ConfigToOMPLState(const Config &q, ob::State *qom
     qomplSO2 = qompl->as<ob::SO2StateSpaceFullInterpolate::StateType>();
     qomplRnSpace = nullptr;
   }
-  qomplSO2->value = q(6);
+  qomplSO2->value = q(6); //Note: this is fixedbase! So first joint value is q(6) in klampt
 
   if(Nompl>0){
     double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
@@ -136,4 +136,30 @@ void GeometricCSpaceOMPLSO2RN::print(std::ostream& out) const
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "Robot \"" << robot->name << "\":" << std::endl;
   std::cout << "Dimensionality Space            : " << 1+Nompl << std::endl;
+}
+
+Vector3 GeometricCSpaceOMPLSO2RN::getXYZ(const ob::State *s)
+{
+  if(!isFixedBase()){
+    OMPL_ERROR("NYI");
+    throw "NYI";
+  }else{
+    Config q = OMPLStateToConfig(s);
+    robot->UpdateConfig(q);
+    robot->UpdateGeometry();
+    Vector3 qq;
+    Vector3 zero; zero.setZero();
+    int lastLink = robot->links.size()-1;
+
+    //NOTE: the world position is zero exactly at the point where link is
+    //attached using a joint to the whole linkage. Check where your last fixed
+    //joint is positioned, before questioning the validity of this method
+    robot->GetWorldPosition(zero, lastLink, qq);
+
+    double x = qq[0];
+    double y = qq[1];
+    double z = qq[2];
+    Vector3 v(x,y,z);
+    return v;
+  }
 }

@@ -197,3 +197,18 @@ const oc::StatePropagatorPtr GeometricCSpaceOMPL::StatePropagatorPtr(oc::SpaceIn
   OMPL_ERROR("GeometricCspace has no StatePropagatorPtr");
   throw "No StatePropagatorPtr.";
 }
+
+Vector3 GeometricCSpaceOMPL::getXYZ(const ob::State *s)
+{
+  const ob::SE3StateSpace::StateType *qomplSE3;
+  if(Nompl>0){
+    qomplSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  }else{
+    qomplSE3 = s->as<ob::SE3StateSpace::StateType>();
+  }
+  double x = qomplSE3->getX();
+  double y = qomplSE3->getY();
+  double z = qomplSE3->getZ();
+  Vector3 q(x,y,z);
+  return q;
+}

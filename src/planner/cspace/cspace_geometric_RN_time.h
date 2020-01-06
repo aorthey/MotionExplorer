@@ -10,6 +10,7 @@ class GeometricCSpaceOMPLRNTime: public GeometricCSpaceOMPL
     virtual void print(std::ostream& out = std::cout) const;
     virtual double GetTime(const ob::State *qompl) override;
     virtual bool isTimeDependent() override;
+    virtual Vector3 getXYZ(const ob::State*) override;
   protected:
     uint N;
 };

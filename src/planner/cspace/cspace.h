@@ -46,7 +46,7 @@ class CSpaceOMPL
     ob::ScopedState<> ConfigToOMPLState(const Config &q);
 
     const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
-    Vector3 getXYZ(const ob::State*);
+    virtual Vector3 getXYZ(const ob::State*) = 0;
     virtual Vector3 getXYZ(const ob::State*, int ridx);
     bool IsPlanar();
 

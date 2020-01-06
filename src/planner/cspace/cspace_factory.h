@@ -7,7 +7,6 @@
 #include "planner/cspace/cspace_geometric_RN.h"
 #include "planner/cspace/cspace_geometric_RN_time.h"
 #include "planner/cspace/cspace_geometric_SE2.h"
-#include "planner/cspace/cspace_geometric_SO2.h"
 #include "planner/cspace/cspace_geometric_SE2RN.h"
 #include "planner/cspace/cspace_geometric_SO2RN.h"
 #include "planner/cspace/cspace_geometric_R3S2.h"
@@ -78,10 +77,7 @@ class CSpaceFactory{
     }
     // CSpace  SO(2)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSO2( RobotWorld *world, int robot_idx){
-      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLSO2(world, robot_idx);
-      cspace->SetCSpaceInput(input);
-      cspace->Init();
-      return cspace;
+      return MakeGeometricCSpaceSO2RN(world, robot_idx, 0);
     }
     // CSpace  SO(2) x R^(N)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSO2RN( RobotWorld *world, int robot_idx, int dimension){

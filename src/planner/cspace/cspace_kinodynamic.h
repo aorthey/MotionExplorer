@@ -27,5 +27,6 @@ class KinodynamicCSpaceOMPL: public GeometricCSpaceOMPL
     virtual ob::SpaceInformationPtr SpaceInformationPtr() override;
     virtual bool isDynamic() const override;
 
+    virtual Vector3 getXYZ(const ob::State*) override;
 };
 

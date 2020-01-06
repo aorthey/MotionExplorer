@@ -304,3 +304,11 @@ const oc::StatePropagatorPtr KinodynamicCSpaceOMPLSE2::StatePropagatorPtr(oc::Sp
   return std::make_shared<IntegratorSE2>(si, this);
 }
 
+Vector3 KinodynamicCSpaceOMPLSE2::getXYZ(const ob::State *s)
+{
+  const ob::SE2StateSpace::StateType *qomplSE2 = s->as<ob::CompoundState>()->as<ob::SE2StateSpace::StateType>(0);
+  double x = qomplSE2->getX();
+  double y = qomplSE2->getY();
+  Vector3 q(x,y,0);
+  return q;
+}

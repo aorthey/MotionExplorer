@@ -279,7 +279,7 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
 
         layer.freeFloating.push_back(GetAttributeDefault<int>(ri, "freeFloating", 1));
 
-        int sid = GetAttributeDefault<int>(ri, "simplification_of_id", 0);
+        int sid = GetAttributeDefault<int>(ri, "simplification_of_id", -1);
         layer.ptr_to_next_level_ids.push_back(sid);
         layer.isMultiAgent = true;
 

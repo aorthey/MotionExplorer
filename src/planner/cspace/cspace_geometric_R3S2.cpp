@@ -62,3 +62,8 @@ Config GeometricCSpaceOMPLR3S2::OMPLStateToConfig(const ob::State *qompl){
 
   return q;
 }
+Vector3 GeometricCSpaceOMPLR3S2::getXYZ(const ob::State *s)
+{
+  OMPL_ERROR("NYI");
+  throw "NYI";
+}

@@ -311,3 +311,13 @@ ob::SpaceInformationPtr KinodynamicCSpaceOMPL::SpaceInformationPtr(){
   }
   return si;
 }
+
+Vector3 KinodynamicCSpaceOMPL::getXYZ(const ob::State *s)
+{
+  const ob::SE3StateSpace::StateType *qomplSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  double x = qomplSE3->getX();
+  double y = qomplSE3->getY();
+  double z = qomplSE3->getZ();
+  Vector3 q(x,y,z);
+  return q;
+}

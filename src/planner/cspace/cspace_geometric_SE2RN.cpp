@@ -151,3 +151,17 @@ void GeometricCSpaceOMPLSE2RN::print(std::ostream& out) const
   std::cout << std::endl;
   std::cout << std::string(80, '-') << std::endl;
 }
+
+Vector3 GeometricCSpaceOMPLSE2RN::getXYZ(const ob::State *s)
+{
+  const ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2{nullptr};
+  if(Nompl>0){
+    qomplSE2 = s->as<ob::CompoundState>()->as<ob::SE2StateSpaceFullInterpolate::StateType>(0);
+  }else{
+    qomplSE2 = s->as<ob::SE2StateSpaceFullInterpolate::StateType>();
+  }
+  double x = qomplSE2->getX();
+  double y = qomplSE2->getY();
+  Vector3 q(x,y,0);
+  return q;
+}

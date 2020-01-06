@@ -100,3 +100,8 @@ void GeometricCSpaceOMPLRNTime::print(std::ostream& out) const
   std::cout << std::endl;
   std::cout << std::string(80, '-') << std::endl;
 }
+Vector3 GeometricCSpaceOMPLRNTime::getXYZ(const ob::State *s)
+{
+  OMPL_ERROR("NYI");
+  throw "NYI";
+}

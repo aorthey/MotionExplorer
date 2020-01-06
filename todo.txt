@@ -705,4 +705,9 @@ would disappear if S1 would be the uppermost level.
 [ ] Rewrite to use Hierarchical PD
 
 
+MultiAgent
+[ ] Fix Roadmap (i.e. show the right vertices and edges)
+[ ] Fix SE2RN (i.e. implement other cspaces than RN)
+[ ] Fix StateValidityChecker
+
 
