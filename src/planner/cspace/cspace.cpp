@@ -44,6 +44,17 @@ CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx_):
   }
 }
 
+bool CSpaceOMPL::UpdateRobotConfig(Config &q)
+{
+  robot->UpdateConfig(q);
+  robot->UpdateGeometry();
+  return true;
+}
+bool CSpaceOMPL::SatisfiesBounds(const ob::State *state)
+{
+  return SpaceInformationPtr()->satisfiesBounds(state);
+}
+
 std::string CSpaceOMPL::GetName()
 {
   if(robot) return robot->name;
@@ -129,8 +140,8 @@ const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr()
 {
   if(!validity_checker){
     si = SpaceInformationPtr();
-    //validity_checker = StateValidityCheckerPtr(si);
-    //si->setStateValidityChecker(validity_checker);
+    validity_checker = StateValidityCheckerPtr(si);
+    si->setStateValidityChecker(validity_checker);
   }
   return validity_checker;
 }

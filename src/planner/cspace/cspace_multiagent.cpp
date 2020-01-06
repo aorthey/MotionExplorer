@@ -12,6 +12,16 @@ CSpaceOMPLMultiAgent::CSpaceOMPLMultiAgent(std::vector<CSpaceOMPL*> cspaces):
 {
 }
 
+bool CSpaceOMPLMultiAgent::SatisfiesBounds(const ob::State *state)
+{
+  for(uint k = 0; k < cspaces_.size(); k++){
+    CSpaceOMPL *ck = cspaces_.at(k);
+    const ob::State *stateK = static_cast<const ob::CompoundState*>(state)->as<ob::State>(k);
+    if(!ck->SatisfiesBounds(stateK)) return false;
+  }
+  return true;
+}
+
 bool CSpaceOMPLMultiAgent::isDynamic() const
 {
   for(uint k = 0; k < cspaces_.size(); k++){
@@ -19,6 +29,18 @@ bool CSpaceOMPLMultiAgent::isDynamic() const
     if(ck->isDynamic()) return true;
   }
   return false;
+}
+
+bool CSpaceOMPLMultiAgent::UpdateRobotConfig(Config &q)
+{
+  std::vector<Config> qks = splitConfig(q);
+  for(uint k = 0; k < cspaces_.size(); k++){
+    CSpaceOMPL *ck = cspaces_.at(k);
+    Robot *robot = ck->GetRobotPtr();
+    robot->UpdateConfig(qks.at(k));
+    robot->UpdateGeometry();
+  }
+  return true;
 }
 
 bool CSpaceOMPLMultiAgent::isMultiAgent() const
@@ -126,7 +148,7 @@ Vector3 CSpaceOMPLMultiAgent::getXYZ(const ob::State *qompl, int ridx)
 
 const ob::StateValidityCheckerPtr CSpaceOMPLMultiAgent::StateValidityCheckerPtr(ob::SpaceInformationPtr si)
 {
-  validity_checker = std::make_shared<OMPLValidityCheckerMultiAgent>(si, cspaces_);
+  validity_checker = std::make_shared<OMPLValidityCheckerMultiAgent>(si, this, cspaces_);
   return validity_checker;
 }
 
@@ -159,7 +181,6 @@ void CSpaceOMPLMultiAgent::ConfigToOMPLState(const Config &q, ob::State *qompl)
   }
 
   for(uint k = 0; k < cspaces_.size(); k++){
-    SpaceInformationPtr()->printState(qompl);
     ConfigToOMPLState(qks.at(k), qompl, k);
   }
 }

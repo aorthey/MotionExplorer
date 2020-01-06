@@ -41,6 +41,8 @@ class CSpaceOMPL
     virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
     virtual double GetTime(const ob::State *qompl);
     virtual bool isTimeDependent();
+    virtual bool SatisfiesBounds(const ob::State*);
+    virtual bool UpdateRobotConfig(Config &q);
 
     Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
     ob::ScopedState<> ConfigToOMPLState(const Config &q);

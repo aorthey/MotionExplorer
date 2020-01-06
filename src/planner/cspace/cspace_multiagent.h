@@ -22,6 +22,8 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
     virtual uint GetKlamptDimensionality() const override;
     std::vector<int> GetKlamptDimensionalities() const;
 
+    virtual bool SatisfiesBounds(const ob::State*) override;
+    virtual bool UpdateRobotConfig(Config &q) override;
     // const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
     // Vector3 getXYZ(const ob::State*);
 
@@ -39,8 +41,8 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
     virtual Vector3 getXYZ(const ob::State*) override;
     virtual Vector3 getXYZ(const ob::State*, int) override;
 
-  protected:
     std::vector<Config> splitConfig(const Config &q);
+  protected:
 
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) override;
     virtual void initSpace() override;
