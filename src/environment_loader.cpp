@@ -122,33 +122,37 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
               // rko->q = pkin->q_init;
               // rko->dq = pkin->dq_init;
               // rko->UpdateFrames();
-            }else{
-              for(uint k = 0; k < layer.ids.size(); k++){
-                uint ri = layer.ids.at(k);
-                if(ri>=world.robots.size()){
-                  OMPL_ERROR("Robot with idx %d does not exists.",ri);
-                  throw "Invalid robot idx.";
-                }
-                Robot *rk= world.robots.at(ri);
-                for(int i = 0; i < 6; i++){
-                  rk->qMin[i] = pkin->se3min[i];
-                  rk->qMax[i] = pkin->se3max[i];
-                }
-              }
-              // rk->q = pkin->q_init;
-              // rk->dq = pkin->dq_init;
-              // rk->UpdateFrames();
-              // rko->q = pkin->q_init;
-              // rko->dq = pkin->dq_init;
-              // rko->UpdateFrames();
+            }
+          }//for layers
+        }//for stratifications
 
+      }//for inputs
+
+      PlannerInput *pkin = pin.inputs.at(0);
+      if(pkin->multiAgent){
+        //multiagent settings
+
+        for(uint k = 0; k < pkin->agent_information.size(); k++){
+          AgentInformation ai = pkin->agent_information.at(k);
+          int ri = ai.id;
+          if(ri>=(int)world.robots.size()){
+            OMPL_ERROR("Robot with idx %d does not exists.",ri);
+            throw "Invalid robot idx.";
+          }
+          Robot *rk= world.robots.at(ri);
+          if(ai.qMin.size()>0){
+            for(int i = 0; i < 6; i++){
+                rk->qMin[i] = ai.qMin[i];
+                rk->qMax[i] = ai.qMax[i];
+            }
+          }else{
+            for(int i = 0; i < 6; i++){
+                rk->qMin[i] = pkin->se3min[i];
+                rk->qMax[i] = pkin->se3max[i];
             }
           }
         }
-
-      }
-
-      if(!pin.inputs.at(0)->multiAgent){
+      }else{
         uint ridx = pin.inputs.at(0)->robot_idx;
         Robot *robot = world.robots[ridx];
         Vector q_init = pin.inputs.at(0)->q_init;
@@ -194,6 +198,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
         }
         util::SetSimulatedRobot(robot, _backend->sim, pin.inputs.at(0)->q_init, pin.inputs.at(0)->dq_init);
       }
+
     }else{
       std::cout << std::string(80, '-') << std::endl;
       std::cout << "No Planner Settings. No Planning" << std::endl;

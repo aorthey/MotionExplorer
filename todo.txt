@@ -706,10 +706,11 @@ would disappear if S1 would be the uppermost level.
 
 
 MultiAgent
-[ ] Fix Roadmap (i.e. show the right vertices and edges)
 [x] Fix SE2RN (i.e. implement other cspaces than RN)
-[ ] Fix starting values for simplifications
+[ ] Fix Roadmap (i.e. show the right vertices and edges)
 [ ] Add simplifications
-[ ] Fix StateValidityChecker
+[ ] Fix starting values for simplifications (for simplification)
+[ ] Fix StateValidityChecker (robot-robot collision checker doesnt work)
+[ ] Visualize over/under of paths
 
 

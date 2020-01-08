@@ -170,29 +170,20 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
   }
   if(multiAgent)
   {
-    TiXmlElement* node_qinit = FindFirstSubNode(node, "agent");
+    TiXmlElement* node_agent = FindFirstSubNode(node, "agent");
     int N = 0;
-    while(node_qinit!=nullptr){
+    while(node_agent!=nullptr){
       AgentInformation ai;
-      ai.id = GetAttribute<int>(node_qinit, "id");
-      ai.q_init = GetAttribute<Config>(node_qinit, "qinit");
-      ai.q_goal = GetAttribute<Config>(node_qinit, "qgoal");
+      ai.id = GetAttribute<int>(node_agent, "id");
+      ai.q_init = GetAttribute<Config>(node_agent, "qinit");
+      ai.q_goal = GetAttribute<Config>(node_agent, "qgoal");
+      Config qzero;
+      ai.qMin = GetAttributeDefault<Config>(node_agent, "qMin", qzero);
+      ai.qMax = GetAttributeDefault<Config>(node_agent, "qMax", qzero);
       agent_information.push_back(ai);
-      node_qinit = FindNextSiblingNode(node_qinit);
+      node_agent = FindNextSiblingNode(node_agent);
       N += ai.q_init.size();
     }
-    // q_init.resize(N);
-    // q_goal.resize(N);
-    // int ctr = 0;
-    // for(uint k = 0; k < agent_information.size(); k++){
-    //   const AgentInformation &ak = agent_information.at(k);
-    //   int Nk = ak.q_init.size();
-    //   for(int j = 0; j < Nk; j++){
-    //     q_init[j+ctr] = ak.q_init[j];
-    //     q_goal[j+ctr] = ak.q_goal[j];
-    //   }
-    //   ctr += Nk;
-    // }
   }else{
     //necessary arguments
     q_init = GetSubNodeAttribute<Config>(node, "qinit", "config");

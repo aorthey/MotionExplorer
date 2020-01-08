@@ -115,6 +115,7 @@ void PathPiecewiseLinear::setColor(const GLColor &color)
 void PathPiecewiseLinear::Smooth(){
   if(path == nullptr) return;
   if(quotient_space->isDynamic()) return;
+
   if(!isSmooth){
 
     og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);

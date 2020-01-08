@@ -11,6 +11,7 @@ OMPLValidityCheckerMultiAgent::OMPLValidityCheckerMultiAgent(const ob::SpaceInfo
     klampt_single_robot_cspaces_.push_back(kck);
   }
 }
+
 bool OMPLValidityCheckerMultiAgent::isValid(const ob::State* state) const
 {
   if(!cspace_->SatisfiesBounds(state)) return false;
@@ -24,7 +25,8 @@ bool OMPLValidityCheckerMultiAgent::isValid(const ob::State* state) const
     SingleRobotCSpace* space = klampt_single_robot_cspaces_.at(k);
 
     int rk = ridxs.at(k);
-    vector<int> idrobot(1, rk);
+    int id = space->world.RobotID(rk);
+    vector<int> idrobot(1, id);
 
     vector<int> idothers;
     for(size_t i=0;i<space->world.terrains.size();i++)
