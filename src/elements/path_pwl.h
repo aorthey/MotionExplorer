@@ -33,6 +33,7 @@ class PathPiecewiseLinear
     Config EvalVelocity(const double t) const;
     Vector EvalVelocityVec3(const double t) const;
     Vector3 EvalVec3(const double t) const;
+    Vector3 EvalVec3(const double t, int ridx) const;
     Config EvalMilestone(const int k) const;
 
     void Normalize(); // convert path length [0,L] -> [0,1]
@@ -77,12 +78,12 @@ class PathPiecewiseLinear
     Vector3 Vector3FromState(ob::State *s, int ridx);
     void Draw2DArrow(Vector3 arrow_pos, Vector3 arrow_dir, double arrow_size_head, double arrow_size_length);
     Vector3 GetNearestStateToTipOfArrow(Vector3 arrow_pos, 
-        const std::vector<ob::State*> states, uint k_start_state, double arrow_size_length);
+        const std::vector<ob::State*> states, uint k_start_state, double arrow_size_length, int ridx);
 
     void DrawGLRibbon(const std::vector<ob::State*> &states);
     void DrawGLRibbonRobotIndex(const std::vector<ob::State*> &states, int ridx);
-    void DrawGLArrowMiddleOfPath(const std::vector<ob::State*> &states);
-    void DrawGLCross(const std::vector<ob::State*> &states);
+    void DrawGLArrowMiddleOfPath(const std::vector<ob::State*> &states, int ridx);
+    void DrawGLCross(const std::vector<ob::State*> &states, int ridx);
 
     SweptVolume *sv{nullptr};
     CSpaceOMPL *cspace{nullptr};

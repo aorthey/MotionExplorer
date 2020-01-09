@@ -171,6 +171,7 @@ bool CSpaceOMPL::isFixedBase(){
 bool CSpaceOMPL::isFreeFloating(){
   return !fixedBase;
 }
+
 bool CSpaceOMPL::IsPlanar(){
   if(GetDimensionality()<=2) return true;
 

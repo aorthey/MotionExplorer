@@ -2,6 +2,7 @@
 #include "planner/strategy/strategy_geometric.h"
 #include "planner/benchmark/benchmark_input.h"
 #include "planner/benchmark/benchmark_output.h"
+#include "planner/strategy/infeasibility_sampler.h"
 
 #include <ompl/geometric/planners/quotientspace/Explorer.h>
 #include <ompl/geometric/planners/quotientspace/QRRT.h>
@@ -130,6 +131,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
   else if(algorithm=="hierarchy:qrrt") planner = std::make_shared<og::QRRT>(siVec);
+  else if(algorithm=="sampler") planner = std::make_shared<og::InfeasibilitySampler>(si);
   else if(algorithm=="hierarchy:explorer") planner = std::make_shared<og::MotionExplorer>(siVec);
 
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){

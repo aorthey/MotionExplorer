@@ -162,6 +162,14 @@ double PathPiecewiseLinear::GetLength() const{
   return length;
 }
 
+Vector3 PathPiecewiseLinear::EvalVec3(const double t, int ridx) const{
+  Config q = Eval(t);
+  ob::ScopedState<> s = quotient_space->ConfigToOMPLState(q);
+  Vector3 v = quotient_space->getXYZ(s.get(), ridx);
+  if(draw_planar) v[2] = 0.0;
+  return v;
+}
+
 Vector3 PathPiecewiseLinear::EvalVec3(const double t) const{
   Config q = Eval(t);
   ob::ScopedState<> s = quotient_space->ConfigToOMPLState(q);
@@ -368,19 +376,19 @@ void PathPiecewiseLinear::Draw2DArrow(Vector3 arrow_pos, Vector3 arrow_dir, doub
 }
 
 Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos, 
-    const std::vector<ob::State*> states, uint k_start_state, double arrow_size_length)
+    const std::vector<ob::State*> states, uint k_start_state, double arrow_size_length, int ridx)
 {
     unsigned Mmax = states.size() - 1;
     uint m = k_start_state;
 
     assert(m < Mmax);
 
-    Vector3 qnext = Vector3FromState(states.at(m));
+    Vector3 qnext = Vector3FromState(states.at(m), ridx);
     double zmax = qnext[2];
     double d_tip_to_state_best = fabs( arrow_pos.distanceSquared(qnext) - arrow_size_length);
 
     m = m+1;
-    qnext = Vector3FromState(states.at(m));
+    qnext = Vector3FromState(states.at(m), ridx);
     if(qnext[2] > zmax) zmax = qnext[2];
     double d_tip_to_state_next = fabs( arrow_pos.distanceSquared(qnext) - arrow_size_length);
 
@@ -392,7 +400,7 @@ Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos,
         m = Mmax;
         break;
       }
-      qnext = Vector3FromState(states.at(m));
+      qnext = Vector3FromState(states.at(m), ridx);
       if(qnext[2] > zmax) zmax = qnext[2];
       d_tip_to_state_next = fabs( arrow_pos.distanceSquared(qnext) - arrow_size_length);
     }
@@ -401,7 +409,7 @@ Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos,
     if(m >= Mmax){
         m = Mmax;
     }
-    qnext = Vector3FromState(states.at(m));
+    qnext = Vector3FromState(states.at(m), ridx);
     qnext[2] = zmax;
     return qnext;
 }
@@ -480,6 +488,7 @@ void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &
   glEnd();
   cLine.setCurrentGL();
 }
+
 void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
 {
   //############################################################################
@@ -491,15 +500,22 @@ void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
     std::vector<int> idxs = cma->GetRobotIdxs();
     foreach(int i, idxs)
     {
-      DrawGLRibbonRobotIndex(states, i);
+        DrawGLRibbonRobotIndex(states, i);
+        DrawGLArrowMiddleOfPath(states, i);
+        if(drawCross) DrawGLCross(states, i);
+    }
+    if(!quotient_space->IsPlanar()){
+    }else{
     }
   }else{
-    DrawGLRibbonRobotIndex(states, -1);
+    DrawGLRibbonRobotIndex(states, quotient_space->GetRobotIndex());
+    DrawGLArrowMiddleOfPath(states, quotient_space->GetRobotIndex());
+    if(drawCross) DrawGLCross(states, quotient_space->GetRobotIndex());
   }
 }
 
 
-void PathPiecewiseLinear::DrawGLArrowMiddleOfPath( const std::vector<ob::State*> &states)
+void PathPiecewiseLinear::DrawGLArrowMiddleOfPath( const std::vector<ob::State*> &states, int ridx)
 {
   if(states.size() < 2) return;
 
@@ -510,19 +526,19 @@ void PathPiecewiseLinear::DrawGLArrowMiddleOfPath( const std::vector<ob::State*>
   glLineWidth(arrow_size_head*10);
   Vector3 qnext;
   if(states.size() == 2){
-    Vector3 q1 = Vector3FromState(states.at(0));
-    qnext = Vector3FromState(states.at(1));
+    Vector3 q1 = Vector3FromState(states.at(0), ridx);
+    qnext = Vector3FromState(states.at(1), ridx);
     arrow_pos = 0.5*(qnext - q1);
   }else if(states.size()%2 == 0){
     unsigned m = 0.5*states.size();
-    Vector3 q1 = Vector3FromState(states.at(m-1));
-    Vector3 q2 = Vector3FromState(states.at(m));
+    Vector3 q1 = Vector3FromState(states.at(m-1), ridx);
+    Vector3 q2 = Vector3FromState(states.at(m), ridx);
     arrow_pos = q1 + 0.5*(q2 - q1);
-    qnext = GetNearestStateToTipOfArrow(arrow_pos, states, m, arrow_size_length);
+    qnext = GetNearestStateToTipOfArrow(arrow_pos, states, m, arrow_size_length, ridx);
   }else{
     unsigned m = floor(0.5*states.size());
-    arrow_pos = Vector3FromState(states.at(m));
-    qnext = GetNearestStateToTipOfArrow(arrow_pos, states, m, arrow_size_length);
+    arrow_pos = Vector3FromState(states.at(m), ridx);
+    qnext = GetNearestStateToTipOfArrow(arrow_pos, states, m, arrow_size_length, ridx);
   }
   arrow_dir = qnext - arrow_pos;
   arrow_dir.inplaceNormalize();
@@ -537,13 +553,13 @@ void PathPiecewiseLinear::DrawGLArrowMiddleOfPath( const std::vector<ob::State*>
   glPopMatrix();
 }
 
-void PathPiecewiseLinear::DrawGLCross( const std::vector<ob::State*> &states)
+void PathPiecewiseLinear::DrawGLCross( const std::vector<ob::State*> &states, int ridx)
 {
   if(states.size() < 2) return;
 
   Vector3 ez(0,0,1);
 
-  Vector3 pos = EvalVec3(0.3*GetLength());
+  Vector3 pos = EvalVec3(0.3*GetLength(), ridx);
 
   //############################################################################
   //Draw Cross at pos
@@ -682,8 +698,6 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
 
   //############################################################################
   DrawGLRibbon(states);
-  DrawGLArrowMiddleOfPath(states);
-  if(drawCross) DrawGLCross(states);
 
   if(drawSweptVolume && state("draw_path_sweptvolume")){
     double L = GetLength();

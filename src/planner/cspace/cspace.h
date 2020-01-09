@@ -50,7 +50,7 @@ class CSpaceOMPL
     const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
     virtual Vector3 getXYZ(const ob::State*) = 0;
     virtual Vector3 getXYZ(const ob::State*, int ridx);
-    bool IsPlanar();
+    virtual bool IsPlanar();
 
     void SetCSpaceInput(const CSpaceInput &input_);
     uint GetDimensionality() const;

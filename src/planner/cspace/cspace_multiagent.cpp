@@ -31,6 +31,17 @@ bool CSpaceOMPLMultiAgent::isDynamic() const
   return false;
 }
 
+bool CSpaceOMPLMultiAgent::IsPlanar(){
+  if(GetDimensionality()<=2) return true;
+
+  //check if at least one robot is non-planar, i.e. freeFloating
+  for(uint k = 0; k < cspaces_.size(); k++){
+    CSpaceOMPL *ck = cspaces_.at(k);
+    if(!ck->IsPlanar()) return false;
+  }
+  return true;
+}
+
 bool CSpaceOMPLMultiAgent::UpdateRobotConfig(Config &q)
 {
   std::vector<Config> qks = splitConfig(q);

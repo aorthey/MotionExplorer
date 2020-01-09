@@ -32,6 +32,7 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
 
     virtual void drawConfig(const Config &q, GLDraw::GLColor color=GLDraw::GLColor(1,0,0), double scale = 1.0) override;
 
+    virtual bool IsPlanar() override;
     virtual bool isDynamic() const override;
     virtual bool isMultiAgent() const override;
 

@@ -599,7 +599,7 @@ void MotionPlanner::DrawGL(GUIState& state){
       Rcurrent->DrawGL(state);
       pwl = Rcurrent->GetShortestPath();
       if(pwl && state("draw_roadmap_shortest_path")){
-        pwl->zOffset = 0.005;
+        pwl->zOffset = 0.015;
         pwl->linewidth = input.pathWidth;
         pwl->widthBorder= input.pathBorderWidth;
         pwl->ptsize = 10;
