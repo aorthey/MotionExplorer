@@ -83,13 +83,13 @@ void GeometricCSpaceOMPL::initSpace()
 
 void GeometricCSpaceOMPL::print(std::ostream& out) const
 {
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "OMPL CSPACE" << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Robot \"" << robot->name << "\":" << std::endl;
-  std::cout << "Dimensionality Space            :" << GetDimensionality() << std::endl;
-  std::cout << " Configuration Space (klampt) : SE(3)" << (Nklampt>0?"xR^"+std::to_string(Nklampt):"") << "  [Klampt]"<< std::endl;
-  std::cout << " Configuration Space (ompl)   : SE(3)" << (Nompl>0?"xR^"+std::to_string(Nompl):"") << "  [OMPL]" << std::endl;
+  out << std::string(80, '-') << std::endl;
+  out << "OMPL CSPACE" << std::endl;
+  out << std::string(80, '-') << std::endl;
+  out << "Robot \"" << robot->name << "\":" << std::endl;
+  out << "Dimensionality Space            :" << GetDimensionality() << std::endl;
+  out << " Configuration Space (klampt) : SE(3)" << (Nklampt>0?"xR^"+std::to_string(Nklampt):"") << "  [Klampt]"<< std::endl;
+  out << " Configuration Space (ompl)   : SE(3)" << (Nompl>0?"xR^"+std::to_string(Nompl):"") << "  [OMPL]" << std::endl;
 
   ob::SE3StateSpace *cspaceSE3 = nullptr;
 
@@ -98,25 +98,24 @@ void GeometricCSpaceOMPL::print(std::ostream& out) const
   }else{
     cspaceSE3 = space->as<ob::SE3StateSpace>();
   }
-  si->printSettings();
+  si->printSettings(out);
 
   //################################################################################
   const ob::RealVectorBounds bounds = cspaceSE3->getBounds();
   std::vector<double> se3min = bounds.low;
   std::vector<double> se3max = bounds.high;
-  std::cout << "SE(3) bounds min     : ";
+  out << "SE(3) bounds min     : ";
   for(uint i = 0; i < se3min.size(); i++){
-    std::cout << " " << se3min.at(i);
+    out << " " << se3min.at(i);
   }
-  std::cout << std::endl;
+  out << std::endl;
 
-  std::cout << "SE(3) bounds max     : ";
+  out << "SE(3) bounds max     : ";
   for(uint i = 0; i < se3max.size(); i++){
-    std::cout << " " << se3max.at(i);
+    out << " " << se3max.at(i);
   }
-  std::cout << std::endl;
-
-  std::cout << std::string(80, '-') << std::endl;
+  out << std::endl;
+  out << std::string(80, '-') << std::endl;
 }
 
 void GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q, ob::State *qompl)

@@ -112,11 +112,11 @@ void PathPiecewiseLinear::setColor(const GLColor &color)
     this->cLine = color;
 }
 
-void PathPiecewiseLinear::Smooth(){
+void PathPiecewiseLinear::Smooth(bool forceSmoothing){
   if(path == nullptr) return;
   if(quotient_space->isDynamic()) return;
 
-  if(!isSmooth){
+  if(!isSmooth || forceSmoothing){
 
     og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
     std::vector<ob::State *> statesB = gpath.getStates();

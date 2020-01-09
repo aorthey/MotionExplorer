@@ -241,7 +241,6 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
     //fixed base robot: visualize last link
 
     Config q = OMPLStateToConfig(s);
-    //std::cout << q << std::endl;
     robot->UpdateConfig(q);
     robot->UpdateGeometry();
     Vector3 qq;
@@ -368,14 +367,11 @@ void CSpaceOMPL::print(std::ostream& out) const
   out << std::string(80, '-') << std::endl;
   out << "[ConfigurationSpace]" << std::endl;
   out << std::string(80, '-') << std::endl;
-  std::cout << "Robot                    : " << robot->name << std::endl;
-  std::cout << "Dimensionality (OMPL)    : " << GetDimensionality() << std::endl;
-  std::cout << "Dimensionality (Klampt)  : " << robot->q.size() << std::endl;
-  //space.space->printSettings(std::cout);
-  std::cout << "OMPL Representation      : " << std::endl;
-  space->diagram(std::cout << "   ");
-  print();
-
+  out << "Robot                    : " << robot->name << std::endl;
+  out << "Dimensionality (OMPL)    : " << GetDimensionality() << std::endl;
+  out << "Dimensionality (Klampt)  : " << robot->q.size() << std::endl;
+  out << "OMPL Representation      : " << std::endl;
+  space->diagram(out << "   ");
   out << std::string(80, '-') << std::endl;
 }
 

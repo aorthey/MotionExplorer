@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <world>
-  <robot name="disk1" file="../../robots/kuka_lwr/kuka_base.urdf"/>
-  <robot name="disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+  <robot name="disk1" file="../../robots/disks/disk.urdf"/>
+  <robot name="disk2" file="../../robots/disks/disk.urdf"/>
 
   <terrain file="../../terrains/primitives/plane.tri">
      <display color="0.6 0.6 0.6 1"/> 

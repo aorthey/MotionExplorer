@@ -5,6 +5,7 @@
 
   <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
   <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+
   <robot name="kuka_disk3" file="../../robots/kuka_lwr/kuka_base.urdf"/>
 
   <!-- <terrain file="../../terrains/primitives/plane.tri"> -->
@@ -24,8 +25,8 @@
     />
     <agent 
       id="1" 
-      qinit="6  -2 -2.5 0 0 0 0"
-      qgoal="6  +3 +1 0 0 0 0"
+      qinit="6  -1 -2 0 0 0 0"
+      qgoal="6  +0 +2 0 0 0 0"
     />
     <agent 
       id="2" 
@@ -34,8 +35,8 @@
     />
     <agent 
       id="3" 
-      qinit="6  0 -3 0 0 0 0"
-      qgoal="6  0 +3 0 0 0 0"
+      qinit="6  -2.5 -1 0 0 0 0"
+      qgoal="6  +2 +0 0 0 0 0"
     />
     <agent 
       id="4" 
@@ -65,13 +66,14 @@
       <!--   <robot id="3" freeFloating="1" type="R2"/> -->
       <!--   <robot id="4" freeFloating="1" type="R2"/> -->
       <!-- </level> -->
-      <!-- <level> -->
-      <!--   <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/> -->
-      <!--   <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/> -->
-      <!-- </level> -->
+      <level>
+        <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/>
+        <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/>
+        <robot id="4" freeFloating="1" simplification_of_id="4" type="R2"/>
+      </level>
       <level>
         <robot id="0" freeFloating="1" type="SE2RN"/>
-        <robot id="1" freeFloating="1" type="R2"/>
+        <robot id="4" freeFloating="1" type="R2"/>
         <robot id="2" freeFloating="1" type="SE2RN"/>
       </level>
     </hierarchy>

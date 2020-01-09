@@ -188,9 +188,9 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
     ob::SpaceInformationPtr sik = cspace_levelk->SpaceInformationPtr();
     setStateSampler(input.name_sampler, sik);
 
-    std::cout << input.q_init << std::endl;
     ob::ScopedState<> startk = cspace_levelk->ConfigToOMPLState(input.q_init);
     ob::ScopedState<> goalk  = cspace_levelk->ConfigToOMPLState(input.q_goal);
+    sik->printState(startk.get());
 
     ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
     pdefk->addStartState(startk);
@@ -202,7 +202,9 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
 
     si_vec.push_back(sik);
     pdef_vec.push_back(pdefk);
+    std::cout << *cspace_levelk << std::endl;
   }
+  exit(0);
   OMPLGeometricStratificationPtr stratification = std::make_shared<OMPLGeometricStratification>(si_vec, pdef_vec);
   return stratification;
 }

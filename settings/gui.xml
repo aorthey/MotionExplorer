@@ -237,15 +237,15 @@
   </hotkey>
 
 
-  <button>
-    <name>planner_draw_spatial_representation_of_SE2</name>
-    <key>o</key>
-  </button>
+  <!-- <button> -->
+  <!--   <name>planner_draw_spatial_representation_of_SE2</name> -->
+  <!--   <key>o</key> -->
+  <!-- </button> -->
 
-  <button>
-    <name>reset_view</name>
-    <key>z</key>
-  </button>
+  <!-- <button> -->
+  <!--   <name>reset_view</name> -->
+  <!--   <key>z</key> -->
+  <!-- </button> -->
   <button>
     <name>load_view</name>
     <key>v</key>

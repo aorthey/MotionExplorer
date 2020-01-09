@@ -37,7 +37,7 @@ class PathPiecewiseLinear
     Config EvalMilestone(const int k) const;
 
     void Normalize(); // convert path length [0,L] -> [0,1]
-    void Smooth();
+    void Smooth(bool forceSmoothing=false);
 
     std::vector<double> GetLengthVector() const;
     int GetNumberOfMilestones();

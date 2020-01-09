@@ -127,24 +127,39 @@ Config GeometricCSpaceOMPLSE2RN::OMPLStateToConfig(const ob::State *qompl){
 
 void GeometricCSpaceOMPLSE2RN::print(std::ostream& out) const
 {
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "OMPL CSPACE" << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Robot \"" << robot->name << "\":" << std::endl;
-  std::cout << "Dimensionality Space            : " << 3 << std::endl;
+  out << std::string(80, '-') << std::endl;
+  out << "SE2RN ";
+  out << "(Robot: " << robot->name << ")" << std::endl;
+  out << "Dimensionality : " 
+    << GetDimensionality() << "[OMPL] and "
+    << robot->q.size() << "[KLAMPT]" << std::endl;
 
-  ob::SE2StateSpaceFullInterpolate *cspace = this->space->as<ob::SE2StateSpaceFullInterpolate>();
-
-  const ob::RealVectorBounds bounds = cspace->getBounds();
+  ob::SE2StateSpaceFullInterpolate *cspaceSE2;
+  ob::RealVectorStateSpace *cspaceRN = nullptr;
+  if(Nompl>0){
+    cspaceSE2 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE2StateSpaceFullInterpolate>(0);
+    cspaceRN = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+  }else{
+    cspaceSE2 = this->space->as<ob::SE2StateSpaceFullInterpolate>();
+  }
+  const ob::RealVectorBounds bounds = cspaceSE2->getBounds();
   std::vector<double> min = bounds.low;
   std::vector<double> max = bounds.high;
-  std::cout << "RN bounds min     : ";
+  if(Nompl>0){
+    const ob::RealVectorBounds boundsRN = cspaceRN->getBounds();
+    for(uint k = 0; k < boundsRN.low.size(); k++){
+      min.push_back(boundsRN.low.at(k));
+      max.push_back(boundsRN.high.at(k));
+    }
+  }
+
+  std::cout << "Bounds min     : ";
   for(uint i = 0; i < min.size(); i++){
     std::cout << " " << min.at(i);
   }
   std::cout << std::endl;
 
-  std::cout << "RN bounds max     : ";
+  std::cout << "Bounds max     : ";
   for(uint i = 0; i < max.size(); i++){
     std::cout << " " << max.at(i);
   }
