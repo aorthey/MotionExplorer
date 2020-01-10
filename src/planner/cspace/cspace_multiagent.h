@@ -27,6 +27,8 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
     // const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
     // Vector3 getXYZ(const ob::State*);
 
+    void setNextLevelRobotPointers(std::vector<int>);
+
     // void SetCSpaceInput(const CSpaceInput &input_);
     // CSpaceKlampt* GetCSpaceKlamptPtr();
 
@@ -50,13 +52,12 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
 
     std::vector<CSpaceOMPL*> cspaces_;
 
+    std::vector<int> ptr_to_next_level_robot_ids;
+    std::vector<int> robot_ids;
+
     std::vector<int> Nklampts;
     std::vector<int> Nompls;
 
     int subspaceCount{0};
-
-    //need to store how to split ob::State
-
-
 
 };

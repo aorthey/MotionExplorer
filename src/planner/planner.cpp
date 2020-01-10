@@ -46,8 +46,9 @@ CSpaceOMPL* MotionPlanner::ComputeMultiAgentCSpace(const Layer &layer){
     CSpaceOMPL* cspace_level_k = ComputeCSpace(type, rk, freeFloating);
     cspace_levels.push_back(cspace_level_k);
   }
-  CSpaceOMPL* cspace_level = factory.MakeGeometricCSpaceMultiAgent(cspace_levels);
-  return cspace_level;
+  CSpaceOMPLMultiAgent* cspace_multiagent = factory.MakeGeometricCSpaceMultiAgent(cspace_levels);
+  cspace_multiagent->setNextLevelRobotPointers(layer.ptr_to_next_level_ids);
+  return cspace_multiagent;
 }
 
 CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robot_idx, bool freeFloating)

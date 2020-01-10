@@ -704,14 +704,14 @@ would disappear if S1 would be the uppermost level.
 [ ] Remove lemon
 [ ] Rewrite to use Hierarchical PD
 
-
 MultiAgent
 [x] Fix SE2RN (i.e. implement other cspaces than RN)
 [x] Fix StateValidityChecker (robot-robot collision checker doesnt work)
 [ ] Fix Roadmap (i.e. show the right vertices and edges)
-[ ] Add simplifications
 [ ] Fix starting values for simplifications
 [ ] Visualize over/under of paths
-[ ] label disks
-
+[ ] label disks (0..9  I..X  A..Z). Stamp them out from some plane in blender.
+[ ] **Add simplifications
+[ ] **implement MergeStates (MAMP)
+[ ] **implement ProjectQ0 (MAMP)
 

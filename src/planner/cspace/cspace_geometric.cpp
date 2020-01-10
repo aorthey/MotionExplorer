@@ -84,9 +84,8 @@ void GeometricCSpaceOMPL::initSpace()
 void GeometricCSpaceOMPL::print(std::ostream& out) const
 {
   out << std::string(80, '-') << std::endl;
-  out << "OMPL CSPACE" << std::endl;
-  out << std::string(80, '-') << std::endl;
-  out << "Robot \"" << robot->name << "\":" << std::endl;
+  out << "SE3RN ";
+  out << "(Robot: " << robot->name << ", id: " << GetRobotIndex() << ")" << std::endl;
   out << "Dimensionality Space            :" << GetDimensionality() << std::endl;
   out << " Configuration Space (klampt) : SE(3)" << (Nklampt>0?"xR^"+std::to_string(Nklampt):"") << "  [Klampt]"<< std::endl;
   out << " Configuration Space (ompl)   : SE(3)" << (Nompl>0?"xR^"+std::to_string(Nompl):"") << "  [OMPL]" << std::endl;

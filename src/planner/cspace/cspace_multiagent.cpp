@@ -10,6 +10,21 @@
 CSpaceOMPLMultiAgent::CSpaceOMPLMultiAgent(std::vector<CSpaceOMPL*> cspaces):
   CSpaceOMPL(cspaces.front()->GetWorldPtr(), cspaces.front()->GetRobotIndex()), cspaces_(cspaces)
 {
+  robot_ids.clear();
+  for(uint k = 0; k < cspaces_.size(); k++){
+    CSpaceOMPL *ck = cspaces_.at(k);
+    robot_ids.push_back(ck->GetRobotIndex());
+  }
+}
+
+void CSpaceOMPLMultiAgent::setNextLevelRobotPointers(std::vector<int> next_level_ids)
+{
+  for(uint k = 0; k < next_level_ids.size(); k++){
+    int ik = next_level_ids.at(k);
+    if(ik >=0){
+      ptr_to_next_level_robot_ids.push_back(ik);
+    }
+  }
 }
 
 bool CSpaceOMPLMultiAgent::SatisfiesBounds(const ob::State *state)
@@ -61,12 +76,7 @@ bool CSpaceOMPLMultiAgent::isMultiAgent() const
 
 std::vector<int> CSpaceOMPLMultiAgent::GetRobotIdxs() const
 {
-  std::vector<int> idxs;
-  for(uint k = 0; k < cspaces_.size(); k++){
-    CSpaceOMPL *ck = cspaces_.at(k);
-    idxs.push_back(ck->GetRobotIndex());
-  }
-  return idxs;
+  return robot_ids;
 }
 
 void CSpaceOMPLMultiAgent::drawConfig(const Config &q, GLColor color, double scale){
@@ -90,7 +100,6 @@ void CSpaceOMPLMultiAgent::initSpace()
   for(uint k = 0; k < cspaces_.size(); k++){
     CSpaceOMPL *ck = cspaces_.at(k);
     ck->initSpace();
-    // space = space + ck->SpacePtr();
 
     static_pointer_cast<ob::CompoundStateSpace>(space)->addSubspace(ck->SpacePtr(), 1);
 
@@ -117,9 +126,16 @@ std::vector<int> CSpaceOMPLMultiAgent::GetKlamptDimensionalities() const{
 
 void CSpaceOMPLMultiAgent::print(std::ostream& out) const
 {
+  std::cout << std::string(80, '-') << std::endl;
+  std::cout << "MultiAgentCspace" << std::endl;
+  std::cout << std::string(80, '-') << std::endl;
   for(uint k = 0; k < cspaces_.size(); k++){
     CSpaceOMPL *ck = cspaces_.at(k);
     ck->print();
+  }
+  if(ptr_to_next_level_robot_ids.size()>0){
+    std::cout << "Pointer To Next Level: " << std::endl;
+    std::cout << ptr_to_next_level_robot_ids << std::endl;
   }
 }
 

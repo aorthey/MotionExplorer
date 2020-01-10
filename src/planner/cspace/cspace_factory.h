@@ -46,7 +46,7 @@ class CSpaceFactory{
       return MakeGeometricCSpace(world, robot_idx);
     }
 
-    virtual CSpaceOMPL* MakeGeometricCSpaceMultiAgent( std::vector<CSpaceOMPL*> cspaces){
+    virtual CSpaceOMPLMultiAgent* MakeGeometricCSpaceMultiAgent( std::vector<CSpaceOMPL*> cspaces){
       CSpaceOMPLMultiAgent *cspace = new CSpaceOMPLMultiAgent(cspaces);
       cspace->Init();
       cspace->SetCSpaceInput(input);

@@ -129,7 +129,7 @@ void GeometricCSpaceOMPLSE2RN::print(std::ostream& out) const
 {
   out << std::string(80, '-') << std::endl;
   out << "SE2RN ";
-  out << "(Robot: " << robot->name << ")" << std::endl;
+  out << "(Robot: " << robot->name << ", id: " << GetRobotIndex() << ")" << std::endl;
   out << "Dimensionality : " 
     << GetDimensionality() << "[OMPL] and "
     << robot->q.size() << "[KLAMPT]" << std::endl;

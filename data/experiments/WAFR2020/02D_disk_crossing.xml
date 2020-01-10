@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <world>
   <robot name="disk1" file="../../robots/disks/disk.urdf"/>
+
   <robot name="disk2" file="../../robots/disks/disk.urdf"/>
 
   <!-- <terrain file="../../terrains/primitives/plane.tri"> -->
@@ -35,7 +36,6 @@
     <pathSpeed>3</pathSpeed>
     <freeFloating>1</freeFloating>
     <smoothPath>1</smoothPath>
-    <algorithm name="sampler"/>
     <algorithm name="hierarchy:explorer"/>
     <algorithm name="hierarchy:qrrt"/>
     <!-- <algorithm name="ompl:rrt"/> -->
