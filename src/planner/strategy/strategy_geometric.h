@@ -8,9 +8,9 @@ namespace og = ompl::geometric;
 
 struct OMPLGeometricStratification{
   std::vector<ob::SpaceInformationPtr> si_vec;
-  std::vector<ob::ProblemDefinitionPtr> pdef_vec;
-  OMPLGeometricStratification( std::vector<ob::SpaceInformationPtr> si_vec_, std::vector<ob::ProblemDefinitionPtr> pdef_vec_):
-    si_vec(si_vec_), pdef_vec(pdef_vec_)
+  ob::ProblemDefinitionPtr pdef;
+  OMPLGeometricStratification( std::vector<ob::SpaceInformationPtr> si_vec_, ob::ProblemDefinitionPtr pdef_):
+    si_vec(si_vec_), pdef(pdef_)
   {
   }
 };

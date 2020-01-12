@@ -96,7 +96,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   ob::PlannerPtr planner;
   const ob::SpaceInformationPtr si = stratification->si_vec.back();
   std::vector<ob::SpaceInformationPtr> siVec = stratification->si_vec;
-  const ob::ProblemDefinitionPtr pdef = stratification->pdef_vec.back();
+  const ob::ProblemDefinitionPtr pdef = stratification->pdef;
 
   if(algorithm=="ompl:rrt") planner = std::make_shared<og::RRT>(si);
   else if(algorithm=="ompl:rrtconnect") planner = std::make_shared<og::RRTConnect>(si);
@@ -181,30 +181,29 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
 (const StrategyInput &input, std::vector<CSpaceOMPL*> cspace_levels )
 {
   std::vector<ob::SpaceInformationPtr> si_vec; 
-  std::vector<ob::ProblemDefinitionPtr> pdef_vec; 
 
   for(uint k = 0; k < cspace_levels.size(); k++){
     CSpaceOMPL* cspace_levelk = cspace_levels.at(k);
     ob::SpaceInformationPtr sik = cspace_levelk->SpaceInformationPtr();
     setStateSampler(input.name_sampler, sik);
 
-    ob::ScopedState<> startk = cspace_levelk->ConfigToOMPLState(input.q_init);
-    ob::ScopedState<> goalk  = cspace_levelk->ConfigToOMPLState(input.q_goal);
-
-    ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
-    pdefk->addStartState(startk);
-    auto goal=std::make_shared<ob::GoalState>(sik);
-    goal->setState(goalk);
-    goal->setThreshold(input.epsilon_goalregion);
-    pdefk->setGoal(goal);
-    pdefk->setOptimizationObjective( GetOptimizationObjective(sik) );
-
     si_vec.push_back(sik);
-    pdef_vec.push_back(pdefk);
     std::cout << *cspace_levelk << std::endl;
   }
-  // exit(0);
-  OMPLGeometricStratificationPtr stratification = std::make_shared<OMPLGeometricStratification>(si_vec, pdef_vec);
+
+  CSpaceOMPL* cspace = cspace_levels.back();
+  ob::SpaceInformationPtr sik = si_vec.back();
+  ob::ScopedState<> startk = cspace->ConfigToOMPLState(input.q_init);
+  ob::ScopedState<> goalk  = cspace->ConfigToOMPLState(input.q_goal);
+
+  ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
+  pdefk->addStartState(startk);
+  auto goal=std::make_shared<ob::GoalState>(sik);
+  goal->setState(goalk);
+  goal->setThreshold(input.epsilon_goalregion);
+  pdefk->setGoal(goal);
+  pdefk->setOptimizationObjective( GetOptimizationObjective(sik) );
+  OMPLGeometricStratificationPtr stratification = std::make_shared<OMPLGeometricStratification>(si_vec, pdefk);
   return stratification;
 }
 
@@ -344,7 +343,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
 
   std::cout << "Largest Ambient Space Dimension for Benchmark:" << largest_ambient_space_dimension << std::endl;
   const ob::SpaceInformationPtr si = stratifications.at(k_largest_ambient_space)->si_vec.back();
-  const ob::ProblemDefinitionPtr pdef = stratifications.at(k_largest_ambient_space)->pdef_vec.back();
+  const ob::ProblemDefinitionPtr pdef = stratifications.at(k_largest_ambient_space)->pdef;
 
 
   std::string environment_name = util::GetFileBasename(input.environment_name);
@@ -368,7 +367,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
         if(shortStratification){
           std::cout << "algorithm " << name_algorithm << " is too short." << std::endl;
           stratifications.at(i)->si_vec.push_back(si);
-          stratifications.at(i)->pdef_vec.push_back(pdef);
+          stratifications.at(i)->pdef = pdef;
         }else{
           if(i != k_largest_ambient_space){
             //found another stratification with maximum ambient space. we need
