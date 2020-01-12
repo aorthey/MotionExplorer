@@ -279,8 +279,57 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
 
       stratification.layers.push_back(layer);
 
+
       lindex = FindNextSiblingNode(lindex);
     }
+
+    //build fiber bundle projection matrix
+    uint k = stratification.layers.size();
+    std::vector<int> last_lvl_ids;
+    std::vector<int> current_lvl_ids;
+    std::vector<std::string> type;
+    std::vector<int> freeFloating;
+    while(k>0){
+      k--;
+      if(k>=stratification.layers.size()-1){
+        std::sort(stratification.layers.at(k).ids.begin(), stratification.layers.at(k).ids.end());
+        last_lvl_ids = stratification.layers.at(k).ids;
+      }else{
+        for(uint i = 0; i < last_lvl_ids.size(); i++){
+          int il = last_lvl_ids.at(i);
+          bool found = false;
+          for(uint j = 0; j < stratification.layers.at(k).ptr_to_next_level_ids.size() ; j++){
+            int ptrj = stratification.layers.at(k).ptr_to_next_level_ids.at(j);
+            if(ptrj == il){
+              int idj = stratification.layers.at(k).ids.at(j);
+              int freeFloatingj = stratification.layers.at(k).freeFloating.at(j);
+              std::string typej = stratification.layers.at(k).types.at(j);
+              current_lvl_ids.push_back(idj);
+              type.push_back(typej);
+              freeFloating.push_back(freeFloatingj);
+              found = true;
+            }
+          }
+          if(!found){
+            current_lvl_ids.push_back(-1);
+            type.push_back("EMPTY_SET");
+            freeFloating.push_back(false);
+          }
+        }
+        stratification.layers.at(k).ids = current_lvl_ids;
+        stratification.layers.at(k).types = type;
+        stratification.layers.at(k).freeFloating = freeFloating;
+
+        last_lvl_ids = current_lvl_ids;
+
+        current_lvl_ids.clear();
+        type.clear();
+        freeFloating.clear();
+      }
+      std::cout << last_lvl_ids << std::endl;
+      std::cout << type << std::endl;
+    }
+    // exit(0);
   }else{
     std::cout << "[WARNING] Did not specify robot hierarchy. Assuming one layer SE3RN" << std::endl;
     Layer layer;

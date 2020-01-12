@@ -9,6 +9,7 @@
 CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx_):
   si(nullptr), world(world_), robot_idx(robot_idx_)
 {
+  if(robot_idx < 0) return;
 
   robot = world->robots[robot_idx];
   worldsettings.InitializeDefault(*world);

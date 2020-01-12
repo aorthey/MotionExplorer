@@ -1,6 +1,7 @@
 #pragma once
 #include "planner/cspace/cspace.h"
 #include "planner/cspace/cspace_geometric.h"
+#include "planner/cspace/cspace_geometric_empty.h"
 #include "planner/cspace/cspace_multiagent.h"
 #include "planner/cspace/cspace_kinodynamic.h"
 #include "planner/cspace/cspace_kinodynamic_SE2.h"
@@ -85,6 +86,13 @@ class CSpaceFactory{
     // CSpace  R^(N)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceRN( RobotWorld *world, int robot_idx, int dimension){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLRN(world, robot_idx, dimension);
+      cspace->SetCSpaceInput(input);
+      cspace->Init();
+      return cspace;
+    }
+    // CSpace  R^(N)
+    virtual GeometricCSpaceOMPL* MakeEmptySetSpace( RobotWorld *world){
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLEmpty(world);
       cspace->SetCSpaceInput(input);
       cspace->Init();
       return cspace;

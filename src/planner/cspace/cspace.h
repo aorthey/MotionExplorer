@@ -53,7 +53,7 @@ class CSpaceOMPL
     virtual bool IsPlanar();
 
     void SetCSpaceInput(const CSpaceInput &input_);
-    uint GetDimensionality() const;
+    virtual uint GetDimensionality() const;
     virtual uint GetKlamptDimensionality() const;
     uint GetControlDimensionality() const;
     Robot* GetRobotPtr();

@@ -148,47 +148,19 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
 
 }
 
-// template<typename T_Algorithm> 
-// ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiChartPtr( 
-//   OMPLGeometricStratificationPtr stratification)
-// {
-//   typedef og::MultiChart<T_Algorithm> MultiChart;
-//   ob::PlannerPtr planner = std::make_shared<MultiChart>(stratification->si_vec);
-//   static_pointer_cast<MultiChart>(planner)->setProblemDefinition(stratification->pdef_vec);
-//   return planner;
-// }
-
-// template<typename T_Algorithm> 
-// ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiQuotientPtr( 
-//   OMPLGeometricStratificationPtr stratification)
-// {
-//   typedef og::MultiQuotient<T_Algorithm> MultiQuotient;
-//   ob::PlannerPtr planner = std::make_shared<MultiQuotient>(stratification->si_vec);
-//   static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(stratification->pdef_vec);
-//   return planner;
-// }
-// template<typename T_Algorithm, typename T_Algorithm_Two> 
-// ob::PlannerPtr StrategyGeometricMultiLevel::GetSharedMultiQuotientPtr( 
-//   OMPLGeometricStratificationPtr stratification)
-// {
-//   typedef og::MultiQuotient<T_Algorithm, T_Algorithm_Two> MultiQuotient;
-//   ob::PlannerPtr planner = std::make_shared<MultiQuotient>(stratification->si_vec);
-//   static_pointer_cast<MultiQuotient>(planner)->setProblemDefinition(stratification->pdef_vec);
-//   return planner;
-// }
-
 OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratificationFromCSpaceStratification
 (const StrategyInput &input, std::vector<CSpaceOMPL*> cspace_levels )
 {
   std::vector<ob::SpaceInformationPtr> si_vec; 
 
-  for(uint k = 0; k < cspace_levels.size(); k++){
+  for(uint k = 0; k < cspace_levels.size(); k++)
+  {
     CSpaceOMPL* cspace_levelk = cspace_levels.at(k);
     ob::SpaceInformationPtr sik = cspace_levelk->SpaceInformationPtr();
     setStateSampler(input.name_sampler, sik);
-
     si_vec.push_back(sik);
     std::cout << *cspace_levelk << std::endl;
+    // sik->printSettings();
   }
 
   CSpaceOMPL* cspace = cspace_levels.back();
@@ -204,6 +176,17 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
   pdefk->setGoal(goal);
   pdefk->setOptimizationObjective( GetOptimizationObjective(sik) );
   OMPLGeometricStratificationPtr stratification = std::make_shared<OMPLGeometricStratification>(si_vec, pdefk);
+
+  // if(cspace->isMultiAgent()){
+  //   for(uint k = 0; k < si_vec.size(); k++){
+  //     std::cout << "siVec " << k << " : ";
+  //     ob::SpaceInformationPtr sik = si_vec.at(k);
+  //     ob::StateSpacePtr space = sik->getStateSpace();
+  //     if(space->isCompound()){
+  //       std::cout << space->as<ob::CompoundStateSpace>()->getSubspaceCount() << std::endl;
+  //     }
+  //   }
+  // }
   return stratification;
 }
 
@@ -214,27 +197,6 @@ void StrategyGeometricMultiLevel::Init( const StrategyInput &input )
   if(util::StartsWith(algorithm,"benchmark")){
     //No Init, directly execute benchmark
     RunBenchmark(input);
-  //}else if (util::StartsWith(algorithm,"fiberoptimizer")){
-  //  std::vector<std::vector<ob::SpaceInformationPtr>> allFiberBundles;
-  //  for(uint k = 0; k < input.cspace_stratifications.size(); k++){
-  //    std::vector<CSpaceOMPL*> cspace_strat_k = input.cspace_stratifications.at(k);
-  //    OMPLGeometricStratificationPtr stratification = OMPLGeometricStratificationFromCSpaceStratification(input, cspace_strat_k);
-  //    //const ob::ProblemDefinitionPtr pdef = stratifications.at(0)->pdef_vec.back();
-  //    std::vector<ob::SpaceInformationPtr> siVec = stratification->si_vec;
-  //    allFiberBundles.push_back(siVec);
-  //    //const ob::ProblemDefinitionPtr pdef = stratification->pdef_vec.back();
-  //  }
-  //  // if(algorithm=="fiberoptimizer:qrrt"){
-  //  //   OMPLGeometricStratificationPtr stratification = 
-  //  //     OMPLGeometricStratificationFromCSpaceStratification(input, input.cspace_levels);
-  //  //   const ob::SpaceInformationPtr si = stratification->si_vec.back();
-  //  //   const ob::ProblemDefinitionPtr pdef = stratification->pdef_vec.back();
-  //  //   // planner = std::make_shared<og::FiberOP>(si, allFiberBundles);
-  //  //   planner->setProblemDefinition(pdef);
-  //  // }else{
-  //  //   std::cout << algorithm << " not found." << std::endl;
-  //  //   exit(0);
-  //  // }
   }else{
     OMPLGeometricStratificationPtr stratification = 
       OMPLGeometricStratificationFromCSpaceStratification(input, input.cspace_levels);
@@ -413,14 +375,12 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
     }
   }
 
-  //CSpaceOMPL *cspace = input.cspace_levels.back();
   CSpaceOMPL *cspace = input.cspace_stratifications.at(k_largest_ambient_space).back();
 
   ob::ScopedState<> start = cspace->ConfigToOMPLState(input.q_init);
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(input.q_goal);
   ss.setStartAndGoalStates(start, goal, input.epsilon_goalregion);
 
-  //ss.getStateSpace()->registerProjection("SE3", ob::ProjectionEvaluatorPtr(new SE3Project0r(ss.getStateSpace())));
   ss.getStateSpace()->registerProjections();
   ss.setup();
 

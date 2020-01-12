@@ -15,6 +15,7 @@ struct Layer{
 
   //multiagent
   bool isMultiAgent{false};
+  int maxRobots{0};
   std::vector<int> ids;
   std::vector<int> ptr_to_next_level_ids;
   std::vector<std::string> types;

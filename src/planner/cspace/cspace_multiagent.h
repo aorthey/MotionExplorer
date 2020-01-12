@@ -24,6 +24,7 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
 
     virtual bool SatisfiesBounds(const ob::State*) override;
     virtual bool UpdateRobotConfig(Config &q) override;
+
     // const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
     // Vector3 getXYZ(const ob::State*);
 

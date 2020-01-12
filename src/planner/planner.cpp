@@ -56,48 +56,52 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
   CSpaceFactory factory(input.GetCSpaceInput());
 
   CSpaceOMPL* cspace_level;
-  if(freeFloating){//input.freeFloating){
-    if(type=="R2") {
-      cspace_level = factory.MakeGeometricCSpaceRN(world, robot_idx, 2);
-    }else if(type=="R3") {
-      cspace_level = factory.MakeGeometricCSpaceRN(world, robot_idx, 3);
-    }else if(type=="R3S2"){
-      cspace_level = factory.MakeGeometricCSpaceR3S2(world, robot_idx);
-    }else if(type=="SE3"){
-      cspace_level = factory.MakeGeometricCSpaceSE3(world, robot_idx);
-    }else if(type=="SE2"){
-      cspace_level = factory.MakeGeometricCSpaceSE2(world, robot_idx);
-    }else if(type=="SE2RN"){
-      cspace_level = factory.MakeGeometricCSpaceSE2RN(world, robot_idx);
-    }else if(type=="SE3RN"){
-      cspace_level = factory.MakeGeometricCSpace(world, robot_idx);
-    }else if(type=="TSE2"){
-      cspace_level = factory.MakeKinodynamicCSpaceSE2(world, robot_idx);
-    }else if(type=="TSE3"){
-      cspace_level = factory.MakeKinodynamicCSpace(world, robot_idx);
-    }else if(type=="R2T") {
-      cspace_level = factory.MakeGeometricCSpaceRNTime(world, robot_idx, 2);
-    }else{
-      std::cout << std::string(80, '#') << std::endl;
-      std::cout << "Type " << type << " not recognized" << std::endl;
-      std::cout << std::string(80, '#') << std::endl;
-      throw "Unrecognized type.";
-    }
+  if(type=="EMPTY_SET") {
+    cspace_level = factory.MakeEmptySetSpace(world);
   }else{
-    if(type.substr(0,1) == "R"){
-      std::string str_dimension = type.substr(1);
-      int N = boost::lexical_cast<int>(str_dimension);
-      cspace_level = factory.MakeGeometricCSpaceFixedBase(world, robot_idx, N);
-    }else if(type=="S1"){
-      cspace_level = factory.MakeGeometricCSpaceSO2(world, robot_idx);
-    }else if(type.substr(0,3) == "S1R"){
-      std::string str_dimension = type.substr(3);
-      int N = boost::lexical_cast<int>(str_dimension);
-      cspace_level = factory.MakeGeometricCSpaceSO2RN(world, robot_idx, N);
+    if(freeFloating){//input.freeFloating){
+      if(type=="R2") {
+        cspace_level = factory.MakeGeometricCSpaceRN(world, robot_idx, 2);
+      }else if(type=="R3") {
+        cspace_level = factory.MakeGeometricCSpaceRN(world, robot_idx, 3);
+      }else if(type=="R3S2"){
+        cspace_level = factory.MakeGeometricCSpaceR3S2(world, robot_idx);
+      }else if(type=="SE3"){
+        cspace_level = factory.MakeGeometricCSpaceSE3(world, robot_idx);
+      }else if(type=="SE2"){
+        cspace_level = factory.MakeGeometricCSpaceSE2(world, robot_idx);
+      }else if(type=="SE2RN"){
+        cspace_level = factory.MakeGeometricCSpaceSE2RN(world, robot_idx);
+      }else if(type=="SE3RN"){
+        cspace_level = factory.MakeGeometricCSpace(world, robot_idx);
+      }else if(type=="TSE2"){
+        cspace_level = factory.MakeKinodynamicCSpaceSE2(world, robot_idx);
+      }else if(type=="TSE3"){
+        cspace_level = factory.MakeKinodynamicCSpace(world, robot_idx);
+      }else if(type=="R2T") {
+        cspace_level = factory.MakeGeometricCSpaceRNTime(world, robot_idx, 2);
+      }else{
+        std::cout << std::string(80, '#') << std::endl;
+        std::cout << "Type " << type << " not recognized" << std::endl;
+        std::cout << std::string(80, '#') << std::endl;
+        throw "Unrecognized type.";
+      }
     }else{
-      std::cout << type.substr(0) << std::endl;
-      std::cout << "fixed robots needs to have configuration space RN or SN, but has " << type << std::endl;
-      throw "Wrong Configuration Space.";
+      if(type.substr(0,1) == "R"){
+        std::string str_dimension = type.substr(1);
+        int N = boost::lexical_cast<int>(str_dimension);
+        cspace_level = factory.MakeGeometricCSpaceFixedBase(world, robot_idx, N);
+      }else if(type=="S1"){
+        cspace_level = factory.MakeGeometricCSpaceSO2(world, robot_idx);
+      }else if(type.substr(0,3) == "S1R"){
+        std::string str_dimension = type.substr(3);
+        int N = boost::lexical_cast<int>(str_dimension);
+        cspace_level = factory.MakeGeometricCSpaceSO2RN(world, robot_idx, N);
+      }else{
+        std::cout << type.substr(0) << std::endl;
+        std::cout << "fixed robots needs to have configuration space RN or SN, but has " << type << std::endl;
+        throw "Wrong Configuration Space.";
+      }
     }
   }
 
@@ -635,9 +639,11 @@ void MotionPlanner::DrawGL(GUIState& state){
   std::vector<Robot*> robots;
   std::vector<Robot*> robots_outer;
   for(uint k = 0; k < ridx.size(); k++){
+    if(ridx.at(k)>=0)
     robots.push_back( world->robots[ridx.at(k)] );
   }
   for(uint k = 0; k < ridx_outer.size(); k++){
+    if(ridx_outer.at(k)>=0)
     robots_outer.push_back( world->robots[ridx_outer.at(k)] );
   }
 
