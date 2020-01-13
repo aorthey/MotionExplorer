@@ -718,7 +718,7 @@ MultiAgent
 [ ] Fix visualization of multiagent quotient-space before planning (wrong
 projection of qinit)
 
-[ ] blender opening for drones
+[x] blender opening for drones
 [ ] blender label disks (0..9  I..X  A..Z). Stamp them out from some plane in blender.
 
 
