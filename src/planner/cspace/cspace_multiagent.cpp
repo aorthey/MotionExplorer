@@ -61,9 +61,11 @@ bool CSpaceOMPLMultiAgent::UpdateRobotConfig(Config &q)
 {
   std::vector<Config> qks = splitConfig(q);
   for(uint k = 0; k < cspaces_.size(); k++){
+    Config qk = qks.at(k);
+    if(qk.size()<=0) continue;
     CSpaceOMPL *ck = cspaces_.at(k);
     Robot *robot = ck->GetRobotPtr();
-    robot->UpdateConfig(qks.at(k));
+    robot->UpdateConfig(qk);
     robot->UpdateGeometry();
   }
   return true;

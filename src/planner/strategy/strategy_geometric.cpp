@@ -160,7 +160,7 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
     setStateSampler(input.name_sampler, sik);
     si_vec.push_back(sik);
     std::cout << *cspace_levelk << std::endl;
-    // sik->printSettings();
+    sik->printSettings();
   }
 
   CSpaceOMPL* cspace = cspace_levels.back();

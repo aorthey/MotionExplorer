@@ -25,6 +25,8 @@ bool OMPLValidityCheckerMultiAgent::isValid(const ob::State* state) const
     SingleRobotCSpace* space = klampt_single_robot_cspaces_.at(k);
 
     int rk = ridxs.at(k);
+    if(rk<0) continue;
+
     int id = space->world.RobotID(rk);
     vector<int> idrobot(1, id);
 
@@ -33,10 +35,12 @@ bool OMPLValidityCheckerMultiAgent::isValid(const ob::State* state) const
       idothers.push_back(space->world.TerrainID(i));
     for(size_t i=0;i<space->world.rigidObjects.size();i++)
       idothers.push_back(space->world.RigidObjectID(i));
-    for(size_t i=0;i<space->world.robots.size();i++)
+    for(size_t i=0;i<ridxs.size();i++)
     {
-      if((uint)rk != i){
-        idothers.push_back(space->world.RobotID(i));
+      int ri = ridxs.at(i);
+      if((ri >= 0) && (ri != rk)){
+        idothers.push_back(space->world.RobotID(ridxs.at(i)));
+        // std::cout << ridxs.at(i) << ":" << space->world.RobotID(i) << std::endl;
       }
     }
 
