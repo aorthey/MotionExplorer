@@ -42,6 +42,7 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
     virtual void print(std::ostream& out) const override;
 
     std::vector<int> GetRobotIdxs() const;
+    std::vector<int> GetProjectionIdxs() const;
     virtual Vector3 getXYZ(const ob::State*) override;
     virtual Vector3 getXYZ(const ob::State*, int) override;
 

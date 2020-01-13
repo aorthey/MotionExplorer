@@ -132,6 +132,14 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       if(pkin->multiAgent){
         //multiagent settings
 
+        for(uint k = 0; k < world.robots.size(); k++)
+        {
+            Robot *rk= world.robots.at(k);
+            for(int i = 0; i < 6; i++){
+              rk->qMin[i] = pkin->se3min[i];
+              rk->qMax[i] = pkin->se3max[i];
+            }
+        }
         for(uint k = 0; k < pkin->agent_information.size(); k++){
           AgentInformation ai = pkin->agent_information.at(k);
           int ri = ai.id;

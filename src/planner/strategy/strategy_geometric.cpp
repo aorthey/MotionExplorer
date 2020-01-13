@@ -177,16 +177,6 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
   pdefk->setOptimizationObjective( GetOptimizationObjective(sik) );
   OMPLGeometricStratificationPtr stratification = std::make_shared<OMPLGeometricStratification>(si_vec, pdefk);
 
-  // if(cspace->isMultiAgent()){
-  //   for(uint k = 0; k < si_vec.size(); k++){
-  //     std::cout << "siVec " << k << " : ";
-  //     ob::SpaceInformationPtr sik = si_vec.at(k);
-  //     ob::StateSpacePtr space = sik->getStateSpace();
-  //     if(space->isCompound()){
-  //       std::cout << space->as<ob::CompoundStateSpace>()->getSubspaceCount() << std::endl;
-  //     }
-  //   }
-  // }
   return stratification;
 }
 

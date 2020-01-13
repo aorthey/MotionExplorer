@@ -97,7 +97,9 @@ void GeometricCSpaceOMPL::print(std::ostream& out) const
   }else{
     cspaceSE3 = space->as<ob::SE3StateSpace>();
   }
-  si->printSettings(out);
+  if(si!=nullptr){
+    si->printSettings(out);
+  }
 
   //################################################################################
   const ob::RealVectorBounds bounds = cspaceSE3->getBounds();

@@ -8,6 +8,7 @@
 #include "gui/drawMotionPlanner.h"
 #include "util.h"
 #include <ompl/geometric/planners/quotientspace/Explorer.h>
+#include <ompl/geometric/planners/quotientspace/datastructures/QuotientSpace.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -145,7 +146,12 @@ void MotionPlanner::GetInitConfigMultiAgent(CSpaceOMPL *cspace, Config &qi, Conf
   qi.resize(N);
   qg.resize(N);
 
+  // og::QuotientSpace* qs = dynamic_cast<og::QuotientSpace*>(strategy->GetPlannerPtr().get());
+
   std::vector<int> idxs = static_cast<CSpaceOMPLMultiAgent*>(cspace)->GetRobotIdxs();
+
+
+
   for(uint j = 0; j < input.agent_information.size(); j++){
     const AgentInformation &aj = input.agent_information.at(j);
     int ctr = 0;

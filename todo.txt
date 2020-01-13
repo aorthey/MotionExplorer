@@ -710,9 +710,15 @@ MultiAgent
 [ ] Fix Roadmap (i.e. show the right vertices and edges)
 [ ] Fix starting values for simplifications
 [ ] Visualize over/under of paths
-[ ] label disks (0..9  I..X  A..Z). Stamp them out from some plane in blender.
-[ ] **Add simplifications
-[ ] **implement MergeStates (MAMP)
-[ ] **implement ProjectQ0 (MAMP)
+[x] **Add simplifications
+[x] **implement MergeStates (MAMP)
+[x] **implement ProjectQ0 (MAMP)
 [ ] **implement X1 (Fiber) 
+[ ] Fix empty-set projection
+[ ] Fix visualization of multiagent quotient-space before planning (wrong
+projection of qinit)
+
+[ ] blender opening for drones
+[ ] blender label disks (0..9  I..X  A..Z). Stamp them out from some plane in blender.
+
 

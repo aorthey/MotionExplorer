@@ -80,12 +80,18 @@ std::vector<int> CSpaceOMPLMultiAgent::GetRobotIdxs() const
 {
   return robot_ids;
 }
+std::vector<int> CSpaceOMPLMultiAgent::GetProjectionIdxs() const
+{
+  return ptr_to_next_level_robot_ids;
+}
 
 void CSpaceOMPLMultiAgent::drawConfig(const Config &q, GLColor color, double scale){
   std::vector<Config> qks = splitConfig(q);
   for(uint k = 0; k < cspaces_.size(); k++){
     CSpaceOMPL *ck = cspaces_.at(k);
-    ck->drawConfig(qks.at(k), color, scale);
+    if(ck->GetRobotIndex()>=0){
+      ck->drawConfig(qks.at(k), color, scale);
+    }
   }
 }
 
