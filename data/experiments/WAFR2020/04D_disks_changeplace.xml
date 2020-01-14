@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <world>
-  <robot name="disk1" file="../../robots/disks/disk.urdf"/>
-  <robot name="disk2" file="../../robots/disks/disk.urdf"/>
-
-  <terrain file="../../terrains/primitives/plane.tri">
-     <display color="0.6 0.6 0.6 1"/> 
-  </terrain>
-  <!-- <rigidObject file="../../terrains/primitives/cylinder.tri"> -->
+  <robot file="../../robots/disks/1.urdf" translation="0 0 0.05"/>
+  <robot file="../../robots/disks/2.urdf" translation="0 0 0.05"/>
 
   <plannerinput>
 
@@ -25,7 +20,7 @@
     <se3max config="6  +1 +1 0 +3.141593 0 0"/>
 
     <epsilongoalregion>0.1</epsilongoalregion>
-    <maxplanningtime>0.05</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>0.1</maxplanningtime>      <!-- runtime in (s) --> 
     <pathBorderWidth>2</pathBorderWidth>
     <pathSpeed>3</pathSpeed>
     <freeFloating>1</freeFloating>
