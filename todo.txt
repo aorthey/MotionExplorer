@@ -718,9 +718,9 @@ MultiAgent
 [ ] implement X1 (Fiber) 
 [ ] Fix visualization of multiagent quotient-space before planning (wrong
 projection of qinit)
-[ ] **Fix empty-set projection
+[x] **Fix empty-set projection
 
-[ ] Environment: Drone Permutation Dome (Pipe through which only one drone can
+[x] Environment: Drone Permutation Dome (Pipe through which only one drone can
 move)
 [ ] Environment: Dome with 10s of Drones. Teamleader approach. K-labeled Drone
  coordination

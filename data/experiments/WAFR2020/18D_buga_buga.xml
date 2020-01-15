@@ -9,8 +9,8 @@
   <robot name="kuka_full3" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
   <robot name="kuka_disk3" file="../../robots/kuka_lwr/kuka_base.urdf"/>
 
+  <robot name="kuka_full3" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
   <robot name="kuka_disk3" file="../../robots/kuka_lwr/kuka_base.urdf"/>
-  <robot name="kuka_disk4" file="../../robots/kuka_lwr/kuka_base.urdf"/>
 
   <terrain file="../../terrains/primitives/plane.tri">
      <display color="0.6 0.6 0.6 1"/> 
@@ -25,37 +25,22 @@
     <agent 
       id="0" 
       qinit="13  -1 -2 0 0 0 0 0 0 0.7 0 0 0 0 "
-      qgoal="13  0 +2 0 0 0 0 0 0 0 0 0 0 0 "
-    />
-    <agent 
-      id="1" 
-      qinit="6  -1 -2 0 0 0 0"
-      qgoal="6  +0 +2 0 0 0 0"
+      qgoal="13  +2 +2 0 0 0 0 0 0 0 0 0 0 0 "
     />
     <agent 
       id="2" 
-      qinit="13  -2.5 -1 0 0 0 0 0 0 -0.1 0 0 0 0 "
-      qgoal="13  +2 0 0 0 0 0 0 0 -0.5 0 -0.5 0 0 "
+      qinit="13  -1 -1 0 0 0 0 0 0 -0.1 0 0 0 0 "
+      qgoal="13  +2 +1 0 0 0 0 0 0 -0.5 0 -0.5 0 0 "
     />
-    <agent 
-      id="3" 
-      qinit="6  -2.5 -1 0 0 0 0"
-      qgoal="6  +2 +0 0 0 0 0"
-    />
-    <!-- <agent --> 
-    <!--   id="4" --> 
-    <!--   qinit="6  -3 -3 0 0 0 0" -->
-    <!--   qgoal="6  -3 +3 0 0 0 0" -->
-    <!-- /> -->
     <agent 
       id="4" 
-      qinit="13  -0.5 -1 0 0 0 0 0 0 -0.1 0 0 0 0 "
-      qgoal="13  +2 +2 0 0 0 0 0 0 -0.5 0 -0.5 0 0 "
+      qinit="13  -1 0 0 0 0 0 0 0 -0.1 0 0 0 0 "
+      qgoal="13  +2 +0 0 0 0 0 0 0 -0.5 0 -0.5 0 0 "
     />
     <agent 
-      id="5" 
-      qinit="6  -0.5 -1 0 0 0 0"
-      qgoal="6  +2 +2 0 0 0 0"
+      id="6" 
+      qinit="13  -1 +1 0 0 0 0 0 0 -0.1 0 0 0 0 "
+      qgoal="13  +2 -1 0 0 0 0 0 0 -0.5 0 -0.5 0 0 "
     />
 
     <se3min config="6  -4 -4 0 -3.141593 0 0"/>
@@ -66,8 +51,8 @@
     <pathSpeed>3</pathSpeed>
     <freeFloating>1</freeFloating>
     <smoothPath>1</smoothPath>
-    <algorithm name="hierarchy:qrrt"/>
     <algorithm name="hierarchy:explorer"/>
+    <algorithm name="hierarchy:qrrt"/>
     <algorithm name="ompl:rrt"/>
 
     <multiAgent>1</multiAgent>
@@ -84,12 +69,14 @@
       <level>
         <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/>
         <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/>
-        <!-- <robot id="5" freeFloating="1" simplification_of_id="4" type="R2"/> -->
-        <!-- <robot id="5" freeFloating="1" simplification_of_id="4" type="R2"/> -->
+        <robot id="5" freeFloating="1" simplification_of_id="4" type="R2"/>
+        <robot id="7" freeFloating="1" simplification_of_id="6" type="R2"/>
       </level>
       <level>
         <robot id="0" freeFloating="1" type="SE2RN"/>
         <robot id="2" freeFloating="1" type="SE2RN"/>
+        <robot id="4" freeFloating="1" type="SE2RN"/>
+        <robot id="6" freeFloating="1" type="SE2RN"/>
         <!-- <robot id="4" freeFloating="1" type="SE2RN"/> -->
         <!-- <robot id="4" freeFloating="1" type="R2"/> -->
       </level>
