@@ -33,7 +33,7 @@
     <se3max config="6  +3 +3 0 +3.141593 0 0"/>
 
     <epsilongoalregion>0.1</epsilongoalregion>
-    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>0.2</maxplanningtime>      <!-- runtime in (s) --> 
     <pathSpeed>3</pathSpeed>
     <freeFloating>1</freeFloating>
     <smoothPath>1</smoothPath>
@@ -45,8 +45,8 @@
 
     <hierarchy>
       <level>
+        <!-- <robot id="0" simplification_of_id="0" freeFloating="1" type="R2"/> -->
         <robot id="1" simplification_of_id="1" freeFloating="1" type="R2"/>
-        <robot id="2" simplification_of_id="2" freeFloating="1" type="R2"/>
       </level>
       <level>
         <robot id="0" freeFloating="1" type="R2"/>

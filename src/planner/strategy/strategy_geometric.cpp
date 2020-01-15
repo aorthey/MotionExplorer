@@ -159,8 +159,8 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
     ob::SpaceInformationPtr sik = cspace_levelk->SpaceInformationPtr();
     setStateSampler(input.name_sampler, sik);
     si_vec.push_back(sik);
-    std::cout << *cspace_levelk << std::endl;
-    sik->printSettings();
+    std::cout << "CSPACE LEVEL" << k << " DIMENSION:" << cspace_levelk->GetDimensionality() << std::endl;
+    // sik->printSettings();
   }
 
   CSpaceOMPL* cspace = cspace_levels.back();
