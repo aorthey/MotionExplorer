@@ -9,14 +9,16 @@ struct Layer{
   int inner_index;
   int outer_index;
   // double cspace_constant;
-  // Config q_init;
-  // Config q_goal;
+  Config q_init;
+  Config q_goal;
   std::string type;
 
   //multiagent
   bool isMultiAgent{false};
   int maxRobots{0};
   std::vector<int> ids;
+  std::vector<Config> q_inits;
+  std::vector<Config> q_goals;
   std::vector<int> ptr_to_next_level_ids;
   std::vector<std::string> types;
   std::vector<int> freeFloating;
@@ -95,6 +97,10 @@ class PlannerInput{
     const StrategyInput& GetStrategyInput();
 
     friend std::ostream& operator<< (std::ostream& out, const PlannerInput& pin) ;
+    const AgentInformation& GetAgentAtID(int id);
+    void AddConfigToConfig(Config &q, const Config &qadd);
+    void AddConfigToConfig(Config &q, const Config &qadd, int Nclip);
+    bool ExistsAgentAtID(int id);
 
   private:
 

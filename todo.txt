@@ -712,18 +712,20 @@ MultiAgent
 [x] **Add simplifications
 [x] **implement MergeStates (MAMP)
 [x] **implement ProjectQ0 (MAMP)
-
-[ ] Fix Roadmap (i.e. show the right vertices and edges)
-[ ] Fix starting values for simplifications
-[ ] implement X1 (Fiber) 
-[ ] Fix visualization of multiagent quotient-space before planning (wrong
-projection of qinit)
 [x] **Fix empty-set projection
-
 [x] Environment: Drone Permutation Dome (Pipe through which only one drone can
 move)
+
+[ ] Fix visualization of multiagent quotient-space before planning (wrong
+projection of qinit)
+[ ] Fix starting values for simplifications
+
+[ ] Fix Roadmap (i.e. show the right vertices and edges)
+[ ] implement X1 (Fiber) 
 [ ] Environment: Dome with 10s of Drones. Teamleader approach. K-labeled Drone
  coordination
 [ ] Identity space check validity twice! (how to differentiate between
 constraint relaxation and copy reduction?)
 [ ] Add gradient color to path to visualize who goes first / Visualize over/under of paths
+
+What about 100s of drones? Should hold key of how to properly simplify it. 

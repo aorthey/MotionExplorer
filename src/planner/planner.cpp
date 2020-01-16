@@ -138,35 +138,6 @@ CSpaceOMPL* MotionPlanner::ComputeCSpaceLayer(const Layer &layer){
     return cspace_layer;
   }
 }
-void MotionPlanner::GetInitConfigMultiAgent(CSpaceOMPL *cspace, Config &qi, Config &qg)
-{
-  std::vector<int> Nklampts = 
-    static_cast<CSpaceOMPLMultiAgent*>(cspace)->GetKlamptDimensionalities();
-  uint N = cspace->GetKlamptDimensionality();
-  qi.resize(N);
-  qg.resize(N);
-
-  // og::QuotientSpace* qs = dynamic_cast<og::QuotientSpace*>(strategy->GetPlannerPtr().get());
-
-  std::vector<int> idxs = static_cast<CSpaceOMPLMultiAgent*>(cspace)->GetRobotIdxs();
-
-
-
-  for(uint j = 0; j < input.agent_information.size(); j++){
-    const AgentInformation &aj = input.agent_information.at(j);
-    int ctr = 0;
-
-    for(uint i = 0; i < idxs.size(); i++){
-      if(aj.id == idxs.at(i)){
-        for(int m = 0; m < aj.q_init.size(); m++){
-          qi(m+ctr) = aj.q_init(m);
-          qg(m+ctr) = aj.q_goal(m);
-        }
-      }
-      ctr+=Nklampts.at(i);
-    }
-  }
-}
 void MotionPlanner::CreateHierarchy()
 {
   hierarchy = std::make_shared<HierarchicalRoadmap>();
@@ -181,7 +152,6 @@ void MotionPlanner::CreateHierarchy()
   if(util::StartsWith(algorithm, "hierarchy")){
     std::vector<Layer> layers = input.stratifications.front().layers;
     for(uint k = 0; k < layers.size(); k++){
-
       CSpaceOMPL *cspace_level_k = ComputeCSpaceLayer(layers.at(k));
       cspace_levels.push_back( cspace_level_k );
 
@@ -198,10 +168,23 @@ void MotionPlanner::CreateHierarchy()
         hierarchy->AddLevel( ii, io, qi, qg); 
       }else{
         Config qi,qg;
-        GetInitConfigMultiAgent(cspace_level_k, qi, qg);
+        if(k>=layers.size()-1)
+        {
+          qi = input.q_init;
+          qg = input.q_goal;
+        }else{
+          std::vector<int> Nklampts = 
+            static_cast<CSpaceOMPLMultiAgent*>(cspace_level_k)->GetKlamptDimensionalities();
+          for(uint j = 0; j < layers.back().q_inits.size(); j++){
+            Config qinit = layers.back().q_inits.at(j);
+            Config qgoal = layers.back().q_goals.at(j);
+            input.AddConfigToConfig(qi, qinit, Nklampts.at(j));
+            input.AddConfigToConfig(qg, qgoal, Nklampts.at(j));
+          }
+        }
+        std::cout << qi << std::endl;
+        std::cout << qg << std::endl;
         std::vector<int> idxs = static_cast<CSpaceOMPLMultiAgent*>(cspace_level_k)->GetRobotIdxs();
-        input.q_init = qi;
-        input.q_goal = qg;
         if(k==0){
           //add a root node
           hierarchy->AddLevel( idxs, qi, qg);
@@ -236,11 +219,14 @@ void MotionPlanner::CreateHierarchy()
 
     }else{
       Config qi,qg;
-      GetInitConfigMultiAgent(cspace, qi, qg);
+      std::vector<int> Nklampts = 
+        static_cast<CSpaceOMPLMultiAgent*>(cspace)->GetKlamptDimensionalities();
+      for(uint j = 0; j < layer.q_inits.size(); j++){
+        Config qinit = layer.q_inits.at(j);
+        Config qgoal = layer.q_goals.at(j);
+        input.AddConfigToConfig(qi, qinit, Nklampts.at(j));
+      }
       std::vector<int> idxs = static_cast<CSpaceOMPLMultiAgent*>(cspace)->GetRobotIdxs();
-
-      input.q_init = qi;
-      input.q_goal = qg;
       hierarchy->AddLevel( idxs, qi, qg);
       hierarchy->AddLevel( idxs, qi, qg); 
     }

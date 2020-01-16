@@ -242,6 +242,41 @@ void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy_index)
   stratifications.push_back(stratification);
 
 }
+
+bool PlannerInput::ExistsAgentAtID(int id)
+{
+  for(uint i = 0; i < agent_information.size(); i++){
+    int idi = agent_information.at(i).id;
+    if(id == idi) return true;
+  }
+  return false;
+}
+
+const AgentInformation& PlannerInput::GetAgentAtID(int id)
+{
+  for(uint i = 0; i < agent_information.size(); i++){
+    int idi = agent_information.at(i).id;
+    if(id == idi){
+      return agent_information.at(i);
+    }
+  }
+  std::cout << "ERROR: Could not find robot with ID " << id << std::endl;
+  throw "NOT FOUND ROBOT";
+}
+
+void PlannerInput::AddConfigToConfig(Config &q, const Config &qadd, int Nclip){
+  assert(qadd.size() >= Nclip);
+  int N = q.size();
+  q.resizePersist(N+Nclip);
+  for(int k = 0; k < Nclip; k++){
+    q[N+k] = qadd[k];
+  }
+}
+void PlannerInput::AddConfigToConfig(Config &q, const Config &qadd){
+  int Nadd = qadd.size();
+  AddConfigToConfig(q, qadd, Nadd);
+}
+
 void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index)
 {
   int ctr = 0;
@@ -278,12 +313,35 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
       }
 
       stratification.layers.push_back(layer);
-
-
       lindex = FindNextSiblingNode(lindex);
     }
+    
+    //############################################################################
+    //compute q_init/q_goal
+    //############################################################################
 
+    q_init.clear();
+    q_goal.clear();
+    for(uint k = 0; k < stratification.layers.size(); k++){
+      Layer &layer = stratification.layers.at(k);
+      layer.q_init.clear();
+      layer.q_goal.clear();
+      for(uint j = 0; j < layer.ids.size(); j++){
+        int idj = layer.ids.at(j);
+        if(!ExistsAgentAtID(idj)) continue;
+        AgentInformation agent = GetAgentAtID(idj);
+        AddConfigToConfig(layer.q_init, agent.q_init);
+        AddConfigToConfig(layer.q_goal, agent.q_goal);
+        layer.q_inits.push_back(agent.q_init);
+        layer.q_goals.push_back(agent.q_goal);
+      }
+    }
+    q_init = stratification.layers.back().q_init;
+    q_goal = stratification.layers.back().q_goal;
+
+    //############################################################################
     //build fiber bundle projection matrix
+    //############################################################################
     uint k = stratification.layers.size();
     std::vector<int> last_lvl_ids;
     std::vector<int> current_lvl_ids;
