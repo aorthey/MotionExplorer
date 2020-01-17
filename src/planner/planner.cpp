@@ -182,8 +182,6 @@ void MotionPlanner::CreateHierarchy()
             input.AddConfigToConfig(qg, qgoal, Nklampts.at(j));
           }
         }
-        std::cout << qi << std::endl;
-        std::cout << qg << std::endl;
         std::vector<int> idxs = static_cast<CSpaceOMPLMultiAgent*>(cspace_level_k)->GetRobotIdxs();
         if(k==0){
           //add a root node

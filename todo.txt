@@ -715,13 +715,11 @@ MultiAgent
 [x] **Fix empty-set projection
 [x] Environment: Drone Permutation Dome (Pipe through which only one drone can
 move)
-
-[ ] Fix visualization of multiagent quotient-space before planning (wrong
+[x] Fix visualization of multiagent quotient-space before planning (wrong
 projection of qinit)
-[ ] Fix starting values for simplifications
+[x] Fix starting values for simplifications
 
 [ ] Fix Roadmap (i.e. show the right vertices and edges)
-[ ] implement X1 (Fiber) 
 [ ] Environment: Dome with 10s of Drones. Teamleader approach. K-labeled Drone
  coordination
 [ ] Identity space check validity twice! (how to differentiate between
