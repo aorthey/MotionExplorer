@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="disk_inner" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="disk_inner" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/rectangle.tri" translation="0 +2 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/rectangle.tri" translation="0 -1 0" rotateRPY="0 0 0"/>
+
+  <plannerinput>
+
+    <agent 
+      id="0" 
+      qinit="15  -3.5 -1.0 +0.0 -0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+      qgoal="15  +3.5 -1.0 +0.0 +0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+      dqinit="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+      dqgoal="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+    />
+    <agent 
+      id="2" 
+      qinit="15  -3.5 1.0 +0.0 -0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+      qgoal="15  +3.5 1.0 +0.0 +0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+      dqinit="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+      dqgoal="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+    />
+    <se3min config="6  -4.0 -2.0 -0.0 -3.141593 0 0"/>
+    <se3max config="6  +4.0 +2.0 +0.0 +3.141593 0 0"/>
+
+    <control_min config="6  0 0 0 -0.3 0 0"/>
+    <control_max config="6  0 0 0 +0.3 0 0"/>
+
+    <freeFloating>1</freeFloating>
+    <kinodynamic>1</kinodynamic>
+    <timestep min="0.01" max="0.1"/>
+
+    <maxplanningtime>0.6</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>0.01</epsilongoalregion>
+    <pathSpeed>10</pathSpeed>
+
+    <!-- <algorithm dynamic="1" name="hierarchy:explorer"/> -->
+    <algorithm dynamic="1" name="ompl:dynamic:sst"/>
+
+    <multiAgent>1</multiAgent>
+    <hierarchy>
+      <!-- <level> -->
+      <!--   <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/> -->
+      <!--   <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/> -->
+      <!-- </level> -->
+      <level>
+        <robot id="0" freeFloating="1" type="TSE2"/>
+        <robot id="2" freeFloating="1" type="TSE2"/>
+      </level>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>
+
