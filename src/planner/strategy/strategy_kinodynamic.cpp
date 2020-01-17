@@ -111,8 +111,10 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
       KinodynamicCSpaceOMPL* cspace_dynamic = dynamic_cast<KinodynamicCSpaceOMPL*>(cspace_levelk);
       if(cspace_dynamic==nullptr)
       {
+        std::cout << std::string(80, '-') << std::endl;
         std::cout << "ERROR: not dynamic even though declared dynamic" << std::endl;
         std::cout << *cspace_levelk << std::endl;
+        std::cout << std::string(80, '-') << std::endl;
         throw "Not dynamic.";
       }
 

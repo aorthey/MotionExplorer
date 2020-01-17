@@ -718,12 +718,26 @@ move)
 [x] Fix visualization of multiagent quotient-space before planning (wrong
 projection of qinit)
 [x] Fix starting values for simplifications
+[ ] (Low Priority, is too obfuscated anyway) Fix Roadmap (i.e. show the right vertices and edges)
 
-[ ] Fix Roadmap (i.e. show the right vertices and edges)
 [ ] Environment: Dome with 10s of Drones. Teamleader approach. K-labeled Drone
  coordination
 [ ] Identity space check validity twice! (how to differentiate between
 constraint relaxation and copy reduction?)
 [ ] Add gradient color to path to visualize who goes first / Visualize over/under of paths
+[ ] How to add all the knowledge from MA community?
+[ ] Add kinodynamic examples
+
+
+
 
 What about 100s of drones? Should hold key of how to properly simplify it. 
+[ ] Restructure everything. 
+XMLLoader
+or Just have one GUI object, in which everything resides. GUI has some commands
+to the outside, like startPlanner, displayGUI (or run in terminal alone).
+Needs further decomposition.
+
+(1) XMLLoader
+(2) GUI Creator (from XML, cause XML defines buttons etc).
+(3) CSPACE AND PLANNER CREATOR

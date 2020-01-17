@@ -216,17 +216,9 @@ void MotionPlanner::CreateHierarchy()
       hierarchy->AddLevel(ri, qi, qg);
 
     }else{
-      Config qi,qg;
-      std::vector<int> Nklampts = 
-        static_cast<CSpaceOMPLMultiAgent*>(cspace)->GetKlamptDimensionalities();
-      for(uint j = 0; j < layer.q_inits.size(); j++){
-        Config qinit = layer.q_inits.at(j);
-        Config qgoal = layer.q_goals.at(j);
-        input.AddConfigToConfig(qi, qinit, Nklampts.at(j));
-      }
       std::vector<int> idxs = static_cast<CSpaceOMPLMultiAgent*>(cspace)->GetRobotIdxs();
-      hierarchy->AddLevel( idxs, qi, qg);
-      hierarchy->AddLevel( idxs, qi, qg); 
+      hierarchy->AddLevel( idxs, input.q_init, input.q_goal);
+      hierarchy->AddLevel( idxs, input.q_init, input.q_goal); 
     }
     hierarchy->AddRootNode( std::make_shared<Roadmap>() ); 
     std::vector<int> path;
@@ -641,6 +633,8 @@ void MotionPlanner::DrawGL(GUIState& state){
   const Config qg = hierarchy->GetGoalConfig(current_level);
   const Config qiOuter = hierarchy->GetInitConfig(maxLevel);
   const Config qgOuter = hierarchy->GetGoalConfig(maxLevel);
+  std::cout << qi << std::endl;
+  std::cout << qg << std::endl;
 
   const GLColor ultralightred_sufficient(0.8,0,0,0.3);
   const GLColor ultralightgreen_sufficient(0,0.5,0,0.2);

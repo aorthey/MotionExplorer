@@ -175,11 +175,14 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
     while(node_agent!=nullptr){
       AgentInformation ai;
       ai.id = GetAttribute<int>(node_agent, "id");
+      Config qzero;
       ai.q_init = GetAttribute<Config>(node_agent, "qinit");
       ai.q_goal = GetAttribute<Config>(node_agent, "qgoal");
-      Config qzero;
+      ai.dq_init = GetAttributeDefault<Config>(node_agent, "dqinit", qzero);
+      ai.dq_goal = GetAttributeDefault<Config>(node_agent, "dqgoal", qzero);
       ai.qMin = GetAttributeDefault<Config>(node_agent, "qMin", qzero);
       ai.qMax = GetAttributeDefault<Config>(node_agent, "qMax", qzero);
+
       agent_information.push_back(ai);
       node_agent = FindNextSiblingNode(node_agent);
       N += ai.q_init.size();

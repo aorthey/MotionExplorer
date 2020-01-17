@@ -6,7 +6,7 @@ int main(int argc, char **argv) {
 
   EnvironmentLoader env = EnvironmentLoader::from_args(argc, argv);
 
-  // env.RenameExec(argc, argv, "quotient-gui");
+  // env.RenameExec(argc, argv, "MotionPlanningExplorer");
 
   PlannerMultiInput in = env.GetPlannerInput();
 

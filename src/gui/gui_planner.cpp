@@ -361,38 +361,38 @@ void PlannerBackend::RenderWorld(){
       path->DrawGL(state, t);
     }
   }
-  if(planner->GetInput().kinodynamic){
-    if(state("draw_controller_com_path")) GLDraw::drawCenterOfMassPathFromController(sim);
+  //if(planner->GetInput().kinodynamic){
+  //  if(state("draw_controller_com_path")) GLDraw::drawCenterOfMassPathFromController(sim);
 
-    SmartPointer<ContactStabilityController>& controller = *reinterpret_cast<SmartPointer<ContactStabilityController>*>(&sim.robotControllers[0]);
-    ControllerState output = controller->GetControllerState();
-    Vector torque = output.current_torque;
+  //  SmartPointer<ContactStabilityController>& controller = *reinterpret_cast<SmartPointer<ContactStabilityController>*>(&sim.robotControllers[0]);
+  //  ControllerState output = controller->GetControllerState();
+  //  Vector torque = output.current_torque;
 
-    //Untested/Experimental Stuff
-    if(state("draw_controller_driver")){
-      Vector T;
-      sim.controlSimulators[0].GetActuatorTorques(T);
-      Robot *robot = &sim.odesim.robot(0)->robot;
+  //  //Untested/Experimental Stuff
+  //  if(state("draw_controller_driver")){
+  //    Vector T;
+  //    sim.controlSimulators[0].GetActuatorTorques(T);
+  //    Robot *robot = &sim.odesim.robot(0)->robot;
 
-      Vector3 dir;
-      for(uint k = 0; k < 3; k++){
-        dir[k] = T[k];
-      }
-      //dir = T(i)*dir/dir.norm();
+  //    Vector3 dir;
+  //    for(uint k = 0; k < 3; k++){
+  //      dir[k] = T[k];
+  //    }
+  //    //dir = T(i)*dir/dir.norm();
 
-      const RobotJointDriver& driver = robot->drivers[0];
-      //uint didx = driver.linkIndices[0];
-      uint lidx = driver.linkIndices[1];
-      Frame3D Tw = robot->links[lidx].T_World;
-      Vector3 pos = Tw*robot->links[lidx].com;
+  //    const RobotJointDriver& driver = robot->drivers[0];
+  //    //uint didx = driver.linkIndices[0];
+  //    uint lidx = driver.linkIndices[1];
+  //    Frame3D Tw = robot->links[lidx].T_World;
+  //    Vector3 pos = Tw*robot->links[lidx].com;
 
-      double r = 0.05;
-      glPushMatrix();
-      glTranslate(pos);
-      drawCone(-dir,2*r,8);
-      glPopMatrix();
-    }
-  }
+  //    double r = 0.05;
+  //    glPushMatrix();
+  //    glTranslate(pos);
+  //    drawCone(-dir,2*r,8);
+  //    glPopMatrix();
+  //  }
+  //}
 }
 
  // //experiments on drawing 3d structures on fixed screen position
