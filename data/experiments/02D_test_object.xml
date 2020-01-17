@@ -15,7 +15,6 @@
 
     <qinit  config="11  0 0 0 0 0 0  +2.0 0.0 1.57 0 0"/>
     <qgoal  config="11  1 0 0 0 0 0  +2.6 0.0 1.0 0 0"/>
-    <!-- angle of second joint maximum of pi/2 -->
     <se3min config="6  -5 -5.0 -0.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +5 +5.0 +0.5 +3.141593 +1.57 +3.141593"/>    
     <epsilongoalregion>0.05</epsilongoalregion>
@@ -26,7 +25,7 @@
     <freeFloating>1</freeFloating>
 
     <hierarchy>
-      <level inner_index="0" type="SE2_CONTACT"/>
+      <level inner_index="0" type="SE2"/> <!-- SE2_CONTACT soll dann der Contact Space anstelle eines Config Space sein -->
     </hierarchy>
 
   </plannerinput>
