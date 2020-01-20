@@ -42,8 +42,13 @@ CSpaceOMPL* MotionPlanner::ComputeMultiAgentCSpace(const Layer &layer){
 
   for(uint k = 0; k < layer.ids.size(); k++){
     int rk = layer.ids.at(k);
+    if(rk >= (int)world->robots.size()){
+      OMPL_ERROR("Robot Index ID %d does not exists. (Check XML)", rk);
+      throw "wrong ID";
+    }
     std::string type = layer.types.at(k);
     bool freeFloating = layer.freeFloating.at(k);
+    // std::cout << type << " " << (freeFloating?"FREEFLOATING":"FIXED") << std::endl;
     CSpaceOMPL* cspace_level_k = ComputeCSpace(type, rk, freeFloating);
     cspace_levels.push_back(cspace_level_k);
   }
@@ -113,7 +118,8 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
   return cspace_level;
 }
 
-CSpaceOMPL* MotionPlanner::ComputeCSpaceLayer(const Layer &layer){
+CSpaceOMPL* MotionPlanner::ComputeCSpaceLayer(const Layer &layer)
+{
 
   if(!input.multiAgent){
     int ii = layer.inner_index;
@@ -633,8 +639,6 @@ void MotionPlanner::DrawGL(GUIState& state){
   const Config qg = hierarchy->GetGoalConfig(current_level);
   const Config qiOuter = hierarchy->GetInitConfig(maxLevel);
   const Config qgOuter = hierarchy->GetGoalConfig(maxLevel);
-  std::cout << qi << std::endl;
-  std::cout << qg << std::endl;
 
   const GLColor ultralightred_sufficient(0.8,0,0,0.3);
   const GLColor ultralightgreen_sufficient(0,0.5,0,0.2);

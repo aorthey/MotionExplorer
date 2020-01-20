@@ -727,8 +727,7 @@ constraint relaxation and copy reduction?)
 [ ] Add gradient color to path to visualize who goes first / Visualize over/under of paths
 [ ] How to add all the knowledge from MA community?
 [ ] Add kinodynamic examples
-
-
+[ ] Implement PathLift Class
 
 
 What about 100s of drones? Should hold key of how to properly simplify it. 
