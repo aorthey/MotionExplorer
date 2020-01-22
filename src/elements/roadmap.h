@@ -48,8 +48,10 @@ class Roadmap{
   private:
 
     //void DrawSingleLevelGL(GUIState &, ob::PlannerDataPtr);
-    void DrawPlannerData(GUIState&);
-    void DrawShortestPath(GUIState&);
+    void DrawGLPlannerData(GUIState&);
+    void DrawGLShortestPath(GUIState&);
+    void DrawGLRoadmapVertices(GUIState&, int ridx = -1);
+    void DrawGLRoadmapEdges(GUIState&, int ridx = -1);
 
     ob::PlannerDataPtr pd{nullptr};
     CSpaceOMPL *cspace{nullptr};
