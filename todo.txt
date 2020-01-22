@@ -728,4 +728,3 @@ constraint relaxation and copy reduction?)
 [ ] How to add all the knowledge from MA community?
 [ ] Add kinodynamic examples
 [ ] Implement PathLift Class
-

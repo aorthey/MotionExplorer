@@ -51,9 +51,9 @@
     <pathSpeed>3</pathSpeed>
     <freeFloating>1</freeFloating>
     <smoothPath>1</smoothPath>
-    <algorithm name="hierarchy:explorer"/>
     <algorithm name="hierarchy:qrrt"/>
-    <algorithm name="ompl:rrt"/>
+    <algorithm name="hierarchy:explorer"/>
+    <!-- <algorithm name="ompl:rrt"/> -->
 
     <multiAgent>1</multiAgent>
 
@@ -68,17 +68,15 @@
       <!-- </level> -->
       <level>
         <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/>
-        <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/>
-        <robot id="5" freeFloating="1" simplification_of_id="4" type="R2"/>
-        <robot id="7" freeFloating="1" simplification_of_id="6" type="R2"/>
+        <!-- <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/> -->
+        <!-- <robot id="5" freeFloating="1" simplification_of_id="4" type="R2"/> -->
+        <!-- <robot id="7" freeFloating="1" simplification_of_id="6" type="R2"/> -->
       </level>
       <level>
         <robot id="0" freeFloating="1" type="SE2RN"/>
         <robot id="2" freeFloating="1" type="SE2RN"/>
-        <robot id="4" freeFloating="1" type="SE2RN"/>
-        <robot id="6" freeFloating="1" type="SE2RN"/>
         <!-- <robot id="4" freeFloating="1" type="SE2RN"/> -->
-        <!-- <robot id="4" freeFloating="1" type="R2"/> -->
+        <!-- <robot id="6" freeFloating="1" type="SE2RN"/> -->
       </level>
     </hierarchy>
 

@@ -30,26 +30,17 @@ class Roadmap{
     GLDraw::GLColor cVertexStart{green};
     GLDraw::GLColor cVertexGoal{red};
     GLDraw::GLColor cPath{darkMagenta};
-    GLDraw::GLColor cComplex{magenta};
-    GLDraw::GLColor cComplexQuad{lightBlue};
 
     GLDraw::GLColor cVertexComponentOut{gray}; //a vertex not in the same component as the designated start vertex
     GLDraw::GLColor cVertexComponentGoal{cyan}; //goal component vertex
-    GLDraw::GLColor cNeighborhoodVolume{lightGreen};
-    GLDraw::GLColor cNeighborhoodVolumeInfeasible{lightRed}; 
-    GLDraw::GLColor cNeighborhoodVolumeSufficient{lightMagenta}; 
-
-    bool wiredNeighborhood{true};
 
     uint numEdges();
     uint numVertices();
-    Vector3 GetXYZFromState(ob::State *s);
 
   private:
 
-    //void DrawSingleLevelGL(GUIState &, ob::PlannerDataPtr);
     void DrawGLPlannerData(GUIState&);
-    void DrawGLShortestPath(GUIState&);
+    //void DrawGLShortestPath(GUIState&);
     void DrawGLRoadmapVertices(GUIState&, int ridx = -1);
     void DrawGLRoadmapEdges(GUIState&, int ridx = -1);
 

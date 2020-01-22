@@ -57,6 +57,7 @@
     <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
     <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
     <pathWidth>0.05</pathWidth>
+    <algorithm name="hierarchy:explorer"/>
     <algorithm name="hierarchy:qrrt"/>
     <!-- <algorithm name="hierarchy:explorer"/> -->
     <algorithm name="ompl:rrt"/>
@@ -66,9 +67,9 @@
     <hierarchy>
       <level>
         <robot id="1" freeFloating="1" simplification_of_id="0" type="R3"/>
-        <robot id="3" freeFloating="1" simplification_of_id="2" type="R3"/>
-        <robot id="5" freeFloating="1" simplification_of_id="4" type="R3"/>
-        <robot id="7" freeFloating="1" simplification_of_id="6" type="R3"/>
+        <!-- <robot id="3" freeFloating="1" simplification_of_id="2" type="R3"/> -->
+        <!-- <robot id="5" freeFloating="1" simplification_of_id="4" type="R3"/> -->
+        <!-- <robot id="7" freeFloating="1" simplification_of_id="6" type="R3"/> -->
         <!-- <robot id="9" freeFloating="1" simplification_of_id="8" type="R3"/> -->
         <!-- <robot id="11" freeFloating="1" simplification_of_id="10" type="R3"/> -->
       </level>

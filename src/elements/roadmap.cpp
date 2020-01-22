@@ -94,32 +94,32 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
   return path_ompl;
 }
 
-void Roadmap::DrawGLShortestPath(GUIState &state)
-{
-  glEnable(GL_BLEND); 
-  glDisable(GL_LIGHTING);
-  const std::vector<Vector3>& q = shortest_path;
-  if(q.size()>1)
-  {
-    glPushMatrix();
-    glLineWidth(widthPath);
-    setColor(cPath);
+// void Roadmap::DrawGLShortestPath(GUIState &state)
+// {
+//   glEnable(GL_BLEND); 
+//   glDisable(GL_LIGHTING);
+//   const std::vector<Vector3>& q = shortest_path;
+//   if(q.size()>1)
+//   {
+//     glPushMatrix();
+//     glLineWidth(widthPath);
+//     setColor(cPath);
 
-    for(uint k = 0; k < q.size()-1; k++){
-      Vector3 v1 = q.at(k);
-      Vector3 v2 = q.at(k+1);
-      if(quotient_space->GetDimensionality()<=2 || 
-          quotient_space->SpaceInformationPtr()->getStateSpace()->getType()==ob::STATE_SPACE_SE2){
-        double offset = +0.05;
-        v1[2]=offset;v2[2]=offset;
-      }
-      drawLineSegment(v1,v2);
-    }
-    glPopMatrix();
-  }
-  glEnable(GL_LIGHTING);
-  glDisable(GL_BLEND); 
-}
+//     for(uint k = 0; k < q.size()-1; k++){
+//       Vector3 v1 = q.at(k);
+//       Vector3 v2 = q.at(k+1);
+//       if(quotient_space->GetDimensionality()<=2 || 
+//           quotient_space->SpaceInformationPtr()->getStateSpace()->getType()==ob::STATE_SPACE_SE2){
+//         double offset = +0.05;
+//         v1[2]=offset;v2[2]=offset;
+//       }
+//       drawLineSegment(v1,v2);
+//     }
+//     glPopMatrix();
+//   }
+//   glEnable(GL_LIGHTING);
+//   glDisable(GL_BLEND); 
+// }
 
 void Roadmap::DrawGLRoadmapVertices(GUIState &state, int ridx)
 {
