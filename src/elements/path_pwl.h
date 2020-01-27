@@ -46,7 +46,7 @@ class PathPiecewiseLinear
     double linewidth{20};
     double widthBorder{0.1};
     double ptsize{10};
-    double zOffset{0.0};
+    double zOffset{-0.1};
     GLColor cVertex{magenta}, cLine{magenta};
     GLColor cSmoothed{magenta}, cUnsmoothed{red};
     GLColor cRobotVolume{grey};

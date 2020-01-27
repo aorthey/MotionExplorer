@@ -719,7 +719,6 @@ move)
 projection of qinit)
 [x] Fix starting values for simplifications
 [ ] (Low Priority, is too obfuscated anyway) Fix Roadmap (i.e. show the right vertices and edges)
-
 [ ] Environment: Dome with 10s of Drones. Teamleader approach. K-labeled Drone
  coordination
 [ ] Identity space check validity twice! (how to differentiate between

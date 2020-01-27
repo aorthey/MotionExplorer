@@ -166,7 +166,7 @@ Vector3 PathPiecewiseLinear::EvalVec3(const double t, int ridx) const{
   Config q = Eval(t);
   ob::ScopedState<> s = quotient_space->ConfigToOMPLState(q);
   Vector3 v = quotient_space->getXYZ(s.get(), ridx);
-  if(draw_planar) v[2] = 0.0;
+  if(draw_planar) v[2] = zOffset;
   return v;
 }
 
@@ -174,7 +174,7 @@ Vector3 PathPiecewiseLinear::EvalVec3(const double t) const{
   Config q = Eval(t);
   ob::ScopedState<> s = quotient_space->ConfigToOMPLState(q);
   Vector3 v = quotient_space->getXYZ(s.get());
-  if(draw_planar) v[2] = 0.0;
+  if(draw_planar) v[2] = zOffset;
   return v;
 }
 
@@ -498,11 +498,15 @@ void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
   if(quotient_space->isMultiAgent()){
     CSpaceOMPLMultiAgent *cma = static_cast<CSpaceOMPLMultiAgent*>(quotient_space);
     std::vector<int> idxs = cma->GetRobotIdxs();
+    bool drawMACross = drawCross;
     foreach(int i, idxs)
     {
         DrawGLRibbonRobotIndex(states, i);
         DrawGLArrowMiddleOfPath(states, i);
-        if(drawCross) DrawGLCross(states, i);
+        if(drawMACross){
+          DrawGLCross(states, i);
+          drawMACross = false;
+        }
     }
     if(!quotient_space->IsPlanar()){
     }else{
