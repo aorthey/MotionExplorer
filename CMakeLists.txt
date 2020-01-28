@@ -5,7 +5,7 @@ INCLUDE(CMakeColors)
 
 SET(DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/")
 
-PROJECT( Orthoklampt )
+PROJECT( MotionPlanningExplorerGUI )
 SET(ORTHOKLAMPT_SUBDIRS algorithms controller elements gui planner ompl)
 
 set(ORTHOKLAMPT_MAJOR_VERSION 0)
