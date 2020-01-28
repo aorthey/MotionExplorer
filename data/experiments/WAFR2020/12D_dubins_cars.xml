@@ -40,8 +40,8 @@
     <epsilongoalregion>0.01</epsilongoalregion>
     <pathSpeed>10</pathSpeed>
 
-    <!-- <algorithm dynamic="1" name="hierarchy:explorer"/> -->
-    <algorithm dynamic="1" name="ompl:dynamic:sst"/>
+    <algorithm dynamic="1" name="hierarchy:explorer"/>
+    <!-- <algorithm dynamic="1" name="ompl:dynamic:sst"/> -->
 
     <multiAgent>1</multiAgent>
     <hierarchy>

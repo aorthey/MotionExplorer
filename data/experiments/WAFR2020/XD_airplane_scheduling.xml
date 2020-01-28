@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <!-- Airplane 1 is holonomic, Airplane 2 is non-holonomic -->
+  <robot name="airplane" file="../../robots/airplane.urdf"/>
+  <!-- <robot name="airplane" file="../../robots/airplane.urdf"/> -->
+
+  <plannerinput>
+    <agent 
+      id="0" 
+      qinit="6  -3.5 -1.0 +0.0 -0.0 +0 +0.0"
+      qgoal="6  +3.5 -1.0 +0.0 +0.0 +0 +0.0"
+      dqinit="6  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+      dqgoal="6  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+    />
+
+    <se3min config="6  -5.0 -5.0 -3.0 -3.141593 0 0"/>
+    <se3max config="6  +5.0 +5.0 +3.0 +3.141593 0 0"/>
+
+    <control_min config="6  0 0 0 -0.1 -0.1 0"/>
+    <control_max config="6  0 0 0 +0.1 +0.1 0"/>
+    <timestep min="0.01" max="0.05"/>
+
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>1</epsilongoalregion>
+    <pathSpeed>4</pathSpeed>
+    <smoothPath>4</smoothPath>
+
+
+    <kinodynamic>1</kinodynamic>
+    <freeFloating>1</freeFloating>
+    <multiAgent>1</multiAgent>
+    <hierarchy>
+      <!-- <level inner_index="1" type = "SE3"/> -->
+      <level>
+        <robot id="0" freeFloating="1" type="TSE2"/>
+      </level>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>
+
