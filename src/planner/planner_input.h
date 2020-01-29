@@ -38,7 +38,8 @@ class PlannerInput{
     uint robot_idx;
     int freeFloating;
     bool contactPlanner{false};
-
+    
+    // access to surface triangles of objects/obstacles
     std::vector<Triangle3D> tris;
 
     std::string name_algorithm;

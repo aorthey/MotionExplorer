@@ -5,11 +5,11 @@
   <robot name="2dof" file="../robots/planar/2dof_testobj.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
   <robot name="1dof_inner" file="../robots/planar/2dof_testobj_1dof_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
 
-<!--
-  <rigidObject name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+0.5 0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+0.5 -2.0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+0.5 -4.0 0" rotateRPY="0 0 0"/>
-  -->
+
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 0 0" rotateRPY="0 0 0"/>
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -2.0 0" rotateRPY="0 0 0"/>
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -4.0 0" rotateRPY="0 0 0"/>
+  
   
   <plannerinput>
 
@@ -25,7 +25,7 @@
     <freeFloating>1</freeFloating>
 
     <hierarchy>
-      <level inner_index="0" type="SE2"/> <!-- SE2_CONTACT soll dann der Contact Space anstelle eines Config Space sein -->
+      <level inner_index="0" type="SE3RN"/> <!-- SE2_CONTACT soll dann der Contact Space anstelle eines Config Space sein -->
     </hierarchy>
 
   </plannerinput>

@@ -84,7 +84,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
           tris.push_back(tri);
         }
       }
-      std::cout << "Environment has " << tris.size() << " triangles to make contact." << std::endl;
+      std::cout << "Environment has " << tris.size() << " triangles to make contact!!" << std::endl;
 
       for(uint k = 0; k < pin.inputs.size(); k++){
         PlannerInput *pkin = pin.inputs.at(k);
