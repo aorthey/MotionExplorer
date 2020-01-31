@@ -40,6 +40,9 @@ def GetFiberType(tbase, tbundle):
       ftype = "SO3RN"
     elif tbase == "SE3":
       ftype = "RN"
+  elif tbundle == "Bundle":
+    if tbase == "Base":
+      ftype = "Fiber"
   else:
     print("Could not determine fiber type")
     print(tbase, tbundle)
@@ -62,6 +65,10 @@ def typeToLatex(typespace):
     rn = 6
     length = rn + 3
     text = r'$SE(2)\times \mathbb{R}^{'+str(rn)+'}$'
+  elif typespace == "SO2RN":
+    rn = 6
+    length = rn + 1
+    text = r'$SO(2)\times \mathbb{R}^{'+str(rn)+'}$'
   elif typespace == "SE2":
     length = 3
     text = r'$SE(2)$'
@@ -74,13 +81,22 @@ def typeToLatex(typespace):
   elif typespace == "SO3":
     length = 3
     text = r'$SO(3)$'
+  elif typespace == "Bundle":
+    length = 6
+    text = r'{Bundle}'
+  elif typespace == "Base":
+    length = 3
+    text = r'{Base}'
+  elif typespace == "Fiber":
+    length = 3
+    text = r'{Fiber}'
   else:
     print("not knowing type",typespace)
     sys.exit(0)
   return [length, text]
 
 
-def PlotFiberDiagram(fname, fontsize, ystep, xstep):
+def PlotFiberDiagram(fname, fontsize, ystep, xstep, xoffset=0):
   doc = parse(fname)
   hierarchy = doc.getElementsByTagName("hierarchy")[0]
   levels = hierarchy.getElementsByTagName("level")
@@ -102,9 +118,12 @@ def PlotFiberDiagram(fname, fontsize, ystep, xstep):
       self._sid = sid
       #print(rid, typespace, sid)
       
+      self._xoffset = 0
       [self._length, self._text] = typeToLatex(typespace)
 
 
+    def setXOffset(self, xoff):
+      self._xoffset = xoff
     def setXY(self, x, y, xstep, ystep):
       self._x = x
       self._y = y
@@ -114,7 +133,7 @@ def PlotFiberDiagram(fname, fontsize, ystep, xstep):
 
     def SetPatch(self, ax):
       offset = 0.05*self._length*self._xstep
-      tx = self._x + 0.4*self._length*self._xstep - offset
+      tx = self._x + 0.4*self._length*self._xstep - offset - self._xoffset
       ty = self._y + 0.3*height
 
       if self._sid:
@@ -135,9 +154,9 @@ def PlotFiberDiagram(fname, fontsize, ystep, xstep):
 
         if length_x > 0:
           [tmp, self._fibertext] = typeToLatex(self._fibertype)
-          tx2 = x2 + 0.4*length_x - offset
+          tx2 = x2 + 0.4*length_x - offset - self._xoffset
           if self._fibertype[0] == "S":
-            tx2 = x2 + 0.2*length_x - offset
+            tx2 = x2 + 0.2*length_x - offset - self._xoffset
           ax.text(tx2, ty, self._fibertext, {'color': 'k', 'fontsize': fontsize})
 
         # if self._fulllength > self._length or self._dashedOnly:
@@ -153,8 +172,12 @@ def PlotFiberDiagram(fname, fontsize, ystep, xstep):
         line = Line2D(xx, yy, linewidth=2, linestyle="--", color='k')
         ax.add_line(line)
 
-        poly = Polygon([[x1, y1], [x1, y2], [x2, y2], [x2, y1]],
-          closed=True, fill=True, linewidth=0, color=(0.95,0.95,0.95))
+        if self._dashedOnly:
+          poly = Polygon([[x1, y1], [x1, y2], [x2, y2], [x2, y1]],
+            closed=True, linestyle='--', fill=False, linewidth=2)
+        else:
+          poly = Polygon([[x1, y1], [x1, y2], [x2, y2], [x2, y1]],
+            closed=True, linestyle='--', fill=False, linewidth=2, hatch='/')
         ax.add_patch(poly)
 
       if not self._dashedOnly:
@@ -187,6 +210,7 @@ def PlotFiberDiagram(fname, fontsize, ystep, xstep):
       t = str(robot.getAttribute("type"))
       sid = robot.getAttribute("simplification_of_id")
       rect = RectangleSpace(rid, t, sid)
+      rect.setXOffset(xoffset)
       rect.setXY(x, y, xstep, ystep)
 
       if sid:
@@ -214,6 +238,7 @@ def PlotFiberDiagram(fname, fontsize, ystep, xstep):
         if not found:
           print("Robot",rectLL._rid,"projects to empty set")
           rect = RectangleSpace(rectLL._rid, rectLL._typespace, rectLL._rid)
+          rect.setXOffset(xoffset)
           rect._fulllength = rectLL._length
           rect.setXY(rectLL._x, y, rectLL._xstep, rectLL._ystep)
           rect.setDashed()
@@ -243,13 +268,15 @@ def PlotFiberDiagram(fname, fontsize, ystep, xstep):
   plt.axis('off')
   ax.get_xaxis().set_visible(False)
   ax.get_yaxis().set_visible(False)
-  plt.savefig(fname+".png", bbox_inches='tight', pad_inches=0)
+  plt.savefig(fname[:-4]+".png", bbox_inches='tight', pad_inches=0)
   plt.clf()
   plt.cla()
   plt.close()
   # plt.show()
 
 
-# PlotFiberDiagram('../data/experiments/WAFR2020/06D_bhattacharya_square.xml', 30, 20, 5)
+PlotFiberDiagram('../data/experiments/WAFR2020/18D_manipulators_crossing.xml',
+    20, 20, 5, xoffset=1)
+PlotFiberDiagram('../data/experiments/WAFR2020/06D_bhattacharya_square.xml', 30, 20, 5)
 PlotFiberDiagram('../data/experiments/WAFR2020/12D_drones_tree.xml', 25, 20, 8)
-# PlotFiberDiagram('../data/experiments/WAFR2020/18D_manipulators_crossing.xml', 20, 20, 5)
+PlotFiberDiagram('testfiber.xml', 35, 20, 10, xoffset=2)
