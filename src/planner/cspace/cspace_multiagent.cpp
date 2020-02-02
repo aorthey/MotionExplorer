@@ -187,18 +187,10 @@ const ob::StateValidityCheckerPtr CSpaceOMPLMultiAgent::StateValidityCheckerPtr(
   return validity_checker;
 }
 
-
-
 void CSpaceOMPLMultiAgent::ConfigToOMPLState(const Config &q, ob::State *qompl, int agent)
 {
-  //computes the first agent-elements (i.e. [0,agent[). [0,2[ = [0,1]
-
   ob::State *qomplAgent = static_cast<ob::CompoundState*>(qompl)->as<ob::State>(agent);
-
   cspaces_.at(agent)->ConfigToOMPLState(q, qomplAgent);
-
-  // cspaces_.at(agent)->SpaceInformationPtr()->printState(qomplAgent);
-
 }
 
 void CSpaceOMPLMultiAgent::ConfigToOMPLState(const Config &q, ob::State *qompl)

@@ -6,7 +6,6 @@
 
 #include <ompl/geometric/planners/quotientspace/Explorer.h>
 #include <ompl/geometric/planners/quotientspace/QRRT.h>
-#include <ompl/geometric/planners/quotientspace/QRRTLift.h>
 // #include <ompl/geometric/planners/fiberbundle/FiberOP.h>
 
 #include <ompl/geometric/planners/rrt/RRT.h>
@@ -132,7 +131,6 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
   else if(algorithm=="hierarchy:qrrt") planner = std::make_shared<og::QRRT>(siVec);
-  else if(algorithm=="hierarchy:qrrtlift") planner = std::make_shared<og::QRRTLift>(siVec);
   else if(algorithm=="sampler") planner = std::make_shared<og::InfeasibilitySampler>(si);
   else if(algorithm=="hierarchy:explorer") planner = std::make_shared<og::MotionExplorer>(siVec);
 

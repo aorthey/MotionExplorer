@@ -560,8 +560,8 @@ void MotionPlanner::DrawGL(GUIState& state){
       const GLColor colorPathSelectedNonExec = magenta;
       const GLColor colorPathSelectedNonExecChildren = green;
 
-      const GLColor colorPathNotSelected = lightMagenta;
-      const GLColor colorPathNotSelectedChildren = lightGreen;
+      const GLColor colorPathNotSelected = lightGrey;
+      const GLColor colorPathNotSelectedChildren = lightGrey;
 
       for(uint k = 0; k < Nsiblings; k++){
         if(k==(uint)last_node) continue;
@@ -572,8 +572,8 @@ void MotionPlanner::DrawGL(GUIState& state){
         bool hasChildren = hierarchy->HasChildren(current_path);
         if(pwlk && state("draw_roadmap_shortest_path")){
           pwlk->zOffset = 0.001;
-          pwlk->linewidth = 0.7*input.pathWidth;
-          pwlk->widthBorder= 0.7*input.pathBorderWidth;
+          pwlk->linewidth = 0.3*input.pathWidth;
+          pwlk->widthBorder= 0.3*input.pathBorderWidth;
           pwlk->ptsize = 8;
           if(!hasChildren){
               pwlk->setColor(colorPathNotSelected);

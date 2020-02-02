@@ -172,7 +172,9 @@ void KinodynamicCSpaceOMPLSE2::initControlSpace(){
   uint NdimControl = 6 + Nompl;
   control_space = std::make_shared<oc::RealVectorControlSpace>(space, NdimControl+1);
 
-  Vector torques = robot->torqueMax;
+  // Vector torques = robot->torqueMax;
+  // std::cout << torques << std::endl;
+  // exit(0);
 
   ob::RealVectorBounds cbounds(NdimControl+1);
   cbounds.setLow(0);

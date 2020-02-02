@@ -32,6 +32,8 @@ struct AgentInformation{
   int id;
   Config qMin;
   Config qMax;
+  Config uMin;
+  Config uMax;
 };
 
 struct Stratification{
@@ -51,14 +53,15 @@ class PlannerInput{
 
     Config qMin;
     Config qMax;
-
-    //multiagents
-    std::vector<AgentInformation> agent_information;
+    Config uMin;
+    Config uMax;
 
     Config se3min;
     Config se3max;
-
     uint robot_idx;
+
+    //multiagents
+    std::vector<AgentInformation> agent_information;
 
     //contact-planning
     int freeFloating;
@@ -83,8 +86,6 @@ class PlannerInput{
 
     bool kinodynamic{false};
     bool multiAgent{false};
-    Config uMin;
-    Config uMax;
 
     std::vector<Stratification> stratifications;
 

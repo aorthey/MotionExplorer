@@ -30,6 +30,12 @@ std::vector<std::string> PlannerMultiInput::GetAlgorithms(TiXmlElement *node, bo
     bool isDynamic = GetAttributeDefault<int>(node_algorithm, "dynamic", false);
     if(kinodynamic == isDynamic){
       algorithms.push_back(a);
+    }else{
+      std::cout << std::string(80, '*') << std::endl;
+      std::cout << "Algorithm: " << a << " is " << (isDynamic?"dynamic":"geometric") <<
+       " but problem is " << (kinodynamic?"dynamic":"geometric") << "." << std::endl;
+      OMPL_WARN("DYNAMIC MISMATCH");
+      std::cout << std::string(80, '*') << std::endl;
     }
     node_algorithm = FindNextSiblingNode(node_algorithm);
   }
@@ -55,7 +61,7 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
   TiXmlElement* node_plannerinput = FindSubNode(node, "plannerinput");
 
   if(!node_plannerinput){
-    std::cout << "world xml file has no plannerinput" << std::endl;
+    OMPL_WARN("XML File does not have PlannerInput");
     return false;
   }
 
@@ -163,11 +169,6 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
   kinodynamic = GetSubNodeTextDefault(node, "kinodynamic", kinodynamic);
   multiAgent = GetSubNodeTextDefault(node, "multiAgent", multiAgent);
   name_loadPath = GetSubNodeAttributeDefault<std::string>(node, "loadPath", "file", name_loadPath);
-  if(kinodynamic)
-  {
-    uMin = GetSubNodeAttribute<Config>(node, "control_min", "config");
-    uMax = GetSubNodeAttribute<Config>(node, "control_max", "config");
-  }
   if(multiAgent)
   {
     TiXmlElement* node_agent = FindFirstSubNode(node, "agent");
@@ -182,7 +183,12 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
       ai.dq_goal = GetAttributeDefault<Config>(node_agent, "dqgoal", qzero);
       ai.qMin = GetAttributeDefault<Config>(node_agent, "qMin", qzero);
       ai.qMax = GetAttributeDefault<Config>(node_agent, "qMax", qzero);
-
+      Config uzero;
+      ai.uMin = GetAttributeDefault<Config>(node_agent, "uMin", uzero);
+      ai.uMax = GetAttributeDefault<Config>(node_agent, "uMax", uzero);
+      uMin = ai.uMin;
+      uMax = ai.uMax;
+      OMPL_WARN("TODO: Currently, we only support one single control input.");
       agent_information.push_back(ai);
       node_agent = FindNextSiblingNode(node_agent);
       N += ai.q_init.size();
@@ -195,6 +201,11 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
     Config dq; dq.resize(q_init.size()); dq.setZero();
     dq_init = GetSubNodeAttributeDefault<Config>(node, "dqinit", "config", dq);
     dq_goal = GetSubNodeAttributeDefault<Config>(node, "dqgoal", "config", dq);
+    if(kinodynamic)
+    {
+      uMin = GetSubNodeAttribute<Config>(node, "control_min", "config");
+      uMax = GetSubNodeAttribute<Config>(node, "control_max", "config");
+    }
   }
 
   se3min.resize(6); se3min.setZero();
@@ -390,7 +401,6 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
       std::cout << last_lvl_ids << std::endl;
       std::cout << type << std::endl;
     }
-    // exit(0);
   }else{
     std::cout << "[WARNING] Did not specify robot hierarchy. Assuming one layer SE3RN" << std::endl;
     Layer layer;

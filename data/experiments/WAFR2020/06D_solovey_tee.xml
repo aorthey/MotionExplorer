@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-     Experiment from Bhattacharya 2018
-     https://link.springer.com/content/pdf/10.1007/s10472-018-9596-8.pdf 
--->
 <world>
   <robot name="disk1" file="../../robots/disks/1.urdf" translation="0 0 0.05"/>
   <robot name="disk2" file="../../robots/disks/2.urdf" translation="0 0 0.05"/>
   <robot name="disk3" file="../../robots/disks/3.urdf" translation="0 0 0.05"/>
-  <terrain file="../../terrains/multiagents/solovey_tee.tri" translation="0 0 0.1">
+  <terrain file="../../terrains/multiagents/solovey_tee.tri" translation="0 0 0.1" scale="0.9 0.9 1">
     <display color="0.6 0.6 0.6 1"/>
   </terrain>
 
@@ -42,6 +38,23 @@
     <!-- <algorithm name="ompl:rrt"/> -->
 
     <multiAgent>1</multiAgent>
+    <hierarchy>
+      <level>
+        <!-- <robot id="0" simplification_of_id="0" freeFloating="1" type="R2"/> -->
+        <robot id="0" simplification_of_id="0" freeFloating="1" type="R2"/>
+      </level>
+      <level>
+        <robot id="0" simplification_of_id="0" freeFloating="1" type="R2"/>
+        <robot id="1" simplification_of_id="1" freeFloating="1" type="R2"/>
+        <!-- <robot id="2" simplification_of_id="2" freeFloating="1" type="R2"/> -->
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" type="R2"/>
+        <robot id="1" freeFloating="1" type="R2"/>
+        <robot id="2" freeFloating="1" type="R2"/>
+      </level>
+    </hierarchy>
+
 
     <hierarchy>
       <level>

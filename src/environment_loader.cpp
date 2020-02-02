@@ -45,7 +45,8 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
   world.background = GLColor(1,1,1);
 
   _backend = new PlannerBackend(&world);
-  if(!_backend->LoadAndInitSim(file_name.c_str())){
+  if(!_backend->LoadAndInitSim(file_name.c_str()))
+  {
     std::cout << std::string(80, '-') << std::endl;
     std::cout << std::endl;
     std::cout << "ERROR:" << std::endl;
@@ -62,6 +63,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
   //################################################################################
   //################################################################################
 
+    std::cout << name_robot << std::endl;
     if(!(world.robots[0]->joints[0].type == RobotJoint::Floating)){
       std::cout << "First joint of robot should be a free floating joint" << std::endl;
       std::cout << "But actual type is: " << world.robots[0]->joints[0].type << std::endl;
@@ -157,6 +159,11 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
             for(int i = 0; i < 6; i++){
                 rk->qMin[i] = pkin->se3min[i];
                 rk->qMax[i] = pkin->se3max[i];
+            }
+          }
+          if(ai.uMin.size() > 0){
+            for(int i = 0; i < 6; i++){
+                rk->torqueMax[i] = ai.uMax[i];
             }
           }
         }

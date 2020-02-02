@@ -30,7 +30,8 @@
     <maxplanningtime>0.3</maxplanningtime>      <!-- runtime in (s) --> 
     <pathSpeed>3</pathSpeed>
     <smoothPath>1</smoothPath>
-    <algorithm name="hierarchy:explorer"/>
+    <!-- <algorithm name="hierarchy:explorer"/> -->
+    <algorithm name="hierarchy:qrrt"/>
     <!-- <algorithm name="hierarchy:qrrt"/> -->
     <!-- <algorithm name="ompl:rrt"/> -->
 
