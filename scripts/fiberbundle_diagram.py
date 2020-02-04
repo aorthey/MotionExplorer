@@ -103,6 +103,7 @@ class RectangleSpace(object):
     self._typespace = typespace
     self._sid = sid
     self._fontsize = fontsize
+    self._fiberSpace = False
     #print(rid, typespace, sid)
     
     self._xoffset = 0
@@ -238,16 +239,18 @@ def PlotFiberDiagram(fname, fontsize, ystep, xstep, xoffset=0):
               found = True
               break
           if not found:
-            print("Robot",rectLL._rid,"projects to empty set")
-            rect = RectangleSpace(rectLL._rid, rectLL._typespace, rectLL._rid,
-                fontsize)
-            rect.setXOffset(xoffset)
-            rect._fulllength = rectLL._length
-            rect.setXY(rectLL._x, y, rectLL._xstep, rectLL._ystep)
-            rect.setDashed()
-            rect._fibertype = rectLL._typespace
-            rectangleSpaces.append(rect)
-            Nr = Nr+1
+            if not rectLL._fiberSpace:
+              print("Robot",rectLL._rid,"projects to empty set")
+              rect = RectangleSpace(rectLL._rid, rectLL._typespace, rectLL._rid,
+                  fontsize)
+              rect._fiberSpace = True
+              rect.setXOffset(xoffset)
+              rect._fulllength = rectLL._length
+              rect.setXY(rectLL._x, y, rectLL._xstep, rectLL._ystep)
+              rect.setDashed()
+              rect._fibertype = rectLL._typespace
+              rectangleSpaces.append(rect)
+              Nr = Nr+1
 
       if x>dx:
         dx = x
@@ -285,8 +288,9 @@ def PlotFiberDiagram(fname, fontsize, ystep, xstep, xoffset=0):
     # plt.show()
 
 
-PlotFiberDiagram('../data/experiments/WAFR2020/06D_solovey_tee.xml', 25, 20, 8)
+# PlotFiberDiagram('../data/experiments/WAFR2020/20D_manipulators_drone.xml', fontsize=15, ystep=40, xstep=10)
+#PlotFiberDiagram('../data/experiments/WAFR2020/06D_solovey_tee.xml', 25, 20, 8)
 # PlotFiberDiagram('../data/experiments/WAFR2020/18D_manipulators_crossing.xml', 20, 20, 5, xoffset=1)
 # PlotFiberDiagram('../data/experiments/WAFR2020/06D_bhattacharya_square.xml', 30, 20, 5)
-# PlotFiberDiagram('../data/experiments/WAFR2020/12D_drones_tree.xml', 25, 20, 8)
+PlotFiberDiagram('../data/experiments/WAFR2020/12D_drones_tree.xml', 25, 20, 8)
 # PlotFiberDiagram('testfiber.xml', 35, 20, 10, xoffset=2)

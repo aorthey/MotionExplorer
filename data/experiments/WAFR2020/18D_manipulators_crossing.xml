@@ -31,8 +31,8 @@
     <pathSpeed>3</pathSpeed>
     <freeFloating>1</freeFloating>
     <smoothPath>1</smoothPath>
-    <algorithm name="hierarchy:explorer"/>
     <algorithm name="hierarchy:qrrt"/>
+    <algorithm name="hierarchy:explorer"/>
     <!-- <algorithm name="ompl:rrt"/> -->
 
     <multiAgent>1</multiAgent>

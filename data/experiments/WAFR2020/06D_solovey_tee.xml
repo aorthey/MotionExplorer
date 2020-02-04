@@ -40,13 +40,11 @@
     <multiAgent>1</multiAgent>
     <hierarchy>
       <level>
-        <!-- <robot id="0" simplification_of_id="0" freeFloating="1" type="R2"/> -->
         <robot id="0" simplification_of_id="0" freeFloating="1" type="R2"/>
       </level>
       <level>
         <robot id="0" simplification_of_id="0" freeFloating="1" type="R2"/>
         <robot id="1" simplification_of_id="1" freeFloating="1" type="R2"/>
-        <!-- <robot id="2" simplification_of_id="2" freeFloating="1" type="R2"/> -->
       </level>
       <level>
         <robot id="0" freeFloating="1" type="R2"/>
@@ -58,11 +56,9 @@
 
     <hierarchy>
       <level>
-        <!-- <robot id="0" simplification_of_id="0" freeFloating="1" type="R2"/> -->
         <robot id="2" simplification_of_id="2" freeFloating="1" type="R2"/>
       </level>
       <level>
-        <!-- <robot id="0" simplification_of_id="0" freeFloating="1" type="R2"/> -->
         <robot id="1" simplification_of_id="1" freeFloating="1" type="R2"/>
         <robot id="2" simplification_of_id="2" freeFloating="1" type="R2"/>
       </level>

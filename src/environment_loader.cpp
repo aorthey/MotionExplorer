@@ -146,7 +146,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
           AgentInformation ai = pkin->agent_information.at(k);
           int ri = ai.id;
           if(ri>=(int)world.robots.size()){
-            OMPL_ERROR("Robot with idx %d does not exists.",ri);
+            OMPL_ERROR("Specified AgentInformation for id %d, but robots only have ids of 0 to %d.", ai.id, world.robots.size()-1);
             throw "Invalid robot idx.";
           }
           Robot *rk= world.robots.at(ri);

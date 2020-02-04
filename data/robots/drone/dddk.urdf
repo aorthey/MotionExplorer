@@ -38,7 +38,7 @@
   <link name="base_link">
     <visual>
       <geometry>
-        <mesh filename="meshes/dddk.stl.dae"/>
+        <mesh filename="meshes/dddk.stl"/>
       </geometry>
       <origin rpy="1.57075 0 -1.57075" xyz="0 0 0"/>
       <material name="black">
@@ -47,7 +47,7 @@
     </visual>
     <collision>
       <geometry>
-        <mesh filename="meshes/dddk.stl.dae"/>
+        <mesh filename="meshes/dddk.stl"/>
       </geometry>
       <origin rpy="1.57075 0 -1.57075" xyz="0 0 0"/>
       <material name="black">
