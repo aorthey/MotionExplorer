@@ -6,7 +6,6 @@
 
 #include <ompl/geometric/planners/quotientspace/Explorer.h>
 #include <ompl/geometric/planners/quotientspace/QRRT.h>
-// #include <ompl/geometric/planners/fiberbundle/FiberOP.h>
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -331,18 +330,6 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
 
         }
         ob::PlannerPtr planner_k_i = GetPlanner(binput.algorithms.at(k), stratifications.at(i));
-        // if(shortStratification){
-        //   typedef og::MultiQuotient<og::QRRT> MultiQuotient;
-        //   std::shared_ptr<MultiQuotient> qplanner = dynamic_pointer_cast<MultiQuotient>(planner_k_i);
-        //   if(qplanner != nullptr){
-        //     qplanner->SetStopLevel(stratifications.at(i)->si_vec.size()-1);
-        //   }else{
-        //     std::cout << "Detected " << di << "/" << largest_ambient_space_dimension << " dimensions." << std::endl;
-        //     std::cout << "at algorithm: " << name_algorithm << std::endl;
-        //     std::cout << "failed to cast" << std::endl;
-        //     OMPL_INFORM("Could not cast algorithm");
-        //   }
-        // }
 
         std::string name_algorithm_strat = planner_k_i->getName()+"_(";
 

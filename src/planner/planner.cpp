@@ -8,7 +8,6 @@
 #include "gui/drawMotionPlanner.h"
 #include "util.h"
 #include <ompl/geometric/planners/quotientspace/Explorer.h>
-#include <ompl/geometric/planners/quotientspace/datastructures/QuotientSpace.h>
 
 #include <boost/lexical_cast.hpp>
 
