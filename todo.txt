@@ -726,7 +726,6 @@ constraint relaxation and copy reduction?)
 [ ] Add gradient color to path to visualize who goes first / Visualize over/under of paths
 [ ] Add kinodynamic examples
 
-
 FiniteMorseTheory
 [ ] Decompose fiber bundle into subfibers
 [ ] make PathVisibilityChecker one of many / exchangable

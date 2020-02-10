@@ -288,9 +288,13 @@ def PlotFiberDiagram(fname, fontsize, ystep, xstep, xoffset=0):
     # plt.show()
 
 
+######################################################################
+####def PlotFiberDiagram(fname, fontsize, ystep, xstep, xoffset=0):
+######################################################################
 # PlotFiberDiagram('../data/experiments/WAFR2020/20D_manipulators_drone.xml', fontsize=15, ystep=40, xstep=10)
 #PlotFiberDiagram('../data/experiments/WAFR2020/06D_solovey_tee.xml', 25, 20, 8)
 # PlotFiberDiagram('../data/experiments/WAFR2020/18D_manipulators_crossing.xml', 20, 20, 5, xoffset=1)
 # PlotFiberDiagram('../data/experiments/WAFR2020/06D_bhattacharya_square.xml', 30, 20, 5)
-PlotFiberDiagram('../data/experiments/WAFR2020/12D_drones_tree.xml', 25, 20, 8)
-# PlotFiberDiagram('testfiber.xml', 35, 20, 10, xoffset=2)
+# PlotFiberDiagram('../data/experiments/WAFR2020/12D_drones_tree.xml', 25, 20, 8)
+PlotFiberDiagram('../data/experiments/WAFR2020/testfiber.xml', 25, 20, 10,
+    xoffset=-0)
