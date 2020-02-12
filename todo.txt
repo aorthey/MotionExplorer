@@ -727,5 +727,9 @@ constraint relaxation and copy reduction?)
 [ ] Add kinodynamic examples
 
 FiniteMorseTheory
-[ ] Decompose fiber bundle into subfibers
+[x] Decompose fiber bundle into subfibers
 [ ] make PathVisibilityChecker one of many / exchangable
+
+[ ] SE3->R3 (drone)
+[ ] SE3RN->SE3->R3 (drone with manip)
+[ ] RN->RM (manipulator, shadow hand)

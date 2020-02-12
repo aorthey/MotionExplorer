@@ -99,9 +99,9 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
       }else if(type=="S1"){
         cspace_level = factory.MakeGeometricCSpaceSO2(world, robot_idx);
       }else if(type.substr(0,3) == "S1R"){
-        std::string str_dimension = type.substr(3);
-        int N = boost::lexical_cast<int>(str_dimension);
-        cspace_level = factory.MakeGeometricCSpaceSO2RN(world, robot_idx, N);
+        // std::string str_dimension = type.substr(3);
+        // int N = boost::lexical_cast<int>(str_dimension);
+        cspace_level = factory.MakeGeometricCSpaceSO2RN(world, robot_idx);
       }else{
         std::cout << type.substr(0) << std::endl;
         std::cout << "fixed robots needs to have configuration space RN or SN, but has " << type << std::endl;

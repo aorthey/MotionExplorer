@@ -541,25 +541,24 @@ void PlannerBackend::RenderScreen(){
     }
 
   }
-  if(state("draw_planner_minima_tree")){
-    std::string line = "Local Minima Tree";
-    DrawText(line_x_pos,line_y_offset,line);
+
+  if(planners.size()>0){
+    //display time
+    double time = planners.at(active_planner)->getLastIterationTime();
+    std::stringstream timeStream;
+    timeStream << std::fixed << std::setprecision(2) << time;
+    std::string line = "Planner Time: ";
+    line += timeStream.str()+"s";
+    DrawText(line_x_pos, line_y_offset, line);
     line_y_offset += line_y_offset_stepsize;
 
-
-    if(planners.size()>0){
-      //display time
-      double time = planners.at(active_planner)->getLastIterationTime();
-      std::stringstream timeStream;
-      timeStream << std::fixed << std::setprecision(2) << time;
-      std::string line = "Construction Time: ";
-      line += timeStream.str()+"s";
-      DrawText(line_x_pos,line_y_offset,line);
-      line_y_offset += line_y_offset_stepsize;
-      //display local-minima tree
-      planners.at(active_planner)->DrawGLScreen(line_x_pos, line_y_offset);
-      line_y_offset += line_y_offset_stepsize;
-
+    if(state("draw_planner_minima_tree")){
+        line = "Local Minima Tree";
+        DrawText(line_x_pos,line_y_offset,line);
+        line_y_offset += line_y_offset_stepsize;
+        //display local-minima tree
+        planners.at(active_planner)->DrawGLScreen(line_x_pos, line_y_offset);
+        line_y_offset += line_y_offset_stepsize;
     }
   }
   if(state("draw_planner_last_command") && last_command!=""){

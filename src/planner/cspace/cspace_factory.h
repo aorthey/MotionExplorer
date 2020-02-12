@@ -74,10 +74,10 @@ class CSpaceFactory{
     }
     // CSpace  SO(2)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSO2( RobotWorld *world, int robot_idx){
-      return MakeGeometricCSpaceSO2RN(world, robot_idx, 0);
+      return MakeGeometricCSpaceSO2RN(world, robot_idx);
     }
     // CSpace  SO(2) x R^(N)
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSO2RN( RobotWorld *world, int robot_idx, int dimension){
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSO2RN( RobotWorld *world, int robot_idx){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLSO2RN(world, robot_idx);
       cspace->SetCSpaceInput(input);
       cspace->Init();

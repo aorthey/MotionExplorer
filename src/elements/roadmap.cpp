@@ -74,7 +74,7 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
         if(v==nullptr){
           s = pd->getVertex(pi).getState();
         }else{
-          s = v->getQuotientState();
+          s = v->getBaseState();
         }
         gpath->append(s);
         Vector3 q = quotient_space->getXYZ(s);
@@ -138,7 +138,7 @@ void Roadmap::DrawGLRoadmapVertices(GUIState &state, int ridx)
 
     if(v!=nullptr)
     {
-      q = quotient_space->getXYZ(v->getQuotientState(), ridx);
+      q = quotient_space->getXYZ(v->getBaseState(), ridx);
       if(draw_planar) q[2] = 0.0;
       if(v->getComponent()==0){
         setColor(cVertex);
@@ -178,7 +178,7 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
     if(draw_planar) v1[2] = 0.0;
 
     ob::PlannerDataVertexAnnotated *va = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
-    if(va!=nullptr) v1 = quotient_space->getXYZ(va->getQuotientState(), ridx);
+    if(va!=nullptr) v1 = quotient_space->getXYZ(va->getBaseState(), ridx);
     if(draw_planar) v1[2] = 0.0;
 
     std::vector<uint> edgeList;
@@ -189,7 +189,7 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
       if(draw_planar) v2[2] = 0.0;
 
       ob::PlannerDataVertexAnnotated *wa = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
-      if(wa!=nullptr) v2 = quotient_space->getXYZ(wa->getQuotientState(), ridx);
+      if(wa!=nullptr) v2 = quotient_space->getXYZ(wa->getBaseState(), ridx);
       if(draw_planar) v2[2] = 0.0;
       if(va!=nullptr && wa!=nullptr){
         if(va->getComponent()==0 || wa->getComponent()==0){

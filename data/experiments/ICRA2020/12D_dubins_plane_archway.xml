@@ -26,6 +26,8 @@
     <pathSpeed>1.5</pathSpeed>
     <pathWidth>0.3</pathWidth>
 
+    <algorithm name="hierarchy:qrrt"/>
+
     <hierarchy>
       <level inner_index="1" type = "R3"/>
       <!-- <level inner_index="0" type = "SE3"/> -->
