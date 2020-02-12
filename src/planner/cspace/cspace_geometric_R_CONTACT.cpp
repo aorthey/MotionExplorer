@@ -11,9 +11,7 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
 {
   std::cout << "[CSPACE] Robot \"" << robot->name << "\" Configuration Space: R CONTACT" << std::endl;
 
-  ompl::base::StateSpacePtr r5(new ompl::base::RealVectorStateSpace(5));
-  ompl::base::StateSpacePtr so2(new ompl::base::SO2StateSpace());
-  ob::StateSpacePtr R_CONTACT = r5 + so2;
+  ob::StateSpacePtr R_CONTACT = (std::make_shared<ob::SE2StateSpaceFullInterpolate>());
   this->space = R_CONTACT;
   ob::SE2StateSpaceFullInterpolate *cspace = this->space->as<ob::SE2StateSpaceFullInterpolate>();
 
@@ -38,21 +36,21 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
 
 void GeometricCSpaceOMPLRCONTACT::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
-  ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2 = qompl->as<ob::SE2StateSpaceFullInterpolate::StateType>();
+  ob::SE2StateSpaceFullInterpolate::StateType *qomplRC = qompl->as<ob::SE2StateSpaceFullInterpolate::StateType>();
 
-  qomplSE2->setXY(q(0),q(1));
-  qomplSE2->setYaw(q(3));
+  qomplRC->setXY(q(0),q(1));
+  qomplRC->setYaw(q(3));
 
 }
 
 Config GeometricCSpaceOMPLRCONTACT::OMPLStateToConfig(const ob::State *qompl){
 
-  const ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2 = qompl->as<ob::SE2StateSpaceFullInterpolate::StateType>();
+  const ob::SE2StateSpaceFullInterpolate::StateType *qomplRC = qompl->as<ob::SE2StateSpaceFullInterpolate::StateType>();
 
   Config q;q.resize(robot->q.size());q.setZero();
-  q(0)=qomplSE2->getX();
-  q(1)=qomplSE2->getY();
-  q(3)=qomplSE2->getYaw();
+  q(0)=qomplRC->getX();
+  q(1)=qomplRC->getY();
+  q(3)=qomplRC->getYaw();
   return q;
 
 }
