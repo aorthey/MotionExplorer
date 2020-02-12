@@ -137,12 +137,16 @@ CSpaceOMPL* MotionPlanner::ComputeCSpaceLayer(const Layer &layer)
 
     std::string type = layer.type;
     CSpaceOMPL *cspace_layer = ComputeCSpace(type, ii, input.freeFloating);
+    if(layer.finite_horizon_relaxation > 0){
+      std::cout << "Finite Horizon relaxation: " << layer.finite_horizon_relaxation << std::endl;
+    }
     return cspace_layer;
   }else{
     CSpaceOMPL *cspace_layer = ComputeMultiAgentCSpace(layer);
     return cspace_layer;
   }
 }
+
 void MotionPlanner::CreateHierarchy()
 {
   hierarchy = std::make_shared<HierarchicalRoadmap>();
@@ -166,6 +170,8 @@ void MotionPlanner::CreateHierarchy()
         uint N = cspace_level_k->GetKlamptDimensionality();
         Config qi = input.q_init; qi.resize(N);
         Config qg = input.q_goal; qg.resize(N);
+        layers.at(k).q_init = qi;
+        layers.at(k).q_goal = qg;
         if(k==0){
           //add a root node
           hierarchy->AddLevel( ii, io, qi, qg);
@@ -205,6 +211,21 @@ void MotionPlanner::CreateHierarchy()
       hierarchy->AddNode( std::make_shared<Roadmap>(), path ); 
       path.push_back(0);
     }
+
+    //Check if any levels have constraint relaxations
+    for(uint k = 0; k < cspace_levels.size(); k++){
+      double cr = layers.at(k).finite_horizon_relaxation;
+      if(cr > 0){
+          std::cout << "Constraint relaxation on level " << k << std::endl;
+          Config qcr = layers.at(k).q_init;
+          std::cout << qcr << " (" << cr << ")" << std::endl;
+          CSpaceOMPL *cspace = cspace_levels.at(k);
+          ob::State *xCenter = cspace->SpaceInformationPtr()->allocState();
+          cspace->ConfigToOMPLState(qcr, xCenter);
+          cspace_levels.at(k)->setStateValidityCheckerConstraintRelaxation(xCenter, cr);
+      }
+    }
+
   }else{
 
     Layer layer = input.stratifications.front().layers.back();

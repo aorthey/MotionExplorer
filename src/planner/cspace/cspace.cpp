@@ -2,6 +2,7 @@
 #include "gui/drawMotionPlanner.h"
 #include "planner/cspace/cspace.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
+#include "planner/cspace/validitychecker/validity_checker_ompl_relaxation.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include "ompl/base/spaces/SE2StateSpaceFullInterpolate.h"
 #include <ompl/base/spaces/SE3StateSpace.h>
@@ -104,35 +105,45 @@ ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
 const ob::StateSpacePtr CSpaceOMPL::SpacePtr(){
   return space;
 }
+
 ob::StateSpacePtr CSpaceOMPL::SpacePtrNonConst(){
   return space;
 }
+
 uint CSpaceOMPL::GetDimensionality() const{
   return space->getDimension();
 }
+
 int CSpaceOMPL::GetRobotIndex() const
 {
   return robot_idx;
 }
+
 uint CSpaceOMPL::GetKlamptDimensionality() const{
   return Nklampt+6;
 }
+
 const oc::RealVectorControlSpacePtr CSpaceOMPL::ControlSpacePtr(){
   return control_space;
 }
+
 uint CSpaceOMPL::GetControlDimensionality() const{
   return control_space->getDimension();
 }
+
 void CSpaceOMPL::SetCSpaceInput(const CSpaceInput &input_){
   input = input_;
   fixedBase = input.fixedBase;
 }
+
 Robot* CSpaceOMPL::GetRobotPtr(){
   return robot;
 }
+
 RobotWorld* CSpaceOMPL::GetWorldPtr(){
   return world;
 }
+
 CSpace* CSpaceOMPL::GetCSpaceKlamptPtr(){
   return klampt_cspace;
 }
@@ -145,6 +156,13 @@ const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr()
     si->setStateValidityChecker(validity_checker);
   }
   return validity_checker;
+}
+
+void CSpaceOMPL::setStateValidityCheckerConstraintRelaxation(ob::State *xCenter, double r)
+{
+  si = SpaceInformationPtr();
+  validity_checker = std::make_shared<OMPLValidityCheckerRelaxation>(si, this, xCenter, r);
+  si->setStateValidityChecker(validity_checker);
 }
 
 const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr(ob::SpaceInformationPtr si)

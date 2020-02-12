@@ -19,6 +19,8 @@ class OMPLValidityChecker: public ob::StateValidityChecker
     CSpaceOMPL* GetCSpaceOMPLPtr() const;
     void SetNeighborhood(double);
 
+    virtual bool operator ==(const ob::StateValidityChecker &rhs) const override;
+
   protected:
     double DistanceToRobot(const ob::State* state, SingleRobotCSpace *space) const;
 

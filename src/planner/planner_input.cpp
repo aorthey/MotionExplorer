@@ -41,6 +41,7 @@ std::vector<std::string> PlannerMultiInput::GetAlgorithms(TiXmlElement *node, bo
   }
   return algorithms;
 }
+
 std::vector<std::string> PlannerMultiInput::GetAlgorithmsDefault(bool kinodynamic)
 {
   std::string pidef = util::GetDataFolder()+"/../settings/planner.xml";
@@ -50,6 +51,7 @@ std::vector<std::string> PlannerMultiInput::GetAlgorithmsDefault(bool kinodynami
   CheckNodeName(node, "planner");
   return GetAlgorithms(node, kinodynamic);
 }
+
 std::vector<std::string> PlannerMultiInput::GetAlgorithmsCustom(TiXmlElement *node, bool kinodynamic)
 {
   CheckNodeName(node, "plannerinput");
@@ -236,8 +238,9 @@ void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy_index)
       layer.level = level++;
       layer.inner_index = GetAttribute<int>(lindex, "inner_index");
       layer.outer_index = GetAttributeDefault<int>(lindex, "outer_index", layer.inner_index);
-      // layer.cspace_constant = GetAttributeDefault<double>(lindex, "cspace_constant", 0);
 
+      // layer.cspace_constant = GetAttributeDefault<double>(lindex, "cspace_constant", 0);
+      layer.finite_horizon_relaxation = GetAttributeDefault<double>(lindex, "finite_horizon_relaxation", 0);
       layer.type = GetAttribute<std::string>(lindex, "type");
 
       stratification.layers.push_back(layer);

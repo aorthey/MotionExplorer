@@ -9,6 +9,7 @@ struct Layer{
   int inner_index;
   int outer_index;
   // double cspace_constant;
+  double finite_horizon_relaxation;
   Config q_init;
   Config q_goal;
   std::string type;

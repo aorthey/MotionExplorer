@@ -3,7 +3,6 @@
 #include "planner/benchmark/benchmark_input.h"
 #include "util.h"
 
-#include <ompl/geometric/planners/quotientspace/datastructures/PlannerDataVertexAnnotated.h>
 #include <ompl/geometric/planners/quotientspace/Explorer.h>
 #include <ompl/geometric/planners/quotientspace/QRRT.h>
 #include <ompl/control/optimizers/Optimizer.h>

@@ -1,7 +1,9 @@
 #include "planner/cspace/cspace_geometric_SO2RN.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
-#include "ompl/base/spaces/SE2StateSpaceFullInterpolate.h"
+#include "ompl/base/spaces/SO2StateSpaceFullInterpolate.h"
 #include "common.h"
+
+#include <ompl/util/Exception.h>
 
 GeometricCSpaceOMPLSO2RN::GeometricCSpaceOMPLSO2RN(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)
@@ -141,8 +143,8 @@ void GeometricCSpaceOMPLSO2RN::print(std::ostream& out) const
 Vector3 GeometricCSpaceOMPLSO2RN::getXYZ(const ob::State *s)
 {
   if(!isFixedBase()){
-    OMPL_ERROR("NYI");
-    throw "NYI";
+    OMPL_ERROR("Undefined: Non-fixedbase robots need to start with spaces SE2 or SE3.");
+    throw ompl::Exception("Undefined");
   }else{
     Config q = OMPLStateToConfig(s);
     robot->UpdateConfig(q);

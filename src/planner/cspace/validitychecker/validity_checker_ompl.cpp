@@ -6,6 +6,7 @@ OMPLValidityChecker::OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpa
   ob::StateValidityChecker(si), cspace(cspace_)
 {
   klampt_single_robot_cspace = static_cast<SingleRobotCSpace*>(cspace_->GetCSpaceKlamptPtr());
+  std::cout << "Validity Checker Robot Index:" << cspace->GetRobotIndex() << std::endl;
 }
 void OMPLValidityChecker::SetNeighborhood(double cspace_constant)
 {
@@ -23,6 +24,14 @@ bool OMPLValidityChecker::isValid(const ob::State* state) const
     cspace->GetTime(state);
   }
   return IsCollisionFree(klampt_single_robot_cspace, q) && si_->satisfiesBounds(state);
+}
+
+bool OMPLValidityChecker::operator ==(const ob::StateValidityChecker &rhs) const
+{
+  const OMPLValidityChecker &vrhs = static_cast<const OMPLValidityChecker&>(rhs);
+  int idx_lhs = GetCSpaceOMPLPtr()->GetRobotIndex();
+  int idx_rhs = vrhs.GetCSpaceOMPLPtr()->GetRobotIndex();
+  return (idx_lhs == idx_rhs);
 }
 
 double OMPLValidityChecker::SufficientDistance(const ob::State* state) const

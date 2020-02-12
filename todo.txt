@@ -616,40 +616,7 @@ projection onto NBH seems to go wrong)
 [ ] smoothed path is not displayed (but the original one)
 [ ] remove Lemon Librarz
 
-
-Expand as long as making progress (into certain direction) -> disrupt if
-progress towards goal can be made
-
-
-
--- Do not smooth several times
--- seems to work well on QS. But on CS, the steps are too small. Exploration not
-fast enough, we often get stuck. Why?
--- It seems that we do not sample on the boundary. Or the boundary is wrongly
-visualized.
-
-[ ] Not exactly on Boundary!
-[ ] We iterate too far into the smallest ball
-[ ] There seems not to be a good alternative strategy once we see that there is
-no move towards the goal. We somehow get stuck exploring all the alternative
-routes of mediocre balls. (Instead of going towards a larger unexplored area)
-
-
 [x] Make StepTowards a strategy 
-Does not show equal performance, because we directly wire the new states
-
-
-We would like to discover a voronoi bias for the free space. Given all our
-information, the only way we can infer anything about the free space is by
-observing the size of the neighborhoods (NBHs). 
-
-Every NBH should have a direction in which it is growing. This direction can be
-helpful to sample more effectively. Also, it could help to expand the largest
-NBHs into the right direction. I.e. instead of having a lodestar, we could just
-go for a large NBH direction, which would be some implicit free space bias.
-
-We should additionally go for momentum, since going towards goal can be
-seriously misleading if we sample randomly. Not very stable the whole thing.
 
 Experiments for paper:
 [ ] Rigid Body 2D misleading
@@ -729,6 +696,9 @@ constraint relaxation and copy reduction?)
 FiniteMorseTheory
 [x] Decompose fiber bundle into subfibers
 [ ] make PathVisibilityChecker one of many / exchangable
+
+[ ] Make Dynamical Systems work inside QRRT (or use Decorator Pattern on
+BundleSpace?)
 
 [ ] SE3->R3 (drone)
 [ ] SE3RN->SE3->R3 (drone with manip)

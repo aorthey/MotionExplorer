@@ -25,13 +25,7 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
     virtual bool SatisfiesBounds(const ob::State*) override;
     virtual bool UpdateRobotConfig(Config &q) override;
 
-    // const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
-    // Vector3 getXYZ(const ob::State*);
-
     void setNextLevelRobotPointers(std::vector<int>);
-
-    // void SetCSpaceInput(const CSpaceInput &input_);
-    // CSpaceKlampt* GetCSpaceKlamptPtr();
 
     virtual void drawConfig(const Config &q, GLDraw::GLColor color=GLDraw::GLColor(1,0,0), double scale = 1.0) override;
 

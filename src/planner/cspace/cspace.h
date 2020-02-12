@@ -47,6 +47,8 @@ class CSpaceOMPL
     Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
     ob::ScopedState<> ConfigToOMPLState(const Config &q);
 
+    virtual void setStateValidityCheckerConstraintRelaxation(ob::State *xCenter, double r);
+
     const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
     virtual Vector3 getXYZ(const ob::State*) = 0;
     virtual Vector3 getXYZ(const ob::State*, int ridx);
