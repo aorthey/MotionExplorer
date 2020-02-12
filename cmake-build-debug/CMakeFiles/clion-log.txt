@@ -1,0 +1,38 @@
+/home/user1/clion-2019.3.3/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/user1/CLionProjects/MotionPlanningExplorerGUI
+-- [32mThe C compiler identification is ;GNU 9.2.1[m
+-- [32mThe CXX compiler identification is ;GNU 9.2.1[m
+-- [32mCheck for working C compiler: /usr/bin/cc[m
+-- [32mCheck for working C compiler: /usr/bin/cc -- works[m
+-- [32mDetecting C compiler ABI info[m
+-- [32mDetecting C compiler ABI info - done[m
+-- [32mDetecting C compile features[m
+-- [32mDetecting C compile features - done[m
+-- [32mCheck for working CXX compiler: /usr/bin/c++[m
+-- [32mCheck for working CXX compiler: /usr/bin/c++ -- works[m
+-- [32mDetecting CXX compiler ABI info[m
+-- [32mDetecting CXX compiler ABI info - done[m
+-- [32mDetecting CXX compile features[m
+-- [32mDetecting CXX compile features - done[m
+[36m USER: user1 
+[36m FOUND KLAMPT AT: /home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/ 
+[1;37m[m
+[36m /home/user1/CLionProjects/MotionPlanningExplorerGUI/CMakeModules;/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt//CMakeModules 
+CMake Error at CMakeLists.txt:40 (FIND_PACKAGE):
+  By not providing "FindKlampt.cmake" in CMAKE_MODULE_PATH this project has
+  asked CMake to find a package configuration file provided by "Klampt", but
+  CMake did not find one.
+
+  Could not find a package configuration file provided by "Klampt" with any
+  of the following names:
+
+    KlamptConfig.cmake
+    klampt-config.cmake
+
+  Add the installation prefix of "Klampt" to CMAKE_PREFIX_PATH or set
+  "Klampt_DIR" to a directory containing one of the above files.  If "Klampt"
+  provides a separate development package or SDK, be sure it has been
+  installed.
+
+
+-- Configuring incomplete, errors occurred!
+See also "/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/CMakeFiles/CMakeOutput.log".

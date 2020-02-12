@@ -25,11 +25,11 @@
     <freeFloating>1</freeFloating>
 
     <hierarchy>
-      <level inner_index="0" type="SE3RN"/> <!-- SE2_CONTACT soll dann der Contact Space anstelle eines Config Space sein -->
+      <level inner_index="0" type="R_CONTACT"/> <!-- R_CONTACT soll dann der Contact Space anstelle eines Config Space sein -->
     </hierarchy>
 
   </plannerinput>
-
+s
 </world>
 
 

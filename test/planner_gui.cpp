@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
   if(in.inputs.empty()) env.GetBackendPtr()->state("draw_robot").active = 1;
 
   std::cout << std::string(80, '-') << std::endl;
-  std::cout << "GUI Start TEST" << std::endl;
+  std::cout << "GUI Start" << std::endl;
   std::cout << std::string(80, '-') << std::endl;
   gui.Run();
 
