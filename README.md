@@ -85,6 +85,9 @@ Current important keys:
       
 When compiling, we often need to compile OMPL and MotionExplorer plus do some debugging with GDB. To simplify this workflow, here are some shortcuts you can copy to your .bashrc (first build OMPL, then build MotionExplorer, then execute planner_gui with GDB)
 
+    gdbrun (){
+      gdb -q -ex 'set confirm off' -ex 'run' --args $@
+    }
     makerunarg (){
       make -j5 $1 && gdbrun $@
     }
