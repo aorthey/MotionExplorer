@@ -13,7 +13,6 @@ OMPLValidityCheckerRelaxation::OMPLValidityCheckerRelaxation(
 
 bool OMPLValidityCheckerRelaxation::isValid(const ob::State* x) const
 {
-  si_->printState(xCenter_);
   double d = si_->distance(xCenter_, x);
   if( d > radius_) return true;
   else return BaseT::isValid(x);

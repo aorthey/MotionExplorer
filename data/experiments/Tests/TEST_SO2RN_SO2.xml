@@ -17,7 +17,6 @@
     <smoothPath>0</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
     <pathSpeed>15</pathSpeed>
     <pathWidth>0.2</pathWidth>
-    <algorithm name="hierarchy:qrrt"/>
 
     <hierarchy>
       <level inner_index="1" type="S1"/>

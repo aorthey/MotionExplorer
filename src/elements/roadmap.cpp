@@ -57,11 +57,16 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
     if(pd->path_){
       path_ompl = new PathPiecewiseLinear(pd->path_, cspace, quotient_space);
     }else{
+
       LemonInterface lemon(pd);
+      std::vector<Vertex> pred = lemon.GetShortestPath();
 
       ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
-      std::vector<Vertex> pred = lemon.GetShortestPath();
+
+      if(quotient_space->isDynamic()){
+        OMPL_WARN("Dynamic cspace, but geometric path.");
+      }
 
       og::PathGeometric *gpath = new og::PathGeometric(quotient_space->SpaceInformationPtr()); 
       shortest_path.clear();

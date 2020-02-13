@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<world>
+
+  <robot name="kuka_full1" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk1" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+
+  <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+
+  <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+
+  <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+
+  <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+
+  <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+
+  <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+
+  <terrain file="../../terrains/primitives/plane.tri" translation="0 0 -0.05">
+     <display color="0.6 0.6 0.6 1"/> 
+  </terrain>
+  <terrain file="../../terrains/primitives/cube.tri" translation="0.3 0 -0.05">
+     <display color="0.6 0.6 0.6 1"/> 
+  </terrain>
+
+  <plannerinput>
+
+    <agent id="0" qinit="13  3.0 0.0 0 0 0 0 0 0 -0.1 0 +0.0 0 0" qgoal="13  -3.0 0.0 0 0 0 0 0 0 -0.5 0 -0.5 0 0"/>
+    <agent id="2" qinit="13  1.87 2.35 0 0 0 0 0 0 -0.1 0 +0.0 0 0" qgoal="13  -1.87 -2.35 0 0 0 0 0 0 -0.5 0 -0.5 0 0"/>
+    <agent id="4" qinit="13  -0.67 2.92 0 0 0 0 0 0 -0.1 0 +0.0 0 0" qgoal="13  0.67 -2.92 0 0 0 0 0 0 -0.5 0 -0.5 0 0"/>
+    <agent id="6" qinit="13  -2.7 1.3 0 0 0 0 0 0 -0.1 0 +0.0 0 0" qgoal="13  2.7 -1.3 0 0 0 0 0 0 -0.5 0 -0.5 0 0"/>
+    <agent id="8" qinit="13  -2.7 -1.3 0 0 0 0 0 0 -0.1 0 +0.0 0 0" qgoal="13  2.7 1.3 0 0 0 0 0 0 -0.5 0 -0.5 0 0"/>
+    <agent id="10" qinit="13  -0.67 -2.92 0 0 0 0 0 0 -0.1 0 +0.0 0 0" qgoal="13  0.67 2.92 0 0 0 0 0 0 -0.5 0 -0.5 0 0"/>
+    <agent id="12" qinit="13  1.87 -2.35 0 0 0 0 0 0 -0.1 0 +0.0 0 0" qgoal="13  -1.87 2.35 0 0 0 0 0 0 -0.5 0 -0.5 0 0"/>
+
+
+    <se3min config="6  -3 -3 0 -3.141593 0 0"/>
+    <se3max config="6  +3 +3 0 +3.141593 0 0"/>
+
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>10</maxplanningtime>      <!-- runtime in (s) --> 
+    <pathSpeed>3</pathSpeed>
+    <freeFloating>1</freeFloating>
+    <smoothPath>1</smoothPath>
+    <!-- <algorithm name="hierarchy:qrrt"/> -->
+
+    <multiAgent>1</multiAgent>
+
+    <hierarchy>
+      <level>
+        <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/>
+        <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/>
+        <robot id="5" freeFloating="1" simplification_of_id="4" type="R2"/>
+        <robot id="7" freeFloating="1" simplification_of_id="6" type="R2"/>
+        <robot id="9" freeFloating="1" simplification_of_id="8" type="R2"/>
+        <robot id="11" freeFloating="1" simplification_of_id="10" type="R2"/>
+        <robot id="13" freeFloating="1" simplification_of_id="12" type="R2"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" type="SE2RN"/>
+        <robot id="2" freeFloating="1" type="SE2RN"/>
+        <robot id="4" freeFloating="1" type="SE2RN"/>
+        <robot id="6" freeFloating="1" type="SE2RN"/>
+        <robot id="8" freeFloating="1" type="SE2RN"/>
+        <robot id="10" freeFloating="1" type="SE2RN"/>
+        <robot id="12" freeFloating="1" type="SE2RN"/>
+      </level>
+    </hierarchy>
+
+  </plannerinput>
+</world>

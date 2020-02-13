@@ -6,6 +6,9 @@
 
 #include <ompl/geometric/planners/quotientspace/Explorer.h>
 #include <ompl/geometric/planners/quotientspace/QRRT.h>
+#include <ompl/geometric/planners/quotientspace/QMP.h>
+#include <ompl/geometric/planners/quotientspace/QMPStar.h>
+#include <ompl/geometric/planners/quotientspace/SQMP.h>
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -130,8 +133,11 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
   else if(algorithm=="hierarchy:qrrt") planner = std::make_shared<og::QRRT>(siVec);
-  else if(algorithm=="sampler") planner = std::make_shared<og::InfeasibilitySampler>(si);
+  else if(algorithm=="hierarchy:qmp") planner = std::make_shared<og::QMP>(siVec);
+  else if(algorithm=="hierarchy:qmpstar") planner = std::make_shared<og::QMPStar>(siVec);
+  else if(algorithm=="hierarchy:sqmp") planner = std::make_shared<og::SQMP>(siVec);
   else if(algorithm=="hierarchy:explorer") planner = std::make_shared<og::MotionExplorer>(siVec);
+  else if(algorithm=="sampler") planner = std::make_shared<og::InfeasibilitySampler>(si);
 
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){
     std::cout << "Planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
