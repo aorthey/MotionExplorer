@@ -2,6 +2,7 @@
 #include "controller/controller.h"
 #include "file_io.h"
 #include <boost/filesystem.hpp>
+#include "Library/KrisLibrary/math3d/Triangle3D.cpp"
 
 RobotWorld& EnvironmentLoader::GetWorld(){
   return world;
@@ -82,8 +83,11 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
           Triangle3D tri;
           mesh.GetTriangle(j, tri);
           tris.push_back(tri);
+
+          std::cout << tris->normal() << std::endl;
         }
       }
+
       std::cout << "Environment has " << tris.size() << " triangles to make contact" << std::endl;
 
       for(uint k = 0; k < pin.inputs.size(); k++){
