@@ -1,5 +1,3 @@
-![C/C++ CI](https://github.com/aorthey/MotionPlanningExplorerGUI/workflows/C/C++%20CI/badge.svg?branch=master)
-
 <h1>MotionPlanningExplorerGUI</h1>
 <p align="middle">
   <img src="https://github.com/aorthey/MotionPlanningExplorerGUI/blob/master/data/images/airplane.png" width="280" />
