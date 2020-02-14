@@ -6,7 +6,6 @@ OMPLValidityChecker::OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpa
   ob::StateValidityChecker(si), cspace(cspace_)
 {
   klampt_single_robot_cspace = static_cast<SingleRobotCSpace*>(cspace_->GetCSpaceKlamptPtr());
-  std::cout << "Validity Checker Robot Index:" << cspace->GetRobotIndex() << std::endl;
 }
 void OMPLValidityChecker::SetNeighborhood(double cspace_constant)
 {
