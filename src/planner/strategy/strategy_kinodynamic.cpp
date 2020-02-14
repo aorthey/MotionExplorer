@@ -57,7 +57,7 @@ StrategyKinodynamicMultiLevel::StrategyKinodynamicMultiLevel()
 
 ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
     std::vector<ob::SpaceInformationPtr> si_vec, 
-    std::vector<ob::ProblemDefinitionPtr> pdef_vec,
+    ob::ProblemDefinitionPtr pdef,
     const StrategyInput& input)
 {
   ob::PlannerPtr planner;
@@ -88,7 +88,7 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     throw "Planner unknown.";
   }
-  planner->setProblemDefinition(pdef_vec.back());
+  planner->setProblemDefinition(pdef);
   return planner;
 
 }
@@ -97,7 +97,7 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
   std::string algorithm = input.name_algorithm;
 
   std::vector<ob::SpaceInformationPtr> si_vec; 
-  std::vector<ob::ProblemDefinitionPtr> pdef_vec; 
+  ob::ProblemDefinitionPtr pdef; 
 
   for(uint k = 0; k < input.cspace_levels.size(); k++){
     CSpaceOMPL* cspace_levelk = input.cspace_levels.at(k);
@@ -129,17 +129,17 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
       goalk  = cspace_levelk->ConfigToOMPLState(input.q_goal);
     }
     setStateSampler(input.name_sampler, sik);
-
-    ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
-    pdefk->addStartState(startk);
-    auto goal=std::make_shared<ob::GoalState>(sik);
-    goal->setState(goalk);
-    goal->setThreshold(input.epsilon_goalregion);
-    pdefk->setGoal(goal);
-    pdefk->setOptimizationObjective( getThresholdPathLengthObj(sik) );
-
     si_vec.push_back(sik);
-    pdef_vec.push_back(pdefk);
+
+    if(k >= input.cspace_levels.size()-1){
+      pdef = std::make_shared<ob::ProblemDefinition>(sik);
+      pdef->addStartState(startk);
+      auto goal=std::make_shared<ob::GoalState>(sik);
+      goal->setState(goalk);
+      goal->setThreshold(input.epsilon_goalregion);
+      pdef->setGoal(goal);
+      pdef->setOptimizationObjective( getThresholdPathLengthObj(sik) );
+    }
   }
 
   ob::StateSpacePtr spacek = si_vec.back()->getStateSpace();
@@ -155,7 +155,7 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
     OMPL_ERROR("NYI");
     throw "NYI";
   }else{
-    planner = GetPlanner(algorithm, si_vec, pdef_vec, input);
+    planner = GetPlanner(algorithm, si_vec, pdef, input);
     planner->setup();
     planner->clear();
     isInitialized = true;

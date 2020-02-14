@@ -11,6 +11,8 @@ ViewHierarchy::ViewHierarchy():
   boundColor.set(0.2,0.2,0.2);
   plotAreaColor.set(0.8,0.8,0.8,0.5);
   node_radius = heightPerLevel/4.0;
+  node_radius_unselected = node_radius - node_radius/4;
+  node_radius_selected = node_radius;
 }
 void ViewHierarchy::PushLevel(int nodes, std::string robot_name){
   if(nodes>0){
@@ -65,8 +67,6 @@ void ViewHierarchy::DrawGL(){
   double yprev = y+0.5*heightPerLevel;
   double xstep = node_radius*3;
   double ystep = heightPerLevel;
-  double node_radius_unselected = node_radius - node_radius/4;
-  double node_radius_selected = node_radius;
 
   double height = ystep * (GetLevel()+1);
 
@@ -214,8 +214,9 @@ void ViewHierarchy::DrawNode( double x, double y, double radius, std::string nst
 void ViewHierarchy::DrawLineFromNodeToNode(double x1, double y1, double r1, double x2, double y2, double r2){
   Vector2 v(x2-x1,y2-y1);
   v = v/v.norm();
+  double r3 = std::max(node_radius_selected, node_radius_unselected);
   double x3 = x1;
-  double y3 = y1+r1;
+  double y3 = y1+r3;
   double x4 = x2;
   double y4 = y2-r2;
   double y34 = y3 + 0.5*(y4-y3);
@@ -225,8 +226,8 @@ void ViewHierarchy::DrawLineFromNodeToNode(double x1, double y1, double r1, doub
   glVertex2i(x4, y34);
   glVertex2i(x4, y4);
   glEnd();
-
 }
+
   // //experiments on drawing 3d structures on fixed screen position
   // double w = viewport.w;
   // double h = viewport.h;

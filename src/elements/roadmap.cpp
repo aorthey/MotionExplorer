@@ -63,12 +63,20 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
 
       ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
+// <<<<<<< HEAD
 
+//       if(quotient_space->isDynamic()){
+//         OMPL_WARN("Dynamic cspace, but geometric path.");
+// =======
+      // og::PathGeometric *gpath = new og::PathGeometric(quotient_space->SpaceInformationPtr()); 
+      ob::PathPtr path;
       if(quotient_space->isDynamic()){
-        OMPL_WARN("Dynamic cspace, but geometric path.");
+        path = std::make_shared<oc::PathControl>(quotient_space->SpaceInformationPtr()); 
+      }else{
+        path = std::make_shared<og::PathGeometric>(quotient_space->SpaceInformationPtr()); 
+// >>>>>>> master
       }
 
-      og::PathGeometric *gpath = new og::PathGeometric(quotient_space->SpaceInformationPtr()); 
       shortest_path.clear();
 
       for(uint i = 0; i < pred.size(); i++)
@@ -81,16 +89,29 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
         }else{
           s = v->getBaseState();
         }
-        gpath->append(s);
+        if(quotient_space->isDynamic()){
+          static_pointer_cast<oc::PathControl>(path)->append(s);
+        }else{
+          static_pointer_cast<og::PathGeometric>(path)->append(s);
+        }
         Vector3 q = quotient_space->getXYZ(s);
         if(draw_planar) q[2] = 0.0;
         shortest_path.push_back(q);
       }
       if(pred.size()>0){
-        gpath->interpolate();
-        ob::PathPtr path_ompl_ptr(gpath);
-        path_ompl = new PathPiecewiseLinear(path_ompl_ptr, cspace, quotient_space);
-        return path_ompl;
+// <<<<<<< HEAD
+        // gpath->interpolate();
+        // ob::PathPtr path_ompl_ptr(gpath);
+        // path_ompl = new PathPiecewiseLinear(path_ompl_ptr, cspace, quotient_space);
+        // return path_ompl;
+// =======
+        if(quotient_space->isDynamic()){
+          static_pointer_cast<oc::PathControl>(path)->interpolate();
+        }else{
+          static_pointer_cast<og::PathGeometric>(path)->interpolate();
+        }
+        path_ompl = new PathPiecewiseLinear(path, cspace, quotient_space);
+// >>>>>>> master
       }
       return nullptr;
     }

@@ -224,79 +224,99 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s, int ridx)
   return getXYZ(s);
 }
 
-Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
-  double x = 0;
-  double y = 0;
-  double z = 0;
+//Vector3 CSpaceOMPL::getXYZ(const ob::State *s){
+//  ob::StateSpacePtr space_first_subspace = GetFirstSubspace();
+//  double x = 0.0;
+//  double y = 0.0;
+//  double z = 0.0;
+//  if(space_first_subspace->getType() == ob::STATE_SPACE_SE3){
+//    const ob::SE3StateSpace::StateType *qomplSE3;
+//    if(space->getType() == ob::STATE_SPACE_SE3){
+//      qomplSE3 = s->as<ob::SE3StateSpace::StateType>();
+//    }else{
+//      //consists of SE(3)xSOMETHING
+//      qomplSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+//    }
+//    x = qomplSE3->getX();
+//    y = qomplSE3->getY();
+//    z = qomplSE3->getZ();
 
-  ob::StateSpacePtr space_first_subspace = GetFirstSubspace();
+//  }else if(space_first_subspace->getType() == ob::STATE_SPACE_SE2){
+//    const ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2;
+//    if(space->getType()==ob::STATE_SPACE_SE2){
+//      qomplSE2 = s->as<ob::SE2StateSpaceFullInterpolate::StateType>();
+//    }else{
+//      qomplSE2 = s->as<ob::CompoundState>()->as<ob::SE2StateSpaceFullInterpolate::StateType>(0);
+//    }
+//    x = qomplSE2->getX();
+//    y = qomplSE2->getY();
+//    z = qomplSE2->getYaw();
+//    //if(z<0) z+= M_PI;
+//  }else if(space_first_subspace->getType() == ob::STATE_SPACE_REAL_VECTOR){
+//    const ob::RealVectorStateSpace::StateType *qomplRN;
+//    if(space->getType() == ob::STATE_SPACE_REAL_VECTOR){
+//      qomplRN = s->as<ob::RealVectorStateSpace::StateType>();
+//    }else{
+//      qomplRN = s->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(0);
+//    }
+//    x = qomplRN->values[0];
+//    if(GetDimensionality()>1) y = qomplRN->values[1];
+//    if(GetDimensionality()>2) z = qomplRN->values[2];
+//  }else{
+//    OMPL_ERROR("Cannot deal with space type %d.", space_first_subspace->getType());
+//    throw "Invalid space type.";
+//  }
+//  Vector3 w(x,y,z);
+//  return w;
+//}
 
-  if(space_first_subspace->getType() == ob::STATE_SPACE_SE3){
-    const ob::SE3StateSpace::StateType *qomplSE3;
-    if(space->getType() == ob::STATE_SPACE_SE3){
-      qomplSE3 = s->as<ob::SE3StateSpace::StateType>();
-    }else{
-      //consists of SE(3)xSOMETHING
-      qomplSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
-    }
-    x = qomplSE3->getX();
-    y = qomplSE3->getY();
-    z = qomplSE3->getZ();
+//Vector3 CSpaceOMPL::getXYZ_fixedBase(const ob::State *s)
+//{
+//  ob::StateSpacePtr space_first_subspace = GetFirstSubspace();
+//  double x = 0.0;
+//  double y = 0.0;
+//  double z = 0.0;
+//  if((space_first_subspace->getType() == ob::STATE_SPACE_REAL_VECTOR)
+//   || (space_first_subspace->getType() == ob::STATE_SPACE_SO2)) {
+//    //fixed base robot: visualize last link
 
-  }else if(space_first_subspace->getType() == ob::STATE_SPACE_SE2){
-    const ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2;
-    if(space->getType()==ob::STATE_SPACE_SE2){
-      qomplSE2 = s->as<ob::SE2StateSpaceFullInterpolate::StateType>();
-    }else{
-      qomplSE2 = s->as<ob::CompoundState>()->as<ob::SE2StateSpaceFullInterpolate::StateType>(0);
-    }
-    x = qomplSE2->getX();
-    y = qomplSE2->getY();
-    z = qomplSE2->getYaw();
-    //if(z<0) z+= M_PI;
+//    Config q = OMPLStateToConfig(s);
+//    robot->UpdateConfig(q);
+//    robot->UpdateGeometry();
+//    Vector3 qq;
+//    Vector3 zero; zero.setZero();
+//    int lastLink = robot->links.size()-1;
 
-  }else if((space_first_subspace->getType() == ob::STATE_SPACE_REAL_VECTOR)
-   || (space_first_subspace->getType() == ob::STATE_SPACE_SO2)) {
-    //fixed base robot: visualize last link
+//    //NOTE: the world position is zero exactly at the point where link is
+//    //attached using a joint to the whole linkage. Check where your last fixed
+//    //joint is positioned, before questioning the validity of this method
+//    robot->GetWorldPosition(zero, lastLink, qq);
 
-    Config q = OMPLStateToConfig(s);
-    robot->UpdateConfig(q);
-    robot->UpdateGeometry();
-    Vector3 qq;
-    Vector3 zero; zero.setZero();
-    int lastLink = robot->links.size()-1;
+//    x = qq[0];
+//    y = qq[1];
+//    z = qq[2];
 
-    //NOTE: the world position is zero exactly at the point where link is
-    //attached using a joint to the whole linkage. Check where your last fixed
-    //joint is positioned, before questioning the validity of this method
-    robot->GetWorldPosition(zero, lastLink, qq);
+//  }else{
+//    OMPL_ERROR("Cannot deal with space type %d.", space_first_subspace->getType());
+//    throw "Invalid space type.";
+//  }
+//  Vector3 w(x,y,z);
+//  return w;
+//}
 
-    x = qq[0];
-    y = qq[1];
-    z = qq[2];
+//Vector3 CSpaceOMPL::getXYZ(const ob::State *s)
+//{
+//  if(isFreeFloating()){
+//    return getXYZ_freeFloating(s);
+//  }else{
+//    //fixedBase
+//    return getXYZ_fixedBase(s);
+//  }
 
-  }else{
-    std::cout << "cspace:getXYZ: cannot deal with space type" << space_first_subspace->getType() << std::endl;
-    std::cout << "please check ompl/base/StateSpaceTypes.h" << std::endl;
-    throw "Invalid space type.";
-  }
-  Vector3 q(x,y,z);
-  return q;
-}
+//}
 
 void CSpaceOMPL::drawConfig(const Config &q, GLColor color, double scale){
     GLDraw::drawRobotAtConfig(robot, q, color);
-  // }else{
-  //   int Nstart = 0;
-  //   for(uint k = 0; k < robots.size(); k++){
-  //     int Nk = robots.at(k)->q.size();
-  //     Config qk; qk.resize(Nk); qk.setZero();
-  //     for(int j = Nstart; j < Nstart+Nk; j++){
-  //       qk[j-Nstart] = q[j];
-  //     }
-  //     GLDraw::drawRobotAtConfig(robots.at(k), qk, color);
-  //   }
-  // }
 }
 
 std::vector<double> CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q ){

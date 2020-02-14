@@ -1,10 +1,15 @@
 <h1>MotionPlanningExplorerGUI</h1>
+<p align="middle">
+  <img src="https://github.com/aorthey/MotionPlanningExplorerGUI/blob/master/data/images/airplane.png" width="280" />
+  <img src="https://github.com/aorthey/MotionPlanningExplorerGUI/blob/master/data/images/PR2.png" width="280" />
+  <img src="https://github.com/aorthey/MotionPlanningExplorerGUI/blob/master/data/images/drone.png" width="280" />
+</p>
 
-Visualize Local Minima using a local minima tree. 
+
+Visualize Local Minima using a local minima tree. See <a href="https://arxiv.org/pdf/1909.05035.pdf">paper</a> for details.
 
 As input we use
-robots (in .urdf files), environments (in .tri or .stl files), and worlds (in .xml
-files). 
+robots (in .urdf files) and objects/environments (in .tri or .stl files).
 
 This framework combines two existing frameworks (OMPL [1] and Klamp't [2]) and adds local-minima visualization plus easier control through vim-like shortcuts.
 
@@ -72,6 +77,11 @@ Current important keys:
 
       [after planning] 
       u : start/stop moving robot along found path (if any)
+      1 : show roadmap vertices (default: off)
+      2 : show roadmap edges (default: off)
+      3 : show paths (default: on)
+      4 : display local-minima tree (default: on)
+      5 : display planning information (default: on)
       
 
 

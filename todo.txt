@@ -703,3 +703,7 @@ BundleSpace?)
 [ ] SE3->R3 (drone)
 [ ] SE3RN->SE3->R3 (drone with manip)
 [ ] RN->RM (manipulator, shadow hand)
+
+[ ] Fix PathControl issue in explorer (probably caused by casting everything
+into recursive tree structure -- which does not support control, or copies it in
+the wrong way)
