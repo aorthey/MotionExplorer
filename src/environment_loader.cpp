@@ -2,7 +2,7 @@
 #include "controller/controller.h"
 #include "file_io.h"
 #include <boost/filesystem.hpp>
-#include "Library/KrisLibrary/math3d/Triangle3D.cpp"
+#include <KrisLibrary/math3d/Triangle3D.h>
 
 RobotWorld& EnvironmentLoader::GetWorld(){
   return world;
@@ -75,7 +75,10 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 
       //Adding triangle information to PlannerInput (to be used as constraint
       //manifolds)
+      //filtering for those triangles that belong to feasible contact surfaces
       std::vector<Triangle3D> tris;
+      std::vector<Triangle3D> tris_filtered;
+
       for(uint k = 0; k < world.terrains.size(); k++){
         Terrain* terrain_k = world.terrains[k];
         const CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();
@@ -83,11 +86,18 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
           Triangle3D tri;
           mesh.GetTriangle(j, tri);
           tris.push_back(tri);
-
-          std::cout << tris->normal() << std::endl;
         }
       }
 
+      for(uint i = 0; i < tris.size(); i++){
+          tris_filtered.push_back(tris.at(i)); //how to access Vector3 ??
+          //std::cout << tris.at(i).normal() << endl;
+          if(tris.at(i).normal() == (1,0,0)){
+              std::cout << "normal vector is in x-direction" << std::endl;
+          }
+
+      }
+      //std::cout << tris_filtered << endl;
       std::cout << "Environment has " << tris.size() << " triangles to make contact" << std::endl;
 
       for(uint k = 0; k < pin.inputs.size(); k++){

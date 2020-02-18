@@ -25,11 +25,10 @@
     <freeFloating>1</freeFloating>
 
     <hierarchy>
-      <level inner_index="0" type="R_CONTACT"/> <!-- R_CONTACT soll dann der Contact Space anstelle eines Config Space sein -->
+      <level inner_index="0" type="SE2RN"/> <!-- to be R_CONTACT -->
     </hierarchy>
 
   </plannerinput>
-s
 </world>
 
 
