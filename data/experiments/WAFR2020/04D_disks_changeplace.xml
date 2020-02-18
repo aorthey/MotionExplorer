@@ -27,6 +27,7 @@
     <smoothPath>1</smoothPath>
     <algorithm name="hierarchy:explorer"/>
     <algorithm name="hierarchy:qrrt"/>
+    <algorithm name="hierarchy:sqmp"/>
     <!-- <algorithm name="ompl:rrt"/> -->
 
     <multiAgent>1</multiAgent>
