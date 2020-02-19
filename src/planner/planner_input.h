@@ -9,7 +9,7 @@ struct Layer{
   int inner_index;
   int outer_index;
   // double cspace_constant;
-  double finite_horizon_relaxation;
+  double finite_horizon_relaxation{0.0};
   Config q_init;
   Config q_goal;
   std::string type;
@@ -75,10 +75,10 @@ class PlannerInput{
     std::string environment_name;
     std::string name_loadPath;
 
-    double epsilon_goalregion;
-    double max_planning_time;
-    double timestep_min;
-    double timestep_max;
+    double epsilon_goalregion{0.0};
+    double max_planning_time{0.0};
+    double timestep_min{0.0};
+    double timestep_max{0.0};
 
     bool smoothPath{false};
     double pathSpeed{1};
