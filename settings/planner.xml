@@ -9,7 +9,7 @@
   <!-- <algorithm dynamic="1" name="benchmark:all_dynamic"/> -->
 
   <!-- <algorithm name="hierarchy:sampler"/> -->
-  <algorithm name="benchmark:minimal"/>
+  <!-- <algorithm name="benchmark:minimal"/> -->
   <algorithm name="hierarchy:qmp"/>
   <algorithm name="hierarchy:qmpstar"/>
   <algorithm name="hierarchy:qrrt"/>
