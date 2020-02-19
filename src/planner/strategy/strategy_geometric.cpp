@@ -132,11 +132,11 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:sbl") planner = std::make_shared<og::SBL>(si);
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
-  else if(algorithm=="hierarchy:qrrt") planner = std::make_shared<og::QRRT>(siVec);
-  else if(algorithm=="hierarchy:qmp") planner = std::make_shared<og::QMP>(siVec);
-  else if(algorithm=="hierarchy:qmpstar") planner = std::make_shared<og::QMPStar>(siVec);
-  else if(algorithm=="hierarchy:sqmp") planner = std::make_shared<og::SQMP>(siVec);
-  else if(algorithm=="hierarchy:explorer") planner = std::make_shared<og::MotionExplorer>(siVec);
+  else if(algorithm=="hierarchy:qrrt") planner = std::make_shared<og::QRRT>(siVec, "QRRT");
+  else if(algorithm=="hierarchy:qmp") planner = std::make_shared<og::QMP>(siVec, "QMP");
+  else if(algorithm=="hierarchy:qmpstar") planner = std::make_shared<og::QMPStar>(siVec, "QMPStar");
+  else if(algorithm=="hierarchy:sqmp") planner = std::make_shared<og::SQMP>(siVec, "SPQR");
+  else if(algorithm=="hierarchy:explorer") planner = std::make_shared<og::MotionExplorer>(siVec, "Explorer");
   else if(algorithm=="sampler") planner = std::make_shared<og::InfeasibilitySampler>(si);
 
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){

@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="snake" file="../robots/snake/snake_2_segments.urdf"/>
-  <robot name="snake0" file="../robots/snake/snake_0_segments_sphere_inner.urdf"/>
-  <robot name="snake1" file="../robots/snake/snake_0_segments.urdf"/>
-  <robot name="snake2" file="../robots/snake/snake_1_segments.urdf"/>
+  <robot name="snake" file="../../robots/snake/snake_2_segments.urdf"/>
+  <robot name="snake0" file="../../robots/snake/snake_0_segments_sphere_inner.urdf"/>
+  <robot name="snake1" file="../../robots/snake/snake_0_segments.urdf"/>
+  <robot name="snake2" file="../../robots/snake/snake_1_segments.urdf"/>
   <!-- <robot name="snake4" file="../robots/snake/snake_0_segments_sphere_outer.urdf"/> -->
   <!-- <robot name="snake4" file="../robots/snake/snake_2_segments_sphere_outer.urdf"/> -->
 
-  <terrain  name="twister/twister.tri" file="../terrains/twister/twister.tri"/>
+  <terrain  name="twister/twister.tri" file="../../terrains/twister/twister.tri"/>
 
   <plannerinput>
 

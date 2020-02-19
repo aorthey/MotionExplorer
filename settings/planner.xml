@@ -9,6 +9,7 @@
   <!-- <algorithm dynamic="1" name="benchmark:all_dynamic"/> -->
 
   <!-- <algorithm name="hierarchy:sampler"/> -->
+  <algorithm name="benchmark:minimal"/>
   <algorithm name="hierarchy:qmp"/>
   <algorithm name="hierarchy:qmpstar"/>
   <algorithm name="hierarchy:qrrt"/>
@@ -17,7 +18,6 @@
   <algorithm name="ompl:rrt"/>
   <algorithm name="ompl:prm"/>
   <algorithm name="ompl:prmstar"/>
-  <!-- <algorithm name="benchmark:minimal"/> -->
   <!-- <algorithm name="ompl:rrt"/> -->
   <!-- <algorithm name="ompl:rrtconnect"/> -->
   <!-- <algorithm name="benchmark:best_geometric"/> -->
