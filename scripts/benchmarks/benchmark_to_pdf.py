@@ -97,7 +97,7 @@ def XMLtoPDF(fname):
   ax.text(0.85, 0.9, txt, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
   ax.axhline(timelimit,color='k',linestyle='--')
 
-  #plt.tight_layout()
+  plt.tight_layout()
   pp.savefig(plt.gcf())
   pp.close()
 

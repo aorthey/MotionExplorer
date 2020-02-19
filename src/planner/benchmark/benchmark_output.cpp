@@ -2,6 +2,7 @@
 #include "util.h"
 #include <fstream>
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
 
 // struct CompleteExperiment
 // {
@@ -52,20 +53,25 @@ BenchmarkOutput::BenchmarkOutput(const ot::Benchmark::CompleteExperiment& experi
 bool BenchmarkOutput::Save(const char* file_)
 {
   file = file_;
+  boost::filesystem::path p(file);
+  boost::filesystem::path dir = p.parent_path();
+  if(boost::filesystem::create_directory(dir))
+  {
+      std::cerr<< "Directory Created: "<< dir.string() <<std::endl;
+  }
+
   TiXmlDocument doc;
   TiXmlElement *node = CreateRootNodeInDocument(doc);
   Save(node);
   doc.LinkEndChild(node);
+
   doc.SaveFile(file.c_str());
   std::cout << "Benchmark saved to " << file << std::endl;
 
   //Copy XML to "last.xml" for better access to last written xml
-  boost::filesystem::path p(file);
-  boost::filesystem::path dir = p.parent_path();
   std::ifstream src(file, std::ios::binary);
 
   std::string file_copy = dir.string()+"/last.xml";
-  std::cout << dir.string() << std::endl;
   std::cout << file_copy << std::endl;
   std::ofstream dst(file_copy, std::ios::binary);
   dst << src.rdbuf();
