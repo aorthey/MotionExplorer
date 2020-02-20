@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="point" file="../../robots/point.urdf"/>
+  <robot name="point" file="../../robots/point.urdf"/>
+
+  <plannerinput>
+
+    <qinit  config="6  +1 +0.2 +0.0 0 0 0  0 0 0 0 0"/>
+    <qgoal  config="6  -1 +0 +0.3 0 0 0  0 0 0 0 0"/>
+    <se3min config="6  -3 -3 +0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +3 +3 +3 +3.141593 +1.57 +3.141593"/>
+
+    <epsilongoalregion>0.01</epsilongoalregion>
+    <maxplanningtime>0.05</maxplanningtime>      <!-- runtime in (s) --> 
+    <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
+    <pathWidth>0.1</pathWidth>
+
+    <!-- <algorithm name="ompl:rrtstar"/> -->
+    <!-- <algorithm name="ompl:prm"/> -->
+    <!-- <algorithm name="ompl:prm"/> -->
+    <hierarchy>
+      <level inner_index="0" type="S1"/>
+      <level inner_index="0" type="MOBIUS"/>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>
+
+
+
+

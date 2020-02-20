@@ -6,6 +6,7 @@
 #include "planner/cspace/cspace_kinodynamic.h"
 #include "planner/cspace/cspace_kinodynamic_SE2.h"
 #include "planner/cspace/cspace_geometric_RN.h"
+#include "planner/cspace/cspace_geometric_Mobius.h"
 #include "planner/cspace/cspace_geometric_RN_time.h"
 #include "planner/cspace/cspace_geometric_SE2RN.h"
 #include "planner/cspace/cspace_geometric_SO2RN.h"
@@ -107,6 +108,13 @@ class CSpaceFactory{
     // CSpace  R^(N)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceFixedBase( RobotWorld *world, int robot_idx, int dimension=0){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLFixedBase(world, robot_idx);
+      cspace->SetCSpaceInput(input);
+      cspace->Init();
+      return cspace;
+    }
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceMobius( RobotWorld *world, int robot_idx)
+    {
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLMobius(world, robot_idx);
       cspace->SetCSpaceInput(input);
       cspace->Init();
       return cspace;
