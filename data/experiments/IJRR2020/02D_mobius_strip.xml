@@ -7,8 +7,8 @@
 
   <plannerinput>
 
-    <qinit  config="6  +1 +0.2 +0.0 0 0 0  0 0 0 0 0"/>
-    <qgoal  config="6  -1 +0 +0.3 0 0 0  0 0 0 0 0"/>
+    <qinit  config="6  +1.0 +0.2 +0.0 0 0 0"/>
+    <qgoal  config="6  -0.9 +0.1 +0.4 0 0 0 "/>
     <se3min config="6  -3 -3 +0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +3 +3 +3 +3.141593 +1.57 +3.141593"/>
 
@@ -21,7 +21,7 @@
     <!-- <algorithm name="ompl:prm"/> -->
     <!-- <algorithm name="ompl:prm"/> -->
     <hierarchy>
-      <level inner_index="0" type="S1"/>
+      <level inner_index="0" type="CIRCULAR"/>
       <level inner_index="0" type="MOBIUS"/>
     </hierarchy>
 

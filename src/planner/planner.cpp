@@ -61,10 +61,12 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
   CSpaceFactory factory(input.GetCSpaceInput());
 
   CSpaceOMPL* cspace_level;
-  if(type=="EMPTY_SET") {
+  if(type=="EMPTY_SET") 
+  {
     cspace_level = factory.MakeEmptySetSpace(world);
   }else{
-    if(freeFloating){//input.freeFloating){
+    if(freeFloating)
+    {
       if(type=="R2") {
         cspace_level = factory.MakeGeometricCSpaceRN(world, robot_idx, 2);
       }else if(type=="R3") {
@@ -87,6 +89,8 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
         cspace_level = factory.MakeGeometricCSpaceRNTime(world, robot_idx, 2);
       }else if(type=="MOBIUS") {
         cspace_level = factory.MakeGeometricCSpaceMobius(world, robot_idx);
+      }else if(type=="CIRCULAR"){
+        cspace_level = factory.MakeGeometricCSpaceCircular(world, robot_idx);
       }else{
         std::cout << std::string(80, '#') << std::endl;
         std::cout << "Type " << type << " not recognized" << std::endl;

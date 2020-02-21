@@ -1,6 +1,6 @@
 #include "planner/cspace/cspace_geometric_Mobius.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
-#include "ompl/base/spaces/SO2StateSpaceFullInterpolate.h"
+#include <ompl/base/spaces/SO2StateSpace.h>
 #include "common.h"
 
 #include <ompl/util/Exception.h>
@@ -12,11 +12,7 @@ GeometricCSpaceOMPLMobius::GeometricCSpaceOMPLMobius(RobotWorld *world_, int rob
 
 void GeometricCSpaceOMPLMobius::initSpace()
 {
-    //###########################################################################
-    // Create bundle space, locally homeomorphic to SO(2) x R^1
-    //###########################################################################
-
-    ob::StateSpacePtr SO2(std::make_shared<ob::SO2StateSpaceFullInterpolate>());
+    ob::StateSpacePtr SO2(std::make_shared<ob::SO2StateSpace>());
     ob::StateSpacePtr R1(std::make_shared<ob::RealVectorStateSpace>(1));
 
     space = SO2 + R1;
@@ -48,8 +44,8 @@ void GeometricCSpaceOMPLMobius::ConfigToOMPLState(const Config &q, ob::State *qo
     else 
         v = (x/cos(u) - 1)/cos(0.5*u);
 
-    ob::SO2StateSpaceFullInterpolate::StateType *qomplSO2 = 
-      qompl->as<ob::CompoundState>()->as<ob::SO2StateSpaceFullInterpolate::StateType>(0);
+    ob::SO2StateSpace::StateType *qomplSO2 = 
+      qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
     ob::RealVectorStateSpace::StateType *qomplRnSpace = 
       qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
 
@@ -74,15 +70,14 @@ Config GeometricCSpaceOMPLMobius::ProjectToConfig(double u, double v)
     double R = 1 + v*cos(0.5*u);
     q[0] = R*cos(u);
     q[1] = R*sin(u);
-    q[2] = v*sin(0.5*u);
+    q[2] = v*sin(0.5*u) + 1.0;
     return q;
 }
 
-
 double GeometricCSpaceOMPLMobius::OMPLStateToSO2Value(const ob::State *qompl)
 {
-    const ob::SO2StateSpaceFullInterpolate::StateType *qomplSO2 = 
-      qompl->as<ob::CompoundState>()->as<ob::SO2StateSpaceFullInterpolate::StateType>(0);
+    const ob::SO2StateSpace::StateType *qomplSO2 = 
+      qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
 
     return qomplSO2->value;
 }
@@ -94,7 +89,6 @@ double GeometricCSpaceOMPLMobius::OMPLStateToRValue(const ob::State *qompl)
 
     return qomplRnSpace->values[0];
 }
-
 
 Config GeometricCSpaceOMPLMobius::OMPLStateToConfig(const ob::State *x)
 {

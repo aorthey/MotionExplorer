@@ -1,3 +1,4 @@
+#pragma once
 #include "planner/cspace/cspace_geometric.h"
 
 class GeometricCSpaceOMPLMobius: public GeometricCSpaceOMPL
@@ -13,8 +14,8 @@ class GeometricCSpaceOMPLMobius: public GeometricCSpaceOMPL
     virtual bool IsPlanar() override;
 
   protected:
-    double OMPLStateToRValue(const ob::State *qompl);
-    double OMPLStateToSO2Value(const ob::State *qompl);
+    virtual double OMPLStateToRValue(const ob::State *qompl);
+    virtual double OMPLStateToSO2Value(const ob::State *qompl);
 
     Vector3 ProjectToVector3(double u, double v);
     Config ProjectToConfig(double u, double v);
