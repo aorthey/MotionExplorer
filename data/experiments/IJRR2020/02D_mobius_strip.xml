@@ -7,15 +7,15 @@
 
   <plannerinput>
 
-    <qinit  config="6  +1.0 +0.2 +0.0 0 0 0"/>
-    <qgoal  config="6  -0.9 +0.1 +0.4 0 0 0 "/>
+    <qinit  config="6  +1.0 +0.2 +1.0 0 0 0"/>
+    <qgoal  config="6  -0.98 +0.23 +1.4 0 0 0 "/>
     <se3min config="6  -3 -3 +0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +3 +3 +3 +3.141593 +1.57 +3.141593"/>
 
     <epsilongoalregion>0.01</epsilongoalregion>
     <maxplanningtime>0.05</maxplanningtime>      <!-- runtime in (s) --> 
     <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
-    <pathWidth>0.1</pathWidth>
+    <pathWidth>0.03</pathWidth>
 
     <!-- <algorithm name="ompl:rrtstar"/> -->
     <!-- <algorithm name="ompl:prm"/> -->

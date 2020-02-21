@@ -8,7 +8,7 @@
 #include <ompl/geometric/planners/quotientspace/QRRT.h>
 #include <ompl/geometric/planners/quotientspace/QMP.h>
 #include <ompl/geometric/planners/quotientspace/QMPStar.h>
-#include <ompl/geometric/planners/quotientspace/SQMP.h>
+#include <ompl/geometric/planners/quotientspace/SPQR.h>
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -135,7 +135,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="hierarchy:qrrt") planner = std::make_shared<og::QRRT>(siVec, "QRRT");
   else if(algorithm=="hierarchy:qmp") planner = std::make_shared<og::QMP>(siVec, "QMP");
   else if(algorithm=="hierarchy:qmpstar") planner = std::make_shared<og::QMPStar>(siVec, "QMPStar");
-  else if(algorithm=="hierarchy:sqmp") planner = std::make_shared<og::SQMP>(siVec, "SPQR");
+  else if(algorithm=="hierarchy:spqr") planner = std::make_shared<og::SPQR>(siVec, "SPQR");
   else if(algorithm=="hierarchy:explorer") planner = std::make_shared<og::MotionExplorer>(siVec, "Explorer");
   else if(algorithm=="sampler") planner = std::make_shared<og::InfeasibilitySampler>(si);
 

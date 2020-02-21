@@ -33,7 +33,7 @@ void GeometricCSpaceOMPLMobius::ConfigToOMPLState(const Config &q, ob::State *qo
 {
     double x = q[0];
     double y = q[1];
-    double z = q[2];
+    double z = q[2] - 1.0;
 
     double r = sqrt(x*x + y*y);
     double u = atan2(y/r, x/r);

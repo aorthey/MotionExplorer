@@ -13,7 +13,7 @@
   <algorithm name="hierarchy:qmp"/>
   <algorithm name="hierarchy:qmpstar"/>
   <algorithm name="hierarchy:qrrt"/>
-  <algorithm name="hierarchy:sqmp"/>
+  <algorithm name="hierarchy:spqr"/>
   <algorithm name="hierarchy:explorer"/>
   <algorithm name="ompl:rrt"/>
   <algorithm name="ompl:prm"/>
