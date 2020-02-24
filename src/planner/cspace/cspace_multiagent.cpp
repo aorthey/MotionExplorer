@@ -2,7 +2,9 @@
 #include "common.h"
 #include "planner/cspace/cspace_multiagent.h"
 #include "planner/cspace/validitychecker/validity_checker_multiagent.h"
+#include "planner/cspace/integrator/multiagent.h"
 #include <ompl/base/spaces/RealVectorStateSpace.h>
+#include <ompl/control/ControlSpace.h>
 
 #include <boost/foreach.hpp>
 #include <numeric>
@@ -41,6 +43,7 @@ bool CSpaceOMPLMultiAgent::isDynamic() const
 {
   for(uint k = 0; k < cspaces_.size(); k++){
     CSpaceOMPL *ck = cspaces_.at(k);
+    std::cout << "cspace (robot=" << ck->GetRobotIndex() << ") component " << k << " is " << (ck->isDynamic()?"":"NOT ") << "dynamic." << std::endl;
     if(ck->isDynamic()) return true;
   }
   return false;
@@ -95,10 +98,48 @@ void CSpaceOMPLMultiAgent::drawConfig(const Config &q, GLColor color, double sca
   }
 }
 
-const oc::StatePropagatorPtr CSpaceOMPLMultiAgent::StatePropagatorPtr(oc::SpaceInformationPtr si)
+ob::SpaceInformationPtr CSpaceOMPLMultiAgent::SpaceInformationPtr(){
+
+  if(isDynamic()){
+
+    if(!si){
+      si = std::make_shared<oc::SpaceInformation>(SpacePtr(), ControlSpacePtr());
+      const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr(si);
+      si->setStateValidityChecker(checker);
+
+      oc::SpaceInformationPtr siC = static_pointer_cast<oc::SpaceInformation>(si);
+
+      const oc::StatePropagatorPtr integrator = 
+        std::make_shared<MultiAgentIntegrator>(siC, this, cspaces_);
+      siC->setStatePropagator(integrator);
+    }
+    return si;
+
+  }else{
+    return BaseT::SpaceInformationPtr();
+  }
+}
+
+const ob::StateValidityCheckerPtr CSpaceOMPLMultiAgent::StateValidityCheckerPtr(ob::SpaceInformationPtr si)
 {
-  OMPL_ERROR("MultiAgentCspace has no StatePropagatorPtr");
-  throw "No StatePropagatorPtr.";
+  validity_checker = std::make_shared<OMPLValidityCheckerMultiAgent>(si, this, cspaces_);
+  return validity_checker;
+}
+
+void CSpaceOMPLMultiAgent::initControlSpace()
+{
+  if(!isDynamic()) return;
+
+  control_space = std::make_shared<oc::CompoundControlSpace>(SpacePtr());
+  for(uint k = 0; k < cspaces_.size(); k++){
+    CSpaceOMPL *ck = cspaces_.at(k);
+    if(ck->isDynamic())
+    {
+      // OMPL_ERROR("Need to add subspace to ControlSpace");
+      static_pointer_cast<oc::CompoundControlSpace>(control_space)->addSubspace(ck->ControlSpacePtr());
+    }
+  }
+
 }
 
 void CSpaceOMPLMultiAgent::initSpace()
@@ -128,6 +169,7 @@ void CSpaceOMPLMultiAgent::initSpace()
 uint CSpaceOMPLMultiAgent::GetKlamptDimensionality() const{
   return Nklampt;
 }
+
 std::vector<int> CSpaceOMPLMultiAgent::GetKlamptDimensionalities() const{
   return Nklampts;
 }
@@ -179,12 +221,6 @@ Vector3 CSpaceOMPLMultiAgent::getXYZ(const ob::State *qompl, int ridx)
   }
   OMPL_ERROR("Could not find robot index %d.", ridx);
   throw "NoIndex";
-}
-
-const ob::StateValidityCheckerPtr CSpaceOMPLMultiAgent::StateValidityCheckerPtr(ob::SpaceInformationPtr si)
-{
-  validity_checker = std::make_shared<OMPLValidityCheckerMultiAgent>(si, this, cspaces_);
-  return validity_checker;
 }
 
 void CSpaceOMPLMultiAgent::ConfigToOMPLState(const Config &q, ob::State *qompl, int agent)

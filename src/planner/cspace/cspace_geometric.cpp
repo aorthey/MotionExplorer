@@ -192,12 +192,6 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
   }
 }
 
-const oc::StatePropagatorPtr GeometricCSpaceOMPL::StatePropagatorPtr(oc::SpaceInformationPtr si)
-{
-  OMPL_ERROR("GeometricCspace has no StatePropagatorPtr");
-  throw "No StatePropagatorPtr.";
-}
-
 Vector3 GeometricCSpaceOMPL::getXYZ(const ob::State *s)
 {
   const ob::SE3StateSpace::StateType *qomplSE3;

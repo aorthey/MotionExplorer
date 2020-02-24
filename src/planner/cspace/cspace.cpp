@@ -4,7 +4,7 @@
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl_relaxation.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
-#include "ompl/base/spaces/SE2StateSpaceFullInterpolate.h"
+#include <ompl/control/spaces/RealVectorControlSpace.h>
 #include <ompl/base/spaces/SE3StateSpace.h>
 
 CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx_):
@@ -93,7 +93,8 @@ double CSpaceOMPL::GetTime(const ob::State *qompl)
   return 0;
 }
 
-ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
+ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr()
+{
   if(!si){
     si = std::make_shared<ob::SpaceInformation>(SpacePtr());
     validity_checker = StateValidityCheckerPtr(si);
@@ -102,15 +103,18 @@ ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr(){
   return si;
 }
 
-const ob::StateSpacePtr CSpaceOMPL::SpacePtr(){
+const ob::StateSpacePtr CSpaceOMPL::SpacePtr()
+{
   return space;
 }
 
-ob::StateSpacePtr CSpaceOMPL::SpacePtrNonConst(){
+ob::StateSpacePtr CSpaceOMPL::SpacePtrNonConst()
+{
   return space;
 }
 
-uint CSpaceOMPL::GetDimensionality() const{
+uint CSpaceOMPL::GetDimensionality() const
+{
   return space->getDimension();
 }
 
@@ -119,32 +123,39 @@ int CSpaceOMPL::GetRobotIndex() const
   return robot_idx;
 }
 
-uint CSpaceOMPL::GetKlamptDimensionality() const{
+uint CSpaceOMPL::GetKlamptDimensionality() const
+{
   return Nklampt+6;
 }
 
-const oc::RealVectorControlSpacePtr CSpaceOMPL::ControlSpacePtr(){
+const oc::ControlSpacePtr CSpaceOMPL::ControlSpacePtr()
+{
   return control_space;
 }
 
-uint CSpaceOMPL::GetControlDimensionality() const{
+uint CSpaceOMPL::GetControlDimensionality() const
+{
   return control_space->getDimension();
 }
 
-void CSpaceOMPL::SetCSpaceInput(const CSpaceInput &input_){
+void CSpaceOMPL::SetCSpaceInput(const CSpaceInput &input_)
+{
   input = input_;
   fixedBase = input.fixedBase;
 }
 
-Robot* CSpaceOMPL::GetRobotPtr(){
+Robot* CSpaceOMPL::GetRobotPtr()
+{
   return robot;
 }
 
-RobotWorld* CSpaceOMPL::GetWorldPtr(){
+RobotWorld* CSpaceOMPL::GetWorldPtr()
+{
   return world;
 }
 
-CSpace* CSpaceOMPL::GetCSpaceKlamptPtr(){
+CSpace* CSpaceOMPL::GetCSpaceKlamptPtr()
+{
   return klampt_cspace;
 }
 
@@ -176,7 +187,8 @@ const ob::StateValidityCheckerPtr CSpaceOMPL::StateValidityCheckerPtr(ob::SpaceI
   return validity_checker;
 }
 
-void CSpaceOMPL::SetSufficient(const uint robot_idx_outer_){
+void CSpaceOMPL::SetSufficient(const uint robot_idx_outer_)
+{
   robot_idx_outer = robot_idx_outer_;
   if(robot_idx_outer != robot_idx){
     klampt_cspace_outer = new SingleRobotCSpace(*world, robot_idx_outer, &worldsettings);
@@ -184,14 +196,17 @@ void CSpaceOMPL::SetSufficient(const uint robot_idx_outer_){
   }
 }
 
-bool CSpaceOMPL::isFixedBase(){
+bool CSpaceOMPL::isFixedBase()
+{
   return fixedBase;
 }
-bool CSpaceOMPL::isFreeFloating(){
+bool CSpaceOMPL::isFreeFloating()
+{
   return !fixedBase;
 }
 
-bool CSpaceOMPL::IsPlanar(){
+bool CSpaceOMPL::IsPlanar()
+{
   if(GetDimensionality()<=2) return true;
 
   ob::StateSpacePtr space_first_subspace = GetFirstSubspace();
@@ -223,11 +238,13 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s, int ridx)
   return getXYZ(s);
 }
 
-void CSpaceOMPL::drawConfig(const Config &q, GLColor color, double scale){
+void CSpaceOMPL::drawConfig(const Config &q, GLColor color, double scale)
+{
     GLDraw::drawRobotAtConfig(robot, q, color);
 }
 
-std::vector<double> CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q ){
+std::vector<double> CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q )
+{
   double qx = q->x;
   double qy = q->y;
   double qz = q->z;
@@ -283,7 +300,8 @@ std::vector<double> CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( const ob::SO3Stat
   return out;
 }
 
-void CSpaceOMPL::OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSpace::StateType *q ){
+void CSpaceOMPL::OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSpace::StateType *q )
+{
   q->setIdentity();
 
   //q SE3: X Y Z yaw pitch roll

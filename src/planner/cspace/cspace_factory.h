@@ -51,8 +51,9 @@ class CSpaceFactory{
 
     virtual CSpaceOMPLMultiAgent* MakeGeometricCSpaceMultiAgent( std::vector<CSpaceOMPL*> cspaces){
       CSpaceOMPLMultiAgent *cspace = new CSpaceOMPLMultiAgent(cspaces);
-      cspace->Init();
       cspace->SetCSpaceInput(input);
+      cspace->Init();
+      cspace->initControlSpace();
       return cspace;
     }
     // CSpace  SE(2) x R^(N)

@@ -76,6 +76,8 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
     planner = std::make_shared<oc::KPIECE1>(si);
   }else if(algorithm=="hierarchy:explorer"){
     planner = std::make_shared<og::MotionExplorer>(si_vec);
+  }else if(algorithm=="hierarchy:qrrt"){
+    planner = std::make_shared<og::QRRT>(si_vec);
   }else if(algorithm=="optimizer"){
     si->setup();
     CSpaceOMPL* cspace = input.cspace_levels.back();
@@ -109,12 +111,13 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
     if(dynamic){
 
       KinodynamicCSpaceOMPL* cspace_dynamic = dynamic_cast<KinodynamicCSpaceOMPL*>(cspace_levelk);
+
       if(cspace_dynamic==nullptr)
       {
         std::cout << std::string(80, '-') << std::endl;
-        std::cout << "ERROR: not dynamic even though declared dynamic" << std::endl;
-        std::cout << *cspace_levelk << std::endl;
+        OMPL_ERROR("ERROR: not dynamic even though declared dynamic.");
         std::cout << std::string(80, '-') << std::endl;
+        std::cout << *cspace_levelk << std::endl;
         throw "Not dynamic.";
       }
 

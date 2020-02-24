@@ -188,7 +188,7 @@ void KinodynamicCSpaceOMPLSE2::initControlSpace(){
     cbounds.setHigh(i,input.uMax(i));
   }
   cbounds.check();
-  control_space->setBounds(cbounds);
+  static_pointer_cast<oc::RealVectorControlSpace>(control_space)->setBounds(cbounds);
 }
 
 

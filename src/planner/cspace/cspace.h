@@ -5,11 +5,8 @@
 #include <ompl/base/spaces/SO3StateSpace.h>
 #include <ompl/base/ScopedState.h>
 #include <ompl/base/StateSpace.h>
-// #include <ompl/base/PlannerData.h>
-// #include <ompl/base/PlannerDataGraph.h>
-//#include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 #include <ompl/control/SpaceInformation.h>
-#include <ompl/control/spaces/RealVectorControlSpace.h>
+#include <ompl/control/ControlSpace.h>
 #include <Planning/RobotCSpace.h>
 
 namespace ob = ompl::base;
@@ -17,7 +14,7 @@ namespace oc = ompl::control;
 
 namespace ompl{
   namespace control{
-    typedef std::shared_ptr<RealVectorControlSpace> RealVectorControlSpacePtr;
+    typedef std::shared_ptr<ControlSpace> ControlSpacePtr;
     typedef std::shared_ptr<StatePropagator> StatePropagatorPtr;
   }
   namespace base{
@@ -36,7 +33,6 @@ class CSpaceOMPL
     void Init();
     virtual ob::SpaceInformationPtr SpaceInformationPtr();
 
-    virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) = 0;
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) = 0;
     virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
     virtual double GetTime(const ob::State *qompl);
@@ -64,7 +60,7 @@ class CSpaceOMPL
     CSpaceKlampt* GetCSpaceKlamptPtr();
     const ob::StateSpacePtr SpacePtr();
     ob::StateSpacePtr SpacePtrNonConst();
-    const oc::RealVectorControlSpacePtr ControlSpacePtr();
+    const oc::ControlSpacePtr ControlSpacePtr();
 
     virtual void drawConfig(const Config &q, GLDraw::GLColor color=GLDraw::GLColor(1,0,0), double scale = 1.0);
 
@@ -109,17 +105,13 @@ class CSpaceOMPL
     ob::StateValidityCheckerPtr validity_checker;
     ob::SpaceInformationPtr si{nullptr};
     ob::StateSpacePtr space{nullptr};
-    oc::RealVectorControlSpacePtr control_space{nullptr};
+    // oc::RealVectorControlSpacePtr control_space{nullptr};
+    oc::ControlSpacePtr control_space{nullptr};
 
     Robot *robot{nullptr};
     CSpaceKlampt *klampt_cspace{nullptr};
     CSpaceKlampt *klampt_cspace_outer{nullptr};
     RobotWorld *world{nullptr};
-
-    ////MultiAgent
-    //std::vector<int> robot_idxs;
-    //std::vector<Robot*> robots;
-    //std::vector<CSpaceKlampt*> klampt_cspaces;
 
     WorldPlannerSettings worldsettings;
     int robot_idx{0};

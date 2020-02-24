@@ -9,6 +9,7 @@
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/geometric/PathSimplifier.h>
 #include <ompl/control/PathControl.h>
+#include <ompl/control/spaces/RealVectorControlSpace.h>
 #include <boost/math/constants/constants.hpp>
 #include <boost/foreach.hpp>
 

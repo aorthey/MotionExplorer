@@ -1,5 +1,6 @@
 #pragma once
 #include "planner/cspace/cspace.h"
+#include "planner/cspace/cspace_kinodynamic.h"
 #include "klampt.h"
 
 namespace ob = ompl::base;
@@ -7,11 +8,10 @@ namespace oc = ompl::control;
 
 class CSpaceOMPLMultiAgent: public CSpaceOMPL
 {
+    using BaseT = CSpaceOMPL;
   public:
 
     CSpaceOMPLMultiAgent(std::vector<CSpaceOMPL*> cspaces);
-
-    virtual const oc::StatePropagatorPtr StatePropagatorPtr(oc::SpaceInformationPtr si) override;
 
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
     void ConfigToOMPLState(const Config &q, ob::State *qompl, int subspace);
@@ -33,6 +33,8 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
     virtual bool isDynamic() const override;
     virtual bool isMultiAgent() const override;
 
+    virtual ob::SpaceInformationPtr SpaceInformationPtr() override;
+
     virtual void print(std::ostream& out) const override;
 
     std::vector<int> GetRobotIdxs() const;
@@ -41,10 +43,13 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
     virtual Vector3 getXYZ(const ob::State*, int) override;
 
     std::vector<Config> splitConfig(const Config &q);
+
+    virtual void initSpace() override;
+    virtual void initControlSpace();
+
   protected:
 
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) override;
-    virtual void initSpace() override;
 
     std::vector<CSpaceOMPL*> cspaces_;
 
