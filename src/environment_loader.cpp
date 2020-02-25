@@ -91,19 +91,21 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 
       for(uint i = 0; i < tris.size(); i++){
           Vector3 normal_i = tris.at(i).normal();
-          //std::cout << normal_i << std::endl;
           double epsilon = 1e-10;
 
-          if(fabs((fabs(normal_i[0]) - 1.0))<epsilon){
+          if(fabs((fabs(normal_i[2]) - 1.0))<epsilon){
 
-              std::cout << "normal vector is in x-direction" << std::endl;
+              std::cout << "normal vector is in z-direction" << std::endl;
           }else{
-              // tris_filtered filled with surface triangles that are feasible for contact (normal in z or y direction)
+              // tris_filtered filled with surface triangles that are feasible for contact (normal in x or y direction)
               tris_filtered.push_back(tris.at(i));
           }
 
       }
-      std::cout << "Environment has " << tris_filtered.size() << " triangles to make contact" << std::endl;
+      std::cout << "Environment has " << tris_filtered.size() << " triangles to make contact TESTTEST" << std::endl;
+
+      tris = tris_filtered;
+      std::cout << "Lalala tris is now filtered lalala" << std::endl;
 
       for(uint k = 0; k < pin.inputs.size(); k++){
         PlannerInput *pkin = pin.inputs.at(k);

@@ -1,0 +1,1161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="Orthoklampt"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\CMakeModules\;CMake Files\libs\;CMake Files\libs\Klampt\;CMake Files\libs\Klampt\CMakeModules\;CMake Files\..\;CMake Files\..\..\;CMake Files\..\..\..\;CMake Files\..\..\..\..\;CMake Files\..\..\..\..\usr\;CMake Files\..\..\..\..\usr\local\;CMake Files\..\..\..\..\usr\local\share\;CMake Files\..\..\..\..\usr\local\share\ompl\;CMake Files\..\..\..\..\usr\local\share\ompl\cmake\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="print_std_vector">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/print_std_vector" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 print_std_vector"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="print_std_vector/fast">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/print_std_vector" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 print_std_vector/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="ompl_so3">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/ompl_so3" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 ompl_so3"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="ompl_so3/fast">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/ompl_so3" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 ompl_so3/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="planner_standalone">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/planner_standalone" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 planner_standalone"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="planner_standalone/fast">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/planner_standalone" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 planner_standalone/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="planner_gui">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/planner_gui" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 planner_gui"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="planner_gui/fast">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/planner_gui" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 planner_gui/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="ompl_so2">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/ompl_so2" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 ompl_so2"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="ompl_so2/fast">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/ompl_so2" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 ompl_so2/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="boost_graph">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/boost_graph" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 boost_graph"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="boost_graph/fast">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/boost_graph" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 boost_graph/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="boost_subgraph">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/boost_subgraph" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 boost_subgraph"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="boost_subgraph/fast">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/boost_subgraph" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 boost_subgraph/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="boost_subgraph_deletion">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/boost_subgraph_deletion" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 boost_subgraph_deletion"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="boost_subgraph_deletion/fast">
+				<Option output="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/boost_subgraph_deletion" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add option="-DBOOST_ALL_NO_LIB"/>
+					<Add option="-DBoost_NO_BOOST_CMAKE"/>
+					<Add option="-DBOOST_TEST_DYN_LINK"/>
+					<Add option="-DUSE_BOOST_THREADS=1"/>
+					<Add option="-DHAVE_GLUI=1"/>
+					<Add option="-DHAVE_GLUT=1"/>
+					<Add option="-DHAVE_GLPK=1"/>
+					<Add option="-DHAVE_TINYXML=1"/>
+					<Add option="-DTIXML_USE_STL"/>
+					<Add option="-DHAVE_ASSIMP=1"/>
+					<Add option="-DASSIMP_MAJOR_VERSION=3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt"/>
+					<Add directory="/usr/include/eigen3"/>
+					<Add directory="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src"/>
+					<Add directory="/usr/include/c++/9"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/9"/>
+					<Add directory="/usr/include/c++/9/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/9/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 boost_subgraph_deletion/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/algorithms/lemon_interface.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/algorithms/lemon_interface.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/controller/controller.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/controller/controller.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/forcefields/forcefield.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/forcefields/forcefield.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/forcefields/forcefield_cylindrical.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/forcefields/forcefield_cylindrical.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/forcefields/forcefield_drag.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/forcefields/forcefield_drag.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/forcefields/forcefield_obb.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/forcefields/forcefield_obb.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/forcefields/forcefield_radial.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/forcefields/forcefield_radial.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/forcefields/forcefield_random.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/forcefields/forcefield_random.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/forcefields/forcefield_uniform.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/forcefields/forcefield_uniform.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/path_pwl.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/path_pwl.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/roadmap.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/roadmap.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/swept_volume.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/swept_volume.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/wrench_field.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/elements/wrench_field.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/environment_loader.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/environment_loader.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/gui/ViewHierarchy.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/gui/ViewHierarchy.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/gui/colors.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/gui/colors.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/gui/drawMotionPlanner.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/gui/drawMotionPlanner.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/gui/gui.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/gui/gui.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/gui/gui_planner.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/gui/gui_planner.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/gui/gui_state.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/gui/gui_state.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/info.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/info.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/ompl/base/spaces/src/SE2StateSpaceFullInterpolate.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/benchmark/benchmark_input.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/benchmark/benchmark_input.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/benchmark/benchmark_output.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/benchmark/benchmark_output.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_R3S2.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_R3S2.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_RN.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_RN.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_RN_time.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_RN_time.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_R_CONTACT.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_R_CONTACT.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_SE2.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_SE2.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_SE2RN.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_SE2RN.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_SO2.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_SO2.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_SO2RN.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_SO2RN.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_fixedbase.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_geometric_fixedbase.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_kinodynamic.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_kinodynamic.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_kinodynamic_SE2.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/cspace_kinodynamic_SE2.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/integrator/integrator_SE2.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/integrator/integrator_SE2.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/integrator/liegroupintegrator.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/integrator/liegroupintegrator.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/integrator/tangentbundle.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/integrator/tangentbundle.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/validitychecker/neighborhood.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/validitychecker/neighborhood.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/validitychecker/validity_checker_ompl.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/cspace/validitychecker/validity_checker_ompl.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/planner.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/planner.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/planner_input.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/planner_input.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/strategy/contact_constraint.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/strategy/strategy.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/strategy/strategy.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/strategy/strategy_geometric.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/strategy/strategy_geometric.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/strategy/strategy_input.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/strategy/strategy_input.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/strategy/strategy_kinodynamic.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/strategy/strategy_kinodynamic.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/strategy/strategy_output.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/strategy/strategy_output.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/util.cpp">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/util.h">
+			<Option target="planner_standalone"/>
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/standalone/boost_graph.cpp">
+			<Option target="boost_graph"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/standalone/boost_subgraph.cpp">
+			<Option target="boost_subgraph"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/standalone/boost_subgraph_deletion.cpp">
+			<Option target="boost_subgraph_deletion"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/standalone/ompl_so2.cpp">
+			<Option target="ompl_so2"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/standalone/ompl_so3.cpp">
+			<Option target="ompl_so3"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/standalone/print_std_vector.cpp">
+			<Option target="print_std_vector"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/test/planner_gui.cpp">
+			<Option target="planner_gui"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/test/planner_standalone.cpp">
+			<Option target="planner_standalone"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/CMakeModules/CMakeColors.cmake">
+			<Option virtualFolder="CMake Files\CMakeModules\"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/CMakeModules/FindAssimp.cmake">
+			<Option virtualFolder="CMake Files\libs\Klampt\CMakeModules\"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/CMakeModules/FindGLPK.cmake">
+			<Option virtualFolder="CMake Files\libs\Klampt\CMakeModules\"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/CMakeModules/FindGLUI.cmake">
+			<Option virtualFolder="CMake Files\libs\Klampt\CMakeModules\"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/CMakeModules/FindKlampt.cmake">
+			<Option virtualFolder="CMake Files\libs\Klampt\CMakeModules\"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/CMakeModules/FindKrisLibrary.cmake">
+			<Option virtualFolder="CMake Files\libs\Klampt\CMakeModules\"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/CMakeModules/FindODE.cmake">
+			<Option virtualFolder="CMake Files\libs\Klampt\CMakeModules\"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/CMakeModules/FindTinyXML.cmake">
+			<Option virtualFolder="CMake Files\libs\Klampt\CMakeModules\"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/CMakeModules/KlamptDependencies.cmake">
+			<Option virtualFolder="CMake Files\libs\Klampt\CMakeModules\"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/CMakeModules/KrisLibraryDependencies.cmake">
+			<Option virtualFolder="CMake Files\libs\Klampt\CMakeModules\"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/../../../../usr/local/share/ompl/cmake/omplConfig.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\share\ompl\cmake\"/>
+		</Unit>
+		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/../../../../usr/local/share/ompl/cmake/omplConfigVersion.cmake">
+			<Option virtualFolder="CMake Files\..\..\..\..\usr\local\share\ompl\cmake\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

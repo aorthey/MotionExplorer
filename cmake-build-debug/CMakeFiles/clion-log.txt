@@ -1,38 +1,157 @@
 /home/user1/clion-2019.3.3/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/user1/CLionProjects/MotionPlanningExplorerGUI
--- [32mThe C compiler identification is ;GNU 9.2.1[m
--- [32mThe CXX compiler identification is ;GNU 9.2.1[m
--- [32mCheck for working C compiler: /usr/bin/cc[m
--- [32mCheck for working C compiler: /usr/bin/cc -- works[m
--- [32mDetecting C compiler ABI info[m
--- [32mDetecting C compiler ABI info - done[m
--- [32mDetecting C compile features[m
--- [32mDetecting C compile features - done[m
--- [32mCheck for working CXX compiler: /usr/bin/c++[m
--- [32mCheck for working CXX compiler: /usr/bin/c++ -- works[m
--- [32mDetecting CXX compiler ABI info[m
--- [32mDetecting CXX compiler ABI info - done[m
--- [32mDetecting CXX compile features[m
--- [32mDetecting CXX compile features - done[m
 [36m USER: user1 
 [36m FOUND KLAMPT AT: /home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/ 
 [1;37m[m
 [36m /home/user1/CLionProjects/MotionPlanningExplorerGUI/CMakeModules;/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt//CMakeModules 
-CMake Error at CMakeLists.txt:40 (FIND_PACKAGE):
-  By not providing "FindKlampt.cmake" in CMAKE_MODULE_PATH this project has
-  asked CMake to find a package configuration file provided by "Klampt", but
-  CMake did not find one.
+-- [32mLooking for pthread.h[m
+-- [32mLooking for pthread.h - found[m
+-- [32mPerforming Test CMAKE_HAVE_LIBC_PTHREAD[m
+-- [32mPerforming Test CMAKE_HAVE_LIBC_PTHREAD - Failed[m
+-- [32mLooking for pthread_create in pthreads[m
+-- [32mLooking for pthread_create in pthreads - not found[m
+-- [32mLooking for pthread_create in pthread[m
+-- [32mLooking for pthread_create in pthread - found[m
+-- [32mFound Threads: TRUE  [m
+-- [32mFound Boost: /usr/include (found version "1.67.0") found components:  thread system chrono date_time atomic [m
+CMake Warning (dev) at CMakeModules/CMakeColors.cmake:29 (_message):
+  [1;36mPolicy CMP0072 is not set: FindOpenGL prefers GLVND by default when
+  available.  Run "cmake --help-policy CMP0072" for policy details.  Use the
+  cmake_policy command to set the policy and suppress this warning.
 
-  Could not find a package configuration file provided by "Klampt" with any
-  of the following names:
+  ;FindOpenGL found both a legacy GL library:
 
-    KlamptConfig.cmake
-    klampt-config.cmake
+  ; OPENGL_gl_LIBRARY: /usr/lib/x86_64-linux-gnu/libGL.so
 
-  Add the installation prefix of "Klampt" to CMAKE_PREFIX_PATH or set
-  "Klampt_DIR" to a directory containing one of the above files.  If "Klampt"
-  provides a separate development package or SDK, be sure it has been
-  installed.
+  ;and GLVND libraries for OpenGL and GLX:
+
+  ; OPENGL_opengl_LIBRARY: /usr/lib/x86_64-linux-gnu/libOpenGL.so
+
+  ; OPENGL_glx_LIBRARY: /usr/lib/x86_64-linux-gnu/libGLX.so
+
+  ;OpenGL_GL_PREFERENCE has not been set to "GLVND" or "LEGACY", so for
+  ;compatibility with CMake 3.10 and below the legacy GL library will be
+  used.[m
+Call Stack (most recent call first):
+  /home/user1/clion-2019.3.3/bin/cmake/linux/share/cmake-3.15/Modules/FindOpenGL.cmake:275 (message)
+  libs/Klampt/CMakeModules/FindGLUI.cmake:30 (find_package)
+  libs/Klampt/CMakeModules/KrisLibraryDependencies.cmake:48 (FIND_PACKAGE)
+  libs/Klampt/CMakeModules/FindKrisLibrary.cmake:16 (INCLUDE)
+  libs/Klampt/CMakeModules/KlamptDependencies.cmake:132 (FIND_PACKAGE)
+  libs/Klampt/CMakeModules/FindKlampt.cmake:13 (INCLUDE)
+  CMakeLists.txt:40 (FIND_PACKAGE)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- [32mFound OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so   [m
+-- [32mFound GLUT: /usr/lib/x86_64-linux-gnu/libglut.so  [m
+-- [32mFound GLUI: /home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include  [m
+[36m GLUI library found 
+[36m GLUT library found 
+CMake Warning (dev) at libs/Klampt/CMakeModules/KrisLibraryDependencies.cmake:76 (FIND_PACKAGE):
+  Policy CMP0074 is not set: find_package uses <PackageName>_ROOT variables.
+  Run "cmake --help-policy CMP0074" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+
+  CMake variable GLPK_ROOT is set to:
+
+    /home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glpk-4.52
+
+  For compatibility, CMake is ignoring the variable.
+Call Stack (most recent call first):
+  libs/Klampt/CMakeModules/FindKrisLibrary.cmake:16 (INCLUDE)
+  libs/Klampt/CMakeModules/KlamptDependencies.cmake:132 (FIND_PACKAGE)
+  libs/Klampt/CMakeModules/FindKlampt.cmake:13 (INCLUDE)
+  CMakeLists.txt:40 (FIND_PACKAGE)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- [32mLooking for C++ include glpk.h[m
+-- [32mLooking for C++ include glpk.h - found[m
+-- [32mFound GLPK: /usr/include  [m
+[36m GLPK library found 
+-- [32mFound TinyXML: /home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml  [m
+[36m TinyXML library found 
+[36m Assimp library found 
+-- [32mFound KRISLIBRARY: /home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library  [m
+CMake Warning (dev) at libs/Klampt/CMakeModules/KlamptDependencies.cmake:139 (FIND_PACKAGE):
+  Policy CMP0074 is not set: find_package uses <PackageName>_ROOT variables.
+  Run "cmake --help-policy CMP0074" for policy details.  Use the cmake_policy
+  command to set the policy and suppress this warning.
+
+  CMake variable ODE_ROOT is set to:
+
+    /home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1
+
+  For compatibility, CMake is ignoring the variable.
+Call Stack (most recent call first):
+  libs/Klampt/CMakeModules/FindKlampt.cmake:13 (INCLUDE)
+  CMakeLists.txt:40 (FIND_PACKAGE)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- [32mFound PkgConfig: /usr/bin/pkg-config (found version "0.29.1") [m
+-- [32mChecking for module 'ode'[m
+-- [32m  No package 'ode' found[m
+[36m /home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include 
+[36m /home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/ode/src/.libs/libode.so 
+-- [32mFound ODE: /home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/ode/src/.libs/libode.so[m
+-- [32mODE uses double precision[m
+[36m Open Dynamics Engine library found 
+[36m   Compiler definitions: -I/usr/local/include -DdDOUBLE
+ 
+-- [32mFound KLAMPT: /home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt  [m
+-- [32mFound ompl: /usr/local/include;/usr/include/eigen3 (Required is at least version "1.5.0") [m
+[36m $OMPL_VERSION 
+-- [32mChecking for one of the modules '3.3;eigen3'[m
+-- [32mFound Boost: /usr/include (found suitable version "1.67.0", minimum required is "1.55.0") found components:  filesystem thread serialization system chrono date_time atomic [m
+[1;37m-------------------------------------[m
+[1;37m-- INCLUDING DEPENDENCIES[m
+[1;37m-------------------------------------[m
+[1;37m[m
+[1;37m-- KLAMPT[m
+[36m VERSION   :   
+[36m LIBRARIES :  /home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/lib/libKlampt.a;/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/KrisLibrary/lib/libKrisLibrary.a;/usr/lib/x86_64-linux-gnu/libboost_thread.so;-lpthread;/usr/lib/x86_64-linux-gnu/libboost_system.so;/usr/lib/x86_64-linux-gnu/libboost_chrono.so;/usr/lib/x86_64-linux-gnu/libboost_date_time.so;/usr/lib/x86_64-linux-gnu/libboost_atomic.so;/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/lib/libglui.a;/usr/lib/x86_64-linux-gnu/libglut.so;/usr/lib/x86_64-linux-gnu/libXmu.so;/usr/lib/x86_64-linux-gnu/libXi.so;/usr/lib/x86_64-linux-gnu/libGL.so;/usr/lib/x86_64-linux-gnu/libGLU.so;/usr/lib/x86_64-linux-gnu/libglpk.so;/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml/libtinyxml.a;/usr/lib/x86_64-linux-gnu/libassimp.so;/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/ode/src/.libs/libode.so  
+[36m INCLUDE   :  /usr/include;/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/glui-2.36/src/include;/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/tinyxml;/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library;/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include;/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt /home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt 
+[1;37m-- OMPL[m
+[36m VERSION   :  1.5.0 
+[36m LIBRARIES :  /usr/local/lib/libompl.so  
+[36m INCLUDE   :  /usr/local/include;/usr/include/eigen3 /usr/local/include 
+[1;37m-- Eigen3[m
+[36m VERSION   :  3.3.7 
+[36m LIBRARIES :    
+[36m INCLUDE   :  /usr/include/eigen3  
+[1;37m-- Boost[m
+[36m VERSION   :  106700 
+[36m LIBRARIES :  /usr/lib/x86_64-linux-gnu/libboost_filesystem.so;/usr/lib/x86_64-linux-gnu/libboost_thread.so;-lpthread;/usr/lib/x86_64-linux-gnu/libboost_serialization.so;/usr/lib/x86_64-linux-gnu/libboost_system.so;/usr/lib/x86_64-linux-gnu/libboost_chrono.so;/usr/lib/x86_64-linux-gnu/libboost_date_time.so;/usr/lib/x86_64-linux-gnu/libboost_atomic.so  
+[36m INCLUDE   :  /usr/include /usr/include 
+[1;37m-------------------------------------[m
+[1;37m-- BUILDING EXECUTABLES[m
+[1;37m-------------------------------------[m
+[1;37m[m
+[1;37m-- planner_gui[m
+[1;37m-- planner_standalone[m
+[36m ------------------------------------- 
+[1;37m-- boost_graph[m
+[1;37m-- boost_subgraph[m
+[1;37m-- boost_subgraph_deletion[m
+[1;37m-- ompl_so2[m
+[1;37m-- ompl_so3[m
+[1;37m-- print_std_vector[m
+[36m ------------------------------------- 
+[36m Compilers: g++ gcc 
+-- Configuring done
+CMake Warning:
+  Value of KLAMPT_DEFINITIONS contained a newline; truncating
 
 
--- Configuring incomplete, errors occurred!
-See also "/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/CMakeFiles/CMakeOutput.log".
+CMake Warning:
+  Value of ODE_DEFINITIONS contained a newline; truncating
+
+
+-- Generating done
+CMake Warning:
+  Value of KLAMPT_DEFINITIONS contained a newline; truncating
+
+
+CMake Warning:
+  Value of ODE_DEFINITIONS contained a newline; truncating
+
+
+-- Build files have been written to: /home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug

@@ -1,6 +1,7 @@
 #include "planner/cspace/cspace_geometric_R_CONTACT.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
-#include "ompl/base/spaces/SE2StateSpaceFullInterpolate.h"
+#include <ompl/base/spaces/SE2StateSpace.h>
+#include <ompl/base/Constraint.h>
 
 GeometricCSpaceOMPLRCONTACT::GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)
@@ -14,7 +15,7 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
     // Create OMPL state space
     //   Create an SE(3) x R^n state space
     //
-    // Plan: OMPL state space that is made up of obstacle surfaces
+    // Plan: OMPL state space that utilizes obstacle surfaces
     //   Normal vector of each surface (0,1,0)*a or (0,0,1)*b
     //###########################################################################
     if(!(robot->joints[0].type==RobotJoint::Floating))
@@ -23,18 +24,18 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
         throw "Invalid robot";
     }
 
-    ob::StateSpacePtr SE2(std::make_shared<ob::SE2StateSpaceFullInterpolate>());
-    ob::SE2StateSpaceFullInterpolate *cspaceSE2;
+    ob::StateSpacePtr SE2(std::make_shared<ob::SE2StateSpace>());
+    ob::SE2StateSpace *cspaceSE2;
     ob::RealVectorStateSpace *cspaceRN = nullptr;
 
     if(Nompl>0){
         ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(Nompl));
         this->space = SE2 + Rn;
-        cspaceSE2 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE2StateSpaceFullInterpolate>(0);
+        cspaceSE2 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE2StateSpace>(0);
         cspaceRN = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
     }else{
         this->space = SE2;
-        cspaceSE2 = this->space->as<ob::SE2StateSpaceFullInterpolate>();
+        cspaceSE2 = this->space->as<ob::SE2StateSpace>();
     }
 
     //###########################################################################
@@ -80,14 +81,14 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
 
 void GeometricCSpaceOMPLRCONTACT::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
-    ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2{nullptr};
+    ob::SE2StateSpace::StateType *qomplSE2{nullptr};
     ob::RealVectorStateSpace::StateType *qomplRnSpace{nullptr};
 
     if(Nompl>0){
-        qomplSE2 = qompl->as<ob::CompoundState>()->as<ob::SE2StateSpaceFullInterpolate::StateType>(0);
+        qomplSE2 = qompl->as<ob::CompoundState>()->as<ob::SE2StateSpace::StateType>(0);
         qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
     }else{
-        qomplSE2 = qompl->as<ob::SE2StateSpaceFullInterpolate::StateType>();
+        qomplSE2 = qompl->as<ob::SE2StateSpace::StateType>();
         qomplRnSpace = nullptr;
     }
     qomplSE2->setXY(q(0),q(1));
@@ -105,14 +106,14 @@ void GeometricCSpaceOMPLRCONTACT::ConfigToOMPLState(const Config &q, ob::State *
 }
 
 Config GeometricCSpaceOMPLRCONTACT::OMPLStateToConfig(const ob::State *qompl){
-    const ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2{nullptr};
+    const ob::SE2StateSpace::StateType *qomplSE2{nullptr};
     const ob::RealVectorStateSpace::StateType *qomplRnSpace{nullptr};
 
     if(Nompl>0){
-        qomplSE2 = qompl->as<ob::CompoundState>()->as<ob::SE2StateSpaceFullInterpolate::StateType>(0);
+        qomplSE2 = qompl->as<ob::CompoundState>()->as<ob::SE2StateSpace::StateType>(0);
         qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
     }else{
-        qomplSE2 = qompl->as<ob::SE2StateSpaceFullInterpolate::StateType>();
+        qomplSE2 = qompl->as<ob::SE2StateSpace::StateType>();
         qomplRnSpace = nullptr;
     }
 
@@ -137,7 +138,7 @@ void GeometricCSpaceOMPLRCONTACT::print() const
     std::cout << "Robot \"" << robot->name << "\":" << std::endl;
     std::cout << "Dimensionality Space            : " << 3 << std::endl;
 
-    ob::SE2StateSpaceFullInterpolate *cspace = this->space->as<ob::SE2StateSpaceFullInterpolate>();
+    ob::SE2StateSpace *cspace = this->space->as<ob::SE2StateSpace>();
 
     const ob::RealVectorBounds bounds = cspace->getBounds();
     std::vector<double> min = bounds.low;
@@ -155,3 +156,34 @@ void GeometricCSpaceOMPLRCONTACT::print() const
     std::cout << std::endl;
     std::cout << std::string(80, '-') << std::endl;
 }
+
+
+
+//##########################################################################################
+// Constraint Function here
+// Taken from the OMPL Constrained Planning Tutorial
+//##########################################################################################
+
+
+class ContactConstraint : public ob::Constraint
+{
+public:
+    // ob::Constraint's constructor takes in two parameters, the dimension of
+    // the ambient state space, and the dimension of the real vector space the
+    // constraint maps into. For our sphere example, as we are planning in R^3, the
+    // dimension of the ambient space is 3, and as our constraint outputs one real
+    // value the second parameter is one (this is also the co-dimension of the
+    // constraint manifold).
+    ContactConstraint() : ob::Constraint(4, 2) // (x,y,theta at 1st link,phi at 2nd)
+    {
+    }
+
+    // Here we define the actual constraint function, which takes in some state "x"
+    // (from the ambient space) and sets the values of "out" to the result of the
+    // constraint function. Note that we are implementing `function` which has this
+    // function signature, not the one that takes in ompl::base::State.
+    void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override
+    {
+        out[0] = x.norm() - 1; // ----change to fit contact case-------
+    }
+};

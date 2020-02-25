@@ -1,0 +1,10 @@
+/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/CMakeFiles/print_std_vector.dir
+/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/CMakeFiles/ompl_so3.dir
+/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/CMakeFiles/planner_standalone.dir
+/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/CMakeFiles/planner_gui.dir
+/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/CMakeFiles/ompl_so2.dir
+/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/CMakeFiles/boost_graph.dir
+/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/CMakeFiles/boost_subgraph.dir
+/home/user1/CLionProjects/MotionPlanningExplorerGUI/cmake-build-debug/CMakeFiles/boost_subgraph_deletion.dir
