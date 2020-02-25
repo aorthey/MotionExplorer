@@ -111,7 +111,11 @@ ob::SpaceInformationPtr CSpaceOMPLMultiAgent::SpaceInformationPtr(){
 
       const oc::StatePropagatorPtr integrator = 
         std::make_shared<MultiAgentIntegrator>(siC, this, cspaces_);
+
       siC->setStatePropagator(integrator);
+
+      siC->setMinMaxControlDuration(0.01, 0.1);
+      siC->setPropagationStepSize(1);
     }
     return si;
 
@@ -139,7 +143,6 @@ void CSpaceOMPLMultiAgent::initControlSpace()
       static_pointer_cast<oc::CompoundControlSpace>(control_space)->addSubspace(ck->ControlSpacePtr());
     }
   }
-
 }
 
 void CSpaceOMPLMultiAgent::initSpace()
@@ -205,6 +208,24 @@ std::vector<Config> CSpaceOMPLMultiAgent::splitConfig(const Config &q)
   return qks;
 }
 
+std::vector<CSpaceOMPLMultiAgent::ConfigVelocity> CSpaceOMPLMultiAgent::splitConfig(const Config &q, const Config &dq)
+{
+  int ctr = 0;
+  std::vector<ConfigVelocity> qks;
+  for(uint k = 0; k < Nklampts.size(); k++){
+    int Nk = Nklampts.at(k);
+    Config qk; qk.resize(Nk);
+    Config dqk; dqk.resize(Nk);
+    for(int j = 0; j < Nk; j++){
+      qk[j] = q[j+ctr];
+      dqk[j] = dq[j+ctr];
+    }
+    qks.push_back(std::make_pair(qk, dqk));
+    ctr+=Nk;
+  }
+  return qks;
+}
+
 Vector3 CSpaceOMPLMultiAgent::getXYZ(const ob::State *qompl)
 {
   return getXYZ(qompl, GetRobotIdxs().front());
@@ -223,6 +244,33 @@ Vector3 CSpaceOMPLMultiAgent::getXYZ(const ob::State *qompl, int ridx)
   throw "NoIndex";
 }
 
+ob::ScopedState<> CSpaceOMPLMultiAgent::ConfigVelocityToOMPLState(const Config &q, const Config &dq)
+{
+  ob::ScopedState<> qompl(space);
+  ConfigVelocityToOMPLState(q, dq, qompl.get());
+  return qompl;
+}
+
+void CSpaceOMPLMultiAgent::ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl)
+{
+  if(!isDynamic())
+  {
+    return ConfigToOMPLState(q, qompl);
+  }else{
+    std::vector<ConfigVelocity> qks = splitConfig(q, dq);
+
+    for(uint k = 0; k < cspaces_.size(); k++){
+      ConfigVelocityToOMPLState(qks.at(k).first, qks.at(k).second, qompl, k);
+    }
+  }
+}
+
+void CSpaceOMPLMultiAgent::ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl, int agent)
+{
+  ob::State *qomplAgent = static_cast<ob::CompoundState*>(qompl)->as<ob::State>(agent);
+  cspaces_.at(agent)->ConfigVelocityToOMPLState(q, dq, qomplAgent);
+}
+
 void CSpaceOMPLMultiAgent::ConfigToOMPLState(const Config &q, ob::State *qompl, int agent)
 {
   ob::State *qomplAgent = static_cast<ob::CompoundState*>(qompl)->as<ob::State>(agent);
@@ -231,23 +279,12 @@ void CSpaceOMPLMultiAgent::ConfigToOMPLState(const Config &q, ob::State *qompl, 
 
 void CSpaceOMPLMultiAgent::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
-  int ctr = 0;
   std::vector<Config> qks = splitConfig(q);
-  for(uint k = 0; k < Nklampts.size(); k++){
-    int Nk = Nklampts.at(k);
-    Config qk; qk.resize(Nk);
-    for(int j = 0; j < Nk; j++){
-      qk[j] = q[j+ctr];
-    }
-    qks.push_back(qk);
-    ctr+=Nk;
-  }
 
   for(uint k = 0; k < cspaces_.size(); k++){
     ConfigToOMPLState(qks.at(k), qompl, k);
   }
 }
-
 
 Config CSpaceOMPLMultiAgent::OMPLStateToConfig(const ob::State *qompl, int agent)
 {
@@ -255,6 +292,7 @@ Config CSpaceOMPLMultiAgent::OMPLStateToConfig(const ob::State *qompl, int agent
   Config qk = cspaces_.at(agent)->OMPLStateToConfig(qomplAgent);
   return qk;
 }
+
 Config CSpaceOMPLMultiAgent::OMPLStateToConfig(const ob::State *qompl)
 {
   int ctr = 0;

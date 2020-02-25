@@ -67,6 +67,19 @@ bool CSpaceOMPL::isMultiAgent() const
   return false;
 }
 
+ob::ScopedState<> CSpaceOMPL::ConfigVelocityToOMPLState(const Config &q, const Config &dq)
+{
+  ob::ScopedState<> qompl(space);
+  ConfigVelocityToOMPLState(q, dq, qompl.get());
+  return qompl;
+}
+
+void CSpaceOMPL::ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl)
+{
+  return ConfigToOMPLState(q, qompl);
+}
+
+
 Config CSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
   const ob::State* s = qompl.get();
   return OMPLStateToConfig(s);

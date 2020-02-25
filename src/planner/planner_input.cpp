@@ -343,18 +343,27 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
       Layer &layer = stratification.layers.at(k);
       layer.q_init.clear();
       layer.q_goal.clear();
+      layer.dq_init.clear();
+      layer.dq_goal.clear();
       for(uint j = 0; j < layer.ids.size(); j++){
         int idj = layer.ids.at(j);
         if(!ExistsAgentAtID(idj)) continue;
         AgentInformation agent = GetAgentAtID(idj);
         AddConfigToConfig(layer.q_init, agent.q_init);
         AddConfigToConfig(layer.q_goal, agent.q_goal);
+        AddConfigToConfig(layer.dq_init, agent.dq_init);
+        AddConfigToConfig(layer.dq_goal, agent.dq_goal);
+
         layer.q_inits.push_back(agent.q_init);
         layer.q_goals.push_back(agent.q_goal);
+        layer.dq_inits.push_back(agent.dq_init);
+        layer.dq_goals.push_back(agent.dq_goal);
       }
     }
     q_init = stratification.layers.back().q_init;
     q_goal = stratification.layers.back().q_goal;
+    dq_init = stratification.layers.back().dq_init;
+    dq_goal = stratification.layers.back().dq_goal;
 
     //############################################################################
     //build fiber bundle projection matrix

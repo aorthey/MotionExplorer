@@ -28,13 +28,16 @@ class CSpaceOMPL
   public:
 
     CSpaceOMPL(RobotWorld *world_, int robot_idx_);
-    // CSpaceOMPL(RobotWorld *world_, std::vector<int> robot_idxs);
 
     void Init();
     virtual ob::SpaceInformationPtr SpaceInformationPtr();
 
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) = 0;
     virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
+
+    virtual void ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl);
+    virtual ob::ScopedState<> ConfigVelocityToOMPLState(const Config &q, const Config &dq);
+
     virtual double GetTime(const ob::State *qompl);
     virtual bool isTimeDependent();
     virtual bool SatisfiesBounds(const ob::State*);

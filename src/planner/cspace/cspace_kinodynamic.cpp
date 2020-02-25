@@ -174,7 +174,8 @@ void KinodynamicCSpaceOMPL::initSpace()
 
 }
 
-void KinodynamicCSpaceOMPL::initControlSpace(){
+void KinodynamicCSpaceOMPL::initControlSpace()
+{
   uint NdimControl = 6 + Nompl;
   control_space = std::make_shared<oc::RealVectorControlSpace>(space, NdimControl+1);
 
@@ -305,10 +306,16 @@ const oc::StatePropagatorPtr KinodynamicCSpaceOMPL::StatePropagatorPtr(oc::Space
 ob::SpaceInformationPtr KinodynamicCSpaceOMPL::SpaceInformationPtr(){
   if(!si){
     si = std::make_shared<oc::SpaceInformation>(SpacePtr(), ControlSpacePtr());
+
     const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr(si);
     si->setStateValidityChecker(checker);
-    const oc::StatePropagatorPtr integrator = StatePropagatorPtr(static_pointer_cast<oc::SpaceInformation>(si));
-    static_pointer_cast<oc::SpaceInformation>(si)->setStatePropagator(integrator);
+
+    oc::SpaceInformationPtr siC = static_pointer_cast<oc::SpaceInformation>(si);
+    const oc::StatePropagatorPtr integrator = StatePropagatorPtr(siC);
+    siC->setStatePropagator(integrator);
+
+    siC->setMinMaxControlDuration(0.01, 0.1);
+    siC->setPropagationStepSize(1);
   }
   return si;
 }

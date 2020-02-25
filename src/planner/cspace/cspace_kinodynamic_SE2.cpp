@@ -192,13 +192,6 @@ void KinodynamicCSpaceOMPLSE2::initControlSpace(){
 }
 
 
-ob::ScopedState<> KinodynamicCSpaceOMPLSE2::ConfigVelocityToOMPLState(const Config &q, const Config &dq)
-{
-  ob::ScopedState<> qompl(space);
-  ConfigVelocityToOMPLState(q, dq, qompl.get());
-  return qompl;
-}
-
 void KinodynamicCSpaceOMPLSE2::ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl)
 {
   ConfigToOMPLState(q, qompl);

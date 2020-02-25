@@ -103,34 +103,31 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
 
   for(uint k = 0; k < input.cspace_levels.size(); k++){
     CSpaceOMPL* cspace_levelk = input.cspace_levels.at(k);
-    bool dynamic = cspace_levelk->isDynamic();
+    // bool dynamic = cspace_levelk->isDynamic();
     ob::SpaceInformationPtr sik = cspace_levelk->SpaceInformationPtr();
 
     ob::ScopedState<> startk(sik);
     ob::ScopedState<> goalk(sik);
-    if(dynamic){
+    // if(dynamic){
 
-      KinodynamicCSpaceOMPL* cspace_dynamic = dynamic_cast<KinodynamicCSpaceOMPL*>(cspace_levelk);
+    //   KinodynamicCSpaceOMPL* cspace_dynamic = dynamic_cast<KinodynamicCSpaceOMPL*>(cspace_levelk);
 
-      if(cspace_dynamic==nullptr)
-      {
-        std::cout << std::string(80, '-') << std::endl;
-        OMPL_ERROR("ERROR: not dynamic even though declared dynamic.");
-        std::cout << std::string(80, '-') << std::endl;
-        std::cout << *cspace_levelk << std::endl;
-        throw "Not dynamic.";
-      }
+    //   if(cspace_dynamic==nullptr)
+    //   {
+    //     std::cout << std::string(80, '-') << std::endl;
+    //     OMPL_ERROR("ERROR: not dynamic but declared dynamic.");
+    //     std::cout << std::string(80, '-') << std::endl;
+    //     std::cout << *cspace_levelk << std::endl;
+    //     throw "Not dynamic.";
+    //   }
 
-      oc::SpaceInformationPtr sik_dynamic = static_pointer_cast<oc::SpaceInformation>(sik);
-      sik_dynamic->setMinMaxControlDuration(0.01, 0.1);
-      sik_dynamic->setPropagationStepSize(1);
+    // }
 
-      startk = cspace_dynamic->ConfigVelocityToOMPLState(input.q_init, input.dq_init);
-      goalk  = cspace_dynamic->ConfigVelocityToOMPLState(input.q_goal, input.dq_goal);
-    }else{
-      startk = cspace_levelk->ConfigToOMPLState(input.q_init);
-      goalk  = cspace_levelk->ConfigToOMPLState(input.q_goal);
-    }
+    std::cout << input.q_init << std::endl;
+    std::cout << input.dq_init << std::endl;
+    startk = cspace_levelk->ConfigVelocityToOMPLState(input.q_init, input.dq_init);
+    goalk  = cspace_levelk->ConfigVelocityToOMPLState(input.q_goal, input.dq_goal);
+
     setStateSampler(input.name_sampler, sik);
     si_vec.push_back(sik);
 

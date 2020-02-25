@@ -12,6 +12,8 @@ struct Layer{
   double finite_horizon_relaxation{0.0};
   Config q_init;
   Config q_goal;
+  Config dq_init;
+  Config dq_goal;
   std::string type;
 
   //multiagent
@@ -19,7 +21,9 @@ struct Layer{
   int maxRobots{0};
   std::vector<int> ids;
   std::vector<Config> q_inits;
+  std::vector<Config> dq_inits;
   std::vector<Config> q_goals;
+  std::vector<Config> dq_goals;
   std::vector<int> ptr_to_next_level_ids;
   std::vector<std::string> types;
   std::vector<int> freeFloating;

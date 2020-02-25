@@ -18,8 +18,8 @@ class KinodynamicCSpaceOMPL: public GeometricCSpaceOMPL
     virtual void print(std::ostream& out = std::cout) const override;
 
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
-    virtual void ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl);
-    virtual ob::ScopedState<> ConfigVelocityToOMPLState(const Config &q, const Config &dq);
+    virtual void ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl) override;
+    virtual ob::ScopedState<> ConfigVelocityToOMPLState(const Config &q, const Config &dq) override;
 
     virtual Config OMPLStateToConfig(const ob::State *qompl) override;
     virtual Config OMPLStateToVelocity(const ob::State *qompl);

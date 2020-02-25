@@ -9,12 +9,17 @@ namespace oc = ompl::control;
 class CSpaceOMPLMultiAgent: public CSpaceOMPL
 {
     using BaseT = CSpaceOMPL;
+    using ConfigVelocity = std::pair<Config, Config>;
   public:
 
     CSpaceOMPLMultiAgent(std::vector<CSpaceOMPL*> cspaces);
 
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
     void ConfigToOMPLState(const Config &q, ob::State *qompl, int subspace);
+
+    virtual void ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl);
+    virtual ob::ScopedState<> ConfigVelocityToOMPLState(const Config &q, const Config &dq);
+    void ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl, int subspace);
 
     virtual Config OMPLStateToConfig(const ob::State *qompl) override;
     Config OMPLStateToConfig(const ob::State *qompl, int subspace);
@@ -43,6 +48,7 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
     virtual Vector3 getXYZ(const ob::State*, int) override;
 
     std::vector<Config> splitConfig(const Config &q);
+    std::vector<ConfigVelocity> splitConfig(const Config &q, const Config &dq);
 
     virtual void initSpace() override;
     virtual void initControlSpace();
