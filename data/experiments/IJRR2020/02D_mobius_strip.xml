@@ -2,9 +2,10 @@
 
 <world>
 
-  <robot name="point" file="../../robots/point.urdf"/>
-  <robot name="point" file="../../robots/point.urdf"/>
+  <robot name="point" file="../../robots/point_nonphysical.urdf"/>
+  <robot name="point" file="../../robots/point_nonphysical.urdf"/>
 
+  <!-- <rigidObject name="mobius.tri" file="../../terrains/mobius.tri" translation="0 0 0.5" rotateRPY="0 0 1.57"/> -->
   <plannerinput>
 
     <qinit  config="6  +1.0 +0.2 +1.0 0 0 0"/>
@@ -17,8 +18,9 @@
     <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
     <pathWidth>0.03</pathWidth>
 
-    <algorithm name="hierarchy:qrrt"/>
-    <algorithm name="ompl:rrtstar"/>
+    <!-- <algorithm name="hierarchy:qrrt"/> -->
+    <!-- <algorithm name="hierarchy:qmpstar"/> -->
+    <!-- <algorithm name="ompl:rrtstar"/> -->
     <!-- <algorithm name="ompl:prm"/> -->
     <!-- <algorithm name="ompl:prm"/> -->
 

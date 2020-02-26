@@ -2,10 +2,10 @@
 
 <world>
   <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
-  <robot name="disk_inner" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+  <robot name="disk_inner1" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
 
   <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
-  <robot name="disk_inner" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+  <robot name="disk_inner2" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
 
   <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="0 0 0" rotateRPY="0 0 0"/>
   <plannerinput>
@@ -50,6 +50,7 @@
         <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/>
       </level>
       <level>
+        <robot id="1" freeFloating="1" type="R2"/>
         <robot id="0" freeFloating="1" type="TSE2"/>
         <robot id="2" freeFloating="1" type="TSE2"/>
       </level>

@@ -1,5 +1,6 @@
 #pragma once
 #include "planner/cspace/cspace_geometric.h"
+#include "gui/gui_state.h"
 
 class GeometricCSpaceOMPLMobius: public GeometricCSpaceOMPL
 {
@@ -13,11 +14,17 @@ class GeometricCSpaceOMPLMobius: public GeometricCSpaceOMPL
 
     virtual bool IsPlanar() override;
 
+    virtual void DrawGL(GUIState& state) override;
+
   protected:
     virtual double OMPLStateToRValue(const ob::State *qompl);
     virtual double OMPLStateToSO2Value(const ob::State *qompl);
 
     Vector3 ProjectToVector3(double u, double v);
     Config ProjectToConfig(double u, double v);
+  private:
+    double zOffset_{1.0};
+    double radius_{1.0};
+    double intervalMax{0.5};
 };
 

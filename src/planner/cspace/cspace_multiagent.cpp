@@ -43,7 +43,7 @@ bool CSpaceOMPLMultiAgent::isDynamic() const
 {
   for(uint k = 0; k < cspaces_.size(); k++){
     CSpaceOMPL *ck = cspaces_.at(k);
-    std::cout << "cspace (robot=" << ck->GetRobotIndex() << ") component " << k << " is " << (ck->isDynamic()?"":"NOT ") << "dynamic." << std::endl;
+    // std::cout << "cspace (robot=" << ck->GetRobotIndex() << ") component " << k << " is " << (ck->isDynamic()?"":"NOT ") << "dynamic." << std::endl;
     if(ck->isDynamic()) return true;
   }
   return false;

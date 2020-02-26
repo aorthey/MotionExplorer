@@ -10,14 +10,15 @@
 
   <!-- <algorithm name="hierarchy:sampler"/> -->
   <!-- <algorithm name="benchmark:minimal"/> -->
-  <algorithm name="hierarchy:qmp"/>
-  <algorithm name="hierarchy:qmpstar"/>
+  <!-- <algorithm name="hierarchy:qmp"/> -->
+  <!-- <algorithm name="hierarchy:qmpstar"/> -->
   <algorithm name="hierarchy:qrrt"/>
-  <algorithm name="hierarchy:spqr"/>
-  <algorithm name="hierarchy:explorer"/>
+  <algorithm name="hierarchy:qrrtstar"/>
+  <!-- <algorithm name="hierarchy:spqr"/> -->
   <algorithm name="ompl:rrt"/>
-  <algorithm name="ompl:prm"/>
-  <algorithm name="ompl:prmstar"/>
+  <algorithm name="ompl:rrtstar"/>
+  <!-- <algorithm name="ompl:prm"/> -->
+  <!-- <algorithm name="ompl:prmstar"/> -->
   <!-- <algorithm name="ompl:rrt"/> -->
   <!-- <algorithm name="ompl:rrtconnect"/> -->
   <!-- <algorithm name="benchmark:best_geometric"/> -->

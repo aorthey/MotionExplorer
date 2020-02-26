@@ -2,6 +2,9 @@
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include "common.h"
+#include "gui/colors.h"
+#include <KrisLibrary/GLdraw/drawextra.h>
+#include <KrisLibrary/GLdraw/GLColor.h>
 
 #include <ompl/util/Exception.h>
 
@@ -15,9 +18,11 @@ void GeometricCSpaceOMPLMobius::initSpace()
     ob::StateSpacePtr SO2(std::make_shared<ob::SO2StateSpace>());
     ob::StateSpacePtr R1(std::make_shared<ob::RealVectorStateSpace>(1));
 
+    R1->as<ob::RealVectorStateSpace>()->setBounds(-intervalMax, +intervalMax);
+
     space = SO2 + R1;
 
-    space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1)->setBounds(-0.5, +0.5);
+    // space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1)
 }
 
 void GeometricCSpaceOMPLMobius::print(std::ostream& out) const
@@ -29,11 +34,54 @@ bool GeometricCSpaceOMPLMobius::IsPlanar(){
     return false;
 }
 
+void GeometricCSpaceOMPLMobius::DrawGL(GUIState& state)
+{
+  glDisable(GL_LIGHTING);
+  glEnable(GL_BLEND);
+  // glEnable(GL_LINE_SMOOTH);
+  // glDisable(GL_CULL_FACE);
+
+  GLDraw::setColor(black);
+  glLineWidth(3);
+
+  const double dstep = 0.01;
+  glBegin(GL_LINE_LOOP);
+  for(double d = 0; d < 2*M_PI; d+=dstep){
+    Vector3 v = ProjectToVector3(d, -intervalMax);
+    // Vector3 v2 = ProjectToVector3(d, +intervalMax);
+    GLDraw::glVertex3v(v);
+  }
+  for(double d = 0; d < 2*M_PI; d+=dstep){
+    Vector3 v = ProjectToVector3(d, +intervalMax);
+    GLDraw::glVertex3v(v);
+  }
+  glEnd();
+
+  GLDraw::setColor(grey);
+  glLineWidth(1);
+
+  glBegin(GL_LINES);
+  const double dstep2 = 0.1;
+  for(double d = 0; d < 2*M_PI; d+=dstep2){
+    Vector3 v1 = ProjectToVector3(d, -intervalMax);
+    Vector3 v2 = ProjectToVector3(d, +intervalMax);
+    GLDraw::glVertex3v(v1);
+    GLDraw::glVertex3v(v2);
+  }
+  glEnd();
+
+  // glEnable(GL_CULL_FACE);
+  // glDisable(GL_LINE_SMOOTH);
+  glDisable(GL_BLEND);
+  glEnable(GL_LIGHTING);
+
+}
+
 void GeometricCSpaceOMPLMobius::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
     double x = q[0];
     double y = q[1];
-    double z = q[2] - 1.0;
+    double z = q[2] - zOffset_;
 
     double r = sqrt(x*x + y*y);
     double u = atan2(y/r, x/r);
@@ -42,7 +90,7 @@ void GeometricCSpaceOMPLMobius::ConfigToOMPLState(const Config &q, ob::State *qo
     if(u > 0.01 || u < -0.01)
         v = z / (sin(0.5*u));
     else 
-        v = (x/cos(u) - 1)/cos(0.5*u);
+        v = (x/cos(u) - radius_)/cos(0.5*u);
 
     ob::SO2StateSpace::StateType *qomplSO2 = 
       qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
@@ -67,10 +115,10 @@ Config GeometricCSpaceOMPLMobius::ProjectToConfig(double u, double v)
 {
     Config q;q.resize(robot->q.size());q.setZero();
 
-    double R = 1 + v*cos(0.5*u);
+    double R = radius_ + v*cos(0.5*u);
     q[0] = R*cos(u);
     q[1] = R*sin(u);
-    q[2] = v*sin(0.5*u) + 1.0;
+    q[2] = v*sin(0.5*u) + zOffset_;
     return q;
 }
 

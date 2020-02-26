@@ -13,8 +13,8 @@ using namespace GLDraw;
 using Graph = ob::PlannerData::Graph;
 using Vertex = Graph::Vertex;
 
-double sizeVertex{10};
-double widthEdge{5};
+double sizeVertex{6};
+double widthEdge{3};
 double widthPath{25};
 
 Roadmap::Roadmap()
@@ -152,7 +152,6 @@ void Roadmap::DrawGLRoadmapVertices(GUIState &state, int ridx)
   for(uint vidx = 0; vidx < pd->numVertices(); vidx++)
   {
     glPointSize(sizeVertex);
-    glLineWidth(widthEdge);
     setColor(cVertex);
     glPushMatrix();
 
@@ -166,13 +165,13 @@ void Roadmap::DrawGLRoadmapVertices(GUIState &state, int ridx)
     {
       q = quotient_space->getXYZ(v->getBaseState(), ridx);
       if(draw_planar) q[2] = 0.0;
-      if(v->getComponent()==0){
-        setColor(cVertex);
-      }else if(v->getComponent()==1){
-        setColor(cVertexComponentGoal);
-      }else{
-        setColor(cVertexComponentOut);
-      }
+      // if(v->getComponent()==0){
+      //   setColor(cVertex);
+      // }else if(v->getComponent()==1){
+      //   setColor(cVertexComponentGoal);
+      // }else{
+      //   setColor(cVertexComponentOut);
+      // }
       if(pd->isStartVertex(vidx))
       {
         glPointSize(2*sizeVertex);
@@ -214,18 +213,18 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
       Vector3 v2 = quotient_space->getXYZ(w->getState(), ridx);
       if(draw_planar) v2[2] = 0.0;
 
-      ob::PlannerDataVertexAnnotated *wa = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
-      if(wa!=nullptr) v2 = quotient_space->getXYZ(wa->getBaseState(), ridx);
-      if(draw_planar) v2[2] = 0.0;
-      if(va!=nullptr && wa!=nullptr){
-        if(va->getComponent()==0 || wa->getComponent()==0){
-          setColor(cEdge);
-        }else if(va->getComponent()==1 || wa->getComponent()==1){
-          setColor(cVertexComponentGoal);
-        }else{
-          setColor(cVertexComponentOut);
-        }
-      }
+      // ob::PlannerDataVertexAnnotated *wa = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
+      // if(wa!=nullptr) v2 = quotient_space->getXYZ(wa->getBaseState(), ridx);
+      // if(draw_planar) v2[2] = 0.0;
+      // if(va!=nullptr && wa!=nullptr){
+      //   if(va->getComponent()==0 || wa->getComponent()==0){
+      //     setColor(cEdge);
+      //   }else if(va->getComponent()==1 || wa->getComponent()==1){
+      //     setColor(cVertexComponentGoal);
+      //   }else{
+      //     setColor(cVertexComponentOut);
+      //   }
+      // }
       drawLineSegment(v1,v2);
     }
   }
@@ -263,6 +262,7 @@ void Roadmap::DrawGL(GUIState& state)
     if(draw_planar && (quotient_space->GetFirstSubspace()->getType()==ob::STATE_SPACE_SE2) && state("planner_draw_spatial_representation_of_SE2")){
       draw_planar = false;
     }
+    // quotient_space->DrawGL(state);
   }
 
   if(pd!=nullptr) DrawGLPlannerData(state);

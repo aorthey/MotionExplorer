@@ -13,11 +13,15 @@ class GeometricCSpaceOMPLCircular: public GeometricCSpaceOMPLMobius
     virtual Vector3 getXYZ(const ob::State*) override;
 
     virtual bool IsPlanar() override;
+    virtual void DrawGL(GUIState& state) override;
 
   protected:
 
     virtual double OMPLStateToSO2Value(const ob::State *qompl) override;
     Vector3 ProjectToVector3(double u);
     Config ProjectToConfig(double u);
+
+  private:
+    double radius_{1.2};
 };
 

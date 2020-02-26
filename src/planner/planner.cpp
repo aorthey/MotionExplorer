@@ -568,6 +568,10 @@ PathPiecewiseLinear* MotionPlanner::GetPath(){
 void MotionPlanner::DrawGL(GUIState& state){
   if(!active) return;
 
+  for(uint k = 0; k < cspace_levels.size(); k++){
+    cspace_levels.at(k)->DrawGL(state);
+  }
+
   uint Nsiblings;
   if(current_path.size()>1){
     std::vector<int>::const_iterator first = current_path.begin();
@@ -615,7 +619,10 @@ void MotionPlanner::DrawGL(GUIState& state){
 
       current_path.back() = last_node;
       Rcurrent = hierarchy->GetNodeContent(current_path);
+
+      //draw current selected roadmap
       Rcurrent->DrawGL(state);
+
       pwl = Rcurrent->GetShortestPath();
       if(pwl && state("draw_roadmap_shortest_path")){
         pwl->zOffset = 0.015;

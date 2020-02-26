@@ -1,6 +1,7 @@
 #pragma once
 #include "planner/cspace/cspace_input.h"
 #include "klampt.h"
+#include "gui/gui_state.h"
 
 #include <ompl/base/spaces/SO3StateSpace.h>
 #include <ompl/base/ScopedState.h>
@@ -66,6 +67,7 @@ class CSpaceOMPL
     const oc::ControlSpacePtr ControlSpacePtr();
 
     virtual void drawConfig(const Config &q, GLDraw::GLColor color=GLDraw::GLColor(1,0,0), double scale = 1.0);
+    virtual void DrawGL(GUIState& state);
 
     std::vector<double> EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
     void OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSpace::StateType *q );

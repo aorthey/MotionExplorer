@@ -2,6 +2,9 @@
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include "common.h"
+#include "gui/colors.h"
+#include <KrisLibrary/GLdraw/drawextra.h>
+#include <KrisLibrary/GLdraw/GLColor.h>
 
 #include <ompl/util/Exception.h>
 
@@ -23,6 +26,27 @@ void GeometricCSpaceOMPLCircular::print(std::ostream& out) const
 
 bool GeometricCSpaceOMPLCircular::IsPlanar(){
     return true;
+}
+
+void GeometricCSpaceOMPLCircular::DrawGL(GUIState& state)
+{
+  glDisable(GL_LIGHTING);
+  glEnable(GL_BLEND);
+
+  GLDraw::setColor(grey);
+  glLineWidth(3);
+
+  const double dstep = 0.01;
+  glBegin(GL_LINE_LOOP);
+  for(double d = 0; d < 2*M_PI; d+=dstep){
+    Vector3 v = ProjectToVector3(d);
+    GLDraw::glVertex3v(v);
+  }
+  glEnd();
+
+  glDisable(GL_BLEND);
+  glEnable(GL_LIGHTING);
+
 }
 
 void GeometricCSpaceOMPLCircular::ConfigToOMPLState(const Config &q, ob::State *qompl)
@@ -63,9 +87,8 @@ Config GeometricCSpaceOMPLCircular::ProjectToConfig(double u)
 {
     Config q;q.resize(robot->q.size());q.setZero();
 
-    double R = 1;
-    q[0] = R*cos(u);
-    q[1] = R*sin(u);
+    q[0] = radius_*cos(u);
+    q[1] = radius_*sin(u);
     q[2] = 0;
     return q;
 }

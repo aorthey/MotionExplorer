@@ -6,6 +6,7 @@
 
 #include <ompl/geometric/planners/quotientspace/Explorer.h>
 #include <ompl/geometric/planners/quotientspace/QRRT.h>
+#include <ompl/geometric/planners/quotientspace/QRRTStar.h>
 #include <ompl/geometric/planners/quotientspace/QMP.h>
 #include <ompl/geometric/planners/quotientspace/QMPStar.h>
 #include <ompl/geometric/planners/quotientspace/SPQR.h>
@@ -133,6 +134,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
   else if(algorithm=="hierarchy:qrrt") planner = std::make_shared<og::QRRT>(siVec, "QRRT");
+  else if(algorithm=="hierarchy:qrrtstar") planner = std::make_shared<og::QRRT>(siVec, "QRRTStar");
   else if(algorithm=="hierarchy:qmp") planner = std::make_shared<og::QMP>(siVec, "QMP");
   else if(algorithm=="hierarchy:qmpstar") planner = std::make_shared<og::QMPStar>(siVec, "QMPStar");
   else if(algorithm=="hierarchy:spqr") planner = std::make_shared<og::SPQR>(siVec, "SPQR");

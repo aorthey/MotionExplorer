@@ -251,6 +251,11 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s, int ridx)
   return getXYZ(s);
 }
 
+void CSpaceOMPL::DrawGL(GUIState&)
+{
+  return;
+}
+
 void CSpaceOMPL::drawConfig(const Config &q, GLColor color, double scale)
 {
     GLDraw::drawRobotAtConfig(robot, q, color);
