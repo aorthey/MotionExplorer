@@ -25,7 +25,7 @@
     <!-- <algorithm name="ompl:prm"/> -->
 
     <hierarchy>
-      <level inner_index="0" type="CIRCULAR"/>
+      <!-- <level inner_index="0" type="CIRCULAR"/> -->
       <level inner_index="0" type="MOBIUS"/>
     </hierarchy>
 

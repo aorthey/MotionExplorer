@@ -211,11 +211,13 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
     for(uint j = 0; j < edgeList.size(); j++){
       ob::PlannerDataVertex *w = &pd->getVertex(edgeList.at(j));
       Vector3 v2 = quotient_space->getXYZ(w->getState(), ridx);
+
+      ob::PlannerDataVertexAnnotated *wa = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
+      if(wa!=nullptr) v2 = quotient_space->getXYZ(wa->getBaseState(), ridx);
       if(draw_planar) v2[2] = 0.0;
 
-      // ob::PlannerDataVertexAnnotated *wa = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
-      // if(wa!=nullptr) v2 = quotient_space->getXYZ(wa->getBaseState(), ridx);
-      // if(draw_planar) v2[2] = 0.0;
+
+
       // if(va!=nullptr && wa!=nullptr){
       //   if(va->getComponent()==0 || wa->getComponent()==0){
       //     setColor(cEdge);
