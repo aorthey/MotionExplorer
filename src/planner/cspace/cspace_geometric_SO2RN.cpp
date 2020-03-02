@@ -1,8 +1,8 @@
 #include "planner/cspace/cspace_geometric_SO2RN.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
-#include "ompl/base/spaces/SO2StateSpaceFullInterpolate.h"
 #include "common.h"
 
+#include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/util/Exception.h>
 
 GeometricCSpaceOMPLSO2RN::GeometricCSpaceOMPLSO2RN(RobotWorld *world_, int robot_idx):
@@ -44,7 +44,7 @@ void GeometricCSpaceOMPLSO2RN::initSpace()
   //   Create an SO(2) x R^n state space
   //###########################################################################
 
-  ob::StateSpacePtr SO2(std::make_shared<ob::SO2StateSpaceFullInterpolate>());
+  ob::StateSpacePtr SO2(std::make_shared<ob::SO2StateSpace>());
   ob::RealVectorStateSpace *cspaceRN = nullptr;
 
 
@@ -85,14 +85,14 @@ void GeometricCSpaceOMPLSO2RN::initSpace()
 
 void GeometricCSpaceOMPLSO2RN::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
-  ob::SO2StateSpaceFullInterpolate::StateType *qomplSO2{nullptr};
+  ob::SO2StateSpace::StateType *qomplSO2{nullptr};
   ob::RealVectorStateSpace::StateType *qomplRnSpace{nullptr};
 
   if(Nompl>0){
-    qomplSO2 = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpaceFullInterpolate::StateType>(0);
+    qomplSO2 = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
     qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
   }else{
-    qomplSO2 = qompl->as<ob::SO2StateSpaceFullInterpolate::StateType>();
+    qomplSO2 = qompl->as<ob::SO2StateSpace::StateType>();
     qomplRnSpace = nullptr;
   }
   qomplSO2->value = q(6); //Note: this is fixedbase! So first joint value is q(6) in klampt
@@ -109,14 +109,14 @@ void GeometricCSpaceOMPLSO2RN::ConfigToOMPLState(const Config &q, ob::State *qom
 }
 
 Config GeometricCSpaceOMPLSO2RN::OMPLStateToConfig(const ob::State *qompl){
-  const ob::SO2StateSpaceFullInterpolate::StateType *qomplSO2{nullptr};
+  const ob::SO2StateSpace::StateType *qomplSO2{nullptr};
   const ob::RealVectorStateSpace::StateType *qomplRnSpace{nullptr};
 
   if(Nompl>0){
-    qomplSO2 = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpaceFullInterpolate::StateType>(0);
+    qomplSO2 = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
     qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
   }else{
-    qomplSO2 = qompl->as<ob::SO2StateSpaceFullInterpolate::StateType>();
+    qomplSO2 = qompl->as<ob::SO2StateSpace::StateType>();
     qomplRnSpace = nullptr;
   }
 

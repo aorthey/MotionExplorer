@@ -45,6 +45,13 @@ CSpaceOMPL::CSpaceOMPL(RobotWorld *world_, int robot_idx_):
     }
   }
 }
+Config CSpaceOMPL::ControlToConfig(const double* control)
+{
+  Config q; q.setZero();
+  OMPL_ERROR("NYI");
+  throw "NYI";
+  return q;
+}
 
 bool CSpaceOMPL::UpdateRobotConfig(Config &q)
 {
@@ -259,6 +266,11 @@ void CSpaceOMPL::DrawGL(GUIState&)
 void CSpaceOMPL::drawConfig(const Config &q, GLColor color, double scale)
 {
     GLDraw::drawRobotAtConfig(robot, q, color);
+}
+
+void CSpaceOMPL::drawConfig(const Config &q, const Config &dq, GLColor color)
+{
+    GLDraw::drawRobotAtConfig(robot, q, dq, color);
 }
 
 std::vector<double> CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q )

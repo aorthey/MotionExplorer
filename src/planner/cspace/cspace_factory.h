@@ -5,6 +5,7 @@
 #include "planner/cspace/cspace_multiagent.h"
 #include "planner/cspace/cspace_kinodynamic.h"
 #include "planner/cspace/cspace_kinodynamic_SE2.h"
+#include "planner/cspace/cspace_kinodynamic_SO2.h"
 #include "planner/cspace/cspace_geometric_RN.h"
 #include "planner/cspace/cspace_geometric_Mobius.h"
 #include "planner/cspace/cspace_geometric_Circular.h"
@@ -31,6 +32,13 @@ class CSpaceFactory{
     }
     virtual KinodynamicCSpaceOMPL* MakeKinodynamicCSpaceSE2( RobotWorld *world, int robot_idx){
       KinodynamicCSpaceOMPL *cspace = new KinodynamicCSpaceOMPLSE2(world, robot_idx);
+      cspace->SetCSpaceInput(input);
+      cspace->Init();
+      cspace->initControlSpace();
+      return cspace;
+    }
+    virtual KinodynamicCSpaceOMPL* MakeKinodynamicCSpaceSO2( RobotWorld *world, int robot_idx){
+      KinodynamicCSpaceOMPL *cspace = new KinodynamicCSpaceOMPLSO2(world, robot_idx);
       cspace->SetCSpaceInput(input);
       cspace->Init();
       cspace->initControlSpace();

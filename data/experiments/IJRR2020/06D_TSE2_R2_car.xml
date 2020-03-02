@@ -7,7 +7,7 @@
   <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
   <robot name="disk_inner2" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
 
-  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="0 0 0" rotateRPY="0 0 0"/>
+  <!-- <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="0 0 0" rotateRPY="0 0 0"/> -->
   <plannerinput>
 
     <agent id="0" 
@@ -37,18 +37,19 @@
     <timestep min="0.01" max="0.1"/>
 
     <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
-    <epsilongoalregion>0.01</epsilongoalregion>
+    <epsilongoalregion>10.01</epsilongoalregion>
     <pathSpeed>10</pathSpeed>
 
     <algorithm dynamic="1" name="hierarchy:qrrt"/>
+    <algorithm dynamic="1" name="ompl:dynamic:sst"/>
 
     <multiAgent>1</multiAgent>
 
     <hierarchy>
-      <level>
-        <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/>
-        <!-- <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/> -->
-      </level>
+      <!-- <level> -->
+      <!--   <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/> -->
+      <!--   <1!-- <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/> --1> -->
+      <!-- </level> -->
       <level>
         <!-- <robot id="1" freeFloating="1" type="R2"/> -->
         <robot id="0" freeFloating="1" type="TSE2"/>

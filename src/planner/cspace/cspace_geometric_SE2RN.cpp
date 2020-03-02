@@ -1,6 +1,6 @@
 #include "planner/cspace/cspace_geometric_SE2RN.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
-#include "ompl/base/spaces/SE2StateSpaceFullInterpolate.h"
+#include <ompl/base/spaces/SE2StateSpace.h>
 
 GeometricCSpaceOMPLSE2RN::GeometricCSpaceOMPLSE2RN(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)
@@ -19,18 +19,18 @@ void GeometricCSpaceOMPLSE2RN::initSpace()
     throw "Invalid robot";
   }
 
-  ob::StateSpacePtr SE2(std::make_shared<ob::SE2StateSpaceFullInterpolate>());
-  ob::SE2StateSpaceFullInterpolate *cspaceSE2;
+  ob::StateSpacePtr SE2(std::make_shared<ob::SE2StateSpace>());
+  ob::SE2StateSpace *cspaceSE2;
   ob::RealVectorStateSpace *cspaceRN = nullptr;
 
   if(Nompl>0){
     ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(Nompl));
     this->space = SE2 + Rn;
-    cspaceSE2 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE2StateSpaceFullInterpolate>(0);
+    cspaceSE2 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE2StateSpace>(0);
     cspaceRN = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
   }else{
     this->space = SE2;
-    cspaceSE2 = this->space->as<ob::SE2StateSpaceFullInterpolate>();
+    cspaceSE2 = this->space->as<ob::SE2StateSpace>();
   }
 
   //###########################################################################
@@ -76,14 +76,14 @@ void GeometricCSpaceOMPLSE2RN::initSpace()
 
 void GeometricCSpaceOMPLSE2RN::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
-  ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2{nullptr};
+  ob::SE2StateSpace::StateType *qomplSE2{nullptr};
   ob::RealVectorStateSpace::StateType *qomplRnSpace{nullptr};
 
   if(Nompl>0){
-    qomplSE2 = qompl->as<ob::CompoundState>()->as<ob::SE2StateSpaceFullInterpolate::StateType>(0);
+    qomplSE2 = qompl->as<ob::CompoundState>()->as<ob::SE2StateSpace::StateType>(0);
     qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
   }else{
-    qomplSE2 = qompl->as<ob::SE2StateSpaceFullInterpolate::StateType>();
+    qomplSE2 = qompl->as<ob::SE2StateSpace::StateType>();
     qomplRnSpace = nullptr;
   }
   qomplSE2->setXY(q(0),q(1));
@@ -101,14 +101,14 @@ void GeometricCSpaceOMPLSE2RN::ConfigToOMPLState(const Config &q, ob::State *qom
 }
 
 Config GeometricCSpaceOMPLSE2RN::OMPLStateToConfig(const ob::State *qompl){
-  const ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2{nullptr};
+  const ob::SE2StateSpace::StateType *qomplSE2{nullptr};
   const ob::RealVectorStateSpace::StateType *qomplRnSpace{nullptr};
 
   if(Nompl>0){
-    qomplSE2 = qompl->as<ob::CompoundState>()->as<ob::SE2StateSpaceFullInterpolate::StateType>(0);
+    qomplSE2 = qompl->as<ob::CompoundState>()->as<ob::SE2StateSpace::StateType>(0);
     qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
   }else{
-    qomplSE2 = qompl->as<ob::SE2StateSpaceFullInterpolate::StateType>();
+    qomplSE2 = qompl->as<ob::SE2StateSpace::StateType>();
     qomplRnSpace = nullptr;
   }
 
@@ -134,13 +134,13 @@ void GeometricCSpaceOMPLSE2RN::print(std::ostream& out) const
     << GetDimensionality() << "[OMPL] and "
     << robot->q.size() << "[KLAMPT]" << std::endl;
 
-  ob::SE2StateSpaceFullInterpolate *cspaceSE2;
+  ob::SE2StateSpace *cspaceSE2;
   ob::RealVectorStateSpace *cspaceRN = nullptr;
   if(Nompl>0){
-    cspaceSE2 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE2StateSpaceFullInterpolate>(0);
+    cspaceSE2 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE2StateSpace>(0);
     cspaceRN = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
   }else{
-    cspaceSE2 = this->space->as<ob::SE2StateSpaceFullInterpolate>();
+    cspaceSE2 = this->space->as<ob::SE2StateSpace>();
   }
   const ob::RealVectorBounds bounds = cspaceSE2->getBounds();
   std::vector<double> min = bounds.low;
@@ -169,11 +169,11 @@ void GeometricCSpaceOMPLSE2RN::print(std::ostream& out) const
 
 Vector3 GeometricCSpaceOMPLSE2RN::getXYZ(const ob::State *s)
 {
-  const ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2{nullptr};
+  const ob::SE2StateSpace::StateType *qomplSE2{nullptr};
   if(Nompl>0){
-    qomplSE2 = s->as<ob::CompoundState>()->as<ob::SE2StateSpaceFullInterpolate::StateType>(0);
+    qomplSE2 = s->as<ob::CompoundState>()->as<ob::SE2StateSpace::StateType>(0);
   }else{
-    qomplSE2 = s->as<ob::SE2StateSpaceFullInterpolate::StateType>();
+    qomplSE2 = s->as<ob::SE2StateSpace::StateType>();
   }
   double x = qomplSE2->getX();
   double y = qomplSE2->getY();

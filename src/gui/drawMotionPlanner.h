@@ -23,6 +23,8 @@ namespace GLDraw {
   void drawGLPathKeyframes(Robot *robot, std::vector<uint> keyframe_indices, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor color = GLColor(0.8,0.8,0.8,1.0), double scale = 1.0);
 
   void drawRobotAtConfig(Robot *robot, const Config &q, GLColor color=GLColor(1,0,0), double scale = 1.0);
+  void drawRobotAtConfig(Robot *robot, const Config &q, const Config &dq, GLColor color=GLColor(1,0,0), double scale = 1.0);
+
   void drawRobotsAtConfig(std::vector<Robot*> robots, const Config &q, GLColor color=GLColor(1,0,0), double scale = 1.0);
   void drawAxesLabels(Camera::Viewport& viewport);
   void drawFrames(std::vector< std::vector<Vector3> > &frames, std::vector<double> frameLength);

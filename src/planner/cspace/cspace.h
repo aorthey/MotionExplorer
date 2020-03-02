@@ -33,19 +33,22 @@ class CSpaceOMPL
     void Init();
     virtual ob::SpaceInformationPtr SpaceInformationPtr();
 
+    //############################################################################
+    //Mapping Functions OMPL <--> KLAMPT
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) = 0;
     virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
 
     virtual void ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl);
     virtual ob::ScopedState<> ConfigVelocityToOMPLState(const Config &q, const Config &dq);
 
+    Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
+    ob::ScopedState<> ConfigToOMPLState(const Config &q);
+    //############################################################################
+
     virtual double GetTime(const ob::State *qompl);
     virtual bool isTimeDependent();
     virtual bool SatisfiesBounds(const ob::State*);
     virtual bool UpdateRobotConfig(Config &q);
-
-    Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
-    ob::ScopedState<> ConfigToOMPLState(const Config &q);
 
     virtual void setStateValidityCheckerConstraintRelaxation(ob::State *xCenter, double r);
     const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
@@ -67,6 +70,7 @@ class CSpaceOMPL
     const oc::ControlSpacePtr ControlSpacePtr();
 
     virtual void drawConfig(const Config &q, GLDraw::GLColor color=GLDraw::GLColor(1,0,0), double scale = 1.0);
+    virtual void drawConfig(const Config &q, const Config &dq, GLDraw::GLColor color=GLDraw::GLColor(1,0,0));
     virtual void DrawGL(GUIState& state);
 
     std::vector<double> EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
@@ -84,6 +88,7 @@ class CSpaceOMPL
 
     virtual bool isMultiAgent() const;
 
+    virtual Config ControlToConfig(const double*);
   protected:
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
     virtual void initSpace() = 0;
@@ -95,15 +100,15 @@ class CSpaceOMPL
     bool fixedBase{false};
     bool enableSufficiency{false};
 
-    //klampt:
+    //KLAMPT (regardless of fixedbase, freefloating, dynamic)
     // SE(3) x R^Nklampt
     //
-    //ompl:
-    // SE(3) x R^Nompl
+    //OMPL:
+    // space with Nompl dimensions
     //
-    // ompl_to_klampt: maps a dimension in R^Nompl to SE(3)xR^Nklampt
-    // klampt_to_ompl: maps a dimension in SE(3)xR^Nklampt to R^Nompl
-    // Note that Nompl <= Nklampt, i.e. all the zero-measure dimensions if any are collapsed
+    // ompl_to_klampt: maps a dimension in OMPL space to SE(3)xR^Nklampt
+    // klampt_to_ompl: maps a dimension in SE(3)xR^Nklampt to OMPL space
+    // Note that in general Nompl <= Nklampt (all zero-measure dimensions are collapsed)
     std::vector<int> ompl_to_klampt;
     std::vector<int> klampt_to_ompl;
 

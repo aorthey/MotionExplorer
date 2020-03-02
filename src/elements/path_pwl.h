@@ -35,7 +35,6 @@ class PathPiecewiseLinear
     Vector EvalVelocityVec3(const double t) const;
     Vector3 EvalVec3(const double t) const;
     Vector3 EvalVec3(const double t, int ridx) const;
-    Config EvalMilestone(const int k) const;
 
     void Normalize(); // convert path length [0,L] -> [0,1]
     void Smooth(bool forceSmoothing=false);
@@ -74,6 +73,7 @@ class PathPiecewiseLinear
   protected:
     double length{0};
     std::vector<double> interLength;//interLength(i) length towards next milestone point from q(i)
+
     bool isSmooth{false};
     Vector3 Vector3FromState(ob::State *s);
     Vector3 Vector3FromState(ob::State *s, int ridx);

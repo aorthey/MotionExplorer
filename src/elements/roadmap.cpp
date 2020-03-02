@@ -58,23 +58,18 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
       path_ompl = new PathPiecewiseLinear(pd->path_, cspace, quotient_space);
     }else{
 
+      std::cout << "Computing Shortest path" << std::endl;
+
       LemonInterface lemon(pd);
       std::vector<Vertex> pred = lemon.GetShortestPath();
 
       ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
-// <<<<<<< HEAD
-
-//       if(quotient_space->isDynamic()){
-//         OMPL_WARN("Dynamic cspace, but geometric path.");
-// =======
-      // og::PathGeometric *gpath = new og::PathGeometric(quotient_space->SpaceInformationPtr()); 
       ob::PathPtr path;
       if(quotient_space->isDynamic()){
         path = std::make_shared<oc::PathControl>(quotient_space->SpaceInformationPtr()); 
       }else{
         path = std::make_shared<og::PathGeometric>(quotient_space->SpaceInformationPtr()); 
-// >>>>>>> master
       }
 
       shortest_path.clear();
@@ -99,19 +94,12 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
         shortest_path.push_back(q);
       }
       if(pred.size()>0){
-// <<<<<<< HEAD
-        // gpath->interpolate();
-        // ob::PathPtr path_ompl_ptr(gpath);
-        // path_ompl = new PathPiecewiseLinear(path_ompl_ptr, cspace, quotient_space);
-        // return path_ompl;
-// =======
         if(quotient_space->isDynamic()){
           static_pointer_cast<oc::PathControl>(path)->interpolate();
         }else{
           static_pointer_cast<og::PathGeometric>(path)->interpolate();
         }
         path_ompl = new PathPiecewiseLinear(path, cspace, quotient_space);
-// >>>>>>> master
       }
       return nullptr;
     }

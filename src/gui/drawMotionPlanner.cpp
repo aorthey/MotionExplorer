@@ -212,6 +212,9 @@ namespace GLDraw{
       ctr += N;
     }
   }
+  void drawRobotAtConfig(Robot *robot, const Config &q, const Config &dq, GLColor color, double scale){
+    drawRobotAtConfig(robot, q, color, scale);
+  }
   void drawRobotAtConfig(Robot *robot, const Config &q, GLColor color, double scale){
     glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);

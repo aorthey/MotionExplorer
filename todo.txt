@@ -661,49 +661,14 @@ externally? That is not their responsibility and could lead to mistakes)
 [ ] Path Equivalence in Car scenario is screwed up
 [ ] In car scenario, Hierarchy visualizer shows only one found path, but 5 were found. This is
 contrary to manip scenario!?
-
 [ ] differentiate between solutions on S1R1 (if starting on that level). Problem
 would disappear if S1 would be the uppermost level.
+[ ] Remove lemon (requires complete rewrite of local minima tree)
 
-[ ] QMP to OMPL
-[ ] QMP* to OMPL
-[ ] QRRT* to OMPL
-[ ] Remove lemon
-[ ] Rewrite to use Hierarchical PD
-
-MultiAgent
-[x] Fix SE2RN (i.e. implement other cspaces than RN)
-[x] Fix StateValidityChecker (robot-robot collision checker doesnt work)
-[x] blender opening for drones
-[x] blender label disks (0..9  I..X  A..Z). Stamp them out from some plane in blender.
-[x] **Add simplifications
-[x] **implement MergeStates (MAMP)
-[x] **implement ProjectQ0 (MAMP)
-[x] **Fix empty-set projection
-[x] Environment: Drone Permutation Dome (Pipe through which only one drone can
-move)
-[x] Fix visualization of multiagent quotient-space before planning (wrong
-projection of qinit)
-[x] Fix starting values for simplifications
-[ ] (Low Priority, is too obfuscated anyway) Fix Roadmap (i.e. show the right vertices and edges)
-[ ] Environment: Dome with 10s of Drones. Teamleader approach. K-labeled Drone
- coordination
-[ ] Identity space check validity twice! (how to differentiate between
-constraint relaxation and copy reduction?)
-[ ] Add gradient color to path to visualize who goes first / Visualize over/under of paths
-[ ] Add kinodynamic examples
-
-FiniteMorseTheory
-[x] Decompose fiber bundle into subfibers
-[ ] make PathVisibilityChecker one of many / exchangable
-
-[ ] Make Dynamical Systems work inside QRRT (or use Decorator Pattern on
+EXPLORER
+[x] Make Dynamical Systems work inside QRRT (or use Decorator Pattern on
 BundleSpace?)
-
-[ ] SE3->R3 (drone)
-[ ] SE3RN->SE3->R3 (drone with manip)
-[ ] RN->RM (manipulator, shadow hand)
-
+[ ] make PathVisibilityChecker one of many / exchangable
 [ ] Fix PathControl issue in explorer (probably caused by casting everything
 into recursive tree structure -- which does not support control, or copies it in
 the wrong way)

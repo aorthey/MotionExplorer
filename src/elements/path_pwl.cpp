@@ -51,20 +51,35 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
       }
 
     }else{
+      KinodynamicCSpaceOMPL *kspace = static_cast<KinodynamicCSpaceOMPL*>(quotient_space);
       oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
       std::vector<ob::State *> states = cpath.getStates();
 
       uint Nstates = std::max(0,(int)states.size()-1);
+      ob::State *x0prime = kspace->SpaceInformationPtr()->allocState();
+      ob::State *x1prime = kspace->SpaceInformationPtr()->allocState();
+
       for(uint k = 0; k < Nstates; k++){
         ob::State *s0 = states.at(k);
         ob::State *s1 = states.at(k+1);
-        double d = cpath.getSpaceInformation()->distance(s0,s1);
+
+        Config v0 = kspace->OMPLStateToVelocity(s0);
+        Config v1 = kspace->OMPLStateToVelocity(s1);
+
+        Config x0 = kspace->OMPLStateToConfig(s0);
+        Config x1 = kspace->OMPLStateToConfig(s1);
+
+        Config zeroVel(v0); zeroVel.setZero();
+        kspace->ConfigVelocityToOMPLState(x0, zeroVel, x0prime);
+        kspace->ConfigVelocityToOMPLState(x1, zeroVel, x1prime);
+        double d = cpath.getSpaceInformation()->distance(x0prime, x1prime);
         interLength.push_back(d);
         length+=d;
       }
     }
   }
 }
+
 ob::PathPtr PathPiecewiseLinear::GetOMPLPath() const
 {
   return path;
@@ -179,14 +194,6 @@ Vector3 PathPiecewiseLinear::EvalVec3(const double t) const{
   return v;
 }
 
-Config PathPiecewiseLinear::EvalMilestone(const int k) const{
-  OMPL_ERROR("NYI");
-  throw "NYI";
-  //if(k<0) return keyframes.front();
-  //if(k>Nkeyframes) return keyframes.back();
-  //return keyframes.at(k);
-}
-
 Config PathPiecewiseLinear::EvalStates(std::vector<ob::State*> states, const double t) const{
   ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
@@ -231,11 +238,10 @@ Config PathPiecewiseLinear::EvalStates(std::vector<ob::State*> states, const dou
   if(t>=Tcum){
     return quotient_space->OMPLStateToConfig(states.back());
   }
-
   std::cout << "Eval could not find point for value " << t << std::endl;
   throw;
-
 }
+
 Config PathPiecewiseLinear::Eval(const double t) const{
   if(!path){
     std::cout << "Cannot Eval empty path" << std::endl;
@@ -249,11 +255,10 @@ Config PathPiecewiseLinear::Eval(const double t) const{
   }else{
     og::PathGeometric *gpath = static_cast<og::PathGeometric*>(path.get());
     states = gpath->getStates();
-    // return EvalStates(states, t);
   }
   return EvalStates(states, t);
-
 }
+
 Config PathPiecewiseLinear::EvalVelocity(const double t) const{
   if(!quotient_space->isDynamic()) 
   {
@@ -710,8 +715,8 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
   glEnable(GL_LINE_SMOOTH);
   glDisable(GL_CULL_FACE);
   cLine.setCurrentGL();
-
   //############################################################################
+
   DrawGLRibbon(states);
 
   if(drawSweptVolume && state("draw_path_sweptvolume")){
@@ -738,8 +743,14 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
 
 void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
 {
-  Config q = Eval(t);
-  quotient_space->drawConfig(q, cRobotVolume);
+  if(quotient_space->isDynamic()){
+    Config q = Eval(t);
+    Config dq = EvalVelocity(t);
+    quotient_space->drawConfig(q, dq, cRobotVolume);
+  }else{
+    Config q = Eval(t);
+    quotient_space->drawConfig(q, cRobotVolume);
+  }
 }
 
 void PathPiecewiseLinear::DrawGL(GUIState& state)

@@ -108,6 +108,8 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
         // std::string str_dimension = type.substr(3);
         // int N = boost::lexical_cast<int>(str_dimension);
         cspace_level = factory.MakeGeometricCSpaceSO2RN(world, robot_idx);
+      }else if(type=="TS1"){
+        cspace_level = factory.MakeKinodynamicCSpaceSO2(world, robot_idx);
       }else{
         std::cout << type.substr(0) << std::endl;
         std::cout << "fixed robots needs to have configuration space RN or SN, but has " << type << std::endl;

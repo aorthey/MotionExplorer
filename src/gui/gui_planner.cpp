@@ -173,11 +173,6 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="load_current_path"){
     // MotionPlanner* planner = planners.at(active_planner); // std::string fn = planner->GetInput().name_loadPath;
     // std::cout << "Try to load path current path from : " << fn << std::endl;
-    // path = planner->GetPath();
-    // // if(!path)
-    // // {
-    // //   path = new PathPiecewiseLinear();
-    // // }
     // {
     //   path->Load(fn.c_str());
     //   std::cout << "load current path from : " << fn << std::endl;

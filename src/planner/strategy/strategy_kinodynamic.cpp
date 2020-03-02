@@ -108,20 +108,6 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
 
     ob::ScopedState<> startk(sik);
     ob::ScopedState<> goalk(sik);
-    // if(dynamic){
-
-    //   KinodynamicCSpaceOMPL* cspace_dynamic = dynamic_cast<KinodynamicCSpaceOMPL*>(cspace_levelk);
-
-    //   if(cspace_dynamic==nullptr)
-    //   {
-    //     std::cout << std::string(80, '-') << std::endl;
-    //     OMPL_ERROR("ERROR: not dynamic but declared dynamic.");
-    //     std::cout << std::string(80, '-') << std::endl;
-    //     std::cout << *cspace_levelk << std::endl;
-    //     throw "Not dynamic.";
-    //   }
-
-    // }
 
     std::cout << input.q_init << std::endl;
     std::cout << input.dq_init << std::endl;
