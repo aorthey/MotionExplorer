@@ -264,7 +264,8 @@ void KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q, ob::State *qompl)
   }
 }
 
-Config KinodynamicCSpaceOMPL::OMPLStateToVelocity(const ob::State *qompl){
+Config KinodynamicCSpaceOMPL::OMPLStateToVelocity(const ob::State *qompl)
+{
   const ob::RealVectorStateSpace::StateType *qomplTMState;
   if(Nompl>0){
     qomplTMState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
@@ -285,7 +286,8 @@ Config KinodynamicCSpaceOMPL::OMPLStateToVelocity(const ob::State *qompl){
   return dq;
 }
 
-Config KinodynamicCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
+Config KinodynamicCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl)
+{
   if(Nompl>0){
     const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
     const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
@@ -303,7 +305,8 @@ const oc::StatePropagatorPtr KinodynamicCSpaceOMPL::StatePropagatorPtr(oc::Space
 }
 
 //#############################################################################
-ob::SpaceInformationPtr KinodynamicCSpaceOMPL::SpaceInformationPtr(){
+ob::SpaceInformationPtr KinodynamicCSpaceOMPL::SpaceInformationPtr()
+{
   if(!si){
     si = std::make_shared<oc::SpaceInformation>(SpacePtr(), ControlSpacePtr());
 

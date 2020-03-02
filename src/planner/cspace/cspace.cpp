@@ -87,6 +87,12 @@ void CSpaceOMPL::ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob
 }
 
 
+Config CSpaceOMPL::OMPLStateToVelocity(const ob::State *)
+{
+  Config dq; dq.resize(GetKlamptDimensionality()); dq.setZero();
+  return dq;
+}
+
 Config CSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
   const ob::State* s = qompl.get();
   return OMPLStateToConfig(s);

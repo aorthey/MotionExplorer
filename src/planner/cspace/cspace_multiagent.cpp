@@ -286,6 +286,27 @@ void CSpaceOMPLMultiAgent::ConfigToOMPLState(const Config &q, ob::State *qompl)
   }
 }
 
+Config CSpaceOMPLMultiAgent::OMPLStateToVelocity(const ob::State *qompl, int agent)
+{
+  const ob::State *qomplAgent = static_cast<const ob::CompoundState*>(qompl)->as<ob::State>(agent);
+  Config dqk = cspaces_.at(agent)->OMPLStateToVelocity(qomplAgent);
+  return dqk;
+}
+
+Config CSpaceOMPLMultiAgent::OMPLStateToVelocity(const ob::State *qompl)
+{
+  int ctr = 0;
+  Config dq; dq.resize(Nklampt);
+  for(uint k = 0; k < cspaces_.size(); k++){
+    Config dqk = OMPLStateToVelocity(qompl, k);
+    for(int j = 0; j < dqk.size(); j++){
+      dq[j+ctr] = dqk[j];
+    }
+    ctr += dqk.size();
+  }
+  return dq;
+}
+
 Config CSpaceOMPLMultiAgent::OMPLStateToConfig(const ob::State *qompl, int agent)
 {
   const ob::State *qomplAgent = static_cast<const ob::CompoundState*>(qompl)->as<ob::State>(agent);

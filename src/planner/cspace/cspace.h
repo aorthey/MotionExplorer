@@ -36,10 +36,11 @@ class CSpaceOMPL
     //############################################################################
     //Mapping Functions OMPL <--> KLAMPT
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) = 0;
-    virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
-
     virtual void ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl);
     virtual ob::ScopedState<> ConfigVelocityToOMPLState(const Config &q, const Config &dq);
+
+    virtual Config OMPLStateToConfig(const ob::State *qompl) = 0;
+    virtual Config OMPLStateToVelocity(const ob::State *qompl);
 
     Config OMPLStateToConfig(const ob::ScopedState<> &qompl);
     ob::ScopedState<> ConfigToOMPLState(const Config &q);

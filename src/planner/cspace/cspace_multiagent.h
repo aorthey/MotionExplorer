@@ -23,6 +23,8 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
 
     virtual Config OMPLStateToConfig(const ob::State *qompl) override;
     Config OMPLStateToConfig(const ob::State *qompl, int subspace);
+    virtual Config OMPLStateToVelocity(const ob::State *qompl) override;
+    Config OMPLStateToVelocity(const ob::State *qompl, int subspace);
 
     virtual uint GetKlamptDimensionality() const override;
     std::vector<int> GetKlamptDimensionalities() const;

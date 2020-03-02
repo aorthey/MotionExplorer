@@ -46,10 +46,13 @@ uint Roadmap::numVertices()
   return pd->numVertices();
 }
 
-void Roadmap::SetShortestPathOMPL(ob::PathPtr& path_ompl_ptr){
+void Roadmap::SetShortestPathOMPL(ob::PathPtr& path_ompl_ptr)
+{
   path_ompl = new PathPiecewiseLinear(path_ompl_ptr, cspace, quotient_space);
 }
-PathPiecewiseLinear* Roadmap::GetShortestPath(){
+
+PathPiecewiseLinear* Roadmap::GetShortestPath()
+{
   if(path_ompl==nullptr)
   {
     if(pd==nullptr) return nullptr;
@@ -57,8 +60,6 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
     if(pd->path_){
       path_ompl = new PathPiecewiseLinear(pd->path_, cspace, quotient_space);
     }else{
-
-      std::cout << "Computing Shortest path" << std::endl;
 
       LemonInterface lemon(pd);
       std::vector<Vertex> pred = lemon.GetShortestPath();
@@ -93,15 +94,17 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
         if(draw_planar) q[2] = 0.0;
         shortest_path.push_back(q);
       }
+
       if(pred.size()>0){
         if(quotient_space->isDynamic()){
-          static_pointer_cast<oc::PathControl>(path)->interpolate();
+          // static_pointer_cast<oc::PathControl>(path)->interpolate();
+          oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+          std::vector<ob::State *> states = cpath.getStates();
         }else{
           static_pointer_cast<og::PathGeometric>(path)->interpolate();
         }
         path_ompl = new PathPiecewiseLinear(path, cspace, quotient_space);
       }
-      return nullptr;
     }
 
   }

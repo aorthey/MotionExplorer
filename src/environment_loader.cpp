@@ -227,7 +227,6 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
   }
 
   _backend->wrenchfield.Load(file_name.c_str());
-  //std::cout << _backend->wrenchfield << std::endl;
 }
 
 void EnvironmentLoader::LoadController(Robot *robot, const PlannerInput &pin)

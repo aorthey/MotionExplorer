@@ -49,29 +49,28 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
         ob::State *s1 = states.at(k+1);
         interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
       }
-
     }else{
-      KinodynamicCSpaceOMPL *kspace = static_cast<KinodynamicCSpaceOMPL*>(quotient_space);
+
       oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
       std::vector<ob::State *> states = cpath.getStates();
 
       uint Nstates = std::max(0,(int)states.size()-1);
-      ob::State *x0prime = kspace->SpaceInformationPtr()->allocState();
-      ob::State *x1prime = kspace->SpaceInformationPtr()->allocState();
+      ob::State *x0prime = quotient_space->SpaceInformationPtr()->allocState();
+      ob::State *x1prime = quotient_space->SpaceInformationPtr()->allocState();
 
       for(uint k = 0; k < Nstates; k++){
         ob::State *s0 = states.at(k);
         ob::State *s1 = states.at(k+1);
 
-        Config v0 = kspace->OMPLStateToVelocity(s0);
-        Config v1 = kspace->OMPLStateToVelocity(s1);
+        Config v0 = quotient_space->OMPLStateToVelocity(s0);
+        Config v1 = quotient_space->OMPLStateToVelocity(s1);
 
-        Config x0 = kspace->OMPLStateToConfig(s0);
-        Config x1 = kspace->OMPLStateToConfig(s1);
+        Config x0 = quotient_space->OMPLStateToConfig(s0);
+        Config x1 = quotient_space->OMPLStateToConfig(s1);
 
         Config zeroVel(v0); zeroVel.setZero();
-        kspace->ConfigVelocityToOMPLState(x0, zeroVel, x0prime);
-        kspace->ConfigVelocityToOMPLState(x1, zeroVel, x1prime);
+        quotient_space->ConfigVelocityToOMPLState(x0, zeroVel, x0prime);
+        quotient_space->ConfigVelocityToOMPLState(x1, zeroVel, x1prime);
         double d = cpath.getSpaceInformation()->distance(x0prime, x1prime);
         interLength.push_back(d);
         length+=d;
@@ -269,18 +268,16 @@ Config PathPiecewiseLinear::EvalVelocity(const double t) const{
     // return dq;
   }
 
-  KinodynamicCSpaceOMPL *kspace = static_cast<KinodynamicCSpaceOMPL*>(quotient_space);
-
   oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
   std::vector<ob::State *> states = cpath.getStates();
 
   ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
   if(t<=0){
-    return kspace->OMPLStateToVelocity(states.front());
+    return quotient_space->OMPLStateToVelocity(states.front());
   }
   if(t>=length){
-    return kspace->OMPLStateToVelocity(states.back());
+    return quotient_space->OMPLStateToVelocity(states.back());
   }
 
   double Tcum = 0;
@@ -296,7 +293,7 @@ Config PathPiecewiseLinear::EvalVelocity(const double t) const{
       ob::State* s2 = states.at(i+1);
       ob::State* sm = si->allocState();
       si->getStateSpace()->interpolate(s1,s2,tloc,sm);
-      Config q = kspace->OMPLStateToVelocity(sm);
+      Config q = quotient_space->OMPLStateToVelocity(sm);
       si->freeState(sm);
       return q;
     }
@@ -314,7 +311,7 @@ Config PathPiecewiseLinear::EvalVelocity(const double t) const{
   }
 
   if(t>=Tcum){
-    return kspace->OMPLStateToVelocity(states.back());
+    return quotient_space->OMPLStateToVelocity(states.back());
   }
 
   std::cout << "Eval could not find point for value " << t << std::endl;
@@ -690,8 +687,8 @@ std::vector<double> PathPiecewiseLinear::GetHighCurvatureConfigurations()
     return pathPts;
 }
 
-void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
-
+void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path)
+{
   std::vector<ob::State *> states;
   if(quotient_space->isDynamic()){
     oc::PathControl *cpath = static_cast<oc::PathControl*>(_path.get());
@@ -743,14 +740,16 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
 
 void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
 {
-  if(quotient_space->isDynamic()){
-    Config q = Eval(t);
-    Config dq = EvalVelocity(t);
-    quotient_space->drawConfig(q, dq, cRobotVolume);
-  }else{
-    Config q = Eval(t);
-    quotient_space->drawConfig(q, cRobotVolume);
-  }
+  Config q = Eval(t);
+  quotient_space->drawConfig(q, cRobotVolume);
+  // if(quotient_space->isDynamic()){
+  //   Config q = Eval(t);
+  //   Config dq = EvalVelocity(t);
+  //   quotient_space->drawConfig(q, dq, cRobotVolume);
+  // }else{
+    // Config q = Eval(t);
+    // quotient_space->drawConfig(q, cRobotVolume);
+  // }
 }
 
 void PathPiecewiseLinear::DrawGL(GUIState& state)
