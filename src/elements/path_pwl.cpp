@@ -140,6 +140,8 @@ void PathPiecewiseLinear::Smooth(bool forceSmoothing){
     shortcutter.simplifyMax(gpath);
     shortcutter.smoothBSpline(gpath);
 
+    gpath.interpolate();
+
     length = gpath.length();
     std::vector<ob::State *> states = gpath.getStates();
 
