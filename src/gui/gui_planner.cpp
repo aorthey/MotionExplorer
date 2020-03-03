@@ -124,13 +124,14 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
       SendPauseIdle();
     }
   }else if(cmd=="simulate_controller"){
+    last_command = "Execute";
     //get controls
     MotionPlanner* planner = planners.at(active_planner);
     path = planner->GetPath();
     if(path){
-      SmartPointer<RobotController> ctrl = sim.robotControllers[0];
+      controller_ = sim.robotControllers[0];
 
-      path->SendToController(ctrl);
+      path->SendToController(controller_);
 
       Config q = path->Eval(0);
       Config dq = path->EvalVelocity(0);
@@ -150,9 +151,20 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
       robot->UpdateDynamics();
 
       //activate simulation
-      state("simulate").toggle();
-      simulate = state("simulate").active;
-      if(simulate) state("draw_robot").activate();
+      // if(state("simulate") != state("draw_play_path")){
+      //   state("simulate").toggle();
+      // }
+
+      state("draw_play_path").activate();
+      state("simulate").activate();
+      state("draw_robot").activate();
+
+      if(state("draw_play_path")){
+        SendPauseIdle(0);
+      }else{
+        SendPauseIdle();
+      }
+      // t=0;
     }else{
       std::cout << "no active control path" << std::endl;
     }
@@ -248,8 +260,6 @@ bool PlannerBackend::OnIdle(){
       }
     }
     return true;
-  }
-  if(state("simulate_controller")){
   }
   return res;
 
@@ -347,13 +357,19 @@ void PlannerBackend::RenderWorld(){
         path = planner->GetPath();
         if(!path){
           std::cout << "No path available." << std::endl;
-        }else{
-          //std::cout << *path << std::endl;
         }
       }
     }
     if(t>0 && path){
-      path->DrawGL(state, t);
+      // path->DrawGL(state, t);
+      // controller_->nominalTimeStep  = 0.05;
+      controller_->Update(t);
+      Config q, qdes;
+      controller_->GetSensedConfig(q);
+      controller_->GetCommandedConfig(qdes);
+
+      std::cout << controller_->time << " : " << q << " (" << qdes << ")" << std::endl;
+      path->GetSpace()->drawConfig(q);
     }
   }
   //if(planner->GetInput().kinodynamic){

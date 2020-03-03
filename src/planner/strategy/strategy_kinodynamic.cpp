@@ -192,7 +192,7 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
 }
 void StrategyKinodynamicMultiLevel::Clear()
 {
-  planner->clear();
+  if(planner != nullptr) planner->clear();
 }
 void StrategyKinodynamicMultiLevel::Step(StrategyOutput &output)
 {

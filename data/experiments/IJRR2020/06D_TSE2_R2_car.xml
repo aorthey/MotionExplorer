@@ -37,7 +37,7 @@
     <timestep min="0.01" max="0.1"/>
 
     <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
-    <epsilongoalregion>0.1</epsilongoalregion>
+    <epsilongoalregion>1</epsilongoalregion>
     <pathSpeed>10</pathSpeed>
 
     <algorithm dynamic="1" name="hierarchy:qrrt"/>

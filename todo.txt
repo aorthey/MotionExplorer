@@ -672,3 +672,12 @@ BundleSpace?)
 [ ] Fix PathControl issue in explorer (probably caused by casting everything
 into recursive tree structure -- which does not support control, or copies it in
 the wrong way)
+[ ] Multi minima RRT
+NONHOLONOMIC CONSTRAINTS
+[ ] Pendulum in G field
+
+
+
+
+[ ] Update Klampt to newest version
+[ ] Make Klampt/OMPL Submodules

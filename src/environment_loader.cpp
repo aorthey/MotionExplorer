@@ -63,11 +63,10 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
   //################################################################################
   //################################################################################
 
-    std::cout << name_robot << std::endl;
-    if(!(world.robots[0]->joints[0].type == RobotJoint::Floating)){
-      std::cout << "First joint of robot should be a free floating joint" << std::endl;
-      std::cout << "But actual type is: " << world.robots[0]->joints[0].type << std::endl;
-    }
+    // if(!(world.robots[0]->joints[0].type == RobotJoint::Floating)){
+    //   std::cout << "First joint of robot should be a free floating joint" << std::endl;
+    //   std::cout << "But actual type is: " << world.robots[0]->joints[0].type << std::endl;
+    // }
 
     if(pin.Load(file_name.c_str())){
 
@@ -127,7 +126,6 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
             }
           }//for layers
         }//for stratifications
-
       }//for inputs
 
       PlannerInput *pkin = pin.inputs.at(0);
@@ -231,7 +229,6 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 
 void EnvironmentLoader::LoadController(Robot *robot, const PlannerInput &pin)
 {
-  std::cout << "Adding free float driver to robot " << name_robot << std::endl;
   vector<string>* driverNames = &robot->driverNames;
   vector<RobotJointDriver>* drivers = &robot->drivers;
 

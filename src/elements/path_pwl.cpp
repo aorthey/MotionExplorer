@@ -35,10 +35,13 @@ void PathPiecewiseLinear::SetDefaultPath()
 PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CSpaceOMPL *quotient_space_):
   cspace(cspace_), quotient_space(quotient_space_), path(p_), path_raw(p_)
 {
-  if(p_ == nullptr){
+  if(p_ == nullptr)
+  {
     SetDefaultPath();
   }else{
+
     if(!quotient_space->isDynamic()){
+
       og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
       length = gpath.length();
       std::vector<ob::State *> states = gpath.getStates();
@@ -49,6 +52,7 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
         ob::State *s1 = states.at(k+1);
         interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
       }
+
     }else{
 
       oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
@@ -71,6 +75,7 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
         Config zeroVel(v0); zeroVel.setZero();
         quotient_space->ConfigVelocityToOMPLState(x0, zeroVel, x0prime);
         quotient_space->ConfigVelocityToOMPLState(x1, zeroVel, x1prime);
+
         double d = cpath.getSpaceInformation()->distance(x0prime, x1prime);
         interLength.push_back(d);
         length+=d;
@@ -91,24 +96,38 @@ void PathPiecewiseLinear::SendToController(SmartPointer<RobotController> control
     return;
   }
 
+  std::cout << "SENDING CONTROLS" << std::endl;
   std::vector<string> cmds = controller->Commands();
   for(uint k = 0; k < cmds.size(); k++){
     std::cout << cmds.at(k) << std::endl;
   }
-  oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
-  
-  std::vector<oc::Control*> controls = cpath.getControls();
 
-  uint N = quotient_space->GetControlDimensionality();
-  for(uint k = 0; k < controls.size(); k++){
-    const oc::RealVectorControlSpace::ControlType *Rctrl = controls.at(k)->as<oc::RealVectorControlSpace::ControlType>();
-    stringstream qstr;
+  oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+  std::vector<ob::State*> states = cpath.getStates();
+
+  
+  // std::vector<oc::Control*> controls = cpath.getControls();
+  uint N = quotient_space->GetKlamptDimensionality();
+  for(uint k = 0; k < states.size(); k++){
+    ob::State *sk = states.at(k);
+    Config qk = quotient_space->OMPLStateToConfig(sk);
+    Config dqk = quotient_space->OMPLStateToVelocity(sk);
+
+    // std::string sq;
+    stringstream qstr, dqstr;
     qstr << N << "  ";
+    dqstr << N << "  ";
     for(uint i = 0; i < N; i++){
-      qstr<< Rctrl->values[i] << " ";
+      qstr<< qk[i] << " ";
+      dqstr<< dqk[i] << " ";
     }
-    string cmd( (k<=0)?("set_torque_control"):("append_torque_control") );
-    if(!controller->SendCommand(cmd,qstr.str())) {
+
+    std::cout << qstr.str() << ":::" << dqstr.str() << std::endl;
+    string cmd( (k<=0)?("set_q"):("append_q") );
+    // string dcmd( (k<=0)?("set_qv"):("append_qv") );
+
+    if(!controller->SendCommand(cmd, qstr.str()))
+    {
       std::cout << std::string(80, '-') << std::endl;
       std::cout << "ERROR in controller commander" << std::endl;
       std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
@@ -116,6 +135,30 @@ void PathPiecewiseLinear::SendToController(SmartPointer<RobotController> control
       throw "Controller command not supported!";
     }
   }
+
+
+
+  // oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+  
+  // std::vector<oc::Control*> controls = cpath.getControls();
+
+  // uint N = quotient_space->GetControlDimensionality();
+  // for(uint k = 0; k < controls.size(); k++){
+  //   const oc::RealVectorControlSpace::ControlType *Rctrl = controls.at(k)->as<oc::RealVectorControlSpace::ControlType>();
+  //   stringstream qstr;
+  //   qstr << N << "  ";
+  //   for(uint i = 0; i < N; i++){
+  //     qstr<< Rctrl->values[i] << " ";
+  //   }
+  //   string cmd( (k<=0)?("set_torque_control"):("append_torque_control") );
+  //   if(!controller->SendCommand(cmd,qstr.str())) {
+  //     std::cout << std::string(80, '-') << std::endl;
+  //     std::cout << "ERROR in controller commander" << std::endl;
+  //     std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
+  //     std::cout << std::string(80, '-') << std::endl;
+  //     throw "Controller command not supported!";
+  //   }
+  // }
 
 }
 
@@ -740,6 +783,10 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path)
 
 }
 
+CSpaceOMPL* PathPiecewiseLinear::GetSpace() const
+{
+  return quotient_space;
+}
 void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
 {
   Config q = Eval(t);

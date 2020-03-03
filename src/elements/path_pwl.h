@@ -36,6 +36,8 @@ class PathPiecewiseLinear
     Vector3 EvalVec3(const double t) const;
     Vector3 EvalVec3(const double t, int ridx) const;
 
+    CSpaceOMPL *GetSpace() const;
+
     void Normalize(); // convert path length [0,L] -> [0,1]
     void Smooth(bool forceSmoothing=false);
 

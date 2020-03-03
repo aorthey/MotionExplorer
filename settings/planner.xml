@@ -14,6 +14,7 @@
   <!-- <algorithm name="hierarchy:qmpstar"/> -->
   <algorithm name="hierarchy:qrrt"/>
   <algorithm name="hierarchy:qrrtstar"/>
+  <algorithm name="hierarchy:qmp"/>
   <!-- <algorithm name="hierarchy:spqr"/> -->
   <algorithm name="ompl:rrt"/>
   <algorithm name="ompl:rrtstar"/>

@@ -17,6 +17,8 @@ class PlannerBackend : public ForceFieldBackend
 
     PathPiecewiseLinear *path;
 
+    SmartPointer<RobotController> controller_;
+
   public:
 
     PlannerBackend(RobotWorld *world);

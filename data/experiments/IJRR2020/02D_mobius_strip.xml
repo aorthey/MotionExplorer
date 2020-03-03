@@ -18,8 +18,8 @@
     <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
     <pathWidth>0.03</pathWidth>
 
+    <!-- <algorithm name="hierarchy:qmp"/> -->
     <!-- <algorithm name="hierarchy:qrrt"/> -->
-    <!-- <algorithm name="hierarchy:qmpstar"/> -->
     <!-- <algorithm name="ompl:rrtstar"/> -->
     <!-- <algorithm name="ompl:prm"/> -->
     <!-- <algorithm name="ompl:prm"/> -->

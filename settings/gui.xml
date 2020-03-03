@@ -85,10 +85,10 @@
     <descr>Simulate</descr>
     <key>s</key>
   </hotkey>
-  <!-- <hotkey> -->
-  <!--   <name>simulate_controller</name> -->
-  <!--   <key>C</key> -->
-  <!-- </hotkey> -->
+  <hotkey>
+    <name>simulate_controller</name>
+    <key>c</key>
+  </hotkey>
 
   <hotkey>
     <name>planner_step</name>
