@@ -21,8 +21,6 @@ void GeometricCSpaceOMPLMobius::initSpace()
     R1->as<ob::RealVectorStateSpace>()->setBounds(-intervalMax, +intervalMax);
 
     space = SO2 + R1;
-
-    // space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1)
 }
 
 void GeometricCSpaceOMPLMobius::print(std::ostream& out) const
@@ -38,8 +36,6 @@ void GeometricCSpaceOMPLMobius::DrawGL(GUIState& state)
 {
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND);
-  // glEnable(GL_LINE_SMOOTH);
-  // glDisable(GL_CULL_FACE);
 
   GLDraw::setColor(black);
   glLineWidth(3);
@@ -70,8 +66,6 @@ void GeometricCSpaceOMPLMobius::DrawGL(GUIState& state)
   }
   glEnd();
 
-  // glEnable(GL_CULL_FACE);
-  // glDisable(GL_LINE_SMOOTH);
   glDisable(GL_BLEND);
   glEnable(GL_LIGHTING);
 

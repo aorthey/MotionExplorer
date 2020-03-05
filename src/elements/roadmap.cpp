@@ -67,7 +67,8 @@ PathPiecewiseLinear* Roadmap::GetShortestPath()
       ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
       ob::PathPtr path;
-      if(quotient_space->isDynamic()){
+      if(quotient_space->isDynamic())
+      {
         path = std::make_shared<oc::PathControl>(quotient_space->SpaceInformationPtr()); 
       }else{
         path = std::make_shared<og::PathGeometric>(quotient_space->SpaceInformationPtr()); 
