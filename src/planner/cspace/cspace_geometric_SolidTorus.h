@@ -18,13 +18,15 @@ class GeometricCSpaceOMPLSolidTorus: public GeometricCSpaceOMPL
 
   protected:
     virtual double OMPLStateToRValue(const ob::State *qompl);
+    virtual double OMPLStateToAngleValue(const ob::State *qompl);
     virtual double OMPLStateToSO2Value(const ob::State *qompl);
 
-    Vector3 ProjectToVector3(double u, double v);
-    Config ProjectToConfig(double u, double v);
+    Vector3 ProjectToVector3(double u, double r, double angle);
+    Config ProjectToConfig(double u, double r, double angle);
   private:
     double zOffset_{0.0};
     double radiusOuter_{1.5};
     double radiusInner_{0.5};
+    double radiusMid_{0.0};
 };
 

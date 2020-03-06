@@ -29,7 +29,7 @@ class GeometricCSpaceOMPLAnnulus: public GeometricCSpaceOMPL
   private:
     ompl::base::StateSamplerPtr sampler_;
 
-    double zOffset_{0.0};
+    double zOffset_{-2.0};
     double radiusOuter_{1.5};
     double radiusInner_{0.5};
 };

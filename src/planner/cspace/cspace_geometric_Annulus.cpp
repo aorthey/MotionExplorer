@@ -20,7 +20,7 @@ class AnnulusStateSampler : public ompl::base::StateSampler
 public:
 		AnnulusStateSampler(const ob::StateSpace *space) : ob::StateSampler(space)
 		{
-      std::cout << "ANNULUS STATE SAMPLER" << std::endl;
+        std::cout << "ANNULUS STATE SAMPLER" << std::endl;
 		}
 
 		void sampleUniform(ob::State *state) override
@@ -44,31 +44,31 @@ public:
         else
           stateRn->values[0] = low + high - u;
 
-        std::cout << "Random sample:" << bounds.low[0] << " < " << stateRn->values[0] 
-          << " < " << bounds.high[0] << std::endl;
+        // std::cout << "Random sample:" << bounds.low[0] << " < " << stateRn->values[0] 
+        //   << " < " << bounds.high[0] << std::endl;
 		}
 
 		void sampleUniformNear(ob::State *state, const ob::State *near, double distance) override
     {
-      throw "NYI";
+        throw "NYI";
     }
 		void sampleGaussian(ob::State *state, const ob::State *mean, double stdDev) override
     {
-      throw "NYI";
+        throw "NYI";
     }
 };
 
 ob::StateSamplerPtr allocAnnulusStateSampler(const ob::StateSpace *space)
 {
-  return std::make_shared<AnnulusStateSampler>(space);
+    return std::make_shared<AnnulusStateSampler>(space);
 }
 
 ob::SpaceInformationPtr GeometricCSpaceOMPLAnnulus::SpaceInformationPtr()
 {
-  si = BaseT::SpaceInformationPtr();
-  const ob::StateSamplerAllocator allocator = allocAnnulusStateSampler;
-  si->getStateSpace()->setStateSamplerAllocator(allocator);
-  return si;
+    si = BaseT::SpaceInformationPtr();
+    const ob::StateSamplerAllocator allocator = allocAnnulusStateSampler;
+    si->getStateSpace()->setStateSamplerAllocator(allocator);
+    return si;
 }
 
 //############################################################################
@@ -84,7 +84,6 @@ void GeometricCSpaceOMPLAnnulus::initSpace()
     ob::StateSpacePtr R1(std::make_shared<ob::RealVectorStateSpace>(1));
 
     R1->as<ob::RealVectorStateSpace>()->setBounds(radiusInner_, radiusOuter_);
-    std::cout << radiusInner_ << "<" << radiusOuter_ << std::endl;
 
     space = SO2 + R1;
 }
@@ -94,8 +93,9 @@ void GeometricCSpaceOMPLAnnulus::print(std::ostream& out) const
     out << "Annulus Space";
 }
 
-bool GeometricCSpaceOMPLAnnulus::IsPlanar(){
-    return true;
+bool GeometricCSpaceOMPLAnnulus::IsPlanar()
+{
+    return false;
 }
 
 void GeometricCSpaceOMPLAnnulus::DrawGL(GUIState& state)
@@ -107,18 +107,20 @@ void GeometricCSpaceOMPLAnnulus::DrawGL(GUIState& state)
   glLineWidth(3);
 
   const double dstep = 0.01;
-  glBegin(GL_LINE_LOOP);
 
+  glBegin(GL_LINE_LOOP);
   for(double d = 0; d < 2*M_PI; d+=dstep){
     Vector3 v = ProjectToVector3(d, radiusInner_);
     GLDraw::glVertex3v(v);
   }
+  glEnd();
+
+  glBegin(GL_LINE_LOOP);
   for(double d = 0; d < 2*M_PI; d+=dstep){
     Vector3 v = ProjectToVector3(d, radiusOuter_);
     GLDraw::glVertex3v(v);
   }
   glEnd();
-
 
   glDisable(GL_BLEND);
   glEnable(GL_LIGHTING);
@@ -135,6 +137,7 @@ void GeometricCSpaceOMPLAnnulus::ConfigToOMPLState(const Config &q, ob::State *q
 
     ob::SO2StateSpace::StateType *qomplSO2 = 
       qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
+
     ob::RealVectorStateSpace::StateType *qomplRnSpace = 
       qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
 

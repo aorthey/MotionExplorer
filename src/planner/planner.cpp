@@ -170,10 +170,13 @@ void MotionPlanner::CreateHierarchy()
   //#########################################################################
   //For each level, compute the inputs/cspaces for each robot
   //#########################################################################
+
   if(util::StartsWith(algorithm, "hierarchy")){
     std::vector<Layer> layers = input.stratifications.front().layers;
     for(uint k = 0; k < layers.size(); k++){
       CSpaceOMPL *cspace_level_k = ComputeCSpaceLayer(layers.at(k));
+      ob::State *stateTmp = cspace_level_k->SpaceInformationPtr()->allocState();
+
       cspace_levels.push_back( cspace_level_k );
 
       if(!layers.at(k).isMultiAgent){
@@ -182,6 +185,32 @@ void MotionPlanner::CreateHierarchy()
         uint N = cspace_level_k->GetKlamptDimensionality();
         Config qi = input.q_init; qi.resize(N);
         Config qg = input.q_goal; qg.resize(N);
+
+
+        //############################################################################
+        //SANITY CHECK
+        // Config qi_full = input.q_init; qi_full.resize(N);
+        // Config qg_full = input.q_goal; qg_full.resize(N);
+
+        // cspace_level_k->ConfigToOMPLState(qi_full, stateTmp);
+        // Config qi_proj = cspace_level_k->OMPLStateToConfig(stateTmp);
+        // cspace_level_k->ConfigToOMPLState(qg_full, stateTmp);
+        // Config qg_proj = cspace_level_k->OMPLStateToConfig(stateTmp);
+
+
+        // bool invalid = ((qi - qi_proj).norm() > 1e-10);
+        // invalid |= ((qg - qg_proj).norm() > 1e-10);
+
+        // if(invalid){
+        //   std::cout << "Error: Projected Config does not equal stated Config." << std::endl;
+        //   std::cout << "Qinit (orig): " << qi << std::endl;
+        //   std::cout << "Qinit (proj): " << qi_proj << std::endl;
+        //   std::cout << "Qgoal (orig): " << qg << std::endl;
+        //   std::cout << "Qgoal (proj): " << qg_proj << std::endl;
+        //   throw "Error";
+        // }
+        //############################################################################
+
         layers.at(k).q_init = qi;
         layers.at(k).q_goal = qg;
         if(k==0){
@@ -206,6 +235,15 @@ void MotionPlanner::CreateHierarchy()
           }
         }
         std::vector<int> idxs = static_cast<CSpaceOMPLMultiAgent*>(cspace_level_k)->GetRobotIdxs();
+
+        Config qi_full = qi;
+        Config qg_full = qg;
+
+        cspace_level_k->ConfigToOMPLState(qi_full, stateTmp);
+        qi = cspace_level_k->OMPLStateToConfig(stateTmp);
+        cspace_level_k->ConfigToOMPLState(qg_full, stateTmp);
+        qg = cspace_level_k->OMPLStateToConfig(stateTmp);
+
         if(k==0){
           //add a root node
           hierarchy->AddLevel( idxs, qi, qg);
@@ -213,6 +251,7 @@ void MotionPlanner::CreateHierarchy()
         hierarchy->AddLevel( idxs, qi, qg); 
 
       }
+      cspace_level_k->SpaceInformationPtr()->freeState(stateTmp);
     }
 
     //empty roadmap on the highest level (so that we can collapse the whole
@@ -574,9 +613,6 @@ PathPiecewiseLinear* MotionPlanner::GetPath(){
 void MotionPlanner::DrawGL(GUIState& state){
   if(!active) return;
 
-  for(uint k = 0; k < cspace_levels.size(); k++){
-    cspace_levels.at(k)->DrawGL(state);
-  }
 
   uint Nsiblings;
   if(current_path.size()>1){
@@ -676,11 +712,40 @@ void MotionPlanner::DrawGL(GUIState& state){
 
   const Config qi = hierarchy->GetInitConfig(current_level);
   const Config qg = hierarchy->GetGoalConfig(current_level);
+
   const Config qiOuter = hierarchy->GetInitConfig(maxLevel);
   const Config qgOuter = hierarchy->GetGoalConfig(maxLevel);
 
   const GLColor ultralightred_sufficient(0.8,0,0,0.3);
   const GLColor ultralightgreen_sufficient(0,0.5,0,0.2);
+
+  for(uint k = 0; k < cspace_levels.size(); k++)
+  {
+      CSpaceOMPL* ck = cspace_levels.at(k);
+      ck->DrawGL(state);
+  }
+
+      // if(k < current_level)
+      // {
+      //     ob::State *qompl = ck->SpaceInformationPtr()->allocState();
+
+      //     if(state("planner_draw_start_configuration"))
+      //     {
+      //         ck->ConfigToOMPLState(qi, qompl);
+      //         Config qk = ck->OMPLStateToConfig(qompl);
+      //         GLDraw::drawRobotsAtConfig(robots, qk, green);
+      //     }
+      //     if(state("planner_draw_goal_configuration"))
+      //     {
+      //         ck->ConfigToOMPLState(qg, qompl);
+      //         Config qk = ck->OMPLStateToConfig(qompl);
+      //         GLDraw::drawRobotsAtConfig(robots, qk, red);
+      //     }
+
+      //     ck->SpaceInformationPtr()->freeState(qompl);
+      // }
+  // }
+
   if(state("planner_draw_start_configuration")){
     GLDraw::drawRobotsAtConfig(robots, qi, green);
     if(state("planner_draw_start_goal_configuration_sufficient")){
