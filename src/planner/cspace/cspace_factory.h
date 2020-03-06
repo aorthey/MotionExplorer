@@ -71,7 +71,7 @@ class CSpaceFactory{
     }
     // CSpace  R CONTACT
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceRCONTACT( RobotWorld *world, int robot_idx){
-        GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLRCONTACT(world, robot_idx); // momentan indentisch zu SE(2)
+        GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLRCONTACT(world, robot_idx); // momentan identisch zu SE2RN
         cspace->SetCSpaceInput(input);
         cspace->Init();
         return cspace;

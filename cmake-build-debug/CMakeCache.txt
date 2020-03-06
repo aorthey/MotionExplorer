@@ -309,10 +309,6 @@ GLUT_glut_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libglut.so
 
 //Klamp't compiler definitions
 KLAMPT_DEFINITIONS:STRING=-DUSE_BOOST_THREADS=1;-DHAVE_GLUI=1;-DHAVE_GLUT=1;-DHAVE_GLPK=1;-DHAVE_TINYXML=1;-DTIXML_USE_STL;-DHAVE_ASSIMP=1;-DASSIMP_MAJOR_VERSION=3;-I/usr/local/include -DdDOUBLE
-# WARNING: Value of KLAMPT_DEFINITIONS contained a newline and
-#  was truncated. Original value:
-# -DUSE_BOOST_THREADS=1;-DHAVE_GLUI=1;-DHAVE_GLUT=1;-DHAVE_GLPK=1;-DHAVE_TINYXML=1;-DTIXML_USE_STL;-DHAVE_ASSIMP=1;-DASSIMP_MAJOR_VERSION=3;-I/usr/local/include -DdDOUBLE
-# \n
 
 //Directory where Klamp't header files are stored
 KLAMPT_INCLUDE_DIR:PATH=/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt
@@ -354,10 +350,6 @@ Klampt_DIR:PATH=Klampt_DIR-NOTFOUND
 ODECONFIG_EXECUTABLE:FILEPATH=/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/ode-config
 
 ODE_DEFINITIONS:STRING=-I/usr/local/include -DdDOUBLE
-# WARNING: Value of ODE_DEFINITIONS contained a newline and was
-#  truncated. Original value:
-# -I/usr/local/include -DdDOUBLE
-# \n
 
 //Path to a file.
 ODE_INCLUDE_DIRS:PATH=/home/user1/CLionProjects/MotionPlanningExplorerGUI/libs/Klampt/Library/ode-0.11.1/include

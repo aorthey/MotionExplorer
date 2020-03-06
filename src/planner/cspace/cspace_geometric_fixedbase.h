@@ -9,7 +9,6 @@ class GeometricCSpaceOMPLFixedBase: public GeometricCSpaceOMPL
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
     virtual Config OMPLStateToConfig(const ob::State *qompl) override;
     virtual void print() const override;
-    virtual Vector3 getXYZ(const ob::State *s);
   protected:
     uint N;
 };

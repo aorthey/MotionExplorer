@@ -44,7 +44,6 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
     if(type=="R2") {
       cspace_level = factory.MakeGeometricCSpaceRN(world, robot_inner_idx, 2);
     }else if(type=="R_CONTACT") {
-      //std::cout << "Type is R_CONTACT config space!" << std::endl;
       cspace_level = factory.MakeGeometricCSpaceRCONTACT(world, robot_inner_idx);
     }else if(type=="R3") {
       cspace_level = factory.MakeGeometricCSpaceRN(world, robot_inner_idx, 3);

@@ -1042,10 +1042,6 @@
 			<Option target="planner_standalone"/>
 			<Option target="planner_gui"/>
 		</Unit>
-		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/strategy/contact_constraint.h">
-			<Option target="planner_standalone"/>
-			<Option target="planner_gui"/>
-		</Unit>
 		<Unit filename="/home/user1/CLionProjects/MotionPlanningExplorerGUI/src/planner/strategy/strategy.cpp">
 			<Option target="planner_standalone"/>
 			<Option target="planner_gui"/>

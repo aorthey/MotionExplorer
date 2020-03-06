@@ -3,6 +3,7 @@
 #include "file_io.h"
 #include <boost/filesystem.hpp>
 #include <KrisLibrary/math3d/Triangle3D.h>
+#include "planner/cspace/cspace_geometric_fixedbase.h"
 
 RobotWorld& EnvironmentLoader::GetWorld(){
   return world;
@@ -73,6 +74,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 
     if(pin.Load(file_name.c_str())){
 
+
       //Adding triangle information to PlannerInput (to be used as constraint
       //manifolds)
       //filtering for those triangles that belong to feasible contact surfaces
@@ -89,28 +91,44 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
         }
       }
 
-      for(uint i = 0; i < tris.size(); i++){
-          Vector3 normal_i = tris.at(i).normal();
+      for(uint l = 0; l < tris.size(); l++){
+          Vector3 normal = tris.at(l).normal();
+          int unused_surf = 0;
           double epsilon = 1e-10;
 
-          if(fabs((fabs(normal_i[2]) - 1.0))<epsilon){
+          if(fabs((fabs(normal[2]) - 1.0))<epsilon){
 
-              std::cout << "normal vector is in z-direction" << std::endl;
+              unused_surf += 1;
+
           }else{
+              // get each triangle's corner coordinates and remove z coordinate
+              Vector3 a = tris.at(l).a;
+              Vector3 b = tris.at(l).b;
+              Vector3 c = tris.at(l).c;
+
+              std::vector<double> cornerA;
+              cornerA.push_back(a[0]);
+              cornerA.push_back(a[1]);
+
+              std::vector<double> cornerB;
+              cornerB.push_back(b[0]);
+              cornerB.push_back(b[1]);
+
+              std::vector<double> cornerC;
+              cornerC.push_back(c[0]);
+              cornerC.push_back(c[1]);
+
               // tris_filtered filled with surface triangles that are feasible for contact (normal in x or y direction)
-              tris_filtered.push_back(tris.at(i));
+              tris_filtered.push_back(tris.at(l));
           }
 
       }
-      std::cout << "Environment has " << tris_filtered.size() << " triangles to make contact TESTTEST" << std::endl;
-
-      tris = tris_filtered;
-      std::cout << "Lalala tris is now filtered lalala" << std::endl;
+      std::cout << "Environment has " << tris_filtered.size() << " triangles to make contact" << std::endl;
 
       for(uint k = 0; k < pin.inputs.size(); k++){
         PlannerInput *pkin = pin.inputs.at(k);
         if(pkin->contactPlanner){
-          pkin->tris = tris;
+          pkin->tris = tris_filtered;
         }
         for(uint j = 0; j < pkin->stratifications.size(); j++){
           Stratification stratification = pkin->stratifications.at(j);
@@ -133,11 +151,11 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 
             Robot *rk= world.robots.at(ri);
             Robot *rko= world.robots.at(ro);
-            for(int i = 0; i < 6; i++){
-              rk->qMin[i] = pkin->se3min[i];
-              rk->qMax[i] = pkin->se3max[i];
-              rko->qMin[i] = pkin->se3min[i];
-              rko->qMax[i] = pkin->se3max[i];
+            for(int m = 0; m < 6; m++){
+              rk->qMin[m] = pkin->se3min[m];
+              rk->qMax[m] = pkin->se3max[m];
+              rko->qMin[m] = pkin->se3min[m];
+              rko->qMax[m] = pkin->se3max[m];
             }
             // rk->q = pkin->q_init;
             // rk->dq = pkin->dq_init;
