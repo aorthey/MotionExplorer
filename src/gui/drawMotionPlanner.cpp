@@ -198,8 +198,8 @@ namespace GLDraw{
     if(!p_goal.empty()) drawRobotAtConfig(robot, p_goal, colorGoal, scale);
   }
 
-
-  void drawRobotsAtConfig(std::vector<Robot*> robots, const Config &q, GLColor color, double scale){
+  void drawRobotsAtConfig(std::vector<Robot*> robots, const Config &q, GLColor color, double scale)
+  {
     int ctr = 0;
     for(uint k = 0; k < robots.size(); k++){
       Robot *rk = robots.at(k);
@@ -212,10 +212,14 @@ namespace GLDraw{
       ctr += N;
     }
   }
-  void drawRobotAtConfig(Robot *robot, const Config &q, const Config &dq, GLColor color, double scale){
+
+  void drawRobotAtConfig(Robot *robot, const Config &q, const Config &dq, GLColor color, double scale)
+  {
     drawRobotAtConfig(robot, q, color, scale);
   }
-  void drawRobotAtConfig(Robot *robot, const Config &q, GLColor color, double scale){
+
+  void drawRobotAtConfig(Robot *robot, const Config &q, GLColor color, double scale)
+  {
     glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);
     glEnable(GL_LINE_SMOOTH);

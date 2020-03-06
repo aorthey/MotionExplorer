@@ -8,8 +8,8 @@
   <!-- <rigidObject name="mobius.tri" file="../../terrains/mobius.tri" translation="0 0 0.5" rotateRPY="0 0 1.57"/> -->
   <plannerinput>
 
-    <qinit  config="6  +1.0 +0.2 -0.3 0 0 0"/>
-    <qgoal  config="6  -0.98 +0.23 +0.3 0 0 0 "/>
+    <qinit  config="6  +1.0 +0.2 -0 0 0 0"/>
+    <qgoal  config="6  -0.98 +0.23 +0 0 0 0 "/>
     <se3min config="6  -3 -3 -1 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +3 +3 +1 +3.141593 +1.57 +3.141593"/>
 

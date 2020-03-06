@@ -183,19 +183,18 @@ void MotionPlanner::CreateHierarchy()
         int io = layers.at(k).outer_index;
         int ii = layers.at(k).inner_index;
         uint N = cspace_level_k->GetKlamptDimensionality();
-        Config qi = input.q_init; qi.resize(N);
-        Config qg = input.q_goal; qg.resize(N);
-
+        // Config qi = input.q_init; qi.resize(N);
+        // Config qg = input.q_goal; qg.resize(N);
 
         //############################################################################
         //SANITY CHECK
-        // Config qi_full = input.q_init; qi_full.resize(N);
-        // Config qg_full = input.q_goal; qg_full.resize(N);
+        Config qi_full = input.q_init; qi_full.resize(N);
+        Config qg_full = input.q_goal; qg_full.resize(N);
 
-        // cspace_level_k->ConfigToOMPLState(qi_full, stateTmp);
-        // Config qi_proj = cspace_level_k->OMPLStateToConfig(stateTmp);
-        // cspace_level_k->ConfigToOMPLState(qg_full, stateTmp);
-        // Config qg_proj = cspace_level_k->OMPLStateToConfig(stateTmp);
+        cspace_level_k->ConfigToOMPLState(qi_full, stateTmp);
+        Config qi = cspace_level_k->OMPLStateToConfig(stateTmp);
+        cspace_level_k->ConfigToOMPLState(qg_full, stateTmp);
+        Config qg = cspace_level_k->OMPLStateToConfig(stateTmp);
 
 
         // bool invalid = ((qi - qi_proj).norm() > 1e-10);
