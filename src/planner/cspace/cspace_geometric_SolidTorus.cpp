@@ -24,11 +24,11 @@ void GeometricCSpaceOMPLSolidTorus::initSpace()
     ob::StateSpacePtr R2(std::make_shared<ob::RealVectorStateSpace>(2));
 
     vector<double> low;
-    low.push_back(radiusInner_);
+    low.push_back(radiusMid_);
     low.push_back(0);
     vector<double> high;
     high.push_back(radiusOuter_);
-    high.push_back(pi);
+    high.push_back(2*pi);
 
     ob::RealVectorBounds bounds(2);
     bounds.low = low;
@@ -102,7 +102,7 @@ void GeometricCSpaceOMPLSolidTorus::DrawGL(GUIState& state)
   glEnable(GL_BLEND);
 
   GLDraw::setColor(black);
-  glLineWidth(3);
+  glLineWidth(1);
 
   const double dstep = 0.01;
 
@@ -124,7 +124,7 @@ void GeometricCSpaceOMPLSolidTorus::DrawGL(GUIState& state)
   glEnd();
 
   //Vertical Circles
-  for(double d = 0; d < 2*M_PI; d+=10*dstep){
+  for(double d = 0; d < 2*M_PI; d+=0.1){
     double lstep = 0.01;
     glBegin(GL_LINE_LOOP);
     for(double l = 0; l < 2*M_PI; l+=lstep){
@@ -166,11 +166,11 @@ void GeometricCSpaceOMPLSolidTorus::ConfigToOMPLState(const Config &q, ob::State
     Vector3 dq = qv - qmid;
     if(z < 0)
     {
-      angle = M_PI - angle;
-      radius = radiusMid_ - dq.norm();
-    }else{
-      radius = radiusMid_ + dq.norm();
+      angle = 2*M_PI - angle;
+      // radius = radiusMid_ - dq.norm();
+    // }else{
     }
+    radius = radiusMid_ + dq.norm();
     qomplRnSpace->values[0] = radius;
     qomplRnSpace->values[1] = angle;
 }

@@ -89,6 +89,8 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
         cspace_level = factory.MakeGeometricCSpaceRNTime(world, robot_idx, 2);
       }else if(type=="ANNULUS") {
         cspace_level = factory.MakeGeometricCSpaceAnnulus(world, robot_idx);
+      }else if(type=="SOLIDCYLINDER") {
+        cspace_level = factory.MakeGeometricCSpaceSolidCylinder(world, robot_idx);
       }else if(type=="SOLIDTORUS") {
         cspace_level = factory.MakeGeometricCSpaceSolidTorus(world, robot_idx);
       }else if(type=="MOBIUS") {

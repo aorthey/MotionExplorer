@@ -189,7 +189,10 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
   glLineWidth(widthEdge);
   setColor(cEdge);
 
-  for(uint vidx = 0; vidx < pd->numVertices(); vidx++){
+  ob::State *vs = quotient_space->SpaceInformationPtr()->allocState();
+  ob::State *ws = quotient_space->SpaceInformationPtr()->allocState();
+  for(uint vidx = 0; vidx < pd->numVertices(); vidx++)
+  {
     ob::PlannerDataVertex *v = &pd->getVertex(vidx);
     Vector3 v1 = quotient_space->getXYZ(v->getState(), ridx);
     if(draw_planar) v1[2] = 0.0;
@@ -208,8 +211,6 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
       if(wa!=nullptr) v2 = quotient_space->getXYZ(wa->getBaseState(), ridx);
       if(draw_planar) v2[2] = 0.0;
 
-
-
       // if(va!=nullptr && wa!=nullptr){
       //   if(va->getComponent()==0 || wa->getComponent()==0){
       //     setColor(cEdge);
@@ -219,9 +220,24 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
       //     setColor(cVertexComponentOut);
       //   }
       // }
-      drawLineSegment(v1,v2);
+			ob::StateSpacePtr space = quotient_space->SpaceInformationPtr()->getStateSpace();
+      int nd = space->validSegmentCount(v->getState(), w->getState());
+      space->copyState(ws, v->getState());
+			for (int j = 1; j < nd; ++j)
+			{
+					space->interpolate(v->getState(), w->getState(), (double)j / (double)nd, vs);
+          Vector3 vj1 = quotient_space->getXYZ(ws, ridx);
+          Vector3 vj2 = quotient_space->getXYZ(vs, ridx);
+          drawLineSegment(vj1,vj2);
+          space->copyState(ws, vs);
+			}
+
+
+      // drawLineSegment(v1,v2);
     }
   }
+  quotient_space->SpaceInformationPtr()->freeState(vs);
+  quotient_space->SpaceInformationPtr()->freeState(ws);
   glPopMatrix();
 }
 

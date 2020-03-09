@@ -14,13 +14,11 @@ using namespace boost::math::double_constants;
 
 
 //############################################################################
-
 class AnnulusStateSampler : public ompl::base::StateSampler
 {
 public:
 		AnnulusStateSampler(const ob::StateSpace *space) : ob::StateSampler(space)
 		{
-        std::cout << "ANNULUS STATE SAMPLER" << std::endl;
 		}
 
 		void sampleUniform(ob::State *state) override
@@ -35,17 +33,10 @@ public:
 
         const ob::RealVectorBounds &bounds = space_->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1)->getBounds();
           
-        double low = bounds.low[0];
-        double high = bounds.high[0];
-        double u = rng_.uniformReal(low, high);
-        double v = rng_.uniformReal(0, low + high);
-        if( v < u )
-          stateRn->values[0] = u;
-        else
-          stateRn->values[0] = low + high - u;
-
-        // std::cout << "Random sample:" << bounds.low[0] << " < " << stateRn->values[0] 
-        //   << " < " << bounds.high[0] << std::endl;
+        double low2 = bounds.low[0]*bounds.low[0];
+        double high2 = bounds.high[0]*bounds.high[0];
+        double u = rng_.uniformReal(0,1);
+        stateRn->values[0] = sqrtf(u*(high2-low2) + low2);
 		}
 
 		void sampleUniformNear(ob::State *state, const ob::State *near, double distance) override
