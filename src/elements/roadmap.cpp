@@ -14,7 +14,7 @@ using Graph = ob::PlannerData::Graph;
 using Vertex = Graph::Vertex;
 
 double sizeVertex{6};
-double widthEdge{3};
+double widthEdge{1};
 double widthPath{25};
 
 Roadmap::Roadmap()
@@ -112,32 +112,6 @@ PathPiecewiseLinear* Roadmap::GetShortestPath()
   return path_ompl;
 }
 
-// void Roadmap::DrawGLShortestPath(GUIState &state)
-// {
-//   glEnable(GL_BLEND); 
-//   glDisable(GL_LIGHTING);
-//   const std::vector<Vector3>& q = shortest_path;
-//   if(q.size()>1)
-//   {
-//     glPushMatrix();
-//     glLineWidth(widthPath);
-//     setColor(cPath);
-
-//     for(uint k = 0; k < q.size()-1; k++){
-//       Vector3 v1 = q.at(k);
-//       Vector3 v2 = q.at(k+1);
-//       if(quotient_space->GetDimensionality()<=2 || 
-//           quotient_space->SpaceInformationPtr()->getStateSpace()->getType()==ob::STATE_SPACE_SE2){
-//         double offset = +0.05;
-//         v1[2]=offset;v2[2]=offset;
-//       }
-//       drawLineSegment(v1,v2);
-//     }
-//     glPopMatrix();
-//   }
-//   glEnable(GL_LIGHTING);
-//   glDisable(GL_BLEND); 
-// }
 
 void Roadmap::DrawGLRoadmapVertices(GUIState &state, int ridx)
 {
@@ -157,13 +131,6 @@ void Roadmap::DrawGLRoadmapVertices(GUIState &state, int ridx)
     {
       q = quotient_space->getXYZ(v->getBaseState(), ridx);
       if(draw_planar) q[2] = 0.0;
-      // if(v->getComponent()==0){
-      //   setColor(cVertex);
-      // }else if(v->getComponent()==1){
-      //   setColor(cVertexComponentGoal);
-      // }else{
-      //   setColor(cVertexComponentOut);
-      // }
       if(pd->isStartVertex(vidx))
       {
         glPointSize(2*sizeVertex);
@@ -189,55 +156,41 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
   glLineWidth(widthEdge);
   setColor(cEdge);
 
-  ob::State *vs = quotient_space->SpaceInformationPtr()->allocState();
-  ob::State *ws = quotient_space->SpaceInformationPtr()->allocState();
+  ob::StateSpacePtr space = quotient_space->SpaceInformationPtr()->getStateSpace();
+  ob::State *stateCur = quotient_space->SpaceInformationPtr()->allocState();
+  ob::State *stateOld = quotient_space->SpaceInformationPtr()->allocState();
+
   for(uint vidx = 0; vidx < pd->numVertices(); vidx++)
   {
     ob::PlannerDataVertex *v = &pd->getVertex(vidx);
-    Vector3 v1 = quotient_space->getXYZ(v->getState(), ridx);
-    if(draw_planar) v1[2] = 0.0;
-
-    ob::PlannerDataVertexAnnotated *va = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
-    if(va!=nullptr) v1 = quotient_space->getXYZ(va->getBaseState(), ridx);
-    if(draw_planar) v1[2] = 0.0;
 
     std::vector<uint> edgeList;
     pd->getEdges(vidx, edgeList);
+
     for(uint j = 0; j < edgeList.size(); j++){
+      space->copyState(stateOld, v->getState());
+
       ob::PlannerDataVertex *w = &pd->getVertex(edgeList.at(j));
-      Vector3 v2 = quotient_space->getXYZ(w->getState(), ridx);
 
-      ob::PlannerDataVertexAnnotated *wa = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
-      if(wa!=nullptr) v2 = quotient_space->getXYZ(wa->getBaseState(), ridx);
-      if(draw_planar) v2[2] = 0.0;
-
-      // if(va!=nullptr && wa!=nullptr){
-      //   if(va->getComponent()==0 || wa->getComponent()==0){
-      //     setColor(cEdge);
-      //   }else if(va->getComponent()==1 || wa->getComponent()==1){
-      //     setColor(cVertexComponentGoal);
-      //   }else{
-      //     setColor(cVertexComponentOut);
-      //   }
-      // }
-			ob::StateSpacePtr space = quotient_space->SpaceInformationPtr()->getStateSpace();
       int nd = space->validSegmentCount(v->getState(), w->getState());
-      space->copyState(ws, v->getState());
-			for (int j = 1; j < nd; ++j)
+
+			for (int j = 1; j <= nd; j++)
 			{
-					space->interpolate(v->getState(), w->getState(), (double)j / (double)nd, vs);
-          Vector3 vj1 = quotient_space->getXYZ(ws, ridx);
-          Vector3 vj2 = quotient_space->getXYZ(vs, ridx);
-          drawLineSegment(vj1,vj2);
-          space->copyState(ws, vs);
+          Vector3 v1 = quotient_space->getXYZ(stateOld, ridx);
+
+					space->interpolate(v->getState(), w->getState(), (double)j / (double)nd, stateCur);
+          Vector3 v2 = quotient_space->getXYZ(stateCur, ridx);
+          if(draw_planar){
+            v1[2] = 0.0;
+            v2[2] = 0.0;
+          }
+          drawLineSegment(v1,v2);
+          space->copyState(stateOld, stateCur);
 			}
-
-
-      // drawLineSegment(v1,v2);
     }
   }
-  quotient_space->SpaceInformationPtr()->freeState(vs);
-  quotient_space->SpaceInformationPtr()->freeState(ws);
+  quotient_space->SpaceInformationPtr()->freeState(stateOld);
+  quotient_space->SpaceInformationPtr()->freeState(stateCur);
   glPopMatrix();
 }
 
