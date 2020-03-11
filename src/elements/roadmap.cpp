@@ -156,9 +156,9 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
   glLineWidth(widthEdge);
   setColor(cEdge);
 
-  ob::StateSpacePtr space = quotient_space->SpaceInformationPtr()->getStateSpace();
-  ob::State *stateCur = quotient_space->SpaceInformationPtr()->allocState();
-  ob::State *stateOld = quotient_space->SpaceInformationPtr()->allocState();
+  ob::StateSpacePtr space = cspace->SpaceInformationPtr()->getStateSpace();
+  ob::State *stateCur = cspace->SpaceInformationPtr()->allocState();
+  ob::State *stateOld = cspace->SpaceInformationPtr()->allocState();
 
   for(uint vidx = 0; vidx < pd->numVertices(); vidx++)
   {
@@ -168,30 +168,42 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
     pd->getEdges(vidx, edgeList);
 
     for(uint j = 0; j < edgeList.size(); j++){
-      space->copyState(stateOld, v->getState());
 
       ob::PlannerDataVertex *w = &pd->getVertex(edgeList.at(j));
-
       int nd = space->validSegmentCount(v->getState(), w->getState());
 
-			for (int j = 1; j <= nd; j++)
-			{
-          Vector3 v1 = quotient_space->getXYZ(stateOld, ridx);
+      if(nd > 1)
+      {
+        space->copyState(stateOld, v->getState());
+        for (int j = 1; j <= nd; j++)
+        {
 
-					space->interpolate(v->getState(), w->getState(), (double)j / (double)nd, stateCur);
-          Vector3 v2 = quotient_space->getXYZ(stateCur, ridx);
-          if(draw_planar){
-            v1[2] = 0.0;
-            v2[2] = 0.0;
-          }
-          drawLineSegment(v1,v2);
-          space->copyState(stateOld, stateCur);
-			}
+            space->interpolate(v->getState(), w->getState(), (double)j / (double)nd, stateCur);
+
+            drawLineWorkspaceStateToState(stateOld, stateCur, ridx);
+
+            space->copyState(stateOld, stateCur);
+        }
+      }else
+      {
+          drawLineWorkspaceStateToState(v->getState(), w->getState(), ridx);
+      }
     }
   }
-  quotient_space->SpaceInformationPtr()->freeState(stateOld);
-  quotient_space->SpaceInformationPtr()->freeState(stateCur);
+  cspace->SpaceInformationPtr()->freeState(stateOld);
+  cspace->SpaceInformationPtr()->freeState(stateCur);
   glPopMatrix();
+}
+
+void Roadmap::drawLineWorkspaceStateToState(const ob::State *from, const ob::State *to, int ridx)
+{
+    Vector3 a = cspace->getXYZ(from, ridx);
+    Vector3 b = cspace->getXYZ(to, ridx);
+    if(draw_planar){
+      a[2] = 0.0;
+      b[2] = 0.0;
+    }
+    drawLineSegment(a, b);
 }
 
 void Roadmap::DrawGLPlannerData(GUIState &state)
@@ -225,7 +237,6 @@ void Roadmap::DrawGL(GUIState& state)
     if(draw_planar && (quotient_space->GetFirstSubspace()->getType()==ob::STATE_SPACE_SE2) && state("planner_draw_spatial_representation_of_SE2")){
       draw_planar = false;
     }
-    // quotient_space->DrawGL(state);
   }
 
   if(pd!=nullptr) DrawGLPlannerData(state);

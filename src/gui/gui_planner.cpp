@@ -361,15 +361,16 @@ void PlannerBackend::RenderWorld(){
       }
     }
     if(t>0 && path){
-      // path->DrawGL(state, t);
+      path->DrawGL(state, t);
       // controller_->nominalTimeStep  = 0.05;
-      controller_->Update(t);
-      Config q, qdes;
-      controller_->GetSensedConfig(q);
-      controller_->GetCommandedConfig(qdes);
+      //
+      // controller_->Update(t);
+      // Config q, qdes;
+      // controller_->GetSensedConfig(q);
+      // controller_->GetCommandedConfig(qdes);
 
-      std::cout << controller_->time << " : " << q << " (" << qdes << ")" << std::endl;
-      path->GetSpace()->drawConfig(q);
+      // std::cout << controller_->time << " : " << q << " (" << qdes << ")" << std::endl;
+      // path->GetSpace()->drawConfig(q);
     }
   }
   //if(planner->GetInput().kinodynamic){

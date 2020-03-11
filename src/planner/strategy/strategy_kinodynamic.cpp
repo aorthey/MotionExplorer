@@ -5,6 +5,10 @@
 
 #include <ompl/geometric/planners/quotientspace/Explorer.h>
 #include <ompl/geometric/planners/quotientspace/QRRT.h>
+#include <ompl/geometric/planners/quotientspace/QRRTStar.h>
+#include <ompl/geometric/planners/quotientspace/QMP.h>
+#include <ompl/geometric/planners/quotientspace/QMPStar.h>
+#include <ompl/geometric/planners/quotientspace/SPQR.h>
 #include <ompl/control/optimizers/Optimizer.h>
 #include <ompl/geometric/PathGeometric.h>
 
@@ -62,7 +66,12 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
 {
   ob::PlannerPtr planner;
   //assume last cspace is dynamic
-  const oc::SpaceInformationPtr si = static_pointer_cast<oc::SpaceInformation>(si_vec.back());
+  const oc::SpaceInformationPtr si = dynamic_pointer_cast<oc::SpaceInformation>(si_vec.back());
+  if(si.get() == nullptr && !util::StartsWith(algorithm,"hierarchy"))
+  {
+    OMPL_WARN("Not a control SpaceInformationPtr (Make sure the last State Space is of type ompl::control::SpaceInformationPtr)");
+    // throw "NotControl";
+  }
 
   if(algorithm=="ompl:dynamic:rrt"){
     planner = std::make_shared<oc::RRT>(si);
@@ -78,6 +87,14 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
     planner = std::make_shared<og::MotionExplorer>(si_vec);
   }else if(algorithm=="hierarchy:qrrt"){
     planner = std::make_shared<og::QRRT>(si_vec);
+  }else if(algorithm=="hierarchy:qrrtstar"){
+    planner = std::make_shared<og::QRRTStar>(si_vec);
+  }else if(algorithm=="hierarchy:qmp"){
+    planner = std::make_shared<og::QMP>(si_vec);
+  }else if(algorithm=="hierarchy:qmpstar"){
+    planner = std::make_shared<og::QMPStar>(si_vec);
+  }else if(algorithm=="hierarchy:spqr"){
+    planner = std::make_shared<og::SPQR>(si_vec);
   }else if(algorithm=="optimizer"){
     si->setup();
     CSpaceOMPL* cspace = input.cspace_levels.back();
@@ -167,10 +184,8 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
     // double max_planning_time= input.max_planning_time;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
-  double minimalCostAcceptable = 5;
-  planner->getProblemDefinition()->getOptimizationObjective()->setCostThreshold(ob::Cost(minimalCostAcceptable));
-  std::cout << planner->getProblemDefinition()->getOptimizationObjective()->getCostThreshold() << std::endl;
-
+  // double minimalCostAcceptable = 5;
+  // planner->getProblemDefinition()->getOptimizationObjective()->setCostThreshold(ob::Cost(minimalCostAcceptable));
 
   ompl::time::point start = ompl::time::now();
   planner->solve(ptc);

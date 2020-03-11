@@ -5,7 +5,7 @@
   <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
   <robot name="disk_inner" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
 
-  <!-- <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="0 0 0" rotateRPY="0 0 0"/> -->
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="0 0 0" rotateRPY="0 0 0"/>
   <plannerinput>
 
     <qinit  config="15  -3.5 0.0 +0.0 -0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
@@ -20,18 +20,20 @@
     <control_max config="6  0 0 0 +0.3 0 0"/>
 
     <freeFloating>1</freeFloating>
-    <kinodynamic>1</kinodynamic>
     <timestep min="0.01" max="0.1"/>
 
-    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
-    <epsilongoalregion>5</epsilongoalregion>
+    <maxplanningtime>0.01</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>0.1</epsilongoalregion>
     <pathSpeed>10</pathSpeed>
 
-    <loadPath file="../data/paths/path_06D_dubins_car.xml"/>
     <algorithm dynamic="1" name="hierarchy:qrrt"/>
+    <algorithm dynamic="1" name="hierarchy:qmp"/>
     <algorithm dynamic="1" name="ompl:dynamic:sst"/>
+    <algorithm dynamic="1" name="ompl:dynamic:rrt"/>
+    <kinodynamic>1</kinodynamic>
 
     <hierarchy>
+      <level inner_index="2" type="R2"/>
       <level inner_index="0" type="TSE2"/>
     </hierarchy>
 

@@ -43,6 +43,7 @@ class Roadmap{
     //void DrawGLShortestPath(GUIState&);
     void DrawGLRoadmapVertices(GUIState&, int ridx = -1);
     void DrawGLRoadmapEdges(GUIState&, int ridx = -1);
+    void drawLineWorkspaceStateToState(const ob::State *from, const ob::State *to, int ridx);
 
     ob::PlannerDataPtr pd{nullptr};
     CSpaceOMPL *cspace{nullptr};
