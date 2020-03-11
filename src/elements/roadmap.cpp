@@ -113,6 +113,22 @@ PathPiecewiseLinear* Roadmap::GetShortestPath()
 }
 
 
+Vector3 Roadmap::VectorFromVertex(const ob::PlannerDataVertex *v, int ridx)
+{
+  // ob::PlannerDataVertex *vd = &pd->getVertex(vidx);
+  Vector3 q = cspace->getXYZ(v->getState(), ridx);
+  if(draw_planar) q[2] = 0.0;
+
+  const ob::PlannerDataVertexAnnotated *va = dynamic_cast<const ob::PlannerDataVertexAnnotated*>(v);
+
+  if(v!=nullptr)
+  {
+    q = quotient_space->getXYZ(va->getBaseState(), ridx);
+    if(draw_planar) q[2] = 0.0;
+  }
+  return q;
+}
+
 void Roadmap::DrawGLRoadmapVertices(GUIState &state, int ridx)
 {
   for(uint vidx = 0; vidx < pd->numVertices(); vidx++)
@@ -122,25 +138,30 @@ void Roadmap::DrawGLRoadmapVertices(GUIState &state, int ridx)
     glPushMatrix();
 
     ob::PlannerDataVertex *vd = &pd->getVertex(vidx);
-    Vector3 q = quotient_space->getXYZ(vd->getState(), ridx);
-    if(draw_planar) q[2] = 0.0;
+    
+    Vector3 q = VectorFromVertex(vd, ridx);
 
-    ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+    // Vector3 q = quotient_space->getXYZ(vd->getState(), ridx);
+    // if(draw_planar) q[2] = 0.0;
 
-    if(v!=nullptr)
+    // ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+
+    // if(v!=nullptr)
+    // {
+    //   q = quotient_space->getXYZ(v->getBaseState(), ridx);
+    //   if(draw_planar) q[2] = 0.0;
+    // }
+
+
+    if(pd->isStartVertex(vidx))
     {
-      q = quotient_space->getXYZ(v->getBaseState(), ridx);
-      if(draw_planar) q[2] = 0.0;
-      if(pd->isStartVertex(vidx))
+      glPointSize(2*sizeVertex);
+      setColor(cVertexStart);
+    }else{
+      if(pd->isGoalVertex(vidx))
       {
         glPointSize(2*sizeVertex);
-        setColor(cVertexStart);
-      }else{
-        if(pd->isGoalVertex(vidx))
-        {
-          glPointSize(2*sizeVertex);
-          setColor(cVertexGoal);
-        }
+        setColor(cVertexGoal);
       }
     }
 
@@ -156,9 +177,9 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
   glLineWidth(widthEdge);
   setColor(cEdge);
 
-  ob::StateSpacePtr space = cspace->SpaceInformationPtr()->getStateSpace();
-  ob::State *stateCur = cspace->SpaceInformationPtr()->allocState();
-  ob::State *stateOld = cspace->SpaceInformationPtr()->allocState();
+  ob::StateSpacePtr space = quotient_space->SpaceInformationPtr()->getStateSpace();
+  ob::State *stateCur = quotient_space->SpaceInformationPtr()->allocState();
+  ob::State *stateOld = quotient_space->SpaceInformationPtr()->allocState();
 
   for(uint vidx = 0; vidx < pd->numVertices(); vidx++)
   {
@@ -190,15 +211,15 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
       }
     }
   }
-  cspace->SpaceInformationPtr()->freeState(stateOld);
-  cspace->SpaceInformationPtr()->freeState(stateCur);
+  quotient_space->SpaceInformationPtr()->freeState(stateOld);
+  quotient_space->SpaceInformationPtr()->freeState(stateCur);
   glPopMatrix();
 }
 
 void Roadmap::drawLineWorkspaceStateToState(const ob::State *from, const ob::State *to, int ridx)
 {
-    Vector3 a = cspace->getXYZ(from, ridx);
-    Vector3 b = cspace->getXYZ(to, ridx);
+    Vector3 a = quotient_space->getXYZ(from, ridx);
+    Vector3 b = quotient_space->getXYZ(to, ridx);
     if(draw_planar){
       a[2] = 0.0;
       b[2] = 0.0;
