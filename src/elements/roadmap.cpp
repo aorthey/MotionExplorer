@@ -115,17 +115,18 @@ PathPiecewiseLinear* Roadmap::GetShortestPath()
 
 Vector3 Roadmap::VectorFromVertex(const ob::PlannerDataVertex *v, int ridx)
 {
-  // ob::PlannerDataVertex *vd = &pd->getVertex(vidx);
-  Vector3 q = cspace->getXYZ(v->getState(), ridx);
-  if(draw_planar) q[2] = 0.0;
-
   const ob::PlannerDataVertexAnnotated *va = dynamic_cast<const ob::PlannerDataVertexAnnotated*>(v);
 
-  if(v!=nullptr)
+  Vector3 q;
+
+  if(va!=nullptr)
   {
     q = quotient_space->getXYZ(va->getBaseState(), ridx);
-    if(draw_planar) q[2] = 0.0;
+  }else{
+    q = cspace->getXYZ(v->getState(), ridx);
   }
+
+  if(draw_planar) q[2] = 0.0;
   return q;
 }
 
@@ -140,18 +141,6 @@ void Roadmap::DrawGLRoadmapVertices(GUIState &state, int ridx)
     ob::PlannerDataVertex *vd = &pd->getVertex(vidx);
     
     Vector3 q = VectorFromVertex(vd, ridx);
-
-    // Vector3 q = quotient_space->getXYZ(vd->getState(), ridx);
-    // if(draw_planar) q[2] = 0.0;
-
-    // ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
-
-    // if(v!=nullptr)
-    // {
-    //   q = quotient_space->getXYZ(v->getBaseState(), ridx);
-    //   if(draw_planar) q[2] = 0.0;
-    // }
-
 
     if(pd->isStartVertex(vidx))
     {
@@ -171,19 +160,75 @@ void Roadmap::DrawGLRoadmapVertices(GUIState &state, int ridx)
   }
 }
 
+void Roadmap::DrawGLEdgeStateToState(CSpaceOMPL *space, const ob::State *s, const ob::State *t, int ridx)
+{
+    Vector3 a = space->getXYZ(s, ridx);
+    Vector3 b = space->getXYZ(t, ridx);
+    if(draw_planar) a[2] = b[2] = 0.0;
+    drawLineSegment(a, b);
+}
+
+void Roadmap::DrawGLEdge(CSpaceOMPL *space, const ob::State *s, const ob::State *t, int ridx)
+{
+  ob::StateSpacePtr stateSpace = space->SpaceInformationPtr()->getStateSpace();
+
+  int nd = stateSpace->validSegmentCount(s, t);
+
+  if(nd <= 1)
+  {
+      DrawGLEdgeStateToState(space, s, t, ridx);
+  }else
+  {
+      stateSpace->copyState(stateTmpOld, s);
+      for (int j = 1; j <= nd; j++)
+      {
+          stateSpace->interpolate(s, t, (double)j / (double)nd, stateTmpCur);
+
+          DrawGLEdgeStateToState(space, stateTmpOld, stateTmpCur, ridx);
+
+          stateSpace->copyState(stateTmpOld, stateTmpCur);
+      }
+  }
+}
+
 void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
 {
+  if(pd->numVertices() <= 0) return;
+
   glPushMatrix();
   glLineWidth(widthEdge);
   setColor(cEdge);
 
-  ob::StateSpacePtr space = quotient_space->SpaceInformationPtr()->getStateSpace();
-  ob::State *stateCur = quotient_space->SpaceInformationPtr()->allocState();
-  ob::State *stateOld = quotient_space->SpaceInformationPtr()->allocState();
+  //############################################################################
+  //Get Space
+  ob::PlannerDataVertex *v = &pd->getVertex(0);
+  const ob::PlannerDataVertexAnnotated *va = dynamic_cast<const ob::PlannerDataVertexAnnotated*>(v);
+  CSpaceOMPL *curSpace;
+  if(va!=nullptr)
+  {
+      curSpace = quotient_space;
+  }else{
+      curSpace = cspace;
+  }
+
+  ob::StateSpacePtr stateSpace = curSpace->SpaceInformationPtr()->getStateSpace();
+  stateTmpCur = stateSpace->allocState();
+  stateTmpOld = stateSpace->allocState();
+  //############################################################################
 
   for(uint vidx = 0; vidx < pd->numVertices(); vidx++)
   {
     ob::PlannerDataVertex *v = &pd->getVertex(vidx);
+  //############################################################################
+    const ob::PlannerDataVertexAnnotated *va = dynamic_cast<const ob::PlannerDataVertexAnnotated*>(v);
+    const ob::State *vState;
+    if(va!=nullptr)
+    {
+      vState = va->getBaseState();
+    }else{
+      vState = v->getState();
+    }
+  //############################################################################
 
     std::vector<uint> edgeList;
     pd->getEdges(vidx, edgeList);
@@ -191,28 +236,23 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
     for(uint j = 0; j < edgeList.size(); j++){
 
       ob::PlannerDataVertex *w = &pd->getVertex(edgeList.at(j));
-      int nd = space->validSegmentCount(v->getState(), w->getState());
-
-      if(nd > 1)
+  //############################################################################
+      const ob::PlannerDataVertexAnnotated *wa = dynamic_cast<const ob::PlannerDataVertexAnnotated*>(w);
+      const ob::State *wState;
+      if(wa!=nullptr)
       {
-        space->copyState(stateOld, v->getState());
-        for (int j = 1; j <= nd; j++)
-        {
-
-            space->interpolate(v->getState(), w->getState(), (double)j / (double)nd, stateCur);
-
-            drawLineWorkspaceStateToState(stateOld, stateCur, ridx);
-
-            space->copyState(stateOld, stateCur);
-        }
-      }else
-      {
-          drawLineWorkspaceStateToState(v->getState(), w->getState(), ridx);
+        wState = wa->getBaseState();
+      }else{
+        wState = w->getState();
       }
+  //############################################################################
+
+      DrawGLEdge(curSpace, vState, wState, ridx);
+
     }
   }
-  quotient_space->SpaceInformationPtr()->freeState(stateOld);
-  quotient_space->SpaceInformationPtr()->freeState(stateCur);
+  stateSpace->freeState(stateTmpCur);
+  stateSpace->freeState(stateTmpOld);
   glPopMatrix();
 }
 

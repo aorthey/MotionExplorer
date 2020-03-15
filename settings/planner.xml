@@ -6,6 +6,7 @@
   <algorithm dynamic="1" name="hierarchy:explorer"/>
   <!-- <algorithm dynamic="1" name="ompl:dynamic:pdst"/> -->
   <!-- <algorithm dynamic="1" name="ompl:dynamic:est"/> -->
+  <algorithm name="hierarchy:qmp"/>
   <algorithm name="benchmark:minimal"/>
 
   <!-- <algorithm name="hierarchy:sampler"/> -->
@@ -14,7 +15,6 @@
   <!-- <algorithm name="hierarchy:qmpstar"/> -->
   <algorithm name="hierarchy:qrrt"/>
   <algorithm name="hierarchy:qrrtstar"/>
-  <algorithm name="hierarchy:qmp"/>
   <!-- <algorithm name="hierarchy:spqr"/> -->
   <algorithm name="ompl:rrt"/>
   <algorithm name="ompl:rrtstar"/>

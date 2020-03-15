@@ -22,19 +22,20 @@
     <freeFloating>1</freeFloating>
     <timestep min="0.01" max="0.1"/>
 
-    <maxplanningtime>0.1</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>0.5</maxplanningtime>      <!-- runtime in (s) --> 
     <epsilongoalregion>0.1</epsilongoalregion>
     <pathSpeed>10</pathSpeed>
 
     <algorithm dynamic="1" name="hierarchy:qrrt"/>
+    <algorithm dynamic="1" name="hierarchy:qrrtstar"/>
     <algorithm dynamic="1" name="hierarchy:qmp"/>
     <algorithm dynamic="1" name="ompl:dynamic:sst"/>
     <algorithm dynamic="1" name="ompl:dynamic:rrt"/>
     <kinodynamic>1</kinodynamic>
 
     <hierarchy>
-      <level inner_index="2" type="R2"/>
-      <!-- <level inner_index="0" type="TSE2"/> -->
+      <!-- <level inner_index="2" type="R2"/> -->
+      <level inner_index="0" type="TSE2"/>
     </hierarchy>
 
   </plannerinput>
