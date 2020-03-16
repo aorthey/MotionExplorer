@@ -23,7 +23,7 @@ class GeometricCSpaceOMPLMobius: public GeometricCSpaceOMPL
     Vector3 ProjectToVector3(double u, double v);
     Config ProjectToConfig(double u, double v);
   private:
-    double zOffset_{1.0};
+    double zOffset_{0.0};
     double radius_{1.0};
     double intervalMax{0.5};
 };

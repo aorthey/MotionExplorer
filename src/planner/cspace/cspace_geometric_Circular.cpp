@@ -9,7 +9,7 @@
 #include <ompl/util/Exception.h>
 
 GeometricCSpaceOMPLCircular::GeometricCSpaceOMPLCircular(RobotWorld *world_, int robot_idx):
-  GeometricCSpaceOMPLMobius(world_, robot_idx)
+  BaseT(world_, robot_idx)
 {
 }
 
@@ -25,7 +25,7 @@ void GeometricCSpaceOMPLCircular::print(std::ostream& out) const
 }
 
 bool GeometricCSpaceOMPLCircular::IsPlanar(){
-    return true;
+    return false;
 }
 
 void GeometricCSpaceOMPLCircular::DrawGL(GUIState& state)
@@ -89,7 +89,7 @@ Config GeometricCSpaceOMPLCircular::ProjectToConfig(double u)
 
     q[0] = radius_*cos(u);
     q[1] = radius_*sin(u);
-    q[2] = 0;
+    q[2] = zOffset_;
     return q;
 }
 

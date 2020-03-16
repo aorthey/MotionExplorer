@@ -1,8 +1,9 @@
 #pragma once
 #include "planner/cspace/cspace_geometric_Mobius.h"
 
-class GeometricCSpaceOMPLCircular: public GeometricCSpaceOMPLMobius
+class GeometricCSpaceOMPLCircular: public GeometricCSpaceOMPL
 {
+  using BaseT = GeometricCSpaceOMPL;
   public:
 
     GeometricCSpaceOMPLCircular(RobotWorld *world_, int robot_idx);
@@ -17,11 +18,12 @@ class GeometricCSpaceOMPLCircular: public GeometricCSpaceOMPLMobius
 
   protected:
 
-    virtual double OMPLStateToSO2Value(const ob::State *qompl) override;
+    double OMPLStateToSO2Value(const ob::State *qompl);
     Vector3 ProjectToVector3(double u);
     Config ProjectToConfig(double u);
 
   private:
-    double radius_{1.2};
+    double radius_{1.0};
+    double zOffset_{-2.0};
 };
 
