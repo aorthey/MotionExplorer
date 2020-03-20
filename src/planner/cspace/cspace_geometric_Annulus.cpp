@@ -41,11 +41,32 @@ public:
 
 		void sampleUniformNear(ob::State *state, const ob::State *near, double distance) override
     {
-        throw "NYI";
+        const ob::SO2StateSpace::StateType *nearSO2 = 
+          near->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
+        ob::SO2StateSpace::StateType *stateSO2 = 
+          state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
+
+        const ob::RealVectorStateSpace::StateType *nearRn = 
+          near->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+        ob::RealVectorStateSpace::StateType *stateRn = 
+          state->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
+
+        double s = nearSO2->value;
+        stateSO2->value = rng_.uniformReal(s-distance, s+distance);
+
+        // const ob::RealVectorBounds &bounds = space_->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1)->getBounds();
+          
+        const double r = nearRn->values[0];
+        double low2 = (r-distance)*(r-distance);
+        double high2 = (r+distance)*(r+distance);
+        double u = rng_.uniformReal(0,1);
+        stateRn->values[0] = sqrtf(u*(high2-low2) + low2);
+
+        space_->enforceBounds(state);
     }
 		void sampleGaussian(ob::State *state, const ob::State *mean, double stdDev) override
     {
-        throw "NYI";
+        throw ompl::Exception("NYI");
     }
 };
 

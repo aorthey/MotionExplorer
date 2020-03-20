@@ -38,10 +38,10 @@ double OMPLValidityChecker::SufficientDistance(const ob::State* state) const
   return 0;
 }
 
-double OMPLValidityChecker::Distance(const ob::State* state) const
-{
-  return DistanceToRobot(state, klampt_single_robot_cspace);
-}
+// double OMPLValidityChecker::clearance(const ob::State* state) const
+// {
+//   return DistanceToRobot(state, klampt_single_robot_cspace);
+// }
 
 double OMPLValidityChecker::DistanceToRobot(const ob::State* state, SingleRobotCSpace *space) const
 {
@@ -74,7 +74,8 @@ double OMPLValidityChecker::DistanceToRobot(const ob::State* state, SingleRobotC
   int closest1, closest2;
   double d = space->settings->DistanceLowerBound(space->world, idrobot, idothers, 0, dInf, &closest1, &closest2);
 
-  return neighborhood->WorkspaceDistanceToConfigurationSpaceDistance(d);
+  return d;
+  // return neighborhood->WorkspaceDistanceToConfigurationSpaceDistance(d);
 }
 
 
@@ -129,5 +130,6 @@ bool OMPLValidityCheckerNecessarySufficient::IsSufficientFeasible(const ob::Stat
 double OMPLValidityCheckerNecessarySufficient::SufficientDistance(const ob::State* state) const
 {
   double dw = DistanceToRobot(state, klampt_single_robot_cspace_outer_approximation);
-  return neighborhood->WorkspaceDistanceToConfigurationSpaceDistance(dw);
+  return dw;
+  // return neighborhood->WorkspaceDistanceToConfigurationSpaceDistance(dw);
 }
