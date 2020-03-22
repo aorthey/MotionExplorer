@@ -1,21 +1,20 @@
 #include "planner/cspace/cspace_geometric_R_CONTACT.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
-#include "planner/cspace/cspace_geometric_fixedbase.h"
 #include <ompl/base/spaces/SE2StateSpace.h>
 #include <ompl/base/Constraint.h>
 
 GeometricCSpaceOMPLRCONTACT::GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)
-{/*
-    //Adding triangle information to PlannerInput (to be used as constraint
+{
+/*    //Adding triangle information to PlannerInput (to be used as constraint
     //manifolds)
     //filtering for those triangles that belong to feasible contact surfaces
     std::vector<Triangle3D> tris;
     std::vector<Triangle3D> tris_filtered;
 
-    for(uint k = 0; k < world.terrains.size(); k++){
-        Terrain* terrain_k = world.terrains[k];
-        const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();
+    for(uint k = 0; k < world->terrains.size(); k++){
+        Terrain* terrain_k = world->terrains[k];
+        const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();//different mesh
         for(uint j = 0; j < mesh.tris.size(); j++){
             Triangle3D tri;
             mesh.GetTriangle(j, tri);
@@ -49,18 +48,39 @@ GeometricCSpaceOMPLRCONTACT::GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int
             cornerC.push_back(c[0]);
             cornerC.push_back(c[1]);
 
-            std::cout << "Corner A: " << cornerA << std::endl;
-            std::cout << "Corner B: " << cornerB << std::endl;
-            std::cout << "Corner C: " << cornerA << std::endl;
+            std::cout << "Corner A1: " << cornerA[0] << std::endl;
+            std::cout << "Corner A2: " << cornerA[1] << std::endl;
+            //std::cout << "Corner B: " << cornerB << std::endl;
+            //std::cout << "Corner C: " << cornerA << std::endl;
 
             // tris_filtered filled with surface triangles that are feasible for contact (normal in x or y direction)
             tris_filtered.push_back(tris.at(l));
         }
 
     }
-    // std::cout << tris_filtered << std::endl;
-    std::cout << "Environment has " << tris_filtered.size() << " triangles to make contact" << std::endl;*/
+    // ---------------------------currently doesnt get the right input -> output says 0 triangles-----------------------
+    std::cout << "Environment has " << tris_filtered.size() << " triangles to make contact" << std::endl;
+
+    surf_triangles = tris_filtered;
+
+    robot = world->robots[robot_idx];*/
+
 }
+
+
+class ContactConstraint : public ob::Constraint
+{
+public:
+    ContactConstraint() : ob::Constraint(4, 1) // (x,y,theta at 1st link,phi at 2nd)
+    {
+    }
+
+    void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override
+    {
+        //out[0] = x.norm() - 1; // ----change to fit contact case-------
+        out[0] = 0; // empty constraint, always minimized?
+    }
+};
 
 void GeometricCSpaceOMPLRCONTACT::initSpace()
 {
@@ -81,10 +101,13 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
     ob::StateSpacePtr SE2(std::make_shared<ob::SE2StateSpace>());
     ob::SE2StateSpace *cspaceSE2;
     ob::RealVectorStateSpace *cspaceRN = nullptr;
+    // add contact constraint space here
 
     if(Nompl>0){
         ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(Nompl));
-        this->space = SE2 + Rn;
+        css = std::make_shared<ob::ProjectedStateSpace>(SE2 + Rn, constraint); // space becomes css
+        csi = std::make_shared<ob::ConstrainedSpaceInformation>(css);
+
         cspaceSE2 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE2StateSpace>(0);
         cspaceRN = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
     }else{
@@ -234,33 +257,12 @@ Vector3 GeometricCSpaceOMPLRCONTACT::getContact(const ob::State *s)
     return v;
 }
 
-
-//##########################################################################################
-// Constraint Function here
-// Taken from the OMPL Constrained Planning Tutorial
-//##########################################################################################
-
-//GeometricCSpaceOMPL fixed = new GeometricCSpaceOMPLFixedBase(RobotWorld *world_, int robot_idx)
-
-class ContactConstraint : public ob::Constraint
-{
-public:
-    // ob::Constraint's constructor takes in two parameters, the dimension of
-    // the ambient state space, and the dimension of the real vector space the
-    // constraint maps into. For our sphere example, as we are planning in R^3, the
-    // dimension of the ambient space is 3, and as our constraint outputs one real
-    // value the second parameter is one (this is also the co-dimension of the
-    // constraint manifold).
-    ContactConstraint() : ob::Constraint(4, 2) // (x,y,theta at 1st link,phi at 2nd)
-    {
+ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr() {
+    if (!si) { //si: stateInformationPtr from cspace.h
+        si = std::make_shared<ob::SpaceInformation>(SpacePtr());
+        // csi = std::make_shared<ob::ContactSpaceInformation>(SpacePtr());
+        validity_checker = StateValidityCheckerPtr(si);
+        si->setStateValidityChecker(validity_checker);
     }
-
-    // Here we define the actual constraint function, which takes in some state "x"
-    // (from the ambient space) and sets the values of "out" to the result of the
-    // constraint function. Note that we are implemen ting `function` which has this
-    // function signature, not the one that takes in ompl::base::State.
-    void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override
-    {
-        out[0] = x.norm() - 1; // ----change to fit contact case-------
-    }
-};
+    return si;
+}
