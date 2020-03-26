@@ -24,13 +24,13 @@ Roadmap::Roadmap()
 Roadmap::Roadmap(const ob::PlannerDataPtr pd_, CSpaceOMPL *cspace_): 
   pd(pd_), cspace(cspace_)
 {
-  std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
+  // std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
   path_ompl = GetShortestPath();
 }
 Roadmap::Roadmap(const ob::PlannerDataPtr pd_, CSpaceOMPL *cspace_, CSpaceOMPL *quotient_space_): 
   pd(pd_), cspace(cspace_), quotient_space(quotient_space_)
 {
-  std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
+  // std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
   path_ompl = GetShortestPath();
 }
 
@@ -332,7 +332,7 @@ bool Roadmap::Save(TiXmlElement *node)
 
       ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
       if(v==nullptr){
-          subnode->SetAttribute("feasible", "unknown");
+          subnode->SetAttribute("feasible", "yes");
       }
       // if(v==nullptr){
       //   subnode->SetAttribute("feasible", "unknown");

@@ -11,9 +11,9 @@
   <plannerinput>
 
     <agent id="0" 
-        qinit="15  -3.5 0.0 +0.0 -0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        qinit="15  -3.5 -1.0 +0.0 -0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
         dqinit="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
-        qgoal="15  +3.5 0.0 +0.0 +0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        qgoal="15  +3.5 -1.0 +0.0 +0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
         dqgoal="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
         uMin="6  0 0 0 -0.3 0 0"
         uMax="6  0 0 0 +0.3 0 0"/>
@@ -36,20 +36,17 @@
     <kinodynamic>1</kinodynamic>
     <timestep min="0.01" max="0.1"/>
 
-    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
     <epsilongoalregion>1</epsilongoalregion>
     <pathSpeed>10</pathSpeed>
-
-    <algorithm dynamic="1" name="hierarchy:qrrt"/>
-    <algorithm dynamic="1" name="ompl:dynamic:sst"/>
 
     <multiAgent>1</multiAgent>
 
     <hierarchy>
-      <!-- <level> -->
-      <!--   <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/> -->
-      <!--   <1!-- <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/> --1> -->
-      <!-- </level> -->
+      <level>
+        <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/>
+        <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/>
+      </level>
       <level>
         <!-- <robot id="1" freeFloating="1" type="R2"/> -->
         <robot id="0" freeFloating="1" type="TSE2"/>

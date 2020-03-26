@@ -29,6 +29,8 @@
     <algorithm dynamic="1" name="hierarchy:qrrt"/>
     <algorithm dynamic="1" name="hierarchy:qrrtstar"/>
     <algorithm dynamic="1" name="hierarchy:qmp"/>
+    <algorithm dynamic="1" name="hierarchy:qmpstar"/>
+    <algorithm dynamic="1" name="hierarchy:spqr"/>
     <algorithm dynamic="1" name="ompl:dynamic:sst"/>
     <algorithm dynamic="1" name="ompl:dynamic:rrt"/>
     <kinodynamic>1</kinodynamic>

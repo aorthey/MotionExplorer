@@ -27,7 +27,7 @@
 
     <freeFloating>1</freeFloating>
     <maxplanningtime>1</maxplanningtime>
-    <!-- <sampler name="bridge_test"/>            <1!-- uniform|gaussian|minimum_clearance|maximum_clearance|obstacle_based|bridge_test --1> -->
+    <pathSpeed>4</pathSpeed>
 
     <hierarchy>
       <level inner_index="3" type="R3"/>
