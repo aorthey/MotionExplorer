@@ -41,7 +41,6 @@
     <pathSpeed>10</pathSpeed>
     <!-- <smoothPath>1</smoothPath> -->
 
-    <algorithm name="hierarchy:qrrt"/>
     <hierarchy>
       <level inner_index="3" type="S1RN"/>
       <level inner_index="6" type="S1RN"/>

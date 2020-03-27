@@ -28,7 +28,7 @@
 #include <ompl/geometric/planners/prm/LazyPRM.h>
 #include <ompl/geometric/planners/prm/LazyPRMstar.h>
 #include <ompl/geometric/planners/prm/SPARS.h>
-// #include <ompl/geometric/planners/prm/SPARStwo.h> //requires C++14
+#include <ompl/geometric/planners/prm/SPARStwo.h> //requires C++14
 #include <ompl/geometric/planners/kpiece/KPIECE1.h>
 #include <ompl/geometric/planners/kpiece/BKPIECE1.h>
 #include <ompl/geometric/planners/kpiece/LBKPIECE1.h>
@@ -118,7 +118,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:lazyprm") planner = std::make_shared<og::LazyPRM>(si);
   else if(algorithm=="ompl:lazyprmstar") planner = std::make_shared<og::LazyPRMstar>(si);
   else if(algorithm=="ompl:spars") planner = std::make_shared<og::SPARS>(si);
-  // else if(algorithm=="ompl:spars2") planner = std::make_shared<og::SPARStwo>(si);
+  else if(algorithm=="ompl:spars2") planner = std::make_shared<og::SPARStwo>(si);
 
   else if(algorithm=="ompl:cforest") planner = std::make_shared<og::CForest>(si);
   else if(algorithm=="ompl:sst") planner = std::make_shared<og::SST>(si);

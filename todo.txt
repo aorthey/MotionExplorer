@@ -618,36 +618,17 @@ projection onto NBH seems to go wrong)
 
 [x] Make StepTowards a strategy 
 
-Experiments for paper:
-[ ] Rigid Body 2D misleading
-[ ] Rigid Body 2D labyrinth
-[ ] Rigid Body 2D non-simple
-[ ] Rigid Body 3D as IROS
-[ ] Articulated Body 3D
-[ ] Manipulator
-[ ] Manipulator DualArm
-[ ] Humanoid Robot!
-[ ] Hand Movement
-[ ] Dubins Car (Kinodynamic)
-
 [ ] Encapsulate Cover Queue
 [ ] Path on CS is sometimes not displayed
 [ ] REMOVE LEMON
-
-[ ] What is not working:
- [ ] Interpolate (QuotientCover.cpp:1055)
 
 [x] Outsource interpolate
 [x] Comment out all interpolate, move to metric, and implement
 EuclideaMEtricInterpolation
 
-[ ] Why is NearestK not working correctly? (because of pseudo metric?) (because
-of pseudo metric?)
-
 Problems for decomposition
 [x] PathClasses contain additional vertices not belonging to path.
 [x] jump directly to last selection, not going back
-[ ] tighten roadmap
 [ ] connect subroadmaps on cspace
 [ ] better way to do DFS path enumeration
 [ ] Fix enumerating path when no solution has been found
@@ -675,9 +656,18 @@ the wrong way)
 [ ] Multi minima RRT
 NONHOLONOMIC CONSTRAINTS
 [ ] Pendulum in G field
-
-
-
-
 [ ] Update Klampt to newest version
 [ ] Make Klampt/OMPL Submodules
+
+Experiments for paper:
+[ ] Rigid Body 2D misleading
+[ ] Rigid Body 2D labyrinth
+[ ] Rigid Body 2D non-simple
+[ ] Rigid Body 3D as IROS
+[ ] Articulated Body 3D
+[ ] Manipulator
+[ ] Manipulator DualArm
+[ ] Humanoid Robot!
+[ ] Hand Movement
+[ ] Dubins Car (Kinodynamic)
+
