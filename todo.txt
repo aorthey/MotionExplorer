@@ -671,3 +671,5 @@ Experiments for paper:
 [ ] Hand Movement
 [ ] Dubins Car (Kinodynamic)
 
+
+[ ] viewport saving for xml file not robot

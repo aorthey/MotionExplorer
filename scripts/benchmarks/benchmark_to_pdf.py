@@ -1,11 +1,13 @@
 import numpy as np
 import sys
 import matplotlib.pyplot as plt
+plt.rcParams.update({'font.size': 14})
+
 from matplotlib.backends.backend_pdf import PdfPages
 from xml.dom.minidom import parse
 import os
 
-def XMLtoPDF(fname):
+def XMLtoPDF(fname, histogram=False):
   fname_base, fname_ext = os.path.splitext(fname)
   fname_pdf = fname_base + ".pdf"
 
@@ -43,7 +45,9 @@ def XMLtoPDF(fname):
       vnodes[c_ctr,p_ctr] = nodes
       vsuccess[c_ctr,p_ctr] = success
       c_ctr=c_ctr+1
-    print ("name:", name, " time: ", np.mean(vtimes[:,p_ctr]))
+    print ("name:", name, 
+        " time: ", np.mean(vtimes[:,p_ctr]), 
+        "+/-", np.std(vtimes[:,p_ctr]))
     p_ctr=p_ctr+1
 
   #print vnodes
@@ -64,7 +68,13 @@ def XMLtoPDF(fname):
     vtimes = np.vstack((vtimes,vtimes))
 
   means = np.mean(vtimes,axis=0)
-  plt.boxplot(vtimes, notch=0, sym='k+', vert=1, whis=1.5)
+
+  if histogram:
+    plt.boxplot(vtimes, notch=0, sym='k+', vert=1, whis=1.5)
+  else:
+    print(means)
+    plt.bar(vnames, means)
+    # plt.boxplot(vtimes, notch=0, sym='k+', vert=1, whis=1.5)
 
   plannerLabelRotation=80
   xtickNames = plt.setp(ax,xticklabels=vnames)
@@ -81,25 +91,25 @@ def XMLtoPDF(fname):
     for ticklabel in plt.gca().get_xticklabels():
       if ctr == bestTimeIdx:
         ticklabel.set_fontweight('extra bold')
-        ticklabel.set_fontsize('large')
       ctr=ctr+1
 
   ###################################################################################
   #visualize timelimit and runcount in upper right corner
   ###################################################################################
   txt = "runcount=%3.0d"%runcount
-  ax.text(0.85, 0.95, txt, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
+  ax.text(0.65, 0.96, txt, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes)
   print(timelimit)
   if timelimit < 1:
     txt = "timelimit=%3.1f"%timelimit+"s"
   else:
     txt = "timelimit=%3.0f"%timelimit+"s"
-  ax.text(0.85, 0.9, txt, horizontalalignment='center', verticalalignment='center', transform = ax.transAxes)
+  ax.text(0.65, 0.9, txt, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes)
   ax.axhline(timelimit,color='k',linestyle='--')
 
   plt.tight_layout()
-  pp.savefig(plt.gcf())
+  pp.savefig(plt.gcf(), pad_inches=0.0, bbox_inches='tight')
   pp.close()
+  plt.show()
 
   cmd = "apvlv "+fname_pdf
   os.system(cmd)

@@ -351,7 +351,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
         }
         name_algorithm_strat += ")";
 
-        planner_k_i->setName(name_algorithm_strat);
+        // planner_k_i->setName(name_algorithm_strat);
         std::cout << "adding planner with ambient space " << si_vec_k.back()->getStateDimension() << std::endl;
         benchmark.addPlanner(planner_k_i);
         planner_ctr++;

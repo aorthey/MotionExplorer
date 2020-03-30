@@ -23,9 +23,9 @@
   <benchmark name="infeasible">
     <!-- <algorithm name="ompl:rrt"/> -->
     <algorithm name="hierarchy:spqr"/>
-    <algorithm name="ompl:spars2"/>
     <algorithm name="ompl:spars"/>
-    <maxplanningtime>60</maxplanningtime> <!-- runtime in (s) --> 
+    <algorithm name="ompl:spars2"/>
+    <maxplanningtime>120</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>10</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
