@@ -373,7 +373,8 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
     std::vector<int> current_lvl_ids;
     std::vector<std::string> type;
     std::vector<int> freeFloating;
-    while(k>0){
+    while(k>0)
+    {
       k--;
       if(k>=stratification.layers.size()-1){
         std::sort(stratification.layers.at(k).ids.begin(), stratification.layers.at(k).ids.end());
@@ -392,6 +393,7 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
               type.push_back(typej);
               freeFloating.push_back(freeFloatingj);
               found = true;
+              break;
             }
           }
           if(!found){
@@ -411,7 +413,6 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
         freeFloating.clear();
       }
       std::cout << last_lvl_ids << std::endl;
-      std::cout << type << std::endl;
     }
   }else{
     std::cout << "[WARNING] Did not specify robot hierarchy. Assuming one layer SE3RN" << std::endl;

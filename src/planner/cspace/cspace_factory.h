@@ -14,6 +14,7 @@
 #include "planner/cspace/cspace_geometric_Circular.h"
 #include "planner/cspace/cspace_geometric_RN_time.h"
 #include "planner/cspace/cspace_geometric_SE2RN.h"
+#include "planner/cspace/cspace_geometric_SE3_constrained.h"
 #include "planner/cspace/cspace_geometric_SO2RN.h"
 #include "planner/cspace/cspace_geometric_R3S2.h"
 #include "planner/cspace/cspace_geometric_fixedbase.h"
@@ -58,6 +59,12 @@ class CSpaceFactory{
     // CSpace  SE(3)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE3( RobotWorld *world, int robot_idx){
       return MakeGeometricCSpace(world, robot_idx);
+    }
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE3Constrained( RobotWorld *world, int robot_idx){
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLSE3Constrained(world, robot_idx);
+      cspace->SetCSpaceInput(input);
+      cspace->Init();
+      return cspace;
     }
 
     virtual CSpaceOMPLMultiAgent* MakeGeometricCSpaceMultiAgent( std::vector<CSpaceOMPL*> cspaces){

@@ -348,10 +348,14 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
           if(j>=si_vec_k.size()-1 && shortStratification) break;
           uint Nj = si_vec_k.at(j)->getStateDimension();
           name_algorithm_strat += std::to_string(Nj);
+          if(j < si_vec_k.size()-1) name_algorithm_strat += "|";
         }
         name_algorithm_strat += ")";
 
-        // planner_k_i->setName(name_algorithm_strat);
+        if(stratifications.size() > 1)
+        {
+          planner_k_i->setName(name_algorithm_strat);
+        }
         std::cout << "adding planner with ambient space " << si_vec_k.back()->getStateDimension() << std::endl;
         benchmark.addPlanner(planner_k_i);
         planner_ctr++;
@@ -368,7 +372,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(input.q_goal);
   ss.setStartAndGoalStates(start, goal, input.epsilon_goalregion);
 
-  ss.getStateSpace()->registerProjections();
+  // ss.getStateSpace()->registerProjections();
   ss.setup();
 
   pdef->setOptimizationObjective( GetOptimizationObjective(si) );

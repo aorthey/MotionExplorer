@@ -60,7 +60,7 @@ def XMLtoPDF(fname, histogram=False):
   fig = plt.figure(0)
   ax = fig.gca()
   fig.patch.set_facecolor('white')
-  ax.set_xlabel('Algorithm')
+  # ax.set_xlabel('Algorithm')
   ax.set_ylim([0,timelimit+0.15*timelimit]);
   ax.set_ylabel('Time (s)')
 
@@ -96,15 +96,17 @@ def XMLtoPDF(fname, histogram=False):
   ###################################################################################
   #visualize timelimit and runcount in upper right corner
   ###################################################################################
-  txt = "runcount=%3.0d"%runcount
-  ax.text(0.65, 0.96, txt, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes)
-  print(timelimit)
-  if timelimit < 1:
-    txt = "timelimit=%3.1f"%timelimit+"s"
-  else:
-    txt = "timelimit=%3.0f"%timelimit+"s"
-  ax.text(0.65, 0.9, txt, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes)
+  # txt = "runcount=%3.0d"%runcount
+  # ax.text(0.65, 0.96, txt, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes)
+  # if timelimit < 1:
+  #   txt = "timelimit=%3.1f"%timelimit+"s"
+  # else:
+  #   txt = "timelimit=%3.0f"%timelimit+"s"
+  # ax.text(0.65, 0.9, txt, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes)
   ax.axhline(timelimit,color='k',linestyle='--')
+  txt = "[%3.0d run average]"%runcount
+  ax.text(0.65, 0.93, txt, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes)
+  ###################################################################################
 
   plt.tight_layout()
   pp.savefig(plt.gcf(), pad_inches=0.0, bbox_inches='tight')
@@ -121,6 +123,7 @@ if __name__ == '__main__':
     for fname in sys.argv[1:]:
       XMLtoPDF(fname)
   else:
+    fname = "../../data/benchmarks/IJRR2020/34D_pr2_infeasible_2020_03_27_11:56:56.xml"
     fname = "../../data/benchmarks/last.xml"
     XMLtoPDF(fname)
 
