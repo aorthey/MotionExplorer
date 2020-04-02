@@ -2,6 +2,7 @@
 #include "planner/cspace/integrator/tangentbundle.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SE3StateSpace.h>
+#include "common.h"
 
 KinodynamicCSpaceOMPL::KinodynamicCSpaceOMPL(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)
@@ -167,9 +168,11 @@ void KinodynamicCSpaceOMPL::initSpace()
   boundsTM.low = lowTM;
   boundsTM.high = highTM;
   boundsTM.check();
+
   //TODO
   boundsTM.setLow(-10);
   boundsTM.setHigh(10);
+  OMPL_WARN("Setting manual velocity.");
   cspaceTM->setBounds(boundsTM);
 
 }
@@ -187,6 +190,12 @@ void KinodynamicCSpaceOMPL::initControlSpace()
 
   cbounds.setLow(NdimControl,input.timestep_min);//propagation step size
   cbounds.setHigh(NdimControl,input.timestep_max);
+
+  if(input.uMin.size() < 6)
+  {
+    OMPL_ERROR("Could not find minimum/maximum control for robot %d", GetRobotIndex());
+    throw "NoControl";
+  }
 
   for(uint i = 0; i < 6; i++){
     cbounds.setLow(i,input.uMin(i));

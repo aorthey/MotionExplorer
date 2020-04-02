@@ -190,7 +190,7 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
       ai.uMax = GetAttributeDefault<Config>(node_agent, "uMax", uzero);
       uMin = ai.uMin;
       uMax = ai.uMax;
-      OMPL_WARN("TODO: Currently, we only support one single control input.");
+      std::cout << ai.id << ":" << ai.uMin << std::endl;
       agent_information.push_back(ai);
       node_agent = FindNextSiblingNode(node_agent);
       N += ai.q_init.size();

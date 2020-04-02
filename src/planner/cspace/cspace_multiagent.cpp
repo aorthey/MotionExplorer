@@ -229,7 +229,14 @@ std::vector<CSpaceOMPLMultiAgent::ConfigVelocity> CSpaceOMPLMultiAgent::splitCon
 
 Vector3 CSpaceOMPLMultiAgent::getXYZ(const ob::State *qompl)
 {
-  return getXYZ(qompl, GetRobotIdxs().front());
+  Vector3 v;
+  std::vector<int> ridxs = GetRobotIdxs();
+  for(uint k = 0; k < ridxs.size(); k++){
+      const ob::State *qomplAgent = static_cast<const ob::CompoundState*>(qompl)->as<ob::State>(k);
+      v += cspaces_.at(k)->getXYZ(qomplAgent);
+  }
+  v = v/(double)ridxs.size();
+  return v;
 }
 
 Vector3 CSpaceOMPLMultiAgent::getXYZ(const ob::State *qompl, int ridx)
