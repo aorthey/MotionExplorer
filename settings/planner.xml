@@ -14,12 +14,15 @@
 
   <!-- <algorithm name="hierarchy:sampler"/> -->
   <!-- <algorithm name="benchmark:minimal"/> -->
+
+  <algorithm name="ompl:bitstar"/>
+
+  <algorithm name="hierarchy:qmp"/>
+  <algorithm name="hierarchy:qmpstar"/>
   <algorithm name="hierarchy:spqr"/>
   <algorithm name="ompl:spars"/>
   <algorithm name="hierarchy:qrrt"/>
   <algorithm name="hierarchy:qrrtstar"/>
-  <algorithm name="hierarchy:qmp"/>
-  <algorithm name="hierarchy:qmpstar"/>
 
   <algorithm name="ompl:rrt"/>
   <algorithm name="ompl:rrtstar"/>
@@ -51,4 +54,5 @@
   <freeFloating>0</freeFloating>
   <kinodynamic>0</kinodynamic> 
   <multiAgent>0</multiAgent> 
+
 </planner>

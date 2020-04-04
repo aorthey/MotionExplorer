@@ -127,14 +127,13 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
   }
 
 
-  std::cout << "Create QuotientSpace with dimensionality " << cspace_level->GetDimensionality() << "[OMPL] and " 
-    << cspace_level->GetKlamptDimensionality() << "[Klampt] (Robot Index " << cspace_level->GetRobotIndex() << ")." << std::endl;
-
   return cspace_level;
 }
 
 CSpaceOMPL* MotionPlanner::ComputeCSpaceLayer(const Layer &layer)
 {
+
+  CSpaceOMPL *cspace_layer = nullptr;
 
   if(!input.multiAgent){
     int ii = layer.inner_index;
@@ -152,15 +151,22 @@ CSpaceOMPL* MotionPlanner::ComputeCSpaceLayer(const Layer &layer)
     }
 
     std::string type = layer.type;
-    CSpaceOMPL *cspace_layer = ComputeCSpace(type, ii, input.freeFloating);
+    cspace_layer = ComputeCSpace(type, ii, input.freeFloating);
     if(layer.finite_horizon_relaxation > 0){
       std::cout << "Finite Horizon relaxation: " << layer.finite_horizon_relaxation << std::endl;
     }
-    return cspace_layer;
+
   }else{
-    CSpaceOMPL *cspace_layer = ComputeMultiAgentCSpace(layer);
-    return cspace_layer;
+    cspace_layer = ComputeMultiAgentCSpace(layer);
   }
+  if(cspace_layer != nullptr)
+  {
+    std::cout << "Create QuotientSpace with dimensionality " 
+      << cspace_layer->GetDimensionality() << "[OMPL] and " 
+      << cspace_layer->GetKlamptDimensionality() << "[Klampt] (Robot Index " 
+      << cspace_layer->GetRobotIndex() << ")." << std::endl;
+  }
+  return cspace_layer;
 }
 
 void MotionPlanner::CreateHierarchy()

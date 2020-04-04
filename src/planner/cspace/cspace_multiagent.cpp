@@ -158,7 +158,6 @@ void CSpaceOMPLMultiAgent::initSpace()
     Nklampts.push_back( ck->GetKlamptDimensionality() );
     Nompls.push_back( ck->GetDimensionality() );
   }
-  space->printSettings(std::cout);
 
   Nompl = std::accumulate(Nompls.begin(), Nompls.end(), 0);
   Nklampt = std::accumulate(Nklampts.begin(), Nklampts.end(), 0);

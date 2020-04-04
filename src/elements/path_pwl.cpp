@@ -195,8 +195,11 @@ void PathPiecewiseLinear::Smooth(bool forceSmoothing){
       interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
     }
 
+    double l = path->length();
     path = std::make_shared<og::PathGeometric>(gpath);
-    std::cout << "Path smoothed (states: " << statesB.size() << " -> " << states.size() << ")" << std::endl;
+    std::cout << "Path smoothed (states: " << statesB.size() << " -> " << states.size() 
+      << ", length: " << l << " -> " << path->length()
+      << ")" << std::endl;
     isSmooth = true;
   }
 

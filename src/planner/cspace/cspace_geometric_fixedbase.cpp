@@ -68,7 +68,7 @@ void GeometricCSpaceOMPLFixedBase::initSpace()
   cspace->setBounds(boundsRn);
 
   //Required to circumvent problems during fine manipulation planning.
-  this->space->setLongestValidSegmentFraction(0.005);
+  this->space->setLongestValidSegmentFraction(0.001);
 
 }
 

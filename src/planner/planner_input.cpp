@@ -190,7 +190,6 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
       ai.uMax = GetAttributeDefault<Config>(node_agent, "uMax", uzero);
       uMin = ai.uMin;
       uMax = ai.uMax;
-      std::cout << ai.id << ":" << ai.uMin << std::endl;
       agent_information.push_back(ai);
       node_agent = FindNextSiblingNode(node_agent);
       N += ai.q_init.size();
@@ -412,7 +411,6 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
         type.clear();
         freeFloating.clear();
       }
-      std::cout << last_lvl_ids << std::endl;
     }
   }else{
     std::cout << "[WARNING] Did not specify robot hierarchy. Assuming one layer SE3RN" << std::endl;

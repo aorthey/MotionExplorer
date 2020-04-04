@@ -47,6 +47,7 @@
 
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 #include <ompl/base/objectives/MaximizeMinClearanceObjective.h>
+#include <ompl/base/terminationconditions/IterationTerminationCondition.h>
 
 #include <ompl/base/goals/GoalState.h>
 #include <ompl/geometric/PathGeometric.h>
@@ -120,6 +121,10 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:spars") planner = std::make_shared<og::SPARS>(si);
   else if(algorithm=="ompl:spars2") planner = std::make_shared<og::SPARStwo>(si);
 
+  else if(algorithm=="ompl:bitstar") planner = std::make_shared<og::BITstar>(si);
+  else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
+  else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
+
   else if(algorithm=="ompl:cforest") planner = std::make_shared<og::CForest>(si);
   else if(algorithm=="ompl:sst") planner = std::make_shared<og::SST>(si);
   else if(algorithm=="ompl:pdst") planner = std::make_shared<og::PDST>(si);
@@ -131,8 +136,6 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:biest") planner = std::make_shared<og::BiEST>(si);
   else if(algorithm=="ompl:projest") planner = std::make_shared<og::ProjEST>(si);
   else if(algorithm=="ompl:sbl") planner = std::make_shared<og::SBL>(si);
-  else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
-  else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
 
   else if(algorithm=="hierarchy:qrrt") planner = std::make_shared<og::QRRT>(siVec, "QRRT");
   else if(algorithm=="hierarchy:qrrtstar") planner = std::make_shared<og::QRRTStar>(siVec, "QRRTStar");
@@ -381,7 +384,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   req.maxTime = binput.maxPlanningTime;
   req.maxMem = binput.maxMemory;
   req.runCount = binput.runCount;
-  req.useThreads = false;
+  // req.useThreads = false;
   req.simplify = false;
   req.displayProgress = true;
 
