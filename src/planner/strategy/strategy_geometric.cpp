@@ -342,6 +342,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
           }
 
         }
+
         ob::PlannerPtr planner_k_i = GetPlanner(binput.algorithms.at(k), stratifications.at(i));
 
         std::string name_algorithm_strat = planner_k_i->getName()+"_(";
@@ -375,7 +376,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(input.q_goal);
   ss.setStartAndGoalStates(start, goal, input.epsilon_goalregion);
 
-  // ss.getStateSpace()->registerProjections();
+  ss.getStateSpace()->registerProjections();
   ss.setup();
 
   pdef->setOptimizationObjective( GetOptimizationObjective(si) );

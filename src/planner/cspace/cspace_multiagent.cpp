@@ -169,7 +169,8 @@ void CSpaceOMPLMultiAgent::initSpace()
 
 }
 
-uint CSpaceOMPLMultiAgent::GetKlamptDimensionality() const{
+uint CSpaceOMPLMultiAgent::GetKlamptDimensionality() const
+{
   return Nklampt;
 }
 

@@ -173,8 +173,8 @@ void KinodynamicCSpaceOMPL::initSpace()
   boundsTM.setLow(-10);
   boundsTM.setHigh(10);
   OMPL_WARN("Setting manual velocity.");
-  cspaceTM->setBounds(boundsTM);
 
+  cspaceTM->setBounds(boundsTM);
 }
 
 void KinodynamicCSpaceOMPL::initControlSpace()

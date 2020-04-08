@@ -163,8 +163,13 @@ CSpaceOMPL* MotionPlanner::ComputeCSpaceLayer(const Layer &layer)
   {
     std::cout << "Create QuotientSpace with dimensionality " 
       << cspace_layer->GetDimensionality() << "[OMPL] and " 
-      << cspace_layer->GetKlamptDimensionality() << "[Klampt] (Robot Index " 
-      << cspace_layer->GetRobotIndex() << ")." << std::endl;
+      << cspace_layer->GetKlamptDimensionality() << "[Klampt] (Robot Index ";
+      if(!input.multiAgent){
+        std::cout << cspace_layer->GetRobotIndex();
+      }else{
+        std::cout << static_cast<CSpaceOMPLMultiAgent*>(cspace_layer)->GetRobotIdxs();
+      }
+      std::cout << ")." << std::endl;
   }
   return cspace_layer;
 }
@@ -233,6 +238,13 @@ void MotionPlanner::CreateHierarchy()
         {
           qi = input.q_init;
           qg = input.q_goal;
+          uint N = cspace_level_k->GetKlamptDimensionality();
+          if(qi.size() != (int)N)
+          {
+            OMPL_ERROR("Init vector contains %d dimensions, but robot %d has %d dimensions", 
+                qi.size(), cspace_level_k->GetRobotIndex(), N);
+            throw "";
+          }
         }else{
           std::vector<int> Nklampts = 
             static_cast<CSpaceOMPLMultiAgent*>(cspace_level_k)->GetKlamptDimensionalities();

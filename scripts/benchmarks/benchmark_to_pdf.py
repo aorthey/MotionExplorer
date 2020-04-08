@@ -1,7 +1,8 @@
 import numpy as np
 import sys
 import matplotlib.pyplot as plt
-plt.rcParams.update({'font.size': 14})
+plt.rcParams.update({'font.size': 30})
+plt.rcParams.update({'font.family': 'cmr'})
 
 from matplotlib.backends.backend_pdf import PdfPages
 from xml.dom.minidom import parse
@@ -57,7 +58,8 @@ def XMLtoPDF(fname, histogram=False):
   #PLOTTING
   ###################################################################################
   pp = PdfPages(fname_pdf)
-  fig = plt.figure(0)
+  # fig = plt.figure(0)
+  fig = plt.figure(figsize=(20,10))
   ax = fig.gca()
   fig.patch.set_facecolor('white')
   # ax.set_xlabel('Algorithm')
@@ -76,7 +78,7 @@ def XMLtoPDF(fname, histogram=False):
     plt.bar(vnames, means)
     # plt.boxplot(vtimes, notch=0, sym='k+', vert=1, whis=1.5)
 
-  plannerLabelRotation=80
+  plannerLabelRotation=85
   xtickNames = plt.setp(ax,xticklabels=vnames)
   plt.setp(xtickNames, rotation=plannerLabelRotation)
 
