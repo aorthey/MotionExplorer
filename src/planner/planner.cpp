@@ -70,7 +70,7 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
       if(type=="R2") {
         cspace_level = factory.MakeGeometricCSpaceRN(world, robot_idx, 2);
       }else if(type=="R_CONTACT") {
-        cspace_level = factory.MakeGeometricCSpaceRCONTACT(world, robot_inner_idx);
+        cspace_level = factory.MakeGeometricCSpaceRCONTACT(world, robot_idx);
       }else if(type=="R3") {
         cspace_level = factory.MakeGeometricCSpaceRN(world, robot_idx, 3);
       }else if(type=="R3S2"){

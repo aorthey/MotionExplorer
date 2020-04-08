@@ -14,8 +14,8 @@ class GeometricCSpaceOMPLRCONTACT: public GeometricCSpaceOMPL
 
     ob::ConstraintPtr constraint;
     ob::ConstrainedStateSpacePtr css;
-    ob::ConstrainedSpaceInformationPtr csi;
-    ompl::geometric::SimpleSetupPtr ss;
+    // ob::ConstrainedSpaceInformationPtr csi;
+    // ompl::geometric::SimpleSetupPtr ss;
 
   public:
     GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int robot_idx);
@@ -25,8 +25,10 @@ class GeometricCSpaceOMPLRCONTACT: public GeometricCSpaceOMPL
     virtual void initSpace() override;
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
     virtual Config OMPLStateToConfig(const ob::State *qompl) override;
-    virtual void print() const override;
+    virtual void print(std::ostream& out = std::cout) const;
     virtual Vector3 getXYZ(const ob::State *s);
+
+    virtual ob::SpaceInformationPtr SpaceInformationPtr() override;
     // virtual ob::SpaceInformationPtr SpaceInformationPtr() override;
 };
 
