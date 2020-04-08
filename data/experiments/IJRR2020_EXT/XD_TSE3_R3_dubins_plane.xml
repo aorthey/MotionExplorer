@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
+  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
+  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
+  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
+  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
+  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
+  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
+  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
+
+  <rigidObject name="canyon" file="../../terrains/buildings/tori.stl" translation="0 0 0"/>
+
+  <plannerinput>
+
+    <agent 
+      id="0" 
+      qinit="6  -3.0 -5.0 +1.5 0 0 0"
+      qgoal="6  +3.0 -5.0 +1.5 0 0 0"
+      dqinit="6  0 0 0 0 0 0 0 0 0 0 0 0"
+      dqgoal="6  0 0 0 0 0 0 0 0 0 0 0 0"
+      uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5 0 0 0 0 0 0"
+      uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5 0 0 0 0 0 0"
+    />
+    <agent 
+      id="1" 
+      qinit="6  -3.0 -2.5 +1.5 0 0 0"
+      qgoal="6  +3.0 -2.5 +1.5 0 0 0"
+      dqinit="6  0 0 0 0 0 0"
+      dqgoal="6  0 0 0 0 0 0"
+      uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5"
+      uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5"
+    />
+    <agent 
+      id="2" 
+      qinit="6  -3.0 +0.0 +1.5 0 0 0"
+      qgoal="6  +3.0 +0.0 +1.5 0 0 0"
+      dqinit="6  0 0 0 0 0 0"
+      dqgoal="6  0 0 0 0 0 0"
+      uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5"
+      uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5"
+    />
+    <agent 
+      id="3" 
+      qinit="6  -3.0 +2.5 +1.5 0 0 0"
+      qgoal="6  +3.0 +2.5 +1.5 0 0 0"
+      dqinit="6  0 0 0 0 0 0"
+      dqgoal="6  0 0 0 0 0 0"
+      uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5"
+      uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5"
+    />
+    <agent 
+      id="4" 
+      qinit="6  -3.0 -5.0 +3.5 0 0 0"
+      qgoal="6  +3.0 -5.0 +3.5 0 0 0"
+      dqinit="6  0 0 0 0 0 0 0 0 0 0 0 0"
+      dqgoal="6  0 0 0 0 0 0 0 0 0 0 0 0"
+      uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5 0 0 0 0 0 0"
+      uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5 0 0 0 0 0 0"
+    />
+    <agent 
+      id="5" 
+      qinit="6  -3.0 -2.5 +3.5 0 0 0"
+      qgoal="6  +3.0 -2.5 +3.5 0 0 0"
+      dqinit="6  0 0 0 0 0 0"
+      dqgoal="6  0 0 0 0 0 0"
+      uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5"
+      uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5"
+    />
+    <agent 
+      id="6" 
+      qinit="6  -3.0 +0.0 +3.5 0 0 0"
+      qgoal="6  +3.0 +0.0 +3.5 0 0 0"
+      dqinit="6  0 0 0 0 0 0"
+      dqgoal="6  0 0 0 0 0 0"
+      uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5"
+      uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5"
+    />
+    <agent 
+      id="7" 
+      qinit="6  -3.0 +2.5 +3.5 0 0 0"
+      qgoal="6  +3.0 +2.5 +3.5 0 0 0"
+      dqinit="6  0 0 0 0 0 0"
+      dqgoal="6  0 0 0 0 0 0"
+      uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5"
+      uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5"
+    />
+
+    <se3min config="6  -8.0 -6.0 -1.0 -3.141593 -0.1 -0.1"/>
+    <se3max config="6  +8.0 +6.0 +7.0 +3.141593 +0.1 +0.1"/>
+
+    <control_min config="6  0 0 0 -0.1 -0.1 -0.1"/>
+    <control_max config="6  0 0 0 +0.1 +0.1 +0.1"/>
+
+    <maxplanningtime>2</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>0.01</epsilongoalregion>
+    <freeFloating>1</freeFloating>
+    <pathSpeed>1.5</pathSpeed>
+    <pathWidth>0.3</pathWidth>
+    <timestep min="0.01" max="0.1"/>
+    <!-- <algorithm dynamic="1" name="hierarchy:qrrt"/> -->
+    <algorithm name="hierarchy:qrrt"/>
+
+    <multiAgent>1</multiAgent>
+    <kinodynamic>0</kinodynamic>
+
+    <hierarchy>
+      <level>
+        <robot id="0" freeFloating="1" type="TSE3"/>
+        <robot id="1" freeFloating="1" type="TSE3"/>
+        <robot id="2" freeFloating="1" type="TSE3"/>
+        <!-- <robot id="3" freeFloating="1" type="SE3C"/> -->
+        <!-- <robot id="4" freeFloating="1" type="SE3C"/> -->
+        <!-- <robot id="5" freeFloating="1" type="SE3C"/> -->
+        <!-- <robot id="6" freeFloating="1" type="SE3C"/> -->
+        <!-- <robot id="7" freeFloating="1" type="SE3C"/> -->
+      </level>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>

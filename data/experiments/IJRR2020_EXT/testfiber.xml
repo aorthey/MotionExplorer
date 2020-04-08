@@ -1,0 +1,9 @@
+
+<hierarchy>
+  <level>
+    <robot id="1" freeFloating="1" simplification_of_id="0" type="Base"/>
+  </level>
+  <level>
+    <robot id="0" freeFloating="1" type="Bundle"/>
+  </level>
+</hierarchy>
