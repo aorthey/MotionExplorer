@@ -1,7 +1,7 @@
 #include "planner/cspace/cspace_geometric_R_CONTACT.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SE2StateSpace.h>
-#include <ompl/base/Constraint.h>
+#include <ompl/geometric/SimpleSetup.h>
 
 GeometricCSpaceOMPLRCONTACT::GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)
@@ -51,7 +51,7 @@ GeometricCSpaceOMPLRCONTACT::GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int
             std::cout << "Corner A1: " << cornerA[0] << std::endl;
             std::cout << "Corner A2: " << cornerA[1] << std::endl;
             //std::cout << "Corner B: " << cornerB << std::endl;
-            //std::cout << "Corner C: " << cornerA << std::endl;
+            //std::cout << "Corner C: " << cornerC << std::endl;
 
             // tris_filtered filled with surface triangles that are feasible for contact (normal in x or y direction)
             tris_filtered.push_back(tris.at(l));
@@ -84,14 +84,11 @@ public:
 
 void GeometricCSpaceOMPLRCONTACT::initSpace()
 {
-    //###########################################################################
     //----Copy of SE2RN------------------------
-    // Create OMPL state space
-    //   Create an SE(3) x R^n state space
-    //
-    // Plan: OMPL state space that utilizes obstacle surfaces
-    //   Normal vector of each surface (0,1,0)*a or (0,0,1)*b
-    //###########################################################################
+    // Adjusted for Constrained Planning
+
+    std::cout << robot->joints[0].type << std::endl;
+
     if(!(robot->joints[0].type==RobotJoint::Floating))
     {
         std::cout << "[MotionPlanner] only supports robots with a configuration space equal to SE(2) x R^n" << std::endl;
@@ -101,18 +98,32 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
     ob::StateSpacePtr SE2(std::make_shared<ob::SE2StateSpace>());
     ob::SE2StateSpace *cspaceSE2;
     ob::RealVectorStateSpace *cspaceRN = nullptr;
-    // add contact constraint space here
+    constraint = std::make_shared<ContactConstraint>();
 
     if(Nompl>0){
         ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(Nompl));
-        css = std::make_shared<ob::ProjectedStateSpace>(SE2 + Rn, constraint); // space becomes css
-        csi = std::make_shared<ob::ConstrainedSpaceInformation>(css);
 
-        cspaceSE2 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE2StateSpace>(0);
-        cspaceRN = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1);
+        // like in ConstrainedPlanningCommon.h, here assuming Projection-Based state space
+        css = std::make_shared<ob::ProjectedStateSpace>(SE2 + Rn, constraint);
+        csi = std::make_shared<ob::ConstrainedSpaceInformation>(css);
+        std::cout << "test point 1" << std::endl;
+        css->setup();
+        std::cout << "test point 2" << std::endl;
+        ss = std::make_shared<ompl::geometric::SimpleSetup>(csi);
+
+        this->space = css;
+        std::cout << "test point 3" << std::endl;
+        cspaceSE2 = this->space->as<ob::CompoundStateSpace>()->as<ob::SE2StateSpace>(0); // ??
+        std::cout << "test point 4" << std::endl;
+        cspaceRN = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(1); // ??
     }else{
-        this->space = SE2;
-        cspaceSE2 = this->space->as<ob::SE2StateSpace>();
+        css = std::make_shared<ob::ProjectedStateSpace>(SE2, constraint);
+        csi = std::make_shared<ob::ConstrainedSpaceInformation>(css);
+        css->setup();
+        ss = std::make_shared<ompl::geometric::SimpleSetup>(csi);
+
+        this->space = css;
+        cspaceSE2 = this->space->as<ob::SE2StateSpace>(); //
     }
 
     //###########################################################################
@@ -133,7 +144,8 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
     ob::RealVectorBounds bounds(2);
     bounds.low = low;
     bounds.high = high;
-    cspaceSE2->setBounds(bounds);
+    cspaceSE2->setBounds(bounds); // problemoooo
+    std::cout << "test point 5" << std::endl;
     bounds.check();
 
     if(cspaceRN!=nullptr)
@@ -154,6 +166,8 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
         boundsRn.check();
         cspaceRN->setBounds(boundsRn);
     }
+
+    std::cout << "test point: end of initspace()" << std::endl;
 }
 
 void GeometricCSpaceOMPLRCONTACT::ConfigToOMPLState(const Config &q, ob::State *qompl)
@@ -235,7 +249,7 @@ void GeometricCSpaceOMPLRCONTACT::print() const
 }
 
 
-Vector3 GeometricCSpaceOMPLRCONTACT::getContact(const ob::State *s)
+Vector3 GeometricCSpaceOMPLRCONTACT::getXYZ(const ob::State *s)
 {
     Config q = OMPLStateToConfig(s);
     robot->UpdateConfig(q);
@@ -257,12 +271,12 @@ Vector3 GeometricCSpaceOMPLRCONTACT::getContact(const ob::State *s)
     return v;
 }
 
-ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr() {
-    if (!si) { //si: stateInformationPtr from cspace.h
-        si = std::make_shared<ob::SpaceInformation>(SpacePtr());
-        // csi = std::make_shared<ob::ContactSpaceInformation>(SpacePtr());
-        validity_checker = StateValidityCheckerPtr(si);
-        si->setStateValidityChecker(validity_checker);
-    }
-    return si;
-}
+//ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr() {
+//    if (!si) { //si: stateInformationPtr from cspace.h
+//        si = std::make_shared<ob::SpaceInformation>(SpacePtr());
+//        // csi = std::make_shared<ob::ContactSpaceInformation>(SpacePtr());
+//        validity_checker = StateValidityCheckerPtr(si);
+//        si->setStateValidityChecker(validity_checker);
+//    }
+//    return si;
+//}

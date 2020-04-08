@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/user1/CLionProjects/MotionPlanningExplorerGUI/standalone/boost_graph.cpp
+boost/graph/graph_traits.hpp
+-
+boost/graph/adjacency_list.hpp
+-
+boost/graph/subgraph.hpp
+-
+boost/foreach.hpp
+-
+iostream
+-
+

@@ -80,6 +80,9 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
       //filtering for those triangles that belong to feasible contact surfaces
       std::vector<Triangle3D> tris;
       std::vector<Triangle3D> tris_filtered;
+      std::vector<double> cornerA;
+      std::vector<double> cornerB;
+      std::vector<double> cornerC;
 
       for(uint k = 0; k < world.terrains.size(); k++){
         Terrain* terrain_k = world.terrains[k];
@@ -106,17 +109,18 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
               Vector3 b = tris.at(l).b;
               Vector3 c = tris.at(l).c;
 
-              std::vector<double> cornerA;
               cornerA.push_back(a[0]);
               cornerA.push_back(a[1]);
 
-              std::vector<double> cornerB;
               cornerB.push_back(b[0]);
               cornerB.push_back(b[1]);
 
-              std::vector<double> cornerC;
               cornerC.push_back(c[0]);
               cornerC.push_back(c[1]);
+
+              //std::cout << "Corner A: " << cornerA << std::endl;
+              //std::cout << "Corner B: " << cornerB << std::endl;
+              //std::cout << "Corner C: " << cornerC << std::endl;
 
               // tris_filtered filled with surface triangles that are feasible for contact (normal in x or y direction)
               tris_filtered.push_back(tris.at(l));
@@ -124,6 +128,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 
       }
       std::cout << "Environment has " << tris_filtered.size() << " triangles to make contact" << std::endl;
+      // std::cout << "Filtered corner cordinates: " << tris_filtered << std::endl;
 
       for(uint k = 0; k < pin.inputs.size(); k++){
         PlannerInput *pkin = pin.inputs.at(k);
