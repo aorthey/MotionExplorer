@@ -1,0 +1,8 @@
+
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="box" file="../../robots/snake/snake_9_segments.urdf"/>
+
+</world>

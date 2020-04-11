@@ -3,7 +3,7 @@
 <link name="body">
   <inertial>
    <mass value="1"/>
-   <inertia ixx="0.11664" ixy="0" ixz="0" iyy="0.11664" iyz="0" izz="0.11664"/>
+   <inertia ixx="0.11664000000000002" ixy="0" ixz="0" iyy="0.11664000000000002" iyz="0" izz="0.11664000000000002"/>
   </inertial>
   <collision>
     <origin rpy="0 0 0" xyz="0 0 0"/>

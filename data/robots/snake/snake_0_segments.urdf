@@ -3,7 +3,7 @@
 <link name="eye">
   <inertial>
    <mass value="1"/>
-   <inertia ixx="0.004" ixy="0" ixz="0" iyy="0.004" iyz="0" izz="0.004"/>
+   <inertia ixx="0.004000000000000001" ixy="0" ixz="0" iyy="0.004000000000000001" iyz="0" izz="0.004000000000000001"/>
   </inertial>
   <collision>
     <origin rpy="0 0 0" xyz="0 0 0"/>
@@ -22,7 +22,7 @@
  <link name="body0">
   <inertial>
     <mass value="1"/>
-    <inertia ixx="0.00333333333333" ixy="0" ixz="0" iyy="0.00333333333333" iyz="0" izz="0.0025"/>
+    <inertia ixx="0.003333333333333334" ixy="0" ixz="0" iyy="0.003333333333333334" iyz="0" izz="0.0025000000000000005"/>
   </inertial>
   <visual>
     <origin rpy="0 1.57 0" xyz="0 0 0"/>
