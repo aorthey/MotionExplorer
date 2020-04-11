@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+import re
 import matplotlib.pyplot as plt
 plt.rcParams.update({'font.size': 30})
 plt.rcParams.update({'font.family': 'cmr'})
@@ -32,6 +33,9 @@ def XMLtoPDF(fname, histogram=False):
   p_ctr = 0
   for planner in planners:
     name = planner.getElementsByTagName("name")[0].firstChild.data
+
+    name = re.sub("([Ss]tar)", '*', name)
+
     vnames.append(name)
     runs = planner.getElementsByTagName("run")
     c_ctr = 0
@@ -51,8 +55,6 @@ def XMLtoPDF(fname, histogram=False):
         "+/-", np.std(vtimes[:,p_ctr]))
     p_ctr=p_ctr+1
 
-  #print vnodes
-  #print vsuccess
 
   ###################################################################################
   #PLOTTING
@@ -125,7 +127,8 @@ if __name__ == '__main__':
     for fname in sys.argv[1:]:
       XMLtoPDF(fname)
   else:
-    fname = "../../data/benchmarks/IJRR2020/34D_pr2_infeasible_2020_03_27_11:56:56.xml"
     fname = "../../data/benchmarks/last.xml"
+    fname = "../../data/benchmarks/IJRR2020/34D_pr2_infeasible_2020_03_27_11:56:56.xml"
+    fname = "../../data/benchmarks/IJRR2020/37D_shadowhand_pregrasp_2020_04_04_22:11:28.xml"
     XMLtoPDF(fname)
 

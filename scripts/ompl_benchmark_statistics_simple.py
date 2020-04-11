@@ -374,12 +374,14 @@ def plotStatistics(dbname, fname):
     c = conn.cursor()
     c.execute('PRAGMA FOREIGN_KEYS = ON')
     c.execute('SELECT id, name FROM plannerConfigs')
-    planners = [(t[0],t[1].replace('geometric_','').replace('control_','').replace('QMPPRMQuotientConnect','QMP'))
+    planners = [(t[0],t[1].replace('geometric_','').replace('control_',''))
         for t in c.fetchall()]
+
+    print(c.fetchall())
     c.execute('PRAGMA table_info(runs)')
     colInfo = c.fetchall()[3:]
 
-    runcount = np.array(c.execute("""SELECT runcount FROM experiments;""").fetchall()).flatten()[0]
+    runcount = np.array(c.execute('SELECT runcount FROM experiments;').fetchall()).flatten()[0]
     timelimit = np.array(c.execute("""SELECT timelimit FROM experiments;""").fetchall()).flatten()[0]
 
     pp = PdfPages(fname)

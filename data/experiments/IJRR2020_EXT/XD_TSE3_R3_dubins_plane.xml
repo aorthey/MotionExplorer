@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
-  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
-  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
-  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
-  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
-  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
-  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
-  <robot name="airplane" file="../../robots/airplane_propeller.urdf"/>
+  <robot name="airplane" file="../../robots/airplane.urdf"/>
+  <robot name="airplane" file="../../robots/airplane.urdf"/>
+  <robot name="airplane" file="../../robots/airplane.urdf"/>
+  <!-- <robot name="airplane" file="../../robots/airplane_propeller.urdf"/> -->
+  <!-- <robot name="airplane" file="../../robots/airplane_propeller.urdf"/> -->
+  <!-- <robot name="airplane" file="../../robots/airplane_propeller.urdf"/> -->
+  <!-- <robot name="airplane" file="../../robots/airplane_propeller.urdf"/> -->
+  <!-- <robot name="airplane" file="../../robots/airplane_propeller.urdf"/> -->
 
-  <rigidObject name="canyon" file="../../terrains/buildings/tori.stl" translation="0 0 0"/>
+  <!-- <rigidObject name="canyon" file="../../terrains/buildings/tori.stl" translation="0 0 0"/> -->
 
   <plannerinput>
 
@@ -41,51 +41,51 @@
       uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5"
       uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5"
     />
-    <agent 
-      id="3" 
-      qinit="6  -3.0 +2.5 +1.5 0 0 0"
-      qgoal="6  +3.0 +2.5 +1.5 0 0 0"
-      dqinit="6  0 0 0 0 0 0"
-      dqgoal="6  0 0 0 0 0 0"
-      uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5"
-      uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5"
-    />
-    <agent 
-      id="4" 
-      qinit="6  -3.0 -5.0 +3.5 0 0 0"
-      qgoal="6  +3.0 -5.0 +3.5 0 0 0"
-      dqinit="6  0 0 0 0 0 0 0 0 0 0 0 0"
-      dqgoal="6  0 0 0 0 0 0 0 0 0 0 0 0"
-      uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5 0 0 0 0 0 0"
-      uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5 0 0 0 0 0 0"
-    />
-    <agent 
-      id="5" 
-      qinit="6  -3.0 -2.5 +3.5 0 0 0"
-      qgoal="6  +3.0 -2.5 +3.5 0 0 0"
-      dqinit="6  0 0 0 0 0 0"
-      dqgoal="6  0 0 0 0 0 0"
-      uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5"
-      uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5"
-    />
-    <agent 
-      id="6" 
-      qinit="6  -3.0 +0.0 +3.5 0 0 0"
-      qgoal="6  +3.0 +0.0 +3.5 0 0 0"
-      dqinit="6  0 0 0 0 0 0"
-      dqgoal="6  0 0 0 0 0 0"
-      uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5"
-      uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5"
-    />
-    <agent 
-      id="7" 
-      qinit="6  -3.0 +2.5 +3.5 0 0 0"
-      qgoal="6  +3.0 +2.5 +3.5 0 0 0"
-      dqinit="6  0 0 0 0 0 0"
-      dqgoal="6  0 0 0 0 0 0"
-      uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5"
-      uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5"
-    />
+    <!-- <agent --> 
+    <!--   id="3" --> 
+    <!--   qinit="6  -3.0 +2.5 +1.5 0 0 0" -->
+    <!--   qgoal="6  +3.0 +2.5 +1.5 0 0 0" -->
+    <!--   dqinit="6  0 0 0 0 0 0" -->
+    <!--   dqgoal="6  0 0 0 0 0 0" -->
+    <!--   uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5" -->
+    <!--   uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5" -->
+    <!-- /> -->
+    <!-- <agent --> 
+    <!--   id="4" --> 
+    <!--   qinit="6  -3.0 -5.0 +3.5 0 0 0" -->
+    <!--   qgoal="6  +3.0 -5.0 +3.5 0 0 0" -->
+    <!--   dqinit="6  0 0 0 0 0 0 0 0 0 0 0 0" -->
+    <!--   dqgoal="6  0 0 0 0 0 0 0 0 0 0 0 0" -->
+    <!--   uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5 0 0 0 0 0 0" -->
+    <!--   uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5 0 0 0 0 0 0" -->
+    <!-- /> -->
+    <!-- <agent --> 
+    <!--   id="5" --> 
+    <!--   qinit="6  -3.0 -2.5 +3.5 0 0 0" -->
+    <!--   qgoal="6  +3.0 -2.5 +3.5 0 0 0" -->
+    <!--   dqinit="6  0 0 0 0 0 0" -->
+    <!--   dqgoal="6  0 0 0 0 0 0" -->
+    <!--   uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5" -->
+    <!--   uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5" -->
+    <!-- /> -->
+    <!-- <agent --> 
+    <!--   id="6" --> 
+    <!--   qinit="6  -3.0 +0.0 +3.5 0 0 0" -->
+    <!--   qgoal="6  +3.0 +0.0 +3.5 0 0 0" -->
+    <!--   dqinit="6  0 0 0 0 0 0" -->
+    <!--   dqgoal="6  0 0 0 0 0 0" -->
+    <!--   uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5" -->
+    <!--   uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5" -->
+    <!-- /> -->
+    <!-- <agent --> 
+    <!--   id="7" --> 
+    <!--   qinit="6  -3.0 +2.5 +3.5 0 0 0" -->
+    <!--   qgoal="6  +3.0 +2.5 +3.5 0 0 0" -->
+    <!--   dqinit="6  0 0 0 0 0 0" -->
+    <!--   dqgoal="6  0 0 0 0 0 0" -->
+    <!--   uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5" -->
+    <!--   uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5" -->
+    <!-- /> -->
 
     <se3min config="6  -8.0 -6.0 -1.0 -3.141593 -0.1 -0.1"/>
     <se3max config="6  +8.0 +6.0 +7.0 +3.141593 +0.1 +0.1"/>

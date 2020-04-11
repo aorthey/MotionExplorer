@@ -4,10 +4,10 @@ import numpy as np
 def printRobot(rid, xi, yi, xg, yg):
   qinit="13  "+str(xi)+" "+str(yi)+" 0 0 0 0 0 0 -0.1 0 +0.0 0 0"
   qgoal="13  "+str(xg)+" "+str(yg)+" 0 0 0 0 0 0 -0.5 0 -0.5 0 0"
-  print("<agent id=\"", rid, "\" qinit=\"", qinit, "\" qgoal=\"", qgoal, "\"/>", sep="")
+  print("<agent id=\"", rid, "\" \nqinit=\"", qinit, "\" \nqgoal=\"", qgoal, "\"/>", sep="")
 
 pts = []
-N = 7
+N = 8
 theta = 0.0
 radius = 3
 for rid in range(0,2*N,2):

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <!-- <robot name="box" file="../../robots/box/box.urdf"/> -->
+  <robot name="box" file="../../robots/box/box_bottom_left_right_top.urdf"/>
+
+  <robot name="box" file="../../robots/box/box_bottom_only.urdf"/>
+  <robot name="box" file="../../robots/box/box_bottom.urdf"/>
+  <robot name="box" file="../../robots/box/box_bottom_left.urdf"/>
+  <robot name="box" file="../../robots/box/box_bottom_left_right.urdf"/>
+
+  <plannerinput>
+    <qinit config="40 1.5 0.8 0 0.9 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+
+    <qgoal config="40  0 0 0 0 0 0 0 1.57 0 1.57 0 1.57 0 -1.57 0 -1.57 0 1.57 0 -1.57 0 0 1.57 0 1.57 0 1.57 0 0 -1.57 0 -1.57 0 -1.57 0 1.57 0 1.57 0 1.57"/>
+
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>5</maxplanningtime>
+    <pathSpeed>4</pathSpeed>
+
+    <se3min config="6  -2.0 -2 -0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +2.0 +2 +0 +3.141593 +1.57 +3.141593"/>
+
+    <algorithm name="hierarchy:qrrt"/>
+    <algorithm name="hierarchy:qmp"/>
+
+    <!-- <hierarchy> -->
+    <!--   <level inner_index="1" type="R7"/> -->
+    <!--   <level inner_index="2" type="R10"/> -->
+    <!--   <level inner_index="3" type="R13"/> -->
+    <!--   <level inner_index="0" type="R15"/> -->
+    <!-- </hierarchy> -->
+    <hierarchy>
+      <level inner_index="1" type="SE2"/>
+      <level inner_index="2" type="SE2RN"/>
+      <level inner_index="3" type="SE2RN"/>
+      <level inner_index="4" type="SE2RN"/>
+      <level inner_index="0" type="SE2RN"/>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>
