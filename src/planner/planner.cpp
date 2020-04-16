@@ -201,8 +201,6 @@ void MotionPlanner::CreateHierarchy()
         // Config qi = input.q_init; qi.resize(N);
         // Config qg = input.q_goal; qg.resize(N);
 
-        //############################################################################
-        //SANITY CHECK
         Config qi_full = input.q_init; qi_full.resize(N);
         Config qg_full = input.q_goal; qg_full.resize(N);
 
@@ -211,7 +209,8 @@ void MotionPlanner::CreateHierarchy()
         cspace_level_k->ConfigToOMPLState(qg_full, stateTmp);
         Config qg = cspace_level_k->OMPLStateToConfig(stateTmp);
 
-
+        //############################################################################
+        //SANITY CHECK
         // bool invalid = ((qi - qi_proj).norm() > 1e-10);
         // invalid |= ((qg - qg_proj).norm() > 1e-10);
 
@@ -447,7 +446,8 @@ void MotionPlanner::AdvanceUntilSolution()
   }
   time = getTime();
 
-  ExpandSimple();
+  // ExpandSimple();
+  ExpandFull();
 }
 
 PlannerInput& MotionPlanner::GetInput(){

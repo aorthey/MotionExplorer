@@ -177,8 +177,17 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
 
   CSpaceOMPL* cspace = cspace_levels.back();
   ob::SpaceInformationPtr sik = si_vec.back();
-  ob::ScopedState<> startk = cspace->ConfigToOMPLState(input.q_init);
-  ob::ScopedState<> goalk  = cspace->ConfigToOMPLState(input.q_goal);
+
+  ob::ScopedState<> startk(sik);
+  ob::ScopedState<> goalk(sik);
+  if(!cspace->isDynamic())
+  {
+      startk = cspace->ConfigToOMPLState(input.q_init);
+      goalk  = cspace->ConfigToOMPLState(input.q_goal);
+  }else{
+      startk = cspace->ConfigVelocityToOMPLState(input.q_init, input.dq_init);
+      goalk  = cspace->ConfigVelocityToOMPLState(input.q_goal, input.dq_goal);
+  }
 
   ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
   pdefk->addStartState(startk);

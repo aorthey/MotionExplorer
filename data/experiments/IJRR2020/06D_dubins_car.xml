@@ -16,13 +16,14 @@
     <se3min config="6  -4.0 -3.0 -0.0 -3.141593 0 0"/>
     <se3max config="6  +4.0 +3.0 +0.0 +3.141593 0 0"/>
 
-    <control_min config="6  0 0 0 -0.15 0 0"/>
-    <control_max config="6  0 0 0 +0.15 0 0"/>
+    <control_min config="6  0 0 0 -0.1 0 0"/>
+    <control_max config="6  0 0 0 +0.1 0 0"/>
 
     <freeFloating>1</freeFloating>
     <timestep min="0.01" max="0.1"/>
+    <!-- num samples = 5 -->
 
-    <maxplanningtime>0.5</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
     <epsilongoalregion>1</epsilongoalregion>
     <pathSpeed>10</pathSpeed>
 
@@ -33,6 +34,8 @@
     <algorithm dynamic="1" name="hierarchy:spqr"/>
     <algorithm dynamic="1" name="ompl:dynamic:sst"/>
     <algorithm dynamic="1" name="ompl:dynamic:rrt"/>
+    <algorithm dynamic="1" name="ompl:dynamic:kpiece"/>
+    <algorithm dynamic="1" name="ompl:dynamic:pdst"/>
     <kinodynamic>1</kinodynamic>
 
     <hierarchy>

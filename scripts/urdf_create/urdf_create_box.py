@@ -108,14 +108,7 @@ def AddBottomSides():
     hstr  += createRevoluteJointY("sideB-right", "sideB2", x=+length/2+thickness/2)
     return hstr
 
-def AddTop():
-    ###############################################################################
-    ## BOTTOM LEFT
-    ###############################################################################
-    ### Hinge (SideA-Top)
-
-    ### SideA
-    ### Hinge (Bottom-SideA)
+def AddTopPreside():
     hstr  = createCylinder("zbottom-ZsideA", 0, width/2+thickness/2, 0, thickness/2,
         lengthZside-0.05)
     hstr  += createRigidJoint("bottom", "zbottom-ZsideA",0,0,0,"")
@@ -127,10 +120,20 @@ def AddTop():
     y = height/2 + thickness/2
     hstr  += createCylinder("ZsideA-top", 0, y, 0, thickness/2, lengthZside-0.05)
     hstr  += createRigidJoint("ZsideA", "ZsideA-top", x=0, y=y)
+    return hstr
+
+def AddTop():
+    ###############################################################################
+    ## BOTTOM LEFT
+    ###############################################################################
+    ### Hinge (SideA-Top)
+
+    ### SideA
+    ### Hinge (Bottom-SideA)
 
     ### Top
     y = thickness/2 + width/2
-    hstr  += createCuboid("Ztop", 0, thickness/2+topWidth/2, 0, topLength, topWidth, thickness)
+    hstr  = createCuboid("Ztop", 0, thickness/2+topWidth/2, 0, topLength, topWidth, thickness)
     hstr  += createRevoluteJointX("ZsideA-top", "Ztop", x=0, y=height/2 + thickness/2)
 
     hstr  += createCylinder("ZT3-cylinder", 0, topWidth/2+thickness/2, 0,
@@ -145,8 +148,10 @@ def AddTop():
 
 def AddTopSides():
     #LEFT SIDE
-    sideLength = 0.5*height
-    sideWidth = 0.8*topWidth
+    sideLength = 0.1*height
+    sideWidth = 0.6*topWidth
+    # sideLength = 0.3*height
+    # sideWidth = 0.5*topWidth
     hstr  = createRotatedCylinder("ZTop-left", -topLength/2-thickness/2,
         topWidth/2 + thickness/2,0,
         1.57, 0, 0,
@@ -261,8 +266,30 @@ f.write('<robot name="'+robot_name+'">\n')
 hstr = AddBottomSides()
 hstr += AddLeftClamping()
 hstr += AddRightClamping()
+hstr += AddTopPreside()
 hstr += AddTop()
 hstr += AddTopSides()
+
+f.write(hstr)
+f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
+f.write('  </klampt>\n')
+f.write('</robot>')
+f.close()
+
+print("\nCreated new file >>",fname)
+###############################################################################
+robot_name = 'box/box_bottom_left_right_top_sides'
+fname = getPathname(robot_name)
+
+f = open(fname,'w')
+f.write('<?xml version="1.0"?>\n')
+f.write('<robot name="'+robot_name+'">\n')
+
+hstr = AddBottomSides()
+hstr += AddLeftClamping()
+hstr += AddRightClamping()
+hstr += AddTopPreside()
+hstr += AddTop()
 
 f.write(hstr)
 f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
@@ -282,7 +309,7 @@ f.write('<robot name="'+robot_name+'">\n')
 hstr = AddBottomSides()
 hstr += AddLeftClamping()
 hstr += AddRightClamping()
-hstr += AddTop()
+hstr += AddTopPreside()
 
 f.write(hstr)
 f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')

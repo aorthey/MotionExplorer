@@ -31,7 +31,7 @@
 
     <freeFloating>1</freeFloating>
     <kinodynamic>1</kinodynamic>
-    <timestep min="0.01" max="0.1"/>
+    <timestep min="0.001" max="0.1"/>
 
     <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
     <epsilongoalregion>1</epsilongoalregion>
@@ -41,7 +41,9 @@
 
     <hierarchy>
       <level>
-        <!-- <robot id="1" freeFloating="1" type="R2"/> -->
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="TSE2"/>
+      </level>
+      <level>
         <robot id="0" freeFloating="1" type="TSE2"/>
         <robot id="2" freeFloating="1" type="TSE2"/>
       </level>

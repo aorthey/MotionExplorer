@@ -41,7 +41,8 @@ bool CSpaceOMPLMultiAgent::SatisfiesBounds(const ob::State *state)
 
 bool CSpaceOMPLMultiAgent::isDynamic() const
 {
-  for(uint k = 0; k < cspaces_.size(); k++){
+  for(uint k = 0; k < cspaces_.size(); k++)
+  {
     CSpaceOMPL *ck = cspaces_.at(k);
     // std::cout << "cspace (robot=" << ck->GetRobotIndex() << ") component " << k << " is " << (ck->isDynamic()?"":"NOT ") << "dynamic." << std::endl;
     if(ck->isDynamic()) return true;
@@ -49,11 +50,13 @@ bool CSpaceOMPLMultiAgent::isDynamic() const
   return false;
 }
 
-bool CSpaceOMPLMultiAgent::IsPlanar(){
+bool CSpaceOMPLMultiAgent::IsPlanar()
+{
   if(GetDimensionality()<=2) return true;
 
   //check if at least one robot is non-planar, i.e. freeFloating
-  for(uint k = 0; k < cspaces_.size(); k++){
+  for(uint k = 0; k < cspaces_.size(); k++)
+  {
     CSpaceOMPL *ck = cspaces_.at(k);
     if(!ck->IsPlanar()) return false;
   }

@@ -31,15 +31,11 @@ void MultiAgentIntegrator::propagate(const ob::State *state, const oc::Control* 
       oc::SpaceInformationPtr siC = static_pointer_cast<oc::SpaceInformation>(sik);
       siC->getStatePropagator()->propagate(statek, controlk, duration, resultk);
     }else{
-      OMPL_ERROR("NYI");
-      throw "NYI";
+      if(ck->GetDimensionality() > 0)
+      {
+        OMPL_ERROR("NYI");
+        throw "NYI";
+      }
     }
   }
 }
-
-// protected:
-// CSpaceOMPLMultiAgent *cspace_;
-// std::vector<CSpaceOMPL*> cspaces_;
-// std::vector<SingleRobotCSpace*> klampt_single_robot_cspaces_;
-// };
-

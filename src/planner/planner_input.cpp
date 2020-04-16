@@ -188,12 +188,20 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
       Config uzero;
       ai.uMin = GetAttributeDefault<Config>(node_agent, "uMin", uzero);
       ai.uMax = GetAttributeDefault<Config>(node_agent, "uMax", uzero);
-      uMin = ai.uMin;
-      uMax = ai.uMax;
+      if(uMin.size() <= 0)
+      {
+        uMin = ai.uMin;
+        uMax = ai.uMax;
+      }
       agent_information.push_back(ai);
       node_agent = FindNextSiblingNode(node_agent);
       N += ai.q_init.size();
     }
+    // if(kinodynamic)
+    // {
+    //     uMin = GetSubNodeAttribute<Config>(node, "control_min", "config");
+    //     uMax = GetSubNodeAttribute<Config>(node, "control_max", "config");
+    // }
   }else{
     //necessary arguments
     q_init = GetSubNodeAttribute<Config>(node, "qinit", "config");

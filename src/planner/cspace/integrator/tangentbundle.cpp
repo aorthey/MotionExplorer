@@ -41,6 +41,11 @@ Matrix3 GetTotalInertiaAtPoint(const Robot *robot, const Vector3 &p)
 //
 void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
 {
+  return propagate_dynamics(state, control, duration, result);
+}
+
+void TangentBundleIntegrator::propagate_naive(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
+{
   //(1) convert state to (q0,dq0,ddq0,u)
   //(2) integrate from (q0,dq0) to (q1,dq1);
   //(3) convert (q1,dq1) to result
@@ -100,7 +105,7 @@ void TangentBundleIntegrator::propagate(const ob::State *state, const oc::Contro
   cspace->ConfigVelocityToOMPLState(q1, dq1, result);
 }
 
-void TangentBundleIntegrator::propagate_deprecated(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
+void TangentBundleIntegrator::propagate_dynamics(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const 
 {
   //###########################################################################
   // (1) Convert state,control to input=(q0,dq0,u)
@@ -111,20 +116,25 @@ void TangentBundleIntegrator::propagate_deprecated(const ob::State *state, const
 
   const double *ucontrol = control->as<oc::RealVectorControlSpace::ControlType>()->values;
 
-  uint Nctrl  = cspace->GetControlDimensionality();
+  uint Nctrl = cspace->GetControlDimensionality();
+  if(Nctrl != 7)
+  {
+    std::cout << "Only SE(3) controls allowed" << std::endl;
+    throw "Too many controls";
+  }
 
-  //last entry is timestep
-  Config u; u.resize(Nctrl-1); u.setZero();
+  Config u; 
+  u.resize(Nctrl-1); //last entry is timestep
+  u.setZero();
   for(uint k = 0; k < Nctrl-1; k++) u(k) = ucontrol[k];
   double dt = ucontrol[Nctrl-1];
-  //double dt2 = 0.5*dt*dt;
   if(dt<0){
     std::cout << "propagation step size is negative:"<<dt << std::endl;
     throw "Negative prop step size.";
   }
 
   //###########################################################################
-  // (2) extract forces Fext at (q0,dq0) from simulator
+  // (2) compute ddq0 (without drift)
   //###########################################################################
 
   Robot *robot = cspace->GetRobotPtr();
@@ -133,18 +143,39 @@ void TangentBundleIntegrator::propagate_deprecated(const ob::State *state, const
   robot->UpdateConfig(q0);
   robot->UpdateDynamics();
 
-  uint Nklampt = cspace->GetKlamptDimensionality();
+  Config ddq0; ddq0.resize(q0.size()); ddq0.setZero();
+  robot->CalcAcceleration(ddq0, u);
 
-  Vector fext; fext.resize(Nklampt); fext.setZero();
-  //fext = S^T * torque, whereby S is the selection matrix
-  for(uint k = 6; k < Nklampt; k++){
-    fext(k) = ucontrol[k];
+  double m = robot->GetTotalMass();
+  if(m <= 0)
+  {
+      OMPL_WARN("Computing dynamics with zero-mass robot.");
   }
 
   //###########################################################################
-  // (3) control uand forces are assumed to be instantaneuous at configuration
-  // (q0,dq0). 
+  //(3) integrate ddq0, dq0 to dq1
   //###########################################################################
+  Config q1(q0);
+  Config dq1(dq0);
+
+  for(int i = 0; i < ddq0.size(); i++){
+    dq1(i) = dq0(i) + dt*ddq0(i);
+  }
+  //###########################################################################
+  //(4) integrate dq0 using lie group operation
+  //###########################################################################
+  LieGroupIntegrator integrator;
+  Matrix4 q0_SE3 = integrator.StateToSE3(q0);
+  Matrix4 dtmp = integrator.SE3Derivative(dq1);
+  Matrix4 q1_SE3 = integrator.Integrate(q0_SE3, dtmp, dt);
+
+  integrator.SE3ToState(q1, q1_SE3);
+
+  //###########################################################################
+  //(5) convert (q1,dq1) to result
+  //###########################################################################
+
+  cspace->ConfigVelocityToOMPLState(q1, dq1, result);
 
 }
 

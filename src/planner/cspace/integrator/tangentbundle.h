@@ -41,8 +41,14 @@ public:
         oc::StatePropagator(si.get()), cspace(cspace_)
     {
     }
-    virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
-    virtual void propagate_deprecated(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const;
+    virtual void propagate(
+        const ob::State *state, 
+        const oc::Control* control, 
+        const double duration, 
+        ob::State *result) const override;
+
+    virtual void propagate_dynamics(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const;
+    virtual void propagate_naive(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const;
 
     KinodynamicCSpaceOMPL *cspace;
 };

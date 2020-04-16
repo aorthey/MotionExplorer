@@ -126,8 +126,6 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
     ob::ScopedState<> startk(sik);
     ob::ScopedState<> goalk(sik);
 
-    // std::cout << input.q_init << std::endl;
-    // std::cout << input.dq_init << std::endl;
     startk = cspace_levelk->ConfigVelocityToOMPLState(input.q_init, input.dq_init);
     goalk  = cspace_levelk->ConfigVelocityToOMPLState(input.q_goal, input.dq_goal);
 
