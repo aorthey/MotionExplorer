@@ -15,7 +15,7 @@
   <algorithm name="ompl:prm"/>
   <!-- <algorithm name="benchmark:minimal"/> -->
   <!-- <algorithm name="ompl:rrt"/> -->
-  <!-- <algorithm name="ompl:rrtconnect"/> -->
+  <algorithm name="ompl:rrtconnect"/>
   <!-- <algorithm name="benchmark:best_geometric"/> -->
   <!-- <algorithm name="ompl:prm"/> -->
   <!-- <algorithm name="ompl:prm"/> -->

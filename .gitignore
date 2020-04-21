@@ -23,3 +23,4 @@ data/robots/sr_grasp_description/
 data/robots/atlas/
 data/robots/kuka_shadowhand/
 data/experiments/11D_planar_snake_0_*
+/cmake-build-debug/

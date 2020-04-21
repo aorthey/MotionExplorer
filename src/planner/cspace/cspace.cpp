@@ -213,8 +213,9 @@ Vector3 CSpaceOMPL::getXYZ_freeFloating(const ob::State *s)
     if(GetDimensionality()>1) y = qomplRN->values[1];
     if(GetDimensionality()>2) z = qomplRN->values[2];
   }else{
-    OMPL_ERROR("Cannot deal with space type %d.", space_first_subspace->getType());
-    throw "Invalid space type.";
+    //OMPL_ERROR("Cannot deal with space type %d.", space_first_subspace->getType());
+    //throw "Invalid space type.";
+
   }
   Vector3 w(x,y,z);
   return w;
