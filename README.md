@@ -34,7 +34,7 @@ Please make sure you have a github.com account AND ssh access from your workstat
 <ol>
   <li> Install Script for Ubuntu 16.04 and 18.04 (requires SSH access)
     
-    git clone git@github.com:aorthey/MotionPlanningExplorerGUI.git
+    git clone git@github.com:aorthey/MotionExplorer.git
     cd MotionPlanningExplorerGUI
     ./install_script.sh
     
