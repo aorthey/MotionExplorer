@@ -5,16 +5,14 @@
   <robot name="2dof" file="../robots/planar/2dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
   <robot name="1dof_inner" file="../robots/planar/2dof_testobj_1dof_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
 
-
-  <!-- <terrain name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="+3.0 0 0" rotateRPY="0 0 0"/> -->
   <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -2.0 0" rotateRPY="0 0 0"/>
-  <!-- <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -4.0 0" rotateRPY="0 0 0"/> -->
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -4.0 0" rotateRPY="0 0 0"/>
   
   
   <plannerinput>
 
-    <qinit  config="10  0 0 0 0 0 0  1.0 0.0 0.0 0 "/> <!-- config="dim  x y z yaw roll pitch  theta phi phi endeff" -->
-    <qgoal  config="10  1 0 0 0 0 0  +2.6 0.0 1.0 0 "/>
+    <qinit  config="10  1.5 2 0 0 0 0  2.6 0.0 1.0 0 "/> <!-- config="dim  x y z yaw roll pitch  theta phi phi endeff" -->
+    <qgoal  config="10  1.5 -4 0 0 0 0  +2.6 0.0 1.0 0 "/>
     <se3min config="6  -5 -5.0 -0.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +5 +5.0 +0.5 +3.141593 +1.57 +3.141593"/>    
     <epsilongoalregion>0.05</epsilongoalregion>

@@ -74,12 +74,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
 
     if(pin.Load(file_name.c_str())){
 
-
-      //Adding triangle information to PlannerInput (to be used as constraint
-      //manifolds)
-      //filtering for those triangles that belong to feasible contact surfaces
       std::vector<Triangle3D> tris;
-      std::vector<Triangle3D> tris_filtered;
 
       for(uint k = 0; k < world.terrains.size(); k++){
         Terrain* terrain_k = world.terrains[k];
@@ -91,26 +86,12 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
         }
       }
 
-      for(uint l = 0; l < tris.size(); l++){
-          Vector3 normal = tris.at(l).normal();
-          int unused_surf = 0;
-          double epsilon = 1e-10;
-
-          if(fabs((fabs(normal[2]) - 1.0))<epsilon){
-
-              unused_surf += 1;
-
-          }else{
-              // tris_filtered filled with surface triangles that are feasible for contact (normal in x or y direction)
-              tris_filtered.push_back(tris.at(l));
-          }
-
-      }
+      // std::cout << "Environment has " << tris.size() << " triangles to make contact!" << std::endl;
 
       for(uint k = 0; k < pin.inputs.size(); k++){
         PlannerInput *pkin = pin.inputs.at(k);
         if(pkin->contactPlanner){
-          pkin->tris = tris_filtered;
+          pkin->tris = tris;
         }
         for(uint j = 0; j < pkin->stratifications.size(); j++){
           Stratification stratification = pkin->stratifications.at(j);
