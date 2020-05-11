@@ -3,17 +3,20 @@
 #include "planner/benchmark/benchmark_input.h"
 #include "util.h"
 
-#include <ompl/geometric/planners/quotientspace/Explorer.h>
-#include <ompl/geometric/planners/quotientspace/QRRT.h>
-#include <ompl/geometric/planners/quotientspace/QRRTStar.h>
-#include <ompl/geometric/planners/quotientspace/QMP.h>
-#include <ompl/geometric/planners/quotientspace/QMPStar.h>
-#include <ompl/geometric/planners/quotientspace/SPQR.h>
+#include <ompl/geometric/planners/explorer/Explorer.h>
+#include <ompl/geometric/planners/multilevel/QRRT.h>
+#include <ompl/geometric/planners/multilevel/QRRTStar.h>
+#include <ompl/geometric/planners/multilevel/QMP.h>
+#include <ompl/geometric/planners/multilevel/QMPStar.h>
+#include <ompl/geometric/planners/multilevel/SPQR.h>
+
 #include <ompl/control/optimizers/Optimizer.h>
 #include <ompl/geometric/PathGeometric.h>
 
 #include <ompl/control/planners/rrt/RRT.h>
 #include <ompl/control/planners/est/EST.h>
+// #include <ompl/control/planners/syclop/SyclopRRT.h>
+// #include <ompl/control/planners/syclop/SyclopEST.h>
 #include <ompl/control/planners/pdst/PDST.h>
 #include <ompl/control/planners/sst/SST.h>
 #include <ompl/control/planners/kpiece/KPIECE1.h>
@@ -83,6 +86,10 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
     planner = std::make_shared<oc::PDST>(si);
   }else if(algorithm=="ompl:dynamic:kpiece"){
     planner = std::make_shared<oc::KPIECE1>(si);
+  // }else if(algorithm=="ompl:dynamic:sycloprrt"){
+  //   planner = std::make_shared<oc::SyclopRRT>(si);
+  // }else if(algorithm=="ompl:dynamic:syclopest"){
+  //   planner = std::make_shared<oc::SyclopEST>(si);
   }else if(algorithm=="hierarchy:explorer"){
     planner = std::make_shared<og::MotionExplorer>(si_vec);
   }else if(algorithm=="hierarchy:qrrt"){

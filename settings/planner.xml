@@ -3,13 +3,13 @@
 
   <!-- <algorithm dynamic="1" name="hierarchy:explorer"/> -->
   <algorithm dynamic="1" name="hierarchy:qrrt"/>
-  <algorithm dynamic="1" name="hierarchy:qmp"/>
-  <algorithm dynamic="1" name="hierarchy:qrrtstar"/>
-  <algorithm dynamic="1" name="hierarchy:qmpstar"/>
-  <algorithm dynamic="1" name="hierarchy:spqr"/>
+  <algorithm dynamic="1" name="ompl:dynamic:rrt"/>
   <algorithm dynamic="1" name="ompl:dynamic:sst"/>
-  <!-- <algorithm dynamic="1" name="ompl:dynamic:pdst"/> -->
-  <!-- <algorithm dynamic="1" name="ompl:dynamic:est"/> -->
+  <algorithm dynamic="1" name="ompl:dynamic:pdst"/>
+  <algorithm dynamic="1" name="ompl:dynamic:est"/>
+  <algorithm dynamic="1" name="ompl:dynamic:kpiece"/>
+  <!-- <algorithm dynamic="1" name="ompl:dynamic:syclopest"/> -->
+  <!-- <algorithm dynamic="1" name="ompl:dynamic:sycloprrt"/> -->
   <!-- <algorithm name="benchmark:minimal"/> -->
 
   <!-- <algorithm name="hierarchy:sampler"/> -->

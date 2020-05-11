@@ -47,8 +47,8 @@ void IntegratorSE2::propagate(const ob::State *state, const oc::Control* control
   uint N  = cspace->GetControlDimensionality();
   Real dt = ucontrol[N-1];
   //Real dt2 = 0.5*dt*dt;
-  if(dt<0){
-    std::cout << "propagation step size is negative:"<<dt << std::endl;
+  if(dt<=0){
+    std::cout << "propagation step size is non-positive:"<<dt << std::endl;
     throw "Negative prop step size.";
   }
 

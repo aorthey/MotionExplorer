@@ -147,8 +147,8 @@ void KinodynamicCSpaceOMPL::initSpace()
   // Set velocity bounds
   //###########################################################################
   std::vector<double> vMin, vMax;
-  vMin = robot->velMin;
-  vMax = robot->velMax;
+  vMin = input.dqMin;
+  vMax = input.dqMax;
 
   assert(vMin.size() == 6+Nklampt);
   assert(vMax.size() == 6+Nklampt);
@@ -169,9 +169,6 @@ void KinodynamicCSpaceOMPL::initSpace()
   boundsTM.high = highTM;
   boundsTM.check();
 
-  //TODO
-  boundsTM.setLow(-10);
-  boundsTM.setHigh(10);
   OMPL_WARN("Setting manual velocity.");
 
   cspaceTM->setBounds(boundsTM);

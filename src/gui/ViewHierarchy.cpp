@@ -2,7 +2,7 @@
 
 using namespace Math3D;
 ViewHierarchy::ViewHierarchy():
-  x(0),y(0),heightPerLevel(70),width(300),width_column1(30),width_column2(40),width_column3(width-width_column1-width_column2),drawBound(true),drawPlotArea(true)
+  x(0),y(0),heightPerLevel(100),width(400),width_column1(0),width_column2(0),width_column3(width-width_column1-width_column2),drawBound(true),drawPlotArea(true)
 {
   textColor.set(0.1,0.1,0.1);
   nodeColor.set(0.8,0.8,0.8);
@@ -61,7 +61,21 @@ void ViewHierarchy::Clear()
   level_robot_name.clear();
 }
 
-void ViewHierarchy::DrawGL(){
+void ViewHierarchy::DrawGL()
+{
+
+  ////update size based on number of levels/nodes
+  //double minHeight = 100;
+  //double maxHeight = 500;
+  //double heightPerLevel = 80;
+
+  //if(heightPerLevel*(GetLevel()+1) > maxHeight)
+  //{
+  //}
+
+  //node_radius = heightPerLevel/4.0;
+  //node_radius_unselected = node_radius - node_radius/4;
+  //node_radius_selected = node_radius;
 
   double xprev = x+width_column1+width_column2+1.5*node_radius;
   double yprev = y+0.5*heightPerLevel;
@@ -78,7 +92,6 @@ void ViewHierarchy::DrawGL(){
     addNodes += selected_path.at(k);
   }
 
-  // double width = xprev + (maxNodes-1) * xstep + 1.5*node_radius - x;
   width_column3 = maxNodes*xstep;
   double width = width_column1 + width_column2 + width_column3;
 
@@ -96,18 +109,18 @@ void ViewHierarchy::DrawGL(){
     glVertex2i(x+width,y+height);
     glVertex2i(x,y+height);
     glEnd();
-    glBegin(GL_LINE_LOOP);
-    glVertex2i(x+width_column1,y);
-    glVertex2i(x+width_column1,y+height);
-    glEnd();
-    glBegin(GL_LINE_LOOP);
-    glVertex2i(x+width_column1+width_column2,y);
-    glVertex2i(x+width_column1+width_column2,y+height);
-    glEnd();
-    glBegin(GL_LINE_LOOP);
-    glVertex2i(x+width_column1+width_column2+width_column3,y);
-    glVertex2i(x+width_column1+width_column2+width_column3,y+height);
-    glEnd();
+    // glBegin(GL_LINE_LOOP);
+    // glVertex2i(x+width_column1,y);
+    // glVertex2i(x+width_column1,y+height);
+    // glEnd();
+    // glBegin(GL_LINE_LOOP);
+    // glVertex2i(x+width_column1+width_column2,y);
+    // glVertex2i(x+width_column1+width_column2,y+height);
+    // glEnd();
+    // glBegin(GL_LINE_LOOP);
+    // glVertex2i(x+width_column1+width_column2+width_column3,y);
+    // glVertex2i(x+width_column1+width_column2+width_column3,y+height);
+    // glEnd();
   }
   if(drawPlotArea) {
     plotAreaColor.setCurrentGL();
@@ -145,24 +158,24 @@ void ViewHierarchy::DrawGL(){
     yprev = yn;
   }
 
-  textColor.setCurrentGL();
-  for(uint k = 0; k < level_nodes.size()+1; k++){
-    double yk = y+k*heightPerLevel+heightPerLevel/2;
-    char buf[64];
-    void* font=GLUT_BITMAP_HELVETICA_18;
-    sprintf(buf,"%d\n",k);
-    glRasterPos2d(x+width_column1/3,yk);
-    glutBitmapString(font,buf);
+  // textColor.setCurrentGL();
+  // for(uint k = 0; k < level_nodes.size()+1; k++){
+  //   double yk = y+k*heightPerLevel+heightPerLevel/2;
+  //   char buf[64];
+  //   void* font=GLUT_BITMAP_HELVETICA_18;
+  //   sprintf(buf,"%d\n",k);
+  //   glRasterPos2d(x+width_column1/3,yk);
+  //   glutBitmapString(font,buf);
 
-    if(k>0){
-      sprintf(buf,"%d\n",level_nodes.at(k-1));
-    }else{
-      sprintf(buf,"%d\n",1);
-    }
-    glRasterPos2d(x+width_column1+width_column2/3,yk);
-    glutBitmapString(font,buf);
+  //   if(k>0){
+  //     sprintf(buf,"%d\n",level_nodes.at(k-1));
+  //   }else{
+  //     sprintf(buf,"%d\n",1);
+  //   }
+  //   glRasterPos2d(x+width_column1+width_column2/3,yk);
+  //   glutBitmapString(font,buf);
 
-  }
+  // }
 
   glDisable(GL_BLEND);
   glEnable(GL_DEPTH_TEST);

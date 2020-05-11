@@ -3,6 +3,7 @@
      Experiment from Bhattacharya 2018
      https://link.springer.com/content/pdf/10.1007/s10472-018-9596-8.pdf 
 -->
+
 <world>
   <robot name="disk1" file="../../robots/disks/1.urdf" translation="0 0 0.04"/>
   <robot name="disk2" file="../../robots/disks/2.urdf" translation="0 0 0.04"/>

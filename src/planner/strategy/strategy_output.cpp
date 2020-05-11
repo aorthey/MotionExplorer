@@ -1,5 +1,5 @@
 #include "planner/strategy/strategy_output.h"
-#include <ompl/geometric/planners/quotientspace/datastructures/PlannerDataVertexAnnotated.h>
+#include <ompl/geometric/planners/multilevel/datastructures/PlannerDataVertexAnnotated.h>
 #include "elements/tree.h"
 #include "common.h"
 #include <ompl/control/PathControl.h>
@@ -161,7 +161,7 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
     std::string rname = cspace_levels.back()->GetName();//RobotPtr()->name;
     std::string fname = "../data/samples/cspace_robot_"+rname+".samples";
     roadmap_k->Save(fname.c_str());
-    // std::cout << "Wrote samples to " << fname << std::endl;
+    std::cout << "Wrote samples to " << fname << std::endl;
   }
 
   if(current->children.size() == 0)

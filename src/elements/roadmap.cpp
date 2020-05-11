@@ -2,7 +2,7 @@
 #include "gui/common.h"
 #include "common.h"
 #include "planner/cspace/cspace_multiagent.h"
-#include <ompl/geometric/planners/quotientspace/datastructures/PlannerDataVertexAnnotated.h>
+#include <ompl/geometric/planners/multilevel/datastructures/PlannerDataVertexAnnotated.h>
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/foreach.hpp>
@@ -332,7 +332,7 @@ bool Roadmap::Save(TiXmlElement *node)
 
       ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
       if(v==nullptr){
-          subnode->SetAttribute("feasible", "yes");
+          subnode->SetAttribute("feasible", "no");
       }
       // if(v==nullptr){
       //   subnode->SetAttribute("feasible", "unknown");

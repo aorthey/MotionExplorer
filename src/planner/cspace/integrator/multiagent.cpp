@@ -28,8 +28,8 @@ void MultiAgentIntegrator::propagate(const ob::State *state, const oc::Control* 
       ob::State *resultk = static_cast<ob::CompoundState*>(result)->as<ob::State>(k);
 
       ob::SpaceInformationPtr sik = ck->SpaceInformationPtr();
-      oc::SpaceInformationPtr siC = static_pointer_cast<oc::SpaceInformation>(sik);
-      siC->getStatePropagator()->propagate(statek, controlk, duration, resultk);
+      oc::SpaceInformationPtr sikC = static_pointer_cast<oc::SpaceInformation>(sik);
+      sikC->getStatePropagator()->propagate(statek, controlk, duration, resultk);
     }else{
       if(ck->GetDimensionality() > 0)
       {

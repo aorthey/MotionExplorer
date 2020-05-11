@@ -13,7 +13,8 @@ CSpaceOMPLMultiAgent::CSpaceOMPLMultiAgent(std::vector<CSpaceOMPL*> cspaces):
   CSpaceOMPL(cspaces.front()->GetWorldPtr(), cspaces.front()->GetRobotIndex()), cspaces_(cspaces)
 {
   robot_ids.clear();
-  for(uint k = 0; k < cspaces_.size(); k++){
+  for(uint k = 0; k < cspaces_.size(); k++)
+  {
     CSpaceOMPL *ck = cspaces_.at(k);
     robot_ids.push_back(ck->GetRobotIndex());
   }
@@ -21,9 +22,11 @@ CSpaceOMPLMultiAgent::CSpaceOMPLMultiAgent(std::vector<CSpaceOMPL*> cspaces):
 
 void CSpaceOMPLMultiAgent::setNextLevelRobotPointers(std::vector<int> next_level_ids)
 {
-  for(uint k = 0; k < next_level_ids.size(); k++){
+  for(uint k = 0; k < next_level_ids.size(); k++)
+  {
     int ik = next_level_ids.at(k);
-    if(ik >=0){
+    if(ik >=0)
+    {
       ptr_to_next_level_robot_ids.push_back(ik);
     }
   }
@@ -31,7 +34,8 @@ void CSpaceOMPLMultiAgent::setNextLevelRobotPointers(std::vector<int> next_level
 
 bool CSpaceOMPLMultiAgent::SatisfiesBounds(const ob::State *state)
 {
-  for(uint k = 0; k < cspaces_.size(); k++){
+  for(uint k = 0; k < cspaces_.size(); k++)
+  {
     CSpaceOMPL *ck = cspaces_.at(k);
     const ob::State *stateK = static_cast<const ob::CompoundState*>(state)->as<ob::State>(k);
     if(!ck->SatisfiesBounds(stateK)) return false;

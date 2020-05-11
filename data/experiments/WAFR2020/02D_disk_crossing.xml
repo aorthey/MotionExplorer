@@ -28,15 +28,13 @@
     <se3max config="6  +1 +1 0 +3.141593 0 0"/>
 
     <epsilongoalregion>0.1</epsilongoalregion>
-    <maxplanningtime>0.1</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>0.05</maxplanningtime>      <!-- runtime in (s) --> 
     <pathBorderWidth>3</pathBorderWidth>
     <pathWidth>0.07</pathWidth>
     <pathSpeed>3</pathSpeed>
     <freeFloating>1</freeFloating>
     <smoothPath>1</smoothPath>
     <algorithm name="hierarchy:explorer"/>
-    <algorithm name="hierarchy:qrrt"/>
-    <!-- <algorithm name="ompl:rrt"/> -->
 
     <multiAgent>1</multiAgent>
 

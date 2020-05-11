@@ -5,7 +5,7 @@
       <lateral_friction value="1"/>
   </contact>
     <collision>
-      <origin rpy="0 0 1.57" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <mesh filename="airplane_small.stl"/>
       </geometry>
@@ -14,7 +14,7 @@
       </material>
     </collision>
     <visual>
-      <origin rpy="0 0 1.57" xyz="0 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <mesh filename="airplane_small.stl"/>
       </geometry>
@@ -24,7 +24,7 @@
     </visual>
     <inertial>
       <mass value="10"/>
-      <inertia ixx="1" ixy="0.0" ixz="0.0" iyy="1" iyz="0.0" izz="1"/>
+      <inertia ixx="1e-6" ixy="0.0" ixz="0.0" iyy="0.083" iyz="0.0" izz="0.083"/>
     </inertial>
   </link>
 </robot>

@@ -30,14 +30,12 @@ std::vector<std::string> PlannerMultiInput::GetAlgorithms(TiXmlElement *node, bo
     bool isDynamic = GetAttributeDefault<int>(node_algorithm, "dynamic", false);
     if(kinodynamic == isDynamic){
       algorithms.push_back(a);
-    }else{
-      std::cout << std::string(80, '*') << std::endl;
-      std::cout << "Algorithm: " << a << " is " << (isDynamic?"dynamic":"geometric") <<
-       " but problem is " << (kinodynamic?"dynamic":"geometric") << "." << std::endl;
-      OMPL_WARN("DYNAMIC MISMATCH");
-      std::cout << std::string(80, '*') << std::endl;
     }
     node_algorithm = FindNextSiblingNode(node_algorithm);
+  }
+  if(algorithms.size()<=0)
+  {
+    OMPL_DEBUG("No algorithms found.");
   }
   return algorithms;
 }
@@ -185,14 +183,16 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
       ai.dq_goal = GetAttributeDefault<Config>(node_agent, "dqgoal", qzero);
       ai.qMin = GetAttributeDefault<Config>(node_agent, "qMin", qzero);
       ai.qMax = GetAttributeDefault<Config>(node_agent, "qMax", qzero);
+      ai.dqMin = GetAttributeDefault<Config>(node_agent, "dqMin", qzero);
+      ai.dqMax = GetAttributeDefault<Config>(node_agent, "dqMax", qzero);
       Config uzero;
       ai.uMin = GetAttributeDefault<Config>(node_agent, "uMin", uzero);
       ai.uMax = GetAttributeDefault<Config>(node_agent, "uMax", uzero);
-      if(uMin.size() <= 0)
-      {
-        uMin = ai.uMin;
-        uMax = ai.uMax;
-      }
+      // if(uMin.size() <= 0)
+      // {
+      //   uMin = ai.uMin;
+      //   uMax = ai.uMax;
+      // }
       agent_information.push_back(ai);
       node_agent = FindNextSiblingNode(node_agent);
       N += ai.q_init.size();
@@ -207,9 +207,11 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
     q_init = GetSubNodeAttribute<Config>(node, "qinit", "config");
     q_goal = GetSubNodeAttribute<Config>(node, "qgoal", "config");
 
-    Config dq; dq.resize(q_init.size()); dq.setZero();
-    dq_init = GetSubNodeAttributeDefault<Config>(node, "dqinit", "config", dq);
-    dq_goal = GetSubNodeAttributeDefault<Config>(node, "dqgoal", "config", dq);
+    Config dqZero; dqZero.resize(q_init.size()); dqZero.setZero();
+    dq_init = GetSubNodeAttributeDefault<Config>(node, "dqinit", "config", dqZero);
+    dq_goal = GetSubNodeAttributeDefault<Config>(node, "dqgoal", "config", dqZero);
+    dqMin =   GetSubNodeAttributeDefault<Config>(node, "dqMin", "config", dqZero);
+    dqMax =   GetSubNodeAttributeDefault<Config>(node, "dqMax", "config", dqZero);
     if(kinodynamic)
     {
       uMin = GetSubNodeAttribute<Config>(node, "control_min", "config");
@@ -361,6 +363,8 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
         AddConfigToConfig(layer.dq_init, agent.dq_init);
         AddConfigToConfig(layer.dq_goal, agent.dq_goal);
 
+        // layer.uMins.push_back(agent.uMin);
+        // layer.uMaxs.push_back(agent.uMax);
         layer.q_inits.push_back(agent.q_init);
         layer.q_goals.push_back(agent.q_goal);
         layer.dq_inits.push_back(agent.dq_init);
@@ -433,14 +437,25 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
 
 }
 
-const CSpaceInput& PlannerInput::GetCSpaceInput()
+const CSpaceInput& PlannerInput::GetCSpaceInput(int robot_idx)
 {
   cin = new CSpaceInput();
   cin->timestep_max = timestep_max;
   cin->timestep_min = timestep_min;
   cin->fixedBase = !freeFloating;
-  cin->uMin = uMin;
-  cin->uMax = uMax;
+  if(!ExistsAgentAtID(robot_idx))
+  {
+      cin->uMin = uMin;
+      cin->uMax = uMax;
+      cin->dqMin = dqMin;
+      cin->dqMax = dqMax;
+  }else{
+      AgentInformation agent = GetAgentAtID(robot_idx);
+      cin->uMin = agent.uMin;
+      cin->uMax = agent.uMax;
+      cin->dqMin = agent.dqMin;
+      cin->dqMax = agent.dqMax;
+  }
   cin->kinodynamic = kinodynamic;
   cin->multiAgent = multiAgent;
   return *cin;

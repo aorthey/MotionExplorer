@@ -49,7 +49,7 @@ W = cvx.Variable((K_basis_functions, N_dim))
 v = np.array((0.1,0.3,1))
 
 C=1e-3
-print F_samples
+print(F_samples)
 obj = cvx.Minimize(cvx.norm(F_samples - (Phi.T*W)))
 constr = [W>=0, np.ones(N).T*W == 1]
 prob = cvx.Problem(obj, constr)

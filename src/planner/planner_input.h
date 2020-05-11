@@ -37,6 +37,8 @@ struct AgentInformation{
   int id;
   Config qMin;
   Config qMax;
+  Config dqMin;
+  Config dqMax;
   Config uMin;
   Config uMax;
 };
@@ -58,6 +60,8 @@ class PlannerInput{
 
     Config qMin;
     Config qMax;
+    Config dqMin;
+    Config dqMax;
     Config uMin;
     Config uMax;
 
@@ -99,7 +103,7 @@ class PlannerInput{
     void SetDefault();
     void ExtractHierarchy(TiXmlElement *node, int hierarchy_index);
     void ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index);
-    const CSpaceInput& GetCSpaceInput();
+    const CSpaceInput& GetCSpaceInput(int robot_idx = -1);
     const StrategyInput& GetStrategyInput();
 
     friend std::ostream& operator<< (std::ostream& out, const PlannerInput& pin) ;

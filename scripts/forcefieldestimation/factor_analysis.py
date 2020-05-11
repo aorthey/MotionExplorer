@@ -36,7 +36,7 @@ Fsamples = np.dstack([xr[::Mth],yr[::Mth],Fxr[::Mth],Fyr[::Mth]])[0]
 #### 
 ################################################################################
 Phi = GetBasisFunctionsAtSamples( Fsamples )
-print Phi
+print(Phi)
 
 N = Phi.shape[0]
 W = Variable(N)

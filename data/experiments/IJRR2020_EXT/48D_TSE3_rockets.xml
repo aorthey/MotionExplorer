@@ -9,11 +9,11 @@
     <agent 
       id="0" 
       qinit="6  -0.0 -0.0 +0.0 0 0 0"
-      dqinit="6  0.0 0 +1.0 0 0 0"
+      dqinit="6  0.0 0 +0.0 0 0 0"
       qgoal="6  +0.0 -0.0 +8.5 0 0 0"
-      dqgoal="6  0 0 +1.0 0 0 0"
-      uMin ="6  -0.0 -0.0 -0.0 -0.2 -0.2 -0.2"
-      uMax ="6  +0.0 +0.0 +0.0 +0.2 +0.2 +0.2"
+      dqgoal="6  0 0 +0.0 0 0 0"
+      uMin ="6  -1.0 -1.0 -1.0 -0.2 -0.2 -0.2"
+      uMax ="6  +1.0 +1.0 +1.0 +0.2 +0.2 +0.2"
     />
     <agent 
       id="1" 
@@ -26,7 +26,7 @@
     <se3min config="6  -3.0 -3.0 +0.0 -3.141593 -0.1 -0.1"/>
     <se3max config="6  +3.0 +3.0 +10.0 +3.141593 +0.1 +0.1"/>
 
-    <maxplanningtime>0.5</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
     <epsilongoalregion>0.1</epsilongoalregion>
     <freeFloating>1</freeFloating>
     <pathSpeed>1.5</pathSpeed>
@@ -34,17 +34,15 @@
     <timestep min="0.01" max="0.01"/>
     <!-- <algorithm dynamic="1" name="hierarchy:qrrt"/> -->
 
-    <algorithm name="hierarchy:qrrt"/>
-    <algorithm name="hierarchy:qmp"/>
-
     <multiAgent>1</multiAgent>
+    <kinodynamic>1</kinodynamic>
 
     <hierarchy>
       <!-- <level> -->
       <!--   <robot id="0" freeFloating="1" simplification_of_id="0" type="SE3"/> -->
       <!-- </level> -->
       <level>
-        <robot id="0" freeFloating="1" simplification_of_id="0" type="TSE3"/>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE3"/>
       </level>
       <level>
         <robot id="0" freeFloating="1" type="TSE3"/>

@@ -565,10 +565,6 @@ void PlannerBackend::RenderScreen(){
     line_y_offset += line_y_offset_stepsize;
 
     if(state("draw_planner_minima_tree")){
-        line = "Local Minima Tree";
-        DrawText(line_x_pos,line_y_offset,line);
-        line_y_offset += line_y_offset_stepsize;
-        //display local-minima tree
         planners.at(active_planner)->DrawGLScreen(line_x_pos, line_y_offset);
         line_y_offset += line_y_offset_stepsize;
     }

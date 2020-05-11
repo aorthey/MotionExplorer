@@ -7,7 +7,9 @@
   <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
   <robot name="disk_inner2" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
 
-  <!-- <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="0 0 0" rotateRPY="0 0 0"/> -->
+  <robot name="airplane" file="../../robots/airplane.urdf"/>
+
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="0 0 0" rotateRPY="0 0 0"/>
   <plannerinput>
 
     <agent id="0" 
@@ -15,40 +17,60 @@
         dqinit="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
         qgoal="15  +3.5 -1.0 +0.0 +0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
         dqgoal="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
-        uMin="6  0 0 0 -0.1 0 0"
-        uMax="6  0 0 0 +0.1 0 0"/>
+
+        dqMin="15  +0.3 0 0 -1 0 0 0 0 0 0 0 0 0 0 0"
+        dqMax="15  +0.3 0 0 +1 0 0 0 0 0 0 0 0 0 0 0"
+        uMin="6  0 0 0 -0.2 0 0"
+        uMax="6  0 0 0 +0.2 0 0"
+    />
 
     <agent id="2" 
         qinit="15  -3.5 +1.0 +0.0 -0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
-        dqinit="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+        dqinit="15  +0.6 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
         qgoal="15  +3.5 +1.0 +0.0 +0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
-        dqgoal="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0" 
-        uMin="6  0 0 0 -0.1 0 0"
-        uMax="6  0 0 0 +0.1 0 0"/>
+        dqgoal="15  +0.6 0 0 0 0 0 0 0 0 0 0 0 0 0 0" 
+        dqMin="15  +0.6 0 0 -1 0 0 0 0 0 0 0 0 0 0 0"
+        dqMax="15  +0.6 0 0 +1 0 0 0 0 0 0 0 0 0 0 0"
+        uMin="6  0 0 0 -0.2 0 0"
+        uMax="6  0 0 0 +0.2 0 0"
+    />
 
-    <se3min config="6  -4.0 -3.0 -0.0 -3.141593 0 0"/>
-    <se3max config="6  +4.0 +3.0 +0.0 +3.141593 0 0"/>
+    <agent 
+      id="4" 
+      qinit="6  -5.0 -0.0 +1.5 0 0 0"
+      dqinit="6  1.0 0 +0.0 0 0 0"
+      qgoal="6  +5.0 -2.0 +1.5 0 0 0"
+      dqgoal="6  1.0 0 +0.0 0 0 0"
+      uMin ="6  -0.0 -0.0 -0.0 -0.1 -0.0 -0.0"
+      uMax ="6  +0.0 +0.0 +0.0 +0.1 +0.0 +0.0"
+    />
+
+    <se3min config="6  -6.0 -3.0 -3.0 -3.141593 0 0"/>
+    <se3max config="6  +6.0 +3.0 +3.0 +3.141593 0 0"/>
 
     <freeFloating>1</freeFloating>
     <kinodynamic>1</kinodynamic>
-    <timestep min="0.001" max="0.1"/>
+    <timestep min="0.1" max="0.1"/>
 
-    <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
-    <epsilongoalregion>1</epsilongoalregion>
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>0.1</epsilongoalregion>
     <pathSpeed>10</pathSpeed>
 
     <multiAgent>1</multiAgent>
 
     <hierarchy>
       <level>
+        <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/>
+      </level>
+      <level>
         <robot id="0" freeFloating="1" simplification_of_id="0" type="TSE2"/>
       </level>
       <level>
         <robot id="0" freeFloating="1" type="TSE2"/>
         <robot id="2" freeFloating="1" type="TSE2"/>
+        <!-- <robot id="4" freeFloating="1" type="TSE3"/> -->
       </level>
     </hierarchy>
-
   </plannerinput>
 
 </world>

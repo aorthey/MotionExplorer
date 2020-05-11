@@ -794,6 +794,14 @@ void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
 {
   Config q = Eval(t);
   quotient_space->drawConfig(q, cRobotVolume);
+
+  if(state("draw_path_trace"))
+  {
+      cLine = cSmoothed;
+      DrawGLPathPtr(state, path);
+  }
+
+
   // if(quotient_space->isDynamic()){
   //   Config q = Eval(t);
   //   Config dq = EvalVelocity(t);
@@ -815,7 +823,6 @@ void PathPiecewiseLinear::DrawGL(GUIState& state)
   }
 
   if(state("draw_path")){
-    //if(path==nullptr) return;
     cLine = cSmoothed;
     DrawGLPathPtr(state, path);
   }

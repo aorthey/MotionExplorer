@@ -7,7 +7,7 @@
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include "gui/drawMotionPlanner.h"
 #include "util.h"
-#include <ompl/geometric/planners/quotientspace/Explorer.h>
+#include <ompl/geometric/planners/explorer/Explorer.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -58,7 +58,7 @@ CSpaceOMPL* MotionPlanner::ComputeMultiAgentCSpace(const Layer &layer){
 
 CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robot_idx, bool freeFloating)
 {
-  CSpaceFactory factory(input.GetCSpaceInput());
+  CSpaceFactory factory(input.GetCSpaceInput(robot_idx));
 
   CSpaceOMPL* cspace_level;
   if(type=="EMPTY_SET") 
@@ -584,12 +584,12 @@ void MotionPlanner::UpdateHierarchy(){
   setSelectedPath(current_path);
 }
 
-void MotionPlanner::setSelectedPath(std::vector<int> selectedPath)
+void MotionPlanner::setSelectedPath(std::vector<int> selectedLocalMinimum)
 {
     //can only be done with Explorer Planners
     auto selectionPlanner = dynamic_pointer_cast<og::MotionExplorer>(strategy->GetPlannerPtr());
     if(selectionPlanner != NULL){
-      selectionPlanner->setSelectedPath( selectedPath );
+      selectionPlanner->setLocalMinimumSelection( selectedLocalMinimum );
     }
 }
 void MotionPlanner::Print()
