@@ -74,8 +74,9 @@ class CSpaceOMPL
     virtual void drawConfig(const Config &q, const Config &dq, GLDraw::GLColor color=GLDraw::GLColor(1,0,0));
     virtual void DrawGL(GUIState& state);
 
-    std::vector<double> EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
-    void OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSpace::StateType *q );
+    //Yaw, Pitch, Roll
+    std::vector<double> EulerZYXFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
+    void OMPLSO3StateSpaceFromEulerZYX( double rz, double ry, double rx, ob::SO3StateSpace::StateType *q );
 
     virtual bool isDynamic() const = 0;
     bool isFixedBase();

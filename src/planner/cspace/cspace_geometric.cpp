@@ -136,7 +136,7 @@ void GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q, ob::State *qompl)
   }
 
   qomplSE3->setXYZ(q(0),q(1),q(2));
-  OMPLSO3StateSpaceFromEulerXYZ(q(3),q(4),q(5),qomplSO3);
+  OMPLSO3StateSpaceFromEulerZYX(q(3),q(4),q(5), qomplSO3);
 
   if(Nompl>0){
     double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
@@ -169,10 +169,10 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType
     throw "SO3 element is NaN.";
   }
 
-  std::vector<double> rxyz = EulerXYZFromOMPLSO3StateSpace(qomplSO3);
-  q(3) = rxyz.at(0);
-  q(4) = rxyz.at(1);
-  q(5) = rxyz.at(2);
+  std::vector<double> rzyx = EulerZYXFromOMPLSO3StateSpace(qomplSO3);
+  q(3) = rzyx.at(0);
+  q(4) = rzyx.at(1);
+  q(5) = rzyx.at(2);
 
   for(uint i = 0; i < Nompl; i++){
     uint idx = ompl_to_klampt.at(i);

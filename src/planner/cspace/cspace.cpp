@@ -279,89 +279,112 @@ void CSpaceOMPL::drawConfig(const Config &q, const Config &dq, GLColor color)
     GLDraw::drawRobotAtConfig(robot, q, dq, color);
 }
 
-std::vector<double> CSpaceOMPL::EulerXYZFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q )
+
+#include <unsupported/Eigen/Splines>
+#include <Eigen/Geometry> 
+std::vector<double> CSpaceOMPL::EulerZYXFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q )
 {
-  double qx = q->x;
-  double qy = q->y;
-  double qz = q->z;
-  double qw = q->w;
+  Eigen::Quaterniond qEigen(q->w, q->x, q->y, q->z);
 
-  double d = sqrt(qx*qx + qy*qy + qz*qz + qw*qw);
-  if(abs(d-1.0) > 1e-10){
-    //scale them down
-    //if(d<0){
-    //  d*=-1;
-    //}
-    qx /= d;
-    qy /= d;
-    qz /= d;
-    qw /= d;
-  }
-
-  Math3D::QuaternionRotation qr(qw, qx, qy, qz);
-  Math3D::Matrix3 qrM;
-  qr.getMatrix(qrM);
-  Math3D::EulerAngleRotation R;
-  bool Rvalid = R.setMatrixXYZ(qrM);
-  if(!Rvalid){
-
-    std::cout << "quaternions: " << qr << std::endl;
-    std::cout << qrM << std::endl;
-    Real b=Asin(qrM(0,2));  //m(0,2)=sb
-    Real cb = Cos(b);
-    Real ca = qrM(2,2)/cb;   //m(2,2)=ca*cb
-    std::cout << ca << std::endl;
-
-    std::cout << "QuaternionRotation to EulerAngle not valid" << std::endl;
-    throw "Invalid quaternion element.";
-  }
-
-  double rx = R[2];
-  double ry = R[1];
-  double rz = R[0];
-
-  if(rx<-M_PI) rx+=2*M_PI;
-  if(rx>M_PI) rx-=2*M_PI;
-
-  if(ry<-M_PI/2) ry+=M_PI;
-  if(ry>M_PI/2) ry-=M_PI;
-
-  if(rz<-M_PI) rz+=2*M_PI;
-  if(rz>M_PI) rz-=2*M_PI;
+  Eigen::Vector3d euler = qEigen.toRotationMatrix().eulerAngles(0, 1, 2);
 
   std::vector<double> out;
-  out.push_back(rx);
-  out.push_back(ry);
-  out.push_back(rz);
+  out.push_back(euler[2]);
+  out.push_back(euler[1]);
+  out.push_back(euler[0]);
   return out;
+
+  //############################################################################
+
+  //double qx = q->x;
+  //double qy = q->y;
+  //double qz = q->z;
+  //double qw = q->w;
+
+  //double d = sqrt(qx*qx + qy*qy + qz*qz + qw*qw);
+  //if(abs(d-1.0) > 1e-10){
+  //  //scale them down
+  //  //if(d<0){
+  //  //  d*=-1;
+  //  //}
+  //  qx /= d;
+  //  qy /= d;
+  //  qz /= d;
+  //  qw /= d;
+  //}
+
+  //Math3D::QuaternionRotation qr(qw, qx, qy, qz);
+  //Math3D::Matrix3 qrM;
+  //qr.getMatrix(qrM);
+  //Math3D::EulerAngleRotation R;
+  //bool Rvalid = R.setMatrixXYZ(qrM);
+  //if(!Rvalid){
+
+  //  std::cout << "quaternions: " << qr << std::endl;
+  //  std::cout << qrM << std::endl;
+  //  Real b=Asin(qrM(0,2));  //m(0,2)=sb
+  //  Real cb = Cos(b);
+  //  Real ca = qrM(2,2)/cb;   //m(2,2)=ca*cb
+  //  std::cout << ca << std::endl;
+
+  //  std::cout << "QuaternionRotation to EulerAngle not valid" << std::endl;
+  //  throw "Invalid quaternion element.";
+  //}
+
+  //double rx = R[2];
+  //double ry = R[1];
+  //double rz = R[0];
+
+  //if(rx<-M_PI) rx+=2*M_PI;
+  //if(rx>M_PI) rx-=2*M_PI;
+
+  //if(ry<-M_PI/2) ry+=M_PI;
+  //if(ry>M_PI/2) ry-=M_PI;
+
+  //if(rz<-M_PI) rz+=2*M_PI;
+  //if(rz>M_PI) rz-=2*M_PI;
+
+  //std::vector<double> out;
+  //out.push_back(rx);
+  //out.push_back(ry);
+  //out.push_back(rz);
+  //return out;
 }
 
-void CSpaceOMPL::OMPLSO3StateSpaceFromEulerXYZ( double x, double y, double z, ob::SO3StateSpace::StateType *q )
+void CSpaceOMPL::OMPLSO3StateSpaceFromEulerZYX( double rz, double ry, double rx, ob::SO3StateSpace::StateType *q )
 {
-  q->setIdentity();
+  // q->setIdentity();
 
   //q SE3: X Y Z yaw pitch roll
   //double yaw = q[3];
   //double pitch = q[4];
   //double roll = q[5];
 
-  //Math3D::EulerAngleRotation Reuler(q(5),q(4),q(3));
-  //Matrix3 R;
-  //Reuler.getMatrixXYZ(R);
-  Math3D::EulerAngleRotation Reuler(z,y,x);
-  Matrix3 R;
-  Reuler.getMatrixXYZ(R);
+  Eigen::Quaterniond qq;
+  qq = Eigen::AngleAxisd(rx, Eigen::Vector3d::UnitX())
+        * Eigen::AngleAxisd(ry, Eigen::Vector3d::UnitY())
+        * Eigen::AngleAxisd(rz, Eigen::Vector3d::UnitZ());
 
-  QuaternionRotation qr;
-  qr.setMatrix(R);
+  q->x = qq.x();
+  q->y = qq.y();
+  q->z = qq.z();
+  q->w = qq.w();
 
-  double qx,qy,qz,qw;
-  qr.get(qw,qx,qy,qz);
+  //Previous using KLAMPT
+  // Math3D::EulerAngleRotation Reuler(x,y,z);
+  // Matrix3 R;
+  // Reuler.getMatrixXYZ(R);
 
-  q->x = qx;
-  q->y = qy;
-  q->z = qz;
-  q->w = qw;
+  // QuaternionRotation qr;
+  // qr.setMatrix(R);
+
+  // double qx,qy,qz,qw;
+  // qr.get(qw,qx,qy,qz);
+
+  // q->x = qx;
+  // q->y = qy;
+  // q->z = qz;
+  // q->w = qw;
 }
 
 void CSpaceOMPL::print(std::ostream& out) const

@@ -253,7 +253,7 @@ void KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q, ob::State *qompl)
   }
 
   qomplSE3->setXYZ(q(0),q(1),q(2));
-  OMPLSO3StateSpaceFromEulerXYZ(q(3),q(4),q(5), qomplSO3);
+  OMPLSO3StateSpaceFromEulerZYX(q(3),q(4),q(5), qomplSO3);
 
   if(Nompl>0){
     double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;

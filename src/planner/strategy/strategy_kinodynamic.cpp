@@ -76,6 +76,7 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
     // throw "NotControl";
   }
 
+
   if(algorithm=="ompl:dynamic:rrt"){
     planner = std::make_shared<oc::RRT>(si);
   }else if(algorithm=="ompl:dynamic:est"){
@@ -137,6 +138,7 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
     goalk  = cspace_levelk->ConfigVelocityToOMPLState(input.q_goal, input.dq_goal);
 
     setStateSampler(input.name_sampler, sik);
+
     si_vec.push_back(sik);
 
     if(k >= input.cspace_levels.size()-1){
