@@ -18,6 +18,8 @@ public:
     GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int robot_idx);
 
     std::vector<Triangle3D> surf_triangles;
+    std::vector<Vector2> corner_coord;
+
 
     virtual void initSpace() override;
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;

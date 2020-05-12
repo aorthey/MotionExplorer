@@ -13,8 +13,6 @@ GeometricCSpaceOMPLRCONTACT::GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int
     std::vector<Triangle3D> tris;
     std::vector<Triangle3D> tris_filtered;
 
-    std::vector<Vector2> cornerCoords;
-
     for(uint k = 0; k < world_->terrains.size(); k++){
         Terrain* terrain_k = world_->terrains[k];
         const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();//different mesh
@@ -36,19 +34,24 @@ GeometricCSpaceOMPLRCONTACT::GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int
             Vector2 bb = Vector2(tris.at(l).b[0], tris.at(l).b[1]);
             Vector2 cc = Vector2(tris.at(l).c[0], tris.at(l).c[1]);
 
-            cornerCoords.push_back(aa);
-            cornerCoords.push_back(bb);
-            cornerCoords.push_back(cc);
-            //std::cout << "Corner A: " << aa << std::endl;
-            //std::cout << "Corner B: " << bb << std::endl;
-            //std::cout << "Corner C: " << cc << std::endl;
+            corner_coord.push_back(aa);
+            corner_coord.push_back(bb);
+            corner_coord.push_back(cc);
 
             // tris_filtered filled with surface triangles that are feasible for contact (normal in x or y direction)
             tris_filtered.push_back(tris.at(l));
         }
     }
     std::cout << "Environment has " << tris_filtered.size() << " triangles to make contact!" << std::endl;
-    std::cout << "Filtered corner coordinates: " << cornerCoords << std::endl;
+
+    // remove all duplicates of (2D) corner coordinates
+    auto end = corner_coord.end();
+    for(auto it = corner_coord.begin(); it != end; ++it){
+        end = std::remove(it + 1, end, *it);
+    }
+    corner_coord.erase(end, corner_coord.end());
+
+    std::cout << "Filtered corner coordinates: " << corner_coord << std::endl;
 
     surf_triangles = tris_filtered;
     robot = world_->robots[robot_idx];
