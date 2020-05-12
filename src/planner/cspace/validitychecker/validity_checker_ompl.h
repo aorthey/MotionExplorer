@@ -19,7 +19,7 @@ class OMPLValidityChecker: public ob::StateValidityChecker
     CSpaceOMPL* GetCSpaceOMPLPtr() const;
     void SetNeighborhood(double);
 
-    // virtual double clearance(const ob::State*) const override;
+    virtual double clearance(const ob::State*) const override;
 
     virtual bool operator ==(const ob::StateValidityChecker &rhs) const override;
 

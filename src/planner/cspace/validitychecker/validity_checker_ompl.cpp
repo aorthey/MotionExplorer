@@ -38,10 +38,11 @@ double OMPLValidityChecker::SufficientDistance(const ob::State* state) const
   return 0;
 }
 
-// double OMPLValidityChecker::clearance(const ob::State* state) const
-// {
-//   return DistanceToRobot(state, klampt_single_robot_cspace);
-// }
+double OMPLValidityChecker::clearance(const ob::State* state) const
+{
+  double c = 1000*DistanceToRobot(state, klampt_single_robot_cspace);
+  return c;
+}
 
 double OMPLValidityChecker::DistanceToRobot(const ob::State* state, SingleRobotCSpace *space) const
 {

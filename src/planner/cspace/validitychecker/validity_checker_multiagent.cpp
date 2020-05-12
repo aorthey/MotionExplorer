@@ -6,7 +6,8 @@ OMPLValidityCheckerMultiAgent::OMPLValidityCheckerMultiAgent(const ob::SpaceInfo
     CSpaceOMPLMultiAgent *cspace, std::vector<CSpaceOMPL*> cspaces):
   ob::StateValidityChecker(si), cspace_(cspace), cspaces_(cspaces)
 {
-  for(uint k = 0; k < cspaces_.size(); k++){
+  for(uint k = 0; k < cspaces_.size(); k++)
+  {
     SingleRobotCSpace *kck = static_cast<SingleRobotCSpace*>(cspaces.at(k)->GetCSpaceKlamptPtr());
     klampt_single_robot_cspaces_.push_back(kck);
   }
@@ -21,7 +22,8 @@ bool OMPLValidityCheckerMultiAgent::isValid(const ob::State* state) const
 
   std::vector<int> ridxs = cspace_->GetRobotIdxs();
 
-  for(uint k = 0; k < ridxs.size(); k++){
+  for(uint k = 0; k < ridxs.size(); k++)
+  {
     SingleRobotCSpace* space = klampt_single_robot_cspaces_.at(k);
 
     int rk = ridxs.at(k);
@@ -35,16 +37,16 @@ bool OMPLValidityCheckerMultiAgent::isValid(const ob::State* state) const
       idothers.push_back(space->world.TerrainID(i));
     for(size_t i=0;i<space->world.rigidObjects.size();i++)
       idothers.push_back(space->world.RigidObjectID(i));
-    for(size_t i=0;i<ridxs.size();i++)
+
+    //all remaining robots
+    for(size_t i=k;i<ridxs.size();i++)
     {
       int ri = ridxs.at(i);
-      if((ri >= 0) && (ri != rk)){
+      if((ri >= 0))
+      {
         idothers.push_back(space->world.RobotID(ridxs.at(i)));
-        // std::cout << ridxs.at(i) << ":" << space->world.RobotID(i) << std::endl;
       }
     }
-
-    // if(!space->settings->CheckCollision(space->world, -1)) return false;
 
     pair<int,int> res;
     res = space->settings->CheckCollision(space->world, idrobot);

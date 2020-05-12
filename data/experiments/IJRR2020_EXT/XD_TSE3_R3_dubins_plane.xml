@@ -1,9 +1,12 @@
 <?xml version="1.0"?>
 
 <world>
-  <robot name="airplane" file="../../robots/airplane.urdf"/>
-  <robot name="airplane" file="../../robots/airplane.urdf"/>
-  <robot name="airplane" file="../../robots/airplane.urdf"/>
+  <robot name="airplane" file="../../robots/airplane/airplane.urdf"/>
+  <robot name="sphere" file="../../robots/airplane/airplane_expanded_sphere.urdf"/>
+  <robot name="airplane" file="../../robots/airplane/airplane.urdf"/>
+  <robot name="sphere" file="../../robots/airplane/airplane_expanded_sphere.urdf"/>
+  <robot name="airplane" file="../../robots/airplane/airplane.urdf"/>
+  <robot name="sphere" file="../../robots/airplane/airplane_expanded_sphere.urdf"/>
   <!-- <robot name="airplane" file="../../robots/airplane_propeller.urdf"/> -->
   <!-- <robot name="airplane" file="../../robots/airplane_propeller.urdf"/> -->
   <!-- <robot name="airplane" file="../../robots/airplane_propeller.urdf"/> -->
@@ -18,26 +21,32 @@
       id="0" 
       qinit="6  -3.0 -5.0 +1.5 0 0 0"
       qgoal="6  +3.0 -5.0 +1.5 0 0 0"
-      dqinit="6  0 0 0 0 0 0 0 0 0 0 0 0"
-      dqgoal="6  0 0 0 0 0 0 0 0 0 0 0 0"
+      dqinit="6  +1 0 0 0 0 0"
+      dqgoal="6  +1 0 0 0 0 0"
+      dqMin="6  +1 0 0 -5 -1 -1"
+      dqMax="6  +1 0 0 +5 +1 +1"
       uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5 0 0 0 0 0 0"
       uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5 0 0 0 0 0 0"
     />
     <agent 
-      id="1" 
+      id="2" 
       qinit="6  -3.0 -2.5 +1.5 0 0 0"
       qgoal="6  +3.0 -2.5 +1.5 0 0 0"
-      dqinit="6  0 0 0 0 0 0"
-      dqgoal="6  0 0 0 0 0 0"
+      dqinit="6  +1 0 0 0 0 0"
+      dqgoal="6  +1 0 0 0 0 0"
+      dqMin="6  +1 0 0 -5 -1 -1"
+      dqMax="6  +1 0 0 +5 +1 +1"
       uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5"
       uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5"
     />
     <agent 
-      id="2" 
+      id="4" 
       qinit="6  -3.0 +0.0 +1.5 0 0 0"
       qgoal="6  +3.0 +0.0 +1.5 0 0 0"
-      dqinit="6  0 0 0 0 0 0"
-      dqgoal="6  0 0 0 0 0 0"
+      dqinit="6  +1 0 0 0 0 0"
+      dqgoal="6  +1 0 0 0 0 0"
+      dqMin="6  +1 0 0 -5 -1 -1"
+      dqMax="6  +1 0 0 +5 +1 +1"
       uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5"
       uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5"
     />
@@ -100,16 +109,21 @@
     <pathWidth>0.3</pathWidth>
     <timestep min="0.01" max="0.1"/>
     <!-- <algorithm dynamic="1" name="hierarchy:qrrt"/> -->
-    <algorithm name="hierarchy:qrrt"/>
+    <algorithm dynamic="1" name="hierarchy:qrrt"/>
 
     <multiAgent>1</multiAgent>
-    <kinodynamic>0</kinodynamic>
+    <kinodynamic>1</kinodynamic>
 
     <hierarchy>
       <level>
+        <robot id="1" freeFloating="1" simplification_of_id="0" type="R3"/>
+        <robot id="3" freeFloating="1" simplification_of_id="2" type="R3"/>
+        <robot id="5" freeFloating="1" simplification_of_id="4" type="R3"/>
+      </level>
+      <level>
         <robot id="0" freeFloating="1" type="TSE3"/>
-        <robot id="1" freeFloating="1" type="TSE3"/>
         <robot id="2" freeFloating="1" type="TSE3"/>
+        <robot id="4" freeFloating="1" type="TSE3"/>
         <!-- <robot id="3" freeFloating="1" type="SE3C"/> -->
         <!-- <robot id="4" freeFloating="1" type="SE3C"/> -->
         <!-- <robot id="5" freeFloating="1" type="SE3C"/> -->
