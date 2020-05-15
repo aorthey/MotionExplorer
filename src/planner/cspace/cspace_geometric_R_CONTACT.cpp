@@ -7,11 +7,8 @@
 GeometricCSpaceOMPLRCONTACT::GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int robot_idx):
         GeometricCSpaceOMPL(world_, robot_idx)
 {
-    //Adding triangle information to PlannerInput (to be used as constraint
-    //manifolds)
-    //filtering for those triangles that belong to feasible contact surfaces
+    //Adding triangle information to PlannerInput (to be used as constraint manifolds)
     std::vector<Triangle3D> tris;
-    std::vector<Triangle3D> tris_filtered;
 
     for(uint k = 0; k < world_->terrains.size(); k++){
         Terrain* terrain_k = world_->terrains[k];
@@ -29,31 +26,31 @@ GeometricCSpaceOMPLRCONTACT::GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int
 
         if(fabs((fabs(normal[2]) - 1.0))<epsilon){
             //do nothing
-        }else{
-            Vector2 aa = Vector2(tris.at(l).a[0], tris.at(l).a[1]);
-            Vector2 bb = Vector2(tris.at(l).b[0], tris.at(l).b[1]);
-            Vector2 cc = Vector2(tris.at(l).c[0], tris.at(l).c[1]);
+        }
+        else{
+            // only x and y coordinates
+            Vector2 a = Vector2(tris.at(l).a[0], tris.at(l).a[1]);
+            Vector2 b = Vector2(tris.at(l).b[0], tris.at(l).b[1]);
+            Vector2 c = Vector2(tris.at(l).c[0], tris.at(l).c[1]);
 
-            corner_coord.push_back(aa);
-            corner_coord.push_back(bb);
-            corner_coord.push_back(cc);
+            cornerCoord.push_back(a);
+            cornerCoord.push_back(b);
+            cornerCoord.push_back(c);
 
-            // tris_filtered filled with surface triangles that are feasible for contact (normal in x or y direction)
-            tris_filtered.push_back(tris.at(l));
+            // trisFiltered filled with surface triangles that are feasible for contact (normal in x or y direction)
+            trisFiltered.push_back(tris.at(l));
         }
     }
-    std::cout << "Environment has " << tris_filtered.size() << " triangles to make contact!" << std::endl;
+    std::cout << "Environment has " << trisFiltered.size() << " triangles to make contact!" << std::endl;
 
     // remove all duplicates of (2D) corner coordinates
-    auto end = corner_coord.end();
-    for(auto it = corner_coord.begin(); it != end; ++it){
+    auto end = cornerCoord.end();
+    for(auto it = cornerCoord.begin(); it != end; ++it){
         end = std::remove(it + 1, end, *it);
     }
-    corner_coord.erase(end, corner_coord.end());
+    cornerCoord.erase(end, cornerCoord.end());
+    std::cout << "Filtered corner coordinates: " << cornerCoord << std::endl;
 
-    std::cout << "Filtered corner coordinates: " << corner_coord << std::endl;
-
-    surf_triangles = tris_filtered;
     robot = world_->robots[robot_idx];
 
 }
@@ -61,15 +58,26 @@ GeometricCSpaceOMPLRCONTACT::GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int
 class ContactConstraint : public ob::Constraint
 {
 public:
-    ContactConstraint() : ob::Constraint(4, 2) // (x,y,theta at 1st link,phi at 2nd)
+    ContactConstraint(Vector3 endEffXYZ, std::vector<Vector2> cornerCoord;)
+    : ob::Constraint(4, 2) // (x,y,theta at 1st link,phi at 2nd)
+    , endEffXYZ_(endEffXYZ)
+    , cornerCoord_(cornerCoord)
     {
     }
 
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override
     {
+        Vector2 endEffXY = Vector2(endEffXYZ_[0], endEffXYZ_[1]);
+        std::cout << endEffXY << std::endl;
+        std::cout << cornerCoord_ << std::endl;
+
         //out[0] = x.norm() - 1; // ----change to fit contact case-------
         out[0] = 0; // empty constraint
     }
+
+private:
+    Vector3 endEffXYZ_;
+    std::vector<Vector2> cornerCoord_;
 };
 
 void GeometricCSpaceOMPLRCONTACT::initSpace()
@@ -101,13 +109,16 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
     bounds.check();
     static_pointer_cast<ob::RealVectorStateSpace>(Rn)->setBounds(bounds);
 
+    //Endeffector coordinates
+    Vector3 endEffXYZ = getXYZ(...);
+
     //Constrained State Space
-    constraint = std::make_shared<ContactConstraint>();
+    constraint = std::make_shared<ContactConstraint>(endEffXYZ, cornerCoord);
     this->space = std::make_shared<ob::ProjectedStateSpace>(Rn, constraint);
 }
 
 ob::SpaceInformationPtr GeometricCSpaceOMPLRCONTACT::SpaceInformationPtr() {
-    if (!si) { //si: stateInformationPtr from cspace.h
+    if (!si) {
         si = std::make_shared<ob::ConstrainedSpaceInformation>(SpacePtr());
         validity_checker = StateValidityCheckerPtr(si);
         si->setStateValidityChecker(validity_checker);
