@@ -176,7 +176,6 @@ void TangentBundleIntegrator::propagate_dynamics(const ob::State *state, const o
   //###########################################################################
 
   cspace->ConfigVelocityToOMPLState(q1, dq1, result);
-
 }
 
 bool TangentBundleIntegrator::steer(const ob::State * /*from*/, const ob::State * /*to*/, oc::Control * /*result*/,

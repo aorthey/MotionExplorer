@@ -97,7 +97,8 @@ PathPiecewiseLinear* Roadmap::GetShortestPath()
       }
 
       if(pred.size()>0){
-        if(quotient_space->isDynamic()){
+        if(quotient_space->isDynamic())
+        {
           // static_pointer_cast<oc::PathControl>(path)->interpolate();
           oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
           std::vector<ob::State *> states = cpath.getStates();

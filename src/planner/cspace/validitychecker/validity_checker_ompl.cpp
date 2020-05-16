@@ -5,8 +5,11 @@
 OMPLValidityChecker::OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_):
   ob::StateValidityChecker(si), cspace(cspace_)
 {
-  klampt_single_robot_cspace = static_cast<SingleRobotCSpace*>(cspace_->GetCSpaceKlamptPtr());
+    klampt_single_robot_cspace = static_cast<SingleRobotCSpace*>(cspace_->GetCSpaceKlamptPtr());
+    specs_.clearanceComputationType = ob::StateValidityCheckerSpecs::BOUNDED_APPROXIMATE;
 }
+
+
 void OMPLValidityChecker::SetNeighborhood(double cspace_constant)
 {
   neighborhood = new Neighborhood(cspace_constant);
@@ -40,8 +43,8 @@ double OMPLValidityChecker::SufficientDistance(const ob::State* state) const
 
 double OMPLValidityChecker::clearance(const ob::State* state) const
 {
-  double c = 1000*DistanceToRobot(state, klampt_single_robot_cspace);
-  return c;
+  double c = DistanceToRobot(state, klampt_single_robot_cspace);
+  return 1.0/c;
 }
 
 double OMPLValidityChecker::DistanceToRobot(const ob::State* state, SingleRobotCSpace *space) const

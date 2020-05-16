@@ -180,6 +180,12 @@ def createPrismaticJoint(parentname, childname, x=0, y=0, z=0, lowerLimit=0, upp
   s+='</joint>\n\n'
   return s
 
+def comment(text):
+  s= '<!--'+'#'*76+'\n'
+  s+=text+'\n'
+  s+= "#"*78
+  s+='-->\n'
+  return s
 def commentNewBranch(bname):
   s= '<!--'+'#'*76+'\n'
   s+=bname+'\n'

@@ -1,3 +1,4 @@
+#pragma once
 #include "planner/cspace/cspace_geometric.h"
 
 class GeometricCSpaceOMPLSE2RN: public GeometricCSpaceOMPL

@@ -59,7 +59,7 @@ def createBranchBundle(headname, Nsegments, Nbranches):
   s=''
   tt = headradius / max(radius, sphere_scale*radius)
   if tt < 2.0:
-    print "[warning] head radius too small, branches too big"
+    print("[warning] head radius too small, branches too big")
 
   scale = 0.7
 
@@ -75,10 +75,9 @@ def createBranchBundle(headname, Nsegments, Nbranches):
   ## + Nbranches*(1+Nsegments) rigid fixed links
 
   Njoints = 6 + 1 + Nbranches * 2*(Nsegments-1) + Nbranches*(1+Nsegments)
-  print "[default position config]"
-  print "config=\""+str(Njoints)+" "+" 0"*Njoints+"\""
-
-  print "[arms open config]"
+  print( "[default position config]")
+  print( "config=\""+str(Njoints)+" "+" 0"*Njoints+"\"")
+  print( "[arms open config]")
   global config
   config = str("config=\"")
 
@@ -111,7 +110,7 @@ def createBranchBundle(headname, Nsegments, Nbranches):
 
       #config+= " 0"*Nsegments ## shoulder of branch
   config+= "\""
-  print config
+  print( config)
   return s
 def CreateSentinelRobot( robot_name, Nsegments, Nbranches):
   fname = getPathname(robot_name)
@@ -127,8 +126,7 @@ def CreateSentinelRobot( robot_name, Nsegments, Nbranches):
   f.write('</robot>')
   f.close()
 
-  print "\nCreated new file >>",
-  print fname
+  print("\nCreated new file >>",fname)
 
 
 robot_name = 'sentinel'

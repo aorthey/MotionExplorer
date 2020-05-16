@@ -3,7 +3,7 @@
 
 class GeometricCSpaceOMPLSE3Constrained: public GeometricCSpaceOMPL
 {
-  using BaseT = GeometricCSpaceOMPL;
+    using BaseT = GeometricCSpaceOMPL;
   public:
     GeometricCSpaceOMPLSE3Constrained(RobotWorld *world_, int robot_idx);
 

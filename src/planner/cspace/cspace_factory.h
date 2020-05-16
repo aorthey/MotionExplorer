@@ -14,6 +14,8 @@
 #include "planner/cspace/cspace_geometric_Circular.h"
 #include "planner/cspace/cspace_geometric_RN_time.h"
 #include "planner/cspace/cspace_geometric_SE2RN.h"
+#include "planner/cspace/cspace_geometric_SE2Dubin.h"
+#include "planner/cspace/cspace_geometric_SE3Dubin.h"
 #include "planner/cspace/cspace_geometric_SE3_constrained.h"
 #include "planner/cspace/cspace_geometric_SO2RN.h"
 #include "planner/cspace/cspace_geometric_R3S2.h"
@@ -74,6 +76,20 @@ class CSpaceFactory{
       cspace->initControlSpace();
       return cspace;
     }
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE3Dubin( RobotWorld *world, int robot_idx){
+      //return MakeGeometricCSpaceSE2RN(world, robot_idx);
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLSE3Dubin(world, robot_idx);
+      cspace->SetCSpaceInput(input);
+      cspace->Init();
+      return cspace;
+    }
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE2Dubin( RobotWorld *world, int robot_idx){
+      //return MakeGeometricCSpaceSE2RN(world, robot_idx);
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLSE2Dubin(world, robot_idx);
+      cspace->SetCSpaceInput(input);
+      cspace->Init();
+      return cspace;
+    }
     // CSpace  SE(2) x R^(N)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSE2RN( RobotWorld *world, int robot_idx){
       //return MakeGeometricCSpaceSE2RN(world, robot_idx);
@@ -111,7 +127,7 @@ class CSpaceFactory{
       cspace->Init();
       return cspace;
     }
-    // CSpace  R^(N)
+    // CSpace  Empty
     virtual GeometricCSpaceOMPL* MakeEmptySetSpace( RobotWorld *world){
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLEmpty(world);
       cspace->SetCSpaceInput(input);
