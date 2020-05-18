@@ -10,7 +10,11 @@ class OMPLValidityCheckerMultiAgent: public ob::StateValidityChecker
 
     bool isValid(const ob::State* state) const override;
 
+    virtual double clearance(const ob::State*) const override;
+
   protected:
+    double DistanceToConstraints(const ob::State* state) const;
+
     CSpaceOMPLMultiAgent *cspace_;
     std::vector<CSpaceOMPL*> cspaces_;
     std::vector<SingleRobotCSpace*> klampt_single_robot_cspaces_;

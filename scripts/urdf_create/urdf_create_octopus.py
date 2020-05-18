@@ -6,6 +6,8 @@ from urdf_create import *
 length = 0.15
 radius = 0.01
 radius_cylinder = 0.02
+radius_cylinder_stub = 0.02
+
 sphere_scale = 2
 headradius = 0.1
 headlength = 0.2
@@ -15,6 +17,7 @@ stublength = length/2
 aperture = 0.4 ## aperture of bouquet of branches
 limit = pi/2
 
+sRadiusStub = sphere_scale*radius
 sRadius = sphere_scale*radius
 config = ''
 
@@ -38,23 +41,23 @@ def createBranchSegment(parentlinkname, linkname, x, y, z):
   linkname3 = linkname+'_cylinder'
   linkname4 = linkname
 
-  s+= createCylinder(linkname1, -stublength/2, 0, 0, radius_cylinder, stublength) 
+  s+= createCylinder(linkname1, -stublength/2, 0, 0, radius_cylinder_stub, stublength) 
   s+= createRigidJoint( parentlinkname, linkname1, x, y, z) 
-  s+= createSphere(linkname2,-stublength-sRadius,0,0,0.95*sRadius)
+  s+= createSphere(linkname2,-stublength-sRadiusStub, 0, 0, 0.95*sRadiusStub)
   s+= createRigidJoint( linkname1, linkname2, 0, 0, 0)
 
   n = np.sqrt(y*y+z*z)
-  d = (length/2+sRadius)/n
+  d = (length/2+sRadiusStub)/n
   theta = np.arctan2(y,z)
 
   s+= createRotatedCylinder(linkname3,
-      -stublength-radius_cylinder,d*y, d*z, 0, theta, 1.57, radius_cylinder, length) 
+      -stublength-radius_cylinder_stub,d*y, d*z, 0, theta, 1.57, radius_cylinder_stub, length) 
   s+= createRigidJoint( linkname2, linkname3, 0, 0, 0)
 
-  d = (length+2*sRadius)/n
+  d = (length+2*sRadiusStub)/n
   # s+= createSphere(linkname4, -stublength-radius_cylinder, d*y, d*z, 0.95*sRadius)
-  s+= createSphere(linkname4, 0,0,0, 0.95*sRadius)
-  s+= createRigidJoint( linkname3, linkname4, -stublength-radius_cylinder, d*y,
+  s+= createSphere(linkname4, 0,0,0, 0.95*sRadiusStub)
+  s+= createRigidJoint( linkname3, linkname4, -stublength-radius_cylinder_stub, d*y,
       d*z)
   return s
 
@@ -74,7 +77,7 @@ def attachBranchSegment(parentlinkname, linkname, x, y, z):
   return s
 
 
-def createBranchBundle(headname, Nsegments, Nbranches):
+def createBranchBundle(headname, Nsegments, NsegmentsLast, Nbranches, NbranchesMax):
   s=''
   tt = headradius / max(radius, sphere_scale*radius)
   if tt < 2.0:
@@ -84,9 +87,12 @@ def createBranchBundle(headname, Nsegments, Nbranches):
   d = 0.7*headradius
   x = -headlength
   for i in range(0,Nbranches):
-    y = d*cos(i*2*pi/Nbranches)
-    z = d*sin(i*2*pi/Nbranches)
-    s+=createBranch("head","branch_"+str(i), x, y, z, Nsegments)
+    y = d*cos(i*2*pi/NbranchesMax)
+    z = d*sin(i*2*pi/NbranchesMax)
+    if i < Nbranches-1:
+      s+=createBranch("head","branch_"+str(i), x, y, z, Nsegments)
+    else:
+      s+=createBranch("head","branch_"+str(i), x, y, z, NsegmentsLast)
 
   ## CSpace structure:
   ## SE(3) ~ R^6 (local chart) 
@@ -122,7 +128,7 @@ def createBranchBundle(headname, Nsegments, Nbranches):
   print( config)
   return s
 
-def CreateOctopus( robot_name, Nsegments, Nbranches):
+def CreateOctopus( robot_name, Nsegments, NsegmentsLast, Nbranches, NbranchesMax):
   fname = getPathname(robot_name)
   f = open(fname,'w')
   f.write('<?xml version="1.0"?>\n')
@@ -130,7 +136,7 @@ def CreateOctopus( robot_name, Nsegments, Nbranches):
   headname = "head"
   f.write(createHead(headname))
   if Nsegments > 0:
-    f.write(createBranchBundle(headname, Nsegments, Nbranches))
+    f.write(createBranchBundle(headname, Nsegments, NsegmentsLast, Nbranches, NbranchesMax))
   f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')
   f.write('  </klampt>\n')
   f.write('</robot>')
@@ -138,9 +144,14 @@ def CreateOctopus( robot_name, Nsegments, Nbranches):
 
   print("\nCreated new file >>",fname)
 
+Nbranches = 8
 
-robot_name = 'sentinel/octopus'
-CreateOctopus(robot_name, Nsegments=7, Nbranches=8)
-# robot_name = 'sentinel/octopus_head'
-# CreateOctopus(robot_name, Nsegments=0, Nbranches=0)
+
+for i in range(0, Nbranches+1):
+    robot_name = 'sentinel/octopus_'+str(i)+'_arms_3_segments'
+    CreateOctopus(robot_name, Nsegments=7, NsegmentsLast=4, Nbranches=i,
+        NbranchesMax=Nbranches)
+    robot_name = 'sentinel/octopus_'+str(i)+'_arms'
+    CreateOctopus(robot_name, Nsegments=7, NsegmentsLast=7, Nbranches=i,
+        NbranchesMax=Nbranches)
 

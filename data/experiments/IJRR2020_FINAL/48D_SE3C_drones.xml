@@ -80,9 +80,12 @@
     <se3max config="6  +3 +2 3 +3.141593 +0.1 +0.1"/>
 
     <epsilongoalregion>0.01</epsilongoalregion>
-    <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>10</maxplanningtime>      <!-- runtime in (s) --> 
     <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
     <pathWidth>0.02</pathWidth>
+
+    <algorithm name="benchmark:minimal"/>
+    <algorithm name="hierarchy:qrrt"/>
 
     <multiAgent>1</multiAgent>
 

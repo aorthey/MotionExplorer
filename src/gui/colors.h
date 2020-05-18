@@ -32,5 +32,9 @@ const GLColor darkGreen(0,0.5,0,1);
 const GLColor darkBlue(0,0,0.5,1);
 
 namespace GLDraw{
+  const GLColor getColorRobotStartConfiguration();
+  const GLColor getColorRobotGoalConfiguration();
+  const GLColor getColorRobotStartConfigurationTransparent();
+  const GLColor getColorRobotGoalConfigurationTransparent();
   void setColor(const GLColor &c);
 };

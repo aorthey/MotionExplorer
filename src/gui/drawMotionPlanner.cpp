@@ -191,10 +191,10 @@ namespace GLDraw{
 
   void drawGLPathStartGoal(Robot *robot, const Config &p_init, const Config &p_goal)
   {
-    GLColor colorInit(0.3,1,0.3);
-    GLColor colorGoal(1,0.3,0.3);
+    const GLColor colorGoal = GLDraw::getColorRobotGoalConfiguration();
+    const GLColor colorStart = GLDraw::getColorRobotStartConfiguration();
     double scale = 1.01;
-    if(!p_init.empty()) drawRobotAtConfig(robot, p_init, colorInit, scale);
+    if(!p_init.empty()) drawRobotAtConfig(robot, p_init, colorStart, scale);
     if(!p_goal.empty()) drawRobotAtConfig(robot, p_goal, colorGoal, scale);
   }
 

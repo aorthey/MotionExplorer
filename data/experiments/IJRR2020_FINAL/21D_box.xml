@@ -17,14 +17,13 @@
     <qgoal config="44  0 -2 0 0 0 0 0 1.57 0 1.57 0 1.57 0 -1.57 0 -1.57 0 1.57 0 -1.57 0 0 1.57 0 1.57 0 1.57 0 0 -1.57 0 -1.57 0 -1.57 0 1.57 0 1.57 0 1.57 0 1.57 0 -1.57"/>
 
     <freeFloating>1</freeFloating>
-    <maxplanningtime>5</maxplanningtime>
+    <maxplanningtime>10</maxplanningtime>
     <pathSpeed>4</pathSpeed>
 
     <se3min config="6  -2.0 -2 -0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +2.0 +2 +0 +3.141593 +1.57 +3.141593"/>
 
-    <algorithm name="hierarchy:qrrt"/>
-    <algorithm name="hierarchy:qmp"/>
+    <algorithm name="benchmark:minimal"/>
 
     <hierarchy>
       <level inner_index="1" type="SE2"/>

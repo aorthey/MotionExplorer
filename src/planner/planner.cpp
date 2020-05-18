@@ -628,7 +628,13 @@ void MotionPlanner::DrawGLScreen(double x_, double y_){
   }
 }
 
-PathPiecewiseLinear* MotionPlanner::GetPath(){
+CSpaceOMPL* MotionPlanner::GetCSpace()
+{
+  return cspace_levels.back();
+}
+
+PathPiecewiseLinear* MotionPlanner::GetPath()
+{
   if(!active) return nullptr;
   Rcurrent = hierarchy->GetNodeContent(current_path);
   pwl = Rcurrent->GetShortestPath();
@@ -771,16 +777,22 @@ void MotionPlanner::DrawGL(GUIState& state){
       // }
   // }
 
+  // const GLColor colorStartConfiguration(0.7,1.0,0.7,1);
+  const GLColor colorGoalConfiguration = GLDraw::getColorRobotGoalConfiguration();
+  const GLColor colorStartConfiguration = GLDraw::getColorRobotStartConfiguration();
+  const GLColor colorGoalConfigurationTransparent = GLDraw::getColorRobotGoalConfigurationTransparent();
+  const GLColor colorStartConfigurationTransparent = GLDraw::getColorRobotStartConfigurationTransparent();
+
   if(state("planner_draw_start_configuration")){
-    GLDraw::drawRobotsAtConfig(robots, qi, green);
+    GLDraw::drawRobotsAtConfig(robots, qi, colorStartConfiguration);
     if(state("planner_draw_start_goal_configuration_sufficient")){
-      GLDraw::drawRobotsAtConfig(robots_outer, qiOuter, ultralightgreen_sufficient);
+      GLDraw::drawRobotsAtConfig(robots_outer, qiOuter, colorStartConfigurationTransparent);
     }
   }
   if(state("planner_draw_goal_configuration")){
-    GLDraw::drawRobotsAtConfig(robots, qg, red);
+    GLDraw::drawRobotsAtConfig(robots, qg, colorGoalConfiguration);
     if(state("planner_draw_start_goal_configuration_sufficient")){
-      GLDraw::drawRobotsAtConfig(robots_outer, qgOuter, ultralightred_sufficient);
+      GLDraw::drawRobotsAtConfig(robots_outer, qgOuter, colorGoalConfigurationTransparent);
     }
   }
 

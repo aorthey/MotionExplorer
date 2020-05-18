@@ -174,8 +174,7 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     path = planners.at(active_planner)->GetPath();
     if(path)
     {
-      std::string rname = planners.at(active_planner)->GetInput().environment_name;
-      std::string fname = "../data/paths/path_"+rname;
+      std::string fname = "../data/paths/"+getRobotEnvironmentString()+".path";
       path->Save(fname.c_str());
       std::cout << "save current path (" << path->GetNumberOfMilestones() 
         << " states) to : " << fname << std::endl;
@@ -183,12 +182,19 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
       std::cout << "cannot save non-existing path." << std::endl;
     }
   }else if(cmd=="load_current_path"){
-    // MotionPlanner* planner = planners.at(active_planner); // std::string fn = planner->GetInput().name_loadPath;
-    // std::cout << "Try to load path current path from : " << fn << std::endl;
-    // {
-    //   path->Load(fn.c_str());
-    //   std::cout << "load current path from : " << fn << std::endl;
-    // }
+    MotionPlanner* planner = planners.at(active_planner); // std::string fn = planner->GetInput().name_loadPath;
+    std::string fname = "../data/paths/"+getRobotEnvironmentString()+".path";
+    if(!path)
+    {
+        CSpaceOMPL* cspace = planner->GetCSpace();
+        path = new PathPiecewiseLinear(cspace);
+        if(planner->GetInput().name_loadPath != "")
+        {
+            fname = planner->GetInput().name_loadPath;
+        }
+    }
+    path->Load(fname.c_str());
+    std::cout << "load current path from : " << fname << std::endl;
   }else if(cmd=="save_view"){
     last_command = "SaveView";
     std::string fname = "../data/viewport/"+getRobotEnvironmentString()+".viewport";
@@ -218,7 +224,7 @@ std::string PlannerBackend::getRobotEnvironmentString()
     std::string rname, tname;
 
     if(world->robots.size()>0){
-        rname = world->robots[active_robot]->name;
+        rname = world->robots[0]->name;
     }
     if(world->terrains.size()>0){
         tname = world->terrains[0]->name;

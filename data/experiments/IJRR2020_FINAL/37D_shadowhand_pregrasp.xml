@@ -30,7 +30,11 @@
     <pathBorderWidth>0.005</pathBorderWidth>
     <pathWidth>0.01</pathWidth>
     <pathSpeed>2</pathSpeed>
-    <maxplanningtime>3</maxplanningtime>
+    <maxplanningtime>10</maxplanningtime>
+
+    <algorithm name="benchmark:minimal"/>
+    <algorithm name="hierarchy:qmp"/>
+
     <hierarchy>
       <!-- <level inner_index="3" type="R7"/> -->
       <level inner_index="2" type="R13"/>

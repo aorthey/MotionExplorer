@@ -428,13 +428,14 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   std::cout << std::string(80, '-') << std::endl;
   //############################################################################
 
-  //BenchmarkFileToPNG(file_benchmark);
 
   benchmark.benchmark(req);
   benchmark.saveResultsToFile(log_file.c_str());
-  //boutput.PrintPDF();
 
   BenchmarkOutput boutput(benchmark.getRecordedExperimentData());
   boutput.Save(xml_file.c_str());
+  boutput.PrintPDF();
+
+  //BenchmarkFileToPNG(file_benchmark);
 }
 

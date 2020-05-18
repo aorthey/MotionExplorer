@@ -25,6 +25,7 @@ class MotionPlanner{
 
     PlannerInput& GetInput();
     PathPiecewiseLinear* GetPath();
+    CSpaceOMPL* GetCSpace();
 
     //folder-like operations on hierarchical roadmap
     virtual void ExpandFull();
