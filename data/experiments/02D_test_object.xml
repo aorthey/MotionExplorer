@@ -4,6 +4,7 @@
 
   <robot name="2dof" file="../robots/planar/2dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
   <robot name="1dof_inner" file="../robots/planar/2dof_testobj_1dof_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
+  <!-- when adding/removing links remember to adjust configurations -->
 
   <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -2.0 0" rotateRPY="0 0 0"/>
   <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -4.0 0" rotateRPY="0 0 0"/>
