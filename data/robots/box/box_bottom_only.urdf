@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot name="box/box_bottom_only">
+ <link name="bottom">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.3335416666666667" ixy="0" ixz="0" iyy="0.41666666666666663" iyz="0" izz="0.08354166666666665"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <box size="2.0 1.0 0.05"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <box size="2.0 1.0 0.05"/>
+    </geometry>
+  </collision>
+ </link>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>

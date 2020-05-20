@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<robot name="rigidBody">
+  <link name="body">
+    <collision>
+      <origin rpy="1.57 0 1.57" xyz="-0.1 0 +.1"/>
+      <geometry>
+        <mesh scale="0.08 0.08 0.08" filename="truckWithTank.obj"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="1.57 0 1.57" xyz="-0.1 0 +.1"/>
+      <geometry>
+        <mesh scale="0.08 0.08 0.08" filename="truckWithTank.obj"/>
+      </geometry>
+    </visual>
+    <inertial>
+      <mass value="100"/>
+      <inertia ixx="1e-6" ixy="0.0" ixz="0.0" iyy="0.083" iyz="0.0" izz="0.083"/>
+    </inertial>
+  </link>
+</robot>
