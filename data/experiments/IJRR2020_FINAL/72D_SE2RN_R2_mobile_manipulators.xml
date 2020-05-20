@@ -81,6 +81,7 @@
     <freeFloating>1</freeFloating>
     <smoothPath>0</smoothPath>
 
+    <algorithm name="hierarchy:qrrt"/>
     <algorithm name="benchmark:minimal"/>
 
     <multiAgent>1</multiAgent>

@@ -84,8 +84,8 @@
     <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
     <pathWidth>0.02</pathWidth>
 
-    <algorithm name="benchmark:minimal"/>
     <algorithm name="hierarchy:qrrt"/>
+    <algorithm name="benchmark:minimal"/>
 
     <multiAgent>1</multiAgent>
 
