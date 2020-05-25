@@ -32,6 +32,7 @@
 
     <algorithm name="ompl:rrt"/> 
     <algorithm name="ompl:rrtconnect"/> 
+    <algorithm name="ompl:rrtsharp"/> 
     <algorithm name="ompl:rrtstar"/> 
     <algorithm name="ompl:rrtxstatic"/> 
     <algorithm name="ompl:lazyrrt"/> 
