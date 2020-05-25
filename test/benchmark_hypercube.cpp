@@ -51,7 +51,7 @@
 const double runtime_limit = 10;
 const double memory_limit = 1024*20; //in MB, but does not consider free operations from prev runs
 const int run_count = 2;
-unsigned int curDim = 40;
+unsigned int curDim = 100;
 
 int main(int argc, char **argv)
 {
