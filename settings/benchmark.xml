@@ -23,6 +23,7 @@
   </benchmark>
 
   <benchmark name="ijrr2020">
+
     <algorithm name="hierarchy:qrrt"/>
     <algorithm name="hierarchy:qrrtstar"/> 
     <algorithm name="hierarchy:qmp"/> 
@@ -51,20 +52,26 @@
     <algorithm name="ompl:est"/> 
     <algorithm name="ompl:biest"/> 
 
-    <!-- PROJECTION PLANNER (or not multi-robot enabled) -->
-    <algorithm name="ompl:cforest"/> 
-    <algorithm name="ompl:sorrtstar"/> 
-    <!-- <algorithm name="ompl:informedrrtstar"/> <1!-- requires RN,SE2 or SE3 --1> -->
-    <!-- <algorithm name="ompl:bitstar"/> -->  
+
+    <!-- PROJECTION PLANNER (NOT USEABLE for multi-robot or non-holonomic
+         constraints -->
+    <!-- <algorithm name="ompl:stride"/> --> 
     <!-- <algorithm name="ompl:projest"/> --> 
     <!-- <algorithm name="ompl:pdst"/> --> 
-    <!-- <algorithm name="ompl:stride"/> --> 
     <!-- <algorithm name="ompl:kpiece"/> --> 
     <!-- <algorithm name="ompl:bkpiece"/> --> 
     <!-- <algorithm name="ompl:lbkpiece"/> --> 
     <!-- <algorithm name="ompl:sbl"/> --> 
+    <!-- <algorithm name="ompl:cforest"/> --> 
+    <!-- <algorithm name="ompl:sorrtstar"/> --> 
+    <!-- <algorithm name="ompl:informedrrtstar"/> -->
 
-    <maxplanningtime>10</maxplanningtime> <!-- runtime in (s) --> 
+    <!--  PLANNERS AVAILABLE BUT NOT USED -->
+    <!-- <algorithm name="ompl:prrt"/> RETURNS INFEASIBLE PATH -->
+    <!-- <algorithm name="ompl:psbl"/> RETURNS INFEASIBLE PATH -->
+    <!-- <algorithm name="ompl:bitstar"/> --> 
+
+    <maxplanningtime>2</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>2</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
