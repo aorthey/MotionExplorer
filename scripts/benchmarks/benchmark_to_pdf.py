@@ -130,5 +130,6 @@ if __name__ == '__main__':
     fname = "../../data/benchmarks/last.xml"
     fname = "../../data/benchmarks/IJRR2020/34D_pr2_infeasible_2020_03_27_11:56:56.xml"
     fname = "../../data/benchmarks/IJRR2020/37D_shadowhand_pregrasp_2020_04_04_22:11:28.xml"
+
     XMLtoPDF(fname)
 
