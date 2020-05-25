@@ -148,6 +148,13 @@ Nbranches = 8
 
 
 for i in range(0, Nbranches+1):
+    robot_name = 'sentinel/octopus_'+str(i)+'_arms_2_segments'
+    CreateOctopus(robot_name, Nsegments=7, NsegmentsLast=3, Nbranches=i,
+        NbranchesMax=Nbranches)
+    robot_name = 'sentinel/octopus_'+str(i)+'_arms_4_segments'
+    CreateOctopus(robot_name, Nsegments=7, NsegmentsLast=5, Nbranches=i,
+        NbranchesMax=Nbranches)
+
     robot_name = 'sentinel/octopus_'+str(i)+'_arms_3_segments'
     CreateOctopus(robot_name, Nsegments=7, NsegmentsLast=4, Nbranches=i,
         NbranchesMax=Nbranches)

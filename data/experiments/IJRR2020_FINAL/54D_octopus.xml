@@ -30,6 +30,9 @@
   </terrain>
 
   <plannerinput>
+    <algorithm name="benchmark:minimal"/>
+    <algorithm name="hierarchy:qrrt"/>
+
     <qinit config="135  0 0 -2 0.2 +1.57 0 0 0 0 0 0 0 0 0 0 0 0 0.15 0 0.15 0 0.15 0 0 0 0 0 0 0 0 0 0 0 0.15 0 0.15 0 0.15 0 0 0 0 0 0 0 0 0 0 0 0.15 0 0.15 0 0.15 0 0 0 0 0 0 0 0 0 0 0 0.15 0 0.15 0 0.15 0 0 0 0 0 0 0 0 0 0 0 0.15 0 0.15 0 0.15 0 0 0 0 0 0 0 0 0 0 0 0.15 0 0.15 0 0.15 0 0 0 0 0 0 0 0 0 0 0 0.15 0 0.15 0 0.15 0 0 0 0 0 0 0 0 0 0 0 0.15 0 0.15 0 0.15 0"/>
 
     <qgoal config="135  0 0 -0.8 0.2 +1.57 0 0 0 0 0 0 0.86 0 0 0 0.44 0 -0.56 0 -1.1 0 0.2 0 0 0 0 0 0.6 0 0 0 0 0 -1.12 0 0 0 -0.96 0 0 0 0 0 0.54 0 0 0 -0.42 0 -0.409204 0 -1.0692 0 -0.6108 0 0 0 0 0 0.22 0 -0.16 0 0.54 0 0 0 -1.57 0 -0.950796 0 0 0 0 0 0.88 0 0 0 -0.149204 0 -0.38 0 -0.96 0 -0.3 0 0 0 0 0 0.22 0 1.57 0 -0.64 0 -0.68 0 -1.36 0 -0.62 0 0 0 0 0 0 0 0.46 0 0.24 0 -1.2508 0 -0.409204 0 -1.57 0 0 0 0 0 0.56 0 0.650796 0 -0.74 0 -0.98 0 -1.06 0 0.16 0 
@@ -41,9 +44,6 @@
     <maxplanningtime>5</maxplanningtime>      <!-- runtime in (s) --> 
     <freeFloating>1</freeFloating>
     <pathSpeed>1</pathSpeed>
-
-    <algorithm name="hierarchy:qrrt"/>
-    <algorithm name="benchmark:minimal"/>
 
     <hierarchy>
         <level inner_index="1" type="SE3"/> <!-- 0 arms -->
@@ -68,17 +68,17 @@
         <level inner_index="0" type="SE3RN"/>
     </hierarchy>
 
-    <hierarchy>
-        <level inner_index="1" type="SE3"/> <!-- 0 arms -->
-        <level inner_index="3" type="SE3RN"/>
-        <level inner_index="5" type="SE3RN"/>
-        <level inner_index="7" type="SE3RN"/>
-        <level inner_index="9" type="SE3RN"/>
-        <level inner_index="11" type="SE3RN"/>
-        <level inner_index="13" type="SE3RN"/>
-        <level inner_index="15" type="SE3RN"/>
-        <level inner_index="0" type="SE3RN"/>
-    </hierarchy>
+    <!-- <hierarchy> -->
+    <!--     <level inner_index="1" type="SE3"/> <1!-- 0 arms --1> -->
+    <!--     <level inner_index="3" type="SE3RN"/> -->
+    <!--     <level inner_index="5" type="SE3RN"/> -->
+    <!--     <level inner_index="7" type="SE3RN"/> -->
+    <!--     <level inner_index="9" type="SE3RN"/> -->
+    <!--     <level inner_index="11" type="SE3RN"/> -->
+    <!--     <level inner_index="13" type="SE3RN"/> -->
+    <!--     <level inner_index="15" type="SE3RN"/> -->
+    <!--     <level inner_index="0" type="SE3RN"/> -->
+    <!-- </hierarchy> -->
   </plannerinput>
 
 </world>

@@ -34,6 +34,10 @@
   </terrain>
 
   <plannerinput>
+    <algorithm name="benchmark:minimal"/>
+    <algorithm name="hierarchy:qrrt"/>
+    <algorithm name="hierarchy:qmp"/>
+
 
     <agent 
       id="0" 
@@ -83,9 +87,6 @@
     <maxplanningtime>10</maxplanningtime>      <!-- runtime in (s) --> 
     <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
     <pathWidth>0.02</pathWidth>
-
-    <algorithm name="hierarchy:qrrt"/>
-    <algorithm name="benchmark:minimal"/>
 
     <multiAgent>1</multiAgent>
 

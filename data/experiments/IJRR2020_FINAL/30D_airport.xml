@@ -24,14 +24,13 @@
 
   <robot name="airplane_SE2" file="../../robots/airplane/airplane.urdf"/>
   <robot name="sphere" file="../../robots/airplane/airplane_inner_sphere.urdf"/>
+
   <!-- <robot name="sphere" file="../../robots/airplane/airplane_inner_sphere.urdf"/> -->
   <!-- <robot name="airplane" file="../../robots/airplane/airplane.urdf"/> -->
   <!-- <robot name="sphere" file="../../robots/airplane/airplane_inner_sphere.urdf"/> -->
   <!-- <robot name="airplane" file="../../robots/airplane/airplane_propeller.urdf"/> -->
   <!-- <robot name="sphere" file="../../robots/airplane/airplane_propeller_inner_sphere.urdf"/> -->
-
   <!-- <robot name="sphere" file="../../robots/airplane/zepllin_inner_sphere.urdf"/> -->
-
   <!-- <robot name="airplane" file="../../robots/rocket/retro_rocket.urdf"/> -->
 
   <terrain  name="plane" file="../../terrains/buildings/airport.tri" translation="0 0 -0.05">
@@ -39,12 +38,14 @@
   </terrain>
 
   <plannerinput>
+    <algorithm name="benchmark:minimal"/>
+    <algorithm name="hierarchy:qrrt"/>
 
     <!--SE2 Trucks -->
     <agent 
       id="0" 
       qinit="6  -8.59 0.58 +0.0 -1.57 0 0"
-      qgoal="6  +5.39 -2.58 +0.0 1.17 0 0"
+      qgoal="6  +4.32 -1.55 +0.0 0 0 0"
     />
     <agent 
       id="2" 
@@ -53,13 +54,13 @@
     />
     <agent 
       id="4" 
-      qinit="6  -9.81 0.76 +0.0 -1.57 0 0"
-      qgoal="6  +2.84 +3.88 +0.0 3.14 0 0"
+      qinit="6  -9.81 -1.76 +0.0 -1.57 0 0"
+      qgoal="6  +2.84 +3.88 +0.0 0.14 0 0"
     />
     <!--SE3 Zeppelin-->
     <agent  
       id="6" 
-      qinit="6  -4.83 -7.23 +4.0 1.24 0 0"
+      qinit="6  -4.83 -7.23 +3.0 1.24 0 0"
       qgoal="6  -1.54 +8.25 +1.14 2.4 0 0"
     />
     <!--SE3 Aircrafts-->
@@ -76,8 +77,8 @@
     <!--SE3 Aircraft Propeller-->
     <agent 
       id="12" 
-      qinit="6  +2.49 -11.0 +4.25 2.45 0 0"
-      qgoal="6  -3.92 +1.57 +0.25 1.57 0 0"
+      qinit="6  +2.49 -11.0 +2.25 2.45 0 0"
+      qgoal="6  -3.92 +2.57 +0.55 1.57 0 0"
     />
     <!--SE2 Aircrafts-->
     <agent 
@@ -89,13 +90,9 @@
     <se3min config="6  -12.0 -12.0 -0.0 -3.141593 -0.1 -0.1"/>
     <se3max config="6  +12.0 +12.0 +7.0 +3.141593 +0.1 +0.1"/>
 
-    <maxplanningtime>10</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
     <epsilongoalregion>0.5</epsilongoalregion>
     <freeFloating>1</freeFloating>
-    <!-- <algorithm dynamic="1" name="hierarchy:qrrt"/> -->
-    <algorithm name="benchmark:minimal"/>
-    <algorithm name="hierarchy:qrrt"/>
-    <algorithm name="ompl:rrt"/>
 
     <multiAgent>1</multiAgent>
 
@@ -108,7 +105,25 @@
       </level>
       <level>
         <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/>
+        <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE2_DUBIN"/>
+        <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE2_DUBIN"/>
         <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/>
+        <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE2_DUBIN"/>
+        <robot id="2" freeFloating="1" simplification_of_id="2" type="SE2_DUBIN"/>
+        <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE2_DUBIN"/>
+        <robot id="2" freeFloating="1" simplification_of_id="2" type="SE2_DUBIN"/>
         <robot id="5" freeFloating="1" simplification_of_id="4" type="R2"/>
         <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
       </level>
@@ -123,9 +138,13 @@
         <robot id="2" freeFloating="1" simplification_of_id="2" type="SE2_DUBIN"/>
         <robot id="4" freeFloating="1" simplification_of_id="4" type="SE2_DUBIN"/>
         <robot id="7" freeFloating="1" simplification_of_id="6" type="R3"/>
-        <robot id="9" freeFloating="1" simplification_of_id="8" type="R3"/>
-        <robot id="11" freeFloating="1" simplification_of_id="10" type="R3"/>
-        <robot id="13" freeFloating="1" simplification_of_id="12" type="R3"/>
+        <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE2_DUBIN"/>
+        <robot id="2" freeFloating="1" simplification_of_id="2" type="SE2_DUBIN"/>
+        <robot id="4" freeFloating="1" simplification_of_id="4" type="SE2_DUBIN"/>
+        <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3"/>
         <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
       </level>
       <level>
@@ -134,8 +153,14 @@
         <robot id="4" freeFloating="1" simplification_of_id="4" type="SE2_DUBIN"/>
         <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3"/>
         <robot id="9" freeFloating="1" simplification_of_id="8" type="R3"/>
-        <robot id="11" freeFloating="1" simplification_of_id="10" type="R3"/>
-        <robot id="13" freeFloating="1" simplification_of_id="12" type="R3"/>
+        <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE2_DUBIN"/>
+        <robot id="2" freeFloating="1" simplification_of_id="2" type="SE2_DUBIN"/>
+        <robot id="4" freeFloating="1" simplification_of_id="4" type="SE2_DUBIN"/>
+        <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3"/>
+        <robot id="8" freeFloating="1" simplification_of_id="8" type="SE3_DUBIN"/>
         <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
       </level>
       <level>
@@ -145,7 +170,6 @@
         <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3"/>
         <robot id="8" freeFloating="1" simplification_of_id="8" type="SE3_DUBIN"/>
         <robot id="11" freeFloating="1" simplification_of_id="10" type="R3"/>
-        <robot id="13" freeFloating="1" simplification_of_id="12" type="R3"/>
         <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
       </level>
       <level>
@@ -155,7 +179,6 @@
         <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3"/>
         <robot id="8" freeFloating="1" simplification_of_id="8" type="SE3_DUBIN"/>
         <robot id="10" freeFloating="1" simplification_of_id="10" type="SE3_DUBIN"/>
-        <robot id="13" freeFloating="1" simplification_of_id="12" type="R3"/>
         <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
       </level>
       <level>

@@ -4,7 +4,7 @@
 GeometricCSpaceOMPLSE3Dubin::GeometricCSpaceOMPLSE3Dubin(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)
 {
-    turningRadius_ = 0.5;
+    turningRadius_ = 1.0;
     climbingAngle_ = 0.4;
 }
 

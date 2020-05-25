@@ -12,6 +12,9 @@
   <terrain name="package" file="../../terrains/box/box.tri" rotateRPY="0 0 1.57" translation="2 -4 0"/>
 
   <plannerinput>
+    <algorithm name="benchmark:minimal"/>
+    <algorithm name="hierarchy:qrrt"/>
+
     <qinit config="44 0 1.8 0 1.9 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
 
     <qgoal config="44  0 -2 0 0 0 0 0 1.57 0 1.57 0 1.57 0 -1.57 0 -1.57 0 1.57 0 -1.57 0 0 1.57 0 1.57 0 1.57 0 0 -1.57 0 -1.57 0 -1.57 0 1.57 0 1.57 0 1.57 0 1.57 0 -1.57"/>
@@ -23,8 +26,6 @@
     <se3min config="6  -2.0 -2 -0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +2.0 +2 +0 +3.141593 +1.57 +3.141593"/>
 
-    <algorithm name="hierarchy:qrrt"/>
-    <algorithm name="benchmark:minimal"/>
 
     <hierarchy>
       <level inner_index="1" type="SE2"/>

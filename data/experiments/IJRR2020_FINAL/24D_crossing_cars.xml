@@ -25,6 +25,9 @@
 
   <plannerinput>
 
+    <algorithm name="benchmark:minimal"/>
+    <algorithm name="hierarchy:qrrt"/>
+
     <agent id="0" 
         qinit="15  -12.0 +1.5 +0.0 -3.14 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
         dqinit="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
@@ -127,7 +130,6 @@
     <pathSpeed>10</pathSpeed>
 
     <multiAgent>1</multiAgent>
-    <algorithm name="benchmark:minimal"/>
 
     <hierarchy>
       <level>

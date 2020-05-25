@@ -37,6 +37,9 @@
 
   <plannerinput>
 
+    <algorithm name="benchmark:minimal"/>
+    <algorithm name="hierarchy:qrrt"/>
+
     <!-- generated using scripts/init_goal_configs_mobile_manipulators.py -->
     <agent 
       id="0" 
@@ -80,9 +83,6 @@
     <pathWidth>0.05</pathWidth>
     <freeFloating>1</freeFloating>
     <smoothPath>0</smoothPath>
-
-    <algorithm name="hierarchy:qrrt"/>
-    <algorithm name="benchmark:minimal"/>
 
     <multiAgent>1</multiAgent>
 

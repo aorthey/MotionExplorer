@@ -25,7 +25,7 @@
   <benchmark name="minimal">
     <!-- <algorithm name="ompl:rrt"/> -->
     <algorithm name="hierarchy:qrrt"/>
-    <maxplanningtime>60</maxplanningtime> <!-- runtime in (s) --> 
+    <maxplanningtime>5</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>10</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
@@ -43,9 +43,7 @@
   <!-- complete benchmark of all planners -->
   <benchmark name="all_geometric">
 
-    <algorithm name="hierarchy:qrrt"/>
-    <algorithm name="ompl:rrtconnect"/>
-
+    <!-- <algorithm name="hierarchy:qrrt"/> -->
     <!-- <algorithm name="hierarchy:qrrtstar"/> -->
     <!-- <algorithm name="hierarchy:qmp"/> -->
     <!-- <algorithm name="hierarchy:qmpstar"/> -->
