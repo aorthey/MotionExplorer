@@ -52,7 +52,6 @@
     <algorithm name="ompl:est"/> 
     <algorithm name="ompl:biest"/> 
 
-
     <!-- PROJECTION PLANNER (NOT USEABLE for multi-robot or non-holonomic
          constraints -->
     <!-- <algorithm name="ompl:stride"/> --> 
@@ -71,7 +70,7 @@
     <!-- <algorithm name="ompl:psbl"/> RETURNS INFEASIBLE PATH -->
     <!-- <algorithm name="ompl:bitstar"/> --> 
 
-    <maxplanningtime>2</maxplanningtime> <!-- runtime in (s) --> 
+    <maxplanningtime>10</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>2</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>

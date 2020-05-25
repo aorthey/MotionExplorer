@@ -37,7 +37,7 @@
 
   <plannerinput>
 
-    <algorithm name="benchmark:minimal"/>
+    <algorithm name="benchmark:ijrr2020"/>
     <algorithm name="hierarchy:qrrt"/>
 
     <!-- generated using scripts/init_goal_configs_mobile_manipulators.py -->

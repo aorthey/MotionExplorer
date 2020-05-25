@@ -12,7 +12,7 @@
   <terrain name="package" file="../../terrains/box/box.tri" rotateRPY="0 0 1.57" translation="2 -4 0"/>
 
   <plannerinput>
-    <algorithm name="benchmark:minimal"/>
+    <algorithm name="benchmark:ijrr2020"/>
     <algorithm name="hierarchy:qrrt"/>
 
     <qinit config="44 0 1.8 0 1.9 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0"/>
