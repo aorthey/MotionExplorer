@@ -48,10 +48,10 @@
 #include <ompl/base/Path.h>
 #include <ompl/geometric/PathGeometric.h>
 
-const double runtime_limit = 1;
+const double runtime_limit = 10;
 const double memory_limit = 1024*20; //in MB, but does not consider free operations from prev runs
-const int run_count = 1;
-unsigned int curDim = 2;
+const int run_count = 2;
+unsigned int curDim = 40;
 
 int main(int argc, char **argv)
 {
@@ -127,7 +127,8 @@ int main(int argc, char **argv)
     addPlanner(benchmark, std::make_shared<og::PDST>(si), range);
     addPlanner(benchmark, std::make_shared<og::PRM>(si), range);
     addPlanner(benchmark, std::make_shared<og::PRMstar>(si), range);
-    addPlanner(benchmark, std::make_shared<og::LazyPRM>(si), range);
+    // addPlanner(benchmark, std::make_shared<og::LazyPRM>(si), range); 
+    // Note: segfault
     addPlanner(benchmark, std::make_shared<og::LazyPRMstar>(si), range);
     addPlanner(benchmark, std::make_shared<og::SPARS>(si), range);
     addPlanner(benchmark, std::make_shared<og::SPARStwo>(si), range);
