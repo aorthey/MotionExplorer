@@ -22,6 +22,53 @@
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 
+  <benchmark name="ijrr2020">
+    <algorithm name="hierarchy:qrrt"/>
+    <algorithm name="hierarchy:qrrtstar"/> 
+    <algorithm name="hierarchy:qmp"/> 
+    <algorithm name="hierarchy:qmpstar"/> 
+    <algorithm name="hierarchy:spqr"/> 
+
+    <algorithm name="ompl:rrt"/> 
+    <algorithm name="ompl:rrtconnect"/> 
+    <algorithm name="ompl:rrtstar"/> 
+    <algorithm name="ompl:rrtxstatic"/> 
+    <algorithm name="ompl:lazyrrt"/> 
+    <algorithm name="ompl:trrt"/> 
+    <algorithm name="ompl:btrrt"/> 
+    <algorithm name="ompl:lbtrrt"/> 
+
+    <algorithm name="ompl:fmt"/> 
+    <algorithm name="ompl:bfmt"/> 
+
+    <algorithm name="ompl:prm"/> 
+    <algorithm name="ompl:prmstar"/> 
+    <algorithm name="ompl:lazyprm"/> 
+    <algorithm name="ompl:lazyprmstar"/> 
+    <algorithm name="ompl:spars"/> 
+    <algorithm name="ompl:spars2"/> 
+    <algorithm name="ompl:sst"/> 
+    <algorithm name="ompl:est"/> 
+    <algorithm name="ompl:biest"/> 
+
+    <!-- PROJECTION PLANNER (or not multi-robot enabled) -->
+    <algorithm name="ompl:cforest"/> 
+    <algorithm name="ompl:sorrtstar"/> 
+    <!-- <algorithm name="ompl:informedrrtstar"/> <1!-- requires RN,SE2 or SE3 --1> -->
+    <!-- <algorithm name="ompl:bitstar"/> -->  
+    <!-- <algorithm name="ompl:projest"/> --> 
+    <!-- <algorithm name="ompl:pdst"/> --> 
+    <!-- <algorithm name="ompl:stride"/> --> 
+    <!-- <algorithm name="ompl:kpiece"/> --> 
+    <!-- <algorithm name="ompl:bkpiece"/> --> 
+    <!-- <algorithm name="ompl:lbkpiece"/> --> 
+    <!-- <algorithm name="ompl:sbl"/> --> 
+
+    <maxplanningtime>10</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>2</runcount> <!-- number of runs per algorithm --> 
+    <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
+  </benchmark>
+
   <benchmark name="minimal">
     <!-- <algorithm name="ompl:rrt"/> -->
     <algorithm name="hierarchy:qrrt"/>
