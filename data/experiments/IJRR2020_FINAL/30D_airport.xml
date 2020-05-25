@@ -38,7 +38,7 @@
   </terrain>
 
   <plannerinput>
-    <algorithm name="benchmark:minimal"/>
+    <algorithm name="benchmark:ijrr2020"/>
     <algorithm name="hierarchy:qrrt"/>
 
     <!--SE2 Trucks -->
