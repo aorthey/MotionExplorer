@@ -72,7 +72,7 @@
     <!-- <algorithm name="ompl:bitstar"/> SPACES NOT SUPPORTED --> 
     <!-- <algorithm name="ompl:abitstar"/> SPACES NOT SUPPORTED --> 
 
-    <maxplanningtime>60</maxplanningtime> <!-- runtime in (s) --> 
+    <maxplanningtime>10</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>10</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
