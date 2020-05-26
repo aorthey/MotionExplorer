@@ -2,7 +2,8 @@
 #include <ompl/tools/benchmark/Benchmark.h>
 
 //include planners
-#include <ompl/geometric/planners/bitstar/BITstar.h> //TODO: gets stuck
+#include <ompl/geometric/planners/bitstar/BITstar.h>
+#include <ompl/geometric/planners/bitstar/ABITstar.h>
 #include <ompl/geometric/planners/est/BiEST.h>
 #include <ompl/geometric/planners/est/EST.h>
 #include <ompl/geometric/planners/est/ProjEST.h>

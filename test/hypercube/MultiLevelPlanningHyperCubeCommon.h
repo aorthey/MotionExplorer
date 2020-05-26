@@ -121,16 +121,6 @@ ob::PlannerPtr GetMultiLevelPlanner(std::vector<int> sequenceLinks, ob::SpaceInf
     si_vec.push_back(si);
 
     auto planner = std::make_shared<T>(si_vec, name);
-    // std::string qName = planner->getName()+"[";
-    // for (unsigned int k = 0; k < sequenceLinks.size() - 1; k++)
-    // {
-    //     int links = sequenceLinks.at(k);
-    //     qName += std::to_string(links) + ",";
-    // }
-    // qName += std::to_string(si->getStateDimension());
-    // qName += "]";
-    // std::cout << qName << std::endl;
-    // planner->setName(qName);
     return planner;
 }
 
