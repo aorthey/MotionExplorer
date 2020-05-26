@@ -34,8 +34,6 @@
   </terrain>
 
   <plannerinput>
-    <algorithm name="benchmark:ijrr2020"/>
-    <algorithm name="hierarchy:qrrt"/>
 
     <agent 
       id="0" 

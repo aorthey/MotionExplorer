@@ -44,6 +44,7 @@
 #include <ompl/geometric/planners/pdst/PDST.h>
 #include <ompl/geometric/planners/cforest/CForest.h>
 #include <ompl/geometric/planners/bitstar/BITstar.h>
+#include <ompl/geometric/planners/bitstar/ABITstar.h>
 
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 #include <ompl/base/objectives/MaximizeMinClearanceObjective.h>
@@ -122,6 +123,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:spars2") planner = std::make_shared<og::SPARStwo>(si);
 
   else if(algorithm=="ompl:bitstar") planner = std::make_shared<og::BITstar>(si);
+  else if(algorithm=="ompl:abitstar") planner = std::make_shared<og::ABITstar>(si);
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
 

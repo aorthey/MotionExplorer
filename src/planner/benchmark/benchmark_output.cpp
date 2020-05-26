@@ -110,8 +110,6 @@ bool BenchmarkOutput::Save(TiXmlElement *node)
     std::string name = util::RemoveStringBeginning(planner_experiment.name, "geometric");
     AddSubNode(pknode, "name", name);
 
-    std::cout << name << std::endl;
-
     std::vector<ot::Benchmark::RunProperties> runs = planner_experiment.runs;
     std::string sstrat = "stratification levels INTEGER";
     if(runs.at(0).find(sstrat) != runs.at(0).end())
@@ -124,7 +122,6 @@ bool BenchmarkOutput::Save(TiXmlElement *node)
       runnode.SetAttribute("number", j+1);
       ot::Benchmark::RunProperties run = runs.at(j);
       double time = std::atof(run["time REAL"].c_str());
-      std::cout << time << std::endl;
       //if time exceeds maxTime, then clip it
       AddSubNode(runnode, "time", std::min(time, experiment.maxTime));
       AddSubNode(runnode, "memory", run["memory REAL"]);

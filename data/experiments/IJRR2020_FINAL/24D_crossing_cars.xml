@@ -25,9 +25,6 @@
 
   <plannerinput>
 
-    <algorithm name="benchmark:ijrr2020"/>
-    <algorithm name="hierarchy:qrrt"/>
-
     <agent id="0" 
         qinit="15  -12.0 +1.5 +0.0 -3.14 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
         dqinit="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"

@@ -15,17 +15,20 @@
   <!-- <algorithm name="hierarchy:sampler"/> -->
   <!-- <algorithm name="benchmark:minimal"/> -->
 
-  <algorithm name="benchmark:all_geometric"/>
-  <algorithm name="hierarchy:qmp"/>
-  <algorithm name="hierarchy:qmpstar"/>
+  <algorithm name="benchmark:ijrr2020"/>
   <algorithm name="hierarchy:spqr"/>
-  <algorithm name="ompl:spars"/>
   <algorithm name="hierarchy:qrrt"/>
-  <algorithm name="hierarchy:qrrtstar"/>
-
-  <algorithm name="ompl:rrt"/>
   <algorithm name="ompl:rrtconnect"/>
-  <algorithm name="ompl:rrtstar"/>
+  <!-- <algorithm name="benchmark:all_geometric"/> -->
+  <!-- <algorithm name="hierarchy:qmp"/> -->
+  <!-- <algorithm name="hierarchy:qmpstar"/> -->
+  <!-- <algorithm name="hierarchy:spqr"/> -->
+  <!-- <algorithm name="ompl:spars"/> -->
+  <!-- <algorithm name="hierarchy:qrrt"/> -->
+  <!-- <algorithm name="hierarchy:qrrtstar"/> -->
+  <!-- <algorithm name="ompl:rrt"/> -->
+  <!-- <algorithm name="ompl:rrtconnect"/> -->
+  <!-- <algorithm name="ompl:rrtstar"/> -->
   <!-- <algorithm name="ompl:prm"/> -->
   <!-- <algorithm name="ompl:prmstar"/> -->
   <!-- <algorithm name="ompl:rrt"/> -->

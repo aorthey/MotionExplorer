@@ -33,13 +33,17 @@
   <!-- <robot name="sphere" file="../../robots/airplane/zepllin_inner_sphere.urdf"/> -->
   <!-- <robot name="airplane" file="../../robots/rocket/retro_rocket.urdf"/> -->
 
+  <terrain  name="box" file="../../terrains/box/box.tri" translation="-0 -2 0" scale="1.2 1.2 0.2">
+     <display color="0.6 0.6 0.6 1"/> 
+  </terrain>
+  <terrain  name="rocket" file="../../robots/rocket/retro_rocket.tri" translation="-0 -4 +3.3" scale="2 2 2">
+     <display color="0.6 0.6 0.6 1"/> 
+  </terrain>
   <terrain  name="plane" file="../../terrains/buildings/airport.tri" translation="0 0 -0.05">
      <display color="0.6 0.6 0.6 1"/> 
   </terrain>
 
   <plannerinput>
-    <algorithm name="benchmark:ijrr2020"/>
-    <algorithm name="hierarchy:qrrt"/>
 
     <!--SE2 Trucks -->
     <agent 
@@ -90,7 +94,7 @@
     <se3min config="6  -12.0 -12.0 -0.0 -3.141593 -0.1 -0.1"/>
     <se3max config="6  +12.0 +12.0 +7.0 +3.141593 +0.1 +0.1"/>
 
-    <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>5</maxplanningtime>      <!-- runtime in (s) --> 
     <epsilongoalregion>0.5</epsilongoalregion>
     <freeFloating>1</freeFloating>
 
@@ -133,25 +137,25 @@
         <robot id="4" freeFloating="1" simplification_of_id="4" type="SE2_DUBIN"/>
         <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
       </level>
+      <!-- <level> -->
+      <!--   <robot id="0" freeFloating="1" simplification_of_id="0" type="SE2_DUBIN"/> -->
+      <!--   <robot id="2" freeFloating="1" simplification_of_id="2" type="SE2_DUBIN"/> -->
+      <!--   <robot id="4" freeFloating="1" simplification_of_id="4" type="SE2_DUBIN"/> -->
+      <!--   <robot id="7" freeFloating="1" simplification_of_id="6" type="R3"/> -->
+      <!--   <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/> -->
+      <!-- </level> -->
       <level>
         <robot id="0" freeFloating="1" simplification_of_id="0" type="SE2_DUBIN"/>
         <robot id="2" freeFloating="1" simplification_of_id="2" type="SE2_DUBIN"/>
         <robot id="4" freeFloating="1" simplification_of_id="4" type="SE2_DUBIN"/>
-        <robot id="7" freeFloating="1" simplification_of_id="6" type="R3"/>
+        <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3C"/>
         <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
       </level>
       <level>
         <robot id="0" freeFloating="1" simplification_of_id="0" type="SE2_DUBIN"/>
         <robot id="2" freeFloating="1" simplification_of_id="2" type="SE2_DUBIN"/>
         <robot id="4" freeFloating="1" simplification_of_id="4" type="SE2_DUBIN"/>
-        <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3"/>
-        <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
-      </level>
-      <level>
-        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE2_DUBIN"/>
-        <robot id="2" freeFloating="1" simplification_of_id="2" type="SE2_DUBIN"/>
-        <robot id="4" freeFloating="1" simplification_of_id="4" type="SE2_DUBIN"/>
-        <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3"/>
+        <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3C"/>
         <robot id="9" freeFloating="1" simplification_of_id="8" type="R3"/>
         <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
       </level>
@@ -159,7 +163,7 @@
         <robot id="0" freeFloating="1" simplification_of_id="0" type="SE2_DUBIN"/>
         <robot id="2" freeFloating="1" simplification_of_id="2" type="SE2_DUBIN"/>
         <robot id="4" freeFloating="1" simplification_of_id="4" type="SE2_DUBIN"/>
-        <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3"/>
+        <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3C"/>
         <robot id="8" freeFloating="1" simplification_of_id="8" type="SE3_DUBIN"/>
         <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
       </level>
@@ -167,7 +171,7 @@
         <robot id="0" freeFloating="1" simplification_of_id="0" type="SE2_DUBIN"/>
         <robot id="2" freeFloating="1" simplification_of_id="2" type="SE2_DUBIN"/>
         <robot id="4" freeFloating="1" simplification_of_id="4" type="SE2_DUBIN"/>
-        <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3"/>
+        <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3C"/>
         <robot id="8" freeFloating="1" simplification_of_id="8" type="SE3_DUBIN"/>
         <robot id="11" freeFloating="1" simplification_of_id="10" type="R3"/>
         <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
@@ -176,7 +180,7 @@
         <robot id="0" freeFloating="1" simplification_of_id="0" type="SE2_DUBIN"/>
         <robot id="2" freeFloating="1" simplification_of_id="2" type="SE2_DUBIN"/>
         <robot id="4" freeFloating="1" simplification_of_id="4" type="SE2_DUBIN"/>
-        <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3"/>
+        <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3C"/>
         <robot id="8" freeFloating="1" simplification_of_id="8" type="SE3_DUBIN"/>
         <robot id="10" freeFloating="1" simplification_of_id="10" type="SE3_DUBIN"/>
         <robot id="14" freeFloating="1" simplification_of_id="14" type="SE2_DUBIN"/>
@@ -185,7 +189,7 @@
         <robot id="0" freeFloating="1" type="SE2_DUBIN"/>
         <robot id="2" freeFloating="1" type="SE2_DUBIN"/>
         <robot id="4" freeFloating="1" type="SE2_DUBIN"/>
-        <robot id="6" freeFloating="1" type="SE3"/>
+        <robot id="6" freeFloating="1" type="SE3C"/>
         <robot id="8" freeFloating="1" type="SE3_DUBIN"/>
         <robot id="10" freeFloating="1" type="SE3_DUBIN"/>
         <robot id="12" freeFloating="1" type="SE3_DUBIN"/>

@@ -53,8 +53,7 @@
     <algorithm name="ompl:est"/> 
     <algorithm name="ompl:biest"/> 
 
-    <!-- PROJECTION PLANNER (NOT USEABLE for multi-robot or non-holonomic
-         constraints -->
+    <!-- PROJECTION PLANNER (NOT for multi-robot) -->
     <!-- <algorithm name="ompl:stride"/> --> 
     <!-- <algorithm name="ompl:projest"/> --> 
     <!-- <algorithm name="ompl:pdst"/> --> 
@@ -62,17 +61,19 @@
     <!-- <algorithm name="ompl:bkpiece"/> --> 
     <!-- <algorithm name="ompl:lbkpiece"/> --> 
     <!-- <algorithm name="ompl:sbl"/> --> 
-    <!-- <algorithm name="ompl:cforest"/> --> 
-    <!-- <algorithm name="ompl:sorrtstar"/> --> 
-    <!-- <algorithm name="ompl:informedrrtstar"/> -->
 
     <!--  PLANNERS AVAILABLE BUT NOT USED -->
+    <!-- <algorithm name="ompl:cforest"/> SEGFAULT? --> 
     <!-- <algorithm name="ompl:prrt"/> RETURNS INFEASIBLE PATH -->
     <!-- <algorithm name="ompl:psbl"/> RETURNS INFEASIBLE PATH -->
-    <!-- <algorithm name="ompl:bitstar"/> --> 
 
-    <maxplanningtime>10</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>2</runcount> <!-- number of runs per algorithm --> 
+    <!-- <algorithm name="ompl:informedrrtstar"/> UNKNOWN ERROR -->
+    <!-- <algorithm name="ompl:sorrtstar"/> UNKNOWN ERROR --> 
+    <!-- <algorithm name="ompl:bitstar"/> SPACES NOT SUPPORTED --> 
+    <!-- <algorithm name="ompl:abitstar"/> SPACES NOT SUPPORTED --> 
+
+    <maxplanningtime>60</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>10</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 
