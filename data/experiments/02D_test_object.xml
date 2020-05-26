@@ -7,12 +7,16 @@
   <!-- when adding/removing links remember to adjust configurations -->
 
   <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -2.0 0" rotateRPY="0 0 0"/>
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -4.0 0" rotateRPY="0 0 0"/>
-  
-  
+  <!-- <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -4.0 0" rotateRPY="0 0 0"/>
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -0.0 0" rotateRPY="0 0 0"/>
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -6.0 0" rotateRPY="0 0 0"/>
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 +1.0 0" rotateRPY="0 0 0"/>
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -8.0 0" rotateRPY="0 0 0"/> -->
+
+
   <plannerinput>
 
-    <qinit  config="10  1.5 2 0 0 0 0  2.6 0.0 1.0 0 "/> <!-- config="dim  x y z yaw roll pitch  theta phi phi endeff" -->
+    <qinit  config="10  1.5 1 0 0 0 0  2.6 0.0 1.0 0 "/> <!-- config="dim  x y z yaw roll pitch  theta phi phi endeff" -->
     <qgoal  config="10  1.5 -4 0 0 0 0  +2.6 0.0 1.0 0 "/>
     <se3min config="6  -5 -5.0 -0.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +5 +5.0 +0.5 +3.141593 +1.57 +3.141593"/>    
@@ -26,7 +30,7 @@
     <algorithm name="ompl:rrtconnect"/>
 
     <hierarchy>
-      <level inner_index="0" type="R_CONTACT"/> <!-- to be R_CONTACT -->
+      <level inner_index="0" type="R_CONTACT"/> <!-- to be R_CONTACTwww -->
     </hierarchy>
 
   </plannerinput>

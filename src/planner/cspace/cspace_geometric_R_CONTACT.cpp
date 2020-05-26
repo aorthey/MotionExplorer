@@ -17,7 +17,7 @@ protected:
 
 public:
     ContactConstraint(Robot *robot, RobotWorld *world)
-    : ob::Constraint(4, 2) // (x,y,theta at 1st link,phi at 2nd)
+    : ob::Constraint(4, 1) // (x,y,theta at 1st link,phi at 2nd)
     , robot_(robot)
     , world_(world)
     {
@@ -74,6 +74,7 @@ public:
     Vector3 getContact(Eigen::VectorXd xd) const
     {
         Config  q;
+        q.resize(xd.size());
 
         for (int r = 0; r < xd.size(); r++) {
             q(r) = xd[r]; // problem here with q, "segmentation fault"
@@ -99,20 +100,25 @@ public:
         return v;
     }
 
+
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override
     {
 
         Vector3 contact = getContact(x);
-        std::cout << contact << std::endl;
 
-        //not checked yet if this works
-        GeometricPrimitive3D gP3D = GeometricPrimitive3D(contact);
+        Point3D pt3D = Point3D(contact);
+
+        Point3D closestPt = trisFiltered.at(0).closestPoint(pt3D);
+        std::cout << "Closest point on triangle: "<<closestPt << std::endl;
+
+        GeometricPrimitive3D gP3D = GeometricPrimitive3D(closestPt);
+
         Real dist = gP3D.Distance(trisFiltered.at(0));
+        std::cout << "Check that 'closestPt' is on surface Triangle: " << dist << std::endl;
 
-        std::cout << dist << std::endl;
+        std::exit(1);
 
-        //out[0] = x.norm() - 1; // ----change to fit contact case-------
-        out[0] = 0; // empty constraint
+        // out[0] = dist;
     }
 
 private:
