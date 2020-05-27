@@ -16,8 +16,11 @@
   <!-- <algorithm name="benchmark:minimal"/> -->
 
   <algorithm name="hierarchy:qrrt"/>
-  <algorithm name="benchmark:ijrr2020"/>
+  <algorithm name="hierarchy:qrrtstar"/>
+  <algorithm name="hierarchy:qmpstar"/>
+  <algorithm name="hierarchy:qmp"/>
   <algorithm name="hierarchy:spqr"/>
+  <algorithm name="benchmark:ijrr2020"/>
   <algorithm name="ompl:rrtconnect"/>
   <!-- <algorithm name="benchmark:all_geometric"/> -->
   <!-- <algorithm name="hierarchy:qmp"/> -->

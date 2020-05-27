@@ -82,6 +82,7 @@ public:
         bool foundMaxDim = false;
 
         for (int i = dimension_ - 1; i >= 0; i--)
+        {
             if (!foundMaxDim)
             {
                 if ((*s)[i] > edgeWidth)
@@ -89,6 +90,7 @@ public:
             }
             else if ((*s)[i] < (1. - edgeWidth))
                 return false;
+        }
         return true;
     }
 
