@@ -17,7 +17,7 @@ public:
     ContactConstraint(Robot *robot, RobotWorld *world, int robot_idx);
 
 
-    Vector3 getXYZ(const Eigen::VectorXd xd) const;
+    Vector3 getPos(const Eigen::VectorXd xd) const;
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override;
 
 private:

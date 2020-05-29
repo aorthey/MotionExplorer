@@ -16,8 +16,8 @@
 
   <plannerinput>
 
-    <qinit  config="10  1.5 -3 0 0 0 0  2.6 1.0 0.0 0 "/> <!-- config="dim  x y z yaw roll pitch  theta phi phi endeff" -->
-    <qgoal  config="10  1.5 -1 0 0 0 0  0.0 0.0 0.0 0 "/>
+    <qinit  config="10  1.75 -3 0 0 0 0  2.6 1.0 0.0 0 "/> <!-- config="dim  x y z yaw roll pitch  theta phi phi endeff" -->
+    <qgoal  config="10  1.75 -1 0 0 0 0  0.0 0.0 0.0 0 "/>
     <se3min config="6  -5 -5.0 -0.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +5 +5.0 +0.5 +3.141593 +1.57 +3.141593"/>    
     <epsilongoalregion>0.05</epsilongoalregion>

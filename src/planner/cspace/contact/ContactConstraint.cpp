@@ -5,13 +5,11 @@
 
 
 ContactConstraint::ContactConstraint(Robot *robot, RobotWorld *world, int robot_idx):
-ob::Constraint(4, 1)
+ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
 , robot_(robot)
 , world_(world)
 ,robot_idx_(robot_idx)
 {
-    // (x,y,theta at 1st link,phi at 2nd)
-
     /**
      * Information on obstacle surface triangles.
      *
@@ -35,7 +33,7 @@ ob::Constraint(4, 1)
         double epsilon = 1e-10;
 
         if(fabs((fabs(normal[2]) - 1.0))<epsilon){
-            //do nothing
+            //does nothing
         }
         else{
             // only x and y coordinates
@@ -64,18 +62,20 @@ ob::Constraint(4, 1)
 
 }
 
-Vector3 ContactConstraint::getXYZ(const Eigen::VectorXd xd) const
+Vector3 ContactConstraint::getPos(const Eigen::VectorXd xd) const
 {
     /**
      * Member function of class ContactConstraint:
      * Calculates position of given robot link in world coordinates.
      */
+    std::cout << "\nEigenVector: \n" << xd << std::endl;
 
     GeometricCSpaceOMPLRCONTACT geometricCSpaceOmplRContact = GeometricCSpaceOMPLRCONTACT(world_, robot_idx_);
 
     Config q = geometricCSpaceOmplRContact.EigenVectorToConfig(xd);
 
     robot_->UpdateConfig(q);
+    std::cout << "Config q: " << q << std::endl;
     robot_->UpdateGeometry();
     Vector3 qq;
     Vector3 zero;
@@ -89,31 +89,32 @@ Vector3 ContactConstraint::getXYZ(const Eigen::VectorXd xd) const
     robot_->GetWorldPosition(zero, firstLink, qq);
 
     double x = qq[0];
-    double y = qq[1];
+    double y = q[1];
     double z = qq[2];
     Vector3 v(x,y,z);
+
+    std::cout << "Vector xyz: " << v << std::endl;
 
     return v;
 }
 
 void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
 {
-    std::cout << "EigenVector: " << x << std::endl;
 
-    Vector3 contact = getXYZ(x);
-    std::cout << "Position of First Link: " << contact << std::endl;
+    Vector3 contact = getPos(x);
+    std::cout << "\nPosition of First Link: " << contact << std::endl;
 
     Vector3 closestPt = trisFiltered.at(6).closestPoint(contact);
-    std::cout << "Filtered Surface Triangles: " << trisFiltered.at(6) << std::endl;
-    std::cout << "Closest Point on triangle: "<< closestPt << std::endl;
+    //std::cout << "\nFiltered Surface Triangles: " << trisFiltered.at(6) << std::endl;
+    std::cout << "\nClosest Point on triangle: "<< closestPt << std::endl;
 
     //GeometricPrimitive3D gP3D = GeometricPrimitive3D(closestPt);
     //Real dist = gP3D.Distance(trisFiltered.at(0));
     // std::cout << "Check that 'closestPt' is on surface Triangle: " << dist << std::endl;
 
     Real distVect = contact.distance(closestPt);
-    std::cout << "Distance between First Link - Closest Point: " << distVect << std::endl;
+    std::cout << "\nDistance between First Link - Closest Point: " << distVect << std::endl;
 
-    std::exit(1);
-    //out[0] = distVect;
+    //std::exit(1);
+    out[0] = distVect;
 }
