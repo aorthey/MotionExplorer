@@ -24,6 +24,11 @@ std::vector<int> getHypercubeAdmissibleProjection(int dim)
 {
     std::vector<int> discrete;
     boost::push_back(discrete, boost::irange(2, dim + 1));
+    // std::cout << "[";
+    // for(uint k = 0; k < discrete.size(); k++){
+    //   std::cout << discrete.at(k) << ",";
+    // }
+    // std::cout << "]" << std::endl;
     return discrete;
 }
 

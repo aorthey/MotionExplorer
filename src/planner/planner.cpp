@@ -644,7 +644,6 @@ PathPiecewiseLinear* MotionPlanner::GetPath()
 void MotionPlanner::DrawGL(GUIState& state){
   if(!active) return;
 
-
   uint Nsiblings;
   if(current_path.size()>1){
     std::vector<int>::const_iterator first = current_path.begin();

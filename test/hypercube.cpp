@@ -46,7 +46,7 @@
 #include <ompl/base/Path.h>
 #include <ompl/geometric/PathGeometric.h>
 
-unsigned int curDim = 100;
+unsigned int curDim = 500;
 
 int main(int argc, char **argv)
 {
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
     // ob::PlannerPtr planner = GetMultiLevelPlanner<og::SPQR>(admissibleProjection, si, "SPQR");
     ss.setPlanner(planner);
 
-    bool solved = ss.solve(1.0);
+    bool solved = ss.solve(10.0);
 
     double timeToCompute = ss.getLastPlanComputationTime();
 

@@ -45,6 +45,9 @@
 double runHyperCubeBenchmark(int ndim, double maxTime, int Nruns)
 {
   double averageTime = 0;
+
+  std::vector<int> admissibleProjection = getHypercubeAdmissibleProjection(ndim);
+
   for(int k = 0; k < Nruns; k++)
   {
     auto space(std::make_shared<ompl::base::RealVectorStateSpace>(ndim));
@@ -65,10 +68,8 @@ double runHyperCubeBenchmark(int ndim, double maxTime, int Nruns)
     }
     ss.setStartAndGoalStates(start, goal);
 
-    std::vector<int> admissibleProjection = getHypercubeAdmissibleProjection(ndim);
-
-    // ob::PlannerPtr planner = GetMultiLevelPlanner<og::QRRTStar>(admissibleProjection, si, "QRRTStar");
-    ob::PlannerPtr planner = std::make_shared<og::STRIDE>(si);
+    ob::PlannerPtr planner = GetMultiLevelPlanner<og::QRRTStar>(admissibleProjection, si, "QRRTStar");
+    // ob::PlannerPtr planner = std::make_shared<og::STRIDE>(si);
     ss.setPlanner(planner);
 
     bool solved = ss.solve(maxTime);
@@ -88,23 +89,24 @@ double runHyperCubeBenchmark(int ndim, double maxTime, int Nruns)
 
 int main(int argc, char **argv)
 {
-    const unsigned int startDim = 3;
-    const unsigned int endDim = 10;
+    const unsigned int startDim = 10;
+    const unsigned int endDim = 110;
+    const unsigned int stepSizeDim = 10;
     const unsigned int Nruns = 10;
-    const double maxTime = 300.0;
+    const double maxTime = 10.0;
 
     ompl::msg::setLogLevel(ompl::msg::LogLevel::LOG_NONE);
 
     std::cout << "x = np.array([";
-    for(unsigned int k = startDim; k < endDim; k++)
+    for(unsigned int k = startDim; k < endDim; k+=stepSizeDim)
     {
-      std::cout << k;
-      if(k<endDim-1) std::cout << ", ";
+      std::cout << k << std::flush;
+      if(k<endDim-1) std::cout << ", " << std::flush;
     }
     std::cout << "])" << std::endl;
 
     std::cout << "time = np.array([" << std::flush;
-    for(unsigned int k = startDim; k < endDim; k++)
+    for(unsigned int k = startDim; k < endDim; k+=stepSizeDim)
     {
        double timek = runHyperCubeBenchmark(k, maxTime, Nruns);
        std::cout << timek << std::flush;
