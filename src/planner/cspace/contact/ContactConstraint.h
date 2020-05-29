@@ -15,7 +15,7 @@ public:
     ContactConstraint(GeometricCSpaceOMPLRCONTACT* cspace, Robot *robot, RobotWorld *world, int robot_idx);
 
 
-    Vector3 getPos(const Eigen::VectorXd xd) const;
+    Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const;
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override;
 
 
@@ -46,10 +46,12 @@ public:
             void project(const ob::State *state, Eigen::Ref<Eigen::VectorXd> projection) const override
             {
                 auto &&x = *state->as<ob::ConstrainedStateSpace::StateType>();
-                projection(0) = 0;
+                projection(0) = 1.75;
                 projection(1) = x[1];
+                if(projection(1) < -3) projection(1) = -3;
+                if(projection(1) > -1) projection(1) = -1;
                 projection(2) = 0;
-                std::cout << "Project " << projection << std::endl;
+                // std::cout << "Project " << projection << std::endl;
             }
         };
         return std::make_shared<ContactProjection>(space);

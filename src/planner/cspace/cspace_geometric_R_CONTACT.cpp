@@ -37,8 +37,6 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
         bounds.low.at(i + 3) = minimum.at(idx);
         bounds.high.at(i + 3) = maximum.at(idx);
     }
-    std::cout << bounds.low << std::endl;
-    std::cout << bounds.high << std::endl;
     bounds.check();
     static_pointer_cast<ob::RealVectorStateSpace>(Rn)->setBounds(bounds);
 
@@ -47,8 +45,8 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
     this->space = std::make_shared<ob::ProjectedStateSpace>(Rn, constraint);
 
     //NOTE: added projection operator
-    this->space->registerProjection("contact", 
-			std::static_pointer_cast<ContactConstraint>(constraint)->getProjection(this->space));
+    // this->space->registerProjection("contact", 
+			// std::static_pointer_cast<ContactConstraint>(constraint)->getProjection(this->space));
 
 }
 
@@ -64,6 +62,7 @@ ob::SpaceInformationPtr GeometricCSpaceOMPLRCONTACT::SpaceInformationPtr() {
 void GeometricCSpaceOMPLRCONTACT::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
     Eigen::VectorXd x(3+Nompl);
+    x.setZero();
 
     x[0] = q[0];
     x[1] = q[1];
@@ -72,7 +71,9 @@ void GeometricCSpaceOMPLRCONTACT::ConfigToOMPLState(const Config &q, ob::State *
     for(uint i = 0; i < Nklampt; i++)
     {
         int idx = klampt_to_ompl.at(i);
-        if(idx<0) continue;
+        if(idx<0){
+          continue;
+        }
         else{
             x[3 + idx]=q(6+i);
         }
@@ -109,6 +110,9 @@ Config GeometricCSpaceOMPLRCONTACT::EigenVectorToConfig(const Eigen::VectorXd &x
     q(0) = xd[0];
     q(1) = xd[1];
     q(3) = xd[2];
+
+    while(q(3)>M_PI) q(3) -= 2*M_PI;
+    while(q(3)<-M_PI) q(3) += 2*M_PI;
 
     for(uint i = 0; i < Nompl; i++){
         uint idx = ompl_to_klampt.at(i);
