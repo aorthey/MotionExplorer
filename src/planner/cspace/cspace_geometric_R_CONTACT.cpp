@@ -2,9 +2,12 @@
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
 #include "planner/cspace/contact/ContactConstraint.h"
+#include <ompl/base/spaces/constraint/AtlasStateSpace.h>
+#include <ompl/base/spaces/constraint/TangentBundleStateSpace.h>
+
+
 #include "planner/cspace/cspace_geometric_R_CONTACT.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
-
 
 GeometricCSpaceOMPLRCONTACT::GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int robot_idx):
         GeometricCSpaceOMPL(world_, robot_idx) {}
@@ -34,14 +37,19 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
         bounds.low.at(i + 3) = minimum.at(idx);
         bounds.high.at(i + 3) = maximum.at(idx);
     }
-    // std::cout << bounds.low << std::endl;
-    // std::cout << bounds.high << std::endl;
+    std::cout << bounds.low << std::endl;
+    std::cout << bounds.high << std::endl;
     bounds.check();
     static_pointer_cast<ob::RealVectorStateSpace>(Rn)->setBounds(bounds);
 
     //Constrained State Space
-    constraint = std::make_shared<ContactConstraint>(robot, world, robot_idx);
+    constraint = std::make_shared<ContactConstraint>(this, robot, world, robot_idx);
     this->space = std::make_shared<ob::ProjectedStateSpace>(Rn, constraint);
+
+    //NOTE: added projection operator
+    this->space->registerProjection("contact", 
+			std::static_pointer_cast<ContactConstraint>(constraint)->getProjection(this->space));
+
 }
 
 ob::SpaceInformationPtr GeometricCSpaceOMPLRCONTACT::SpaceInformationPtr() {
@@ -107,6 +115,14 @@ Config GeometricCSpaceOMPLRCONTACT::EigenVectorToConfig(const Eigen::VectorXd &x
         q(idx) = xd[i+3];
     }
     return q;
+}
+
+//NOTE: add getXYZ to set XYZ coordinate of vertices
+Vector3 GeometricCSpaceOMPLRCONTACT::getXYZ(const ob::State *s)
+{
+    Config q = OMPLStateToConfig(s);
+    Vector3 v(q[0],q[1],0);
+    return v;
 }
 
 void GeometricCSpaceOMPLRCONTACT::print(std::ostream& out) const{}
