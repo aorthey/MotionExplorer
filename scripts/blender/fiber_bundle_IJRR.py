@@ -4,6 +4,10 @@ import numpy as np
 from math import *
 from mathutils import *
 
+### Using blender 2.82a
+## How to use:
+### ./blender --background --python fiber_bundle_IJRR.py &&
+###  convert -trim ~/image.png ~/image.png && display ~/image.png
 
 diameterState = 0.45
 mobiusStripThickness = 0.1
@@ -155,8 +159,6 @@ def mobius_mesh(resolution, thick):
         faces.append( [i1+2,i1+3,id,ic])
         faces.append( [i1+3,i1,ia,id])
 
-    #print (verts)
-    #print (faces)
     mesh = bpy.data.meshes.new("mobius")
     mesh.from_pydata(verts, [], faces)
 
@@ -384,7 +386,6 @@ def torusRestriction_mesh(torusLocation):
     for u in U:
       M = len(verts)
       for v in V:
-        print(u,v)
         x = ((r0 + r1*cos(2*pi*v))*cos(2*pi*u), \
              (r0 + r1*cos(2*pi*v))*sin(2*pi*u), \
              r1*sin(2*pi*v))
@@ -399,8 +400,6 @@ def torusRestriction_mesh(torusLocation):
 
       ctr = ctr + 1
 
-    print(verts)
-    print(faces)
     mesh = bpy.data.meshes.new("trestrict")
     mesh.from_pydata(verts, [], faces)
 

@@ -80,57 +80,27 @@ Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) c
         exit(0);
     }
 
-    Config q_old = robot_->q;
-
     robot_->UpdateConfig(q);
     robot_->UpdateGeometry();
+
     Vector3 zero;
     zero.setZero();
     //int lastLink = robot_->links.size() - 1;
-    int firstLink = 0; // maybe .type to check type of last/first link, ball endeffector
+    int firstLink = 6; // maybe .type to check type of last/first link, ball endeffector
 
-    //NOTE: the world position is zero exactly at the point where link is
-    //attached using a joint to the whole linkage. Check where your last fixed
-    //joint is positioned, before questioning the validity of this method
     Vector3 v;
     robot_->GetWorldPosition(zero, firstLink, v);
-    robot_->UpdateConfig(q_old);
 
-    v[0] = xd[0];
-    v[1] = xd[1];
-    v[2] = 0;
     return v;
 }
 
 void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
 {
-    // f(x!=x)
-    // {
-    //     std::cout << std::string(80, '-') << std::endl;
-    //     std::cout << x << std::endl;
-    //     std::cout << "detected NaN value" << std::endl;
-    //     exit(0);
 
-    // }
-
-
-    // TEST
-    Vector3 contact(x[0], x[1], 0);
-    // Vector3 contact = getPos(x);
+    Vector3 contact = getPos(x);
+    // Vector3 closestPt = trisFiltered.at(6).closestPoint(contact);
     Vector3 closestPt(1.75, x[1], 0);
     Real distVect = contact.distance(closestPt);
-
-
-    // std::cout << std::string(80, '-') << std::endl;
-    // std::cout << "contact:" << contact << std::endl;
-    // // Vector3 closestPt = trisFiltered.at(6).closestPoint(contact);
-    // // closestPt[2] = 0;
-    // Vector3 closestPt(1.75, x[1], 0);
-    // Real distVect = contact.distance(closestPt);
-    // std::cout << "contact:" << contact << std::endl;
-    // std::cout << contact << std::endl;
-    // std::cout << closestPt << std::endl;
-    // std::cout << distVect << std::endl;
 
     // std::cout << "Filtered Surface Triangles: " << trisFiltered.at(6) << std::endl;
     // std::cout << "Closest Point on triangle: "<< closestPt << std::endl;
