@@ -1,8 +1,8 @@
-<h1>MotionPlanningExplorerGUI</h1>
+<h1>MotionExplorer</h1>
 <p align="middle">
-  <img src="https://github.com/aorthey/MotionPlanningExplorerGUI/blob/master/data/images/airplane.png" width="280" />
-  <img src="https://github.com/aorthey/MotionPlanningExplorerGUI/blob/master/data/images/PR2.png" width="280" />
-  <img src="https://github.com/aorthey/MotionPlanningExplorerGUI/blob/master/data/images/drone.png" width="280" />
+  <img src="https://github.com/aorthey/MotionExplorer/blob/master/data/images/airplane.png" width="280" />
+  <img src="https://github.com/aorthey/MotionExplorer/blob/master/data/images/PR2.png" width="280" />
+  <img src="https://github.com/aorthey/MotionExplorer/blob/master/data/images/drone.png" width="280" />
 </p>
 
 
@@ -34,7 +34,7 @@ Please make sure you have a github.com account AND ssh access from your workstat
 <ol>
   <li> Install Script for Ubuntu 16.04 and 18.04 (requires SSH access)
     
-    git clone git@github.com:aorthey/MotionPlanningExplorerGUI.git
+    git clone git@github.com:aorthey/MotionExplorer.git
     cd MotionPlanningExplorerGUI
     ./install_script.sh
     
