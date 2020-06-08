@@ -3,10 +3,10 @@
 <world>
 
   <robot name="2dof" file="../robots/planar/2dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
-  <robot name="1dof_inner" file="../robots/planar/2dof_testobj_1dof_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
+  <!-- <robot name="1dof_inner" file="../robots/planar/2dof_testobj_1dof_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>-->
   <!-- when adding/removing links remember to adjust configurations -->
 
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -2.0 0" rotateRPY="0 0 0"/>
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -2.0 -0.5" rotateRPY="0 0 0"/>
   <!-- <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -4.0 0" rotateRPY="0 0 0"/>
   <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -0.0 0" rotateRPY="0 0 0"/>
   <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -6.0 0" rotateRPY="0 0 0"/>
@@ -16,21 +16,23 @@
 
   <plannerinput>
 
-    <qinit  config="10  1.75 -3 0 0 0 0  2.6 1.0 0.0 0 "/> <!-- config="dim  x y z yaw roll pitch  theta phi phi endeff" -->
+    <qinit  config="10  1.75 -2.5 0 0 0 0  2.6 0.0 1.0 0 "/> <!-- config="dim  x y z yaw roll pitch  theta phi phi endeff" -->
     <qgoal  config="10  1.75 -1 0 0 0 0  0.0 0.0 0.0 0 "/>
-    <se3min config="6  -5 -5.0 -0.0 -3.141593 -1.57 -3.141593"/>
-    <se3max config="6  +5 +5.0 +0.5 +3.141593 +1.57 +3.141593"/>    
+    <se3min config="6  -3 -3 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +3 +3 +0.0 +3.141593 +1.57 +3.141593"/>
     <epsilongoalregion>0.05</epsilongoalregion>
-    <maxplanningtime>1.0</maxplanningtime>      <!-- runtime in (s) -->
+    <maxplanningtime>0.1</maxplanningtime>      <!-- runtime in (s) -->
     <smoothPath>0</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
     <pathSpeed>15</pathSpeed>
     <pathWidth>0.2</pathWidth>
     <freeFloating>1</freeFloating>
 
     <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:rrt"/>
+    <algorithm name="ompl:prm"/>
 
     <hierarchy>
-      <level inner_index="0" type="R_CONTACT"/> <!-- to be R_CONTACTwww -->
+      <level inner_index="0" type="R_CONTACT"/>
     </hierarchy>
 
   </plannerinput>

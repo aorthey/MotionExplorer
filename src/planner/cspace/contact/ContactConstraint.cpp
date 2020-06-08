@@ -4,11 +4,11 @@
 #include "planner/cspace/cspace_geometric_R_CONTACT.h"
 
 
-ContactConstraint::ContactConstraint(Robot *robot, RobotWorld *world, int robot_idx):
+ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world):
 ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
+, cspace_(cspace)
 , robot_(robot)
 , world_(world)
-,robot_idx_(robot_idx)
 {
     /**
      * Information on obstacle surface triangles.
@@ -62,38 +62,42 @@ ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
 
 }
 
-Vector3 ContactConstraint::getPos(const Eigen::VectorXd xd) const
+Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const
 {
     /**
      * Member function of class ContactConstraint:
      * Calculates position of given robot link in world coordinates.
      */
-    std::cout << "\nEigenVector: \n" << xd << std::endl;
 
-    GeometricCSpaceOMPLRCONTACT geometricCSpaceOmplRContact = GeometricCSpaceOMPLRCONTACT(world_, robot_idx_);
+    Config q = cspace_->EigenVectorToConfig(xd);
+    if (xd!=xd){
+        std::cout << std::string (80, '-') << std::endl;
+        std::cout << "EigenVector: " << std::endl;
+        std::cout << xd << std::endl;
+        std::cout << q << std::endl;
+        exit(0);
+    }
 
-    Config q = geometricCSpaceOmplRContact.EigenVectorToConfig(xd);
+    Config  q_old = robot_->q;
 
     robot_->UpdateConfig(q);
-    std::cout << "Config q: " << q << std::endl;
     robot_->UpdateGeometry();
-    Vector3 qq;
     Vector3 zero;
     zero.setZero();
+
     //int lastLink = robot_->links.size() - 1;
-    int firstLink = 0; // maybe .type to check type of last/first link, ball endeffector
+    int firstLink = 6; // first 6 links are virtual links x,y,z, yaw, pitch, roll
 
     //NOTE: the world position is zero exactly at the point where link is
     //attached using a joint to the whole linkage. Check where your last fixed
     //joint is positioned, before questioning the validity of this method
-    robot_->GetWorldPosition(zero, firstLink, qq);
+    Vector3 v;
+    robot_->GetWorldPosition(zero, firstLink, v);
+    robot_->UpdateConfig(q_old);
 
-    double x = qq[0];
-    double y = q[1];
-    double z = qq[2];
-    Vector3 v(x,y,z);
-
-    std::cout << "Vector xyz: " << v << std::endl;
+//    v[0] = xd[0]; //fix for now
+//    v[1] = xd[1];
+//    v[2] = 0;
 
     return v;
 }
@@ -102,19 +106,20 @@ void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eig
 {
 
     Vector3 contact = getPos(x);
-    std::cout << "\nPosition of First Link: " << contact << std::endl;
+    std::cout << "\nPosition of Link: " << contact << std::endl;
 
-    Vector3 closestPt = trisFiltered.at(6).closestPoint(contact);
+    Vector3 closestPt(1.75, x[1], 0);
+    //Vector3 closestPt = trisFiltered.at(6).closestPoint(contact);
+
     //std::cout << "\nFiltered Surface Triangles: " << trisFiltered.at(6) << std::endl;
     std::cout << "\nClosest Point on triangle: "<< closestPt << std::endl;
 
-    //GeometricPrimitive3D gP3D = GeometricPrimitive3D(closestPt);
-    //Real dist = gP3D.Distance(trisFiltered.at(0));
-    // std::cout << "Check that 'closestPt' is on surface Triangle: " << dist << std::endl;
+//    GeometricPrimitive3D gP3D = GeometricPrimitive3D(closestPt);
+//    Real dist = gP3D.Distance(trisFiltered.at(0));
+//     std::cout << "Check that 'closestPt' is on surface Triangle: " << dist << std::endl;
 
     Real distVect = contact.distance(closestPt);
     std::cout << "\nDistance between First Link - Closest Point: " << distVect << std::endl;
 
-    //std::exit(1);
     out[0] = distVect;
 }

@@ -50,7 +50,7 @@ class CSpaceOMPL
 
     //function to display vertices/edges in the workspace (different from
     //possible quotient-spaces)
-    Vector3 getXYZ(const ob::State*);
+    virtual Vector3 getXYZ(const ob::State*);
     Vector3 getXYZ_freeFloating(const ob::State *s);
     Vector3 getXYZ_fixedBase(const ob::State *s);
 

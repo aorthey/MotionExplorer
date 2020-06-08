@@ -2,6 +2,9 @@
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
 #include "planner/cspace/contact/ContactConstraint.h"
+#include <ompl/base/spaces/constraint/AtlasStateSpace.h>
+#include <ompl/base/spaces/constraint/TangentBundleStateSpace.h>
+
 #include "planner/cspace/cspace_geometric_R_CONTACT.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
@@ -34,17 +37,19 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
         bounds.low.at(i + 3) = minimum.at(idx);
         bounds.high.at(i + 3) = maximum.at(idx);
     }
-    // std::cout << bounds.low << std::endl;
-    // std::cout << bounds.high << std::endl;
+    std::cout << bounds.low << std::endl;
+    std::cout << bounds.high << std::endl;
     bounds.check();
     static_pointer_cast<ob::RealVectorStateSpace>(Rn)->setBounds(bounds);
 
     //Constrained State Space
-    constraint = std::make_shared<ContactConstraint>(robot, world, robot_idx);
+    constraint = std::make_shared<ContactConstraint>(this, robot, world);
     this->space = std::make_shared<ob::ProjectedStateSpace>(Rn, constraint);
+
 }
 
-ob::SpaceInformationPtr GeometricCSpaceOMPLRCONTACT::SpaceInformationPtr() {
+ob::SpaceInformationPtr GeometricCSpaceOMPLRCONTACT::SpaceInformationPtr()
+{
     if (!si) {
         si = std::make_shared<ob::ConstrainedSpaceInformation>(SpacePtr());
         validity_checker = StateValidityCheckerPtr(si);
@@ -102,11 +107,22 @@ Config GeometricCSpaceOMPLRCONTACT::EigenVectorToConfig(const Eigen::VectorXd &x
     q(1) = xd[1];
     q(3) = xd[2];
 
+    while(q(3)>M_PI) q(3) -= 2*M_PI;
+    while(q(3)<-M_PI) q(3) += 2*M_PI;
+
     for(uint i = 0; i < Nompl; i++){
         uint idx = ompl_to_klampt.at(i);
         q(idx) = xd[i+3];
     }
     return q;
+}
+
+//NOTE: add getXYZ to set XYZ coordinate of vertices
+Vector3 GeometricCSpaceOMPLRCONTACT::getXYZ(const ob::State *s)
+{
+    Config q = OMPLStateToConfig(s);
+    Vector3 v(q[0],q[1],0);
+    return v;
 }
 
 void GeometricCSpaceOMPLRCONTACT::print(std::ostream& out) const{}
