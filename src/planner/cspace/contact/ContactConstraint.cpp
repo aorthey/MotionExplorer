@@ -13,7 +13,7 @@ ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
     /**
      * Information on obstacle surface triangles.
      *
-     * Filtering list of all triangles such that feasible contact surfaces remain.
+     * Saves all triangles that are feasible contact surfaces into member variable "trisFiltered".
      */
 
     std::vector<Triangle3D> tris;
@@ -46,6 +46,7 @@ ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
             cornerCoord.push_back(c);
 
             trisFiltered.push_back(tris.at(l));
+            //std::cout << tris.at(l) << std::endl;
         }
     }
     std::cout << "Environment has " << trisFiltered.size() << " triangles to make contact!" << std::endl;
@@ -66,7 +67,7 @@ Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) c
 {
     /**
      * Member function of class ContactConstraint:
-     * Calculates position of given robot link in world coordinates.
+     * Returns position of given robot link in world coordinates.
      */
 
     Config q = cspace_->EigenVectorToConfig(xd);
@@ -78,7 +79,6 @@ Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) c
         exit(0);
     }
 
-    Config  q_old = robot_->q;
 
     robot_->UpdateConfig(q);
     robot_->UpdateGeometry();
@@ -93,11 +93,6 @@ Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) c
     //joint is positioned, before questioning the validity of this method
     Vector3 v;
     robot_->GetWorldPosition(zero, firstLink, v);
-    robot_->UpdateConfig(q_old);
-
-//    v[0] = xd[0]; //fix for now
-//    v[1] = xd[1];
-//    v[2] = 0;
 
     return v;
 }
@@ -107,11 +102,30 @@ void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eig
 
     Vector3 contact = getPos(x);
     std::cout << "\nPosition of Link: " << contact << std::endl;
+    //std::exit(1);
 
-    Vector3 closestPt(1.75, x[1], 0);
-    //Vector3 closestPt = trisFiltered.at(6).closestPoint(contact);
+    //Vector3 closestPt(1.75, x[1], 0);
+    Vector3 closestPt = trisFiltered.at(6).closestPoint(contact);
 
-    //std::cout << "\nFiltered Surface Triangles: " << trisFiltered.at(6) << std::endl;
+    Real distances = 100;
+    //loop over all surface triangles to get triangle that's closest
+    for (uint j = 0; j < trisFiltered.size(); j++) {
+        Vector3 cP = trisFiltered.at(j).closestPoint(contact);
+        Real d = contact.distance(cP);
+        if (distances > d){
+
+            distances = d;
+            closestPt = cP;
+            std::cout << "Dist: " << distances << std::endl;
+            std::cout << "ClosestPt: " << cP << std::endl;
+
+        }
+
+        //std::cout << "Triangle: " << trisFiltered.at(j) << std::endl;
+        //std::cout << "Distance: " << distances << std::endl;
+    }
+
+    closestPt[2] = 0;
     std::cout << "\nClosest Point on triangle: "<< closestPt << std::endl;
 
 //    GeometricPrimitive3D gP3D = GeometricPrimitive3D(closestPt);
