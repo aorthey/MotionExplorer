@@ -101,10 +101,8 @@ void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eig
 {
 
     Vector3 contact = getPos(x);
-    std::cout << "\nPosition of Link: " << contact << std::endl;
-    //std::exit(1);
+    //std::cout << "\nPosition of Link: " << contact << std::endl;
 
-    //Vector3 closestPt(1.75, x[1], 0);
     Vector3 closestPt = trisFiltered.at(6).closestPoint(contact);
 
     Real distances = 100;
@@ -116,24 +114,20 @@ void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eig
 
             distances = d;
             closestPt = cP;
-            std::cout << "Dist: " << distances << std::endl;
-            std::cout << "ClosestPt: " << cP << std::endl;
+            //std::cout << "Dist: " << distances << std::endl;
+            //std::cout << "ClosestPt: " << cP << std::endl;
 
         }
-
-        //std::cout << "Triangle: " << trisFiltered.at(j) << std::endl;
-        //std::cout << "Distance: " << distances << std::endl;
     }
 
-    closestPt[2] = 0;
-    std::cout << "\nClosest Point on triangle: "<< closestPt << std::endl;
+    //std::cout << "\nClosest Point on triangle: "<< closestPt << std::endl;
 
 //    GeometricPrimitive3D gP3D = GeometricPrimitive3D(closestPt);
 //    Real dist = gP3D.Distance(trisFiltered.at(0));
 //     std::cout << "Check that 'closestPt' is on surface Triangle: " << dist << std::endl;
 
     Real distVect = contact.distance(closestPt);
-    std::cout << "\nDistance between First Link - Closest Point: " << distVect << std::endl;
+    //std::cout << "\nDistance between First Link - Closest Point: " << distVect << std::endl;
 
     out[0] = distVect;
 }
