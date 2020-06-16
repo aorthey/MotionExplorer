@@ -24,6 +24,11 @@ std::vector<int> getHypercubeAdmissibleProjection(int dim)
 {
     std::vector<int> discrete;
     boost::push_back(discrete, boost::irange(2, dim + 1));
+    // std::cout << "[";
+    // for(uint k = 0; k < discrete.size(); k++){
+    //   std::cout << discrete.at(k) << ",";
+    // }
+    // std::cout << "]" << std::endl;
     return discrete;
 }
 
@@ -82,6 +87,7 @@ public:
         bool foundMaxDim = false;
 
         for (int i = dimension_ - 1; i >= 0; i--)
+        {
             if (!foundMaxDim)
             {
                 if ((*s)[i] > edgeWidth)
@@ -89,6 +95,7 @@ public:
             }
             else if ((*s)[i] < (1. - edgeWidth))
                 return false;
+        }
         return true;
     }
 

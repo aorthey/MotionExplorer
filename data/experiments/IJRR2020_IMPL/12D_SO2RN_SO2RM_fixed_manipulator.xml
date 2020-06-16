@@ -43,8 +43,9 @@
 
     <hierarchy>
       <level inner_index="3" type="S1RN"/>
-      <level inner_index="6" type="S1RN"/>
-      <level inner_index="8" type="S1RN"/>
+      <level inner_index="5" type="S1RN"/>
+      <level inner_index="7" type="S1RN"/>
+      <level inner_index="10" type="S1RN"/>
       <level inner_index="12" type="S1RN"/>
     </hierarchy>
 

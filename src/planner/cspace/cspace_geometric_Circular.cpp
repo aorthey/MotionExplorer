@@ -11,6 +11,8 @@
 GeometricCSpaceOMPLCircular::GeometricCSpaceOMPLCircular(RobotWorld *world_, int robot_idx):
   BaseT(world_, robot_idx)
 {
+    radius_ = 1.5;
+    zOffset_ = -2.5;
 }
 
 void GeometricCSpaceOMPLCircular::initSpace()
@@ -102,5 +104,6 @@ Config GeometricCSpaceOMPLCircular::OMPLStateToConfig(const ob::State *x)
 Vector3 GeometricCSpaceOMPLCircular::getXYZ(const ob::State *x)
 {
     double u = OMPLStateToSO2Value(x);
-    return ProjectToVector3(u);
+    Vector3 v = ProjectToVector3(u);
+    return v;
 }

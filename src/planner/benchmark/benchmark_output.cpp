@@ -88,9 +88,9 @@ void BenchmarkOutput::PrintPDF()
   int rvalue = std::system(cmd.c_str());
 
   if(rvalue){
-    std::cout << "Successfully wrote converted to PDF" << std::endl;
+      std::cout << "Successfully converted XML to PDF" << std::endl;
   }else{
-    std::cout << "### [ERROR] Benchmark to PDF failed" << std::endl;
+      std::cout << "### [ERROR] Benchmark to PDF failed" << std::endl;
   }
 }
 

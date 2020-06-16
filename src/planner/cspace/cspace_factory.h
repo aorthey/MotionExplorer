@@ -2,6 +2,8 @@
 #include "planner/cspace/cspace.h"
 #include "planner/cspace/cspace_geometric.h"
 #include "planner/cspace/cspace_geometric_empty.h"
+#include "planner/cspace/cspace_geometric_R_CONTACT.h"
+
 #include "planner/cspace/cspace_multiagent.h"
 #include "planner/cspace/cspace_kinodynamic.h"
 #include "planner/cspace/cspace_kinodynamic_SE2.h"
@@ -56,6 +58,13 @@ class CSpaceFactory{
       cspace->SetCSpaceInput(input);
       cspace->Init();
       return cspace;
+    }
+    // CSpace  R CONTACT
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceRCONTACT( RobotWorld *world, int robot_idx){
+        GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLRCONTACT(world, robot_idx);
+        cspace->SetCSpaceInput(input);
+        cspace->Init();
+        return cspace;
     }
 
     // CSpace  SE(3)

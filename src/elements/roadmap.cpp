@@ -204,6 +204,7 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
   //Get Space
   ob::PlannerDataVertex *v = &pd->getVertex(0);
   const ob::PlannerDataVertexAnnotated *va = dynamic_cast<const ob::PlannerDataVertexAnnotated*>(v);
+
   CSpaceOMPL *curSpace;
   if(va!=nullptr)
   {
@@ -223,6 +224,7 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
   //############################################################################
     const ob::PlannerDataVertexAnnotated *va = dynamic_cast<const ob::PlannerDataVertexAnnotated*>(v);
     const ob::State *vState;
+
     if(va!=nullptr)
     {
       vState = va->getBaseState();
