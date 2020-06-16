@@ -84,7 +84,7 @@ void BenchmarkOutput::PrintPDF()
     std::cout << "Cannot print PDF. No XML file loaded" << std::endl;
     return;
   }
-  std::string cmd = std::string("python ../scripts/benchmarks/benchmark_to_pdf.py ")+file;
+  std::string cmd = std::string("python ../scripts/benchmarks/benchmark_to_pdf.py ")+file+std::string(" &");
   int rvalue = std::system(cmd.c_str());
 
   if(rvalue){
