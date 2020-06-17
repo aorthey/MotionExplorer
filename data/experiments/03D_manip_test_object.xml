@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="3dof" file="../robots/planar_manipulator/3dof_manip_no_endeffector_test_object.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -2.0 0.0" rotateRPY="0 0 0"/>
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -0.0 -0.0" rotateRPY="0 0 0"/>
+  <!--<terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -6.0 -0.0" rotateRPY="0 0 0"/>
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -4.0 -0.0" rotateRPY="0 0 0"/>
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 +2.0 -0.0" rotateRPY="0 0 0"/> -->
+
+  <plannerinput>
+
+    <qinit  config="12  1.75 -1 +0.0 0.0 0.0 0.0  1.570796 0.0 1.570796 0.0 1.570796"/>
+    <qgoal  config="12  2.25 0 +0.0 +0.0 0.0 0.0  -0.7 0.0 2.2 0.0 1.7"/>
+    <!-- <qgoal  config="12  2.25 1.5 +0.0 +0.0 0.0 0.0  -1.570796 0.0 -1.570796 0.0 -1.570796"/> -->
+    <se3min config="6  -5 -5 -0.0 -3.141593 -3.141593 -3.141593"/>
+    <se3max config="6  +5 +5 +0.0 +3.141593 +3.141593 +3.141593"/>
+    <epsilongoalregion>0.05</epsilongoalregion>
+    <maxplanningtime>10</maxplanningtime>      <!-- runtime in (s) -->
+    <smoothPath>0</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
+    <pathSpeed>15</pathSpeed>
+    <pathWidth>0.2</pathWidth>
+    <freeFloating>1</freeFloating>
+
+    <hierarchy>
+      <level inner_index="0" type="R_CONTACT"/>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>
+
+
+

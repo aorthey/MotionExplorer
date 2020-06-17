@@ -2,10 +2,8 @@
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
 #include "planner/cspace/contact/ContactConstraint.h"
-#include <ompl/base/spaces/constraint/AtlasStateSpace.h>
-#include <ompl/base/spaces/constraint/TangentBundleStateSpace.h>
 
-#include "planner/cspace/cspace_geometric_R_CONTACT.h"
+#include "planner/cspace/cspace_geometric_R2_CONTACT.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
 

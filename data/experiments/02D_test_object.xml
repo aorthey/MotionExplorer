@@ -6,18 +6,18 @@
   <!-- <robot name="1dof_inner" file="../robots/planar/2dof_testobj_1dof_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>-->
   <!-- when adding/removing links remember to adjust configurations -->
 
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -2.0 0.0" rotateRPY="0 0 0"/>
-  <!--<terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -4.0 -0.11" rotateRPY="0 0 0"/>
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -0.0 -0.11" rotateRPY="0 0 0"/>
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -6.0 -0.11" rotateRPY="0 0 0"/> -->
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -2.0 0" rotateRPY="0 0 0"/>
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -4.0 0" rotateRPY="0 0 0"/>
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -0.0 0" rotateRPY="0 0 0"/>
+  <!--<terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -6.0 -0.11" rotateRPY="0 0 0"/> -->
 
 
   <plannerinput>
 
-    <qinit  config="10  1.75 -2.5 0 0 0 0  2.6 0.0 1.0 0 "/> <!-- config="dim  x y z yaw roll pitch  theta phi phi endeff" -->
-    <qgoal  config="10  2.25 -1.5 0 0 0 0  -0.4 0.0 0.0 0 "/>
-    <se3min config="6  -5 -5 -0.0 -3.141593 -1.57 -3.141593"/>
-    <se3max config="6  +5 +5 +0.0 +3.141593 +1.57 +3.141593"/>
+    <qinit  config="10  1.75 -2.25 0 0 0 0  2.35619 0.0 1.570796 0 "/> <!-- config="dim  x y z yaw roll pitch  theta phi phi endeff" -->
+    <qgoal  config="10  2.25 -1.75 0 0 0 0  -0.785398 0.0 1.570796 0 "/>
+    <se3min config="6  -3 -3 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +3 +3 +0.0 +3.141593 +1.57 +3.141593"/>
     <epsilongoalregion>0.05</epsilongoalregion>
     <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) -->
     <smoothPath>0</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->

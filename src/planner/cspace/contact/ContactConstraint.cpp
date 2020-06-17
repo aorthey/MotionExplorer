@@ -1,7 +1,7 @@
 #include <ompl/base/Constraint.h>
 #include <Library/KrisLibrary/math3d/geometry3d.cpp>
 #include "planner/cspace/contact/ContactConstraint.h"
-#include "planner/cspace/cspace_geometric_R_CONTACT.h"
+#include "planner/cspace/cspace_geometric_R2_CONTACT.h"
 
 
 ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world):
@@ -63,7 +63,7 @@ ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
 
 }
 
-Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const
+Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd, int linkNumber) const
 {
     /**
      * Member function of class ContactConstraint:
@@ -86,48 +86,63 @@ Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) c
     zero.setZero();
 
     //int lastLink = robot_->links.size() - 1;
-    int firstLink = 6; // first 6 links are virtual links x,y,z, yaw, pitch, roll
+    //int firstLink = 6; // first 6 links are virtual links x,y,z, yaw, pitch, roll
 
     //NOTE: the world position is zero exactly at the point where link is
     //attached using a joint to the whole linkage. Check where your last fixed
     //joint is positioned, before questioning the validity of this method
     Vector3 v;
-    robot_->GetWorldPosition(zero, firstLink, v);
+    robot_->GetWorldPosition(zero, linkNumber, v);
 
     return v;
 }
 
 void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
 {
+    // ---------- Contact with First Link ------------------
+//    int firstLink = 6;
+//    Vector3 contact_firstLink = getPos(x, firstLink);
+//
+//    Vector3 closestPt = trisFiltered.at(6).closestPoint(contact_firstLink);
+//
+//    Real distances = 1000;
+//    //loop over all surface triangles to get triangle that's closest
+//    for (uint j = 0; j < trisFiltered.size(); j++) {
+//        Vector3 cP = trisFiltered.at(j).closestPoint(contact_firstLink);
+//        Real d = contact_firstLink.distance(cP);
+//        if (distances > d){
+//
+//            distances = d;
+//            closestPt = cP;
+//        }
+//    }
+//
+////    GeometricPrimitive3D gP3D = GeometricPrimitive3D(closestPt);
+////    Real dist = gP3D.Distance(trisFiltered.at(0));
+////     std::cout << "Check that 'closestPt' is on surface Triangle: " << dist << std::endl;
+//
+//    Real distVect = contact_firstLink.distance(closestPt);
 
-    Vector3 contact = getPos(x);
-    //std::cout << "\nPosition of Link: " << contact << std::endl;
 
-    Vector3 closestPt = trisFiltered.at(6).closestPoint(contact);
+    // ---------- Contact with Last Link ------------------
+    int lastLink = robot_->links.size() - 1;
+    Vector3 contact_lastLink = getPos(x, lastLink);
 
-    Real distances = 100;
+    Vector3 closestPt_last = trisFiltered.at(6).closestPoint(contact_lastLink);
+
+    Real distances_last = 1000;
     //loop over all surface triangles to get triangle that's closest
     for (uint j = 0; j < trisFiltered.size(); j++) {
-        Vector3 cP = trisFiltered.at(j).closestPoint(contact);
-        Real d = contact.distance(cP);
-        if (distances > d){
+        Vector3 cP = trisFiltered.at(j).closestPoint(contact_lastLink);
+        Real d = contact_lastLink.distance(cP);
+        if (distances_last > d){
 
-            distances = d;
-            closestPt = cP;
-            //std::cout << "Dist: " << distances << std::endl;
-            //std::cout << "ClosestPt: " << cP << std::endl;
-
+            distances_last = d;
+            closestPt_last = cP;
         }
     }
+    Real distVect_last = contact_lastLink.distance(closestPt_last);
 
-    //std::cout << "\nClosest Point on triangle: "<< closestPt << std::endl;
-
-//    GeometricPrimitive3D gP3D = GeometricPrimitive3D(closestPt);
-//    Real dist = gP3D.Distance(trisFiltered.at(0));
-//     std::cout << "Check that 'closestPt' is on surface Triangle: " << dist << std::endl;
-
-    Real distVect = contact.distance(closestPt);
-    //std::cout << "\nDistance between First Link - Closest Point: " << distVect << std::endl;
-
-    out[0] = distVect;
+    //out[0] = distVect;
+    out[0] = distVect_last;
 }

@@ -10,7 +10,7 @@
 #include "planner/cspace/cspace_geometric_SE2RN.h"
 #include "planner/cspace/cspace_geometric_SO2RN.h"
 #include "planner/cspace/cspace_geometric_R3S2.h"
-#include "planner/cspace/cspace_geometric_R_CONTACT.h"
+#include "planner/cspace/cspace_geometric_R2_CONTACT.h"
 #include "planner/cspace/cspace_geometric_fixedbase.h"
 #include "planner/cspace/cspace_input.h"
 
