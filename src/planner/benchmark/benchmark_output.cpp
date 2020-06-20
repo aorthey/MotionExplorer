@@ -3,6 +3,7 @@
 #include <fstream>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
+#include <stdlib.h>
 
 // struct CompleteExperiment
 // {
@@ -84,7 +85,7 @@ void BenchmarkOutput::PrintPDF()
     std::cout << "Cannot print PDF. No XML file loaded" << std::endl;
     return;
   }
-  std::string cmd = std::string("python ../scripts/benchmarks/benchmark_to_pdf.py ")+file;
+  std::string cmd = std::string("python3 ../scripts/benchmarks/benchmark_to_pdf.py ")+file;
   int rvalue = std::system(cmd.c_str());
 
   if(rvalue){
@@ -92,6 +93,7 @@ void BenchmarkOutput::PrintPDF()
   }else{
       std::cout << "### [ERROR] Benchmark to PDF failed" << std::endl;
   }
+  exit(0);
 }
 
 bool BenchmarkOutput::Save(TiXmlElement *node)

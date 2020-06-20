@@ -355,26 +355,341 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
 
         }
 
-        ob::PlannerPtr planner_k_i = GetPlanner(binput.algorithms.at(k), stratifications.at(i));
+        if(util::StartsWith(name_algorithm, "hierarchy:qmpk")){
 
-        std::string name_algorithm_strat = planner_k_i->getName()+"_(";
+          for ( unsigned int knn = 3; knn <= 19; knn += 2)
+          {
 
-        std::vector<ob::SpaceInformationPtr> si_vec_k = stratifications.at(i)->si_vec;
-        for(uint j = 0; j < si_vec_k.size(); j++){
-          if(j>=si_vec_k.size()-1 && shortStratification) break;
-          uint Nj = si_vec_k.at(j)->getStateDimension();
-          name_algorithm_strat += std::to_string(Nj);
-          if(j < si_vec_k.size()-1) name_algorithm_strat += "|";
+            ob::PlannerPtr planner_k_i = GetPlanner("hierarchy:qmp", stratifications.at(i));
+            planner_k_i->params().setParam("knn", std::to_string( knn ));
+
+            planner_k_i->as<og::QMP>()->setK(knn);
+
+            std::string name_algorithm_strat = planner_k_i->getName()+"_(";
+
+            std::vector<ob::SpaceInformationPtr> si_vec_k = stratifications.at(i)->si_vec;
+            for(uint j = 0; j < si_vec_k.size(); j++){
+              if(j>=si_vec_k.size()-1 && shortStratification) break;
+              uint Nj = si_vec_k.at(j)->getStateDimension();
+              name_algorithm_strat += std::to_string(Nj);
+              if(j < si_vec_k.size()-1) name_algorithm_strat += "|";
+            }
+            name_algorithm_strat += ")";
+
+            name_algorithm_strat += "(k_" + std::to_string( knn );
+            name_algorithm_strat += ")";
+
+            //if(stratifications.size() > 1)
+            {
+              planner_k_i->setName(name_algorithm_strat);
+            }
+            std::cout << "adding planner with ambient space " << si_vec_k.back()->getStateDimension() << std::endl;
+            benchmark.addPlanner(planner_k_i);
+            planner_ctr++;
+          }
+          
         }
-        name_algorithm_strat += ")";
+        else if(util::StartsWith(name_algorithm, "hierarchy:metric")){
 
-        if(stratifications.size() > 1)
-        {
-          planner_k_i->setName(name_algorithm_strat);
+          std::string algo_name = name_algorithm.replace(9,7,"");
+
+          std::cout << "distance metric benchmark algorithm  :  " << algo_name << std::endl;
+
+          
+          ob::PlannerPtr planner_k_geodesic = GetPlanner(algo_name, stratifications.at(i));
+
+          ob::PlannerPtr planner_k_shortestpath = GetPlanner(algo_name, stratifications.at(i));
+
+
+          if(name_algorithm.find("qrrt") != std::string::npos){
+            planner_k_geodesic->as<og::QRRT>()->setMetric("geodesic");
+            planner_k_shortestpath->as<og::QRRT>()->setMetric("shortestpath");
+          }
+          else if(name_algorithm.find("qrrtstar") != std::string::npos){
+            planner_k_geodesic->as<og::QRRTStar>()->setMetric("geodesic");
+            planner_k_shortestpath->as<og::QRRTStar>()->setMetric("shortestpath");
+          }
+          else if(name_algorithm.find("qmp") != std::string::npos){
+            planner_k_geodesic->as<og::QMP>()->setMetric("geodesic");
+            planner_k_shortestpath->as<og::QMP>()->setMetric("shortestpath");
+          }
+          else if(name_algorithm.find("qmpstar") != std::string::npos){
+            planner_k_geodesic->as<og::QMPStar>()->setMetric("geodesic");
+            planner_k_shortestpath->as<og::QMPStar>()->setMetric("shortestpath");
+          }
+          else if(name_algorithm.find("spqr") != std::string::npos){
+            planner_k_geodesic->as<og::SPQR>()->setMetric("geodesic");
+            planner_k_shortestpath->as<og::SPQR>()->setMetric("shortestpath");
+          }
+          
+          
+          std::string name_algorithm_strat = planner_k_geodesic->getName() ;//+ "_(";
+
+          std::vector<ob::SpaceInformationPtr> si_vec_k = stratifications.at(i)->si_vec;
+          /*for (uint j = 0; j < si_vec_k.size(); j++)
+          {
+            if (j >= si_vec_k.size() - 1 && shortStratification)
+              break;
+            uint Nj = si_vec_k.at(j)->getStateDimension();
+            name_algorithm_strat += std::to_string(Nj);
+            if (j < si_vec_k.size() - 1)
+              name_algorithm_strat += "|";
+          }
+          name_algorithm_strat += ")";*/
+
+          std::string name_algorithm_1 = name_algorithm_strat + "(intrinsic)";
+          std::string name_algorithm_2 = name_algorithm_strat + "(QS metric)";
+
+          planner_k_geodesic->setName(name_algorithm_1);
+          planner_k_shortestpath->setName(name_algorithm_2);
+          
+          std::cout << "adding planner with ambient space " << si_vec_k.back()->getStateDimension() << std::endl;
+          
+          
+          benchmark.addPlanner(planner_k_geodesic);
+          planner_ctr++;
+
+          benchmark.addPlanner(planner_k_shortestpath);
+          planner_ctr++;
         }
-        std::cout << "adding planner with ambient space " << si_vec_k.back()->getStateDimension() << std::endl;
-        benchmark.addPlanner(planner_k_i);
-        planner_ctr++;
+        else if(util::StartsWith(name_algorithm, "hierarchy:importance")){
+
+          std::string algo_name = name_algorithm.replace(9,11,"");
+
+          std::cout << "importance benchmark algorithm  :  " << algo_name << std::endl;
+
+          
+          ob::PlannerPtr planner_k_uniform = GetPlanner(algo_name, stratifications.at(i));
+
+          ob::PlannerPtr planner_k_greedy = GetPlanner(algo_name, stratifications.at(i));
+
+          ob::PlannerPtr planner_k_exponential = GetPlanner(algo_name, stratifications.at(i));
+
+
+          if(name_algorithm.find("qrrt") != std::string::npos){
+            planner_k_uniform->as<og::QRRT>()->setImportance("uniform");
+            planner_k_greedy->as<og::QRRT>()->setImportance("greedy");
+            planner_k_exponential->as<og::QRRT>()->setImportance("exponential");
+          }
+          else if(name_algorithm.find("qrrtstar") != std::string::npos){
+            planner_k_uniform->as<og::QRRTStar>()->setImportance("uniform");
+            planner_k_greedy->as<og::QRRTStar>()->setImportance("greedy");
+            planner_k_exponential->as<og::QRRTStar>()->setImportance("exponential");
+          }
+          else if(name_algorithm.find("qmp") != std::string::npos){
+            planner_k_uniform->as<og::QMP>()->setImportance("uniform");
+            planner_k_greedy->as<og::QMP>()->setImportance("greedy");
+            planner_k_exponential->as<og::QMP>()->setImportance("exponential");
+          }
+          else if(name_algorithm.find("qmpstar") != std::string::npos){
+            planner_k_uniform->as<og::QMPStar>()->setImportance("uniform");
+            planner_k_greedy->as<og::QMPStar>()->setImportance("greedy");
+            planner_k_exponential->as<og::QMPStar>()->setImportance("exponential");
+          }
+          else if(name_algorithm.find("spqr") != std::string::npos){
+            planner_k_uniform->as<og::SPQR>()->setImportance("uniform");
+            planner_k_greedy->as<og::SPQR>()->setImportance("greedy");
+            planner_k_exponential->as<og::SPQR>()->setImportance("exponential");
+          }
+          
+          
+          std::string name_algorithm_strat = planner_k_uniform->getName() ;//;//;//+ "_(";
+
+          std::vector<ob::SpaceInformationPtr> si_vec_k = stratifications.at(i)->si_vec;
+          /*for (uint j = 0; j < si_vec_k.size(); j++)
+          {
+            if (j >= si_vec_k.size() - 1 && shortStratification)
+              break;
+            uint Nj = si_vec_k.at(j)->getStateDimension();
+            name_algorithm_strat += std::to_string(Nj);
+            if (j < si_vec_k.size() - 1)
+              name_algorithm_strat += "|";
+          }
+          name_algorithm_strat += ")";*/
+
+          std::string name_algorithm_1 = name_algorithm_strat + "(uniform)";
+          std::string name_algorithm_2 = name_algorithm_strat + "(greedy)";
+          std::string name_algorithm_3 = name_algorithm_strat + "(exponential)";
+
+          planner_k_uniform->setName(name_algorithm_1);
+          planner_k_greedy->setName(name_algorithm_2);
+          planner_k_exponential->setName(name_algorithm_3);
+          
+          std::cout << "adding planner with ambient space " << si_vec_k.back()->getStateDimension() << std::endl;
+          
+          
+          benchmark.addPlanner(planner_k_uniform);
+          planner_ctr++;
+
+          benchmark.addPlanner(planner_k_greedy);
+          planner_ctr++;
+
+          benchmark.addPlanner(planner_k_exponential);
+          planner_ctr++;
+        }
+        else if(util::StartsWith(name_algorithm, "hierarchy:GraphSampler")){
+
+          std::string algo_name = name_algorithm.replace(9,13,"");
+
+          std::cout << "Graph Sampler benchmark algorithm  :  " << algo_name << std::endl;
+
+          
+          ob::PlannerPtr planner_k_randomvertex = GetPlanner(algo_name, stratifications.at(i));
+
+          ob::PlannerPtr planner_k_randomedge = GetPlanner(algo_name, stratifications.at(i));
+
+          ob::PlannerPtr planner_k_randomdegreevertex = GetPlanner(algo_name, stratifications.at(i));
+
+
+          if(name_algorithm.find("qrrt") != std::string::npos){
+            planner_k_randomvertex->as<og::QRRT>()->setGraphSampler("randomvertex");
+            planner_k_randomedge->as<og::QRRT>()->setGraphSampler("randomedge");
+            planner_k_randomdegreevertex->as<og::QRRT>()->setGraphSampler("randomdegreevertex");
+          }
+          else if(name_algorithm.find("qrrtstar") != std::string::npos){
+            planner_k_randomvertex->as<og::QRRTStar>()->setGraphSampler("randomvertex");
+            planner_k_randomedge->as<og::QRRTStar>()->setGraphSampler("randomedge");
+            planner_k_randomdegreevertex->as<og::QRRTStar>()->setGraphSampler("randomdegreevertex");
+          }
+          else if(name_algorithm.find("qmp") != std::string::npos){
+            planner_k_randomvertex->as<og::QMP>()->setGraphSampler("randomvertex");
+            planner_k_randomedge->as<og::QMP>()->setGraphSampler("randomedge");
+            planner_k_randomdegreevertex->as<og::QMP>()->setGraphSampler("randomdegreevertex");
+          }
+          else if(name_algorithm.find("qmpstar") != std::string::npos){
+            planner_k_randomvertex->as<og::QMPStar>()->setGraphSampler("randomvertex");
+            planner_k_randomedge->as<og::QMPStar>()->setGraphSampler("randomedge");
+            planner_k_randomdegreevertex->as<og::QMPStar>()->setGraphSampler("randomdegreevertex");
+          }
+          else if(name_algorithm.find("spqr") != std::string::npos){
+            planner_k_randomvertex->as<og::SPQR>()->setGraphSampler("randomvertex");
+            planner_k_randomedge->as<og::SPQR>()->setGraphSampler("randomedge");
+            planner_k_randomdegreevertex->as<og::SPQR>()->setGraphSampler("randomdegreevertex");
+          }
+          
+          
+          std::string name_algorithm_strat = planner_k_randomvertex->getName(); //;//+ "_(";
+
+          std::vector<ob::SpaceInformationPtr> si_vec_k = stratifications.at(i)->si_vec;
+          /*for (uint j = 0; j < si_vec_k.size(); j++)
+          {
+            if (j >= si_vec_k.size() - 1 && shortStratification)
+              break;
+            uint Nj = si_vec_k.at(j)->getStateDimension();
+            name_algorithm_strat += std::to_string(Nj);
+            if (j < si_vec_k.size() - 1)
+              name_algorithm_strat += "|";
+          }
+          name_algorithm_strat += ")";*/
+
+          std::string name_algorithm_1 = name_algorithm_strat + "(randomvertex)";
+          std::string name_algorithm_2 = name_algorithm_strat + "(randomedge)";
+          std::string name_algorithm_3 = name_algorithm_strat + "(degreevertex)";
+
+          planner_k_randomvertex->setName(name_algorithm_1);
+          planner_k_randomedge->setName(name_algorithm_2);
+          planner_k_randomdegreevertex->setName(name_algorithm_3);
+          
+          std::cout << "adding planner with ambient space " << si_vec_k.back()->getStateDimension() << std::endl;
+          
+          
+          benchmark.addPlanner(planner_k_randomvertex);
+          planner_ctr++;
+
+          benchmark.addPlanner(planner_k_randomedge);
+          planner_ctr++;
+
+          benchmark.addPlanner(planner_k_randomdegreevertex);
+          planner_ctr++;
+        }
+        else if(util::StartsWith(name_algorithm, "hierarchy:FeasiblePathRestriction")){
+
+          std::string algo_name = name_algorithm.replace(9,24,"");
+
+          std::cout << "distance metric benchmark algorithm  :  " << algo_name << std::endl;
+
+          
+          ob::PlannerPtr planner_k_true = GetPlanner(algo_name, stratifications.at(i));
+
+          ob::PlannerPtr planner_k_false = GetPlanner(algo_name, stratifications.at(i));
+
+
+          if(name_algorithm.find("qrrt") != std::string::npos){
+            planner_k_true->as<og::QRRT>()->setFeasiblePathRestriction(true);
+            planner_k_false->as<og::QRRT>()->setFeasiblePathRestriction(false);
+          }
+          else if(name_algorithm.find("qrrtstar") != std::string::npos){
+            planner_k_true->as<og::QRRTStar>()->setFeasiblePathRestriction(true);
+            planner_k_false->as<og::QRRTStar>()->setFeasiblePathRestriction(false);
+          }
+          else if(name_algorithm.find("qmp") != std::string::npos){
+            planner_k_true->as<og::QMP>()->setFeasiblePathRestriction(true);
+            planner_k_false->as<og::QMP>()->setFeasiblePathRestriction(false);
+          }
+          else if(name_algorithm.find("qmpstar") != std::string::npos){
+            planner_k_true->as<og::QMPStar>()->setFeasiblePathRestriction(true);
+            planner_k_false->as<og::QMPStar>()->setFeasiblePathRestriction(false);
+          }
+          else if(name_algorithm.find("spqr") != std::string::npos){
+            planner_k_true->as<og::SPQR>()->setFeasiblePathRestriction(true);
+            planner_k_false->as<og::SPQR>()->setFeasiblePathRestriction(false);
+          }
+          
+          
+          std::string name_algorithm_strat = planner_k_true->getName() ;//+ "_(";
+
+          std::vector<ob::SpaceInformationPtr> si_vec_k = stratifications.at(i)->si_vec;
+         /* for (uint j = 0; j < si_vec_k.size(); j++)
+          {
+            if (j >= si_vec_k.size() - 1 && shortStratification)
+              break;
+            uint Nj = si_vec_k.at(j)->getStateDimension();
+            name_algorithm_strat += std::to_string(Nj);
+            if (j < si_vec_k.size() - 1)
+              name_algorithm_strat += "|";
+          }
+          name_algorithm_strat += ")";*/
+
+          std::string name_algorithm_1 = name_algorithm_strat + "(Find Section)";
+          std::string name_algorithm_2 = name_algorithm_strat + "(No Find Section)";
+
+          planner_k_true->setName(name_algorithm_1);
+          planner_k_false->setName(name_algorithm_2);
+          
+          std::cout << "adding planner with ambient space " << si_vec_k.back()->getStateDimension() << std::endl;
+          
+          
+          benchmark.addPlanner(planner_k_true);
+          planner_ctr++;
+
+          benchmark.addPlanner(planner_k_false);
+          planner_ctr++;
+        }
+        else {
+          
+
+          ob::PlannerPtr planner_k_i = GetPlanner(binput.algorithms.at(k), stratifications.at(i));
+
+          std::string name_algorithm_strat = planner_k_i->getName()+"_(";
+
+          std::vector<ob::SpaceInformationPtr> si_vec_k = stratifications.at(i)->si_vec;
+          for(uint j = 0; j < si_vec_k.size(); j++){
+            if(j>=si_vec_k.size()-1 && shortStratification) break;
+            uint Nj = si_vec_k.at(j)->getStateDimension();
+            name_algorithm_strat += std::to_string(Nj);
+            if(j < si_vec_k.size()-1) name_algorithm_strat += "|";
+          }
+          name_algorithm_strat += ")";
+
+          if(stratifications.size() > 1)
+          {
+            planner_k_i->setName(name_algorithm_strat);
+          }
+          std::cout << "adding planner with ambient space " << si_vec_k.back()->getStateDimension() << std::endl;
+          benchmark.addPlanner(planner_k_i);
+          planner_ctr++;
+
+        }
       }
     }else{
       benchmark.addPlanner(GetPlanner(binput.algorithms.at(k), stratifications.at(0)));

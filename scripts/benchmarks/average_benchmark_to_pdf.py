@@ -2,23 +2,67 @@ import numpy as np
 import sys
 import re
 import matplotlib.pyplot as plt
-plt.rcParams.update({'font.size': 22})
-#plt.rcParams.update({'font.family': 'cmr'})
+plt.rcParams.update({'font.size': 30})
+plt.rcParams.update({'font.family': 'cmr'})
 
 from matplotlib.backends.backend_pdf import PdfPages
 from xml.dom.minidom import parse
 import os
-import sys
+import glob
 
-def XMLtoPDF(fname, histogram=False):
-  fname_base, fname_ext = os.path.splitext(fname)
-  fname_pdf = fname_base + ".pdf"
+def createBenchmark(folderName):
+  files = glob.glob(folderName + "/*.xml")
 
-  ###################################################################################
-  #GET DATA
-  ###################################################################################
+  fname_pdf = folderName + "/average.pdf"
+  
+  meandData = None
+  runcount = 0
+  timelimit = 0
+  vnames = []
+  b_names = []
+  for file in files:
+    print(file)
+    benchmark_name, runcount, timelimit, vnames, vtimes = readXML(file)
+
+    b_names.append(benchmark_name)
+    #print("vtimes", vtimes)
+    #print(vtimes.shape)
+
+    if vtimes.shape[0]<=1:
+      vtimes = np.vstack((vtimes,vtimes))
+
+    means = np.mean(vtimes,axis=0)
+
+    #print("vtimes", vtimes)
+    #print("means", means)
+
+    if meandData is None:
+      meandData = np.zeros(means.shape)
+    meandData = meandData + means
+  
+  print("runcount", runcount)
+  print("timelimit", timelimit)
+  print("vnames",vnames)
+
+  #print("meandData", meandData)
+  meandData = meandData / len(files)
+  #print("meandData2" , meandData)
+  
+  timelimit = 1.25 * meandData.max()
+
+  #vnames = [w.replace('_', '\n') for w in vnames]
+
+  plotBenchmarks(fname_pdf, runcount, timelimit, vnames, meandData, b_names)
+
+###################################################################################
+#GET DATA
+###################################################################################
+def readXML(fname):
   doc = parse(fname)
   name = doc.getElementsByTagName("name")[0]
+
+  benchmark_name = name.firstChild.data
+  print("benchmark name", benchmark_name)
 
   planners = doc.getElementsByTagName("planner")
   nr_planners = int(doc.getElementsByTagName("number_of_planners")[0].firstChild.data)
@@ -51,34 +95,38 @@ def XMLtoPDF(fname, histogram=False):
       vnodes[c_ctr,p_ctr] = nodes
       vsuccess[c_ctr,p_ctr] = success
       c_ctr=c_ctr+1
-    print ("name:", name, 
-        " time: ", np.mean(vtimes[:,p_ctr]), 
-        "+/-", np.std(vtimes[:,p_ctr]))
+    #print ("name:", name,  " time: ", np.mean(vtimes[:,p_ctr]), "+/-", np.std(vtimes[:,p_ctr]))
     p_ctr=p_ctr+1
+  
+  return benchmark_name, runcount, timelimit, vnames, vtimes
 
 
-  ###################################################################################
-  #PLOTTING
-  ###################################################################################
+
+###################################################################################
+#PLOTTING
+###################################################################################
+
+
+def plotBenchmarks(fname_pdf, runcount, timelimit, vnames, means, benchmark_name):
   pp = PdfPages(fname_pdf)
   # fig = plt.figure(0)
   fig = plt.figure(figsize=(20,10))
   ax = fig.gca()
   fig.patch.set_facecolor('white')
   # ax.set_xlabel('Algorithm')
-  ax.set_ylim([0,timelimit+0.15*timelimit]);
+  ax.set_ylim([0,timelimit+0.15*timelimit])
   ax.set_ylabel('Time (s)')
 
-  if vtimes.shape[0]<=1:
-    vtimes = np.vstack((vtimes,vtimes))
+  #if vtimes.shape[0]<=1:
+    #vtimes = np.vstack((vtimes,vtimes))
 
-  means = np.mean(vtimes,axis=0)
+  #means = np.mean(vtimes,axis=0)
 
-  if histogram:
-    plt.boxplot(vtimes, notch=0, sym='k+', vert=1, whis=1.5)
-  else:
-    print(means)
-    plt.bar(vnames, means)
+  #if histogram:
+    #plt.boxplot(vtimes, notch=0, sym='k+', vert=1, whis=1.5)
+  #else:
+  print(means)
+  plt.bar(vnames, means)
     # plt.boxplot(vtimes, notch=0, sym='k+', vert=1, whis=1.5)
 
   plannerLabelRotation=85
@@ -88,8 +136,8 @@ def XMLtoPDF(fname, histogram=False):
   ###################################################################################
   #max lowest mean value be visualized as bold
   ###################################################################################
-  bestTimeIdx = np.mean(vtimes,axis=0).argmin()
-  bestTime = np.mean(vtimes,axis=0).min()
+  bestTimeIdx = means.argmin() # np.mean(vtimes,axis=0).argmin()
+  bestTime = means.min() # np.mean(vtimes,axis=0).min()
   ##only if bestTime is unique
   if bestTime < timelimit:
     ctr = 0
@@ -111,31 +159,29 @@ def XMLtoPDF(fname, histogram=False):
   ax.axhline(timelimit,color='k',linestyle='--')
   txt = "[%3.0d run average]"%runcount
   ax.text(0.65, 0.93, txt, horizontalalignment='left', verticalalignment='center', transform = ax.transAxes)
+  
+  benchmark_name_txt = ', '.join(benchmark_name)
+  plt.title(benchmark_name_txt)
   ###################################################################################
 
   plt.tight_layout()
   pp.savefig(plt.gcf(), pad_inches=0.0, bbox_inches='tight')
   pp.close()
-  #plt.show()
+  plt.show()
 
   cmd = "apvlv "+fname_pdf
-  #os.system(cmd)
-  sys.exit(1)
+  os.system(cmd)
+
+
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
-  Nargs = len(sys.argv)
-  args = str(sys.argv)
-  if Nargs>1:
-    for fname in sys.argv[1:]:
-      XMLtoPDF(fname)
-  else:
-    fname = "../../data/benchmarks/last.xml"
-    #fname = "../../data/benchmarks/54D_octopus_2020_05_25_13:54:57.xml"
-    #fname = "../../data/benchmarks/48D_SE3C_drones_2020_05_25_14:09:49.xml"
-    #fname = "../../data/benchmarks/72D_SE2RN_R2_mobile_manipulators_2020_05_25_14:17:14.xml"
-    #fname = "../../data/benchmarks/30D_airport_2020_05_25_14:37:03.xml"
-    #fname = "../../data/benchmarks/24D_crossing_cars_2020_05_25_14:48:27.xml"
-    #fname = "../../data/benchmarks/21D_box_folding_2020_05_25_14:56:05.xml"
-    #fname = "../../data/benchmarks/37D_shadowhand_pregrasp_2020_05_25_15:13:32.xml"
-    XMLtoPDF(fname)
+  folderName = "../../data/benchmarks/average_all"
+  createBenchmark(folderName)
 
