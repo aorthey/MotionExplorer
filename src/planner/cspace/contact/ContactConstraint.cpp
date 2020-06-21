@@ -1,5 +1,4 @@
 #include <ompl/base/Constraint.h>
-#include <Library/KrisLibrary/math3d/geometry3d.cpp>
 #include "planner/cspace/contact/ContactConstraint.h"
 #include "planner/cspace/cspace_geometric_R2_CONTACT.h"
 
@@ -116,7 +115,7 @@ void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eig
 //            closestPt = cP;
 //        }
 //    }
-//
+//// remember to #include <Library/KrisLibrary/math3d/geometry3d.cpp> for this to work
 ////    GeometricPrimitive3D gP3D = GeometricPrimitive3D(closestPt);
 ////    Real dist = gP3D.Distance(trisFiltered.at(0));
 ////     std::cout << "Check that 'closestPt' is on surface Triangle: " << dist << std::endl;

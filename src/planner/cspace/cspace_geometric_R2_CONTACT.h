@@ -11,7 +11,6 @@ class GeometricCSpaceOMPLRCONTACT: public GeometricCSpaceOMPL
 {
 protected:
     ob::ConstraintPtr constraint;
-    ob::ConstrainedStateSpacePtr css;
 
 public:
     GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int robot_idx);

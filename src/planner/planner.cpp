@@ -42,11 +42,13 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
   CSpaceOMPL* cspace_level;
   if(input.freeFloating){
     if(type=="R2") {
-      cspace_level = factory.MakeGeometricCSpaceRN(world, robot_inner_idx, 2);
-    }else if(type=="R_CONTACT") {
-      cspace_level = factory.MakeGeometricCSpaceRCONTACT(world, robot_inner_idx);
+        cspace_level = factory.MakeGeometricCSpaceRN(world, robot_inner_idx, 2);
     }else if(type=="R3") {
-      cspace_level = factory.MakeGeometricCSpaceRN(world, robot_inner_idx, 3);
+        cspace_level = factory.MakeGeometricCSpaceRN(world, robot_inner_idx, 3);
+    }else if(type=="R2_CONTACT") {
+        cspace_level = factory.MakeGeometricCSpaceRCONTACT(world, robot_inner_idx);
+    }else if(type=="R3_CONTACT") {
+        cspace_level = factory.MakeGeometricCSpaceRCONTACT_3D(world, robot_inner_idx);
     }else if(type=="R3S2"){
       cspace_level = factory.MakeGeometricCSpaceR3S2(world, robot_inner_idx);
     }else if(type=="SE3"){

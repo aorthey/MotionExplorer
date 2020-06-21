@@ -25,7 +25,7 @@
     <freeFloating>1</freeFloating>
 
     <hierarchy>
-      <level inner_index="0" type="R_CONTACT"/>
+      <level inner_index="0" type="R3_CONTACT"/>
     </hierarchy>
 
   </plannerinput>

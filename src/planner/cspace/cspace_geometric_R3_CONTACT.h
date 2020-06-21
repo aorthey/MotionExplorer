@@ -7,14 +7,13 @@
 #include <ompl/base/spaces/constraint/ConstrainedStateSpace.h>
 
 
-class GeometricCSpaceOMPLRCONTACT: public GeometricCSpaceOMPL
+class GeometricCSpaceOMPLRCONTACT_3D: public GeometricCSpaceOMPL
 {
 protected:
     ob::ConstraintPtr constraint;
-    ob::ConstrainedStateSpacePtr css;
 
 public:
-    GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int robot_idx);
+    GeometricCSpaceOMPLRCONTACT_3D(RobotWorld *world_, int robot_idx);
 
 
     virtual void initSpace() override;
