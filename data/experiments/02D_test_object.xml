@@ -12,7 +12,6 @@
   <!-- <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 +1.0 0" rotateRPY="0 0 0"/> -->
   <!-- <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -8.0 0" rotateRPY="0 0 0"/> --1> -->
 
-
   <plannerinput>
 
     <qinit  config="10  1.75 -2.5 0 0 0 0  2.6 0.0 1.0 0 "/> <!-- config="dim  x y z yaw roll pitch  theta phi phi endeff" -->
@@ -36,6 +35,3 @@
 
   </plannerinput>
 </world>
-
-
-
