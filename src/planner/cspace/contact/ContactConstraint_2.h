@@ -3,17 +3,16 @@
 #include "planner/cspace/cspace_geometric.h"
 #include <ompl/base/spaces/constraint/ConstrainedStateSpace.h>
 
-class GeometricCSpaceOMPLRCONTACT_3D;
+class GeometricCSpaceOMPLRCONTACT;
 
-class ContactConstraint_3D : public ob::Constraint
+class ContactConstraint_2 : public ob::Constraint
 {
 protected:
-    std::vector<Triangle3D> tris;
     std::vector<Triangle3D> trisFiltered;
     std::vector<Vector2> cornerCoord;
 
 public:
-    ContactConstraint_3D(GeometricCSpaceOMPLRCONTACT_3D *cspace, Robot *robot, RobotWorld *world);
+    ContactConstraint_2(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world);
 
 
     Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd, int linkNumber) const;
@@ -57,7 +56,7 @@ public:
 
 
 private:
-    GeometricCSpaceOMPLRCONTACT_3D *cspace_;
+    GeometricCSpaceOMPLRCONTACT *cspace_;
     Robot *robot_;
     RobotWorld *world_;
 };

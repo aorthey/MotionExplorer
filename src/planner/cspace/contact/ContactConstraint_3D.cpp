@@ -15,8 +15,6 @@ ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
      * Saves all triangles that are feasible contact surfaces into member variable "trisFiltered".
      */
 
-    std::vector<Triangle3D> tris;
-
     for(uint k = 0; k < world_->terrains.size(); k++){
         Terrain* terrain_k = world_->terrains[k];
         const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();
@@ -27,27 +25,27 @@ ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
             tris.push_back(tri);
         }
     }
-    for(uint l = 0; l < tris.size(); l++){
-        Vector3 normal = tris.at(l).normal();
-        double epsilon = 1e-10;
-
-        if(fabs((fabs(normal[2]) - 1.0))<epsilon){
-            //does nothing
-        }
-        else{
-            // only x and y coordinates
-            Vector2 a = Vector2(tris.at(l).a[0], tris.at(l).a[1]);
-            Vector2 b = Vector2(tris.at(l).b[0], tris.at(l).b[1]);
-            Vector2 c = Vector2(tris.at(l).c[0], tris.at(l).c[1]);
-
-            cornerCoord.push_back(a);
-            cornerCoord.push_back(b);
-            cornerCoord.push_back(c);
-
-            trisFiltered.push_back(tris.at(l));
-        }
-    }
-    std::cout << "Environment has " << trisFiltered.size() << " triangles to make contact!" << std::endl;
+//    for(uint l = 0; l < tris.size(); l++){
+//        Vector3 normal = tris.at(l).normal();
+//        double epsilon = 1e-10;
+//
+//        if(fabs((fabs(normal[2]) - 1.0))<epsilon){
+//            //does nothing
+//        }
+//        else{
+//            // only x and y coordinates
+//            Vector2 a = Vector2(tris.at(l).a[0], tris.at(l).a[1]);
+//            Vector2 b = Vector2(tris.at(l).b[0], tris.at(l).b[1]);
+//            Vector2 c = Vector2(tris.at(l).c[0], tris.at(l).c[1]);
+//
+//            cornerCoord.push_back(a);
+//            cornerCoord.push_back(b);
+//            cornerCoord.push_back(c);
+//
+//            trisFiltered.push_back(tris.at(l));
+//        }
+//    }
+    std::cout << "Environment has " << tris.size() << " triangles to make contact!" << std::endl;
 
 }
 
@@ -89,8 +87,8 @@ void ContactConstraint_3D::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
 
     Real distances = 1000;
     //loop over all surface triangles to get triangle that's closest
-    for (uint j = 0; j < trisFiltered.size(); j++) {
-        Vector3 cP = trisFiltered.at(j).closestPoint(contact_firstLink);
+    for (uint j = 0; j < tris.size(); j++) {
+        Vector3 cP = tris.at(j).closestPoint(contact_firstLink);
         Real d = contact_firstLink.distance(cP);
         if (distances > d){
 

@@ -1,9 +1,9 @@
 #include <ompl/base/Constraint.h>
-#include "planner/cspace/contact/ContactConstraint.h"
+#include "planner/cspace/contact/ContactConstraint_2.h"
 #include "planner/cspace/cspace_geometric_R2_CONTACT.h"
 
 
-ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world):
+ContactConstraint_2::ContactConstraint_2(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world):
 ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
 , cspace_(cspace)
 , robot_(robot)
@@ -62,7 +62,7 @@ ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
 
 }
 
-Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd, int linkNumber) const
+Vector3 ContactConstraint_2::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd, int linkNumber) const
 {
     /**
      * Member function of class ContactConstraint:
@@ -96,52 +96,27 @@ Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd, i
     return v;
 }
 
-void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
+void ContactConstraint_2::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
 {
     // ---------- Contact with First Link ------------------
-//    int firstLink = 6;
-//    Vector3 contact_firstLink = getPos(x, firstLink);
-//
-//    Vector3 closestPt = trisFiltered.at(6).closestPoint(contact_firstLink);
-//
-//    Real distances = 1000;
-//    //loop over all surface triangles to get triangle that's closest
-//    for (uint j = 0; j < trisFiltered.size(); j++) {
-//        Vector3 cP = trisFiltered.at(j).closestPoint(contact_firstLink);
-//        Real d = contact_firstLink.distance(cP);
-//        if (distances > d){
-//
-//            distances = d;
-//            closestPt = cP;
-//        }
-//    }
-//// remember to #include <Library/KrisLibrary/math3d/geometry3d.cpp> for this to work
-////    GeometricPrimitive3D gP3D = GeometricPrimitive3D(closestPt);
-////    Real dist = gP3D.Distance(trisFiltered.at(0));
-////     std::cout << "Check that 'closestPt' is on surface Triangle: " << dist << std::endl;
-//
-//    Real distVect = contact_firstLink.distance(closestPt);
+    int firstLink = 6;
+    Vector3 contact_firstLink = getPos(x, firstLink);
 
+    Vector3 closestPt = trisFiltered.at(6).closestPoint(contact_firstLink);
 
-    // ---------- Contact with Last Link ------------------
-    int lastLink = robot_->links.size() - 1;
-    Vector3 contact_lastLink = getPos(x, lastLink);
-
-    Vector3 closestPt_last = trisFiltered.at(6).closestPoint(contact_lastLink);
-
-    Real distances_last = 1000;
+    Real distances = 1000;
     //loop over all surface triangles to get triangle that's closest
     for (uint j = 0; j < trisFiltered.size(); j++) {
-        Vector3 cP = trisFiltered.at(j).closestPoint(contact_lastLink);
-        Real d = contact_lastLink.distance(cP);
-        if (distances_last > d){
+        Vector3 cP = trisFiltered.at(j).closestPoint(contact_firstLink);
+        Real d = contact_firstLink.distance(cP);
+        if (distances > d){
 
-            distances_last = d;
-            closestPt_last = cP;
+            distances = d;
+            closestPt = cP;
         }
     }
-    Real distVect_last = contact_lastLink.distance(closestPt_last);
 
-      //out[0] = distVect;
-      out[0] = distVect_last;
+    Real distVect = contact_firstLink.distance(closestPt);
+
+      out[0] = distVect;
 }
