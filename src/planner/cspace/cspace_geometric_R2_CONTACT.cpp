@@ -1,6 +1,7 @@
 #include "common.h"
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
+#include <ompl/base/Constraint.h>
 #include "planner/cspace/contact/ContactConstraint.h"
 #include "planner/cspace/contact/ContactConstraint_2.h"
 
@@ -41,14 +42,16 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
     bounds.check();
     static_pointer_cast<ob::RealVectorStateSpace>(Rn)->setBounds(bounds);
 
-    //Constrained State Space
-    constraint_firstLink = std::make_shared<ContactConstraint_2>(this, robot, world);
-    constraint_lastLink = std::make_shared<ContactConstraint>(this, robot, world);
+    //Constraint Pointer Vector
+    constraints.push_back(std::make_shared<ContactConstraint_2>(this, robot, world));
+    constraints.push_back(std::make_shared<ContactConstraint>(this, robot, world));
 
-    ob::StateSpacePtr RN_FirstLink = std::make_shared<ob::ProjectedStateSpace>(Rn, constraint_firstLink);
-    ob::StateSpacePtr RN_LastLink =  std::make_shared<ob::ProjectedStateSpace>(Rn, constraint_lastLink);
+    //Constraint Intersection
+    constraint_intersect = std::make_shared<ompl::base::ConstraintIntersection>(6, constraints);
 
-    this->space = RN_FirstLink + RN_LastLink;
+    ob::StateSpacePtr RN_Constraint =  std::make_shared<ob::ProjectedStateSpace>(Rn, constraint_intersect);
+
+    this->space = RN_Constraint;
 }
 
 ob::SpaceInformationPtr GeometricCSpaceOMPLRCONTACT::SpaceInformationPtr()

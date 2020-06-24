@@ -48,7 +48,6 @@ ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
             //std::cout << tris.at(l) << std::endl;
         }
     }
-    //std::cout << "Environment has " << trisFiltered.size() << " triangles to make contact!" << std::endl;
 
     // remove all duplicates of (2D) corner coordinates
     auto end = cornerCoord.end();
@@ -56,9 +55,6 @@ ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
         end = std::remove(it + 1, end, *it);
     }
     cornerCoord.erase(end, cornerCoord.end());
-    //std::cout << "Filtered corner coordinates: " << cornerCoord << std::endl;
-
-    // robot = world_->robots[robot_idx];
 
 }
 
@@ -83,9 +79,6 @@ Vector3 ContactConstraint_2::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd,
     robot_->UpdateGeometry();
     Vector3 zero;
     zero.setZero();
-
-    //int lastLink = robot_->links.size() - 1;
-    //int firstLink = 6; // first 6 links are virtual links x,y,z, yaw, pitch, roll
 
     //NOTE: the world position is zero exactly at the point where link is
     //attached using a joint to the whole linkage. Check where your last fixed
@@ -118,5 +111,5 @@ void ContactConstraint_2::function(const Eigen::Ref<const Eigen::VectorXd> &x, E
 
     Real distVect = contact_firstLink.distance(closestPt);
 
-      out[0] = distVect;
+    out[0] = distVect;
 }

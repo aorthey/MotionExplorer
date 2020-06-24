@@ -10,8 +10,8 @@
 class GeometricCSpaceOMPLRCONTACT: public GeometricCSpaceOMPL
 {
 protected:
-    ob::ConstraintPtr constraint_firstLink;
-    ob::ConstraintPtr constraint_lastLink;
+    std::vector<ob::ConstraintPtr> constraints;
+    ob::ConstraintPtr  constraint_intersect;
 
 public:
     GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int robot_idx);

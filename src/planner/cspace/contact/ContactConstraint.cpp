@@ -84,9 +84,6 @@ Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd, i
     Vector3 zero;
     zero.setZero();
 
-    //int lastLink = robot_->links.size() - 1;
-    //int firstLink = 6; // first 6 links are virtual links x,y,z, yaw, pitch, roll
-
     //NOTE: the world position is zero exactly at the point where link is
     //attached using a joint to the whole linkage. Check where your last fixed
     //joint is positioned, before questioning the validity of this method

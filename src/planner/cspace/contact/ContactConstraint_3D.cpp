@@ -45,7 +45,7 @@ ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
 //            trisFiltered.push_back(tris.at(l));
 //        }
 //    }
-    std::cout << "Environment has " << tris.size() << " triangles to make contact!" << std::endl;
+//    std::cout << "Environment has " << tris.size() << " triangles to make contact!" << std::endl;
 
 }
 
@@ -82,6 +82,7 @@ void ContactConstraint_3D::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
     // ---------- Contact with First Link ------------------
     int firstLink = 6;
     Vector3 contact_firstLink = getPos(x, firstLink);
+
 
     Vector3 closestPt = trisFiltered.at(6).closestPoint(contact_firstLink);
 
