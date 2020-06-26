@@ -3,11 +3,12 @@
 #include "planner/cspace/cspace_geometric_R2_CONTACT.h"
 
 
-ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world):
-ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
-, cspace_(cspace)
-, robot_(robot)
-, world_(world)
+ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber):
+        ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
+        , cspace_(cspace)
+        , robot_(robot)
+        , world_(world)
+        , linkNumber_(linkNumber)
 {
     /**
      * Information on obstacle surface triangles.
@@ -48,7 +49,6 @@ ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
             //std::cout << tris.at(l) << std::endl;
         }
     }
-    //std::cout << "Environment has " << trisFiltered.size() << " triangles to make contact!" << std::endl;
 
     // remove all duplicates of (2D) corner coordinates
     auto end = cornerCoord.end();
@@ -56,13 +56,10 @@ ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
         end = std::remove(it + 1, end, *it);
     }
     cornerCoord.erase(end, cornerCoord.end());
-    //std::cout << "Filtered corner coordinates: " << cornerCoord << std::endl;
-
-    // robot = world_->robots[robot_idx];
 
 }
 
-Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd, int linkNumber) const
+Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const
 {
     /**
      * Member function of class ContactConstraint:
@@ -88,57 +85,31 @@ Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd, i
     //attached using a joint to the whole linkage. Check where your last fixed
     //joint is positioned, before questioning the validity of this method
     Vector3 v;
-    robot_->GetWorldPosition(zero, linkNumber, v);
+    robot_->GetWorldPosition(zero, linkNumber_, v);
 
     return v;
 }
 
 void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
 {
-    // ---------- Contact with First Link ------------------
-//    int firstLink = 6;
-//    Vector3 contact_firstLink = getPos(x, firstLink);
-//
-//    Vector3 closestPt = trisFiltered.at(6).closestPoint(contact_firstLink);
-//
-//    Real distances = 1000;
-//    //loop over all surface triangles to get triangle that's closest
-//    for (uint j = 0; j < trisFiltered.size(); j++) {
-//        Vector3 cP = trisFiltered.at(j).closestPoint(contact_firstLink);
-//        Real d = contact_firstLink.distance(cP);
-//        if (distances > d){
-//
-//            distances = d;
-//            closestPt = cP;
-//        }
-//    }
-//// remember to #include <Library/KrisLibrary/math3d/geometry3d.cpp> for this to work
-////    GeometricPrimitive3D gP3D = GeometricPrimitive3D(closestPt);
-////    Real dist = gP3D.Distance(trisFiltered.at(0));
-////     std::cout << "Check that 'closestPt' is on surface Triangle: " << dist << std::endl;
-//
-//    Real distVect = contact_firstLink.distance(closestPt);
+    // ---------- Contact with chosen Link ------------------
+    Vector3 contact = getPos(x);
 
+    Vector3 closestPt = trisFiltered.at(6).closestPoint(contact);
 
-    // ---------- Contact with Last Link ------------------
-    int lastLink = robot_->links.size() - 1;
-    Vector3 contact_lastLink = getPos(x, lastLink);
-
-    Vector3 closestPt_last = trisFiltered.at(6).closestPoint(contact_lastLink);
-
-    Real distances_last = 1000;
+    Real distances = 1000;
     //loop over all surface triangles to get triangle that's closest
     for (uint j = 0; j < trisFiltered.size(); j++) {
-        Vector3 cP = trisFiltered.at(j).closestPoint(contact_lastLink);
-        Real d = contact_lastLink.distance(cP);
-        if (distances_last > d){
+        Vector3 cP = trisFiltered.at(j).closestPoint(contact);
+        Real d = contact.distance(cP);
 
-            distances_last = d;
-            closestPt_last = cP;
+        if (distances > d){
+            distances = d;
+            closestPt = cP;
         }
     }
-    Real distVect_last = contact_lastLink.distance(closestPt_last);
 
-      //out[0] = distVect;
-      out[0] = distVect_last;
+    Real distVect = contact.distance(closestPt);
+
+    out[0] = distVect;
 }

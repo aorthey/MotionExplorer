@@ -3,7 +3,6 @@
 #include <ompl/base/spaces/SE2StateSpace.h>
 #include <ompl/base/Constraint.h>
 #include "planner/cspace/contact/ContactConstraint.h"
-#include "planner/cspace/contact/ContactConstraint_2.h"
 
 #include "planner/cspace/cspace_geometric_R2_CONTACT.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
@@ -43,8 +42,10 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
     static_pointer_cast<ob::RealVectorStateSpace>(Rn)->setBounds(bounds);
 
     //Constraint Pointer Vector
-    constraints.push_back(std::make_shared<ContactConstraint_2>(this, robot, world));
-    constraints.push_back(std::make_shared<ContactConstraint>(this, robot, world));
+    int firstLink = 6;
+    int lastLink  = robot->links.size() - 1;
+    constraints.push_back(std::make_shared<ContactConstraint>(this, robot, world, firstLink));
+    constraints.push_back(std::make_shared<ContactConstraint>(this, robot, world, lastLink));
 
     //Constraint Intersection
     constraint_intersect = std::make_shared<ompl::base::ConstraintIntersection>(6, constraints);

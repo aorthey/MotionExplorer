@@ -3,6 +3,15 @@
 #include "planner/cspace/cspace_geometric.h"
 #include <ompl/base/spaces/constraint/ConstrainedStateSpace.h>
 
+/*****************************************************
+ * Contact Constraint for a link that doesn't break contact with initial contact surface.
+ *
+ * @param cspace
+ * @param robot
+ * @param world
+ * @param linkNumber
+ * ***************************************************/
+
 class GeometricCSpaceOMPLRCONTACT;
 
 class ContactConstraint : public ob::Constraint
@@ -12,10 +21,10 @@ protected:
     std::vector<Vector2> cornerCoord;
 
 public:
-    ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world);
+    ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber);
 
 
-    Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd, int linkNumber) const;
+    Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const;
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override;
 
 
@@ -59,4 +68,5 @@ private:
     GeometricCSpaceOMPLRCONTACT *cspace_;
     Robot *robot_;
     RobotWorld *world_;
+    uint linkNumber_;
 };

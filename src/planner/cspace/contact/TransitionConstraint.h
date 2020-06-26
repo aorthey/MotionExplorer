@@ -5,17 +5,15 @@
 
 class GeometricCSpaceOMPLRCONTACT;
 
-class ContactConstraint_2 : public ob::Constraint
+class TransitionConstraint : public ob::Constraint
 {
 protected:
     std::vector<Triangle3D> trisFiltered;
-    std::vector<Vector2> cornerCoord;
 
 public:
-    ContactConstraint_2(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world);
+    TransitionConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint mode);
 
-
-    Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd, int linkNumber) const;
+    Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const;
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override;
 
 
@@ -59,4 +57,6 @@ private:
     GeometricCSpaceOMPLRCONTACT *cspace_;
     Robot *robot_;
     RobotWorld *world_;
+    uint  linkNumber_;
+    uint mode_;
 };
