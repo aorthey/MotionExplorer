@@ -3,15 +3,28 @@
 #include "planner/cspace/cspace_geometric.h"
 #include <ompl/base/spaces/constraint/ConstrainedStateSpace.h>
 
+/*****************************************************
+ * Transition Contact Constraint
+ * -> link can either in contact with initial surface, unconstrained/in transition or in contact with different surface
+ *
+ * @param cspace
+ * @param robot
+ * @param world
+ * @param linkNumber
+ * @param obstacleNumber currently doesn't do anything
+ * @param mode
+ * ***************************************************/
+
 class GeometricCSpaceOMPLRCONTACT;
 
 class TransitionConstraint : public ob::Constraint
 {
 protected:
     std::vector<Triangle3D> trisFiltered;
+    std::vector<Triangle3D> trisFiltered_negative;
 
 public:
-    TransitionConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint mode);
+    TransitionConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber, uint mode);
 
     Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const;
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override;
@@ -58,5 +71,6 @@ private:
     Robot *robot_;
     RobotWorld *world_;
     uint  linkNumber_;
+    uint obstacleNumber_;
     uint mode_;
 };

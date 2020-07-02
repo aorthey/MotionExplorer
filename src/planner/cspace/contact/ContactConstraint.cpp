@@ -3,12 +3,13 @@
 #include "planner/cspace/cspace_geometric_R2_CONTACT.h"
 
 
-ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber):
+ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
         ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
         , cspace_(cspace)
         , robot_(robot)
         , world_(world)
         , linkNumber_(linkNumber)
+        , obstacleNumber_(obstacleNumber)
 {
     /**
      * Information on obstacle surface triangles.
@@ -45,8 +46,14 @@ ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot 
             cornerCoord.push_back(b);
             cornerCoord.push_back(c);
 
-            trisFiltered.push_back(tris.at(l));
-            //std::cout << tris.at(l) << std::endl;
+            // quick fix for distinction between two obstacles that dont touch
+            if(tris.at(l).a[0] < 0){
+                trisFiltered_negative.push_back(tris.at(l));
+
+            }else{
+                trisFiltered.push_back(tris.at(l));
+            }
+
         }
     }
 
@@ -92,22 +99,45 @@ Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) c
 
 void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
 {
-    // ---------- Contact with chosen Link ------------------
+    // ---------- Contact with chosen Link and chosen Obstacle ------------------
     Vector3 contact = getPos(x);
 
-    Vector3 closestPt = trisFiltered.at(6).closestPoint(contact);
-
+    Vector3 closestPt;
     Real distances = 1000;
-    //loop over all surface triangles to get triangle that's closest
-    for (uint j = 0; j < trisFiltered.size(); j++) {
-        Vector3 cP = trisFiltered.at(j).closestPoint(contact);
-        Real d = contact.distance(cP);
 
-        if (distances > d){
-            distances = d;
-            closestPt = cP;
+    if(obstacleNumber_ == 0){
+        // obstacle 0 is initial surface -> contact starts here
+
+        //loop over all surface triangles to get triangle that's closest
+        for (uint j = 0; j < trisFiltered.size(); j++) {
+            Vector3 cP = trisFiltered.at(j).closestPoint(contact);
+            Real d = contact.distance(cP);
+
+            if (distances > d){
+                distances = d;
+                closestPt = cP;
+            }
         }
+
+    }else if(obstacleNumber_ == 1){
+        // obstacle 1 has only negative x cordinates
+
+        //loop over all surface triangles to get triangle that's closest
+        for (uint j = 0; j < trisFiltered_negative.size(); j++) {
+            Vector3 cP = trisFiltered_negative.at(j).closestPoint(contact);
+            Real d = contact.distance(cP);
+
+            if (distances > d){
+                distances = d;
+                closestPt = cP;
+            }
+        }
+    }else{
+        std::cout << "Invalid Obstacle!" << std::endl;
+        std::exit(0);
     }
+
+
 
     Real distVect = contact.distance(closestPt);
 

@@ -3,6 +3,15 @@
 #include "planner/cspace/cspace_geometric.h"
 #include <ompl/base/spaces/constraint/ConstrainedStateSpace.h>
 
+/*****************************************************
+ * Contact Constraint in 3D
+ * -> contact with closest object surface
+ *
+ * @param cspace
+ * @param robot
+ * @param world
+ * ***************************************************/
+
 class GeometricCSpaceOMPLRCONTACT_3D;
 
 class ContactConstraint_3D : public ob::Constraint

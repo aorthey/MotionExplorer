@@ -4,12 +4,13 @@
 
 
 TransitionConstraint::TransitionConstraint
-(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint mode):
+(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber, uint mode):
 ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd) !!! gotta check these numbers !!!
         , cspace_(cspace)
         , robot_(robot)
         , world_(world)
         , linkNumber_(linkNumber)
+        , obstacleNumber_(obstacleNumber)
         , mode_(mode)
 {
     /**
@@ -39,7 +40,14 @@ ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd) !!! gotta check t
         }
         else{
 
-            trisFiltered.push_back(tris.at(l));
+            // quick fix for distinction between two obstacles that dont touch
+            if(tris.at(l).a[0] < 0){
+                trisFiltered_negative.push_back(tris.at(l));
+
+            }else{
+                trisFiltered.push_back(tris.at(l));
+            }
+
         }
     }
 
@@ -78,32 +86,11 @@ Vector3 TransitionConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd
 
 void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
 {
-    // ---------- Contact with First Link ------------------
-//    int firstLink = 6;
-//    Vector3 contact_firstLink = getPos(x, firstLink);
-//
-//    Vector3 closestPt = trisFiltered.at(6).closestPoint(contact_firstLink);
-//
-//    Real distances = 1000;
-//    //loop over all surface triangles to get triangle that's closest
-//    for (uint j = 0; j < trisFiltered.size(); j++) {
-//        Vector3 cP = trisFiltered.at(j).closestPoint(contact_firstLink);
-//        Real d = contact_firstLink.distance(cP);
-//        if (distances > d){
-//
-//            distances = d;
-//            closestPt = cP;
-//        }
-//    }
 //// remember to #include <Library/KrisLibrary/math3d/geometry3d.cpp> for this to work
 ////    GeometricPrimitive3D gP3D = GeometricPrimitive3D(closestPt);
 ////    Real dist = gP3D.Distance(trisFiltered.at(0));
 ////     std::cout << "Check that 'closestPt' is on surface Triangle: " << dist << std::endl;
-//
-//    Real distVect = contact_firstLink.distance(closestPt);
 
-
-    //out[0] = distVect;
 
     // Variable "mode" defines which constraint function is active
     // -> Contact with initial surface
@@ -114,9 +101,10 @@ void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
         // --------------- Mode 0: Contact with initial contact surface ---------------
         Vector3 contact = getPos(x);
 
-        Vector3 closestPt = trisFiltered.at(6).closestPoint(contact);
+        Vector3 closestPt;
 
         Real distances = 1000;
+
         //loop over all surface triangles to get triangle that's closest
         for (uint j = 0; j < trisFiltered.size(); j++) {
             Vector3 cP = trisFiltered.at(j).closestPoint(contact);
@@ -139,12 +127,12 @@ void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
         // --------------- Mode 2: Contact with different contact surface ---------------
         Vector3 contact = getPos(x);
 
-        Vector3 closestPt = trisFiltered.at(6).closestPoint(contact);  // !!! SURFACE CHOICE HERE !!!
+        Vector3 closestPt;  // !!! SURFACE CHOICE HERE !!!
 
         Real distances = 1000;
         //loop over all surface triangles to get triangle that's closest
-        for (uint j = 0; j < trisFiltered.size(); j++) {
-            Vector3 cP = trisFiltered.at(j).closestPoint(contact);
+        for (uint j = 0; j < trisFiltered_negative.size(); j++) {
+            Vector3 cP = trisFiltered_negative.at(j).closestPoint(contact);
             Real d = contact.distance(cP);
 
             if (distances > d){
