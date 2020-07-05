@@ -95,7 +95,7 @@ ENDFOREACH(SUBDIR)
 ENDFOREACH(SOURCETYPE)
 
 FILE(GLOB SUBDIR_SRC src/*.cpp)
-SET(ORTHOKLAMPT_SRC ${ORTHOKLAMPT_SRC} ${SUBDIR_SRC} src/planner/cspace/contact/ContactConstraint.h src/planner/cspace/contact/ContactConstraint.cpp src/planner/cspace/contact/TransitionConstraint.cpp src/planner/cspace/contact/TransitionConstraint.h)
+SET(ORTHOKLAMPT_SRC ${ORTHOKLAMPT_SRC} ${SUBDIR_SRC} src/planner/cspace/contact/ContactConstraint.h src/planner/cspace/contact/ContactConstraint.cpp src/planner/cspace/contact/TransitionConstraint.cpp src/planner/cspace/contact/TransitionConstraint.h src/planner/cspace/contact/ConstraintIntersection_Transition.cpp src/planner/cspace/contact/ConstraintIntersection_Transition.h)
 
 MESSAGE(COLOR_WHITE "-------------------------------------")
 MESSAGE(COLOR_WHITE "-- BUILDING EXECUTABLES")

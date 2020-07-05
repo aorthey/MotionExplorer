@@ -51,6 +51,17 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
     constraint_intersect = std::make_shared<ompl::base::ConstraintIntersection>(6, constraints);
 
     // constraintA, constraintB,... -> constraintIntersection -> constraintPtr
+    /*
+     *
+    // if constraint transition
+    // then sample uniform transition.mode(0,1,2)
+    // else
+    // contactconstraint
+    std::default_random_engine generator;
+    std::uniform_int_distribution<int> distribution(0,2);
+
+    int mode = distribution(generator);
+     */
     ob::StateSpacePtr RN_Constraint =  std::make_shared<ob::ProjectedStateSpace>(Rn, constraint_intersect);
 
     this->space = RN_Constraint;
