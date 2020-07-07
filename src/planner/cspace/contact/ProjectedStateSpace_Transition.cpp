@@ -1,41 +1,53 @@
 #include "planner/cspace/contact/ProjectedStateSpace_Transition.h"
+#include "planner/cspace/contact/ConstraintIntersection_Transition.h"
+#include "planner/cspace/contact/TransitionConstraint.h"
 #include <utility>
 
 /// ProjectedStateSampler
 
 /// Public
 
-ompl::base::ProjectedStateSampler::ProjectedStateSampler(const ProjectedStateSpace *space, StateSamplerPtr sampler)
-  : WrapperStateSampler(space, std::move(sampler)), constraint_(space->getConstraint())
-{
+ompl::base::ProjectedStateSamplerTransition::ProjectedStateSamplerTransition(const ProjectedStateSpaceTransition *space, StateSamplerPtr sampler)
+  : ProjectedStateSampler(reinterpret_cast<const ProjectedStateSpace *>(space), std::move(sampler))
+  , constraint_(space->getConstraint()) {
+    // check if multiple (constraintIntersection) or single constraint
+    const ConstraintIntersectionTransitionPtr cIP = std::dynamic_pointer_cast<ConstraintIntersectionTransition>(
+            space->getConstraint());
+    if (cIP != nullptr) {
+        constraintsVec = cIP->getConstraintsVec();
+    }
 }
 
-void ompl::base::ProjectedStateSampler::sampleUniform(State *state)
+void ompl::base::ProjectedStateSamplerTransition::sampleUniform(State *state)
 {
-    WrapperStateSampler::sampleUniform(state);
-    constraint_->project(state);
+    ProjectedStateSampler::sampleUniform(state);
+
+    for(uint i = 0; i < constraintsVec.size(); i++){
+
+        ConstraintPtr cPi = constraintsVec.at(i);
+
+        // check if constraints in vector are transitionConstraints
+        const TransitionConstraintPtr tCP = std::dynamic_pointer_cast<TransitionConstraint>(cPi);
+        if (tCP != nullptr){
+
+            int newMode = randomNumberGenerator.uniformInt(0,2);
+
+            // std::cout << "Random Mode" << newMode << std::endl;
+            tCP->setMode(newMode);
+            tCP->project(state);
+        }
+        else{
+            cPi->project(state);
+        }
+    }
     space_->enforceBounds(state);
 }
 
-void ompl::base::ProjectedStateSampler::sampleUniformNear(State *state, const State *near, const double distance)
-{
-    WrapperStateSampler::sampleUniformNear(state, near, distance);
-    constraint_->project(state);
-    space_->enforceBounds(state);
-}
-
-void ompl::base::ProjectedStateSampler::sampleGaussian(State *state, const State *mean, const double stdDev)
-{
-    WrapperStateSampler::sampleGaussian(state, mean, stdDev);
-    constraint_->project(state);
-    space_->enforceBounds(state);
-}
-
-/// ProjectedStateSpace
+/// ProjectedStateSpaceTransition
 
 /// Public
 
-bool ompl::base::ProjectedStateSpace::discreteGeodesic(const State *from, const State *to, bool interpolate,
+bool ompl::base::ProjectedStateSpaceTransition::discreteGeodesic(const State *from, const State *to, bool interpolate,
                                                        std::vector<State *> *geodesic) const
 {
     // Save a copy of the from state.

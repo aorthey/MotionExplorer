@@ -1,7 +1,7 @@
 #include "common.h"
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
-#include <ompl/base/Constraint.h>
+#include "planner/cspace/contact/ConstraintIntersection_Transition.h"
 #include "planner/cspace/contact/ContactConstraint.h"
 #include "planner/cspace/contact/TransitionConstraint.h"
 #include "planner/cspace/cspace_geometric_R2_CONTACT.h"
@@ -45,24 +45,11 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
     int firstLink = 6;
     int lastLink  = robot->links.size() - 1;
     constraints.push_back(std::make_shared<ContactConstraint>(this, robot, world, firstLink, 0));
-    constraints.push_back(std::make_shared<TransitionConstraint>(this, robot, world, lastLink, 0, 0));
+    constraints.push_back(std::make_shared<TransitionConstraint>(this, robot, world, lastLink, 0));
 
-    //Constraint Intersection
-    constraint_intersect = std::make_shared<ompl::base::ConstraintIntersection>(6, constraints);
-
-    // constraintA, constraintB,... -> constraintIntersection -> constraintPtr
-    /*
-     *
-    // if constraint transition
-    // then sample uniform transition.mode(0,1,2)
-    // else
-    // contactconstraint
-    std::default_random_engine generator;
-    std::uniform_int_distribution<int> distribution(0,2);
-
-    int mode = distribution(generator);
-     */
-    ob::StateSpacePtr RN_Constraint =  std::make_shared<ob::ProjectedStateSpace>(Rn, constraint_intersect);
+    //Constraint Intersection to join multiple constraints
+    constraint_intersect = std::make_shared<ConstraintIntersectionTransition>(6, constraints);
+    ob::StateSpacePtr RN_Constraint =  std::make_shared<ob::ProjectedStateSpaceTransition>(Rn, constraint_intersect);
 
     this->space = RN_Constraint;
 }

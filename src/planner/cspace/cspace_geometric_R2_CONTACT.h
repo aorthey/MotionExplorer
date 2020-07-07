@@ -3,7 +3,7 @@
 #include <ompl/geometric/SimpleSetup.h>
 #include "planner/cspace/cspace_geometric.h"
 #include <ompl/base/ConstrainedSpaceInformation.h>
-#include <ompl/base/spaces/constraint/ProjectedStateSpace.h>
+#include "planner/cspace/contact/ProjectedStateSpace_Transition.h"
 #include <ompl/base/spaces/constraint/ConstrainedStateSpace.h>
 
 
@@ -11,7 +11,7 @@ class GeometricCSpaceOMPLRCONTACT: public GeometricCSpaceOMPL
 {
 protected:
     std::vector<ob::ConstraintPtr> constraints;
-    ob::ConstraintPtr  constraint_intersect;
+    ob::ConstraintIntersectionPtr  constraint_intersect;
 
 public:
     GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int robot_idx);

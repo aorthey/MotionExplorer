@@ -12,8 +12,9 @@
  * @param world
  * @param linkNumber
  * @param obstacleNumber currently doesn't do anything
- * @param mode
  * ***************************************************/
+
+OMPL_CLASS_FORWARD(TransitionConstraint);
 
 class GeometricCSpaceOMPLRCONTACT;
 
@@ -22,14 +23,17 @@ class TransitionConstraint : public ob::Constraint
 protected:
     std::vector<Triangle3D> trisFiltered;
     std::vector<Triangle3D> trisFiltered_negative;
+    uint mode;
 
 public:
-    TransitionConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber, uint mode);
+    TransitionConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber);
+    // the 2 contact surfaces as parameters
 
     Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const;
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override;
+    void setMode(uint newMode);
 
-
+/*
     ob::ProjectionEvaluatorPtr getProjection(ob::StateSpacePtr space) const
     {
 
@@ -64,6 +68,7 @@ public:
         };
         return std::make_shared<ContactProjection>(space);
     }
+*/
 
 
 private:
@@ -72,5 +77,4 @@ private:
     RobotWorld *world_;
     uint  linkNumber_;
     uint obstacleNumber_;
-    uint mode_;
 };

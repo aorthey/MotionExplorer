@@ -4,14 +4,13 @@
 
 
 TransitionConstraint::TransitionConstraint
-(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber, uint mode):
-ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd) !!! gotta check these numbers !!!
+(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
+ob::Constraint(5, 2) //!!! gotta check these numbers !!!
         , cspace_(cspace)
         , robot_(robot)
         , world_(world)
         , linkNumber_(linkNumber)
         , obstacleNumber_(obstacleNumber)
-        , mode_(mode)
 {
     /**
      * Information on obstacle surface triangles.
@@ -40,7 +39,7 @@ ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd) !!! gotta check t
         }
         else{
 
-            // quick fix for distinction between two obstacles that dont touch
+            // quick fix for distinction between two obstacles that dont touch, x coordinates positive or negative
             if(tris.at(l).a[0] < 0){
                 trisFiltered_negative.push_back(tris.at(l));
 
@@ -84,6 +83,10 @@ Vector3 TransitionConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd
     return v;
 }
 
+void TransitionConstraint::setMode(uint newMode){
+    mode = newMode;
+}
+
 void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
 {
 //// remember to #include <Library/KrisLibrary/math3d/geometry3d.cpp> for this to work
@@ -97,7 +100,7 @@ void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
     // OR Free from constraint
     // OR Contact with different surface
 
-    if (mode_ == 0){
+    if (mode == 0){
         // --------------- Mode 0: Contact with initial contact surface ---------------
         Vector3 contact = getPos(x);
 
@@ -119,11 +122,11 @@ void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
 
         out[0] = distVect;
 
-    } else if (mode_ == 1){
+    } else if (mode == 1){
         // --------------- Mode 1: No contact constraint ---------------
         out[0] = 0;
 
-    } else if (mode_ == 2){
+    } else if (mode == 2){
         // --------------- Mode 2: Contact with different contact surface ---------------
         Vector3 contact = getPos(x);
 
