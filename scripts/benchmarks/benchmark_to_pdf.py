@@ -115,10 +115,10 @@ def XMLtoPDF(fname, histogram=False):
   plt.tight_layout()
   pp.savefig(plt.gcf(), pad_inches=0.0, bbox_inches='tight')
   pp.close()
-  plt.show()
+  # plt.show()
 
-  cmd = "apvlv "+fname_pdf
-  os.system(cmd)
+  # cmd = "apvlv "+fname_pdf
+  # os.system(cmd)
 
 if __name__ == '__main__':
   Nargs = len(sys.argv)
@@ -134,6 +134,6 @@ if __name__ == '__main__':
     fname = "../../data/benchmarks/30D_airport_2020_05_25_14:37:03.xml"
     fname = "../../data/benchmarks/24D_crossing_cars_2020_05_25_14:48:27.xml"
     fname = "../../data/benchmarks/21D_box_folding_2020_05_25_14:56:05.xml"
-    fname = "../../data/benchmarks/37D_shadowhand_pregrasp_2020_05_25_15:13:32.xml"
+    fname = "../../data/benchmarks/30D_airport.xml"
     XMLtoPDF(fname)
 

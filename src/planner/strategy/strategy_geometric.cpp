@@ -329,6 +329,15 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   std::string output_file_without_extension = util::GetDataFolder()+"/benchmarks/"+file_benchmark;
   std::string log_file = output_file_without_extension+".log";
   std::string xml_file = output_file_without_extension+".xml";
+  std::string xml_file_minimal = util::GetDataFolder()+"/benchmarks/"+environment_name+".xml";
+
+  std::string cmd = std::string("cp ")+xml_file+std::string(" ")+xml_file_minimal;
+
+  int rvalue = std::system(cmd.c_str());
+  if(rvalue)
+  {
+    std::cout << "Copied xml file " << xml_file << " to " << xml_file_minimal << std::endl;
+  }
 
   og::SimpleSetup ss(si);
   ot::Benchmark benchmark(ss, environment_name);
@@ -438,6 +447,9 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
 
   BenchmarkOutput boutput(benchmark.getRecordedExperimentData());
   boutput.Save(xml_file.c_str());
+  boutput.PrintPDF();
+
+  boutput.Save(xml_file_minimal.c_str());
   boutput.PrintPDF();
 
   //BenchmarkFileToPNG(file_benchmark);

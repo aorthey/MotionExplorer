@@ -45,7 +45,6 @@
 
     <algorithm name="ompl:prm"/> 
     <algorithm name="ompl:prmstar"/> 
-    <algorithm name="ompl:lazyprm"/> 
     <algorithm name="ompl:lazyprmstar"/> 
     <algorithm name="ompl:spars"/> 
     <algorithm name="ompl:spars2"/> 
@@ -53,14 +52,18 @@
     <algorithm name="ompl:est"/> 
     <algorithm name="ompl:biest"/> 
 
-    <!-- PROJECTION PLANNER (NOT for multi-robot) -->
-    <!-- <algorithm name="ompl:stride"/> --> 
-    <!-- <algorithm name="ompl:projest"/> --> 
-    <!-- <algorithm name="ompl:pdst"/> --> 
-    <!-- <algorithm name="ompl:kpiece"/> --> 
-    <!-- <algorithm name="ompl:bkpiece"/> --> 
-    <!-- <algorithm name="ompl:lbkpiece"/> --> 
-    <!-- <algorithm name="ompl:sbl"/> --> 
+    <!-- PLANNERS FOR RN -->
+    <algorithm name="ompl:informedrrtstar"/> 
+    <algorithm name="ompl:sorrtstar"/> 
+    <algorithm name="ompl:bitstar"/> 
+    <algorithm name="ompl:abitstar"/> 
+    <algorithm name="ompl:stride"/> 
+    <algorithm name="ompl:projest"/> 
+    <algorithm name="ompl:pdst"/> 
+    <algorithm name="ompl:kpiece"/> 
+    <algorithm name="ompl:bkpiece"/> 
+    <algorithm name="ompl:lbkpiece"/> 
+    <algorithm name="ompl:sbl"/> 
 
     <!--  PLANNERS AVAILABLE BUT NOT USED -->
     <!-- <algorithm name="ompl:cforest"/> SEGFAULT? --> 
@@ -72,7 +75,16 @@
     <!-- <algorithm name="ompl:bitstar"/> SPACES NOT SUPPORTED --> 
     <!-- <algorithm name="ompl:abitstar"/> SPACES NOT SUPPORTED --> 
 
-    <maxplanningtime>10</maxplanningtime> <!-- runtime in (s) --> 
+    <!-- REQ PROJECTION BUT COMPOUND SPACE HAVE NONE -->
+    <!-- <algorithm name="ompl:stride"/> --> 
+    <!-- <algorithm name="ompl:projest"/> --> 
+    <!-- <algorithm name="ompl:pdst"/> --> 
+    <!-- <algorithm name="ompl:kpiece"/> --> 
+    <!-- <algorithm name="ompl:bkpiece"/> --> 
+    <!-- <algorithm name="ompl:lbkpiece"/> --> 
+    <!-- <algorithm name="ompl:sbl"/> --> 
+
+    <maxplanningtime>60</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>10</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
