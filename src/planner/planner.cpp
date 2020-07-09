@@ -675,27 +675,30 @@ void MotionPlanner::DrawGL(GUIState& state){
       const GLColor colorPathNotSelected = lightGrey;
       const GLColor colorPathNotSelectedChildren = lightGrey;
 
-      for(uint k = 0; k < Nsiblings; k++){
-        if(k==(uint)last_node) continue;
-        current_path.back() = k;
-        Rcurrent = hierarchy->GetNodeContent(current_path);
-        Rcurrent->DrawGL(state);
-        PathPiecewiseLinear *pwlk = Rcurrent->GetShortestPath();
-        bool hasChildren = hierarchy->HasChildren(current_path);
-        if(pwlk && state("draw_roadmap_shortest_path")){
-          pwlk->zOffset = 0.001;
-          pwlk->linewidth = 0.3*input.pathWidth;
-          pwlk->widthBorder= 0.3*input.pathBorderWidth;
-          pwlk->ptsize = 8;
-          if(!hasChildren){
-              pwlk->setColor(colorPathNotSelected);
-          }else{
-              pwlk->setColor(colorPathNotSelectedChildren);
+      if(state("draw_explorer_non_selected_paths"))
+      {
+        for(uint k = 0; k < Nsiblings; k++){
+          if(k==(uint)last_node) continue;
+          current_path.back() = k;
+          Rcurrent = hierarchy->GetNodeContent(current_path);
+          Rcurrent->DrawGL(state);
+          PathPiecewiseLinear *pwlk = Rcurrent->GetShortestPath();
+          bool hasChildren = hierarchy->HasChildren(current_path);
+          if(pwlk && state("draw_roadmap_shortest_path")){
+            pwlk->zOffset = 0.001;
+            pwlk->linewidth = 0.3*input.pathWidth;
+            pwlk->widthBorder= 0.3*input.pathBorderWidth;
+            pwlk->ptsize = 8;
+            if(!hasChildren){
+                pwlk->setColor(colorPathNotSelected);
+            }else{
+                pwlk->setColor(colorPathNotSelectedChildren);
 
+            }
+            pwlk->drawSweptVolume = false;
+            pwlk->drawCross = false;
+            pwlk->DrawGL(state);
           }
-          pwlk->drawSweptVolume = false;
-          pwlk->drawCross = false;
-          pwlk->DrawGL(state);
         }
       }
 

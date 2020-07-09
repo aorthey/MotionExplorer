@@ -83,8 +83,8 @@ class PathPiecewiseLinear
     Vector3 GetNearestStateToTipOfArrow(Vector3 arrow_pos, 
         const std::vector<ob::State*> states, uint k_start_state, double arrow_size_length, int ridx);
 
-    void DrawGLRibbon(const std::vector<ob::State*> &states);
-    void DrawGLRibbonRobotIndex(const std::vector<ob::State*> &states, int ridx);
+    void DrawGLRibbon(const std::vector<ob::State*> &states, double percentage = 1.0);
+    void DrawGLRibbonRobotIndex(const std::vector<ob::State*> &states, int ridx, double percentage = 1.0);
     void DrawGLArrowMiddleOfPath(const std::vector<ob::State*> &states, int ridx);
     void DrawGLCross(const std::vector<ob::State*> &states, int ridx);
 

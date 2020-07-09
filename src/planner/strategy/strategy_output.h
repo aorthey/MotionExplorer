@@ -20,7 +20,9 @@ struct StrategyOutput{
 
     void SetShortestPath( std::vector<Config> );
 
-    void GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, std::vector<CSpaceOMPL*> cspace_levels);
+    void GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, 
+        std::vector<CSpaceOMPL*> cspace_levels);
+
     void SetPlannerData( ob::PlannerDataPtr pd_ );
     void SetProblemDefinition( ob::ProblemDefinitionPtr pdef_ );
     ob::PlannerDataPtr GetPlannerDataPtr();

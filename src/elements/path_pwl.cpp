@@ -465,20 +465,38 @@ Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos,
     return qnext;
 }
 
-void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &states, int ridx)
+void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &states, int ridx, double percentage)
 {
   glBegin(GL_QUAD_STRIP);
   std::vector<Vector3> path_left;
   std::vector<Vector3> path_right;
-  for(uint i = 0; i < states.size(); i++){
-    Vector3 q1 = Vector3FromState(states.at(i), ridx);
+
+  //compute stopping distance
+  std::vector<Vector3> milestones;
+  double dist = 0;
+  int ctr = 0;
+  while(dist < percentage*length)
+  {
+    Vector3 v = Vector3FromState(states.at(ctr), ridx);
+    milestones.push_back(v);
+    dist += interLength.at(ctr);
+    ctr++;
+  }
+  //// 
+
+
+  for(uint i = 0; i < milestones.size(); i++){
+    // Vector3 q1 = Vector3FromState(states.at(i), ridx);
+    Vector3 q1 = milestones.at(i);
     Vector3 dq;
 
-    if(i<states.size()-1){
-      Vector3 q2 = Vector3FromState(states.at(i+1), ridx);
+    if(i < milestones.size()-1){
+      // Vector3 q2 = Vector3FromState(states.at(i+1), ridx);
+      Vector3 q2 = milestones.at(i+1);
       dq = q2 - q1;
     }else{
-      Vector3 q2 = Vector3FromState(states.at(i-1), ridx);
+      Vector3 q2 = milestones.at(i-1);
+      // Vector3 q2 = Vector3FromState(states.at(i-1), ridx);
       dq = q1 - q2;
     }
 
@@ -540,7 +558,7 @@ void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &
   cLine.setCurrentGL();
 }
 
-void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
+void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states, double percentage)
 {
   //############################################################################
   //Draws a tron-like line strip
@@ -552,8 +570,8 @@ void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
     bool drawMACross = drawCross;
     foreach(int i, idxs)
     {
-        DrawGLRibbonRobotIndex(states, i);
-        DrawGLArrowMiddleOfPath(states, i);
+        DrawGLRibbonRobotIndex(states, i, percentage);
+        // DrawGLArrowMiddleOfPath(states, i);
         if(drawMACross){
           DrawGLCross(states, i);
           drawMACross = false;
@@ -563,8 +581,8 @@ void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
     }else{
     }
   }else{
-    DrawGLRibbonRobotIndex(states, quotient_space->GetRobotIndex());
-    DrawGLArrowMiddleOfPath(states, quotient_space->GetRobotIndex());
+    DrawGLRibbonRobotIndex(states, quotient_space->GetRobotIndex(), percentage);
+    // DrawGLArrowMiddleOfPath(states, quotient_space->GetRobotIndex());
     if(drawCross) DrawGLCross(states, quotient_space->GetRobotIndex());
   }
 }
@@ -762,7 +780,12 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path)
   cLine.setCurrentGL();
   //############################################################################
 
-  DrawGLRibbon(states);
+  if(state("draw_explorer_partial_paths"))
+  {
+      DrawGLRibbon(states, 0.5);
+  }else{
+      DrawGLRibbon(states);
+  }
 
   if(drawSweptVolume && state("draw_path_sweptvolume")){
     double L = GetLength();
