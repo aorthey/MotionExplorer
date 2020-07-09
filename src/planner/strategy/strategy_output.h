@@ -21,7 +21,6 @@ struct StrategyOutput{
     void SetShortestPath( std::vector<Config> );
 
     void GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, std::vector<CSpaceOMPL*> cspace_levels);
-
     void SetPlannerData( ob::PlannerDataPtr pd_ );
     void SetProblemDefinition( ob::ProblemDefinitionPtr pdef_ );
     ob::PlannerDataPtr GetPlannerDataPtr();
@@ -29,7 +28,6 @@ struct StrategyOutput{
 
     std::vector<Config> GetShortestPath();
     ob::PathPtr getShortestPathOMPL();
-    //std::vector<std::vector<Config>> GetSolutionPaths();
 
     bool hasExactSolution();
     bool hasApproximateSolution();

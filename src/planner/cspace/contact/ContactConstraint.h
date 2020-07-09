@@ -19,7 +19,6 @@ public:
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override;
 
 
-
     ob::ProjectionEvaluatorPtr getProjection(ob::StateSpacePtr space) const
     {
 

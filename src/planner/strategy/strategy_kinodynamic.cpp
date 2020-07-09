@@ -3,7 +3,7 @@
 #include "planner/benchmark/benchmark_input.h"
 #include "util.h"
 
-#include <ompl/geometric/planners/explorer/Explorer.h>
+#include <ompl/geometric/planners/explorer/MotionExplorer.h>
 #include <ompl/geometric/planners/multilevel/QRRT.h>
 #include <ompl/geometric/planners/multilevel/QRRTStar.h>
 #include <ompl/geometric/planners/multilevel/QMP.h>
