@@ -1,10 +1,11 @@
 #include <ompl/base/Constraint.h>
-#include "planner/cspace/contact/ContactConstraint.h"
+#include "planner/cspace/contact/TransitionConstraint.h"
 #include "planner/cspace/cspace_geometric_R2_CONTACT.h"
 
 
-ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
-        ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
+TransitionConstraint::TransitionConstraint
+(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
+ob::Constraint(5, 2) //!!! gotta check these numbers !!!
         , cspace_(cspace)
         , robot_(robot)
         , world_(world)
@@ -34,19 +35,11 @@ ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot 
         double epsilon = 1e-10;
 
         if(fabs((fabs(normal[2]) - 1.0))<epsilon){
-            //does nothing
+            //do nothing
         }
         else{
-            // only x and y coordinates
-            Vector2 a = Vector2(tris.at(l).a[0], tris.at(l).a[1]);
-            Vector2 b = Vector2(tris.at(l).b[0], tris.at(l).b[1]);
-            Vector2 c = Vector2(tris.at(l).c[0], tris.at(l).c[1]);
 
-            cornerCoord.push_back(a);
-            cornerCoord.push_back(b);
-            cornerCoord.push_back(c);
-
-            // quick fix for distinction between two obstacles that dont touch
+            // quick fix for distinction between two obstacles that dont touch, x coordinates positive or negative
             if(tris.at(l).a[0] < 0){
                 trisFiltered_negative.push_back(tris.at(l));
 
@@ -57,16 +50,9 @@ ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot 
         }
     }
 
-    // remove all duplicates of (2D) corner coordinates
-    auto end = cornerCoord.end();
-    for(auto it = cornerCoord.begin(); it != end; ++it){
-        end = std::remove(it + 1, end, *it);
-    }
-    cornerCoord.erase(end, cornerCoord.end());
-
 }
 
-Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const
+Vector3 TransitionConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const
 {
     /**
      * Member function of class ContactConstraint:
@@ -97,16 +83,30 @@ Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) c
     return v;
 }
 
-void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
+void TransitionConstraint::setMode(uint newMode){
+    mode = newMode;
+}
+
+void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
 {
-    // ---------- Contact with chosen Link and chosen Obstacle ------------------
-    Vector3 contact = getPos(x);
+//// remember to #include <Library/KrisLibrary/math3d/geometry3d.cpp> for this to work
+////    GeometricPrimitive3D gP3D = GeometricPrimitive3D(closestPt);
+////    Real dist = gP3D.Distance(trisFiltered.at(0));
+////     std::cout << "Check that 'closestPt' is on surface Triangle: " << dist << std::endl;
 
-    Vector3 closestPt;
-    Real distances = 1000;
 
-    if(obstacleNumber_ == 0){
-        // obstacle 0 is initial surface -> contact starts here
+    // Variable "mode" defines which constraint function is active
+    // -> Contact with initial surface
+    // OR Free from constraint
+    // OR Contact with different surface
+
+    if (mode == 0){
+        // --------------- Mode 0: Contact with initial contact surface ---------------
+        Vector3 contact = getPos(x);
+
+        Vector3 closestPt;
+
+        Real distances = 1000;
 
         //loop over all surface triangles to get triangle that's closest
         for (uint j = 0; j < trisFiltered.size(); j++) {
@@ -118,10 +118,21 @@ void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eig
                 closestPt = cP;
             }
         }
+        Real distVect = contact.distance(closestPt);
 
-    }else if(obstacleNumber_ == 1){
-        // obstacle 1 has only negative x cordinates
+        out[0] = distVect;
 
+    } else if (mode == 1){
+        // --------------- Mode 1: No contact constraint ---------------
+        out[0] = 0;
+
+    } else if (mode == 2){
+        // --------------- Mode 2: Contact with different contact surface ---------------
+        Vector3 contact = getPos(x);
+
+        Vector3 closestPt;  // !!! SURFACE CHOICE HERE !!!
+
+        Real distances = 1000;
         //loop over all surface triangles to get triangle that's closest
         for (uint j = 0; j < trisFiltered_negative.size(); j++) {
             Vector3 cP = trisFiltered_negative.at(j).closestPoint(contact);
@@ -132,14 +143,10 @@ void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eig
                 closestPt = cP;
             }
         }
-    }else{
-        std::cout << "Invalid Obstacle!" << std::endl;
-        std::exit(0);
+        Real distVect = contact.distance(closestPt);
+
+        out[0] = distVect;
+
     }
 
-
-
-    Real distVect = contact.distance(closestPt);
-
-    out[0] = distVect;
 }

@@ -1,21 +1,19 @@
 #include "common.h"
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
-#include "planner/cspace/contact/ContactConstraint.h"
-#include <ompl/base/spaces/constraint/AtlasStateSpace.h>
-#include <ompl/base/spaces/constraint/TangentBundleStateSpace.h>
+#include "planner/cspace/contact/ContactConstraint_3D.h"
 
-
-#include "planner/cspace/cspace_geometric_R_CONTACT.h"
+#include "planner/cspace/cspace_geometric_R3_CONTACT.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
-GeometricCSpaceOMPLRCONTACT::GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int robot_idx):
+
+GeometricCSpaceOMPLRCONTACT_3D::GeometricCSpaceOMPLRCONTACT_3D(RobotWorld *world_, int robot_idx):
         GeometricCSpaceOMPL(world_, robot_idx) {}
 
 
-void GeometricCSpaceOMPLRCONTACT::initSpace()
+void GeometricCSpaceOMPLRCONTACT_3D::initSpace()
 {
-    ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(3 + Nompl));
+    ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(6 + Nompl));
 
     //Get Bounds on Joints
     std::vector<double> minimum, maximum;
@@ -23,34 +21,33 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
     maximum = robot->qMax;
 
     //SE2 Bounds
-    ob::RealVectorBounds bounds(3 + Nompl);
-    bounds.low.at(0) = minimum.at(0);
-    bounds.low.at(1) = minimum.at(1);
-    bounds.low.at(2) = minimum.at(3);
+    ob::RealVectorBounds bounds(6 + Nompl);
 
-    bounds.high.at(0) = maximum.at(0);
-    bounds.high.at(1) = maximum.at(1);
-    bounds.high.at(2) = maximum.at(3);
+    for (int j = 0; j < 6; j++) {
+        bounds.low.at(j) = minimum.at(j);
+    }
+    for (int k = 0; k < 6; k++) {
+        bounds.high.at(k) = maximum.at(k);
+    }
 
     for(uint i = 0; i < Nompl;i++){
         uint idx = ompl_to_klampt.at(i);
-        bounds.low.at(i + 3) = minimum.at(idx);
-        bounds.high.at(i + 3) = maximum.at(idx);
+        bounds.low.at(i + 6) = minimum.at(idx);
+        bounds.high.at(i + 6) = maximum.at(idx);
     }
+    std::cout << bounds.low << std::endl;
+    std::cout << bounds.high << std::endl;
     bounds.check();
     static_pointer_cast<ob::RealVectorStateSpace>(Rn)->setBounds(bounds);
 
     //Constrained State Space
-    constraint = std::make_shared<ContactConstraint>(this, robot, world, robot_idx);
+    constraint = std::make_shared<ContactConstraint_3D>(this, robot, world);
     this->space = std::make_shared<ob::ProjectedStateSpace>(Rn, constraint);
-
-    //NOTE: added projection operator
-    // this->space->registerProjection("contact", 
-			// std::static_pointer_cast<ContactConstraint>(constraint)->getProjection(this->space));
 
 }
 
-ob::SpaceInformationPtr GeometricCSpaceOMPLRCONTACT::SpaceInformationPtr() {
+ob::SpaceInformationPtr GeometricCSpaceOMPLRCONTACT_3D::SpaceInformationPtr()
+{
     if (!si) {
         si = std::make_shared<ob::ConstrainedSpaceInformation>(SpacePtr());
         validity_checker = StateValidityCheckerPtr(si);
@@ -59,21 +56,19 @@ ob::SpaceInformationPtr GeometricCSpaceOMPLRCONTACT::SpaceInformationPtr() {
     return si;
 }
 
-void GeometricCSpaceOMPLRCONTACT::ConfigToOMPLState(const Config &q, ob::State *qompl)
+void GeometricCSpaceOMPLRCONTACT_3D::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
     Eigen::VectorXd x(3+Nompl);
-    x.setZero();
 
-    x[0] = q[0];
-    x[1] = q[1];
+    for (int i = 0; i < 5; ++i) {
+        x[i] = q[i];
+    }
     x[2] = q[3];
 
     for(uint i = 0; i < Nklampt; i++)
     {
         int idx = klampt_to_ompl.at(i);
-        if(idx<0){
-          continue;
-        }
+        if(idx<0) continue;
         else{
             x[3 + idx]=q(6+i);
         }
@@ -82,7 +77,7 @@ void GeometricCSpaceOMPLRCONTACT::ConfigToOMPLState(const Config &q, ob::State *
     qompl->as<ob::ConstrainedStateSpace::StateType>()->copy(x);
 }
 
-Config GeometricCSpaceOMPLRCONTACT::OMPLStateToConfig(const ob::State *qompl)
+Config GeometricCSpaceOMPLRCONTACT_3D::OMPLStateToConfig(const ob::State *qompl)
 {
     auto &&x = *qompl->as<ob::ConstrainedStateSpace::StateType>();
 
@@ -90,8 +85,9 @@ Config GeometricCSpaceOMPLRCONTACT::OMPLStateToConfig(const ob::State *qompl)
     q.resize(robot->q.size());
     q.setZero();
 
-    q(0)=x[0];
-    q(1)=x[1];
+    for (int i = 0; i < 5; ++i) {
+        q(i)=x[i];
+    }
     q(3)=x[2];
 
     for(uint i = 0; i < Nompl; i++){
@@ -101,14 +97,15 @@ Config GeometricCSpaceOMPLRCONTACT::OMPLStateToConfig(const ob::State *qompl)
     return q;
 }
 
-Config GeometricCSpaceOMPLRCONTACT::EigenVectorToConfig(const Eigen::VectorXd &xd) const
+Config GeometricCSpaceOMPLRCONTACT_3D::EigenVectorToConfig(const Eigen::VectorXd &xd) const
 {
     Config q;
     q.resize(robot->q.size());
     q.setZero();
 
-    q(0) = xd[0];
-    q(1) = xd[1];
+    for (int i = 0; i < 5; ++i) {
+        q(i)=xd[i];
+    }
     q(3) = xd[2];
 
     while(q(3)>M_PI) q(3) -= 2*M_PI;
@@ -122,11 +119,11 @@ Config GeometricCSpaceOMPLRCONTACT::EigenVectorToConfig(const Eigen::VectorXd &x
 }
 
 //NOTE: add getXYZ to set XYZ coordinate of vertices
-Vector3 GeometricCSpaceOMPLRCONTACT::getXYZ(const ob::State *s)
+Vector3 GeometricCSpaceOMPLRCONTACT_3D::getXYZ(const ob::State *s)
 {
     Config q = OMPLStateToConfig(s);
-    Vector3 v(q[0],q[1],0);
+    Vector3 v(q[0],q[1],q[2]);
     return v;
 }
 
-void GeometricCSpaceOMPLRCONTACT::print(std::ostream& out) const{}
+void GeometricCSpaceOMPLRCONTACT_3D::print(std::ostream& out) const{}

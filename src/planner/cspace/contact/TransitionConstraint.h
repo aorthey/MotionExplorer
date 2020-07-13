@@ -4,33 +4,36 @@
 #include <ompl/base/spaces/constraint/ConstrainedStateSpace.h>
 
 /*****************************************************
- * Contact Constraint
- * -> for a link that doesn't break contact with initial contact surface.
+ * Transition Contact Constraint
+ * -> link can either in contact with initial surface, unconstrained/in transition or in contact with different surface
  *
  * @param cspace
  * @param robot
  * @param world
  * @param linkNumber
- * @param obstacleNumber
+ * @param obstacleNumber currently doesn't do anything
  * ***************************************************/
+
+OMPL_CLASS_FORWARD(TransitionConstraint);
 
 class GeometricCSpaceOMPLRCONTACT;
 
-class ContactConstraint : public ob::Constraint
+class TransitionConstraint : public ob::Constraint
 {
 protected:
     std::vector<Triangle3D> trisFiltered;
     std::vector<Triangle3D> trisFiltered_negative;
-    std::vector<Vector2> cornerCoord;
+    uint mode;
 
 public:
-    ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber);
-
+    TransitionConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber);
+    // the 2 contact surfaces as parameters
 
     Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const;
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override;
+    void setMode(uint newMode);
 
-
+/*
     ob::ProjectionEvaluatorPtr getProjection(ob::StateSpacePtr space) const
     {
 
@@ -65,12 +68,13 @@ public:
         };
         return std::make_shared<ContactProjection>(space);
     }
+*/
 
 
 private:
     GeometricCSpaceOMPLRCONTACT *cspace_;
     Robot *robot_;
     RobotWorld *world_;
-    uint linkNumber_;
+    uint  linkNumber_;
     uint obstacleNumber_;
 };
