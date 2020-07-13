@@ -5,12 +5,7 @@
 
 TransitionConstraint::TransitionConstraint
 (GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
-ob::Constraint(5, 2) //!!! gotta check these numbers !!!
-        , cspace_(cspace)
-        , robot_(robot)
-        , world_(world)
-        , linkNumber_(linkNumber)
-        , obstacleNumber_(obstacleNumber)
+ContactConstraint(cspace, robot, world, linkNumber, obstacleNumber)
 {
     /**
      * Information on obstacle surface triangles.
@@ -20,8 +15,8 @@ ob::Constraint(5, 2) //!!! gotta check these numbers !!!
 
     std::vector<Triangle3D> tris;
 
-    for(uint k = 0; k < world_->terrains.size(); k++){
-        Terrain* terrain_k = world_->terrains[k];
+    for(uint k = 0; k < world->terrains.size(); k++){
+        Terrain* terrain_k = world->terrains[k];
         const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();//different mesh
 
         for(uint j = 0; j < mesh.tris.size(); j++){
@@ -40,47 +35,18 @@ ob::Constraint(5, 2) //!!! gotta check these numbers !!!
         else{
 
             // quick fix for distinction between two obstacles that dont touch, x coordinates positive or negative
-            if(tris.at(l).a[0] < 0){
+            if(tris.at(l).a[0] < 0 && tris.at(l).a[0] > -2 && tris.at(l).b[0] > -2 && tris.at(l).c[0] > -2){
                 trisFiltered_negative.push_back(tris.at(l));
+                //std::cout << "Triangle with negative x coord: " << tris.at(l) << std::endl;
 
-            }else{
+            }else if (tris.at(l).a[0] > 0 && tris.at(l).a[0] < 2.5 && tris.at(l).b[0] < 2.5 && tris.at(l).c[0] < 2.5){
                 trisFiltered.push_back(tris.at(l));
+                //std::cout << "Triangle with positive x coord: " << tris.at(l) << std::endl;
             }
 
         }
     }
 
-}
-
-Vector3 TransitionConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const
-{
-    /**
-     * Member function of class ContactConstraint:
-     * Returns position of given robot link in world coordinates.
-     */
-
-    Config q = cspace_->EigenVectorToConfig(xd);
-    if (xd!=xd){
-        std::cout << std::string (80, '-') << std::endl;
-        std::cout << "EigenVector: " << std::endl;
-        std::cout << xd << std::endl;
-        std::cout << q << std::endl;
-        exit(0);
-    }
-
-
-    robot_->UpdateConfig(q);
-    robot_->UpdateGeometry();
-    Vector3 zero;
-    zero.setZero();
-
-    //NOTE: the world position is zero exactly at the point where link is
-    //attached using a joint to the whole linkage. Check where your last fixed
-    //joint is positioned, before questioning the validity of this method
-    Vector3 v;
-    robot_->GetWorldPosition(zero, linkNumber_, v);
-
-    return v;
 }
 
 void TransitionConstraint::setMode(uint newMode){

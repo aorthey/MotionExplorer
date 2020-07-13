@@ -27,7 +27,7 @@
     <algorithm name="ompl:prm"/>
 
     <hierarchy>
-      <level inner_index="0" type="R2_CONTACT"/>
+      <level inner_index="0" type="R3_CONTACT"/>
     </hierarchy>
 
   </plannerinput>
