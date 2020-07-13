@@ -13,6 +13,8 @@
 #include <tinyxml.h>
 #include <vector>
 #include <memory>
+#include <boost/thread.hpp>
+
 
 class Strategy;
 typedef std::shared_ptr<Strategy> StrategyPtr;

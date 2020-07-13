@@ -346,20 +346,6 @@ void MotionPlanner::CreateHierarchy()
         CSpaceOMPL *cspace_strat_k_level_j = ComputeCSpaceLayer(layers.at(j));
         cspace_strat_k.push_back( cspace_strat_k_level_j );
       }
-      //DEBUG
-      //############################################################################
-      // CSpaceOMPL *cspace_strat_k_last_level = ComputeCSpaceLayer(layers.back());
-      // uint N_kl = cspace_strat_k_last_level->GetDimensionality();
-      // uint N_a = cspace_ambient->GetDimensionality();
-      // if(N_kl != N_a){
-      //   OMPL_INFORM("For benchmark we require ALL hierarchies to share the same ambient space.");
-      //   std::cout << "Please make sure every hierarchy has the same last entry" << std::endl;
-      //   std::cout << "However, stratification " << k << " has Dimensionality " << N_kl << std::endl;
-      //   std::cout << "While stratification 0 has Dimensionality " << N_a << std::endl;
-      // }
-      //############################################################################
-      //every stratification must share the same ambient space
-      //cspace_strat_k.push_back(cspace_ambient);
       cspace_stratifications.push_back(cspace_strat_k);
     }
   }
@@ -407,7 +393,8 @@ void MotionPlanner::Step()
 void MotionPlanner::StepOneLevel()
 {
   if(!active) return;
-  if(cspace_levels.size()<=2){
+  if(cspace_levels.size()<=2)
+  {
     return AdvanceUntilSolution();
   }
 
@@ -446,6 +433,7 @@ void MotionPlanner::AdvanceUntilSolution()
     // strategy->Clear();
   }
   resetTime();
+
   if(!util::StartsWith(input.name_algorithm,"benchmark")){
     StrategyOutput output(cspace_levels.back());
     strategy->Plan(output);
@@ -455,17 +443,21 @@ void MotionPlanner::AdvanceUntilSolution()
   time = getTime();
 
   // ExpandSimple();
-  ExpandFull();
+  Expand();
 }
 
-PlannerInput& MotionPlanner::GetInput(){
+PlannerInput& MotionPlanner::GetInput()
+{
   return input;
 }
-bool MotionPlanner::isActive(){
+
+bool MotionPlanner::isActive()
+{
   return active;
 }
 
-void MotionPlanner::ExpandFull(){
+void MotionPlanner::ExpandFull()
+{
   if(!active) return;
 
   uint Nmax=hierarchy->NumberLevels();
@@ -493,7 +485,8 @@ void MotionPlanner::ExpandFull(){
 }
 
 //folder-like operations on hierarchical roadmap
-void MotionPlanner::Expand(){
+void MotionPlanner::Expand()
+{
   if(!active) return;
 
   uint Nmax=hierarchy->NumberLevels();
@@ -508,7 +501,9 @@ void MotionPlanner::Expand(){
   }
   UpdateHierarchy();
 }
-void MotionPlanner::ExpandSimple(){
+
+void MotionPlanner::ExpandSimple()
+{
   if(!active) return;
 
   uint Nmax=hierarchy->NumberLevels();
@@ -525,7 +520,8 @@ void MotionPlanner::ExpandSimple(){
   UpdateHierarchy();
 }
 
-void MotionPlanner::Collapse(){
+void MotionPlanner::Collapse()
+{
   if(!active) return;
 
   if(current_level>0){
@@ -540,7 +536,8 @@ void MotionPlanner::Collapse(){
   UpdateHierarchy();
 }
 
-void MotionPlanner::Next(){
+void MotionPlanner::Next()
+{
   if(!active) return;
 
   uint Nmax=hierarchy->NumberNodesOnLevel(current_level);
@@ -551,7 +548,9 @@ void MotionPlanner::Next(){
   }
   UpdateHierarchy();
 }
-void MotionPlanner::Previous(){
+
+void MotionPlanner::Previous()
+{
   if(!active) return;
   uint Nmax=hierarchy->NumberNodesOnLevel(current_level);
   if(current_level_node>0) current_level_node--;
@@ -567,7 +566,9 @@ void MotionPlanner::Previous(){
   }
   UpdateHierarchy();
 }
-void MotionPlanner::UpdateHierarchy(){
+
+void MotionPlanner::UpdateHierarchy()
+{
   if(!active) return;
 
   uint L = viewHierarchy.GetLevel();
@@ -606,6 +607,7 @@ void MotionPlanner::setSelectedPath(std::vector<int> selectedLocalMinimum)
       selectionPlanner2->setLocalMinimumSelection( selectedLocalMinimum );
     }
 }
+
 void MotionPlanner::Print()
 {
   if(!active) return;
@@ -621,7 +623,9 @@ void MotionPlanner::Print()
   std::cout << std::endl;
   std::cout << std::string(80, '-') << std::endl;
 }
-bool MotionPlanner::isHierarchical(){
+
+bool MotionPlanner::isHierarchical()
+{
   if(!active) return false;
 
   uint N = hierarchy->NumberLevels();
@@ -629,7 +633,8 @@ bool MotionPlanner::isHierarchical(){
   return false;
 }
 
-void MotionPlanner::DrawGLScreen(double x_, double y_){
+void MotionPlanner::DrawGLScreen(double x_, double y_)
+{
   if(!active) return;
   if(isHierarchical()){
     viewHierarchy.x = x_;
@@ -651,7 +656,8 @@ PathPiecewiseLinear* MotionPlanner::GetPath()
   return pwl;
 }
 
-void MotionPlanner::DrawGL(GUIState& state){
+void MotionPlanner::DrawGL(GUIState& state)
+{
   if(!active) return;
 
   uint Nsiblings;
@@ -768,28 +774,6 @@ void MotionPlanner::DrawGL(GUIState& state){
       ck->DrawGL(state);
   }
 
-      // if(k < current_level)
-      // {
-      //     ob::State *qompl = ck->SpaceInformationPtr()->allocState();
-
-      //     if(state("planner_draw_start_configuration"))
-      //     {
-      //         ck->ConfigToOMPLState(qi, qompl);
-      //         Config qk = ck->OMPLStateToConfig(qompl);
-      //         GLDraw::drawRobotsAtConfig(robots, qk, green);
-      //     }
-      //     if(state("planner_draw_goal_configuration"))
-      //     {
-      //         ck->ConfigToOMPLState(qg, qompl);
-      //         Config qk = ck->OMPLStateToConfig(qompl);
-      //         GLDraw::drawRobotsAtConfig(robots, qk, red);
-      //     }
-
-      //     ck->SpaceInformationPtr()->freeState(qompl);
-      // }
-  // }
-
-  // const GLColor colorStartConfiguration(0.7,1.0,0.7,1);
   const GLColor colorGoalConfiguration = GLDraw::getColorRobotGoalConfiguration();
   const GLColor colorStartConfiguration = GLDraw::getColorRobotStartConfiguration();
   const GLColor colorGoalConfigurationTransparent = GLDraw::getColorRobotGoalConfigurationTransparent();
@@ -823,12 +807,11 @@ double MotionPlanner::getTime()
 
 double MotionPlanner::getLastIterationTime()
 {
-  // int timeInt = (int)time*100.0;
-  // time = ((double)timeInt/100.0);
   return time;
 }
 
-std::ostream& operator<< (std::ostream& out, const MotionPlanner& planner){
+std::ostream& operator<< (std::ostream& out, const MotionPlanner& planner)
+{
   out << std::string(80, '-') << std::endl;
   out << " Planner: " << std::endl;
   out << std::string(80, '-') << std::endl;
