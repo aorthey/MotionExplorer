@@ -20,8 +20,7 @@ ompl::base::ProjectedStateSamplerTransition::ProjectedStateSamplerTransition(con
 
 void ompl::base::ProjectedStateSamplerTransition::sampleUniform(State *state)
 {
-    ProjectedStateSampler::sampleUniform(state);
-
+    WrapperStateSampler::sampleUniform(state);
     for(uint i = 0; i < constraintsVec.size(); i++){
 
         ConstraintPtr cPi = constraintsVec.at(i);
@@ -34,12 +33,9 @@ void ompl::base::ProjectedStateSamplerTransition::sampleUniform(State *state)
 
             // std::cout << "Random Mode" << newMode << std::endl;
             tCP->setMode(newMode);
-            tCP->project(state);
-        }
-        else{
-            cPi->project(state);
         }
     }
+    constraint_->project(state);
     space_->enforceBounds(state);
 }
 

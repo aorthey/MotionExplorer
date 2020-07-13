@@ -46,12 +46,13 @@ ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot 
             cornerCoord.push_back(b);
             cornerCoord.push_back(c);
 
-            // quick fix for distinction between two obstacles that dont touch
-            if(tris.at(l).a[0] < 0){
+            // quick fix for distinction between two obstacles that dont touch, x coordinates positive or negative
+            if(tris.at(l).a[0] < 0 && tris.at(l).a[0] > -2 && tris.at(l).b[0] > -2 && tris.at(l).c[0] > -2){
                 trisFiltered_negative.push_back(tris.at(l));
 
-            }else{
+            }else if (tris.at(l).a[0] > 0 && tris.at(l).a[0] < 2.5 && tris.at(l).b[0] < 2.5 && tris.at(l).c[0] < 2.5){
                 trisFiltered.push_back(tris.at(l));
+
             }
 
         }

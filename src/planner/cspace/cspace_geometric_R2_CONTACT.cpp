@@ -44,8 +44,8 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
     //Constraint Pointer Vector
     int firstLink = 6;
     int lastLink  = robot->links.size() - 1;
-    constraints.push_back(std::make_shared<ContactConstraint>(this, robot, world, firstLink, 0));
-    constraints.push_back(std::make_shared<TransitionConstraint>(this, robot, world, lastLink, 0));
+    constraints.push_back(std::make_shared<ContactConstraint>(this, robot, world, lastLink, 0));
+    constraints.push_back(std::make_shared<TransitionConstraint>(this, robot, world, firstLink, 0));
 
     //Constraint Intersection to join multiple constraints
     constraint_intersect = std::make_shared<ConstraintIntersectionTransition>(6, constraints);
@@ -82,6 +82,13 @@ void GeometricCSpaceOMPLRCONTACT::ConfigToOMPLState(const Config &q, ob::State *
     }
 
     qompl->as<ob::ConstrainedStateSpace::StateType>()->copy(x);
+    constraint_intersect->project(qompl);
+
+/*    for (uint c = 0; c < constraints.size(); c++) {
+        constraints[c]->project(qompl);
+    }
+*/
+
 }
 
 Config GeometricCSpaceOMPLRCONTACT::OMPLStateToConfig(const ob::State *qompl)
