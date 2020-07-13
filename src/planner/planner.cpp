@@ -443,7 +443,7 @@ void MotionPlanner::AdvanceUntilSolution()
   time = getTime();
 
   // ExpandSimple();
-  Expand();
+  ExpandFull();
 }
 
 PlannerInput& MotionPlanner::GetInput()
@@ -462,10 +462,10 @@ void MotionPlanner::ExpandFull()
 
   uint Nmax=hierarchy->NumberLevels();
 
-  current_level = 0;
-  current_level_node = 0;
-  current_path.clear();
-  viewHierarchy.Clear();
+  // current_level = 0;
+  // current_level_node = 0;
+  // current_path.clear();
+  // viewHierarchy.Clear();
 
   while(true){
     if(current_level<Nmax-1){
@@ -728,7 +728,7 @@ void MotionPlanner::DrawGL(GUIState& state)
         unsigned curLevel = hierarchy->GetNode(current_path)->level;
         bool hasChildren = hierarchy->HasChildren(current_path);
         if(curLevel < maxLevels-1){
-            pwl->drawCross = true;
+            pwl->drawCross = false;
             if(hasChildren){
                 pwl->cCross = colorPathSelectedNonExecChildren;
                 pwl->setColor(colorPathSelectedNonExecChildren);

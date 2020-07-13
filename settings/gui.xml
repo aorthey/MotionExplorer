@@ -65,8 +65,12 @@
   <checkbox>
     <name>draw_roadmap_shortest_path</name>
     <active>1</active>
-    <key>3</key>
   </checkbox>
+
+  <hotkey>
+    <name>draw_path_modus</name>
+    <key>3</key>
+  </hotkey>
 
   <checkbox>
     <name>draw_play_path</name>
