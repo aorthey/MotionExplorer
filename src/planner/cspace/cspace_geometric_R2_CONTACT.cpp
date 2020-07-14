@@ -48,7 +48,7 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
     constraints.push_back(std::make_shared<TransitionConstraint>(this, robot, world, firstLink, 0));
 
     //Constraint Intersection to join multiple constraints
-    constraint_intersect = std::make_shared<ConstraintIntersectionTransition>(5, constraints);
+    constraint_intersect = std::make_shared<ConstraintIntersectionTransition>(Rn->getDimension(), constraints);
     ob::StateSpacePtr RN_Constraint =  std::make_shared<ob::ProjectedStateSpaceTransition>(Rn, constraint_intersect);
 
     this->space = RN_Constraint;
