@@ -101,3 +101,8 @@ bool ompl::base::ProjectedStateSpaceTransition::discreteGeodesic(const State *fr
 
     return dist <= tolerance;
 }
+// unsigned int ompl::base::ProjectedStateSpaceTransition::validSegmentCount(const State *state1, const State *state2) const
+// {
+//   return 1;
+// }
+

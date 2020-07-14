@@ -79,6 +79,9 @@ namespace ompl
              * freeing states returned in \a geodesic.*/
             bool discreteGeodesic(const State *from, const State *to, bool interpolate = false,
                                   std::vector<State *> *geodesic = nullptr) const override;
+
+            // unsigned int validSegmentCount(const State *state1, const State *state2) const override;
+
         };
     }
 }

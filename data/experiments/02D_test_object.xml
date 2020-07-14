@@ -25,21 +25,21 @@
 
     <!-- These configs are for last link in contact and first link in transition. -->
     <qinit  config="10  +2.2 -0.2 0 0 0 0  2.35619 0.0 1.55 0 "/>
-    <qgoal  config="10  -1.45 +0.5 0 0 0 0  -1.570796 0.0 -0.4 0 "/>
+    <qgoal  config="10  -1.45 +0.5 0 0 0 0  -1.57 0.0 -0.4 0 "/>
     <!--<qgoal  config="10  +2.2 +1.0 0 0 0 0  2.35619 0.0 1.570796 0 "/> -->
 
-    <se3min config="6  -1.7 -2.5 -0.0 -3.141593 -1.57 -3.141593"/>
-    <se3max config="6  +2.5 +2.5 +0.0 +3.141593 +1.57 +3.141593"/>
+    <se3min config="6  -2.7 -3.5 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +3.5 +3.5 +0.0 +3.141593 +1.57 +3.141593"/>
     <epsilongoalregion>0.05</epsilongoalregion>
-    <maxplanningtime>2</maxplanningtime>      <!-- runtime in (s) -->
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) -->
     <smoothPath>0</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
     <pathSpeed>15</pathSpeed>
     <pathWidth>0.2</pathWidth>
     <freeFloating>1</freeFloating>
 
-    <!--<algorithm name="ompl:rrtconnect"/>
-    <algorithm name="ompl:rrt"/>-->
     <algorithm name="ompl:prm"/>
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:rrt"/>
 
     <hierarchy>
       <level inner_index="0" type="R2_CONTACT"/>

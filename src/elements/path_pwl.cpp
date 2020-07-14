@@ -486,6 +486,7 @@ void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &
   milestones.push_back(v);
   //// 
 
+  if(milestones.size()<2) return;
 
   for(uint i = 0; i < milestones.size(); i++){
     // Vector3 q1 = Vector3FromState(states.at(i), ridx);

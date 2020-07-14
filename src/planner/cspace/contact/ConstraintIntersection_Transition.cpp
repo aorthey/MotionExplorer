@@ -4,6 +4,7 @@
 ConstraintIntersectionTransition::ConstraintIntersectionTransition(const unsigned int ambientDim, std::vector<ompl::base::ConstraintPtr> constraints)
 : ConstraintIntersection(ambientDim, constraints){}
 
-std::vector<ompl::base::ConstraintPtr> ConstraintIntersectionTransition::getConstraintsVec() {
+std::vector<ompl::base::ConstraintPtr> ConstraintIntersectionTransition::getConstraintsVec() 
+{
     return constraints_;
 }
