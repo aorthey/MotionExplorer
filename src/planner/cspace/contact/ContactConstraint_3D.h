@@ -20,10 +20,10 @@ protected:
     std::vector<Triangle3D> tris;
 
 public:
-    ContactConstraint_3D(GeometricCSpaceOMPLRCONTACT_3D *cspace, Robot *robot, RobotWorld *world);
+    ContactConstraint_3D(GeometricCSpaceOMPLRCONTACT_3D *cspace, Robot *robot, RobotWorld *world, uint linkNumber);
 
 
-    Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd, int linkNumber) const;
+    Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const;
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override;
 
 
@@ -67,4 +67,5 @@ private:
     GeometricCSpaceOMPLRCONTACT_3D *cspace_;
     Robot *robot_;
     RobotWorld *world_;
+    uint linkNumber_;
 };

@@ -3,14 +3,15 @@
 #include <ompl/geometric/SimpleSetup.h>
 #include "planner/cspace/cspace_geometric.h"
 #include <ompl/base/ConstrainedSpaceInformation.h>
-#include <ompl/base/spaces/constraint/ProjectedStateSpace.h>
+#include "planner/cspace/contact/ProjectedStateSpace_Transition.h"
 #include <ompl/base/spaces/constraint/ConstrainedStateSpace.h>
 
 
 class GeometricCSpaceOMPLRCONTACT_3D: public GeometricCSpaceOMPL
 {
 protected:
-    ob::ConstraintPtr constraint;
+    std::vector<ob::ConstraintPtr> constraints;
+    ob::ConstraintIntersectionPtr  constraint_intersect;
 
 public:
     GeometricCSpaceOMPLRCONTACT_3D(RobotWorld *world_, int robot_idx);

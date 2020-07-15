@@ -2,7 +2,7 @@
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
 #include "planner/cspace/contact/ContactConstraint_3D.h"
-
+#include "planner/cspace/contact/ConstraintIntersection_Transition.h"
 #include "planner/cspace/cspace_geometric_R3_CONTACT.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
@@ -40,10 +40,17 @@ void GeometricCSpaceOMPLRCONTACT_3D::initSpace()
     bounds.check();
     static_pointer_cast<ob::RealVectorStateSpace>(Rn)->setBounds(bounds);
 
-    //Constrained State Space
-    constraint = std::make_shared<ContactConstraint_3D>(this, robot, world);
-    this->space = std::make_shared<ob::ProjectedStateSpace>(Rn, constraint);
+    //Constraint Pointer Vector
+    int firstLink = 6;
+    int lastLink  = robot->links.size() - 1;
+    constraints.push_back(std::make_shared<ContactConstraint_3D>(this, robot, world, lastLink));
+    constraints.push_back(std::make_shared<ContactConstraint_3D>(this, robot, world, firstLink));
 
+    //Constraint Intersection to join multiple constraints
+    constraint_intersect = std::make_shared<ConstraintIntersectionTransition>(Rn->getDimension(), constraints);
+    ob::StateSpacePtr RN_Constraint =  std::make_shared<ob::ProjectedStateSpaceTransition>(Rn, constraint_intersect);
+
+    this->space = RN_Constraint;
 }
 
 ob::SpaceInformationPtr GeometricCSpaceOMPLRCONTACT_3D::SpaceInformationPtr()
@@ -74,7 +81,8 @@ void GeometricCSpaceOMPLRCONTACT_3D::ConfigToOMPLState(const Config &q, ob::Stat
     }
 
     qompl->as<ob::ConstrainedStateSpace::StateType>()->copy(x);
-    constraint->project(qompl);
+    constraint_intersect->project(qompl);
+    SpaceInformationPtr()->enforceBounds(qompl);
 }
 
 Config GeometricCSpaceOMPLRCONTACT_3D::OMPLStateToConfig(const ob::State *qompl)
