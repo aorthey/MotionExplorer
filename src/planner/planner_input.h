@@ -29,6 +29,22 @@ struct Layer{
   std::vector<int> freeFloating;
 };
 
+struct ContactInformation
+{
+  std::string robot_name;
+  std::string robot_link;
+  int robot_link_idx{-1};
+  std::string mode;
+
+  std::string meshFrom;
+  std::string meshTo;
+  int meshFromIdx{-1};
+  int meshToIdx{-1};
+  int triFrom{-1};
+  int triTo{-1};
+};
+
+
 struct AgentInformation{
   Config q_init;
   Config q_goal;
@@ -41,6 +57,7 @@ struct AgentInformation{
   Config dqMax;
   Config uMin;
   Config uMax;
+  std::vector<ContactInformation> contact_links;
 };
 
 struct Stratification{
@@ -68,6 +85,7 @@ class PlannerInput{
     Config se3min;
     Config se3max;
     uint robot_idx;
+    std::vector<ContactInformation> contact_links;
 
     //multiagents
     std::vector<AgentInformation> agent_information;

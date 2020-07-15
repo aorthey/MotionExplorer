@@ -132,7 +132,7 @@ void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eig
             }
         }
     }else{
-        std::cout << "Invalid Obstacle!" << std::endl;
+        std::cout << "Invalid Obstacle "  << obstacleNumber_ << std::endl;
         std::exit(0);
     }
 

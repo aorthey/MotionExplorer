@@ -106,6 +106,48 @@ ob::ScopedState<> CSpaceOMPL::ConfigToOMPLState(const Config &q){
 
 void CSpaceOMPL::Init()
 {
+  //Read out Contact points of robot
+  Robot *robot = GetRobotPtr();
+  for(uint j = 0; j < input.contact_links.size(); j++)
+  {
+    ContactInformation &cj = input.contact_links.at(j);
+    std::cout << std::string(80, '-') << std::endl;
+    for(uint k = 0; k < robot->linkNames.size(); k++)
+    {
+      // std::cout << robot->name << ":" << robot->linkNames.at(k) << std::endl;
+      std::string link = robot->linkNames.at(k);
+      if(link == cj.robot_link)
+      {
+        cj.robot_link_idx = k;
+        break;
+      }
+    }
+    bool foundMesh = false;
+    for(uint k = 0; k < GetWorldPtr()->terrains.size(); k++)
+    {
+      std::string obj = GetWorldPtr()->terrains.at(k)->name;
+      if(obj == cj.meshFrom)
+      {
+        cj.meshFromIdx = k;
+        foundMesh = true;
+      }
+      if(obj == cj.meshTo)
+      {
+        cj.meshToIdx = k;
+      }
+    }
+    if(!foundMesh)
+    {
+      std::cout << "Could not find mesh " << cj.meshFrom << std::endl;
+      std::cout << "Mesh available:" << std::endl;
+      for(uint k = 0; k < GetWorldPtr()->terrains.size(); k++)
+      {
+        std::string obj = GetWorldPtr()->terrains.at(k)->name;
+        std::cout << obj << std::endl;
+      }
+      exit(0);
+    }
+  }
   this->initSpace();
 }
 

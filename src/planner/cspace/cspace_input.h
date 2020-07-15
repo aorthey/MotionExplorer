@@ -1,5 +1,6 @@
 #pragma once
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
+#include "planner/planner_input.h"
 
 struct CSpaceInput{
   double timestep_min;
@@ -11,4 +12,5 @@ struct CSpaceInput{
   bool fixedBase{false};
   bool kinodynamic{false};
   bool multiAgent{false};
+  std::vector<ContactInformation> contact_links;
 };

@@ -6,14 +6,8 @@
   <!-- <robot name="1dof_inner" file="../robots/planar/2dof_testobj_1dof_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>-->
   <!-- when adding/removing links remember to adjust configurations -->
 
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+3.2 -1.0 0" rotateRPY="0 0 0" scale="4 2 1"/>
-  <!--<terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+3.2 -0.0 0" rotateRPY="0 0 0" scale="4 1 1"/>
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+3.2 -4.0 0" rotateRPY="0 0 0" scale="4 1 1"/>
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -6.0 0" rotateRPY="0 0 0"/>
-
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="-2.5 -2.0 0" rotateRPY="0 0 0" scale="4 1 1"/>
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="-2.5 -4.0 0" rotateRPY="0 0 0" scale="4 1 1"/>-->
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="-2.45 +1.0 0" rotateRPY="0 0 0" scale="4 2 1"/>
+  <terrain name="rectangleBottom" file="../terrains/primitives/rectangle.tri" translation="+3.2 -1.0 0" rotateRPY="0 0 0" scale="4 2 1"/>
+  <terrain name="rectangleTop" file="../terrains/primitives/rectangle.tri" translation="-2.45 +0.0 0" rotateRPY="0 0 0" scale="4 1 1"/>
 
 
 
@@ -37,9 +31,21 @@
     <pathWidth>0.2</pathWidth>
     <freeFloating>1</freeFloating>
 
+    <algorithm name="ompl:rrt"/>
     <algorithm name="ompl:prm"/>
     <algorithm name="ompl:rrtconnect"/>
-    <algorithm name="ompl:rrt"/>
+    <algorithm name="ompl:lazyprm"/>
+
+    <contacts>
+      <contact robot_name="2dof" robot_link="jlink2" 
+        mode="fixed" 
+        mesh="rectangleBottom"
+        tri="13"/>
+      <contact robot_name="2dof" robot_link="jlink0" 
+        mode="transition" 
+        meshFrom="rectangleBottom" triFrom="3" 
+        meshTo="rectangleTop" triTo="6"/>
+    </contacts>
 
     <hierarchy>
       <level inner_index="0" type="R2_CONTACT"/>
