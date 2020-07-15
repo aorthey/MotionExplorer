@@ -2,17 +2,15 @@
 
 <world>
 
-  <robot name="3dof" file="../robots/planar_manipulator/3dof_manip_no_endeffector_test_object.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="3dof" file="../robots/planar_manipulator/3dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -2.0 0.0" rotateRPY="0 0 0"/>
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -0.0 -0.0" rotateRPY="0 0 0"/>
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -4.0 -0.0" rotateRPY="0 0 0"/>
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 +2.0 -0.0" rotateRPY="0 0 0"/>
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+3.0 -1.5 -0.0" rotateRPY="0 0 0" scale="4 4 1"/>
+  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="-2.45 0.0 0" rotateRPY="0 0 0" scale="4 1 1"/>
 
   <plannerinput>
 
-    <qinit  config="12  1.75 -3 +0.0 0.0 0.0 0.0  1.570796 0.0 1.570796 0 1.570796"/>
-    <qgoal  config="12  1.75 2 +0.0 +0.0 0.0 0.0  1.570796 0.0 1.570796 0 1.570796"/>
+    <qinit  config="12  2 -3 +0.0 0.0 0.0 0.0  1.570796 0.0 1.570796 0 1.570796"/>
+    <qgoal  config="12  2 2 +0.0 +0.0 0.0 0.0  1.570796 0.0 1.570796 0 1.570796"/>
     <se3min config="6  0 -5.5 -0.0 -3.141593 -3.141593 -3.141593"/>
     <se3max config="6  +4 +3 +0.0 +3.141593 +3.141593 +3.141593"/>
     <epsilongoalregion>0.05</epsilongoalregion>

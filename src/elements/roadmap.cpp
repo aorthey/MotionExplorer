@@ -88,11 +88,11 @@ PathPiecewiseLinear* Roadmap::GetShortestPath(){
         shortest_path.push_back(q);
       }
       if(pred.size()>0){
-        if(quotient_space->isDynamic()){
+        /*if(quotient_space->isDynamic()){
           static_pointer_cast<oc::PathControl>(path)->interpolate();
         }else{
           static_pointer_cast<og::PathGeometric>(path)->interpolate();
-        }
+        }*/
         path_ompl = new PathPiecewiseLinear(path, cspace, quotient_space);
       }
       return nullptr;

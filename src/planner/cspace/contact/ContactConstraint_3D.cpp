@@ -4,7 +4,7 @@
 
 
 ContactConstraint_3D::ContactConstraint_3D(GeometricCSpaceOMPLRCONTACT_3D *cspace, Robot *robot, RobotWorld *world):
-ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
+ob::Constraint(5, 1)  // (x,y,z, theta at 1st link,phi at 2nd)
 , cspace_(cspace)
 , robot_(robot)
 , world_(world)
@@ -25,28 +25,6 @@ ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
             tris.push_back(tri);
         }
     }
-//    for(uint l = 0; l < tris.size(); l++){
-//        Vector3 normal = tris.at(l).normal();
-//        double epsilon = 1e-10;
-//
-//        if(fabs((fabs(normal[2]) - 1.0))<epsilon){
-//            //does nothing
-//        }
-//        else{
-//            // only x and y coordinates
-//            Vector2 a = Vector2(tris.at(l).a[0], tris.at(l).a[1]);
-//            Vector2 b = Vector2(tris.at(l).b[0], tris.at(l).b[1]);
-//            Vector2 c = Vector2(tris.at(l).c[0], tris.at(l).c[1]);
-//
-//            cornerCoord.push_back(a);
-//            cornerCoord.push_back(b);
-//            cornerCoord.push_back(c);
-//
-//            trisFiltered.push_back(tris.at(l));
-//        }
-//    }
-//    std::cout << "Environment has " << tris.size() << " triangles to make contact!" << std::endl;
-
 }
 
 Vector3 ContactConstraint_3D::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd, int linkNumber) const
@@ -84,7 +62,7 @@ void ContactConstraint_3D::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
     Vector3 contact_firstLink = getPos(x, firstLink);
 
 
-    Vector3 closestPt = trisFiltered.at(6).closestPoint(contact_firstLink);
+    Vector3 closestPt = tris.at(0).closestPoint(contact_firstLink);
 
     Real distances = 1000;
     //loop over all surface triangles to get triangle that's closest
@@ -99,6 +77,8 @@ void ContactConstraint_3D::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
     }
 
     Real distVect = contact_firstLink.distance(closestPt);
+
+    out[0] = distVect;
 
 
 //    // ---------- Contact with Last Link ------------------
@@ -120,6 +100,6 @@ void ContactConstraint_3D::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
 //    }
 //    Real distVect_last = contact_lastLink.distance(closestPt_last);
 
-    out[0] = distVect;
-    //out[0] = distVect_last;
+//    out[0] = distVect_last;
+
 }

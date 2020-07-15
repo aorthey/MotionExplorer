@@ -4,7 +4,7 @@
 
 
 ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
-        ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
+        ob::Constraint(5, 1)  // (x,y,z, theta at 1st link,phi at 2nd)
         , cspace_(cspace)
         , robot_(robot)
         , world_(world)

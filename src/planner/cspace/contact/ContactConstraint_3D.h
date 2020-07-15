@@ -18,8 +18,6 @@ class ContactConstraint_3D : public ob::Constraint
 {
 protected:
     std::vector<Triangle3D> tris;
-    std::vector<Triangle3D> trisFiltered;
-    std::vector<Vector2> cornerCoord;
 
 public:
     ContactConstraint_3D(GeometricCSpaceOMPLRCONTACT_3D *cspace, Robot *robot, RobotWorld *world);
