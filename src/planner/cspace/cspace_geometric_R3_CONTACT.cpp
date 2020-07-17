@@ -41,7 +41,7 @@ void GeometricCSpaceOMPLRCONTACT_3D::initSpace()
     static_pointer_cast<ob::RealVectorStateSpace>(Rn)->setBounds(bounds);
 
     //Constrained State Space
-    constraint = std::make_shared<ContactConstraint_3D>(this, robot, world);
+    constraint = std::make_shared<ContactConstraint_3D>(this, Rn->getDimension(), robot, world);
     this->space = std::make_shared<ob::ProjectedStateSpace>(Rn, constraint);
 
 }

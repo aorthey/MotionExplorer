@@ -33,6 +33,9 @@ namespace ompl
             /** \brief Sample a state uniformly in ambient space and project to
              * the manifold. Return sample in \a state. */
             void sampleUniform(State *state) override;
+            void sampleUniformNear(State *state, const State *near, double distance) override;
+            void sampleGaussian(State *state, const State *mean, double stdDev) override;
+
 
         protected:
             /** \brief Constraint. */
@@ -79,6 +82,7 @@ namespace ompl
              * freeing states returned in \a geodesic.*/
             bool discreteGeodesic(const State *from, const State *to, bool interpolate = false,
                                   std::vector<State *> *geodesic = nullptr) const override;
+            // void resetTransitionConstraints();
 
             // unsigned int validSegmentCount(const State *state1, const State *state2) const override;
 

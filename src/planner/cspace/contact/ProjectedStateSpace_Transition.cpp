@@ -11,8 +11,8 @@ ompl::base::ProjectedStateSamplerTransition::ProjectedStateSamplerTransition(con
   : ProjectedStateSampler(reinterpret_cast<const ProjectedStateSpace *>(space), std::move(sampler))
   , constraint_(space->getConstraint()) {
     // check if multiple (constraintIntersection) or single constraint
-    const ConstraintIntersectionTransitionPtr cIP = std::dynamic_pointer_cast<ConstraintIntersectionTransition>(
-            space->getConstraint());
+    const ConstraintIntersectionTransitionPtr cIP = 
+      std::dynamic_pointer_cast<ConstraintIntersectionTransition>(space->getConstraint());
     if (cIP != nullptr) {
         constraintsVec = cIP->getConstraintsVec();
     }
@@ -21,8 +21,8 @@ ompl::base::ProjectedStateSamplerTransition::ProjectedStateSamplerTransition(con
 void ompl::base::ProjectedStateSamplerTransition::sampleUniform(State *state)
 {
     WrapperStateSampler::sampleUniform(state);
-    for(uint i = 0; i < constraintsVec.size(); i++){
-
+    for(uint i = 0; i < constraintsVec.size(); i++)
+    {
         ConstraintPtr cPi = constraintsVec.at(i);
 
         // check if constraints in vector are transitionConstraints
@@ -37,11 +37,50 @@ void ompl::base::ProjectedStateSamplerTransition::sampleUniform(State *state)
     }
     constraint_->project(state);
     space_->enforceBounds(state);
+
+    for(uint i = 0; i < constraintsVec.size(); i++)
+    {
+        ConstraintPtr cPi = constraintsVec.at(i);
+        const TransitionConstraintPtr tCP = std::dynamic_pointer_cast<TransitionConstraint>(cPi);
+        if (tCP != nullptr){
+            tCP->setMode(1);
+        }
+    }
+}
+void ompl::base::ProjectedStateSamplerTransition::sampleUniformNear(
+    State *state, const State *near, double distance)
+{
+  OMPL_ERROR("NYI");
+  ompl::Exception("NYI");
+}
+void ompl::base::ProjectedStateSamplerTransition::sampleGaussian(
+    State *state, const State *mean, double stdDev)
+{
+  OMPL_ERROR("NYI");
+  ompl::Exception("NYI");
 }
 
 /// ProjectedStateSpaceTransition
 
 /// Public
+// void ompl::base::ProjectedStateSpaceTransition::resetTransitionConstraints()
+// {
+//     const ConstraintIntersectionTransitionPtr cIP = 
+//       std::dynamic_pointer_cast<ConstraintIntersectionTransition>(constraint_);
+
+//     std::vector<ConstraintPtr> constraintsVec = cIP->getConstraintsVec();
+//     for(uint i = 0; i < constraintsVec.size(); i++)
+//     {
+//         ConstraintPtr cPi = constraintsVec.at(i);
+
+//         // check if constraints in vector are transitionConstraints
+//         const TransitionConstraintPtr tCP = std::dynamic_pointer_cast<TransitionConstraint>(cPi);
+//         if (tCP != nullptr)
+//         {
+//             tCP->setMode(1);
+//         }
+//     }
+// }
 
 bool ompl::base::ProjectedStateSpaceTransition::discreteGeodesic(const State *from, const State *to, bool interpolate,
                                                        std::vector<State *> *geodesic) const

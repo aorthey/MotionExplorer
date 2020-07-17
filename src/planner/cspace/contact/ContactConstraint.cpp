@@ -3,8 +3,8 @@
 #include "planner/cspace/cspace_geometric_R2_CONTACT.h"
 
 
-ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
-        ob::Constraint(5, 1)  // (x,y,z, theta at 1st link,phi at 2nd)
+ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
+        ob::Constraint(ambientSpaceDim, 1)  // (x,y,z, theta at 1st link,phi at 2nd)
         , cspace_(cspace)
         , robot_(robot)
         , world_(world)
@@ -135,8 +135,6 @@ void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eig
         std::cout << "Invalid Obstacle "  << obstacleNumber_ << std::endl;
         std::exit(0);
     }
-
-
 
     Real distVect = contact.distance(closestPt);
 

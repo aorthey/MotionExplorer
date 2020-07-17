@@ -58,7 +58,7 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
           << " link " << cj.robot_link << " (idx " << cj.robot_link_idx << ")"
           << " on mesh " << cj.meshFrom << " (idx " << cj.meshFromIdx << ")"
            << std::endl;
-        constraints.push_back(std::make_shared<ContactConstraint>(this, robot, world, link, meshIdx));
+        constraints.push_back(std::make_shared<ContactConstraint>(this, Rn->getDimension(), robot, world, link, meshIdx));
       }else if(cj.mode == "transition")
       {
         std::cout << "Adding Transition Contact Constraint:"
@@ -71,17 +71,13 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
         // int triFromIdx = cj.triFromIdx; //relative to mesh
         // int meshToIdx = cj.meshToIdx;
         // int triToIdx = cj.triToIdx;
-        constraints.push_back(std::make_shared<TransitionConstraint>(this, robot, world, link, meshFromIdx));
+        constraints.push_back(std::make_shared<TransitionConstraint>(this, Rn->getDimension(), robot, world, link, meshFromIdx));
       }else{
         std::cout << "Could not identify contact mode" << std::endl;
         exit(0);
       }
 
     }
-    // constraints.push_back(std::make_shared<ContactConstraint>(this, robot, world, lastLink, 0));
-    // constraints.push_back(std::make_shared<TransitionConstraint>(this, robot, world, firstLink, 0));
-
-
 
     //Constraint Intersection to join multiple constraints
     constraint_intersect = std::make_shared<ConstraintIntersectionTransition>(Rn->getDimension(), constraints);
@@ -118,15 +114,27 @@ void GeometricCSpaceOMPLRCONTACT::ConfigToOMPLState(const Config &q, ob::State *
     }
 
     qompl->as<ob::ConstrainedStateSpace::StateType>()->copy(x);
-    constraint_intersect->project(qompl);
+
+    SpaceInformationPtr()->printState(qompl);
+    std::cout << constraints.size() << std::endl;
+
+    // for(uint i = 0; i < constraints.size(); i++)
+    // {
+    //   ob::ConstraintPtr cPi = constraints.at(i);
+
+    //     // check if constraints in vector are transitionConstraints
+    //     const TransitionConstraintPtr tCP = std::dynamic_pointer_cast<TransitionConstraint>(cPi);
+    //     if (tCP != nullptr)
+    //     {
+    //       std::cout << "Constraint " << i << " modus " << tCP->getMode() << std::endl;
+    //     }
+    // }
+
+    static_pointer_cast<ob::ConstrainedStateSpace>(this->space)->getConstraint()->project(qompl);
 
     SpaceInformationPtr()->enforceBounds(qompl);
-
-/*    for (uint c = 0; c < constraints.size(); c++) {
-        constraints[c]->project(qompl);
-    }
-*/
-
+    SpaceInformationPtr()->printState(qompl);
+    
 }
 
 Config GeometricCSpaceOMPLRCONTACT::OMPLStateToConfig(const ob::State *qompl)

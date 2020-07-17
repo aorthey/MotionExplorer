@@ -4,8 +4,8 @@
 
 
 TransitionConstraint::TransitionConstraint
-(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
-ContactConstraint(cspace, robot, world, linkNumber, obstacleNumber)
+(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
+ContactConstraint(cspace, ambientSpaceDim, robot, world, linkNumber, obstacleNumber)
 {
     /**
      * Information on obstacle surface triangles.
@@ -49,8 +49,14 @@ ContactConstraint(cspace, robot, world, linkNumber, obstacleNumber)
 
 }
 
-void TransitionConstraint::setMode(uint newMode){
-    mode = newMode;
+int TransitionConstraint::getMode()
+{
+  return mode;
+}
+
+void TransitionConstraint::setMode(int newMode)
+{
+    mode = static_cast<Mode>(newMode);
 }
 
 void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
@@ -66,7 +72,7 @@ void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
     // OR Free from constraint
     // OR Contact with different surface
 
-    if (mode == 0){
+    if (mode == ACTIVE_CONSTRAINT_INITIAL){
         // --------------- Mode 0: Contact with initial contact surface ---------------
         Vector3 contact = getPos(x);
 
@@ -88,11 +94,11 @@ void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
 
         out[0] = distVect;
 
-    } else if (mode == 1){
+    } else if (mode == NO_ACTIVE_CONSTRAINT){
         // --------------- Mode 1: No contact constraint ---------------
-        out[0] = 0;
+        out[0] = 0.0;
 
-    } else if (mode == 2){
+    } else if (mode == ACTIVE_CONSTRAINT_GOAL){
         // --------------- Mode 2: Contact with different contact surface ---------------
         Vector3 contact = getPos(x);
 
@@ -113,6 +119,9 @@ void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
 
         out[0] = distVect;
 
+    }else
+    {
+      OMPL_ERROR("Mode %d not recognized", mode);
+      throw ompl::Exception("UNKNOWN MODE");
     }
-
 }

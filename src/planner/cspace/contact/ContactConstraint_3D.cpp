@@ -3,8 +3,8 @@
 #include "planner/cspace/cspace_geometric_R3_CONTACT.h"
 
 
-ContactConstraint_3D::ContactConstraint_3D(GeometricCSpaceOMPLRCONTACT_3D *cspace, Robot *robot, RobotWorld *world):
-ob::Constraint(5, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
+ContactConstraint_3D::ContactConstraint_3D(GeometricCSpaceOMPLRCONTACT_3D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world):
+ob::Constraint(ambientSpaceDim, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
 , cspace_(cspace)
 , robot_(robot)
 , world_(world)

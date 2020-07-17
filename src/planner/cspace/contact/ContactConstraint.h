@@ -24,7 +24,7 @@ protected:
     std::vector<Vector2> cornerCoord;
 
 public:
-    ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber);
+    ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber);
 
 
     Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const;
