@@ -162,6 +162,49 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
   dq_init = GetSubNodeAttributeDefault<Config>(node, "dqinit", "config", dq);
   dq_goal = GetSubNodeAttributeDefault<Config>(node, "dqgoal", "config", dq);
 
+    contact_links.clear();
+    TiXmlElement* node_contacts = FindSubNode(node, "contacts");
+    if(node_contacts != nullptr)
+    {
+        TiXmlElement* node_contact = FindFirstSubNode(node_contacts, "contact");
+        while(node_contact != nullptr)
+        {
+            ContactInformation c_link;
+
+            std::string robot_name = GetAttribute<std::string>(node_contact, "robot_name");
+            c_link.robot_name = robot_name;
+
+            std::string link = GetAttribute<std::string>(node_contact, "robot_link");
+            c_link.robot_link = link;
+
+            std::string mode = GetAttribute<std::string>(node_contact, "mode");
+            c_link.mode = mode;
+
+            if(mode=="fixed")
+            {
+                std::string mesh = GetAttribute<std::string>(node_contact, "mesh");
+                int tri = GetAttributeDefault<int>(node_contact, "tri", -1);
+                c_link.meshFrom = mesh;
+                c_link.triFrom = tri;
+            }else if(mode=="transition")
+            {
+                std::string meshFrom = GetAttribute<std::string>(node_contact, "meshFrom");
+                int triFrom = GetAttributeDefault<int>(node_contact, "triFrom", -1);
+                std::string meshTo = GetAttribute<std::string>(node_contact, "meshTo");
+                int triTo = GetAttributeDefault<int>(node_contact, "triTo", -1);
+                c_link.meshFrom = meshFrom;
+                c_link.triFrom = triFrom;
+                c_link.meshTo = meshTo;
+                c_link.triTo = triTo;
+            }else{
+                std::cout << "ERROR: mode " << mode << " unknown." << std::endl;
+                throw "MODE";
+            }
+            contact_links.push_back(c_link);
+            node_contact = FindNextSiblingNode(node_contact);
+        }
+    }
+
   se3min.resize(6); se3min.setZero();
   se3max.resize(6); se3max.setZero();
   se3min = GetSubNodeAttributeDefault<Config>(node, "se3min", "config", se3min);
@@ -219,6 +262,7 @@ const CSpaceInput& PlannerInput::GetCSpaceInput()
   cin->fixedBase = !freeFloating;
   cin->uMin = uMin;
   cin->uMax = uMax;
+  cin->contact_links = contact_links;
   cin->kinodynamic = kinodynamic;
   return *cin;
 }

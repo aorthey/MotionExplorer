@@ -102,6 +102,6 @@
 </joint>
 
   <klampt package_root="../../.." fixed_root_link="1" default_acc_max="4" >
-  <link name = "jlink2" physical = "0" />
+    <link name = "jlink2" physical = "0" />
   </klampt>
 </robot>

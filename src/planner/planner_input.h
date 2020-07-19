@@ -14,6 +14,21 @@ struct Layer{
   std::string type;
 };
 
+struct ContactInformation
+{
+    std::string robot_name;
+    std::string robot_link;
+    int robot_link_idx{-1};
+    std::string mode;
+
+    std::string meshFrom;
+    std::string meshTo;
+    int meshFromIdx{-1};
+    int meshToIdx{-1};
+    int triFrom{-1};
+    int triTo{-1};
+};
+
 struct Stratification{
   std::vector<Layer> layers;
 };
@@ -36,6 +51,9 @@ class PlannerInput{
     Config se3max;
 
     uint robot_idx;
+    std::vector<ContactInformation> contact_links;
+
+    //contact-planning
     int freeFloating;
     bool contactPlanner{false};
     
