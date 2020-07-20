@@ -4,7 +4,7 @@
 
 
 ContactConstraint_3D::ContactConstraint_3D(GeometricCSpaceOMPLRCONTACT_3D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber):
-ob::Constraint(ambientSpaceDim, 2)  // (x,y,z, theta at 1st link,phi at 2nd)
+ob::Constraint(ambientSpaceDim, 1)  // (x,y,z, theta at 1st link,phi at 2nd)
 , cspace_(cspace)
 , robot_(robot)
 , world_(world)
@@ -79,4 +79,5 @@ void ContactConstraint_3D::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
     Real distVect = contact.distance(closestPt);
 
     out[0] = distVect;
+    // out[1] = 0;
 }

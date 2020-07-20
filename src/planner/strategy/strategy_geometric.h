@@ -9,7 +9,6 @@ namespace og = ompl::geometric;
 struct OMPLGeometricStratification{
   std::vector<ob::SpaceInformationPtr> si_vec;
   ob::ProblemDefinitionPtr pdef;
-  std::vector<std::vector<int> > projectionMatrix;
   OMPLGeometricStratification( std::vector<ob::SpaceInformationPtr> si_vec_, ob::ProblemDefinitionPtr pdef_):
     si_vec(si_vec_), pdef(pdef_)
   {

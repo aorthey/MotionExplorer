@@ -33,6 +33,7 @@
     <algorithm dynamic="1" name="hierarchy:explorer"/>
     <algorithm dynamic="1" name="optimizer"/>
     <algorithm dynamic="1" name="ompl:dynamic:sst"/>
+    <algorithm dynamic="1" name="ompl:dynamic:kpiece"/>
 
     <hierarchy>
       <level inner_index="0" type="TSE2"/>

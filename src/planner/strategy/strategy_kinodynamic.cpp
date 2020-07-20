@@ -179,7 +179,6 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
   // choose planner
   //###########################################################################
   // const oc::SpaceInformationPtr si = static_pointer_cast<oc::SpaceInformation>(planner->getSpaceInformation());
-  // si->getStateSpace()->registerProjections();
   // si->setMinMaxControlDuration(0.01, 0.1);
   // si->setPropagationStepSize(1);
   // si->getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(si->getStateSpace())));
@@ -195,6 +194,7 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
   // planner->getProblemDefinition()->getOptimizationObjective()->setCostThreshold(ob::Cost(minimalCostAcceptable));
 
   ompl::time::point start = ompl::time::now();
+  planner->getSpaceInformation()->getStateSpace()->registerProjections();
   planner->solve(ptc);
   output.planner_time = ompl::time::seconds(ompl::time::now() - start);
   output.max_planner_time = max_planning_time;
