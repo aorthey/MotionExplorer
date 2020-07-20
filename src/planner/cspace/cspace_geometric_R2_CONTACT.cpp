@@ -115,9 +115,8 @@ void GeometricCSpaceOMPLRCONTACT::ConfigToOMPLState(const Config &q, ob::State *
 
     qompl->as<ob::ConstrainedStateSpace::StateType>()->copy(x);
 
-    SpaceInformationPtr()->printState(qompl);
-    std::cout << constraints.size() << std::endl;
 
+    //TODO: set into right modus
     // for(uint i = 0; i < constraints.size(); i++)
     // {
     //   ob::ConstraintPtr cPi = constraints.at(i);
@@ -130,11 +129,9 @@ void GeometricCSpaceOMPLRCONTACT::ConfigToOMPLState(const Config &q, ob::State *
     //     }
     // }
 
-    static_pointer_cast<ob::ConstrainedStateSpace>(this->space)->getConstraint()->project(qompl);
 
+    static_pointer_cast<ob::ConstrainedStateSpace>(this->space)->getConstraint()->project(qompl);
     SpaceInformationPtr()->enforceBounds(qompl);
-    SpaceInformationPtr()->printState(qompl);
-    
 }
 
 Config GeometricCSpaceOMPLRCONTACT::OMPLStateToConfig(const ob::State *qompl)

@@ -2,7 +2,7 @@
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
 #include "planner/cspace/contact/ContactConstraint_3D.h"
-
+#include "planner/cspace/contact/ConstraintIntersection_Transition.h"
 #include "planner/cspace/cspace_geometric_R3_CONTACT.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
@@ -40,10 +40,17 @@ void GeometricCSpaceOMPLRCONTACT_3D::initSpace()
     bounds.check();
     static_pointer_cast<ob::RealVectorStateSpace>(Rn)->setBounds(bounds);
 
-    //Constrained State Space
-    constraint = std::make_shared<ContactConstraint_3D>(this, Rn->getDimension(), robot, world);
-    this->space = std::make_shared<ob::ProjectedStateSpace>(Rn, constraint);
+    //Constraint Pointer Vector
+    int firstLink = 6;
+    int lastLink  = robot->links.size() - 1;
+    constraints.push_back(std::make_shared<ContactConstraint_3D>(this, Rn->getDimension(), robot, world, lastLink));
+    constraints.push_back(std::make_shared<ContactConstraint_3D>(this, Rn->getDimension(), robot, world, firstLink));
 
+    //Constraint Intersection to join multiple constraints
+    constraint_intersect = std::make_shared<ConstraintIntersectionTransition>(Rn->getDimension(), constraints);
+    ob::StateSpacePtr RN_Constraint =  std::make_shared<ob::ProjectedStateSpaceTransition>(Rn, constraint_intersect);
+
+    this->space = RN_Constraint;
 }
 
 ob::SpaceInformationPtr GeometricCSpaceOMPLRCONTACT_3D::SpaceInformationPtr()
@@ -58,23 +65,24 @@ ob::SpaceInformationPtr GeometricCSpaceOMPLRCONTACT_3D::SpaceInformationPtr()
 
 void GeometricCSpaceOMPLRCONTACT_3D::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
-    Eigen::VectorXd x(3+Nompl);
+    Eigen::VectorXd x(6+Nompl);
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 6; i++) {
         x[i] = q[i];
     }
-    x[2] = q[3];
 
     for(uint i = 0; i < Nklampt; i++)
     {
         int idx = klampt_to_ompl.at(i);
         if(idx<0) continue;
         else{
-            x[3 + idx]=q(6+i);
+            x[6 + idx]=q(6+i);
         }
     }
 
     qompl->as<ob::ConstrainedStateSpace::StateType>()->copy(x);
+    constraint_intersect->project(qompl);
+    SpaceInformationPtr()->enforceBounds(qompl);
 }
 
 Config GeometricCSpaceOMPLRCONTACT_3D::OMPLStateToConfig(const ob::State *qompl)
@@ -85,14 +93,13 @@ Config GeometricCSpaceOMPLRCONTACT_3D::OMPLStateToConfig(const ob::State *qompl)
     q.resize(robot->q.size());
     q.setZero();
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 6; i++) {
         q(i)=x[i];
     }
-    q(3)=x[2];
 
     for(uint i = 0; i < Nompl; i++){
         uint idx = ompl_to_klampt.at(i);
-        q(idx) = x[i+3];
+        q(idx) = x[i+6];
     }
     return q;
 }
@@ -103,17 +110,16 @@ Config GeometricCSpaceOMPLRCONTACT_3D::EigenVectorToConfig(const Eigen::VectorXd
     q.resize(robot->q.size());
     q.setZero();
 
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 6; i++) {
         q(i)=xd[i];
     }
-    q(3) = xd[2];
 
     while(q(3)>M_PI) q(3) -= 2*M_PI;
     while(q(3)<-M_PI) q(3) += 2*M_PI;
 
     for(uint i = 0; i < Nompl; i++){
         uint idx = ompl_to_klampt.at(i);
-        q(idx) = xd[i+3];
+        q(idx) = xd[i+6];
     }
     return q;
 }
