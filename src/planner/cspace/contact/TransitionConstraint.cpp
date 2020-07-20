@@ -34,14 +34,25 @@ ContactConstraint(cspace, robot, world, linkNumber, obstacleNumber)
         }
         else{
 
-            // quick fix for distinction between two obstacles that dont touch, x coordinates positive or negative
-            if(tris.at(l).a[0] < 0 && tris.at(l).a[0] > -2 && tris.at(l).b[0] > -2 && tris.at(l).c[0] > -2){
-                trisFiltered_negative.push_back(tris.at(l));
-                //std::cout << "Triangle with negative x coord: " << tris.at(l) << std::endl;
+//            // quick fix for distinction between two obstacles that dont touch, x coordinates positive or negative
+//            if(tris.at(l).a[0] < 0 && tris.at(l).a[0] > -2 && tris.at(l).b[0] > -2 && tris.at(l).c[0] > -2){
+//                trisFiltered_negative.push_back(tris.at(l));
+//                //std::cout << "Triangle with negative x coord: " << tris.at(l) << std::endl;
+//
+//            }else if (tris.at(l).a[0] > 0 && tris.at(l).a[0] < 2.5 && tris.at(l).b[0] < 2.5 && tris.at(l).c[0] < 2.5){
+//                trisFiltered.push_back(tris.at(l));
+//                //std::cout << "Triangle with positive x coord: " << tris.at(l) << std::endl;
+//            }
 
-            }else if (tris.at(l).a[0] > 0 && tris.at(l).a[0] < 2.5 && tris.at(l).b[0] < 2.5 && tris.at(l).c[0] < 2.5){
-                trisFiltered.push_back(tris.at(l));
-                //std::cout << "Triangle with positive x coord: " << tris.at(l) << std::endl;
+            // quick fix for distinction between two obstacles that dont touch, Y coordinates positive or negative
+            if (tris.at(l).a[0] < 2.5 && tris.at(l).b[0] < 2.5 && tris.at(l).c[0] < 2.5){
+                if(tris.at(l).a[1] > 0){
+                    trisFiltered_negative.push_back(tris.at(l));
+                    std::cout << "Y-Coord greater than 0: " << tris.at(l) << std::endl;
+                } else{
+                    trisFiltered.push_back(tris.at(l));
+                    std::cout << "Y-Coord smaller than 0: " << tris.at(l) << std::endl;
+                }
             }
 
         }

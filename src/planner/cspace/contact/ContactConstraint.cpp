@@ -45,14 +45,24 @@ ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot 
             cornerCoord.push_back(a);
             cornerCoord.push_back(b);
             cornerCoord.push_back(c);
+//
+//            // quick fix for distinction between two obstacles that dont touch, x coordinates positive or negative
+//            if(tris.at(l).a[0] < 0 && tris.at(l).a[0] > -2 && tris.at(l).b[0] > -2 && tris.at(l).c[0] > -2){
+//                trisFiltered_negative.push_back(tris.at(l));
+//
+//            }else if (tris.at(l).a[0] > 0 && tris.at(l).a[0] < 2.5 && tris.at(l).b[0] < 2.5 && tris.at(l).c[0] < 2.5){
+//                trisFiltered.push_back(tris.at(l));
+//
+//            }
 
-            // quick fix for distinction between two obstacles that dont touch, x coordinates positive or negative
-            if(tris.at(l).a[0] < 0 && tris.at(l).a[0] > -2 && tris.at(l).b[0] > -2 && tris.at(l).c[0] > -2){
-                trisFiltered_negative.push_back(tris.at(l));
+            // quick fix for distinction between two obstacles that dont touch, Y coordinates positive or negative
+            if(tris.at(l).a[0] > -2 && tris.at(l).b[0] > -2 && tris.at(l).c[0] > -2){
+                if(tris.at(l).a[1] > 0){
+                    trisFiltered_negative.push_back(tris.at(l));
 
-            }else if (tris.at(l).a[0] > 0 && tris.at(l).a[0] < 2.5 && tris.at(l).b[0] < 2.5 && tris.at(l).c[0] < 2.5){
-                trisFiltered.push_back(tris.at(l));
-
+                } else{
+                    trisFiltered.push_back(tris.at(l));
+                }
             }
 
         }
