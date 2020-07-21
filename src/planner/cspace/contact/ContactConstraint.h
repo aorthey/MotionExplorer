@@ -57,7 +57,7 @@ public:
             void project(const ob::State *state, Eigen::Ref<Eigen::VectorXd> projection) const override
             {
                 auto &&x = *state->as<ob::ConstrainedStateSpace::StateType>();
-                projection(0) = 0;
+                projection(0) = x[0];
                 projection(1) = x[1];
                 projection(2) = 0;
                 std::cout << "Project " << projection << std::endl;
