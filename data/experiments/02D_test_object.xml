@@ -6,8 +6,8 @@
   <!-- <robot name="1dof_inner" file="../robots/planar/2dof_testobj_1dof_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>-->
   <!-- when adding/removing links remember to adjust configurations -->
 
-  <terrain name="rectangleBottom" file="../terrains/primitives/rectangle.tri" translation="+3.2 -2.5 0" rotateRPY="0 0 0" scale="4 2 1"/>
-  <terrain name="rectangleBottom" file="../terrains/primitives/rectangle.tri" translation="+3.2 +2.5 0" rotateRPY="0 0 0" scale="4 2 1"/>
+  <terrain name="rectangleBottom1" file="../terrains/primitives/rectangle.tri" translation="+3.2 -2.5 0" rotateRPY="0 0 0" scale="4 2 1"/>
+  <terrain name="rectangleBottom2" file="../terrains/primitives/rectangle.tri" translation="+3.2 +2.5 0" rotateRPY="0 0 0" scale="4 2 1"/>
 
   <!-- <terrain name="rectangleTop" file="../terrains/primitives/rectangle.tri" translation="-2.45 +0.0 0" rotateRPY="0 0 0" scale="4 1 1"/> -->
 
@@ -39,12 +39,12 @@
     <contacts>
       <contact robot_name="2dof" robot_link="jlink2"
                mode="fixed"
-               mesh="rectangleBottom"
+               mesh="rectangleBottom1"
                tri="13"/>
       <contact robot_name="2dof" robot_link="jlink0"
                mode="transition"
-               meshFrom="rectangleBottom" triFrom="3"
-               meshTo="rectangleTop" triTo="6"/>
+               meshFrom="rectangleBottom1" triFrom="3"
+               meshTo="rectangleBottom2" triTo="6"/>
     </contacts>
 
     <hierarchy>

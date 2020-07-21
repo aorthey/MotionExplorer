@@ -4,8 +4,8 @@
 
 
 TransitionConstraint::TransitionConstraint
-(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
-ContactConstraint(cspace, ambientSpaceDim, robot, world, linkNumber, obstacleNumber)
+(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint startMeshIdx, uint goalMeshIdx):
+ContactConstraint(cspace, ambientSpaceDim, robot, world, linkNumber, startMeshIdx)
 {
     /**
      * Information on obstacle surface triangles.
@@ -17,7 +17,7 @@ ContactConstraint(cspace, ambientSpaceDim, robot, world, linkNumber, obstacleNum
 
     for(uint k = 0; k < world->terrains.size(); k++){
         Terrain* terrain_k = world->terrains[k];
-        const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();//different mesh
+        const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();
 
         for(uint j = 0; j < mesh.tris.size(); j++){
             Triangle3D tri;

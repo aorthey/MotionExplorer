@@ -3,8 +3,9 @@
 #include "planner/cspace/cspace_geometric_R2_CONTACT.h"
 
 
-ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
-        ob::Constraint(ambientSpaceDim, 1)  // (x,y,z, theta at 1st link,phi at 2nd)
+ContactConstraint::ContactConstraint
+(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
+ob::Constraint(ambientSpaceDim, 1)
         , cspace_(cspace)
         , robot_(robot)
         , world_(world)
@@ -21,7 +22,7 @@ ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, int am
 
     for(uint k = 0; k < world_->terrains.size(); k++){
         Terrain* terrain_k = world_->terrains[k];
-        const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();//different mesh
+        const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();
 
         for(uint j = 0; j < mesh.tris.size(); j++){
             Triangle3D tri;
@@ -38,13 +39,13 @@ ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, int am
         }
         else{
             // only x and y coordinates
-            Vector2 a = Vector2(tris.at(l).a[0], tris.at(l).a[1]);
+/*          Vector2 a = Vector2(tris.at(l).a[0], tris.at(l).a[1]);
             Vector2 b = Vector2(tris.at(l).b[0], tris.at(l).b[1]);
             Vector2 c = Vector2(tris.at(l).c[0], tris.at(l).c[1]);
 
             cornerCoord.push_back(a);
             cornerCoord.push_back(b);
-            cornerCoord.push_back(c);
+            cornerCoord.push_back(c); */
 //
 //            // quick fix for distinction between two obstacles that dont touch, x coordinates positive or negative
 //            if(tris.at(l).a[0] < 0 && tris.at(l).a[0] > -2 && tris.at(l).b[0] > -2 && tris.at(l).c[0] > -2){
@@ -69,11 +70,11 @@ ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, int am
     }
 
     // remove all duplicates of (2D) corner coordinates
-    auto end = cornerCoord.end();
+/*  auto end = cornerCoord.end();
     for(auto it = cornerCoord.begin(); it != end; ++it){
         end = std::remove(it + 1, end, *it);
     }
-    cornerCoord.erase(end, cornerCoord.end());
+    cornerCoord.erase(end, cornerCoord.end()); */
 
 }
 

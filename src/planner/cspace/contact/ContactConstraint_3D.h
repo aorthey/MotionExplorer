@@ -26,7 +26,7 @@ public:
     Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const;
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override;
 
-
+/*
     ob::ProjectionEvaluatorPtr getProjection(ob::StateSpacePtr space) const
     {
 
@@ -60,7 +60,7 @@ public:
             }
         };
         return std::make_shared<ContactProjection>(space);
-    }
+    }*/
 
 
 private:
