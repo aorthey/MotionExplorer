@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot name="truck_inner_approximation">
+ <link name="body">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0189583333333" ixy="0" ixz="0" iyy="0.0189583333333" iyz="0" izz="0.015625"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0.225"/>
+    <geometry>
+      <cylinder length="0.45" radius="0.16"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0.25"/>
+    <geometry>
+      <cylinder length="0.45" radius="0.16"/>
+    </geometry>
+  </collision>
+ </link>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>

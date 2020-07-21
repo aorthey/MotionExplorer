@@ -23,7 +23,6 @@ class EnvironmentLoader{
   public:
     RobotWorld& GetWorld();
     RobotWorld* GetWorldPtr();
-    Robot* GetRobotPtr();
     PlannerBackendPtr GetBackendPtr();
     PlannerMultiInput GetPlannerInput();
     void RenameExec(int argc, char** argv, const std::string &s);

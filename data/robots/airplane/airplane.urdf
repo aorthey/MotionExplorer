@@ -1,0 +1,30 @@
+<?xml version="1.0" ?>
+<robot name="airplane">
+  <link name="planeLink">
+  <contact>
+      <lateral_friction value="1"/>
+  </contact>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 +.10"/>
+      <geometry>
+        <mesh filename="meshes/airplane_small.stl"/>
+      </geometry>
+       <material name="grey">
+        <color rgba="0.5 0.5 0.5 0.5"/>
+      </material>
+    </collision>
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 +.10"/>
+      <geometry>
+        <mesh filename="meshes/airplane_small.stl"/>
+      </geometry>
+       <material name="grey">
+        <color rgba="0.5 0.5 0.5 0.5"/>
+      </material>
+    </visual>
+    <inertial>
+      <mass value="10"/>
+      <inertia ixx="1e-6" ixy="0.0" ixz="0.0" iyy="0.083" iyz="0.0" izz="0.083"/>
+    </inertial>
+  </link>
+</robot>

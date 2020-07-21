@@ -17,6 +17,8 @@ class PlannerBackend : public ForceFieldBackend
 
     PathPiecewiseLinear *path;
 
+    SmartPointer<RobotController> controller_;
+
   public:
 
     PlannerBackend(RobotWorld *world);
@@ -32,6 +34,7 @@ class PlannerBackend : public ForceFieldBackend
 
     uint draw_cover_active_open_set{0};
     bool draw_cover_all_open_sets{true};
+    int draw_path_modus{0};
 };
 
 

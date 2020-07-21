@@ -191,15 +191,35 @@ namespace GLDraw{
 
   void drawGLPathStartGoal(Robot *robot, const Config &p_init, const Config &p_goal)
   {
-    GLColor colorInit(0.3,1,0.3);
-    GLColor colorGoal(1,0.3,0.3);
+    const GLColor colorGoal = GLDraw::getColorRobotGoalConfiguration();
+    const GLColor colorStart = GLDraw::getColorRobotStartConfiguration();
     double scale = 1.01;
-    if(!p_init.empty()) drawRobotAtConfig(robot, p_init, colorInit, scale);
+    if(!p_init.empty()) drawRobotAtConfig(robot, p_init, colorStart, scale);
     if(!p_goal.empty()) drawRobotAtConfig(robot, p_goal, colorGoal, scale);
   }
 
+  void drawRobotsAtConfig(std::vector<Robot*> robots, const Config &q, GLColor color, double scale)
+  {
+    int ctr = 0;
+    for(uint k = 0; k < robots.size(); k++){
+      Robot *rk = robots.at(k);
+      uint N = rk->q.size();
+      Config qk; qk.resize(N);
+      for(uint j = 0; j < N; j++){
+        qk[j] = q[j+ctr];
+      }
+      drawRobotAtConfig(rk, qk, color, scale);
+      ctr += N;
+    }
+  }
 
-  void drawRobotAtConfig(Robot *robot, const Config &q, GLColor color, double scale){
+  void drawRobotAtConfig(Robot *robot, const Config &q, const Config &dq, GLColor color, double scale)
+  {
+    drawRobotAtConfig(robot, q, color, scale);
+  }
+
+  void drawRobotAtConfig(Robot *robot, const Config &q, GLColor color, double scale)
+  {
     glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);
     glEnable(GL_LINE_SMOOTH);

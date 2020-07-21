@@ -3,8 +3,8 @@
 #include "planner/cspace/cspace_geometric_R2_CONTACT.h"
 
 
-ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
-        ob::Constraint(5, 1)  // (x,y,z, theta at 1st link,phi at 2nd)
+ContactConstraint::ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
+        ob::Constraint(ambientSpaceDim, 1)  // (x,y,z, theta at 1st link,phi at 2nd)
         , cspace_(cspace)
         , robot_(robot)
         , world_(world)
@@ -84,15 +84,14 @@ Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) c
      * Returns position of given robot link in world coordinates.
      */
 
-    Config q = cspace_->EigenVectorToConfig(xd);
     if (xd!=xd){
         std::cout << std::string (80, '-') << std::endl;
         std::cout << "EigenVector: " << std::endl;
         std::cout << xd << std::endl;
-        std::cout << q << std::endl;
         exit(0);
     }
 
+    Config q = cspace_->EigenVectorToConfig(xd);
 
     robot_->UpdateConfig(q);
     robot_->UpdateGeometry();
@@ -104,7 +103,6 @@ Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) c
     //joint is positioned, before questioning the validity of this method
     Vector3 v;
     robot_->GetWorldPosition(zero, linkNumber_, v);
-
     return v;
 }
 
@@ -147,8 +145,6 @@ void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eig
         std::cout << "Invalid Obstacle "  << obstacleNumber_ << std::endl;
         std::exit(0);
     }
-
-
 
     Real distVect = contact.distance(closestPt);
 

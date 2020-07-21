@@ -2,6 +2,33 @@
 #include <iomanip>
 #include "planner/cspace/integrator/liegroupintegrator.h"
 
+LieGroupIntegrator::LieGroupIntegrator()
+{
+  X1.setZero();
+  X2.setZero();
+  X3.setZero();
+  X4.setZero();
+  X5.setZero();
+  X6.setZero();
+
+  //XYZ Rz Ry Rx
+  //##########################
+  X1(0,3) = 1;
+  //##########################
+  X2(1,3) = 1;
+  //##########################
+  X3(2,3) = 1;
+  //##########################
+  X4(0,1) = -1;
+  X4(1,0) = 1;
+  //##########################
+  X5(0,2) = 1;
+  X5(2,0) = -1;
+  //##########################
+  X6(1,2) = -1;
+  X6(2,1) = 1;
+}
+
 void LieGroupIntegrator::Euler_step(std::vector<Matrix4>& p, const Matrix4& dp0, double dt)
 {  
   Matrix4 p0 = p.back();
@@ -80,32 +107,6 @@ void LieGroupIntegrator::SimulateEndpoint(const State& x0, const ControlInput& u
 
 Matrix4 LieGroupIntegrator::SE3Derivative(const ControlInput& u)
 {
-  // Lie Algebra Generators
-  Matrix4 X1,X2,X3,X4,X5,X6;
-  X1.setZero();
-  X2.setZero();
-  X3.setZero();
-  X4.setZero();
-  X5.setZero();
-  X6.setZero();
-
-  //XYZ Rz Ry Rx
-  //##########################
-  X1(0,3) = 1;
-  //##########################
-  X2(1,3) = 1;
-  //##########################
-  X3(2,3) = 1;
-  //##########################
-  X4(0,1) = -1;
-  X4(1,0) = 1;
-  //##########################
-  X5(0,2) = 1;
-  X5(2,0) = -1;
-  //##########################
-  X6(1,2) = -1;
-  X6(2,1) = 1;
-  
   //#########################################################################
   Matrix4 dx_se3 = (X1*u(0) + X2*u(1) + X3*u(2) + X4*u(3) + X5*u(4) + X6*u(5));
   //#########################################################################

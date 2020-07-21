@@ -28,28 +28,26 @@ class Roadmap{
     GLDraw::GLColor cEdge{green};
     GLDraw::GLColor cVertex{green};
     GLDraw::GLColor cVertexStart{green};
-    GLDraw::GLColor cVertexGoal{red};
+    GLDraw::GLColor cVertexGoal{yellow};
     GLDraw::GLColor cPath{darkMagenta};
-    GLDraw::GLColor cComplex{magenta};
-    GLDraw::GLColor cComplexQuad{lightBlue};
 
     GLDraw::GLColor cVertexComponentOut{gray}; //a vertex not in the same component as the designated start vertex
     GLDraw::GLColor cVertexComponentGoal{cyan}; //goal component vertex
-    GLDraw::GLColor cNeighborhoodVolume{lightGreen};
-    GLDraw::GLColor cNeighborhoodVolumeInfeasible{lightRed}; 
-    GLDraw::GLColor cNeighborhoodVolumeSufficient{lightMagenta}; 
-
-    bool wiredNeighborhood{true};
 
     uint numEdges();
     uint numVertices();
-    Vector3 GetXYZFromState(ob::State *s);
 
   private:
 
-    //void DrawSingleLevelGL(GUIState &, ob::PlannerDataPtr);
-    void DrawPlannerData(GUIState&);
-    void DrawShortestPath(GUIState&);
+    void DrawGLPlannerData(GUIState&);
+    //void DrawGLShortestPath(GUIState&);
+    void DrawGLRoadmapVertices(GUIState&, int ridx = -1);
+    void DrawGLRoadmapEdges(GUIState&, int ridx = -1);
+    void DrawGLEdge(const ob::PlannerDataVertex *v, const ob::PlannerDataVertex *w, int ridx);
+    void DrawGLEdge(CSpaceOMPL *space, const ob::State *s, const ob::State *t, int ridx);
+    void DrawGLEdgeStateToState(CSpaceOMPL *space, const ob::State *s, const ob::State *t, int ridx);
+    void drawLineWorkspaceStateToState(const ob::State *from, const ob::State *to, int ridx);
+    Vector3 VectorFromVertex(const ob::PlannerDataVertex *v, int ridx);
 
     ob::PlannerDataPtr pd{nullptr};
     CSpaceOMPL *cspace{nullptr};
@@ -58,5 +56,8 @@ class Roadmap{
 
     std::vector<Vector3> shortest_path;
     bool draw_planar{false};
+
+    ob::State *stateTmpCur{nullptr};
+    ob::State *stateTmpOld{nullptr};
 };
 typedef std::shared_ptr<Roadmap> RoadmapPtr;

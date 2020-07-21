@@ -67,6 +67,9 @@ void GeometricCSpaceOMPLFixedBase::initSpace()
   boundsRn.check();
   cspace->setBounds(boundsRn);
 
+  //Required to circumvent problems during fine manipulation planning.
+  this->space->setLongestValidSegmentFraction(0.001);
+
 }
 
 void GeometricCSpaceOMPLFixedBase::ConfigToOMPLState(const Config &q, ob::State *qompl)
@@ -91,11 +94,31 @@ Config GeometricCSpaceOMPLFixedBase::OMPLStateToConfig(const ob::State *qompl){
   return q;
 
 }
-
-void GeometricCSpaceOMPLFixedBase::print() const
+void GeometricCSpaceOMPLFixedBase::print(std::ostream& out) const
 {
   std::cout << "Robot \"" << robot->name << "\":" << std::endl;
   std::cout << "Dimensionality Space            :" << GetDimensionality() << std::endl;
   std::cout << " Configuration Space (klampt) : " << (Nklampt>0?"xR^"+std::to_string(Nklampt):"") << "  [Klampt]"<< std::endl;
   std::cout << " Configuration Space (ompl)   : " << (Nompl>0?"xR^"+std::to_string(Nompl):"") << "  [OMPL]" << std::endl;
+}
+
+Vector3 GeometricCSpaceOMPLFixedBase::getXYZ(const ob::State *s)
+{
+  Config q = OMPLStateToConfig(s);
+  robot->UpdateConfig(q);
+  robot->UpdateGeometry();
+  Vector3 qq;
+  Vector3 zero; zero.setZero();
+  int lastLink = robot->links.size()-1;
+
+  //NOTE: the world position is zero exactly at the point where link is
+  //attached using a joint to the whole linkage. Check where your last fixed
+  //joint is positioned, before questioning the validity of this method
+  robot->GetWorldPosition(zero, lastLink, qq);
+
+  double x = qq[0];
+  double y = qq[1];
+  double z = qq[2];
+  Vector3 v(x,y,z);
+  return v;
 }

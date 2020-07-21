@@ -2,17 +2,17 @@
 #include "planner/cspace/cspace_kinodynamic_SE2.h"
 #include "planner/cspace/integrator/integrator_SE2.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
-#include "ompl/base/spaces/SE2StateSpaceFullInterpolate.h"
+#include <ompl/base/spaces/SE2StateSpace.h>
 
 KinodynamicCSpaceOMPLSE2::KinodynamicCSpaceOMPLSE2(RobotWorld *world_, int robot_idx):
   KinodynamicCSpaceOMPL(world_, robot_idx)
 {
 }
 
-void KinodynamicCSpaceOMPLSE2::print() const
+void KinodynamicCSpaceOMPLSE2::print(std::ostream& out) const
 {
   ob::CompoundStateSpace *cspace = space->as<ob::CompoundStateSpace>();
-  ob::SE2StateSpaceFullInterpolate *cspaceSE2 = cspace->as<ob::SE2StateSpaceFullInterpolate>(0);
+  ob::SE2StateSpace *cspaceSE2 = cspace->as<ob::SE2StateSpace>(0);
 
   ob::RealVectorStateSpace *cspaceTM = nullptr;
 
@@ -71,7 +71,7 @@ void KinodynamicCSpaceOMPLSE2::initSpace()
     throw "Invalid robot";
   }
 
-  ob::StateSpacePtr SE2(std::make_shared<ob::SE2StateSpaceFullInterpolate>());
+  ob::StateSpacePtr SE2(std::make_shared<ob::SE2StateSpace>());
 
   ob::StateSpacePtr TM(std::make_shared<ob::RealVectorStateSpace>(3+Nompl));
 
@@ -82,7 +82,7 @@ void KinodynamicCSpaceOMPLSE2::initSpace()
     space = SE2 + TM;
   }
 
-  ob::SE2StateSpaceFullInterpolate *cspaceSE2 = space->as<ob::CompoundStateSpace>()->as<ob::SE2StateSpaceFullInterpolate>(0);
+  ob::SE2StateSpace *cspaceSE2 = space->as<ob::CompoundStateSpace>()->as<ob::SE2StateSpace>(0);
 
   ob::RealVectorStateSpace *cspaceTM;
   ob::RealVectorStateSpace *cspaceRN = nullptr;
@@ -136,8 +136,10 @@ void KinodynamicCSpaceOMPLSE2::initSpace()
   // Set velocity bounds
   //###########################################################################
   std::vector<double> vMin, vMax;
-  vMin = robot->velMin;
-  vMax = robot->velMax;
+  // vMin = robot->velMin;
+  // vMax = robot->velMax;
+  vMin = input.dqMin;
+  vMax = input.dqMax;
 
   assert(vMin.size() == 6+Nklampt);
   assert(vMax.size() == 6+Nklampt);
@@ -161,9 +163,6 @@ void KinodynamicCSpaceOMPLSE2::initSpace()
   boundsTM.low = lowTM;
   boundsTM.high = highTM;
   boundsTM.check();
-  //TODO
-  boundsTM.setLow(-10);
-  boundsTM.setHigh(10);
   cspaceTM->setBounds(boundsTM);
 
 }
@@ -172,7 +171,9 @@ void KinodynamicCSpaceOMPLSE2::initControlSpace(){
   uint NdimControl = 6 + Nompl;
   control_space = std::make_shared<oc::RealVectorControlSpace>(space, NdimControl+1);
 
-  Vector torques = robot->torqueMax;
+  // Vector torques = robot->torqueMax;
+  // std::cout << torques << std::endl;
+  // exit(0);
 
   ob::RealVectorBounds cbounds(NdimControl+1);
   cbounds.setLow(0);
@@ -186,16 +187,9 @@ void KinodynamicCSpaceOMPLSE2::initControlSpace(){
     cbounds.setHigh(i,input.uMax(i));
   }
   cbounds.check();
-  control_space->setBounds(cbounds);
+  static_pointer_cast<oc::RealVectorControlSpace>(control_space)->setBounds(cbounds);
 }
 
-
-ob::ScopedState<> KinodynamicCSpaceOMPLSE2::ConfigVelocityToOMPLState(const Config &q, const Config &dq)
-{
-  ob::ScopedState<> qompl(space);
-  ConfigVelocityToOMPLState(q, dq, qompl.get());
-  return qompl;
-}
 
 void KinodynamicCSpaceOMPLSE2::ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl)
 {
@@ -221,7 +215,7 @@ void KinodynamicCSpaceOMPLSE2::ConfigVelocityToOMPLState(const Config &q, const 
 
 void KinodynamicCSpaceOMPLSE2::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
-  ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2;
+  ob::SE2StateSpace::StateType *qomplSE2;
   ob::RealVectorStateSpace::StateType *qomplRnSpace = nullptr;
   ob::RealVectorStateSpace::StateType *qomplTMSpace;
 
@@ -229,7 +223,7 @@ void KinodynamicCSpaceOMPLSE2::ConfigToOMPLState(const Config &q, ob::State *qom
   //[SE2][RN]    OR   [ SE2]
   //[  TM   ]         [ TM ]
   //
-  qomplSE2 = qompl->as<ob::CompoundState>()->as<ob::SE2StateSpaceFullInterpolate::StateType>(0);
+  qomplSE2 = qompl->as<ob::CompoundState>()->as<ob::SE2StateSpace::StateType>(0);
   if(Nompl>0){
     qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
     qomplTMSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
@@ -278,8 +272,9 @@ Config KinodynamicCSpaceOMPLSE2::OMPLStateToVelocity(const ob::State *qompl){
   return dq;
 }
 
-Config KinodynamicCSpaceOMPLSE2::OMPLStateToConfig(const ob::State *qompl){
-  const ob::SE2StateSpaceFullInterpolate::StateType *qomplSE2 = qompl->as<ob::CompoundState>()->as<ob::SE2StateSpaceFullInterpolate::StateType>(0);
+Config KinodynamicCSpaceOMPLSE2::OMPLStateToConfig(const ob::State *qompl)
+{
+  const ob::SE2StateSpace::StateType *qomplSE2 = qompl->as<ob::CompoundState>()->as<ob::SE2StateSpace::StateType>(0);
 
   Config q;
   q.resize(6+Nklampt);
@@ -289,9 +284,11 @@ Config KinodynamicCSpaceOMPLSE2::OMPLStateToConfig(const ob::State *qompl){
   q(1) = qomplSE2->getY();
   q(3) = qomplSE2->getYaw();
 
-  if(Nompl>0){
+  if(Nompl>0)
+  {
     const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
-    for(uint i = 0; i < Nompl; i++){
+    for(uint i = 0; i < Nompl; i++)
+    {
       uint idx = ompl_to_klampt.at(i);
       q(idx) = qomplRnState->values[i];
     }
@@ -304,3 +301,11 @@ const oc::StatePropagatorPtr KinodynamicCSpaceOMPLSE2::StatePropagatorPtr(oc::Sp
   return std::make_shared<IntegratorSE2>(si, this);
 }
 
+Vector3 KinodynamicCSpaceOMPLSE2::getXYZ(const ob::State *s)
+{
+  const ob::SE2StateSpace::StateType *qomplSE2 = s->as<ob::CompoundState>()->as<ob::SE2StateSpace::StateType>(0);
+  double x = qomplSE2->getX();
+  double y = qomplSE2->getY();
+  Vector3 q(x,y,0);
+  return q;
+}

@@ -1,0 +1,3102 @@
+<?xml version="1.0"?>
+<robot name="cable/cable_38_segments">
+ <link name="body0">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.05 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.05 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body1_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body0_body1_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.03001 0 0"/>
+  <parent link="body0"/>
+  <child link="body1_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body1_joint_link_body1_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body1_joint_link"/>
+  <child link="body1_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body1_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body1_joint_link_body1_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body1_joint_link_spherical_joint_link"/>
+  <child link="body1"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body2_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body1_body2_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body1"/>
+  <child link="body2_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body2_joint_link_body2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body2_joint_link"/>
+  <child link="body2_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body2_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body2_joint_link_body2_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body2_joint_link_spherical_joint_link"/>
+  <child link="body2"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body3_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body2_body3_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body2"/>
+  <child link="body3_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body3_joint_link_body3_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body3_joint_link"/>
+  <child link="body3_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body3_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body3_joint_link_body3_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body3_joint_link_spherical_joint_link"/>
+  <child link="body3"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body4_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body3_body4_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body3"/>
+  <child link="body4_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body4_joint_link_body4_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body4_joint_link"/>
+  <child link="body4_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body4_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body4_joint_link_body4_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body4_joint_link_spherical_joint_link"/>
+  <child link="body4"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body4">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body5_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body4_body5_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body4"/>
+  <child link="body5_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body5_joint_link_body5_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body5_joint_link"/>
+  <child link="body5_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body5_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body5_joint_link_body5_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body5_joint_link_spherical_joint_link"/>
+  <child link="body5"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body5">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body6_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body5_body6_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body5"/>
+  <child link="body6_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body6_joint_link_body6_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body6_joint_link"/>
+  <child link="body6_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body6_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body6_joint_link_body6_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body6_joint_link_spherical_joint_link"/>
+  <child link="body6"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body6">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body7_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body6_body7_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body6"/>
+  <child link="body7_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body7_joint_link_body7_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body7_joint_link"/>
+  <child link="body7_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body7_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body7_joint_link_body7_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body7_joint_link_spherical_joint_link"/>
+  <child link="body7"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body7">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body8_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body7_body8_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body7"/>
+  <child link="body8_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body8_joint_link_body8_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body8_joint_link"/>
+  <child link="body8_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body8_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body8_joint_link_body8_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body8_joint_link_spherical_joint_link"/>
+  <child link="body8"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body8">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body9_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body8_body9_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body8"/>
+  <child link="body9_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body9_joint_link_body9_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body9_joint_link"/>
+  <child link="body9_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body9_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body9_joint_link_body9_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body9_joint_link_spherical_joint_link"/>
+  <child link="body9"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body9">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body10_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body9_body10_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body9"/>
+  <child link="body10_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body10_joint_link_body10_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body10_joint_link"/>
+  <child link="body10_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body10_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body10_joint_link_body10_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body10_joint_link_spherical_joint_link"/>
+  <child link="body10"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body10">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body11_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body10_body11_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body10"/>
+  <child link="body11_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body11_joint_link_body11_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body11_joint_link"/>
+  <child link="body11_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body11_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body11_joint_link_body11_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body11_joint_link_spherical_joint_link"/>
+  <child link="body11"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body11">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body12_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body11_body12_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body11"/>
+  <child link="body12_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body12_joint_link_body12_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body12_joint_link"/>
+  <child link="body12_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body12_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body12_joint_link_body12_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body12_joint_link_spherical_joint_link"/>
+  <child link="body12"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body12">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body13_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body12_body13_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body12"/>
+  <child link="body13_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body13_joint_link_body13_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body13_joint_link"/>
+  <child link="body13_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body13_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body13_joint_link_body13_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body13_joint_link_spherical_joint_link"/>
+  <child link="body13"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body13">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body14_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body13_body14_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body13"/>
+  <child link="body14_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body14_joint_link_body14_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body14_joint_link"/>
+  <child link="body14_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body14_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body14_joint_link_body14_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body14_joint_link_spherical_joint_link"/>
+  <child link="body14"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body14">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body15_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body14_body15_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body14"/>
+  <child link="body15_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body15_joint_link_body15_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body15_joint_link"/>
+  <child link="body15_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body15_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body15_joint_link_body15_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body15_joint_link_spherical_joint_link"/>
+  <child link="body15"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body15">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body16_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body15_body16_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body15"/>
+  <child link="body16_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body16_joint_link_body16_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body16_joint_link"/>
+  <child link="body16_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body16_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body16_joint_link_body16_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body16_joint_link_spherical_joint_link"/>
+  <child link="body16"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body16">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body17_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body16_body17_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body16"/>
+  <child link="body17_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body17_joint_link_body17_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body17_joint_link"/>
+  <child link="body17_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body17_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body17_joint_link_body17_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body17_joint_link_spherical_joint_link"/>
+  <child link="body17"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body17">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body18_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body17_body18_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body17"/>
+  <child link="body18_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body18_joint_link_body18_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body18_joint_link"/>
+  <child link="body18_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body18_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body18_joint_link_body18_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body18_joint_link_spherical_joint_link"/>
+  <child link="body18"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body18">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body19_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body18_body19_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body18"/>
+  <child link="body19_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body19_joint_link_body19_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body19_joint_link"/>
+  <child link="body19_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body19_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body19_joint_link_body19_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body19_joint_link_spherical_joint_link"/>
+  <child link="body19"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body19">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body20_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body19_body20_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body19"/>
+  <child link="body20_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body20_joint_link_body20_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body20_joint_link"/>
+  <child link="body20_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body20_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body20_joint_link_body20_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body20_joint_link_spherical_joint_link"/>
+  <child link="body20"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body20">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body21_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body20_body21_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body20"/>
+  <child link="body21_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body21_joint_link_body21_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body21_joint_link"/>
+  <child link="body21_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body21_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body21_joint_link_body21_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body21_joint_link_spherical_joint_link"/>
+  <child link="body21"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body21">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body22_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body21_body22_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body21"/>
+  <child link="body22_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body22_joint_link_body22_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body22_joint_link"/>
+  <child link="body22_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body22_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body22_joint_link_body22_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body22_joint_link_spherical_joint_link"/>
+  <child link="body22"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body22">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body23_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body22_body23_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body22"/>
+  <child link="body23_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body23_joint_link_body23_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body23_joint_link"/>
+  <child link="body23_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body23_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body23_joint_link_body23_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body23_joint_link_spherical_joint_link"/>
+  <child link="body23"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body23">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body24_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body23_body24_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body23"/>
+  <child link="body24_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body24_joint_link_body24_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body24_joint_link"/>
+  <child link="body24_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body24_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body24_joint_link_body24_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body24_joint_link_spherical_joint_link"/>
+  <child link="body24"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body24">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body25_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body24_body25_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body24"/>
+  <child link="body25_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body25_joint_link_body25_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body25_joint_link"/>
+  <child link="body25_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body25_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body25_joint_link_body25_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body25_joint_link_spherical_joint_link"/>
+  <child link="body25"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body25">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body26_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body25_body26_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body25"/>
+  <child link="body26_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body26_joint_link_body26_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body26_joint_link"/>
+  <child link="body26_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body26_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body26_joint_link_body26_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body26_joint_link_spherical_joint_link"/>
+  <child link="body26"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body26">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body27_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body26_body27_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body26"/>
+  <child link="body27_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body27_joint_link_body27_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body27_joint_link"/>
+  <child link="body27_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body27_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body27_joint_link_body27_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body27_joint_link_spherical_joint_link"/>
+  <child link="body27"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body27">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body28_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body27_body28_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body27"/>
+  <child link="body28_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body28_joint_link_body28_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body28_joint_link"/>
+  <child link="body28_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body28_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body28_joint_link_body28_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body28_joint_link_spherical_joint_link"/>
+  <child link="body28"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body28">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body29_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body28_body29_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body28"/>
+  <child link="body29_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body29_joint_link_body29_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body29_joint_link"/>
+  <child link="body29_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body29_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body29_joint_link_body29_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body29_joint_link_spherical_joint_link"/>
+  <child link="body29"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body29">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body30_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body29_body30_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body29"/>
+  <child link="body30_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body30_joint_link_body30_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body30_joint_link"/>
+  <child link="body30_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body30_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body30_joint_link_body30_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body30_joint_link_spherical_joint_link"/>
+  <child link="body30"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body30">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body31_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body30_body31_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body30"/>
+  <child link="body31_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body31_joint_link_body31_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body31_joint_link"/>
+  <child link="body31_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body31_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body31_joint_link_body31_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body31_joint_link_spherical_joint_link"/>
+  <child link="body31"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body31">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body32_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body31_body32_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body31"/>
+  <child link="body32_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body32_joint_link_body32_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body32_joint_link"/>
+  <child link="body32_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body32_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body32_joint_link_body32_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body32_joint_link_spherical_joint_link"/>
+  <child link="body32"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body32">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body33_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body32_body33_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body32"/>
+  <child link="body33_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body33_joint_link_body33_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body33_joint_link"/>
+  <child link="body33_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body33_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body33_joint_link_body33_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body33_joint_link_spherical_joint_link"/>
+  <child link="body33"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body33">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body34_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body33_body34_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body33"/>
+  <child link="body34_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body34_joint_link_body34_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body34_joint_link"/>
+  <child link="body34_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body34_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body34_joint_link_body34_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body34_joint_link_spherical_joint_link"/>
+  <child link="body34"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body34">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body35_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body34_body35_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body34"/>
+  <child link="body35_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body35_joint_link_body35_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body35_joint_link"/>
+  <child link="body35_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body35_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body35_joint_link_body35_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body35_joint_link_spherical_joint_link"/>
+  <child link="body35"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body35">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body36_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body35_body36_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body35"/>
+  <child link="body36_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body36_joint_link_body36_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body36_joint_link"/>
+  <child link="body36_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body36_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body36_joint_link_body36_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body36_joint_link_spherical_joint_link"/>
+  <child link="body36"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body36">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body37_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body36_body37_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body36"/>
+  <child link="body37_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body37_joint_link_body37_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body37_joint_link"/>
+  <child link="body37_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body37_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body37_joint_link_body37_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body37_joint_link_spherical_joint_link"/>
+  <child link="body37"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body37">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="body38_joint_link">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00035999999999999997" ixy="0" ixz="0" iyy="0.00035999999999999997" iyz="0" izz="0.00035999999999999997"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.03"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_body37_body38_joint_link" type="fixed">
+  <origin rpy="0 0 0" xyz="-0.16001 0 0"/>
+  <parent link="body37"/>
+  <child link="body38_joint_link"/>
+</joint>
+
+<joint name="joint_spherical_body38_joint_link_body38_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body38_joint_link"/>
+  <child link="body38_joint_link_spherical_joint_link"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="body38_joint_link_spherical_joint_link" physical="0">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="4.0000000000000003e-07" ixy="0" ixz="0" iyy="4.0000000000000003e-07" iyz="0" izz="4.0000000000000003e-07"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.001"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_spherical_body38_joint_link_body38_Y" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="body38_joint_link_spherical_joint_link"/>
+  <child link="body38"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.5707963267948966" upper="1.5707963267948966" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="body38">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0010583333333333334" ixy="0" ixz="0" iyy="0.0010583333333333334" iyz="0" izz="0.000225"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="-0.08001 0 0"/>
+    <geometry>
+      <cylinder length="0.1" radius="0.03"/>
+    </geometry>
+  </collision>
+ </link>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>

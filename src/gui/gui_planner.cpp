@@ -84,7 +84,9 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     path = planners.at(active_planner)->GetPath();
   }else if(cmd=="smooth_path"){
     path = planners.at(active_planner)->GetPath();
-    if(path) path->Smooth();
+    if(path){
+      path->Smooth(true);
+    }
   }else if(cmd=="draw_cover_single_open_set"){
     draw_cover_all_open_sets = false;
     draw_cover_active_open_set++;
@@ -112,6 +114,26 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="draw_text"){
     state("draw_text_robot_info").toggle();
     state("draw_planner_text").toggle();
+  }else if(cmd=="draw_path_modus"){
+    draw_path_modus++;
+    if(draw_path_modus > 2) draw_path_modus = 0;
+
+    switch (draw_path_modus) {
+      case 0:
+        state("draw_roadmap_shortest_path").activate();
+        // state("draw_path").activate();
+        state("draw_explorer_partial_paths").deactivate();
+        break;
+      case 1:
+        state("draw_roadmap_shortest_path").activate();
+        state("draw_explorer_partial_paths").activate();
+        break;
+      default:
+        state("draw_roadmap_shortest_path").deactivate();
+        state("draw_explorer_partial_paths").deactivate();
+        break;
+    }
+
   }else if(cmd=="draw_play_path"){
     last_command = "Execute";
     state("draw_play_path").toggle();
@@ -122,13 +144,14 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
       SendPauseIdle();
     }
   }else if(cmd=="simulate_controller"){
+    last_command = "Execute";
     //get controls
     MotionPlanner* planner = planners.at(active_planner);
     path = planner->GetPath();
     if(path){
-      SmartPointer<RobotController> ctrl = sim.robotControllers[0];
+      controller_ = sim.robotControllers[0];
 
-      path->SendToController(ctrl);
+      path->SendToController(controller_);
 
       Config q = path->Eval(0);
       Config dq = path->EvalVelocity(0);
@@ -148,9 +171,20 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
       robot->UpdateDynamics();
 
       //activate simulation
-      state("simulate").toggle();
-      simulate = state("simulate").active;
-      if(simulate) state("draw_robot").activate();
+      // if(state("simulate") != state("draw_play_path")){
+      //   state("simulate").toggle();
+      // }
+
+      state("draw_play_path").activate();
+      state("simulate").activate();
+      state("draw_robot").activate();
+
+      if(state("draw_play_path")){
+        SendPauseIdle(0);
+      }else{
+        SendPauseIdle();
+      }
+      // t=0;
     }else{
       std::cout << "no active control path" << std::endl;
     }
@@ -160,8 +194,7 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     path = planners.at(active_planner)->GetPath();
     if(path)
     {
-      std::string rname = planners.at(active_planner)->GetInput().environment_name;
-      std::string fname = "../data/paths/path_"+rname;
+      std::string fname = "../data/paths/"+getRobotEnvironmentString()+".path";
       path->Save(fname.c_str());
       std::cout << "save current path (" << path->GetNumberOfMilestones() 
         << " states) to : " << fname << std::endl;
@@ -169,17 +202,19 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
       std::cout << "cannot save non-existing path." << std::endl;
     }
   }else if(cmd=="load_current_path"){
-    // MotionPlanner* planner = planners.at(active_planner); // std::string fn = planner->GetInput().name_loadPath;
-    // std::cout << "Try to load path current path from : " << fn << std::endl;
-    // path = planner->GetPath();
-    // // if(!path)
-    // // {
-    // //   path = new PathPiecewiseLinear();
-    // // }
-    // {
-    //   path->Load(fn.c_str());
-    //   std::cout << "load current path from : " << fn << std::endl;
-    // }
+    MotionPlanner* planner = planners.at(active_planner); // std::string fn = planner->GetInput().name_loadPath;
+    std::string fname = "../data/paths/"+getRobotEnvironmentString()+".path";
+    if(!path)
+    {
+        CSpaceOMPL* cspace = planner->GetCSpace();
+        path = new PathPiecewiseLinear(cspace);
+        if(planner->GetInput().name_loadPath != "")
+        {
+            fname = planner->GetInput().name_loadPath;
+        }
+    }
+    path->Load(fname.c_str());
+    std::cout << "load current path from : " << fname << std::endl;
   }else if(cmd=="save_view"){
     last_command = "SaveView";
     std::string fname = "../data/viewport/"+getRobotEnvironmentString()+".viewport";
@@ -209,7 +244,7 @@ std::string PlannerBackend::getRobotEnvironmentString()
     std::string rname, tname;
 
     if(world->robots.size()>0){
-        rname = world->robots[active_robot]->name;
+        rname = world->robots[0]->name;
     }
     if(world->terrains.size()>0){
         tname = world->terrains[0]->name;
@@ -251,8 +286,6 @@ bool PlannerBackend::OnIdle(){
       }
     }
     return true;
-  }
-  if(state("simulate_controller")){
   }
   return res;
 
@@ -350,47 +383,54 @@ void PlannerBackend::RenderWorld(){
         path = planner->GetPath();
         if(!path){
           std::cout << "No path available." << std::endl;
-        }else{
-          //std::cout << *path << std::endl;
         }
       }
     }
     if(t>0 && path){
       path->DrawGL(state, t);
+      // controller_->nominalTimeStep  = 0.05;
+      //
+      // controller_->Update(t);
+      // Config q, qdes;
+      // controller_->GetSensedConfig(q);
+      // controller_->GetCommandedConfig(qdes);
+
+      // std::cout << controller_->time << " : " << q << " (" << qdes << ")" << std::endl;
+      // path->GetSpace()->drawConfig(q);
     }
   }
-  if(planner->GetInput().kinodynamic){
-    if(state("draw_controller_com_path")) GLDraw::drawCenterOfMassPathFromController(sim);
+  //if(planner->GetInput().kinodynamic){
+  //  if(state("draw_controller_com_path")) GLDraw::drawCenterOfMassPathFromController(sim);
 
-    SmartPointer<ContactStabilityController>& controller = *reinterpret_cast<SmartPointer<ContactStabilityController>*>(&sim.robotControllers[0]);
-    ControllerState output = controller->GetControllerState();
-    Vector torque = output.current_torque;
+  //  SmartPointer<ContactStabilityController>& controller = *reinterpret_cast<SmartPointer<ContactStabilityController>*>(&sim.robotControllers[0]);
+  //  ControllerState output = controller->GetControllerState();
+  //  Vector torque = output.current_torque;
 
-    //Untested/Experimental Stuff
-    if(state("draw_controller_driver")){
-      Vector T;
-      sim.controlSimulators[0].GetActuatorTorques(T);
-      Robot *robot = &sim.odesim.robot(0)->robot;
+  //  //Untested/Experimental Stuff
+  //  if(state("draw_controller_driver")){
+  //    Vector T;
+  //    sim.controlSimulators[0].GetActuatorTorques(T);
+  //    Robot *robot = &sim.odesim.robot(0)->robot;
 
-      Vector3 dir;
-      for(uint k = 0; k < 3; k++){
-        dir[k] = T[k];
-      }
-      //dir = T(i)*dir/dir.norm();
+  //    Vector3 dir;
+  //    for(uint k = 0; k < 3; k++){
+  //      dir[k] = T[k];
+  //    }
+  //    //dir = T(i)*dir/dir.norm();
 
-      const RobotJointDriver& driver = robot->drivers[0];
-      //uint didx = driver.linkIndices[0];
-      uint lidx = driver.linkIndices[1];
-      Frame3D Tw = robot->links[lidx].T_World;
-      Vector3 pos = Tw*robot->links[lidx].com;
+  //    const RobotJointDriver& driver = robot->drivers[0];
+  //    //uint didx = driver.linkIndices[0];
+  //    uint lidx = driver.linkIndices[1];
+  //    Frame3D Tw = robot->links[lidx].T_World;
+  //    Vector3 pos = Tw*robot->links[lidx].com;
 
-      double r = 0.05;
-      glPushMatrix();
-      glTranslate(pos);
-      drawCone(-dir,2*r,8);
-      glPopMatrix();
-    }
-  }
+  //    double r = 0.05;
+  //    glPushMatrix();
+  //    glTranslate(pos);
+  //    drawCone(-dir,2*r,8);
+  //    glPopMatrix();
+  //  }
+  //}
 }
 
  // //experiments on drawing 3d structures on fixed screen position
@@ -539,25 +579,20 @@ void PlannerBackend::RenderScreen(){
     }
 
   }
-  if(state("draw_planner_minima_tree")){
-    std::string line = "Local Minima Tree";
-    DrawText(line_x_pos,line_y_offset,line);
+
+  if(planners.size()>0){
+    //display time
+    double time = planners.at(active_planner)->getLastIterationTime();
+    std::stringstream timeStream;
+    timeStream << std::fixed << std::setprecision(2) << time;
+    std::string line = "Planner Time: ";
+    line += timeStream.str()+"s";
+    DrawText(line_x_pos, line_y_offset, line);
     line_y_offset += line_y_offset_stepsize;
 
-
-    if(planners.size()>0){
-      //display time
-      double time = planners.at(active_planner)->getLastIterationTime();
-      std::stringstream timeStream;
-      timeStream << std::fixed << std::setprecision(2) << time;
-      std::string line = "Construction Time: ";
-      line += timeStream.str()+"s";
-      DrawText(line_x_pos,line_y_offset,line);
-      line_y_offset += line_y_offset_stepsize;
-      //display local-minima tree
-      planners.at(active_planner)->DrawGLScreen(line_x_pos, line_y_offset);
-      line_y_offset += line_y_offset_stepsize;
-
+    if(state("draw_planner_minima_tree")){
+        planners.at(active_planner)->DrawGLScreen(line_x_pos, line_y_offset);
+        line_y_offset += line_y_offset_stepsize;
     }
   }
   if(state("draw_planner_last_command") && last_command!=""){

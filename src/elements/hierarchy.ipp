@@ -7,13 +7,15 @@ Hierarchy<T>::Hierarchy(){root=NULL;};
 template <class T>
 void Hierarchy<T>::CheckLevel( uint level ){
   if(level>=level_robot_inner_idx.size()){
-    std::cout << "level " << level << " does not exists" << std::endl;
-    throw "Level not existent.";
+    if(level>=level_robot_inner_idxs.size()){
+      std::cout << "level " << level << " does not exists" << std::endl;
+      throw "Level not existent.";
+    }
   }
 }
 template <class T>
 uint Hierarchy<T>::NumberLevels(){
-  return level_robot_inner_idx.size();
+  return level_robot_inner_idxs.size();
 }
 template <class T>
 uint Hierarchy<T>::NumberNodesOnLevel(uint level){
@@ -25,6 +27,11 @@ template <class T>
 uint Hierarchy<T>::GetRobotIdx( uint level ){
   CheckLevel(level);
   return level_robot_inner_idx.at(level);
+}
+template <class T>
+std::vector<int> Hierarchy<T>::GetRobotIdxs( uint level ){
+  CheckLevel(level);
+  return level_robot_inner_idxs.at(level);
 }
 
 template <class T>
@@ -77,6 +84,16 @@ void Hierarchy<T>::AddLevel( uint inner_idx, uint outer_idx, Config qi, Config q
   //}
   level_robot_inner_idx.push_back(inner_idx);
   level_robot_outer_idx.push_back(outer_idx);
+  level_q_init.push_back(qi);
+  level_q_goal.push_back(qg);
+  level_number_nodes.push_back(0);
+
+  std::vector<int> idxs; idxs.push_back(inner_idx);
+  level_robot_inner_idxs.push_back(idxs);
+}
+template <class T>
+void Hierarchy<T>::AddLevel( std::vector<int> idxs, Config qi, Config qg ){
+  level_robot_inner_idxs.push_back(idxs);
   level_q_init.push_back(qi);
   level_q_goal.push_back(qg);
   level_number_nodes.push_back(0);

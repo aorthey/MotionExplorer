@@ -1,6 +1,7 @@
 #include "elements/path_pwl.h"
 #include "planner/cspace/cspace.h"
 #include "planner/cspace/cspace_kinodynamic.h"
+#include "planner/cspace/cspace_multiagent.h"
 #include "gui/drawMotionPlanner.h"
 #include <iostream>
 #include <ompl/base/spaces/SE3StateSpace.h>
@@ -8,7 +9,11 @@
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/geometric/PathSimplifier.h>
 #include <ompl/control/PathControl.h>
+#include <ompl/control/spaces/RealVectorControlSpace.h>
 #include <boost/math/constants/constants.hpp>
+#include <boost/foreach.hpp>
+
+#define foreach BOOST_FOREACH
 
 namespace oc = ompl::control;
 
@@ -30,10 +35,13 @@ void PathPiecewiseLinear::SetDefaultPath()
 PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CSpaceOMPL *quotient_space_):
   cspace(cspace_), quotient_space(quotient_space_), path(p_), path_raw(p_)
 {
-  if(p_ == nullptr){
+  if(p_ == nullptr)
+  {
     SetDefaultPath();
   }else{
+
     if(!quotient_space->isDynamic()){
+
       og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
       length = gpath.length();
       std::vector<ob::State *> states = gpath.getStates();
@@ -46,20 +54,36 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
       }
 
     }else{
+
       oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
       std::vector<ob::State *> states = cpath.getStates();
 
       uint Nstates = std::max(0,(int)states.size()-1);
+      ob::State *x0prime = quotient_space->SpaceInformationPtr()->allocState();
+      ob::State *x1prime = quotient_space->SpaceInformationPtr()->allocState();
+
       for(uint k = 0; k < Nstates; k++){
         ob::State *s0 = states.at(k);
         ob::State *s1 = states.at(k+1);
-        double d = cpath.getSpaceInformation()->distance(s0,s1);
+
+        Config v0 = quotient_space->OMPLStateToVelocity(s0);
+        Config v1 = quotient_space->OMPLStateToVelocity(s1);
+
+        Config x0 = quotient_space->OMPLStateToConfig(s0);
+        Config x1 = quotient_space->OMPLStateToConfig(s1);
+
+        Config zeroVel(v0); zeroVel.setZero();
+        quotient_space->ConfigVelocityToOMPLState(x0, zeroVel, x0prime);
+        quotient_space->ConfigVelocityToOMPLState(x1, zeroVel, x1prime);
+
+        double d = cpath.getSpaceInformation()->distance(x0prime, x1prime);
         interLength.push_back(d);
         length+=d;
       }
     }
   }
 }
+
 ob::PathPtr PathPiecewiseLinear::GetOMPLPath() const
 {
   return path;
@@ -72,24 +96,38 @@ void PathPiecewiseLinear::SendToController(SmartPointer<RobotController> control
     return;
   }
 
+  std::cout << "SENDING CONTROLS" << std::endl;
   std::vector<string> cmds = controller->Commands();
   for(uint k = 0; k < cmds.size(); k++){
     std::cout << cmds.at(k) << std::endl;
   }
-  oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
-  
-  std::vector<oc::Control*> controls = cpath.getControls();
 
-  uint N = quotient_space->GetControlDimensionality();
-  for(uint k = 0; k < controls.size(); k++){
-    const oc::RealVectorControlSpace::ControlType *Rctrl = controls.at(k)->as<oc::RealVectorControlSpace::ControlType>();
-    stringstream qstr;
+  oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+  std::vector<ob::State*> states = cpath.getStates();
+
+  
+  // std::vector<oc::Control*> controls = cpath.getControls();
+  uint N = quotient_space->GetKlamptDimensionality();
+  for(uint k = 0; k < states.size(); k++){
+    ob::State *sk = states.at(k);
+    Config qk = quotient_space->OMPLStateToConfig(sk);
+    Config dqk = quotient_space->OMPLStateToVelocity(sk);
+
+    // std::string sq;
+    stringstream qstr, dqstr;
     qstr << N << "  ";
+    dqstr << N << "  ";
     for(uint i = 0; i < N; i++){
-      qstr<< Rctrl->values[i] << " ";
+      qstr<< qk[i] << " ";
+      dqstr<< dqk[i] << " ";
     }
-    string cmd( (k<=0)?("set_torque_control"):("append_torque_control") );
-    if(!controller->SendCommand(cmd,qstr.str())) {
+
+    std::cout << qstr.str() << ":::" << dqstr.str() << std::endl;
+    string cmd( (k<=0)?("set_q"):("append_q") );
+    // string dcmd( (k<=0)?("set_qv"):("append_qv") );
+
+    if(!controller->SendCommand(cmd, qstr.str()))
+    {
       std::cout << std::string(80, '-') << std::endl;
       std::cout << "ERROR in controller commander" << std::endl;
       std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
@@ -97,6 +135,30 @@ void PathPiecewiseLinear::SendToController(SmartPointer<RobotController> control
       throw "Controller command not supported!";
     }
   }
+
+
+
+  // oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+  
+  // std::vector<oc::Control*> controls = cpath.getControls();
+
+  // uint N = quotient_space->GetControlDimensionality();
+  // for(uint k = 0; k < controls.size(); k++){
+  //   const oc::RealVectorControlSpace::ControlType *Rctrl = controls.at(k)->as<oc::RealVectorControlSpace::ControlType>();
+  //   stringstream qstr;
+  //   qstr << N << "  ";
+  //   for(uint i = 0; i < N; i++){
+  //     qstr<< Rctrl->values[i] << " ";
+  //   }
+  //   string cmd( (k<=0)?("set_torque_control"):("append_torque_control") );
+  //   if(!controller->SendCommand(cmd,qstr.str())) {
+  //     std::cout << std::string(80, '-') << std::endl;
+  //     std::cout << "ERROR in controller commander" << std::endl;
+  //     std::cout << cmd << " command  does not work with the robot's controller" << std::endl;
+  //     std::cout << std::string(80, '-') << std::endl;
+  //     throw "Controller command not supported!";
+  //   }
+  // }
 
 }
 
@@ -108,10 +170,11 @@ void PathPiecewiseLinear::setColor(const GLColor &color)
     this->cLine = color;
 }
 
-void PathPiecewiseLinear::Smooth(){
+void PathPiecewiseLinear::Smooth(bool forceSmoothing){
   if(path == nullptr) return;
   if(quotient_space->isDynamic()) return;
-  if(!isSmooth){
+
+  if(!isSmooth || forceSmoothing){
 
     og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
     std::vector<ob::State *> statesB = gpath.getStates();
@@ -119,6 +182,8 @@ void PathPiecewiseLinear::Smooth(){
     og::PathSimplifier shortcutter(gpath.getSpaceInformation());
     shortcutter.simplifyMax(gpath);
     shortcutter.smoothBSpline(gpath);
+
+    gpath.interpolate();
 
     length = gpath.length();
     std::vector<ob::State *> states = gpath.getStates();
@@ -130,8 +195,11 @@ void PathPiecewiseLinear::Smooth(){
       interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
     }
 
+    double l = path->length();
     path = std::make_shared<og::PathGeometric>(gpath);
-    std::cout << "Path smoothed (states: " << statesB.size() << " -> " << states.size() << ")" << std::endl;
+    std::cout << "Path smoothed (states: " << statesB.size() << " -> " << states.size() 
+      << ", length: " << l << " -> " << path->length()
+      << ")" << std::endl;
     isSmooth = true;
   }
 
@@ -157,20 +225,20 @@ double PathPiecewiseLinear::GetLength() const{
   return length;
 }
 
+Vector3 PathPiecewiseLinear::EvalVec3(const double t, int ridx) const{
+  Config q = Eval(t);
+  ob::ScopedState<> s = quotient_space->ConfigToOMPLState(q);
+  Vector3 v = quotient_space->getXYZ(s.get(), ridx);
+  if(draw_planar) v[2] = zOffset;
+  return v;
+}
+
 Vector3 PathPiecewiseLinear::EvalVec3(const double t) const{
   Config q = Eval(t);
   ob::ScopedState<> s = quotient_space->ConfigToOMPLState(q);
   Vector3 v = quotient_space->getXYZ(s.get());
-  if(draw_planar) v[2] = 0.0;
+  if(draw_planar) v[2] = zOffset;
   return v;
-}
-
-Config PathPiecewiseLinear::EvalMilestone(const int k) const{
-  std::cout << "NYI" << std::endl;
-  throw "NYI";
-  //if(k<0) return keyframes.front();
-  //if(k>Nkeyframes) return keyframes.back();
-  //return keyframes.at(k);
 }
 
 Config PathPiecewiseLinear::EvalStates(std::vector<ob::State*> states, const double t) const{
@@ -217,11 +285,10 @@ Config PathPiecewiseLinear::EvalStates(std::vector<ob::State*> states, const dou
   if(t>=Tcum){
     return quotient_space->OMPLStateToConfig(states.back());
   }
-
   std::cout << "Eval could not find point for value " << t << std::endl;
   throw;
-
 }
+
 Config PathPiecewiseLinear::Eval(const double t) const{
   if(!path){
     std::cout << "Cannot Eval empty path" << std::endl;
@@ -235,20 +302,19 @@ Config PathPiecewiseLinear::Eval(const double t) const{
   }else{
     og::PathGeometric *gpath = static_cast<og::PathGeometric*>(path.get());
     states = gpath->getStates();
-    // return EvalStates(states, t);
   }
   return EvalStates(states, t);
-
 }
+
 Config PathPiecewiseLinear::EvalVelocity(const double t) const{
   if(!quotient_space->isDynamic()) 
   {
-    Config dq = quotient_space->GetRobotPtr()->dq;
-    dq.setZero();
-    return dq;
+    OMPL_ERROR("Cannot eval velocity.");
+    throw "EvalVelocityError";
+    // Config dq = quotient_space->RobotPtr()->dq;
+    // dq.setZero();
+    // return dq;
   }
-
-  KinodynamicCSpaceOMPL *kspace = static_cast<KinodynamicCSpaceOMPL*>(quotient_space);
 
   oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
   std::vector<ob::State *> states = cpath.getStates();
@@ -256,10 +322,10 @@ Config PathPiecewiseLinear::EvalVelocity(const double t) const{
   ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
   if(t<=0){
-    return kspace->OMPLStateToVelocity(states.front());
+    return quotient_space->OMPLStateToVelocity(states.front());
   }
   if(t>=length){
-    return kspace->OMPLStateToVelocity(states.back());
+    return quotient_space->OMPLStateToVelocity(states.back());
   }
 
   double Tcum = 0;
@@ -275,7 +341,7 @@ Config PathPiecewiseLinear::EvalVelocity(const double t) const{
       ob::State* s2 = states.at(i+1);
       ob::State* sm = si->allocState();
       si->getStateSpace()->interpolate(s1,s2,tloc,sm);
-      Config q = kspace->OMPLStateToVelocity(sm);
+      Config q = quotient_space->OMPLStateToVelocity(sm);
       si->freeState(sm);
       return q;
     }
@@ -293,7 +359,7 @@ Config PathPiecewiseLinear::EvalVelocity(const double t) const{
   }
 
   if(t>=Tcum){
-    return kspace->OMPLStateToVelocity(states.back());
+    return quotient_space->OMPLStateToVelocity(states.back());
   }
 
   std::cout << "Eval could not find point for value " << t << std::endl;
@@ -308,6 +374,19 @@ Vector3 PathPiecewiseLinear::Vector3FromState(ob::State *s){
   v[2] += zOffset;
   return v;
 }
+
+Vector3 PathPiecewiseLinear::Vector3FromState(ob::State *s, int ridx){
+  if(!quotient_space->isMultiAgent()) return Vector3FromState(s);
+
+  Vector3 v = quotient_space->getXYZ(s, ridx);
+  if(draw_planar){
+    v[2] = 0.0;
+  }
+  v[2] += zOffset;
+  return v;
+}
+
+
 void PathPiecewiseLinear::Draw2DArrow(Vector3 arrow_pos, Vector3 arrow_dir, double arrow_size_head, double arrow_size_length)
 {
   Vector3 ez(0,0,1);
@@ -348,19 +427,19 @@ void PathPiecewiseLinear::Draw2DArrow(Vector3 arrow_pos, Vector3 arrow_dir, doub
 }
 
 Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos, 
-    const std::vector<ob::State*> states, uint k_start_state, double arrow_size_length)
+    const std::vector<ob::State*> states, uint k_start_state, double arrow_size_length, int ridx)
 {
     unsigned Mmax = states.size() - 1;
     uint m = k_start_state;
 
     assert(m < Mmax);
 
-    Vector3 qnext = Vector3FromState(states.at(m));
+    Vector3 qnext = Vector3FromState(states.at(m), ridx);
     double zmax = qnext[2];
     double d_tip_to_state_best = fabs( arrow_pos.distanceSquared(qnext) - arrow_size_length);
 
     m = m+1;
-    qnext = Vector3FromState(states.at(m));
+    qnext = Vector3FromState(states.at(m), ridx);
     if(qnext[2] > zmax) zmax = qnext[2];
     double d_tip_to_state_next = fabs( arrow_pos.distanceSquared(qnext) - arrow_size_length);
 
@@ -372,7 +451,7 @@ Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos,
         m = Mmax;
         break;
       }
-      qnext = Vector3FromState(states.at(m));
+      qnext = Vector3FromState(states.at(m), ridx);
       if(qnext[2] > zmax) zmax = qnext[2];
       d_tip_to_state_next = fabs( arrow_pos.distanceSquared(qnext) - arrow_size_length);
     }
@@ -381,28 +460,46 @@ Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos,
     if(m >= Mmax){
         m = Mmax;
     }
-    qnext = Vector3FromState(states.at(m));
+    qnext = Vector3FromState(states.at(m), ridx);
     qnext[2] = zmax;
     return qnext;
 }
 
-void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
+void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &states, int ridx, double percentage)
 {
-  //############################################################################
-  //Draws a tron-like line strip
-  //############################################################################
   glBegin(GL_QUAD_STRIP);
   std::vector<Vector3> path_left;
   std::vector<Vector3> path_right;
-  for(uint i = 0; i < states.size(); i++){
-    Vector3 q1 = Vector3FromState(states.at(i));
+
+  //compute stopping distance
+  std::vector<Vector3> milestones;
+  double dist = 0;
+  int ctr = 0;
+  while(dist < percentage*length)
+  {
+    Vector3 v = Vector3FromState(states.at(ctr), ridx);
+    milestones.push_back(v);
+    dist += interLength.at(ctr);
+    ctr++;
+  }
+  Vector3 v = Vector3FromState(states.at(ctr), ridx);
+  milestones.push_back(v);
+  //// 
+
+  if(milestones.size()<2) return;
+
+  for(uint i = 0; i < milestones.size(); i++){
+    // Vector3 q1 = Vector3FromState(states.at(i), ridx);
+    Vector3 q1 = milestones.at(i);
     Vector3 dq;
 
-    if(i<states.size()-1){
-      Vector3 q2 = Vector3FromState(states.at(i+1));
+    if(i < milestones.size()-1){
+      // Vector3 q2 = Vector3FromState(states.at(i+1), ridx);
+      Vector3 q2 = milestones.at(i+1);
       dq = q2 - q1;
     }else{
-      Vector3 q2 = Vector3FromState(states.at(i-1));
+      Vector3 q2 = milestones.at(i-1);
+      // Vector3 q2 = Vector3FromState(states.at(i-1), ridx);
       dq = q1 - q2;
     }
 
@@ -464,8 +561,37 @@ void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
   cLine.setCurrentGL();
 }
 
+void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states, double percentage)
+{
+  //############################################################################
+  //Draws a tron-like line strip
+  //############################################################################
 
-void PathPiecewiseLinear::DrawGLArrowMiddleOfPath( const std::vector<ob::State*> &states)
+  if(quotient_space->isMultiAgent()){
+    CSpaceOMPLMultiAgent *cma = static_cast<CSpaceOMPLMultiAgent*>(quotient_space);
+    std::vector<int> idxs = cma->GetRobotIdxs();
+    bool drawMACross = drawCross;
+    foreach(int i, idxs)
+    {
+        DrawGLRibbonRobotIndex(states, i, percentage);
+        // DrawGLArrowMiddleOfPath(states, i);
+        if(drawMACross){
+          DrawGLCross(states, i);
+          drawMACross = false;
+        }
+    }
+    if(!quotient_space->IsPlanar()){
+    }else{
+    }
+  }else{
+    DrawGLRibbonRobotIndex(states, quotient_space->GetRobotIndex(), percentage);
+    // DrawGLArrowMiddleOfPath(states, quotient_space->GetRobotIndex());
+    if(drawCross) DrawGLCross(states, quotient_space->GetRobotIndex());
+  }
+}
+
+
+void PathPiecewiseLinear::DrawGLArrowMiddleOfPath( const std::vector<ob::State*> &states, int ridx)
 {
   if(states.size() < 2) return;
 
@@ -476,19 +602,19 @@ void PathPiecewiseLinear::DrawGLArrowMiddleOfPath( const std::vector<ob::State*>
   glLineWidth(arrow_size_head*10);
   Vector3 qnext;
   if(states.size() == 2){
-    Vector3 q1 = Vector3FromState(states.at(0));
-    qnext = Vector3FromState(states.at(1));
+    Vector3 q1 = Vector3FromState(states.at(0), ridx);
+    qnext = Vector3FromState(states.at(1), ridx);
     arrow_pos = 0.5*(qnext - q1);
   }else if(states.size()%2 == 0){
     unsigned m = 0.5*states.size();
-    Vector3 q1 = Vector3FromState(states.at(m-1));
-    Vector3 q2 = Vector3FromState(states.at(m));
+    Vector3 q1 = Vector3FromState(states.at(m-1), ridx);
+    Vector3 q2 = Vector3FromState(states.at(m), ridx);
     arrow_pos = q1 + 0.5*(q2 - q1);
-    qnext = GetNearestStateToTipOfArrow(arrow_pos, states, m, arrow_size_length);
+    qnext = GetNearestStateToTipOfArrow(arrow_pos, states, m, arrow_size_length, ridx);
   }else{
     unsigned m = floor(0.5*states.size());
-    arrow_pos = Vector3FromState(states.at(m));
-    qnext = GetNearestStateToTipOfArrow(arrow_pos, states, m, arrow_size_length);
+    arrow_pos = Vector3FromState(states.at(m), ridx);
+    qnext = GetNearestStateToTipOfArrow(arrow_pos, states, m, arrow_size_length, ridx);
   }
   arrow_dir = qnext - arrow_pos;
   arrow_dir.inplaceNormalize();
@@ -503,13 +629,13 @@ void PathPiecewiseLinear::DrawGLArrowMiddleOfPath( const std::vector<ob::State*>
   glPopMatrix();
 }
 
-void PathPiecewiseLinear::DrawGLCross( const std::vector<ob::State*> &states)
+void PathPiecewiseLinear::DrawGLCross( const std::vector<ob::State*> &states, int ridx)
 {
   if(states.size() < 2) return;
 
   Vector3 ez(0,0,1);
 
-  Vector3 pos = EvalVec3(0.3*GetLength());
+  Vector3 pos = EvalVec3(0.3*GetLength(), ridx);
 
   //############################################################################
   //Draw Cross at pos
@@ -630,8 +756,8 @@ std::vector<double> PathPiecewiseLinear::GetHighCurvatureConfigurations()
     return pathPts;
 }
 
-void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
-
+void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path)
+{
   std::vector<ob::State *> states;
   if(quotient_space->isDynamic()){
     oc::PathControl *cpath = static_cast<oc::PathControl*>(_path.get());
@@ -655,11 +781,14 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
   glEnable(GL_LINE_SMOOTH);
   glDisable(GL_CULL_FACE);
   cLine.setCurrentGL();
-
   //############################################################################
-  DrawGLRibbon(states);
-  DrawGLArrowMiddleOfPath(states);
-  if(drawCross) DrawGLCross(states);
+
+  if(state("draw_explorer_partial_paths"))
+  {
+      DrawGLRibbon(states, 0.5);
+  }else{
+      DrawGLRibbon(states);
+  }
 
   if(drawSweptVolume && state("draw_path_sweptvolume")){
     double L = GetLength();
@@ -683,11 +812,30 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path){
 
 }
 
+CSpaceOMPL* PathPiecewiseLinear::GetSpace() const
+{
+  return quotient_space;
+}
 void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
 {
   Config q = Eval(t);
-  Robot* robot = quotient_space->GetRobotPtr();
-  GLDraw::drawRobotAtConfig(robot, q, cRobotVolume);
+  quotient_space->drawConfig(q, cRobotVolume);
+
+  if(state("draw_path_trace"))
+  {
+      cLine = cSmoothed;
+      DrawGLPathPtr(state, path);
+  }
+
+
+  // if(quotient_space->isDynamic()){
+  //   Config q = Eval(t);
+  //   Config dq = EvalVelocity(t);
+  //   quotient_space->drawConfig(q, dq, cRobotVolume);
+  // }else{
+    // Config q = Eval(t);
+    // quotient_space->drawConfig(q, cRobotVolume);
+  // }
 }
 
 void PathPiecewiseLinear::DrawGL(GUIState& state)
@@ -701,7 +849,6 @@ void PathPiecewiseLinear::DrawGL(GUIState& state)
   }
 
   if(state("draw_path")){
-    //if(path==nullptr) return;
     cLine = cSmoothed;
     DrawGLPathPtr(state, path);
   }
@@ -711,20 +858,6 @@ void PathPiecewiseLinear::DrawGL(GUIState& state)
     cLine = cUnsmoothed;
     DrawGLPathPtr(state, path_raw);
   }
-  // if(state("draw_path_sweptvolume")){
-  //   if(!path) return;
-  //   if(!sv){
-  //     double tmin = 0.05;
-  //     double L = GetLength();
-  //     uint Nmilestones = int(L/tmin);
-  //     std::vector<Config> q;
-  //     for(uint k = 0; k < Nmilestones; k++){
-  //       q.push_back( Eval(k*tmin) );
-  //     }
-  //     sv = new SweptVolume(quotient_space->GetRobotPtr(), q, Nmilestones);
-  //   }
-  //   sv->DrawGL(state);
-  // }
 }
 bool PathPiecewiseLinear::Load(const char* fn)
 {

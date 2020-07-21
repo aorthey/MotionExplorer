@@ -31,7 +31,6 @@ class WrenchField{
 
     //wrench induced by force field on each link of the main robot
     std::vector<Wrench> wrench_per_link;
-
     COM com;
 
   public: 

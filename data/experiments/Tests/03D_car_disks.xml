@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="car" file="../../robots/planar/car.urdf"/>
+  <!-- <robot name="disk" file="../../robots/planar/car_capsule_inner.urdf"/> -->
+
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="-2 +2 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="-5 +5 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="-7 -5 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="-2.5 -2.5 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="-6 0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="1 -2.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="5 5.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="10 5.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="-10 5.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="-3 8.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="+7 -8.0 0" rotateRPY="0 0 0"/>
+  <plannerinput>
+
+    <qinit  config="15  -7 +3 +0.0 0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
+    <qgoal  config="15  +4 -0 +0.0 0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
+    <se3min config="6  -8 -8.0 -0.1 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +8 +8.0 +0.1 +3.141593 +1.57 +3.141593"/>
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <pathSpeed>10</pathSpeed>
+    <!-- <smoothPath>1</smoothPath> -->
+    <freeFloating>1</freeFloating>
+
+    <algorithm name="hierarchy:qrrt"/>
+    <algorithm name="hierarchy:explorer"/>
+    <hierarchy>
+      <level inner_index="0" type="SE2" finite_horizon_relaxation="10"/>
+      <level inner_index="0" type="SE2"/>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>
+
+
+

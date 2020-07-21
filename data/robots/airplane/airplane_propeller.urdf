@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<robot name="airplane">
+  <link name="planeLink">
+    <collision>
+      <origin rpy="0 0 -1.57" xyz="-0.1 0 0"/>
+      <geometry>
+        <mesh scale="0.001 0.001 0.001" filename="meshes/PropellerPlane.tri"/>
+      </geometry>
+    </collision>
+    <visual>
+      <origin rpy="0 0 -1.57" xyz="-0.1 0 0"/>
+      <geometry>
+        <mesh scale="0.001 0.001 0.001" filename="meshes/PropellerPlane.tri"/>
+      </geometry>
+    </visual>
+  </link>
+</robot>

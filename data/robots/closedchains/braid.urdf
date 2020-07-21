@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<robot name="braid">
+ <link name="base">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.753333333333" ixy="0" ixz="0" iyy="0.244166666667" iyz="0" izz="0.990833333333"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <box size="1.0 0.1 0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <box size="1.0 0.1 0.1"/>
+    </geometry>
+  </collision>
+ </link>
+ <link name="link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.753333333333" ixy="0" ixz="0" iyy="0.244166666667" iyz="0" izz="0.990833333333"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.5 0 0"/>
+    <geometry>
+      <box size="1.0 0.1 0.1"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.5 0 0"/>
+    <geometry>
+      <box size="1.0 0.1 0.1"/>
+    </geometry>
+  </collision>
+ </link>
+
+  <joint name="joint_head_base" type="revolute">
+    <origin rpy="0 0 1.57" xyz="0.5 0 0"/>
+    <parent link="base"/>
+    <child link="link1"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14" upper="3.14" effort="0.01" velocity="100"/>
+  </joint>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>
+

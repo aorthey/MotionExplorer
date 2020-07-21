@@ -2,14 +2,21 @@
 #include "planner/cspace/cspace_kinodynamic.h"
 #include "planner/benchmark/benchmark_input.h"
 #include "util.h"
-#include <ompl/geometric/planners/quotientspace/datastructures/PlannerDataVertexAnnotated.h>
-#include <ompl/geometric/planners/quotientspace/Explorer.h>
-#include <ompl/geometric/planners/quotientspace/QRRT.h>
+
+#include <ompl/geometric/planners/explorer/MotionExplorer.h>
+#include <ompl/geometric/planners/multilevel/QRRT.h>
+#include <ompl/geometric/planners/multilevel/QRRTStar.h>
+#include <ompl/geometric/planners/multilevel/QMP.h>
+#include <ompl/geometric/planners/multilevel/QMPStar.h>
+#include <ompl/geometric/planners/multilevel/SPQR.h>
+
 #include <ompl/control/optimizers/Optimizer.h>
 #include <ompl/geometric/PathGeometric.h>
 
 #include <ompl/control/planners/rrt/RRT.h>
 #include <ompl/control/planners/est/EST.h>
+// #include <ompl/control/planners/syclop/SyclopRRT.h>
+// #include <ompl/control/planners/syclop/SyclopEST.h>
 #include <ompl/control/planners/pdst/PDST.h>
 #include <ompl/control/planners/sst/SST.h>
 #include <ompl/control/planners/kpiece/KPIECE1.h>
@@ -62,7 +69,13 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
 {
   ob::PlannerPtr planner;
   //assume last cspace is dynamic
-  const oc::SpaceInformationPtr si = static_pointer_cast<oc::SpaceInformation>(si_vec.back());
+  const oc::SpaceInformationPtr si = dynamic_pointer_cast<oc::SpaceInformation>(si_vec.back());
+  if(si.get() == nullptr && !util::StartsWith(algorithm,"hierarchy"))
+  {
+    OMPL_WARN("Not a control SpaceInformationPtr (Make sure the last State Space is of type ompl::control::SpaceInformationPtr)");
+    // throw "NotControl";
+  }
+
 
   if(algorithm=="ompl:dynamic:rrt"){
     planner = std::make_shared<oc::RRT>(si);
@@ -74,8 +87,22 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
     planner = std::make_shared<oc::PDST>(si);
   }else if(algorithm=="ompl:dynamic:kpiece"){
     planner = std::make_shared<oc::KPIECE1>(si);
+  // }else if(algorithm=="ompl:dynamic:sycloprrt"){
+  //   planner = std::make_shared<oc::SyclopRRT>(si);
+  // }else if(algorithm=="ompl:dynamic:syclopest"){
+  //   planner = std::make_shared<oc::SyclopEST>(si);
   }else if(algorithm=="hierarchy:explorer"){
     planner = std::make_shared<og::MotionExplorer>(si_vec);
+  }else if(algorithm=="hierarchy:qrrt"){
+    planner = std::make_shared<og::QRRT>(si_vec);
+  }else if(algorithm=="hierarchy:qrrtstar"){
+    planner = std::make_shared<og::QRRTStar>(si_vec);
+  }else if(algorithm=="hierarchy:qmp"){
+    planner = std::make_shared<og::QMP>(si_vec);
+  }else if(algorithm=="hierarchy:qmpstar"){
+    planner = std::make_shared<og::QMPStar>(si_vec);
+  }else if(algorithm=="hierarchy:spqr"){
+    planner = std::make_shared<og::SPQR>(si_vec);
   }else if(algorithm=="optimizer"){
     si->setup();
     CSpaceOMPL* cspace = input.cspace_levels.back();
@@ -101,32 +128,17 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
 
   for(uint k = 0; k < input.cspace_levels.size(); k++){
     CSpaceOMPL* cspace_levelk = input.cspace_levels.at(k);
-    bool dynamic = cspace_levelk->isDynamic();
+    // bool dynamic = cspace_levelk->isDynamic();
     ob::SpaceInformationPtr sik = cspace_levelk->SpaceInformationPtr();
 
     ob::ScopedState<> startk(sik);
     ob::ScopedState<> goalk(sik);
-    if(dynamic){
 
-      KinodynamicCSpaceOMPL* cspace_dynamic = dynamic_cast<KinodynamicCSpaceOMPL*>(cspace_levelk);
-      if(cspace_dynamic==nullptr)
-      {
-        std::cout << "ERROR: not dynamic even though declared dynamic" << std::endl;
-        std::cout << *cspace_levelk << std::endl;
-        throw "Not dynamic.";
-      }
+    startk = cspace_levelk->ConfigVelocityToOMPLState(input.q_init, input.dq_init);
+    goalk  = cspace_levelk->ConfigVelocityToOMPLState(input.q_goal, input.dq_goal);
 
-      oc::SpaceInformationPtr sik_dynamic = static_pointer_cast<oc::SpaceInformation>(sik);
-      sik_dynamic->setMinMaxControlDuration(0.01, 0.1);
-      sik_dynamic->setPropagationStepSize(1);
-
-      startk = cspace_dynamic->ConfigVelocityToOMPLState(input.q_init, input.dq_init);
-      goalk  = cspace_dynamic->ConfigVelocityToOMPLState(input.q_goal, input.dq_goal);
-    }else{
-      startk = cspace_levelk->ConfigToOMPLState(input.q_init);
-      goalk  = cspace_levelk->ConfigToOMPLState(input.q_goal);
-    }
     setStateSampler(input.name_sampler, sik);
+
     si_vec.push_back(sik);
 
     if(k >= input.cspace_levels.size()-1){
@@ -150,7 +162,7 @@ void StrategyKinodynamicMultiLevel::Init( const StrategyInput &input )
 
   if(util::StartsWith(algorithm,"benchmark")){
     //No Init, directly execute benchmark
-    std::cout << "NYI" << std::endl;
+    OMPL_ERROR("NYI");
     throw "NYI";
   }else{
     planner = GetPlanner(algorithm, si_vec, pdef, input);
@@ -167,7 +179,6 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
   // choose planner
   //###########################################################################
   // const oc::SpaceInformationPtr si = static_pointer_cast<oc::SpaceInformation>(planner->getSpaceInformation());
-  // si->getStateSpace()->registerProjections();
   // si->setMinMaxControlDuration(0.01, 0.1);
   // si->setPropagationStepSize(1);
   // si->getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(si->getStateSpace())));
@@ -179,12 +190,11 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
     // double max_planning_time= input.max_planning_time;
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
 
-  double minimalCostAcceptable = 5;
-  planner->getProblemDefinition()->getOptimizationObjective()->setCostThreshold(ob::Cost(minimalCostAcceptable));
-  std::cout << planner->getProblemDefinition()->getOptimizationObjective()->getCostThreshold() << std::endl;
-
+  // double minimalCostAcceptable = 5;
+  // planner->getProblemDefinition()->getOptimizationObjective()->setCostThreshold(ob::Cost(minimalCostAcceptable));
 
   ompl::time::point start = ompl::time::now();
+  planner->getSpaceInformation()->getStateSpace()->registerProjections();
   planner->solve(ptc);
   output.planner_time = ompl::time::seconds(ompl::time::now() - start);
   output.max_planner_time = max_planning_time;
@@ -204,7 +214,7 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
 }
 void StrategyKinodynamicMultiLevel::Clear()
 {
-  planner->clear();
+  if(planner != nullptr) planner->clear();
 }
 void StrategyKinodynamicMultiLevel::Step(StrategyOutput &output)
 {

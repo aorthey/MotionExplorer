@@ -43,6 +43,8 @@ void Strategy::Clear()
 }
 void Strategy::setStateSampler(std::string sampler, ob::SpaceInformationPtr si)
 {
+  if(sampler=="custom") return;
+
   ob::ValidStateSamplerAllocator allocator;
   if(sampler=="uniform"){
     allocator = allocUniformValidStateSampler;

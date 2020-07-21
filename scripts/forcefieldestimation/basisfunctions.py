@@ -17,7 +17,6 @@ def GetBasisFunctionsAtSamples(X):
   ThetaUniform[0,2]=1
   ThetaUniform[1,2]=1
 
-  print ThetaUniform
   D = np.zeros((N_dim, K_basic_functions, M_samples))
 
   for k in range(0,M_samples):

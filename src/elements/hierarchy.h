@@ -20,12 +20,15 @@ class Hierarchy{
     uint NumberLevels();
     uint NumberNodesOnLevel(uint level);
     uint GetRobotIdx( uint level );
+    std::vector<int> GetRobotIdxs( uint level );
+
     uint GetInnerRobotIdx( uint level );
     uint GetOuterRobotIdx( uint level );
     Config GetInitConfig( uint level );
     Config GetGoalConfig( uint level );
 
     void AddLevel( uint idx, Config qi, Config qg );
+    void AddLevel( std::vector<int> idxs, Config qi, Config qg );
     void AddLevel( uint inner_idx, uint outer_idx, Config qi, Config qg );
 
     void AddRootNode(T content_);
@@ -53,6 +56,7 @@ class Hierarchy{
     //meta information about tree
     ob::SpaceInformationPtr si;
     std::vector<int> level_robot_inner_idx;
+    std::vector<std::vector<int>> level_robot_inner_idxs;
     std::vector<int> level_robot_outer_idx;
     std::vector<Config> level_q_init;
     std::vector<Config> level_q_goal;

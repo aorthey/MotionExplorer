@@ -6,7 +6,7 @@ from urdf_create import *
 from urdf_create_primitives import *
 
 #number of segments of snake INCLUDING head segment
-Nsegments = 3
+Nsegments = 10
 
 headradius = 0.1
 segment_length = 3*headradius
@@ -53,7 +53,7 @@ def CreateRobotNsegments(robot_name, Nsegments):
   f.write('  </klampt>\n')
   f.write('</robot>')
   f.close()
-  print "\nCreated new file >>",fname
+  print("\nCreated new file >>",fname)
 
 robot_name = 'snake/snake'
 for i in range(0,Nsegments):

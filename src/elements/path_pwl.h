@@ -34,10 +34,12 @@ class PathPiecewiseLinear
     Config EvalVelocity(const double t) const;
     Vector EvalVelocityVec3(const double t) const;
     Vector3 EvalVec3(const double t) const;
-    Config EvalMilestone(const int k) const;
+    Vector3 EvalVec3(const double t, int ridx) const;
+
+    CSpaceOMPL *GetSpace() const;
 
     void Normalize(); // convert path length [0,L] -> [0,1]
-    void Smooth();
+    void Smooth(bool forceSmoothing=false);
 
     std::vector<double> GetLengthVector() const;
     int GetNumberOfMilestones();
@@ -46,7 +48,7 @@ class PathPiecewiseLinear
     double linewidth{20};
     double widthBorder{0.1};
     double ptsize{10};
-    double zOffset{0.0};
+    double zOffset{-0.1};
     GLColor cVertex{magenta}, cLine{magenta};
     GLColor cSmoothed{magenta}, cUnsmoothed{red};
     GLColor cRobotVolume{grey};
@@ -73,15 +75,18 @@ class PathPiecewiseLinear
   protected:
     double length{0};
     std::vector<double> interLength;//interLength(i) length towards next milestone point from q(i)
+
     bool isSmooth{false};
     Vector3 Vector3FromState(ob::State *s);
+    Vector3 Vector3FromState(ob::State *s, int ridx);
     void Draw2DArrow(Vector3 arrow_pos, Vector3 arrow_dir, double arrow_size_head, double arrow_size_length);
     Vector3 GetNearestStateToTipOfArrow(Vector3 arrow_pos, 
-        const std::vector<ob::State*> states, uint k_start_state, double arrow_size_length);
+        const std::vector<ob::State*> states, uint k_start_state, double arrow_size_length, int ridx);
 
-    void DrawGLRibbon(const std::vector<ob::State*> &states);
-    void DrawGLArrowMiddleOfPath(const std::vector<ob::State*> &states);
-    void DrawGLCross(const std::vector<ob::State*> &states);
+    void DrawGLRibbon(const std::vector<ob::State*> &states, double percentage = 1.0);
+    void DrawGLRibbonRobotIndex(const std::vector<ob::State*> &states, int ridx, double percentage = 1.0);
+    void DrawGLArrowMiddleOfPath(const std::vector<ob::State*> &states, int ridx);
+    void DrawGLCross(const std::vector<ob::State*> &states, int ridx);
 
     SweptVolume *sv{nullptr};
     CSpaceOMPL *cspace{nullptr};

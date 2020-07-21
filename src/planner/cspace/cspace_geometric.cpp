@@ -81,15 +81,14 @@ void GeometricCSpaceOMPL::initSpace()
 
 }
 
-void GeometricCSpaceOMPL::print() const
+void GeometricCSpaceOMPL::print(std::ostream& out) const
 {
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "OMPL CSPACE" << std::endl;
-  std::cout << std::string(80, '-') << std::endl;
-  std::cout << "Robot \"" << robot->name << "\":" << std::endl;
-  std::cout << "Dimensionality Space            :" << GetDimensionality() << std::endl;
-  std::cout << " Configuration Space (klampt) : SE(3)" << (Nklampt>0?"xR^"+std::to_string(Nklampt):"") << "  [Klampt]"<< std::endl;
-  std::cout << " Configuration Space (ompl)   : SE(3)" << (Nompl>0?"xR^"+std::to_string(Nompl):"") << "  [OMPL]" << std::endl;
+  out << std::string(80, '-') << std::endl;
+  out << "SE3RN ";
+  out << "(Robot: " << robot->name << ", id: " << GetRobotIndex() << ")" << std::endl;
+  out << "Dimensionality Space            :" << GetDimensionality() << std::endl;
+  out << " Configuration Space (klampt) : SE(3)" << (Nklampt>0?"xR^"+std::to_string(Nklampt):"") << "  [Klampt]"<< std::endl;
+  out << " Configuration Space (ompl)   : SE(3)" << (Nompl>0?"xR^"+std::to_string(Nompl):"") << "  [OMPL]" << std::endl;
 
   ob::SE3StateSpace *cspaceSE3 = nullptr;
 
@@ -98,25 +97,26 @@ void GeometricCSpaceOMPL::print() const
   }else{
     cspaceSE3 = space->as<ob::SE3StateSpace>();
   }
-  si->printSettings();
+  if(si!=nullptr){
+    si->printSettings(out);
+  }
 
   //################################################################################
   const ob::RealVectorBounds bounds = cspaceSE3->getBounds();
   std::vector<double> se3min = bounds.low;
   std::vector<double> se3max = bounds.high;
-  std::cout << "SE(3) bounds min     : ";
+  out << "SE(3) bounds min     : ";
   for(uint i = 0; i < se3min.size(); i++){
-    std::cout << " " << se3min.at(i);
+    out << " " << se3min.at(i);
   }
-  std::cout << std::endl;
+  out << std::endl;
 
-  std::cout << "SE(3) bounds max     : ";
+  out << "SE(3) bounds max     : ";
   for(uint i = 0; i < se3max.size(); i++){
-    std::cout << " " << se3max.at(i);
+    out << " " << se3max.at(i);
   }
-  std::cout << std::endl;
-
-  std::cout << std::string(80, '-') << std::endl;
+  out << std::endl;
+  out << std::string(80, '-') << std::endl;
 }
 
 void GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q, ob::State *qompl)
@@ -136,7 +136,7 @@ void GeometricCSpaceOMPL::ConfigToOMPLState(const Config &q, ob::State *qompl)
   }
 
   qomplSE3->setXYZ(q(0),q(1),q(2));
-  OMPLSO3StateSpaceFromEulerXYZ(q(3),q(4),q(5),qomplSO3);
+  OMPLSO3StateSpaceFromEulerZYX(q(3),q(4),q(5), qomplSO3);
 
   if(Nompl>0){
     double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
@@ -169,10 +169,10 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::SE3StateSpace::StateType
     throw "SO3 element is NaN.";
   }
 
-  std::vector<double> rxyz = EulerXYZFromOMPLSO3StateSpace(qomplSO3);
-  q(3) = rxyz.at(0);
-  q(4) = rxyz.at(1);
-  q(5) = rxyz.at(2);
+  std::vector<double> rzyx = EulerZYXFromOMPLSO3StateSpace(qomplSO3);
+  q(3) = rzyx.at(0);
+  q(4) = rzyx.at(1);
+  q(5) = rzyx.at(2);
 
   for(uint i = 0; i < Nompl; i++){
     uint idx = ompl_to_klampt.at(i);
@@ -192,8 +192,17 @@ Config GeometricCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
   }
 }
 
-const oc::StatePropagatorPtr GeometricCSpaceOMPL::StatePropagatorPtr(oc::SpaceInformationPtr si)
+Vector3 GeometricCSpaceOMPL::getXYZ(const ob::State *s)
 {
-  OMPL_ERROR("GeometricCspace has no StatePropagatorPtr");
-  throw "No StatePropagatorPtr.";
+  const ob::SE3StateSpace::StateType *qomplSE3;
+  if(Nompl>0){
+    qomplSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  }else{
+    qomplSE3 = s->as<ob::SE3StateSpace::StateType>();
+  }
+  double x = qomplSE3->getX();
+  double y = qomplSE3->getY();
+  double z = qomplSE3->getZ();
+  Vector3 q(x,y,z);
+  return q;
 }

@@ -1,8 +1,8 @@
-<h1>MotionPlanningExplorerGUI</h1>
+<h1>MotionExplorer</h1>
 <p align="middle">
-  <img src="https://github.com/aorthey/MotionPlanningExplorerGUI/blob/master/data/images/airplane.png" width="280" />
-  <img src="https://github.com/aorthey/MotionPlanningExplorerGUI/blob/master/data/images/PR2.png" width="280" />
-  <img src="https://github.com/aorthey/MotionPlanningExplorerGUI/blob/master/data/images/drone.png" width="280" />
+  <img src="https://github.com/aorthey/MotionExplorer/blob/master/data/images/airplane.png" width="280" />
+  <img src="https://github.com/aorthey/MotionExplorer/blob/master/data/images/PR2.png" width="280" />
+  <img src="https://github.com/aorthey/MotionExplorer/blob/master/data/images/drone.png" width="280" />
 </p>
 
 
@@ -34,7 +34,7 @@ Please make sure you have a github.com account AND ssh access from your workstat
 <ol>
   <li> Install Script for Ubuntu 16.04 and 18.04 (requires SSH access)
     
-    git clone git@github.com:aorthey/MotionPlanningExplorerGUI.git
+    git clone git@github.com:aorthey/MotionExplorer.git
     cd MotionPlanningExplorerGUI
     ./install_script.sh
     
@@ -83,5 +83,14 @@ Current important keys:
       4 : display local-minima tree (default: on)
       5 : display planning information (default: on)
       
+When compiling, we often need to compile OMPL and MotionExplorer plus do some debugging with GDB. To simplify this workflow, here are some shortcuts you can copy to your .bashrc (first build OMPL, then build MotionExplorer, then execute planner_gui with GDB)
 
-
+    gdbrun (){
+      gdb -q -ex 'set confirm off' -ex 'run' --args $@
+    }
+    makerunarg (){
+      make -j5 $1 && gdbrun $@
+    }
+    alias cdm='cd ${HOME}/git/MotionPlanningExplorerGUI'
+    alias cdmb='cdm && cd build'
+    alias explorerGUI='cdmb && cd ../libs/ompl/build && cmake .. && sudo make -j4 install && cdmb && makerunarg planner_gui'

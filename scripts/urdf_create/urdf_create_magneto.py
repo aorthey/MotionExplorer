@@ -25,7 +25,7 @@ def createSymmetricMagneto(robot_name, foot_radius, leg_length, leg_radius):
   f.write('</robot>')
   f.close()
 
-  print "\nCreated new file >>",fname
+  print("\nCreated new file >>",fname)
 def createMagneto(robot_name, foot_radius, leg1_length, leg2_length, leg3_length, leg_radius):
   joint_radius = leg_radius
   joint_length = 2*leg_radius
@@ -61,7 +61,7 @@ def createMagneto(robot_name, foot_radius, leg1_length, leg2_length, leg3_length
   f.write('</robot>')
   f.close()
 
-  print "\nCreated new file >>",fname
+  print("\nCreated new file >>",fname)
 
 foot_radius= 0.05
 

@@ -10,7 +10,7 @@ class ForceFieldEstimator:
 
     N = self.Phi.shape[0]
     W = cvx.Variable(N)
-    print self.Phi.shape
+    print(self.Phi.shape)
     C=1e-3
     obj = cvx.Minimize(cvx.norm(self.Phi.T*W))
     constr = [W>=0, np.ones(N).T*W == 1]
@@ -25,8 +25,8 @@ class ForceFieldEstimator:
     self.xx, self.yy = np.meshgrid(x, y)
     self.Fx, self.Fy = self.GetForceAt(self.xx, self.yy)
     Nth = 1
-    print self.xx
-    print self.Fx
+    print(self.xx)
+    print(self.Fx)
     Q = plt.quiver(self.xx[::Nth, ::Nth], self.yy[::Nth, ::Nth], self.Fx[::Nth, ::Nth], self.Fy[::Nth, ::Nth], pivot='mid', units='inches', color='grey')
     plt.scatter(self.xx[::Nth, ::Nth], self.yy[::Nth, ::Nth], color='r', s=5)
     plt.xlabel('x')
@@ -45,5 +45,5 @@ class ForceFieldEstimator:
 
 
 if __name__ == '__main__':
-  print "NYI"
+  print("NYI")
 

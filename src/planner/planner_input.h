@@ -8,25 +8,56 @@ struct Layer{
   int level;
   int inner_index;
   int outer_index;
-  double cspace_constant;
+  // double cspace_constant;
+  double finite_horizon_relaxation{0.0};
   Config q_init;
   Config q_goal;
+  Config dq_init;
+  Config dq_goal;
   std::string type;
+
+  //multiagent
+  bool isMultiAgent{false};
+  int maxRobots{0};
+  std::vector<int> ids;
+  std::vector<Config> q_inits;
+  std::vector<Config> dq_inits;
+  std::vector<Config> q_goals;
+  std::vector<Config> dq_goals;
+  std::vector<int> ptr_to_next_level_ids;
+  std::vector<std::string> types;
+  std::vector<int> freeFloating;
 };
 
 struct ContactInformation
 {
-    std::string robot_name;
-    std::string robot_link;
-    int robot_link_idx{-1};
-    std::string mode;
+  std::string robot_name;
+  std::string robot_link;
+  int robot_link_idx{-1};
+  std::string mode;
 
-    std::string meshFrom;
-    std::string meshTo;
-    int meshFromIdx{-1};
-    int meshToIdx{-1};
-    int triFrom{-1};
-    int triTo{-1};
+  std::string meshFrom;
+  std::string meshTo;
+  int meshFromIdx{-1};
+  int meshToIdx{-1};
+  int triFrom{-1};
+  int triTo{-1};
+};
+
+
+struct AgentInformation{
+  Config q_init;
+  Config q_goal;
+  Config dq_init;
+  Config dq_goal;
+  int id;
+  Config qMin;
+  Config qMax;
+  Config dqMin;
+  Config dqMax;
+  Config uMin;
+  Config uMax;
+  std::vector<ContactInformation> contact_links;
 };
 
 struct Stratification{
@@ -46,12 +77,18 @@ class PlannerInput{
 
     Config qMin;
     Config qMax;
+    Config dqMin;
+    Config dqMax;
+    Config uMin;
+    Config uMax;
 
     Config se3min;
     Config se3max;
-
     uint robot_idx;
     std::vector<ContactInformation> contact_links;
+
+    //multiagents
+    std::vector<AgentInformation> agent_information;
 
     //contact-planning
     int freeFloating;
@@ -65,10 +102,10 @@ class PlannerInput{
     std::string environment_name;
     std::string name_loadPath;
 
-    double epsilon_goalregion;
-    double max_planning_time;
-    double timestep_min;
-    double timestep_max;
+    double epsilon_goalregion{0.0};
+    double max_planning_time{0.0};
+    double timestep_min{0.0};
+    double timestep_max{0.0};
 
     bool smoothPath{false};
     double pathSpeed{1};
@@ -76,8 +113,7 @@ class PlannerInput{
     double pathBorderWidth{0.01};
 
     bool kinodynamic{false};
-    Config uMin;
-    Config uMax;
+    bool multiAgent{false};
 
     std::vector<Stratification> stratifications;
 
@@ -85,11 +121,18 @@ class PlannerInput{
     bool Load(TiXmlElement *node, int hierarchy = 0);
     void SetDefault();
     void ExtractHierarchy(TiXmlElement *node, int hierarchy_index);
-    const CSpaceInput& GetCSpaceInput();
+    void ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index);
+    const CSpaceInput& GetCSpaceInput(int robot_idx = -1);
     const StrategyInput& GetStrategyInput();
 
     friend std::ostream& operator<< (std::ostream& out, const PlannerInput& pin) ;
+    const AgentInformation& GetAgentAtID(int id);
+    void AddConfigToConfig(Config &q, const Config &qadd);
+    void AddConfigToConfig(Config &q, const Config &qadd, int Nclip);
+    bool ExistsAgentAtID(int id);
+
   private:
+
     CSpaceInput* cin;
     StrategyInput* sin;
 };

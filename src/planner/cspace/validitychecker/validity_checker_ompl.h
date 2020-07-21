@@ -8,7 +8,7 @@ class OMPLValidityChecker: public ob::StateValidityChecker
     OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_);
 
     bool IsFeasible(const ob::State* state) const;
-    double Distance(const ob::State* state) const;
+    // double Distance(const ob::State* state) const;
 
     virtual bool IsSufficientFeasible(const ob::State* state) const;
     virtual double SufficientDistance(const ob::State* state) const;
@@ -18,6 +18,10 @@ class OMPLValidityChecker: public ob::StateValidityChecker
 
     CSpaceOMPL* GetCSpaceOMPLPtr() const;
     void SetNeighborhood(double);
+
+    virtual double clearance(const ob::State*) const override;
+
+    virtual bool operator ==(const ob::StateValidityChecker &rhs) const override;
 
   protected:
     double DistanceToRobot(const ob::State* state, SingleRobotCSpace *space) const;

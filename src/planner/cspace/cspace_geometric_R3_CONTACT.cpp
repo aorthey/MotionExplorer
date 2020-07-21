@@ -43,8 +43,8 @@ void GeometricCSpaceOMPLRCONTACT_3D::initSpace()
     //Constraint Pointer Vector
     int firstLink = 6;
     int lastLink  = robot->links.size() - 1;
-    constraints.push_back(std::make_shared<ContactConstraint_3D>(this, robot, world, lastLink));
-    constraints.push_back(std::make_shared<ContactConstraint_3D>(this, robot, world, firstLink));
+    constraints.push_back(std::make_shared<ContactConstraint_3D>(this, Rn->getDimension(), robot, world, lastLink));
+    constraints.push_back(std::make_shared<ContactConstraint_3D>(this, Rn->getDimension(), robot, world, firstLink));
 
     //Constraint Intersection to join multiple constraints
     constraint_intersect = std::make_shared<ConstraintIntersectionTransition>(Rn->getDimension(), constraints);

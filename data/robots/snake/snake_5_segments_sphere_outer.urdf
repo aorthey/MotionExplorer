@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot name="snake/snake_5_segments_sphere_outer">
+<link name="body">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="2.1160000000000005" ixy="0" ixz="0" iyy="2.1160000000000005" iyz="0" izz="2.1160000000000005"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="2.3000000000000003"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="2.3000000000000003"/>
+    </geometry>
+  </visual>
+</link>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>

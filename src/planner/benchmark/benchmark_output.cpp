@@ -2,6 +2,7 @@
 #include "util.h"
 #include <fstream>
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
 
 // struct CompleteExperiment
 // {
@@ -52,20 +53,25 @@ BenchmarkOutput::BenchmarkOutput(const ot::Benchmark::CompleteExperiment& experi
 bool BenchmarkOutput::Save(const char* file_)
 {
   file = file_;
+  boost::filesystem::path p(file);
+  boost::filesystem::path dir = p.parent_path();
+  if(boost::filesystem::create_directory(dir))
+  {
+      std::cerr<< "Directory Created: "<< dir.string() <<std::endl;
+  }
+
   TiXmlDocument doc;
   TiXmlElement *node = CreateRootNodeInDocument(doc);
   Save(node);
   doc.LinkEndChild(node);
+
   doc.SaveFile(file.c_str());
   std::cout << "Benchmark saved to " << file << std::endl;
 
   //Copy XML to "last.xml" for better access to last written xml
-  boost::filesystem::path p(file);
-  boost::filesystem::path dir = p.parent_path();
   std::ifstream src(file, std::ios::binary);
 
   std::string file_copy = dir.string()+"/last.xml";
-  std::cout << dir.string() << std::endl;
   std::cout << file_copy << std::endl;
   std::ofstream dst(file_copy, std::ios::binary);
   dst << src.rdbuf();
@@ -78,13 +84,13 @@ void BenchmarkOutput::PrintPDF()
     std::cout << "Cannot print PDF. No XML file loaded" << std::endl;
     return;
   }
-  std::string cmd = std::string("python ../scripts/benchmarks/benchmark_to_pdf.py ")+file;
+  std::string cmd = std::string("python ../scripts/benchmarks/benchmark_to_pdf.py ")+file+std::string(" &");
   int rvalue = std::system(cmd.c_str());
 
   if(rvalue){
-    std::cout << "Successfully wrote converted to PDF" << std::endl;
+      std::cout << "Successfully converted XML to PDF" << std::endl;
   }else{
-    std::cout << "### [ERROR] Benchmark to PDF failed" << std::endl;
+      std::cout << "### [ERROR] Benchmark to PDF failed" << std::endl;
   }
 }
 
@@ -104,10 +110,12 @@ bool BenchmarkOutput::Save(TiXmlElement *node)
     std::string name = util::RemoveStringBeginning(planner_experiment.name, "geometric");
     AddSubNode(pknode, "name", name);
 
-
     std::vector<ot::Benchmark::RunProperties> runs = planner_experiment.runs;
     std::string sstrat = "stratification levels INTEGER";
-    AddSubNode(pknode, "number_of_levels", runs.at(0)[sstrat]);
+    if(runs.at(0).find(sstrat) != runs.at(0).end())
+    {
+        AddSubNode(pknode, "number_of_levels", runs.at(0)[sstrat]);
+    }
 
     for(uint j = 0; j < runs.size(); j++){
       TiXmlElement runnode("run");

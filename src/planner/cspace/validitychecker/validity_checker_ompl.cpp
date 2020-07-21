@@ -5,8 +5,11 @@
 OMPLValidityChecker::OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_):
   ob::StateValidityChecker(si), cspace(cspace_)
 {
-  klampt_single_robot_cspace = static_cast<SingleRobotCSpace*>(cspace_->GetCSpaceKlamptPtr());
+    klampt_single_robot_cspace = static_cast<SingleRobotCSpace*>(cspace_->GetCSpaceKlamptPtr());
+    specs_.clearanceComputationType = ob::StateValidityCheckerSpecs::BOUNDED_APPROXIMATE;
 }
+
+
 void OMPLValidityChecker::SetNeighborhood(double cspace_constant)
 {
   neighborhood = new Neighborhood(cspace_constant);
@@ -25,14 +28,23 @@ bool OMPLValidityChecker::isValid(const ob::State* state) const
   return IsCollisionFree(klampt_single_robot_cspace, q) && si_->satisfiesBounds(state);
 }
 
+bool OMPLValidityChecker::operator ==(const ob::StateValidityChecker &rhs) const
+{
+  const OMPLValidityChecker &vrhs = static_cast<const OMPLValidityChecker&>(rhs);
+  int idx_lhs = GetCSpaceOMPLPtr()->GetRobotIndex();
+  int idx_rhs = vrhs.GetCSpaceOMPLPtr()->GetRobotIndex();
+  return (idx_lhs == idx_rhs);
+}
+
 double OMPLValidityChecker::SufficientDistance(const ob::State* state) const
 {
   return 0;
 }
 
-double OMPLValidityChecker::Distance(const ob::State* state) const
+double OMPLValidityChecker::clearance(const ob::State* state) const
 {
-  return DistanceToRobot(state, klampt_single_robot_cspace);
+  double c = DistanceToRobot(state, klampt_single_robot_cspace);
+  return 1.0/c;
 }
 
 double OMPLValidityChecker::DistanceToRobot(const ob::State* state, SingleRobotCSpace *space) const
@@ -66,7 +78,8 @@ double OMPLValidityChecker::DistanceToRobot(const ob::State* state, SingleRobotC
   int closest1, closest2;
   double d = space->settings->DistanceLowerBound(space->world, idrobot, idothers, 0, dInf, &closest1, &closest2);
 
-  return neighborhood->WorkspaceDistanceToConfigurationSpaceDistance(d);
+  return d;
+  // return neighborhood->WorkspaceDistanceToConfigurationSpaceDistance(d);
 }
 
 
@@ -121,5 +134,6 @@ bool OMPLValidityCheckerNecessarySufficient::IsSufficientFeasible(const ob::Stat
 double OMPLValidityCheckerNecessarySufficient::SufficientDistance(const ob::State* state) const
 {
   double dw = DistanceToRobot(state, klampt_single_robot_cspace_outer_approximation);
-  return neighborhood->WorkspaceDistanceToConfigurationSpaceDistance(dw);
+  return dw;
+  // return neighborhood->WorkspaceDistanceToConfigurationSpaceDistance(dw);
 }

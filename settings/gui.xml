@@ -65,8 +65,12 @@
   <checkbox>
     <name>draw_roadmap_shortest_path</name>
     <active>1</active>
-    <key>3</key>
   </checkbox>
+
+  <hotkey>
+    <name>draw_path_modus</name>
+    <key>3</key>
+  </hotkey>
 
   <checkbox>
     <name>draw_play_path</name>
@@ -85,10 +89,10 @@
     <descr>Simulate</descr>
     <key>s</key>
   </hotkey>
-  <!-- <hotkey> -->
-  <!--   <name>simulate_controller</name> -->
-  <!--   <key>C</key> -->
-  <!-- </hotkey> -->
+  <hotkey>
+    <name>simulate_controller</name>
+    <key>c</key>
+  </hotkey>
 
   <hotkey>
     <name>planner_step</name>
@@ -237,15 +241,15 @@
   </hotkey>
 
 
-  <button>
-    <name>planner_draw_spatial_representation_of_SE2</name>
-    <key>o</key>
-  </button>
+  <!-- <button> -->
+  <!--   <name>planner_draw_spatial_representation_of_SE2</name> -->
+  <!--   <key>o</key> -->
+  <!-- </button> -->
 
-  <button>
-    <name>reset_view</name>
-    <key>z</key>
-  </button>
+  <!-- <button> -->
+  <!--   <name>reset_view</name> -->
+  <!--   <key>z</key> -->
+  <!-- </button> -->
   <button>
     <name>load_view</name>
     <key>v</key>
@@ -280,6 +284,9 @@
   <!-- <property name="planner_draw_goal_configuration" enabled="1"/> -->
   <property name="draw_path" enabled="1"/>
   <property name="draw_path_unsmoothed" enabled="0"/>
+
+  <property name="draw_explorer_non_selected_paths" enabled="1"/>
+  <property name="draw_explorer_partial_paths" enabled="0"/>
 
   <property name="draw_robot_zero_position" enabled="1"/>
   <property name="draw_controller_driver" enabled="1"/>

@@ -7,7 +7,10 @@ struct CSpaceInput{
   double timestep_max;
   Config uMin;
   Config uMax;
+  Config dqMin;
+  Config dqMax;
   bool fixedBase{false};
   bool kinodynamic{false};
+  bool multiAgent{false};
   std::vector<ContactInformation> contact_links;
 };

@@ -2,9 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+#draw unit circle
 t = 1*np.exp(np.linspace(0,2*np.pi,100)*1j)
 plt.plot(np.real(t), np.imag(t))
 
+#draw start and goal points
 tstart = np.pi/2.0
 tgoal = 2*np.pi
 tstart_proj = np.exp(tstart*1j)

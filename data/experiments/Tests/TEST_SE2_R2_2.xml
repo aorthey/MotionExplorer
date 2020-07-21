@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<world>
+  <robot name="car" file="../../robots/planar/car.urdf"/>
+  <robot name="disk" file="../../robots/planar/car_capsule_inner.urdf"/>
+  <robot name="car" file="../../robots/planar/car.urdf"/>
+  <robot name="disk" file="../../robots/planar/car_capsule_inner.urdf"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/narrow_passage_icra_2020.tri">
+     <display color="0.8 0.8 0.8"/>
+  </terrain>
+
+  <plannerinput>
+
+    <!-- <qinit  config="15  -2 +0 +0.0 0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/> -->
+    <!-- <qgoal  config="15  +2 -0 +0.0 0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/> -->
+    <agent 
+      id="0" 
+      qinit="15  -2 -0.3 +0.0 0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+      qgoal="15  +2 -0.3 +0.0 0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+    />
+    <agent 
+      id="2" 
+      qinit="15  -2 +0.3 +0.0 0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+      qgoal="15  +2 +0.3 +0.0 0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+    />
+
+    <se3min config="6  -3 -3 0 -3.141593 0 0"/>
+    <se3max config="6  +3 +3 0 +3.141593 0 0"/>
+
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <pathBorderWidth>2</pathBorderWidth>
+    <pathSpeed>3</pathSpeed>
+    <freeFloating>1</freeFloating>
+    <smoothPath>1</smoothPath>
+    <algorithm name="hierarchy:qrrt"/>
+    <algorithm name="hierarchy:explorer"/>
+    <!-- <algorithm name="ompl:rrt"/> -->
+
+    <multiAgent>1</multiAgent>
+
+    <hierarchy>
+      <level>
+        <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/>
+        <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" type="SE2"/>
+        <robot id="2" freeFloating="1" type="SE2"/>
+      </level>
+    </hierarchy>
+
+  </plannerinput>
+</world>

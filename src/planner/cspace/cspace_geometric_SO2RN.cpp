@@ -1,7 +1,9 @@
 #include "planner/cspace/cspace_geometric_SO2RN.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
-#include "ompl/base/spaces/SE2StateSpaceFullInterpolate.h"
 #include "common.h"
+
+#include <ompl/base/spaces/SO2StateSpace.h>
+#include <ompl/util/Exception.h>
 
 GeometricCSpaceOMPLSO2RN::GeometricCSpaceOMPLSO2RN(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)
@@ -42,7 +44,7 @@ void GeometricCSpaceOMPLSO2RN::initSpace()
   //   Create an SO(2) x R^n state space
   //###########################################################################
 
-  ob::StateSpacePtr SO2(std::make_shared<ob::SO2StateSpaceFullInterpolate>());
+  ob::StateSpacePtr SO2(std::make_shared<ob::SO2StateSpace>());
   ob::RealVectorStateSpace *cspaceRN = nullptr;
 
 
@@ -83,17 +85,17 @@ void GeometricCSpaceOMPLSO2RN::initSpace()
 
 void GeometricCSpaceOMPLSO2RN::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
-  ob::SO2StateSpaceFullInterpolate::StateType *qomplSO2{nullptr};
+  ob::SO2StateSpace::StateType *qomplSO2{nullptr};
   ob::RealVectorStateSpace::StateType *qomplRnSpace{nullptr};
 
   if(Nompl>0){
-    qomplSO2 = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpaceFullInterpolate::StateType>(0);
+    qomplSO2 = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
     qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
   }else{
-    qomplSO2 = qompl->as<ob::SO2StateSpaceFullInterpolate::StateType>();
+    qomplSO2 = qompl->as<ob::SO2StateSpace::StateType>();
     qomplRnSpace = nullptr;
   }
-  qomplSO2->value = q(6);
+  qomplSO2->value = q(6); //Note: this is fixedbase! So first joint value is q(6) in klampt
 
   if(Nompl>0){
     double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
@@ -106,15 +108,16 @@ void GeometricCSpaceOMPLSO2RN::ConfigToOMPLState(const Config &q, ob::State *qom
 
 }
 
-Config GeometricCSpaceOMPLSO2RN::OMPLStateToConfig(const ob::State *qompl){
-  const ob::SO2StateSpaceFullInterpolate::StateType *qomplSO2{nullptr};
+Config GeometricCSpaceOMPLSO2RN::OMPLStateToConfig(const ob::State *qompl)
+{
+  const ob::SO2StateSpace::StateType *qomplSO2{nullptr};
   const ob::RealVectorStateSpace::StateType *qomplRnSpace{nullptr};
 
   if(Nompl>0){
-    qomplSO2 = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpaceFullInterpolate::StateType>(0);
+    qomplSO2 = qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
     qomplRnSpace = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
   }else{
-    qomplSO2 = qompl->as<ob::SO2StateSpaceFullInterpolate::StateType>();
+    qomplSO2 = qompl->as<ob::SO2StateSpace::StateType>();
     qomplRnSpace = nullptr;
   }
 
@@ -129,11 +132,37 @@ Config GeometricCSpaceOMPLSO2RN::OMPLStateToConfig(const ob::State *qompl){
   return q;
 }
 
-void GeometricCSpaceOMPLSO2RN::print() const
+void GeometricCSpaceOMPLSO2RN::print(std::ostream& out) const
 {
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "OMPL CSPACE" << std::endl;
   std::cout << std::string(80, '-') << std::endl;
   std::cout << "Robot \"" << robot->name << "\":" << std::endl;
   std::cout << "Dimensionality Space            : " << 1+Nompl << std::endl;
+}
+
+Vector3 GeometricCSpaceOMPLSO2RN::getXYZ(const ob::State *s)
+{
+  if(!isFixedBase()){
+    OMPL_ERROR("Undefined: Non-fixedbase robots need to start with spaces SE2 or SE3.");
+    throw ompl::Exception("Undefined");
+  }else{
+    Config q = OMPLStateToConfig(s);
+    robot->UpdateConfig(q);
+    robot->UpdateGeometry();
+    Vector3 qq;
+    Vector3 zero; zero.setZero();
+    int lastLink = robot->links.size()-1;
+
+    //NOTE: the world position is zero exactly at the point where link is
+    //attached using a joint to the whole linkage. Check where your last fixed
+    //joint is positioned, before questioning the validity of this method
+    robot->GetWorldPosition(zero, lastLink, qq);
+
+    double x = qq[0];
+    double y = qq[1];
+    double z = qq[2];
+    Vector3 v(x,y,z);
+    return v;
+  }
 }

@@ -159,11 +159,11 @@ def createSphere(lname,x,y,z,radius,PHYSICAL=True):
   s+='</link>\n\n'
   return s
 
-def createRigidJoint(parentname, childname, x=0, y=0, z=0):
-  jname = "joint_fixed_"+parentname+"_"+childname
+def createRigidJoint(parentname, childname, x=0, y=0, z=0, r=0, p=0, yaw=0, prefix=""):
+  jname = prefix+"joint_fixed_"+parentname+"_"+childname
   s= ''
   s+='<joint name="'+jname+'" type="fixed">\n'
-  s+='  <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
+  s+='  <origin rpy="'+str(r)+' '+str(p)+' '+str(yaw)+'" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
   s+='  <parent link="'+parentname+'"/>\n'
   s+='  <child link="'+childname+'"/>\n'
   s+='</joint>\n\n'
@@ -180,6 +180,12 @@ def createPrismaticJoint(parentname, childname, x=0, y=0, z=0, lowerLimit=0, upp
   s+='</joint>\n\n'
   return s
 
+def comment(text):
+  s= '<!--'+'#'*76+'\n'
+  s+=text+'\n'
+  s+= "#"*78
+  s+='-->\n'
+  return s
 def commentNewBranch(bname):
   s= '<!--'+'#'*76+'\n'
   s+=bname+'\n'

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="disk_inner" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="0 0 0" rotateRPY="0 0 0"/>
+  <plannerinput>
+
+    <qinit  config="15  -3.5 0.0 +0.0 -0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
+    <dqinit config="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0  "/>
+    <qgoal  config="15  +3.5 0.0 +0.0 +0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
+    <dqgoal config="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0  "/>
+
+    <se3min config="6  -4.0 -3.0 -0.0 -3.141593 0 0"/>
+    <se3max config="6  +4.0 +3.0 +0.0 +3.141593 0 0"/>
+
+    <control_min config="6  0 0 0 -0.1 0 0"/>
+    <control_max config="6  0 0 0 +0.1 0 0"/>
+
+    <freeFloating>1</freeFloating>
+    <timestep min="0.01" max="0.1"/>
+    <!-- num samples = 5 -->
+
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>1</epsilongoalregion>
+    <pathSpeed>5</pathSpeed>
+
+    <algorithm name="hierarchy:qrrt"/>
+    <algorithm name="ompl:rrt"/>
+    <kinodynamic>0</kinodynamic>
+
+    <hierarchy>
+      <level inner_index="1" type="R2"/>
+      <level inner_index="0" type="SE2_DUBIN"/>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>

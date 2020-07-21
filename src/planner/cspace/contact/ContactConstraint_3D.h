@@ -20,7 +20,7 @@ protected:
     std::vector<Triangle3D> tris;
 
 public:
-    ContactConstraint_3D(GeometricCSpaceOMPLRCONTACT_3D *cspace, Robot *robot, RobotWorld *world, uint linkNumber);
+    ContactConstraint_3D(GeometricCSpaceOMPLRCONTACT_3D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber);
 
 
     Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const;

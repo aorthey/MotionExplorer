@@ -1,0 +1,342 @@
+<?xml version="1.0"?>
+<robot name="box/box_bottom_sides">
+ <link name="bottom">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.3335416666666667" ixy="0" ixz="0" iyy="0.41666666666666663" iyz="0" izz="0.08354166666666665"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <box size="2.0 1.0 0.05"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <box size="2.0 1.0 0.05"/>
+    </geometry>
+  </collision>
+ </link>
+
+ <link name="bottom-sideB">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.33348958333333334" ixy="0" ixz="0" iyy="0.33348958333333334" iyz="0" izz="0.00015625000000000003"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0 -0.525 0"/>
+    <geometry>
+      <cylinder length="2.0" radius="0.025"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0 -0.525 0"/>
+    <geometry>
+      <cylinder length="2.0" radius="0.025"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_bottom_bottom-sideB" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="bottom"/>
+  <child link="bottom-sideB"/>
+</joint>
+
+ <link name="sideB">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.3335416666666667" ixy="0" ixz="0" iyy="0.37416666666666665" iyz="0" izz="0.04104166666666666"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 -0.375 0"/>
+    <geometry>
+      <box size="2.0 0.7 0.05"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 -0.375 0"/>
+    <geometry>
+      <box size="2.0 0.7 0.05"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_bottom-sideB_sideB_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 -0.525 0"/>
+  <parent link="bottom-sideB"/>
+  <child link="sideB"/>
+  <axis xyz="1 0 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="bottom-sideA">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.33348958333333334" ixy="0" ixz="0" iyy="0.33348958333333334" iyz="0" izz="0.00015625000000000003"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0 0.525 0"/>
+    <geometry>
+      <cylinder length="2.0" radius="0.025"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0 0.525 0"/>
+    <geometry>
+      <cylinder length="2.0" radius="0.025"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_bottom_bottom-sideA" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="bottom"/>
+  <child link="bottom-sideA"/>
+</joint>
+
+ <link name="sideA">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.3335416666666667" ixy="0" ixz="0" iyy="0.37416666666666665" iyz="0" izz="0.04104166666666666"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0.375 0"/>
+    <geometry>
+      <box size="2.0 0.7 0.05"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0.375 0"/>
+    <geometry>
+      <box size="2.0 0.7 0.05"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_bottom-sideA_sideA_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0.525 0"/>
+  <parent link="bottom-sideA"/>
+  <child link="sideA"/>
+  <axis xyz="1 0 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="sideA-left">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.04098958333333332" ixy="0" ixz="0" iyy="0.04098958333333332" iyz="0" izz="0.00015625000000000003"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="-1.025 0 0"/>
+    <geometry>
+      <cylinder length="0.7" radius="0.025"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="-1.025 0 0"/>
+    <geometry>
+      <cylinder length="0.7" radius="0.025"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_sideA_sideA-left" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0.375 0"/>
+  <parent link="sideA"/>
+  <child link="sideA-left"/>
+</joint>
+
+ <link name="sideA1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.013541666666666669" ixy="0" ixz="0" iyy="0.046408333333333336" iyz="0" izz="0.03328333333333333"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.225 0 0"/>
+    <geometry>
+      <box size="0.4 0.63 0.05"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.225 0 0"/>
+    <geometry>
+      <box size="0.4 0.63 0.05"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_sideA-left_sideA1_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-1.025 0 0"/>
+  <parent link="sideA-left"/>
+  <child link="sideA1"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="sideA-right">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.04098958333333332" ixy="0" ixz="0" iyy="0.04098958333333332" iyz="0" izz="0.00015625000000000003"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="1.025 0 0"/>
+    <geometry>
+      <cylinder length="0.7" radius="0.025"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="1.025 0 0"/>
+    <geometry>
+      <cylinder length="0.7" radius="0.025"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_sideA_sideA-right" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0.375 0"/>
+  <parent link="sideA"/>
+  <child link="sideA-right"/>
+</joint>
+
+ <link name="sideA2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.013541666666666669" ixy="0" ixz="0" iyy="0.046408333333333336" iyz="0" izz="0.03328333333333333"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.225 0 0"/>
+    <geometry>
+      <box size="0.4 0.63 0.05"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.225 0 0"/>
+    <geometry>
+      <box size="0.4 0.63 0.05"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_sideA-right_sideA2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="1.025 0 0"/>
+  <parent link="sideA-right"/>
+  <child link="sideA2"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="sideB-left">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.04098958333333332" ixy="0" ixz="0" iyy="0.04098958333333332" iyz="0" izz="0.00015625000000000003"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="-1.025 0 0"/>
+    <geometry>
+      <cylinder length="0.7" radius="0.025"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="-1.025 0 0"/>
+    <geometry>
+      <cylinder length="0.7" radius="0.025"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_sideB_sideB-left" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.375 0"/>
+  <parent link="sideB"/>
+  <child link="sideB-left"/>
+</joint>
+
+ <link name="sideB1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.013541666666666669" ixy="0" ixz="0" iyy="0.046408333333333336" iyz="0" izz="0.03328333333333333"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="-0.225 0 0"/>
+    <geometry>
+      <box size="0.4 0.63 0.05"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="-0.225 0 0"/>
+    <geometry>
+      <box size="0.4 0.63 0.05"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_sideB-left_sideB1_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="-1.025 0 0"/>
+  <parent link="sideB-left"/>
+  <child link="sideB1"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="sideB-right">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.04098958333333332" ixy="0" ixz="0" iyy="0.04098958333333332" iyz="0" izz="0.00015625000000000003"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="1.025 0 0"/>
+    <geometry>
+      <cylinder length="0.7" radius="0.025"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="1.025 0 0"/>
+    <geometry>
+      <cylinder length="0.7" radius="0.025"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_sideB_sideB-right" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.375 0"/>
+  <parent link="sideB"/>
+  <child link="sideB-right"/>
+</joint>
+
+ <link name="sideB2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.013541666666666669" ixy="0" ixz="0" iyy="0.046408333333333336" iyz="0" izz="0.03328333333333333"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.225 0 0"/>
+    <geometry>
+      <box size="0.4 0.63 0.05"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.225 0 0"/>
+    <geometry>
+      <box size="0.4 0.63 0.05"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_sideB-right_sideB2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="1.025 0 0"/>
+  <parent link="sideB-right"/>
+  <child link="sideB2"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>

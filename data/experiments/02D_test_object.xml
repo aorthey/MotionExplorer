@@ -32,7 +32,6 @@
     <pathWidth>0.2</pathWidth>
     <freeFloating>1</freeFloating>
 
-    <algorithm name="ompl:rrtconnect"/>
     <algorithm name="ompl:rrt"/>
     <algorithm name="ompl:prm"/>
     <algorithm name="ompl:lazyprm"/>
@@ -47,7 +46,6 @@
                meshFrom="rectangleBottom" triFrom="3"
                meshTo="rectangleTop" triTo="6"/>
     </contacts>
-
 
     <hierarchy>
       <level inner_index="0" type="R2_CONTACT"/>

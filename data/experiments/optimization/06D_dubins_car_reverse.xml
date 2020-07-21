@@ -11,6 +11,8 @@
     <dqinit config="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0  "/>
     <qgoal  config="15  +1 0.0 +0.0 +0.00 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
     <dqgoal config="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0  "/>
+    <dqMin config="15  +0.3 0 0 -10 0 0 0 0 0 0 0 0 0 0 0  "/>
+    <dqMax config="15  +0.3 0 0 +10 0 0 0 0 0 0 0 0 0 0 0  "/>
 
     <se3min config="6  -4.0 -3.0 -0.0 -3.141593 0 0"/>
     <se3max config="6  +4.0 +3.0 +0.0 +3.141593 0 0"/>
@@ -27,8 +29,11 @@
     <pathSpeed>10</pathSpeed>
 
     <loadPath file="../data/paths/path_06D_dubins_car_reverse.xml"/>
+
+    <algorithm dynamic="1" name="hierarchy:explorer"/>
     <algorithm dynamic="1" name="optimizer"/>
     <algorithm dynamic="1" name="ompl:dynamic:sst"/>
+    <algorithm dynamic="1" name="ompl:dynamic:kpiece"/>
 
     <hierarchy>
       <level inner_index="0" type="TSE2"/>

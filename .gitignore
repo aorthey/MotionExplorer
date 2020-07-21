@@ -15,6 +15,9 @@
 *.rar
 *.tar
 *.zip
+*.gv
+*.blend
+*.blend1
 build/
 data/videos/
 data/benchmarks/

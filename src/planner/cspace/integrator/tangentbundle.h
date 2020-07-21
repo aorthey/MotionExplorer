@@ -35,15 +35,29 @@ namespace ob = ompl::base;
 
 class TangentBundleIntegrator : public oc::StatePropagator
 {
-public:
+  public:
 
-    TangentBundleIntegrator(oc::SpaceInformationPtr si, KinodynamicCSpaceOMPL *cspace_) : 
-        oc::StatePropagator(si.get()), cspace(cspace_)
-    {
-    }
-    virtual void propagate(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const override;
-    virtual void propagate_deprecated(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const;
+      TangentBundleIntegrator(oc::SpaceInformationPtr si, KinodynamicCSpaceOMPL *cspace_) : 
+          oc::StatePropagator(si.get()), cspace(cspace_)
+      {
+      }
+      virtual void propagate(
+          const ob::State *state, 
+          const oc::Control* control, 
+          const double duration, 
+          ob::State *result) const override;
 
-    KinodynamicCSpaceOMPL *cspace;
+      virtual void propagate_dynamics(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const;
+
+      virtual void propagate_naive(const ob::State *state, const oc::Control* control, const double duration, ob::State *result) const;
+
+      virtual bool steer(const ob::State*, const ob::State*, 
+          oc::Control*, double&) const override;
+
+      virtual bool canSteer() const override;
+
+
+
+      KinodynamicCSpaceOMPL *cspace;
 };
 

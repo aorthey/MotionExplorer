@@ -13,6 +13,8 @@
 #include <tinyxml.h>
 #include <vector>
 #include <memory>
+#include <boost/thread.hpp>
+
 
 class Strategy;
 typedef std::shared_ptr<Strategy> StrategyPtr;
@@ -25,6 +27,7 @@ class MotionPlanner{
 
     PlannerInput& GetInput();
     PathPiecewiseLinear* GetPath();
+    CSpaceOMPL* GetCSpace();
 
     //folder-like operations on hierarchical roadmap
     virtual void ExpandFull();
@@ -92,7 +95,8 @@ class MotionPlanner{
 
     // \brief solution path of planner
     PathPiecewiseLinear *pwl; 
-    CSpaceOMPL* ComputeCSpace(const std::string type, const uint robot_inner_index, const uint robot_outer_index = 0);
+    CSpaceOMPL* ComputeCSpace(const std::string type, const uint robot_index, bool freeFloating);
+    CSpaceOMPL* ComputeMultiAgentCSpace(const Layer &layer);
     CSpaceOMPL* ComputeCSpaceLayer(const Layer &layer);
 };
 

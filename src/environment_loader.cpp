@@ -2,17 +2,12 @@
 #include "controller/controller.h"
 #include "file_io.h"
 #include <boost/filesystem.hpp>
-#include <KrisLibrary/math3d/Triangle3D.h>
-#include "planner/cspace/cspace_geometric_fixedbase.h"
 
 RobotWorld& EnvironmentLoader::GetWorld(){
   return world;
 }
 RobotWorld* EnvironmentLoader::GetWorldPtr(){
   return &world;
-}
-Robot* EnvironmentLoader::GetRobotPtr(){
-  return world.robots[0];
 }
 PlannerMultiInput EnvironmentLoader::GetPlannerInput(){
   return pin;
@@ -50,7 +45,8 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
   world.background = GLColor(1,1,1);
 
   _backend = new PlannerBackend(&world);
-  if(!_backend->LoadAndInitSim(file_name.c_str())){
+  if(!_backend->LoadAndInitSim(file_name.c_str()))
+  {
     std::cout << std::string(80, '-') << std::endl;
     std::cout << std::endl;
     std::cout << "ERROR:" << std::endl;
@@ -67,15 +63,16 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
   //################################################################################
   //################################################################################
 
-    if(!(world.robots[0]->joints[0].type == RobotJoint::Floating)){
-      std::cout << "First joint of robot should be a free floating joint" << std::endl;
-      std::cout << "But actual type is: " << world.robots[0]->joints[0].type << std::endl;
-    }
+    // if(!(world.robots[0]->joints[0].type == RobotJoint::Floating)){
+    //   std::cout << "First joint of robot should be a free floating joint" << std::endl;
+    //   std::cout << "But actual type is: " << world.robots[0]->joints[0].type << std::endl;
+    // }
 
     if(pin.Load(file_name.c_str())){
 
+      //Adding triangle information to PlannerInput (to be used as constraint
+      //manifolds)
       std::vector<Triangle3D> tris;
-
       for(uint k = 0; k < world.terrains.size(); k++){
         Terrain* terrain_k = world.terrains[k];
         const CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();
@@ -85,8 +82,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
           tris.push_back(tri);
         }
       }
-
-      // std::cout << "Environment has " << tris.size() << " triangles to make contact!" << std::endl;
+      std::cout << "Environment has " << tris.size() << " triangles to make contact." << std::endl;
 
       for(uint k = 0; k < pin.inputs.size(); k++){
         PlannerInput *pkin = pin.inputs.at(k);
@@ -97,84 +93,125 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
           Stratification stratification = pkin->stratifications.at(j);
           for(uint i = 0; i < stratification.layers.size(); i++){
             Layer layer = stratification.layers.at(i);
-            uint ri = layer.inner_index;
-            uint ro = layer.outer_index;
-            if(ri>=world.robots.size()){
-              std::cout << std::string(80, '>') << std::endl;
-              std::cout << ">>> [ERROR] Robot with idx " << ri << " does not exists." << std::endl;
-              std::cout << std::string(80, '>') << std::endl;
-              throw "Invalid robot idx.";
-            }
-            if(ro>=world.robots.size()){
-              std::cout << std::string(80, '>') << std::endl;
-              std::cout << ">>> [ERROR] Robot with idx " << ro << " does not exists." << std::endl;
-              std::cout << std::string(80, '>') << std::endl;
-              throw "Invalid robot idx.";
-            }
+            if(!layer.isMultiAgent){
+              uint ri = layer.inner_index;
+              uint ro = layer.outer_index;
+              if(ri>=world.robots.size()){
+                std::cout << std::string(80, '>') << std::endl;
+                std::cout << ">>> [ERROR] Robot with idx " << ri << " does not exists." << std::endl;
+                std::cout << std::string(80, '>') << std::endl;
+                throw "Invalid robot idx.";
+              }
+              if(ro>=world.robots.size()){
+                std::cout << std::string(80, '>') << std::endl;
+                std::cout << ">>> [ERROR] Robot with idx " << ro << " does not exists." << std::endl;
+                std::cout << std::string(80, '>') << std::endl;
+                throw "Invalid robot idx.";
+              }
 
-            Robot *rk= world.robots.at(ri);
-            Robot *rko= world.robots.at(ro);
-            for(int m = 0; m < 6; m++){
-              rk->qMin[m] = pkin->se3min[m];
-              rk->qMax[m] = pkin->se3max[m];
-              rko->qMin[m] = pkin->se3min[m];
-              rko->qMax[m] = pkin->se3max[m];
+              Robot *rk= world.robots.at(ri);
+              Robot *rko= world.robots.at(ro);
+              for(int i = 0; i < 6; i++){
+                rk->qMin[i] = pkin->se3min[i];
+                rk->qMax[i] = pkin->se3max[i];
+                rko->qMin[i] = pkin->se3min[i];
+                rko->qMax[i] = pkin->se3max[i];
+              }
+              // rk->q = pkin->q_init;
+              // rk->dq = pkin->dq_init;
+              // rk->UpdateFrames();
+              // rko->q = pkin->q_init;
+              // rko->dq = pkin->dq_init;
+              // rko->UpdateFrames();
             }
-            // rk->q = pkin->q_init;
-            // rk->dq = pkin->dq_init;
-            // rk->UpdateFrames();
-            // rko->q = pkin->q_init;
-            // rko->dq = pkin->dq_init;
-            // rko->UpdateFrames();
+          }//for layers
+        }//for stratifications
+      }//for inputs
+
+      PlannerInput *pkin = pin.inputs.at(0);
+      if(pkin->multiAgent){
+        //multiagent settings
+
+        for(uint k = 0; k < world.robots.size(); k++)
+        {
+            Robot *rk= world.robots.at(k);
+            for(int i = 0; i < 6; i++){
+              rk->qMin[i] = pkin->se3min[i];
+              rk->qMax[i] = pkin->se3max[i];
+            }
+        }
+        for(uint k = 0; k < pkin->agent_information.size(); k++){
+          AgentInformation ai = pkin->agent_information.at(k);
+          int ri = ai.id;
+          if(ri>=(int)world.robots.size()){
+            OMPL_ERROR("Specified AgentInformation for id %d, but robots only have ids of 0 to %d.", ai.id, world.robots.size()-1);
+            throw "Invalid robot idx.";
+          }
+          Robot *rk= world.robots.at(ri);
+          if(ai.qMin.size()>0){
+            for(int i = 0; i < 6; i++){
+                rk->qMin[i] = ai.qMin[i];
+                rk->qMax[i] = ai.qMax[i];
+            }
+          }else{
+            for(int i = 0; i < 6; i++){
+                rk->qMin[i] = pkin->se3min[i];
+                rk->qMax[i] = pkin->se3max[i];
+            }
+          }
+          if(ai.uMin.size() > 0){
+            for(int i = 0; i < 6; i++){
+                rk->torqueMax[i] = ai.uMax[i];
+            }
           }
         }
+      }else{
+        uint ridx = pin.inputs.at(0)->robot_idx;
+        Robot *robot = world.robots[ridx];
+        Vector q_init = pin.inputs.at(0)->q_init;
+        Vector q_goal = pin.inputs.at(0)->q_goal;
+        Vector dq_init = pin.inputs.at(0)->dq_init;
 
+        // for(int i = 0; i < 6; i++){
+        //   robot->qMin[i] = pin.inputs.at(0)->se3min[i];
+        //   robot->qMax[i] = pin.inputs.at(0)->se3max[i];
+        // }
+
+        // pin.inputs.at(0)->qMin = robot->qMin;
+        // pin.inputs.at(0)->qMax = robot->qMax;
+        uint N = robot->q.size();
+
+        uint Ni = pin.inputs.at(0)->q_init.size();
+        uint Ng = pin.inputs.at(0)->q_goal.size();
+        if(Ni!=N){
+          std::cout << std::string(80, '#') << std::endl;
+          std::cout << "q_init has " << Ni << " dofs, but robot " << robot->name << " expects " << N << " dofs." << std::endl;
+          std::cout << std::string(80, '#') << std::endl;
+          throw "Invalid dofs.";
+        }
+        if(Ng!=N){
+          std::cout << std::string(80, '#') << std::endl;
+          std::cout << "q_goal has " << Ng << " dofs, but robot " << robot->name << " expects " << N << " dofs." << std::endl;
+          std::cout << std::string(80, '#') << std::endl;
+          throw "Invalid dofs.";
+        }
+
+        robot->q = q_init;
+        robot->dq = dq_init;
+        robot->UpdateFrames();
+
+        //set oderobot to planner start pos
+        ODERobot *simrobot = _backend->sim.odesim.robot(ridx);
+        simrobot->SetConfig(q_init);
+        simrobot->SetVelocities(dq_init);
+
+        // if(pin.inputs.at(0)->kinodynamic){
+        //   LoadController(robot, *pin.inputs.at(0));
+        //   std::cout << "Loaded Controller for robot " << name_robot << std::endl;
+        // }
+        util::SetSimulatedRobot(robot, _backend->sim, pin.inputs.at(0)->q_init, pin.inputs.at(0)->dq_init);
       }
 
-      uint ridx = pin.inputs.at(0)->robot_idx;
-      Robot *robot = world.robots[ridx];
-      Vector q_init = pin.inputs.at(0)->q_init;
-      Vector q_goal = pin.inputs.at(0)->q_goal;
-      Vector dq_init = pin.inputs.at(0)->dq_init;
-
-      // for(int i = 0; i < 6; i++){
-      //   robot->qMin[i] = pin.inputs.at(0)->se3min[i];
-      //   robot->qMax[i] = pin.inputs.at(0)->se3max[i];
-      // }
-
-      // pin.inputs.at(0)->qMin = robot->qMin;
-      // pin.inputs.at(0)->qMax = robot->qMax;
-      uint N = robot->q.size();
-
-      uint Ni = pin.inputs.at(0)->q_init.size();
-      uint Ng = pin.inputs.at(0)->q_goal.size();
-      if(Ni!=N){
-        std::cout << std::string(80, '#') << std::endl;
-        std::cout << "q_init has " << Ni << " dofs, but robot " << robot->name << " expects " << N << " dofs." << std::endl;
-        std::cout << std::string(80, '#') << std::endl;
-        throw "Invalid dofs.";
-      }
-      if(Ng!=N){
-        std::cout << std::string(80, '#') << std::endl;
-        std::cout << "q_goal has " << Ng << " dofs, but robot " << robot->name << " expects " << N << " dofs." << std::endl;
-        std::cout << std::string(80, '#') << std::endl;
-        throw "Invalid dofs.";
-      }
-
-      robot->q = q_init;
-      robot->dq = dq_init;
-      robot->UpdateFrames();
-
-      //set oderobot to planner start pos
-      ODERobot *simrobot = _backend->sim.odesim.robot(ridx);
-      simrobot->SetConfig(q_init);
-      simrobot->SetVelocities(dq_init);
-
-      if(pin.inputs.at(0)->kinodynamic){
-        LoadController(robot, *pin.inputs.at(0));
-        std::cout << "Loaded Controller for robot " << name_robot << std::endl;
-      }
-      util::SetSimulatedRobot(robot, _backend->sim, pin.inputs.at(0)->q_init, pin.inputs.at(0)->dq_init);
     }else{
       std::cout << std::string(80, '-') << std::endl;
       std::cout << "No Planner Settings. No Planning" << std::endl;
@@ -188,12 +225,10 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
   }
 
   _backend->wrenchfield.Load(file_name.c_str());
-  //std::cout << _backend->wrenchfield << std::endl;
 }
 
 void EnvironmentLoader::LoadController(Robot *robot, const PlannerInput &pin)
 {
-  std::cout << "Adding free float driver to robot " << name_robot << std::endl;
   vector<string>* driverNames = &robot->driverNames;
   vector<RobotJointDriver>* drivers = &robot->drivers;
 

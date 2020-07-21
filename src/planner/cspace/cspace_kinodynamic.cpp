@@ -2,13 +2,14 @@
 #include "planner/cspace/integrator/tangentbundle.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SE3StateSpace.h>
+#include "common.h"
 
 KinodynamicCSpaceOMPL::KinodynamicCSpaceOMPL(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)
 {
 }
 
-void KinodynamicCSpaceOMPL::print() const
+void KinodynamicCSpaceOMPL::print(std::ostream& out) const
 {
   ob::CompoundStateSpace *cspace = space->as<ob::CompoundStateSpace>();
   ob::SE3StateSpace *cspaceSE3 = cspace->as<ob::SE3StateSpace>(0);
@@ -63,6 +64,7 @@ bool KinodynamicCSpaceOMPL::isDynamic() const
 {
   return true;
 }
+
 void KinodynamicCSpaceOMPL::initSpace()
 {
   //###########################################################################
@@ -145,8 +147,8 @@ void KinodynamicCSpaceOMPL::initSpace()
   // Set velocity bounds
   //###########################################################################
   std::vector<double> vMin, vMax;
-  vMin = robot->velMin;
-  vMax = robot->velMax;
+  vMin = input.dqMin;
+  vMax = input.dqMax;
 
   assert(vMin.size() == 6+Nklampt);
   assert(vMax.size() == 6+Nklampt);
@@ -166,14 +168,14 @@ void KinodynamicCSpaceOMPL::initSpace()
   boundsTM.low = lowTM;
   boundsTM.high = highTM;
   boundsTM.check();
-  //TODO
-  boundsTM.setLow(-10);
-  boundsTM.setHigh(10);
-  cspaceTM->setBounds(boundsTM);
 
+  OMPL_WARN("Setting manual velocity.");
+
+  cspaceTM->setBounds(boundsTM);
 }
 
-void KinodynamicCSpaceOMPL::initControlSpace(){
+void KinodynamicCSpaceOMPL::initControlSpace()
+{
   uint NdimControl = 6 + Nompl;
   control_space = std::make_shared<oc::RealVectorControlSpace>(space, NdimControl+1);
 
@@ -186,12 +188,18 @@ void KinodynamicCSpaceOMPL::initControlSpace(){
   cbounds.setLow(NdimControl,input.timestep_min);//propagation step size
   cbounds.setHigh(NdimControl,input.timestep_max);
 
+  if(input.uMin.size() < 6)
+  {
+    OMPL_ERROR("Could not find minimum/maximum control for robot %d", GetRobotIndex());
+    throw "NoControl";
+  }
+
   for(uint i = 0; i < 6; i++){
     cbounds.setLow(i,input.uMin(i));
     cbounds.setHigh(i,input.uMax(i));
   }
   cbounds.check();
-  control_space->setBounds(cbounds);
+  static_pointer_cast<oc::RealVectorControlSpace>(control_space)->setBounds(cbounds);
 }
 
 
@@ -245,7 +253,7 @@ void KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q, ob::State *qompl)
   }
 
   qomplSE3->setXYZ(q(0),q(1),q(2));
-  OMPLSO3StateSpaceFromEulerXYZ(q(3),q(4),q(5), qomplSO3);
+  OMPLSO3StateSpaceFromEulerZYX(q(3),q(4),q(5), qomplSO3);
 
   if(Nompl>0){
     double* qomplRn = static_cast<ob::RealVectorStateSpace::StateType*>(qomplRnSpace)->values;
@@ -262,7 +270,8 @@ void KinodynamicCSpaceOMPL::ConfigToOMPLState(const Config &q, ob::State *qompl)
   }
 }
 
-Config KinodynamicCSpaceOMPL::OMPLStateToVelocity(const ob::State *qompl){
+Config KinodynamicCSpaceOMPL::OMPLStateToVelocity(const ob::State *qompl)
+{
   const ob::RealVectorStateSpace::StateType *qomplTMState;
   if(Nompl>0){
     qomplTMState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(2);
@@ -283,7 +292,8 @@ Config KinodynamicCSpaceOMPL::OMPLStateToVelocity(const ob::State *qompl){
   return dq;
 }
 
-Config KinodynamicCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl){
+Config KinodynamicCSpaceOMPL::OMPLStateToConfig(const ob::State *qompl)
+{
   if(Nompl>0){
     const ob::SE3StateSpace::StateType *qomplSE3 = qompl->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
     const ob::RealVectorStateSpace::StateType *qomplRnState = qompl->as<ob::CompoundState>()->as<ob::RealVectorStateSpace::StateType>(1);
@@ -301,13 +311,30 @@ const oc::StatePropagatorPtr KinodynamicCSpaceOMPL::StatePropagatorPtr(oc::Space
 }
 
 //#############################################################################
-ob::SpaceInformationPtr KinodynamicCSpaceOMPL::SpaceInformationPtr(){
+ob::SpaceInformationPtr KinodynamicCSpaceOMPL::SpaceInformationPtr()
+{
   if(!si){
     si = std::make_shared<oc::SpaceInformation>(SpacePtr(), ControlSpacePtr());
+
     const ob::StateValidityCheckerPtr checker = StateValidityCheckerPtr(si);
     si->setStateValidityChecker(checker);
-    const oc::StatePropagatorPtr integrator = StatePropagatorPtr(static_pointer_cast<oc::SpaceInformation>(si));
-    static_pointer_cast<oc::SpaceInformation>(si)->setStatePropagator(integrator);
+
+    oc::SpaceInformationPtr siC = static_pointer_cast<oc::SpaceInformation>(si);
+    const oc::StatePropagatorPtr integrator = StatePropagatorPtr(siC);
+    siC->setStatePropagator(integrator);
+
+    siC->setMinMaxControlDuration(0.01, 0.1);
+    siC->setPropagationStepSize(1);
   }
   return si;
+}
+
+Vector3 KinodynamicCSpaceOMPL::getXYZ(const ob::State *s)
+{
+  const ob::SE3StateSpace::StateType *qomplSE3 = s->as<ob::CompoundState>()->as<ob::SE3StateSpace::StateType>(0);
+  double x = qomplSE3->getX();
+  double y = qomplSE3->getY();
+  double z = qomplSE3->getZ();
+  Vector3 q(x,y,z);
+  return q;
 }

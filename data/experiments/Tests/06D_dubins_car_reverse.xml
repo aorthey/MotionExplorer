@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="disk_inner" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+
+  <plannerinput>
+
+    <qinit  config="15  -1 0.0 +0.0 +3.14 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
+    <dqinit config="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0  "/>
+    <qgoal  config="15  +1 0.0 +0.0 +0.00 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"/>
+    <dqgoal config="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0  "/>
+
+    <se3min config="6  -4.0 -3.0 -0.0 -3.141593 0 0"/>
+    <se3max config="6  +4.0 +3.0 +0.0 +3.141593 0 0"/>
+
+    <control_min config="6  0 0 0 -0.1 0 0"/>
+    <control_max config="6  0 0 0 +0.1 0 0"/>
+
+    <freeFloating>1</freeFloating>
+    <kinodynamic>1</kinodynamic>
+    <timestep min="0.01" max="0.1"/>
+
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>0.01</epsilongoalregion>
+    <pathSpeed>10</pathSpeed>
+
+    <loadPath file="../data/paths/path_06D_dubins_car_reverse.xml"/>
+    <algorithm dynamic="1" name="hierarchy:explorer"/>
+
+    <hierarchy>
+      <level inner_index="0" type="TSE2"/>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>
