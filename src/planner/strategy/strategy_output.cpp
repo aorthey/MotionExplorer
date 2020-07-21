@@ -1,5 +1,6 @@
 #include "planner/strategy/strategy_output.h"
 #include <ompl/geometric/planners/multilevel/datastructures/PlannerDataVertexAnnotated.h>
+#include <ompl/base/PlannerData.h>
 #include "elements/tree.h"
 #include "common.h"
 #include <ompl/control/PathControl.h>
@@ -13,6 +14,13 @@ void StrategyOutput::SetPlannerData( ob::PlannerDataPtr pd_ ){
   pd = pd_;
   pd->decoupleFromPlanner();
   pd->computeEdgeWeights();
+  // std::cout << "Vertices:" << pd->numVertices() << std::endl;
+  // for(uint k = 0; k < pd->numVertices(); k++)
+  // {
+  //   const ob::PlannerDataVertex v = pd->getVertex(k);
+  //   ob::SpaceInformationPtr si = cspace->SpaceInformationPtr();
+  //   si->printState(v.getState());
+  // }
 }
 void StrategyOutput::SetProblemDefinition( ob::ProblemDefinitionPtr pdef_ ){
   pdef = pdef_;

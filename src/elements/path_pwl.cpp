@@ -467,7 +467,6 @@ Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos,
 
 void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &states, int ridx, double percentage)
 {
-  glBegin(GL_QUAD_STRIP);
   std::vector<Vector3> path_left;
   std::vector<Vector3> path_right;
 
@@ -486,7 +485,11 @@ void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &
   milestones.push_back(v);
   //// 
 
-  if(milestones.size()<2) return;
+  if(milestones.size()<2)
+  {
+    return;
+  }
+  glBegin(GL_QUAD_STRIP);
 
   for(uint i = 0; i < milestones.size(); i++){
     // Vector3 q1 = Vector3FromState(states.at(i), ridx);
@@ -511,6 +514,7 @@ void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &
     dqn.inplaceMul(0.5*linewidth);
 
     Vector3 n = -cross(dq, dqn);
+    std::cout << n << std::endl;
     Matrix3 R0, R1;
     AngleAxisRotation Raa(0, dq);
     Raa.getMatrix(R0);

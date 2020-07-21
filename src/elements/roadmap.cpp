@@ -100,15 +100,12 @@ PathPiecewiseLinear* Roadmap::GetShortestPath()
         if(quotient_space->isDynamic())
         {
           // static_pointer_cast<oc::PathControl>(path)->interpolate();
-          oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
-          std::vector<ob::State *> states = cpath.getStates();
-        }
-        /*if(quotient_space->isDynamic()){
+          // oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
+          // std::vector<ob::State *> states = cpath.getStates();
           static_pointer_cast<oc::PathControl>(path)->interpolate();
->>>>>>> marie/contact_feature
         }else{
           static_pointer_cast<og::PathGeometric>(path)->interpolate();
-        }*/
+        }
         path_ompl = new PathPiecewiseLinear(path, cspace, quotient_space);
       }
     }
