@@ -25,3 +25,4 @@ data/robots/kuka_shadowhand/
 data/experiments/11D_planar_snake_0_*
 /cmake-build-debug/
 cmake-build-debug
+libs/
