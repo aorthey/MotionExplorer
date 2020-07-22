@@ -4,13 +4,13 @@
 
 
 ContactConstraint::ContactConstraint
-(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint obstacleNumber):
+(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint startMeshIdx):
 ob::Constraint(ambientSpaceDim, 1)
         , cspace_(cspace)
         , robot_(robot)
         , world_(world)
         , linkNumber_(linkNumber)
-        , obstacleNumber_(obstacleNumber)
+        , startMeshIdx_(startMeshIdx)
 {
     /**
      * Information on obstacle surface triangles.
@@ -115,7 +115,7 @@ void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eig
     Vector3 closestPt;
     Real distances = 1000;
 
-    if(obstacleNumber_ == 0){
+    if(startMeshIdx_ == 0){
         // obstacle 0 is initial surface -> contact starts here
 
         //loop over all surface triangles to get triangle that's closest
@@ -129,7 +129,7 @@ void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eig
             }
         }
 
-    }else if(obstacleNumber_ == 1){
+    }else if(startMeshIdx_ == 1){
         // obstacle 1 has only negative x cordinates
 
         //loop over all surface triangles to get triangle that's closest
@@ -143,7 +143,7 @@ void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eig
             }
         }
     }else{
-        std::cout << "Invalid Obstacle "  << obstacleNumber_ << std::endl;
+        std::cout << "Invalid Obstacle "  << startMeshIdx_ << std::endl;
         std::exit(0);
     }
 
