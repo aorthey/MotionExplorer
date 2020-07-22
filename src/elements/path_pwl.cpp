@@ -514,7 +514,6 @@ void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &
     dqn.inplaceMul(0.5*linewidth);
 
     Vector3 n = -cross(dq, dqn);
-    std::cout << n << std::endl;
     Matrix3 R0, R1;
     AngleAxisRotation Raa(0, dq);
     Raa.getMatrix(R0);

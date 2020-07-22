@@ -1,11 +1,12 @@
 #include "planner/strategy/strategy_output.h"
-#include <ompl/geometric/planners/multilevel/datastructures/PlannerDataVertexAnnotated.h>
+#include <ompl/multilevel/datastructures/PlannerDataVertexAnnotated.h>
 #include <ompl/base/PlannerData.h>
 #include "elements/tree.h"
 #include "common.h"
 #include <ompl/control/PathControl.h>
 #include <ompl/geometric/PathSimplifier.h>
 
+namespace om = ompl::multilevel;
 StrategyOutput::StrategyOutput(CSpaceOMPL *cspace_):
   cspace(cspace_)
 {
@@ -133,7 +134,7 @@ void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std:
     unsigned N = pdi->numVertices();
     if(N <= 0) return;
 
-    ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pdi->getVertex(0));
+    om::PlannerDataVertexAnnotated *v = dynamic_cast<om::PlannerDataVertexAnnotated*>(&pdi->getVertex(0));
     RoadmapPtr roadmap_k = nullptr;
     if(v==nullptr)
     {
@@ -188,7 +189,7 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
     return;
   }
 
-  ob::PlannerDataVertexAnnotated *v0 = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(0));
+  om::PlannerDataVertexAnnotated *v0 = dynamic_cast<om::PlannerDataVertexAnnotated*>(&pd->getVertex(0));
 
   PTree *root = new PTree(nullptr);
 
@@ -199,7 +200,7 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
     std::map<std::vector<int>, int> tree_vertices;
 
     for(uint i = 0; i < pd->numVertices(); i++){
-      ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(i));
+      om::PlannerDataVertexAnnotated *v = dynamic_cast<om::PlannerDataVertexAnnotated*>(&pd->getVertex(i));
       if( v == nullptr)
       {
           OMPL_ERROR("Vertex %d/%d is not annotated.", i, pd->numVertices());
@@ -236,7 +237,7 @@ void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, s
       pd->getEdges(i, edgeList);
 
       for(uint j = 0; j < edgeList.size(); j++){
-        ob::PlannerDataVertexAnnotated *w = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
+        om::PlannerDataVertexAnnotated *w = dynamic_cast<om::PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
         pdi->addVertex(*w);
         uint vi = pdi->vertexIndex(*v);
         uint wi = pdi->vertexIndex(*w);

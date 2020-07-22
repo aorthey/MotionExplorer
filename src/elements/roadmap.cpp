@@ -2,7 +2,7 @@
 #include "gui/common.h"
 #include "common.h"
 #include "planner/cspace/cspace_multiagent.h"
-#include <ompl/geometric/planners/multilevel/datastructures/PlannerDataVertexAnnotated.h>
+#include <ompl/multilevel/datastructures/PlannerDataVertexAnnotated.h>
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/foreach.hpp>
@@ -12,6 +12,7 @@
 using namespace GLDraw;
 using Graph = ob::PlannerData::Graph;
 using Vertex = Graph::Vertex;
+namespace om = ompl::multilevel;
 
 double sizeVertex{6};
 double widthEdge{1};
@@ -24,13 +25,11 @@ Roadmap::Roadmap()
 Roadmap::Roadmap(const ob::PlannerDataPtr pd_, CSpaceOMPL *cspace_): 
   pd(pd_), cspace(cspace_)
 {
-  // std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
   path_ompl = GetShortestPath();
 }
 Roadmap::Roadmap(const ob::PlannerDataPtr pd_, CSpaceOMPL *cspace_, CSpaceOMPL *quotient_space_): 
   pd(pd_), cspace(cspace_), quotient_space(quotient_space_)
 {
-  // std::cout << "roadmap from planner data with " << pd->numVertices() << " vertices and " << pd->numEdges() << " edges" << std::endl;
   path_ompl = GetShortestPath();
 }
 
@@ -79,7 +78,7 @@ PathPiecewiseLinear* Roadmap::GetShortestPath()
       for(uint i = 0; i < pred.size(); i++)
       {
         Vertex pi = pred.at(i);
-        ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(pi));
+        om::PlannerDataVertexAnnotated *v = dynamic_cast<om::PlannerDataVertexAnnotated*>(&pd->getVertex(pi));
         const ob::State *s;
         if(v==nullptr){
           s = pd->getVertex(pi).getState();
@@ -117,7 +116,7 @@ PathPiecewiseLinear* Roadmap::GetShortestPath()
 
 Vector3 Roadmap::VectorFromVertex(const ob::PlannerDataVertex *v, int ridx)
 {
-  const ob::PlannerDataVertexAnnotated *va = dynamic_cast<const ob::PlannerDataVertexAnnotated*>(v);
+  const om::PlannerDataVertexAnnotated *va = dynamic_cast<const om::PlannerDataVertexAnnotated*>(v);
 
   Vector3 q;
 
@@ -204,7 +203,7 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
   //############################################################################
   //Get Space
   ob::PlannerDataVertex *v = &pd->getVertex(0);
-  const ob::PlannerDataVertexAnnotated *va = dynamic_cast<const ob::PlannerDataVertexAnnotated*>(v);
+  const om::PlannerDataVertexAnnotated *va = dynamic_cast<const om::PlannerDataVertexAnnotated*>(v);
 
   CSpaceOMPL *curSpace;
   if(va!=nullptr)
@@ -223,7 +222,7 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
   {
     ob::PlannerDataVertex *v = &pd->getVertex(vidx);
   //############################################################################
-    const ob::PlannerDataVertexAnnotated *va = dynamic_cast<const ob::PlannerDataVertexAnnotated*>(v);
+    const om::PlannerDataVertexAnnotated *va = dynamic_cast<const om::PlannerDataVertexAnnotated*>(v);
     const ob::State *vState;
 
     if(va!=nullptr)
@@ -241,7 +240,7 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
 
       ob::PlannerDataVertex *w = &pd->getVertex(edgeList.at(j));
   //############################################################################
-      const ob::PlannerDataVertexAnnotated *wa = dynamic_cast<const ob::PlannerDataVertexAnnotated*>(w);
+      const om::PlannerDataVertexAnnotated *wa = dynamic_cast<const om::PlannerDataVertexAnnotated*>(w);
       const ob::State *wState;
       if(wa!=nullptr)
       {
@@ -334,7 +333,7 @@ bool Roadmap::Save(TiXmlElement *node)
       space->copyToReals(state_serialized, vd->getState());
       TiXmlElement *subnode = ReturnSubNodeVector(*node, "state", state_serialized);
 
-      ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
+      om::PlannerDataVertexAnnotated *v = dynamic_cast<om::PlannerDataVertexAnnotated*>(&pd->getVertex(vidx));
       if(v==nullptr){
           subnode->SetAttribute("feasible", "no");
       }
@@ -342,7 +341,7 @@ bool Roadmap::Save(TiXmlElement *node)
       //   subnode->SetAttribute("feasible", "unknown");
       //   // subnode->SetAttribute("sufficient", "unknown");
       // }else{
-      //   using FeasibilityType = ob::PlannerDataVertexAnnotated::FeasibilityType;
+      //   using FeasibilityType = om::PlannerDataVertexAnnotated::FeasibilityType;
       //   FeasibilityType feasibility_t = v->GetFeasibility();
       //   if(feasibility_t == FeasibilityType::INFEASIBLE){
       //     subnode->SetAttribute("feasible", "no");

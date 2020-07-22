@@ -7,9 +7,9 @@
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include "gui/drawMotionPlanner.h"
 #include "util.h"
-#include <ompl/geometric/planners/explorer/MotionExplorer.h>
-#include <ompl/geometric/planners/explorer/MotionExplorerQMP.h>
-#include <ompl/geometric/planners/explorer/datastructures/MultiLevelPathSpace.h>
+#include <ompl/multilevel/planners/explorer/MotionExplorer.h>
+#include <ompl/multilevel/planners/explorer/MotionExplorerQMP.h>
+#include <ompl/multilevel/planners/explorer/datastructures/MultiLevelPathSpace.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -598,12 +598,12 @@ void MotionPlanner::UpdateHierarchy()
 void MotionPlanner::setSelectedPath(std::vector<int> selectedLocalMinimum)
 {
     //can only be done with Explorer Planners
-    auto selectionPlanner = dynamic_pointer_cast<og::MotionExplorer>(strategy->GetPlannerPtr());
+    auto selectionPlanner = dynamic_pointer_cast<ompl::multilevel::MotionExplorer>(strategy->GetPlannerPtr());
     if(selectionPlanner != NULL)
     {
       selectionPlanner->setLocalMinimumSelection( selectedLocalMinimum );
     }
-    auto selectionPlanner2 = dynamic_pointer_cast<og::MotionExplorerQMP>(strategy->GetPlannerPtr());
+    auto selectionPlanner2 = dynamic_pointer_cast<ompl::multilevel::MotionExplorerQMP>(strategy->GetPlannerPtr());
     if(selectionPlanner2 != NULL)
     {
       selectionPlanner2->setLocalMinimumSelection( selectedLocalMinimum );

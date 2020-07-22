@@ -4,13 +4,13 @@
 #include "planner/benchmark/benchmark_output.h"
 #include "planner/strategy/infeasibility_sampler.h"
 
-#include <ompl/geometric/planners/explorer/MotionExplorer.h>
-#include <ompl/geometric/planners/explorer/MotionExplorerQMP.h>
-#include <ompl/geometric/planners/multilevel/QRRT.h>
-#include <ompl/geometric/planners/multilevel/QRRTStar.h>
-#include <ompl/geometric/planners/multilevel/QMP.h>
-#include <ompl/geometric/planners/multilevel/QMPStar.h>
-#include <ompl/geometric/planners/multilevel/SPQR.h>
+#include <ompl/multilevel/planners/explorer/MotionExplorer.h>
+#include <ompl/multilevel/planners/explorer/MotionExplorerQMP.h>
+#include <ompl/multilevel/planners/qrrt/QRRT.h>
+#include <ompl/multilevel/planners/qrrt/QRRTStar.h>
+#include <ompl/multilevel/planners/qmp/QMP.h>
+#include <ompl/multilevel/planners/qmp/QMPStar.h>
+#include <ompl/multilevel/planners/spqr/SPQR.h>
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -55,6 +55,10 @@
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/util/Time.h>
 #include <boost/lexical_cast.hpp>
+
+namespace om = ompl::multilevel;
+namespace og = ompl::geometric;
+namespace ob = ompl::base;
 
 static ob::OptimizationObjectivePtr GetOptimizationObjective(const ob::SpaceInformationPtr& si)
 {
@@ -140,14 +144,14 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:projest") planner = std::make_shared<og::ProjEST>(si);
   else if(algorithm=="ompl:sbl") planner = std::make_shared<og::SBL>(si);
 
-  else if(algorithm=="hierarchy:qrrt") planner = std::make_shared<og::QRRT>(siVec, "QRRT");
-  else if(algorithm=="hierarchy:qrrtstar") planner = std::make_shared<og::QRRTStar>(siVec, "QRRTStar");
-  else if(algorithm=="hierarchy:qmp") planner = std::make_shared<og::QMP>(siVec, "QMP");
-  else if(algorithm=="hierarchy:qmpstar") planner = std::make_shared<og::QMPStar>(siVec, "QMPStar");
-  else if(algorithm=="hierarchy:spqr") planner = std::make_shared<og::SPQR>(siVec, "SPQR");
+  else if(algorithm=="hierarchy:qrrt") planner = std::make_shared<om::QRRT>(siVec, "QRRT");
+  else if(algorithm=="hierarchy:qrrtstar") planner = std::make_shared<om::QRRTStar>(siVec, "QRRTStar");
+  else if(algorithm=="hierarchy:qmp") planner = std::make_shared<om::QMP>(siVec, "QMP");
+  else if(algorithm=="hierarchy:qmpstar") planner = std::make_shared<om::QMPStar>(siVec, "QMPStar");
+  else if(algorithm=="hierarchy:spqr") planner = std::make_shared<om::SPQR>(siVec, "SPQR");
 
-  else if(algorithm=="hierarchy:explorer") planner = std::make_shared<og::MotionExplorer>(siVec, "Explorer");
-  else if(algorithm=="hierarchy:explorer2") planner = std::make_shared<og::MotionExplorerQMP>(siVec, "ExplorerQMP");
+  else if(algorithm=="hierarchy:explorer") planner = std::make_shared<om::MotionExplorer>(siVec, "Explorer");
+  else if(algorithm=="hierarchy:explorer2") planner = std::make_shared<om::MotionExplorerQMP>(siVec, "ExplorerQMP");
   else if(algorithm=="sampler") planner = std::make_shared<og::InfeasibilitySampler>(si);
 
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){
