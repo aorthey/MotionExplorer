@@ -23,7 +23,6 @@ class ViewHierarchy
   void PushLevel(int nodes, std::string robot_name);
   void PopLevel();
   void UpdateSelectionPath( std::vector<int> path );
-  void DrawGL();
   int GetLevel();
   void Clear();
 
@@ -39,6 +38,7 @@ class ViewHierarchy
   bool drawBound,drawPlotArea;
   GLDraw::GLColor boundColor, plotAreaColor, textColor, nodeColor, nodeSelectedColor, nodeUnselectedColor;
 
+  void DrawGL();
   void DrawNode( double x, double y, double radius, int number = 0);
   void DrawNode( double x, double y, double radius, std::string nstr);
   void DrawLineFromNodeToNode(double x1, double y1, double n1, double x2, double y2, double n2);

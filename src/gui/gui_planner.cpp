@@ -58,10 +58,8 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="planner_step"){
     last_command = "Step";
     planners.at(active_planner)->Step();
-    planners.at(active_planner)->ExpandFull();
   }else if(cmd=="planner_step_one_level"){
     planners.at(active_planner)->StepOneLevel();
-    planners.at(active_planner)->Expand();
     hierarchy_change = true;
   }else if(cmd=="planner_clear"){
     last_command = "Clear";
@@ -70,7 +68,6 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="planner_advance_until_solution"){
     last_command = "Plan";
     planners.at(active_planner)->AdvanceUntilSolution();
-    // planners.at(active_planner)->ExpandFull();
     hierarchy_change = true;
   }else if(cmd=="next_planner"){
     if(active_planner<planners.size()-1) active_planner++;
@@ -255,21 +252,28 @@ std::string PlannerBackend::getRobotEnvironmentString()
     }
     return rname+"_"+tname;
 }
-void PlannerBackend::CenterCameraOn(const Vector3& v){
+
+void PlannerBackend::CenterCameraOn(const Vector3& v)
+{
   Math3D::AABB3D box(v,v);
   GLNavigationBackend::CenterCameraOn(box);
 }
 
-bool PlannerBackend::OnIdle(){
+bool PlannerBackend::OnIdle()
+{
   bool res = BaseT::OnIdle();
   if(planners.empty()) return res;
 
   MotionPlanner* planner = planners.at(active_planner);
-  if(state("draw_play_path")){
+  if(!planner->isActive()) return false;
+
+  if(state("draw_play_path"))
+  {
     if(t<=0){
       path = planner->GetPath();
     }
-    if(path){
+    if(path)
+    {
       double T = path->GetLength();
       double tstep = planner->GetInput().pathSpeed*T/1000;
       //std::cout << "play path: " << t << "/" << T << std::endl;
@@ -288,7 +292,6 @@ bool PlannerBackend::OnIdle(){
     return true;
   }
   return res;
-
 }
 
 void PlannerBackend::RenderWorld(){
@@ -361,22 +364,8 @@ void PlannerBackend::RenderWorld(){
       GLDraw::drawBoundingBox(Vector3(min(0),min(1),min(2)), Vector3(max(0),max(1),max(2)));
       glEnable(GL_LIGHTING);
       glDisable(GL_BLEND); 
-
-      // uint N = 8;
-      // world->lights.resize(N);
-      // for(uint k = 0; k < N; k++){
-      //   world->lights[k].setColor(GLColor(1,1,1));
-      // }
-      // world->lights[0].setPointLight(Vector3(min(0),min(1),min(2)));
-      // world->lights[1].setPointLight(Vector3(min(0),min(1),max(2)));
-      // world->lights[2].setPointLight(Vector3(min(0),max(1),min(2)));
-      // world->lights[3].setPointLight(Vector3(min(0),max(1),max(2)));
-      // world->lights[4].setPointLight(Vector3(max(0),min(1),min(2)));
-      // world->lights[5].setPointLight(Vector3(max(0),min(1),max(2)));
-      // world->lights[6].setPointLight(Vector3(max(0),max(1),min(2)));
-      // world->lights[7].setPointLight(Vector3(max(0),max(1),max(2)));
-
     }
+
     static PathPiecewiseLinear *path;
     if(state("draw_play_path")){
       if(t<=0){

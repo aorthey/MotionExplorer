@@ -7,9 +7,11 @@
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include "gui/drawMotionPlanner.h"
 #include "util.h"
+#include "gui/ViewLocalMinimaTree.h"
 #include <ompl/multilevel/planners/explorer/MotionExplorer.h>
 #include <ompl/multilevel/planners/explorer/MotionExplorerQMP.h>
 #include <ompl/multilevel/planners/explorer/datastructures/MultiLevelPathSpace.h>
+#include <ompl/multilevel/planners/explorer/datastructures/LocalMinimaTree.h>
 
 #include <boost/lexical_cast.hpp>
 
@@ -371,6 +373,18 @@ void MotionPlanner::InitStrategy()
   strategy_input.cspace_levels = cspace_levels;
   strategy_input.cspace_stratifications = cspace_stratifications;
   strategy->Init(strategy_input);
+  auto explorerPlanner = dynamic_pointer_cast<ompl::multilevel::MotionExplorer>(strategy->GetPlannerPtr());
+  if(explorerPlanner != nullptr)
+  {
+      localMinimaTree_ = explorerPlanner->getLocalMinimaTree();
+      viewLocalMinimaTree_ = std::make_shared<ViewLocalMinimaTree>(localMinimaTree_, cspace_levels);
+  }
+  auto explorerPlanner2 = dynamic_pointer_cast<ompl::multilevel::MotionExplorerQMP>(strategy->GetPlannerPtr());
+  if(explorerPlanner2 != nullptr)
+  {
+      localMinimaTree_ = explorerPlanner2->getLocalMinimaTree();
+      viewLocalMinimaTree_ = std::make_shared<ViewLocalMinimaTree>(localMinimaTree_, cspace_levels);
+  }
 }
 
 void MotionPlanner::Step()
@@ -431,22 +445,20 @@ void MotionPlanner::AdvanceUntilSolution()
     current_level_node = 0;
     current_path.clear();
     viewHierarchy.Clear();
-  }else{
-    // strategy->Clear();
   }
   resetTime();
 
   if(!util::StartsWith(input.name_algorithm,"benchmark")){
     StrategyOutput output(cspace_levels.back());
     strategy->Plan(output);
-    output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
+    // output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
     // std::cout << output << std::endl;
   }
   time = getTime();
 
-  // ExpandSimple();
-  ExpandFull();
+  Expand();
 }
+
 
 PlannerInput& MotionPlanner::GetInput()
 {
@@ -458,191 +470,49 @@ bool MotionPlanner::isActive()
   return active;
 }
 
-void MotionPlanner::ExpandFull()
-{
-  if(!active) return;
-
-  uint Nmax=hierarchy->NumberLevels();
-
-  // current_level = 0;
-  // current_level_node = 0;
-  // current_path.clear();
-  // viewHierarchy.Clear();
-
-  while(true){
-    if(current_level<Nmax-1){
-      if(hierarchy->HasChildren(current_path)){
-        current_level++;
-        current_level_node=hierarchy->NumberChildren(current_path)-1;
-        current_path.push_back(current_level_node);
-      }else{
-        break;
-      }
-    }else{
-      break;
-    }
-    UpdateHierarchy();
-  }
-  UpdateHierarchy();
-}
-
-//folder-like operations on hierarchical roadmap
 void MotionPlanner::Expand()
 {
   if(!active) return;
-
-  uint Nmax=hierarchy->NumberLevels();
-  if(current_level<Nmax-1){
-    if(hierarchy->HasChildren(current_path)){
-      current_level++;
-      current_level_node=hierarchy->NumberChildren(current_path)-1;
-      current_path.push_back(current_level_node);
-    }else{
-      AdvanceUntilSolution();
-    }
-  }
-  UpdateHierarchy();
-}
-
-void MotionPlanner::ExpandSimple()
-{
-  if(!active) return;
-
-  uint Nmax=hierarchy->NumberLevels();
-  if(current_level<Nmax-1)
-  {
-    // std::cout << (hierarchy->HasChildren(current_path)?"HasChildren":"NoChildren") << std::endl;
-    if(hierarchy->HasChildren(current_path))
-    {
-      current_level++;
-      current_level_node=hierarchy->NumberChildren(current_path)-1;
-      current_path.push_back(current_level_node);
-    }
-  }
-  UpdateHierarchy();
+  if(!hasLocalMinimaTree()) return;
+  localMinimaTree_->setSelectedMinimumExpand();
 }
 
 void MotionPlanner::Collapse()
 {
   if(!active) return;
-
-  if(current_level>0){
-    current_path.erase(current_path.end() - 1);
-    current_level--;
-    if(current_path.size()>0){
-      current_level_node = current_path.back();
-    }else{
-      current_level_node = 0;
-    }
-  }
-  UpdateHierarchy();
+  if(!hasLocalMinimaTree()) return;
+  localMinimaTree_->setSelectedMinimumCollapse();
 }
 
 void MotionPlanner::Next()
 {
   if(!active) return;
-
-  uint Nmax=hierarchy->NumberNodesOnLevel(current_level);
-  if(current_level_node<Nmax-1) current_level_node++;
-  else current_level_node = 0;
-  if(current_level > 0){
-    current_path.at(current_level-1) = current_level_node;
-  }
-  UpdateHierarchy();
+  if(!hasLocalMinimaTree()) return;
+  localMinimaTree_->setSelectedMinimumNext();
 }
 
 void MotionPlanner::Previous()
 {
   if(!active) return;
-  uint Nmax=hierarchy->NumberNodesOnLevel(current_level);
-  if(current_level_node>0) current_level_node--;
-  else{
-    if(Nmax>0){
-      current_level_node = Nmax-1;
-    }else{
-      current_level_node = 0;
-    }
-  }
-  if(current_level > 0){
-    current_path.at(current_level-1) = current_level_node;
-  }
-  UpdateHierarchy();
-}
-
-void MotionPlanner::UpdateHierarchy()
-{
-  if(!active) return;
-
-  uint L = viewHierarchy.GetLevel();
-  if(current_level == L ){
-  }else{
-    if(current_level < L){
-      viewHierarchy.PopLevel();
-    }else{
-        // uint idx = hierarchy->GetRobotIdx( current_level );
-        // Robot *robot = world->robots[idx];
-        // uint N = hierarchy->NumberNodesOnLevel(current_level);
-        // viewHierarchy.PushLevel(N, robot->name);
-      uint N = hierarchy->NumberNodesOnLevel(current_level);
-      viewHierarchy.PushLevel(N, "");
-    }
-  }
-  pwl = GetPath();
-  if(pwl && input.smoothPath){
-    pwl->Smooth();
-  }
-  viewHierarchy.UpdateSelectionPath( current_path );
-  setSelectedPath(current_path);
-}
-
-void MotionPlanner::setSelectedPath(std::vector<int> selectedLocalMinimum)
-{
-    //can only be done with Explorer Planners
-    auto selectionPlanner = dynamic_pointer_cast<ompl::multilevel::MotionExplorer>(strategy->GetPlannerPtr());
-    if(selectionPlanner != NULL)
-    {
-      selectionPlanner->setLocalMinimumSelection( selectedLocalMinimum );
-    }
-    auto selectionPlanner2 = dynamic_pointer_cast<ompl::multilevel::MotionExplorerQMP>(strategy->GetPlannerPtr());
-    if(selectionPlanner2 != NULL)
-    {
-      selectionPlanner2->setLocalMinimumSelection( selectedLocalMinimum );
-    }
+  if(!hasLocalMinimaTree()) return;
+  localMinimaTree_->setSelectedMinimumPrev();
 }
 
 void MotionPlanner::Print()
 {
-  if(!active) return;
-  hierarchy->Print();
-  std::cout << "current level " << current_level << "/" << hierarchy->NumberLevels()-1 << std::endl;
-  std::cout << "viewHierarchy level " << viewHierarchy.GetLevel() << std::endl;
-  std::cout << "current node  " << current_level_node << std::endl;
-  std::cout << "current path: ";
-  for(uint k = 0; k < current_path.size(); k++){
-    std::cout << "->" << current_path.at(k);
-  }
-
-  std::cout << std::endl;
   std::cout << std::string(80, '-') << std::endl;
 }
 
-bool MotionPlanner::isHierarchical()
+bool MotionPlanner::hasLocalMinimaTree()
 {
-  if(!active) return false;
-
-  uint N = hierarchy->NumberLevels();
-  if(N>1) return true;
-  return false;
+  return (localMinimaTree_ != nullptr);
 }
 
 void MotionPlanner::DrawGLScreen(double x_, double y_)
 {
   if(!active) return;
-  if(isHierarchical()){
-    viewHierarchy.x = x_;
-    viewHierarchy.y = y_;
-    viewHierarchy.DrawGL();
-  }
+  if(!hasLocalMinimaTree()) return;
+  viewLocalMinimaTree_->DrawGLScreen(x_, y_);
 }
 
 CSpaceOMPL* MotionPlanner::GetCSpace()
@@ -662,89 +532,94 @@ void MotionPlanner::DrawGL(GUIState& state)
 {
   if(!active) return;
 
-  uint Nsiblings;
-  if(current_path.size()>1){
-    std::vector<int>::const_iterator first = current_path.begin();
-    std::vector<int>::const_iterator last = current_path.end()-1;
-    std::vector<int> current_parent_path(first, last);
-    Nsiblings = hierarchy->NumberChildren(current_parent_path);
-  }else{
-    Nsiblings = hierarchy->NumberNodesOnLevel(current_path.size());
+  if(hasLocalMinimaTree())
+  {
+      viewLocalMinimaTree_->DrawGL(state);
   }
 
-  if(current_path.size() > 0){
-      int last_node = current_path.back();
-      const GLColor magenta(0.7,0,0.7,1);
+  //uint Nsiblings;
+  //if(current_path.size()>1){
+  //  std::vector<int>::const_iterator first = current_path.begin();
+  //  std::vector<int>::const_iterator last = current_path.end()-1;
+  //  std::vector<int> current_parent_path(first, last);
+  //  Nsiblings = hierarchy->NumberChildren(current_parent_path);
+  //}else{
+  //  Nsiblings = hierarchy->NumberNodesOnLevel(current_path.size());
+  //}
 
-      const GLColor colorPathSelectedExecutable = green;
-      const GLColor colorPathSelectedNonExec = magenta;
-      const GLColor colorPathSelectedNonExecChildren = green;
+  //if(current_path.size() > 0){
+  //    int last_node = current_path.back();
+  //    const GLColor magenta(0.7,0,0.7,1);
 
-      const GLColor colorPathNotSelected = lightGrey;
-      const GLColor colorPathNotSelectedChildren = lightGrey;
+  //    const GLColor colorPathSelectedExecutable = green;
+  //    const GLColor colorPathSelectedNonExec = magenta;
+  //    const GLColor colorPathSelectedNonExecChildren = green;
 
-      if(state("draw_explorer_non_selected_paths"))
-      {
-        for(uint k = 0; k < Nsiblings; k++){
-          if(k==(uint)last_node) continue;
-          current_path.back() = k;
-          Rcurrent = hierarchy->GetNodeContent(current_path);
-          Rcurrent->DrawGL(state);
-          PathPiecewiseLinear *pwlk = Rcurrent->GetShortestPath();
-          bool hasChildren = hierarchy->HasChildren(current_path);
-          if(pwlk && state("draw_roadmap_shortest_path")){
-            pwlk->zOffset = 0.001;
-            pwlk->linewidth = 0.3*input.pathWidth;
-            pwlk->widthBorder= 0.3*input.pathBorderWidth;
-            pwlk->ptsize = 8;
-            if(!hasChildren){
-                pwlk->setColor(colorPathNotSelected);
-            }else{
-                pwlk->setColor(colorPathNotSelectedChildren);
+  //    const GLColor colorPathNotSelected = lightGrey;
+  //    const GLColor colorPathNotSelectedChildren = lightGrey;
 
-            }
-            pwlk->drawSweptVolume = false;
-            pwlk->drawCross = false;
-            pwlk->DrawGL(state);
-          }
-        }
-      }
+  //    if(state("draw_explorer_non_selected_paths"))
+  //    {
+  //      for(uint k = 0; k < Nsiblings; k++){
+  //        if(k==(uint)last_node) continue;
+  //        current_path.back() = k;
+  //        Rcurrent = hierarchy->GetNodeContent(current_path);
+  //        Rcurrent->DrawGL(state);
+  //        PathPiecewiseLinear *pwlk = Rcurrent->GetShortestPath();
+  //        bool hasChildren = hierarchy->HasChildren(current_path);
+  //        if(pwlk && state("draw_roadmap_shortest_path")){
+  //          pwlk->zOffset = 0.001;
+  //          pwlk->linewidth = 0.3*input.pathWidth;
+  //          pwlk->widthBorder= 0.3*input.pathBorderWidth;
+  //          pwlk->ptsize = 8;
+  //          if(!hasChildren){
+  //              pwlk->setColor(colorPathNotSelected);
+  //          }else{
+  //              pwlk->setColor(colorPathNotSelectedChildren);
 
-      current_path.back() = last_node;
-      Rcurrent = hierarchy->GetNodeContent(current_path);
+  //          }
+  //          pwlk->drawSweptVolume = false;
+  //          pwlk->drawCross = false;
+  //          pwlk->DrawGL(state);
+  //        }
+  //      }
+  //    }
 
-      //draw current selected roadmap
-      Rcurrent->DrawGL(state);
+  //    current_path.back() = last_node;
+  //    Rcurrent = hierarchy->GetNodeContent(current_path);
 
-      pwl = Rcurrent->GetShortestPath();
-      if(pwl && state("draw_roadmap_shortest_path")){
-        pwl->zOffset = 0.015;
-        pwl->linewidth = input.pathWidth;
-        pwl->widthBorder= input.pathBorderWidth;
-        pwl->ptsize = 10;
+  //    //draw current selected roadmap
+  //    Rcurrent->DrawGL(state);
+
+  //    pwl = Rcurrent->GetShortestPath();
+  //    if(pwl && state("draw_roadmap_shortest_path")){
+  //      pwl->zOffset = 0.015;
+  //      pwl->linewidth = input.pathWidth;
+  //      pwl->widthBorder= input.pathBorderWidth;
+  //      pwl->ptsize = 10;
 
 
-        pwl->cRobotVolume = GLColor(0.8,0.8,0.8,1);
-        pwl->drawSweptVolume = true;
-        unsigned maxLevels = hierarchy->NumberLevels();
-        unsigned curLevel = hierarchy->GetNode(current_path)->level;
-        bool hasChildren = hierarchy->HasChildren(current_path);
-        if(curLevel < maxLevels-1){
-            pwl->drawCross = false;
-            if(hasChildren){
-                pwl->cCross = colorPathSelectedNonExecChildren;
-                pwl->setColor(colorPathSelectedNonExecChildren);
-            }else{
-                pwl->cCross = colorPathSelectedNonExec;
-                pwl->setColor(colorPathSelectedNonExec);
-            }
-        }else{
-            pwl->drawCross = false;
-            pwl->setColor(colorPathSelectedExecutable);
-        }
-        pwl->DrawGL(state);
-      }
-  }
+  //      pwl->cRobotVolume = GLColor(0.8,0.8,0.8,1);
+  //      pwl->drawSweptVolume = true;
+  //      unsigned maxLevels = hierarchy->NumberLevels();
+  //      unsigned curLevel = hierarchy->GetNode(current_path)->level;
+  //      bool hasChildren = hierarchy->HasChildren(current_path);
+  //      if(curLevel < maxLevels-1){
+  //          pwl->drawCross = false;
+  //          if(hasChildren){
+  //              pwl->cCross = colorPathSelectedNonExecChildren;
+  //              pwl->setColor(colorPathSelectedNonExecChildren);
+  //          }else{
+  //              pwl->cCross = colorPathSelectedNonExec;
+  //              pwl->setColor(colorPathSelectedNonExec);
+  //          }
+  //      }else{
+  //          pwl->drawCross = false;
+  //          pwl->setColor(colorPathSelectedExecutable);
+  //      }
+  //      pwl->DrawGL(state);
+  //    }
+  //}
 
   unsigned maxLevel = hierarchy->NumberLevels()-1;
   std::vector<int> ridx = hierarchy->GetRobotIdxs(current_level);

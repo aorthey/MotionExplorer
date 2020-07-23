@@ -17,7 +17,17 @@
 
 
 class Strategy;
+namespace ompl
+{
+  namespace multilevel
+  {
+    class LocalMinimaTree;
+  }
+}
+class ViewLocalMinimaTree;
 typedef std::shared_ptr<Strategy> StrategyPtr;
+typedef std::shared_ptr<ompl::multilevel::LocalMinimaTree> LocalMinimaTreePtr;
+typedef std::shared_ptr<ViewLocalMinimaTree> ViewLocalMinimaTreePtr;
 
 class MotionPlanner{
 
@@ -29,13 +39,12 @@ class MotionPlanner{
     PathPiecewiseLinear* GetPath();
     CSpaceOMPL* GetCSpace();
 
-    //folder-like operations on hierarchical roadmap
-    virtual void ExpandFull();
-    virtual void ExpandSimple();
+    //Ops on tree only, no interference with planner
     virtual void Expand();
     virtual void Collapse();
     virtual void Next();
     virtual void Previous();
+    void UpdateHierarchy();
 
     //operations on motion planning strategy (the underlying algorithm)
     virtual void Step();
@@ -45,12 +54,9 @@ class MotionPlanner{
     virtual void DrawGL(GUIState&);
     virtual void DrawGLScreen(double x_ =0.0, double y_=0.0);
 
-    virtual void setSelectedPath(std::vector<int> selectedPath);
-
     //planner will only be active if input exists and contains a valid algorithm
     bool isActive();
     void Print();
-    void UpdateHierarchy();
 
     virtual std::string getName() const;
     virtual void Clear();
@@ -68,20 +74,19 @@ class MotionPlanner{
     double getTime();
 
     double time{0};
+    bool active;
 
-    //position in hierarchy
+    //TODO: Prune all Hi structures
     uint current_level; //vertical level in hierarchy (tree)
     uint current_level_node; //horizontal node inside a level
     std::vector<int> current_path; //current selected path through tree
-
     HierarchicalRoadmapPtr hierarchy;
-
     RoadmapPtr Rcurrent;
-
-    bool isHierarchical();
-
-    bool active;
+    bool hasLocalMinimaTree();
     void CreateHierarchy();
+    ViewHierarchy viewHierarchy;
+    ViewLocalMinimaTreePtr viewLocalMinimaTree_;
+    LocalMinimaTreePtr localMinimaTree_;
 
     RobotWorld *world;
     std::vector<CSpaceOMPL*> cspace_levels;
@@ -90,7 +95,6 @@ class MotionPlanner{
     void InitStrategy();
 
     PlannerInput input;
-    ViewHierarchy viewHierarchy;
     StrategyPtr strategy; //the actual algorithm implementation
 
     // \brief solution path of planner

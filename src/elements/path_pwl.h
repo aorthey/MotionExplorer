@@ -45,9 +45,9 @@ class PathPiecewiseLinear
     int GetNumberOfMilestones();
     double GetLength() const;
 
-    double linewidth{20};
+    double linewidth{1};
     double widthBorder{0.1};
-    double ptsize{10};
+    double ptsize{1};
     double zOffset{-0.1};
     GLColor cVertex{magenta}, cLine{magenta};
     GLColor cSmoothed{magenta}, cUnsmoothed{red};
