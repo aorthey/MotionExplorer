@@ -4,7 +4,7 @@
 
 
 TransitionConstraint::TransitionConstraint
-(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint startMeshIdx, uint goalMeshIdx, uint triFromIdx, uint triToIdx, std::string meshFrom):
+(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint triFromIdx, std::string meshFrom):
 ContactConstraint(cspace, ambientSpaceDim, robot, world, linkNumber, meshFrom, triFromIdx)
 {
     /**
