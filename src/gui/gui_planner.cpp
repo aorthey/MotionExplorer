@@ -265,7 +265,14 @@ bool PlannerBackend::OnIdle()
   if(planners.empty()) return res;
 
   MotionPlanner* planner = planners.at(active_planner);
+
   if(!planner->isActive()) return false;
+
+  SendRefresh();
+  if(planner->hasChanged())
+  {
+      SendRefresh();
+  }
 
   if(state("draw_play_path"))
   {

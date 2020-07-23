@@ -54,7 +54,7 @@
     <name>draw_path_sweptvolume</name>
     <descr>Draw Swept Volume</descr>
     <key>l</key>
-    <active>1</active>
+    <active>0</active>
   </checkbox>
 
   <checkbox>

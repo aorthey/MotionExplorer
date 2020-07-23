@@ -17,6 +17,7 @@
 
 
 class Strategy;
+class StrategyOutput;
 namespace ompl
 {
   namespace multilevel
@@ -64,6 +65,7 @@ class MotionPlanner{
     friend std::ostream& operator<< (std::ostream& out, const MotionPlanner& planner);
 
     double getLastIterationTime();
+    bool hasChanged();
   protected:
     MotionPlanner() = delete;
 
@@ -82,11 +84,11 @@ class MotionPlanner{
     std::vector<int> current_path; //current selected path through tree
     HierarchicalRoadmapPtr hierarchy;
     RoadmapPtr Rcurrent;
-    bool hasLocalMinimaTree();
     void CreateHierarchy();
     ViewHierarchy viewHierarchy;
     ViewLocalMinimaTreePtr viewLocalMinimaTree_;
     LocalMinimaTreePtr localMinimaTree_;
+    bool hasLocalMinimaTree();
 
     RobotWorld *world;
     std::vector<CSpaceOMPL*> cspace_levels;
@@ -96,6 +98,7 @@ class MotionPlanner{
 
     PlannerInput input;
     StrategyPtr strategy; //the actual algorithm implementation
+    StrategyOutput *output;
 
     // \brief solution path of planner
     PathPiecewiseLinear *pwl; 

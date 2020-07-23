@@ -14,6 +14,7 @@
 #include <ompl/multilevel/planners/explorer/datastructures/LocalMinimaTree.h>
 
 #include <boost/lexical_cast.hpp>
+#include <thread>
 
 using namespace GLDraw;
 
@@ -37,6 +38,15 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
 }
 std::string MotionPlanner::getName() const{
   return input.name_algorithm;
+}
+
+bool MotionPlanner::hasChanged()
+{
+  if(hasLocalMinimaTree())
+  {
+      return localMinimaTree_->hasChanged();
+  }
+  return false;
 }
 
 CSpaceOMPL* MotionPlanner::ComputeMultiAgentCSpace(const Layer &layer){
@@ -435,6 +445,11 @@ void MotionPlanner::StepOneLevel()
   time = getTime();
 }
 
+void RunPlanner(StrategyPtr strategy, StrategyOutput* output)
+{
+    strategy->Plan(*output);
+}
+
 void MotionPlanner::AdvanceUntilSolution()
 {
   if(!active) return;
@@ -446,17 +461,14 @@ void MotionPlanner::AdvanceUntilSolution()
     current_path.clear();
     viewHierarchy.Clear();
   }
-  resetTime();
 
   if(!util::StartsWith(input.name_algorithm,"benchmark")){
-    StrategyOutput output(cspace_levels.back());
-    strategy->Plan(output);
+    output = new StrategyOutput(cspace_levels.back());
+    std::thread threadStrategy(RunPlanner, std::ref(strategy), std::ref(output));
+    threadStrategy.detach();
     // output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
     // std::cout << output << std::endl;
   }
-  time = getTime();
-
-  Expand();
 }
 
 

@@ -80,8 +80,7 @@ void ViewLocalMinimaTree::DrawGLNodeUnSelected(GUIState& state, LocalMinimaNode*
 }
 void ViewLocalMinimaTree::DrawGL(GUIState& state)
 {
-
-  std::lock_guard<std::mutex> guard(localMinimaTree_->getLock());
+  std::lock_guard<std::recursive_mutex> guard(localMinimaTree_->getLock());
 
   LocalMinimaNode* node = localMinimaTree_->getSelectedPath();
   DrawGLNodeSelected(state, node);
@@ -96,7 +95,7 @@ void ViewLocalMinimaTree::DrawGL(GUIState& state)
 
 void ViewLocalMinimaTree::DrawGLScreen(double x, double y)
 {
-  std::lock_guard<std::mutex> guard(localMinimaTree_->getLock());
+  std::lock_guard<std::recursive_mutex> guard(localMinimaTree_->getLock());
 
 
   int lmtLevel = localMinimaTree_->getNumberOfLevelContainingMinima();
