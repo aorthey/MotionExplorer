@@ -4,13 +4,14 @@
 
 
 ContactConstraint::ContactConstraint
-(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint startMeshIdx):
+(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, int linkNumber, std::string meshFrom, int triFromIdx):
 ob::Constraint(ambientSpaceDim, 1)
         , cspace_(cspace)
         , robot_(robot)
         , world_(world)
         , linkNumber_(linkNumber)
-        , startMeshIdx_(startMeshIdx)
+        , meshFrom_(meshFrom)
+        , triFromIdx_(triFromIdx)
 {
     /**
      * Information on obstacle surface triangles.
@@ -18,64 +19,43 @@ ob::Constraint(ambientSpaceDim, 1)
      * Saves all triangles that are feasible contact surfaces into member variable "trisFiltered".
      */
 
-    std::vector<Triangle3D> tris;
-
     for(uint k = 0; k < world_->terrains.size(); k++){
         Terrain* terrain_k = world_->terrains[k];
-        const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();
 
-        for(uint j = 0; j < mesh.tris.size(); j++){
-            Triangle3D tri;
-            mesh.GetTriangle(j, tri);
-            tris.push_back(tri);
+        // adding only those Triangles to tris that belong to specified obstacle (meshFrom)
+        if (terrain_k->name == meshFrom_){
+            const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();
+
+            for(uint j = 0; j < mesh.tris.size(); j++){
+                Triangle3D tri;
+                mesh.GetTriangle(j, tri);
+                tris.push_back(tri);
+            }
         }
+
     }
+
     for(uint l = 0; l < tris.size(); l++){
         Vector3 normal = tris.at(l).normal();
         double epsilon = 1e-10;
 
         if(fabs((fabs(normal[2]) - 1.0))<epsilon){
-            //does nothing
+            //filter out surface triangles with normal in z direction
         }
         else{
-            // only x and y coordinates
-/*          Vector2 a = Vector2(tris.at(l).a[0], tris.at(l).a[1]);
-            Vector2 b = Vector2(tris.at(l).b[0], tris.at(l).b[1]);
-            Vector2 c = Vector2(tris.at(l).c[0], tris.at(l).c[1]);
-
-            cornerCoord.push_back(a);
-            cornerCoord.push_back(b);
-            cornerCoord.push_back(c); */
-//
-//            // quick fix for distinction between two obstacles that dont touch, x coordinates positive or negative
-//            if(tris.at(l).a[0] < 0 && tris.at(l).a[0] > -2 && tris.at(l).b[0] > -2 && tris.at(l).c[0] > -2){
-//                trisFiltered_negative.push_back(tris.at(l));
-//
-//            }else if (tris.at(l).a[0] > 0 && tris.at(l).a[0] < 2.5 && tris.at(l).b[0] < 2.5 && tris.at(l).c[0] < 2.5){
+            // for now we just take the whole obstacle
+            trisFiltered.push_back(tris.at(l));
+//            // filtered surface triangles of specified obstacle
+//            if (triFromIdx_ < 0){
+//                // if triFromIdx not given DEFAULT is triFromIdx = -1
 //                trisFiltered.push_back(tris.at(l));
-//
 //            }
-
-            // quick fix for distinction between two obstacles that dont touch, Y coordinates positive or negative
-            if(tris.at(l).a[0] > -2 && tris.at(l).b[0] > -2 && tris.at(l).c[0] > -2){
-                if(tris.at(l).a[1] > 0){
-                    trisFiltered_negative.push_back(tris.at(l));
-
-                } else{
-                    trisFiltered.push_back(tris.at(l));
-                }
-            }
-
+//            else{
+//                // if triFromIdx is given, contact will be only with that surface triangle
+//                trisFiltered.push_back(tris.at(triFromIdx_));
+//            }
         }
     }
-
-    // remove all duplicates of (2D) corner coordinates
-/*  auto end = cornerCoord.end();
-    for(auto it = cornerCoord.begin(); it != end; ++it){
-        end = std::remove(it + 1, end, *it);
-    }
-    cornerCoord.erase(end, cornerCoord.end()); */
-
 }
 
 Vector3 ContactConstraint::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const
@@ -115,39 +95,17 @@ void ContactConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eig
     Vector3 closestPt;
     Real distances = 1000;
 
-    if(startMeshIdx_ == 0){
-        // obstacle 0 is initial surface -> contact starts here
+    //loop over all surface triangles to get triangle that's closest
+    for (uint j = 0; j < trisFiltered.size(); j++) {
+        Vector3 cP = trisFiltered.at(j).closestPoint(contact);
+        Real d = contact.distance(cP);
 
-        //loop over all surface triangles to get triangle that's closest
-        for (uint j = 0; j < trisFiltered.size(); j++) {
-            Vector3 cP = trisFiltered.at(j).closestPoint(contact);
-            Real d = contact.distance(cP);
-
-            if (distances > d){
-                distances = d;
-                closestPt = cP;
-            }
+        if (distances > d){
+            distances = d;
+            closestPt = cP;
         }
-
-    }else if(startMeshIdx_ == 1){
-        // obstacle 1 has only negative x cordinates
-
-        //loop over all surface triangles to get triangle that's closest
-        for (uint j = 0; j < trisFiltered_negative.size(); j++) {
-            Vector3 cP = trisFiltered_negative.at(j).closestPoint(contact);
-            Real d = contact.distance(cP);
-
-            if (distances > d){
-                distances = d;
-                closestPt = cP;
-            }
-        }
-    }else{
-        std::cout << "Invalid Obstacle "  << startMeshIdx_ << std::endl;
-        std::exit(0);
     }
 
     Real distVect = contact.distance(closestPt);
-
     out[0] = distVect;
 }

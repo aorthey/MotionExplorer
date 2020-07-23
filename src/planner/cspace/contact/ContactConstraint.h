@@ -19,12 +19,11 @@ class GeometricCSpaceOMPLRCONTACT;
 class ContactConstraint : public ob::Constraint
 {
 protected:
+    std::vector<Triangle3D> tris;
     std::vector<Triangle3D> trisFiltered;
-    std::vector<Triangle3D> trisFiltered_negative;
-    //std::vector<Vector2> cornerCoord;
 
 public:
-    ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint startMeshIdx);
+    ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, int linkNumber, std::string meshFrom, int triFromIdx);
 
 
     Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const;
@@ -71,6 +70,7 @@ private:
     GeometricCSpaceOMPLRCONTACT *cspace_;
     Robot *robot_;
     RobotWorld *world_;
-    uint linkNumber_;
-    uint startMeshIdx_;
+    int linkNumber_;
+    std::string  meshFrom_;
+    int triFromIdx_;
 };

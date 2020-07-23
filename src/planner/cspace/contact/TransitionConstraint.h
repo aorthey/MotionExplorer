@@ -32,7 +32,7 @@ protected:
     Mode mode{ACTIVE_CONSTRAINT_INITIAL};
 
 public:
-    TransitionConstraint(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint startMeshIdx, uint goalMeshIdx);
+    TransitionConstraint(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint startMeshIdx, uint goalMeshIdx, uint triFromIdx, uint triToIdx, std::string meshForm);
 
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override;
     void setMode(int newMode);
