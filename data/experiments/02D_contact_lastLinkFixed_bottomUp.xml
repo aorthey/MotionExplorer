@@ -37,8 +37,8 @@
                tri="3"/>
       <contact robot_name="2dof" robot_link="jlink0"
                mode="transition"
-               meshFrom="rectangleTop" triFrom="3"
-               meshTo="rectangleBottom" triTo="6"/>
+               meshFrom="rectangleBottom" triFrom="3"
+               meshTo="rectangleTop" triTo="6"/>
     </contacts>
 
     <hierarchy>

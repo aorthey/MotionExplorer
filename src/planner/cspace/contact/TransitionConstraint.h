@@ -21,8 +21,8 @@ class GeometricCSpaceOMPLRCONTACT;
 class TransitionConstraint : public ContactConstraint
 {
 protected:
-    std::vector<Triangle3D> trisFiltered;
-    std::vector<Triangle3D> trisFiltered_negative;
+    std::vector<Triangle3D> trisFrom;
+    std::vector<Triangle3D> trisTo;
 
     enum Mode {
       ACTIVE_CONSTRAINT_INITIAL = 0,
@@ -32,7 +32,7 @@ protected:
     Mode mode{ACTIVE_CONSTRAINT_INITIAL};
 
 public:
-    TransitionConstraint(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint triFromIdx, std::string meshForm);
+    TransitionConstraint(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, std::string meshFrom, std::string meshTo);
 
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override;
     void setMode(int newMode);

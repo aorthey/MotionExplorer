@@ -4,58 +4,56 @@
 
 
 TransitionConstraint::TransitionConstraint
-(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, uint triFromIdx, std::string meshFrom):
-ContactConstraint(cspace, ambientSpaceDim, robot, world, linkNumber, meshFrom, triFromIdx)
+(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, std::string meshFrom, std::string meshTo):
+ContactConstraint(cspace, ambientSpaceDim, robot, world, linkNumber, meshFrom)
 {
-    /**
-     * Information on obstacle surface triangles.
-     *
-     * Saves all triangles that are feasible contact surfaces into member variable "trisFiltered".
-     */
-
-    std::vector<Triangle3D> tris;
 
     for(uint k = 0; k < world->terrains.size(); k++){
         Terrain* terrain_k = world->terrains[k];
-        const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();
 
-        for(uint j = 0; j < mesh.tris.size(); j++){
-            Triangle3D tri;
-            mesh.GetTriangle(j, tri);
-            tris.push_back(tri);
-        }
-    }
-    for(uint l = 0; l < tris.size(); l++){
-        Vector3 normal = tris.at(l).normal();
-        double epsilon = 1e-10;
+        // adding only those Triangles to tris that belong to specified obstacle (meshFrom)
+        if (terrain_k->name == meshFrom){
+            const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();
 
-        if(fabs((fabs(normal[2]) - 1.0))<epsilon){
-            //do nothing
-        }
-        else{
+            for(uint j = 0; j < mesh.tris.size(); j++){
+                Triangle3D tri;
+                mesh.GetTriangle(j, tri);
 
-//            // quick fix for distinction between two obstacles that dont touch, x coordinates positive or negative
-//            if(tris.at(l).a[0] < 0 && tris.at(l).a[0] > -2 && tris.at(l).b[0] > -2 && tris.at(l).c[0] > -2){
-//                trisFiltered_negative.push_back(tris.at(l));
-//                //std::cout << "Triangle with negative x coord: " << tris.at(l) << std::endl;
-//
-//            }else if (tris.at(l).a[0] > 0 && tris.at(l).a[0] < 2.5 && tris.at(l).b[0] < 2.5 && tris.at(l).c[0] < 2.5){
-//                trisFiltered.push_back(tris.at(l));
-//                //std::cout << "Triangle with positive x coord: " << tris.at(l) << std::endl;
-//            }
+                Vector3 normal = tri.normal();
+                double epsilon = 1e-10;
 
-            // quick fix for distinction between two obstacles that dont touch, Y coordinates positive or negative
-            if (tris.at(l).a[0] < 2.5 && tris.at(l).b[0] < 2.5 && tris.at(l).c[0] < 2.5){
-                if(tris.at(l).a[1] > 0){
-                    trisFiltered_negative.push_back(tris.at(l));
-                } else{
-                    trisFiltered.push_back(tris.at(l));
+                // for 2D case, filter out all surface triangles with normal vector in z direction
+                if(fabs((fabs(normal[2]) - 1.0))<epsilon){
+                    //do nothing
+                }
+                else{
+                    trisFrom.push_back(tri);
                 }
             }
+        }
 
+        // adding only those Triangles to tris that belong to specified obstacle (meshTo)
+        if (terrain_k->name == meshTo){
+            const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();
+
+            for(uint j = 0; j < mesh.tris.size(); j++){
+                Triangle3D tri;
+                mesh.GetTriangle(j, tri);
+
+                Vector3 normal = tri.normal();
+                double epsilon = 1e-10;
+
+                // for 2D case, filter out all surface triangles with normal vector in z direction
+                if(fabs((fabs(normal[2]) - 1.0))<epsilon){
+                    //do nothing
+                }
+                else{
+                    trisTo.push_back(tri);
+                }
+
+            }
         }
     }
-
 }
 
 int TransitionConstraint::getMode()
@@ -84,14 +82,12 @@ void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
     if (mode == ACTIVE_CONSTRAINT_INITIAL){
         // --------------- Mode 0: Contact with initial contact surface ---------------
         Vector3 contact = getPos(x);
-
         Vector3 closestPt;
-
         Real distances = 1000;
 
         //loop over all surface triangles to get triangle that's closest
-        for (uint j = 0; j < trisFiltered.size(); j++) {
-            Vector3 cP = trisFiltered.at(j).closestPoint(contact);
+        for (uint j = 0; j < trisFrom.size(); j++) {
+            Vector3 cP = trisFrom.at(j).closestPoint(contact);
             Real d = contact.distance(cP);
 
             if (distances > d){
@@ -108,15 +104,14 @@ void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
         out[0] = 0.0;
 
     } else if (mode == ACTIVE_CONSTRAINT_GOAL){
-        // --------------- Mode 2: Contact with different contact surface ---------------
+        // --------------- Mode 2: Contact with goal contact surface ---------------
         Vector3 contact = getPos(x);
-
-        Vector3 closestPt;  // !!! SURFACE CHOICE HERE !!!
-
+        Vector3 closestPt;
         Real distances = 1000;
+
         //loop over all surface triangles to get triangle that's closest
-        for (uint j = 0; j < trisFiltered_negative.size(); j++) {
-            Vector3 cP = trisFiltered_negative.at(j).closestPoint(contact);
+        for (uint j = 0; j < trisTo.size(); j++) {
+            Vector3 cP = trisTo.at(j).closestPoint(contact);
             Real d = contact.distance(cP);
 
             if (distances > d){
