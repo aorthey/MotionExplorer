@@ -77,23 +77,16 @@ class MotionPlanner{
     void resetTime();
     double getTime();
 
-    std::atomic<bool> threadRunning{false};
+    //\brief if strategy thread is currently running
+    std::atomic<bool> threadRunning{false}; 
 
     double time{0};
     bool active;
 
-    //TODO: Prune all depr Hi structures
-    uint current_level; //vertical level in hierarchy (tree)
-    // uint current_level_node; //horizontal node inside a level
-    // std::vector<int> current_path; //current selected path through tree
-    // HierarchicalRoadmapPtr hierarchy;
-    // RoadmapPtr Rcurrent;
-    // ViewHierarchy viewHierarchy;
-
-    //Novel Hi Structure
     ViewLocalMinimaTreePtr viewLocalMinimaTree_;
     LocalMinimaTreePtr localMinimaTree_;
     bool hasLocalMinimaTree();
+    uint current_level;
 
     RobotWorld *world;
     std::vector<CSpaceOMPL*> cspace_levels;

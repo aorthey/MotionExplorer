@@ -228,9 +228,9 @@ void MotionPlanner::CreateHierarchy()
         Config qg_full = input.q_goal; qg_full.resize(N);
 
         cspace_level_k->ConfigToOMPLState(qi_full, stateTmp);
-        Config qi = cspace_level_k->OMPLStateToConfig(stateTmp);
+        qi = cspace_level_k->OMPLStateToConfig(stateTmp);
         cspace_level_k->ConfigToOMPLState(qg_full, stateTmp);
-        Config qg = cspace_level_k->OMPLStateToConfig(stateTmp);
+        qg = cspace_level_k->OMPLStateToConfig(stateTmp);
 
         layers.at(k).q_init = qi;
         layers.at(k).q_goal = qg;
@@ -308,6 +308,8 @@ void MotionPlanner::CreateHierarchy()
     //  hierarchy->AddLevel( idxs, input.q_init, input.q_goal);
     //  hierarchy->AddLevel( idxs, input.q_init, input.q_goal); 
     //}
+
+
     config_init_levels.push_back(input.q_init);
     config_goal_levels.push_back(input.q_goal);
     // hierarchy->AddRootNode( std::make_shared<Roadmap>() ); 
@@ -370,11 +372,9 @@ void MotionPlanner::Step()
 {
   if(!active) return;
   current_level = 0;
-  // current_level_node = 0;
-  // current_path.clear();
-  // viewHierarchy.Clear();
 
-  if(!strategy->IsInitialized()){
+  if(!strategy->IsInitialized())
+  {
     InitStrategy();
   }
 
@@ -389,6 +389,7 @@ void RunPlanner(StrategyPtr strategy, StrategyOutput* output, std::atomic<bool>&
 {
     strategy->Plan(*output);
     threadRunning = false;
+    std::cout << "Strategy thread terminated." << std::endl;
 }
 
 bool MotionPlanner::isRunning()
