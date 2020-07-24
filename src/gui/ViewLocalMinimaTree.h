@@ -23,6 +23,7 @@ namespace ompl
     OMPL_CLASS_FORWARD(LocalMinimaNode);
   }
 }
+class PathPiecewiseLinear;
 
 // Different modes to display: (1) Display complete structure
 // (2) Display current selected minimum + siblings
@@ -43,6 +44,8 @@ class ViewLocalMinimaTree
 
     bool drawBound,drawPlotArea;
     GLDraw::GLColor boundColor, plotAreaColor, textColor, nodeColor, nodeSelectedColor, nodeUnselectedColor;
+
+    PathPiecewiseLinear *getPathSelected();
     void DrawGL(GUIState& state);
     void DrawGLScreen(double x, double y);
     void DrawNode( double x, double y, double radius, int number = 0);
@@ -52,6 +55,7 @@ class ViewLocalMinimaTree
     void DrawGLNodeUnSelected(GUIState& state, ompl::multilevel::LocalMinimaNode* node);
     void DrawGLNodeSelected(GUIState& state, ompl::multilevel::LocalMinimaNode* node);
   private:
+    PathPiecewiseLinear *pathSelected_;
     ompl::multilevel::LocalMinimaTreePtr localMinimaTree_;
     std::vector<CSpaceOMPL*> cspace_levels_;
 };

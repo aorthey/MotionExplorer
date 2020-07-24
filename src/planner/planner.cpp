@@ -24,8 +24,8 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   pwl = nullptr;
   active = true;
   current_level = 0;
-  current_level_node = 0;
-  current_path.clear();
+  // current_level_node = 0;
+  // current_path.clear();
   this->world->InitCollisions();
   if(input.kinodynamic){
     strategy = std::make_shared<StrategyKinodynamicMultiLevel>();
@@ -198,7 +198,7 @@ CSpaceOMPL* MotionPlanner::ComputeCSpaceLayer(const Layer &layer)
 
 void MotionPlanner::CreateHierarchy()
 {
-  hierarchy = std::make_shared<HierarchicalRoadmap>();
+  // hierarchy = std::make_shared<HierarchicalRoadmap>();
   std::string algorithm = input.name_algorithm;
 
   WorldPlannerSettings worldsettings;
@@ -216,12 +216,13 @@ void MotionPlanner::CreateHierarchy()
 
       cspace_levels.push_back( cspace_level_k );
 
+      Config qi;
+      Config qg;
+
       if(!layers.at(k).isMultiAgent){
-        int io = layers.at(k).outer_index;
-        int ii = layers.at(k).inner_index;
+        // int io = layers.at(k).outer_index;
+        // int ii = layers.at(k).inner_index;
         uint N = cspace_level_k->GetKlamptDimensionality();
-        // Config qi = input.q_init; qi.resize(N);
-        // Config qg = input.q_goal; qg.resize(N);
 
         Config qi_full = input.q_init; qi_full.resize(N);
         Config qg_full = input.q_goal; qg_full.resize(N);
@@ -231,30 +232,9 @@ void MotionPlanner::CreateHierarchy()
         cspace_level_k->ConfigToOMPLState(qg_full, stateTmp);
         Config qg = cspace_level_k->OMPLStateToConfig(stateTmp);
 
-        //############################################################################
-        //SANITY CHECK
-        // bool invalid = ((qi - qi_proj).norm() > 1e-10);
-        // invalid |= ((qg - qg_proj).norm() > 1e-10);
-
-        // if(invalid){
-        //   std::cout << "Error: Projected Config does not equal stated Config." << std::endl;
-        //   std::cout << "Qinit (orig): " << qi << std::endl;
-        //   std::cout << "Qinit (proj): " << qi_proj << std::endl;
-        //   std::cout << "Qgoal (orig): " << qg << std::endl;
-        //   std::cout << "Qgoal (proj): " << qg_proj << std::endl;
-        //   throw "Error";
-        // }
-        //############################################################################
-
         layers.at(k).q_init = qi;
         layers.at(k).q_goal = qg;
-        if(k==0){
-          //add a root node
-          hierarchy->AddLevel( ii, io, qi, qg);
-        }
-        hierarchy->AddLevel( ii, io, qi, qg); 
       }else{
-        Config qi,qg;
         if(k>=layers.size()-1)
         {
           qi = input.q_init;
@@ -286,23 +266,10 @@ void MotionPlanner::CreateHierarchy()
         cspace_level_k->ConfigToOMPLState(qg_full, stateTmp);
         qg = cspace_level_k->OMPLStateToConfig(stateTmp);
 
-        if(k==0){
-          //add a root node
-          hierarchy->AddLevel( idxs, qi, qg);
-        }
-        hierarchy->AddLevel( idxs, qi, qg); 
-
       }
+      config_init_levels.push_back(qi);
+      config_goal_levels.push_back(qg);
       cspace_level_k->SpaceInformationPtr()->freeState(stateTmp);
-    }
-
-    //empty roadmap on the highest level (so that we can collapse the whole
-    //hierarchy into a singleton node)
-    hierarchy->AddRootNode( std::make_shared<Roadmap>() ); 
-    std::vector<int> path;
-    for(uint k = 0; k < cspace_levels.size(); k++){
-      hierarchy->AddNode( std::make_shared<Roadmap>(), path ); 
-      path.push_back(0);
     }
 
     //Check if any levels have constraint relaxations
@@ -324,24 +291,28 @@ void MotionPlanner::CreateHierarchy()
     Layer layer = input.stratifications.front().layers.back();
     CSpaceOMPL *cspace = ComputeCSpaceLayer(layer);
     cspace_levels.push_back(cspace);
-    if(!layer.isMultiAgent){
-      //shallow algorithm (use last robot in hierarchy)
-      //two levels, so we can collapse the roadmap 
-      uint N = cspace->GetRobotPtr()->q.size();
-      Config qi = input.q_init; qi.resize(N);
-      Config qg = input.q_goal; qg.resize(N);
-      int ri = cspace->GetRobotIndex();
-      hierarchy->AddLevel(ri, qi, qg);
-      hierarchy->AddLevel(ri, qi, qg);
+    // Config qi;
+    // Config qg;
+    //if(!layer.isMultiAgent){
+    //  //shallow algorithm (use last robot in hierarchy)
+    //  //two levels, so we can collapse the roadmap 
+    //  uint N = cspace->GetRobotPtr()->q.size();
+    //  Config qi = input.q_init; qi.resize(N);
+    //  Config qg = input.q_goal; qg.resize(N);
+    //  int ri = cspace->GetRobotIndex();
+    //  hierarchy->AddLevel(ri, qi, qg);
+    //  hierarchy->AddLevel(ri, qi, qg);
 
-    }else{
-      std::vector<int> idxs = static_cast<CSpaceOMPLMultiAgent*>(cspace)->GetRobotIdxs();
-      hierarchy->AddLevel( idxs, input.q_init, input.q_goal);
-      hierarchy->AddLevel( idxs, input.q_init, input.q_goal); 
-    }
-    hierarchy->AddRootNode( std::make_shared<Roadmap>() ); 
-    std::vector<int> path;
-    hierarchy->AddNode( std::make_shared<Roadmap>(), path ); 
+    //}else{
+    //  std::vector<int> idxs = static_cast<CSpaceOMPLMultiAgent*>(cspace)->GetRobotIdxs();
+    //  hierarchy->AddLevel( idxs, input.q_init, input.q_goal);
+    //  hierarchy->AddLevel( idxs, input.q_init, input.q_goal); 
+    //}
+    config_init_levels.push_back(input.q_init);
+    config_goal_levels.push_back(input.q_goal);
+    // hierarchy->AddRootNode( std::make_shared<Roadmap>() ); 
+    // std::vector<int> path;
+    // hierarchy->AddNode( std::make_shared<Roadmap>(), path ); 
   }
 
   if(util::StartsWith(algorithm, "benchmark") || 
@@ -370,11 +341,9 @@ void MotionPlanner::Clear()
   if(!active) return;
   pwl = nullptr;
   current_level = 0;
-  current_level_node = 0;
-  current_path.clear();
 
   strategy->Clear();
-  viewHierarchy.Clear();
+  // viewHierarchy.Clear();
 }
 
 void MotionPlanner::InitStrategy()
@@ -401,70 +370,48 @@ void MotionPlanner::Step()
 {
   if(!active) return;
   current_level = 0;
-  current_level_node = 0;
-  current_path.clear();
-  viewHierarchy.Clear();
+  // current_level_node = 0;
+  // current_path.clear();
+  // viewHierarchy.Clear();
 
   if(!strategy->IsInitialized()){
     InitStrategy();
   }
 
-  StrategyOutput output(cspace_levels.back());
+  output = new StrategyOutput(cspace_levels.back());
   resetTime();
-  strategy->Step(output);
+  strategy->Step(*output);
   time = getTime();
-  output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
+  // output->GetHierarchicalRoadmap( hierarchy, cspace_levels );
 }
 
-void MotionPlanner::StepOneLevel()
-{
-  if(!active) return;
-  if(cspace_levels.size()<=2)
-  {
-    return AdvanceUntilSolution();
-  }
-
-  if(!strategy->IsInitialized()){
-    current_level = 0;
-    current_level_node = 0;
-    current_path.clear();
-    viewHierarchy.Clear();
-    InitStrategy();
-  }
-
-  StrategyOutput output(cspace_levels.back());
-
-  uint numberOfSolutionPathsCurrentLevel = 0;
-  resetTime();
-  while(numberOfSolutionPathsCurrentLevel < 1)
-  {
-    strategy->Step(output);
-    output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
-    numberOfSolutionPathsCurrentLevel = hierarchy->NumberNodesOnLevel(current_level+2);
-  }
-  time = getTime();
-}
-
-void RunPlanner(StrategyPtr strategy, StrategyOutput* output)
+void RunPlanner(StrategyPtr strategy, StrategyOutput* output, std::atomic<bool>& threadRunning)
 {
     strategy->Plan(*output);
+    threadRunning = false;
+}
+
+bool MotionPlanner::isRunning()
+{
+  return threadRunning;
 }
 
 void MotionPlanner::AdvanceUntilSolution()
 {
   if(!active) return;
+  if(threadRunning){
+    std::cout << "Tried Restarting planner, but thread still running." << std::endl;
+    return;
+  }
 
   if(!strategy->IsInitialized()){
     InitStrategy();
-    current_level = 0;
-    current_level_node = 0;
-    current_path.clear();
-    viewHierarchy.Clear();
   }
 
   if(!util::StartsWith(input.name_algorithm,"benchmark")){
     output = new StrategyOutput(cspace_levels.back());
-    std::thread threadStrategy(RunPlanner, std::ref(strategy), std::ref(output));
+    threadRunning = true;
+    std::thread threadStrategy(RunPlanner, std::ref(strategy), std::ref(output), std::ref(threadRunning));
     threadStrategy.detach();
     // output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
     // std::cout << output << std::endl;
@@ -535,9 +482,8 @@ CSpaceOMPL* MotionPlanner::GetCSpace()
 PathPiecewiseLinear* MotionPlanner::GetPath()
 {
   if(!active) return nullptr;
-  Rcurrent = hierarchy->GetNodeContent(current_path);
-  pwl = Rcurrent->GetShortestPath();
-  return pwl;
+  if(!hasLocalMinimaTree()) return nullptr;
+  return viewLocalMinimaTree_->getPathSelected();
 }
 
 void MotionPlanner::DrawGL(GUIState& state)
@@ -633,29 +579,20 @@ void MotionPlanner::DrawGL(GUIState& state)
   //    }
   //}
 
-  unsigned maxLevel = hierarchy->NumberLevels()-1;
-  std::vector<int> ridx = hierarchy->GetRobotIdxs(current_level);
-  std::vector<int> ridx_outer = hierarchy->GetRobotIdxs(maxLevel);
+  // unsigned maxLevel = hierarchy->NumberLevels()-1;
+  // std::vector<int> ridx = hierarchy->GetRobotIdxs(current_level);
+  // std::vector<int> ridx_outer = hierarchy->GetRobotIdxs(maxLevel);
 
-  std::vector<Robot*> robots;
-  std::vector<Robot*> robots_outer;
-  for(uint k = 0; k < ridx.size(); k++){
-    if(ridx.at(k)>=0)
-    robots.push_back( world->robots[ridx.at(k)] );
-  }
-  for(uint k = 0; k < ridx_outer.size(); k++){
-    if(ridx_outer.at(k)>=0)
-    robots_outer.push_back( world->robots[ridx_outer.at(k)] );
-  }
-
-  const Config qi = hierarchy->GetInitConfig(current_level);
-  const Config qg = hierarchy->GetGoalConfig(current_level);
-
-  const Config qiOuter = hierarchy->GetInitConfig(maxLevel);
-  const Config qgOuter = hierarchy->GetGoalConfig(maxLevel);
-
-  const GLColor ultralightred_sufficient(0.8,0,0,0.3);
-  const GLColor ultralightgreen_sufficient(0,0.5,0,0.2);
+  // std::vector<Robot*> robots;
+  // std::vector<Robot*> robots_outer;
+  // for(uint k = 0; k < ridx.size(); k++){
+  //   if(ridx.at(k)>=0)
+  //   robots.push_back( world->robots[ridx.at(k)] );
+  // }
+  // for(uint k = 0; k < ridx_outer.size(); k++){
+  //   if(ridx_outer.at(k)>=0)
+  //   robots_outer.push_back( world->robots[ridx_outer.at(k)] );
+  // }
 
   for(uint k = 0; k < cspace_levels.size(); k++)
   {
@@ -663,22 +600,36 @@ void MotionPlanner::DrawGL(GUIState& state)
       ck->DrawGL(state);
   }
 
+  const Config qi = config_init_levels.at(current_level);//hierarchy->GetInitConfig(current_level);
+  const Config qg = config_goal_levels.at(current_level);//hierarchy->GetGoalConfig(current_level);
+
+  // const Config qiOuter = hierarchy->GetInitConfig(maxLevel);
+  // const Config qgOuter = hierarchy->GetGoalConfig(maxLevel);
+
+  // const GLColor ultralightred_sufficient(0.8,0,0,0.3);
+  // const GLColor ultralightgreen_sufficient(0,0.5,0,0.2);
+
+
   const GLColor colorGoalConfiguration = GLDraw::getColorRobotGoalConfiguration();
   const GLColor colorStartConfiguration = GLDraw::getColorRobotStartConfiguration();
-  const GLColor colorGoalConfigurationTransparent = GLDraw::getColorRobotGoalConfigurationTransparent();
-  const GLColor colorStartConfigurationTransparent = GLDraw::getColorRobotStartConfigurationTransparent();
+  // const GLColor colorGoalConfigurationTransparent = GLDraw::getColorRobotGoalConfigurationTransparent();
+  // const GLColor colorStartConfigurationTransparent = GLDraw::getColorRobotStartConfigurationTransparent();
 
+  CSpaceOMPL* cspace = cspace_levels.at(current_level);
   if(state("planner_draw_start_configuration")){
-    GLDraw::drawRobotsAtConfig(robots, qi, colorStartConfiguration);
-    if(state("planner_draw_start_goal_configuration_sufficient")){
-      GLDraw::drawRobotsAtConfig(robots_outer, qiOuter, colorStartConfigurationTransparent);
-    }
+    // cGLDraw::drawRobotsAtConfig(robots, qi, colorStartConfiguration);
+    cspace->drawConfig(qi, colorStartConfiguration);
+    // if(state("planner_draw_start_goal_configuration_sufficient")){
+    //   GLDraw::drawRobotsAtConfig(robots_outer, qiOuter, colorStartConfigurationTransparent);
+    // }
   }
   if(state("planner_draw_goal_configuration")){
-    GLDraw::drawRobotsAtConfig(robots, qg, colorGoalConfiguration);
-    if(state("planner_draw_start_goal_configuration_sufficient")){
-      GLDraw::drawRobotsAtConfig(robots_outer, qgOuter, colorGoalConfigurationTransparent);
-    }
+    cspace->drawConfig(qg, colorGoalConfiguration);
+    // if(state("planner_draw_start_goal_configuration_sufficient")){
+    // GLDraw::drawRobotsAtConfig(robots, qg, colorGoalConfiguration);
+    // if(state("planner_draw_start_goal_configuration_sufficient")){
+    //   GLDraw::drawRobotsAtConfig(robots_outer, qgOuter, colorGoalConfigurationTransparent);
+    // }
   }
 
 }
@@ -705,18 +656,8 @@ std::ostream& operator<< (std::ostream& out, const MotionPlanner& planner)
   out << " Planner: " << std::endl;
   out << std::string(80, '-') << std::endl;
   out << " Robots  " << std::endl;
-  for(uint k = 0; k < planner.hierarchy->NumberLevels(); k++){
-    uint ii = planner.hierarchy->GetInnerRobotIdx(k);
-    uint io = planner.hierarchy->GetOuterRobotIdx(k);
-    Robot* ri = planner.world->robots[ii];
-    Robot* ro = planner.world->robots[io];
-    out << " Level" << k << std::endl;
-    out << "   Robot (inner) : idx " << ii << " name " << ri->name << std::endl;
-    out << "   Robot (outer) : idx " << io << " name " << ro->name << std::endl;
-    Config qi = planner.hierarchy->GetInitConfig(k);
-    Config qg = planner.hierarchy->GetGoalConfig(k);
-    out << "      qinit      : " << qi << std::endl;
-    out << "      qgoal      : " << qg << std::endl;
+  for(uint k = 0; k < planner.cspace_levels.size(); k++){
+    std::cout << "Level:" << k << std::endl;
   }
   out << std::string(80, '-') << std::endl;
   return out;

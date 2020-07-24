@@ -1,6 +1,7 @@
 #include "forcefield_cylindrical.h"
 #include "gui/drawMotionPlanner.h"
 #include "gui/colors.h"
+#include "KrisLibrary/math3d/basis.h"
 
 using namespace Math3D;
 const double minimumRadiusSingularity = 0.05;

@@ -30,28 +30,35 @@ ViewLocalMinimaTree::ViewLocalMinimaTree(ompl::multilevel::LocalMinimaTreePtr lo
   node_radius_selected = node_radius;
 }
 
+PathPiecewiseLinear* ViewLocalMinimaTree::getPathSelected()
+{
+  return pathSelected_;
+}
+
 void ViewLocalMinimaTree::DrawGLNodeSelected(GUIState& state, LocalMinimaNode* node)
 {
   if(node == nullptr) return;
 
+  int level = node->getLevel();
   if(node->customRepresentation == nullptr)
   {
       auto path = node->asPathPtr();
       PathPiecewiseLinear *pwl = new PathPiecewiseLinear(path, cspace_levels_.back(),
-          cspace_levels_.at(node->getLevel()));
+          cspace_levels_.at(level));
       node->customRepresentation = pwl;
   }
 
-  PathPiecewiseLinear *pwl = static_cast<PathPiecewiseLinear*>(node->customRepresentation);
+  pathSelected_ = static_cast<PathPiecewiseLinear*>(node->customRepresentation);
 
-  pwl->zOffset = 0.001;
-  pwl->ptsize = 1;
-  pwl->linewidth = 0.05;
-  pwl->widthBorder = 0.001;
-  pwl->setColor(magenta);
-  pwl->drawSweptVolume = false;
-  pwl->drawCross = false;
-  pwl->DrawGL(state);
+
+  pathSelected_->zOffset = 0.001;
+  pathSelected_->ptsize = 1;
+  pathSelected_->linewidth = 0.05;
+  pathSelected_->widthBorder = 0.001;
+  pathSelected_->setColor(magenta);
+  pathSelected_->drawSweptVolume = true;
+  pathSelected_->drawCross = false;
+  pathSelected_->DrawGL(state);
 
 }
 void ViewLocalMinimaTree::DrawGLNodeUnSelected(GUIState& state, LocalMinimaNode* node)

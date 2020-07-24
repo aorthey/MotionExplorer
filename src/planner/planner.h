@@ -4,7 +4,7 @@
 #include "elements/hierarchical_roadmap.h"
 #include "elements/path_pwl.h"
 #include "gui/gui_state.h"
-#include "gui/ViewHierarchy.h"
+// #include "gui/ViewHierarchy.h"
 
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 #include <Modeling/World.h> //RobotWorld
@@ -13,6 +13,7 @@
 #include <tinyxml.h>
 #include <vector>
 #include <memory>
+#include <atomic>
 #include <boost/thread.hpp>
 
 
@@ -49,7 +50,6 @@ class MotionPlanner{
 
     //operations on motion planning strategy (the underlying algorithm)
     virtual void Step();
-    virtual void StepOneLevel();
     virtual void AdvanceUntilSolution();
     
     virtual void DrawGL(GUIState&);
@@ -66,6 +66,8 @@ class MotionPlanner{
 
     double getLastIterationTime();
     bool hasChanged();
+    bool isRunning();
+
   protected:
     MotionPlanner() = delete;
 
@@ -75,23 +77,28 @@ class MotionPlanner{
     void resetTime();
     double getTime();
 
+    std::atomic<bool> threadRunning{false};
+
     double time{0};
     bool active;
 
-    //TODO: Prune all Hi structures
+    //TODO: Prune all depr Hi structures
     uint current_level; //vertical level in hierarchy (tree)
-    uint current_level_node; //horizontal node inside a level
-    std::vector<int> current_path; //current selected path through tree
-    HierarchicalRoadmapPtr hierarchy;
-    RoadmapPtr Rcurrent;
-    void CreateHierarchy();
-    ViewHierarchy viewHierarchy;
+    // uint current_level_node; //horizontal node inside a level
+    // std::vector<int> current_path; //current selected path through tree
+    // HierarchicalRoadmapPtr hierarchy;
+    // RoadmapPtr Rcurrent;
+    // ViewHierarchy viewHierarchy;
+
+    //Novel Hi Structure
     ViewLocalMinimaTreePtr viewLocalMinimaTree_;
     LocalMinimaTreePtr localMinimaTree_;
     bool hasLocalMinimaTree();
 
     RobotWorld *world;
     std::vector<CSpaceOMPL*> cspace_levels;
+    std::vector<Config> config_init_levels;
+    std::vector<Config> config_goal_levels;
     std::vector<std::vector<CSpaceOMPL*>> cspace_stratifications;
 
     void InitStrategy();
@@ -100,6 +107,7 @@ class MotionPlanner{
     StrategyPtr strategy; //the actual algorithm implementation
     StrategyOutput *output;
 
+    void CreateHierarchy();
     // \brief solution path of planner
     PathPiecewiseLinear *pwl; 
     CSpaceOMPL* ComputeCSpace(const std::string type, const uint robot_index, bool freeFloating);

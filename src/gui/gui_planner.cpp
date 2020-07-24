@@ -58,9 +58,6 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="planner_step"){
     last_command = "Step";
     planners.at(active_planner)->Step();
-  }else if(cmd=="planner_step_one_level"){
-    planners.at(active_planner)->StepOneLevel();
-    hierarchy_change = true;
   }else if(cmd=="planner_clear"){
     last_command = "Clear";
     planners.at(active_planner)->Clear();
@@ -381,18 +378,9 @@ void PlannerBackend::RenderWorld(){
           std::cout << "No path available." << std::endl;
         }
       }
-    }
-    if(t>0 && path){
-      path->DrawGL(state, t);
-      // controller_->nominalTimeStep  = 0.05;
-      //
-      // controller_->Update(t);
-      // Config q, qdes;
-      // controller_->GetSensedConfig(q);
-      // controller_->GetCommandedConfig(qdes);
-
-      // std::cout << controller_->time << " : " << q << " (" << qdes << ")" << std::endl;
-      // path->GetSpace()->drawConfig(q);
+      if(t>0 && path!=nullptr){
+        path->DrawGL(state, t);
+      }
     }
   }
   //if(planner->GetInput().kinodynamic){
