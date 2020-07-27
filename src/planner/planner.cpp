@@ -515,27 +515,27 @@ void MotionPlanner::DrawGL(GUIState& state)
       viewLocalMinimaTree_->DrawGL(state);
       DrawGLStartGoal(state);
   }else{
-      if(output != nullptr)
-      {
-          output->DrawGL(state, current_level);
-          if(!hasLocalMinimaTree())
-          {
-            PathPiecewiseLinear *pwl = output->getSolutionPath(current_level);
-            if(pwl != nullptr)
-            {
-                pwl->linewidth = input.pathWidth;
-                pwl->widthBorder= input.pathBorderWidth;
-                pwl->zOffset = 0.001;
-                pwl->ptsize = 8;
-                pwl->drawSweptVolume = false;
-                pwl->drawCross = false;
-                const GLColor magenta(0.7,0,0.7,1);
-                pwl->setColor(magenta);
-                pwl->DrawGL(state);
-            }
-          }
-      }
       DrawGLStartGoal(state);
+  }
+  if(output != nullptr)
+  {
+      output->DrawGL(state, current_level);
+      if(!hasLocalMinimaTree())
+      {
+        PathPiecewiseLinear *pwl = output->getSolutionPath(current_level);
+        if(pwl != nullptr)
+        {
+            pwl->linewidth = input.pathWidth;
+            pwl->widthBorder= input.pathBorderWidth;
+            pwl->zOffset = 0.001;
+            pwl->ptsize = 8;
+            pwl->drawSweptVolume = false;
+            pwl->drawCross = false;
+            const GLColor magenta(0.7,0,0.7,1);
+            pwl->setColor(magenta);
+            pwl->DrawGL(state);
+        }
+      }
   }
   // DrawGLStartGoal(state);
 

@@ -56,7 +56,7 @@ void ViewLocalMinimaTree::DrawGLNodeSelected(GUIState& state, LocalMinimaNode* n
   pathSelected_->linewidth = 0.05;
   pathSelected_->widthBorder = 0.001;
   pathSelected_->setColor(magenta);
-  pathSelected_->drawSweptVolume = false;
+  pathSelected_->drawSweptVolume = true;
   pathSelected_->drawCross = false;
   pathSelected_->DrawGL(state);
 
