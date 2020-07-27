@@ -84,7 +84,8 @@ class MotionPlanner{
     ViewLocalMinimaTreePtr viewLocalMinimaTree_;
     LocalMinimaTreePtr localMinimaTree_;
     bool hasLocalMinimaTree();
-    uint current_level;
+    uint current_level{0};
+    uint max_levels_{0};
 
     RobotWorld *world;
     std::vector<CSpaceOMPL*> cspace_levels;

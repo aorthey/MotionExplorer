@@ -12,6 +12,7 @@ namespace om = ompl::multilevel;
 StrategyOutput::StrategyOutput(std::vector<CSpaceOMPL*> cspace_levels):
   cspace_levels_(cspace_levels)
 {
+  pathVec_.resize(cspace_levels.size(), nullptr);
 }
 
 void StrategyOutput::SetPlannerData( ob::PlannerDataPtr pd)
@@ -32,9 +33,9 @@ PathPiecewiseLinear* StrategyOutput::getSolutionPath(int level)
   ob::ProblemDefinitionPtr pdef = pdefVec_.at(level);
   if(pdef->hasExactSolution() || pdef->hasApproximateSolution())
   {
-      path_ = new PathPiecewiseLinear(pdef->getSolutionPath(), 
+      pathVec_.at(level) = new PathPiecewiseLinear(pdef->getSolutionPath(), 
           cspace_levels_.back(), cspace_levels_.at(level));
-      return path_;
+      return pathVec_.at(level);
   }else{
       return nullptr;
   }
@@ -53,7 +54,9 @@ bool StrategyOutput::hasApproximateSolution(){
   for(uint k = 0; k < pdefVec_.size(); k++)
   {
     if(pdefVec_.at(k)->hasApproximateSolution())
+    {
       return true;
+    }
   }
   return false;
 }
@@ -66,13 +69,14 @@ void StrategyOutput::DrawGL(GUIState& state, int level)
 {
   if(roadmap_ != nullptr)
   {
-    roadmap_->DrawGL(state, level);
+      roadmap_->DrawGL(state, level);
   }
 }
 void StrategyOutput::DrawGLPath(GUIState& state, int level)
 {
-    path_ = getSolutionPath(level);
-    path_->DrawGL(state);
+  std::cout << "DRAWGL " << level << std::endl;
+    // pathVec_.at(level) = getSolutionPath(level);
+    pathVec_.at(level)->DrawGL(state);
 }
 
 std::ostream& operator<< (std::ostream& out, const StrategyOutput& so) 

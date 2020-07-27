@@ -374,9 +374,9 @@ void PlannerBackend::RenderWorld(){
     if(state("draw_play_path")){
       if(t<=0){
         path = planner->GetPath();
-        if(!path){
-          std::cout << "No path available." << std::endl;
-        }
+        // if(!path){
+          // std::cout << "No path available." << std::endl;
+        // }
       }
       if(t>0 && path!=nullptr){
         path->DrawGL(state, t);

@@ -11,7 +11,9 @@ namespace ob = ompl::base;
 namespace og = ompl::geometric;
 
 OMPL_CLASS_FORWARD(Roadmap);
-struct StrategyOutput{
+
+struct StrategyOutput
+{
 
   public:
 
@@ -46,7 +48,7 @@ struct StrategyOutput{
 
     ob::PlannerDataPtr plannerData_;
 
-    PathPiecewiseLinear *path_;
+    std::vector<PathPiecewiseLinear*> pathVec_;
 
     std::vector<ob::ProblemDefinitionPtr> pdefVec_;
 

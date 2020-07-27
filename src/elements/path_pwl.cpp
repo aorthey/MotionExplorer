@@ -42,9 +42,9 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
 
     if(!quotient_space->isDynamic()){
 
-      og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+      og::PathGeometric& gpath = static_cast<og::PathGeometric&>(*path);
+      gpath.interpolate();
       length = gpath.length();
-      // gpath.interpolate();
       std::vector<ob::State *> states = gpath.getStates();
 
       uint Nstates = std::max(0,(int)states.size()-1);

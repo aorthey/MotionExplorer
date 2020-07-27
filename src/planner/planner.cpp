@@ -25,6 +25,7 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   pwl = nullptr;
   active = true;
   current_level = 0;
+  max_levels_ = 0;
   threading = input.threading;
   std::cout << "THREADING: "<< (threading?"ON":"OFF") << std::endl;
 
@@ -215,6 +216,7 @@ void MotionPlanner::CreateHierarchy()
   if(util::StartsWith(algorithm, "hierarchy"))
   {
     std::vector<Layer> layers = input.stratifications.front().layers;
+    max_levels_ = layers.size()-1;
     for(uint k = 0; k < layers.size(); k++)
     {
       CSpaceOMPL *cspace_level_k = ComputeCSpaceLayer(layers.at(k));
@@ -291,7 +293,7 @@ void MotionPlanner::CreateHierarchy()
     }
 
   }else{
-
+    max_levels_ = 0;
     Layer layer = input.stratifications.front().layers.back();
     CSpaceOMPL *cspace = ComputeCSpaceLayer(layer);
     cspace_levels.push_back(cspace);
@@ -419,15 +421,31 @@ bool MotionPlanner::isActive()
 void MotionPlanner::Expand()
 {
   if(!active) return;
-  if(!hasLocalMinimaTree()) return;
-  localMinimaTree_->setSelectedMinimumExpand();
+  if(hasLocalMinimaTree())
+  {
+    localMinimaTree_->setSelectedMinimumExpand();
+  }else
+  {
+    if(current_level < max_levels_)
+    {
+      current_level++;
+    }
+  }
 }
 
 void MotionPlanner::Collapse()
 {
   if(!active) return;
-  if(!hasLocalMinimaTree()) return;
-  localMinimaTree_->setSelectedMinimumCollapse();
+  if(hasLocalMinimaTree())
+  {
+      localMinimaTree_->setSelectedMinimumCollapse();
+      return;
+  }else{
+    if(current_level > 0)
+    {
+      current_level--;
+    }
+  }
 }
 
 void MotionPlanner::Next()
@@ -475,7 +493,7 @@ PathPiecewiseLinear* MotionPlanner::GetPath()
   }else{
     if(output != nullptr)
     {
-      if(output->hasExactSolution() || output->hasApproximateSolution())
+      if(!hasLocalMinimaTree())
       {
           return output->getSolutionPath(current_level);
       }
@@ -618,36 +636,29 @@ void MotionPlanner::DrawGL(GUIState& state)
       ck->DrawGL(state);
   }
 
-  const Config qi = config_init_levels.at(current_level);//hierarchy->GetInitConfig(current_level);
-  const Config qg = config_goal_levels.at(current_level);//hierarchy->GetGoalConfig(current_level);
+  const Config qi = config_init_levels.at(current_level);
+  const Config qg = config_goal_levels.at(current_level);
 
-  // const Config qiOuter = hierarchy->GetInitConfig(maxLevel);
-  // const Config qgOuter = hierarchy->GetGoalConfig(maxLevel);
+  const Config qiOuter = config_init_levels.at(max_levels_);
+  const Config qgOuter = config_goal_levels.at(max_levels_);
 
-  // const GLColor ultralightred_sufficient(0.8,0,0,0.3);
-  // const GLColor ultralightgreen_sufficient(0,0.5,0,0.2);
-
+  const GLColor ultralightred_sufficient(0.8,0,0,0.3);
+  const GLColor ultralightgreen_sufficient(0,0.5,0,0.2);
 
   const GLColor colorGoalConfiguration = GLDraw::getColorRobotGoalConfiguration();
   const GLColor colorStartConfiguration = GLDraw::getColorRobotStartConfiguration();
-  // const GLColor colorGoalConfigurationTransparent = GLDraw::getColorRobotGoalConfigurationTransparent();
-  // const GLColor colorStartConfigurationTransparent = GLDraw::getColorRobotStartConfigurationTransparent();
+  const GLColor colorGoalConfigurationTransparent = GLDraw::getColorRobotGoalConfigurationTransparent();
+  const GLColor colorStartConfigurationTransparent = GLDraw::getColorRobotStartConfigurationTransparent();
 
-  CSpaceOMPL* cspace = cspace_levels.at(current_level);
+  CSpaceOMPL* qspace = cspace_levels.at(current_level);
+  CSpaceOMPL* cspace = cspace_levels.at(max_levels_);
   if(state("planner_draw_start_configuration")){
-    // cGLDraw::drawRobotsAtConfig(robots, qi, colorStartConfiguration);
-    cspace->drawConfig(qi, colorStartConfiguration);
-    // if(state("planner_draw_start_goal_configuration_sufficient")){
-    //   GLDraw::drawRobotsAtConfig(robots_outer, qiOuter, colorStartConfigurationTransparent);
-    // }
+    qspace->drawConfig(qi, colorStartConfiguration);
+    cspace->drawConfig(qiOuter, colorStartConfigurationTransparent);
   }
   if(state("planner_draw_goal_configuration")){
-    cspace->drawConfig(qg, colorGoalConfiguration);
-    // if(state("planner_draw_start_goal_configuration_sufficient")){
-    // GLDraw::drawRobotsAtConfig(robots, qg, colorGoalConfiguration);
-    // if(state("planner_draw_start_goal_configuration_sufficient")){
-    //   GLDraw::drawRobotsAtConfig(robots_outer, qgOuter, colorGoalConfigurationTransparent);
-    // }
+    qspace->drawConfig(qg, colorGoalConfiguration);
+    cspace->drawConfig(qgOuter, colorGoalConfigurationTransparent);
   }
 
 }
