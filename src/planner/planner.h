@@ -1,10 +1,8 @@
 #pragma once
 
 #include "planner/planner_input.h"
-#include "elements/hierarchical_roadmap.h"
 #include "elements/path_pwl.h"
 #include "gui/gui_state.h"
-// #include "gui/ViewHierarchy.h"
 
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 #include <Modeling/World.h> //RobotWorld
@@ -46,7 +44,6 @@ class MotionPlanner{
     virtual void Collapse();
     virtual void Next();
     virtual void Previous();
-    void UpdateHierarchy();
 
     //operations on motion planning strategy (the underlying algorithm)
     virtual void Step();
@@ -82,6 +79,7 @@ class MotionPlanner{
 
     double time{0};
     bool active;
+    bool threading{false};
 
     ViewLocalMinimaTreePtr viewLocalMinimaTree_;
     LocalMinimaTreePtr localMinimaTree_;
@@ -98,7 +96,7 @@ class MotionPlanner{
 
     PlannerInput input;
     StrategyPtr strategy; //the actual algorithm implementation
-    StrategyOutput *output;
+    StrategyOutput *output{nullptr};
 
     void CreateHierarchy();
     // \brief solution path of planner

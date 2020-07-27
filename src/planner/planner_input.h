@@ -93,6 +93,7 @@ class PlannerInput{
     //contact-planning
     int freeFloating;
     bool contactPlanner{false};
+    bool threading{false};
     
     // access to surface triangles of objects/obstacles
     std::vector<Triangle3D> tris;

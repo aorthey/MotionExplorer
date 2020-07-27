@@ -7,6 +7,7 @@
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include "gui/drawMotionPlanner.h"
 #include "util.h"
+#include "common.h"
 #include "gui/ViewLocalMinimaTree.h"
 #include <ompl/multilevel/planners/explorer/MotionExplorer.h>
 #include <ompl/multilevel/planners/explorer/MotionExplorerQMP.h>
@@ -24,6 +25,9 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   pwl = nullptr;
   active = true;
   current_level = 0;
+  threading = input.threading;
+  std::cout << "THREADING: "<< (threading?"ON":"OFF") << std::endl;
+
   // current_level_node = 0;
   // current_path.clear();
   this->world->InitCollisions();
@@ -208,9 +212,11 @@ void MotionPlanner::CreateHierarchy()
   //For each level, compute the inputs/cspaces for each robot
   //#########################################################################
 
-  if(util::StartsWith(algorithm, "hierarchy")){
+  if(util::StartsWith(algorithm, "hierarchy"))
+  {
     std::vector<Layer> layers = input.stratifications.front().layers;
-    for(uint k = 0; k < layers.size(); k++){
+    for(uint k = 0; k < layers.size(); k++)
+    {
       CSpaceOMPL *cspace_level_k = ComputeCSpaceLayer(layers.at(k));
       ob::State *stateTmp = cspace_level_k->SpaceInformationPtr()->allocState();
 
@@ -220,8 +226,6 @@ void MotionPlanner::CreateHierarchy()
       Config qg;
 
       if(!layers.at(k).isMultiAgent){
-        // int io = layers.at(k).outer_index;
-        // int ii = layers.at(k).inner_index;
         uint N = cspace_level_k->GetKlamptDimensionality();
 
         Config qi_full = input.q_init; qi_full.resize(N);
@@ -291,30 +295,9 @@ void MotionPlanner::CreateHierarchy()
     Layer layer = input.stratifications.front().layers.back();
     CSpaceOMPL *cspace = ComputeCSpaceLayer(layer);
     cspace_levels.push_back(cspace);
-    // Config qi;
-    // Config qg;
-    //if(!layer.isMultiAgent){
-    //  //shallow algorithm (use last robot in hierarchy)
-    //  //two levels, so we can collapse the roadmap 
-    //  uint N = cspace->GetRobotPtr()->q.size();
-    //  Config qi = input.q_init; qi.resize(N);
-    //  Config qg = input.q_goal; qg.resize(N);
-    //  int ri = cspace->GetRobotIndex();
-    //  hierarchy->AddLevel(ri, qi, qg);
-    //  hierarchy->AddLevel(ri, qi, qg);
-
-    //}else{
-    //  std::vector<int> idxs = static_cast<CSpaceOMPLMultiAgent*>(cspace)->GetRobotIdxs();
-    //  hierarchy->AddLevel( idxs, input.q_init, input.q_goal);
-    //  hierarchy->AddLevel( idxs, input.q_init, input.q_goal); 
-    //}
-
 
     config_init_levels.push_back(input.q_init);
     config_goal_levels.push_back(input.q_goal);
-    // hierarchy->AddRootNode( std::make_shared<Roadmap>() ); 
-    // std::vector<int> path;
-    // hierarchy->AddNode( std::make_shared<Roadmap>(), path ); 
   }
 
   if(util::StartsWith(algorithm, "benchmark") || 
@@ -345,7 +328,6 @@ void MotionPlanner::Clear()
   current_level = 0;
 
   strategy->Clear();
-  // viewHierarchy.Clear();
 }
 
 void MotionPlanner::InitStrategy()
@@ -354,13 +336,15 @@ void MotionPlanner::InitStrategy()
   strategy_input.cspace_levels = cspace_levels;
   strategy_input.cspace_stratifications = cspace_stratifications;
   strategy->Init(strategy_input);
-  auto explorerPlanner = dynamic_pointer_cast<ompl::multilevel::MotionExplorer>(strategy->GetPlannerPtr());
+  auto explorerPlanner = 
+    dynamic_pointer_cast<ompl::multilevel::MotionExplorer>(strategy->GetPlannerPtr());
   if(explorerPlanner != nullptr)
   {
       localMinimaTree_ = explorerPlanner->getLocalMinimaTree();
       viewLocalMinimaTree_ = std::make_shared<ViewLocalMinimaTree>(localMinimaTree_, cspace_levels);
   }
-  auto explorerPlanner2 = dynamic_pointer_cast<ompl::multilevel::MotionExplorerQMP>(strategy->GetPlannerPtr());
+  auto explorerPlanner2 = 
+    dynamic_pointer_cast<ompl::multilevel::MotionExplorerQMP>(strategy->GetPlannerPtr());
   if(explorerPlanner2 != nullptr)
   {
       localMinimaTree_ = explorerPlanner2->getLocalMinimaTree();
@@ -378,11 +362,10 @@ void MotionPlanner::Step()
     InitStrategy();
   }
 
-  output = new StrategyOutput(cspace_levels.back());
+  output = new StrategyOutput(cspace_levels);
   resetTime();
   strategy->Step(*output);
   time = getTime();
-  // output->GetHierarchicalRoadmap( hierarchy, cspace_levels );
 }
 
 void RunPlanner(StrategyPtr strategy, StrategyOutput* output, std::atomic<bool>& threadRunning)
@@ -409,13 +392,16 @@ void MotionPlanner::AdvanceUntilSolution()
     InitStrategy();
   }
 
-  if(!util::StartsWith(input.name_algorithm,"benchmark")){
-    output = new StrategyOutput(cspace_levels.back());
-    threadRunning = true;
-    std::thread threadStrategy(RunPlanner, std::ref(strategy), std::ref(output), std::ref(threadRunning));
-    threadStrategy.detach();
-    // output.GetHierarchicalRoadmap( hierarchy, cspace_levels );
-    // std::cout << output << std::endl;
+  if(threading){
+    if(!util::StartsWith(input.name_algorithm,"benchmark")){
+      output = new StrategyOutput(cspace_levels);
+      threadRunning = true;
+      std::thread threadStrategy(RunPlanner, std::ref(strategy), std::ref(output), std::ref(threadRunning));
+      threadStrategy.detach();
+    }
+  }else{
+      output = new StrategyOutput(cspace_levels);
+      strategy->Plan(*output);
   }
 }
 
@@ -483,8 +469,19 @@ CSpaceOMPL* MotionPlanner::GetCSpace()
 PathPiecewiseLinear* MotionPlanner::GetPath()
 {
   if(!active) return nullptr;
-  if(!hasLocalMinimaTree()) return nullptr;
-  return viewLocalMinimaTree_->getPathSelected();
+  if(hasLocalMinimaTree())
+  {
+      return viewLocalMinimaTree_->getPathSelected();
+  }else{
+    if(output != nullptr)
+    {
+      if(output->hasExactSolution() || output->hasApproximateSolution())
+      {
+          return output->getSolutionPath(current_level);
+      }
+    }
+    return nullptr;
+  }
 }
 
 void MotionPlanner::DrawGL(GUIState& state)
@@ -494,6 +491,26 @@ void MotionPlanner::DrawGL(GUIState& state)
   if(hasLocalMinimaTree())
   {
       viewLocalMinimaTree_->DrawGL(state);
+  }
+  if(output != nullptr)
+  {
+      output->DrawGL(state, current_level);
+      if(!hasLocalMinimaTree())
+      {
+        PathPiecewiseLinear *pwl = output->getSolutionPath(current_level);
+        if(pwl != nullptr)
+        {
+            pwl->linewidth = input.pathWidth;
+            pwl->widthBorder= input.pathBorderWidth;
+            pwl->zOffset = 0.001;
+            pwl->ptsize = 8;
+            pwl->drawSweptVolume = false;
+            pwl->drawCross = false;
+            const GLColor magenta(0.7,0,0.7,1);
+            pwl->setColor(magenta);
+            pwl->DrawGL(state);
+        }
+      }
   }
 
   //uint Nsiblings;

@@ -4,6 +4,7 @@
 #include "planner/benchmark/benchmark_output.h"
 #include "planner/strategy/infeasibility_sampler.h"
 
+#include <ompl/multilevel/datastructures/PlannerMultiLevel.h>
 #include <ompl/multilevel/planners/explorer/MotionExplorer.h>
 #include <ompl/multilevel/planners/explorer/MotionExplorerQMP.h>
 #include <ompl/multilevel/planners/qrrt/QRRT.h>
@@ -66,7 +67,7 @@ static ob::OptimizationObjectivePtr GetOptimizationObjective(const ob::SpaceInfo
   ob::OptimizationObjectivePtr clearObj(new ob::MaximizeMinClearanceObjective(si));
   ob::MultiOptimizationObjective* opt = new ob::MultiOptimizationObjective(si);
   opt->addObjective(lengthObj, 1.0);
-  opt->addObjective(clearObj, 1.0);
+  // opt->addObjective(clearObj, 1.0);
   return ob::OptimizationObjectivePtr(opt);
 }
 
@@ -244,31 +245,8 @@ void StrategyGeometricMultiLevel::Step(StrategyOutput &output)
   output.SetPlannerData(pd);
   ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
   output.SetProblemDefinition(pdef);
+
 }
-//void StrategyGeometricMultiLevel::StepOneLevel(StrategyOutput &output)
-//{
-//  ompl::time::point start = ompl::time::now();
-//  std::string algorithm = input.name_algorithm;
-//  //###########################################################################
-//
-//  ob::IterationTerminationCondition itc(1);
-//  ob::PlannerTerminationCondition ptc_step(itc);
-//  ob::PlannerTerminationCondition ptc_time( ob::timedPlannerTerminationCondition(max_planning_time) );
-//  ob::PlannerTerminationCondition ptc(plannerAndTerminationCondition(ptc_time, ptc_step));
-//
-//
-//  planner->solve(ptc);
-//
-//  ob::PlannerDataPtr pd( new ob::PlannerData(planner->getSpaceInformation()) );
-//  planner->getPlannerData(*pd);
-//  output.SetPlannerData(pd);
-//  ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
-//  output.SetProblemDefinition(pdef);
-//  //###########################################################################
-//
-//  output.planner_time = ompl::time::seconds(ompl::time::now() - start);
-//  output.max_planner_time = max_planning_time;
-//}
 
 void StrategyGeometricMultiLevel::Clear()
 {
@@ -283,17 +261,20 @@ void StrategyGeometricMultiLevel::Plan(StrategyOutput &output)
   output.max_planner_time = max_planning_time;
 
   //###########################################################################
-
   ob::PlannerDataPtr pd( new ob::PlannerData(planner->getSpaceInformation()) );
   planner->getPlannerData(*pd);
-  unsigned int N = planner->getProblemDefinition()->getSolutionCount();
-  if(N>0){
-      ob::PlannerSolution solution = planner->getProblemDefinition()->getSolutions().at(0);
-      pd->path_ = solution.path_;
-  }
   output.SetPlannerData(pd);
-  ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
-  output.SetProblemDefinition(pdef);
+
+  auto mPlanner = dynamic_pointer_cast<om::PlannerMultiLevel>(planner);
+  if(mPlanner != nullptr)
+  {
+      const std::vector<ob::ProblemDefinitionPtr> pdefVec = mPlanner->getProblemDefinitionVector();
+      output.SetProblemDefinition(pdefVec);
+
+  }else{
+      ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
+      output.SetProblemDefinition(pdef);
+  }
 
 }
 

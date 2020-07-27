@@ -55,6 +55,7 @@
   <pathSpeed>1</pathSpeed>             <!-- <1: slower, 1: default, >1: faster -->
   <pathWidth>0.1</pathWidth>
   <pathBorderWidth>1</pathBorderWidth>
+  <threading>0</threading>
 
   <epsilongoalregion>0.01</epsilongoalregion>
   <freeFloating>0</freeFloating>

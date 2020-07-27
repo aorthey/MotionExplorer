@@ -29,14 +29,5 @@ class StrategyGeometricMultiLevel: public Strategy{
     OMPLGeometricStratificationPtr OMPLGeometricStratificationFromCSpaceStratification
     (const StrategyInput &input, std::vector<CSpaceOMPL*> cspace_levels );
 
-    // template<class T_Algorithm>
-    // ompl::base::PlannerPtr GetSharedMultiChartPtr( 
-    //     OMPLGeometricStratificationPtr stratification);
-    // template<class T_Algorithm>
-    // ompl::base::PlannerPtr GetSharedMultiQuotientPtr( 
-    //     OMPLGeometricStratificationPtr stratification);
-    // template<class T_Algorithm, class T_Algorithm_Two>
-    // ompl::base::PlannerPtr GetSharedMultiQuotientPtr( 
-    //     OMPLGeometricStratificationPtr stratification);
 };
 

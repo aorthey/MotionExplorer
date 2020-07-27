@@ -44,6 +44,7 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
 
       og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
       length = gpath.length();
+      // gpath.interpolate();
       std::vector<ob::State *> states = gpath.getStates();
 
       uint Nstates = std::max(0,(int)states.size()-1);
@@ -843,13 +844,13 @@ void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
 
 void PathPiecewiseLinear::DrawGL(GUIState& state)
 {
-  if(quotient_space != nullptr)
-  {
-    draw_planar = (quotient_space->IsPlanar());
-    if(draw_planar && (quotient_space->GetFirstSubspace()->getType()==ob::STATE_SPACE_SE2) && state("planner_draw_spatial_representation_of_SE2")){
-      draw_planar = false;
-    }
-  }
+  // if(quotient_space != nullptr)
+  // {
+  //   draw_planar = (quotient_space->IsPlanar());
+  //   if(draw_planar && (quotient_space->GetFirstSubspace()->getType()==ob::STATE_SPACE_SE2) && state("planner_draw_spatial_representation_of_SE2")){
+  //     draw_planar = false;
+  //   }
+  // }
 
   if(state("draw_path")){
     cLine = cSmoothed;
