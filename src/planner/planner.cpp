@@ -506,30 +506,38 @@ void MotionPlanner::DrawGL(GUIState& state)
 {
   if(!active) return;
 
+  CSpaceOMPL *cspace = cspace_levels.at(current_level);
+  std::lock_guard<std::recursive_mutex> guard(cspace->getLock());
+
   if(hasLocalMinimaTree())
   {
+      std::lock_guard<std::recursive_mutex> guard(localMinimaTree_->getLock());
       viewLocalMinimaTree_->DrawGL(state);
-  }
-  if(output != nullptr)
-  {
-      output->DrawGL(state, current_level);
-      if(!hasLocalMinimaTree())
+      DrawGLStartGoal(state);
+  }else{
+      if(output != nullptr)
       {
-        PathPiecewiseLinear *pwl = output->getSolutionPath(current_level);
-        if(pwl != nullptr)
-        {
-            pwl->linewidth = input.pathWidth;
-            pwl->widthBorder= input.pathBorderWidth;
-            pwl->zOffset = 0.001;
-            pwl->ptsize = 8;
-            pwl->drawSweptVolume = false;
-            pwl->drawCross = false;
-            const GLColor magenta(0.7,0,0.7,1);
-            pwl->setColor(magenta);
-            pwl->DrawGL(state);
-        }
+          output->DrawGL(state, current_level);
+          if(!hasLocalMinimaTree())
+          {
+            PathPiecewiseLinear *pwl = output->getSolutionPath(current_level);
+            if(pwl != nullptr)
+            {
+                pwl->linewidth = input.pathWidth;
+                pwl->widthBorder= input.pathBorderWidth;
+                pwl->zOffset = 0.001;
+                pwl->ptsize = 8;
+                pwl->drawSweptVolume = false;
+                pwl->drawCross = false;
+                const GLColor magenta(0.7,0,0.7,1);
+                pwl->setColor(magenta);
+                pwl->DrawGL(state);
+            }
+          }
       }
+      DrawGLStartGoal(state);
   }
+  // DrawGLStartGoal(state);
 
   //uint Nsiblings;
   //if(current_path.size()>1){
@@ -630,6 +638,10 @@ void MotionPlanner::DrawGL(GUIState& state)
   //   robots_outer.push_back( world->robots[ridx_outer.at(k)] );
   // }
 
+
+}
+void MotionPlanner::DrawGLStartGoal(GUIState& state)
+{
   for(uint k = 0; k < cspace_levels.size(); k++)
   {
       CSpaceOMPL* ck = cspace_levels.at(k);
@@ -660,8 +672,8 @@ void MotionPlanner::DrawGL(GUIState& state)
     qspace->drawConfig(qg, colorGoalConfiguration);
     cspace->drawConfig(qgOuter, colorGoalConfigurationTransparent);
   }
-
 }
+
 void MotionPlanner::resetTime()
 {
   timePointStart = ompl::time::now();

@@ -186,6 +186,11 @@ uint CSpaceOMPL::GetDimensionality() const
   return space->getDimension();
 }
 
+std::recursive_mutex& CSpaceOMPL::getLock()
+{
+    return lock_;
+}
+
 int CSpaceOMPL::GetRobotIndex() const
 {
   return robot_idx;

@@ -40,10 +40,10 @@ class MotionPlanner{
     CSpaceOMPL* GetCSpace();
 
     //Ops on tree only, no interference with planner
-    virtual void Expand();
-    virtual void Collapse();
-    virtual void Next();
-    virtual void Previous();
+    void Expand();
+    void Collapse();
+    void Next();
+    void Previous();
 
     //operations on motion planning strategy (the underlying algorithm)
     virtual void Step();
@@ -51,6 +51,7 @@ class MotionPlanner{
     
     virtual void DrawGL(GUIState&);
     virtual void DrawGLScreen(double x_ =0.0, double y_=0.0);
+    void DrawGLStartGoal(GUIState&);
 
     //planner will only be active if input exists and contains a valid algorithm
     bool isActive();
@@ -88,6 +89,7 @@ class MotionPlanner{
     uint max_levels_{0};
 
     RobotWorld *world;
+
     std::vector<CSpaceOMPL*> cspace_levels;
     std::vector<Config> config_init_levels;
     std::vector<Config> config_goal_levels;
