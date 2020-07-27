@@ -49,12 +49,12 @@ void GeometricCSpaceOMPLRCONTACT_3D::initSpace()
 
         int link = cj.robot_link_idx;
         if(cj.mode == "fixed"){
-            std::string meshFrom = cj.meshFrom;
             std::cout << "Adding Fixed Contact Constraint:"
                       << " robot: " << cj.robot_name
                       << ", link: " << cj.robot_link << " (idx: " << cj.robot_link_idx << ")"
                       << " on mesh: " << cj.meshFrom << " (idx: " << cj.meshFromIdx << ")"
                       << std::endl;
+
             constraints.push_back(std::make_shared<ContactConstraint_3D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom));
 
         }else if(cj.mode == "transition"){
@@ -64,6 +64,7 @@ void GeometricCSpaceOMPLRCONTACT_3D::initSpace()
                       << ", from mesh: " << cj.meshFrom << " (idx: " << cj.meshFromIdx << ")"
                       << " to mesh: " << cj.meshTo << " (idx: " << cj.meshToIdx << ")"
                       << std::endl;
+
             constraints.push_back(std::make_shared<TransitionConstraint_3D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom, cj.meshTo));
         }else{
             std::cout << "Could not identify contact mode" << std::endl;

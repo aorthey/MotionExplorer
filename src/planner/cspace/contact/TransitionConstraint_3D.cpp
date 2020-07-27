@@ -18,6 +18,7 @@ TransitionConstraint_3D::TransitionConstraint_3D
                 Triangle3D tri;
                 mesh.GetTriangle(j, tri);
                 trisFrom.push_back(tri);
+                //std::cout << "TrisFrom: " << tri << std::endl;
             }
         }
 
@@ -29,6 +30,8 @@ TransitionConstraint_3D::TransitionConstraint_3D
                 Triangle3D tri;
                 mesh.GetTriangle(j, tri);
                 trisTo.push_back(tri);
+                //std::cout << "TrisTo: " << tri << std::endl;
+
             }
         }
     }
