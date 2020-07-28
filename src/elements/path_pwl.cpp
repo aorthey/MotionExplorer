@@ -43,7 +43,7 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
     if(!quotient_space->isDynamic()){
 
       og::PathGeometric& gpath = static_cast<og::PathGeometric&>(*path);
-      gpath.interpolate();
+      // gpath.interpolate();
       length = gpath.length();
       std::vector<ob::State *> states = gpath.getStates();
 
@@ -787,7 +787,7 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path)
   cLine.setCurrentGL();
   //############################################################################
 
-  if(state("draw_explorer_partial_paths"))
+  if(state("draw_path_partial"))
   {
       DrawGLRibbon(states, 0.5);
   }else{

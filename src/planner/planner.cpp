@@ -517,6 +517,7 @@ void MotionPlanner::DrawGL(GUIState& state)
   }else{
       DrawGLStartGoal(state);
   }
+
   if(output != nullptr)
   {
       output->DrawGL(state, current_level);
@@ -622,22 +623,6 @@ void MotionPlanner::DrawGL(GUIState& state)
   //      pwl->DrawGL(state);
   //    }
   //}
-
-  // unsigned maxLevel = hierarchy->NumberLevels()-1;
-  // std::vector<int> ridx = hierarchy->GetRobotIdxs(current_level);
-  // std::vector<int> ridx_outer = hierarchy->GetRobotIdxs(maxLevel);
-
-  // std::vector<Robot*> robots;
-  // std::vector<Robot*> robots_outer;
-  // for(uint k = 0; k < ridx.size(); k++){
-  //   if(ridx.at(k)>=0)
-  //   robots.push_back( world->robots[ridx.at(k)] );
-  // }
-  // for(uint k = 0; k < ridx_outer.size(); k++){
-  //   if(ridx_outer.at(k)>=0)
-  //   robots_outer.push_back( world->robots[ridx_outer.at(k)] );
-  // }
-
 
 }
 void MotionPlanner::DrawGLStartGoal(GUIState& state)

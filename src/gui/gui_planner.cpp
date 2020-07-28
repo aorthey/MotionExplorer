@@ -111,23 +111,23 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="draw_path_modus"){
     draw_path_modus++;
     if(draw_path_modus > 2) draw_path_modus = 0;
-
     switch (draw_path_modus) {
       case 0:
-        state("draw_roadmap_shortest_path").activate();
-        // state("draw_path").activate();
-        state("draw_explorer_partial_paths").deactivate();
+        state("draw_path").activate();
+        state("draw_path_partial").deactivate();
+        state("draw_explorer_unselected_paths").activate();
         break;
       case 1:
-        state("draw_roadmap_shortest_path").activate();
-        state("draw_explorer_partial_paths").activate();
+        state("draw_path").activate();
+        state("draw_path_partial").activate();
+        state("draw_explorer_unselected_paths").activate();
         break;
       default:
-        state("draw_roadmap_shortest_path").deactivate();
-        state("draw_explorer_partial_paths").deactivate();
+        state("draw_path").deactivate();
+        state("draw_path_partial").deactivate();
+        state("draw_explorer_unselected_paths").deactivate();
         break;
     }
-
   }else if(cmd=="draw_play_path"){
     last_command = "Execute";
     state("draw_play_path").toggle();

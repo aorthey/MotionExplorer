@@ -50,7 +50,6 @@ void ViewLocalMinimaTree::DrawGLNodeSelected(GUIState& state, LocalMinimaNode* n
 
   pathSelected_ = static_cast<PathPiecewiseLinear*>(node->customRepresentation);
 
-
   pathSelected_->zOffset = 0.001;
   pathSelected_->ptsize = 1;
   pathSelected_->linewidth = 0.05;
@@ -92,10 +91,13 @@ void ViewLocalMinimaTree::DrawGL(GUIState& state)
   LocalMinimaNode* node = localMinimaTree_->getSelectedPath();
   DrawGLNodeSelected(state, node);
 
-  std::vector<LocalMinimaNode*> nodeVector = localMinimaTree_->getSelectedPathSiblings();
-  for(uint k = 0; k < nodeVector.size(); k++)
+  if(state("draw_explorer_unselected_paths"))
   {
+    std::vector<LocalMinimaNode*> nodeVector = localMinimaTree_->getSelectedPathSiblings();
+    for(uint k = 0; k < nodeVector.size(); k++)
+    {
       DrawGLNodeUnSelected(state, nodeVector.at(k));
+    }
   }
 
 }
