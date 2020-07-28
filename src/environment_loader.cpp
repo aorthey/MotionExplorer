@@ -89,6 +89,8 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
         if(pkin->contactPlanner){
           pkin->tris = tris;
         }
+
+
         for(uint j = 0; j < pkin->stratifications.size(); j++){
           Stratification stratification = pkin->stratifications.at(j);
           for(uint i = 0; i < stratification.layers.size(); i++){
@@ -117,12 +119,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
                 rko->qMin[i] = pkin->se3min[i];
                 rko->qMax[i] = pkin->se3max[i];
               }
-              // rk->q = pkin->q_init;
-              // rk->dq = pkin->dq_init;
-              // rk->UpdateFrames();
-              // rko->q = pkin->q_init;
-              // rko->dq = pkin->dq_init;
-              // rko->UpdateFrames();
+
             }
           }//for layers
         }//for stratifications
