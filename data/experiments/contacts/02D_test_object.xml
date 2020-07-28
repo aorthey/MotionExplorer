@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="2dof" file="../../robots/planar/test.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
+  <!-- <robot name="1dof_inner" file="../robots/planar/2dof_testobj_1dof_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>-->
+  <!-- when adding/removing links remember to adjust configurations -->
+
+  <terrain name="rectangleBottom" file="../../terrains/primitives/rectangle.tri" translation="+3.2 -1.0 0" rotateRPY="0 0 0" scale="4 2 1"/>
+  <terrain name="rectangleTop" file="../../terrains/primitives/rectangle.tri" translation="-2.4 +0.0 0" rotateRPY="0 0 0" scale="4 1 1"/>
+
+
+
+  <plannerinput>
+
+    <!-- These configs are for first link in contact and last link in transition.
+    <qinit  config="10  +2.2 -2.4 0 0 0 0  0.785398 0.0 -1.55 0 "/>
+    <qgoal  config="10  +2.2 +0.5 0 0 0 0  1.570796 0.0 0.4 0 "/>-->
+
+    <!-- These configs are for last link in contact and first link in transition. -->
+    <!-- <qinit  config="10  +2.2 -0.2 0 0 0 0  2.35619 0.0 1.55 0 "/> -->
+    <!-- <qgoal  config="10  -1.45 +0.5 0 0 0 0  -1.57 0.0 -0.4 0 "/> -->
+    <!-- <qinit  config="10  +2.2 -0.2 0 2.35 0 0  0 0 1.55 0 "/> -->
+
+    <qinit config="10  2.19849 -0.909669 0 2.11 0 0 0 0 2.09 0"/>
+
+    <!-- <qgoal  config="10  +2.2 -0.2 0 1.22 0 0  0 0 0.19 0 "/> -->
+    <!-- <qgoal config="10  -1.27653 -0.276561 0 5.23236 0 0 0 0 -0.55 0 "/> -->
+
+    <qgoal  config="10  +2.2 +0.8 0 2.35 0 0  0 0 1.55 0 "/>
+
+    <se3min config="6  -2.7 -3.5 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +3.5 +3.5 +0.0 +3.141593 +1.57 +3.141593"/>
+
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) -->
+    <smoothPath>0</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
+    <pathSpeed>3</pathSpeed>
+    <pathWidth>0.2</pathWidth>
+    <freeFloating>1</freeFloating>
+
+    <!-- <algorithm name="hierarchy:qrrt"/> -->
+    <algorithm name="ompl:rrt"/>
+    <algorithm name="ompl:prm"/>
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:lazyprm"/>
+
+    <contacts>
+      <contact robot_name="2dof" robot_link="jlink0" 
+        mode="fixed" 
+        mesh="rectangleBottom" />
+      <!-- <contact robot_name="2dof" robot_link="jlink2" --> 
+      <!--   mode="fixed" --> 
+      <!--   mesh="rectangleBottom" /> -->
+      <!-- <contact robot_name="2dof" robot_link="jlink2" --> 
+      <!--   mode="transition" --> 
+      <!--   meshFrom="rectangleBottom" triFrom="3" --> 
+      <!--   meshTo="rectangleTop" triTo="6"/> -->
+    </contacts>
+
+    <hierarchy>
+      <level inner_index="0" type="R3_CONTACT"/>
+    </hierarchy>
+
+  </plannerinput>
+</world>
+
+
+

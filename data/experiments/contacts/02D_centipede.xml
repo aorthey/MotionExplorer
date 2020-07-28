@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="centipede" file="../../robots/contact/centipede.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
+
+  <terrain name="mountain.tri" file="../../terrains/mountain/ridge.tri" translation="+0 +0 -5">
+     <display color="0.6 0.6 0.6 1"/> 
+  </terrain>
+  <plannerinput>
+
+
+    <qinit config="95  -3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+    <qgoal config="95  0 0 -2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+
+    <se3min config="6  -5 -5 -5 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +5 +5 +5 +3.141593 +1.57 +3.141593"/>
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>2</maxplanningtime>      <!-- runtime in (s) --> 
+    <freeFloating>1</freeFloating>
+    <algorithm name="hierarchy:qrrt"/>
+
+    <hierarchy>
+        <level inner_index="0" type="SE3RN"/>
+    </hierarchy>
+  </plannerinput>
+</world>
+
+
+
