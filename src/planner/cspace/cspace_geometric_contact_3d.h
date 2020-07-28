@@ -1,20 +1,15 @@
 #pragma once
-#include <ompl/base/Constraint.h>
-#include <ompl/geometric/SimpleSetup.h>
-#include "planner/cspace/cspace_geometric.h"
-#include <ompl/base/ConstrainedSpaceInformation.h>
+#include "planner/cspace/cspace_geometric_contact.h"
 #include "planner/cspace/contact/ProjectedStateSpace_Transition.h"
+#include <ompl/base/Constraint.h>
+#include <ompl/base/ConstrainedSpaceInformation.h>
 #include <ompl/base/spaces/constraint/ConstrainedStateSpace.h>
 
 
-class GeometricCSpaceOMPLRCONTACT: public GeometricCSpaceOMPL
+class GeometricCSpaceContact3D: public GeometricCSpaceContact
 {
-protected:
-    std::vector<ob::ConstraintPtr> constraints;
-    ob::ConstraintIntersectionPtr  constraint_intersect;
-
 public:
-    GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int robot_idx);
+    GeometricCSpaceContact3D(RobotWorld *world_, int robot_idx);
 
 
     virtual void initSpace() override;
@@ -24,6 +19,4 @@ public:
     virtual void print(std::ostream& out = std::cout) const override;
 
     virtual Vector3 getXYZ(const ob::State*) override;
-
-    virtual ob::SpaceInformationPtr SpaceInformationPtr() override;
 };

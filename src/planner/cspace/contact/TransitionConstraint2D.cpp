@@ -1,11 +1,11 @@
 #include <ompl/base/Constraint.h>
-#include "planner/cspace/contact/TransitionConstraint.h"
-#include "planner/cspace/cspace_geometric_R2_CONTACT.h"
+#include "planner/cspace/contact/TransitionConstraint2D.h"
+#include "planner/cspace/cspace_geometric_contact_2d.h"
 
 
-TransitionConstraint::TransitionConstraint
-(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, std::string meshFrom, std::string meshTo):
-ContactConstraint(cspace, ambientSpaceDim, robot, world, linkNumber, meshFrom)
+TransitionConstraint2D::TransitionConstraint2D
+(GeometricCSpaceContact2D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, std::string meshFrom, std::string meshTo):
+ContactConstraint2D(cspace, ambientSpaceDim, robot, world, linkNumber, meshFrom)
 {
 
     for(uint k = 0; k < world->terrains.size(); k++){
@@ -56,17 +56,17 @@ ContactConstraint(cspace, ambientSpaceDim, robot, world, linkNumber, meshFrom)
     }
 }
 
-int TransitionConstraint::getMode()
+int TransitionConstraint2D::getMode()
 {
   return mode;
 }
 
-void TransitionConstraint::setMode(int newMode)
+void TransitionConstraint2D::setMode(int newMode)
 {
-    mode = static_cast<Mode>(newMode);
+    mode = static_cast<TransitionMode>(newMode);
 }
 
-void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
+void TransitionConstraint2D::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
 {
 //// remember to #include <Library/KrisLibrary/math3d/geometry3d.cpp> for this to work
 ////    GeometricPrimitive3D gP3D = GeometricPrimitive3D(closestPt);

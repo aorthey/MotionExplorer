@@ -3,14 +3,16 @@
 #include "planner/benchmark/benchmark_input.h"
 #include "planner/benchmark/benchmark_output.h"
 #include "planner/strategy/infeasibility_sampler.h"
+#include "planner/cspace/cspace_geometric_contact.h"
 
-#include <ompl/geometric/planners/explorer/MotionExplorer.h>
-#include <ompl/geometric/planners/explorer/MotionExplorerQMP.h>
-#include <ompl/geometric/planners/multilevel/QRRT.h>
-#include <ompl/geometric/planners/multilevel/QRRTStar.h>
-#include <ompl/geometric/planners/multilevel/QMP.h>
-#include <ompl/geometric/planners/multilevel/QMPStar.h>
-#include <ompl/geometric/planners/multilevel/SPQR.h>
+#include <ompl/multilevel/datastructures/PlannerMultiLevel.h>
+#include <ompl/multilevel/planners/explorer/MotionExplorer.h>
+#include <ompl/multilevel/planners/explorer/MotionExplorerQMP.h>
+#include <ompl/multilevel/planners/qrrt/QRRT.h>
+#include <ompl/multilevel/planners/qrrt/QRRTStar.h>
+#include <ompl/multilevel/planners/qmp/QMP.h>
+#include <ompl/multilevel/planners/qmp/QMPStar.h>
+#include <ompl/multilevel/planners/spqr/SPQR.h>
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -56,13 +58,17 @@
 #include <ompl/util/Time.h>
 #include <boost/lexical_cast.hpp>
 
+namespace om = ompl::multilevel;
+namespace og = ompl::geometric;
+namespace ob = ompl::base;
+
 static ob::OptimizationObjectivePtr GetOptimizationObjective(const ob::SpaceInformationPtr& si)
 {
   ob::OptimizationObjectivePtr lengthObj(new ob::PathLengthOptimizationObjective(si));
   ob::OptimizationObjectivePtr clearObj(new ob::MaximizeMinClearanceObjective(si));
   ob::MultiOptimizationObjective* opt = new ob::MultiOptimizationObjective(si);
   opt->addObjective(lengthObj, 1.0);
-  opt->addObjective(clearObj, 1.0);
+  // opt->addObjective(clearObj, 1.0);
   return ob::OptimizationObjectivePtr(opt);
 }
 
@@ -140,14 +146,14 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:projest") planner = std::make_shared<og::ProjEST>(si);
   else if(algorithm=="ompl:sbl") planner = std::make_shared<og::SBL>(si);
 
-  else if(algorithm=="hierarchy:qrrt") planner = std::make_shared<og::QRRT>(siVec, "QRRT");
-  else if(algorithm=="hierarchy:qrrtstar") planner = std::make_shared<og::QRRTStar>(siVec, "QRRTStar");
-  else if(algorithm=="hierarchy:qmp") planner = std::make_shared<og::QMP>(siVec, "QMP");
-  else if(algorithm=="hierarchy:qmpstar") planner = std::make_shared<og::QMPStar>(siVec, "QMPStar");
-  else if(algorithm=="hierarchy:spqr") planner = std::make_shared<og::SPQR>(siVec, "SPQR");
+  else if(algorithm=="hierarchy:qrrt") planner = std::make_shared<om::QRRT>(siVec, "QRRT");
+  else if(algorithm=="hierarchy:qrrtstar") planner = std::make_shared<om::QRRTStar>(siVec, "QRRTStar");
+  else if(algorithm=="hierarchy:qmp") planner = std::make_shared<om::QMP>(siVec, "QMP");
+  else if(algorithm=="hierarchy:qmpstar") planner = std::make_shared<om::QMPStar>(siVec, "QMPStar");
+  else if(algorithm=="hierarchy:spqr") planner = std::make_shared<om::SPQR>(siVec, "SPQR");
 
-  else if(algorithm=="hierarchy:explorer") planner = std::make_shared<og::MotionExplorer>(siVec, "Explorer");
-  else if(algorithm=="hierarchy:explorer2") planner = std::make_shared<og::MotionExplorerQMP>(siVec, "ExplorerQMP");
+  else if(algorithm=="hierarchy:explorer") planner = std::make_shared<om::MotionExplorer>(siVec, "Explorer");
+  else if(algorithm=="hierarchy:explorer2") planner = std::make_shared<om::MotionExplorerQMP>(siVec, "ExplorerQMP");
   else if(algorithm=="sampler") planner = std::make_shared<og::InfeasibilitySampler>(si);
 
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){
@@ -186,8 +192,18 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
   ob::ScopedState<> goalk(sik);
   if(!cspace->isDynamic())
   {
-      startk = cspace->ConfigToOMPLState(input.q_init);
-      goalk  = cspace->ConfigToOMPLState(input.q_goal);
+      auto *cspaceContact  = dynamic_cast<GeometricCSpaceContact*>(cspace);
+      if(cspaceContact!=nullptr)
+      {
+        cspaceContact->setInitialConstraints();
+        startk = cspace->ConfigToOMPLState(input.q_init);
+        cspaceContact->setGoalConstraints();
+        goalk  = cspace->ConfigToOMPLState(input.q_goal);
+        cspaceContact->setInitialConstraints();
+      }else{
+        startk = cspace->ConfigToOMPLState(input.q_init);
+        goalk  = cspace->ConfigToOMPLState(input.q_goal);
+      }
   }else{
       startk = cspace->ConfigVelocityToOMPLState(input.q_init, input.dq_init);
       goalk  = cspace->ConfigVelocityToOMPLState(input.q_goal, input.dq_goal);
@@ -240,31 +256,8 @@ void StrategyGeometricMultiLevel::Step(StrategyOutput &output)
   output.SetPlannerData(pd);
   ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
   output.SetProblemDefinition(pdef);
+
 }
-//void StrategyGeometricMultiLevel::StepOneLevel(StrategyOutput &output)
-//{
-//  ompl::time::point start = ompl::time::now();
-//  std::string algorithm = input.name_algorithm;
-//  //###########################################################################
-//
-//  ob::IterationTerminationCondition itc(1);
-//  ob::PlannerTerminationCondition ptc_step(itc);
-//  ob::PlannerTerminationCondition ptc_time( ob::timedPlannerTerminationCondition(max_planning_time) );
-//  ob::PlannerTerminationCondition ptc(plannerAndTerminationCondition(ptc_time, ptc_step));
-//
-//
-//  planner->solve(ptc);
-//
-//  ob::PlannerDataPtr pd( new ob::PlannerData(planner->getSpaceInformation()) );
-//  planner->getPlannerData(*pd);
-//  output.SetPlannerData(pd);
-//  ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
-//  output.SetProblemDefinition(pdef);
-//  //###########################################################################
-//
-//  output.planner_time = ompl::time::seconds(ompl::time::now() - start);
-//  output.max_planner_time = max_planning_time;
-//}
 
 void StrategyGeometricMultiLevel::Clear()
 {
@@ -279,17 +272,20 @@ void StrategyGeometricMultiLevel::Plan(StrategyOutput &output)
   output.max_planner_time = max_planning_time;
 
   //###########################################################################
-
   ob::PlannerDataPtr pd( new ob::PlannerData(planner->getSpaceInformation()) );
   planner->getPlannerData(*pd);
-  unsigned int N = planner->getProblemDefinition()->getSolutionCount();
-  if(N>0){
-      ob::PlannerSolution solution = planner->getProblemDefinition()->getSolutions().at(0);
-      pd->path_ = solution.path_;
-  }
   output.SetPlannerData(pd);
-  ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
-  output.SetProblemDefinition(pdef);
+
+  auto mPlanner = dynamic_pointer_cast<om::PlannerMultiLevel>(planner);
+  if(mPlanner != nullptr)
+  {
+      const std::vector<ob::ProblemDefinitionPtr> pdefVec = mPlanner->getProblemDefinitionVector();
+      output.SetProblemDefinition(pdefVec);
+
+  }else{
+      ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
+      output.SetProblemDefinition(pdef);
+  }
 
 }
 

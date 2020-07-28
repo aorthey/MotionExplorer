@@ -42,7 +42,8 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
 
     if(!quotient_space->isDynamic()){
 
-      og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+      og::PathGeometric& gpath = static_cast<og::PathGeometric&>(*path);
+      // gpath.interpolate();
       length = gpath.length();
       std::vector<ob::State *> states = gpath.getStates();
 
@@ -514,7 +515,6 @@ void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &
     dqn.inplaceMul(0.5*linewidth);
 
     Vector3 n = -cross(dq, dqn);
-    std::cout << n << std::endl;
     Matrix3 R0, R1;
     AngleAxisRotation Raa(0, dq);
     Raa.getMatrix(R0);
@@ -787,7 +787,7 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path)
   cLine.setCurrentGL();
   //############################################################################
 
-  if(state("draw_explorer_partial_paths"))
+  if(state("draw_path_partial"))
   {
       DrawGLRibbon(states, 0.5);
   }else{
@@ -844,13 +844,13 @@ void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
 
 void PathPiecewiseLinear::DrawGL(GUIState& state)
 {
-  if(quotient_space != nullptr)
-  {
-    draw_planar = (quotient_space->IsPlanar());
-    if(draw_planar && (quotient_space->GetFirstSubspace()->getType()==ob::STATE_SPACE_SE2) && state("planner_draw_spatial_representation_of_SE2")){
-      draw_planar = false;
-    }
-  }
+  // if(quotient_space != nullptr)
+  // {
+  //   draw_planar = (quotient_space->IsPlanar());
+  //   if(draw_planar && (quotient_space->GetFirstSubspace()->getType()==ob::STATE_SPACE_SE2) && state("planner_draw_spatial_representation_of_SE2")){
+  //     draw_planar = false;
+  //   }
+  // }
 
   if(state("draw_path")){
     cLine = cSmoothed;

@@ -9,6 +9,7 @@
 #include <ompl/control/SpaceInformation.h>
 #include <ompl/control/ControlSpace.h>
 #include <Planning/RobotCSpace.h>
+#include <mutex>
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;
@@ -78,6 +79,10 @@ class CSpaceOMPL
     std::vector<double> EulerZYXFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
     void OMPLSO3StateSpaceFromEulerZYX( double rz, double ry, double rx, ob::SO3StateSpace::StateType *q );
 
+
+    std::recursive_mutex& getLock();
+
+
     virtual bool isDynamic() const = 0;
     bool isFixedBase();
     bool isFreeFloating();
@@ -95,6 +100,7 @@ class CSpaceOMPL
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
     virtual void initSpace() = 0;
 
+    std::recursive_mutex lock_;
     CSpaceInput input;
 
     uint Nklampt;

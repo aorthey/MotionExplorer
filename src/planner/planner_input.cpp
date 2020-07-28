@@ -132,6 +132,7 @@ void PlannerInput::SetDefault()
   CheckNodeName(node, "planner");
 
   max_planning_time = GetSubNodeText<double>(node, "maxplanningtime");
+  threading = GetSubNodeText<int>(node, "threading");
   freeFloating = GetSubNodeText<int>(node, "freeFloating");
   contactPlanner = GetSubNodeText<int>(node, "contactPlanner");
   timestep_min = GetSubNodeAttribute<double>(node, "timestep", "min");
@@ -153,7 +154,7 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
   CheckNodeName(node, "plannerinput");
 
   //optional arguments
-
+  threading = GetSubNodeTextDefault<int>(node, "threading", threading);
   freeFloating = GetSubNodeTextDefault(node, "freeFloating", freeFloating);
   contactPlanner = GetSubNodeTextDefault(node, "contactPlanner", contactPlanner);
   robot_idx = GetSubNodeTextDefault(node, "robot", 0);
@@ -261,49 +262,6 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
       }
     }
   }
-
-    contact_links.clear();
-    TiXmlElement* node_contacts = FindSubNode(node, "contacts");
-    if(node_contacts != nullptr)
-    {
-        TiXmlElement* node_contact = FindFirstSubNode(node_contacts, "contact");
-        while(node_contact != nullptr)
-        {
-            ContactInformation c_link;
-
-            std::string robot_name = GetAttribute<std::string>(node_contact, "robot_name");
-            c_link.robot_name = robot_name;
-
-            std::string link = GetAttribute<std::string>(node_contact, "robot_link");
-            c_link.robot_link = link;
-
-            std::string mode = GetAttribute<std::string>(node_contact, "mode");
-            c_link.mode = mode;
-
-            if(mode=="fixed")
-            {
-                std::string mesh = GetAttribute<std::string>(node_contact, "mesh");
-                int tri = GetAttributeDefault<int>(node_contact, "tri", -1);
-                c_link.meshFrom = mesh;
-                c_link.triFrom = tri;
-            }else if(mode=="transition")
-            {
-                std::string meshFrom = GetAttribute<std::string>(node_contact, "meshFrom");
-                int triFrom = GetAttributeDefault<int>(node_contact, "triFrom", -1);
-                std::string meshTo = GetAttribute<std::string>(node_contact, "meshTo");
-                int triTo = GetAttributeDefault<int>(node_contact, "triTo", -1);
-                c_link.meshFrom = meshFrom;
-                c_link.triFrom = triFrom;
-                c_link.meshTo = meshTo;
-                c_link.triTo = triTo;
-            }else{
-                std::cout << "ERROR: mode " << mode << " unknown." << std::endl;
-                throw "MODE";
-            }
-            contact_links.push_back(c_link);
-            node_contact = FindNextSiblingNode(node_contact);
-        }
-    }
 
   se3min.resize(6); se3min.setZero();
   se3max.resize(6); se3max.setZero();

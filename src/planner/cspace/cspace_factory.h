@@ -20,8 +20,9 @@
 #include "planner/cspace/cspace_geometric_SE3_constrained.h"
 #include "planner/cspace/cspace_geometric_SO2RN.h"
 #include "planner/cspace/cspace_geometric_R3S2.h"
-#include "planner/cspace/cspace_geometric_R2_CONTACT.h"
-#include "planner/cspace/cspace_geometric_R3_CONTACT.h"
+#include "planner/cspace/cspace_geometric_contact.h"
+#include "planner/cspace/cspace_geometric_contact_2d.h"
+#include "planner/cspace/cspace_geometric_contact_3d.h"
 #include "planner/cspace/cspace_geometric_fixedbase.h"
 #include "planner/cspace/cspace_input.h"
 
@@ -113,15 +114,15 @@ class CSpaceFactory{
       return cspace;
     }
     // CSpace  R CONTACT 2D
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceRCONTACT( RobotWorld *world, int robot_idx){
-        GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLRCONTACT(world, robot_idx);
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceContact2D( RobotWorld *world, int robot_idx){
+        GeometricCSpaceOMPL *cspace = new GeometricCSpaceContact2D(world, robot_idx);
         cspace->SetCSpaceInput(input);
         cspace->Init();
         return cspace;
     }
     // CSpace  R CONTACT 3D
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceRCONTACT_3D( RobotWorld *world, int robot_idx){
-        GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLRCONTACT_3D(world, robot_idx);
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceContact3D( RobotWorld *world, int robot_idx){
+        GeometricCSpaceOMPL *cspace = new GeometricCSpaceContact3D(world, robot_idx);
         cspace->SetCSpaceInput(input);
         cspace->Init();
         return cspace;

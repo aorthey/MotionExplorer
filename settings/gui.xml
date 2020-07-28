@@ -89,10 +89,10 @@
     <descr>Simulate</descr>
     <key>s</key>
   </hotkey>
-  <hotkey>
-    <name>simulate_controller</name>
-    <key>c</key>
-  </hotkey>
+  <!-- <hotkey> -->
+  <!--   <name>simulate_controller</name> -->
+  <!--   <key>c</key> -->
+  <!-- </hotkey> -->
 
   <hotkey>
     <name>planner_step</name>
@@ -282,11 +282,11 @@
 
   <property name="planner_draw_start_configuration" enabled="1"/>
   <!-- <property name="planner_draw_goal_configuration" enabled="1"/> -->
-  <property name="draw_path" enabled="1"/>
-  <property name="draw_path_unsmoothed" enabled="0"/>
 
-  <property name="draw_explorer_non_selected_paths" enabled="1"/>
-  <property name="draw_explorer_partial_paths" enabled="0"/>
+  <property name="draw_explorer_unselected_paths" enabled="1"/>
+  <property name="draw_path" enabled="1"/>
+  <property name="draw_path_partial" enabled="0"/>
+  <property name="draw_path_unsmoothed" enabled="0"/>
 
   <property name="draw_robot_zero_position" enabled="1"/>
   <property name="draw_controller_driver" enabled="1"/>

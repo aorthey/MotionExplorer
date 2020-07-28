@@ -1,7 +1,7 @@
 #include "planner/cspace/contact/ProjectedStateSpace_Transition.h"
 #include "planner/cspace/contact/ConstraintIntersection_Transition.h"
-#include "planner/cspace/contact/TransitionConstraint.h"
-#include "planner/cspace/contact/TransitionConstraint_3D.h"
+#include "planner/cspace/contact/TransitionConstraint2D.h"
+#include "planner/cspace/contact/TransitionConstraint3D.h"
 #include <utility>
 
 /// ProjectedStateSampler
@@ -27,8 +27,8 @@ void ompl::base::ProjectedStateSamplerTransition::sampleUniform(State *state)
     {
         ConstraintPtr cPi = constraintsVec.at(i);
         // check if constraints in vector are transitionConstraints
-        const TransitionConstraintPtr tCP = std::dynamic_pointer_cast<TransitionConstraint>(cPi);
-        const TransitionConstraint_3DPtr tCP3D = std::dynamic_pointer_cast<TransitionConstraint_3D>(cPi);
+        auto tCP = std::dynamic_pointer_cast<TransitionConstraint2D>(cPi);
+        auto tCP3D = std::dynamic_pointer_cast<TransitionConstraint3D>(cPi);
         if (tCP != nullptr){
             int newMode = randomNumberGenerator.uniformInt(0,2);
 
@@ -47,13 +47,13 @@ void ompl::base::ProjectedStateSamplerTransition::sampleUniform(State *state)
     for(uint i = 0; i < constraintsVec.size(); i++)
     {
         ConstraintPtr cPi = constraintsVec.at(i);
-        const TransitionConstraintPtr tCP = std::dynamic_pointer_cast<TransitionConstraint>(cPi);
-        const TransitionConstraint_3DPtr tCP3D = std::dynamic_pointer_cast<TransitionConstraint_3D>(cPi);
+        auto tCP = std::dynamic_pointer_cast<TransitionConstraint2D>(cPi);
+        auto tCP3D = std::dynamic_pointer_cast<TransitionConstraint3D>(cPi);
         if (tCP != nullptr){
-            tCP->setMode(1);
+            tCP->setMode(NO_ACTIVE_CONSTRAINT);
 
         } else if (tCP3D != nullptr){
-            tCP3D->setMode(1);
+            tCP3D->setMode(NO_ACTIVE_CONSTRAINT);
         }
     }
 }
@@ -101,6 +101,29 @@ bool ompl::base::ProjectedStateSpaceTransition::discreteGeodesic(const State *fr
         geodesic->clear();
         geodesic->push_back(cloneState(from));
     }
+
+    //#########################################################################
+    //Set Transition constraints to be inactive
+    ob::ConstraintPtr constraint = getConstraint();
+    auto constraintIntersection = 
+      std::dynamic_pointer_cast<ConstraintIntersectionTransition>(getConstraint());
+    if (constraintIntersection != nullptr) {
+        std::vector<ob::ConstraintPtr> constraintsVec = 
+            constraintIntersection->getConstraintsVec();
+        for(uint i = 0; i < constraintsVec.size(); i++)
+        {
+            ConstraintPtr cPi = constraintsVec.at(i);
+            auto tCP = std::dynamic_pointer_cast<TransitionConstraint2D>(cPi);
+            auto tCP3D = std::dynamic_pointer_cast<TransitionConstraint3D>(cPi);
+            if (tCP != nullptr){
+                tCP->setMode(NO_ACTIVE_CONSTRAINT);
+
+            } else if (tCP3D != nullptr){
+                tCP3D->setMode(NO_ACTIVE_CONSTRAINT);
+            }
+        }
+    }
+    //#########################################################################
 
     const double tolerance = delta_;
 
