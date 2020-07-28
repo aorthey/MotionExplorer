@@ -1,11 +1,11 @@
 #include <ompl/base/Constraint.h>
-#include "planner/cspace/contact/TransitionConstraint_3D.h"
-#include "planner/cspace/cspace_geometric_R3_CONTACT.h"
+#include "planner/cspace/contact/TransitionConstraint3D.h"
+#include "planner/cspace/cspace_geometric_contact_3d.h"
 
 
-TransitionConstraint_3D::TransitionConstraint_3D
-        (GeometricCSpaceOMPLRCONTACT_3D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, std::string meshFrom, std::string meshTo):
-        ContactConstraint_3D(cspace, ambientSpaceDim, robot, world, linkNumber, meshFrom)
+TransitionConstraint3D::TransitionConstraint3D
+        (GeometricCSpaceContact3D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, std::string meshFrom, std::string meshTo):
+        ContactConstraint3D(cspace, ambientSpaceDim, robot, world, linkNumber, meshFrom)
 {
     for(uint k = 0; k < world->terrains.size(); k++){
         Terrain* terrain_k = world->terrains[k];
@@ -37,17 +37,17 @@ TransitionConstraint_3D::TransitionConstraint_3D
     }
 }
 
-int TransitionConstraint_3D::getMode()
+int TransitionConstraint3D::getMode()
 {
     return mode;
 }
 
-void TransitionConstraint_3D::setMode(int newMode)
+void TransitionConstraint3D::setMode(int newMode)
 {
-    mode = static_cast<Mode>(newMode);
+    mode = static_cast<TransitionMode>(newMode);
 }
 
-void TransitionConstraint_3D::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
+void TransitionConstraint3D::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
 {
     // Variable "mode" defines which constraint function is active
     // -> Contact with initial surface

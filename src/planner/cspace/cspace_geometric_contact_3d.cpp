@@ -1,18 +1,18 @@
 #include "common.h"
-#include <ompl/geometric/SimpleSetup.h>
-#include <ompl/base/spaces/SE2StateSpace.h>
-#include "planner/cspace/contact/ContactConstraint_3D.h"
-#include "planner/cspace/contact/TransitionConstraint_3D.h"
+#include "planner/cspace/contact/ContactConstraint3D.h"
+#include "planner/cspace/contact/TransitionConstraint3D.h"
 #include "planner/cspace/contact/ConstraintIntersection_Transition.h"
-#include "planner/cspace/cspace_geometric_R3_CONTACT.h"
+#include "planner/cspace/cspace_geometric_contact_3d.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
 
-GeometricCSpaceOMPLRCONTACT_3D::GeometricCSpaceOMPLRCONTACT_3D(RobotWorld *world_, int robot_idx):
-        GeometricCSpaceOMPL(world_, robot_idx) {}
+GeometricCSpaceContact3D::GeometricCSpaceContact3D(RobotWorld *world_, int robot_idx):
+        GeometricCSpaceContact(world_, robot_idx) 
+{
+}
 
 
-void GeometricCSpaceOMPLRCONTACT_3D::initSpace()
+void GeometricCSpaceContact3D::initSpace()
 {
     ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(6 + Nompl));
 
@@ -55,7 +55,7 @@ void GeometricCSpaceOMPLRCONTACT_3D::initSpace()
                       << " on mesh: " << cj.meshFrom << " (idx: " << cj.meshFromIdx << ")"
                       << std::endl;
 
-            constraints.push_back(std::make_shared<ContactConstraint_3D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom));
+            constraints.push_back(std::make_shared<ContactConstraint3D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom));
 
         }else if(cj.mode == "transition"){
             std::cout << "Adding Transition Contact Constraint:"
@@ -65,7 +65,7 @@ void GeometricCSpaceOMPLRCONTACT_3D::initSpace()
                       << " to mesh: " << cj.meshTo << " (idx: " << cj.meshToIdx << ")"
                       << std::endl;
 
-            constraints.push_back(std::make_shared<TransitionConstraint_3D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom, cj.meshTo));
+            constraints.push_back(std::make_shared<TransitionConstraint3D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom, cj.meshTo));
         }else{
             std::cout << "Could not identify contact mode" << std::endl;
             exit(0);
@@ -80,17 +80,7 @@ void GeometricCSpaceOMPLRCONTACT_3D::initSpace()
     this->space = RN_Constraint;
 }
 
-ob::SpaceInformationPtr GeometricCSpaceOMPLRCONTACT_3D::SpaceInformationPtr()
-{
-    if (!si) {
-        si = std::make_shared<ob::ConstrainedSpaceInformation>(SpacePtr());
-        validity_checker = StateValidityCheckerPtr(si);
-        si->setStateValidityChecker(validity_checker);
-    }
-    return si;
-}
-
-void GeometricCSpaceOMPLRCONTACT_3D::ConfigToOMPLState(const Config &q, ob::State *qompl)
+void GeometricCSpaceContact3D::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
     Eigen::VectorXd x(6+Nompl);
 
@@ -112,7 +102,7 @@ void GeometricCSpaceOMPLRCONTACT_3D::ConfigToOMPLState(const Config &q, ob::Stat
     SpaceInformationPtr()->enforceBounds(qompl);
 }
 
-Config GeometricCSpaceOMPLRCONTACT_3D::OMPLStateToConfig(const ob::State *qompl)
+Config GeometricCSpaceContact3D::OMPLStateToConfig(const ob::State *qompl)
 {
     auto &&x = *qompl->as<ob::ConstrainedStateSpace::StateType>();
 
@@ -131,7 +121,7 @@ Config GeometricCSpaceOMPLRCONTACT_3D::OMPLStateToConfig(const ob::State *qompl)
     return q;
 }
 
-Config GeometricCSpaceOMPLRCONTACT_3D::EigenVectorToConfig(const Eigen::VectorXd &xd) const
+Config GeometricCSpaceContact3D::EigenVectorToConfig(const Eigen::VectorXd &xd) const
 {
     Config q;
     q.resize(robot->q.size());
@@ -152,11 +142,11 @@ Config GeometricCSpaceOMPLRCONTACT_3D::EigenVectorToConfig(const Eigen::VectorXd
 }
 
 //NOTE: add getXYZ to set XYZ coordinate of vertices
-Vector3 GeometricCSpaceOMPLRCONTACT_3D::getXYZ(const ob::State *s)
+Vector3 GeometricCSpaceContact3D::getXYZ(const ob::State *s)
 {
     Config q = OMPLStateToConfig(s);
     Vector3 v(q[0],q[1],q[2]);
     return v;
 }
 
-void GeometricCSpaceOMPLRCONTACT_3D::print(std::ostream& out) const{}
+void GeometricCSpaceContact3D::print(std::ostream& out) const{}

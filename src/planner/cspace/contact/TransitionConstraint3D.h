@@ -1,5 +1,6 @@
 #pragma once
-#include "planner/cspace/contact/ContactConstraint_3D.h"
+#include "planner/cspace/contact/ContactConstraint3D.h"
+#include "planner/cspace/contact/TransitionModeTypes.h"
 #include "planner/cspace/cspace_geometric.h"
 #include <ompl/base/spaces/constraint/ConstrainedStateSpace.h>
 
@@ -14,25 +15,16 @@
  * @param obstacleNumber currently doesn't do anything
  * ***************************************************/
 
-OMPL_CLASS_FORWARD(TransitionConstraint_3D);
-
-class GeometricCSpaceOMPLRCONTACT_3D;
-
-class TransitionConstraint_3D : public ContactConstraint_3D
+class TransitionConstraint3D : public ContactConstraint3D
 {
 protected:
     std::vector<Triangle3D> trisFrom;
     std::vector<Triangle3D> trisTo;
 
-    enum Mode {
-      ACTIVE_CONSTRAINT_INITIAL = 0,
-      NO_ACTIVE_CONSTRAINT = 1,
-      ACTIVE_CONSTRAINT_GOAL = 2
-    };
-    Mode mode{ACTIVE_CONSTRAINT_INITIAL};
+    TransitionMode mode{ACTIVE_CONSTRAINT_INITIAL};
 
 public:
-    TransitionConstraint_3D(GeometricCSpaceOMPLRCONTACT_3D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, std::string meshFrom, std::string meshTo);
+    TransitionConstraint3D(GeometricCSpaceContact3D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, std::string meshFrom, std::string meshTo);
 
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override;
     void setMode(int newMode);

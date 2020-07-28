@@ -1,21 +1,17 @@
 #include <ompl/base/Constraint.h>
-#include "planner/cspace/contact/ContactConstraint_3D.h"
-#include "planner/cspace/cspace_geometric_R3_CONTACT.h"
+#include "planner/cspace/contact/ContactConstraint2D.h"
+#include "planner/cspace/cspace_geometric_contact_2d.h"
 
 
-ContactConstraint_3D::ContactConstraint_3D(GeometricCSpaceOMPLRCONTACT_3D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, int linkNumber, std::string meshFrom):
-        ob::Constraint(ambientSpaceDim, 1)  // (x,y,z, theta at 1st link,phi at 2nd)
-, cspace_(cspace)
-, robot_(robot)
-, world_(world)
-, linkNumber_(linkNumber)
-, meshFrom_(meshFrom)
+ContactConstraint2D::ContactConstraint2D
+(GeometricCSpaceContact2D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, int linkNumber, std::string meshFrom):
+ob::Constraint(ambientSpaceDim, 1)
+        , cspace_(cspace)
+        , robot_(robot)
+        , world_(world)
+        , linkNumber_(linkNumber)
+        , meshFrom_(meshFrom)
 {
-    /**
-     * Information on obstacle surface triangles.
-     *
-     * Saves all triangles that are feasible contact surfaces into member variable "trisFiltered".
-     */
 
     for(uint k = 0; k < world_->terrains.size(); k++){
         Terrain* terrain_k = world_->terrains[k];
@@ -28,41 +24,51 @@ ContactConstraint_3D::ContactConstraint_3D(GeometricCSpaceOMPLRCONTACT_3D *cspac
                 Triangle3D tri;
                 mesh.GetTriangle(j, tri);
 
-                tris.push_back(tri);
+                Vector3 normal = tri.normal();
+                double epsilon = 1e-10;
+
+                // for 2D case, filter out all surface triangles with normal vector in z direction
+                if(fabs((fabs(normal[2]) - 1.0))<epsilon){
+                    //do nothing
+                }
+                else{
+                    tris.push_back(tri);
+                }
             }
         }
     }
 }
 
-Vector3 ContactConstraint_3D::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const
+Vector3 ContactConstraint2D::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const
 {
     /**
-     * Member function of class ContactConstraint_3D:
+     * Member function of class ContactConstraint2D:
      * Returns position of given robot link in world coordinates.
      */
 
-    Config q = cspace_->EigenVectorToConfig(xd);
     if (xd!=xd){
         std::cout << std::string (80, '-') << std::endl;
         std::cout << "EigenVector: " << std::endl;
         std::cout << xd << std::endl;
-        std::cout << q << std::endl;
         exit(0);
     }
 
+    Config q = cspace_->EigenVectorToConfig(xd);
 
     robot_->UpdateConfig(q);
     robot_->UpdateGeometry();
     Vector3 zero;
     zero.setZero();
 
+    //NOTE: the world position is zero exactly at the point where link is
+    //attached using a joint to the whole linkage. Check where your last fixed
+    //joint is positioned, before questioning the validity of this method
     Vector3 v;
     robot_->GetWorldPosition(zero, linkNumber_, v);
-
     return v;
 }
 
-void ContactConstraint_3D::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
+void ContactConstraint2D::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
 {
     // ---------- Contact with chosen Link and chosen Obstacle ------------------
     Vector3 contact = getPos(x);

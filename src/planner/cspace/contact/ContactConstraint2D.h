@@ -14,15 +14,15 @@
  * @param obstacleNumber
  * ***************************************************/
 
-class GeometricCSpaceOMPLRCONTACT;
+class GeometricCSpaceContact2D;
 
-class ContactConstraint : public ob::Constraint
+class ContactConstraint2D : public ob::Constraint
 {
 protected:
     std::vector<Triangle3D> tris;
 
 public:
-    ContactConstraint(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot,RobotWorld *world,
+    ContactConstraint2D(GeometricCSpaceContact2D *cspace, int ambientSpaceDim, Robot *robot,RobotWorld *world,
             int linkNumber, std::string meshFrom);
 
 
@@ -67,7 +67,7 @@ public:
 
 
 private:
-    GeometricCSpaceOMPLRCONTACT *cspace_;
+    GeometricCSpaceContact2D *cspace_;
     Robot *robot_;
     RobotWorld *world_;
     int linkNumber_;

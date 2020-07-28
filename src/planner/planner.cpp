@@ -97,9 +97,9 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
       }else if(type=="SE3"){
         cspace_level = factory.MakeGeometricCSpaceSE3(world, robot_idx);
       }else if(type=="R3_CONTACT") {
-        cspace_level = factory.MakeGeometricCSpaceRCONTACT_3D(world, robot_idx);
+        cspace_level = factory.MakeGeometricCSpaceContact3D(world, robot_idx);
       }else if(type=="R2_CONTACT") {
-        cspace_level = factory.MakeGeometricCSpaceRCONTACT(world, robot_idx);
+        cspace_level = factory.MakeGeometricCSpaceContact2D(world, robot_idx);
       }else if(type=="SE2"){
         cspace_level = factory.MakeGeometricCSpaceSE2(world, robot_idx);
       }else if(type=="SE2RN"){
@@ -293,13 +293,40 @@ void MotionPlanner::CreateHierarchy()
     }
 
   }else{
-    max_levels_ = 0;
     Layer layer = input.stratifications.front().layers.back();
     CSpaceOMPL *cspace = ComputeCSpaceLayer(layer);
     cspace_levels.push_back(cspace);
+    max_levels_ = 0;
 
-    config_init_levels.push_back(input.q_init);
-    config_goal_levels.push_back(input.q_goal);
+    ob::State *stateTmp = cspace->SpaceInformationPtr()->allocState();
+
+    Config qi = input.q_init;
+    Config qg = input.q_goal;
+
+    auto *cspaceContact  = dynamic_cast<GeometricCSpaceContact*>(cspace);
+    if(cspaceContact!=nullptr)
+    {
+      cspaceContact->setInitialConstraints();
+      cspaceContact->ConfigToOMPLState(qi, stateTmp);
+      qi = cspaceContact->OMPLStateToConfig(stateTmp);
+
+      cspaceContact->setGoalConstraints();
+      cspaceContact->ConfigToOMPLState(qg, stateTmp);
+      qg = cspaceContact->OMPLStateToConfig(stateTmp);
+
+      //reset
+      cspaceContact->setInitialConstraints();
+    }else{
+      cspace->ConfigToOMPLState(qi, stateTmp);
+      qi = cspace->OMPLStateToConfig(stateTmp);
+      cspace->ConfigToOMPLState(qg, stateTmp);
+      qg = cspace->OMPLStateToConfig(stateTmp);
+    }
+
+    config_init_levels.push_back(qi);
+    config_goal_levels.push_back(qg);
+
+    cspace->SpaceInformationPtr()->freeState(stateTmp);
   }
 
   if(util::StartsWith(algorithm, "benchmark") || 
@@ -326,9 +353,15 @@ void MotionPlanner::CreateHierarchy()
 void MotionPlanner::Clear()
 {
   if(!active) return;
+
+  if(threadRunning)
+  {
+    OMPL_WARN("Tried Clearing planner, but thread still running.");
+    return;
+  }
+
   pwl = nullptr;
   current_level = 0;
-
   strategy->Clear();
 }
 
@@ -374,7 +407,6 @@ void RunPlanner(StrategyPtr strategy, StrategyOutput* output, std::atomic<bool>&
 {
     strategy->Plan(*output);
     threadRunning = false;
-    std::cout << "Strategy thread terminated." << std::endl;
 }
 
 bool MotionPlanner::isRunning()
@@ -385,8 +417,9 @@ bool MotionPlanner::isRunning()
 void MotionPlanner::AdvanceUntilSolution()
 {
   if(!active) return;
-  if(threadRunning){
-    std::cout << "Tried Restarting planner, but thread still running." << std::endl;
+  if(threadRunning)
+  {
+    OMPL_ERROR("Tried Restarting planner, but thread still running.");
     return;
   }
 

@@ -8,6 +8,7 @@
 #include "ompl/base/spaces/constraint/ConstrainedStateSpace.h"
 #include <ompl/base/spaces/constraint/ProjectedStateSpace.h>
 #include <ompl/util/RandomNumbers.h>
+#include "planner/cspace/contact/TransitionModeTypes.h"
 
 #include <Eigen/Core>
 
@@ -65,6 +66,8 @@ namespace ompl
             {
                 return std::make_shared<ProjectedStateSamplerTransition>(this, space_->allocDefaultStateSampler());
             }
+
+            void setMode(TransitionMode mode);
 
             /** \brief Allocate the previously set state sampler for this space. */
             StateSamplerPtr allocStateSampler() const override

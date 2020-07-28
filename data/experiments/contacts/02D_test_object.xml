@@ -52,10 +52,10 @@
       <!-- <contact robot_name="2dof" robot_link="jlink2" --> 
       <!--   mode="fixed" --> 
       <!--   mesh="rectangleBottom" /> -->
-      <!-- <contact robot_name="2dof" robot_link="jlink2" --> 
-      <!--   mode="transition" --> 
-      <!--   meshFrom="rectangleBottom" triFrom="3" --> 
-      <!--   meshTo="rectangleTop" triTo="6"/> -->
+      <contact robot_name="2dof" robot_link="jlink2" 
+        mode="transition" 
+        meshFrom="rectangleBottom" triFrom="3" 
+        meshTo="rectangleTop" triTo="6"/>
     </contacts>
 
     <hierarchy>

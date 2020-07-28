@@ -3,6 +3,7 @@
 #include "planner/benchmark/benchmark_input.h"
 #include "planner/benchmark/benchmark_output.h"
 #include "planner/strategy/infeasibility_sampler.h"
+#include "planner/cspace/cspace_geometric_contact.h"
 
 #include <ompl/multilevel/datastructures/PlannerMultiLevel.h>
 #include <ompl/multilevel/planners/explorer/MotionExplorer.h>
@@ -191,8 +192,18 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
   ob::ScopedState<> goalk(sik);
   if(!cspace->isDynamic())
   {
-      startk = cspace->ConfigToOMPLState(input.q_init);
-      goalk  = cspace->ConfigToOMPLState(input.q_goal);
+      auto *cspaceContact  = dynamic_cast<GeometricCSpaceContact*>(cspace);
+      if(cspaceContact!=nullptr)
+      {
+        cspaceContact->setInitialConstraints();
+        startk = cspace->ConfigToOMPLState(input.q_init);
+        cspaceContact->setGoalConstraints();
+        goalk  = cspace->ConfigToOMPLState(input.q_goal);
+        cspaceContact->setInitialConstraints();
+      }else{
+        startk = cspace->ConfigToOMPLState(input.q_init);
+        goalk  = cspace->ConfigToOMPLState(input.q_goal);
+      }
   }else{
       startk = cspace->ConfigVelocityToOMPLState(input.q_init, input.dq_init);
       goalk  = cspace->ConfigVelocityToOMPLState(input.q_goal, input.dq_goal);

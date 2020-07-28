@@ -1,19 +1,16 @@
 #include "common.h"
-#include <ompl/geometric/SimpleSetup.h>
-#include <ompl/base/spaces/SE2StateSpace.h>
+#include "planner/cspace/cspace_geometric_contact_2d.h"
 #include "planner/cspace/contact/ConstraintIntersection_Transition.h"
-#include "planner/cspace/contact/ContactConstraint.h"
-#include "planner/cspace/contact/TransitionConstraint.h"
-#include "planner/cspace/cspace_geometric_R2_CONTACT.h"
+#include "planner/cspace/contact/ContactConstraint2D.h"
+#include "planner/cspace/contact/TransitionConstraint2D.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
-
-GeometricCSpaceOMPLRCONTACT::GeometricCSpaceOMPLRCONTACT(RobotWorld *world_, int robot_idx):
-    GeometricCSpaceOMPL(world_, robot_idx) 
+GeometricCSpaceContact2D::GeometricCSpaceContact2D(RobotWorld *world_, int robot_idx):
+    GeometricCSpaceContact(world_, robot_idx) 
 {
 }
 
-void GeometricCSpaceOMPLRCONTACT::initSpace()
+void GeometricCSpaceContact2D::initSpace()
 {
     ob::StateSpacePtr Rn(std::make_shared<ob::RealVectorStateSpace>(3 + Nompl));
 
@@ -56,7 +53,7 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
                       << " on mesh: " << cj.meshFrom << " (idx: " << cj.meshFromIdx << ")"
                       << std::endl;
 
-            constraints.push_back(std::make_shared<ContactConstraint>(this, Rn->getDimension(), robot, world, link, cj.meshFrom));
+            constraints.push_back(std::make_shared<ContactConstraint2D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom));
 
         }else if(cj.mode == "transition"){
             std::cout << "Adding Transition Contact Constraint:"
@@ -66,7 +63,7 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
                       << " to mesh: " << cj.meshTo << " (idx: " << cj.meshToIdx << ")"
                       << std::endl;
 
-            constraints.push_back(std::make_shared<TransitionConstraint>(this, Rn->getDimension(), robot, world, link, cj.meshFrom, cj.meshTo));
+            constraints.push_back(std::make_shared<TransitionConstraint2D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom, cj.meshTo));
 
         }else{
             std::cout << "Could not identify contact mode" << std::endl;
@@ -82,17 +79,7 @@ void GeometricCSpaceOMPLRCONTACT::initSpace()
     this->space = RN_Constraint;
 }
 
-ob::SpaceInformationPtr GeometricCSpaceOMPLRCONTACT::SpaceInformationPtr()
-{
-    if (!si) {
-        si = std::make_shared<ob::ConstrainedSpaceInformation>(SpacePtr());
-        validity_checker = StateValidityCheckerPtr(si);
-        si->setStateValidityChecker(validity_checker);
-    }
-    return si;
-}
-
-void GeometricCSpaceOMPLRCONTACT::ConfigToOMPLState(const Config &q, ob::State *qompl)
+void GeometricCSpaceContact2D::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
     Eigen::VectorXd x(3+Nompl);
 
@@ -110,27 +97,12 @@ void GeometricCSpaceOMPLRCONTACT::ConfigToOMPLState(const Config &q, ob::State *
     }
 
     qompl->as<ob::ConstrainedStateSpace::StateType>()->copy(x);
-
-
-    //TODO: set into right modus
-    // for(uint i = 0; i < constraints.size(); i++)
-    // {
-    //   ob::ConstraintPtr cPi = constraints.at(i);
-
-    //     // check if constraints in vector are transitionConstraints
-    //     const TransitionConstraintPtr tCP = std::dynamic_pointer_cast<TransitionConstraint>(cPi);
-    //     if (tCP != nullptr)
-    //     {
-    //       std::cout << "Constraint " << i << " modus " << tCP->getMode() << std::endl;
-    //     }
-    // }
-
-
-    static_pointer_cast<ob::ConstrainedStateSpace>(this->space)->getConstraint()->project(qompl);
+    // static_pointer_cast<ob::ConstrainedStateSpace>(this->space)->getConstraint()->project(qompl);
+    constraint_intersect->project(qompl);
     SpaceInformationPtr()->enforceBounds(qompl);
 }
 
-Config GeometricCSpaceOMPLRCONTACT::OMPLStateToConfig(const ob::State *qompl)
+Config GeometricCSpaceContact2D::OMPLStateToConfig(const ob::State *qompl)
 {
     auto &&x = *qompl->as<ob::ConstrainedStateSpace::StateType>();
 
@@ -149,7 +121,7 @@ Config GeometricCSpaceOMPLRCONTACT::OMPLStateToConfig(const ob::State *qompl)
     return q;
 }
 
-Config GeometricCSpaceOMPLRCONTACT::EigenVectorToConfig(const Eigen::VectorXd &xd) const
+Config GeometricCSpaceContact2D::EigenVectorToConfig(const Eigen::VectorXd &xd) const
 {
     Config q;
     q.resize(robot->q.size());
@@ -177,11 +149,11 @@ Config GeometricCSpaceOMPLRCONTACT::EigenVectorToConfig(const Eigen::VectorXd &x
 }
 
 //NOTE: add getXYZ to set XYZ coordinate of vertices
-Vector3 GeometricCSpaceOMPLRCONTACT::getXYZ(const ob::State *s)
+Vector3 GeometricCSpaceContact2D::getXYZ(const ob::State *s)
 {
     Config q = OMPLStateToConfig(s);
     Vector3 v(q[0],q[1],0);
     return v;
 }
 
-void GeometricCSpaceOMPLRCONTACT::print(std::ostream& out) const{}
+void GeometricCSpaceContact2D::print(std::ostream& out) const{}
