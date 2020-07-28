@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="3dof" file="../../robots/planar_manipulator/3dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+  <terrain name="rectangleBottom1" file="../../terrains/primitives/rectangle.tri" translation="+3.0 -2.5 -0.0" rotateRPY="0 0 0" scale="4 2 30"/>
+  <terrain name="rectangleBottom2" file="../../terrains/primitives/rectangle.tri" translation="+3.0 +2.5 -0.0" rotateRPY="0 0 0" scale="4 2 30"/>
+
+
+  <plannerinput>
+
+    <qinit  config="12  +2 -1.5 0 0.0 0.0 0.0  1.570796 0.0 1.570796 0 1.570796"/>
+    <qgoal  config="12  +2 +1.0 0 0.0 0.0 0.0  1.570796 0.0 1.570796 0 1.570796"/>
+    <se3min config="6   0.0 -3.5 -1.0 -3.141593 -3.141593 -3.141593"/>
+    <se3max config="6  +2.5 +2.25 +1.0 +3.141593 +3.141593 +3.141593"/>
+    <epsilongoalregion>0.05</epsilongoalregion>
+    <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) -->
+    <smoothPath>0</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
+    <pathSpeed>15</pathSpeed>
+    <pathWidth>0.2</pathWidth>
+    <freeFloating>1</freeFloating>
+
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:rrt"/>
+    <algorithm name="ompl:prm"/>
+    <algorithm name="ompl:lazyprm"/>
+
+    <contacts>
+      <contact robot_name="3dof" robot_link="jlink0"
+               mode="transition"
+               meshFrom="rectangleBottom1"
+               meshTo="rectangleBottom2"/>
+      <contact robot_name="3dof" robot_link="jlink3"
+               mode="fixed"
+               mesh="rectangleBottom1"/>
+    </contacts>
+
+    <hierarchy>
+      <level inner_index="0" type="R3_CONTACT"/>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>
+
+
+
