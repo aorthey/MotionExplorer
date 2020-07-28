@@ -280,7 +280,7 @@ bool PlannerBackend::OnIdle()
     {
       double T = path->GetLength();
       double tstep = planner->GetInput().pathSpeed*T/1000;
-      //std::cout << "play path: " << t << "/" << T << std::endl;
+      // std::cout << "play path: " << t << "/" << T << std::endl;
       if(t>=T){
         t=0;
         SendPauseIdle();
@@ -295,6 +295,11 @@ bool PlannerBackend::OnIdle()
     }
     return true;
   }
+  if(t>0 && path)
+  {
+      path->DrawGL(state, t);
+  }
+
   return res;
 }
 
@@ -374,13 +379,10 @@ void PlannerBackend::RenderWorld(){
     if(state("draw_play_path")){
       if(t<=0){
         path = planner->GetPath();
-        // if(!path){
-          // std::cout << "No path available." << std::endl;
-        // }
       }
-      if(t>0 && path!=nullptr){
-        path->DrawGL(state, t);
-      }
+    }
+    if(t>0 && path!=nullptr){
+      path->DrawGL(state, t);
     }
   }
   //if(planner->GetInput().kinodynamic){

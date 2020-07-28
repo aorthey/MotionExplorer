@@ -119,6 +119,7 @@ void CSpaceOMPL::Init()
       if(link == cj.robot_link)
       {
         cj.robot_link_idx = k;
+        robot->contactLinkIndices.push_back(k);
         break;
       }
     }
