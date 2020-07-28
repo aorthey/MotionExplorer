@@ -4,7 +4,7 @@
 
   <robot name="3dof" file="../robots/planar_manipulator/3dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+3.0 -1.5 -0.0" rotateRPY="0 0 0" scale="4 5 100"/>
+  <terrain name="rectangleBottom" file="../terrains/primitives/rectangle.tri" translation="+3.0 -1.5 -0.0" rotateRPY="0 0 0" scale="4 5 100"/>
 
   <plannerinput>
 
@@ -22,6 +22,15 @@
     <algorithm name="ompl:rrtconnect"/>
     <algorithm name="ompl:rrt"/>
     <algorithm name="ompl:prm"/>
+
+    <contacts>
+      <contact robot_name="3dof" robot_link="jlink0"
+               mode="fixed"
+               mesh="rectangleBottom"/>
+      <contact robot_name="3dof" robot_link="jlink3"
+               mode="fixed"
+               mesh="rectangleBottom"/>
+    </contacts>
 
     <hierarchy>
       <level inner_index="0" type="R3_CONTACT"/>

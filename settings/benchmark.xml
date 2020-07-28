@@ -11,14 +11,13 @@
     <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 
-  <benchmark name="bundleplanner">
-    <algorithm name="hierarchy:qrrt"/>
-    <!-- <algorithm name="hierarchy:qrrtstar"/> -->
-    <algorithm name="hierarchy:qmp"/>
-    <!-- <algorithm name="hierarchy:qmpstar"/> -->
-    <!-- <algorithm name="hierarchy:spqr"/> -->
-    <maxplanningtime>180</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>3</runcount> <!-- number of runs per algorithm --> 
+  <benchmark name="contact">
+    <algorithm name="ompl:rrt"/>
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:prm"/>
+    <algorithm name="ompl:lazyprm"/>
+    <maxplanningtime>2</maxplanningtime> <!-- runtime in (s) -->
+    <runcount>2</runcount> <!-- number of runs per algorithm -->
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 

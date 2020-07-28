@@ -2,6 +2,7 @@
 #include <ompl/geometric/SimpleSetup.h>
 #include <ompl/base/spaces/SE2StateSpace.h>
 #include "planner/cspace/contact/ContactConstraint_3D.h"
+#include "planner/cspace/contact/TransitionConstraint_3D.h"
 #include "planner/cspace/contact/ConstraintIntersection_Transition.h"
 #include "planner/cspace/cspace_geometric_R3_CONTACT.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
@@ -41,10 +42,36 @@ void GeometricCSpaceOMPLRCONTACT_3D::initSpace()
     static_pointer_cast<ob::RealVectorStateSpace>(Rn)->setBounds(bounds);
 
     //Constraint Pointer Vector
-    int firstLink = 6;
-    int lastLink  = robot->links.size() - 1;
-    constraints.push_back(std::make_shared<ContactConstraint_3D>(this, Rn->getDimension(), robot, world, lastLink));
-    constraints.push_back(std::make_shared<ContactConstraint_3D>(this, Rn->getDimension(), robot, world, firstLink));
+    std::cout << "Number of Links: " << robot->links.size() - 1 << std::endl;
+    for(uint j = 0; j < input.contact_links.size(); j++)
+    {
+        ContactInformation cj = input.contact_links.at(j);
+
+        int link = cj.robot_link_idx;
+        if(cj.mode == "fixed"){
+            std::cout << "Adding Fixed Contact Constraint:"
+                      << " robot: " << cj.robot_name
+                      << ", link: " << cj.robot_link << " (idx: " << cj.robot_link_idx << ")"
+                      << " on mesh: " << cj.meshFrom << " (idx: " << cj.meshFromIdx << ")"
+                      << std::endl;
+
+            constraints.push_back(std::make_shared<ContactConstraint_3D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom));
+
+        }else if(cj.mode == "transition"){
+            std::cout << "Adding Transition Contact Constraint:"
+                      << " robot: " << cj.robot_name
+                      << ", link: " << cj.robot_link << " (idx: " << cj.robot_link_idx << ")"
+                      << ", from mesh: " << cj.meshFrom << " (idx: " << cj.meshFromIdx << ")"
+                      << " to mesh: " << cj.meshTo << " (idx: " << cj.meshToIdx << ")"
+                      << std::endl;
+
+            constraints.push_back(std::make_shared<TransitionConstraint_3D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom, cj.meshTo));
+        }else{
+            std::cout << "Could not identify contact mode" << std::endl;
+            exit(0);
+        }
+
+    }
 
     //Constraint Intersection to join multiple constraints
     constraint_intersect = std::make_shared<ConstraintIntersectionTransition>(Rn->getDimension(), constraints);

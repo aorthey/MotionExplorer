@@ -1,79 +1,54 @@
 #include <ompl/base/Constraint.h>
-#include "planner/cspace/contact/TransitionConstraint.h"
-#include "planner/cspace/cspace_geometric_R2_CONTACT.h"
+#include "planner/cspace/contact/TransitionConstraint_3D.h"
+#include "planner/cspace/cspace_geometric_R3_CONTACT.h"
 
 
-TransitionConstraint::TransitionConstraint
-(GeometricCSpaceOMPLRCONTACT *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, std::string meshFrom, std::string meshTo):
-ContactConstraint(cspace, ambientSpaceDim, robot, world, linkNumber, meshFrom)
+TransitionConstraint_3D::TransitionConstraint_3D
+        (GeometricCSpaceOMPLRCONTACT_3D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, std::string meshFrom, std::string meshTo):
+        ContactConstraint_3D(cspace, ambientSpaceDim, robot, world, linkNumber, meshFrom)
 {
-
     for(uint k = 0; k < world->terrains.size(); k++){
         Terrain* terrain_k = world->terrains[k];
 
-        // adding only those Triangles to tris that belong to specified obstacle (meshFrom)
+        // adding only those Triangles to tris that belong to specified initial obstacle (meshFrom)
         if (terrain_k->name == meshFrom){
             const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();
 
             for(uint j = 0; j < mesh.tris.size(); j++){
                 Triangle3D tri;
                 mesh.GetTriangle(j, tri);
-
-                Vector3 normal = tri.normal();
-                double epsilon = 1e-10;
-
-                // for 2D case, filter out all surface triangles with normal vector in z direction
-                if(fabs((fabs(normal[2]) - 1.0))<epsilon){
-                    //do nothing
-                }
-                else{
-                    trisFrom.push_back(tri);
-                }
+                trisFrom.push_back(tri);
+                //std::cout << "TrisFrom: " << tri << std::endl;
             }
         }
 
-        // adding only those Triangles to tris that belong to specified obstacle (meshTo)
+        // adding only those Triangles to tris that belong to specified goal obstacle (meshTo)
         if (terrain_k->name == meshTo){
             const Geometry::CollisionMesh mesh = terrain_k->geometry->TriangleMeshCollisionData();
 
             for(uint j = 0; j < mesh.tris.size(); j++){
                 Triangle3D tri;
                 mesh.GetTriangle(j, tri);
-
-                Vector3 normal = tri.normal();
-                double epsilon = 1e-10;
-
-                // for 2D case, filter out all surface triangles with normal vector in z direction
-                if(fabs((fabs(normal[2]) - 1.0))<epsilon){
-                    //do nothing
-                }
-                else{
-                    trisTo.push_back(tri);
-                }
+                trisTo.push_back(tri);
+                //std::cout << "TrisTo: " << tri << std::endl;
 
             }
         }
     }
 }
 
-int TransitionConstraint::getMode()
+int TransitionConstraint_3D::getMode()
 {
-  return mode;
+    return mode;
 }
 
-void TransitionConstraint::setMode(int newMode)
+void TransitionConstraint_3D::setMode(int newMode)
 {
     mode = static_cast<Mode>(newMode);
 }
 
-void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
+void TransitionConstraint_3D::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
 {
-//// remember to #include <Library/KrisLibrary/math3d/geometry3d.cpp> for this to work
-////    GeometricPrimitive3D gP3D = GeometricPrimitive3D(closestPt);
-////    Real dist = gP3D.Distance(trisFiltered.at(0));
-////     std::cout << "Check that 'closestPt' is on surface Triangle: " << dist << std::endl;
-
-
     // Variable "mode" defines which constraint function is active
     // -> Contact with initial surface
     // OR Free from constraint
@@ -96,7 +71,6 @@ void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
             }
         }
         Real distVect = contact.distance(closestPt);
-
         out[0] = distVect;
 
     } else if (mode == NO_ACTIVE_CONSTRAINT){
@@ -104,7 +78,7 @@ void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
         out[0] = 0.0;
 
     } else if (mode == ACTIVE_CONSTRAINT_GOAL){
-        // --------------- Mode 2: Contact with goal contact surface ---------------
+        // --------------- Mode 2: Contact with different contact surface ---------------
         Vector3 contact = getPos(x);
         Vector3 closestPt;
         Real distances = 1000;
@@ -120,12 +94,11 @@ void TransitionConstraint::function(const Eigen::Ref<const Eigen::VectorXd> &x, 
             }
         }
         Real distVect = contact.distance(closestPt);
-
         out[0] = distVect;
 
     }else
     {
-      OMPL_ERROR("Mode %d not recognized", mode);
-      throw ompl::Exception("UNKNOWN MODE");
+        OMPL_ERROR("Mode %d not recognized", mode);
+        throw ompl::Exception("UNKNOWN MODE");
     }
 }

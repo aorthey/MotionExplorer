@@ -1,6 +1,7 @@
 #include "planner/cspace/contact/ProjectedStateSpace_Transition.h"
 #include "planner/cspace/contact/ConstraintIntersection_Transition.h"
 #include "planner/cspace/contact/TransitionConstraint.h"
+#include "planner/cspace/contact/TransitionConstraint_3D.h"
 #include <utility>
 
 /// ProjectedStateSampler
@@ -10,6 +11,7 @@
 ompl::base::ProjectedStateSamplerTransition::ProjectedStateSamplerTransition(const ProjectedStateSpaceTransition *space, StateSamplerPtr sampler)
   : ProjectedStateSampler(reinterpret_cast<const ProjectedStateSpace *>(space), std::move(sampler))
   , constraint_(space->getConstraint()) {
+
     // check if multiple (constraintIntersection) or single constraint
     const ConstraintIntersectionTransitionPtr cIP = 
       std::dynamic_pointer_cast<ConstraintIntersectionTransition>(space->getConstraint());
@@ -24,16 +26,20 @@ void ompl::base::ProjectedStateSamplerTransition::sampleUniform(State *state)
     for(uint i = 0; i < constraintsVec.size(); i++)
     {
         ConstraintPtr cPi = constraintsVec.at(i);
-
         // check if constraints in vector are transitionConstraints
         const TransitionConstraintPtr tCP = std::dynamic_pointer_cast<TransitionConstraint>(cPi);
+        const TransitionConstraint_3DPtr tCP3D = std::dynamic_pointer_cast<TransitionConstraint_3D>(cPi);
         if (tCP != nullptr){
-
             int newMode = randomNumberGenerator.uniformInt(0,2);
 
-            // std::cout << "Random Mode" << newMode << std::endl;
             tCP->setMode(newMode);
+
+        } else if(tCP3D != nullptr){
+            int newMode = randomNumberGenerator.uniformInt(0,2);
+
+            tCP3D->setMode(newMode);
         }
+
     }
     constraint_->project(state);
     space_->enforceBounds(state);
@@ -42,8 +48,12 @@ void ompl::base::ProjectedStateSamplerTransition::sampleUniform(State *state)
     {
         ConstraintPtr cPi = constraintsVec.at(i);
         const TransitionConstraintPtr tCP = std::dynamic_pointer_cast<TransitionConstraint>(cPi);
+        const TransitionConstraint_3DPtr tCP3D = std::dynamic_pointer_cast<TransitionConstraint_3D>(cPi);
         if (tCP != nullptr){
             tCP->setMode(1);
+
+        } else if (tCP3D != nullptr){
+            tCP3D->setMode(1);
         }
     }
 }

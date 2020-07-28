@@ -20,52 +20,16 @@ protected:
     std::vector<Triangle3D> tris;
 
 public:
-    ContactConstraint_3D(GeometricCSpaceOMPLRCONTACT_3D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber);
+    ContactConstraint_3D(GeometricCSpaceOMPLRCONTACT_3D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, int linkNumber, std::string meshFrom);
 
 
     Vector3 getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const;
     void function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const override;
 
-
-    ob::ProjectionEvaluatorPtr getProjection(ob::StateSpacePtr space) const
-    {
-
-        class ContactProjection : public ob::ProjectionEvaluator
-        {
-        public:
-            ContactProjection(const ob::StateSpacePtr &space) : ob::ProjectionEvaluator(space)
-            {
-            }
-
-            unsigned int getDimension() const override
-            {
-                return 3;
-            }
-
-            void defaultCellSizes() override
-            {
-                cellSizes_.resize(2);
-                cellSizes_[0] = 0.1;
-                cellSizes_[1] = 0.1;
-                cellSizes_[2] = 0.1;
-            }
-
-            void project(const ob::State *state, Eigen::Ref<Eigen::VectorXd> projection) const override
-            {
-                auto &&x = *state->as<ob::ConstrainedStateSpace::StateType>();
-                projection(0) = 0;
-                projection(1) = x[1];
-                projection(2) = 0;
-                std::cout << "Project " << projection << std::endl;
-            }
-        };
-        return std::make_shared<ContactProjection>(space);
-    }
-
-
 private:
     GeometricCSpaceOMPLRCONTACT_3D *cspace_;
     Robot *robot_;
     RobotWorld *world_;
-    uint linkNumber_;
+    int linkNumber_;
+    std::string meshFrom_;
 };
