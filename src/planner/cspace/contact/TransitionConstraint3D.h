@@ -1,5 +1,5 @@
 #pragma once
-#include "planner/cspace/contact/ContactConstraint3D.h"
+#include "planner/cspace/contact/FixedContactConstraint3D.h"
 #include "planner/cspace/contact/TransitionModeTypes.h"
 #include "planner/cspace/cspace_geometric.h"
 #include <ompl/base/spaces/constraint/ConstrainedStateSpace.h>
@@ -15,7 +15,7 @@
  * @param obstacleNumber currently doesn't do anything
  * ***************************************************/
 
-class TransitionConstraint3D : public ContactConstraint3D
+class TransitionConstraint3D : public FixedContactConstraint3D
 {
 protected:
     std::vector<Triangle3D> trisFrom;

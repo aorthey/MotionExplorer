@@ -1,5 +1,6 @@
 #pragma once
-enum TransitionMode {
+enum TransitionMode 
+{
   ACTIVE_CONSTRAINT_INITIAL = 0,
   NO_ACTIVE_CONSTRAINT = 1,
   ACTIVE_CONSTRAINT_GOAL = 2

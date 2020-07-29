@@ -5,7 +5,7 @@
 
 TransitionConstraint3D::TransitionConstraint3D
         (GeometricCSpaceContact3D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, std::string meshFrom, std::string meshTo):
-        ContactConstraint3D(cspace, ambientSpaceDim, robot, world, linkNumber, meshFrom)
+        FixedContactConstraint3D(cspace, ambientSpaceDim, robot, world, linkNumber, meshFrom)
 {
     for(uint k = 0; k < world->terrains.size(); k++){
         Terrain* terrain_k = world->terrains[k];

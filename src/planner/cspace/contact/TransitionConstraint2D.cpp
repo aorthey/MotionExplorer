@@ -5,7 +5,7 @@
 
 TransitionConstraint2D::TransitionConstraint2D
 (GeometricCSpaceContact2D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, uint linkNumber, std::string meshFrom, std::string meshTo):
-ContactConstraint2D(cspace, ambientSpaceDim, robot, world, linkNumber, meshFrom)
+FixedContactConstraint2D(cspace, ambientSpaceDim, robot, world, linkNumber, meshFrom)
 {
 
     for(uint k = 0; k < world->terrains.size(); k++){

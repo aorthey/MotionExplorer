@@ -1,9 +1,9 @@
 #include <ompl/base/Constraint.h>
-#include "planner/cspace/contact/ContactConstraint2D.h"
+#include "planner/cspace/contact/FixedContactConstraint2D.h"
 #include "planner/cspace/cspace_geometric_contact_2d.h"
 
 
-ContactConstraint2D::ContactConstraint2D
+FixedContactConstraint2D::FixedContactConstraint2D
 (GeometricCSpaceContact2D *cspace, int ambientSpaceDim, Robot *robot, RobotWorld *world, int linkNumber, std::string meshFrom):
 ob::Constraint(ambientSpaceDim, 1)
         , cspace_(cspace)
@@ -39,10 +39,10 @@ ob::Constraint(ambientSpaceDim, 1)
     }
 }
 
-Vector3 ContactConstraint2D::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const
+Vector3 FixedContactConstraint2D::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd) const
 {
     /**
-     * Member function of class ContactConstraint2D:
+     * Member function of class FixedContactConstraint2D:
      * Returns position of given robot link in world coordinates.
      */
 
@@ -68,7 +68,7 @@ Vector3 ContactConstraint2D::getPos(const Eigen::Ref<const Eigen::VectorXd> &xd)
     return v;
 }
 
-void ContactConstraint2D::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
+void FixedContactConstraint2D::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
 {
     // ---------- Contact with chosen Link and chosen Obstacle ------------------
     Vector3 contact = getPos(x);

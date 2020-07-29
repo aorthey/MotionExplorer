@@ -1,5 +1,5 @@
 #include "common.h"
-#include "planner/cspace/contact/ContactConstraint3D.h"
+#include "planner/cspace/contact/FixedContactConstraint3D.h"
 #include "planner/cspace/contact/TransitionConstraint3D.h"
 #include "planner/cspace/contact/ConstraintIntersection_Transition.h"
 #include "planner/cspace/cspace_geometric_contact_3d.h"
@@ -55,7 +55,7 @@ void GeometricCSpaceContact3D::initSpace()
                       << " on mesh: " << cj.meshFrom << " (idx: " << cj.meshFromIdx << ")"
                       << std::endl;
 
-            constraints.push_back(std::make_shared<ContactConstraint3D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom));
+            constraints.push_back(std::make_shared<FixedContactConstraint3D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom));
 
         }else if(cj.mode == "transition"){
             std::cout << "Adding Transition Contact Constraint:"

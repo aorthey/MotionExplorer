@@ -1,4 +1,6 @@
 #pragma once
+#include "planner/cspace/contact/ConstraintIntersection_Transition.h"
+#include "planner/cspace/contact/TransitionModeTypes.h"
 #include "ompl/base/MotionValidator.h"
 #include "ompl/base/PlannerData.h"
 #include "ompl/base/StateSampler.h"
@@ -8,7 +10,6 @@
 #include "ompl/base/spaces/constraint/ConstrainedStateSpace.h"
 #include <ompl/base/spaces/constraint/ProjectedStateSpace.h>
 #include <ompl/util/RandomNumbers.h>
-#include "planner/cspace/contact/TransitionModeTypes.h"
 
 #include <Eigen/Core>
 
@@ -42,7 +43,7 @@ namespace ompl
             /** \brief Constraint. */
             const ConstraintPtr constraint_;
             std::vector<ConstraintPtr> constraintsVec;
-            RNG randomNumberGenerator;
+            ConstraintIntersectionTransitionPtr constraintIntersection_;
         };
 
 
@@ -61,6 +62,27 @@ namespace ompl
             /** \brief Destructor. */
             ~ProjectedStateSpaceTransition() override = default;
 
+            class StateType : public ConstrainedStateSpace::StateType
+            {
+            public:
+                /** \brief Construct state of size \a n. */
+                StateType(const ConstrainedStateSpace *space) : ConstrainedStateSpace::StateType(space)
+                {
+                }
+                void setMode(TransitionMode mode)
+                {
+                  mode_ = mode;
+                }
+                TransitionMode getMode() const
+                {
+                  return mode_;
+                }
+            protected:
+                TransitionMode mode_;
+
+            };
+
+
             /** \brief Allocate the default state sampler for this space. */
             StateSamplerPtr allocDefaultStateSampler() const override
             {
@@ -74,6 +96,16 @@ namespace ompl
             {
                 return std::make_shared<ProjectedStateSamplerTransition>(this, space_->allocStateSampler());
             }
+            void copyState(State *destination, const State *source) const override
+            {
+                ConstrainedStateSpace::copyState(destination, source);
+                destination->as<StateType>()->setMode(source->as<StateType>()->getMode());
+            }
+            State *allocState() const override
+            {
+                return new StateType(this);
+            }
+
 
             /** \brief Traverse the manifold from \a from toward \a to. Returns
              * true if we reached \a to, and false if we stopped early for any

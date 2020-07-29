@@ -1,7 +1,7 @@
 #include "common.h"
 #include "planner/cspace/cspace_geometric_contact_2d.h"
 #include "planner/cspace/contact/ConstraintIntersection_Transition.h"
-#include "planner/cspace/contact/ContactConstraint2D.h"
+#include "planner/cspace/contact/FixedContactConstraint2D.h"
 #include "planner/cspace/contact/TransitionConstraint2D.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 
@@ -53,7 +53,7 @@ void GeometricCSpaceContact2D::initSpace()
                       << " on mesh: " << cj.meshFrom << " (idx: " << cj.meshFromIdx << ")"
                       << std::endl;
 
-            constraints.push_back(std::make_shared<ContactConstraint2D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom));
+            constraints.push_back(std::make_shared<FixedContactConstraint2D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom));
 
         }else if(cj.mode == "transition"){
             std::cout << "Adding Transition Contact Constraint:"

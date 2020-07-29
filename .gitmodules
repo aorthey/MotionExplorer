@@ -1,0 +1,4 @@
+[submodule "libs/ompl"]
+	path = libs/ompl
+	url = git@github.com:aorthey/ompl.git
+	branch = develop

@@ -1,5 +1,5 @@
 #pragma once
-#include "planner/cspace/contact/ContactConstraint2D.h"
+#include "planner/cspace/contact/FixedContactConstraint2D.h"
 #include "planner/cspace/contact/TransitionModeTypes.h"
 #include "planner/cspace/cspace_geometric.h"
 #include <ompl/base/spaces/constraint/ConstrainedStateSpace.h>
@@ -17,7 +17,7 @@
 
 class GeometricCSpaceContact2D;
 
-class TransitionConstraint2D : public ContactConstraint2D
+class TransitionConstraint2D : public FixedContactConstraint2D
 {
 protected:
     std::vector<Triangle3D> trisFrom;
