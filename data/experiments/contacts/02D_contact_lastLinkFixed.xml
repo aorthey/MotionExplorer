@@ -24,15 +24,11 @@
     <pathWidth>0.05</pathWidth>
     <freeFloating>1</freeFloating>
 
+    <algorithm name="benchmark:contact"/>
     <algorithm name="ompl:rrtconnect"/>
     <algorithm name="ompl:rrt"/>
-<<<<<<< HEAD:data/experiments/02D_contact_lastLinkFixed.xml
     <algorithm name="ompl:prm"/>
     <algorithm name="ompl:lazyprm"/>
-=======
-    <!-- <algorithm name="ompl:prm"/> -->
-    <!-- <algorithm name="ompl:lazyprm"/> -->
->>>>>>> upstream/develop:data/experiments/contacts/02D_contact_lastLinkFixed.xml
     <!--<algorithm name="benchmark:contact"/> -->
 
     <!-- jlink2 is the end of fatter link ("endeffector"),

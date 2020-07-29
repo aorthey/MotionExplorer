@@ -12,11 +12,11 @@
   </benchmark>
 
   <benchmark name="contact">
-    <algorithm name="ompl:rrt"/>
+    <!-- <algorithm name="ompl:rrt"/> -->
     <algorithm name="ompl:rrtconnect"/>
     <algorithm name="ompl:prm"/>
-    <algorithm name="ompl:lazyprm"/>
-    <maxplanningtime>2</maxplanningtime> <!-- runtime in (s) -->
+    <!-- <algorithm name="ompl:lazyprm"/> -->
+    <maxplanningtime>5</maxplanningtime> <!-- runtime in (s) -->
     <runcount>2</runcount> <!-- number of runs per algorithm -->
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>

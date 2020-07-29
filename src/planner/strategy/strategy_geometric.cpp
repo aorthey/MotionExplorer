@@ -263,6 +263,7 @@ void StrategyGeometricMultiLevel::Clear()
 {
   if(isInitialized) planner->clear();
 }
+
 void StrategyGeometricMultiLevel::Plan(StrategyOutput &output)
 {
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
@@ -391,7 +392,16 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
 
   CSpaceOMPL *cspace = input.cspace_stratifications.at(k_largest_ambient_space).back();
 
+  auto *cspaceContact  = dynamic_cast<GeometricCSpaceContact*>(cspace);
+  if(cspaceContact!=nullptr)
+  {
+      cspaceContact->setInitialConstraints();
+  }
   ob::ScopedState<> start = cspace->ConfigToOMPLState(input.q_init);
+  if(cspaceContact!=nullptr)
+  {
+      cspaceContact->setGoalConstraints();
+  }
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(input.q_goal);
   ss.setStartAndGoalStates(start, goal, input.epsilon_goalregion);
 
