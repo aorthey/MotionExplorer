@@ -133,6 +133,16 @@ def createRotatedCylinder(lname,x,y,z,r,p,yaw,radius,length,COLLISION_ENABLED=Tr
     s+= ' </link>\n\n'
   return s
 
+def createEmptyLink(lname,x,y,z):
+  Ixx = Iyy = Izz = (2.0/5.0)*mass
+  s=''
+  s+='<link name="'+lname+'" physical="0">\n'
+  s+='  <inertial>\n'
+  s+='   <mass value="'+str(mass)+'"/>\n'
+  s+='   <inertia ixx="'+str(Ixx)+'" ixy="0" ixz="0" iyy="'+str(Iyy)+'" iyz="0" izz="'+str(Izz)+'"/>\n'
+  s+='  </inertial>\n'
+  s+='</link>\n\n'
+  return s
 def createSphere(lname,x,y,z,radius,PHYSICAL=True):
   Ixx = Iyy = Izz = (2.0/5.0)*mass*radius*radius
   s=''

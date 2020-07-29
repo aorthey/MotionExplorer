@@ -228,7 +228,8 @@ namespace GLDraw{
     Config qq; qq.resize(robot->q.size());qq.setZero();
     for(int k = 0; k < qq.size(); k++) qq(k)=q(k);
     robot->UpdateConfig(qq);
-    for(uint j=0;j<robot->links.size();j++) {
+    for(uint j=0;j<robot->links.size();j++) 
+    {
       if(robot->IsGeometryEmpty(j)) continue;
       //############################################################################
       //ORIGINAL CODE SEGMENTS
@@ -246,6 +247,31 @@ namespace GLDraw{
     glDisable(GL_LINE_SMOOTH);
     glDisable(GL_BLEND);
     glEnable(GL_LIGHTING);
+
+
+
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND);
+    glEnable(GL_LINE_SMOOTH);
+    glDisable(GL_CULL_FACE);
+    const GLColor colorContact (1,1,0,0.3);
+    glColor4f(1, 1, 0, 0.3);
+    setColor(colorContact);
+    for(uint j=0;j<robot->contactLinkIndices.size();j++) 
+    {
+      int idx = robot->contactLinkIndices.at(j);
+      Matrix4 mat = robot->links[idx].T_World;
+      glPushMatrix();
+      setColor(colorContact);
+      glMultMatrix(mat);
+      drawSphere(0.2, 16, 8);
+      glPopMatrix();
+    }
+    glEnable(GL_CULL_FACE);
+    glDisable(GL_LINE_SMOOTH);
+    glDisable(GL_BLEND);
+    glEnable(GL_LIGHTING);
+
   }
 
 
