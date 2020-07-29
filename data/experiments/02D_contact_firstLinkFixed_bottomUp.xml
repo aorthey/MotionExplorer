@@ -2,12 +2,12 @@
 
 <world>
 
-  <robot name="2dof" file="../../robots/planar/2dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
+  <robot name="2dof" file="../robots/planar/2dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
   <!-- <robot name="1dof_inner" file="../robots/planar/2dof_testobj_1dof_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>-->
   <!-- when adding/removing links remember to adjust configurations -->
 
-  <terrain name="rectangleBottom" file="../../terrains/primitives/rectangle.tri" translation="+3.2 -1.5 0" rotateRPY="0 0 0" scale="4 3 1"/>
-  <terrain name="rectangleTop" file="../../terrains/primitives/rectangle.tri" translation="-2.45 +1.0 0" rotateRPY="0 0 0" scale="4 2 1"/>
+  <terrain name="rectangleBottom" file="../terrains/primitives/rectangle.tri" translation="+3.2 -1.5 0" rotateRPY="0 0 0" scale="4 3 1"/>
+  <terrain name="rectangleTop" file="../terrains/primitives/rectangle.tri" translation="-2.45 +1.0 0" rotateRPY="0 0 0" scale="4 2 1"/>
 
 
   <plannerinput>

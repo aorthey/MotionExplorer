@@ -2,13 +2,12 @@
 
 <world>
 
-  <robot name="centipede" file="../../robots/contact/centipede.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
+  <robot name="centipede" file="../../robots/centipede/centipede.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
 
   <terrain name="mountain.tri" file="../../terrains/mountain/ridge.tri" translation="+0 +0 -5">
-     <display color="0.6 0.6 0.6 1"/> 
+     <display color="0.6 0.6 0.6 1"/>
   </terrain>
   <plannerinput>
-
 
     <qinit config="95  -3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
     <qgoal config="95  0 0 -2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
