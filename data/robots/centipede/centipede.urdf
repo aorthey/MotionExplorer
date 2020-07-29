@@ -1,0 +1,2354 @@
+<?xml version="1.0"?>
+<robot name="centipede/centipede">
+ <link name="main0A">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.004075" ixy="0" ixz="0" iyy="0.004075" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<link name="main0_connector">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00064" ixy="0" ixz="0" iyy="0.00064" iyz="0" izz="0.00064"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.04"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.04"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_revolute_main0A_main0_connector_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 -0.145 0"/>
+  <parent link="main0A"/>
+  <child link="main0_connector"/>
+  <axis xyz="1 0 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="main0">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.004075" ixy="0" ixz="0" iyy="0.004075" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_main0_connector_main0" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.145 0"/>
+  <parent link="main0_connector"/>
+  <child link="main0"/>
+</joint>
+
+ <link name="pair0middle_axis">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_main0_pair0middle_axis" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.145 0"/>
+  <parent link="main0"/>
+  <child link="pair0middle_axis"/>
+</joint>
+
+ <link name="pair0leg1central_link">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair0middle_axis_pair0leg1central_link" type="fixed">
+  <origin rpy="0 0 0" xyz="0.19 0 0"/>
+  <parent link="pair0middle_axis"/>
+  <child link="pair0leg1central_link"/>
+</joint>
+
+ <link name="pair0leg1link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair0leg1central_link_pair0leg1link1_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair0leg1central_link"/>
+  <child link="pair0leg1link1"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair0leg1joint1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair0leg1link1_pair0leg1joint1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair0leg1link1"/>
+  <child link="pair0leg1joint1"/>
+</joint>
+
+ <link name="pair0leg1link2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.021233333333333333" ixy="0" ixz="0" iyy="0.021233333333333333" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair0leg1joint1_pair0leg1link2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+  <parent link="pair0leg1joint1"/>
+  <child link="pair0leg1link2"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair0leg1joint2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair0leg1link2_pair0leg1joint2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair0leg1link2"/>
+  <child link="pair0leg1joint2"/>
+</joint>
+
+ <link name="pair0leg1link3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair0leg1joint2_pair0leg1link3_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.58 0 0"/>
+  <parent link="pair0leg1joint2"/>
+  <child link="pair0leg1link3"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="pair0leg1foot">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00040960000000000004" ixy="0" ixz="0" iyy="0.00040960000000000004" iyz="0" izz="0.00040960000000000004"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_pair0leg1link3_pair0leg1foot" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair0leg1link3"/>
+  <child link="pair0leg1foot"/>
+</joint>
+
+ <link name="pair0leg2central_link">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair0middle_axis_pair0leg2central_link" type="fixed">
+  <origin rpy="0 0 3.14" xyz="-0.19 0 0"/>
+  <parent link="pair0middle_axis"/>
+  <child link="pair0leg2central_link"/>
+</joint>
+
+ <link name="pair0leg2link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair0leg2central_link_pair0leg2link1_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair0leg2central_link"/>
+  <child link="pair0leg2link1"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair0leg2joint1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair0leg2link1_pair0leg2joint1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair0leg2link1"/>
+  <child link="pair0leg2joint1"/>
+</joint>
+
+ <link name="pair0leg2link2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.021233333333333333" ixy="0" ixz="0" iyy="0.021233333333333333" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair0leg2joint1_pair0leg2link2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+  <parent link="pair0leg2joint1"/>
+  <child link="pair0leg2link2"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair0leg2joint2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair0leg2link2_pair0leg2joint2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair0leg2link2"/>
+  <child link="pair0leg2joint2"/>
+</joint>
+
+ <link name="pair0leg2link3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair0leg2joint2_pair0leg2link3_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.58 0 0"/>
+  <parent link="pair0leg2joint2"/>
+  <child link="pair0leg2link3"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="pair0leg2foot">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00040960000000000004" ixy="0" ixz="0" iyy="0.00040960000000000004" iyz="0" izz="0.00040960000000000004"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_pair0leg2link3_pair0leg2foot" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair0leg2link3"/>
+  <child link="pair0leg2foot"/>
+</joint>
+
+ <link name="main1A">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.004075" ixy="0" ixz="0" iyy="0.004075" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_main0_main1A" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.29 0"/>
+  <parent link="main0"/>
+  <child link="main1A"/>
+</joint>
+
+<link name="main1_connector">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00064" ixy="0" ixz="0" iyy="0.00064" iyz="0" izz="0.00064"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.04"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.04"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_revolute_main1A_main1_connector_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 -0.145 0"/>
+  <parent link="main1A"/>
+  <child link="main1_connector"/>
+  <axis xyz="1 0 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="main1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.004075" ixy="0" ixz="0" iyy="0.004075" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_main1_connector_main1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.145 0"/>
+  <parent link="main1_connector"/>
+  <child link="main1"/>
+</joint>
+
+ <link name="pair1middle_axis">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_main1_pair1middle_axis" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.145 0"/>
+  <parent link="main1"/>
+  <child link="pair1middle_axis"/>
+</joint>
+
+ <link name="pair1leg1central_link">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair1middle_axis_pair1leg1central_link" type="fixed">
+  <origin rpy="0 0 0" xyz="0.19 0 0"/>
+  <parent link="pair1middle_axis"/>
+  <child link="pair1leg1central_link"/>
+</joint>
+
+ <link name="pair1leg1link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair1leg1central_link_pair1leg1link1_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair1leg1central_link"/>
+  <child link="pair1leg1link1"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair1leg1joint1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair1leg1link1_pair1leg1joint1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair1leg1link1"/>
+  <child link="pair1leg1joint1"/>
+</joint>
+
+ <link name="pair1leg1link2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.021233333333333333" ixy="0" ixz="0" iyy="0.021233333333333333" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair1leg1joint1_pair1leg1link2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+  <parent link="pair1leg1joint1"/>
+  <child link="pair1leg1link2"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair1leg1joint2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair1leg1link2_pair1leg1joint2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair1leg1link2"/>
+  <child link="pair1leg1joint2"/>
+</joint>
+
+ <link name="pair1leg1link3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair1leg1joint2_pair1leg1link3_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.58 0 0"/>
+  <parent link="pair1leg1joint2"/>
+  <child link="pair1leg1link3"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="pair1leg1foot">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00040960000000000004" ixy="0" ixz="0" iyy="0.00040960000000000004" iyz="0" izz="0.00040960000000000004"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_pair1leg1link3_pair1leg1foot" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair1leg1link3"/>
+  <child link="pair1leg1foot"/>
+</joint>
+
+ <link name="pair1leg2central_link">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair1middle_axis_pair1leg2central_link" type="fixed">
+  <origin rpy="0 0 3.14" xyz="-0.19 0 0"/>
+  <parent link="pair1middle_axis"/>
+  <child link="pair1leg2central_link"/>
+</joint>
+
+ <link name="pair1leg2link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair1leg2central_link_pair1leg2link1_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair1leg2central_link"/>
+  <child link="pair1leg2link1"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair1leg2joint1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair1leg2link1_pair1leg2joint1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair1leg2link1"/>
+  <child link="pair1leg2joint1"/>
+</joint>
+
+ <link name="pair1leg2link2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.021233333333333333" ixy="0" ixz="0" iyy="0.021233333333333333" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair1leg2joint1_pair1leg2link2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+  <parent link="pair1leg2joint1"/>
+  <child link="pair1leg2link2"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair1leg2joint2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair1leg2link2_pair1leg2joint2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair1leg2link2"/>
+  <child link="pair1leg2joint2"/>
+</joint>
+
+ <link name="pair1leg2link3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair1leg2joint2_pair1leg2link3_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.58 0 0"/>
+  <parent link="pair1leg2joint2"/>
+  <child link="pair1leg2link3"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="pair1leg2foot">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00040960000000000004" ixy="0" ixz="0" iyy="0.00040960000000000004" iyz="0" izz="0.00040960000000000004"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_pair1leg2link3_pair1leg2foot" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair1leg2link3"/>
+  <child link="pair1leg2foot"/>
+</joint>
+
+ <link name="main2A">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.004075" ixy="0" ixz="0" iyy="0.004075" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_main1_main2A" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.29 0"/>
+  <parent link="main1"/>
+  <child link="main2A"/>
+</joint>
+
+<link name="main2_connector">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00064" ixy="0" ixz="0" iyy="0.00064" iyz="0" izz="0.00064"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.04"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.04"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_revolute_main2A_main2_connector_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 -0.145 0"/>
+  <parent link="main2A"/>
+  <child link="main2_connector"/>
+  <axis xyz="1 0 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="main2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.004075" ixy="0" ixz="0" iyy="0.004075" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_main2_connector_main2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.145 0"/>
+  <parent link="main2_connector"/>
+  <child link="main2"/>
+</joint>
+
+ <link name="pair2middle_axis">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_main2_pair2middle_axis" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.145 0"/>
+  <parent link="main2"/>
+  <child link="pair2middle_axis"/>
+</joint>
+
+ <link name="pair2leg1central_link">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair2middle_axis_pair2leg1central_link" type="fixed">
+  <origin rpy="0 0 0" xyz="0.19 0 0"/>
+  <parent link="pair2middle_axis"/>
+  <child link="pair2leg1central_link"/>
+</joint>
+
+ <link name="pair2leg1link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair2leg1central_link_pair2leg1link1_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair2leg1central_link"/>
+  <child link="pair2leg1link1"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair2leg1joint1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair2leg1link1_pair2leg1joint1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair2leg1link1"/>
+  <child link="pair2leg1joint1"/>
+</joint>
+
+ <link name="pair2leg1link2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.021233333333333333" ixy="0" ixz="0" iyy="0.021233333333333333" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair2leg1joint1_pair2leg1link2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+  <parent link="pair2leg1joint1"/>
+  <child link="pair2leg1link2"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair2leg1joint2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair2leg1link2_pair2leg1joint2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair2leg1link2"/>
+  <child link="pair2leg1joint2"/>
+</joint>
+
+ <link name="pair2leg1link3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair2leg1joint2_pair2leg1link3_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.58 0 0"/>
+  <parent link="pair2leg1joint2"/>
+  <child link="pair2leg1link3"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="pair2leg1foot">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00040960000000000004" ixy="0" ixz="0" iyy="0.00040960000000000004" iyz="0" izz="0.00040960000000000004"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_pair2leg1link3_pair2leg1foot" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair2leg1link3"/>
+  <child link="pair2leg1foot"/>
+</joint>
+
+ <link name="pair2leg2central_link">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair2middle_axis_pair2leg2central_link" type="fixed">
+  <origin rpy="0 0 3.14" xyz="-0.19 0 0"/>
+  <parent link="pair2middle_axis"/>
+  <child link="pair2leg2central_link"/>
+</joint>
+
+ <link name="pair2leg2link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair2leg2central_link_pair2leg2link1_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair2leg2central_link"/>
+  <child link="pair2leg2link1"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair2leg2joint1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair2leg2link1_pair2leg2joint1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair2leg2link1"/>
+  <child link="pair2leg2joint1"/>
+</joint>
+
+ <link name="pair2leg2link2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.021233333333333333" ixy="0" ixz="0" iyy="0.021233333333333333" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair2leg2joint1_pair2leg2link2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+  <parent link="pair2leg2joint1"/>
+  <child link="pair2leg2link2"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair2leg2joint2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair2leg2link2_pair2leg2joint2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair2leg2link2"/>
+  <child link="pair2leg2joint2"/>
+</joint>
+
+ <link name="pair2leg2link3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair2leg2joint2_pair2leg2link3_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.58 0 0"/>
+  <parent link="pair2leg2joint2"/>
+  <child link="pair2leg2link3"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="pair2leg2foot">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00040960000000000004" ixy="0" ixz="0" iyy="0.00040960000000000004" iyz="0" izz="0.00040960000000000004"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_pair2leg2link3_pair2leg2foot" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair2leg2link3"/>
+  <child link="pair2leg2foot"/>
+</joint>
+
+ <link name="main3A">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.004075" ixy="0" ixz="0" iyy="0.004075" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_main2_main3A" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.29 0"/>
+  <parent link="main2"/>
+  <child link="main3A"/>
+</joint>
+
+<link name="main3_connector">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00064" ixy="0" ixz="0" iyy="0.00064" iyz="0" izz="0.00064"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.04"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.04"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_revolute_main3A_main3_connector_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 -0.145 0"/>
+  <parent link="main3A"/>
+  <child link="main3_connector"/>
+  <axis xyz="1 0 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="main3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.004075" ixy="0" ixz="0" iyy="0.004075" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_main3_connector_main3" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.145 0"/>
+  <parent link="main3_connector"/>
+  <child link="main3"/>
+</joint>
+
+ <link name="pair3middle_axis">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_main3_pair3middle_axis" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.145 0"/>
+  <parent link="main3"/>
+  <child link="pair3middle_axis"/>
+</joint>
+
+ <link name="pair3leg1central_link">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair3middle_axis_pair3leg1central_link" type="fixed">
+  <origin rpy="0 0 0" xyz="0.19 0 0"/>
+  <parent link="pair3middle_axis"/>
+  <child link="pair3leg1central_link"/>
+</joint>
+
+ <link name="pair3leg1link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair3leg1central_link_pair3leg1link1_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair3leg1central_link"/>
+  <child link="pair3leg1link1"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair3leg1joint1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair3leg1link1_pair3leg1joint1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair3leg1link1"/>
+  <child link="pair3leg1joint1"/>
+</joint>
+
+ <link name="pair3leg1link2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.021233333333333333" ixy="0" ixz="0" iyy="0.021233333333333333" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair3leg1joint1_pair3leg1link2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+  <parent link="pair3leg1joint1"/>
+  <child link="pair3leg1link2"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair3leg1joint2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair3leg1link2_pair3leg1joint2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair3leg1link2"/>
+  <child link="pair3leg1joint2"/>
+</joint>
+
+ <link name="pair3leg1link3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair3leg1joint2_pair3leg1link3_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.58 0 0"/>
+  <parent link="pair3leg1joint2"/>
+  <child link="pair3leg1link3"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="pair3leg1foot">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00040960000000000004" ixy="0" ixz="0" iyy="0.00040960000000000004" iyz="0" izz="0.00040960000000000004"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_pair3leg1link3_pair3leg1foot" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair3leg1link3"/>
+  <child link="pair3leg1foot"/>
+</joint>
+
+ <link name="pair3leg2central_link">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair3middle_axis_pair3leg2central_link" type="fixed">
+  <origin rpy="0 0 3.14" xyz="-0.19 0 0"/>
+  <parent link="pair3middle_axis"/>
+  <child link="pair3leg2central_link"/>
+</joint>
+
+ <link name="pair3leg2link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair3leg2central_link_pair3leg2link1_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair3leg2central_link"/>
+  <child link="pair3leg2link1"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair3leg2joint1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair3leg2link1_pair3leg2joint1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair3leg2link1"/>
+  <child link="pair3leg2joint1"/>
+</joint>
+
+ <link name="pair3leg2link2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.021233333333333333" ixy="0" ixz="0" iyy="0.021233333333333333" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair3leg2joint1_pair3leg2link2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+  <parent link="pair3leg2joint1"/>
+  <child link="pair3leg2link2"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair3leg2joint2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair3leg2link2_pair3leg2joint2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair3leg2link2"/>
+  <child link="pair3leg2joint2"/>
+</joint>
+
+ <link name="pair3leg2link3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair3leg2joint2_pair3leg2link3_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.58 0 0"/>
+  <parent link="pair3leg2joint2"/>
+  <child link="pair3leg2link3"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="pair3leg2foot">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00040960000000000004" ixy="0" ixz="0" iyy="0.00040960000000000004" iyz="0" izz="0.00040960000000000004"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_pair3leg2link3_pair3leg2foot" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair3leg2link3"/>
+  <child link="pair3leg2foot"/>
+</joint>
+
+ <link name="main4A">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.004075" ixy="0" ixz="0" iyy="0.004075" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_main3_main4A" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.29 0"/>
+  <parent link="main3"/>
+  <child link="main4A"/>
+</joint>
+
+<link name="main4_connector">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00064" ixy="0" ixz="0" iyy="0.00064" iyz="0" izz="0.00064"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.04"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <sphere radius="0.04"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_revolute_main4A_main4_connector_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 -0.145 0"/>
+  <parent link="main4A"/>
+  <child link="main4_connector"/>
+  <axis xyz="1 0 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="main4">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.004075" ixy="0" ixz="0" iyy="0.004075" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.21" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_main4_connector_main4" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.145 0"/>
+  <parent link="main4_connector"/>
+  <child link="main4"/>
+</joint>
+
+ <link name="pair4middle_axis">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_main4_pair4middle_axis" type="fixed">
+  <origin rpy="0 0 0" xyz="0 -0.145 0"/>
+  <parent link="main4"/>
+  <child link="pair4middle_axis"/>
+</joint>
+
+ <link name="pair4leg1central_link">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair4middle_axis_pair4leg1central_link" type="fixed">
+  <origin rpy="0 0 0" xyz="0.19 0 0"/>
+  <parent link="pair4middle_axis"/>
+  <child link="pair4leg1central_link"/>
+</joint>
+
+ <link name="pair4leg1link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair4leg1central_link_pair4leg1link1_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair4leg1central_link"/>
+  <child link="pair4leg1link1"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair4leg1joint1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair4leg1link1_pair4leg1joint1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair4leg1link1"/>
+  <child link="pair4leg1joint1"/>
+</joint>
+
+ <link name="pair4leg1link2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.021233333333333333" ixy="0" ixz="0" iyy="0.021233333333333333" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair4leg1joint1_pair4leg1link2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+  <parent link="pair4leg1joint1"/>
+  <child link="pair4leg1link2"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair4leg1joint2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair4leg1link2_pair4leg1joint2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair4leg1link2"/>
+  <child link="pair4leg1joint2"/>
+</joint>
+
+ <link name="pair4leg1link3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair4leg1joint2_pair4leg1link3_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.58 0 0"/>
+  <parent link="pair4leg1joint2"/>
+  <child link="pair4leg1link3"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="pair4leg1foot">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00040960000000000004" ixy="0" ixz="0" iyy="0.00040960000000000004" iyz="0" izz="0.00040960000000000004"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_pair4leg1link3_pair4leg1foot" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair4leg1link3"/>
+  <child link="pair4leg1foot"/>
+</joint>
+
+ <link name="pair4leg2central_link">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 0 1.57" xyz="0 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair4middle_axis_pair4leg2central_link" type="fixed">
+  <origin rpy="0 0 3.14" xyz="-0.19 0 0"/>
+  <parent link="pair4middle_axis"/>
+  <child link="pair4leg2central_link"/>
+</joint>
+
+ <link name="pair4leg2link1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair4leg2central_link_pair4leg2link1_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair4leg2central_link"/>
+  <child link="pair4leg2link1"/>
+  <axis xyz="0 0 1"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair4leg2joint1">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair4leg2link1_pair4leg2joint1" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair4leg2link1"/>
+  <child link="pair4leg2joint1"/>
+</joint>
+
+ <link name="pair4leg2link2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.021233333333333333" ixy="0" ixz="0" iyy="0.021233333333333333" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.29 0 0"/>
+    <geometry>
+      <cylinder length="0.5" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair4leg2joint1_pair4leg2link2_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+  <parent link="pair4leg2joint1"/>
+  <child link="pair4leg2link2"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+ <link name="pair4leg2joint2">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.0007893333333333333" ixy="0" ixz="0" iyy="0.0007893333333333333" iyz="0" izz="0.000256"/>
+  </inertial>
+  <visual>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="1.57 0 0" xyz="0.58 0 0"/>
+    <geometry>
+      <cylinder length="0.08" radius="0.032"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_fixed_pair4leg2link2_pair4leg2joint2" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair4leg2link2"/>
+  <child link="pair4leg2joint2"/>
+</joint>
+
+ <link name="pair4leg2link3">
+  <inertial>
+    <mass value="1"/>
+    <inertia ixx="0.007899999999999999" ixy="0" ixz="0" iyy="0.007899999999999999" iyz="0" izz="0.0004"/>
+  </inertial>
+  <visual>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </visual>
+  <collision>
+    <origin rpy="0 1.57 0" xyz="0.19 0 0"/>
+    <geometry>
+      <cylinder length="0.3" radius="0.04"/>
+    </geometry>
+  </collision>
+ </link>
+
+<joint name="joint_revolute_pair4leg2joint2_pair4leg2link3_Z" type="revolute">
+  <origin rpy="0 0 0" xyz="0.58 0 0"/>
+  <parent link="pair4leg2joint2"/>
+  <child link="pair4leg2link3"/>
+  <axis xyz="0 1 0"/>
+  <dynamics damping="0.01" friction="0.5"/>
+  <limit lower="-1.57" upper="1.57" effort="0.01" velocity="100"/>
+</joint>
+
+<link name="pair4leg2foot">
+  <inertial>
+   <mass value="1"/>
+   <inertia ixx="0.00040960000000000004" ixy="0" ixz="0" iyy="0.00040960000000000004" iyz="0" izz="0.00040960000000000004"/>
+  </inertial>
+  <collision>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0.37999999999999995 0 0"/>
+    <geometry>
+      <sphere radius="0.032"/>
+    </geometry>
+  </visual>
+</link>
+
+<joint name="joint_fixed_pair4leg2link3_pair4leg2foot" type="fixed">
+  <origin rpy="0 0 0" xyz="0 0 0"/>
+  <parent link="pair4leg2link3"/>
+  <child link="pair4leg2foot"/>
+</joint>
+
+  <klampt package_root="../../.." default_acc_max="4" >
+  </klampt>
+</robot>
