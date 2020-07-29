@@ -1,9 +1,9 @@
 #include "common.h"
 #include "planner/cspace/cspace_geometric_contact_2d.h"
-#include "planner/cspace/contact/ConstraintIntersection_Transition.h"
-#include "planner/cspace/contact/FixedContactConstraint2D.h"
-#include "planner/cspace/contact/TransitionConstraint2D.h"
-#include "planner/cspace/validitychecker/validity_checker_ompl.h"
+#include "planner/cspace/contact/ProjectedStateSpaceMultiMode.h"
+#include <ompl/base/Constraint.h>
+#include <ompl/base/ConstrainedSpaceInformation.h>
+#include <ompl/base/spaces/constraint/ConstrainedStateSpace.h>
 
 GeometricCSpaceContact2D::GeometricCSpaceContact2D(RobotWorld *world_, int robot_idx):
     GeometricCSpaceContact(world_, robot_idx) 
@@ -39,42 +39,10 @@ void GeometricCSpaceContact2D::initSpace()
     bounds.check();
     static_pointer_cast<ob::RealVectorStateSpace>(Rn)->setBounds(bounds);
 
-    //Constraint Pointer Vector
-    std::cout << "Number of Links: " << robot->links.size() - 1 << std::endl;
-    for(uint j = 0; j < input.contact_links.size(); j++)
-    {
-        ContactInformation cj = input.contact_links.at(j);
+    initConstraints(Rn);
 
-        int link = cj.robot_link_idx;
-        if(cj.mode == "fixed"){
-            std::cout << "Adding Fixed Contact Constraint:"
-                      << " robot: " << cj.robot_name
-                      << ", link: " << cj.robot_link << " (idx: " << cj.robot_link_idx << ")"
-                      << " on mesh: " << cj.meshFrom << " (idx: " << cj.meshFromIdx << ")"
-                      << std::endl;
-
-            constraints.push_back(std::make_shared<FixedContactConstraint2D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom));
-
-        }else if(cj.mode == "transition"){
-            std::cout << "Adding Transition Contact Constraint:"
-                      << " robot: " << cj.robot_name
-                      << ", link: " << cj.robot_link << " (idx: " << cj.robot_link_idx << ")"
-                      << ", from mesh: " << cj.meshFrom << " (idx: " << cj.meshFromIdx << ")"
-                      << " to mesh: " << cj.meshTo << " (idx: " << cj.meshToIdx << ")"
-                      << std::endl;
-
-            constraints.push_back(std::make_shared<TransitionConstraint2D>(this, Rn->getDimension(), robot, world, link, cj.meshFrom, cj.meshTo));
-
-        }else{
-            std::cout << "Could not identify contact mode" << std::endl;
-            exit(0);
-        }
-
-    }
-
-    //Constraint Intersection to join multiple constraints
-    constraint_intersect = std::make_shared<ConstraintIntersectionTransition>(Rn->getDimension(), constraints);
-    ob::StateSpacePtr RN_Constraint =  std::make_shared<ob::ProjectedStateSpaceTransition>(Rn, constraint_intersect);
+    ob::StateSpacePtr RN_Constraint =  
+      std::make_shared<ob::ProjectedStateSpaceMultiMode>(Rn, getConstraints());
 
     this->space = RN_Constraint;
 }
@@ -97,8 +65,7 @@ void GeometricCSpaceContact2D::ConfigToOMPLState(const Config &q, ob::State *qom
     }
 
     qompl->as<ob::ConstrainedStateSpace::StateType>()->copy(x);
-    // static_pointer_cast<ob::ConstrainedStateSpace>(this->space)->getConstraint()->project(qompl);
-    constraint_intersect->project(qompl);
+    getConstraints()->project(qompl);
     SpaceInformationPtr()->enforceBounds(qompl);
 }
 

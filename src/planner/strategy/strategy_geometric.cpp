@@ -197,8 +197,12 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
       {
         cspaceContact->setInitialConstraints();
         startk = cspace->ConfigToOMPLState(input.q_init);
+        cspaceContact->addConstraintsToState(startk.get());
+
         cspaceContact->setGoalConstraints();
         goalk  = cspace->ConfigToOMPLState(input.q_goal);
+        cspaceContact->addConstraintsToState(goalk.get());
+
         cspaceContact->setInitialConstraints();
       }else{
         startk = cspace->ConfigToOMPLState(input.q_init);

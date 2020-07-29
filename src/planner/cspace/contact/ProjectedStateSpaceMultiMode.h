@@ -1,6 +1,5 @@
 #pragma once
-#include "planner/cspace/contact/ConstraintIntersection_Transition.h"
-#include "planner/cspace/contact/TransitionModeTypes.h"
+#include "planner/cspace/contact/ConstraintIntersectionMultiMode.h"
 #include "ompl/base/MotionValidator.h"
 #include "ompl/base/PlannerData.h"
 #include "ompl/base/StateSampler.h"
@@ -22,15 +21,15 @@ namespace ompl
     {
         /// @cond IGNORE
         /** \brief Forward declaration of ompl::base::ProjectedStateSpace */
-        OMPL_CLASS_FORWARD(ProjectedStateSpaceTransition);
+        OMPL_CLASS_FORWARD(ProjectedStateSpaceMultiMode);
         /// @endcond
 
         /** \brief StateSampler for use for a projection-based state space. */
-        class ProjectedStateSamplerTransition : public ProjectedStateSampler
+        class ProjectedStateSamplerMultiMode : public ProjectedStateSampler
         {
         public:
             /** \brief Constructor. */
-            ProjectedStateSamplerTransition(const ProjectedStateSpaceTransition *space, StateSamplerPtr sampler);
+            ProjectedStateSamplerMultiMode(const ProjectedStateSpaceMultiMode *space, StateSamplerPtr sampler);
 
             /** \brief Sample a state uniformly in ambient space and project to
              * the manifold. Return sample in \a state. */
@@ -43,24 +42,29 @@ namespace ompl
             /** \brief Constraint. */
             const ConstraintPtr constraint_;
             std::vector<ConstraintPtr> constraintsVec;
-            ConstraintIntersectionTransitionPtr constraintIntersection_;
+            ConstraintIntersectionMultiModePtr constraintIntersection_;
         };
-
 
         /** \brief ConstrainedStateSpace encapsulating a projection-based
          * methodology for planning with constraints. */
-        class ProjectedStateSpaceTransition : public ConstrainedStateSpace
+        class ProjectedStateSpaceMultiMode : public ConstrainedStateSpace
         {
         public:
             /** \brief Construct an atlas with the specified dimensions. */
-            ProjectedStateSpaceTransition(const StateSpacePtr &ambientSpace, const ConstraintPtr &constraint)
+            ProjectedStateSpaceMultiMode(const StateSpacePtr &ambientSpace, const ConstraintPtr &constraint)
               : ConstrainedStateSpace(ambientSpace, constraint)
             {
                 setName("Projected" + space_->getName());
+                // constraintIntersection_ =
+                //   std::dynamic_pointer_cast<const ConstraintIntersectionMultiMode>(constraint);
+                // if(constraintIntersection_ == nullptr)
+                // {
+                //   throw ompl::Exception("Required Intersection Constraint MultiMode");
+                // }
             }
 
             /** \brief Destructor. */
-            ~ProjectedStateSpaceTransition() override = default;
+            ~ProjectedStateSpaceMultiMode() override = default;
 
             class StateType : public ConstrainedStateSpace::StateType
             {
@@ -69,16 +73,16 @@ namespace ompl
                 StateType(const ConstrainedStateSpace *space) : ConstrainedStateSpace::StateType(space)
                 {
                 }
-                void setMode(TransitionMode mode)
+                void setMode(ConstraintMode mode)
                 {
                   mode_ = mode;
                 }
-                TransitionMode getMode() const
+                ConstraintMode getMode() const
                 {
                   return mode_;
                 }
             protected:
-                TransitionMode mode_;
+                ConstraintMode mode_; //to which constraint intersection the state belongs
 
             };
 
@@ -86,15 +90,13 @@ namespace ompl
             /** \brief Allocate the default state sampler for this space. */
             StateSamplerPtr allocDefaultStateSampler() const override
             {
-                return std::make_shared<ProjectedStateSamplerTransition>(this, space_->allocDefaultStateSampler());
+                return std::make_shared<ProjectedStateSamplerMultiMode>(this, space_->allocDefaultStateSampler());
             }
-
-            void setMode(TransitionMode mode);
 
             /** \brief Allocate the previously set state sampler for this space. */
             StateSamplerPtr allocStateSampler() const override
             {
-                return std::make_shared<ProjectedStateSamplerTransition>(this, space_->allocStateSampler());
+                return std::make_shared<ProjectedStateSamplerMultiMode>(this, space_->allocStateSampler());
             }
             void copyState(State *destination, const State *source) const override
             {
@@ -117,9 +119,9 @@ namespace ompl
              * freeing states returned in \a geodesic.*/
             bool discreteGeodesic(const State *from, const State *to, bool interpolate = false,
                                   std::vector<State *> *geodesic = nullptr) const override;
-            // void resetTransitionConstraints();
 
             // unsigned int validSegmentCount(const State *state1, const State *state2) const override;
+
 
         };
     }

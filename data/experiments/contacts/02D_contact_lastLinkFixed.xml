@@ -36,10 +36,13 @@
       <contact robot_name="2dof" robot_link="jlink2" 
                mode="fixed"
                mesh="rectangleBottom1" />
-      <contact robot_name="2dof" robot_link="jlink0"
-               mode="transition"
-               meshFrom="rectangleBottom1"
-               meshTo="rectangleBottom2"/>
+      <contact robot_name="2dof" robot_link="jlink0" 
+               mode="fixed"
+               mesh="rectangleBottom1" />
+      <!-- <contact robot_name="2dof" robot_link="jlink0" -->
+      <!--          mode="transition" -->
+      <!--          meshFrom="rectangleBottom1" -->
+      <!--          meshTo="rectangleBottom2"/> -->
     </contacts>
 
     <hierarchy>
