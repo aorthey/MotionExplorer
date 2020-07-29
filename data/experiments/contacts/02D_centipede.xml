@@ -4,24 +4,52 @@
 
   <robot name="centipede" file="../../robots/contact/centipede.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
 
-  <terrain name="mountain.tri" file="../../terrains/mountain/ridge.tri" translation="+0 +0 -5">
-     <display color="0.6 0.6 0.6 1"/> 
-  </terrain>
+  <terrain name="rectangleBottom1" file="../../terrains/primitives/rectangle.tri" translation="0 0 0" rotateRPY="0 0 0" scale="10 5 1"/>
   <plannerinput>
 
 
-    <qinit config="95  -3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
-    <qgoal config="95  0 0 -2 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+    <qinit config="59  0 3 1.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.55 0 0 0 0 0 0 1.57 0 0 0 0 0 0 0 1.57 0 0 0 0 0 0 1.57 0 0 0 0 0 0 0 1.57 0 0 0 0 0 0 1.57 0 0 0 "/>
+    <qgoal config="59  0 -3 1.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.55 0 0 0 0 0 0 1.57 0 0 0 0 0 0 0 1.57 0 0 0 0 0 0 1.57 0 0 0 0 0 0 0 1.57 0 0 0 0 0 0 1.57 0 0 0 "/>
 
     <se3min config="6  -5 -5 -5 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +5 +5 +5 +3.141593 +1.57 +3.141593"/>
     <epsilongoalregion>0.1</epsilongoalregion>
     <maxplanningtime>2</maxplanningtime>      <!-- runtime in (s) --> 
     <freeFloating>1</freeFloating>
+
+    <algorithm name="ompl:prmstar"/>
+    <algorithm name="ompl:rrt"/>
     <algorithm name="hierarchy:qrrt"/>
 
+    <contacts>
+      <contact robot_name="centipede" 
+               robot_link="pair2leg2foot"
+               mode="fixed"
+               mesh="rectangleBottom1" />
+      <contact robot_name="centipede" 
+               robot_link="pair2leg1foot"
+               mode="fixed"
+               mesh="rectangleBottom1" />
+      <contact robot_name="centipede" 
+               robot_link="pair1leg1foot"
+               mode="fixed"
+               mesh="rectangleBottom1" />
+      <contact robot_name="centipede" 
+               robot_link="pair1leg2foot"
+               mode="fixed"
+               mesh="rectangleBottom1" />
+      <contact robot_name="centipede" 
+               robot_link="pair0leg1foot"
+               mode="fixed"
+               mesh="rectangleBottom1" />
+      <contact robot_name="centipede" 
+               robot_link="pair0leg2foot"
+               mode="fixed"
+               mesh="rectangleBottom1" />
+     </contacts>
+
     <hierarchy>
-        <level inner_index="0" type="SE3RN"/>
+        <level inner_index="0" type="R3_CONTACT"/>
     </hierarchy>
   </plannerinput>
 </world>
