@@ -5,6 +5,7 @@
   <robot name="centipede" file="../../robots/contact/centipede.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
 
   <terrain name="rectangleBottom1" file="../../terrains/primitives/rectangle.tri" translation="0 0 0" rotateRPY="0 0 0" scale="10 5 1"/>
+  <terrain name="rectangleObstacle1" file="../../terrains/primitives/rectangle.tri" translation="+1 -1 +0.25" rotateRPY="0 0 0" scale="4 1 10"/>
   <plannerinput>
 
 

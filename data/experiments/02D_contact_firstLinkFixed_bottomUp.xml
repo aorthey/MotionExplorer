@@ -2,20 +2,20 @@
 
 <world>
 
-  <robot name="2dof" file="../../robots/planar/2dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
+  <robot name="2dof" file="../robots/planar/2dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
   <!-- <robot name="1dof_inner" file="../robots/planar/2dof_testobj_1dof_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>-->
   <!-- when adding/removing links remember to adjust configurations -->
 
-  <terrain name="rectangleBottom" file="../../terrains/primitives/rectangle.tri" translation="+3.2 -1.5 0" rotateRPY="0 0 0" scale="4 3 1"/>
-  <terrain name="rectangleTop" file="../../terrains/primitives/rectangle.tri" translation="-2.45 +1.0 0" rotateRPY="0 0 0" scale="4 2 1"/>
+  <terrain name="rectangleBottom" file="../terrains/primitives/rectangle.tri" translation="+3.2 -1.5 0" rotateRPY="0 0 0" scale="4 3 1"/>
+  <terrain name="rectangleTop" file="../terrains/primitives/rectangle.tri" translation="-2.45 +1.0 0" rotateRPY="0 0 0" scale="4 2 1"/>
 
 
   <plannerinput>
 
-    <qinit  config="10  +2.2 -1 0 0 0 0  2.35619 0.0 1.55 0 "/>
-    <qgoal  config="10  -1.45 +0.5 0 0 0 0  -1.570796 0.0 -0.4 0 "/>
+    <qinit  config="10  +2.2 -4.5 0 0 0 0  0.785398 0.0 -1.55 0 "/>
+    <qgoal  config="10  +2.2 +0.5 0 0 0 0  1.570796 0.0 0.4 0 "/>
 
-    <se3min config="6  -1.5 -2.5 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3min config="6  -1.5 -5.0 -0.0 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +2.5 +2.5 +0.0 +3.141593 +1.57 +3.141593"/>
     <epsilongoalregion>0.05</epsilongoalregion>
     <maxplanningtime>5</maxplanningtime>      <!-- runtime in (s) -->
@@ -31,11 +31,11 @@
     <!--<algorithm name="benchmark:contact"/> -->
 
     <contacts>
-      <contact robot_name="2dof" robot_link="jlink2"
+      <contact robot_name="2dof" robot_link="jlink0"
                mode="fixed"
                mesh="rectangleBottom"
                tri="3"/>
-      <contact robot_name="2dof" robot_link="jlink0"
+      <contact robot_name="2dof" robot_link="jlink2"
                mode="transition"
                meshFrom="rectangleBottom" triFrom="3"
                meshTo="rectangleTop" triTo="6"/>

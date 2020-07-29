@@ -35,8 +35,14 @@ def createSingleLeg(connectorLink, suffix, x, y, yaw=0):
   hstr += createRevoluteJointY(suffix+"joint2", suffix+"link3",link2_length+2*joint_radius,0,0)
 
   d = link3_length+joint_radius+joint_radius
-  hstr += createSphere(suffix+"foot", d, 0, 0, 0.8*joint_radius)
-  hstr += createRigidJoint(suffix+"link3", suffix+"foot")
+  hstr += createFoot(suffix, suffix+"link3", d)
+  # hstr += createSphere(suffix+"foot", d, 0, 0, 0.8*joint_radius)
+  # hstr += createRigidJoint(suffix+"link3", suffix+"foot")
+  return hstr
+
+def createFoot(suffix, lastLink, d):
+  hstr  = createEmptyLink(suffix+"foot", 0, 0, 0)
+  hstr += createRigidJoint(lastLink, suffix+"foot", d)
   return hstr
 
 def createDoubleLeg(connectorLink, suffix, x, y):
@@ -84,7 +90,7 @@ def createCentipede(robot_name):
   f.write('<?xml version="1.0"?>\n')
   f.write('<robot name="'+robot_name+'">\n')
 
-  hstr = createLegPairs(5, 0.5)
+  hstr = createLegPairs(3, 0.5)
 
   f.write(hstr)
   f.write('  <klampt package_root="../../.." default_acc_max="4" >\n')

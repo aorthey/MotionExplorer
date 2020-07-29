@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="3dof" file="../robots/planar_manipulator/3dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+  <terrain name="the_sphere" file="../terrains/primitives/sphere.tri" translation="+0 +0 0" scale="10 10 10"/>
+  <terrain name="rectangle" file="../terrains/primitives/rectangle.tri" translation="-4.0 +10.0 +2.0" rotateRPY="0 0 0" scale="10 1 50"/>
+
+  <plannerinput>
+
+    <qinit  config="12  +5.0 +0.0 0 0.0 0.0 0.0  -1.4 0 +1.57 0 +1.57"/>
+    <qgoal  config="12  +0.0 +4.33 +2.5 0.0 0.0 0.0  +0.25 0 +0.8 0 -1"/>
+    <se3min config="6  -5.5 -5.5 -5.5 -3.141593 -1.571 -3.141593"/>
+    <se3max config="6  +5.5 +12 +5.5 +3.141593 +1.571 +3.141593"/>
+
+    <epsilongoalregion>0.01</epsilongoalregion>
+    <maxplanningtime>0.2</maxplanningtime>      <!-- runtime in (s) --> 
+    <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
+    <pathWidth>0.1</pathWidth>
+
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:rrt"/>
+    <algorithm name="ompl:prm"/>
+    <algorithm name="ompl:lazyprm"/>
+
+    <contacts>
+      <contact robot_name="3dof" robot_link="jlink3"
+               mode="transition"
+               meshFrom="the_sphere"
+               meshTo="rectangle"/>
+      <contact robot_name="3dof" robot_link="jlink0"
+               mode="fixed"
+               mesh="the_sphere"/>
+    </contacts>
+
+    <hierarchy>
+      <level inner_index="0" type="R3_CONTACT"/>
+    </hierarchy>
+
+  </plannerinput>
+
+</world>

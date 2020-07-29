@@ -2,10 +2,10 @@
 
 <world>
 
-  <robot name="3dof" file="../../robots/planar_manipulator/3dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="3dof" file="../robots/planar_manipulator/3dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-  <terrain name="rectangleBottom1" file="../../terrains/primitives/rectangle.tri" translation="+3.0 -2.5 -0.0" rotateRPY="0 0 0" scale="4 2 30"/>
-  <terrain name="rectangleBottom2" file="../../terrains/primitives/rectangle.tri" translation="+3.0 +2.5 -0.0" rotateRPY="0 0 0" scale="4 2 30"/>
+  <terrain name="rectangleBottom1" file="../terrains/primitives/rectangle.tri" translation="+3.0 -2.5 -0.0" rotateRPY="0 0 0" scale="4 2 30"/>
+  <terrain name="rectangleBottom2" file="../terrains/primitives/rectangle.tri" translation="+3.0 +2.5 -0.0" rotateRPY="0 0 0" scale="4 2 30"/>
 
 
   <plannerinput>
