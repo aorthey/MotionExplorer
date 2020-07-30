@@ -24,11 +24,14 @@ void ompl::base::ProjectedStateSamplerMultiMode::sampleUniform(State *state)
 
     constraintIntersection_->setRandomMode();
 
-    state->as<ProjectedStateSpaceMultiMode::StateType>()->setMode(constraintIntersection_->getMode());
-    
     constraintIntersection_->project(state);
 
     space_->enforceBounds(state);
+
+    constraintIntersection_->engraveConstraintMode(state);
+    // std::cout << "Random Sample" << std::endl;
+    // space_->printState(state);
+
 }
 
 void ompl::base::ProjectedStateSamplerMultiMode::sampleUniformNear(
@@ -44,9 +47,40 @@ void ompl::base::ProjectedStateSamplerMultiMode::sampleGaussian(
   ompl::Exception("NYI");
 }
 
+void ompl::base::ProjectedStateSpaceMultiMode::printState(
+    const State *state, std::ostream &out) const
+{
+  out << "Constraint State " << std::endl << "[" << std::endl;
+  out << "  ";
+  BaseT::printState(state, out);
+  if (state != nullptr)
+  {
+    out << "  Active Contacts ";
+    ConstraintMode cfrom = state->as<StateType>()->getMode();
+
+    const std::vector<int>& vecIdx = cfrom.getFixedConstraintIndices();
+    const std::vector<Math3D::Vector3>& vec = cfrom.getFixedConstraintContactPoints();
+
+    for(uint k = 0; k < vec.size(); k++)
+    {
+      Math3D::Vector3 vk = vec.at(k);
+      out << "[" << vecIdx.at(k) << ":" << vk << "] ";
+    }
+    out << std::endl;
+
+    out << "  Constraint Modes: " << cfrom << std::endl;
+  }else{
+    out << "nullptr" << std::endl;
+  }
+  out << ']' << std::endl;
+}
+
 bool ompl::base::ProjectedStateSpaceMultiMode::discreteGeodesic(
   const State *from, const State *to, bool interpolate, std::vector<State *> *geodesic) const
 {
+    // std::cout << std::string(80, '-') << std::endl;
+    // std::cout << "DISCRETE GEODESIC" << std::endl;
+    // std::cout << std::string(80, '-') << std::endl;
     // Save a copy of the from state.
     if (geodesic != nullptr)
     {
@@ -54,51 +88,70 @@ bool ompl::base::ProjectedStateSpaceMultiMode::discreteGeodesic(
         geodesic->push_back(cloneState(from));
     }
 
-    ConstraintMode cfrom = from->as<StateType>()->getMode();
-    ConstraintMode cto = to->as<StateType>()->getMode();
+    const ConstraintMode& cfrom = from->as<StateType>()->getMode();
+    const ConstraintMode& cto = to->as<StateType>()->getMode();
+    ConstraintIntersectionMultiModePtr constraintIntersection
+      = std::static_pointer_cast<ConstraintIntersectionMultiMode>(constraint_);
+
+    if(!cfrom.canReach(cto))
+    {
+      return false;
+    }
+
+    // State *fromProjected = si_->cloneState(from);
+    //if(cto.isLargerAs(cfrom))
+    //{
+    //  //removing constraint
+    //    constraintIntersection->setMode(cto);
+    //    // constraint_->project(toProjected);
+    //    // constraintIntersection->engraveConstraintMode(toProjected);
+    //}else
+    //{
+    //    //on constraint or adding constraint (at end)
+    //    constraintIntersection->setMode(cfrom);
+    //    // constraint_->project(toProjected);
+    //    // constraintIntersection->engraveConstraintMode(toProjected);
+    //}
+
+    constraintIntersection->setTransitionMode(cfrom, cto);
+
+    State *toProjected = si_->cloneState(to);
+    constraint_->project(toProjected);
+    constraintIntersection->engraveConstraintMode(toProjected);
+
+    // State *toProjected = si_->cloneState(to);
 
     std::cout << std::string(80, '-') << std::endl;
     std::cout << "Trying to connect states" << std::endl;
     si_->printState(from);
-    std::cout << "Mode:" << cfrom << std::endl;
-    si_->printState(to);
-    std::cout << "Mode:" << cto << std::endl;
-
-    if(!cfrom.canReach(cto))
-    {
-      std::cout << "Cannot be reached" << std::endl;
-      return false;
-    }
-
-    ConstraintIntersectionMultiModePtr constraintIntersection
-      = std::static_pointer_cast<ConstraintIntersectionMultiMode>(constraint_);
-
-    if(cfrom.isLargerAs(cto))
-    {
-        std::cout << "From InActive to Active" << std::endl;
-        constraintIntersection->setMode(cfrom);
-    }else{
-        std::cout << "From Active to Inactive" << std::endl;
-        constraintIntersection->setMode(cto);
-    }
+    si_->printState(toProjected);
 
     const double tolerance = delta_;
 
     // No need to traverse the manifold if we are already there.
     double dist, step, total = 0;
-    if ((dist = distance(from, to)) <= tolerance)
+    if ((dist = distance(from, toProjected)) <= tolerance)
+    {
         return true;
+    }
 
     const double max = dist * lambda_;
 
     auto previous = cloneState(from);
     auto scratch = allocState();
 
+    scratch->as<StateType>()->setMode(from->as<StateType>()->getMode());
+
+    if(!constraintIntersection->getMode().isValid())
+    {
+      std::cout << "INVALID" << std::endl;
+    }
+
     auto &&svc = si_->getStateValidityChecker();
 
     do
     {
-        WrapperStateSpace::interpolate(previous, to, delta_ / dist, scratch);
+        WrapperStateSpace::interpolate(previous, toProjected, delta_ / dist, scratch);
 
         // Project new state onto constraint manifold
         if (!constraint_->project(scratch)                  // not on manifold
@@ -112,7 +165,7 @@ bool ompl::base::ProjectedStateSpaceMultiMode::discreteGeodesic(
             break;
 
         // Check if we are no closer than before
-        const double newDist = distance(scratch, to);
+        const double newDist = distance(scratch, toProjected);
         if (newDist >= dist)
             break;
 
@@ -122,6 +175,7 @@ bool ompl::base::ProjectedStateSpaceMultiMode::discreteGeodesic(
         // Store the new state
         if (geodesic != nullptr)
         {
+            // si_->printState(scratch);
             geodesic->push_back(cloneState(scratch));
         }
 
@@ -130,6 +184,7 @@ bool ompl::base::ProjectedStateSpaceMultiMode::discreteGeodesic(
     std::cout << "Geodesic distance to goal: " << dist << "/" << tolerance<< std::endl;
     freeState(scratch);
     freeState(previous);
+    freeState(toProjected);
 
     return dist <= tolerance;
 }

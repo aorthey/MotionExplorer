@@ -67,6 +67,7 @@ void GeometricCSpaceContact2D::ConfigToOMPLState(const Config &q, ob::State *qom
     qompl->as<ob::ConstrainedStateSpace::StateType>()->copy(x);
     getConstraints()->project(qompl);
     SpaceInformationPtr()->enforceBounds(qompl);
+    getConstraints()->engraveConstraintMode(qompl);
 }
 
 Config GeometricCSpaceContact2D::OMPLStateToConfig(const ob::State *qompl)

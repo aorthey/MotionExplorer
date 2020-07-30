@@ -49,6 +49,7 @@ namespace ompl
          * methodology for planning with constraints. */
         class ProjectedStateSpaceMultiMode : public ConstrainedStateSpace
         {
+          using BaseT = ConstrainedStateSpace;
         public:
             /** \brief Construct an atlas with the specified dimensions. */
             ProjectedStateSpaceMultiMode(const StateSpacePtr &ambientSpace, const ConstraintPtr &constraint)
@@ -77,7 +78,7 @@ namespace ompl
                 {
                   mode_ = mode;
                 }
-                ConstraintMode getMode() const
+                const ConstraintMode& getMode() const
                 {
                   return mode_;
                 }
@@ -107,6 +108,7 @@ namespace ompl
             {
                 return new StateType(this);
             }
+            virtual void printState(const State *state, std::ostream &out = std::cout) const;
 
 
             /** \brief Traverse the manifold from \a from toward \a to. Returns

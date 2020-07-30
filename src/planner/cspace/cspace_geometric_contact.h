@@ -15,7 +15,7 @@ public:
 
     std::vector<Triangle3D> getTrianglesOnMesh(std::string nameMesh);
 
-    ob::ConstraintPtr getConstraints();
+    ConstraintIntersectionMultiModePtr getConstraints();
 
     void setGoalConstraints();
 

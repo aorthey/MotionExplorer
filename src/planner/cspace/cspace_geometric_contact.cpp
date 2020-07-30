@@ -68,7 +68,7 @@ std::vector<Triangle3D> GeometricCSpaceContact::getTrianglesOnMesh(std::string n
     return tris;
 }
 
-ob::ConstraintPtr GeometricCSpaceContact::getConstraints()
+ConstraintIntersectionMultiModePtr GeometricCSpaceContact::getConstraints()
 {
   return constraint_intersect;
 }

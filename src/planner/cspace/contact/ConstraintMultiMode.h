@@ -8,11 +8,10 @@ class ConstraintMultiMode: public ompl::base::Constraint
     ConstraintMultiMode(int ambientSpaceDim);
 
     virtual int getNumberOfModes() = 0;
-
     virtual int setRandomMode();
-
-    void setMode(int mode);
+    virtual void setMode(int mode);
     int getMode() const;
+
   private:
     int mode_{0};
     ompl::RNG randomNumberGenerator_;

@@ -64,6 +64,11 @@ double ConstraintContact::contactDistanceToMesh(const Vector3& contact) const
     Real distVect = contact.distance(closestPt);
     return distVect;
 }
+double ConstraintContact::contactDistanceToPoint(const Vector3& contact, const Vector3& point) const
+{
+    Real distVect = contact.distance(point);
+    return distVect;
+}
 
 //void ConstraintContact::function(const Eigen::Ref<const Eigen::VectorXd> &x, Eigen::Ref<Eigen::VectorXd> out) const
 //{

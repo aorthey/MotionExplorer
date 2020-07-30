@@ -17,9 +17,30 @@ void ConstraintContactFixed::function(
     {
       out[0]=0.0;
     }else{
+
       Vector3 contact = getPos(x);
-      out[0] = contactDistanceToMesh(contact);
+      if(!hasFixedContactPoint_)
+      {
+        out[0] = contactDistanceToMesh(contact);
+      }else{
+        out[0] = contactDistanceToPoint(contact, fixedContactPoint_);
+      }
     }
+}
+void ConstraintContactFixed::setMode(int mode)
+{
+  BaseT::setMode(mode);
+  hasFixedContactPoint_ = false;
+}
+void ConstraintContactFixed::setFixedContactPoint(const Vector3 &v)
+{
+  hasFixedContactPoint_ = true;
+  fixedContactPoint_ = v;
+}
+
+const Vector3& ConstraintContactFixed::getFixedContactPoint() const
+{
+  return fixedContactPoint_;
 }
 
 int ConstraintContactFixed::getNumberOfModes()

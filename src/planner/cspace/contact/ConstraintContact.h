@@ -21,6 +21,7 @@ public:
     const std::vector<Triangle3D>& getTriangles() const;
 
     double contactDistanceToMesh(const Vector3& contact) const;
+    double contactDistanceToPoint(const Vector3& contact, const Vector3& point) const;
 
 private:
     GeometricCSpaceContact *cspace_;
