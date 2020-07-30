@@ -423,12 +423,14 @@ void MotionPlanner::AdvanceUntilSolution()
     return;
   }
 
-  if(!strategy->IsInitialized()){
+  if(!strategy->IsInitialized())
+  {
     InitStrategy();
   }
   if(util::StartsWith(input.name_algorithm,"benchmark")) return;
 
-  if(threading){
+  if(threading)
+  {
     output = new StrategyOutput(cspace_levels);
     threadRunning = true;
     std::thread threadStrategy(RunPlanner, std::ref(strategy), std::ref(output), std::ref(threadRunning));

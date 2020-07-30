@@ -249,7 +249,6 @@ namespace GLDraw{
     glEnable(GL_LIGHTING);
 
 
-
     glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);
     glEnable(GL_LINE_SMOOTH);
@@ -263,6 +262,7 @@ namespace GLDraw{
       Matrix4 mat = robot->links[idx].T_World;
       glPushMatrix();
       setColor(colorContact);
+      glScalef(scale, scale, scale);
       glMultMatrix(mat);
       drawSphere(0.2, 16, 8);
       glPopMatrix();
