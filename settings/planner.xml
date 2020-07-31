@@ -54,7 +54,7 @@
   <smoothPath>0</smoothPath>           <!-- 0: no smoothing, 1: smoothing      -->
   <pathSpeed>1</pathSpeed>             <!-- <1: slower, 1: default, >1: faster -->
   <pathWidth>0.1</pathWidth>
-  <pathBorderWidth>1</pathBorderWidth>
+  <pathBorderWidth>0.01</pathBorderWidth>
   <threading>0</threading>
 
   <epsilongoalregion>0.01</epsilongoalregion>

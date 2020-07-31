@@ -33,6 +33,8 @@ class ViewLocalMinimaTree
     ViewLocalMinimaTree() = delete;
     ViewLocalMinimaTree(ompl::multilevel::LocalMinimaTreePtr, std::vector<CSpaceOMPL*> cspace_levels);
 
+    double pathWidth{0.1};
+    double pathBorderWidth{0.005};
     int x_,y_,heightPerLevel,width;
     int width_column1;
     int width_column2;

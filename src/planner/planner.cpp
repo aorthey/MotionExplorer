@@ -385,6 +385,11 @@ void MotionPlanner::InitStrategy()
       localMinimaTree_ = explorerPlanner2->getLocalMinimaTree();
       viewLocalMinimaTree_ = std::make_shared<ViewLocalMinimaTree>(localMinimaTree_, cspace_levels);
   }
+  if(viewLocalMinimaTree_ != nullptr)
+  {
+    viewLocalMinimaTree_->pathWidth = input.pathWidth;
+    viewLocalMinimaTree_->pathBorderWidth = input.pathBorderWidth;
+  }
 }
 
 void MotionPlanner::Step()

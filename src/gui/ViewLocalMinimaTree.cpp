@@ -52,8 +52,8 @@ void ViewLocalMinimaTree::DrawGLNodeSelected(GUIState& state, LocalMinimaNode* n
 
   pathSelected_->zOffset = 0.001;
   pathSelected_->ptsize = 1;
-  pathSelected_->linewidth = 0.05;
-  pathSelected_->widthBorder = 0.001;
+  pathSelected_->linewidth = pathWidth;
+  pathSelected_->widthBorder = pathBorderWidth;
   pathSelected_->setColor(magenta);
   pathSelected_->drawSweptVolume = true;
   pathSelected_->drawCross = false;
@@ -76,8 +76,8 @@ void ViewLocalMinimaTree::DrawGLNodeUnSelected(GUIState& state, LocalMinimaNode*
 
   pwl->zOffset = 0.001;
   pwl->ptsize = 1;
-  pwl->linewidth = 0.03;
-  pwl->widthBorder = 0.001;
+  pwl->linewidth = 0.5*pathWidth;
+  pwl->widthBorder = 0.3*pathBorderWidth;
   pwl->setColor(grey);
   pwl->drawSweptVolume = false;
   pwl->drawCross = false;

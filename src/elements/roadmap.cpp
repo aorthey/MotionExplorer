@@ -100,24 +100,24 @@ void Roadmap::DrawGLEdgeStateToState(CSpaceOMPL *space, const ob::State *s, cons
 void Roadmap::DrawGLEdge(CSpaceOMPL *space, const ob::State *s, const ob::State *t, int ridx)
 {
   ob::StateSpacePtr stateSpace = space->SpaceInformationPtr()->getStateSpace();
-  DrawGLEdgeStateToState(space, s, t, ridx);
+  // DrawGLEdgeStateToState(space, s, t, ridx);
 
-  // int nd = stateSpace->validSegmentCount(s, t);
-  // if(nd <= 1)
-  // {
-  //     DrawGLEdgeStateToState(space, s, t, ridx);
-  // }else
-  // {
-  //     stateSpace->copyState(stateTmpOld, s);
-  //     for (int j = 1; j <= nd; j++)
-  //     {
-  //         stateSpace->interpolate(s, t, (double)j / (double)nd, stateTmpCur);
+  int nd = stateSpace->validSegmentCount(s, t);
+  if(nd <= 1)
+  {
+      DrawGLEdgeStateToState(space, s, t, ridx);
+  }else
+  {
+      stateSpace->copyState(stateTmpOld, s);
+      for (int j = 1; j <= nd; j++)
+      {
+          stateSpace->interpolate(s, t, (double)j / (double)nd, stateTmpCur);
 
-  //         DrawGLEdgeStateToState(space, stateTmpOld, stateTmpCur, ridx);
+          DrawGLEdgeStateToState(space, stateTmpOld, stateTmpCur, ridx);
 
-  //         stateSpace->copyState(stateTmpOld, stateTmpCur);
-  //     }
-  // }
+          stateSpace->copyState(stateTmpOld, stateTmpCur);
+      }
+  }
 }
 
 void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
