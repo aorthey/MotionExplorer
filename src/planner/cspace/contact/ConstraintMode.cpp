@@ -46,6 +46,8 @@ bool ConstraintMode::canReach(const ConstraintMode &rhs) const
 {
   if(!rhs.isValid()) return false;
 
+  return false;
+
   const std::vector<int>& cRhs = rhs.getConstraintModeIndices();
   if(rhs.size() != size())
   {
@@ -63,7 +65,38 @@ bool ConstraintMode::canReach(const ConstraintMode &rhs) const
     if(ctr > 1) break;
   }
   //either they are in same mode or they differ by at most one mode
-  return (ctr <= 1);
+  bool validModeIndices = (ctr <= 1);
+  if(!validModeIndices) return false;
+
+  //check equivalent fixed constraints for all overlapping indices
+  if(ctr <= 0)
+  {
+    const std::vector<int>& rhsFixedIndices = rhs.getFixedConstraintIndices();
+    const std::vector<Math3D::Vector3>& rhsFixedContactPoints = 
+      rhs.getFixedConstraintContactPoints();
+
+    const double epsilonEquivalence = 1e-5;
+    for(uint i = 0; i < fixedConstraintIndices_.size(); i++)
+    {
+      int lhsIdx = fixedConstraintIndices_.at(i);
+      for(uint j = 0; j < rhsFixedIndices.size(); j++)
+      {
+        int rhsIdx = rhsFixedIndices.at(j);
+        if(lhsIdx == rhsIdx)
+        {
+          //check for equivalent contact points
+          Math3D::Vector3 lhsPt = fixedConstraintContactPoints_.at(i);
+          Math3D::Vector3 rhsPt = rhsFixedContactPoints.at(j);
+          if(!lhsPt.isEqual(rhsPt, epsilonEquivalence))
+          {
+            return false;
+          }
+        }
+      }
+    }
+  }
+  return true;
+
 }
 
 const std::vector<int>& ConstraintMode::getConstraintModeIndices() const
@@ -81,13 +114,13 @@ const std::vector<Math3D::Vector3>& ConstraintMode::getFixedConstraintContactPoi
 
 bool ConstraintMode::isLargerAs(const ConstraintMode &lhs) const
 {
-  int r = this->countInactiveConstraints();
-  int l = lhs.countInactiveConstraints();
-  return (r > l);
+    int r = this->countInactiveConstraints();
+    int l = lhs.countInactiveConstraints();
+    return (r > l);
 }
 int ConstraintMode::countInactiveConstraints() const
 {
-  return std::count(constraintModeIndices_.begin(), constraintModeIndices_.end(), 0);
+    return std::count(constraintModeIndices_.begin(), constraintModeIndices_.end(), 0);
 }
 void ConstraintMode::addFixedConstraint(int idx, Math3D::Vector3 v)
 {
@@ -102,8 +135,8 @@ void ConstraintMode::clearFixedConstraint()
 
 std::ostream& operator<< (std::ostream& out, const ConstraintMode& cmode)
 {
-  for(int k = 0; k < cmode.size(); k++){
-    out << cmode.at(k) << " ";
-  }
-  return out;
+    for(int k = 0; k < cmode.size(); k++){
+      out << cmode.at(k) << " ";
+    }
+    return out;
 }

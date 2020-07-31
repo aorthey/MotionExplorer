@@ -30,7 +30,6 @@ void ompl::base::ProjectedStateSamplerMultiMode::sampleUniform(State *state)
 
     constraintIntersection_->engraveConstraintMode(state);
     // std::cout << "Random Sample" << std::endl;
-    // space_->printState(state);
 
 }
 
@@ -121,10 +120,10 @@ bool ompl::base::ProjectedStateSpaceMultiMode::discreteGeodesic(
 
     // State *toProjected = si_->cloneState(to);
 
-    std::cout << std::string(80, '-') << std::endl;
-    std::cout << "Trying to connect states" << std::endl;
-    si_->printState(from);
-    si_->printState(toProjected);
+    // std::cout << std::string(80, '-') << std::endl;
+    // std::cout << "Trying to connect states" << std::endl;
+    // si_->printState(from);
+    // si_->printState(toProjected);
 
     const double tolerance = delta_;
 
@@ -140,7 +139,7 @@ bool ompl::base::ProjectedStateSpaceMultiMode::discreteGeodesic(
     auto previous = cloneState(from);
     auto scratch = allocState();
 
-    scratch->as<StateType>()->setMode(from->as<StateType>()->getMode());
+    scratch->as<StateType>()->setMode(constraintIntersection->getMode());
 
     if(!constraintIntersection->getMode().isValid())
     {
@@ -156,18 +155,28 @@ bool ompl::base::ProjectedStateSpaceMultiMode::discreteGeodesic(
         // Project new state onto constraint manifold
         if (!constraint_->project(scratch)                  // not on manifold
             || !(interpolate || svc->isValid(scratch))      // not valid
-            || (step = distance(previous, scratch)) > lambda_ * delta_)  // deviated
+            || (step = distance(previous, scratch)) > lambda_ * delta_
+            || (step < 1e-8))  // too small step
+        {
             break;
+        }
 
         // Check if we have wandered too far
         total += step;
         if (total > max)
+        {
+            // std::cout << "TERMINATE: " << " total:" << total << " step:" << step << std::endl;
             break;
+        }
 
         // Check if we are no closer than before
         const double newDist = distance(scratch, toProjected);
         if (newDist >= dist)
+        {
+            // std::cout << "TERMINATE: (2) New distance " << newDist << ">=" << dist <<
+            //   " total:" << total << " step:" << step << std::endl;
             break;
+        }
 
         dist = newDist;
         copyState(previous, scratch);
@@ -175,13 +184,14 @@ bool ompl::base::ProjectedStateSpaceMultiMode::discreteGeodesic(
         // Store the new state
         if (geodesic != nullptr)
         {
+            // std::cout << "ADDING STATE" << std::endl;
             // si_->printState(scratch);
             geodesic->push_back(cloneState(scratch));
         }
 
     } while (dist >= tolerance);
 
-    std::cout << "Geodesic distance to goal: " << dist << "/" << tolerance<< std::endl;
+    // std::cout << "Geodesic distance to goal: " << dist << "/" << tolerance<< std::endl;
     freeState(scratch);
     freeState(previous);
     freeState(toProjected);

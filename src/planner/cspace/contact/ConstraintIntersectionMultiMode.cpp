@@ -40,7 +40,7 @@ void ConstraintIntersectionMultiMode::setRandomMode()
           }
       }
     }
-    std::cout << "Random mode:" << constraintMode_ << std::endl;
+    // std::cout << "Random mode:" << constraintMode_ << std::endl;
 }
 
 void ConstraintIntersectionMultiMode::setTransitionMode(

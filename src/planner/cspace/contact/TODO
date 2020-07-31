@@ -1,0 +1,10 @@
+[ ] Fix contact point while interpolation (so that it does not slide)
+[ ] Visualize path for every contact
+
+
+Connecting two states on the same mode, but with different fixed constraints
+results in the second state being projected onto the first, and then
+interpolated and an edge is created
+
+Solution: check if fixed constraints are compatible. (in reach?)
+

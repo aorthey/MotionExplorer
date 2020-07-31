@@ -15,6 +15,8 @@ OMPLValidityCheckerMultiAgent::OMPLValidityCheckerMultiAgent(const ob::SpaceInfo
 
 bool OMPLValidityCheckerMultiAgent::isValid(const ob::State* state) const
 {
+  std::lock_guard<std::recursive_mutex> guard(cspace_->getLock());
+
   if(!cspace_->SatisfiesBounds(state)) return false;
 
   Config q = cspace_->OMPLStateToConfig(state);
