@@ -278,7 +278,6 @@ void StrategyGeometricMultiLevel::Plan(StrategyOutput &output)
 {
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
   ompl::time::point start = ompl::time::now();
-  std::cout << "PLAN FOR " << max_planning_time << std::endl;
   planner->solve(ptc);
   output.planner_time = ompl::time::seconds(ompl::time::now() - start);
   output.max_planner_time = max_planning_time;
