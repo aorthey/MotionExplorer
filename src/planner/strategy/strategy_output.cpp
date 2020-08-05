@@ -33,6 +33,12 @@ void StrategyOutput::SetProblemDefinition( ob::ProblemDefinitionPtr pdef )
   pdefVec_.push_back(pdef);
 }
 
+bool StrategyOutput::hasSolution(int level)
+{
+  ob::ProblemDefinitionPtr pdef = pdefVec_.at(level);
+  return (pdef->hasExactSolution() || pdef->hasApproximateSolution());
+}
+
 PathPiecewiseLinear* StrategyOutput::getSolutionPath(int level)
 {
   ob::ProblemDefinitionPtr pdef = pdefVec_.at(level);
@@ -79,8 +85,6 @@ void StrategyOutput::DrawGL(GUIState& state, int level)
 }
 void StrategyOutput::DrawGLPath(GUIState& state, int level)
 {
-  std::cout << "DRAWGL " << level << std::endl;
-    // pathVec_.at(level) = getSolutionPath(level);
     pathVec_.at(level)->DrawGL(state);
 }
 

@@ -16,11 +16,8 @@
     <freeFloating>1</freeFloating>
     <maxplanningtime>10</maxplanningtime>
     <pathSpeed>12</pathSpeed>
-    <threading>0</threading>
+    <threading>1</threading>
 
-    <algorithm name="ompl:rrt"/>
-    <algorithm name="ompl:prmstar"/>
-    <algorithm name="ompl:sst"/>
     <algorithm name="multilevel:explorer2"/>
     <algorithm name="multilevel:explorer"/>
     <algorithm name="multilevel:qmpstar"/>

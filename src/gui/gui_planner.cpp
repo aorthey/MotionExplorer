@@ -288,7 +288,8 @@ bool PlannerBackend::OnIdle()
         t+=tstep;
         SendRefresh();
       }
-      if(state("draw_path_autofocus")){
+      if(state("draw_path_autofocus"))
+      {
         Vector3 v = path->EvalVec3(t);
         CenterCameraOn(v);
       }

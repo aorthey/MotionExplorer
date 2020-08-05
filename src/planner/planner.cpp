@@ -470,7 +470,12 @@ void MotionPlanner::ExpandFull()
   {
     while(current_level < max_levels_)
     {
-      current_level++;
+      if(output && output->hasSolution(current_level))
+      {
+          current_level++;
+      }else{
+          break;
+      }
     }
   }
 
