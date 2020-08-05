@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="disk" file="../robots/planar/disk_0_20.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="point" file="../robots/planar/disk_0_10.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+  <terrain name="O1" file="../terrains/2droom/2droom_anti_voronoi_bias.tri" translation="0 0 0" rotateRPY="0 0 1.57">
+     <display color="0.8 0.8 0.8 0.5" texture="checker" texture_projection="z"/>
+  </terrain>
+
+  <plannerinput>
+
+    <qinit  config="6  +6.5 -6.0 0 0 0 0 0 0"/>
+    <qgoal  config="6  -7.0 +7.5 0 0 0 0 0 0"/>
+    <se3min config="6  -8.0 -8.0 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +8.0 +8.0 +0.0 +3.141593 +1.57 +3.141593"/>
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
+
+    <multilevel>
+      <level inner_index="0" finite_horizon_relaxation="2" type="R2"/>
+      <level inner_index="0" type="R2"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

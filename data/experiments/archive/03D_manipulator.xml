@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="3dof" file="../robots/planar_manipulator/3dof_manip.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-2 +2 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-2 +2 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-2.5 -2.5 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-2.5 -2.5 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="1 -2.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="1 -2.0 0" rotateRPY="0 0 0"/>
+
+  <plannerinput>
+
+    <qinit  config="13  -0.0 +0.0 +0.0 0.0 0.0 0.0  +0.0 0.0 0.0  0 0 0 0"/>
+    <!-- <qinit  config="9  -0.0 +0.0 +0.0 0.0 0.0 0.0  +0.4 0.0 -0.3"/> -->
+    <qgoal  config="13  0.0 +0.0 +0.0 +0.0 0.0 0.0  -1.2 0.0 -0.2 0 0 0 0"/>
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>0.5</maxplanningtime>      <!-- runtime in (s) --> 
+
+    <multilevel>
+      <level inner_index="0" type="R3"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>
+
+
+

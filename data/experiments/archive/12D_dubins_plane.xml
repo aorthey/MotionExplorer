@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <!-- Airplane 1 is holonomic, Airplane 2 is non-holonomic -->
+  <robot name="airplane" file="../robots/airplane.urdf"/>
+  <robot name="airplane" file="../robots/airplane.urdf"/>
+
+   <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
+
+  <plannerinput>
+
+    <qinit  config="6  -4 0 -0.5 0 0 0"/>
+    <dqinit config="6 0.5 0 0 0 0 0 "/>
+    <qgoal  config="6  +4 +2.5 +0.5 0 0 0"/>
+    <dqgoal config="6 0.5 0 0 0 0 0 "/>
+
+    <se3min config="6  -5.0 -5.0 -3.0 -3.141593 0 0"/>
+    <se3max config="6  +5.0 +5.0 +3.0 +3.141593 0 0"/>
+
+    <control_min config="6  0 0 0 -0.1 -0.1 0"/>
+    <control_max config="6  0 0 0 +0.1 +0.1 0"/>
+
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>0.01</epsilongoalregion>
+    <kinodynamic>1</kinodynamic>
+    <pathSpeed>10</pathSpeed>
+
+    <multilevel>
+      <level inner_index="1" type = "SE3"/>
+      <level inner_index="0" type = "TSE3"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

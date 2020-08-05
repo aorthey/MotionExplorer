@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="airplane" file="../../robots/airplane/airplane.urdf"/>
+  <robot name="sphere" file="../../robots/airplane/airplane_inner_sphere.urdf"/>
+  <robot name="sphere" file="../../robots/airplane/airplane_expanded_sphere.urdf"/>
+
+  <!-- <rigidObject name="tori" file="../../terrains/buildings/tori.stl"/> -->
+  <!-- <rigidObject name="tori2" file="../../terrains/buildings/tori.stl" --> 
+  <!--   translation="2.0 0 0"/> -->
+  <!-- <rigidObject name="tri" file="../../terrains/primitives/sphere.tri" translation="+0 +0 +0.5" rotateRPY="0 0 0"/> -->
+  <!-- <rigidObject name="tri" file="../../terrains/primitives/sphere.tri" translation="+0 +0.5 +0.5" rotateRPY="0 0 0"/> -->
+
+
+  <plannerinput>
+
+    <qinit  config="6  -5 +0.0 +0.25 0.57 0 0"/>
+    <dqinit config="6 +1 0 0 0 0 0 "/>
+    <qgoal  config="6  +5 +0.2 +3.75 0 0 0"/>
+    <dqgoal config="6 +1 0 0 0 0 0 "/>
+
+    <dqMin  config="6  +1 0 0 -1 -1 -1"/>
+    <dqMax  config="6  +1 0 0 +1 +1 +1"/>
+
+    <se3min config="6  -8.0 -6.0 +0 -3.141593 0 0"/>
+    <se3max config="6  +8.0 +6.0 +5 +3.141593 0 3.14"/>
+
+    <!-- YPR -->
+    <control_min config="6  0 0 0 -0.3 -0.001 -0.01"/>
+    <control_max config="6  0 0 0 +0.3 +0.001 +0.01"/>
+    <timestep min="0.1" max="0.1"/>
+
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>2</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <pathSpeed>5.5</pathSpeed>
+    <pathWidth>0.1</pathWidth>
+
+    <algorithm name="multilevel:qrrt"/>
+    <algorithm name="ompl:rrt"/>
+
+    <multilevel>
+      <level inner_index="1" type = "R3"/>
+      <level inner_index="0" type = "SE3_DUBIN"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

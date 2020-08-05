@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="disk_inner1" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="disk_inner2" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+
+  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="0 0 0" rotateRPY="0 0 0"/>
+
+  <plannerinput>
+
+    <agent id="0" 
+        qinit="15  -3.5 -1.0 +0.0 -0.57 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqinit="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+        qgoal="15  +3.5 -1.0 +0.0 +0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqgoal="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+
+        dqMin="15  +0.3 0 0 -1 0 0 0 0 0 0 0 0 0 0 0"
+        dqMax="15  +0.3 0 0 +1 0 0 0 0 0 0 0 0 0 0 0"
+        uMin="6  0 0 0 -0.2 0 0"
+        uMax="6  0 0 0 +0.2 0 0"
+    />
+
+    <agent id="2" 
+        qinit="15  -3.5 +1.0 +0.0 -0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqinit="15  +0.6 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+        qgoal="15  +3.5 +1.0 +0.0 +0.0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqgoal="15  +0.6 0 0 0 0 0 0 0 0 0 0 0 0 0 0" 
+        dqMin="15  +0.6 0 0 -1 0 0 0 0 0 0 0 0 0 0 0"
+        dqMax="15  +0.6 0 0 +1 0 0 0 0 0 0 0 0 0 0 0"
+        uMin="6  0 0 0 -0.2 0 0"
+        uMax="6  0 0 0 +0.2 0 0"
+    />
+
+    <se3min config="6  -6.0 -3.0 -0.0 -3.141593 0 0"/>
+    <se3max config="6  +6.0 +3.0 +0.0 +3.141593 0 0"/>
+
+    <freeFloating>1</freeFloating>
+    <timestep min="0.1" max="0.1"/>
+
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>0.5</epsilongoalregion>
+    <pathSpeed>10</pathSpeed>
+
+    <multiAgent>1</multiAgent>
+    <algorithm name="multilevel:qrrt"/>
+    <algorithm name="ompl:rrt"/>
+
+    <multilevel>
+      <level>
+        <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/>
+        <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" type="SE2_DUBIN"/>
+        <robot id="2" freeFloating="1" type="SE2_DUBIN"/>
+      </level>
+    </multilevel>
+  </plannerinput>
+
+</world>

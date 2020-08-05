@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<world>
+  <robot name="disk1" file="../../robots/disks/1.urdf" translation="0 0 0.05"/>
+  <robot name="disk2" file="../../robots/disks/2.urdf" translation="0 0 0.05"/>
+  <robot name="disk3" file="../../robots/disks/3.urdf" translation="0 0 0.05"/>
+  <terrain file="../../terrains/multiagents/solovey_tee.tri" translation="0 0 0.1" scale="0.9 0.9 1">
+    <display color="0.6 0.6 0.6 1"/>
+  </terrain>
+
+  <plannerinput>
+
+    <agent 
+      id="0" 
+      qinit="6  -1 -0.5 0.05 0 0 0"
+      qgoal="6  +1 -0.5 0.05 0 0 0"
+    />
+    <agent 
+      id="1" 
+      qinit="6  -1.7 -0.5 0.05 0 0 0"
+      qgoal="6  +1.7 -0.5 0.05 0 0 0"
+    />
+    <agent 
+      id="2" 
+      qinit="6  -2.4 -0.5 0.05 0 0 0"
+      qgoal="6  +2.4 -0.5 0.05 0 0 0"
+    />
+
+    <se3min config="6  -3 -1 0 -3.141593 0 0"/>
+    <se3max config="6  +3 +3 0 +3.141593 0 0"/>
+
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>0.2</maxplanningtime>      <!-- runtime in (s) --> 
+    <pathSpeed>3</pathSpeed>
+    <freeFloating>1</freeFloating>
+    <smoothPath>1</smoothPath>
+    <algorithm name="multilevel:explorer"/>
+    <algorithm name="multilevel:qrrt"/>
+    <!-- <algorithm name="ompl:rrt"/> -->
+
+    <multiAgent>1</multiAgent>
+    <multilevel>
+      <level>
+        <robot id="0" simplification_of_id="0" freeFloating="1" type="R2"/>
+      </level>
+      <level>
+        <robot id="0" simplification_of_id="0" freeFloating="1" type="R2"/>
+        <robot id="1" simplification_of_id="1" freeFloating="1" type="R2"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" type="R2"/>
+        <robot id="1" freeFloating="1" type="R2"/>
+        <robot id="2" freeFloating="1" type="R2"/>
+      </level>
+    </multilevel>
+
+
+    <multilevel>
+      <!-- <level> -->
+      <!--   <robot id="2" simplification_of_id="2" freeFloating="1" type="R2"/> -->
+      <!-- </level> -->
+      <!-- <level> -->
+      <!--   <robot id="1" simplification_of_id="1" freeFloating="1" type="R2"/> -->
+      <!--   <robot id="2" simplification_of_id="2" freeFloating="1" type="R2"/> -->
+      <!-- </level> -->
+      <level>
+        <robot id="0" freeFloating="1" type="R2"/>
+        <robot id="1" freeFloating="1" type="R2"/>
+        <robot id="2" freeFloating="1" type="R2"/>
+      </level>
+    </multilevel>
+
+  </plannerinput>
+</world>

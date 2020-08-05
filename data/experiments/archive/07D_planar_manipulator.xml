@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="7dof" file="../robots/planar_manipulator/7dof_manip.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="1dof" file="../robots/planar_manipulator/1dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="2dof" file="../robots/planar_manipulator/2dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="3dof" file="../robots/planar_manipulator/3dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="4dof" file="../robots/planar_manipulator/4dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <!-- <robot name="5dof" file="../robots/planar_manipulator/5dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/> -->
+  <!-- <robot name="6dof" file="../robots/planar_manipulator/6dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/> -->
+
+  <!-- <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-2 +2 0" rotateRPY="0 0 0"/> -->
+  <!-- <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-2.5 -2.5 0" rotateRPY="0 0 0"/> -->
+  <!-- <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="1 -2.0 0" rotateRPY="0 0 0"/> -->
+  <!-- <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="5 2.0 0" rotateRPY="0 0 0"/> -->
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="10 3.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-4 7.0 0" rotateRPY="0 0 0"/>
+  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="+0.5 6.0 0" rotateRPY="0 0 0"/>
+  <!-- <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="+6 -3.0 0" rotateRPY="0 0 0"/> -->
+
+  <plannerinput>
+
+    <qinit  config="21  +0.0 +0.0 +0.0 0.0 0.0 0.0  +0.0 0 +0.5 0 +0.4 0 +0.7 0 +0.6 0 +0.4 0 0 0 0"/>
+    <qgoal  config="21  +0.0 +0.0 +0.0 0.0 0.0 0.0  -1.2 0 -0.5 0 -0.2 0 +0.2 0 +0.2 0 +0.5 0 0 0 0"/>
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <pathSpeed>8</pathSpeed>
+    <!-- <smoothPath>1</smoothPath> -->
+
+    <!-- <multilevel> -->
+    <!--   <level inner_index="1" type="R1"/> -->
+    <!--   <level inner_index="2" type="R2"/> -->
+    <!--   <level inner_index="3" type="R3"/> -->
+    <!--   <level inner_index="4" type="R4"/> -->
+    <!--   <level inner_index="0" type="R5"/> -->
+    <!-- </multilevel> -->
+    <!-- <multilevel> -->
+    <!--   <level inner_index="2" type="R2"/> -->
+    <!--   <level inner_index="4" type="R4"/> -->
+    <!--   <level inner_index="0" type="R5"/> -->
+    <!-- </multilevel> -->
+    <!-- <multilevel> -->
+    <!--   <level inner_index="3" type="R3"/> -->
+    <!--   <level inner_index="0" type="R5"/> -->
+    <!-- </multilevel> -->
+    <multilevel>
+      <level inner_index="1" type="S1"/>
+      <level inner_index="2" type="S1R1"/>
+      <level inner_index="4" type="S1R4"/>
+      <level inner_index="0" type="S1R7"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>
+
+
+

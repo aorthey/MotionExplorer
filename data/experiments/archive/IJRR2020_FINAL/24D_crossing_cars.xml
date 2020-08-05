@@ -1,0 +1,197 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="disk_inner1" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="disk_inner2" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="disk_inner2" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="disk_inner2" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="disk_inner2" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="disk_inner2" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="disk_inner2" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+  <robot name="dubins_car" file="../../robots/dubinscar/dubinscar.urdf"/>
+  <robot name="disk_inner2" file="../../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
+
+  <rigidObject name="cylinder.tri" file="../../terrains/roads/crossing.tri" translation="0 0 -0.05" rotateRPY="0 0 0"/>
+
+  <plannerinput>
+
+    <agent id="0" 
+        qinit="15  -12.0 +1.5 +0.0 -3.14 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqinit="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+        qgoal="15  +8.0 +1.0 +0.0 +3.14 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqgoal="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+
+        dqMin="15  +0.3 0 0 -1 0 0 0 0 0 0 0 0 0 0 0"
+        dqMax="15  +0.3 0 0 +1 0 0 0 0 0 0 0 0 0 0 0"
+        uMin="6  0 0 0 -0.2 0 0"
+        uMax="6  0 0 0 +0.2 0 0"
+    />
+
+    <agent id="2" 
+        qinit="15  -8.0 +1.5 +0.0 -3.14 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqinit="15  +0.6 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+        qgoal="15  +12.0 +1.0 +0.0 +3.14 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqgoal="15  +0.6 0 0 0 0 0 0 0 0 0 0 0 0 0 0" 
+        dqMin="15  +0.6 0 0 -1 0 0 0 0 0 0 0 0 0 0 0"
+        dqMax="15  +0.6 0 0 +1 0 0 0 0 0 0 0 0 0 0 0"
+        uMin="6  0 0 0 -0.2 0 0"
+        uMax="6  0 0 0 +0.2 0 0"
+    />
+    <agent id="4" 
+        qinit="15  -15.0 -1.0 +0.0 -3.14 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqinit="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+        qgoal="15  +5.0 -1.0 +0.0 +3.14 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqgoal="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+
+        dqMin="15  +0.3 0 0 -1 0 0 0 0 0 0 0 0 0 0 0"
+        dqMax="15  +0.3 0 0 +1 0 0 0 0 0 0 0 0 0 0 0"
+        uMin="6  0 0 0 -0.2 0 0"
+        uMax="6  0 0 0 +0.2 0 0"
+    />
+
+    <agent id="6" 
+        qinit="15  -11.0 -1.0 +0.0 -3.14 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqinit="15  +0.6 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+        qgoal="15  +9.0 -1.0 +0.0 +3.14 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqgoal="15  +0.6 0 0 0 0 0 0 0 0 0 0 0 0 0 0" 
+        dqMin="15  +0.6 0 0 -1 0 0 0 0 0 0 0 0 0 0 0"
+        dqMax="15  +0.6 0 0 +1 0 0 0 0 0 0 0 0 0 0 0"
+        uMin="6  0 0 0 -0.2 0 0"
+        uMax="6  0 0 0 +0.2 0 0"
+    />
+
+    <agent id="8" 
+        qinit="15  -1.0 +8.0 +0.0 +1.57 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqinit="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+        qgoal="15  -1.0 -12.0 +0.0 +1.57 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqgoal="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+
+        dqMin="15  +0.3 0 0 -1 0 0 0 0 0 0 0 0 0 0 0"
+        dqMax="15  +0.3 0 0 +1 0 0 0 0 0 0 0 0 0 0 0"
+        uMin="6  0 0 0 -0.2 0 0"
+        uMax="6  0 0 0 +0.2 0 0"
+    />
+
+    <agent id="10" 
+        qinit="15  -1.0 +12.0 +0.0 +1.57 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqinit="15  +0.6 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+        qgoal="15  -1.0 -8.0 +0.0 +1.57 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqgoal="15  +0.6 0 0 0 0 0 0 0 0 0 0 0 0 0 0" 
+        dqMin="15  +0.6 0 0 -1 0 0 0 0 0 0 0 0 0 0 0"
+        dqMax="15  +0.6 0 0 +1 0 0 0 0 0 0 0 0 0 0 0"
+        uMin="6  0 0 0 -0.2 0 0"
+        uMax="6  0 0 0 +0.2 0 0"
+    />
+
+    <agent id="12" 
+        qinit="15  1.0 +10.0 +0.0 +1.57 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqinit="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+        qgoal="15  1.0 -10.0 +0.0 +1.57 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqgoal="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+
+        dqMin="15  +0.3 0 0 -1 0 0 0 0 0 0 0 0 0 0 0"
+        dqMax="15  +0.3 0 0 +1 0 0 0 0 0 0 0 0 0 0 0"
+        uMin="6  0 0 0 -0.2 0 0"
+        uMax="6  0 0 0 +0.2 0 0"
+    />
+
+    <agent id="14" 
+        qinit="15  1.0 +14.0 +0.0 +1.57 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqinit="15  +0.6 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+        qgoal="15  1.0 -6.0 +0.0 +1.57 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqgoal="15  +0.6 0 0 0 0 0 0 0 0 0 0 0 0 0 0" 
+        dqMin="15  +0.6 0 0 -1 0 0 0 0 0 0 0 0 0 0 0"
+        dqMax="15  +0.6 0 0 +1 0 0 0 0 0 0 0 0 0 0 0"
+        uMin="6  0 0 0 -0.2 0 0"
+        uMax="6  0 0 0 +0.2 0 0"
+    />
+
+    <se3min config="6  -20.0 -20.0 -0.0 -3.141593 0 0"/>
+    <se3max config="6  +20.0 +20.0 +0.0 +3.141593 0 0"/>
+
+    <freeFloating>1</freeFloating>
+    <timestep min="0.1" max="0.1"/>
+
+    <maxplanningtime>5</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <pathSpeed>10</pathSpeed>
+
+    <multiAgent>1</multiAgent>
+
+    <multilevel>
+      <level>
+        <robot id="1" freeFloating="1" simplification_of_id="1" type="R2"/>
+        <robot id="3" freeFloating="1" simplification_of_id="3" type="R2"/>
+        <robot id="5" freeFloating="1" simplification_of_id="5" type="R2"/>
+        <robot id="7" freeFloating="1" simplification_of_id="7" type="R2"/>
+      </level>
+      <level>
+        <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/>
+        <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/>
+        <robot id="5" freeFloating="1" simplification_of_id="4" type="R2"/>
+        <robot id="7" freeFloating="1" simplification_of_id="6" type="R2"/>
+        <robot id="9" freeFloating="1" simplification_of_id="8" type="R2"/>
+        <robot id="11" freeFloating="1" simplification_of_id="10" type="R2"/>
+        <robot id="13" freeFloating="1" simplification_of_id="12" type="R2"/>
+        <robot id="15" freeFloating="1" simplification_of_id="14" type="R2"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" type="SE2_DUBIN"/>
+        <robot id="2" freeFloating="1" type="SE2_DUBIN"/>
+        <robot id="4" freeFloating="1" type="SE2_DUBIN"/>
+        <robot id="6" freeFloating="1" type="SE2_DUBIN"/>
+        <robot id="8" freeFloating="1" type="SE2_DUBIN"/>
+        <robot id="10" freeFloating="1" type="SE2_DUBIN"/>
+        <robot id="12" freeFloating="1" type="SE2_DUBIN"/>
+        <robot id="14" freeFloating="1" type="SE2_DUBIN"/>
+      </level>
+    </multilevel>
+  </plannerinput>
+
+</world>
+
+    <!-- <multilevel> -->
+    <!--   <level> -->
+    <!--     <robot id="1" freeFloating="1" simplification_of_id="0" type="R2"/> -->
+    <!--     <robot id="3" freeFloating="1" simplification_of_id="2" type="R2"/> -->
+    <!--     <robot id="5" freeFloating="1" simplification_of_id="4" type="R2"/> -->
+    <!--     <robot id="7" freeFloating="1" simplification_of_id="6" type="R2"/> -->
+    <!--   </level> -->
+    <!--   <level> -->
+    <!--     <robot id="0" freeFloating="1" simplification_of_id="0" type="SE2_DUBIN"/> -->
+    <!--     <robot id="2" freeFloating="1" simplification_of_id="2" type="SE2_DUBIN"/> -->
+    <!--     <robot id="4" freeFloating="1" simplification_of_id="4" type="SE2_DUBIN"/> -->
+    <!--     <robot id="6" freeFloating="1" simplification_of_id="6" type="SE2_DUBIN"/> -->
+    <!--   </level> -->
+    <!--   <level> -->
+    <!--     <robot id="0" freeFloating="1" simplification_of_id="0" type="SE2_DUBIN"/> -->
+    <!--     <robot id="2" freeFloating="1" simplification_of_id="2" type="SE2_DUBIN"/> -->
+    <!--     <robot id="4" freeFloating="1" simplification_of_id="4" type="SE2_DUBIN"/> -->
+    <!--     <robot id="6" freeFloating="1" simplification_of_id="6" type="SE2_DUBIN"/> -->
+    <!--     <robot id="9" freeFloating="1" simplification_of_id="8" type="R2"/> -->
+    <!--     <robot id="11" freeFloating="1" simplification_of_id="10" type="R2"/> -->
+    <!--     <robot id="13" freeFloating="1" simplification_of_id="12" type="R2"/> -->
+    <!--     <robot id="15" freeFloating="1" simplification_of_id="14" type="R2"/> -->
+    <!--   </level> -->
+    <!--   <level> -->
+    <!--     <robot id="0" freeFloating="1" type="SE2_DUBIN"/> -->
+    <!--     <robot id="2" freeFloating="1" type="SE2_DUBIN"/> -->
+    <!--     <robot id="4" freeFloating="1" type="SE2_DUBIN"/> -->
+    <!--     <robot id="6" freeFloating="1" type="SE2_DUBIN"/> -->
+    <!--     <robot id="8" freeFloating="1" type="SE2_DUBIN"/> -->
+    <!--     <robot id="10" freeFloating="1" type="SE2_DUBIN"/> -->
+    <!--     <robot id="12" freeFloating="1" type="SE2_DUBIN"/> -->
+    <!--     <robot id="14" freeFloating="1" type="SE2_DUBIN"/> -->
+    <!--   </level> -->
+    <!-- </multilevel> -->
+

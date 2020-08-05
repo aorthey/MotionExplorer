@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="Lshape" file="../robots/Lshape/PlanarLshape.urdf"/>
+  <robot name="disk_inner" file="../robots/Lshape/PlanarLshape_cylinder_inner.urdf"/>
+
+  <terrain name="O1" file="../terrains/spurious_path_N.tri">
+     <display color="0.8 0.8 0.8"/>
+  </terrain>
+
+
+  <plannerinput>
+
+    <qinit  config="8  -3 +1.5 +0.0 -0.1 +0 +0.0 +0.0 0.0"/>
+    <qgoal  config="8  +2 +1.0 +0.0 +0.1 +0 +0.0 +0.0 0.0"/>
+    <se3min config="6  -4.0 -5.0 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +4.0 +25.0 +0.0 +3.141593 +1.57 +3.141593"/>
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>0.5</maxplanningtime>      <!-- runtime in (s) --> 
+    <pathSpeed>10</pathSpeed>
+
+    <multilevel>
+      <level inner_index="1" type="R2"/>
+      <level inner_index="0" type="SE2"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

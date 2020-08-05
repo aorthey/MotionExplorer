@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<world>
+
+  <robot name="hubo" file="../../../Klampt/data/robots/robonaut2.rob" translation="0.5 -1 0" rotation="0.5 0.5 0 -0.5 0.5 0 0 0 1"/>
+
+  <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.1 0.1 0.1" translation="0.5 0.0 0.81"/>
+  <!--  <display color="0.8 0.8 0.8"/> -->
+  <!-- </terrain> -->
+  <!-- ************************************************************************* -->
+  <!-- the table -->
+  <!-- ************************************************************************* -->
+  <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.3 0.25 0.01">
+   <display color="0.4 0.3 0.2"/>
+  </terrain>
+  <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.3 -0.25 0.01">
+     <display color="0.4 0.3 0.2"/>
+  </terrain>
+  <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.8 0.25 0.01">
+     <display color="0.4 0.3 0.2"/>
+  </terrain>
+  <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.8 -0.25 0.01">
+     <display color="0.4 0.3 0.2"/>
+  </terrain>
+  <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.6 0.6 0.02" translation="0.275 -0.275 0.81">
+     <display color="0.4 0.3 0.2"/>
+  </terrain>
+  <!-- ************************************************************************* -->
+
+  <plannerinput>
+
+  <!-- <qinit config="90 0 0 0 0 0 0 0 0 0 -0.846084 -0.683908 -1.02376 -0.0509303 -0.580473 1.05474 0.586955 0 0.3491 1.30176 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.84417 0 0.258058 0.910112 1.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/> -->
+  <qinit config="90 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.84417 0 0.258058 0.910112 1.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+
+  <qgoal config="90 0 0 0 0 -0.25491 0 0 0 0 -0.246084 -0.683908 -1.02376 -0.0509303 -0.580473 1.05474 0.586955 0 0.3491 1.30176 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.84417 0 0.258058 0.910112 0.0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+
+  <pathSpeed>6</pathSpeed>   <!-- <1: slower, 1: default, >1: faster -->
+  <smoothPath>1</smoothPath> <!-- 0: no smoothing, 1: smoothing      -->
+      
+  <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
+  <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
+
+  <multilevel>
+    <level inner_index="0" type="R90"/>
+  </multilevel>
+
+  </plannerinput>
+
+  <!-- <simulation>-->
+  <!--   <globals maxContacts="20" />-->
+  <!--   <robot index="0">-->
+  <!--      <controller type="PolynomialPathController" />-->
+  <!--   </robot>-->
+  <!-- </simulation>-->
+
+
+</world>

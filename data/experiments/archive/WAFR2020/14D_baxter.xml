@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<world>
+
+  <robot name="baxter_07dof_leftarm" file="../../robots/baxter_description/baxter_07dof_leftarm.urdf"/>
+  <robot name="baxter_07dof_rightarm" file="../../robots/baxter_description/baxter_07dof_rightarm.urdf"/>
+
+  <plannerinput>
+    <!-- <qinit config="54  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.64 -0.7 -0.29418 2.18 0 0 0.82 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.64 -0.66 0 2.1 0 0 0.94 0 0 0 0 0 0 0 0 0 0 0 0 "/> -->
+    <!-- <qgoal config="54  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.64 -0.113 2.45418 -0.05 0.5 0 -1.286 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 -0.313 1.19418 0.51 -0.86 0 -0.866 0 0 0 0 0 0 0 0 0 0 0 0 "/> -->
+    <agent 
+      id="0" 
+      qinit="35  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.22 -0.02 -1.70582 1.938 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "
+      qgoal="35  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.02 0.46 -1.5 1.8 0.36 0 0.64 0 0 0 0 0 0 0 0 0 0 0 0 0 "
+    />
+    <agent 
+      id="1" 
+      qinit="25 0 0 0 0 0 0 0 0.36 0.16 1.34 1.818 0 0 0.5 0 0 0 0 0 0 0 0 0 0 0 "
+      qgoal="25  0 0 0 0 0 0 0 0.44 -0.1 1.66 1.818 0.16 0 -0.02 0 0 0 0 0 0 0 0 0 0 0 "
+    />
+
+    <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
+
+    <freeFloating>0</freeFloating>
+    <pathWidth>0.5</pathWidth>
+    <multiAgent>1</multiAgent>
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>10</maxplanningtime>
+    <multilevel>
+      <level>
+        <robot id="0" freeFloating="0" type="R7"/>
+        <robot id="1" freeFloating="0" type="R7"/>
+      </level>
+    </multilevel>
+
+  </plannerinput>
+</world>
