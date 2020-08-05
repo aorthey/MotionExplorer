@@ -72,7 +72,7 @@ static ob::OptimizationObjectivePtr GetOptimizationObjective(const ob::SpaceInfo
   // opt->setCostThreshold(ob::Cost(std::numeric_limits<double>::infinity()));
 
   lengthObj->setCostThreshold(ob::Cost(std::numeric_limits<double>::infinity()));
-  lengthObj->print(std::cout);
+  // lengthObj->print(std::cout);
 
   return ob::OptimizationObjectivePtr(lengthObj);
 }

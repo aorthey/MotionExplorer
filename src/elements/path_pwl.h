@@ -1,11 +1,11 @@
 #pragma once
 #include "gui/gui_state.h"
 #include "gui/colors.h"
-#include "elements/swept_volume.h"
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/control/PathControl.h>
 #include <Library/KrisLibrary/math/vector.h>
 #include <Library/KrisLibrary/math3d/primitives.h>
+#include <Library/KrisLibrary/utils/SmartPointer.h>
 typedef Math::Vector Config;
 using Math3D::Vector3;
 
@@ -32,7 +32,6 @@ class PathPiecewiseLinear
     Config Eval(const double t) const;
     Config EvalStates(std::vector<ob::State*> states, const double t) const;
     Config EvalVelocity(const double t) const;
-    Vector EvalVelocityVec3(const double t) const;
     Vector3 EvalVec3(const double t) const;
     Vector3 EvalVec3(const double t, int ridx) const;
 
@@ -88,7 +87,6 @@ class PathPiecewiseLinear
     void DrawGLArrowMiddleOfPath(const std::vector<ob::State*> &states, int ridx);
     void DrawGLCross(const std::vector<ob::State*> &states, int ridx);
 
-    SweptVolume *sv{nullptr};
     CSpaceOMPL *cspace{nullptr};
     CSpaceOMPL *quotient_space{nullptr};
 

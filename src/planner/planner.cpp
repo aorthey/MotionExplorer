@@ -41,6 +41,7 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
 
   CreateHierarchy();
 }
+
 std::string MotionPlanner::getName() const{
   return input.name_algorithm;
 }
@@ -152,14 +153,11 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
       }
     }
   }
-
-
   return cspace_level;
 }
 
 CSpaceOMPL* MotionPlanner::ComputeCSpaceLayer(const Layer &layer)
 {
-
   CSpaceOMPL *cspace_layer = nullptr;
 
   if(!input.multiAgent){
@@ -448,7 +446,6 @@ void MotionPlanner::AdvanceUntilSolution()
       time = getTime();
   }
 }
-
 
 PlannerInput& MotionPlanner::GetInput()
 {

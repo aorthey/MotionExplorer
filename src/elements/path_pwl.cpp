@@ -12,10 +12,14 @@
 #include <ompl/control/spaces/RealVectorControlSpace.h>
 #include <boost/math/constants/constants.hpp>
 #include <boost/foreach.hpp>
+#include <KrisLibrary/GLdraw/drawMesh.h>
+#include <KrisLibrary/GLdraw/GLError.h>
+#include <KrisLibrary/GLdraw/GLColor.h>
 
 #define foreach BOOST_FOREACH
 
 namespace oc = ompl::control;
+using namespace GLDraw;
 
 PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
   cspace(cspace_), quotient_space(cspace_)

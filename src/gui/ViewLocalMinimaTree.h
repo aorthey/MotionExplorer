@@ -61,4 +61,3 @@ class ViewLocalMinimaTree
     ompl::multilevel::LocalMinimaTreePtr localMinimaTree_;
     std::vector<CSpaceOMPL*> cspace_levels_;
 };
-

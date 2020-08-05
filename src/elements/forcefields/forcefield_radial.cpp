@@ -3,6 +3,8 @@
 #include "gui/colors.h"
 
 using namespace Math3D;
+using namespace GLDraw;
+
 const double minimumRadiusSingularity = 0.05;
 
 RadialForceField::RadialForceField(Vector3 _source, double _power, double _radius):

@@ -1,7 +1,6 @@
 #include "planner/strategy/strategy_output.h"
 #include <ompl/multilevel/datastructures/PlannerDataVertexAnnotated.h>
 #include <ompl/base/PlannerData.h>
-#include "elements/tree.h"
 #include "elements/roadmap.h"
 #include "common.h"
 #include <ompl/control/PathControl.h>
