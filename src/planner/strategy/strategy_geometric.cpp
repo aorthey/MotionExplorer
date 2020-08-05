@@ -65,11 +65,16 @@ namespace ob = ompl::base;
 static ob::OptimizationObjectivePtr GetOptimizationObjective(const ob::SpaceInformationPtr& si)
 {
   ob::OptimizationObjectivePtr lengthObj(new ob::PathLengthOptimizationObjective(si));
-  ob::OptimizationObjectivePtr clearObj(new ob::MaximizeMinClearanceObjective(si));
-  ob::MultiOptimizationObjective* opt = new ob::MultiOptimizationObjective(si);
-  opt->addObjective(lengthObj, 1.0);
+  // ob::OptimizationObjectivePtr clearObj(new ob::MaximizeMinClearanceObjective(si));
+  // ob::MultiOptimizationObjective* opt = new ob::MultiOptimizationObjective(si);
+  // opt->addObjective(lengthObj, 1.0);
   // opt->addObjective(clearObj, 1.0);
-  return ob::OptimizationObjectivePtr(opt);
+  // opt->setCostThreshold(ob::Cost(std::numeric_limits<double>::infinity()));
+
+  lengthObj->setCostThreshold(ob::Cost(std::numeric_limits<double>::infinity()));
+  lengthObj->print(std::cout);
+
+  return ob::OptimizationObjectivePtr(lengthObj);
 }
 
 static uint all_runs{0};
@@ -165,6 +170,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     throw "Invalid planner.";
   }
   std::cout << "Planner algorithm " << planner->getName() << " initialized." << std::endl;
+  pdef->setOptimizationObjective( GetOptimizationObjective(si) );
   planner->setProblemDefinition(pdef);
   return planner;
 
@@ -272,6 +278,7 @@ void StrategyGeometricMultiLevel::Plan(StrategyOutput &output)
 {
   ob::PlannerTerminationCondition ptc( ob::timedPlannerTerminationCondition(max_planning_time) );
   ompl::time::point start = ompl::time::now();
+  std::cout << "PLAN FOR " << max_planning_time << std::endl;
   planner->solve(ptc);
   output.planner_time = ompl::time::seconds(ompl::time::now() - start);
   output.max_planner_time = max_planning_time;
@@ -344,11 +351,14 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   ot::Benchmark benchmark(ss, environment_name);
 
   uint planner_ctr = 0;
-  for(uint k = 0; k < binput.algorithms.size(); k++){
+  for(uint k = 0; k < binput.algorithms.size(); k++)
+  {
     std::string name_algorithm = binput.algorithms.at(k);
 
-    if(util::StartsWith(name_algorithm, "hierarchy")){
-      for(uint i = 0; i < stratifications.size(); i++){
+    if(util::StartsWith(name_algorithm, "hierarchy"))
+    {
+      for(uint i = 0; i < stratifications.size(); i++)
+      {
         const ob::SpaceInformationPtr sii = stratifications.at(i)->si_vec.back();
         uint di = sii->getStateDimension();
         bool shortStratification = (di < largest_ambient_space_dimension);
@@ -412,6 +422,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   ss.getStateSpace()->registerProjections();
   ss.setup();
 
+  ss.getProblemDefinition()->setOptimizationObjective( GetOptimizationObjective(si) );
   pdef->setOptimizationObjective( GetOptimizationObjective(si) );
 
   ot::Benchmark::Request req;

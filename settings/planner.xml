@@ -14,7 +14,11 @@
   <!-- <algorithm name="hierarchy:sampler"/> -->
   <!-- <algorithm name="benchmark:minimal"/> -->
 
-  <algorithm name="benchmark:ijrr2020"/>
+  <algorithm name="benchmark:minimal"/>
+  <algorithm name="ompl:spars"/>
+  <algorithm name="ompl:prm"/>
+  <algorithm name="ompl:sst"/>
+  <algorithm name="ompl:rrt"/>
   <algorithm name="hierarchy:qrrt"/>
   <algorithm name="hierarchy:qrrt"/>
   <algorithm name="hierarchy:qrrtstar"/>
