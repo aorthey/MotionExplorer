@@ -41,6 +41,7 @@ class MotionPlanner{
 
     //Ops on tree only, no interference with planner
     void Expand();
+    void ExpandFull();
     void Collapse();
     void Next();
     void Previous();

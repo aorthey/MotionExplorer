@@ -20,7 +20,7 @@
     <algorithm name="ompl:prmstar"/>
     <algorithm name="ompl:rrtconnect"/>
     <algorithm name="ompl:rrt"/>
-    <algorithm name="hierarchy:qrrt"/>
+    <algorithm name="multilevel:qrrt"/>
 
     <contacts>
       <contact robot_name="centipede" 
@@ -49,9 +49,9 @@
                mesh="rectangleBottom1" />
      </contacts>
 
-    <hierarchy>
+    <multilevel>
         <level inner_index="0" type="R3_CONTACT"/>
-    </hierarchy>
+    </multilevel>
   </plannerinput>
 </world>
 

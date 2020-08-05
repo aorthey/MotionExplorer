@@ -1,7 +1,7 @@
 <!-- Default Planner Settings -->
 <planner>
 
-  <algorithm dynamic="1" name="hierarchy:explorer"/>
+  <algorithm dynamic="1" name="multilevel:explorer"/>
   <algorithm dynamic="1" name="ompl:dynamic:rrt"/>
   <algorithm dynamic="1" name="ompl:dynamic:sst"/>
   <algorithm dynamic="1" name="ompl:dynamic:pdst"/>
@@ -11,29 +11,29 @@
   <!-- <algorithm dynamic="1" name="ompl:dynamic:sycloprrt"/> -->
   <!-- <algorithm name="benchmark:minimal"/> -->
 
-  <!-- <algorithm name="hierarchy:sampler"/> -->
+  <!-- <algorithm name="multilevel:sampler"/> -->
   <!-- <algorithm name="benchmark:minimal"/> -->
 
-  <algorithm name="hierarchy:spqr"/>
+  <algorithm name="multilevel:spqr"/>
 
   <algorithm name="benchmark:minimal"/>
   <algorithm name="ompl:spars"/>
   <algorithm name="ompl:prm"/>
   <algorithm name="ompl:sst"/>
   <algorithm name="ompl:rrt"/>
-  <algorithm name="hierarchy:qrrt"/>
-  <algorithm name="hierarchy:qrrtstar"/>
-  <algorithm name="hierarchy:qmpstar"/>
-  <algorithm name="hierarchy:qmp"/>
-  <algorithm name="hierarchy:spqr"/>
+  <algorithm name="multilevel:qrrt"/>
+  <algorithm name="multilevel:qrrtstar"/>
+  <algorithm name="multilevel:qmpstar"/>
+  <algorithm name="multilevel:qmp"/>
+  <algorithm name="multilevel:spqr"/>
   <algorithm name="ompl:rrtconnect"/>
   <!-- <algorithm name="benchmark:all_geometric"/> -->
-  <!-- <algorithm name="hierarchy:qmp"/> -->
-  <!-- <algorithm name="hierarchy:qmpstar"/> -->
-  <!-- <algorithm name="hierarchy:spqr"/> -->
+  <!-- <algorithm name="multilevel:qmp"/> -->
+  <!-- <algorithm name="multilevel:qmpstar"/> -->
+  <!-- <algorithm name="multilevel:spqr"/> -->
   <!-- <algorithm name="ompl:spars"/> -->
-  <!-- <algorithm name="hierarchy:qrrt"/> -->
-  <!-- <algorithm name="hierarchy:qrrtstar"/> -->
+  <!-- <algorithm name="multilevel:qrrt"/> -->
+  <!-- <algorithm name="multilevel:qrrtstar"/> -->
   <!-- <algorithm name="ompl:rrt"/> -->
   <!-- <algorithm name="ompl:rrtconnect"/> -->
   <!-- <algorithm name="ompl:rrtstar"/> -->

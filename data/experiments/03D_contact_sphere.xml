@@ -34,9 +34,9 @@
                mesh="the_sphere"/>
     </contacts>
 
-    <hierarchy>
+    <multilevel>
       <level inner_index="0" type="R3_CONTACT"/>
-    </hierarchy>
+    </multilevel>
 
   </plannerinput>
 

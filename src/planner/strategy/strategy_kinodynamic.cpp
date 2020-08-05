@@ -92,17 +92,17 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
   //   planner = std::make_shared<oc::SyclopRRT>(si);
   // }else if(algorithm=="ompl:dynamic:syclopest"){
   //   planner = std::make_shared<oc::SyclopEST>(si);
-  }else if(algorithm=="hierarchy:explorer"){
+  }else if(algorithm=="multilevel:explorer"){
     planner = std::make_shared<om::MotionExplorer>(si_vec);
-  }else if(algorithm=="hierarchy:qrrt"){
+  }else if(algorithm=="multilevel:qrrt"){
     planner = std::make_shared<om::QRRT>(si_vec);
-  }else if(algorithm=="hierarchy:qrrtstar"){
+  }else if(algorithm=="multilevel:qrrtstar"){
     planner = std::make_shared<om::QRRTStar>(si_vec);
-  }else if(algorithm=="hierarchy:qmp"){
+  }else if(algorithm=="multilevel:qmp"){
     planner = std::make_shared<om::QMP>(si_vec);
-  }else if(algorithm=="hierarchy:qmpstar"){
+  }else if(algorithm=="multilevel:qmpstar"){
     planner = std::make_shared<om::QMPStar>(si_vec);
-  }else if(algorithm=="hierarchy:spqr"){
+  }else if(algorithm=="multilevel:spqr"){
     planner = std::make_shared<om::SPQR>(si_vec);
   }else if(algorithm=="optimizer"){
     si->setup();

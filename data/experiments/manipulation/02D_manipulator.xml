@@ -17,9 +17,9 @@
     <maxplanningtime>0.5</maxplanningtime>      <!-- runtime in (s) --> 
     <freeFloating>0</freeFloating>
 
-    <hierarchy>
+    <multilevel>
       <level inner_index="0" type="R2"/>
-    </hierarchy>
+    </multilevel>
 
   </plannerinput>
 

@@ -41,9 +41,9 @@
                meshTo="rectangleBottom2" triTo="6"/>
     </contacts>
 
-    <hierarchy>
+    <multilevel>
       <level inner_index="0" type="R2_CONTACT"/>
-    </hierarchy>
+    </multilevel>
 
   </plannerinput>
 </world>

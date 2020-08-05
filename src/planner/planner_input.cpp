@@ -78,7 +78,7 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
     algorithms = GetAlgorithmsDefault(kinodynamic);
   }
 
-  int i_hierarchy = CountNumberOfSubNodes(node_plannerinput, "hierarchy");
+  int i_hierarchy = CountNumberOfSubNodes(node_plannerinput, "multilevel");
 
   for(uint k_algorithm = 0; k_algorithm < algorithms.size(); k_algorithm++){
     std::string name_algorithm = algorithms.at(k_algorithm);
@@ -97,7 +97,7 @@ bool PlannerMultiInput::Load(TiXmlElement *node){
       inputs.push_back(input);
     }else{
       uint number_of_hierarchies = 1;
-      if(util::StartsWith(name_algorithm, "hierarchy")){
+      if(util::StartsWith(name_algorithm, "multilevel")){
         number_of_hierarchies = i_hierarchy;
       }
       for(uint k_hierarchy = 0; k_hierarchy < number_of_hierarchies; k_hierarchy++){
@@ -274,7 +274,7 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
 void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy_index)
 {
   int ctr = 0;
-  TiXmlElement* node_hierarchy = FindSubNode(node, "hierarchy");
+  TiXmlElement* node_hierarchy = FindSubNode(node, "multilevel");
   while(ctr < hierarchy_index){
     node_hierarchy = FindNextSiblingNode(node_hierarchy);
     ctr++;
@@ -301,7 +301,7 @@ void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy_index)
       lindex = FindNextSiblingNode(lindex);
     }
   }else{
-    std::cout << "[WARNING] Did not specify robot hierarchy. Assuming one layer SE3RN" << std::endl;
+    std::cout << "[WARNING] Did not specify robot multilevel. Assuming one layer SE3RN" << std::endl;
     Layer layer;
     layer.level = 0;
     layer.inner_index = 0;
@@ -350,7 +350,7 @@ void PlannerInput::AddConfigToConfig(Config &q, const Config &qadd){
 void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index)
 {
   int ctr = 0;
-  TiXmlElement* node_hierarchy = FindSubNode(node, "hierarchy");
+  TiXmlElement* node_hierarchy = FindSubNode(node, "multilevel");
   while(ctr < hierarchy_index){
     node_hierarchy = FindNextSiblingNode(node_hierarchy);
     ctr++;
@@ -469,7 +469,7 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
       }
     }
   }else{
-    std::cout << "[WARNING] Did not specify robot hierarchy. Assuming one layer SE3RN" << std::endl;
+    std::cout << "[WARNING] Did not specify robot multilevel. Assuming one layer SE3RN" << std::endl;
     Layer layer;
     layer.level = 0;
     layer.inner_index = 0;

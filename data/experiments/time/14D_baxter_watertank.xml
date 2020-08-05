@@ -29,17 +29,17 @@
     <freeFloating>0</freeFloating>
     <epsilongoalregion>0.1</epsilongoalregion>
     <maxplanningtime>10</maxplanningtime>
-    <hierarchy>
+    <multilevel>
       <level inner_index="1" type="R5"/>
       <level inner_index="2" type="R7"/>
       <level inner_index="3" type="R12"/>
       <level inner_index="0" type="R14"/>
-    </hierarchy>
+    </multilevel>
 
-    <!-- <hierarchy> -->
+    <!-- <multilevel> -->
     <!--   <level inner_index="5" outer_index="5" type="R5"/> -->
     <!--   <level inner_index="0" outer_index="0" type="R7"/> -->
-    <!-- </hierarchy> -->
+    <!-- </multilevel> -->
 
   </plannerinput>
 </world>

@@ -43,11 +43,11 @@
     <pathSpeed>10</pathSpeed>
     <!-- <smoothPath>1</smoothPath> -->
 
-    <hierarchy>
+    <multilevel>
       <level inner_index="2" type="S1R1"/>
       <level inner_index="4" type="S1R3"/>
       <level inner_index="8" type="S1R7"/>
-    </hierarchy>
+    </multilevel>
 
   </plannerinput>
 

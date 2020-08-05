@@ -34,12 +34,12 @@
     <freeFloating>0</freeFloating>
     <maxplanningtime>0.2</maxplanningtime>
     <epsilongoalregion>0.1</epsilongoalregion>
-    <algorithm name="hierarchy:qrrt"/>
+    <algorithm name="multilevel:qrrt"/>
 
-    <hierarchy>
+    <multilevel>
       <level inner_index="2" type="R3"/>
       <level inner_index="0" type="R7"/>
-    </hierarchy>
+    </multilevel>
 
   </plannerinput>
 

@@ -28,6 +28,8 @@ struct StrategyOutput
     ob::PlannerDataPtr GetPlannerDataPtr();
     PathPiecewiseLinear* getSolutionPath(int level = 0);
 
+    void Clear();
+
     bool hasExactSolution();
     bool hasApproximateSolution();
 

@@ -22,6 +22,12 @@ void StrategyOutput::SetPlannerData( ob::PlannerDataPtr pd)
   roadmap_ = std::make_shared<Roadmap>(plannerData_, cspace_levels_);
 }
 
+void StrategyOutput::Clear()
+{
+  plannerData_ = nullptr;
+  roadmap_ = nullptr;
+}
+
 void StrategyOutput::SetProblemDefinition( ob::ProblemDefinitionPtr pdef )
 {
   pdefVec_.push_back(pdef);

@@ -12,7 +12,7 @@
 #include <ompl/multilevel/planners/qrrt/QRRTStar.h>
 #include <ompl/multilevel/planners/qmp/QMP.h>
 #include <ompl/multilevel/planners/qmp/QMPStar.h>
-#include <ompl/multilevel/planners/spqr/SPQR.h>
+#include <ompl/multilevel/planners/sparse/SPQR.h>
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -151,14 +151,14 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:projest") planner = std::make_shared<og::ProjEST>(si);
   else if(algorithm=="ompl:sbl") planner = std::make_shared<og::SBL>(si);
 
-  else if(algorithm=="hierarchy:qrrt") planner = std::make_shared<om::QRRT>(siVec, "QRRT");
-  else if(algorithm=="hierarchy:qrrtstar") planner = std::make_shared<om::QRRTStar>(siVec, "QRRTStar");
-  else if(algorithm=="hierarchy:qmp") planner = std::make_shared<om::QMP>(siVec, "QMP");
-  else if(algorithm=="hierarchy:qmpstar") planner = std::make_shared<om::QMPStar>(siVec, "QMPStar");
-  else if(algorithm=="hierarchy:spqr") planner = std::make_shared<om::SPQR>(siVec, "SPQR");
+  else if(algorithm=="multilevel:qrrt") planner = std::make_shared<om::QRRT>(siVec, "QRRT");
+  else if(algorithm=="multilevel:qrrtstar") planner = std::make_shared<om::QRRTStar>(siVec, "QRRTStar");
+  else if(algorithm=="multilevel:qmp") planner = std::make_shared<om::QMP>(siVec, "QMP");
+  else if(algorithm=="multilevel:qmpstar") planner = std::make_shared<om::QMPStar>(siVec, "QMPStar");
+  else if(algorithm=="multilevel:spqr") planner = std::make_shared<om::SPQR>(siVec, "SPQR");
 
-  else if(algorithm=="hierarchy:explorer") planner = std::make_shared<om::MotionExplorer>(siVec, "Explorer");
-  else if(algorithm=="hierarchy:explorer2") planner = std::make_shared<om::MotionExplorerQMP>(siVec, "ExplorerQMP");
+  else if(algorithm=="multilevel:explorer") planner = std::make_shared<om::MotionExplorer>(siVec, "Explorer");
+  else if(algorithm=="multilevel:explorer2") planner = std::make_shared<om::MotionExplorerQMP>(siVec, "ExplorerQMP");
   else if(algorithm=="sampler") planner = std::make_shared<og::InfeasibilitySampler>(si);
 
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){
@@ -354,7 +354,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   {
     std::string name_algorithm = binput.algorithms.at(k);
 
-    if(util::StartsWith(name_algorithm, "hierarchy"))
+    if(util::StartsWith(name_algorithm, "multilevel"))
     {
       for(uint i = 0; i < stratifications.size(); i++)
       {

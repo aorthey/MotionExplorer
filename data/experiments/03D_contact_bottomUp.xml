@@ -37,9 +37,9 @@
                mesh="rectangleBottom"/>
     </contacts>
 
-    <hierarchy>
+    <multilevel>
       <level inner_index="0" type="R3_CONTACT"/>
-    </hierarchy>
+    </multilevel>
 
   </plannerinput>
 

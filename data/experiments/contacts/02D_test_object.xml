@@ -39,7 +39,7 @@
     <pathWidth>0.2</pathWidth>
     <freeFloating>1</freeFloating>
 
-    <!-- <algorithm name="hierarchy:qrrt"/> -->
+    <!-- <algorithm name="multilevel:qrrt"/> -->
     <algorithm name="ompl:rrt"/>
     <algorithm name="ompl:prm"/>
     <algorithm name="ompl:rrtconnect"/>
@@ -58,9 +58,9 @@
         meshTo="rectangleTop" triTo="6"/>
     </contacts>
 
-    <hierarchy>
+    <multilevel>
       <level inner_index="0" type="R3_CONTACT"/>
-    </hierarchy>
+    </multilevel>
 
   </plannerinput>
 </world>

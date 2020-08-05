@@ -19,9 +19,9 @@
     <pathWidth>0.1</pathWidth>
     <pathBorderWidth>3</pathBorderWidth>
 
-    <hierarchy>
+    <multilevel>
       <level inner_index="0" type="R2"/>
-    </hierarchy>
+    </multilevel>
 
   </plannerinput>
 </world>

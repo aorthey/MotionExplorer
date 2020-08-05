@@ -29,13 +29,13 @@
 
     <loadPath file="../data/paths/path_06D_dubins_car.xml"/>
     <algorithm dynamic="1" name="optimizer"/>
-    <algorithm dynamic="1" name="hierarchy:qrrt"/>
+    <algorithm dynamic="1" name="multilevel:qrrt"/>
     <algorithm dynamic="1" name="ompl:dynamic:sst"/>
-    <algorithm dynamic="1" name="hierarchy:explorer"/>
+    <algorithm dynamic="1" name="multilevel:explorer"/>
 
-    <hierarchy>
+    <multilevel>
       <level inner_index="0" type="TSE2"/>
-    </hierarchy>
+    </multilevel>
 
   </plannerinput>
 

@@ -30,14 +30,14 @@
 
     <loadPath file="../data/paths/path_06D_dubins_car_reverse.xml"/>
 
-    <algorithm dynamic="1" name="hierarchy:explorer"/>
+    <algorithm dynamic="1" name="multilevel:explorer"/>
     <algorithm dynamic="1" name="optimizer"/>
     <algorithm dynamic="1" name="ompl:dynamic:sst"/>
     <algorithm dynamic="1" name="ompl:dynamic:kpiece"/>
 
-    <hierarchy>
+    <multilevel>
       <level inner_index="0" type="TSE2"/>
-    </hierarchy>
+    </multilevel>
 
   </plannerinput>
 

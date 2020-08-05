@@ -18,11 +18,11 @@
     <pathSpeed>15</pathSpeed>
     <pathWidth>0.2</pathWidth>
 
-    <hierarchy>
+    <multilevel>
       <level inner_index="1" type="S1"/>
       <level inner_index="0" type="S1R1"/>
       <!-- <level inner_index="0" type="R2"/> -->
-    </hierarchy>
+    </multilevel>
 
   </plannerinput>
 
