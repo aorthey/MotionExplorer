@@ -1,5 +1,7 @@
 .*
 !.gitignore
+*.cmake
+*.path
 *.viewport
 *.pyc
 *.npy
@@ -24,9 +26,13 @@ data/benchmarks/
 data/samples/
 data/robots/sr_grasp_description/
 data/robots/atlas/
+data/paths/
 data/robots/kuka_shadowhand/
 data/experiments/11D_planar_snake_0_*
 /cmake-build-debug/
 cmake-build-debug
 libs/*
 !libs/ompl/
+test/CMakeCache.txt
+test/CMakeFiles/
+test/Makefile
