@@ -127,7 +127,6 @@ if __name__ == '__main__':
     for fname in sys.argv[1:]:
       XMLtoPDF(fname)
   else:
-    fname = "../../data/benchmarks/last.xml"
     fname = "../../data/benchmarks/54D_octopus_2020_05_25_13:54:57.xml"
     fname = "../../data/benchmarks/48D_SE3C_drones_2020_05_25_14:09:49.xml"
     fname = "../../data/benchmarks/72D_SE2RN_R2_mobile_manipulators_2020_05_25_14:17:14.xml"
@@ -135,5 +134,6 @@ if __name__ == '__main__':
     fname = "../../data/benchmarks/24D_crossing_cars_2020_05_25_14:48:27.xml"
     fname = "../../data/benchmarks/21D_box_folding_2020_05_25_14:56:05.xml"
     fname = "../../data/benchmarks/30D_airport.xml"
+    fname = "../../data/benchmarks/last.xml"
     XMLtoPDF(fname)
 
