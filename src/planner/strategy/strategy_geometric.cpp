@@ -72,7 +72,6 @@ static ob::OptimizationObjectivePtr GetOptimizationObjective(const ob::SpaceInfo
   // opt->setCostThreshold(ob::Cost(std::numeric_limits<double>::infinity()));
 
   lengthObj->setCostThreshold(ob::Cost(std::numeric_limits<double>::infinity()));
-  // lengthObj->print(std::cout);
 
   return ob::OptimizationObjectivePtr(lengthObj);
 }
@@ -169,7 +168,6 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     throw "Invalid planner.";
   }
-  std::cout << "Planner algorithm " << planner->getName() << " initialized." << std::endl;
   pdef->setOptimizationObjective( GetOptimizationObjective(si) );
   planner->setProblemDefinition(pdef);
   return planner;
@@ -187,8 +185,6 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
     ob::SpaceInformationPtr sik = cspace_levelk->SpaceInformationPtr();
     setStateSampler(input.name_sampler, sik);
     si_vec.push_back(sik);
-    std::cout << "CSPACE LEVEL" << k << " DIMENSION:" << cspace_levelk->GetDimensionality() << std::endl;
-    // sik->printSettings();
   }
 
   CSpaceOMPL* cspace = cspace_levels.back();
@@ -317,10 +313,12 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   }
   uint k_largest_ambient_space = 0;
   uint largest_ambient_space_dimension = 0;
-  for(uint k = 0; k < stratifications.size(); k++){
+  for(uint k = 0; k < stratifications.size(); k++)
+  {
     const ob::SpaceInformationPtr sik = stratifications.at(k)->si_vec.back();
     uint dk = sik->getStateDimension();
-    if(dk > largest_ambient_space_dimension){
+    if(dk > largest_ambient_space_dimension)
+    {
       k_largest_ambient_space = k;
       largest_ambient_space_dimension = dk;
     }
@@ -361,12 +359,14 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
         const ob::SpaceInformationPtr sii = stratifications.at(i)->si_vec.back();
         uint di = sii->getStateDimension();
         bool shortStratification = (di < largest_ambient_space_dimension);
-        if(shortStratification){
+        if(shortStratification)
+        {
           std::cout << "algorithm " << name_algorithm << " is too short." << std::endl;
           stratifications.at(i)->si_vec.push_back(si);
           stratifications.at(i)->pdef = pdef;
         }else{
-          if(i != k_largest_ambient_space){
+          if(i != k_largest_ambient_space)
+          {
             //found another stratification with maximum ambient space. we need
             //to swap  its last space out and swap the chosen one in. (otherwise
             //OMPL will claim that those two spaces are different)
@@ -381,7 +381,8 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
         std::string name_algorithm_strat = planner_k_i->getName()+"_(";
 
         std::vector<ob::SpaceInformationPtr> si_vec_k = stratifications.at(i)->si_vec;
-        for(uint j = 0; j < si_vec_k.size(); j++){
+        for(uint j = 0; j < si_vec_k.size(); j++)
+        {
           if(j>=si_vec_k.size()-1 && shortStratification) break;
           uint Nj = si_vec_k.at(j)->getStateDimension();
           name_algorithm_strat += std::to_string(Nj);
@@ -397,7 +398,8 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
         benchmark.addPlanner(planner_k_i);
         planner_ctr++;
       }
-    }else{
+    }else
+    {
       benchmark.addPlanner(GetPlanner(binput.algorithms.at(k), stratifications.at(0)));
       planner_ctr++;
     }
@@ -449,8 +451,10 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   std::cout << "Time Per Run (s)             : " << binput.maxPlanningTime << std::endl;
   std::cout << "Worst-case time requirement  : ";
 
-  if(worst_case_time_estimate_in_hours < 1){
-    if(worst_case_time_estimate_in_minutes < 1){
+  if(worst_case_time_estimate_in_hours < 1)
+  {
+    if(worst_case_time_estimate_in_minutes < 1)
+    {
       std::cout << worst_case_time_estimate_in_seconds << "s" << std::endl;
     }else{
       std::cout << worst_case_time_estimate_in_minutes << "m" << std::endl;
