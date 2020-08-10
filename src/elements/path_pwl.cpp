@@ -897,7 +897,7 @@ bool PathPiecewiseLinear::Load(TiXmlElement *node)
     oc::SpaceInformationPtr siC = 
       dynamic_pointer_cast<oc::SpaceInformation>(cpath->getSpaceInformation());
     ob::StateSpacePtr space = siC->getStateSpace();
-    cpath->clear();
+    // cpath->clear();
 
     std::vector<ob::State*> states;
     TiXmlElement* node_state = FindFirstSubNode(node, "state");

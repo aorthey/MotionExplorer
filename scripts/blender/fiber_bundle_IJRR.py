@@ -30,18 +30,17 @@ colorGoalState = (0.7, 0.0, 0.0, 1.0)
 minor_radius = 2
 major_radius = 5
 
-pathMaterial = bpy.data.materials.new(name="Green")
-pathMaterial.diffuse_color = (0.0, 1.0, 0.0, 1.0)
-pathMaterial.metallic = 0.0
-pathMaterial.specular_intensity = 0.0
+materialGreen = bpy.data.materials.new(name="Green")
+materialGreen.diffuse_color = (0.0, 1.0, 0.0, 1.0)
+materialGreen.metallic = 0.0
+materialGreen.specular_intensity = 0.0
 
-material_mobius_strip = bpy.data.materials.new(name="Magenta")
-material_mobius_strip.diffuse_color = (0.45, 0.05, 0.72, 1.0)
-material_mobius_strip.diffuse_color = (0.575, 0.12, 1.0, 1.0)
-material_mobius_strip.diffuse_color = (0.205, 0.0, 0.37, 1.0)
-material_mobius_strip.metallic = 0.9
-
-material_mobius_strip.specular_intensity = 0.9
+materialMagenta = bpy.data.materials.new(name="Magenta")
+materialMagenta.diffuse_color = (0.45, 0.05, 0.72, 1.0)
+materialMagenta.diffuse_color = (0.575, 0.12, 1.0, 1.0)
+materialMagenta.diffuse_color = (0.205, 0.0, 0.37, 1.0)
+materialMagenta.metallic = 0.9
+materialMagenta.specular_intensity = 0.9
 
 def arrow_mesh(position, length, width=-1, headlength=-1, headwidth = -1):
     verts = []
@@ -190,7 +189,7 @@ def addPath():
     curve.fill_mode = 'FULL'
     curve.bevel_depth = pathThickness
 
-    path_obj.data.materials.append(pathMaterial)
+    path_obj.data.materials.append(materialGreen)
 
 
     # mesh = bpy.data.meshes.new("path_mesh")
@@ -220,7 +219,7 @@ def addPathAnnulus():
     curve.fill_mode = 'FULL'
     curve.bevel_depth = pathThickness
 
-    path_obj.data.materials.append(pathMaterial)
+    path_obj.data.materials.append(materialGreen)
 
 def addPathTorusAnnulus():
     curve = bpy.data.curves.new(name="PATH_TORUS_ANNULUS", type='CURVE')
@@ -245,7 +244,7 @@ def addPathTorusAnnulus():
     curve.fill_mode = 'FULL'
     curve.bevel_depth = pathThickness
 
-    path_obj.data.materials.append(pathMaterial)
+    path_obj.data.materials.append(materialGreen)
 
 def update_camera(camera, focus_point=Vector((0.0, 0.0, 0.0)), distance=10.0):
     """
@@ -416,7 +415,7 @@ def addTorus(position):
         major_segments = 64, minor_segments = 32, location=position)
     torus_obj = bpy.context.object
     torus_obj.name = 'Torus'
-    torus_obj.data.materials.append(material_mobius_strip)
+    torus_obj.data.materials.append(materialMagenta)
 
 def drawScene(scn, resolution, thick):
 
@@ -446,7 +445,7 @@ def drawScene(scn, resolution, thick):
     bpy.context.view_layer.objects.active = mobius_strip_obj
     mod = mobius_strip_obj.modifiers.new("edge split", 'EDGE_SPLIT')
 
-    mobius_strip_obj.data.materials.append(material_mobius_strip)
+    mobius_strip_obj.data.materials.append(materialMagenta)
     # mobius_strip_obj.show_transparent = True
 
     ###########################################################################
@@ -461,7 +460,7 @@ def drawScene(scn, resolution, thick):
     bpy.context.view_layer.objects.active = annulus_strip_obj
     mod = annulus_strip_obj.modifiers.new("edge split", 'EDGE_SPLIT')
 
-    annulus_strip_obj.data.materials.append(material_mobius_strip)
+    annulus_strip_obj.data.materials.append(materialMagenta)
 
     ###########################################################################
     ### ANNULUS RIGHT
@@ -475,7 +474,7 @@ def drawScene(scn, resolution, thick):
     bpy.context.view_layer.objects.active = annulus_r_strip_obj
     mod = annulus_r_strip_obj.modifiers.new("edge split", 'EDGE_SPLIT')
 
-    annulus_r_strip_obj.data.materials.append(material_mobius_strip)
+    annulus_r_strip_obj.data.materials.append(materialMagenta)
 
     ###########################################################################
     ### ARROW
@@ -499,7 +498,7 @@ def drawScene(scn, resolution, thick):
     restriction_torus_obj = bpy.data.objects.new("arrow", restriction_torus_mesh)
     # restriction_torus_obj.location = offsetAnnulusLeft + Vector((0,-0.8,0))
     bpy.context.collection.objects.link(restriction_torus_obj)
-    restriction_torus_obj.data.materials.append(pathMaterial)
+    restriction_torus_obj.data.materials.append(materialGreen)
 
     ###########################################################################
     ### INITIAL STATE
