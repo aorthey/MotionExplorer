@@ -24,8 +24,11 @@ void StrategyOutput::SetPlannerData( ob::PlannerDataPtr pd)
 
 void StrategyOutput::Clear()
 {
+  std::cout << "Clear Output" << std::endl;
+  if(plannerData_) plannerData_->clear();
   plannerData_ = nullptr;
   roadmap_ = nullptr;
+  shortest_path.clear();
 }
 
 void StrategyOutput::SetProblemDefinition( ob::ProblemDefinitionPtr pdef )

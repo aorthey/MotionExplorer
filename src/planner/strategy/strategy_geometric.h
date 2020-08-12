@@ -14,6 +14,7 @@ struct OMPLGeometricStratification{
 typedef std::shared_ptr<OMPLGeometricStratification> OMPLGeometricStratificationPtr;
 
 class StrategyGeometricMultiLevel: public Strategy{
+  using BaseT = Strategy;
   public:
     StrategyGeometricMultiLevel() = default;
 

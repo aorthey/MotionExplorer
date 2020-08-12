@@ -14,11 +14,11 @@
   <!-- <algorithm name="multilevel:sampler"/> -->
   <!-- <algorithm name="benchmark:minimal"/> -->
 
+  <algorithm name="ompl:prm"/>
+  <algorithm name="benchmark:minimal"/>
   <algorithm name="multilevel:spqr"/>
 
-  <algorithm name="benchmark:minimal"/>
   <algorithm name="ompl:spars"/>
-  <algorithm name="ompl:prm"/>
   <algorithm name="ompl:sst"/>
   <algorithm name="ompl:rrt"/>
   <algorithm name="multilevel:qrrt"/>

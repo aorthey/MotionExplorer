@@ -46,8 +46,9 @@
 #include <ompl/geometric/planners/sst/SST.h>
 #include <ompl/geometric/planners/pdst/PDST.h>
 #include <ompl/geometric/planners/cforest/CForest.h>
-#include <ompl/geometric/planners/bitstar/BITstar.h>
-#include <ompl/geometric/planners/bitstar/ABITstar.h>
+#include <ompl/geometric/planners/informedtrees/BITstar.h>
+#include <ompl/geometric/planners/informedtrees/ABITstar.h>
+#include <ompl/geometric/planners/informedtrees/AITstar.h>
 
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 #include <ompl/base/objectives/MaximizeMinClearanceObjective.h>
@@ -267,7 +268,8 @@ void StrategyGeometricMultiLevel::Step(StrategyOutput &output)
 
 void StrategyGeometricMultiLevel::Clear()
 {
-  if(isInitialized) planner->clear();
+  BaseT::Clear();
+  if(planner) planner->clear();
 }
 
 void StrategyGeometricMultiLevel::Plan(StrategyOutput &output)

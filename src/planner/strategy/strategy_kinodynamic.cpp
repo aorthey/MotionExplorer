@@ -8,9 +8,7 @@
 #include <ompl/multilevel/planners/qrrt/QRRTStar.h>
 #include <ompl/multilevel/planners/qmp/QMP.h>
 #include <ompl/multilevel/planners/qmp/QMPStar.h>
-#include <ompl/multilevel/planners/spqr/SPQR.h>
 
-#include <ompl/control/optimizers/Optimizer.h>
 #include <ompl/geometric/PathGeometric.h>
 
 #include <ompl/control/planners/rrt/RRT.h>
@@ -102,16 +100,14 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
     planner = std::make_shared<om::QMP>(si_vec);
   }else if(algorithm=="multilevel:qmpstar"){
     planner = std::make_shared<om::QMPStar>(si_vec);
-  }else if(algorithm=="multilevel:spqr"){
-    planner = std::make_shared<om::SPQR>(si_vec);
-  }else if(algorithm=="optimizer"){
-    si->setup();
-    CSpaceOMPL* cspace = input.cspace_levels.back();
-    PathPiecewiseLinear *path = new PathPiecewiseLinear(cspace);
-    std::string fpath = input.name_loadPath;
-    path->Load(fpath.c_str());
-    std::cout << "load current path from : " << fpath << std::endl;
-    planner = std::make_shared<oc::Optimizer>(si, path->GetOMPLPath());
+  // }else if(algorithm=="optimizer"){
+  //   si->setup();
+  //   CSpaceOMPL* cspace = input.cspace_levels.back();
+  //   PathPiecewiseLinear *path = new PathPiecewiseLinear(cspace);
+  //   std::string fpath = input.name_loadPath;
+  //   path->Load(fpath.c_str());
+  //   std::cout << "load current path from : " << fpath << std::endl;
+  //   planner = std::make_shared<oc::Optimizer>(si, path->GetOMPLPath());
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     throw "Planner unknown.";
@@ -204,11 +200,11 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
   ob::PlannerDataPtr pd( new ob::PlannerData(planner->getSpaceInformation()) );
   planner->getPlannerData(*pd);
 
-  unsigned int N = planner->getProblemDefinition()->getSolutionCount();
-  if(N>0){
-      ob::PlannerSolution solution = planner->getProblemDefinition()->getSolutions().at(0);
-      pd->path_ = solution.path_;
-  }
+  // unsigned int N = planner->getProblemDefinition()->getSolutionCount();
+  // if(N>0){
+  //     ob::PlannerSolution solution = planner->getProblemDefinition()->getSolutions().at(0);
+  //     // pd->path_ = solution.path_;
+  // }
 
   output.SetPlannerData(pd);
   output.SetProblemDefinition(planner->getProblemDefinition());

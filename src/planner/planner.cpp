@@ -29,8 +29,6 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
   threading = input.threading;
   std::cout << "THREADING: "<< (threading?"ON":"OFF") << std::endl;
 
-  // current_level_node = 0;
-  // current_path.clear();
   this->world->InitCollisions();
   if(input.kinodynamic){
     strategy = std::make_shared<StrategyKinodynamicMultiLevel>();

@@ -121,7 +121,7 @@ namespace ompl
             DubinsAirplaneStateSpace(double turningRadius = 1.0, double climbAngleLimit = 1.0, bool isSymmetric = false)
               : rho_(turningRadius), climbAngleLimit_(climbAngleLimit), isSymmetric_(isSymmetric)
             {
-                type_ = STATE_SPACE_DUBINS_AIRPLANE;
+                //type_ = STATE_SPACE_DUBINS_AIRPLANE;
             }
 
             bool isMetricSpace() const override

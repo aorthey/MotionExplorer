@@ -133,7 +133,6 @@ void Roadmap::DrawGLRoadmapEdges(GUIState &state, int ridx)
   ob::StateSpacePtr stateSpace = cspace->SpaceInformationPtr()->getStateSpace();
   stateTmpCur = stateSpace->allocState();
   stateTmpOld = stateSpace->allocState();
-  //############################################################################
 
   for(uint vidx = 0; vidx < pd_->numVertices(); vidx++)
   {
