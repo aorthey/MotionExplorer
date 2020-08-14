@@ -4,7 +4,6 @@
   <robot name="2dof" file="../robots/planar/2dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
   <robot name="1dof_inner" file="../robots/planar/2dof_manip_1dof_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
-
   <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -2.0 0" rotateRPY="0 0 0"/>
   <terrain name="rectangle.tri" file="../terrains/primitives/rectangle.tri" translation="+2.0 -4.0 0" rotateRPY="0 0 0"/>
 
@@ -20,14 +19,12 @@
     <pathWidth>0.2</pathWidth>
 
     <multilevel>
-      <level inner_index="1" type="S1"/>
-      <level inner_index="0" type="S1R1"/>
-      <!-- <level inner_index="0" type="R2"/> -->
+      <level robot_index="1" type="S1"/>
+      <level robot_index="0" type="S1R1"/>
+      <!-- <level robot_index="0" type="R2"/> -->
     </multilevel>
 
   </plannerinput>
 
 </world>
-
-
 

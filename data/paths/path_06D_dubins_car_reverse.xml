@@ -159,7 +159,6 @@
     <!--Duration for each Control-->
     <controlDuration>10</controlDuration>
     <controlDuration>8</controlDuration>
-    <controlDuration>8</controlDuration>
     <controlDuration>5</controlDuration>
     <controlDuration>10</controlDuration>
     <controlDuration>8</controlDuration>
@@ -175,7 +174,6 @@
     <controlDuration>10</controlDuration>
     <controlDuration>8</controlDuration>
     <controlDuration>6</controlDuration>
-    <controlDuration>8</controlDuration>
     <controlDuration>8</controlDuration>
     <controlDuration>10</controlDuration>
     <controlDuration>5</controlDuration>
@@ -185,19 +183,16 @@
     <controlDuration>4</controlDuration>
     <controlDuration>10</controlDuration>
     <controlDuration>7</controlDuration>
-    <controlDuration>7</controlDuration>
     <controlDuration>9</controlDuration>
     <controlDuration>5</controlDuration>
     <controlDuration>6</controlDuration>
     <controlDuration>7</controlDuration>
-    <controlDuration>5</controlDuration>
     <controlDuration>5</controlDuration>
     <controlDuration>7</controlDuration>
     <controlDuration>5</controlDuration>
     <controlDuration>10</controlDuration>
     <controlDuration>2</controlDuration>
     <controlDuration>7</controlDuration>
-    <controlDuration>4</controlDuration>
     <controlDuration>4</controlDuration>
     <controlDuration>10</controlDuration>
     <controlDuration>8</controlDuration>

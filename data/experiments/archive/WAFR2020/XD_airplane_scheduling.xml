@@ -4,9 +4,7 @@
 
   <!-- Airplane 1 is holonomic, Airplane 2 is non-holonomic -->
   <robot name="airplane" file="../../robots/airplane.urdf"/>
-  <robot name="airplane" file="../../robots/airplane.urdf"/>
 
-  <robot name="airplane_inner_sphere" file="../../robots/airplane_inner_sphere.urdf"/>
   <robot name="airplane_inner_sphere" file="../../robots/airplane_inner_sphere.urdf"/>
 
   <plannerinput>
@@ -45,7 +43,7 @@
     <freeFloating>1</freeFloating>
     <multiAgent>1</multiAgent>
     <multilevel>
-      <!-- <level inner_index="1" type = "SE3"/> -->
+      <!-- <level robot_index="1" type = "SE3"/> -->
       <!-- <level> -->
       <!--   <robot id="1" freeFloating="1" simplification_of_id="0" type="SE2"/> -->
       <!-- </level> -->

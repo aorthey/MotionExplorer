@@ -15,7 +15,7 @@
 
     <freeFloating>1</freeFloating>
     <hierarchy>
-      <level inner_index="0" type="SE3RN"/>
+      <level robot_index="0" type="SE3RN"/>
     </hierarchy>
   </plannerinput>
 

@@ -2,7 +2,6 @@
 
 <world>
   <robot name="airplane" file="../../robots/airplane/airplane.urdf"/>
-  <robot name="airplane" file="../../robots/airplane/airplane.urdf"/>
   <!-- <robot name="sphere" file="../../robots/airplane/airplane_inner_sphere.urdf"/> -->
   <!-- <robot name="airplane" file="../../robots/airplane/airplane.urdf"/> -->
   <!-- <robot name="sphere" file="../../robots/airplane/airplane_inner_sphere.urdf"/> -->

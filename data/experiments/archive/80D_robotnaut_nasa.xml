@@ -6,9 +6,7 @@
   <robot name="nasa-unknown" file="../robots/robonaut2.rob"  translation="-0.1 0 1.38"/>
 
   <!-- <terrain file="../../../Klampt/data/terrains/plane.tri"/> -->
-  <!-- <terrain file="../../../Klampt/data/terrains/plane.tri"/> -->
 
-  <!-- <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.1 0.1 0.1" translation="0.5 0.0 0.81"> -->
   <!-- <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.1 0.1 0.1" translation="0.5 0.0 0.81"> -->
   <!--  <display color="0.8 0.8 0.8"/> -->
   <!-- </terrain> -->
@@ -16,22 +14,17 @@
   <!-- <1!-- the table --1> -->
   <!-- <1!-- ************************************************************************* --1> -->
   <!-- <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.3 0.25 0.01"> -->
-  <!-- <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.3 0.25 0.01"> -->
   <!--  <display color="0.4 0.3 0.2"/> -->
   <!-- </terrain> -->
   <!-- <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.3 -0.25 0.01"> -->
-  <!-- <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.3 -0.25 0.01"> -->
   <!--    <display color="0.4 0.3 0.2"/> -->
   <!-- </terrain> -->
-  <!-- <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.8 0.25 0.01"> -->
   <!-- <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.8 0.25 0.01"> -->
   <!--    <display color="0.4 0.3 0.2"/> -->
   <!-- </terrain> -->
   <!-- <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.8 -0.25 0.01"> -->
-  <!-- <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.05 0.05 0.8" translation="0.8 -0.25 0.01"> -->
   <!--    <display color="0.4 0.3 0.2"/> -->
   <!-- </terrain> -->
-  <!-- <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.6 0.6 0.02" translation="0.275 -0.275 0.81"> -->
   <!-- <terrain file="../../../Klampt/data/terrains/cube.tri" scale="0.6 0.6 0.02" translation="0.275 -0.275 0.81"> -->
   <!--    <display color="0.4 0.3 0.2"/> -->
   <!-- </terrain> -->
@@ -52,7 +45,7 @@
   <se3max config="6  +8 +8 +8 +3.141593 +1.57 +3.141593"/>
 
   <multilevel>
-    <level inner_index="0" type="R80"/>
+    <level robot_index="0" type="R80"/>
   </multilevel>
 
   </plannerinput>

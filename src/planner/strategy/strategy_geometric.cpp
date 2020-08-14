@@ -159,9 +159,12 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
 
   else if(algorithm=="multilevel:explorer") planner = std::make_shared<om::MotionExplorer>(siVec, "Explorer");
   else if(algorithm=="multilevel:explorer2") planner = std::make_shared<om::MotionExplorerQMP>(siVec, "ExplorerQMP");
-  else if(algorithm=="sampler") planner = std::make_shared<og::InfeasibilitySampler>(si);
-
-  else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl"){
+  else if(algorithm=="sampler")
+  {
+    planner = std::make_shared<og::InfeasibilitySampler>(si);
+  }
+  else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl")
+  {
     std::cout << "Planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
     throw "Invalid planner.";
   }
@@ -216,7 +219,6 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
       goalk  = cspace->ConfigVelocityToOMPLState(input.q_goal, input.dq_goal);
   }
 
-
   ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
   pdefk->addStartState(startk);
   auto goal=std::make_shared<ob::GoalState>(sik);
@@ -233,7 +235,8 @@ void StrategyGeometricMultiLevel::Init( const StrategyInput &input )
 {
   std::string algorithm = input.name_algorithm;
 
-  if(util::StartsWith(algorithm,"benchmark")){
+  if(util::StartsWith(algorithm,"benchmark"))
+  {
     //No Init, directly execute benchmark
     RunBenchmark(input);
   }else{

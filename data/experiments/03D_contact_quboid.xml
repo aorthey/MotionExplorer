@@ -34,12 +34,10 @@
     </contacts>
 
     <multilevel>
-      <level inner_index="0" type="R3_CONTACT"/>
+      <level robot_index="0" type="R3_CONTACT"/>
     </multilevel>
 
   </plannerinput>
 
 </world>
-
-
 

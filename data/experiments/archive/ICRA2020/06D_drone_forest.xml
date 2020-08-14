@@ -20,13 +20,11 @@
     <pathWidth>0.05</pathWidth>
 
     <multilevel>
-      <level inner_index="1" type="R3"/>
-      <level inner_index="0" type="SE3"/>
+      <level robot_index="1" type="R3"/>
+      <level robot_index="0" type="SE3"/>
     </multilevel>
 
   </plannerinput>
 
 </world>
-
-
 

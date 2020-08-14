@@ -17,7 +17,7 @@
     <freeFloating>1</freeFloating>
     <maxplanningtime>0.5</maxplanningtime>      <!-- runtime in (s) --> 
     <multilevel>
-      <level inner_index="0" cspace_constant="1" type="R2"/>
+      <level robot_index="0" cspace_constant="1" type="R2"/>
     </multilevel>
 
   </plannerinput>

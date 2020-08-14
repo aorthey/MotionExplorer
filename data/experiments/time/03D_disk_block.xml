@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <world>
   <robot name="disk" file="../../robots/planar/disk_maze.urdf"/>
-  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="0 0 0" rotateRPY="0 0 0"/>
+  <rigidObject 
+    name="cylinder.tri" 
+    file="../../terrains/primitives/cylinder.tri"
+    path="../../paths/objects/cylinder.xml"/>
 
   <plannerinput>
     <qinit  config="6  -5 0 0 0 0 0"/>
@@ -16,7 +19,7 @@
 
     <multilevel>
       <!-- <level inner_index="1" type="R2"/> -->
-      <level inner_index="0" type="R2"/>
+      <level robot_index="0" type="R2T"/>
     </multilevel>
   </plannerinput>
 </world>

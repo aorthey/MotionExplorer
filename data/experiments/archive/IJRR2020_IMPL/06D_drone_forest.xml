@@ -22,12 +22,10 @@
     <algorithm name="multilevel:qrrt"/>
 
     <multilevel>
-      <level inner_index="0" type="SE3C"/>
+      <level robot_index="0" type="SE3C"/>
     </multilevel>
 
   </plannerinput>
 
 </world>
-
-
 

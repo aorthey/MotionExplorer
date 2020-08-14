@@ -20,14 +20,11 @@
     <smoothPath>0</smoothPath>
 
     <multilevel>
-      <level inner_index="1" type="ANNULUS"/>
-      <level inner_index="0" type="SOLIDCYLINDER"/>
+      <level robot_index="1" type="ANNULUS"/>
+      <level robot_index="0" type="SOLIDCYLINDER"/>
     </multilevel>
 
   </plannerinput>
 
 </world>
-
-
-
 

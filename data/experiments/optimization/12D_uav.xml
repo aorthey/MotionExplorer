@@ -29,7 +29,7 @@
     <pathWidth>0.3</pathWidth>
 
     <multilevel>
-      <level inner_index="0" type = "TSE3"/>
+      <level robot_index="0" type = "TSE3"/>
     </multilevel>
 
   </plannerinput>

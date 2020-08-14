@@ -21,8 +21,10 @@
     <smoothPath>1</smoothPath>
 
     <hierarchy>
-      <level inner_index="1" outer_index="1" type="R2"/>
-      <level inner_index="0" outer_index="0" type="SE2"/>
+      <level robot_index="1" outer_index="1" type="R2"/>
+      <level robot_index="1" outer_index="1" type="R2"/>
+      <level robot_index="0" outer_index="0" type="SE2"/>
+      <level robot_index="0" outer_index="0" type="SE2"/>
     </hierarchy>
 
     <algorithm name="ompl:qmp_prm_connect"/>

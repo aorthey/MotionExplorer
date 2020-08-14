@@ -369,7 +369,7 @@ void PlannerBackend::RenderWorld(){
 
       glDisable(GL_LIGHTING);
       glEnable(GL_BLEND); 
-      GLColor lightgrey(0.5,0.5,0.5,0.8);
+      GLColor lightgrey(0.9,0.9,0.9,0.7);
       lightgrey.setCurrentGL();
       GLDraw::drawBoundingBox(Vector3(min(0),min(1),min(2)), Vector3(max(0),max(1),max(2)));
       glEnable(GL_LIGHTING);

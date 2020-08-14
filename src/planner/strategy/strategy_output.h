@@ -44,6 +44,8 @@ struct StrategyOutput
 
     void DrawGLPath(GUIState&, int);
 
+    RoadmapPtr getRoadmap();
+
   private:
 
     std::vector<Config> PathGeometricToConfigPath(og::PathGeometric &path);

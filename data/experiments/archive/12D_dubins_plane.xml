@@ -4,7 +4,6 @@
 
   <!-- Airplane 1 is holonomic, Airplane 2 is non-holonomic -->
   <robot name="airplane" file="../robots/airplane.urdf"/>
-  <robot name="airplane" file="../robots/airplane.urdf"/>
 
    <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
 
@@ -28,8 +27,8 @@
     <pathSpeed>10</pathSpeed>
 
     <multilevel>
-      <level inner_index="1" type = "SE3"/>
-      <level inner_index="0" type = "TSE3"/>
+      <level robot_index="1" type = "SE3"/>
+      <level robot_index="0" type = "TSE3"/>
     </multilevel>
 
   </plannerinput>

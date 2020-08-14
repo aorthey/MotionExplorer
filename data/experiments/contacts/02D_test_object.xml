@@ -9,8 +9,6 @@
   <terrain name="rectangleBottom" file="../../terrains/primitives/rectangle.tri" translation="+3.2 -1.0 0" rotateRPY="0 0 0" scale="4 2 1"/>
   <terrain name="rectangleTop" file="../../terrains/primitives/rectangle.tri" translation="-2.4 +0.0 0" rotateRPY="0 0 0" scale="4 1 1"/>
 
-
-
   <plannerinput>
 
     <!-- These configs are for first link in contact and last link in transition.
@@ -59,11 +57,9 @@
     </contacts>
 
     <multilevel>
-      <level inner_index="0" type="R3_CONTACT"/>
+      <level robot_index="0" type="R3_CONTACT"/>
     </multilevel>
 
   </plannerinput>
 </world>
-
-
 

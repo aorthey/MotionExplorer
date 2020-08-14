@@ -23,7 +23,7 @@
     <algorithm dynamic="1" name="multilevel:qrrt"/>
 
     <multilevel>
-      <level inner_index="0" type="TS1"/>
+      <level robot_index="0" type="TS1"/>
     </multilevel>
   </plannerinput>
 

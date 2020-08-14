@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<robot name="907758">
+<link name="body">
+  <collision>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+     <mesh filename="tests/907758.stl"/>
+    </geometry>
+  </collision>
+  <visual>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <geometry>
+      <mesh filename="tests/907758.stl"/>
+    </geometry>
+  </visual>
+  </link>
+</robot>

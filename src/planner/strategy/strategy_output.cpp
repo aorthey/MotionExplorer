@@ -86,6 +86,12 @@ void StrategyOutput::DrawGL(GUIState& state, int level)
       roadmap_->DrawGL(state, level);
   }
 }
+
+RoadmapPtr StrategyOutput::getRoadmap()
+{
+  return roadmap_;
+}
+
 void StrategyOutput::DrawGLPath(GUIState& state, int level)
 {
     pathVec_.at(level)->DrawGL(state);

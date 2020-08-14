@@ -13,7 +13,6 @@
 
   <robot name="airplane" file="../../robots/rocket/retro_rocket.urdf"/>
 
-
   <!-- <rigidObject name="canyon" file="../../terrains/buildings/tori.stl" translation="0 0 0"/> -->
 
   <plannerinput>

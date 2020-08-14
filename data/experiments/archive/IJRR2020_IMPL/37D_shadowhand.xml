@@ -19,9 +19,7 @@
 
     <qinit config="42  0 0 0 0 0 0 0 -0.949204 0.18 -0.954395 1.12706 -0.02 -0.26 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
 
-
     <qgoal config="42  0 0 0 0 0 0 -0.1 -0.990796 0.2 1.04561 1.42706 1.73472e-16 1.4 -0.00546707 -0.785398 0 1.0508 1.08 0.36 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.309 0 0.2163 0.02 0 "/>
-
 
     <epsilongoalregion>0.001</epsilongoalregion>
       
@@ -33,9 +31,9 @@
     <pathSpeed>7</pathSpeed>
     <maxplanningtime>10</maxplanningtime>
     <multilevel>
-      <level inner_index="2" type="R7"/>
-      <level inner_index="1" type="R13"/>
-      <level inner_index="0" type="R31"/>
+      <level robot_index="2" type="R7"/>
+      <level robot_index="1" type="R13"/>
+      <level robot_index="0" type="R31"/>
     </multilevel>
 
   </plannerinput>

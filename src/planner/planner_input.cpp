@@ -289,8 +289,8 @@ void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy_index)
       Layer layer;
 
       layer.level = level++;
-      layer.inner_index = GetAttribute<int>(lindex, "inner_index");
-      layer.outer_index = GetAttributeDefault<int>(lindex, "outer_index", layer.inner_index);
+      layer.robot_index = GetAttribute<int>(lindex, "robot_index");
+      layer.outer_index = GetAttributeDefault<int>(lindex, "outer_index", layer.robot_index);
 
       // layer.cspace_constant = GetAttributeDefault<double>(lindex, "cspace_constant", 0);
       layer.finite_horizon_relaxation = GetAttributeDefault<double>(lindex, "finite_horizon_relaxation", 0);
@@ -304,7 +304,7 @@ void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy_index)
     std::cout << "[WARNING] Did not specify robot multilevel. Assuming one layer SE3RN" << std::endl;
     Layer layer;
     layer.level = 0;
-    layer.inner_index = 0;
+    layer.robot_index = 0;
     layer.outer_index = 0;
     layer.type = "SE3RN";
     stratification.layers.push_back(layer);
@@ -472,7 +472,7 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
     std::cout << "[WARNING] Did not specify robot multilevel. Assuming one layer SE3RN" << std::endl;
     Layer layer;
     layer.level = 0;
-    layer.inner_index = 0;
+    layer.robot_index = 0;
     layer.outer_index = 0;
     layer.type = "SE3RN";
     stratification.layers.push_back(layer);

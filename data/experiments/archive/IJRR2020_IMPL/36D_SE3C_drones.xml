@@ -4,10 +4,6 @@
 
   <!-- Prioritized Multi-Robot Motion Planning -->
   <robot name="drone" file="../../robots/drone/dddk.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="drone" file="../../robots/drone/dddk.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <!-- <robot name="drone" file="../../robots/drone/dddk.urdf" translation="0 0 0" rotateRPY="0 0 0"/> -->
-  <!-- <robot name="drone" file="../../robots/drone/dddk.urdf" translation="0 0 0" rotateRPY="0 0 0"/> -->
-  <!-- <robot name="drone" file="../../robots/drone/dddk.urdf" translation="0 0 0" rotateRPY="0 0 0"/> -->
   <!-- <robot name="drone" file="../../robots/drone/dddk.urdf" translation="0 0 0" rotateRPY="0 0 0"/> -->
 
   <terrain name="tree" file="../../terrains/drone/tree.tri">

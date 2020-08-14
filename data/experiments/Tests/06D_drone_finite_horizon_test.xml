@@ -21,14 +21,12 @@
     <algorithm name="multilevel:qrrt"/>
 
     <multilevel>
-      <level inner_index="1" type="R3" finite_horizon_relaxation="0.01"/>
-      <level inner_index="1" type="R3"/>
-      <!-- <level inner_index="0" type="SE3"/> -->
+      <level robot_index="1" type="R3" finite_horizon_relaxation="0.01"/>
+      <level robot_index="1" type="R3"/>
+      <!-- <level robot_index="0" type="SE3"/> -->
     </multilevel>
 
   </plannerinput>
 
 </world>
-
-
 

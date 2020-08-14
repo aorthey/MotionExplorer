@@ -18,12 +18,10 @@
     <freeFloating>0</freeFloating>
 
     <multilevel>
-      <level inner_index="0" type="R2"/>
+      <level robot_index="0" type="R2"/>
     </multilevel>
 
   </plannerinput>
 
 </world>
-
-
 

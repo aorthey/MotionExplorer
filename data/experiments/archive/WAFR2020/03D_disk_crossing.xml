@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <world>
   <robot file="../../robots/sphere.urdf" translation="0 0 0.05"/>
-  <robot file="../../robots/sphere.urdf" translation="0 0 0.05"/>
-  <robot file="../../robots/sphere.urdf" translation="0 0 0.05"/>
 
   <plannerinput>
 
@@ -37,7 +35,6 @@
     <pathSpeed>3</pathSpeed>
     <freeFloating>1</freeFloating>
     <smoothPath>1</smoothPath>
-    <algorithm name="multilevel:explorer"/>
     <algorithm name="multilevel:explorer"/>
     <algorithm name="sampler"/>
 

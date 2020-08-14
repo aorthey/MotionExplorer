@@ -6,7 +6,7 @@
 
 struct Layer{
   int level;
-  int inner_index;
+  int robot_index;
   int outer_index;
   // double cspace_constant;
   double finite_horizon_relaxation{0.0};

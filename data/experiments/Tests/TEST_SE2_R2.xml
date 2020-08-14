@@ -20,8 +20,8 @@
     <algorithm name="multilevel:qrrt"/>
 
     <multilevel>
-      <level inner_index="1" type="R2"/>
-      <level inner_index="0" type="SE2"/>
+      <level robot_index="1" type="R2"/>
+      <level robot_index="0" type="SE2"/>
     </multilevel>
   </plannerinput>
 </world>

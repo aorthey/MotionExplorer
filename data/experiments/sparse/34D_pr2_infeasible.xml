@@ -30,9 +30,9 @@
     <freeFloating>1</freeFloating>
     <smoothPath>1</smoothPath>
     <multilevel>
-      <level inner_index="4" type="R2"/>
-      <level inner_index="2" type="SE2RN"/>
-      <level inner_index="0" type="SE2RN"/>
+      <level robot_index="4" type="R2"/>
+      <level robot_index="2" type="SE2RN"/>
+      <level robot_index="0" type="SE2RN"/>
     </multilevel>
 
   </plannerinput>

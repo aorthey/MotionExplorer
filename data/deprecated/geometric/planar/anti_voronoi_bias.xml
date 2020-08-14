@@ -18,7 +18,8 @@
     <maxplanningtime>1.0</maxplanningtime>      <!-- runtime in (s) --> 
 
     <hierarchy>
-      <level inner_index="0" type="R2"/>
+      <level robot_index="0" type="R2"/>
+      <level robot_index="0" type="R2"/>
     </hierarchy>
 
   </plannerinput>

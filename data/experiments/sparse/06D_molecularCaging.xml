@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="molecule" file="../../objects/molecules/907758.urdf"
+  config="6 -1.47325 0.547223 0.168376 5.40898 -0.645368 1.15796 "/>
+    <!-- 6 -1.47325 0.547223 0.168376 5.40898 -0.645368 1.15796 --> 
+
+  <terrain name="cage" file="../../objects/molecules/707056.stl"
+    rotateRPY="0.3 -0.4 0">
+     <display color="0.6 0.6 0.6 1"/> 
+  </terrain>
+
+  <!-- <terrain name="mug" file="../../objects/power_drill.stl" translation="-5 0 0" rotateRPY="0 0 0"> -->
+  <!--    <display color="0.6 0.6 0.6 1"/> --> 
+  <!-- </terrain> -->
+  <!-- <terrain name="mug" file="../../objects/mug.stl" translation="-3 0 0" rotateRPY="0 0 0"> -->
+  <!--    <display color="0.6 0.6 0.6 1"/> --> 
+  <!-- </terrain> -->
+  <!-- <plannerinput> -->
+
+  <!--   <1!-- <qinit config=" 6 -0.00151088 -0.494222 0.920576 3.7115 -0.875066 3.05242"/> --1> -->
+  <!--   <qgoal config=" 6 -0.00151088 -0.494222 0.920576 3.7115 -0.875066 3.05242"/> -->
+  <!--   <qinit  config="6  -5 -5 -20 1.57 1.57 0 0 0"/> -->
+  <!--   <se3min config="6  -12.0 -12.0 -40.0 -3.141593 -1.57 -3.141593"/> -->
+  <!--   <se3max config="6  +12.0 +12.0 +20.0 +3.141593 +1.57 +3.141593"/> -->
+  <!--   <freeFloating>1</freeFloating> -->
+  <!--   <maxplanningtime>3</maxplanningtime>      <1!-- runtime in (s) --1> --> 
+
+  <!--   <multilevel> -->
+  <!--     <level robot_index="0" type="SE3"/> -->
+  <!--   </multilevel> -->
+
+  <!-- </plannerinput> -->
+</world>

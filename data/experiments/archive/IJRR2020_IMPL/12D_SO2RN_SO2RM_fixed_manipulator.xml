@@ -17,20 +17,12 @@
   <robot name="12dof" file="../../robots/planar_manipulator/12dof_manip.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
   <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="-2 +2 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="-2 +2 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="-2.5 -2.5 0" rotateRPY="0 0 0"/>
   <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="-2.5 -2.5 0" rotateRPY="0 0 0"/>
   <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="1 -2.0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="1 -2.0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="5 5.0 0" rotateRPY="0 0 0"/>
   <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="5 5.0 0" rotateRPY="0 0 0"/>
   <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="10 5.0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="10 5.0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="-10 5.0 0" rotateRPY="0 0 0"/>
   <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="-10 5.0 0" rotateRPY="0 0 0"/>
   <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="-3 8.0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="-3 8.0 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="+7 -8.0 0" rotateRPY="0 0 0"/>
   <rigidObject name="cylinder.tri" file="../../terrains/primitives/cylinder.tri" translation="+7 -8.0 0" rotateRPY="0 0 0"/>
   <plannerinput>
 
@@ -42,11 +34,11 @@
     <!-- <smoothPath>1</smoothPath> -->
 
     <multilevel>
-      <level inner_index="3" type="S1RN"/>
-      <level inner_index="5" type="S1RN"/>
-      <level inner_index="7" type="S1RN"/>
-      <level inner_index="10" type="S1RN"/>
-      <level inner_index="12" type="S1RN"/>
+      <level robot_index="3" type="S1RN"/>
+      <level robot_index="5" type="S1RN"/>
+      <level robot_index="7" type="S1RN"/>
+      <level robot_index="10" type="S1RN"/>
+      <level robot_index="12" type="S1RN"/>
     </multilevel>
 
   </plannerinput>

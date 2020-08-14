@@ -3,7 +3,6 @@
 <world>
 
   <robot name="point" file="../../robots/point_nonphysical.urdf"/>
-  <robot name="point" file="../../robots/point_nonphysical.urdf"/>
 
   <!-- <rigidObject name="mobius.tri" file="../../terrains/mobius.tri" translation="0 0 0.5" rotateRPY="0 0 1.57"/> -->
   <plannerinput>
@@ -19,14 +18,11 @@
     <pathWidth>0.03</pathWidth>
 
     <multilevel>
-      <level inner_index="1" type="CIRCULAR"/>
-      <level inner_index="0" type="MOBIUS"/>
+      <level robot_index="1" type="CIRCULAR"/>
+      <level robot_index="0" type="MOBIUS"/>
     </multilevel>
 
   </plannerinput>
 
 </world>
-
-
-
 

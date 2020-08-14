@@ -2,8 +2,6 @@
 <world>
 
   <robot name="hand" file="../robots/kuka_shadowhand/kuka_shadowhand.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-  <robot name="hand" file="../robots/kuka_shadowhand/kuka_shadowhand.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
-
 
   <plannerinput>
 
@@ -18,7 +16,7 @@
     <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
 
     <multilevel>
-      <level inner_index="0" type="R37"/>
+      <level robot_index="0" type="R37"/>
     </multilevel>
 
   </plannerinput>

@@ -66,20 +66,28 @@
 
     <algorithm name="hierarchical:ompl:qmp_prm_connect">
       <hierarchy>
-        <level inner_index="1" type="R5"/>
-        <level inner_index="2" type="R7"/>
-        <level inner_index="3" type="R12"/>
-        <level inner_index="0" type="R14"/>
+        <level robot_index="1" type="R5"/>
+        <level robot_index="1" type="R5"/>
+        <level robot_index="2" type="R7"/>
+        <level robot_index="2" type="R7"/>
+        <level robot_index="3" type="R12"/>
+        <level robot_index="3" type="R12"/>
+        <level robot_index="0" type="R14"/>
+        <level robot_index="0" type="R14"/>
       </hierarchy>
     </algorithm>
     <algorithm name="ompl:rrtconnect"/>
 
     <algorithm name="hierarchical:ompl:benchmark_narrow">
       <hierarchy>
-        <level inner_index="1" type="R5"/>
-        <level inner_index="2" type="R7"/>
-        <level inner_index="3" type="R12"/>
-        <level inner_index="0" type="R14"/>
+        <level robot_index="1" type="R5"/>
+        <level robot_index="1" type="R5"/>
+        <level robot_index="2" type="R7"/>
+        <level robot_index="2" type="R7"/>
+        <level robot_index="3" type="R12"/>
+        <level robot_index="3" type="R12"/>
+        <level robot_index="0" type="R14"/>
+        <level robot_index="0" type="R14"/>
       </hierarchy>
     </algorithm>
 

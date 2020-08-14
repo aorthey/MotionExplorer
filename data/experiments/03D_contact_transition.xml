@@ -7,7 +7,6 @@
   <terrain name="rectangleBottom1" file="../terrains/primitives/rectangle.tri" translation="+3.0 -2.5 -0.0" rotateRPY="0 0 0" scale="4 2 30"/>
   <terrain name="rectangleBottom2" file="../terrains/primitives/rectangle.tri" translation="+3.0 +2.5 -0.0" rotateRPY="0 0 0" scale="4 2 30"/>
 
-
   <plannerinput>
 
     <qinit  config="12  +2 -1.5 0 0.0 0.0 0.0  1.570796 0.0 1.570796 0 1.570796"/>
@@ -37,12 +36,10 @@
     </contacts>
 
     <multilevel>
-      <level inner_index="0" type="R3_CONTACT"/>
+      <level robot_index="0" type="R3_CONTACT"/>
     </multilevel>
 
   </plannerinput>
 
 </world>
-
-
 

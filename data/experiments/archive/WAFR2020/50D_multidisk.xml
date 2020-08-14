@@ -47,7 +47,6 @@
   <rigidObject file="../../terrains/primitives/cuboid_1meter.tri" translation="+3 +2 0"/>
   <rigidObject file="../../terrains/primitives/cuboid_1meter.tri" translation="+3 +0 0"/>
 
-
   <rigidObject file="../../terrains/primitives/cuboid_1meter.tri" translation="+2 -0.5 0" 
     rotateRPY="0 0 1.57"/>
   <rigidObject file="../../terrains/primitives/cuboid_1meter.tri" translation="-0 -0.5 0" 

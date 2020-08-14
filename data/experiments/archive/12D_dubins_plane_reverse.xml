@@ -4,7 +4,6 @@
 
   <!-- Airplane 1 is holonomic, Airplane 2 is non-holonomic -->
   <robot name="airplane" file="../robots/airplane.urdf"/>
-  <robot name="airplane" file="../robots/airplane.urdf"/>
 
   <plannerinput>
 
@@ -27,8 +26,8 @@
     <pathSpeed>4</pathSpeed>
 
     <multilevel>
-      <!-- <level inner_index="1" type = "SE3"/> -->
-      <level inner_index="0" type = "TSE3"/>
+      <!-- <level robot_index="1" type = "SE3"/> -->
+      <level robot_index="0" type = "TSE3"/>
     </multilevel>
 
   </plannerinput>

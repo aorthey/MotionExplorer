@@ -15,7 +15,9 @@ void GeometricCSpaceOMPLRNTime::initSpace()
   ob::StateSpacePtr RN = (std::make_shared<ob::RealVectorStateSpace>(N));
   ob::StateSpacePtr T = (std::make_shared<ob::TimeStateSpace>());
   this->space = RN + T;
-  ob::RealVectorStateSpace *cspaceRN = this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(0);
+
+  ob::RealVectorStateSpace *cspaceRN = 
+    this->space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(0);
 
   std::vector<double> minimum, maximum;
   minimum = robot->qMin;
@@ -69,7 +71,8 @@ bool GeometricCSpaceOMPLRNTime::isTimeDependent()
 
 double GeometricCSpaceOMPLRNTime::GetTime(const ob::State *qompl)
 {
-  const ob::TimeStateSpace::StateType *qOMPLTime = qompl->as<ob::CompoundState>()->as<ob::TimeStateSpace::StateType>(1);
+  const ob::TimeStateSpace::StateType *qOMPLTime = 
+    qompl->as<ob::CompoundState>()->as<ob::TimeStateSpace::StateType>(1);
   double t = qOMPLTime->position;
   return t;
 }
@@ -82,7 +85,8 @@ void GeometricCSpaceOMPLRNTime::print(std::ostream& out) const
   std::cout << "Robot \"" << robot->name << "\":" << std::endl;
   std::cout << "Dimensionality Space            : R^" << GetDimensionality() << std::endl;
 
-  ob::RealVectorStateSpace *cspace = space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(0);
+  ob::RealVectorStateSpace *cspace = 
+    space->as<ob::CompoundStateSpace>()->as<ob::RealVectorStateSpace>(0);
 
   const ob::RealVectorBounds bounds = cspace->getBounds();
   std::vector<double> min = bounds.low;
@@ -100,8 +104,10 @@ void GeometricCSpaceOMPLRNTime::print(std::ostream& out) const
   std::cout << std::endl;
   std::cout << std::string(80, '-') << std::endl;
 }
+
 Vector3 GeometricCSpaceOMPLRNTime::getXYZ(const ob::State *s)
 {
+  // double t = GetTime(s);
   OMPL_ERROR("NYI");
   throw "NYI";
 }

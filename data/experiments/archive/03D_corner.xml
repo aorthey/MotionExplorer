@@ -25,9 +25,9 @@
     <pathSpeed>10</pathSpeed>
 
     <multilevel>
-      <!-- <level inner_index="3" cspace_constant="1" type="R2"/> -->
-      <level inner_index="1" cspace_constant="1" type="R2"/>
-      <level inner_index="0" cspace_constant="0.532623641291" type="SE2"/>
+      <!-- <level robot_index="3" cspace_constant="1" type="R2"/> -->
+      <level robot_index="1" cspace_constant="1" type="R2"/>
+      <level robot_index="0" cspace_constant="0.532623641291" type="SE2"/>
     </multilevel>
 
   </plannerinput>

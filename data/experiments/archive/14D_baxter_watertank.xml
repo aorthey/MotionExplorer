@@ -27,20 +27,14 @@
 
   <!--
   <rigidObject   name="biolab" file="../terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
+    <display color="0.7 0.7 0.7 0.5"/>
+  </rigidObject>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 0.9" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 -0.2" rotateRPY="0 0 0"/>
   <rigidObject   name="biolab" file="../terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
     <display color="0.7 0.7 0.7 0.5"/>
   </rigidObject>
   <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 0.9" rotateRPY="0 0 0"/>
-  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 0.9" rotateRPY="0 0 0"/>
-  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 -0.2" rotateRPY="0 0 0"/>
-  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 -0.2" rotateRPY="0 0 0"/>
-  <rigidObject   name="biolab" file="../terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
-  <rigidObject   name="biolab" file="../terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
-    <display color="0.7 0.7 0.7 0.5"/>
-  </rigidObject>
-  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 0.9" rotateRPY="0 0 0"/>
-  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 0.9" rotateRPY="0 0 0"/>
-  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 -0.2" rotateRPY="0 0 0"/>
   <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 -0.2" rotateRPY="0 0 0"/>
   -->
   <terrain   name="biolab" file="../terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
@@ -63,15 +57,15 @@
     <epsilongoalregion>0.1</epsilongoalregion>
     <maxplanningtime>10</maxplanningtime>
     <multilevel>
-      <level inner_index="1" type="R5"/>
-      <level inner_index="2" type="R7"/>
-      <level inner_index="3" type="R12"/>
-      <level inner_index="0" type="R14"/>
+      <level robot_index="1" type="R5"/>
+      <level robot_index="2" type="R7"/>
+      <level robot_index="3" type="R12"/>
+      <level robot_index="0" type="R14"/>
     </multilevel>
 
     <!-- <multilevel> -->
-    <!--   <level inner_index="5" outer_index="5" type="R5"/> -->
-    <!--   <level inner_index="0" outer_index="0" type="R7"/> -->
+    <!--   <level robot_index="5" outer_index="5" type="R5"/> -->
+    <!--   <level robot_index="0" outer_index="0" type="R7"/> -->
     <!-- </multilevel> -->
 
   </plannerinput>

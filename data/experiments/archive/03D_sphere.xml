@@ -19,7 +19,7 @@
     <pathWidth>0.1</pathWidth>
 
     <multilevel>
-      <level inner_index="0" type="R3"/>
+      <level robot_index="0" type="R3"/>
     </multilevel>
 
   </plannerinput>

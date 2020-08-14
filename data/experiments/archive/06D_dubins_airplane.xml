@@ -30,7 +30,7 @@
     <kinodynamic>1</kinodynamic>
 
     <multilevel>
-      <level inner_index="0" cspace_constant="1" type="TSE3"/>
+      <level robot_index="0" cspace_constant="1" type="TSE3"/>
     </multilevel>
 
   </plannerinput>

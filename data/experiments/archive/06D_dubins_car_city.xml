@@ -2,7 +2,6 @@
 
 <world>
   <robot name="dubins_car" file="../robots/dubinscar/dubinscar.urdf"/>
-  <robot name="dubins_car" file="../robots/dubinscar/dubinscar.urdf"/>
   <robot name="disk_inner" file="../robots/dubinscar/dubinscar_disk_approximation.urdf"/>
 
   <rigidObject name="city" file="../terrains/city_03333.stl" translation="0 0 -0.2"/>
@@ -29,9 +28,9 @@
     <pathSpeed>10</pathSpeed>
 
     <multilevel>
-      <!-- <level inner_index="2" type="R2"/> -->
-      <!-- <level inner_index="1" type="SE2"/> -->
-      <level inner_index="0" type="TSE2"/>
+      <!-- <level robot_index="2" type="R2"/> -->
+      <!-- <level robot_index="1" type="SE2"/> -->
+      <level robot_index="0" type="TSE2"/>
     </multilevel>
 
   </plannerinput>

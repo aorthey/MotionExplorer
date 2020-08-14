@@ -94,7 +94,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_)
           for(uint i = 0; i < stratification.layers.size(); i++){
             Layer layer = stratification.layers.at(i);
             if(!layer.isMultiAgent){
-              uint ri = layer.inner_index;
+              uint ri = layer.robot_index;
               uint ro = layer.outer_index;
               if(ri>=world.robots.size()){
                 std::cout << std::string(80, '>') << std::endl;

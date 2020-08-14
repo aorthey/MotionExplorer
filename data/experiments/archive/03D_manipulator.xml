@@ -5,10 +5,7 @@
   <robot name="3dof" file="../robots/planar_manipulator/3dof_manip.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
   <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-2 +2 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-2 +2 0" rotateRPY="0 0 0"/>
   <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-2.5 -2.5 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="-2.5 -2.5 0" rotateRPY="0 0 0"/>
-  <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="1 -2.0 0" rotateRPY="0 0 0"/>
   <rigidObject name="cylinder.tri" file="../terrains/primitives/cylinder.tri" translation="1 -2.0 0" rotateRPY="0 0 0"/>
 
   <plannerinput>
@@ -20,12 +17,10 @@
     <maxplanningtime>0.5</maxplanningtime>      <!-- runtime in (s) --> 
 
     <multilevel>
-      <level inner_index="0" type="R3"/>
+      <level robot_index="0" type="R3"/>
     </multilevel>
 
   </plannerinput>
 
 </world>
-
-
 

@@ -1,4 +1,5 @@
 #include "infeasibility_sampler.h"
+#include "util.h"
 
 
 using namespace ompl::geometric;
@@ -41,5 +42,4 @@ void InfeasibilitySampler::getPlannerData(ob::PlannerData &data) const
     ob::PlannerDataVertex p(states.at(k));
     data.addVertex(p);
   }
-  std::cout << "Sampled " << data.numVertices() << " infeasible vertices." << std::endl;
 }

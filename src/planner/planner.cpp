@@ -9,6 +9,7 @@
 #include "util.h"
 #include "common.h"
 #include "gui/ViewLocalMinimaTree.h"
+#include "elements/roadmap.h"
 #include <ompl/multilevel/planners/explorer/MotionExplorer.h>
 #include <ompl/multilevel/planners/explorer/MotionExplorerQMP.h>
 #include <ompl/multilevel/planners/explorer/datastructures/MultiLevelPathSpace.h>
@@ -159,7 +160,7 @@ CSpaceOMPL* MotionPlanner::ComputeCSpaceLayer(const Layer &layer)
   CSpaceOMPL *cspace_layer = nullptr;
 
   if(!input.multiAgent){
-    int ii = layer.inner_index;
+    int ii = layer.robot_index;
     int io = layer.outer_index;
     Robot* ri = world->robots[ii];
     Robot* ro = world->robots[io];
@@ -445,6 +446,15 @@ void MotionPlanner::AdvanceUntilSolution()
       strategy->Plan(*output);
       ExpandFull();
       time = getTime();
+      if(input.name_algorithm=="sampler")
+      {
+        std::string name = util::GetFileBasename(input.environment_name);
+        std::string fname = util::GetDataFolder()+"/samples/"+name+".samples";
+
+        output->getRoadmap()->Save(fname.c_str());
+        std::cout << "Saved " << output->getRoadmap()->numVertices() 
+          << " infeasible samples to " << fname << std::endl;
+      }
   }
 }
 

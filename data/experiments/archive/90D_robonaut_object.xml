@@ -40,7 +40,7 @@
   <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
 
   <multilevel>
-    <level inner_index="0" type="R90"/>
+    <level robot_index="0" type="R90"/>
   </multilevel>
 
   </plannerinput>
@@ -51,6 +51,5 @@
   <!--      <controller type="PolynomialPathController" />-->
   <!--   </robot>-->
   <!-- </simulation>-->
-
 
 </world>
