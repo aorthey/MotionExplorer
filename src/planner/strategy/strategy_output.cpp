@@ -44,6 +44,11 @@ bool StrategyOutput::hasSolution(int level)
 
 PathPiecewiseLinear* StrategyOutput::getSolutionPath(int level)
 {
+  if(pathVec_.at(level) != nullptr)
+  {
+    return pathVec_.at(level);
+  }
+
   ob::ProblemDefinitionPtr pdef = pdefVec_.at(level);
   if(pdef->hasExactSolution() || pdef->hasApproximateSolution())
   {

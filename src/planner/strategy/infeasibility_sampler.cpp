@@ -17,15 +17,14 @@ ompl::base::PlannerStatus InfeasibilitySampler::solve(const ompl::base::PlannerT
   while(!ptc())
   {
     sampler->sampleUniform(testState);
-    if(!si_->isValid(testState)){
+    if(!si_->isValid(testState))
+    {
       ob::State *q = si_->cloneState(testState);
       states.push_back(q);
     }
   }
   return ompl::base::PlannerStatus::EXACT_SOLUTION;
-
 }
-
 
 void InfeasibilitySampler::clear()
 {

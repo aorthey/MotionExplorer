@@ -446,7 +446,8 @@ void MotionPlanner::AdvanceUntilSolution()
       strategy->Plan(*output);
       ExpandFull();
       time = getTime();
-      if(input.name_algorithm=="sampler")
+      if(input.name_algorithm=="sampler" ||
+         input.name_algorithm=="multilevel:sampler")
       {
         std::string name = util::GetFileBasename(input.environment_name);
         std::string fname = util::GetDataFolder()+"/samples/"+name+".samples";

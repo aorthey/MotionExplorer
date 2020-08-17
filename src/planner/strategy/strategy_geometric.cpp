@@ -3,6 +3,7 @@
 #include "planner/benchmark/benchmark_input.h"
 #include "planner/benchmark/benchmark_output.h"
 #include "planner/strategy/infeasibility_sampler.h"
+#include "planner/strategy/infeasibility_restriction_sampler.h"
 #include "planner/cspace/cspace_geometric_contact.h"
 
 #include <ompl/multilevel/datastructures/PlannerMultiLevel.h>
@@ -162,6 +163,10 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="sampler")
   {
     planner = std::make_shared<og::InfeasibilitySampler>(si);
+  }
+  else if(algorithm=="multilevel:sampler")
+  {
+    planner = std::make_shared<om::RestrictionSampler>(siVec);
   }
   else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl")
   {
