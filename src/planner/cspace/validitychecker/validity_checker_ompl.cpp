@@ -46,7 +46,7 @@ double OMPLValidityChecker::SufficientDistance(const ob::State* state) const
 double OMPLValidityChecker::clearance(const ob::State* state) const
 {
   double c = DistanceToRobot(state, klampt_single_robot_cspace);
-  return 1.0/c;
+  return c;
 }
 
 double OMPLValidityChecker::DistanceToRobot(const ob::State* state, SingleRobotCSpace *space) const

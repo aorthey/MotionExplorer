@@ -59,6 +59,7 @@ class MotionPlanner{
     void Print();
 
     virtual std::string getName() const;
+    int getCurrentLevel() const;
     virtual void Clear();
 
     friend std::ostream& operator<< (std::ostream& out, const MotionPlanner& planner);

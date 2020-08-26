@@ -146,8 +146,8 @@ class CSpaceFactory{
       return cspace;
     }
     // CSpace  Empty
-    virtual GeometricCSpaceOMPL* MakeEmptySetSpace( RobotWorld *world){
-      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLEmpty(world);
+    virtual GeometricCSpaceOMPL* MakeEmptySetSpace( RobotWorld *world, int robot_idx){
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLEmpty(world, robot_idx);
       cspace->SetCSpaceInput(input);
       cspace->Init();
       return cspace;

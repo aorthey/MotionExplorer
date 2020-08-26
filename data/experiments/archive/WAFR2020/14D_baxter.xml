@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <world>
 
-  <robot name="baxter_07dof_leftarm" file="../../robots/baxter_description/baxter_07dof_leftarm.urdf"/>
-  <robot name="baxter_07dof_rightarm" file="../../robots/baxter_description/baxter_07dof_rightarm.urdf"/>
+  <robot name="baxter_07dof_leftarm" file="../../../robots/baxter_description/baxter_07dof_leftarm.urdf"/>
+  <robot name="baxter_07dof_rightarm" file="../../../robots/baxter_description/baxter_07dof_rightarm.urdf"/>
 
   <plannerinput>
     <!-- <qinit config="54  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.64 -0.7 -0.29418 2.18 0 0 0.82 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.64 -0.66 0 2.1 0 0 0.94 0 0 0 0 0 0 0 0 0 0 0 0 "/> -->
@@ -20,6 +20,9 @@
 
     <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
+
+    <algorithm name="multilevel:explorer2"/>
+    <threading>1</threading>
 
     <freeFloating>0</freeFloating>
     <pathWidth>0.5</pathWidth>

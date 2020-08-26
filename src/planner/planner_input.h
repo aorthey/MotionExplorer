@@ -16,6 +16,8 @@ struct Layer{
   Config dq_goal;
   std::string type;
 
+  std::string path_fname;
+
   //multiagent
   bool isMultiAgent{false};
   int maxRobots{0};

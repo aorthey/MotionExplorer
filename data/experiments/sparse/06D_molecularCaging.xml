@@ -3,7 +3,7 @@
 <world>
 
   <robot name="molecule" file="../../objects/molecules/907758.urdf"
-  config="6 -1.47325 0.547223 0.168376 5.40898 -0.645368 1.15796 "/>
+  config="6 -1.17325 0.547223 0.168376 5.40898 -0.645368 1.15796 "/>
     <!-- 6 -1.47325 0.547223 0.168376 5.40898 -0.645368 1.15796 --> 
 
   <terrain name="cage" file="../../objects/molecules/707056.stl"
@@ -11,7 +11,7 @@
      <display color="0.6 0.6 0.6 1"/> 
   </terrain>
 
-  <!-- <terrain name="mug" file="../../objects/power_drill.stl" translation="-5 0 0" rotateRPY="0 0 0"> -->
+  <terrain name="mug" file="../../objects/power_drill.stl" translation="-5 0 0" rotateRPY="0 0 0"/>
   <!--    <display color="0.6 0.6 0.6 1"/> --> 
   <!-- </terrain> -->
   <!-- <terrain name="mug" file="../../objects/mug.stl" translation="-3 0 0" rotateRPY="0 0 0"> -->

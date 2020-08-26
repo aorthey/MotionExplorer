@@ -1056,15 +1056,17 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
 
     {
       AddComment(*node, "Raw States: Unsmoothed");
-
-      og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path_raw);
-      ob::SpaceInformationPtr si = gpath.getSpaceInformation();
-      ob::StateSpacePtr space = si->getStateSpace();
-      std::vector<ob::State *> states = gpath.getStates();
-      for(uint k = 0; k < states.size(); k++){
-        std::vector<double> state_k_serialized;
-        space->copyToReals(state_k_serialized, states.at(k));
-        AddSubNodeVector(*node, "rawstate", state_k_serialized);
+      if(path_raw)
+      {
+        og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path_raw);
+        ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+        ob::StateSpacePtr space = si->getStateSpace();
+        std::vector<ob::State *> states = gpath.getStates();
+        for(uint k = 0; k < states.size(); k++){
+          std::vector<double> state_k_serialized;
+          space->copyToReals(state_k_serialized, states.at(k));
+          AddSubNodeVector(*node, "rawstate", state_k_serialized);
+        }
       }
     }
   }

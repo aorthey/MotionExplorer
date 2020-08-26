@@ -6,7 +6,7 @@ INCLUDE(CMakeColors)
 SET(DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data/")
 
 PROJECT( MotionPlanningExplorerGUI )
-SET(MOTION_EXPLORER_SUBDIRS algorithms controller elements gui planner ompl)
+SET(MOTION_EXPLORER_SUBDIRS controller elements gui planner ompl)
 
 set(MOTION_EXPLORER_MAJOR_VERSION 0)
 set(MOTION_EXPLORER_MINOR_VERSION 2)

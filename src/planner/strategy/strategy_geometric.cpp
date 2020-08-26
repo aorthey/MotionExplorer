@@ -137,6 +137,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
 
   else if(algorithm=="ompl:bitstar") planner = std::make_shared<og::BITstar>(si);
   else if(algorithm=="ompl:abitstar") planner = std::make_shared<og::ABITstar>(si);
+  else if(algorithm=="ompl:aitstar") planner = std::make_shared<og::AITstar>(si);
   else if(algorithm=="ompl:fmt") planner = std::make_shared<og::FMT>(si);
   else if(algorithm=="ompl:bfmt") planner = std::make_shared<og::BFMT>(si);
 
@@ -151,6 +152,8 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:biest") planner = std::make_shared<og::BiEST>(si);
   else if(algorithm=="ompl:projest") planner = std::make_shared<og::ProjEST>(si);
   else if(algorithm=="ompl:sbl") planner = std::make_shared<og::SBL>(si);
+  else if(algorithm=="ompl:prrt") planner = std::make_shared<og::pRRT>(si);
+  else if(algorithm=="ompl:psbl") planner = std::make_shared<og::pSBL>(si);
 
   else if(algorithm=="multilevel:qrrt") planner = std::make_shared<om::QRRT>(siVec, "QRRT");
   else if(algorithm=="multilevel:qrrtstar") planner = std::make_shared<om::QRRTStar>(siVec, "QRRTStar");
@@ -168,11 +171,11 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   {
     planner = std::make_shared<om::RestrictionSampler>(siVec);
   }
-  else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl")
-  {
-    std::cout << "Planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
-    throw "Invalid planner.";
-  }
+  // else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl")
+  // {
+  //   std::cout << "Planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
+  //   throw "Invalid planner.";
+  // }
   else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     throw "Invalid planner.";
@@ -430,7 +433,7 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   ob::ScopedState<> goal  = cspace->ConfigToOMPLState(input.q_goal);
   ss.setStartAndGoalStates(start, goal, input.epsilon_goalregion);
 
-  ss.getStateSpace()->registerProjections();
+  // ss.getStateSpace()->registerProjections();
   ss.setup();
 
   ss.getProblemDefinition()->setOptimizationObjective( GetOptimizationObjective(si) );

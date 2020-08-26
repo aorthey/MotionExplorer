@@ -26,8 +26,8 @@ namespace ompl
 }
 
 
-GeometricCSpaceOMPLEmpty::GeometricCSpaceOMPLEmpty(RobotWorld *world_):
-  GeometricCSpaceOMPL(world_, -1)
+GeometricCSpaceOMPLEmpty::GeometricCSpaceOMPLEmpty(RobotWorld *world_, int robot_idx):
+  GeometricCSpaceOMPL(world_, robot_idx)
 {
 }
 
@@ -41,17 +41,15 @@ void GeometricCSpaceOMPLEmpty::initSpace()
 uint GeometricCSpaceOMPLEmpty::GetDimensionality() const{
   return 0;
 }
-uint GeometricCSpaceOMPLEmpty::GetKlamptDimensionality() const{
-  return 0;
-}
 
 void GeometricCSpaceOMPLEmpty::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
+  q_ = q;
 }
 
-Config GeometricCSpaceOMPLEmpty::OMPLStateToConfig(const ob::State *qompl){
-  Config q;
-  return q;
+Config GeometricCSpaceOMPLEmpty::OMPLStateToConfig(const ob::State *qompl)
+{
+  return q_;
 }
 void GeometricCSpaceOMPLEmpty::print(std::ostream& out) const
 {

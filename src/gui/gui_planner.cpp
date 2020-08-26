@@ -186,9 +186,11 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="save_current_path"){
     //state("save_current_path").activate();
     path = planners.at(active_planner)->GetPath();
+    int current_level = planners.at(active_planner)->getCurrentLevel();
     if(path)
     {
-      std::string fname = "../data/paths/"+getRobotEnvironmentString()+".path";
+      std::string fname = "../data/paths/"+getRobotEnvironmentString()+
+        "_level"+std::to_string(current_level)+".path";
       path->Save(fname.c_str());
       std::cout << "save current path (" << path->GetNumberOfMilestones() 
         << " states) to : " << fname << std::endl;

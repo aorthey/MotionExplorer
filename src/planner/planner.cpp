@@ -80,9 +80,9 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
   CSpaceFactory factory(input.GetCSpaceInput(robot_idx));
 
   CSpaceOMPL* cspace_level;
-  if(type=="EMPTY_SET") 
+  if(type=="EMPTY_SET" || type=="FIXED") 
   {
-    cspace_level = factory.MakeEmptySetSpace(world);
+    cspace_level = factory.MakeEmptySetSpace(world, robot_idx);
   }else{
     if(freeFloating)
     {
@@ -648,6 +648,11 @@ void MotionPlanner::DrawGLStartGoal(GUIState& state)
 void MotionPlanner::resetTime()
 {
   timePointStart = ompl::time::now();
+}
+
+int MotionPlanner::getCurrentLevel() const
+{
+  return current_level;
 }
 
 double MotionPlanner::getTime()

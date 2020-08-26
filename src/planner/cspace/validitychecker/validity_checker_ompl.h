@@ -8,7 +8,6 @@ class OMPLValidityChecker: public ob::StateValidityChecker
     OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_);
 
     bool IsFeasible(const ob::State* state) const;
-    // double Distance(const ob::State* state) const;
 
     virtual bool IsSufficientFeasible(const ob::State* state) const;
     virtual double SufficientDistance(const ob::State* state) const;

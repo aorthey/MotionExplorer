@@ -289,11 +289,18 @@ void PlannerInput::ExtractHierarchy(TiXmlElement *node, int hierarchy_index)
       Layer layer;
 
       layer.level = level++;
-      layer.robot_index = GetAttribute<int>(lindex, "robot_index");
-      layer.outer_index = GetAttributeDefault<int>(lindex, "outer_index", layer.robot_index);
 
-      // layer.cspace_constant = GetAttributeDefault<double>(lindex, "cspace_constant", 0);
-      layer.finite_horizon_relaxation = GetAttributeDefault<double>(lindex, "finite_horizon_relaxation", 0);
+      layer.robot_index = GetAttribute<int>(lindex, "robot_index");
+
+      layer.outer_index = 
+        GetAttributeDefault<int>(lindex, "outer_index", layer.robot_index);
+
+      layer.path_fname = 
+        GetAttributeDefault<std::string>(lindex, "path", "");
+
+      layer.finite_horizon_relaxation = 
+        GetAttributeDefault<double>(lindex, "finite_horizon_relaxation", 0);
+
       layer.type = GetAttribute<std::string>(lindex, "type");
 
       stratification.layers.push_back(layer);
