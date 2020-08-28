@@ -52,9 +52,15 @@ bool OMPLValidityCheckerMultiAgent::isValid(const ob::State* state) const
 
     pair<int,int> res;
     res = space->settings->CheckCollision(space->world, idrobot);
-    if(res.first >= 0) return false;
+    if(res.first >= 0)
+    {
+      return false;
+    }
     res = space->settings->CheckCollision(space->world, idrobot, idothers);
-    if(res.first >= 0) return false;
+    if(res.first >= 0)
+    {
+      return false;
+    }
 
   }
   return true;

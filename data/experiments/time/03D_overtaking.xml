@@ -7,23 +7,22 @@
   <robot name="diskExternal" file="../../robots/planar/disk_maze.urdf"
     />
 
-  <rigidObject 
-    name="cylinder.tri" 
-    file="../../terrains/primitives/cylinder.tri"/>
+  <!-- <rigidObject --> 
+  <!--   name="cylinder.tri" --> 
+  <!--   file="../../terrains/primitives/cylinder.tri"/> -->
 
   <plannerinput>
 
     <agent 
       id="0" 
-      qinit="6  0 +4 0 0 0 0"
-      qgoal="6  0 -4 0 0 0 0"
+      qinit="6  -5 -2 0 0 0 0"
+      qgoal="6  +5 +0.5 0 0 0 0"
       qMin="6  -5 -5 0 0 0 0"
       qMax="6  +5 +5 0 0 0 0"
     />
     <agent 
       id="1" 
       qinit="6  -5 0 0 0 0 0"
-      qgoal="6  +5 0 0 0 0 0"
       qMin="6  -5 -5 0 0 0 0"
       qMax="6  +5 +5 0 0 0 0"
       timedependent="1"

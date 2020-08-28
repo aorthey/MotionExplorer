@@ -661,11 +661,13 @@ void MotionPlanner::DrawGLStartGoal(GUIState& state)
 
   CSpaceOMPL* qspace = cspace_levels.at(current_level);
   CSpaceOMPL* cspace = cspace_levels.at(max_levels_);
-  if(state("planner_draw_start_configuration")){
+  if(state("planner_draw_start_configuration"))
+  {
     qspace->drawConfig(qi, colorStartConfiguration);
     cspace->drawConfig(qiOuter, colorStartConfigurationTransparent);
   }
-  if(state("planner_draw_goal_configuration")){
+  if(state("planner_draw_goal_configuration"))
+  {
     qspace->drawConfig(qg, colorGoalConfiguration);
     cspace->drawConfig(qgOuter, colorGoalConfigurationTransparent);
   }
@@ -699,7 +701,8 @@ std::ostream& operator<< (std::ostream& out, const MotionPlanner& planner)
   out << " Planner: " << std::endl;
   out << std::string(80, '-') << std::endl;
   out << " Robots  " << std::endl;
-  for(uint k = 0; k < planner.cspace_levels.size(); k++){
+  for(uint k = 0; k < planner.cspace_levels.size(); k++)
+  {
     std::cout << "Level:" << k << std::endl;
   }
   out << std::string(80, '-') << std::endl;

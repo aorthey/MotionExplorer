@@ -206,13 +206,12 @@ void CSpaceOMPLMultiAgent::initSpace()
     if(ck->isTimeDependent())
     {
       Nompls.push_back(0);
-      Nklampts.push_back( ck->GetKlamptDimensionality() );
       static_pointer_cast<ob::CompoundStateSpace>(space)->addSubspace(emptySpace_, 1);
     }else{
       static_pointer_cast<ob::CompoundStateSpace>(space)->addSubspace(ck->SpacePtr(), 1);
       Nompls.push_back( ck->GetDimensionality() );
-      Nklampts.push_back( ck->GetKlamptDimensionality() );
     }
+    Nklampts.push_back( ck->GetKlamptDimensionality() );
   }
 
   Nompl = std::accumulate(Nompls.begin(), Nompls.end(), 0);
@@ -297,7 +296,8 @@ Vector3 CSpaceOMPLMultiAgent::getXYZ(const ob::State *qompl)
 {
   Vector3 v;
   std::vector<int> ridxs = GetRobotIdxs();
-  for(uint k = 0; k < ridxs.size(); k++){
+  for(uint k = 0; k < ridxs.size(); k++)
+  {
       const ob::State *qomplAgent = static_cast<const ob::CompoundState*>(qompl)->as<ob::State>(k);
       v += cspaces_.at(k)->getXYZ(qomplAgent);
   }
@@ -308,8 +308,10 @@ Vector3 CSpaceOMPLMultiAgent::getXYZ(const ob::State *qompl)
 Vector3 CSpaceOMPLMultiAgent::getXYZ(const ob::State *qompl, int ridx)
 {
   std::vector<int> ridxs = GetRobotIdxs();
-  for(uint k = 0; k < ridxs.size(); k++){
-    if(ridx == ridxs.at(k)){
+  for(uint k = 0; k < ridxs.size(); k++)
+  {
+    if(ridx == ridxs.at(k))
+    {
       const ob::State *qomplAgent = static_cast<const ob::CompoundState*>(qompl)->as<ob::State>(k);
       return cspaces_.at(k)->getXYZ(qomplAgent);
     }
@@ -422,7 +424,8 @@ Config CSpaceOMPLMultiAgent::OMPLStateToConfig(const ob::State *qompl)
     t = ck->GetTime(stateTime);
   }
 
-  for(uint k = 0; k < cspaces_.size(); k++){
+  for(uint k = 0; k < cspaces_.size(); k++)
+  {
     Config qk;
     if(cspaces_.at(k)->isTimeDependent())
     {
