@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="mug" file="../../objects/mug.urdf"
+  config="6 -0.0903446 0.0843289 0 1.27075 0 0"/>
+
+  <robot name="schunk" file="../../robots/schunk/sdh.urdf" 
+  config="18  -0.130317 -0.0879818 0.0876798 2.9787 1.4743 2.35701 0 0 -0.14 1.5708 0 0 -0.12 1.5708 0 0.22 1.5708 0 "/>
+
+  <plannerinput>
+
+    <agent 
+      id="0" 
+      qinit="6  -0.097 0.087 +.01 1.27 0 0"
+      qgoal="6  +0.2 0.2 -.01 1.27 0 0"
+      qMin="6  -0.3 -0.3 -0.1 0 0 0"
+      qMax="6  +0.3 +0.3 +0.1 0 0 0"
+    />
+
+    <agent 
+      id="1" 
+      qinit="18  -0.130317 -0.0879818 0.0876798 2.9787 1.4743 2.35701 0 0 -1.1 1.5708 0 0 -1.2 1.5708 0 0.16 0.890796 0 "
+    />
+
+    <se3min config="6  -12.0 -12.0 -40.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +12.0 +12.0 +20.0 +3.141593 +1.57 +3.141593"/>
+
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
+    <multiAgent>1</multiAgent>
+
+    <multilevel>
+      <level>
+        <robot id="0" freeFloating="1" type="SE3"/>
+        <robot id="1" freeFloating="1" type="FIXED"/>
+      </level>
+    </multilevel>
+
+  </plannerinput>
+</world>
