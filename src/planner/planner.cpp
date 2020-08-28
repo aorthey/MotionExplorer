@@ -58,7 +58,8 @@ CSpaceOMPL* MotionPlanner::ComputeMultiAgentCSpace(const Layer &layer){
   CSpaceFactory factory(input.GetCSpaceInput());
   std::vector<CSpaceOMPL*> cspace_levels;
 
-  for(uint k = 0; k < layer.ids.size(); k++){
+  for(uint k = 0; k < layer.ids.size(); k++)
+  {
     int rk = layer.ids.at(k);
     if(rk >= (int)world->robots.size()){
       OMPL_ERROR("Robot Index ID %d does not exists. (Check XML)", rk);
@@ -67,9 +68,20 @@ CSpaceOMPL* MotionPlanner::ComputeMultiAgentCSpace(const Layer &layer){
     std::string type = layer.types.at(k);
     bool freeFloating = layer.freeFloating.at(k);
     // std::cout << type << " " << (freeFloating?"FREEFLOATING":"FIXED") << std::endl;
+
     CSpaceOMPL* cspace_level_k = ComputeCSpace(type, rk, freeFloating);
     cspace_levels.push_back(cspace_level_k);
+    if(!layer.controllable.at(k))
+    {
+      std::cout << "Not controllable" << std::endl;
+    }
   }
+  if(layer.isTimeDependent)
+  {
+      CSpaceOMPL* cspace_level_t = ComputeCSpace("TIME", -1, true);
+      cspace_levels.push_back(cspace_level_t);
+  }
+
   CSpaceOMPLMultiAgent* cspace_multiagent = factory.MakeGeometricCSpaceMultiAgent(cspace_levels);
   cspace_multiagent->setNextLevelRobotPointers(layer.ptr_to_next_level_ids);
   return cspace_multiagent;
@@ -114,8 +126,8 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
         cspace_level = factory.MakeGeometricCSpaceSE2Dubin(world, robot_idx);
       }else if(type=="TSE3"){
         cspace_level = factory.MakeKinodynamicCSpace(world, robot_idx);
-      }else if(type=="R2T") {
-        cspace_level = factory.MakeGeometricCSpaceRNTime(world, robot_idx, 2);
+      }else if(type=="TIME") {
+        cspace_level = factory.MakeCSpaceTime(world);
       }else if(type=="ANNULUS") {
         cspace_level = factory.MakeGeometricCSpaceAnnulus(world, robot_idx);
       }else if(type=="SOLIDCYLINDER") {
@@ -241,23 +253,26 @@ void MotionPlanner::CreateHierarchy()
         {
           qi = input.q_init;
           qg = input.q_goal;
-          uint N = cspace_level_k->GetKlamptDimensionality();
-          if(qi.size() != (int)N)
-          {
-            OMPL_ERROR("Init vector contains %d dimensions, but robot %d has %d dimensions", 
-                qi.size(), cspace_level_k->GetRobotIndex(), N);
-            throw "";
-          }
         }else{
           std::vector<int> Nklampts = 
             static_cast<CSpaceOMPLMultiAgent*>(cspace_level_k)->GetKlamptDimensionalities();
-          for(uint j = 0; j < layers.back().q_inits.size(); j++){
+
+          for(uint j = 0; j < layers.back().q_inits.size(); j++)
+          {
             Config qinit = layers.back().q_inits.at(j);
             Config qgoal = layers.back().q_goals.at(j);
             input.AddConfigToConfig(qi, qinit, Nklampts.at(j));
             input.AddConfigToConfig(qg, qgoal, Nklampts.at(j));
           }
         }
+        uint N = cspace_level_k->GetKlamptDimensionality();
+        if(qi.size() != (int)N)
+        {
+          OMPL_ERROR("Init vector contains %d dimensions, but robot %d has %d dimensions", 
+              qi.size(), cspace_level_k->GetRobotIndex(), N);
+          throw "";
+        }
+
         std::vector<int> idxs = static_cast<CSpaceOMPLMultiAgent*>(cspace_level_k)->GetRobotIdxs();
 
         Config qi_full = qi;
@@ -299,6 +314,15 @@ void MotionPlanner::CreateHierarchy()
     Config qi = input.q_init;
     Config qg = input.q_goal;
 
+    uint N = cspace->GetKlamptDimensionality();
+    if(qi.size() != (int)N)
+    {
+      OMPL_ERROR("Init vector contains only %d dimensions, but robots have %d dimensions", 
+          qi.size(), N);
+      std::cout << *cspace << std::endl;
+      throw "";
+    }
+
     auto *cspaceContact  = dynamic_cast<GeometricCSpaceContact*>(cspace);
     if(cspaceContact!=nullptr)
     {
@@ -314,8 +338,10 @@ void MotionPlanner::CreateHierarchy()
       cspaceContact->setInitialConstraints();
     }else{
       cspace->ConfigToOMPLState(qi, stateTmp);
+      cspace->SetTime(stateTmp, 0);
       qi = cspace->OMPLStateToConfig(stateTmp);
       cspace->ConfigToOMPLState(qg, stateTmp);
+      cspace->SetTime(stateTmp, 1);
       qg = cspace->OMPLStateToConfig(stateTmp);
     }
 

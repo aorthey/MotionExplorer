@@ -2,7 +2,8 @@
 #include <KrisLibrary/robotics/RobotKinematics3D.h> //Config
 #include "planner/planner_input.h"
 
-struct CSpaceInput{
+struct CSpaceInput
+{
   double timestep_min;
   double timestep_max;
   Config uMin;
@@ -13,4 +14,7 @@ struct CSpaceInput{
   bool kinodynamic{false};
   bool multiAgent{false};
   std::vector<ContactInformation> contact_links;
+
+  bool isTimeDependent{false};
+  std::string timePathFile;
 };

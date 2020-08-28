@@ -11,18 +11,27 @@
   <robot name="DoubleLshape" file="../../robots/Lshape/DoubleLshape.urdf"/>
   <robot name="capsule_inner" file="../../robots/Lshape/DoubleLshape_capsule_inner.urdf"/>
   <robot name="capsule_outer" file="../../robots/Lshape/DoubleLshape_capsule_outer.urdf"/>
-  <robot name="sphere_inner" file="../../robots/Lshape/DoubleLshape_sphere_inner.urdf" />
+
+  <!-- <robot name="sphere_inner" file="../../robots/Lshape/DoubleLshape_sphere_inner.urdf" /> -->
+
+  <!-- equivalent to clearance optimization after base path found || 
+       equivalent to requiring distance to constraints -->
+  <robot name="sphere_inner_extended" 
+    file="../../robots/Lshape/DoubleLshape_sphere_inner_extended.urdf" />
+
   <robot name="sphere_outer" file="../../robots/Lshape/DoubleLshape_sphere_outer.urdf" />
   <robot name="point_inner" file="../../robots/Lshape/DoubleLshape_point_inner.urdf" />
 
-  <terrain name="doublelshape.tri" file="../../terrains/DoubleLshape_large.tri" />
+  <terrain name="doublelshape.tri" file="../../terrains/DoubleLshape_large.tri" scale ="0.8 0.8 0.8">
+     <display color="0.6 0.6 0.6 1"/> 
+  </terrain>
 
   <plannerinput>
     <qinit config="9  +3.00 +0.90 +0.00 -2.0 0.6 0.3 0 0 0"/>
     <qgoal config="9  -3.00 -1.00 +0.45 -0.8 -0.6 0 0 0 0"/>
 
-    <se3min config="6  -6 -10 -10 -3.141593 -1.57 -3.141593"/>
-    <se3max config="6  +6 +10 +10 +3.141593 +1.57 +3.141593"/>
+    <se3min config="6  -6 -8 -8 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +6 +8 +8 +3.141593 +1.57 +3.141593"/>
 
     <freeFloating>1</freeFloating>
     <maxplanningtime>5</maxplanningtime>

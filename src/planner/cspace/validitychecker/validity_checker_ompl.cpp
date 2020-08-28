@@ -24,9 +24,6 @@ bool OMPLValidityChecker::isValid(const ob::State* state) const
   std::lock_guard<std::recursive_mutex> guard(cspace->getLock());
 
   Config q = cspace->OMPLStateToConfig(state);
-  if(cspace->isTimeDependent()){
-    cspace->GetTime(state);
-  }
   return IsCollisionFree(klampt_single_robot_cspace, q) && si_->satisfiesBounds(state);
 }
 

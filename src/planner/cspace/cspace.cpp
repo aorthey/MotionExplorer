@@ -59,6 +59,7 @@ bool CSpaceOMPL::UpdateRobotConfig(Config &q)
   robot->UpdateGeometry();
   return true;
 }
+
 bool CSpaceOMPL::SatisfiesBounds(const ob::State *state)
 {
   return SpaceInformationPtr()->satisfiesBounds(state);
@@ -98,7 +99,8 @@ Config CSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
   return OMPLStateToConfig(s);
 }
 
-ob::ScopedState<> CSpaceOMPL::ConfigToOMPLState(const Config &q){
+ob::ScopedState<> CSpaceOMPL::ConfigToOMPLState(const Config &q)
+{
   ob::ScopedState<> qompl(space);
   ConfigToOMPLState(q, qompl.get());
   return qompl;
@@ -150,11 +152,37 @@ void CSpaceOMPL::Init()
     }
   }
   this->initSpace();
+
+  if(isTimeDependent() && !isMultiAgent())
+  {
+      std::cout << *this << std::endl;
+      path_ = std::make_shared<PathPiecewiseLinear>(this);
+      path_->Load(input.timePathFile.c_str());
+      path_->Normalize();
+      std::cout << "Loading path from " << input.timePathFile << std::endl;
+  }
+}
+
+void CSpaceOMPL::setFixedTimePath(std::string file)
+{
+  file_ = file;
+  isTimeDependent_ = true;
 }
 
 bool CSpaceOMPL::isTimeDependent()
 {
-  return false;
+  return isTimeDependent_;
+}
+
+Config CSpaceOMPL::GetRobotConfigAtTime(double t)
+{
+  if(!path_)
+  {
+      Config q; q.resize(robot->q.size());
+      return q;
+  }else{
+      return path_->Eval(t);
+  }
 }
 
 double CSpaceOMPL::GetTime(const ob::State *qompl)
@@ -162,9 +190,20 @@ double CSpaceOMPL::GetTime(const ob::State *qompl)
   return 0;
 }
 
+void CSpaceOMPL::SetTime(ob::State *qompl, double time)
+{
+  return;
+}
+void CSpaceOMPL::SetTime(ob::ScopedState<> &qompl, double time)
+{
+  ob::State* s = qompl.get();
+  return SetTime(s, time);
+}
+
 ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr()
 {
-  if(!si){
+  if(!si)
+  {
     si = std::make_shared<ob::SpaceInformation>(SpacePtr());
     validity_checker = StateValidityCheckerPtr(si);
     si->setStateValidityChecker(validity_checker);
@@ -216,6 +255,7 @@ void CSpaceOMPL::SetCSpaceInput(const CSpaceInput &input_)
 {
   input = input_;
   fixedBase = input.fixedBase;
+  isTimeDependent_ = input.isTimeDependent;
 }
 
 Robot* CSpaceOMPL::GetRobotPtr()
@@ -312,8 +352,20 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s, int ridx)
   return getXYZ(s);
 }
 
-void CSpaceOMPL::DrawGL(GUIState&)
+void CSpaceOMPL::DrawGL(GUIState& state)
 {
+  if(isTimeDependent())
+  {
+    if(path_ != nullptr)
+    {
+      path_->linewidth = 0.1;
+      path_->widthBorder = 0.0;
+      path_->drawSweptVolume = false;
+      path_->drawCross = false;
+      path_->setColor(grey);
+      path_->DrawGL(state);
+    }
+  }
   return;
 }
 

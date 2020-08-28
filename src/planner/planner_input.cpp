@@ -178,8 +178,11 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
       AgentInformation ai;
       ai.id = GetAttribute<int>(node_agent, "id");
       Config qzero;
+      ai.isTimeDependent = GetAttributeDefault<int>(node_agent, "timedependent", 0);
+      ai.timePathFile = GetAttributeDefault<std::string>(node_agent, "path", "");
+
       ai.q_init = GetAttribute<Config>(node_agent, "qinit");
-      ai.q_goal = GetAttribute<Config>(node_agent, "qgoal");
+      ai.q_goal = GetAttributeDefault<Config>(node_agent, "qgoal", ai.q_init);
       ai.dq_init = GetAttributeDefault<Config>(node_agent, "dqinit", qzero);
       ai.dq_goal = GetAttributeDefault<Config>(node_agent, "dqgoal", qzero);
       ai.qMin = GetAttributeDefault<Config>(node_agent, "qMin", qzero);
@@ -342,13 +345,20 @@ const AgentInformation& PlannerInput::GetAgentAtID(int id)
 }
 
 void PlannerInput::AddConfigToConfig(Config &q, const Config &qadd, int Nclip){
-  assert(qadd.size() >= Nclip);
+  // assert(qadd.size() >= Nclip);
+  if(qadd.size() < Nclip)
+  {
+    std::cout << "Config size is " << qadd.size() << " but we want to clip " << Nclip << std::endl;
+    throw "ERROR";
+  }
   int N = q.size();
   q.resizePersist(N+Nclip);
-  for(int k = 0; k < Nclip; k++){
+  for(int k = 0; k < Nclip; k++)
+  {
     q[N+k] = qadd[k];
   }
 }
+
 void PlannerInput::AddConfigToConfig(Config &q, const Config &qadd){
   int Nadd = qadd.size();
   AddConfigToConfig(q, qadd, Nadd);
@@ -367,8 +377,11 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
   if(node_hierarchy){
     TiXmlElement* lindex = FindFirstSubNode(node_hierarchy, "level");
     int lctr = 0;
-    while(lindex!=nullptr){
-      Layer layer;
+
+    Layer layer;
+
+    while(lindex!=nullptr)
+    {
       layer.level = lctr++;
 
       TiXmlElement* ri = FindFirstSubNode(lindex, "robot");
@@ -382,12 +395,20 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
 
         layer.freeFloating.push_back(GetAttributeDefault<int>(ri, "freeFloating", 1));
 
+        layer.controllable.push_back(GetAttributeDefault<int>(ri, "controllable", 1));
+
         int sid = GetAttributeDefault<int>(ri, "simplification_of_id", -1);
         layer.ptr_to_next_level_ids.push_back(sid);
-        layer.isMultiAgent = true;
 
         ri = FindNextSiblingNode(ri);
       }
+      TiXmlElement* time = FindFirstSubNode(lindex, "time");
+      if(time!=nullptr)
+      {
+        layer.isTimeDependent = true;
+      }
+
+      layer.isMultiAgent = true;
 
       stratification.layers.push_back(layer);
       lindex = FindNextSiblingNode(lindex);
@@ -508,6 +529,11 @@ const CSpaceInput& PlannerInput::GetCSpaceInput(int robot_idx)
       cin->dqMin = agent.dqMin;
       cin->dqMax = agent.dqMax;
       cin->contact_links = agent.contact_links;
+      if(agent.isTimeDependent)
+      {
+        cin->isTimeDependent = true;
+        cin->timePathFile = agent.timePathFile;
+      }
   }
   cin->kinodynamic = kinodynamic;
   cin->multiAgent = multiAgent;

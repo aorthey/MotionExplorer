@@ -15,11 +15,13 @@ struct Layer{
   Config dq_init;
   Config dq_goal;
   std::string type;
+  bool isTimeDependent{false};
 
   std::string path_fname;
 
   //multiagent
   bool isMultiAgent{false};
+
   int maxRobots{0};
   std::vector<int> ids;
   std::vector<Config> q_inits;
@@ -29,6 +31,7 @@ struct Layer{
   std::vector<int> ptr_to_next_level_ids;
   std::vector<std::string> types;
   std::vector<int> freeFloating;
+  std::vector<int> controllable;
 };
 
 struct ContactInformation
@@ -60,6 +63,9 @@ struct AgentInformation{
   Config uMin;
   Config uMax;
   std::vector<ContactInformation> contact_links;
+
+  bool isTimeDependent{false};
+  std::string timePathFile;
 };
 
 struct Stratification{

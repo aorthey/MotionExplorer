@@ -1,5 +1,6 @@
 #pragma once
 #include "planner/cspace/cspace.h"
+#include "planner/cspace/cspace_time.h"
 #include "planner/cspace/cspace_geometric.h"
 #include "planner/cspace/cspace_geometric_empty.h"
 
@@ -13,7 +14,6 @@
 #include "planner/cspace/cspace_geometric_SolidCylinder.h"
 #include "planner/cspace/cspace_geometric_Annulus.h"
 #include "planner/cspace/cspace_geometric_Circular.h"
-#include "planner/cspace/cspace_geometric_RN_time.h"
 #include "planner/cspace/cspace_geometric_SE2RN.h"
 #include "planner/cspace/cspace_geometric_SE2Dubin.h"
 #include "planner/cspace/cspace_geometric_SE3Dubin.h"
@@ -153,8 +153,9 @@ class CSpaceFactory{
       return cspace;
     }
     // CSpace  R^(N) + Time
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceRNTime( RobotWorld *world, int robot_idx, int dimension){
-      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLRNTime(world, robot_idx, dimension);
+    virtual CSpaceOMPL* MakeCSpaceTime( RobotWorld *world)
+    {
+      CSpaceOMPL *cspace = new CSpaceOMPLTime(world);
       cspace->SetCSpaceInput(input);
       cspace->Init();
       return cspace;

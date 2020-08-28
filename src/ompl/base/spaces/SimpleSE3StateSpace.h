@@ -1,5 +1,6 @@
 // State space in three dimentions with only yaw for rotation. To be used for Dubins Airplane state space.
 
+#pragma once
 #include <ompl/base/StateSpace.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/base/spaces/SO2StateSpace.h>

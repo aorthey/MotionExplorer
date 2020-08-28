@@ -43,6 +43,7 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
     virtual ob::SpaceInformationPtr SpaceInformationPtr() override;
 
     virtual void print(std::ostream& out) const override;
+    virtual bool isTimeDependent() override;
 
     std::vector<int> GetRobotIdxs() const;
     std::vector<int> GetProjectionIdxs() const;
@@ -55,18 +56,25 @@ class CSpaceOMPLMultiAgent: public CSpaceOMPL
     virtual void initSpace() override;
     virtual void initControlSpace();
 
+    virtual void SetTime(ob::State *qompl, double time) override;
+    virtual void DrawGL(GUIState& state) override;
   protected:
 
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si) override;
-
     std::vector<CSpaceOMPL*> cspaces_;
 
     std::vector<int> ptr_to_next_level_robot_ids;
     std::vector<int> robot_ids;
 
+    std::vector<int> timeDependentSpaceIdxs_;
+
+    int idxTimeSpace_{-1};
+
     std::vector<int> Nklampts;
     std::vector<int> Nompls;
 
     int subspaceCount{0};
+
+    ob::StateSpacePtr emptySpace_{nullptr};
 
 };

@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
 <world>
+
   <robot name="disk" file="../../robots/planar/disk_maze.urdf"/>
+
   <rigidObject 
     name="cylinder.tri" 
     file="../../terrains/primitives/cylinder.tri"

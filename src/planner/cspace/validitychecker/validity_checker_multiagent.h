@@ -18,6 +18,8 @@ class OMPLValidityCheckerMultiAgent: public ob::StateValidityChecker
     CSpaceOMPLMultiAgent *cspace_;
     std::vector<CSpaceOMPL*> cspaces_;
     std::vector<SingleRobotCSpace*> klampt_single_robot_cspaces_;
+
+    int idxTimeSpace_{-1};
 };
 
 typedef std::shared_ptr<OMPLValidityCheckerMultiAgent> OMPLValidityCheckerMultiAgentPtr;

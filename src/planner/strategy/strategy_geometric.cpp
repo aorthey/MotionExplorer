@@ -226,6 +226,8 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
       startk = cspace->ConfigVelocityToOMPLState(input.q_init, input.dq_init);
       goalk  = cspace->ConfigVelocityToOMPLState(input.q_goal, input.dq_goal);
   }
+  cspace->SetTime(startk, 0);
+  cspace->SetTime(goalk, 1);
 
   ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
   pdefk->addStartState(startk);

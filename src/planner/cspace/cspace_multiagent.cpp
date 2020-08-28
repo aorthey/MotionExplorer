@@ -1,10 +1,12 @@
 #include "gui/colors.h"
 #include "common.h"
 #include "planner/cspace/cspace_multiagent.h"
+#include "planner/cspace/cspace_time.h"
 #include "planner/cspace/validitychecker/validity_checker_multiagent.h"
 #include "planner/cspace/integrator/multiagent.h"
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/control/ControlSpace.h>
+#include <ompl/base/spaces/EmptyStateSpace.h>
 
 #include <boost/foreach.hpp>
 #include <numeric>
@@ -16,8 +18,19 @@ CSpaceOMPLMultiAgent::CSpaceOMPLMultiAgent(std::vector<CSpaceOMPL*> cspaces):
   for(uint k = 0; k < cspaces_.size(); k++)
   {
     CSpaceOMPL *ck = cspaces_.at(k);
+    if(dynamic_cast<CSpaceOMPLTime*>(ck))
+    {
+      idxTimeSpace_ = k;
+    }
+    if(ck->isTimeDependent())
+    {
+        timeDependentSpaceIdxs_.push_back(k);
+    }
     robot_ids.push_back(ck->GetRobotIndex());
   }
+
+  ob::StateSpacePtr empty(std::make_shared<ob::EmptyStateSpace>());
+  emptySpace_ = empty;
 }
 
 void CSpaceOMPLMultiAgent::setNextLevelRobotPointers(std::vector<int> next_level_ids)
@@ -67,12 +80,42 @@ bool CSpaceOMPLMultiAgent::IsPlanar()
   return true;
 }
 
+bool CSpaceOMPLMultiAgent::isTimeDependent()
+{
+  if(timeDependentSpaceIdxs_.size()  >= 0) return true;
+  return false;
+}
+
+// bool CSpaceOMPLMultiAgent::UpdateRobotConfigTimeDependent(const ob::State *state)
+// {
+//     CSpaceOMPLTime *ck = static_cast<CSpaceOMPLTime*>(cspaces_.at(idxTimeSpace_));
+//     const ob::State *stateTime = 
+//       static_cast<const ob::CompoundState*>(state)->as<ob::State>(idxTimeSpace_);
+
+//     double t = ck->GetTime(stateTime);
+
+//     for(uint k = 0; k < timeDependentSpaceIdxs_.size(); k++)
+//     {
+//       int idx = timeDependentSpaceIdxs_.at(k);
+//       CSpaceOMPL *ck = cspaces_.at(idx);
+//       Config q = ck->GetRobotConfigAtTime(t);
+
+//       Robot *robot = ck->GetRobotPtr();
+//       robot->UpdateConfig(q);
+//       robot->UpdateGeometry();
+//     }
+//     return true;
+// }
+
 bool CSpaceOMPLMultiAgent::UpdateRobotConfig(Config &q)
 {
   std::vector<Config> qks = splitConfig(q);
   for(uint k = 0; k < cspaces_.size(); k++){
+    if((int)k==idxTimeSpace_)
+    {
+      continue;
+    }
     Config qk = qks.at(k);
-    if(qk.size()<=0) continue;
     CSpaceOMPL *ck = cspaces_.at(k);
     Robot *robot = ck->GetRobotPtr();
     robot->UpdateConfig(qk);
@@ -160,10 +203,16 @@ void CSpaceOMPLMultiAgent::initSpace()
     CSpaceOMPL *ck = cspaces_.at(k);
     ck->initSpace();
 
-    static_pointer_cast<ob::CompoundStateSpace>(space)->addSubspace(ck->SpacePtr(), 1);
-
-    Nklampts.push_back( ck->GetKlamptDimensionality() );
-    Nompls.push_back( ck->GetDimensionality() );
+    if(ck->isTimeDependent())
+    {
+      Nompls.push_back(0);
+      Nklampts.push_back( ck->GetKlamptDimensionality() );
+      static_pointer_cast<ob::CompoundStateSpace>(space)->addSubspace(emptySpace_, 1);
+    }else{
+      static_pointer_cast<ob::CompoundStateSpace>(space)->addSubspace(ck->SpacePtr(), 1);
+      Nompls.push_back( ck->GetDimensionality() );
+      Nklampts.push_back( ck->GetKlamptDimensionality() );
+    }
   }
 
   Nompl = std::accumulate(Nompls.begin(), Nompls.end(), 0);
@@ -174,6 +223,16 @@ void CSpaceOMPLMultiAgent::initSpace()
     throw "Not compound state space";
   }
 
+}
+
+void CSpaceOMPLMultiAgent::DrawGL(GUIState& state)
+{
+  for(uint k = 0; k < cspaces_.size(); k++)
+  {
+    CSpaceOMPL *ck = cspaces_.at(k);
+    ck->DrawGL(state);
+  }
+  return;
 }
 
 uint CSpaceOMPLMultiAgent::GetKlamptDimensionality() const
@@ -296,9 +355,28 @@ void CSpaceOMPLMultiAgent::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
   std::vector<Config> qks = splitConfig(q);
 
-  for(uint k = 0; k < cspaces_.size(); k++){
-    ConfigToOMPLState(qks.at(k), qompl, k);
+  int ctr = 0;
+  for(uint k = 0; k < cspaces_.size(); k++)
+  {
+    if((int)k!=idxTimeSpace_)
+    {
+        if(!cspaces_.at(k)->isTimeDependent())
+        {
+            ConfigToOMPLState(qks.at(k), qompl, ctr);
+            ctr += 1;
+        }
+    }else{
+        ob::State *qomplAgent = static_cast<ob::CompoundState*>(qompl)->as<ob::State>(ctr);
+        cspaces_.at(ctr)->SetTime(qomplAgent, 0);
+        ctr+=1;
+    }
   }
+}
+
+void CSpaceOMPLMultiAgent::SetTime(ob::State *qompl, double time)
+{
+  ob::State *qomplAgent = static_cast<ob::CompoundState*>(qompl)->as<ob::State>(idxTimeSpace_);
+  cspaces_.at(idxTimeSpace_)->SetTime(qomplAgent, time);
 }
 
 Config CSpaceOMPLMultiAgent::OMPLStateToVelocity(const ob::State *qompl, int agent)
@@ -331,10 +409,27 @@ Config CSpaceOMPLMultiAgent::OMPLStateToConfig(const ob::State *qompl, int agent
 
 Config CSpaceOMPLMultiAgent::OMPLStateToConfig(const ob::State *qompl)
 {
+  Config q; q.resize(GetKlamptDimensionality());
   int ctr = 0;
-  Config q; q.resize(Nklampt);
+
+
+  double t = 0;
+  if(idxTimeSpace_ >= 0)
+  {
+    CSpaceOMPLTime *ck = static_cast<CSpaceOMPLTime*>(cspaces_.at(idxTimeSpace_));
+    const ob::State *stateTime = 
+      static_cast<const ob::CompoundState*>(qompl)->as<ob::State>(idxTimeSpace_);
+    t = ck->GetTime(stateTime);
+  }
+
   for(uint k = 0; k < cspaces_.size(); k++){
-    Config qk = OMPLStateToConfig(qompl, k);
+    Config qk;
+    if(cspaces_.at(k)->isTimeDependent())
+    {
+        qk = cspaces_.at(k)->GetRobotConfigAtTime(t);
+    }else{
+        qk = OMPLStateToConfig(qompl, k);
+    }
     for(int j = 0; j < qk.size(); j++){
       q[j+ctr] = qk[j];
     }
