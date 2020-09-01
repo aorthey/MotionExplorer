@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="drone" file="../robots/drone/dddk.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="drone_sphere" file="../robots/drone/dddk_inner_sphere.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+  <rigidObject name="lattice" file="../terrains/jailletgrill.tri" translation="+0 +0 0" rotateRPY="0 0 0"/>
+
+  <plannerinput>
+
+    <qinit  config="9  -2 0 0.3 0 0 0  0 0 0 0 0"/>
+    <qgoal  config="9  2 0 0.3 0 0 0  0 0 0 0 0"/>
+    <se3min config="6  -3 -5 -3 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +3 +5 +3 +3.141593 +1.57 +3.141593"/>
+
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
+
+    <multilevel>
+      <level robot_index="1" type="R3"/>
+      <level robot_index="0" type="SE3"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>
+

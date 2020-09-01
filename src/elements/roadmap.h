@@ -1,5 +1,4 @@
 #pragma once
-#include "algorithms/lemon_interface.h"
 #include "planner/cspace/cspace.h"
 #include "elements/path_pwl.h"
 #include "gui/gui_state.h"
@@ -13,14 +12,10 @@ namespace ob = ompl::base;
 class Roadmap{
 
   public:
-    Roadmap();
-    Roadmap(const ob::PlannerDataPtr, CSpaceOMPL* cspace_);
-    Roadmap(const ob::PlannerDataPtr, CSpaceOMPL* cspace_, CSpaceOMPL* quotient_space_);
+    Roadmap() = delete;
+    Roadmap(const ob::PlannerDataPtr, std::vector<CSpaceOMPL*> cspace_levels);
 
-    PathPiecewiseLinear* GetShortestPath();
-    void SetShortestPathOMPL(ob::PathPtr&);
-
-    virtual void DrawGL(GUIState&);
+    virtual void DrawGL(GUIState&, int level=0);
 
     bool Save(const char* fn);
     bool Save(TiXmlElement *node);
@@ -40,22 +35,18 @@ class Roadmap{
   private:
 
     void DrawGLPlannerData(GUIState&);
-    //void DrawGLShortestPath(GUIState&);
     void DrawGLRoadmapVertices(GUIState&, int ridx = -1);
     void DrawGLRoadmapEdges(GUIState&, int ridx = -1);
     void DrawGLEdge(const ob::PlannerDataVertex *v, const ob::PlannerDataVertex *w, int ridx);
     void DrawGLEdge(CSpaceOMPL *space, const ob::State *s, const ob::State *t, int ridx);
     void DrawGLEdgeStateToState(CSpaceOMPL *space, const ob::State *s, const ob::State *t, int ridx);
-    void drawLineWorkspaceStateToState(const ob::State *from, const ob::State *to, int ridx);
     Vector3 VectorFromVertex(const ob::PlannerDataVertex *v, int ridx);
 
-    ob::PlannerDataPtr pd{nullptr};
-    CSpaceOMPL *cspace{nullptr};
-    CSpaceOMPL *quotient_space{nullptr};
-    PathPiecewiseLinear *path_ompl{nullptr};
+    ob::PlannerDataPtr pd_{nullptr};
 
-    std::vector<Vector3> shortest_path;
+    std::vector<CSpaceOMPL*> cspace_levels_;
     bool draw_planar{false};
+    int current_level_{0};
 
     ob::State *stateTmpCur{nullptr};
     ob::State *stateTmpOld{nullptr};

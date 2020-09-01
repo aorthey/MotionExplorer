@@ -21,10 +21,9 @@ CSpaceOMPL* OMPLValidityChecker::GetCSpaceOMPLPtr() const
 }
 bool OMPLValidityChecker::isValid(const ob::State* state) const
 {
+  std::lock_guard<std::recursive_mutex> guard(cspace->getLock());
+
   Config q = cspace->OMPLStateToConfig(state);
-  if(cspace->isTimeDependent()){
-    cspace->GetTime(state);
-  }
   return IsCollisionFree(klampt_single_robot_cspace, q) && si_->satisfiesBounds(state);
 }
 
@@ -44,7 +43,7 @@ double OMPLValidityChecker::SufficientDistance(const ob::State* state) const
 double OMPLValidityChecker::clearance(const ob::State* state) const
 {
   double c = DistanceToRobot(state, klampt_single_robot_cspace);
-  return 1.0/c;
+  return c;
 }
 
 double OMPLValidityChecker::DistanceToRobot(const ob::State* state, SingleRobotCSpace *space) const

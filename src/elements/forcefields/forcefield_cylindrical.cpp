@@ -1,8 +1,11 @@
 #include "forcefield_cylindrical.h"
 #include "gui/drawMotionPlanner.h"
 #include "gui/colors.h"
+#include "KrisLibrary/math3d/basis.h"
 
 using namespace Math3D;
+using namespace GLDraw;
+
 const double minimumRadiusSingularity = 0.05;
 
 CylindricalForceField::CylindricalForceField(Math3D::Vector3 _source, Math3D::Vector3 _direction, double _elongation, double _radius, double _power):

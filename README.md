@@ -26,7 +26,6 @@ This framework combines two existing frameworks (OMPL [1] and Klamp't [2]) and a
   <li> Klampt 0.8 (modified version github.com/aorthey/Klampt and
   github.com/aorthey/KrisLibrary)
   <li> Eigen 3.3
-  <li> Lemon
   <li> Boost 1.55 or later
 </ul>
 

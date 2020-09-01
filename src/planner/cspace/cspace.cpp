@@ -59,6 +59,7 @@ bool CSpaceOMPL::UpdateRobotConfig(Config &q)
   robot->UpdateGeometry();
   return true;
 }
+
 bool CSpaceOMPL::SatisfiesBounds(const ob::State *state)
 {
   return SpaceInformationPtr()->satisfiesBounds(state);
@@ -98,7 +99,8 @@ Config CSpaceOMPL::OMPLStateToConfig(const ob::ScopedState<> &qompl){
   return OMPLStateToConfig(s);
 }
 
-ob::ScopedState<> CSpaceOMPL::ConfigToOMPLState(const Config &q){
+ob::ScopedState<> CSpaceOMPL::ConfigToOMPLState(const Config &q)
+{
   ob::ScopedState<> qompl(space);
   ConfigToOMPLState(q, qompl.get());
   return qompl;
@@ -106,12 +108,81 @@ ob::ScopedState<> CSpaceOMPL::ConfigToOMPLState(const Config &q){
 
 void CSpaceOMPL::Init()
 {
+  //Read out Contact points of robot
+  Robot *robot = GetRobotPtr();
+  for(uint j = 0; j < input.contact_links.size(); j++)
+  {
+    ContactInformation &cj = input.contact_links.at(j);
+    std::cout << std::string(80, '-') << std::endl;
+    for(uint k = 0; k < robot->linkNames.size(); k++)
+    {
+      // std::cout << robot->name << ":" << robot->linkNames.at(k) << std::endl;
+      std::string link = robot->linkNames.at(k);
+      if(link == cj.robot_link)
+      {
+        cj.robot_link_idx = k;
+        robot->contactLinkIndices.push_back(k);
+        break;
+      }
+    }
+    bool foundMesh = false;
+    for(uint k = 0; k < GetWorldPtr()->terrains.size(); k++)
+    {
+      std::string obj = GetWorldPtr()->terrains.at(k)->name;
+      if(obj == cj.meshFrom)
+      {
+        cj.meshFromIdx = k;
+        foundMesh = true;
+      }
+      if(obj == cj.meshTo)
+      {
+        cj.meshToIdx = k;
+      }
+    }
+    if(!foundMesh)
+    {
+      std::cout << "Could not find mesh " << cj.meshFrom << std::endl;
+      std::cout << "Mesh available:" << std::endl;
+      for(uint k = 0; k < GetWorldPtr()->terrains.size(); k++)
+      {
+        std::string obj = GetWorldPtr()->terrains.at(k)->name;
+        std::cout << obj << std::endl;
+      }
+      exit(0);
+    }
+  }
   this->initSpace();
+
+  if(isTimeDependent() && !isMultiAgent())
+  {
+      std::cout << *this << std::endl;
+      path_ = std::make_shared<PathPiecewiseLinear>(this);
+      path_->Load(input.timePathFile.c_str());
+      path_->Normalize();
+      std::cout << "Loading path from " << input.timePathFile << std::endl;
+  }
+}
+
+void CSpaceOMPL::setFixedTimePath(std::string file)
+{
+  file_ = file;
+  isTimeDependent_ = true;
 }
 
 bool CSpaceOMPL::isTimeDependent()
 {
-  return false;
+  return isTimeDependent_;
+}
+
+Config CSpaceOMPL::GetRobotConfigAtTime(double t)
+{
+  if(!path_)
+  {
+      Config q; q.resize(robot->q.size());
+      return q;
+  }else{
+      return path_->Eval(t);
+  }
 }
 
 double CSpaceOMPL::GetTime(const ob::State *qompl)
@@ -119,9 +190,20 @@ double CSpaceOMPL::GetTime(const ob::State *qompl)
   return 0;
 }
 
+void CSpaceOMPL::SetTime(ob::State *qompl, double time)
+{
+  return;
+}
+void CSpaceOMPL::SetTime(ob::ScopedState<> &qompl, double time)
+{
+  ob::State* s = qompl.get();
+  return SetTime(s, time);
+}
+
 ob::SpaceInformationPtr CSpaceOMPL::SpaceInformationPtr()
 {
-  if(!si){
+  if(!si)
+  {
     si = std::make_shared<ob::SpaceInformation>(SpacePtr());
     validity_checker = StateValidityCheckerPtr(si);
     si->setStateValidityChecker(validity_checker);
@@ -142,6 +224,11 @@ ob::StateSpacePtr CSpaceOMPL::SpacePtrNonConst()
 uint CSpaceOMPL::GetDimensionality() const
 {
   return space->getDimension();
+}
+
+std::recursive_mutex& CSpaceOMPL::getLock()
+{
+    return lock_;
 }
 
 int CSpaceOMPL::GetRobotIndex() const
@@ -168,6 +255,7 @@ void CSpaceOMPL::SetCSpaceInput(const CSpaceInput &input_)
 {
   input = input_;
   fixedBase = input.fixedBase;
+  isTimeDependent_ = input.isTimeDependent;
 }
 
 Robot* CSpaceOMPL::GetRobotPtr()
@@ -264,8 +352,20 @@ Vector3 CSpaceOMPL::getXYZ(const ob::State *s, int ridx)
   return getXYZ(s);
 }
 
-void CSpaceOMPL::DrawGL(GUIState&)
+void CSpaceOMPL::DrawGL(GUIState& state)
 {
+  if(isTimeDependent())
+  {
+    if(path_ != nullptr)
+    {
+      path_->linewidth = 0.1;
+      path_->widthBorder = 0.0;
+      path_->drawSweptVolume = false;
+      path_->drawCross = false;
+      path_->setColor(grey);
+      path_->DrawGL(state);
+    }
+  }
   return;
 }
 

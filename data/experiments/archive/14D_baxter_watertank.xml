@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<world>
+
+  <robot name="baxter" file="../robots/baxter_description/baxter_14dof.urdf"/>
+  <robot name="baxter_05dof" file="../robots/baxter_description/baxter_05dof.urdf"/>
+  <robot name="baxter_07dof" file="../robots/baxter_description/baxter_07dof.urdf"/>
+  <robot name="baxter_12dof" file="../robots/baxter_description/baxter_12dof.urdf"/>
+  <!--
+  <robot name="baxter" file="../robots/baxter_description/baxter_14dof.urdf"/>
+  <robot name="baxter_03dof" file="../robots/baxter_description/baxter_03dof.urdf"/>
+  <robot name="baxter_04dof" file="../robots/baxter_description/baxter_04dof.urdf"/>
+  <robot name="baxter_05dof" file="../robots/baxter_description/baxter_05dof.urdf"/>
+  <robot name="baxter_10dof" file="../robots/baxter_description/baxter_10dof.urdf"/>
+  <robot name="baxter_12dof" file="../robots/baxter_description/baxter_12dof.urdf"/>
+-->
+
+<!--
+  <robot name="baxter_14dof" file="../robots/baxter_description/baxter_14dof.urdf"/>
+  <robot name="baxter_03dof" file="../robots/baxter_description/baxter_03dof.urdf"/>
+  <robot name="baxter_07dof" file="../robots/baxter_description/baxter_07dof.urdf"/>
+  <robot name="baxter" file="../robots/baxter_description/baxter.urdf"/>
+  <robot name="baxter3dof" file="../robots/baxter_description/baxter_3dof_leftarm.urdf"/>
+  <robot name="baxter7dof" file="../robots/baxter_description/baxter_7dof_leftarm.urdf"/>
+  <robot name="baxter10dof" file="../robots/baxter_description/baxter_10dof_leftarm_rightupper.urdf"/>
+  <robot name="baxter14dof" file="../robots/baxter_description/baxter_14dof_nohead.urdf"/>
+-->
+
+  <!--
+  <rigidObject   name="biolab" file="../terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
+    <display color="0.7 0.7 0.7 0.5"/>
+  </rigidObject>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 0.9" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 -0.2" rotateRPY="0 0 0"/>
+  <rigidObject   name="biolab" file="../terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
+    <display color="0.7 0.7 0.7 0.5"/>
+  </rigidObject>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 0.9" rotateRPY="0 0 0"/>
+  <rigidObject name="cuboid.tri" file="../terrains/primitives/cuboid.tri" translation="0.8 0 -0.2" rotateRPY="0 0 0"/>
+  -->
+  <terrain   name="biolab" file="../terrains/biolab.tri" translation="0 0 -0.93" rotateRPY="0 0 3.14">
+    <display color="0.7 0.7 0.7 0.5"/>
+  </terrain>
+
+    <!--
+    <qgoal config="54 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+    -->
+
+  <plannerinput>
+    <qinit config="54  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.64 -0.7 -0.29418 2.18 0 0 0.82 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.64 -0.66 0 2.1 0 0 0.94 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+    <qgoal config="54  0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.64 -0.113 2.45418 -0.05 0.5 0 -1.286 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 -0.313 1.19418 0.51 -0.86 0 -0.866 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+
+    <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
+    <pathSpeed>10</pathSpeed>
+
+    <freeFloating>0</freeFloating>
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>10</maxplanningtime>
+    <multilevel>
+      <level robot_index="1" type="R5"/>
+      <level robot_index="2" type="R7"/>
+      <level robot_index="3" type="R12"/>
+      <level robot_index="0" type="R14"/>
+    </multilevel>
+
+    <!-- <multilevel> -->
+    <!--   <level robot_index="5" outer_index="5" type="R5"/> -->
+    <!--   <level robot_index="0" outer_index="0" type="R7"/> -->
+    <!-- </multilevel> -->
+
+  </plannerinput>
+</world>

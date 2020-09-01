@@ -1,7 +1,7 @@
 <benchmarks>
 
   <benchmark name="best_geometric">
-    <algorithm name="hierarchy:qng_goal_directed"/>
+    <algorithm name="multilevel:qng_goal_directed"/>
     <algorithm name="ompl:rrtconnect"/>
     <algorithm name="ompl:kpiece"/>
     <!-- <algorithm name="ompl:prm"/> -->
@@ -11,24 +11,23 @@
     <maxmemory>10000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 
-  <benchmark name="bundleplanner">
-    <algorithm name="hierarchy:qrrt"/>
-    <!-- <algorithm name="hierarchy:qrrtstar"/> -->
-    <algorithm name="hierarchy:qmp"/>
-    <!-- <algorithm name="hierarchy:qmpstar"/> -->
-    <!-- <algorithm name="hierarchy:spqr"/> -->
-    <maxplanningtime>180</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>3</runcount> <!-- number of runs per algorithm --> 
+  <benchmark name="contact">
+    <!-- <algorithm name="ompl:rrt"/> -->
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:prm"/>
+    <!-- <algorithm name="ompl:lazyprm"/> -->
+    <maxplanningtime>5</maxplanningtime> <!-- runtime in (s) -->
+    <runcount>2</runcount> <!-- number of runs per algorithm -->
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 
   <benchmark name="ijrr2020">
 
-    <algorithm name="hierarchy:qrrt"/>
-    <algorithm name="hierarchy:qrrtstar"/> 
-    <algorithm name="hierarchy:qmp"/> 
-    <algorithm name="hierarchy:qmpstar"/> 
-    <algorithm name="hierarchy:spqr"/> 
+    <algorithm name="multilevel:qrrt"/>
+    <algorithm name="multilevel:qrrtstar"/> 
+    <algorithm name="multilevel:qmp"/> 
+    <algorithm name="multilevel:qmpstar"/> 
+    <algorithm name="multilevel:spqr"/> 
 
     <algorithm name="ompl:rrt"/> 
     <algorithm name="ompl:rrtconnect"/> 
@@ -45,7 +44,6 @@
 
     <algorithm name="ompl:prm"/> 
     <algorithm name="ompl:prmstar"/> 
-    <algorithm name="ompl:lazyprm"/> 
     <algorithm name="ompl:lazyprmstar"/> 
     <algorithm name="ompl:spars"/> 
     <algorithm name="ompl:spars2"/> 
@@ -53,41 +51,62 @@
     <algorithm name="ompl:est"/> 
     <algorithm name="ompl:biest"/> 
 
-    <!-- PROJECTION PLANNER (NOT for multi-robot) -->
-    <!-- <algorithm name="ompl:stride"/> --> 
-    <!-- <algorithm name="ompl:projest"/> --> 
-    <!-- <algorithm name="ompl:pdst"/> --> 
-    <!-- <algorithm name="ompl:kpiece"/> --> 
-    <!-- <algorithm name="ompl:bkpiece"/> --> 
-    <!-- <algorithm name="ompl:lbkpiece"/> --> 
-    <!-- <algorithm name="ompl:sbl"/> --> 
+    <!-- PLANNERS FOR RN -->
+    <algorithm name="ompl:informedrrtstar"/> 
+    <algorithm name="ompl:sorrtstar"/> 
+    <algorithm name="ompl:bitstar"/> 
+    <algorithm name="ompl:abitstar"/> 
+    <algorithm name="ompl:aitstar"/> 
+    <algorithm name="ompl:stride"/> 
+    <algorithm name="ompl:projest"/> 
+    <algorithm name="ompl:pdst"/> 
+    <algorithm name="ompl:kpiece"/> 
+    <algorithm name="ompl:bkpiece"/> 
+    <algorithm name="ompl:lbkpiece"/> 
+    <algorithm name="ompl:sbl"/> 
 
     <!--  PLANNERS AVAILABLE BUT NOT USED -->
-    <!-- <algorithm name="ompl:cforest"/> SEGFAULT? --> 
-    <!-- <algorithm name="ompl:prrt"/> RETURNS INFEASIBLE PATH -->
-    <!-- <algorithm name="ompl:psbl"/> RETURNS INFEASIBLE PATH -->
+    <algorithm name="ompl:cforest"/> 
+    <algorithm name="ompl:prrt"/>
+    <algorithm name="ompl:psbl"/>
 
-    <!-- <algorithm name="ompl:informedrrtstar"/> UNKNOWN ERROR -->
-    <!-- <algorithm name="ompl:sorrtstar"/> UNKNOWN ERROR --> 
-    <!-- <algorithm name="ompl:bitstar"/> SPACES NOT SUPPORTED --> 
-    <!-- <algorithm name="ompl:abitstar"/> SPACES NOT SUPPORTED --> 
+    <algorithm name="ompl:informedrrtstar"/> 
+    <algorithm name="ompl:sorrtstar"/>
+    <algorithm name="ompl:bitstar"/> 
+    <algorithm name="ompl:abitstar"/> 
 
-    <maxplanningtime>10</maxplanningtime> <!-- runtime in (s) --> 
+    <!-- REQ PROJECTION BUT COMPOUND SPACE HAVE NONE -->
+    <algorithm name="ompl:stride"/> 
+    <algorithm name="ompl:projest"/> 
+    <algorithm name="ompl:pdst"/> 
+    <algorithm name="ompl:kpiece"/> 
+    <algorithm name="ompl:bkpiece"/> 
+    <algorithm name="ompl:lbkpiece"/> 
+    <algorithm name="ompl:sbl"/> 
+
+    <maxplanningtime>60</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>10</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 
   <benchmark name="minimal">
-    <!-- <algorithm name="ompl:rrt"/> -->
-    <algorithm name="hierarchy:qrrt"/>
-    <maxplanningtime>5</maxplanningtime> <!-- runtime in (s) --> 
-    <runcount>10</runcount> <!-- number of runs per algorithm --> 
+    <!-- <algorithm name="ompl:spars"/> -->
+    <algorithm name="multilevel:spqr"/>
+    <algorithm name="multilevel:qmpstar"/>
+    <algorithm name="multilevel:qrrt"/>
+    <algorithm name="ompl:prm"/>
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:est"/>
+    <algorithm name="ompl:kpiece"/>
+    <!-- <algorithm name="ompl:sst"/> -->
+    <maxplanningtime>10</maxplanningtime> <!-- runtime in (s) --> 
+    <runcount>3</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 
   </benchmark>
 
   <benchmark name="infeasible">
     <!-- <algorithm name="ompl:rrt"/> -->
-    <algorithm name="hierarchy:spqr"/>
+    <algorithm name="multilevel:spqr"/>
     <algorithm name="ompl:spars"/>
     <algorithm name="ompl:spars2"/>
     <maxplanningtime>120</maxplanningtime> <!-- runtime in (s) --> 
@@ -98,11 +117,11 @@
   <!-- complete benchmark of all planners -->
   <benchmark name="all_geometric">
 
-    <!-- <algorithm name="hierarchy:qrrt"/> -->
-    <!-- <algorithm name="hierarchy:qrrtstar"/> -->
-    <!-- <algorithm name="hierarchy:qmp"/> -->
-    <!-- <algorithm name="hierarchy:qmpstar"/> -->
-    <!-- <algorithm name="hierarchy:spqr"/> -->
+    <!-- <algorithm name="multilevel:qrrt"/> -->
+    <!-- <algorithm name="multilevel:qrrtstar"/> -->
+    <!-- <algorithm name="multilevel:qmp"/> -->
+    <!-- <algorithm name="multilevel:qmpstar"/> -->
+    <!-- <algorithm name="multilevel:spqr"/> -->
 
     <!-- <algorithm name="ompl:rrt"/> -->
     <!-- <algorithm name="ompl:rrtconnect"/> -->

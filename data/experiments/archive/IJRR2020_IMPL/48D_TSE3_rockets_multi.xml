@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="rocket0" file="../../robots/rocket/retro_rocket.urdf"/>
+  <robot name="rocket1" file="../../robots/rocket/retro_rocket.urdf"/>
+
+  <plannerinput>
+
+    <agent 
+      id="0" 
+      qinit="6  -0.0 -0.0 +0.0 0 0 0"
+      dqinit="6  0 0 +1.5 0 0 0"
+      qgoal="6  +0.0 -0.0 +8.5 0 0 0"
+      dqgoal="6  0 0 +1.5 0 0 0"
+      uMin ="6  -0.0 -0.0 -0.0 -0.0 -0.0 -0.0 0 0 0 0 0 0"
+      uMax ="6  +0.0 +0.0 +0.0 +0.0 +0.0 +0.0 0 0 0 0 0 0"
+    />
+    <!-- <agent --> 
+    <!--   id="1" --> 
+    <!--   qinit="6  -3.0 -0.0 +0.0 0 0 0" -->
+    <!--   qgoal="6  -3.0 -0.0 +8.5 0 0 0" -->
+    <!--   dqinit="6  0 0 0 0 0 0 0 0 0 0 0 0" -->
+    <!--   dqgoal="6  0 0 0 0 0 0 0 0 0 0 0 0" -->
+    <!--   uMin ="6  -0.0 -0.0 -0.0 -0.2 -0.2 -0.2 0 0 0 0 0 0" -->
+    <!--   uMax ="6  +0.0 +0.0 +0.5 +0.2 +0.2 +0.2 0 0 0 0 0 0" -->
+    <!-- /> -->
+    <!-- <agent --> 
+    <!--   id="2" --> 
+    <!--   qinit="6  -3.0 +0.0 +1.5 0 0 0" -->
+    <!--   qgoal="6  +3.0 +0.0 +1.5 0 0 0" -->
+    <!--   dqinit="6  0 0 0 0 0 0" -->
+    <!--   dqgoal="6  0 0 0 0 0 0" -->
+    <!--   uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5" -->
+    <!--   uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5" -->
+    <!-- /> -->
+    <!-- <agent --> 
+    <!--   id="3" --> 
+    <!--   qinit="6  -3.0 +2.5 +1.5 0 0 0" -->
+    <!--   qgoal="6  +3.0 +2.5 +1.5 0 0 0" -->
+    <!--   dqinit="6  0 0 0 0 0 0" -->
+    <!--   dqgoal="6  0 0 0 0 0 0" -->
+    <!--   uMin ="6  -0.0 -0.0 -0.0 -0.5 -0.5 -0.5" -->
+    <!--   uMax ="6  +0.5 +0.0 +0.0 +0.5 +0.5 +0.5" -->
+    <!-- /> -->
+
+    <se3min config="6  -3.0 -3.0 +0.0 -3.141593 -0.1 -0.1"/>
+    <se3max config="6  +3.0 +3.0 +10.0 +3.141593 +0.1 +0.1"/>
+
+    <!-- <control_min config="6  0 0 0 -0.1 -0.1 -0.1"/> -->
+    <!-- <control_max config="6  0 0 0 +0.1 +0.1 +0.1"/> -->
+
+    <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <freeFloating>1</freeFloating>
+    <pathSpeed>1.5</pathSpeed>
+    <pathWidth>0.3</pathWidth>
+    <timestep min="0.01" max="0.01"/>
+    <!-- <algorithm dynamic="1" name="multilevel:qrrt"/> -->
+    <algorithm name="multilevel:qrrt"/>
+    <algorithm name="multilevel:qmp"/>
+
+    <multiAgent>1</multiAgent>
+    <kinodynamic>0</kinodynamic>
+
+    <multilevel>
+      <level>
+        <robot id="0" freeFloating="1" type="TSE3"/>
+      </level>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

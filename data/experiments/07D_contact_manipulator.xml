@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="7dof" file="../robots/planar_manipulator/7dof_manip_no_endeffector_contact.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+  <terrain name="cylinderBottom" file="../terrains/primitives/cylinder.tri" translation="0 0 0" rotateRPY="0 1.570796 0"/>
+  <terrain name="cylinderTopLeft" file="../terrains/primitives/cylinder.tri" translation="-6.0 -6.0 0" rotateRPY="0 1.570796 0"/>
+  <terrain name="cylinderTopRight" file="../terrains/primitives/cylinder.tri" translation="-6.0 +6.0 0" rotateRPY="0 1.570796 0"/>
+
+  <plannerinput>
+
+    <qinit  config="20  -0.1 -1 +0.0 0.0 0.0 0.0  +1.4 0 +0.2 0 +0.2 0 +0.3 0 +0.6 0 +0.7 0 +0.7 0 "/>
+    <qgoal  config="20  -0.1 +1 +0.0 0.0 0.0 0.0  +1.74 0 -0.2 0 -0.2 0 -0.3 0 -0.6 0 -0.7 0 -0.7 0 "/>
+    <se3min config="6  -4 -4 -5.0 -3.141593 -3.141593 -3.141593"/>
+    <se3max config="6  +4 +4 +5.0 +3.141593 +3.141593 +3.141593"/>
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <pathSpeed>8</pathSpeed>
+    <smoothPath>0</smoothPath>
+    <freeFloating>1</freeFloating>
+
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:rrt"/>
+    <algorithm name="ompl:prm"/>
+    <algorithm name="ompl:lazyprm"/>
+
+    <contacts>
+      <contact robot_name="7dof" robot_link="jlink0"
+               mode="fixed"
+               mesh="cylinderBottom"
+               tri="3"/>
+      <contact robot_name="7dof" robot_link="jlink7"
+               mode="transition"
+               meshFrom="cylinderTopLeft"
+               meshTo="cylinderTopRight"/>
+    </contacts>
+
+    <multilevel>
+      <level robot_index="0" type="R2_CONTACT"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>
+

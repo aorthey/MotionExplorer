@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <!-- Airplane 1 is holonomic, Airplane 2 is non-holonomic -->
+  <robot name="airplane" file="../../robots/airplane.urdf"/>
+
+  <robot name="airplane_inner_sphere" file="../../robots/airplane_inner_sphere.urdf"/>
+
+  <plannerinput>
+    <agent 
+      id="0" 
+      qinit="6  -3.5 -0.0 +0.0 -0.0 +0 +0.0"
+      qgoal="6  +3.5 -0.0 +0.0 +0.0 +0 +0.0"
+      dqinit="6  +0.3 0 0 0 0 0"
+      dqgoal="6  +0.3 0 0 0 0 0"
+      uMin ="6  0 0 0 -0.3 0 0"
+      uMax ="6  0 0 0 0.3 0 0"
+    />
+    <agent 
+      id="1" 
+      qinit="6  -3.5 -3.0 +0.0 -0.0 +0 +0.0"
+      qgoal="6  +3.5 -3.0 +0.0 +0.0 +0 +0.0"
+      dqinit="6  +0.3 0 0 0 0 0"
+      dqgoal="6  +0.3 0 0 0 0 0"
+      uMin ="6  0 0 0 -0.3 0 0"
+      uMax ="6  0 0 0 0.3 0 0"
+    />
+
+    <se3min config="6  -5.0 -5.0 -3.0 -3.141593 0 0"/>
+    <se3max config="6  +5.0 +5.0 +3.0 +3.141593 0 0"/>
+
+    <timestep min="0.01" max="0.05"/>
+
+    <maxplanningtime>0.5</maxplanningtime>      <!-- runtime in (s) --> 
+    <epsilongoalregion>1</epsilongoalregion>
+    <pathSpeed>4</pathSpeed>
+    <smoothPath>4</smoothPath>
+    <algorithm dynamic="0" name="multilevel:qrrt"/>
+    <!-- <algorithm name="multilevel:explorer"/> -->
+
+    <!-- <kinodynamic>0</kinodynamic> -->
+    <freeFloating>1</freeFloating>
+    <multiAgent>1</multiAgent>
+    <multilevel>
+      <!-- <level robot_index="1" type = "SE3"/> -->
+      <!-- <level> -->
+      <!--   <robot id="1" freeFloating="1" simplification_of_id="0" type="SE2"/> -->
+      <!-- </level> -->
+      <level>
+        <robot id="2" simplification_of_id="0" freeFloating="1" type="R2"/>
+        <robot id="3" simplification_of_id="1" freeFloating="1" type="R2"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" type="SE2"/>
+        <robot id="1" freeFloating="1" type="SE2"/>
+      </level>
+    </multilevel>
+
+  </plannerinput>
+
+</world>
+

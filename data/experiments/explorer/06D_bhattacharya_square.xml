@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+     Experiment from Bhattacharya 2018
+     https://link.springer.com/content/pdf/10.1007/s10472-018-9596-8.pdf 
+-->
+
+<world>
+  <robot name="disk1" file="../../robots/disks/1.urdf" translation="0 0 0.04"/>
+  <robot name="disk2" file="../../robots/disks/2.urdf" translation="0 0 0.04"/>
+  <robot name="disk3" file="../../robots/disks/3.urdf" translation="0 0 0.04"/>
+
+  <plannerinput>
+
+    <agent 
+      id="0" 
+      qinit="6  -1 -1 0.02 0 0 0"
+      qgoal="6  +1 +1 0.02 0 0 0"
+    />
+    <agent 
+      id="1" 
+      qinit="6  +1 -1 0.02 0 0 0"
+      qgoal="6  -1 +1 0.02 0 0 0"
+    />
+    <agent 
+      id="2" 
+      qinit="6  0 +1 0.02 0 0 0"
+      qgoal="6  0 -1 0.02 0 0 0"
+    />
+
+    <se3min config="6  -1 -1 0 -3.141593 0 0"/>
+    <se3max config="6  +1 +1 0 +3.141593 0 0"/>
+
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>0.3</maxplanningtime>      <!-- runtime in (s) --> 
+    <pathSpeed>3</pathSpeed>
+    <freeFloating>1</freeFloating>
+    <smoothPath>0</smoothPath>
+    <algorithm name="multilevel:explorer2"/>
+
+    <multiAgent>1</multiAgent>
+
+    <multilevel>
+      <level>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="R2"/>
+        <robot id="1" freeFloating="1" simplification_of_id="1" type="R2"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" type="R2"/>
+        <robot id="1" freeFloating="1" type="R2"/>
+        <robot id="2" freeFloating="1" type="R2"/>
+      </level>
+    </multilevel>
+
+  </plannerinput>
+</world>

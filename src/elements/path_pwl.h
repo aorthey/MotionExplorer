@@ -1,11 +1,11 @@
 #pragma once
 #include "gui/gui_state.h"
 #include "gui/colors.h"
-#include "elements/swept_volume.h"
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/control/PathControl.h>
 #include <Library/KrisLibrary/math/vector.h>
 #include <Library/KrisLibrary/math3d/primitives.h>
+#include <Library/KrisLibrary/utils/SmartPointer.h>
 typedef Math::Vector Config;
 using Math3D::Vector3;
 
@@ -32,9 +32,14 @@ class PathPiecewiseLinear
     Config Eval(const double t) const;
     Config EvalStates(std::vector<ob::State*> states, const double t) const;
     Config EvalVelocity(const double t) const;
-    Vector EvalVelocityVec3(const double t) const;
     Vector3 EvalVec3(const double t) const;
     Vector3 EvalVec3(const double t, int ridx) const;
+
+    void StatesToMilestones(
+        const std::vector<ob::State*> &states,
+        std::vector<Vector3> &milestones,
+        int ridx,
+        double percentage);
 
     CSpaceOMPL *GetSpace() const;
 
@@ -45,9 +50,9 @@ class PathPiecewiseLinear
     int GetNumberOfMilestones();
     double GetLength() const;
 
-    double linewidth{20};
+    double linewidth{1};
     double widthBorder{0.1};
-    double ptsize{10};
+    double ptsize{1};
     double zOffset{-0.1};
     GLColor cVertex{magenta}, cLine{magenta};
     GLColor cSmoothed{magenta}, cUnsmoothed{red};
@@ -83,12 +88,11 @@ class PathPiecewiseLinear
     Vector3 GetNearestStateToTipOfArrow(Vector3 arrow_pos, 
         const std::vector<ob::State*> states, uint k_start_state, double arrow_size_length, int ridx);
 
-    void DrawGLRibbon(const std::vector<ob::State*> &states);
-    void DrawGLRibbonRobotIndex(const std::vector<ob::State*> &states, int ridx);
+    void DrawGLRibbon(const std::vector<ob::State*> &states, double percentage = 1.0);
+    void DrawGLRibbonRobotIndex(const std::vector<ob::State*> &states, int ridx, double percentage = 1.0);
     void DrawGLArrowMiddleOfPath(const std::vector<ob::State*> &states, int ridx);
     void DrawGLCross(const std::vector<ob::State*> &states, int ridx);
 
-    SweptVolume *sv{nullptr};
     CSpaceOMPL *cspace{nullptr};
     CSpaceOMPL *quotient_space{nullptr};
 

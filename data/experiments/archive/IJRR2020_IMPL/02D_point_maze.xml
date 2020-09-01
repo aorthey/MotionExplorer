@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<world>
+  <robot name="disk" file="../../robots/planar/disk_0_20.urdf"/>
+  <robot name="disk" file="../../robots/planar/disk_0_15.urdf"/>
+  <!-- <robot name="disk" file="../robots/planar/disk_maze_small.urdf"/> -->
+  <terrain name="maze" file="../../terrains/Labyrinth.tri" translation="0 0 0.1" rotateRPY="3.14 0 0" >
+     <display color="0.8 0.8 0.8"/>
+  </terrain>
+  <plannerinput>
+    <qinit  config="6  -9.5 -9.4 0 0 0 0"/>
+    <qgoal  config="6  -9.5 -6.5 0 0 0 0"/>
+    <se3min config="6  -10 -10.0 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +10 +10.0 +0.5 +3.141593 +1.57 +3.141593"/>
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>3</maxplanningtime>
+    <pathSpeed>10</pathSpeed>
+    <pathWidth>0.2</pathWidth>
+    <smoothPath>0</smoothPath>
+
+    <multilevel>
+      <level robot_index="1" type="R2"/>
+      <level robot_index="0" type="R2"/>
+    </multilevel>
+  </plannerinput>
+</world>

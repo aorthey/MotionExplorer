@@ -3,6 +3,7 @@
 #include "planner/cspace/cspace_kinodynamic.h"
 #include "planner/cspace/cspace_multiagent.h"
 #include "gui/drawMotionPlanner.h"
+#include "common.h"
 #include <iostream>
 #include <ompl/base/spaces/SE3StateSpace.h>
 #include <ompl/base/StateSpace.h>
@@ -12,10 +13,14 @@
 #include <ompl/control/spaces/RealVectorControlSpace.h>
 #include <boost/math/constants/constants.hpp>
 #include <boost/foreach.hpp>
+#include <KrisLibrary/GLdraw/drawMesh.h>
+#include <KrisLibrary/GLdraw/GLError.h>
+#include <KrisLibrary/GLdraw/GLColor.h>
 
 #define foreach BOOST_FOREACH
 
 namespace oc = ompl::control;
+using namespace GLDraw;
 
 PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
   cspace(cspace_), quotient_space(cspace_)
@@ -25,10 +30,13 @@ PathPiecewiseLinear::PathPiecewiseLinear(CSpaceOMPL *cspace_):
 void PathPiecewiseLinear::SetDefaultPath()
 {
   ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
-  if(quotient_space->isDynamic()){
+  if(quotient_space->isDynamic())
+  {
     path = std::make_shared<oc::PathControl>(si);
+    path_raw = std::make_shared<oc::PathControl>(si);
   }else{
     path = std::make_shared<og::PathGeometric>(si);
+    path_raw = std::make_shared<og::PathGeometric>(si);
   }
 }
 
@@ -40,17 +48,22 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
     SetDefaultPath();
   }else{
 
-    if(!quotient_space->isDynamic()){
+    if(!quotient_space->isDynamic())
+    {
 
-      og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-      length = gpath.length();
+      og::PathGeometric& gpath = static_cast<og::PathGeometric&>(*path);
+      // gpath.interpolate();
       std::vector<ob::State *> states = gpath.getStates();
 
       uint Nstates = std::max(0,(int)states.size()-1);
-      for(uint k = 0; k < Nstates; k++){
+      length = 0.0;
+      for(uint k = 0; k < Nstates; k++)
+      {
         ob::State *s0 = states.at(k);
         ob::State *s1 = states.at(k+1);
-        interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
+        double dk = gpath.getSpaceInformation()->distance(s0,s1);
+        interLength.push_back(dk);
+        length += dk;
       }
 
     }else{
@@ -62,7 +75,8 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
       ob::State *x0prime = quotient_space->SpaceInformationPtr()->allocState();
       ob::State *x1prime = quotient_space->SpaceInformationPtr()->allocState();
 
-      for(uint k = 0; k < Nstates; k++){
+      for(uint k = 0; k < Nstates; k++)
+      {
         ob::State *s0 = states.at(k);
         ob::State *s1 = states.at(k+1);
 
@@ -82,6 +96,7 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
       }
     }
   }
+  // std::cout << *this << std::endl;
 }
 
 ob::PathPtr PathPiecewiseLinear::GetOMPLPath() const
@@ -91,14 +106,16 @@ ob::PathPtr PathPiecewiseLinear::GetOMPLPath() const
 
 void PathPiecewiseLinear::SendToController(SmartPointer<RobotController> controller)
 {
-  if(!quotient_space->isDynamic()){
+  if(!quotient_space->isDynamic())
+  {
     std::cout << "Path is not dynamic, cannot access torques" << std::endl;
     return;
   }
 
   std::cout << "SENDING CONTROLS" << std::endl;
   std::vector<string> cmds = controller->Commands();
-  for(uint k = 0; k < cmds.size(); k++){
+  for(uint k = 0; k < cmds.size(); k++)
+  {
     std::cout << cmds.at(k) << std::endl;
   }
 
@@ -108,7 +125,8 @@ void PathPiecewiseLinear::SendToController(SmartPointer<RobotController> control
   
   // std::vector<oc::Control*> controls = cpath.getControls();
   uint N = quotient_space->GetKlamptDimensionality();
-  for(uint k = 0; k < states.size(); k++){
+  for(uint k = 0; k < states.size(); k++)
+  {
     ob::State *sk = states.at(k);
     Config qk = quotient_space->OMPLStateToConfig(sk);
     Config dqk = quotient_space->OMPLStateToVelocity(sk);
@@ -174,7 +192,8 @@ void PathPiecewiseLinear::Smooth(bool forceSmoothing){
   if(path == nullptr) return;
   if(quotient_space->isDynamic()) return;
 
-  if(!isSmooth || forceSmoothing){
+  if(!isSmooth || forceSmoothing)
+  {
 
     og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
     std::vector<ob::State *> statesB = gpath.getStates();
@@ -189,7 +208,8 @@ void PathPiecewiseLinear::Smooth(bool forceSmoothing){
     std::vector<ob::State *> states = gpath.getStates();
 
     interLength.clear();
-    for(uint k = 1; k < states.size(); k++){
+    for(uint k = 1; k < states.size(); k++)
+    {
       ob::State *s0 = states.at(k-1);
       ob::State *s1 = states.at(k);
       interLength.push_back(gpath.getSpaceInformation()->distance(s0,s1));
@@ -202,30 +222,33 @@ void PathPiecewiseLinear::Smooth(bool forceSmoothing){
       << ")" << std::endl;
     isSmooth = true;
   }
-
-  //gpath update is not saved in path!
 }
+
 void PathPiecewiseLinear::Normalize(){
   if(!path) return;
 
   double newLength =0.0;
-  for(uint i = 0; i < interLength.size(); i++){
+  for(uint i = 0; i < interLength.size(); i++)
+  {
     interLength.at(i) /= length;
     newLength+=interLength.at(i);
-
   }
-  assert( fabs(newLength-1.0) < 1e-10);
+
   length = newLength;
 }
-std::vector<double> PathPiecewiseLinear::GetLengthVector() const{
+
+std::vector<double> PathPiecewiseLinear::GetLengthVector() const
+{
   return interLength;
 }
 
-double PathPiecewiseLinear::GetLength() const{
+double PathPiecewiseLinear::GetLength() const
+{
   return length;
 }
 
-Vector3 PathPiecewiseLinear::EvalVec3(const double t, int ridx) const{
+Vector3 PathPiecewiseLinear::EvalVec3(const double t, int ridx) const
+{
   Config q = Eval(t);
   ob::ScopedState<> s = quotient_space->ConfigToOMPLState(q);
   Vector3 v = quotient_space->getXYZ(s.get(), ridx);
@@ -233,7 +256,8 @@ Vector3 PathPiecewiseLinear::EvalVec3(const double t, int ridx) const{
   return v;
 }
 
-Vector3 PathPiecewiseLinear::EvalVec3(const double t) const{
+Vector3 PathPiecewiseLinear::EvalVec3(const double t) const
+{
   Config q = Eval(t);
   ob::ScopedState<> s = quotient_space->ConfigToOMPLState(q);
   Vector3 v = quotient_space->getXYZ(s.get());
@@ -241,13 +265,18 @@ Vector3 PathPiecewiseLinear::EvalVec3(const double t) const{
   return v;
 }
 
-Config PathPiecewiseLinear::EvalStates(std::vector<ob::State*> states, const double t) const{
+Config PathPiecewiseLinear::EvalStates(std::vector<ob::State*> states, const double t) const
+{
   ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
-  if(t<=0){
+  if(states.size() <= 0) 
+
+  if(t<=0)
+  {
     return quotient_space->OMPLStateToConfig(states.front());
   }
-  if(t>=length){
+  if(t>=length)
+  {
     return quotient_space->OMPLStateToConfig(states.back());
   }
 
@@ -255,7 +284,8 @@ Config PathPiecewiseLinear::EvalStates(std::vector<ob::State*> states, const dou
 
   assert(interLength.size()==states.size()-1);
 
-  for(uint i = 0; i < interLength.size(); i++){
+  for(uint i = 0; i < interLength.size(); i++)
+  {
     double Tnext = interLength.at(i);
     if((Tcum+Tnext)>=t){
       //t \in [Lcum, Lcum+Lnext]
@@ -273,7 +303,8 @@ Config PathPiecewiseLinear::EvalStates(std::vector<ob::State*> states, const dou
   //rounding errors could lead to the fact that the cumulative length is not
   //exactly 1. If t is sufficiently close, we just return the last keyframe.
   double epsilon = 1e-10;
-  if(length-Tcum > epsilon){
+  if(length-Tcum > epsilon)
+  {
     std::cout << "length of path is significantly different from " << length << std::endl;
     std::cout << "length    : " << Tcum << "/" << length << std::endl;
     std::cout << "difference: " << length-Tcum << " > " << epsilon << std::endl;
@@ -282,21 +313,24 @@ Config PathPiecewiseLinear::EvalStates(std::vector<ob::State*> states, const dou
     exit(0);
   }
 
-  if(t>=Tcum){
+  if(t>=Tcum)
+  {
     return quotient_space->OMPLStateToConfig(states.back());
   }
   std::cout << "Eval could not find point for value " << t << std::endl;
   throw;
 }
 
-Config PathPiecewiseLinear::Eval(const double t) const{
+Config PathPiecewiseLinear::Eval(const double t) const
+{
   if(!path){
     std::cout << "Cannot Eval empty path" << std::endl;
     throw "Empty path";
   }
 
   std::vector<ob::State *> states;
-  if(quotient_space->isDynamic()){
+  if(quotient_space->isDynamic())
+  {
     oc::PathControl *cpath = static_cast<oc::PathControl*>(path.get());
     states = cpath->getStates();
   }else{
@@ -306,7 +340,8 @@ Config PathPiecewiseLinear::Eval(const double t) const{
   return EvalStates(states, t);
 }
 
-Config PathPiecewiseLinear::EvalVelocity(const double t) const{
+Config PathPiecewiseLinear::EvalVelocity(const double t) const
+{
   if(!quotient_space->isDynamic()) 
   {
     OMPL_ERROR("Cannot eval velocity.");
@@ -321,7 +356,8 @@ Config PathPiecewiseLinear::EvalVelocity(const double t) const{
 
   ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
 
-  if(t<=0){
+  if(t<=0)
+  {
     return quotient_space->OMPLStateToVelocity(states.front());
   }
   if(t>=length){
@@ -332,9 +368,11 @@ Config PathPiecewiseLinear::EvalVelocity(const double t) const{
 
   assert(interLength.size()==states.size()-1);
 
-  for(uint i = 0; i < interLength.size(); i++){
+  for(uint i = 0; i < interLength.size(); i++)
+  {
     double Tnext = interLength.at(i);
-    if((Tcum+Tnext)>=t){
+    if((Tcum+Tnext)>=t)
+    {
       //t \in [Lcum, Lcum+Lnext]
       double tloc = (t-Tcum)/Tnext; //tloc \in [0,1]
       ob::State* s1 = states.at(i);
@@ -350,7 +388,8 @@ Config PathPiecewiseLinear::EvalVelocity(const double t) const{
   //rounding errors could lead to the fact that the cumulative length is not
   //exactly 1. If t is sufficiently close, we just return the last keyframe.
   double epsilon = 1e-10;
-  if(length-Tcum > epsilon){
+  if(length-Tcum > epsilon)
+  {
     std::cout << "length of path is significantly different from " << length << std::endl;
     std::cout << "length    : " << Tcum << "/" << length << std::endl;
     std::cout << "difference: " << length-Tcum << " > " << epsilon << std::endl;
@@ -358,7 +397,8 @@ Config PathPiecewiseLinear::EvalVelocity(const double t) const{
     throw;
   }
 
-  if(t>=Tcum){
+  if(t>=Tcum)
+  {
     return quotient_space->OMPLStateToVelocity(states.back());
   }
 
@@ -366,20 +406,24 @@ Config PathPiecewiseLinear::EvalVelocity(const double t) const{
   throw;
 }
 
-Vector3 PathPiecewiseLinear::Vector3FromState(ob::State *s){
+Vector3 PathPiecewiseLinear::Vector3FromState(ob::State *s)
+{
   Vector3 v = quotient_space->getXYZ(s);
-  if(draw_planar){
+  if(draw_planar)
+  {
     v[2] = 0.0;
   }
   v[2] += zOffset;
   return v;
 }
 
-Vector3 PathPiecewiseLinear::Vector3FromState(ob::State *s, int ridx){
+Vector3 PathPiecewiseLinear::Vector3FromState(ob::State *s, int ridx)
+{
   if(!quotient_space->isMultiAgent()) return Vector3FromState(s);
 
   Vector3 v = quotient_space->getXYZ(s, ridx);
-  if(draw_planar){
+  if(draw_planar)
+  {
     v[2] = 0.0;
   }
   v[2] += zOffset;
@@ -443,7 +487,8 @@ Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos,
     if(qnext[2] > zmax) zmax = qnext[2];
     double d_tip_to_state_next = fabs( arrow_pos.distanceSquared(qnext) - arrow_size_length);
 
-    while(d_tip_to_state_next < d_tip_to_state_best){
+    while(d_tip_to_state_next < d_tip_to_state_best)
+    {
       d_tip_to_state_best = d_tip_to_state_next;
 
       m = m+1;
@@ -457,7 +502,8 @@ Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos,
     }
     m = m-1;
     
-    if(m >= Mmax){
+    if(m >= Mmax)
+    {
         m = Mmax;
     }
     qnext = Vector3FromState(states.at(m), ridx);
@@ -465,20 +511,96 @@ Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos,
     return qnext;
 }
 
-void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &states, int ridx)
+
+void PathPiecewiseLinear::StatesToMilestones(
+    const std::vector<ob::State*> &states,
+    std::vector<Vector3> &milestones,
+    int ridx,
+    double percentage)
 {
-  glBegin(GL_QUAD_STRIP);
+  double dist = 0;
+  unsigned int ctr = 0;
+
+  ob::StateSpacePtr space = quotient_space->SpaceInformationPtr()->getStateSpace();
+
+  ob::State* stateTmpCur = space->allocState();
+
+  while(dist < percentage*length && ctr < states.size()-1)
+  {
+    ob::State *s1 = states.at(ctr);
+    ob::State *s2 = states.at(ctr+1);
+
+    int nd = space->validSegmentCount(s1, s2);
+
+    // nd = 1; //set to 1 if we do not want to interpolate
+
+    Vector3 v = quotient_space->getXYZ(s1, ridx);
+    milestones.push_back(v);
+
+    for (int j = 1; j < nd; j++)
+    {
+        double step = (double)j / (double)nd;
+        
+        space->interpolate(s1, s2, step, stateTmpCur);
+
+        Vector3 v = quotient_space->getXYZ(stateTmpCur, ridx);
+
+        if((v-milestones.back()).normSquared() < 1e-2) continue;
+
+        milestones.push_back(v);
+    }
+
+    dist += interLength.at(ctr);
+    ctr++;
+  }
+
+  space->freeState(stateTmpCur);
+}
+
+
+void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &states, int ridx, double percentage)
+{
   std::vector<Vector3> path_left;
   std::vector<Vector3> path_right;
-  for(uint i = 0; i < states.size(); i++){
-    Vector3 q1 = Vector3FromState(states.at(i), ridx);
+
+  //compute stopping distance
+  std::vector<Vector3> milestones;
+
+  StatesToMilestones(states, milestones, ridx, percentage);
+
+  // double dist = 0;
+  // int ctr = 0;
+  // while(dist < percentage*length)
+  // {
+  //   Vector3 v = Vector3FromState(states.at(ctr), ridx);
+  //   milestones.push_back(v);
+  //   dist += interLength.at(ctr);
+  //   ctr++;
+  // }
+  // Vector3 v = Vector3FromState(states.at(ctr), ridx);
+  // milestones.push_back(v);
+  //// 
+
+  if(milestones.size()<2)
+  {
+    return;
+  }
+  glBegin(GL_QUAD_STRIP);
+
+  for(uint i = 0; i < milestones.size(); i++)
+  {
+    // Vector3 q1 = Vector3FromState(states.at(i), ridx);
+    Vector3 q1 = milestones.at(i);
     Vector3 dq;
 
-    if(i<states.size()-1){
-      Vector3 q2 = Vector3FromState(states.at(i+1), ridx);
+    if(i < milestones.size()-1)
+    {
+      // Vector3 q2 = Vector3FromState(states.at(i+1), ridx);
+      Vector3 q2 = milestones.at(i+1);
       dq = q2 - q1;
     }else{
-      Vector3 q2 = Vector3FromState(states.at(i-1), ridx);
+      Vector3 q2 = milestones.at(i-1);
+      // Vector3 q2 = Vector3FromState(states.at(i-1), ridx);
       dq = q1 - q2;
     }
 
@@ -523,37 +645,43 @@ void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &
   // std::cout << sizes[0] << std::endl;
   // std::cout << sizes[1] << std::endl;
 
-  black.setCurrentGL();
-  glLineWidth(widthBorder);
-  glBegin(GL_LINE_STRIP);
-  for(uint k = 0; k < path_left.size(); k++){
-    Vector3 v = path_left.at(k);
-    glVertex3f(v[0], v[1], v[2]);
+  if(widthBorder > 0)
+  {
+      black.setCurrentGL();
+      glLineWidth(widthBorder);
+      glBegin(GL_LINE_STRIP);
+      for(uint k = 0; k < path_left.size(); k++)
+      {
+        Vector3 v = path_left.at(k);
+        glVertex3f(v[0], v[1], v[2]);
+      }
+      glEnd();
+      glBegin(GL_LINE_STRIP);
+      for(uint k = 0; k < path_right.size(); k++)
+      {
+        Vector3 v = path_right.at(k);
+        glVertex3f(v[0], v[1], v[2]);
+      }
+      glEnd();
   }
-  glEnd();
-  glBegin(GL_LINE_STRIP);
-  for(uint k = 0; k < path_right.size(); k++){
-    Vector3 v = path_right.at(k);
-    glVertex3f(v[0], v[1], v[2]);
-  }
-  glEnd();
   cLine.setCurrentGL();
 }
 
-void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
+void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states, double percentage)
 {
   //############################################################################
   //Draws a tron-like line strip
   //############################################################################
 
-  if(quotient_space->isMultiAgent()){
+  if(quotient_space->isMultiAgent())
+  {
     CSpaceOMPLMultiAgent *cma = static_cast<CSpaceOMPLMultiAgent*>(quotient_space);
     std::vector<int> idxs = cma->GetRobotIdxs();
     bool drawMACross = drawCross;
     foreach(int i, idxs)
     {
-        DrawGLRibbonRobotIndex(states, i);
-        DrawGLArrowMiddleOfPath(states, i);
+        DrawGLRibbonRobotIndex(states, i, percentage);
+        // DrawGLArrowMiddleOfPath(states, i);
         if(drawMACross){
           DrawGLCross(states, i);
           drawMACross = false;
@@ -563,8 +691,8 @@ void PathPiecewiseLinear::DrawGLRibbon(const std::vector<ob::State*> &states)
     }else{
     }
   }else{
-    DrawGLRibbonRobotIndex(states, quotient_space->GetRobotIndex());
-    DrawGLArrowMiddleOfPath(states, quotient_space->GetRobotIndex());
+    DrawGLRibbonRobotIndex(states, quotient_space->GetRobotIndex(), percentage);
+    // DrawGLArrowMiddleOfPath(states, quotient_space->GetRobotIndex());
     if(drawCross) DrawGLCross(states, quotient_space->GetRobotIndex());
   }
 }
@@ -580,7 +708,8 @@ void PathPiecewiseLinear::DrawGLArrowMiddleOfPath( const std::vector<ob::State*>
 
   glLineWidth(arrow_size_head*10);
   Vector3 qnext;
-  if(states.size() == 2){
+  if(states.size() == 2)
+  {
     Vector3 q1 = Vector3FromState(states.at(0), ridx);
     qnext = Vector3FromState(states.at(1), ridx);
     arrow_pos = 0.5*(qnext - q1);
@@ -664,9 +793,12 @@ void PathPiecewiseLinear::DrawGLCross( const std::vector<ob::State*> &states, in
   glTranslatef(pos[0], pos[1], pos[2]);
   drawCylinder(cylinderHeight*ez, radius);
 
-  glLineWidth(widthBorder);
-  black.setCurrentGL();
-  drawWireCircle(ez, radius);
+  if(widthBorder > 0)
+  {
+      glLineWidth(widthBorder);
+      black.setCurrentGL();
+      drawWireCircle(ez, radius);
+  }
 
   glPopMatrix();
 }
@@ -738,7 +870,8 @@ std::vector<double> PathPiecewiseLinear::GetHighCurvatureConfigurations()
 void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path)
 {
   std::vector<ob::State *> states;
-  if(quotient_space->isDynamic()){
+  if(quotient_space->isDynamic())
+  {
     oc::PathControl *cpath = static_cast<oc::PathControl*>(_path.get());
     states = cpath->getStates();
   }else{
@@ -746,7 +879,8 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path)
     states = gpath->getStates();
   }
   ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
-  if(states.size() < 2){
+  if(states.size() < 2)
+  {
     return;
   }
 
@@ -762,7 +896,12 @@ void PathPiecewiseLinear::DrawGLPathPtr(GUIState& state, ob::PathPtr _path)
   cLine.setCurrentGL();
   //############################################################################
 
-  DrawGLRibbon(states);
+  if(state("draw_path_partial"))
+  {
+      DrawGLRibbon(states, 0.5);
+  }else{
+      DrawGLRibbon(states);
+  }
 
   if(drawSweptVolume && state("draw_path_sweptvolume")){
     double L = GetLength();
@@ -790,9 +929,11 @@ CSpaceOMPL* PathPiecewiseLinear::GetSpace() const
 {
   return quotient_space;
 }
+
 void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
 {
   Config q = Eval(t);
+  // std::cout << t << ": " << q << std::endl;
   quotient_space->drawConfig(q, cRobotVolume);
 
   if(state("draw_path_trace"))
@@ -814,15 +955,16 @@ void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
 
 void PathPiecewiseLinear::DrawGL(GUIState& state)
 {
-  if(quotient_space != nullptr)
-  {
-    draw_planar = (quotient_space->IsPlanar());
-    if(draw_planar && (quotient_space->GetFirstSubspace()->getType()==ob::STATE_SPACE_SE2) && state("planner_draw_spatial_representation_of_SE2")){
-      draw_planar = false;
-    }
-  }
+  // if(quotient_space != nullptr)
+  // {
+  //   draw_planar = (quotient_space->IsPlanar());
+  //   if(draw_planar && (quotient_space->GetFirstSubspace()->getType()==ob::STATE_SPACE_SE2) && state("planner_draw_spatial_representation_of_SE2")){
+  //     draw_planar = false;
+  //   }
+  // }
 
-  if(state("draw_path")){
+  if(state("draw_path"))
+  {
     cLine = cSmoothed;
     DrawGLPathPtr(state, path);
   }
@@ -836,7 +978,6 @@ void PathPiecewiseLinear::DrawGL(GUIState& state)
 bool PathPiecewiseLinear::Load(const char* fn)
 {
   TiXmlDocument doc(fn);
-  std::cout << "Loading from " << fn << std::endl;
   return Load(GetRootNodeFromDocument(doc));
 }
 bool PathPiecewiseLinear::Load(TiXmlElement *node)
@@ -849,7 +990,8 @@ bool PathPiecewiseLinear::Load(TiXmlElement *node)
   interLength.clear();
 
   TiXmlElement* node_il = FindFirstSubNode(node, "interlength");
-  while(node_il!=nullptr){
+  while(node_il!=nullptr)
+  {
     double tmp;
     GetStreamText(node_il) >> tmp;
     interLength.push_back(tmp);
@@ -863,11 +1005,12 @@ bool PathPiecewiseLinear::Load(TiXmlElement *node)
     oc::SpaceInformationPtr siC = 
       dynamic_pointer_cast<oc::SpaceInformation>(cpath->getSpaceInformation());
     ob::StateSpacePtr space = siC->getStateSpace();
-    cpath->clear();
+    // cpath->clear();
 
     std::vector<ob::State*> states;
     TiXmlElement* node_state = FindFirstSubNode(node, "state");
-    while(node_state!=nullptr){
+    while(node_state!=nullptr)
+    {
       std::vector<double> tmp = GetNodeVector<double>(node_state);
       ob::State *state = siC->allocState();
       space->copyFromReals(state, tmp);
@@ -879,11 +1022,13 @@ bool PathPiecewiseLinear::Load(TiXmlElement *node)
     uint N = quotient_space->GetControlDimensionality();
     std::vector<oc::Control*> controls;
     TiXmlElement* node_ctrl = FindFirstSubNode(node, "control");
-    while(node_ctrl!=nullptr){
+    while(node_ctrl!=nullptr)
+    {
       std::vector<double> tmp = GetNodeVector<double>(node_ctrl);
       oc::RealVectorControlSpace::ControlType *control = 
         static_cast<oc::RealVectorControlSpace::ControlType*>(siC->allocControl());
-      for(uint j = 0; j < N; j++){
+      for(uint j = 0; j < N; j++)
+      {
         control->values[j] = tmp.at(j);
       }
       controls.push_back(control);
@@ -892,7 +1037,8 @@ bool PathPiecewiseLinear::Load(TiXmlElement *node)
     //############################################################################
     TiXmlElement* node_ctrl_duration = FindFirstSubNode(node, "controlDuration");
     std::vector<double> controlDurations;
-    while(node_ctrl_duration!=nullptr){
+    while(node_ctrl_duration!=nullptr)
+    {
       std::stringstream ss = GetStreamText(node_ctrl_duration);
       double _tmp;
       ss >> _tmp;
@@ -900,22 +1046,26 @@ bool PathPiecewiseLinear::Load(TiXmlElement *node)
       node_ctrl_duration = FindNextSiblingNode(node_ctrl_duration);
     }
     //############################################################################
-    for(uint k = 0; k < controls.size(); k++){
+    for(uint k = 0; k < controls.size(); k++)
+    {
       cpath->append(states.at(k), controls.at(k), controlDurations.at(k));
     }
     cpath->append(states.back());
     //############################################################################
   }else{
+    ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
+    ob::StateSpacePtr space = si->getStateSpace();
+    space->setup();
     {
       og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-      ob::SpaceInformationPtr si = gpath.getSpaceInformation();
-      ob::StateSpacePtr space = si->getStateSpace();
       gpath.clear();
       TiXmlElement* node_state = FindFirstSubNode(node, "state");
-      while(node_state!=nullptr){
+      while(node_state!=nullptr)
+      {
         std::vector<double> tmp = GetNodeVector<double>(node_state);
         ob::State *state = si->allocState();
         space->copyFromReals(state, tmp);
+
         gpath.append(state);
         node_state = FindNextSiblingNode(node_state);
       }
@@ -923,11 +1073,10 @@ bool PathPiecewiseLinear::Load(TiXmlElement *node)
     }
     {
       og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path_raw);
-      ob::SpaceInformationPtr si = gpath.getSpaceInformation();
-      ob::StateSpacePtr space = si->getStateSpace();
       gpath.clear();
       TiXmlElement* node_state = FindFirstSubNode(node, "rawstate");
-      while(node_state!=nullptr){
+      while(node_state!=nullptr)
+      {
         std::vector<double> tmp = GetNodeVector<double>(node_state);
         ob::State *state = si->allocState();
         space->copyFromReals(state, tmp);
@@ -963,11 +1112,13 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
 
   AddSubNode(*node, "number_of_milestones", interLength.size()+1);
   AddComment(*node, "Interlength: Length between States");
-  for(uint k = 0; k < interLength.size(); k++){
+  for(uint k = 0; k < interLength.size(); k++)
+  {
     AddSubNode(*node, "interlength", interLength.at(k));
   }
 
-  if(quotient_space->isDynamic()){
+  if(quotient_space->isDynamic())
+  {
     AddComment(*node, "States: Sequence of Configurations in Bundle Space");
 
     oc::PathControl *cpath = static_cast<oc::PathControl*>(path.get());
@@ -977,7 +1128,8 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
 
     //############################################################################
     std::vector<ob::State *> states = cpath->getStates();
-    for(uint k = 0; k < states.size(); k++){
+    for(uint k = 0; k < states.size(); k++)
+    {
       std::vector<double> state_k_serialized;
       space->copyToReals(state_k_serialized, states.at(k));
       AddSubNodeVector(*node, "state", state_k_serialized);
@@ -987,7 +1139,8 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
     AddComment(*node, "Controls: Sequence of Controls applied inbetwen States");
 
     std::vector<oc::Control*> &controls = cpath->getControls();
-    for(uint k = 0; k < controls.size(); k++){
+    for(uint k = 0; k < controls.size(); k++)
+    {
       double *control = 
         controls.at(k)->as<oc::RealVectorControlSpace::ControlType>()->values;
       std::vector<double> control_k_serialized;
@@ -1000,7 +1153,8 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
     AddComment(*node, "Duration for each Control");
     std::vector<double> ctrlDurations = cpath->getControlDurations();
 
-    for(uint k = 0; k < ctrlDurations.size(); k++){
+    for(uint k = 0; k < ctrlDurations.size(); k++)
+    {
       AddSubNode(*node, "controlDuration", ctrlDurations.at(k));
     }
 
@@ -1022,15 +1176,17 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
 
     {
       AddComment(*node, "Raw States: Unsmoothed");
-
-      og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path_raw);
-      ob::SpaceInformationPtr si = gpath.getSpaceInformation();
-      ob::StateSpacePtr space = si->getStateSpace();
-      std::vector<ob::State *> states = gpath.getStates();
-      for(uint k = 0; k < states.size(); k++){
-        std::vector<double> state_k_serialized;
-        space->copyToReals(state_k_serialized, states.at(k));
-        AddSubNodeVector(*node, "rawstate", state_k_serialized);
+      if(path_raw)
+      {
+        og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path_raw);
+        ob::SpaceInformationPtr si = gpath.getSpaceInformation();
+        ob::StateSpacePtr space = si->getStateSpace();
+        std::vector<ob::State *> states = gpath.getStates();
+        for(uint k = 0; k < states.size(); k++){
+          std::vector<double> state_k_serialized;
+          space->copyToReals(state_k_serialized, states.at(k));
+          AddSubNodeVector(*node, "rawstate", state_k_serialized);
+        }
       }
     }
   }
@@ -1039,14 +1195,22 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
   
 std::ostream& operator<< (std::ostream& out, const PathPiecewiseLinear& pwl) 
 {
-  out << std::string(80, '-') << std::endl;
-  out << "[Path]" << std::endl;
+  out << "PathPiecewiseLinear " << std::string(80, '-') << std::endl;
   out << "Path Length   : " << pwl.length << std::endl;
   out << "Path Keyframes: " << pwl.interLength.size()+1 << std::endl;
-  double dstep = pwl.length/10.0;
-  for(double d = 0; d < pwl.length; d+=dstep){
-    out << pwl.Eval(d) << std::endl;  
+  // double dstep = pwl.length/10.0;
+  int ctr = 0;
+  int ctrMax = 10;
+  while(ctr <= ctrMax)
+  {
+    double d = ctr * pwl.length/(double)ctrMax;
+    out << ctr << "/" << ctrMax << " :" << pwl.Eval(d) << std::endl;  
+    ctr++;
   }
-  out << std::string(80, '-') << std::endl;
+  pwl.path->print(std::cout);
+  // for(double d = 0; d < pwl.length; d+=dstep){
+  //   out << pwl.Eval(d) << std::endl;  
+  // }
+  out << "PathPiecewiseLinear " << std::string(80, '-') << std::endl;
   return out;
 }

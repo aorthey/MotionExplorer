@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="drone" file="../../robots/drone/dddk.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="drone_sphere" file="../../robots/drone/dddk_inner_sphere.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="drone" file="../../robots/drone/dddk.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="drone_sphere" file="../../robots/drone/dddk_inner_sphere.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+  <terrain name="tree" file="../../terrains/drone/tree.tri">
+     <display color="0.6 0.6 0.6 1"/> 
+  </terrain>
+
+  <plannerinput>
+
+    <agent 
+      id="0" 
+      qinit="9  -1.0 +0.0 +0.5 0 0 0 0 0 0"
+      qgoal="9  +1.0 +0.0 +0.5 0 0 0 0 0 0"
+    />
+    <agent 
+      id="2" 
+      qinit="9  -1.2 -0.0 +0.5 0 0 0 0 0 0"
+      qgoal="9  +1.2 -0.0 +0.5 0 0 0 0 0 0"
+    />
+
+    <se3min config="6  -2.5 -2.5 0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +2.5 +2.5 4 +3.141593 +1.57 +3.141593"/>
+
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>0.1</maxplanningtime>      <!-- runtime in (s) --> 
+    <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
+    <pathWidth>0.05</pathWidth>
+    <algorithm name="multilevel:explorer"/>
+    <algorithm name="multilevel:qrrt"/>
+    <!-- <algorithm name="multilevel:explorer"/> -->
+    <algorithm name="ompl:rrt"/>
+
+    <multiAgent>1</multiAgent>
+
+    <multilevel>
+      <level>
+        <robot id="1" freeFloating="1" simplification_of_id="1" type="R3"/>
+      </level>
+      <level>
+        <robot id="1" freeFloating="1" simplification_of_id="0" type="R3"/>
+        <robot id="3" freeFloating="1" simplification_of_id="2" type="R3"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" type="SE3"/>
+        <robot id="2" freeFloating="1" type="SE3"/>
+      </level>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

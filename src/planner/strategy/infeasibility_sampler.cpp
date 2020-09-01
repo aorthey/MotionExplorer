@@ -1,4 +1,5 @@
 #include "infeasibility_sampler.h"
+#include "util.h"
 
 
 using namespace ompl::geometric;
@@ -16,15 +17,14 @@ ompl::base::PlannerStatus InfeasibilitySampler::solve(const ompl::base::PlannerT
   while(!ptc())
   {
     sampler->sampleUniform(testState);
-    if(!si_->isValid(testState)){
+    if(!si_->isValid(testState))
+    {
       ob::State *q = si_->cloneState(testState);
       states.push_back(q);
     }
   }
   return ompl::base::PlannerStatus::EXACT_SOLUTION;
-
 }
-
 
 void InfeasibilitySampler::clear()
 {
@@ -41,5 +41,4 @@ void InfeasibilitySampler::getPlannerData(ob::PlannerData &data) const
     ob::PlannerDataVertex p(states.at(k));
     data.addVertex(p);
   }
-  std::cout << "Sampled " << data.numVertices() << " infeasible vertices." << std::endl;
 }

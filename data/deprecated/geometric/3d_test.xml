@@ -28,8 +28,10 @@
     <freeFloating>1</freeFloating>
 
     <hierarchy>
-      <level inner_index="1" type="R3"/>
-      <level inner_index="0" type="SE3"/>
+      <level robot_index="1" type="R3"/>
+      <level robot_index="1" type="R3"/>
+      <level robot_index="0" type="SE3"/>
+      <level robot_index="0" type="SE3"/>
     </hierarchy>
 
   </plannerinput>

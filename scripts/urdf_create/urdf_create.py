@@ -133,6 +133,16 @@ def createRotatedCylinder(lname,x,y,z,r,p,yaw,radius,length,COLLISION_ENABLED=Tr
     s+= ' </link>\n\n'
   return s
 
+def createEmptyLink(lname,x,y,z):
+  Ixx = Iyy = Izz = (2.0/5.0)*mass
+  s=''
+  s+='<link name="'+lname+'" physical="0">\n'
+  s+='  <inertial>\n'
+  s+='   <mass value="'+str(mass)+'"/>\n'
+  s+='   <inertia ixx="'+str(Ixx)+'" ixy="0" ixz="0" iyy="'+str(Iyy)+'" iyz="0" izz="'+str(Izz)+'"/>\n'
+  s+='  </inertial>\n'
+  s+='</link>\n\n'
+  return s
 def createSphere(lname,x,y,z,radius,PHYSICAL=True):
   Ixx = Iyy = Izz = (2.0/5.0)*mass*radius*radius
   s=''
@@ -159,11 +169,11 @@ def createSphere(lname,x,y,z,radius,PHYSICAL=True):
   s+='</link>\n\n'
   return s
 
-def createRigidJoint(parentname, childname, x=0, y=0, z=0, prefix=""):
+def createRigidJoint(parentname, childname, x=0, y=0, z=0, r=0, p=0, yaw=0, prefix=""):
   jname = prefix+"joint_fixed_"+parentname+"_"+childname
   s= ''
   s+='<joint name="'+jname+'" type="fixed">\n'
-  s+='  <origin rpy="0 0 0" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
+  s+='  <origin rpy="'+str(r)+' '+str(p)+' '+str(yaw)+'" xyz="'+str(x)+' '+str(y)+' '+str(z)+'"/>\n'
   s+='  <parent link="'+parentname+'"/>\n'
   s+='  <child link="'+childname+'"/>\n'
   s+='</joint>\n\n'

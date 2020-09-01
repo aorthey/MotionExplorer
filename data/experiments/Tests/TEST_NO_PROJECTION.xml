@@ -25,18 +25,18 @@
     <pathSpeed>3</pathSpeed>
     <freeFloating>1</freeFloating>
     <smoothPath>1</smoothPath>
-    <algorithm name="hierarchy:explorer"/>
-    <algorithm name="hierarchy:qrrt"/>
+    <algorithm name="multilevel:explorer"/>
+    <algorithm name="multilevel:qrrt"/>
     <!-- <algorithm name="ompl:rrt"/> -->
 
     <multiAgent>1</multiAgent>
 
-    <hierarchy>
+    <multilevel>
       <level>
         <robot id="0" freeFloating="1" type="R2"/>
         <robot id="1" freeFloating="1" type="R2"/>
       </level>
-    </hierarchy>
+    </multilevel>
 
   </plannerinput>
 </world>

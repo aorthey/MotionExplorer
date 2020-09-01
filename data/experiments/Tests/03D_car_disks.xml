@@ -28,16 +28,14 @@
     <!-- <smoothPath>1</smoothPath> -->
     <freeFloating>1</freeFloating>
 
-    <algorithm name="hierarchy:qrrt"/>
-    <algorithm name="hierarchy:explorer"/>
-    <hierarchy>
-      <level inner_index="0" type="SE2" finite_horizon_relaxation="10"/>
-      <level inner_index="0" type="SE2"/>
-    </hierarchy>
+    <algorithm name="multilevel:qrrt"/>
+    <algorithm name="multilevel:explorer"/>
+    <multilevel>
+      <level robot_index="0" type="SE2" finite_horizon_relaxation="10"/>
+      <level robot_index="0" type="SE2"/>
+    </multilevel>
 
   </plannerinput>
 
 </world>
-
-
 

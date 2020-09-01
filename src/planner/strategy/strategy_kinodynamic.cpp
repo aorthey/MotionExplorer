@@ -3,14 +3,12 @@
 #include "planner/benchmark/benchmark_input.h"
 #include "util.h"
 
-#include <ompl/geometric/planners/explorer/Explorer.h>
-#include <ompl/geometric/planners/multilevel/QRRT.h>
-#include <ompl/geometric/planners/multilevel/QRRTStar.h>
-#include <ompl/geometric/planners/multilevel/QMP.h>
-#include <ompl/geometric/planners/multilevel/QMPStar.h>
-#include <ompl/geometric/planners/multilevel/SPQR.h>
+#include <ompl/multilevel/planners/explorer/MotionExplorer.h>
+#include <ompl/multilevel/planners/qrrt/QRRT.h>
+#include <ompl/multilevel/planners/qrrt/QRRTStar.h>
+#include <ompl/multilevel/planners/qmp/QMP.h>
+#include <ompl/multilevel/planners/qmp/QMPStar.h>
 
-#include <ompl/control/optimizers/Optimizer.h>
 #include <ompl/geometric/PathGeometric.h>
 
 #include <ompl/control/planners/rrt/RRT.h>
@@ -31,6 +29,7 @@
 #include <boost/lexical_cast.hpp>
 
 namespace ot = ompl::tools;
+namespace om = ompl::multilevel;
 
 static ob::OptimizationObjectivePtr getThresholdPathLengthObj(const ob::SpaceInformationPtr& si)
 {
@@ -91,26 +90,24 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
   //   planner = std::make_shared<oc::SyclopRRT>(si);
   // }else if(algorithm=="ompl:dynamic:syclopest"){
   //   planner = std::make_shared<oc::SyclopEST>(si);
-  }else if(algorithm=="hierarchy:explorer"){
-    planner = std::make_shared<og::MotionExplorer>(si_vec);
-  }else if(algorithm=="hierarchy:qrrt"){
-    planner = std::make_shared<og::QRRT>(si_vec);
-  }else if(algorithm=="hierarchy:qrrtstar"){
-    planner = std::make_shared<og::QRRTStar>(si_vec);
-  }else if(algorithm=="hierarchy:qmp"){
-    planner = std::make_shared<og::QMP>(si_vec);
-  }else if(algorithm=="hierarchy:qmpstar"){
-    planner = std::make_shared<og::QMPStar>(si_vec);
-  }else if(algorithm=="hierarchy:spqr"){
-    planner = std::make_shared<og::SPQR>(si_vec);
-  }else if(algorithm=="optimizer"){
-    si->setup();
-    CSpaceOMPL* cspace = input.cspace_levels.back();
-    PathPiecewiseLinear *path = new PathPiecewiseLinear(cspace);
-    std::string fpath = input.name_loadPath;
-    path->Load(fpath.c_str());
-    std::cout << "load current path from : " << fpath << std::endl;
-    planner = std::make_shared<oc::Optimizer>(si, path->GetOMPLPath());
+  }else if(algorithm=="multilevel:explorer"){
+    planner = std::make_shared<om::MotionExplorer>(si_vec);
+  }else if(algorithm=="multilevel:qrrt"){
+    planner = std::make_shared<om::QRRT>(si_vec);
+  }else if(algorithm=="multilevel:qrrtstar"){
+    planner = std::make_shared<om::QRRTStar>(si_vec);
+  }else if(algorithm=="multilevel:qmp"){
+    planner = std::make_shared<om::QMP>(si_vec);
+  }else if(algorithm=="multilevel:qmpstar"){
+    planner = std::make_shared<om::QMPStar>(si_vec);
+  // }else if(algorithm=="optimizer"){
+  //   si->setup();
+  //   CSpaceOMPL* cspace = input.cspace_levels.back();
+  //   PathPiecewiseLinear *path = new PathPiecewiseLinear(cspace);
+  //   std::string fpath = input.name_loadPath;
+  //   path->Load(fpath.c_str());
+  //   std::cout << "load current path from : " << fpath << std::endl;
+  //   planner = std::make_shared<oc::Optimizer>(si, path->GetOMPLPath());
   }else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     throw "Planner unknown.";
@@ -179,7 +176,6 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
   // choose planner
   //###########################################################################
   // const oc::SpaceInformationPtr si = static_pointer_cast<oc::SpaceInformation>(planner->getSpaceInformation());
-  // si->getStateSpace()->registerProjections();
   // si->setMinMaxControlDuration(0.01, 0.1);
   // si->setPropagationStepSize(1);
   // si->getStateSpace()->registerDefaultProjection(ob::ProjectionEvaluatorPtr(new SE3Project0r(si->getStateSpace())));
@@ -195,6 +191,7 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
   // planner->getProblemDefinition()->getOptimizationObjective()->setCostThreshold(ob::Cost(minimalCostAcceptable));
 
   ompl::time::point start = ompl::time::now();
+  planner->getSpaceInformation()->getStateSpace()->registerProjections();
   planner->solve(ptc);
   output.planner_time = ompl::time::seconds(ompl::time::now() - start);
   output.max_planner_time = max_planning_time;
@@ -203,11 +200,11 @@ void StrategyKinodynamicMultiLevel::Plan( StrategyOutput &output)
   ob::PlannerDataPtr pd( new ob::PlannerData(planner->getSpaceInformation()) );
   planner->getPlannerData(*pd);
 
-  unsigned int N = planner->getProblemDefinition()->getSolutionCount();
-  if(N>0){
-      ob::PlannerSolution solution = planner->getProblemDefinition()->getSolutions().at(0);
-      pd->path_ = solution.path_;
-  }
+  // unsigned int N = planner->getProblemDefinition()->getSolutionCount();
+  // if(N>0){
+  //     ob::PlannerSolution solution = planner->getProblemDefinition()->getSolutions().at(0);
+  //     // pd->path_ = solution.path_;
+  // }
 
   output.SetPlannerData(pd);
   output.SetProblemDefinition(planner->getProblemDefinition());

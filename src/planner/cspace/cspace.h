@@ -9,6 +9,7 @@
 #include <ompl/control/SpaceInformation.h>
 #include <ompl/control/ControlSpace.h>
 #include <Planning/RobotCSpace.h>
+#include <mutex>
 
 namespace ob = ompl::base;
 namespace oc = ompl::control;
@@ -23,6 +24,8 @@ namespace ompl{
   }
 }
 
+class PathPiecewiseLinear;
+
 class CSpaceOMPL
 {
   friend class CSpaceOMPLMultiAgent;
@@ -35,6 +38,8 @@ class CSpaceOMPL
 
     //############################################################################
     //Mapping Functions OMPL <--> KLAMPT
+    // virtual void ConfigTimeToOMPLState(const Config &q, ob::State *qompl, double time = 0);
+
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) = 0;
     virtual void ConfigVelocityToOMPLState(const Config &q, const Config &dq, ob::State *qompl);
     virtual ob::ScopedState<> ConfigVelocityToOMPLState(const Config &q, const Config &dq);
@@ -47,9 +52,17 @@ class CSpaceOMPL
     //############################################################################
 
     virtual double GetTime(const ob::State *qompl);
+    virtual void SetTime(ob::State *qompl, double time);
+    virtual void SetTime(ob::ScopedState<> &qompl, double time);
+
+    void setFixedTimePath(std::string file);
+
     virtual bool isTimeDependent();
+
     virtual bool SatisfiesBounds(const ob::State*);
     virtual bool UpdateRobotConfig(Config &q);
+
+    virtual Config GetRobotConfigAtTime(double t);
 
     virtual void setStateValidityCheckerConstraintRelaxation(ob::State *xCenter, double r);
     const ob::StateValidityCheckerPtr StateValidityCheckerPtr();
@@ -78,6 +91,8 @@ class CSpaceOMPL
     std::vector<double> EulerZYXFromOMPLSO3StateSpace( const ob::SO3StateSpace::StateType *q );
     void OMPLSO3StateSpaceFromEulerZYX( double rz, double ry, double rx, ob::SO3StateSpace::StateType *q );
 
+    std::recursive_mutex& getLock();
+
     virtual bool isDynamic() const = 0;
     bool isFixedBase();
     bool isFreeFloating();
@@ -95,6 +110,7 @@ class CSpaceOMPL
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
     virtual void initSpace() = 0;
 
+    std::recursive_mutex lock_;
     CSpaceInput input;
 
     uint Nklampt;
@@ -128,5 +144,9 @@ class CSpaceOMPL
     WorldPlannerSettings worldsettings;
     int robot_idx{0};
     int robot_idx_outer{0};
+
+    bool isTimeDependent_{false};
+    std::shared_ptr<PathPiecewiseLinear> path_{nullptr};
+    std::string file_;
 
 };

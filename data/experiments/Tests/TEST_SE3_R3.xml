@@ -34,7 +34,7 @@
 
     <multiAgent>1</multiAgent>
 
-    <hierarchy>
+    <multilevel>
       <level>
         <robot id="1" freeFloating="1" simplification_of_id="1" type="R3"/>
       </level>
@@ -46,7 +46,7 @@
         <robot id="0" freeFloating="1" type="SE3"/>
         <robot id="2" freeFloating="1" type="SE3"/>
       </level>
-    </hierarchy>
+    </multilevel>
 
   </plannerinput>
 

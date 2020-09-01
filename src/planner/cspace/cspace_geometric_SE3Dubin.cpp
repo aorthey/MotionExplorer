@@ -1,5 +1,5 @@
 #include "planner/cspace/cspace_geometric_SE3Dubin.h"
-#include <ompl/base/spaces/DubinsAirplaneStateSpace.h>
+#include "ompl/base/spaces/DubinsAirplaneStateSpace.h"
 
 GeometricCSpaceOMPLSE3Dubin::GeometricCSpaceOMPLSE3Dubin(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)

@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <!-- Prioritized Multi-Robot Motion Planning -->
+  <robot name="drone" file="../../robots/drone/dddk.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+  <rigidObject  name="tree" file="../../terrains/drone/tree_single.tri"
+      translation="+1 0 0">
+     <display color="0.6 0.6 0.6 1"/> 
+  </rigidObject>
+
+  <rigidObject  name="tree2" file="../../terrains/drone/tree_single.tri" 
+    translation="-1.5 -2 0"
+    rotateRPY="0 0 1.57">
+     <display color="0.6 0.6 0.6 1"/> 
+  </rigidObject>
+
+  <rigidObject  name="tree3" file="../../terrains/drone/tree_single.tri" 
+    translation="-1 +1.5 0"
+    rotateRPY="0 0 0.57">
+     <display color="0.6 0.6 0.6 1"/> 
+  </rigidObject>
+
+  <terrain name="plane" file="../../terrains/primitives/plane.tri">
+     <display color="0.6 0.6 0.6 1"/> 
+  </terrain>
+
+  <plannerinput>
+
+    <agent 
+      id="0" 
+      qinit="9  -2.0 +0.0 +0.5 0 0 0 0 0 0"
+      qgoal="9  +2.0 +0.5 +0.5 0 0 0 0 0 0"
+    />
+    <agent 
+      id="1" 
+      qinit="9  -2.0 -0.4 +0.5 0 0 0 0 0 0"
+      qgoal="9  +2.0 +0.1 +0.5 0 0 0 0 0 0"
+    />
+    <agent 
+      id="2" 
+      qinit="9  -2.3 -0.0 +0.5 0 0 0 0 0 0"
+      qgoal="9  +2.3 +0.5 +0.5 0 0 0 0 0 0"
+    />
+    <agent 
+      id="3" 
+      qinit="9  -2.3 -0.4 +0.5 0 0 0 0 0 0"
+      qgoal="9  +2.3 +0.1 +0.5 0 0 0 0 0 0"
+    />
+    <agent 
+      id="4" 
+      qinit="9  -2.3 -0.8 +0.5 0 0 0 0 0 0"
+      qgoal="9  +2.3 -0.3 +0.5 0 0 0 0 0 0"
+    />
+    <agent 
+      id="5" 
+      qinit="9  -2.0 -0.8 +0.5 0 0 0 0 0 0"
+      qgoal="9  +2.0 -0.3 +0.5 0 0 0 0 0 0"
+    />
+    <agent 
+      id="6" 
+      qinit="9  -2.0 -1.2 +0.5 0 0 0 0 0 0"
+      qgoal="9  +2.0 -0.8 +0.5 0 0 0 0 0 0"
+    />
+    <agent 
+      id="7" 
+      qinit="9  -2.3 -1.2 +0.5 0 0 0 0 0 0"
+      qgoal="9  +2.3 -0.8 +0.5 0 0 0 0 0 0"
+    />
+
+    <se3min config="6  -3 -2 0 -3.141593 -0.1 -0.1"/> <!-- YPR -->
+    <se3max config="6  +3 +2 3 +3.141593 +0.1 +0.1"/>
+
+    <epsilongoalregion>0.01</epsilongoalregion>
+    <maxplanningtime>10</maxplanningtime>      <!-- runtime in (s) --> 
+    <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
+    <pathWidth>0.02</pathWidth>
+
+    <multiAgent>1</multiAgent>
+
+    <!-- SE3C = R3 x SO2 x R2 with limited roll pitch, unlimited yaw -->
+    <multilevel>
+      <level>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE3C"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE3C"/>
+        <robot id="1" freeFloating="1" simplification_of_id="1" type="SE3C"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE3C"/>
+        <robot id="1" freeFloating="1" simplification_of_id="1" type="SE3C"/>
+        <robot id="2" freeFloating="1" simplification_of_id="2" type="SE3C"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE3C"/>
+        <robot id="1" freeFloating="1" simplification_of_id="1" type="SE3C"/>
+        <robot id="2" freeFloating="1" simplification_of_id="2" type="SE3C"/>
+        <robot id="3" freeFloating="1" simplification_of_id="3" type="SE3C"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE3C"/>
+        <robot id="1" freeFloating="1" simplification_of_id="1" type="SE3C"/>
+        <robot id="2" freeFloating="1" simplification_of_id="2" type="SE3C"/>
+        <robot id="3" freeFloating="1" simplification_of_id="3" type="SE3C"/>
+        <robot id="4" freeFloating="1" simplification_of_id="4" type="SE3C"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE3C"/>
+        <robot id="1" freeFloating="1" simplification_of_id="1" type="SE3C"/>
+        <robot id="2" freeFloating="1" simplification_of_id="2" type="SE3C"/>
+        <robot id="3" freeFloating="1" simplification_of_id="3" type="SE3C"/>
+        <robot id="4" freeFloating="1" simplification_of_id="4" type="SE3C"/>
+        <robot id="5" freeFloating="1" simplification_of_id="5" type="SE3C"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE3C"/>
+        <robot id="1" freeFloating="1" simplification_of_id="1" type="SE3C"/>
+        <robot id="2" freeFloating="1" simplification_of_id="2" type="SE3C"/>
+        <robot id="3" freeFloating="1" simplification_of_id="3" type="SE3C"/>
+        <robot id="4" freeFloating="1" simplification_of_id="4" type="SE3C"/>
+        <robot id="5" freeFloating="1" simplification_of_id="5" type="SE3C"/>
+        <robot id="6" freeFloating="1" simplification_of_id="6" type="SE3C"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" type="SE3C"/>
+        <robot id="1" freeFloating="1" type="SE3C"/>
+        <robot id="2" freeFloating="1" type="SE3C"/>
+        <robot id="3" freeFloating="1" type="SE3C"/>
+        <robot id="4" freeFloating="1" type="SE3C"/>
+        <robot id="5" freeFloating="1" type="SE3C"/>
+        <robot id="6" freeFloating="1" type="SE3C"/>
+        <robot id="7" freeFloating="1" type="SE3C"/>
+      </level>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="2dof" file="../robots/planar/2dof_manip_no_endeffector.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
+  <!-- <robot name="1dof_inner" file="../robots/planar/2dof_testobj_1dof_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>-->
+  <!-- when adding/removing links remember to adjust configurations -->
+
+  <terrain name="rectangleBottom1" file="../terrains/primitives/rectangle.tri" translation="+3.2 -2.5 0" rotateRPY="0 0 0" scale="4 2 1"/>
+  <terrain name="rectangleBottom2" file="../terrains/primitives/rectangle.tri" translation="+2.6 +2.5 0" rotateRPY="0 0 0" scale="4 2 1"/>
+
+  <plannerinput>
+
+    <qinit  config="10  +2.2 -1 0 0 0 0  2.35619 0.0 1.55 0 "/>
+    <qgoal  config="10  +2.2 +1.75 0 0 0 0  2.35619 0.0 1.55 0 "/>
+
+    <se3min config="6  +0.5 -2.5 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +2.5 +2.5 +0.0 +3.141593 +1.57 +3.141593"/>
+    <epsilongoalregion>0.05</epsilongoalregion>
+    <maxplanningtime>5</maxplanningtime>      <!-- runtime in (s) -->
+    <smoothPath>0</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
+    <pathSpeed>15</pathSpeed>
+    <pathWidth>0.05</pathWidth>
+    <freeFloating>1</freeFloating>
+
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:rrt"/>
+    <algorithm name="ompl:prm"/>
+    <algorithm name="ompl:lazyprm"/>
+    <!--<algorithm name="benchmark:contact"/> -->
+
+    <!-- jlink2 is the end of fatter link ("endeffector"),
+         jlink0 is the root (start of thin link) -->
+    <contacts>
+      <contact robot_name="2dof" robot_link="jlink2" 
+               mode="fixed"
+               mesh="rectangleBottom1" />
+      <contact robot_name="2dof" robot_link="jlink0"
+               mode="transition"
+               meshFrom="rectangleBottom1"
+               meshTo="rectangleBottom2"/>
+    </contacts>
+
+    <multilevel>
+      <level robot_index="0" type="R2_CONTACT"/>
+    </multilevel>
+
+  </plannerinput>
+</world>
+

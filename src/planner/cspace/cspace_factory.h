@@ -1,8 +1,8 @@
 #pragma once
 #include "planner/cspace/cspace.h"
+#include "planner/cspace/cspace_time.h"
 #include "planner/cspace/cspace_geometric.h"
 #include "planner/cspace/cspace_geometric_empty.h"
-#include "planner/cspace/cspace_geometric_R_CONTACT.h"
 
 #include "planner/cspace/cspace_multiagent.h"
 #include "planner/cspace/cspace_kinodynamic.h"
@@ -14,13 +14,15 @@
 #include "planner/cspace/cspace_geometric_SolidCylinder.h"
 #include "planner/cspace/cspace_geometric_Annulus.h"
 #include "planner/cspace/cspace_geometric_Circular.h"
-#include "planner/cspace/cspace_geometric_RN_time.h"
 #include "planner/cspace/cspace_geometric_SE2RN.h"
 #include "planner/cspace/cspace_geometric_SE2Dubin.h"
 #include "planner/cspace/cspace_geometric_SE3Dubin.h"
 #include "planner/cspace/cspace_geometric_SE3_constrained.h"
 #include "planner/cspace/cspace_geometric_SO2RN.h"
 #include "planner/cspace/cspace_geometric_R3S2.h"
+#include "planner/cspace/cspace_geometric_contact.h"
+#include "planner/cspace/cspace_geometric_contact_2d.h"
+#include "planner/cspace/cspace_geometric_contact_3d.h"
 #include "planner/cspace/cspace_geometric_fixedbase.h"
 #include "planner/cspace/cspace_input.h"
 
@@ -58,13 +60,6 @@ class CSpaceFactory{
       cspace->SetCSpaceInput(input);
       cspace->Init();
       return cspace;
-    }
-    // CSpace  R CONTACT
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceRCONTACT( RobotWorld *world, int robot_idx){
-        GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLRCONTACT(world, robot_idx);
-        cspace->SetCSpaceInput(input);
-        cspace->Init();
-        return cspace;
     }
 
     // CSpace  SE(3)
@@ -118,6 +113,20 @@ class CSpaceFactory{
       cspace->Init();
       return cspace;
     }
+    // CSpace  R CONTACT 2D
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceContact2D( RobotWorld *world, int robot_idx){
+        GeometricCSpaceOMPL *cspace = new GeometricCSpaceContact2D(world, robot_idx);
+        cspace->SetCSpaceInput(input);
+        cspace->Init();
+        return cspace;
+    }
+    // CSpace  R CONTACT 3D
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceContact3D( RobotWorld *world, int robot_idx){
+        GeometricCSpaceOMPL *cspace = new GeometricCSpaceContact3D(world, robot_idx);
+        cspace->SetCSpaceInput(input);
+        cspace->Init();
+        return cspace;
+    }
     // CSpace  SO(2)
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSO2( RobotWorld *world, int robot_idx){
       return MakeGeometricCSpaceSO2RN(world, robot_idx);
@@ -137,15 +146,16 @@ class CSpaceFactory{
       return cspace;
     }
     // CSpace  Empty
-    virtual GeometricCSpaceOMPL* MakeEmptySetSpace( RobotWorld *world){
-      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLEmpty(world);
+    virtual GeometricCSpaceOMPL* MakeEmptySetSpace( RobotWorld *world, int robot_idx){
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLEmpty(world, robot_idx);
       cspace->SetCSpaceInput(input);
       cspace->Init();
       return cspace;
     }
     // CSpace  R^(N) + Time
-    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceRNTime( RobotWorld *world, int robot_idx, int dimension){
-      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLRNTime(world, robot_idx, dimension);
+    virtual CSpaceOMPL* MakeCSpaceTime( RobotWorld *world)
+    {
+      CSpaceOMPL *cspace = new CSpaceOMPLTime(world);
       cspace->SetCSpaceInput(input);
       cspace->Init();
       return cspace;

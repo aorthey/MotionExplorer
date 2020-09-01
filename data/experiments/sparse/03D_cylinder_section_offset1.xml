@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="cylinder" file="../../robots/planar/PlanarRectangle.urdf"/>
+  <robot name="disk" file="../../robots/planar/disk_0_36.urdf"/>
+
+  <rigidObject file="../../terrains/primitives/cuboid.tri" translation="0 +1.4 -0" rotateRPY="0 0 0"/>
+  <rigidObject file="../../terrains/primitives/cuboid.tri" translation="0 -1.4 +0" rotateRPY="0 0 0"/>
+
+  <plannerinput>
+
+    <qinit  config="6  -2 0.6 0 1.57 0 0"/>
+    <qgoal  config="6  +2 0.6 0 1.57 0 0"/>
+    <se3min config="6  -2.0 -1.0 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +2.0 +1.0 +0.0 +3.141593 +1.57 +3.141593"/>
+    <freeFloating>1</freeFloating>
+    <smoothPath>0</smoothPath>
+    <maxplanningtime>0.5</maxplanningtime>
+    <pathSpeed>3</pathSpeed>
+
+    <algorithm name="multilevel:spqr"/>
+    <algorithm name="sampler"/>
+    <algorithm name="multilevel:sampler"/>
+    <algorithm name="ompl:prm"/>
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:rrt"/>
+
+    <multilevel>
+      <level robot_index="1" type="R2" path="../../paths/cylinder_Object_0.path"/> 
+      <level robot_index="0" type="SE2"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>
+

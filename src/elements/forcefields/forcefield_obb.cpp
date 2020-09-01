@@ -3,6 +3,7 @@
 #include "gui/colors.h"
 
 using namespace Math3D;
+using namespace GLDraw;
 ForceFieldTypes OrientedBoundingBoxForceField::type()
 {
   return OBB;

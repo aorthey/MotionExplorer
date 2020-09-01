@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<world>
+
+  <robot name="kuka_lwr" file="../../robots/kuka_lwr/kuka.urdf"/>
+  <robot name="kuka_lwr_2links" file="../../robots/kuka_lwr/kuka_2links.urdf"/>
+
+  <robot name="kuka_lwr" file="../../robots/kuka_lwr/kuka.urdf"/>
+  <robot name="kuka_lwr_2links" file="../../robots/kuka_lwr/kuka_2links.urdf"/>
+
+  <robot name="drone" file="../../robots/drone/dddk_2.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+  <robot name="drone_sphere" file="../../robots/drone/dddk_2_inner_sphere.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+  <rigidObject file="../../terrains/primitives/cuboid_1meter.tri" translation="+0.5 0 0.5"/>
+  <rigidObject file="../../terrains/primitives/cuboid_1meter.tri" translation="+0.5 0 -0.5"/>
+
+  <plannerinput>
+    <agent 
+      id="0" 
+      qinit="13  0 +0.9 0 0 0 1.57 1.57 -1.0 0.0 -0.8 0 -0.0 0"
+      qgoal="13  0 +0.9 0 0 0 1.57 1.57 +1.0 0.0 +0.8 0 -0.0 0"
+    />
+    <agent 
+      id="2" 
+      qinit="13  0 -0.9 0 3.14 0 1.57 1.57 +1 0 +0.8 0 -0.0 0"
+      qgoal="13  0 -0.9 0 3.14 0 1.57 1.57 -1 0 -0.8 0 -0.0 0"
+    />
+    <agent 
+      id="4" 
+      qinit="9  -1.0 +0.0 +0 0 0 0 0 0 0"
+      qgoal="9  +1.5 +0.0 +0 0 0 0 0 0 0"
+    />
+
+    <se3min config="6  -1 -0.75 -0.5 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +1.5 +0.75 +0.5 +3.141593 +1.57 +3.141593"/>
+
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <pathSpeed>3</pathSpeed>
+    <pathWidth>0.0</pathWidth>
+    <smoothPath>1</smoothPath>
+    <algorithm name="multilevel:explorer"/>
+    <algorithm name="multilevel:qrrt"/>
+    <!-- <algorithm name="ompl:rrt"/> -->
+
+    <multiAgent>1</multiAgent>
+
+    <multilevel>
+      <level>
+        <robot id="0" freeFloating="0" simplification_of_id="0" type="R7"/>
+        <robot id="2" freeFloating="0" simplification_of_id="2" type="R7"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="0" simplification_of_id="0" type="R7"/>
+        <robot id="2" freeFloating="0" simplification_of_id="2" type="R7"/>
+        <robot id="5" freeFloating="1" simplification_of_id="4" type="R3"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="0" type="R7"/>
+        <robot id="2" freeFloating="0" type="R7"/>
+        <robot id="4" freeFloating="1" type="SE3"/>
+      </level>
+    </multilevel>
+
+  </plannerinput>
+</world>
+

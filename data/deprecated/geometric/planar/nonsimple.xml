@@ -24,8 +24,10 @@
     <maxplanningtime>0.5</maxplanningtime>
 
     <hierarchy>
-      <level inner_index="1" outer_index="2" type="R2"/>
-      <level inner_index="0" type="SE2"/>
+      <level robot_index="1" outer_index="2" type="R2"/>
+      <level robot_index="1" outer_index="2" type="R2"/>
+      <level robot_index="0" type="SE2"/>
+      <level robot_index="0" type="SE2"/>
     </hierarchy>
 
   </plannerinput>

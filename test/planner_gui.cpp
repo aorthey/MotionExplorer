@@ -6,13 +6,13 @@ int main(int argc, char **argv) {
 
   EnvironmentLoader env = EnvironmentLoader::from_args(argc, argv);
 
-  // env.RenameExec(argc, argv, "MotionPlanningExplorer");
+  env.RenameExec(argc, argv, "MotionExplorer");
 
   PlannerMultiInput in = env.GetPlannerInput();
 
   GLUIPlannerGUI gui(env.GetBackendPtr(), env.GetWorldPtr());
   gui.AddPlannerInput(in);
-  gui.SetWindowTitle("MotionPlannerGUI");
+  gui.SetWindowTitle("MotionExplorerGUI");
   if(in.inputs.empty()) env.GetBackendPtr()->state("draw_robot").active = 1;
 
   std::cout << std::string(80, '-') << std::endl;

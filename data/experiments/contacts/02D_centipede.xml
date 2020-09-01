@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="centipede" file="../../robots/contact/centipede.urdf" translation="0 0 0" rotateRPY="0 0 0"></robot>
+
+  <terrain name="rectangleBottom1" file="../../terrains/primitives/rectangle.tri" translation="+1 -1 +0.25" rotateRPY="0 0 0" scale="4 1 10"/>
+  <plannerinput>
+
+    <qinit config="59  0 -3 1.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.55 0 0 0 0 0 0 1.57 0 0 0 0 0 0 0 1.57 0 0 0 0 0 0 1.57 0 0 0 0 0 0 0 1.57 0 0 0 0 0 0 1.57 0 0 0 "/>
+    <qgoal config="59  0 +3 1.5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.55 0 0 0 0 0 0 1.57 0 0 0 0 0 0 0 1.57 0 0 0 0 0 0 1.57 0 0 0 0 0 0 0 1.57 0 0 0 0 0 0 1.57 0 0 0 "/>
+
+    <se3min config="6  -5 -5 -5 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +5 +5 +5 +3.141593 +1.57 +3.141593"/>
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>2</maxplanningtime>      <!-- runtime in (s) --> 
+    <freeFloating>1</freeFloating>
+
+    <algorithm name="ompl:prmstar"/>
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:rrt"/>
+    <algorithm name="multilevel:qrrt"/>
+
+    <contacts>
+      <contact robot_name="centipede" 
+               robot_link="pair2leg2foot"
+               mode="fixed"
+               mesh="rectangleBottom1" />
+      <contact robot_name="centipede" 
+               robot_link="pair2leg1foot"
+               mode="fixed"
+               mesh="rectangleBottom1" />
+      <contact robot_name="centipede" 
+               robot_link="pair1leg1foot"
+               mode="fixed"
+               mesh="rectangleBottom1" />
+      <contact robot_name="centipede" 
+               robot_link="pair1leg2foot"
+               mode="fixed"
+               mesh="rectangleBottom1" />
+      <contact robot_name="centipede" 
+               robot_link="pair0leg1foot"
+               mode="fixed"
+               mesh="rectangleBottom1" />
+      <contact robot_name="centipede" 
+               robot_link="pair0leg2foot"
+               mode="fixed"
+               mesh="rectangleBottom1" />
+     </contacts>
+
+    <multilevel>
+        <level robot_index="0" type="R3_CONTACT"/>
+    </multilevel>
+  </plannerinput>
+</world>
+

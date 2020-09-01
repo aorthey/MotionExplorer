@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<world>
+  <robot file="../../robots/disks/1.urdf" translation="0 0 0.05"/>
+  <robot file="../../robots/disks/2.urdf" translation="0 0 0.05"/>
+
+  <!-- <terrain file="../../terrains/primitives/plane.tri"> -->
+  <!--    <display color="0.6 0.6 0.6 1"/> --> 
+  <!-- </terrain> -->
+  <!-- <rigidObject file="../../terrains/primitives/cylinder.tri"> -->
+
+  <plannerinput>
+
+    <agent 
+      id="0" 
+      qinit="6  -1 0 0 0 0 0"
+      qgoal="6  +1 0 0 0 0 0"
+      qMin="6  -1 0 0 0 0 0"
+      qMax="6  +1 0 0 0 0 0"
+    />
+    <agent 
+      id="1" 
+      qinit="6  0 -1 0 0 0 0"
+      qgoal="6  0 +1 0 0 0 0"
+      qMin="6  0 -1 0 0 0 0"
+      qMax="6  0 +1 0 0 0 0"
+    />
+    <se3min config="6  -1 -1 0 -3.141593 0 0"/>
+    <se3max config="6  +1 +1 0 +3.141593 0 0"/>
+
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>0.05</maxplanningtime>      <!-- runtime in (s) --> 
+    <pathBorderWidth>3</pathBorderWidth>
+    <pathWidth>0.07</pathWidth>
+    <pathSpeed>3</pathSpeed>
+    <freeFloating>1</freeFloating>
+    <smoothPath>1</smoothPath>
+    <algorithm name="multilevel:explorer"/>
+
+    <multiAgent>1</multiAgent>
+
+    <multilevel>
+      <level>
+        <robot id="0" freeFloating="1" type="R2"/>
+        <robot id="1" freeFloating="1" type="R2"/>
+      </level>
+    </multilevel>
+
+  </plannerinput>
+</world>

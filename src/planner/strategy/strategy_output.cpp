@@ -1,252 +1,105 @@
 #include "planner/strategy/strategy_output.h"
-#include <ompl/geometric/planners/multilevel/datastructures/PlannerDataVertexAnnotated.h>
-#include "elements/tree.h"
+#include <ompl/multilevel/datastructures/PlannerDataVertexAnnotated.h>
+#include <ompl/base/PlannerData.h>
+#include "elements/roadmap.h"
 #include "common.h"
 #include <ompl/control/PathControl.h>
 #include <ompl/geometric/PathSimplifier.h>
 
-StrategyOutput::StrategyOutput(CSpaceOMPL *cspace_):
-  cspace(cspace_)
+namespace om = ompl::multilevel;
+
+StrategyOutput::StrategyOutput(std::vector<CSpaceOMPL*> cspace_levels):
+  cspace_levels_(cspace_levels)
 {
+  pathVec_.resize(cspace_levels.size(), nullptr);
 }
-void StrategyOutput::SetPlannerData( ob::PlannerDataPtr pd_ ){
-  pd = pd_;
-  pd->decoupleFromPlanner();
-  pd->computeEdgeWeights();
+
+void StrategyOutput::SetPlannerData( ob::PlannerDataPtr pd)
+{
+  plannerData_ = pd;
+  plannerData_->decoupleFromPlanner();
+  plannerData_->computeEdgeWeights();
+  roadmap_ = std::make_shared<Roadmap>(plannerData_, cspace_levels_);
 }
-void StrategyOutput::SetProblemDefinition( ob::ProblemDefinitionPtr pdef_ ){
-  pdef = pdef_;
+
+void StrategyOutput::Clear()
+{
+  std::cout << "Clear Output" << std::endl;
+  if(plannerData_) plannerData_->clear();
+  plannerData_ = nullptr;
+  roadmap_ = nullptr;
+  shortest_path.clear();
 }
-void StrategyOutput::SetShortestPath( std::vector<Config> path_){
-  shortest_path = path_;
+
+void StrategyOutput::SetProblemDefinition( ob::ProblemDefinitionPtr pdef )
+{
+  pdefVec_.push_back(pdef);
 }
+
+bool StrategyOutput::hasSolution(int level)
+{
+  ob::ProblemDefinitionPtr pdef = pdefVec_.at(level);
+  return (pdef->hasExactSolution() || pdef->hasApproximateSolution());
+}
+
+PathPiecewiseLinear* StrategyOutput::getSolutionPath(int level)
+{
+  if(pathVec_.at(level) != nullptr)
+  {
+    return pathVec_.at(level);
+  }
+
+  ob::ProblemDefinitionPtr pdef = pdefVec_.at(level);
+  if(pdef->hasExactSolution() || pdef->hasApproximateSolution())
+  {
+      pathVec_.at(level) = new PathPiecewiseLinear(pdef->getSolutionPath(), 
+          cspace_levels_.back(), cspace_levels_.at(level));
+      return pathVec_.at(level);
+  }else{
+      return nullptr;
+  }
+}
+
+void StrategyOutput::SetProblemDefinition( std::vector<ob::ProblemDefinitionPtr> pdefVec )
+{
+  pdefVec_ = pdefVec;
+}
+
 bool StrategyOutput::hasExactSolution(){
-  return pdef->hasExactSolution();
+  return pdefVec_.back()->hasExactSolution();
 }
+
 bool StrategyOutput::hasApproximateSolution(){
-  return pdef->hasApproximateSolution();
-}
-ob::PlannerDataPtr StrategyOutput::GetPlannerDataPtr(){
-  return pd;
-}
-ob::ProblemDefinitionPtr StrategyOutput::GetProblemDefinitionPtr(){
-  return pdef;
-}
-
-std::vector<Config> StrategyOutput::PathGeometricToConfigPath(og::PathGeometric &path){
-  //og::PathSimplifier shortcutter(pdef->getSpaceInformation());
-  //shortcutter.shortcutPath(path);
-  //shortcutter.simplify(path,0.1);
-
-  path.interpolate();
-
-  std::vector<ob::State *> states = path.getStates();
-  std::vector<Config> keyframes;
-  for(uint i = 0; i < states.size(); i++)
+  for(uint k = 0; k < pdefVec_.size(); k++)
   {
-    ob::State *state = states.at(i);
-
-    int N = cspace->GetDimensionality();
-    Config cur = cspace->OMPLStateToConfig(state);
-    if(N>cur.size()){
-      Config qq;qq.resize(N);
-      qq.setZero();
-      for(int k = 0; k < cur.size(); k++){
-        qq(k) = cur(k);
-      }
-      keyframes.push_back(qq);
-    }else keyframes.push_back(cur);
-  }
-
-  return keyframes;
-}
-
-ob::PathPtr StrategyOutput::getShortestPathOMPL(){
-
-  ob::PathPtr path = pdef->getSolutionPath();
-  if(cspace->isDynamic()){
-    oc::PathControl cpath = static_cast<oc::PathControl&>(*path);
-    cpath.interpolate();
-  }else{
-
-    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
-    gpath.interpolate();
-
-    og::PathSimplifier shortcutter(pdef->getSpaceInformation());
-    shortcutter.simplifyMax(gpath);
-    shortcutter.smoothBSpline(gpath);
-
-    bool valid = false;
-    uint ctr = 0;
-
-    while((!valid) && (ctr++ < 5)){
-      const std::pair<bool, bool> &p = gpath.checkAndRepair(10);
-      valid = p.second;
-    }
-
-    if(!gpath.check()){
-      std::cout << "WARNING: path is not valid. Unsuccessfully tried to repair it for " << ctr-1 << " iterations." << std::endl;
-    }
-  }
-
-  return path;
-}
-
-std::vector<Config> StrategyOutput::GetShortestPath(){
-  const ob::PathPtr p = pdef->getSolutionPath();
-  std::vector<Config> path;
-  if(p){
-    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*p);
-    path = PathGeometricToConfigPath(gpath);
-  }
-  return path;
-}
-
-//std::vector<std::vector<Config>> StrategyOutput::GetSolutionPaths(){
-//  solution_paths.clear();
-//  std::vector<ob::PlannerSolution> paths = pdef->getSolutions();
-//  for(uint k = 0; k < paths.size(); k++){
-//    og::PathGeometric gpath = static_cast<og::PathGeometric&>(*paths.at(k).path_);
-//    solution_paths.push_back( PathGeometricToConfigPath(gpath) );
-//  }
-//  return solution_paths;
-//}
-
-typedef Tree<ob::PlannerDataPtr> PTree;
-
-void RecurseTraverseTree( PTree *current, HierarchicalRoadmapPtr hierarchy, std::vector<CSpaceOMPL*> cspace_levels)
-{
-
-  if(current->content != nullptr)
-  {
-    ob::PlannerDataPtr pdi = current->content;
-    pdi->decoupleFromPlanner();
-
-    unsigned N = pdi->numVertices();
-    if(N <= 0) return;
-
-    ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pdi->getVertex(0));
-    RoadmapPtr roadmap_k = nullptr;
-    if(v==nullptr)
+    if(pdefVec_.at(k)->hasApproximateSolution())
     {
-      // std::cout << "Could not cast vertex to Annotated." << std::endl;
-      // std::cout << "Number of vertices: " << pdi->numVertices() << std::endl;
-      // pdi->getSpaceInformation()->printState(pdi->getVertex(0).getState());
-
-      roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.back());
-      std::vector<int> hindex;
-      hierarchy->AddNode( roadmap_k, hindex);
-      if(current->children.size()>0)
-      {
-        if(N>0){
-          std::cout << "ERROR: tried to add " << N << " unannotated vertices with a hierarchy of multiple layers." << std::endl;
-        }else{
-          OMPL_ERROR("ERROR: tried to create roadmap with zero vertices.");
-        }
-        OMPL_ERROR("ERROR");
-        throw "Roadmap error.";
-      }
-    }else{
-      std::vector<int> path = v->getPath();
-      uint level = v->getLevel();
-
-      roadmap_k = std::make_shared<Roadmap>(pdi, cspace_levels.back(), cspace_levels.at(level));
-      //std::cout << "level " << level << "," << path << " : " << pdi->numVertices() << " | " << pdi->numEdges() << std::endl;
-      while(!hierarchy->NodeExists(path)){
-        std::vector<int> ppath(path.begin(), path.end()-1);
-        hierarchy->AddNode( roadmap_k, ppath);
-      }
-      hierarchy->UpdateNode( roadmap_k, path);
+      return true;
     }
-    std::string rname = cspace_levels.back()->GetName();//RobotPtr()->name;
-    std::string fname = "../data/samples/cspace_robot_"+rname+".samples";
-    roadmap_k->Save(fname.c_str());
-    // std::cout << "Wrote samples to " << fname << std::endl;
   }
+  return false;
+}
 
-  if(current->children.size() == 0)
+ob::PlannerDataPtr StrategyOutput::GetPlannerDataPtr(){
+  return plannerData_;
+}
+
+void StrategyOutput::DrawGL(GUIState& state, int level)
+{
+  if(roadmap_ != nullptr)
   {
-    return;
-  }
-  for(uint k = 0; k < current->children.size(); k++){
-    RecurseTraverseTree(current->children.at(k), hierarchy, cspace_levels);
+      roadmap_->DrawGL(state, level);
   }
 }
 
-void StrategyOutput::GetHierarchicalRoadmap( HierarchicalRoadmapPtr hierarchy, std::vector<CSpaceOMPL*> cspace_levels)
+RoadmapPtr StrategyOutput::getRoadmap()
 {
-  if(!pd){
-    std::cout << "planner data not set." << std::endl;
-    return;
-  }
+  return roadmap_;
+}
 
-  ob::PlannerDataVertexAnnotated *v0 = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(0));
-
-  PTree *root = new PTree(nullptr);
-
-  if(v0==nullptr){
-    //means that we do not have annotated vertices (e.g. classical OMPL planner)
-    root->children.push_back( new PTree(pd) );
-  }else{
-    std::map<std::vector<int>, int> tree_vertices;
-
-    for(uint i = 0; i < pd->numVertices(); i++){
-      ob::PlannerDataVertexAnnotated *v = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(i));
-      if( v == nullptr)
-      {
-          OMPL_ERROR("Vertex %d/%d is not annotated.", i, pd->numVertices());
-          throw "Vertex not annotated error.";
-      }
-
-      std::vector<int> path = v->getPath();
-
-      PTree *current = root;
-
-      for(uint k = 0; k < path.size(); k++){
-        while(current->children.size() <= (uint)path.at(k))
-        {
-          ob::PlannerDataPtr pdk = std::make_shared<ob::PlannerData>(cspace_levels.back()->SpaceInformationPtr());
-          current->children.push_back( new PTree(pdk) );
-        }
-        current = current->children.at(path.at(k));
-      }
-
-      ob::PlannerDataPtr pdi = current->content;
-
-      tree_vertices[path]++;
-
-      //if error occurs here, then the getPath method does not return right path
-      if(pd->isStartVertex(i)){
-          pdi->addStartVertex(*v);
-      }else if(pd->isGoalVertex(i)){
-          pdi->addGoalVertex(*v);
-      }else{
-          pdi->addVertex(*v);
-      }
-
-      std::vector<uint> edgeList;
-      pd->getEdges(i, edgeList);
-
-      for(uint j = 0; j < edgeList.size(); j++){
-        ob::PlannerDataVertexAnnotated *w = dynamic_cast<ob::PlannerDataVertexAnnotated*>(&pd->getVertex(edgeList.at(j)));
-        pdi->addVertex(*w);
-        uint vi = pdi->vertexIndex(*v);
-        uint wi = pdi->vertexIndex(*w);
-
-        uint vo = pd->vertexIndex(*v);
-        uint wo = pd->vertexIndex(*w);
-        ob::PlannerDataEdge evw = pd->getEdge(vo,wo);
-        ob::Cost weight;
-        pd->getEdgeWeight(vo, wo, &weight);
-
-        pdi->addEdge(vi, wi, evw, weight);
-      }
-    }
-  }
-
-  hierarchy->DeleteAllNodes();
-  hierarchy->AddRootNode( std::make_shared<Roadmap>() ); 
-  RecurseTraverseTree(root, hierarchy, cspace_levels);
+void StrategyOutput::DrawGLPath(GUIState& state, int level)
+{
+    pathVec_.at(level)->DrawGL(state);
 }
 
 std::ostream& operator<< (std::ostream& out, const StrategyOutput& so) 
@@ -254,16 +107,10 @@ std::ostream& operator<< (std::ostream& out, const StrategyOutput& so)
   out << std::string(80, '-') << std::endl;
   out << "Planning Output" << std::endl;
   out << std::string(80, '-') << std::endl;
-  out << " robot                : " << so.cspace->GetName() << std::endl;
-  if(so.pdef){
-    out << " exact solution       : " << (so.pdef->hasExactSolution()? "Yes":"No")<< std::endl;
-    out << " approximate solution : " << (so.pdef->hasApproximateSolution()? "Yes":"No")<< std::endl;
-    double dg = so.pdef->getSolutionDifference();
-    out << " solution difference  : " << dg << std::endl;
-  }
-  if(so.pd){
-    out << " roadmap vertices     : " << so.pd->numVertices() << std::endl;
-    out << " roadmap edges        : " << so.pd->numEdges() << std::endl;
+  out << " robot                : " << so.cspace_levels_.back()->GetName() << std::endl;
+  if(so.plannerData_){
+    out << " roadmap vertices     : " << so.plannerData_->numVertices() << std::endl;
+    out << " roadmap edges        : " << so.plannerData_->numEdges() << std::endl;
   }
   out << " planner time         : " << so.planner_time << std::endl;
   out << " max planner time     : " << so.max_planner_time << std::endl;

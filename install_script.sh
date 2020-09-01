@@ -85,20 +85,6 @@ sudo make install
 # ./install-ompl-ubuntu.sh --app
 
 echo "***********************************************************************"
-echo "Installing LEMON (Graph Library)"
-echo "***********************************************************************"
-cd ${INSTALL_DIR}/libs/
-wget http://lemon.cs.elte.hu/pub/sources/lemon-1.3.1.tar.gz
-tar xfv lemon-1.3.1.tar.gz 
-cd lemon-1.3.1/
-mkdir build
-cd build/
-cmake ..
-make -j$(nproc)
-sudo make install
-
-
-echo "***********************************************************************"
 echo "Installing KLAMPT (Dynamical Simulator)"
 echo "***********************************************************************"
 cd ${INSTALL_DIR}/libs/

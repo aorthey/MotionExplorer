@@ -15,6 +15,8 @@ OMPLValidityCheckerMultiAgent::OMPLValidityCheckerMultiAgent(const ob::SpaceInfo
 
 bool OMPLValidityCheckerMultiAgent::isValid(const ob::State* state) const
 {
+  std::lock_guard<std::recursive_mutex> guard(cspace_->getLock());
+
   if(!cspace_->SatisfiesBounds(state)) return false;
 
   Config q = cspace_->OMPLStateToConfig(state);
@@ -50,9 +52,15 @@ bool OMPLValidityCheckerMultiAgent::isValid(const ob::State* state) const
 
     pair<int,int> res;
     res = space->settings->CheckCollision(space->world, idrobot);
-    if(res.first >= 0) return false;
+    if(res.first >= 0)
+    {
+      return false;
+    }
     res = space->settings->CheckCollision(space->world, idrobot, idothers);
-    if(res.first >= 0) return false;
+    if(res.first >= 0)
+    {
+      return false;
+    }
 
   }
   return true;

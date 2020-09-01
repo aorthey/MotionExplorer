@@ -17,11 +17,11 @@
     <pathSpeed>12</pathSpeed>
     <smoothPath>1</smoothPath>
     <pathWidth>0.08</pathWidth>
-    <algorithm name="hierarchy:qrrt"/>
+    <algorithm name="multilevel:qrrt"/>
 
-    <hierarchy>
-      <level inner_index="1" type="R2"/>
-      <level inner_index="0" type="SE2"/>
-    </hierarchy>
+    <multilevel>
+      <level robot_index="1" type="R2"/>
+      <level robot_index="0" type="SE2"/>
+    </multilevel>
   </plannerinput>
 </world>

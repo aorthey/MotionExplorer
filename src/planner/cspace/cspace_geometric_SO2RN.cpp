@@ -108,7 +108,8 @@ void GeometricCSpaceOMPLSO2RN::ConfigToOMPLState(const Config &q, ob::State *qom
 
 }
 
-Config GeometricCSpaceOMPLSO2RN::OMPLStateToConfig(const ob::State *qompl){
+Config GeometricCSpaceOMPLSO2RN::OMPLStateToConfig(const ob::State *qompl)
+{
   const ob::SO2StateSpace::StateType *qomplSO2{nullptr};
   const ob::RealVectorStateSpace::StateType *qomplRnSpace{nullptr};
 

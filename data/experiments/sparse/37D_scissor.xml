@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<world>
+
+  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand.urdf"
+  config="42  0 0 0 0 0 0 -0.24 -0.8 0 1.04 -1.62 0.624395 -2.22706 0 0.1 0 0.9 0.78 0.42 0 0 1.309 0 0.5237 0 0 0 0 1.32 1.57 1.57 0 0 1.57 1.57 1.57 0 0 1.42 1.57 1.57 0 "
+    />
+  <terrain file="../../terrains/objects/Scissor.stl" translation="0.8 0 0.3" scale="0.1 0.1 0.1">
+    <display color="0.7 0.7 0.7 1"/>
+  </terrain>
+
+  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand_no_fingers.urdf"/>
+  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand_index.urdf"/>
+  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand_index_thumb.urdf"/>
+  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand_index_thumb_middle.urdf"/>
+
+  <rigidObject file="../../terrains/primitives/plane.tri" translation="0 0 -0.01"/>
+
+  <terrain file="../../terrains/objects/beer_mug.tri" translation="0.775 0.005 0.18" scale="0.5 0.5 0.5" rotateRPY="0 0 1.57">
+    <display color="0.7 0.7 0.7 1"/>
+  </terrain>
+
+  <terrain file="../../terrains/objects/Coffee_Table.tri" translation="1 0 0" scale="0.5 0.5 0.5">
+    <display color="0.7 0.7 0.7 1"/>
+  </terrain>
+
+  <plannerinput>
+
+    <qinit config="42  0 0 0 0 0 0 0 -0.949204 0.18 -0.954395 1.12706 -0.02 -0.26 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+
+    <qgoal config="42  0 0 0 0 0 0 -0.24 -0.8 0 1.04 -1.62 0.624395 -2.22706 0 0.1 0 0.9 0.32 0.12 0 0 1.309 0 0.5237 0 0 0 0 1.32 1.57 1.57 0 0 1.57 1.57 1.57 0 0 1.42 1.57 1.57 0 "/>
+
+    <epsilongoalregion>0.01</epsilongoalregion>
+      
+    <se3min config="6  -0.0 -1 -0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +1.5 +1 +2 +3.141593 +1.57 +3.141593"/>
+
+    <pathBorderWidth>0.005</pathBorderWidth>
+    <pathWidth>0.01</pathWidth>
+    <pathSpeed>2</pathSpeed>
+    <maxplanningtime>5</maxplanningtime>
+
+    <algorithm name="multilevel:qmp"/>
+    <algorithm name="multilevel:spqr"/>
+
+    <multilevel>
+      <level robot_index="2" type="R13"/>
+      <level robot_index="3" type="R18"/>
+      <level robot_index="0" type="R31"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

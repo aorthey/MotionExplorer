@@ -24,7 +24,8 @@
     <algorithm name="ompl:rrt"/>
     <algorithm name="hierarchical:ompl:prm_multislice">
       <hierarchy>
-        <level inner_index="0" outer_index="0" type="SE3"/>
+        <level robot_index="0" outer_index="0" type="SE3"/>
+        <level robot_index="0" outer_index="0" type="SE3"/>
       </hierarchy>
     </algorithm>
 

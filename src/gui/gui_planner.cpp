@@ -58,11 +58,6 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="planner_step"){
     last_command = "Step";
     planners.at(active_planner)->Step();
-    planners.at(active_planner)->ExpandFull();
-  }else if(cmd=="planner_step_one_level"){
-    planners.at(active_planner)->StepOneLevel();
-    planners.at(active_planner)->Expand();
-    hierarchy_change = true;
   }else if(cmd=="planner_clear"){
     last_command = "Clear";
     planners.at(active_planner)->Clear();
@@ -70,7 +65,6 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="planner_advance_until_solution"){
     last_command = "Plan";
     planners.at(active_planner)->AdvanceUntilSolution();
-    // planners.at(active_planner)->ExpandFull();
     hierarchy_change = true;
   }else if(cmd=="next_planner"){
     if(active_planner<planners.size()-1) active_planner++;
@@ -114,6 +108,27 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="draw_text"){
     state("draw_text_robot_info").toggle();
     state("draw_planner_text").toggle();
+    state("draw_planner_time").toggle();
+  }else if(cmd=="draw_path_modus"){
+    draw_path_modus++;
+    if(draw_path_modus > 2) draw_path_modus = 0;
+    switch (draw_path_modus) {
+      case 0:
+        state("draw_path").activate();
+        state("draw_path_partial").deactivate();
+        state("draw_explorer_unselected_paths").activate();
+        break;
+      case 1:
+        state("draw_path").activate();
+        state("draw_path_partial").activate();
+        state("draw_explorer_unselected_paths").activate();
+        break;
+      default:
+        state("draw_path").deactivate();
+        state("draw_path_partial").deactivate();
+        state("draw_explorer_unselected_paths").deactivate();
+        break;
+    }
   }else if(cmd=="draw_play_path"){
     last_command = "Execute";
     state("draw_play_path").toggle();
@@ -172,9 +187,11 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="save_current_path"){
     //state("save_current_path").activate();
     path = planners.at(active_planner)->GetPath();
+    int current_level = planners.at(active_planner)->getCurrentLevel();
     if(path)
     {
-      std::string fname = "../data/paths/"+getRobotEnvironmentString()+".path";
+      std::string fname = "../data/paths/"+getRobotEnvironmentString()+
+        "_level"+std::to_string(current_level)+".path";
       path->Save(fname.c_str());
       std::cout << "save current path (" << path->GetNumberOfMilestones() 
         << " states) to : " << fname << std::endl;
@@ -235,40 +252,66 @@ std::string PlannerBackend::getRobotEnvironmentString()
     }
     return rname+"_"+tname;
 }
-void PlannerBackend::CenterCameraOn(const Vector3& v){
+
+void PlannerBackend::CenterCameraOn(const Vector3& v)
+{
   Math3D::AABB3D box(v,v);
   GLNavigationBackend::CenterCameraOn(box);
 }
 
-bool PlannerBackend::OnIdle(){
+bool PlannerBackend::OnIdle()
+{
   bool res = BaseT::OnIdle();
   if(planners.empty()) return res;
 
   MotionPlanner* planner = planners.at(active_planner);
-  if(state("draw_play_path")){
-    if(t<=0){
+
+  if(!planner->isActive()) return false;
+
+  SendRefresh();
+  if(planner->hasChanged())
+  {
+      SendRefresh();
+  }
+
+  if(state("draw_play_path"))
+  {
+    if(t<=0)
+    {
       path = planner->GetPath();
     }
-    if(path){
+    if(path)
+    {
       double T = path->GetLength();
-      double tstep = planner->GetInput().pathSpeed*T/1000;
-      //std::cout << "play path: " << t << "/" << T << std::endl;
-      if(t>=T){
-        t=0;
-        SendPauseIdle();
-      }else{
-        t+=tstep;
-        SendRefresh();
+      if(t>=T)
+      {
+        t = 0;
       }
-      if(state("draw_path_autofocus")){
+      double tstep = planner->GetInput().pathSpeed*T/1000;
+      // std::cout << "play path: " << t << "/" << T << std::endl;
+      t+=tstep;
+      SendRefresh();
+
+      if(t>=T)
+      {
+        t=T;
+        state("draw_play_path").deactivate();
+        SendPauseIdle();
+      }
+      if(state("draw_path_autofocus"))
+      {
         Vector3 v = path->EvalVec3(t);
         CenterCameraOn(v);
       }
     }
     return true;
   }
-  return res;
+  if(t>0 && path)
+  {
+      path->DrawGL(state, t);
+  }
 
+  return res;
 }
 
 void PlannerBackend::RenderWorld(){
@@ -336,47 +379,21 @@ void PlannerBackend::RenderWorld(){
 
       glDisable(GL_LIGHTING);
       glEnable(GL_BLEND); 
-      GLColor lightgrey(0.5,0.5,0.5,0.8);
+      GLColor lightgrey(0.9,0.9,0.9,0.7);
       lightgrey.setCurrentGL();
       GLDraw::drawBoundingBox(Vector3(min(0),min(1),min(2)), Vector3(max(0),max(1),max(2)));
       glEnable(GL_LIGHTING);
       glDisable(GL_BLEND); 
-
-      // uint N = 8;
-      // world->lights.resize(N);
-      // for(uint k = 0; k < N; k++){
-      //   world->lights[k].setColor(GLColor(1,1,1));
-      // }
-      // world->lights[0].setPointLight(Vector3(min(0),min(1),min(2)));
-      // world->lights[1].setPointLight(Vector3(min(0),min(1),max(2)));
-      // world->lights[2].setPointLight(Vector3(min(0),max(1),min(2)));
-      // world->lights[3].setPointLight(Vector3(min(0),max(1),max(2)));
-      // world->lights[4].setPointLight(Vector3(max(0),min(1),min(2)));
-      // world->lights[5].setPointLight(Vector3(max(0),min(1),max(2)));
-      // world->lights[6].setPointLight(Vector3(max(0),max(1),min(2)));
-      // world->lights[7].setPointLight(Vector3(max(0),max(1),max(2)));
-
     }
+
     static PathPiecewiseLinear *path;
     if(state("draw_play_path")){
       if(t<=0){
         path = planner->GetPath();
-        if(!path){
-          std::cout << "No path available." << std::endl;
-        }
       }
     }
-    if(t>0 && path){
+    if(t>0 && path!=nullptr){
       path->DrawGL(state, t);
-      // controller_->nominalTimeStep  = 0.05;
-      //
-      // controller_->Update(t);
-      // Config q, qdes;
-      // controller_->GetSensedConfig(q);
-      // controller_->GetCommandedConfig(qdes);
-
-      // std::cout << controller_->time << " : " << q << " (" << qdes << ")" << std::endl;
-      // path->GetSpace()->drawConfig(q);
     }
   }
   //if(planner->GetInput().kinodynamic){
@@ -562,15 +579,19 @@ void PlannerBackend::RenderScreen(){
 
   if(planners.size()>0){
     //display time
-    double time = planners.at(active_planner)->getLastIterationTime();
-    std::stringstream timeStream;
-    timeStream << std::fixed << std::setprecision(2) << time;
-    std::string line = "Planner Time: ";
-    line += timeStream.str()+"s";
-    DrawText(line_x_pos, line_y_offset, line);
-    line_y_offset += line_y_offset_stepsize;
+    if(state("draw_planner_time"))
+    {
+        double time = planners.at(active_planner)->getLastIterationTime();
+        std::stringstream timeStream;
+        timeStream << std::fixed << std::setprecision(2) << time;
+        std::string line = "Planner Time: ";
+        line += timeStream.str()+"s";
+        DrawText(line_x_pos, line_y_offset, line);
+        line_y_offset += line_y_offset_stepsize;
+    }
 
-    if(state("draw_planner_minima_tree")){
+    if(state("draw_planner_minima_tree"))
+    {
         planners.at(active_planner)->DrawGLScreen(line_x_pos, line_y_offset);
         line_y_offset += line_y_offset_stepsize;
     }

@@ -21,7 +21,9 @@ void EnvironmentLoader::RenameExec(int argc, char** argv, const std::string &s)
   strncpy(argv[0], s.c_str(), strlen(argv[0]));
   for(int i = 1; i < argc; i++) memset(argv[i], 0, strlen(argv[i]));
 }
-EnvironmentLoader EnvironmentLoader::from_args(int argc, char** argv){
+
+EnvironmentLoader EnvironmentLoader::from_args(int argc, char** argv)
+{
   std::string exec = argv[0];
   std::string file;
   std::vector<std::string> all_args;
@@ -36,7 +38,9 @@ EnvironmentLoader EnvironmentLoader::from_args(int argc, char** argv){
   file = util::GetExecFilePath()+"/"+file;
   return EnvironmentLoader(file.c_str());
 }
-EnvironmentLoader::EnvironmentLoader(const char *file_name_){
+
+EnvironmentLoader::EnvironmentLoader(const char *file_name_)
+{
   file_name = file_name_;
 
   std::cout << "[EnvironmentLoader] loading from file " << file_name << std::endl;
@@ -58,15 +62,9 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
   }
 
   uint Nrobots = world.robots.size();
-  if(Nrobots>0){
+  if(Nrobots>0)
+  {
     name_robot = world.robots[0]->name;
-  //################################################################################
-  //################################################################################
-
-    // if(!(world.robots[0]->joints[0].type == RobotJoint::Floating)){
-    //   std::cout << "First joint of robot should be a free floating joint" << std::endl;
-    //   std::cout << "But actual type is: " << world.robots[0]->joints[0].type << std::endl;
-    // }
 
     if(pin.Load(file_name.c_str())){
 
@@ -89,12 +87,14 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
         if(pkin->contactPlanner){
           pkin->tris = tris;
         }
+
+
         for(uint j = 0; j < pkin->stratifications.size(); j++){
           Stratification stratification = pkin->stratifications.at(j);
           for(uint i = 0; i < stratification.layers.size(); i++){
             Layer layer = stratification.layers.at(i);
             if(!layer.isMultiAgent){
-              uint ri = layer.inner_index;
+              uint ri = layer.robot_index;
               uint ro = layer.outer_index;
               if(ri>=world.robots.size()){
                 std::cout << std::string(80, '>') << std::endl;
@@ -117,12 +117,7 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_){
                 rko->qMin[i] = pkin->se3min[i];
                 rko->qMax[i] = pkin->se3max[i];
               }
-              // rk->q = pkin->q_init;
-              // rk->dq = pkin->dq_init;
-              // rk->UpdateFrames();
-              // rko->q = pkin->q_init;
-              // rko->dq = pkin->dq_init;
-              // rko->UpdateFrames();
+
             }
           }//for layers
         }//for stratifications

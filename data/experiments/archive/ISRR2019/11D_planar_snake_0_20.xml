@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="snake_planar4" file="../../robots/snake/snake_planar_4_segments.urdf"/>
+  <robot name="snake_planar_disk" file="../../robots/snake/snake_planar_0_segments_disk_inner.urdf"/>
+  <robot name="snake_planar0" file="../../robots/snake/snake_planar_0_segments.urdf"/>
+  <robot name="snake_planar1" file="../../robots/snake/snake_planar_1_segments.urdf"/>
+  <robot name="snake_planar2" file="../../robots/snake/snake_planar_2_segments.urdf"/>
+  <robot name="snake_planar3" file="../../robots/snake/snake_planar_3_segments.urdf"/>
+
+  <terrain name="O1" file="../../terrains/narrow_passage/narrow_passage_0_20.tri"/>
+  <plannerinput>
+
+    <se3min config="6  -3 -2.0 -0.1 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +3 +4.0 +0.1 +3.141593 +1.57 +3.141593"/>
+
+    <qinit config="15  -1.0 -0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+    <qgoal config="15  +2.0 -0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>10</maxplanningtime>
+    <pathSpeed>12</pathSpeed>
+
+    <multilevel>
+      <level robot_index="1" type="R2"/>
+      <level robot_index="3" type="SE2RN"/>
+    </multilevel>
+    <multilevel>
+      <level robot_index="2" type="SE2"/>
+      <level robot_index="3" type="SE2RN"/>
+    </multilevel>
+    <multilevel>
+      <level robot_index="1" type="R2"/>
+      <level robot_index="2" type="SE2"/>
+      <level robot_index="3" type="SE2RN"/>
+    </multilevel>
+    <multilevel>
+      <level robot_index="3" type="SE2RN"/>
+    </multilevel>
+
+    <!-- <multilevel> -->
+    <!--   <level robot_index="1" type="R2"/> -->
+    <!--   <level robot_index="2" type="SE2"/> -->
+    <!--   <level robot_index="5" type="SE2RN"/> -->
+    <!-- </multilevel> -->
+    <!-- <multilevel> -->
+    <!--   <level robot_index="1" type="R2"/> -->
+    <!--   <level robot_index="2" type="SE2"/> -->
+    <!--   <level robot_index="3" type="SE2RN"/> -->
+    <!--   <level robot_index="4" type="SE2RN"/> -->
+    <!--   <level robot_index="5" type="SE2RN"/> -->
+    <!-- </multilevel> -->
+    <!-- <multilevel> -->
+    <!--   <level robot_index="5" type="SE2RN"/> -->
+    <!-- </multilevel> -->
+
+  </plannerinput>
+</world>

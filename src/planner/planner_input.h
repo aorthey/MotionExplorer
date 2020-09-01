@@ -6,7 +6,7 @@
 
 struct Layer{
   int level;
-  int inner_index;
+  int robot_index;
   int outer_index;
   // double cspace_constant;
   double finite_horizon_relaxation{0.0};
@@ -15,9 +15,13 @@ struct Layer{
   Config dq_init;
   Config dq_goal;
   std::string type;
+  bool isTimeDependent{false};
+
+  std::string path_fname;
 
   //multiagent
   bool isMultiAgent{false};
+
   int maxRobots{0};
   std::vector<int> ids;
   std::vector<Config> q_inits;
@@ -27,7 +31,24 @@ struct Layer{
   std::vector<int> ptr_to_next_level_ids;
   std::vector<std::string> types;
   std::vector<int> freeFloating;
+  std::vector<int> controllable;
 };
+
+struct ContactInformation
+{
+  std::string robot_name;
+  std::string robot_link;
+  int robot_link_idx{-1};
+  std::string mode;
+
+  std::string meshFrom;
+  std::string meshTo;
+  int meshFromIdx{-1};
+  int meshToIdx{-1};
+  int triFrom{-1};
+  int triTo{-1};
+};
+
 
 struct AgentInformation{
   Config q_init;
@@ -41,6 +62,10 @@ struct AgentInformation{
   Config dqMax;
   Config uMin;
   Config uMax;
+  std::vector<ContactInformation> contact_links;
+
+  bool isTimeDependent{false};
+  std::string timePathFile;
 };
 
 struct Stratification{
@@ -68,6 +93,7 @@ class PlannerInput{
     Config se3min;
     Config se3max;
     uint robot_idx;
+    std::vector<ContactInformation> contact_links;
 
     //multiagents
     std::vector<AgentInformation> agent_information;
@@ -75,7 +101,9 @@ class PlannerInput{
     //contact-planning
     int freeFloating;
     bool contactPlanner{false};
-
+    bool threading{false};
+    
+    // access to surface triangles of objects/obstacles
     std::vector<Triangle3D> tris;
 
     std::string name_algorithm;
