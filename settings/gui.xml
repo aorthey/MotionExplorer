@@ -292,6 +292,7 @@
   <property name="draw_controller_driver" enabled="1"/>
   <property name="draw_text_robot_info" enabled="1"/>
   <property name="draw_planner_text" enabled="1"/>
+  <property name="draw_planner_time" enabled="1"/>
   <property name="draw_planner_last_command" enabled="0"/>
   <!-- <property name="draw_cover_geometric_center" enabled="1"/> -->
   <!-- <property name="draw_cover_vertices" enabled="1"/> -->

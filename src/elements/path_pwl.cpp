@@ -96,7 +96,7 @@ PathPiecewiseLinear::PathPiecewiseLinear(ob::PathPtr p_, CSpaceOMPL *cspace_, CS
       }
     }
   }
-  std::cout << *this << std::endl;
+  // std::cout << *this << std::endl;
 }
 
 ob::PathPtr PathPiecewiseLinear::GetOMPLPath() const
@@ -222,8 +222,6 @@ void PathPiecewiseLinear::Smooth(bool forceSmoothing){
       << ")" << std::endl;
     isSmooth = true;
   }
-
-  //gpath update is not saved in path!
 }
 
 void PathPiecewiseLinear::Normalize(){
@@ -270,6 +268,8 @@ Vector3 PathPiecewiseLinear::EvalVec3(const double t) const
 Config PathPiecewiseLinear::EvalStates(std::vector<ob::State*> states, const double t) const
 {
   ob::SpaceInformationPtr si = quotient_space->SpaceInformationPtr();
+
+  if(states.size() <= 0) 
 
   if(t<=0)
   {
@@ -511,6 +511,53 @@ Vector3 PathPiecewiseLinear::GetNearestStateToTipOfArrow(Vector3 arrow_pos,
     return qnext;
 }
 
+
+void PathPiecewiseLinear::StatesToMilestones(
+    const std::vector<ob::State*> &states,
+    std::vector<Vector3> &milestones,
+    int ridx,
+    double percentage)
+{
+  double dist = 0;
+  unsigned int ctr = 0;
+
+  ob::StateSpacePtr space = quotient_space->SpaceInformationPtr()->getStateSpace();
+
+  ob::State* stateTmpCur = space->allocState();
+
+  while(dist < percentage*length && ctr < states.size()-1)
+  {
+    ob::State *s1 = states.at(ctr);
+    ob::State *s2 = states.at(ctr+1);
+
+    int nd = space->validSegmentCount(s1, s2);
+
+    // nd = 1; //set to 1 if we do not want to interpolate
+
+    Vector3 v = quotient_space->getXYZ(s1, ridx);
+    milestones.push_back(v);
+
+    for (int j = 1; j < nd; j++)
+    {
+        double step = (double)j / (double)nd;
+        
+        space->interpolate(s1, s2, step, stateTmpCur);
+
+        Vector3 v = quotient_space->getXYZ(stateTmpCur, ridx);
+
+        if((v-milestones.back()).normSquared() < 1e-2) continue;
+
+        milestones.push_back(v);
+    }
+
+    dist += interLength.at(ctr);
+    ctr++;
+  }
+
+  space->freeState(stateTmpCur);
+}
+
+
 void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &states, int ridx, double percentage)
 {
   std::vector<Vector3> path_left;
@@ -518,17 +565,20 @@ void PathPiecewiseLinear::DrawGLRibbonRobotIndex(const std::vector<ob::State*> &
 
   //compute stopping distance
   std::vector<Vector3> milestones;
-  double dist = 0;
-  int ctr = 0;
-  while(dist < percentage*length)
-  {
-    Vector3 v = Vector3FromState(states.at(ctr), ridx);
-    milestones.push_back(v);
-    dist += interLength.at(ctr);
-    ctr++;
-  }
-  Vector3 v = Vector3FromState(states.at(ctr), ridx);
-  milestones.push_back(v);
+
+  StatesToMilestones(states, milestones, ridx, percentage);
+
+  // double dist = 0;
+  // int ctr = 0;
+  // while(dist < percentage*length)
+  // {
+  //   Vector3 v = Vector3FromState(states.at(ctr), ridx);
+  //   milestones.push_back(v);
+  //   dist += interLength.at(ctr);
+  //   ctr++;
+  // }
+  // Vector3 v = Vector3FromState(states.at(ctr), ridx);
+  // milestones.push_back(v);
   //// 
 
   if(milestones.size()<2)
@@ -1145,8 +1195,7 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
   
 std::ostream& operator<< (std::ostream& out, const PathPiecewiseLinear& pwl) 
 {
-  out << std::string(80, '-') << std::endl;
-  out << "[Path]" << std::endl;
+  out << "PathPiecewiseLinear " << std::string(80, '-') << std::endl;
   out << "Path Length   : " << pwl.length << std::endl;
   out << "Path Keyframes: " << pwl.interLength.size()+1 << std::endl;
   // double dstep = pwl.length/10.0;
@@ -1162,6 +1211,6 @@ std::ostream& operator<< (std::ostream& out, const PathPiecewiseLinear& pwl)
   // for(double d = 0; d < pwl.length; d+=dstep){
   //   out << pwl.Eval(d) << std::endl;  
   // }
-  out << std::string(80, '-') << std::endl;
+  out << "PathPiecewiseLinear " << std::string(80, '-') << std::endl;
   return out;
 }

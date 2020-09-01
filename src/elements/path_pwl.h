@@ -35,6 +35,12 @@ class PathPiecewiseLinear
     Vector3 EvalVec3(const double t) const;
     Vector3 EvalVec3(const double t, int ridx) const;
 
+    void StatesToMilestones(
+        const std::vector<ob::State*> &states,
+        std::vector<Vector3> &milestones,
+        int ridx,
+        double percentage);
+
     CSpaceOMPL *GetSpace() const;
 
     void Normalize(); // convert path length [0,L] -> [0,1]

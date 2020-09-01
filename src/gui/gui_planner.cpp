@@ -108,6 +108,7 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
   }else if(cmd=="draw_text"){
     state("draw_text_robot_info").toggle();
     state("draw_planner_text").toggle();
+    state("draw_planner_time").toggle();
   }else if(cmd=="draw_path_modus"){
     draw_path_modus++;
     if(draw_path_modus > 2) draw_path_modus = 0;
@@ -275,20 +276,27 @@ bool PlannerBackend::OnIdle()
 
   if(state("draw_play_path"))
   {
-    if(t<=0){
+    if(t<=0)
+    {
       path = planner->GetPath();
     }
     if(path)
     {
       double T = path->GetLength();
+      if(t>=T)
+      {
+        t = 0;
+      }
       double tstep = planner->GetInput().pathSpeed*T/1000;
       // std::cout << "play path: " << t << "/" << T << std::endl;
-      if(t>=T){
-        t=0;
+      t+=tstep;
+      SendRefresh();
+
+      if(t>=T)
+      {
+        t=T;
+        state("draw_play_path").deactivate();
         SendPauseIdle();
-      }else{
-        t+=tstep;
-        SendRefresh();
       }
       if(state("draw_path_autofocus"))
       {
@@ -571,15 +579,19 @@ void PlannerBackend::RenderScreen(){
 
   if(planners.size()>0){
     //display time
-    double time = planners.at(active_planner)->getLastIterationTime();
-    std::stringstream timeStream;
-    timeStream << std::fixed << std::setprecision(2) << time;
-    std::string line = "Planner Time: ";
-    line += timeStream.str()+"s";
-    DrawText(line_x_pos, line_y_offset, line);
-    line_y_offset += line_y_offset_stepsize;
+    if(state("draw_planner_time"))
+    {
+        double time = planners.at(active_planner)->getLastIterationTime();
+        std::stringstream timeStream;
+        timeStream << std::fixed << std::setprecision(2) << time;
+        std::string line = "Planner Time: ";
+        line += timeStream.str()+"s";
+        DrawText(line_x_pos, line_y_offset, line);
+        line_y_offset += line_y_offset_stepsize;
+    }
 
-    if(state("draw_planner_minima_tree")){
+    if(state("draw_planner_minima_tree"))
+    {
         planners.at(active_planner)->DrawGLScreen(line_x_pos, line_y_offset);
         line_y_offset += line_y_offset_stepsize;
     }

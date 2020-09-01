@@ -5,8 +5,7 @@
   <robot name="mug" file="../../objects/mug.urdf"
   config="6 -0.0903446 0.0843289 0 1.27075 0 0"/>
 
-  <robot name="schunk" file="../../robots/schunk/sdh.urdf" 
-  config="18  -0.130317 -0.0879818 0.0876798 2.9787 1.4743 2.35701 0 0 -0.14 1.5708 0 0 -0.12 1.5708 0 0.22 1.5708 0 "/>
+  <robot name="schunk" file="../../robots/schunk/sdh.urdf"/>
 
   <plannerinput>
 

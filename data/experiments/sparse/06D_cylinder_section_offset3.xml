@@ -21,8 +21,8 @@
     <maxplanningtime>5</maxplanningtime>
     <pathSpeed>3</pathSpeed>
 
+    <algorithm name="multilevel:qmp"/>
     <algorithm name="multilevel:spqr"/>
-    <algorithm name="multilevel:qmpstar"/>
     <algorithm name="ompl:prm"/>
     <algorithm name="ompl:rrtconnect"/>
 

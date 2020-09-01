@@ -377,8 +377,11 @@ void CSpaceOMPLMultiAgent::ConfigToOMPLState(const Config &q, ob::State *qompl)
 
 void CSpaceOMPLMultiAgent::SetTime(ob::State *qompl, double time)
 {
-  ob::State *qomplAgent = static_cast<ob::CompoundState*>(qompl)->as<ob::State>(idxTimeSpace_);
-  cspaces_.at(idxTimeSpace_)->SetTime(qomplAgent, time);
+  if(idxTimeSpace_ >= 0)
+  {
+      ob::State *qomplAgent = static_cast<ob::CompoundState*>(qompl)->as<ob::State>(idxTimeSpace_);
+      cspaces_.at(idxTimeSpace_)->SetTime(qomplAgent, time);
+  }
 }
 
 Config CSpaceOMPLMultiAgent::OMPLStateToVelocity(const ob::State *qompl, int agent)

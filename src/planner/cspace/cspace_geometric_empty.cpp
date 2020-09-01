@@ -19,12 +19,16 @@ uint GeometricCSpaceOMPLEmpty::GetDimensionality() const{
 
 void GeometricCSpaceOMPLEmpty::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
+  q_ = q;
 }
 
 Config GeometricCSpaceOMPLEmpty::OMPLStateToConfig(const ob::State *qompl)
 {
-  Config q;q.resize(robot->q.size());q.setZero();
-  return q;
+  if(q_.size() != robot->q.size()) 
+  {
+    q_.resize(robot->q.size());q_.setZero();
+  }
+  return q_;
 }
 void GeometricCSpaceOMPLEmpty::print(std::ostream& out) const
 {

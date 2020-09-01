@@ -31,7 +31,6 @@
     <pathBorderWidth>3</pathBorderWidth>
     <maxplanningtime>2</maxplanningtime>      <!-- runtime in (s) --> 
 
-    <algorithm name="benchmark:minimal"/>
     <algorithm name="multilevel:spqr"/>
     <algorithm name="multilevel:qmpstar"/>
     <algorithm name="multilevel:qrrt"/>

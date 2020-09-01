@@ -1,33 +1,42 @@
 <?xml version="1.0"?>
 <world>
 
-  <robot name="disk" file="../../robots/planar/disk_maze.urdf"
-    />
+  <robot name="car" file="../../robots/planar/car.urdf"/>
+  <robot name="carAbstraction" file="../../robots/planar/car_capsule_inner.urdf"/>
 
-  <robot name="diskExternal" file="../../robots/planar/disk_maze.urdf"
-    />
+  <robot name="carIncoming" file="../../robots/planar/car.urdf"/>
+  <robot name="carFront" file="../../robots/planar/car.urdf"/>
 
-  <!-- <rigidObject --> 
-  <!--   name="cylinder.tri" --> 
-  <!--   file="../../terrains/primitives/cylinder.tri"/> -->
+  <terrain name="road" file="../../terrains/roads/road.stl" scale="8 3 2" translation="0 0 -0.12">
+    <display color="0.6 0.6 0.6 1"/>
+  </terrain>
 
   <plannerinput>
 
     <agent 
-      id="0" 
-      qinit="6  -5 -2 0 0 0 0"
-      qgoal="6  +5 +0.5 0 0 0 0"
-      qMin="6  -5 -5 0 0 0 0"
-      qMax="6  +5 +5 0 0 0 0"
+        id="0" 
+        qinit="15  -4.0 +0.0 +0.0 0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqinit="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+        qgoal="15  +4.0 +0.0 +0.0 0 +0 +0.0 +0.0 0.0 0 0 0 0 0 0 0"
+        dqgoal="15  +0.3 0 0 0 0 0 0 0 0 0 0 0 0 0 0"
+
+        dqMin="15  +0.3 0 0 -1 0 0 0 0 0 0 0 0 0 0 0"
+        dqMax="15  +0.3 0 0 +1 0 0 0 0 0 0 0 0 0 0 0"
+        uMin="6  0 0 0 -0.2 0 0"
+        uMax="6  0 0 0 +0.2 0 0"
     />
-    <agent 
-      id="1" 
-      qinit="6  -5 0 0 0 0 0"
-      qMin="6  -5 -5 0 0 0 0"
-      qMax="6  +5 +5 0 0 0 0"
-      timedependent="1"
-      path="../data/paths/disk_cylinder.tri_level0.path"
-    />
+
+    <se3min config="6  -5.0 -1.0 -0.0 -3.141593 0 0"/>
+    <se3max config="6  +5.0 +1.0 +0.0 +3.141593 0 0"/>
+
+    <!-- <agent --> 
+    <!--   id="1" --> 
+    <!--   qinit="6  -5 0 0 0 0 0" -->
+    <!--   qMin="6  -5 -5 0 0 0 0" -->
+    <!--   qMax="6  +5 +5 0 0 0 0" -->
+    <!--   timedependent="1" -->
+    <!--   path="../data/paths/disk_cylinder.tri_level0.path" -->
+    <!-- /> -->
 
     <algorithm name="multilevel:qmp"/>
     <algorithm name="ompl:prm"/>
@@ -42,8 +51,9 @@
 
     <multilevel>
       <level>
-        <robot id="0" freeFloating="1" type="R2"/>
-        <robot id="1" freeFloating="1" type="R2"/>
+        <robot id="0" freeFloating="1" type="SE2_DUBIN"/>
+        <!-- <robot id="1" freeFloating="1" type="SE2"/> -->
+        <!-- <robot id="1" freeFloating="1" type="SE2"/> -->
         <time/>
       </level>
     </multilevel>
