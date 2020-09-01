@@ -3,7 +3,7 @@
 <world>
 
   <robot name="cylinder" file="../../robots/primitives/cylinder_r_0_2_w_2_0.urdf"/>
-  <robot name="sphere" file="../../robots/primitives/sphere_0_2.urdf"/>
+  <robot name="sphere" file="../../robots/primitives/sphere_0_2_4.urdf"/>
 
   <rigidObject file="../../terrains/primitives/cuboid.tri" translation="0 +1.4 -0"/>
   <rigidObject file="../../terrains/primitives/cuboid.tri" translation="0 -1.4 +0"/>
@@ -12,7 +12,7 @@
 
   <plannerinput>
 
-    <qinit  config="6  -2 -0.5 0.5 0 0 0"/>
+    <qinit  config="6  -2 +0.5 -0.5 0 0 0"/>
     <qgoal  config="6  +2 -0.5 0.5 0 0 0"/>
     <se3min config="6  -2 -1 -0.5 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +2 +1 +0.5 +3.141593 +1.57 +3.141593"/>

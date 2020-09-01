@@ -34,6 +34,7 @@
 
     <algorithm name="multilevel:qmp"/>
     <algorithm name="multilevel:spqr"/>
+    <algorithm name="ompl:rrtconnect"/>
 
     <multilevel>
       <level robot_index="2" type="R13"/>

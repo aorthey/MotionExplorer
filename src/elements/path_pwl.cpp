@@ -545,7 +545,7 @@ void PathPiecewiseLinear::StatesToMilestones(
 
         Vector3 v = quotient_space->getXYZ(stateTmpCur, ridx);
 
-        if((v-milestones.back()).normSquared() < 1e-2) continue;
+        if((v-milestones.back()).normSquared() < 1e-2 && j < nd-1) continue;
 
         milestones.push_back(v);
     }

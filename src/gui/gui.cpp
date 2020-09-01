@@ -133,7 +133,7 @@ void ForceFieldBackend::RenderWorld()
 
   glDisable(GL_LIGHTING);
   glEnable(GL_BLEND); 
-  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+  // glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 
   for(size_t i=0;i<world->terrains.size();i++){
     Terrain *terra = world->terrains[i];
