@@ -13,10 +13,10 @@ RestrictionSamplerImpl::RestrictionSamplerImpl(
 
 void RestrictionSamplerImpl::grow()
 {
-  if(hasChild()) return BaseT::grow();
+  if(hasTotalSpace()) return BaseT::grow();
 
   base::SpaceInformationPtr bundle = getBundle();
-  BundleSpaceGraph *graph = static_cast<BundleSpaceGraph*>(getParent());
+  BundleSpaceGraph *graph = static_cast<BundleSpaceGraph*>(getBaseBundleSpace());
   geometric::PathGeometric &spath = static_cast<geometric::PathGeometric &>(*graph->solutionPath_);
   std::vector<base::State *> states = spath.getStates();
 
@@ -62,9 +62,6 @@ void RestrictionSamplerImpl::grow()
         addConfiguration(q);
       }
   }
-
-
-
 }
 
 void RestrictionSamplerImpl::clear()
@@ -79,7 +76,7 @@ void RestrictionSamplerImpl::setup()
 
 void RestrictionSamplerImpl::getPlannerData(ob::PlannerData &data) const
 {
-  if(hasChild()) return;
+  if(hasTotalSpace()) return;
   BaseT::getPlannerData(data);
 }
 

@@ -25,6 +25,7 @@ MotionPlanner::MotionPlanner(RobotWorld *world_, PlannerInput& input_):
 {
   pwl = nullptr;
   active = true;
+  active = true;
   current_level = 0;
   max_levels_ = 0;
   threading = input.threading;
@@ -67,7 +68,6 @@ CSpaceOMPL* MotionPlanner::ComputeMultiAgentCSpace(const Layer &layer){
     }
     std::string type = layer.types.at(k);
     bool freeFloating = layer.freeFloating.at(k);
-    // std::cout << type << " " << (freeFloating?"FREEFLOATING":"FIXED") << std::endl;
 
     CSpaceOMPL* cspace_level_k = ComputeCSpace(type, rk, freeFloating);
     cspace_levels.push_back(cspace_level_k);
@@ -235,11 +235,14 @@ void MotionPlanner::CreateHierarchy()
       Config qi;
       Config qg;
 
-      if(!layers.at(k).isMultiAgent){
+      if(!layers.at(k).isMultiAgent)
+      {
         uint N = cspace_level_k->GetKlamptDimensionality();
 
         Config qi_full = input.q_init; qi_full.resize(N);
         Config qg_full = input.q_goal; qg_full.resize(N);
+
+        cspace_level_k->UpdateRobotConfig(qi_full);
 
         cspace_level_k->ConfigToOMPLState(qi_full, stateTmp);
         qi = cspace_level_k->OMPLStateToConfig(stateTmp);
@@ -278,6 +281,8 @@ void MotionPlanner::CreateHierarchy()
         Config qi_full = qi;
         Config qg_full = qg;
 
+        cspace_level_k->UpdateRobotConfig(qi_full);
+
         cspace_level_k->ConfigToOMPLState(qi_full, stateTmp);
         qi = cspace_level_k->OMPLStateToConfig(stateTmp);
         cspace_level_k->ConfigToOMPLState(qg_full, stateTmp);
@@ -298,6 +303,7 @@ void MotionPlanner::CreateHierarchy()
           std::cout << qcr << " (" << cr << ")" << std::endl;
           CSpaceOMPL *cspace = cspace_levels.at(k);
           ob::State *xCenter = cspace->SpaceInformationPtr()->allocState();
+          cspace->UpdateRobotConfig(qcr);
           cspace->ConfigToOMPLState(qcr, xCenter);
           cspace_levels.at(k)->setStateValidityCheckerConstraintRelaxation(xCenter, cr);
       }

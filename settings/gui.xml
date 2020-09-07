@@ -224,7 +224,7 @@
   </checkbox>
 
   <hotkey>
-    <name>planner_draw_start_goal_configuration</name>
+    <name>planner_draw_start_configuration</name>
     <key>G</key>
     <active>1</active>
   </hotkey>
@@ -280,8 +280,7 @@
     <active>1</active>
   </hotkey>
 
-  <property name="planner_draw_start_configuration" enabled="1"/>
-  <!-- <property name="planner_draw_goal_configuration" enabled="1"/> -->
+  <!-- <property name="planner_draw_start_configuration" enabled="1"/> -->
 
   <property name="draw_explorer_unselected_paths" enabled="1"/>
   <property name="draw_path" enabled="1"/>

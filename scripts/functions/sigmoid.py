@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-print "Smooth valued functions on [0,1]"
+print("Smooth valued functions on [0,1]")
 t = np.linspace(0,1,100)
 
 

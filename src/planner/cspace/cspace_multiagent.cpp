@@ -111,15 +111,18 @@ bool CSpaceOMPLMultiAgent::UpdateRobotConfig(Config &q)
 {
   std::vector<Config> qks = splitConfig(q);
   for(uint k = 0; k < cspaces_.size(); k++){
-    if((int)k==idxTimeSpace_)
+    if(idxTimeSpace_ >= 0 && (int)k==idxTimeSpace_)
     {
       continue;
     }
     Config qk = qks.at(k);
-    CSpaceOMPL *ck = cspaces_.at(k);
-    Robot *robot = ck->GetRobotPtr();
-    robot->UpdateConfig(qk);
-    robot->UpdateGeometry();
+    if(qk.size() > 0)
+    {
+      CSpaceOMPL *ck = cspaces_.at(k);
+      Robot *robot = ck->GetRobotPtr();
+      robot->UpdateConfig(qk);
+      robot->UpdateGeometry();
+    }
   }
   return true;
 }
@@ -212,6 +215,7 @@ void CSpaceOMPLMultiAgent::initSpace()
       Nompls.push_back( ck->GetDimensionality() );
     }
     Nklampts.push_back( ck->GetKlamptDimensionality() );
+    std::cout << *ck << std::endl;
   }
 
   Nompl = std::accumulate(Nompls.begin(), Nompls.end(), 0);

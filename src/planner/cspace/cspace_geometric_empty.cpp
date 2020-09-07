@@ -13,8 +13,16 @@ void GeometricCSpaceOMPLEmpty::initSpace()
   ob::StateSpacePtr RN = std::make_shared<ob::EmptyStateSpace>();
   this->space = RN;
 }
-uint GeometricCSpaceOMPLEmpty::GetDimensionality() const{
+
+uint GeometricCSpaceOMPLEmpty::GetDimensionality() const
+{
   return 0;
+}
+
+uint GeometricCSpaceOMPLEmpty::GetKlamptDimensionality() const
+{
+  if(GetRobotIndex() >= 0) return BaseT::GetKlamptDimensionality();
+  else return 0;
 }
 
 void GeometricCSpaceOMPLEmpty::ConfigToOMPLState(const Config &q, ob::State *qompl)
@@ -24,9 +32,15 @@ void GeometricCSpaceOMPLEmpty::ConfigToOMPLState(const Config &q, ob::State *qom
 
 Config GeometricCSpaceOMPLEmpty::OMPLStateToConfig(const ob::State *qompl)
 {
-  if(q_.size() != robot->q.size()) 
+  if(GetRobotIndex() >= 0)
   {
-    q_.resize(robot->q.size());q_.setZero();
+      if(q_.size() != robot->q.size()) 
+      {
+        q_.resize(robot->q.size());q_.setZero();
+      }
+  }else
+  {
+      q_.resize(0);q_.setZero();
   }
   return q_;
 }

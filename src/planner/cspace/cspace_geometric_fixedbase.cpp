@@ -84,7 +84,8 @@ void GeometricCSpaceOMPLFixedBase::ConfigToOMPLState(const Config &q, ob::State 
   }
 }
 
-Config GeometricCSpaceOMPLFixedBase::OMPLStateToConfig(const ob::State *qompl){
+Config GeometricCSpaceOMPLFixedBase::OMPLStateToConfig(const ob::State *qompl)
+{
   const ob::RealVectorStateSpace::StateType *qomplRN = qompl->as<ob::RealVectorStateSpace::StateType>();
   Config q = robot->q; //do not change first 6 values (robot might have been translated from origin)
   for(uint i = 0; i < Nompl; i++){

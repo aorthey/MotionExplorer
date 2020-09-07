@@ -378,10 +378,10 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
     TiXmlElement* lindex = FindFirstSubNode(node_hierarchy, "level");
     int lctr = 0;
 
-    Layer layer;
-
     while(lindex!=nullptr)
     {
+      Layer layer;
+
       layer.level = lctr++;
 
       TiXmlElement* ri = FindFirstSubNode(lindex, "robot");
@@ -389,6 +389,7 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
 
         int id = GetAttribute<int>(ri, "id");
         layer.ids.push_back(id);
+
 
         std::string type = GetAttribute<std::string>(ri, "type");
         layer.types.push_back(type);
@@ -430,6 +431,7 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
         int idj = layer.ids.at(j);
         if(!ExistsAgentAtID(idj)) continue;
         AgentInformation agent = GetAgentAtID(idj);
+        std::cout << layer.q_init << std::endl;
         AddConfigToConfig(layer.q_init, agent.q_init);
         AddConfigToConfig(layer.q_goal, agent.q_goal);
         AddConfigToConfig(layer.dq_init, agent.dq_init);
@@ -456,6 +458,7 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
     std::vector<int> current_lvl_ids;
     std::vector<std::string> type;
     std::vector<int> freeFloating;
+    std::vector<int> controllable;
     while(k>0)
     {
       k--;
@@ -463,7 +466,8 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
         std::sort(stratification.layers.at(k).ids.begin(), stratification.layers.at(k).ids.end());
         last_lvl_ids = stratification.layers.at(k).ids;
       }else{
-        for(uint i = 0; i < last_lvl_ids.size(); i++){
+        for(uint i = 0; i < last_lvl_ids.size(); i++)
+        {
           int il = last_lvl_ids.at(i);
           bool found = false;
           for(uint j = 0; j < stratification.layers.at(k).ptr_to_next_level_ids.size() ; j++){
@@ -474,6 +478,7 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
               std::string typej = stratification.layers.at(k).types.at(j);
               current_lvl_ids.push_back(idj);
               type.push_back(typej);
+              controllable.push_back(1);
               freeFloating.push_back(freeFloatingj);
               found = true;
               break;
@@ -482,12 +487,14 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
           if(!found){
             current_lvl_ids.push_back(-1);
             type.push_back("EMPTY_SET");
+            controllable.push_back(0);
             freeFloating.push_back(false);
           }
         }
         stratification.layers.at(k).ids = current_lvl_ids;
         stratification.layers.at(k).types = type;
         stratification.layers.at(k).freeFloating = freeFloating;
+        stratification.layers.at(k).controllable = controllable;
 
         last_lvl_ids = current_lvl_ids;
 
@@ -495,6 +502,7 @@ void PlannerInput::ExtractMultiHierarchy(TiXmlElement *node, int hierarchy_index
         type.clear();
         freeFloating.clear();
       }
+      std::cout << "level "<< k << " ids " << stratification.layers.at(k).ids << std::endl;
     }
   }else{
     std::cout << "[WARNING] Did not specify robot multilevel. Assuming one layer SE3RN" << std::endl;
