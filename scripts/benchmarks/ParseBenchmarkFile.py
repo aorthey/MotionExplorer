@@ -32,8 +32,6 @@ class PlannerResults:
         for d in child:
           self.dimensions_per_level.append(int(d.text))
         self.dimensions_per_level = np.array(self.dimensions_per_level).flatten()
-        if len(self.dimensions_per_level)==1:
-          self.name = "QRRT (Trivial)"
 
     self.runcount = runcount
     self.levels = len(self.dimensions_per_level)
