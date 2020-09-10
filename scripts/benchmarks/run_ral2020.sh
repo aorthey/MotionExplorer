@@ -1,11 +1,8 @@
 cd ../../build/
+make -j4 planner_standalone
+
 pwd
 for f in ../data/experiments/RAL2021_FINAL/*;
-do 
-  echo $f
-  ./planner_standalone $f
-done;
-for f in ../data/benchmarks/RAL2021_FINAL/*;
 do 
   echo $f
   ./planner_standalone $f

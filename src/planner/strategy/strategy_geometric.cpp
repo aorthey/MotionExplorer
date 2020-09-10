@@ -178,11 +178,6 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   {
     planner = std::make_shared<om::RestrictionSampler>(siVec);
   }
-  // else if(algorithm=="ompl:prrt" || algorithm=="ompl:psbl")
-  // {
-  //   std::cout << "Planner " << algorithm << " is returning infeasible paths and has been removed" << std::endl;
-  //   throw "Invalid planner.";
-  // }
   else{
     std::cout << "Planner algorithm " << algorithm << " is unknown." << std::endl;
     throw "Invalid planner.";

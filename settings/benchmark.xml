@@ -22,7 +22,6 @@
   </benchmark>
 
   <benchmark name="ral2020">
-
     <algorithm name="multilevel:qrrt"/>
     <algorithm name="multilevel:qrrtstar"/> 
     <algorithm name="multilevel:qmp"/> 
@@ -75,10 +74,8 @@
 
   <benchmark name="ral2020minimal">
     <algorithm name="multilevel:qrrt"/>
-    <algorithm name="multilevel:qrrtstar"/>
     <algorithm name="multilevel:qmp"/>
     <algorithm name="multilevel:qmpstar"/>
-    <algorithm name="ompl:rrtconnect"/>
     <maxplanningtime>60</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>10</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 

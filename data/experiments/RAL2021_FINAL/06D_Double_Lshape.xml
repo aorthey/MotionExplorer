@@ -36,10 +36,10 @@
     <freeFloating>1</freeFloating>
     <maxplanningtime>5</maxplanningtime>
 
+    <algorithm name="benchmark:ral2020"/>
     <algorithm name="multilevel:qmp"/>
     <algorithm name="multilevel:qmpstar"/>
     <algorithm name="multilevel:qrrt"/>
-    <algorithm name="benchmark:ijrr2020"/>
     <algorithm name="ompl:est"/>
     <algorithm name="ompl:kpiece"/>
     <algorithm name="ompl:stride"/> 

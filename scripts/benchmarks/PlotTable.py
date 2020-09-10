@@ -1,6 +1,7 @@
 from ParseBenchmarkFile import *
 from collections import defaultdict
 import subprocess
+import re
 
 
 
@@ -8,8 +9,10 @@ def PlotTable(fnames):
     texName = '../../data/benchmarks/table.tex'
     pdfName = '../../data/benchmarks/table.pdf'
 
+    fnames = sorted(fnames)
+
     d = defaultdict(dict)
-    planner_names = []
+    planner_names_tmp = []
     env_names = []
 
     for f in fnames:
@@ -18,16 +21,28 @@ def PlotTable(fnames):
         env = env.replace("_"," ")
         env_names.append(env)
         for p in benchmark.planners:
-            planner_names.append(p.name)
-            d[env][p.name] = p.AverageTime()
+            pname = p.name
+            pname = pname.replace("#","\#")
+            pname = re.sub('[Ss]tar', '*', pname)
+
+            planner_names_tmp.append(pname)
+            d[env][pname] = p.AverageTime()
 
     ## unique list
-    planner_names = set(planner_names)
+    planner_names = []
+     
+    for p in planner_names_tmp:
+      if p not in planner_names:
+        planner_names.append(p) 
+
+    # print(planner_names_tmp)
+    # print(planner_names)
+    # sys.exit(0)
     env_names = sorted(env_names)
+    
 
     Nplanner = len(planner_names)
     Nenv = len(env_names)
-    print(env_names)
 
     ## create tex
     f = open(texName, 'w')
@@ -35,19 +50,23 @@ def PlotTable(fnames):
     f.write("\documentclass{article}\n")
     # %\usetikzlibrary{...}% tikz package already loaded by 'tikz' option
     f.write("\\usepackage{makecell}\n")
-    f.write("\\usepackage{tabularx}\n")
+    f.write("\\usepackage{tabulary}\n")
     f.write("\\usepackage{rotating}\n")
     f.write("\\usepackage{booktabs}\n")
 
     f.write("\\begin{document}\n\n")
 
-    f.write("\\begin{table}\n")
+    f.write("\\begin{table}[h!]\n")
+    f.write("\\centering\n")
 
-    f.write("\\setcellgapes{2pt}\n")
-    f.write("\\makegapedcells\n")
+    # f.write("\\setcellgapes{2pt}\n")
+    # f.write("\\makegapedcells\n")
     f.write("\\renewcommand{\\cellrotangle}{90}\n")
     f.write("\\renewcommand\\theadfont{\\bfseries}\n")
-    f.write("\\renewcommand\\theadset{\\linespread{1.0}}\n")
+    #f.write("\\renewcommand{\\tabcolsep}{1pt}\n")
+
+
+    # f.write("\\renewcommand\\theadset{\\linespread{1.0}}\n")
     # f.write("\\settowidth\\rotheadsize{\\theadfont graduate (\\%)}\n")
 
     klongest = 0
@@ -58,22 +77,26 @@ def PlotTable(fnames):
         env_name_length = l
         klongest = k
 
-    f.write("\\settowidth{\\rotheadsize}{\\theadfont %s}" % env_names[klongest])
+    f.write("\\settowidth{\\rotheadsize}{\\theadfont %s}" % (env_names[klongest]))
 
-    # f.write("\\newcolumntype{Y}{>{\\raggedleft\\arraybackslash}X}")
+    f.write("\\newcolumntype{Y}{>{\\raggedleft\\arraybackslash}X}")
 
     f.write("\\footnotesize\\centering\n")
+    f.write("\\renewcommand{\\arraystretch}{1.2}\n")
+
 
     # st = "\\begin{tabularx}{\\textwidth}{@{} l *{%d}{Y}| @{}}" % Nenv
-    st = "\\begin{tabularx}{\\textwidth}{l|"
-    for k in range(0, Nenv-1):
-      st += "c|"
-    st+="c}\n"
+    st = "\\begin{tabulary}{\\linewidth}{@{}L"
+    for k in range(0, Nenv):
+      st += "C"
+    st+="@{}}\n"
     f.write(st)
 
-    f.write("\\hline\n")
+    # f.write("\\cline{2-%d}\n" % (Nenv+1))
+    f.write("\\toprule\n")
     # f.write("\\addlinespace[-10ex]\n")
 
+    # estr = "\\multicolumn{1}{c|}{} &"
     estr = " & "
     for k in range(0,Nenv):
       e = env_names[k]
@@ -84,7 +107,7 @@ def PlotTable(fnames):
     estr += " \\\\ \n"
 
     f.write(estr)
-    f.write("\\hline\n")
+    f.write("\\midrule\n")
 
     for p in planner_names:
       pstr = str(p)+" & "
@@ -104,13 +127,17 @@ def PlotTable(fnames):
       pstr += " \\\\ \n"
       f.write(pstr)
 
-    f.write("\\hline\n")
-    f.write("\end{tabularx}\n")
+    f.write("\\bottomrule\n")
+    f.write("\end{tabulary}\n")
     f.write("\\end{table}\n")
     f.write("\end{document}\n")
     f.close()
 
+    os.system("pdflatex -output-directory %s %s" % (os.path.dirname(texName),
+      texName))
     print("Wrote tex file to %s" % texName)
+
+    os.system("apvlv %s" % pdfName)
 
 if __name__ == '__main__':
     fnames = [

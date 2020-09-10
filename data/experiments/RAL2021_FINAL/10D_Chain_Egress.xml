@@ -44,6 +44,7 @@
     <smoothPath>0</smoothPath>
     <maxplanningtime>5</maxplanningtime>      <!-- runtime in (s) --> 
 
+    <algorithm name="benchmark:ral2020"/>
     <algorithm name="multilevel:qmp"/>
     <algorithm name="multilevel:qrrt"/>
     <algorithm name="benchmark:ral2020"/>
