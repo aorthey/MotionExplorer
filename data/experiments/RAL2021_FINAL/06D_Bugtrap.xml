@@ -31,8 +31,8 @@
     <pathBorderWidth>3</pathBorderWidth>
     <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
 
-    <algorithm name="multilevel:qmp"/>
     <algorithm name="benchmark:ral2020"/>
+    <algorithm name="multilevel:qmp"/>
     <algorithm name="multilevel:qrrt"/>
 
     <multilevel>

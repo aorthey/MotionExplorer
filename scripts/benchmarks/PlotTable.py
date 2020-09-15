@@ -1,25 +1,28 @@
 from ParseBenchmarkFile import *
 from collections import defaultdict
 import subprocess
+import glob
 import re
-
-
 
 def PlotTable(fnames):
     texName = '../../data/benchmarks/table.tex'
     pdfName = '../../data/benchmarks/table.pdf'
 
-    fnames = sorted(fnames)
+    # fnames = sorted(fnames)
 
     d = defaultdict(dict)
     planner_names_tmp = []
-    env_names = []
+    env_names_tmp = []
 
+    Nruns = 0
     for f in fnames:
+        print(f)
         benchmark = BenchmarkAnalytica(f)
         env = benchmark.benchmark_name
         env = env.replace("_"," ")
-        env_names.append(env)
+        if benchmark.runcount > Nruns:
+          Nruns = benchmark.runcount
+        env_names_tmp.append(env)
         for p in benchmark.planners:
             pname = p.name
             pname = pname.replace("#","\#")
@@ -28,6 +31,7 @@ def PlotTable(fnames):
             planner_names_tmp.append(pname)
             d[env][pname] = p.AverageTime()
 
+    # sys.exit(0)
     ## unique list
     planner_names = []
      
@@ -35,6 +39,10 @@ def PlotTable(fnames):
       if p not in planner_names:
         planner_names.append(p) 
 
+    env_names = []
+    for e in env_names_tmp:
+      if e not in env_names:
+        env_names.append(e)
     # print(planner_names_tmp)
     # print(planner_names)
     # sys.exit(0)
@@ -53,17 +61,17 @@ def PlotTable(fnames):
     f.write("\\usepackage{tabulary}\n")
     f.write("\\usepackage{rotating}\n")
     f.write("\\usepackage{booktabs}\n")
+    f.write("\\usepackage{multirow}\n")
 
     f.write("\\begin{document}\n\n")
 
-    f.write("\\begin{table}[h!]\n")
+    f.write("\\begin{table}[!t]\n")
     f.write("\\centering\n")
 
     # f.write("\\setcellgapes{2pt}\n")
     # f.write("\\makegapedcells\n")
     f.write("\\renewcommand{\\cellrotangle}{90}\n")
     f.write("\\renewcommand\\theadfont{\\bfseries}\n")
-    #f.write("\\renewcommand{\\tabcolsep}{1pt}\n")
 
 
     # f.write("\\renewcommand\\theadset{\\linespread{1.0}}\n")
@@ -77,16 +85,19 @@ def PlotTable(fnames):
         env_name_length = l
         klongest = k
 
-    f.write("\\settowidth{\\rotheadsize}{\\theadfont %s}" % (env_names[klongest]))
+    f.write("\\settowidth{\\rotheadsize}{\\theadfont %s}\n" % (env_names[klongest]))
 
-    f.write("\\newcolumntype{Y}{>{\\raggedleft\\arraybackslash}X}")
+    f.write("\\newcolumntype{Y}{>{\\raggedleft\\arraybackslash}X}\n")
+    # f.write("\\newcolumntype{C}[1]{>{\\centering\\arraybackslash}p{#1}}\n")
 
     f.write("\\footnotesize\\centering\n")
     f.write("\\renewcommand{\\arraystretch}{1.2}\n")
+    f.write("\\setlength\\tabcolsep{3pt}\n")
+
 
 
     # st = "\\begin{tabularx}{\\textwidth}{@{} l *{%d}{Y}| @{}}" % Nenv
-    st = "\\begin{tabulary}{\\linewidth}{@{}L"
+    st = "\\begin{tabulary}{\\linewidth}{@{}LL"
     for k in range(0, Nenv):
       st += "C"
     st+="@{}}\n"
@@ -96,8 +107,12 @@ def PlotTable(fnames):
     f.write("\\toprule\n")
     # f.write("\\addlinespace[-10ex]\n")
 
+    # fstr = "&& \\multicolumn{3}{|c|}{Narrow Passage} & \\multicolumn{4}{c|}{Grasping}\\\\ \n"
+    # f.write(fstr)
+
     # estr = "\\multicolumn{1}{c|}{} &"
-    estr = " & "
+    estr = "\\multicolumn{2}{>{\\centering}p{2.8cm}}{Runtime in seconds (%d run average)} & "%(Nruns)
+    # estr = " && "
     for k in range(0,Nenv):
       e = env_names[k]
       estr += "\\rothead{%s}"%e
@@ -109,8 +124,10 @@ def PlotTable(fnames):
     f.write(estr)
     f.write("\\midrule\n")
 
+    ctr = 1
     for p in planner_names:
-      pstr = str(p)+" & "
+      pstr = str(ctr) + " & \\mbox{" + str(p)+"} & "
+      ctr = ctr + 1
       for k in range(0,Nenv):
         e = env_names[k]
         bestPlanner = min(d[e],key=d[e].get)
@@ -129,6 +146,12 @@ def PlotTable(fnames):
 
     f.write("\\bottomrule\n")
     f.write("\end{tabulary}\n")
+
+
+    f.write("\\caption{Runtime (s) of motion planner on $7$ scenarios, each \
+        averaged over $10$ runs with cut-off time limit of $60$s. Entry $-$ \
+        means that planner does not support compound state spaces.}\n")
+
     f.write("\\end{table}\n")
     f.write("\end{document}\n")
     f.close()
@@ -140,8 +163,10 @@ def PlotTable(fnames):
     os.system("apvlv %s" % pdfName)
 
 if __name__ == '__main__':
-    fnames = [
-        "../../data/benchmarks/06D_bugtrap.xml",
-        "../../data/benchmarks/06D_doubleLshape.xml",
-        "../../data/benchmarks/10D_snake_outrun.xml"]
+    # fnames = glob.glob("../../data/benchmarks/RAL2020v1/*.xml")
+    fnames = []
+    fnames += glob.glob("../../data/benchmarks/RAL2020v2_Bundle/*.xml")
+    fnames += glob.glob("../../data/benchmarks/RAL2020v2_QRRTstar/*.xml")
+    fnames += glob.glob("../../data/benchmarks/RAL2020v2_NonBundle/*.xml")
+    # fnames = glob.glob("../../data/benchmarks/*.xml")
     PlotTable(fnames)

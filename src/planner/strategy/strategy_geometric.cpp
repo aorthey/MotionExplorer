@@ -26,6 +26,7 @@
 #include <ompl/geometric/planners/rrt/TRRT.h>
 #include <ompl/geometric/planners/rrt/BiTRRT.h>
 #include <ompl/geometric/planners/rrt/LBTRRT.h>
+#include <ompl/geometric/planners/rrt/LazyLBTRRT.h>
 #include <ompl/geometric/planners/rrt/SORRTstar.h>
 
 #include <ompl/geometric/planners/rlrt/RLRT.h>
@@ -130,6 +131,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="ompl:trrt") planner = std::make_shared<og::TRRT>(si);
   else if(algorithm=="ompl:btrrt") planner = std::make_shared<og::BiTRRT>(si);
   else if(algorithm=="ompl:lbtrrt") planner = std::make_shared<og::LBTRRT>(si);
+  else if(algorithm=="ompl:lazylbtrrt") planner = std::make_shared<og::LazyLBTRRT>(si);
   else if(algorithm=="ompl:sorrtstar") planner = std::make_shared<og::SORRTstar>(si);
 
   else if(algorithm=="ompl:rlrt") planner = std::make_shared<og::RLRT>(si);

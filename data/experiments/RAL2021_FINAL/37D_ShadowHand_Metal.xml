@@ -30,11 +30,11 @@
     <pathSpeed>2</pathSpeed>
     <maxplanningtime>4</maxplanningtime>
 
+    <algorithm name="benchmark:ral2020"/>
     <algorithm name="multilevel:qmp"/>
     <algorithm name="multilevel:qmpstar"/>
     <algorithm name="multilevel:qrrt"/>
     <algorithm name="ompl:rrtconnect"/>
-    <algorithm name="benchmark:ral2020"/>
 
     <multilevel>
       <level robot_index="2" type="R13"/>

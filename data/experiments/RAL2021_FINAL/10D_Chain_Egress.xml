@@ -5,7 +5,6 @@
   <!-- <robot name="snake_head_inner" file="../../robots/snake/snake_0_segments_sphere_inner.urdf"/> -->
   <robot name="sphere" file="../../robots/primitives/sphere_0_1_5.urdf"/>
 
-
   <!--
   <terrain  name="pipin" file="../../terrains/pipes/pipedreamin.tri" translation="0 0 0">
     <display color="0.7 0.7 0.7 0.5"/>
@@ -44,10 +43,9 @@
     <smoothPath>0</smoothPath>
     <maxplanningtime>5</maxplanningtime>      <!-- runtime in (s) --> 
 
-    <algorithm name="benchmark:ral2020"/>
+    <algorithm name="benchmark:ral2020_NonEuclidean"/>
     <algorithm name="multilevel:qmp"/>
     <algorithm name="multilevel:qrrt"/>
-    <algorithm name="benchmark:ral2020"/>
 
     <multilevel>
       <level robot_index="1" type="R3"/>

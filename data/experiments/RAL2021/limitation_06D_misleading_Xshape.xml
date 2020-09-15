@@ -8,7 +8,7 @@
   <robot name="sphere_outer" file="../../robots/Xshape/Xshape_sphere_outer.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
   <terrain  name="cubes" file="../../terrains/Lshape2.tri">
-    <display color="0.6 0.6 0.6 1"/>
+    <display color="0.6 0.6 0.6 0.3"/>
   </terrain>
 
   <plannerinput>

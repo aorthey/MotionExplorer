@@ -117,16 +117,32 @@ bool BenchmarkOutput::Save(TiXmlElement *node)
         AddSubNode(pknode, "number_of_levels", runs.at(0)[sstrat]);
     }
 
-    for(uint j = 0; j < runs.size(); j++){
+    int ctr = 0;
+    for(uint j = 0; j < runs.size(); j++)
+    {
+      ot::Benchmark::RunProperties run = runs.at(j);
+      double time = std::atof(run["time REAL"].c_str());
+      if(time < experiment.maxTime)
+      {
+        ctr++;
+      }
+    }
+    AddSubNode(pknode, "number_runs", runs.size());
+    AddSubNode(pknode, "number_successful_runs", ctr);
+
+    for(uint j = 0; j < runs.size(); j++)
+    {
+      ot::Benchmark::RunProperties run = runs.at(j);
+
       TiXmlElement runnode("run");
       runnode.SetAttribute("number", j+1);
-      ot::Benchmark::RunProperties run = runs.at(j);
       double time = std::atof(run["time REAL"].c_str());
       //if time exceeds maxTime, then clip it
       AddSubNode(runnode, "time", std::min(time, experiment.maxTime));
       AddSubNode(runnode, "memory", run["memory REAL"]);
       AddSubNode(runnode, "nodes", run["graph states INTEGER"]);
-      if(run.find(sstrat) != run.end()){
+      if(run.find(sstrat) != run.end())
+      {
         //AddSubNode(runnode, "levels", run[sstrat]);
         TiXmlElement all_levels_node("levels");
 
