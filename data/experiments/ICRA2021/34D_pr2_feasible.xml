@@ -10,7 +10,7 @@
   <robot name="pr2_norightarm" file="../../robots/PR2/pr2_20D_norightarm.urdf"/>
   <robot name="pr2_disk" file="../../robots/PR2/pr2_02D_disk.urdf"/>
 
-  <terrain name="plane" file="../../terrains/3droom/room_infeasible.stl" translation="0 0 0" rotateRPY="0 0 0">
+  <terrain name="plane" file="../../terrains/3droom/room_feasible.stl" translation="0 0 -0.01" rotateRPY="0 0 0">
      <display color="0.6 0.6 0.6 1"/> 
   </terrain>
 
@@ -22,7 +22,7 @@
     <se3min config="6  -4 -4 0 -3.141593 0 0"/>
     <se3max config="6  +4 +4 0 +3.141593 0 0"/>
 
-    <algorithm name="multilevel:spqr"/>
+    <algorithm name="multilevel:smlr"/>
 
     <epsilongoalregion>0.1</epsilongoalregion>
     <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 

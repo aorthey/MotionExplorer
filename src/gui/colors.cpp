@@ -4,6 +4,12 @@ void GLDraw::setColor(const GLColor &c){
   c.setCurrentGL();
 }
 int colorType = 1;
+const GLColor GLDraw::getColorRobot()
+{
+  // const GLColor colorStartConfiguration(0.7, 0.7, 0.7, 1);
+  // return colorStartConfiguration;
+  return GLColor(0.6, 0.6, 0.6, 1.0);
+}
 const GLColor GLDraw::getColorRobotStartConfiguration()
 {
   // const GLColor colorStartConfiguration(0.7, 0.7, 0.7, 1);

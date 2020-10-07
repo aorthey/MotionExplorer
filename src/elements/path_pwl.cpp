@@ -934,7 +934,7 @@ void PathPiecewiseLinear::DrawGL(GUIState& state, double t)
 {
   Config q = Eval(t);
   // std::cout << t << ": " << q << std::endl;
-  quotient_space->drawConfig(q, cRobotVolume);
+  quotient_space->drawConfig(q, GLDraw::getColorRobot());
 
   if(state("draw_path_trace"))
   {
@@ -1089,6 +1089,11 @@ bool PathPiecewiseLinear::Load(TiXmlElement *node)
   return true;
 }
 
+int PathPiecewiseLinear::GetNumberOfMilestones()
+{
+  return interLength.size()+1;
+}
+
 bool PathPiecewiseLinear::Save(const char* fn)
 {
   TiXmlDocument doc;
@@ -1097,11 +1102,6 @@ bool PathPiecewiseLinear::Save(const char* fn)
   doc.LinkEndChild(node);
   doc.SaveFile(fn);
   return true;
-}
-
-int PathPiecewiseLinear::GetNumberOfMilestones()
-{
-  return interLength.size()+1;
 }
 
 bool PathPiecewiseLinear::Save(TiXmlElement *node)

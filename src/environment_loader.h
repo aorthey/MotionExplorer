@@ -9,7 +9,6 @@
 
 class EnvironmentLoader{
   private:
-    std::string file_name;
 
     std::string name_environment;
     std::string name_robot;
@@ -21,6 +20,8 @@ class EnvironmentLoader{
     PlannerMultiInput pin;
 
   public:
+    std::string file_name;
+
     RobotWorld& GetWorld();
     RobotWorld* GetWorldPtr();
     PlannerBackendPtr GetBackendPtr();

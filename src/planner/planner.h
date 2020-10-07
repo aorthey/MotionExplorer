@@ -68,6 +68,7 @@ class MotionPlanner{
     bool hasChanged();
     bool isRunning();
 
+    void Save(std::string name);
   protected:
     MotionPlanner() = delete;
 

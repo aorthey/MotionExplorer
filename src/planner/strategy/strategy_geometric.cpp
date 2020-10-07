@@ -13,7 +13,7 @@
 #include <ompl/multilevel/planners/qrrt/QRRTStar.h>
 #include <ompl/multilevel/planners/qmp/QMP.h>
 #include <ompl/multilevel/planners/qmp/QMPStar.h>
-#include <ompl/multilevel/planners/sparse/SPQR.h>
+#include <ompl/multilevel/planners/sparse/SMLR.h>
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -168,7 +168,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="multilevel:qrrtstar") planner = std::make_shared<om::QRRTStar>(siVec, "QRRTStar");
   else if(algorithm=="multilevel:qmp") planner = std::make_shared<om::QMP>(siVec, "QMP");
   else if(algorithm=="multilevel:qmpstar") planner = std::make_shared<om::QMPStar>(siVec, "QMPStar");
-  else if(algorithm=="multilevel:spqr") planner = std::make_shared<om::SPQR>(siVec, "SPQR");
+  else if(algorithm=="multilevel:smlr") planner = std::make_shared<om::SMLR>(siVec, "SMLR");
 
   else if(algorithm=="multilevel:explorer") planner = std::make_shared<om::MotionExplorer>(siVec, "Explorer");
   else if(algorithm=="multilevel:explorer2") planner = std::make_shared<om::MotionExplorerQMP>(siVec, "ExplorerQMP");

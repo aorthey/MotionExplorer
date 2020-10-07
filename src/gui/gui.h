@@ -40,6 +40,7 @@ class ForceFieldBackend : public SimTestBackend
     virtual bool OnCommand(const string& cmd,const string& args);
     virtual void RenderWorld();
     virtual void RenderScreen();
+    void SetEnvironmentName(std::string fname);
 
     virtual bool OnIdle();
 
@@ -56,6 +57,8 @@ class ForceFieldBackend : public SimTestBackend
     int line_y_offset;
     int line_y_offset_stepsize;
     std::string last_command;
+
+    std::string filename_;
 
     uint active_robot;
     GUIState state;
@@ -75,6 +78,8 @@ class GLUIForceFieldGUI: public GLUISimTestGUI
     virtual void Handle_Keypress(unsigned char c,int x,int y);
     virtual bool OnCommand(const string& cmd,const string& args);
     virtual void Handle_Control(int id);
+
+    void SetEnvironmentName(std::string fname);
 
   private:
     typedef std::map<const char *, std::string> Keymap;

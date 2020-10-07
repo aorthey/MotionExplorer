@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <world>
 
-  <robot name="kuka_full1" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
-  <robot name="kuka_disk1" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+  <robot name="kuka_full1" file="../../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk1" file="../../../robots/kuka_lwr/kuka_base.urdf"/>
 
-  <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
-  <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+  <robot name="kuka_full2" file="../../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk2" file="../../../robots/kuka_lwr/kuka_base.urdf"/>
 
-  <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
-  <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+  <robot name="kuka_full2" file="../../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk2" file="../../../robots/kuka_lwr/kuka_base.urdf"/>
 
-  <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
-  <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+  <robot name="kuka_full2" file="../../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk2" file="../../../robots/kuka_lwr/kuka_base.urdf"/>
 
-  <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
-  <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+  <robot name="kuka_full2" file="../../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk2" file="../../../robots/kuka_lwr/kuka_base.urdf"/>
 
-  <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
-  <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+  <robot name="kuka_full2" file="../../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk2" file="../../../robots/kuka_lwr/kuka_base.urdf"/>
 
-  <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
-  <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+  <robot name="kuka_full2" file="../../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk2" file="../../../robots/kuka_lwr/kuka_base.urdf"/>
 
-  <robot name="kuka_full2" file="../../robots/kuka_lwr/kuka_5links_base.urdf"/>
-  <robot name="kuka_disk2" file="../../robots/kuka_lwr/kuka_base.urdf"/>
+  <robot name="kuka_full2" file="../../../robots/kuka_lwr/kuka_5links_base.urdf"/>
+  <robot name="kuka_disk2" file="../../../robots/kuka_lwr/kuka_base.urdf"/>
 
-  <terrain file="../../terrains/primitives/plane.tri" translation="0 0 -0.05">
+  <terrain file="../../../terrains/primitives/plane.tri" translation="0 0 -0.05">
      <display color="0.6 0.6 0.6 1"/> 
   </terrain>
-  <terrain file="../../terrains/primitives/cube.tri" translation="0.3 0 -0.05">
+  <terrain file="../../../terrains/primitives/cube.tri" translation="0.3 0 -0.05">
      <display color="0.6 0.6 0.6 1"/> 
   </terrain>
-  <terrain file="../../terrains/primitives/cuboid_1meter.tri" scale="1.0 1.0 0.5" rotateRPY="1.57 0 0.57" translation="-1.5 -1.2 1.0">
+  <terrain file="../../../terrains/primitives/cuboid_1meter.tri" scale="1.0 1.0 0.5" rotateRPY="1.57 0 0.57" translation="-1.5 -1.2 1.0">
      <display color="0.6 0.6 0.6 1"/> 
   </terrain>
 

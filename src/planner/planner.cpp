@@ -134,6 +134,8 @@ CSpaceOMPL* MotionPlanner::ComputeCSpace(const std::string type, const uint robo
         cspace_level = factory.MakeGeometricCSpaceSolidCylinder(world, robot_idx);
       }else if(type=="SOLIDTORUS") {
         cspace_level = factory.MakeGeometricCSpaceSolidTorus(world, robot_idx);
+      }else if(type=="TORUS") {
+        cspace_level = factory.MakeGeometricCSpaceTorus(world, robot_idx);
       }else if(type=="MOBIUS") {
         cspace_level = factory.MakeGeometricCSpaceMobius(world, robot_idx);
       }else if(type=="CIRCULAR"){
@@ -478,16 +480,22 @@ void MotionPlanner::AdvanceUntilSolution()
       strategy->Plan(*output);
       ExpandFull();
       time = getTime();
-      if(input.name_algorithm=="sampler" ||
-         input.name_algorithm=="multilevel:sampler")
-      {
-        std::string name = util::GetFileBasename(input.environment_name);
-        std::string fname = util::GetDataFolder()+"/samples/"+name+".samples";
+      // if(input.name_algorithm=="sampler" ||
+      //    input.name_algorithm=="multilevel:sampler")
+      // {
+      //   std::string name = util::GetFileBasename(input.environment_name);
+      //   std::string fname = util::GetDataFolder()+"/samples/"+name+".samples";
 
-        output->getRoadmap()->Save(fname.c_str());
-        std::cout << "Saved " << output->getRoadmap()->numVertices() 
-          << " infeasible samples to " << fname << std::endl;
-      }
+      //   output->getRoadmap()->Save(fname.c_str());
+      //   std::cout << "Saved " << output->getRoadmap()->numVertices() 
+      //     << " infeasible samples to " << fname << std::endl;
+      // }
+      // std::string name = util::GetFileBasename(input.environment_name);
+      // std::string fname = util::GetDataFolder()+"/samples/"+name+".samples";
+
+      // output->getRoadmap()->Save(fname.c_str());
+      // std::cout << "Saved roadmap with " << output->getRoadmap()->numVertices() 
+      //   << " samples to " << fname << std::endl;
   }
 }
 
@@ -699,6 +707,43 @@ double MotionPlanner::getTime()
 double MotionPlanner::getLastIterationTime()
 {
   return time;
+}
+
+void MotionPlanner::Save(std::string name)
+{
+  int current_level = getCurrentLevel();
+
+  PathPiecewiseLinear *path = GetPath();
+
+  std::string pname = strategy->GetPlannerPtr()->getName();
+
+  std::string id = name + "_" + pname;
+
+  if(max_levels_ > 1)
+  {
+    id += "_level"+std::to_string(current_level);
+  }
+ 
+  if(path)
+  {
+    std::string fname = util::GetDataFolder()+"/paths/"+id+".path";
+    path->Save(fname.c_str());
+    std::cout << "save current path (" << path->GetNumberOfMilestones() 
+      << " states) to : " << fname << std::endl;
+  }
+  if(output)
+  {
+      RoadmapPtr roadmap = output->getRoadmap();
+      if(roadmap)
+      {
+          std::string fname = util::GetDataFolder()+"/roadmaps/"+id+".roadmap";
+          roadmap->Save(fname.c_str());
+          std::cout << "Saved roadmap with " << roadmap->numVertices() 
+            << " vertices and " << roadmap->numEdges() 
+            << " edges to " << fname << "." << std::endl;
+      }
+
+  }
 }
 
 std::ostream& operator<< (std::ostream& out, const MotionPlanner& planner)

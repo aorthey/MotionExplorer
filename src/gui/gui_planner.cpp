@@ -1,6 +1,7 @@
 #include "gui/gui_planner.h"
 #include "elements/path_pwl.h"
 #include "gui/drawMotionPlanner.h"
+#include "util.h"
 
 PlannerBackend::PlannerBackend(RobotWorld *world) : 
   ForceFieldBackend(world)
@@ -184,8 +185,14 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
       std::cout << "no active control path" << std::endl;
     }
 
+  }else if(cmd=="save_current_planner"){
+
+    std::string fname = util::GetFileBasename(filename_);
+    planners.at(active_planner)->Save(fname);
+
   }else if(cmd=="save_current_path"){
     //state("save_current_path").activate();
+
     path = planners.at(active_planner)->GetPath();
     int current_level = planners.at(active_planner)->getCurrentLevel();
     if(path)
@@ -198,6 +205,8 @@ bool PlannerBackend::OnCommand(const string& cmd,const string& args){
     }else{
       std::cout << "cannot save non-existing path." << std::endl;
     }
+
+
   }else if(cmd=="load_current_path"){
     MotionPlanner* planner = planners.at(active_planner); // std::string fn = planner->GetInput().name_loadPath;
     std::string fname = "../data/paths/"+getRobotEnvironmentString()+".path";

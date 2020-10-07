@@ -264,8 +264,8 @@
     <key>m</key>
   </button>
   <button>
-    <name>save_current_path</name>
-    <descr>Save Current Path</descr>
+    <name>save_current_planner</name>
+    <descr>Save Current Planner</descr>
     <key>0</key>
   </button>
   <button>

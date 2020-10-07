@@ -17,7 +17,6 @@ const GLColor black(0,0,0,0.5);
 const GLColor white(1,1,1,1);
 const GLColor grey(0.7,0.7,0.7,0.5);
 const GLColor gray(0.7,0.7,0.7,0.5);
-const GLColor cRobot(0.4,0.4,0.4,0.5);
 
 const GLColor lightGrey(0.4,0.4,0.4,0.2);
 const GLColor lightGreen(0.5,0.9,0.5,0.5);
@@ -32,6 +31,7 @@ const GLColor darkGreen(0,0.5,0,1);
 const GLColor darkBlue(0,0,0.5,1);
 
 namespace GLDraw{
+  const GLColor getColorRobot();
   const GLColor getColorRobotStartConfiguration();
   const GLColor getColorRobotGoalConfiguration();
   const GLColor getColorRobotStartConfigurationTransparent();

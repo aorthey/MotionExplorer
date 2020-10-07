@@ -12,6 +12,7 @@ int main(int argc, char **argv) {
 
   GLUIPlannerGUI gui(env.GetBackendPtr(), env.GetWorldPtr());
   gui.AddPlannerInput(in);
+  gui.SetEnvironmentName(env.file_name);
   gui.SetWindowTitle("MotionExplorerGUI");
   if(in.inputs.empty()) env.GetBackendPtr()->state("draw_robot").active = 1;
 

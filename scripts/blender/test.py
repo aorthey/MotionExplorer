@@ -3,6 +3,8 @@ import bmesh
 import numpy as np
 from math import *
 from mathutils import *
+import mathutils as M, random as R, bpy_extras
+# from export_svg_280 import ExporterToSVG
 
 ### Using blender 2.82a
 ## How to use:
@@ -412,7 +414,7 @@ def addTorus(position):
 
     torus_mesh = bpy.ops.mesh.primitive_torus_add(major_radius = torusMajorRadius,
         minor_radius = torusMinorRadius-0.05,
-        major_segments = 64, minor_segments = 32, location=position)
+        major_segments = 16, minor_segments = 8, location=position)
     torus_obj = bpy.context.object
     torus_obj.name = 'Torus'
     torus_obj.data.materials.append(materialMagenta)
@@ -526,11 +528,14 @@ def drawScene(scn, resolution, thick):
 
     ### SAVE IMAGE
     bpy.context.scene.render.film_transparent = True
-    bpy.context.scene.render.image_settings.color_mode = 'RGBA'
-    bpy.context.scene.render.filepath = '/home/aorthey/image.png'
-    bpy.ops.render.render(write_still = True)
+    bpy.context.scene.render.filepath = '/home/aorthey/image.svg'
+    sceneR = bpy.context.scene
 
-    print(bpy.context.scene.render.filepath)
+
+    # exporter = ExporterToSVG('/home/aorthey/image.svg')
+    # exporter.execute(bpy.context, bpy.data, bpy.ops)
+
+    # bpy.ops.render.render(write_still = True)
 
 
 drawScene(bpy.context.scene, 72, mobiusStripThickness)

@@ -8,7 +8,7 @@
 GeometricCSpaceOMPLSO2RN::GeometricCSpaceOMPLSO2RN(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)
 {
-  Nklampt =  robot->q.size() - 7;
+  Nklampt =  robot->q.size() - 6;
   //check if the robot is SE(3) or if we need to add real vector space for joints
   klampt_to_ompl.clear();
   ompl_to_klampt.clear();
@@ -18,13 +18,13 @@ GeometricCSpaceOMPLSO2RN::GeometricCSpaceOMPLSO2RN(RobotWorld *world_, int robot
     std::vector<double> minimum, maximum;
     minimum = robot->qMin;
     maximum = robot->qMax;
-    assert(minimum.size() == 7+Nklampt);
-    assert(maximum.size() == 7+Nklampt);
+    assert(minimum.size() == 6+Nklampt);
+    assert(maximum.size() == 6+Nklampt);
 
     //prune dimensions which are smaller than epsilon (for ompl)
     double epsilonSpacing=1e-10;
     Nompl = 0;
-    for(uint i = 7; i < 7+Nklampt; i++){
+    for(uint i = 6; i < 6+Nklampt; i++){
 
       if(abs(minimum.at(i)-maximum.at(i))>epsilonSpacing){
         klampt_to_ompl.push_back(Nompl);
@@ -102,7 +102,7 @@ void GeometricCSpaceOMPLSO2RN::ConfigToOMPLState(const Config &q, ob::State *qom
     for(uint i = 0; i < Nklampt; i++){
       int idx = klampt_to_ompl.at(i);
       if(idx<0) continue;
-      else qomplRn[idx]=q(7+i);
+      else qomplRn[idx]=q(6+i);
     }
   }
 

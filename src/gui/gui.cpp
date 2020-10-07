@@ -33,6 +33,10 @@ ForceFieldBackend::ForceFieldBackend(RobotWorld *world)
 }
 
 //############################################################################
+void ForceFieldBackend::SetEnvironmentName(std::string fname)
+{
+  filename_ = fname;
+}
 bool ForceFieldBackend::OnIdle()
 {
   bool res=BaseT::OnIdle();
@@ -181,7 +185,7 @@ void ForceFieldBackend::RenderWorld()
         glMultMatrix(mat);
         GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
         if(a.geom != robot->geometry[j]) a.Set(*robot->geometry[j]);
-        a.SetColor(cRobot);
+        a.SetColor(GLDraw::getColorRobot());
         a.DrawGL();
         glPopMatrix();
 
@@ -435,6 +439,12 @@ GLUIForceFieldGUI::GLUIForceFieldGUI(GenericBackendBase* _backend,RobotWorld* _w
     :BaseT(_backend,_world)
 {
 }
+void GLUIForceFieldGUI::SetEnvironmentName(std::string fname)
+{
+  ForceFieldBackend* _backend = static_cast<ForceFieldBackend*>(backend);
+  _backend->SetEnvironmentName(fname);
+}
+
 bool GLUIForceFieldGUI::Initialize()
 {
   if(!BaseT::Initialize()) return false;

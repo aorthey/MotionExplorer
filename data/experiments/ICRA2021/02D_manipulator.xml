@@ -16,13 +16,14 @@
     <smoothPath>0</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
     <pathSpeed>15</pathSpeed>
     <pathWidth>0.2</pathWidth>
+
+    <algorithm name="multilevel:spqr"/>
     <algorithm name="ompl:spars"/>
-    <algorithm name="hierarchy:explorer"/>
 
     <multilevel>
-      <level robot_index="1" type="S1"/>
+      <!-- <level robot_index="1" type="S1"/> -->
+      <!-- <level robot_index="0" type="TORUS"/> -->
       <level robot_index="0" type="S1R1"/>
-      <!-- <level robot_index="0" type="R2"/> -->
     </multilevel>
 
   </plannerinput>

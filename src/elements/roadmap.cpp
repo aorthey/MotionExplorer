@@ -234,7 +234,7 @@ bool Roadmap::Save(TiXmlElement *node)
 
       om::PlannerDataVertexAnnotated *v = dynamic_cast<om::PlannerDataVertexAnnotated*>(&pd_->getVertex(vidx));
       if(v==nullptr){
-          subnode->SetAttribute("feasible", "no");
+          subnode->SetAttribute("feasible", "yes");
       }
       // if(v==nullptr){
       //   subnode->SetAttribute("feasible", "unknown");
@@ -258,6 +258,60 @@ bool Roadmap::Save(TiXmlElement *node)
       // }
       node->InsertEndChild(*subnode);
     }
+
+  }
+  {
+    AddComment(*node, "edges");
+    ob::SpaceInformationPtr si = cspace_levels_.back()->SpaceInformationPtr();
+    ob::StateSpacePtr space = si->getStateSpace();
+
+    ob::State* stateTmp = space->allocState();
+
+    for(uint vidx = 0; vidx < pd_->numVertices(); vidx++)
+    {
+
+      std::vector<unsigned int> edgeList;
+      pd_->getEdges(vidx, edgeList);
+      ob::PlannerDataVertex *v = &pd_->getVertex(vidx);
+      for(uint k = 0; k < edgeList.size(); k++)
+      {
+          ob::PlannerDataVertex *vk = &pd_->getVertex(edgeList.at(k));
+
+          TiXmlElement* node_edge = new TiXmlElement("edge");
+
+          std::vector<double> state_serialized;
+
+          const ob::State *s = v->getState();
+          const ob::State *t = vk->getState();
+          const int nd = space->validSegmentCount(s, t);
+          if(nd <= 1)
+          {
+              // DrawGLEdgeStateToState(space, s, t, ridx);
+              space->copyToReals(state_serialized, s);
+              TiXmlElement *s1 = ReturnSubNodeVector(*node, "state", state_serialized);
+              node_edge->InsertEndChild(*s1);
+
+              space->copyToReals(state_serialized, t);
+              TiXmlElement *s2 = ReturnSubNodeVector(*node, "state", state_serialized);
+              node_edge->InsertEndChild(*s2);
+          }else
+          {
+              for (int j = 0; j <= nd; j++)
+              {
+                  space->interpolate(s, t, (double)j / (double)nd, stateTmp);
+                  space->copyToReals(state_serialized, stateTmp);
+                  TiXmlElement *snode = ReturnSubNodeVector(*node, "state", state_serialized);
+                  node_edge->InsertEndChild(*snode);
+
+              }
+          }
+
+          node->InsertEndChild(*node_edge);
+      }
+
+    }
+    space->freeState(stateTmp);
+
 
   }
 

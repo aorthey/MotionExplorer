@@ -2,29 +2,29 @@
 
 <world>
 
-  <robot name="sentinel" file="../../robots/sentinel/octopus_8_arms.urdf"/>
+  <robot name="sentinel" file="../../../robots/sentinel/octopus_8_arms.urdf"/>
 
-  <robot name="o1" file="../../robots/sentinel/octopus_0_arms.urdf"/>
+  <robot name="o1" file="../../../robots/sentinel/octopus_0_arms.urdf"/>
 
-  <robot name="o2" file="../../robots/sentinel/octopus_1_arms_3_segments.urdf"/>
-  <robot name="o3" file="../../robots/sentinel/octopus_1_arms.urdf"/>
+  <robot name="o2" file="../../../robots/sentinel/octopus_1_arms_3_segments.urdf"/>
+  <robot name="o3" file="../../../robots/sentinel/octopus_1_arms.urdf"/>
 
-  <robot name="o4" file="../../robots/sentinel/octopus_2_arms_3_segments.urdf"/>
-  <robot name="o5" file="../../robots/sentinel/octopus_2_arms.urdf"/>
+  <robot name="o4" file="../../../robots/sentinel/octopus_2_arms_3_segments.urdf"/>
+  <robot name="o5" file="../../../robots/sentinel/octopus_2_arms.urdf"/>
 
-  <robot name="o6" file="../../robots/sentinel/octopus_3_arms_3_segments.urdf"/>
-  <robot name="o7" file="../../robots/sentinel/octopus_3_arms.urdf"/>
-  <robot name="o8" file="../../robots/sentinel/octopus_4_arms_3_segments.urdf"/>
-  <robot name="o9" file="../../robots/sentinel/octopus_4_arms.urdf"/>
-  <robot name="o10" file="../../robots/sentinel/octopus_5_arms_3_segments.urdf"/>
-  <robot name="o11" file="../../robots/sentinel/octopus_5_arms.urdf"/>
-  <robot name="o12" file="../../robots/sentinel/octopus_6_arms_3_segments.urdf"/>
-  <robot name="o13" file="../../robots/sentinel/octopus_6_arms.urdf"/>
-  <robot name="o14" file="../../robots/sentinel/octopus_7_arms_3_segments.urdf"/>
-  <robot name="o15" file="../../robots/sentinel/octopus_7_arms.urdf"/>
-  <robot name="o16" file="../../robots/sentinel/octopus_8_arms_3_segments.urdf"/>
+  <robot name="o6" file="../../../robots/sentinel/octopus_3_arms_3_segments.urdf"/>
+  <robot name="o7" file="../../../robots/sentinel/octopus_3_arms.urdf"/>
+  <robot name="o8" file="../../../robots/sentinel/octopus_4_arms_3_segments.urdf"/>
+  <robot name="o9" file="../../../robots/sentinel/octopus_4_arms.urdf"/>
+  <robot name="o10" file="../../../robots/sentinel/octopus_5_arms_3_segments.urdf"/>
+  <robot name="o11" file="../../../robots/sentinel/octopus_5_arms.urdf"/>
+  <robot name="o12" file="../../../robots/sentinel/octopus_6_arms_3_segments.urdf"/>
+  <robot name="o13" file="../../../robots/sentinel/octopus_6_arms.urdf"/>
+  <robot name="o14" file="../../../robots/sentinel/octopus_7_arms_3_segments.urdf"/>
+  <robot name="o15" file="../../../robots/sentinel/octopus_7_arms.urdf"/>
+  <robot name="o16" file="../../../robots/sentinel/octopus_8_arms_3_segments.urdf"/>
 
-  <terrain scale="0.15 0.15 0.15" name="ship" file="../../robots/rigidBodies/PirateShip.tri">
+  <terrain scale="0.15 0.15 0.15" name="ship" file="../../../robots/rigidBodies/PirateShip.tri">
      <display color="0.6 0.6 0.6 1"/> 
   </terrain>
 

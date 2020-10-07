@@ -59,19 +59,19 @@ class MetaMesh:
 
   def AddBox(self, x,y,z,width,length,height):
     vhandle = []
-    vl0 = self.mesh.add_vertex([x-width, y-length, -height])
-    vl1 = self.mesh.add_vertex([x+width, y-length, -height])
-    vl2 = self.mesh.add_vertex([x+width, y+length, -height])
-    vl3 = self.mesh.add_vertex([x-width, y+length, -height])
+    vl0 = self.mesh.add_vertex([x-width, y-length, z-height])
+    vl1 = self.mesh.add_vertex([x+width, y-length, z-height])
+    vl2 = self.mesh.add_vertex([x+width, y+length, z-height])
+    vl3 = self.mesh.add_vertex([x-width, y+length, z-height])
     vhandle.append(vl0)
     vhandle.append(vl1)
     vhandle.append(vl2)
     vhandle.append(vl3)
 
-    vh0 = self.mesh.add_vertex([x-width, y-length, +height])
-    vh1 = self.mesh.add_vertex([x+width, y-length, +height])
-    vh2 = self.mesh.add_vertex([x+width, y+length, +height])
-    vh3 = self.mesh.add_vertex([x-width, y+length, +height])
+    vh0 = self.mesh.add_vertex([x-width, y-length, z+height])
+    vh1 = self.mesh.add_vertex([x+width, y-length, z+height])
+    vh2 = self.mesh.add_vertex([x+width, y+length, z+height])
+    vh3 = self.mesh.add_vertex([x-width, y+length, z+height])
     vhandle.append(vh0)
     vhandle.append(vh1)
     vhandle.append(vh2)
