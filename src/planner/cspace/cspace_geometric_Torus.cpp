@@ -10,7 +10,98 @@
 
 using namespace boost::math::double_constants;
 
+const double majorRadius_{1.0};
+const double minorRadius_{0.6};
+
 #include <ompl/util/Exception.h>
+class TorusStateSampler : public ompl::base::StateSampler
+{
+public:
+		TorusStateSampler(const ob::StateSpace *space) : ob::StateSampler(space)
+		{
+		}
+
+		void sampleUniform(ob::State *state) override
+		{
+        ob::SO2StateSpace::StateType *SO2_1 = 
+          state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
+        ob::SO2StateSpace::StateType *SO2_2 = 
+          state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+
+        bool acceptedSampleFound = false;
+        while(!acceptedSampleFound)
+        {
+            double u = rng_.uniformReal(-pi, pi);
+            double v = rng_.uniformReal(-pi, pi);
+
+            const double &R = majorRadius_;
+            const double &r = minorRadius_;
+
+            double vprime = (R + r*cos(v))/(R + r);
+
+            double mu = rng_.uniformReal(0, 1);
+            if(mu <= vprime)
+            {
+                SO2_1->value = u;
+                SO2_2->value = v;
+                acceptedSampleFound = true;
+            }
+        }
+		}
+
+		void sampleUniformNear(ob::State *state, const ob::State *near, double distance) override
+    {
+        ob::SO2StateSpace::StateType *SO2_1 = 
+          state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
+        ob::SO2StateSpace::StateType *SO2_2 = 
+          state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+
+        const ob::SO2StateSpace::StateType *SO2_n1 = 
+          near->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
+        const ob::SO2StateSpace::StateType *SO2_n2 = 
+          near->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+
+        const double &u = SO2_n1->value;
+        const double &v = SO2_n2->value;
+
+        SO2_1->value = rng_.uniformReal(u - distance, u + distance);
+        SO2_2->value = rng_.uniformReal(v - distance, v + distance);
+        space_->enforceBounds(state);
+    }
+
+		void sampleGaussian(ob::State *state, const ob::State *mean, double stdDev) override
+    {
+        ob::SO2StateSpace::StateType *SO2_1 = 
+          state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
+        ob::SO2StateSpace::StateType *SO2_2 = 
+          state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+
+        const ob::SO2StateSpace::StateType *SO2_m1 = 
+          mean->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
+        const ob::SO2StateSpace::StateType *SO2_m2 = 
+          mean->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+
+        SO2_1->value = rng_.gaussian(SO2_m1->value, stdDev);
+        SO2_2->value = rng_.gaussian(SO2_m2->value, stdDev);
+
+        space_->enforceBounds(state);
+    }
+
+};
+
+ob::StateSamplerPtr allocTorusStateSampler(const ob::StateSpace *space)
+{
+    return std::make_shared<TorusStateSampler>(space);
+}
+
+ob::SpaceInformationPtr GeometricCSpaceOMPLTorus::SpaceInformationPtr()
+{
+    si = BaseT::SpaceInformationPtr();
+    const ob::StateSamplerAllocator allocator = allocTorusStateSampler;
+    si->getStateSpace()->setStateSamplerAllocator(allocator);
+    return si;
+}
+
 
 GeometricCSpaceOMPLTorus::GeometricCSpaceOMPLTorus(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)
@@ -35,14 +126,14 @@ bool GeometricCSpaceOMPLTorus::IsPlanar(){
 
 Config GeometricCSpaceOMPLTorus::AnglesToConfig(double u, double v)
 {
-    const double &R = distanceToCenter_;
-    const double &r = radiusTorus_;
+    const double &R = majorRadius_;
+    const double &r = minorRadius_;
 
     Config q;q.resize(robot->q.size());q.setZero();
 
-    q[0] = (R + r*cos(u))*cos(v);
-    q[1] = (R + r*cos(u))*sin(v);
-    q[2] = r*sin(u);
+    q[0] = (R + r*cos(v))*cos(u);
+    q[1] = (R + r*cos(v))*sin(u);
+    q[2] = r*sin(v);
 
     return q;
 }
@@ -57,7 +148,7 @@ Config GeometricCSpaceOMPLTorus::OMPLStateToConfig(const ob::State *x)
     const double u = SO2_1->value;
     const double v = SO2_2->value;
 
-    return AnglesToConfig(v, u);
+    return AnglesToConfig(u, v);
 }
 
 void GeometricCSpaceOMPLTorus::ConfigToOMPLState(const Config &q, ob::State *qompl)
@@ -76,7 +167,7 @@ void GeometricCSpaceOMPLTorus::ConfigToOMPLState(const Config &q, ob::State *qom
 
     SO2_1->value = u;
 
-    const double &R = distanceToCenter_;
+    const double &R = majorRadius_;
 
     Vector3 qv(x, y, z);
     Vector3 a(R*cos(u), R*sin(u), 0);

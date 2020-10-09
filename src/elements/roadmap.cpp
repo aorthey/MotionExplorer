@@ -227,35 +227,21 @@ bool Roadmap::Save(TiXmlElement *node)
     ob::StateSpacePtr space = si->getStateSpace();
 
     for(uint vidx = 0; vidx < pd_->numVertices(); vidx++){
+      om::PlannerDataVertexAnnotated *v = 
+        dynamic_cast<om::PlannerDataVertexAnnotated*>(&pd_->getVertex(vidx));
+      if(v != nullptr)
+      {
+        if((int)v->getLevel() != current_level_) continue;
+      }
+
       ob::PlannerDataVertex *vd = &pd_->getVertex(vidx);
       std::vector<double> state_serialized;
       space->copyToReals(state_serialized, vd->getState());
       TiXmlElement *subnode = ReturnSubNodeVector(*node, "state", state_serialized);
 
-      om::PlannerDataVertexAnnotated *v = dynamic_cast<om::PlannerDataVertexAnnotated*>(&pd_->getVertex(vidx));
       if(v==nullptr){
           subnode->SetAttribute("feasible", "yes");
       }
-      // if(v==nullptr){
-      //   subnode->SetAttribute("feasible", "unknown");
-      //   // subnode->SetAttribute("sufficient", "unknown");
-      // }else{
-      //   using FeasibilityType = om::PlannerDataVertexAnnotated::FeasibilityType;
-      //   FeasibilityType feasibility_t = v->GetFeasibility();
-      //   if(feasibility_t == FeasibilityType::INFEASIBLE){
-      //     subnode->SetAttribute("feasible", "no");
-      //     // subnode->SetAttribute("sufficient", "no");
-      //   }else{
-      //     subnode->SetAttribute("feasible", "yes");
-      //     // if(feasibility_t == FeasibilityType::SUFFICIENT_FEASIBLE){
-      //     //   subnode->SetAttribute("sufficient", "yes");
-      //     // }else{
-      //     //   subnode->SetAttribute("sufficient", "no");
-      //     // }
-      //   }
-      //   // double d = v->GetOpenNeighborhoodDistance();
-      //   // subnode->SetDoubleAttribute("open_ball_radius", d);
-      // }
       node->InsertEndChild(*subnode);
     }
 
@@ -269,6 +255,12 @@ bool Roadmap::Save(TiXmlElement *node)
 
     for(uint vidx = 0; vidx < pd_->numVertices(); vidx++)
     {
+      om::PlannerDataVertexAnnotated *va = 
+        dynamic_cast<om::PlannerDataVertexAnnotated*>(&pd_->getVertex(vidx));
+      if(va != nullptr)
+      {
+        if((int)va->getLevel() != current_level_) continue;
+      }
 
       std::vector<unsigned int> edgeList;
       pd_->getEdges(vidx, edgeList);

@@ -3,6 +3,10 @@
 #include <fstream>
 #include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
+#include <ompl/base/PlannerStatus.h>
+
+namespace ot = ompl::tools;
+namespace ob = ompl::base;
 
 // struct CompleteExperiment
 // {
@@ -68,14 +72,14 @@ bool BenchmarkOutput::Save(const char* file_)
   doc.SaveFile(file.c_str());
   std::cout << "Benchmark saved to " << file << std::endl;
 
-  //Copy XML to "last.xml" for better access to last written xml
-  std::ifstream src(file, std::ios::binary);
+  ////Copy XML to "last.xml" for better access to last written xml
+  //std::ifstream src(file, std::ios::binary);
 
-  std::string file_copy = dir.string()+"/last.xml";
-  std::cout << file_copy << std::endl;
-  std::ofstream dst(file_copy, std::ios::binary);
-  dst << src.rdbuf();
-  std::cout << "Benchmark copied to " << file_copy << std::endl;
+  //std::string file_copy = dir.string()+"/last.xml";
+  //std::cout << file_copy << std::endl;
+  //std::ofstream dst(file_copy, std::ios::binary);
+  //dst << src.rdbuf();
+  //std::cout << "Benchmark copied to " << file_copy << std::endl;
   return true;
 }
 void BenchmarkOutput::PrintPDF()
@@ -139,7 +143,32 @@ bool BenchmarkOutput::Save(TiXmlElement *node)
       double time = std::atof(run["time REAL"].c_str());
       //if time exceeds maxTime, then clip it
       AddSubNode(runnode, "time", std::min(time, experiment.maxTime));
+
       AddSubNode(runnode, "memory", run["memory REAL"]);
+
+      //extract status
+      int status = stoi(run["status ENUM"]);
+      if(time >= experiment.maxTime)
+      {
+        status = ob::PlannerStatus::TIMEOUT;
+      }
+      switch (status) {
+        case ob::PlannerStatus::INFEASIBLE:
+          AddSubNode(runnode, "status", "infeasible");
+          break;
+        case ob::PlannerStatus::EXACT_SOLUTION:
+          AddSubNode(runnode, "status", "solved");
+          break;
+        case ob::PlannerStatus::TIMEOUT:
+        case ob::PlannerStatus::APPROXIMATE_SOLUTION:
+          AddSubNode(runnode, "status", "timeout");
+          break;
+        default:
+          std::cout << "Planner Status unknown: " << status << ":" << run["status ENUM"] << std::endl;
+          AddSubNode(runnode, "status", "unknown");
+          break;
+      }
+
       AddSubNode(runnode, "nodes", run["graph states INTEGER"]);
       if(run.find(sstrat) != run.end())
       {

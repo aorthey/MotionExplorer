@@ -1,6 +1,7 @@
 #include "planner/cspace/cspace_geometric_Circular.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
+#include <ompl/base/spaces/EmptyStateSpace.h>
 #include "common.h"
 #include "gui/colors.h"
 #include <KrisLibrary/GLdraw/drawextra.h>

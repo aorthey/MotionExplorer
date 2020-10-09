@@ -4,13 +4,13 @@
 GeometricCSpaceOMPLSE2Dubin::GeometricCSpaceOMPLSE2Dubin(RobotWorld *world_, int robot_idx):
   BaseT(world_, robot_idx)
 {
-    turningRadius_ = 1.0;
+    turningRadius_ = 0.5;
 }
 
 void GeometricCSpaceOMPLSE2Dubin::initSpace()
 {
 
-  ob::StateSpacePtr SE2Dubin(std::make_shared<ob::DubinsStateSpace>(turningRadius_));
+  ob::StateSpacePtr SE2Dubin(std::make_shared<ob::DubinsStateSpace>(turningRadius_, false));
   ob::DubinsStateSpace *cspaceDubin;
   this->space = SE2Dubin;
   cspaceDubin = this->space->as<ob::DubinsStateSpace>();
@@ -35,7 +35,6 @@ void GeometricCSpaceOMPLSE2Dubin::initSpace()
   bounds.high = high;
   cspaceDubin->setBounds(bounds);
   bounds.check();
-
 }
 
 void GeometricCSpaceOMPLSE2Dubin::ConfigToOMPLState(const Config &q, ob::State *qompl)
@@ -57,6 +56,6 @@ Config GeometricCSpaceOMPLSE2Dubin::OMPLStateToConfig(const ob::State *qompl){
 ob::SpaceInformationPtr GeometricCSpaceOMPLSE2Dubin::SpaceInformationPtr()
 {
     si = BaseT::SpaceInformationPtr();
-    si->setMotionValidator(std::make_shared<ob::DubinsMotionValidator>(si));
+    // si->setMotionValidator(std::make_shared<ob::DubinsMotionValidator>(si));
     return si;
 }

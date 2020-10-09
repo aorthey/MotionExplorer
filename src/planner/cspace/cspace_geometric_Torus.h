@@ -2,11 +2,19 @@
 #include "planner/cspace/cspace_geometric.h"
 #include "gui/gui_state.h"
 
+//TODO: IMPLEMENT UNIFORM SAMPLING
+// https://stackoverflow.com/questions/26300510/generating-random-points-on-a-surface-of-an-n-dimensional-torus
+//
+// Based on pub "Random selection of points distributed on curved surfaces."
+//
 class GeometricCSpaceOMPLTorus: public GeometricCSpaceOMPL
 {
+  using BaseT = GeometricCSpaceOMPL;
   public:
     GeometricCSpaceOMPLTorus(RobotWorld *world_, int robot_idx);
     virtual void initSpace();
+
+    virtual ob::SpaceInformationPtr SpaceInformationPtr() override;
 
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
     virtual Config OMPLStateToConfig(const ob::State *qompl) override;
@@ -23,7 +31,5 @@ class GeometricCSpaceOMPLTorus: public GeometricCSpaceOMPL
 
   private:
     double zOffset_{0.0};
-    double distanceToCenter_{1.0};
-    double radiusTorus_{0.6};
 };
 

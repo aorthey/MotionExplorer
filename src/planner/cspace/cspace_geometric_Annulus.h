@@ -27,8 +27,6 @@ class GeometricCSpaceOMPLAnnulus: public GeometricCSpaceOMPL
     Vector3 ProjectToVector3(double u, double v);
     Config ProjectToConfig(double u, double v);
   private:
-    ompl::base::StateSamplerPtr sampler_;
-
     double zOffset_{-2.0};
     double radiusOuter_{1.5};
     double radiusInner_{0.5};

@@ -68,6 +68,7 @@
 namespace om = ompl::multilevel;
 namespace og = ompl::geometric;
 namespace ob = ompl::base;
+namespace ot = ompl::tools;
 
 static ob::OptimizationObjectivePtr GetOptimizationObjective(const ob::SpaceInformationPtr& si)
 {
@@ -97,6 +98,7 @@ void PostRunEvent(const ob::PlannerPtr &planner, ot::Benchmark::RunProperties &r
   uint states = boost::lexical_cast<int>(run["graph states INTEGER"]);
   double time = boost::lexical_cast<double>(run["time REAL"]);
   double memory = boost::lexical_cast<double>(run["memory REAL"]);
+  // int status = boost::lexical_cast<int>(run["status ENUM"]);
 
   uint N = si->getStateDimension();
   run["stratification levels INTEGER"] = to_string(1);
@@ -492,8 +494,8 @@ void StrategyGeometricMultiLevel::RunBenchmark(const StrategyInput& input)
   boutput.Save(xml_file.c_str());
   boutput.PrintPDF();
 
-  boutput.Save(xml_file_minimal.c_str());
-  boutput.PrintPDF();
+  // boutput.Save(xml_file_minimal.c_str());
+  // boutput.PrintPDF();
 
   //BenchmarkFileToPNG(file_benchmark);
 }

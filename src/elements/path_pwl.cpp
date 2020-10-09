@@ -1164,6 +1164,8 @@ bool PathPiecewiseLinear::Save(TiXmlElement *node)
       AddComment(*node, "Smoothed States: Sequence of Configurations in Configuration Space");
 
       og::PathGeometric gpath = static_cast<og::PathGeometric&>(*path);
+      gpath.interpolate();
+
       ob::SpaceInformationPtr si = gpath.getSpaceInformation();
       ob::StateSpacePtr space = si->getStateSpace();
       std::vector<ob::State *> states = gpath.getStates();

@@ -4,7 +4,6 @@
 
   <robot name="point" file="../../robots/point_nonphysical.urdf"/>
 
-  <!-- <rigidObject name="mobius.tri" file="../../terrains/mobius.tri" translation="0 0 0.5" rotateRPY="0 0 1.57"/> -->
   <plannerinput>
 
     <qinit  config="6  +3.0 +0.0 -0.03 0 0 0"/>
@@ -19,13 +18,14 @@
     <pathSpeed>8</pathSpeed>
 
     <algorithm name="multilevel:qmp"/>
-    <algorithm name="multilevel:spqr"/>
+    <algorithm name="multilevel:smlr"/>
     <algorithm name="ompl:spars"/>
-    <algorithm name="ompl:prm"/>
+    <algorithm name="ompl:spars2"/>
+    <algorithm name="ompl:prmstar"/>
     <algorithm name="ompl:rrtconnect"/>
 
     <multilevel>
-      <!-- <level robot_index="1" type="CIRCULAR"/> -->
+      <level robot_index="0" type="CIRCULAR"/>
       <level robot_index="0" type="TORUS"/>
     </multilevel>
 

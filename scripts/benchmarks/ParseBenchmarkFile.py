@@ -14,6 +14,7 @@ class PlannerResults:
   run_nodes_per_level = []
   run_feasible_nodes_per_level = []
   run_time = []
+  run_status = [] #outcome: #solved, #infeasible, #aborted
 
   def __del__(self):
     del self.run_time
@@ -39,6 +40,7 @@ class PlannerResults:
     self.run_nodes_per_level = np.zeros((self.runcount, self.levels),dtype=np.int)
     self.run_feasible_nodes_per_level = np.zeros((self.runcount, self.levels),dtype=np.int)
     self.run_time = np.zeros(self.runcount)
+    self.run_status = np.zeros((3,1))
 
     self.AddRuns(xml)
 
@@ -66,6 +68,9 @@ class PlannerResults:
   def GetNumberSubspaces(self):
     return len(self.dimensions_per_level)
 
+  def GetStatusCounter(self):
+    return self.run_status
+
   def AverageTime(self):
     t =  np.mean(self.run_time)
     return t
@@ -80,6 +85,17 @@ class PlannerResults:
         for rchild in child:
           if rchild.tag == "time":
             self.run_time[run_ctr] = float(rchild.text)
+          if rchild.tag == "status":
+            status = str(rchild.text)
+            if status == "infeasible":
+              self.run_status[1] += 1
+            elif status == "timeout":
+              self.run_status[2] += 1
+            elif status == "solved":
+              self.run_status[0] += 1
+            else:
+              print("Status %s is unknown."%status)
+              sys.exit(0)
           if rchild.tag == "levels":
             for level_idx, level in enumerate(rchild):
               for lchild in level:

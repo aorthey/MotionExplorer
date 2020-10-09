@@ -6,8 +6,8 @@
         Results are averaged over 100 runs and show RRT (145s), 
         Retraction RRT by Zhang 2008 (39.72s) and SR-RRT+PCA (22.17s) -->
 
-  <robot name="bug" file="../../objects/bugtrap/bug_inner_cylinder.urdf"/>
-  <robot name="bug" file="../../objects/bugtrap/bug_inner_sphere.urdf"/>
+  <robot name="bug" file="../../objects/bugtrap/bug_cylinder_infeasible.urdf"/>
+  <robot name="bug" file="../../objects/bugtrap/bug_sphere_infeasible.urdf"/>
 
   <terrain name="mug" file="../../objects/bugtrap/trap.tri">
      <display color="0.6 0.6 0.6 1"/> 
@@ -27,12 +27,9 @@
     <se3max config="6  +13.0 +13.0 +20.0 +3.141593 +1.57 +3.141593"/>
     <freeFloating>1</freeFloating>
     <pathBorderWidth>3</pathBorderWidth>
-    <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>10</maxplanningtime>      <!-- runtime in (s) --> 
 
     <algorithm name="benchmark:icra2021"/>
-    <algorithm name="multilevel:smlr"/>
-    <algorithm name="ompl:spars"/>
-    <algorithm name="ompl:spars2"/>
 
     <multilevel>
       <level robot_index="1" type="R3"/>
