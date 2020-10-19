@@ -22,7 +22,7 @@
   </benchmark>
 
   <benchmark name="icra2021">
-    <algorithm name="multilevel:smlr"/>
+    <!-- <algorithm name="multilevel:smlr"/> -->
     <algorithm name="ompl:spars"/>
     <algorithm name="ompl:spars2"/>
     <maxplanningtime>60</maxplanningtime> <!-- runtime in (s) --> 

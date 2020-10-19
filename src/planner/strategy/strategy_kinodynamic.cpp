@@ -3,7 +3,7 @@
 #include "planner/benchmark/benchmark_input.h"
 #include "util.h"
 
-#include <ompl/multilevel/planners/explorer/MotionExplorer.h>
+// #include <ompl/multilevel/planners/explorer/MotionExplorer.h>
 #include <ompl/multilevel/planners/qrrt/QRRT.h>
 #include <ompl/multilevel/planners/qrrt/QRRTStar.h>
 #include <ompl/multilevel/planners/qmp/QMP.h>
@@ -90,8 +90,8 @@ ob::PlannerPtr StrategyKinodynamicMultiLevel::GetPlanner(std::string algorithm,
   //   planner = std::make_shared<oc::SyclopRRT>(si);
   // }else if(algorithm=="ompl:dynamic:syclopest"){
   //   planner = std::make_shared<oc::SyclopEST>(si);
-  }else if(algorithm=="multilevel:explorer"){
-    planner = std::make_shared<om::MotionExplorer>(si_vec);
+  // }else if(algorithm=="multilevel:explorer"){
+  //   planner = std::make_shared<om::MotionExplorer>(si_vec);
   }else if(algorithm=="multilevel:qrrt"){
     planner = std::make_shared<om::QRRT>(si_vec);
   }else if(algorithm=="multilevel:qrrtstar"){

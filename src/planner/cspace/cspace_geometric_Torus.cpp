@@ -1,6 +1,7 @@
 #include "planner/cspace/cspace_geometric_Torus.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
+#include "ompl/base/spaces/TorusStateSpace.h"
 #include "common.h"
 #include "gui/colors.h"
 #include <KrisLibrary/GLdraw/drawextra.h>
@@ -23,10 +24,6 @@ public:
 
 		void sampleUniform(ob::State *state) override
 		{
-        ob::SO2StateSpace::StateType *SO2_1 = 
-          state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
-        ob::SO2StateSpace::StateType *SO2_2 = 
-          state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
 
         bool acceptedSampleFound = false;
         while(!acceptedSampleFound)
@@ -42,8 +39,15 @@ public:
             double mu = rng_.uniformReal(0, 1);
             if(mu <= vprime)
             {
-                SO2_1->value = u;
-                SO2_2->value = v;
+                // ob::SO2StateSpace::StateType *SO2_1 = 
+                //   state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
+                // ob::SO2StateSpace::StateType *SO2_2 = 
+                //   state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+                // SO2_1->value = u;
+                // SO2_2->value = v;
+                ob::TorusStateSpace::StateType *T = 
+                  state->as<ob::TorusStateSpace::StateType>();
+                T->setS1S2(u, v);
                 acceptedSampleFound = true;
             }
         }
@@ -51,38 +55,56 @@ public:
 
 		void sampleUniformNear(ob::State *state, const ob::State *near, double distance) override
     {
-        ob::SO2StateSpace::StateType *SO2_1 = 
-          state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
-        ob::SO2StateSpace::StateType *SO2_2 = 
-          state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+        // ob::SO2StateSpace::StateType *SO2_1 = 
+        //   state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
+        // ob::SO2StateSpace::StateType *SO2_2 = 
+        //   state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
 
-        const ob::SO2StateSpace::StateType *SO2_n1 = 
-          near->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
-        const ob::SO2StateSpace::StateType *SO2_n2 = 
-          near->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+        // const ob::SO2StateSpace::StateType *SO2_n1 = 
+        //   near->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
+        // const ob::SO2StateSpace::StateType *SO2_n2 = 
+        //   near->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
 
-        const double &u = SO2_n1->value;
-        const double &v = SO2_n2->value;
+        // const double &u = SO2_n1->value;
+        // const double &v = SO2_n2->value;
 
-        SO2_1->value = rng_.uniformReal(u - distance, u + distance);
-        SO2_2->value = rng_.uniformReal(v - distance, v + distance);
+        // SO2_1->value = rng_.uniformReal(u - distance, u + distance);
+        // SO2_2->value = rng_.uniformReal(v - distance, v + distance);
+        // space_->enforceBounds(state);
+
+
+
+        ob::TorusStateSpace::StateType *T = 
+          state->as<ob::TorusStateSpace::StateType>();
+        const ob::TorusStateSpace::StateType *Tnear = 
+          near->as<ob::TorusStateSpace::StateType>();
+        T->setS1( rng_.uniformReal(Tnear->getS1() - distance, Tnear->getS1() + distance));
+        T->setS2( rng_.uniformReal(Tnear->getS2() - distance, Tnear->getS2() + distance));
         space_->enforceBounds(state);
     }
 
 		void sampleGaussian(ob::State *state, const ob::State *mean, double stdDev) override
     {
-        ob::SO2StateSpace::StateType *SO2_1 = 
-          state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
-        ob::SO2StateSpace::StateType *SO2_2 = 
-          state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+        // ob::SO2StateSpace::StateType *SO2_1 = 
+        //   state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
+        // ob::SO2StateSpace::StateType *SO2_2 = 
+        //   state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
 
-        const ob::SO2StateSpace::StateType *SO2_m1 = 
-          mean->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
-        const ob::SO2StateSpace::StateType *SO2_m2 = 
-          mean->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+        // const ob::SO2StateSpace::StateType *SO2_m1 = 
+        //   mean->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
+        // const ob::SO2StateSpace::StateType *SO2_m2 = 
+        //   mean->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
 
-        SO2_1->value = rng_.gaussian(SO2_m1->value, stdDev);
-        SO2_2->value = rng_.gaussian(SO2_m2->value, stdDev);
+        // SO2_1->value = rng_.gaussian(SO2_m1->value, stdDev);
+        // SO2_2->value = rng_.gaussian(SO2_m2->value, stdDev);
+        // space_->enforceBounds(state);
+
+        ob::TorusStateSpace::StateType *T = 
+          state->as<ob::TorusStateSpace::StateType>();
+        const ob::TorusStateSpace::StateType *Tmean = 
+          mean->as<ob::TorusStateSpace::StateType>();
+        T->setS1( rng_.gaussian(Tmean->getS1(), stdDev) );
+        T->setS2( rng_.gaussian(Tmean->getS2(), stdDev) );
 
         space_->enforceBounds(state);
     }
@@ -110,9 +132,12 @@ GeometricCSpaceOMPLTorus::GeometricCSpaceOMPLTorus(RobotWorld *world_, int robot
 
 void GeometricCSpaceOMPLTorus::initSpace()
 {
-    ob::StateSpacePtr SO2_1(std::make_shared<ob::SO2StateSpace>());
-    ob::StateSpacePtr SO2_2(std::make_shared<ob::SO2StateSpace>());
-    space = SO2_1 + SO2_2;
+    // ob::StateSpacePtr SO2_1(std::make_shared<ob::SO2StateSpace>());
+    // ob::StateSpacePtr SO2_2(std::make_shared<ob::SO2StateSpace>());
+    // space = SO2_1 + SO2_2;
+
+    ob::StateSpacePtr T(std::make_shared<ob::TorusStateSpace>());
+		space = T;
 }
 
 void GeometricCSpaceOMPLTorus::print(std::ostream& out) const
@@ -140,23 +165,23 @@ Config GeometricCSpaceOMPLTorus::AnglesToConfig(double u, double v)
 
 Config GeometricCSpaceOMPLTorus::OMPLStateToConfig(const ob::State *x)
 {
-    const ob::SO2StateSpace::StateType *SO2_1 = 
-      x->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
-    const ob::SO2StateSpace::StateType *SO2_2 = 
-      x->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+    // const ob::SO2StateSpace::StateType *SO2_1 = 
+    //   x->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
+    // const ob::SO2StateSpace::StateType *SO2_2 = 
+    //   x->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+    // const double u = SO2_1->value;
+    // const double v = SO2_2->value;
 
-    const double u = SO2_1->value;
-    const double v = SO2_2->value;
+    const ob::TorusStateSpace::StateType *T = 
+      x->as<ob::TorusStateSpace::StateType>();
+    const double u = T->getS1();
+    const double v = T->getS2();
 
     return AnglesToConfig(u, v);
 }
 
 void GeometricCSpaceOMPLTorus::ConfigToOMPLState(const Config &q, ob::State *qompl)
 {
-    ob::SO2StateSpace::StateType *SO2_1 = 
-      qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
-    ob::SO2StateSpace::StateType *SO2_2 = 
-      qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
 
     double x = q[0];
     double y = q[1];
@@ -164,8 +189,6 @@ void GeometricCSpaceOMPLTorus::ConfigToOMPLState(const Config &q, ob::State *qom
 
     double rxy = sqrt(x*x + y*y);
     double u = atan2(y/rxy, x/rxy);
-
-    SO2_1->value = u;
 
     const double &R = majorRadius_;
 
@@ -178,7 +201,15 @@ void GeometricCSpaceOMPLTorus::ConfigToOMPLState(const Config &q, ob::State *qom
 
     double v = acos(dot(a, b));
 
-    SO2_2->value = v;
+    // ob::SO2StateSpace::StateType *SO2_1 = 
+    //   qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
+    // ob::SO2StateSpace::StateType *SO2_2 = 
+    //   qompl->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
+    // SO2_1->value = u;
+    // SO2_2->value = v;
+    ob::TorusStateSpace::StateType *T = 
+      qompl->as<ob::TorusStateSpace::StateType>();
+		T->setS1S2(u, v);
 }
 
 

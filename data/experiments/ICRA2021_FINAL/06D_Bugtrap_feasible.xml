@@ -30,6 +30,7 @@
     <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
 
     <algorithm name="benchmark:icra2021"/>
+    <algorithm name="multilevel:smlr"/>
 
     <multilevel>
       <level robot_index="1" type="R3"/>

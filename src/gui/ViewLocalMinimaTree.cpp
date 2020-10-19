@@ -21,8 +21,13 @@ ViewLocalMinimaTree::ViewLocalMinimaTree(ompl::multilevel::LocalMinimaTreePtr lo
 {
   textColor.set(0.1,0.1,0.1);
   nodeColor.set(0.8,0.8,0.8);
+
   nodeSelectedColor.set(0.4,0.4,0.4);
   nodeUnselectedColor.set(0.8,0.8,0.8);
+
+  colorPathSelected.set(0,1,0);
+  colorPathUnselected.set(1,0,1);
+
   boundColor.set(0.2,0.2,0.2);
   plotAreaColor.set(0.8,0.8,0.8,0.5);
   node_radius = heightPerLevel/4.0;
@@ -54,7 +59,7 @@ void ViewLocalMinimaTree::DrawGLNodeSelected(GUIState& state, LocalMinimaNode* n
   pathSelected_->ptsize = 1;
   pathSelected_->linewidth = pathWidth;
   pathSelected_->widthBorder = pathBorderWidth;
-  pathSelected_->setColor(magenta);
+  pathSelected_->setColor(colorPathSelected);
   pathSelected_->drawSweptVolume = true;
   pathSelected_->drawCross = false;
   pathSelected_->DrawGL(state);
@@ -72,16 +77,16 @@ void ViewLocalMinimaTree::DrawGLNodeUnSelected(GUIState& state, LocalMinimaNode*
       node->customRepresentation = pwl;
   }
 
-  PathPiecewiseLinear *pwl = static_cast<PathPiecewiseLinear*>(node->customRepresentation);
+  PathPiecewiseLinear *pathUnselected = static_cast<PathPiecewiseLinear*>(node->customRepresentation);
 
-  pwl->zOffset = 0.001;
-  pwl->ptsize = 1;
-  pwl->linewidth = 0.5*pathWidth;
-  pwl->widthBorder = 0.3*pathBorderWidth;
-  pwl->setColor(grey);
-  pwl->drawSweptVolume = false;
-  pwl->drawCross = false;
-  pwl->DrawGL(state);
+  pathUnselected->zOffset = 0.001;
+  pathUnselected->ptsize = 1;
+  pathUnselected->linewidth = 0.5*pathWidth;
+  pathUnselected->widthBorder = 0.3*pathBorderWidth;
+  pathUnselected->setColor(colorPathUnselected);
+  pathUnselected->drawSweptVolume = false;
+  pathUnselected->drawCross = false;
+  pathUnselected->DrawGL(state);
 
 }
 void ViewLocalMinimaTree::DrawGL(GUIState& state)

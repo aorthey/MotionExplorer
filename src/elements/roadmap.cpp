@@ -207,12 +207,14 @@ void Roadmap::DrawGL(GUIState& state, int level)
 
 bool Roadmap::Save(const char* fn)
 {
+  if(numVertices() <= 0 && numEdges() <= 0) return false;
+
   TiXmlDocument doc;
   TiXmlElement *node = CreateRootNodeInDocument(doc);
-  Save(node);
+  bool s = Save(node);
   doc.LinkEndChild(node);
   doc.SaveFile(fn);
-  return true;
+  return s;
 }
 bool Roadmap::Save(TiXmlElement *node)
 {

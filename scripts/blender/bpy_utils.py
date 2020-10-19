@@ -28,7 +28,7 @@ materialGreen.metallic = 0.0
 materialGreen.specular_intensity = 0.0
 
 materialMagenta = bpy.data.materials.new(name="Magenta")
-materialMagenta.diffuse_color = (0.205, 0.0, 0.37, 0.5)
+materialMagenta.diffuse_color = (0.205, 0.0, 0.37, 1.0)
 materialMagenta.metallic = 0.9
 materialMagenta.specular_intensity = 0.9
 # materialMagenta.blend_method = "BLEND"
@@ -324,30 +324,24 @@ def addStateAnnulus(x_1, name, color=(1.0, 1.0, 1.0, 1.0), offset = offsetAnnulu
     addSphere(pos, name, color)
 
 
-def addLightSource():
+def addLightSourceSun(location):
 
     light_data = bpy.data.lights.new(name="light_2.80", type='SUN')
     light_data.energy = 5
     light_object = bpy.data.objects.new(name="light_2.80",
       object_data=light_data)
     bpy.context.collection.objects.link(light_object)
-    light_object.location = (0, 0, 20)
+    light_object.location = location
 
-    light_2 = bpy.data.lights.new(name="light_source", type='AREA')
+def addLightSourceArea(location):
+
+    name = "light_source_area_"+str(location)
+    light_2 = bpy.data.lights.new(name=name, type='AREA')
     light_2.energy = 400
     light_2.size = 13
-    light_2_object = bpy.data.objects.new(name="light_source",
-      object_data=light_2)
+    light_2_object = bpy.data.objects.new(name=name, object_data=light_2)
     bpy.context.collection.objects.link(light_2_object)
-    light_2_object.location = offsetAnnulusLeft + Vector((0, 0, +1))
-
-    light_3 = bpy.data.lights.new(name="light_source", type='AREA')
-    light_3.energy = 400
-    light_3.size = 13
-    light_3_object = bpy.data.objects.new(name="light_source",
-      object_data=light_2)
-    bpy.context.collection.objects.link(light_3_object)
-    light_3_object.location = offsetAnnulusRight + Vector((0, 0, +1))
+    light_2_object.location = location
 
 def addCamera(location, focus=cameraFocusPoint):
     cam = bpy.data.cameras.new("Camera")
@@ -392,11 +386,6 @@ def torusRestriction_mesh(torusLocation,
 
     return mesh
 
-def addStateTorus(u, v, color=(1.0,1.0,1.0,1.0), size=diameterState, offset = 0):
-    x = torusCoordinatesToGlobalCoordinates(u, v, offset)
-    pos = Vector((x[0]+torusLocation[0],x[1]+torusLocation[1],x[2]+torusLocation[2]))
-    addSphere(pos, "x_on_torus", color, size)
-
 def torusCoordinatesToGlobalCoordinates(u, v, offset = 0):
     r0 = torusMajorRadius
     r1 = torusMinorRadius + offset
@@ -405,7 +394,12 @@ def torusCoordinatesToGlobalCoordinates(u, v, offset = 0):
          r1*sin(v))
     return x
 
-def addEdgeTorus(e, color=(1.0,1.0,1.0,1.0), width=diameterState,
+def addStateTorus(u, v, location = torusLocation, color=(1.0,1.0,1.0,1.0), size=diameterState, offset = 0):
+    x = torusCoordinatesToGlobalCoordinates(u, v, offset)
+    pos = Vector((x[0]+location[0],x[1]+location[1],x[2]+location[2]))
+    addSphere(pos, "x_on_torus", color, size)
+
+def addEdgeTorus(e, location=torusLocation, color=(1.0,1.0,1.0,1.0), width=diameterState,
     material=materialGreen, offset =0):
     curve = bpy.data.curves.new(name="EDGE_TORUS", type='CURVE')
     curve.dimensions = '3D'
@@ -420,13 +414,13 @@ def addEdgeTorus(e, color=(1.0,1.0,1.0,1.0), width=diameterState,
     if e.shape[1]>1:
       for (u,v) in e:
         x = torusCoordinatesToGlobalCoordinates(u, v, offset)
-        pt = Vector((x[0]+torusLocation[0],x[1]+torusLocation[1],x[2]+torusLocation[2]))
+        pt = Vector((x[0]+location[0],x[1]+location[1],x[2]+location[2]))
         poly.points[ctr].co = (pt[0],pt[1],pt[2],1)
         ctr = ctr + 1
     else:
       for (u) in e:
         x = torusCoordinatesToGlobalCoordinates(u, 0, offset)
-        v = Vector((x[0]+torusLocation[0],x[1]+torusLocation[1],x[2]+torusLocation[2]))
+        v = Vector((x[0]+location[0],x[1]+location[1],x[2]+location[2]))
         poly.points[ctr].co = (v[0],v[1],v[2],1)
         ctr = ctr + 1
 

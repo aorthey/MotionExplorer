@@ -14,12 +14,11 @@
     <qgoal config="6  +2.0 0 0 0 0 0 "/>
 
     <freeFloating>1</freeFloating>
-    <maxplanningtime>10</maxplanningtime>
+    <maxplanningtime>5</maxplanningtime>
     <pathSpeed>12</pathSpeed>
     <threading>1</threading>
 
-    <algorithm name="multilevel:explorer2"/>
-    <algorithm name="multilevel:explorer"/>
+    <algorithm name="multilevel:minimaspanner"/>
     <algorithm name="multilevel:qmpstar"/>
     <multilevel>
       <level robot_index="0" type="R2"/>

@@ -7,8 +7,9 @@
 #include "planner/cspace/cspace_geometric_contact.h"
 
 #include <ompl/multilevel/datastructures/PlannerMultiLevel.h>
-#include <ompl/multilevel/planners/explorer/MotionExplorer.h>
-#include <ompl/multilevel/planners/explorer/MotionExplorerQMP.h>
+// #include <ompl/multilevel/planners/explorer/MotionExplorer.h>
+// #include <ompl/multilevel/planners/explorer/MotionExplorerQMP.h>
+#include <ompl/multilevel/planners/explorer/LocalMinimaSpanners.h>
 #include <ompl/multilevel/planners/qrrt/QRRT.h>
 #include <ompl/multilevel/planners/qrrt/QRRTStar.h>
 #include <ompl/multilevel/planners/qmp/QMP.h>
@@ -172,8 +173,9 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="multilevel:qmpstar") planner = std::make_shared<om::QMPStar>(siVec, "QMPStar");
   else if(algorithm=="multilevel:smlr") planner = std::make_shared<om::SMLR>(siVec, "SMLR");
 
-  else if(algorithm=="multilevel:explorer") planner = std::make_shared<om::MotionExplorer>(siVec, "Explorer");
-  else if(algorithm=="multilevel:explorer2") planner = std::make_shared<om::MotionExplorerQMP>(siVec, "ExplorerQMP");
+  // else if(algorithm=="multilevel:explorer") planner = std::make_shared<om::MotionExplorer>(siVec, "Explorer");
+  // else if(algorithm=="multilevel:explorer2") planner = std::make_shared<om::MotionExplorerQMP>(siVec, "ExplorerQMP");
+  else if(algorithm=="multilevel:minimaspanner") planner = std::make_shared<om::LocalMinimaSpanners>(siVec, "LocalMinimaSpanners");
   else if(algorithm=="sampler")
   {
     planner = std::make_shared<og::InfeasibilitySampler>(si);

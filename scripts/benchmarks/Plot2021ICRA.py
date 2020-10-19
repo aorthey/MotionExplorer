@@ -186,7 +186,7 @@ def PlotTable(fnames):
     os.system("apvlv %s" % pdfName)
 
 if __name__ == '__main__':
-    fnames = glob.glob("../../data/benchmarks/*xml")
+    fnames = glob.glob("../../data/benchmarks/2021_ICRA/*xml")
     print(fnames)
 
     PlotTable(fnames)

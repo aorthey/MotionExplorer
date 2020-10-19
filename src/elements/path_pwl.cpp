@@ -1096,6 +1096,8 @@ int PathPiecewiseLinear::GetNumberOfMilestones()
 
 bool PathPiecewiseLinear::Save(const char* fn)
 {
+  if(GetLength() <= 0) return false;
+
   TiXmlDocument doc;
   TiXmlElement *node = CreateRootNodeInDocument(doc);
   Save(node);

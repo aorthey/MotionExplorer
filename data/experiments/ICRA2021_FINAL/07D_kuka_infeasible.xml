@@ -26,22 +26,21 @@
     <qinit config="14  0 0 0 0 0 0 2.94 1.2508 1.52 -0.3 -1.48 1.6544 0.1 0"/>
     <qgoal config="14  0 0 0 0 0 0 -0.05 1.3 0.34 0.56 -0.17 1.6144 -0.26 0 "/>
 
-    <!-- 14  0 -0.298911 0 6.28319 -0 6.28319 -0.02 1.3 0.34 0.56 -0.17 1.6144 -0.26 0 --> 
-
     <se3min config="6  -8 -8 -4 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +8 +8 +4 +3.141593 +1.57 +3.141593"/>
     <smoothPath>0</smoothPath> <!-- 0: no smoothing, 1: smoothing      -->
     <pathSpeed>3</pathSpeed>   <!-- <1: slower, 1: default, >1: faster -->
 
     <algorithm name="benchmark:icra2021"/>
+    <algorithm name="multilevel:smlr"/>
 
     <freeFloating>0</freeFloating>
-    <maxplanningtime>2</maxplanningtime>
+    <maxplanningtime>5</maxplanningtime>
     <epsilongoalregion>0.05</epsilongoalregion>
     <pathWidth>0.05</pathWidth>
 
     <multilevel>
-      <level robot_index="2" type="R2"/>
+      <level robot_index="2" type="R3"/>
       <level robot_index="0" type="R7"/>
     </multilevel>
 

@@ -12,6 +12,7 @@
 #include "planner/cspace/cspace_geometric_Mobius.h"
 #include "planner/cspace/cspace_geometric_SolidTorus.h"
 #include "planner/cspace/cspace_geometric_Torus.h"
+#include "planner/cspace/cspace_geometric_Sphere.h"
 #include "planner/cspace/cspace_geometric_SolidCylinder.h"
 #include "planner/cspace/cspace_geometric_Annulus.h"
 #include "planner/cspace/cspace_geometric_Circular.h"
@@ -185,6 +186,13 @@ class CSpaceFactory{
     virtual GeometricCSpaceOMPL* MakeGeometricCSpaceTorus( RobotWorld *world, int robot_idx)
     {
       GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLTorus(world, robot_idx);
+      cspace->SetCSpaceInput(input);
+      cspace->Init();
+      return cspace;
+    }
+    virtual GeometricCSpaceOMPL* MakeGeometricCSpaceSphere( RobotWorld *world, int robot_idx)
+    {
+      GeometricCSpaceOMPL *cspace = new GeometricCSpaceOMPLSphere(world, robot_idx);
       cspace->SetCSpaceInput(input);
       cspace->Init();
       return cspace;

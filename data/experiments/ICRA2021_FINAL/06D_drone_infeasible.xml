@@ -23,6 +23,7 @@
     <pathWidth>0.05</pathWidth>
 
     <algorithm name="benchmark:icra2021"/>
+    <algorithm name="multilevel:qmp"/>
 
     <multilevel>
       <level robot_index="1" type="R3"/>

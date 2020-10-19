@@ -45,7 +45,16 @@ class ViewLocalMinimaTree
     double node_radius_selected;
 
     bool drawBound,drawPlotArea;
-    GLDraw::GLColor boundColor, plotAreaColor, textColor, nodeColor, nodeSelectedColor, nodeUnselectedColor;
+
+    GLDraw::GLColor colorPathSelected;
+    GLDraw::GLColor colorPathUnselected;
+
+    GLDraw::GLColor boundColor;
+    GLDraw::GLColor plotAreaColor;
+    GLDraw::GLColor textColor;
+    GLDraw::GLColor nodeColor;
+    GLDraw::GLColor nodeSelectedColor;
+    GLDraw::GLColor nodeUnselectedColor;
 
     PathPiecewiseLinear *getPathSelected();
     void DrawGL(GUIState& state);

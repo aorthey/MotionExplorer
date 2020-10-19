@@ -53,91 +53,43 @@ def drawScene(filename, scn, resolution, thick):
     bpy.ops.object.delete()
 
     X = getRoadmapStates(fname)
-    print("Loaded %d states from file %s." % (X.shape[0],fname))
     E = getRoadmapEdges(fname)
-    print("Loaded %d edges from file %s." % (E.shape[0],fname))
     P = getRoadmapStates(pname)
+    print("Loaded %d states from file %s." % (X.shape[0],fname))
+    print("Loaded %d edges from file %s." % (E.shape[0],fname))
     print("Loaded %d path states from file %s." % (P.shape[0],fname))
-
-    ###########################################################################
-    ### RESTRICTION
-    ###########################################################################
-
-      # major_radius = 3
-      # circleThickness = 0.3
-      # resolution = 72
-      # annulus_strip_mesh = annulus_mesh(resolution, major_radius -
-      #     circleThickness, major_radius + circleThickness)
-      # annulus_strip_obj = bpy.data.objects.new("annulus", annulus_strip_mesh)
-      # annulus_strip_obj.location = Vector((+3, +3, -6))
-
-      # bpy.context.collection.objects.link(annulus_strip_obj)
-      # bpy.context.view_layer.objects.active = annulus_strip_obj
-      # mod = annulus_strip_obj.modifiers.new("edge split", 'EDGE_SPLIT')
-
-      # annulus_strip_obj.data.materials.append(materialMagenta)
 
     ###########################################################################
     ### INITIAL STATE
     ###########################################################################
-    if re.search("level0", filename):
+    offsetRoadmap = 0.0
+    if re.search("SMLR", filename):
+      offsetRoadmap = 0.1
+      fromU = float(X[0,0])
+      fromV = 0.0
+      toU = float(X[1,0])
+      toV = 2*np.pi
+      offset = 0.0
+      restriction_torus_mesh = torusRestriction_mesh(torusLocation, fromU, toU,
+          fromV, toV, offset)
+      restriction_torus_obj = bpy.data.objects.new("arrow", restriction_torus_mesh)
+      # restriction_torus_obj.location = offsetAnnulusLeft + Vector((0,-0.8,0))
+      bpy.context.collection.objects.link(restriction_torus_obj)
+      restriction_torus_obj.data.materials.append(materialRestriction)
 
-      bpy_utils.torusMajorRadius = bpy_utils.torusMajorRadius - bpy_utils.torusMinorRadius
+    addTorus(torusLocation, offset = -0.1)
+    addStateTorus(X[0,0], X[0,1], color=colorStartState, size=0.4, offset=offsetRoadmap)
+    addStateTorus(X[1,0], X[1,1], color=colorGoalState, size=0.4, offset=offsetRoadmap)
+    for x in X[2:]:
+      addStateTorus(x[0], x[1], color=colorStartState, size=0.2, offset=offsetRoadmap)
 
-      cameraLocation = Vector((+3,-1.5,+2.5))
-      addStateTorus(X[0,0], 0, color=colorStartState, size=0.4)
-      addStateTorus(X[1,0], 0, color=colorGoalState, size=0.4)
-      for x in X[2:]:
-        addStateTorus(x[0], 0, color=colorStartState, size=0.2)
+    for e in E:
+      addEdgeTorus(e, color=colorStartState, width=0.01, offset=offsetRoadmap)
 
-      for e in E:
-        addEdgeTorus(e, color=colorStartState, width=0.01)
+    addEdgeTorus(P, color=colorStartState, width=0.10,
+        material=materialGreenLight, offset=offsetRoadmap)
 
-      addEdgeTorus(P, color=colorStartState, width=0.10,
-          material=materialGreenLight)
-
-      radius = torusMajorRadius
-      circleThickness = 0.3
-      resolution = 72
-      annulus_strip_mesh = annulus_mesh(resolution, radius -
-          circleThickness, radius + circleThickness)
-      annulus_strip_obj = bpy.data.objects.new("annulus", annulus_strip_mesh)
-      annulus_strip_obj.location = Vector((+0, +0, -0.1))
-
-      bpy.context.collection.objects.link(annulus_strip_obj)
-      bpy.context.view_layer.objects.active = annulus_strip_obj
-      mod = annulus_strip_obj.modifiers.new("edge split", 'EDGE_SPLIT')
-
-      annulus_strip_obj.data.materials.append(materialMagenta)
-    else:
-      offsetRoadmap = 0.0
-      if re.search("SMLR", filename):
-        offsetRoadmap = 0.1
-        fromU = float(X[0,0])
-        fromV = 0.0
-        toU = float(X[1,0])
-        toV = 2*np.pi
-        offset = 0.0
-        restriction_torus_mesh = torusRestriction_mesh(torusLocation, fromU, toU,
-            fromV, toV, offset)
-        restriction_torus_obj = bpy.data.objects.new("arrow", restriction_torus_mesh)
-        # restriction_torus_obj.location = offsetAnnulusLeft + Vector((0,-0.8,0))
-        bpy.context.collection.objects.link(restriction_torus_obj)
-        restriction_torus_obj.data.materials.append(materialRestriction)
-
-      addTorus(torusLocation, offset = -0.1)
-      addStateTorus(X[0,0], X[0,1], color=colorStartState, size=0.4, offset=offsetRoadmap)
-      addStateTorus(X[1,0], X[1,1], color=colorGoalState, size=0.4, offset=offsetRoadmap)
-      for x in X[2:]:
-        addStateTorus(x[0], x[1], color=colorStartState, size=0.2, offset=offsetRoadmap)
-
-      for e in E:
-        addEdgeTorus(e, color=colorStartState, width=0.01, offset=offsetRoadmap)
-
-      addEdgeTorus(P, color=colorStartState, width=0.10,
-          material=materialGreenLight, offset=offsetRoadmap)
-
-    addLightSource()
+    addLightSourceSun(Vector((0,0,20)))
     addCamera(cameraLocation, cameraFocusPoint)
 
     ### SAVE IMAGE
@@ -155,11 +107,7 @@ def drawScene(filename, scn, resolution, thick):
 
 if __name__ == "__main__":
 
-  filenames = ["2020ICRA/02D_torus_SMLR", 
-      "2020ICRA/02D_torus_SPARStwo", 
-      "2020ICRA/02D_torus_PRMstar", 
-      "2020ICRA/02D_torus_SMLR_level0"]
+  filenames = [ "2020ICRA/02D_torus_SPARStwo", 
+      "2020ICRA/02D_torus_PRMstar"]
   for filename in filenames:
     drawScene(filename, bpy.context.scene, 72, mobiusStripThickness)
-  # filename = "2020ICRA/02D_torus_SMLR_level0"
-  # drawScene(filename, bpy.context.scene, 72, mobiusStripThickness)
