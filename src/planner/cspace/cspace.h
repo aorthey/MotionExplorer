@@ -106,6 +106,8 @@ class CSpaceOMPL
     virtual bool isMultiAgent() const;
 
     virtual Config ControlToConfig(const double*);
+
+    bool drawDistanceRobotTerrain_{false};
   protected:
     virtual const ob::StateValidityCheckerPtr StateValidityCheckerPtr(ob::SpaceInformationPtr si);
     virtual void initSpace() = 0;

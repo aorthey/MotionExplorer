@@ -4,7 +4,7 @@
 
 OMPLValidityCheckerMultiAgent::OMPLValidityCheckerMultiAgent(const ob::SpaceInformationPtr &si, 
     CSpaceOMPLMultiAgent *cspace, std::vector<CSpaceOMPL*> cspaces):
-  ob::StateValidityChecker(si), cspace_(cspace), cspaces_(cspaces)
+  ob::StateValidityCheckerDifferentiable(si), cspace_(cspace), cspaces_(cspaces)
 {
   for(uint k = 0; k < cspaces_.size(); k++)
   {

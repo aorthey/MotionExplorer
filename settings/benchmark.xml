@@ -22,9 +22,9 @@
   </benchmark>
 
   <benchmark name="icra2021">
-    <!-- <algorithm name="multilevel:smlr"/> -->
-    <algorithm name="ompl:spars"/>
-    <algorithm name="ompl:spars2"/>
+    <algorithm name="multilevel:smlr"/>
+    <!-- <algorithm name="ompl:spars"/> -->
+    <!-- <algorithm name="ompl:spars2"/> -->
     <maxplanningtime>60</maxplanningtime> <!-- runtime in (s) --> 
     <runcount>10</runcount> <!-- number of runs per algorithm --> 
     <maxmemory>100000</maxmemory> <!-- max memory (MB) --> 

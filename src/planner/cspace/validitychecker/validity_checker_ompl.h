@@ -1,11 +1,29 @@
 #pragma once
 #include "planner/cspace/cspace.h"
 #include "neighborhood.h"
+#include <ompl/base/StateValidityCheckerDifferentiable.h>
 
-class OMPLValidityChecker: public ob::StateValidityChecker
+
+class InteractionPoint
 {
+    typedef std::vector<std::pair<Vector3, Vector3> > InteractionPoints;
+
+    int robot;
+    int robotLink;
+    Vector3 ptRobot;
+    Vector3 ptEnvironment;
+    double distance;
+
+}
+
+class OMPLValidityChecker: public ob::StateValidityCheckerDifferentiable
+{
+
   public:
+    typedef std::vector<std::pair<Vector3, Vector3> > InteractionPoints;
+
     OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_);
+    ~OMPLValidityChecker();
 
     bool IsFeasible(const ob::State* state) const;
 
@@ -22,12 +40,31 @@ class OMPLValidityChecker: public ob::StateValidityChecker
 
     virtual bool operator ==(const ob::StateValidityChecker &rhs) const override;
 
+    virtual double cost(const ob::State *state) const override;
+
+    double constrainedness(const ob::State *state) const;
+
+    virtual Eigen::VectorXd costGradient(const ob::State *state) const override;
+
+    Vector getVirtualForceRobotToMesh( Robot *robot,
+        const ManagedGeometry::GeometryPtr geometry) const;
+
+    virtual void DrawGL(GUIState& state);
+
+    InteractionPoints getInteractionPoints(
+        Robot *robot,
+        std::vector<ManagedGeometry::GeometryPtr> collisionGeometries 
+        ) const;
+
   protected:
     double DistanceToRobot(const ob::State* state, SingleRobotCSpace *space) const;
 
     CSpaceOMPL *cspace{nullptr};
     SingleRobotCSpace *klampt_single_robot_cspace{nullptr};
     Neighborhood *neighborhood{nullptr};
+
+    ompl::base::State *tmp;
+
 };
 
 class OMPLValidityCheckerNecessarySufficient: public OMPLValidityChecker

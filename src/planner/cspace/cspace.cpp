@@ -366,6 +366,7 @@ void CSpaceOMPL::DrawGL(GUIState& state)
       path_->DrawGL(state);
     }
   }
+
   return;
 }
 

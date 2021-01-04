@@ -22,7 +22,11 @@ RobotWorld (World.h) contains
 World -> Terrain -> ManagedGeometry -> DrawGL()
 -> GLDraw::GeometryAppearance -> DrawGL() ->
   
-Jacobian:
+RobotKinematics3D:
+  ///for a force f at pi on link i, returns joint torques F = J^t f
+  void GetForceTorques(const Vector3& f, const Vector3& pi, int i, Vector& F) const;
+
+  Jacobian:
   void GetCOMJacobian(Matrix& Jc) const;
   void GetCOMHessian(Matrix& Hx,Matrix& Hy,Matrix& Hz) const;
 
@@ -390,9 +394,6 @@ TreeRoadmapPlanner
   MotionPlannerFactory factory;
   factory.type="rrt"
   MotionPlannerInterface = factory.create(CSpace)
-
-
-
 
 -------------------------------------------------------------------------------
 LOAD/SAVE RESOURCE (KrisLibrary/utils/ResourceLibrary.h)

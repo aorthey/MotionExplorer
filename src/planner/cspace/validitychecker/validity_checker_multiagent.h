@@ -2,8 +2,9 @@
 #include "planner/cspace/cspace.h"
 #include "planner/cspace/cspace_multiagent.h"
 #include "neighborhood.h"
+#include <ompl/base/StateValidityCheckerDifferentiable.h>
 
-class OMPLValidityCheckerMultiAgent: public ob::StateValidityChecker
+class OMPLValidityCheckerMultiAgent: public ob::StateValidityCheckerDifferentiable
 {
   public:
     OMPLValidityCheckerMultiAgent(const ob::SpaceInformationPtr &si, CSpaceOMPLMultiAgent *cspace, std::vector<CSpaceOMPL*> cspaces_);

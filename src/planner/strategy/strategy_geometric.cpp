@@ -3,6 +3,7 @@
 #include "planner/benchmark/benchmark_input.h"
 #include "planner/benchmark/benchmark_output.h"
 #include "planner/strategy/infeasibility_sampler.h"
+#include "planner/strategy/feasibility_sampler.h"
 #include "planner/strategy/infeasibility_restriction_sampler.h"
 #include "planner/cspace/cspace_geometric_contact.h"
 
@@ -15,6 +16,9 @@
 #include <ompl/multilevel/planners/qmp/QMP.h>
 #include <ompl/multilevel/planners/qmp/QMPStar.h>
 #include <ompl/multilevel/planners/sparse/SMLR.h>
+
+//experimental
+#include <ompl/multilevel/planners/DRRT.h>
 
 #include <ompl/geometric/planners/rrt/RRT.h>
 #include <ompl/geometric/planners/rrt/pRRT.h>
@@ -61,7 +65,7 @@
 #include <ompl/base/objectives/MaximizeMinClearanceObjective.h>
 #include <ompl/base/terminationconditions/IterationTerminationCondition.h>
 
-#include <ompl/base/goals/GoalState.h>
+#include <ompl/base/goals/GoalStateDifferentiable.h>
 #include <ompl/geometric/PathGeometric.h>
 #include <ompl/util/Time.h>
 #include <boost/lexical_cast.hpp>
@@ -172,13 +176,18 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="multilevel:qmp") planner = std::make_shared<om::QMP>(siVec, "QMP");
   else if(algorithm=="multilevel:qmpstar") planner = std::make_shared<om::QMPStar>(siVec, "QMPStar");
   else if(algorithm=="multilevel:smlr") planner = std::make_shared<om::SMLR>(siVec, "SMLR");
+  else if(algorithm=="multilevel:drrt") planner = std::make_shared<om::DRRT>(siVec, "DRRT");
 
   // else if(algorithm=="multilevel:explorer") planner = std::make_shared<om::MotionExplorer>(siVec, "Explorer");
   // else if(algorithm=="multilevel:explorer2") planner = std::make_shared<om::MotionExplorerQMP>(siVec, "ExplorerQMP");
   else if(algorithm=="multilevel:minimaspanner") planner = std::make_shared<om::LocalMinimaSpanners>(siVec, "LocalMinimaSpanners");
-  else if(algorithm=="sampler")
+  else if(algorithm=="sampler_infeasible")
   {
     planner = std::make_shared<og::InfeasibilitySampler>(si);
+  }
+  else if(algorithm=="sampler_feasible")
+  {
+    planner = std::make_shared<og::FeasibilitySampler>(si);
   }
   else if(algorithm=="multilevel:sampler")
   {
@@ -191,7 +200,6 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   pdef->setOptimizationObjective( GetOptimizationObjective(si) );
   planner->setProblemDefinition(pdef);
   return planner;
-
 }
 
 OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratificationFromCSpaceStratification
@@ -239,7 +247,7 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
 
   ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
   pdefk->addStartState(startk);
-  auto goal=std::make_shared<ob::GoalState>(sik);
+  auto goal=std::make_shared<ob::GoalStateDifferentiable>(sik);
   goal->setState(goalk);
   goal->setThreshold(input.epsilon_goalregion);
   pdefk->setGoal(goal);

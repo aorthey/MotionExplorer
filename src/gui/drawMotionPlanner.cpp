@@ -249,6 +249,9 @@ namespace GLDraw{
     glEnable(GL_LIGHTING);
 
 
+    //############################################################################
+    //Draw Contact Points
+    //############################################################################
     glDisable(GL_LIGHTING);
     glEnable(GL_BLEND);
     glEnable(GL_LINE_SMOOTH);
@@ -419,38 +422,38 @@ namespace GLDraw{
     glEnable(GL_LIGHTING);
     glDisable(GL_BLEND); 
   }
-  void drawDistanceRobotTerrain(const ODERobot *robot, const Terrain* terrain){
-    //ODERobot *robot = sim.odesim.robot(0);
-    uint Nlinks = robot->robot.links.size();
-    //const Terrain* terrain = sim.odesim.terrain(0);
+
+  void drawDistanceRobotTerrain(const ODERobot *robot, const Terrain* terrain)
+  {
+    drawDistanceRobotTerrain(&robot->robot, terrain);
+  }
+
+  void drawDistanceRobotTerrain(Robot *robot, const Terrain* terrain)
+  {
+    uint Nlinks = robot->links.size();
     const Geometry::AnyCollisionGeometry3D tgeom = (*terrain->geometry);
     Geometry::AnyCollisionGeometry3D tt(tgeom);
-    robot->robot.CleanupCollisions();
-    robot->robot.InitMeshCollision(tt);
+    robot->CleanupCollisions();
+    robot->InitMeshCollision(tt);
 
     //glDisable(GL_LIGHTING);
     //glEnable(GL_BLEND); 
     GLColor yellow(1,1,0);
     GLColor white(1,1,1);
-    for(uint i = 0; i < Nlinks; i++){
-      dBodyID bodyid = robot->body(i);
-      if(bodyid){
-        if(!robot->robot.IsGeometryEmpty(i)){
-          RobotLink3D *link = &robot->robot.links[i];
+    for(uint i = 0; i < Nlinks; i++)
+    {
+      if(!robot->IsGeometryEmpty(i))
+      {
+          RobotLink3D *link = &robot->links[i];
 
-          Geometry::AnyCollisionQuery *query = robot->robot.envCollisions[i];
+          Geometry::AnyCollisionQuery *query = robot->envCollisions[i];
           //double d = query->Distance(0,0.1);
           std::vector<Vector3> vp1,vp2;
           query->InteractingPoints(vp1,vp2);
-          if(vp1.size()<1){
-            std::cout << "Warning: got " << vp1.size() << " contact points for single rigid body" << std::endl;
-            std::cout << "Ignoring Link " << i << "/" << Nlinks << std::endl;
-          }else{
-            //Matrix4 mat = link->T_World;
-            //glMultMatrix(mat);
+          if(vp1.size()>=1)
+          {
             Vector3 p1 = link->T_World*vp1.front();
             Vector3 p2 = vp2.front();
-            //Vector3 dp = p1-p2;
 
             glPushMatrix();
             glLineWidth(3);
@@ -465,7 +468,6 @@ namespace GLDraw{
             glEnd();
             glPopMatrix();
           }
-        }
       }
     }
   }

@@ -7,13 +7,14 @@ import os, sys, re
 def CreateTriRoom(alpha):
   mesh = MetaMesh()
 
+  length_passage = 0.2
   Z_height = 0.1
   width_wall = 0.2
-  length_wall = 1.5
+  length_wall = 4
 
   length_bttm = 1
-  max_x = 3
-  length_passage = 0.1
+  max_x = 6
+
   width_mid = 0.5*(max_x - length_passage - width_wall)
   x_mid = length_passage + width_mid
 
@@ -33,7 +34,7 @@ def CreateTriRoom(alpha):
   mesh.AddBox(0,+y,0,length_passage,width_passage_box,Z_height)
   mesh.AddBox(0,-y,0,length_passage,width_passage_box,Z_height)
 
-  fname = "%.3f"%alpha
+  fname = "%.2f"%alpha
   fname = fname.replace(".", "_")
 
   path = "../../data/terrains/narrow_passage/"
@@ -41,10 +42,9 @@ def CreateTriRoom(alpha):
   fname = "narrow_passage_"+fname+".off"
   mesh.write(fname)
 
-  #output, error = process.communicate()
-
-print os.path.dirname(os.path.abspath(__file__))
+print(os.path.dirname(os.path.abspath(__file__)))
 path = os.getcwd()
+print(path)
 
 ## radius for articulated chain is 0.1, i.e. the passage with 0.1 should contain
 ## a zero measure solution which we would not find using rrt. Everything above
@@ -52,22 +52,17 @@ path = os.getcwd()
 ## and 0.3. Above 0.3 the cases are too easy to solve (and trivial
 ## stratification should dominate)
 #for d in np.linspace(0.15,0.35):
-f = "../../data/experiments/11D_planar_snake_narrow_passage.xml"
-for d in np.arange(0.11,0.15,0.001):
+for d in np.arange(0.30,1.0,0.1):
   CreateTriRoom(d)
   os.chdir(path)
 
-  alpha = "{:.3f}".format(d)
-  alpha = alpha.replace('.','_')
-  fname = f.replace('narrow_passage',alpha)
-  copyfile(f, fname)
+  # alpha = "{:.3f}".format(d)
+  # alpha = alpha.replace('.','_')
+  # fname = f.replace('alpha',alpha)
 
-  print fname
-  with open(fname, "r") as sources:
-    lines = sources.readlines()
-  with open(fname, "w") as sources:
-    for line in lines:
-      env = 'narrow_passage_'+alpha+'.tri'
-      sources.write(re.sub(r'narrow_passage_0_20.tri', env, line))
+  # with open(fname, "w") as sources:
+  #   for line in lines:
+  #     env = 'narrow_passage_'+alpha+'.tri'
+  #     sources.write(re.sub(r'narrow_passage_0_20.tri', env, line))
 
   #11D_planar_snake_0_20.xml

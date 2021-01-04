@@ -34,7 +34,7 @@
     <pathSpeed>3</pathSpeed>
     <freeFloating>1</freeFloating>
     <smoothPath>1</smoothPath>
-    <algorithm name="multilevel:explorer2"/>
+    <algorithm name="multilevel:minimaspanner"/>
     <threading>1</threading>
     <multiAgent>1</multiAgent>
 

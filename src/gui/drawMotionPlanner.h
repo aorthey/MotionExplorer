@@ -23,6 +23,7 @@ namespace GLDraw {
   void drawGLPathKeyframes(Robot *robot, std::vector<uint> keyframe_indices, std::vector<std::vector<Matrix4> > mats, vector<GLDraw::GeometryAppearance> appearanceStack, GLColor color = GLColor(0.8,0.8,0.8,1.0), double scale = 1.0);
 
   void drawRobotAtConfig(Robot *robot, const Config &q, GLColor color=GLColor(1,0,0), double scale = 1.0);
+
   void drawRobotAtConfig(Robot *robot, const Config &q, const Config &dq, GLColor color=GLColor(1,0,0), double scale = 1.0);
 
   void drawRobotsAtConfig(std::vector<Robot*> robots, const Config &q, GLColor color=GLColor(1,0,0), double scale = 1.0);
@@ -32,6 +33,7 @@ namespace GLDraw {
   void drawCenterOfMassPathFromController(WorldSimulation &sim);
   void drawForceEllipsoid( const ODERobot *robot );
   void drawDistanceRobotTerrain(const ODERobot *robot, const Terrain* terrain);
+  void drawDistanceRobotTerrain(Robot *robot, const Terrain* terrain);
 
   void drawWireEllipsoid(Vector3 &c, Vector3 &u, Vector3 &v, Vector3 &w, int numSteps=16);
   // void drawEllipsoid(Vector3 &c, Vector3 &u, Vector3 &v, Vector3 &w, int numSteps=16);

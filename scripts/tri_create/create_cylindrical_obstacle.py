@@ -4,14 +4,19 @@ import subprocess
 from tri_primitives import MetaMesh
 import os, sys, re
 
-Z_height = 0.1
-radius = 0.15
+height = 3.0
+radius = 0.4
+
 mesh = MetaMesh()
-mesh.AddCylinder(0,0,0, radius, Z_height)
+mesh.AddCylinder(0,0,0, radius, height)
 
 path = "../../data/terrains/primitives/"
 os.chdir(path)
-fname = "manipulatable_disk.off"
+
+fname = "cylinder_height_%.2f_radius_%.2f"%(height, radius)
+fname = fname.replace(".", "_")
+fname = fname + ".stl"
+
 mesh.write(fname)
 # import subprocess
 # subprocess.run(["off2tri", fname])

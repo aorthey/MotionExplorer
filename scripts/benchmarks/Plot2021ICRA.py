@@ -111,7 +111,7 @@ def PlotTable(fnames):
 
 
     # st = "\\begin{tabularx}{\\textwidth}{@{} l *{%d}{Y}| @{}}" % Nenv
-    st = "\\begin{tabulary}{\\linewidth}{@{}LL"
+    st = "\\begin{tabulary}{\\linewidth}{@{}L"
     for k in range(0, Nenv):
       st += "C"
     st+="@{}}\n"
@@ -125,8 +125,8 @@ def PlotTable(fnames):
     # f.write(fstr)
 
     # estr = "\\multicolumn{1}{c|}{} &"
-    estr = "\\multicolumn{2}{>{\\centering}p{4cm}}{Runtime in seconds (Feasible$\mid$Infeasible$\mid$Timeout)} & "
-    # estr = " && "
+    #estr = "\\multicolumn{2}{>{\\centering}p{4cm}}{Runtime in seconds (Feasible$\mid$Infeasible$\mid$Timeout)} & "
+    estr = " & "
     for k in range(0,Nenv):
       e = env_names[k]
       estr += "\\rothead{%s}"%e
@@ -140,7 +140,7 @@ def PlotTable(fnames):
 
     ctr = 1
     for p in planner_names:
-      pstr = str(ctr) + " & \\mbox{" + str(p)+"} & "
+      pstr = " \\mbox{" + str(p)+"} & "
       ctr = ctr + 1
       for k in range(0,Nenv):
         e = env_names[k]
@@ -171,9 +171,9 @@ def PlotTable(fnames):
     f.write("\end{tabulary}\n")
 
 
-    f.write("\\caption{Runtime (s) of motion planner on $7$ scenarios, each \
-        averaged over $10$ runs with cut-off time limit of $60$s. Entry $-$ \
-        means that planner does not support compound state spaces.}\n")
+    # f.write("\\caption{Runtime (s) of motion planner on $7$ scenarios, each \
+    #     averaged over $10$ runs with cut-off time limit of $60$s. Entry $-$ \
+    #     means that planner does not support compound state spaces.}\n")
 
     f.write("\\end{table}\n")
     f.write("\end{document}\n")
@@ -186,7 +186,11 @@ def PlotTable(fnames):
     os.system("apvlv %s" % pdfName)
 
 if __name__ == '__main__':
-    fnames = glob.glob("../../data/benchmarks/2021_ICRA/*xml")
+    # fnames = glob.glob("../../data/benchmarks/2021_ICRA/*xml")
+    fnames = []
+    fnames += glob.glob("../../data/benchmarks/2021_ICRA_SMLR_NEWIMPORTANCE/*xml")
+    fnames += glob.glob("../../data/benchmarks/2021_ICRA_SPARS/*xml")
+    fnames += glob.glob("../../data/benchmarks/*xml")
     print(fnames)
 
     PlotTable(fnames)

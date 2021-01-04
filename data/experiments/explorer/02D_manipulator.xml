@@ -19,8 +19,7 @@
     <pathSpeed>5</pathSpeed>
     <pathWidth>0.2</pathWidth>
 
-    <algorithm name="multilevel:explorer2"/>
-    <algorithm name="multilevel:explorer"/>
+    <algorithm name="multilevel:minimaspanner"/>
     <algorithm name="multilevel:qrrt"/>
     <algorithm name="multilevel:qmpstar"/>
     <algorithm name="multilevel:qrrtstar"/>

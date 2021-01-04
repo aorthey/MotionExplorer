@@ -55,7 +55,8 @@ bool MotionPlanner::hasChanged()
   return false;
 }
 
-CSpaceOMPL* MotionPlanner::ComputeMultiAgentCSpace(const Layer &layer){
+CSpaceOMPL* MotionPlanner::ComputeMultiAgentCSpace(const Layer &layer)
+{
   CSpaceFactory factory(input.GetCSpaceInput());
   std::vector<CSpaceOMPL*> cspace_levels;
 
@@ -492,16 +493,17 @@ void MotionPlanner::AdvanceUntilSolution()
       strategy->Plan(*output);
       ExpandFull();
       time = getTime();
-      // if(input.name_algorithm=="sampler" ||
-      //    input.name_algorithm=="multilevel:sampler")
-      // {
-      //   std::string name = util::GetFileBasename(input.environment_name);
-      //   std::string fname = util::GetDataFolder()+"/samples/"+name+".samples";
+      if(input.name_algorithm=="sampler_feasible" ||
+        input.name_algorithm=="sampler_infeasible" ||
+         input.name_algorithm=="multilevel:sampler")
+      {
+        std::string name = util::GetFileBasename(input.environment_name);
+        std::string fname = util::GetDataFolder()+"/samples/"+name+".samples";
 
-      //   output->getRoadmap()->Save(fname.c_str());
-      //   std::cout << "Saved " << output->getRoadmap()->numVertices() 
-      //     << " infeasible samples to " << fname << std::endl;
-      // }
+        output->getRoadmap()->Save(fname.c_str());
+        std::cout << "Saved " << output->getRoadmap()->numVertices() 
+          << " infeasible samples to " << fname << std::endl;
+      }
       // std::string name = util::GetFileBasename(input.environment_name);
       // std::string fname = util::GetDataFolder()+"/samples/"+name+".samples";
 
@@ -687,10 +689,20 @@ void MotionPlanner::DrawGLStartGoal(GUIState& state)
 
   CSpaceOMPL* qspace = cspace_levels.at(current_level);
   CSpaceOMPL* cspace = cspace_levels.at(max_levels_);
+
   if(state("planner_draw_start_configuration"))
   {
     qspace->drawConfig(qi, colorStartConfiguration);
     cspace->drawConfig(qiOuter, colorStartConfigurationTransparent);
+    if(state("draw_distance_robot_terrain"))
+    {
+      auto checker = dynamic_cast<OMPLValidityChecker*>(
+          cspace->SpaceInformationPtr()->getStateValidityChecker().get());
+      if(checker!=nullptr)
+      {
+        checker->DrawGL(state);
+      }
+    }
   }
   if(state("planner_draw_goal_configuration"))
   {

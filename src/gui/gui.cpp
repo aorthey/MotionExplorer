@@ -190,6 +190,7 @@ void ForceFieldBackend::RenderWorld()
         glPopMatrix();
 
       }
+
     }
   }
 
@@ -197,9 +198,11 @@ void ForceFieldBackend::RenderWorld()
   glDisable(GL_BLEND); 
   glEnable(GL_LIGHTING);
 
-  if(state("draw_distance_robot_terrain")){
+  if(state("draw_distance_robot_terrain"))
+  {
     const ODERobot *oderobot = sim.odesim.robot(0);
-    for(uint k = 0; k < world->terrains.size(); k++){
+    for(uint k = 0; k < world->terrains.size(); k++)
+    {
       const Terrain *terrain = world->terrains[k];
       GLDraw::drawDistanceRobotTerrain(oderobot, terrain);
     }

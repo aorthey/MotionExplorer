@@ -333,12 +333,12 @@ def addLightSourceSun(location):
     bpy.context.collection.objects.link(light_object)
     light_object.location = location
 
-def addLightSourceArea(location):
+def addLightSourceArea(location, size=13, energy=400):
 
     name = "light_source_area_"+str(location)
     light_2 = bpy.data.lights.new(name=name, type='AREA')
-    light_2.energy = 400
-    light_2.size = 13
+    light_2.energy = energy
+    light_2.size = size
     light_2_object = bpy.data.objects.new(name=name, object_data=light_2)
     bpy.context.collection.objects.link(light_2_object)
     light_2_object.location = location
@@ -351,6 +351,7 @@ def addCamera(location, focus=cameraFocusPoint):
     bpy.context.scene.camera = cam_ob
     bpy.context.view_layer.objects.active = cam_ob
     update_camera(cam_ob, focus_point=focus, distance=distanceCamera)
+    return cam
 
 #V is the major circle coordinate, U is the minor circle
 

@@ -149,6 +149,17 @@ void Info::operator()(Robot *robot){
       }
     }
   }
+  if(robot->MeshCollision(0))
+  {
+    for(uint j = 0; j < robot->envCollisions.size(); j++)
+    {
+      AnyCollisionQuery* cq = robot->envCollisions.at(j);
+      if(cq && cq->Collide())
+      {
+        std::cout << "ERROR (Env Collision): " << std::endl;
+      }
+    }
+  }
 
 }
 

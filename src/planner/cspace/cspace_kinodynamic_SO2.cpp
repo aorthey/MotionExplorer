@@ -1,7 +1,7 @@
 #include "common.h"
 #include "planner/cspace/cspace_kinodynamic_SO2.h"
 // #include "planner/cspace/integrator/integrator_SO2.h"
-#include "planner/cspace/validitychecker/validity_checker_ompl.h"
+// #include "planner/cspace/validitychecker/validity_checker_ompl.h"
 #include <ompl/base/spaces/SO2StateSpace.h>
 #include <ompl/base/spaces/RealVectorStateSpace.h>
 #include <ompl/control/spaces/RealVectorControlSpace.h>

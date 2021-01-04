@@ -244,6 +244,13 @@ bool Roadmap::Save(TiXmlElement *node)
       if(v==nullptr){
           subnode->SetAttribute("feasible", "yes");
       }
+      auto checker = dynamic_cast<OMPLValidityChecker*>(si->getStateValidityChecker().get());
+      if(checker!=nullptr)
+      {
+          double d = checker->constrainedness(vd->getState());
+          subnode->SetDoubleAttribute("cost", (double)d);
+          // std::cout << subnode->Attribute("cost") << std::endl;
+      }
       node->InsertEndChild(*subnode);
     }
 

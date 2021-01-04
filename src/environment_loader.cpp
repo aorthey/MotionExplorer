@@ -46,9 +46,10 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_)
   std::cout << "[EnvironmentLoader] loading from file " << file_name << std::endl;
   std::cout << std::string(80, '-') << std::endl;
 
+  //Load GUI from XML
   world.background = GLColor(1,1,1);
-
   _backend = new PlannerBackend(&world);
+
   if(!_backend->LoadAndInitSim(file_name.c_str()))
   {
     std::cout << std::string(80, '-') << std::endl;
@@ -61,12 +62,15 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_)
     throw "Invalid name";
   }
 
+  //Load PlannerInput data from XML
+
   uint Nrobots = world.robots.size();
   if(Nrobots>0)
   {
     name_robot = world.robots[0]->name;
 
-    if(pin.Load(file_name.c_str())){
+    if(pin.Load(file_name.c_str()))
+    {
 
       //Adding triangle information to PlannerInput (to be used as constraint
       //manifolds)
@@ -200,10 +204,21 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_)
         simrobot->SetConfig(q_init);
         simrobot->SetVelocities(dq_init);
 
-        // if(pin.inputs.at(0)->kinodynamic){
-        //   LoadController(robot, *pin.inputs.at(0));
-        //   std::cout << "Loaded Controller for robot " << name_robot << std::endl;
-        // }
+        if(pin.inputs.at(0)->kinodynamic)
+        {
+          WorldSimulation &wsim = _backend->sim;
+          std::cout << "ControlSimulators: " << wsim.controlSimulators.size() << std::endl;
+          std::cout << "RobotController  : " << wsim.robotControllers.size() << std::endl;
+          std::cout << "Hooks            : " << wsim.hooks.size() << std::endl;
+
+          ControlledRobotSimulator &csim = wsim.controlSimulators.at(0);
+          std::cout << csim.robot->name << std::endl;
+          std::cout << csim.controller->time << std::endl;
+
+          LoadController(robot, *pin.inputs.at(0));
+          std::cout << "Loaded Controller for robot " << name_robot << std::endl;
+        }
+
         util::SetSimulatedRobot(robot, _backend->sim, pin.inputs.at(0)->q_init, pin.inputs.at(0)->dq_init);
       }
 

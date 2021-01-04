@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from ParseBenchmarkFile import *
 from collections import defaultdict
 import subprocess
@@ -165,8 +166,8 @@ def PlotTable(fnames):
 if __name__ == '__main__':
     # fnames = glob.glob("../../data/benchmarks/RAL2020v1/*.xml")
     fnames = []
-    fnames += glob.glob("../../data/benchmarks/RAL2020v2_Bundle/*.xml")
-    fnames += glob.glob("../../data/benchmarks/RAL2020v2_QRRTstar/*.xml")
-    fnames += glob.glob("../../data/benchmarks/RAL2020v2_NonBundle/*.xml")
+    fnames += glob.glob("../../data/benchmarks/TRO2020/RAL2020v2_Bundle/*.xml")
+    fnames += glob.glob("../../data/benchmarks/TRO2020/RAL2020v2_QRRTstar/*.xml")
+    fnames += glob.glob("../../data/benchmarks/TRO2020/RAL2020v2_NonBundle/*.xml")
     # fnames = glob.glob("../../data/benchmarks/*.xml")
     PlotTable(fnames)
