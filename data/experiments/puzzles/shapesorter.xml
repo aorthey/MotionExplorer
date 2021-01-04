@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="shape1" file="../../objects/puzzles/shapesorter/shapesorter-0.urdf"/>
+  <robot name="shape2" file="../../objects/puzzles/shapesorter/shapesorter-1.urdf"/>
+  <robot name="shape3" file="../../objects/puzzles/shapesorter/shapesorter-2.urdf"/>
+  <robot name="shape4" file="../../objects/puzzles/shapesorter/shapesorter-3.urdf"/>
+  <robot name="shape5" file="../../objects/puzzles/shapesorter/shapesorter-4.urdf"/>
+
+  <robot name="shape1" file="../../objects/puzzles/shapesorter/shapesorter-0-relaxed.urdf"/>
+  <robot name="shape2" file="../../objects/puzzles/shapesorter/shapesorter-1-relaxed.urdf"/>
+  <robot name="shape3" file="../../objects/puzzles/shapesorter/shapesorter-2-relaxed.urdf"/>
+  <robot name="shape4" file="../../objects/puzzles/shapesorter/shapesorter-3-relaxed.urdf"/>
+  <robot name="shape5" file="../../objects/puzzles/shapesorter/shapesorter-4-relaxed.urdf"/>
+  <!-- <robot name="shape" file="../../objects/puzzles/shapesorter/shapesorter-1-relaxed.urdf"/> -->
+
+  <terrain name="shape" file="../../objects/puzzles/shapesorter/shapesorter_box_lid.obj"
+    rotateRPY="0 0 1.57"/>
+
+
+  <plannerinput>
+
+    <agent 
+      id="0" 
+      qinit="6  -4 -4 0.0 0 1.57 0"
+      qgoal="6  +4 -4 0.0 0 0 0"
+    />
+    <agent 
+      id="1" 
+      qinit="6  -4 +4 0.0 0.5 1.57 0"
+      qgoal="6  +4 +4 0.0 0.5 1.57 0"
+    />
+    <agent 
+      id="2" 
+      qinit="6  -4 +0 4.0 0.5 1.57 0"
+      qgoal="6  +4 +0 4.0 0.5 1.57 0"
+    />
+    <agent 
+      id="3" 
+      qinit="6  -4 +2 -4.0 0.5 1.57 0"
+      qgoal="6  +4 +2 -4.0 0.5 0 0"
+    />
+    <agent 
+      id="4" 
+      qinit="6  -4 -2 -4.0 0.5 1.57 0"
+      qgoal="6  +4 -2 -4.0 0.5 0 0"
+    />
+
+    <se3min config="6  -7.0 -4.5 -4.5 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +7.0 +4.5 +4.5 +3.141593 +1.57 +3.141593"/>
+
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <!-- <freeFloating>1</freeFloating> -->
+    <smoothPath>0</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
+    <pathSpeed>8</pathSpeed>                    <!-- <1: slower, 1: default, >1: faster -->
+    <multiAgent>1</multiAgent>
+
+    <algorithm name="multilevel:qrrt"/>
+    <algorithm name="multilevel:qmpstar"/>
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="sampler_feasible"/>
+    <algorithm name="multilevel:drrt"/>
+
+    <multilevel>
+      <level>
+        <robot id="5" freeFloating="1" simplification_of_id="0" type="SE3"/>
+      </level>
+      <level>
+        <robot id="0" freeFloating="1" simplification_of_id="0" type="SE3"/>
+      </level>
+      <!-- <level> -->
+      <!--   <robot id="0" freeFloating="1" simplification_of_id="0" type="SE3"/> -->
+      <!--   <robot id="1" freeFloating="1" simplification_of_id="1" type="SE3"/> -->
+      <!-- </level> -->
+      <!-- <level> -->
+      <!--   <robot id="0" freeFloating="1" simplification_of_id="0" type="SE3"/> -->
+      <!--   <robot id="1" freeFloating="1" simplification_of_id="1" type="SE3"/> -->
+      <!--   <robot id="2" freeFloating="1" simplification_of_id="2" type="SE3"/> -->
+      <!-- </level> -->
+      <!-- <level> -->
+      <!--   <robot id="0" freeFloating="1" simplification_of_id="0" type="SE3"/> -->
+      <!--   <robot id="1" freeFloating="1" simplification_of_id="1" type="SE3"/> -->
+      <!--   <robot id="2" freeFloating="1" simplification_of_id="2" type="SE3"/> -->
+      <!--   <robot id="3" freeFloating="1" simplification_of_id="3" type="SE3"/> -->
+      <!-- </level> -->
+      <level>
+        <robot id="0" freeFloating="1" type="SE3"/>
+        <robot id="1" freeFloating="1" type="SE3"/>
+        <robot id="2" freeFloating="1" type="SE3"/>
+        <robot id="3" freeFloating="1" type="SE3"/>
+        <robot id="4" freeFloating="1" type="SE3"/>
+      </level>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

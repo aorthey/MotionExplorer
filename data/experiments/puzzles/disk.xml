@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="disk" file="../../robots/planar/disk_0_60.urdf"/>
+
+  <!-- <terrain name="O1" file="../../terrains/narrow_passage/narrow_passage_0_70.stl"/> -->
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-0.obj"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-1.obj"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-2.obj"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-3.obj"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-4.obj"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-5.obj"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-6.obj"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-7.obj"/>
+
+  <plannerinput>
+
+    <qinit  config="6  -4.0 -1.5 +0.0 +0.0 +0 +0.0"/>
+    <qgoal  config="6  +4.0 -0.5 +0.0 -0.0 +0 +0.0"/>
+    <!-- <se3min config="6  -6.0 -3.5 -1.0 -3.141593 -1.57 -3.141593"/> -->
+    <!-- <se3max config="6  +6.0 +3.5 +1.0 +3.141593 +1.57 +3.141593"/> -->
+
+
+    <!--For visualization SAMPLER-->
+    <se3min config="6  -1.0 -0.5 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +1.0 +0.5 +0.0 +3.141593 +1.57 +3.141593"/>
+    <algorithm name="sampler_feasible"/>
+
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>0.01</maxplanningtime>      <!-- runtime in (s) --> 
+    <!-- <freeFloating>1</freeFloating> -->
+    <smoothPath>1</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
+    <pathSpeed>8</pathSpeed>                    <!-- <1: slower, 1: default, >1: faster -->
+
+    <algorithm name="multilevel:drrt"/>
+    <algorithm name="ompl:rrt"/>
+
+    <multilevel>
+      <!-- <level robot_index="1" type="R2"/> -->
+      <level robot_index="0" type="R2"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="alpha" file="../../objects/puzzles/alpha-1.0.urdf"/>
+  <terrain name="env" file="../../objects/puzzles/alpha_env-1.0.stl"/>
+
+  <plannerinput>
+
+    <qinit  config="13  30.0 0.0 0.0 0 0 0 0 0 0 0 0 0 0"/>
+    <qgoal  config="13  0.0 4 -1 0 0 0 0 0 0 0 0 0 0"/>
+    <se3min config="6  -20.0 -20.0 -20.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  80.0 80.0 +80.0 +3.141593 +1.57 +3.141593"/>
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>0.1</maxplanningtime>      <!-- runtime in (s) --> 
+    <smoothPath>1</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
+    <pathSpeed>8</pathSpeed>                    <!-- <1: slower, 1: default, >1: faster -->
+
+    <algorithm name="multilevel:drrt"/>
+    <multilevel>
+      <level robot_index="0" type="SE3"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

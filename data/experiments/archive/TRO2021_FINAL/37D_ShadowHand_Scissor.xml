@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<world>
+
+  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand.urdf"/>
+  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand_index.urdf"/>
+  <robot name="hand" file="../../robots/kuka_shadowhand/kuka_shadowhand_index_thumb.urdf"/>
+
+  <terrain file="../../terrains/objects/Scissor.stl" translation="0.8 0 0.3" scale="0.1 0.1 0.1">
+    <display color="0.7 0.7 0.7 1"/>
+  </terrain>
+
+
+  <rigidObject file="../../terrains/primitives/plane.tri" translation="0 0 -0.01"/>
+
+  <terrain file="../../terrains/objects/beer_mug.tri" translation="0.775 0.005 0.18" scale="0.5 0.5 0.5" rotateRPY="0 0 1.57">
+    <display color="0.7 0.7 0.7 1"/>
+  </terrain>
+
+  <terrain file="../../terrains/objects/Coffee_Table.tri" translation="1 0 0" scale="0.5 0.5 0.5">
+    <display color="0.7 0.7 0.7 1"/>
+  </terrain>
+
+  <plannerinput>
+
+    <qinit config="42  0 0 0 0 0 0 0 -0.949204 0.18 -0.954395 1.12706 -0.02 -0.26 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 "/>
+
+
+    <qgoal config="42  0 0 0 0 0 0 -0.22 -0.66 0.32 1.26 1.55294 -0.375605 -1.74706 -0.163599 0.36 0 1.0708 0.7108 0.88 0 0 1.309 0 -0.2837 0.46 0 0 0 0 0 0.330796 0 0 0 0 0.55 0 0 0 0 0.67 0 "/>
+
+
+
+
+    <epsilongoalregion>0.01</epsilongoalregion>
+      
+    <se3min config="6  -0.0 -1 -0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +1.5 +1 +2 +3.141593 +1.57 +3.141593"/>
+
+    <pathBorderWidth>0.005</pathBorderWidth>
+    <pathWidth>0.01</pathWidth>
+    <pathSpeed>2</pathSpeed>
+    <maxplanningtime>2</maxplanningtime>
+
+    <algorithm name="multilevel:qmp"/>
+    <algorithm name="multilevel:qmpstar"/>
+    <algorithm name="multilevel:qrrt"/>
+    <algorithm name="benchmark:ral2020"/>
+
+    <multilevel>
+      <level robot_index="1" type="R13"/>
+      <level robot_index="2" type="R18"/>
+      <level robot_index="0" type="R31"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

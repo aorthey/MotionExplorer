@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="gear" file="../../objects/puzzles/gear/gear.urdf"/>
+  <robot name="gear" file="../../objects/puzzles/gear/gear.urdf"/>
+  <robot name="gear" file="../../objects/puzzles/gear/gear.urdf"/>
+
+  <terrain name="rod" file="../../terrains/primitives/cylinder_height_3_00_radius_0_40.stl"
+    translation="1.5 0 +1.0"/>
+  <terrain name="rod" file="../../terrains/primitives/cylinder_height_3_00_radius_0_40.stl"
+    translation="-1.8 0 +1.0"/>
+  <terrain name="rod" file="../../terrains/primitives/cylinder_height_3_00_radius_0_40.stl"
+    translation="-0.0 +3 +1.0"/>
+
+  <terrain name="plane" file="../../terrains/primitives/plane.tri" translation="0 0 -0.5"
+    scale="1.5 1.5 1.0"/>
+
+  <plannerinput>
+    <agent 
+      id="0" 
+      qinit="6  -3.5 -5.5 0.0 0 0 0"
+      qgoal="6  -1.8 0 0.0 0 0 0"
+    />
+    <agent 
+      id="1" 
+      qinit="6  +0 -5.5 0.0 0.0 0 0"
+      qgoal="6  +1.5 +0 0.0 0.0 0 0"
+    />
+    <agent 
+      id="2" 
+      qinit="6  +3.5 -5.5 0.0 0.0 0 0"
+      qgoal="6  -0.0 +3 0.0 0.0 0 0"
+    />
+
+    <se3min config="6  -7.0 -7.0 -0.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +7.0 +7.0 +20.0 +3.141593 +1.57 +3.141593"/>
+    <freeFloating>1</freeFloating>
+    <pathBorderWidth>3</pathBorderWidth>
+    <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
+
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="multilevel:drrt"/>
+    <algorithm name="multilevel:qrrt"/>
+
+    <multiAgent>1</multiAgent>
+    <multilevel>
+      <level>
+        <robot id="0" simplification_of_id="0" type="SE3"/>
+      </level>
+      <level>
+        <robot id="0" simplification_of_id="0" type="SE3"/>
+        <robot id="1" simplification_of_id="1" type="SE3"/>
+      </level>
+      <level>
+        <robot id="0" type="SE3"/>
+        <robot id="1" type="SE3"/>
+        <robot id="2" type="SE3"/>
+      </level>
+    </multilevel>
+
+  </plannerinput>
+</world>

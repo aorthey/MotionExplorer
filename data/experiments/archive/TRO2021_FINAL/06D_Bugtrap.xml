@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+
+<world>
+  <!-- Please see Lee 2012 "SR-RRT: Selective Retraction-based RRT Planner" for recent
+       benchmark on this environment. 
+        Results are averaged over 100 runs and show RRT (145s), 
+        Retraction RRT by Zhang 2008 (39.72s) and SR-RRT+PCA (22.17s) -->
+
+  <robot name="bug" file="../../objects/bugtrap/bug.urdf"/>
+  <robot name="bug" file="../../objects/bugtrap/bug_inner_cylinder.urdf"/>
+  <robot name="bug" file="../../objects/bugtrap/bug_inner_cylinder_small.urdf"/>
+  <robot name="bug" file="../../objects/bugtrap/bug_inner_sphere.urdf"/>
+
+  <terrain name="mug" file="../../objects/bugtrap/trap.tri">
+     <display color="0.6 0.6 0.6 1"/> 
+  </terrain>
+
+  <!-- <terrain name="mug" file="../../objects/power_drill.stl" translation="-5 0 0" rotateRPY="0 0 0"> -->
+  <!--    <display color="0.6 0.6 0.6 1"/> --> 
+  <!-- </terrain> -->
+  <!-- <terrain name="mug" file="../../objects/mug.stl" translation="-3 0 0" rotateRPY="0 0 0"> -->
+  <!--    <display color="0.6 0.6 0.6 1"/> --> 
+  <!-- </terrain> -->
+  <plannerinput>
+
+    <qinit  config="6  -3 0 +8 0 1.57 0"/>
+    <qgoal  config="6  -3 +1 -20 0 1.57 0"/>
+    <se3min config="6  -12.0 -12.0 -40.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +12.0 +12.0 +20.0 +3.141593 +1.57 +3.141593"/>
+    <freeFloating>1</freeFloating>
+    <pathBorderWidth>3</pathBorderWidth>
+    <maxplanningtime>3</maxplanningtime>      <!-- runtime in (s) --> 
+
+    <algorithm name="benchmark:ral2020"/>
+    <algorithm name="multilevel:qmp"/>
+    <algorithm name="multilevel:qrrt"/>
+
+    <multilevel>
+      <level robot_index="3" type="R3"/>
+      <level robot_index="1" type="SE3"/>
+    </multilevel>
+
+  </plannerinput>
+</world>

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<world>
+
+  <robot name="Xshape" file="../../robots/Xshape/Xshape.urdf"/>
+  <robot name="Xshape" file="../../robots/Xshape/Xshape_skinny.urdf"/>
+
+  <terrain  name="cubes" file="../../terrains/Lshape2.tri">
+    <display color="0.6 0.6 0.6 1"/>
+  </terrain>
+
+  <plannerinput>
+    <qinit config="10  +3.5 +0.0 +1.5 -2.00 +0.6 +0.3 0 0 0 0"/>
+    <qgoal config="10  -3.5 -2.5 +1.0 +1.57 +0.0 +0.0 0 0 0 0 "/>
+
+    <se3min config="6  -8.0 -8.0 -8.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +8.0 +8.0 +8.0 +3.141593 +1.57 +3.141593"/>
+
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>5</maxplanningtime>
+    <pathWidth>0.4</pathWidth>
+
+    <algorithm name="multilevel:qmp"/>
+    <algorithm name="multilevel:qrrt"/>
+    <algorithm name="multilevel:spqr"/>
+
+    <multilevel>
+      <level robot_index="1" type="SE3"/>
+      <level robot_index="0" type="SE3"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

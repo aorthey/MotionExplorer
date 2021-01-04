@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<world>
+  <robot name="Lshape" file="../../robots/Lshape/PlanarLshape.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
+
+  <rigidObject name="O1" file="../../terrains/2droom/2droom_misleading.tri" translation="0 0 0" rotateRPY="0 0 1.57"/>
+
+  <plannerinput>
+
+    <qinit  config="8  -3.0 +2.2 +0.0 -1.47 +0 +0.0 +0.0 0.0"/>
+    <qgoal  config="8  -2.9 -2.0 +0.0 -1.8 +0 +0.0 +0.0 0.0"/>
+    <se3min config="6  -4.0 -4.0 -1.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +4.0 +4.0 +1.0 +3.141593 +1.57 +3.141593"/>
+    <freeFloating>1</freeFloating>
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <!-- <freeFloating>1</freeFloating> -->
+    <smoothPath>1</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
+    <pathSpeed>8</pathSpeed>                    <!-- <1: slower, 1: default, >1: faster -->
+
+    <multilevel>
+      <level robot_index="0" type="SE2"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>
