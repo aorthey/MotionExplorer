@@ -8,8 +8,6 @@
 #include "planner/cspace/cspace_geometric_contact.h"
 
 #include <ompl/multilevel/datastructures/PlannerMultiLevel.h>
-// #include <ompl/multilevel/planners/explorer/MotionExplorer.h>
-// #include <ompl/multilevel/planners/explorer/MotionExplorerQMP.h>
 #include <ompl/multilevel/planners/explorer/LocalMinimaSpanners.h>
 #include <ompl/multilevel/planners/qrrt/QRRT.h>
 #include <ompl/multilevel/planners/qrrt/QRRTStar.h>

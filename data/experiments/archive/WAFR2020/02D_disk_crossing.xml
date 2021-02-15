@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <world>
-  <robot file="../../robots/disks/1.urdf" translation="0 0 0.05"/>
-  <robot file="../../robots/disks/2.urdf" translation="0 0 0.05"/>
+  <robot file="../../../robots/disks/1.urdf" translation="0 0 0.05"/>
+  <robot file="../../../robots/disks/2.urdf" translation="0 0 0.05"/>
 
   <!-- <terrain file="../../terrains/primitives/plane.tri"> -->
   <!--    <display color="0.6 0.6 0.6 1"/> --> 
@@ -34,7 +34,7 @@
     <pathSpeed>3</pathSpeed>
     <freeFloating>1</freeFloating>
     <smoothPath>1</smoothPath>
-    <algorithm name="multilevel:explorer"/>
+    <algorithm name="multilevel:minimaspanner"/>
 
     <multiAgent>1</multiAgent>
 

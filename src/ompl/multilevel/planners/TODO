@@ -1,0 +1,7 @@
+[ ] Ensure GoalStateDifferentiable is set for each pdef for each level when
+calling setProblemDefinition
+
+[ ] Visualize checker for each robot state per default.
+
+[ ] Implement cost gradient for multirobot (super important for larger
+assemblies)

@@ -249,7 +249,10 @@ bool Roadmap::Save(TiXmlElement *node)
       {
           double d = checker->constrainedness(vd->getState());
           subnode->SetDoubleAttribute("cost", (double)d);
-          // std::cout << subnode->Attribute("cost") << std::endl;
+          auto dx = checker->costGradient(vd->getState());
+          std::stringstream dxs;
+          dxs << dx;
+          subnode->SetAttribute("gradient", dxs.str());
       }
       node->InsertEndChild(*subnode);
     }

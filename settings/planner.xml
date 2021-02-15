@@ -14,7 +14,6 @@
   <!-- <algorithm name="multilevel:sampler"/> -->
   <!-- <algorithm name="benchmark:minimal"/> -->
 
-  <algorithm name="sampler"/>
   <algorithm name="ompl:prm"/>
   <algorithm name="benchmark:minimal"/>
   <algorithm name="multilevel:spqr"/>

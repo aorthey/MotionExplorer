@@ -4,6 +4,9 @@ from cspace_visualizer import *
 from cspace_system_2dof import *
 import cspace_system_2dof as dof
 
+# from matplotlib import rc
+# rc("text", usetex=False)
+
 c1 = (0.9,0.9,0.9)
 c2 = (0.7,0.7,0.7)
 c3 = (0.5,0.5,0.5)

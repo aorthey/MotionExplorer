@@ -502,7 +502,7 @@ void MotionPlanner::AdvanceUntilSolution()
 
         output->getRoadmap()->Save(fname.c_str());
         std::cout << "Saved " << output->getRoadmap()->numVertices() 
-          << " infeasible samples to " << fname << std::endl;
+          << " samples to " << fname << std::endl;
       }
       // std::string name = util::GetFileBasename(input.environment_name);
       // std::string fname = util::GetDataFolder()+"/samples/"+name+".samples";

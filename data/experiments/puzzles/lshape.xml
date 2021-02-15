@@ -5,22 +5,30 @@
   <robot name="disk_inner" file="../../robots/Lshape/PlanarLshape_cylinder_inner.urdf" translation="0 0 0" rotateRPY="0 0 0"/>
 
 
-  <terrain name="O1" file="../../terrains/narrow_passage/narrow_passage_0_70.stl"/>
+  <!-- <terrain name="O1" file="../../terrains/narrow_passage/narrow_passage_0_70.stl"/> -->
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-0.obj"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-1.obj"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-2.obj"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-3.obj"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-4.obj"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-5.obj"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-6.obj"/>
+  <terrain name="O1" file="../../terrains/narrow_passage/meshes/narrow_passage_0_70-7.obj"/>
   <plannerinput>
 
     <qinit  config="8  -3.5 -0.5 +0.0 +0.5 +0 +0.0 +0.0 0.0"/>
     <qgoal  config="8  +3.5 -0.5 +0.0 -0.5 +0 +0.0 +0.0 0.0"/>
-    <!-- <se3min config="6  -6.0 -3.5 -1.0 -3.141593 -1.57 -3.141593"/> -->
-    <!-- <se3max config="6  +6.0 +3.5 +1.0 +3.141593 +1.57 +3.141593"/> -->
+    <se3min config="6  -6.0 -3.5 -1.0 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +6.0 +3.5 +1.0 +3.141593 +1.57 +3.141593"/>
 
 
     <!--For visualization SAMPLER-->
-    <se3min config="6  -2.0 -0.5 -1.0 -3.141593 -1.57 -3.141593"/>
-    <se3max config="6  +2.0 +0.5 +1.0 +3.141593 +1.57 +3.141593"/>
-    <algorithm name="sampler_feasible"/>
+    <!-- <se3min config="6  -2.0 -0.5 -1.0 -3.141593 -1.57 -3.141593"/> -->
+    <!-- <se3max config="6  +2.0 +0.5 +1.0 +3.141593 +1.57 +3.141593"/> -->
+    <!-- <algorithm name="sampler_feasible"/> -->
 
     <freeFloating>1</freeFloating>
-    <maxplanningtime>0.5</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>0.2</maxplanningtime>      <!-- runtime in (s) --> 
     <!-- <freeFloating>1</freeFloating> -->
     <smoothPath>1</smoothPath>                  <!-- 0: no smoothing, 1: smoothing      -->
     <pathSpeed>8</pathSpeed>                    <!-- <1: slower, 1: default, >1: faster -->

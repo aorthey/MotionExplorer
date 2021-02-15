@@ -6,21 +6,31 @@
 
 class InteractionPoint
 {
-    typedef std::vector<std::pair<Vector3, Vector3> > InteractionPoints;
+  public:
+    Robot *robot;
 
-    int robot;
-    int robotLink;
+    uint link{0};
+    uint collisionGeometriesId{0};
+
+    double distance{0};
+
+    //point on robot link closest to collision geometry
     Vector3 ptRobot;
+    //point on collision geometry
     Vector3 ptEnvironment;
-    double distance;
 
-}
+    //virtual force (directional vector) from geometry to robot
+    Vector3 force;
+    //force projected into state space of robot as wrench (on tangent space)
+    Vector wrench;
+};
 
 class OMPLValidityChecker: public ob::StateValidityCheckerDifferentiable
 {
 
   public:
-    typedef std::vector<std::pair<Vector3, Vector3> > InteractionPoints;
+    // typedef std::vector<std::pair<Vector3, Vector3> > InteractionPoints;
+    typedef std::vector<InteractionPoint> InteractionPoints;
 
     OMPLValidityChecker(const ob::SpaceInformationPtr &si, CSpaceOMPL *cspace_);
     ~OMPLValidityChecker();
@@ -50,6 +60,8 @@ class OMPLValidityChecker: public ob::StateValidityCheckerDifferentiable
         const ManagedGeometry::GeometryPtr geometry) const;
 
     virtual void DrawGL(GUIState& state);
+
+    // double costFromInteractionPoints(InteractionPoint& ip1, InteractionPoint& ip2);
 
     InteractionPoints getInteractionPoints(
         Robot *robot,

@@ -4,6 +4,23 @@
 #include <ompl/base/StateSpaceTypes.h>
 #include <KrisLibrary/GLdraw/drawextra.h>
 
+//convert t in [t0, t1] (default: [0.0, 1.0]) to a value in [x0, x1] (default:
+//[1.0, 0.0]), whereby values of t closer to t0 are assigned values closer to x0
+//and values closer to t1 are assigned values closer to x1 (smoothly
+//interpolated)
+
+double stepfunction(double t, double t0=0.0, double t1=1.0, double x0=1.0, double x1=0.0)
+{
+  double x = (t-t0)/(t1-t0);
+
+  //catch out of bound values
+  if(x < 0.0) return x0;
+  if(x >= 1.0) return x1;
+
+  //smooth segment using hermite polynomial
+  return x0 + (x1-x0)*(x*x*(3-2*x));
+}
+
 std::vector<ManagedGeometry::GeometryPtr> 
 getEnvironmentCollisionGeometries(SingleRobotCSpace *space)
 {
@@ -18,6 +35,9 @@ getEnvironmentCollisionGeometries(SingleRobotCSpace *space)
   {
       const ManagedGeometry::GeometryPtr tgeom = 
         space->world.terrains[k]->geometry;
+      // std::cout << tgeom->TypeName() << std::endl;
+        //const Meshing::TriMesh& AsTriangleMesh() const;
+
       collisionGeometries.push_back(tgeom);
   }
   return collisionGeometries;
@@ -197,44 +217,6 @@ double OMPLValidityChecker::cost(const ob::State *state) const
     }
 }
 
-double OMPLValidityChecker::constrainedness(const ob::State *state) const
-{
-  //update robot geometry to state
-  Config q = cspace->OMPLStateToConfig(state);
-  SingleRobotCSpace *space = klampt_single_robot_cspace;
-  Robot* robot = space->GetRobot();
-  robot->UpdateConfig(q);
-  robot->UpdateGeometry();
-
-  std::vector<ManagedGeometry::GeometryPtr> collisionGeometries 
-    = getEnvironmentCollisionGeometries(space);
-
-  uint N = si_->getStateDimension();
-  Vector torqueTotal(N);
-  torqueTotal.setZero();
-
-  InteractionPoints interactionPoints = getInteractionPoints(robot, collisionGeometries);
-  // typedef std::vector<std::pair<Vector3, Vector3> > InteractionPoints;
-
-  //constrainedness depends on:
-  //(1) distance to constraint
-  //(2) number of opposing constraints
-  for(uint k = 0; k < collisionGeometries.size(); k++)
-  {
-    const ManagedGeometry::GeometryPtr tgeom = collisionGeometries.at(k);
-    Vector wrench_k = getVirtualForceRobotToMesh(robot, tgeom);
-  }
-
-  Eigen::VectorXd dx(si_->getStateDimension());
-  for(uint k = 0; k < si_->getStateDimension(); k++)
-  {
-    dx(k) = torqueTotal[k];
-  }
-
-  return dx.norm();
-
-}
-
 void adjustForce(Vector3 &f)
 {
   double eta = 0.01; //gain on repulsive gradient
@@ -315,9 +297,6 @@ OMPLValidityChecker::InteractionPoints OMPLValidityChecker::getInteractionPoints
 
   InteractionPoints interactionPoints;
 
-  // std::cout << "Checking against " << collisionGeometries.size() 
-  //   << " collisionGeometries."  << std::endl;
-  // std::cout << "Config: " << robot->q << std::endl;
   for(uint k = 0; k < collisionGeometries.size(); k++)
   {
       const ManagedGeometry::GeometryPtr tgeom = collisionGeometries.at(k);
@@ -332,55 +311,51 @@ OMPLValidityChecker::InteractionPoints OMPLValidityChecker::getInteractionPoints
           RobotLink3D *link = &robot->links[i];
 
           Geometry::AnyCollisionQuery *query = robot->envCollisions[i];
-          std::vector<Vector3> vp1,vp2;
+          double d = query->Distance(0,0);
 
-          query->Distance(0,0);
+          std::vector<Vector3> vp1,vp2;
           query->InteractingPoints(vp1,vp2);
 
           if(vp1.size() >= 1)
           {
-            Vector3 p1 = link->T_World * vp1.front();
-            Vector3 p2 = tgeom->currentTransform * vp2.front();
+            InteractionPoint ip;
+            ip.ptRobot = link->T_World * vp1.front();
+            ip.ptEnvironment = tgeom->currentTransform * vp2.front();
+            ip.distance = d;
+            ip.robot = robot;
+            ip.link = i;
+            ip.collisionGeometriesId = k;
 
-            interactionPoints.push_back(std::make_pair(p1, p2));
-            // std::cout << "Interaction " << i <<":" << p1 << "," << p2 << std::endl;
+            ///for a force f at pi on link i, returns joint wrenches F = J^t f
+            Vector3 f = ip.ptRobot - ip.ptEnvironment;
+
+            Vector3 l(0,0,1);
+
+            double d = stepfunction(f.normSquared(), 0, 10, 1.0, 0.1);
+            int q = (k%2)*2 - 1;
+
+            Vector3 b = q*cross(l,f)/d;
+
+            Vector wrenchesAtLink;
+            //requires the local point coordinate
+            robot->GetForceTorques(b, vp1.front(), ip.link, wrenchesAtLink);
+
+            // std::cout << "Force from geometry " << k << " : " << b << std::endl;
+
+            ip.wrench = wrenchesAtLink;
+
+            // std::cout << "Wrench from geometry " << k << " : " << ip.wrench << std::endl;
+            // cspace->ConfigToOMPLState(wrenchesAtLink, tmp);
+
+            // std::vector<double> wrenchVec;
+            // si_->getStateSpace()->copyToReals(wrenchVec, tmp);
+
+            // wrenches += wrenchVec;
+            interactionPoints.push_back(ip);
           }
       }
   }
   return interactionPoints;
-}
-
-Eigen::VectorXd OMPLValidityChecker::costGradient(const ob::State *state) const
-{
-  //update robot geometry to state
-  Config q = cspace->OMPLStateToConfig(state);
-
-  SingleRobotCSpace *space = klampt_single_robot_cspace;
-  Robot* robot = space->GetRobot();
-  robot->UpdateConfig(q);
-  robot->UpdateGeometry();
-
-  std::vector<ManagedGeometry::GeometryPtr> collisionGeometries 
-    = getEnvironmentCollisionGeometries(space);
-
-  uint N = si_->getStateDimension();
-  Vector torqueTotal(N);
-  torqueTotal.setZero();
-  for(uint k = 0; k < collisionGeometries.size(); k++)
-  {
-      const ManagedGeometry::GeometryPtr tgeom = collisionGeometries.at(k);
-      torqueTotal+= getVirtualForceRobotToMesh(robot, tgeom);
-  }
-
-  Eigen::VectorXd dx(si_->getStateDimension());
-  for(uint k = 0; k < si_->getStateDimension(); k++)
-  {
-    dx(k) = torqueTotal[k];
-  }
-
-  // std::cout << "Force " << dx << std::endl;
-
-  return dx;
 }
 
 void OMPLValidityChecker::DrawGL(GUIState& state)
@@ -402,8 +377,8 @@ void OMPLValidityChecker::DrawGL(GUIState& state)
   setColor(yellow);
   for(uint k = 0; k < interactionPoints.size(); k++)
   {
-    Vector3 p1 = interactionPoints.at(k).first;
-    Vector3 p2 = interactionPoints.at(k).second;
+    Vector3 p1 = interactionPoints.at(k).ptRobot;
+    Vector3 p2 = interactionPoints.at(k).ptEnvironment;
     glPushMatrix();
     glLineWidth(3);
     glPointSize(5);
@@ -419,4 +394,159 @@ void OMPLValidityChecker::DrawGL(GUIState& state)
   glDisable(GL_LINE_SMOOTH);
   glDisable(GL_BLEND);
   glEnable(GL_LIGHTING);
+}
+
+struct interactionPointCompare
+{
+  inline bool operator() (const InteractionPoint& ip1, const InteractionPoint& ip2)
+  {
+    return (ip1.distance < ip2.distance);
+  }
+};
+
+double costFromInteractionPoints(InteractionPoint& ip1, InteractionPoint& ip2)
+{
+    ip1.distance = ip1.wrench.norm();
+    ip2.distance = ip2.wrench.norm();
+
+    ip1.wrench /= ip1.distance;
+    ip2.wrench /= ip2.distance;
+
+    //-1.0 to 1.0
+    double d = dot(ip1.wrench, ip2.wrench);
+    // double pinchness = std::max(stepfunction(d, -1.0, +0.0),
+    //     stepfunction(d,1.0,0.0));
+    double pinchness = stepfunction(d, -1.0, +0.0);
+
+    //NOTES: 
+    //-- long tails == bad (because they stretch too much in high-dim spaces
+    //which would confuse sampler)
+    //-- crisp tight ridges is what we want (easier to travel along, but curves
+    //should be smooth)
+    //-- stay out of corners (might not be totally possible)
+
+    double equalness = stepfunction(fabs(ip1.distance - ip2.distance), 0.0, 2.0);
+
+    double lowest_distance = std::min(ip1.distance, ip2.distance);
+    double strength = stepfunction(lowest_distance, 0.0, 2.0);
+
+    double constrainedness = equalness * strength * pinchness;
+    // std::cout << "Best distance: " << ip1.distance << "," << ip2.distance << " :"<< 
+    //   constrainedness << std::endl;
+    return constrainedness;
+}
+
+double costFromInteractionPointsMagnetic(InteractionPoint& ip1, InteractionPoint& ip2)
+{
+    ip1.distance = ip1.wrench.norm();
+    ip2.distance = ip2.wrench.norm();
+
+    auto ip_mid = 0.5*(ip1.wrench + ip2.wrench);
+
+    return ip_mid.norm();
+}
+
+double OMPLValidityChecker::constrainedness(const ob::State *state) const
+{
+  //update robot geometry to state
+  Config q = cspace->OMPLStateToConfig(state);
+  SingleRobotCSpace *space = klampt_single_robot_cspace;
+  Robot* robot = space->GetRobot();
+  robot->UpdateConfig(q);
+  robot->UpdateGeometry();
+
+  std::vector<ManagedGeometry::GeometryPtr> collisionGeometries 
+    = getEnvironmentCollisionGeometries(space);
+
+  uint N = si_->getStateDimension();
+  Vector torqueTotal(N);
+  torqueTotal.setZero();
+
+  InteractionPoints interactionPoints = getInteractionPoints(robot, collisionGeometries);
+
+  std::sort(interactionPoints.begin(), interactionPoints.end(), interactionPointCompare());
+
+  if(interactionPoints.size() < 2)
+  {
+    std::cout << "No interaction points (" << interactionPoints.size() << ")" << std::endl;
+    return 0;
+  }else{
+    InteractionPoint ip1 = interactionPoints.at(0);
+    InteractionPoint ip2 = interactionPoints.at(1);
+    return costFromInteractionPointsMagnetic(ip1, ip2);
+  }
+
+}
+
+//Eigen::VectorXd OMPLValidityChecker::costGradient(const ob::State *state) const
+//{
+//  //update robot geometry to state
+//  Config q = cspace->OMPLStateToConfig(state);
+
+//  SingleRobotCSpace *space = klampt_single_robot_cspace;
+//  Robot* robot = space->GetRobot();
+//  robot->UpdateConfig(q);
+//  robot->UpdateGeometry();
+
+//  std::vector<ManagedGeometry::GeometryPtr> collisionGeometries 
+//    = getEnvironmentCollisionGeometries(space);
+
+//  uint N = si_->getStateDimension();
+//  Vector torqueTotal(N);
+//  torqueTotal.setZero();
+//  for(uint k = 0; k < collisionGeometries.size(); k++)
+//  {
+//      const ManagedGeometry::GeometryPtr tgeom = collisionGeometries.at(k);
+//      torqueTotal+= getVirtualForceRobotToMesh(robot, tgeom);
+//  }
+
+//  Eigen::VectorXd dx(si_->getStateDimension());
+//  for(uint k = 0; k < si_->getStateDimension(); k++)
+//  {
+//    dx(k) = torqueTotal[k];
+//  }
+
+//  // std::cout << "Force " << dx << std::endl;
+
+//  return dx;
+//}
+
+Eigen::VectorXd OMPLValidityChecker::costGradient(const ob::State *state) const
+{
+  //update robot geometry to state
+  Config q = cspace->OMPLStateToConfig(state);
+  SingleRobotCSpace *space = klampt_single_robot_cspace;
+  Robot* robot = space->GetRobot();
+  robot->UpdateConfig(q);
+  robot->UpdateGeometry();
+
+  std::vector<ManagedGeometry::GeometryPtr> collisionGeometries 
+    = getEnvironmentCollisionGeometries(space);
+
+  uint N = si_->getStateDimension();
+  Vector torqueTotal(N);
+  torqueTotal.setZero();
+
+  InteractionPoints interactionPoints = getInteractionPoints(robot, collisionGeometries);
+
+  std::sort(interactionPoints.begin(), interactionPoints.end(), interactionPointCompare());
+
+  Eigen::VectorXd dx(si_->getStateDimension());
+  dx.setZero();
+
+  if(interactionPoints.size() < 2)
+  {
+    std::cout << "No interaction points (" << interactionPoints.size() << ")" << std::endl;
+  }else{
+    InteractionPoint ip1 = interactionPoints.at(0);
+    InteractionPoint ip2 = interactionPoints.at(1);
+
+    for(uint k = 0; k < si_->getStateDimension(); k++)
+    {
+      dx(k) = 0.5*(ip1.wrench[k]+ip2.wrench[k]);
+    }
+  }
+
+  return dx;
+
 }
