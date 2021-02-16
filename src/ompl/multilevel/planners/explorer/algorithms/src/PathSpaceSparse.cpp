@@ -52,31 +52,32 @@ PathSpaceSparse::~PathSpaceSparse()
 void PathSpaceSparse::optimizePath(geometric::PathGeometric& gpath)
 { 
     // optimizer_->perturbPath(gpath, 2, 1000, 1000);
-    // optimizer_->simplifyMax(gpath);
-    // return;
-
+    optimizer_->smoothBSpline(gpath);
+    optimizer_->simplifyMax(gpath);
+    gpath.interpolate();
+    return;
 
     base::ProblemDefinitionPtr pdef = getProblemDefinition();
     base::OptimizationObjectivePtr obj = pdef->getOptimizationObjective();
-    const double rangeRatio = 0.01;
+    // const double rangeRatio = 0.01;
 
-    double dmax = gpath.length();
+    // double dmax = gpath.length();
 
     if (gpath.getStateCount() < 3)
         return;
 
-    unsigned int maxSteps = gpath.getStateCount();
+    // unsigned int maxSteps = gpath.getStateCount();
 
-    unsigned int maxEmptySteps = 10000;//floor(0.5*gpath.getStateCount());
+    unsigned int maxEmptySteps = 1000;//floor(0.5*gpath.getStateCount());
 
-    const base::SpaceInformationPtr &si = gpath.getSpaceInformation();
+    // const base::SpaceInformationPtr &si = gpath.getSpaceInformation();
     std::vector<base::State *> &states = gpath.getStates();
 	
-    std::cout << "Path with cost " << gpath.length() << "(" << states.size() << ")";
     unsigned int rmStates = 0;
 		for (unsigned int nochange = 0; nochange < maxEmptySteps; nochange++)
 		{
 				int count = states.size();
+        if(count < 3) break;
 				int maxN = count - 1;
 
         {
@@ -98,59 +99,7 @@ void PathSpaceSparse::optimizePath(geometric::PathGeometric& gpath)
               continue;
           }
         }
-
-//         {
-//           int p1 = rng_.uniformInt(0, maxN);
-//           int p2 = std::min(maxN, p1 + 3);
-//           int p3 = std::min(maxN, p1 + 1);
-//           int p4 = std::min(maxN, p1 + 2);
-
-//           base::Cost d12 = obj->motionCost(states[p1], states[p2]);
-
-//           base::Cost d13 = obj->motionCost(states[p1], states[p3]);
-//           base::Cost d34 = obj->motionCost(states[p3], states[p4]);
-//           base::Cost d42 = obj->motionCost(states[p4], states[p2]);
-
-//           base::Cost d1342 = obj->combineCosts(d13, obj->combineCosts(d34, d42));
-
-//           if(obj->isCostBetterThan(d12, d1342))
-//           {
-//               states.erase(states.begin() + p1 + 1, states.begin() + p2);
-//               nochange = 0;
-//               rmStates++;
-//               continue;
-//           }
-//         }
-//         {
-//           int p1 = rng_.uniformInt(0, maxN);
-//           int p2 = std::min(maxN, p1 + 4);
-//           int p3 = std::min(maxN, p1 + 1);
-//           int p4 = std::min(maxN, p1 + 2);
-//           int p5 = std::min(maxN, p1 + 3);
-
-//           base::Cost d12 = obj->motionCost(states[p1], states[p2]);
-
-//           base::Cost d13 = obj->motionCost(states[p1], states[p3]);
-//           base::Cost d34 = obj->motionCost(states[p3], states[p4]);
-//           base::Cost d45 = obj->motionCost(states[p4], states[p5]);
-//           base::Cost d52 = obj->motionCost(states[p5], states[p2]);
-
-//           base::Cost d12prime = 
-//             obj->combineCosts(d13, 
-//                 obj->combineCosts(d34, 
-//                   obj->combineCosts(d45, d52)));
-
-//           if(obj->isCostBetterThan(d12, d12prime))
-//           {
-//               states.erase(states.begin() + p1 + 1, states.begin() + p2);
-//               nochange = 0;
-//               rmStates++;
-//               continue;
-//           }
-//         }
 		}
-    std::cout << " to cost " << gpath.length() 
-      << " (" << states.size() << "). removed " << rmStates << " states."<< std::endl;
 }
 
 void PathSpaceSparse::grow()
@@ -226,11 +175,17 @@ void PathSpaceSparse::grow()
           gpath.append(sk);
         }
 
-        std::cout << "Interpolate " << gpath.getStates().size();
-        gpath.interpolate();
-        std::cout << " to " << gpath.getStates().size() << std::endl;
+        // std::cout << "Interpolate " << gpath.getStates().size();
+        // gpath.interpolate();
+        // std::cout << " to " << gpath.getStates().size() << std::endl;
+
+        std::cout << "Path with cost " << gpath.length() 
+          << " (" << states.size() << " states).";
 
         optimizePath(gpath);
+
+        std::cout << " OPTIMIZED to path with cost " << gpath.length() 
+          << " (" << states.size() << " states)." << std::endl;
 
         bool isVisible = false;
 
@@ -240,19 +195,22 @@ void PathSpaceSparse::grow()
         {
             // FALL 2: verbessert bestehenden pfad
             // Knoten wurde mit 2 Knoten des Pfades verbunden
-            // if (pathVisibilityChecker_->IsPathVisible(gpath.getStates(), getMinimumPathStates(i)))
-            // {
-            //     isVisible = true;
-            //     // Path is shorter than visible path else do nothing
-                // isVisible = true;
+            // if (pathVisibilityChecker_->IsPathVisible(gpath.getStates(), 
+            //       getMinimumPath(i)))
+            if (pathVisibilityChecker_->IsPathVisible(
+                  gpath.getStates(), 
+                  getMinimumPathStatesNonConst(i)))
+            {
+               isVisible = (fabs(pathcost  - getPathCost(i)) < 1e-10);
+               //TODO: same cost but could be in differnet minima. Better use
+               //distance or visibility check!
 
-                isVisible = (fabs(pathcost  - getPathCost(i)) < 1e-10);
-                if (isVisible)//pathcost < getPathCost(i))
-                {
-                    updatePath(i, pPath, pathcost);
-                    break;
-                }
-            // }
+               if (isVisible)//pathcost < getPathCost(i))
+               {
+                   updatePath(i, pPath, pathcost);
+                   break;
+               }
+            }
         }
 
         if (!isVisible)

@@ -41,7 +41,7 @@ ompl::base::PathPtr PathSpace::VerticesToPathPtr(VertexPath vpath)
 void ompl::multilevel::PathSpace::updatePath(unsigned int k, base::PathPtr path, double cost)
 {
     int level = bundleSpaceGraph_->getLevel();
-    LocalMinimaNode *node = localMinimaTree_->updatePath(path, cost, level, k);
+    // LocalMinimaNode *node = localMinimaTree_->updatePath(path, cost, level, k);
     // node->setVertexPath(vpath);
     OMPL_INFORM("Update path %d with cost %.2f (%d path(s) on level %d).", k, cost, getNumberOfPaths(), level);
 }
@@ -66,7 +66,8 @@ void ompl::multilevel::PathSpace::addPath(VertexPath vpath, double cost)
 void ompl::multilevel::PathSpace::addPath(base::PathPtr path, double cost)
 {
     int level = bundleSpaceGraph_->getLevel();
-    LocalMinimaNode *node = localMinimaTree_->addPath(path, cost, level);
+    /*LocalMinimaNode *node = */
+    localMinimaTree_->addPath(path, cost, level);
     OMPL_INFORM("New path with cost %.2f (%d path(s) on level %d).", cost, getNumberOfPaths(), level);
 }
 
@@ -85,6 +86,12 @@ const std::vector<ompl::base::State*> &PathSpace::getMinimumPathStates(unsigned 
 {
     const LocalMinimaNode *node = localMinimaTree_->getPath(bundleSpaceGraph_->getLevel(), k);
     return node->asStates();
+}
+
+std::vector<ompl::base::State*> &PathSpace::getMinimumPathStatesNonConst(unsigned int k)
+{
+    LocalMinimaNode *node = localMinimaTree_->getPath(bundleSpaceGraph_->getLevel(), k);
+    return node->asStatesNonConst();
 }
 
 unsigned int ompl::multilevel::PathSpace::getNumberOfPaths() const

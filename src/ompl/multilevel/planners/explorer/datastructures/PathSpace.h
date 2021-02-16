@@ -40,6 +40,7 @@ namespace ompl
 
             const std::vector<BundleSpaceGraph::Vertex> &getMinimumPath(unsigned int k);
             const std::vector<base::State*> &getMinimumPathStates(unsigned int k);
+            std::vector<base::State*> &getMinimumPathStatesNonConst(unsigned int k);
 
         protected:
             BundleSpaceGraph *bundleSpaceGraph_;

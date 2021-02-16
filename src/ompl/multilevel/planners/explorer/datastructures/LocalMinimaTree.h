@@ -31,25 +31,31 @@ namespace ompl
             LocalMinimaNode(base::SpaceInformationPtr si, base::PathPtr path);
             LocalMinimaNode(base::SpaceInformationPtr si, StatesPath &states);
             LocalMinimaNode(base::SpaceInformationPtr si, VertexPath &vertices);
+
             double getCost()
             {
                 return cost_.value();
             }
+
             void setVertexPath(VertexPath &vertices)
             {
                 vpath_ = vertices;
                 hasVertexRepresentation = true;
                 customRepresentation = nullptr;
             }
+
             void setPathPtr(base::PathPtr path)
             {
                 path_ = path;
                 hasPathPtrRepresentation = true;
                 customRepresentation = nullptr;
             }
+
             const StatesPath &asStates() const;
+            StatesPath &asStatesNonConst();
             const VertexPath &asVertices() const;
             const base::PathPtr &asPathPtr() const;
+
             void setCost(double c)
             {
                 cost_ = base::Cost(c);
@@ -85,7 +91,7 @@ namespace ompl
             LocalMinimaNode *parent_{nullptr};
         };
 
-        // The PlannerData class for Local minima tree
+        /** \brief Local minima tree as database of local minima plus connections between minima */
         class LocalMinimaTree
         {
         public:

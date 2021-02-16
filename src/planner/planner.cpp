@@ -10,10 +10,10 @@
 #include "common.h"
 #include "gui/ViewLocalMinimaTree.h"
 #include "elements/roadmap.h"
-#include <ompl/multilevel/planners/explorer/datastructures/PathSpace.h>
-#include <ompl/multilevel/planners/explorer/datastructures/MultiLevelPathSpace.h>
-#include <ompl/multilevel/planners/explorer/datastructures/LocalMinimaTree.h>
-#include <ompl/multilevel/planners/explorer/LocalMinimaSpanners.h>
+#include "ompl/multilevel/planners/explorer/datastructures/PathSpace.h"
+#include "ompl/multilevel/planners/explorer/datastructures/MultiLevelPathSpace.h"
+#include "ompl/multilevel/planners/explorer/datastructures/LocalMinimaTree.h"
+#include "ompl/multilevel/planners/explorer/LocalMinimaSpanners.h"
 
 #include <boost/lexical_cast.hpp>
 #include <thread>
@@ -429,6 +429,7 @@ void MotionPlanner::InitStrategy()
 
   auto pathSpacePlanner = 
     dynamic_pointer_cast<ompl::multilevel::LocalMinimaSpanners>(strategy->GetPlannerPtr());
+
   if(pathSpacePlanner != nullptr)
   {
       localMinimaTree_ = pathSpacePlanner->getLocalMinimaTree();

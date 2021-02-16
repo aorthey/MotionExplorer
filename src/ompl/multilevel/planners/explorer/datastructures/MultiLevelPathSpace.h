@@ -40,14 +40,13 @@ namespace ompl
             double pathBias{0.8};  //[0,1]
 
             T *current{nullptr};
-            // std::vector<int> selectedLocalMinimum_;
 
             LocalMinimaTreePtr localMinimaTree_;
 
             enum ExtensionMode
             {
-                AUTOMATIC_UNIFORM = 0,
-                AUTOMATIC_FAST_DOWNWARD = 1,
+                AUTOMATIC_BREADTH_FIRST = 0,
+                AUTOMATIC_DEPTH_FIRST = 1,
                 MANUAL = 2
             };
 

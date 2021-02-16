@@ -2,6 +2,7 @@
 #define OMPL_MULTILEVEL_PLANNERS_BUNDLESPACE_LOCALMINIMASPANNERS__
 #include <ompl/multilevel/datastructures/BundleSpaceSequence.h>
 #include <ompl/multilevel/planners/explorer/algorithms/PathSpaceSparse.h>
+#include <ompl/multilevel/planners/explorer/algorithms/PathSpaceSparseOptimization.h>
 #include <ompl/multilevel/planners/explorer/datastructures/MultiLevelPathSpace.h>
 
 namespace ompl
@@ -9,6 +10,7 @@ namespace ompl
     namespace multilevel
     {
         using LocalMinimaSpanners = MultiLevelPathSpace<PathSpaceSparse>;
+        // using LocalMinimaSpanners = MultiLevelPathSpace<PathSpaceSparseOptimization>;
     }
 }
 
