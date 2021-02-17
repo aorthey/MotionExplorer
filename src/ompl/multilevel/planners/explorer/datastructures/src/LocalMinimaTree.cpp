@@ -303,6 +303,15 @@ const ompl::base::PathPtr &LocalMinimaNode::asPathPtr() const
     throw ompl::Exception("NYI");
 }
 
+ompl::base::PathPtr &LocalMinimaNode::asPathPtrNonConst()
+{
+    if (hasPathPtrRepresentation)
+        return path_;
+
+    OMPL_ERROR("NYI");
+    throw ompl::Exception("NYI");
+}
+
 const StatesPath &LocalMinimaNode::asStates() const
 {
     if (hasStatesRepresentation)

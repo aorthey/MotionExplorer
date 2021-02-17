@@ -17,7 +17,8 @@ void RestrictionSamplerImpl::grow()
 
   base::SpaceInformationPtr bundle = getBundle();
   BundleSpaceGraph *graph = static_cast<BundleSpaceGraph*>(getBaseBundleSpace());
-  geometric::PathGeometric &spath = static_cast<geometric::PathGeometric &>(*graph->solutionPath_);
+  geometric::PathGeometric &spath = 
+    static_cast<geometric::PathGeometric &>(*graph->getSolutionPathByReference());
   std::vector<base::State *> states = spath.getStates();
 
   if (states.size() < 2)

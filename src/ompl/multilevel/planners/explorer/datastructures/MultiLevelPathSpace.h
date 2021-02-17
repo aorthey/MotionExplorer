@@ -17,7 +17,8 @@ namespace ompl
         template <class T>
         class MultiLevelPathSpace : public BundleSpaceSequence<T>
         {
-            static_assert(std::is_base_of<BundleSpace, T>::value, "Template must inherit from BundleSpace");
+            static_assert(std::is_base_of<BundleSpace, T>::value, 
+                "Template must inherit from BundleSpace");
 
             using BaseT = BundleSpaceSequence<T>;
 
@@ -43,14 +44,6 @@ namespace ompl
 
             LocalMinimaTreePtr localMinimaTree_;
 
-            enum ExtensionMode
-            {
-                AUTOMATIC_BREADTH_FIRST = 0,
-                AUTOMATIC_DEPTH_FIRST = 1,
-                MANUAL = 2
-            };
-
-            ExtensionMode mode;
         };
     }
 }

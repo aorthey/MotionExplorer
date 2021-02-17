@@ -95,7 +95,7 @@ void PathSpaceQMP::grow()
         {
             // FALL 2: verbessert bestehenden pfad
             // Knoten wurde mit 2 Knoten des Pfades verbunden
-            if (pathVisibilityChecker_->IsPathVisible(path, getMinimumPath(i), graph_))
+            if (pathVisibilityChecker_->IsPathVisible(path, getPathVertices(i), graph_))
             {
                 isVisible = true;
                 // Path is shorter than visible path else do nothing

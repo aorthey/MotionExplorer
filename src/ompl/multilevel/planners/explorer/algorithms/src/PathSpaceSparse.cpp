@@ -1,4 +1,5 @@
 #include <ompl/multilevel/planners/explorer/algorithms/PathSpaceSparse.h>
+#include <ompl/multilevel/planners/explorer/datastructures/PathSpaceMetrics.h>
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <ompl/datastructures/PDF.h>
@@ -38,15 +39,22 @@ PathSpaceSparse::PathSpaceSparse(const base::SpaceInformationPtr &si, BundleSpac
         optimizationObjective_);
     optimizer_->freeStates(false);
 
-    // if (hasBaseSpace())
-    // {
-    //     static_cast<BundleSpaceGraph *>(getBaseBundleSpace())->getGraphSampler()->disablePathBias();
-    // }
+    sparseDeltaFraction_ = 0.1; //original is 0.25
+
+    if (hasBaseSpace())
+    {
+        static_cast<BundleSpaceGraph *>(getBaseBundleSpace())->getGraphSampler()->disablePathBias();
+    }
 }
 
 PathSpaceSparse::~PathSpaceSparse()
 {
     delete pathVisibilityChecker_;
+}
+
+ompl::base::PathPtr& PathSpaceSparse::getSolutionPathByReference()
+{
+  return getBestPathPtrNonConst();
 }
 
 void PathSpaceSparse::optimizePath(geometric::PathGeometric& gpath)
@@ -196,20 +204,24 @@ void PathSpaceSparse::grow()
             // FALL 2: verbessert bestehenden pfad
             // Knoten wurde mit 2 Knoten des Pfades verbunden
             // if (pathVisibilityChecker_->IsPathVisible(gpath.getStates(), 
-            //       getMinimumPath(i)))
-            if (pathVisibilityChecker_->IsPathVisible(
-                  gpath.getStates(), 
-                  getMinimumPathStatesNonConst(i)))
-            {
-               isVisible = (fabs(pathcost  - getPathCost(i)) < 1e-10);
-               //TODO: same cost but could be in differnet minima. Better use
-               //distance or visibility check!
+            //       getPath(i)))
+            // if (pathVisibilityChecker_->IsPathVisible(
+            //       gpath.getStates(), 
+            //       getPathStatesNonConst(i)))
 
-               if (isVisible)//pathcost < getPathCost(i))
-               {
-                   updatePath(i, pPath, pathcost);
-                   break;
-               }
+            //NOTE: 
+            //computing maximum metric over finely discretized paths might be 
+            //a bit costly, but definitely more efficient than path visibility
+            //(which would not only compute distance, but also edge feasibility between
+            //path segments). 
+            double d = pathMetric_Maximum(
+                gpath.getStates(), getPathStates(i), getBundle());
+            std::cout << "Metric cost difference: " << d << std::endl;
+            isVisible = (d < 0.5);
+            if (isVisible)//pathcost < getPathCost(i))
+            {
+                updatePath(i, pPath, pathcost);
+                break;
             }
         }
 

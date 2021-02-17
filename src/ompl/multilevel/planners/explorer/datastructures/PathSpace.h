@@ -38,9 +38,15 @@ namespace ompl
 
             void clear();
 
-            const std::vector<BundleSpaceGraph::Vertex> &getMinimumPath(unsigned int k);
-            const std::vector<base::State*> &getMinimumPathStates(unsigned int k);
-            std::vector<base::State*> &getMinimumPathStatesNonConst(unsigned int k);
+            const base::PathPtr& getPathPtr(unsigned int k);
+            const std::vector<BundleSpaceGraph::Vertex> &getPathVertices(unsigned int k);
+            const std::vector<base::State*> &getPathStates(unsigned int k);
+            std::vector<base::State*> &getPathStatesNonConst(unsigned int k);
+
+            unsigned int getBestPathIndex() const;
+            double getBestPathCost() const;
+            const base::PathPtr& getBestPathPtr() const;
+            base::PathPtr& getBestPathPtrNonConst();
 
         protected:
             BundleSpaceGraph *bundleSpaceGraph_;

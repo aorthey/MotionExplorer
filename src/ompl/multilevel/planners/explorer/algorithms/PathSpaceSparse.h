@@ -30,6 +30,9 @@ namespace ompl
             virtual ~PathSpaceSparse() override;
             virtual void grow() override;
 
+            virtual ompl::base::PathPtr& getSolutionPathByReference() override;
+
+
         protected:
             double bestCost_{std::numeric_limits<double>::infinity()};
 

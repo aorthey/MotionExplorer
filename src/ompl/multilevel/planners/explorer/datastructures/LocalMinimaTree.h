@@ -32,7 +32,7 @@ namespace ompl
             LocalMinimaNode(base::SpaceInformationPtr si, StatesPath &states);
             LocalMinimaNode(base::SpaceInformationPtr si, VertexPath &vertices);
 
-            double getCost()
+            double getCost() const
             {
                 return cost_.value();
             }
@@ -55,6 +55,7 @@ namespace ompl
             StatesPath &asStatesNonConst();
             const VertexPath &asVertices() const;
             const base::PathPtr &asPathPtr() const;
+            base::PathPtr &asPathPtrNonConst();
 
             void setCost(double c)
             {
@@ -148,6 +149,15 @@ namespace ompl
 
             int numberOfMinima_{0};
             int levels_{0};
+
+            enum ExtensionMode
+            {
+                AUTOMATIC_BREADTH_FIRST = 0,
+                AUTOMATIC_DEPTH_FIRST = 1,
+                MANUAL = 2
+            };
+
+            // ExtensionMode mode{2};
         };
     }
 }

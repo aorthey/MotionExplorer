@@ -1,10 +1,6 @@
-[ ] Add function getLocalMinimaTree() to explorer (make corresponding changes in GUI)
-[ ] Incorporate optimizer
-[ ] Return control in PlannerData
-[ ] Try out non-holonomic example
-
+[x] Add function getLocalMinimaTree() to explorer (make corresponding changes in GUI)
 [x] Anytime thread-based (plus exhaustive mode)
-[ ] Every non-const function of LMT should be mutexed
+[x] Every non-const function of LMT should be mutexed
 
 [ ] Better visualization of path classes (beginning with bold green, rest with
 magenta or red?)
