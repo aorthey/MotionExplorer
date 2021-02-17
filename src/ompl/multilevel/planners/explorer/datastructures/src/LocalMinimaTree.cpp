@@ -13,10 +13,21 @@ LocalMinimaTree::LocalMinimaTree(std::vector<base::SpaceInformationPtr> siVec) :
         std::vector<LocalMinimaNode *> kthLevel;
         tree_.push_back(kthLevel);
     }
+    setExtensionStrategy(ExtensionStrategy::MANUAL);
 }
 
 LocalMinimaTree::~LocalMinimaTree()
 {
+}
+
+void LocalMinimaTree::setExtensionStrategy(ExtensionStrategy extensionStrategy)
+{
+  extensionStrategy_ = extensionStrategy;
+}
+
+LocalMinimaTree::ExtensionStrategy LocalMinimaTree::getExtensionStrategy()
+{
+  return extensionStrategy_;
 }
 
 void LocalMinimaTree::clear()

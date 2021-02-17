@@ -96,6 +96,19 @@ namespace ompl
         class LocalMinimaTree
         {
         public:
+            /** \brief Extension Strategy to grow local minima tree.
+             *  AUTOMATIC_BREADTH_FIRST: select a uniform random path 
+             *    on base space for restriction sampling
+             *  AUTOMATIC_DEPTH_FIRST: select best cost path
+             *  MANUAL: let user select path
+             */
+            enum ExtensionStrategy
+            {
+                AUTOMATIC_BREADTH_FIRST = 0,
+                AUTOMATIC_DEPTH_FIRST = 1, 
+                MANUAL = 2
+            };
+
             LocalMinimaTree() = delete;
             LocalMinimaTree(const LocalMinimaTree &) = delete;
             LocalMinimaTree(std::vector<base::SpaceInformationPtr>);
@@ -137,7 +150,13 @@ namespace ompl
 
             bool hasChanged();
 
+            void setExtensionStrategy(ExtensionStrategy);
+            ExtensionStrategy getExtensionStrategy();
+
         protected:
+
+            ExtensionStrategy extensionStrategy_;
+
             std::recursive_mutex lock_;
 
             bool hasChanged_{false};
@@ -150,14 +169,6 @@ namespace ompl
             int numberOfMinima_{0};
             int levels_{0};
 
-            enum ExtensionMode
-            {
-                AUTOMATIC_BREADTH_FIRST = 0,
-                AUTOMATIC_DEPTH_FIRST = 1,
-                MANUAL = 2
-            };
-
-            // ExtensionMode mode{2};
         };
     }
 }
