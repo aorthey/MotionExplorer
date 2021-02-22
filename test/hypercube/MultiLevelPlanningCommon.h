@@ -2,8 +2,8 @@
 #include <ompl/tools/benchmark/Benchmark.h>
 
 //include planners
-#include <ompl/geometric/planners/bitstar/BITstar.h>
-#include <ompl/geometric/planners/bitstar/ABITstar.h>
+#include <ompl/geometric/planners/informedtrees/BITstar.h>
+#include <ompl/geometric/planners/informedtrees/ABITstar.h>
 #include <ompl/geometric/planners/est/BiEST.h>
 #include <ompl/geometric/planners/est/EST.h>
 #include <ompl/geometric/planners/est/ProjEST.h>
@@ -19,11 +19,11 @@
 #include <ompl/geometric/planners/prm/PRMstar.h>
 #include <ompl/geometric/planners/prm/SPARS.h>
 #include <ompl/geometric/planners/prm/SPARStwo.h>
-#include <ompl/geometric/planners/multilevel/QRRT.h>
-#include <ompl/geometric/planners/multilevel/QRRTStar.h>
-#include <ompl/geometric/planners/multilevel/QMP.h>
-#include <ompl/geometric/planners/multilevel/QMPStar.h>
-#include <ompl/geometric/planners/multilevel/SPQR.h>
+#include <ompl/multilevel/planners/qrrt/QRRT.h>
+#include <ompl/multilevel/planners/qrrt/QRRTStar.h>
+#include <ompl/multilevel/planners/qmp/QMP.h>
+#include <ompl/multilevel/planners/qmp/QMPStar.h>
+#include <ompl/multilevel/planners/sparse/SMLR.h>
 #include <ompl/geometric/planners/rrt/BiTRRT.h>
 #include <ompl/geometric/planners/rrt/InformedRRTstar.h>
 #include <ompl/geometric/planners/rrt/LazyRRT.h>
@@ -44,6 +44,7 @@
 
 namespace ot = ompl::tools;
 namespace ob = ompl::base;
+namespace om = ompl::multilevel;
 namespace og = ompl::geometric;
 
 void printBenchmarkResults(const ot::Benchmark &b)

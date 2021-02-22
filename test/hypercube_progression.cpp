@@ -68,7 +68,7 @@ double runHyperCubeBenchmark(int ndim, double maxTime, int Nruns)
     }
     ss.setStartAndGoalStates(start, goal);
 
-    ob::PlannerPtr planner = GetMultiLevelPlanner<og::QRRTStar>(admissibleProjection, si, "QRRTStar");
+    ob::PlannerPtr planner = GetMultiLevelPlanner<om::QRRTStar>(admissibleProjection, si, "QRRTStar");
     // ob::PlannerPtr planner = std::make_shared<og::STRIDE>(si);
     ss.setPlanner(planner);
 

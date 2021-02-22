@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 
     std::vector<int> admissibleProjection = getHypercubeAdmissibleProjection(curDim);
 
-    ob::PlannerPtr planner = GetMultiLevelPlanner<og::QRRTStar>(admissibleProjection, si, "QRRTStar");
+    ob::PlannerPtr planner = GetMultiLevelPlanner<om::QRRTStar>(admissibleProjection, si, "QRRTStar");
     // ob::PlannerPtr planner = std::make_shared<og::ABITstar>(si);
     // ob::PlannerPtr planner = GetMultiLevelPlanner<og::SPQR>(admissibleProjection, si, "SPQR");
     ss.setPlanner(planner);

@@ -91,11 +91,11 @@ int main(int argc, char **argv)
     for (unsigned int k = 0; k < admissibleProjections.size(); k++)
     {
         std::vector<int> proj = admissibleProjections.at(k);
-        addPlanner(benchmark, GetMultiLevelPlanner<og::QRRT>(proj, si, "QRRT"), range);
-        addPlanner(benchmark, GetMultiLevelPlanner<og::QRRTStar>(proj, si, "QRRTStar"), range);
-        addPlanner(benchmark, GetMultiLevelPlanner<og::QMP>(proj, si, "QMP"), range);
-        addPlanner(benchmark, GetMultiLevelPlanner<og::QMPStar>(proj, si, "QMPStar"), range);
-        addPlanner(benchmark, GetMultiLevelPlanner<og::SPQR>(proj, si, "SPQR"), range);
+        addPlanner(benchmark, GetMultiLevelPlanner<om::QRRT>(proj, si, "QRRT"), range);
+        addPlanner(benchmark, GetMultiLevelPlanner<om::QRRTStar>(proj, si, "QRRTStar"), range);
+        addPlanner(benchmark, GetMultiLevelPlanner<om::QMP>(proj, si, "QMP"), range);
+        addPlanner(benchmark, GetMultiLevelPlanner<om::QMPStar>(proj, si, "QMPStar"), range);
+        addPlanner(benchmark, GetMultiLevelPlanner<om::SMLR>(proj, si, "SMLR"), range);
     }
 
     //Classical Planner
