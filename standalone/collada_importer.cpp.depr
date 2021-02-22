@@ -1,0 +1,19 @@
+#include <iostream>
+// #include <dae.h>
+#include <dom/domCOLLADA.h>
+
+using namespace std;
+
+int main()
+{
+    DAE dae;
+    daeElement* root = dae->open("quad.dae");
+
+    if(!root) 
+    {
+      std::cout << "Failed import" << std::endl;
+    }
+
+    return 0;
+}
+
