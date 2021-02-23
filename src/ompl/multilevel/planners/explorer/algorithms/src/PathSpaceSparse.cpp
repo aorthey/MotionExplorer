@@ -201,14 +201,6 @@ void PathSpaceSparse::grow()
 
         for (uint i = 0; i < getNumberOfPaths(); i++)
         {
-            // FALL 2: verbessert bestehenden pfad
-            // Knoten wurde mit 2 Knoten des Pfades verbunden
-            // if (pathVisibilityChecker_->IsPathVisible(gpath.getStates(), 
-            //       getPath(i)))
-            // if (pathVisibilityChecker_->IsPathVisible(
-            //       gpath.getStates(), 
-            //       getPathStatesNonConst(i)))
-
             //NOTE: 
             //computing maximum metric over finely discretized paths might be 
             //a bit costly, but definitely more efficient than path visibility
