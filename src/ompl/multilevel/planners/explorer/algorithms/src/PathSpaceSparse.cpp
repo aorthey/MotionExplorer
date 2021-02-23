@@ -187,13 +187,13 @@ void PathSpaceSparse::grow()
         // gpath.interpolate();
         // std::cout << " to " << gpath.getStates().size() << std::endl;
 
-        std::cout << "Path with cost " << gpath.length() 
-          << " (" << states.size() << " states).";
+        // std::cout << "Path with cost " << gpath.length() 
+        //   << " (" << states.size() << " states).";
 
         optimizePath(gpath);
 
-        std::cout << " OPTIMIZED to path with cost " << gpath.length() 
-          << " (" << states.size() << " states)." << std::endl;
+        // std::cout << " OPTIMIZED to path with cost " << gpath.length() 
+        //   << " (" << states.size() << " states)." << std::endl;
 
         bool isVisible = false;
 
@@ -208,8 +208,8 @@ void PathSpaceSparse::grow()
             //path segments). 
             double d = pathMetric_Maximum(
                 gpath.getStates(), getPathStates(i), getBundle());
-            std::cout << "Metric cost difference: " << d << std::endl;
-            isVisible = (d < 0.5);
+            // std::cout << "Metric cost difference: " << d << std::endl;
+            isVisible = (d < 0.3);
             if (isVisible)//pathcost < getPathCost(i))
             {
                 updatePath(i, pPath, pathcost);
@@ -219,7 +219,6 @@ void PathSpaceSparse::grow()
 
         if (!isVisible)
         {
-            std::cout << "Add new path" << std::endl;
             addPath(pPath, pathcost);
         }
 
@@ -228,7 +227,7 @@ void PathSpaceSparse::grow()
             bestCost_ = pathcost;
         }
 
-        std::cout << "Best cost found: " << bestCost_ << std::endl;
+        // std::cout << "Best cost found: " << bestCost_ << std::endl;
 
         OMPL_INFORM("Found %d path classes.", getNumberOfPaths());
     }
