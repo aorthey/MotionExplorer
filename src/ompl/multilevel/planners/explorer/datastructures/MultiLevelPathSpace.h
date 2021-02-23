@@ -42,6 +42,8 @@ namespace ompl
 
             T *current{nullptr};
 
+            bool needPreprocessing = false;
+
             LocalMinimaTreePtr localMinimaTree_;
 
         };

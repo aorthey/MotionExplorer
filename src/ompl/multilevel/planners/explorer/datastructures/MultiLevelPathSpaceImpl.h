@@ -2,7 +2,7 @@
 #include <ompl/multilevel/datastructures/BundleSpace.h>
 #include <ompl/multilevel/planners/explorer/datastructures/PathSpace.h>
 #include <ompl/multilevel/planners/explorer/datastructures/LocalMinimaTree.h>
-// #include <ompl/multilevel/planners/explorer/algorithms/PathSpaceSparseOptimization.h>
+#include <ompl/multilevel/planners/explorer/algorithms/PathSpaceSparseOptimization.h>
 
 #include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/base/spaces/SO2StateSpace.h>
@@ -26,6 +26,13 @@ ompl::multilevel::MultiLevelPathSpace<T>::MultiLevelPathSpace(std::vector<base::
     {
         PathSpace *Pk = static_cast<PathSpace *>(this->bundleSpaces_.at(k));
         Pk->setLocalMinimaTree(localMinimaTree_);
+    }
+
+    PathSpaceSparseOptimization *Qk_tmp = 
+      dynamic_cast<PathSpaceSparseOptimization*>( this->bundleSpaces_.back());
+    if(Qk_tmp != nullptr)
+    {
+        needPreprocessing = true;
     }
 }
 
@@ -115,11 +122,12 @@ void MultiLevelPathSpace<T>::getPlannerData(base::PlannerData &data) const
     {
         BundleSpaceGraph *Qk = static_cast<BundleSpaceGraph *>(this->bundleSpaces_.at(k));
 
-        // PathSpaceSparseOptimization *Qk_tmp = dynamic_cast<PathSpaceSparseOptimization*>(Qk);
-        // if(Qk_tmp != nullptr)
-        // {
-        //     Qk_tmp->enumerateAllPaths();
-        // }
+        if(needPreprocessing)
+        {
+            PathSpaceSparseOptimization *Qk_tmp = 
+              static_cast<PathSpaceSparseOptimization*>(Qk);
+            Qk_tmp->enumerateAllPaths();
+        }
         Qk->getPlannerData(data);
 
         for (unsigned int vidx = Nvertices; vidx < data.numVertices(); vidx++)

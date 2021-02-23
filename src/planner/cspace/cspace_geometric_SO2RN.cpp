@@ -35,10 +35,17 @@ GeometricCSpaceOMPLSO2RN::GeometricCSpaceOMPLSO2RN(RobotWorld *world_, int robot
       }
     }
   }
+
 }
 
 void GeometricCSpaceOMPLSO2RN::initSpace()
 {
+  if(Nompl==1 && isFixedBase())
+  {
+    klampt_to_ompl.clear();
+    ompl_to_klampt.clear();
+    Nompl--;
+  }
   //###########################################################################
   // Create OMPL state space
   //   Create an SO(2) x R^n state space

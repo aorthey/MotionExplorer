@@ -19,6 +19,8 @@
     <pathWidth>0.1</pathWidth>
     <pathBorderWidth>3</pathBorderWidth>
 
+    <algorithm name="multilevel:explorer"/>
+    <algorithm name="multilevel:minimaspanner"/>
     <multilevel>
       <level robot_index="0" type="R2"/>
     </multilevel>

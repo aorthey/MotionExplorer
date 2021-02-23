@@ -59,6 +59,7 @@ PathSpaceSparseOptimization::PathSpaceSparseOptimization(const base::SpaceInform
 
     std::static_pointer_cast<base::MultiOptimizationObjective>(pathObj_)->addObjective(lengthObj, 0.5);
     // std::static_pointer_cast<base::MultiOptimizationObjective>(pathObj_)->addObjective(clearObj, 0.5);
+    sparseDeltaFraction_ = 0.1; //original is 0.25
 }
 
 PathSpaceSparseOptimization::~PathSpaceSparseOptimization()
@@ -122,6 +123,7 @@ void PathSpaceSparseOptimization::grow()
     {
         init();
         firstRun_ = false;
+        vGoal_ = addConfiguration(qGoal_);
     }
     if (isDynamic())
     {
@@ -133,7 +135,7 @@ void PathSpaceSparseOptimization::grow()
     if (hasSolution_ && pathStackHead_.size() > 0)
     {
         // No Goal Biasing if we already found a solution on this quotient space
-        sampleBundle(xRandom_->state);
+        sampleBundleValid(xRandom_->state);
     }
     else
     {
@@ -145,7 +147,7 @@ void PathSpaceSparseOptimization::grow()
         }
         else
         {
-            sampleBundle(xRandom_->state);
+            sampleBundleValid(xRandom_->state);
         }
     }
     if (isDynamic())
@@ -218,9 +220,9 @@ void PathSpaceSparseOptimization::growGeometric()
     {
         Configuration *q_next = new Configuration(getBundle(), xRandom_->state);
 
-        Vertex v_next = addConfigurationConditional(q_next);
+        if(!addConfigurationConditional(q_next)) return;
 
-        addEdge(q_nearest->index, v_next);
+        addEdge(q_nearest->index, q_next->index);
 
         if (!hasSolution_)
         {
@@ -302,8 +304,6 @@ void PathSpaceSparseOptimization::getPlannerData(base::PlannerData &data) const
         {
             const std::vector<base::State *> states = pathStackHead_.at(i);
 
-            std::cout << pathStackHead_.at(i).size() << std::endl;
-
             // idxPathI.clear();
             // getPathIndices(states, idxPathI);
             // std::reverse(idxPathI.begin(), idxPathI.end());
@@ -312,12 +312,14 @@ void PathSpaceSparseOptimization::getPlannerData(base::PlannerData &data) const
 
             //############################################################################
             // DEBUG
-            std::cout << "[";
-            for (uint k = 0; k < idxPathI.size(); k++)
-            {
-                std::cout << idxPathI.at(k) << " ";
-            }
-            std::cout << "]" << std::endl;
+            // std::cout << pathStackHead_.at(i).size() << std::endl;
+
+            // std::cout << "[";
+            // for (uint k = 0; k < idxPathI.size(); k++)
+            // {
+            //     std::cout << idxPathI.at(k) << " ";
+            // }
+            // std::cout << "]" << std::endl;
             //############################################################################
 
             multilevel::PlannerDataVertexAnnotated *p1 = new multilevel::PlannerDataVertexAnnotated(states.at(0));
@@ -347,7 +349,6 @@ void PathSpaceSparseOptimization::getPlannerData(base::PlannerData &data) const
 
                 p1 = p2;
             }
-            std::cout << "Cost: " << dk << std::endl;
 
             // getBundle()->printState(states.back());
         }
@@ -355,9 +356,9 @@ void PathSpaceSparseOptimization::getPlannerData(base::PlannerData &data) const
     }
     else
     {
-        OMPL_DEVMSG1("Sparse Roadmap has %d/%d vertices/edges.", 
-            getNumberOfVertices(),
-            getNumberOfEdges());
+        // OMPL_DEVMSG1("Sparse Roadmap has %d/%d vertices/edges.", 
+        //     getNumberOfVertices(),
+        //     getNumberOfEdges());
     }
 }
 //############################################################################
@@ -458,7 +459,6 @@ void PathSpaceSparseOptimization::pushPathToStack(std::vector<base::State *> &pa
         // visualized (problems with S1)
         if (getBundle()->getStateSpace()->getType() == base::STATE_SPACE_SO2)
         {
-            std::cout << "SO2 INTERPOLATE" << std::endl;
             gpath.interpolate();
         }
         else
@@ -479,11 +479,7 @@ void PathSpaceSparseOptimization::pushPathToStack(std::vector<base::State *> &pa
             numberOfFailedAddingPathCalls++;
             return;
         }
-        if (pathStack_.size() <= 0)
-        {
-            pathStack_.push_back(gpath);
-        }
-        else
+        if (pathStack_.size() > 0)
         {
             for (uint k = 0; k < pathStack_.size(); k++)
             {
@@ -495,8 +491,9 @@ void PathSpaceSparseOptimization::pushPathToStack(std::vector<base::State *> &pa
                     return;
                 }
             }
-            pathStack_.push_back(gpath);
         }
+        pathStack_.push_back(gpath);
+
         std::cout << "Added to stack (" << pathStack_.size() << " paths on stack)" << std::endl;
     }
 }
@@ -783,9 +780,9 @@ void PathSpaceSparseOptimization::enumerateAllPaths()
         // vertices has not changed.
         if (!hasSparseGraphChanged())
         {
+            std::cout << "No change" << std::endl;
             return;
         }
-        std::cout << "Enumerating paths on " << getName() << std::endl;
 
         // Remove Edges
         //(1) REDUCIBLE: Removal of reducible loops [Schmitzberger 02]
@@ -815,11 +812,13 @@ void PathSpaceSparseOptimization::enumerateAllPaths()
     uint Npathsize = pathStack_.size();
     uint Npaths = std::min(Nhead, Npathsize);
     pathStackHead_.clear();
+    PathSpace::clear();
     for (uint k = 0; k < Npaths; k++)
     {
         // geometric::PathGeometric& pathK = (*(pathStack_.rbegin()+k));
         geometric::PathGeometric &pathK = pathStack_.at(k);  //*(pathStack_.rbegin()+k));
         pathStackHead_.push_back(pathK.getStates());
+        PathSpace::addPath(pathK, pathK.length());
     }
     OMPL_INFORM("Found %d path classes.", pathStackHead_.size());
     OMPL_INFORM("%s", std::string(80, '-').c_str());

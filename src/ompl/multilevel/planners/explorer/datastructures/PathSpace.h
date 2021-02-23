@@ -2,6 +2,7 @@
 #include <ompl/multilevel/datastructures/BundleSpaceGraph.h>
 #include <ompl/multilevel/planners/explorer/datastructures/LocalMinimaTree.h>
 #include <ompl/base/PlannerData.h>
+#include <ompl/geometric/PathGeometric.h>
 
 namespace ompl
 {
@@ -33,6 +34,8 @@ namespace ompl
             void addPath(VertexPath p, double cost);
 
             void addPath(base::PathPtr path, double cost);
+
+            void addPath(geometric::PathGeometric&, double cost);
 
             double getPathCost(unsigned int k) const;
 

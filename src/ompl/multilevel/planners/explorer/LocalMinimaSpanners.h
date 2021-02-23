@@ -10,7 +10,7 @@ namespace ompl
     namespace multilevel
     {
         using LocalMinimaSpanners = MultiLevelPathSpace<PathSpaceSparse>;
-        // using LocalMinimaSpanners = MultiLevelPathSpace<PathSpaceSparseOptimization>;
+        using MotionExplorer = MultiLevelPathSpace<PathSpaceSparseOptimization>;
     }
 }
 

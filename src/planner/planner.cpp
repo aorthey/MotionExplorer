@@ -407,13 +407,7 @@ void MotionPlanner::InitStrategy()
   strategy_input.cspace_levels = cspace_levels;
   strategy_input.cspace_stratifications = cspace_stratifications;
   strategy->Init(strategy_input);
-  // auto explorerPlanner = 
-  //   dynamic_pointer_cast<ompl::multilevel::MotionExplorer>(strategy->GetPlannerPtr());
-  // if(explorerPlanner != nullptr)
-  // {
-  //     localMinimaTree_ = explorerPlanner->getLocalMinimaTree();
-  //     viewLocalMinimaTree_ = std::make_shared<ViewLocalMinimaTree>(localMinimaTree_, cspace_levels);
-  // }
+
   // auto explorerPlanner2 = 
   //   dynamic_pointer_cast<ompl::multilevel::MotionExplorerQMP>(strategy->GetPlannerPtr());
   // if(explorerPlanner2 != nullptr)
@@ -433,6 +427,15 @@ void MotionPlanner::InitStrategy()
   if(pathSpacePlanner != nullptr)
   {
       localMinimaTree_ = pathSpacePlanner->getLocalMinimaTree();
+      viewLocalMinimaTree_ = std::make_shared<ViewLocalMinimaTree>(localMinimaTree_, cspace_levels);
+      viewLocalMinimaTree_->pathWidth = input.pathWidth;
+      viewLocalMinimaTree_->pathBorderWidth = input.pathBorderWidth;
+  }
+  auto explorerPlanner = 
+    dynamic_pointer_cast<ompl::multilevel::MotionExplorer>(strategy->GetPlannerPtr());
+  if(explorerPlanner != nullptr)
+  {
+      localMinimaTree_ = explorerPlanner->getLocalMinimaTree();
       viewLocalMinimaTree_ = std::make_shared<ViewLocalMinimaTree>(localMinimaTree_, cspace_levels);
       viewLocalMinimaTree_->pathWidth = input.pathWidth;
       viewLocalMinimaTree_->pathBorderWidth = input.pathBorderWidth;

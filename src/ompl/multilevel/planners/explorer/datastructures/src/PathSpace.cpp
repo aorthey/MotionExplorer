@@ -55,6 +55,17 @@ void ompl::multilevel::PathSpace::updatePath(unsigned int k, VertexPath vpath, d
     OMPL_INFORM("Update path %d with cost %.2f (%d path(s) on level %d).", k, cost, getNumberOfPaths(), level);
 }
 
+void PathSpace::addPath(geometric::PathGeometric& gpath, double cost)
+{
+    int level = bundleSpaceGraph_->getLevel();
+
+    auto path(std::make_shared<geometric::PathGeometric>(bundleSpaceGraph_->getBundle()));
+    path->append(gpath);
+
+    localMinimaTree_->addPath(path, cost, level);
+    OMPL_INFORM("New path with cost %.2f (%d path(s) on level %d).", cost, getNumberOfPaths(), level);
+}
+
 void PathSpace::addPath(VertexPath vpath, double cost)
 {
     int level = bundleSpaceGraph_->getLevel();

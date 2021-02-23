@@ -177,6 +177,7 @@ ob::PlannerPtr StrategyGeometricMultiLevel::GetPlanner(std::string algorithm,
   else if(algorithm=="multilevel:drrt") planner = std::make_shared<om::DRRT>(siVec, "DRRT");
 
   else if(algorithm=="multilevel:minimaspanner") planner = std::make_shared<om::LocalMinimaSpanners>(siVec, "LocalMinimaSpanners");
+  else if(algorithm=="multilevel:explorer") planner = std::make_shared<om::MotionExplorer>(siVec, "MotionExplorer");
   else if(algorithm=="sampler_infeasible")
   {
     planner = std::make_shared<og::InfeasibilitySampler>(si);
