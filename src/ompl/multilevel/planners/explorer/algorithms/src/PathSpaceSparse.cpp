@@ -57,59 +57,6 @@ ompl::base::PathPtr& PathSpaceSparse::getSolutionPathByReference()
   return getBestPathPtrNonConst();
 }
 
-void PathSpaceSparse::optimizePath(geometric::PathGeometric& gpath)
-{ 
-    // optimizer_->perturbPath(gpath, 2, 1000, 1000);
-    optimizer_->smoothBSpline(gpath);
-    optimizer_->simplifyMax(gpath);
-    gpath.interpolate();
-    return;
-
-    base::ProblemDefinitionPtr pdef = getProblemDefinition();
-    base::OptimizationObjectivePtr obj = pdef->getOptimizationObjective();
-    // const double rangeRatio = 0.01;
-
-    // double dmax = gpath.length();
-
-    if (gpath.getStateCount() < 3)
-        return;
-
-    // unsigned int maxSteps = gpath.getStateCount();
-
-    unsigned int maxEmptySteps = 1000;//floor(0.5*gpath.getStateCount());
-
-    // const base::SpaceInformationPtr &si = gpath.getSpaceInformation();
-    std::vector<base::State *> &states = gpath.getStates();
-	
-    unsigned int rmStates = 0;
-		for (unsigned int nochange = 0; nochange < maxEmptySteps; nochange++)
-		{
-				int count = states.size();
-        if(count < 3) break;
-				int maxN = count - 1;
-
-        {
-          int p1 = rng_.uniformInt(0, maxN);
-          int p2 = std::min(maxN, p1 + 2);
-          int p3 = std::min(maxN, p1 + 1);
-
-          base::Cost d12 = obj->motionCost(states[p1], states[p2]);
-          base::Cost d13 = obj->motionCost(states[p1], states[p3]);
-          base::Cost d32 = obj->motionCost(states[p3], states[p2]);
-
-          base::Cost d132 = obj->combineCosts(d13, d32);
-
-          if(obj->isCostBetterThan(d12, d132))
-          {
-              states.erase(states.begin() + p1 + 1, states.begin() + p2);
-              nochange = 0;
-              rmStates++;
-              continue;
-          }
-        }
-		}
-}
-
 void PathSpaceSparse::grow()
 {
     if (firstRun_)
@@ -231,5 +178,61 @@ void PathSpaceSparse::grow()
 
         OMPL_INFORM("Found %d path classes.", getNumberOfPaths());
     }
-
 }
+
+void PathSpaceSparse::optimizePath(geometric::PathGeometric& gpath)
+{ 
+    // optimizer_->perturbPath(gpath, 0.1, 1000, 1000);
+    optimizer_->smoothBSpline(gpath);
+    optimizer_->simplifyMax(gpath);
+    // optimizer_->reduceVertices(gpath, 100, 100, 0.2);
+    // optimizer_->collapseCloseVertices(gpath, 1000, 1000);
+
+    gpath.interpolate();
+    return;
+
+    base::ProblemDefinitionPtr pdef = getProblemDefinition();
+    base::OptimizationObjectivePtr obj = pdef->getOptimizationObjective();
+    // const double rangeRatio = 0.01;
+
+    // double dmax = gpath.length();
+
+    if (gpath.getStateCount() < 3)
+        return;
+
+    // unsigned int maxSteps = gpath.getStateCount();
+
+    unsigned int maxEmptySteps = 100;//floor(0.5*gpath.getStateCount());
+
+    // const base::SpaceInformationPtr &si = gpath.getSpaceInformation();
+    std::vector<base::State *> &states = gpath.getStates();
+	
+    unsigned int rmStates = 0;
+		for (unsigned int nochange = 0; nochange < maxEmptySteps; nochange++)
+		{
+				int count = states.size();
+        if(count < 3) break;
+				int maxN = count - 1;
+
+        {
+          int p1 = rng_.uniformInt(0, maxN);
+          int p2 = std::min(maxN, p1 + 2);
+          int p3 = std::min(maxN, p1 + 1);
+
+          base::Cost d12 = obj->motionCost(states[p1], states[p2]);
+          base::Cost d13 = obj->motionCost(states[p1], states[p3]);
+          base::Cost d32 = obj->motionCost(states[p3], states[p2]);
+
+          base::Cost d132 = obj->combineCosts(d13, d32);
+
+          if(obj->isCostBetterThan(d12, d132))
+          {
+              states.erase(states.begin() + p1 + 1, states.begin() + p2);
+              nochange = 0;
+              rmStates++;
+              continue;
+          }
+        }
+		}
+}
+

@@ -3,6 +3,7 @@
 #include <ompl/multilevel/planners/explorer/datastructures/PathSpace.h>
 #include <ompl/multilevel/planners/explorer/datastructures/LocalMinimaTree.h>
 #include <ompl/multilevel/planners/explorer/algorithms/PathSpaceSparseOptimization.h>
+#include <ompl/multilevel/planners/explorer/algorithms/PathSpaceSparse.h>
 
 #include <ompl/base/goals/GoalSampleableRegion.h>
 #include <ompl/base/spaces/SO2StateSpace.h>
@@ -98,6 +99,18 @@ ompl::base::PlannerStatus MultiLevelPathSpace<T>::solve(const ompl::base::Planne
     while (!ptc())
     {
         jBundle->grow();
+        bool isInfeasible = jBundle->isInfeasible();
+        if (jBundle->isInfeasible())
+        {
+            OMPL_DEBUG("Infeasibility detected (level %d).", K);
+            return ompl::base::PlannerStatus::INFEASIBLE;
+        }
+
+        if (jBundle->hasConverged())
+        {
+            OMPL_DEBUG("Converged (level %d).", K);
+            return ompl::base::PlannerStatus::APPROXIMATE_SOLUTION;
+        }
         ctr++;
     }
     return base::PlannerStatus::TIMEOUT;

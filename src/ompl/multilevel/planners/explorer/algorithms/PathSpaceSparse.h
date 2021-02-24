@@ -26,8 +26,11 @@ namespace ompl
             using BaseT = SMLRImpl;
 
         public:
+
             PathSpaceSparse(const ompl::base::SpaceInformationPtr &si, BundleSpace *parent_);
+
             virtual ~PathSpaceSparse() override;
+
             virtual void grow() override;
 
             virtual ompl::base::PathPtr& getSolutionPathByReference() override;
