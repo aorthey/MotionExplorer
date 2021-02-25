@@ -200,7 +200,7 @@ void PathPiecewiseLinear::Smooth(bool forceSmoothing){
 
     og::PathSimplifier shortcutter(gpath.getSpaceInformation());
     shortcutter.simplifyMax(gpath);
-    shortcutter.smoothBSpline(gpath);
+    // shortcutter.smoothBSpline(gpath);
 
     gpath.interpolate();
 

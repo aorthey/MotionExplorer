@@ -31,6 +31,8 @@ namespace ompl
 
             void updatePath(unsigned int k, base::PathPtr path, double cost);
 
+            void removePath(unsigned int k);
+
             void addPath(VertexPath p, double cost);
 
             void addPath(base::PathPtr path, double cost);
@@ -40,6 +42,8 @@ namespace ompl
             double getPathCost(unsigned int k) const;
 
             void clear();
+
+            void setup();
 
             const base::PathPtr& getPathPtr(unsigned int k);
             const std::vector<BundleSpaceGraph::Vertex> &getPathVertices(unsigned int k);

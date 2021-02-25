@@ -38,7 +38,11 @@ ompl::base::PathPtr PathSpace::VerticesToPathPtr(VertexPath vpath)
     return path;
 }
 
-void ompl::multilevel::PathSpace::updatePath(unsigned int k, base::PathPtr path, double cost)
+void PathSpace::removePath(unsigned int k)
+{
+}
+
+void PathSpace::updatePath(unsigned int k, base::PathPtr path, double cost)
 {
     int level = bundleSpaceGraph_->getLevel();
     // LocalMinimaNode *node = localMinimaTree_->updatePath(path, cost, level, k);
@@ -47,7 +51,7 @@ void ompl::multilevel::PathSpace::updatePath(unsigned int k, base::PathPtr path,
 }
 
 
-void ompl::multilevel::PathSpace::updatePath(unsigned int k, VertexPath vpath, double cost)
+void PathSpace::updatePath(unsigned int k, VertexPath vpath, double cost)
 {
     int level = bundleSpaceGraph_->getLevel();
     LocalMinimaNode *node = localMinimaTree_->updatePath(VerticesToPathPtr(vpath), cost, level, k);
@@ -82,7 +86,7 @@ void PathSpace::addPath(base::PathPtr path, double cost)
     OMPL_INFORM("New path with cost %.2f (%d path(s) on level %d).", cost, getNumberOfPaths(), level);
 }
 
-double ompl::multilevel::PathSpace::getPathCost(unsigned int k) const
+double PathSpace::getPathCost(unsigned int k) const
 {
     return localMinimaTree_->getPathCost(bundleSpaceGraph_->getLevel(), k);
 }
@@ -155,12 +159,12 @@ std::vector<ompl::base::State*> &PathSpace::getPathStatesNonConst(unsigned int k
     return node->asStatesNonConst();
 }
 
-unsigned int ompl::multilevel::PathSpace::getNumberOfPaths() const
+unsigned int PathSpace::getNumberOfPaths() const
 {
     return localMinimaTree_->getNumberOfMinima(bundleSpaceGraph_->getLevel());
 }
 
-// void ompl::multilevel::PathSpace::getPathIndices(
+// void PathSpace::getPathIndices(
 //     const std::vector<BundleSpaceGraph::Vertex> &vertices,
 //     std::vector<int> &idxPath) const
 // {
@@ -176,7 +180,7 @@ unsigned int ompl::multilevel::PathSpace::getNumberOfPaths() const
 //     }
 // }
 
-// void ompl::multilevel::PathSpace::getPlannerData(base::PlannerData &data, BundleSpaceGraph* bundleGraph) const
+// void PathSpace::getPlannerData(base::PlannerData &data, BundleSpaceGraph* bundleGraph) const
 //{
 //    BundleSpaceGraph::Graph graph = bundleGraph->getGraph();
 //    base::SpaceInformationPtr si = bundleGraph->getBundle();

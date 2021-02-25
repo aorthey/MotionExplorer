@@ -2,6 +2,17 @@
 [x] Anytime thread-based (plus exhaustive mode)
 [x] Every non-const function of LMT should be mutexed
 
+[ ] Make sure that pdef->getGoal/getObjective is as quick as setting them
+beforehand
+[ ] Fix goal regions
+[ ] Relax assumption that optimizer always converges (idempotent).
 [ ] Better visualization of path classes (beginning with bold green, rest with
-magenta or red?)
-[ ] Pipe it all to blender
+magenta or red?) [Should be addressed by blender]
+[ ] Pipe it all to blender [Export scene to dae. Export frames (world pos) to txt. Import to
+blender.]. Make an automatic "render image" from current camera view by invoking
+bpy script! Could also be used to handle partial path displays.
+[ ] More experiments:
+  [ ] Hand scenario baxter
+  [ ] Overtaking in time
+  
+

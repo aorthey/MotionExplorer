@@ -2,13 +2,14 @@
 #define OMPL_BASE_GOALS_GOAL_STATE_DIFFERENTIABLE_
 
 #include "ompl/base/goals/GoalState.h"
+#include "ompl/base/goals/GoalStates.h"
 #include "ompl/base/ScopedState.h"
 
 namespace ompl
 {
     namespace base
     {
-        class GoalStateDifferentiable : public GoalState
+        class GoalStateDifferentiable : public GoalStates
         {
         public:
             GoalStateDifferentiable(const SpaceInformationPtr &si);

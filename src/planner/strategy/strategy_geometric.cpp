@@ -244,12 +244,16 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
 
   ob::ProblemDefinitionPtr pdefk = std::make_shared<ob::ProblemDefinition>(sik);
   pdefk->addStartState(startk);
+
+  //goalRegion
   auto goal=std::make_shared<ob::GoalStateDifferentiable>(sik);
-  goal->setState(goalk);
+  // goal->setState(goalk);
+  goal->addState(goalk);
   goal->setThreshold(input.epsilon_goalregion);
   pdefk->setGoal(goal);
   pdefk->setOptimizationObjective( GetOptimizationObjective(sik) );
-  OMPLGeometricStratificationPtr stratification = std::make_shared<OMPLGeometricStratification>(si_vec, pdefk);
+  OMPLGeometricStratificationPtr stratification = 
+    std::make_shared<OMPLGeometricStratification>(si_vec, pdefk);
 
   return stratification;
 }
@@ -289,7 +293,6 @@ void StrategyGeometricMultiLevel::Step(StrategyOutput &output)
   output.SetPlannerData(pd);
   ob::ProblemDefinitionPtr pdef = planner->getProblemDefinition();
   output.SetProblemDefinition(pdef);
-
 }
 
 void StrategyGeometricMultiLevel::Clear()

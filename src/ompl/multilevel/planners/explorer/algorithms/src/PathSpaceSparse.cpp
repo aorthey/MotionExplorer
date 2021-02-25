@@ -28,16 +28,13 @@ PathSpaceSparse::PathSpaceSparse(const base::SpaceInformationPtr &si, BundleSpac
     setName("PathSpaceSparse" + std::to_string(id_));
 
 
-    optimizationObjective_ = std::make_shared<ompl::base::MultiOptimizationObjective>(getBundle());
+    // optimizationObjective_ = std::make_shared<ompl::base::MultiOptimizationObjective>(
+    //     getBundle());
 
-    ompl::base::OptimizationObjectivePtr lengthObj =
-        std::make_shared<ompl::base::PathLengthOptimizationObjective>(getBundle());
-    std::static_pointer_cast<base::MultiOptimizationObjective>(optimizationObjective_)
-      ->addObjective(lengthObj, 1.0);
-
-    optimizer_ = std::make_shared<ompl::geometric::PathSimplifier>(getBundle(), base::GoalPtr(),
-        optimizationObjective_);
-    optimizer_->freeStates(false);
+    // ompl::base::OptimizationObjectivePtr lengthObj =
+    //     std::make_shared<ompl::base::PathLengthOptimizationObjective>(getBundle());
+    // std::static_pointer_cast<base::MultiOptimizationObjective>(optimizationObjective_)
+    //   ->addObjective(lengthObj, 1.0);
 
     sparseDeltaFraction_ = 0.1; //original is 0.25
 
@@ -50,6 +47,11 @@ PathSpaceSparse::PathSpaceSparse(const base::SpaceInformationPtr &si, BundleSpac
 PathSpaceSparse::~PathSpaceSparse()
 {
     delete pathVisibilityChecker_;
+}
+
+void PathSpaceSparse::setup()
+{
+    BaseT::setup();
 }
 
 ompl::base::PathPtr& PathSpaceSparse::getSolutionPathByReference()
@@ -130,13 +132,6 @@ void PathSpaceSparse::grow()
           gpath.append(sk);
         }
 
-        // std::cout << "Interpolate " << gpath.getStates().size();
-        // gpath.interpolate();
-        // std::cout << " to " << gpath.getStates().size() << std::endl;
-
-        // std::cout << "Path with cost " << gpath.length() 
-        //   << " (" << states.size() << " states).";
-
         optimizePath(gpath);
 
         // std::cout << " OPTIMIZED to path with cost " << gpath.length() 
@@ -146,6 +141,7 @@ void PathSpaceSparse::grow()
 
         double pathcost = gpath.length();
 
+        OMPL_INFORM("** Testing path with length %f",gpath.length());
         for (uint i = 0; i < getNumberOfPaths(); i++)
         {
             //NOTE: 
@@ -156,9 +152,11 @@ void PathSpaceSparse::grow()
             double d = pathMetric_Maximum(
                 gpath.getStates(), getPathStates(i), getBundle());
             // std::cout << "Metric cost difference: " << d << std::endl;
+            OMPL_INFORM("Distance to minima %d is %f", i, d);
             isVisible = (d < 0.3);
-            if (isVisible)//pathcost < getPathCost(i))
+            if (isVisible &&  pathcost < getPathCost(i))
             {
+                OMPL_INFORM("Update minima %d with path.", i);
                 updatePath(i, pPath, pathcost);
                 break;
             }
@@ -175,8 +173,7 @@ void PathSpaceSparse::grow()
         }
 
         // std::cout << "Best cost found: " << bestCost_ << std::endl;
-
-        OMPL_INFORM("Found %d path classes.", getNumberOfPaths());
+        // OMPL_INFORM("Found %d path classes.", getNumberOfPaths());
     }
 }
 
@@ -185,14 +182,14 @@ void PathSpaceSparse::optimizePath(geometric::PathGeometric& gpath)
     // optimizer_->perturbPath(gpath, 0.1, 1000, 1000);
     optimizer_->smoothBSpline(gpath);
     optimizer_->simplifyMax(gpath);
-    // optimizer_->reduceVertices(gpath, 100, 100, 0.2);
-    // optimizer_->collapseCloseVertices(gpath, 1000, 1000);
+    // optimizer_->reduceVertices(gpath);
+    optimizer_->collapseCloseVertices(gpath);
 
     gpath.interpolate();
     return;
 
     base::ProblemDefinitionPtr pdef = getProblemDefinition();
-    base::OptimizationObjectivePtr obj = pdef->getOptimizationObjective();
+    base::OptimizationObjectivePtr obj = getOptimizationObjectivePtr();
     // const double rangeRatio = 0.01;
 
     // double dmax = gpath.length();
@@ -202,7 +199,7 @@ void PathSpaceSparse::optimizePath(geometric::PathGeometric& gpath)
 
     // unsigned int maxSteps = gpath.getStateCount();
 
-    unsigned int maxEmptySteps = 100;//floor(0.5*gpath.getStateCount());
+    unsigned int maxEmptySteps = 1000;//floor(0.5*gpath.getStateCount());
 
     // const base::SpaceInformationPtr &si = gpath.getSpaceInformation();
     std::vector<base::State *> &states = gpath.getStates();

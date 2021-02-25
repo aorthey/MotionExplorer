@@ -5,7 +5,7 @@
 using namespace ompl::base;
 
 GoalStateDifferentiable::GoalStateDifferentiable(const SpaceInformationPtr &si) 
-  : GoalState(si)
+  : GoalStates(si)
 {
     neighbor_ = si->allocState();
 }
@@ -22,9 +22,16 @@ double GoalStateDifferentiable::cost(const State *state) const
 
 Eigen::VectorXd GoalStateDifferentiable::costGradient(const State *state) const
 {
+    uint N = si_->getStateDimension();
+
+    Eigen::VectorXd dx(N);
+    dx.setZero();
+
+    if(getStateCount() <= 0) return dx;
+
     double d = distanceGoal(state);
 
-    const base::State *goalState = getState();
+    const base::State *goalState = getState(0);
 
     double minStep = si_->getStateValidityCheckingResolution();
 
@@ -38,8 +45,6 @@ Eigen::VectorXd GoalStateDifferentiable::costGradient(const State *state) const
     // spaces to the two states (and then do proper subtraction in the same
     // tangent space).
     si_->getStateSpace()->interpolate(state, goalState, step, neighbor_);
-
-    uint N = si_->getStateDimension();
 
     std::vector<double> s1d(N);
     std::vector<double> s2d(N);
@@ -62,7 +67,6 @@ Eigen::VectorXd GoalStateDifferentiable::costGradient(const State *state) const
     }else{
       force = dGoalStar*zeta*direction;
     }
-    Eigen::VectorXd dx(N);
     for(uint k = 0; k < N; k++)
     {
       dx(k) = force[k];

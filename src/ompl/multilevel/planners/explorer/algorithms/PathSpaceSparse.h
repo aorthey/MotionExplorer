@@ -33,6 +33,8 @@ namespace ompl
 
             virtual void grow() override;
 
+            virtual void setup() override;
+
             virtual ompl::base::PathPtr& getSolutionPathByReference() override;
 
 
@@ -40,10 +42,6 @@ namespace ompl
             double bestCost_{std::numeric_limits<double>::infinity()};
 
             PathVisibilityChecker *pathVisibilityChecker_{nullptr};
-
-            geometric::PathSimplifierPtr optimizer_;
-
-            ompl::base::OptimizationObjectivePtr optimizationObjective_;
 
             void optimizePath(geometric::PathGeometric&);
         };

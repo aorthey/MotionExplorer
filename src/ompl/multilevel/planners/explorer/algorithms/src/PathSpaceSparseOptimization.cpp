@@ -256,7 +256,7 @@ void PathSpaceSparseOptimization::growControl()
     if (!hasSolution_)
     {
         const Configuration *q_nearest_to_goal = nearest(qGoal_);
-        goal_->isSatisfied(q_nearest_to_goal->state, &distanceToGoal);
+        pdef_->getGoal()->isSatisfied(q_nearest_to_goal->state, &distanceToGoal);
         // if(hasSolution_){
         //   std::cout << "Found solution " << distanceToGoal << " away from goal." << std::endl;
         // }
