@@ -1,5 +1,5 @@
-#include <ompl/multilevel/planners/explorer/algorithms/PathSpaceSparseOptimization.h>
-#include <ompl/multilevel/planners/explorer/datastructures/PathVisibilityChecker.h>
+#include <ompl/multilevel/planners/multimodal/PathSpaceSparseOptimization.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/PathVisibilityChecker.h>
 #include <ompl/multilevel/datastructures/PlannerDataVertexAnnotated.h>
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/datastructures/PDF.h>
@@ -23,7 +23,7 @@ using namespace ompl::base;
 PathSpaceSparseOptimization::PathSpaceSparseOptimization(const base::SpaceInformationPtr &si, BundleSpace *parent_)
   : PathSpace(this), BaseT(si, parent_)
 {
-    setName("BundleSpaceExplorer" + std::to_string(id_));
+    setName("BundleSpaceMultimodal" + std::to_string(id_));
     Planner::declareParam<double>("range", this, &PathSpaceSparseOptimization::setRange,
                                   &PathSpaceSparseOptimization::getRange, "0.:1.:10000.");
     Planner::declareParam<double>("goal_bias", this, &PathSpaceSparseOptimization::setGoalBias,
@@ -361,9 +361,7 @@ void PathSpaceSparseOptimization::getPlannerData(base::PlannerData &data) const
         //     getNumberOfEdges());
     }
 }
-//############################################################################
-// EXPLORER
-//############################################################################
+
 void PathSpaceSparseOptimization::sampleFromDatastructure(base::State *xRandom_graph)
 {
     if (!getTotalBundleSpace()->isDynamic() && pathStack_.size() > 0)

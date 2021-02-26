@@ -16,3 +16,5 @@ bpy script! Could also be used to handle partial path displays.
   [ ] Overtaking in time
   
 
+[ ] Rename BasePathHead -> Head
+[ ] Rename FindSEctionAnalyzer -> HeadAnalyzer

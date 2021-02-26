@@ -1,4 +1,4 @@
-#include <ompl/multilevel/planners/explorer/datastructures/LocalMinimaTree.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/LocalMinimaTree.h>
 #include <ompl/util/Console.h>
 #include <thread>
 #include <ompl/geometric/PathSimplifier.h>

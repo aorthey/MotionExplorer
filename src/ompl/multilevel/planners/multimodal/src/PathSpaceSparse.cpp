@@ -1,5 +1,5 @@
-#include <ompl/multilevel/planners/explorer/algorithms/PathSpaceSparse.h>
-#include <ompl/multilevel/planners/explorer/datastructures/PathSpaceMetrics.h>
+#include <ompl/multilevel/planners/multimodal/PathSpaceSparse.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/PathSpaceMetrics.h>
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <ompl/datastructures/PDF.h>
@@ -8,7 +8,7 @@
 #include <ompl/multilevel/datastructures/graphsampler/GraphSampler.h>
 #include <ompl/multilevel/datastructures/pathrestriction/PathRestriction.h>
 #include <ompl/multilevel/datastructures/PlannerDataVertexAnnotated.h>
-#include <ompl/multilevel/planners/explorer/datastructures/PathVisibilityChecker.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/PathVisibilityChecker.h>
 
 #include <ompl/util/Exception.h>
 #include <ompl/geometric/PathSimplifier.h>

@@ -1,7 +1,7 @@
 #ifndef OMPL_MULTILEVEL_PLANNERS_BundleSpace_PathSpaceQMP_
 #define OMPL_MULTILEVEL_PLANNERS_BundleSpace_PathSpaceQMP_
 #include <ompl/multilevel/planners/qmp/QMPStarImpl.h>
-#include <ompl/multilevel/planners/explorer/datastructures/PathSpace.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/PathSpace.h>
 #include <ompl/datastructures/PDF.h>
 
 namespace ompl

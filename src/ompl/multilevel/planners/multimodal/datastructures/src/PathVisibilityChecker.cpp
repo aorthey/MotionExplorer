@@ -1,4 +1,4 @@
-#include <ompl/multilevel/planners/explorer/datastructures/PathVisibilityChecker.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/PathVisibilityChecker.h>
 #include <ompl/base/State.h>
 #include <ompl/base/ScopedState.h>
 #include <ompl/util/Exception.h>

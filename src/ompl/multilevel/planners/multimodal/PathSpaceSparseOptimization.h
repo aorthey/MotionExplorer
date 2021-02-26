@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ompl/multilevel/datastructures/BundleSpaceGraphSparse.h>
-#include <ompl/multilevel/planners/explorer/datastructures/PathSpace.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/PathSpace.h>
 #include <ompl/datastructures/PDF.h>
 #include <ompl/control/Control.h>
 #include <ompl/control/StatePropagator.h>

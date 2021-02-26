@@ -1,6 +1,6 @@
 #pragma once
 #include <ompl/multilevel/datastructures/BundleSpaceGraph.h>
-#include <ompl/multilevel/planners/explorer/datastructures/LocalMinimaTree.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/LocalMinimaTree.h>
 #include <ompl/base/PlannerData.h>
 #include <ompl/geometric/PathGeometric.h>
 

@@ -1,4 +1,4 @@
-#include <ompl/multilevel/planners/explorer/algorithms/PathSpaceQMP.h>
+#include <ompl/multilevel/planners/multimodal/PathSpaceQMP.h>
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <ompl/datastructures/PDF.h>
@@ -8,7 +8,7 @@
 #include <ompl/multilevel/datastructures/graphsampler/GraphSampler.h>
 #include <ompl/multilevel/datastructures/pathrestriction/PathRestriction.h>
 #include <ompl/multilevel/datastructures/PlannerDataVertexAnnotated.h>
-#include <ompl/multilevel/planners/explorer/datastructures/PathVisibilityChecker.h>
+#include <ompl/multilevel/planners/multimodal/datastructures/PathVisibilityChecker.h>
 
 #define foreach BOOST_FOREACH
 
