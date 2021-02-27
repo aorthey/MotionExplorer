@@ -8,6 +8,25 @@ namespace ompl
 {
     namespace base
     {
+        class SphereStateSampler : public ompl::base::StateSampler
+        {
+        public:
+            SphereStateSampler(const StateSpace *space);
+
+            void sampleUniform(State *state) override;
+
+            void sampleUniformNear(
+                State *state, 
+                const State *near, 
+                double distance) override;
+
+            void sampleGaussian(
+                State *state, 
+                const State *mean, 
+                double stdDev) override;
+
+        };
+
         class SphereStateSpace : public CompoundStateSpace
         {
         public:
@@ -43,6 +62,8 @@ namespace ompl
             SphereStateSpace();
 
             virtual ~SphereStateSpace() override = default;
+
+            StateSamplerPtr allocDefaultStateSampler() const override;
 
             double getMeasure() const override;
 

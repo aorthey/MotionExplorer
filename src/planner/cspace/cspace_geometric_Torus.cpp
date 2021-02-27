@@ -15,116 +15,6 @@ const double majorRadius_{1.0};
 const double minorRadius_{0.6};
 
 #include <ompl/util/Exception.h>
-class TorusStateSampler : public ompl::base::StateSampler
-{
-public:
-		TorusStateSampler(const ob::StateSpace *space) : ob::StateSampler(space)
-		{
-		}
-
-		void sampleUniform(ob::State *state) override
-		{
-
-        bool acceptedSampleFound = false;
-        while(!acceptedSampleFound)
-        {
-            double u = rng_.uniformReal(-pi, pi);
-            double v = rng_.uniformReal(-pi, pi);
-
-            const double &R = majorRadius_;
-            const double &r = minorRadius_;
-
-            double vprime = (R + r*cos(v))/(R + r);
-
-            double mu = rng_.uniformReal(0, 1);
-            if(mu <= vprime)
-            {
-                // ob::SO2StateSpace::StateType *SO2_1 = 
-                //   state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
-                // ob::SO2StateSpace::StateType *SO2_2 = 
-                //   state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-                // SO2_1->value = u;
-                // SO2_2->value = v;
-                ob::TorusStateSpace::StateType *T = 
-                  state->as<ob::TorusStateSpace::StateType>();
-                T->setS1S2(u, v);
-                acceptedSampleFound = true;
-            }
-        }
-		}
-
-		void sampleUniformNear(ob::State *state, const ob::State *near, double distance) override
-    {
-        // ob::SO2StateSpace::StateType *SO2_1 = 
-        //   state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
-        // ob::SO2StateSpace::StateType *SO2_2 = 
-        //   state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-
-        // const ob::SO2StateSpace::StateType *SO2_n1 = 
-        //   near->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
-        // const ob::SO2StateSpace::StateType *SO2_n2 = 
-        //   near->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-
-        // const double &u = SO2_n1->value;
-        // const double &v = SO2_n2->value;
-
-        // SO2_1->value = rng_.uniformReal(u - distance, u + distance);
-        // SO2_2->value = rng_.uniformReal(v - distance, v + distance);
-        // space_->enforceBounds(state);
-
-
-
-        ob::TorusStateSpace::StateType *T = 
-          state->as<ob::TorusStateSpace::StateType>();
-        const ob::TorusStateSpace::StateType *Tnear = 
-          near->as<ob::TorusStateSpace::StateType>();
-        T->setS1( rng_.uniformReal(Tnear->getS1() - distance, Tnear->getS1() + distance));
-        T->setS2( rng_.uniformReal(Tnear->getS2() - distance, Tnear->getS2() + distance));
-        space_->enforceBounds(state);
-    }
-
-		void sampleGaussian(ob::State *state, const ob::State *mean, double stdDev) override
-    {
-        // ob::SO2StateSpace::StateType *SO2_1 = 
-        //   state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
-        // ob::SO2StateSpace::StateType *SO2_2 = 
-        //   state->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-
-        // const ob::SO2StateSpace::StateType *SO2_m1 = 
-        //   mean->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(0);
-        // const ob::SO2StateSpace::StateType *SO2_m2 = 
-        //   mean->as<ob::CompoundState>()->as<ob::SO2StateSpace::StateType>(1);
-
-        // SO2_1->value = rng_.gaussian(SO2_m1->value, stdDev);
-        // SO2_2->value = rng_.gaussian(SO2_m2->value, stdDev);
-        // space_->enforceBounds(state);
-
-        ob::TorusStateSpace::StateType *T = 
-          state->as<ob::TorusStateSpace::StateType>();
-        const ob::TorusStateSpace::StateType *Tmean = 
-          mean->as<ob::TorusStateSpace::StateType>();
-        T->setS1( rng_.gaussian(Tmean->getS1(), stdDev) );
-        T->setS2( rng_.gaussian(Tmean->getS2(), stdDev) );
-
-        space_->enforceBounds(state);
-    }
-
-};
-
-ob::StateSamplerPtr allocTorusStateSampler(const ob::StateSpace *space)
-{
-    return std::make_shared<TorusStateSampler>(space);
-}
-
-ob::SpaceInformationPtr GeometricCSpaceOMPLTorus::SpaceInformationPtr()
-{
-    si = BaseT::SpaceInformationPtr();
-    const ob::StateSamplerAllocator allocator = allocTorusStateSampler;
-    si->getStateSpace()->setStateSamplerAllocator(allocator);
-    return si;
-}
-
-
 GeometricCSpaceOMPLTorus::GeometricCSpaceOMPLTorus(RobotWorld *world_, int robot_idx):
   GeometricCSpaceOMPL(world_, robot_idx)
 {
@@ -136,7 +26,7 @@ void GeometricCSpaceOMPLTorus::initSpace()
     // ob::StateSpacePtr SO2_2(std::make_shared<ob::SO2StateSpace>());
     // space = SO2_1 + SO2_2;
 
-    ob::StateSpacePtr T(std::make_shared<ob::TorusStateSpace>());
+    ob::StateSpacePtr T(std::make_shared<ob::TorusStateSpace>(majorRadius_, minorRadius_));
 		space = T;
 }
 

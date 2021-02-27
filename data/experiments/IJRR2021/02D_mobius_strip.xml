@@ -8,17 +8,19 @@
   <plannerinput>
 
     <qinit  config="6  +1.0 +0.2 -0.03 0 0 0"/>
+    <!-- <qinit  config="6  -0.58 -0.53 +0.4 0 0 0 "/> -->
     <qgoal  config="6  -0.98 +0.23 +0.4 0 0 0 "/>
     <se3min config="6  -3 -3 -3 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +3 +3 +3 +3.141593 +1.57 +3.141593"/>
 
     <epsilongoalregion>0.01</epsilongoalregion>
-    <maxplanningtime>60</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>0.001</maxplanningtime>      <!-- runtime in (s) --> 
     <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
     <pathWidth>0.03</pathWidth>
 
     <threading>1</threading>
     <algorithm name="multilevel:minimaspanner"/>
+    <algorithm name="ompl:prmstar"/>
 
     <multilevel>
       <!-- <level robot_index="1" type="CIRCULAR"/> -->

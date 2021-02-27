@@ -12,8 +12,6 @@
 
 using namespace boost::math::double_constants;
 
-
-//############################################################################
 class AnnulusStateSampler : public ompl::base::StateSampler
 {
 public:
@@ -98,6 +96,8 @@ void GeometricCSpaceOMPLAnnulus::initSpace()
     R1->as<ob::RealVectorStateSpace>()->setBounds(radiusInner_, radiusOuter_);
 
     space = SO2 + R1;
+
+    // TODO: std::make_shared<AnnulusStateSpace>();
 }
 
 void GeometricCSpaceOMPLAnnulus::print(std::ostream& out) const

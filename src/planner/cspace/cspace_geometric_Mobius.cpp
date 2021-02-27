@@ -1,6 +1,7 @@
 #include "planner/cspace/cspace_geometric_Mobius.h"
 #include "planner/cspace/validitychecker/validity_checker_ompl.h"
-#include <ompl/base/spaces/SO2StateSpace.h>
+// #include <ompl/base/spaces/SO2StateSpace.h>
+#include <ompl/base/spaces/MobiusStateSpace.h>
 #include "common.h"
 #include "gui/colors.h"
 #include <KrisLibrary/GLdraw/drawextra.h>
@@ -15,12 +16,15 @@ GeometricCSpaceOMPLMobius::GeometricCSpaceOMPLMobius(RobotWorld *world_, int rob
 
 void GeometricCSpaceOMPLMobius::initSpace()
 {
-    ob::StateSpacePtr SO2(std::make_shared<ob::SO2StateSpace>());
-    ob::StateSpacePtr R1(std::make_shared<ob::RealVectorStateSpace>(1));
+    // ob::StateSpacePtr SO2(std::make_shared<ob::SO2StateSpace>());
+    // ob::StateSpacePtr R1(std::make_shared<ob::RealVectorStateSpace>(1));
 
-    R1->as<ob::RealVectorStateSpace>()->setBounds(-intervalMax, +intervalMax);
+    // R1->as<ob::RealVectorStateSpace>()->setBounds(-intervalMax, +intervalMax);
 
-    space = SO2 + R1;
+    // space = SO2 + R1;
+
+    ob::StateSpacePtr M(std::make_shared<ob::MobiusStateSpace>(intervalMax));
+		space = M;
 }
 
 void GeometricCSpaceOMPLMobius::print(std::ostream& out) const

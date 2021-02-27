@@ -14,8 +14,6 @@ class GeometricCSpaceOMPLTorus: public GeometricCSpaceOMPL
     GeometricCSpaceOMPLTorus(RobotWorld *world_, int robot_idx);
     virtual void initSpace();
 
-    virtual ob::SpaceInformationPtr SpaceInformationPtr() override;
-
     virtual void ConfigToOMPLState(const Config &q, ob::State *qompl) override;
     virtual Config OMPLStateToConfig(const ob::State *qompl) override;
 

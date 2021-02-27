@@ -14,58 +14,13 @@ using namespace boost::math::double_constants;
 const double radius_{1.0};
 
 #include <ompl/util/Exception.h>
-class SphereStateSampler : public ompl::base::StateSampler
-{
-public:
-		SphereStateSampler(const ob::StateSpace *space) : ob::StateSampler(space)
-		{
-		}
-
-		void sampleUniform(ob::State *state) override
-		{
-       double theta = 2.0 * M_PI * rng_.uniformReal(0,1) - M_PI;
-       double phi = acos(1.0 - 2.0 * rng_.uniformReal(0,1));
-       ob::SphereStateSpace::StateType *S = 
-         state->as<ob::SphereStateSpace::StateType>();
-       S->setThetaPhi(theta, phi);
-		}
-
-		void sampleUniformNear(ob::State *state, const ob::State *near, double distance) override
-    {
-        ob::SphereStateSpace::StateType *S = 
-          state->as<ob::SphereStateSpace::StateType>();
-        const ob::SphereStateSpace::StateType *Snear = 
-          near->as<ob::SphereStateSpace::StateType>();
-        S->setTheta( rng_.uniformReal(Snear->getTheta() - distance, Snear->getTheta() + distance));
-        S->setPhi( rng_.uniformReal(Snear->getPhi() - distance, Snear->getPhi() + distance));
-        space_->enforceBounds(state);
-    }
-
-		void sampleGaussian(ob::State *state, const ob::State *mean, double stdDev) override
-    {
-        ob::SphereStateSpace::StateType *S = 
-          state->as<ob::SphereStateSpace::StateType>();
-        const ob::SphereStateSpace::StateType *Smean = 
-          mean->as<ob::SphereStateSpace::StateType>();
-        S->setTheta( rng_.gaussian(Smean->getTheta(), stdDev) );
-        S->setPhi( rng_.gaussian(Smean->getPhi(), stdDev) );
-        space_->enforceBounds(state);
-    }
-
-};
-
-ob::StateSamplerPtr allocSphereStateSampler(const ob::StateSpace *space)
-{
-    return std::make_shared<SphereStateSampler>(space);
-}
-
-ob::SpaceInformationPtr GeometricCSpaceOMPLSphere::SpaceInformationPtr()
-{
-    si = BaseT::SpaceInformationPtr();
-    const ob::StateSamplerAllocator allocator = allocSphereStateSampler;
-    si->getStateSpace()->setStateSamplerAllocator(allocator);
-    return si;
-}
+// ob::SpaceInformationPtr GeometricCSpaceOMPLSphere::SpaceInformationPtr()
+// {
+//     si = BaseT::SpaceInformationPtr();
+//     const ob::StateSamplerAllocator allocator = allocSphereStateSampler;
+//     si->getStateSpace()->setStateSamplerAllocator(allocator);
+//     return si;
+// }
 
 
 GeometricCSpaceOMPLSphere::GeometricCSpaceOMPLSphere(RobotWorld *world_, int robot_idx):
