@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="point" file="../../robots/point_nonphysical.urdf"/>
+
+  <plannerinput>
+
+    <qinit  config="6  +0.5 +0.7 -0.5 0 0 0"/>
+    <qgoal  config="6  +0.0 -1.0 +0.5 0 0 0 "/>
+    <se3min config="6  -3 -3 -3 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +3 +3 +3 +3.141593 +1.57 +3.141593"/>
+
+    <epsilongoalregion>0.1</epsilongoalregion>
+    <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
+    <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
+    <pathWidth>0.07</pathWidth>
+    <smoothPath>0</smoothPath>           <!-- 0: no smoothing, 1: smoothing      -->
+    <pathSpeed>8</pathSpeed>
+    <threading>1</threading>
+
+    <algorithm name="multilevel:minimaspanner"/>
+    <algorithm name="multilevel:smlr"/>
+    <algorithm name="multilevel:qmpstar"/>
+    <algorithm name="multilevel:qmp"/>
+    <algorithm name="multilevel:qrrt"/>
+    <algorithm name="multilevel:qrrtstar"/>
+    <algorithm name="ompl:spars"/>
+    <algorithm name="ompl:prmstar"/>
+    <algorithm name="ompl:rrtconnect"/>
+
+    <multilevel>
+      <level robot_index="0" type="SPHERE"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>

@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<world>
+
+  <robot name="robot_sphere" file="../../robots/sphere.urdf"/>
+
+  <rigidObject name="the_lattice" file="../../terrains/lattice.tri" translation="+0 +0 0"/>
+
+  <plannerinput>
+
+    <qinit  config="6  +0.1 +2 -0.1 0 0 0  0 0 0 0 0"/>
+    <qgoal  config="6  +0.1 -2 +0.1 0 0 0  0 0 0 0 0"/>
+    <se3min config="6  -2 -3 -2 -3.141593 -1.57 -3.141593"/>
+    <se3max config="6  +2 +3 +2 +3.141593 +1.57 +3.141593"/>
+
+    <!-- <epsilongoalregion>0.01</epsilongoalregion> -->
+    <epsilongoalregion>1</epsilongoalregion>
+    <maxplanningtime>0.2</maxplanningtime>      <!-- runtime in (s) --> 
+    <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
+    <pathWidth>0.1</pathWidth>
+
+    <algorithm name="multilevel:minimaspanner"/>
+    <algorithm name="multilevel:qmp"/>
+    <algorithm name="multilevel:qrrt"/>
+    <algorithm name="multilevel:qrrtstar"/>
+    <algorithm name="ompl:rrt"/>
+    <algorithm name="ompl:rrtstar"/>
+
+    <multilevel>
+      <level robot_index="0" type="R3"/>
+    </multilevel>
+
+  </plannerinput>
+
+</world>
+
