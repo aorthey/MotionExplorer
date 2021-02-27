@@ -2,6 +2,8 @@
 [x] Anytime thread-based (plus exhaustive mode)
 [x] Every non-const function of LMT should be mutexed
 
+[ ] Find better name for PathSpaceSparse. TreeBuilder. MultimodalExplorer.
+MultimodalBuilder. LocalMinimaSpanner. MultiPath
 [ ] Make sure that pdef->getGoal/getObjective is as quick as setting them
 beforehand
 [ ] Fix goal regions

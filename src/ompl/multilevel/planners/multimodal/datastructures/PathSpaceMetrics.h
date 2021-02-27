@@ -28,3 +28,12 @@ double pathMetric_Maximum(
 double pathMetric_Maximum(
     const ompl::geometric::PathGeometricPtr& f, 
     const ompl::geometric::PathGeometricPtr& g);
+
+double pathMetric_MaxMin(
+    const std::vector<ompl::base::State*> f,
+    const std::vector<ompl::base::State*> g,
+    const ompl::base::SpaceInformationPtr si);
+
+double pathMetric_MaxMin(
+    const ompl::geometric::PathGeometricPtr& f, 
+    const ompl::geometric::PathGeometricPtr& g);

@@ -31,11 +31,16 @@ namespace ompl
 
             virtual ~PathSpaceSparse() override;
 
-            virtual void grow() override;
+            // virtual void grow() override;
 
             virtual void setup() override;
 
             virtual ompl::base::PathPtr& getSolutionPathByReference() override;
+
+            virtual const std::pair<BundleSpaceGraph::Edge, bool> 
+              addEdge(const Vertex a, const Vertex b) override;
+
+            void checkPath(const Vertex v, const Vertex vStart, const Vertex vGoal);
 
 
         protected:

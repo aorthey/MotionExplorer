@@ -27,16 +27,8 @@ PathSpaceSparse::PathSpaceSparse(const base::SpaceInformationPtr &si, BundleSpac
 
     setName("PathSpaceSparse" + std::to_string(id_));
 
-
-    // optimizationObjective_ = std::make_shared<ompl::base::MultiOptimizationObjective>(
-    //     getBundle());
-
-    // ompl::base::OptimizationObjectivePtr lengthObj =
-    //     std::make_shared<ompl::base::PathLengthOptimizationObjective>(getBundle());
-    // std::static_pointer_cast<base::MultiOptimizationObjective>(optimizationObjective_)
-    //   ->addObjective(lengthObj, 1.0);
-
     sparseDeltaFraction_ = 0.1; //original is 0.25
+    maxFailures_ = 1000;
 
     if (hasBaseSpace())
     {
@@ -59,63 +51,34 @@ ompl::base::PathPtr& PathSpaceSparse::getSolutionPathByReference()
   return getBestPathPtrNonConst();
 }
 
-void PathSpaceSparse::grow()
+const std::pair<BundleSpaceGraph::Edge, bool> 
+PathSpaceSparse::addEdge(const Vertex a, const Vertex b)
 {
-    if (firstRun_)
-    {
-        init();
+    auto edge = BaseT::addEdge(a, b);
 
-        firstRun_ = false;
-
-        vGoal_ = addConfiguration(qGoal_);
-
-
-        // if (hasBaseSpace())
-        // {
-        //     if (getPathRestriction()->hasFeasibleSection(qStart_, qGoal_))
-        //     {
-        //         if (sameComponent(vStart_, vGoal_))
-        //         {
-        //             hasSolution_ = true;
-        //         }
-        //     }
-        // }
+    const Vertex vt = boost::target(edge.first, getGraph());
+    const Vertex vs = boost::source(edge.first, getGraph());
+    const Vertex vStart = getStartIndex();
+    const Vertex vGoal = getGoalIndex();
+    if(vt!=vStart && vt!=vGoal)
+    { 
+      checkPath(vt, vStart, vGoal);
+    }else{
+      if(vs!=vStart && vs!=vGoal)
+      {
+        checkPath(vs, vStart, vGoal);
+      }
+      //do not checkPath if only one edge exists between start/goal
     }
 
-    //(1) Get Random Sample
-    if (!sampleBundleValid(xRandom_->state))
-        return;
+    return edge;
+}
 
-    //(2) Add Configuration if valid
-    Configuration *xNew = new Configuration(getBundle(), xRandom_->state);
+void PathSpaceSparse::checkPath(const Vertex v, const Vertex vStart, const Vertex vGoal)
+{
+    bool eligible = sameComponent(vStart, v) && sameComponent(v, vGoal);
 
-    if(!addConfigurationConditional(xNew)) return;
-
-    Vertex v = xNew->index;
-
-    if(v>1e10)
-    {
-      std::cout << "Vertex " << v << std::endl;
-      throw ompl::Exception("Vertex invalid");
-    }
-
-
-    Vertex vStart = getStartIndex();
-
-    Vertex vGoal = getGoalIndex();
-
-    if (!hasSolution_)
-    {
-        if (sameComponent(vStart, vGoal))
-        {
-            hasSolution_ = true;
-        }
-    }
-
-    // FALL 1: Pfad ist mit Start und Ziel verbunden
-    bool b = sameComponent(vStart, v) && sameComponent(v, vGoal);
-
-    if (b)
+    if (eligible)
     {
         ompl::base::PathPtr pPath = getPath(vStart, v);
         ompl::base::PathPtr pPath2 = getPath(v, vGoal);
@@ -149,15 +112,20 @@ void PathSpaceSparse::grow()
             //a bit costly, but definitely more efficient than path visibility
             //(which would not only compute distance, but also edge feasibility between
             //path segments). 
-            double d = pathMetric_Maximum(
+            double d = pathMetric_MaxMin(
                 gpath.getStates(), getPathStates(i), getBundle());
             // std::cout << "Metric cost difference: " << d << std::endl;
             OMPL_INFORM("Distance to minima %d is %f", i, d);
             isVisible = (d < 0.3);
-            if (isVisible &&  pathcost < getPathCost(i))
+            if (isVisible)
             {
-                OMPL_INFORM("Update minima %d with path.", i);
-                updatePath(i, pPath, pathcost);
+                if (pathcost < getPathCost(i))
+                {
+                    OMPL_INFORM("Update minima %d with path.", i);
+                    updatePath(i, pPath, pathcost);
+                }
+                //DEBUG
+                // isVisible = false;
                 break;
             }
         }
@@ -177,13 +145,64 @@ void PathSpaceSparse::grow()
     }
 }
 
+//void PathSpaceSparse::grow()
+//{
+//    if (firstRun_)
+//    {
+//        init();
+
+//        firstRun_ = false;
+
+//        vGoal_ = addConfiguration(qGoal_);
+
+//        // if (hasBaseSpace())
+//        // {
+//        //     if (getPathRestriction()->hasFeasibleSection(qStart_, qGoal_))
+//        //     {
+//        //         if (sameComponent(vStart_, vGoal_))
+//        //         {
+//        //             hasSolution_ = true;
+//        //         }
+//        //     }
+//        // }
+//    }
+
+//    //(1) Get Random Sample
+//    if (!sampleBundleValid(xRandom_->state))
+//        return;
+
+//    //(2) Add Configuration if valid
+//    Configuration *xNew = new Configuration(getBundle(), xRandom_->state);
+
+//    //TODO: problem is that we do not check here if a new edge is added! (which
+//    //is what we would ultimately care about). Maybe we need to highjack the
+//    //addEdge function
+//    addConfigurationConditional(xNew);
+
+//    if (!hasSolution_)
+//    {
+//        if (sameComponent(getStartIndex(), getGoalIndex()))
+//        {
+//            hasSolution_ = true;
+//        }
+//    }
+
+//    // writeToGraphviz("graphviz"+std::to_string(getNumberOfVertices()));
+//}
+
 void PathSpaceSparse::optimizePath(geometric::PathGeometric& gpath)
 { 
-    // optimizer_->perturbPath(gpath, 0.1, 1000, 1000);
-    optimizer_->smoothBSpline(gpath);
-    optimizer_->simplifyMax(gpath);
-    // optimizer_->reduceVertices(gpath);
-    optimizer_->collapseCloseVertices(gpath);
+    if (getBundle()->getStateSpace()->getType() == base::STATE_SPACE_SO2)
+    {
+        std::cout << "SO2 detected. Optimizer disabled." << std::endl;
+        // optimizer_->collapseCloseVertices(gpath);
+    }else{
+        // optimizer_->perturbPath(gpath, 0.1, 1000, 1000);
+        optimizer_->smoothBSpline(gpath);
+        optimizer_->simplifyMax(gpath);
+        // optimizer_->reduceVertices(gpath);
+        // optimizer_->collapseCloseVertices(gpath);
+    }
 
     gpath.interpolate();
     return;

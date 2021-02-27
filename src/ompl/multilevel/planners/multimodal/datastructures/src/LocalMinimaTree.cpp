@@ -7,7 +7,8 @@ using namespace ompl::multilevel;
 
 LocalMinimaTree::LocalMinimaTree(std::vector<base::SpaceInformationPtr> siVec) : siVec_(siVec)
 {
-    OMPL_DEBUG("Number of threads supported by implementation: %d", std::thread::hardware_concurrency());
+    OMPL_DEBUG("Number of threads supported by implementation: %d", 
+        std::thread::hardware_concurrency());
     for (uint k = 0; k < siVec.size(); k++)
     {
         std::vector<LocalMinimaNode *> kthLevel;
@@ -132,11 +133,11 @@ LocalMinimaNode *LocalMinimaTree::addPath(base::PathPtr path, double cost, int l
     //   std::make_shared<ompl::base::PathLengthOptimizationObjective>(siVec_.at(level));
     // geometric::PathSimplifier shortcutter(siVec_.at(level), base::GoalPtr(), obj);
 
-    geometric::PathGeometricPtr gpath = std::dynamic_pointer_cast<geometric::PathGeometric>(path);
-    if (gpath != nullptr)
-    {
-        gpath->interpolate();
-    }
+    // geometric::PathGeometricPtr gpath = std::dynamic_pointer_cast<geometric::PathGeometric>(path);
+    // if (gpath != nullptr)
+    // {
+    //     // gpath->interpolate();
+    // }
 
     LocalMinimaNode *node = new LocalMinimaNode(siVec_.at(level), path);
     node->setLevel(level);
