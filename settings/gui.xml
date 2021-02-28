@@ -95,6 +95,12 @@
   <!-- </hotkey> -->
 
   <hotkey>
+    <name>export_to_collada</name>
+    <descr>Export Scene to Collada File</descr>
+    <key>x</key>
+  </hotkey>
+
+  <hotkey>
     <name>planner_step</name>
     <descr>Advance Planner by one step</descr>
     <key>q</key>

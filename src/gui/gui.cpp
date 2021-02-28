@@ -183,7 +183,7 @@ void ForceFieldBackend::RenderWorld()
 
         glPushMatrix();
         glMultMatrix(mat);
-        GLDraw::GeometryAppearance& a = *robot->geomManagers[i].Appearance();
+        GLDraw::GeometryAppearance& a = *robot->geomManagers[j].Appearance();
         if(a.geom != robot->geometry[j]) a.Set(*robot->geometry[j]);
         a.SetColor(GLDraw::getColorRobot());
         a.DrawGL();

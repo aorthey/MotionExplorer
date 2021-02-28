@@ -1,34 +1,34 @@
+---- Theory/Algorithmic Tasks
 [ ] How to address minima which have not yet been converged (example:
 03D_rod.xml). Ideas are either to do additional sweeps over database to update
 minima over time. Or use visibility checker? Or do nothing: argue that this is a
 problem of the OPTIMIZER. Our job is only to detect it and point it out.
 [ ] Relax assumption that optimizer always converges (idempotent).
+[ ] Implement the three different modes (call them differently. Extension
+strategy maybe)
 
-[ ] Fix Mobius State Space (interpolation seems off. Do 3d interpolation+projection)
+---- Pipeline Tasks
 [ ] Implement multi-goal regions
-
-[ ] Find better name for PathSpaceSparse. TreeBuilder. MultimodalExplorer.
-MultimodalBuilder. LocalMinimaSpanner. MultiPath.
-
-[ ] Make sure that pdef->getGoal/getObjective is as quick as setting them
-beforehand
-
 [ ] Pipe it all to blender [Export scene to dae. Export frames (world pos) to txt. Import to
 blender.]. Make an automatic "render image" from current camera view by invoking
 bpy script! Could also be used to handle partial path displays.
-
+[ ] Find better name for PathSpaceSparse. TreeBuilder. MultimodalExplorer.
+MultimodalBuilder. LocalMinimaSpanner. MultiPath.
 [ ] Interesting experiments (try to come up with examples which visualize
 different symbols)
   [ ] Left/Right: Mobile Base
   [ ] Up/Down: Drone
-  [ ] CW/CCW: Revolute joints
-  [ ] Hand scenario baxter
+  [ ] CW/CCW: Revolute joints/Manipulators
+  [ ] Hand scenario baxter (Combination)
   [ ] Overtaking in time
-  [ ] 
+  [ ] Different robots to combine Left/Right, Up/Down, CW/CCW
+  [ ] Different grasping positions! Requires goal states
 
+---- Finished Tasks
 [x] Rename BasePathHead -> Head
 [x] Rename FindSEctionAnalyzer -> HeadAnalyzer
 [x] Add function getLocalMinimaTree() to explorer (make corresponding changes in GUI)
 [x] Anytime thread-based (plus exhaustive mode)
 [x] Every non-const function of LMT should be mutexed
+[x] Fix Mobius State Space (interpolation seems off. Do 3d interpolation+projection)
 

@@ -32,6 +32,8 @@ class PlannerBackend : public ForceFieldBackend
     std::string getRobotEnvironmentString();
     void CenterCameraOn(const Vector3& v);
 
+    virtual void ExportToCollada();
+
     uint draw_cover_active_open_set{0};
     bool draw_cover_all_open_sets{true};
     int draw_path_modus{0};
