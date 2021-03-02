@@ -1,4 +1,5 @@
 ---- Theory/Algorithmic Tasks
+
 [ ] How to address minima which have not yet been converged (example:
 03D_rod.xml). Ideas are either to do additional sweeps over database to update
 minima over time. Or use visibility checker? Or do nothing: argue that this is a
@@ -9,12 +10,25 @@ strategy maybe)
 
 ---- Pipeline Tasks
 [ ] Implement multi-goal regions
-[ ] Pipe it all to blender [Export scene to dae. Export frames (world pos) to txt. Import to
-blender.]. Make an automatic "render image" from current camera view by invoking
-bpy script! Could also be used to handle partial path displays.
+  [ ] Allow specification in XML (first do multiple states)
+
+[ ] Pipe it all to blender 
+  [x] Export scene to dae. 
+  [ ] Export frames (world pos) to txt. 
+  [ ] Import to blender using bpy.
+  [ ] Make an automatic "render image" from current camera view by invoking
+      bpy script! Could also be used to handle partial paths.
+
 [ ] Find better name for PathSpaceSparse. TreeBuilder. MultimodalExplorer.
 MultimodalBuilder. LocalMinimaSpanner. MultiPath.
-[ ] Interesting experiments (try to come up with examples which visualize
+
+MMP--Multimodal Motion Planner
+
+Multimodal Sparse Roadmap (MULTISPARO)
+
+Rapidly-exploring random-tree (RRT) algorithm
+
+[ ] Interesting >3dof experiments (try to come up with examples which visualize
 different symbols)
   [ ] Left/Right: Mobile Base
   [ ] Up/Down: Drone

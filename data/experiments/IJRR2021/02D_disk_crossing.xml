@@ -35,6 +35,9 @@
     <freeFloating>1</freeFloating>
     <smoothPath>1</smoothPath>
     <algorithm name="multilevel:minimaspanner"/>
+    <algorithm name="multilevel:qmp"/>
+    <algorithm name="ompl:rrtconnect"/>
+    <algorithm name="ompl:prm"/>
     <threading>1</threading>
     <multiAgent>1</multiAgent>
 

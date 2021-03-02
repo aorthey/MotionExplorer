@@ -145,51 +145,6 @@ void PathSpaceSparse::checkPath(const Vertex v, const Vertex vStart, const Verte
     }
 }
 
-//void PathSpaceSparse::grow()
-//{
-//    if (firstRun_)
-//    {
-//        init();
-
-//        firstRun_ = false;
-
-//        vGoal_ = addConfiguration(qGoal_);
-
-//        // if (hasBaseSpace())
-//        // {
-//        //     if (getPathRestriction()->hasFeasibleSection(qStart_, qGoal_))
-//        //     {
-//        //         if (sameComponent(vStart_, vGoal_))
-//        //         {
-//        //             hasSolution_ = true;
-//        //         }
-//        //     }
-//        // }
-//    }
-
-//    //(1) Get Random Sample
-//    if (!sampleBundleValid(xRandom_->state))
-//        return;
-
-//    //(2) Add Configuration if valid
-//    Configuration *xNew = new Configuration(getBundle(), xRandom_->state);
-
-//    //TODO: problem is that we do not check here if a new edge is added! (which
-//    //is what we would ultimately care about). Maybe we need to highjack the
-//    //addEdge function
-//    addConfigurationConditional(xNew);
-
-//    if (!hasSolution_)
-//    {
-//        if (sameComponent(getStartIndex(), getGoalIndex()))
-//        {
-//            hasSolution_ = true;
-//        }
-//    }
-
-//    // writeToGraphviz("graphviz"+std::to_string(getNumberOfVertices()));
-//}
-
 void PathSpaceSparse::optimizePath(geometric::PathGeometric& gpath)
 { 
     if (getBundle()->getStateSpace()->getType() == base::STATE_SPACE_SO2)

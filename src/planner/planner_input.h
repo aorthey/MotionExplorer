@@ -12,6 +12,7 @@ struct Layer{
   double finite_horizon_relaxation{0.0};
   Config q_init;
   Config q_goal;
+  std::vector<Config> q_goal_region;
   Config dq_init;
   Config dq_goal;
   std::string type;
@@ -80,6 +81,7 @@ class PlannerInput{
     //general input for any planner method (fixed)
     Config q_init;
     Config q_goal;
+    std::vector<Config> q_goal_region;
     Config dq_init;
     Config dq_goal;
 

@@ -245,17 +245,32 @@ void MotionPlanner::CreateHierarchy()
         uint N = cspace_level_k->GetKlamptDimensionality();
 
         Config qi_full = input.q_init; qi_full.resize(N);
-        Config qg_full = input.q_goal; qg_full.resize(N);
 
         cspace_level_k->UpdateRobotConfig(qi_full);
 
         cspace_level_k->ConfigToOMPLState(qi_full, stateTmp);
         qi = cspace_level_k->OMPLStateToConfig(stateTmp);
-        cspace_level_k->ConfigToOMPLState(qg_full, stateTmp);
-        qg = cspace_level_k->OMPLStateToConfig(stateTmp);
-
         layers.at(k).q_init = qi;
-        layers.at(k).q_goal = qg;
+
+        if(input.q_goal_region.size() > 0)
+        {
+            for(uint j = 0; j < input.q_goal_region.size(); j++)
+            {
+              Config qj = input.q_goal_region.at(j);
+              qj.resize(N);
+              cspace_level_k->ConfigToOMPLState(qj, stateTmp);
+              qj = cspace_level_k->OMPLStateToConfig(stateTmp);
+              layers.at(k).q_goal_region.push_back(qj);
+              config_goal_levels.push_back(qj);
+            }
+            config_goal_region_levels.push_back( layers.at(k).q_goal_region );
+        }else{
+            Config qg_full = input.q_goal; qg_full.resize(N);
+            cspace_level_k->ConfigToOMPLState(qg_full, stateTmp);
+            qg = cspace_level_k->OMPLStateToConfig(stateTmp);
+            layers.at(k).q_goal = qg;
+        }
+
       }else{
         if(k>=layers.size()-1)
         {
@@ -295,14 +310,19 @@ void MotionPlanner::CreateHierarchy()
 
       }
       config_init_levels.push_back(qi);
-      config_goal_levels.push_back(qg);
+      if(input.q_goal_region.size() <= 0)
+      {
+          config_goal_levels.push_back(qg);
+      }
       cspace_level_k->SpaceInformationPtr()->freeState(stateTmp);
     }
 
     //Check if any levels have constraint relaxations
-    for(uint k = 0; k < cspace_levels.size(); k++){
+    for(uint k = 0; k < cspace_levels.size(); k++)
+    {
       double cr = layers.at(k).finite_horizon_relaxation;
-      if(cr > 0){
+      if(cr > 0)
+      {
           std::cout << "Constraint relaxation on level " << k << std::endl;
           Config qcr = layers.at(k).q_init;
           std::cout << qcr << " (" << cr << ")" << std::endl;
@@ -351,9 +371,24 @@ void MotionPlanner::CreateHierarchy()
       cspace->ConfigToOMPLState(qi, stateTmp);
       cspace->SetTime(stateTmp, 0);
       qi = cspace->OMPLStateToConfig(stateTmp);
-      cspace->ConfigToOMPLState(qg, stateTmp);
-      cspace->SetTime(stateTmp, 1);
-      qg = cspace->OMPLStateToConfig(stateTmp);
+
+      if(input.q_goal_region.size() > 0)
+      {
+        std::vector<Config> goalConfigVec;
+        for(uint j = 0; j < input.q_goal_region.size(); j++)
+        {
+          Config qj = input.q_goal_region.at(j);
+          qj.resize(N);
+          cspace->ConfigToOMPLState(qj, stateTmp);
+          qj = cspace->OMPLStateToConfig(stateTmp);
+          goalConfigVec.push_back(qj);
+        }
+        config_goal_region_levels.push_back(goalConfigVec);
+      }else{
+        cspace->ConfigToOMPLState(qg, stateTmp);
+        cspace->SetTime(stateTmp, 1);
+        qg = cspace->OMPLStateToConfig(stateTmp);
+      }
     }
 
     config_init_levels.push_back(qi);
@@ -710,8 +745,20 @@ void MotionPlanner::DrawGLStartGoal(GUIState& state)
   }
   if(state("planner_draw_goal_configuration"))
   {
-    qspace->drawConfig(qg, colorGoalConfiguration);
-    cspace->drawConfig(qgOuter, colorGoalConfigurationTransparent);
+    if(config_goal_region_levels.size() > 0)
+    {
+      const std::vector<Config> qgVec = config_goal_region_levels.at(current_level);
+      const std::vector<Config> qgOuterVec = config_goal_region_levels.at(max_levels_);
+      for(uint k = 0; k < qgVec.size(); k++){
+        Config qk = qgVec.at(k);
+        Config qkOuter = qgOuterVec.at(k);
+        qspace->drawConfig(qk, colorGoalConfiguration);
+        cspace->drawConfig(qkOuter, colorGoalConfigurationTransparent);
+      }
+    }else{
+      qspace->drawConfig(qg, colorGoalConfiguration);
+      cspace->drawConfig(qgOuter, colorGoalConfigurationTransparent);
+    }
   }
 }
 

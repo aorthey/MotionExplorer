@@ -11,7 +11,7 @@
     <se3min config="6  -3 -3 -3 -3.141593 -1.57 -3.141593"/>
     <se3max config="6  +3 +3 +3 +3.141593 +1.57 +3.141593"/>
 
-    <epsilongoalregion>0.1</epsilongoalregion>
+    <epsilongoalregion>0.01</epsilongoalregion>
     <maxplanningtime>1</maxplanningtime>      <!-- runtime in (s) --> 
     <freeFloating>1</freeFloating>      <!-- runtime in (s) --> 
     <pathWidth>0.07</pathWidth>

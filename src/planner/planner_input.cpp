@@ -209,7 +209,20 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
   }else{
     //necessary arguments
     q_init = GetSubNodeAttribute<Config>(node, "qinit", "config");
-    q_goal = GetSubNodeAttribute<Config>(node, "qgoal", "config");
+    if(ExistSubnodeAttribute(node, "qgoal", "config"))
+    {
+        q_goal = GetSubNodeAttribute<Config>(node, "qgoal", "config");
+    }else
+    {
+      TiXmlElement* node_goal = FindFirstSubNode(node, "qgoal");
+      TiXmlElement* node_states = FindFirstSubNode(node_goal, "state");
+      while(node_states != nullptr)
+      {
+        Config goal = GetAttribute<Config>(node_states, "config");
+        q_goal_region.push_back(goal);
+        node_states = FindNextSiblingNode(node_states);
+      }
+    }
 
     Config dqZero; dqZero.resize(q_init.size()); dqZero.setZero();
     dq_init = GetSubNodeAttributeDefault<Config>(node, "dqinit", "config", dqZero);
@@ -552,6 +565,7 @@ const StrategyInput& PlannerInput::GetStrategyInput()
   sin = new StrategyInput();
   sin->q_init = q_init;
   sin->q_goal = q_goal;
+  sin->q_goal_region = q_goal_region;
   sin->dq_init = dq_init;
   sin->dq_goal = dq_goal;
   sin->name_sampler = name_sampler;

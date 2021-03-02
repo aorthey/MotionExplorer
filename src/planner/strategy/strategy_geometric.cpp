@@ -233,7 +233,10 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
         cspaceContact->setInitialConstraints();
       }else{
         startk = cspace->ConfigToOMPLState(input.q_init);
-        goalk  = cspace->ConfigToOMPLState(input.q_goal);
+        if(input.q_goal_region.size()<=0)
+        {
+          goalk  = cspace->ConfigToOMPLState(input.q_goal);
+        }
       }
   }else{
       startk = cspace->ConfigVelocityToOMPLState(input.q_init, input.dq_init);
@@ -248,8 +251,22 @@ OMPLGeometricStratificationPtr StrategyGeometricMultiLevel::OMPLGeometricStratif
   //goalRegion
   auto goal=std::make_shared<ob::GoalStateDifferentiable>(sik);
   // goal->setState(goalk);
-  goal->addState(goalk);
-  goal->setThreshold(input.epsilon_goalregion);
+
+  if(input.q_goal_region.size()>0)
+  {
+    for(uint k = 0; k < input.q_goal_region.size(); k++)
+    {
+      Config qgk = input.q_goal_region.at(k);
+      ob::ScopedState<> goalk(sik);
+      goalk  = cspace->ConfigToOMPLState(qgk);
+      goal->addState(goalk);
+    }
+    goal->setThreshold(input.epsilon_goalregion);
+  }else{
+    goal->addState(goalk);
+    goal->setThreshold(input.epsilon_goalregion);
+  }
+
   pdefk->setGoal(goal);
   pdefk->setOptimizationObjective( GetOptimizationObjective(sik) );
   OMPLGeometricStratificationPtr stratification = 

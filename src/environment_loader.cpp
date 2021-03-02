@@ -189,10 +189,13 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_)
           throw "Invalid dofs.";
         }
         if(Ng!=N){
-          std::cout << std::string(80, '#') << std::endl;
-          std::cout << "q_goal has " << Ng << " dofs, but robot " << robot->name << " expects " << N << " dofs." << std::endl;
-          std::cout << std::string(80, '#') << std::endl;
-          throw "Invalid dofs.";
+          if(pin.inputs.at(0)->q_goal_region.size() <= 0)
+          {
+            std::cout << std::string(80, '#') << std::endl;
+            std::cout << "q_goal has " << Ng << " dofs, but robot " << robot->name << " expects " << N << " dofs." << std::endl;
+            std::cout << std::string(80, '#') << std::endl;
+            throw "Invalid dofs.";
+          }
         }
 
         robot->q = q_init;

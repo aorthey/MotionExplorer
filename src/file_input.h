@@ -11,6 +11,7 @@ inline TiXmlElement* FindFirstSubNode(TiXmlElement* node, const char *name);
 inline TiXmlElement* FindNextSiblingNode(TiXmlElement* node, const char *name);
 inline TiXmlElement* FindNextSiblingNode(TiXmlElement* node);
 inline bool ExistStreamAttribute(TiXmlElement* node, const char *name);
+inline bool ExistSubnodeAttribute(TiXmlElement* node, const char *name, const char *attribute);
 inline std::stringstream GetStreamAttributeConfig(TiXmlElement* node, const char *name);
 inline int CountNumberOfSubNodes(TiXmlElement* parent, const char *name);
 

@@ -96,6 +96,7 @@ class MotionPlanner{
     std::vector<CSpaceOMPL*> cspace_levels;
     std::vector<Config> config_init_levels;
     std::vector<Config> config_goal_levels;
+    std::vector<std::vector<Config>> config_goal_region_levels;
     std::vector<std::vector<CSpaceOMPL*>> cspace_stratifications;
 
     void InitStrategy();

@@ -64,9 +64,23 @@ int CountNumberOfSubNodes(TiXmlElement* parent, const char *name)
   return ctr;
 }
 
-bool ExistStreamAttribute(TiXmlElement* node, const char *name){
+bool ExistStreamAttribute(TiXmlElement* node, const char *name)
+{
   if(!node) return false;
   const char *na = node->Attribute(name);
+  if(na){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+bool ExistSubnodeAttribute(TiXmlElement* node, const char *name, const char *attribute)
+{
+  if(!node) return false;
+  TiXmlElement* subnode = FindSubNode(node, name);
+  if(!subnode) return false;
+  const char *na = subnode->Attribute(attribute);
   if(na){
     return true;
   }else{

@@ -8,6 +8,13 @@
 
   <plannerinput>
 
+    <!-- <agent --> 
+    <!--   id="0" --> 
+    <!--   qinit="11  0 0 0 0 0 0 +0 0 0 0 0" -->
+    <!--   qgoal="11  0 0 0 0 0 0 -3.14 0 0 0 0" -->
+    <!--   qMin="11  0 0 0 0 0 0 0 0 0 0 0" -->
+    <!--   qMax="11  0 0 0 0 0 0 0 0 0 0 0" -->
+    <!-- /> -->
     <qinit  config="11  0 0 0 0 0 0  +0.00 0.0 0.0 0 0"/>
     <!-- <qinit  config="9  -0.0 +0.0 +0.0 0.0 0.0 0.0  +0.4 0.0 -0.3"/> -->
     <qgoal  config="11  0 0 0 0 0 0  -3.14 0.0 0.8 0 0"/>
@@ -18,14 +25,22 @@
     <pathWidth>0.2</pathWidth>
     <freeFloating>0</freeFloating>
 
-    <algorithm name="multilevel:explorer"/>
     <algorithm name="multilevel:minimaspanner"/>
+    <algorithm name="multilevel:explorer"/>
     <algorithm name="multilevel:smlr"/>
 
     <multilevel>
       <level robot_index="1" type="S1"/>
       <level robot_index="0" type="S1R1"/>
     </multilevel>
+    <!-- <multilevel> -->
+    <!--   <level> -->
+    <!--     <robot id="1" freeFloating="1" type="S1"/> -->
+    <!--   </level> -->
+    <!--   <level> -->
+    <!--     <robot id="0" freeFloating="1" type="S1R1"/> -->
+    <!--   </level> -->
+    <!-- </multilevel> -->
 
   </plannerinput>
 
