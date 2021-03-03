@@ -28,7 +28,7 @@
     <se3max config="6  +1 +1 0 +3.141593 0 0"/>
 
     <epsilongoalregion>0.1</epsilongoalregion>
-    <maxplanningtime>10</maxplanningtime>      <!-- runtime in (s) --> 
+    <maxplanningtime>60</maxplanningtime>      <!-- runtime in (s) --> 
     <pathBorderWidth>0.01</pathBorderWidth>
     <pathWidth>0.1</pathWidth>
     <pathSpeed>3</pathSpeed>

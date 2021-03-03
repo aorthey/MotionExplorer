@@ -13,6 +13,8 @@ struct Layer{
   Config q_init;
   Config q_goal;
   std::vector<Config> q_goal_region;
+  std::vector<std::pair<Config, Config>> q_goal_region_subspace;
+
   Config dq_init;
   Config dq_goal;
   std::string type;
@@ -82,6 +84,7 @@ class PlannerInput{
     Config q_init;
     Config q_goal;
     std::vector<Config> q_goal_region;
+    std::vector<std::pair<Config, Config>> q_goal_region_subspace;
     Config dq_init;
     Config dq_goal;
 

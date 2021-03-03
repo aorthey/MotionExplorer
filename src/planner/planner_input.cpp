@@ -216,11 +216,34 @@ bool PlannerInput::Load(TiXmlElement *node, int hierarchy_index)
     {
       TiXmlElement* node_goal = FindFirstSubNode(node, "qgoal");
       TiXmlElement* node_states = FindFirstSubNode(node_goal, "state");
-      while(node_states != nullptr)
+      if(node_states !=nullptr)
       {
-        Config goal = GetAttribute<Config>(node_states, "config");
-        q_goal_region.push_back(goal);
-        node_states = FindNextSiblingNode(node_states);
+        while(node_states != nullptr)
+        {
+          Config goal = GetAttribute<Config>(node_states, "config");
+          q_goal_region.push_back(goal);
+          node_states = FindNextSiblingNode(node_states);
+        }
+      }else
+      {
+        TiXmlElement* node_subspace = FindFirstSubNode(node_goal, "subspace");
+        if(node_subspace ==nullptr)
+        {
+          std::cout << "Goal specification not understood." << std::endl;
+          throw "";
+          exit(0);
+        }
+
+        while(node_subspace != nullptr)
+        {
+          Config qL = GetAttribute<Config>(node_subspace, "lowerbound");
+          Config qU = GetAttribute<Config>(node_subspace, "upperbound");
+          std::pair<Config, Config> goal = std::make_pair(qL, qU);
+          q_goal_region_subspace.push_back(goal);
+          // std::cout << goal.first << "," << goal.second << std::endl;
+          node_subspace = FindNextSiblingNode(node_subspace);
+        }
+        // exit(0);
       }
     }
 
@@ -566,6 +589,7 @@ const StrategyInput& PlannerInput::GetStrategyInput()
   sin->q_init = q_init;
   sin->q_goal = q_goal;
   sin->q_goal_region = q_goal_region;
+  sin->q_goal_region_subspace = q_goal_region_subspace;
   sin->dq_init = dq_init;
   sin->dq_goal = dq_goal;
   sin->name_sampler = name_sampler;

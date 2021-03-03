@@ -135,6 +135,9 @@ void MultiLevelPathSpace<T>::getPlannerData(base::PlannerData &data) const
     {
         BundleSpaceGraph *Qk = static_cast<BundleSpaceGraph *>(this->bundleSpaces_.at(k));
 
+        //TODO: remove once the new planner runs robustly (only needed for old
+        //explorer version where we do the path enumeration AFTER the planning
+        //step, not inbetween)
         if(needPreprocessing)
         {
             PathSpaceSparseOptimization *Qk_tmp = 

@@ -3,7 +3,6 @@
 #include <ompl/tools/config/SelfConfig.h>
 #include <ompl/datastructures/NearestNeighbors.h>
 #include <ompl/datastructures/PDF.h>
-#include <boost/foreach.hpp>
 #include <boost/math/constants/constants.hpp>
 #include <ompl/multilevel/datastructures/graphsampler/GraphSampler.h>
 #include <ompl/multilevel/datastructures/pathrestriction/PathRestriction.h>
@@ -16,9 +15,16 @@
 #include <ompl/base/objectives/PathLengthOptimizationObjective.h>
 #include <ompl/base/objectives/MaximizeMinClearanceObjective.h>
 
+#include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
+double dInf = std::numeric_limits<double>::infinity();
+
 using namespace ompl::multilevel;
+
+//The idea here is to highjack the "addEdge" method of sparse roadmap spanners. 
+//Whenever this function is called, we compute a candidate path which we then
+//optimize and potentially add to our local minima tree.
 
 PathSpaceSparse::PathSpaceSparse(const base::SpaceInformationPtr &si, BundleSpace *parent_)
   : PathSpace(this), BaseT(si, parent_)
@@ -27,7 +33,7 @@ PathSpaceSparse::PathSpaceSparse(const base::SpaceInformationPtr &si, BundleSpac
 
     setName("PathSpaceSparse" + std::to_string(id_));
 
-    sparseDeltaFraction_ = 0.1; //original is 0.25
+    sparseDeltaFraction_ = 0.1; //original is 0.25 (SMLR). We used 0.15 for WAFR
     maxFailures_ = 1000;
 
     if (hasBaseSpace())
@@ -46,54 +52,130 @@ void PathSpaceSparse::setup()
     BaseT::setup();
 }
 
+void PathSpaceSparse::grow()
+{
+    BaseT::grow();
+
+    //from time to time add some more goal configurations to our roadmap
+    if(pis_.getSampledGoalsCount() < getGoalPtr()->maxSampleCount())
+    {
+        const base::State *state = pis_.nextGoal();
+        Configuration *qgoal = new Configuration(getBundle(), state);
+        qgoal->isGoal = true;
+        addConfiguration(qgoal);
+        goalConfigurations_.push_back(qgoal);
+    }
+
+}
+
 ompl::base::PathPtr& PathSpaceSparse::getSolutionPathByReference()
 {
   return getBestPathPtrNonConst();
 }
 
+const BundleSpaceGraph::Vertex 
+PathSpaceSparse::getNearestStartVertex(
+const std::pair<BundleSpaceGraph::Edge, bool> &edge)
+{
+    if(startConfigurations_.size() > 0)
+    {
+        std::cout << "NYI" << std::endl;
+        exit(0);
+    }else
+    {
+        return getStartIndex();
+    }
+}
+
+const BundleSpaceGraph::Vertex 
+PathSpaceSparse::getNearestGoalVertex(
+const std::pair<BundleSpaceGraph::Edge, bool> &edge)
+{
+    const Vertex v = boost::source(edge.first, getGraph());
+    if(goalConfigurations_.size() > 0)
+    {
+        double dBest = dInf;
+        Vertex vBest = 0;
+        bool foundBest = false;
+        foreach (Configuration *goal, goalConfigurations_)
+        {
+            bool eligible = sameComponent(v, goal->index);
+            if(eligible)
+            {
+                double d = distance(getGraph()[v], goal);
+                if(d < dBest)
+                {
+                    dBest = d;
+                    vBest = goal->index;
+                    // std::cout << "Best goal index (d=" << d << "): " << goal->index << std::endl;
+                    foundBest = true;
+                }
+            }
+        }
+        if(foundBest) return vBest;
+    }
+    return getGoalIndex();
+}
+
 const std::pair<BundleSpaceGraph::Edge, bool> 
 PathSpaceSparse::addEdge(const Vertex a, const Vertex b)
 {
-    auto edge = BaseT::addEdge(a, b);
+    // std::cout << getStartIndex() << std::endl;
+    // std::cout << getGoalIndex() << std::endl;
+    // std::cout << getNumberOfVertices() << std::endl;
+    // std::cout << a << "," << b << std::endl;
+    const std::pair<Edge, bool> edge = BaseT::addEdge(a, b);
 
-    const Vertex vt = boost::target(edge.first, getGraph());
-    const Vertex vs = boost::source(edge.first, getGraph());
-    const Vertex vStart = getStartIndex();
-    const Vertex vGoal = getGoalIndex();
-    if(vt!=vStart && vt!=vGoal)
-    { 
-      checkPath(vt, vStart, vGoal);
-    }else{
-      if(vs!=vStart && vs!=vGoal)
-      {
-        checkPath(vs, vStart, vGoal);
-      }
-      //do not checkPath if only one edge exists between start/goal
-    }
+    const Vertex vStart = getNearestStartVertex(edge);
+    const Vertex vGoal = getNearestGoalVertex(edge);
+    const Vertex v = boost::source(edge.first, getGraph());
+
+    checkPath(v, vStart, vGoal);
 
     return edge;
 }
 
+ompl::base::PathPtr PathSpaceSparse::constructPath(const Vertex v, const Vertex vStart, const Vertex vGoal)
+{
+    base::PathPtr path1 = getPath(vStart, v);
+    base::PathPtr path2 = getPath(v, vGoal);
+
+    if(!path1)
+    {
+        return path2;
+    }
+    if(!path2)
+    {
+        return path1;
+    }
+
+    geometric::PathGeometric &gpath1 = 
+      static_cast<geometric::PathGeometric &>(*path1);
+    geometric::PathGeometric &gpath2 = 
+      static_cast<geometric::PathGeometric &>(*path2);
+    std::vector<base::State*> states = gpath2.getStates();
+    for(uint k = 0; k < states.size(); k++)
+    {
+      base::State* sk = states.at(k);
+      gpath1.append(sk);
+    }
+    return path1;
+}
+
 void PathSpaceSparse::checkPath(const Vertex v, const Vertex vStart, const Vertex vGoal)
 {
+  //how to best get additional (diverse) goal states?
     bool eligible = sameComponent(vStart, v) && sameComponent(v, vGoal);
+
+    // std::cout << "Goal states:" << goalConfigurations_.size() << std::endl;
+    // std::cout << "Vertices: v=" << v << " vStart=" 
+    //   << vStart << " vGoal=" << vGoal << std::endl;
 
     if (eligible)
     {
-        ompl::base::PathPtr pPath = getPath(vStart, v);
-        ompl::base::PathPtr pPath2 = getPath(v, vGoal);
-
+        ompl::base::PathPtr path = constructPath(v, vStart, vGoal);
         geometric::PathGeometric &gpath = 
-          static_cast<geometric::PathGeometric &>(*pPath);
-        geometric::PathGeometric &gpath2 = 
-          static_cast<geometric::PathGeometric &>(*pPath2);
-
-        std::vector<base::State*> states = gpath2.getStates();
-        for(uint k = 0; k < states.size(); k++)
-        {
-          base::State* sk = states.at(k);
-          gpath.append(sk);
-        }
+          static_cast<geometric::PathGeometric &>(*path);
 
         optimizePath(gpath);
 
@@ -122,7 +204,7 @@ void PathSpaceSparse::checkPath(const Vertex v, const Vertex vStart, const Verte
                 if (pathcost < getPathCost(i))
                 {
                     OMPL_INFORM("Update minima %d with path.", i);
-                    updatePath(i, pPath, pathcost);
+                    updatePath(i, path, pathcost);
                 }
                 //DEBUG
                 // isVisible = false;
@@ -132,7 +214,7 @@ void PathSpaceSparse::checkPath(const Vertex v, const Vertex vStart, const Verte
 
         if (!isVisible)
         {
-            addPath(pPath, pathcost);
+            addPath(path, pathcost);
         }
 
         if (pathcost < bestCost_)

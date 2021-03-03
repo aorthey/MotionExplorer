@@ -4,12 +4,14 @@
 #include <ompl/multilevel/planners/multimodal/datastructures/PathSpace.h>
 #include <ompl/datastructures/PDF.h>
 #include <ompl/geometric/PathGeometric.h>
+#include <ompl/base/Path.h>
 
 namespace ompl
 {
     namespace base
     {
         OMPL_CLASS_FORWARD(OptimizationObjective);
+        OMPL_CLASS_FORWARD(Path);
     }
     namespace geometric
     {
@@ -31,16 +33,17 @@ namespace ompl
 
             virtual ~PathSpaceSparse() override;
 
-            // virtual void grow() override;
+            virtual void grow() override;
 
             virtual void setup() override;
 
-            virtual ompl::base::PathPtr& getSolutionPathByReference() override;
+            virtual base::PathPtr& getSolutionPathByReference() override;
 
             virtual const std::pair<BundleSpaceGraph::Edge, bool> 
               addEdge(const Vertex a, const Vertex b) override;
 
             void checkPath(const Vertex v, const Vertex vStart, const Vertex vGoal);
+            base::PathPtr constructPath(const Vertex v, const Vertex vStart, const Vertex vGoal);
 
 
         protected:
@@ -49,6 +52,11 @@ namespace ompl
             PathVisibilityChecker *pathVisibilityChecker_{nullptr};
 
             void optimizePath(geometric::PathGeometric&);
+
+            const Vertex 
+            getNearestGoalVertex(const std::pair<BundleSpaceGraph::Edge, bool> &edge);
+            const Vertex 
+            getNearestStartVertex(const std::pair<BundleSpaceGraph::Edge, bool> &edge);
         };
     }  // namespace multilevel
 }  // namespace ompl

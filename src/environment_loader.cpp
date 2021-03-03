@@ -189,7 +189,8 @@ EnvironmentLoader::EnvironmentLoader(const char *file_name_)
           throw "Invalid dofs.";
         }
         if(Ng!=N){
-          if(pin.inputs.at(0)->q_goal_region.size() <= 0)
+          if(pin.inputs.at(0)->q_goal_region.size() <= 0
+              && pin.inputs.at(0)->q_goal_region_subspace.size() <= 0)
           {
             std::cout << std::string(80, '#') << std::endl;
             std::cout << "q_goal has " << Ng << " dofs, but robot " << robot->name << " expects " << N << " dofs." << std::endl;

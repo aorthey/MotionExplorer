@@ -10,8 +10,11 @@ namespace ob = ompl::base;
 
 struct StrategyInput{
   Config q_init;
+
   Config q_goal;
   std::vector<Config> q_goal_region;
+  std::vector<std::pair<Config, Config>> q_goal_region_subspace;
+
   Config dq_init;
   Config dq_goal;
   std::string name_algorithm;

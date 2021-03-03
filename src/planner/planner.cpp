@@ -254,6 +254,7 @@ void MotionPlanner::CreateHierarchy()
 
         if(input.q_goal_region.size() > 0)
         {
+            //MULTI STATE GOAL
             for(uint j = 0; j < input.q_goal_region.size(); j++)
             {
               Config qj = input.q_goal_region.at(j);
@@ -261,14 +262,42 @@ void MotionPlanner::CreateHierarchy()
               cspace_level_k->ConfigToOMPLState(qj, stateTmp);
               qj = cspace_level_k->OMPLStateToConfig(stateTmp);
               layers.at(k).q_goal_region.push_back(qj);
+              //TODO: uncomment?
               config_goal_levels.push_back(qj);
             }
             config_goal_region_levels.push_back( layers.at(k).q_goal_region );
         }else{
+          if(input.q_goal_region_subspace.size()>0)
+          {
+            //SUBSPACE GOAL
+    // std::vector<std::vector<std::pair<Config,Config>>> config_goal_region_levels_subspace;
+            for(uint j = 0; j < input.q_goal_region_subspace.size(); j++)
+            {
+              Config qL = input.q_goal_region_subspace.at(j).first;
+              qL.resize(N);
+              cspace_level_k->ConfigToOMPLState(qL, stateTmp);
+              qL = cspace_level_k->OMPLStateToConfig(stateTmp);
+
+              Config qU = input.q_goal_region_subspace.at(j).second;
+              qU.resize(N);
+              cspace_level_k->ConfigToOMPLState(qU, stateTmp);
+              qU = cspace_level_k->OMPLStateToConfig(stateTmp);
+
+              std::pair<Config, Config> qsubspace;
+              qsubspace.first = qL;
+              qsubspace.second = qU;
+              layers.at(k).q_goal_region_subspace.push_back(qsubspace);
+
+              // config_goal_levels.push_back(qj);
+            }
+            config_goal_region_levels_subspace.push_back( layers.at(k).q_goal_region_subspace );
+          }else{
+            //SINGLE STATE GOAL
             Config qg_full = input.q_goal; qg_full.resize(N);
             cspace_level_k->ConfigToOMPLState(qg_full, stateTmp);
             qg = cspace_level_k->OMPLStateToConfig(stateTmp);
             layers.at(k).q_goal = qg;
+          }
         }
 
       }else{
@@ -385,9 +414,26 @@ void MotionPlanner::CreateHierarchy()
         }
         config_goal_region_levels.push_back(goalConfigVec);
       }else{
-        cspace->ConfigToOMPLState(qg, stateTmp);
-        cspace->SetTime(stateTmp, 1);
-        qg = cspace->OMPLStateToConfig(stateTmp);
+        if(input.q_goal_region_subspace.size()>0)
+        {
+          std::vector<std::pair<Config, Config>> subspaceConfigVec;
+          for(uint j = 0; j < input.q_goal_region_subspace.size(); j++)
+          {
+            std::pair<Config,Config> q = input.q_goal_region_subspace.at(j);
+            q.first.resize(N);
+            cspace->ConfigToOMPLState(q.first, stateTmp);
+            q.first = cspace->OMPLStateToConfig(stateTmp);
+            q.second.resize(N);
+            cspace->ConfigToOMPLState(q.second, stateTmp);
+            q.second = cspace->OMPLStateToConfig(stateTmp);
+            subspaceConfigVec.push_back(q);
+          }
+          config_goal_region_levels_subspace.push_back(subspaceConfigVec);
+        }else{
+          cspace->ConfigToOMPLState(qg, stateTmp);
+          cspace->SetTime(stateTmp, 1);
+          qg = cspace->OMPLStateToConfig(stateTmp);
+        }
       }
     }
 
@@ -749,15 +795,34 @@ void MotionPlanner::DrawGLStartGoal(GUIState& state)
     {
       const std::vector<Config> qgVec = config_goal_region_levels.at(current_level);
       const std::vector<Config> qgOuterVec = config_goal_region_levels.at(max_levels_);
-      for(uint k = 0; k < qgVec.size(); k++){
+      for(uint k = 0; k < qgVec.size(); k++)
+      {
         Config qk = qgVec.at(k);
         Config qkOuter = qgOuterVec.at(k);
         qspace->drawConfig(qk, colorGoalConfiguration);
         cspace->drawConfig(qkOuter, colorGoalConfigurationTransparent);
       }
     }else{
-      qspace->drawConfig(qg, colorGoalConfiguration);
-      cspace->drawConfig(qgOuter, colorGoalConfigurationTransparent);
+      if(config_goal_region_levels_subspace.size()>0)
+      {
+        if(qspace->GetDimensionality() < 3)
+        {
+          const std::vector<std::pair<Config,Config>> qs 
+            = config_goal_region_levels_subspace.at(current_level);
+          //visualize 2D area
+          for(uint i = 0; i < qs.size(); i++){
+            std::pair<Config,Config> qi = qs.at(i);
+            Config qL = qi.first;
+            Config qU = qi.second;
+            qspace->drawConfig(qL, colorGoalConfiguration);
+            qspace->drawConfig(qU, colorGoalConfiguration);
+          }
+
+        }
+      }else{
+        qspace->drawConfig(qg, colorGoalConfiguration);
+        cspace->drawConfig(qgOuter, colorGoalConfigurationTransparent);
+      }
     }
   }
 }

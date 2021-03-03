@@ -1,3 +1,7 @@
+MOST PRESSING ISSUES:
+(1) What to do about non-converged minima?
+(2) Fix multilevel assignment of minima to classes
+
 ---- Theory/Algorithmic Tasks
 
 [ ] How to address minima which have not yet been converged (example:
@@ -9,8 +13,13 @@ problem of the OPTIMIZER. Our job is only to detect it and point it out.
 strategy maybe)
 
 ---- Pipeline Tasks
+
 [ ] Implement multi-goal regions
-  [ ] Allow specification in XML (first do multiple states)
+  [x] Allow specification in XML (first do multiple states)
+  [ ] Allow goal-space-region specification
+
+[ ] Get rid of dynamics. Would be nice, but makes it too complicated to
+understand. Better have that as a separate contribution.
 
 [ ] Pipe it all to blender 
   [x] Export scene to dae. 
@@ -37,6 +46,9 @@ different symbols)
   [ ] Overtaking in time
   [ ] Different robots to combine Left/Right, Up/Down, CW/CCW
   [ ] Different grasping positions! Requires goal states
+  [ ] Scenario where multiple goal regions are important. Touch table? Subspace
+goal regions! 2D scenario: escape cube? Minima are direct connections from
+center to faces.
 
 ---- Finished Tasks
 [x] Rename BasePathHead -> Head

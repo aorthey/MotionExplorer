@@ -14,7 +14,7 @@
     <qgoal config="6  +2.0 0 0 0 0 0 "/>
 
     <freeFloating>1</freeFloating>
-    <maxplanningtime>5</maxplanningtime>
+    <maxplanningtime>60</maxplanningtime>
     <pathSpeed>12</pathSpeed>
     <threading>1</threading>
 
